@@ -72,7 +72,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 RawDims = float2(RawWidth, RawHeight);
 	float2 TexCoord = Input.TexCoord * RawDims;
-	TexCoord -= frac(float2(0.0f, TexCoord.y));
+	TexCoord -= frac(TexCoord);
+	TexCoord += 0.5f;
 	TexCoord /= RawDims;
 	
 	float4 Center = tex2D(DiffuseSampler, TexCoord);

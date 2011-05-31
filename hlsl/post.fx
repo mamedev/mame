@@ -129,7 +129,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float PincushionR2 = pow(length(PinUnitCoord), 2.0f) / pow(length(Ratios), 2.0f);
 	float2 PincushionCurve = PinUnitCoord * PincushionAmount * PincushionR2;
 	float2 BaseCoord = Input.TexCoord;
-	float2 ScanCoord = BaseCoord - 0.5f / (float2(RawWidth, RawHeight) * Ratios);
+	float2 ScanCoord = BaseCoord - 0.5f / float2(TargetWidth, TargetHeight);
 	
 	BaseCoord -= 0.5f / Ratios;
 	BaseCoord *= 1.0f - PincushionAmount * Ratios * 0.2f; // Warning: Magic constant

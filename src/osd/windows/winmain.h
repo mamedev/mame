@@ -96,8 +96,6 @@
 #define WINOPTION_SCREEN_SCALE_TOP			"screen_scale_top"
 #define WINOPTION_SCREEN_SCALE_BOTTOM		"screen_scale_bottom"
 #define WINOPTION_CURVATURE					"curvature"
-#define WINOPTION_OVERSAMPLE_X				"oversample_x"
-#define WINOPTION_OVERSAMPLE_Y				"oversample_y"
 #define WINOPTION_SCANLINE_AMOUNT			"scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE			"scanline_size"
 #define WINOPTION_SCANLINE_HEIGHT			"scanline_height"
@@ -231,8 +229,6 @@ public:
 	int screen_shadow_mask_count_y() const { return int_value(WINOPTION_SHADOW_MASK_COUNT_Y); }
 	float screen_shadow_mask_u_size() const { return float_value(WINOPTION_SHADOW_MASK_USIZE); }
 	float screen_shadow_mask_v_size() const { return float_value(WINOPTION_SHADOW_MASK_VSIZE); }
-	float screen_oversample_x() const { return float_value(WINOPTION_OVERSAMPLE_X); }
-	float screen_oversample_y() const { return float_value(WINOPTION_OVERSAMPLE_Y); }
 	float screen_scanline_amount() const { return float_value(WINOPTION_SCANLINE_AMOUNT); }
 	float screen_scanline_scale() const { return float_value(WINOPTION_SCANLINE_SCALE); }
 	float screen_scanline_height() const { return float_value(WINOPTION_SCANLINE_HEIGHT); }

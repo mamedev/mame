@@ -371,8 +371,6 @@ struct _d3d_info
 	bool					yiq_enable;					// HLSL YIQ-convolution flag
 	int						hlsl_prescale_size;			// HLSL prescale size
 	int						hlsl_preset;				// HLSL preset, if relevant
-	float					oversample_x;				// render target oversampling factor (width) for shader prettification
-	float					oversample_y;				// render target oversampling factor (height) for shader prettification
 	bitmap_t *				shadow_bitmap;				// shadow mask bitmap for post-processing shader
 	texture_info *			shadow_texture;				// shadow mask texture for post-processing shader
 	int						registered_targets;			// Number of registered HLSL targets (i.e., screens)
@@ -1520,8 +1518,6 @@ try_again:
 	d3d->create_error_count = 0;
 	mame_printf_verbose("Direct3D: Device created at %dx%d\n", d3d->width, d3d->height);
 
-	d3d->oversample_x = downcast<windows_options &>(d3d->window->machine().options()).screen_oversample_x();
-	d3d->oversample_y = downcast<windows_options &>(d3d->window->machine().options()).screen_oversample_y();
 	d3d->hlsl_snap_width = downcast<windows_options &>(d3d->window->machine().options()).d3d_snap_width();
 	d3d->hlsl_snap_height = downcast<windows_options &>(d3d->window->machine().options()).d3d_snap_height();
 
@@ -1803,7 +1799,7 @@ static int device_create_resources(d3d_info *d3d)
 	// experimental: initialize some more things if we're using HLSL
 	if(d3d->hlsl_enable && d3dintf->post_fx_available)
 	{
-		result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &d3d->hlsl_avi_copy_texture);
+		result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->hlsl_snap_width), (int)(d3d->hlsl_snap_height), 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &d3d->hlsl_avi_copy_texture);
 		if (result != D3D_OK)
 		{
 			mame_printf_verbose("Direct3D: Unable to init system-memory target for HLSL AVI dumping (%08x)\n", (UINT32)result);
@@ -1811,7 +1807,7 @@ static int device_create_resources(d3d_info *d3d)
 		}
 		(*d3dintf->texture.get_surface_level)(d3d->hlsl_avi_copy_texture, 0, &d3d->hlsl_avi_copy_surface);
 
-		result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsl_avi_final_texture);
+		result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->hlsl_snap_width), (int)(d3d->hlsl_snap_height), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsl_avi_final_texture);
 		if (result != D3D_OK)
 		{
 			mame_printf_verbose("Direct3D: Unable to init video-memory target for HLSL AVI dumping (%08x)\n", (UINT32)result);
@@ -2159,7 +2155,7 @@ static int device_verify_caps(d3d_info *d3d, win_window_info *window)
 
 	d3d->hlsl_enable = downcast<windows_options &>(window->machine().options()).d3d_hlsl_enable() && d3dintf->post_fx_available;
 	d3d->yiq_enable = downcast<windows_options &>(window->machine().options()).screen_yiq_enable();
-	d3d->hlsl_prescale_size = downcast<windows_options &>(window->machine().options()).d3d_hlsl_prescale_size();
+	d3d->hlsl_prescale_size = 1;
 	d3d->hlsl_preset = downcast<windows_options &>(window->machine().options()).d3d_hlsl_preset();
 
 	result = (*d3dintf->d3d.get_caps_dword)(d3dintf, d3d->adapter, D3DDEVTYPE_HAL, CAPS_MAX_PS30_INSN_SLOTS, &tempcaps);
@@ -3616,13 +3612,13 @@ static void hlsl_avi_update_snap(d3d_info *d3d, d3d_surface *surface)
 	D3DLOCKED_RECT rect;
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (d3d->hlsl_avi_snap == NULL || (int)((float)d3d->width * d3d->oversample_x) != d3d->hlsl_avi_snap->width || (int)((float)d3d->height * d3d->oversample_y) != d3d->hlsl_avi_snap->height)
+	if (d3d->hlsl_avi_snap == NULL || (int)(d3d->hlsl_snap_width) != d3d->hlsl_avi_snap->width || (int)(d3d->hlsl_snap_height) != d3d->hlsl_avi_snap->height)
 	{
 		if (d3d->hlsl_avi_snap != NULL)
 		{
 			auto_free(d3d->window->machine(), d3d->hlsl_avi_snap);
 		}
-		d3d->hlsl_avi_snap = auto_alloc(d3d->window->machine(), bitmap_t((int)((float)d3d->width * d3d->oversample_x), (int)((float)d3d->height * d3d->oversample_y), BITMAP_FORMAT_RGB32));
+		d3d->hlsl_avi_snap = auto_alloc(d3d->window->machine(), bitmap_t((int)(d3d->hlsl_snap_width), (int)(d3d->hlsl_snap_height), BITMAP_FORMAT_RGB32));
 	}
 
 	// copy the texture
@@ -3642,12 +3638,12 @@ static void hlsl_avi_update_snap(d3d_info *d3d, d3d_surface *surface)
 	}
 
 	// loop over Y
-	for (int srcy = 0; srcy < (int)((float)d3d->height * d3d->oversample_y); srcy++)
+	for (int srcy = 0; srcy < (int)d3d->hlsl_snap_height; srcy++)
 	{
 		BYTE *src = (BYTE *)rect.pBits + srcy * rect.Pitch;
 		BYTE *dst = (BYTE *)d3d->hlsl_avi_snap->base + srcy * d3d->hlsl_avi_snap->rowpixels * 4;
 
-		for(int x = 0; x < (int)((float)d3d->width * d3d->oversample_x); x++)
+		for(int x = 0; x < d3d->hlsl_snap_width; x++)
 		{
 			*dst++ = *src++;
 			*dst++ = *src++;
@@ -3844,8 +3840,8 @@ static void begin_hlsl_avi_recording(d3d_info *d3d, const char *name)
 	info.video_timescale = 1000 * ((d3d->window->machine().primary_screen != NULL) ? ATTOSECONDS_TO_HZ(d3d->window->machine().primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
-	info.video_width = d3d->width * d3d->oversample_x;
-	info.video_height = d3d->height * d3d->oversample_y;
+	info.video_width = d3d->hlsl_snap_width;
+	info.video_height = d3d->hlsl_snap_height;
 	info.video_depth = 24;
 
 	info.audio_format = 0;
@@ -3976,47 +3972,51 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 					{
 						int idx = d3d->registered_targets;
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture0[idx]);
+						// Find the nearest prescale factor that is over our screen size
+						int hlsl_prescale = 1;
+						while(texture->rawwidth * hlsl_prescale < d3d->width) hlsl_prescale++;
+						while(texture->rawheight * hlsl_prescale < d3d->height) hlsl_prescale++;
+						d3d->hlsl_prescale_size = hlsl_prescale;
+
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture0[idx], 0, &d3d->hlsltarget0[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_hlsltexture[idx]);
-						if (result != D3D_OK)
-							goto error;
-						(*d3dintf->texture.get_surface_level)(d3d->last_hlsltexture[idx], 0, &d3d->last_hlsltarget[idx]);
-
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture1[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture1[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture1[idx], 0, &d3d->hlsltarget1[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture2[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture2[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture2[idx], 0, &d3d->hlsltarget2[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture3[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture3[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture3[idx], 0, &d3d->hlsltarget3[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture4[idx], 0, &d3d->hlsltarget4[idx]);
 
-						int scale = d3d->hlsl_prescale_size;
-
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * scale, texture->rawheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslsmalltexture0[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslsmalltexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlslsmalltexture0[idx], 0, &d3d->hlslsmalltarget0[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * scale, texture->rawheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslprescaletexture0[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslprescaletexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlslprescaletexture0[idx], 0, &d3d->hlslprescaletarget0[idx]);
+
+						result = (*d3dintf->device.create_texture)(d3d->device, d3d->width, d3d->height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_hlsltexture[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->last_hlsltexture[idx], 0, &d3d->last_hlsltarget[idx]);
 
 						texture->target_index = d3d->registered_targets;
 						d3d->target_use_count[texture->target_index] = 60;
@@ -4067,47 +4067,51 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 					{
 						int idx = d3d->registered_targets;
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture0[idx]);
+						// Find the nearest prescale factor that is over our screen size
+						int hlsl_prescale = 1;
+						while(texture->rawwidth * hlsl_prescale < d3d->width) hlsl_prescale++;
+						while(texture->rawheight * hlsl_prescale < d3d->height) hlsl_prescale++;
+						d3d->hlsl_prescale_size = hlsl_prescale;
+
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture0[idx], 0, &d3d->hlsltarget0[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_hlsltexture[idx]);
-						if (result != D3D_OK)
-							goto error;
-						(*d3dintf->texture.get_surface_level)(d3d->last_hlsltexture[idx], 0, &d3d->last_hlsltarget[idx]);
-
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture1[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture1[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture1[idx], 0, &d3d->hlsltarget1[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture2[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture2[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture2[idx], 0, &d3d->hlsltarget2[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture3[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture3[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture3[idx], 0, &d3d->hlsltarget3[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture4[idx], 0, &d3d->hlsltarget4[idx]);
 
-						int scale = d3d->hlsl_prescale_size;
-
-						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * scale, scheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslsmalltexture0[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslsmalltexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlslsmalltexture0[idx], 0, &d3d->hlslsmalltarget0[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * scale, scheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslprescaletexture0[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslprescaletexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlslprescaletexture0[idx], 0, &d3d->hlslprescaletarget0[idx]);
+
+						result = (*d3dintf->device.create_texture)(d3d->device, d3d->width, d3d->height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_hlsltexture[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->last_hlsltexture[idx], 0, &d3d->last_hlsltarget[idx]);
 
 						texture->target_index = d3d->registered_targets;
 						d3d->target_use_count[texture->target_index] = 60;

@@ -117,8 +117,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	Deconverge = 1.0f;//clamp(Deconverge, 0.0f, 1.0f);
 	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;
 	
-	float2 TargetDims = float2(RawWidth * Prescale, RawHeight * Prescale);
-	float2 DimOffset = 0.5f / TargetDims;
+	float2 TargetDims = float2(RawWidth, RawHeight);
+	float2 DimOffset = 0.0f / TargetDims;
 	float2 TexCoord = Input.TexCoord;
 	float2 RedCoord = Input.RedCoord;
 	float2 GrnCoord = Input.GrnCoord;
