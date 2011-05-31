@@ -19,21 +19,32 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MC146818_ADD(_tag, _type) \
+#define MCFG_MC146818_IRQ_ADD(_tag, _type, _intrf) \
 	MCFG_DEVICE_ADD(_tag, MC146818, 0) \
 	mc146818_device::static_set_type(*device, mc146818_device::_type); \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-
+#define MCFG_MC146818_ADD(_tag, _type) \
+	MCFG_DEVICE_ADD(_tag, MC146818, 0) \
+	mc146818_device::static_set_type(*device, mc146818_device::_type); 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> mc146818_interface
+
+struct mc146818_interface
+{
+	devcb_write_line	m_out_irq_cb;
+};
+
 // ======================> mc146818_device
 
 class mc146818_device :	public device_t,
 						public device_rtc_interface,
-						public device_nvram_interface
+						public device_nvram_interface,
+						public mc146818_interface
 {
 public:
 	// values
@@ -58,6 +69,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_rtc_interface overrides
@@ -87,6 +99,15 @@ protected:
 	bool			m_updated;  /* update ended interrupt flag */
 
 	attotime		m_last_refresh;
+	attotime		m_period;
+	
+	static const device_timer_id TIMER_CLOCK = 0;
+	static const device_timer_id TIMER_PERIODIC = 1;
+
+	emu_timer *m_clock_timer;
+	emu_timer *m_periodic_timer;
+
+	devcb_resolved_write_line m_out_irq_func;
 };
 
 

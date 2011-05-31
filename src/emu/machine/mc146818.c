@@ -142,19 +142,45 @@ void mc146818_device::static_set_type(device_t &device, mc146818_type type)
 void mc146818_device::device_start()
 {
 	m_last_refresh = machine().time();
-	emu_timer *timer = timer_alloc();
+	m_clock_timer = timer_alloc(TIMER_CLOCK);
+	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 
 	memset(m_data, 0, sizeof(m_data));
 
 	if (m_type == MC146818_UTC) {
 		// hack: for apollo we increase the update frequency to stay in sync with real time
-		timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+		m_clock_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 	} else {
-		timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
+		m_clock_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 	}
+
+	m_periodic_timer->adjust(attotime::never);
+	m_period = attotime::never;
+
 	set_base_datetime();
+
+	m_out_irq_func.resolve(m_out_irq_cb, *this);
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mc146818_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const mc146818_interface *intf = reinterpret_cast<const mc146818_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<mc146818_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+	}
+}
 
 //-------------------------------------------------
 //  device_timer - handler timer events
@@ -163,6 +189,12 @@ void mc146818_device::device_start()
 void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int year/*, month*/;
+
+	if (id == TIMER_PERIODIC) {
+		m_data[0x0c] |= 0xc0;
+		if (!m_out_irq_func.isnull()) m_out_irq_func(CLEAR_LINE);
+		return;
+	}
 
 	if (m_type == MC146818_UTC) {
 		// hack: set correct real time even for overloaded emulation
@@ -283,9 +315,12 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 	// set the interrupt request flag IRQF
 	// FIXME: should throw IRQ line as well
-	if ((m_data[0x0b] & m_data[0x0c] & 0x70) != 0) {
+	if ((m_data[0x0b] & m_data[0x0c] & 0x30) != 0) {
 		m_data[0x0c] |=  0x80;
 	}
+
+	// IRQ line is active low
+	if (!m_out_irq_func.isnull()) m_out_irq_func((m_data[0x0c] & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_updated = true;  /* clock has been updated */
 	m_last_refresh = machine().time();
@@ -430,6 +465,7 @@ READ8_MEMBER( mc146818_device::read )
 			data = m_data[m_index % MC146818_DATA_SIZE] & 0xf0;
 			// read 0x0c will clear all IRQ flags in register 0x0c
 			m_data[m_index % MC146818_DATA_SIZE] &= 0x0f;
+			if (!m_out_irq_func.isnull()) m_out_irq_func(ASSERT_LINE);
 			break;
 		case 0xd:
 			/* battery ok */
@@ -455,6 +491,7 @@ READ8_MEMBER( mc146818_device::read )
 
 WRITE8_MEMBER( mc146818_device::write )
 {
+	attotime rate;
 	if (LOG_MC146818)
 		logerror("mc146818_port_w(): index=0x%02x data=0x%02x\n", m_index, data);
 
@@ -466,9 +503,30 @@ WRITE8_MEMBER( mc146818_device::write )
 	case 1:
 		switch(m_index % MC146818_DATA_SIZE)
 		{
+		case 0x0a:
+			// fixme: allow different time base
+			data &= 0x0f;
+			if (m_data[0x0b] & 0x40) {
+				if (data > 2) 
+					m_period = attotime::from_hz(32768 >> (data - 1));
+				else if (data > 0)
+					m_period = attotime::from_hz(32768 >> (data + 6));
+				else m_period = attotime::never;
+				rate = attotime::zero;
+			} else rate = attotime::never;
+			m_periodic_timer->adjust(rate, 0, m_period);
+			data |= m_data[m_index % MC146818_DATA_SIZE] & 0xf0;
+			m_data[m_index % MC146818_DATA_SIZE] = data;
+			break;
 		case 0x0b:
 			if(data & 0x80)
 				m_updated = false;
+			// this probably isn't right but otherwise
+			// you'll be making a lot of unnecessary callbacks
+			if (data & 0x40)
+				m_periodic_timer->adjust(attotime::zero, 0, m_period);
+			else
+				m_periodic_timer->adjust(attotime::never);
 			m_data[m_index % MC146818_DATA_SIZE] = data;
 			break;
 		case 0x0c:
