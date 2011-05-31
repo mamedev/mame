@@ -4072,8 +4072,8 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 
 						// Find the nearest prescale factor that is over our screen size
 						int hlsl_prescale = 1;
-						while(texture->rawwidth * hlsl_prescale < d3d->width) hlsl_prescale++;
-						while(texture->rawheight * hlsl_prescale < d3d->height) hlsl_prescale++;
+						while(scwidth * hlsl_prescale < d3d->width) hlsl_prescale++;
+						while(scheight * hlsl_prescale < d3d->height) hlsl_prescale++;
 						d3d->hlsl_prescale_size = hlsl_prescale;
 
 						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture0[idx]);
