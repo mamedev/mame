@@ -786,7 +786,8 @@ public:
 	void enable_watchpoints(bool enable = true) { m_live_lookup = enable ? s_watchpoint_table : m_table; }
 
 	// table mapping helpers
-	UINT8 map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT8 staticentry = 0);
+	void map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT8 staticentry);
+	UINT8 setup_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror);
 	UINT8 derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const;
 
 	// misc helpers
@@ -857,7 +858,7 @@ public:
 
 	// range getter
 	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
-		UINT32 entry = map_range(bytestart, byteend, bytemask, bytemirror);
+		UINT32 entry = setup_range(bytestart, byteend, bytemask, bytemirror);
 		return handler_entry_proxy<handler_entry_read>(handler_read(entry), mask);
 	}
 
@@ -919,7 +920,7 @@ public:
 
 	// range getter
 	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
-		UINT32 entry = map_range(bytestart, byteend, bytemask, bytemirror);
+		UINT32 entry = setup_range(bytestart, byteend, bytemask, bytemirror);
 		return handler_entry_proxy<handler_entry_write>(handler_write(entry), mask);
 	}
 
@@ -3177,12 +3178,11 @@ address_table::~address_table()
 
 
 //-------------------------------------------------
-//  map_range - finds an approprite handler entry
-//  and requests to populate the address map with
-//  it
+//  map_range - map a specific entry in the address
+//  map
 //-------------------------------------------------
 
-UINT8 address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 staticentry)
+void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 entry)
 {
 	// convert addresses to bytes
 	offs_t bytestart = addrstart;
@@ -3196,45 +3196,74 @@ UINT8 address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask
 	assert_always((bytestart & (m_space.data_width() / 8 - 1)) == 0, "address_table::map_range called with misaligned start address");
 	assert_always((byteend & (m_space.data_width() / 8 - 1)) == (m_space.data_width() / 8 - 1), "address_table::map_range called with misaligned end address");
 
-	// if we weren't given an explicit entry, find a free one
-	UINT8 entry = staticentry;
-	if (entry == STATIC_INVALID)
-	{
-		// two attempts to find an empty
-		for (int attempt = 0; attempt < 2; attempt++)
-		{
-			// scan all possible assigned entries for something unpopulated, or for an exact match
-			for (UINT8 scanentry = STATIC_COUNT; scanentry < SUBTABLE_BASE; scanentry++)
-			{
-				handler_entry &curentry = handler(scanentry);
-
-				// exact match takes precedence
-				if (curentry.matches_exactly(bytestart, byteend, bytemask))
-				{
-					entry = scanentry;
-					break;
-				}
-
-				// unpopulated is our second choice
-				if (entry == STATIC_INVALID && !curentry.populated())
-					entry = scanentry;
-			}
-
-			// if we didn't find anything, find something to depopulate
-			if (entry != STATIC_INVALID)
-				break;
-			depopulate_unused();
-		}
-
-		// if we utterly failed, it's fatal
-		if (entry == STATIC_INVALID)
-			throw emu_fatalerror("Out of handler entries in address table");
-	}
-
 	// configure the entry to our parameters (but not for static non-banked cases)
 	handler_entry &curentry = handler(entry);
 	if (entry <= STATIC_BANKMAX || entry >= STATIC_COUNT)
 		curentry.configure(bytestart, byteend, bytemask);
+
+	// populate it
+	populate_range_mirrored(bytestart, byteend, bytemirror, entry);
+
+	// recompute any direct access on this space if it is a read modification
+	m_space.m_direct.force_update(entry);
+}
+
+
+//-------------------------------------------------
+//  setup_range - finds an approprite handler entry
+//  and requests to populate the address map with
+//  it
+//-------------------------------------------------
+
+UINT8 address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror)
+{
+	// convert addresses to bytes
+	offs_t bytestart = addrstart;
+	offs_t byteend = addrend;
+	offs_t bytemask = addrmask;
+	offs_t bytemirror = addrmirror;
+	m_space.adjust_addresses(bytestart, byteend, bytemask, bytemirror);
+
+	// validity checks
+	assert_always(addrstart <= addrend, "address_table::map_range called with start greater than end");
+	assert_always((bytestart & (m_space.data_width() / 8 - 1)) == 0, "address_table::map_range called with misaligned start address");
+	assert_always((byteend & (m_space.data_width() / 8 - 1)) == (m_space.data_width() / 8 - 1), "address_table::map_range called with misaligned end address");
+
+	// find a free entry
+	UINT8 entry = STATIC_INVALID;
+	// two attempts to find an empty
+	for (int attempt = 0; attempt < 2; attempt++)
+	{
+		// scan all possible assigned entries for something unpopulated, or for an exact match
+		for (UINT8 scanentry = STATIC_COUNT; scanentry < SUBTABLE_BASE; scanentry++)
+		{
+			handler_entry &curentry = handler(scanentry);
+
+			// exact match takes precedence
+			if (curentry.matches_exactly(bytestart, byteend, bytemask))
+			{
+				entry = scanentry;
+				break;
+			}
+
+			// unpopulated is our second choice
+			if (entry == STATIC_INVALID && !curentry.populated())
+				entry = scanentry;
+		}
+
+		// if we didn't find anything, find something to depopulate
+		if (entry != STATIC_INVALID)
+			break;
+		depopulate_unused();
+	}
+
+	// if we utterly failed, it's fatal
+	if (entry == STATIC_INVALID)
+		throw emu_fatalerror("Out of handler entries in address table");
+
+	// configure the entry to our parameters
+	handler_entry &curentry = handler(entry);
+	curentry.configure(bytestart, byteend, bytemask);
 
 	// populate it
 	populate_range_mirrored(bytestart, byteend, bytemirror, entry);
