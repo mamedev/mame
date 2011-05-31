@@ -827,6 +827,12 @@ public:
 	virtual handler_entry &handler(UINT32 index) const;
 	handler_entry_read &handler_read(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
+	// range getter
+	handler_entry_read &handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror) {
+		UINT32 entry = map_range(bytestart, byteend, bytemask, bytemirror);
+		return handler_read(entry);
+	}
+
 private:
 	// internal unmapped handler
 	template<typename _UintType>
@@ -882,6 +888,12 @@ public:
 	// getters
 	virtual handler_entry &handler(UINT32 index) const;
 	handler_entry_write &handler_write(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
+
+	// range getter
+	handler_entry_write &handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror) {
+		UINT32 entry = map_range(bytestart, byteend, bytemask, bytemirror);
+		return handler_write(entry);
+	}
 
 private:
 	// internal handlers
@@ -1974,7 +1986,7 @@ inline void address_space::adjust_addresses(offs_t &start, offs_t &end, offs_t &
 
 //-------------------------------------------------
 //  prepare_map - allocate the address map and
-//  walk through it to find implcit memory regions
+//  walk through it to find implicit memory regions
 //  and identify shared regions
 //-------------------------------------------------
 
@@ -2484,8 +2496,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
 
 		// map the range and set the ioport
-		UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-		read().handler_read(entry).set_ioport(*port);
+		read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_ioport(*port);
 	}
 
 	if (wtag != NULL)
@@ -2496,8 +2507,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
 
 		// map the range and set the ioport
-		UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-		write().handler_write(entry).set_ioport(*port);
+		write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_ioport(*port);
 	}
 
 	// update the memory dump
@@ -2625,8 +2635,7 @@ UINT8 *address_space::install_read_handler(offs_t addrstart, offs_t addrend, off
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_delegate(handler, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_delegate(handler, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2638,8 +2647,7 @@ UINT8 *address_space::install_write_handler(offs_t addrstart, offs_t addrend, of
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_delegate(handler, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_delegate(handler, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2664,8 +2672,7 @@ UINT8 *address_space::install_legacy_read_handler(offs_t addrstart, offs_t addre
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 rname, core_i64_hex_format(unitmask, data_width() / 4)));
 
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_legacy_func(*this, rhandler, rname, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(*this, rhandler, rname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2677,8 +2684,7 @@ UINT8 *address_space::install_legacy_write_handler(offs_t addrstart, offs_t addr
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 wname, core_i64_hex_format(unitmask, data_width() / 4)));
 
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_legacy_func(*this, whandler, wname, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(*this, whandler, wname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2702,8 +2708,7 @@ UINT8 *address_space::install_legacy_read_handler(device_t &device, offs_t addrs
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 rname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
 
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_legacy_func(device, rhandler, rname, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(device, rhandler, rname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2715,8 +2720,7 @@ UINT8 *address_space::install_legacy_write_handler(device_t &device, offs_t addr
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 wname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
 
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_legacy_func(device, whandler, wname, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(device, whandler, wname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2735,16 +2739,14 @@ UINT8 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t 
 
 UINT16 *address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_delegate handler, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_delegate(handler, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_delegate(handler, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT16 *address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_delegate handler, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_delegate(handler, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_delegate(handler, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2764,16 +2766,14 @@ UINT16 *address_space::install_readwrite_handler(offs_t addrstart, offs_t addren
 
 UINT16 *address_space::install_legacy_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, const char *rname, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_legacy_func(*this, rhandler, rname, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(*this, rhandler, rname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT16 *address_space::install_legacy_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_space_func whandler, const char *wname, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_legacy_func(*this, whandler, wname, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(*this, whandler, wname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2792,16 +2792,14 @@ UINT16 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t
 
 UINT16 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rname, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_legacy_func(device, rhandler, rname, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(device, rhandler, rname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT16 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_device_func whandler, const char *wname, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_legacy_func(device, whandler, wname, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(device, whandler, wname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2820,16 +2818,14 @@ UINT16 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t
 
 UINT32 *address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_delegate handler, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_delegate(handler, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_delegate(handler, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT32 *address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_delegate handler, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_delegate(handler, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_delegate(handler, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2849,16 +2845,14 @@ UINT32 *address_space::install_readwrite_handler(offs_t addrstart, offs_t addren
 
 UINT32 *address_space::install_legacy_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, const char *rname, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_legacy_func(*this, rhandler, rname, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(*this, rhandler, rname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT32 *address_space::install_legacy_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_space_func whandler, const char *wname, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_legacy_func(*this, whandler, wname, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(*this, whandler, wname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2877,16 +2871,14 @@ UINT32 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t
 
 UINT32 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rname, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_legacy_func(device, rhandler, rname, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(device, rhandler, rname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT32 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_device_func whandler, const char *wname, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_legacy_func(device, whandler, wname, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(device, whandler, wname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2905,16 +2897,14 @@ UINT32 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t
 
 UINT64 *address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_delegate handler, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_delegate(handler, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_delegate(handler, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT64 *address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_delegate handler, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_delegate(handler, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_delegate(handler, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2934,16 +2924,14 @@ UINT64 *address_space::install_readwrite_handler(offs_t addrstart, offs_t addren
 
 UINT64 *address_space::install_legacy_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, const char *rname, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_legacy_func(*this, rhandler, rname, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(*this, rhandler, rname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT64 *address_space::install_legacy_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_space_func whandler, const char *wname, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_legacy_func(*this, whandler, wname, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(*this, whandler, wname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
@@ -2962,16 +2950,14 @@ UINT64 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t
 
 UINT64 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rname, UINT64 unitmask)
 {
-	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
-	read().handler_read(entry).set_legacy_func(device, rhandler, rname, unitmask);
+	read().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(device, rhandler, rname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
 UINT64 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_device_func whandler, const char *wname, UINT64 unitmask)
 {
-	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
-	write().handler_write(entry).set_legacy_func(device, whandler, wname, unitmask);
+	write().handler_map_range(addrstart, addrend, addrmask, addrmirror).set_legacy_func(device, whandler, wname, unitmask);
 	generate_memdump(machine());
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
