@@ -467,6 +467,16 @@ public:
 	void apply_mask(offs_t bytemask) { m_bytemask &= bytemask; }
 
 protected:
+	// Subunit description information
+	struct subunit_info
+	{
+		UINT32				m_mask;					// mask (ff, ffff or ffffffff)
+		UINT32				m_offset;				// offset to add to the address
+		UINT32				m_multiplier;			// multiplier to the pre-split address
+		UINT8				m_size;					// size (8, 16 or 32)
+		UINT8				m_shift;				// shift of the subunit
+	};
+
 	// internal helpers
 	void configure_subunits(UINT64 handlermask, int handlerbits);
 
@@ -479,7 +489,7 @@ protected:
 	offs_t					m_bytemask;				// byte-adjusted mask against the final address
 	UINT8 **				m_rambaseptr;			// pointer to the bank base
 	UINT8					m_subunits;				// for width stubs, the number of subunits
-	UINT8					m_subshift[8];			// for width stubs, the shift of each subunit
+	subunit_info			m_subunit_infos[8];		// for width stubs, the associated subunit info
 	UINT64					m_invsubmask;			// inverted mask of the populated subunits
 };
 
@@ -551,12 +561,9 @@ public:
 
 private:
 	// stubs for converting between address sizes
-	UINT16 read_stub_16_from_8(address_space &space, offs_t offset, UINT16 mask);
-	UINT32 read_stub_32_from_8(address_space &space, offs_t offset, UINT32 mask);
-	UINT64 read_stub_64_from_8(address_space &space, offs_t offset, UINT64 mask);
-	UINT32 read_stub_32_from_16(address_space &space, offs_t offset, UINT32 mask);
-	UINT64 read_stub_64_from_16(address_space &space, offs_t offset, UINT64 mask);
-	UINT64 read_stub_64_from_32(address_space &space, offs_t offset, UINT64 mask);
+	UINT16 read_stub_16(address_space &space, offs_t offset, UINT16 mask);
+	UINT32 read_stub_32(address_space &space, offs_t offset, UINT32 mask);
+	UINT64 read_stub_64(address_space &space, offs_t offset, UINT64 mask);
 
 	// stubs for calling legacy read handlers
 	UINT8 read_stub_legacy(address_space &space, offs_t offset, UINT8 mask);
@@ -646,12 +653,9 @@ public:
 
 private:
 	// stubs for converting between address sizes
-	void write_stub_16_from_8(address_space &space, offs_t offset, UINT16 data, UINT16 mask);
-	void write_stub_32_from_8(address_space &space, offs_t offset, UINT32 data, UINT32 mask);
-	void write_stub_64_from_8(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
-	void write_stub_32_from_16(address_space &space, offs_t offset, UINT32 data, UINT32 mask);
-	void write_stub_64_from_16(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
-	void write_stub_64_from_32(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
+	void write_stub_16(address_space &space, offs_t offset, UINT16 data, UINT16 mask);
+	void write_stub_32(address_space &space, offs_t offset, UINT32 data, UINT32 mask);
+	void write_stub_64(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
 
 	// stubs for calling legacy write handlers
 	void write_stub_legacy(address_space &space, offs_t offset, UINT8 data, UINT8 mask);
@@ -4366,39 +4370,46 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits)
 	UINT64 unitmask = ((UINT64)1 << handlerbits) - 1;
 	assert(handlermask != 0);
 
-	// set the inverse mask
-	m_invsubmask = ~handlermask;
-
 	// compute the maximum possible subunits
 	int maxunits = m_datawidth / handlerbits;
 	assert(maxunits > 1);
 	assert(maxunits <= ARRAY_LENGTH(m_subshift));
 
+	int shift_xor_mask = m_endianness == ENDIANNESS_LITTLE ? 0 : maxunits - 1;
+
 	// walk the handlermask to find out how many we have
+	int count = 0;
+	for (int unitnum = 0; unitnum < maxunits; unitnum++)
+	{
+		UINT32 shift = unitnum * handlerbits;
+		UINT32 scanmask = handlermask >> shift;
+		assert((scanmask & unitmask) == 0 || (scanmask & unitmask) == unitmask);
+		if ((scanmask & unitmask) != 0)
+			count++;
+	}
+
+	// fill in the shifts
 	m_subunits = 0;
 	for (int unitnum = 0; unitnum < maxunits; unitnum++)
 	{
-		UINT64 scanmask = unitmask << (unitnum * handlerbits);
-		assert((handlermask & scanmask) == 0 || (handlermask & scanmask) == scanmask);
-		if ((handlermask & scanmask) != 0)
+		UINT32 shift = (unitnum^shift_xor_mask) * handlerbits;
+		if (((handlermask >> shift) & unitmask) != 0)
+		{
+			m_subunit_infos[m_subunits].m_mask = unitmask;
+			m_subunit_infos[m_subunits].m_offset = m_subunits;
+			m_subunit_infos[m_subunits].m_size = handlerbits;
+			m_subunit_infos[m_subunits].m_shift = shift;
+			m_subunit_infos[m_subunits].m_multiplier = count;
+
 			m_subunits++;
+		}
 	}
 
-	// then fill in the shifts based on the endianness
-	if (m_endianness == ENDIANNESS_LITTLE)
-	{
-		UINT8 *unitshift = &m_subshift[0];
-		for (int unitnum = 0; unitnum < maxunits; unitnum++)
-			if ((handlermask & (unitmask << (unitnum * handlerbits))) != 0)
-				*unitshift++ = unitnum * handlerbits;
-	}
-	else
-	{
-		UINT8 *unitshift = &m_subshift[m_subunits];
-		for (int unitnum = 0; unitnum < maxunits; unitnum++)
-			if ((handlermask & (unitmask << (unitnum * handlerbits))) != 0)
-				*--unitshift = unitnum * handlerbits;
-	}
+	// compute the inverse mask
+	m_invsubmask = 0;
+	for (int i = 0; i < m_subunits; i++)
+		m_invsubmask |= m_subunit_infos[i].m_mask << m_subunit_infos[i].m_shift;
+	m_invsubmask = ~m_invsubmask;
 }
 
 
@@ -4447,11 +4458,11 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask, cons
 	{
 		configure_subunits(mask, 8);
 		if (m_datawidth == 16)
-			set_delegate(read16_delegate(&handler_entry_read::read_stub_16_from_8, delegate.name(), this));
+			set_delegate(read16_delegate(&handler_entry_read::read_stub_16, delegate.name(), this));
 		else if (m_datawidth == 32)
-			set_delegate(read32_delegate(&handler_entry_read::read_stub_32_from_8, delegate.name(), this));
+			set_delegate(read32_delegate(&handler_entry_read::read_stub_32, delegate.name(), this));
 		else if (m_datawidth == 64)
-			set_delegate(read64_delegate(&handler_entry_read::read_stub_64_from_8, delegate.name(), this));
+			set_delegate(read64_delegate(&handler_entry_read::read_stub_64, delegate.name(), this));
 	}
 }
 
@@ -4478,9 +4489,9 @@ void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask, con
 	{
 		configure_subunits(mask, 16);
 		if (m_datawidth == 32)
-			set_delegate(read32_delegate(&handler_entry_read::read_stub_32_from_16, delegate.name(), this));
+			set_delegate(read32_delegate(&handler_entry_read::read_stub_32, delegate.name(), this));
 		else if (m_datawidth == 64)
-			set_delegate(read64_delegate(&handler_entry_read::read_stub_64_from_16, delegate.name(), this));
+			set_delegate(read64_delegate(&handler_entry_read::read_stub_64, delegate.name(), this));
 	}
 }
 
@@ -4507,7 +4518,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask, con
 	{
 		configure_subunits(mask, 32);
 		if (m_datawidth == 64)
-			set_delegate(read64_delegate(&handler_entry_read::read_stub_64_from_32, delegate.name(), this));
+			set_delegate(read64_delegate(&handler_entry_read::read_stub_64, delegate.name(), this));
 	}
 }
 
@@ -4626,114 +4637,76 @@ void handler_entry_read::set_ioport(const input_port_config &ioport)
 
 
 //-------------------------------------------------
-//  read_stub_16_from_8 - construct a 16-bit read
-//  from 8-bit sources
+//  read_stub_16 - construct a 16-bit read from
+//  8-bit sources
 //-------------------------------------------------
 
-UINT16 handler_entry_read::read_stub_16_from_8(address_space &space, offs_t offset, UINT16 mask)
+UINT16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, UINT16 mask)
 {
 	UINT16 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
-		int shift = m_subshift[index];
-		UINT8 mask8 = mask >> shift;
-		if (mask8 != 0)
-			result |= m_read8(space, offset * m_subunits + index, mask8) << shift;
+		const subunit_info &si = m_subunit_infos[index];
+		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		if (submask)
+			result |= m_read8(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
 	}
 	return result;
 }
 
 
 //-------------------------------------------------
-//  read_stub_32_from_8 - construct a 32-bit read
-//  from 8-bit sources
+//  read_stub_32 - construct a 32-bit read from
+//  8-bit and 16-bit sources
 //-------------------------------------------------
 
-UINT32 handler_entry_read::read_stub_32_from_8(address_space &space, offs_t offset, UINT32 mask)
+UINT32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, UINT32 mask)
 {
 	UINT32 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
-		int shift = m_subshift[index];
-		UINT8 mask8 = mask >> shift;
-		if (mask8 != 0)
-			result |= m_read8(space, offset * m_subunits + index, mask8) << shift;
+		const subunit_info &si = m_subunit_infos[index];
+		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		if (submask)
+			switch (si.m_size)
+			{
+			case 8:
+				result |= m_read8(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
+				break;
+			case 16:
+				result |= m_read16(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
+				break;
+			}
 	}
 	return result;
 }
 
 
 //-------------------------------------------------
-//  read_stub_64_from_8 - construct a 64-bit read
-//  from 8-bit sources
+//  read_stub_64 - construct a 64-bit read from
+//  8-bit, 16-bit and 32-bit sources
 //-------------------------------------------------
 
-UINT64 handler_entry_read::read_stub_64_from_8(address_space &space, offs_t offset, UINT64 mask)
+UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UINT64 mask)
 {
 	UINT64 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
-		int shift = m_subshift[index];
-		UINT8 mask8 = mask >> shift;
-		if (mask8 != 0)
-			result |= (UINT64)m_read8(space, offset * m_subunits + index, mask8) << shift;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  read_stub_32_from_16 - construct a 32-bit read
-//  from 16-bit sources
-//-------------------------------------------------
-
-UINT32 handler_entry_read::read_stub_32_from_16(address_space &space, offs_t offset, UINT32 mask)
-{
-	UINT32 result = space.unmap() & m_invsubmask;
-	for (int index = 0; index < m_subunits; index++)
-	{
-		int shift = m_subshift[index];
-		UINT16 mask16 = mask >> shift;
-		if (mask16 != 0)
-			result |= m_read16(space, offset * m_subunits + index, mask16) << shift;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  read_stub_64_from_16 - construct a 64-bit read
-//  from 16-bit sources
-//-------------------------------------------------
-
-UINT64 handler_entry_read::read_stub_64_from_16(address_space &space, offs_t offset, UINT64 mask)
-{
-	UINT64 result = space.unmap() & m_invsubmask;
-	for (int index = 0; index < m_subunits; index++)
-	{
-		int shift = m_subshift[index];
-		UINT16 mask16 = mask >> shift;
-		if (mask16 != 0)
-			result |= (UINT64)m_read16(space, offset * m_subunits + index, mask16) << shift;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  read_stub_64_from_32 - construct a 64-bit read
-//  from 32-bit sources
-//-------------------------------------------------
-
-UINT64 handler_entry_read::read_stub_64_from_32(address_space &space, offs_t offset, UINT64 mask)
-{
-	UINT64 result = space.unmap() & m_invsubmask;
-	for (int index = 0; index < m_subunits; index++)
-	{
-		int shift = m_subshift[index];
-		UINT32 mask32 = mask >> shift;
-		if (mask32 != 0)
-			result |= (UINT64)m_read32(space, offset * m_subunits + index, mask32) << shift;
+		const subunit_info &si = m_subunit_infos[index];
+		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		if (submask)
+			switch (si.m_size)
+			{
+			case 8:
+				result |= UINT64(m_read8(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
+				break;
+			case 16:
+				result |= UINT64(m_read16(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
+				break;
+			case 32:
+				result |= UINT64(m_read32(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
+				break;
+			}
 	}
 	return result;
 }
@@ -4805,11 +4778,11 @@ void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask, co
 	{
 		configure_subunits(mask, 8);
 		if (m_datawidth == 16)
-			set_delegate(write16_delegate(&handler_entry_write::write_stub_16_from_8, delegate.name(), this));
+			set_delegate(write16_delegate(&handler_entry_write::write_stub_16, delegate.name(), this));
 		else if (m_datawidth == 32)
-			set_delegate(write32_delegate(&handler_entry_write::write_stub_32_from_8, delegate.name(), this));
+			set_delegate(write32_delegate(&handler_entry_write::write_stub_32, delegate.name(), this));
 		else if (m_datawidth == 64)
-			set_delegate(write64_delegate(&handler_entry_write::write_stub_64_from_8, delegate.name(), this));
+			set_delegate(write64_delegate(&handler_entry_write::write_stub_64, delegate.name(), this));
 	}
 }
 
@@ -4831,9 +4804,9 @@ void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask, c
 	{
 		configure_subunits(mask, 16);
 		if (m_datawidth == 32)
-			set_delegate(write32_delegate(&handler_entry_write::write_stub_32_from_16, delegate.name(), this));
+			set_delegate(write32_delegate(&handler_entry_write::write_stub_32, delegate.name(), this));
 		else if (m_datawidth == 64)
-			set_delegate(write64_delegate(&handler_entry_write::write_stub_64_from_16, delegate.name(), this));
+			set_delegate(write64_delegate(&handler_entry_write::write_stub_64, delegate.name(), this));
 	}
 }
 
@@ -4855,7 +4828,7 @@ void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask, c
 	{
 		configure_subunits(mask, 32);
 		if (m_datawidth == 64)
-			set_delegate(write64_delegate(&handler_entry_write::write_stub_64_from_32, delegate.name(), this));
+			set_delegate(write64_delegate(&handler_entry_write::write_stub_64, delegate.name(), this));
 	}
 }
 
@@ -4969,103 +4942,71 @@ void handler_entry_write::set_ioport(const input_port_config &ioport)
 
 
 //-------------------------------------------------
-//  write_stub_16_from_8 - construct a 16-bit write
-//  from 8-bit sources
+//  write_stub_16 - construct a 16-bit write from
+//  8-bit sources
 //-------------------------------------------------
 
-void handler_entry_write::write_stub_16_from_8(address_space &space, offs_t offset, UINT16 data, UINT16 mask)
+void handler_entry_write::write_stub_16(address_space &space, offs_t offset, UINT16 data, UINT16 mask)
 {
 	for (int index = 0; index < m_subunits; index++)
 	{
-		int shift = m_subshift[index];
-		UINT8 mask8 = mask >> shift;
-		if (mask8 != 0)
-			m_write8(space, offset * m_subunits + index, data >> shift, mask8);
+		const subunit_info &si = m_subunit_infos[index];
+		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		if (submask)
+			m_write8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
 	}
 }
 
 
 //-------------------------------------------------
-//  write_stub_32_from_8 - construct a 32-bit write
-//  from 8-bit sources
+//  write_stub_32 - construct a 32-bit write from
+//  8-bit and 16-bit sources
 //-------------------------------------------------
 
-void handler_entry_write::write_stub_32_from_8(address_space &space, offs_t offset, UINT32 data, UINT32 mask)
+void handler_entry_write::write_stub_32(address_space &space, offs_t offset, UINT32 data, UINT32 mask)
 {
 	for (int index = 0; index < m_subunits; index++)
 	{
-		int shift = m_subshift[index];
-		UINT8 mask8 = mask >> shift;
-		if (mask8 != 0)
-			m_write8(space, offset * m_subunits + index, data >> shift, mask8);
+		const subunit_info &si = m_subunit_infos[index];
+		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		if (submask)
+			switch (si.m_size)
+			{
+			case 8:
+				m_write8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				break;
+			case 16:
+				m_write16(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				break;
+			}
 	}
 }
 
 
 //-------------------------------------------------
-//  write_stub_64_from_8 - construct a 64-bit write
-//  from 8-bit sources
+//  write_stub_64 - construct a 64-bit write from
+//  8-bit, 16-bit and 32-bit sources
 //-------------------------------------------------
 
-void handler_entry_write::write_stub_64_from_8(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
+void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
 {
 	for (int index = 0; index < m_subunits; index++)
 	{
-		int shift = m_subshift[index];
-		UINT8 mask8 = mask >> shift;
-		if (mask8 != 0)
-			m_write8(space, offset * m_subunits + index, data >> shift, mask8);
-	}
-}
-
-
-//-------------------------------------------------
-//  write_stub_32_from_16 - construct a 32-bit
-//  write from 16-bit sources
-//-------------------------------------------------
-
-void handler_entry_write::write_stub_32_from_16(address_space &space, offs_t offset, UINT32 data, UINT32 mask)
-{
-	for (int index = 0; index < m_subunits; index++)
-	{
-		int shift = m_subshift[index];
-		UINT16 mask16 = mask >> shift;
-		if (mask16 != 0)
-			m_write16(space, offset * m_subunits + index, data >> shift, mask16);
-	}
-}
-
-
-//-------------------------------------------------
-//  write_stub_64_from_16 - construct a 64-bit
-//  write from 16-bit sources
-//-------------------------------------------------
-
-void handler_entry_write::write_stub_64_from_16(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
-{
-	for (int index = 0; index < m_subunits; index++)
-	{
-		int shift = m_subshift[index];
-		UINT16 mask16 = mask >> shift;
-		if (mask16 != 0)
-			m_write16(space, offset * m_subunits + index, data >> shift, mask16);
-	}
-}
-
-
-//-------------------------------------------------
-//  write_stub_64_from_32 - construct a 64-bit
-//  write from 32-bit sources
-//-------------------------------------------------
-
-void handler_entry_write::write_stub_64_from_32(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
-{
-	for (int index = 0; index < m_subunits; index++)
-	{
-		int shift = m_subshift[index];
-		UINT32 mask32 = mask >> shift;
-		if (mask32 != 0)
-			m_write32(space, offset * m_subunits + index, data >> shift, mask32);
+		const subunit_info &si = m_subunit_infos[index];
+		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
+		if (submask)
+			switch (si.m_size)
+			{
+			case 8:
+				m_write8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				break;
+			case 16:
+				m_write16(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				break;
+			case 32:
+				m_write32(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				break;
+			}
 	}
 }
 
