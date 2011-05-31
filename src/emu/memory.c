@@ -709,6 +709,33 @@ private:
 	legacy_info m_sublegacy_info[8];
 };
 
+// ======================> handler_entry_proxy
+
+// A proxy class that contains an handler_entry_read or _write and forwards the setter calls
+
+template<typename _HandlerEntry>
+class handler_entry_proxy
+{
+public:
+	handler_entry_proxy(_HandlerEntry &_handler) : handler(_handler) {}
+	handler_entry_proxy(const handler_entry_proxy<_HandlerEntry> &hep) : handler(hep.handler) {}
+		
+	// forward delegate callbacks configuration
+	template<typename _delegate> void set_delegate(_delegate delegate, UINT64 mask = 0) const { handler.set_delegate(delegate, mask); }
+
+	// forward legacy address space functions configuration
+	template<typename _func> void set_legacy_func(address_space &space, _func func, const char *name, UINT64 mask = 0) const { handler.set_legacy_func(space, func, name, mask); }
+
+	// forward legacy device functions configuration
+	template<typename _func> void set_legacy_func(device_t &device, _func func, const char *name, UINT64 mask = 0) const { handler.set_legacy_func(device, func, name, mask); }
+
+	// forward I/O port access configuration
+	void set_ioport(const input_port_config &ioport) { handler.set_ioport(ioport); }
+
+private:
+	_HandlerEntry &handler;
+};
+		
 
 // ======================> address_table
 
@@ -828,9 +855,9 @@ public:
 	handler_entry_read &handler_read(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
 	// range getter
-	handler_entry_read &handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror) {
+	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror) {
 		UINT32 entry = map_range(bytestart, byteend, bytemask, bytemirror);
-		return handler_read(entry);
+		return handler_entry_proxy<handler_entry_read>(handler_read(entry));
 	}
 
 private:
@@ -890,9 +917,9 @@ public:
 	handler_entry_write &handler_write(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
 	// range getter
-	handler_entry_write &handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror) {
+	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror) {
 		UINT32 entry = map_range(bytestart, byteend, bytemask, bytemirror);
-		return handler_write(entry);
+		return handler_entry_proxy<handler_entry_write>(handler_write(entry));
 	}
 
 private:
