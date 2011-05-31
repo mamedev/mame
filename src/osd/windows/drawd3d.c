@@ -2976,6 +2976,8 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "RedFloor", options->screen_red_floor);
 					(*d3dintf->effect.set_float)(curr_effect, "GrnFloor", options->screen_green_floor);
 					(*d3dintf->effect.set_float)(curr_effect, "BluFloor", options->screen_blue_floor);
+					(*d3dintf->effect.set_float)(curr_effect, "SnapX", d3d->hlsl_snap_width);
+					(*d3dintf->effect.set_float)(curr_effect, "SnapY", d3d->hlsl_snap_height);
 					(*d3dintf->effect.set_float)(curr_effect, "PincushionAmount", options->screen_pincushion);
 					(*d3dintf->effect.set_float)(curr_effect, "CurvatureAmount", options->screen_curvature);
 					(*d3dintf->effect.set_float)(curr_effect, "UseShadow", d3d->shadow_texture == NULL ? 0.0f : 1.0f);
@@ -3388,6 +3390,8 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlsltexture0[poly->texture->target_index]);
 
+					(*d3dintf->effect.set_float)(curr_effect, "SnapX", d3d->hlsl_snap_width);
+					(*d3dintf->effect.set_float)(curr_effect, "SnapY", d3d->hlsl_snap_height);
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsl_snap_target);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 
@@ -3406,6 +3410,9 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 					d3d->hlsl_snap_rendered = true;
 				}
+
+				(*d3dintf->effect.set_float)(curr_effect, "SnapX", d3d->width);
+				(*d3dintf->effect.set_float)(curr_effect, "SnapY", d3d->height);
 
 				/* Scanlines and shadow mask */
 				curr_effect = d3d->post_effect;

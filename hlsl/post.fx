@@ -116,6 +116,9 @@ uniform float RedFloor = 0.0f;
 uniform float GrnFloor = 0.0f;
 uniform float BluFloor = 0.0f;
 
+uniform float SnapX = 0.0f;
+uniform float SnapY = 0.0f;
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 Ratios = float2(WidthRatio, HeightRatio);
@@ -125,7 +128,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 PinUnitCoord = (Input.TexCoord + PinViewpointOffset) * Ratios * 2.0f - 1.0f;
 	float PincushionR2 = pow(length(PinUnitCoord), 2.0f) / pow(length(Ratios), 2.0f);
 	float2 PincushionCurve = PinUnitCoord * PincushionAmount * PincushionR2;
-	float2 BaseCoord = Input.TexCoord;
+	float2 BaseCoord = Input.TexCoord + float2(0.0f, 0.0f / TargetHeight);
+	BaseCoord.y *= TargetHeight;
+	BaseCoord.y -= frac(BaseCoord.y);
+	BaseCoord.y += 0.5f;
+	BaseCoord.y /= TargetHeight;
 	BaseCoord -= 0.5f / Ratios;
 	BaseCoord *= 1.0f - PincushionAmount * Ratios * 0.2f; // Warning: Magic constant
 	BaseCoord += 0.5f / Ratios;
