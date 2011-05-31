@@ -586,9 +586,12 @@ private:
 
 	// internal state
 	access_handler				m_read;
+	access_handler				m_subread;
 	const input_port_config *	m_ioport;
 
+	bool m_sub_is_legacy;
 	legacy_info m_legacy_info;
+	legacy_info m_sublegacy_info;
 };
 
 
@@ -684,9 +687,12 @@ private:
 
 	// internal state
 	access_handler				m_write;
+	access_handler				m_subwrite;
 	const input_port_config *	m_ioport;
 
+	bool m_sub_is_legacy;
 	legacy_info m_legacy_info;
+	legacy_info m_sublegacy_info;
 };
 
 
@@ -4461,14 +4467,21 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask, cons
 
 	// make sure this is a valid size
 	assert(m_datawidth >= 8);
-	m_read.r8 = delegate;
-	if (info)
-		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 8)
 	{
 		configure_subunits(mask, 8);
+		if (info)
+		{		
+			m_sublegacy_info = *info;
+			m_sub_is_legacy = true;
+		}
+		else
+		{
+			m_subread.r8 = delegate;
+			m_sub_is_legacy = false;
+		}
 		if (m_datawidth == 16)
 			set_delegate(read16_delegate(&handler_entry_read::read_stub_16, delegate.name(), this));
 		else if (m_datawidth == 32)
@@ -4476,6 +4489,12 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask, cons
 		else if (m_datawidth == 64)
 			set_delegate(read64_delegate(&handler_entry_read::read_stub_64, delegate.name(), this));
 	}
+	else
+	{
+		m_read.r8 = delegate;
+		if (info)
+			m_legacy_info = *info;
+	}		
 }
 
 
@@ -4492,18 +4511,31 @@ void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask, con
 
 	// make sure this is a valid size
 	assert(m_datawidth >= 16);
-	m_read.r16 = delegate;
-	if (info)
-		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 16)
 	{
 		configure_subunits(mask, 16);
+		if (info)
+		{		
+			m_sublegacy_info = *info;
+			m_sub_is_legacy = true;
+		}
+		else
+		{
+			m_subread.r16 = delegate;
+			m_sub_is_legacy = false;
+		}
 		if (m_datawidth == 32)
 			set_delegate(read32_delegate(&handler_entry_read::read_stub_32, delegate.name(), this));
 		else if (m_datawidth == 64)
 			set_delegate(read64_delegate(&handler_entry_read::read_stub_64, delegate.name(), this));
+	}
+	else
+	{
+		m_read.r16 = delegate;
+		if (info)
+			m_legacy_info = *info;
 	}
 }
 
@@ -4521,16 +4553,29 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask, con
 
 	// make sure this is a valid size
 	assert(m_datawidth >= 32);
-	m_read.r32 = delegate;
-	if (info)
-		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 32)
 	{
 		configure_subunits(mask, 32);
+		if (info)
+		{		
+			m_sublegacy_info = *info;
+			m_sub_is_legacy = true;
+		}
+		else
+		{
+			m_subread.r32 = delegate;
+			m_sub_is_legacy = false;
+		}
 		if (m_datawidth == 64)
 			set_delegate(read64_delegate(&handler_entry_read::read_stub_64, delegate.name(), this));
+	}
+	else
+	{
+		m_read.r32 = delegate;
+		if (info)
+			m_legacy_info = *info;
 	}
 }
 
@@ -4661,7 +4706,15 @@ UINT16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, UIN
 		const subunit_info &si = m_subunit_infos[index];
 		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
-			result |= m_read.r8(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
+		{
+			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
+			UINT8 val;
+			if (m_sub_is_legacy)
+				val = m_sublegacy_info.handler.space8(m_sublegacy_info.object.space, aoffset);
+			else
+				val = m_subread.r8(space, aoffset, submask);
+			result |= val << si.m_shift;
+		}
 	}
 	return result;
 }
@@ -4680,15 +4733,35 @@ UINT32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, UIN
 		const subunit_info &si = m_subunit_infos[index];
 		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
-			switch (si.m_size)
+		{
+			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
+			UINT16 val = 0;
+			if (m_sub_is_legacy)
 			{
-			case 8:
-				result |= m_read.r8(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
-				break;
-			case 16:
-				result |= m_read.r16(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
-				break;
+				switch (si.m_size)
+				{
+				case 8:
+					val = m_sublegacy_info.handler.space8(m_sublegacy_info.object.space, aoffset);
+					break;
+				case 16:
+					val = m_sublegacy_info.handler.space16(m_sublegacy_info.object.space, aoffset, submask);
+					break;
+				}
 			}
+			else
+			{
+				switch (si.m_size)
+				{
+				case 8:
+					val = m_subread.r8(space, aoffset, submask);
+					break;
+				case 16:
+					val = m_subread.r16(space, aoffset, submask);
+					break;
+				}
+			}
+			result |= val << si.m_shift;
+		}
 	}
 	return result;
 }
@@ -4707,18 +4780,41 @@ UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UIN
 		const subunit_info &si = m_subunit_infos[index];
 		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
-			switch (si.m_size)
+		{
+			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
+			UINT32 val = 0;
+			if (m_sub_is_legacy)
 			{
-			case 8:
-				result |= UINT64(m_read.r8(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
-				break;
-			case 16:
-				result |= UINT64(m_read.r16(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
-				break;
-			case 32:
-				result |= UINT64(m_read.r32(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
-				break;
+				switch (si.m_size)
+				{
+				case 8:
+					val = m_sublegacy_info.handler.space8(m_sublegacy_info.object.space, aoffset);
+					break;
+				case 16:
+					val = m_sublegacy_info.handler.space16(m_sublegacy_info.object.space, aoffset, submask);
+					break;
+				case 32:
+					val = m_sublegacy_info.handler.space32(m_sublegacy_info.object.space, aoffset, submask);
+					break;
+				}
 			}
+			else
+			{
+				switch (si.m_size)
+				{
+				case 8:
+					val = m_subread.r8(space, aoffset, submask);
+					break;
+				case 16:
+					val = m_subread.r16(space, aoffset, submask);
+					break;
+				case 32:
+					val = m_subread.r32(space, aoffset, submask);
+					break;
+				}
+			}
+			result |=  UINT64(val) << si.m_shift;
+		}
 	}
 	return result;
 }
@@ -4781,20 +4877,33 @@ const char *handler_entry_write::name() const
 void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 8);
-	m_write.w8 = delegate;
-	if (info)
-		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 8)
 	{
 		configure_subunits(mask, 8);
+		if (info)
+		{		
+			m_sublegacy_info = *info;
+			m_sub_is_legacy = true;
+		}
+		else
+		{
+			m_subwrite.w8 = delegate;
+			m_sub_is_legacy = false;
+		}
 		if (m_datawidth == 16)
 			set_delegate(write16_delegate(&handler_entry_write::write_stub_16, delegate.name(), this));
 		else if (m_datawidth == 32)
 			set_delegate(write32_delegate(&handler_entry_write::write_stub_32, delegate.name(), this));
 		else if (m_datawidth == 64)
 			set_delegate(write64_delegate(&handler_entry_write::write_stub_64, delegate.name(), this));
+	}
+	else
+	{
+		m_write.w8 = delegate;
+		if (info)
+			m_legacy_info = *info;
 	}
 }
 
@@ -4807,18 +4916,31 @@ void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask, co
 void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 16);
-	m_write.w16 = delegate;
-	if (info)
-		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 16)
 	{
 		configure_subunits(mask, 16);
+		if (info)
+		{		
+			m_sublegacy_info = *info;
+			m_sub_is_legacy = true;
+		}
+		else
+		{
+			m_subwrite.w16 = delegate;
+			m_sub_is_legacy = false;
+		}
 		if (m_datawidth == 32)
 			set_delegate(write32_delegate(&handler_entry_write::write_stub_32, delegate.name(), this));
 		else if (m_datawidth == 64)
 			set_delegate(write64_delegate(&handler_entry_write::write_stub_64, delegate.name(), this));
+	}
+	else
+	{
+		m_subwrite.w16 = delegate;
+		if (info)
+			m_legacy_info = *info;
 	}
 }
 
@@ -4831,16 +4953,29 @@ void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask, c
 void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 32);
-	m_write.w32 = delegate;
-	if (info)
-		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 32)
 	{
 		configure_subunits(mask, 32);
+		if (info)
+		{		
+			m_sublegacy_info = *info;
+			m_sub_is_legacy = true;
+		}
+		else
+		{
+			m_subwrite.w32 = delegate;
+			m_sub_is_legacy = false;
+		}
 		if (m_datawidth == 64)
 			set_delegate(write64_delegate(&handler_entry_write::write_stub_64, delegate.name(), this));
+	}
+	else
+	{
+		m_write.w32 = delegate;
+		if (info)
+			m_legacy_info = *info;
 	}
 }
 
@@ -4965,7 +5100,14 @@ void handler_entry_write::write_stub_16(address_space &space, offs_t offset, UIN
 		const subunit_info &si = m_subunit_infos[index];
 		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
-			m_write.w8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+		{
+			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
+			UINT8 adata = data >> si.m_shift;
+			if (m_sub_is_legacy)
+				m_sublegacy_info.handler.space8(m_sublegacy_info.object.space, aoffset, adata);
+			else
+				m_subwrite.w8(space, aoffset, adata, submask);
+		}
 	}
 }
 
@@ -4982,15 +5124,34 @@ void handler_entry_write::write_stub_32(address_space &space, offs_t offset, UIN
 		const subunit_info &si = m_subunit_infos[index];
 		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
-			switch (si.m_size)
+		{
+			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
+			UINT16 adata = data >> si.m_shift;
+			if (m_sub_is_legacy)
 			{
-			case 8:
-				m_write.w8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
-				break;
-			case 16:
-				m_write.w16(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
-				break;
+				switch (si.m_size)
+				{
+				case 8:
+					m_sublegacy_info.handler.space8(m_sublegacy_info.object.space, aoffset, adata);
+					break;
+				case 16:
+					m_sublegacy_info.handler.space16(m_sublegacy_info.object.space, aoffset, adata, submask);
+					break;
+				}
 			}
+			else
+			{
+				switch (si.m_size)
+				{
+				case 8:
+					m_subwrite.w8(space, aoffset, adata, submask);
+					break;
+				case 16:
+					m_subwrite.w16(space, aoffset, adata, submask);
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -5007,18 +5168,40 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UIN
 		const subunit_info &si = m_subunit_infos[index];
 		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
-			switch (si.m_size)
+		{
+			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
+			UINT32 adata = data >> si.m_shift;
+			if (m_sub_is_legacy)
 			{
-			case 8:
-				m_write.w8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
-				break;
-			case 16:
-				m_write.w16(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
-				break;
-			case 32:
-				m_write.w32(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
-				break;
+				switch (si.m_size)
+				{
+				case 8:
+					m_sublegacy_info.handler.space8(m_sublegacy_info.object.space, aoffset, adata);
+					break;
+				case 16:
+					m_sublegacy_info.handler.space16(m_sublegacy_info.object.space, aoffset, adata, submask);
+					break;
+				case 32:
+					m_sublegacy_info.handler.space32(m_sublegacy_info.object.space, aoffset, adata, submask);
+					break;
+				}
 			}
+			else
+			{
+				switch (si.m_size)
+				{
+				case 8:
+					m_subwrite.w8(space, aoffset, adata, submask);
+					break;
+				case 16:
+					m_subwrite.w16(space, aoffset, adata, submask);
+					break;
+				case 32:
+					m_subwrite.w32(space, aoffset, adata, submask);
+					break;
+				}
+			}
+		}
 	}
 }
 
