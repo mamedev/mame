@@ -200,6 +200,8 @@
 
 ***************************************************************************/
 
+#include <list>
+
 #include "emu.h"
 #include "profiler.h"
 #include "debug/debugcpu.h"
@@ -717,23 +719,35 @@ template<typename _HandlerEntry>
 class handler_entry_proxy
 {
 public:
-	handler_entry_proxy(_HandlerEntry &_handler, UINT64 _mask) : handler(_handler), mask(_mask) {}
-	handler_entry_proxy(const handler_entry_proxy<_HandlerEntry> &hep) : handler(hep.handler), mask(hep.mask) {}
-		
+	handler_entry_proxy(const std::list<_HandlerEntry *> &_handlers, UINT64 _mask) : handlers(_handlers), mask(_mask) {}
+	handler_entry_proxy(const handler_entry_proxy<_HandlerEntry> &hep) : handlers(hep.handlers), mask(hep.mask) {}
+
 	// forward delegate callbacks configuration
-	template<typename _delegate> void set_delegate(_delegate delegate) const { handler.set_delegate(delegate, mask); }
+	template<typename _delegate> void set_delegate(_delegate delegate) const {
+		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
+			(*i)->set_delegate(delegate, mask);
+	}
 
 	// forward legacy address space functions configuration
-	template<typename _func> void set_legacy_func(address_space &space, _func func, const char *name) const { handler.set_legacy_func(space, func, name, mask); }
+	template<typename _func> void set_legacy_func(address_space &space, _func func, const char *name) const {
+		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
+			(*i)->set_legacy_func(space, func, name, mask);
+	}
 
 	// forward legacy device functions configuration
-	template<typename _func> void set_legacy_func(device_t &device, _func func, const char *name) const { handler.set_legacy_func(device, func, name, mask); }
+	template<typename _func> void set_legacy_func(device_t &device, _func func, const char *name) const {
+		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
+			(*i)->set_legacy_func(device, func, name, mask);
+	}
 
 	// forward I/O port access configuration
-	void set_ioport(const input_port_config &ioport) { handler.set_ioport(ioport); }
+	void set_ioport(const input_port_config &ioport) const {
+		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
+			(*i)->set_ioport(ioport);
+	}
 
 private:
-	_HandlerEntry &handler;
+	std::list<_HandlerEntry *> handlers;
 	UINT64 mask;
 };
 		
@@ -787,7 +801,7 @@ public:
 
 	// table mapping helpers
 	void map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT8 staticentry);
-	UINT8 setup_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror);
+	void setup_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, std::list<UINT32> &entries);
 	UINT8 derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const;
 
 	// misc helpers
@@ -858,8 +872,12 @@ public:
 
 	// range getter
 	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
-		UINT32 entry = setup_range(bytestart, byteend, bytemask, bytemirror);
-		return handler_entry_proxy<handler_entry_read>(handler_read(entry), mask);
+		std::list<UINT32> entries;
+		setup_range(bytestart, byteend, bytemask, bytemirror, entries);
+		std::list<handler_entry_read *> handlers;
+		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); i++)
+			handlers.push_back(&handler_read(*i));
+		return handler_entry_proxy<handler_entry_read>(handlers, mask);
 	}
 
 private:
@@ -920,8 +938,12 @@ public:
 
 	// range getter
 	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
-		UINT32 entry = setup_range(bytestart, byteend, bytemask, bytemirror);
-		return handler_entry_proxy<handler_entry_write>(handler_write(entry), mask);
+		std::list<UINT32> entries;
+		setup_range(bytestart, byteend, bytemask, bytemirror, entries);
+		std::list<handler_entry_write *> handlers;
+		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); i++)
+			handlers.push_back(&handler_write(*i));
+		return handler_entry_proxy<handler_entry_write>(handlers, mask);
 	}
 
 private:
@@ -3215,7 +3237,7 @@ void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask,
 //  it
 //-------------------------------------------------
 
-UINT8 address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror)
+void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<UINT32> &entries)
 {
 	// convert addresses to bytes
 	offs_t bytestart = addrstart;
@@ -3270,7 +3292,8 @@ UINT8 address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrma
 
 	// recompute any direct access on this space if it is a read modification
 	m_space.m_direct.force_update(entry);
-	return entry;
+
+	entries.push_back(entry);
 }
 
 
