@@ -433,6 +433,8 @@ public:
 	offs_t byteend() const { return m_byteend; }
 	offs_t bytemask() const { return m_bytemask; }
 	virtual const char *name() const = 0;
+	virtual const char *subunit_name(int entry) const = 0;
+	void description(char *buffer) const;
 
 	// return offset within the range referenced by this handler
 	offs_t byteoffset(offs_t byteaddress) const { return (byteaddress - m_bytestart) & m_bytemask; }
@@ -540,6 +542,7 @@ public:
 
 	// getters
 	virtual const char *name() const;
+	virtual const char *subunit_name(int entry) const;
 
 	// configure delegate callbacks
 	void set_delegate(read8_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
@@ -641,6 +644,7 @@ public:
 
 	// getters
 	virtual const char *name() const;
+	virtual const char *subunit_name(int entry) const;
 
 	// configure delegate callbacks
 	void set_delegate(write8_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
@@ -3738,10 +3742,14 @@ const char *address_table::handler_name(UINT8 entry) const
 	// constant strings for lower entries
 	if (entry < ARRAY_LENGTH(strings))
 		return strings[entry];
-	else if (handler(entry).name() != NULL)
-		return handler(entry).name();
 	else
+	{
+		static char desc[4096];
+		handler(entry).description(desc);
+		if (desc[0])
+			return desc;
 		return "???";
+	}
 }
 
 
@@ -4434,6 +4442,32 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 
 
 
+//-------------------------------------------------
+//  description - build a printable description
+//  of the handler
+//-------------------------------------------------
+
+void handler_entry::description(char *buffer) const
+{
+	if (m_subunits)
+	{
+		for (int i=0; i != m_subunits; i++)
+		{
+			if (i)
+				*buffer++ = ' ';
+			buffer += sprintf (buffer, "%d:%d:%x:%d:%s",
+							   m_subunit_infos[i].m_size,
+							   m_subunit_infos[i].m_shift,
+							   m_subunit_infos[i].m_offset,
+							   m_subunit_infos[i].m_multiplier,
+							   subunit_name(i));
+		}
+	}
+	else
+		strcpy (buffer, name());
+}
+
+
 //**************************************************************************
 //  HANDLER ENTRY READ
 //**************************************************************************
@@ -4451,6 +4485,23 @@ const char *handler_entry_read::name() const
 		case 16:	return m_read.r16.name();
 		case 32:	return m_read.r32.name();
 		case 64:	return m_read.r64.name();
+	}
+	return NULL;
+}
+
+//-------------------------------------------------
+//  subunit_name - return the handler name, from the
+//  appropriately-sized delegate of a subunit
+//-------------------------------------------------
+
+const char *handler_entry_read::subunit_name(int entry) const
+{
+	switch (m_subunit_infos[entry].m_size)
+	{
+		case 8:		return m_subread[entry].r8.name();
+		case 16:	return m_subread[entry].r16.name();
+		case 32:	return m_subread[entry].r32.name();
+		case 64:	return m_subread[entry].r64.name();
 	}
 	return NULL;
 }
@@ -4877,6 +4928,41 @@ const char *handler_entry_write::name() const
 		case 64:	return m_write.w64.name();
 	}
 	return NULL;
+}
+
+
+//-------------------------------------------------
+//  subunit_name - return the handler name, from the
+//  appropriately-sized delegate of a subunit
+//-------------------------------------------------
+
+const char *handler_entry_write::subunit_name(int entry) const
+{
+	switch (m_subunit_infos[entry].m_size)
+	{
+		case 8:		return m_subwrite[entry].w8.name();
+		case 16:	return m_subwrite[entry].w16.name();
+		case 32:	return m_subwrite[entry].w32.name();
+		case 64:	return m_subwrite[entry].w64.name();
+	}
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  remove_subunit - delete a subunit specific
+//  information and shift up the following ones
+//-------------------------------------------------
+void handler_entry_write::remove_subunit(int entry)
+{
+	int moving = m_subunits - entry - 1;
+	if (moving)
+	{
+		memmove(m_subwrite+entry,       m_subwrite+entry+1,       moving*sizeof(m_subwrite[0]));
+		memmove(m_sub_is_legacy+entry,  m_sub_is_legacy+entry+1,  moving*sizeof(m_sub_is_legacy[0]));
+		memmove(m_sublegacy_info+entry, m_sublegacy_info+entry+1, moving*sizeof(m_sublegacy_info[0]));
+	}
+	m_subunits--;
 }
 
 
