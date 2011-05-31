@@ -201,6 +201,7 @@
 ***************************************************************************/
 
 #include <list>
+#include <map>
 
 #include "emu.h"
 #include "profiler.h"
@@ -463,11 +464,16 @@ public:
 	// configure the handler addresses, and mark as populated
 	void configure(offs_t bytestart, offs_t byteend, offs_t bytemask)
 	{
+		if (m_populated && m_subunits)
+			reconfigure_subunits(bytestart);
 		m_populated = true;
 		m_bytestart = bytestart;
 		m_byteend = byteend;
 		m_bytemask = bytemask;
 	}
+
+	// reconfigure the subunits on a base address change
+	void reconfigure_subunits(offs_t bytestart);
 
 	// apply a global mask
 	void apply_mask(offs_t bytemask) { m_bytemask &= bytemask; }
@@ -807,7 +813,7 @@ public:
 
 	// table mapping helpers
 	void map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT8 staticentry);
-	void setup_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, std::list<UINT32> &entries);
+	void setup_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask, std::list<UINT32> &entries);
 	UINT8 derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const;
 
 	// misc helpers
@@ -859,6 +865,9 @@ protected:
 
 	// static global read-only watchpoint table
 	static UINT8			s_watchpoint_table[1 << LEVEL1_BITS];
+
+private:
+	UINT8 get_free_handler();
 };
 
 
@@ -879,7 +888,7 @@ public:
 	// range getter
 	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
 		std::list<UINT32> entries;
-		setup_range(bytestart, byteend, bytemask, bytemirror, entries);
+		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
 		std::list<handler_entry_read *> handlers;
 		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); i++)
 			handlers.push_back(&handler_read(*i));
@@ -945,7 +954,7 @@ public:
 	// range getter
 	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
 		std::list<UINT32> entries;
-		setup_range(bytestart, byteend, bytemask, bytemirror, entries);
+		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
 		std::list<handler_entry_write *> handlers;
 		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); i++)
 			handlers.push_back(&handler_write(*i));
@@ -3236,15 +3245,39 @@ void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask,
 	m_space.m_direct.force_update(entry);
 }
 
+UINT8 address_table::get_free_handler()
+{
+	// scan all possible assigned entries for something unpopulated
+	for (UINT8 scanentry = STATIC_COUNT; scanentry < SUBTABLE_BASE; scanentry++)
+		if (!handler(scanentry).populated())
+			return scanentry;
+
+	// if we didn't find anything, find something to depopulate and try again
+	depopulate_unused();
+	for (UINT8 scanentry = STATIC_COUNT; scanentry < SUBTABLE_BASE; scanentry++)
+		if (!handler(scanentry).populated())
+			return scanentry;
+
+	throw emu_fatalerror("Out of handler entries in address table");
+}
+
 
 //-------------------------------------------------
-//  setup_range - finds an approprite handler entry
+//  setup_range - finds an appropriate handler entry
 //  and requests to populate the address map with
 //  it
 //-------------------------------------------------
 
-void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<UINT32> &entries)
+namespace {
+	struct subrange {
+		offs_t start, end;
+		subrange(offs_t _start, offs_t _end) : start(_start), end(_end) {}
+	};
+};
+
+void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
 {
+
 	// convert addresses to bytes
 	offs_t bytestart = addrstart;
 	offs_t byteend = addrend;
@@ -3252,54 +3285,105 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 	offs_t bytemirror = addrmirror;
 	m_space.adjust_addresses(bytestart, byteend, bytemask, bytemirror);
 
-	// validity checks
+	// Validity checks
 	assert_always(addrstart <= addrend, "address_table::map_range called with start greater than end");
 	assert_always((bytestart & (m_space.data_width() / 8 - 1)) == 0, "address_table::map_range called with misaligned start address");
 	assert_always((byteend & (m_space.data_width() / 8 - 1)) == (m_space.data_width() / 8 - 1), "address_table::map_range called with misaligned end address");
 
-	// find a free entry
-	UINT8 entry = STATIC_INVALID;
-	// two attempts to find an empty
-	for (int attempt = 0; attempt < 2; attempt++)
+	// Scan the memory to see what has to be done
+	std::list<subrange> range_override;
+	std::map<UINT8, std::list<subrange> > range_partial;
+	
+	offs_t base_mirror = 0;
+	do
 	{
-		// scan all possible assigned entries for something unpopulated, or for an exact match
-		for (UINT8 scanentry = STATIC_COUNT; scanentry < SUBTABLE_BASE; scanentry++)
+		offs_t base_address = base_mirror | bytestart;
+		offs_t end_address  = base_mirror | byteend;
+
+		do
 		{
-			handler_entry &curentry = handler(scanentry);
+			offs_t range_start, range_end;
+			UINT8 entry = derive_range(base_address, range_start, range_end);
+			UINT32 stop_address = range_end > end_address ? end_address : range_end;
 
-			// exact match takes precedence
-			if (curentry.matches_exactly(bytestart, byteend, bytemask))
-			{
-				entry = scanentry;
-				break;
-			}
+			if (entry < STATIC_COUNT || handler(entry).overriden_by_mask(mask))
+				range_override.push_back(subrange(base_address, stop_address));
+			else
+				range_partial[entry].push_back(subrange(base_address, stop_address));
 
-			// unpopulated is our second choice
-			if (entry == STATIC_INVALID && !curentry.populated())
-				entry = scanentry;
+			base_address = stop_address + 1;
 		}
+		while (base_address != end_address + 1);
 
-		// if we didn't find anything, find something to depopulate
-		if (entry != STATIC_INVALID)
-			break;
-		depopulate_unused();
+		// Efficient method to go the the next range start given a mirroring mask
+		base_mirror = (base_mirror + 1 + ~bytemirror) & bytemirror;
+	}
+	while (base_mirror);
+
+	// Ranges in range_override must be plain replaced by the new handler
+	if (!range_override.empty())
+	{
+		// Grab a free entry
+		UINT8 entry = get_free_handler();
+
+		// configure the entry to our parameters
+		handler_entry &curentry = handler(entry);
+		curentry.configure(bytestart, byteend, bytemask);
+
+		// Populate it wherever needed
+		for (std::list<subrange>::const_iterator i = range_override.begin(); i != range_override.end(); i++)
+			populate_range(i->start, i->end, entry);
+
+		// Add it in the "to be setup" list
+		entries.push_back(entry);
+
+		// recompute any direct access on this space if it is a read modification
+		m_space.m_direct.force_update(entry);
 	}
 
-	// if we utterly failed, it's fatal
-	if (entry == STATIC_INVALID)
-		throw emu_fatalerror("Out of handler entries in address table");
+	// Ranges in range_partial must duplicated then partially changed
+	if (!range_partial.empty())
+	{
+		for (std::map<UINT8, std::list<subrange> >::const_iterator i = range_partial.begin(); i != range_partial.end(); i++)
+		{
+			// Theorically, if the handler to change matches the
+			// characteristics of ours, we can directly change it.  In
+			// practice, it's more complex than that because the
+			// mirroring is not saved, so we're not sure there aren't
+			// mappings on the handler outside of the zones we're
+			// supposed to change.  So we won't do the obvious
+			// optimization at this point.
 
-	// configure the entry to our parameters
-	handler_entry &curentry = handler(entry);
-	curentry.configure(bytestart, byteend, bytemask);
+			// Get the original handler
+			handler_entry *base_entry = &handler(i->first);
 
-	// populate it
-	populate_range_mirrored(bytestart, byteend, bytemirror, entry);
+			// Verify it is compatible enough with ours given what we can
+			// support.
+			if (base_entry->bytemask() != bytemask)
+				throw emu_fatalerror("Handlers on different subunits of the same address with different address masks are not supported.");
 
-	// recompute any direct access on this space if it is a read modification
-	m_space.m_direct.force_update(entry);
+			// Grab a new handler and copy it there
+			UINT8 entry = get_free_handler();
+			handler_entry &curentry = handler(entry);
+			curentry.copy(base_entry);
 
-	entries.push_back(entry);
+			// Clear the colliding entries
+			curentry.clear_conflicting_subunits(mask);
+
+			// Reconfigure the base addresses
+			curentry.configure(bytestart, byteend, bytemask);
+
+			// Populate it wherever needed
+			for (std::list<subrange>::const_iterator j = i->second.begin(); j != i->second.end(); j++)
+				populate_range(j->start, j->end, entry);
+
+			// Add it in the "to be setup" list
+			entries.push_back(entry);
+
+			// recompute any direct access on this space if it is a read modification
+			m_space.m_direct.force_update(entry);
+		}
+	}
 }
 
 
@@ -4494,6 +4578,18 @@ void handler_entry::copy(handler_entry *entry)
 
 
 //-------------------------------------------------
+//  reconfigure_subunits - reconfigure the subunits
+//  to handle a new base address
+//-------------------------------------------------
+void handler_entry::reconfigure_subunits(offs_t bytestart)
+{
+	offs_t delta = bytestart - m_bytestart;
+	for (int i=0; i != m_subunits; i++)
+		m_subunit_infos[i].m_offset -= delta;
+}
+
+
+//-------------------------------------------------
 //  configure_subunits - configure the subunits
 //  and subshift array to represent the provided
 //  mask
@@ -4523,7 +4619,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 	}
 
 	// fill in the shifts
-	m_subunits = 0;
+	int cur_offset = 0;
 	start_slot = m_subunits;
 	for (int unitnum = 0; unitnum < maxunits; unitnum++)
 	{
@@ -4531,7 +4627,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 		if (((handlermask >> shift) & unitmask) != 0)
 		{
 			m_subunit_infos[m_subunits].m_mask = unitmask;
-			m_subunit_infos[m_subunits].m_offset = m_subunits;
+			m_subunit_infos[m_subunits].m_offset = cur_offset++;
 			m_subunit_infos[m_subunits].m_size = handlerbits;
 			m_subunit_infos[m_subunits].m_shift = shift;
 			m_subunit_infos[m_subunits].m_multiplier = count;
