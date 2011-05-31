@@ -330,7 +330,6 @@ const options_entry windows_options::s_option_entries[] =
 	{ NULL,                                             		NULL,        OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
 	{ WINOPTION_HLSL_ENABLE";hlsl",         					"0",         OPTION_BOOLEAN,    "enable HLSL post-processing (PS3.0 required)" },
 	{ WINOPTION_HLSLPATH,                                   	"hlsl",      OPTION_STRING,     "path to hlsl files" },
-	{ WINOPTION_HLSL_PRESCALE";hlsl_prescale",         			"0",         OPTION_BOOLEAN,    "enable HLSL scaling pre-pass (for 'x' filters)" },
 	{ WINOPTION_HLSL_PRESCALE_SIZE,         					"2",         OPTION_INTEGER,    "HLSL scaling pre-pass factor (usually 2 or 3)" },
 	{ WINOPTION_HLSL_PRESET";(-1-5)",                           "-1",        OPTION_INTEGER,    "HLSL preset to use (0-5)" },
 	{ WINOPTION_HLSL_WRITE,         					        NULL,        OPTION_STRING,     "enable HLSL AVI writing (huge disk bandwidth suggested)" },

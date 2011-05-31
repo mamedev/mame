@@ -79,7 +79,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	
 	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
 	Output.TexCoord = Input.TexCoord + 0.5f * InvTexSize; 
-	Output.PrevCoord = Input.TexCoord + 0.5f * InvTexSize;
+	Output.PrevCoord = Input.TexCoord;// + 0.5f * InvTexSize;
 	
 	return Output;
 }
@@ -101,7 +101,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float GreenMax = max(CurrPix.g, PrevPix.g);
 	float BlueMax = max(CurrPix.b, PrevPix.b);
 
-	return float4(RedMax, GreenMax, BlueMax, CurrPix.a);
+	return CurrPix;//float4(RedMax, GreenMax, BlueMax, CurrPix.a);
 }
 
 //-----------------------------------------------------------------------------

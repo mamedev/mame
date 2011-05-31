@@ -369,7 +369,6 @@ struct _d3d_info
 
 	bool					hlsl_enable;				// HLSL enable flag
 	bool					yiq_enable;					// HLSL YIQ-convolution flag
-	bool					hlsl_prescale;				// HLSL prescale enable flag
 	int						hlsl_prescale_size;			// HLSL prescale size
 	int						hlsl_preset;				// HLSL preset, if relevant
 	float					oversample_x;				// render target oversampling factor (width) for shader prettification
@@ -2160,7 +2159,6 @@ static int device_verify_caps(d3d_info *d3d, win_window_info *window)
 
 	d3d->hlsl_enable = downcast<windows_options &>(window->machine().options()).d3d_hlsl_enable() && d3dintf->post_fx_available;
 	d3d->yiq_enable = downcast<windows_options &>(window->machine().options()).screen_yiq_enable();
-	d3d->hlsl_prescale = downcast<windows_options &>(window->machine().options()).d3d_hlsl_prescale();
 	d3d->hlsl_prescale_size = downcast<windows_options &>(window->machine().options()).d3d_hlsl_prescale_size();
 	d3d->hlsl_preset = downcast<windows_options &>(window->machine().options()).d3d_hlsl_preset();
 
@@ -3151,48 +3149,9 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				(*d3dintf->effect.end)(curr_effect);
 
-				/* Pre-scaling pass (if enabled) */
-				if(d3d->hlsl_prescale)
-				{
-					curr_effect = d3d->prescale_effect;
-					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlslsmalltexture0[poly->texture->target_index]);
-
-					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
-					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
-
-					(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
-
-					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlslprescaletarget0[poly->texture->target_index]);
-					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-					for (UINT pass = 0; pass < num_passes; pass++)
-					{
-						(*d3dintf->effect.begin_pass)(curr_effect, pass);
-						// add the primitives
-						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
-						if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-						(*d3dintf->effect.end_pass)(curr_effect);
-					}
-
-					(*d3dintf->effect.end)(curr_effect);
-
-					curr_effect = d3d->deconverge_effect;
-					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlslprescaletexture0[poly->texture->target_index]);
-				}
-				else
-				{
-					curr_effect = d3d->deconverge_effect;
-					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlslsmalltexture0[poly->texture->target_index]);
-				}
-
-				/* Deconverge pass */
-				curr_effect = d3d->deconverge_effect;
+				/* Pre-scaling pass */
+				curr_effect = d3d->prescale_effect;
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlslsmalltexture0[poly->texture->target_index]);
 
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
@@ -3200,6 +3159,37 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
 				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
 				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+
+				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
+
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlslprescaletarget0[poly->texture->target_index]);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+
+				for (UINT pass = 0; pass < num_passes; pass++)
+				{
+					(*d3dintf->effect.begin_pass)(curr_effect, pass);
+					// add the primitives
+					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
+					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+					(*d3dintf->effect.end_pass)(curr_effect);
+				}
+
+				(*d3dintf->effect.end)(curr_effect);
+
+
+				/* Deconverge pass */
+				curr_effect = d3d->deconverge_effect;
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlslprescaletexture0[poly->texture->target_index]);
+
+				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+				(*d3dintf->effect.set_float)(curr_effect, "Prescale", d3d->hlsl_prescale_size);
 				(*d3dintf->effect.set_float)(curr_effect, "RedConvergeX", options->screen_red_converge_x);
 				(*d3dintf->effect.set_float)(curr_effect, "RedConvergeY", options->screen_red_converge_y);
 				(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeX", options->screen_green_converge_x);
@@ -4016,8 +4006,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture4[idx], 0, &d3d->hlsltarget4[idx]);
 
-						int scale = 1;
-						if(d3d->hlsl_prescale) scale = d3d->hlsl_prescale_size;
+						int scale = d3d->hlsl_prescale_size;
 
 						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * scale, texture->rawheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslsmalltexture0[idx]);
 						if (result != D3D_OK)
@@ -4108,8 +4097,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture4[idx], 0, &d3d->hlsltarget4[idx]);
 
-						int scale = 1;
-						if(d3d->hlsl_prescale) scale = d3d->hlsl_prescale_size;
+						int scale = d3d->hlsl_prescale_size;
 
 						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * scale, scheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslsmalltexture0[idx]);
 						if (result != D3D_OK)

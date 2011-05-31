@@ -81,7 +81,6 @@
 // core post-processing options
 #define WINOPTION_HLSL_ENABLE				"hlsl_enable"
 #define WINOPTION_HLSLPATH					"hlslpath"
-#define WINOPTION_HLSL_PRESCALE				"hlsl_prescale"
 #define WINOPTION_HLSL_PRESCALE_SIZE		"hlsl_prescale_size"
 #define WINOPTION_HLSL_PRESET				"hlsl_preset"
 #define WINOPTION_HLSL_WRITE				"hlsl_write"
@@ -222,7 +221,6 @@ public:
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
 	const char *d3d_hlsl_write() const { return value(WINOPTION_HLSL_WRITE); }
-	bool d3d_hlsl_prescale() const { return bool_value(WINOPTION_HLSL_PRESCALE); }
 	int d3d_hlsl_prescale_size() const { return int_value(WINOPTION_HLSL_PRESCALE_SIZE); }
 	int d3d_hlsl_preset() const { return int_value(WINOPTION_HLSL_PRESET); }
 	int d3d_snap_width() const { return int_value(WINOPTION_HLSL_SNAP_WIDTH); }

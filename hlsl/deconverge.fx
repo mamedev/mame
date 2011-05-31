@@ -72,6 +72,8 @@ uniform float GrnRadialConvergeY;
 uniform float BluRadialConvergeX;
 uniform float BluRadialConvergeY;
 
+uniform float Prescale;
+
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
@@ -115,23 +117,20 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	Deconverge = 1.0f;//clamp(Deconverge, 0.0f, 1.0f);
 	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;
 	
-	float2 RawDims = float2(RawWidth, RawHeight);
-	float2 TexCoord = Input.TexCoord * RawDims;
-	float2 RedCoord = Input.RedCoord * RawDims;
-	float2 GrnCoord = Input.GrnCoord * RawDims;
-	float2 BluCoord = Input.BluCoord * RawDims;
-	TexCoord.y = TexCoord.y - frac(TexCoord.y);
-	RedCoord.y = RedCoord.y - frac(RedCoord.y);
-	GrnCoord.y = GrnCoord.y - frac(GrnCoord.y);
-	BluCoord.y = BluCoord.y - frac(BluCoord.y);
+	float2 TargetDims = float2(RawWidth * Prescale, RawHeight * Prescale);
+	float2 DimOffset = 0.5f / TargetDims;
+	float2 TexCoord = Input.TexCoord;
+	float2 RedCoord = Input.RedCoord;
+	float2 GrnCoord = Input.GrnCoord;
+	float2 BluCoord = Input.BluCoord;
 	
-	RedCoord = lerp(TexCoord, RedCoord, Deconverge) / RawDims;
-	GrnCoord = lerp(TexCoord, GrnCoord, Deconverge) / RawDims;
-	BluCoord = lerp(TexCoord, BluCoord, Deconverge) / RawDims;
+	RedCoord = lerp(TexCoord, RedCoord, Deconverge);
+	GrnCoord = lerp(TexCoord, GrnCoord, Deconverge);
+	BluCoord = lerp(TexCoord, BluCoord, Deconverge);
 
-	float RedTexel = tex2D(DiffuseSampler, RedCoord + float2(0.0f, 0.5f) / RawDims).r;
-	float GrnTexel = tex2D(DiffuseSampler, GrnCoord + float2(0.0f, 0.5f) / RawDims).g;
-	float BluTexel = tex2D(DiffuseSampler, BluCoord + float2(0.0f, 0.5f) / RawDims).b;
+	float RedTexel = tex2D(DiffuseSampler, RedCoord - DimOffset).r;
+	float GrnTexel = tex2D(DiffuseSampler, GrnCoord - DimOffset).g;
+	float BluTexel = tex2D(DiffuseSampler, BluCoord - DimOffset).b;
 	
 	//RedTexel *= Input.RedCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
 	//RedTexel *= Input.RedCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;

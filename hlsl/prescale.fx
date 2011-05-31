@@ -59,7 +59,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 
-	Output.TexCoord = Input.TexCoord + 0.5f / float2(RawWidth, RawHeight);
+	Output.TexCoord = Input.TexCoord;
 
 	return Output;
 }
@@ -70,7 +70,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 Center = tex2D(DiffuseSampler, Input.TexCoord);
+	float2 RawDims = float2(RawWidth, RawHeight);
+	float2 TexCoord = Input.TexCoord * RawDims;
+	TexCoord -= frac(float2(0.0f, TexCoord.y));
+	TexCoord /= RawDims;
+	
+	float4 Center = tex2D(DiffuseSampler, TexCoord);
 	return Center;
 }
 
