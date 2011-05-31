@@ -468,6 +468,9 @@ public:
 	// apply a global mask
 	void apply_mask(offs_t bytemask) { m_bytemask &= bytemask; }
 
+	void clear_conflicting_subunits(UINT64 handlermask);
+	bool overriden_by_mask(UINT64 handlermask);
+
 protected:
 	// Subunit description information
 	struct subunit_info
@@ -481,6 +484,7 @@ protected:
 
 	// internal helpers
 	void configure_subunits(UINT64 handlermask, int handlerbits, int &start_slot, int &end_slot);
+	virtual void remove_subunit(int entry) = 0;
 
 	// internal state
 	bool					m_populated;			// populated?
@@ -587,6 +591,9 @@ private:
 	template<typename _UintType>
 	_UintType read_stub_ioport(address_space &space, offs_t offset, _UintType mask) { return input_port_read_direct(m_ioport); }
 
+	// internal helper
+	virtual void remove_subunit(int entry);
+
 	// internal state
 	access_handler				m_read;
 	access_handler				m_subread[8];
@@ -688,6 +695,9 @@ private:
 	// stubs for writing I/O ports
 	template<typename _UintType>
 	void write_stub_ioport(address_space &space, offs_t offset, _UintType data, _UintType mask) { input_port_write_direct(m_ioport, data, mask); }
+
+	// internal helper
+	virtual void remove_subunit(int entry);
 
 	// internal state
 	access_handler				m_write;
@@ -4441,6 +4451,61 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 }
 
 
+//-------------------------------------------------
+//  clear_conflicting_subunits - clear the subunits
+//  conflicting with the provided mask
+//-------------------------------------------------
+
+void handler_entry::clear_conflicting_subunits(UINT64 handlermask)
+{
+	// A mask of 0 is in fact an alternative way of saying ~0
+	if (!handlermask)
+	{
+		m_subunits = 0;
+		return;
+	}
+
+	// Start by the end to avoid unnecessary memmoves
+	for (int i=m_subunits-1; i>=0; i--)
+		if (((handlermask >> m_subunit_infos[i].m_shift) & m_subunit_infos[i].m_mask) != 0)
+		{
+			if (i != m_subunits-1)
+				memmove (m_subunit_infos+i, m_subunit_infos+i+1, (m_subunits-i-1)*sizeof(m_subunit_infos[0]));
+			remove_subunit(i);
+		}
+
+	// compute the inverse mask
+	m_invsubmask = 0;
+	for (int i = 0; i < m_subunits; i++)
+		m_invsubmask |= m_subunit_infos[i].m_mask << m_subunit_infos[i].m_shift;
+	m_invsubmask = ~m_invsubmask;
+}
+
+
+//-------------------------------------------------
+//  overriden_by_mask - check whether a handler with
+//  the provided mask fully overrides everything
+//  that's currently present
+//-------------------------------------------------
+
+bool handler_entry::overriden_by_mask(UINT64 handlermask)
+{
+	// A mask of 0 is in fact an alternative way of saying ~0
+	if (!handlermask)
+		return true;
+
+	// If there are no subunits, it's going to override
+	if (!m_subunits)
+		return true;
+
+	// Check whether a subunit would be left
+	for (int i=0; i != m_subunits; i++)
+		if (((handlermask >> m_subunit_infos[i].m_shift) & m_subunit_infos[i].m_mask) == 0)
+			return false;
+
+	return true;
+}
+
 
 //-------------------------------------------------
 //  description - build a printable description
@@ -4504,6 +4569,23 @@ const char *handler_entry_read::subunit_name(int entry) const
 		case 64:	return m_subread[entry].r64.name();
 	}
 	return NULL;
+}
+
+
+//-------------------------------------------------
+//  remove_subunit - delete a subunit specific
+//  information and shift up the following ones
+//-------------------------------------------------
+void handler_entry_read::remove_subunit(int entry)
+{
+	int moving = m_subunits - entry - 1;
+	if (moving)
+	{
+		memmove(m_subread+entry,        m_subread+entry+1,        moving*sizeof(m_subread[0]));
+		memmove(m_sub_is_legacy+entry,  m_sub_is_legacy+entry+1,  moving*sizeof(m_sub_is_legacy[0]));
+		memmove(m_sublegacy_info+entry, m_sublegacy_info+entry+1, moving*sizeof(m_sublegacy_info[0]));
+	}
+	m_subunits--;
 }
 
 
