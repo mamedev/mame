@@ -494,8 +494,7 @@ public:
 	handler_entry_read(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr)
 	{
-		m_legacy_object.space = NULL;
-		m_legacy_handler.space8 = NULL;
+		memset(&m_legacy_info, 0, sizeof(m_legacy_info));
 	}
 
 	// getters
@@ -554,24 +553,29 @@ private:
 	read64_delegate				m_read64;
 	const input_port_config *	m_ioport;
 
-	// unions to hold legacy objects and callbacks
-	union
+	// combination of unions to hold legacy objects and callbacks
+	struct legacy_info
 	{
-		address_space *	space;
-		device_t *				device;
-	} m_legacy_object;
+		union
+		{
+			address_space *	space;
+			device_t *				device;
+		} object;
 
-	union
-	{
-		read8_space_func		space8;
-		read16_space_func		space16;
-		read32_space_func		space32;
-		read64_space_func		space64;
-		read8_device_func		device8;
-		read16_device_func		device16;
-		read32_device_func		device32;
-		read64_device_func		device64;
-	} m_legacy_handler;
+		union
+		{
+			read8_space_func		space8;
+			read16_space_func		space16;
+			read32_space_func		space32;
+			read64_space_func		space64;
+			read8_device_func		device8;
+			read16_device_func		device16;
+			read32_device_func		device32;
+			read64_device_func		device64;
+		} handler;
+	};
+
+	legacy_info m_legacy_info;
 };
 
 
@@ -585,8 +589,7 @@ public:
 	handler_entry_write(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr)
 	{
-		m_legacy_object.space = NULL;
-		m_legacy_handler.space8 = NULL;
+		memset(&m_legacy_info, 0, sizeof(m_legacy_info));
 	}
 
 	// getters
@@ -645,24 +648,29 @@ private:
 	write64_delegate			m_write64;
 	const input_port_config *	m_ioport;
 
-	// unions to hold legacy objects and callbacks
-	union
+	// combination of unions to hold legacy objects and callbacks
+	struct legacy_info
 	{
-		address_space *	space;
-		device_t *				device;
-	} m_legacy_object;
+		union
+		{
+			address_space *	space;
+			device_t *				device;
+		} object;
 
-	union
-	{
-		write8_space_func		space8;
-		write16_space_func		space16;
-		write32_space_func		space32;
-		write64_space_func		space64;
-		write8_device_func		device8;
-		write16_device_func		device16;
-		write32_device_func		device32;
-		write64_device_func		device64;
-	} m_legacy_handler;
+		union
+		{
+			write8_space_func		space8;
+			write16_space_func		space16;
+			write32_space_func		space32;
+			write64_space_func		space64;
+			write8_device_func		device8;
+			write16_device_func		device16;
+			write32_device_func		device32;
+			write64_device_func		device64;
+		} handler;
+	};
+
+	legacy_info m_legacy_info;
 };
 
 
@@ -4521,29 +4529,29 @@ void handler_entry_read::set_delegate(read64_delegate delegate, UINT64 mask)
 
 void handler_entry_read::set_legacy_func(address_space &space, read8_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.space8 = func;
-	m_legacy_object.space = &space;
+	m_legacy_info.handler.space8 = func;
+	m_legacy_info.object.space = &space;
 	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read16_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.space16 = func;
-	m_legacy_object.space = &space;
+	m_legacy_info.handler.space16 = func;
+	m_legacy_info.object.space = &space;
 	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read32_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.space32 = func;
-	m_legacy_object.space = &space;
+	m_legacy_info.handler.space32 = func;
+	m_legacy_info.object.space = &space;
 	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read64_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.space64 = func;
-	m_legacy_object.space = &space;
+	m_legacy_info.handler.space64 = func;
+	m_legacy_info.object.space = &space;
 	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
@@ -4555,29 +4563,29 @@ void handler_entry_read::set_legacy_func(address_space &space, read64_space_func
 
 void handler_entry_read::set_legacy_func(device_t &device, read8_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.device8 = func;
-	m_legacy_object.device = &device;
+	m_legacy_info.handler.device8 = func;
+	m_legacy_info.object.device = &device;
 	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read16_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.device16 = func;
-	m_legacy_object.device = &device;
+	m_legacy_info.handler.device16 = func;
+	m_legacy_info.object.device = &device;
 	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read32_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.device32 = func;
-	m_legacy_object.device = &device;
+	m_legacy_info.handler.device32 = func;
+	m_legacy_info.object.device = &device;
 	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read64_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.device64 = func;
-	m_legacy_object.device = &device;
+	m_legacy_info.handler.device64 = func;
+	m_legacy_info.object.device = &device;
 	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
@@ -4722,22 +4730,22 @@ UINT64 handler_entry_read::read_stub_64_from_32(address_space &space, offs_t off
 
 UINT8 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT8 mask)
 {
-	return m_legacy_handler.space8(m_legacy_object.space, offset);
+	return m_legacy_info.handler.space8(m_legacy_info.object.space, offset);
 }
 
 UINT16 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT16 mask)
 {
-	return m_legacy_handler.space16(m_legacy_object.space, offset, mask);
+	return m_legacy_info.handler.space16(m_legacy_info.object.space, offset, mask);
 }
 
 UINT32 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT32 mask)
 {
-	return m_legacy_handler.space32(m_legacy_object.space, offset, mask);
+	return m_legacy_info.handler.space32(m_legacy_info.object.space, offset, mask);
 }
 
 UINT64 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset, UINT64 mask)
 {
-	return m_legacy_handler.space64(m_legacy_object.space, offset, mask);
+	return m_legacy_info.handler.space64(m_legacy_info.object.space, offset, mask);
 }
 
 
@@ -4848,29 +4856,29 @@ void handler_entry_write::set_delegate(write64_delegate delegate, UINT64 mask)
 
 void handler_entry_write::set_legacy_func(address_space &space, write8_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.space8 = func;
-	m_legacy_object.space = &space;
+	m_legacy_info.handler.space8 = func;
+	m_legacy_info.object.space = &space;
 	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write16_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.space16 = func;
-	m_legacy_object.space = &space;
+	m_legacy_info.handler.space16 = func;
+	m_legacy_info.object.space = &space;
 	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write32_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.space32 = func;
-	m_legacy_object.space = &space;
+	m_legacy_info.handler.space32 = func;
+	m_legacy_info.object.space = &space;
 	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write64_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.space64 = func;
-	m_legacy_object.space = &space;
+	m_legacy_info.handler.space64 = func;
+	m_legacy_info.object.space = &space;
 	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
@@ -4882,29 +4890,29 @@ void handler_entry_write::set_legacy_func(address_space &space, write64_space_fu
 
 void handler_entry_write::set_legacy_func(device_t &device, write8_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.device8 = func;
-	m_legacy_object.device = &device;
+	m_legacy_info.handler.device8 = func;
+	m_legacy_info.object.device = &device;
 	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write16_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.device16 = func;
-	m_legacy_object.device = &device;
+	m_legacy_info.handler.device16 = func;
+	m_legacy_info.object.device = &device;
 	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write32_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.device32 = func;
-	m_legacy_object.device = &device;
+	m_legacy_info.handler.device32 = func;
+	m_legacy_info.object.device = &device;
 	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write64_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_handler.device64 = func;
-	m_legacy_object.device = &device;
+	m_legacy_info.handler.device64 = func;
+	m_legacy_info.object.device = &device;
 	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
@@ -5037,20 +5045,20 @@ void handler_entry_write::write_stub_64_from_32(address_space &space, offs_t off
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT8 data, UINT8 mask)
 {
-	m_legacy_handler.space8(m_legacy_object.space, offset, data);
+	m_legacy_info.handler.space8(m_legacy_info.object.space, offset, data);
 }
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT16 data, UINT16 mask)
 {
-	m_legacy_handler.space16(m_legacy_object.space, offset, data, mask);
+	m_legacy_info.handler.space16(m_legacy_info.object.space, offset, data, mask);
 }
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT32 data, UINT32 mask)
 {
-	m_legacy_handler.space32(m_legacy_object.space, offset, data, mask);
+	m_legacy_info.handler.space32(m_legacy_info.object.space, offset, data, mask);
 }
 
 void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
 {
-	m_legacy_handler.space64(m_legacy_object.space, offset, data, mask);
+	m_legacy_info.handler.space64(m_legacy_info.object.space, offset, data, mask);
 }
