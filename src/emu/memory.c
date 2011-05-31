@@ -4603,7 +4603,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 	// compute the maximum possible subunits
 	int maxunits = m_datawidth / handlerbits;
 	assert(maxunits > 1);
-	assert(maxunits <= ARRAY_LENGTH(m_subshift));
+	assert(maxunits <= ARRAY_LENGTH(m_subunit_infos));
 
 	int shift_xor_mask = m_endianness == ENDIANNESS_LITTLE ? 0 : maxunits - 1;
 
