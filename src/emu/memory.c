@@ -438,6 +438,8 @@ public:
 	virtual const char *subunit_name(int entry) const = 0;
 	void description(char *buffer) const;
 
+	virtual void copy(handler_entry *entry);
+
 	// return offset within the range referenced by this handler
 	offs_t byteoffset(offs_t byteaddress) const { return (byteaddress - m_bytestart) & m_bytemask; }
 
@@ -546,6 +548,8 @@ public:
 		memset(&m_legacy_info, 0, sizeof(m_legacy_info));
 	}
 
+	virtual void copy(handler_entry *entry);
+
 	// getters
 	virtual const char *name() const;
 	virtual const char *subunit_name(int entry) const;
@@ -650,6 +654,8 @@ public:
 	{
 		memset(&m_legacy_info, 0, sizeof(m_legacy_info));
 	}
+
+	virtual void copy(handler_entry *entry);
 
 	// getters
 	virtual const char *name() const;
@@ -4462,6 +4468,32 @@ handler_entry::~handler_entry()
 
 
 //-------------------------------------------------
+//  copy - copy another handler_entry, but only
+//  if it is populated and constitutes of one or
+//  more subunit handlers
+//-------------------------------------------------
+
+void handler_entry::copy(handler_entry *entry)
+{
+	assert(entry->m_populated);
+	assert(entry->m_subunits);
+	assert(!entry->m_rambaseptr);
+	assert(!m_populated);
+
+	m_populated = true;
+	m_datawidth = entry->m_datawidth;
+	m_endianness = entry->m_endianness;
+	m_bytestart = entry->m_bytestart;
+	m_byteend = entry->m_byteend;
+	m_bytemask = entry->m_bytemask;
+	m_rambaseptr = 0;
+	m_subunits = entry->m_subunits;
+	memcpy(m_subunit_infos, entry->m_subunit_infos, m_subunits*sizeof(subunit_info));
+	m_invsubmask = entry->m_invsubmask;
+}
+
+
+//-------------------------------------------------
 //  configure_subunits - configure the subunits
 //  and subshift array to represent the provided
 //  mask
@@ -4602,6 +4634,22 @@ void handler_entry::description(char *buffer) const
 //**************************************************************************
 //  HANDLER ENTRY READ
 //**************************************************************************
+
+//-------------------------------------------------
+//  copy - copy another handler_entry, but only
+//  if it is populated and constitutes of one or
+//  more subunit handlers
+//-------------------------------------------------
+
+void handler_entry_read::copy(handler_entry *entry)
+{
+	handler_entry::copy(entry);
+	handler_entry_read *rentry = static_cast<handler_entry_read *>(entry);
+	m_read = rentry->m_read;
+	memcpy(m_subread, rentry->m_subread, m_subunits*sizeof(access_handler));
+	memcpy(m_sub_is_legacy, rentry->m_sub_is_legacy, m_subunits*sizeof(bool));
+	memcpy(m_sublegacy_info, rentry->m_sublegacy_info, m_subunits*sizeof(legacy_info));
+}
 
 //-------------------------------------------------
 //  name - return the handler name, from the
@@ -5060,6 +5108,22 @@ UINT64 handler_entry_read::read_stub_legacy(address_space &space, offs_t offset,
 //**************************************************************************
 //  HANDLER ENTRY WRITE
 //**************************************************************************
+
+//-------------------------------------------------
+//  copy - copy another handler_entry, but only
+//  if it is populated and constitutes of one or
+//  more subunit handlers
+//-------------------------------------------------
+
+void handler_entry_write::copy(handler_entry *entry)
+{
+	handler_entry::copy(entry);
+	handler_entry_write *wentry = static_cast<handler_entry_write *>(entry);
+	m_write = wentry->m_write;
+	memcpy(m_subwrite, wentry->m_subwrite, m_subunits*sizeof(access_handler));
+	memcpy(m_sub_is_legacy, wentry->m_sub_is_legacy, m_subunits*sizeof(bool));
+	memcpy(m_sublegacy_info, wentry->m_sublegacy_info, m_subunits*sizeof(legacy_info));
+}
 
 //-------------------------------------------------
 //  name - return the handler name, from the
