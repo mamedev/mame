@@ -104,6 +104,7 @@ also has a DSP;
 #include "machine/stvcd.h"
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
+#include "sound/cdda.h"
 #include "machine/stvprot.h"
 #include "includes/stv.h"
 #include "imagedev/chd_cd.h"
@@ -2756,6 +2757,10 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
+	MCFG_SOUND_ADD("cdda", CDDA, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CARTSLOT_ADD("cart")
 MACHINE_CONFIG_END
@@ -2800,6 +2805,10 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 
 	MCFG_SOUND_ADD("scsp", SCSP, 0)
 	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("cdda", CDDA, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
