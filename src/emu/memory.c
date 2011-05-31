@@ -522,6 +522,15 @@ public:
 		} handler;
 	};
 
+	struct access_handler
+	{
+		// Constructors mean you can't union them
+		read8_delegate				r8;
+		read16_delegate				r16;
+		read32_delegate				r32;
+		read64_delegate				r64;
+	};
+		
 	// construction/destruction
 	handler_entry_read(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr)
@@ -554,10 +563,10 @@ public:
 	void set_ioport(const input_port_config &ioport);
 
 	// read via the underlying delegates
-	UINT8 read8(address_space &space, offs_t offset, UINT8 mask) const { return m_read8(space, offset, mask); }
-	UINT16 read16(address_space &space, offs_t offset, UINT16 mask) const { return m_read16(space, offset, mask); }
-	UINT32 read32(address_space &space, offs_t offset, UINT32 mask) const { return m_read32(space, offset, mask); }
-	UINT64 read64(address_space &space, offs_t offset, UINT64 mask) const { return m_read64(space, offset, mask); }
+	UINT8 read8(address_space &space, offs_t offset, UINT8 mask) const { return m_read.r8(space, offset, mask); }
+	UINT16 read16(address_space &space, offs_t offset, UINT16 mask) const { return m_read.r16(space, offset, mask); }
+	UINT32 read32(address_space &space, offs_t offset, UINT32 mask) const { return m_read.r32(space, offset, mask); }
+	UINT64 read64(address_space &space, offs_t offset, UINT64 mask) const { return m_read.r64(space, offset, mask); }
 
 private:
 	// stubs for converting between address sizes
@@ -576,10 +585,7 @@ private:
 	_UintType read_stub_ioport(address_space &space, offs_t offset, _UintType mask) { return input_port_read_direct(m_ioport); }
 
 	// internal state
-	read8_delegate				m_read8;
-	read16_delegate				m_read16;
-	read32_delegate				m_read32;
-	read64_delegate				m_read64;
+	access_handler				m_read;
 	const input_port_config *	m_ioport;
 
 	legacy_info m_legacy_info;
@@ -614,6 +620,15 @@ public:
 		} handler;
 	};
 
+	struct access_handler
+	{
+		// Constructors mean you can't union them
+		write8_delegate				w8;
+		write16_delegate			w16;
+		write32_delegate			w32;
+		write64_delegate			w64;
+	};
+
 	// construction/destruction
 	handler_entry_write(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr)
@@ -646,10 +661,10 @@ public:
 	void set_ioport(const input_port_config &ioport);
 
 	// write via the underlying delegates
-	void write8(address_space &space, offs_t offset, UINT8 data, UINT8 mask) const { m_write8(space, offset, data, mask); }
-	void write16(address_space &space, offs_t offset, UINT16 data, UINT16 mask) const { m_write16(space, offset, data, mask); }
-	void write32(address_space &space, offs_t offset, UINT32 data, UINT32 mask) const { m_write32(space, offset, data, mask); }
-	void write64(address_space &space, offs_t offset, UINT64 data, UINT64 mask) const { m_write64(space, offset, data, mask); }
+	void write8(address_space &space, offs_t offset, UINT8 data, UINT8 mask) const { m_write.w8(space, offset, data, mask); }
+	void write16(address_space &space, offs_t offset, UINT16 data, UINT16 mask) const { m_write.w16(space, offset, data, mask); }
+	void write32(address_space &space, offs_t offset, UINT32 data, UINT32 mask) const { m_write.w32(space, offset, data, mask); }
+	void write64(address_space &space, offs_t offset, UINT64 data, UINT64 mask) const { m_write.w64(space, offset, data, mask); }
 
 private:
 	// stubs for converting between address sizes
@@ -668,10 +683,7 @@ private:
 	void write_stub_ioport(address_space &space, offs_t offset, _UintType data, _UintType mask) { input_port_write_direct(m_ioport, data, mask); }
 
 	// internal state
-	write8_delegate				m_write8;
-	write16_delegate			m_write16;
-	write32_delegate			m_write32;
-	write64_delegate			m_write64;
+	access_handler				m_write;
 	const input_port_config *	m_ioport;
 
 	legacy_info m_legacy_info;
@@ -4427,10 +4439,10 @@ const char *handler_entry_read::name() const
 {
 	switch (m_datawidth)
 	{
-		case 8:		return m_read8.name();
-		case 16:	return m_read16.name();
-		case 32:	return m_read32.name();
-		case 64:	return m_read64.name();
+		case 8:		return m_read.r8.name();
+		case 16:	return m_read.r16.name();
+		case 32:	return m_read.r32.name();
+		case 64:	return m_read.r64.name();
 	}
 	return NULL;
 }
@@ -4449,7 +4461,7 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask, cons
 
 	// make sure this is a valid size
 	assert(m_datawidth >= 8);
-	m_read8 = delegate;
+	m_read.r8 = delegate;
 	if (info)
 		m_legacy_info = *info;
 
@@ -4480,7 +4492,7 @@ void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask, con
 
 	// make sure this is a valid size
 	assert(m_datawidth >= 16);
-	m_read16 = delegate;
+	m_read.r16 = delegate;
 	if (info)
 		m_legacy_info = *info;
 
@@ -4509,7 +4521,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask, con
 
 	// make sure this is a valid size
 	assert(m_datawidth >= 32);
-	m_read32 = delegate;
+	m_read.r32 = delegate;
 	if (info)
 		m_legacy_info = *info;
 
@@ -4535,7 +4547,7 @@ void handler_entry_read::set_delegate(read64_delegate delegate, UINT64 mask, con
 
 	// make sure this is a valid size
 	assert(m_datawidth >= 64);
-	m_read64 = delegate;
+	m_read.r64 = delegate;
 	if (info)
 		m_legacy_info = *info;
 }
@@ -4649,7 +4661,7 @@ UINT16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, UIN
 		const subunit_info &si = m_subunit_infos[index];
 		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
-			result |= m_read8(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
+			result |= m_read.r8(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
 	}
 	return result;
 }
@@ -4671,10 +4683,10 @@ UINT32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, UIN
 			switch (si.m_size)
 			{
 			case 8:
-				result |= m_read8(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
+				result |= m_read.r8(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
 				break;
 			case 16:
-				result |= m_read16(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
+				result |= m_read.r16(space, offset * si.m_multiplier + si.m_offset, submask) << si.m_shift;
 				break;
 			}
 	}
@@ -4698,13 +4710,13 @@ UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UIN
 			switch (si.m_size)
 			{
 			case 8:
-				result |= UINT64(m_read8(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
+				result |= UINT64(m_read.r8(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
 				break;
 			case 16:
-				result |= UINT64(m_read16(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
+				result |= UINT64(m_read.r16(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
 				break;
 			case 32:
-				result |= UINT64(m_read32(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
+				result |= UINT64(m_read.r32(space, offset * si.m_multiplier + si.m_offset, submask)) << si.m_shift;
 				break;
 			}
 	}
@@ -4752,10 +4764,10 @@ const char *handler_entry_write::name() const
 {
 	switch (m_datawidth)
 	{
-		case 8:		return m_write8.name();
-		case 16:	return m_write16.name();
-		case 32:	return m_write32.name();
-		case 64:	return m_write64.name();
+		case 8:		return m_write.w8.name();
+		case 16:	return m_write.w16.name();
+		case 32:	return m_write.w32.name();
+		case 64:	return m_write.w64.name();
 	}
 	return NULL;
 }
@@ -4769,7 +4781,7 @@ const char *handler_entry_write::name() const
 void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 8);
-	m_write8 = delegate;
+	m_write.w8 = delegate;
 	if (info)
 		m_legacy_info = *info;
 
@@ -4795,7 +4807,7 @@ void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask, co
 void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 16);
-	m_write16 = delegate;
+	m_write.w16 = delegate;
 	if (info)
 		m_legacy_info = *info;
 
@@ -4819,7 +4831,7 @@ void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask, c
 void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 32);
-	m_write32 = delegate;
+	m_write.w32 = delegate;
 	if (info)
 		m_legacy_info = *info;
 
@@ -4840,7 +4852,7 @@ void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask, c
 void handler_entry_write::set_delegate(write64_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 64);
-	m_write64 = delegate;
+	m_write.w64 = delegate;
 	if (info)
 		m_legacy_info = *info;
 }
@@ -4953,7 +4965,7 @@ void handler_entry_write::write_stub_16(address_space &space, offs_t offset, UIN
 		const subunit_info &si = m_subunit_infos[index];
 		UINT32 submask = (mask >> si.m_shift) & si.m_mask;
 		if (submask)
-			m_write8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+			m_write.w8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
 	}
 }
 
@@ -4973,10 +4985,10 @@ void handler_entry_write::write_stub_32(address_space &space, offs_t offset, UIN
 			switch (si.m_size)
 			{
 			case 8:
-				m_write8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				m_write.w8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
 				break;
 			case 16:
-				m_write16(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				m_write.w16(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
 				break;
 			}
 	}
@@ -4998,13 +5010,13 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UIN
 			switch (si.m_size)
 			{
 			case 8:
-				m_write8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				m_write.w8(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
 				break;
 			case 16:
-				m_write16(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				m_write.w16(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
 				break;
 			case 32:
-				m_write32(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
+				m_write.w32(space, offset * si.m_multiplier + si.m_offset, data >> si.m_shift, submask);
 				break;
 			}
 	}
