@@ -2967,6 +2967,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+					(*d3dintf->effect.set_float)(curr_effect, "Prescale", (float)d3d->hlsl_prescale_size);
 					(*d3dintf->effect.set_float)(curr_effect, "RedFloor", options->screen_red_floor);
 					(*d3dintf->effect.set_float)(curr_effect, "GrnFloor", options->screen_green_floor);
 					(*d3dintf->effect.set_float)(curr_effect, "BluFloor", options->screen_blue_floor);
@@ -3031,6 +3032,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
 					(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
 					(*d3dintf->effect.set_float)(curr_effect, "ScanTime", winoptions.screen_yiq_scan_time());
+					(*d3dintf->effect.set_float)(curr_effect, "Prescale", (float)d3d->hlsl_prescale_size);
 
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsltarget4[poly->texture->target_index]);
 
@@ -3071,6 +3073,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
 					(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
 					(*d3dintf->effect.set_float)(curr_effect, "ScanTime", winoptions.screen_yiq_scan_time());
+					(*d3dintf->effect.set_float)(curr_effect, "Prescale", (float)d3d->hlsl_prescale_size);
 
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsltarget3[poly->texture->target_index]);
 
@@ -3993,12 +3996,12 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture2[idx], 0, &d3d->hlsltarget2[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture3[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture3[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture3[idx], 0, &d3d->hlsltarget3[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture4[idx], 0, &d3d->hlsltarget4[idx]);
@@ -4093,7 +4096,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture3[idx], 0, &d3d->hlsltarget3[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
 						if (result != D3D_OK)
 							goto error;
 						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture4[idx], 0, &d3d->hlsltarget4[idx]);

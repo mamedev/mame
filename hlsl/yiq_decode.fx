@@ -114,13 +114,16 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float PI = 3.1415926535897932384626433832795;
 	float PI2 = 2.0f * PI;
 	float PI2Length = PI2 / 42.0f;
+	float4 NOffset = float4(0.0f, 1.0f, 2.0f, 3.0f);
+	float W = PI2 * CCValue * ScanTime;
 	for(float n = -21.0f; n < 22.0f; n += 4.0f)
 	{
-		float4 n4 = float4(n + 0.0f, n + 1.0f, n + 2.0f, n + 3.0f);
+		float4 n4 = n + NOffset;
 		float4 CoordX = Input.Coord0.x + Input.Coord0.z * n4 * 0.25f;
 		float4 CoordY = Input.Coord0.y;
-		float4 C = tex2D(CompositeSampler, float2(CoordX.r, CoordY.r)) * CRange + MinC;
-		float4 WT = PI2 * CCValue * ScanTime * (CoordX * WidthRatio + AValue * CoordY * 2.0f * (RawHeight / HeightRatio) + BValue) + OValue;
+		float2 TexCoord = float2(CoordX.r, CoordY.r);
+		float4 C = tex2D(CompositeSampler, TexCoord) * CRange + MinC;
+		float4 WT = W * (CoordX * WidthRatio + AValue * CoordY * 2.0f * (RawHeight / HeightRatio) + BValue) + OValue;
 
 		float4 SincYIn = PI2 * Fc_y * n4;
 		float4 IdealY = 2.0f * Fc_y * ((SincYIn != 0.0f) ? (sin(SincYIn) / SincYIn) : 1.0f);
