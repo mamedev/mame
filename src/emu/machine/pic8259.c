@@ -47,6 +47,7 @@ struct pic8259
 	UINT8 irr;
 	UINT8 prio;
 	UINT8 imr;
+	UINT8 irq_lines;
 
 	UINT8 input;
 	UINT8 ocw3;
@@ -124,6 +125,7 @@ INLINE void pic8259_set_timer(pic8259_t *pic8259)
 static void pic8259_set_irq_line(device_t *device, int irq, int state)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
+	UINT8 mask = (1 << irq);
 
 	if (state)
 	{
@@ -131,7 +133,9 @@ static void pic8259_set_irq_line(device_t *device, int irq, int state)
 		if (LOG_GENERAL)
 			logerror("pic8259_set_irq_line(): PIC set IRQ line #%d\n", irq);
 
-		pic8259->irr |= 1 << irq;
+		if(pic8259->level_trig_mode || (!pic8259->level_trig_mode && !(pic8259->irq_lines & mask)))
+			pic8259->irr |= mask;
+		pic8259->irq_lines |= mask;
 	}
 	else
 	{
@@ -139,7 +143,8 @@ static void pic8259_set_irq_line(device_t *device, int irq, int state)
 		if (LOG_GENERAL)
 			logerror("pic8259_set_irq_line(): PIC cleared IRQ line #%d\n", irq);
 
-		pic8259->irr &= ~(1 << irq);
+		pic8259->irq_lines &= ~mask;
+		pic8259->irr &= ~mask;
 	}
 
 	pic8259_set_timer(pic8259);
@@ -304,6 +309,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 								if (pic8259->isr & mask)
 								{
 									pic8259->isr &= ~mask;
+									pic8259->irr &= ~mask;
 									break;
 								}
 							}
@@ -423,6 +429,7 @@ static DEVICE_RESET( pic8259 ) {
 	pic8259->state = STATE_READY;
 	pic8259->isr = 0;
 	pic8259->irr = 0;
+	pic8259->irq_lines = 0;
 	pic8259->prio = 0;
 	pic8259->imr = 0;
 	pic8259->input = 0;
