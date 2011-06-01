@@ -60,7 +60,6 @@ struct _nec_state_t
 	direct_read_data *direct;
 	address_space *io;
 	int		icount;
-	int noem;
 
 	UINT8	prefetch_size;
 	UINT8	prefetch_cycles;
@@ -132,7 +131,7 @@ typedef enum {
 
 
 #define PUSH(val) { Wreg(SP)-=2; write_mem_word((((Sreg(SS)<<4)+Wreg(SP))),val); }
-#define POP(var) { Wreg(SP)+=2; var = read_mem_word((((Sreg(SS)<<4)+Wreg(SP)-2))); }
+#define POP(var) { var = read_mem_word((((Sreg(SS)<<4)+Wreg(SP)))); Wreg(SP)+=2; }
 
 #define GetModRM UINT32 ModRM=FETCH()
 

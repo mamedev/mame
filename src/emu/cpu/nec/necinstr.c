@@ -357,8 +357,8 @@ OP( 0x98, i_cbw       ) { Breg(AH) = (Breg(AL) & 0x80) ? 0xff : 0;		CLK(2);	}
 OP( 0x99, i_cwd       ) { Wreg(DW) = (Breg(AH) & 0x80) ? 0xffff : 0;	CLK(4);	}
 OP( 0x9a, i_call_far  ) { UINT32 tmp, tmp2;	tmp = FETCHWORD(); tmp2 = FETCHWORD(); PUSH(Sreg(PS)); PUSH(nec_state->ip); nec_state->ip = (WORD)tmp; Sreg(PS) = (WORD)tmp2; CHANGE_PC; CLKW(29,29,13,29,21,9,Wreg(SP)); }
 OP( 0x9b, i_wait      ) { if (!nec_state->poll_state) nec_state->ip--; CLK(5); }
-OP( 0x9c, i_pushf     ) { UINT16 tmp = CompressFlags(); tmp |= (nec_state->noem << 15); PUSH( tmp ); CLKS(12,8,3); }
-OP( 0x9d, i_popf      ) { UINT32 tmp; POP(tmp); tmp |= (nec_state->noem << 15); ExpandFlags(tmp); CLKS(12,8,5); if (nec_state->TF) nec_trap(nec_state); }
+OP( 0x9c, i_pushf     ) { UINT16 tmp = CompressFlags(); PUSH( tmp ); CLKS(12,8,3); }
+OP( 0x9d, i_popf      ) { UINT32 tmp; POP(tmp); ExpandFlags(tmp); CLKS(12,8,5); if (nec_state->TF) nec_trap(nec_state); }
 OP( 0x9e, i_sahf      ) { UINT32 tmp = (CompressFlags() & 0xff00) | (Breg(AH) & 0xd5); ExpandFlags(tmp); CLKS(3,3,2); }
 OP( 0x9f, i_lahf      ) { Breg(AH) = CompressFlags() & 0xff; CLKS(3,3,2); }
 

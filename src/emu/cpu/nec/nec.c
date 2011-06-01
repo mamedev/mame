@@ -204,7 +204,7 @@ static CPU_RESET( nec )
 	nec_state->TF = 0;
 	nec_state->IF = 0;
 	nec_state->DF = 0;
-	nec_state->MF = 1;
+	nec_state->MF = 1;	// brkem should set to 0 when implemented
 	nec_state->SignVal = 0;
 	nec_state->AuxVal = 0;
 	nec_state->OverVal = 0;
@@ -215,7 +215,6 @@ static CPU_RESET( nec )
 	nec_state->nmi_state = 0;
 	nec_state->irq_state = 0;
 	nec_state->poll_state = 1;
-	nec_state->noem = 1;  // brkem should set to 0 when implemented
 
 	Sreg(PS) = 0xffff;
 	Sreg(SS) = 0;

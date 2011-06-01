@@ -181,7 +181,6 @@ static CPU_RESET( v25 )
 	nec_state->intp_state[0] = 0;
 	nec_state->intp_state[1] = 0;
 	nec_state->intp_state[2] = 0;
-	nec_state->noem = 1;
 
 	nec_state->TM0 = nec_state->MD0 = nec_state->TM1 = nec_state->MD1 = 0;
 	nec_state->TMC0 = nec_state->TMC1 = 0;
