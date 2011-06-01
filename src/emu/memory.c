@@ -475,6 +475,13 @@ public:
 	// reconfigure the subunits on a base address change
 	void reconfigure_subunits(offs_t bytestart);
 
+	// depopulate an handler
+	void deconfigure()
+	{
+		m_populated = false;
+		m_subunits = 0;
+	}
+
 	// apply a global mask
 	void apply_mask(offs_t bytemask) { m_bytemask &= bytemask; }
 
@@ -3543,7 +3550,31 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 
 void address_table::depopulate_unused()
 {
-	assert(false);
+	bool used[SUBTABLE_BASE - STATIC_COUNT];
+	memset(used, 0, sizeof(used));
+
+	for (int level1 = 0; level1 != 1 << LEVEL1_BITS; level1++)
+	{
+		UINT8 l1_entry = m_table[level1];
+		if (l1_entry >= SUBTABLE_BASE)
+		{
+			assert(m_large);
+			const UINT8 *subtable = subtable_ptr(l1_entry);
+			for (int level2 = 0; level2 != 1 << LEVEL2_BITS; level2++)
+			{
+				UINT8 l2_entry = subtable[level2];
+				assert(l2_entry < SUBTABLE_BASE);
+				if (l2_entry >= STATIC_COUNT)
+					used[l2_entry - STATIC_COUNT] = true;
+			}
+		}
+		else if (l1_entry >= STATIC_COUNT)
+			used[l1_entry - STATIC_COUNT] = true;
+	}
+
+	for (int slot=0; slot != SUBTABLE_BASE - STATIC_COUNT; slot++)
+		if (!used[slot])
+			handler(slot + STATIC_COUNT).deconfigure();
 }
 
 
