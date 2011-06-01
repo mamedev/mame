@@ -9445,7 +9445,9 @@ static void SIO(upd7810_state *cpustate)
 
 static void SKIT_F0(upd7810_state *cpustate)
 {
-	logerror("unimplemented instruction: SKIT_F0\n");
+	if (IRR & INTF0)
+		PSW |= SK;
+	IRR &= ~INTF0;
 }
 
 static void SKNIT_F0(upd7810_state *cpustate)
