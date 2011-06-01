@@ -788,10 +788,10 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 		cpustate->pc=(cpustate->base[CS]+off)&AMASK ;
 
 		// docs say check rpl but windows doesn't like it
-		if (i80286_verify(cpustate, cpustate->sregs[DS], I80286_READ, cpustate->rights[DS]) && (DPL(cpustate->rights[DS]) < CPL))
+		if (i80286_verify(cpustate, cpustate->sregs[DS], I80286_READ, cpustate->rights[DS]) || (DPL(cpustate->rights[DS]) < CPL))
 			i80286_data_descriptor(cpustate, DS, 0);
 
-		if (i80286_verify(cpustate, cpustate->sregs[ES], I80286_READ, cpustate->rights[ES]) && (DPL(cpustate->rights[ES]) < CPL))
+		if (i80286_verify(cpustate, cpustate->sregs[ES], I80286_READ, cpustate->rights[ES]) || (DPL(cpustate->rights[ES]) < CPL))
 			i80286_data_descriptor(cpustate, ES, 0);
 	} else {
 		cpustate->regs.w[SP] += (iret?6:4) + bytes;
