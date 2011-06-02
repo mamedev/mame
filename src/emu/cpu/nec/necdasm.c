@@ -29,6 +29,8 @@ enum
 	PARAM_REG2_16,		/* 16-bit register */
 	PARAM_RM8,			/* 8-bit memory or register */
 	PARAM_RM16,			/* 16-bit memory or register */
+	PARAM_RMPTR8,		/* 8-bit memory or register */
+	PARAM_RMPTR16,		/* 16-bit memory or register */
 	PARAM_I3,			/* 3-bit immediate */
 	PARAM_I4,			/* 4-bit immediate */
 	PARAM_I8,			/* 8-bit signed immediate */
@@ -139,7 +141,7 @@ static const I386_OPCODE necv_opcode_table1[256] =
 	{"sub",				MODRM,			PARAM_RM16,			PARAM_REG16,		0				},
 	{"sub",				MODRM,			PARAM_REG8,			PARAM_RM8,			0				},
 	{"sub",				MODRM,			PARAM_REG16,		PARAM_RM16,			0				},
-	{"sub",				0,				PARAM_AL,			PARAM_I8,			0				},
+	{"sub",				0,				PARAM_AL,			PARAM_UI8,			0				},
 	{"sub",				0,				PARAM_AW,			PARAM_IMM,			0				},
 	{"ps:",				SEG_PS,			0,					0,					0				},
 	{"adj4s",			0,				0,					0,					0				},
@@ -303,8 +305,8 @@ static const I386_OPCODE necv_opcode_table1[256] =
 	{"ret",				0,				0,					0,					0,				DASMFLAG_STEP_OUT},
 	{"mov     ds1,",	MODRM,			PARAM_REG16,		PARAM_RM16,			0				},
 	{"mov     ds0,",	MODRM,			PARAM_REG16,		PARAM_RM16,			0				},
-	{"mov",				MODRM,			PARAM_RM8,			PARAM_UI8,			0				},
-	{"mov",				MODRM,			PARAM_RM16,			PARAM_IMM,			0				},
+	{"mov",				MODRM,			PARAM_RMPTR8,		PARAM_UI8,			0				},
+	{"mov",				MODRM,			PARAM_RMPTR16,		PARAM_IMM,			0				},
 	{"prepare",			0,				PARAM_I16,			PARAM_UI8,			0				},
 	{"dispose",			0,				0,					0,					0				},
 	{"retf",			0,				PARAM_I16,			0,					0,				DASMFLAG_STEP_OUT},
@@ -386,22 +388,22 @@ static const I386_OPCODE necv_opcode_table2[256] =
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	// 0x10
-	{"test1",			MODRM,			PARAM_RM8,			PARAM_CL,			0				},
-	{"test1",			MODRM,			PARAM_RM16,			PARAM_CL,			0				},
-	{"clr1",			MODRM,			PARAM_RM8,			PARAM_CL,			0				},
-	{"clr1",			MODRM,			PARAM_RM16,			PARAM_CL,			0				},
-	{"set1",			MODRM,			PARAM_RM8,			PARAM_CL,			0				},
-	{"set1",			MODRM,			PARAM_RM16,			PARAM_CL,			0				},
-	{"not1",			MODRM,			PARAM_RM8,			PARAM_CL,			0				},
-	{"not1",			MODRM,			PARAM_RM16,			PARAM_CL,			0				},
-	{"test1",			MODRM,			PARAM_RM8,			PARAM_I3,			0				},
-	{"test1",			MODRM,			PARAM_RM16,			PARAM_I4,			0				},
-	{"clr1",			MODRM,			PARAM_RM8,			PARAM_I3,			0				},
-	{"clr1",			MODRM,			PARAM_RM16,			PARAM_I4,			0				},
-	{"set1",			MODRM,			PARAM_RM8,			PARAM_I3,			0				},
-	{"set1",			MODRM,			PARAM_RM16,			PARAM_I4,			0				},
-	{"not1",			MODRM,			PARAM_RM8,			PARAM_I3,			0				},
-	{"not1",			MODRM,			PARAM_RM16,			PARAM_I4,			0				},
+	{"test1",			MODRM,			PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"test1",			MODRM,			PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"clr1",			MODRM,			PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"clr1",			MODRM,			PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"set1",			MODRM,			PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"set1",			MODRM,			PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"not1",			MODRM,			PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"not1",			MODRM,			PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"test1",			MODRM,			PARAM_RMPTR8,		PARAM_I3,			0				},
+	{"test1",			MODRM,			PARAM_RMPTR16,		PARAM_I4,			0				},
+	{"clr1",			MODRM,			PARAM_RMPTR8,		PARAM_I3,			0				},
+	{"clr1",			MODRM,			PARAM_RMPTR16,		PARAM_I4,			0				},
+	{"set1",			MODRM,			PARAM_RMPTR8,		PARAM_I3,			0				},
+	{"set1",			MODRM,			PARAM_RMPTR16,		PARAM_I4,			0				},
+	{"not1",			MODRM,			PARAM_RMPTR8,		PARAM_I3,			0				},
+	{"not1",			MODRM,			PARAM_RMPTR16,		PARAM_I4,			0				},
 	// 0x20
 	{"add4s",			0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
@@ -411,9 +413,9 @@ static const I386_OPCODE necv_opcode_table2[256] =
 	{"movspa",			0,				0,					0,					0				},	/* V25/V35 only */
 	{"cmp4s",			0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
-	{"rol4",			MODRM,			PARAM_RM8,			0,					0				},
+	{"rol4",			MODRM,			PARAM_RMPTR8,		0,					0				},
 	{"???",				0,				0,					0,					0				},
-	{"ror4",			MODRM,			PARAM_RM8,			0,					0				},
+	{"ror4",			MODRM,			PARAM_RMPTR8,		0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"brkcs",			MODRM,			PARAM_REG2_16,		0,					0,				DASMFLAG_STEP_OVER},	/* V25/V35 only */
@@ -644,140 +646,140 @@ static const I386_OPCODE necv_opcode_table2[256] =
 
 static const I386_OPCODE immb_table[8] =
 {
-	{"add",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"or",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"addc",			0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"subc",			0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"and",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"sub",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"xor",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"cmp",				0,				PARAM_RM8,			PARAM_I8,			0				}
+	{"add",				0,				PARAM_RMPTR8,		PARAM_UI8,			0				},
+	{"or",				0,				PARAM_RMPTR8,		PARAM_UI8,			0				},
+	{"addc",			0,				PARAM_RMPTR8,		PARAM_UI8,			0				},
+	{"subc",			0,				PARAM_RMPTR8,		PARAM_UI8,			0				},
+	{"and",				0,				PARAM_RMPTR8,		PARAM_UI8,			0				},
+	{"sub",				0,				PARAM_RMPTR8,		PARAM_UI8,			0				},
+	{"xor",				0,				PARAM_RMPTR8,		PARAM_UI8,			0				},
+	{"cmp",				0,				PARAM_RMPTR8,		PARAM_UI8,			0				}
 };
 
 static const I386_OPCODE immw_table[8] =
 {
-	{"add",				0,				PARAM_RM16,			PARAM_IMM,			0				},
-	{"or",				0,				PARAM_RM16,			PARAM_IMM,			0				},
-	{"addc",			0,				PARAM_RM16,			PARAM_IMM,			0				},
-	{"subc",			0,				PARAM_RM16,			PARAM_IMM,			0				},
-	{"and",				0,				PARAM_RM16,			PARAM_IMM,			0				},
-	{"sub",				0,				PARAM_RM16,			PARAM_IMM,			0				},
-	{"xor",				0,				PARAM_RM16,			PARAM_IMM,			0				},
-	{"cmp",				0,				PARAM_RM16,			PARAM_IMM,			0				}
+	{"add",				0,				PARAM_RMPTR16,		PARAM_IMM,			0				},
+	{"or",				0,				PARAM_RMPTR16,		PARAM_IMM,			0				},
+	{"addc",			0,				PARAM_RMPTR16,		PARAM_IMM,			0				},
+	{"subc",			0,				PARAM_RMPTR16,		PARAM_IMM,			0				},
+	{"and",				0,				PARAM_RMPTR16,		PARAM_IMM,			0				},
+	{"sub",				0,				PARAM_RMPTR16,		PARAM_IMM,			0				},
+	{"xor",				0,				PARAM_RMPTR16,		PARAM_IMM,			0				},
+	{"cmp",				0,				PARAM_RMPTR16,		PARAM_IMM,			0				}
 };
 
 static const I386_OPCODE immws_table[8] =
 {
-	{"add",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"or",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"addc",			0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"subc",			0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"and",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"sub",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"xor",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"cmp",				0,				PARAM_RM16,			PARAM_I8,			0				}
+	{"add",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"or",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"addc",			0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"subc",			0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"and",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"sub",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"xor",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"cmp",				0,				PARAM_RMPTR16,		PARAM_I8,			0				}
 };
 
 static const I386_OPCODE shiftbi_table[8] =
 {
-	{"rol",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"ror",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"rolc",			0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"rorc",			0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"shl",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"shr",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"???",				0,				PARAM_RM8,			PARAM_I8,			0				},
-	{"shra",			0,				PARAM_RM8,			PARAM_I8,			0				}
+	{"rol",				0,				PARAM_RMPTR8,		PARAM_I8,			0				},
+	{"ror",				0,				PARAM_RMPTR8,		PARAM_I8,			0				},
+	{"rolc",			0,				PARAM_RMPTR8,		PARAM_I8,			0				},
+	{"rorc",			0,				PARAM_RMPTR8,		PARAM_I8,			0				},
+	{"shl",				0,				PARAM_RMPTR8,		PARAM_I8,			0				},
+	{"shr",				0,				PARAM_RMPTR8,		PARAM_I8,			0				},
+	{"???",				0,				PARAM_RMPTR8,		PARAM_I8,			0				},
+	{"shra",			0,				PARAM_RMPTR8,		PARAM_I8,			0				}
 };
 
 static const I386_OPCODE shiftwi_table[8] =
 {
-	{"rol",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"ror",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"rolc",			0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"rorc",			0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"shl",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"shr",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"???",				0,				PARAM_RM16,			PARAM_I8,			0				},
-	{"shra",			0,				PARAM_RM16,			PARAM_I8,			0				}
+	{"rol",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"ror",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"rolc",			0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"rorc",			0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"shl",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"shr",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"???",				0,				PARAM_RMPTR16,		PARAM_I8,			0				},
+	{"shra",			0,				PARAM_RMPTR16,		PARAM_I8,			0				}
 };
 
 static const I386_OPCODE shiftb_table[8] =
 {
-	{"rol",				0,				PARAM_RM8,			PARAM_1,			0				},
-	{"ror",				0,				PARAM_RM8,			PARAM_1,			0				},
-	{"rolc",			0,				PARAM_RM8,			PARAM_1,			0				},
-	{"rorc",			0,				PARAM_RM8,			PARAM_1,			0				},
-	{"shl",				0,				PARAM_RM8,			PARAM_1,			0				},
-	{"shr",				0,				PARAM_RM8,			PARAM_1,			0				},
-	{"???",				0,				PARAM_RM8,			PARAM_1,			0				},
-	{"shra",			0,				PARAM_RM8,			PARAM_1,			0				}
+	{"rol",				0,				PARAM_RMPTR8,		PARAM_1,			0				},
+	{"ror",				0,				PARAM_RMPTR8,		PARAM_1,			0				},
+	{"rolc",			0,				PARAM_RMPTR8,		PARAM_1,			0				},
+	{"rorc",			0,				PARAM_RMPTR8,		PARAM_1,			0				},
+	{"shl",				0,				PARAM_RMPTR8,		PARAM_1,			0				},
+	{"shr",				0,				PARAM_RMPTR8,		PARAM_1,			0				},
+	{"???",				0,				PARAM_RMPTR8,		PARAM_1,			0				},
+	{"shra",			0,				PARAM_RMPTR8,		PARAM_1,			0				}
 };
 
 static const I386_OPCODE shiftw_table[8] =
 {
-	{"rol",				0,				PARAM_RM16,			PARAM_1,			0				},
-	{"ror",				0,				PARAM_RM16,			PARAM_1,			0				},
-	{"rolc",			0,				PARAM_RM16,			PARAM_1,			0				},
-	{"rorc",			0,				PARAM_RM16,			PARAM_1,			0				},
-	{"shl",				0,				PARAM_RM16,			PARAM_1,			0				},
-	{"shr",				0,				PARAM_RM16,			PARAM_1,			0				},
-	{"???",				0,				PARAM_RM16,			PARAM_1,			0				},
-	{"shra",			0,				PARAM_RM16,			PARAM_1,			0				}
+	{"rol",				0,				PARAM_RMPTR16,		PARAM_1,			0				},
+	{"ror",				0,				PARAM_RMPTR16,		PARAM_1,			0				},
+	{"rolc",			0,				PARAM_RMPTR16,		PARAM_1,			0				},
+	{"rorc",			0,				PARAM_RMPTR16,		PARAM_1,			0				},
+	{"shl",				0,				PARAM_RMPTR16,		PARAM_1,			0				},
+	{"shr",				0,				PARAM_RMPTR16,		PARAM_1,			0				},
+	{"???",				0,				PARAM_RMPTR16,		PARAM_1,			0				},
+	{"shra",			0,				PARAM_RMPTR16,		PARAM_1,			0				}
 };
 
 static const I386_OPCODE shiftbv_table[8] =
 {
-	{"rol",				0,				PARAM_RM8,			PARAM_CL,			0				},
-	{"ror",				0,				PARAM_RM8,			PARAM_CL,			0				},
-	{"rolc",			0,				PARAM_RM8,			PARAM_CL,			0				},
-	{"rorc",			0,				PARAM_RM8,			PARAM_CL,			0				},
-	{"shl",				0,				PARAM_RM8,			PARAM_CL,			0				},
-	{"shr",				0,				PARAM_RM8,			PARAM_CL,			0				},
-	{"???",				0,				PARAM_RM8,			PARAM_CL,			0				},
-	{"shra",			0,				PARAM_RM8,			PARAM_CL,			0				}
+	{"rol",				0,				PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"ror",				0,				PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"rolc",			0,				PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"rorc",			0,				PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"shl",				0,				PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"shr",				0,				PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"???",				0,				PARAM_RMPTR8,		PARAM_CL,			0				},
+	{"shra",			0,				PARAM_RMPTR8,		PARAM_CL,			0				}
 };
 
 static const I386_OPCODE shiftwv_table[8] =
 {
-	{"rol",				0,				PARAM_RM16,			PARAM_CL,			0				},
-	{"ror",				0,				PARAM_RM16,			PARAM_CL,			0				},
-	{"rolc",			0,				PARAM_RM16,			PARAM_CL,			0				},
-	{"rorc",			0,				PARAM_RM16,			PARAM_CL,			0				},
-	{"shl",				0,				PARAM_RM16,			PARAM_CL,			0				},
-	{"shr",				0,				PARAM_RM16,			PARAM_CL,			0				},
-	{"???",				0,				PARAM_RM16,			PARAM_CL,			0				},
-	{"shra",			0,				PARAM_RM16,			PARAM_CL,			0				}
+	{"rol",				0,				PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"ror",				0,				PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"rolc",			0,				PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"rorc",			0,				PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"shl",				0,				PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"shr",				0,				PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"???",				0,				PARAM_RMPTR16,		PARAM_CL,			0				},
+	{"shra",			0,				PARAM_RMPTR16,		PARAM_CL,			0				}
 };
 
 static const I386_OPCODE group1b_table[8] =
 {
-	{"test",			0,				PARAM_RM8,			PARAM_I8,			0				},
+	{"test",			0,				PARAM_RMPTR8,		PARAM_UI8,			0				},
 	{"???",				0,				0,					0,					0				},
-	{"not",				0,				PARAM_RM8,			0,					0				},
-	{"neg",				0,				PARAM_RM8,			0,					0				},
-	{"mulu",			0,				PARAM_RM8,			0,					0				},
-	{"mul",				0,				PARAM_RM8,			0,					0				},
-	{"divu",			0,				PARAM_RM8,			0,					0				},
-	{"div",				0,				PARAM_RM8,			0,					0				}
+	{"not",				0,				PARAM_RMPTR8,		0,					0				},
+	{"neg",				0,				PARAM_RMPTR8,		0,					0				},
+	{"mulu",			0,				PARAM_RMPTR8,		0,					0				},
+	{"mul",				0,				PARAM_RMPTR8,		0,					0				},
+	{"divu",			0,				PARAM_RMPTR8,		0,					0				},
+	{"div",				0,				PARAM_RMPTR8,		0,					0				}
 };
 
 static const I386_OPCODE group1w_table[8] =
 {
-	{"test",			0,				PARAM_RM16,			PARAM_IMM,			0				},
+	{"test",			0,				PARAM_RMPTR16,		PARAM_IMM,			0				},
 	{"???",				0,				0,					0,					0				},
-	{"not",				0,				PARAM_RM16,			0,					0				},
-	{"neg",				0,				PARAM_RM16,			0,					0				},
-	{"mulu",			0,				PARAM_RM16,			0,					0				},
-	{"mul",				0,				PARAM_RM16,			0,					0				},
-	{"divu",			0,				PARAM_RM16,			0,					0				},
-	{"div",				0,				PARAM_RM16,			0,					0				}
+	{"not",				0,				PARAM_RMPTR16,		0,					0				},
+	{"neg",				0,				PARAM_RMPTR16,		0,					0				},
+	{"mulu",			0,				PARAM_RMPTR16,		0,					0				},
+	{"mul",				0,				PARAM_RMPTR16,		0,					0				},
+	{"divu",			0,				PARAM_RMPTR16,		0,					0				},
+	{"div",				0,				PARAM_RMPTR16,		0,					0				}
 };
 
 static const I386_OPCODE group2b_table[8] =
 {
-	{"inc",				0,				PARAM_RM8,			0,					0				},
-	{"dec",				0,				PARAM_RM8,			0,					0				},
+	{"inc",				0,				PARAM_RMPTR8,		0,					0				},
+	{"dec",				0,				PARAM_RMPTR8,		0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
@@ -788,13 +790,13 @@ static const I386_OPCODE group2b_table[8] =
 
 static const I386_OPCODE group2w_table[8] =
 {
-	{"inc",				0,				PARAM_RM16,			0,					0				},
-	{"dec",				0,				PARAM_RM16,			0,					0				},
-	{"call",			0,				PARAM_RM16,			0,					0,				DASMFLAG_STEP_OVER},
+	{"inc",				0,				PARAM_RMPTR16,		0,					0				},
+	{"dec",				0,				PARAM_RMPTR16,		0,					0				},
+	{"call",			0,				PARAM_RMPTR16,		0,					0,				DASMFLAG_STEP_OVER},
 	{"call    far ptr ",0,				PARAM_RM16,			0,					0,				DASMFLAG_STEP_OVER},
-	{"br",				0,				PARAM_RM16,			0,					0				},
+	{"br",				0,				PARAM_RMPTR16,		0,					0				},
 	{"br      far ptr ",0,				PARAM_RM16,			0,					0				},
-	{"push",			0,				PARAM_RM16,			0,					0				},
+	{"push",			0,				PARAM_RMPTR16,		0,					0				},
 	{"???",				0,				0,					0,					0				}
 };
 
@@ -1022,19 +1024,23 @@ static char* handle_param(char* s, UINT32 param)
 			break;
 
 		case PARAM_RM8:
+		case PARAM_RMPTR8:
 			if( modrm >= 0xc0 ) {
 				s += sprintf( s, "%s", nec_reg8[MODRM_REG2] );
 			} else {
-				s += sprintf( s, "byte ptr " );
+				if (param == PARAM_RMPTR8)
+					s += sprintf( s, "byte ptr " );
 				s += sprintf( s, "%s", modrm_string );
 			}
 			break;
 
 		case PARAM_RM16:
+		case PARAM_RMPTR16:
 			if( modrm >= 0xc0 ) {
 				s += sprintf( s, "%s", nec_reg[MODRM_REG2] );
 			} else {
-				s += sprintf( s, "word ptr " );
+				if (param == PARAM_RMPTR16)
+					s += sprintf( s, "word ptr " );
 				s += sprintf( s, "%s", modrm_string );
 			}
 			break;
