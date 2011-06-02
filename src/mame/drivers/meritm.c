@@ -1181,6 +1181,18 @@ ROM_START( pitbosss )
 	ROM_LOAD( "9221-10-0.u16",  0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
 ROM_END
 
+ROM_START( pitbosssa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9221-10-0a.u9",  0x00000, 0x10000, CRC(41be6b30) SHA1(c4df87a599e310ce29ee9277e5adc916ff68f060) )
+	ROM_LOAD( "9221-10-0.u10",  0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
+	ROM_LOAD( "9221-10-0a.u11", 0x20000, 0x10000, CRC(c9137469) SHA1(618680609bdffa92b919a2417bd3ec41a4c8bf2b) )
+	ROM_LOAD( "9221-10-0.u12",  0x30000, 0x10000, CRC(3577a203) SHA1(80f9c827ad9dea2c6af788bd3b46ab65e8c594eb) )
+	ROM_LOAD( "9221-10-0.u13",  0x40000, 0x10000, CRC(466f81f9) SHA1(88429d9ff53d27bf639200852a7bf61768c8fd1b) )
+	ROM_LOAD( "9221-10-0.u14a", 0x50000, 0x10000, CRC(0a928852) SHA1(c6c623f63a73b3de6298f436a4ca339c1447888d) )
+	ROM_LOAD( "9221-10-0.u15",  0x60000, 0x10000, CRC(c302b4c2) SHA1(d62d4bb33a9ccb95d1e550f9e439be3316b94c99) )
+	ROM_LOAD( "9221-10-0.u16",  0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
+ROM_END
+
 ROM_START( spitboss )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "u9-0a.rom",  0x00000, 0x10000, CRC(e0c45c9c) SHA1(534bff67c8fee08f1c348275de8977659efa9f69) )
@@ -1895,9 +1907,10 @@ static DRIVER_INIT(megat6)
 }
 
 /* CRT 250 */
-GAME( 1988, pitboss2,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, spitboss,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, pitbosss,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss Superstar", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, pitboss2,  0,        meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, spitboss,  0,        meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosss,  0,        meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosssa, pitbosss, meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 254 + CRT 256 */
 GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30, pbst30,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
