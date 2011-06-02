@@ -12,6 +12,11 @@
 
 #include "emu.h"
 
+#define MCFG_PSXGPU_ADD( cputag, tag, type, clock ) \
+	MCFG_DEVICE_ADD( tag, type, clock ) \
+	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \
+	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psx_dma_read_delegate( FUNC( psxgpu_device::dma_write ), (psxgpu_device *) device ) )
+
 extern const device_type CXD8514Q;
 extern const device_type CXD8538Q;
 extern const device_type CXD8561Q;
@@ -168,8 +173,8 @@ public:
 	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
 	WRITE32_MEMBER( write );
 	READ32_MEMBER( read );
-	void dma_read( UINT32 *p_ram, INT32 n_size );
-	void dma_write( UINT32 *p_ram, INT32 n_size );
+	void dma_read( UINT32 n_address, INT32 n_size );
+	void dma_write( UINT32 n_address, INT32 n_size );
 	void lightgun_set( int, int );
 	void vblank( void );
 
@@ -195,6 +200,8 @@ protected:
 	void MoveImage( void );
 	void psx_gpu_init( int n_gputype );
 	void gpu_reset();
+	void gpu_read( UINT32 *p_ram, INT32 n_size );
+	void gpu_write( UINT32 *p_ram, INT32 n_size );
 
 #if defined( MAME_DEBUG )
 	void DebugMeshInit( void );

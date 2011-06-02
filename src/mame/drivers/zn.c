@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_DEVICE_ADD( "gpu", CXD8561Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -538,7 +538,7 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_DEVICE_ADD( "gpu", CXD8654Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

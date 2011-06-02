@@ -32,8 +32,6 @@ VIDEO_START( psx_type2 );
 SCREEN_UPDATE( psx );
 INTERRUPT_GEN( psx_vblank );
 extern void psx_gpu_reset( running_machine &machine );
-extern void psx_gpu_read( running_machine &, UINT32 *p_ram, INT32 n_size );
-extern void psx_gpu_write( running_machine &, UINT32 *p_ram, INT32 n_size );
 READ32_HANDLER( psx_gpu_r );
 WRITE32_HANDLER( psx_gpu_w );
 extern void psx_lightgun_set( running_machine &, int, int );

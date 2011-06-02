@@ -2924,7 +2924,15 @@ void psxgpu_device::MoveImage( void )
 	}
 }
 
-void psxgpu_device::dma_write( UINT32 *p_ram, INT32 n_size )
+void psxgpu_device::dma_write( UINT32 n_address, INT32 n_size )
+{
+	psx_state *p_psx = machine().driver_data<psx_state>();
+	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
+
+	gpu_write( &p_n_psxram[ n_address / 4 ], n_size );
+}
+
+void psxgpu_device::gpu_write( UINT32 *p_ram, INT32 n_size )
 {
 	while( n_size > 0 )
 	{
@@ -3418,7 +3426,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 	switch( offset )
 	{
 	case 0x00:
-		dma_write( &data, 1 );
+		gpu_write( &data, 1 );
 		break;
 	case 0x01:
 		switch( data >> 24 )
@@ -3556,7 +3564,15 @@ WRITE32_MEMBER( psxgpu_device::write )
 }
 
 
-void psxgpu_device::dma_read( UINT32 *p_ram, INT32 n_size )
+void psxgpu_device::dma_read( UINT32 n_address, INT32 n_size )
+{
+	psx_state *p_psx = machine().driver_data<psx_state>();
+	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
+
+	gpu_read( &p_n_psxram[ n_address / 4 ], n_size );
+}
+
+void psxgpu_device::gpu_read( UINT32 *p_ram, INT32 n_size )
 {
 	while( n_size > 0 )
 	{
@@ -3611,7 +3627,7 @@ READ32_MEMBER( psxgpu_device::read )
 	switch( offset )
 	{
 	case 0x00:
-		dma_read( &data, 1 );
+		gpu_read( &data, 1 );
 		break;
 	case 0x01:
 		data = n_gpustatus;
