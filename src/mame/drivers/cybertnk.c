@@ -248,7 +248,7 @@ static SCREEN_UPDATE( cybertnk )
 			UINT16 param1 = state->m_roadram[i+2];
 			UINT16 param2 = state->m_roadram[i+0];
 
-			drawgfx_transpen(bitmap,cliprect,gfx,param1,0,0,0,-param2+screen_shift,i/4,0);
+			drawgfx_transpen(bitmap,cliprect,gfx,param1,0x23,0,0,-param2+screen_shift,i/4,0);
 
 
 		}
