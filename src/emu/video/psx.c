@@ -26,7 +26,7 @@ psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, co
 
 void psxgpu_device::device_start( void )
 {
-	if( m_type == CXD8514Q )
+	if( m_type == CXD8538Q )
 	{
 		psx_gpu_init( 1 );
 	}
