@@ -5012,8 +5012,8 @@ ROM_START( fb6s1 ) /* Compact PCB version */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17r.bin", 0x00000, 0x40000, CRC(679747d1) SHA1(ca702324c436d54f4c23350b1af4f0250915883c) )
 
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "rom2.bin", 0x00000, 0x80010, CRC(b940a9b1) SHA1(944eb41b9bbf293a476d96fda0ad19710cbc970f) ) /* Surface mounted AMIC A29040BV */
+	ROM_REGION( 0x080010, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "rom2.bin", 0x00000, 0x080010, CRC(b940a9b1) SHA1(944eb41b9bbf293a476d96fda0ad19710cbc970f) ) /* Surface mounted AMIC A29040BV */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "rom3.bin", 0x00000, 0x080000, CRC(4c2f9729) SHA1(2dd3ef0b90ab22caaafb412fa4bec4aa395bb718) ) /* Surface mounted MX29LV400TTC */
@@ -5046,8 +5046,8 @@ ROM_START( fb6s3 ) /* Compact PCB version */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s13r.bin", 0x00000, 0x40000, CRC(93ba8c7c) SHA1(905572e98bd01c4db597ee30afbe5f9cb1b114ed) )
 
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "rom2.bin", 0x00000, 0x80010, CRC(b940a9b1) SHA1(944eb41b9bbf293a476d96fda0ad19710cbc970f) ) /* Surface mounted AMIC A29040BV */
+	ROM_REGION( 0x080010, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "rom2.bin", 0x00000, 0x080010, CRC(b940a9b1) SHA1(944eb41b9bbf293a476d96fda0ad19710cbc970f) ) /* Surface mounted AMIC A29040BV */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "rom3.bin", 0x00000, 0x080000, CRC(4c2f9729) SHA1(2dd3ef0b90ab22caaafb412fa4bec4aa395bb718) ) /* Surface mounted MX29LV400TTC */
