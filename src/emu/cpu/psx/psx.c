@@ -3156,7 +3156,7 @@ void psxcpu_device::setcp3cr( int reg, UINT32 value )
 {
 }
 
-static psxcpu_device *getcpu( device_t &device, const char *cputag )
+psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
 {
 	if( strcmp( cputag, DEVICE_SELF ) == 0 )
 	{
@@ -3170,18 +3170,6 @@ void psxcpu_device::irq_set( device_t &device, const char *cputag, UINT32 bitmas
 {
 	psxirq_device *irq = downcast<psxirq_device *>( getcpu( device, cputag )->subdevice("irq") );
 	irq->set( bitmask );
-}
-
-void psxcpu_device::install_dma_read_handler( device_t &device, const char *cputag, int channel, psx_dma_read_delegate handler )
-{
-	psxdma_device *dma = downcast<psxdma_device *>( getcpu( device, cputag )->subdevice("dma") );
-	dma->install_read_handler( channel, handler );
-}
-
-void psxcpu_device::install_dma_write_handler( device_t &device, const char *cputag, int channel, psx_dma_write_delegate handler )
-{
-	psxdma_device *dma = downcast<psxdma_device *>( getcpu( device, cputag )->subdevice("dma") );
-	dma->install_write_handler( channel, handler );
 }
 
 void psxcpu_device::install_sio_handler( device_t &device, const char *cputag, int n_port, psx_sio_handler p_f_sio_handler )

@@ -105,10 +105,10 @@ enum
 //**************************************************************************
 
 #define MCFG_PSX_DMA_CHANNEL_READ( cputag, channel, handler ) \
-	psxcpu_device::install_dma_read_handler( *owner, cputag, channel, handler ); \
+	downcast<psxdma_device *>( psxcpu_device::getcpu( *owner, cputag )->subdevice("dma") )->install_read_handler( channel, handler );
 
 #define MCFG_PSX_DMA_CHANNEL_WRITE( cputag, channel, handler ) \
-	psxcpu_device::install_dma_write_handler( *owner, cputag, channel, handler ); \
+	downcast<psxdma_device *>( psxcpu_device::getcpu( *owner, cputag )->subdevice("dma") )->install_write_handler( channel, handler );
 
 
 
@@ -130,8 +130,7 @@ public:
 	WRITE32_MEMBER( berr_w );
 	READ32_MEMBER( berr_r );
 
-	static void install_dma_read_handler( device_t &device, const char *cputag, int channel, psx_dma_read_delegate handler );
-	static void install_dma_write_handler( device_t &device, const char *cputag, int channel, psx_dma_write_delegate handler );
+	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 	static void install_sio_handler( device_t &device, const char *cputag, int n_port, psx_sio_handler p_f_sio_handler );
 	static void sio_input( device_t &device, const char *cputag, int n_port, int n_mask, int n_data );
 	static void irq_set( device_t &device, const char *cputag, UINT32 bitmask );

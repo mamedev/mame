@@ -66,12 +66,12 @@ void psx_irq_set( running_machine &machine, UINT32 data )
 
 void psx_dma_install_read_handler( running_machine &machine, int n_channel, psx_dma_read_delegate p_fn_dma_read )
 {
-	psxcpu_device::install_dma_read_handler( *machine.device("maincpu"), "maincpu", n_channel, p_fn_dma_read );
+	downcast<psxdma_device *>( machine.device("maincpu")->subdevice("dma") )->install_read_handler( n_channel, p_fn_dma_read );
 }
 
 void psx_dma_install_write_handler( running_machine &machine, int n_channel, psx_dma_read_delegate p_fn_dma_write )
 {
-	psxcpu_device::install_dma_write_handler( *machine.device("maincpu"), "maincpu", n_channel, p_fn_dma_write );
+	downcast<psxdma_device *>( machine.device("maincpu")->subdevice("dma") )->install_write_handler( n_channel, p_fn_dma_write );
 }
 
 void psx_sio_install_handler( running_machine &machine, int n_port, psx_sio_handler p_f_sio_handler )
