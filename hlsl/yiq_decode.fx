@@ -122,7 +122,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		float4 CoordX = Input.Coord0.x + Input.Coord0.z * n4 * 0.25f;
 		float4 CoordY = Input.Coord0.y;
 		float2 TexCoord = float2(CoordX.r, CoordY.r);
-		float4 C = tex2D(CompositeSampler, TexCoord) * CRange + MinC;
+		float4 C = tex2D(CompositeSampler, TexCoord + float2(0.125f, 0.0f) / RawDims) * CRange + MinC;
 		float4 WT = W * (CoordX * WidthRatio + AValue * CoordY * 2.0f * (RawHeight / HeightRatio) + BValue) + OValue;
 
 		float4 SincYIn = PI2 * Fc_y * n4;
