@@ -17,6 +17,11 @@
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psx_dma_read_delegate( FUNC( psxgpu_device::dma_write ), (psxgpu_device *) device ) )
 
+#define MCFG_PSXGPU_REPLACE( cputag, tag, type, clock ) \
+	MCFG_DEVICE_REPLACE( tag, type, clock ) \
+	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \
+	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psx_dma_read_delegate( FUNC( psxgpu_device::dma_write ), (psxgpu_device *) device ) )
+
 extern const device_type CXD8514Q;
 extern const device_type CXD8538Q;
 extern const device_type CXD8561Q;
