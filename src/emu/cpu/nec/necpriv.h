@@ -130,8 +130,8 @@ typedef enum {
 #define EMPTY_PREFETCH()	nec_state->prefetch_reset = 1
 
 
-#define PUSH(val) { Wreg(SP)-=2; write_mem_word((((Sreg(SS)<<4)+Wreg(SP))),val); }
-#define POP(var) { var = read_mem_word((((Sreg(SS)<<4)+Wreg(SP)))); Wreg(SP)+=2; }
+#define PUSH(val) { Wreg(SP) -= 2; write_mem_word(((Sreg(SS)<<4)+Wreg(SP)), val); }
+#define POP(var) { Wreg(SP) += 2; var = read_mem_word(((Sreg(SS)<<4) + ((Wreg(SP)-2) & 0xffff))); }
 
 #define GetModRM UINT32 ModRM=FETCH()
 
