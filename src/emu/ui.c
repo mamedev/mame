@@ -138,6 +138,7 @@ static UINT32 handler_messagebox_ok(running_machine &machine, render_container *
 static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
 static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state);
 static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);
+static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state);
 
 /* slider controls */
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg);
@@ -1356,7 +1357,12 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	if (ui_disabled) return ui_disabled;
 
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
-		machine.schedule_exit();
+	{
+		if (!machine.options().confirm_quit())
+			machine.schedule_exit();
+		else
+			return ui_set_handler(handler_confirm_quit, 0);
+	}
 
 	/* turn on menus if requested */
 	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
@@ -1551,6 +1557,37 @@ static UINT32 handler_load_save(running_machine &machine, render_container *cont
 	return UI_HANDLER_CANCEL;
 }
 
+
+/*-------------------------------------------------
+ handler_confirm_quit - leads the user through
+ confirming quit emulation
+ -------------------------------------------------*/
+
+static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
+{
+	astring quit_message("Are you sure you want to quit?\n\n");
+	quit_message.cat("Press ''UI Select'' (default: Enter) to quit,\n");
+	quit_message.cat("Press ''UI Cancel'' (default: Esc) to return to emulation.");
+
+	ui_draw_text_box(container, quit_message, JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	machine.pause();
+
+	/* if the user press ENTER, quit the game */
+	if (ui_input_pressed(machine, IPT_UI_SELECT))
+	{
+		machine.schedule_exit();
+		state = UI_HANDLER_CANCEL;
+	}
+
+	/* if the user press ESC, just continue */
+	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	{
+		machine.resume();
+		state = UI_HANDLER_CANCEL;
+	}
+
+	return state;
+}
 
 
 /***************************************************************************
