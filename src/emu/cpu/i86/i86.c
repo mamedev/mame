@@ -242,7 +242,7 @@ static CPU_RESET( i8086 )
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
-	cpustate->sregs[CS] = 0xf000;
+	cpustate->sregs[CS] = 0xffff;
 	cpustate->base[CS] = SegBase(CS);
 	cpustate->pc = 0xffff0 & AMASK;
 	ExpandFlags(cpustate->flags);
