@@ -507,6 +507,9 @@ static void drawd3d_window_destroy(win_window_info *window)
 	if (d3d == NULL)
 		return;
 
+	// delete the HLSL interface
+	global_free(d3d->hlsl);
+
 	// delete the device
 	device_delete(d3d);
 
