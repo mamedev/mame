@@ -184,7 +184,8 @@ hlsl_info::hlsl_info()
 {
 	master_enable = false;
 	yiq_enable = false;
-	prescale_size = 1;
+	prescale_size_x = 1;
+	prescale_size_y = 1;
 	preset = -1;
 	shadow_bitmap = NULL;
 	shadow_texture = NULL;
@@ -201,15 +202,6 @@ hlsl_info::hlsl_info()
 
 hlsl_info::~hlsl_info()
 {
-	master_enable = false;
-	yiq_enable = false;
-	prescale_size = 1;
-	preset = -1;
-	shadow_bitmap = NULL;
-	shadow_texture = NULL;
-	registered_targets = 0;
-	options = NULL;
-
 }
 
 
@@ -623,7 +615,8 @@ void hlsl_info::init(d3d *d3dintf, win_window_info *window)
 
 	master_enable = downcast<windows_options &>(window->machine().options()).d3d_hlsl_enable();
 	yiq_enable = downcast<windows_options &>(window->machine().options()).screen_yiq_enable();
-	prescale_size = 1;
+	prescale_size_x = 1;
+	prescale_size_y = 1;
 	preset = downcast<windows_options &>(window->machine().options()).d3d_hlsl_preset();
 
 	snap_width = downcast<windows_options &>(window->machine().options()).d3d_snap_width();
@@ -1001,7 +994,6 @@ void hlsl_info::init_effect_info(d3d_poly_info *poly)
 		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-		(*d3dintf->effect.set_float)(curr_effect, "Prescale", (float)prescale_size);
 		(*d3dintf->effect.set_float)(curr_effect, "RedFloor", options->red_floor);
 		(*d3dintf->effect.set_float)(curr_effect, "GrnFloor", options->green_floor);
 		(*d3dintf->effect.set_float)(curr_effect, "BluFloor", options->blue_floor);
@@ -1074,7 +1066,6 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
 			(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
 			(*d3dintf->effect.set_float)(curr_effect, "ScanTime", winoptions.screen_yiq_scan_time());
-			(*d3dintf->effect.set_float)(curr_effect, "Prescale", (float)prescale_size);
 
 			HRESULT result = (*d3dintf->device.set_render_target)(d3d->device, 0, target4[poly->texture->target_index]);
 
@@ -1115,7 +1106,6 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
 			(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
 			(*d3dintf->effect.set_float)(curr_effect, "ScanTime", winoptions.screen_yiq_scan_time());
-			(*d3dintf->effect.set_float)(curr_effect, "Prescale", (float)prescale_size);
 
 			result = (*d3dintf->device.set_render_target)(d3d->device, 0, target3[poly->texture->target_index]);
 
@@ -1230,7 +1220,6 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
 		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
 		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
-		(*d3dintf->effect.set_float)(curr_effect, "Prescale", prescale_size);
 		(*d3dintf->effect.set_float)(curr_effect, "RedConvergeX", options->red_converge_x);
 		(*d3dintf->effect.set_float)(curr_effect, "RedConvergeY", options->red_converge_y);
 		(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeX", options->green_converge_x);
@@ -1658,26 +1647,30 @@ int hlsl_info::register_prescaled_texture(d3d_texture_info *texture, int scwidth
 	int idx = registered_targets;
 
 	// Find the nearest prescale factor that is over our screen size
-	int hlsl_prescale = 1;
-	while(texture->rawwidth * hlsl_prescale < d3d->width) hlsl_prescale++;
-	prescale_size = hlsl_prescale;
+	int hlsl_prescale_x = 1;
+	while(scwidth * hlsl_prescale_x < d3d->width) hlsl_prescale_x++;
+	prescale_size_x = hlsl_prescale_x;
 
-	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture0[idx]);
+	int hlsl_prescale_y = 1;
+	while(scheight * hlsl_prescale_y < d3d->height) hlsl_prescale_y++;
+	prescale_size_y = hlsl_prescale_y;
+
+	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale_x, scheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture0[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(texture0[idx], 0, &target0[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture1[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale_x, scheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture1[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(texture1[idx], 0, &target1[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture2[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale_x, scheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture2[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(texture2[idx], 0, &target2[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture3[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale_x, scheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture3[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(texture3[idx], 0, &target3[idx]);
@@ -1692,7 +1685,7 @@ int hlsl_info::register_prescaled_texture(d3d_texture_info *texture, int scwidth
 		return 1;
 	(*d3dintf->texture.get_surface_level)(smalltexture0[idx], 0, &smalltarget0[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale, scheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescaletexture0[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale_x, scheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescaletexture0[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(prescaletexture0[idx], 0, &prescaletarget0[idx]);
@@ -1725,21 +1718,25 @@ int hlsl_info::register_texture(d3d_texture_info *texture)
 	int idx = registered_targets;
 
 	// Find the nearest prescale factor that is over our screen size
-	int hlsl_prescale = 1;
-	while(texture->rawwidth * hlsl_prescale < d3d->width) hlsl_prescale++;
-	prescale_size = hlsl_prescale;
+	int hlsl_prescale_x = 1;
+	while(texture->rawwidth * hlsl_prescale_x < d3d->width) hlsl_prescale_x++;
+	prescale_size_x = hlsl_prescale_x;
 
-	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture0[idx]);
+	int hlsl_prescale_y = 1;
+	while(texture->rawheight * hlsl_prescale_y < d3d->height) hlsl_prescale_y++;
+	prescale_size_y = hlsl_prescale_y;
+
+	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale_x, texture->rawheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture0[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(texture0[idx], 0, &target0[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture1[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale_x, texture->rawheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture1[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(texture1[idx], 0, &target1[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture2[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale_x, texture->rawheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture2[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(texture2[idx], 0, &target2[idx]);
@@ -1759,7 +1756,7 @@ int hlsl_info::register_texture(d3d_texture_info *texture)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(smalltexture0[idx], 0, &smalltarget0[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale, texture->rawheight * hlsl_prescale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescaletexture0[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale_x, texture->rawheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescaletexture0[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(prescaletexture0[idx], 0, &prescaletarget0[idx]);
@@ -2279,64 +2276,62 @@ slider_state *hlsl_info::init_slider_list()
 		return NULL;
 	}
 
-	d3d_info *d3d = (d3d_info *)window->drawdata;
-
 	slider_state *listhead = NULL;
 	slider_state **tailptr = &listhead;
 	astring string;
 
-	*tailptr = slider_alloc(window->machine(), "Shadow Mask Darkness", 0, 0, 100, 1, slider_shadow_mask_alpha, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Shadow Mask X Count", 1, 640, 1024, 1, slider_shadow_mask_x_count, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Shadow Mask Y Count", 1, 480, 1024, 1, slider_shadow_mask_y_count, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Shadow Mask Pixel Count X", 1, 3, 32, 1, slider_shadow_mask_usize, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Shadow Mask Pixel Count Y", 1, 3, 32, 1, slider_shadow_mask_vsize, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Screen Curvature", 0, 0, 100, 1, slider_curvature, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Image Pincushion", 0, 0, 100, 1, slider_pincushion, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Scanline Darkness", 0, 0, 100, 1, slider_scanline_alpha, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Scanline Screen Height", 1, 20, 80, 1, slider_scanline_scale, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Scanline Indiv. Height", 1, 10, 80, 1, slider_scanline_height, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Scanline Brightness", 0, 20, 40, 1, slider_scanline_bright_scale, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Scanline Brightness Overdrive", 0, 12, 20, 1, slider_scanline_bright_offset, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Scanline Jitter", 0, 0, 40, 1, slider_scanline_offset, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Defocus X", 0, 0, 64, 1, slider_defocus_x, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Defocus Y", 0, 0, 64, 1, slider_defocus_y, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Position Offset X", -1500, 0, 1500, 1, slider_red_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Position Offset Y", -1500, 0, 1500, 1, slider_red_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Position Offset X", -1500, 0, 1500, 1, slider_green_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Position Offset Y", -1500, 0, 1500, 1, slider_green_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Position Offset X", -1500, 0, 1500, 1, slider_blue_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Position Offset Y", -1500, 0, 1500, 1, slider_blue_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Convergence X", -1500, 0, 1500, 1, slider_red_radial_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Convergence Y", -1500, 0, 1500, 1, slider_red_radial_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Convergence X", -1500, 0, 1500, 1, slider_green_radial_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Convergence Y", -1500, 0, 1500, 1, slider_green_radial_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Convergence X", -1500, 0, 1500, 1, slider_blue_radial_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Convergence Y", -1500, 0, 1500, 1, slider_blue_radial_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Output from Red Input", -400, 0, 400, 5, slider_red_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Output from Green Input", -400, 0, 400, 5, slider_red_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Output from Blue Input", -400, 0, 400, 5, slider_red_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Output from Red Input", -400, 0, 400, 5, slider_green_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Output from Green Input", -400, 0, 400, 5, slider_green_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Output from Blue Input", -400, 0, 400, 5, slider_green_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Output from Red Input", -400, 0, 400, 5, slider_blue_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Output from Green Input", -400, 0, 400, 5, slider_blue_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Output from Blue Input", -400, 0, 400, 5, slider_blue_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red DC Offset", -100, 0, 100, 1, slider_red_offset, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green DC Offset", -100, 0, 100, 1, slider_green_offset, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue DC Offset", -100, 0, 100, 1, slider_blue_offset, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Scale", -200, 100, 200, 1, slider_red_scale, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Scale", -200, 100, 200, 1, slider_green_scale, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Scale", -200, 100, 200, 1, slider_blue_scale, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Power", -80, 20, 80, 1, slider_red_power, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Power", -80, 20, 80, 1, slider_green_power, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Power", -80, 20, 80, 1, slider_blue_power, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Floor", 0, 0, 100, 1, slider_red_floor, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Floor", 0, 0, 100, 1, slider_green_floor, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Floor", 0, 0, 100, 1, slider_blue_floor, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Red Phosphor Life", 0, 0, 100, 1, slider_red_phosphor_life, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Green Phosphor Life", 0, 0, 100, 1, slider_green_phosphor_life, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Blue Phosphor Life", 0, 0, 100, 1, slider_blue_phosphor_life, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(window->machine(), "Saturation", 0, 100, 400, 1, slider_saturation, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Shadow Mask Darkness", 0, 0, 100, 1, slider_shadow_mask_alpha, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Shadow Mask X Count", 1, 640, 1024, 1, slider_shadow_mask_x_count, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Shadow Mask Y Count", 1, 480, 1024, 1, slider_shadow_mask_y_count, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Shadow Mask Pixel Count X", 1, 3, 32, 1, slider_shadow_mask_usize, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Shadow Mask Pixel Count Y", 1, 3, 32, 1, slider_shadow_mask_vsize, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Screen Curvature", 0, 0, 100, 1, slider_curvature, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Image Pincushion", 0, 0, 100, 1, slider_pincushion, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Scanline Darkness", 0, 0, 100, 1, slider_scanline_alpha, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Scanline Screen Height", 1, 20, 80, 1, slider_scanline_scale, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Scanline Indiv. Height", 1, 10, 80, 1, slider_scanline_height, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Scanline Brightness", 0, 20, 40, 1, slider_scanline_bright_scale, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Scanline Brightness Overdrive", 0, 12, 20, 1, slider_scanline_bright_offset, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Scanline Jitter", 0, 0, 40, 1, slider_scanline_offset, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Defocus X", 0, 0, 64, 1, slider_defocus_x, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Defocus Y", 0, 0, 64, 1, slider_defocus_y, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Position Offset X", -1500, 0, 1500, 1, slider_red_converge_x, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Position Offset Y", -1500, 0, 1500, 1, slider_red_converge_y, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Position Offset X", -1500, 0, 1500, 1, slider_green_converge_x, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Position Offset Y", -1500, 0, 1500, 1, slider_green_converge_y, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Position Offset X", -1500, 0, 1500, 1, slider_blue_converge_x, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Position Offset Y", -1500, 0, 1500, 1, slider_blue_converge_y, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Convergence X", -1500, 0, 1500, 1, slider_red_radial_converge_x, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Convergence Y", -1500, 0, 1500, 1, slider_red_radial_converge_y, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Convergence X", -1500, 0, 1500, 1, slider_green_radial_converge_x, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Convergence Y", -1500, 0, 1500, 1, slider_green_radial_converge_y, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Convergence X", -1500, 0, 1500, 1, slider_blue_radial_converge_x, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Convergence Y", -1500, 0, 1500, 1, slider_blue_radial_converge_y, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Output from Red Input", -400, 0, 400, 5, slider_red_from_r, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Output from Green Input", -400, 0, 400, 5, slider_red_from_g, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Output from Blue Input", -400, 0, 400, 5, slider_red_from_b, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Output from Red Input", -400, 0, 400, 5, slider_green_from_r, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Output from Green Input", -400, 0, 400, 5, slider_green_from_g, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Output from Blue Input", -400, 0, 400, 5, slider_green_from_b, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Output from Red Input", -400, 0, 400, 5, slider_blue_from_r, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Output from Green Input", -400, 0, 400, 5, slider_blue_from_g, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Output from Blue Input", -400, 0, 400, 5, slider_blue_from_b, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red DC Offset", -100, 0, 100, 1, slider_red_offset, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green DC Offset", -100, 0, 100, 1, slider_green_offset, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue DC Offset", -100, 0, 100, 1, slider_blue_offset, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Scale", -200, 100, 200, 1, slider_red_scale, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Scale", -200, 100, 200, 1, slider_green_scale, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Scale", -200, 100, 200, 1, slider_blue_scale, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Power", -80, 20, 80, 1, slider_red_power, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Power", -80, 20, 80, 1, slider_green_power, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Power", -80, 20, 80, 1, slider_blue_power, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Floor", 0, 0, 100, 1, slider_red_floor, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Floor", 0, 0, 100, 1, slider_green_floor, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Floor", 0, 0, 100, 1, slider_blue_floor, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Red Phosphor Life", 0, 0, 100, 1, slider_red_phosphor_life, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Green Phosphor Life", 0, 0, 100, 1, slider_green_phosphor_life, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Blue Phosphor Life", 0, 0, 100, 1, slider_blue_phosphor_life, (void*)options); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(window->machine(), "Saturation", 0, 100, 400, 1, slider_saturation, (void*)options); tailptr = &(*tailptr)->next;
 
 	return listhead;
 }

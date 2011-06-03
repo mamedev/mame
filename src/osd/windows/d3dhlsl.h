@@ -158,7 +158,8 @@ private:
 
 	bool					master_enable;				// overall enable flag
 	bool					yiq_enable;					// YIQ-convolution flag
-	int						prescale_size;				// prescale size
+	int						prescale_size_x;			// prescale size x
+	int						prescale_size_y;			// prescale size y
 	int						preset;						// preset, if relevant
 	bitmap_t *				shadow_bitmap;				// shadow mask bitmap for post-processing shader
 	d3d_texture_info *		shadow_texture;				// shadow mask texture for post-processing shader
