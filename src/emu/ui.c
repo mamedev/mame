@@ -1574,10 +1574,7 @@ static UINT32 handler_confirm_quit(running_machine &machine, render_container *c
 
 	/* if the user press ENTER, quit the game */
 	if (ui_input_pressed(machine, IPT_UI_SELECT))
-	{
 		machine.schedule_exit();
-		state = UI_HANDLER_CANCEL;
-	}
 
 	/* if the user press ESC, just continue */
 	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
