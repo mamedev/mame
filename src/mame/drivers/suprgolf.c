@@ -23,6 +23,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "machine/i8255.h"
 
 class suprgolf_state : public driver_device
 {
@@ -36,7 +37,7 @@ public:
 	UINT8 *m_bg_vram;
 	UINT16 *m_bg_fb;
 	UINT16 *m_fg_fb;
-	int m_rom_bank;
+	UINT8 m_rom_bank;
 	UINT8 m_bg_bank;
 	UINT8 m_vreg_bank;
 	UINT8 m_msm5205next;
@@ -44,7 +45,7 @@ public:
 	UINT8 m_vreg_pen;
 	UINT8 m_palette_switch;
 	UINT8 m_bg_vreg_test;
-	int m_toggle;
+	UINT8 m_toggle;
 };
 
 static TILE_GET_INFO( get_tile_info )
@@ -152,16 +153,16 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 	}
 }
 
-static READ8_HANDLER( suprgolf_vregs_r )
+static READ8_DEVICE_HANDLER( suprgolf_vregs_r )
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
+	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
 
 	return state->m_vreg_bank;
 }
 
-static WRITE8_HANDLER( suprgolf_vregs_w )
+static WRITE8_DEVICE_HANDLER( suprgolf_vregs_w )
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
+	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
 
 	//bits 0,1,2 and probably 3 controls the background vram banking
 	state->m_vreg_bank = data;
@@ -241,27 +242,27 @@ static WRITE8_HANDLER( adpcm_data_w )
 	state->m_msm5205next = data;
 }
 
-static READ8_HANDLER( rom_bank_select_r )
+static READ8_DEVICE_HANDLER( rom_bank_select_r )
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
+	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
 
 	return state->m_rom_bank;
 }
 
-static WRITE8_HANDLER( rom_bank_select_w )
+static WRITE8_DEVICE_HANDLER( rom_bank_select_w )
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
-	UINT8 *region_base = space->machine().region("user1")->base();
+	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
+	UINT8 *region_base = device->machine().region("user1")->base();
 
 	state->m_rom_bank = data;
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
 //  mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
-	memory_set_bankptr(space->machine(), "bank2", region_base + (data&0x3f ) * 0x4000);
+	memory_set_bankptr(device->machine(), "bank2", region_base + (data&0x3f ) * 0x4000);
 
 	state->m_msm_nmi_mask = data & 0x40;
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(device->machine(), data & 0x80);
 }
 
 static WRITE8_HANDLER( rom2_bank_select_w )
@@ -269,30 +270,30 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 	UINT8 *region_base = space->machine().region("user2")->base();
 //  mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
 
-	memory_set_bankptr(space->machine(), "bank1", region_base + (data&0x0f ) * 0x4000);
+	memory_set_bankptr(space->machine(), "bank1", region_base + (data&0x0f) * 0x4000);
 
 	if(data & 0xf0)
 		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
-static READ8_HANDLER( pedal_extra_bits_r )
+static READ8_DEVICE_HANDLER( pedal_extra_bits_r )
 {
 	UINT8 p1_sht_sw,p2_sht_sw;
 
-	p1_sht_sw = (input_port_read(space->machine(), "P1_RELEASE") & 0x80)>>7;
-	p2_sht_sw = (input_port_read(space->machine(), "P2_RELEASE") & 0x80)>>6;
+	p1_sht_sw = (input_port_read(device->machine(), "P1_RELEASE") & 0x80)>>7;
+	p2_sht_sw = (input_port_read(device->machine(), "P2_RELEASE") & 0x80)>>6;
 
 	return p1_sht_sw | p2_sht_sw;
 }
 
-static READ8_HANDLER( p1_r )
+static READ8_DEVICE_HANDLER( p1_r )
 {
-	return (input_port_read(space->machine(), "P1") & 0xf0) | ((input_port_read(space->machine(), "P1_ANALOG") & 0xf));
+	return (input_port_read(device->machine(), "P1") & 0xf0) | ((input_port_read(device->machine(), "P1_ANALOG") & 0xf));
 }
 
-static READ8_HANDLER( p2_r )
+static READ8_DEVICE_HANDLER( p2_r )
 {
-	return (input_port_read(space->machine(), "P2") & 0xf0) | ((input_port_read(space->machine(), "P2_ANALOG") & 0xf));
+	return (input_port_read(device->machine(), "P2") & 0xf0) | ((input_port_read(device->machine(), "P2_ANALOG") & 0xf));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -309,14 +310,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(p1_r)
-	AM_RANGE(0x01, 0x01) AM_READ(p2_r)
-	AM_RANGE(0x02, 0x02) AM_READ(pedal_extra_bits_r)
-//  AM_RANGE(0x03, 0x03)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x05, 0x05) AM_READ(rom_bank_select_r) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w )
-//  AM_RANGE(0x07, 0x07)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
  ADDRESS_MAP_END
@@ -481,10 +476,32 @@ static MACHINE_RESET( suprgolf )
 	state->m_msm_nmi_mask = 0;
 }
 
+static I8255A_INTERFACE( ppi8255_intf_0 )
+{
+	DEVCB_HANDLER(p1_r),						/* Port A read */
+	DEVCB_NULL,									/* Port A write */
+	DEVCB_HANDLER(p2_r),						/* Port B read */
+	DEVCB_NULL,									/* Port B write */
+	DEVCB_HANDLER(pedal_extra_bits_r),			/* Port C read */
+	DEVCB_NULL									/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_intf_1 )
+{
+	DEVCB_INPUT_PORT("SYSTEM"),					/* Port A read */
+	DEVCB_NULL,									/* Port A write */
+	DEVCB_HANDLER(rom_bank_select_r),			/* Port B read */
+	DEVCB_HANDLER(rom_bank_select_w),			/* Port B write */
+	DEVCB_HANDLER(suprgolf_vregs_r),			/* Port C read */
+	DEVCB_HANDLER(suprgolf_vregs_w)				/* Port C write */
+};
+
+#define MASTER_CLOCK XTAL_12MHz
+
 static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000) /* guess */
+	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) /* guess */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -492,6 +509,9 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_VIDEO_START(suprgolf)
 
 	MCFG_MACHINE_RESET(suprgolf)
+
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -508,13 +528,13 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000) /* guess */
+	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/4) /* guess */
 	MCFG_SOUND_CONFIG(ym2203_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-	MCFG_SOUND_ADD("msm", MSM5205, 400000) /* guess */
-	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* guess */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -586,6 +606,7 @@ static DRIVER_INIT( suprgolf )
 
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;
+	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; //patch ROM check
 }
 
 GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
