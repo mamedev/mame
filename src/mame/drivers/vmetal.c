@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_tlookup)
 	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_vmetal_videoregs)
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(metro_state, m_videoregs)	// Metro sprite chip Video Registers
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(vmetal_state, m_videoregs)	// Metro sprite chip Video Registers
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
