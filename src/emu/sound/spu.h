@@ -11,10 +11,8 @@
 
 #define MCFG_SPU_ADD(_tag, _clock, _irqf) \
 	MCFG_DEVICE_ADD(_tag, SPU, _clock) \
-	MCFG_IRQ_FUNC(_irqf)
-
-#define MCFG_SPU_REPLACE(_tag, _clock, _irqf) \
-	MCFG_DEVICE_REPLACE(_tag, SPU, _clock) \
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 4, psx_dma_read_delegate( FUNC( spu_device::dma_read ), (spu_device *) device ) ) \
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 4, psx_dma_write_delegate( FUNC( spu_device::dma_write ), (spu_device *) device ) ) \
 	MCFG_IRQ_FUNC(_irqf)
 
 #define MCFG_IRQ_FUNC(_irqf) \
@@ -222,6 +220,9 @@ public:
 	// inline configuration helpers
 	static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, UINT32 state));
 
+	void dma_read( UINT32 n_address, INT32 n_size );
+	void dma_write( UINT32 n_address, INT32 n_size );
+
 	void reinit_sound();
 	void kill_sound();
 
@@ -238,7 +239,6 @@ public:
 	void write_byte(const unsigned int addr, const unsigned char byte);
 	void write_word(const unsigned int addr, const unsigned short word);
 
-	bool installed_dma_hooks;
 	sound_stream *m_stream;
 };
 

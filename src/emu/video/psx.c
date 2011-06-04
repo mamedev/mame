@@ -99,16 +99,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 	}
 }
 
-PALETTE_INIT( psx )
-{
-	UINT32 n_colour;
-
-	for( n_colour = 0; n_colour < 0x10000; n_colour++ )
-	{
-		palette_set_color_rgb( machine, n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
-	}
-}
-
 #if defined( MAME_DEBUG )
 
 void psxgpu_device::DebugMeshInit( void )

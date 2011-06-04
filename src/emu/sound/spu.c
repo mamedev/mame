@@ -1042,8 +1042,6 @@ void spu_device::device_reset()
 	dirty_flags = -1;
 	changed_xa_vol = 0;
 
-	installed_dma_hooks = false;
-
 	xa_cnt=0;
 	xa_freq=0;
 	xa_channels=2;
@@ -3090,20 +3088,20 @@ void spu_device::flush_cdda(const unsigned int sector)
 
 // MAME I/O stuff.  This can get cleaner when machine/psx.c does.
 
-static void spu_dma_read( spu_device *spu, UINT32 n_address, INT32 n_size )
+void spu_device::dma_read( UINT32 n_address, INT32 n_size )
 {
-	UINT8 *psxram = (UINT8 *)memory_get_shared(spu->machine(), "share1");
+	UINT8 *psxram = (UINT8 *)memory_get_shared(machine(), "share1");
 
-	spu->start_dma(psxram + n_address, false, n_size*4);
+	start_dma(psxram + n_address, false, n_size*4);
 }
 
-static void spu_dma_write( spu_device *spu, UINT32 n_address, INT32 n_size )
+void spu_device::dma_write( UINT32 n_address, INT32 n_size )
 {
-	UINT8 *psxram = (UINT8 *)memory_get_shared(spu->machine(), "share1");
+	UINT8 *psxram = (UINT8 *)memory_get_shared(machine(), "share1");
 
 //  printf("SPU DMA write from %x, size %x\n", n_address, n_size);
 
-	spu->start_dma(psxram + n_address, true, n_size*4);
+	start_dma(psxram + n_address, true, n_size*4);
 }
 
 READ16_HANDLER( spu_r )
@@ -3113,13 +3111,6 @@ READ16_HANDLER( spu_r )
 	if (spu == NULL )
 	{
 		return 0;
-	}
-
-	if (!spu->installed_dma_hooks)
-	{
-		psx_dma_install_read_handler( space->machine(), 4, psx_dma_read_delegate( FUNC( spu_dma_read ), spu ) );
-		psx_dma_install_write_handler( space->machine(), 4, psx_dma_write_delegate( FUNC( spu_dma_write ), spu ) );
-		spu->installed_dma_hooks = true;
 	}
 
 	return spu->read_word(offset*2);
@@ -3134,13 +3125,5 @@ WRITE16_HANDLER( spu_w )
 		return;
 	}
 
-	if (!spu->installed_dma_hooks)
-	{
-		psx_dma_install_read_handler( space->machine(), 4, psx_dma_read_delegate( FUNC( spu_dma_read ), spu ) );
-		psx_dma_install_write_handler( space->machine(), 4, psx_dma_write_delegate( FUNC( spu_dma_write ), spu ) );
-		spu->installed_dma_hooks = true;
-	}
-
 	spu->write_word(offset*2, data);
 }
-
