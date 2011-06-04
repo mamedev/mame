@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc)  AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_WRITENOP //???

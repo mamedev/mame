@@ -89,7 +89,7 @@ public:
 	UINT16 *m_mid1tileram;
 	UINT16 *m_mid2tileram;
 	UINT16 *m_tlookup;
-	UINT16 *m_videoregs;
+	UINT16 *m_vmetal_videoregs;
 
 	tilemap_t *m_texttilemap;
 	tilemap_t *m_mid1tilemap;
@@ -106,7 +106,7 @@ static READ16_HANDLER ( varia_crom_read )
 	UINT16 retdat;
 
 	offset = offset << 1;
-	offset |= (state->m_videoregs[0x0ab / 2] & 0x7f) << 16;
+	offset |= (state->m_vmetal_videoregs[0x0ab / 2] & 0x7f) << 16;
 	retdat = ((cgrom[offset] << 8) | (cgrom[offset + 1]));
 	// popmessage("varia romread offset %06x data %04x", offset, retdat);
 
@@ -228,8 +228,8 @@ static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_MEMBER(vmetal_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_tlookup)
-	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_videoregs)
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(vmetal_state, m_videoregs)	// Video Registers
+	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_vmetal_videoregs)
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(metro_state, m_videoregs)	// Metro sprite chip Video Registers
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
@@ -423,9 +423,9 @@ static SCREEN_UPDATE(varia)
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	tilemap_set_scrollx(state->m_mid2tilemap, 0, state->m_videoregs[0x06a/2]-64 /*+ state->m_videoregs[0x066/2]*/);
-	tilemap_set_scrollx(state->m_mid1tilemap, 0, state->m_videoregs[0x07a/2]-64 /*+ state->m_videoregs[0x076/2]*/);
-	tilemap_set_scrollx(state->m_texttilemap, 0, -64 /*+ state->m_videoregs[0x076/2]*/);
+	tilemap_set_scrollx(state->m_mid2tilemap, 0, state->m_vmetal_videoregs[0x06a/2]-64 /*+ state->m_vmetal_videoregs[0x066/2]*/);
+	tilemap_set_scrollx(state->m_mid1tilemap, 0, state->m_vmetal_videoregs[0x07a/2]-64 /*+ state->m_vmetal_videoregs[0x076/2]*/);
+	tilemap_set_scrollx(state->m_texttilemap, 0, -64 /*+ state->m_vmetal_videoregs[0x076/2]*/);
 
 	tilemap_set_scrolly(state->m_mid2tilemap, 0, -64);
 	tilemap_set_scrolly(state->m_mid1tilemap, 0, -64);
