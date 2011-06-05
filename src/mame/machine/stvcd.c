@@ -576,7 +576,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
-//      CDROM_LOG(("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat))
+		if(cr1 != 0 && 0)
+      		printf("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 		if (!cdrom)
 		{
@@ -681,6 +682,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			// clear the "transfer" flag
 			cd_stat &= ~CD_STAT_TRANS;
+			// hack for the bootloader (TODO: Falcom Classics doesn't want this!)
+			cd_stat |= CD_STAT_PERI;
 
 			if (xferdnum)
 			{
@@ -738,11 +741,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				default:
 					break;
 			}
-
-
-			// hack for the bootloader
-			cd_stat |= CD_STAT_PERI;
-			cr1 = cd_stat;
 
 			// and kick the CD if there's more to read
 			cd_playdata();
@@ -816,7 +814,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 		case 0x1100: // disc seek
 			CDROM_LOG(("%s:CD: Disc seek\n",   machine.describe_context()))
-			printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
+			//printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
 			if (cr1 & 0x80)
 			{
 				temp = (cr1&0xff)<<16;	// get FAD to seek to
@@ -999,6 +997,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			{
 				UINT32 bufnum = cr3>>8;
 
+				/* TODO: Akumajou Dracula X reads 0 there, why? */
 				// is the partition empty?
 				if (partitions[bufnum].size == -1)
 				{
@@ -1226,6 +1225,10 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
+			#if 0
+			if(temp == 0xfffff8) /* TODO: Falcom Classics */
+				temp = 0;
+			#endif
 			read_new_dir(machine, temp);
 			break;
 
@@ -1235,6 +1238,10 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
+			#if 0
+			if(temp == 0xfffff8) /* TODO: Falcom Classics */
+				temp = 0;
+			#endif
 			cr2 = 0x4101;	// CTRL/track
 			cr3 = (curdir[temp].firstfad>>16)&0xff;
 			cr4 = (curdir[temp].firstfad&0xffff);
@@ -1256,6 +1263,11 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
+
+			#if 0
+			if(temp == 0xfffff8) /* TODO: Falcom Classics */
+				temp = 0;
+			#endif
 
 			if (temp == 0xffffff)	// special
 			{
