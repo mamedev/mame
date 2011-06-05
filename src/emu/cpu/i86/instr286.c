@@ -848,10 +848,12 @@ static void PREFIX286(_escape_7)(i8086_state *cpustate)    /* Opcode 0xdf */
 static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT16 offset, i80286_size size, i80286_operation operation)
 {
 	int trap = 0;
+	UINT8 rights;
 	if (PM) {
-		trap = i80286_verify(cpustate, cpustate->sregs[check_seg], operation, cpustate->rights[check_seg]);
-		if (!EXPDOWN(cpustate->rights[check_seg]) && ((offset+size-1) > cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
-		if (EXPDOWN(cpustate->rights[check_seg]) && (offset < cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
+		rights = cpustate->rights[check_seg];
+		trap = i80286_verify(cpustate, cpustate->sregs[check_seg], operation, rights);
+		if ((CODE(rights) || !EXPDOWN(rights)) && ((offset+size-1) > cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
+		if (!CODE(rights) && EXPDOWN(rights) && (offset < cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
 
 		if (trap) throw TRAP(trap, IDXTBL(cpustate->sregs[check_seg]));
 	}

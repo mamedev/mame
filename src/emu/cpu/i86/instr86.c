@@ -3226,6 +3226,9 @@ static void PREFIX86(_ffpre)(i8086_state *cpustate)    /* Opcode 0xff */
 		tmp = GetRMWord(ModRM);
 		PUSH(tmp);
 		break;
+	default:
+		tmp = GetRMWord(ModRM);  // 286 doesn't matter but 8086?
+		return PREFIX(_invalid)(cpustate);
 	}
 }
 
