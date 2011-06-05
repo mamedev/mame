@@ -2991,6 +2991,7 @@ void diplocation_list_alloc(input_field_config &field, const char *location, ast
 	field.diploclist().reset();
 
 	/* parse the string */
+	astring name; // Don't move this variable inside the loop, lastname's lifetime depends on it being outside
 	const char *lastname = NULL;
 	const char *curentry = location;
 	int entries = 0;
@@ -3010,7 +3011,6 @@ void diplocation_list_alloc(input_field_config &field, const char *location, ast
 		const char *colon = strchr(tempstr, ':');
 
 		/* allocate and copy the name if it is present */
-		astring name;
 		if (colon != NULL)
 		{
 			lastname = name.cpy(number, colon - number);
