@@ -837,7 +837,6 @@ protected:
 	// table population/depopulation
 	void populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler);
 	void populate_range(offs_t bytestart, offs_t byteend, UINT8 handler);
-	void depopulate_unused();
 
 	// subtable management
 	UINT8 subtable_alloc();
@@ -874,7 +873,30 @@ protected:
 	static UINT8			s_watchpoint_table[1 << LEVEL1_BITS];
 
 private:
+	int handler_refcount[SUBTABLE_BASE-STATIC_COUNT];
+	UINT8 handler_next_free[SUBTABLE_BASE-STATIC_COUNT];
+	UINT8 handler_free;
 	UINT8 get_free_handler();
+	void verify_reference_counts();
+
+	void handler_ref(UINT8 entry, int count)
+	{
+		assert(entry < SUBTABLE_BASE);
+		if (entry >= STATIC_COUNT)
+			handler_refcount[entry - STATIC_COUNT] += count;
+	}
+
+	void handler_unref(UINT8 entry)
+	{
+		assert(entry < SUBTABLE_BASE);
+		if (entry >= STATIC_COUNT)
+			if (! --handler_refcount[entry - STATIC_COUNT])
+			{
+				handler(entry).deconfigure();
+				handler_next_free[entry - STATIC_COUNT] = handler_free;
+				handler_free = entry;
+			}
+	}
 };
 
 
@@ -3207,6 +3229,15 @@ address_table::address_table(address_space &space, bool large)
 
 	// initialize everything to unmapped
 	memset(m_table, STATIC_UNMAP, 1 << LEVEL1_BITS);
+
+	// initialize the handlers freelist
+	for (int i=0; i != SUBTABLE_BASE-STATIC_COUNT-1; i++)
+		handler_next_free[i] = i+STATIC_COUNT+1;
+	handler_next_free[SUBTABLE_BASE-STATIC_COUNT-1] = STATIC_INVALID;
+	handler_free = STATIC_COUNT;
+
+	// initialize the handlers refcounts
+	memset(handler_refcount, 0, sizeof(handler_refcount));
 }
 
 
@@ -3250,22 +3281,18 @@ void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask,
 
 	// recompute any direct access on this space if it is a read modification
 	m_space.m_direct.force_update(entry);
+
+	//	verify_reference_counts();
 }
 
 UINT8 address_table::get_free_handler()
 {
-	// scan all possible assigned entries for something unpopulated
-	for (UINT8 scanentry = STATIC_COUNT; scanentry < SUBTABLE_BASE; scanentry++)
-		if (!handler(scanentry).populated())
-			return scanentry;
+	if (handler_free == STATIC_INVALID)
+		throw emu_fatalerror("Out of handler entries in address table");
 
-	// if we didn't find anything, find something to depopulate and try again
-	depopulate_unused();
-	for (UINT8 scanentry = STATIC_COUNT; scanentry < SUBTABLE_BASE; scanentry++)
-		if (!handler(scanentry).populated())
-			return scanentry;
-
-	throw emu_fatalerror("Out of handler entries in address table");
+	UINT8 handler = handler_free;
+	handler_free = handler_next_free[handler - STATIC_COUNT];
+	return handler;
 }
 
 
@@ -3284,7 +3311,6 @@ namespace {
 
 void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
 {
-
 	// convert addresses to bytes
 	offs_t bytestart = addrstart;
 	offs_t byteend = addrend;
@@ -3391,6 +3417,54 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 			m_space.m_direct.force_update(entry);
 		}
 	}
+
+	//	verify_reference_counts();
+}
+
+
+//-------------------------------------------------
+//  verify_reference_counts - check how much of a
+//  hash we've made of things
+//-------------------------------------------------
+
+void address_table::verify_reference_counts()
+{
+	int actual_refcounts[SUBTABLE_BASE-STATIC_COUNT];
+	memset(actual_refcounts, 0, sizeof(actual_refcounts));
+
+	bool subtable_seen[256 - SUBTABLE_BASE];
+	memset(subtable_seen, 0, sizeof(subtable_seen));
+
+	for (int level1 = 0; level1 != 1 << LEVEL1_BITS; level1++)
+	{
+		UINT8 l1_entry = m_table[level1];
+		if (l1_entry >= SUBTABLE_BASE)
+		{
+			assert(m_large);
+			if (subtable_seen[l1_entry - SUBTABLE_BASE])
+				continue;
+
+			subtable_seen[l1_entry - SUBTABLE_BASE] = true;
+			const UINT8 *subtable = subtable_ptr(l1_entry);
+			for (int level2 = 0; level2 != 1 << LEVEL2_BITS; level2++)
+			{
+				UINT8 l2_entry = subtable[level2];
+				assert(l2_entry < SUBTABLE_BASE);
+				if (l2_entry >= STATIC_COUNT)
+					actual_refcounts[l2_entry - STATIC_COUNT]++;
+			}
+		}
+		else if (l1_entry >= STATIC_COUNT)
+			actual_refcounts[l1_entry - STATIC_COUNT]++;
+	}
+
+	if (memcmp(actual_refcounts, handler_refcount, sizeof(handler_refcount)))
+	{
+		logerror("Refcount failure:\n");
+		for(int i = STATIC_COUNT; i != SUBTABLE_BASE; i++)
+			logerror("%02x: %4x .. %4x\n", i, handler_refcount[i-STATIC_COUNT], actual_refcounts[i-STATIC_COUNT]);
+		throw emu_fatalerror("memory.c: refcounts are fucked.\n");
+	}		
 }
 
 
@@ -3419,13 +3493,23 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handl
 		// if the start and stop end within the same block, handle that
 		if (l1start == l1stop)
 		{
-			memset(&subtable[l2start], handlerindex, l2stop - l2start + 1);
+			handler_ref(handlerindex, l2stop-l2start+1);
+			for (int i = l2start; i <= l2stop; i++)
+			{
+				handler_unref(subtable[i]);
+				subtable[i] = handlerindex;
+			}
 			subtable_close(l1start);
 			return;
 		}
 
 		// otherwise, fill until the end
-		memset(&subtable[l2start], handlerindex, (1 << level2_bits()) - l2start);
+		handler_ref(handlerindex, l2mask - l2start + 1);
+		for (int i = l2start; i <= l2mask; i++)
+		{
+			handler_unref(subtable[i]);
+			subtable[i] = handlerindex;
+		}
 		subtable_close(l1start);
 		if (l1start != (offs_t)~0)
 			l1start++;
@@ -3437,7 +3521,12 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handl
 		UINT8 *subtable = subtable_open(l1stop);
 
 		// fill from the beginning
-		memset(&subtable[0], handlerindex, l2stop + 1);
+		handler_ref(handlerindex, l2stop+1);
+		for (int i = 0; i <= l2stop; i++)
+		{
+			handler_unref(subtable[i]);
+			subtable[i] = handlerindex;
+		}
 		subtable_close(l1stop);
 
 		// if the start and stop end within the same block, handle that
@@ -3448,11 +3537,16 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handl
 	}
 
 	// now fill in the middle tables
+	handler_ref(handlerindex, l1stop - l1start + 1);
 	for (offs_t l1index = l1start; l1index <= l1stop; l1index++)
 	{
+		UINT8 subindex = m_table[l1index];
+
 		// if we have a subtable here, release it
-		if (m_table[l1index] >= SUBTABLE_BASE)
-			subtable_release(m_table[l1index]);
+		if (subindex >= SUBTABLE_BASE)
+			subtable_release(subindex);
+		else
+			handler_unref(subindex);
 		m_table[l1index] = handlerindex;
 	}
 }
@@ -3514,10 +3608,14 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 				// release the subtable if the old value was a subtable
 				if (m_table[cur_index] >= SUBTABLE_BASE)
 					subtable_release(m_table[cur_index]);
+				else
+					handler_unref(m_table[cur_index]);
 
 				// reallocate the subtable if the new value is a subtable
 				if (m_table[prev_index] >= SUBTABLE_BASE)
 					subtable_realloc(m_table[prev_index]);
+				else
+					handler_ref(m_table[prev_index], 1);
 
 				// set the new value and short-circuit the mapping step
 				m_table[cur_index] = m_table[prev_index];
@@ -3540,41 +3638,6 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 			populate_range(bytestart + lmirrorbase, byteend + lmirrorbase, handlerindex);
 		}
 	}
-}
-
-
-//-------------------------------------------------
-//  depopulate_unused - scan the table and
-//  eliminate entries that are no longer used
-//-------------------------------------------------
-
-void address_table::depopulate_unused()
-{
-	bool used[SUBTABLE_BASE - STATIC_COUNT];
-	memset(used, 0, sizeof(used));
-
-	for (int level1 = 0; level1 != 1 << LEVEL1_BITS; level1++)
-	{
-		UINT8 l1_entry = m_table[level1];
-		if (l1_entry >= SUBTABLE_BASE)
-		{
-			assert(m_large);
-			const UINT8 *subtable = subtable_ptr(l1_entry);
-			for (int level2 = 0; level2 != 1 << LEVEL2_BITS; level2++)
-			{
-				UINT8 l2_entry = subtable[level2];
-				assert(l2_entry < SUBTABLE_BASE);
-				if (l2_entry >= STATIC_COUNT)
-					used[l2_entry - STATIC_COUNT] = true;
-			}
-		}
-		else if (l1_entry >= STATIC_COUNT)
-			used[l1_entry - STATIC_COUNT] = true;
-	}
-
-	for (int slot=0; slot != SUBTABLE_BASE - STATIC_COUNT; slot++)
-		if (!used[slot])
-			handler(slot + STATIC_COUNT).deconfigure();
 }
 
 
@@ -3826,9 +3889,15 @@ void address_table::subtable_release(UINT8 subentry)
 		fatalerror("Called subtable_release on a table with a usecount of 0");
 
 	// decrement the usecount and clear the checksum if we're at 0
+	// also unref the subhandlers
 	m_subtable[subindex].m_usecount--;
 	if (m_subtable[subindex].m_usecount == 0)
+	{
 		m_subtable[subindex].m_checksum = 0;
+		UINT8 *subtable = subtable_ptr(subentry);
+		for (int i = 0; i < (1 << LEVEL2_BITS); i++)
+			handler_unref(subtable[i]);
+	}
 }
 
 
@@ -3844,8 +3913,10 @@ UINT8 *address_table::subtable_open(offs_t l1index)
 	// if we don't have a subtable yet, allocate a new one
 	if (subentry < SUBTABLE_BASE)
 	{
+		int size = 1 << level2_bits();
 		UINT8 newentry = subtable_alloc();
-		memset(subtable_ptr(newentry), subentry, 1 << level2_bits());
+		handler_ref(subentry, size-1);
+		memset(subtable_ptr(newentry), subentry, size);
 		m_table[l1index] = newentry;
 		m_subtable[newentry - SUBTABLE_BASE].m_checksum = (subentry + (subentry << 8) + (subentry << 16) + (subentry << 24)) * ((1 << level2_bits())/4);
 		subentry = newentry;
@@ -3862,7 +3933,12 @@ UINT8 *address_table::subtable_open(offs_t l1index)
 		assert(subentry >= SUBTABLE_BASE);
 		assert(m_subtable[subentry - SUBTABLE_BASE].m_usecount > 1);
 
-		memcpy(subtable_ptr(newentry), subtable_ptr(subentry), 1 << level2_bits());
+		int size = 1 << level2_bits();
+		UINT8 *src = subtable_ptr(subentry);
+		for(int i=0; i != size; i++)
+			handler_ref(src[i], 1);
+
+		memcpy(subtable_ptr(newentry), src, size);
 		subtable_release(subentry);
 		m_table[l1index] = newentry;
 		m_subtable[newentry - SUBTABLE_BASE].m_checksum = m_subtable[subentry - SUBTABLE_BASE].m_checksum;
