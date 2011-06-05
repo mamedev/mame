@@ -804,6 +804,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			// make sure it doesn't come in too early
 			if (cdrom_get_track_type(cdrom, cur_track-1) == CD_TRACK_AUDIO)
 			{
+				cdda_pause_audio( machine.device( "cdda" ), 0 );
 				cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
 			}
 			else
@@ -818,14 +819,21 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
 			if (cr1 & 0x80)
 			{
-				temp = (cr1&0x7f)<<16;	// get FAD to seek to
+				temp = (cr1&0xff)<<16;	// get FAD to seek to
 				temp |= cr2;
 
-				cd_stat = CD_STAT_PAUSE;
-				if (temp != 0xffffff)
+				//cd_curfad = temp;
+
+				if (temp == 0xffffff)
 				{
-					cd_curfad = temp;
+					cd_stat = CD_STAT_PAUSE;
+					cdda_pause_audio( machine.device( "cdda" ), 1 );
 				}
+				else
+					printf("disc seek with params %04x %04x",cr1,cr2);
+
+				cr3 = (temp>>16)&0xff;
+				cr4 = temp;
 			}
 			else
 			{
@@ -835,6 +843,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 					cd_stat = CD_STAT_PAUSE;
 					cur_track = cr2>>8;;
 					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+					cdda_pause_audio( machine.device( "cdda" ), 1 );
 					// (index is cr2 low byte)
 				}
 				else // error!
@@ -842,16 +851,18 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 					cd_stat = CD_STAT_STANDBY;
 					cd_curfad = 0xffffffff;
 					cur_track = 0xff;
-					//cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
+					cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
 				}
+
+				cr3 = (cd_curfad>>16)&0xff;
+				cr4 = cd_curfad;
 			}
 
 
 			hirqreg |= CMOK;
 			cr1 = cd_stat;
 			cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
-			cr3 = (cd_curfad>>16)&0xff;
-			cr4 = cd_curfad;
+
 			break;
 
 		case 0x3000:	// Set CD Device connection
