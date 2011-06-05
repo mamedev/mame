@@ -387,12 +387,12 @@ static void recalc_m3(void)
 WRITE8_HANDLER( atari_gtia_w )
 {
 	/* used for mixing hue/lum of different colors */
-//	static UINT8 lumpm0=0,lumpm1=0,lumpm2=0,lumpm3=0,lumpm4=0;
+//  static UINT8 lumpm0=0,lumpm1=0,lumpm2=0,lumpm3=0,lumpm4=0;
 	static UINT8 lumpf1=0;
-//	static UINT8 lumpf2=0;
-//	static UINT8 lumbk= 0;
+//  static UINT8 lumpf2=0;
+//  static UINT8 lumbk= 0;
 	static UINT8 huepm0=0,huepm1=0,huepm2=0,huepm3=0,huepm4=0;
-//	static UINT8 huepf1=0;
+//  static UINT8 huepf1=0;
 	static UINT8 huepf2=0,huebk= 0;
 
     switch (offset & 31)

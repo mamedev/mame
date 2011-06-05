@@ -1026,7 +1026,7 @@ void screen_device::finalize_burnin()
 	if (filerr == FILERR_NONE)
 	{
 		png_info pnginfo = { 0 };
-//		png_error pngerr;
+//      png_error pngerr;
 		char text[256];
 
 		// add two text entries describing the image

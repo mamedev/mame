@@ -4240,15 +4240,15 @@ Marvel Vs. Capcom: Clash of Super Heroes (Euro 980123):
 The originally dumped ROM4 contains garbage instructions that cause the game to crash during the ending staff roll.
 The ROM has been repaired so that the code matches the other sets after decryption:
 
-	offset		dumped	repaired	decrypted
-	0x40/2		001a	189a		EB11 -> 4EF9
-	0x60/2		800b	c00b		0843 -> 227C
+    offset      dumped  repaired    decrypted
+    0x40/2      001a    189a        EB11 -> 4EF9
+    0x60/2      800b    c00b        0843 -> 227C
 */
 
 ROM_START( mvsc )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "mvce.03a", 0x000000, 0x80000, CRC(824e4a90) SHA1(5c79c166d988d8a75d9941f4ee6fa4d6476e55e1) )
-//	ROM_LOAD16_WORD_SWAP( "mvce.04a", 0x080000, 0x80000, BAD_DUMP CRC(cac02153) SHA1(ee9f9da6fda53f21ba7b74367612c90281269690) )
+//  ROM_LOAD16_WORD_SWAP( "mvce.04a", 0x080000, 0x80000, BAD_DUMP CRC(cac02153) SHA1(ee9f9da6fda53f21ba7b74367612c90281269690) )
 	ROM_LOAD16_WORD_SWAP( "mvce.04a", 0x080000, 0x80000, CRC(436c5a4e) SHA1(82f4586e888f2550c53bfdc93a53791a595e05bd) )
 	ROM_LOAD16_WORD_SWAP( "mvc.05a",  0x100000, 0x80000, CRC(2d8c8e86) SHA1(b07d640a734c5d336054ed05195786224c9a6cd4) )
 	ROM_LOAD16_WORD_SWAP( "mvc.06a",  0x180000, 0x80000, CRC(8528e1f5) SHA1(cd065c05268ab581b05676da544baf6af642acac) )

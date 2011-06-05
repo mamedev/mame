@@ -9013,7 +9013,7 @@ static void k001005_render_polygons( device_t *device )
 		if (k001005->_3d_fifo[i] == 0x80000003)
 		{
 			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
-//			poly_vertex v[4];
+//          poly_vertex v[4];
 			int r, g, b, a;
 			UINT32 color;
 			int index = i;

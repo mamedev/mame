@@ -677,7 +677,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	rmask = sdl->sdlsurf->format->Rmask;
 	gmask = sdl->sdlsurf->format->Gmask;
 	bmask = sdl->sdlsurf->format->Bmask;
-//	amask = sdl->sdlsurf->format->Amask;
+//  amask = sdl->sdlsurf->format->Amask;
 
 	if (window->blitwidth != sdl->old_blitwidth || window->blitheight != sdl->old_blitheight)
 	{

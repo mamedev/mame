@@ -1018,7 +1018,7 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 	UINT32 repeated_eip = cpustate->eip;
 	UINT32 repeated_pc = cpustate->pc;
 	UINT8 opcode; // = FETCH(cpustate);
-//	UINT32 eas, ead;
+//  UINT32 eas, ead;
 	UINT32 count;
 	INT32 cycle_base = 0, cycle_adjustment = 0;
 	UINT8 prefix_flag=1;
@@ -1070,7 +1070,7 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 		// FIXME: the following does not work if both address override and segment override are used
 		i386_translate(cpustate, cpustate->segment_override, cpustate->sreg[cpustate->segment_prefix].d ? REG32(ESI) : REG16(SI) );
 	} else {
-		//eas = 
+		//eas =
 		i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI) );
 	}
 	i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );

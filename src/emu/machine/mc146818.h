@@ -26,7 +26,7 @@
 
 #define MCFG_MC146818_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, MC146818, 0) \
-	mc146818_device::static_set_type(*device, mc146818_device::_type); 
+	mc146818_device::static_set_type(*device, mc146818_device::_type);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -100,7 +100,7 @@ protected:
 
 	attotime		m_last_refresh;
 	attotime		m_period;
-	
+
 	static const device_timer_id TIMER_CLOCK = 0;
 	static const device_timer_id TIMER_PERIODIC = 1;
 

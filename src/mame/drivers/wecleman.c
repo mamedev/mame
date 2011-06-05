@@ -675,13 +675,13 @@ static WRITE8_HANDLER( hotchase_sound_control_w )
 {
 	device_t *sound[3];
 
-//	int reg[8];
+//  int reg[8];
 
 	sound[0] = space->machine().device("konami1");
 	sound[1] = space->machine().device("konami2");
 	sound[2] = space->machine().device("konami3");
 
-//	reg[offset] = data;
+//  reg[offset] = data;
 
 	switch (offset)
 	{

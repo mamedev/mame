@@ -3320,7 +3320,7 @@ ROM_START( stcc ) /* Sega Touring Car Championship, Model 2C - Defaults to Japan
 	ROM_LOAD("mpr-19265.60s", 0x600000, 0x200000, CRC(7d98700a) SHA1(bedd37314ecab424b5b27030e1e7dc1b596303f3))
 
 	ROM_REGION( 0x10000, "drive", 0 ) // drive board CPU (code is Z80 compatible)
-	ROM_LOAD( "epr-18261.ic9", 0x000000, 0x010000, CRC(0c7fac58) SHA1(68c1724c41401e28a5123022981c8919fd22656e) ) 
+	ROM_LOAD( "epr-18261.ic9", 0x000000, 0x010000, CRC(0c7fac58) SHA1(68c1724c41401e28a5123022981c8919fd22656e) )
 ROM_END
 
 ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defaults to Japan, Twin & no "Default View" option */
@@ -3379,7 +3379,7 @@ ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defau
 	ROM_LOAD("mpr-19265.60s", 0x600000, 0x200000, CRC(7d98700a) SHA1(bedd37314ecab424b5b27030e1e7dc1b596303f3))
 
 	ROM_REGION( 0x10000, "drive", 0 ) // drive board CPU (code is Z80 compatible)
-	ROM_LOAD( "epr-18261.ic9", 0x000000, 0x010000, CRC(0c7fac58) SHA1(68c1724c41401e28a5123022981c8919fd22656e) ) 
+	ROM_LOAD( "epr-18261.ic9", 0x000000, 0x010000, CRC(0c7fac58) SHA1(68c1724c41401e28a5123022981c8919fd22656e) )
 ROM_END
 
 ROM_START( stccb ) /* Sega Touring Car Championship Revision unknown, Model 2C - Defaults to Japan, Twin & Default View set to Driver's */
@@ -3438,7 +3438,7 @@ ROM_START( stccb ) /* Sega Touring Car Championship Revision unknown, Model 2C -
 	ROM_LOAD("mpr-19265.60s", 0x600000, 0x200000, CRC(7d98700a) SHA1(bedd37314ecab424b5b27030e1e7dc1b596303f3))
 
 	ROM_REGION( 0x10000, "drive", 0 ) // drive board CPU (code is Z80 compatible)
-	ROM_LOAD( "epr-18261.ic9", 0x000000, 0x010000, CRC(0c7fac58) SHA1(68c1724c41401e28a5123022981c8919fd22656e) ) 
+	ROM_LOAD( "epr-18261.ic9", 0x000000, 0x010000, CRC(0c7fac58) SHA1(68c1724c41401e28a5123022981c8919fd22656e) )
 ROM_END
 
 ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C */

@@ -688,10 +688,10 @@ static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, 
 		ax_neg = -1;
 	else
 		ax_neg = 1;
-/*	if (ay < 0)
-		ay_neg = -1;
-	else
-		ay_neg = 1;*/
+/*  if (ay < 0)
+        ay_neg = -1;
+    else
+        ay_neg = 1;*/
 
 	if (opcode & 0x0800)
 		switch (opcode & 0x0700)

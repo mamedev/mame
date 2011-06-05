@@ -2079,7 +2079,7 @@ INLINE UINT32 compute_raster_hash(const raster_info *info)
 	const UINT8 *dither4 = NULL;												\
 	const UINT8 *dither = NULL													\
 
-#define DECLARE_DITHER_POINTERS_NO_DITHER_VAR 												\
+#define DECLARE_DITHER_POINTERS_NO_DITHER_VAR												\
 	const UINT8 *dither_lookup = NULL;											\
 
 #define COMPUTE_DITHER_POINTERS(FBZMODE, YY)									\

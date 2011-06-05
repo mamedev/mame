@@ -148,7 +148,7 @@ const char *attotime::as_string(int precision) const
 	static char buffers[8][30];
 	static int nextbuf;
 	char *buffer = &buffers[nextbuf++ % 8][0];
-	
+
 	// special case: never
 	if (*this == never)
 		sprintf(buffer, "%-*s", precision, "(never)");

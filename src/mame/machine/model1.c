@@ -1059,7 +1059,7 @@ static TGP_FUNCTION( track_lookup )
 
 	dist = -1;
 
-//	behaviour = 0;
+//  behaviour = 0;
 	height = 0.0;
 	entry = 0;
 
@@ -1080,7 +1080,7 @@ static TGP_FUNCTION( track_lookup )
 				float d = (a-z)*(a-z);
 				if(dist == -1 || d<dist) {
 					dist = d;
-//					behaviour = tgp_data[posd+15];
+//                  behaviour = tgp_data[posd+15];
 					height = z;
 					entry = bpos+i;
 				}

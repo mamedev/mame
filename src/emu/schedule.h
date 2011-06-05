@@ -117,7 +117,7 @@ public:
 	attotime remaining() const;
 	attotime start() const { return m_start; }
 	attotime expire() const { return m_expire; }
-	
+
 private:
 	// internal helpers
 	void register_save();
@@ -184,7 +184,7 @@ public:
 
 	// debugging
 	void dump_timers() const;
-	
+
 	// for emergencies only!
 	void eat_all_cycles();
 

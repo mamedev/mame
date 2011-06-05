@@ -1361,7 +1361,7 @@ static MACHINE_CONFIG_DERIVED( newhilop, noraut_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(newhilop_map)
-//	MCFG_CPU_IO_MAP(newhilop_portmap)
+//  MCFG_CPU_IO_MAP(newhilop_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 

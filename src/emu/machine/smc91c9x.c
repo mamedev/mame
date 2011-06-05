@@ -388,7 +388,7 @@ READ16_DEVICE_HANDLER( smc91c9x_r )
 WRITE16_DEVICE_HANDLER( smc91c9x_w )
 {
 	smc91c9x_state *smc = get_safe_token(device);
-//	UINT16 olddata;
+//  UINT16 olddata;
 
 	/* determine the effective register */
 	offset %= 8;
@@ -396,7 +396,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 		offset += 8 * (smc->reg[EREG_BANK] & 7);
 
 	/* update the data generically */
-//	olddata = smc->reg[offset];
+//  olddata = smc->reg[offset];
 	mem_mask &= smc->regmask[offset];
 	COMBINE_DATA(&smc->reg[offset]);
 

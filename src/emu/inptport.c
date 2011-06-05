@@ -2886,7 +2886,7 @@ input_field_config::input_field_config(input_port_config &port, int _type, input
 	memset(&condition, 0, sizeof(condition));
 	for (int seqtype = 0; seqtype < ARRAY_LENGTH(seq); seqtype++)
 		seq[seqtype].set_default();
-	chars[0] = chars[1] = chars[2] = (unicode_char) 0;		
+	chars[0] = chars[1] = chars[2] = (unicode_char) 0;
 }
 
 

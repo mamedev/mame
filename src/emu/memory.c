@@ -553,7 +553,7 @@ public:
 		read32_delegate				r32;
 		read64_delegate				r64;
 	};
-		
+
 	// construction/destruction
 	handler_entry_read(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr)
@@ -769,7 +769,7 @@ private:
 	std::list<_HandlerEntry *> handlers;
 	UINT64 mask;
 };
-		
+
 
 // ======================> address_table
 
@@ -3282,7 +3282,7 @@ void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask,
 	// recompute any direct access on this space if it is a read modification
 	m_space.m_direct.force_update(entry);
 
-	//	verify_reference_counts();
+	//  verify_reference_counts();
 }
 
 UINT8 address_table::get_free_handler()
@@ -3326,7 +3326,7 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 	// Scan the memory to see what has to be done
 	std::list<subrange> range_override;
 	std::map<UINT8, std::list<subrange> > range_partial;
-	
+
 	offs_t base_mirror = 0;
 	do
 	{
@@ -3418,7 +3418,7 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 		}
 	}
 
-	//	verify_reference_counts();
+	//  verify_reference_counts();
 }
 
 
@@ -3464,7 +3464,7 @@ void address_table::verify_reference_counts()
 		for(int i = STATIC_COUNT; i != SUBTABLE_BASE; i++)
 			logerror("%02x: %4x .. %4x\n", i, handler_refcount[i-STATIC_COUNT], actual_refcounts[i-STATIC_COUNT]);
 		throw emu_fatalerror("memory.c: refcounts are fucked.\n");
-	}		
+	}
 }
 
 
@@ -4949,7 +4949,7 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask, cons
 		m_read.r8 = delegate;
 		if (info)
 			m_legacy_info = *info;
-	}		
+	}
 }
 
 

@@ -3859,14 +3859,14 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 	int scroll_values_equal;
 	int lines;
 	INT16 scrollx, scrolly;
-//	INT32 incx;
+//  INT32 incx;
 	int linescroll_enable, vertical_linescroll_enable, linezoom_enable;
 	int vertical_linescroll_index = -1;
 
 	// read original scroll values
 	scrollx = stv2_current_tilemap.scrollx;
 	scrolly = stv2_current_tilemap.scrolly;
-//	incx = stv2_current_tilemap.incx;
+//  incx = stv2_current_tilemap.incx;
 
 	// prepare linescroll flags
 	linescroll_enable = stv2_current_tilemap.linescroll_enable;
@@ -3965,11 +3965,11 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 		{
 			prev_scroll_values[i] &= 0x0007ff00;
 			if ( prev_scroll_values[i] & 0x00040000 ) prev_scroll_values[i] |= 0xfff80000;
-//			incx = prev_scroll_values[i];
+//          incx = prev_scroll_values[i];
 			i++;
 		}
 
-//		if ( LOG_VDP2 ) logerror( "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.min_y, mycliprect.max_y, stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0 );
+//      if ( LOG_VDP2 ) logerror( "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.min_y, mycliprect.max_y, stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0 );
 		// render current tilemap portion
 		stv_vdp2_check_tilemap(machine, bitmap, &mycliprect );
 

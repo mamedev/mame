@@ -303,7 +303,7 @@ static void oki_process(device_t *device, int channel, int command)
 {
 	okim6376_state *info = get_safe_token(device);
 
-	/* if a command is pending, process the second half */				
+	/* if a command is pending, process the second half */
 	if ((command != -1) && (command != 0)) //process silence separately
 	{
 		int start;
@@ -488,7 +488,7 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_ch2_w )
 {
 	okim6376_state *info = get_safe_token(device);
 
-	if (info->ch2 != state) 
+	if (info->ch2 != state)
 	{
 		info->ch2 = state;
 		info->ch2_update = 1;
@@ -516,7 +516,7 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_st_w )
 
 	okim6376_state *info = get_safe_token(device);
 
-	if (info->st != state) 
+	if (info->st != state)
 	{
 
 		info->st = state;
@@ -525,8 +525,8 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_st_w )
 		if ((info->channel == 1) & !info->st)//ST acts as attenuation for Channel 2 when low, and stays at that level until the channel is reset
 		{
 			struct ADPCMVoice *voice = &info->voice[info->channel];
-			{ 
-	
+			{
+
 				info->st_pulses ++;
 				if (info->st_pulses > 3)
 				{

@@ -1780,7 +1780,7 @@ static void
 BlitQuads( running_machine &machine, bitmap_t *bitmap, INT32 addr, float m[4][4], INT32 base )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-//	int numAdditionalNormals = 0;
+//  int numAdditionalNormals = 0;
 	int chunkLength = GetPolyData(state, addr++);
 	int finish = addr + chunkLength;
 
@@ -1857,7 +1857,7 @@ BlitQuads( running_machine &machine, bitmap_t *bitmap, INT32 addr, float m[4][4]
                 000000  000000  007fff // normal vector
                 000000  000000  007fff // normal vector
                 */
-//				numAdditionalNormals = GetPolyData(state, addr+2);
+//              numAdditionalNormals = GetPolyData(state, addr+2);
 				state->m_mSurfaceNormalFormat = GetPolyData(state, addr+3);
 				state->m_mLitSurfaceCount = 0;
 				state->m_mLitSurfaceIndex = 0;
@@ -2127,7 +2127,7 @@ SimulateSlaveDSP( running_machine &machine, bitmap_t *bitmap )
 
 		/* hackery! commands should be streamed, not parsed here */
 		pSource += len;
-//		marker = (INT16)*pSource++; /* always 0xffff */
+//      marker = (INT16)*pSource++; /* always 0xffff */
 		pSource++;
 		next   = (INT16)*pSource++; /* link to next command */
 		if( (next&0x7fff) != (pSource - (INT32 *)state->m_polygonram) )

@@ -231,7 +231,7 @@ static WRITE8_HANDLER( doraemon_outputs_w )
 
 	memory_set_bank(space->machine(), "bank1", (data & 0x30) >> 4);
 
-//	popmessage("%02x", data);
+//  popmessage("%02x", data);
 }
 
 static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8 )
@@ -363,9 +363,9 @@ static INPUT_PORTS_START( doraemon )
 	PORT_DIPSETTING(    0x06,  "40 %" )
 	PORT_DIPSETTING(    0x05,  "60 %" )
 	PORT_DIPSETTING(    0x04,  "80 %" )
-//	PORT_DIPSETTING(    0x03, "100 %" )
-//	PORT_DIPSETTING(    0x02, "100 %" )
-//	PORT_DIPSETTING(    0x01, "100 %" )
+//  PORT_DIPSETTING(    0x03, "100 %" )
+//  PORT_DIPSETTING(    0x02, "100 %" )
+//  PORT_DIPSETTING(    0x01, "100 %" )
 	PORT_DIPSETTING(    0x00, "100 %" )
 	PORT_DIPNAME( 0x10, 0x10, "Games For 100 Yen" )
 	PORT_DIPSETTING(    0x10, "1" )

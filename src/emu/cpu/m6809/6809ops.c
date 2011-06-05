@@ -371,7 +371,7 @@ OP_HANDLER( bra )
 }
 
 /* $21 BRN relative ----- */
-static UINT8 m6809_brn_t; // hack around GCC 4.6 error because we need the side effects of IMMBYTE  
+static UINT8 m6809_brn_t; // hack around GCC 4.6 error because we need the side effects of IMMBYTE
 OP_HANDLER( brn )
 {
 	IMMBYTE(m6809_brn_t);

@@ -63,7 +63,7 @@ int sort_callback(const void *elem1, const void *elem2)
 
 
 //-------------------------------------------------
-//  parse_file - parse a single file, may be 
+//  parse_file - parse a single file, may be
 //  called recursively
 //-------------------------------------------------
 
@@ -143,7 +143,7 @@ int parse_file(const char *srcfile)
 			parse_file(filename);
 			continue;
 		}
-		
+
 		// otherwise treat as a driver name
 		char drivname[32];
 		drivname[0] = 0;

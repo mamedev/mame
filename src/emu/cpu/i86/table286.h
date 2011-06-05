@@ -221,14 +221,14 @@ static void (*const PREFIX286(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_aad),				/* 0xd5 */
 	 PREFIX286(_invalid),
 	 PREFIX86(_xlat),				/* 0xd7 */
-	 PREFIX286(_escape), 			/* 0xd8 */
-	 PREFIX286(_escape), 			/* 0xd9 */
-	 PREFIX286(_escape), 			/* 0xda */
-	 PREFIX286(_escape), 			/* 0xdb */
-	 PREFIX286(_escape), 			/* 0xdc */
-	 PREFIX286(_escape), 			/* 0xdd */
-	 PREFIX286(_escape), 			/* 0xde */
-	 PREFIX286(_escape_7), 			/* 0xdf */
+	 PREFIX286(_escape),			/* 0xd8 */
+	 PREFIX286(_escape),			/* 0xd9 */
+	 PREFIX286(_escape),			/* 0xda */
+	 PREFIX286(_escape),			/* 0xdb */
+	 PREFIX286(_escape),			/* 0xdc */
+	 PREFIX286(_escape),			/* 0xdd */
+	 PREFIX286(_escape),			/* 0xde */
+	 PREFIX286(_escape_7),			/* 0xdf */
 	 PREFIX86(_loopne), 			/* 0xe0 */
 	 PREFIX86(_loope),				/* 0xe1 */
 	 PREFIX86(_loop),				/* 0xe2 */

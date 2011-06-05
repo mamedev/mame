@@ -779,7 +779,7 @@ void cdicdic_device::process_delayed_command()
             UINT32 next_msf = increment_cdda_frame_bcd((m_time & 0xffff7f00) >> 8);
             UINT32 rounded_next_msf = increment_cdda_sector_bcd((m_time & 0xffff0000) >> 8);
 			UINT32 lba = 0;
-//			UINT32 next_lba = 0;
+//          UINT32 next_lba = 0;
 			UINT8 nybbles[6] =
 			{
 				 msf & 0x0000000f,
@@ -789,15 +789,15 @@ void cdicdic_device::process_delayed_command()
 				(msf & 0x000f0000) >> 16,
 				(msf & 0x00f00000) >> 20
 			};
-/*			UINT8 next_nybbles[6] =
-			{
-				 rounded_next_msf & 0x0000000f,
-				(rounded_next_msf & 0x000000f0) >> 4,
-				(rounded_next_msf & 0x00000f00) >> 8,
-				(rounded_next_msf & 0x0000f000) >> 12,
-				(rounded_next_msf & 0x000f0000) >> 16,
-				(rounded_next_msf & 0x00f00000) >> 20
-			};*/
+/*          UINT8 next_nybbles[6] =
+            {
+                 rounded_next_msf & 0x0000000f,
+                (rounded_next_msf & 0x000000f0) >> 4,
+                (rounded_next_msf & 0x00000f00) >> 8,
+                (rounded_next_msf & 0x0000f000) >> 12,
+                (rounded_next_msf & 0x000f0000) >> 16,
+                (rounded_next_msf & 0x00f00000) >> 20
+            };*/
 
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
@@ -808,7 +808,7 @@ void cdicdic_device::process_delayed_command()
 
 			if(!(msf & 0x0000ff))
 			{
-//				next_lba = next_nybbles[0] + next_nybbles[1]*10 + ((next_nybbles[2] + next_nybbles[3]*10)*75) + ((next_nybbles[4] + next_nybbles[5]*10)*75*60);
+//              next_lba = next_nybbles[0] + next_nybbles[1]*10 + ((next_nybbles[2] + next_nybbles[3]*10)*75) + ((next_nybbles[4] + next_nybbles[5]*10)*75*60);
                 verboselog(machine(), 0, "Playing CDDA sector from MSF location %06x\n", m_time | 2 );
 
                 cdda_start_audio(machine().device("cdda"), lba, rounded_next_msf);

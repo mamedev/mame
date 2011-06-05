@@ -2501,11 +2501,11 @@ static UINT32 * geo_end( geo_state *geo, UINT32 opcode, UINT32 *input )
 /* Command 10: Dummy */
 static UINT32 * geo_dummy( geo_state *geo, UINT32 opcode, UINT32 *input )
 {
-//	UINT32	data;
+//  UINT32  data;
 	(void)opcode;
 
 	/* do the dummy read cycle */
-//	data = *input++;
+//  data = *input++;
 	input++;
 
 	return input;
@@ -2571,7 +2571,7 @@ static UINT32 * geo_code_upload( geo_state *geo, UINT32 opcode, UINT32 *input )
 	(void)opcode;
 
 	/* read in the flags */
-//	flags = *input++;
+//  flags = *input++;
 	input++;
 
 	/* read in the count */
@@ -2606,7 +2606,7 @@ static UINT32 * geo_code_upload( geo_state *geo, UINT32 opcode, UINT32 *input )
 /* Command 1E: Code Jump (undocumented, unsupported) */
 static UINT32 * geo_code_jump( geo_state *geo, UINT32 opcode, UINT32 *input )
 {
-//	UINT32	address;
+//  UINT32  address;
 
 	/*
         This command jumps to a specified address in program
@@ -2620,7 +2620,7 @@ static UINT32 * geo_code_jump( geo_state *geo, UINT32 opcode, UINT32 *input )
 
 	(void)opcode;
 
-//	address = *input++ & 0x3FF;
+//  address = *input++ & 0x3FF;
 	input++;
 
 /*

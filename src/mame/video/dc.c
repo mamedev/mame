@@ -1632,12 +1632,12 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 
 WRITE64_HANDLER( ta_fifo_yuv_w )
 {
-//	int reg;
-//	UINT64 shift;
-//	UINT32 dat;
+//  int reg;
+//  UINT64 shift;
+//  UINT32 dat;
 
-//	reg = decode_reg_64(offset, mem_mask, &shift);
-//	dat = (UINT32)(data >> shift);
+//  reg = decode_reg_64(offset, mem_mask, &shift);
+//  dat = (UINT32)(data >> shift);
 
 //  printf("YUV FIFO: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x %08x\n", 0x10800000+reg*4, dat, data, offset, mem_mask,test);
 }

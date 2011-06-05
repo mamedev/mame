@@ -1654,7 +1654,7 @@ static int pif_channel_handle_command(running_machine &machine, int channel, int
             mame_printf_debug("\n");*/
 
 			address = (sdata[1] << 8) | (sdata[2]);
-//			checksum = address & 0x1f;
+//          checksum = address & 0x1f;
 			address &= ~0x1f;
 
 			if (address == 0x400)
@@ -1691,7 +1691,7 @@ static int pif_channel_handle_command(running_machine &machine, int channel, int
             mame_printf_debug("\n");*/
 
 			address = (sdata[1] << 8) | (sdata[2]);
-//			checksum = address & 0x1f;
+//          checksum = address & 0x1f;
 			address &= ~0x1f;
 
 			if (address == 0x8000)

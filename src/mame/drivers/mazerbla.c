@@ -273,13 +273,13 @@ SCREEN_UPDATE( test_vcu )
 static SCREEN_UPDATE( mazerbla )
 {
 	mazerbla_state *state = screen->machine().driver_data<mazerbla_state>();
-//	UINT32 color_base = 0;
+//  UINT32 color_base = 0;
 
 	if (state->m_game_id == MAZERBLA)
-//		color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
+//      color_base = 0x80;  /* 0x80 constant: matches Mazer Blazer movie */
 
-//	if (state->m_game_id == GREATGUN)
-//		color_base = 0x00;
+//  if (state->m_game_id == GREATGUN)
+//      color_base = 0x00;
 
 	//  bitmap_fill(bitmap, NULL, 0);
 

@@ -822,7 +822,7 @@ ROM_START( nam1975 ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x080000, "ymsnd", 0 )
 	ROM_LOAD( "001-v11.v11", 0x000000, 0x080000, CRC(a7c3d5e5) SHA1(e3efc86940f91c53b7724c4566cfc21ea1a7a465) ) /* MB834200 */
 	// AES has different label, data is the same: 001-v1.v1
-	
+
 	ROM_REGION( 0x180000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "001-v21.v21", 0x000000, 0x080000, CRC(55e670b3) SHA1(a047049646a90b6db2d1882264df9256aa5a85e5) )  /* MB834200 */
 	// AES has different label, data is the same: 001-v2.v21

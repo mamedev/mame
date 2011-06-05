@@ -151,7 +151,7 @@ private:
 	void					end_avi_recording();
 	void					begin_avi_recording(const char *name);
 
-	bool 					screen_encountered[9];		// whether a given screen was encountered this frame
+	bool					screen_encountered[9];		// whether a given screen was encountered this frame
 
 	d3d *                   d3dintf;					// D3D interface
 	win_window_info *       window;						// D3D window info

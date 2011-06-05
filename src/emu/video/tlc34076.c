@@ -163,11 +163,11 @@ READ8_DEVICE_HANDLER( tlc34076_r )
 WRITE8_DEVICE_HANDLER( tlc34076_w )
 {
 	tlc34076_state *state = get_safe_token(device);
-//	UINT8 oldval;
+//  UINT8 oldval;
 
 	/* keep in range */
 	offset &= 0x0f;
-//	oldval = state->regs[offset];
+//  oldval = state->regs[offset];
 	state->regs[offset] = data;
 
 	/* switch off the offset */

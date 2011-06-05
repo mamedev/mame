@@ -238,7 +238,7 @@ static WRITE16_HANDLER( tv_vcf_bankselect_w )
 static WRITE16_DEVICE_HANDLER( tv_oki6376_w )
 {
 	static int okidata;
-	if (ACCESSING_BITS_0_7 && okidata != data) 
+	if (ACCESSING_BITS_0_7 && okidata != data)
 	{
 		okidata = data;
 		okim6376_w(device, 0, data & ~0x80);
@@ -248,7 +248,7 @@ static WRITE16_DEVICE_HANDLER( tv_oki6376_w )
 
 static READ16_DEVICE_HANDLER( tv_oki6376_r )
 {
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		return okim6376_busy_r(device);
 	}
@@ -319,7 +319,7 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6376_w )
 
 static WRITE16_DEVICE_HANDLER( tv_ncf_oki6376_st_w )
 {
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		okim6376_st_w(device, (data & 0x80) );
 	}

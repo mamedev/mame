@@ -3,11 +3,11 @@
 Note: this hardware is a copy of Psikyo's 68020 based hardware,
       the Strikers 1945 bootleg has the same unknown rom!
 
-	  It isn't quite as flexible as the original Psikyo hardware
-	  by the looks of it, there are various subtle changes to how
-	  things work, for example the tilemap sizes and missing
-	  transparent pen modification.  This makes it rather hard to
-	  merge with psikyo.c and it should probably be left separate.
+      It isn't quite as flexible as the original Psikyo hardware
+      by the looks of it, there are various subtle changes to how
+      things work, for example the tilemap sizes and missing
+      transparent pen modification.  This makes it rather hard to
+      merge with psikyo.c and it should probably be left separate.
 
 Dream World
 SemiCom, 2000
@@ -93,25 +93,25 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 
    Baryon has some annoying sound looping clicks / cutouts, these need to
     be verified against the HW (it's a very cheap sound system, so it might
-	be accurate)
+    be accurate)
 
    Baryon has playfield background which fade in with very rough / visible
     edges.  In this case the tilemap size registers from the original
-	psikyo hardware are set to be the alternate tilemap size, however that
-	doesn't make sense in the context of the data in RAM, which doesn't
-	appear to wrap properly anyway, again, it's likely this is just how the
-	game is.  Furthermore the BG test in the test menu indicates that it
-	tests alternate tilemap sizes, but doesn't even write to the register,
-	probably a leftover from hardware development as the test menu is mostly
-	incomplete.
+    psikyo hardware are set to be the alternate tilemap size, however that
+    doesn't make sense in the context of the data in RAM, which doesn't
+    appear to wrap properly anyway, again, it's likely this is just how the
+    game is.  Furthermore the BG test in the test menu indicates that it
+    tests alternate tilemap sizes, but doesn't even write to the register,
+    probably a leftover from hardware development as the test menu is mostly
+    incomplete.
 
    All: sprite priority, the original psikyo.c HW has sprite<->tilemap
     priority but we don't support it here, does the clone HW support it?
 
    All: sprite zooming, again the original psikyo.c HW supports this, but we
     don't support it here.  The Strikers 1945 bootleg in psikyo.c doesn't
-	appear to support it properly either, so it might be missing on these
-	clone boards.
+    appear to support it properly either, so it might be missing on these
+    clone boards.
 
 */
 
@@ -140,7 +140,7 @@ public:
 	tilemap_t  *m_bg2_tilemap;
 	int      m_tilebank[2];
 	int      m_tilebankold[2];
-	
+
 	UINT32* m_spritebuf1;
 	UINT32* m_spritebuf2;
 
@@ -283,7 +283,7 @@ SCREEN_EOF( dreamwld )
 static SCREEN_UPDATE( dreamwld )
 {
 	dreamwld_state *state = screen->machine().driver_data<dreamwld_state>();
-//	int tm0size, tm1size;
+//  int tm0size, tm1size;
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
@@ -424,7 +424,7 @@ static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 		logerror("OKI1: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
 
-// why doesn't using paletteram16_xRRRRRGGGGGBBBBB_word_w with a 16-bit handler work? colours are 
+// why doesn't using paletteram16_xRRRRRGGGGGBBBBB_word_w with a 16-bit handler work? colours are
 // severely corrupt on dream world's semicom screen + many sprites, seems palette values get duplicated.
 static WRITE32_HANDLER( dreamwld_palette_w )
 {
@@ -448,7 +448,7 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_spriteram)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_BASE_MEMBER(dreamwld_state, m_paletteram) 
+	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_BASE_MEMBER(dreamwld_state, m_paletteram)
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE_MEMBER(dreamwld_state, m_bg_videoram)
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE_MEMBER(dreamwld_state, m_bg2_videoram)
 	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_vregs)  // scroll regs etc.

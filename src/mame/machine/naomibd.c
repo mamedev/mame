@@ -1223,7 +1223,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 
 static void load_rom_gdrom(running_machine& machine, naomibd_state *v)
 {
-//	UINT32 result;
+//  UINT32 result;
 	cdrom_file *gdromfile;
 	UINT8 buffer[2048];
 	UINT8 *ptr;

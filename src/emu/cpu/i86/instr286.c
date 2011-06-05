@@ -841,7 +841,7 @@ static void PREFIX286(_escape_7)(i8086_state *cpustate)    /* Opcode 0xdf */
 	if ((cpustate->msw&8) || (cpustate->msw&4)) throw TRAP(FPU_UNAVAILABLE,-1);
 	unsigned ModRM = FETCH;
 	ICOUNT -= timing.nop;
-    GetRMByte(ModRM); 
+    GetRMByte(ModRM);
 	if (ModRM == 0xe0) cpustate->regs.w[AX] = 0xffff;  // FPU not present
 }
 

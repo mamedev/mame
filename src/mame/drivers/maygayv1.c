@@ -343,7 +343,7 @@ static SCREEN_UPDATE( maygayv1 )
 //                  printf("Blinking\n");
 
 				/* Resolution: either 4bpp or 2bpp */
-//				res = (w0 >> 9) & 3;
+//              res = (w0 >> 9) & 3;
 
 
 				/* Expand 2bpp to 3bpp */

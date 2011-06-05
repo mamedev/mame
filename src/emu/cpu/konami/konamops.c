@@ -300,7 +300,7 @@ INLINE void bra( konami_state *cpustate )
 }
 
 /* $21 BRN relative ----- */
-static UINT8 konami_brn_t;	// hack around GCC 4.6 error because we need the side effects of IMMBYTE 
+static UINT8 konami_brn_t;	// hack around GCC 4.6 error because we need the side effects of IMMBYTE
 INLINE void brn( konami_state *cpustate )
 {
 	IMMBYTE(cpustate, konami_brn_t);

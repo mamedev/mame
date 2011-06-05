@@ -753,7 +753,7 @@ MACHINE_CONFIG_END
 static void dcs_boot(running_machine &machine)
 {
 	UINT8 buffer[0x1000];
-//	UINT32 max_banks;
+//  UINT32 max_banks;
 	UINT16 *base;
 	int i;
 
@@ -763,7 +763,7 @@ static void dcs_boot(running_machine &machine)
 		case 1:
 
 			/* determine the base */
-//			max_banks = dcs.bootrom_words / 0x1000;
+//          max_banks = dcs.bootrom_words / 0x1000;
 			base = dcs.bootrom + ((dcs.sounddata_bank * 0x1000) % dcs.bootrom_words);
 
 			/* convert from 16-bit data to 8-bit data and boot */

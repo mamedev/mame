@@ -310,7 +310,7 @@ static STREAM_UPDATE( beezer_stream_update )
 		/* skip if nothing enabled */
 		if ((sh6840_timer[0].cr & 0x01) == 0) // if we're not in reset...
 		{
-//			int noise_clocks_this_sample = 0;
+//          int noise_clocks_this_sample = 0;
 			UINT32 chan1_clocks;
 
 			/* generate noise if configured to do so */

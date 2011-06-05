@@ -683,7 +683,7 @@ void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanl
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
-//			lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
+//          lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
 
 			/* compute the pixel fetch parameters */
 			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);

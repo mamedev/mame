@@ -133,7 +133,7 @@ static STREAM_UPDATE( rf5c400_update )
 		stream_sample_t *buf0 = outputs[0];
 		stream_sample_t *buf1 = outputs[1];
 
-//		start = ((channel->startH & 0xFF00) << 8) | channel->startL;
+//      start = ((channel->startH & 0xFF00) << 8) | channel->startL;
 		end = ((channel->endHloopH & 0xFF) << 16) | channel->endL;
 		loop = ((channel->endHloopH & 0xFF00) << 8) | channel->loopL;
 		pos = channel->pos;

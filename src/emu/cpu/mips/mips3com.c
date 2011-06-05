@@ -312,7 +312,7 @@ void mips3com_tlbwr(mips3_state *mips)
 void mips3com_tlbp(mips3_state *mips)
 {
 	UINT32 tlbindex;
-//	UINT64 vpn;
+//  UINT64 vpn;
 
 	/* iterate over TLB entries */
 	for (tlbindex = 0; tlbindex < mips->tlbentries; tlbindex++)
@@ -329,7 +329,7 @@ void mips3com_tlbp(mips3_state *mips)
 	}
 
 	/* validate that our tlb_table was in sync */
-//	vpn = ((mips->cpr[0][COP0_EntryHi] >> 13) & 0x07ffffff) << 1;
+//  vpn = ((mips->cpr[0][COP0_EntryHi] >> 13) & 0x07ffffff) << 1;
 	if (tlbindex != mips->tlbentries)
 		mips->cpr[0][COP0_Index] = tlbindex;
 	else

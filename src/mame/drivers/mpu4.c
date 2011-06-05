@@ -219,8 +219,8 @@ TODO: - Distinguish door switches using manual
       - Flo's move in Great Escape gives spin alarms - need a different opto setting for reverse spin reels?
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
       - Fix MSM6376 - We need all features of the chip, including dynamic sample rate adjustment and BEEP.
-	  - OKI sound chip rate - need to confirm independently (3MHz sounds good, but that could be because
-	    of the old driver - BwB manual claims 64KHz to 128KHz). 
+      - OKI sound chip rate - need to confirm independently (3MHz sounds good, but that could be because
+        of the old driver - BwB manual claims 64KHz to 128KHz).
 ***********************************************************************************************************/
 #include "emu.h"
 #include "machine/6821pia.h"

@@ -1530,7 +1530,7 @@ static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk 
 	//subtype = chunkdata[2];
 	type = chunkdata[3];
 	entries = fetch_32bits(&chunkdata[4]);
-	//id = fetch_32bits(&chunkdata[8]); 
+	//id = fetch_32bits(&chunkdata[8]);
 	baseoffset = fetch_64bits(&chunkdata[12]);
 
 	/* if this is a superindex, loop over entries and call ourselves recursively */

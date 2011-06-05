@@ -731,20 +731,20 @@ static READ8_HANDLER( saturn_SMPC_r8 )
 	if (offset == 0x75)//PDR1 read
 	{
 /*
-	PORT_START("JOY1")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)	// START
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)	// A
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)	// B
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)	// C
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1)	// R
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 X") PORT_PLAYER(1)	// X
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Y") PORT_PLAYER(1)	// Y
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1)	// Z
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1)	// L
+    PORT_START("JOY1")
+    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) // START
+    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1) // A
+    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1) // B
+    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1) // C
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1) // R
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 X") PORT_PLAYER(1) // X
+    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Y") PORT_PLAYER(1) // Y
+    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1) // Z
+    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1) // L
 */
 		if (state->m_smpc.IOSEL1)
 		{
@@ -1741,12 +1741,12 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r8, saturn_SMPC_w8,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r, saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
-//	AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
+//  AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
-//	AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
+//  AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
-//	AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
@@ -1771,9 +1771,9 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r,saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
 	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_io_r32, stv_io_w32) AM_BASE_MEMBER(saturn_state,m_ioga) AM_SHARE("share4") AM_MIRROR(0x20)
-//	AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
+//  AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
-//	AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
+//  AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("abus", 0) // cartridge
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
@@ -2676,7 +2676,7 @@ static MACHINE_RESET( saturn )
 
 	if(state->m_cart_type == 1)
 	{
-		//	AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
 		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
@@ -2685,7 +2685,7 @@ static MACHINE_RESET( saturn )
 
 	if(state->m_cart_type == 2)
 	{
-		//	AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
 		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));

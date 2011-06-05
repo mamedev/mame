@@ -2,9 +2,9 @@
 Reality Tennis - (c) 1993 TCH
 
  driver by Tomasz Slanina
- 
-	based on informations provided by Antonio 'Peluko' Carrillo
-	
+
+    based on informations provided by Antonio 'Peluko' Carrillo
+
 Game Credits:
 Antonio 'Peluko' Carrillo: programmer and game designer
 David Sandoval: hardware designer
@@ -39,7 +39,7 @@ Two Actel FPGA chips (marked as JOAQUIN and JUANA).
 Juana can read data from ROMs. JOAQUIN - write to VRAM.
 Both can access 256x256 pixel pages.
 Size and direction of data read/write, as well as active page is
-selectable for each of the chips. 
+selectable for each of the chips.
 
 Sound hardware (verify):
 ------------------------
@@ -48,8 +48,8 @@ Two custom DACs are conencted directly to data lines of sound ROMs.
 A0-A10 address lines are controlled by a counter, clocked by scaline
 clock ( not verified, just guessed ). Top lines are controlled by cpu,
 and select 2k sample to play. There's probably no way to stop the sample
-player - when there's nothing to play - first, empty 2k of ROMs are selected. 
-  
+player - when there's nothing to play - first, empty 2k of ROMs are selected.
+
  TODO:
 - proper timing and interrupts (remove extra hacky blitter int generation @ vblank)
 - fix various gfx glitches here and there, mostly related to wrong size of data
@@ -71,7 +71,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 static READ16_HANDLER( rlt_io_r )
 {
 	rltennis_state *state = space->machine().driver_data<rltennis_state>();
-	
+
 	return (input_port_read(space->machine(), "P1" )&0x1fff) | (state->m_unk_counter<<13); /* top 3 bits controls smaple address update */
 }
 
@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x720006, 0x720007) AM_WRITE(rlt_ramdac_address_rm_w)
 	AM_RANGE(0x740000, 0x740001) AM_WRITE(rlt_snd1_w)
 	AM_RANGE(0x760000, 0x760001) AM_WRITE(rlt_snd2_w)
-	AM_RANGE(0x780000, 0x780001) AM_WRITENOP 	/* sound control, unknown, usually = 0x0044 */
+	AM_RANGE(0x780000, 0x780001) AM_WRITENOP	/* sound control, unknown, usually = 0x0044 */
 	AM_RANGE(0x7a0000, 0x7a0003) AM_READNOP 	/* unknown, read only at boot time*/
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(rlt_io_r)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
@@ -120,7 +120,7 @@ static INPUT_PORTS_START( rltennis )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE )
 
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -135,7 +135,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( sample_player )
 {
 	rltennis_state *state = machine.driver_data<rltennis_state>();
-	
+
 	if((state->m_dac_counter&0x7ff) == 0x7ff) /* reload top address bits */
 	{
 		state->m_sample_rom_offset_1=(( state->m_data740000 >> state->m_offset_shift ) & 0xff )<<11;
@@ -143,7 +143,7 @@ static TIMER_CALLBACK( sample_player )
 		state->m_offset_shift^=8; /* switch between MSB and LSB */
 	}
 	++state->m_dac_counter; /* update low address bits */
-	
+
 	dac_signed_data_w(state->m_dac_1, state->m_samples_1[state->m_sample_rom_offset_1 + ( state->m_dac_counter&0x7ff )]);
 	dac_data_w(state->m_dac_2, state->m_samples_2[state->m_sample_rom_offset_2 + ( state->m_dac_counter&0x7ff )]);
 	state->m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
@@ -182,13 +182,13 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
 	MCFG_CPU_PROGRAM_MAP(rltennis_main)
 	MCFG_CPU_VBLANK_INT("screen", rltennis_interrupt)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( RLT_REFRESH_RATE )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0,319, 0, 239)
-		
+
 	MCFG_SCREEN_UPDATE(rltennis)
 	MCFG_PALETTE_LENGTH(256)
 
@@ -223,10 +223,10 @@ ROM_START( rltennis )
 	ROM_LOAD( "tennis_12.u40",0x380000, 0x80000, CRC(b9677887) SHA1(84b79864555d3d6e9c443913910a055e27d30d08) )
 	ROM_LOAD( "tennis_13.u41",0x400000, 0x80000, CRC(3d4fbcac) SHA1(e01f479d7d516ff83cbbd82d83617146d7a242d3) )
 	ROM_LOAD( "tennis_14.u42",0x480000, 0x80000, CRC(37fe0f5d) SHA1(7593f1ea07bc0a741c952e6850bed1bf0a824510) )
-	
+
 	ROM_REGION( 0x080000, "samples1", 0 )
 	ROM_LOAD( "tennis_4.u59", 0x00000, 0x80000, CRC(f56462ea) SHA1(638777e12f2649a5b4366f034f0ba721fc4580a8) )
-	
+
 	ROM_REGION( 0x080000, "samples2", 0 )
 	ROM_LOAD( "tennis_3.u52", 0x00000, 0x80000, CRC(517dcd0e) SHA1(b2703e185ee8cf7e115ea07151e7bee8be34948b) )
 ROM_END

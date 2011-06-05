@@ -332,7 +332,7 @@ enum input_item_id
 	ITEM_ID_OTHER_AXIS_ABSOLUTE,
 	ITEM_ID_OTHER_AXIS_RELATIVE,
 	ITEM_ID_MAXIMUM,
-	
+
 	// internal codes for sequences
 	ITEM_ID_SEQ_END,
 	ITEM_ID_SEQ_DEFAULT,
@@ -370,14 +370,14 @@ public:
 	// construction/destruction
 	joystick_map();
 	joystick_map(const joystick_map &src) { copy(src); }
-	
+
 	// operators
 	joystick_map &operator=(const joystick_map &src) { if (this != &src) copy(src); return *this; }
 
 	// parse from a string
 	bool parse(const char *mapstring);
 
-	// create a friendly string	
+	// create a friendly string
 	const char *to_string(astring &string) const;
 
 	// update the state of a live map
@@ -426,11 +426,11 @@ public:
 	input_code(const input_code &src)
 		: m_internal(src.m_internal) { }
 	input_code(input_device &device, input_item_id itemid);
-	
+
 	// operators
 	bool operator==(const input_code &rhs) const { return m_internal == rhs.m_internal; }
 	bool operator!=(const input_code &rhs) const { return m_internal != rhs.m_internal; }
-	
+
 	// getters
 	bool internal() const { return device_class() == DEVICE_CLASS_INTERNAL; }
 	input_device_class device_class() const { return input_device_class((m_internal >> 28) & 0xf); }
@@ -438,14 +438,14 @@ public:
 	input_item_class item_class() const { return input_item_class((m_internal >> 16) & 0xf); }
 	input_item_modifier item_modifier() const { return input_item_modifier((m_internal >> 12) & 0xf); }
 	input_item_id item_id() const { return input_item_id(m_internal & 0xfff); }
-	
+
 	// setters
 	void set_device_class(input_device_class devclass) { assert(devclass >= 0 && devclass <= 0xf); m_internal = (m_internal & ~(0xf << 28)) | ((devclass & 0xf) << 28); }
 	void set_device_index(int devindex) { assert(devindex >= 0 && devindex <= 0xff); m_internal = (m_internal & ~(0xff << 20)) | ((devindex & 0xff) << 20); }
 	void set_item_class(input_item_class itemclass) { assert(itemclass >= 0 && itemclass <= 0xf); m_internal = (m_internal & ~(0xf << 16)) | ((itemclass & 0xf) << 16); }
 	void set_item_modifier(input_item_modifier modifier) { assert(modifier >= 0 && modifier <= 0xf); m_internal = (m_internal & ~(0xf << 12)) | ((modifier & 0xf) << 12); }
 	void set_item_id(input_item_id itemid) { assert(itemid >= 0 && itemid <= 0xfff); m_internal = (m_internal & ~0xfff) | (itemid & 0xfff); }
-	
+
 private:
 	// internal state
 	UINT32		m_internal;
@@ -481,7 +481,7 @@ public:
 	void set_default() { set(default_code); }
 	void backspace();
 	void replace(input_code oldcode, input_code newcode);
-	
+
 	// constant codes used in sequences
 	static const input_code end_code;
 	static const input_code default_code;
@@ -494,7 +494,7 @@ public:
 
 private:
 	// internal state
-	input_code 	m_code[16];
+	input_code	m_code[16];
 };
 
 
@@ -502,7 +502,7 @@ private:
 
 // a logical device of a given class that can provide input
 class input_device
-{	
+{
 	friend class input_class;
 
 	// construction/destruction
@@ -557,7 +557,7 @@ class input_class
 public:
 	// construction/destruction
 	input_class(input_manager &manager, input_device_class devclass, bool enabled = false, bool multi = false);
-	
+
 	// getters
 	input_manager &manager() const { return m_manager; }
 	running_machine &machine() const;
@@ -566,7 +566,7 @@ public:
 	int maxindex() const { return m_maxindex; }
 	bool enabled() const { return m_enabled; }
 	bool multi() const { return m_multi; }
-	
+
 	// setters
 	void enable(bool state = true) { m_enabled = state; }
 	void set_multi(bool multi = true) { m_multi = multi; }
@@ -584,7 +584,7 @@ private:
 
 	// internal state
 	input_manager &			m_manager;				// reference to our manager
-	input_device * 			m_device[DEVICE_INDEX_MAXIMUM];	// array of devices in this class
+	input_device *			m_device[DEVICE_INDEX_MAXIMUM];	// array of devices in this class
 	input_device_class		m_devclass;				// our device class
 	int						m_maxindex;				// maximum populated index
 	bool					m_enabled;				// is this class enabled?
@@ -600,22 +600,22 @@ class input_manager
 public:
 	// construction/destruction
 	input_manager(running_machine &machine);
-	
+
 	// getters
 	running_machine &machine() const { return m_machine; }
 	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != NULL); return *m_class[devclass]; }
-	
+
 	// input code readers
 	INT32 code_value(input_code code);
 	bool code_pressed(input_code code) { return code_value(code) != 0; }
 	bool code_pressed_once(input_code code);
-	
+
 	// input code polling
 	void reset_polling();
 	input_code poll_axes();
 	input_code poll_switches();
 	input_code poll_keyboard_switches();
-	
+
 	// input code helpers
 	input_device *device_from_code(input_code code) const;
 	input_device_item *item_from_code(input_code code) const;
@@ -623,16 +623,16 @@ public:
 	const char *code_name(astring &string, input_code code) const;
 	const char *code_to_token(astring &string, input_code code) const;
 	input_code code_from_token(const char *_token);
-	
+
 	// input sequence readers
 	bool seq_pressed(const input_seq &seq);
 	INT32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
-	
+
 	// input sequence polling
 	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = NULL);
 	bool seq_poll();
 	const input_seq &seq_poll_final() const { return m_poll_seq; }
-	
+
 	// input sequence helpers
 	const char *seq_name(astring &string, const input_seq &seq) const;
 	const char *seq_to_tokens(astring &string, const input_seq &seq) const;
@@ -656,7 +656,7 @@ private:
 	input_class			m_joystick_class;
 	input_class			m_lightgun_class;
 	input_class *		m_class[DEVICE_CLASS_MAXIMUM];
-	
+
 	// sequence polling state
 	input_seq			m_poll_seq;
 	osd_ticks_t			m_poll_seq_last_ticks;

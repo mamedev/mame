@@ -61,16 +61,16 @@ static WRITE16_HANDLER( f3_es5505_bank_w )
 
 static WRITE16_HANDLER( f3_volume_w )
 {
-//	static UINT16 channel[8],last_l,last_r;
-//	static int latch;
+//  static UINT16 channel[8],last_l,last_r;
+//  static int latch;
 
-//	if (offset==0) latch=(data>>8)&0x7;
-//	if (offset==1) channel[latch]=data>>8;
+//  if (offset==0) latch=(data>>8)&0x7;
+//  if (offset==1) channel[latch]=data>>8;
 
 //      if (channel[7]!=last_l) mixer_set_volume(0, (int)((float)channel[7]*1.58)); /* Left master volume */
 //      if (channel[6]!=last_r) mixer_set_volume(1, (int)((float)channel[6]*1.58)); /* Right master volume */
-//	last_l=channel[7];
-//	last_r=channel[6];
+//  last_l=channel[7];
+//  last_r=channel[6];
 
 	/* Channel 5 - Left Aux?  Always set to volume, but never used for panning */
 	/* Channel 4 - Right Aux?  Always set to volume, but never used for panning */

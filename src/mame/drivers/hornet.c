@@ -1161,8 +1161,8 @@ static void jamma_jvs_cmd_exec(running_machine &machine)
 	int rdata_ptr;
 	int sum;
 
-//	sync = state->m_jvs_sdata[0];
-//	node = state->m_jvs_sdata[1];
+//  sync = state->m_jvs_sdata[0];
+//  node = state->m_jvs_sdata[1];
 	byte_num = state->m_jvs_sdata[2];
 
 #if 0

@@ -781,7 +781,7 @@ static void memorywin_new(running_machine &machine)
 	downcast<debug_view_memory *>(mem->views[0]->view)->set_expression("0");
 
 	// populate the combobox
-//	cursel = 0;
+//  cursel = 0;
 	item = 0;
 
 	for (const debug_view_source *source = mem->views[0]->view->source_list().head(); source != NULL; source = source->next())
@@ -878,7 +878,7 @@ static void disasmwin_new(running_machine &machine)
 	downcast<debug_view_disasm *>(dis->views[0]->view)->set_expression("curpc");
 
 	// populate the combobox
-//	cursel = 0;
+//  cursel = 0;
 	item = 0;
 	for (const debug_view_source *source = dis->views[0]->view->source_list().head(); source != NULL; source = source->next())
 	{

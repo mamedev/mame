@@ -70,7 +70,7 @@ static casserr_t wavfile_process(cassette_image *cassette, struct CassetteOption
 
 	UINT16 format_type = 0;
 	UINT32 bytes_per_second = 0;
-//	UINT16 block_align = 0;
+//  UINT16 block_align = 0;
 	int waveform_flags = 0;
 
 	/* read header */
@@ -108,7 +108,7 @@ static casserr_t wavfile_process(cassette_image *cassette, struct CassetteOption
 			opts->channels			= get_leuint16(&format_tag[2]);
 			opts->sample_frequency	= get_leuint32(&format_tag[4]);
 			bytes_per_second		= get_leuint32(&format_tag[8]);
-//			block_align				= get_leuint16(&format_tag[12]);
+//          block_align             = get_leuint16(&format_tag[12]);
 			opts->bits_per_sample	= get_leuint16(&format_tag[14]);
 
 			if (format_type != WAV_FORMAT_PCM)

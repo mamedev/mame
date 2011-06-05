@@ -7536,12 +7536,12 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 	UINT16 hsize = 64;
 	UINT16 vsize = 64;
 	UINT16 window_right;
-//	UINT16 window_hpos;
+//  UINT16 window_hpos;
 	UINT16 window_down;
-//	UINT16 window_vpos;
+//  UINT16 window_vpos;
 	UINT16 hscroll_base;
-//	UINT8  vscroll_mode;
-//	UINT8  hscroll_mode;
+//  UINT8  vscroll_mode;
+//  UINT8  hscroll_mode;
 	int window_firstline;
 	int window_lastline;
 	int window_firstcol;
@@ -7586,9 +7586,9 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 	base_b = MEGADRIVE_REG04_PATTERN_ADDR_B << 13;
 	size  = MEGADRIVE_REG10_HSCROLL_SIZE | (MEGADRIVE_REG10_VSCROLL_SIZE<<4);
 	window_right = MEGADRIVE_REG11_WINDOW_RIGHT;
-//	window_hpos = MEGADRIVE_REG11_WINDOW_HPOS;
+//  window_hpos = MEGADRIVE_REG11_WINDOW_HPOS;
 	window_down = MEGADRIVE_REG12_WINDOW_DOWN;
-//	window_vpos = MEGADRIVE_REG12_WINDOW_VPOS;
+//  window_vpos = MEGADRIVE_REG12_WINDOW_VPOS;
 
 	screenwidth = MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1);
 
@@ -9487,10 +9487,10 @@ int megadrive_z80irq_hpos = 320;
 	if (0)
 	{
 		//int xxx;
-//		UINT64 frametime;
+//      UINT64 frametime;
 
 	//  /* reference */
-//		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
+//      frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
 		//time_elapsed_since_crap = frame_timer->time_elapsed();
 		//xxx = machine.device<cpudevice>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);

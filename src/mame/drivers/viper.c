@@ -191,14 +191,14 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
 
     Driver by Ville Linde
 
-	DASM code snippets:
+    DASM code snippets:
 
-	00FE0B8C: addi      r31,r3,0x0000
-	00FE0B90: lwz       r3,0x0040(r1)
-	00FE0B94: cmpi      r31,0x0000 ;offending check, understand where r3 comes from!
-	00FE0B98: lwz       r4,0x0044(r1)
-	00FE0B9C: addic     r5,r1,0x0058
-	00FE0BA0: bne       0x00FE0C00
+    00FE0B8C: addi      r31,r3,0x0000
+    00FE0B90: lwz       r3,0x0040(r1)
+    00FE0B94: cmpi      r31,0x0000 ;offending check, understand where r3 comes from!
+    00FE0B98: lwz       r4,0x0044(r1)
+    00FE0B9C: addic     r5,r1,0x0058
+    00FE0BA0: bne       0x00FE0C00
 
 */
 

@@ -109,7 +109,7 @@ INTERRUPT_GEN( psx_vblank )
 {
 	psxgpu_device *gpu = downcast<psxgpu_device *>( device->machine().device("gpu") );
 	psx_state *p_psx = device->machine().driver_data<psx_state>();
-	
+
 	if(p_psx->b_need_sianniv_vblank_hack)
 	{
 		UINT32 pc = cpu_get_pc(device);
