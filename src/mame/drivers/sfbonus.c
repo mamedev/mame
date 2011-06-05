@@ -6173,7 +6173,6 @@ GAME( 200?, getrich,     0,        sfbonus,    amcoe1_reels3,    getrich,       
 
 // Known sets but no roms dumped at all for these:
 // Merry Circus
-// Super Ball (skill game)
 // Devil Island - 14 Liner version
 // Fruit Bonus 2010 (or is this on the older goldstar.c style hardware)
 
