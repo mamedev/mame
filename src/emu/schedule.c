@@ -257,8 +257,8 @@ attotime emu_timer::remaining() const
 
 
 //-------------------------------------------------
-//  timer_register_save - register ourself with
-//  the save state system
+//  register_save - register ourself with the save
+//  state system
 //-------------------------------------------------
 
 void emu_timer::register_save()
@@ -312,6 +312,21 @@ void emu_timer::schedule_next_period()
 }
 
 
+//-------------------------------------------------
+//  dump - dump internal state to a single output
+//  line in the error log
+//-------------------------------------------------
+
+void emu_timer::dump() const
+{
+	logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(), m_start.as_string(), m_period.as_string(), m_param, m_ptr);
+	if (m_device == NULL)
+		logerror(" cb=%s\n", m_callback.name());
+	else
+		logerror(" dev=%s id=%d\n", m_device->tag(), m_id);
+}
+
+
 
 //**************************************************************************
 //  DEVICE SCHEDULER
@@ -341,6 +356,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 
 	// register global states
 	machine.save().save_item(NAME(m_basetime));
+	machine.save().register_presave(save_prepost_delegate(FUNC(device_scheduler::presave), this));
 	machine.save().register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
 }
 
@@ -382,8 +398,12 @@ bool device_scheduler::can_save() const
 {
 	// if any live temporary timers exit, fail
 	for (emu_timer *timer = m_timer_list; timer != NULL; timer = timer->next())
-		if (timer->m_temporary)
+		if (timer->m_temporary && timer->expire() != attotime::never)
+		{
+			logerror("Failed save state attempt due to anonymous timers:\n");
+			dump_timers();
 			return false;
+		}
 
 	// otherwise, we're good
 	return true;
@@ -633,6 +653,18 @@ void device_scheduler::timed_trigger(void *ptr, INT32 param)
 
 
 //-------------------------------------------------
+//  presave - before creating a save state
+//-------------------------------------------------
+
+void device_scheduler::presave()
+{
+	// report the timer state after a log
+	logerror("Prior to saving state:\n");
+	dump_timers();
+}
+
+
+//-------------------------------------------------
 //  postload - after loading a save state
 //-------------------------------------------------
 
@@ -644,8 +676,8 @@ void device_scheduler::postload()
 	{
 		emu_timer &timer = *m_timer_list;
 
-		// temporary timers go away entirely
-		if (timer.m_temporary)
+		// temporary timers go away entirely (except our special never-expiring one)
+		if (timer.m_temporary && timer.expire() != attotime::never)
 			m_timer_allocator.reclaim(timer.release());
 
 		// permanent ones get added to our private list
@@ -657,6 +689,10 @@ void device_scheduler::postload()
 	emu_timer *timer;
 	while ((timer = private_list.detach_head()) != NULL)
 		timer_list_insert(*timer);
+
+	// report the timer state after a log
+	logerror("After resetting/reordering timers:\n");
+	dump_timers();
 }
 
 
@@ -936,3 +972,19 @@ void device_scheduler::add_scheduling_quantum(attotime quantum, attotime duratio
 		m_quantum_list.insert_after(quant, insert_after);
 	}
 }
+
+
+//-------------------------------------------------
+//  dump_timers - dump the current timer state
+//-------------------------------------------------
+
+void device_scheduler::dump_timers() const
+{
+	logerror("=============================================\n");
+	logerror("Timer Dump: Time = %15s\n", time().as_string());
+	for (emu_timer *timer = first_timer(); timer != NULL; timer = timer->next())
+		timer->dump();
+	logerror("=============================================\n");
+}
+
+

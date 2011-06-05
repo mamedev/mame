@@ -789,7 +789,7 @@ void running_machine::handle_saveload()
 
 	// if there are anonymous timers, we can't save just yet, and we can't load yet either
 	// because the timers might overwrite data we have loaded
-	if (m_scheduler.can_save())
+	if (!m_scheduler.can_save())
 	{
 		// if more than a second has passed, we're probably screwed
 		if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))

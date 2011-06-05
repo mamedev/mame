@@ -117,11 +117,12 @@ public:
 	attotime remaining() const;
 	attotime start() const { return m_start; }
 	attotime expire() const { return m_expire; }
-
+	
 private:
 	// internal helpers
 	void register_save();
 	void schedule_next_period();
+	void dump() const;
 
 	// internal state
 	running_machine *	m_machine;		// reference to the owning machine
@@ -181,12 +182,16 @@ public:
 	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = NULL);
 	void timer_set(attotime duration, device_t &device, device_timer_id id = 0, int param = 0, void *ptr = NULL);
 
+	// debugging
+	void dump_timers() const;
+	
 	// for emergencies only!
 	void eat_all_cycles();
 
 private:
 	// callbacks
 	void timed_trigger(void *ptr, INT32 param);
+	void presave();
 	void postload();
 
 	// scheduling helpers
