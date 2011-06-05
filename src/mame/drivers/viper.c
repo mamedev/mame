@@ -1,39 +1,204 @@
 /*
+
+Konami Viper Hardware Overview (last updated 5th June 2011 10:56pm)
+
+Games on this hardware include:
+
+Konami
+Game ID  Year    Game
+-------------------------------------------------------------------------------------------------
+GK922    2000    Code One Dispatch
+G????    2001    ParaParaParadise 2nd Mix
+GM941    2001    GTI Club 2
+G?A00    2001    Police 911 (USA) / Police 24/7 (World) / Keisatsukan Shinjuku 24ji (Japan)
+GKA13    2001    Silent Scope EX (USA/World) / Sogeki (Japan)
+G?A29    2001    Mocap Boxing
+G?A30    2001    Tsurugi
+GMA41    2001    Thrill Drive 2
+G?A45    2001    Boxing Mania
+G?B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / Keisatsukan Shinjuku 24ji 2 (Japan)
+G?B33    2001    Mocap Golf
+G?B41    2001    Jurassic Park 3
+G?B4x    2002    Xtrial Racing
+G?C09    2002    Mahjong Fight Club
+G?C22    2002    World Combat (USA/Japan/Korea) / Warzaid (Europe)
+
+PCB Layout
+----------
+Early revision - GM941-PWB(A)B (CN13/15/16 not populated and using 941A01 BIOS)
+Later revision - GM941-PWB(A)C (with 941B01 BIOS)
+Copyright 1999 KONAMI
+ |----------------------------------------------------------|
+ |            LA4705      6379AL                            |
+|-|  TD62064                               14.31818MHz   CN15|
+|                  3793-A                                    |
+|     |------|                            |--------|         |
+|J    |056879|                            |3DFX    |MB81G163222-80
+|A    |      |PQR0RV21                    |355-0024|         |
+|M    |------|          XC9572XL          |-030    |MB81G163222-80
+|M                                        |--------|         |
+|A                                    MB81G163222-80         |
+|    ADC0838           |------------|          MB81G163222-80|
+|    LM358             |MOTOROLA    |                        |
+|                      XPC8240LZU200E  33.868MHz         CN13|
+|-| PC16552            |            |                        |
+ |           PQ30RV21 |            |        CY7C199         |
+|-|                    |            |                        |
+|                      |------------|        XCS10XL         |
+|                 48LC2M32B2   48LC2M32B2                    |
+|2                                                           |
+|8                                       CN17                |
+|W       XC9536(1)  XC9536(2)        |-------------|         |
+|A                                   |  DUAL       |         |
+|Y                                   |  PCMCIA     |         |
+|                     M48T58Y.U39    |  SLOTS      |         |
+|                                    |             |         |
+|           29F002                   |             |     CN16|
+|-|                       DS2430.U37 |             |         |
+ | DIP(4)  CN4 CN5 CN7         CN9  |             |  CN12   |
+ |----------------------------------|-------------|---------|
+Notes:
+XPC8240LZU200E - Motorola XPC8240LZU200E MPC8420 PPC603e-based CPU (TBGA352 @ U38). Clock input is 33.868MHz
+                Chip rated at 200MHz so likely clock is 33.868 x6 = 203.208MHz
+         3DFX - 3DFX Voodoo III 3500 graphics chip with heatsink (BGA @ U54). Clock input 14.31818MHz
+                Full markings: 355-0024-030 F26664.10C 0025 20005 TAIWAN 1301
+   48LC2M32B2 - Micron Technology 48LC2M32B2-6 2M x32-bit (512k x 32 x 4 banks = 64MB) 166MHz Synchronous
+                DRAM (TSOP86 @ U28 & U45)
+MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Graphics DRAM (TQFP100 @ U53, U56, U59 & U60)
+      CY7C199 - Cypress Semiconductor CY7C199-15VC 32k x8 SRAM (SOJ28 @ U57)
+      PC16552 - National Semiconductor PC16552D Dual Universal Asynchronous Receiver/Transmitter with FIFO's (PLCC44 @ U7)
+    XC9536(1) - Xilinx XC9536 In-System Programmable CPLD stamped 'M941A1' (PLCC44 @ U17)
+    XC9536(2) - Xilinx XC9536 In-System Programmable CPLD stamped 'M941A2' (PLCC44 @ U24)
+     XC9572XL - Xilinx XC9572XL High Performance CPLD stamped 'M941A3A' (PLCC44 @ U29)
+      XCS10XL - Xilinx XCS10XL Spartan-XL FPGA (TQFP100 @ U55)
+       056879 - Konami 056879 custom IC (QFP120 @ U15)
+     PQ30RV21 - Sharp PQ30RV21 low-power voltage regulator (5 Volt to 3 Volt)
+       LA4705 - Sanyo LA4705 15W 2-channel power amplifier (SIP18)
+        LM358 - National Semiconductor LM358 low power dual operational amplifier (SOIC8 @ U14)
+       6379AL - NEC uPC6379AL 2-channel 16-bit D/A converter (SOIC8 @ U30)
+      ADC0838 - National Semiconductor ADC0838 Serial I/O 8-Bit A/D Converters with Multiplexer Options (SOIC20 @ U13)
+       DS2430 - Dallas DS2430 256-bits 1-Wire EEPROM. Has 256 bits x8 EEPROM (32 bytes), 64 bits x8 (8 bytes)
+                one-time programmable application register and unique factory-lasered and tested 64-bit
+                registration number (8-bit family code + 48-bit serial number + 8-bit CRC tester) (TO-92 @ U37)
+                It appears the DS2430 is not protected from reading but the unique silicon serial number isn't
+                included in the 40 byte dump.
+      M48T58Y - ST Microelectronics M48T58Y Timekeeper RAM (DIP28 @ U39). When this dies (after 10 year lifespan)
+                the game will complain with error RTC BAD then reset. The data inside the RTC can not be hand created
+                (yet) so to revive the PCB the correct RTC data must be re-programmed to a new RTC and replaced
+                on the PCB.
+       29F002 - Fujitsu 29F002 256k x8 EEPROM stamped '941B01' (PLCC44 @ U25). Earlier revision stamped '941A01'
+      CN4/CN5 - RCA-type network connection jacks
+          CN7 - 80 pin connector (unused in all games?)
+          CN9 - DIN5 socket for dongle. Dongle is a DIN5 male plug containing a standard DS2430 wired to
+                DIN pins 2, 3 & 4. Pin 1 NC, Pin 2 GND, Pin 3 DATA, Pin 4 NC, Pin 5 NC. If the dongle is
+                required and plugged in it overrides the DS2430 on the main board. Without the (on-board)
+                DS2430 the PCB will complain after the CF check with HARDWARE ERROR. If the DS2430 is not
+                correct for the game the error given is RTC BAD even if the RTC is correct. Most games don't require                 a dongle and use the factory DS2430 on the main board.
+         CN12 - 4 pin connector (possibly stereo audio output?)
+         CN13 - Power connector for plug-in daughterboard
+    CN15/CN16 - Multi-pin IDC connectors for plug-in daughterboard (see detail below)
+         CN17 - Dual PCMCIA slots. Usually only one slot is used containing a PCMCIA to CF adapter. The entire game
+                software resides on the CF card. Games use 32M, 64M and 128M CF cards. In many cases a different
+                CF card version of the same game can be swapped and the existing RTC works but sometimes the RTC data
+                needs to be re-initialised to factory defaults by entering test mode. Sometimes the game will not boot
+                and gives error RTC BAD meaning the RTC is not compatible with the version or the dongle is required.                 See DS2430 above for more info.
+       28-WAY - Edge connector used for connecting special controls such as guns etc.
+       DIP(4) - 4-position DIP switch. Switch 1 skips the CF check for a faster boot-up. The others appear unused?
+
+The PCB pinout is JAMMA but the analog controls (pots for driving games mostly) connect to pins on the JAMMA connector.
+The 2 outer pins of each pot connect to +5V and GND. If the direction of control is opposite to what is expected simply
+reverse the wires.
+The centre pin of each pot joins to the following pins on the JAMMA connector.....
+Pin 25 Parts side  - GAS POT
+Pin 25 Solder side - STEERING POT
+Pin 26 Parts side  - HANDBRAKE POT (if used, for example Xtrail Racing)
+Pin 26 Solder side - BRAKE POT
+
+For the gun games (Jurassic Park III and Warzaid) the gun connects to the 28 way connector like this......
+Pin 1 Parts side        - Gun optical input
+Pin 2 Parts side        - Ground
+Pin 3 Parts side        - +5V
+Jamma pin 22 parts side - Gun trigger
+
+Player 2 gun connects to the same pin numbers on the solder side.
+
+Jurassic Park III also uses 2 additional buttons for escaping left and right. These are wired to buttons on the Jamma
+connector.
+
+
+Measurements
+------------
+X1    - 33.86803MHz
+X2    - 14.31700MHz
+HSync - 24.48700kHz
+VSync - 58.05630Hz
+
+
+Additional PCBs
+---------------
+
+GQA13-PWB(D)
+Copyright 2000 KONAMI
+         |--------------------|
+         | MB81G163222-80     |
+         |               40MHz|
+         |                 CN4|
+         | IP90C63A           |
+         |----|            CN2|
+              |               |
+              |               |
+              |               |
+              |            CN3|
+              |               |
+|--------------|               |
+|                            |-|
+|        IP90C63A            |
+|                            |-|
+| MB81G163222-80               |
+|----------|     XC9536XL  CN1 |
+          |----------------|  |
+                           |  |
+                           |  |
+                           | *|
+                           |  |
+                           |  |
+                           |  |
+                           |  |
+                           |  |
+                           |  |
+                           |  |
+                           |CN5
+                           |--|
+Notes:
+     This PCB is used with Mocap Golf only and drives the 2 external monitors.
+     An almost identical PCB is used with Silent Scope EX but the sticker says '15KHz x2' and the
+     CPLD is likely different. This most likely drives the small monitor inside the gun sight.
+
+     XC9536XL - Xilinx XC9536 In-System Programmable CPLD stamped 'QB33A1' (PLCC44)
+            * - sticker '24KHz x2'
+MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Graphics DRAM (TQFP100)
+     IP90C63A - i-Chips IP90C63A Video Controller chip (QFP144)
+          CN1 - Power connector, plugs into CN13 on main board
+      CN2/CN3 - Video output connector to external monitors
+      CN4/CN5 - Multi-pin IDC connectors joining to main board CN15/CN16
+
+An additional control PCB is used for Mocap Golf for the golf club sensor. It contains a ROMless MCU, an EPROM and some other components. It will be documented at a later date.
+
+*/
+
+/*
     Konami Viper System
 
     Driver by Ville Linde
 
+	DASM code snippets:
 
-
-    Games on this hardware:
-
-    Game ID       Year    Game
-    ------------------------------------------------------------------------------------------------------
-    GK922         2000    Code One Dispatch
-    G????         2001    ParaParaParadise 2nd Mix
-    GM941         2001    GTI Club 2
-    G?A00         2001    Police 911 (USA) / Police 24/7 (World) / Keisatsukan Shinjuku 24ji (Japan)
-    GKA13         2001    Silent Scope EX (USA/World) / Sogeki (Japan)
-    G?A29         2001    Mocap Boxing
-    G?A30         2001    Tsurugi
-    GMA41         2001    Thrill Drive 2
-    G?A45         2001    Boxing Mania
-    G?B11         2001    Police 911 2 (USA) / Police 24/7 2 (World) / Keisatsukan Shinjuku 24ji 2 (Japan)
-    G?B33         2001    Mocap Golf
-    G?B41         2001    Jurassic Park 3
-    G?B4x         2002    Xtrial Racing
-    G?C00         2003    Pop'n Music 9
-    G?C09         2002    Mahjong Fight Club
-    G?C22         2002    World Combat (USA/Japan/Korea) / Warzaid (Europe)
-
-DASM code snippets:
-
-00FE0B8C: addi      r31,r3,0x0000
-00FE0B90: lwz       r3,0x0040(r1)
-00FE0B94: cmpi      r31,0x0000 ;offending check, understand where r3 comes from!
-00FE0B98: lwz       r4,0x0044(r1)
-00FE0B9C: addic     r5,r1,0x0058
-00FE0BA0: bne       0x00FE0C00
+	00FE0B8C: addi      r31,r3,0x0000
+	00FE0B90: lwz       r3,0x0040(r1)
+	00FE0B94: cmpi      r31,0x0000 ;offending check, understand where r3 comes from!
+	00FE0B98: lwz       r4,0x0044(r1)
+	00FE0B9C: addic     r5,r1,0x0058
+	00FE0BA0: bne       0x00FE0C00
 
 */
 
