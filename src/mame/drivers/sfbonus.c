@@ -1300,6 +1300,23 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
+/* Super Ball */
+ROM_START( suprball )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80  Code */
+	ROM_LOAD( "superball.rom1", 0x00000, 0x40000, CRC(6134ec14) SHA1(4e48c1cac7bba8ec1453d4285cc2adf431b7d3d2) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "superball.rom2", 0x00000, 0x40000, CRC(8f4512bf) SHA1(e5f44624ba25cef8e38b752cb300a8bc259db3ec) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "superball.rom3", 0x00000, 0x80000, CRC(087a85a7) SHA1(c6c0945c5c591a20f709b2afff79c5f7bed7fa66) )
+	ROM_LOAD16_BYTE( "superball.rom4", 0x00001, 0x80000, CRC(811a1328) SHA1(ae012dcaf4c953b3f7fd45a70a4385cae4b7363b) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "superball.rom5", 0x00000, 0x80000, CRC(86bf2c84) SHA1(b8fdc5942a6f01ccdd41e3461d886bf285666355) )
+	ROM_LOAD16_BYTE( "superball.rom6", 0x00001, 0x80000, CRC(83d1fbb0) SHA1(80d67062a9ac2a28b47302481c3a692ac1a6a280) )
+ROM_END
+
 
 /* Skill Fruit Bonus */
 ROM_START( sfbonus )
@@ -5859,6 +5876,7 @@ static DRIVER_INIT(sfruitb) { sfbonus_bitswap(machine,    0x3e, 2,1,7,6,5,4,3,0,
 static DRIVER_INIT(sfruitbd) { sfbonus_bitswap(machine,   0x3e, 1,0,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x25, 2,0,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3c, 0,1,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x25, 2,0,1,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
 static DRIVER_INIT(sfruitbv) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 static DRIVER_INIT(sfruitbv2) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(suprball) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xe7, 4,7,6,5,0,3,1,2, 0x33, 0,2,1,7,6,5,4,3, 0xb3, 0,3,4,2,1,7,6,5, 0x2a, 1,3,7,6,5,2,0,4, 0xe4, 3,7,6,5,2,0,4,1, 0x2d, 4,1,3,7,6,5,2,0, 0xb6, 0,3,2,1,4,7,6,5); }
 static DRIVER_INIT(tighook) { sfbonus_bitswap(machine,    0x33, 0,1,7,6,5,2,3,4, 0xf3, 3,7,6,5,1,0,4,2, 0x2e, 4,0,2,7,6,5,3,1, 0xa7, 1,0,4,2,3,7,6,5, 0x2d, 1,2,7,6,5,3,4,0, 0xff, 2,7,6,5,1,0,3,4, 0x27, 1,0,2,7,6,5,3,4, 0xa7, 1,0,4,2,3,7,6,5); }
 static DRIVER_INIT(tighookd) { sfbonus_bitswap(machine,   0x3d, 0,1,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x26, 2,1,0,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3c, 1,0,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x26, 2,1,0,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
 static DRIVER_INIT(tighookv) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
@@ -5880,6 +5898,7 @@ static DRIVER_INIT(fb3g)       { sfbonus_bitswap(machine, 0x39, 1,2,7,6,5,4,3,0,
 static DRIVER_INIT(getrich)   { sfbonus_bitswap(machine,  0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x23, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x24, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
 
 
+GAME( 2002, suprball,    0,        sfbonus,    amcoe2_reels3,    suprball,        ROT0,  "Amcoe", "Super Ball (Version 1.3)", 0)
 
 GAME( 2003, sfbonus,     0,        sfbonus,    amcoe2_reels3,    sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", 0)
 GAME( 2003, sfbonusd1,   sfbonus,  sfbonus,    amcoe1_reels3,    sfbonusd,        ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", 0)
@@ -6101,13 +6120,13 @@ GAME( 2005, fb5v,        fb5,      sfbonus,    amcoe1_reels3,    fb5v,          
 
 GAME( 2006, fb6,         0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E CGA)", 0)
 GAME( 2006, fb6v,        fb6,      sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E Dual)", 0)
-GAME( 2006, fb6d1,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA, set 1)", 0)
-GAME( 2006, fb6s1,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA, set 2)", 0)
+GAME( 2006, fb6d1,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA)", 0)
+GAME( 2006, fb6s1,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA, Compact PCB)", 0)
 GAME( 2006, fb6v1,       fb6,      sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R Dual)", 0)
-GAME( 2006, fb6d2,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, set 1)", 0)
-GAME( 2006, fb6s2,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, set 2)", 0)
+GAME( 2006, fb6d2,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA)", 0)
+GAME( 2006, fb6s2,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, Compact PCB)", 0)
 GAME( 2006, fb6v2,       fb6,      sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT Dual)", 0)
-GAME( 2006, fb6s3,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.3R CGA)", 0)
+GAME( 2006, fb6s3,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.3R CGA, Compact PCB)", 0)
 
 GAME( 2006, fb6se,       0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E CGA)", 0) /* Released August 2006 according to Amcoe web site */
 GAME( 2006, fb6sev,      fb6se,    sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E Dual)", 0)

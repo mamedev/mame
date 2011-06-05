@@ -10137,6 +10137,7 @@ magoddsb		// 198? (c) Micro Manufacturing Ltd.
 magoddsc		// 198? (c) Micro Manufacturing Ltd.
 magoddsd		// 198? (c) Micro Manufacturing Ltd.
 
+suprball		// (c) 2002 Amcoe - Skill based
 sfbonus			// (c) 2003 Amcoe - Skill Fruit Bonus
 sfbonusd1		// (c) 2003 Amcoe
 sfbonusv1		// (c) 2003 Amcoe
@@ -10256,7 +10257,7 @@ fb2ndc2			// (c) 2004 Amcoe
 fb2ndd2			// (c) 2004 Amcoe
 fb2ndv2			// (c) 2004 Amcoe
 fb2ndo			// (c) 2004 Amcoe
-fb4				// (c) 2004 Amcoe - Fruit Bonus 2004
+fb4			// (c) 2004 Amcoe - Fruit Bonus 2004
 fb4c1			// (c) 2004 Amcoe
 fb4d1			// (c) 2004 Amcoe
 fb4v1			// (c) 2004 Amcoe
@@ -10267,11 +10268,11 @@ fb4d2			// (c) 2004 Amcoe
 fb4v2			// (c) 2004 Amcoe
 fb4o			// (c) 2004 Amcoe
 fb4o2			// (c) 2004 Amcoe
-fb5				// (c) 2005 Amcoe - Fruit Bonus 2005
+fb5			// (c) 2005 Amcoe - Fruit Bonus 2005
 fb5c			// (c) 2005 Amcoe
 fb5d			// (c) 2005 Amcoe
 fb5v			// (c) 2005 Amcoe
-fb6				// (c) 2006 Amcoe - Fruit Bonus '06 - 10th anniversary
+fb6			// (c) 2006 Amcoe - Fruit Bonus '06 - 10th anniversary
 fb6v			// (c) 2006 Amcoe
 fb6d1			// (c) 2006 Amcoe
 fb6s1			// (c) 2006 Amcoe
@@ -10309,7 +10310,7 @@ atworld			// (c) 2007 Amcoe - Around The World
 atworldd1		// (c) 2007 Amcoe
 atworlde1		// (c) 2007 Amcoe
 amclink			// (c) 200? Amcoe - Amcoe Link Control Box?
-fbdeluxe		// (c) 200? Amcoe
+fbdeluxe		// (c) 200? Amcoe - Fruit Bonus Deluxe
 fbdeluxeo		// (c) 200? Amcoe
 
 act2000			// (c) 1999 Amcoe - Action 2000
