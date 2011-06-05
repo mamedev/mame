@@ -4,6 +4,7 @@
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
 
+     05-2011: Add better OKI emulation - clock rate may be wrong but samples sound good now.
      04-2011: More accurate gamball code, fixed ROM banking (Project Amber), added BwB CHR simulator (Amber)
               This is still a hard coded system, but significantly different to Barcrest's version.
               Started adding support for the Crystal Gaming program card, and the link keys for setting parameters.
@@ -217,8 +218,9 @@ TODO: - Distinguish door switches using manual
       For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything*
       - Flo's move in Great Escape gives spin alarms - need a different opto setting for reverse spin reels?
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
-      - Fix MSM6376 - We're triggering 'contact MAMEDEV' since we need all features of the chip,
-      including dynamic sample rate adjustment and BEEP.
+      - Fix MSM6376 - We need all features of the chip, including dynamic sample rate adjustment and BEEP.
+	  - OKI sound chip rate - need to confirm independently (3MHz sounds good, but that could be because
+	    of the old driver - BwB manual claims 64KHz to 128KHz). 
 ***********************************************************************************************************/
 #include "emu.h"
 #include "machine/6821pia.h"
@@ -374,6 +376,7 @@ public:
 	int m_pageset;
 	int m_hopper;
 	int m_reels;
+	int m_chrdata;
 	const mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
 	//Video
@@ -1670,6 +1673,8 @@ static WRITE8_DEVICE_HANDLER( pia_gb_porta_w )
 static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 {
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
+	device_t *msm6376 = device->machine().device("msm6376");
+
 	int changed = state->m_expansion_latch^data;
 
 	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine().describe_context(),data));
@@ -1695,18 +1700,29 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 			}
 		}
 	}
+	okim6376_ch2_w(msm6376,data&0x02);
+	okim6376_st_w(msm6376,data&0x01);
+
 }
 static READ8_DEVICE_HANDLER( pia_gb_portb_r )
 {
 	device_t *msm6376 = device->machine().device("msm6376");
+	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n",device->machine().describe_context()));
+	int data=0;
 	//
 	// b7, 1 = OKI ready, 0 = OKI busy
 	// b5, vol clock
 	// b4, 1 = Vol down, 0 = Vol up
 	//
 
-	return okim6376_r(msm6376,0);
+	if ( okim6376_busy_r(msm6376) ) data |= 0x80;
+	else							data &= ~0x80;
+
+	if ( okim6376_nar_r(msm6376) )	data |= 0x40;
+	else							data &= ~0x40;
+
+	return ( data | state->m_expansion_latch );
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pia_gb_ca2_w )
@@ -2883,7 +2899,7 @@ static MACHINE_CONFIG_DERIVED( mod4oki, mpu4mod2 )
 	MCFG_CPU_PROGRAM_MAP(mod4_oki_map)
 
 	MCFG_DEVICE_REMOVE("ay8913")
-	MCFG_SOUND_ADD("msm6376", OKIM6376, 64000) //Dynamic, can also be 85430 at 10.5KHz and 128000 at 16KHz
+	MCFG_SOUND_ADD("msm6376", OKIM6376, 3000000) //Wrong, needs to be 64 KHz, can also be 85430 at 10.5KHz and 128000 at 16KHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
