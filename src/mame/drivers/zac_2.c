@@ -890,7 +890,7 @@ GAME(1984,	mcastle,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Magic Castle
 GAME(1984,	mcastlei,	mcastle,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Magic Castle (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1984,	mcastleg,	mcastle,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Magic Castle (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1984,	mcastlef,	mcastle,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Magic Castle (French speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1986,	mexico,		0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Mexico '86 (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,	mexico,		0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Mexico 86 (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1987,	nstrphnx,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"New Star's Phoenix (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1983,	pinchamp,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pinball Champ",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1983,	pinchampg,	pinchamp,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pinball Champ (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

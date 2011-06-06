@@ -713,4 +713,4 @@ GAME( 1986, kikikai,  0,        kikikai,  kikikai,  0, ROT90, "Taito Corporation
 GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  0, ROT90, "bootleg", "Knight Boy", GAME_SUPPORTS_SAVE )
 GAME( 1986, kicknrun, 0,        mexico86, mexico86, 0, ROT0,  "Taito Corporation", "Kick and Run (World)", GAME_SUPPORTS_SAVE )
 GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, 0, ROT0,  "Taito America Corp", "Kick and Run (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86, mexico86, 0, ROT0,  "bootleg", "Mexico 86", GAME_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86, mexico86, 0, ROT0,  "bootleg", "Mexico 86 (bootleg of Kick and Run)", GAME_SUPPORTS_SAVE )
