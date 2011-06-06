@@ -91,7 +91,8 @@ uniform float PValue = 1.0f;
 uniform float OValue = 0.0f;
 uniform float ScanTime = 52.6f;
 
-uniform float YFreqResponse = 3.0f;
+uniform float NotchHalfWidth = 1.0f;
+uniform float YFreqResponse = 6.0f;
 uniform float IFreqResponse = 1.2f;
 uniform float QFreqResponse = 0.6f;
 
@@ -108,15 +109,17 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float MaxC = 2.1183f;
 	float MinC = -1.1183f;
 	float CRange = MaxC - MinC;
-	float Fc_y = YFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
+	float Fc_y1 = (CCValue - NotchHalfWidth) * ScanTime / (RawWidth * 4.0f / WidthRatio);
+	float Fc_y2 = (CCValue + NotchHalfWidth) * ScanTime / (RawWidth * 4.0f / WidthRatio);
+	float Fc_y3 = YFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
 	float Fc_i = IFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
 	float Fc_q = QFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
 	float PI = 3.1415926535897932384626433832795;
 	float PI2 = 2.0f * PI;
-	float PI2Length = PI2 / 42.0f;
+	float PI2Length = PI2 / 82.0f;
 	float4 NOffset = float4(0.0f, 1.0f, 2.0f, 3.0f);
 	float W = PI2 * CCValue * ScanTime;
-	for(float n = -21.0f; n < 22.0f; n += 4.0f)
+	for(float n = -41.0f; n < 42.0f; n += 4.0f)
 	{
 		float4 n4 = n + NOffset;
 		float4 CoordX = Input.Coord0.x + Input.Coord0.z * n4 * 0.25f;
@@ -125,9 +128,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		float4 C = tex2D(CompositeSampler, TexCoord + float2(0.625f, 0.4f) / RawDims) * CRange + MinC;
 		float4 WT = W * (CoordX * WidthRatio + AValue * CoordY * 2.0f * (RawHeight / HeightRatio) + BValue) + OValue;
 
-		float4 SincYIn = PI2 * Fc_y * n4;
-		float4 IdealY = 2.0f * Fc_y * ((SincYIn != 0.0f) ? (sin(SincYIn) / SincYIn) : 1.0f);
-		float4 FilterY = (0.54f + 0.46f * cos(PI2Length * n4)) * IdealY;
+		float4 SincYIn1 = PI2 * Fc_y1 * n4;
+		float4 SincYIn2 = PI2 * Fc_y2 * n4;
+		float4 SincYIn3 = PI2 * Fc_y3 * n4;
+		float4 SincY1 = ((SincYIn1 != 0.0f) ? (sin(SincYIn1) / SincYIn1) : 1.0f);
+		float4 SincY2 = ((SincYIn2 != 0.0f) ? (sin(SincYIn2) / SincYIn2) : 1.0f);
+		float4 SincY3 = ((SincYIn3 != 0.0f) ? (sin(SincYIn3) / SincYIn3) : 1.0f);
+		float4 IdealY = (2.0f * Fc_y1 * SincY1 - 2.0f * Fc_y2 * SincY2) + 2.0f * Fc_y3 * SincY3;
+		float4 FilterY = (0.54f + 0.46f * cos(PI2Length * n4)) * IdealY;		
 		
 		float4 SincIIn = PI2 * Fc_i * n4;
 		float4 IdealI = 2.0f * Fc_i * ((SincIIn != 0.0f) ? (sin(SincIIn) / SincIIn) : 1.0f);

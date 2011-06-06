@@ -100,10 +100,6 @@ uniform float BluFloor = 0.0f;
 
 uniform float Saturation = 1.0f;
 
-uniform float RedPower = 2.2f;
-uniform float GrnPower = 2.2f;
-uniform float BluPower = 2.2f;
-
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
@@ -126,10 +122,6 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 OutChroma = OutTexel - OutLuma;
 	float3 Saturated = OutLuma + OutChroma * Saturation;
 	
-	OutRGB.r = pow(Saturated.r, RedPower);
-	OutRGB.g = pow(Saturated.g, GrnPower);
-	OutRGB.b = pow(Saturated.b, BluPower);
-
 	return float4(OutRGB, BaseTexel.a);
 }
 

@@ -119,6 +119,10 @@ uniform float BluFloor = 0.0f;
 uniform float SnapX = 0.0f;
 uniform float SnapY = 0.0f;
 
+uniform float RedPower = 2.2f;
+uniform float GrnPower = 2.2f;
+uniform float BluPower = 2.2f;
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 Ratios = float2(WidthRatio, HeightRatio);
@@ -174,13 +178,17 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 ShadowDims = float2(ShadowWidth, ShadowHeight);
 	float2 ShadowUV = float2(ShadowU, ShadowV);
 	float2 ShadowMaskSize = float2(ShadowMaskSizeX, ShadowMaskSizeY);
-	float2 ShadowFrac = frac(BaseCoord * ShadowMaskSize * 0.5f);
+	float2 ShadowFrac = frac(BaseCoord * ShadowMaskSize);
 	float2 ShadowCoord = ShadowFrac * ShadowUV + float2(1.5f / ShadowWidth, 1.5f / ShadowHeight);
 	float3 ShadowTexel = lerp(1.0f, tex2D(ShadowSampler, ShadowCoord).rgb, UseShadow);
 	
 	// -- Final Pixel --
 	float4 Output = float4(Scanned * lerp(1.0f, ShadowTexel, ShadowBrightness), BaseTexel.a) * Input.Color;
 	
+	Output.r = pow(Output.r, RedPower);
+	Output.g = pow(Output.g, GrnPower);
+	Output.b = pow(Output.b, BluPower);
+
 	return Output;
 }
 

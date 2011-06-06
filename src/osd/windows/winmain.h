@@ -147,6 +147,7 @@
 #define WINOPTION_YIQ_BVALUE				"yiq_b"
 #define WINOPTION_YIQ_OVALUE				"yiq_o"
 #define WINOPTION_YIQ_PVALUE				"yiq_p"
+#define WINOPTION_YIQ_NVALUE				"yiq_n"
 #define WINOPTION_YIQ_YVALUE				"yiq_y"
 #define WINOPTION_YIQ_IVALUE				"yiq_i"
 #define WINOPTION_YIQ_QVALUE				"yiq_q"
@@ -268,6 +269,7 @@ public:
 	float screen_yiq_b() const { return float_value(WINOPTION_YIQ_BVALUE); }
 	float screen_yiq_o() const { return float_value(WINOPTION_YIQ_OVALUE); }
 	float screen_yiq_p() const { return float_value(WINOPTION_YIQ_PVALUE); }
+	float screen_yiq_n() const { return float_value(WINOPTION_YIQ_NVALUE); }
 	float screen_yiq_y() const { return float_value(WINOPTION_YIQ_YVALUE); }
 	float screen_yiq_i() const { return float_value(WINOPTION_YIQ_IVALUE); }
 	float screen_yiq_q() const { return float_value(WINOPTION_YIQ_QVALUE); }

@@ -1016,6 +1016,9 @@ void hlsl_info::init_effect_info(d3d_poly_info *poly)
 		(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", options->scanline_bright_scale);
 		(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", options->scanline_bright_offset);
 		(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->scanline_offset);
+		(*d3dintf->effect.set_float)(curr_effect, "RedPower", options->red_power);
+		(*d3dintf->effect.set_float)(curr_effect, "GrnPower", options->green_power);
+		(*d3dintf->effect.set_float)(curr_effect, "BluPower", options->blue_power);
 	}
 	else
 	{
@@ -1062,6 +1065,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			(*d3dintf->effect.set_float)(curr_effect, "AValue", winoptions.screen_yiq_a());
 			(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * winoptions.screen_yiq_b()));
 			(*d3dintf->effect.set_float)(curr_effect, "PValue", winoptions.screen_yiq_p());
+			(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", winoptions.screen_yiq_n());
 			(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", winoptions.screen_yiq_y());
 			(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
 			(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
@@ -1102,6 +1106,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * winoptions.screen_yiq_b()));
 			(*d3dintf->effect.set_float)(curr_effect, "OValue", winoptions.screen_yiq_o());
 			(*d3dintf->effect.set_float)(curr_effect, "PValue", winoptions.screen_yiq_p());
+			(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", winoptions.screen_yiq_n());
 			(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", winoptions.screen_yiq_y());
 			(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
 			(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
@@ -1156,9 +1161,6 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		(*d3dintf->effect.set_float)(curr_effect, "RedScale", options->red_scale);
 		(*d3dintf->effect.set_float)(curr_effect, "GrnScale", options->green_scale);
 		(*d3dintf->effect.set_float)(curr_effect, "BluScale", options->blue_scale);
-		(*d3dintf->effect.set_float)(curr_effect, "RedPower", options->red_power);
-		(*d3dintf->effect.set_float)(curr_effect, "GrnPower", options->green_power);
-		(*d3dintf->effect.set_float)(curr_effect, "BluPower", options->blue_power);
 		(*d3dintf->effect.set_float)(curr_effect, "Saturation", options->saturation);
 
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->device, 0, smalltarget0[poly->texture->target_index]);
