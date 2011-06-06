@@ -1257,7 +1257,7 @@ void cli_frontend::display_help()
 		   "        " APPNAME " -showconfig   for a list of configuration options\n"
 		   "        " APPNAME " -listmedia    for a full list of supported media\n"
 		   "        " APPNAME " -createconfig to create a " CONFIGNAME ".ini\n\n"
-		   "For usage instructions, please consult the file windows.txt\n",APPNAME,GAMENOUN);
+		   "For usage instructions, please consult the files config.txt and windows.txt.\n",APPNAME,GAMENOUN);
 }
 
 
