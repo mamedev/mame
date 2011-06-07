@@ -350,7 +350,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 			// skip second chunk size and UPC code
 			fseek(infile, 16, SEEK_CUR);
 
-			//	toc_type = read_uint32(infile);
+			read_uint32(infile);
 			fread(&start, 1, 1, infile);
 			fread(&end, 1, 1, infile);
 
