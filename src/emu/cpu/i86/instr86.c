@@ -2813,6 +2813,9 @@ static void PREFIX(_sti)(i8086_state *cpustate)    /* Opcode 0xfb */
 #ifndef I80186
 static void PREFIX86(_hlt)(i8086_state *cpustate)    /* Opcode 0xf4 */
 {
+#ifdef I80286
+	if(PM && (CPL!=0)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
+#endif
 	cpustate->halted=1;
 	ICOUNT = 0;
 }
