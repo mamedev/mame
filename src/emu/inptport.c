@@ -3478,7 +3478,7 @@ static void save_game_inputs(running_machine &machine, xml_data_node *parentnode
 		for (field = port->first_field(); field != NULL; field = field->next())
 			if (save_this_input_field_type(field->type))
 			{
-				int changed = FALSE;
+				bool changed = false;
 				int seqtype;
 
 				/* determine if we changed */
