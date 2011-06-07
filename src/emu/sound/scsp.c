@@ -844,6 +844,7 @@ static void SCSP_UpdateRegR(scsp_state *scsp, int reg)
 				v&=0xff00;
 				v|=scsp->MidiStack[scsp->MidiR];
 				scsp->Int68kCB(scsp->device, -scsp->IrqMidi);	// cancel the IRQ
+                printf("Read %x from SCSP MIDI\n", v);
 				if(scsp->MidiR!=scsp->MidiW)
 				{
 					++scsp->MidiR;
@@ -1303,15 +1304,13 @@ READ16_DEVICE_HANDLER( scsp_r )
 WRITE16_DEVICE_HANDLER( scsp_w )
 {
 	scsp_state *scsp = get_safe_token(device);
-	UINT16 tmp, *scsp_regs;
+	UINT16 tmp;
 
 	scsp->stream->update();
 
 	tmp = SCSP_r16(scsp, offset*2);
 	COMBINE_DATA(&tmp);
 	SCSP_w16(scsp,offset*2, tmp);
-
-	scsp_regs = (UINT16 *)scsp->udata.datab;
 
 	switch(offset*2)
 	{
@@ -1336,6 +1335,8 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 WRITE16_DEVICE_HANDLER( scsp_midi_in )
 {
 	scsp_state *scsp = get_safe_token(device);
+
+//    printf("scsp_midi_in: %02x\n", data);
 
 	scsp->MidiStack[scsp->MidiW++]=data;
 	scsp->MidiW &= 31;
