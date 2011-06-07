@@ -9,21 +9,22 @@
     for the FM still comes from the wavetable RAM.
 
     ChangeLog:
-    * November 25, 2003 (ES) Fixed buggy timers and envelope overflows.
-                        (RB) Improved sample rates other than 44100, multiple
+    * November 25, 2003  (ES) Fixed buggy timers and envelope overflows.
+                         (RB) Improved sample rates other than 44100, multiple
                              chips now works properly.
-    * December 02, 2003 (ES) Added DISDL register support, improves mix.
-    * April 28, 2004    (ES) Corrected envelope rates, added key-rate scaling,
+    * December 02, 2003  (ES) Added DISDL register support, improves mix.
+    * April 28, 2004     (ES) Corrected envelope rates, added key-rate scaling,
                              added ringbuffer support.
-    * January 8, 2005   (RB) Added ability to specify region offset for RAM.
-    * January 26, 2007  (ES) Added on-board DSP capability
+    * January 8, 2005    (RB) Added ability to specify region offset for RAM.
+    * January 26, 2007   (ES) Added on-board DSP capability
     * September 24, 2007 (RB+ES) Removed fake reverb.  Rewrote timers and IRQ handling.
                              Fixed case where voice frequency is updated while looping.
                              Enabled DSP again.
-    * December 16, 2007 (kingshriek) Many EG bug fixes, implemented effects mixer,
+    * December 16, 2007  (kingshriek) Many EG bug fixes, implemented effects mixer,
                              implemented FM.
-    * January 5, 2008   (kingshriek+RB) Working, good-sounding FM, removed obsolete non-USEDSP code.
-    * April 22, 2009   ("PluginNinja") Improved slot monitor, misc cleanups
+    * January 5, 2008    (kingshriek+RB) Working, good-sounding FM, removed obsolete non-USEDSP code.
+    * April 22, 2009     ("PluginNinja") Improved slot monitor, misc cleanups
+    * June 6, 2011       (AS) Rewrote DMA from scratch, Darius 2 relies on it.
 */
 
 #include "emu.h"
@@ -218,6 +219,9 @@ struct _scsp_state
 	UINT32 scsp_dmea;
 	UINT16 scsp_drga;
 	UINT16 scsp_dtlg;
+	UINT16 scsp_dmactrl;
+
+	UINT16 dma_regs[3];
 
 	int ARTABLE[64], DRTABLE[64];
 
@@ -228,10 +232,11 @@ struct _scsp_state
 };
 
 static void dma_scsp(address_space *space, scsp_state *scsp);		/*state DMA transfer function*/
-#define	scsp_dgate		scsp_regs[0x16/2] & 0x4000
-#define	scsp_ddir		scsp_regs[0x16/2] & 0x2000
-#define scsp_dexe		scsp_regs[0x16/2] & 0x1000
-#define dma_transfer_end	((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
+#define	scsp_dgate		scsp->scsp_dmactrl & 0x4000
+#define	scsp_ddir		scsp->scsp_dmactrl & 0x2000
+#define scsp_dexe		scsp->scsp_dmactrl & 0x1000
+/* TODO */
+//#define dma_transfer_end	((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
 
 static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f,0.0f};
 
@@ -909,7 +914,7 @@ static void SCSP_w16(scsp_state *scsp,unsigned int addr,unsigned short val)
 			if(addr==0xBF0)
 			{
 				SCSPDSP_Start(&scsp->DSP);
-	    		}
+	    	}
 		}
 	}
 }
@@ -925,6 +930,8 @@ static unsigned short SCSP_r16(scsp_state *scsp, unsigned int addr)
 		SCSP_UpdateSlotRegR(scsp, slot,addr&0x1f);
 		v=*((unsigned short *) (scsp->Slots[slot].udata.datab+(addr)));
 	}
+	else if(addr>=0x412 && addr <= 0x416)
+		v = scsp->dma_regs[((addr-0x412)/2) & 3];
 	else if(addr<0x600)
 	{
 		if (addr < 0x430)
@@ -1167,11 +1174,21 @@ static void SCSP_DoMasterSamples(scsp_state *scsp, int nsamples)
 	}
 }
 
+/* TODO: this needs to be timer-ized */
 static void dma_scsp(address_space *space, scsp_state *scsp)
 {
-	static UINT16 tmp_dma[3], *scsp_regs;
+	static UINT16 tmp_dma[3];
+	int i;
 
-	scsp_regs = (UINT16 *)scsp->udata.datab;
+	scsp->scsp_dmactrl = scsp->dma_regs[2] & 0x7000;
+
+	if(!(scsp_dexe)) //don't bother if DMA is off
+		return;
+
+	/* calc the registers */
+	scsp->scsp_dmea = ((scsp->dma_regs[1] & 0xf000) << 4) | (scsp->dma_regs[0] & 0xfffe); /* RAM address */
+	scsp->scsp_drga = (scsp->dma_regs[1] & 0x0ffe);
+	scsp->scsp_dtlg = (scsp->dma_regs[2] & 0x0ffe);
 
 	logerror("SCSP: DMA transfer START\n"
 			 "DMEA: %04x DRGA: %04x DTLG: %04x\n"
@@ -1181,14 +1198,14 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
     	/* (DMA *can't* overwrite his parameters).                  */
 	if(!(scsp_ddir))
 	{
-		tmp_dma[0] = scsp_regs[0x12/2];
-		tmp_dma[1] = scsp_regs[0x14/2];
-		tmp_dma[2] = scsp_regs[0x16/2];
+		for(i=0;i<3;i++)
+			tmp_dma[i] = scsp->dma_regs[i];
 	}
 
+	/* TODO: don't know if params auto-updates, I guess not ... */
 	if(scsp_ddir)
 	{
-		for(;scsp->scsp_dtlg > 0;scsp->scsp_dtlg-=2)
+		for(i=0;i < scsp->scsp_dtlg;i+=2)
 		{
 			space->write_word(scsp->scsp_dmea, space->read_word(0x100000|scsp->scsp_drga));
 			scsp->scsp_dmea+=2;
@@ -1197,7 +1214,7 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
 	}
 	else
 	{
-		for(;scsp->scsp_dtlg > 0;scsp->scsp_dtlg-=2)
+		for(i=0;i < scsp->scsp_dtlg;i+=2)
 		{
 			space->write_word(0x100000|scsp->scsp_drga,space->read_word(scsp->scsp_dmea));
 			scsp->scsp_dmea+=2;
@@ -1208,14 +1225,18 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
 	/*Resume the values*/
 	if(!(scsp_ddir))
 	{
-		scsp_regs[0x12/2] = tmp_dma[0];
-		scsp_regs[0x14/2] = tmp_dma[1];
-		scsp_regs[0x16/2] = tmp_dma[2];
+		for(i=0;i<3;i++)
+			scsp->dma_regs[i] = tmp_dma[i];
 	}
 
-	/*Job done,request a dma end irq*/
-	if(scsp_regs[0x1e/2] & 0x10)
-		device_set_input_line(space->machine().device("audiocpu"),dma_transfer_end,HOLD_LINE);
+	/* Job done */
+	scsp->dma_regs[2] &= ~0x1000;
+	/* request a dma end irq (TODO: make it inside the interface) */
+	if(scsp->udata.data[0x1e/2] & 0x10)
+	{
+		popmessage("SCSP DMA IRQ triggered, contact MAMEdev");
+		device_set_input_line(space->machine().device("audiocpu"),DecodeSCI(scsp,SCIDMA),HOLD_LINE);
+	}
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1279,8 +1300,6 @@ READ16_DEVICE_HANDLER( scsp_r )
 	return SCSP_r16(scsp, offset*2);
 }
 
-UINT32* stv_scu;
-
 WRITE16_DEVICE_HANDLER( scsp_w )
 {
 	scsp_state *scsp = get_safe_token(device);
@@ -1298,40 +1317,19 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 	{
 		// check DMA
 		case 0x412:
-		/*DMEA [15:1]*/
-		/*Sound memory address*/
-		scsp->scsp_dmea = (((scsp_regs[0x414/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x412/2] & 0xfffe);
-		break;
 		case 0x414:
-		/*DMEA [19:16]*/
-		scsp->scsp_dmea = (((scsp_regs[0x414/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x412/2] & 0xfffe);
-		/*DRGA [11:1]*/
-		/*Register memory address*/
-		scsp->scsp_drga = scsp_regs[0x414/2] & 0x0ffe;
-		break;
 		case 0x416:
-		/*DGATE[14]*/
-		/*DDIR[13]*/
-		/*if 0 sound_mem -> reg*/
-		/*if 1 sound_mem <- reg*/
-		/*DEXE[12]*/
-		/*starting bit*/
-		/*DTLG[11:1]*/
-		/*size of transfer*/
-		scsp->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
-		if(scsp_dexe)
-		{
-			dma_scsp(device->machine().firstcpu->memory().space(AS_PROGRAM), scsp);
-			scsp_regs[0x416/2]^=0x1000;//disable starting bit
-		}
-		break;
+			COMBINE_DATA(&scsp->dma_regs[((offset-0x412)/2) & 3]);
+			if(ACCESSING_BITS_8_15 && offset*2 == 0x416)
+				dma_scsp(device->machine().firstcpu->memory().space(AS_PROGRAM), scsp);
+			break;
 		case 0x42a:		//check main cpu IRQ
-		scsp->main_irq(1);
-		break;
+			scsp->main_irq(1);
+			break;
 		case 0x42c:
-		break;
+			break;
 		case 0x42e:
-		break;
+			break;
 	}
 }
 
