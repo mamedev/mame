@@ -927,6 +927,17 @@ ROM_START( officeye )
 ROM_END
 
 
+ROM_START( donghaer )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
+	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 ) // Flash
+	ROM_LOAD( "u1",           0x000000, 0x1000000, CRC(61217ad7) SHA1(2593f1356aa850f4f9aa5d00bec822aa59c59224) ) 
+	ROM_LOAD( "u2",           0x000000, 0x1000000, CRC(6d82f1a5) SHA1(036bd45f0daac1ffeaa5ad9774fc1b56e3c75ff9) ) 
+
+	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+ROM_END
+
 static DRIVER_INIT(crysking)
 {
 	UINT16 *Rom = (UINT16*) machine.region("user1")->base();
@@ -1008,3 +1019,4 @@ GAME( 2001, crysking, crysbios, crystal,  crystal,  crysking, ROT0, "BrezzaSoft"
 GAME( 2001, evosocc,  crysbios, crystal,  crystal,  evosocc,  ROT0, "Evoga", "Evolution Soccer", 0 )
 GAME( 2003, topbladv, crysbios, topbladv, crystal,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", GAME_NOT_WORKING ) // protection
 GAME( 2001, officeye,        0, crystal,  crystal,  officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", GAME_NOT_WORKING ) // protection
+GAME( 2001, donghaer,        0, crystal,  crystal,  officeye, ROT0, "BrezzaSoft", "Donggul Donggul Haerong", GAME_NOT_WORKING )
