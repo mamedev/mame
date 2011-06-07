@@ -70,9 +70,9 @@ static void PREFIX86(_trap)(i8086_state *cpustate)
 #endif
 
 #ifndef I80186
-static void PREFIX86(_rotate_shift_Byte)(i8086_state *cpustate, unsigned ModRM, unsigned count)
+static void PREFIX86(_rotate_shift_Byte)(i8086_state *cpustate, unsigned ModRM, unsigned count, unsigned src)
 {
-	unsigned src = (unsigned)GetRMByte(ModRM);
+//	unsigned src = (unsigned)GetRMByte(ModRM);
 	unsigned dst=src;
 
 	if (count==0)
@@ -203,9 +203,9 @@ static void PREFIX86(_rotate_shift_Byte)(i8086_state *cpustate, unsigned ModRM, 
 	}
 }
 
-static void PREFIX86(_rotate_shift_Word)(i8086_state *cpustate, unsigned ModRM, unsigned count)
+static void PREFIX86(_rotate_shift_Word)(i8086_state *cpustate, unsigned ModRM, unsigned count, unsigned src)
 {
-	unsigned src = GetRMWord(ModRM);
+//	unsigned src = GetRMWord(ModRM);
 	unsigned dst=src;
 
 	if (count==0)
@@ -2403,25 +2403,29 @@ static void PREFIX86(_iret)(i8086_state *cpustate)    /* Opcode 0xcf */
 
 static void PREFIX86(_rotshft_b)(i8086_state *cpustate)    /* Opcode 0xd0 */
 {
-	PREFIX(_rotate_shift_Byte)(cpustate,FETCHOP,1);
+	unsigned ModRM = FETCHOP;
+	PREFIX(_rotate_shift_Byte)(cpustate,ModRM,1,GetRMByte(ModRM));
 }
 
 
 static void PREFIX86(_rotshft_w)(i8086_state *cpustate)    /* Opcode 0xd1 */
 {
-	PREFIX(_rotate_shift_Word)(cpustate,FETCHOP,1);
+	unsigned ModRM = FETCHOP;
+	PREFIX(_rotate_shift_Word)(cpustate,ModRM,1,GetRMWord(ModRM));
 }
 
 
 #ifdef I8086
 static void PREFIX86(_rotshft_bcl)(i8086_state *cpustate)    /* Opcode 0xd2 */
 {
-	PREFIX(_rotate_shift_Byte)(cpustate,FETCHOP,cpustate->regs.b[CL]);
+	unsigned ModRM = FETCHOP;
+	PREFIX(_rotate_shift_Byte)(cpustate,ModRM,cpustate->regs.b[CL],GetRMByte(ModRM));
 }
 
 static void PREFIX86(_rotshft_wcl)(i8086_state *cpustate)    /* Opcode 0xd3 */
 {
-	PREFIX(_rotate_shift_Word)(cpustate,FETCHOP,cpustate->regs.b[CL]);
+	unsigned ModRM = FETCHOP;
+	PREFIX(_rotate_shift_Word)(cpustate,ModRM,cpustate->regs.b[CL],GetRMWord(ModRM));
 }
 #endif
 
