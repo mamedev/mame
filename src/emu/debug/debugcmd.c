@@ -149,7 +149,9 @@ static void execute_memdump(running_machine &machine, int ref, int params, const
 static void execute_symlist(running_machine &machine, int ref, int params, const char **param);
 static void execute_softreset(running_machine &machine, int ref, int params, const char **param);
 static void execute_hardreset(running_machine &machine, int ref, int params, const char **param);
-
+static void execute_images(running_machine &machine, int ref, int params, const char **param);
+static void execute_mount(running_machine &machine, int ref, int params, const char **param);
+static void execute_unmount(running_machine &machine, int ref, int params, const char **param);
 
 
 /***************************************************************************
@@ -368,6 +370,10 @@ void debug_command_init(running_machine &machine)
 
 	debug_console_register_command(machine, "softreset",	CMDFLAG_NONE, 0, 0, 1, execute_softreset);
 	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
+
+	debug_console_register_command(machine, "images",	CMDFLAG_NONE, 0, 0, 0, execute_images);
+	debug_console_register_command(machine, "mount",	CMDFLAG_NONE, 0, 2, 2, execute_mount);
+	debug_console_register_command(machine, "unmount",	CMDFLAG_NONE, 0, 1, 1, execute_unmount);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debug_command_exit), &machine));
 
@@ -2667,4 +2673,66 @@ static void execute_softreset(running_machine &machine, int ref, int params, con
 static void execute_hardreset(running_machine &machine, int ref, int params, const char **param)
 {
 	machine.schedule_hard_reset();
+}
+
+/*-------------------------------------------------
+    execute_images - lists all image devices with
+	mounted files
+-------------------------------------------------*/
+
+static void execute_images(running_machine &machine, int ref, int params, const char **param)
+{
+	device_image_interface *img = NULL;	
+	for (bool gotone = machine.devicelist().first(img); gotone; gotone = img->next(img))
+	{
+		debug_console_printf(machine, "%s: %s\n",img->brief_instance_name(),img->exists() ? img->filename() : "[empty slot]");
+	}
+	if (!machine.devicelist().first(img)) {
+		debug_console_printf(machine, "No image devices in this driver\n");
+	}
+}
+
+/*-------------------------------------------------
+    execute_mount - execute the image mount command
+-------------------------------------------------*/
+
+static void execute_mount(running_machine &machine, int ref, int params, const char **param)
+{
+	device_image_interface *img = NULL;	
+	bool done = false;
+	for (bool gotone = machine.devicelist().first(img); gotone; gotone = img->next(img))
+	{
+		if (strcmp(img->brief_instance_name(),param[0])==0) {
+			if (img->load(param[1])==IMAGE_INIT_FAIL) {
+				debug_console_printf(machine, "Unable to mount file %s on %s\n",param[1],param[0]);
+			} else {
+				debug_console_printf(machine, "File %s mounted on %s\n",param[1],param[0]);
+			}			
+			done = true; 
+			break;
+		}
+	}
+	if (!done)
+		debug_console_printf(machine, "There is no image device :%s\n",param[0]);
+}
+
+/*-------------------------------------------------
+    execute_unmount - execute the image unmount command
+-------------------------------------------------*/
+
+static void execute_unmount(running_machine &machine, int ref, int params, const char **param)
+{
+	device_image_interface *img = NULL;	
+	bool done = false;
+	for (bool gotone = machine.devicelist().first(img); gotone; gotone = img->next(img))
+	{
+		if (strcmp(img->brief_instance_name(),param[0])==0) {
+			img->unload();
+			debug_console_printf(machine, "Unmounted file from : %s\n",param[0]);
+			done = true; 
+			break;
+		}
+	}
+	if (!done)
+		debug_console_printf(machine, "There is no image device :%s\n",param[0]);
 }
