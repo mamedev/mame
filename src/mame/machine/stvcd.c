@@ -204,7 +204,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 		cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
 	}
 	cr3 = (cd_curfad>>16)&0xff;
-	cr4 = cd_curfad;
+	cr4 = cd_curfad&0xffff;
 
 	timer.adjust(attotime::from_hz(CD_SPEED));
 }
@@ -576,7 +576,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
-		if(cr1 != 0 && 1)
+		if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
     		printf("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 		if (!cdrom)
@@ -675,7 +675,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			cr4 = cd_curfad;
 			break;
 
-		case 0x0600:	// end data transfer
+		case 0x0600:	// end data transfer (TODO: needs to be worked on!)
 				// returns # of bytes transfered (24 bits) in
 				// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
 			CDROM_LOG(("%s:CD: End data transfer (%d bytes xfer'd)\n", machine.describe_context(), xferdnum))
@@ -783,7 +783,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			else	// play until the end of the disc
 			{
-				fadstoplay = cdrom_get_track_start(cdrom, 0xaa) + 150;
+				fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
 				printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
 			}
 
@@ -805,11 +805,11 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				cdda_pause_audio( machine.device( "cdda" ), 0 );
 				cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
 			}
-			else
-			{
-				sector_timer->reset();
-				sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
-			}
+			//else
+			//{
+			//	sector_timer->reset();
+			//	sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
+			//}
 			break;
 
 		case 0x1100: // disc seek
@@ -1080,6 +1080,27 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			cr4 = 0;
 			break;
 
+		case 0x5400:    // get sector info
+			{
+				UINT32 sectoffs = cr2 & 0xff;
+				UINT32 bufnum = cr3>>8;
+
+				if (bufnum >= MAX_FILTERS || !partitions[bufnum].blocks[sectoffs])
+				{
+					cr1 |= CD_STAT_REJECT & 0xff00;
+					hirqreg |= (CMOK|ESEL);
+				}
+				else
+				{
+					cr1 = cd_stat | ((partitions[bufnum].blocks[sectoffs]->FAD >> 16) & 0xff);
+					cr2 = partitions[bufnum].blocks[sectoffs]->FAD & 0xffff;
+					cr3 = ((partitions[bufnum].blocks[sectoffs]->fnum & 0xff) << 8) | (partitions[bufnum].blocks[sectoffs]->chan & 0xff);
+					cr4 = ((partitions[bufnum].blocks[sectoffs]->subm & 0xff) << 8) | (partitions[bufnum].blocks[sectoffs]->cinf & 0xff);
+					hirqreg |= (CMOK|ESEL);
+				}
+			}
+			break;
+
 		case 0x6000:	// set sector length
 			CDROM_LOG(("%s:CD: Set sector length\n",   machine.describe_context()))
 			hirqreg |= (CMOK|ESEL|EFLS|SCDQ|DRDY);
@@ -1127,16 +1148,18 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				if (bufnum >= MAX_FILTERS)
 				{
-					CDROM_LOG(("CD: invalid buffer number\n"));
-					cd_stat = 0xff;	// ERROR
+					printf("CD: invalid buffer number\n");
+					/* TODO: why this is happening? */
+					//cd_stat = 0xff00;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
 
 				if (partitions[bufnum].numblks == 0)
 				{
-					CDROM_LOG(("CD: buffer is empty\n"))
-					cd_stat = 0xff;	// ERROR
+					printf("CD: buffer is empty\n");
+					/* TODO: why this is happening? */
+					//cd_stat = 0xff00;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
@@ -1168,7 +1191,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				if (bufnum >= MAX_FILTERS)
 				{
 					printf("CD: invalid buffer number\n");
-					cd_stat = CD_STAT_REJECT;	// ERROR
+					/* TODO: why this is happening? */
+					//cd_stat = CD_STAT_REJECT;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
@@ -1176,7 +1200,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				if (partitions[bufnum].numblks == 0)
 				{
 					printf("CD: buffer is empty\n");
-					cd_stat = CD_STAT_REJECT;	// ERROR
+					/* TODO: why this is happening? */
+					//cd_stat = CD_STAT_REJECT;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
@@ -1211,16 +1236,18 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				if (bufnum >= MAX_FILTERS)
 				{
-					CDROM_LOG(("CD: invalid buffer number\n"))
-					cd_stat = 0xff;	// ERROR
+					printf("CD: invalid buffer number\n");
+					/* TODO: why this is happening? */
+					//cd_stat = 0xff00;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
 
 				if (partitions[bufnum].numblks == 0)
 				{
-					CDROM_LOG(("CD: buffer is empty\n"))
-					cd_stat = 0xff;	// ERROR
+					printf("CD: buffer is empty\n");
+					/* TODO: why this is happening? */
+					//cd_stat = 0xff00;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
@@ -1925,8 +1952,10 @@ static void cd_playdata(void)
 
 			if (cdrom)
 			{
-				cd_read_filtered_sector(cd_curfad);
+				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+					cd_read_filtered_sector(cd_curfad);
 
+				//popmessage("%08x %08x",cd_curfad,fadstoplay);
 				cd_curfad++;
 				fadstoplay--;
 
