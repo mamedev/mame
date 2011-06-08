@@ -122,7 +122,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		goto error;
 	}
 
-	if (strlen(sdlfile_socket_identifier) > 0 && strncmp(path, sdlfile_socket_identifier, strlen(sdlfile_socket_identifier)) == 0)
+	if (sdl_check_socket_path(path))
 	{
 		(*file)->type = SDLFILE_SOCKET;
 		filerr = sdl_open_socket(path, openflags, file, filesize);
