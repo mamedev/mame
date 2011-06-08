@@ -258,7 +258,7 @@ LIBS += -ldinput
 CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0700
 endif
 
-
+LIBS += -lcomdlg32
 
 #-------------------------------------------------
 # OSD core library

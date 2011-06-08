@@ -44,6 +44,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <tchar.h>
+#include <commdlg.h>
 #ifdef _MSC_VER
 #include <zmouse.h>
 #endif
@@ -51,6 +52,7 @@
 // MAME headers
 #include "emu.h"
 #include "uiinput.h"
+#include "imagedev/cassette.h"
 #include "debugger.h"
 #include "debug/debugvw.h"
 #include "debug/dvdisasm.h"
@@ -138,7 +140,9 @@ enum
 	ID_SHOW_ENCRYPTED,
 	ID_SHOW_COMMENTS,
 	ID_RUN_TO_CURSOR,
-	ID_TOGGLE_BREAKPOINT
+	ID_TOGGLE_BREAKPOINT,
+	
+	ID_DEVICE_OPTIONS  // keep this always at the end
 };
 
 
@@ -266,7 +270,7 @@ static void smart_set_window_bounds(HWND wnd, HWND parent, RECT *bounds);
 static void smart_show_window(HWND wnd, BOOL show);
 static void smart_show_all(BOOL show);
 
-
+static void image_update_menu(debugwin_info *info);
 
 //============================================================
 //  wait_for_debugger
@@ -2376,6 +2380,79 @@ static void disasm_update_caption(running_machine &machine, HWND wnd)
 }
 
 
+enum
+{
+	DEVOPTION_OPEN,
+	DEVOPTION_CREATE,
+	DEVOPTION_CLOSE,
+	DEVOPTION_CASSETTE_STOPPAUSE,
+	DEVOPTION_CASSETTE_PLAY,
+	DEVOPTION_CASSETTE_RECORD,
+	DEVOPTION_CASSETTE_REWIND,
+	DEVOPTION_CASSETTE_FASTFORWARD,
+	DEVOPTION_MAX
+};
+
+//============================================================
+//  memory_update_menu
+//============================================================
+
+static void image_update_menu(debugwin_info *info)
+{
+	device_image_interface *img = NULL;
+	UINT32 cnt = 0;
+	HMENU devicesmenu;
+
+	DeleteMenu(GetMenu(info->wnd), 2, MF_BYPOSITION);
+	
+	// create the image menu
+	devicesmenu = CreatePopupMenu();
+	for (bool gotone = info->machine().devicelist().first(img); gotone; gotone = img->next(img))
+	{
+		astring temp;
+		UINT flags_for_exists;
+		UINT flags_for_writing;
+		HMENU devicesubmenu = CreatePopupMenu();
+		
+		UINT_PTR new_item = ID_DEVICE_OPTIONS + (cnt * DEVOPTION_MAX);
+		
+		flags_for_exists = MF_ENABLED | MF_STRING;
+
+		if (!img->exists())
+			flags_for_exists |= MF_GRAYED;
+
+		flags_for_writing = flags_for_exists;
+		if (img->is_readonly())
+			flags_for_writing |= MF_GRAYED;
+
+		AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount..."));
+
+		/*if (img->is_creatable())
+			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
+		*/
+		AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CLOSE, TEXT("Unmount"));
+
+		if (img->device().type() == CASSETTE)
+		{
+			cassette_state state;
+			state = (cassette_state)(img->exists() ? (cassette_get_state(&img->device()) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
+			AppendMenu(devicesubmenu, MF_SEPARATOR, 0, NULL);
+			AppendMenu(devicesubmenu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, TEXT("Pause/Stop"));
+			AppendMenu(devicesubmenu, flags_for_exists	| ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, TEXT("Play"));
+			AppendMenu(devicesubmenu, flags_for_writing | ((state == CASSETTE_RECORD)	? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_RECORD, TEXT("Record"));
+			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_REWIND, TEXT("Rewind"));
+			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
+		}
+	
+		temp.format("%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
+
+		AppendMenu(devicesmenu, MF_ENABLED | MF_POPUP, (UINT_PTR)devicesubmenu,  tstring_from_utf8(temp.cstr()));	
+		
+		cnt++;
+	}
+	AppendMenu(GetMenu(info->wnd), MF_ENABLED | MF_POPUP, (UINT_PTR)devicesmenu, TEXT("Images"));
+
+}
 
 //============================================================
 //  console_create_window
@@ -2388,6 +2465,7 @@ void console_create_window(running_machine &machine)
 	RECT bounds, work_bounds;
 	HMENU optionsmenu;
 	UINT32 conchars;
+	device_image_interface *img = NULL;
 
 	// create the window
 	info = debugwin_window_create(machine, "Debug", NULL);
@@ -2413,6 +2491,12 @@ void console_create_window(running_machine &machine)
 	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_COMMENTS, TEXT("Comments\tCtrl+N"));
 	AppendMenu(GetMenu(info->wnd), MF_ENABLED | MF_POPUP, (UINT_PTR)optionsmenu, TEXT("Options"));
 
+	// Add image menu only if image devices exist
+	if (info->machine().devicelist().first(img))	{
+		info->update_menu = image_update_menu;	
+		image_update_menu(info);
+	}
+	
 	// set the handlers
 	info->handle_command = disasm_handle_command;
 	info->handle_key = disasm_handle_key;
@@ -2647,7 +2731,94 @@ static HMENU create_standard_menubar(void)
 	return menubar;
 }
 
+//============================================================
+//  copy_extension_list
+//============================================================
 
+static int copy_extension_list(char *dest, size_t dest_len, const char *extensions)
+{
+	const char *s;
+	int pos = 0;
+
+	// our extension lists are comma delimited; Win32 expects to see lists
+	// delimited by semicolons
+	s = extensions;
+	while(*s)
+	{
+		// append a semicolon if not at the beginning
+		if (s != extensions)
+			pos += snprintf(&dest[pos], dest_len - pos, ";");
+
+		// append ".*"
+		pos += snprintf(&dest[pos], dest_len - pos, "*.");
+
+		// append the file extension
+		while(*s && (*s != ','))
+		{
+			pos += snprintf(&dest[pos], dest_len - pos, "%c", *s);
+			s++;
+		}
+
+		// if we found a comma, advance
+		while(*s == ',')
+			s++;
+	}
+	return pos;
+}
+
+//============================================================
+//  add_filter_entry
+//============================================================
+
+static int add_filter_entry(char *dest, size_t dest_len, const char *description, const char *extensions)
+{
+	int pos = 0;
+
+	// add the description
+	pos += snprintf(&dest[pos], dest_len - pos, "%s (", description);
+
+	// add the extensions to the description
+	pos += copy_extension_list(&dest[pos], dest_len - pos, extensions);
+
+	// add the trailing rparen and '|' character
+	pos += snprintf(&dest[pos], dest_len - pos, ")|");
+
+	// now add the extension list itself
+	pos += copy_extension_list(&dest[pos], dest_len - pos, extensions);
+
+	// append a '|'
+	pos += snprintf(&dest[pos], dest_len - pos, "|");
+
+	return pos;
+}
+//============================================================
+//  build_generic_filter
+//============================================================
+
+static void build_generic_filter(device_image_interface *img, int is_save, char *filter, size_t filter_len)
+{
+	char *s;
+
+	const char *file_extension;
+
+	/* copy the string */
+	file_extension = img->file_extensions();
+
+	// start writing the filter
+	s = filter;
+
+	// common image types
+	s += add_filter_entry(filter, filter_len, "Common image types", file_extension);
+
+	// all files
+	s += sprintf(s, "All files (*.*)|*.*|");
+
+	// compressed
+	if (!is_save)
+		s += sprintf(s, "Compressed Images (*.zip)|*.zip|");
+
+	*(s++) = '\0';
+}
 
 //============================================================
 //  global_handle_command
@@ -2715,7 +2886,89 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				info->machine().schedule_exit();
 				return 1;
 		}
+		if (LOWORD(wparam) >= ID_DEVICE_OPTIONS) {
+			UINT32 devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX; 
+			device_image_interface *img = NULL;
+			UINT32 cnt = 0;
+			for (bool gotone = info->machine().devicelist().first(img); gotone; gotone = img->next(img))
+			{
+				if (cnt==devid) break;
+				cnt++;
+			}
+			if (img!=NULL) {
+				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX) 
+				{
+					case DEVOPTION_OPEN : 
+											{											
+												char filter[2048];
+												build_generic_filter(img, FALSE, filter, ARRAY_LENGTH(filter));
+												
+												TCHAR selectedFilename[MAX_PATH];												
+												selectedFilename[0] = '\0';
+												LPTSTR buffer;
+												LPTSTR t_filter = NULL;
+												
+												buffer = tstring_from_utf8(filter);
 
+												// convert a pipe-char delimited string into a NUL delimited string
+												t_filter = (LPTSTR) alloca((_tcslen(buffer) + 2) * sizeof(*t_filter));
+												int i = 0;
+												for (i = 0; buffer[i] != '\0'; i++)
+													t_filter[i] = (buffer[i] != '|') ? buffer[i] : '\0';
+												t_filter[i++] = '\0';
+												t_filter[i++] = '\0';
+												osd_free(buffer);
+
+												
+												OPENFILENAME  ofn;        
+												memset(&ofn,0,sizeof(ofn));
+												ofn.lStructSize = sizeof(ofn);
+												ofn.hwndOwner = NULL;
+												ofn.lpstrFile = selectedFilename;
+												ofn.lpstrFile[0] = '\0';
+												ofn.nMaxFile = MAX_PATH;
+												ofn.lpstrFilter = t_filter;
+												ofn.nFilterIndex = 1;
+												ofn.lpstrFileTitle = NULL;
+												ofn.nMaxFileTitle = 0;
+												ofn.lpstrInitialDir = NULL;
+												ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+												if (GetOpenFileName(&ofn)) {													
+													img->load(utf8_from_tstring(selectedFilename));
+												}
+											}
+											return 1;
+/*					case DEVOPTION_CREATE: 
+											return 1;*/
+					case DEVOPTION_CLOSE: 
+											img->unload();
+											return 1;
+					default: 
+						if (img->device().type() == CASSETTE) {
+							switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX) 
+							{
+
+								case DEVOPTION_CASSETTE_STOPPAUSE: 
+														cassette_change_state(&img->device(), CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+														return 1;
+								case DEVOPTION_CASSETTE_PLAY: 
+														cassette_change_state(&img->device(), CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+														return 1;
+								case DEVOPTION_CASSETTE_RECORD: 
+														cassette_change_state(&img->device(), CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
+														return 1;
+								case DEVOPTION_CASSETTE_REWIND: 
+														cassette_seek(&img->device(), -60.0, SEEK_CUR);
+														return 1;
+								case DEVOPTION_CASSETTE_FASTFORWARD: 
+														cassette_seek(&img->device(), +60.0, SEEK_CUR);
+														return 1;	
+							}
+						}		
+				}						
+			}
+		}
 	return 0;
 }
 
