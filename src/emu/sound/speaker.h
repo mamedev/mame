@@ -13,6 +13,7 @@
 
 #include "devlegcy.h"
 
+#define SPEAKER_TAG		"speaker"
 
 typedef struct _speaker_interface speaker_interface;
 struct _speaker_interface
