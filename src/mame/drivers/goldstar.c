@@ -428,7 +428,7 @@ static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kkojnoli_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* definitely no NVRAM */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,m_fg_vidram)
@@ -3228,7 +3228,7 @@ static INPUT_PORTS_START( ladylinr )
 */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kkojnoli )
+static INPUT_PORTS_START( kkotnoli )
 	PORT_START("IN0")	/* d800 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5552,7 +5552,7 @@ static const ppi8255_interface lucky8_ppi8255_intf[3] =
 	}
 };
 
-static const ppi8255_interface kkojnoli_ppi8255_intf[3] =
+static const ppi8255_interface kkotnoli_ppi8255_intf[3] =
 {
 	{	/* A, B & C set as input */
 		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
@@ -6160,19 +6160,19 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kkojnoli, goldstar_state )
+static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kkojnoli_map)
+	MCFG_CPU_PROGRAM_MAP(kkotnoli_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", kkojnoli_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", kkojnoli_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", kkojnoli_ppi8255_intf[2] )
+	MCFG_PPI8255_ADD( "ppi8255_0", kkotnoli_ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", kkotnoli_ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_2", kkotnoli_ppi8255_intf[2] )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8356,7 +8356,7 @@ ROM_END
   D8255AC-2
 
 */
-ROM_START( kkojnoli )
+ROM_START( kkotnoli )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "9006.u66",	0x0000, 0x8000, CRC(5807a005) SHA1(9c7156656cd651c7785c42ce25e96aadd8e3d9ff) )
 
@@ -10330,7 +10330,7 @@ GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  lucky8a,   ROT0, "Wing Co.
 GAMEL( 1989, lucky8b,   lucky8,   lucky8,   ns8lines, 0,         ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8 )
 GAMEL( 198?, ns8lines,  0,        lucky8,   ns8lines, 0,         ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8 )
 GAMEL( 198?, ns8linew,  0,        lucky8,   ns8linew, 0,         ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )
-GAMEL( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "hack",                 "Kkoj Noli (Kill the Bees)",                                GAME_IMPERFECT_COLORS, layout_lucky8 )
+GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, 0,         ROT0, "hack",                 "Kkot No Li (Kill the Bees)",                               GAME_IMPERFECT_COLORS, layout_lucky8 )
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",          "Lady Liner",                                               0 )
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",               "Wild Cat 3",                                               GAME_NOT_WORKING )
 
