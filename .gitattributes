@@ -2811,6 +2811,7 @@ src/mame/drivers/vsnes.c svneol=native#text/plain
 src/mame/drivers/vulgus.c svneol=native#text/plain
 src/mame/drivers/wallc.c svneol=native#text/plain
 src/mame/drivers/wardner.c svneol=native#text/plain
+src/mame/drivers/warpsped.c svneol=native#text/plain
 src/mame/drivers/warpwarp.c svneol=native#text/plain
 src/mame/drivers/warriorb.c svneol=native#text/plain
 src/mame/drivers/wc90.c svneol=native#text/plain

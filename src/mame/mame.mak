@@ -912,6 +912,7 @@ $(MAMEOBJ)/maygay.a: \
 $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/lazercmd.o $(VIDEO)/lazercmd.o \
 	$(DRIVERS)/meadows.o $(AUDIO)/meadows.o $(VIDEO)/meadows.o \
+	$(DRIVERS)/warpsped.o
 
 $(MAMEOBJ)/merit.a: \
 	$(DRIVERS)/mpoker.o \
