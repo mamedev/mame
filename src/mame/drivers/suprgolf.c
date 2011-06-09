@@ -11,6 +11,7 @@
    trees (zooming?)
  - not sure if the analog inputs are handled correctly;
  - Fix the framebuffer display in cocktail mode;
+ - Albatross: bad graphics, caused by missing rom(s).
 
  Notes:
  - The game uses special control panel with 1 golf club shaped device to select shot
@@ -296,7 +297,7 @@ static READ8_DEVICE_HANDLER( p2_r )
 	return (input_port_read(device->machine(), "P2") & 0xf0) | ((input_port_read(device->machine(), "P2_ANALOG") & 0xf));
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
@@ -306,7 +307,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE( suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -496,13 +496,14 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 	DEVCB_HANDLER(suprgolf_vregs_w)				/* Port C write */
 };
 
+
 #define MASTER_CLOCK XTAL_12MHz
 
 static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) /* guess */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_PROGRAM_MAP(suprgolf_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -536,7 +537,6 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
 
 /*
 ----------------------
@@ -591,14 +591,47 @@ ROM_START( suprgolf )
 	ROM_LOAD( "cg23.7f",0x030000, 0x10000, CRC(50191b4d) SHA1(8f74cba2a2b5fd2a03eaf13a6d6b39af8833a4ab) )
 
 	ROM_REGION( 0x70000, "gfx1", 0 )
-	ROM_LOAD( "cg18.3k",0x60000, 0x10000, CRC(36edd88e) SHA1(374c95721198a88831d6f7e0b71d05e2f8465271) )
-	ROM_LOAD( "cg17.5f",0x50000, 0x10000, CRC(d27f87b5) SHA1(5b2927e89615589540e3853593aeff517584b6a0) )
-	ROM_LOAD( "cg16.5g",0x40000, 0x10000, CRC(0498aa2e) SHA1(988965c3a584dac17ad8c7e504fa1f1e49775611) )
-	ROM_LOAD( "cg15.5j",0x30000, 0x10000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
-	ROM_LOAD( "cg14.5k",0x20000, 0x10000, CRC(ca12e01d) SHA1(9c627fb527c8966e16dc6bdb99ec0b9728b5c5f9) )
-	ROM_LOAD( "cg13.6j",0x10000, 0x10000, CRC(02ff0187) SHA1(aeeb3b2d15c3c8ff4695ecf6cfc0c385295ecce6) )
 	ROM_LOAD( "cg12.6k",0x00000, 0x10000, CRC(5707b3d5) SHA1(9102a40fefb6426f2cd9d92d66fdc77e078e3f4c) )
+	ROM_LOAD( "cg13.6j",0x10000, 0x10000, CRC(02ff0187) SHA1(aeeb3b2d15c3c8ff4695ecf6cfc0c385295ecce6) )
+	ROM_LOAD( "cg14.5k",0x20000, 0x10000, CRC(ca12e01d) SHA1(9c627fb527c8966e16dc6bdb99ec0b9728b5c5f9) )
+	ROM_LOAD( "cg15.5j",0x30000, 0x10000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
+	ROM_LOAD( "cg16.5g",0x40000, 0x10000, CRC(0498aa2e) SHA1(988965c3a584dac17ad8c7e504fa1f1e49775611) )
+	ROM_LOAD( "cg17.5f",0x50000, 0x10000, CRC(d27f87b5) SHA1(5b2927e89615589540e3853593aeff517584b6a0) )
+	ROM_LOAD( "cg18.3k",0x60000, 0x10000, CRC(36edd88e) SHA1(374c95721198a88831d6f7e0b71d05e2f8465271) )
 ROM_END
+
+ROM_START( albatross )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.6k",         0x000000, 0x008000, CRC(6f934951) SHA1(b7217a4e509e452f15f414ce7e23c724ecac6184) )
+
+	ROM_REGION( 0x100000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD( "at1.6h",       0x000000, 0x010000, CRC(ee545c71) SHA1(8ee459a85e52257d3f9a2aa7263b641aad87bafd) )
+	ROM_LOAD( "at2.6g",       0x010000, 0x010000, CRC(a2ed2159) SHA1(5e13b6c4eaba8146a4c6c2ff24197f3ffca29b92) )
+	ROM_LOAD( "at3.6e",       0x020000, 0x010000, CRC(4543334d) SHA1(7ee268ed6d02c78db8c222418313593df37cde4b) )
+	ROM_LOAD( "at4.6d",       0x030000, 0x010000, CRC(85ace664) SHA1(5267406c98e2d124a4985816f8e2e32e74e09614) )
+	ROM_LOAD( "at5.6c",       0x040000, 0x010000, CRC(609d5b37) SHA1(60640a9bd0883bf4dc999077d89ef793e827ac23) )
+	ROM_LOAD( "at6.6a",       0x050000, 0x010000, CRC(5e4a8ddb) SHA1(0c71c7eba9fe79187c4214eb639a481305070dcc) )
+	ROM_LOAD( "at7.4h",       0x060000, 0x010000, CRC(90ac6734) SHA1(2656397fca6dceabf8e35c093c0ba25e08d2ad1e) )
+	ROM_LOAD( "at8.4g",       0x070000, 0x010000, CRC(2e9edece) SHA1(a0961bb23f312ed137134746d2d3d438fe098085) )
+	ROM_LOAD( "kage.4e",      0x080000, 0x010000, CRC(139d71f1) SHA1(756ed068e1e2b76a9d1df95b432976e632edfa77) )
+	ROM_LOAD( "at10.4d",      0x090000, 0x010000, CRC(c4d5617c) SHA1(5f2d66f827d8d7437fde84ffa17db105a5352f06) )
+	/* 4c is connected below */
+	ROM_LOAD( "map.4a",       0x0b0000, 0x010000, CRC(cfec1a0f) SHA1(c09ece059cb3c456b66c016c6fab3139d3f61c6a) )
+
+	ROM_REGION( 0x100000, "user2", ROMREGION_ERASEFF )
+	ROM_LOAD( "cg20.7k",0x000000, 0x10000, BAD_DUMP CRC(1e3fa2fd) SHA1(4771b90e40ebfbae4a98ff7ce6db50f635232597) ) // - empty sockets on PCB :/ (temps from Super Crowns Golf)
+	ROM_LOAD( "cg21.7j",0x010000, 0x10000, BAD_DUMP CRC(0323a2cd) SHA1(d7d4b35ad451acb2fa3d117bb0ae2f8fbd883f17) ) // /
+	ROM_LOAD( "2.4c",   0x020000, 0x20000, CRC(08d4363b) SHA1(60c5543c35f44af2f4a8f7ca4bc10633f5fa67fb) )
+
+	ROM_REGION( 0x70000, "gfx1", 0 )
+	ROM_LOAD( "chr1.3h",      0x000000, 0x020000, CRC(e62d2bb4) SHA1(f931699114a99b7eb25f8bb841d85de0d6a106a5) )
+	ROM_LOAD( "chr2.3g",      0x020000, 0x020000, CRC(808c15e6) SHA1(d7d1ac7456f492dfcc1c1b501f8dde86e405fd7b) )
+	ROM_LOAD( "chr3.3e",      0x040000, 0x020000, CRC(9a60193d) SHA1(d22c958b5bd82626fcfc94f7ad16d8cd4bacdda2) )
+	ROM_LOAD( "chr4.3d",      0x060000, 0x010000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
+ROM_END
+
+
+
 
 static DRIVER_INIT( suprgolf )
 {
@@ -609,4 +642,5 @@ static DRIVER_INIT( suprgolf )
 	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; //patch ROM check
 }
 
-GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf,  0,        ROT0, "Nasco", "Albatross (US Prototype?)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
