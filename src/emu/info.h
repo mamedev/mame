@@ -73,6 +73,7 @@ private:
 	void output_categories(const ioport_list &portlist);
 	void output_driver();
 	void output_images();
+	void output_slots();
 	void output_software_list();
 	void output_ramoptions();
 

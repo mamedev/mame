@@ -58,7 +58,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t<!ATTLIST " XML_ROOT " build CDATA #IMPLIED>\n"
 "\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
 "\t<!ATTLIST " XML_ROOT " mameconfig CDATA #REQUIRED>\n"
-"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, softwarelist*, ramoption*)>\n"
+"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, slot*, softwarelist*, ramoption*)>\n"
 "\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 "\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
 "\t\t<!ATTLIST " XML_TOP " isbios (yes|no) \"no\">\n"
@@ -175,6 +175,11 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
 "\t\t\t<!ELEMENT extension EMPTY>\n"
 "\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
+"\t\t<!ELEMENT slot (slotoption*)>\n"
+"\t\t\t<!ATTLIST slot name CDATA #REQUIRED>\n"
+"\t\t\t<!ELEMENT slotoption EMPTY>\n"
+"\t\t\t\t<!ATTLIST slotoption name CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "\t\t<!ELEMENT softwarelist EMPTY>\n"
 "\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
@@ -309,6 +314,7 @@ void info_xml_creator::output_one()
 	output_adjusters(portlist);
 	output_driver();
 	output_images();
+	output_slots();
 	output_software_list();
 	output_ramoptions();
 
@@ -1071,6 +1077,41 @@ void info_xml_creator::output_images()
 		}
 
 		fprintf(m_output, "\t\t</device>\n");
+	}
+}
+
+
+//-------------------------------------------------
+//  output_images - prints all info about slots
+//-------------------------------------------------
+
+void info_xml_creator::output_slots()
+{
+	const device_slot_interface *slot = NULL;
+	for (bool gotone = m_drivlist.config().devicelist().first(slot); gotone; gotone = slot->next(slot))
+	{
+		// print m_output device type
+		fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(slot->device().tag()));
+
+		/*
+		if (slot->slot_interface()[0])
+			fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
+		 */
+	
+		const slot_interface* intf = slot->get_slot_interfaces();
+		for (int i = 0; intf[i].name != NULL; i++)
+		{
+			fprintf(m_output, "\t\t\t<slotoption");
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
+			if (slot->get_default_card())
+			{
+				if (slot->get_default_card() == intf[i].name)
+					fprintf(m_output, " default=\"yes\"");
+			}
+			fprintf(m_output, "/>\n");
+		}
+
+		fprintf(m_output, "\t\t</slot>\n");
 	}
 }
 
