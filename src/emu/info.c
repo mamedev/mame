@@ -93,6 +93,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST disk merge CDATA #IMPLIED>\n"
 "\t\t\t<!ATTLIST disk region CDATA #IMPLIED>\n"
 "\t\t\t<!ATTLIST disk index CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST disk writable (yes|no) \"no\">\n"
 "\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
 "\t\t\t<!ATTLIST disk optional (yes|no) \"no\">\n"
 "\t\t<!ELEMENT sample EMPTY>\n"
@@ -468,7 +469,10 @@ void info_xml_creator::output_rom()
 
 					// for disk entries, add the disk index
 					else
+					{
 						fprintf(m_output, " index=\"%x\"", DISK_GETINDEX(rom));
+						fprintf(m_output, " writeable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
+					}
 
 					// add optional flag
 					if ((!is_disk && ROM_ISOPTIONAL(rom)) || (is_disk && DISK_ISOPTIONAL(rom)))
