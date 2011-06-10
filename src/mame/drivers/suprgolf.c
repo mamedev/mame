@@ -6,7 +6,7 @@
 
  TODO:
  - remove the patch and understand what needs to be modified for the gfxs, game
-   doesn't crash anymore;
+   doesn't crash anymore (note: I suspect it's actually a ppi port C bug);
  - Some weird framebuffer vertical gaps with some object, namely the green and the
    trees (zooming?)
  - not sure if the analog inputs are handled correctly;
@@ -164,6 +164,8 @@ static READ8_DEVICE_HANDLER( suprgolf_vregs_r )
 static WRITE8_DEVICE_HANDLER( suprgolf_vregs_w )
 {
 	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
+
+	//printf("%02x\n",data);
 
 	//bits 0,1,2 and probably 3 controls the background vram banking
 	state->m_vreg_bank = data;
