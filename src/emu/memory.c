@@ -878,6 +878,8 @@ private:
 	UINT8 handler_free;
 	UINT8 get_free_handler();
 	void verify_reference_counts();
+	void setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<UINT32> &entries);
+	void setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries);
 
 	void handler_ref(UINT8 entry, int count)
 	{
@@ -3302,6 +3304,41 @@ UINT8 address_table::get_free_handler()
 //  it
 //-------------------------------------------------
 
+void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
+{
+	// Careful, you can't shift by 64 or more
+	UINT64 testmask = (1ULL << (m_space.data_width()-1) << 1) - 1;
+
+	if((mask & testmask) == 0 || (mask & testmask) == mask)
+		setup_range_solid(addrstart, addrend, addrmask, addrmirror, entries);
+	else
+		setup_range_masked(addrstart, addrend, addrmask, addrmirror, mask, entries);
+}
+
+//-------------------------------------------------
+//  setup_range_solid - finds an appropriate handler
+//  entry and requests to populate the address map with
+//  it.  Replace what's there.
+//-------------------------------------------------
+
+void address_table::setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<UINT32> &entries)
+{
+	// Grab a free entry
+	UINT8 entry = get_free_handler();
+
+	// Add it in the "to be setup" list
+	entries.push_back(entry);
+
+	// Configure and map it
+	map_range(addrstart, addrend, addrmask, addrmirror, entry);
+}
+
+//-------------------------------------------------
+//  setup_range_solid - finds an appropriate handler
+//  entry and requests to populate the address map with
+//  it.  Handle non-overlapping subunits.
+//-------------------------------------------------
+	
 namespace {
 	struct subrange {
 		offs_t start, end;
@@ -3309,7 +3346,7 @@ namespace {
 	};
 };
 
-void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
+void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
 {
 	// convert addresses to bytes
 	offs_t bytestart = addrstart;
@@ -3319,9 +3356,9 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 	m_space.adjust_addresses(bytestart, byteend, bytemask, bytemirror);
 
 	// Validity checks
-	assert_always(addrstart <= addrend, "address_table::map_range called with start greater than end");
-	assert_always((bytestart & (m_space.data_width() / 8 - 1)) == 0, "address_table::map_range called with misaligned start address");
-	assert_always((byteend & (m_space.data_width() / 8 - 1)) == (m_space.data_width() / 8 - 1), "address_table::map_range called with misaligned end address");
+	assert_always(addrstart <= addrend, "address_table::setup_range called with start greater than end");
+	assert_always((bytestart & (m_space.data_width() / 8 - 1)) == 0, "address_table::setup_range called with misaligned start address");
+	assert_always((byteend & (m_space.data_width() / 8 - 1)) == (m_space.data_width() / 8 - 1), "address_table::setup_range called with misaligned end address");
 
 	// Scan the memory to see what has to be done
 	std::list<subrange> range_override;
