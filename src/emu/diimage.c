@@ -81,7 +81,9 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 	  m_software_info_ptr(NULL),
 	  m_software_part_ptr(NULL),
       m_readonly(false),
-      m_created(false)
+      m_created(false),
+	  m_formatlist(NULL),
+	  m_is_loading(FALSE)
 {
 }
 
@@ -92,6 +94,15 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 
 device_image_interface::~device_image_interface()
 {
+   image_device_format **formatptr = &m_formatlist;
+
+	/* free all entries */
+	while (*formatptr != NULL)
+	{
+		image_device_format *entry = *formatptr;
+		*formatptr = entry->m_next;
+		global_free(entry);
+	}
 }
 
 //-------------------------------------------------
@@ -541,3 +552,456 @@ void device_image_interface::battery_save(const void *buffer, int length)
     astring_free(fname);
 }
 
+//-------------------------------------------------
+//  uses_file_extension - update configuration
+//  based on completed device setup
+//-------------------------------------------------
+
+bool device_image_interface::uses_file_extension(const char *file_extension) const
+{
+    bool result = FALSE;
+
+	if (file_extension[0] == '.')
+        file_extension++;
+
+	/* find the extensions */
+	astring extensions(file_extensions());
+	char *ext = strtok((char*)extensions.cstr(),",");
+	while (ext != NULL)
+	{
+		if (!mame_stricmp(ext, file_extension))
+        {
+            result = TRUE;
+            break;
+        }
+		ext = strtok (NULL, ",");
+	}
+    return result;
+}
+
+/****************************************************************************
+    IMAGE LOADING
+****************************************************************************/
+
+/*-------------------------------------------------
+    is_loaded - quick check to determine whether an
+    image is loaded
+-------------------------------------------------*/
+
+bool device_image_interface::is_loaded()
+{
+    return (m_file != NULL);
+}
+
+/*-------------------------------------------------
+    load_image_by_path - loads an image with a
+    specific path
+-------------------------------------------------*/
+
+image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const char *path)
+{
+    file_error filerr = FILERR_NOT_FOUND;
+    image_error_t err = IMAGE_ERROR_FILENOTFOUND;
+    astring revised_path;
+
+    /* attempt to read the file */
+    filerr = zippath_fopen(path, open_flags, &m_file, &revised_path);
+
+    /* did the open succeed? */
+    switch(filerr)
+    {
+        case FILERR_NONE:
+            /* success! */
+            m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
+            m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
+            err = IMAGE_ERROR_SUCCESS;
+            break;
+
+        case FILERR_NOT_FOUND:
+        case FILERR_ACCESS_DENIED:
+            /* file not found (or otherwise cannot open); continue */
+            err = IMAGE_ERROR_FILENOTFOUND;
+            break;
+
+        case FILERR_OUT_OF_MEMORY:
+            /* out of memory */
+            err = IMAGE_ERROR_OUTOFMEMORY;
+            break;
+
+        case FILERR_ALREADY_OPEN:
+            /* this shouldn't happen */
+            err = IMAGE_ERROR_ALREADYOPEN;
+            break;
+
+        case FILERR_FAILURE:
+        case FILERR_TOO_MANY_FILES:
+        case FILERR_INVALID_DATA:
+        default:
+            /* other errors */
+            err = IMAGE_ERROR_INTERNAL;
+            break;
+    }
+
+    /* if successful, set the file name */
+    if (filerr == FILERR_NONE)
+        set_image_filename(revised_path);
+
+    return err;
+}
+
+/*-------------------------------------------------
+    determine_open_plan - determines which open
+    flags to use, and in what order
+-------------------------------------------------*/
+
+void device_image_interface::determine_open_plan(int is_create, UINT32 *open_plan)
+{
+    int i = 0;
+
+    /* emit flags */
+    if (!is_create && is_readable() && is_writeable())
+        open_plan[i++] = OPEN_FLAG_READ | OPEN_FLAG_WRITE;
+    if (!is_create && !is_readable() && is_writeable())
+        open_plan[i++] = OPEN_FLAG_WRITE;
+    if (!is_create && is_readable())
+        open_plan[i++] = OPEN_FLAG_READ;
+    if (is_writeable() && is_creatable())
+        open_plan[i++] = OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE;
+    open_plan[i] = 0;
+}
+
+/*-------------------------------------------------
+    load_software - software image loading
+-------------------------------------------------*/
+bool device_image_interface::load_software(char *swlist, char *swname, rom_entry *start)
+{
+	astring locationtag, breakstr("%");
+	const rom_entry *region;
+	astring regiontag;
+	bool retVal = FALSE;
+	for (region = start; region != NULL; region = rom_next_region(region))
+	{
+		/* loop until we hit the end of this region */
+		const rom_entry *romp = region + 1;
+		while (!ROMENTRY_ISREGIONEND(romp))
+		{
+			/* handle files */
+			if (ROMENTRY_ISFILE(romp))
+			{
+				file_error filerr = FILERR_NOT_FOUND;
+
+				UINT32 crc = 0;
+				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
+
+				// attempt reading up the chain through the parents and create a locationtag astring in the format
+				// " swlist % clonename % parentname "
+				// below, we have the code to split the elements and to create paths to load from
+
+				software_list *software_list_ptr = software_list_open(device().machine().options(), swlist, FALSE, NULL);
+				if (software_list_ptr)
+				{
+					for (software_info *swinfo = software_list_find(software_list_ptr, swname, NULL); swinfo != NULL; )
+					{
+						if (swinfo != NULL)
+						{
+							astring tmp(swinfo->shortname);
+							locationtag.cat(tmp);
+							locationtag.cat(breakstr);
+							//printf("%s\n", locationtag.cstr());
+						}
+						const char *parentname = software_get_clone(device().machine().options(), swlist, swinfo->shortname);
+						if (parentname != NULL)
+							swinfo = software_list_find(software_list_ptr, parentname, NULL);
+						else
+							swinfo = NULL;
+					}
+					// strip the final '%'
+					locationtag.del(locationtag.len() - 1, 1);
+					software_list_close(software_list_ptr);
+				}
+
+				if (software_get_support(device().machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_PARTIAL)
+					mame_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist);
+
+				if (software_get_support(device().machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_NO)
+					mame_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist);
+
+				// check if locationtag actually contains two locations separated by '%'
+				// (i.e. check if we are dealing with a clone in softwarelist)
+				astring tag2, tag3, tag4(locationtag), tag5;
+				int separator = tag4.chr(0, '%');
+				if (separator != -1)
+				{
+					// we are loading a clone through softlists, split the setname from the parentname
+					tag5.cpysubstr(tag4, separator + 1, tag4.len() - separator + 1);
+					tag4.del(separator, tag4.len() - separator);
+				}
+
+				// prepare locations where we have to load from: list/parentname & list/clonename
+				astring tag1(swlist);
+				tag1.cat(PATH_SEPARATOR);
+				tag2.cpy(tag1.cat(tag4));
+				tag1.cpy(swlist);
+				tag1.cat(PATH_SEPARATOR);
+				tag3.cpy(tag1.cat(tag5));
+
+				if (tag5.chr(0, '%') != -1)
+					fatalerror("We do not support clones of clones!\n");
+
+				// try to load from the available location(s):
+				// - if we are not using lists, we have regiontag only;
+				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
+				// try to load from list/setname
+				if ((m_mame_file == NULL) && (tag2.cstr() != NULL))
+					filerr = common_process_file(device().machine().options(), tag2.cstr(), has_crc, crc, romp, &m_mame_file);
+				// try to load from list/parentname
+				if ((m_mame_file == NULL) && (tag3.cstr() != NULL))
+					filerr = common_process_file(device().machine().options(), tag3.cstr(), has_crc, crc, romp, &m_mame_file);
+				// try to load from setname
+				if ((m_mame_file == NULL) && (tag4.cstr() != NULL))
+					filerr = common_process_file(device().machine().options(), tag4.cstr(), has_crc, crc, romp, &m_mame_file);
+				// try to load from parentname
+				if ((m_mame_file == NULL) && (tag5.cstr() != NULL))
+					filerr = common_process_file(device().machine().options(), tag5.cstr(), has_crc, crc, romp, &m_mame_file);
+
+				if (filerr == FILERR_NONE)
+				{
+					m_file = *m_mame_file;
+					retVal = TRUE;
+				}
+
+				break; // load first item for start
+			}
+			romp++;	/* something else; skip */
+		}
+	}
+	return retVal;
+}
+
+/*-------------------------------------------------
+    load_internal - core image loading
+-------------------------------------------------*/
+
+bool device_image_interface::load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args)
+{
+    UINT32 open_plan[4];
+    int i;
+	bool softload = FALSE;
+	m_from_swlist = FALSE;
+
+	// if the path contains no period, we are using softlists, so we won't create an image
+	astring pathstr(path);
+	bool filename_has_period = (pathstr.rchr(0, '.') != -1) ? TRUE : FALSE;
+
+    /* first unload the image */
+    unload();
+
+    /* clear any possible error messages */
+    clear_error();
+
+    /* we are now loading */
+    m_is_loading = TRUE;
+
+    /* record the filename */
+    m_err = set_image_filename(path);
+
+    if (m_err)
+        goto done;
+
+	/* Check if there's a software list defined for this device and use that if we're not creating an image */
+	if (!filename_has_period)
+	{
+		softload = load_software_part( this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name );
+		// if we had launched from softlist with a specified part, e.g. "shortname:part"
+		// we would have recorded the wrong name, so record it again based on software_info
+		if (m_software_info_ptr && m_software_info_ptr->shortname)
+			m_err = set_image_filename(m_software_info_ptr->shortname);
+
+		m_from_swlist = TRUE;
+	}
+
+	if (is_create || filename_has_period)
+	{
+		/* determine open plan */
+		determine_open_plan(is_create, open_plan);
+
+		/* attempt to open the file in various ways */
+		for (i = 0; !m_file && open_plan[i]; i++)
+		{
+			/* open the file */
+			m_err = load_image_by_path(open_plan[i], path);
+			if (m_err && (m_err != IMAGE_ERROR_FILENOTFOUND))
+				goto done;
+		}
+	}
+
+	/* Copy some image information when we have been loaded through a software list */
+	if ( m_software_info_ptr )
+	{
+		m_longname = m_software_info_ptr->longname;
+		m_manufacturer = m_software_info_ptr->publisher;
+		m_year = m_software_info_ptr->year;
+		//m_playable = m_software_info_ptr->supported;
+	}
+
+	/* did we fail to find the file? */
+	if (!is_loaded() && !softload)
+	{
+		m_err = IMAGE_ERROR_FILENOTFOUND;
+		goto done;
+	}
+
+	/* call device load or create */
+	m_create_format = create_format;
+	m_create_args = create_args;
+
+	if (m_init_phase==FALSE) {
+		m_err = (image_error_t)finish_load();
+		if (m_err)
+			goto done;
+	}
+    /* success! */
+
+done:
+    if (m_err!=0) {
+		if (!m_init_phase)
+		{
+			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
+				popmessage("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
+			else
+				mame_printf_error("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
+		}
+		clear();
+	}
+	else {
+		/* do we need to reset the CPU? only schedule it if load/create is successful */
+		if (device().machine().time() > attotime::zero && is_reset_on_load())
+			device().machine().schedule_hard_reset();
+		else
+		{
+			if (!m_init_phase)
+			{
+				if (device().machine().phase() == MACHINE_PHASE_RUNNING)
+					popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
+				else
+					mame_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");
+			}
+		}
+	}
+	return m_err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
+}
+
+
+
+/*-------------------------------------------------
+    load - load an image into MESS
+-------------------------------------------------*/
+
+bool device_image_interface::load(const char *path)
+{
+    return load_internal(path, FALSE, 0, NULL);
+}
+
+
+/*-------------------------------------------------
+    image_finish_load - special call - only use
+    from core
+-------------------------------------------------*/
+
+bool device_image_interface::finish_load()
+{
+    bool err = IMAGE_INIT_PASS;
+
+    if (m_is_loading)
+    {
+		image_checkhash();
+
+		if (m_from_swlist)
+			call_display_info();
+
+		if (has_been_created() )// && get_legacy_fct(DEVINFO_FCT_IMAGE_CREATE) != NULL)
+        {
+            err = call_create(m_create_format, m_create_args);
+            if (err)
+            {
+                if (!m_err)
+                    m_err = IMAGE_ERROR_UNSPECIFIED;
+            }
+        }
+        else
+        {
+            /* using device load */
+            err = call_load();
+            if (err)
+            {
+                if (!m_err)
+                    m_err = IMAGE_ERROR_UNSPECIFIED;
+            }
+        }
+    }
+    m_is_loading = FALSE;
+    m_create_format = 0;
+    m_create_args = NULL;
+	m_init_phase = FALSE;
+    return err;
+}
+
+/*-------------------------------------------------
+    create - create a image
+-------------------------------------------------*/
+
+bool device_image_interface::create(const char *path, const image_device_format *create_format, option_resolution *create_args)
+{
+    int format_index = (create_format != NULL) ? create_format->m_index : 0;
+    return load_internal(path, TRUE, format_index, create_args);
+}
+
+
+/*-------------------------------------------------
+    clear - clear all internal data pertaining
+    to an image
+-------------------------------------------------*/
+
+void device_image_interface::clear()
+{
+	if (m_mame_file)
+    {
+		global_free(m_mame_file);
+		m_mame_file = NULL;
+		m_file = NULL;
+	} else {
+		if (m_file)
+		{
+			core_fclose(m_file);
+			m_file = NULL;
+		}
+	}
+
+    m_image_name.reset();
+    m_readonly = false;
+    m_created = false;
+
+    m_longname.reset();
+    m_manufacturer.reset();
+    m_year.reset();
+	m_basename.reset();
+    m_basename_noext.reset();
+	m_filetype.reset();
+
+	m_full_software_name = NULL;
+	m_software_info_ptr = NULL;
+	m_software_part_ptr = NULL;
+}
+
+/*-------------------------------------------------
+    unload - main call to unload an image
+-------------------------------------------------*/
+
+void device_image_interface::unload()
+{
+	if (is_loaded()) {
+		call_unload();
+	}
+    clear();
+	clear_error();
+}

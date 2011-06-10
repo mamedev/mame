@@ -513,70 +513,33 @@ class legacy_image_device_base :	public legacy_device_base,
 									public device_image_interface
 {
 public:
-	virtual iodevice_t image_type()  const { return m_type; }
-	virtual const char *image_type_name()  const { return device_typename(m_type); }
-	virtual iodevice_t image_type_direct() const { return static_cast<iodevice_t>(get_legacy_int(DEVINFO_INT_IMAGE_TYPE)); }
-	virtual bool is_readable()  const { return m_readable; }
-	virtual bool is_writeable() const { return m_writeable; }
-	virtual bool is_creatable() const { return m_creatable; }
-	virtual bool must_be_loaded() const { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const { return m_reset_on_load; }
-	virtual bool has_partial_hash() const { return m_has_partial_hash; }
-	virtual const char *image_interface() const { return m_interface_name; }
-	virtual const char *file_extensions() const { return m_file_extensions; }
-	virtual const char *instance_name() const { return m_instance_name; }
-	virtual const char *brief_instance_name() const { return m_brief_instance_name; }
-	virtual bool uses_file_extension(const char *file_extension) const;
-	virtual const option_guide *create_option_guide() const { return m_create_option_guide; }
-    virtual image_device_format *formatlist() const { return m_formatlist; }
-	virtual device_image_partialhash_func get_partial_hash() const;
-
-	virtual bool load(const char *path);
-	virtual bool finish_load();
-	virtual void unload();
-	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
-	virtual bool load_software(char *swlist, char *swname, rom_entry *entry);
-
-	virtual int call_load();
+	virtual bool call_load();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
-	virtual int call_create(int format_type, option_resolution *format_options);
+	virtual bool call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display();
 	virtual void call_display_info();
-	virtual device_image_partialhash_func get_partial_hash();
+	virtual device_image_partialhash_func get_partial_hash() const;
 	virtual void call_get_devices();
 	virtual void *get_device_specific_call();
+
+	virtual iodevice_t image_type() const { return static_cast<iodevice_t>(get_legacy_int(DEVINFO_INT_IMAGE_TYPE)); }	
+	
+	virtual bool is_readable()  const { return get_legacy_int(DEVINFO_INT_IMAGE_READABLE)!=0; }
+	virtual bool is_writeable() const { return get_legacy_int(DEVINFO_INT_IMAGE_WRITEABLE)!=0; }
+	virtual bool is_creatable() const { return get_legacy_int(DEVINFO_INT_IMAGE_CREATABLE)!=0; }
+	virtual bool must_be_loaded() const { return get_legacy_int(DEVINFO_INT_IMAGE_MUST_BE_LOADED)!=0; }
+	virtual bool is_reset_on_load() const { return get_legacy_int(DEVINFO_INT_IMAGE_RESET_ON_LOAD)!=0; }
+	virtual const char *image_interface() const { return get_legacy_string(DEVINFO_STR_IMAGE_INTERFACE); }
+	virtual const char *file_extensions() const { return get_legacy_string(DEVINFO_STR_IMAGE_FILE_EXTENSIONS); }
+	virtual const option_guide *create_option_guide() const { return reinterpret_cast<const option_guide *>(get_legacy_ptr(DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE)); }
 protected:
 	// device overrides
 	virtual void device_config_complete();
 
-    iodevice_t   m_type;
-	bool m_readable;
-	bool m_writeable;
-	bool m_creatable;
-	bool m_must_be_loaded;
-    bool m_reset_on_load;
-    bool m_has_partial_hash;
-    astring m_file_extensions;
-    astring m_instance_name;
-    astring m_brief_instance_name;
-	astring m_interface_name;
-
-    /* creation info */
-    const option_guide *m_create_option_guide;
-    image_device_format *m_formatlist;
-
 	// construction/destruction
 	legacy_image_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
 	~legacy_image_device_base();
-	// device_image_interface overrides
-	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
-	void determine_open_plan(int is_create, UINT32 *open_plan);
-	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
-	void clear();
-	bool is_loaded();
-
-	bool m_is_loading;
 };
 
 

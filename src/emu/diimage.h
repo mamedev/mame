@@ -158,51 +158,36 @@ public:
 	device_image_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_image_interface();
 
-	virtual iodevice_t image_type()  const = 0;
-	virtual const char *image_type_name()  const = 0;
-	virtual iodevice_t image_type_direct() const = 0;
-	virtual bool is_readable()  const = 0;
-	virtual bool is_writeable() const = 0;
-	virtual bool is_creatable() const = 0;
-	virtual bool must_be_loaded() const = 0;
-	virtual bool is_reset_on_load() const = 0;
-	virtual bool has_partial_hash() const = 0;
-	virtual const char *image_interface() const = 0;
-	virtual const char *file_extensions() const = 0;
-	virtual const char *instance_name() const = 0;
-	virtual const char *brief_instance_name() const = 0;
-	virtual bool uses_file_extension(const char *file_extension) const = 0;
-	virtual const option_guide *create_option_guide() const = 0;
-	virtual image_device_format *formatlist() const = 0;
-
 	static const char *device_typename(iodevice_t type);
 	static const char *device_brieftypename(iodevice_t type);
 	static iodevice_t device_typeid(const char *name);
 
-	virtual device_image_partialhash_func get_partial_hash() const = 0;
 	virtual void device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
-	virtual bool load(const char *path) = 0;
-	virtual bool finish_load() = 0;
-	virtual void unload() = 0;
-	virtual bool load_software(char *swlist, char *swname, rom_entry *entry) = 0;
-
-	virtual int call_load() = 0;
+	virtual bool call_load() = 0;
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) = 0;
-	virtual int call_create(int format_type, option_resolution *format_options) = 0;
+	virtual bool call_create(int format_type, option_resolution *format_options) = 0;
 	virtual void call_unload() = 0;
 	virtual void call_display() = 0;
 	virtual void call_display_info() = 0;
 	virtual void call_get_devices() = 0;
 	virtual void *get_device_specific_call() = 0;
-
-	virtual const image_device_format *device_get_indexed_creatable_format(int index);
-	virtual const image_device_format *device_get_named_creatable_format(const char *format_name);
+	virtual device_image_partialhash_func get_partial_hash() const = 0;
+	virtual iodevice_t image_type()  const = 0;
+	virtual bool is_readable()  const = 0;
+	virtual bool is_writeable() const = 0;
+	virtual bool is_creatable() const = 0;
+	virtual bool must_be_loaded() const = 0;
+	virtual bool is_reset_on_load() const = 0;
+	virtual const char *image_interface() const = 0;
+	virtual const char *file_extensions() const = 0;
+	virtual const option_guide *create_option_guide() const = 0;
+	
+	const image_device_format *device_get_indexed_creatable_format(int index);
+	const image_device_format *device_get_named_creatable_format(const char *format_name);
 	const option_guide *device_get_creation_option_guide() { return create_option_guide(); }
 	const image_device_format *device_get_creatable_formats() { return formatlist(); }
-
-	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args) = 0;
-
+	
 	const char *error();
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...);
@@ -236,8 +221,8 @@ public:
 	const software_info *software_entry() { return m_software_info_ptr; }
 	const software_part *part_entry() { return m_software_part_ptr; }
 
-	virtual void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
-	virtual const char * working_directory();
+	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
+	const char * working_directory();
 
 	UINT8 *get_software_region(const char *tag);
 	UINT32 get_software_region_length(const char *tag);
@@ -248,7 +233,28 @@ public:
 
 	void battery_load(void *buffer, int length, int fill);
 	void battery_save(const void *buffer, int length);
+	
+	const char *image_type_name()  const { return device_typename(image_type()); }
+
+
+    
+	const char *instance_name() const { return m_instance_name; }
+	const char *brief_instance_name() const { return m_brief_instance_name; }
+	bool uses_file_extension(const char *file_extension) const;
+	image_device_format *formatlist() const { return m_formatlist; }
+
+	bool load(const char *path);
+	bool finish_load();
+	void unload();
+	bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
+	bool load_software(char *swlist, char *swname, rom_entry *entry);	
 protected:
+	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
+	void determine_open_plan(int is_create, UINT32 *open_plan);
+	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
+	void clear();
+	bool is_loaded();
+
 	image_error_t set_image_filename(const char *filename);
 
 	void clear_error();
@@ -304,6 +310,14 @@ protected:
     option_resolution *m_create_args;
 
 	hash_collection m_hash;
+	
+	astring m_brief_instance_name;
+	astring m_instance_name;
+	
+    /* creation info */
+    image_device_format *m_formatlist;	
+
+	bool m_is_loading;
 };
 
 
