@@ -2298,13 +2298,13 @@ static void PREFIX86(_les_dw)(i8086_state *cpustate)    /* Opcode 0xc4 */
 	unsigned ModRM = FETCH;
     WORD tmp = GetRMWord(ModRM);
 
-    RegWord(ModRM)= tmp;
 #ifdef I80286
 	i80286_data_descriptor(cpustate,ES,GetnextRMWord);
 #else
 	cpustate->sregs[ES] = GetnextRMWord;
 	cpustate->base[ES] = SegBase(ES);
 #endif
+	RegWord(ModRM)= tmp;
 	ICOUNT -= timing.load_ptr;
 }
 
@@ -2313,13 +2313,13 @@ static void PREFIX86(_lds_dw)(i8086_state *cpustate)    /* Opcode 0xc5 */
 	unsigned ModRM = FETCH;
     WORD tmp = GetRMWord(ModRM);
 
-    RegWord(ModRM)=tmp;
 #ifdef I80286
 	i80286_data_descriptor(cpustate,DS,GetnextRMWord);
 #else
 	cpustate->sregs[DS] = GetnextRMWord;
 	cpustate->base[DS] = SegBase(DS);
 #endif
+	RegWord(ModRM)=tmp;
 	ICOUNT -= timing.load_ptr;
 }
 
