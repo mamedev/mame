@@ -267,10 +267,6 @@ static READ16_HANDLER( polepos2_ic25_r )
 }
 
 
-
-
-
-
 static READ8_HANDLER( polepos_adc_r )
 {
 	polepos_state *state = space->machine().driver_data<polepos_state>();
@@ -454,6 +450,25 @@ static const namco_53xx_interface namco_53xx_intf =
 	},
 	DEVCB_NULL								/* P port (connected to test socket) */
 };
+
+
+static TIMER_DEVICE_CALLBACK( polepos_scanline )
+{
+	int scanline = param;
+	running_machine &machine = timer.machine();
+
+	// irq0_line_assert() checks if irq is enabled - IMPORTANT!
+	// so don't replace with cputag_set_input_line()
+
+	if ((scanline == 64) || (scanline == 192))	// 64V
+		irq0_line_assert(machine.device("maincpu"));
+
+	if (scanline == 240)	// VBLANK
+	{
+		irq0_line_assert(machine.device("sub"));
+		irq0_line_assert(machine.device("sub2"));
+	}
+}
 
 
 static MACHINE_RESET( polepos )
@@ -869,15 +884,12 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 	MCFG_CPU_IO_MAP(z80_io)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert,2*60)	/* 64V */
 
 	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z8002_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MCFG_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z8002_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2, namco_51xx_intf)		/* 1.536 MHz */
 	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2, namco_52xx_intf)		/* 1.536 MHz */
@@ -893,17 +905,13 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_MACHINE_RESET(polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	MCFG_TIMER_ADD_SCANLINE("scantimer", polepos_scanline, "screen", 0, 1)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((double)MASTER_CLOCK/4/384/264)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
 	MCFG_SCREEN_UPDATE(polepos)
-
-	/* should be correct, but makes polepos2 and clones fail to boot */
-//  MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
 
 	MCFG_GFXDECODE(polepos)
 	MCFG_PALETTE_LENGTH(0x0f00)
@@ -955,15 +963,12 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 	MCFG_CPU_IO_MAP(z80_io)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert,2*60)	/* 64V */
 
 	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z8002_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MCFG_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z8002_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* todo, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.. */
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2, namco_51xx_bl_intf)		/* 1.536 MHz */
@@ -976,13 +981,12 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_MACHINE_RESET(polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	MCFG_TIMER_ADD_SCANLINE("scantimer", polepos_scanline, "screen", 0, 1)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((double)MASTER_CLOCK/4/384/264)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
 	MCFG_SCREEN_UPDATE(polepos)
 
 	MCFG_GFXDECODE(polepos)
