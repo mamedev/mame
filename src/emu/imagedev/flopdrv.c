@@ -639,6 +639,9 @@ static int internal_floppy_device_load(device_image_interface *image, int create
 			floppy_get_tracks_per_disk(flopimg->floppy),
 			floppy_get_heads_per_disk(flopimg->floppy));
 	}
+	/* disk changed */
+	flopimg->dskchg = CLEAR_LINE;
+	
 	return IMAGE_INIT_PASS;
 
 error:
