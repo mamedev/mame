@@ -2578,6 +2578,9 @@ VBLANK-IN is used at the end of the vblank period.
 
 SCU register[36] is the timer zero compare register.
 SCU register[40] is for IRQ masking.
+
+TODO:
+- VDP1 timing and CEF emulation isn't accurate at all.
 */
 
 
@@ -2598,9 +2601,17 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	//popmessage("%08x %d %08x %08x",state->m_scu_regs[40] ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
 
 	if(scanline == 0*y_step)
+	{
 		device_set_input_line_and_vector(state->m_maincpu, 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
+		//CEF_0; //TODO
+	}
 	else if(scanline == vblank_line*y_step)
+	{
 		device_set_input_line_and_vector(state->m_maincpu, 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40);
+		if(stv_irq.vdp1_end)
+			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
+		CEF_1;
+	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42);
 
@@ -2611,8 +2622,6 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 );
 
-	if(scanline == 64) //TODO: emulate the timing of this
-		device_set_input_line_and_vector(state->m_maincpu, 0x2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d);
 }
 
 static READ32_HANDLER( saturn_cart_dram0_r )

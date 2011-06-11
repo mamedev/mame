@@ -154,8 +154,6 @@ struct shaded_point
 #define STV_VDP1_EDSR ((state->m_vdp1_regs[0x010/4] >> 16)&0x0000ffff)
 #define STV_VDP1_CEF  (STV_VDP1_EDSR & 2)
 #define STV_VDP1_BEF  (STV_VDP1_EDSR & 1)
-#define CEF_1	state->m_vdp1_regs[0x010/4]|=0x00020000
-#define CEF_0   state->m_vdp1_regs[0x010/4]&=~0x00020000
 /**/
 
 
@@ -347,6 +345,7 @@ WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w )
 	if ( STV_VDP1_TVM & 1 )
 	{
 		/* 8-bit mode */
+		printf("%08x %02x\n",offset,data);
 	}
 	else
 	{
@@ -370,6 +369,7 @@ READ32_HANDLER ( saturn_vdp1_framebuffer0_r )
 	if ( STV_VDP1_TVM & 1 )
 	{
 		/* 8-bit mode */
+		printf("%08x\n",offset);
 	}
 	else
 	{
@@ -1768,7 +1768,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 	stv_clear_gouraud_shading();
 
 	/*Set CEF bit to 0*/
-	CEF_0;
+	//CEF_0;
 
 	while (spritecount<10000) // if its drawn this many sprites something is probably wrong or sega were crazy ;-)
 	{
@@ -1978,7 +1978,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 
 	end:
 	/*set CEF to 1*/
-	CEF_1;
+	//CEF_1;
 
 	/* not here! this is done every frame drawn even if the cpu isn't running eg in the debugger */
 //  if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
