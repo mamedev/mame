@@ -145,7 +145,9 @@ static int i80286_verify(i80286_state *cpustate, UINT16 selector, i80286_operati
 
 static void i80286_pop_seg(i80286_state *cpustate, int reg)
 {
-	UINT16 sel = ReadWord(cpustate->base[SS]+cpustate->regs.w[SP]);
+	UINT16 sel;
+	if(PM) i80286_check_permission(cpustate, SS, cpustate->regs.w[SP], I80286_WORD, I80286_READ);
+	sel = ReadWord(cpustate->base[SS]+cpustate->regs.w[SP]);
 	i80286_data_descriptor(cpustate, reg, sel);
 	cpustate->regs.w[SP] += 2;
 }
@@ -437,7 +439,8 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 		break;
 	case INTGATE:
 	case TRAPGATE:
-		if ((addr = i80286_selector_address(cpustate,gatesel)) == -1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
+		if ((addr = i80286_selector_address(cpustate,gatesel)) == -1)
+			throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
 		gatedesc[0] = ReadWord(addr);
 		gatedesc[1] = ReadWord(addr+2);
 		gatedesc[2] = ReadWord(addr+4);
@@ -712,7 +715,7 @@ static void PREFIX286(_arpl)(i8086_state *cpustate) /* 0x63 */
 static void i80286_load_flags(i8086_state *cpustate, UINT16 flags, int cpl)
 {
 	if(PM && cpl) {
-		UINT16 mask = 0xf000;
+		UINT16 mask = 0x3000;
 		if(cpl>IOPL) mask |= 0x200;
 		flags &= ~mask;
 		flags |= (cpustate->flags & mask);
@@ -747,6 +750,7 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 	}
 
 	// must be restartable
+	if(PM) i80286_check_permission(cpustate, SS, cpustate->regs.w[SP], (iret?6:4), I80286_READ);
 	spaddr = (cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK;
 	off = ReadWord(spaddr);
 	sel = ReadWord(spaddr+2);
@@ -843,7 +847,7 @@ static void PREFIX286(_escape_7)(i8086_state *cpustate)    /* Opcode 0xdf */
 	if (ModRM == 0xe0) cpustate->regs.w[AX] = 0xffff;  // FPU not present
 }
 
-static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT16 offset, i80286_size size, i80286_operation operation)
+static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT32 offset, int size, i80286_operation operation)
 {
 	int trap = 0;
 	UINT8 rights;
@@ -851,9 +855,10 @@ static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT
 		rights = cpustate->rights[check_seg];
 		trap = i80286_verify(cpustate, cpustate->sregs[check_seg], operation, rights);
 		if ((CODE(rights) || !EXPDOWN(rights)) && ((offset+size-1) > cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
-		if (!CODE(rights) && EXPDOWN(rights) && (offset < cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
+		if (!CODE(rights) && EXPDOWN(rights) && (offset <= cpustate->limit[check_seg]) && ((offset+size) > 0xffff)) trap = GENERAL_PROTECTION_FAULT;
 
-		if (trap) throw TRAP(trap, IDXTBL(cpustate->sregs[check_seg]));
+		if ((trap == GENERAL_PROTECTION_FAULT) && (check_seg == SS)) trap = STACK_FAULT;
+		if (trap) throw TRAP(trap, 0);
 	}
 }
 

@@ -39,4 +39,4 @@ enum i80286_operation
 	I80286_EXECUTE
 };
 
-static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT16 offset, i80286_size size, i80286_operation operation);
+static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT32 offset, int size, i80286_operation operation);

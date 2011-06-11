@@ -117,9 +117,13 @@ typedef enum {
 #define PEEKOP(addr)			(cpustate->direct->read_decrypted_byte(addr, cpustate->fetch_xor))
 #define FETCHWORD(var)			{ var = cpustate->direct->read_raw_byte(cpustate->pc, cpustate->fetch_xor); var += (cpustate->direct->read_raw_byte(cpustate->pc + 1, cpustate->fetch_xor) << 8); cpustate->pc += 2; }
 #define CHANGE_PC(addr)
+#ifdef I80286
+#define PUSH(val)				{ if(PM) i80286_check_permission(cpustate, SS, cpustate->regs.w[SP]-2, I80286_WORD, I80286_WRITE); cpustate->regs.w[SP] -= 2; WriteWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK), val); }
+#define POP(var)				{ if(PM) i80286_check_permission(cpustate, SS, cpustate->regs.w[SP], I80286_WORD, I80286_READ); cpustate->regs.w[SP] += 2; var = ReadWord(((cpustate->base[SS] + ((cpustate->regs.w[SP]-2) & 0xffff)) & AMASK)); }
+#else
 #define PUSH(val)				{ cpustate->regs.w[SP] -= 2; WriteWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK), val); }
 #define POP(var)				{ cpustate->regs.w[SP] += 2; var = ReadWord(((cpustate->base[SS] + ((cpustate->regs.w[SP]-2) & 0xffff)) & AMASK)); }
-
+#endif
 /************************************************************************/
 #ifdef I80286
 #define IOPL ((cpustate->flags&0x3000)>>12)

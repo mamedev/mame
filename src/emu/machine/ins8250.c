@@ -449,7 +449,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 				}
 			}
 #endif
-			ins8250->lsr |= 0x20; /* set THRE */
+			ins8250->lsr |= 0x60; /* set THRE */
 			data = ins8250->lsr;
 			if( ins8250->lsr & 0x1f )
 			{
