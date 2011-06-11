@@ -638,7 +638,7 @@ static void d3d_effect_set_technique(d3d_effect *effect, const char *name)
 }
 
 
-static void d3d_effect_set_vector(d3d_effect *effect, const char *name, d3d_vector *vector)
+static void d3d_effect_set_vector(d3d_effect *effect, const char *name, int count, float *vector)
 {
 	assert(FALSE);
 }

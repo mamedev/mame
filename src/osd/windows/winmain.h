@@ -93,8 +93,6 @@
 #define WINOPTION_SHADOW_MASK_USIZE			"shadow_mask_usize"
 #define WINOPTION_SHADOW_MASK_VSIZE			"shadow_mask_vsize"
 #define WINOPTION_PINCUSHION				"pincushion"
-#define WINOPTION_SCREEN_SCALE_TOP			"screen_scale_top"
-#define WINOPTION_SCREEN_SCALE_BOTTOM		"screen_scale_bottom"
 #define WINOPTION_CURVATURE					"curvature"
 #define WINOPTION_SCANLINE_AMOUNT			"scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE			"scanline_size"
@@ -102,44 +100,19 @@
 #define WINOPTION_SCANLINE_BRIGHT_SCALE 	"scanline_bright_scale"
 #define WINOPTION_SCANLINE_BRIGHT_OFFSET	"scanline_bright_offset"
 #define WINOPTION_SCANLINE_OFFSET			"scanline_jitter"
-#define WINOPTION_DEFOCUS_X					"defocus_x"
-#define WINOPTION_DEFOCUS_Y					"defocus_y"
-#define WINOPTION_RED_CONVERGE_X			"red_converge_x"
-#define WINOPTION_RED_CONVERGE_Y			"red_converge_y"
-#define WINOPTION_GREEN_CONVERGE_X			"green_converge_x"
-#define WINOPTION_GREEN_CONVERGE_Y			"green_converge_y"
-#define WINOPTION_BLUE_CONVERGE_X			"blue_converge_x"
-#define WINOPTION_BLUE_CONVERGE_Y			"blue_converge_y"
-#define WINOPTION_RED_RADIAL_CONVERGE_X		"red_radial_converge_x"
-#define WINOPTION_RED_RADIAL_CONVERGE_Y		"red_radial_converge_y"
-#define WINOPTION_GREEN_RADIAL_CONVERGE_X	"green_radial_converge_x"
-#define WINOPTION_GREEN_RADIAL_CONVERGE_Y	"green_radial_converge_y"
-#define WINOPTION_BLUE_RADIAL_CONVERGE_X	"blue_radial_converge_x"
-#define WINOPTION_BLUE_RADIAL_CONVERGE_Y	"blue_radial_converge_y"
-#define WINOPTION_RED_MATRIX_R				"red_from_r"
-#define WINOPTION_RED_MATRIX_G				"red_from_g"
-#define WINOPTION_RED_MATRIX_B				"red_from_b"
-#define WINOPTION_GREEN_MATRIX_R			"green_from_r"
-#define WINOPTION_GREEN_MATRIX_G			"green_from_g"
-#define WINOPTION_GREEN_MATRIX_B			"green_from_b"
-#define WINOPTION_BLUE_MATRIX_R				"blue_from_r"
-#define WINOPTION_BLUE_MATRIX_G				"blue_from_g"
-#define WINOPTION_BLUE_MATRIX_B				"blue_from_b"
-#define WINOPTION_RED_OFFSET				"red_offset"
-#define WINOPTION_GREEN_OFFSET				"green_offset"
-#define WINOPTION_BLUE_OFFSET				"blue_offset"
-#define WINOPTION_RED_SCALE					"red_scale"
-#define WINOPTION_GREEN_SCALE				"green_scale"
-#define WINOPTION_BLUE_SCALE				"blue_scale"
-#define WINOPTION_RED_POWER					"red_power"
-#define WINOPTION_GREEN_POWER				"green_power"
-#define WINOPTION_BLUE_POWER				"blue_power"
-#define WINOPTION_RED_FLOOR					"red_floor"
-#define WINOPTION_GREEN_FLOOR				"green_floor"
-#define WINOPTION_BLUE_FLOOR				"blue_floor"
-#define WINOPTION_RED_PHOSPHOR				"red_phosphor_life"
-#define WINOPTION_GREEN_PHOSPHOR			"green_phosphor_life"
-#define WINOPTION_BLUE_PHOSPHOR				"blue_phosphor_life"
+#define WINOPTION_DEFOCUS					"defocus"
+#define WINOPTION_CONVERGE_X				"converge_x"
+#define WINOPTION_CONVERGE_Y				"converge_y"
+#define WINOPTION_RADIAL_CONVERGE_X			"radial_converge_x"
+#define WINOPTION_RADIAL_CONVERGE_Y			"radial_converge_y"
+#define WINOPTION_RED_RATIO					"red_ratio"
+#define WINOPTION_GRN_RATIO					"grn_ratio"
+#define WINOPTION_BLU_RATIO					"blu_ratio"
+#define WINOPTION_OFFSET					"offset"
+#define WINOPTION_SCALE						"scale"
+#define WINOPTION_POWER						"power"
+#define WINOPTION_FLOOR						"floor"
+#define WINOPTION_PHOSPHOR					"phosphor_life"
 #define WINOPTION_SATURATION				"saturation"
 #define WINOPTION_YIQ_ENABLE				"yiq_enable"
 #define WINOPTION_YIQ_CCVALUE				"yiq_cc"
@@ -237,32 +210,15 @@ public:
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
 	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
 	float screen_pincushion() const { return float_value(WINOPTION_PINCUSHION); }
-	float screen_scale_top() const { return float_value(WINOPTION_SCREEN_SCALE_TOP); }
-	float screen_scale_bottom() const { return float_value(WINOPTION_SCREEN_SCALE_BOTTOM); }
 	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
-	float screen_defocus_x() const { return float_value(WINOPTION_DEFOCUS_X); }
-	float screen_defocus_y() const { return float_value(WINOPTION_DEFOCUS_Y); }
-	float screen_red_converge_x() const { return float_value(WINOPTION_RED_CONVERGE_X); }
-	float screen_red_converge_y() const { return float_value(WINOPTION_RED_CONVERGE_Y); }
-	float screen_green_converge_x() const { return float_value(WINOPTION_GREEN_CONVERGE_X); }
-	float screen_green_converge_y() const { return float_value(WINOPTION_GREEN_CONVERGE_Y); }
-	float screen_blue_converge_x() const { return float_value(WINOPTION_BLUE_CONVERGE_X); }
-	float screen_blue_converge_y() const { return float_value(WINOPTION_BLUE_CONVERGE_Y); }
-	float screen_red_radial_converge_x() const { return float_value(WINOPTION_RED_RADIAL_CONVERGE_X); }
-	float screen_red_radial_converge_y() const { return float_value(WINOPTION_RED_RADIAL_CONVERGE_Y); }
-	float screen_green_radial_converge_x() const { return float_value(WINOPTION_GREEN_RADIAL_CONVERGE_X); }
-	float screen_green_radial_converge_y() const { return float_value(WINOPTION_GREEN_RADIAL_CONVERGE_Y); }
-	float screen_blue_radial_converge_x() const { return float_value(WINOPTION_BLUE_RADIAL_CONVERGE_X); }
-	float screen_blue_radial_converge_y() const { return float_value(WINOPTION_BLUE_RADIAL_CONVERGE_Y); }
-	float screen_red_from_red() const { return float_value(WINOPTION_RED_MATRIX_R); }
-	float screen_red_from_green() const { return float_value(WINOPTION_RED_MATRIX_G); }
-	float screen_red_from_blue() const { return float_value(WINOPTION_RED_MATRIX_B); }
-	float screen_green_from_red() const { return float_value(WINOPTION_GREEN_MATRIX_R); }
-	float screen_green_from_green() const { return float_value(WINOPTION_GREEN_MATRIX_G); }
-	float screen_green_from_blue() const { return float_value(WINOPTION_GREEN_MATRIX_B); }
-	float screen_blue_from_red() const { return float_value(WINOPTION_BLUE_MATRIX_R); }
-	float screen_blue_from_green() const { return float_value(WINOPTION_BLUE_MATRIX_G); }
-	float screen_blue_from_blue() const { return float_value(WINOPTION_BLUE_MATRIX_B); }
+	const char *screen_defocus() const { return value(WINOPTION_DEFOCUS); }
+	const char *screen_converge_x() const { return value(WINOPTION_CONVERGE_X); }
+	const char *screen_converge_y() const { return value(WINOPTION_CONVERGE_Y); }
+	const char *screen_radial_converge_x() const { return value(WINOPTION_RADIAL_CONVERGE_X); }
+	const char *screen_radial_converge_y() const { return value(WINOPTION_RADIAL_CONVERGE_Y); }
+	const char *screen_red_ratio() const { return value(WINOPTION_RED_RATIO); }
+	const char *screen_grn_ratio() const { return value(WINOPTION_GRN_RATIO); }
+	const char *screen_blu_ratio() const { return value(WINOPTION_BLU_RATIO); }
 	bool screen_yiq_enable() const { return bool_value(WINOPTION_YIQ_ENABLE); }
 	float screen_yiq_cc() const { return float_value(WINOPTION_YIQ_CCVALUE); }
 	float screen_yiq_a() const { return float_value(WINOPTION_YIQ_AVALUE); }
@@ -275,22 +231,12 @@ public:
 	float screen_yiq_q() const { return float_value(WINOPTION_YIQ_QVALUE); }
 	float screen_yiq_scan_time() const { return float_value(WINOPTION_YIQ_SCAN_TIME); }
 	int screen_yiq_phase_count() const { return int_value(WINOPTION_YIQ_PHASE_COUNT); }
-	float screen_red_offset() const { return float_value(WINOPTION_RED_OFFSET); }
-	float screen_green_offset() const { return float_value(WINOPTION_GREEN_OFFSET); }
-	float screen_blue_offset() const { return float_value(WINOPTION_BLUE_OFFSET); }
-	float screen_red_scale() const { return float_value(WINOPTION_RED_SCALE); }
-	float screen_green_scale() const { return float_value(WINOPTION_GREEN_SCALE); }
-	float screen_blue_scale() const { return float_value(WINOPTION_BLUE_SCALE); }
-	float screen_red_power() const { return float_value(WINOPTION_RED_POWER); }
-	float screen_green_power() const { return float_value(WINOPTION_GREEN_POWER); }
-	float screen_blue_power() const { return float_value(WINOPTION_BLUE_POWER); }
-	float screen_red_floor() const { return float_value(WINOPTION_RED_FLOOR); }
-	float screen_green_floor() const { return float_value(WINOPTION_GREEN_FLOOR); }
-	float screen_blue_floor() const { return float_value(WINOPTION_BLUE_FLOOR); }
+	const char *screen_offset() const { return value(WINOPTION_OFFSET); }
+	const char *screen_scale() const { return value(WINOPTION_SCALE); }
+	const char *screen_power() const { return value(WINOPTION_POWER); }
+	const char *screen_floor() const { return value(WINOPTION_FLOOR); }
+	const char *screen_phosphor() const { return value(WINOPTION_PHOSPHOR); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
-	float screen_red_phosphor() const { return float_value(WINOPTION_RED_PHOSPHOR); }
-	float screen_green_phosphor() const { return float_value(WINOPTION_GREEN_PHOSPHOR); }
-	float screen_blue_phosphor() const { return float_value(WINOPTION_BLUE_PHOSPHOR); }
 
 	// per-window options
 	const char *screen() const { return value(WINOPTION_SCREEN); }

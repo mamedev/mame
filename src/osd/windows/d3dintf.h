@@ -258,7 +258,7 @@ struct _d3d_effect_interface
 	void     (*begin_pass)(d3d_effect *effect, UINT pass);
 	void     (*end_pass)(d3d_effect *effect);
 	void     (*set_technique)(d3d_effect *effect, const char *name);
-	void     (*set_vector)(d3d_effect *effect, const char *name, d3d_vector *vector);
+	void     (*set_vector)(d3d_effect *effect, const char *name, int count, float *vector);
 	void     (*set_float)(d3d_effect *effect, const char *name, float value);
 	void     (*set_int)(d3d_effect *effect, const char *name, int value);
 	void     (*set_matrix)(d3d_effect *effect, const char *name, d3d_matrix *matrix);

@@ -604,7 +604,7 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 	// loop over primitives
 	if(d3d->hlsl->enabled())
 	{
-		d3d->hlsl_buf = (void*)primitive_alloc(d3d, 4);
+		d3d->hlsl_buf = (void*)primitive_alloc(d3d, 6);
 		d3d->hlsl->init_fsfx_quad(d3d->hlsl_buf);
 	}
 
@@ -1655,7 +1655,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 	// first remember the original render target in case we need to set a new one
 	if(d3d->hlsl->enabled() && d3dintf->post_fx_available)
 	{
-		vertnum = 4;
+		vertnum = 6;
 	}
 	else
 	{

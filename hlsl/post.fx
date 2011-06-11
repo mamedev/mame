@@ -112,16 +112,8 @@ uniform float ShadowV = 0.375f;
 uniform float ShadowWidth = 8.0f;
 uniform float ShadowHeight = 8.0f;
 
-uniform float RedFloor = 0.0f;
-uniform float GrnFloor = 0.0f;
-uniform float BluFloor = 0.0f;
-
-uniform float SnapX = 0.0f;
-uniform float SnapY = 0.0f;
-
-uniform float RedPower = 2.2f;
-uniform float GrnPower = 2.2f;
-uniform float BluPower = 2.2f;
+uniform float3 Power = float3(1.0f, 1.0f, 1.0f);
+uniform float3 Floor = float3(0.0f, 0.0f, 0.0f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
@@ -173,7 +165,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 Scanned = BaseTexel.rgb * ScanBrightness;
 
 	// -- Color Compression (increasing the floor of the signal without affecting the ceiling) --
-	Scanned = float3(RedFloor + (1.0f - RedFloor) * Scanned.r, GrnFloor + (1.0f - GrnFloor) * Scanned.g, BluFloor + (1.0f - BluFloor) * Scanned.b);
+	Scanned = Floor + (1.0f - Floor) * Scanned;
 
 	float2 ShadowDims = float2(ShadowWidth, ShadowHeight);
 	float2 ShadowUV = float2(ShadowU, ShadowV);
@@ -185,9 +177,9 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// -- Final Pixel --
 	float4 Output = float4(Scanned * lerp(1.0f, ShadowTexel, ShadowBrightness), BaseTexel.a) * Input.Color;
 	
-	Output.r = pow(Output.r, RedPower);
-	Output.g = pow(Output.g, GrnPower);
-	Output.b = pow(Output.b, BluPower);
+	Output.r = pow(Output.r, Power.r);
+	Output.g = pow(Output.g, Power.g);
+	Output.b = pow(Output.b, Power.b);
 
 	return Output;
 }

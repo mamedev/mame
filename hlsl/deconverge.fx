@@ -23,10 +23,9 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	float2 RedCoord : TEXCOORD0;
-	float2 GrnCoord : TEXCOORD1;
-	float2 BluCoord : TEXCOORD2;
-	float2 TexCoord : TEXCOORD3;
+	float3 CoordX : TEXCOORD0;
+	float3 CoordY : TEXCOORD1;
+	float2 TexCoord : TEXCOORD2;
 };
 
 struct VS_INPUT
@@ -39,22 +38,17 @@ struct VS_INPUT
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	float2 RedCoord : TEXCOORD0;
-	float2 GrnCoord : TEXCOORD1;
-	float2 BluCoord : TEXCOORD2;
-	float2 TexCoord : TEXCOORD3;
+	float3 CoordX : TEXCOORD0;
+	float3 CoordY : TEXCOORD1;
+	float2 TexCoord : TEXCOORD2;
 };
 
 //-----------------------------------------------------------------------------
 // Deconvergence Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float RedConvergeX;
-uniform float RedConvergeY;
-uniform float GrnConvergeX;
-uniform float GrnConvergeY;
-uniform float BluConvergeX;
-uniform float BluConvergeY;
+uniform float3 ConvergeX = float3(0.0f, 0.0f, 0.0f);
+uniform float3 ConvergeY = float3(0.0f, 0.0f, 0.0f);
 
 uniform float TargetWidth;
 uniform float TargetHeight;
@@ -65,12 +59,8 @@ uniform float RawHeight;
 uniform float WidthRatio;
 uniform float HeightRatio;
 
-uniform float RedRadialConvergeX;
-uniform float RedRadialConvergeY;
-uniform float GrnRadialConvergeX;
-uniform float GrnRadialConvergeY;
-uniform float BluRadialConvergeX;
-uniform float BluRadialConvergeY;
+uniform float3 RadialConvergeX = float3(0.0f, 0.0f, 0.0f);
+uniform float3 RadialConvergeY = float3(0.0f, 0.0f, 0.0f);
 
 uniform float Prescale;
 
@@ -91,14 +81,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 	float2 TexCoord = Input.TexCoord;
 
-	Output.RedCoord.x = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + RedRadialConvergeX / RawWidth) + 0.5f) * Ratios.x + RedConvergeX * invDims.x;
-	Output.GrnCoord.x = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + GrnRadialConvergeX / RawWidth) + 0.5f) * Ratios.x + GrnConvergeX * invDims.x;
-	Output.BluCoord.x = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + BluRadialConvergeX / RawWidth) + 0.5f) * Ratios.x + BluConvergeX * invDims.x;
-	
-	Output.RedCoord.y = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + RedRadialConvergeY / RawHeight) + 0.5f) * Ratios.y + RedConvergeY * invDims.y;
-	Output.GrnCoord.y = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + GrnRadialConvergeY / RawHeight) + 0.5f) * Ratios.y + GrnConvergeY * invDims.y;
-	Output.BluCoord.y = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + BluRadialConvergeY / RawHeight) + 0.5f) * Ratios.y + BluConvergeY * invDims.y;
-
+	Output.CoordX = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + RadialConvergeX / RawWidth) + 0.5f) * Ratios.x + ConvergeX * invDims.x;
+	Output.CoordY = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + RadialConvergeY / RawHeight) + 0.5f) * Ratios.y + ConvergeY * invDims.y;
 	Output.TexCoord = TexCoord;	
 
 	return Output;
@@ -120,17 +104,15 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 TargetDims = float2(RawWidth, RawHeight);
 	float2 DimOffset = 0.0f / TargetDims;
 	float2 TexCoord = Input.TexCoord;
-	float2 RedCoord = Input.RedCoord;
-	float2 GrnCoord = Input.GrnCoord;
-	float2 BluCoord = Input.BluCoord;
+	float3 CoordX = Input.CoordX;
+	float3 CoordY = Input.CoordY;
 	
-	RedCoord = lerp(TexCoord, RedCoord, Deconverge);
-	GrnCoord = lerp(TexCoord, GrnCoord, Deconverge);
-	BluCoord = lerp(TexCoord, BluCoord, Deconverge);
+	CoordX = lerp(TexCoord.x, CoordX, Deconverge);
+	CoordY = lerp(TexCoord.y, CoordY, Deconverge);
 
-	float RedTexel = tex2D(DiffuseSampler, RedCoord - DimOffset).r;
-	float GrnTexel = tex2D(DiffuseSampler, GrnCoord - DimOffset).g;
-	float BluTexel = tex2D(DiffuseSampler, BluCoord - DimOffset).b;
+	float RedTexel = tex2D(DiffuseSampler, float2(CoordX.x, CoordY.x) - DimOffset).r;
+	float GrnTexel = tex2D(DiffuseSampler, float2(CoordX.y, CoordY.y) - DimOffset).g;
+	float BluTexel = tex2D(DiffuseSampler, float2(CoordX.z, CoordY.z) - DimOffset).b;
 	
 	//RedTexel *= Input.RedCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
 	//RedTexel *= Input.RedCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;

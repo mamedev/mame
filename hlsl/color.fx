@@ -76,28 +76,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Post-Processing Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform float RedFromRed = 1.0f;
-uniform float RedFromGrn = 0.0f;
-uniform float RedFromBlu = 0.0f;
-uniform float GrnFromRed = 0.0f;
-uniform float GrnFromGrn = 1.0f;
-uniform float GrnFromBlu = 0.0f;
-uniform float BluFromRed = 0.0f;
-uniform float BluFromGrn = 0.0f;
-uniform float BluFromBlu = 1.0f;
-
-uniform float RedOffset = 0.0f;
-uniform float GrnOffset = 0.0f;
-uniform float BluOffset = 0.0f;
-
-uniform float RedScale = 1.0f;
-uniform float GrnScale = 1.0f;
-uniform float BluScale = 1.0f;
-
-uniform float RedFloor = 0.0f;
-uniform float GrnFloor = 0.0f;
-uniform float BluFloor = 0.0f;
-
+uniform float3 RedRatios = float3(1.0f, 0.0f, 0.0f);
+uniform float3 GrnRatios = float3(0.0f, 1.0f, 0.0f);
+uniform float3 BluRatios = float3(0.0f, 0.0f, 1.0f);
+uniform float3 Offset = float3(0.0f, 0.0f, 0.0f);
+uniform float3 Scale = float3(1.0f, 1.0f, 1.0f);
 uniform float Saturation = 1.0f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
@@ -107,14 +90,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 OutRGB = BaseTexel.rgb;
 
 	// -- RGB Tint & Shift --
-	float ShiftedRed = dot(OutRGB, float3(RedFromRed, RedFromGrn, RedFromBlu));
-	float ShiftedGrn = dot(OutRGB, float3(GrnFromRed, GrnFromGrn, GrnFromBlu));
-	float ShiftedBlu = dot(OutRGB, float3(BluFromRed, BluFromGrn, BluFromBlu));
+	float ShiftedRed = dot(OutRGB, RedRatios);
+	float ShiftedGrn = dot(OutRGB, GrnRatios);
+	float ShiftedBlu = dot(OutRGB, BluRatios);
 	
 	// -- RGB Offset & Scale --
-	float3 RGBScale = float3(RedScale, GrnScale, BluScale);
-	float3 RGBShift = float3(RedOffset, GrnOffset, BluOffset);
-	float3 OutTexel = float3(ShiftedRed, ShiftedGrn, ShiftedBlu) * RGBScale + RGBShift;
+	float3 OutTexel = float3(ShiftedRed, ShiftedGrn, ShiftedBlu) * Scale + Offset;
 	
 	// -- Saturation --
 	float3 Gray = float3(0.3f, 0.59f, 0.11f);
@@ -122,7 +103,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 OutChroma = OutTexel - OutLuma;
 	float3 Saturated = OutLuma + OutChroma * Saturation;
 	
-	return float4(OutRGB, BaseTexel.a);
+	return float4(Saturated, BaseTexel.a);
 }
 
 //-----------------------------------------------------------------------------

@@ -63,8 +63,7 @@ uniform float TargetHeight;
 uniform float WidthRatio;
 uniform float HeightRatio;
 
-uniform float DefocusX;
-uniform float DefocusY;
+uniform float2 Defocus = float2(0.0f, 0.0f);
 uniform float FocusEnable;
 
 float2 Coord0Offset = float2( 0.0f,  0.0f);
@@ -92,15 +91,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
 	float2 TexCoord = Input.TexCoord;
 	TexCoord = TexCoord + 0.5f * InvTexSize;
-	float2 DefocusVal = float2(DefocusX, DefocusY);
-	Output.TexCoord0 = TexCoord + Coord0Offset * InvTexSize * DefocusVal;
-	Output.TexCoord1 = TexCoord + Coord1Offset * InvTexSize * DefocusVal;
-	Output.TexCoord2 = TexCoord + Coord2Offset * InvTexSize * DefocusVal;
-	Output.TexCoord3 = TexCoord + Coord3Offset * InvTexSize * DefocusVal;
-	Output.TexCoord4 = TexCoord + Coord4Offset * InvTexSize * DefocusVal;
-	Output.TexCoord5 = TexCoord + Coord5Offset * InvTexSize * DefocusVal;
-	Output.TexCoord6 = TexCoord + Coord6Offset * InvTexSize * DefocusVal;
-	Output.TexCoord7 = TexCoord + Coord7Offset * InvTexSize * DefocusVal;
+	Output.TexCoord0 = TexCoord + Coord0Offset * InvTexSize * Defocus;
+	Output.TexCoord1 = TexCoord + Coord1Offset * InvTexSize * Defocus;
+	Output.TexCoord2 = TexCoord + Coord2Offset * InvTexSize * Defocus;
+	Output.TexCoord3 = TexCoord + Coord3Offset * InvTexSize * Defocus;
+	Output.TexCoord4 = TexCoord + Coord4Offset * InvTexSize * Defocus;
+	Output.TexCoord5 = TexCoord + Coord5Offset * InvTexSize * Defocus;
+	Output.TexCoord6 = TexCoord + Coord6Offset * InvTexSize * Defocus;
+	Output.TexCoord7 = TexCoord + Coord7Offset * InvTexSize * Defocus;
 
 	return Output;
 }
