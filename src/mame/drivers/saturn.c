@@ -2610,6 +2610,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		device_set_input_line_and_vector(state->m_maincpu, 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40);
 		if(stv_irq.vdp1_end)
 			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
+		video_update_vdp1(timer.machine());
 		CEF_1;
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)

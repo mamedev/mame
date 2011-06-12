@@ -6305,7 +6305,6 @@ SCREEN_UPDATE( stv_vdp2 )
 {
 	saturn_state *state = screen->machine().driver_data<saturn_state>();
 	static UINT8 pri;
-	video_update_vdp1(screen->machine());
 
 	stv_vdp2_fade_effects(screen->machine());
 

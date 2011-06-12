@@ -9,7 +9,6 @@ Framebuffer todo:
 - add proper framebuffer erase
 - 8 bpp support - now we always draw as 16 bpp, but this is not a problem since
   VDP2 interprets framebuffer as 8 bpp in these cases
-- make this to be inp record/playback safe
 
 */
 
@@ -1962,13 +1961,10 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				default:
-					if (VDP1_LOG) logerror ("Sprite List Illegal!\n");
-					break;
-
-
+					popmessage ("VDP1: Sprite List Illegal, contact MAMEdev");
+					// TODO: LOPR/COPR hook-up
+					return;
 			}
-
-
 		}
 
 		spritecount++;
@@ -1977,12 +1973,6 @@ static void stv_vdp1_process_list(running_machine &machine)
 
 
 	end:
-	/*set CEF to 1*/
-	//CEF_1;
-
-	/* not here! this is done every frame drawn even if the cpu isn't running eg in the debugger */
-//  if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
-//      cputag_set_input_line_and_vector(machine, "maincpu", 2, HOLD_LINE , 0x4d);
 
 	if (VDP1_LOG) logerror ("End of list processing!\n");
 }
@@ -1990,7 +1980,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 void video_update_vdp1(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int framebufer_changed = 0;
+	int framebuffer_changed = 0;
 
 //  int enable;
 //  if (machine.input().code_pressed (KEYCODE_R)) VDP1_LOG = 1;
@@ -2010,6 +2000,11 @@ void video_update_vdp1(running_machine &machine)
 	if (VDP1_LOG) logerror("video_update_vdp1 called\n");
 	if (VDP1_LOG) logerror( "FBCR = %0x, accessed = %d\n", STV_VDP1_FBCR, state->m_vdp1.fbcr_accessed );
 
+	if(STV_VDP1_CEF)
+		BEF_1;
+	else
+		BEF_0;
+
 	if ( state->m_vdp1.framebuffer_clear_on_next_frame )
 	{
 		if ( ((STV_VDP1_FBCR & 0x3) == 3) &&
@@ -2025,7 +2020,7 @@ void video_update_vdp1(running_machine &machine)
 		case 0: /* Automatic mode */
 			stv_vdp1_change_framebuffers(machine);
 			stv_clear_framebuffer(machine, state->m_vdp1.framebuffer_current_draw);
-			framebufer_changed = 1;
+			framebuffer_changed = 1;
 			break;
 		case 1: /* Setting prohibited */
 			break;
@@ -2043,7 +2038,7 @@ void video_update_vdp1(running_machine &machine)
 				{
 					stv_clear_framebuffer(machine, state->m_vdp1.framebuffer_current_draw);
 				}
-				framebufer_changed = 1;
+				framebuffer_changed = 1;
 			}
 			break;
 	}
@@ -2057,8 +2052,12 @@ void video_update_vdp1(running_machine &machine)
 		case 1:/*Draw by request*/
 			break;
 		case 2:/*Automatic Draw*/
-			if ( framebufer_changed )
+			if ( framebuffer_changed )
+			{
+				/*set CEF to 1*/
+				//CEF_1;
 				stv_vdp1_process_list(machine);
+			}
 			break;
 		case 3:	/*<invalid>*/
 			logerror("Warning: Invalid PTM mode set for VDP1!\n");
