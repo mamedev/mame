@@ -3309,7 +3309,7 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 	// Careful, you can't shift by 64 or more
 	UINT64 testmask = (1ULL << (m_space.data_width()-1) << 1) - 1;
 
-	if((mask & testmask) == 0 || (mask & testmask) == mask)
+	if((mask & testmask) == 0 || (mask & testmask) == testmask)
 		setup_range_solid(addrstart, addrend, addrmask, addrmirror, entries);
 	else
 		setup_range_masked(addrstart, addrend, addrmask, addrmirror, mask, entries);
