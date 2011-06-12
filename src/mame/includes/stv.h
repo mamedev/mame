@@ -98,6 +98,8 @@ public:
 #define MASTER_CLOCK_320 53748200
 #define CEF_1	state->m_vdp1_regs[0x010/4]|=0x00020000
 #define CEF_0   state->m_vdp1_regs[0x010/4]&=~0x00020000
+#define BEF_1	state->m_vdp1_regs[0x010/4]|=0x00010000
+#define BEF_0	state->m_vdp1_regs[0x010/4]&=~0x00010000
 
 DRIVER_INIT ( stv );
 
