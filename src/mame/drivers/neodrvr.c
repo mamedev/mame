@@ -8446,7 +8446,7 @@ GAME( 1995, kabukikl,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Hudson", "
 GAME( 1997, neobombe,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Hudson", "Neo Bomberman", GAME_SUPPORTS_SAVE )
 
 /* Monolith Corp. */
-GAME( 1990, minasan,   neogeo,   neogeo,   mjneogeo, neogeo,   ROT0, "Monolith Corp.", "Minashanno Okageshamadeshu! Daishugorokutaikai (MOM-001)(MOH-001)", GAME_SUPPORTS_SAVE )
+GAME( 1990, minasan,   neogeo,   neogeo,   mjneogeo, neogeo,   ROT0, "Monolith Corp.", "Minasanno Okagesamadesu! Daisugorokutaikai (MOM-001)(MOH-001)", GAME_SUPPORTS_SAVE )
 GAME( 1991, bakatono,  neogeo,   neogeo,   mjneogeo, neogeo,   ROT0, "Monolith Corp.", "Bakatonosama Mahjong Manyuuki (MOM-002)(MOH-002)", GAME_SUPPORTS_SAVE )
 
 /* Nazca (later acquired by SNK) */
