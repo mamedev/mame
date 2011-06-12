@@ -900,10 +900,10 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 	while ((size > 0) && tms->speaking_now)
     {
         /* if it is the appropriate time to update the old energy/pitch idxes,
-         * i.e. when IP=7, PC=12, T=17, do so. Since IP=7 PC=12 T=17 is JUST
-         * BEFORE the transition to IP=0 PC=0 T=0 (4 T-cycles later), we change
-         * on the latter.*/
-        if ((tms->interp_period == 0) && (tms->PC == 0))
+         * i.e. when IP=7, PC=12, T=17, subcycle=2, do so. Since IP=7 PC=12 T=17
+         * is JUST BEFORE the transition to IP=0 PC=0 T=0 sybcycle=(0 or 1),
+         * which happens 4 T-cycles later), we change on the latter.*/
+        if ((tms->interp_period == 0) && (tms->PC == 0) && (tms->subcycle < 2))
 		{
 			tms->OLDE = (tms->new_frame_energy_idx == 0);
 			tms->OLDP = (tms->new_frame_pitch_idx == 0);
@@ -998,7 +998,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		}
 		else // Not a new frame, just interpolate the existing frame.
 		{
-			if (tms->interp_period == 0) tms->inhibit = 0; // disable inhibit when reaching the last interp period
+			int inhibit_state = ((tms->inhibit==1)&&(tms->interp_period != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the tms->inhibit value
 #ifdef PERFECT_INTERPOLATION_HACK
 			int samples_per_frame = tms->subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
 			//int samples_per_frame = tms->subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
@@ -1016,10 +1016,10 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			// now adjust each value to be exactly correct for each of the samples per frame
 			if (tms->interp_period != 0) // if we're still interpolating...
 			{
-				tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit))*current_sample)/samples_per_frame;
-				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit))*current_sample)/samples_per_frame;
+				tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-inhibit_state))*current_sample)/samples_per_frame;
+				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-inhibit_state))*current_sample)/samples_per_frame;
 				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->current_k[i] += (((tms->target_k[i] - tms->current_k[i])*(1-tms->inhibit))*current_sample)/samples_per_frame;
+					tms->current_k[i] += (((tms->target_k[i] - tms->current_k[i])*(1-inhibit_state))*current_sample)/samples_per_frame;
 			}
 			else // we're done, play this frame for 1/8 frame.
 			{
@@ -1035,14 +1035,14 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				switch(tms->PC)
 				{
 					case 0: /* PC = 0, B cycle, write updated energy */
-					tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit)) INTERP_SHIFT);
+					tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-inhibit_state)) INTERP_SHIFT);
 					break;
 					case 1: /* PC = 1, B cycle, write updated pitch */
-					tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit)) INTERP_SHIFT);
+					tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-inhibit_state)) INTERP_SHIFT);
 					break;
 					case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11:
 					/* PC = 2 thru 11, B cycle, write updated K1 thru K10 */
-					tms->current_k[tms->PC-2] += (((tms->target_k[tms->PC-2] - tms->current_k[tms->PC-2])*(1-tms->inhibit)) INTERP_SHIFT);
+					tms->current_k[tms->PC-2] += (((tms->target_k[tms->PC-2] - tms->current_k[tms->PC-2])*(1-inhibit_state)) INTERP_SHIFT);
 					break;
 					case 12: /* PC = 12, do nothing */
 					break;
@@ -1172,8 +1172,18 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             tms->subcycle = tms->subc_reload;
             tms->PC++;
         }
+        /* Circuit 412 in the patent ensures that when INHIBIT is true,
+         * during the period from IP=7 PC=12 T12, to IP=0 PC=12 T12, the pitch
+         * count is forced to 0; since the initial stop happens right before
+         * the switch to IP=0 PC=0 and this code is located after the switch would
+         * happen, we check for ip=0 inhibit=1, which covers that whole range.
+         * The purpose of Circuit 412 is to prevent a spurious click caused by
+         * the voiced source being fed to the filter before all the values have
+         * been updated during ip=0 when interpolation was inhibited.
+         */
         tms->pitch_count++;
         if (tms->pitch_count >= tms->current_pitch) tms->pitch_count = 0;
+        if ((tms->interp_period == 0)&&(tms->inhibit==1)) tms->pitch_count = 0;
         tms->pitch_count &= 0x1FF;
         buf_count++;
         size--;
