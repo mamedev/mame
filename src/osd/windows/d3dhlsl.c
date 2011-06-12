@@ -750,6 +750,7 @@ int hlsl_info::create_resources()
 		get_vector(winoptions.screen_converge_y(), 3, options->converge_y, TRUE);
 		get_vector(winoptions.screen_radial_converge_x(), 3, options->radial_converge_x, TRUE);
 		get_vector(winoptions.screen_radial_converge_y(), 3, options->radial_converge_y, TRUE);
+		get_vector(winoptions.screen_red_ratio(), 3, options->red_ratio, TRUE);
 		get_vector(winoptions.screen_grn_ratio(), 3, options->grn_ratio, TRUE);
 		get_vector(winoptions.screen_blu_ratio(), 3, options->blu_ratio, TRUE);
 		get_vector(winoptions.screen_offset(), 3, options->offset, TRUE);
