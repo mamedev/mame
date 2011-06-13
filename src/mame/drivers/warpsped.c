@@ -67,11 +67,27 @@ public:
 	warpspeed_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8 *  m_videoram;
-	tilemap_t  *m_tilemap;
+	UINT8		*m_videoram;
+	tilemap_t	*m_text_tilemap;
+	tilemap_t	*m_starfield_tilemap;
+	UINT8		*m_workram;
 };
 
-static TILE_GET_INFO( get_warpspeed_tile_info )
+static READ8_HANDLER( warpspeed_hardware_r )
+{
+	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
+
+	switch( offset )
+	{
+		case 3: 
+		{
+			return input_port_read(space->machine(), "IN0" );
+		}
+	}
+	return 0;
+}
+
+static TILE_GET_INFO( get_warpspeed_text_tile_info )
 {
 	warpspeed_state *state = machine.driver_data<warpspeed_state>();
 
@@ -79,38 +95,58 @@ static TILE_GET_INFO( get_warpspeed_tile_info )
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
+static TILE_GET_INFO( get_warpspeed_starfield_tile_info )
+{
+	UINT8 code = 0x3f;
+	if ( tile_index & 1 )
+	{
+		code = machine.region("starfield")->base()[tile_index >> 1] & 0x3f;
+	}
+	SET_TILE_INFO(1, code, 0, 0);
+}
+
 static WRITE8_HANDLER( warpspeed_vidram_w )
 {
 	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_text_tilemap, offset);
 }
 
 static VIDEO_START( warpspeed )
 {
 	warpspeed_state *state = machine.driver_data<warpspeed_state>();
-	state->m_tilemap = tilemap_create(machine, get_warpspeed_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_text_tilemap = tilemap_create(machine, get_warpspeed_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_text_tilemap, 0);
+	state->m_starfield_tilemap = tilemap_create(machine, get_warpspeed_starfield_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_mark_all_tiles_dirty(state->m_starfield_tilemap);
 }
 
 static SCREEN_UPDATE( warpspeed )
 {
 	warpspeed_state *state = screen->machine().driver_data<warpspeed_state>();
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+
+	tilemap_draw(bitmap, cliprect, state->m_starfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
 	return 0;
 }
 
 static ADDRESS_MAP_START( warpspeed_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0dff) AM_ROM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE( warpspeed_vidram_w ) AM_BASE_MEMBER(warpspeed_state, m_videoram)
-	AM_RANGE(0x1c00, 0x1cff) AM_RAM
+	AM_RANGE(0x1c00, 0x1cff) AM_RAM AM_BASE_MEMBER(warpspeed_state, m_workram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x03) AM_READ( warpspeed_hardware_r )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( warpspeed )
+	PORT_START("IN0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
 static const gfx_layout warpspeed_charlayout =
@@ -125,12 +161,13 @@ static const gfx_layout warpspeed_charlayout =
 };
 
 static GFXDECODE_START( warpspeed )
-	GFXDECODE_ENTRY( "gfx", 0, warpspeed_charlayout,   0, 1  )
+	GFXDECODE_ENTRY( "gfx1", 0, warpspeed_charlayout,   0, 1  )
+	GFXDECODE_ENTRY( "gfx2", 0, warpspeed_charlayout,   0, 1  )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(warpspeed_map)
 	MCFG_CPU_IO_MAP(warpspeed_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -139,10 +176,10 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 8*8, 32*8-1)
 
 	MCFG_VIDEO_START(warpspeed)
 	MCFG_SCREEN_UPDATE(warpspeed)
@@ -163,36 +200,33 @@ ROM_START( warpsped )
 	ROM_LOAD( "m16 pro 5.e4",  0x0a00, 0x0200, CRC(7a16bc2b) SHA1(48f58f0c7469da24a3ebee9183b5aae8c676e6ea) )
 	ROM_LOAD( "m16 pro 6.c3",  0x0c00, 0x0200, CRC(e2e7940f) SHA1(78c9df32580784c278675d09b89095781893d48f) )
 
-	ROM_REGION(0x1800, "unknown", 0)
+	ROM_REGION(0x1000, "sprite", 0)
+	ROM_LOAD( "l9 l13 l17 g17.g17",  0x0000, 0x0200, CRC(7449aae9) SHA1(1f49dad6f60103da6093592efa2087bc24dc0283) )
+	ROM_LOAD( "l10 l15 l18 g18.g18", 0x0200, 0x0200, CRC(5829699c) SHA1(20ffa7b81a0de159408d2668005b9ee8a2e588d1) )
+	ROM_LOAD( "l9 l13 l17 g17.l9",   0x0400, 0x0200, CRC(7449aae9) SHA1(1f49dad6f60103da6093592efa2087bc24dc0283) )
+	ROM_LOAD( "l10 l15 l18 g18.l10", 0x0600, 0x0200, CRC(5829699c) SHA1(20ffa7b81a0de159408d2668005b9ee8a2e588d1) )
+	ROM_LOAD( "l9 l13 l17 g17.l13",  0x0800, 0x0200, CRC(7449aae9) SHA1(1f49dad6f60103da6093592efa2087bc24dc0283) )
+	ROM_LOAD( "l10 l15 l18 g18.l15", 0x0a00, 0x0200, CRC(5829699c) SHA1(20ffa7b81a0de159408d2668005b9ee8a2e588d1) )
+	ROM_LOAD( "l9 l13 l17 g17.l17",  0x0c00, 0x0200, CRC(7449aae9) SHA1(1f49dad6f60103da6093592efa2087bc24dc0283) )
+	ROM_LOAD( "l10 l15 l18 g18.l18", 0x0e00, 0x0200, CRC(5829699c) SHA1(20ffa7b81a0de159408d2668005b9ee8a2e588d1) )
+
+	ROM_REGION(0x200, "starfield", 0)
+	ROM_LOAD( "e10.e10", 0x0000, 0x0200, CRC(e0d4b72c) SHA1(ae5fae0df9e0bfc67f586649474ff8a69abd7579) )
+
+	ROM_REGION(0x400, "unknown", 0)
 	ROM_LOAD( "c12.c12", 0x0000, 0x0200, CRC(88a8db15) SHA1(3fdf4e23cf75cf5dd4d3bad08e9e71c0268f8d79) )
 	ROM_LOAD( "e8.e8",   0x0200, 0x0200, CRC(3ef3a576) SHA1(905f9b8d3cabab944a0f6f0736c5c26d0e36107f) )
-	ROM_LOAD( "e10.e10", 0x0400, 0x0200, CRC(e0d4b72c) SHA1(ae5fae0df9e0bfc67f586649474ff8a69abd7579) )
-	ROM_LOAD( "l9 l13 l17 g17.g17",  0x0600, 0x0200, CRC(7449aae9) SHA1(1f49dad6f60103da6093592efa2087bc24dc0283) )
-	ROM_LOAD( "l10 l15 l18 g18.g18", 0x0800, 0x0200, CRC(5829699c) SHA1(20ffa7b81a0de159408d2668005b9ee8a2e588d1) )
-	ROM_LOAD( "l9 l13 l17 g17.l9",   0x0a00, 0x0200, CRC(7449aae9) SHA1(1f49dad6f60103da6093592efa2087bc24dc0283) )
-	ROM_LOAD( "l10 l15 l18 g18.l10", 0x0c00, 0x0200, CRC(5829699c) SHA1(20ffa7b81a0de159408d2668005b9ee8a2e588d1) )
-	ROM_LOAD( "l9 l13 l17 g17.l13",  0x0e00, 0x0200, CRC(7449aae9) SHA1(1f49dad6f60103da6093592efa2087bc24dc0283) )
-	ROM_LOAD( "l10 l15 l18 g18.l15", 0x1000, 0x0200, CRC(5829699c) SHA1(20ffa7b81a0de159408d2668005b9ee8a2e588d1) )
-	ROM_LOAD( "l9 l13 l17 g17.l17",  0x1200, 0x0200, CRC(7449aae9) SHA1(1f49dad6f60103da6093592efa2087bc24dc0283) )
-	ROM_LOAD( "l10 l15 l18 g18.l18", 0x1400, 0x0200, CRC(5829699c) SHA1(20ffa7b81a0de159408d2668005b9ee8a2e588d1) )
 
-	ROM_REGION(0x0400, "gfx", 0)
+	ROM_REGION(0x0200, "gfx1", 0)
 	ROM_LOAD( "k1.g1",  0x0000, 0x0200, CRC(63d4fa84) SHA1(3465ce27497e2d4fcae994c022480e37e1345686) )
-	ROM_LOAD( "k1.k1",  0x0200, 0x0200, CRC(76b10d47) SHA1(e644a50df06535fe1fbfb8754cfc7b4a49fcb05e) )
+
+	ROM_REGION(0x0200, "gfx2", 0)
+	ROM_LOAD( "k1.k1",  0x0000, 0x0200, CRC(76b10d47) SHA1(e644a50df06535fe1fbfb8754cfc7b4a49fcb05e) )
 
 ROM_END
 
 static DRIVER_INIT( warpspeed )
 {
-	// hack halt -> nop until interrupts are implemented properly
-	UINT8* rom = machine.region("maincpu")->base();
-	rom[0xa57] = 0x00;
-	rom[0xbf9] = 0x00;
-	rom[0x883] = 0x00;
-	rom[0xcee] = 0x00;
-	rom[0xcf9] = 0x00;
-	rom[0xda5] = 0x00;
-	rom[0x83d] = 0x00;
 }
 
 GAME( 197?, warpsped,  0,      warpspeed, warpspeed, warpspeed, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", GAME_NO_SOUND | GAME_NOT_WORKING )
