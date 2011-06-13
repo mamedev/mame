@@ -45,6 +45,7 @@ protected:
 	virtual void function_list(UINT8 *&buf);
 	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch);
 	virtual bool coin_counters(UINT8 *&buf, UINT8 count);
+	virtual bool coin_add(UINT8 slot, INT32 count);
 	virtual bool analogs(UINT8 *&buf, UINT8 count);
 	virtual bool swoutputs(UINT8 count, const UINT8 *vals);
 	virtual bool swoutputs(UINT8 id, UINT8 val);

@@ -105,6 +105,17 @@ bool sega_837_13551::coin_counters(UINT8 *&buf, UINT8 count)
 	return true;
 }
 
+bool sega_837_13551::coin_add(UINT8 slot, INT32 count)
+{
+	if(slot < 1 || slot > 2)
+		return false;
+
+	coin_counter[slot-1] += count;
+	fprintf(stderr, "coin_add(%d, %d) -> %d\n", slot, count, coin_counter[slot]);
+
+	return true;
+}
+
 bool sega_837_13551::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch)
 {
 	if(count_players > 2 || bytes_per_switch > 2)

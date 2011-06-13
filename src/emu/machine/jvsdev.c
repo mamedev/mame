@@ -150,6 +150,18 @@ int jvs_device::handle_message(const UINT8 *send_buffer, UINT32 send_size, UINT8
 		*recv_buffer++ = 0x01;
 		return analogs(recv_buffer, send_buffer[1]) ? 2 : 0;
 
+	case 0x30:
+		if(send_size < 4)
+			return 0;
+		*recv_buffer++ = 0x01;
+		return coin_add(send_buffer[1], -((send_buffer[2] << 8) | send_buffer[3])) ? 4 : 0;
+
+	case 0x31:
+		if(send_size < 4)
+			return 0;
+		*recv_buffer++ = 0x01;
+		return coin_add(send_buffer[1],  ((send_buffer[2] << 8) | send_buffer[3])) ? 4 : 0;
+
 	case 0x32:
 		if(send_size < 2 || send_size < 2+send_buffer[1])
 			return 0;
@@ -201,6 +213,12 @@ bool jvs_device::coin_counters(UINT8 *&buf, UINT8 count)
 {
 	return false;
 }
+
+bool jvs_device::coin_add(UINT8 slot, INT32 count)
+{
+	return false;
+}
+
 
 bool jvs_device::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch)
 {
