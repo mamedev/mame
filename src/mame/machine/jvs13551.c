@@ -111,7 +111,6 @@ bool sega_837_13551::coin_add(UINT8 slot, INT32 count)
 		return false;
 
 	coin_counter[slot-1] += count;
-	fprintf(stderr, "coin_add(%d, %d) -> %d\n", slot, count, coin_counter[slot]);
 
 	return true;
 }
