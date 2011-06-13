@@ -85,7 +85,8 @@
 static hlsl_options g_hlsl_presets[4] =
 {
 	{	// 25% Shadow mask, 50% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
-		0.25f, 320, 240, 0.09375f, 0.109375f,
+		true,
+		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.03f, 0.03f,
 		0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f, 0.0f, 0.0f },
@@ -102,9 +103,11 @@ static hlsl_options g_hlsl_presets[4] =
 		{ 0.05f,0.05f,0.05f},
 		{ 0.25f,0.25f,0.25f},
 		1.2f,
+		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0
 	},
 	{	// 25% Shadow mask, 0% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
-		0.25f, 320, 240, 0.09375f, 0.109375f,
+		true,
+		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.03f, 0.03f,
 		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f, 0.0f, 0.0f },
@@ -121,9 +124,11 @@ static hlsl_options g_hlsl_presets[4] =
 		{ 0.05f,0.05f,0.05f},
 		{ 0.25f,0.25f,0.25f},
 		1.2f,
+		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0
 	},
 	{	// 25% Shadow mask, 0% Scanlines, 0% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
-		0.25f, 320, 240, 0.09375f, 0.109375f,
+		true,
+		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.0f, 0.0f,
 		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f, 0.0f, 0.0f },
@@ -140,9 +145,11 @@ static hlsl_options g_hlsl_presets[4] =
 		{ 0.05f,0.05f,0.05f},
 		{ 0.25f,0.25f,0.25f},
 		1.2f,
+		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0
 	},
 	{	// 25% Shadow mask, 100% Scanlines, 15% Pincushion, 3 defocus, 24-degree Tint Out, 1.5 Exponent, 5% Floor, 70% Phosphor Return, 80% Saturation, Bad Convergence
-		0.25f, 320, 240, 0.09375f, 0.109375f,
+		true,
+		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.15f, 0.15f,
 		1.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.5f,
 		{ 3.0f, 3.0f, 3.0f, 3.0f },
@@ -159,6 +166,7 @@ static hlsl_options g_hlsl_presets[4] =
 		{ 0.05f,0.05f,0.05f},
 		{ 0.7f, 0.7f, 0.7f},
 		0.8f,
+		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0
 	},
 };
 
@@ -171,7 +179,7 @@ static slider_state *g_slider_list;
 //============================================================
 
 static void get_vector(const char *data, int count, float *out, int report_error);
-static file_error open_next(d3d_info *d3d, emu_file &file, const char *extension, int idx);
+static file_error open_next(d3d_info *d3d, emu_file &file, const char *templ, const char *extension, int idx);
 
 
 
@@ -182,15 +190,15 @@ static file_error open_next(d3d_info *d3d, emu_file &file, const char *extension
 hlsl_info::hlsl_info()
 {
 	master_enable = false;
-	yiq_enable = false;
 	prescale_size_x = 1;
 	prescale_size_y = 1;
+	prescale_force_x = 0;
+	prescale_force_y = 0;
 	preset = -1;
 	shadow_bitmap = NULL;
 	shadow_texture = NULL;
 	registered_targets = 0;
 	options = NULL;
-
 }
 
 
@@ -383,7 +391,7 @@ void hlsl_info::render_snapshot(d3d_surface *surface)
 			int idx = cy * 2 + cx;
 
 			emu_file file(window->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = open_next(d3d, file, "png", idx);
+			file_error filerr = open_next(d3d, file, NULL, "png", idx);
 			if (filerr != FILERR_NONE)
 				return;
 
@@ -553,7 +561,7 @@ void hlsl_info::begin_avi_recording(const char *name)
 		}
 		else
 		{
-			filerr = open_next(d3d, tempfile, "avi", 0);
+			filerr = open_next(d3d, tempfile, NULL, "avi", 0);
 		}
 
 		// compute the frame time
@@ -592,7 +600,7 @@ void hlsl_info::set_texture(d3d_texture_info *texture)
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
 	(*d3dintf->effect.set_texture)(effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
-	if (yiq_enable)
+	if (options->yiq_enable)
 		(*d3dintf->effect.set_texture)(yiq_encode_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 	else
 		(*d3dintf->effect.set_texture)(color_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
@@ -613,11 +621,9 @@ void hlsl_info::init(d3d *d3dintf, win_window_info *window)
 	this->window = window;
 
 	master_enable = downcast<windows_options &>(window->machine().options()).d3d_hlsl_enable();
-	yiq_enable = downcast<windows_options &>(window->machine().options()).screen_yiq_enable();
 	prescale_size_x = 1;
 	prescale_size_y = 1;
 	preset = downcast<windows_options &>(window->machine().options()).d3d_hlsl_preset();
-	printf("%d\n", preset);
 
 	snap_width = downcast<windows_options &>(window->machine().options()).d3d_snap_width();
 	snap_height = downcast<windows_options &>(window->machine().options()).d3d_snap_height();
@@ -647,12 +653,12 @@ void hlsl_info::init_fsfx_quad(void *vertbuf)
 	fsfx_vertices[1].y = 0.0f;
 	fsfx_vertices[2].x = 0.0f;
 	fsfx_vertices[2].y = d3d->height;
-	fsfx_vertices[3].x = d3d->width;// - 1.5f;
-	fsfx_vertices[3].y = 0.0f;// - 1.5f;
-	fsfx_vertices[4].x = 0.0f;// - 1.5f;
-	fsfx_vertices[4].y = d3d->height;// - 1.5f;
-	fsfx_vertices[5].x = d3d->width;// - 1.5f;
-	fsfx_vertices[5].y = d3d->height;// - 1.5f;
+	fsfx_vertices[3].x = d3d->width + 1.5f;
+	fsfx_vertices[3].y = 0.0f - 1.5f;
+	fsfx_vertices[4].x = 0.0f + 1.5f;
+	fsfx_vertices[4].y = d3d->height - 1.5f;
+	fsfx_vertices[5].x = d3d->width + 1.5f;
+	fsfx_vertices[5].y = d3d->height - 1.5f;
 
 	fsfx_vertices[0].u0 = 0.0f;
 	fsfx_vertices[0].v0 = 0.0f;
@@ -660,12 +666,12 @@ void hlsl_info::init_fsfx_quad(void *vertbuf)
 	fsfx_vertices[1].v0 = 0.0f;
 	fsfx_vertices[2].u0 = 0.0f;
 	fsfx_vertices[2].v0 = 1.0f;
-	fsfx_vertices[3].u0 = 1.0f;// + 0.5f / d3d->width;
-	fsfx_vertices[3].v0 = 0.0f;// + 0.5f / d3d->height;
-	fsfx_vertices[4].u0 = 0.0f;// + 0.5f / d3d->width;
-	fsfx_vertices[4].v0 = 1.0f;// + 0.5f / d3d->height;
-	fsfx_vertices[5].u0 = 1.0f;// + 0.5f / d3d->width;
-	fsfx_vertices[5].v0 = 1.0f;// + 0.5f / d3d->height;
+	fsfx_vertices[3].u0 = 1.0f + 1.5f / d3d->width;
+	fsfx_vertices[3].v0 = 0.0f - 1.5f / d3d->height;
+	fsfx_vertices[4].u0 = 0.0f + 1.5f / d3d->width;
+	fsfx_vertices[4].v0 = 1.0f - 1.5f / d3d->height;
+	fsfx_vertices[5].u0 = 1.0f + 1.5f / d3d->width;
+	fsfx_vertices[5].v0 = 1.0f - 1.5f / d3d->height;
 
 	// set the color, Z parameters to standard values
 	for (int i = 0; i < 6; i++)
@@ -706,10 +712,183 @@ int hlsl_info::create_resources()
 
 	windows_options &winoptions = downcast<windows_options &>(window->machine().options());
 
+	options = (hlsl_options*)global_alloc_clear(hlsl_options);
+
+	options->params_dirty = true;
+
+	emu_file ini_file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_READ | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = open_next((d3d_info*)window->drawdata, ini_file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
+
+	external_ini = false;
+	if (filerr == FILERR_NONE)
+	{
+		ini_file.seek(0, SEEK_END);
+		if (ini_file.tell() >= 1000)
+		{
+			external_ini = true;
+			ini_file.seek(0, SEEK_SET);
+
+			int en = 0;
+			char buf[1024];
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "hlsl_enable %d\n", &en);
+			master_enable = en == 1;
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "hlsl_prescale_x %d\n", &prescale_force_x);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "hlsl_prescale_y %d\n", &prescale_force_y);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "hlsl_preset %d\n", &preset);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "hlsl_snap_width %d\n", &snap_width);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "hlsl_snap_height %d\n", &snap_height);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "shadow_mask_alpha %f\n", &options->shadow_mask_alpha);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "shadow_mask_texture %s\n", options->shadow_mask_texture);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "shadow_mask_x_count %d\n", &options->shadow_mask_count_x);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "shadow_mask_y_count %d\n", &options->shadow_mask_count_y);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "shadow_mask_usize %f\n", &options->shadow_mask_u_size);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "shadow_mask_vsize %f\n", &options->shadow_mask_v_size);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "curvature %f\n", &options->curvature);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "pincushion %f\n", &options->pincushion);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "scanline_alpha %f\n", &options->scanline_alpha);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "scanline_size %f\n", &options->scanline_scale);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "scanline_height %f\n", &options->scanline_height);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "scanline_bright_scale %f\n", &options->scanline_bright_scale);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "scanline_bright_offset %f\n", &options->scanline_bright_offset);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "scanline_jitter %f\n", &options->scanline_offset);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "defocus %f %f\n", &options->defocus[0], &options->defocus[1]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "converge_x %f %f %f\n", &options->converge_x[0], &options->converge_x[1], &options->converge_x[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "converge_y %f %f %f\n", &options->converge_y[0], &options->converge_y[1], &options->converge_y[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "radial_converge_x %f %f %f\n", &options->radial_converge_x[0], &options->radial_converge_x[1], &options->radial_converge_x[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "radial_converge_y %f %f %f\n", &options->radial_converge_y[0], &options->radial_converge_y[1], &options->radial_converge_y[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "red_ratio %f %f %f\n", &options->red_ratio[0], &options->red_ratio[1], &options->red_ratio[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "grn_ratio %f %f %f\n", &options->grn_ratio[0], &options->grn_ratio[1], &options->grn_ratio[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "blu_ratio %f %f %f\n", &options->blu_ratio[0], &options->blu_ratio[1], &options->blu_ratio[2]);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "saturation %f\n", &options->saturation);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "offset %f %f %f\n", &options->offset[0], &options->offset[1], &options->offset[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "scale %f %f %f\n", &options->scale[0], &options->scale[1], &options->scale[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "power %f %f %f\n", &options->power[0], &options->power[1], &options->power[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "floor %f %f %f\n", &options->floor[0], &options->floor[1], &options->floor[2]);
+
+			ini_file.gets(buf, 1024);
+			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+			sscanf(buf, "phosphor_life %f %f %f\n", &options->phosphor[0], &options->phosphor[1], &options->phosphor[2]);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_enable %d\n", &en);
+			options->yiq_enable = en == 1;
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_cc %f\n", &options->yiq_cc);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_a %f\n", &options->yiq_a);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_b %f\n", &options->yiq_b);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_o %f\n", &options->yiq_o);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_p %f\n", &options->yiq_p);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_n %f\n", &options->yiq_n);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_y %f\n", &options->yiq_y);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_i %f\n", &options->yiq_i);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_q %f\n", &options->yiq_q);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_scan_time %f\n", &options->yiq_scan_time);
+
+			ini_file.gets(buf, 1024);
+			sscanf(buf, "yiq_phase_count %d\n", &options->yiq_phase_count);
+		}
+	}
+
 	// experimental: load a PNG to use for vector rendering; it is treated
 	// as a brightness map
 	emu_file file(window->machine().options().art_path(), OPEN_FLAG_READ);
-	shadow_bitmap = render_load_png(file, NULL, winoptions.screen_shadow_mask_texture(), NULL, NULL);
+	shadow_bitmap = render_load_png(file, NULL, options->shadow_mask_texture, NULL, NULL);
 
 	// experimental: if we have a shadow bitmap, create a texture for it
 	if (shadow_bitmap != NULL)
@@ -728,43 +907,58 @@ int hlsl_info::create_resources()
 		shadow_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
-	options = (hlsl_options*)global_alloc_clear(hlsl_options);
-
-	if(preset == -1)
+	if(!external_ini)
 	{
-		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
-		options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
-		options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
-		options->shadow_mask_u_size = winoptions.screen_shadow_mask_u_size();
-		options->shadow_mask_v_size = winoptions.screen_shadow_mask_v_size();
-		options->curvature = winoptions.screen_curvature();
-		options->pincushion = winoptions.screen_pincushion();
-		options->scanline_alpha = winoptions.screen_scanline_amount();
-		options->scanline_scale = winoptions.screen_scanline_scale();
-		options->scanline_height = winoptions.screen_scanline_height();
-		options->scanline_bright_scale = winoptions.screen_scanline_bright_scale();
-		options->scanline_bright_offset = winoptions.screen_scanline_bright_offset();
-		options->scanline_offset = winoptions.screen_scanline_offset();
-		get_vector(winoptions.screen_defocus(), 2, options->defocus, TRUE);
-		get_vector(winoptions.screen_converge_x(), 3, options->converge_x, TRUE);
-		get_vector(winoptions.screen_converge_y(), 3, options->converge_y, TRUE);
-		get_vector(winoptions.screen_radial_converge_x(), 3, options->radial_converge_x, TRUE);
-		get_vector(winoptions.screen_radial_converge_y(), 3, options->radial_converge_y, TRUE);
-		get_vector(winoptions.screen_red_ratio(), 3, options->red_ratio, TRUE);
-		get_vector(winoptions.screen_grn_ratio(), 3, options->grn_ratio, TRUE);
-		get_vector(winoptions.screen_blu_ratio(), 3, options->blu_ratio, TRUE);
-		get_vector(winoptions.screen_offset(), 3, options->offset, TRUE);
-		get_vector(winoptions.screen_scale(), 3, options->scale, TRUE);
-		get_vector(winoptions.screen_power(), 3, options->power, TRUE);
-		get_vector(winoptions.screen_floor(), 3, options->floor, TRUE);
-		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, TRUE);
-		options->saturation = winoptions.screen_saturation();
-	}
-	else
-	{
-		options = &g_hlsl_presets[preset];
-	}
+		prescale_force_x = winoptions.d3d_hlsl_prescale_x();
+		prescale_force_y = winoptions.d3d_hlsl_prescale_y();
+		if(preset == -1)
+		{
+			options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
+			options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
+			options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
+			options->shadow_mask_u_size = winoptions.screen_shadow_mask_u_size();
+			options->shadow_mask_v_size = winoptions.screen_shadow_mask_v_size();
+			options->curvature = winoptions.screen_curvature();
+			options->pincushion = winoptions.screen_pincushion();
+			options->scanline_alpha = winoptions.screen_scanline_amount();
+			options->scanline_scale = winoptions.screen_scanline_scale();
+			options->scanline_height = winoptions.screen_scanline_height();
+			options->scanline_bright_scale = winoptions.screen_scanline_bright_scale();
+			options->scanline_bright_offset = winoptions.screen_scanline_bright_offset();
+			options->scanline_offset = winoptions.screen_scanline_offset();
+			get_vector(winoptions.screen_defocus(), 2, options->defocus, TRUE);
+			get_vector(winoptions.screen_converge_x(), 3, options->converge_x, TRUE);
+			get_vector(winoptions.screen_converge_y(), 3, options->converge_y, TRUE);
+			get_vector(winoptions.screen_radial_converge_x(), 3, options->radial_converge_x, TRUE);
+			get_vector(winoptions.screen_radial_converge_y(), 3, options->radial_converge_y, TRUE);
+			get_vector(winoptions.screen_red_ratio(), 3, options->red_ratio, TRUE);
+			get_vector(winoptions.screen_grn_ratio(), 3, options->grn_ratio, TRUE);
+			get_vector(winoptions.screen_blu_ratio(), 3, options->blu_ratio, TRUE);
+			get_vector(winoptions.screen_offset(), 3, options->offset, TRUE);
+			get_vector(winoptions.screen_scale(), 3, options->scale, TRUE);
+			get_vector(winoptions.screen_power(), 3, options->power, TRUE);
+			get_vector(winoptions.screen_floor(), 3, options->floor, TRUE);
+			get_vector(winoptions.screen_phosphor(), 3, options->phosphor, TRUE);
+			options->saturation = winoptions.screen_saturation();
+		}
+		else
+		{
+			options = &g_hlsl_presets[preset];
+		}
 
+		options->yiq_enable = winoptions.screen_yiq_enable();
+		options->yiq_cc = winoptions.screen_yiq_cc();
+		options->yiq_a = winoptions.screen_yiq_a();
+		options->yiq_b = winoptions.screen_yiq_b();
+		options->yiq_o = winoptions.screen_yiq_o();
+		options->yiq_p = winoptions.screen_yiq_p();
+		options->yiq_n = winoptions.screen_yiq_n();
+		options->yiq_y = winoptions.screen_yiq_y();
+		options->yiq_i = winoptions.screen_yiq_i();
+		options->yiq_q = winoptions.screen_yiq_q();
+		options->yiq_scan_time = winoptions.screen_yiq_scan_time();
+		options->yiq_phase_count = winoptions.screen_yiq_phase_count();
+	}
 	g_slider_list = init_slider_list();
 
 	const char *fx_dir = downcast<windows_options &>(window->machine().options()).screen_post_fx_dir();
@@ -967,33 +1161,36 @@ void hlsl_info::init_effect_info(d3d_poly_info *poly)
 		// just post-processing.
 		curr_effect = post_effect;
 
-		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
-		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
-		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-		(*d3dintf->effect.set_vector)(curr_effect, "Floor", 3, options->floor);
-		(*d3dintf->effect.set_float)(curr_effect, "SnapX", snap_width);
-		(*d3dintf->effect.set_float)(curr_effect, "SnapY", snap_height);
-		(*d3dintf->effect.set_float)(curr_effect, "PincushionAmount", options->pincushion);
-		(*d3dintf->effect.set_float)(curr_effect, "CurvatureAmount", options->curvature);
-		(*d3dintf->effect.set_float)(curr_effect, "UseShadow", shadow_texture == NULL ? 0.0f : 1.0f);
-		(*d3dintf->effect.set_texture)(curr_effect, "Shadow", shadow_texture == NULL ? NULL : shadow_texture->d3dfinaltex);
-		(*d3dintf->effect.set_float)(curr_effect, "ShadowBrightness", options->shadow_mask_alpha);
-		(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeX", (float)options->shadow_mask_count_x);
-		(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeY", (float)options->shadow_mask_count_y);
-		(*d3dintf->effect.set_float)(curr_effect, "ShadowU", options->shadow_mask_u_size);
-		(*d3dintf->effect.set_float)(curr_effect, "ShadowV", options->shadow_mask_v_size);
-		(*d3dintf->effect.set_float)(curr_effect, "ShadowWidth", shadow_texture == NULL ? 1.0f : (float)shadow_texture->rawwidth);
-		(*d3dintf->effect.set_float)(curr_effect, "ShadowHeight", shadow_texture == NULL ? 1.0f : (float)shadow_texture->rawheight);
-		(*d3dintf->effect.set_float)(curr_effect, "ScanlineAmount", options->scanline_alpha);
-		(*d3dintf->effect.set_float)(curr_effect, "ScanlineScale", options->scanline_scale);
-		(*d3dintf->effect.set_float)(curr_effect, "ScanlineHeight", options->scanline_height);
-		(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", options->scanline_bright_scale);
-		(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", options->scanline_bright_offset);
-		(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->scanline_offset);
-		(*d3dintf->effect.set_vector)(curr_effect, "Power", 3, options->power);
+		if(options->params_dirty)
+		{
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+			(*d3dintf->effect.set_vector)(curr_effect, "Floor", 3, options->floor);
+			(*d3dintf->effect.set_float)(curr_effect, "SnapX", snap_width);
+			(*d3dintf->effect.set_float)(curr_effect, "SnapY", snap_height);
+			(*d3dintf->effect.set_float)(curr_effect, "PincushionAmount", options->pincushion);
+			(*d3dintf->effect.set_float)(curr_effect, "CurvatureAmount", options->curvature);
+			(*d3dintf->effect.set_float)(curr_effect, "UseShadow", shadow_texture == NULL ? 0.0f : 1.0f);
+			(*d3dintf->effect.set_texture)(curr_effect, "Shadow", shadow_texture == NULL ? NULL : shadow_texture->d3dfinaltex);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowBrightness", options->shadow_mask_alpha);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeX", (float)options->shadow_mask_count_x);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeY", (float)options->shadow_mask_count_y);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowU", options->shadow_mask_u_size);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowV", options->shadow_mask_v_size);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowWidth", shadow_texture == NULL ? 1.0f : (float)shadow_texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowHeight", shadow_texture == NULL ? 1.0f : (float)shadow_texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "ScanlineAmount", options->scanline_alpha);
+			(*d3dintf->effect.set_float)(curr_effect, "ScanlineScale", options->scanline_scale);
+			(*d3dintf->effect.set_float)(curr_effect, "ScanlineHeight", options->scanline_height);
+			(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", options->scanline_bright_scale);
+			(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", options->scanline_bright_offset);
+			(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->scanline_offset);
+			(*d3dintf->effect.set_vector)(curr_effect, "Power", 3, options->power);
+		}
 	}
 	else
 	{
@@ -1016,8 +1213,6 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 	UINT num_passes = 0;
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
-	windows_options &winoptions = downcast<windows_options &>(window->machine().options());
-
 	if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags) && poly->texture != NULL)
 	{
 		screen_encountered[poly->texture->target_index] = true;
@@ -1025,26 +1220,29 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		target_use_count[poly->texture->target_index] = 60;
 
-		if(yiq_enable)
+		if(options->yiq_enable)
 		{
 			/* Convert our signal into YIQ */
 			curr_effect = yiq_encode_effect;
 
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
-			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
-			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-			(*d3dintf->effect.set_float)(curr_effect, "CCValue", winoptions.screen_yiq_cc());
-			(*d3dintf->effect.set_float)(curr_effect, "AValue", winoptions.screen_yiq_a());
-			(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * winoptions.screen_yiq_b()));
-			(*d3dintf->effect.set_float)(curr_effect, "PValue", winoptions.screen_yiq_p());
-			(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", winoptions.screen_yiq_n());
-			(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", winoptions.screen_yiq_y());
-			(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
-			(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
-			(*d3dintf->effect.set_float)(curr_effect, "ScanTime", winoptions.screen_yiq_scan_time());
+			if(options->params_dirty)
+			{
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+				(*d3dintf->effect.set_float)(curr_effect, "CCValue", options->yiq_cc);
+				(*d3dintf->effect.set_float)(curr_effect, "AValue", options->yiq_a);
+				(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * options->yiq_b));
+				(*d3dintf->effect.set_float)(curr_effect, "PValue", options->yiq_p);
+				(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", options->yiq_n);
+				(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", options->yiq_y);
+				(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", options->yiq_i);
+				(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", options->yiq_q);
+				(*d3dintf->effect.set_float)(curr_effect, "ScanTime", options->yiq_scan_time);
+			}
 
 			HRESULT result = (*d3dintf->device.set_render_target)(d3d->device, 0, target4[poly->texture->target_index]);
 
@@ -1070,22 +1268,25 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			(*d3dintf->effect.set_texture)(curr_effect, "Composite", texture4[poly->texture->target_index]);
 			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dfinaltex);
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
-			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
-			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-			(*d3dintf->effect.set_float)(curr_effect, "CCValue", winoptions.screen_yiq_cc());
-			(*d3dintf->effect.set_float)(curr_effect, "AValue", winoptions.screen_yiq_a());
-			(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * winoptions.screen_yiq_b()));
-			(*d3dintf->effect.set_float)(curr_effect, "OValue", winoptions.screen_yiq_o());
-			(*d3dintf->effect.set_float)(curr_effect, "PValue", winoptions.screen_yiq_p());
-			(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", winoptions.screen_yiq_n());
-			(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", winoptions.screen_yiq_y());
-			(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
-			(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
-			(*d3dintf->effect.set_float)(curr_effect, "ScanTime", winoptions.screen_yiq_scan_time());
+			if(options->params_dirty)
+			{
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+				(*d3dintf->effect.set_float)(curr_effect, "CCValue", options->yiq_cc);
+				(*d3dintf->effect.set_float)(curr_effect, "AValue", options->yiq_a);
+				(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * options->yiq_b));
+				(*d3dintf->effect.set_float)(curr_effect, "OValue", options->yiq_o);
+				(*d3dintf->effect.set_float)(curr_effect, "PValue", options->yiq_p);
+				(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", options->yiq_n);
+				(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", options->yiq_y);
+				(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", options->yiq_i);
+				(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", options->yiq_q);
+				(*d3dintf->effect.set_float)(curr_effect, "ScanTime", options->yiq_scan_time);
+			}
 
 			result = (*d3dintf->device.set_render_target)(d3d->device, 0, target3[poly->texture->target_index]);
 
@@ -1114,19 +1315,22 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		curr_effect = color_effect;
 
 		/* Render the initial color-convolution pass */
-		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", yiq_enable ? 1.0f : (1.0f / (poly->texture->ustop - poly->texture->ustart)));
-		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", yiq_enable ? 1.0f : (1.0f / (poly->texture->vstop - poly->texture->vstart)));
-		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-		(*d3dintf->effect.set_float)(curr_effect, "YIQEnable", yiq_enable ? 1.0f : 0.0f);
-		(*d3dintf->effect.set_vector)(curr_effect, "RedRatios", 3, options->red_ratio);
-		(*d3dintf->effect.set_vector)(curr_effect, "GrnRatios", 3, options->grn_ratio);
-		(*d3dintf->effect.set_vector)(curr_effect, "BluRatios", 3, options->blu_ratio);
-		(*d3dintf->effect.set_vector)(curr_effect, "Offset", 3, options->offset);
-		(*d3dintf->effect.set_vector)(curr_effect, "Scale", 3, options->scale);
-		(*d3dintf->effect.set_float)(curr_effect, "Saturation", options->saturation);
+		if(options->params_dirty)
+		{
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", options->yiq_enable ? 1.0f : (1.0f / (poly->texture->ustop - poly->texture->ustart)));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", options->yiq_enable ? 1.0f : (1.0f / (poly->texture->vstop - poly->texture->vstart)));
+			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+			(*d3dintf->effect.set_float)(curr_effect, "YIQEnable", options->yiq_enable ? 1.0f : 0.0f);
+			(*d3dintf->effect.set_vector)(curr_effect, "RedRatios", 3, options->red_ratio);
+			(*d3dintf->effect.set_vector)(curr_effect, "GrnRatios", 3, options->grn_ratio);
+			(*d3dintf->effect.set_vector)(curr_effect, "BluRatios", 3, options->blu_ratio);
+			(*d3dintf->effect.set_vector)(curr_effect, "Offset", 3, options->offset);
+			(*d3dintf->effect.set_vector)(curr_effect, "Scale", 3, options->scale);
+			(*d3dintf->effect.set_float)(curr_effect, "Saturation", options->saturation);
+		}
 
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->device, 0, smalltarget0[poly->texture->target_index]);
 
@@ -1151,12 +1355,15 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		curr_effect = prescale_effect;
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", smalltexture0[poly->texture->target_index]);
 
-		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
-		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+		if(options->params_dirty)
+		{
+			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+		}
 
 		(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
@@ -1181,16 +1388,19 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		curr_effect = deconverge_effect;
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", prescaletexture0[poly->texture->target_index]);
 
-		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
-		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
-		(*d3dintf->effect.set_vector)(curr_effect, "ConvergeX", 3, options->converge_x);
-		(*d3dintf->effect.set_vector)(curr_effect, "ConvergeY", 3, options->converge_y);
-		(*d3dintf->effect.set_vector)(curr_effect, "RadialConvergeX", 3, options->radial_converge_x);
-		(*d3dintf->effect.set_vector)(curr_effect, "RadialConvergeY", 3, options->radial_converge_y);
+		if(options->params_dirty)
+		{
+			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+			(*d3dintf->effect.set_vector)(curr_effect, "ConvergeX", 3, options->converge_x);
+			(*d3dintf->effect.set_vector)(curr_effect, "ConvergeY", 3, options->converge_y);
+			(*d3dintf->effect.set_vector)(curr_effect, "RadialConvergeX", 3, options->radial_converge_x);
+			(*d3dintf->effect.set_vector)(curr_effect, "RadialConvergeY", 3, options->radial_converge_y);
+		}
 
 		(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
@@ -1282,11 +1492,14 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		// input texture.
 		curr_effect = phosphor_effect;
 
-		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-		(*d3dintf->effect.set_vector)(curr_effect, "Phosphor", 3, options->phosphor);
+		if(options->params_dirty)
+		{
+			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_vector)(curr_effect, "Phosphor", 3, options->phosphor);
+		}
 
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? texture1[poly->texture->target_index] : texture2[poly->texture->target_index]);
 		(*d3dintf->effect.set_texture)(curr_effect, "LastPass", last_texture[poly->texture->target_index]);
@@ -1314,8 +1527,11 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		(*d3dintf->effect.set_float)(curr_effect, "FixedAlpha", 1.0f);
 
-		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? texture1[poly->texture->target_index] : texture2[poly->texture->target_index]);
-		(*d3dintf->effect.set_texture)(curr_effect, "LastPass", focus_enable ? texture1[poly->texture->target_index] : texture2[poly->texture->target_index]);
+		if(options->params_dirty)
+		{
+			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? texture1[poly->texture->target_index] : texture2[poly->texture->target_index]);
+			(*d3dintf->effect.set_texture)(curr_effect, "LastPass", focus_enable ? texture1[poly->texture->target_index] : texture2[poly->texture->target_index]);
+		}
 
 		result = (*d3dintf->device.set_render_target)(d3d->device, 0, last_target[poly->texture->target_index]);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
@@ -1365,8 +1581,6 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[poly->texture->target_index]);
 
-			(*d3dintf->effect.set_float)(curr_effect, "SnapX", snap_width);
-			(*d3dintf->effect.set_float)(curr_effect, "SnapY", snap_height);
 			result = (*d3dintf->device.set_render_target)(d3d->device, 0, snap_target);
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 
@@ -1408,7 +1622,9 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		(*d3dintf->effect.end)(curr_effect);
 
 		poly->texture->cur_frame++;
-		poly->texture->cur_frame %= winoptions.screen_yiq_phase_count();
+		poly->texture->cur_frame %= options->yiq_phase_count;
+
+		options->params_dirty = false;
 	}
 	else
 	{
@@ -1598,13 +1814,19 @@ int hlsl_info::register_prescaled_texture(d3d_texture_info *texture, int scwidth
 	int idx = registered_targets;
 
 	// Find the nearest prescale factor that is over our screen size
-	int hlsl_prescale_x = 1;
-	while(scwidth * hlsl_prescale_x < d3d->width) hlsl_prescale_x++;
-	prescale_size_x = hlsl_prescale_x;
+	int hlsl_prescale_x = prescale_force_x ? prescale_force_x : 1;
+	if(!prescale_force_x)
+	{
+		while(scwidth * hlsl_prescale_x < d3d->width) hlsl_prescale_x++;
+		prescale_size_x = hlsl_prescale_x;
+	}
 
-	int hlsl_prescale_y = 1;
-	while(scheight * hlsl_prescale_y < d3d->height) hlsl_prescale_y++;
-	prescale_size_y = hlsl_prescale_y;
+	int hlsl_prescale_y = prescale_force_y ? prescale_force_y : 1;
+	if(!prescale_force_y)
+	{
+		while(scheight * hlsl_prescale_y < d3d->height) hlsl_prescale_y++;
+		prescale_size_y = hlsl_prescale_y;
+	}
 
 	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale_x, scheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture0[idx]);
 	if (result != D3D_OK)
@@ -1669,13 +1891,19 @@ int hlsl_info::register_texture(d3d_texture_info *texture)
 	int idx = registered_targets;
 
 	// Find the nearest prescale factor that is over our screen size
-	int hlsl_prescale_x = 1;
-	while(texture->rawwidth * hlsl_prescale_x < d3d->width) hlsl_prescale_x++;
-	prescale_size_x = hlsl_prescale_x;
+	int hlsl_prescale_x = prescale_force_x ? prescale_force_x : 1;
+	if(!prescale_force_x)
+	{
+		while(texture->rawwidth * hlsl_prescale_x < d3d->width) hlsl_prescale_x++;
+		prescale_size_x = hlsl_prescale_x;
+	}
 
-	int hlsl_prescale_y = 1;
-	while(texture->rawheight * hlsl_prescale_y < d3d->height) hlsl_prescale_y++;
-	prescale_size_y = hlsl_prescale_y;
+	int hlsl_prescale_y = prescale_force_y ? prescale_force_y : 1;
+	if(!prescale_force_y)
+	{
+		while(texture->rawheight * hlsl_prescale_y < d3d->height) hlsl_prescale_y++;
+		prescale_size_y = hlsl_prescale_y;
+	}
 
 	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale_x, texture->rawheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture0[idx]);
 	if (result != D3D_OK)
@@ -1734,6 +1962,59 @@ void hlsl_info::delete_resources()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
+
+	emu_file file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = open_next((d3d_info*)window->drawdata, file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
+
+	if (filerr != FILERR_NONE)
+		return;
+
+	file.printf("hlsl_enable            %d\n", master_enable ? 1 : 0);
+	file.printf("hlsl_prescale_x        %d\n", prescale_force_x);
+	file.printf("hlsl_prescale_y        %d\n", prescale_force_y);
+	file.printf("hlsl_preset            %d\n", preset);
+	file.printf("hlsl_snap_width        %d\n", snap_width);
+	file.printf("hlsl_snap_height       %d\n", snap_height);
+	file.printf("shadow_mask_alpha      %f\n", options->shadow_mask_alpha);
+	file.printf("shadow_mask_texture    %s\n", options->shadow_mask_texture);
+	file.printf("shadow_mask_x_count    %d\n", options->shadow_mask_count_x);
+	file.printf("shadow_mask_y_count    %d\n", options->shadow_mask_count_y);
+	file.printf("shadow_mask_usize      %f\n", options->shadow_mask_u_size);
+	file.printf("shadow_mask_vsize      %f\n", options->shadow_mask_v_size);
+	file.printf("curvature              %f\n", options->curvature);
+	file.printf("pincushion             %f\n", options->pincushion);
+	file.printf("scanline_alpha         %f\n", options->scanline_alpha);
+	file.printf("scanline_size          %f\n", options->scanline_scale);
+	file.printf("scanline_height        %f\n", options->scanline_height);
+	file.printf("scanline_bright_scale  %f\n", options->scanline_bright_scale);
+	file.printf("scanline_bright_offset %f\n", options->scanline_bright_offset);
+	file.printf("scanline_jitter        %f\n", options->scanline_offset);
+	file.printf("defocus                %f,%f\n", options->defocus[0], options->defocus[1]);
+	file.printf("converge_x             %f,%f,%f\n", options->converge_x[0], options->converge_x[1], options->converge_x[2]);
+	file.printf("converge_y             %f,%f,%f\n", options->converge_y[0], options->converge_y[1], options->converge_y[2]);
+	file.printf("radial_converge_x      %f,%f,%f\n", options->radial_converge_x[0], options->radial_converge_x[1], options->radial_converge_x[2]);
+	file.printf("radial_converge_y      %f,%f,%f\n", options->radial_converge_y[0], options->radial_converge_y[1], options->radial_converge_y[2]);
+	file.printf("red_ratio              %f,%f,%f\n", options->red_ratio[0], options->red_ratio[1], options->red_ratio[2]);
+	file.printf("grn_ratio              %f,%f,%f\n", options->grn_ratio[0], options->grn_ratio[1], options->grn_ratio[2]);
+	file.printf("blu_ratio              %f,%f,%f\n", options->blu_ratio[0], options->blu_ratio[1], options->blu_ratio[2]);
+	file.printf("saturation             %f\n", options->saturation);
+	file.printf("offset                 %f,%f,%f\n", options->offset[0], options->offset[1], options->offset[2]);
+	file.printf("scale                  %f,%f,%f\n", options->scale[0], options->scale[1], options->scale[2]);
+	file.printf("power                  %f,%f,%f\n", options->power[0], options->power[1], options->power[2]);
+	file.printf("floor                  %f,%f,%f\n", options->floor[0], options->floor[1], options->floor[2]);
+	file.printf("phosphor_life          %f,%f,%f\n", options->phosphor[0], options->phosphor[1], options->phosphor[2]);
+	file.printf("yiq_enable             %d\n", options->yiq_enable ? 1 : 0);
+	file.printf("yiq_cc                 %f\n", options->yiq_cc);
+	file.printf("yiq_a                  %f\n", options->yiq_a);
+	file.printf("yiq_b                  %f\n", options->yiq_b);
+	file.printf("yiq_o                  %f\n", options->yiq_o);
+	file.printf("yiq_p                  %f\n", options->yiq_p);
+	file.printf("yiq_n                  %f\n", options->yiq_n);
+	file.printf("yiq_y                  %f\n", options->yiq_y);
+	file.printf("yiq_i                  %f\n", options->yiq_i);
+	file.printf("yiq_q                  %f\n", options->yiq_q);
+	file.printf("yiq_scan_time          %f\n", options->yiq_scan_time);
+	file.printf("yiq_phase_count        %d\n", options->yiq_phase_count);
 
 	if (effect != NULL)
 	{
@@ -1988,6 +2269,7 @@ static INT32 slider_shadow_mask_x_count(running_machine &machine, void *arg, ast
 	hlsl_options *options = (hlsl_options*)arg;
 	if (newval != SLIDER_NOCHANGE) options->shadow_mask_count_x = newval;
 	if (string != NULL) string->printf("%d", options->shadow_mask_count_x);
+	options->params_dirty = true;
 	return options->shadow_mask_count_x;
 }
 
@@ -1996,261 +2278,313 @@ static INT32 slider_shadow_mask_y_count(running_machine &machine, void *arg, ast
 	hlsl_options *options = (hlsl_options*)arg;
 	if (newval != SLIDER_NOCHANGE) options->shadow_mask_count_y = newval;
 	if (string != NULL) string->printf("%d", options->shadow_mask_count_y);
+	options->params_dirty = true;
 	return options->shadow_mask_count_y;
 }
 
 static INT32 slider_shadow_mask_usize(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->shadow_mask_u_size), 1.0f / 32.0f, "%2.5f", string, newval);
 }
 
 static INT32 slider_shadow_mask_vsize(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->shadow_mask_v_size), 1.0f / 32.0f, "%2.5f", string, newval);
 }
 
 static INT32 slider_curvature(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->curvature), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_pincushion(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->pincushion), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_scanline_alpha(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scanline_alpha), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_scanline_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scanline_scale), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_scanline_height(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scanline_height), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_scanline_bright_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scanline_bright_scale), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_scanline_bright_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scanline_bright_offset), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_scanline_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scanline_offset), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_defocus_x(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->defocus[0]), 0.5f, "%2.1f", string, newval);
 }
 
 static INT32 slider_defocus_y(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->defocus[1]), 0.5f, "%2.1f", string, newval);
 }
 
 static INT32 slider_post_defocus_x(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->defocus[2]), 0.5f, "%2.1f", string, newval);
 }
 
 static INT32 slider_post_defocus_y(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->defocus[3]), 0.5f, "%2.1f", string, newval);
 }
 
 static INT32 slider_red_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->converge_x[0]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_red_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->converge_y[0]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_green_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->converge_x[1]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_green_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->converge_y[1]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_blue_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->converge_x[2]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_blue_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->converge_y[2]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_red_radial_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->radial_converge_x[0]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_red_radial_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->radial_converge_y[0]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_green_radial_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->radial_converge_x[1]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_green_radial_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->radial_converge_y[1]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_blue_radial_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->radial_converge_x[2]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_blue_radial_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->radial_converge_y[2]), 0.1f, "%3.1f", string, newval);
 }
 
 static INT32 slider_red_from_r(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->red_ratio[0]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_red_from_g(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->red_ratio[1]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_red_from_b(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->red_ratio[2]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_green_from_r(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->grn_ratio[0]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_green_from_g(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->grn_ratio[1]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_green_from_b(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->grn_ratio[2]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_blue_from_r(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->blu_ratio[0]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_blue_from_g(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->blu_ratio[1]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_blue_from_b(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->blu_ratio[2]), 0.005f, "%2.3f", string, newval);
 }
 
 static INT32 slider_red_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->offset[0]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_green_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->offset[1]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_blue_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->offset[2]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_red_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scale[0]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_green_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scale[1]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_blue_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->scale[2]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_red_power(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->power[0]), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_green_power(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->power[1]), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_blue_power(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->power[2]), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_red_floor(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->floor[0]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_green_floor(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->floor[1]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_blue_floor(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->floor[2]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_red_phosphor_life(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->phosphor[0]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_green_phosphor_life(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->phosphor[1]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_blue_phosphor_life(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->phosphor[2]), 0.01f, "%2.2f", string, newval);
 }
 
 static INT32 slider_saturation(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->saturation), 0.01f, "%2.2f", string, newval);
 }
 
@@ -2346,12 +2680,12 @@ void *windows_osd_interface::get_slider_list()
 //  scheme
 //-------------------------------------------------
 
-static file_error open_next(d3d_info *d3d, emu_file &file, const char *extension, int idx)
+static file_error open_next(d3d_info *d3d, emu_file &file, const char *templ, const char *extension, int idx)
 {
 	UINT32 origflags = file.openflags();
 
 	// handle defaults
-	const char *snapname = d3d->window->machine().options().snap_name();
+	const char *snapname = templ ? templ : d3d->window->machine().options().snap_name();
 
 	if (snapname == NULL || snapname[0] == 0)
 		snapname = "%g/%i";

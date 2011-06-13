@@ -55,7 +55,9 @@
 typedef struct _hlsl_options hlsl_options;
 struct _hlsl_options
 {
+	bool					params_dirty;
 	float					shadow_mask_alpha;
+	char 					shadow_mask_texture[1024];
 	int						shadow_mask_count_x;
 	int						shadow_mask_count_y;
 	float					shadow_mask_u_size;
@@ -82,6 +84,18 @@ struct _hlsl_options
 	float					floor[3];
 	float					phosphor[3];
 	float					saturation;
+	bool					yiq_enable;
+	float					yiq_cc;
+	float					yiq_a;
+	float					yiq_b;
+	float					yiq_o;
+	float					yiq_p;
+	float					yiq_n;
+	float					yiq_y;
+	float					yiq_i;
+	float					yiq_q;
+	float					yiq_scan_time;
+	int						yiq_phase_count;
 };
 
 class hlsl_info
@@ -132,7 +146,9 @@ private:
 	win_window_info *       window;						// D3D window info
 
 	bool					master_enable;				// overall enable flag
-	bool					yiq_enable;					// YIQ-convolution flag
+	bool					external_ini;				// external ini flag
+	int						prescale_force_x;			// prescale force x
+	int						prescale_force_y;			// prescale force y
 	int						prescale_size_x;			// prescale size x
 	int						prescale_size_y;			// prescale size y
 	int						preset;						// preset, if relevant
