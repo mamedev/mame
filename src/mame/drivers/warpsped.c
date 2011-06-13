@@ -75,7 +75,7 @@ public:
 
 static READ8_HANDLER( warpspeed_hardware_r )
 {
-	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
+//	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
 
 	switch( offset )
 	{
