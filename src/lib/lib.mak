@@ -91,6 +91,7 @@ EXPATOBJS = \
 	$(LIBOBJ)/formats/apf_apt.o		\
 	$(LIBOBJ)/formats/apridisk.o	\
 	$(LIBOBJ)/formats/ap_dsk35.o	\
+	$(LIBOBJ)/formats/atari_dsk.o	\
 	$(LIBOBJ)/formats/atarist_dsk.o	\
 	$(LIBOBJ)/formats/atom_tap.o	\
 	$(LIBOBJ)/formats/cbm_tap.o		\
@@ -112,6 +113,7 @@ EXPATOBJS = \
 	$(LIBOBJ)/formats/fmsx_cas.o	\
 	$(LIBOBJ)/formats/g64_dsk.o		\
 	$(LIBOBJ)/formats/gtp_cas.o		\
+	$(LIBOBJ)/formats/hect_dsk.o	\
 	$(LIBOBJ)/formats/hect_tap.o	\
 	$(LIBOBJ)/formats/imd_dsk.o		\
 	$(LIBOBJ)/formats/kim1_cas.o	\
@@ -144,6 +146,7 @@ EXPATOBJS = \
 	$(LIBOBJ)/formats/vg5k_cas.o	\
 	$(LIBOBJ)/formats/vt_cas.o		\
 	$(LIBOBJ)/formats/vt_dsk.o		\
+	$(LIBOBJ)/formats/vtech1_dsk.o	\
 	$(LIBOBJ)/formats/wavfile.o		\
 	$(LIBOBJ)/formats/x1_tap.o		\
 	$(LIBOBJ)/formats/z80ne_dsk.o	\

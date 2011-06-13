@@ -39,7 +39,7 @@
 */
 
 #include "atom_tap.h"
-
+#include "uef_cas.h"
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
@@ -136,3 +136,8 @@ const struct CassetteFormat atom_tap_format =
 	atom_tap_load,
 	NULL
 };
+
+CASSETTE_FORMATLIST_START( atom_cassette_formats )
+	CASSETTE_FORMAT(atom_tap_format)
+	CASSETTE_FORMAT(uef_cassette_format)
+CASSETTE_FORMATLIST_END
