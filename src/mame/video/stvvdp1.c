@@ -299,8 +299,9 @@ WRITE16_HANDLER( saturn_vdp1_regs_w )
 		case 0x06/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Erase data set %08X\n", data );
 
-			if(data)
+			if(data && data != 0x8000)
 				popmessage("EWDR set %08x, contact MAMEdev",STV_VDP1_EWDR);
+
 			break;
 		case 0x08/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Erase upper-left coord set: %08X\n", data );

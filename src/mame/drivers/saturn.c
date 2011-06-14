@@ -2712,6 +2712,11 @@ static MACHINE_RESET( saturn )
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
 		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
 	}
+
+	/* TODO: default value is probably 7 */
+	state->m_scu.start_factor[0] = -1;
+	state->m_scu.start_factor[1] = -1;
+	state->m_scu.start_factor[2] = -1;
 }
 
 
@@ -2740,6 +2745,11 @@ static MACHINE_RESET( stv )
 
 	state->m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	state->m_prev_bankswitch = 0xff;
+
+	/* TODO: default value is probably 7 */
+	state->m_scu.start_factor[0] = -1;
+	state->m_scu.start_factor[1] = -1;
+	state->m_scu.start_factor[2] = -1;
 }
 
 static MACHINE_CONFIG_START( saturn, saturn_state )
