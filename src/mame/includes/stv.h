@@ -17,7 +17,7 @@ public:
 	UINT32    *m_vdp2_vram;
 	UINT32    *m_vdp2_cram;
     UINT32    *m_vdp1_vram;
-    UINT32    *m_vdp1_regs;
+    UINT16    *m_vdp1_regs;
 
 	UINT8     m_NMI_reset;
 	UINT8     m_en_68k;
@@ -29,6 +29,8 @@ public:
 		UINT32    dst_add[3];	/* Destination Addition for DMA lv n*/
 		INT32     size[3];		/* Transfer DMA size lv n*/
 		UINT32    index[3];
+		UINT8     start_factor[3];
+		UINT8     enable_mask[3];
 	}m_scu;
 
 	int       m_minit_boost;
@@ -96,10 +98,14 @@ public:
 
 #define MASTER_CLOCK_352 57272800
 #define MASTER_CLOCK_320 53748200
-#define CEF_1	state->m_vdp1_regs[0x010/4]|=0x00020000
-#define CEF_0   state->m_vdp1_regs[0x010/4]&=~0x00020000
-#define BEF_1	state->m_vdp1_regs[0x010/4]|=0x00010000
-#define BEF_0	state->m_vdp1_regs[0x010/4]&=~0x00010000
+#define CEF_1	state->m_vdp1_regs[0x010/2]|=0x0002
+#define CEF_0   state->m_vdp1_regs[0x010/2]&=~0x0002
+#define BEF_1	state->m_vdp1_regs[0x010/2]|=0x0001
+#define BEF_0	state->m_vdp1_regs[0x010/2]&=~0x0001
+#define STV_VDP1_TVMR ((state->m_vdp1_regs[0x000/2])&0xffff)
+#define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
+#define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
+
 
 DRIVER_INIT ( stv );
 
@@ -159,11 +165,11 @@ int stv_vdp1_start ( running_machine &machine );
 void video_update_vdp1(running_machine &machine);
 void stv_vdp2_dynamic_res_change(running_machine &machine);
 
-READ32_HANDLER ( saturn_vdp1_regs_r );
+READ16_HANDLER ( saturn_vdp1_regs_r );
 READ32_HANDLER ( saturn_vdp1_vram_r );
 READ32_HANDLER ( saturn_vdp1_framebuffer0_r );
 
-WRITE32_HANDLER ( saturn_vdp1_regs_w );
+WRITE16_HANDLER ( saturn_vdp1_regs_w );
 WRITE32_HANDLER ( saturn_vdp1_vram_w );
 WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w );
 

@@ -149,6 +149,7 @@ static struct
 	UINT8 abus;
 }stv_irq;
 
+static void scu_do_transfer(running_machine &machine,UINT8 event);
 static void scu_dma_direct(address_space *space, UINT8 dma_ch);	/*DMA level 0 direct transfer function*/
 static void scu_dma_indirect(address_space *space, UINT8 dma_ch); /*DMA level 0 indirect transfer function*/
 
@@ -1189,11 +1190,8 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 **********************************************************************************/
 /*
 DMA TODO:
--Verify if there are any kind of bugs,do clean-ups,use better comments
- and macroize for better reading...
 -Add timings(but how fast are each DMA?).
 -Add level priority & DMA status register.
--Add DMA start factor conditions that are different than 7.
 -Add byte data type transfer.
 -Set boundaries.
 */
@@ -1218,6 +1216,22 @@ static UINT32 scu_add_tmp;
 #define WORK_RAM_L(_lv_) ((scu_##_lv_ & 0x07ffffff) >= 0x00200000) && ((scu_##_lv_ & 0x07ffffff) <= 0x002fffff)
 #define WORK_RAM_H(_lv_) ((scu_##_lv_ & 0x07ffffff) >= 0x06000000) && ((scu_##_lv_ & 0x07ffffff) <= 0x060fffff)
 #define SOUND_RAM(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05afffff)
+
+static void scu_do_transfer(running_machine &machine,UINT8 event)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	int i;
+
+	for(i=0;i<3;i++)
+	{
+		if(state->m_scu.enable_mask[i] && state->m_scu.start_factor[i] == event)
+		{
+			if(DIRECT_MODE(i)) 		{ scu_dma_direct(space,i);   }
+			else			   	    { scu_dma_indirect(space,i); }
+		}
+	}
+}
 
 static READ32_HANDLER( saturn_scu_r )
 {
@@ -1304,11 +1318,11 @@ static WRITE32_HANDLER( saturn_scu_w )
     It must be 7 for this specific condition.
 -state->m_scu_regs[5] bit 24 is Indirect Mode/Direct Mode (0/1).
 */
-		if(state->m_scu_regs[offset] & 1 && ((state->m_scu_regs[offset+1] & 7) == 7) && state->m_scu_regs[offset] & 0x100)
+		state->m_scu.enable_mask[DMA_CH] = (data & 0x100) >> 8;
+		if(state->m_scu.enable_mask[DMA_CH] && state->m_scu.start_factor[DMA_CH] == 7 && state->m_scu_regs[offset] & 1)
 		{
 			if(DIRECT_MODE(DMA_CH)) { scu_dma_direct(space,DMA_CH);   }
-			else				    { scu_dma_indirect(space,DMA_CH); }
-
+			else			   	    { scu_dma_indirect(space,DMA_CH); }
 			state->m_scu_regs[offset]&=~1;//disable starting bit.
 		}
 		break;
@@ -1320,8 +1334,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		}
 
 		/*Start factor enable bits,bit 2,bit 1 and bit 0*/
-		if((state->m_scu_regs[offset] & 7) != 7)
-			if(LOG_SCU) logerror("Start factor chosen for lv %d = %d\n",state->m_scu_regs[offset+1] & 7,DMA_CH);
+		state->m_scu.start_factor[DMA_CH] = state->m_scu_regs[offset] & 7;
 		break;
 
 		case 24:
@@ -1753,7 +1766,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	/* VDP1 */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(saturn_vdp1_regs_r, saturn_vdp1_regs_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
 	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(saturn_vdp2_regs_r, saturn_vdp2_regs_w)
@@ -1781,7 +1794,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	/* VDP1 */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(saturn_vdp1_regs_r, saturn_vdp1_regs_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
 	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(saturn_vdp2_regs_r, saturn_vdp2_regs_w)
@@ -2364,7 +2377,11 @@ static WRITE_LINE_DEVICE_HANDLER( scsp_to_main_irq )
 {
 	saturn_state *drvstate = device->machine().driver_data<saturn_state>();
 
-	device_set_input_line_and_vector(drvstate->m_maincpu, 9, (stv_irq.sound_req) ? HOLD_LINE : CLEAR_LINE, 0x46);
+	if(stv_irq.sound_req)
+	{
+		device_set_input_line_and_vector(drvstate->m_maincpu, 9, HOLD_LINE, 0x46);
+		scu_do_transfer(device->machine(),5);
+	}
 }
 
 static const scsp_interface scsp_config =
@@ -2569,27 +2586,54 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 
 	if(scanline == 0*y_step)
 	{
-		device_set_input_line_and_vector(state->m_maincpu, 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
-		//CEF_0; //TODO
+		if(stv_irq.vblank_out)
+		{
+			device_set_input_line_and_vector(state->m_maincpu, 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
+			scu_do_transfer(timer.machine(),1);
+		}
 	}
 	else if(scanline == vblank_line*y_step)
 	{
-		device_set_input_line_and_vector(state->m_maincpu, 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40);
-		video_update_vdp1(timer.machine());
+		if(stv_irq.vblank_in)
+		{
+			device_set_input_line_and_vector(state->m_maincpu, 0xf, HOLD_LINE ,0x40);
+			scu_do_transfer(timer.machine(),0);
+		}
+
 		if(stv_irq.vdp1_end)
+		{
 			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
-		CEF_1;
+			scu_do_transfer(timer.machine(),6);
+		}
+		video_update_vdp1(timer.machine());
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
-		device_set_input_line_and_vector(state->m_maincpu, 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42);
+	{
+		if(stv_irq.hblank_in)
+		{
+			device_set_input_line_and_vector(state->m_maincpu, 0xd, HOLD_LINE, 0x42);
+			scu_do_transfer(timer.machine(),2);
+		}
+	}
+
+	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
+	{
+		if(stv_irq.timer_0)
+		{
+			device_set_input_line_and_vector(state->m_maincpu, 0xc, HOLD_LINE, 0x43 );
+			scu_do_transfer(timer.machine(),3);
+		}
+	}
 
 	/* TODO: this isn't completely correct */
 	if((state->m_scu_regs[38] & 0x81) == 0x01 && ((scanline % y_step) == 0))
-		device_set_input_line_and_vector(state->m_maincpu, 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 );
-
-	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
-		device_set_input_line_and_vector(state->m_maincpu, 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 );
-
+	{
+		if(stv_irq.timer_1)
+		{
+			device_set_input_line_and_vector(state->m_maincpu, 0xb, HOLD_LINE, 0x44 );
+			scu_do_transfer(timer.machine(),4);
+		}
+	}
 }
 
 static READ32_HANDLER( saturn_cart_dram0_r )

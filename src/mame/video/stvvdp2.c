@@ -5812,9 +5812,6 @@ static int		stv_sprite_priorities_used[8];
 static int		stv_sprite_priorities_usage_valid;
 static UINT8	stv_sprite_priorities_in_fb_line[512][8];
 
-#define STV_VDP1_TVMR ((state->m_vdp1_regs[0x000/4] >> 16)&0x0000ffff)
-#define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
-
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 pri)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
