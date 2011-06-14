@@ -1055,7 +1055,7 @@ void info_xml_creator::output_images()
 		if (dev->must_be_loaded())
 			fprintf(m_output, " mandatory=\"1\"");
 
-		if (dev->image_interface()[0])
+		if (dev->image_interface() && dev->image_interface()[0])
 			fprintf(m_output, " interface=\"%s\"", xml_normalize_string(dev->image_interface()));
 
 		// close the XML tag

@@ -71,7 +71,4 @@ extern const device_type PRINTER;
 #define MCFG_PRINTER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PRINTER, 0) \
 
-#define MCFG_PRINTER_ONLINE(_online) \
-	MCFG_DEVICE_CONFIG_DATAPTR(printer_interface, m_online, _online)
-
 #endif /* __PRINTER_H__ */

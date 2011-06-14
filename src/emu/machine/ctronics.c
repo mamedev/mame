@@ -71,10 +71,14 @@ const centronics_interface standard_centronics =
 /*****************************************************************************
     PRINTER INTERFACE
 *****************************************************************************/
+const struct printer_interface centronics_printer_config =
+{
+    DEVCB_LINE(centronics_printer_online)
+};
 
 static MACHINE_CONFIG_FRAGMENT( centronics )
 	MCFG_PRINTER_ADD("printer")
-	MCFG_PRINTER_ONLINE(centronics_printer_online)
+	MCFG_DEVICE_CONFIG(centronics_printer_config)
 MACHINE_CONFIG_END
 
 
@@ -151,7 +155,7 @@ DEVICE_GET_INFO( centronics )
     sets us busy when the printer goes offline
 -------------------------------------------------*/
 
-void centronics_printer_online(device_t *device, int state)
+WRITE_LINE_DEVICE_HANDLER(centronics_printer_online)
 {
 	centronics_state *centronics = get_safe_token(device->owner());
 
