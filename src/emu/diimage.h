@@ -164,15 +164,15 @@ public:
 
 	virtual void device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
-	virtual bool call_load() = 0;
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) = 0;
-	virtual bool call_create(int format_type, option_resolution *format_options) = 0;
-	virtual void call_unload() = 0;
-	virtual void call_display() = 0;
-	virtual void call_display_info() = 0;
-	virtual void call_get_devices() = 0;
-	virtual void *get_device_specific_call() = 0;
-	virtual device_image_partialhash_func get_partial_hash() const = 0;
+	virtual bool call_load() { return FALSE; }
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return FALSE; }
+	virtual bool call_create(int format_type, option_resolution *format_options) { return FALSE; }
+	virtual void call_unload() { }
+	virtual void call_display() { }
+	virtual void call_display_info() { }
+	virtual void call_get_devices() { }
+	virtual void *get_device_specific_call() { return NULL; }
+	virtual device_image_partialhash_func get_partial_hash() const { return NULL; }
 	virtual iodevice_t image_type()  const = 0;
 	virtual bool is_readable()  const = 0;
 	virtual bool is_writeable() const = 0;
@@ -267,6 +267,7 @@ protected:
 	int read_hash_config(const char *sysname);
 	void run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *), hash_collection &hashes, const char *types);
 	void image_checkhash();
+	void update_names();
 	// derived class overrides
 
 	// configuration

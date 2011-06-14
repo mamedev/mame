@@ -25,7 +25,7 @@ static TIMER_CALLBACK( busy_callback );
 typedef struct _centronics_state centronics_state;
 struct _centronics_state
 {
-	device_t *printer;
+	printer_image_device *printer;
 
 	devcb_resolved_write_line out_ack_func;
 	devcb_resolved_write_line out_busy_func;
@@ -97,7 +97,7 @@ static DEVICE_START( centronics )
 	centronics->strobe = TRUE;
 
 	/* get printer device */
-	centronics->printer = device->subdevice("printer");
+	centronics->printer = device->subdevice<printer_image_device>("printer");
 
 	/* resolve callbacks */
 	centronics->out_ack_func.resolve(intf->out_ack_func, *device);
@@ -173,7 +173,7 @@ static TIMER_CALLBACK( ack_callback )
 	if (param == FALSE)
 	{
 		/* data is now ready, output it */
-		printer_output(centronics->printer, centronics->data);
+		centronics->printer->output(centronics->data);
 
 		/* ready to receive more data, return BUSY to low */
 		machine.scheduler().timer_set(attotime::from_usec(7), FUNC(busy_callback), FALSE, ptr);

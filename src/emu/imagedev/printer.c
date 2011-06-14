@@ -10,6 +10,60 @@
 #include "printer.h"
 
 
+// device type definition
+const device_type PRINTER = &device_creator<printer_image_device>;
+
+//-------------------------------------------------
+//  printer_image_device - constructor
+//-------------------------------------------------
+
+printer_image_device::printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, PRINTER, "Printer", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+
+}
+
+//-------------------------------------------------
+//  printer_image_device - destructor
+//-------------------------------------------------
+
+printer_image_device::~printer_image_device()
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void printer_image_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const printer_interface *intf = reinterpret_cast<const printer_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<printer_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_online, 0, sizeof(m_online));
+	}
+	
+	// set brief and instance name
+	update_names();
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void printer_image_device::device_start()
+{
+    m_online_func.resolve(m_online, *this);
+}
 
 /***************************************************************************
     IMPLEMENTATION
@@ -20,11 +74,9 @@
     is ready
 -------------------------------------------------*/
 
-int printer_is_ready(device_t *printer)
+int printer_image_device::is_ready()
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(printer);
-	/* if there is a file attached to it, it's online */
-	return image->exists() != 0;
+	return exists() != 0;
 }
 
 
@@ -33,12 +85,11 @@ int printer_is_ready(device_t *printer)
     printer_output - outputs data to a printer
 -------------------------------------------------*/
 
-void printer_output(device_t *printer, UINT8 data)
+void printer_image_device::output(UINT8 data)
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(printer);
-	if (image->exists())
+	if (exists())
 	{
-		image->fwrite(&data, 1);
+		fwrite(&data, 1);
 	}
 }
 
@@ -46,14 +97,11 @@ void printer_output(device_t *printer, UINT8 data)
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( printer )
 -------------------------------------------------*/
-
-static DEVICE_IMAGE_LOAD( printer )
+bool printer_image_device::call_load()
 {
-	const printer_config *conf = (const printer_config *)downcast<const legacy_image_device_base &>(image.device()).inline_config();
-
 	/* send notify that the printer is now online */
-	if (conf != NULL && conf->online != NULL)
-		conf->online(image, TRUE);
+	if (!m_online_func.isnull())
+		m_online_func(TRUE);
 
 	/* we don't need to do anything special */
 	return IMAGE_INIT_PASS;
@@ -63,54 +111,10 @@ static DEVICE_IMAGE_LOAD( printer )
 /*-------------------------------------------------
     DEVICE_IMAGE_UNLOAD( printer )
 -------------------------------------------------*/
-
-static DEVICE_IMAGE_UNLOAD( printer )
+void printer_image_device::call_unload()
 {
-	const printer_config *conf = (const printer_config *)downcast<const legacy_image_device_base &>(image.device()).inline_config();
-
 	/* send notify that the printer is now offline */
-	if (conf != NULL && conf->online != NULL)
-		conf->online(image, FALSE);
+	if (!m_online_func.isnull())
+		m_online_func(FALSE);
 }
 
-
-/*-------------------------------------------------
-    DEVICE_START(printer)
--------------------------------------------------*/
-
-static DEVICE_START(printer)
-{
-}
-
-
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO(printer)
--------------------------------------------------*/
-
-DEVICE_GET_INFO(printer)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = 1; break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(printer_config); break;
-		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_PRINTER; break;
-		case DEVINFO_INT_IMAGE_READABLE:				info->i = 0; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(printer); break;
-		case DEVINFO_FCT_IMAGE_LOAD:					info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(printer);		break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:					info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(printer);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Printer"); break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Printer"); break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__); break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "prn"); break;
-	}
-}
-
-DEFINE_LEGACY_IMAGE_DEVICE(PRINTER, printer);

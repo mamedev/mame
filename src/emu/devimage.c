@@ -76,9 +76,6 @@ legacy_image_device_base::legacy_image_device_base(const machine_config &mconfig
 
 void legacy_image_device_base::device_config_complete()
 {
-	const device_image_interface *image = NULL;
-	int count = 0;
-	int index = -1;
     image_device_format **formatptr;
     image_device_format *format;
     formatptr = &m_formatlist;
@@ -107,22 +104,8 @@ void legacy_image_device_base::device_config_complete()
 		}
 	}
 
-	for (bool gotone = device_t::m_machine_config.devicelist().first(image); gotone; gotone = image->next(image))
-	{
-		if (this == image)
-			index = count;
-		if (image->image_type() == image_type())
-			count++;
-	}
-	if (count > 1) {
-		m_instance_name.printf("%s%d", device_typename(image_type()), index + 1);
-		m_brief_instance_name.printf("%s%d", device_brieftypename(image_type()), index + 1);
-	}
-	else
-	{
-		m_instance_name = device_typename(image_type());
-		m_brief_instance_name = device_brieftypename(image_type());
-	}
+	update_names();
+	
 	// Override in case of hardcoded values
 	if (strlen(get_legacy_string(DEVINFO_STR_IMAGE_INSTANCE_NAME))>0) {
 		m_instance_name = get_legacy_string(DEVINFO_STR_IMAGE_INSTANCE_NAME);		
