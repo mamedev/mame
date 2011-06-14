@@ -109,6 +109,7 @@ static const char * const device_tags[NUM_TYPES] = { "ins8250", "ins8250a", "ns1
 #define COM_LOG(n,m,a) LOG(VERBOSE_COM,n,m,a)
 
 typedef struct {
+	devcb_resolved_write_line	out_intr_func;
 	const ins8250_interface *interface;
 	int	device_type;
 
@@ -215,8 +216,7 @@ static void ins8250_update_interrupt(device_t *device)
 	}
 
 	/* set or clear the int */
-	if (ins8250->interface->interrupt)
-		ins8250->interface->interrupt(device, state);
+	ins8250->out_intr_func(state);
 }
 
 
@@ -549,6 +549,8 @@ static void common_start( device_t *device, int device_type )
 
 	ins8250->interface = (const ins8250_interface*)device->static_config();
 	ins8250->device_type = device_type;
+
+	ins8250->out_intr_func.resolve(ins8250->interface->out_intr_cb, *device);
 }
 
 

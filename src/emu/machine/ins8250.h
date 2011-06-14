@@ -29,12 +29,10 @@ DECLARE_LEGACY_DEVICE(PC16550D, pc16550d);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*ins8250_interrupt_func)(device_t *device, int state);
 typedef void (*ins8250_transmit_func)(device_t *device, int data);
 typedef void (*ins8250_handshake_out_func)(device_t *device, int data);
 typedef void (*ins8250_refresh_connect_func)(device_t *device);
 
-#define INS8250_INTERRUPT(name)			void name(device_t *device, int state)
 #define INS8250_TRANSMIT(name)			void name(device_t *device, int data)
 #define INS8250_HANDSHAKE_OUT(name)		void name(device_t *device, int data)
 #define INS8250_REFRESH_CONNECT(name)	void name(device_t *device)
@@ -42,7 +40,7 @@ typedef void (*ins8250_refresh_connect_func)(device_t *device);
 typedef struct
 {
 	long clockin;
-	ins8250_interrupt_func			interrupt;
+	devcb_write_line				out_intr_cb;
 
 	ins8250_transmit_func			transmit;
 	ins8250_handshake_out_func		handshake_out;
