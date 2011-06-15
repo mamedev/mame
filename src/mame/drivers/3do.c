@@ -149,6 +149,11 @@ static MACHINE_RESET( 3do )
 	_3do_clio_init(machine, downcast<screen_device *>(machine.device("screen")));
 }
 
+struct cdrom_interface _3do_cdrom =
+{
+	NULL,
+	NULL
+};
 
 static MACHINE_CONFIG_START( 3do, _3do_state )
 
@@ -167,7 +172,7 @@ static MACHINE_CONFIG_START( 3do, _3do_state )
 //  MCFG_SCREEN_UPDATE( generic_bitmapped )
 	MCFG_SCREEN_UPDATE( _3do )
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom", _3do_cdrom)
 MACHINE_CONFIG_END
 
 
@@ -188,7 +193,7 @@ static MACHINE_CONFIG_START( 3do_pal, _3do_state )
 	MCFG_SCREEN_REFRESH_RATE( 50 )
 	MCFG_SCREEN_UPDATE( generic_bitmapped )
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom", _3do_cdrom)
 MACHINE_CONFIG_END
 
 

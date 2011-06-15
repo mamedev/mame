@@ -267,7 +267,7 @@ void stvcd_reset(running_machine &machine)
 	}
 
 	#ifdef MESS
-	cdrom = cd_get_cdrom_file(machine.device( "cdrom" ));
+	cdrom = machine.device<cdrom_image_device>("cdrom")->get_cdrom_file();
 	#else
 	cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
 	#endif

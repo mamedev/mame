@@ -2751,6 +2751,11 @@ static MACHINE_RESET( stv )
 	state->m_scu.start_factor[1] = -1;
 	state->m_scu.start_factor[2] = -1;
 }
+struct cdrom_interface saturn_cdrom =
+{
+	NULL,
+	NULL
+};
 
 static MACHINE_CONFIG_START( saturn, saturn_state )
 
@@ -2796,7 +2801,7 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom", saturn_cdrom)
 	MCFG_CARTSLOT_ADD("cart")
 MACHINE_CONFIG_END
 

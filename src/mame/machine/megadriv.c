@@ -6103,12 +6103,10 @@ static MACHINE_RESET( segacd )
 	lc89510_Reset();
 
 	{
-		device_t *device;
-
-		device = machine.device("cdrom");
+		cdrom_image_device *device = machine.device<cdrom_image_device>("cdrom");
 		if ( device )
 		{
-			segacd.cd = cd_get_cdrom_file(device);
+			segacd.cd = device->get_cdrom_file();
 			if ( segacd.cd )
 			{
 				segacd.toc = cdrom_get_toc( segacd.cd );
@@ -9783,22 +9781,25 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
 MACHINE_CONFIG_END
 
+struct cdrom_interface scd_cdrom =
+{
+	"scd_cdrom",
+	NULL
+};
+
 /* Different Softlists for different regions (for now at least) */
 MACHINE_CONFIG_DERIVED( genesis_scd_scd, genesis_scd )
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_scd_mcd, genesis_scd )
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_scd_mcdj, genesis_scd )
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
 MACHINE_CONFIG_END
 
@@ -9819,8 +9820,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	MCFG_CDROM_ADD( "cdrom", scd_cdrom)
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
 
 	MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")

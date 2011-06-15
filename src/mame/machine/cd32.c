@@ -103,12 +103,11 @@ static DEVICE_RESET( akiko )
 	running_machine &machine = device->machine();
 	akiko_state *state = get_safe_token(device);
 
-	device_t *cddevice;
-	cddevice = machine.device("cdrom");
+	cdrom_image_device *cddevice = machine.device<cdrom_image_device>("cdrom");
 	if (cddevice!=NULL)
 	{
 		// MESS case
-		state->m_cdrom = cd_get_cdrom_file(cddevice);
+		state->m_cdrom = cddevice->get_cdrom_file();
 		state->m_cdrom_is_device = 1;
 	}
 	else

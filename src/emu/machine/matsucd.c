@@ -62,11 +62,11 @@ static matsucd cd;
 
 static TIMER_CALLBACK(matsu_subcode_proc);
 
-void matsucd_init( device_t *cdrom_device, const char *cdda_tag )
+void matsucd_init( cdrom_image_device *cdrom_device, const char *cdda_tag )
 {
 	memset(&cd, 0, sizeof( matsucd ) );
 
-	cd.cdrom = cd_get_cdrom_file( cdrom_device );
+	cd.cdrom = cdrom_device->get_cdrom_file();
 	cd.cdda = cdrom_device->machine().device(cdda_tag);
 
 	cd.frame_timer = cdrom_device->machine().scheduler().timer_alloc(FUNC(matsu_subcode_proc));

@@ -1199,11 +1199,11 @@ void cdicdic_device::device_reset()
 {
     init();
 
-	device_t *cdrom_dev = machine().device("cdrom");
+	cdrom_image_device *cdrom_dev = machine().device<cdrom_image_device>("cdrom");
 	if( cdrom_dev )
 	{
 		// MESS case (has CDROM device)
-		m_cd = cd_get_cdrom_file(cdrom_dev);
+		m_cd = cdrom_dev->get_cdrom_file();
 		cdda_set_cdrom(machine().device("cdda"), m_cd);
 	}
 	else

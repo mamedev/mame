@@ -341,13 +341,17 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
     MCFG_MK48T08_ADD( "mk48t08" )
 MACHINE_CONFIG_END
 
+struct cdrom_interface cdi_cdrom =
+{
+	"cdi_cdrom",
+	DEVICE_IMAGE_DISPLAY_INFO_NAME(cdi_cdinfo)
+};
+
 // Standard CD-i system, with CD-ROM image device (MESS) and Software List (MESS)
 static MACHINE_CONFIG_DERIVED( cdimono1, cdi )
 	MCFG_MACHINE_RESET( cdi )
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("cdi_cdrom")
-	MCFG_CDROM_DISPLAY_INFO(cdi_cdinfo)
+	MCFG_CDROM_ADD( "cdrom", cdi_cdrom )	
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 MACHINE_CONFIG_END

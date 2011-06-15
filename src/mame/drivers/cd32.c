@@ -800,11 +800,14 @@ static MACHINE_CONFIG_START( cd32base, cd32_state )
 	MCFG_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cia_1_intf)
 MACHINE_CONFIG_END
 
-
+struct cdrom_interface cd32_cdrom =
+{
+	"cd32_cdrom",
+	NULL
+};
 
 static MACHINE_CONFIG_DERIVED( cd32, cd32base )
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("cd32_cdrom")
+	MCFG_CDROM_ADD( "cdrom", cd32_cdrom )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cd32")
 MACHINE_CONFIG_END
 

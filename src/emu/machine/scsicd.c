@@ -692,7 +692,8 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 
 	if (machine.device( diskregion )) {
 		our_this->is_file = TRUE;
-		our_this->cdrom = cd_get_cdrom_file( machine.device( diskregion ) );
+		cdrom_image_device *cdrom = machine.device<cdrom_image_device>(diskregion);
+		our_this->cdrom = cdrom->get_cdrom_file();
 	} else {
 		our_this->is_file = FALSE;
 		our_this->cdrom = cdrom_open(get_disk_handle( machine, diskregion ));
