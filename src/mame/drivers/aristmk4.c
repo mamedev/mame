@@ -1,176 +1,199 @@
 /*
-        Driver: aristmk4
+	Driver: aristmk4
 
-        Manufacturer: Aristocrat Leisure Industries ( aka Ainsworth Nominees P.L. )
-        Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
-        Driver by Palindrome & FraSher
+	Manufacturer: Aristocrat Leisure Industries ( aka Ainsworth Nominees P.L. )
+	Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
+	Driver by Palindrome & FraSher
 
-        original 86lions.c driver by Chris Hardy, Angelo Salese & Roberto Fresca
+	original 86lions.c driver by Chris Hardy, Angelo Salese & Roberto Fresca
 
-        ***************** INITIALISATION *********************************************************************
+	***************** INITIALISATION *********************************************************************
 
-        Method 1 :
-        * Key in with the Jackpot Key followed by the Audit Key
-        * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
-        * A value (displayed below) will appear next to RF/AMT on the right of the screen
-        * Key out both the Jackpot and Audit Keys
+	Method 1 :
+	* Key in with the Jackpot Key followed by the Audit Key
+	* Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+	* A value (displayed below) will appear next to RF/AMT on the right of the screen
+	* Key out both the Jackpot and Audit Keys
 
-        This method works with the following games:
-        3bagflnz 200
-        3bagflvt 200
-        autmoon  200
-        blkrhino 200
-        coralr2  200
-        eforesta 200
-        eforestb 200
-        ffortune 200
-        gldnpkr  400
-        goldenc  200
-        gtroppo  500
-        kgbird   200
-        kgbirda  200
-        phantomp 200
-        swtht2nz 200
-        wildone  200
-        wtigernz 200
+	This method works with the following games:
+	3bagflnz 200
+	3bagflvt 200
+	autmoon  200
+	blkrhino 200
+	coralr2  200
+	eforesta 200
+	eforestb 200
+	ffortune 200
+	gldnpkr  400
+	goldenc  200
+	gtroppo  500
+	kgbird   200
+	kgbirda  200
+	phantomp 200
+	swtht2nz 200
+	wildone  200
+	wtigernz 200
 
-        Method 2 :
-        * Key in with the Jackpot Key followed by the Audit Key
-        * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
-        * This will enter the cashcade screen and increment $100 to the maximum
-        * Press PLAY 2 LINES [BET 2 is erroneously displayed on the screen] to increment the minimum cashcade value by $5
-            (optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment the $5 to start with above or the game won't initialise)
-        * A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible until you key out and back in again with the Audit Key)
-        * Key out both the Jackpot and Audit Keys
+	Method 2 :
+	* Key in with the Jackpot Key followed by the Audit Key
+	* Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+	* This will enter the cashcade screen and increment $100 to the maximum
+	* Press PLAY 2 LINES [listed as BET 2 on the screen] to increment the minimum cashcade value by $5
+	  - (optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment the $5 to start with above or the game won't initialise)
+	* A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible until you key out and back in again with the Audit Key)
+	* Key out both the Jackpot and Audit Keys
 
-        This method works with the following games:
-        topgear  500
+	This method works with the following games:
+	topgear  500
 
-        Technical Notes:
+	Technical Notes:
 
-        68B09EP Motorola Processor
-        R6545AP for CRT video controller
-        UPD43256BCZ-70LL for 32kb of static ram used for 3 way electronic meters / 3 way memory
-        U6264A for Standard 8K x 8 bit SRAM used for video buffer
-        1 x R65C21P2  PIA - Peripheral Interface Adapter, connects to RTC and sends pulses to mechanical meters
-        1 x 6522 VIA - 1 x Rockwell - Versatile Interface Adapter.
-        2 x WF19054 = AY3-8910 sound chips driven by the 6522 VIA
-        1 x PML 2852 ( programmable logic ) used as address decoder.
-        1 x PML 2852 programmed as a PIA
+	68B09EP Motorola Processor
+	R6545AP for CRT video controller
+	UPD43256BCZ-70LL for 32kb of static ram used for 3 way electronic meters / 3 way memory
+	U6264A for Standard 8K x 8 bit SRAM used for video buffer
+	1 x R65C21P2  PIA - Peripheral Interface Adapter, connects to RTC and sends pulses to mechanical meters
+	1 x 6522 VIA - 1 x Rockwell - Versatile Interface Adapter.
+	2 x WF19054 = AY3-8910 sound chips driven by the 6522 VIA
+	1 x PML 2852 ( programmable logic ) used as address decoder.
+	1 x PML 2852 programmed as a PIA
 
-        PIA provides output signals to six mechanical meters.
-        It also provides the real time clock DS1287 to the CPU.
+	PIA provides output signals to six mechanical meters.
+	It also provides the real time clock DS1287 to the CPU.
 
-        VIA drives the programmable sound generators and generates
-        a timing interrupt to the CPU (M6809_FIRQ_LINE)
+	VIA drives the programmable sound generators and generates
+	a timing interrupt to the CPU (M6809_FIRQ_LINE)
 
-        The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
-        The remaining 4 bits are connected to other hardware, read via the VIA.
+	The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
+	The remaining 4 bits are connected to other hardware, read via the VIA.
 
-        The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
-        The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
+	The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
+	The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
 
-        27/04/10 - FrasheR
-        2 x Sound Chips connected to the 6522 VIA.
+	27/04/10 - FrasheR
+	2 x Sound Chips connected to the 6522 VIA.
 
-        16/05/10 - FrasheR
-        Fixed VIA for good. 5010 - 501F.
-        Hooked up push button inputs - FrasheR
-        Hooked up ports for the PML 2852 U3 - FrasheR
+	16/05/10 - FrasheR
+	Fixed VIA for good. 5010 - 501F.
+	Hooked up push button inputs - FrasheR
+	Hooked up ports for the PML 2852 U3 - FrasheR
 
-        16/05/10 - Palindrome
-        Lamp outputs and layout added - Palindrome
-        NVRAM backup - Palindrome
+	16/05/10 - Palindrome
+	Lamp outputs and layout added - Palindrome
+	NVRAM backup - Palindrome
 
-        20/05/10 - Palindrome
-        Connected SW7 for BGCOLOUR map select
-        Added LK13. 3Mhz or 1.5 Mhz CPU speed select
-        Added sound sample for mechanical meter pulse ( aristmk4.zip  ).
+	20/05/10 - Palindrome
+	Connected SW7 for BGCOLOUR map select
+	Added LK13. 3Mhz or 1.5 Mhz CPU speed select
+	Added sound sample for mechanical meter pulse ( aristmk4.zip ).
 
-        30/5/10 - Palindrome
-        Now using mc146818 rtc driver instead of rtc_get_reg.
+	30/5/10 - Palindrome
+	Now using mc146818 rtc driver instead of rtc_get_reg.
 
-        The mc146818 driver has issues and is not working correctly.
-        MESS developers are looking at it.
+	The mc146818 driver has issues and is not working correctly.
+	MESS developers are looking at it.
 
-        - day of week is incorrect
-        - day of month is incorrect ( code is using day instead of mday ).
-        - hours are not showing up correct in PM and 12 hour mode
-        - rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data )
+	- day of week is incorrect
+	- day of month is incorrect ( code is using day instead of mday ).
+	- hours are not showing up correct in PM and 12 hour mode
+	- rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data )
 
-        9/7/2010 - Palindrome
-        Robot Test added
-        Default Jackpot key re-assigned to 'I'
-        Work around for topgear & cashcade games
-        Improved coininput - force CBOPT1 to detect passing coin
-        Added new game Golden Poker ( Aristocrat version ) [ bad dump ]
-        Added new game Gone Troppo
-        Added new game Wild One
-        Misc improvements
+	9/7/2010 - Palindrome
+	Robot Test added
+	Default Jackpot key re-assigned to 'I'
+	Work around for topgear & cashcade games
+	Improved coininput - force CBOPT1 to detect passing coin
+	Added new game Golden Poker ( Aristocrat version ) [ bad dump ]
+	Added new game Gone Troppo
+	Added new game Wild One
+	Misc improvements
 
-        12/12/2010 - Palindrome and Heihachi_73
-        Updated source to 0.140u2 standards
-        Disabled real time clock to stop games from hanging. This causes a graphics glitch on the month display but makes the games more reliable in audit mode.
-        Fixed ROM names
-        Added new game Arctic Wins
-        Added new game Caribbean Gold 2 (missing 2 gfx roms, still boots)
-        Added new game Clockwise (program ROM nodump, all other roms fine)
-        Added new game Fortune Hunter (2 sets)
+	12/12/2010 - Palindrome and Heihachi_73
+	Updated source to 0.140u2 standards
+	Disabled real time clock to stop games from hanging. This causes a graphics glitch on the month display but makes the games more reliable in audit mode.
+	Fixed ROM names
+	Added new game Arctic Wins
+	Added new game Caribbean Gold 2 (missing 2 gfx roms, still boots)
+	Added new game Clockwise (program ROM nodump, all other roms fine)
+	Added new game Fortune Hunter (2 sets)
 
-        Gone Troppo requires DIP SW7 to be set to off/off or else the second screen will be broken. This is possibly true to the original machine.
+	06/06/2011 - Heihachi_73
+	Added button panel artwork for all games, and renamed the in-game buttons to match the artwork and/or Robot Test description.
+	Remapped Jackpot Key to 'L'
+	Remapped 'power fail' key to ',' (comma)
+	Remapped the video poker buttons; holds are now keys S,D,F,G,H
+	Un-mapped the unused inputs
 
-        TODO:
-        1.Create layouts for each game  ( each game is currently using the generic aristmk4.lay for now ).
-        - Games may have different button configuration requirements ( ie.. 9 or 5 lines and different bet values )
-        - Top gear and Gone Troppo have no BET play buttons, only PLAY 1 - 5 lines and a MAX BET option. These games are just standard 5 line games with no multipliers.
-        - Video poker and Keno button panels needed.
+	When the games first power on (or when reset), they will display a TILT message on the screen. This doesn't affect gameplay, and if there are no pending errors the game should coin up and/or play immediately.
+	The tilt message will also appear when an error code is displayed, such as the main door being opened/closed, or a hardware error/fault (such as hopper empty, coin yoyo, printer errors; none of which should happen MAME however).
+	The tilt message will disappear if you turn the Audit Key on and off, or after you start playing.
+	Despite the name, there is no 'tilt' mechanism in the machine and there is nothing to worry about. The first Aristocrat system to have a tilt mechanism was the MK5, which will cause the machine to reset abruptly if the player is too rough (e.g. hitting the screen or bumping the machine).
 
-        2.Extend the driver to use the keno keyboard input for keno games (no MK2.5/MKIV Keno games dumped yet as of 28/02/2010).
+	These games do not feature a backup mechanism in case of power faults or system crashes requiring a reboot; if the player was in the middle of a spin or watching a win count up, any credits won on that spin will be voided.
+	On the machine's artwork, this is reflected with text reading 'Malfunction voids all pays and plays', of which the text has also been carried onto later machines. The Aristocrat MK5 and later systems however feature backup mechanisms and will repeat the last game (including free game features and/or gamble selection) when powered on, to where the player had left off.
 
-        3.arcwins, eforest, fhunter, fhuntera and cgold2 do not work (these US-based games require note acceptor and printer support).
-        - fhunter, fhuntera and cgold2 won't enter audit mode for some reason.
+	Gone Troppo and Caribbean Gold 2 require DIP SW7 to be set to off/off or else the second screen will be broken. This is possibly true to the original machine.
+	A similar thing happens with Top Gear, the drag cars' tyres will only be the correct colour (grey) if SW7 is off/off.
+	In Wild One, the dollar sign on the Insert $2 graphic is the wrong colour on other settings as well. It only appears correct when SW7 is off/off. This is probably a bug in the original game, where the graphic designers have used the wrong palette for the background of the dollar sign.
+	From these findings, it is noted that the off/off setting may in fact be the default background setting of all games.
 
-        4.ROMs need redumping for the following games:
-        - White Tiger has bad graphics ROMs.
-        - Clockwise needs its program ROM redumped, original dump was 32K of 0xFF's. Graphics and video/sound ROM are OK.
-        - Correct PROMs needed for Top Gear (2CM33), Clockwise (2CM18) and Golden Poker (unknown).
+	Top Gear and Gone Troppo are non-multiplier, 5 payline games, therefore, you cannot bet higher than 5 credits on these machines.
 
-        5.Add note acceptor support
+	TODO:
+	1. Video poker and Keno button panels needed. 06/06/11: Video poker panels done, however they need confirmation with a real machine.
 
-        6.Provide complete cashcade emulation
+	2. Extend the driver to use the keno keyboard input for keno games (no MK2.5/MKIV Keno games dumped yet as of 28/02/2010).
 
-        7.Look into what the hopper probe signal is for.
+	3. arcwins, eforest, fhunter, fhuntera and cgold2 do not work (these US-based games require note acceptor and printer support).
+	 - fhunter, fhuntera and cgold2 need DIP 5201-5 enabled to work (if disabled, it acts as a 'freeze' switch).
+	 - The US games do work as such, however the unemulated items cause the games to end up disabled with the error (most notably, 70 - Printer Fault).
+	 - These games possibly need a set chip, as it is currently impossible to set up denominations; the machines are stuck in $100 per credit mode, which is a highly unusual setting.
+	 - If you turn PTRHOM off (with PTRTAC on), this will give you a short amount of time to enter the audit menu, however the games will still lock up with a printer fault.
+		To temporarily get around the lockup, keep triggering the main door switch (hit M twice). The machine will keep locking up every 2-3 seconds, however it is usable. If PTRHOM is on, the lockup happens immediately.
+	 - None of these games can coin up, however they are remotely playable with a memory/NVRAM hack to bypass the printer error and add credits. All of the US games pay out wins as physical coins (to hopper) rather than adding to credits.
+	 - Arctic Wins is similar to the Black Rhino/White Tiger style games, and Fortune Hunter is a direct clone of 3 Bags Full, even having the second screen feature named the 'Three Bags Full Feature'. Caribbean Gold 2 is a clone of Gone Troppo.
 
-        8.Investigate issues with the Poker style games as described below.
+	4. ROMs need redumping for the following games:
+	 - White Tiger has bad graphics ROMs.
+	 - Clockwise needs its program ROM redumped, original dump was 32K of 0xFF's. Graphics and video/sound ROM are OK.
+	 - Correct PROMs needed for Top Gear (2CM33), Caribbean Gold 2 (unknown), Clockwise (2CM18) and Golden Poker (unknown).
 
-        9.When DIP SW7 is set to off/off, speed is dramatically reduced.
+	5.Add note acceptor support
 
-        10. rewrite video emulation by using custom drawing code.
+	6.Provide complete cashcade emulation
 
-        11. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
+	7.Look into what the hopper probe signal is for.
 
-        12. fix 86 Lions (pre-Aristocrat Mk-4 HW, without prom and dunno what else)
+	8.Investigate issues with the Poker style games as described below.
 
-        ***************** POKER GAMES ************************************************************************
+	9.When DIP SW7 is set to off/off, speed is dramatically reduced.
 
-        Wild One & Golden Poker have a problem where the second branch condition is always true, see assebler below for
-        example of Wild One.
+	10. rewrite video emulation by using custom drawing code.
 
-        907D    BITA $1800  ( crtc )
-        9080    BNE  $907D  ; is zero
-        9082    BITA $1800
-        9085    BEQ  $9082  ; branches to 9082 indefinately, value is always zero.
-        9087    LDA  #$40
+	11. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
 
-        If the PC ( program counter ) is set to 9087 then the game runs.
+	12. fix 86 Lions (pre-Aristocrat Mk-4 HW, without prom and dunno what else)
 
-        Bug in the 6845 crtc core ? Seems like some kind of logic there not working.
+	***************** POKER GAMES ************************************************************************
 
-        EDIT: it's a vblank check, BITA opcode checks bit 5 in A register and compares it with the contents of 0x1800 (that is vblank in
-        mc6845_status_r). Checking if a bit goes low then high it usually means that is moaning for a vblank. ;-)
-        But now there is a new question: what kind of mc6845 clone this HW uses? It's clearly not standard mc6845, since that version doesn't
-        support vblank reading. The vblank bit can be read only on C6545-1, R6545-1, SY6545-1 and SY6845E subvariants, so it all lies to
-        those. -AS
+	Wild One & Golden Poker have a problem where the second branch condition is always true, see assebler below for
+	example of Wild One.
+
+	907D    BITA $1800  ( crtc )
+	9080    BNE  $907D  ; is zero
+	9082    BITA $1800
+	9085    BEQ  $9082  ; branches to 9082 indefinately, value is always zero.
+	9087    LDA  #$40
+
+	If the PC ( program counter ) is set to 9087 then the game runs.
+
+	Bug in the 6845 crtc core ? Seems like some kind of logic there not working.
+
+	EDIT: it's a vblank check, BITA opcode checks bit 5 in A register and compares it with the contents of 0x1800 (that is vblank in
+	mc6845_status_r). Checking if a bit goes low then high it usually means that is moaning for a vblank. ;-)
+	But now there is a new question: what kind of mc6845 clone this HW uses? It's clearly not standard mc6845, since that version doesn't
+	support vblank reading. The vblank bit can be read only on C6545-1, R6545-1, SY6545-1 and SY6845E subvariants, so it all lies to
+	those. -AS
 
 ***********************************************************************************************************************************************/
 
@@ -183,10 +206,24 @@
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "machine/8255ppi.h"
-#include "aristmk4.lh"
 #include "sound/samples.h"
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
 #include "machine/nvram.h"
+
+// Button panel and lamps
+#include "aristmk4.lh" // AU 90cr with gamble
+#include "arimk4nz.lh" // NZ 45cr with double up
+#include "3bagflnz.lh" // NZ 45cr without gamble
+#include "3bagflvt.lh" // AU 90cr without gamble
+#include "arcwins.lh"  // US 25cr with gamble
+#include "cgold2.lh"   // US 25cr without gamble
+#include "eforest.lh"  // US 45cr with gamble
+#include "fhunter.lh"  // US 45cr without gamble
+#include "goldenc.lh"  // NZ 90cr with double up
+#include "kgbird.lh"   // NZ 25cr with double up
+#include "topgear.lh"  // NZ 5 line without gamble
+#include "wildone.lh"  // Video poker
+#include "gldnpkr.lh"  // Video poker
 
 UINT8 crtc_cursor_index = 0;
 UINT8 crtc_reg = 0;
@@ -195,7 +232,7 @@ class aristmk4_state : public driver_device
 {
 public:
 	aristmk4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+	: driver_device(mconfig, type, tag) { }
 
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
@@ -215,55 +252,51 @@ public:
 	int m_cashcade_c;
 };
 
-
-
-
-
-
-/* Partial Caschcade protocol */
+/* Partial Cashcade protocol */
 static const UINT8 cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xf0};
 
 static VIDEO_START(aristmk4)
 {
-    int tile;
-    for (tile = 0; tile < machine.gfx[0]->total_elements; tile++)
-    {
+	int tile;
+	for (tile = 0; tile < machine.gfx[0]->total_elements; tile++)
+	{
 		gfx_element_decode(machine.gfx[0], tile);
-    }
+	}
 }
 
 INLINE void uBackgroundColour(running_machine &machine)
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-    /* SW7 can be set when the main door is open, this allows the colours for the background
-        to be adjusted whilst the machine is running.
 
-       There are 4 possible combinations for colour select via SW7, colours vary based on software installed.
+	/* SW7 can be set when the main door is open, this allows the colours for the background
+	to be adjusted whilst the machine is running.
 
-    */
-    switch(input_port_read(machine, "SW7"))
+	There are 4 possible combinations for colour select via SW7, colours vary based on software installed.
+	*/
+
+	switch(input_port_read(machine, "SW7"))
 	{
-        case 0x00:
-             // restore defaults
-             memcpy(state->m_shapeRomPtr,state->m_shapeRom, sizeof(state->m_shapeRom)); // restore defaults, both switches off
-                                                             // OE enabled on both shapes
-             break;
-        case 0x01:
-             // unselect U22 via SW7. OE on U22 is low.
-             memset(&state->m_shapeRomPtr[0x4000],0xff,0x2000);               // fill unused space with 0xff
-             memcpy(&state->m_shapeRomPtr[0xa000],&state->m_shapeRom[0xa000], 0x2000); // restore defaults here
-             break;
-        case 0x02:
-             // unselect U47 via SW7. OE on U47 is low.
-             memcpy(&state->m_shapeRomPtr[0x4000],&state->m_shapeRom[0x4000], 0x2000);
-             memset(&state->m_shapeRomPtr[0xa000],0xff,0x2000);
-             break;
-        case 0x03:
-             // unselect U47 & U22 via SW7. Both output enable low.
-             memset(&state->m_shapeRomPtr[0x4000],0xff,0x2000);
-             memset(&state->m_shapeRomPtr[0xa000],0xff,0x2000);
-             break;
-    }
+	case 0x00:
+		// restore defaults
+		memcpy(state->m_shapeRomPtr,state->m_shapeRom, sizeof(state->m_shapeRom)); // restore defaults, both switches off
+											// OE enabled on both shapes
+		break;
+	case 0x01:
+		// unselect U22 via SW7. OE on U22 is low.
+		memset(&state->m_shapeRomPtr[0x4000],0xff,0x2000);			// fill unused space with 0xff
+		memcpy(&state->m_shapeRomPtr[0xa000],&state->m_shapeRom[0xa000], 0x2000); // restore defaults here
+		break;
+	case 0x02:
+		// unselect U47 via SW7. OE on U47 is low.
+		memcpy(&state->m_shapeRomPtr[0x4000],&state->m_shapeRom[0x4000], 0x2000);
+		memset(&state->m_shapeRomPtr[0xa000],0xff,0x2000);
+		break;
+	case 0x03:
+		// unselect U47 & U22 via SW7. Both output enable low.
+		memset(&state->m_shapeRomPtr[0x4000],0xff,0x2000);
+		memset(&state->m_shapeRomPtr[0xa000],0xff,0x2000);
+		break;
+	}
 }
 
 static SCREEN_UPDATE(aristmk4)
@@ -272,22 +305,22 @@ static SCREEN_UPDATE(aristmk4)
 	const gfx_element *gfx = screen->machine().gfx[0];
 	int x,y;
 	int count = 0;
-    int color;
-    int tile;
-    int bgtile;
-    int flipx;
-    int flipy;
+	int color;
+	int tile;
+	int bgtile;
+	int flipx;
+	int flipy;
 
 	for (y=27;y--;)
 	{
 		for (x=38;x--;)
 		{
-            color = ((state->m_mkiv_vram[count]) & 0xe0) >> 5;
+		color = ((state->m_mkiv_vram[count]) & 0xe0) >> 5;
 			tile = (state->m_mkiv_vram[count+1]|state->m_mkiv_vram[count]<<8) & 0x3ff;
 			bgtile = (state->m_mkiv_vram[count+1]|state->m_mkiv_vram[count]<<8) & 0xff; // first 256 tiles
-			uBackgroundColour(screen->machine()); // read sw7
-			gfx_element_decode(gfx, bgtile);    // force the machine to update only the first 256 tiles.
-			                                    // as we only update the background, not the entire display.
+			uBackgroundColour(screen->machine());	// read sw7
+			gfx_element_decode(gfx, bgtile);	// force the machine to update only the first 256 tiles.
+								// as we only update the background, not the entire display.
 			flipx = ((state->m_mkiv_vram[count]) & 0x04);
 			flipy = ((state->m_mkiv_vram[count]) & 0x08);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,flipx,flipy,(38-x-1)<<3,(27-y-1)<<3);
@@ -301,31 +334,30 @@ static READ8_HANDLER(ldsw)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-   int U3_p2_ret= input_port_read(space->machine(), "5002");
-   if(U3_p2_ret & 0x1)
-   {
-        return 0;
-   }
-   return state->m_cgdrsw = input_port_read(space->machine(), "CGDRSW");
+	int U3_p2_ret= input_port_read(space->machine(), "5002");
+	if(U3_p2_ret & 0x1)
+	{
+	return 0;
+	}
+	return state->m_cgdrsw = input_port_read(space->machine(), "CGDRSW");
 }
 
 static READ8_HANDLER(cgdrr)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-   if(state->m_cgdrsw) // is the LC closed
-   {
-        return state->m_ripple; // return a positive value from the ripple counter
-   }
-   return 0x0; // otherwise the counter outputs are set low.
+	if(state->m_cgdrsw) // is the LC closed
+	{
+	return state->m_ripple; // return a positive value from the ripple counter
+	}
+	return 0x0; // otherwise the counter outputs are set low.
 }
 
 static WRITE8_HANDLER(cgdrw)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-    state->m_ripple = data;
-
+	state->m_ripple = data;
 }
 
 static WRITE8_HANDLER(u3_p0)
@@ -334,40 +366,34 @@ static WRITE8_HANDLER(u3_p0)
 
 	state->m_u3_p0_w = data;
 	//logerror("u3_p0_w: %02X\n",state->m_u3_p0_w);
-
 }
 
 static READ8_HANDLER(u3_p2)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-    int u3_p2_ret= input_port_read(space->machine(), "5002");
-    int u3_p3_ret= input_port_read(space->machine(), "5003");
+	int u3_p2_ret= input_port_read(space->machine(), "5002");
+	int u3_p3_ret= input_port_read(space->machine(), "5003");
 
-    output_set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
-    output_set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
+	output_set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
+	output_set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
 
-    if (state->m_u3_p0_w&0x20) // DOPTE on
-    {
-        if (u3_p3_ret&0x02) // door closed
-			u3_p2_ret = u3_p2_ret^0x08; // DOPTI on
+	if (state->m_u3_p0_w&0x20) // DOPTE on
+	{
+	if (u3_p3_ret&0x02) // door closed
+		u3_p2_ret = u3_p2_ret^0x08; // DOPTI on
 	}
 
-    if (state->m_inscrd==0)
-    {
+	if (state->m_inscrd==0)
+	{
 		state->m_inscrd=input_port_read(space->machine(), "insertcoin");
 	}
 
-    if (state->m_inscrd==1)
+	if (state->m_inscrd==1)
 		u3_p2_ret=u3_p2_ret^0x02;
 
-    return u3_p2_ret;
-
+	return u3_p2_ret;
 }
-
-
-
-
 
 /******************************************************************************
 
@@ -378,98 +404,82 @@ PORTB - MECHANICAL METERS
 
 ******************************************************************************/
 
-
-
-
 /*****************************************************************************/
 /* DALLAS DS1287 OR mc146818
 ******************************************************************************/
 
-
 //input a
-
-
 static READ8_HANDLER(mkiv_pia_ina)
 {
-     /* uncomment this code once RTC is fixed */
+	/* uncomment this code once RTC is fixed */
 
-    //return space->machine().device<mc146818_device>("rtc")->read(*space,1);
-    return 0;       // OK for now, the aussie version has no RTC on the MB so this is valid.
+	//return space->machine().device<mc146818_device>("rtc")->read(*space,1);
+	return 0;	// OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
 //output a
-
 static WRITE8_HANDLER(mkiv_pia_outa)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 	mc146818_device *mc = space->machine().device<mc146818_device>("rtc");
-    if(state->m_rtc_data_strobe)
-    {
-        mc->write(*space,1,data);
-        //logerror("rtc protocol write data: %02X\n",data);
-
-    }
-    else
-    {
-        mc->write(*space,0,data);
-        //logerror("rtc protocol write address: %02X\n",data);
-
-    }
-
+	if(state->m_rtc_data_strobe)
+	{
+		mc->write(*space,1,data);
+		//logerror("rtc protocol write data: %02X\n",data);
+	}
+	else
+	{
+		mc->write(*space,0,data);
+		//logerror("rtc protocol write address: %02X\n",data);
+	}
 }
 
 //output ca2
 static WRITE8_DEVICE_HANDLER(mkiv_pia_ca2)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-     state->m_rtc_address_strobe = data;
-    // logerror("address strobe %02X\n", address_strobe);
+	state->m_rtc_address_strobe = data;
+	// logerror("address strobe %02X\n", address_strobe);
 }
-
 
 //output cb2
 static WRITE8_DEVICE_HANDLER(mkiv_pia_cb2)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-     state->m_rtc_data_strobe = data;
-     //logerror("data strobe: %02X\n", data);
+	state->m_rtc_data_strobe = data;
+	//logerror("data strobe: %02X\n", data);
 }
-
-
 
 //output b
 static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 
-     UINT8 emet[5];
-     int i = 0;
-     //pia_data = data;
-     emet[0] = data & 0x01;	/* emet1  -  bit 1 - PB0 */
-    						/* seren1 -  bit 2 - PB1 */
-     emet[1] = data & 0x04; /* emet3  -  bit 3 - PB2 */
-     emet[2] = data & 0x08; /* emet4  -  bit 4 - PB3 */
-     emet[3] = data & 0x10; /* emet5  -  bit 5 - PB4 */
-     emet[4] = data & 0x20; /* emet6  -  bit 6 - PB5 */
+	UINT8 emet[5];
+	int i = 0;
+	//pia_data = data;
+	emet[0] = data & 0x01;	/* emet1  -  bit 1 - PB0 */
+				/* seren1 -  bit 2 - PB1 */
+	emet[1] = data & 0x04;	/* emet3  -  bit 3 - PB2 */
+	emet[2] = data & 0x08;	/* emet4  -  bit 4 - PB3 */
+	emet[3] = data & 0x10;	/* emet5  -  bit 5 - PB4 */
+	emet[4] = data & 0x20;	/* emet6  -  bit 6 - PB5 */
 
-
-
-     for(i = 0;i<sizeof(emet);i++)
-     {
-            if(emet[i])
-            {
-                //logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
-                sample_start(state->m_samples,i,0, FALSE); // pulse sound for mechanical meters
-            }
-     }
-
+	for(i = 0;i<sizeof(emet);i++)
+	{
+		if(emet[i])
+		{
+		//logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
+		sample_start(state->m_samples,i,0, FALSE); // pulse sound for mechanical meters
+		}
+	}
 }
 
 /* sound interface for playing mechanical meter sound */
 
 static const char *const meter_sample_names[] =
 {
-    "*aristmk4",
+	"*aristmk4",
 	"tick.wav",
 	0
 };
@@ -480,44 +490,35 @@ static const samples_interface meter_samples_interface =
 	meter_sample_names
 };
 
-
-
 /******************************************************************************
 
 VERSATILE INTERFACE ADAPTER CONFIGURATION
 
 ******************************************************************************/
 
-
 static TIMER_CALLBACK(coin_input_reset)
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-
 	state->m_inscrd=0; //reset credit input after 150msec
-
 }
 
 static TIMER_CALLBACK(hopper_reset)
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-
 	state->m_hopper_motor=0x01;
-
 }
 
-
 // Port A read (SW1)
-
 static READ8_DEVICE_HANDLER(via_a_r)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 	int psg_ret=0;
 
-    if (state->m_ay8910_1&0x03) // SW1 read.
-    {
-    	psg_ret = ay8910_r(device->machine().device("ay1"), 0);
-    	//logerror("PSG porta ay1 returned %02X\n",psg_ret);
-    }
+	if (state->m_ay8910_1&0x03) // SW1 read.
+	{
+	psg_ret = ay8910_r(device->machine().device("ay1"), 0);
+	//logerror("PSG porta ay1 returned %02X\n",psg_ret);
+	}
 
 	else if (state->m_ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
 	{
@@ -525,15 +526,13 @@ static READ8_DEVICE_HANDLER(via_a_r)
 		//logerror("PSG porta ay2 returned %02X\n",psg_ret);
 	}
 	return psg_ret;
-
 }
-
 
 static READ8_DEVICE_HANDLER(via_b_r)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 
-    int ret=input_port_read(device->machine(), "via_port_b");
+	int ret=input_port_read(device->machine(), "via_port_b");
 
 // Not expecting to read anything from port B on the AY8910's ( controls BC1, BC2 and BDIR )
 // However there are extra 4 bits not going to the AY8910's on the schematics, which get read from here.
@@ -544,48 +543,42 @@ static READ8_DEVICE_HANDLER(via_b_r)
 /* Coin input... CBOPT2 goes LOW, then the optic detectors OPTA1 / OPTB1 detect the coin passing */
 /* The timer causes one credit, per 150ms or so... */
 
-    switch(state->m_inscrd)
+	switch(state->m_inscrd)
 	{
-
-		case 0x00:
-			break;
-
-		case 0x01:
-			ret=ret^0x10;
-			state->m_inscrd++;
-			break;
-
-		case 0x02:
-			ret=ret^0x20;
-			state->m_inscrd++;
-			device->machine().scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
-			break;
-
-		default:
-			break; //timer will reset the input
+	case 0x00:
+		break;
+	case 0x01:
+		ret=ret^0x10;
+		state->m_inscrd++;
+		break;
+	case 0x02:
+		ret=ret^0x20;
+		state->m_inscrd++;
+		device->machine().scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
+		break;
+	default:
+		break; //timer will reset the input
 	}
-
 
 // if user presses collect.. send coins to hopper.
 
-    switch(state->m_hopper_motor)
+	switch(state->m_hopper_motor)
 	{
-		case 0x00:
-			ret=ret^0x40;
-			device->machine().scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
-			state->m_hopper_motor=0x02;
-			break;
-		case 0x01:
-			break; //default
-		case 0x02:
-			ret=ret^0x40;
-			break;
-		default:
-			break;
+	case 0x00:
+		ret=ret^0x40;
+		device->machine().scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
+		state->m_hopper_motor=0x02;
+		break;
+	case 0x01:
+		break; //default
+	case 0x02:
+		ret=ret^0x40;
+		break;
+	default:
+		break;
 	}
-    return ret;
+	return ret;
 }
-
 
 static WRITE8_DEVICE_HANDLER(via_a_w)
 {
@@ -593,20 +586,19 @@ static WRITE8_DEVICE_HANDLER(via_a_w)
 
 	//logerror("VIA port A write %02X\n",data);
 	state->m_psg_data = data;
-
 }
 
 static WRITE8_DEVICE_HANDLER(via_b_w)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 	state->m_ay8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
-                                 //NOTE: when bit 4 is off, we write to AY1, when bit 4 is on, we write to AY2
+		//NOTE: when bit 4 is off, we write to AY1, when bit 4 is on, we write to AY2
 	state->m_ay8910_2 = state->m_ay8910_1;
 
 	if ( state->m_ay8910_2 & 0x08 ) // is bit 4 on ?
 	{
-        state->m_ay8910_2  = (state->m_ay8910_2 | 0x02) ; // bit 2 is turned on as bit 4 hooks to bit 2 in the schematics
-        state->m_ay8910_1  = 0x00; // write only to ay2
+	state->m_ay8910_2  = (state->m_ay8910_2 | 0x02) ; // bit 2 is turned on as bit 4 hooks to bit 2 in the schematics
+	state->m_ay8910_1  = 0x00; // write only to ay2
 	}
 	else
 	{
@@ -622,97 +614,80 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 
 	switch(state->m_ay8910_1)
 	{
-
-		case 0x00:	//INACT -Nothing to do here. Inactive PSG
-			break;
-
-		case 0x03:  //READ - Nothing to do here. The read happens in via_a_r
-			break;
-
-		case 0x06:  //WRITE
-        {
-        	ay8910_data_w( device->machine().device("ay1"), 0 , state->m_psg_data );
-        	//logerror("VIA Port A write data ay1: %02X\n",state->m_psg_data);
-        	break;
-        }
-
-		case 0x07:  //LATCH Address (set register)
-        {
-        	ay8910_address_w( device->machine().device("ay1"), 0 , state->m_psg_data );
-        	//logerror("VIA Port B write register ay1: %02X\n",state->m_psg_data);
-        	break;
-        }
-
-		default:
-			//logerror("Unknown PSG state on ay1: %02X\n",state->m_ay8910_1);
-			break;
+	case 0x00:	//INACT -Nothing to do here. Inactive PSG
+		break;
+	case 0x03:	//READ - Nothing to do here. The read happens in via_a_r
+		break;
+	case 0x06:	//WRITE
+	{
+		ay8910_data_w( device->machine().device("ay1"), 0 , state->m_psg_data );
+		//logerror("VIA Port A write data ay1: %02X\n",state->m_psg_data);
+		break;
+	}
+	case 0x07:	//LATCH Address (set register)
+	{
+		ay8910_address_w( device->machine().device("ay1"), 0 , state->m_psg_data );
+		//logerror("VIA Port B write register ay1: %02X\n",state->m_psg_data);
+		break;
+	}
+	default:
+		//logerror("Unknown PSG state on ay1: %02X\n",state->m_ay8910_1);
+		break;
 	}
 
 	//PSG ay2
 
 	switch(state->m_ay8910_2)
 	{
-
-		case 0x00:	//INACT - Nothing to do here. Inactive PSG
-			break;
-
-		case 0x02:	//INACT - '010' Nothing to do here. Inactive PSG. this will only happen on ay2 due to the bit 2 swap on 'inactive'
-			break;
-
-		case 0x03:  //READ - Nothing to do here. The read happens in via_a_r
-			break;
-
-		case 0x06:  //WRITE
-        {
-        	ay8910_data_w( device->machine().device("ay2"), 0 , state->m_psg_data );
-        	//logerror("VIA Port A write data ay2: %02X\n",state->m_psg_data);
-        	break;
-        }
-
-		case 0x07:  //LATCH Address (set register)
-        {
-            ay8910_address_w( device->machine().device("ay2"), 0 , state->m_psg_data );
-            //logerror("VIA Port B write register ay2: %02X\n",state->m_psg_data);
-            break;
-        }
-
-		default:
-			//logerror("Unknown PSG state on ay2: %02X\n",state->m_ay8910_2);
-			break;
-
+	case 0x00:	//INACT - Nothing to do here. Inactive PSG
+		break;
+	case 0x02:	//INACT - '010' Nothing to do here. Inactive PSG. this will only happen on ay2 due to the bit 2 swap on 'inactive'
+		break;
+	case 0x03:	//READ - Nothing to do here. The read happens in via_a_r
+		break;
+	case 0x06:	//WRITE
+	{
+		ay8910_data_w( device->machine().device("ay2"), 0 , state->m_psg_data );
+		//logerror("VIA Port A write data ay2: %02X\n",state->m_psg_data);
+		break;
 	}
-
+	case 0x07:	//LATCH Address (set register)
+	{
+		ay8910_address_w( device->machine().device("ay2"), 0 , state->m_psg_data );
+		//logerror("VIA Port B write register ay2: %02X\n",state->m_psg_data);
+		break;
+	}
+		default:
+		//logerror("Unknown PSG state on ay2: %02X\n",state->m_ay8910_2);
+		break;
+	}
 }
 
 static READ8_DEVICE_HANDLER(via_ca2_r)
 {
-    //logerror("Via Port CA2 read %02X\n",0) ;
+	//logerror("Via Port CA2 read %02X\n",0) ;
 	// CA2 is connected to CDSOL1 on schematics ?
 
 	return 0 ;
-
 }
 
 static READ8_DEVICE_HANDLER(via_cb2_r)
 {
-    //logerror("Via Port CB2 read %02X\n",0) ;
-    // CB2 is connected to HOPMO1 on schematics ?
+	//logerror("Via Port CB2 read %02X\n",0) ;
+	// CB2 is connected to HOPMO1 on schematics ?
 
 	return 0 ;
-
 }
-
 
 static WRITE8_DEVICE_HANDLER(via_ca2_w)
 {
-    //logerror("Via Port CA2 write %02X\n",data) ;
+	//logerror("Via Port CA2 write %02X\n",data) ;
 }
-
 
 static WRITE8_DEVICE_HANDLER(via_cb2_w)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-// CB2 = hopper motor (HOPMO1). When it is 0x01, it is not running (active low)
+	// CB2 = hopper motor (HOPMO1). When it is 0x01, it is not running (active low)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r
 	// as soon as it is 1, HOPCO1 to remain 'ON'
 
@@ -722,52 +697,46 @@ static WRITE8_DEVICE_HANDLER(via_cb2_w)
 		state->m_hopper_motor=data;
 }
 
-
 // Lamp output
 
 static WRITE8_DEVICE_HANDLER(pblp_out)
 {
-    output_set_lamp_value(1, (data) & 1);
-    output_set_lamp_value(5, (data >> 1) & 1);
-    output_set_lamp_value(9, (data >> 2) & 1);
-    output_set_lamp_value(11,(data >> 3) & 1);
-    output_set_lamp_value(3, (data >> 4) & 1);
-    output_set_lamp_value(4, (data >> 5) & 1);
-    output_set_lamp_value(2, (data >> 6) & 1);
-    output_set_lamp_value(10,(data >> 7) & 1);
-
-    //logerror("Lights port A %02X\n",data);
+	output_set_lamp_value(1, (data) & 1);
+	output_set_lamp_value(5, (data >> 1) & 1);
+	output_set_lamp_value(9, (data >> 2) & 1);
+	output_set_lamp_value(11,(data >> 3) & 1);
+	output_set_lamp_value(3, (data >> 4) & 1);
+	output_set_lamp_value(4, (data >> 5) & 1);
+	output_set_lamp_value(2, (data >> 6) & 1);
+	output_set_lamp_value(10,(data >> 7) & 1);
+	//logerror("Lights port A %02X\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER(pbltlp_out)
 {
-    output_set_lamp_value(8,  (data) & 1);
-    output_set_lamp_value(12, (data >> 1) & 1);
-    output_set_lamp_value(6,  (data >> 2) & 1);
-    output_set_lamp_value(7,  (data >> 3) & 1);
-    output_set_lamp_value(14, (data >> 4) & 1); // light tower
-    output_set_lamp_value(15, (data >> 5) & 1); // light tower
-    output_set_lamp_value(16, (data >> 6) & 1); // light tower
-    output_set_lamp_value(17, (data >> 7) & 1); // light tower
-
-    //logerror("Lights port B: %02X\n",data);
+	output_set_lamp_value(8,  (data) & 1);
+	output_set_lamp_value(12, (data >> 1) & 1);
+	output_set_lamp_value(6,  (data >> 2) & 1);
+	output_set_lamp_value(7,  (data >> 3) & 1);
+	output_set_lamp_value(14, (data >> 4) & 1); // light tower
+	output_set_lamp_value(15, (data >> 5) & 1); // light tower
+	output_set_lamp_value(16, (data >> 6) & 1); // light tower
+	output_set_lamp_value(17, (data >> 7) & 1); // light tower
+	//logerror("Lights port B: %02X\n",data);
 }
 
 static WRITE8_HANDLER(mlamps)
 {
-    /* TAKE WIN AND GAMBLE LAMPS */
-    output_set_lamp_value(18, (data >> 5) & 1);
-    output_set_lamp_value(13, (data >> 6) & 1);
-
+	/* TAKE WIN AND GAMBLE LAMPS */
+	output_set_lamp_value(18, (data >> 5) & 1);
+	output_set_lamp_value(13, (data >> 6) & 1);
 }
-
 
 static WRITE8_DEVICE_HANDLER(zn434_w)
 {
 
 	// Introducted to prevent warning in log for write to AY1 PORT B
 	// this is a write to the ZN434 DA convertors..
-
 }
 
 
@@ -787,6 +756,12 @@ static READ8_HANDLER(mk4_printer_r)
 {
 	return 0;
 }
+
+/******************************************************************************
+
+ADDRESS MAP - SLOT GAMES
+
+******************************************************************************/
 
 static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, m_mkiv_vram) // video ram -  chips U49 / U50
@@ -816,17 +791,19 @@ static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END
 
-/*
+/******************************************************************************
 
+ADDRESS MAP - VIDEO POKER GAMES
+
+******************************************************************************/
+
+/*
 Poker card style games seem to have different address mapping
 
 The graphics rom is mapped from 0x4000 - 0x4fff
 
 The U87 personality rom is not required, therefore game rom code mapping is from 0x8000-0xffff
-
-
 */
-
 
 static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, m_mkiv_vram) // video ram -  chips U49 / U50
@@ -856,24 +833,22 @@ static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END
 
+/******************************************************************************
+
+INPUT PORTS
+
+******************************************************************************/
+
 static INPUT_PORTS_START(aristmk4)
 
-    /***********************************************************************************************************/
+	PORT_START("via_port_b")
+	PORT_DIPNAME( 0x40, 0x40, "HOPCO1" )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) ) PORT_DIPLOCATION("AY:3")
+	PORT_DIPNAME( 0x80, 0x00, "CBOPT1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("AY:4")
 
-    PORT_START("via_port_b")
-    PORT_DIPNAME( 0x40, 0x40, "HOPCO1" )
-    PORT_DIPSETTING(    0x40, DEF_STR( On ) ) PORT_DIPLOCATION("AY:3")
-    PORT_DIPNAME( 0x80, 0x00, "CBOPT1" )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("AY:4")
-
-	/************************************************************************************************************
-
-    5002
-
-    ************************************************************************************************************/
-
-    PORT_START("5002")
+	PORT_START("5002")
 	PORT_DIPNAME( 0x01, 0x00, "HOPCO2") // coins out hopper 2 , why triggers logic door ?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -884,28 +859,21 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "DOPTI")  // photo optic door
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("AUDTSW") PORT_TOGGLE PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Audit Key") PORT_TOGGLE PORT_CODE(KEYCODE_K) // AUDTSW
 	PORT_DIPNAME( 0x20, 0x00, "HOPLO1") // hopper 1 low
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "HOPLO2") // hopper 2 low
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("ROBO/HOP RESET - PB6") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Robot Test / Hopper Reset") PORT_CODE(KEYCODE_Z) // PB6
 
-
-    /************************************************************************************************************
-
-    5003
-
-    ************************************************************************************************************/
-
-    PORT_START("5003")
+	PORT_START("5003")
 	PORT_DIPNAME( 0x01, 0x00, "OPTAUI") // opto audit in
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DSWDT") PORT_TOGGLE PORT_CODE(KEYCODE_M) // main door switch
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("JKPTSW") PORT_TOGGLE PORT_CODE(KEYCODE_I) // jackpot reset switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Main Door") PORT_TOGGLE PORT_CODE(KEYCODE_M) // DSWDT
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Jackpot Key") PORT_TOGGLE PORT_CODE(KEYCODE_L) // JKPTSW
 	PORT_DIPNAME( 0x08, 0x08, "HOPHI1") // hopper 1 full
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -922,7 +890,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-    PORT_START("5300")
+	PORT_START("5300")
 	PORT_DIPNAME( 0x01, 0x00, "5300-1")
 	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -948,35 +916,35 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:8") // mechanical meters, must be on
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-    PORT_START("500d")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_T) // 5 credits per line
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10 CREDITS PER LINE") PORT_CODE(KEYCODE_Y) // 10 credits per line
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_Q)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESERVE") PORT_CODE(KEYCODE_A) // reserve
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("GAMBLE") PORT_CODE(KEYCODE_U) // auto gamble & gamble
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TAKE WIN") PORT_CODE(KEYCODE_J)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7 UNUSED") PORT_CODE(KEYCODE_I)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
+	PORT_START("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("5 Credits Per Line") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("10 Credits Per Line") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Reserve") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Gamble") PORT_CODE(KEYCODE_U) // auto gamble & gamble
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Win") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-7 UNUSED")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-8 UNUSED")
 
-    PORT_START("500e")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 CREDIT PER LINE") PORT_CODE(KEYCODE_W) // 1 credit per line
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1 LINE/RED") PORT_CODE(KEYCODE_S)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2 CREDITS PER LINE") PORT_CODE(KEYCODE_E) // 2 credits per line
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 9 LINES/BLACK") PORT_CODE(KEYCODE_H)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3 CREDITS PER LINE") PORT_CODE(KEYCODE_R) // 3 credits per line
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 7 LINES") PORT_CODE(KEYCODE_G)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5 LINES") PORT_CODE(KEYCODE_F)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3 LINES") PORT_CODE(KEYCODE_D)
+	PORT_START("500e")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1 Credit Per Line") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line / Red") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("2 Credits Per Line") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 9 Lines / Black") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("3 Credits Per Line") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 7 Lines") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 3 Lines") PORT_CODE(KEYCODE_D)
 
-    PORT_START("500f")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_1)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_2)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_3)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("AUX - PB5") PORT_CODE(KEYCODE_X)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("MEM TEST - PB4") PORT_CODE(KEYCODE_C)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOPPER TEST - PB3") PORT_CODE(KEYCODE_V)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PRINT DATA - PB2") PORT_CODE(KEYCODE_B)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("CLOCK INIT - PB1") PORT_CODE(KEYCODE_N)
+	PORT_START("500f")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("2-1 UNUSED")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("2-2 UNUSED")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("2-3 UNUSED")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("AUX1") PORT_CODE(KEYCODE_X) // PB5
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Memory Reset") PORT_CODE(KEYCODE_C) // PB4
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Hopper Test") PORT_CODE(KEYCODE_V) // PB3
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Print Data") PORT_CODE(KEYCODE_B) // PB2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Clock Init") PORT_CODE(KEYCODE_N) // PB1
 
 	PORT_START("5200")
 	PORT_DIPNAME( 0x01, 0x00, "5200-1")
@@ -1033,27 +1001,20 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_START("insertcoin")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Insert Credit")
 
-    PORT_START("powerfail")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_L)
+	PORT_START("powerfail")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_COMMA)
 
-	/************************************************************************************************************
-
-    Logic Door switch
-
-    ************************************************************************************************************/
-
-    PORT_START("CGDRSW")
-    PORT_DIPNAME( 0x10, 0x10, "CGDRSW" ) PORT_DIPLOCATION("CGDRSW:1")	/* toggle switch */
-    PORT_DIPSETTING(    0x00, "Open" )
+	PORT_START("CGDRSW") // Logic Door (Security Cage)
+	PORT_DIPNAME( 0x10, 0x10, "CGDRSW" ) PORT_DIPLOCATION("CGDRSW:1")	/* toggle switch */
+	PORT_DIPSETTING(    0x00, "Open" )
 	PORT_DIPSETTING(    0x10, "Closed" )
 
 	/************************************** LINKS ***************************************************************/
 
-    PORT_START("LK13")
-    PORT_DIPNAME( 0x10, 0x10, "Speed Select" ) PORT_DIPLOCATION("LK13:1")
-    PORT_DIPSETTING(    0x00, "3 Mhz" )
+	PORT_START("LK13")
+	PORT_DIPNAME( 0x10, 0x10, "Speed Select" ) PORT_DIPLOCATION("LK13:1")
+	PORT_DIPSETTING(    0x00, "3 Mhz" )
 	PORT_DIPSETTING(    0x10, "1.5 Mhz" )
-
 
 	/********************************* Dip switch for background color *************************************************/
 
@@ -1065,11 +1026,10 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW7:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 
-
 	/********************************* 9 way control rotary switches ***************************************************/
 
 	PORT_START("SW3")
-    PORT_DIPNAME( 0x0f, 0x00, "SW3 - M/C NO" )
+	PORT_DIPNAME( 0x0f, 0x00, "SW3 - M/C NO" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -1082,7 +1042,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x09, "9" )
 
 	PORT_START("SW4")
-    PORT_DIPNAME( 0x0f, 0x00, "SW4 - M/C NO" )
+	PORT_DIPNAME( 0x0f, 0x00, "SW4 - M/C NO" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -1095,7 +1055,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x09, "9" )
 
 	PORT_START("SW5")
-    PORT_DIPNAME( 0x0f, 0x00, "SW5 - M/C NO" )
+	PORT_DIPNAME( 0x0f, 0x00, "SW5 - M/C NO" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -1108,7 +1068,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x09, "9" )
 
 	PORT_START("SW6")
-    PORT_DIPNAME( 0x0f, 0x00, "SW6 - M/C NO" )
+	PORT_DIPNAME( 0x0f, 0x00, "SW6 - M/C NO" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -1122,7 +1082,7 @@ static INPUT_PORTS_START(aristmk4)
 
 	/***************** DIP SWITCHES **********************************************************************/
 
-    PORT_START("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "DSW1 - Maxbet rejection" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1133,7 +1093,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "DSW1 - Hopper pay limit - S3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, "DSW1 - Cash credit option" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW1:5")
@@ -1159,7 +1119,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "DSW2 - Jackpot limit - S1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "DSW2 - Jackpot limit - S2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW2:5")
@@ -1173,119 +1133,181 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x80, 0x00, "DSW2 - Unconnected" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(3bagflvt)
 	PORT_INCLUDE(aristmk4)
 
 	PORT_MODIFY("500d")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("MAX BET") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("AUTO PLAY") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Max Bet") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Auto Play") PORT_CODE(KEYCODE_J)
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1 LINE") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 9 LINES") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 7 LINES") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5 LINES") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3 LINES") PORT_CODE(KEYCODE_D)
-
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 9 Lines") PORT_CODE(KEYCODE_H)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(3bagflnz)
 	PORT_INCLUDE(3bagflvt)
 
 	PORT_MODIFY("500d")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 CREDITS PER LINE") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5 UNUSED") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6 UNUSED") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4 Credits Per Line") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("5 Credits Per Line") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-5 UNUSED")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-6 UNUSED")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(eforestb)
+static INPUT_PORTS_START(eforest)
 	PORT_INCLUDE(aristmk4)
 
 	PORT_MODIFY("500d")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 CREDITS PER LINE") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 7 Lines") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 9 Lines / Black") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_CODE(KEYCODE_A)
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line / Red") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1 Credit Per Line") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 3 Lines") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("5 Credits Per Line") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4 Credits Per Line") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("3 Credits Per Line") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("2 Credits Per Line") PORT_CODE(KEYCODE_D)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(arcwins)
+	PORT_INCLUDE(eforest)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 4 Lines") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines / Black") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_Q)
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 2 Lines") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Play 3 Lines") PORT_CODE(KEYCODE_R)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(cgold2)
+	PORT_INCLUDE(arcwins)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-5 UNUSED")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-6 UNUSED")
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_W)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(fhunter)
+	PORT_INCLUDE(cgold2)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 7 Lines") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 9 Lines") PORT_CODE(KEYCODE_Y)
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 3 Lines") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_R)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(arimk4nz)
+	PORT_INCLUDE(aristmk4)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4 Credits Per Line") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("5 Credits Per Line") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_CODE(KEYCODE_U)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(goldenc)
+	PORT_INCLUDE(aristmk4)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_CODE(KEYCODE_U)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(kgbird)
 	PORT_INCLUDE(aristmk4)
 
 	PORT_MODIFY("500d")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 CREDITS PER LINE") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4 Credits Per Line") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("5 Credits Per Line") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_CODE(KEYCODE_U)
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5 LINES/BLACK") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 4 LINES") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3 LINES") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 2 LINES") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines / Black") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 4 Lines") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Play 3 Lines") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 2 Lines") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(topgear)
 	PORT_INCLUDE(aristmk4)
 
-    PORT_MODIFY("500d")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1 UNUSED") PORT_CODE(KEYCODE_T)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-2 UNUSED") PORT_CODE(KEYCODE_Y)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_Q)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SERVICE") PORT_CODE(KEYCODE_A)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5 UNUSED") PORT_CODE(KEYCODE_U)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6 UNUSED") PORT_CODE(KEYCODE_J)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7 UNUSED") PORT_CODE(KEYCODE_I)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-1 UNUSED")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-2 UNUSED")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Change") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-5 UNUSED")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-6 UNUSED")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-7 UNUSED")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-8 UNUSED")
 
-    PORT_MODIFY("500e")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1 UNUSED") PORT_CODE(KEYCODE_W)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1 LINE") PORT_CODE(KEYCODE_S)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("MAX BET") PORT_CODE(KEYCODE_E)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5 LINES") PORT_CODE(KEYCODE_H)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5 UNUSED") PORT_CODE(KEYCODE_R)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 4 LINES") PORT_CODE(KEYCODE_G)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3 LINES") PORT_CODE(KEYCODE_F)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 2 LINES") PORT_CODE(KEYCODE_D)
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("1-1 UNUSED")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Max Bet") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("1-5 UNUSED")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 4 Lines") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Play 3 Lines") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 2 Lines") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(wildone)
 	PORT_INCLUDE(aristmk4)
 
 	PORT_MODIFY("500d")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SERVICE") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("GAMBLE") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET 2/HOLD 2") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET 3/HOLD 3") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5 UNUSED") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6 UNUSED") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7 UNUSED") PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Bet 2 / Hold 2") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Bet 3 / Hold 3") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-5 UNUSED")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-6 UNUSED")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-7 UNUSED")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-8 UNUSED")
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BLACK") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RED") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET 1/HOLD 1") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HIGH 5/HOLD 5") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BIG 5/HOLD 4") PORT_CODE(KEYCODE_G) // no bet 4 button
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TAKE WIN") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DRAW") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Black") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Red") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Bet 1 / Hold 1") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("High 5 / Hold 5") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Big 5 / Hold 4") PORT_CODE(KEYCODE_G) // no bet 4 button
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Win") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Draw") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(gldnpkr)
 	PORT_INCLUDE(wildone)
 
 	PORT_MODIFY("500d")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1 UNUSED") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 2") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-1 UNUSED")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("GAMBLE") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_CODE(KEYCODE_F)
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SERVICE") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 1/RED") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 5/BLACK") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Change") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Red") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Black") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
 static const gfx_layout layout8x8x6 =
@@ -1315,7 +1337,7 @@ static const ay8910_interface ay8910_config1 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW1"),
-    DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(zn434_w) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
 };
@@ -1332,43 +1354,43 @@ static const ay8910_interface ay8910_config2 =
 
 static WRITE8_DEVICE_HANDLER(firq)
 {
-       cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B               */ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
-	/*inputs : CA/B1,CA/B2       */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_r),DEVCB_HANDLER(via_cb2_r),
-	/*outputs: A/B               */ DEVCB_HANDLER(via_a_w), DEVCB_HANDLER(via_b_w),
-	/*outputs: CA/B1,CA/B2       */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_w),DEVCB_HANDLER(via_cb2_w),
-	/*irq                        */ DEVCB_HANDLER(firq)
+	/*inputs : A/B		*/ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
+	/*inputs : CA/B1,CA/B2	*/ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_r),DEVCB_HANDLER(via_cb2_r),
+	/*outputs: A/B		*/ DEVCB_HANDLER(via_a_w), DEVCB_HANDLER(via_b_w),
+	/*outputs: CA/B1,CA/B2	*/ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_w),DEVCB_HANDLER(via_cb2_w),
+	/*irq			*/ DEVCB_HANDLER(firq)
 
 	// CA1 is connected to +5V, CB1 is not connected.
 };
 
 static const pia6821_interface aristmk4_pia1_intf =
 {
-    DEVCB_MEMORY_HANDLER("maincpu",PROGRAM,mkiv_pia_ina),     /* port A in */
-	DEVCB_NULL, 	/* port B in */
-    DEVCB_NULL,     /* line CA1 in */
-    DEVCB_NULL,     /* line CB1 in */
-    DEVCB_NULL,     /* line CA2 in */
-    DEVCB_NULL,     /* line CB2 in */
-    DEVCB_MEMORY_HANDLER("maincpu",PROGRAM,mkiv_pia_outa),     /* port A out */
-    DEVCB_HANDLER(mkiv_pia_outb),     /* port B out */
-    DEVCB_HANDLER(mkiv_pia_ca2),     /* line CA2 out */
-    DEVCB_HANDLER(mkiv_pia_cb2),     /* port CB2 out */
-    DEVCB_NULL,       /* IRQA */
-    DEVCB_NULL        /* IRQB */
+	DEVCB_MEMORY_HANDLER("maincpu",PROGRAM,mkiv_pia_ina),	// port A in
+	DEVCB_NULL,	// port B in
+	DEVCB_NULL,	// line CA1 in
+	DEVCB_NULL,	// line CB1 in
+	DEVCB_NULL,	// line CA2 in
+	DEVCB_NULL,	// line CB2 in
+	DEVCB_MEMORY_HANDLER("maincpu",PROGRAM,mkiv_pia_outa),	// port A out
+	DEVCB_HANDLER(mkiv_pia_outb),	// port B out
+	DEVCB_HANDLER(mkiv_pia_ca2),	// line CA2 out
+	DEVCB_HANDLER(mkiv_pia_cb2),	// port CB2 out
+	DEVCB_NULL,	// IRQA
+	DEVCB_NULL	// IRQB
 };
 
 static const mc6845_interface mc6845_intf =
 {
 	/* in fact is a mc6845 driving 4 pixels by memory address.
-       that's why the big horizontal parameters */
+	that's why the big horizontal parameters */
 
 	"screen",	/* screen we are acting on */
-	4,			/* number of pixels per video memory address */
+	4,		/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
 	NULL,		/* after pixel update callback */
@@ -1393,7 +1415,7 @@ static READ8_DEVICE_HANDLER(pb1_r)
 
 static READ8_DEVICE_HANDLER(pc1_r)
 {
-    return 0;
+	return 0;
 }
 
 static const ppi8255_interface ppi8255_intf1 =
@@ -1432,13 +1454,11 @@ static PALETTE_INIT( aristmk4 )
 	}
 }
 
-
-
 static DRIVER_INIT( aristmk4 )
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 	state->m_shapeRomPtr = (UINT8 *)machine.region("tile_gfx")->base();
-    memcpy(state->m_shapeRom,state->m_shapeRomPtr,sizeof(state->m_shapeRom)); // back up
+	memcpy(state->m_shapeRom,state->m_shapeRomPtr,sizeof(state->m_shapeRom)); // back up
 	state->m_nvram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
@@ -1447,54 +1467,48 @@ static MACHINE_START( aristmk4 )
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
 	state->m_samples = machine.device("samples");
-    state_save_register_global_pointer(machine, state->m_nvram, 0x1000); // state->m_nvram
+	state_save_register_global_pointer(machine, state->m_nvram, 0x1000); // state->m_nvram
 }
-
 
 static MACHINE_RESET( aristmk4 )
 {
-    /* mark 4 has a link on the motherboard to switch between 1.5Mhz and 3Mhz clock speed */
-    switch(input_port_read(machine, "LK13"))  // cpu speed control... 3mhz or 1.5mhz
-    {
-        case  0x00:
-            machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 Mhz
-            break;
-        case  0x10:
-            machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/8);  // 1.5 Mhz
-            break;
-    }
-
+	/* mark 4 has a link on the motherboard to switch between 1.5MHz and 3MHz clock speed */
+	switch(input_port_read(machine, "LK13"))  // CPU speed control... 3mhz or 1.5MHz
+	{
+	case 0x00:
+		machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 MHz
+		break;
+	case 0x10:
+		machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/8);  // 1.5 MHz
+		break;
+	}
 }
 
 static TIMER_DEVICE_CALLBACK( aristmk4_pf )
 {
-    /*
-    IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.
-    This event is recorded in NVRAM to facilitate the Robot Test.
+	/*
+	IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.
+	This event is recorded in NVRAM to facilitate the Robot Test.
 
-    Would be ideal to use this in our add_exit_callback instead of using a timer but it doesn't seem to
-    save the power down state in nvram . Is there a cleaner way to do this ?
+	Would be ideal to use this in our add_exit_callback instead of using a timer but it doesn't seem to
+	save the power down state in nvram. Is there a cleaner way to do this?
 
-    To enter the robot test
+	To enter the robot test
 
-    1. Open the main door
-    2. Trigger powerfail / NMI by presing L for at least 1 second, the game will freeze.
-    3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
+	1. Open the main door
+	2. Trigger powerfail / NMI by presing L for at least 1 second, the game will freeze.
+	3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
 
-    Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI  ( ie.. hold down L for at least 1 second )
+	Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
+	*/
 
-    */
-
-    if(input_port_read(timer.machine(), "powerfail")) // send NMI signal if L pressed
-    {
-        cputag_set_input_line( timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE );
-    }
+	if(input_port_read(timer.machine(), "powerfail")) // send NMI signal if L pressed
+	{
+	cputag_set_input_line( timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE );
+	}
 }
 
-
-
 static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
@@ -1543,12 +1557,10 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( aristmk4_poker, aristmk4 )
-
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-    MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
+	MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
@@ -1580,7 +1592,6 @@ static MACHINE_CONFIG_DERIVED( 86lions, aristmk4 )
 MACHINE_CONFIG_END
 
 ROM_START( 3bagflvt )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59",  0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1604,7 +1615,6 @@ ROM_START( 3bagflvt )
 ROM_END
 
 ROM_START( 3bagflnz )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59",  0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1628,7 +1638,6 @@ ROM_START( 3bagflnz )
 ROM_END
 
 ROM_START( blkrhino )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1652,7 +1661,6 @@ ROM_START( blkrhino )
 ROM_END
 
 ROM_START( coralr2 )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1676,7 +1684,6 @@ ROM_START( coralr2 )
 ROM_END
 
 ROM_START( eforest )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1700,7 +1707,6 @@ ROM_START( eforest )
 ROM_END
 
 ROM_START( eforesta )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1724,7 +1730,6 @@ ROM_START( eforesta )
 ROM_END
 
 ROM_START( eforestb )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1748,7 +1753,6 @@ ROM_START( eforestb )
 ROM_END
 
 ROM_START( goldenc )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1772,7 +1776,6 @@ ROM_START( goldenc )
 ROM_END
 
 ROM_START( swtht2nz )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1796,7 +1799,6 @@ ROM_START( swtht2nz )
 ROM_END
 
 ROM_START( kgbird )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1820,7 +1822,6 @@ ROM_START( kgbird )
 ROM_END
 
 ROM_START( kgbirda )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1844,7 +1845,6 @@ ROM_START( kgbirda )
 ROM_END
 
 ROM_START( phantomp )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1868,7 +1868,6 @@ ROM_START( phantomp )
 ROM_END
 
 ROM_START( topgear )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1892,7 +1891,6 @@ ROM_START( topgear )
 ROM_END
 
 ROM_START( wtigernz )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1916,7 +1914,6 @@ ROM_START( wtigernz )
 ROM_END
 
 ROM_START( ffortune )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1940,7 +1937,6 @@ ROM_START( ffortune )
 ROM_END
 
 ROM_START( autmoon )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -1964,7 +1960,6 @@ ROM_START( autmoon )
 ROM_END
 
 ROM_START( gtroppo )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("3vas003.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406)) // sound and video rom
@@ -1987,7 +1982,6 @@ ROM_START( gtroppo )
 ROM_END
 
 ROM_START( clkwise )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("3vas003.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406)) // sound and video rom
@@ -2006,11 +2000,10 @@ ROM_START( clkwise )
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("gtroppo.u40", 0x0000, 0x0200, BAD_DUMP CRC(918cb0ab) SHA1(2ec37abae2ecae2f0f525daf6fafd03789fca20b)) // Using gtroppo's PROM until clkwise's 2CM1B (2CM18?) PROM is dumped
+	ROM_LOAD("gtroppo.u40", 0x0000, 0x0200, BAD_DUMP CRC(918cb0ab) SHA1(2ec37abae2ecae2f0f525daf6fafd03789fca20b)) // Using gtroppo's PROM until clkwise's 2CM18 PROM is dumped
 ROM_END
 
 ROM_START( cgold2 )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -2030,11 +2023,10 @@ ROM_START( cgold2 )
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, BAD_DUMP CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f)) // Using 2CM34 PROM until cgold2's PROM is dumped
+	ROM_LOAD("gtroppo.u71", 0x0000, 0x0200, BAD_DUMP CRC(918cb0ab) SHA1(2ec37abae2ecae2f0f525daf6fafd03789fca20b)) // Using gtroppo's PROM for now
 ROM_END
 
 ROM_START( fhunter )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -2058,7 +2050,6 @@ ROM_START( fhunter )
 ROM_END
 
 ROM_START( fhuntera )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -2082,7 +2073,6 @@ ROM_START( fhuntera )
 ROM_END
 
 ROM_START( arcwins )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
@@ -2108,7 +2098,6 @@ ROM_END
 /* Video poker games */
 
 ROM_START( wildone )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("3vas003.u59", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406)) // sound and video rom
@@ -2131,7 +2120,6 @@ ROM_START( wildone )
 ROM_END
 
 ROM_START( gldnpkr )
-
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
 	ROM_LOAD("vidsnd.u7", 0x06000, 0x2000, CRC(568bd63f) SHA1(128b0b085c8b97d1c90baeab4886c522c0bc9a0e)) // sound and video rom
@@ -2153,6 +2141,8 @@ ROM_START( gldnpkr )
 	ROM_LOAD("2cm07.u40", 0x0000, 0x0200,  CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
 ROM_END
 
+/* 86 Lions */
+
 ROM_START( 86lions )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lion_std.u9", 0xe000, 0x2000, CRC(994842b0) SHA1(72fc31c577ee70b07ce9a4f2e864fe113d32affe) )
@@ -2165,34 +2155,32 @@ ROM_START( 86lions )
 	ROM_LOAD( "gn1.u11", 0x08000, 0x1000, CRC(80dce6f4) SHA1(bf953eba9cb270297b0d0efffe15b926e94dfbe7) )
 	ROM_LOAD( "rd0.u13", 0x0a000, 0x1000, CRC(38c57504) SHA1(cc3ac1df644abc4586fc9f0e88531ba146b86b48) )
 
-//  ROM_REGION( 0x200, "proms", 0 )
-//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
+	//  ROM_REGION( 0x200, "proms", 0 )
+	//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
-
-GAMEL( 1985, 86lions,  0,        86lions,  aristmk4, aristmk4, ROT0, "Aristocrat", "86 Lions",                                       GAME_NOT_WORKING, layout_aristmk4 )
-GAMEL( 1996, eforest,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",              GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
-GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",               0,                layout_aristmk4 ) // 10c, $1 = 10 credits
-GAMEL( 1996, eforestb, eforest,  aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)",      0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 1996, 3bagflvt, 0,        aristmk4, 3bagflvt, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",               0,                layout_aristmk4 ) // 5c, $1 = 20 credits
-GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",           0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 1996, blkrhino, 0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",           0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 1996, kgbird,   0,        aristmk4, kgbird,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 87.98%)",     0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 1996, kgbirda,  kgbird,   aristmk4, kgbird,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 91.97%)",     0,                layout_aristmk4 ) // 10c, $2 = 20 credits
-GAMEL( 1998, swtht2nz, 0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Sweet Hearts II (1VXFC5461, New Zealand)",       0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 1996, goldenc,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",       0,                layout_aristmk4 ) // 2c, $2 = 100 credits
-GAMEL( 1996, topgear,  0,        aristmk4, topgear,  aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, NSW)",                       0,                layout_aristmk4 ) // 10c, 1 coin = 1 credit
-GAMEL( 1996, wtigernz, 0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",           0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 1998, phantomp, 0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",          0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 2000, coralr2,  0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",       0,                layout_aristmk4 ) // 2c, $2 = 100 credits
-GAMEL( 1998, ffortune, 0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",       0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 1999, autmoon,  0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",           0,                layout_aristmk4 ) // 5c, $2 = 40 credits
-GAMEL( 1986, gtroppo,  0,        aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, NSW)",       0,                layout_aristmk4 ) // possibly 20c, 1 coin = 1 credit
-GAMEL( 1986, clkwise,  0,        aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)", GAME_NOT_WORKING, layout_aristmk4 ) // 20c, 1 coin = 1 credit
-GAMEL( 1995, cgold2,   0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, US)",             GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
-GAMEL( 1996, fhunter,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, US)",                GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
-GAMEL( 1996, fhuntera, fhunter,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, US)",                GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
-GAMEL( 1996, arcwins,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, US)",                   GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
-GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",              0,                layout_aristmk4 ) // 20c, $2 = 10 credits, video poker
-GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, NSW)",      0,                layout_aristmk4 ) // possibly 20c, 1 coin = 1 credit, video poker
-
+GAMEL( 1985, 86lions,  0,	 86lions,  aristmk4, aristmk4, ROT0, "Aristocrat", "86 Lions",					GAME_NOT_WORKING, layout_topgear  )
+GAMEL( 1996, eforest,  0,	 aristmk4, eforest,  aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",		GAME_NOT_WORKING, layout_eforest  ) // multiple denominations
+GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",	 	0,		  layout_aristmk4 ) // 10c, $1 = 10 credits
+GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1996, 3bagflvt, 0,	 aristmk4, 3bagflvt, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",		0,		  layout_3bagflvt ) // 5c, $1 = 20 credits
+GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",	0,		  layout_3bagflnz ) // 5c, $2 = 40 credits
+GAMEL( 1996, blkrhino, 0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1996, kgbird,   0,	 aristmk4, kgbird,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 87.98%)",0,		  layout_kgbird   ) // 5c, $2 = 40 credits
+GAMEL( 1996, kgbirda,  kgbird,   aristmk4, kgbird,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 91.97%)",0,		  layout_kgbird   ) // 10c, $2 = 20 credits
+GAMEL( 1998, swtht2nz, 0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Sweet Hearts II (1VXFC5461, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1996, goldenc,  0,	 aristmk4, goldenc,  aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",	0,		  layout_goldenc  ) // 2c, $2 = 100 credits
+GAMEL( 1996, topgear,  0,	 aristmk4, topgear,  aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",		0,		  layout_topgear  ) // 10c, 1 coin = 1 credit
+GAMEL( 1996, wtigernz, 0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1998, phantomp, 0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 2000, coralr2,  0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",	0,		  layout_arimk4nz ) // 2c, $2 = 100 credits
+GAMEL( 1998, ffortune, 0,	 aristmk4, goldenc,  aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",	0,		  layout_goldenc  ) // 5c, $2 = 40 credits
+GAMEL( 1999, autmoon,  0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1986, gtroppo,  0,	 aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, NSW)",	0,		  layout_topgear  ) // possibly 20c, 1 coin = 1 credit
+GAMEL( 1986, clkwise,  0,	 aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)", GAME_NOT_WORKING, layout_topgear ) // 20c, 1 coin = 1 credit
+GAMEL( 1995, cgold2,   0,	 aristmk4, cgold2,   aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, US)",	GAME_NOT_WORKING, layout_cgold2   ) // multiple denominations
+GAMEL( 1996, fhunter,  0,	 aristmk4, fhunter,  aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, US)",		GAME_NOT_WORKING, layout_fhunter  ) // multiple denominations
+GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter,  aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, US)",		GAME_NOT_WORKING, layout_fhunter  ) // multiple denominations
+GAMEL( 1996, arcwins,  0,	 aristmk4, arcwins,  aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, US)",		GAME_NOT_WORKING, layout_arcwins  ) // multiple denominations
+GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",		0,		  layout_wildone  ) // 20c, $2 = 10 credits, video poker
+GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, NSW)",	0,		  layout_gldnpkr  ) // possibly 20c, 1 coin = 1 credit, video poker

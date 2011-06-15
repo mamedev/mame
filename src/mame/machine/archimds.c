@@ -125,7 +125,7 @@ static TIMER_CALLBACK( vidc_video_tick )
 	size = vidc_vidend-vidc_vidstart+0x10;
 
 	for(vidc_vidcur = 0;vidc_vidcur < size;vidc_vidcur++)
-		vram[vidc_vidcur] = (space->read_byte(vidc_vidstart+vidc_vidcur+vidc_vidinit));
+		vram[vidc_vidcur] = (space->read_byte(vidc_vidstart+vidc_vidcur));
 
 	if(video_dma_on)
 		vid_timer->adjust(space->machine().primary_screen->time_until_pos(vidc_regs[0xb4]));

@@ -1824,6 +1824,18 @@ $(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 			$(LAYOUT)/sigmapkr.lh \
 
 $(DRIVERS)/aristmk4.o:	$(LAYOUT)/aristmk4.lh \
+			$(LAYOUT)/arimk4nz.lh \
+			$(LAYOUT)/3bagflnz.lh \
+			$(LAYOUT)/3bagflvt.lh \
+			$(LAYOUT)/arcwins.lh \
+			$(LAYOUT)/cgold2.lh \
+			$(LAYOUT)/eforest.lh \
+			$(LAYOUT)/fhunter.lh \
+			$(LAYOUT)/goldenc.lh \
+			$(LAYOUT)/kgbird.lh \
+			$(LAYOUT)/topgear.lh \
+			$(LAYOUT)/wildone.lh \
+			$(LAYOUT)/gldnpkr.lh \
 
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
 			$(LAYOUT)/tenpindx.lh
