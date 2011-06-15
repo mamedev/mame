@@ -40,38 +40,77 @@ typedef enum _cassette_state cassette_state;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct cassette_config_t	cassette_config;
-struct cassette_config_t
+// ======================> cassette_interface
+
+struct cassette_interface
 {
-	const struct CassetteFormat*	const *formats;
-	const struct CassetteOptions	*create_opts;
-	const cassette_state			default_state;
-	const char *					interface;
+	const struct CassetteFormat*	const *m_formats;
+	const struct CassetteOptions	*m_create_opts;
+	cassette_state					m_default_state;
+	const char *					m_interface;
+	device_image_display_info_func	m_device_displayinfo;
 };
 
-typedef struct inline_cassette_config_t	inline_cassette_config;
-struct inline_cassette_config_t
+// ======================> cassette_image_device
+
+class cassette_image_device :	public device_t,
+								public cassette_interface,
+								public device_image_interface
 {
-	device_image_display_info_func	device_displayinfo;
+public:
+	// construction/destruction
+	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~cassette_image_device();
+
+	// image-level overrides
+	virtual bool call_load();
+	virtual void call_unload();
+	virtual void call_display();
+	virtual void call_display_info() { m_device_displayinfo(*this); }
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
+
+	virtual iodevice_t image_type() const { return IO_CASSETTE; }	
+	
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return m_interface; }
+	virtual const char *file_extensions() const { return m_extension_list; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	// specific implementation
+	cassette_state get_state() { return m_state; }
+	void set_state(cassette_state state) { change_state(m_state, (cassette_state)(~0)); }
+	void change_state(cassette_state state, cassette_state mask);
+
+	double input();
+	void output(double value);
+
+	cassette_image *get_image() { return m_cassette; }
+	double get_position();
+	double get_length();
+	void seek(double time, int origin);
+	
+protected:
+	bool is_motor_on();
+	void update();
+	
+	// device-level overrides
+    virtual void device_config_complete();
+	virtual void device_start();
+private:	
+	cassette_image	*m_cassette;
+	cassette_state	m_state;
+	double			m_position;
+	double			m_position_time;
+	INT32			m_value;    
+	char			m_extension_list[256];
 };
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-cassette_state cassette_get_state(device_t *cassette);
-void cassette_set_state(device_t *cassette, cassette_state state);
-void cassette_change_state(device_t *cassette, cassette_state state, cassette_state mask);
-
-double cassette_input(device_t *cassette);
-void cassette_output(device_t *cassette, double value);
-
-cassette_image *cassette_get_image(device_t *cassette);
-double cassette_get_position(device_t *cassette);
-double cassette_get_length(device_t *cassette);
-void cassette_seek(device_t *cassette, double time, int origin);
-
-DECLARE_LEGACY_IMAGE_DEVICE(CASSETTE, cassette);
+// device type definition
+extern const device_type CASSETTE;
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -87,9 +126,6 @@ DECLARE_LEGACY_IMAGE_DEVICE(CASSETTE, cassette);
 	MCFG_DEVICE_MODIFY(_tag)		\
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_CASSETTE_DISPLAY_INFO(_displayinfo)										\
-	MCFG_DEVICE_CONFIG_DATAPTR(inline_cassette_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))
-
-extern const cassette_config default_cassette_config;
+extern const cassette_interface default_cassette_interface;
 
 #endif /* CASSETTE_H */

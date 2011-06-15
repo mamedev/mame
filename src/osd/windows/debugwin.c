@@ -2435,7 +2435,7 @@ static void image_update_menu(debugwin_info *info)
 		if (img->device().type() == CASSETTE)
 		{
 			cassette_state state;
-			state = (cassette_state)(img->exists() ? (cassette_get_state(&img->device()) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
+			state = (cassette_state)(img->exists() ? (dynamic_cast<cassette_image_device*>(&img->device())->get_state() & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
 			AppendMenu(devicesubmenu, MF_SEPARATOR, 0, NULL);
 			AppendMenu(devicesubmenu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, TEXT("Pause/Stop"));
 			AppendMenu(devicesubmenu, flags_for_exists	| ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, TEXT("Play"));
@@ -2946,23 +2946,24 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 											return 1;
 					default: 
 						if (img->device().type() == CASSETTE) {
+							cassette_image_device* cassette = dynamic_cast<cassette_image_device*>(&img->device());
 							switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX) 
 							{
 
 								case DEVOPTION_CASSETTE_STOPPAUSE: 
-														cassette_change_state(&img->device(), CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+														cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 														return 1;
 								case DEVOPTION_CASSETTE_PLAY: 
-														cassette_change_state(&img->device(), CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+														cassette->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 														return 1;
 								case DEVOPTION_CASSETTE_RECORD: 
-														cassette_change_state(&img->device(), CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
+														cassette->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 														return 1;
 								case DEVOPTION_CASSETTE_REWIND: 
-														cassette_seek(&img->device(), -60.0, SEEK_CUR);
+														cassette->seek(-60.0, SEEK_CUR);
 														return 1;
 								case DEVOPTION_CASSETTE_FASTFORWARD: 
-														cassette_seek(&img->device(), +60.0, SEEK_CUR);
+														cassette->seek(+60.0, SEEK_CUR);
 														return 1;	
 							}
 						}		

@@ -18,205 +18,193 @@
 #define VERBOSE				0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-
-typedef struct _dev_cassette_t	dev_cassette_t;
-struct _dev_cassette_t
-{
-	const cassette_config	*config;
-	cassette_image	*cassette;
-	cassette_state	state;
-	double			position;
-	double			position_time;
-	INT32			value;
-};
-
-
-/* Default cassette_config for drivers only wav files */
-const cassette_config default_cassette_config =
+/* Default cassette_interface for drivers only wav files */
+const cassette_interface default_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	CASSETTE_PLAY,
+	NULL,
 	NULL
 };
 
 
-INLINE dev_cassette_t *get_safe_token(device_t *device)
+// device type definition
+const device_type CASSETTE = &device_creator<cassette_image_device>;
+
+//-------------------------------------------------
+//  cassette_image_device - constructor
+//-------------------------------------------------
+
+cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
 {
-	assert( device != NULL );
-	assert( device->type() == CASSETTE );
-	return (dev_cassette_t *) downcast<legacy_device_base *>(device)->token();
+
 }
 
-INLINE const inline_cassette_config *get_config_dev(const device_t *device)
+//-------------------------------------------------
+//  cassette_image_device - destructor
+//-------------------------------------------------
+
+cassette_image_device::~cassette_image_device()
 {
-	assert(device != NULL);
-	assert(device->type() == CASSETTE);
-	return (const inline_cassette_config *)downcast<const legacy_device_base *>(device)->inline_config();
 }
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cassette_image_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const cassette_interface *intf = reinterpret_cast<const cassette_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<cassette_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_formats, 0, sizeof(m_formats));
+		memset(&m_create_opts, 0, sizeof(m_create_opts));
+		memset(&m_default_state, 0, sizeof(m_default_state));
+		memset(&m_interface, 0, sizeof(m_interface));
+		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
+	}
+	
+	m_extension_list[0] = '\0';
+	for (int i = 0; m_formats[i]; i++ )
+		image_specify_extension( m_extension_list, 256, m_formats[i]->extensions );
+	
+	// set brief and instance name
+	update_names();
+}
+
 
 /*********************************************************************
     cassette IO
 *********************************************************************/
 
-INLINE int cassette_is_motor_on(device_t *device)
+bool cassette_image_device::is_motor_on()
 {
-	dev_cassette_t	*cassette = get_safe_token( device );
-
-	if ((cassette->state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)
+	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)
 		return FALSE;
-	if ((cassette->state & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED)
+	if ((m_state & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED)
 		return FALSE;
 	return TRUE;
 }
 
 
 
-static void cassette_update(device_t *device)
+void cassette_image_device::update()
 {
-	dev_cassette_t	*cassette = get_safe_token( device );
-	double cur_time = device->machine().time().as_double();
+	double cur_time = device().machine().time().as_double();
 
-	if (cassette_is_motor_on(device))
+	if (is_motor_on())
 	{
-		double new_position = cassette->position + (cur_time - cassette->position_time);
+		double new_position = m_position + (cur_time - m_position_time);
 
-		switch(cassette->state & CASSETTE_MASK_UISTATE) {
+		switch(m_state & CASSETTE_MASK_UISTATE) {
 		case CASSETTE_RECORD:
-			cassette_put_sample(cassette->cassette, 0, cassette->position, new_position - cassette->position, cassette->value);
+			cassette_put_sample(m_cassette, 0, m_position, new_position - m_position, m_value);
 			break;
 
 		case CASSETTE_PLAY:
-			if ( cassette->cassette )
+			if ( m_cassette )
 			{
-				cassette_get_sample(cassette->cassette, 0, new_position, 0.0, &cassette->value);
+				cassette_get_sample(m_cassette, 0, new_position, 0.0, &m_value);
 				/* See if reached end of tape */
-				double length = cassette_get_length(device);
+				double length = get_length();
 				if (new_position > length)
 				{
-					cassette->state = (cassette_state)(( cassette->state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+					m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
 					new_position = length;
 				}
 			}
 			break;
 		}
-		cassette->position = new_position;
+		m_position = new_position;
 	}
-	cassette->position_time = cur_time;
+	m_position_time = cur_time;
 }
 
-
-
-cassette_state cassette_get_state(device_t *device)
+void cassette_image_device::change_state(cassette_state state, cassette_state mask)
 {
-	dev_cassette_t	*cassette = get_safe_token( device );
-	return cassette->state;
-}
-
-
-
-void cassette_change_state(device_t *device, cassette_state state, cassette_state mask)
-{
-	dev_cassette_t	*cassette = get_safe_token( device );
 	cassette_state new_state;
 
-	new_state = cassette->state;
+	new_state = m_state;
 	new_state = (cassette_state)(new_state & ~mask);
 	new_state = (cassette_state)(new_state | (state & mask));
 
-	if (new_state != cassette->state)
+	if (new_state != m_state)
 	{
-		cassette_update(device);
-		cassette->state = new_state;
+		update();
+		m_state = new_state;
 	}
 }
 
 
 
-void cassette_set_state(device_t *device, cassette_state state)
+double cassette_image_device::input()
 {
-	cassette_change_state(device, state, (cassette_state)(~0));
-}
-
-
-
-double cassette_input(device_t *device)
-{
-	dev_cassette_t	*cassette = get_safe_token( device );
 	INT32 sample;
 	double double_value;
 
-	cassette_update(device);
-	sample = cassette->value;
+	update();
+	sample = m_value;
 	double_value = sample / ((double) 0x7FFFFFFF);
 
-	LOG(("cassette_input(): time_index=%g value=%g\n", cassette->position, double_value));
+	LOG(("cassette_input(): time_index=%g value=%g\n", m_position, double_value));
 
 	return double_value;
 }
 
 
 
-void cassette_output(device_t *device, double value)
+void cassette_image_device::output(double value)
 {
-	dev_cassette_t	*cassette = get_safe_token( device );
-
-	if (((cassette->state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD) && (cassette->value != value))
+	if (((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD) && (m_value != value))
 	{
-		cassette_update(device);
+		update();
 
 		value = MIN(value, 1.0);
 		value = MAX(value, -1.0);
 
-		cassette->value = (INT32) (value * 0x7FFFFFFF);
+		m_value = (INT32) (value * 0x7FFFFFFF);
 	}
 }
 
 
-
-cassette_image *cassette_get_image(device_t *device)
+double cassette_image_device::get_position()
 {
-	dev_cassette_t	*cassette = get_safe_token( device );
+	double position = m_position;
 
-	return cassette->cassette;
-}
-
-
-
-double cassette_get_position(device_t *device)
-{
-	dev_cassette_t	*cassette = get_safe_token( device );
-	double position;
-
-	position = cassette->position;
-
-	if (cassette_is_motor_on(device))
-		position += device->machine().time().as_double() - cassette->position_time;
+	if (is_motor_on())
+		position += device().machine().time().as_double() - m_position_time;
 	return position;
 }
 
 
 
-double cassette_get_length(device_t *device)
+double cassette_image_device::get_length()
 {
-	dev_cassette_t	*cassette = get_safe_token( device );
 	struct CassetteInfo info;
 
-	cassette_get_info(cassette->cassette, &info);
+	cassette_get_info(m_cassette, &info);
 	return ((double) info.sample_count) / info.sample_frequency;
 }
 
 
 
-void cassette_seek(device_t *device, double time, int origin)
+void cassette_image_device::seek(double time, int origin)
 {
-	dev_cassette_t	*cassette = get_safe_token( device );
-
 	double length;
 
-	cassette_update(device);
+	update();
 
-	length = cassette_get_length(device);
+	length = get_length();
 
 	switch(origin) {
 	case SEEK_SET:
@@ -227,7 +215,7 @@ void cassette_seek(device_t *device, double time, int origin)
 		break;
 
 	case SEEK_CUR:
-		time += cassette_get_position(device);
+		time += get_position();
 		break;
 	}
 
@@ -238,7 +226,7 @@ void cassette_seek(device_t *device, double time, int origin)
 	if (time > length)
 		time = length;
 
-	cassette->position = time;
+	m_position = time;
 }
 
 
@@ -247,37 +235,26 @@ void cassette_seek(device_t *device, double time, int origin)
     cassette device init/load/unload/specify
 *********************************************************************/
 
-static DEVICE_START( cassette )
+void cassette_image_device::device_start()
 {
-	dev_cassette_t	*cassette = get_safe_token( device );
-
 	/* set to default state */
-	cassette->config = (const cassette_config*)device->static_config();
-	cassette->cassette = NULL;
-	cassette->state = cassette->config->default_state;
+	m_cassette = NULL;
+	m_state = m_default_state;
 }
 
-
-
-static DEVICE_IMAGE_LOAD( cassette )
+bool cassette_image_device::call_load()
 {
-	device_t *device = &image.device();
-	dev_cassette_t	*cassette = get_safe_token( device );
 	casserr_t err;
 	int cassette_flags;
-	const struct CassetteFormat * const *formats;
-	const struct CassetteOptions *create_opts;
 	const char *extension;
 	int is_writable;
+	device_image_interface *image = NULL;
+	interface(image);
 
-	/* figure out the cassette format */
-	formats = cassette->config->formats;
-
-	if (image.has_been_created())
+	if (has_been_created())
 	{
 		/* creating an image */
-		create_opts = cassette->config->create_opts;
-		err = cassette_create((void *) &image, &image_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &cassette->cassette);
+		err = cassette_create((void *)image, &image_ioprocs, &wavfile_format, m_create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &m_cassette);
 		if (err)
 			goto error;
 	}
@@ -286,14 +263,14 @@ static DEVICE_IMAGE_LOAD( cassette )
 		/* opening an image */
 		do
 		{
-			is_writable = !image.is_readonly();
+			is_writable = !is_readonly();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
-			extension = image.filetype();
-			err = cassette_open_choices((void *) &image, &image_ioprocs, extension, formats, cassette_flags, &cassette->cassette);
+			extension = filetype();
+			err = cassette_open_choices((void *)image, &image_ioprocs, extension, m_formats, cassette_flags, &m_cassette);
 
 			/* this is kind of a hack */
 			if (err && is_writable)
-				image.make_readonly();
+				make_readonly();
 		}
 		while(err && is_writable);
 
@@ -302,11 +279,11 @@ static DEVICE_IMAGE_LOAD( cassette )
 	}
 
 	/* set to default state, but only change the UI state */
-	cassette_change_state(device, cassette->config->default_state, CASSETTE_MASK_UISTATE);
+	change_state(m_default_state, CASSETTE_MASK_UISTATE);
 
 	/* reset the position */
-	cassette->position = 0.0;
-	cassette->position_time = device->machine().time().as_double();
+	m_position = 0.0;
+	m_position_time = device().machine().time().as_double();
 
 	return IMAGE_INIT_PASS;
 
@@ -316,21 +293,19 @@ error:
 
 
 
-static DEVICE_IMAGE_UNLOAD( cassette )
+void cassette_image_device::call_unload()
 {
-	device_t *device = &image.device();
-	dev_cassette_t	*cassette = get_safe_token( device );
 
 	/* if we are recording, write the value to the image */
-	if ((cassette->state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
-		cassette_update(device);
+	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
+		update();
 
 	/* close out the cassette */
-	cassette_close(cassette->cassette);
-	cassette->cassette = NULL;
+	cassette_close(m_cassette);
+	m_cassette = NULL;
 
 	/* set to default state, but only change the UI state */
-	cassette_change_state(device, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+	change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 }
 
 
@@ -338,9 +313,8 @@ static DEVICE_IMAGE_UNLOAD( cassette )
 /*
     display a small tape icon, with the current position in the tape image
 */
-static DEVICE_IMAGE_DISPLAY(cassette)
+void cassette_image_device::call_display()
 {
-	device_t *device = &image.device();
 	char buf[65];
 	float x, y;
 	int n;
@@ -350,29 +324,29 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 	static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
 
 	/* abort if we should not be showing the image */
-	if (!image.exists())
+	if (!exists())
 		return;
-	if (!cassette_is_motor_on(device))
+	if (!is_motor_on())
 		return;
 
 	/* figure out where we are in the cassette */
-	position = cassette_get_position(device);
-	length = cassette_get_length(device);
-	uistate = (cassette_state)(cassette_get_state(device) & CASSETTE_MASK_UISTATE);
+	position = get_position();
+	length = get_length();
+	uistate = (cassette_state)(get_state() & CASSETTE_MASK_UISTATE);
 
 	/* choose a location on the screen */
 	x = 0.2f;
 	y = 0.5f;
 
-	dev = device->machine().devicelist().first(CASSETTE );
+	dev = device().machine().devicelist().first(CASSETTE );
 
-	while ( dev && strcmp( dev->tag(), device->tag() ) )
+	while ( dev && strcmp( dev->tag(), device().tag() ) )
 	{
 		y += 1;
 		dev = dev->typenext();
 	}
 
-	y *= ui_get_line_height(device->machine()) + 2.0f * UI_BOX_TB_BORDER;
+	y *= ui_get_line_height(device().machine()) + 2.0f * UI_BOX_TB_BORDER;
 	/* choose which frame of the animation we are at */
 	n = ((int) position / ANIMATION_FPS) % ANIMATION_FRAMES;
 	/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
@@ -397,67 +371,5 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 		(int) length);
 
 	/* draw the cassette */
-	ui_draw_text_box(&device->machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+	ui_draw_text_box(&device().machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
 }
-
-/*-------------------------------------------------
-    DEVICE_IMAGE_SOFTLIST_LOAD(cassette)
--------------------------------------------------*/
-static DEVICE_IMAGE_SOFTLIST_LOAD(cassette)
-{
-	return image.load_software(swlist, swname, start_entry);
-}
-
-DEVICE_GET_INFO(cassette)
-{
-	switch( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(dev_cassette_t); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = sizeof(inline_cassette_config); break;
-		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(cassette); break;
-		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cassette); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cassette); break;
-		case DEVINFO_FCT_IMAGE_DISPLAY:				info->f = (genf *) DEVICE_IMAGE_DISPLAY_NAME(cassette); break;
-		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(cassette);	break;
-		case DEVINFO_FCT_IMAGE_DISPLAY_INFO:
-			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
-				info->f = (genf *) get_config_dev(device)->device_displayinfo;
-			} else {
-				info->f = NULL;
-			}
-			break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "Cassette"); break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cassette"); break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:
-			if ( device && device->static_config() )
-			{
-				const struct CassetteFormat * const *formats = ((cassette_config *)device->static_config())->formats;
-				int		i;
-
-				/* set up a temporary string */
-				info->s[0] = '\0';
-
-				for ( i = 0; formats[i]; i++ )
-					image_specify_extension( info->s, 256, formats[i]->extensions );
-			}
-			break;
-		case DEVINFO_STR_IMAGE_INTERFACE:
-			if ( device && device->static_config() && ((cassette_config *)device->static_config())->interface)
-			{
-				strcpy(info->s, ((cassette_config *)device->static_config())->interface );
-			}
-			break;
-	}
-}
-
-DEFINE_LEGACY_IMAGE_DEVICE(CASSETTE, cassette);

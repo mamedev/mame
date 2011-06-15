@@ -1207,12 +1207,12 @@ INLINE int bitbanger_count( running_machine &machine )
     representation of the time
 -------------------------------------------------*/
 
-astring *tapecontrol_gettime(astring *dest, device_t *device, int *curpos, int *endpos)
+astring *tapecontrol_gettime(astring *dest, cassette_image_device *cassette, int *curpos, int *endpos)
 {
 	double t0, t1;
 
-	t0 = cassette_get_position(device);
-	t1 = cassette_get_length(device);
+	t0 = cassette->get_position();
+	t1 = cassette->get_length();
 
 	if (t1)
 		astring_printf(dest, "%04d/%04d", (int) t0, (int) t1);
@@ -1253,9 +1253,10 @@ static void menu_tape_control_populate(running_machine &machine, ui_menu *menu, 
 	{
 		double t0, t1;
 		UINT32 tapeflags = 0;
+		cassette_image_device* cassette = dynamic_cast<cassette_image_device*>(&menustate->device->device());
 
-		t0 = cassette_get_position(&menustate->device->device());
-		t1 = cassette_get_length(&menustate->device->device());
+		t0 = cassette->get_position();
+		t1 = cassette->get_length();
 
 		if (t1 > 0)
 		{
@@ -1269,8 +1270,8 @@ static void menu_tape_control_populate(running_machine &machine, ui_menu *menu, 
 		ui_menu_item_append(menu, menustate->device->device().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
 
 		/* state */
-		tapecontrol_gettime(&timepos, &menustate->device->device(), NULL, NULL);
-		state = cassette_get_state(&menustate->device->device());
+		tapecontrol_gettime(&timepos, cassette, NULL, NULL);
+		state = cassette->get_state();
 		ui_menu_item_append(
 			menu,
 			(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
@@ -1393,7 +1394,9 @@ void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *pa
 	/* rebuild the menu - we have to do this so that the counter updates */
 	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
 	menu_tape_control_populate(machine, menu, (tape_control_menu_state*)state);
-
+	
+	cassette_image_device* cassette = dynamic_cast<cassette_image_device*>(&menustate->device->device());
+	
 	/* process the menu */
 	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 	if (event != NULL)
@@ -1402,7 +1405,7 @@ void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *pa
 		{
 			case IPT_UI_LEFT:
 				if (event->itemref==TAPECMD_SLIDER)
-					cassette_seek(&menustate->device->device(), -1, SEEK_CUR);
+					cassette->seek(-1, SEEK_CUR);
 				else
 				if (event->itemref==TAPECMD_SELECT)
 				{
@@ -1417,7 +1420,7 @@ void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *pa
 
 			case IPT_UI_RIGHT:
 				if (event->itemref==TAPECMD_SLIDER)
-					cassette_seek(&menustate->device->device(), +1, SEEK_CUR);
+					cassette->seek(+1, SEEK_CUR);
 				else
 				if (event->itemref==TAPECMD_SELECT)
 				{
@@ -1433,22 +1436,22 @@ void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *pa
 			case IPT_UI_SELECT:
 				{
 					if (event->itemref==TAPECMD_STOP)
-						cassette_change_state(&menustate->device->device(), CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+						cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 					else
 					if (event->itemref==TAPECMD_PLAY)
-						cassette_change_state(&menustate->device->device(), CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+						cassette->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 					else
 					if (event->itemref==TAPECMD_RECORD)
-						cassette_change_state(&menustate->device->device(), CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
+						cassette->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 					else
 					if (event->itemref==TAPECMD_REWIND)
-						cassette_seek(&menustate->device->device(), -30, SEEK_CUR);
+						cassette->seek(-30, SEEK_CUR);
 					else
 					if (event->itemref==TAPECMD_FAST_FORWARD)
-						cassette_seek(&menustate->device->device(), 30, SEEK_CUR);
+						cassette->seek(30, SEEK_CUR);
 					else
 					if (event->itemref==TAPECMD_SLIDER)
-						cassette_seek(&menustate->device->device(), 0, SEEK_SET);
+						cassette->seek(0, SEEK_SET);
 				}
 				break;
 		}
