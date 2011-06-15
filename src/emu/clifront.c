@@ -180,6 +180,57 @@ int cli_frontend::execute(int argc, char **argv)
 			if (system == NULL && strlen(m_options.system_name()) > 0)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
+			if (strlen(m_options.software_name()) > 0) {
+				machine_config config(*system, m_options);
+				if (!config.devicelist().first(SOFTWARE_LIST))
+					throw emu_fatalerror(MAMERR_FATALERROR, "No software lists defined for this system\n");
+
+				bool found = FALSE;
+				for (device_t *swlists = config.devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
+				{
+					software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
+
+					for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
+					{
+						if (swlist->list_name[i] && *swlist->list_name[i])
+						{
+							software_list *list = software_list_open(m_options, swlist->list_name[i], FALSE, NULL);
+
+							if (list)
+							{
+								software_info *swinfo = software_list_find(list, m_options.software_name(), NULL);
+								if (swinfo!=NULL) {		
+									const device_image_interface *image = NULL;								
+									software_part *part = software_find_part(swinfo, NULL, NULL);
+									// search for a device with the right interface
+									for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
+									{
+										const char *interface = image->image_interface();
+										if (interface != NULL)
+										{
+											if (!strcmp(interface, part->interface_))
+											{
+												astring error;
+												m_options.set_value(image->brief_instance_name(), m_options.software_name(), OPTION_PRIORITY_CMDLINE, error);
+												assert(!error);
+												software_list_close(list);
+												break;
+											}
+										}
+									}
+									found = TRUE;
+									break;
+								}
+
+							}
+							software_list_close(list);
+						}
+						if (found) break;
+					}
+				}
+				if (!found)
+					throw emu_fatalerror(MAMERR_FATALERROR, "Software item '%s' can not be found in any list\n",m_options.software_name());
+			}
 			// otherwise just run the game
 			m_result = mame_execute(m_options, m_osd);
 		}

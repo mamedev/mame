@@ -52,6 +52,7 @@ const options_entry emu_options::s_option_entries[] =
 {
 	// unadorned options - only a single one supported at the moment
 	{ OPTION_SYSTEMNAME,                                 NULL,        OPTION_STRING,     NULL },
+	{ OPTION_SOFTWARENAME,                               NULL,        OPTION_STRING,     NULL },
 
 	// config options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE CONFIGURATION OPTIONS" },

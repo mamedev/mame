@@ -69,6 +69,7 @@ enum
 
 // core options
 #define OPTION_SYSTEMNAME			core_options::unadorned(0)
+#define OPTION_SOFTWARENAME			core_options::unadorned(1)
 
 // core configuration options
 #define OPTION_READCONFIG			"readconfig"
@@ -217,6 +218,7 @@ public:
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
+	const char *software_name() const { return value(OPTION_SOFTWARENAME); }
 	const game_driver *system() const;
 	void set_system_name(const char *name);
 
