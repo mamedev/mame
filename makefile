@@ -672,16 +672,6 @@ depend: maketree $(MAKEDEP_TARGET)
 	@echo Rebuilding depend.mak...
 	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... src/$(TARGET) > depend.mak
 
-INCPATH += \
-	-I$(SRC)/$(TARGET) \
-	-I$(OBJ)/$(TARGET)/layout \
-	-I$(SRC)/emu \
-	-I$(OBJ)/emu \
-	-I$(OBJ)/emu/layout \
-	-I$(SRC)/lib/util \
-	-I$(SRC)/osd \
-	-I$(SRC)/osd/$(OSD) \
-
 tools: maketree $(TOOLS)
 
 maketree: $(sort $(OBJDIRS))
