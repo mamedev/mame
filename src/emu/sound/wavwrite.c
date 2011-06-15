@@ -86,10 +86,12 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 
 void wav_close(wav_file *wav)
 {
-	UINT32 total = ftell(wav->file);
+	UINT32 total;
 	UINT32 temp32;
 
 	if (!wav) return;
+
+	total = ftell(wav->file);
 
 	/* update the total file size */
 	fseek(wav->file, wav->total_offs, SEEK_SET);

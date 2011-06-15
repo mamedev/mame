@@ -1346,7 +1346,6 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 
 		for (software_info *swinfo = software_list_find(software_list_ptr, swname, NULL); swinfo != NULL; )
 		{
-			if (swinfo != NULL)
 			{
 				astring tmp(swinfo->shortname);
 				locationtag.cat(tmp);

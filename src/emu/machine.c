@@ -239,8 +239,6 @@ const char *running_machine::describe_context()
 		cpu_device *cpu = downcast<cpu_device *>(&executing->device());
 		if (cpu != NULL)
 			m_context.printf("'%s' (%s)", cpu->tag(), core_i64_hex_format(cpu->pc(), cpu->space(AS_PROGRAM)->logaddrchars()));
-		else
-			m_context.printf("'%s'", cpu->tag());
 	}
 	else
 		m_context.cpy("(no context)");
