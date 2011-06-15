@@ -4,6 +4,23 @@ Meadows Warp Speed
 
 Preliminary driver by Mariusz Wojcieszek
 
+Hardware registers:
+0x00 - 0x1f control register for discs generator (8 bytes each)
+			0x00, 0x01	disc radius (?)
+			0x02, 0x03	disc middle point
+			0x04, 0x05	disc middle point
+			0x06		disc colour (0-7)
+			0x07		unused
+0x20		?
+0x21		sound (intro screens have bit 1 toggled for click effect)
+0x22		?
+0x23		?
+0x24		?
+0x25		?
+0x26		?
+0x27		?
+
+
 Board etched...
 	MEADOWS 024-0084
 	MADE IN USA
@@ -71,6 +88,7 @@ public:
 	tilemap_t	*m_text_tilemap;
 	tilemap_t	*m_starfield_tilemap;
 	UINT8		*m_workram;
+	UINT8		m_regs[0x28];
 };
 
 static READ8_HANDLER( warpspeed_hardware_r )
@@ -79,12 +97,18 @@ static READ8_HANDLER( warpspeed_hardware_r )
 
 	switch( offset )
 	{
-		case 3: 
-		{
-			return input_port_read(space->machine(), "IN0" );
-		}
+		case 0: return input_port_read(space->machine(), "IN1" );
+		/* dipswitches? bit 6 when set causes jump to $e01 during vblank (rom missing) is this test mode? */
+		case 2: return 0; 
+		case 3: return input_port_read(space->machine(), "IN0" );
 	}
 	return 0;
+}
+
+static WRITE8_HANDLER( warpspeed_hardware_w )
+{
+	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
+	state->m_regs[offset] = data;
 }
 
 static TILE_GET_INFO( get_warpspeed_text_tile_info )
@@ -140,13 +164,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READ( warpspeed_hardware_r )
+	AM_RANGE(0x00, 0x27) AM_WRITE( warpspeed_hardware_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( warpspeed )
 	PORT_START("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Accelerate" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Brake" )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout warpspeed_charlayout =
