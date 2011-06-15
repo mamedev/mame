@@ -1141,7 +1141,7 @@ void software_list_find_approx_matches(software_list *swlist, const char *name, 
 		software_info *candidate = swinfo;
 
 		software_part *part = software_find_part(swinfo, NULL, NULL);
-		if (!strcmp(interface, part->interface_))
+		if (interface==NULL || !strcmp(interface, part->interface_))
 		{
 
 			/* pick the best match between driver name and description */
