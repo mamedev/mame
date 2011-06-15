@@ -229,45 +229,8 @@ int cli_frontend::execute(int argc, char **argv)
 					}
 				}
 				if (!found) {
-					for (device_t *swlists = config.devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
-					{
-						software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
-
-						for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
-						{
-							if (swlist->list_name[i] && *swlist->list_name[i])
-							{
-								software_list *list = software_list_open(m_options, swlist->list_name[i], FALSE, NULL);
-
-								if (list)
-								{
-									software_info *matches[10] = { 0 };
-									int softnum;
-
-									software_list_parse(list, list->error_proc, NULL);
-									// get the top 5 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
-									software_list_find_approx_matches(list, m_options.software_name(), ARRAY_LENGTH(matches), matches, NULL);
-
-									if (matches[0] != 0)
-									{
-										if (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-											mame_printf_error("* Software list \"%s\" (%s) matches: \n", swlist->list_name[i], software_list_get_description(list));
-										else
-											mame_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlist->list_name[i], software_list_get_description(list));
-
-										// print them out
-										for (softnum = 0; softnum < ARRAY_LENGTH(matches); softnum++)
-											if (matches[softnum] != NULL)
-												mame_printf_error("%-18s%s\n", matches[softnum]->shortname, matches[softnum]->longname);
-
-										mame_printf_error("\n");
-									}
-									software_list_close(list);
-								}
-							}
-						}
-					}
-					throw emu_fatalerror(MAMERR_FATALERROR, "Software item '%s' can not be found in any list\n",m_options.software_name());
+					software_display_matches(config.devicelist(),m_options, NULL,m_options.software_name());
+					throw emu_fatalerror(MAMERR_FATALERROR, "");
 				}
 			}
 			// otherwise just run the game

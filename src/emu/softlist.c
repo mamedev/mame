@@ -1321,6 +1321,58 @@ software_part *software_part_next(software_part *part)
 }
 
 /*-------------------------------------------------
+    software_display_matches
+-------------------------------------------------*/
+
+void software_display_matches(const device_list &devlist,emu_options &options, const char *interface ,const char *name)
+{
+	// check if there is at least a software list
+	if (devlist.first(SOFTWARE_LIST))
+	{
+		mame_printf_error("\n\"%s\" approximately matches the following\n"
+						  "supported software items (best match first):\n\n", name);
+	}
+
+	for (device_t *swlists = devlist.first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
+	{
+		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
+
+		for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
+		{
+			if (swlist->list_name[i] && *swlist->list_name[i])
+			{
+				software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
+
+				if (list)
+				{
+					software_info *matches[10] = { 0 };
+					int softnum;
+
+					software_list_parse(list, list->error_proc, NULL);
+					// get the top 5 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
+					software_list_find_approx_matches(list, name, ARRAY_LENGTH(matches), matches, interface);
+
+					if (matches[0] != 0)
+					{
+						if (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+							mame_printf_error("* Software list \"%s\" (%s) matches: \n", swlist->list_name[i], software_list_get_description(list));
+						else
+							mame_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlist->list_name[i], software_list_get_description(list));
+
+						// print them out
+						for (softnum = 0; softnum < ARRAY_LENGTH(matches); softnum++)
+							if (matches[softnum] != NULL)
+								mame_printf_error("%-18s%s\n", matches[softnum]->shortname, matches[softnum]->longname);
+
+						mame_printf_error("\n");
+					}
+					software_list_close(list);
+				}
+			}
+		}
+	}
+}
+/*-------------------------------------------------
     load_software_part
 
     Load a software part for a device. The part to
@@ -1463,51 +1515,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 	// if no match has been found, we suggest similar shortnames
 	if (software_info_ptr == NULL)
 	{
-		// check if there is at least a software list
-		if (image->device().machine().devicelist().first(SOFTWARE_LIST))
-		{
-			mame_printf_error("\n\"%s\" approximately matches the following\n"
-							  "supported software items (best match first):\n\n", swname_bckp);
-		}
-
-		for (device_t *swlists = image->device().machine().devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
-		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
-
-			for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
-			{
-				if (swlist->list_name[i] && *swlist->list_name[i])
-				{
-					software_list *list = software_list_open(image->device().machine().options(), swlist->list_name[i], FALSE, NULL);
-
-					if (list)
-					{
-						software_info *matches[10] = { 0 };
-						int softnum;
-
-						software_list_parse(list, list->error_proc, NULL);
-						// get the top 5 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
-						software_list_find_approx_matches(list, swname_bckp, ARRAY_LENGTH(matches), matches, image->image_interface());
-
-						if (matches[0] != 0)
-						{
-							if (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-								mame_printf_error("* Software list \"%s\" (%s) matches: \n", swlist->list_name[i], software_list_get_description(list));
-							else
-								mame_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlist->list_name[i], software_list_get_description(list));
-
-							// print them out
-							for (softnum = 0; softnum < ARRAY_LENGTH(matches); softnum++)
-								if (matches[softnum] != NULL)
-									mame_printf_error("%-18s%s\n", matches[softnum]->shortname, matches[softnum]->longname);
-
-							mame_printf_error("\n");
-						}
-						software_list_close(list);
-					}
-				}
-			}
-		}
+		software_display_matches(image->device().machine().devicelist(),image->device().machine().options(), image->image_interface(), swname_bckp);
 	}
 
 	if ( software_part_ptr )
