@@ -925,7 +925,7 @@ static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	//OkiM6376
-	MCFG_SOUND_ADD("oki", OKIM6376, XTAL_12MHz/2/2)
+	MCFG_SOUND_ADD("oki", OKIM6376, XTAL_12MHz/2/2/20)//Guess, gives approx. same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -991,7 +991,7 @@ static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("oki", OKIM6376, XTAL_12MHz/2/2)
+	MCFG_SOUND_ADD("oki", OKIM6376, XTAL_12MHz/2/2/20)//Guess, gives same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

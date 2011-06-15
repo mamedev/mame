@@ -1902,13 +1902,29 @@ INPUT_PORTS_END
 /* OKI M6376 (for Mating Game) FIXME */
 static READ16_DEVICE_HANDLER( oki_r )
 {
-	return device->machine().rand();
+//	logerror("RO%X \n",offset);
+
+	{
+		return device->machine().rand();
+	}
 }
 
 static WRITE16_DEVICE_HANDLER( oki_w )
 {
 	// 0x10: .xxx xxxx      OKIM6736 I6-I0
 	// 0x12: .... ...x      OKIM6736 /ST
+
+	//FIXME
+	if (offset == 0x10)
+	{
+		okim6376_w(device, 0, data & 0x7f);
+	}
+	if (offset == 0x12)
+	{
+		okim6376_st_w(device,data & 0x01);
+	}
+
+	logerror("O%X D%X\n",offset, data);
 }
 
 static void video_reset(device_t *device)

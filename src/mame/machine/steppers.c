@@ -6,7 +6,7 @@
 //            also emulates the index optic                              //
 //                                                                       //
 // 04-04-2011: J. Wallace - Added reverse spin (this is necessary for    //
-//                          accuracy, and improved wraparound logic      //
+//                          accuracy), and improved wraparound logic     //
 //    03-2011:              New 2D array to remove reel bounce and       //
 //                          make more realistic                          //
 // 26-01-2007: J. Wallace - Rewritten to make it more flexible           //
@@ -249,7 +249,7 @@ int stepper_update(int which, UINT8 pattern)
 			case MPU3_48STEP_REEL :	    /* Same unit as above, but different interface (2 active lines, not 4)*/
 			steps = MPU3StepTab[step[which].phase][pattern];
 		}
-		#if 1 /* Assists with new index generation */
+		#if 0 /* Assists with new index generation */
 		if ( which ==1 )logerror("which %d Steps %d Phase %d Pattern Old %02X New %02X\n",which,steps,(step[which].phase),step[which].old_pattern,step[which].pattern);
 		#endif
 

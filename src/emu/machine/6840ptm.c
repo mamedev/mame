@@ -599,7 +599,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 
 void ptm6840_device::timeout(int idx)
 {
-	PLOG(("**ptm6840 %s t%d timeout**\n", tag(), idx + 1));
+	PLOG(("**ptm6840 %s t%d timeout**\n", tag(), idx));
 
 	// Set the interrupt flag
 	m_status_reg |= (1 << idx);
@@ -611,7 +611,7 @@ void ptm6840_device::timeout(int idx)
 		if ((m_mode[idx] == 0)||(m_mode[idx] == 2))
 		{
 			m_output[idx] = m_output[idx] ? 0 : 1;
-			PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx + 1, m_output[idx]));
+			PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx, m_output[idx]));
 
 			m_out_func[idx](0, m_output[idx]);
 		}
@@ -620,7 +620,7 @@ void ptm6840_device::timeout(int idx)
 			if (!m_fired[idx])
 			{
 				m_output[idx] = 1;
-				PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx + 1, m_output[idx]));
+				PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx, m_output[idx]));
 
 				m_out_func[idx](0, m_output[idx]);
 

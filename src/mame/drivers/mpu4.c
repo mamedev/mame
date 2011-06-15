@@ -69,7 +69,7 @@ In addition there are two auxiliary ports that can be accessed separately to the
 -----------+---+-----------------+--------------------------------------------------------------------------
  0850 ?    | W | ??????????????? | page latch (NV)
 -----------+---+-----------------+--------------------------------------------------------------------------
- 0880      |R/W| D D D D D D D D | PIA6821 on soundboard (Oki MSM6376@16MHz)
+ 0880      |R/W| D D D D D D D D | PIA6821 on soundboard (Oki MSM6376 clocked by 6840)
            |   |                 | port A = ??
            |   |                 | port B (882)
            |   |                 |        b7 = NAR
@@ -78,7 +78,7 @@ In addition there are two auxiliary ports that can be accessed separately to the
            |   |                 |        b4 = volume control direction (0= up, 1 = down)
            |   |                 |        b3 = ??
            |   |                 |        b2 = ??
-           |   |                 |        b1 = CH2
+           |   |                 |        b1 = 2ch
            |   |                 |        b0 = ST
 -----------+---+-----------------+--------------------------------------------------------------------------
  08C0      |   |                 | MC6840 on sound board
@@ -218,9 +218,6 @@ TODO: - Distinguish door switches using manual
       For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything*
       - Flo's move in Great Escape gives spin alarms - need a different opto setting for reverse spin reels?
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
-      - Fix MSM6376 - We need all features of the chip, including dynamic sample rate adjustment and BEEP.
-      - OKI sound chip rate - need to confirm independently (3MHz sounds good, but that could be because
-        of the old driver - BwB manual claims 64KHz to 128KHz).
 ***********************************************************************************************************/
 #include "emu.h"
 #include "machine/6821pia.h"
@@ -377,6 +374,9 @@ public:
 	int m_hopper;
 	int m_reels;
 	int m_chrdata;
+	int m_t1;
+	int m_t3l;
+	int m_t3h;
 	const mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
 	//Video
@@ -1674,6 +1674,7 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 {
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	device_t *msm6376 = device->machine().device("msm6376");
+	okim6376_device *msm = device->machine().device<okim6376_device>("ymsnd");
 
 	int changed = state->m_expansion_latch^data;
 
@@ -1695,8 +1696,11 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 			}
 
 			{
-//              float percent = (32-state->m_global_volume)/32.0; //volume_override?1.0:(32-state->m_global_volume)/32.0;
-//              LOG(("GAMEBOARD: OKI volume %f \n",percent));
+				float percent = (32-state->m_global_volume)/32.0; //volume_override?1.0:(32-state->m_global_volume)/32.0;
+				msm->set_output_gain(0, percent);
+			//	msm6376->stream->set_output_gain(1, percent);
+
+				//              LOG(("GAMEBOARD: OKI volume %f \n",percent));
 			}
 		}
 	}
@@ -1762,7 +1766,6 @@ static const pia6821_interface pia_ic4ss_intf =
 
 //Sampled sound timer
 /*
-FIXME
 The MSM6376 sound chip is configured in a slightly strange way, to enable dynamic
 sample rate changes (8Khz, 10.6 Khz, 16 KHz) by varying the clock.
 According to the BwB programmer's guide, the formula is:
@@ -1771,9 +1774,9 @@ freq = (1720000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
 where [] means rounded up integer,
 t3L is the LSB of Clock 3,
 t3H is the MSB of Clock 3,
-+and t1 is the initial value in clock 1.
 
 The sample speed divisor is f/300
+and t1 is the initial value in clock 1.
 */
 
 //O3 -> G1  O1 -> c2 o2 -> c1
@@ -1794,6 +1797,40 @@ static WRITE8_DEVICE_HANDLER( ic3ss_o3_callback )
 	downcast<ptm6840_device *>(device)->set_g1(data); /* this output is the clock for timer1 */
 }
 
+/* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
+calculate the oscillation frequency in advance. We're running the timer for interrupt
+purposes, but the frequency calculation is done by plucking the values out as they are written.*/
+static WRITE8_HANDLER( ic3ss_w )
+{
+	device_t *ic3ss = space->machine().device("ptm_ic3ss");
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	downcast<ptm6840_device *>(ic3ss)->write(offset,data);
+	device_t *msm6376 = space->machine().device("msm6376");
+
+	if (offset == 3)
+	{
+		state->m_t1 = data;
+	}
+	if (offset == 6)
+	{
+		state->m_t3h = data;
+	}
+	if (offset == 7)
+	{
+		state->m_t3l = data;
+	}
+
+	float num = (1720000/((state->m_t3l + 1)*(state->m_t3h + 1)));
+	float denom1 = ((state->m_t3h *(state->m_t3l + 1)+ 1)/(2*(state->m_t1 + 1)));
+
+	int denom2 = denom1 +0.5;//need to round up, this gives same precision as chip
+	int freq=num*denom2;
+
+	if (freq)
+	{
+		okim6376_set_frequency(msm6376, freq);
+	}
+}
 
 static const ptm6840_interface ptm_ic3ss_intf =
 {
@@ -2752,7 +2789,9 @@ static ADDRESS_MAP_START( mod4_oki_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE_MODERN("pia_ic4ss", pia6821_device, read, write)      // PIA6821 on sampled sound board
 
-	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
+//	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
+	AM_RANGE(0x08c0, 0x08c7) AM_DEVREAD_MODERN("ptm_ic3ss", ptm6840_device, read)  // 6840PTM on sampled sound board
+	AM_RANGE(0x08c0, 0x08c7) AM_WRITE(ic3ss_w)  // 6840PTM on sampled sound board
 
 //  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
 
@@ -2777,7 +2816,9 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0858, 0x0858) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
-	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE_MODERN("pia_ic4ss", pia6821_device, read, write)      // PIA6821 on sampled sound board
+//	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
+	AM_RANGE(0x08c0, 0x08c7) AM_DEVREAD_MODERN("ptm_ic3ss", ptm6840_device, read)  // 6840PTM on sampled sound board
+	AM_RANGE(0x08c0, 0x08c7) AM_WRITE(ic3ss_w)  // 6840PTM on sampled sound board
 
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 
@@ -2899,7 +2940,7 @@ static MACHINE_CONFIG_DERIVED( mod4oki, mpu4mod2 )
 	MCFG_CPU_PROGRAM_MAP(mod4_oki_map)
 
 	MCFG_DEVICE_REMOVE("ay8913")
-	MCFG_SOUND_ADD("msm6376", OKIM6376, 3000000) //Wrong, needs to be 64 KHz, can also be 85430 at 10.5KHz and 128000 at 16KHz
+	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)		//16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

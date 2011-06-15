@@ -54,7 +54,7 @@ public:
 	// static configuration helpers
 	static void static_set_interface(device_t &device, const ptm6840_interface &interface);
 
-	int status(int clock) const { return m_enabled[clock - 1]; } // get whether timer is enabled
+	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
 	int irq_state() const { return m_IRQ; }					// get IRQ state
 	UINT16 count(int counter) const { return compute_counter(counter); }	// get counter value
 	void set_ext_clock(int counter, double clock);	// set clock frequency
