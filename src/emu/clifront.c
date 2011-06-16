@@ -202,26 +202,29 @@ int cli_frontend::execute(int argc, char **argv)
 								if (swinfo!=NULL) {		
 									for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 									{
-										// loop trough all parts 
-										// search for a device with the right interface										
-										const device_image_interface *image = NULL;
-										for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
-										{
-											const char *interface = image->image_interface();																						
-											if (interface != NULL)
-											{												
-												if (!strcmp(interface, swpart->interface_))
-												{													
-													const char *option = m_options.value(image->brief_instance_name());
-													// mount only if not already mounted
-													if (strlen(option)==0) {
-														astring val;
-														astring error;
-														val.printf("%s:%s",m_options.software_name(),swpart->name);
-														m_options.set_value(image->brief_instance_name(), val.cstr(), OPTION_PRIORITY_CMDLINE, error);
-														assert(!error);														
+										const char *mount = software_part_get_feature(swpart, "automount");
+										if (mount==NULL || strcmp(mount,"no")!=0) {										
+											// loop trough all parts 
+											// search for a device with the right interface										
+											const device_image_interface *image = NULL;
+											for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
+											{
+												const char *interface = image->image_interface();																						
+												if (interface != NULL)
+												{												
+													if (!strcmp(interface, swpart->interface_))
+													{													
+														const char *option = m_options.value(image->brief_instance_name());
+														// mount only if not already mounted
+														if (strlen(option)==0) {
+															astring val;
+															astring error;
+															val.printf("%s:%s",m_options.software_name(),swpart->name);
+															m_options.set_value(image->brief_instance_name(), val.cstr(), OPTION_PRIORITY_CMDLINE, error);
+															assert(!error);														
+														}
+														break;
 													}
-													break;
 												}
 											}
 										}
