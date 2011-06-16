@@ -552,7 +552,7 @@ const char *option_resolution_error_string(optreserr_t err)
 		"Parameter out of range",					/* OPTIONRESOLUTION_ERROR_PARAMOUTOFRANGE */
 		"Parameter not specified",					/* OPTIONRESOLUTION_ERROR_PARAMNOTSPECIFIED */
         "Unknown parameter",						/* OPTIONRESOLUTION_ERROR_PARAMNOTFOUND */
-		"Paramter specified multiple times",		/* OPTIONRESOLUTION_ERROR_PARAMALREADYSPECIFIED */
+		"Parameter specified multiple times",		/* OPTIONRESOLUTION_ERROR_PARAMALREADYSPECIFIED */
 		"Invalid parameter",						/* OPTIONRESOLUTION_ERROR_BADPARAM */
 		"Syntax error",								/* OPTIONRESOLUTION_ERROR_SYNTAX */
 		"Internal error"							/* OPTIONRESOLTUION_ERROR_INTERNAL */
