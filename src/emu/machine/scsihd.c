@@ -256,7 +256,7 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 
 	if (machine.device( diskregion )) {
 		our_this->is_file = TRUE;
-		our_this->disk = hd_get_hard_disk_file( machine.device( diskregion ) );
+		our_this->disk = machine.device<harddisk_image_device>(diskregion)->get_hard_disk_file();
 	} else {
 		our_this->is_file = FALSE;
 		our_this->disk = hard_disk_open(get_disk_handle( machine, diskregion ));

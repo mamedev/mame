@@ -22,7 +22,7 @@ struct cdrom_interface
 	device_image_display_info_func	m_device_displayinfo;
 };
 
-// ======================> printer_image_device
+// ======================> cdrom_image_device
 
 class cdrom_image_device :	public device_t,
 								public cdrom_interface,

@@ -179,7 +179,7 @@ public:
 	virtual bool is_creatable() const = 0;
 	virtual bool must_be_loaded() const = 0;
 	virtual bool is_reset_on_load() const = 0;
-	virtual const char *image_interface() const = 0;
+	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
 	
