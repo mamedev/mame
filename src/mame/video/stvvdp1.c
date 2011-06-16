@@ -177,7 +177,7 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset);
+			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset*2);
 
 			break;
 	}
