@@ -200,24 +200,33 @@ int cli_frontend::execute(int argc, char **argv)
 							{
 								software_info *swinfo = software_list_find(list, m_options.software_name(), NULL);
 								if (swinfo!=NULL) {		
-									const device_image_interface *image = NULL;								
-									software_part *part = software_find_part(swinfo, NULL, NULL);
-									// search for a device with the right interface
-									for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
+									for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 									{
-										const char *interface = image->image_interface();
-										if (interface != NULL)
+										// loop trough all parts 
+										// search for a device with the right interface										
+										const device_image_interface *image = NULL;
+										for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
 										{
-											if (!strcmp(interface, part->interface_))
-											{
-												astring error;
-												m_options.set_value(image->brief_instance_name(), m_options.software_name(), OPTION_PRIORITY_CMDLINE, error);
-												assert(!error);
-												software_list_close(list);
-												break;
+											const char *interface = image->image_interface();																						
+											if (interface != NULL)
+											{												
+												if (!strcmp(interface, swpart->interface_))
+												{													
+													const char *option = m_options.value(image->brief_instance_name());
+													// mount only if not already mounted
+													if (strlen(option)==0) {
+														astring val;
+														astring error;
+														val.printf("%s:%s",m_options.software_name(),swpart->name);
+														m_options.set_value(image->brief_instance_name(), val.cstr(), OPTION_PRIORITY_CMDLINE, error);
+														assert(!error);														
+													}
+													break;
+												}
 											}
 										}
 									}
+									software_list_close(list);
 									found = TRUE;
 									break;
 								}
