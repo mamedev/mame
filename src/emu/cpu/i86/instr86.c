@@ -138,6 +138,7 @@ static void PREFIX86(_rotate_shift_Byte)(i8086_state *cpustate, unsigned ModRM, 
 	}
 	else
 	{
+		int tmpcf = CF;
 		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base + timing.rot_reg_bit : timing.rot_m8_base + timing.rot_m8_bit;
 
 		switch (ModRM & 0x38)
@@ -161,19 +162,21 @@ static void PREFIX86(_rotate_shift_Byte)(i8086_state *cpustate, unsigned ModRM, 
 		case 0x10:	/* RCL eb,count */
 			for (; count > 0; count--)
 			{
-				dst = (dst << 1) + CF;
-				SetCFB(dst);
+				dst = (dst << 1) + tmpcf;
+				tmpcf = (int)((dst & 0x100) != 0);
 			}
 			PutbackRMByte(ModRM,(BYTE)dst);
+			cpustate->CarryVal = tmpcf;
 			break;
 		case 0x18:	/* RCR eb,count */
 			for (; count > 0; count--)
 			{
-				dst = (CF<<8)+dst;
-				cpustate->CarryVal = dst & 0x01;
+				dst = (tmpcf<<8)+dst;
+				tmpcf = dst & 0x01;
 				dst >>= 1;
 			}
 			PutbackRMByte(ModRM,(BYTE)dst);
+			cpustate->CarryVal = tmpcf;
 			break;
 		case 0x20:
 		case 0x30:	/* SHL eb,count */
@@ -329,6 +332,7 @@ static void PREFIX86(_rotate_shift_Word)(i8086_state *cpustate, unsigned ModRM, 
 	}
 	else
 	{
+		int tmpcf = CF;
 		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base + timing.rot_reg_bit : timing.rot_m8_base + timing.rot_m16_bit;
 
 		switch (ModRM & 0x38)
@@ -352,19 +356,21 @@ static void PREFIX86(_rotate_shift_Word)(i8086_state *cpustate, unsigned ModRM, 
 		case 0x10:  /* RCL ew,count */
 			for (; count > 0; count--)
 			{
-				dst = (dst << 1) + CF;
-				SetCFW(dst);
+				dst = (dst << 1) + tmpcf;
+				tmpcf = (int)((dst & 0x10000) != 0);
 			}
 			PutbackRMWord(ModRM,dst);
+			cpustate->CarryVal = tmpcf;
 			break;
 		case 0x18:	/* RCR ew,count */
 			for (; count > 0; count--)
 			{
-				dst = dst + (CF << 16);
-				cpustate->CarryVal = dst & 0x01;
+				dst = dst + (tmpcf << 16);
+				tmpcf = dst & 0x01;
 				dst >>= 1;
 			}
 			PutbackRMWord(ModRM,dst);
+			cpustate->CarryVal = tmpcf;
 			break;
 		case 0x20:
 		case 0x30:	/* SHL ew,count */
@@ -401,7 +407,6 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
          loop  to continue for CMPS and SCAS instructions. */
 
 	unsigned next = FETCHOP;
-	unsigned count = cpustate->regs.w[CX];
 
     switch(next)
     {
@@ -441,14 +446,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_ins8_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			PutMemB(ES,cpustate->regs.w[DI],read_port_byte(cpustate->regs.w[DX]));
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_ins8_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6d:  /* REP INSW */
 #ifdef I80286
@@ -457,14 +462,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_ins16_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			PutMemW(ES,cpustate->regs.w[DI],read_port_word(cpustate->regs.w[DX]));
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_ins16_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6e:  /* REP OUTSB */
 #ifdef I80286
@@ -473,14 +478,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_outs8_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			write_port_byte(cpustate->regs.w[DX],GetMemB(DS,cpustate->regs.w[SI]));
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[SI] += cpustate->DirVal; /* GOL 11/27/01 */
 			ICOUNT -= timing.rep_outs8_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6f:  /* REP OUTSW */
 #ifdef I80286
@@ -489,55 +494,56 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_outs16_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			write_port_word(cpustate->regs.w[DX],GetMemW(DS,cpustate->regs.w[SI]));
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[SI] += 2 * cpustate->DirVal; /* GOL 11/27/01 */
 			ICOUNT -= timing.rep_outs16_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 #endif
 	case 0xa4:  /* REP MOVSB */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_movs8_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			BYTE tmp;
 
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			tmp = GetMemB(DS,cpustate->regs.w[SI]);
 			PutMemB(ES,cpustate->regs.w[DI], tmp);
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += cpustate->DirVal;
 			cpustate->regs.w[SI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_movs8_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xa5:  /* REP MOVSW */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_movs16_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			WORD tmp;
 
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			tmp = GetMemW(DS,cpustate->regs.w[SI]);
 			PutMemW(ES,cpustate->regs.w[DI], tmp);
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += 2 * cpustate->DirVal;
 			cpustate->regs.w[SI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_movs16_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xa6:  /* REP(N)E CMPSB */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_cmps8_base;
 		cpustate->rep_in_progress = FALSE;
-		for (cpustate->ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
+		cpustate->ZeroVal = !flagval;
+		while(cpustate->regs.w[CX] && (ZF == flagval))
 		{
 			unsigned dst, src;
 
@@ -545,17 +551,18 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 			dst = GetMemB(ES, cpustate->regs.w[DI]);
 			src = GetMemB(DS, cpustate->regs.w[SI]);
 		    SUBB(src,dst); /* opposite of the usual convention */
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += cpustate->DirVal;
 			cpustate->regs.w[SI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_cmps8_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xa7:  /* REP(N)E CMPSW */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_cmps16_base;
 		cpustate->rep_in_progress = FALSE;
-		for (cpustate->ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
+		cpustate->ZeroVal = !flagval;
+		while(cpustate->regs.w[CX] && (ZF == flagval))
 		{
 			unsigned dst, src;
 
@@ -563,69 +570,70 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 			dst = GetMemW(ES, cpustate->regs.w[DI]);
 			src = GetMemW(DS, cpustate->regs.w[SI]);
 		    SUBW(src,dst); /* opposite of the usual convention */
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += 2 * cpustate->DirVal;
 			cpustate->regs.w[SI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_cmps16_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xaa:  /* REP STOSB */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_stos8_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			PutMemB(ES,cpustate->regs.w[DI],cpustate->regs.b[AL]);
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_stos8_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xab:  /* REP STOSW */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_stos16_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			PutMemW(ES,cpustate->regs.w[DI],cpustate->regs.w[AX]);
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_stos16_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xac:  /* REP LODSB */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_lods8_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			cpustate->regs.b[AL] = GetMemB(DS,cpustate->regs.w[SI]);
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[SI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_lods8_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xad:  /* REP LODSW */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_lods16_base;
 		cpustate->rep_in_progress = FALSE;
-		for (; count > 0; count--)
+		while(cpustate->regs.w[CX])
 		{
 			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			cpustate->regs.w[AX] = GetMemW(DS,cpustate->regs.w[SI]);
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[SI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_lods16_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xae:  /* REP(N)E SCASB */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_scas8_base;
 		cpustate->rep_in_progress = FALSE;
-		for (cpustate->ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
+		cpustate->ZeroVal = !flagval;
+		while(cpustate->regs.w[CX] && (ZF == flagval))
 		{
 			unsigned src, dst;
 
@@ -633,16 +641,17 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 			src = GetMemB(ES, cpustate->regs.w[DI]);
 			dst = cpustate->regs.b[AL];
 		    SUBB(dst,src);
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_scas8_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	case 0xaf:  /* REP(N)E SCASW */
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_scas16_base;
 		cpustate->rep_in_progress = FALSE;
-		for (cpustate->ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
+		cpustate->ZeroVal = !flagval;
+		while(cpustate->regs.w[CX] && (ZF == flagval))
 		{
 			unsigned src, dst;
 
@@ -650,10 +659,10 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 			src = GetMemW(ES, cpustate->regs.w[DI]);
 			dst = cpustate->regs.w[AX];
 		    SUBW(dst,src);
+			cpustate->regs.w[CX]--;
 			cpustate->regs.w[DI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_scas16_count;
 		}
-		cpustate->regs.w[CX]=count;
 		break;
 	default:
 		PREFIX(_instruction)[next](cpustate);
@@ -798,20 +807,24 @@ static void PREFIX86(_pop_cs)(i8086_state *cpustate)    /* Opcode 0x0f */
 
 static void PREFIX86(_adc_br8)(i8086_state *cpustate)    /* Opcode 0x10 */
 {
-    DEF_br8(dst,src);
+    int tmpcf;
+	DEF_br8(dst,src);
 	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
     src+=CF;
-    ADDB(dst,src);
+    ADCB(dst,src,tmpcf);
     PutbackRMByte(ModRM,dst);
+	cpustate->CarryVal = tmpcf;
 }
 
 static void PREFIX86(_adc_wr16)(i8086_state *cpustate)    /* Opcode 0x11 */
 {
-    DEF_wr16(dst,src);
+    int tmpcf;
+	DEF_wr16(dst,src);
 	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
     src+=CF;
-    ADDW(dst,src);
+    ADCW(dst,src,tmpcf);
 	PutbackRMWord(ModRM,dst);
+	cpustate->CarryVal = tmpcf;
 }
 
 static void PREFIX86(_adc_r8b)(i8086_state *cpustate)    /* Opcode 0x12 */
@@ -858,20 +871,24 @@ static void PREFIX86(_push_ss)(i8086_state *cpustate)    /* Opcode 0x16 */
 
 static void PREFIX86(_sbb_br8)(i8086_state *cpustate)    /* Opcode 0x18 */
 {
-    DEF_br8(dst,src);
+    int tmpcf;
+	DEF_br8(dst,src);
 	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
     src+=CF;
-    SUBB(dst,src);
+    SBBB(dst,src,tmpcf);
     PutbackRMByte(ModRM,dst);
+	cpustate->CarryVal = tmpcf;
 }
 
 static void PREFIX86(_sbb_wr16)(i8086_state *cpustate)    /* Opcode 0x19 */
 {
+    int tmpcf;
     DEF_wr16(dst,src);
 	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
     src+=CF;
-	SUBW(dst,src);
+	SBBW(dst,src,tmpcf);
 	PutbackRMWord(ModRM,dst);
+	cpustate->CarryVal = tmpcf;
 }
 
 static void PREFIX86(_sbb_r8b)(i8086_state *cpustate)    /* Opcode 0x1a */
@@ -1581,6 +1598,7 @@ static void PREFIX86(_80pre)(i8086_state *cpustate)    /* Opcode 0x80 */
 	unsigned ModRM = FETCHOP;
 	unsigned dst = GetRMByte(ModRM);
     unsigned src = FETCH;
+	int tmpcf;
 
     switch (ModRM & 0x38)
 	{
@@ -1596,14 +1614,16 @@ static void PREFIX86(_80pre)(i8086_state *cpustate)    /* Opcode 0x80 */
 		break;
     case 0x10:  /* ADC eb,d8 */
         src+=CF;
-        ADDB(dst,src);
+        ADCB(dst,src,tmpcf);
 		PutbackRMByte(ModRM,dst);
+		cpustate->CarryVal = tmpcf;
         ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x18:  /* SBB eb,b8 */
 		src+=CF;
-		SUBB(dst,src);
+		SBBB(dst,src,tmpcf);
         PutbackRMByte(ModRM,dst);
+		cpustate->CarryVal = tmpcf;
         ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x20:  /* AND eb,d8 */
@@ -1634,6 +1654,7 @@ static void PREFIX86(_81pre)(i8086_state *cpustate)    /* Opcode 0x81 */
 	unsigned ModRM = FETCH;
 	unsigned dst = GetRMWord(ModRM);
     unsigned src = FETCH;
+	int tmpcf;
     src+= (FETCH << 8);
 
 	switch (ModRM & 0x38)
@@ -1650,14 +1671,16 @@ static void PREFIX86(_81pre)(i8086_state *cpustate)    /* Opcode 0x81 */
 		break;
 	case 0x10:	/* ADC ew,d16 */
 		src+=CF;
-		ADDW(dst,src);
+		ADCW(dst,src,tmpcf);
         PutbackRMWord(ModRM,dst);
+		cpustate->CarryVal = tmpcf;
         ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
     case 0x18:  /* SBB ew,d16 */
         src+=CF;
-		SUBW(dst,src);
+		SBBW(dst,src,tmpcf);
         PutbackRMWord(ModRM,dst);
+		cpustate->CarryVal = tmpcf;
         ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
     case 0x20:  /* AND ew,d16 */
@@ -1687,6 +1710,7 @@ static void PREFIX86(_82pre)(i8086_state *cpustate)	 /* Opcode 0x82 */
 	unsigned ModRM = FETCH;
 	unsigned dst = GetRMByte(ModRM);
 	unsigned src = FETCH;
+	int tmpcf;
 
 	switch (ModRM & 0x38)
 	{
@@ -1702,14 +1726,16 @@ static void PREFIX86(_82pre)(i8086_state *cpustate)	 /* Opcode 0x82 */
 		break;
 	case 0x10:	/* ADC eb,d8 */
 		src+=CF;
-		ADDB(dst,src);
+		ADCB(dst,src,tmpcf);
 		PutbackRMByte(ModRM,dst);
+		cpustate->CarryVal = tmpcf;
         ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x18:	/* SBB eb,d8 */
         src+=CF;
-		SUBB(dst,src);
+		SBBB(dst,src,tmpcf);
 		PutbackRMByte(ModRM,dst);
+		cpustate->CarryVal = tmpcf;
         ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x20:	/* AND eb,d8 */
@@ -1739,6 +1765,7 @@ static void PREFIX86(_83pre)(i8086_state *cpustate)    /* Opcode 0x83 */
 	unsigned ModRM = FETCH;
     unsigned dst = GetRMWord(ModRM);
     unsigned src = (WORD)((INT16)((INT8)FETCH));
+	int tmpcf;
 
 	switch (ModRM & 0x38)
     {
@@ -1754,14 +1781,16 @@ static void PREFIX86(_83pre)(i8086_state *cpustate)    /* Opcode 0x83 */
 		break;
     case 0x10:  /* ADC ew,d16 */
         src+=CF;
-		ADDW(dst,src);
+		ADCW(dst,src,tmpcf);
         PutbackRMWord(ModRM,dst);
+		cpustate->CarryVal = tmpcf;
         ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
 	case 0x18:	/* SBB ew,d16 */
 		src+=CF;
-        SUBW(dst,src);
+        SBBW(dst,src,tmpcf);
         PutbackRMWord(ModRM,dst);
+		cpustate->CarryVal = tmpcf;
         ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
 	case 0x20:	/* AND ew,d16 */
@@ -1804,16 +1833,16 @@ static void PREFIX86(_xchg_br8)(i8086_state *cpustate)    /* Opcode 0x86 */
 {
     DEF_br8(dst,src);
 	ICOUNT -= (ModRM >= 0xc0) ? timing.xchg_rr8 : timing.xchg_rm8;
-    RegByte(ModRM)=dst;
     PutbackRMByte(ModRM,src);
+    RegByte(ModRM)=dst;
 }
 
 static void PREFIX86(_xchg_wr16)(i8086_state *cpustate)    /* Opcode 0x87 */
 {
     DEF_wr16(dst,src);
 	ICOUNT -= (ModRM >= 0xc0) ? timing.xchg_rr16 : timing.xchg_rm16;
-    RegWord(ModRM)=dst;
     PutbackRMWord(ModRM,src);
+    RegWord(ModRM)=dst;
 }
 
 static void PREFIX86(_mov_br8)(i8086_state *cpustate)    /* Opcode 0x88 */
@@ -2754,6 +2783,7 @@ static void PREFIX(_mov_sregw)(i8086_state *cpustate)    /* Opcode 0x8e */
 		PREFIX(_instruction)[FETCHOP](cpustate);
 		break;
     case 0x08:  /* mov cs,ew */
+		PREFIX(_invalid)(cpustate);
 		break;  /* doesn't do a jump far */
     }
 #else

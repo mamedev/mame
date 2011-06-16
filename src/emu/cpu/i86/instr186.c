@@ -16,6 +16,9 @@ static void PREFIX186(_pusha)(i8086_state *cpustate)    /* Opcode 0x60 */
 {
 	unsigned tmp=cpustate->regs.w[SP];
 
+#ifdef I80286
+	if(PM) i80286_check_permission(cpustate, SS, cpustate->regs.w[SP]-16, 16, I80286_WRITE);
+#endif
 	ICOUNT -= timing.pusha;
 	PUSH(cpustate->regs.w[AX]);
 	PUSH(cpustate->regs.w[CX]);
@@ -31,6 +34,9 @@ static unsigned i186_popa_tmp;  // hack around GCC 4.6 error because we need the
 static void PREFIX186(_popa)(i8086_state *cpustate)    /* Opcode 0x61 */
 {
 
+#ifdef I80286
+	if(PM) i80286_check_permission(cpustate, SS, cpustate->regs.w[SP], 16, I80286_READ);
+#endif
 	ICOUNT -= timing.popa;
 	POP(cpustate->regs.w[DI]);
 	POP(cpustate->regs.w[SI]);
@@ -100,6 +106,9 @@ static void PREFIX186(_imul_d8)(i8086_state *cpustate)    /* Opcode 0x6b */
 
 static void PREFIX186(_insb)(i8086_state *cpustate)    /* Opcode 0x6c */
 {
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 	ICOUNT -= timing.ins8;
 	PutMemB(ES,cpustate->regs.w[DI],read_port_byte(cpustate->regs.w[DX]));
 	cpustate->regs.w[DI] += cpustate->DirVal;
@@ -107,6 +116,9 @@ static void PREFIX186(_insb)(i8086_state *cpustate)    /* Opcode 0x6c */
 
 static void PREFIX186(_insw)(i8086_state *cpustate)    /* Opcode 0x6d */
 {
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 	ICOUNT -= timing.ins16;
 	PutMemW(ES,cpustate->regs.w[DI],read_port_word(cpustate->regs.w[DX]));
 	cpustate->regs.w[DI] += 2 * cpustate->DirVal;
@@ -114,6 +126,9 @@ static void PREFIX186(_insw)(i8086_state *cpustate)    /* Opcode 0x6d */
 
 static void PREFIX186(_outsb)(i8086_state *cpustate)    /* Opcode 0x6e */
 {
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 	ICOUNT -= timing.outs8;
 	write_port_byte(cpustate->regs.w[DX],GetMemB(DS,cpustate->regs.w[SI]));
 	cpustate->regs.w[SI] += cpustate->DirVal; /* GOL 11/27/01 */
@@ -121,6 +136,9 @@ static void PREFIX186(_outsb)(i8086_state *cpustate)    /* Opcode 0x6e */
 
 static void PREFIX186(_outsw)(i8086_state *cpustate)    /* Opcode 0x6f */
 {
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 	ICOUNT -= timing.outs16;
 	write_port_word(cpustate->regs.w[DX],GetMemW(DS,cpustate->regs.w[SI]));
 	cpustate->regs.w[SI] += 2 * cpustate->DirVal; /* GOL 11/27/01 */
@@ -146,17 +164,25 @@ static void PREFIX186(_rotshft_wd8)(i8086_state *cpustate)    /* Opcode 0xc1 */
 
 static void PREFIX186(_enter)(i8086_state *cpustate)    /* Opcode 0xc8 */
 {
-	unsigned nb = FETCH;	 unsigned i,level;
+	unsigned nb = FETCH;
+	unsigned i,level;
+	UINT16 fp;
 
 	nb += FETCH << 8;
+#ifdef I80286
+	level = FETCH & 0x1f;
+	if(PM) i80286_check_permission(cpustate, SS, cpustate->regs.w[SP]-2-(level*2), 2+(level*2), I80286_WRITE);
+#else
 	level = FETCH;
+#endif
 	ICOUNT -= (level == 0) ? timing.enter0 : (level == 1) ? timing.enter1 : timing.enter_base + level * timing.enter_count;
 	PUSH(cpustate->regs.w[BP]);
-	cpustate->regs.w[BP]=cpustate->regs.w[SP];
-	cpustate->regs.w[SP] -= nb;
+	fp = cpustate->regs.w[SP];
 	for (i=1;i<level;i++)
 		PUSH(GetMemW(SS,cpustate->regs.w[BP]-i*2));
-	if (level) PUSH(cpustate->regs.w[BP]);
+	if (level) PUSH(fp);
+	cpustate->regs.w[BP] = fp;
+	cpustate->regs.w[SP] -= nb;
 }
 
 static void PREFIX186(_leave)(i8086_state *cpustate)    /* Opcode 0xc9 */

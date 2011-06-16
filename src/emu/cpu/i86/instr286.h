@@ -13,8 +13,8 @@
 #define STACK_FAULT 12
 #define GENERAL_PROTECTION_FAULT 13
 
-#define PM (cpustate->msw&1)
 #define CPL (cpustate->sregs[CS]&3)
+#define PM (cpustate->msw&1)
 
 static void i80286_trap2(i80286_state *cpustate,UINT32 error);
 static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, int trap, int error);
@@ -40,3 +40,9 @@ enum i80286_operation
 };
 
 static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT32 offset, int size, i80286_operation operation);
+
+static inline UINT32 GetMemAddr(i80286_state *cpustate, UINT16 seg, UINT16 off, UINT8 size, i80286_operation op) {
+	seg = DefaultSeg(seg);
+	if(PM) i80286_check_permission(cpustate, seg, off, size, op);
+	return (cpustate->base[seg] + off) & AMASK;
+}

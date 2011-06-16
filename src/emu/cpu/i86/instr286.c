@@ -152,7 +152,7 @@ static void i80286_pop_seg(i80286_state *cpustate, int reg)
 	cpustate->regs.w[SP] += 2;
 }
 
-static void i80286_data_descriptor_full(i80286_state *cpustate,int reg, UINT16 selector, int cpl, UINT32 trap)
+static void i80286_data_descriptor_full(i80286_state *cpustate, int reg, UINT16 selector, int cpl, UINT32 trap, UINT16 offset, int size)
 {
 	if (PM) {
 		UINT16 desc[3];
@@ -189,6 +189,10 @@ static void i80286_data_descriptor_full(i80286_state *cpustate,int reg, UINT16 s
 			if (CODE(r) && !READ(r)) throw trap;
 			if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,(IDXTBL(selector)+(trap&1)));
 		}
+		if (offset+size) {
+			if ((CODE(r) || !EXPDOWN(r)) && ((offset+size-1) > LIMIT(desc))) throw (reg==SS)?TRAP(STACK_FAULT,(trap&1)):trap;
+			if (!CODE(r) && EXPDOWN(r) && ((offset <= LIMIT(desc)) || ((offset+size) > 0xffff))) throw (reg==SS)?TRAP(STACK_FAULT,(trap&1)):trap;
+		}
 
 		SET_ACC(desc);
 		WriteWord(addr+4, desc[2]);
@@ -204,7 +208,7 @@ static void i80286_data_descriptor_full(i80286_state *cpustate,int reg, UINT16 s
 
 static void i80286_data_descriptor(i80286_state *cpustate, int reg, UINT16 selector)
 {
-	i80286_data_descriptor_full(cpustate, reg, selector, CPL, TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector)));
+	i80286_data_descriptor_full(cpustate, reg, selector, CPL, TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector)), 0, 0);
 }
 
 static void i80286_switch_task(i80286_state *cpustate, UINT16 ntask, int type)
@@ -296,7 +300,7 @@ static void i80286_switch_task(i80286_state *cpustate, UINT16 ntask, int type)
 
 	if (type == CALL) cpustate->flags |= 0x4000;
 	cpustate->msw |= 8;
-	i80286_data_descriptor_full(cpustate, SS, ntss[TSS_SS], RPL(ntss[TSS_CS]), TRAP(INVALID_TSS,IDXTBL(ntss[TSS_SS])));
+	i80286_data_descriptor_full(cpustate, SS, ntss[TSS_SS], RPL(ntss[TSS_CS]), TRAP(INVALID_TSS,IDXTBL(ntss[TSS_SS])), 0, 0);
 
 	cpustate->sregs[CS] = IDXTBL(cpustate->sregs[CS]) | RPL(ntss[TSS_CS]);  // fixme
 	try {
@@ -307,8 +311,8 @@ static void i80286_switch_task(i80286_state *cpustate, UINT16 ntask, int type)
 		throw e;
 	}
 
-	i80286_data_descriptor_full(cpustate, ES, ntss[TSS_ES], RPL(ntss[TSS_CS]), TRAP(INVALID_TSS,IDXTBL(ntss[TSS_ES])));
-	i80286_data_descriptor_full(cpustate, DS, ntss[TSS_DS], RPL(ntss[TSS_CS]), TRAP(INVALID_TSS,IDXTBL(ntss[TSS_DS])));
+	i80286_data_descriptor_full(cpustate, ES, ntss[TSS_ES], RPL(ntss[TSS_CS]), TRAP(INVALID_TSS,IDXTBL(ntss[TSS_ES])), 0, 0);
+	i80286_data_descriptor_full(cpustate, DS, ntss[TSS_DS], RPL(ntss[TSS_CS]), TRAP(INVALID_TSS,IDXTBL(ntss[TSS_DS])), 0, 0);
 }
 
 static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT16 offset, int gate)
@@ -360,7 +364,7 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 				if (!CODE(r) || !SEGDESC(r)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
 				if (DPL(r)>CPL) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
 				if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,IDXTBL(gatesel));
-				if (GATEOFF(desc) > LIMIT(gatedesc)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
+				if (GATEOFF(desc) > LIMIT(gatedesc)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
 
 				if (!CONF(r)&&(DPL(r)<CPL)) {  // inner call
 					UINT16 tss_ss, tss_sp, oldss, oldsp;
@@ -373,13 +377,13 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 					oldss = cpustate->sregs[SS];
 					oldsp = cpustate->regs.w[SP];
 					oldstk = cpustate->base[SS] + oldsp;
-					i80286_data_descriptor_full(cpustate, SS, tss_ss, DPL(r), TRAP(INVALID_TSS,IDXTBL(tss_ss)));
+					i80286_data_descriptor_full(cpustate, SS, tss_ss, DPL(r), TRAP(INVALID_TSS,IDXTBL(tss_ss)), tss_sp-8-(GATECNT(desc)*2), 8+(GATECNT(desc)*2));
 					cpustate->regs.w[SP] = tss_sp;
 					PUSH(oldss);
 					PUSH(oldsp);
 					for (i = GATECNT(desc)-1; i >= 0; i--)
 						PUSH(ReadWord(oldstk+(i*2)));
-				}
+				} else i80286_check_permission(cpustate, SS, cpustate->regs.w[SP]-4, 4, I80286_READ);
 				SET_ACC(gatedesc);
 				WriteWord(addr+4, gatedesc[2]);
 				cpustate->sregs[CS]=IDXTBL(gatesel) | DPL(r);
@@ -448,7 +452,7 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 		if (!CODE(r) || !SEGDESC(r)) throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
 		if (DPL(r)>CPL) throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
 		if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,(IDXTBL(gatesel)+(hwint&&1)));
-		if (GATEOFF(desc) > LIMIT(gatedesc)) throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
+		if (GATEOFF(desc) > LIMIT(gatedesc)) throw TRAP(GENERAL_PROTECTION_FAULT,(hwint&&1));
 
 		if (!CONF(r)&&(DPL(r)<CPL)) {  // inner call
 			UINT16 tss_ss, tss_sp, oldss, oldsp;
@@ -457,11 +461,11 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 
 			oldss = cpustate->sregs[SS];
 			oldsp = cpustate->regs.w[SP];
-			i80286_data_descriptor_full(cpustate, SS, tss_ss, DPL(r), TRAP(INVALID_TSS,(IDXTBL(tss_ss)+(hwint&&1))));
+			i80286_data_descriptor_full(cpustate, SS, tss_ss, DPL(r), TRAP(INVALID_TSS,(IDXTBL(tss_ss)+(hwint&&1))), tss_sp-((error != -1)?12:10), (error != -1)?12:10);
 			cpustate->regs.w[SP] = tss_sp;
 			PUSH(oldss);
 			PUSH(oldsp);
-		}
+		} else i80286_check_permission(cpustate, SS, cpustate->regs.w[SP]-((error != -1)?8:6), (error != -1)?8:6, I80286_READ);
 		SET_ACC(gatedesc);
 		WriteWord(addr+4, gatedesc[2]);
 		PREFIX(_pushf(cpustate));
@@ -776,9 +780,10 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 		if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,IDXTBL(sel));
 		if (off > LIMIT(desc)) throw TRAP(GENERAL_PROTECTION_FAULT, IDXTBL(sel));
 		if (CPL<RPL(sel)) {
+			i80286_check_permission(cpustate, SS, cpustate->regs.w[SP]+(iret?6:4)+bytes, 4, I80286_READ);
 			newsp = ReadWord(spaddr+((iret?6:4)+bytes));
 			newss = ReadWord(spaddr+((iret?8:6)+bytes));
-			i80286_data_descriptor_full(cpustate, SS, newss, RPL(sel), TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(newss)));
+			i80286_data_descriptor_full(cpustate, SS, newss, RPL(sel), TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(newss)), 0, 0);
 			cpustate->regs.w[SP] = newsp + bytes;
 		} else cpustate->regs.w[SP] += (iret?6:4) + bytes;
 		SET_ACC(desc);
@@ -855,7 +860,7 @@ static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT
 		rights = cpustate->rights[check_seg];
 		trap = i80286_verify(cpustate, cpustate->sregs[check_seg], operation, rights);
 		if ((CODE(rights) || !EXPDOWN(rights)) && ((offset+size-1) > cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
-		if (!CODE(rights) && EXPDOWN(rights) && (offset <= cpustate->limit[check_seg]) && ((offset+size) > 0xffff)) trap = GENERAL_PROTECTION_FAULT;
+		if (!CODE(rights) && EXPDOWN(rights) && ((offset <= cpustate->limit[check_seg]) || ((offset+size) > 0xffff))) trap = GENERAL_PROTECTION_FAULT;
 
 		if ((trap == GENERAL_PROTECTION_FAULT) && (check_seg == SS)) trap = STACK_FAULT;
 		if (trap) throw TRAP(trap, 0);

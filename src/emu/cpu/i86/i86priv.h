@@ -65,6 +65,13 @@ typedef enum {
 #define SUBB(dst,src) { unsigned res=dst-src; SetCFB(res); SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
 #define SUBW(dst,src) { unsigned res=dst-src; SetCFW(res); SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
 
+// don't modify CF in case fault occurs
+#define ADCB(dst,src,tmpcf) { unsigned res=dst+src; tmpcf = res & 0x100; SetOFB_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
+#define ADCW(dst,src,tmpcf) { unsigned res=dst+src; tmpcf = res & 0x10000; SetOFW_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
+
+#define SBBB(dst,src,tmpcf) { unsigned res=dst-src; tmpcf = res & 0x100; SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
+#define SBBW(dst,src,tmpcf) { unsigned res=dst-src; tmpcf = res & 0x10000; SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
+
 #define ORB(dst,src)		dst |= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
 #define ORW(dst,src)		dst |= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
 
@@ -101,10 +108,17 @@ typedef enum {
 #define DefaultSeg(Seg)			((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->prefix_seg : Seg)
 #define DefaultBase(Seg)		((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->base[cpustate->prefix_seg] : cpustate->base[Seg])
 
+#ifdef I80286
+#define GetMemB(Seg,Off)		(read_mem_byte(GetMemAddr(cpustate,Seg,Off,1,I80286_READ)))
+#define GetMemW(Seg,Off)		(read_mem_word(GetMemAddr(cpustate,Seg,Off,2,I80286_READ)))
+#define PutMemB(Seg,Off,x)		write_mem_byte(GetMemAddr(cpustate,Seg,Off,1,I80286_WRITE), (x))
+#define PutMemW(Seg,Off,x)		write_mem_word(GetMemAddr(cpustate,Seg,Off,2,I80286_WRITE), (x))
+#else
 #define GetMemB(Seg,Off)		(read_mem_byte((DefaultBase(Seg) + (Off)) & AMASK))
 #define GetMemW(Seg,Off)		(read_mem_word((DefaultBase(Seg) + (Off)) & AMASK))
 #define PutMemB(Seg,Off,x)		write_mem_byte((DefaultBase(Seg) + (Off)) & AMASK, (x))
 #define PutMemW(Seg,Off,x)		write_mem_word((DefaultBase(Seg) + (Off)) & AMASK, (x))
+#endif
 
 #define PEEKBYTE(ea)			(read_mem_byte((ea) & AMASK))
 #define ReadByte(ea)			(read_mem_byte((ea) & AMASK))
