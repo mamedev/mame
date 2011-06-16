@@ -227,6 +227,7 @@ int cli_frontend::execute(int argc, char **argv)
 						}
 						if (found) break;
 					}
+					if (found) break;
 				}
 				if (!found) {
 					software_display_matches(config.devicelist(),m_options, NULL,m_options.software_name());
