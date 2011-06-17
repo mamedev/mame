@@ -251,7 +251,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 				else strcat(phonemes,PhonemeTable[phoneme]);
 			}
 
-			printf("Votrax played '%s'\n", phonemes);
+			mame_printf_debug("Votrax played '%s'\n", phonemes);
 			play_sample(samples, phonemes);
 #if 0
 			popmessage("%s", phonemes);
