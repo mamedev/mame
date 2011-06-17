@@ -79,6 +79,19 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 				break;
 			}
 
+			case 6:			// FSTENV
+			{  // TODO: 32-bit operand size
+				WRITE16(cpustate,ea, cpustate->fpu_control_word);
+				WRITE16(cpustate,ea+2, cpustate->fpu_status_word);
+				WRITE16(cpustate,ea+4, cpustate->fpu_tag_word);
+				WRITE16(cpustate,ea+6, cpustate->fpu_inst_ptr & 0xffff);
+				WRITE16(cpustate,ea+8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+				WRITE16(cpustate,ea+10, cpustate->fpu_data_ptr & 0xffff);
+				WRITE16(cpustate,ea+12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+				CYCLES(cpustate,1);		// TODO
+				break;
+			}
+
 			case 7:			// FSTCW
 			{
 				WRITE16(cpustate,ea, cpustate->fpu_control_word);

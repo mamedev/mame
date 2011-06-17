@@ -6,7 +6,7 @@ static void I486OP(cpuid)(i386_state *cpustate)				// Opcode 0x0F A2
 	{
 		// this 486 doesn't support the CPUID instruction
 		logerror("CPUID not supported at %08x!\n", cpustate->eip);
-		i386_trap(cpustate, 6, 0);
+		i386_trap(cpustate, 6, 0, 0);
 	}
 	else
 	{

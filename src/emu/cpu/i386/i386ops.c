@@ -2197,20 +2197,20 @@ static void I386OP(nop)(i386_state *cpustate)				// Opcode 0x90
 static void I386OP(int3)(i386_state *cpustate)				// Opcode 0xcc
 {
 	CYCLES(cpustate,CYCLES_INT3);
-	i386_trap(cpustate,3, 1);
+	i386_trap(cpustate,3, 1, 0);
 }
 
 static void I386OP(int)(i386_state *cpustate)				// Opcode 0xcd
 {
 	int interrupt = FETCH(cpustate);
 	CYCLES(cpustate,CYCLES_INT);
-	i386_trap(cpustate,interrupt, 1);
+	i386_trap(cpustate,interrupt, 1, 0);
 }
 
 static void I386OP(into)(i386_state *cpustate)				// Opcode 0xce
 {
 	if( cpustate->OF ) {
-		i386_trap(cpustate,4, 1);
+		i386_trap(cpustate,4, 1, 0);
 		CYCLES(cpustate,CYCLES_INTO_OF1);
 	}
 	else
@@ -2372,5 +2372,5 @@ static void I386OP(unimplemented)(i386_state *cpustate)
 static void I386OP(invalid)(i386_state *cpustate)
 {
 	logerror("i386: Invalid opcode %02X at %08X\n", cpustate->opcode, cpustate->pc - 1);
-	i386_trap(cpustate, 6, 0);
+	i386_trap(cpustate, 6, 0, 0);
 }

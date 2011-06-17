@@ -447,21 +447,16 @@ static void I386OP(call_abs16)(i386_state *cpustate)		// Opcode 0x9a
 	UINT16 offset = FETCH16(cpustate);
 	UINT16 ptr = FETCH16(cpustate);
 
-	if( PROTECTED_MODE ) {
-		/* TODO */
-		fatalerror("i386: call_abs16 in protected mode unimplemented");
-	} else {
-		if (cpustate->sreg[CS].d)
-		{
-			PUSH32(cpustate, cpustate->sreg[CS].selector );
-			PUSH32(cpustate, cpustate->eip );
-		}
-		else
-		{
-			PUSH16(cpustate, cpustate->sreg[CS].selector );
-			PUSH16(cpustate, cpustate->eip );
-		}
+	if( PROTECTED_MODE && !V8086_MODE)
+	{
+		i386_protected_mode_call(cpustate,ptr,offset,0,0);
+	}
+	else
+	{
+		PUSH16(cpustate, cpustate->sreg[CS].selector );
+		PUSH16(cpustate, cpustate->eip );
 		cpustate->sreg[CS].selector = ptr;
+		cpustate->performed_intersegment_jump = 1;
 		cpustate->eip = offset;
 		i386_load_segment_descriptor(cpustate,CS);
 	}
@@ -745,17 +740,12 @@ static void I386OP(inc_di)(i386_state *cpustate)			// Opcode 0x47
 
 static void I386OP(iret16)(i386_state *cpustate)			// Opcode 0xcf
 {
-	if( PROTECTED_MODE ) {
-		/* TODO: Virtual 8086-mode */
-		/* TODO: Nested task */
-		/* TODO: #SS(0) exception */
-		/* TODO: All the protection-related stuff... */
-		cpustate->eip = POP16(cpustate);
-		cpustate->sreg[CS].selector = POP16(cpustate);
-		set_flags(cpustate, POP16(cpustate) );
-		i386_load_segment_descriptor(cpustate,CS);
-		CHANGE_PC(cpustate,cpustate->eip);
-	} else {
+	if( PROTECTED_MODE )
+	{
+		i386_protected_mode_iret(cpustate,0);
+	}
+	else
+	{
 		/* TODO: #SS(0) exception */
 		/* TODO: #GP(0) exception */
 		cpustate->eip = POP16(cpustate);
@@ -1111,15 +1101,12 @@ static void I386OP(jmp_abs16)(i386_state *cpustate)			// Opcode 0xea
 	UINT16 address = FETCH16(cpustate);
 	UINT16 segment = FETCH16(cpustate);
 
-	if( PROTECTED_MODE ) {
-		/* TODO: #GP */
-		/* TODO: access rights, etc. */
-		cpustate->eip = address;
-		cpustate->sreg[CS].selector = segment;
-		cpustate->performed_intersegment_jump = 1;
-		i386_load_segment_descriptor(cpustate,CS);
-		CHANGE_PC(cpustate,cpustate->eip);
-	} else {
+	if( PROTECTED_MODE && !V8086_MODE)
+	{
+		i386_protected_mode_jump(cpustate,segment,address,0,0);
+	}
+	else
+	{
 		cpustate->eip = address;
 		cpustate->sreg[CS].selector = segment;
 		cpustate->performed_intersegment_jump = 1;
@@ -2737,21 +2724,32 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 		case 3:			/* CALL FAR Rm16 */
 			{
 				UINT16 address, selector;
-				if( modrm >= 0xc0 ) {
+				if( modrm >= 0xc0 )
+				{
 					fatalerror("i386: groupFF_16 /%d NYI", (modrm >> 3) & 0x7);
-				} else {
+				}
+				else
+				{
 					UINT32 ea = GetEA(cpustate,modrm);
 					address = READ16(cpustate,ea + 0);
 					selector = READ16(cpustate,ea + 2);
 					CYCLES(cpustate,CYCLES_CALL_MEM_INTERSEG);		/* TODO: Timing = 10 + m */
+
+					if(PROTECTED_MODE && !V8086_MODE)
+					{
+						i386_protected_mode_call(cpustate,selector,address,1,0);
+					}
+					else
+					{
+						PUSH16(cpustate, cpustate->sreg[CS].selector );
+						PUSH16(cpustate, cpustate->eip );
+						cpustate->sreg[CS].selector = selector;
+						cpustate->performed_intersegment_jump = 1;
+						i386_load_segment_descriptor(cpustate, CS );
+						cpustate->eip = address;
+						CHANGE_PC(cpustate,cpustate->eip);
+					}
 				}
-				PUSH16(cpustate, cpustate->sreg[CS].selector );
-				PUSH16(cpustate, cpustate->eip );
-				cpustate->sreg[CS].selector = selector;
-				cpustate->performed_intersegment_jump = 1;
-				i386_load_segment_descriptor(cpustate, CS );
-				cpustate->eip = address;
-				CHANGE_PC(cpustate,cpustate->eip);
 			}
 			break;
 		case 4:			/* JMP Rm16 */
@@ -2772,19 +2770,30 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 		case 5:			/* JMP FAR Rm16 */
 			{
 				UINT16 address, selector;
-				if( modrm >= 0xc0 ) {
+
+				if( modrm >= 0xc0 )
+				{
 					fatalerror("i386: groupFF_16 /%d NYI", (modrm >> 3) & 0x7);
-				} else {
+				}
+				else
+				{
 					UINT32 ea = GetEA(cpustate,modrm);
 					address = READ16(cpustate,ea + 0);
 					selector = READ16(cpustate,ea + 2);
 					CYCLES(cpustate,CYCLES_JMP_MEM_INTERSEG);		/* TODO: Timing = 10 + m */
+					if(PROTECTED_MODE && !V8086_MODE)
+					{
+						i386_protected_mode_jump(cpustate,selector,address,1,0);
+					}
+					else
+					{
+						cpustate->sreg[CS].selector = selector;
+						cpustate->performed_intersegment_jump = 1;
+						i386_load_segment_descriptor(cpustate, CS );
+						cpustate->eip = address;
+						CHANGE_PC(cpustate,cpustate->eip);
+					}
 				}
-				cpustate->sreg[CS].selector = selector;
-				cpustate->performed_intersegment_jump = 1;
-				i386_load_segment_descriptor(cpustate, CS );
-				cpustate->eip = address;
-				CHANGE_PC(cpustate,cpustate->eip);
 			}
 			break;
 		case 6:			/* PUSH Rm16 */
@@ -2833,7 +2842,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(cpustate,6, 0);
+				i386_trap(cpustate,6, 0, 0);
 			}
 			break;
 		case 1: 		/* STR */
@@ -2851,7 +2860,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(cpustate,6, 0);
+				i386_trap(cpustate,6, 0, 0);
 			}
 			break;
 		case 2:			/* LLDT */
@@ -2875,7 +2884,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(cpustate,6, 0);
+				i386_trap(cpustate,6, 0, 0);
 			}
 			break;
 
@@ -2900,7 +2909,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(cpustate,6, 0);
+				i386_trap(cpustate,6, 0, 0);
 			}
 			break;
 
@@ -2962,7 +2971,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(cpustate,6, 0);
+				i386_trap(cpustate,6, 0, 0);
 				logerror("i386: VERR: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
@@ -3020,7 +3029,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(cpustate,6, 0);
+				i386_trap(cpustate,6, 0, 0);
 				logerror("i386: VERW: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
@@ -3304,7 +3313,7 @@ static void I386OP(lar_r16_rm16)(i386_state *cpustate)  // Opcode 0x0f 0x02
 	else
 	{
 		// illegal opcode
-		i386_trap(cpustate,6,0);
+		i386_trap(cpustate,6,0, 0);
 		logerror("i386: LAR: Exception - running in real mode or virtual 8086 mode.\n");
 	}
 }
@@ -3333,7 +3342,7 @@ static void I386OP(lsl_r16_rm16)(i386_state *cpustate)  // Opcode 0x0f 0x03
 		}
 	}
 	else
-		i386_trap(cpustate,6, 0);
+		i386_trap(cpustate,6, 0, 0);
 }
 
 static void I386OP(bound_r16_m16_m16)(i386_state *cpustate)	// Opcode 0x62
@@ -3358,7 +3367,7 @@ static void I386OP(bound_r16_m16_m16)(i386_state *cpustate)	// Opcode 0x62
 	if ((val < low) || (val > high))
 	{
 		CYCLES(cpustate,CYCLES_BOUND_OUT_RANGE);
-		i386_trap(cpustate,5, 0);
+		i386_trap(cpustate,5, 0, 0);
 	}
 	else
 	{
@@ -3368,10 +3377,17 @@ static void I386OP(bound_r16_m16_m16)(i386_state *cpustate)	// Opcode 0x62
 
 static void I386OP(retf16)(i386_state *cpustate)			// Opcode 0xcb
 {
-	cpustate->eip = POP16(cpustate);
-	cpustate->sreg[CS].selector = POP16(cpustate);
-	i386_load_segment_descriptor(cpustate, CS );
-	CHANGE_PC(cpustate,cpustate->eip);
+	if(PROTECTED_MODE && !V8086_MODE)
+	{
+		i386_protected_mode_retf(cpustate,0,0);
+	}
+	else
+	{
+		cpustate->eip = POP16(cpustate);
+		cpustate->sreg[CS].selector = POP16(cpustate);
+		i386_load_segment_descriptor(cpustate, CS );
+		CHANGE_PC(cpustate,cpustate->eip);
+	}
 
 	CYCLES(cpustate,CYCLES_RET_INTERSEG);
 }
@@ -3380,12 +3396,19 @@ static void I386OP(retf_i16)(i386_state *cpustate)			// Opcode 0xca
 {
 	UINT16 count = FETCH16(cpustate);
 
-	cpustate->eip = POP16(cpustate);
-	cpustate->sreg[CS].selector = POP16(cpustate);
-	i386_load_segment_descriptor(cpustate, CS );
-	CHANGE_PC(cpustate,cpustate->eip);
+	if(PROTECTED_MODE && !V8086_MODE)
+	{
+		i386_protected_mode_retf(cpustate,count,0);
+	}
+	else
+	{
+		cpustate->eip = POP16(cpustate);
+		cpustate->sreg[CS].selector = POP16(cpustate);
+		i386_load_segment_descriptor(cpustate, CS );
+		CHANGE_PC(cpustate,cpustate->eip);
+		REG16(SP) += count;
+	}
 
-	REG16(SP) += count;
 	CYCLES(cpustate,CYCLES_RET_IMM_INTERSEG);
 }
 

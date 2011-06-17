@@ -136,6 +136,8 @@ enum
 	I386_LDTR_LIMIT,
 	I386_LDTR_FLAGS,
 
+	I386_CPL,
+
 	X87_CTRL,
 	X87_STATUS,
 	X87_ST0,
@@ -148,6 +150,17 @@ enum
 	X87_ST7,
 };
 
+/* Protected mode exceptions */
+#define FAULT_UD 6   // Invalid Opcode
+#define FAULT_NM 7   // Coprocessor not available
+#define FAULT_DF 8   // Double Fault
+#define FAULT_TS 10  // Invalid TSS
+#define FAULT_NP 11  // Segment or Gate not present
+#define FAULT_SS 12  // Stack fault
+#define FAULT_GP 13  // General Protection Fault
+#define FAULT_PF 14  // Page Fault
+#define FAULT_MF 16  // Match (Coprocessor) Fault
+
 typedef struct {
 	UINT16 selector;
 	UINT16 flags;
@@ -155,6 +168,17 @@ typedef struct {
 	UINT32 limit;
 	int d;		// Operand size
 } I386_SREG;
+
+typedef struct
+{
+	UINT16 segment;
+	UINT16 selector;
+	UINT32 offset;
+	UINT8 ar;  // access rights
+	UINT8 dpl;
+	UINT8 dword_count;
+	UINT8 present;
+} I386_CALL_GATE;
 
 typedef struct {
 	UINT32 base;
@@ -201,6 +225,8 @@ struct _i386_state
 	UINT8 IOP1;
 	UINT8 IOP2;
 	UINT8 NT;
+
+	UINT8 CPL;  // current privilege level
 
 	UINT8 performed_intersegment_jump;
 
@@ -273,6 +299,7 @@ extern int i386_parity_table[256];
 #define PROTECTED_MODE		(cpustate->cr[0] & 0x1)
 #define STACK_32BIT			(cpustate->sreg[SS].d)
 #define V8086_MODE			(cpustate->eflags & 0x00020000)
+#define NESTED_TASK			(cpustate->eflags & 0x00004000)
 
 #define SetOF_Add32(r,s,d)	(cpustate->OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x80000000) ? 1: 0)
 #define SetOF_Add16(r,s,d)	(cpustate->OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? 1 : 0)
