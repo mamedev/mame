@@ -275,7 +275,7 @@ static void fuuki16_draw_layer( running_machine &machine, bitmap_t *bitmap, cons
 		case 2:	if (buffer)	tilemap_draw(bitmap, cliprect, state->m_tilemap[3], flag, pri);
 				else		tilemap_draw(bitmap, cliprect, state->m_tilemap[2], flag, pri);
 				return;
-		case 1:	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], flag, pri);
+		case 1:	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], flag, pri);
 				return;
 		case 0:	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], flag, pri);
 				return;
