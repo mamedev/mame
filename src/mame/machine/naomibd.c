@@ -1436,7 +1436,7 @@ M1: DMA read of protected ROM area
 M2: special read of ROM area which supplies decryption key first
 M3: normal read followed by write to cart's decryption buffer (up to 64kB), followed by M2 but from buffer area
 
-M1's working is still unclear (more on this later), so we will be speaking of M2 & M3 most of the time.
+Notes below refer to M2 & M3.
 
 The encryption is done by a stream cipher operating in counter mode, which use a 16-bits internal block cipher.
 
@@ -1454,7 +1454,7 @@ internal block-cipher. So, at a given step, the internal block cipher will outpu
 given plaintext word, and the remaining 2 to the next plaintext word.
 
 The underlying block cipher consists of two 4-round Feistel Networks (FN): the first one takes the counter (16 bits),
-the game-key (>=25 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
+the game-key (>=26 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
 for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key and the result
 from the first FN and will output the decrypted word (16 bits).
 
@@ -1483,19 +1483,6 @@ chosen so as to make the key for CAPSNK equal to 0.
 It can be observed that a couple of sboxes have incomplete tables (a 255 value indicate an unknown value). The recovered keys
 as of december/2010 show small randomness and big correlations, making possible that some unseen bits could make the
 decryption need those incomplete parts.
-
-When bit #1 of the heading control bits is set to 1, an additional decompression step seems to be carried out. As of
-february/2010, Deunan Knute has put some work on analyzing the decompression algorithm, but probably much more work will
-be needed to completely reverse engineer it. Interested devs with quick access to hardware tests are welcomed to join
-the task.
-
-Guilty Gear X & Sega Tetris are examples of games using the decompression ingame.
-
-Due to technical details, it's more difficult to get custom decryption data from M1 carts, which hinders some types of
-analysis. The only M1 cart which have received attention until now have been AH! MY GODDESS. The available data clearly
-doesn't have the same structure than M2&M3 carts using only the decryption step. However, due to that some hardware tests
-show cycled structures similar to the ones returned by M2&M3 carts using the decompression algo, it's conjectured that M1
-carts will be using the same decompression algorithm seen in M2&M3 ones.
 
 ****************************************************************************************/
 
