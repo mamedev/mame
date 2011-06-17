@@ -396,7 +396,7 @@ void cli_frontend::listclones(const char *gamename)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		if (clone_of != -1)
+		if (clone_of != -1 && (drivlist.driver(clone_of).flags & GAME_IS_BIOS_ROOT) == 0)
 			mame_printf_info("%-16s %-8s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
 	}
 }
