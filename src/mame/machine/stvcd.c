@@ -597,6 +597,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			cr2 = 0xffff;
 			cr3 = 0xffff;
 			cr4 = 0xffff;
+			hirqreg |= CMOK;
 			return;
 		}
 
@@ -658,7 +659,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			hirqreg |= (CMOK);
 			break;
 
-		case 0x400:	// initialize CD system
+		case 0x0400:	// initialize CD system
 				// CR1 & 1 = reset software
 				// CR1 & 2 = decode RW subcode
 				// CR1 & 4 = don't confirm mode 2 subheader
@@ -910,8 +911,12 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			break;
 
-		case 0x3200:
-			popmessage("Last Buffer Destination triggered, contact MAMEdev");
+		case 0x3200:	// Last Buffer Destination
+			cr1 = cd_stat | 0;
+			cr2 = 0;
+			cr3 = lastbuf << 8;
+			cr4 = 0;
+			hirqreg |= (CMOK);
 			break;
 
 		case 0x4000:	// Set Filter Range
@@ -1320,6 +1325,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			hirqreg |= (CMOK|EFLS);
 
 			// TODO!
+			popmessage("X");
 
 			//temp = (cr3&0xff)<<16;
 			//temp |= cr4;

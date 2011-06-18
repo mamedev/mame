@@ -1273,7 +1273,7 @@ static READ32_HANDLER( saturn_scu_r )
 		state->m_scu_regs[41]|= (stv_irq.vdp1_end & 1)<<13;
 		state->m_scu_regs[41]|= (stv_irq.abus & 1)<<15;
 
-		return state->m_scu_regs[41] ^ 0xffffffff;
+		return state->m_scu_regs[41] ^ 0xffffffff; //TODO: this is WRONG (Choice Cuts is a good test case)
 	}
 	else if( offset == 50 )
 	{
@@ -1577,7 +1577,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	{
 		state->m_scu.dst_add[dma_ch] = (scu_add_tmp & 0xff00) >> 8;
 		state->m_scu.src_add[dma_ch] = (scu_add_tmp & 0x00ff) >> 0;
-		scu_add_tmp^=0x80000000;
+		scu_add_tmp&=~0x80000000;
 	}
 }
 
@@ -1589,37 +1589,39 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 	UINT8 job_done = 0;
 	/*temporary storage for the transfer data*/
 	UINT32 tmp_src;
+	UINT32 indirect_src,indirect_dst;
+	INT32 indirect_size;
 
 	DnMV_1(dma_ch);
 
-	if(state->m_scu.index[dma_ch] == 0) { state->m_scu.index[dma_ch] = state->m_scu.dst[0]; }
+	state->m_scu.index[dma_ch] = state->m_scu.dst[dma_ch];
 
 	do{
 		tmp_src = state->m_scu.index[dma_ch];
 
-		state->m_scu.size[dma_ch] = space->read_dword(state->m_scu.index[dma_ch]);
-		state->m_scu.src[dma_ch]  = space->read_dword(state->m_scu.index[dma_ch]+8);
-		state->m_scu.dst[dma_ch]  = space->read_dword(state->m_scu.index[dma_ch]+4);
+		indirect_size = space->read_dword(state->m_scu.index[dma_ch]);
+		indirect_src  = space->read_dword(state->m_scu.index[dma_ch]+8);
+		indirect_dst  = space->read_dword(state->m_scu.index[dma_ch]+4);
 
 		/*Indirect Mode end factor*/
-		if(state->m_scu.src[dma_ch] & 0x80000000)
+		if(indirect_src & 0x80000000)
 			job_done = 1;
 
 		if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
-				             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
+				           "Index %08x Start %08x End %08x Size %04x\n",dma_ch,tmp_src,indirect_src,indirect_dst,indirect_size);
 		if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
 
 		//guess,but I believe it's right.
-		state->m_scu.src[dma_ch] &=0x07ffffff;
-		state->m_scu.dst[dma_ch] &=0x07ffffff;
-		state->m_scu.size[dma_ch] &= ((dma_ch == 0) ? 0xfffff : 0x1fff);
+		indirect_src &=0x07ffffff;
+		indirect_dst &=0x07ffffff;
+		indirect_size &= ((dma_ch == 0) ? 0xfffff : 0x3ffff); //TODO: Guardian Heroes sets up a 0x23000 transfer for the FMV?
 
-		if(state->m_scu.size[dma_ch] == 0) { state->m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
+		if(indirect_size == 0) { indirect_size = (dma_ch == 0) ? 0x00100000 : 0x2000; }
 
-		for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=state->m_scu.dst_add[dma_ch])
+		for (; indirect_size > 0; indirect_size-=state->m_scu.dst_add[dma_ch])
 		{
 			if(state->m_scu.dst_add[dma_ch] == 2)
-				space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
+				space->write_word(indirect_dst,space->read_word(indirect_src));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -1627,11 +1629,11 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
-				space->write_word(state->m_scu.dst[dma_ch]+2,space->read_word(state->m_scu.src[dma_ch]+2));
+				space->write_word(indirect_dst,space->read_word(indirect_src));
+				space->write_word(indirect_dst+2,space->read_word(indirect_src+2));
 			}
-			state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
-			state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
+			indirect_dst+=state->m_scu.dst_add[dma_ch];
+			indirect_src+=state->m_scu.src_add[dma_ch];
 		}
 
 		//if(DRUP(0))   space->write_dword(tmp_src+8,state->m_scu.src[0]|job_done ? 0x80000000 : 0);
