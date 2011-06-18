@@ -39,9 +39,9 @@ enum i80286_operation
 	I80286_EXECUTE
 };
 
-static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT32 offset, int size, i80286_operation operation);
+static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT32 offset, UINT16 size, i80286_operation operation);
 
-static inline UINT32 GetMemAddr(i80286_state *cpustate, UINT16 seg, UINT16 off, UINT8 size, i80286_operation op) {
+static inline UINT32 GetMemAddr(i80286_state *cpustate, UINT8 seg, UINT32 off, UINT16 size, i80286_operation op) {
 	seg = DefaultSeg(seg);
 	if(PM) i80286_check_permission(cpustate, seg, off, size, op);
 	return (cpustate->base[seg] + off) & AMASK;

@@ -852,7 +852,7 @@ static void PREFIX286(_escape_7)(i8086_state *cpustate)    /* Opcode 0xdf */
 	if (ModRM == 0xe0) cpustate->regs.w[AX] = 0xffff;  // FPU not present
 }
 
-static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT32 offset, int size, i80286_operation operation)
+static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT32 offset, UINT16 size, i80286_operation operation)
 {
 	int trap = 0;
 	UINT8 rights;
@@ -860,7 +860,7 @@ static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT
 		rights = cpustate->rights[check_seg];
 		trap = i80286_verify(cpustate, cpustate->sregs[check_seg], operation, rights);
 		if ((CODE(rights) || !EXPDOWN(rights)) && ((offset+size-1) > cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
-		if (!CODE(rights) && EXPDOWN(rights) && ((offset <= cpustate->limit[check_seg]) || ((offset+size) > 0xffff))) trap = GENERAL_PROTECTION_FAULT;
+		if (!CODE(rights) && EXPDOWN(rights) && ((offset <= cpustate->limit[check_seg]) || ((offset+size-1) > 0xffff))) trap = GENERAL_PROTECTION_FAULT;
 
 		if ((trap == GENERAL_PROTECTION_FAULT) && (check_seg == SS)) trap = STACK_FAULT;
 		if (trap) throw TRAP(trap, 0);
