@@ -47,7 +47,9 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-typedef struct floppy_type_t	floppy_type;
+
+// ======================> floppy_type_t
+
 struct floppy_type_t
 {
 	UINT8 media_size;
@@ -56,14 +58,9 @@ struct floppy_type_t
 	UINT8 max_density;
 };
 
-typedef struct inline_floppy_config_t	inline_floppy_config;
-struct inline_floppy_config_t
-{
-	device_image_display_info_func	device_displayinfo;
-};
+// ======================> floppy_interface
 
-typedef struct floppy_config_t	floppy_config;
-struct floppy_config_t
+struct floppy_interface
 {
 	devcb_write_line out_idx_func;  /* index */
 	devcb_read_line  in_mon_func;   /* motor on */
@@ -75,6 +72,7 @@ struct floppy_config_t
 	floppy_type_t floppy_type;
 	const struct FloppyFormat *formats;
 	const char *interface;
+	device_image_display_info_func	device_displayinfo;
 };
 
 /* sector has a deleted data address mark */
@@ -84,7 +82,7 @@ struct floppy_config_t
 /* CRC error in data field */
 #define ID_FLAG_CRC_ERROR_IN_DATA_FIELD 0x0004
 
-typedef struct chrn_id
+struct chrn_id
 {
 	unsigned char C;
 	unsigned char H;
@@ -92,7 +90,7 @@ typedef struct chrn_id
 	unsigned char N;
 	int data_id;			// id for read/write data command
 	unsigned long flags;
-} chrn_id;
+};
 
 /* set if drive is ready */
 #define FLOPPY_DRIVE_READY						0x0010
@@ -248,24 +246,5 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 #define MCFG_FLOPPY_2_DRIVES_REMOVE()	\
 	MCFG_DEVICE_REMOVE(FLOPPY_0)		\
 	MCFG_DEVICE_REMOVE(FLOPPY_1)
-
-#define MCFG_FLOPPY_DRIVE_DISPLAY_INFO(_displayinfo)										\
-	MCFG_DEVICE_CONFIG_DATAPTR(inline_floppy_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))
-
-#define MCFG_FLOPPY_2_DRIVES_DISPLAY_INFO(_displayinfo)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_0)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(inline_floppy_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))	\
-	MCFG_DEVICE_MODIFY(FLOPPY_1)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(inline_floppy_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))
-
-#define MCFG_FLOPPY_4_DRIVES_DISPLAY_INFO(_displayinfo)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_0)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(inline_floppy_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))	\
-	MCFG_DEVICE_MODIFY(FLOPPY_1)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(inline_floppy_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))	\
-	MCFG_DEVICE_MODIFY(FLOPPY_2)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(inline_floppy_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))	\
-	MCFG_DEVICE_MODIFY(FLOPPY_3)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(inline_floppy_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))
 
 #endif /* __FLOPDRV_H__ */
