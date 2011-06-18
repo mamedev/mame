@@ -39,11 +39,13 @@ struct _poly_extra_data
 	const void *	palbase;
 	const void *	texbase;
 	UINT16			solidcolor;
+	UINT16			voffset;
 	INT16			zoffset;
 	UINT16			transcolor;
 	UINT16			texwidth;
 	UINT16			color;
 	UINT32			alpha;
+	UINT8			(*get_texel)(const void *, int, int, int);
 };
 
 
@@ -73,6 +75,7 @@ static rectangle zeus_cliprect;
 static UINT32 *waveram[2];
 static int yoffs;
 static int texel_width;
+static int is_mk4b;
 
 
 
@@ -90,10 +93,14 @@ static void zeus_register32_w(running_machine &machine, offs_t offset, UINT32 da
 static void zeus_register_update(running_machine &machine, offs_t offset);
 static int zeus_fifo_process(running_machine &machine, const UINT32 *data, int numwords);
 static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit);
-static void zeus_draw_quad(running_machine &machine, const UINT32 *databuffer, UINT32 texdata, int logit);
+static void zeus_draw_quad(running_machine &machine, int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit);
 
-static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
-static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
+INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width);
+INLINE UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width);
+INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width);
+INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width);
+
+static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 static void render_poly_solid_fixedz(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
@@ -229,6 +236,13 @@ INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width)
 }
 
 
+INLINE UINT8 get_texel_alt_8bit(const void *base, int y, int x, int width)
+{
+	UINT32 byteoffs =  (y / 4) * (width * 4) + ((x / 2) << 3) + ((y & 3) << 1) + (x & 1);
+	return WAVERAM_READ8(base, byteoffs);
+}
+
+
 INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
@@ -236,6 +250,11 @@ INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 }
 
 
+INLINE UINT8 get_texel_alt_4bit(const void *base, int y, int x, int width)
+{
+	UINT32 byteoffs = (y / 4) * (width * 4) + ((x / 4) << 3) + ((y & 3) << 1) + ((x / 2) & 1);
+	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
+}
 
 /*************************************
  *
@@ -279,6 +298,9 @@ VIDEO_START( midzeus )
 	state_save_register_global(machine, zeus_cliprect.max_y);
 	state_save_register_global_pointer(machine, waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
 	state_save_register_global_pointer(machine, waveram[1], WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8 / sizeof(waveram[1][0]));
+
+	/* hack */
+	is_mk4b = strcmp(machine.system().name, "mk4b") == 0;
 }
 
 
@@ -798,14 +820,16 @@ static int zeus_fifo_process(running_machine &machine, const UINT32 *data, int n
 			zeus_register32_w(machine, (data[0] >> 16) & 0x7f, data[1], log_fifo);
 			break;
 
-		/* 0x1A: sync pipeline(?) */
+		/* 0x1A/0x1B: sync pipeline(?) */
 		case 0x1a:
+		case 0x1b:
 			if (log_fifo)
 				log_fifo_command(data, numwords, " -- sync\n");
 			break;
 
-		/* 0x1C: write matrix and translation vector */
+		/* 0x1C/0x1E: write matrix and translation vector */
 		case 0x1c:
+		case 0x1e:
 
 			/* single matrix form */
 			if ((data[0] & 0xffff) != 0x7fff)
@@ -905,22 +929,40 @@ static int zeus_fifo_process(running_machine &machine, const UINT32 *data, int n
 				zeus_light[2] = (INT16)data[1];
 			}
 			break;
-
 		/* 0x25: display control? */
+		/* 0x28: same for mk4b */
 		/* 0x30: same for invasn */
 		case 0x25:
+		{
+			/* 0x25 is used differently in mk4b. What determines this? */
+			if (is_mk4b)
+			{
+				if (numwords < 2)
+					return FALSE;
+
+				break;
+			}
+		}
+		case 0x28:
 		case 0x30:
 			if (numwords < 4 || ((data[0] & 0x808000) && numwords < 10))
 				return FALSE;
+
 			if (log_fifo)
-				log_fifo_command(data, numwords, " -- unknown control + hack clear screen\n");
-			if ((data[0] & 0xffff7f) == 0)
+				log_fifo_command(data, numwords, " -- alt. quad and hack screen clear\n");
+
+			if ((numwords < 10) && (data[0] & 0xffff7f) == 0)
 			{
 				/* not right -- just a hack */
 				int x, y;
 				for (y = zeus_cliprect.min_y; y <= zeus_cliprect.max_y; y++)
 					for (x = zeus_cliprect.min_x; x <= zeus_cliprect.max_x; x++)
 						waveram_plot_depth(y, x, 0, 0x7fff);
+			}
+			else
+			{
+				UINT32 texdata = (zeusbase[0x06] << 16) | (zeusbase[0x00] >> 16);
+				zeus_draw_quad(machine, FALSE, data, texdata, log_fifo);
 			}
 			break;
 
@@ -989,7 +1031,7 @@ static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit)
 
 			/* if this is enough, process the command */
 			cmd = databuffer[0] >> 24;
-			countneeded = (cmd == 0x25 || cmd == 0x30) ? 14 : 2;
+			countneeded = (cmd == 0x25 || cmd == 0x30 || cmd == 0x28) ? 14 : 2;
 			if (databufcount == countneeded)
 			{
 				/* handle logging of the command */
@@ -1032,8 +1074,9 @@ static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit)
 						break;
 
 					case 0x25:	/* mk4 */
+					case 0x28:	/* mk4r1 */
 					case 0x30:	/* invasn */
-						zeus_draw_quad(machine, databuffer, texdata, logit);
+						zeus_draw_quad(machine, TRUE, databuffer, texdata, logit);
 						break;
 
 					default:
@@ -1057,7 +1100,7 @@ static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit)
  *
  *************************************/
 
-static void zeus_draw_quad(running_machine &machine, const UINT32 *databuffer, UINT32 texdata, int logit)
+static void zeus_draw_quad(running_machine &machine, int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit)
 {
 	poly_draw_scanline_func callback;
 	poly_extra_data *extra;
@@ -1065,22 +1108,24 @@ static void zeus_draw_quad(running_machine &machine, const UINT32 *databuffer, U
 	poly_vertex vert[4];
 	float uscale, vscale;
 	float maxy, maxx;
-	int val1, val2, texwshift;
+	int val2, texbase, texwshift;
 	int numverts;
 	int i;
 	INT16 normal[3];
 	INT32 rotnormal[3];
 
-/* look for interesting data patterns  */
-if (
-	(databuffer[1] & 0xffffffff) != 0x200c0000 && /* mk4 sometimes */
-	(databuffer[1] & 0xfffe0000) != 0x21000000 && /* most of mk4 */
-	(databuffer[1] & 0xffffffff) != 0x008c0000 && /* invasn */
-	(databuffer[1] & 0xfffeffff) != 0x028c0000 && /* invasn */
-	(databuffer[1] & 0xfffe0000) != 0x21800000 && /* invasn */
-	(databuffer[1] & 0xfffe0000) != 0x23800000 && /* invasn */
-	1)
-	printf("zeus_draw_quad: databuffer[1] = %08X\n", databuffer[1]);
+	INT32 ctrl_word = databuffer[long_fmt ? 1 : 9];
+
+	/* look for interesting data patterns  */
+	if (
+		(ctrl_word & 0xffffffff) != 0x200c0000 && /* mk4 sometimes */
+		(ctrl_word & 0xfffe0000) != 0x21000000 && /* most of mk4 */
+		(ctrl_word & 0xffffffff) != 0x008c0000 && /* invasn */
+		(ctrl_word & 0xfffeffff) != 0x028c0000 && /* invasn */
+		(ctrl_word & 0xfffe0000) != 0x21800000 && /* invasn */
+		(ctrl_word & 0xfffe0000) != 0x23800000 && /* invasn */
+		1)
+		printf("zeus_draw_quad: ctrl_word = %08X\n", ctrl_word);
 
 
 	/* do a simple backface cull; not sure if the hardware does it, but I see no other
@@ -1103,60 +1148,44 @@ if (
 //          return;
 	}
 
-	if (logit)
-		logerror("quad\n");
-
-	texdata = (texdata & 0xffff0000) | ((texdata + databuffer[1]) & 0xffff);
-
-	val1 = ((texdata >> 10) & 0x3f0000) | (texdata & 0xffff);
+	texbase = ((texdata >> 10) & 0x3f0000) | (texdata & 0xffff);
 	val2 = (texdata >> 16) & 0x3ff;
 	texwshift = (val2 >> 6) & 7;
-
-//if (machine.input().code_pressed(KEYCODE_Z) && (val2 & 0x01)) return;
-//if (machine.input().code_pressed(KEYCODE_X) && (val2 & 0x02)) return;
-//if (machine.input().code_pressed(KEYCODE_C) && (val2 & 0x04)) return;
-//if (machine.input().code_pressed(KEYCODE_V) && (val2 & 0x08)) return;
-//if (machine.input().code_pressed(KEYCODE_B) && (val2 & 0x10)) return;
-//if (machine.input().code_pressed(KEYCODE_N) && (val2 & 0x20)) return;
-//if (machine.input().code_pressed(KEYCODE_M) && (val2 & 0x200)) return;
 
 	uscale = (8 >> ((zeusbase[0x04] >> 4) & 3)) * 0.125f * 256.0f;
 	vscale = (8 >> ((zeusbase[0x04] >> 6) & 3)) * 0.125f * 256.0f;
 
-	if ((databuffer[1] & 0x000c0000) == 0x000c0000)
-		callback = render_poly_solid;
-	else if (val2 == 0x182)
-		callback = render_poly_shade;
-	else if (val2 & 0x20)
-		callback = render_poly_8bit;
-	else
-		callback = render_poly_4bit;
+	int xy_offset = long_fmt ? 2 : 1;
 
 	for (i = 0; i < 4; i++)
 	{
-		UINT32 ixy = databuffer[2 + i*2];
-		UINT32 iuvz = databuffer[3 + i*2];
-		UINT32 inormal = databuffer[10 + i];
+		UINT32 ixy = databuffer[xy_offset + i*2];
+		UINT32 iuvz = databuffer[xy_offset + 1 + i*2];
 		INT32 xo = (INT16)ixy;
 		INT32 yo = (INT16)(ixy >> 16);
 		INT32 zo = (INT16)iuvz;
-		INT32 xn = (INT32)(inormal <<  2) >> 20;
-		INT32 yn = (INT32)(inormal << 12) >> 20;
-		INT32 zn = (INT32)(inormal << 22) >> 20;
 		UINT8 u = iuvz >> 16;
 		UINT8 v = iuvz >> 24;
-		INT32 dotnormal;
+		INT32 dotnormal = 0;
 		INT64 x, y, z;
 
 		x = (INT64)(xo * zeus_matrix[0][0]) + (INT64)(yo * zeus_matrix[0][1]) + (INT64)(zo * zeus_matrix[0][2]) + zeus_point[0];
 		y = (INT64)(xo * zeus_matrix[1][0]) + (INT64)(yo * zeus_matrix[1][1]) + (INT64)(zo * zeus_matrix[1][2]) + zeus_point[1];
 		z = (INT64)(xo * zeus_matrix[2][0]) + (INT64)(yo * zeus_matrix[2][1]) + (INT64)(zo * zeus_matrix[2][2]) + zeus_point[2];
 
-		rotnormal[0] = ((INT64)(xn * zeus_matrix[0][0]) + (INT64)(yn * zeus_matrix[0][1]) + (INT64)(zn * zeus_matrix[0][2])) >> 14;
-		rotnormal[1] = ((INT64)(xn * zeus_matrix[1][0]) + (INT64)(yn * zeus_matrix[1][1]) + (INT64)(zn * zeus_matrix[1][2])) >> 14;
-		rotnormal[2] = ((INT64)(xn * zeus_matrix[2][0]) + (INT64)(yn * zeus_matrix[2][1]) + (INT64)(zn * zeus_matrix[2][2])) >> 14;
+		if (long_fmt)
+		{
+			UINT32 inormal = databuffer[10 + i];
+			INT32 xn = (INT32)(inormal <<  2) >> 20;
+			INT32 yn = (INT32)(inormal << 12) >> 20;
+			INT32 zn = (INT32)(inormal << 22) >> 20;
 
-		dotnormal = rotnormal[0] * ((x >> 16) + zeus_light[0]) + rotnormal[1] * ((y >> 16) + zeus_light[1]) + rotnormal[2] * ((z >> 16) + zeus_light[2]);
+			rotnormal[0] = ((INT64)(xn * zeus_matrix[0][0]) + (INT64)(yn * zeus_matrix[0][1]) + (INT64)(zn * zeus_matrix[0][2])) >> 14;
+			rotnormal[1] = ((INT64)(xn * zeus_matrix[1][0]) + (INT64)(yn * zeus_matrix[1][1]) + (INT64)(zn * zeus_matrix[1][2])) >> 14;
+			rotnormal[2] = ((INT64)(xn * zeus_matrix[2][0]) + (INT64)(yn * zeus_matrix[2][1]) + (INT64)(zn * zeus_matrix[2][2])) >> 14;
+
+			dotnormal = rotnormal[0] * ((x >> 16) + zeus_light[0]) + rotnormal[1] * ((y >> 16) + zeus_light[1]) + rotnormal[2] * ((z >> 16) + zeus_light[2]);
+		}
 
 		vert[i].x = x;
 		vert[i].y = y;
@@ -1203,12 +1232,47 @@ if (
 	}
 
 	extra = (poly_extra_data *)poly_get_extra_data(poly);
+
+	if ((ctrl_word & 0x000c0000) == 0x000c0000)
+	{
+		callback = render_poly_solid;
+	}
+	else if (val2 == 0x182)
+	{
+		callback = render_poly_shade;
+	}
+	else if (ctrl_word & 0x01000000)
+	{
+		int tex_type = val2 & 3;
+
+		callback = render_poly_texture;
+		extra->texwidth = 512 >> texwshift;
+		extra->voffset = ctrl_word & 0xffff;
+		extra->texbase = waveram0_ptr_from_texture_addr(texbase, extra->texwidth);
+
+		if (tex_type == 1)
+		{
+			extra->get_texel = (val2 & 0x20) ? get_texel_8bit : get_texel_4bit;
+		}
+		else if (tex_type == 2)
+		{
+			extra->get_texel = (val2 & 0x20) ? get_texel_alt_8bit : get_texel_alt_4bit;			
+		}
+		else
+		{
+			printf("Unknown texture type: %d\n", tex_type);
+			return;
+		}
+	}
+	else
+	{
+		printf("Unknown draw mode: %.8x\n", ctrl_word);
+		return;
+	}
 	extra->solidcolor = zeusbase[0x00] & 0x7fff;
 	extra->zoffset = zeusbase[0x7e] >> 16;
 	extra->alpha = zeusbase[0x4e];
-	extra->transcolor = ((databuffer[1] >> 16) & 1) ? 0 : 0x100;
-	extra->texwidth = 512 >> texwshift;
-	extra->texbase = waveram0_ptr_from_texture_addr(val1, extra->texwidth);
+	extra->transcolor = ((ctrl_word >> 16) & 1) ? 0 : 0x100;
 	extra->palbase = waveram0_ptr_from_block_addr(zeus_palbase);
 
 	poly_render_quad_fan(poly, NULL, &zeus_cliprect, callback, 4, numverts, &clipvert[0]);
@@ -1222,7 +1286,7 @@ if (
  *
  *************************************/
 
-static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	INT32 curz = extent->param[0].start;
@@ -1246,14 +1310,14 @@ static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *exte
 		if (depth > 0x7fff) depth = 0x7fff;
 		if (depth >= 0 && depth <= *depthptr)
 		{
-			int u0 = (curu >> 8);// & (texwidth - 1);
-			int v0 = (curv >> 8);// & 255;
+			int u0 = (curu >> 8);
+			int v0 = (curv >> 8) + extra->voffset;
 			int u1 = (u0 + 1);
 			int v1 = (v0 + 1);
-			UINT8 texel0 = get_texel_4bit(texbase, v0, u0, texwidth);
-			UINT8 texel1 = get_texel_4bit(texbase, v0, u1, texwidth);
-			UINT8 texel2 = get_texel_4bit(texbase, v1, u0, texwidth);
-			UINT8 texel3 = get_texel_4bit(texbase, v1, u1, texwidth);
+			UINT8 texel0 = extra->get_texel(texbase, v0, u0, texwidth);
+			UINT8 texel1 = extra->get_texel(texbase, v0, u1, texwidth);
+			UINT8 texel2 = extra->get_texel(texbase, v1, u0, texwidth);
+			UINT8 texel3 = extra->get_texel(texbase, v1, u1, texwidth);
 			if (texel0 != transcolor)
 			{
 				rgb_t color0 = WAVERAM_READ16(palbase, texel0);
@@ -1277,64 +1341,6 @@ static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *exte
 		curi += didx;
 	}
 }
-
-
-static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
-{
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	INT32 curz = extent->param[0].start;
-	INT32 curu = extent->param[1].start;
-	INT32 curv = extent->param[2].start;
-	INT32 curi = extent->param[3].start;
-	INT32 dzdx = extent->param[0].dpdx;
-	INT32 dudx = extent->param[1].dpdx;
-	INT32 dvdx = extent->param[2].dpdx;
-	INT32 didx = extent->param[3].dpdx;
-	const void *texbase = extra->texbase;
-	const void *palbase = extra->palbase;
-	UINT16 transcolor = extra->transcolor;
-	int texwidth = extra->texwidth;
-	int x;
-
-	for (x = extent->startx; x < extent->stopx; x++)
-	{
-		UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, scanline, x);
-		INT32 depth = (curz >> 16) + extra->zoffset;
-		if (depth > 0x7fff) depth = 0x7fff;
-		if (depth >= 0 && depth <= *depthptr)
-		{
-			int u0 = (curu >> 8);// & (texwidth - 1);
-			int v0 = (curv >> 8);// & 255;
-			int u1 = (u0 + 1);
-			int v1 = (v0 + 1);
-			UINT8 texel0 = get_texel_8bit(texbase, v0, u0, texwidth);
-			UINT8 texel1 = get_texel_8bit(texbase, v0, u1, texwidth);
-			UINT8 texel2 = get_texel_8bit(texbase, v1, u0, texwidth);
-			UINT8 texel3 = get_texel_8bit(texbase, v1, u1, texwidth);
-			if (texel0 != transcolor)
-			{
-				rgb_t color0 = WAVERAM_READ16(palbase, texel0);
-				rgb_t color1 = WAVERAM_READ16(palbase, texel1);
-				rgb_t color2 = WAVERAM_READ16(palbase, texel2);
-				rgb_t color3 = WAVERAM_READ16(palbase, texel3);
-				rgb_t filtered;
-				color0 = ((color0 & 0x7fe0) << 6) | (color0 & 0x1f);
-				color1 = ((color1 & 0x7fe0) << 6) | (color1 & 0x1f);
-				color2 = ((color2 & 0x7fe0) << 6) | (color2 & 0x1f);
-				color3 = ((color3 & 0x7fe0) << 6) | (color3 & 0x1f);
-				filtered = rgb_bilinear_filter(color0, color1, color2, color3, curu, curv);
-				WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, ((filtered >> 6) & 0x7fe0) | (filtered & 0x1f));
-				*depthptr = depth;
-			}
-		}
-
-		curz += dzdx;
-		curu += dudx;
-		curv += dvdx;
-		curi += didx;
-	}
-}
-
 
 static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
