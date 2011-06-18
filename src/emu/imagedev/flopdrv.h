@@ -75,13 +75,6 @@ struct floppy_interface
 	device_image_display_info_func	device_displayinfo;
 };
 
-/* sector has a deleted data address mark */
-#define ID_FLAG_DELETED_DATA	0x0001
-/* CRC error in id field */
-#define ID_FLAG_CRC_ERROR_IN_ID_FIELD 0x0002
-/* CRC error in data field */
-#define ID_FLAG_CRC_ERROR_IN_DATA_FIELD 0x0004
-
 struct chrn_id
 {
 	unsigned char C;

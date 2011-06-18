@@ -386,7 +386,6 @@ const wd17xx_interface default_wd17xx_interface_2_drives =
 
 static void wd17xx_complete_command(device_t *device, int delay);
 static void wd17xx_timed_data_request(device_t *device);
-static void wd17xx_index_pulse_callback(device_t *controller, device_t *img, int state);
 static int wd17xx_locate_sector(device_t *device);
 static void wd17xx_timed_read_sector_request(device_t *device);
 
@@ -899,7 +898,7 @@ static void wd17xx_read_id(device_t *device)
 
 
 
-static void wd17xx_index_pulse_callback(device_t *controller, device_t *img, int state)
+void wd17xx_index_pulse_callback(device_t *controller, device_t *img, int state)
 {
 	wd1770_state *w = get_safe_token(controller);
 
