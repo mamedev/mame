@@ -429,7 +429,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		int type;
 		UINT16 flags;
 		I386_SREG desc;
-		UINT8 CPL = 0, DPL = 0, RPL = 0;
+		UINT8 CPL = 0, DPL = 0; //, RPL = 0;
 		I386_CALL_GATE gate;
 
 		/* 32-bit */
@@ -519,7 +519,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			i386_load_protected_mode_segment(cpustate,&desc);
 			CPL = cpustate->CPL;  // current privilege level
 			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
-			RPL = segment & 0x03;  // requested privilege level
+//			RPL = segment & 0x03;  // requested privilege level
 
 			if((segment & ~0x07) == 0)
 			{
