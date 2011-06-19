@@ -191,7 +191,7 @@ static void i80286_data_descriptor_full(i80286_state *cpustate, int reg, UINT16 
 		}
 		if (offset+size) {
 			if ((CODE(r) || !EXPDOWN(r)) && ((offset+size-1) > LIMIT(desc))) throw (reg==SS)?TRAP(STACK_FAULT,(trap&1)):trap;
-			if (!CODE(r) && EXPDOWN(r) && ((offset <= LIMIT(desc)) || ((offset+size) > 0xffff))) throw (reg==SS)?TRAP(STACK_FAULT,(trap&1)):trap;
+			if (!CODE(r) && EXPDOWN(r) && ((offset <= LIMIT(desc)) || ((offset+size-1) > 0xffff))) throw (reg==SS)?TRAP(STACK_FAULT,(trap&1)):trap;
 		}
 
 		SET_ACC(desc);
