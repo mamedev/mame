@@ -1098,10 +1098,10 @@ void info_xml_creator::output_slots()
 		fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(slot->device().tag()));
 
 		/*
-		if (slot->slot_interface()[0])
-			fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
-		 */
-	
+        if (slot->slot_interface()[0])
+            fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
+         */
+
 		const slot_interface* intf = slot->get_slot_interfaces();
 		for (int i = 0; intf[i].name != NULL; i++)
 		{

@@ -538,7 +538,7 @@ static READ32_HANDLER( decathlt_prot_r )
 	if (offset==2)
 	{
 		UINT32 retvalue;
-		
+
 		retvalue = ROM[(decathlt_protregs[0]*2)-2]; decathlt_protregs[0]++;
 		retvalue <<= 8;
 		retvalue |= ROM[(decathlt_protregs[0]*2)+1-2];
@@ -547,7 +547,7 @@ static READ32_HANDLER( decathlt_prot_r )
 		retvalue <<= 8;
 		retvalue |= ROM[(decathlt_protregs[0]*2)+1-2];
 
-		
+
 		decathlt_lastcount++;
 		logerror("blah_r %08x\n", retvalue);
 		return retvalue;
@@ -581,19 +581,19 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 		{
 			if (data == 0x80000000)
 			{
-			//	logerror("changed to upload mode 1\n");
+			//  logerror("changed to upload mode 1\n");
 				decathlt_prot_uploadmode = 1;
 				decathlt_prot_uploadoffset = 0;
 			}
 			else if (data == 0x80800000)
 			{
-			//	logerror("changed to upload mode 2\n");
+			//  logerror("changed to upload mode 2\n");
 				decathlt_prot_uploadmode = 2;
 				decathlt_prot_uploadoffset = 0;
 			}
 			else
 			{
-			//	logerror("unknown upload mode\n");
+			//  logerror("unknown upload mode\n");
 				decathlt_prot_uploadmode = 2;
 				decathlt_prot_uploadoffset = 0;
 			}
@@ -606,7 +606,7 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 			{
 				if (decathlt_prot_uploadoffset>=24)
 				{
-				//	logerror("upload mode 1 error, too big\n");
+				//  logerror("upload mode 1 error, too big\n");
 					return;
 				}
 
@@ -620,7 +620,7 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 
                        uploaded values appear to be 12-bit, some are repeated
                     */
-					
+
 					{
 
 						FILE* fp;
@@ -649,7 +649,7 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 
 				{
 					/* the table uploaded here is a 256 byte table with 256 unique values, remaps something? */
-					
+
 					{
 						FILE* fp;
 						if (which==1) fp = fopen("table2x","wb");
@@ -664,14 +664,14 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 			}
 			else
 			{
-			//	logerror("unknown upload mode!\n");
+			//  logerror("unknown upload mode!\n");
 			}
 		}
 	}
 
 	if (offset>1)
 	{
-	//	logerror("higher offset write\n");
+	//  logerror("higher offset write\n");
 	}
 
 }

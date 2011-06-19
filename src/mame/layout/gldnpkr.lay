@@ -45,7 +45,7 @@
 		</rect>
 		<rect state="0">
 		<color red="0.25" green="0.0" blue="0.35" />
-			
+
 		</rect>
 		<text string="DOUBLE UP">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -257,7 +257,7 @@
 
 		<bezel name="lamp10" element="hold3">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
-		</bezel>	
+		</bezel>
 
 		<bezel name="lamp9" element="hold4">
 			<bounds x="2.31" y="3.28" width="0.31" height="0.24" />

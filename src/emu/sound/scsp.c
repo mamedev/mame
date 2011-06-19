@@ -236,7 +236,7 @@ static void dma_scsp(address_space *space, scsp_state *scsp);		/*state DMA trans
 #define	scsp_ddir		scsp->scsp_dmactrl & 0x2000
 #define scsp_dexe		scsp->scsp_dmactrl & 0x1000
 /* TODO */
-//#define dma_transfer_end	((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
+//#define dma_transfer_end  ((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
 
 static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f,0.0f};
 

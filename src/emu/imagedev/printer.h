@@ -38,8 +38,8 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 
-	virtual iodevice_t image_type() const { return IO_PRINTER; }	
-	
+	virtual iodevice_t image_type() const { return IO_PRINTER; }
+
 	virtual bool is_readable()  const { return 0; }
 	virtual bool is_writeable() const { return 1; }
 	virtual bool is_creatable() const { return 1; }
@@ -48,18 +48,18 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "prn"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	// specific implementation
-	
+
 	/* checks to see if a printer is ready */
 	int is_ready();
 	/* outputs data to a printer */
-	void output(UINT8 data);	
+	void output(UINT8 data);
 protected:
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
-    
+
 	devcb_resolved_write_line m_online_func;
 };
 

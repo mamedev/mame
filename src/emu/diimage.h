@@ -182,12 +182,12 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
-	
+
 	const image_device_format *device_get_indexed_creatable_format(int index);
 	const image_device_format *device_get_named_creatable_format(const char *format_name);
 	const option_guide *device_get_creation_option_guide() { return create_option_guide(); }
 	const image_device_format *device_get_creatable_formats() { return formatlist(); }
-	
+
 	const char *error();
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...);
@@ -233,11 +233,11 @@ public:
 
 	void battery_load(void *buffer, int length, int fill);
 	void battery_save(const void *buffer, int length);
-	
+
 	const char *image_type_name()  const { return device_typename(image_type()); }
 
 
-    
+
 	const char *instance_name() const { return m_instance_name; }
 	const char *brief_instance_name() const { return m_brief_instance_name; }
 	bool uses_file_extension(const char *file_extension) const;
@@ -247,7 +247,7 @@ public:
 	bool finish_load();
 	void unload();
 	bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
-	bool load_software(char *swlist, char *swname, rom_entry *entry);	
+	bool load_software(char *swlist, char *swname, rom_entry *entry);
 protected:
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
@@ -311,12 +311,12 @@ protected:
     option_resolution *m_create_args;
 
 	hash_collection m_hash;
-	
+
 	astring m_brief_instance_name;
 	astring m_instance_name;
-	
+
     /* creation info */
-    image_device_format *m_formatlist;	
+    image_device_format *m_formatlist;
 
 	bool m_is_loading;
 };

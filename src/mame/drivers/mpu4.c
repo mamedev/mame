@@ -5,9 +5,9 @@
   This driver holds all the mechanical games.
 
      06-2011: Fixed boneheaded interface glitch that was causing samples to not be cancelled correctly.
-	          Added the ability to read each segment of an LED display separately, this may be necessary for some
-			  games that use them as surrogate lamp lines.
-			  New persistence 'hack' to stop light flicker for the small extender.
+              Added the ability to read each segment of an LED display separately, this may be necessary for some
+              games that use them as surrogate lamp lines.
+              New persistence 'hack' to stop light flicker for the small extender.
      05-2011: Add better OKI emulation
      04-2011: More accurate gamball code, fixed ROM banking (Project Amber), added BwB CHR simulator (Amber)
               This is still a hard coded system, but significantly different to Barcrest's version.
@@ -220,7 +220,7 @@ TODO: - Distinguish door switches using manual
       - It seems that the MPU4 core program relies on some degree of persistence when switching strobes and handling
       writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs
       For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything* and
-	  start modelling the individual hysteresis curves of filament lamps.
+      start modelling the individual hysteresis curves of filament lamps.
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
       - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
 ***********************************************************************************************************/
@@ -1822,10 +1822,10 @@ static WRITE8_HANDLER( ic3ss_w )
 
 	float num = (1720000/((state->m_t3l + 1)*(state->m_t3h + 1)));
 	float denom1 = ((state->m_t3h *(state->m_t3l + 1)+ 1)/(2*(state->m_t1 + 1)));
-	
+
 	int denom2 = denom1 +0.5;//need to round up, this gives same precision as chip
-	int freq=num*denom2;			
-			
+	int freq=num*denom2;
+
 	if (freq)
 	{
 		okim6376_set_frequency(msm6376, freq);
@@ -3008,7 +3008,7 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
 	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE_MODERN("pia_ic4ss", pia6821_device, read, write)      // PIA6821 on sampled sound board
 
-//	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
+//  AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREAD_MODERN("ptm_ic3ss", ptm6840_device, read)  // 6840PTM on sampled sound board
 	AM_RANGE(0x08c0, 0x08c7) AM_WRITE(ic3ss_w)  // 6840PTM on sampled sound board
 

@@ -73,11 +73,11 @@ void cassette_image_device::device_config_complete()
 		memset(&m_interface, 0, sizeof(m_interface));
 		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
 	}
-	
+
 	m_extension_list[0] = '\0';
 	for (int i = 0; m_formats[i]; i++ )
 		image_specify_extension( m_extension_list, 256, m_formats[i]->extensions );
-	
+
 	// set brief and instance name
 	update_names();
 }

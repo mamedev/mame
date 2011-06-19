@@ -18,7 +18,7 @@
 
 struct cdrom_interface
 {
-   	const char *					m_interface;
+	const char *					m_interface;
 	device_image_display_info_func	m_device_displayinfo;
 };
 
@@ -39,8 +39,8 @@ public:
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
-	virtual iodevice_t image_type() const { return IO_CDROM; }	
-	
+	virtual iodevice_t image_type() const { return IO_CDROM; }
+
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
 	virtual bool is_creatable() const { return 0; }
@@ -49,14 +49,14 @@ public:
 	virtual const char *image_interface() const { return m_interface; }
 	virtual const char *file_extensions() const { return "chd"; }
 	virtual const option_guide *create_option_guide() const;
-	
+
 	// specific implementation
-	cdrom_file *get_cdrom_file() { return m_cdrom_handle; }	
+	cdrom_file *get_cdrom_file() { return m_cdrom_handle; }
 protected:
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
-    
+
 	cdrom_file	*m_cdrom_handle;
 	image_device_format m_format;
 };

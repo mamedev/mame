@@ -40,8 +40,8 @@ public:
 	virtual bool call_create(int create_format, option_resolution *create_args);
 	virtual void call_unload();
 
-	virtual iodevice_t image_type() const { return IO_HARDDISK; }	
-	
+	virtual iodevice_t image_type() const { return IO_HARDDISK; }
+
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 1; }
 	virtual bool is_creatable() const { return 0; }
@@ -49,7 +49,7 @@ public:
 	virtual bool is_reset_on_load() const { return 0; }
 	virtual const char *file_extensions() const { return "chd,hd"; }
 	virtual const option_guide *create_option_guide() const;
-	
+
 	// specific implementation
 	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
 	chd_file *get_chd_file();
@@ -58,13 +58,13 @@ protected:
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
-	
+
 	int internal_load_hd(const char *metadata);
-    
+
 	chd_file		*m_chd;
 	hard_disk_file	*m_hard_disk_handle;
 
-	image_device_format m_format;	
+	image_device_format m_format;
 };
 
 // device type definition

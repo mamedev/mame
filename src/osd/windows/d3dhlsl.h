@@ -57,7 +57,7 @@ struct _hlsl_options
 {
 	bool					params_dirty;
 	float					shadow_mask_alpha;
-	char 					shadow_mask_texture[1024];
+	char					shadow_mask_texture[1024];
 	int						shadow_mask_count_x;
 	int						shadow_mask_count_y;
 	float					shadow_mask_u_size;

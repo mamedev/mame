@@ -1055,7 +1055,7 @@ static READ8_DEVICE_HANDLER( hopper_b_r )
 	jpmimpct_state *state = device->machine().driver_data<jpmimpct_state>();
 
 	int retval;
-	// B0 = £1 Hopper Out Verif
+	// B0 = ?1 Hopper Out Verif
 	// B1 = Hopper High
 	// B2 = Hopper Low
 	// B3 = 20p Hopper Opto
@@ -1087,7 +1087,7 @@ static READ8_DEVICE_HANDLER( hopper_c_r )
    // C3
    // C4 = 20p Hopper Detect
    // C5 = Hopper Top-Up
-   // C6 = £1 Hopper Detect
+   // C6 = ?1 Hopper Detect
    // C7 = Payout Verif (Slides)
 
    retval=0xf0; //1111 0000
@@ -1414,14 +1414,14 @@ static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00480084, 0x00480085) AM_DEVREAD("upd", upd7759_r)
 	AM_RANGE(0x00480086, 0x0048009f) AM_READ(prot_1_r)
 	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmioawp_w)
-//	AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
-//	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
-//	AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
+//  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
+//  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
+//  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
 	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(prot_1_r)
 
-//	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
-//	AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
-//	AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
+//  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
+//  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
+//  AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
 	//AM_RANGE(0x00657602, 0x00bfffff) AM_READ(prot_1_r)
 //  AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
 	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
@@ -1501,7 +1501,7 @@ static INPUT_PORTS_START( tbirds )
 	PORT_CONFSETTING(    0x40, "20p" )
 	PORT_CONFSETTING(    0xC0, "25p" )
 	PORT_CONFSETTING(    0x20, "30p" )
-//	PORT_CONFSETTING(    0x20, "40p" )
+//  PORT_CONFSETTING(    0x20, "40p" )
 	PORT_CONFSETTING(    0x60, "50p" )
 	PORT_CONFSETTING(    0xE0, "1 GBP" )
 

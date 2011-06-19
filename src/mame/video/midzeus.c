@@ -1256,7 +1256,7 @@ static void zeus_draw_quad(running_machine &machine, int long_fmt, const UINT32 
 		}
 		else if (tex_type == 2)
 		{
-			extra->get_texel = (val2 & 0x20) ? get_texel_alt_8bit : get_texel_alt_4bit;			
+			extra->get_texel = (val2 & 0x20) ? get_texel_alt_8bit : get_texel_alt_4bit;
 		}
 		else
 		{

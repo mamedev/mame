@@ -123,9 +123,9 @@ struct shaded_point
 #define PTM_0         state->m_vdp1_regs[0x004/2]&=~0x0001
 
 /*
-	Erase/Write Data Register
-	16 bpp = data
-	8 bpp = erase/write data for even/odd X coordinates
+    Erase/Write Data Register
+    16 bpp = data
+    8 bpp = erase/write data for even/odd X coordinates
 */
 #define STV_VDP1_EWDR ((state->m_vdp1_regs[0x006/2])&0xffff)
 

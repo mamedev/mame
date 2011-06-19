@@ -141,7 +141,7 @@ enum
 	ID_SHOW_COMMENTS,
 	ID_RUN_TO_CURSOR,
 	ID_TOGGLE_BREAKPOINT,
-	
+
 	ID_DEVICE_OPTIONS  // keep this always at the end
 };
 
@@ -2404,7 +2404,7 @@ static void image_update_menu(debugwin_info *info)
 	HMENU devicesmenu;
 
 	DeleteMenu(GetMenu(info->wnd), 2, MF_BYPOSITION);
-	
+
 	// create the image menu
 	devicesmenu = CreatePopupMenu();
 	for (bool gotone = info->machine().devicelist().first(img); gotone; gotone = img->next(img))
@@ -2413,9 +2413,9 @@ static void image_update_menu(debugwin_info *info)
 		UINT flags_for_exists;
 		UINT flags_for_writing;
 		HMENU devicesubmenu = CreatePopupMenu();
-		
+
 		UINT_PTR new_item = ID_DEVICE_OPTIONS + (cnt * DEVOPTION_MAX);
-		
+
 		flags_for_exists = MF_ENABLED | MF_STRING;
 
 		if (!img->exists())
@@ -2428,8 +2428,8 @@ static void image_update_menu(debugwin_info *info)
 		AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount..."));
 
 		/*if (img->is_creatable())
-			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
-		*/
+            AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
+        */
 		AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CLOSE, TEXT("Unmount"));
 
 		if (img->device().type() == CASSETTE)
@@ -2443,11 +2443,11 @@ static void image_update_menu(debugwin_info *info)
 			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_REWIND, TEXT("Rewind"));
 			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 		}
-	
+
 		temp.format("%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 
-		AppendMenu(devicesmenu, MF_ENABLED | MF_POPUP, (UINT_PTR)devicesubmenu,  tstring_from_utf8(temp.cstr()));	
-		
+		AppendMenu(devicesmenu, MF_ENABLED | MF_POPUP, (UINT_PTR)devicesubmenu,  tstring_from_utf8(temp.cstr()));
+
 		cnt++;
 	}
 	AppendMenu(GetMenu(info->wnd), MF_ENABLED | MF_POPUP, (UINT_PTR)devicesmenu, TEXT("Images"));
@@ -2493,10 +2493,10 @@ void console_create_window(running_machine &machine)
 
 	// Add image menu only if image devices exist
 	if (info->machine().devicelist().first(img))	{
-		info->update_menu = image_update_menu;	
+		info->update_menu = image_update_menu;
 		image_update_menu(info);
 	}
-	
+
 	// set the handlers
 	info->handle_command = disasm_handle_command;
 	info->handle_key = disasm_handle_key;
@@ -2887,7 +2887,7 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				return 1;
 		}
 		if (LOWORD(wparam) >= ID_DEVICE_OPTIONS) {
-			UINT32 devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX; 
+			UINT32 devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
 			device_image_interface *img = NULL;
 			UINT32 cnt = 0;
 			for (bool gotone = info->machine().devicelist().first(img); gotone; gotone = img->next(img))
@@ -2896,18 +2896,18 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				cnt++;
 			}
 			if (img!=NULL) {
-				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX) 
+				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 				{
-					case DEVOPTION_OPEN : 
-											{											
+					case DEVOPTION_OPEN :
+											{
 												char filter[2048];
 												build_generic_filter(img, FALSE, filter, ARRAY_LENGTH(filter));
-												
-												TCHAR selectedFilename[MAX_PATH];												
+
+												TCHAR selectedFilename[MAX_PATH];
 												selectedFilename[0] = '\0';
 												LPTSTR buffer;
 												LPTSTR t_filter = NULL;
-												
+
 												buffer = tstring_from_utf8(filter);
 
 												// convert a pipe-char delimited string into a NUL delimited string
@@ -2919,8 +2919,8 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 												t_filter[i++] = '\0';
 												osd_free(buffer);
 
-												
-												OPENFILENAME  ofn;        
+
+												OPENFILENAME  ofn;
 												memset(&ofn,0,sizeof(ofn));
 												ofn.lStructSize = sizeof(ofn);
 												ofn.hwndOwner = NULL;
@@ -2934,40 +2934,40 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 												ofn.lpstrInitialDir = NULL;
 												ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-												if (GetOpenFileName(&ofn)) {													
+												if (GetOpenFileName(&ofn)) {
 													img->load(utf8_from_tstring(selectedFilename));
 												}
 											}
 											return 1;
-/*					case DEVOPTION_CREATE: 
-											return 1;*/
-					case DEVOPTION_CLOSE: 
+/*                  case DEVOPTION_CREATE:
+                                            return 1;*/
+					case DEVOPTION_CLOSE:
 											img->unload();
 											return 1;
-					default: 
+					default:
 						if (img->device().type() == CASSETTE) {
 							cassette_image_device* cassette = dynamic_cast<cassette_image_device*>(&img->device());
-							switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX) 
+							switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 							{
 
-								case DEVOPTION_CASSETTE_STOPPAUSE: 
+								case DEVOPTION_CASSETTE_STOPPAUSE:
 														cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 														return 1;
-								case DEVOPTION_CASSETTE_PLAY: 
+								case DEVOPTION_CASSETTE_PLAY:
 														cassette->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 														return 1;
-								case DEVOPTION_CASSETTE_RECORD: 
+								case DEVOPTION_CASSETTE_RECORD:
 														cassette->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 														return 1;
-								case DEVOPTION_CASSETTE_REWIND: 
+								case DEVOPTION_CASSETTE_REWIND:
 														cassette->seek(-60.0, SEEK_CUR);
 														return 1;
-								case DEVOPTION_CASSETTE_FASTFORWARD: 
+								case DEVOPTION_CASSETTE_FASTFORWARD:
 														cassette->seek(+60.0, SEEK_CUR);
-														return 1;	
+														return 1;
 							}
-						}		
-				}						
+						}
+				}
 			}
 		}
 	return 0;

@@ -1,199 +1,199 @@
 /*
-	Driver: aristmk4
+    Driver: aristmk4
 
-	Manufacturer: Aristocrat Leisure Industries ( aka Ainsworth Nominees P.L. )
-	Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
-	Driver by Palindrome & FraSher
+    Manufacturer: Aristocrat Leisure Industries ( aka Ainsworth Nominees P.L. )
+    Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
+    Driver by Palindrome & FraSher
 
-	original 86lions.c driver by Chris Hardy, Angelo Salese & Roberto Fresca
+    original 86lions.c driver by Chris Hardy, Angelo Salese & Roberto Fresca
 
-	***************** INITIALISATION *********************************************************************
+    ***************** INITIALISATION *********************************************************************
 
-	Method 1 :
-	* Key in with the Jackpot Key followed by the Audit Key
-	* Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
-	* A value (displayed below) will appear next to RF/AMT on the right of the screen
-	* Key out both the Jackpot and Audit Keys
+    Method 1 :
+    * Key in with the Jackpot Key followed by the Audit Key
+    * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+    * A value (displayed below) will appear next to RF/AMT on the right of the screen
+    * Key out both the Jackpot and Audit Keys
 
-	This method works with the following games:
-	3bagflnz 200
-	3bagflvt 200
-	autmoon  200
-	blkrhino 200
-	coralr2  200
-	eforesta 200
-	eforestb 200
-	ffortune 200
-	gldnpkr  400
-	goldenc  200
-	gtroppo  500
-	kgbird   200
-	kgbirda  200
-	phantomp 200
-	swtht2nz 200
-	wildone  200
-	wtigernz 200
+    This method works with the following games:
+    3bagflnz 200
+    3bagflvt 200
+    autmoon  200
+    blkrhino 200
+    coralr2  200
+    eforesta 200
+    eforestb 200
+    ffortune 200
+    gldnpkr  400
+    goldenc  200
+    gtroppo  500
+    kgbird   200
+    kgbirda  200
+    phantomp 200
+    swtht2nz 200
+    wildone  200
+    wtigernz 200
 
-	Method 2 :
-	* Key in with the Jackpot Key followed by the Audit Key
-	* Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
-	* This will enter the cashcade screen and increment $100 to the maximum
-	* Press PLAY 2 LINES [listed as BET 2 on the screen] to increment the minimum cashcade value by $5
-	  - (optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment the $5 to start with above or the game won't initialise)
-	* A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible until you key out and back in again with the Audit Key)
-	* Key out both the Jackpot and Audit Keys
+    Method 2 :
+    * Key in with the Jackpot Key followed by the Audit Key
+    * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+    * This will enter the cashcade screen and increment $100 to the maximum
+    * Press PLAY 2 LINES [listed as BET 2 on the screen] to increment the minimum cashcade value by $5
+      - (optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment the $5 to start with above or the game won't initialise)
+    * A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible until you key out and back in again with the Audit Key)
+    * Key out both the Jackpot and Audit Keys
 
-	This method works with the following games:
-	topgear  500
+    This method works with the following games:
+    topgear  500
 
-	Technical Notes:
+    Technical Notes:
 
-	68B09EP Motorola Processor
-	R6545AP for CRT video controller
-	UPD43256BCZ-70LL for 32kb of static ram used for 3 way electronic meters / 3 way memory
-	U6264A for Standard 8K x 8 bit SRAM used for video buffer
-	1 x R65C21P2  PIA - Peripheral Interface Adapter, connects to RTC and sends pulses to mechanical meters
-	1 x 6522 VIA - 1 x Rockwell - Versatile Interface Adapter.
-	2 x WF19054 = AY3-8910 sound chips driven by the 6522 VIA
-	1 x PML 2852 ( programmable logic ) used as address decoder.
-	1 x PML 2852 programmed as a PIA
+    68B09EP Motorola Processor
+    R6545AP for CRT video controller
+    UPD43256BCZ-70LL for 32kb of static ram used for 3 way electronic meters / 3 way memory
+    U6264A for Standard 8K x 8 bit SRAM used for video buffer
+    1 x R65C21P2  PIA - Peripheral Interface Adapter, connects to RTC and sends pulses to mechanical meters
+    1 x 6522 VIA - 1 x Rockwell - Versatile Interface Adapter.
+    2 x WF19054 = AY3-8910 sound chips driven by the 6522 VIA
+    1 x PML 2852 ( programmable logic ) used as address decoder.
+    1 x PML 2852 programmed as a PIA
 
-	PIA provides output signals to six mechanical meters.
-	It also provides the real time clock DS1287 to the CPU.
+    PIA provides output signals to six mechanical meters.
+    It also provides the real time clock DS1287 to the CPU.
 
-	VIA drives the programmable sound generators and generates
-	a timing interrupt to the CPU (M6809_FIRQ_LINE)
+    VIA drives the programmable sound generators and generates
+    a timing interrupt to the CPU (M6809_FIRQ_LINE)
 
-	The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
-	The remaining 4 bits are connected to other hardware, read via the VIA.
+    The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
+    The remaining 4 bits are connected to other hardware, read via the VIA.
 
-	The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
-	The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
+    The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
+    The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
 
-	27/04/10 - FrasheR
-	2 x Sound Chips connected to the 6522 VIA.
+    27/04/10 - FrasheR
+    2 x Sound Chips connected to the 6522 VIA.
 
-	16/05/10 - FrasheR
-	Fixed VIA for good. 5010 - 501F.
-	Hooked up push button inputs - FrasheR
-	Hooked up ports for the PML 2852 U3 - FrasheR
+    16/05/10 - FrasheR
+    Fixed VIA for good. 5010 - 501F.
+    Hooked up push button inputs - FrasheR
+    Hooked up ports for the PML 2852 U3 - FrasheR
 
-	16/05/10 - Palindrome
-	Lamp outputs and layout added - Palindrome
-	NVRAM backup - Palindrome
+    16/05/10 - Palindrome
+    Lamp outputs and layout added - Palindrome
+    NVRAM backup - Palindrome
 
-	20/05/10 - Palindrome
-	Connected SW7 for BGCOLOUR map select
-	Added LK13. 3Mhz or 1.5 Mhz CPU speed select
-	Added sound sample for mechanical meter pulse ( aristmk4.zip ).
+    20/05/10 - Palindrome
+    Connected SW7 for BGCOLOUR map select
+    Added LK13. 3Mhz or 1.5 Mhz CPU speed select
+    Added sound sample for mechanical meter pulse ( aristmk4.zip ).
 
-	30/5/10 - Palindrome
-	Now using mc146818 rtc driver instead of rtc_get_reg.
+    30/5/10 - Palindrome
+    Now using mc146818 rtc driver instead of rtc_get_reg.
 
-	The mc146818 driver has issues and is not working correctly.
-	MESS developers are looking at it.
+    The mc146818 driver has issues and is not working correctly.
+    MESS developers are looking at it.
 
-	- day of week is incorrect
-	- day of month is incorrect ( code is using day instead of mday ).
-	- hours are not showing up correct in PM and 12 hour mode
-	- rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data )
+    - day of week is incorrect
+    - day of month is incorrect ( code is using day instead of mday ).
+    - hours are not showing up correct in PM and 12 hour mode
+    - rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data )
 
-	9/7/2010 - Palindrome
-	Robot Test added
-	Default Jackpot key re-assigned to 'I'
-	Work around for topgear & cashcade games
-	Improved coininput - force CBOPT1 to detect passing coin
-	Added new game Golden Poker ( Aristocrat version ) [ bad dump ]
-	Added new game Gone Troppo
-	Added new game Wild One
-	Misc improvements
+    9/7/2010 - Palindrome
+    Robot Test added
+    Default Jackpot key re-assigned to 'I'
+    Work around for topgear & cashcade games
+    Improved coininput - force CBOPT1 to detect passing coin
+    Added new game Golden Poker ( Aristocrat version ) [ bad dump ]
+    Added new game Gone Troppo
+    Added new game Wild One
+    Misc improvements
 
-	12/12/2010 - Palindrome and Heihachi_73
-	Updated source to 0.140u2 standards
-	Disabled real time clock to stop games from hanging. This causes a graphics glitch on the month display but makes the games more reliable in audit mode.
-	Fixed ROM names
-	Added new game Arctic Wins
-	Added new game Caribbean Gold 2 (missing 2 gfx roms, still boots)
-	Added new game Clockwise (program ROM nodump, all other roms fine)
-	Added new game Fortune Hunter (2 sets)
+    12/12/2010 - Palindrome and Heihachi_73
+    Updated source to 0.140u2 standards
+    Disabled real time clock to stop games from hanging. This causes a graphics glitch on the month display but makes the games more reliable in audit mode.
+    Fixed ROM names
+    Added new game Arctic Wins
+    Added new game Caribbean Gold 2 (missing 2 gfx roms, still boots)
+    Added new game Clockwise (program ROM nodump, all other roms fine)
+    Added new game Fortune Hunter (2 sets)
 
-	06/06/2011 - Heihachi_73
-	Added button panel artwork for all games, and renamed the in-game buttons to match the artwork and/or Robot Test description.
-	Remapped Jackpot Key to 'L'
-	Remapped 'power fail' key to ',' (comma)
-	Remapped the video poker buttons; holds are now keys S,D,F,G,H
-	Un-mapped the unused inputs
+    06/06/2011 - Heihachi_73
+    Added button panel artwork for all games, and renamed the in-game buttons to match the artwork and/or Robot Test description.
+    Remapped Jackpot Key to 'L'
+    Remapped 'power fail' key to ',' (comma)
+    Remapped the video poker buttons; holds are now keys S,D,F,G,H
+    Un-mapped the unused inputs
 
-	When the games first power on (or when reset), they will display a TILT message on the screen. This doesn't affect gameplay, and if there are no pending errors the game should coin up and/or play immediately.
-	The tilt message will also appear when an error code is displayed, such as the main door being opened/closed, or a hardware error/fault (such as hopper empty, coin yoyo, printer errors; none of which should happen MAME however).
-	The tilt message will disappear if you turn the Audit Key on and off, or after you start playing.
-	Despite the name, there is no 'tilt' mechanism in the machine and there is nothing to worry about. The first Aristocrat system to have a tilt mechanism was the MK5, which will cause the machine to reset abruptly if the player is too rough (e.g. hitting the screen or bumping the machine).
+    When the games first power on (or when reset), they will display a TILT message on the screen. This doesn't affect gameplay, and if there are no pending errors the game should coin up and/or play immediately.
+    The tilt message will also appear when an error code is displayed, such as the main door being opened/closed, or a hardware error/fault (such as hopper empty, coin yoyo, printer errors; none of which should happen MAME however).
+    The tilt message will disappear if you turn the Audit Key on and off, or after you start playing.
+    Despite the name, there is no 'tilt' mechanism in the machine and there is nothing to worry about. The first Aristocrat system to have a tilt mechanism was the MK5, which will cause the machine to reset abruptly if the player is too rough (e.g. hitting the screen or bumping the machine).
 
-	These games do not feature a backup mechanism in case of power faults or system crashes requiring a reboot; if the player was in the middle of a spin or watching a win count up, any credits won on that spin will be voided.
-	On the machine's artwork, this is reflected with text reading 'Malfunction voids all pays and plays', of which the text has also been carried onto later machines. The Aristocrat MK5 and later systems however feature backup mechanisms and will repeat the last game (including free game features and/or gamble selection) when powered on, to where the player had left off.
+    These games do not feature a backup mechanism in case of power faults or system crashes requiring a reboot; if the player was in the middle of a spin or watching a win count up, any credits won on that spin will be voided.
+    On the machine's artwork, this is reflected with text reading 'Malfunction voids all pays and plays', of which the text has also been carried onto later machines. The Aristocrat MK5 and later systems however feature backup mechanisms and will repeat the last game (including free game features and/or gamble selection) when powered on, to where the player had left off.
 
-	Gone Troppo and Caribbean Gold 2 require DIP SW7 to be set to off/off or else the second screen will be broken. This is possibly true to the original machine.
-	A similar thing happens with Top Gear, the drag cars' tyres will only be the correct colour (grey) if SW7 is off/off.
-	In Wild One, the dollar sign on the Insert $2 graphic is the wrong colour on other settings as well. It only appears correct when SW7 is off/off. This is probably a bug in the original game, where the graphic designers have used the wrong palette for the background of the dollar sign.
-	From these findings, it is noted that the off/off setting may in fact be the default background setting of all games.
+    Gone Troppo and Caribbean Gold 2 require DIP SW7 to be set to off/off or else the second screen will be broken. This is possibly true to the original machine.
+    A similar thing happens with Top Gear, the drag cars' tyres will only be the correct colour (grey) if SW7 is off/off.
+    In Wild One, the dollar sign on the Insert $2 graphic is the wrong colour on other settings as well. It only appears correct when SW7 is off/off. This is probably a bug in the original game, where the graphic designers have used the wrong palette for the background of the dollar sign.
+    From these findings, it is noted that the off/off setting may in fact be the default background setting of all games.
 
-	Top Gear and Gone Troppo are non-multiplier, 5 payline games, therefore, you cannot bet higher than 5 credits on these machines.
+    Top Gear and Gone Troppo are non-multiplier, 5 payline games, therefore, you cannot bet higher than 5 credits on these machines.
 
-	TODO:
-	1. Video poker and Keno button panels needed. 06/06/11: Video poker panels done, however they need confirmation with a real machine.
+    TODO:
+    1. Video poker and Keno button panels needed. 06/06/11: Video poker panels done, however they need confirmation with a real machine.
 
-	2. Extend the driver to use the keno keyboard input for keno games (no MK2.5/MKIV Keno games dumped yet as of 28/02/2010).
+    2. Extend the driver to use the keno keyboard input for keno games (no MK2.5/MKIV Keno games dumped yet as of 28/02/2010).
 
-	3. arcwins, eforest, fhunter, fhuntera and cgold2 do not work (these US-based games require note acceptor and printer support).
-	 - fhunter, fhuntera and cgold2 need DIP 5201-5 enabled to work (if disabled, it acts as a 'freeze' switch).
-	 - The US games do work as such, however the unemulated items cause the games to end up disabled with the error (most notably, 70 - Printer Fault).
-	 - These games possibly need a set chip, as it is currently impossible to set up denominations; the machines are stuck in $100 per credit mode, which is a highly unusual setting.
-	 - If you turn PTRHOM off (with PTRTAC on), this will give you a short amount of time to enter the audit menu, however the games will still lock up with a printer fault.
-		To temporarily get around the lockup, keep triggering the main door switch (hit M twice). The machine will keep locking up every 2-3 seconds, however it is usable. If PTRHOM is on, the lockup happens immediately.
-	 - None of these games can coin up, however they are remotely playable with a memory/NVRAM hack to bypass the printer error and add credits. All of the US games pay out wins as physical coins (to hopper) rather than adding to credits.
-	 - Arctic Wins is similar to the Black Rhino/White Tiger style games, and Fortune Hunter is a direct clone of 3 Bags Full, even having the second screen feature named the 'Three Bags Full Feature'. Caribbean Gold 2 is a clone of Gone Troppo.
+    3. arcwins, eforest, fhunter, fhuntera and cgold2 do not work (these US-based games require note acceptor and printer support).
+     - fhunter, fhuntera and cgold2 need DIP 5201-5 enabled to work (if disabled, it acts as a 'freeze' switch).
+     - The US games do work as such, however the unemulated items cause the games to end up disabled with the error (most notably, 70 - Printer Fault).
+     - These games possibly need a set chip, as it is currently impossible to set up denominations; the machines are stuck in $100 per credit mode, which is a highly unusual setting.
+     - If you turn PTRHOM off (with PTRTAC on), this will give you a short amount of time to enter the audit menu, however the games will still lock up with a printer fault.
+        To temporarily get around the lockup, keep triggering the main door switch (hit M twice). The machine will keep locking up every 2-3 seconds, however it is usable. If PTRHOM is on, the lockup happens immediately.
+     - None of these games can coin up, however they are remotely playable with a memory/NVRAM hack to bypass the printer error and add credits. All of the US games pay out wins as physical coins (to hopper) rather than adding to credits.
+     - Arctic Wins is similar to the Black Rhino/White Tiger style games, and Fortune Hunter is a direct clone of 3 Bags Full, even having the second screen feature named the 'Three Bags Full Feature'. Caribbean Gold 2 is a clone of Gone Troppo.
 
-	4. ROMs need redumping for the following games:
-	 - White Tiger has bad graphics ROMs.
-	 - Clockwise needs its program ROM redumped, original dump was 32K of 0xFF's. Graphics and video/sound ROM are OK.
-	 - Correct PROMs needed for Top Gear (2CM33), Caribbean Gold 2 (unknown), Clockwise (2CM18) and Golden Poker (unknown).
+    4. ROMs need redumping for the following games:
+     - White Tiger has bad graphics ROMs.
+     - Clockwise needs its program ROM redumped, original dump was 32K of 0xFF's. Graphics and video/sound ROM are OK.
+     - Correct PROMs needed for Top Gear (2CM33), Caribbean Gold 2 (unknown), Clockwise (2CM18) and Golden Poker (unknown).
 
-	5.Add note acceptor support
+    5.Add note acceptor support
 
-	6.Provide complete cashcade emulation
+    6.Provide complete cashcade emulation
 
-	7.Look into what the hopper probe signal is for.
+    7.Look into what the hopper probe signal is for.
 
-	8.Investigate issues with the Poker style games as described below.
+    8.Investigate issues with the Poker style games as described below.
 
-	9.When DIP SW7 is set to off/off, speed is dramatically reduced.
+    9.When DIP SW7 is set to off/off, speed is dramatically reduced.
 
-	10. rewrite video emulation by using custom drawing code.
+    10. rewrite video emulation by using custom drawing code.
 
-	11. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
+    11. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
 
-	12. fix 86 Lions (pre-Aristocrat Mk-4 HW, without prom and dunno what else)
+    12. fix 86 Lions (pre-Aristocrat Mk-4 HW, without prom and dunno what else)
 
-	***************** POKER GAMES ************************************************************************
+    ***************** POKER GAMES ************************************************************************
 
-	Wild One & Golden Poker have a problem where the second branch condition is always true, see assebler below for
-	example of Wild One.
+    Wild One & Golden Poker have a problem where the second branch condition is always true, see assebler below for
+    example of Wild One.
 
-	907D    BITA $1800  ( crtc )
-	9080    BNE  $907D  ; is zero
-	9082    BITA $1800
-	9085    BEQ  $9082  ; branches to 9082 indefinately, value is always zero.
-	9087    LDA  #$40
+    907D    BITA $1800  ( crtc )
+    9080    BNE  $907D  ; is zero
+    9082    BITA $1800
+    9085    BEQ  $9082  ; branches to 9082 indefinately, value is always zero.
+    9087    LDA  #$40
 
-	If the PC ( program counter ) is set to 9087 then the game runs.
+    If the PC ( program counter ) is set to 9087 then the game runs.
 
-	Bug in the 6845 crtc core ? Seems like some kind of logic there not working.
+    Bug in the 6845 crtc core ? Seems like some kind of logic there not working.
 
-	EDIT: it's a vblank check, BITA opcode checks bit 5 in A register and compares it with the contents of 0x1800 (that is vblank in
-	mc6845_status_r). Checking if a bit goes low then high it usually means that is moaning for a vblank. ;-)
-	But now there is a new question: what kind of mc6845 clone this HW uses? It's clearly not standard mc6845, since that version doesn't
-	support vblank reading. The vblank bit can be read only on C6545-1, R6545-1, SY6545-1 and SY6845E subvariants, so it all lies to
-	those. -AS
+    EDIT: it's a vblank check, BITA opcode checks bit 5 in A register and compares it with the contents of 0x1800 (that is vblank in
+    mc6845_status_r). Checking if a bit goes low then high it usually means that is moaning for a vblank. ;-)
+    But now there is a new question: what kind of mc6845 clone this HW uses? It's clearly not standard mc6845, since that version doesn't
+    support vblank reading. The vblank bit can be read only on C6545-1, R6545-1, SY6545-1 and SY6845E subvariants, so it all lies to
+    those. -AS
 
 ***********************************************************************************************************************************************/
 
@@ -269,10 +269,10 @@ INLINE void uBackgroundColour(running_machine &machine)
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
 	/* SW7 can be set when the main door is open, this allows the colours for the background
-	to be adjusted whilst the machine is running.
+    to be adjusted whilst the machine is running.
 
-	There are 4 possible combinations for colour select via SW7, colours vary based on software installed.
-	*/
+    There are 4 possible combinations for colour select via SW7, colours vary based on software installed.
+    */
 
 	switch(input_port_read(machine, "SW7"))
 	{
@@ -1359,11 +1359,11 @@ static WRITE8_DEVICE_HANDLER(firq)
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B		*/ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
-	/*inputs : CA/B1,CA/B2	*/ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_r),DEVCB_HANDLER(via_cb2_r),
-	/*outputs: A/B		*/ DEVCB_HANDLER(via_a_w), DEVCB_HANDLER(via_b_w),
-	/*outputs: CA/B1,CA/B2	*/ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_w),DEVCB_HANDLER(via_cb2_w),
-	/*irq			*/ DEVCB_HANDLER(firq)
+	/*inputs : A/B      */ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
+	/*inputs : CA/B1,CA/B2  */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_r),DEVCB_HANDLER(via_cb2_r),
+	/*outputs: A/B      */ DEVCB_HANDLER(via_a_w), DEVCB_HANDLER(via_b_w),
+	/*outputs: CA/B1,CA/B2  */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_w),DEVCB_HANDLER(via_cb2_w),
+	/*irq           */ DEVCB_HANDLER(firq)
 
 	// CA1 is connected to +5V, CB1 is not connected.
 };
@@ -1387,7 +1387,7 @@ static const pia6821_interface aristmk4_pia1_intf =
 static const mc6845_interface mc6845_intf =
 {
 	/* in fact is a mc6845 driving 4 pixels by memory address.
-	that's why the big horizontal parameters */
+    that's why the big horizontal parameters */
 
 	"screen",	/* screen we are acting on */
 	4,		/* number of pixels per video memory address */
@@ -1487,20 +1487,20 @@ static MACHINE_RESET( aristmk4 )
 static TIMER_DEVICE_CALLBACK( aristmk4_pf )
 {
 	/*
-	IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.
-	This event is recorded in NVRAM to facilitate the Robot Test.
+    IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.
+    This event is recorded in NVRAM to facilitate the Robot Test.
 
-	Would be ideal to use this in our add_exit_callback instead of using a timer but it doesn't seem to
-	save the power down state in nvram. Is there a cleaner way to do this?
+    Would be ideal to use this in our add_exit_callback instead of using a timer but it doesn't seem to
+    save the power down state in nvram. Is there a cleaner way to do this?
 
-	To enter the robot test
+    To enter the robot test
 
-	1. Open the main door
-	2. Trigger powerfail / NMI by presing L for at least 1 second, the game will freeze.
-	3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
+    1. Open the main door
+    2. Trigger powerfail / NMI by presing L for at least 1 second, the game will freeze.
+    3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
 
-	Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
-	*/
+    Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
+    */
 
 	if(input_port_read(timer.machine(), "powerfail")) // send NMI signal if L pressed
 	{
@@ -2161,7 +2161,7 @@ ROM_END
 
 GAMEL( 1985, 86lions,  0,	 86lions,  aristmk4, aristmk4, ROT0, "Aristocrat", "86 Lions",					GAME_NOT_WORKING, layout_topgear  )
 GAMEL( 1996, eforest,  0,	 aristmk4, eforest,  aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",		GAME_NOT_WORKING, layout_eforest  ) // multiple denominations
-GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",	 	0,		  layout_aristmk4 ) // 10c, $1 = 10 credits
+GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",		0,		  layout_aristmk4 ) // 10c, $1 = 10 credits
 GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
 GAMEL( 1996, 3bagflvt, 0,	 aristmk4, 3bagflvt, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",		0,		  layout_3bagflvt ) // 5c, $1 = 20 credits
 GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",	0,		  layout_3bagflnz ) // 5c, $2 = 40 credits

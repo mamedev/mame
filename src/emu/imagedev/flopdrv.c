@@ -634,7 +634,7 @@ static int internal_floppy_device_load(device_image_interface *image, int create
 	}
 	/* disk changed */
 	flopimg->dskchg = CLEAR_LINE;
-	
+
 	return IMAGE_INIT_PASS;
 
 error:

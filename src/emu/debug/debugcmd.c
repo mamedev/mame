@@ -2677,12 +2677,12 @@ static void execute_hardreset(running_machine &machine, int ref, int params, con
 
 /*-------------------------------------------------
     execute_images - lists all image devices with
-	mounted files
+    mounted files
 -------------------------------------------------*/
 
 static void execute_images(running_machine &machine, int ref, int params, const char **param)
 {
-	device_image_interface *img = NULL;	
+	device_image_interface *img = NULL;
 	for (bool gotone = machine.devicelist().first(img); gotone; gotone = img->next(img))
 	{
 		debug_console_printf(machine, "%s: %s\n",img->brief_instance_name(),img->exists() ? img->filename() : "[empty slot]");
@@ -2698,7 +2698,7 @@ static void execute_images(running_machine &machine, int ref, int params, const 
 
 static void execute_mount(running_machine &machine, int ref, int params, const char **param)
 {
-	device_image_interface *img = NULL;	
+	device_image_interface *img = NULL;
 	bool done = false;
 	for (bool gotone = machine.devicelist().first(img); gotone; gotone = img->next(img))
 	{
@@ -2707,8 +2707,8 @@ static void execute_mount(running_machine &machine, int ref, int params, const c
 				debug_console_printf(machine, "Unable to mount file %s on %s\n",param[1],param[0]);
 			} else {
 				debug_console_printf(machine, "File %s mounted on %s\n",param[1],param[0]);
-			}			
-			done = true; 
+			}
+			done = true;
 			break;
 		}
 	}
@@ -2722,14 +2722,14 @@ static void execute_mount(running_machine &machine, int ref, int params, const c
 
 static void execute_unmount(running_machine &machine, int ref, int params, const char **param)
 {
-	device_image_interface *img = NULL;	
+	device_image_interface *img = NULL;
 	bool done = false;
 	for (bool gotone = machine.devicelist().first(img); gotone; gotone = img->next(img))
 	{
 		if (strcmp(img->brief_instance_name(),param[0])==0) {
 			img->unload();
 			debug_console_printf(machine, "Unmounted file from : %s\n",param[0]);
-			done = true; 
+			done = true;
 			break;
 		}
 	}

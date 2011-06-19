@@ -96,7 +96,7 @@ ROM_END
 
 ROM_START(specfrce)
 	ROM_REGION(0x100000, "maincpu", 0)	/* Boot ROM */
-    ROM_LOAD( "specialforces_boot34.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58) ) 
+    ROM_LOAD( "specialforces_boot34.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58) )
 
 	DISK_REGION( "ide" )
 	DISK_IMAGE_READONLY("sf010101", 0, SHA1(2fc4e02d08163d8ed28b00f590240d550eaa6015) )

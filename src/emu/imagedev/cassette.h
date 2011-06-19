@@ -69,8 +69,8 @@ public:
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
-	virtual iodevice_t image_type() const { return IO_CASSETTE; }	
-	
+	virtual iodevice_t image_type() const { return IO_CASSETTE; }
+
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 1; }
 	virtual bool is_creatable() const { return 1; }
@@ -79,7 +79,7 @@ public:
 	virtual const char *image_interface() const { return m_interface; }
 	virtual const char *file_extensions() const { return m_extension_list; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	// specific implementation
 	cassette_state get_state() { return m_state; }
 	void set_state(cassette_state state) { change_state(m_state, (cassette_state)(~0)); }
@@ -92,20 +92,20 @@ public:
 	double get_position();
 	double get_length();
 	void seek(double time, int origin);
-	
+
 protected:
 	bool is_motor_on();
 	void update();
-	
+
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
-private:	
+private:
 	cassette_image	*m_cassette;
 	cassette_state	m_state;
 	double			m_position;
 	double			m_position_time;
-	INT32			m_value;    
+	INT32			m_value;
 	char			m_extension_list[256];
 };
 

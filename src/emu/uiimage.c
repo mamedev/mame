@@ -1394,9 +1394,9 @@ void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *pa
 	/* rebuild the menu - we have to do this so that the counter updates */
 	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
 	menu_tape_control_populate(machine, menu, (tape_control_menu_state*)state);
-	
+
 	cassette_image_device* cassette = dynamic_cast<cassette_image_device*>(&menustate->device->device());
-	
+
 	/* process the menu */
 	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 	if (event != NULL)

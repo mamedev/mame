@@ -3338,7 +3338,7 @@ void address_table::setup_range_solid(offs_t addrstart, offs_t addrend, offs_t a
 //  entry and requests to populate the address map with
 //  it.  Handle non-overlapping subunits.
 //-------------------------------------------------
-	
+
 namespace {
 	struct subrange {
 		offs_t start, end;

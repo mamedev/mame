@@ -7,9 +7,9 @@
 
 // Decoder for M4-type NAOMI cart encryption
 
-// In hardware, the decryption is managed by the XC3S50 Xilinx Spartan FPGA (IC2) 
-// and the annexed PIC16C621A PIC MCU (IC3). 
-// - The FPGA control the clock line of the security PIC. 
+// In hardware, the decryption is managed by the XC3S50 Xilinx Spartan FPGA (IC2)
+// and the annexed PIC16C621A PIC MCU (IC3).
+// - The FPGA control the clock line of the security PIC.
 // - The protocol between the FPGA and the MCU is nibble-based, though it hasn't been RE for now.
 // - The decryption algorithm is clearly nibble-based too.
 
@@ -28,13 +28,13 @@ class NaomiM4Decoder
 public:
     NaomiM4Decoder(UINT32 cart_key);
     ~NaomiM4Decoder();
-    
+
     void init();        // initialize the decryption of a new stream (set the IV)
     UINT16 decrypt(UINT16 ciphertext);      // decrypt the next 16-bits value in the stream
-    
+
 private:
     UINT16 one_round_core(UINT16 round_input);
-    
+
     static const UINT8 k_sboxes[4][16];
     UINT16 *m_one_round;
     const UINT16 m_key;

@@ -351,7 +351,7 @@ struct cdrom_interface cdi_cdrom =
 static MACHINE_CONFIG_DERIVED( cdimono1, cdi )
 	MCFG_MACHINE_RESET( cdi )
 
-	MCFG_CDROM_ADD( "cdrom", cdi_cdrom )	
+	MCFG_CDROM_ADD( "cdrom", cdi_cdrom )
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 MACHINE_CONFIG_END

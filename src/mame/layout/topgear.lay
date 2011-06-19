@@ -51,7 +51,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="2 lines">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -64,7 +64,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="3 lines">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -77,7 +77,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="4 lines">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -90,7 +90,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="5 lines">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -103,7 +103,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="light tower1">
 		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -116,7 +116,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="light tower2">
 		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -129,7 +129,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="light tower3">
 		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -142,7 +142,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="light tower4">
 		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -156,7 +156,7 @@
 		</text>
 	</element>
 
-	
+
 	<element name="auditkey">
 		<rect state="1">
 			<color red="0.5" green="0.35" blue="0.0" />
@@ -203,46 +203,46 @@
 		<bezel name="lamp1" element="1 line">
 			<bounds x="1.08" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		
+
 		<bezel name="lamp2" element="2 lines">
 			<bounds x="1.49" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		
+
 		<bezel name="lamp3" element="3 lines">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
-		</bezel>	
+		</bezel>
 
 		<bezel name="lamp9" element="4 lines">
 			<bounds x="2.31" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-        	
+
 		<bezel name="lamp4" element="5 lines">
 			<bounds x="2.72" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		
+
 		<bezel name="lamp14" element="light tower1">
 			<bounds x="3.70" y="3.28" width="0.10" height="0.10" />
 		</bezel>
-		
+
 		<bezel name="lamp15" element="light tower2">
 			<bounds x="3.80" y="3.28" width="0.10" height="0.10" />
 		</bezel>
-		
+
 		<bezel name="lamp16" element="light tower3">
 			<bounds x="3.70" y="3.38" width="0.10" height="0.10" />
 		</bezel>
-		
+
 		<bezel name="lamp17" element="light tower4">
 			<bounds x="3.80" y="3.38" width="0.10" height="0.10" />
 		</bezel>
-		
+
 		<bezel name="lamp19" element="auditkey">
 			<bounds x="0.26" y="3.09" width="0.31" height="0.12" />
 		</bezel>
-		
+
 		<bezel name="lamp20" element="jackpotkey">
 			<bounds x="0.26" y="3.34" width="0.31" height="0.12" />
 		</bezel>
-		
+
 	</view>
 </mamelayout>

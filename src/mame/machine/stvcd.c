@@ -805,8 +805,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			//else
 			//{
-			//	sector_timer->reset();
-			//	sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
+			//  sector_timer->reset();
+			//  sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
 			//}
 			break;
 
@@ -1333,7 +1333,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			if(temp == 0xfffff8) /* TODO: Falcom Classics */
 				temp = 0;
 			#endif
-			//cr2 = 0x4101;	// CTRL/track
+			//cr2 = 0x4101; // CTRL/track
 			//cr3 = (curdir[temp].firstfad>>16)&0xff;
 			//cr4 = (curdir[temp].firstfad&0xffff);
 			cr_standard_return(cd_stat);

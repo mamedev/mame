@@ -523,8 +523,8 @@ public:
 	virtual void call_get_devices();
 	virtual void *get_device_specific_call();
 
-	virtual iodevice_t image_type() const { return static_cast<iodevice_t>(get_legacy_int(DEVINFO_INT_IMAGE_TYPE)); }	
-	
+	virtual iodevice_t image_type() const { return static_cast<iodevice_t>(get_legacy_int(DEVINFO_INT_IMAGE_TYPE)); }
+
 	virtual bool is_readable()  const { return get_legacy_int(DEVINFO_INT_IMAGE_READABLE)!=0; }
 	virtual bool is_writeable() const { return get_legacy_int(DEVINFO_INT_IMAGE_WRITEABLE)!=0; }
 	virtual bool is_creatable() const { return get_legacy_int(DEVINFO_INT_IMAGE_CREATABLE)!=0; }

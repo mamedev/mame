@@ -50,7 +50,7 @@ void printer_image_device::device_config_complete()
 	{
     	memset(&m_online, 0, sizeof(m_online));
 	}
-	
+
 	// set brief and instance name
 	update_names();
 }

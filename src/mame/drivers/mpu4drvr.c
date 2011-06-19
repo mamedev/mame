@@ -166,7 +166,7 @@ timer driven, the video is capable of various raster effects etc.)
 TODO:
       - Correctly implement characteriser protection for each game.
       - Mating Game animation and screen still slower than it should be, AVDC timing/IRQs?
-	  - Get the BwB games running
+      - Get the BwB games running
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
         They appear to hang on the handshake with the MPU4 board
       - Find out what causes the games to reset in service mode (see jump taken at CPU1:c8e8)
@@ -1226,10 +1226,10 @@ static WRITE8_HANDLER( ic3ss_vid_w )
 
 	float num = ((VIDEO_MASTER_CLOCK / 10)/((state->m_t3l + 1)*(state->m_t3h + 1)));
 	float denom1 = ((state->m_t3h *(state->m_t3l + 1)+ 1)/(2*(state->m_t1 + 1)));
-	
+
 	int denom2 = denom1 +0.5;//need to round up, this gives same precision as chip
-	int freq=num*denom2;			
-			
+	int freq=num*denom2;
+
 	if (freq)
 	{
 		okim6376_set_frequency(msm6376, freq);
@@ -2403,7 +2403,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4_state )
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
 
-//	MCFG_QUANTUM_TIME(attotime::from_hz(960))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(960))
 
 	MCFG_MACHINE_START(mpu4_vid)
 	MCFG_MACHINE_RESET(mpu4_vid)
