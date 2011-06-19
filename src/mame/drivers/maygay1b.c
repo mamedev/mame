@@ -758,7 +758,12 @@ static WRITE8_HANDLER( m1_latch_w )
 	}
 }
 
-
+static WRITE8_HANDLER( latch_ch2_w )
+{
+	device_t *msm6376 = space->machine().device("msm6376");
+	okim6376_w(msm6376, 0, data&0x7f);
+	okim6376_ch2_w(msm6376,data&0x80);
+}
 static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
@@ -781,6 +786,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
 
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE( "ymsnd", ym2413_w )
+	AM_RANGE(0x2420, 0x2421) AM_WRITE( latch_ch2_w )
 
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END

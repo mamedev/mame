@@ -4,7 +4,11 @@
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
 
-     05-2011: Add better OKI emulation - clock rate may be wrong but samples sound good now.
+     06-2011: Fixed boneheaded interface glitch that was causing samples to not be cancelled correctly.
+	          Added the ability to read each segment of an LED display separately, this may be necessary for some
+			  games that use them as surrogate lamp lines.
+			  New persistence 'hack' to stop light flicker for the small extender.
+     05-2011: Add better OKI emulation
      04-2011: More accurate gamball code, fixed ROM banking (Project Amber), added BwB CHR simulator (Amber)
               This is still a hard coded system, but significantly different to Barcrest's version.
               Started adding support for the Crystal Gaming program card, and the link keys for setting parameters.
@@ -69,7 +73,7 @@ In addition there are two auxiliary ports that can be accessed separately to the
 -----------+---+-----------------+--------------------------------------------------------------------------
  0850 ?    | W | ??????????????? | page latch (NV)
 -----------+---+-----------------+--------------------------------------------------------------------------
- 0880      |R/W| D D D D D D D D | PIA6821 on soundboard (Oki MSM6376 clocked by 6840)
+ 0880      |R/W| D D D D D D D D | PIA6821 on soundboard (Oki MSM6376 clocked by 6840 (8C0))
            |   |                 | port A = ??
            |   |                 | port B (882)
            |   |                 |        b7 = NAR
@@ -215,9 +219,10 @@ TODO: - Distinguish door switches using manual
       - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device emulation)
       - It seems that the MPU4 core program relies on some degree of persistence when switching strobes and handling
       writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs
-      For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything*
-      - Flo's move in Great Escape gives spin alarms - need a different opto setting for reverse spin reels?
+      For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything* and
+	  start modelling the individual hysteresis curves of filament lamps.
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
+      - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
 ***********************************************************************************************************/
 #include "emu.h"
 #include "machine/6821pia.h"
@@ -352,6 +357,8 @@ public:
 	int m_input_strobe;
 	UINT8 m_lamp_strobe;
 	UINT8 m_lamp_strobe2;
+	UINT8 m_lamp_strobe_ext;
+	UINT8 m_lamp_strobe_ext_persistence;
 	UINT8 m_led_strobe;
 	UINT8 m_ay_data;
 	int m_optic_pattern;
@@ -456,81 +463,57 @@ with settings like this in the majority of cases.
 8 display enables (pins 10 - 17)
 */
 
-static void lamp_extend_small(int data)
+static void lamp_extend_small(mpu4_state *state, int data)
 {
-	int lamp_strobe_ext,column,i;
+	int lamp_ext_data,column,i;
 	column = data & 0x07;
 
-	lamp_strobe_ext = 0x1f - ((data & 0xf8) >> 3);
-	if ( lamp_strobe_ext )
+	lamp_ext_data = 0x1f - ((data & 0xf8) >> 3);//remove the mux lines from the data
+
+	if ((state->m_lamp_strobe_ext_persistence == 0))
+	//One write to reset the drive lines, one with the data, one to clear the lines, so only the 2nd write does anything
+	//Once again, lamp persistences would take care of this, but we can't do that
 	{
 		for (i = 0; i < 5; i++)
 		{
-			output_set_lamp_value((5*column)+i+128,((lamp_strobe_ext  & (1 << i)) != 0));
+			output_set_lamp_value((8*column)+i+128,((lamp_ext_data  & (1 << i)) != 0));
 		}
-    }
-}
-
-static void lamp_extend_largea(mpu4_state *state, int data,int column,int active)
-{
-	int lampbase,i,byte7;
-
-	state->m_lamp_sense = 0;
-	byte7 = data & 0x80;
-	if ( byte7 != state->m_last_b7 )
+	}
+	state->m_lamp_strobe_ext_persistence ++;
+	if ((state->m_lamp_strobe_ext_persistence == 3)||(state->m_lamp_strobe_ext!=column))
 	{
-		if ( byte7 )
-		{
-			lampbase = 128 + column * 8;
-		}
-		else
-		{
-			lampbase = 192 + column * 8;
-		}
-		if ( data & 0x3f )
-		{
-			state->m_lamp_sense = 1;
-		}
-		if ( active )
-		{
-			for (i = 0; i < 6; i++)
-			{
-				output_set_lamp_value(lampbase+i,(data  & (1 << i)) != 0);
-			}
-		}
-    }
-    state->m_last_b7 = byte7;
+		state->m_lamp_strobe_ext_persistence = 0;
+		state->m_lamp_strobe_ext=column;
+	}
 }
 
-static void lamp_extend_largebc(mpu4_state *state, int data,int column,int active)
+static void lamp_extend_large(mpu4_state *state, int data,int column,int active)
 {
-	int lampbase,i,byte7;
+	int lampbase,i,bit7;
 
 	state->m_lamp_sense = 0;
-	byte7 = data & 0x80;
-	if ( byte7 != state->m_last_b7 )
+	bit7 = data & 0x80;
+	if ( bit7 != state->m_last_b7 )
 	{
 		state->m_card_live = 1;
-		if ( byte7 )
-		{
-			lampbase = 128 + column * 8;
-		}
-		else
-		{
-			lampbase = 192 + column * 8;
-		}
+		//depending on bit 7, we can access one of two 'blocks' of 64 lamps
+		lampbase = bit7 ? 0 : 64;
 		if ( data & 0x3f )
 		{
 			state->m_lamp_sense = 1;
 		}
 		if ( active )
 		{
-			for (i = 0; i < 6; i++)
+			if (state->m_lamp_strobe_ext != column)
 			{
-				output_set_lamp_value(lampbase+i,(data  & (1 << i)) != 0);
+				for (i = 0; i < 8; i++)
+				{//CHECK, this includes bit 7
+					output_set_lamp_value((8*column)+i+128+lampbase ,(data  & (1 << i)) != 0);
+				}
+				state->m_lamp_strobe_ext = column;
 			}
 		}
-		state->m_last_b7 = byte7;
+	    state->m_last_b7 = bit7;
 	}
 	else
 	{
@@ -540,20 +523,24 @@ static void lamp_extend_largebc(mpu4_state *state, int data,int column,int activ
 
 static void led_write_latch(mpu4_state *state, int latch, int data, int column)
 {
-	int diff,i;
+	int diff,i,j;
 
 	diff = (latch ^ state->m_last_latch) & latch;
 	column = 7 - column; // like main board, these are wired up in reverse
-	data = ~data;//inverted?
+	data = ~data;//inverted drive lines?
 
 	for(i=0; i<5; i++)
 	{
 		if (diff & (1<<i))
 		{
-			column += (i*8);
+			column += i;
 		}
 	}
-	output_set_digit_value(column, data);
+	for(j=0; j<8; j++)
+	{
+		output_set_indexed_value("mpu4led",(8*column)+j,(data & (1 << j)) !=0);
+	}
+	output_set_digit_value(column * 8, data);
 
 	state->m_last_latch = diff;
 }
@@ -645,6 +632,8 @@ static MACHINE_RESET( mpu4 )
 	state->m_lamp_strobe    = 0;
 	state->m_lamp_strobe2   = 0;
 	state->m_led_strobe     = 0;
+	state->m_mmtr_data      = 0;
+	state->m_remote_meter   = 0;
 
 	state->m_IC23GC    = 0;
 	state->m_IC23GB    = 0;
@@ -949,6 +938,7 @@ static TIMER_CALLBACK( ic24_timeout )
 /* IC4, 7 seg leds, 50Hz timer reel sensors, current sensors */
 static WRITE8_DEVICE_HANDLER( pia_ic4_porta_w )
 {
+	int i;
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	if(state->m_ic23_active)
 	{
@@ -956,6 +946,10 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_porta_w )
 		{
 			if(state->m_led_strobe != state->m_input_strobe)
 			{
+				for(i=0; i<8; i++)
+				{
+					output_set_indexed_value("mpu4led",((7 - state->m_input_strobe) * 8) +i,(data & (1 << i)) !=0);
+				}
 				output_set_digit_value(7 - state->m_input_strobe,data);
 			}
 			state->m_led_strobe = state->m_input_strobe;
@@ -1105,6 +1099,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 
 static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 {
+	int i;
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	pia6821_device *pia_ic4 = device->machine().device<pia6821_device>("pia_ic4");
 	if (state->m_hopper == HOPPER_NONDUART_A)
@@ -1120,27 +1115,35 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 		}
 		else if ((state->m_led_extender != CARD_A)||(state->m_led_extender != NO_EXTENDER))
 		{
+			for(i=0; i<8; i++)
+			{
+				output_set_indexed_value("mpu4led",((state->m_input_strobe + 8) * 8) +i,(data & (1 << i)) !=0);
+			}
 			output_set_digit_value((state->m_input_strobe+8),data);
 		}
 		break;
 		case SMALL_CARD:
 		if(state->m_ic23_active)
 		{
-			lamp_extend_small(data);
+			lamp_extend_small(state,data);
 		}
 		break;
 		case LARGE_CARD_A:
-		lamp_extend_largea(state,data,state->m_input_strobe,state->m_ic23_active);
+		lamp_extend_large(state,data,state->m_input_strobe,state->m_ic23_active);
 		break;
 		case LARGE_CARD_B:
-		lamp_extend_largebc(state,data,state->m_input_strobe,state->m_ic23_active);
+		lamp_extend_large(state,data,state->m_input_strobe,state->m_ic23_active);
 		if ((state->m_ic23_active) && state->m_card_live)
 		{
+			for(i=0; i<8; i++)
+			{
+				output_set_indexed_value("mpu4led",(((8*(state->m_last_b7 >>7))+ state->m_input_strobe) * 8) +i,(~data & (1 << i)) !=0);
+			}
 			output_set_digit_value(((8*(state->m_last_b7 >>7))+state->m_input_strobe),~data);
 		}
 		break;
 		case LARGE_CARD_C:
-		lamp_extend_largebc(state,data,state->m_input_strobe,state->m_ic23_active);
+		lamp_extend_large(state,data,state->m_input_strobe,state->m_ic23_active);
 		break;
 	}
 	if (state->m_reel_mux == SIX_REEL_5TO8)
@@ -1676,9 +1679,10 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 	device_t *msm6376 = device->machine().device("msm6376");
 	okim6376_device *msm = device->machine().device<okim6376_device>("ymsnd");
 
+
 	int changed = state->m_expansion_latch^data;
 
-	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine().describe_context(),data));
+	LOG_SS(("%s: GAMEBOARD: PIA Port B Set to %2x\n", device->machine().describe_context(),data));
 
 	state->m_expansion_latch = data;
 
@@ -1698,9 +1702,7 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 			{
 				float percent = (32-state->m_global_volume)/32.0; //volume_override?1.0:(32-state->m_global_volume)/32.0;
 				msm->set_output_gain(0, percent);
-			//	msm6376->stream->set_output_gain(1, percent);
-
-				//              LOG(("GAMEBOARD: OKI volume %f \n",percent));
+				msm->set_output_gain(1, percent);
 			}
 		}
 	}
@@ -1714,16 +1716,16 @@ static READ8_DEVICE_HANDLER( pia_gb_portb_r )
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n",device->machine().describe_context()));
 	int data=0;
-	//
-	// b7, 1 = OKI ready, 0 = OKI busy
+	// b7 NAR - we can load another address into Channel 1
+	// b6, 1 = OKI ready, 0 = OKI busy
 	// b5, vol clock
 	// b4, 1 = Vol down, 0 = Vol up
 	//
 
-	if ( okim6376_busy_r(msm6376) ) data |= 0x80;
+	if ( okim6376_nar_r(msm6376) ) data |= 0x80;
 	else							data &= ~0x80;
 
-	if ( okim6376_nar_r(msm6376) )	data |= 0x40;
+	if ( okim6376_busy_r(msm6376) )	data |= 0x40;
 	else							data &= ~0x40;
 
 	return ( data | state->m_expansion_latch );
@@ -1774,8 +1776,6 @@ freq = (1720000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
 where [] means rounded up integer,
 t3L is the LSB of Clock 3,
 t3H is the MSB of Clock 3,
-
-The sample speed divisor is f/300
 and t1 is the initial value in clock 1.
 */
 
@@ -1794,7 +1794,7 @@ static WRITE8_DEVICE_HANDLER( ic3ss_o2_callback )//Generates 'beep' tone
 
 static WRITE8_DEVICE_HANDLER( ic3ss_o3_callback )
 {
-	downcast<ptm6840_device *>(device)->set_g1(data); /* this output is the clock for timer1 */
+	//downcast<ptm6840_device *>(device)->set_g1(data); /* this output is the clock for timer1 */
 }
 
 /* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
@@ -1822,10 +1822,10 @@ static WRITE8_HANDLER( ic3ss_w )
 
 	float num = (1720000/((state->m_t3l + 1)*(state->m_t3h + 1)));
 	float denom1 = ((state->m_t3h *(state->m_t3l + 1)+ 1)/(2*(state->m_t1 + 1)));
-
+	
 	int denom2 = denom1 +0.5;//need to round up, this gives same precision as chip
-	int freq=num*denom2;
-
+	int freq=num*denom2;			
+			
 	if (freq)
 	{
 		okim6376_set_frequency(msm6376, freq);
@@ -1918,56 +1918,61 @@ static INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START1)
 
 	PORT_START("DIL1")
-	PORT_DIPNAME( 0x80, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x01, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0xF0, 0x00, "Target Percentage (if key not fitted)" )PORT_DIPLOCATION("DIL1:05,06,07,08")
+	PORT_DIPSETTING(    0x00, "Unset (Program Optimum)"  )
+	PORT_DIPSETTING(    0x10, "70" )
+	PORT_DIPSETTING(    0x20, "72" )
+	PORT_DIPSETTING(    0x30, "74" )
+	PORT_DIPSETTING(    0x40, "76" )
+	PORT_DIPSETTING(    0x50, "78" )
+	PORT_DIPSETTING(    0x60, "80" )
+	PORT_DIPSETTING(    0x70, "82" )
+	PORT_DIPSETTING(    0x80, "84" )
+	PORT_DIPSETTING(    0x90, "86" )
+	PORT_DIPSETTING(    0xA0, "88" )
+	PORT_DIPSETTING(    0xB0, "90" )
+	PORT_DIPSETTING(    0xC0, "92" )
+	PORT_DIPSETTING(    0xD0, "94" )
+	PORT_DIPSETTING(    0xE0, "96" )
+	PORT_DIPSETTING(    0xF0, "98" )
 
 	PORT_START("DIL2")
-	PORT_DIPNAME( 0x80, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x01, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPNAME( 0x01, 0x00, "Token Lockout when full" ) PORT_DIPLOCATION("DIL2:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused )) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "Scottish Coin Handling" ) PORT_DIPLOCATION("DIL2:03")//20p payout
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "Out of Credit Display Inhibit" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "OCD Audio Enable" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coin Alarm Inhibit" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "Token Refill Level Inhibit" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "Single Credit Entry" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
@@ -2107,24 +2112,57 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gamball )
 	PORT_START("ORANGE1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("05")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("06")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("07")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")//  20p level
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")// 100p level
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")// Token 1 level
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")// Token 2 level
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
+	PORT_CONFNAME( 0xE0, 0x00, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted / 5p"  )
+	PORT_CONFSETTING(    0x20, "10p" )
+	PORT_CONFSETTING(    0x40, "20p" )
+	PORT_CONFSETTING(    0x60, "25p" )
+	PORT_CONFSETTING(    0x80, "30p" )
+	PORT_CONFSETTING(    0xA0, "40p" )
+	PORT_CONFSETTING(    0xC0, "50p" )
+	PORT_CONFSETTING(    0xE0, "1 GBP" )
 
 	PORT_START("ORANGE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("08")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("09")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("11")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("12")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("13")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("14")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("15")
+	PORT_CONFNAME( 0x0F, 0x00, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted"  )
+	PORT_CONFSETTING(    0x01, "3 GBP"  )
+	PORT_CONFSETTING(    0x02, "4 GBP"  )
+	PORT_CONFSETTING(    0x08, "5 GBP"  )
+	PORT_CONFSETTING(    0x03, "6 GBP"  )
+	PORT_CONFSETTING(    0x04, "6 GBP Token"  )
+	PORT_CONFSETTING(    0x05, "8 GBP"  )
+	PORT_CONFSETTING(    0x06, "8 GBP Token"  )
+	PORT_CONFSETTING(    0x07, "10 GBP"  )
+	PORT_CONFSETTING(    0x09, "15 GBP"  )
+	PORT_CONFSETTING(    0x0A, "25 GBP"  )
+	PORT_CONFSETTING(    0x0B, "25 GBP (Licensed Betting Office Profile)"  )
+	PORT_CONFSETTING(    0x0C, "35 GBP"  )
+	PORT_CONFSETTING(    0x0D, "70 GBP"  )
+	PORT_CONFSETTING(    0x0E, "Reserved"  )
+	PORT_CONFSETTING(    0x0F, "Reserved"  )
+
+	PORT_CONFNAME( 0xF0, 0x00, "Percentage Key" )
+	PORT_CONFSETTING(    0x00, "As Option Switches"  )
+	PORT_CONFSETTING(    0x10, "70" )
+	PORT_CONFSETTING(    0x20, "72" )
+	PORT_CONFSETTING(    0x30, "74" )
+	PORT_CONFSETTING(    0x40, "76" )
+	PORT_CONFSETTING(    0x50, "78" )
+	PORT_CONFSETTING(    0x60, "80" )
+	PORT_CONFSETTING(    0x70, "82" )
+	PORT_CONFSETTING(    0x80, "84" )
+	PORT_CONFSETTING(    0x90, "86" )
+	PORT_CONFSETTING(    0xA0, "88" )
+	PORT_CONFSETTING(    0xB0, "90" )
+	PORT_CONFSETTING(    0xC0, "92" )
+	PORT_CONFSETTING(    0xD0, "94" )
+	PORT_CONFSETTING(    0xE0, "96" )
+	PORT_CONFSETTING(    0xF0, "98" )
 
 	PORT_START("BLACK1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Hi")
@@ -2212,6 +2250,158 @@ static INPUT_PORTS_START( gamball )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( grtecp )
+	PORT_START("ORANGE1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")//  20p level
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")// 100p level
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")// Token 1 level
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")// Token 2 level
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
+	PORT_CONFNAME( 0xE0, 0x00, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted / 5p"  )
+	PORT_CONFSETTING(    0x20, "10p" )
+	PORT_CONFSETTING(    0x40, "20p" )
+	PORT_CONFSETTING(    0x60, "25p" )
+	PORT_CONFSETTING(    0x80, "30p" )
+	PORT_CONFSETTING(    0xA0, "40p" )
+	PORT_CONFSETTING(    0xC0, "50p" )
+	PORT_CONFSETTING(    0xE0, "1 GBP" )
+
+	PORT_START("ORANGE2")
+	PORT_CONFNAME( 0x0F, 0x00, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted"  )
+	PORT_CONFSETTING(    0x01, "3 GBP"  )
+	PORT_CONFSETTING(    0x02, "4 GBP"  )
+	PORT_CONFSETTING(    0x08, "5 GBP"  )
+	PORT_CONFSETTING(    0x03, "6 GBP"  )
+	PORT_CONFSETTING(    0x04, "6 GBP Token"  )
+	PORT_CONFSETTING(    0x05, "8 GBP"  )
+	PORT_CONFSETTING(    0x06, "8 GBP Token"  )
+	PORT_CONFSETTING(    0x07, "10 GBP"  )
+	PORT_CONFSETTING(    0x09, "15 GBP"  )
+	PORT_CONFSETTING(    0x0A, "25 GBP"  )
+	PORT_CONFSETTING(    0x0B, "25 GBP (Licensed Betting Office Profile)"  )
+	PORT_CONFSETTING(    0x0C, "35 GBP"  )
+	PORT_CONFSETTING(    0x0D, "70 GBP"  )
+	PORT_CONFSETTING(    0x0E, "Reserved"  )
+	PORT_CONFSETTING(    0x0F, "Reserved"  )
+
+	PORT_CONFNAME( 0xF0, 0x00, "Percentage Key" )
+	PORT_CONFSETTING(    0x00, "As Option Switches"  )
+	PORT_CONFSETTING(    0x10, "70" )
+	PORT_CONFSETTING(    0x20, "72" )
+	PORT_CONFSETTING(    0x30, "74" )
+	PORT_CONFSETTING(    0x40, "76" )
+	PORT_CONFSETTING(    0x50, "78" )
+	PORT_CONFSETTING(    0x60, "80" )
+	PORT_CONFSETTING(    0x70, "82" )
+	PORT_CONFSETTING(    0x80, "84" )
+	PORT_CONFSETTING(    0x90, "86" )
+	PORT_CONFSETTING(    0xA0, "88" )
+	PORT_CONFSETTING(    0xB0, "90" )
+	PORT_CONFSETTING(    0xC0, "92" )
+	PORT_CONFSETTING(    0xD0, "94" )
+	PORT_CONFSETTING(    0xE0, "96" )
+	PORT_CONFSETTING(    0xF0, "98" )
+
+	PORT_START("BLACK1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+
+	PORT_START("BLACK2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Collect/Cancel")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Hold 1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Hold 2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Hold 3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Hi")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Lo")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Exchange")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START1)
+
+	PORT_START("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0xF0, 0x00, "Target Percentage (if key not fitted)" )PORT_DIPLOCATION("DIL1:05,06,07,08")
+	PORT_DIPSETTING(    0x00, "Unset (Program Optimum)"  )
+	PORT_DIPSETTING(    0x10, "70" )
+	PORT_DIPSETTING(    0x20, "72" )
+	PORT_DIPSETTING(    0x30, "74" )
+	PORT_DIPSETTING(    0x40, "76" )
+	PORT_DIPSETTING(    0x50, "78" )
+	PORT_DIPSETTING(    0x60, "80" )
+	PORT_DIPSETTING(    0x70, "82" )
+	PORT_DIPSETTING(    0x80, "84" )
+	PORT_DIPSETTING(    0x90, "86" )
+	PORT_DIPSETTING(    0xA0, "88" )
+	PORT_DIPSETTING(    0xB0, "90" )
+	PORT_DIPSETTING(    0xC0, "92" )
+	PORT_DIPSETTING(    0xD0, "94" )
+	PORT_DIPSETTING(    0xE0, "96" )
+	PORT_DIPSETTING(    0xF0, "98" )
+
+	PORT_START("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "Token Lockout when full" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused )) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "Scottish Coin Handling" ) PORT_DIPLOCATION("DIL2:03")//20p payout
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "Out of Credit Display Inhibit" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "OCD Audio Enable" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coin Alarm Inhibit" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "Token Refill Level Inhibit" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "Single Credit Entry" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("AUX1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("4")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("5")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("6")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
+
+	PORT_START("AUX2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+INPUT_PORTS_END
+
 static const stepper_interface barcrest_reel_interface =
 {
 	BARCREST_48STEP_REEL,
@@ -2266,6 +2456,7 @@ static void mpu4_config_common(running_machine &machine)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_ic24_timer = machine.scheduler().timer_alloc(FUNC(ic24_timeout));
+	state->m_lamp_strobe_ext_persistence = 0;
 }
 
 static void mpu4_config_common_reels(running_machine &machine,int reels)
@@ -2789,7 +2980,6 @@ static ADDRESS_MAP_START( mod4_oki_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE_MODERN("pia_ic4ss", pia6821_device, read, write)      // PIA6821 on sampled sound board
 
-//	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREAD_MODERN("ptm_ic3ss", ptm6840_device, read)  // 6840PTM on sampled sound board
 	AM_RANGE(0x08c0, 0x08c7) AM_WRITE(ic3ss_w)  // 6840PTM on sampled sound board
 
@@ -2816,11 +3006,11 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0858, 0x0858) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
+	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE_MODERN("pia_ic4ss", pia6821_device, read, write)      // PIA6821 on sampled sound board
+
 //	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREAD_MODERN("ptm_ic3ss", ptm6840_device, read)  // 6840PTM on sampled sound board
 	AM_RANGE(0x08c0, 0x08c7) AM_WRITE(ic3ss_w)  // 6840PTM on sampled sound board
-
-	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 
 //  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
 
@@ -3036,7 +3226,7 @@ ROM_END
 GAME( 198?,  m_oldtmr,0,      mpu4dutch,mpu4,	  m_oldtmr, ROT0,   "Barcrest",		 "Old Timer",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME( 198?,  m_ccelbr,0,      mpu4mod2, mpu4,	  m_ccelbr, ROT0,   "Barcrest",		 "Club Celebration",				GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
 GAMEL(198?,  m_gmball,0,      mod4yam,  gamball,  m_gmball, ROT0, "Barcrest",       "Gamball",							GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
-GAMEL(198?,  m_grtecp,0,      mod4oki,  mpu4,	  m_grtecp, ROT0,   "Barcrest",		 "Andy's Great Escape",				GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_mpu4ext )//5 reel meter mux
+GAMEL(198?,  m_grtecp,0,      mod4oki,  grtecp,	  m_grtecp, ROT0,   "Barcrest",		 "Andy's Great Escape",				GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_mpu4ext )//5 reel meter mux
 GAME(199?,   m_blsbys,0,	  bwboki,   mpu4,	  m_blsbys, ROT0,   "Barcrest",		 "Blues Boys (Version 6)",			GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
 GAME(199?,   m_frkstn,0,    mpu4crys, mpu4,     m_frkstn, ROT0,   "Crystal Gaming","Frank 'n' Stein (unencrypted)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )//hardware not connected
 

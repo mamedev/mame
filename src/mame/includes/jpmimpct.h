@@ -64,6 +64,12 @@ public:
 	UINT8 m_Lamps[256];
 	int m_optic_pattern;
 	int m_payen;
+	int m_alpha_data_line;
+	int m_alpha_clock;
+	int m_hopinhibit;
+	int m_slidesout;
+	int m_hopper[3];
+	int m_motor[3];
 	UINT16 *m_vram;
 	struct bt477_t m_bt477;
 };

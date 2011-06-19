@@ -5,7 +5,7 @@
 
 #include "devlegcy.h"
 
-/* an interface for the OKIM6376 and similar chips */
+/* an interface for the OKIM6376 and similar chips (CPU interface only) */
 
 READ8_DEVICE_HANDLER( okim6376_r );
 WRITE8_DEVICE_HANDLER( okim6376_w );

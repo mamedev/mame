@@ -5,9 +5,8 @@
  *
  *   TODO:
  *     add BEEP tone generator
- *     add echo - done, but not tested due to lack of supporting software
- *     add proper NAR handling - this varies with clock rate, and is ideally done
- *      off a second timer triggered by ST
+ *     confirm echo
+ *     sample divisor in ROM table not implemented (no documentation)
  *     modernise
  **********************************************************************************************/
 
@@ -20,7 +19,6 @@
 
 #define OKIVERBOSE 0
 #define MSM6376LOG(x) do { if (OKIVERBOSE) logerror x; } while (0)
-
 
 /* struct describing a single playing ADPCM voice */
 struct ADPCMVoice
@@ -43,12 +41,14 @@ struct _okim6376_state
 	struct ADPCMVoice voice[OKIM6376_VOICES];
 	INT32 command[OKIM6376_VOICES];
 	INT32 latch;			/* Command data is held before transferring to either channel */
+	UINT8 stage[OKIM6376_VOICES];/* If a sample is playing, flag that we have a command staged */
 	UINT8 *region_base;		/* pointer to the base of the region */
 	sound_stream *stream;	/* which stream are we playing on? */
 	UINT32 master_clock;	/* master clock frequency */
 	UINT8 divisor;			/* can be 8,10,16, and is read out of ROM data */
 	UINT8 channel;
 	UINT8 nar;				/* Next Address Ready */
+	UINT8 nartimer;
 	UINT8 busy;
 	UINT8 ch2;				/* 2CH pin - enables Channel 2 operation */
 	UINT8 st;				/* STart */
@@ -75,8 +75,7 @@ static const int volume_table[3] =
 
 /* divisor lookup table. When an individual word is selected, it can be assigned one of three different 'rates'.
    These are implemented as clock divisors, and are looked up in the ROM header. More often than not, this value is 0,
-   relating to a division by 8, or nominally 8KHz sampling.
-   channel*/
+   relating to a division by 8, or nominally 8KHz sampling (based on the datasheet exampleof a 64KHz clock).*/
 static const int divisor_table[3] =
 {
 	8,
@@ -185,6 +184,72 @@ static INT16 clock_adpcm(struct ADPCMVoice *voice, UINT8 nibble)
 }
 
 
+static void oki_process(okim6376_state *info, int channel, int command)
+{
+	/* if a command is pending, process the second half */
+	if ((command != -1) && (command != 0)) //process silence separately
+	{
+		int start;
+		unsigned char *base/*, *base_end*/;
+		/* update the stream */
+		info->stream->update();
+
+		/* determine which voice(s) (voice is set by the state of 2CH) */
+		{
+			struct ADPCMVoice *voice = &info->voice[channel];
+
+			/* determine the start position, max address space is 16Mbit */
+			base = &info->region_base[info->command[channel] * 4];
+			//base_end = &info->region_base[(MAX_WORDS+1) * 4];
+			start = ((base[0] << 16) + (base[1] << 8) + base[2]) & 0x1fffff;
+
+				if (start == 0)
+				{
+					voice->playing = 0;
+				}
+				else
+				{
+					/* set up the voice to play this sample */
+					if (!voice->playing)
+					{
+						voice->playing = 1;
+						voice->base_offset = start;
+						voice->sample = 0;
+						voice->count = 0;
+
+						/* also reset the ADPCM parameters */
+						reset_adpcm(voice);
+						/* FIX: no attenuation for now, handle for channel 2 separately */
+						voice->volume = volume_table[0];
+					}
+					else
+					{
+						if (((info->nar)&&(channel == 0))||(channel == 1))//Store the request, for later processing (channel 2 ignores NAR)
+						{
+							info->stage[channel] = 1;
+						}
+					}
+				}
+			}
+		}
+		/* otherwise, see if this is a silence command */
+		else
+		{
+			/* update the stream, then turn it off */
+			info->stream->update();
+
+			if (command ==0)
+			{
+				int i;
+				for (i = 0; i < OKIM6376_VOICES; i++)
+				{
+					struct ADPCMVoice *voice = &info->voice[i];
+					voice->playing = 0;
+			}
+		}
+	}
+}
+
 
 /**********************************************************************************************
 
@@ -192,7 +257,7 @@ static INT16 clock_adpcm(struct ADPCMVoice *voice, UINT8 nibble)
 
 ***********************************************************************************************/
 
-static void generate_adpcm(okim6376_state *chip, struct ADPCMVoice *voice, INT16 *buffer, int samples)
+static void generate_adpcm(okim6376_state *chip, struct ADPCMVoice *voice, INT16 *buffer, int samples,int channel)
 {
 	/* if this voice is active */
 	if (voice->playing)
@@ -244,6 +309,12 @@ static void generate_adpcm(okim6376_state *chip, struct ADPCMVoice *voice, INT16
 	/* fill the rest with silence */
 	while (samples--)
 		*buffer++ = 0;
+
+	if ((!voice->playing)&&(chip->stage[channel]))//end of samples, load anything staged in
+	{
+		chip->stage[channel] = 0;
+		oki_process(chip,channel,chip->command[channel]);
+	}
 }
 
 
@@ -267,6 +338,17 @@ static STREAM_UPDATE( okim6376_update )
 		stream_sample_t *buffer = outputs[0];
 		INT16 sample_data[MAX_SAMPLE_CHUNK];
 		int remaining = samples;
+		if (i == 0) //channel 1 is the only channel to affect NAR
+		{
+			if (chip->nartimer > 0)
+			{
+				chip->nartimer--;
+				if (!chip->nartimer)
+				{
+					chip->nar =1;
+				}
+			}
+		}
 
 		/* loop while we have samples remaining */
 		while (remaining)
@@ -274,7 +356,7 @@ static STREAM_UPDATE( okim6376_update )
 			int samples = (remaining > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : remaining;
 			int samp;
 
-			generate_adpcm(chip, voice, sample_data, samples);
+			generate_adpcm(chip, voice, sample_data, samples,i);
 			for (samp = 0; samp < samples; samp++)
 				*buffer++ += sample_data[samp];
 
@@ -313,77 +395,6 @@ static void okim6376_state_save_register(okim6376_state *info, device_t *device)
 		device->save_item(NAME(info->command[1]));
 }
 
-static void oki_process(device_t *device, int channel, int command)
-{
-	okim6376_state *info = get_safe_token(device);
-
-	/* if a command is pending, process the second half */
-	if ((command != -1) && (command != 0)) //process silence separately
-	{
-		int start;
-		unsigned char *base/*, *base_end*/;
-		info->nar = 0;//processing
-		/* update the stream */
-		info->stream->update();
-
-		/* determine which voice(s) (voice is set by the state of 2CH) */
-		{
-			struct ADPCMVoice *voice = &info->voice[channel];
-
-			/* determine the start position, max address space is 16Mbit */
-			base = &info->region_base[info->command[channel] * 4];
-			//base_end = &info->region_base[(MAX_WORDS+1) * 4];
-			start = ((base[0] << 16) + (base[1] << 8) + base[2]) & 0x1fffff;
-
-				if (start == 0)
-				{
-					voice->playing = 0;
-					MSM6376LOG(("OKIM6376:'%s' Stopping %x\n",device->tag(),channel));
-				}
-				else
-				{
-					/* set up the voice to play this sample */
-					if (!voice->playing)
-					{
-						voice->playing = 1;
-						voice->base_offset = start;
-						voice->sample = 0;
-						voice->count = 0;
-
-						/* also reset the ADPCM parameters */
-						reset_adpcm(voice);
-						/* Channel 1 cannot be attenuated, only Channel 2. We handle that separately */
-						voice->volume = volume_table[0];
-						MSM6376LOG(("OKIM6376:'%s' Playing %x\n",device->tag(),voice->base_offset));
-					}
-					else
-					{
-						MSM6376LOG(("OKIM6376:'%s' requested to play sample %02x on non-stopped voice\n",device->tag(),info->command[channel]));
-					}
-				}
-				info->nar = 1;
-			}
-		}
-		/* otherwise, see if this is a silence command */
-		else
-		{
-			info->nar = 0;
-			/* update the stream, then turn it off */
-			info->stream->update();
-
-			if (command ==0)
-			{
-				int i;
-				for (i = 0; i < OKIM6376_VOICES; i++)
-				{
-					struct ADPCMVoice *voice = &info->voice[i];
-					voice->playing = 0;
-			}
-			info->nar = 1;
-		}
-	}
-}
-
 /**********************************************************************************************
 
      DEVICE_START( okim6376 ) -- start emulation of an OKIM6376-compatible chip
@@ -394,23 +405,26 @@ static DEVICE_START( okim6376 )
 {
 	okim6376_state *info = get_safe_token(device);
 	int voice;
-
 	compute_tables();
 
 	info->command[0] = -1;
 	info->command[1] = -1;
+	info->stage[0] = 0;
+	info->stage[1] = 0;
 	info->latch = 0;
 	info->divisor = divisor_table[0];
 	info->region_base = *device->region();
 	info->master_clock = device->clock();
 	info->nar = 1;
+	info->nartimer = 0;
 	info->busy = 1;
 	info->st = 1;
+	info->ch2 = 1;
 	info->st_update = 0;
 	info->ch2_update = 0;
 	info->st_pulses = 0;
 	/* generate the name and create the stream */
-	info->stream = device->machine().sound().stream_alloc(*device, 0, 1, info->master_clock / info->divisor, info, okim6376_update);
+	info->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/ info->divisor, info, okim6376_update);
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6376_VOICES; voice++)
@@ -456,42 +470,22 @@ static DEVICE_RESET( okim6376 )
 
 ***********************************************************************************************/
 
-READ8_DEVICE_HANDLER( okim6376_r )
-{
-	okim6376_state *info = get_safe_token(device);
-	int i, result;
-
-	result = 0xff;
-
-	/* set the bit to 1 if something is playing on a given channel */
-	info->stream->update();
-	for (i = 0; i < OKIM6376_VOICES; i++)
-	{
-		struct ADPCMVoice *voice = &info->voice[i];
-
-		/* set the bit if it's playing */
-		if (!voice->playing)
-			result ^= 1 << i;
-	}
-
-	return result;
-}
-
-
 READ_LINE_DEVICE_HANDLER( okim6376_busy_r )
 {
 	okim6376_state *info = get_safe_token(device);
-	int i,result=1;
 
-	for (i = 0; i < OKIM6376_VOICES; i++)
+	struct ADPCMVoice *voice0 = &info->voice[0];
+	struct ADPCMVoice *voice1 = &info->voice[1];
+
+	/* set the bit low if it's playing */
+	if ((voice0->playing)||(voice1->playing))
 	{
-		struct ADPCMVoice *voice = &info->voice[i];
-
-		/* set the bit low if it's playing */
-		if (voice->playing)
-			result = 0;
+		return 0;
 	}
-	return result;
+	else
+	{
+		return 1;
+	}
 }
 
 READ_LINE_DEVICE_HANDLER( okim6376_nar_r )
@@ -512,31 +506,29 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_ch2_w )
 		info->ch2 = state;
 		info->ch2_update = 1;
 	}
-
 	if((!info->ch2)&&(info->ch2_update))
 	{
+		info->st_pulses = 0;
 		struct ADPCMVoice *voice0 = &info->voice[0];
 		struct ADPCMVoice *voice1 = &info->voice[1];
-		//Echo functions when Channel 1 is playing, and ST is still high
+		// We set to channel 2
+		MSM6376LOG(("OKIM6376:'%s' Channel 1\n",device->tag()));
+		info->channel = 1;
+
 		if ((voice0->playing)&&(info->st))
 		{
+			//Echo functions when Channel 1 is playing, and ST is still high
 			info->command[1] = info->command[0];//copy sample over
 			voice1->volume = volume_table[1]; //echo is 6dB attenuated
- 		}
-		else
-		{// Process as a proper channel
-			info->channel = 1;
-			if (info->command[1] != info->latch)
-			{
-				info->command[1] = info->latch;
-			}
 		}
 	}
 
 	if((info->ch2)&&(info->ch2_update))
 	{
+		info->stage[1]=0;
+		oki_process(info, 1, info->command[1]);
+		MSM6376LOG(("OKIM6376:'%s' Channel 0\n",device->tag()));
 		info->channel = 0;
-		oki_process(device, 0, info->command[1]);
 	}
 }
 
@@ -546,7 +538,6 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_st_w )
 	//As in STart, presumably, this triggers everything
 
 	okim6376_state *info = get_safe_token(device);
-
 	info->st_update = 0;//Clear flag
 	MSM6376LOG(("OKIM6376:'%s' ST %x\n",device->tag(),state));
 
@@ -567,18 +558,19 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_st_w )
 					info->st_pulses = 3; //undocumented behaviour beyond 3 pulses
 				}
 
-				MSM6376LOG(("OKIM6376:'%s' Attenuation %x\n",device->tag(),info->st_pulses));
-				voice->volume = volume_table[info->st_pulses];
+				voice->volume = volume_table[info->st_pulses - 1];
 			}
 		}
 		if (info->st && info->st_update)
 		{
 			info->command[info->channel] = info->latch;
-			MSM6376LOG(("OKIM6376:'%s' Latching %x into  %x\n",device->tag(),info->latch,info->channel));
-
-			if (info->channel ==0)
+			if (info->channel ==0 && info->nar)
 			{
-				oki_process(device, 0, info->command[0]);
+				info->stage[info->channel]=0;
+				oki_process(info, 0, info->command[0]);
+				info->nar = 0;
+				info->nartimer = 4;
+				/*According to datasheet, NAR timing is ~375 us at 8KHz, and is inversely proportional to sample rate, effectively 6 stream updates. */
 			}
 		}
 	}
@@ -596,8 +588,9 @@ WRITE8_DEVICE_HANDLER( okim6376_w )
 
 	okim6376_state *info = get_safe_token(device);
 	info->latch = data & 0x7f;
-	// FIX: The maximum adpcm words supported are 111, there are another 8 commands to generate BEEP tone, like beep.c (0x70 to 0x77),
-	// and others for internal testing, that the manual explicitly says not to use (0x78 to 0x7f).
+	// FIX: maximum adpcm words are 111, there are other 8 commands to generate BEEP tone (0x70 to 0x77),
+	// and others for internal testing, that manual explicitly says not to use (0x78 to 0x7f)
+	// We aren't doing anything with the BEEP at the moment, as we'd need to mix the ADPCM stream with beep.c
 }
 
 
