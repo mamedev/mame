@@ -59,7 +59,25 @@ INLINE X87_REG FPU_POP(i386_state *cpustate)
 static void I386OP(fpu_group_d8)(i386_state *cpustate)		// Opcode 0xd8
 {
 	UINT8 modrm = FETCH(cpustate);
-	fatalerror("I386: FPU Op D8 %02X at %08X", modrm, cpustate->pc-2);
+	if (modrm < 0xc0)
+	{
+		UINT32 ea = GetEA(cpustate,modrm);
+
+		switch ((modrm >> 3) & 0x7)
+		{
+		case 6:  // FDIV
+			UINT32 src = READ32(cpustate,ea);
+			if(src == 0)
+				fatalerror("FPU: Unimplemented Divide-by-zero exception at %08X.\n", cpustate->pc-2);
+			ST(0).f = ST(0).f / src;
+			CYCLES(cpustate,1);		// TODO
+			break;
+		}
+	}
+	else
+	{
+		fatalerror("I386: FPU Op D8 %02X at %08X", modrm, cpustate->pc-2);
+	}
 }
 
 static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9

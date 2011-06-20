@@ -422,7 +422,6 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 
 		cpustate->TF = 0;
 		cpustate->IF = 0;
-
 	}
 	else
 	{
@@ -510,6 +509,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				i386_task_switch(cpustate,desc.selector,0);
 			else
 				i286_task_switch(cpustate,desc.selector,0);
+			return;
 		}
 		else
 		{
@@ -519,7 +519,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			i386_load_protected_mode_segment(cpustate,&desc);
 			CPL = cpustate->CPL;  // current privilege level
 			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
-//          RPL = segment & 0x03;  // requested privilege level
+//			RPL = segment & 0x03;  // requested privilege level
 
 			if((segment & ~0x07) == 0)
 			{
@@ -556,11 +556,20 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			{
 				/* IRQ to inner privilege */
 				I386_SREG stack;
+				UINT32 newESP,oldSS,oldESP;
 
 				/* Check new stack segment in TSS */
 				memset(&stack, 0, sizeof(stack));
-				stack.selector = i386_get_stack_segment(cpustate,DPL);
+				if(flags & 0x0008)
+					stack.selector = i386_get_stack_segment(cpustate,DPL);
+				else
+					stack.selector = i286_get_stack_segment(cpustate,DPL);
 				i386_load_protected_mode_segment(cpustate,&stack);
+				oldSS = cpustate->sreg[SS].selector;
+				if(flags & 0x0008)
+					oldESP = REG32(ESP);
+				else
+					oldESP = REG16(SP);
 				if((stack.selector & ~0x07) == 0)
 				{
 					logerror("IRQ: New stack selector is null.\n");
@@ -604,7 +613,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				if(type & 0x08) // 32-bit gate
 				{
-					UINT32 newESP = i386_get_stack_ptr(cpustate,DPL);
+					newESP = i386_get_stack_ptr(cpustate,DPL);
 					if(newESP < 20)
 					{
 						logerror("IRQ: New stack has no space for return addresses.\n");
@@ -613,7 +622,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				else // 16-bit gate
 				{
-					UINT32 newESP = i386_get_stack_ptr(cpustate,DPL);
+					newESP = i286_get_stack_ptr(cpustate,DPL);
 					if(newESP < 10)
 					{
 						logerror("IRQ: New stack has no space for return addresses.\n");
@@ -626,20 +635,23 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					FAULT_EXP(FAULT_GP,0)
 				}
 				/* Load new stack segment descriptor */
-				cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,DPL);
+				cpustate->sreg[SS].selector = stack.selector;
 				i386_load_segment_descriptor(cpustate,SS);
-				REG32(ESP) = i386_get_stack_ptr(cpustate,DPL);
+				if(flags & 0x0008)
+					REG32(ESP) = i386_get_stack_ptr(cpustate,DPL);
+				else
+					REG16(SP) = i286_get_stack_ptr(cpustate,DPL);
 				if(type & 0x08)
 				{
 					// 32-bit gate
-					PUSH32(cpustate,cpustate->sreg[SS].selector);
-					PUSH32(cpustate,REG32(ESP));
+					PUSH32(cpustate,oldSS);
+					PUSH32(cpustate,oldESP);
 				}
 				else
 				{
 					// 16-bit gate
-					PUSH16(cpustate,cpustate->sreg[SS].selector);
-					PUSH16(cpustate,REG16(ESP));
+					PUSH16(cpustate,oldSS);
+					PUSH16(cpustate,oldESP);
 				}
 				cpustate->CPL = DPL;
 				SetRPL = 1;
@@ -733,15 +745,15 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	/* For tasks that aren't nested, clear the busy bit in the task's descriptor */
 	if(nested == 0)
 	{
-		if(cpustate->sreg[CS].selector & 0x0004)
+		if(cpustate->task.segment & 0x0004)
 		{
-			ar_byte = READ8(cpustate,cpustate->ldtr.base + ((cpustate->sreg[CS].selector & ~0x0007)*8) + 5);
-			WRITE8(cpustate,cpustate->ldtr.base + ((cpustate->sreg[CS].selector & ~0x0007)*8) + 5,ar_byte & ~0x02);
+			ar_byte = READ8(cpustate,cpustate->ldtr.base + (cpustate->task.segment & ~0x0007) + 5);
+			WRITE8(cpustate,cpustate->ldtr.base + (cpustate->task.segment & ~0x0007) + 5,ar_byte & ~0x02);
 		}
 		else
 		{
-			ar_byte = READ8(cpustate,cpustate->gdtr.base + ((cpustate->sreg[CS].selector & ~0x0007)*8) + 5);
-			WRITE8(cpustate,cpustate->gdtr.base + ((cpustate->sreg[CS].selector & ~0x0007)*8) + 5,ar_byte & ~0x02);
+			ar_byte = READ8(cpustate,cpustate->gdtr.base + (cpustate->task.segment & ~0x0007) + 5);
+			WRITE8(cpustate,cpustate->gdtr.base + (cpustate->task.segment & ~0x0007) + 5,ar_byte & ~0x02);
 		}
 	}
 
@@ -779,7 +791,7 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	/* Load incoming task state from the new task's TSS */
 	tss = cpustate->task.base;
 	cpustate->eip = READ16(cpustate,tss+0x0e);
-	set_flags(cpustate,READ32(cpustate,tss+0x10));
+	set_flags(cpustate,READ16(cpustate,tss+0x10));
 	REG16(AX) = READ16(cpustate,tss+0x12);
 	REG16(CX) = READ16(cpustate,tss+0x14);
 	REG16(DX) = READ16(cpustate,tss+0x16);
@@ -796,7 +808,7 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	i386_load_segment_descriptor(cpustate, SS);
 	cpustate->sreg[DS].selector = READ16(cpustate,tss+0x28) & 0xffff;
 	i386_load_segment_descriptor(cpustate, DS);
-	cpustate->ldtr.segment = READ32(cpustate,tss+0x2a) & 0xffff;
+	cpustate->ldtr.segment = READ16(cpustate,tss+0x2a) & 0xffff;
 	seg.selector = cpustate->ldtr.segment;
 	i386_load_protected_mode_segment(cpustate,&seg);
 	cpustate->ldtr.limit = seg.limit;
@@ -804,27 +816,28 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	cpustate->ldtr.flags = seg.flags;
 
 	/* Set the busy bit in the new task's descriptor */
-	if(seg.selector & 0x0004)
+	if(selector & 0x0004)
 	{
-		ar_byte = READ8(cpustate,cpustate->ldtr.base + ((seg.selector & ~0x0007)*8) + 5);
-		WRITE8(cpustate,cpustate->ldtr.base + ((seg.selector & ~0x0007)*8) + 5,ar_byte | 0x02);
+		ar_byte = READ8(cpustate,cpustate->ldtr.base + (selector & ~0x0007) + 5);
+		WRITE8(cpustate,cpustate->ldtr.base + (selector & ~0x0007) + 5,ar_byte | 0x02);
 	}
 	else
 	{
-		ar_byte = READ8(cpustate,cpustate->gdtr.base + ((seg.selector & ~0x0007)*8) + 5);
-		WRITE8(cpustate,cpustate->gdtr.base + ((seg.selector & ~0x0007)*8) + 5,ar_byte | 0x02);
+		ar_byte = READ8(cpustate,cpustate->gdtr.base + (selector & ~0x0007) + 5);
+		WRITE8(cpustate,cpustate->gdtr.base + (selector & ~0x0007) + 5,ar_byte | 0x02);
 	}
 
 	/* For nested tasks, we write the outgoing task's selector to the back-link field of the new TSS,
-       and set the NT flag in the EFLAGS register */
+	   and set the NT flag in the EFLAGS register */
 	if(nested != 0)
 	{
 		WRITE16(cpustate,tss+0,old_task);
 		cpustate->NT = 1;
 	}
+	CHANGE_PC(cpustate,cpustate->eip);
 
 	cpustate->CPL = cpustate->sreg[CS].selector & 0x03;
-	printf("286 Task Switch from selector %04x to %04x\n",old_task,seg.selector);
+	printf("286 Task Switch from selector %04x to %04x\n",old_task,selector);
 }
 
 static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested)
@@ -839,20 +852,21 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	/* For tasks that aren't nested, clear the busy bit in the task's descriptor */
 	if(nested == 0)
 	{
-		if(cpustate->sreg[CS].selector & 0x0004)
+		if(cpustate->task.segment & 0x0004)
 		{
-			ar_byte = READ8(cpustate,cpustate->ldtr.base + ((cpustate->sreg[CS].selector & ~0x0007)*8) + 5);
-			WRITE8(cpustate,cpustate->ldtr.base + ((cpustate->sreg[CS].selector & ~0x0007)*8) + 5,ar_byte & ~0x02);
+			ar_byte = READ8(cpustate,cpustate->ldtr.base + (cpustate->task.segment & ~0x0007) + 5);
+			WRITE8(cpustate,cpustate->ldtr.base + (cpustate->task.segment & ~0x0007) + 5,ar_byte & ~0x02);
 		}
 		else
 		{
-			ar_byte = READ8(cpustate,cpustate->gdtr.base + ((cpustate->sreg[CS].selector & ~0x0007)*8) + 5);
-			WRITE8(cpustate,cpustate->gdtr.base + ((cpustate->sreg[CS].selector & ~0x0007)*8) + 5,ar_byte & ~0x02);
+			ar_byte = READ8(cpustate,cpustate->gdtr.base + (cpustate->task.segment & ~0x0007) + 5);
+			WRITE8(cpustate,cpustate->gdtr.base + (cpustate->task.segment & ~0x0007) + 5,ar_byte & ~0x02);
 		}
 	}
 
 	/* Save the state of the current task in the current TSS (TR register base) */
 	tss = cpustate->task.base;
+	WRITE32(cpustate,tss+0x1c,cpustate->cr[3]);  // correct?
 	WRITE32(cpustate,tss+0x20,cpustate->eip);
 	WRITE32(cpustate,tss+0x24,get_flags(cpustate));
 	WRITE32(cpustate,tss+0x28,REG32(EAX));
@@ -917,27 +931,28 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	cpustate->ldtr.flags = seg.flags;
 
 	/* Set the busy bit in the new task's descriptor */
-	if(seg.selector & 0x0004)
+	if(selector & 0x0004)
 	{
-		ar_byte = READ8(cpustate,cpustate->ldtr.base + ((seg.selector & ~0x0007)*8) + 5);
-		WRITE8(cpustate,cpustate->ldtr.base + ((seg.selector & ~0x0007)*8) + 5,ar_byte | 0x02);
+		ar_byte = READ8(cpustate,cpustate->ldtr.base + (selector & ~0x0007) + 5);
+		WRITE8(cpustate,cpustate->ldtr.base + (selector & ~0x0007) + 5,ar_byte | 0x02);
 	}
 	else
 	{
-		ar_byte = READ8(cpustate,cpustate->gdtr.base + ((seg.selector & ~0x0007)*8) + 5);
-		WRITE8(cpustate,cpustate->gdtr.base + ((seg.selector & ~0x0007)*8) + 5,ar_byte | 0x02);
+		ar_byte = READ8(cpustate,cpustate->gdtr.base + (selector & ~0x0007) + 5);
+		WRITE8(cpustate,cpustate->gdtr.base + (selector & ~0x0007) + 5,ar_byte | 0x02);
 	}
 
 	/* For nested tasks, we write the outgoing task's selector to the back-link field of the new TSS,
-       and set the NT flag in the EFLAGS register */
+	   and set the NT flag in the EFLAGS register */
 	if(nested != 0)
 	{
 		WRITE32(cpustate,tss+0,old_task);
 		cpustate->NT = 1;
 	}
+	CHANGE_PC(cpustate,cpustate->eip);
 
 	cpustate->CPL = cpustate->sreg[CS].selector & 0x03;
-	printf("386 Task Switch from selector %04x to %04x",old_task,seg.selector);
+	printf("386 Task Switch from selector %04x to %04x\n",old_task,selector);
 }
 
 static void i386_check_irq_line(i386_state *cpustate)
@@ -1042,6 +1057,10 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 			{
 			case 0x09:  // 386 Available TSS
 				popmessage("JMP: Available TSS.");
+				memset(&desc, 0, sizeof(desc));
+				desc.selector = segment;
+				i386_load_protected_mode_segment(cpustate,&desc);
+				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				if(DPL < CPL)
 				{
 					logerror("JMP: TSS: DPL %i is less than CPL %i\n",DPL,CPL);
@@ -1052,15 +1071,16 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 					logerror("JMP: TSS: DPL %i is less than TSS RPL %i\n",DPL,RPL);
 					FAULT(FAULT_GP,segment & 0xfffc)
 				}
-				if(call_gate.present == 0)
+				if((desc.flags & 0x0080) == 0)
 				{
 					logerror("JMP: TSS: Segment is not present\n");
 					FAULT(FAULT_GP,segment & 0xfffc)
 				}
-				if(call_gate.ar & 0x08)
+				if(desc.flags & 0x0008)
 					i386_task_switch(cpustate,desc.selector,0);
 				else
 					i286_task_switch(cpustate,desc.selector,0);
+				return;
 				break;
 			case 0x04:  // 286 Call Gate
 			case 0x0c:  // 386 Call Gate
@@ -1199,9 +1219,10 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 					i386_task_switch(cpustate,call_gate.selector,0);
 				else
 					i286_task_switch(cpustate,call_gate.selector,0);
+				return;
 				break;
 			default:  // invalid segment type
-				logerror("JMP: Invalid segment type (%i) to jump to.",desc.flags & 0x000f);
+				logerror("JMP: Invalid segment type (%i) to jump to.\n",desc.flags & 0x000f);
 				FAULT(FAULT_GP,segment & 0xfffc)
 			}
 		}
@@ -1349,10 +1370,10 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					i386_task_switch(cpustate,desc.selector,1);
 				else
 					i286_task_switch(cpustate,desc.selector,1);
+				return;
 				break;
 			case 0x04:  // 286 call gate
 			case 0x0c:  // 386 call gate
-				logerror("CALL: Call gate at %08x\n",cpustate->pc);
 				if((desc.flags & 0x000f) == 0x04)
 					operand32 = 0;
 				else
@@ -1361,6 +1382,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				gate.segment = selector;
 				i386_load_call_gate(cpustate,&gate);
 				DPL = gate.dpl;
+				logerror("CALL: Call gate at %08x (%i parameters)\n",cpustate->pc,gate.dword_count);
 				if(DPL < CPL)
 				{
 					logerror("CALL: Call gate DPL %i is less than CPL %i.\n",DPL,CPL);
@@ -1617,6 +1639,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					i386_task_switch(cpustate,desc.selector,1);  // with nesting
 				else
 					i286_task_switch(cpustate,desc.selector,1);
+				return;
 				break;
 			default:
 				logerror("CALL: Invalid special segment type (%i) to jump to.\n",desc.flags & 0x000f);
@@ -1778,6 +1801,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 				FAULT(FAULT_SS,0)
 			}
 		}
+
 		/* Check CS selector and descriptor */
 		if((newCS & ~0x07) == 0)
 		{
@@ -1886,6 +1910,11 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		cpustate->sreg[SS].selector = newSS;
 		i386_load_segment_descriptor(cpustate, SS );
 
+		if(operand32 == 0)
+			REG16(SP) += count;
+		else
+			REG32(ESP) += count;
+
 		/* Check that DS, ES, FS and GS are valid for the new privilege level */
 		i386_check_sreg_validity(cpustate,DS);
 		i386_check_sreg_validity(cpustate,ES);
@@ -1959,11 +1988,11 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			logerror("IRET: Task return: Back-linked TSS is not present.\n");
 			FAULT(FAULT_NP,task & ~0x07)
 		}
-		i386_task_switch(cpustate,task,0);  // no nesting
 		if(desc.flags & 0x08)
 			i386_task_switch(cpustate,desc.selector,0);
 		else
 			i286_task_switch(cpustate,desc.selector,0);
+		return;
 	}
 	else
 	{
