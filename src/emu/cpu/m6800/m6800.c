@@ -1433,16 +1433,19 @@ READ8_HANDLER( m6801_io_r )
 		break;
 
 	case IO_P3DATA:
-		if (cpustate->p3csr_is3_flag_read)
+		if (!space->debugger_access())
 		{
-			//logerror("M6801 '%s' Cleared IS3\n", space->device().tag());
-			cpustate->p3csr &= ~M6801_P3CSR_IS3_FLAG;
-			cpustate->p3csr_is3_flag_read = 0;
-		}
+			if (cpustate->p3csr_is3_flag_read)
+			{
+				//logerror("M6801 '%s' Cleared IS3\n", space->device().tag());
+				cpustate->p3csr &= ~M6801_P3CSR_IS3_FLAG;
+				cpustate->p3csr_is3_flag_read = 0;
+			}
 
-		if (!(cpustate->p3csr & M6801_P3CSR_OSS))
-		{
-			set_os3(cpustate, ASSERT_LINE);
+			if (!(cpustate->p3csr & M6801_P3CSR_OSS))
+			{
+				set_os3(cpustate, ASSERT_LINE);
+			}
 		}
 
 		if ((cpustate->p3csr & M6801_P3CSR_LE) || (cpustate->port3_ddr == 0xff))
@@ -1451,11 +1454,14 @@ READ8_HANDLER( m6801_io_r )
 			data = (cpustate->io->read_byte(M6801_PORT3) & (cpustate->port3_ddr ^ 0xff))
 				| (cpustate->port3_data & cpustate->port3_ddr);
 
-		cpustate->port3_latched = 0;
-
-		if (!(cpustate->p3csr & M6801_P3CSR_OSS))
+		if (!space->debugger_access())
 		{
-			set_os3(cpustate, CLEAR_LINE);
+			cpustate->port3_latched = 0;
+
+			if (!(cpustate->p3csr & M6801_P3CSR_OSS))
+			{
+				set_os3(cpustate, CLEAR_LINE);
+			}
 		}
 		break;
 
@@ -1473,7 +1479,7 @@ READ8_HANDLER( m6801_io_r )
 		break;
 
 	case IO_CH:
-		if(!(cpustate->pending_tcsr&TCSR_TOF))
+		if(!(cpustate->pending_tcsr&TCSR_TOF) && !space->debugger_access())
 		{
 			cpustate->tcsr &= ~TCSR_TOF;
 			MODIFIED_tcsr;
@@ -1485,7 +1491,7 @@ READ8_HANDLER( m6801_io_r )
 		data = cpustate->counter.b.l;
 
 	case IO_OCRH:
-		if(!(cpustate->pending_tcsr&TCSR_OCF))
+		if(!(cpustate->pending_tcsr&TCSR_OCF) && !space->debugger_access())
 		{
 			cpustate->tcsr &= ~TCSR_OCF;
 			MODIFIED_tcsr;
@@ -1494,7 +1500,7 @@ READ8_HANDLER( m6801_io_r )
 		break;
 
 	case IO_OCRL:
-		if(!(cpustate->pending_tcsr&TCSR_OCF))
+		if(!(cpustate->pending_tcsr&TCSR_OCF) && !space->debugger_access())
 		{
 			cpustate->tcsr &= ~TCSR_OCF;
 			MODIFIED_tcsr;
@@ -1503,7 +1509,7 @@ READ8_HANDLER( m6801_io_r )
 		break;
 
 	case IO_ICRH:
-		if(!(cpustate->pending_tcsr&TCSR_ICF))
+		if(!(cpustate->pending_tcsr&TCSR_ICF) && !space->debugger_access())
 		{
 			cpustate->tcsr &= ~TCSR_ICF;
 			MODIFIED_tcsr;
@@ -1516,7 +1522,7 @@ READ8_HANDLER( m6801_io_r )
 		break;
 
 	case IO_P3CSR:
-		if (cpustate->p3csr & M6801_P3CSR_IS3_FLAG)
+		if ((cpustate->p3csr & M6801_P3CSR_IS3_FLAG) && !space->debugger_access())
 		{
 			cpustate->p3csr_is3_flag_read = 1;
 		}
@@ -1529,37 +1535,43 @@ READ8_HANDLER( m6801_io_r )
 		break;
 
 	case IO_TRCSR:
-		if (cpustate->trcsr & M6800_TRCSR_TDRE)
+		if (!space->debugger_access())
 		{
-			cpustate->trcsr_read_tdre = 1;
-		}
+			if (cpustate->trcsr & M6800_TRCSR_TDRE)
+			{
+				cpustate->trcsr_read_tdre = 1;
+			}
 
-		if (cpustate->trcsr & M6800_TRCSR_ORFE)
-		{
-			cpustate->trcsr_read_orfe = 1;
-		}
+			if (cpustate->trcsr & M6800_TRCSR_ORFE)
+			{
+				cpustate->trcsr_read_orfe = 1;
+			}
 
-		if (cpustate->trcsr & M6800_TRCSR_RDRF)
-		{
-			cpustate->trcsr_read_rdrf = 1;
+			if (cpustate->trcsr & M6800_TRCSR_RDRF)
+			{
+				cpustate->trcsr_read_rdrf = 1;
+			}
 		}
 
 		data = cpustate->trcsr;
 		break;
 
 	case IO_RDR:
-		if (cpustate->trcsr_read_orfe)
+		if (!space->debugger_access())
 		{
-			//logerror("M6801 '%s' Cleared ORFE\n", space->device().tag());
-			cpustate->trcsr_read_orfe = 0;
-			cpustate->trcsr &= ~M6800_TRCSR_ORFE;
-		}
+			if (cpustate->trcsr_read_orfe)
+			{
+				//logerror("M6801 '%s' Cleared ORFE\n", space->device().tag());
+				cpustate->trcsr_read_orfe = 0;
+				cpustate->trcsr &= ~M6800_TRCSR_ORFE;
+			}
 
-		if (cpustate->trcsr_read_rdrf)
-		{
-			//logerror("M6801 '%s' Cleared RDRF\n", space->device().tag());
-			cpustate->trcsr_read_rdrf = 0;
-			cpustate->trcsr &= ~M6800_TRCSR_RDRF;
+			if (cpustate->trcsr_read_rdrf)
+			{
+				//logerror("M6801 '%s' Cleared RDRF\n", space->device().tag());
+				cpustate->trcsr_read_rdrf = 0;
+				cpustate->trcsr &= ~M6800_TRCSR_RDRF;
+			}
 		}
 
 		data = cpustate->rdr;
