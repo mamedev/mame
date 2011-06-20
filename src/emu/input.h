@@ -490,7 +490,6 @@ public:
 
 	// constant sequences
 	static const input_seq empty_seq;
-	static const input_seq default_seq;
 
 private:
 	// internal state

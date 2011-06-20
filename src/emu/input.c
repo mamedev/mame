@@ -59,15 +59,14 @@
 // invalid memory value for axis polling
 const INT32 INVALID_AXIS_VALUE		= 0x7fffffff;
 
-// constant sequences
-const input_seq input_seq::empty_seq;
-const input_seq input_seq::default_seq(input_seq::default_code);
-
 // additional expanded input codes for sequences
 const input_code input_seq::end_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_END);
 const input_code input_seq::default_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_DEFAULT);
 const input_code input_seq::not_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_NOT);
 const input_code input_seq::or_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_OR);
+
+// constant sequences
+const input_seq input_seq::empty_seq;
 
 
 

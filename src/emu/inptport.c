@@ -1080,9 +1080,8 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 	for (seqtype = 0; seqtype < ARRAY_LENGTH(settings->seq); seqtype++)
 	{
 		const input_seq &defseq = input_type_seq(field->machine(), field->type, field->player, (input_seq_type)seqtype);
-		// TODO: find what the default_seq/ITEM_ID_SEQ_DEFAULT is supposed to do, besides crashing mame
-		if (false && defseq == settings->seq[seqtype])
-			field->state->seq[seqtype] = input_seq::default_seq;
+		if (defseq == settings->seq[seqtype])
+			field->state->seq[seqtype].set_default();
 		else
 			field->state->seq[seqtype] = settings->seq[seqtype];
 	}
@@ -4906,8 +4905,6 @@ input_type_entry::input_type_entry(UINT32 _type, ioport_group _group, int _playe
 	  m_next(NULL)
 {
 	defseq[SEQ_TYPE_STANDARD] = seq[SEQ_TYPE_STANDARD] = standard;
-	defseq[SEQ_TYPE_INCREMENT] = seq[SEQ_TYPE_INCREMENT] = input_seq::empty_seq;
-	defseq[SEQ_TYPE_DECREMENT] = seq[SEQ_TYPE_DECREMENT] = input_seq::empty_seq;
 }
 
 input_type_entry::input_type_entry(UINT32 _type, ioport_group _group, int _player, const char *_token, const char *_name, input_seq standard, input_seq decrement, input_seq increment)
