@@ -718,6 +718,7 @@ static void PREFIX286(_arpl)(i8086_state *cpustate) /* 0x63 */
 
 static void i80286_load_flags(i8086_state *cpustate, UINT16 flags, int cpl)
 {
+	cpustate->flags = CompressFlags();
 	if(PM && cpl) {
 		UINT16 mask = 0x3000;
 		if(cpl>IOPL) mask |= 0x200;
@@ -727,7 +728,6 @@ static void i80286_load_flags(i8086_state *cpustate, UINT16 flags, int cpl)
 	else if(!PM) (flags &= ~0xf000);
 	ExpandFlags(flags);
 	cpustate->flags = flags;
-	cpustate->flags = CompressFlags();
 
 	if (cpustate->TF) PREFIX(_trap)(cpustate);
 	/* if the IF is set, and an interrupt is pending, signal an interrupt */
@@ -778,7 +778,7 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 		else if (DPL(r)!=RPL(sel)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
 
 		if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,IDXTBL(sel));
-		if (off > LIMIT(desc)) throw TRAP(GENERAL_PROTECTION_FAULT, IDXTBL(sel));
+		if (off > LIMIT(desc)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
 		if (CPL<RPL(sel)) {
 			i80286_check_permission(cpustate, SS, cpustate->regs.w[SP]+(iret?6:4)+bytes, 4, I80286_READ);
 			newsp = ReadWord(spaddr+((iret?6:4)+bytes));
@@ -792,19 +792,20 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 		cpustate->limit[CS]=LIMIT(desc);
 		cpustate->base[CS]=BASE(desc);
 		cpustate->rights[CS]=RIGHTS(desc);
-		cpustate->pc=(cpustate->base[CS]+off)&AMASK ;
+		cpustate->pc=(cpustate->base[CS]+off)&AMASK;
 
 		// docs say check rpl but windows doesn't like it
-		if (i80286_verify(cpustate, cpustate->sregs[DS], I80286_READ, cpustate->rights[DS]) || (DPL(cpustate->rights[DS]) < CPL))
+		r = cpustate->rights[DS];
+		if (i80286_verify(cpustate, cpustate->sregs[DS], I80286_READ, r) || (CODE(r) && CONF(r) ? 0 : (DPL(r) < CPL)))
 			i80286_data_descriptor(cpustate, DS, 0);
-
-		if (i80286_verify(cpustate, cpustate->sregs[ES], I80286_READ, cpustate->rights[ES]) || (DPL(cpustate->rights[ES]) < CPL))
+		r = cpustate->rights[ES];
+		if (i80286_verify(cpustate, cpustate->sregs[ES], I80286_READ, r) || (CODE(r) && CONF(r) ? 0 : (DPL(r) < CPL)))
 			i80286_data_descriptor(cpustate, ES, 0);
 	} else {
 		cpustate->regs.w[SP] += (iret?6:4) + bytes;
 		cpustate->sregs[CS]=sel;
 		cpustate->base[CS]=sel<<4;
-		cpustate->rights[CS]=0x93;
+		cpustate->rights[CS]=0x9a;
 		cpustate->limit[CS]=0xffff;
 		cpustate->pc=(cpustate->base[CS]+off)&AMASK;
 	}

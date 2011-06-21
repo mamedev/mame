@@ -84,7 +84,7 @@ typedef enum {
 #define CF					(int)(cpustate->CarryVal != 0)
 #define SF					(int)(cpustate->SignVal < 0)
 #define ZF					(int)(cpustate->ZeroVal == 0)
-#define PF					parity_table[cpustate->ParityVal]
+#define PF					parity_table[cpustate->ParityVal&0xff]
 #define AF					(int)(cpustate->AuxVal != 0)
 #define OF					(int)(cpustate->OverVal != 0)
 #define DF					(int)(cpustate->DirVal < 0)

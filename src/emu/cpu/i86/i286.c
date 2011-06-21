@@ -160,7 +160,8 @@ static CPU_RESET( i80286 )
 	cpustate->limit[CS]=cpustate->limit[SS]=cpustate->limit[DS]=cpustate->limit[ES]=0xffff;
 	cpustate->sregs[DS]=cpustate->sregs[SS]=cpustate->sregs[ES]=0;
 	cpustate->base[DS]=cpustate->base[SS]=cpustate->base[ES]=0;
-	cpustate->rights[CS]=cpustate->rights[DS]=cpustate->rights[SS]=cpustate->rights[ES]=0x93;
+	cpustate->rights[DS]=cpustate->rights[SS]=cpustate->rights[ES]=0x93;
+	cpustate->rights[CS]=0x9a;
 	cpustate->msw=0xfff0;
 	cpustate->flags=2;
 	ExpandFlags(cpustate->flags);
