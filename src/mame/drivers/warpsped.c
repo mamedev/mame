@@ -2,7 +2,16 @@
 
 Meadows Warp Speed
 
-Preliminary driver by Mariusz Wojcieszek
+Driver by Mariusz Wojcieszek
+
+Notes:
+- Circles drawing does not follow the hardware. Roms which come in pairs four times
+  on the board are used by circle generators. These roms are thought to contain cosine tables,
+  16 bits wide, with g17 being the MSB and g18 being the LSB
+- Circles colors are probably not correct
+- Starfield is wrong. It is done with tilemap fixed in rom, but rom mapping is not correct.
+  Starfield scrolling is missing too
+- What are unknown roms used for?
 
 Hardware registers:
 0x00 - 0x1f control register for circles generator (8 bytes each)			
@@ -89,18 +98,6 @@ public:
 	UINT8		*m_workram;
 	UINT8		m_regs[0x28];
 };
-
-static READ8_HANDLER( warpspeed_hardware_r )
-{
-//	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
-
-	switch( offset )
-	{
-		case 0: return input_port_read(space->machine(), "IN1" );
-		case 2: return input_port_read(space->machine(), "DSW" ); 		case 3: return input_port_read(space->machine(), "IN0" );
-	}
-	return 0;
-}
 
 static WRITE8_HANDLER( warpspeed_hardware_w )
 {
@@ -224,20 +221,27 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_READ( warpspeed_hardware_r )
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN2")
 	AM_RANGE(0x00, 0x27) AM_WRITE( warpspeed_hardware_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( warpspeed )
 	PORT_START("IN0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Accelerate" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Brake" )
+	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(20) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_REVERSE
+
+	PORT_START("IN1")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(20) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_REVERSE
+
+	PORT_START("IN2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Accelerate" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Brake" )
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x00, "Coin/Time" )
@@ -358,4 +362,4 @@ static DRIVER_INIT( warpspeed )
 {
 }
 
-GAME( 197?, warpsped,  0,      warpspeed, warpspeed, warpspeed, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 197?, warpsped,  0,      warpspeed, warpspeed, warpspeed, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_NO_SOUND )
