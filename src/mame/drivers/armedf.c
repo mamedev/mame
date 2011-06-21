@@ -1631,12 +1631,46 @@ ROM_END
 
 ROM_START( terraf )
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
-	ROM_LOAD16_BYTE( "tf-014.6e", 0x00000, 0x10000, CRC(8e5f557f) SHA1(3462a58146c3f33bf8686adbd2ead25dae3804a8) )
-	ROM_LOAD16_BYTE( "tf-011.6h", 0x00001, 0x10000, CRC(5320162a) SHA1(eaffafcaf146cdddb03f40f92ce23dfd096eb89e) )
-	ROM_LOAD16_BYTE( "tf-013.4e", 0x20000, 0x10000, CRC(a86951e0) SHA1(804cc6f143993f5a9d5f3798e971d7abfe94c3a8) )
-	ROM_LOAD16_BYTE( "tf-010.4h", 0x20001, 0x10000, CRC(58b5f43b) SHA1(9df77235c0b7ac5af4258c04bd90d0a86ccc86b0) )
-	ROM_LOAD16_BYTE( "tf-012.3e", 0x40000, 0x08000, CRC(4f0e1d76) SHA1(b8636acde7547358663b94bdc8d49b5cc6b596eb) )
-	ROM_LOAD16_BYTE( "tf-009.3h", 0x40001, 0x08000, CRC(d1014280) SHA1(5ee8d71d77b31b25cce2bf1953c0a5166313a857) )
+	ROM_LOAD16_BYTE( "8.6e", 0x00000, 0x10000, CRC(fd58fa06) SHA1(f1f5fbd153be5fd5669aada66134baedfeac5d32) )
+	ROM_LOAD16_BYTE( "3.6h", 0x00001, 0x10000, CRC(54823a7d) SHA1(bdf67890428710470a622ea48383b3fae8de8cbd) )
+	ROM_LOAD16_BYTE( "7.4e", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
+	ROM_LOAD16_BYTE( "2.4h", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
+	ROM_LOAD16_BYTE( "6.3e", 0x40000, 0x10000, CRC(a5bb8c3b) SHA1(36730b1a4a686de7251b80eb084a00f64bd7b40d) )
+	ROM_LOAD16_BYTE( "1.3h", 0x40001, 0x10000, CRC(d2de6d28) SHA1(0371b5bf8e6105aaf8847c4b6d0d2d7d105079c1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
+	ROM_LOAD( "11.17k", 0x00000, 0x10000,  CRC(4407d475) SHA1(96e86c7ef4dc997812436f7d0ddea332b4e6cb2b) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
+	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
+	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
+
+	ROM_REGION( 0x20000, "gfx4", 0 )
+	ROM_LOAD( "12.7d", 0x00000, 0x10000, CRC(2d1f2ceb) SHA1(77544e1c4bda06feac135a96bb76af7c79278dc0) ) /* sprites */
+	ROM_LOAD( "13.9d", 0x10000, 0x10000, CRC(1d2f92d6) SHA1(e842c6bf95a5958a6ca2c85e68b9bc3cc15211a4) )
+
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
+	ROM_LOAD( "10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
+
+	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
+	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
+ROM_END
+
+ROM_START( terrafu ) /* Bootleg of the USA version?, uses some roms common to bootlegs that differ to the orginal board sets */
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
+	ROM_LOAD16_BYTE( "tf-8.6e", 0x00000, 0x10000, CRC(fea6dd64) SHA1(682eae338ce14808f134897f594fae1c69e75a1a) )
+	ROM_LOAD16_BYTE( "tf-3.6h", 0x00001, 0x10000, CRC(02f9d05a) SHA1(88985373bc3cffbc838e0b701ecd732a417975a1) )
+	ROM_LOAD16_BYTE( "tf-7.4e", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
+	ROM_LOAD16_BYTE( "tf-2.4h", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
+	ROM_LOAD16_BYTE( "tf-6.3e", 0x40000, 0x08000, CRC(b91e9ba3) SHA1(33e5272d1691859a2bb1f340eb4bdfdd5d73a5d4) ) /* Half the size of World & Japan sets?? */
+	ROM_LOAD16_BYTE( "tf-1.3h", 0x40001, 0x08000, CRC(d6e22375) SHA1(c84fc19700b65ee36b0c7d75cd7c97f86c7f719d) ) /* bootlegs use this size rom for 1 & 6  */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "tf-001.17k", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
@@ -1656,8 +1690,42 @@ ROM_START( terraf )
 	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
 	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
-	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter, shouldn't be loaded? */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
 	ROM_LOAD( "tf-10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
+
+	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
+	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
+ROM_END
+
+ROM_START( terrafj )
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
+	ROM_LOAD16_BYTE( "tfj-8.bin", 0x00000, 0x10000, CRC(b11a6fa7) SHA1(7bb2b98be02d8913796a6d4fa20eed16226ce6b9) )
+	ROM_LOAD16_BYTE( "tfj-3.bin", 0x00001, 0x10000, CRC(6c6aa7ed) SHA1(ee5fdeb5411034ce0fd1c883ee25bf1fe9a3ec52) )
+	ROM_LOAD16_BYTE( "tfj-7.bin", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
+	ROM_LOAD16_BYTE( "tfj-2.bin", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
+	ROM_LOAD16_BYTE( "tfj-6.bin", 0x40000, 0x10000, CRC(4911dfbf) SHA1(91d3607e98e2e746cebddd20a10a033a5557c017) )
+	ROM_LOAD16_BYTE( "tfj-1.bin", 0x40001, 0x10000, CRC(93063d9a) SHA1(58321e18865a0a72b74beab969b7ea5e010be16a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
+	ROM_LOAD( "11.17k", 0x00000, 0x10000,  CRC(4407d475) SHA1(96e86c7ef4dc997812436f7d0ddea332b4e6cb2b) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
+	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
+	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
+
+	ROM_REGION( 0x20000, "gfx4", 0 )
+	ROM_LOAD( "12.7d", 0x00000, 0x10000, CRC(2d1f2ceb) SHA1(77544e1c4bda06feac135a96bb76af7c79278dc0) ) /* sprites */
+	ROM_LOAD( "13.9d", 0x10000, 0x10000, CRC(1d2f92d6) SHA1(e842c6bf95a5958a6ca2c85e68b9bc3cc15211a4) )
+
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
+	ROM_LOAD( "10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
@@ -1693,12 +1761,12 @@ Company logo and copyright string removed.
 */
 
 
-ROM_START( terrafb )
+ROM_START( terrafjb )
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
-	ROM_LOAD16_BYTE( "tfb-8.bin", 0x00000, 0x10000, CRC(b11a6fa7) SHA1(7bb2b98be02d8913796a6d4fa20eed16226ce6b9) )
-	ROM_LOAD16_BYTE( "tfb-3.bin", 0x00001, 0x10000, CRC(6c6aa7ed) SHA1(ee5fdeb5411034ce0fd1c883ee25bf1fe9a3ec52) )
-	ROM_LOAD16_BYTE( "tfb-7.bin", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
-	ROM_LOAD16_BYTE( "tfb-2.bin", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
+	ROM_LOAD16_BYTE( "tfj-8.bin", 0x00000, 0x10000, CRC(b11a6fa7) SHA1(7bb2b98be02d8913796a6d4fa20eed16226ce6b9) )
+	ROM_LOAD16_BYTE( "tfj-3.bin", 0x00001, 0x10000, CRC(6c6aa7ed) SHA1(ee5fdeb5411034ce0fd1c883ee25bf1fe9a3ec52) )
+	ROM_LOAD16_BYTE( "tfj-7.bin", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
+	ROM_LOAD16_BYTE( "tfj-2.bin", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
 	ROM_LOAD16_BYTE( "tfb-6.bin", 0x40000, 0x08000, CRC(552c3c63) SHA1(82d930b7fcdf4879c4644c47ecce58fd2645f10f) )
 	ROM_LOAD16_BYTE( "tfb-1.bin", 0x40001, 0x08000, CRC(6a0b94c7) SHA1(55fb32ab859bf51a1c79bf962bb677fa557216ed) )
 
@@ -1728,15 +1796,14 @@ ROM_START( terrafb )
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
 ROM_END
 
-
-ROM_START( terrafu )
+ROM_START( terrafb ) /* Seems to be a bootleg of the Japanese version with the region warning screen hacked to just say "WAIT" */
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
-	ROM_LOAD16_BYTE( "tf-8.6e", 0x00000, 0x10000, CRC(fea6dd64) SHA1(682eae338ce14808f134897f594fae1c69e75a1a) )
-	ROM_LOAD16_BYTE( "tf-3.6h", 0x00001, 0x10000, CRC(02f9d05a) SHA1(88985373bc3cffbc838e0b701ecd732a417975a1) )
-	ROM_LOAD16_BYTE( "tf-7.4e", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
-	ROM_LOAD16_BYTE( "tf-2.4h", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
-	ROM_LOAD16_BYTE( "tf-6.3e", 0x40000, 0x08000, CRC(b91e9ba3) SHA1(33e5272d1691859a2bb1f340eb4bdfdd5d73a5d4) )
-	ROM_LOAD16_BYTE( "tf-1.3h", 0x40001, 0x08000, CRC(d6e22375) SHA1(c84fc19700b65ee36b0c7d75cd7c97f86c7f719d) )
+	ROM_LOAD16_BYTE( "tf-014.6e", 0x00000, 0x10000, CRC(8e5f557f) SHA1(3462a58146c3f33bf8686adbd2ead25dae3804a8) )
+	ROM_LOAD16_BYTE( "tf-011.6h", 0x00001, 0x10000, CRC(5320162a) SHA1(eaffafcaf146cdddb03f40f92ce23dfd096eb89e) )
+	ROM_LOAD16_BYTE( "tf-013.4e", 0x20000, 0x10000, CRC(a86951e0) SHA1(804cc6f143993f5a9d5f3798e971d7abfe94c3a8) )
+	ROM_LOAD16_BYTE( "tf-010.4h", 0x20001, 0x10000, CRC(58b5f43b) SHA1(9df77235c0b7ac5af4258c04bd90d0a86ccc86b0) )
+	ROM_LOAD16_BYTE( "tf-012.3e", 0x40000, 0x08000, CRC(4f0e1d76) SHA1(b8636acde7547358663b94bdc8d49b5cc6b596eb) )
+	ROM_LOAD16_BYTE( "tf-009.3h", 0x40001, 0x08000, CRC(d1014280) SHA1(5ee8d71d77b31b25cce2bf1953c0a5166313a857) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "tf-001.17k", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
@@ -1756,41 +1823,7 @@ ROM_START( terrafu )
 	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
 	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
-	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
-	ROM_LOAD( "tf-10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
-
-	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
-	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
-ROM_END
-
-ROM_START( terrafa )
-	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
-	ROM_LOAD16_BYTE( "8.6e", 0x00000, 0x10000, CRC(fd58fa06) SHA1(f1f5fbd153be5fd5669aada66134baedfeac5d32) )
-	ROM_LOAD16_BYTE( "3.6h", 0x00001, 0x10000, CRC(54823a7d) SHA1(bdf67890428710470a622ea48383b3fae8de8cbd) )
-	ROM_LOAD16_BYTE( "7.4e", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
-	ROM_LOAD16_BYTE( "2.4h", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
-	ROM_LOAD16_BYTE( "6.3e", 0x40000, 0x10000, CRC(a5bb8c3b) SHA1(36730b1a4a686de7251b80eb084a00f64bd7b40d) )
-	ROM_LOAD16_BYTE( "1.3h", 0x40001, 0x10000, CRC(d2de6d28) SHA1(0371b5bf8e6105aaf8847c4b6d0d2d7d105079c1) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
-	ROM_LOAD( "11.17k", 0x00000, 0x10000,  CRC(4407d475) SHA1(96e86c7ef4dc997812436f7d0ddea332b4e6cb2b) )
-
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
-
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
-	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
-
-	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
-	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
-
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "12.7d", 0x00000, 0x10000, CRC(2d1f2ceb) SHA1(77544e1c4bda06feac135a96bb76af7c79278dc0) ) /* sprites */
-	ROM_LOAD( "13.9d", 0x10000, 0x10000, CRC(1d2f92d6) SHA1(e842c6bf95a5958a6ca2c85e68b9bc3cc15211a4) )
-
-	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter, shouldn't be loaded? */
 	ROM_LOAD( "tf-10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
@@ -2121,17 +2154,18 @@ static DRIVER_INIT( bigfghtr )
  *
  *************************************/
 
-/*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,         FULLNAME,                          FLAGS */
-GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE )
-GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (Japan bootleg ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
-GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "bootleg",        "Terra Force (bootleg)", GAME_SUPPORTS_SAVE ) //world bootleg?
-GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",        "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 2)", GAME_SUPPORTS_SAVE ) //world?
-GAME( 1987, kozure,   0,        kozure,   kozure,   kozure,   ROT0,   "Nichibutsu",     "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
-GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )
+/*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,                        FULLNAME,                          FLAGS */
+GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE )
+GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan bootleg ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
+GAME( 1987, terraf,   0,        terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafj,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafjb, terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",                       "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafb,  terraf,   terraf,   terraf,   terraf,   ROT0,   "bootleg",                       "Terra Force (bootleg)", GAME_SUPPORTS_SAVE ) //bootleg of Japan with warning screen hacked
+GAME( 1987, kozure,   0,        kozure,   kozure,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
+GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )
-GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr, ROT0,   "Nichibutsu",                    "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
