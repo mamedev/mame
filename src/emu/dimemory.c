@@ -318,7 +318,11 @@ bool device_memory_interface::interface_validity_check(emu_options &options, con
 							{
 								astring fulltag;
 								astring regiontag;
-								device().siblingtag(regiontag, entry->m_region);
+								if (strchr(entry->m_region,':')) {
+									regiontag = entry->m_region;
+								} else {
+									device().siblingtag(regiontag, entry->m_region);
+								}
 								rom_region_name(fulltag, &driver, source, romp);
 								if (fulltag.cmp(regiontag) == 0)
 								{

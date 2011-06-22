@@ -2136,7 +2136,11 @@ void address_space::prepare_map()
 		if (entry->m_region != NULL && entry->m_share == NULL && entry->m_baseptr == NULL)
 		{
 			astring regiontag;
-			m_device.siblingtag(regiontag, entry->m_region);
+			if (strchr(entry->m_region,':')) {
+				regiontag = entry->m_region;
+			} else {
+				m_device.siblingtag(regiontag, entry->m_region);
+			}
 			const memory_region *region = machine().region(regiontag.cstr());
 			if (region == NULL)
 				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
@@ -2149,7 +2153,11 @@ void address_space::prepare_map()
 		// convert any region-relative entries to their memory pointers
 		if (entry->m_region != NULL) {
 			astring regiontag;
-			m_device.siblingtag(regiontag, entry->m_region);
+			if (strchr(entry->m_region,':')) {
+				regiontag = entry->m_region;
+			} else {
+				m_device.siblingtag(regiontag, entry->m_region);
+			}
 			entry->m_memory = machine().region(regiontag.cstr())->base() + entry->m_rgnoffs;
 		}
 	}
