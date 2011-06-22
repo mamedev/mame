@@ -1868,7 +1868,7 @@ static void menu_input_specific_populate(running_machine &machine, ui_menu *menu
 			const char *name = input_field_name(field);
 
 			/* add if we match the group and we have a valid name */
-			if (name != NULL && input_condition_true(machine, &field->condition) &&
+			if (name != NULL && input_condition_true(machine, &field->condition, port->owner()) &&
 				(field->category == 0 || input_category_active(machine, field->category)) &&
 				((field->type == IPT_OTHER && field->name != NULL) || input_type_group(machine, field->type, field->player) != IPG_INVALID))
 			{
@@ -2216,7 +2216,7 @@ static void menu_settings_populate(running_machine &machine, ui_menu *menu, sett
 	/* loop over input ports and set up the current values */
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->type == type && input_condition_true(machine, &field->condition))
+			if (field->type == type && input_condition_true(machine, &field->condition, port->owner()))
 			{
 				UINT32 flags = 0;
 
@@ -2470,7 +2470,7 @@ static void menu_analog_populate(running_machine &machine, ui_menu *menu)
 	/* loop over input ports and add the items */
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (input_type_is_analog(field->type) && input_condition_true(machine, &field->condition))
+			if (input_type_is_analog(field->type) && input_condition_true(machine, &field->condition, port->owner()))
 			{
 				input_field_user_settings settings;
 				int use_autocenter = FALSE;

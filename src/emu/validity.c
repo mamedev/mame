@@ -1038,10 +1038,12 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 			if (field->condition.tag != NULL)
 			{
 				/* find a matching port */
-				for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next())
-					if (strcmp(field->condition.tag, scanport->tag()) == 0)
+				for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next()) {
+					astring porttag;
+					port->owner().subtag(porttag, field->condition.tag);
+					if (strcmp(porttag.cstr(), scanport->tag()) == 0)
 						break;
-
+				}
 				/* if none, error */
 				if (scanport == NULL)
 				{
@@ -1055,10 +1057,12 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 				if (setting->condition.tag != NULL)
 				{
 					/* find a matching port */
-					for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next())
-						if (strcmp(setting->condition.tag, scanport->tag()) == 0)
+					for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next()) {
+						astring porttag;
+						port->owner().subtag(porttag, setting->condition.tag);						
+						if (strcmp(porttag.cstr(), scanport->tag()) == 0)
 							break;
-
+					}
 					/* if none, error */
 					if (scanport == NULL)
 					{
