@@ -79,7 +79,9 @@ void device_sound_interface::static_add_route(device_t &device, UINT32 output, c
 		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device.tag());
 
 	// append a new route to the list
-	sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, target)));
+	astring devtag;
+	device.siblingtag(devtag, target);
+	sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, core_strdup(devtag.cstr()))));
 }
 
 
