@@ -2135,7 +2135,9 @@ void address_space::prepare_map()
 		// validate adjusted addresses against implicit regions
 		if (entry->m_region != NULL && entry->m_share == NULL && entry->m_baseptr == NULL)
 		{
-			const memory_region *region = machine().region(entry->m_region);
+			astring regiontag;
+			m_device.siblingtag(regiontag, entry->m_region);
+			const memory_region *region = machine().region(regiontag.cstr());
 			if (region == NULL)
 				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
 
@@ -2145,8 +2147,11 @@ void address_space::prepare_map()
 		}
 
 		// convert any region-relative entries to their memory pointers
-		if (entry->m_region != NULL)
-			entry->m_memory = machine().region(entry->m_region)->base() + entry->m_rgnoffs;
+		if (entry->m_region != NULL) {
+			astring regiontag;
+			m_device.siblingtag(regiontag, entry->m_region);
+			entry->m_memory = machine().region(regiontag.cstr())->base() + entry->m_rgnoffs;
+		}
 	}
 
 	// now loop over all the handlers and enforce the address mask
