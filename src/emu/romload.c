@@ -1429,8 +1429,10 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	}
 
 	/* now go back and post-process all the regions */
-	for (region = start_region; region != NULL; region = rom_next_region(region))
-		region_post_process(romdata, ROMREGION_GETTAG(region), ROMREGION_ISINVERTED(region));
+	for (region = start_region; region != NULL; region = rom_next_region(region)) {
+		device->subtag(regiontag, ROMREGION_GETTAG(region));
+		region_post_process(romdata, regiontag.cstr(), ROMREGION_ISINVERTED(region));
+	}
 
 	/* display the results and exit */
 	display_rom_load_results(romdata);
@@ -1494,8 +1496,10 @@ static void process_region_list(rom_load_data *romdata)
 
 	/* now go back and post-process all the regions */
 	for (source = rom_first_source(romdata->machine().config()); source != NULL; source = rom_next_source(*source))
-		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
-			region_post_process(romdata, ROMREGION_GETTAG(region), ROMREGION_ISINVERTED(region));
+		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region)) {
+			rom_region_name(regiontag, &romdata->machine().system(), source, region);
+			region_post_process(romdata, regiontag, ROMREGION_ISINVERTED(region));
+		}
 }
 
 
