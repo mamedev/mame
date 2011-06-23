@@ -1785,6 +1785,18 @@ void memory_configure_bank(running_machine &machine, const char *tag, int starte
 
 
 //-------------------------------------------------
+//  memory_configure_bank - configure the
+//  addresses for a bank
+//-------------------------------------------------
+
+void memory_configure_bank(device_t *device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+{
+	astring tempstring;
+	memory_configure_bank(device->machine(), device->subtag(tempstring, tag), startentry, numentries, base, stride);
+}
+
+
+//-------------------------------------------------
 //  memory_configure_bank_decrypted - configure
 //  the decrypted addresses for a bank
 //-------------------------------------------------
@@ -1801,6 +1813,18 @@ void memory_configure_bank_decrypted(running_machine &machine, const char *tag, 
 	// fill in the requested bank entries (backwards to improve allocation)
 	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
 		bank->configure_decrypted(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
+}
+
+
+//-------------------------------------------------
+//  memory_configure_bank_decrypted - configure
+//  the decrypted addresses for a bank
+//-------------------------------------------------
+
+void memory_configure_bank_decrypted(device_t *device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+{
+	astring tempstring;
+	memory_configure_bank_decrypted(device->machine(), device->subtag(tempstring, tag), startentry, numentries, base, stride);
 }
 
 
@@ -1822,6 +1846,18 @@ void memory_set_bank(running_machine &machine, const char *tag, int entrynum)
 
 
 //-------------------------------------------------
+//  memory_set_bank - select one pre-configured
+//  entry to be the new bank base
+//-------------------------------------------------
+
+void memory_set_bank(device_t *device, const char *tag, int entrynum)
+{
+	astring tempstring;
+	memory_set_bank(device->machine(), device->subtag(tempstring, tag), entrynum);
+}
+
+
+//-------------------------------------------------
 //  memory_get_bank - return the currently
 //  selected bank
 //-------------------------------------------------
@@ -1839,6 +1875,18 @@ int memory_get_bank(running_machine &machine, const char *tag)
 
 
 //-------------------------------------------------
+//  memory_get_bank - return the currently
+//  selected bank
+//-------------------------------------------------
+
+int memory_get_bank(device_t *device, const char *tag)
+{
+	astring tempstring;
+	return memory_get_bank(device->machine(), device->subtag(tempstring, tag));
+}
+
+
+//-------------------------------------------------
 //  memory_set_bankptr - set the base of a bank
 //-------------------------------------------------
 
@@ -1851,6 +1899,17 @@ void memory_set_bankptr(running_machine &machine, const char *tag, void *base)
 
 	// set the base
 	bank->set_base(base);
+}
+
+
+//-------------------------------------------------
+//  memory_set_bankptr - set the base of a bank
+//-------------------------------------------------
+
+void memory_set_bankptr(device_t *device, const char *tag, void *base)
+{
+	astring tempstring;
+	return memory_set_bankptr(device->machine(), device->subtag(tempstring, tag), base);
 }
 
 
