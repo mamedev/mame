@@ -28,9 +28,9 @@
       WD2793   x     x          1 or 2 MHz  Internal data separator
       WD2795         x     x    1 or 2 MHz  Internal data separator
       WD2797   x     x     x    1 or 2 MHz  Internal data separator
-      WD1770         x          8 MHz       Motor On signal
-      WD1772         x          8 MHz       Motor On signal, Faster stepping rates
-      WD1773         x          8 MHz       Enable precomp line
+      WD1770   x     x          8 MHz       Motor On signal
+      WD1772   x     x          8 MHz       Motor On signal, Faster stepping rates
+      WD1773   x     x          8 MHz       Enable precomp line
 
       Notes: - In general, later models include all features of earlier models
              - DAL: Data access lines, x = TRUE; otherwise inverted
@@ -136,10 +136,14 @@
     2011-Apr-01 Curt Coder
     - Set complete command delay to 16 usec (DD) / 32 usec (SD) and removed
       the external delay setting hack.
+	  
+	2011-Jun-24 Curt Coder
+	- Added device types for all known variants, and enforced inverted DAL lines.
 
     TODO:
         - What happens if a track is read that doesn't have any id's on it?
          (e.g. unformatted disc)
+		- Rewrite into a C++ device
 
 ***************************************************************************/
 
@@ -397,10 +401,12 @@ static void wd17xx_timed_read_sector_request(device_t *device);
 INLINE wd1770_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == WD1770 || device->type() == WD1771 || device->type() == WD1772 || device->type() == WD1773 ||
-		device->type() == WD1793 ||	device->type() == WD1795 || device->type() == WD1797 ||
-		device->type() == WD2793 || device->type() == WD2795 || device->type() == WD2797 ||
-		device->type() == WD177X || device->type() == WD179X || device->type() == MB8877);
+	assert(device->type() == FD1771 || device->type() == FD1781 || 
+		device->type() == FD1791 || device->type() == FD1792 || device->type() == FD1793 || device->type() == FD1794 || device->type() == FD1795 || device->type() == FD1797 ||
+		device->type() == FD1761 || device->type() == FD1762 || device->type() == FD1763 || device->type() == FD1764 || device->type() == FD1765 || device->type() == FD1767 || 
+		device->type() == WD2791 || device->type() == WD2793 || device->type() == WD2795 || device->type() == WD2797 ||
+		device->type() == WD1770 || device->type() == WD1772 || device->type() == WD1773 || 
+		device->type() == MB8866 || device->type() == MB8876 || device->type() == MB8877);
 
 	return (wd1770_state *)downcast<legacy_device_base *>(device)->token();
 }
@@ -410,9 +416,24 @@ INLINE wd1770_state *get_safe_token(device_t *device)
     HELPER FUNCTIONS
 ***************************************************************************/
 
+static int wd17xx_has_dal(device_t *device)
+{
+	return (device->type() == FD1793 || device->type() == FD1794 || device->type() == FD1797 || 
+			device->type() == FD1763 || device->type() == FD1764 || device->type() == FD1767 || 
+			device->type() == WD1770 || device->type() == WD1772 || device->type() == WD1773 || 
+			device->type() == WD2793 || device->type() == WD2797 ||
+			device->type() == MB8877);
+}
+
+static int wd17xx_is_sd_only(device_t *device)
+{
+	return (device->type() == FD1771 || device->type() == FD1792 || device->type() == FD1794 || device->type() == FD1762 || device->type() == FD1764);
+}
+
 static int wd17xx_has_side_select(device_t *device)
 {
-	return (device->type() == WD1795 || device->type() == WD1797 ||
+	return (device->type() == FD1795 || device->type() == FD1797 ||
+			device->type() == FD1765 || device->type() == FD1767 ||
 			device->type() == WD2795 || device->type() == WD2797);
 }
 
@@ -674,10 +695,10 @@ static void write_track(device_t *device)
 
         if (w->data_count==0)
         {
-                if (device->type() == WD1771)
-                        w->data_count = TRKSIZE_SD;
-                else
-			w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
+			if (wd17xx_is_sd_only(device))
+				w->data_count = TRKSIZE_SD;
+			else
+				w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
         }
 
 	floppy_drive_write_track_data_info_buffer( w->drive, w->hd, (char *)w->buffer, &(w->data_count) );
@@ -826,10 +847,10 @@ static void read_track(device_t *device)
 
         if (w->data_count==0)
         {
-                if (device->type() == WD1771)
-                        w->data_count = TRKSIZE_SD;
-                else
-			w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
+			if (wd17xx_is_sd_only(device))
+				w->data_count = TRKSIZE_SD;
+			else
+				w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
         }
 
 	floppy_drive_read_track_data_info_buffer( w->drive, w->hd, (char *)w->buffer, &(w->data_count) );
@@ -1322,7 +1343,7 @@ WRITE_LINE_DEVICE_HANDLER( wd17xx_dden_w )
 	wd1770_state *w = get_safe_token(device);
 
 	/* not supported on FD1771, FD1792, FD1794, FD1762 and FD1764 */
-	if (device->type() == WD1771)
+	if (wd17xx_is_sd_only(device))
 		fatalerror("wd17xx_dden_w: double density input not supported on this model!");
 	else if (!w->in_dden_func.isnull())
 		logerror("wd17xx_dden_w: write has no effect because a read handler is already defined!\n");
@@ -1402,7 +1423,7 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 			logerror("%s: wd17xx_status_r: $%02X (data_count %d)\n", device->machine().describe_context(), result, w->data_count);
 	}
 
-	return result;
+	return result ^ (wd17xx_has_dal(device) ? 0 : 0xff);
 }
 
 /* read the FDC track register */
@@ -1413,7 +1434,7 @@ READ8_DEVICE_HANDLER( wd17xx_track_r )
 	if (VERBOSE)
 		logerror("%s: wd17xx_track_r: $%02X\n", device->machine().describe_context(), w->track);
 
-	return w->track;
+	return w->track ^ (wd17xx_has_dal(device) ? 0 : 0xff);
 }
 
 /* read the FDC sector register */
@@ -1424,7 +1445,7 @@ READ8_DEVICE_HANDLER( wd17xx_sector_r )
 	if (VERBOSE)
 		logerror("%s: wd17xx_sector_r: $%02X\n", device->machine().describe_context(), w->sector);
 
-	return w->sector;
+	return w->sector ^ (wd17xx_has_dal(device) ? 0 : 0xff);
 }
 
 /* read the FDC data register */
@@ -1438,13 +1459,14 @@ READ8_DEVICE_HANDLER( wd17xx_data_r )
 	/* clear data request */
 	wd17xx_clear_drq(device);
 
-	return w->data;
+	return w->data ^ (wd17xx_has_dal(device) ? 0 : 0xff);
 }
 
 /* write the FDC command register */
 WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 {
 	wd1770_state *w = get_safe_token(device);
+	if (!wd17xx_has_dal(device)) data ^= 0xff;
 
 	w->last_command_data = data;
 
@@ -1597,7 +1619,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 				{
 				w->command = data & ~FDC_MASK_TYPE_III;
 				w->data_offset = 0;
-				if (device->type() == WD1771)
+				if (wd17xx_is_sd_only(device))
 					w->data_count = TRKSIZE_SD;
 				else
 					w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
@@ -1790,6 +1812,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 WRITE8_DEVICE_HANDLER( wd17xx_track_w )
 {
 	wd1770_state *w = get_safe_token(device);
+	if (!wd17xx_has_dal(device)) data ^= 0xff;
 
 	w->track = data;
 
@@ -1801,6 +1824,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_track_w )
 WRITE8_DEVICE_HANDLER( wd17xx_sector_w )
 {
 	wd1770_state *w = get_safe_token(device);
+	if (!wd17xx_has_dal(device)) data ^= 0xff;
 
 	w->sector = data;
 
@@ -1812,6 +1836,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_sector_w )
 WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 {
 	wd1770_state *w = get_safe_token(device);
+	if (!wd17xx_has_dal(device)) data ^= 0xff;
 
 	if (w->data_count > 0)
 	{
@@ -1967,15 +1992,17 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 
 READ8_DEVICE_HANDLER( wd17xx_r )
 {
+	UINT8 data = 0;
+
 	switch (offset & 0x03)
 	{
-	case 0: return wd17xx_status_r(device, 0);
-	case 1:	return wd17xx_track_r(device, 0);
-	case 2:	return wd17xx_sector_r(device, 0);
-	case 3:	return wd17xx_data_r(device, 0);
+	case 0: data = wd17xx_status_r(device, 0); break;
+	case 1:	data = wd17xx_track_r(device, 0); break;
+	case 2:	data = wd17xx_sector_r(device, 0); break;
+	case 3:	data = wd17xx_data_r(device, 0); break;
 	}
-
-	return 0;
+	
+	return data;
 }
 
 WRITE8_DEVICE_HANDLER( wd17xx_w )
@@ -2096,34 +2123,79 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1771##s
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1771##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD1771"
+#define DEVTEMPLATE_DERIVED_NAME		"FD1771"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1772##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"WD1772"
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1781##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1781"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1773##s
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1791##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD1773"
+#define DEVTEMPLATE_DERIVED_NAME		"FD1791"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1793##s
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1792##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD1793"
+#define DEVTEMPLATE_DERIVED_NAME		"FD1792"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1795##s
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1793##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD1795"
+#define DEVTEMPLATE_DERIVED_NAME		"FD1793"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1797##s
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1794##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD1797"
+#define DEVTEMPLATE_DERIVED_NAME		"FD1794"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1795##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1795"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1797##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1797"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1761##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1761"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1762##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1762"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1763##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1763"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1764##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1764"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1765##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1765"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1767##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"FD1767"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2791##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"WD2791"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2793##s
@@ -2141,14 +2213,24 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_DERIVED_NAME		"WD2797"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd177x##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD179x"
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1772##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"WD1772"
 #include "devtempl.h"
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd179x##s
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1773##s
 #define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD179x"
+#define DEVTEMPLATE_DERIVED_NAME		"WD1773"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##mb8866##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"MB8866"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##mb8876##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"MB8876"
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##mb8877##s
@@ -2156,17 +2238,27 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_DERIVED_NAME		"MB8877"
 #include "devtempl.h"
 
-DEFINE_LEGACY_DEVICE(WD1770, wd1770);
-DEFINE_LEGACY_DEVICE(WD1771, wd1771);
-DEFINE_LEGACY_DEVICE(WD1772, wd1772);
-DEFINE_LEGACY_DEVICE(WD1773, wd1773);
-DEFINE_LEGACY_DEVICE(WD1793, wd1793);
-DEFINE_LEGACY_DEVICE(WD1795, wd1795);
-DEFINE_LEGACY_DEVICE(WD1797, wd1797);
+DEFINE_LEGACY_DEVICE(FD1771, fd1771);
+DEFINE_LEGACY_DEVICE(FD1781, fd1781);
+DEFINE_LEGACY_DEVICE(FD1791, fd1791);
+DEFINE_LEGACY_DEVICE(FD1792, fd1792);
+DEFINE_LEGACY_DEVICE(FD1793, fd1793);
+DEFINE_LEGACY_DEVICE(FD1794, fd1794);
+DEFINE_LEGACY_DEVICE(FD1795, fd1795);
+DEFINE_LEGACY_DEVICE(FD1797, fd1797);
+DEFINE_LEGACY_DEVICE(FD1761, fd1761);
+DEFINE_LEGACY_DEVICE(FD1762, fd1762);
+DEFINE_LEGACY_DEVICE(FD1763, fd1763);
+DEFINE_LEGACY_DEVICE(FD1764, fd1764);
+DEFINE_LEGACY_DEVICE(FD1765, fd1765);
+DEFINE_LEGACY_DEVICE(FD1767, fd1767);
+DEFINE_LEGACY_DEVICE(WD2791, wd2791);
 DEFINE_LEGACY_DEVICE(WD2793, wd2793);
 DEFINE_LEGACY_DEVICE(WD2795, wd2795);
 DEFINE_LEGACY_DEVICE(WD2797, wd2797);
-DEFINE_LEGACY_DEVICE(WD177X, wd177x);
-DEFINE_LEGACY_DEVICE(WD179X, wd179x);
+DEFINE_LEGACY_DEVICE(WD1770, wd1770);
+DEFINE_LEGACY_DEVICE(WD1772, wd1772);
+DEFINE_LEGACY_DEVICE(WD1773, wd1773);
+DEFINE_LEGACY_DEVICE(MB8866, mb8866);
+DEFINE_LEGACY_DEVICE(MB8876, mb8876);
 DEFINE_LEGACY_DEVICE(MB8877, mb8877);
-

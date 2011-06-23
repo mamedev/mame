@@ -946,7 +946,7 @@ READ_LINE_DEVICE_HANDLER( floppy_index_r )
 
 READ_LINE_DEVICE_HANDLER( floppy_ready_r )
 {
-	return floppy_drive_get_flag_state(device, FLOPPY_DRIVE_READY);
+	return !(floppy_drive_get_flag_state(device, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY);
 }
 
 /*-------------------------------------------------

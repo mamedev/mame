@@ -17,19 +17,31 @@
     MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(WD1770, wd1770);
-DECLARE_LEGACY_DEVICE(WD1771, wd1771);
-DECLARE_LEGACY_DEVICE(WD1772, wd1772);
-DECLARE_LEGACY_DEVICE(WD1773, wd1773);
-DECLARE_LEGACY_DEVICE(WD1793, wd1793);
-DECLARE_LEGACY_DEVICE(WD1795, wd1795);
-DECLARE_LEGACY_DEVICE(WD1797, wd1797);
+DECLARE_LEGACY_DEVICE(FD1771, fd1771);
+DECLARE_LEGACY_DEVICE(FD1781, fd1781);
+DECLARE_LEGACY_DEVICE(FD1791, fd1791);
+DECLARE_LEGACY_DEVICE(FD1792, fd1792);
+DECLARE_LEGACY_DEVICE(FD1793, fd1793);
+DECLARE_LEGACY_DEVICE(FD1794, fd1794);
+DECLARE_LEGACY_DEVICE(FD1795, fd1795);
+DECLARE_LEGACY_DEVICE(FD1797, fd1797);
+DECLARE_LEGACY_DEVICE(FD1761, fd1761);
+DECLARE_LEGACY_DEVICE(FD1762, fd1762);
+DECLARE_LEGACY_DEVICE(FD1763, fd1763);
+DECLARE_LEGACY_DEVICE(FD1764, fd1764);
+DECLARE_LEGACY_DEVICE(FD1765, fd1765);
+DECLARE_LEGACY_DEVICE(FD1767, fd1767);
+DECLARE_LEGACY_DEVICE(WD2791, wd2791);
 DECLARE_LEGACY_DEVICE(WD2793, wd2793);
 DECLARE_LEGACY_DEVICE(WD2795, wd2795);
 DECLARE_LEGACY_DEVICE(WD2797, wd2797);
-DECLARE_LEGACY_DEVICE(WD177X, wd177x);
-DECLARE_LEGACY_DEVICE(WD179X, wd179x);
+DECLARE_LEGACY_DEVICE(WD1770, wd1770);
+DECLARE_LEGACY_DEVICE(WD1772, wd1772);
+DECLARE_LEGACY_DEVICE(WD1773, wd1773);
+DECLARE_LEGACY_DEVICE(MB8866, mb8866);
+DECLARE_LEGACY_DEVICE(MB8876, mb8876);
 DECLARE_LEGACY_DEVICE(MB8877, mb8877);
+
 
 
 /***************************************************************************
@@ -91,32 +103,60 @@ extern const wd17xx_interface default_wd17xx_interface_2_drives;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_WD1770_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1770, 0) \
+#define MCFG_FD1771_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1771, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_WD1771_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1771, 0) \
+#define MCFG_FD1781_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1781, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_WD1772_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1772, 0) \
+#define MCFG_FD1791_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1791, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_WD1773_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1773, 0) \
+#define MCFG_FD1792_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1792, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_WD1793_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1793, 0) \
+#define MCFG_FD1793_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1793, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_WD1795_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1795, 0) \
+#define MCFG_FD1794_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1794, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_WD1797_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD1797, 0) \
+#define MCFG_FD1795_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1795, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_FD1797_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1797, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_FD1761_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1761, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_FD1762_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1762, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_FD1763_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1763, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_FD1764_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1764, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_FD1765_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1765, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_FD1767_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, FD1767, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
 #define MCFG_WD2793_ADD(_tag, _intrf) \
@@ -131,17 +171,28 @@ extern const wd17xx_interface default_wd17xx_interface_2_drives;
 	MCFG_DEVICE_ADD(_tag, WD2797, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_WD177X_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD177X, 0) \
+#define MCFG_WD1770_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD1770, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_WD179X_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, WD179X, 0) \
+#define MCFG_WD1772_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD1772, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_WD1773_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD1773, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_MB8866_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, MB8866, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_MB8876_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, MB8876, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
 #define MCFG_MB8877_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, MB8877, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
-
 
 #endif /* __WD17XX_H__ */
