@@ -174,6 +174,12 @@ READ_LINE_DEVICE_HANDLER( floppy_dskchg_r );
 /* 2-sided disk */
 READ_LINE_DEVICE_HANDLER( floppy_twosid_r );
 
+// index pulse
+READ_LINE_DEVICE_HANDLER( floppy_index_r );
+
+// drive ready
+READ_LINE_DEVICE_HANDLER( floppy_ready_r );
+
 DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY, floppy);
 
 extern DEVICE_START( floppy );
