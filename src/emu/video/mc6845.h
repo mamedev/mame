@@ -117,6 +117,18 @@ public:
 
 	/* write to the currently selected register */
 	DECLARE_WRITE8_MEMBER( register_w );
+	
+	// read display enable line state
+	DECLARE_READ_LINE_MEMBER( de_r );
+	
+	// read cursor line state
+	DECLARE_READ_LINE_MEMBER( cursor_r );
+	
+	// read horizontal sync line state
+	DECLARE_READ_LINE_MEMBER( hsync_r );
+	
+	// read vertical sync line state
+	DECLARE_READ_LINE_MEMBER( vsync_r );
 
 	/* return the current value on the MA0-MA13 pins */
 	UINT16 get_ma();

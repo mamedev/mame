@@ -241,6 +241,30 @@ WRITE8_MEMBER( mc6845_device::register_w )
 }
 
 
+READ_LINE_MEMBER( mc6845_device::de_r )
+{
+	return m_de;
+}
+
+
+READ_LINE_MEMBER( mc6845_device::cursor_r )
+{
+	return m_cur;
+}
+
+
+READ_LINE_MEMBER( mc6845_device::hsync_r )
+{
+	return m_hsync;
+}
+
+
+READ_LINE_MEMBER( mc6845_device::vsync_r )
+{
+	return m_vsync;
+}
+
+
 void mc6845_device::recompute_parameters(bool postload)
 {
 	UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
