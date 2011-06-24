@@ -1073,18 +1073,19 @@ MACHINE_CONFIG_END
  *************************************/
 
 /*
-Cruis'n USA
+Cruis'n USA & Offroad Challenge (Midway V-Unit)
 Midway, 1994
 
 PCB Layout
 ----------
 
-5770-14365-02 (C) 1994 NINTENDO
+5770-14365-02 (C) 1994 NINTENDO (for Cruisin USA)
+5770-14365-05 WILLIAMS ELECTRONICS GAMES INC. (for Offroad Challenge)
 |-------------------------------------------------------------------------------|
-|  SOUND.U5  SOUND.U9   BATTERY          GAME.U26  GAME.U27  GAME.U28  GAME.U29 |
+|  SOUND.U5  SOUND.U9   BATTERY  MAX691  GAME.U26  GAME.U27  GAME.U28  GAME.U29 |
 |  SOUND.U4  SOUND.U8                    GAME.U22  GAME.U23  GAME.U24  GAME.U25 |
 |  SOUND.U3  SOUND.U7   6264  RESET_SW   GAME.U18  GAME.U19  GAME.U20  GAME.U21 |
-|  SOUND.U2  SOUND.U6                    GAME.U14  GAME.U15  GAME.U16  GAME.U17 |
+|  SOUND.U2  SOUND.U6         PIC16C57   GAME.U14  GAME.U15  GAME.U16  GAME.U17 |
 |                                        GAME.U10  GAME.U11  GAME.U12  GAME.U13 |
 |            6116            PAL2              IDT7204      IDT7204             |
 |                                          LH521007 LH521007   LH521007 LH521007|
@@ -1113,19 +1114,33 @@ Notes:
       6264      - 8k x8 SRAM (battery-backed)
       6116      - 2k x8 SRAM
       AD1851    - Analog Devices AD1851 16 bit PCM Audio DAC
+      MAX691    - Maxim MAX691 Master Reset IC (DIP16)
       TDA2030   - ST TDA2030 Audio AMP
       TL084     - Texas Instruments TL084 JFET-Input Operational Amplifier
       ADC0844   - National Semiconductor ADC0844 8-Bit Microprocessor Compatible A/D Converter with Multiplexer Option
+      PIC16C57  - Microchip PIC16C57
+                    - not populated for Cruis'n USA
+                    - labelled 'Offroad 25" U904' for Offroad Challenge
       PAL1      - GAL20V8 labelled 'A-19668'
-      PAL2      - PALC22V10 (no label)
-      PAL3      - TIBPAL20L8 labelled 'A-19670'
-      PAL4      - TIBPAL22V10 labelled 'A-19671'
-      PAL5      - TIBPAL22V10 labelled 'A-19672'
-      PAL6      - TIBPAL22V10 labelled 'A-19673'
+      PAL2      - PALC22V10 
+                    - no label for Cruisin USA
+                    - labelled 'A-21883 U38' for Offroad Challenge
+      PAL3      - TIBPAL20L8
+                    - labelled 'A-19670' for Cruis'n USA
+                    - labelled 'A-21170 U43' for Offroad Challenge
+      PAL4      - TIBPAL22V10
+                    - labelled 'A-19671' for Cruis'n USA
+                    - labelled 'A-21171 U54' for Offroad Challenge
+      PAL5      - TIBPAL22V10 
+                    - labelled 'A-19672' for Cruis'n USA
+                    - labelled 'A-21884 U114' for Offroad Challenge
+      PAL6      - TIBPAL22V10 
+                    - labelled 'A-19673' for Cruis'n USA
+                    - no label for Offroad Challenge
       P3 - P11  - various connectors for controls
       VSync     - 57.7090Hz  \
-      HSync     - 15.3544kHz / measured via EL4583
-      ROMs      - All ROMs 27C040
+      HSync     - 24.807kHz  / measured via EL4583
+      ROMs      - All ROMs 27C040 or 27C801
                   SOUND.Uxx - Sound ROMs
                   GAME.Uxx  - PROGRAM ROMs (including GFX)
 */
