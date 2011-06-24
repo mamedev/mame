@@ -28,8 +28,6 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 
-//#define SHOW_AARON_BUG
-
 #ifndef USE_SH4DRC
 
 CPU_DISASSEMBLE( sh4 );
@@ -119,9 +117,6 @@ UINT32 abs;
 
 INLINE UINT8 RB(sh4_state *sh4, offs_t A)
 {
-	if (A >= 0xfe000000)
-		return sh4_internal_r(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xff << ((A & 3)*8)) >> ((A & 3)*8);
-
 	if (A >= 0xe0000000)
 		return sh4->program->read_byte(A);
 
@@ -130,9 +125,6 @@ INLINE UINT8 RB(sh4_state *sh4, offs_t A)
 
 INLINE UINT16 RW(sh4_state *sh4, offs_t A)
 {
-	if (A >= 0xfe000000)
-		return sh4_internal_r(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffff << ((A & 2)*8)) >> ((A & 2)*8);
-
 	if (A >= 0xe0000000)
 		return sh4->program->read_word(A);
 
@@ -141,25 +133,14 @@ INLINE UINT16 RW(sh4_state *sh4, offs_t A)
 
 INLINE UINT32 RL(sh4_state *sh4, offs_t A)
 {
-	if (A >= 0xfe000000)
-		return sh4_internal_r(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffffffff);
-
 	if (A >= 0xe0000000)
 		return sh4->program->read_dword(A);
 
-  return sh4->program->read_dword(A & AM);
+	return sh4->program->read_dword(A & AM);
 }
 
 INLINE void WB(sh4_state *sh4, offs_t A, UINT8 V)
 {
-	#ifndef SHOW_AARON_BUG
-	if (A >= 0xfe000000)
-	{
-		sh4_internal_w(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 3)*8), 0xff << ((A & 3)*8));
-		return;
-	}
-	#endif
-
 	if (A >= 0xe0000000)
 	{
 		sh4->program->write_byte(A,V);
@@ -171,14 +152,6 @@ INLINE void WB(sh4_state *sh4, offs_t A, UINT8 V)
 
 INLINE void WW(sh4_state *sh4, offs_t A, UINT16 V)
 {
-	#ifndef SHOW_AARON_BUG
-	if (A >= 0xfe000000)
-	{
-		sh4_internal_w(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 2)*8), 0xffff << ((A & 2)*8));
-		return;
-	}
-	#endif
-
 	if (A >= 0xe0000000)
 	{
 		sh4->program->write_word(A,V);
@@ -190,22 +163,11 @@ INLINE void WW(sh4_state *sh4, offs_t A, UINT16 V)
 
 INLINE void WL(sh4_state *sh4, offs_t A, UINT32 V)
 {
-	#ifndef SHOW_AARON_BUG
-	if (A >= 0xfe000000)
-	{
-		sh4_internal_w(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V, 0xffffffff);
-		return;
-	}
-	#endif
-
 	if (A >= 0xe0000000)
 	{
 		sh4->program->write_dword(A,V);
 		return;
 	}
-
-/*  if (A >= 0x40000000)
-        return;*/
 
 	sh4->program->write_dword(A & AM,V);
 }
@@ -3616,22 +3578,13 @@ static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64 )
 ADDRESS_MAP_END
 #endif
 
-#ifdef SHOW_AARON_BUG
-static WRITE32_HANDLER(sh4_test_w)
-{
-	printf("offset = %08x, data = %08x, mask = %08x\n", offset, data, mem_mask);
-}
-#endif
-
 /*When OC index mode is on (CCR.OIX = 1)*/
 static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0) // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
 	AM_RANGE(0xF6000000, 0xF7FFFFFF) AM_READWRITE(sh4_tlb_r,sh4_tlb_w)
-#ifdef SHOW_AARON_BUG
-	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_WRITE32(sh4_test_w, U64(0xffffffffffffffff))
-#endif
+	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, U64(0xffffffffffffffff))
 ADDRESS_MAP_END
 
 

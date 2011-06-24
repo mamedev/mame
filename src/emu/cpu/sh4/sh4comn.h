@@ -134,19 +134,19 @@ typedef struct
 	UINT32				irq;				/* irq we're taking */
 
 	/* register mappings */
-	drcuml_parameter	regmap[16];		    		/* parameter to register mappings for all 16 integer registers */
+	uml::parameter	regmap[16];		    		/* parameter to register mappings for all 16 integer registers */
 
-	drcuml_codehandle *	entry;			    		/* entry point */
-	drcuml_codehandle *	read8;					/* read byte */
-	drcuml_codehandle *	write8;					/* write byte */
-	drcuml_codehandle *	read16;					/* read half */
-	drcuml_codehandle *	write16;		    		/* write half */
-	drcuml_codehandle *	read32;					/* read word */
-	drcuml_codehandle *	write32;		    		/* write word */
+	uml::code_handle *	entry;			    		/* entry point */
+	uml::code_handle *	read8;					/* read byte */
+	uml::code_handle *	write8;					/* write byte */
+	uml::code_handle *	read16;					/* read half */
+	uml::code_handle *	write16;		    		/* write half */
+	uml::code_handle *	read32;					/* read word */
+	uml::code_handle *	write32;		    		/* write word */
 
-	drcuml_codehandle *	interrupt;				/* interrupt */
-	drcuml_codehandle *	nocode;					/* nocode */
-	drcuml_codehandle *	out_of_cycles;				/* out of cycles exception handler */
+	uml::code_handle *	interrupt;				/* interrupt */
+	uml::code_handle *	nocode;					/* nocode */
+	uml::code_handle *	out_of_cycles;				/* out of cycles exception handler */
 
 	UINT32 prefadr;
 	UINT32 target;

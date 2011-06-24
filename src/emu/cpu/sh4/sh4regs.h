@@ -15,6 +15,7 @@
 #define TRA 	0x2008	/* FF000020 */
 #define EXPEVT	0x2009	/* FF000024 */
 #define INTEVT	0x200A	/* FF000028 */
+#define VERSION	0x200C	/* FF000030 */
 #define PTEA	0x200D	/* FF000034 */
 #define QACR0	0x200E	/* FF000038 */
 #define QACR1	0x200F	/* FF00003C */

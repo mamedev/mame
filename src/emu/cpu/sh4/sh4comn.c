@@ -627,10 +627,13 @@ WRITE32_HANDLER( sh4_internal_w )
 {
 	sh4_state *sh4 = get_safe_token(&space->device());
 	int a;
+	UINT32 addr = (offset << 2) + 0xfe000000;
+	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
+
 	UINT32 old = sh4->m[offset];
 	COMBINE_DATA(sh4->m+offset);
 
-	//  logerror("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
+//	printf("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
 
 	switch( offset )
 	{
@@ -938,9 +941,20 @@ WRITE32_HANDLER( sh4_internal_w )
 READ32_HANDLER( sh4_internal_r )
 {
 	sh4_state *sh4 = get_safe_token(&space->device());
-	//  logerror("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
+
+	UINT32 addr = (offset << 2) + 0xfe000000;
+	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
+
+//	printf("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
+
 	switch( offset )
 	{
+	case VERSION:
+		return 0x040205c1;	// this is what a real SH7750 in a Dreamcast returns - the later Naomi BIOSes check and care!
+		break;
+	case IPRD:
+		return 0x00000000;	// SH7750 ignores writes here and always returns zero
+		break;
 	case RTCNT:
 		if ((sh4->m[RTCSR] >> 3) & 7)
 		{ // activated
