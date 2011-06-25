@@ -37,7 +37,7 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { load_software_part_region(this, swlist, swname, start_entry ); return TRUE; }
 
 	virtual iodevice_t image_type() const { return IO_CDROM; }
 
