@@ -174,8 +174,8 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 	{
 		case 0x10/2:
 			break;
-		case 0x12/2:
-		case 0x14/2:
+		case 0x12/2: return state->m_vdp1.lopr;
+		case 0x14/2: return state->m_vdp1.copr;
 		case 0x16/2:
 			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset*2);
 
@@ -1968,7 +1968,8 @@ static void stv_vdp1_process_list(running_machine &machine)
 
 				default:
 					popmessage ("VDP1: Sprite List Illegal, contact MAMEdev");
-					// TODO: LOPR/COPR hook-up
+					state->m_vdp1.lopr = (position * 0x20) >> 3;
+					state->m_vdp1.copr = (position * 0x20) >> 3;
 					return;
 			}
 		}
@@ -1981,6 +1982,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 	end:
 	/* set CEF to 1*/
 	CEF_1;
+	state->m_vdp1.copr = (position * 0x20) >> 3;
 
 	if (VDP1_LOG) logerror ("End of list processing!\n");
 }

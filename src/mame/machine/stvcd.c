@@ -1642,9 +1642,10 @@ static void make_dir_current(running_machine &machine, UINT32 fad)
 {
 	int i;
 	UINT32 nextent, numentries;
-	UINT8 sect[MAX_DIR_SIZE];
+	UINT8 *sect;
 	direntryT *curentry;
 
+	sect = (UINT8 *)malloc(MAX_DIR_SIZE);
 	memset(sect, 0, MAX_DIR_SIZE);
 	for (i = 0; i < (curroot.length/2048); i++)
 	{
@@ -1701,6 +1702,8 @@ static void make_dir_current(running_machine &machine, UINT32 fad)
 			i = numfiles;
 		}
 	}
+
+	free(sect);
 }
 
 void stvcd_exit(running_machine& machine)

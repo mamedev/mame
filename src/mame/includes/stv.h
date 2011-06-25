@@ -53,6 +53,8 @@ public:
         UINT16	  *framebuffer[2];
         UINT16	  **framebuffer_draw_lines;
 	    UINT8     *gfx_decode;
+		UINT16    lopr;
+		UINT16    copr;
 
 		int       local_x;
 		int       local_y;
