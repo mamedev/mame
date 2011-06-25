@@ -87,7 +87,8 @@ Street Fighter II: The World Warrior (World 910228)            90629B-3   STF29 
 Street Fighter II: The World Warrior (World 910522)            90629B-3   STF29            IOB1  90632C-1     CPS-B-11  DL-0411-10004  C632
 Street Fighter II: The World Warrior (USA 910206)              90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (USA 910214)              90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
-Street Fighter II: The World Warrior (USA 910228)              90629B-3   STF29            IOB2  90632C-1     CPS-B-18  DL-0411-10013  C632B
+Street Fighter II: The World Warrior (USA 910228)              90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (USA 910306)              90629B-3   STF29            IOB1  90632C-1     CPS-B-12  DL-0411-10007  C632
 Street Fighter II: The World Warrior (USA 910318)              90629B-?   STF29            IOB1  ?            CPS-B-05  DL-0411-10006  C632
 Street Fighter II: The World Warrior (USA 910411)              90629B-?   STF29            IOB1  ?            CPS-B-15  DL-0411-10010  C632
 Street Fighter II: The World Warrior (USA 910522)              90629B-3   STF29            IOB1  90632C-1     CPS-B-14  DL-0411-10009  C632
@@ -1280,6 +1281,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"willowj",     CPS_B_03,     mapper_WL24B },	// wrong, this set uses WL22B, still non dumped
 	{"ffight",      CPS_B_04,     mapper_S224B },
 	{"ffightu",     CPS_B_04,     mapper_S224B },
+	{"ffightu1",    CPS_B_04,     mapper_S224B },
 	{"ffightua",    CPS_B_01,     mapper_S224B },
 	{"ffightub",    CPS_B_05,     mapper_S224B },
 	{"ffightj",     CPS_B_04,     mapper_S224B },	// wrong, this set uses S222B, still non dumped
@@ -1314,6 +1316,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ebbl",     CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ua",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ub",       CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2uc",       CPS_B_12,     mapper_STF29,  0x36 },
 	{"sf2ud",       CPS_B_05,     mapper_STF29,  0x36 },
 	{"sf2ue",       CPS_B_18,     mapper_STF29,  0x3c },
 	{"sf2uf",       CPS_B_15,     mapper_STF29,  0x36 },
