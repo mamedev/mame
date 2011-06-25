@@ -1952,8 +1952,19 @@ static partitionT *cd_read_filtered_sector(INT32 fad)
 		// find out the track's type
 		trktype = cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad-150));
 
-		// now get a raw 2352 byte sector
-		cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_RAW_DONTCARE);
+		// now get a raw 2352 byte sector - if it's mode 1, get mode1_raw
+		if ((trktype == CD_TRACK_MODE1) || (trktype == CD_TRACK_MODE1_RAW))
+		{
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE1_RAW);
+		}
+		else if (trktype != CD_TRACK_AUDIO)	// if not audio it must be mode 2 so get mode2_raw
+		{
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE2_RAW);
+		}
+		else
+		{
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_AUDIO);
+		}
 		cr3 = 0x100 | (fad>>16);	// update cr3/4 with the current fad
 		cr4 = fad;
 		curblock.size = sectlenin;
