@@ -47,6 +47,10 @@
 #define __DIEXEC_H__
 
 
+// set to 1 to execute on cothread instead of directly
+#define USE_COTHREADS 0
+
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -199,7 +203,11 @@ public:
 	UINT64 total_cycles() const;
 
 	// required operation overrides
+#if USE_COTHREADS
 	void run() { m_cothread.make_active(); }
+#else
+	void run() { execute_run(); }
+#endif
 
 protected:
 	// internal helpers
