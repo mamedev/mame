@@ -8,7 +8,7 @@
 //#define use_intrinsics
 
 #ifdef use_intrinsics
-	#include "mmintrin.h"
+	#include <mmintrin.h>
 #endif
 
 //
