@@ -2,7 +2,7 @@
 
     cothread.c
 
-    Class wrapper around buyy's cothread library.
+    Class wrapper around byuu's cothread library.
 
 ****************************************************************************
 
