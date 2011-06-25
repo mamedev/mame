@@ -1005,8 +1005,8 @@ DEVICE_GET_INFO(floppy)
 			if (device->type() == FLOPPY_APPLE) {
 				info->f = NULL;
 			} else {
-				if ( device && downcast<const legacy_image_device_base *>(device)->static_config() && ((floppy_interface*)(device))->device_displayinfo) {
-					info->f = (genf *) ((floppy_interface*)(device))->device_displayinfo;
+				if ( device && downcast<const legacy_image_device_base *>(device)->static_config() && ((floppy_interface*)(device)->static_config())->device_displayinfo) {
+					info->f = (genf *) ((floppy_interface*)(device)->static_config())->device_displayinfo;
 				} else {
 					info->f = NULL;
 				}
