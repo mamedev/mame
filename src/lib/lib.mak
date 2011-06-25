@@ -210,4 +210,4 @@ $(OBJ)/libco.a: $(COTHREADOBJS)
 
 $(LIBOBJ)/cothread/%.o: $(LIBSRC)/cothread/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) -c -fomit-frame-pointer $< -o $@
+	$(CC) $(CDEFS) $(CCOMFLAGS) -c -fomit-frame-pointer $< -o $@
