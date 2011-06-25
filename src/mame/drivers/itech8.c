@@ -2072,20 +2072,20 @@ ROM_END
 
 ROM_START( gtg )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "u5.bin", 0x04000, 0x4000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) )
-	ROM_CONTINUE(       0x10000, 0xc000 )
+	ROM_LOAD( "gtg.bin_3.1.u5", 0x04000, 0x4000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version */
+	ROM_CONTINUE(        0x10000, 0xc000 )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
-	ROM_LOAD( "grom5.bin", 0xa0000, 0x20000, CRC(5b393314) SHA1(9e314a75ea52373369904915ec786f09eee725a9) )
+	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "grom5.bin",        0xa0000, 0x20000, CRC(5b393314) SHA1(9e314a75ea52373369904915ec786f09eee725a9) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
@@ -2093,41 +2093,41 @@ ROM_END
 
 ROM_START( gtgt )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bim_2.0.u5",     0x4000, 0x4000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) )
-	ROM_CONTINUE(       0x10000, 0xc000 )
+	ROM_LOAD( "gtg.bin_2.0.u5", 0x4000, 0x4000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) ) /* Trackball version */
+	ROM_CONTINUE(        0x10000, 0xc000 )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "golf-snd.u27", 0x08000, 0x8000, CRC(f6a7429b) SHA1(0fb378606c12c3543aa1ff603101e262acb9c692) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
-	ROM_LOAD( "golf-grom5", 0xa0000, 0x10000, CRC(62a523d2) SHA1(431f89fa044bf0ed3c197745d9c1a61f666da658) )
+	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "golf-grom5.grom5", 0xa0000, 0x10000, CRC(62a523d2) SHA1(431f89fa044bf0ed3c197745d9c1a61f666da658) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
+	ROM_LOAD( "golf-srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
 
 ROM_START( gtgt1 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "pgm-u5.512", 0x04000, 0x4000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) )
-	ROM_CONTINUE(       0x10000, 0xc000 )
+	ROM_LOAD( "gtg.bin_1.0.u5", 0x04000, 0x4000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) ) /* Trackball version */
+	ROM_CONTINUE(        0x10000, 0xc000 )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "snd-u27.256", 0x08000, 0x8000, CRC(471da557) SHA1(32bfe450a42d9eb6c14edcfa2b4e33f65a11126e) )
 
 	ROM_REGION( 0xb0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
-	ROM_LOAD( "grom5.512", 0xa0000, 0x10000, CRC(44b47015) SHA1(5dde4c932a697b51fe02eab8d948889b3fe7baff) )
+	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "grom5.512",        0xa0000, 0x10000, CRC(44b47015) SHA1(5dde4c932a697b51fe02eab8d948889b3fe7baff) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.010", 0x00000, 0x20000, CRC(d041e0c9) SHA1(1d90f37071d92c714ff69ab2b0337c7c66147995) )
@@ -2137,8 +2137,8 @@ ROM_END
 ROM_START( gtg2t )
 	/* banks are loaded in the opposite order from the others, */
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "u5",     0x10000, 0x4000, CRC(c7b3a9f3) SHA1(5edaca6fd6ee58bd1676dc9b2c86da4dd2f51687) )
-	ROM_CONTINUE(       0x04000, 0xc000 )
+	ROM_LOAD( "gtg2.bin_1.1.u5", 0x10000, 0x4000, CRC(c7b3a9f3) SHA1(5edaca6fd6ee58bd1676dc9b2c86da4dd2f51687) ) /* Trackball version */
+	ROM_CONTINUE(        0x04000, 0xc000 )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2163,8 +2163,8 @@ ROM_END
 
 ROM_START( gtg2j )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "u5.bin", 0x04000, 0x4000, CRC(9c95ceaa) SHA1(d9fd2b2419c026822a07d2ba51d6ab40b7cd0d49) )
-	ROM_CONTINUE(       0x10000, 0xc000 )
+	ROM_LOAD( "gtg2.bin_1.0.u5", 0x04000, 0x4000, CRC(9c95ceaa) SHA1(d9fd2b2419c026822a07d2ba51d6ab40b7cd0d49) ) /* Joystick version */
+	ROM_CONTINUE(        0x10000, 0xc000 )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2455,17 +2455,17 @@ ROM_END
 
 ROM_START( rimrockn )
 	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "u5-2_2",    0x04000, 0x4000, CRC(97777683) SHA1(0998dde26daaa2d2b78e83647e03ba01b0ef31f2) )
-	ROM_CONTINUE(          0x10000, 0x4000 )
-	ROM_CONTINUE(          0x1c000, 0x4000 )
-	ROM_CONTINUE(          0x28000, 0xc000 )
-	ROM_CONTINUE(          0x2c000, 0x8000 )
+	ROM_LOAD( "rrb.bin_2.2.u5", 0x04000, 0x4000, CRC(97777683) SHA1(0998dde26daaa2d2b78e83647e03ba01b0ef31f2) )
+	ROM_CONTINUE(        0x10000, 0x4000 )
+	ROM_CONTINUE(        0x1c000, 0x4000 )
+	ROM_CONTINUE(        0x28000, 0xc000 )
+	ROM_CONTINUE(        0x2c000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x08000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x14000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x20000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) )
+	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
 
 	ROM_REGION( 0x100000, "grom", 0 )
 	ROM_LOAD( "grom00",       0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
@@ -2485,17 +2485,17 @@ ROM_END
 
 ROM_START( rimrockn20 )
 	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin",   0x04000, 0x4000, CRC(7e9d5545) SHA1(2aa028b3f5d05bec4ee289e7d39eaad30b3d4d5f) )
-	ROM_CONTINUE(          0x10000, 0x4000 )
-	ROM_CONTINUE(          0x1c000, 0x4000 )
-	ROM_CONTINUE(          0x28000, 0xc000 )
-	ROM_CONTINUE(          0x2c000, 0x8000 )
+	ROM_LOAD( "rrb.bin_2.0.u5", 0x04000, 0x4000, CRC(7e9d5545) SHA1(2aa028b3f5d05bec4ee289e7d39eaad30b3d4d5f) )
+	ROM_CONTINUE(        0x10000, 0x4000 )
+	ROM_CONTINUE(        0x1c000, 0x4000 )
+	ROM_CONTINUE(        0x28000, 0xc000 )
+	ROM_CONTINUE(        0x2c000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x08000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x14000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x20000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) )
+	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
 
 	ROM_REGION( 0x100000, "grom", 0 )
 	ROM_LOAD( "grom00",       0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
@@ -2510,17 +2510,17 @@ ROM_END
 
 ROM_START( rimrockn16 )
 	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "rrbbv16.u5",0x04000, 0x4000, CRC(999cd502) SHA1(8ad0d641a9f853eff27be1d4de04ab86b9275d57) )
-	ROM_CONTINUE(          0x10000, 0x4000 )
-	ROM_CONTINUE(          0x1c000, 0x4000 )
-	ROM_CONTINUE(          0x28000, 0xc000 )
-	ROM_CONTINUE(          0x2c000, 0x8000 )
+	ROM_LOAD( "rrb.bin_1.6.u5",0x04000, 0x4000, CRC(999cd502) SHA1(8ad0d641a9f853eff27be1d4de04ab86b9275d57) )
+	ROM_CONTINUE(        0x10000, 0x4000 )
+	ROM_CONTINUE(        0x1c000, 0x4000 )
+	ROM_CONTINUE(        0x28000, 0xc000 )
+	ROM_CONTINUE(        0x2c000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x08000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x14000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x20000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) )
+	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
 
 	ROM_REGION( 0x100000, "grom", 0 )
 	ROM_LOAD( "grom00", 0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
@@ -2535,11 +2535,11 @@ ROM_END
 
 ROM_START( rimrockn12 )
 	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "rrbbv12.u5",0x04000, 0x4000, CRC(661761a6) SHA1(7224b1eac2fd0969d70657448ab241a433143df4) )
-	ROM_CONTINUE(          0x10000, 0x4000 )
-	ROM_CONTINUE(          0x1c000, 0x4000 )
-	ROM_CONTINUE(          0x28000, 0xc000 )
-	ROM_CONTINUE(          0x2c000, 0x8000 )
+	ROM_LOAD( "rrb.bin_1.2.u5",0x04000, 0x4000, CRC(661761a6) SHA1(7224b1eac2fd0969d70657448ab241a433143df4) )
+	ROM_CONTINUE(        0x10000, 0x4000 )
+	ROM_CONTINUE(        0x1c000, 0x4000 )
+	ROM_CONTINUE(        0x28000, 0xc000 )
+	ROM_CONTINUE(        0x2c000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x08000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x14000, 0x8000 )
 	ROM_COPY( "maincpu", 0x2c000, 0x20000, 0x8000 )
@@ -2582,7 +2582,7 @@ ROM_END
 
 ROM_START( gpgolf )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gpgjv1_1.bin",   0x04000, 0x4000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) )
+	ROM_LOAD( "gpgv1_1.bin",   0x04000, 0x4000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version */
 	ROM_CONTINUE(       0x10000, 0xc000 )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
@@ -2602,7 +2602,7 @@ ROM_END
 ROM_START( gtg2 )
 	/* banks are loaded in the opposite order from the others, */
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "u5.2",   0x10000, 0x4000, CRC(4a61580f) SHA1(7c64648d47418fbcc0f9b5bd91f88856209bc0f5) )
+	ROM_LOAD( "gtg2_v2_2.u5",   0x10000, 0x4000, CRC(4a61580f) SHA1(7c64648d47418fbcc0f9b5bd91f88856209bc0f5) ) /* Trackball version */
 	ROM_CONTINUE(       0x04000, 0xc000 )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
