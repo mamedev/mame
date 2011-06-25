@@ -51,6 +51,7 @@ EMUOBJS = \
 	$(EMUOBJ)/cheat.o \
 	$(EMUOBJ)/clifront.o \
 	$(EMUOBJ)/config.o \
+	$(EMUOBJ)/cothread.o \
 	$(EMUOBJ)/crsshair.o \
 	$(EMUOBJ)/debugger.o \
 	$(EMUOBJ)/delegate.o \

@@ -19,6 +19,7 @@ OBJDIRS += \
 	$(LIBOBJ)/formats \
 	$(LIBOBJ)/zlib \
 	$(LIBOBJ)/softfloat \
+	$(LIBOBJ)/cothread \
 
 
 
@@ -78,7 +79,7 @@ $(LIBOBJ)/expat/%.o: $(LIBSRC)/explat/%.c | $(OSPREBUILD)
 # formats library objects
 #-------------------------------------------------
 
-EXPATOBJS = \
+FORMATSOBJS = \
 	$(LIBOBJ)/formats/cassimg.o 	\
 	$(LIBOBJ)/formats/flopimg.o		\
 	$(LIBOBJ)/formats/imageutl.o	\
@@ -152,8 +153,8 @@ EXPATOBJS = \
 	$(LIBOBJ)/formats/z80ne_dsk.o	\
 	$(LIBOBJ)/formats/zx81_p.o		\
 
+$(OBJ)/libformats.a: $(FORMATSOBJS)
 
-$(OBJ)/libformats.a: $(EXPATOBJS)
 
 
 #-------------------------------------------------
@@ -180,6 +181,8 @@ $(LIBOBJ)/zlib/%.o: $(LIBSRC)/zlib/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
 
+
+
 #-------------------------------------------------
 # SoftFloat library objects
 #-------------------------------------------------
@@ -194,3 +197,17 @@ $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 
 $(LIBOBJ)/softfloat/softfloat.o: $(LIBSRC)/softfloat/softfloat.c $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
 
+
+
+#-------------------------------------------------
+# cothread library objects
+#-------------------------------------------------
+
+COTHREADOBJS = \
+	$(LIBOBJ)/cothread/libco.o
+
+$(OBJ)/libco.a: $(COTHREADOBJS)
+
+$(LIBOBJ)/cothread/%.o: $(LIBSRC)/cothread/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) -c -fomit-frame-pointer $< -o $@

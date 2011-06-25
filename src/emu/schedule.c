@@ -341,6 +341,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_executing_device(NULL),
 	m_execute_list(NULL),
 	m_basetime(attotime::zero),
+	m_cothread(co_active()),
 	m_timer_list(NULL),
 	m_timer_allocator(machine.respool()),
 	m_callback_timer(NULL),
@@ -483,11 +484,11 @@ void device_scheduler::timeslice()
 						m_executing_device = exec;
 						*exec->m_icountptr = exec->m_cycles_running;
 						if (!call_debugger)
-							exec->execute_run();
+							exec->run();
 						else
 						{
 							debugger_start_cpu_hook(&exec->device(), target);
-							exec->execute_run();
+							exec->run();
 							debugger_stop_cpu_hook(&exec->device());
 						}
 
