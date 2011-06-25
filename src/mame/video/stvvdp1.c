@@ -916,7 +916,7 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 		{
 			case 0x0000: // mode 0 16 colour bank mode (4bits) (hanagumi blocks)
 				// most of the shienryu sprites use this mode
-				pix = gfxdata[patterndata+offsetcnt/2];
+				pix = gfxdata[(patterndata+offsetcnt/2) & 0xfffff];
 				pix = offsetcnt&1 ? (pix & 0x0f):((pix & 0xf0)>>4) ;
 				pix = pix+((stv2_current_sprite.CMDCOLR&0xfff0));
 				mode = 0;
@@ -924,7 +924,7 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 				break;
 			case 0x0008: // mode 1 16 colour lookup table mode (4bits)
 				// shienryu explosisons (and some enemies) use this mode
-				pix2 = gfxdata[patterndata+offsetcnt/2];
+				pix2 = gfxdata[(patterndata+offsetcnt/2) & 0xfffff];
 				pix2 = offsetcnt&1 ?  (pix2 & 0x0f):((pix2 & 0xf0)>>4);
 				pix = pix2&1 ?
 				((((state->m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0x0000ffff) >> 0):
@@ -946,26 +946,26 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 				}
 				break;
 			case 0x0010: // mode 2 64 colour bank mode (8bits) (character select portraits on hanagumi)
-				pix = gfxdata[patterndata+offsetcnt];
+				pix = gfxdata[(patterndata+offsetcnt) & 0xfffff];
 				mode = 2;
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xffc0);
 				transmask = 0x3f;
 				break;
 			case 0x0018: // mode 3 128 colour bank mode (8bits) (little characters on hanagumi use this mode)
-				pix = gfxdata[patterndata+offsetcnt];
+				pix = gfxdata[(patterndata+offsetcnt) & 0xfffff];
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
 				mode = 3;
 			//  pix = machine.rand();
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
-				pix = gfxdata[patterndata+offsetcnt];
+				pix = gfxdata[(patterndata+offsetcnt) & 0xfffff];
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff00);
 				transmask = 0xff;
 				mode = 4;
 				break;
 			case 0x0028: // mode 5 32,768 colour RGB mode (16bits)
-				pix = gfxdata[patterndata+offsetcnt*2+1] | (gfxdata[patterndata+offsetcnt*2]<<8) ;
+				pix = gfxdata[(patterndata+offsetcnt*2+1) & 0xfffff] | (gfxdata[(patterndata+offsetcnt*2) & 0xfffff]<<8) ;
 				mode = 5;
 				transmask = 0xffff;
 				break;
