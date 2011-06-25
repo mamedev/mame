@@ -233,6 +233,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 {
 	UINT32 tracktype, tracknum, sectoroffs;
 	chd_error err;
+	static const UINT8 syncbytes[12] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
 
 	if (file == NULL)
 		return 0;
@@ -254,6 +255,22 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 		if ((datatype == CD_TRACK_MODE1) && (tracktype == CD_TRACK_MODE1_RAW))
 		{
 			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 16], 2048);
+			return 1;
+		}
+		
+		/* return 2352 byte mode 1 raw sector from 2048 bytes of mode 1 data */
+		if ((datatype == CD_TRACK_MODE1_RAW) && (tracktype == CD_TRACK_MODE1))
+		{
+			UINT8 *bufptr = (UINT8 *)buffer;
+			UINT32 msf = lba_to_msf(lbasector);
+
+			memcpy(bufptr, syncbytes, 12);
+			bufptr[12] = msf>>16;
+			bufptr[13] = msf>>8;
+			bufptr[14] = msf&0xff;
+			bufptr[15] = 1;	// mode 1
+			memcpy(bufptr+16, &file->cache[(sectoroffs * CD_FRAME_SIZE)], 2048);
+			LOG(("CDROM: promotion of mode1/form1 sector to mode1 raw is not complete!\n"));
 			return 1;
 		}
 
