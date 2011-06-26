@@ -62,7 +62,9 @@ static int load_cartridge(device_image_interface *image, const rom_entry *romrgn
 	int datawidth, littleendian, i, j;
 	device_t *cpu;
 
-	region = ROMREGION_GETTAG(romrgn);
+	astring regiontag;
+	image->device().siblingtag(regiontag, ROMREGION_GETTAG(romrgn));
+	region = regiontag.cstr();
 	offset = ROM_GETOFFSET(roment);
 	length = ROM_GETLENGTH(roment);
 	flags = ROM_GETFLAGS(roment);
@@ -112,7 +114,7 @@ static int load_cartridge(device_image_interface *image, const rom_entry *romrgn
 		}
 
 		/* postprocess this region */
-		type = ROMREGION_GETTAG(romrgn);
+		type = regiontag.cstr();
 		littleendian = ROMREGION_ISLITTLEENDIAN(romrgn);
 		datawidth = ROMREGION_GETWIDTH(romrgn) / 8;
 
@@ -171,8 +173,11 @@ static int process_cartridge(device_image_interface *image, process_mode mode)
 			while(!ROMENTRY_ISREGIONEND(roment))
 			{
 				if (ROMENTRY_GETTYPE(roment) == ROMENTRYTYPE_CARTRIDGE)
-				{
-					if (strcmp(roment->_hashdata,image->device().tag())==0)
+				{					
+					astring regiontag;
+					image->device().siblingtag(regiontag, roment->_hashdata);
+
+					if (strcmp(regiontag.cstr(),image->device().tag())==0)
 					{
 						result |= load_cartridge(image, romrgn, roment, mode);
 
