@@ -87,7 +87,7 @@ Street Fighter II: The World Warrior (World 910228)            90629B-3   STF29 
 Street Fighter II: The World Warrior (World 910522)            90629B-3   STF29            IOB1  90632C-1     CPS-B-11  DL-0411-10004  C632
 Street Fighter II: The World Warrior (USA 910206)              90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (USA 910214)              90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
-Street Fighter II: The World Warrior (USA 910228)              90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (USA 910228)              90629B-3   STF29            IOB2  90632C-1     CPS-B-18  DL-0411-10013  C632B
 Street Fighter II: The World Warrior (USA 910306)              90629B-3   STF29            IOB1  90632C-1     CPS-B-12  DL-0411-10007  C632
 Street Fighter II: The World Warrior (USA 910318)              90629B-?   STF29            IOB1  ?            CPS-B-05  DL-0411-10006  C632
 Street Fighter II: The World Warrior (USA 910411)              90629B-?   STF29            IOB1  ?            CPS-B-15  DL-0411-10010  C632
