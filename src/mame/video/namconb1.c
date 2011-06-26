@@ -4,7 +4,6 @@
 #include "includes/namconb1.h"
 #include "includes/namcoic.h"
 #include "includes/namcos2.h"
-#include "audio/namcoc7x.h"
 
 
 /* nth_word32 is a general-purpose utility function, which allows us to
