@@ -918,7 +918,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 }
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16 )
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_r, c352_w)
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_BASE_MEMBER(namconb1_state, m_namconb_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
@@ -1045,7 +1045,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_VIDEO_START(namconb1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("c352", C352, MASTER_CLOCK_HZ/3)
+	MCFG_C352_ADD("c352", MASTER_CLOCK_HZ/3)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -1078,7 +1078,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_VIDEO_START(namconb2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("c352", C352, MASTER_CLOCK_HZ/3)
+	MCFG_C352_ADD("c352", MASTER_CLOCK_HZ/3)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -1099,7 +1099,7 @@ ROM_START( ptblank ) /* World set using 4Mb sound data rom (verified) */
 //  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
 	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
 
 	ROM_REGION( 0x800000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1130,7 +1130,7 @@ ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
 //  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
 	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
 
 	ROM_REGION( 0x800000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1161,7 +1161,7 @@ ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
 	ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
 //  ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
 
 	ROM_REGION( 0x800000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1191,7 +1191,7 @@ ROM_START( nebulray )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "nr1-spr0", 0, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "nr1-voi0", 0, 0x200000, CRC(332d5e26) SHA1(9daddac3fbe0709e25ed8e0b456bac15bfae20d7) )
 
 	ROM_REGION( 0x1000000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1228,7 +1228,7 @@ ROM_START( nebulrayj )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "nr1-spr0", 0, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "nr1-voi0", 0, 0x200000, CRC(332d5e26) SHA1(9daddac3fbe0709e25ed8e0b456bac15bfae20d7) )
 
 	ROM_REGION( 0x1000000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1265,7 +1265,7 @@ ROM_START( gslgr94u )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "gse2spr0.bin", 0, 0x20000, CRC(17e87cfc) SHA1(9cbeadb6dfcb736e8c80eab344f70fc2f58469d6) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "gse-voi0.bin", 0, 0x200000, CRC(d3480574) SHA1(0c468ed060769b36b7e41cf4919cb6d8691d64f6) )
 
 	ROM_REGION( 0x400000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1293,7 +1293,7 @@ ROM_START( gslgr94j )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "gs41spr0.5b", 0, 0x80000, CRC(3e2b6d55) SHA1(f6a1ecaee3a9a7a535850084e469aa7f873f301e) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "gs4voi0.5j", 0, 0x200000, CRC(c3053a90) SHA1(e76799b33b2457421255b03786bc24266d59c7dd) )
 
 	ROM_REGION( 0x800000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1448,7 +1448,7 @@ ROM_START( gslugrsj )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "gs1spr0.5b", 0, 0x80000, CRC(561ea20f) SHA1(adac6b77effc3a82079a9b228bafca0fcef72ba5) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "gs1voi-0.5j", 0, 0x200000, CRC(6f8262aa) SHA1(beea98d9f8b927a572eb0bfcf678e9d6e40fc68d) )
 
 	ROM_REGION( 0x400000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1476,7 +1476,7 @@ ROM_START( sws95 )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ss51spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ss51voi0.bin", 0, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
 
 
@@ -1505,7 +1505,7 @@ ROM_START( sws96 )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ss61spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ss61voi0.bin", 0, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
 
 	ROM_REGION( 0x400000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1533,7 +1533,7 @@ ROM_START( sws97 )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ss71spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ss71voi0.bin", 0, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
 
 	ROM_REGION( 0x400000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1561,7 +1561,7 @@ ROM_START( vshoot )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "vsj1spr0.5b", 0, 0x80000, CRC(b0c71aa6) SHA1(a94fae02b46a645ff728d2f98827c85ff155892b) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "vsjvoi-0.5j", 0, 0x200000, CRC(0528c9ed) SHA1(52b67978fdeb97b77065575774a7ddeb49fe1d81) )
 
 	ROM_REGION( 0x800000, NAMCONB1_SPRITEGFXREGION, 0 )
@@ -1749,7 +1749,7 @@ ROM_START( outfxies )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
 	ROM_REGION( 0x200000, NAMCONB1_TILEMASKREGION, 0 )
@@ -1794,7 +1794,7 @@ ROM_START( outfxiesj )
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 
-	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
 	ROM_REGION( 0x200000, NAMCONB1_TILEMASKREGION, 0 )

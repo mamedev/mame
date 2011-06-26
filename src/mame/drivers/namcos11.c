@@ -775,7 +775,7 @@ static READ16_HANDLER( c76_inputs_r )
 }
 
 ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_r, c352_w )
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
 	AM_RANGE(0x001000, 0x001007) AM_READ( c76_inputs_r )
 	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( c76_shared_r, c76_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c76", 0x40000)
@@ -1009,7 +1009,7 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0 )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("c352", C352, 16384000)
+	MCFG_C352_ADD("c352", 16384000)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -1657,7 +1657,7 @@ ROM_START( tekkenac )
 	ROM_LOAD( "te1sprog.6d",  0x0000000, 0x040000, CRC(849587e9) SHA1(94c6a757b24758a866a41bd8acd46aa46844f74b) )
 	ROM_LOAD( "c76.bin",      0x040000, 0x004000, CRC(399faac7) SHA1(ceb184ef0486caf715dd997101999785f67a40b8) )
 
-	ROM_REGION( 0x0200000, "c352", 0 ) /* samples */
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "te1wave.8k",   0x0000000, 0x200000, CRC(fce6c57a) SHA1(7fb8c69452c92c59a940a2b69d0d73ef7aefcb82) )
 ROM_END
 
@@ -1680,7 +1680,7 @@ ROM_START( tekkenab )
 	ROM_LOAD( "te1sprog.6d",  0x0000000, 0x040000, CRC(849587e9) SHA1(94c6a757b24758a866a41bd8acd46aa46844f74b) )
 	ROM_LOAD( "c76.bin",      0x040000, 0x004000, CRC(399faac7) SHA1(ceb184ef0486caf715dd997101999785f67a40b8) )
 
-	ROM_REGION( 0x0200000, "c352", 0 ) /* samples */
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "te1wave.8k",   0x0000000, 0x200000, CRC(fce6c57a) SHA1(7fb8c69452c92c59a940a2b69d0d73ef7aefcb82) )
 ROM_END
 
@@ -1703,7 +1703,7 @@ ROM_START( tekkenjb )
 	ROM_LOAD( "te1sprog.6d",  0x0000000, 0x040000, CRC(849587e9) SHA1(94c6a757b24758a866a41bd8acd46aa46844f74b) )
 	ROM_LOAD( "c76.bin",      0x040000, 0x004000, CRC(399faac7) SHA1(ceb184ef0486caf715dd997101999785f67a40b8) )
 
-	ROM_REGION( 0x0200000, "c352", 0 ) /* samples */
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "te1wave.8k",   0x0000000, 0x200000, CRC(fce6c57a) SHA1(7fb8c69452c92c59a940a2b69d0d73ef7aefcb82) )
 ROM_END
 

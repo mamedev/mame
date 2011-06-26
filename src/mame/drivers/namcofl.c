@@ -331,7 +331,7 @@ static READ8_HANDLER(dac1_r) { return 0xff; }
 static READ8_HANDLER(dac0_r) { return 0xff; }
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16 )
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_r, c352_w)
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_BASE_MEMBER(namcofl_state, m_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
@@ -617,7 +617,7 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 	MCFG_VIDEO_START(namcofl)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("c352", C352, 48384000/3)
+	MCFG_C352_ADD("c352", 48384000/3)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -663,7 +663,7 @@ ROM_START( speedrcr )
 	ROM_REGION( 0x100000, NAMCOFL_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("se1_ssh.18u",    0x000000, 0x100000, CRC(7a8e0bda) SHA1(f6a508d90274d0205fec0c46f5f783a2715c0c6e) )
 
-	ROM_REGION( 0x400000, "c352", 0 ) // Samples
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD("se1_voi.23s",   0x000000, 0x400000, CRC(b95e2ffb) SHA1(7669232d772caa9afa4c7593d018e8b6e534114a) )
 
     ROM_REGION( 0x000005, "pals", 0) /* PAL's */
@@ -715,7 +715,7 @@ ROM_START( finalapr )
 	ROM_REGION( 0x80000, NAMCOFL_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x200000, "c352", 0 ) // Samples
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) // default settings, including calibration
@@ -757,7 +757,7 @@ ROM_START( finalapro )
 	ROM_REGION( 0x80000, NAMCOFL_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x200000, "c352", 0 ) // Samples
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) // default settings, including calibration
@@ -800,7 +800,7 @@ ROM_START( finalaprj )
 	ROM_REGION( 0x80000, NAMCOFL_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x200000, "c352", 0 ) // Samples
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) // default settings, including calibration

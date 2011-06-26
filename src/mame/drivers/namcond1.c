@@ -253,7 +253,7 @@ static WRITE8_HANDLER( mcu_pa_write )
 static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
-	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE( "c352", c352_r, c352_w )
+	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xc00010, 0xc00011) AM_NOP
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("c352", C352, 16384000)
+	MCFG_C352_ADD("c352", 16384000)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -345,7 +345,7 @@ ROM_START( ncv1 )
 	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
-	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
     ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
@@ -360,7 +360,7 @@ ROM_START( ncv1j )
 	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
-	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
     ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
@@ -375,7 +375,7 @@ ROM_START( ncv1j2 )
 	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
-	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
     ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
@@ -391,7 +391,7 @@ ROM_START( ncv2 )
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 
-	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
     ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
@@ -407,7 +407,7 @@ ROM_START( ncv2j )
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 
-	ROM_REGION( 0x200000,"c352", 0 )	/* 2MB sound data */
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
     ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
