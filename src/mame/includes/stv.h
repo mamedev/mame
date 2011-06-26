@@ -98,8 +98,8 @@ public:
 	legacy_cpu_device* m_audiocpu;
 };
 
-#define MASTER_CLOCK_352 57272800
-#define MASTER_CLOCK_320 53748200
+#define MASTER_CLOCK_352 57272720
+#define MASTER_CLOCK_320 53693174
 #define CEF_1	state->m_vdp1_regs[0x010/2]|=0x0002
 #define CEF_0   state->m_vdp1_regs[0x010/2]&=~0x0002
 #define BEF_1	state->m_vdp1_regs[0x010/2]|=0x0001

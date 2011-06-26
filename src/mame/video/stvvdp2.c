@@ -5621,8 +5621,8 @@ static void stv_vdp2_get_window0_coordinates(running_machine &machine,UINT16 *s_
 			*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
 			break;
 		case 3:
-			*s_y = ((STV_VDP2_W1SY & 0x7ff) >> 0) << 1;
-			*e_y = ((STV_VDP2_W1EY & 0x7ff) >> 0) << 1;
+			*s_y = ((STV_VDP2_W0SY & 0x7ff) >> 0);
+			*e_y = ((STV_VDP2_W0EY & 0x7ff) >> 0);
 			break;
 	}
 	switch(STV_VDP2_HRES & 6)
@@ -5668,8 +5668,8 @@ static void stv_vdp2_get_window1_coordinates(running_machine &machine,UINT16 *s_
 			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
 			break;
 		case 3:
-			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0) << 1;
-			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0) << 1;
+			*s_y = ((STV_VDP2_W1SY & 0x7ff) >> 0);
+			*e_y = ((STV_VDP2_W1EY & 0x7ff) >> 0);
 			break;
 	}
 	switch(STV_VDP2_HRES & 6)

@@ -956,7 +956,6 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
 				mode = 3;
-			//  pix = machine.rand();
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
 				pix = gfxdata[(patterndata+offsetcnt) & 0xfffff];
@@ -967,12 +966,13 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 			case 0x0028: // mode 5 32,768 colour RGB mode (16bits)
 				pix = gfxdata[(patterndata+offsetcnt*2+1) & 0xfffff] | (gfxdata[(patterndata+offsetcnt*2) & 0xfffff]<<8) ;
 				mode = 5;
-				transmask = 0xffff;
+				transmask = -1; /* TODO: check me */
 				break;
 			default: // other settings illegal
 				pix = machine.rand();
 				mode = 0;
 				transmask = 0xff;
+				popmessage("Illegal Sprite Mode, contact MAMEdev");
 		}
 
 

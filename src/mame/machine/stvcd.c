@@ -803,6 +803,9 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				cdda_pause_audio( machine.device( "cdda" ), 0 );
 				cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
 			}
+			else
+				cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
+
 			//else
 			//{
 			//  sector_timer->reset();

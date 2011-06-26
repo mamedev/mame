@@ -437,7 +437,6 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 
 	machine.device("maincpu")->set_unscaled_clock(xtal/2);
 	machine.device("slave")->set_unscaled_clock(xtal/2);
-	machine.device("audiocpu")->set_unscaled_clock(xtal/5);
 
 	state->m_vdp2.dotsel = cmd ^ 1;
 	stv_vdp2_dynamic_res_change(machine);
@@ -542,7 +541,7 @@ static TIMER_CALLBACK( smpc_intback )
 		state->m_smpc.smpcSR = 0x60;		// peripheral data ready, no reset, etc.
 		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
 
-		state->m_smpc.intback_stage = 1;
+		state->m_smpc.intback_stage = 2;
 
 		smpc_intbackhelper(machine);
 	}
@@ -1465,7 +1464,7 @@ static TIMER_CALLBACK( dma_lv2_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(stv_irq.dma_end[2])	device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
+	if(stv_irq.dma_end[2]) device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
 
 	DnMV_0(2);
 }
@@ -2776,7 +2775,7 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
 
-	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_MACHINE_START(saturn)
@@ -2825,7 +2824,7 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
 
-	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_MACHINE_START(stv)
