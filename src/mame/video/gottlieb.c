@@ -75,7 +75,7 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 {
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
-	device_t *laserdisc = space->machine().devicelist().first(LASERDISC);
+	device_t *laserdisc = space->machine().devicelist().first(PIONEER_PR8210);
 
 	/* bit 0 works like the other games */
 	gottlieb_video_control_w(space, offset, data & 0x01);

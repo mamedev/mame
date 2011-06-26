@@ -51,7 +51,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
-	laserdisc_device *m_laserdisc;
+	device_t *m_laserdisc;
 	UINT8 m_last_misc;
 	UINT8 m_laserdisc_type;
 	UINT8 m_laserdisc_data;
@@ -200,7 +200,7 @@ static SCREEN_UPDATE( dleuro )
 static MACHINE_START( dlair )
 {
 	dlair_state *state = machine.driver_data<dlair_state>();
-	state->m_laserdisc = machine.device<laserdisc_device>("laserdisc");
+	state->m_laserdisc = machine.device<device_t>("laserdisc");
 }
 
 

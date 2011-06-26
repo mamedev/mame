@@ -1723,32 +1723,33 @@ static slider_state *slider_init(running_machine &machine)
 		tailptr = &(*tailptr)->next;
 	}
 
-	for (device = machine.devicelist().first(LASERDISC); device != NULL; device = device->typenext())
-	{
-		const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_base *>(device)->inline_config();
-		if (config->overupdate != NULL)
+	for (device = machine.devicelist().first(); device != NULL; device = device->next())
+		if (device_is_laserdisc(device))
 		{
-			int defxscale = floor(config->overscalex * 1000.0f + 0.5f);
-			int defyscale = floor(config->overscaley * 1000.0f + 0.5f);
-			int defxoffset = floor(config->overposx * 1000.0f + 0.5f);
-			int defyoffset = floor(config->overposy * 1000.0f + 0.5f);
-			void *param = (void *)device;
+			const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_base *>(device)->inline_config();
+			if (config->overupdate != NULL)
+			{
+				int defxscale = floor(config->overscalex * 1000.0f + 0.5f);
+				int defyscale = floor(config->overscaley * 1000.0f + 0.5f);
+				int defxoffset = floor(config->overposx * 1000.0f + 0.5f);
+				int defyoffset = floor(config->overposy * 1000.0f + 0.5f);
+				void *param = (void *)device;
 
-			/* add scale and offset controls per-overlay */
-			string.printf("%s Horiz Stretch", slider_get_laserdisc_desc(device));
-			*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
-			tailptr = &(*tailptr)->next;
-			string.printf("%s Horiz Position", slider_get_laserdisc_desc(device));
-			*tailptr = slider_alloc(machine, string, -500, defxoffset, 500, 2, slider_overxoffset, param);
-			tailptr = &(*tailptr)->next;
-			string.printf("%s Vert Stretch", slider_get_laserdisc_desc(device));
-			*tailptr = slider_alloc(machine, string, 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
-			tailptr = &(*tailptr)->next;
-			string.printf("%s Vert Position", slider_get_laserdisc_desc(device));
-			*tailptr = slider_alloc(machine, string, -500, defyoffset, 500, 2, slider_overyoffset, param);
-			tailptr = &(*tailptr)->next;
+				/* add scale and offset controls per-overlay */
+				string.printf("%s Horiz Stretch", slider_get_laserdisc_desc(device));
+				*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
+				tailptr = &(*tailptr)->next;
+				string.printf("%s Horiz Position", slider_get_laserdisc_desc(device));
+				*tailptr = slider_alloc(machine, string, -500, defxoffset, 500, 2, slider_overxoffset, param);
+				tailptr = &(*tailptr)->next;
+				string.printf("%s Vert Stretch", slider_get_laserdisc_desc(device));
+				*tailptr = slider_alloc(machine, string, 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
+				tailptr = &(*tailptr)->next;
+				string.printf("%s Vert Position", slider_get_laserdisc_desc(device));
+				*tailptr = slider_alloc(machine, string, -500, defyoffset, 500, 2, slider_overyoffset, param);
+				tailptr = &(*tailptr)->next;
+			}
 		}
-	}
 
 	for (screen_device *screen = machine.first_screen(); screen != NULL; screen = screen->next_screen())
 		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
@@ -2168,25 +2169,23 @@ static char *slider_get_screen_desc(screen_device &screen)
 	return descbuf;
 }
 
-
 /*-------------------------------------------------
     slider_get_laserdisc_desc - returns the
     description for a given laseridsc
 -------------------------------------------------*/
-
 static char *slider_get_laserdisc_desc(device_t *laserdisc)
 {
-	int ldcount = laserdisc->machine().devicelist().count(LASERDISC);
 	static char descbuf[256];
+	for (device_t *device = laserdisc->machine().devicelist().first(); device != NULL; device = device->next())
+		if (device_is_laserdisc(device) && device != laserdisc)
+		{
+			sprintf(descbuf, "Laserdisc '%s'", laserdisc->tag());
+			return descbuf;
+		}
 
-	if (ldcount > 1)
-		sprintf(descbuf, "Laserdisc '%s'", laserdisc->tag());
-	else
-		strcpy(descbuf, "Laserdisc");
-
+	strcpy(descbuf, "Laserdisc");
 	return descbuf;
 }
-
 
 /*-------------------------------------------------
     slider_crossscale - crosshair scale slider
