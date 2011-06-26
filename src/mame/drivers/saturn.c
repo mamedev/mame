@@ -128,9 +128,7 @@ also has a DSP;
 /*VDP2 stuff*/
 /*SMPC stuff*/
 /*SCU stuff*/
-/* TODO: not stated because IRQ system needs to be rewritten anyway ... */
-static int	  timer_0;			/* Counter for Timer 0 irq*/
-static int    timer_1;          /* Counter for Timer 1 irq*/
+
 
 static struct
 {
@@ -2484,8 +2482,6 @@ static MACHINE_START( stv )
 	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
 	state_save_register_global(machine, state->m_NMI_reset);
 	state_save_register_global(machine, state->m_en_68k);
-	state_save_register_global(machine, timer_0);
-	state_save_register_global(machine, timer_1);
 //  state_save_register_global(machine, scanline);
 	state_save_register_global(machine, state->m_smpc.IOSEL1);
 	state_save_register_global(machine, state->m_smpc.IOSEL2);
@@ -2529,8 +2525,6 @@ static MACHINE_START( saturn )
 	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
 	state_save_register_global(machine, state->m_NMI_reset);
 	state_save_register_global(machine, state->m_en_68k);
-	state_save_register_global(machine, timer_0);
-	state_save_register_global(machine, timer_1);
 	state_save_register_global(machine, state->m_smpc.IOSEL1);
 	state_save_register_global(machine, state->m_smpc.IOSEL2);
 	state_save_register_global(machine, state->m_smpc.EXLE1);
@@ -2678,8 +2672,6 @@ static MACHINE_RESET( saturn )
 
 	state->m_smpc.smpcSR = 0x40;	// this bit is always on according to docs
 
-	timer_0 = 0;
-	timer_1 = 0;
 	state->m_en_68k = 0;
 	state->m_NMI_reset = 1;
 	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
@@ -2733,8 +2725,6 @@ static MACHINE_RESET( stv )
 	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
-	timer_0 = 0;
-	timer_1 = 0;
 	state->m_en_68k = 0;
 	state->m_NMI_reset = 1;
 	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
