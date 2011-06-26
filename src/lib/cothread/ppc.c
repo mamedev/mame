@@ -13,7 +13,7 @@ floating-point and AltiVec save/restore */
 #include <stdint.h>
 #include <string.h>
 
-#define LIBCO_MPROTECT (__unix__ && !LIBCO_PPC_ASM)
+#define LIBCO_MPROTECT defined(__unix__) && !defined(LIBCO_PPC_ASM)
 
 #if LIBCO_MPROTECT
 	#include <unistd.h>
@@ -41,12 +41,12 @@ static thread_local cothread_t co_active_handle = 0;
 
 /**** Determine environment ****/
 
-#define LIBCO_PPC64 (_ARCH_PPC64 || __PPC64__ || __ppc64__ || __powerpc64__)
+#define LIBCO_PPC64 defined(_ARCH_PPC64) || defined(__PPC64__) || defined(__ppc64__) || defined(__powerpc64__)
 
 /* Whether function calls are indirect through a descriptor,
 or are directly to function */
 #ifndef LIBCO_PPCDESC
-	#if !_CALL_SYSV && (_CALL_AIX || _CALL_AIXDESC || LIBCO_PPC64)
+	#if !defined(_CALL_SYSV) && (defined(_CALL_AIX) || defined(_CALL_AIXDESC) || defined(LIBCO_PPC64))
 		#define LIBCO_PPCDESC 1
 	#endif
 #endif
