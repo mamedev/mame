@@ -210,68 +210,86 @@ emu_options::emu_options()
 
 
 //-------------------------------------------------
-//  add_device_options - add all of the device
+//  add_slot_options - add all of the slot
 //  options for the configured system
 //-------------------------------------------------
 
-void emu_options::add_device_options()
+bool emu_options::add_slot_options(bool isfirst)
 {
-	// remove any existing device options
-	remove_device_options();
-
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system();
 	if (cursystem == NULL)
-		return;
-
-	// create the configuration
-	machine_config config(*cursystem, *this);
+		return false;
 
 	// iterate through all slot devices
 	options_entry entry[2] = { { 0 }, { 0 } };
 	bool first = true;
 	const device_slot_interface *slot = NULL;
+	// create the configuration
+	machine_config config(*cursystem, *this);
+	bool added = false;
 	for (bool gotone = config.devicelist().first(slot); gotone; gotone = slot->next(slot))
 	{
 		// first device? add the header as to be pretty
-		if (first)
+		if (first && isfirst)
 		{
-			first = false;
 			entry[0].name = NULL;
 			entry[0].description = "SLOT DEVICES";
 			entry[0].flags = OPTION_HEADER | OPTION_FLAG_DEVICE;
 			entry[0].defvalue = NULL;
 			add_entries(entry);
 		}
+		first = false;
 
 		// retrieve info about the device instance
 		astring option_name;
 		option_name.printf("%s;%s", slot->device().tag(), slot->device().tag());
 
-		// add the option
-		entry[0].name = option_name;
-		entry[0].description = NULL;
-		entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-		entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card() : NULL;
-		add_entries(entry, true);
+		if (!exists(slot->device().tag())) {
+		
+			// add the option
+			entry[0].name = slot->device().tag();
+			entry[0].description = NULL;
+			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
+			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card() : NULL;
+			add_entries(entry, true);
+			
+			added = true;
+		}
 	}
+	return added;
+}
 
+//-------------------------------------------------
+//  add_device_options - add all of the device
+//  options for the configured system
+//-------------------------------------------------
+
+void emu_options::add_device_options(bool isfirst)
+{
+	// look up the system configured by name; if no match, do nothing
+	const game_driver *cursystem = system();
+	if (cursystem == NULL)
+		return;
+
+	// iterate through all slot devices
+	options_entry entry[2] = { { 0 }, { 0 } };
+	bool first = true;
 	// iterate through all image devices
 	const device_image_interface *image = NULL;
-	machine_config slot_config(*cursystem, *this);
-	first = true;
-	for (bool gotone = slot_config.devicelist().first(image); gotone; gotone = image->next(image))
+	machine_config config(*cursystem, *this);
+	for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
 	{
 		// first device? add the header as to be pretty
-		if (first)
+		if (first && isfirst)
 		{
-			first = false;
 			entry[0].name = NULL;
 			entry[0].description = "IMAGE DEVICES";
 			entry[0].flags = OPTION_HEADER | OPTION_FLAG_DEVICE;
 			entry[0].defvalue = NULL;
 			add_entries(entry);
 		}
+		first = false;
 
 		// retrieve info about the device instance
 		astring option_name;
@@ -323,8 +341,15 @@ bool emu_options::parse_command_line(int argc, char *argv[], astring &error_stri
 	// if the system name changed, fix up the device options
 	if (old_system_name != system_name())
 	{
-		add_device_options();
-
+		// remove any existing device options
+		remove_device_options();
+		add_device_options(true);
+		bool isfirst = true;
+		while (add_slot_options(isfirst)) {
+			result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+			add_device_options(false);
+			isfirst = false;
+		}
 		// if we failed the first time, try parsing again with the new options in place
 		if (!result)
 			result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
@@ -423,9 +448,10 @@ void emu_options::set_system_name(const char *name)
 		astring error;
 		set_value(OPTION_SYSTEMNAME, name, OPTION_PRIORITY_CMDLINE, error);
 		assert(!error);
-
+		// remove any existing device options
+		remove_device_options();
 		// then add the options
-		add_device_options();
+		add_device_options(true);
 	}
 }
 

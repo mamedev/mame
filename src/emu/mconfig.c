@@ -76,7 +76,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		{
 			device_t &owner = slot->device();
 			const char *selval = options.value(owner.tag());
-			if (options.seqid(owner.tag()) == 0)
+			if (!options.exists(owner.tag()))
 				selval = slot->get_default_card();
 
 			if (selval != NULL)

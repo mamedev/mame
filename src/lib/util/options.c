@@ -556,6 +556,15 @@ UINT32 core_options::seqid(const char *name) const
 	return (curentry != NULL) ? curentry->seqid() : 0;
 }
 
+//-------------------------------------------------
+//  exists - return if option exists in list
+//-------------------------------------------------
+
+bool core_options::exists(const char *name) const
+{
+	entry *curentry = m_entrymap.find(name);
+	return (curentry != NULL);
+}
 
 //-------------------------------------------------
 //  set_value - set the raw option value

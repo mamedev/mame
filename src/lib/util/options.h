@@ -175,6 +175,7 @@ public:
 	int int_value(const char *name) const { return atoi(value(name)); }
 	float float_value(const char *name) const { return atof(value(name)); }
 	UINT32 seqid(const char *name) const;
+	bool exists(const char *name) const;
 
 	// setting
 	void set_command(const char *command);

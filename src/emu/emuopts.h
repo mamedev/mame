@@ -349,7 +349,8 @@ public:
 
 private:
 	// device-specific option handling
-	void add_device_options();
+	void add_device_options(bool isfirst);
+	bool add_slot_options(bool isfirst);
 	void remove_device_options();
 
 	// INI parsing helper
