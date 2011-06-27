@@ -363,7 +363,10 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_BYTE_BIOS( 2, "gcp-2-hi", 0x020000, 0x10000, CRC(1d7594ae) SHA1(6173bbfecf18d7d9ee6bc2b6753ca9d42fabd781) ) \
 	ROM_LOAD16_BYTE_BIOS( 2, "gcp-2-lo", 0x020001, 0x10000, CRC(e776198d) SHA1(694ca4cc99ed84a95d18201c94a3332f8599654f) ) \
 	ROM_LOAD16_BYTE_BIOS( 2, "gcp-3-hi", 0x040000, 0x10000, CRC(3e7364be) SHA1(26e10d0ddc031a891138db36ce4f1732722e6847) ) \
-	ROM_LOAD16_BYTE_BIOS( 2, "gcp-3-lo", 0x040001, 0x10000, CRC(87229e0d) SHA1(0b18544801e529f954b9e03226bd2e5475f36351) )
+	ROM_LOAD16_BYTE_BIOS( 2, "gcp-3-lo", 0x040001, 0x10000, CRC(87229e0d) SHA1(0b18544801e529f954b9e03226bd2e5475f36351) ) \
+	ROM_SYSTEM_BIOS(3, "onep220", "OnePlay 2.20" ) \
+	ROM_LOAD16_BYTE_BIOS( 3, "scpa_v220_1h.u12", 0x000000, 0x10000, CRC(79450b4b) SHA1(a1e508a89fc62e1c4994064f2786f491b1dc8bc6) ) \
+	ROM_LOAD16_BYTE_BIOS( 3, "scpa_v220_1l.u16", 0x000001, 0x10000, CRC(d2825511) SHA1(747a37c6073224472bf261ae376ac9abfbe07554) )
 
 
 
@@ -543,6 +546,28 @@ ROM_START( ar_ldrba )
 	ROM_LOAD16_BYTE( "ldrb_8l.bin", 0xe0001, 0x10000, CRC(322f52eb) SHA1(3033eb753fb8b3bf56b152377bf567b06a0c8144) )
 ROM_END
 
+/* LDRB */
+ROM_START( ar_ldrbb )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "ldrb_1h.u11", 0x00000, 0x10000, CRC(97dcde78) SHA1(d324415b853de17646b5266581bea27e571fa08f) )
+	ROM_LOAD16_BYTE( "ldrb_1l_gcp_22.u15", 0x00001, 0x10000, CRC(b51d17f7) SHA1(56add2f69c35e5082926bd59be7f98a6a223c549) )
+	ROM_LOAD16_BYTE( "ldrb_2h.u10", 0x20000, 0x10000, CRC(64e5fbae) SHA1(0dde0d05b05f232aac9ad44398cedd8c7627f146) )
+	ROM_LOAD16_BYTE( "ldrb_2l.u14", 0x20001, 0x10000, CRC(bb115e1c) SHA1(768cf51661f630b1c0a4b83b9f6124c78a517d0a) )
+	ROM_LOAD16_BYTE( "ldrb_3h.u9",  0x40000, 0x10000, CRC(1d290e28) SHA1(0d589628fe59de9d7e2a57ddeabca991d1c79fdf) )
+	ROM_LOAD16_BYTE( "ldrb_3l.u13", 0x40001, 0x10000, CRC(b1352a77) SHA1(ac7337a3778442d444002f730e2880f61f32cf2a) )
+	ROM_LOAD16_BYTE( "ldrb_4h.u20", 0x60000, 0x10000, CRC(b621c688) SHA1(f2a50ebfc50725cdef77bb8a4864405dbb203784) )
+	ROM_LOAD16_BYTE( "ldrb_4l.u24", 0x60001, 0x10000, CRC(13f9c4b0) SHA1(08a1fab271307191c5caa108c4ae284f92c270e4) )
+	ROM_LOAD16_BYTE( "ldrb_5h.u19", 0x80000, 0x10000, CRC(71273172) SHA1(2b6204fdf03268e920b5948c999aa725fc66cac6) )
+	ROM_LOAD16_BYTE( "ldrb_5l.u23", 0x80001, 0x10000, CRC(d9028183) SHA1(009b496da31f67b11de54e50254a9897ea68cd92) )
+	ROM_LOAD16_BYTE( "ldrb_6h.u18", 0xa0000, 0x10000, CRC(a6ce61a4) SHA1(6cd64b7d589c91aeee06293f473fd1b3c56b19e0) )
+	ROM_LOAD16_BYTE( "ldrb_6l.u22", 0xa0001, 0x10000, CRC(13c71422) SHA1(93e6dca2b28e1b5235b922f064be96eed0bedd8c) )
+	ROM_LOAD16_BYTE( "ldrb_7h.u17", 0xc0000, 0x10000, CRC(4ebb8d12) SHA1(c328a26139ba0792cab1020b32eb4b8e39d51a22) )
+	ROM_LOAD16_BYTE( "ldrb_7l.u21", 0xc0001, 0x10000, CRC(1afa9a4f) SHA1(3e5ca56e03d693a72424b9ad0717494ea8eb561e) )
+	ROM_LOAD16_BYTE( "ldrb_8h.u28", 0xe0000, 0x10000, CRC(701f50ba) SHA1(4ea6be00aa2d32d739fa6ec70ec8bce470b28f90) )
+	ROM_LOAD16_BYTE( "ldrb_8l.u32", 0xe0001, 0x10000, CRC(80642c1d) SHA1(fc2101b749db3ebb3499c8870026c05acf46fa4d) )
+ROM_END
 
 /* NINJ V 2.5 */
 ROM_START( ar_ninj )
@@ -830,8 +855,9 @@ GAME( 1987, ar_dart2,	ar_dart, arcadia, arcadia, dart,  ROT0, "Arcadia Systems",
 
 GAME( 1988, ar_fast,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
 
-GAME( 1988, ar_ldrb,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, V 2.4?)", 0 )
-GAME( 1988, ar_ldrba,	ar_ldrb, arcadia, arcadia, ldrba, ROT0, "Arcadia Systems", "Leader Board (Arcadia, V 2.5)", 0 )
+GAME( 1988, ar_ldrb,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 1, V 2.4?)", 0 )
+GAME( 1988, ar_ldrba,	ar_ldrb, arcadia, arcadia, ldrba, ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 2, V 2.5)", 0 )
+GAME( 1988, ar_ldrbb,	ar_ldrb, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 3)", 0 )
 
 GAME( 1987, ar_ninj,	ar_bios, arcadia, arcadia, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 1, V 2.5)", 0 )
 GAME( 1987, ar_ninj2,   ar_ninj, arcadia, arcadia, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 2)", 0 )

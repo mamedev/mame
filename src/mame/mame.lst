@@ -8964,6 +8964,7 @@ ar_dart2		// (c) 1987
 ar_fast			// (c) 1988
 ar_ldrb			// (c) 1988
 ar_ldrba		// (c) 1988
+ar_ldrbb		// (c) 1988
 ar_ninj			// (c) 1987
 ar_ninj2		// (c) 1987
 ar_rdwr			// (c) 1988
