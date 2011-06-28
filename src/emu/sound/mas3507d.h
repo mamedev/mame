@@ -3,7 +3,6 @@
 #ifndef __MAS3507D_H__
 #define __MAS3507D_H__
 
-#include "devintrf.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
