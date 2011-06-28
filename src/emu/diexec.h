@@ -269,7 +269,7 @@ protected:
 		static void static_empty_event_queue(running_machine &machine, void *ptr, int param);
 		void empty_event_queue();
 	};
-	
+
 	// internal state
 	cothread				m_cothread;					// thread used for execution
 

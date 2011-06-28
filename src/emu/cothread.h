@@ -66,22 +66,22 @@ public:
 	cothread(cothread_t existing_thread);
 	cothread(cothread_entry_delegate entry, size_t stack = 16384);
 	~cothread() { if (m_creator_cothread != NULL) co_delete(m_cothread); }
-	
+
 	// switching
 	void make_active() { co_switch(m_cothread); }
-	
+
 private:
 	// internal helpers
 	static void cothread_entry();
 
 	// internal state
-	cothread_t 			m_cothread;
+	cothread_t			m_cothread;
 	cothread_t			m_creator_cothread;
 	cothread_entry_delegate m_entry;
-	
+
 	// static state
-	static osd_lock * 	s_create_lock;
-	static cothread * 	s_create_cothread;
+	static osd_lock *	s_create_lock;
+	static cothread *	s_create_cothread;
 };
 
 
