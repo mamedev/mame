@@ -401,7 +401,7 @@ public:
 	UINT16 * m_vid_vidram;
 	UINT16 * m_vid_mainram;
 //	UINT8 m_scn2674_IR[16];
-	UINT8 m_scn2675_IR_pointer;
+	UINT8 m_scn2674_IR_pointer;
 	UINT8 m_scn2674_screen1_l;
 	UINT8 m_scn2674_screen1_h;
 	UINT8 m_scn2674_cursor_l;
@@ -450,8 +450,10 @@ public:
 	UINT8 m_IR14_scn2674_scroll_lines;
 	UINT8 m_IR14_scn2674_double_1;
 	UINT8 m_IR14_scn2674_double_2;
+	UINT8 m_scn2674_horz_front_porch;
 	UINT8 m_scn2674_spl1;
 	UINT8 m_scn2674_spl2;
+	UINT8 m_scn2674_dbl1;
 	INT8 m_cur[2];
 	UINT8 *m_dealem_videoram;
 	int m_rowcounter;
