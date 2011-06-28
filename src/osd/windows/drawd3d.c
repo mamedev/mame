@@ -507,6 +507,9 @@ static void drawd3d_window_destroy(win_window_info *window)
 	if (d3d == NULL)
 		return;
 
+	// free our effects
+	d3d->hlsl->delete_resources();
+	
 	// delete the HLSL interface
 	global_free(d3d->hlsl);
 
@@ -935,6 +938,8 @@ static void device_delete_resources(d3d_info *d3d)
 
 	// free our effects
 	d3d->hlsl->delete_resources();
+	
+	global_free(d3d->hlsl);
 }
 
 
