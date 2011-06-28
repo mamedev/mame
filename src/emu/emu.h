@@ -82,7 +82,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // I/O
 #include "input.h"
-#include "inptport.h"
+#include "ioport.h"
 #include "output.h"
 
 // devices and callbacks

@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    inptport.c
+    ioport.c
 
-    Input port handling.
+    Input/output port handling.
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
