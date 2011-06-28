@@ -170,6 +170,7 @@ TODO:
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
         They appear to hang on the handshake with the MPU4 board
       - Find out what causes the games to reset in service mode (see jump taken at CPU1:c8e8)
+	    Changing the state of the doors should force a reset but not in the mode itself - is there an input we should be checking?
       - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
       - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
         to give black on green.
@@ -452,7 +453,7 @@ static SCREEN_UPDATE( mpu4_vid )
 	/* count = 0x0018b6/2; - crmaze count = 0x004950/2; - turnover */
 
 	/* we're in row table mode...thats why */
-	for(y = 0; y <= state->m_IR4_scn2674_rows_per_screen; y++)
+	for(y = 0; y < state->m_IR4_scn2674_rows_per_screen; y++)
 	{
 		int screen2_base = (state->m_scn2674_screen2_h << 8) | state->m_scn2674_screen2_l;
 
@@ -464,7 +465,7 @@ static SCREEN_UPDATE( mpu4_vid )
 
 		if (dbl_size&2) gfxregion = 1;
 
-		for(x = 0; x <= state->m_IR5_scn2674_character_per_row; x++)
+		for(x = 0; x < state->m_IR5_scn2674_character_per_row; x++)
 		{
 			UINT16 tiledat;
 			UINT16 attr;
@@ -509,24 +510,6 @@ static WRITE16_HANDLER( mpu4_vid_vidram_w )
 SCN2674 - Advanced Video Display Controller (AVDC)  (Video Chip)
 
 15 Initialization Registers (8-bit each)
-
--- fill me in later ---
-
-IR0  ---- ----
-IR1  ---- ----
-IR2  ---- ----
-IR3  ---- ----
-IR4  ---- ----
-IR5  ---- ----
-IR6  ---- ----
-IR7  ---- ----
-IR8  ---- ----
-IR9  ---- ----
-IR10 ---- ----
-IR11 ---- ----
-IR12 ---- ----
-IR13 ---- ----
-IR14 ---- ----
 */
 
 
@@ -534,69 +517,88 @@ static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 {
 	LOGSTUFF(("scn2674_write_init_regs %02x %02x\n",state->m_scn2675_IR_pointer,data));
 
-	state->m_scn2674_IR[state->m_scn2675_IR_pointer]=data;
+//	state->m_scn2674_IR[state->m_scn2675_IR_pointer]=data;
 
 
 	switch ( state->m_scn2675_IR_pointer) /* display some debug info, set mame specific variables */
 	{
 		case 0:
 			state->m_IR0_scn2674_double_ht_wd = (data & 0x80)>>7;
-			state->m_IR0_scn2674_scanline_per_char_row = (data & 0x78)>>3;
+			state->m_IR0_scn2674_scanline_per_char_row = ((data & 0x78)>>3) + 1;
 			state->m_IR0_scn2674_sync_select = (data&0x04)>>2;
 			state->m_IR0_scn2674_buffer_mode_select = (data&0x03);
 
-			LOGSTUFF(("IR0 - Double Ht Wd %02x\n",state->m_IR0_scn2674_double_ht_wd));
-			LOGSTUFF(("IR0 - Scanlines per Character Row %02x\n",state->m_IR0_scn2674_scanline_per_char_row));
-			LOGSTUFF(("IR0 - Sync Select %02x\n",state->m_IR0_scn2674_sync_select));
-			LOGSTUFF(("IR0 - Buffer Mode Select %02x\n",state->m_IR0_scn2674_buffer_mode_select));
+			LOGSTUFF(("IR0 - Double Ht Wd %02x\n",state->m_IR0_scn2674_double_ht_wd));//affects IR14 as well
+			LOGSTUFF(("IR0 - Scanlines per Character Row %02x\n",state->m_IR0_scn2674_scanline_per_char_row));//value+1 = scanlines
+
+			if (state->m_IR0_scn2674_scanline_per_char_row != 8)
+			{
+				popmessage("Row size change, contact MAMEDEV");
+			}
+			LOGSTUFF(("IR0 - Sync Select %02x\n",state->m_IR0_scn2674_sync_select));//1 = csync
+			LOGSTUFF(("IR0 - Buffer Mode Select %02x\n",state->m_IR0_scn2674_buffer_mode_select)); //0 independent 1 transparent 2 shared 3 row
 			break;
 
 		case 1:
 			state->m_IR1_scn2674_interlace_enable = (data&0x80)>>7;
-			state->m_IR1_scn2674_equalizing_constant = (data&0x7f);
+			state->m_IR1_scn2674_equalizing_constant = (data&0x7f)+1;
 
 			LOGSTUFF(("IR1 - Interlace Enable %02x\n",state->m_IR1_scn2674_interlace_enable));
-			LOGSTUFF(("IR1 - Equalizing Constant %02x\n",state->m_IR1_scn2674_equalizing_constant));
+			LOGSTUFF(("IR1 - Equalizing Constant %02x CCLKs\n",state->m_IR1_scn2674_equalizing_constant));
 			break;
 
 		case 2:
 			state->m_IR2_scn2674_row_table = (data&0x80)>>7;
-			state->m_IR2_scn2674_horz_sync_width = (data&0x78)>>3;
-			state->m_IR2_scn2674_horz_back_porch = (data&0x07);
+			state->m_IR2_scn2674_horz_sync_width = (((data&0x78)>>3)*2) + 2;
+			state->m_IR2_scn2674_horz_back_porch = ((data&0x07)*4) - 1;
 
 			LOGSTUFF(("IR2 - Row Table %02x\n",state->m_IR2_scn2674_row_table));
-			LOGSTUFF(("IR2 - Horizontal Sync Width %02x\n",state->m_IR2_scn2674_horz_sync_width));
-			LOGSTUFF(("IR2 - Horizontal Back Porch %02x\n",state->m_IR2_scn2674_horz_back_porch));
+			LOGSTUFF(("IR2 - Horizontal Sync Width %02x CCLKs\n",state->m_IR2_scn2674_horz_sync_width));
+			LOGSTUFF(("IR2 - Horizontal Back Porch %02x CCLKs\n",state->m_IR2_scn2674_horz_back_porch));
 			break;
 
 		case 3:
-			state->m_IR3_scn2674_vert_front_porch = (data&0xe0)>>5;
-			state->m_IR3_scn2674_vert_back_porch = (data&0x1f)>>0;
+			state->m_IR3_scn2674_vert_front_porch =  (((data&0xe0)>>5) * 4)+4 ;//returning actual value
+			state->m_IR3_scn2674_vert_back_porch = ((data&0x1f) * 2) + 4;
 
-			LOGSTUFF(("IR3 - Vertical Front Porch %02x\n",state->m_IR3_scn2674_vert_front_porch));
-			LOGSTUFF(("IR3 - Vertical Back Porch %02x\n",state->m_IR3_scn2674_vert_back_porch));
+			LOGSTUFF(("IR3 - Vertical Front Porch %02x Lines\n",state->m_IR3_scn2674_vert_front_porch));
+			LOGSTUFF(("IR3 - Vertical Back Porch %02x Lines\n",state->m_IR3_scn2674_vert_back_porch));
 			break;
 
 		case 4:
-			state->m_IR4_scn2674_rows_per_screen = data&0x7f;
-			state->m_IR4_scn2674_character_blink_rate = (data & 0x80)>>7;
+			state->m_IR4_scn2674_rows_per_screen = (data&0x7f) + 1;
+			state->m_IR4_scn2674_character_blink_rate_divisor = ((data & 0x80)>>7 ? 128:64);
 
 			LOGSTUFF(("IR4 - Rows Per Screen %02x\n",state->m_IR4_scn2674_rows_per_screen));
-			LOGSTUFF(("IR4 - Character Blink Rate %02x\n",state->m_IR4_scn2674_character_blink_rate));
+			LOGSTUFF(("IR4 - Character Blink Rate = 1/%02x\n",state->m_IR4_scn2674_character_blink_rate_divisor));
 			break;
 
 		case 5:
 		   /* IR5 - Active Characters Per Row
              cccc cccc
              c = Characters Per Row */
-			state->m_IR5_scn2674_character_per_row = data;
+			state->m_IR5_scn2674_character_per_row = data + 1;
 			LOGSTUFF(("IR5 - Active Characters Per Row %02x\n",state->m_IR5_scn2674_character_per_row));
 			break;
 
 		case 6:
+			state->m_IR6_scn2674_cursor_last_scanline = (data & 0x0f);
+			state->m_IR6_scn2674_cursor_first_scanline = (data & 0xf0)>>4;
+			LOGSTUFF(("IR6 - First Line of Cursor %02x\n",state->m_IR6_scn2674_cursor_first_scanline));
+			LOGSTUFF(("IR6 - Last Line of Cursor %02x\n",state->m_IR6_scn2674_cursor_last_scanline));
 			break;
 
 		case 7:
+			state->m_IR7_scn2674_cursor_underline_position = (data & 0x0f);
+			state->m_IR7_scn2674_cursor_rate_divisor = ((data & 0x10)>>4 ? 64:32);
+			state->m_IR7_scn2674_cursor_blink = (data & 0x20)>>5;
+
+			state->m_IR7_scn2674_vsync_width = vsync_table[(data & 0xC0)>>6];
+
+			LOGSTUFF(("IR7 - Underline Position %02x\n",state->m_IR7_scn2674_cursor_underline_position));
+			LOGSTUFF(("IR7 - Cursor rate 1/%02x\n",state->m_IR7_scn2674_cursor_rate_divisor));
+			LOGSTUFF(("IR7 - Cursor blink %02x\n",state->m_IR7_scn2674_cursor_blink));
+			LOGSTUFF(("IR7 - Vsync Width  %02x\n",state->m_IR7_scn2674_vsync_width));
 			break;
 
 		case 8:
@@ -618,7 +620,12 @@ static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 
 		case 11:
 			state->m_IR11_scn2674_display_pointer_address_upper= data&0x3f;
+			state->m_IR11_scn2674_reset_scanline_counter_on_scrollup= (data&0x40 >> 6);
+			state->m_IR11_scn2674_reset_scanline_counter_on_scrolldown= (data&0x80 >> 7);
+
 			LOGSTUFF(("IR11 - Display Pointer Address Lower %02x\n",state->m_IR11_scn2674_display_pointer_address_upper));
+			LOGSTUFF(("IR11 - Reset Scanline Counter on Scroll Up %02x\n",state->m_IR11_scn2674_reset_scanline_counter_on_scrollup));
+			LOGSTUFF(("IR11 - Reset Scanline Counter on Scroll Down %02x\n",state->m_IR11_scn2674_reset_scanline_counter_on_scrolldown));
 			break;
 
 		case 12:
@@ -636,6 +643,18 @@ static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 			break;
 
 		case 14:
+			state->m_IR14_scn2674_scroll_lines = (data & 0x0f);
+			if (!state->m_IR0_scn2674_double_ht_wd)
+			{
+				state->m_IR14_scn2674_double_1 = (data & 0xc0)>>6;
+				LOGSTUFF(("IR14 - Double 1 %02x\n",state->m_IR14_scn2674_double_1));
+			}
+			//0 normal, 1, double width, 2, double width and double tops 3, double width and double bottoms
+			//1 affects SSR1, 2 affects SSR2
+			//If Double Height enabled in IR0, Screen start 1 upper (bits 7 and 6)replace Double 1, and Double 2 is unused
+			state->m_IR14_scn2674_double_2 = (data & 0x30)>>4;
+			LOGSTUFF(("IR14 - Scroll Lines %02x\n",state->m_IR14_scn2674_scroll_lines));
+			LOGSTUFF(("IR14 - Double 2 %02x\n",state->m_IR14_scn2674_double_2));
 			break;
 
 		case 15: /* not valid! */
@@ -650,7 +669,7 @@ static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 static void scn2674_write_command(running_machine &machine, UINT8 data)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
-	UINT8 oprand;
+	UINT8 operand;
 	int i;
 
 	LOGSTUFF(("scn2674_write_command %02x\n",data));
@@ -672,10 +691,10 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 	if ((data&0xf0)==0x10)
 	{
 		/* set IR pointer */
-		LOGSTUFF(("set IR pointer %02x\n",data));
+		operand = data & 0x0f;
+		LOGSTUFF(("set IR pointer %02x\n",operand));
 
-		oprand = data & 0x0f;
-		state->m_scn2675_IR_pointer=oprand;
+		state->m_scn2675_IR_pointer=operand;
 
 	}
 
@@ -698,11 +717,11 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 	if ((data&0xe9)==0x28)
 	{
 		/* Display off */
-		oprand = data & 0x04;
+		operand = data & 0x04;
 
 		state->m_scn2674_display_enabled = 0;
 
-		if (oprand)
+		if (operand)
 			LOGSTUFF(("display OFF - float DADD bus %02x\n",data));
 		else
 			LOGSTUFF(("display OFF - no float DADD bus %02x\n",data));
@@ -711,14 +730,20 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 	if ((data&0xe9)==0x29)
 	{
 		/* Display on */
-		oprand = data & 0x04;
+		operand = data & 0x04;
 
-		state->m_scn2674_display_enabled = 1;
+		//state->m_scn2674_display_enabled = 1;
 
-		if (oprand)
+		if (operand)
+		{
+			state->m_scn2674_display_enabled_field = 1;
 			LOGSTUFF(("display ON - next field %02x\n",data));
+		}
 		else
+		{
+			state->m_scn2674_display_enabled_scanline = 1;
 			LOGSTUFF(("display ON - next scanline %02x\n",data));
+		}
 	}
 
 	if ((data&0xf1)==0x30)
@@ -740,17 +765,18 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 	if ((data&0xe0)==0x40)
 	{
 		/* Reset Interrupt / Status bit */
-		oprand = data & 0x1f;
-		LOGSTUFF(("reset interrupt / status bit %02x\n",data));
+		operand = data & 0x1f;
+		LOGSTUFF(("reset interrupt / status bit %02x\n",operand));
 
-		LOGSTUFF(("Split 2   IRQ: %d Reset\n",(data>>0)&1));
-		LOGSTUFF(("Ready     IRQ: %d Reset\n",(data>>1)&1));
-		LOGSTUFF(("Split 1   IRQ: %d Reset\n",(data>>2)&1));
-		LOGSTUFF(("Line Zero IRQ: %d Reset\n",(data>>3)&1));
-		LOGSTUFF(("V-Blank   IRQ: %d Reset\n",(data>>4)&1));
+		state->m_scn2674_irq_register &= ~(data & 0x1f);//((data & 0x1f)^0x1f);
+		state->m_scn2674_status_register &= ~(data & 0x1f);//((data & 0x1f)^0x1f);
 
-		state->m_scn2674_irq_register &= ((data & 0x1f)^0x1f);
-		state->m_scn2674_status_register &= ((data & 0x1f)^0x1f);
+		LOGSTUFF(("IRQ Status after reset\n"));
+		LOGSTUFF(("Split 2   IRQ: %d Active\n",(state->m_scn2674_irq_register>>0)&1));
+		LOGSTUFF(("Ready     IRQ: %d Active\n",(state->m_scn2674_irq_register>>1)&1));
+		LOGSTUFF(("Split 1   IRQ: %d Active\n",(state->m_scn2674_irq_register>>2)&1));
+		LOGSTUFF(("Line Zero IRQ: %d Active\n",(state->m_scn2674_irq_register>>3)&1));
+		LOGSTUFF(("V-Blank   IRQ: %d Active\n",(state->m_scn2674_irq_register>>4)&1));
 
 		state->m_scn2674_irq_state = 0;
 
@@ -767,32 +793,45 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 	if ((data&0xe0)==0x80)
 	{
 		/* Disable Interrupt mask*/
-		oprand = data & 0x1f;
-		LOGSTUFF(("disable interrupt %02x\n",data));
-		LOGSTUFF(("Split 2   IRQ: %d Disabled\n",(data>>0)&1));
-		LOGSTUFF(("Ready     IRQ: %d Disabled\n",(data>>1)&1));
-		LOGSTUFF(("Split 1   IRQ: %d Disabled\n",(data>>2)&1));
-		LOGSTUFF(("Line Zero IRQ: %d Disabled\n",(data>>3)&1));
-		LOGSTUFF(("V-Blank   IRQ: %d Disabled\n",(data>>4)&1));
+		operand = data & 0x1f;
+		state->m_scn2674_irq_mask &= ~(data & 0x1f);
+		//While the datasheet says that bits can only be cleared by reset, 
+		//Mating game hangs waiting for line zero to be cleared unless disabling does turn the irq bits off
+		//Timing clearly needs fixing
+		LOGSTUFF(("IRQ Mask after disable %x\n",operand));
+		LOGSTUFF(("Split 2   IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>0)&1));
+		LOGSTUFF(("Ready     IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>1)&1));
+		LOGSTUFF(("Split 1   IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>2)&1));
+		LOGSTUFF(("Line Zero IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>3)&1));
+		LOGSTUFF(("V-Blank   IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>4)&1));
 
 /*      state->m_scn2674_irq_mask &= ((data & 0x1f)^0x1f); disables.. doesn't enable? */
 
-		state->m_scn2674_irq_mask &= ~(data & 0x1f);
-		//mask changes, but bit can ONLY be cleared by reset
+//		state->m_scn2674_irq_state = 0;
+
+//		for (i = 0; i < 5; i++)
+//		{
+//			if ((state->m_scn2674_irq_register>>i&1)&(state->m_scn2674_irq_mask>>i&1))
+//			{
+//				state->m_scn2674_irq_state = 1;
+//			}
+//		}
+//		update_mpu68_interrupts(machine);
 	}
 
 	if ((data&0xe0)==0x60)
 	{
 		/* Enable Interrupt mask*/
-		LOGSTUFF(("enable interrupt %02x\n",data));
-		LOGSTUFF(("Split 2   IRQ: %d Enabled\n",(data>>0)&1));
-		LOGSTUFF(("Ready     IRQ: %d Enabled\n",(data>>1)&1));
-		LOGSTUFF(("Split 1   IRQ: %d Enabled\n",(data>>2)&1));
-		LOGSTUFF(("Line Zero IRQ: %d Enabled\n",(data>>3)&1));
-		LOGSTUFF(("V-Blank   IRQ: %d Enabled\n",(data>>4)&1));
-
+		operand = data & 0x1f;
 		state->m_scn2674_irq_mask |= (data & 0x1f);  /* enables .. doesn't disable? */
-		//mask changes, but IRQ can ONLY be triggered by the next event, according to datasheet
+
+		LOGSTUFF(("IRQ Mask after enable %x\n",operand));
+		LOGSTUFF(("Split 2   IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>0)&1));
+		LOGSTUFF(("Ready     IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>1)&1));
+		LOGSTUFF(("Split 1   IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>2)&1));
+		LOGSTUFF(("Line Zero IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>3)&1));
+		LOGSTUFF(("V-Blank   IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>4)&1));
+
 	}
 
 	/* Delayed Commands */
@@ -801,55 +840,55 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 	if (data == 0xa4)
 	{
 		/* read at pointer address */
-		LOGSTUFF(("read at pointer address %02x\n",data));
+		LOGSTUFF(("DELAYED read at pointer address %02x\n",data));
 	}
 
 	if (data == 0xa2)
 	{
 		/* write at pointer address */
-		LOGSTUFF(("write at pointer address %02x\n",data));
+		LOGSTUFF(("DELAYED write at pointer address %02x\n",data));
 	}
 
 	if (data == 0xa9)
 	{
 		/* increase cursor address */
-		LOGSTUFF(("increase cursor address %02x\n",data));
+		LOGSTUFF(("DELAYED increase cursor address %02x\n",data));
 	}
 
 	if (data == 0xac)
 	{
 		/* read at cursor address */
-		LOGSTUFF(("read at cursor address %02x\n",data));
+		LOGSTUFF(("DELAYED read at cursor address %02x\n",data));
 	}
 
 	if (data == 0xaa)
 	{
 		/* write at cursor address */
-		LOGSTUFF(("write at cursor address %02x\n",data));
+		LOGSTUFF(("DELAYED write at cursor address %02x\n",data));
 	}
 
 	if (data == 0xad)
 	{
 		/* read at cursor address + increment */
-		LOGSTUFF(("read at cursor address+increment %02x\n",data));
+		LOGSTUFF(("DELAYED read at cursor address+increment %02x\n",data));
 	}
 
 	if (data == 0xab)
 	{
 		/* write at cursor address + increment */
-		LOGSTUFF(("write at cursor address+increment %02x\n",data));
+		LOGSTUFF(("DELAYED write at cursor address+increment %02x\n",data));
 	}
 
 	if (data == 0xbb)
 	{
 		/* write from cursor address to pointer address */
-		LOGSTUFF(("write from cursor address to pointer address %02x\n",data));
+		LOGSTUFF(("DELAYED write from cursor address to pointer address %02x\n",data));
 	}
 
 	if (data == 0xbd)
 	{
 		/* read from cursor address to pointer address */
-		LOGSTUFF(("read from cursor address to pointer address %02x\n",data));
+		LOGSTUFF(("DELAYED read from cursor address to pointer address %02x\n",data));
 	}
 }
 
@@ -876,21 +915,21 @@ static READ16_HANDLER( mpu4_vid_scn2674_r )
 
             --RV ZSRs
 
-            -- = ALWAYS 0
-            R  = RDFLG (Status Register Only)
-            V  = Vblank
-            Z  = Line Zero
-            S  = Split 1
-            R  = Ready
-            s  = Split 2
+         6+7 -- = ALWAYS 0
+          5  R  = RDFLG (Status Register Only)
+          4  V  = Vblank
+          3  Z  = Line Zero
+          2  S  = Split 1
+          1  R  = Ready
+          0  s  = Split 2
         */
 
 		case 0:
-			LOGSTUFF(("Read Irq Register %06x\n",cpu_get_pc(&space->device())));
+			LOGSTUFF(("Read Irq Register %02x %06x\n",state->m_scn2674_irq_register,cpu_get_pc(&space->device())));
 			return state->m_scn2674_irq_register;
 
 		case 1:
-			LOGSTUFF(("Read Status Register %06x\n",cpu_get_pc(&space->device())));
+			LOGSTUFF(("Read Status Register %02X %06x\n",state->m_scn2674_status_register,cpu_get_pc(&space->device())));
 			return state->m_scn2674_status_register;
 
 		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",cpu_get_pc(&space->device())));return state->m_scn2674_screen1_l;
@@ -933,11 +972,25 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 			break;
 
 		case 2: state->m_scn2674_screen1_l = data; break;
-		case 3: state->m_scn2674_screen1_h = data; break;
+		case 3: 
+			state->m_scn2674_screen1_h = (data&0x3f);//uppermost two bytes not part of register
+			if (state->m_IR0_scn2674_double_ht_wd)
+			{
+				state->m_IR14_scn2674_double_1 = (data & 0xc0)>>6;
+				LOGSTUFF(("IR14 - Double 1 overridden %02x\n",state->m_IR14_scn2674_double_1));
+			}
+			break;
+
 		case 4: state->m_scn2674_cursor_l  = data; break;
 		case 5: state->m_scn2674_cursor_h  = data; break;
 		case 6:	state->m_scn2674_screen2_l = data; break;
-		case 7: state->m_scn2674_screen2_h = data; break;
+		case 7: 
+			state->m_scn2674_screen2_h = (data&0x3f); 
+			state->m_scn2674_spl1 = (data & 0x40);
+			state->m_scn2674_spl2 = (data & 0x80);
+			break;
+
+		break;
 	}
 }
 
@@ -1124,8 +1177,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
     mainboard. As per usual, they've taken the cheap route here, reading and processing the
     raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
     additional hardware to simplify matters. What makes matters worse is that there is a 45 degree rotation to take into account.
-    For our purposes, two fake ports give the X and Y positions,
-    which are then worked back into the signal levels.
+    For our purposes, two fake ports give the X and Y positions, which are then worked back into the signal levels.
     We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
     clean up the pulses and flip the active phase.*/
 
@@ -1999,12 +2051,13 @@ static MACHINE_RESET( mpu4_vid )
 
 static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram) AM_MIRROR(0x10000)
+//	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)//where is BLANK?
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
 	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
 	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
@@ -2013,9 +2066,9 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x5fffff) AM_ROM AM_WRITENOP
+	AM_RANGE(0x000000, 0x5fffff) AM_ROM //AM_WRITENOP
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM	/* The Mating Game has an extra 256kB RAM on the program card */
-	AM_RANGE(0x640000, 0x7fffff) AM_NOP	/* Possible bug, reads and writes here */
+//	AM_RANGE(0x640000, 0x7fffff) AM_NOP	/* Possible bug, reads and writes here */
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
@@ -2029,7 +2082,7 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_vid_w,0x00ff)  // 6840PTM on sampled sound board
 	AM_RANGE(0xffa060, 0xffa067) AM_DEVREADWRITE8_MODERN("pia_ic4ss", pia6821_device, read, write,0x00ff)    // PIA6821 on sampled sound board
 	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w)
-	AM_RANGE(0xfff000, 0xffffff) AM_NOP	/* Possible bug, reads and writes here */
+//	AM_RANGE(0xfff000, 0xffffff) AM_NOP	/* Possible bug, reads and writes here */
 ADDRESS_MAP_END
 
 /* TODO: Fix up MPU4 map*/
@@ -2281,6 +2334,10 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	int current_scanline=param;
 	timer.machine().scheduler().synchronize();
 
+	if ((state->m_scn2674_display_enabled_scanline)&&(!state->m_scn2674_display_enabled))
+	{
+		state->m_scn2674_display_enabled = 1;
+	}
 
 	if (current_scanline==0)
 	{
@@ -2302,36 +2359,38 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	}
 
 	// should be triggered at the start of each ROW (line zero for that row)
-	if ((current_scanline%8 == 7) && (current_scanline<296))
+//Disabling for now, doesn't seem to be tested, and hangs things up
+	if ((current_scanline%8 == 7) && (current_scanline<296) &&(state->m_scn2674_display_enabled))//7 
 	{
 
 		state->m_scn2674_status_register |= 0x08;
-		if (state->m_scn2674_irq_mask&0x08)
+/*		if (state->m_scn2674_irq_mask&0x08)
 		{
+			logerror("scanline %d\n",current_scanline);
 			LOG2674(("SCN2674 Line Zero\n"));
 			state->m_scn2674_irq_state = 1;
 			state->m_scn2674_irq_register |= 0x08;
 			update_mpu68_interrupts(timer.machine());
-		}
+		}*/
 	}
 
 	// this is ROWS not scanlines!!
 	if (current_scanline == state->m_IR12_scn2674_split_register_1*8)
 	/* Split Screen 1 */
 	{
-		if (state->m_scn2674_screen2_h & 0x40)
+		if (state->m_scn2674_spl1)
 		{
 			popmessage("Split screen 1 address shift required, contact MAMEDEV");
 		}
 		state->m_scn2674_status_register |= 0x04;
 		if (state->m_scn2674_irq_mask&0x04)
 		{
+			state->m_scn2674_irq_register |= 0x04;
 			LOG2674(("SCN2674 Split Screen 1\n"));
 			state->m_scn2674_irq_state = 1;
 			update_mpu68_interrupts(timer.machine());
 			timer.machine().primary_screen->update_partial(timer.machine().primary_screen->vpos());
 
-			state->m_scn2674_irq_register |= 0x04;
 		}
 	}
 
@@ -2339,7 +2398,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	if (current_scanline == state->m_IR13_scn2674_split_register_2*8)
 	/* Split Screen 2 */
 	{
-		if (state->m_scn2674_screen2_h & 0x80)
+		if (state->m_scn2674_spl2)
 		{
 			popmessage("Split screen 2 address shift required, contact MAMEDEV");
 		}
@@ -2356,14 +2415,15 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	}
 
 	// vblank?
-	if (current_scanline == 300)
+	if (current_scanline == 300)//300)
 	{
 	/*  if (state->m_scn2674_display_enabled) ? */
+//		if (state->m_scn2674_display_enabled)
 		{
 			state->m_scn2674_status_register |= 0x10;
 			if (state->m_scn2674_irq_mask&0x10)
 			{
-				//LOG2674(("vblank irq\n"));
+				LOG2674(("vblank irq\n"));
 				state->m_scn2674_irq_state = 1;
 				state->m_scn2674_irq_register |= 0x10;
 				update_mpu68_interrupts(timer.machine());
@@ -2396,6 +2456,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
+	//8*28 + 4 + 22 + 
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE(mpu4_vid)
@@ -3557,8 +3618,8 @@ GAME( 1989,  adders,    bctvidbs, mpu4_vid, adders,   adders,   ROT0, "Barcrest"
 
 GAME( 1989,  timemchn,  bctvidbs, mpu4_vid, skiltrek, timemchn, ROT0, "Barcrest",		"Time Machine (v2.0)",												GAME_NOT_WORKING )
 
-GAME( 199?,  mating,    bctvidbs, mating,   mating,   mating,   ROT0, "Barcrest",		"The Mating Game (v0.4)",											GAME_NOT_WORKING )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
-GAME( 199?,  matingd,   mating,   mating,   mating,   mating,   ROT0, "Barcrest",		"The Mating Game (v0.4, Datapak)",									GAME_NOT_WORKING )//SWP 0.2D
+GAME( 1996?,  mating,    bctvidbs, mating,   mating,   mating,   ROT0, "Barcrest",		"The Mating Game (v0.4)",											GAME_NOT_WORKING )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
+GAME( 1996?,  matingd,   mating,   mating,   mating,   mating,   ROT0, "Barcrest",		"The Mating Game (v0.4, Datapak)",									GAME_NOT_WORKING )//SWP 0.2D
 
 /* Barquest */
 /* Barquest II */

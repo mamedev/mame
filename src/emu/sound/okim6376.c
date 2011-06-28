@@ -373,6 +373,13 @@ static STREAM_UPDATE( okim6376_update )
 
 ***********************************************************************************************/
 
+static void okim6376_postload(device_t *device)
+{
+	okim6376_state *info = get_safe_token(device);
+
+	okim6376_set_frequency(device, info->master_clock);
+}
+
 static void adpcm_state_save_register(struct ADPCMVoice *voice, device_t *device, int index)
 {
 	device->save_item(NAME(voice->playing), index);
@@ -391,8 +398,22 @@ static void okim6376_state_save_register(okim6376_state *info, device_t *device)
 	{
 		adpcm_state_save_register(&info->voice[j], device, j);
 	}
+		device->machine().save().register_postload(save_prepost_delegate(FUNC(okim6376_postload), device));
 		device->save_item(NAME(info->command[0]));
 		device->save_item(NAME(info->command[1]));
+		device->save_item(NAME(info->stage[0]));
+		device->save_item(NAME(info->stage[1]));
+		device->save_item(NAME(info->latch));
+		device->save_item(NAME(info->divisor));
+		device->save_item(NAME(info->nar));
+		device->save_item(NAME(info->nartimer));
+		device->save_item(NAME(info->busy));
+		device->save_item(NAME(info->st));
+		device->save_item(NAME(info->st_pulses));
+		device->save_item(NAME(info->st_update));
+		device->save_item(NAME(info->ch2));
+		device->save_item(NAME(info->ch2_update));
+		device->save_item(NAME(info->master_clock));
 }
 
 /**********************************************************************************************

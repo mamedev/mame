@@ -50,10 +50,10 @@
 			<color red="0.7" green="0.0" blue="0.0" />
 		</disk>
 	</element>
-	<element name="bluepiece">
+	<element name="yellowpiece">
 		<disk state ="1">
 			<bounds x="0" y="0" width="7" height="7" />
-			<color red="0.0" green="0.0" blue="0.7" />
+			<color red="0.7" green="0.7" blue="0.0" />
 		</disk>
 	</element>
 	<element name="greenpiece">
@@ -71,42 +71,42 @@
 
 	<element name="C" defstate="0">
 		<text string="C" state="1">
-			<color red="1.0" green="1.0" blue="0.0" />
+			<color red="0.0" green="0.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="O" defstate="0">
 		<text string="O" state="1">
-			<color red="1.0" green="1.0" blue="0.0" />
+			<color red="0.0" green="0.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="N" defstate="0">
 		<text string="N" state="1">
-			<color red="1.0" green="1.0" blue="0.0" />
+			<color red="0.0" green="0.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="E" defstate="0">
 		<text string="E" state="1">
-			<color red="1.0" green="1.0" blue="0.0" />
+			<color red="0.0" green="0.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="T" defstate="0">
 		<text string="T" state="1">
-			<color red="1.0" green="1.0" blue="0.0" />
+			<color red="0.0" green="0.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="4" defstate="0">
 		<text string="4" state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
@@ -226,25 +226,25 @@
 		<backdrop name="blank" element="emptypiece" state="0">
 			<bounds x="48" y="7" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp0" element="bluepiece" state="0">
+		<backdrop name="lamp0" element="yellowpiece" state="0">
 			<bounds x="0" y="7" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp1" element="bluepiece" state="0">
+		<backdrop name="lamp1" element="yellowpiece" state="0">
 			<bounds x="8" y="7" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp2" element="bluepiece" state="0">
+		<backdrop name="lamp2" element="yellowpiece" state="0">
 			<bounds x="16" y="7" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp3" element="bluepiece" state="0">
+		<backdrop name="lamp3" element="yellowpiece" state="0">
 			<bounds x="24" y="7" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp4" element="bluepiece" state="0">
+		<backdrop name="lamp4" element="yellowpiece" state="0">
 			<bounds x="32" y="7" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp5" element="bluepiece" state="0">
+		<backdrop name="lamp5" element="yellowpiece" state="0">
 			<bounds x="40" y="7" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp6" element="bluepiece" state="0">
+		<backdrop name="lamp6" element="yellowpiece" state="0">
 			<bounds x="48" y="7" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp8" element="redpiece" state="0">
@@ -310,25 +310,25 @@
 		<backdrop name="lamp30" element="redpiece" state="0">
 			<bounds x="48" y="14" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp16" element="bluepiece" state="0">
+		<backdrop name="lamp16" element="yellowpiece" state="0">
 			<bounds x="0" y="14" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp17" element="bluepiece" state="0">
+		<backdrop name="lamp17" element="yellowpiece" state="0">
 			<bounds x="8" y="14" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp18" element="bluepiece" state="0">
+		<backdrop name="lamp18" element="yellowpiece" state="0">
 			<bounds x="16" y="14" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp19" element="bluepiece" state="0">
+		<backdrop name="lamp19" element="yellowpiece" state="0">
 			<bounds x="24" y="14" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp20" element="bluepiece" state="0">
+		<backdrop name="lamp20" element="yellowpiece" state="0">
 			<bounds x="32" y="14" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp21" element="bluepiece" state="0">
+		<backdrop name="lamp21" element="yellowpiece" state="0">
 			<bounds x="40" y="14" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp22" element="bluepiece" state="0">
+		<backdrop name="lamp22" element="yellowpiece" state="0">
 			<bounds x="48" y="14" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="blank" element="emptypiece" state="0">
@@ -352,25 +352,25 @@
 		<backdrop name="blank" element="emptypiece" state="0">
 			<bounds x="48" y="21" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp32" element="bluepiece" state="0">
+		<backdrop name="lamp32" element="yellowpiece" state="0">
 			<bounds x="0" y="21" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp33" element="bluepiece" state="0">
+		<backdrop name="lamp33" element="yellowpiece" state="0">
 			<bounds x="8" y="21" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp34" element="bluepiece" state="0">
+		<backdrop name="lamp34" element="yellowpiece" state="0">
 			<bounds x="16" y="21" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp35" element="bluepiece" state="0">
+		<backdrop name="lamp35" element="yellowpiece" state="0">
 			<bounds x="24" y="21" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp36" element="bluepiece" state="0">
+		<backdrop name="lamp36" element="yellowpiece" state="0">
 			<bounds x="32" y="21" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp37" element="bluepiece" state="0">
+		<backdrop name="lamp37" element="yellowpiece" state="0">
 			<bounds x="40" y="21" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp38" element="bluepiece" state="0">
+		<backdrop name="lamp38" element="yellowpiece" state="0">
 			<bounds x="48" y="21" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp40" element="redpiece" state="0">
@@ -415,25 +415,25 @@
 		<backdrop name="blank" element="emptypiece" state="0">
 			<bounds x="48" y="28" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp48" element="bluepiece" state="0">
+		<backdrop name="lamp48" element="yellowpiece" state="0">
 			<bounds x="0" y="28" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp49" element="bluepiece" state="0">
+		<backdrop name="lamp49" element="yellowpiece" state="0">
 			<bounds x="8" y="28" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp50" element="bluepiece" state="0">
+		<backdrop name="lamp50" element="yellowpiece" state="0">
 			<bounds x="16" y="28" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp51" element="bluepiece" state="0">
+		<backdrop name="lamp51" element="yellowpiece" state="0">
 			<bounds x="24" y="28" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp52" element="bluepiece" state="0">
+		<backdrop name="lamp52" element="yellowpiece" state="0">
 			<bounds x="32" y="28" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp53" element="bluepiece" state="0">
+		<backdrop name="lamp53" element="yellowpiece" state="0">
 			<bounds x="40" y="28" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp54" element="bluepiece" state="0">
+		<backdrop name="lamp54" element="yellowpiece" state="0">
 			<bounds x="48" y="28" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp56" element="redpiece" state="0">
@@ -478,25 +478,25 @@
 		<backdrop name="blank" element="emptypiece" state="0">
 			<bounds x="48" y="35" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp64" element="bluepiece" state="0">
+		<backdrop name="lamp64" element="yellowpiece" state="0">
 			<bounds x="0" y="35" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp65" element="bluepiece" state="0">
+		<backdrop name="lamp65" element="yellowpiece" state="0">
 			<bounds x="8" y="35" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp66" element="bluepiece" state="0">
+		<backdrop name="lamp66" element="yellowpiece" state="0">
 			<bounds x="16" y="35" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp67" element="bluepiece" state="0">
+		<backdrop name="lamp67" element="yellowpiece" state="0">
 			<bounds x="24" y="35" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp68" element="bluepiece" state="0">
+		<backdrop name="lamp68" element="yellowpiece" state="0">
 			<bounds x="32" y="35" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp69" element="bluepiece" state="0">
+		<backdrop name="lamp69" element="yellowpiece" state="0">
 			<bounds x="40" y="35" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp70" element="bluepiece" state="0">
+		<backdrop name="lamp70" element="yellowpiece" state="0">
 			<bounds x="48" y="35" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp72" element="redpiece" state="0">
@@ -541,25 +541,25 @@
 		<backdrop name="blank" element="emptypiece" state="0">
 			<bounds x="48" y="42" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp80" element="bluepiece" state="0">
+		<backdrop name="lamp80" element="yellowpiece" state="0">
 			<bounds x="0" y="42" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp81" element="bluepiece" state="0">
+		<backdrop name="lamp81" element="yellowpiece" state="0">
 			<bounds x="8" y="42" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp82" element="bluepiece" state="0">
+		<backdrop name="lamp82" element="yellowpiece" state="0">
 			<bounds x="16" y="42" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp83" element="bluepiece" state="0">
+		<backdrop name="lamp83" element="yellowpiece" state="0">
 			<bounds x="24" y="42" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp84" element="bluepiece" state="0">
+		<backdrop name="lamp84" element="yellowpiece" state="0">
 			<bounds x="32" y="42" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp85" element="bluepiece" state="0">
+		<backdrop name="lamp85" element="yellowpiece" state="0">
 			<bounds x="40" y="42" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp86" element="bluepiece" state="0">
+		<backdrop name="lamp86" element="yellowpiece" state="0">
 			<bounds x="48" y="42" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp88" element="redpiece" state="0">

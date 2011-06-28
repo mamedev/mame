@@ -263,6 +263,7 @@ static TIMER_CALLBACK( ic24_timeout );
 
 static const UINT8 reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
+static const UINT8 vsync_table[4] = {3,1,5,7}; //Video related
 
 static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
@@ -399,7 +400,7 @@ public:
 	int m_gfx_index;
 	UINT16 * m_vid_vidram;
 	UINT16 * m_vid_mainram;
-	UINT8 m_scn2674_IR[16];
+//	UINT8 m_scn2674_IR[16];
 	UINT8 m_scn2675_IR_pointer;
 	UINT8 m_scn2674_screen1_l;
 	UINT8 m_scn2674_screen1_h;
@@ -412,6 +413,8 @@ public:
 	UINT8 m_scn2674_irq_mask;
 	UINT8 m_scn2674_gfx_enabled;
 	UINT8 m_scn2674_display_enabled;
+	UINT8 m_scn2674_display_enabled_field;
+	UINT8 m_scn2674_display_enabled_scanline;
 	UINT8 m_scn2674_cursor_enabled;
 	UINT8 m_IR0_scn2674_double_ht_wd;
 	UINT8 m_IR0_scn2674_scanline_per_char_row;
@@ -425,17 +428,30 @@ public:
 	UINT8 m_IR3_scn2674_vert_front_porch;
 	UINT8 m_IR3_scn2674_vert_back_porch;
 	UINT8 m_IR4_scn2674_rows_per_screen;
-	UINT8 m_IR4_scn2674_character_blink_rate;
+	UINT8 m_IR4_scn2674_character_blink_rate_divisor;
 	UINT8 m_IR5_scn2674_character_per_row;
+	UINT8 m_IR6_scn2674_cursor_first_scanline;
+	UINT8 m_IR6_scn2674_cursor_last_scanline;
+	UINT8 m_IR7_scn2674_cursor_underline_position;
+	UINT8 m_IR7_scn2674_cursor_rate_divisor;
+	UINT8 m_IR7_scn2674_cursor_blink;
+	UINT8 m_IR7_scn2674_vsync_width;
 	UINT8 m_IR8_scn2674_display_buffer_first_address_LSB;
 	UINT8 m_IR9_scn2674_display_buffer_first_address_MSB;
 	UINT8 m_IR9_scn2674_display_buffer_last_address;
 	UINT8 m_IR10_scn2674_display_pointer_address_lower;
 	UINT8 m_IR11_scn2674_display_pointer_address_upper;
+	UINT8 m_IR11_scn2674_reset_scanline_counter_on_scrollup;
+	UINT8 m_IR11_scn2674_reset_scanline_counter_on_scrolldown;
 	UINT8 m_IR12_scn2674_scroll_start;
 	UINT8 m_IR12_scn2674_split_register_1;
 	UINT8 m_IR13_scn2674_scroll_end;
 	UINT8 m_IR13_scn2674_split_register_2;
+	UINT8 m_IR14_scn2674_scroll_lines;
+	UINT8 m_IR14_scn2674_double_1;
+	UINT8 m_IR14_scn2674_double_2;
+	UINT8 m_scn2674_spl1;
+	UINT8 m_scn2674_spl2;
 	INT8 m_cur[2];
 	UINT8 *m_dealem_videoram;
 	int m_rowcounter;
