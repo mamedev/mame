@@ -386,7 +386,7 @@ void device_execute_interface::run_thread_wrapper()
     	// call the classic run function, then swap back to the scheduler's thread
     	execute_run();
         scheduler.make_active();
-    }	
+    }
 }
 
 

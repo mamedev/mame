@@ -114,7 +114,6 @@ static blockT curblock;
 
 static UINT8 tocbuf[102*4];
 static UINT8 finfbuf[256];
-static UINT8 onesectorstored;
 
 static INT32 sectlenin, sectlenout;
 
@@ -731,7 +730,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 						if (freeblocks == 200)
 						{
-							onesectorstored = 0;
+							sectorstore = 0;
 						}
 
 						hirqreg |= EHST;
@@ -1024,7 +1023,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				// TODO: buffer full flag
 
-				if (freeblocks == 200) { onesectorstored = 0; }
+				if (freeblocks == 200) { sectorstore = 0; }
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);

@@ -257,7 +257,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 16], 2048);
 			return 1;
 		}
-		
+
 		/* return 2352 byte mode 1 raw sector from 2048 bytes of mode 1 data */
 		if ((datatype == CD_TRACK_MODE1_RAW) && (tracktype == CD_TRACK_MODE1))
 		{

@@ -62,7 +62,7 @@ int c352_device::get_mseq_bit()
 
 	if (bit)
 	{
-   		reg = ((reg ^ mask) << 1) | 1;
+		reg = ((reg ^ mask) << 1) | 1;
 	}
 	else
 	{

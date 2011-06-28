@@ -173,7 +173,7 @@ static int process_cartridge(device_image_interface *image, process_mode mode)
 			while(!ROMENTRY_ISREGIONEND(roment))
 			{
 				if (ROMENTRY_GETTYPE(roment) == ROMENTRYTYPE_CARTRIDGE)
-				{					
+				{
 					astring regiontag;
 					image->device().siblingtag(regiontag, roment->_hashdata);
 

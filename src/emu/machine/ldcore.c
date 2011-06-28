@@ -1616,7 +1616,7 @@ DEVICE_GET_INFO( laserdisc )
 }
 
 DEVICE_GET_INFO( unkldplay )
-{	
+{
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
@@ -1642,7 +1642,7 @@ DEVICE_GET_INFO( pioneer_pr8210 )
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = pr8210_interface.romregion; return;
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = pr8210_interface.machine_config; return;
-			
+
 		/* --- the following bits of info are returned as NULL-terminated strings -- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, pr8210_interface.name); return;
 		case DEVINFO_STR_SHORTNAME:				strcpy(info->s, pr8210_interface.shortname); return;
@@ -1658,7 +1658,7 @@ DEVICE_GET_INFO( simutrek_special )
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = simutrek_interface.romregion; return;
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = simutrek_interface.machine_config; return;
-			
+
 		/* --- the following bits of info are returned as NULL-terminated strings -- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, simutrek_interface.name); return;
 		case DEVINFO_STR_SHORTNAME:				strcpy(info->s, simutrek_interface.shortname); return;
@@ -1674,7 +1674,7 @@ DEVICE_GET_INFO( pioneer_ldv1000 )
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = ldv1000_interface.romregion; return;
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = ldv1000_interface.machine_config; return;
-			
+
 		/* --- the following bits of info are returned as NULL-terminated strings -- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, ldv1000_interface.name); return;
 		case DEVINFO_STR_SHORTNAME:				strcpy(info->s, ldv1000_interface.shortname); return;
@@ -1690,7 +1690,7 @@ DEVICE_GET_INFO( phillips_22vp931 )
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = vp931_interface.romregion; return;
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = vp931_interface.machine_config; return;
-			
+
 		/* --- the following bits of info are returned as NULL-terminated strings -- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, vp931_interface.name); return;
 		case DEVINFO_STR_SHORTNAME:				strcpy(info->s, vp931_interface.shortname); return;

@@ -14,24 +14,24 @@ Notes:
 - What are unknown roms used for?
 
 Hardware registers:
-0x00 - 0x1f control register for circles generator (8 bytes each)			
-			0x00, 0x01	circle radius			
-			0x02, 0x03	circle middle point			
-			0x04, 0x05	circle middle point			
-			0x06		circle colour (0-7)			
-			0x07		unused
-0x20		?
-0x21		sound (intro screens have bit 1 toggled for click effect)
-0x22		?
-0x23		?
-0x24		?
-0x25		?
-0x26		?
-0x27		?
+0x00 - 0x1f control register for circles generator (8 bytes each)
+            0x00, 0x01  circle radius
+            0x02, 0x03  circle middle point
+            0x04, 0x05  circle middle point
+            0x06        circle colour (0-7)
+            0x07        unused
+0x20        ?
+0x21        sound (intro screens have bit 1 toggled for click effect)
+0x22        ?
+0x23        ?
+0x24        ?
+0x25        ?
+0x26        ?
+0x27        ?
 
 Board etched...
-	MEADOWS 024-0084
-	MADE IN USA
+    MEADOWS 024-0084
+    MADE IN USA
 
 Empty socket at .E3
 Z80 processor
@@ -40,43 +40,43 @@ Z80 processor
 5Mhz crystal
 All PROMS are SN74s474
 
-.L18 	no sticker
-.L17	stickered		L9, L13
-				L17, G17
-.L15	stickered		L10, L15
-				L18, G18
-.L13	stickered		L9, L13
-				L17, G17
-.L10	stickered		L10, L15
-				L18, G18
-.L9	stickered (damaged)	xxx, L13
-				xxx, G1y
-.K1	stickered		K1
-.G2	no sticker		K1
-.E4	no sticker		
-.E5	stickered		M16
-				PRO
-				1
-.E6	stickered		M16
-				PRO
-				3
-.C3	can't read
-.C4	stickered		M16
-				PRO
-				4
-.C5	stickered		M16
-				PRO
-				0
-.C6	stickered		M16
-				PRO
-				2
-.E8	stickered		E8
-.E10	stickered		E10
-.C12	stickered		C12
-.G17	stickered		L9, L13
-				L17, G17
-.G18	stickered		L10, L15
-				L18, G18
+.L18    no sticker
+.L17    stickered       L9, L13
+                L17, G17
+.L15    stickered       L10, L15
+                L18, G18
+.L13    stickered       L9, L13
+                L17, G17
+.L10    stickered       L10, L15
+                L18, G18
+.L9 stickered (damaged) xxx, L13
+                xxx, G1y
+.K1 stickered       K1
+.G2 no sticker      K1
+.E4 no sticker
+.E5 stickered       M16
+                PRO
+                1
+.E6 stickered       M16
+                PRO
+                3
+.C3 can't read
+.C4 stickered       M16
+                PRO
+                4
+.C5 stickered       M16
+                PRO
+                0
+.C6 stickered       M16
+                PRO
+                2
+.E8 stickered       E8
+.E10    stickered       E10
+.C12    stickered       C12
+.G17    stickered       L9, L13
+                L17, G17
+.G18    stickered       L10, L15
+                L18, G18
 
 L9, L13, L17 and G17 all read the same
 L10, L15, L18 and G18 all read the same

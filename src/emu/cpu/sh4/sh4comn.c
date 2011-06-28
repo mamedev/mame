@@ -633,7 +633,7 @@ WRITE32_HANDLER( sh4_internal_w )
 	UINT32 old = sh4->m[offset];
 	COMBINE_DATA(sh4->m+offset);
 
-//	printf("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
+//  printf("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
 
 	switch( offset )
 	{
@@ -945,7 +945,7 @@ READ32_HANDLER( sh4_internal_r )
 	UINT32 addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
 
-//	printf("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
+//  printf("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
 
 	switch( offset )
 	{

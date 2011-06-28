@@ -172,7 +172,7 @@ TODO:
       - Find out what causes the games to hang/reset in service mode
         Probably down to AVDC interrupt timing, there seem to be a number of race conditions re: masks
         that need sorting out with proper blank handling, etc.
-	  - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
+      - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
       - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
         to give black on green.
 ***********************************************************************************************************/
@@ -480,7 +480,7 @@ static SCREEN_UPDATE(mpu4_vid)
 
 			if (attr)
 				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[gfxregion],tiledat,0,0,0,(x*8)+(4*8),(y*8)+4);
-			
+
 		}
 		if (dbl_size&2)
 		{
@@ -524,7 +524,7 @@ static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 {
 	LOGSTUFF(("scn2674_write_init_regs %02x %02x\n",state->m_scn2674_IR_pointer,data));
 
-//	state->m_scn2674_IR[state->m_scn2674_IR_pointer]=data;
+//  state->m_scn2674_IR[state->m_scn2674_IR_pointer]=data;
 
 
 	switch ( state->m_scn2674_IR_pointer) /* display some debug info, set mame specific variables */
@@ -970,7 +970,7 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 			break;
 
 		case 2: state->m_scn2674_screen1_l = data; break;
-		case 3: 
+		case 3:
 			state->m_scn2674_screen1_h = (data&0x3f);//uppermost two bytes not part of register
 			state->m_scn2674_dbl1=(data & 0xc0)>>6;
 			if (state->m_IR0_scn2674_double_ht_wd)
@@ -983,8 +983,8 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 		case 4: state->m_scn2674_cursor_l  = data; break;
 		case 5: state->m_scn2674_cursor_h  = data; break;
 		case 6:	state->m_scn2674_screen2_l = data; break;
-		case 7: 
-			state->m_scn2674_screen2_h = (data&0x3f); 
+		case 7:
+			state->m_scn2674_screen2_h = (data&0x3f);
 			state->m_scn2674_spl1 = (data & 0x40);
 			state->m_scn2674_spl2 = (data & 0x80);
 			break;
@@ -2051,7 +2051,7 @@ static MACHINE_RESET( mpu4_vid )
 static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)// AM_MIRROR(0x10000)
-//	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
+//  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
@@ -2067,7 +2067,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x5fffff) AM_ROM //AM_WRITENOP
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM	/* The Mating Game has an extra 256kB RAM on the program card */
-//	AM_RANGE(0x640000, 0x7fffff) AM_NOP	/* Possible bug, reads and writes here */
+//  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
@@ -2081,7 +2081,7 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_vid_w,0x00ff)  // 6840PTM on sampled sound board
 	AM_RANGE(0xffa060, 0xffa067) AM_DEVREADWRITE8_MODERN("pia_ic4ss", pia6821_device, read, write,0x00ff)    // PIA6821 on sampled sound board
 	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w)
-//	AM_RANGE(0xfff000, 0xffffff) AM_NOP	/* Possible bug, reads and writes here */
+//  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
 ADDRESS_MAP_END
 
 /* TODO: Fix up MPU4 map*/
@@ -2461,7 +2461,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4_state )
 	MCFG_SCREEN_VISIBLE_AREA(4*8, (63*8)+(4*8)-1, 4, (37*8)+4-1)
 
 	MCFG_SCREEN_REFRESH_RATE(50)
-//	MCFG_SCREEN_RAW_PARAMS(4000000*2, 80*8, 4, (63*8)+4, (37*8)+10+4+3, 4, (37*8)+4)//42*8, 0*8, 37*8) 3
+//  MCFG_SCREEN_RAW_PARAMS(4000000*2, 80*8, 4, (63*8)+4, (37*8)+10+4+3, 4, (37*8)+4)//42*8, 0*8, 37*8) 3
 	MCFG_SCREEN_UPDATE(mpu4_vid)
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )

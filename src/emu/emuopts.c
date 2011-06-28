@@ -246,14 +246,14 @@ bool emu_options::add_slot_options(bool isfirst)
 		option_name.printf("%s;%s", slot->device().tag(), slot->device().tag());
 
 		if (!exists(slot->device().tag())) {
-		
+
 			// add the option
 			entry[0].name = slot->device().tag();
 			entry[0].description = NULL;
 			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
 			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card() : NULL;
 			add_entries(entry, true);
-			
+
 			added = true;
 		}
 	}

@@ -1059,7 +1059,7 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 					/* find a matching port */
 					for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next()) {
 						astring porttag;
-						port->owner().subtag(porttag, setting->condition.tag);						
+						port->owner().subtag(porttag, setting->condition.tag);
 						if (strcmp(porttag.cstr(), scanport->tag()) == 0)
 							break;
 					}

@@ -519,7 +519,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			i386_load_protected_mode_segment(cpustate,&desc);
 			CPL = cpustate->CPL;  // current privilege level
 			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
-//			RPL = segment & 0x03;  // requested privilege level
+//          RPL = segment & 0x03;  // requested privilege level
 
 			if((segment & ~0x07) == 0)
 			{
@@ -828,7 +828,7 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	}
 
 	/* For nested tasks, we write the outgoing task's selector to the back-link field of the new TSS,
-	   and set the NT flag in the EFLAGS register */
+       and set the NT flag in the EFLAGS register */
 	if(nested != 0)
 	{
 		WRITE16(cpustate,tss+0,old_task);
@@ -943,7 +943,7 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	}
 
 	/* For nested tasks, we write the outgoing task's selector to the back-link field of the new TSS,
-	   and set the NT flag in the EFLAGS register */
+       and set the NT flag in the EFLAGS register */
 	if(nested != 0)
 	{
 		WRITE32(cpustate,tss+0,old_task);

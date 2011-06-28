@@ -3712,7 +3712,7 @@ static void set_irq_line(z80_state *z80, int irqline, int state)
 			z80->nmi_pending = TRUE;
 		z80->nmi_state = state;
 		break;
-	
+
 	case INPUT_LINE_IRQ0:
 		/* update the IRQ state via the daisy chain */
 		z80->irq_state = state;
@@ -3721,7 +3721,7 @@ static void set_irq_line(z80_state *z80, int irqline, int state)
 
 		/* the main execute loop will take the interrupt */
 		break;
-		
+
 	case Z80_INPUT_LINE_WAIT:
 		z80->wait_state = state;
 		break;
@@ -3743,19 +3743,19 @@ static void set_irq_line_nsc800(z80_state *z80, int irqline, int state)
 			z80->nmi_pending = TRUE;
 		z80->nmi_state = state;
 		break;
-		
+
 	case NSC800_RSTA:
 		z80->nsc800_irq_state[NSC800_RSTA] = state;
 		break;
-		
+
 	case NSC800_RSTB:
 		z80->nsc800_irq_state[NSC800_RSTB] = state;
 		break;
-		
+
 	case NSC800_RSTC:
 		z80->nsc800_irq_state[NSC800_RSTC] = state;
 		break;
-		
+
 	case INPUT_LINE_IRQ0:
 		/* update the IRQ state via the daisy chain */
 		z80->irq_state = state;
@@ -3764,7 +3764,7 @@ static void set_irq_line_nsc800(z80_state *z80, int irqline, int state)
 
 		/* the main execute loop will take the interrupt */
 		break;
-		
+
 	case Z80_INPUT_LINE_WAIT:
 		z80->wait_state = state;
 		break;
@@ -3841,10 +3841,10 @@ static CPU_SET_INFO( z80 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + Z80_INPUT_LINE_BUSRQ:	set_irq_line(z80, Z80_INPUT_LINE_BUSRQ, info->i); 	break;
+		case CPUINFO_INT_INPUT_STATE + Z80_INPUT_LINE_BUSRQ:	set_irq_line(z80, Z80_INPUT_LINE_BUSRQ, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:			set_irq_line(z80, INPUT_LINE_NMI, info->i); 		break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:			set_irq_line(z80, INPUT_LINE_IRQ0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + Z80_INPUT_LINE_WAIT:		set_irq_line(z80, Z80_INPUT_LINE_WAIT, info->i); 	break;
+		case CPUINFO_INT_INPUT_STATE + Z80_INPUT_LINE_WAIT:		set_irq_line(z80, Z80_INPUT_LINE_WAIT, info->i);	break;
 	}
 }
 
@@ -3854,13 +3854,13 @@ static CPU_SET_INFO( nsc800 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + Z80_INPUT_LINE_BUSRQ:	set_irq_line(z80, Z80_INPUT_LINE_BUSRQ, info->i); 	break;
+		case CPUINFO_INT_INPUT_STATE + Z80_INPUT_LINE_BUSRQ:	set_irq_line(z80, Z80_INPUT_LINE_BUSRQ, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:			set_irq_line_nsc800(z80, INPUT_LINE_NMI, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + NSC800_RSTA:				set_irq_line_nsc800(z80, NSC800_RSTA, info->i); 	break;
 		case CPUINFO_INT_INPUT_STATE + NSC800_RSTB:				set_irq_line_nsc800(z80, NSC800_RSTB, info->i); 	break;
 		case CPUINFO_INT_INPUT_STATE + NSC800_RSTC:				set_irq_line_nsc800(z80, NSC800_RSTC, info->i); 	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:			set_irq_line_nsc800(z80, INPUT_LINE_IRQ0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + Z80_INPUT_LINE_WAIT:		set_irq_line(z80, Z80_INPUT_LINE_WAIT, info->i); 	break;
+		case CPUINFO_INT_INPUT_STATE + Z80_INPUT_LINE_WAIT:		set_irq_line(z80, Z80_INPUT_LINE_WAIT, info->i);	break;
 	}
 }
 
@@ -3931,7 +3931,7 @@ CPU_GET_INFO( z80 )
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 	}
-} 
+}
 
 CPU_GET_INFO( nsc800 )
 {

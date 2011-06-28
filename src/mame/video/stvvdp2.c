@@ -5366,6 +5366,9 @@ UINT8 get_vblank(running_machine &machine)
 	int cur_v,vblank;
 	cur_v = machine.primary_screen->vpos();
 
+	if(!STV_VDP2_DISP)
+		return 1;
+
 	vblank = (state->m_vdp2.pal) ? 288 : 240;
 
 	if((STV_VDP2_LSMD & 3) == 3)
@@ -6340,7 +6343,7 @@ SCREEN_UPDATE( stv_vdp2 )
 	}
 	#endif
 
-	if(STV_VDP2_DISP != 0)
+	if(STV_VDP2_DISP)
 	{
 		stv_sprite_priorities_usage_valid = 0;
 		memset(stv_sprite_priorities_used, 0, sizeof(stv_sprite_priorities_used));
