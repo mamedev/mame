@@ -38,21 +38,21 @@ Software/Cartridge:
 
 PSS-61  - SUPER FAMICOM BOX Commercial Regular Cart
 This cartridge is required for the machine to operate
+- Star Fox (Nintendo)
 - Super Mario Kart (Nintendo)
 - Super Mario Collection (Nintendo)
-- Star Fox (Nintendo)
 
 PSS-62  - SUPER FAMICOM BOX Commercial Optional Cart
 - New Super 3D Golf Simulation - Waialae No Kiseki (Waialae Golf) (T&E SOFT)
 - Super Mahjong 2 (I'MAX)
 
 PSS-63  - SUPER FAMICOM BOX Commercial Optional Cart
-- Super Donkey Kong (Nintendo)
 - Super Tetris 2 + Bombliss (BPS)
+- Super Donkey Kong (Nintendo)
 
-PSS-64  - SUPER FAMICOM BOX Commercial Optional Cart (Only rumored to exist)
-- Super Donkey Kong
-- Super Bomberman 2
+PSS-64  - SUPER FAMICOM BOX Commercial Optional Cart
+- Super Donkey Kong (Nintendo)
+- Super Bomberman 2 (Hudson Soft)
 
 ***************************************************************************/
 
@@ -250,13 +250,27 @@ MACHINE_CONFIG_END
 ROM_START( sfcbox )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x10000, "grom", 0 )
-	ROM_LOAD( "grom1-1.bin", 0x0000, 0x8000, CRC(333bf9a7) SHA1(5d0cd9ca29e5580c3eebe9f136839987c879f979) )
-	ROM_LOAD( "grom1-3.bin", 0x8000, 0x8000, CRC(ebec4c1c) SHA1(d638ef1486b4c0b3d4d5b666929ca7947e16efad) )
-
 //  ROM_REGION( 0x80000, "atrom", 0 )
 	ROM_REGION( 0x100000, "user3", 0 )
-	ROM_LOAD( "atrom-4s-0.smc", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
+	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
+
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
+//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
+//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( pss61 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x10000, "grom", 0 )
+	ROM_LOAD( "grom1-1.ic1", 0x0000, 0x8000, CRC(333bf9a7) SHA1(5d0cd9ca29e5580c3eebe9f136839987c879f979) )
+
+	ROM_REGION( 0x380000, "user3", 0 )
+	ROM_LOAD( "shvc-4m-1.rom3", 0x000000, 0x200000, CRC(91b28d56) SHA1(b83dd73d3d6049450bb8092d73c3af879804f58c) )
+	ROM_LOAD( "shvc-mk-0.rom6", 0x200000, 0x080000, CRC(c8002453) SHA1(cbb853bf911255c1d8eb27cd34fc7855a0dda218) )
+	ROM_LOAD( "shvc-fo-1.ic20", 0x280000, 0x100000, CRC(ad668a41) SHA1(39ff7354a7fa02295c899b7a7ec3556998ac2636) ) /* Super FX hook needed for Star Fox */
 
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
@@ -272,7 +286,7 @@ ROM_START( pss62 )
 	ROM_LOAD( "grom2-1.ic1", 0x0000, 0x8000, CRC(bcfc5642) SHA1(a96e52685bd3dcdf09d1b7acd6e1c1ab7726a640) )
 
 	ROM_REGION( 0x180000, "user3", 0 )
-	ROM_LOAD( "shvc-gc-0.rom1", 0x000000, 0x100000, CRC(988fd5f9) SHA1(8b283e1361cae8ffe1a44cacce54f1edb4d879be) )
+	ROM_LOAD( "shvc-gc-0.rom1", 0x000000, 0x100000, CRC(b4fd7aff) SHA1(eb553b77418dedba25fc4d5dddcb04f424b0f6a9) )
 	ROM_LOAD( "shvc-2a-1.rom3", 0x100000, 0x080000, CRC(6b23e2e4) SHA1(684123a12ca1e31115bd6221d96f82461066877f) )
 
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
@@ -282,8 +296,46 @@ ROM_START( pss62 )
 //  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( pss63 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x10000, "grom", 0 )
+	ROM_LOAD( "grom3-1.ic1", 0x0000, 0x8000, CRC(ebec4c1c) SHA1(d638ef1486b4c0b3d4d5b666929ca7947e16efad) )
+
+	ROM_REGION( 0x500000, "user3", 0 )
+	ROM_LOAD( "shvc-t2-1.rom3", 0x000000, 0x100000, CRC(4ae93c10) SHA1(5fa25d027940907b769578d7bf85a9d5ba94911a) )
+	ROM_LOAD( "shvc-8x-1.rom1", 0x100000, 0x400000, CRC(3adef543) SHA1(df02860e691fbee453e345dd343c08b6da08d4ea) )
+
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
+//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
+//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( pss64 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x10000, "grom", 0 )
+	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x500000, "user3", 0 )
+	ROM_LOAD( "shvc-m4-0.rom3", 0x000000, 0x100000, CRC(fb259f4f) SHA1(8faeb56f80e82dd042bdc84d19c526a979c6de8f) )
+	ROM_LOAD( "shvc-8x-1.rom1", 0x100000, 0x400000, CRC(3adef543) SHA1(df02860e691fbee453e345dd343c08b6da08d4ea) )
+//	Possibly reverse order :
+//	ROM_LOAD( "shvc-8x-1.rom1", 0x000000, 0x400000, CRC(3adef543) SHA1(df02860e691fbee453e345dd343c08b6da08d4ea) )
+//	ROM_LOAD( "shvc-m4-0.rom3", 0x400000, 0x100000, CRC(fb259f4f) SHA1(8faeb56f80e82dd042bdc84d19c526a979c6de8f) )
+
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
+//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
+//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+ROM_END
+
+
 GAME( 199?, sfcbox,      0,     sfcbox,      snes,    snes,    ROT0, "Nintendo",                   "Super Famicom Box BIOS", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
-//pss61 - Super Mario Kart / Super Mario Collection / Star Fox
-GAME( 199?, pss62,       sfcbox,     sfcbox,      snes,    snes,    ROT0,  "T&E Soft / I'Max",         "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", GAME_NOT_WORKING )
-//pss63 - Super Donkey Kong / Super Tetris 2 + Bombliss
-//pss64 - Super Donkey Kong / Super Bomberman 2
+GAME( 199?, pss61, sfcbox, sfcbox, snes, snes, ROT0, "Nintendo", "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", GAME_NOT_WORKING )
+GAME( 199?, pss62, sfcbox, sfcbox, snes, snes, ROT0, "T&E Soft / I'Max", "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", GAME_NOT_WORKING )
+GAME( 199?, pss63, sfcbox, sfcbox, snes, snes, ROT0, "Nintendo / BPS", "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", GAME_NOT_WORKING )
+GAME( 199?, pss64, sfcbox, sfcbox, snes, snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", GAME_NOT_WORKING )
