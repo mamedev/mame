@@ -339,6 +339,7 @@ protected:
 	};
 
 	// internal state
+	UINT16				m_pc;				// fake program counter
 	UINT8				m_op;				// current opcode
 	UINT8				m_flagsio;			// flags storage for state saving
 	cosmac_state		m_state;			// state

@@ -16,7 +16,6 @@
 
     TODO:
 
-    - debugger cursor is not on R(P)
     - divide clock by 8
     - min cycles -> 2 and 3
 
@@ -237,7 +236,7 @@ void cosmac_device::device_start()
 	m_io = space(AS_IO);
 
 	// register our state for the debugger
-	state_add(STATE_GENPC,		"GENPC",		R[P]).noshow();
+	state_add(STATE_GENPC,		"GENPC",		m_pc).callimport().callexport().noshow();
 	state_add(STATE_GENFLAGS,	"GENFLAGS",		m_flagsio).mask(0x7).callimport().callexport().noshow().formatstr("%3s");
 
 	state_add(COSMAC_P,		"P",	m_p).mask(0xf);
@@ -339,6 +338,10 @@ void cosmac_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case STATE_GENPC:
+			R[P] = m_pc;
+			break;
+			
 		case STATE_GENFLAGS:
 			SET_FLAGS(m_flagsio);
 			break;
@@ -355,6 +358,10 @@ void cosmac_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case STATE_GENPC:
+			m_pc = R[P];
+			break;
+
 		case STATE_GENFLAGS:
 			m_flagsio = GET_FLAGS();
 			break;
