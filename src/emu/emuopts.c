@@ -350,9 +350,7 @@ bool emu_options::parse_command_line(int argc, char *argv[], astring &error_stri
 			add_device_options(false);
 			isfirst = false;
 		}
-		// if we failed the first time, try parsing again with the new options in place
-		if (!result)
-			result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	}
 	return result;
 }
