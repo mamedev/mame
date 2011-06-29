@@ -3409,8 +3409,7 @@ static void cp1610_set_irq_line(cp1610_state *cpustate, UINT32 irqline, int stat
 	switch(irqline)
 	{
 		case CP1610_INT_INTRM:
-			if (state == ASSERT_LINE)
-				cpustate->intrm_pending = 1;
+			cpustate->intrm_pending = (state == ASSERT_LINE);
 			cpustate->intrm_state = state;
 			break;
 		case CP1610_RESET:
