@@ -81,6 +81,22 @@ public:
         UINT8 intback;
 	}m_smpc;
 
+	struct {
+		UINT8 vblank_out;
+		UINT8 vblank_in;
+		UINT8 hblank_in;
+		UINT8 timer_0;
+		UINT8 timer_1;
+		UINT8 dsp_end;
+		UINT8 sound_req;
+		UINT8 smpc;
+		UINT8 pad;
+		UINT8 dma_end[3];
+		UINT8 dma_ill;
+		UINT8 vdp1_end;
+		UINT8 abus;
+	}m_scu_irq;
+
 	/* Saturn specific*/
 	int m_saturn_region;
 	UINT8 m_cart_type;
