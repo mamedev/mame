@@ -84,7 +84,6 @@ Custom: Imagetek 15000 (2ch video & 2ch sound)
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 
 #define VERBOSE_AUDIO_LOG (0)	// enable to show audio writes (very noisy when music is playing)
@@ -942,29 +941,22 @@ GFXDECODE_END
 
   */
 
-static INTERRUPT_GEN( rabbit_interrupts )
+static TIMER_DEVICE_CALLBACK( rabbit_scanline )
 {
-	rabbit_state *state = device->machine().driver_data<rabbit_state>();
-	int intlevel = 0;
+	rabbit_state *state = timer.machine().driver_data<rabbit_state>();
+	int scanline = param;
 
-	int line = 262 - cpu_getiloops(device);
+	if(scanline == 224) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", state->m_vblirqlevel, HOLD_LINE);
 
-	if(line==262)
-	{
-		intlevel = state->m_vblirqlevel;
-	}
-	else
-	{
-		return;
-	}
-
-	device_set_input_line(device, intlevel, HOLD_LINE);
 }
+
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MCFG_CPU_PROGRAM_MAP(rabbit_map)
-	MCFG_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", rabbit_scanline, "screen", 0, 1)
+
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_GFXDECODE(rabbit)

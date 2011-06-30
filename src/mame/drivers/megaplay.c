@@ -53,7 +53,6 @@ Bugs:
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 
-#include "deprecat.h"
 #include "includes/megadriv.h"
 #include "includes/segamsys.h"
 

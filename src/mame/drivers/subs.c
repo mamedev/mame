@@ -19,7 +19,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "includes/subs.h"
 #include "sound/discrete.h"
 #include "rendlay.h"
@@ -180,7 +179,7 @@ static MACHINE_CONFIG_START( subs, subs_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,12096000/16)		/* clock input is the "4H" signal */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(subs_interrupt,4)
+	MCFG_CPU_PERIODIC_INT(subs_interrupt,4*57)
 
 	MCFG_MACHINE_RESET(subs)
 

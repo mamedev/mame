@@ -62,7 +62,6 @@ D.9B         [f99cac4b] /
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
-#include "deprecat.h"
 #include "audio/t5182.h"
 
 
@@ -253,12 +252,15 @@ static SCREEN_UPDATE( panicr)
 	return 0;
 }
 
-static INTERRUPT_GEN( panicr_interrupt )
+static TIMER_DEVICE_CALLBACK( panicr_scanline )
 {
-	if (cpu_getiloops(device))
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc4/4);
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xc4/4);
+
+	if(scanline == 0) // <unknown>
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xc8/4);
 }
 
 static INPUT_PORTS_START( panicr )
@@ -381,7 +383,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_CPU_PROGRAM_MAP(panicr_map)
-	MCFG_CPU_VBLANK_INT_HACK(panicr_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", panicr_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD(CPUTAG_T5182,Z80,SOUND_CLOCK/4)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(t5182_map)

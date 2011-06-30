@@ -53,7 +53,6 @@ $7004 writes, related to $7000 reads
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 class olibochu_state : public driver_device
@@ -414,14 +413,6 @@ GFXDECODE_END
 
 
 
-static INTERRUPT_GEN( olibochu_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
-}
-
 static MACHINE_START( olibochu )
 {
 	olibochu_state *state = machine.driver_data<olibochu_state>();
@@ -436,12 +427,23 @@ static MACHINE_RESET( olibochu )
 	state->m_cmd = 0;
 }
 
+static TIMER_DEVICE_CALLBACK( olibochu_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 248) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+
+	if(scanline == 0) // sprite buffer irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xcf);	/* RST 08h */
+}
+
 static MACHINE_CONFIG_START( olibochu, olibochu_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ?? */
 	MCFG_CPU_PROGRAM_MAP(olibochu_map)
-	MCFG_CPU_VBLANK_INT_HACK(olibochu_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", olibochu_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ?? */
 	MCFG_CPU_PROGRAM_MAP(olibochu_sound_map)

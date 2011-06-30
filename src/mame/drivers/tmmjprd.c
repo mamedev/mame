@@ -31,7 +31,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "rendlay.h"
 
@@ -725,22 +724,24 @@ static GFXDECODE_START( tmmjprd )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( tmmjprd_interrupt )
+static TIMER_DEVICE_CALLBACK( tmmjprd_scanline )
 {
-	int intlevel = 0;
+	//tmmjprd_state *state = timer.machine().driver_data<tmmjprd_state>();
+	int scanline = param;
 
-	if (cpu_getiloops(device)==0)
-		intlevel = 5;
-	else
-		intlevel = 3;
+	if(scanline == 224) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
 
-	device_set_input_line(device, intlevel, HOLD_LINE);
+	if(scanline == 736) // blitter irq?
+		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+
 }
 
 static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
-	MCFG_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", tmmjprd_scanline, "lscreen", 0, 1)
+
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_GFXDECODE(tmmjprd)

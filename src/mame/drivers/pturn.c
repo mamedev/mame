@@ -76,7 +76,6 @@ ROMS: All ROM labels say only "PROM" and a number.
 */
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 
@@ -480,14 +479,12 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", pturn_main_intgen)
-	MCFG_MACHINE_RESET(pturn)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/3)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_HACK(pturn_sub_intgen,3)
+	MCFG_CPU_PERIODIC_INT(pturn_sub_intgen,3*60)
 
-	MCFG_GFXDECODE(pturn)
-
+	MCFG_MACHINE_RESET(pturn)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -501,6 +498,7 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 
 	MCFG_VIDEO_START(pturn)
+	MCFG_GFXDECODE(pturn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

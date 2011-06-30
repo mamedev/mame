@@ -152,7 +152,7 @@ TODO:
 #include "machine/smpc.h"
 #include "machine/eeprom.h"
 
-#define LOG_SMPC 0
+#define LOG_SMPC 1
 
 READ8_HANDLER( stv_SMPC_r )
 {

@@ -311,7 +311,6 @@ The first sprite data is located at f20b,then f21b and so on.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "includes/psychic5.h"
 
@@ -329,13 +328,17 @@ static MACHINE_RESET( psychic5 )
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( psychic5_interrupt )
+static TIMER_DEVICE_CALLBACK( psychic5_scanline )
 {
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);		/* RST 10h */
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);		/* RST 08h */
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+
+	if(scanline == 0) // sprite buffer irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
+
 
 
 /***************************************************************************
@@ -664,7 +667,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
 	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
-	MCFG_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", psychic5_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)
 	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
@@ -711,7 +714,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
-	MCFG_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", psychic5_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
 	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)

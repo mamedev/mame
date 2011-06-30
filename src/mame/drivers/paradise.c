@@ -31,7 +31,6 @@ paradise: I'm not sure it's working correctly:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "includes/paradise.h"
 #include "sound/okim6295.h"
 
