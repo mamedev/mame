@@ -1552,6 +1552,7 @@ const char *ui_slot_get_prev(running_machine &machine, device_slot_interface *sl
 	int idx = ui_slot_get_current_index(machine, slot) - 1;
 	if (idx==-1) return "";
 	if (idx==-2) idx = ui_slot_get_length(machine,slot) -1;
+	if (idx==-1) return "";
 	return slot->get_slot_interfaces()[idx].name;
 }
 
