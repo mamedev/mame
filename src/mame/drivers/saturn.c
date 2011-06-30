@@ -1966,7 +1966,6 @@ static MACHINE_RESET( saturn )
 
 	machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 	machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 
 	stvcd_reset( machine );
 
@@ -2017,7 +2016,6 @@ static MACHINE_RESET( stv )
 
 	machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 	machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 
 	stvcd_reset(machine);
 
