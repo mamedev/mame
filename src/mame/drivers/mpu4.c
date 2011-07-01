@@ -400,7 +400,7 @@ public:
 	int m_gfx_index;
 	UINT16 * m_vid_vidram;
 	UINT16 * m_vid_mainram;
-//  UINT8 m_scn2674_IR[16];
+//	UINT8 m_scn2674_IR[16];
 	UINT8 m_scn2674_IR_pointer;
 	UINT8 m_scn2674_screen1_l;
 	UINT8 m_scn2674_screen1_h;

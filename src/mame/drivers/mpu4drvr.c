@@ -1,5 +1,5 @@
 /***********************************************************************************************************
-Barcrest MPU4 Extension driver by J.Wallace, and Anonymous.
+Barcrest MPU4 Extension driver by J.Wallace, Phil Bennett and Anonymous.
 
 --- Board Setup ---
 For the Barcrest MPU4 Video system, the GAME CARD (cartridge) contains the MPU4 video bios in the usual ROM
@@ -165,13 +165,13 @@ timer driven, the video is capable of various raster effects etc.)
 
 TODO:
       - Correctly implement characteriser protection for each game.
-      - Mating Game animation and screen still slower than it should be, AVDC timing/IRQs?
       - Get the BwB games running
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
         They appear to hang on the handshake with the MPU4 board
       - Find out what causes the games to hang/reset in service mode
         Probably down to AVDC interrupt timing, there seem to be a number of race conditions re: masks
-        that need sorting out with proper blank handling, etc.
+        that need sorting out with proper blank handling, etc. I'm using a scanline timer to drive an
+		approximation of the SCN2674 scanline logic, but this is perhaps better served as a proper device.
       - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
       - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
         to give black on green.
@@ -230,7 +230,6 @@ static void update_mpu68_interrupts(running_machine &machine)
 	cputag_set_input_line(machine, "video", 1, state->m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "video", 2, state->m_m6850_irq_state ? CLEAR_LINE : ASSERT_LINE);
 	cputag_set_input_line(machine, "video", 3, state->m_scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	//logerror("%x,%x,%x\n",state->m_m6840_irq_state,state->m_m6850_irq_state,state->m_scn2674_irq_state);
 }
 
 /* Communications with 6809 board */
@@ -479,12 +478,11 @@ static SCREEN_UPDATE(mpu4_vid)
 			attr = tiledat >>12;
 
 			if (attr)
-				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[gfxregion],tiledat,0,0,0,(x*8)+(4*8),(y*8)+4);
+				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[gfxregion],tiledat,0,0,0,(x*8),(y*8));
 
 		}
 		if (dbl_size&2)
 		{
-			//state->m_linecounter -=8;//Since every row is 8 scanlines, a double row must halve this, so we take 8 lines off the counter
 			y++;/* skip a row? */
 		}
 
@@ -565,7 +563,7 @@ static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 			break;
 
 		case 3:
-			state->m_IR3_scn2674_vert_front_porch =  (((data&0xe0)>>5) * 4)+4 ;//returning actual value
+			state->m_IR3_scn2674_vert_front_porch =  (((data&0xe0)>>5) * 4)+4 ;
 			state->m_IR3_scn2674_vert_back_porch = ((data&0x1f) * 2) + 4;
 
 			LOGSTUFF(("IR3 - Vertical Front Porch %02i Lines\n",state->m_IR3_scn2674_vert_front_porch));
@@ -671,7 +669,7 @@ static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 	}
 
 	state->m_scn2674_horz_front_porch = 2*(state->m_IR1_scn2674_equalizing_constant) + 3*(state->m_IR2_scn2674_horz_sync_width)-(state->m_IR5_scn2674_character_per_row) - state->m_IR2_scn2674_horz_back_porch;
-	LOGSTUFF(("IRXX - Horizontal Front Porch %02x CCLKs\n",state->m_scn2674_horz_front_porch));
+	LOGSTUFF(("Horizontal Front Porch %02x CCLKs\n",state->m_scn2674_horz_front_porch));
 
 	state->m_scn2674_IR_pointer++;
 	if (state->m_scn2674_IR_pointer>14)state->m_scn2674_IR_pointer=14;
@@ -745,8 +743,6 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 		/* Display on */
 		operand = data & 0x04;
 
-		//state->m_scn2674_display_enabled = 1;
-
 		if (operand)
 		{
 			state->m_scn2674_display_enabled_field = 1;
@@ -781,8 +777,8 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 		operand = data & 0x1f;
 		LOGSTUFF(("reset interrupt / status bit %02x\n",operand));
 
-		state->m_scn2674_irq_register &= ~(data & 0x1f);//((data & 0x1f)^0x1f);
-		state->m_scn2674_status_register &= ~(data & 0x1f);//((data & 0x1f)^0x1f);
+		state->m_scn2674_irq_register &= ~(data & 0x1f);
+		state->m_scn2674_status_register &= ~(data & 0x1f);
 
 		LOGSTUFF(("IRQ Status after reset\n"));
 		LOGSTUFF(("Split 2   IRQ: %d Active\n",(state->m_scn2674_irq_register>>0)&1));
@@ -821,7 +817,7 @@ static void scn2674_write_command(running_machine &machine, UINT8 data)
 	{
 		/* Enable Interrupt mask*/
 		operand = data & 0x1f;
-		state->m_scn2674_irq_mask |= (data & 0x1f);  /* enables .. doesn't disable? */
+		state->m_scn2674_irq_mask |= (data & 0x1f);
 
 		LOGSTUFF(("IRQ Mask after enable %x\n",operand));
 		LOGSTUFF(("Split 2   IRQ: %d Unmasked\n",(state->m_scn2674_irq_mask>>0)&1));
@@ -998,7 +994,7 @@ static VIDEO_START( mpu4_vid )
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	/* if anything uses tile sizes other than 8x8 we can't really do it this way.. we'll have to draw tiles by hand.
-      maybe we will anyway, but for now we don't need to */
+      All Barcrest stuff uses 8x8, son unless the BwB is different, we don't need to */
 
 	state->m_vid_vidram = auto_alloc_array(machine, UINT16, 0x20000/2);
 
@@ -1115,7 +1111,7 @@ WRITE16_HANDLER( bt471_w )
 	struct bt471_t &bt471 = state->m_bt471;
 	UINT8 val = data & 0xff;
 		{
-			popmessage("Bt477: Unhandled write access (offset:%x, data:%x)", offset, val);
+			popmessage("Bt471: Unhandled write access (offset:%x, data:%x)", offset, val);
 		}
 
 	switch (offset)
@@ -1151,14 +1147,14 @@ WRITE16_HANDLER( bt471_w )
 
 //      default:
 		{
-			popmessage("Bt477: Unhandled write access (offset:%x, data:%x)", offset, val);
+			popmessage("Bt471: Unhandled write access (offset:%x, data:%x)", offset, val);
 		}
 	}
 }
 
 READ16_HANDLER( bt471_r )
 {
-	popmessage("Bt477: Unhandled read access (offset:%x)", offset);
+	popmessage("Bt471: Unhandled read access (offset:%x)", offset);
 	return 0;
 }
 
@@ -1259,7 +1255,7 @@ static WRITE8_HANDLER( ic3ss_vid_w )
 	//This would seem to be right, needs checking against a PCB
 	device_t *ic3ssv = space->machine().device("ptm_ic3ss_vid");
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	downcast<ptm6840_device *>(ic3ssv)->write(offset,data);//can speed things up if this is disabled
+	downcast<ptm6840_device *>(ic3ssv)->write(offset,data);
 	device_t *msm6376 = space->machine().device("msm6376");
 
 	if (offset == 3)
@@ -1316,9 +1312,9 @@ static INPUT_PORTS_START( crmaze )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Switch")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Door Switch?") PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Yellow")
@@ -1327,7 +1323,7 @@ static INPUT_PORTS_START( crmaze )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Left Red")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Left Yellow")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Getout Yellow")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Getout Red")/* Labelled Escape on cabinet */
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Escape/Getout Red")/* Labelled Escape on cabinet */
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("DIL1")
@@ -1386,7 +1382,7 @@ static INPUT_PORTS_START( crmaze )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)//resets game if pressed - sometimes hoppers run here, but crmaze has tubes
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL)//XA
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL)//YA
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL)//XB
@@ -1435,13 +1431,13 @@ static INPUT_PORTS_START( mating )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Yellow")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Red") // selects the answer
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Red")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Left Yellow")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Left Red")
@@ -2050,13 +2046,13 @@ static MACHINE_RESET( mpu4_vid )
 
 static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)// AM_MIRROR(0x10000)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)//where is BLANK?
+	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
 	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
 	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
@@ -2174,7 +2170,7 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* Deal 'Em */
-/* Deal 'Em was designed as an enhanced gamecard, to fit into an existing MPU4 cabinet
+/* Deal 'Em was designed as an enhanced gamecard, to fit into various existing MPU4 cabinets
 It's an unoffical addon, and does all its work through the existing 6809 CPU.
 Although given unofficial status, Barcrest's patent on the MPU4 Video hardware (GB1596363) describes
 the Deal 'Em board design, rather than the one they ultimately used, suggesting some sort of licensing deal. */
@@ -2329,23 +2325,7 @@ static void scn2674_line(running_machine &machine)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 
-	if (state->m_linecounter==0)//front porch
-	{
-		// these will be used to track which row / line we're on eventually
-		// and used by the renderer to render the correct data
-
-		state->m_scn2674_status_register |= 0x10;
-		if (state->m_scn2674_irq_mask&0x10)
-		{
-			LOG2674(("vblank irq\n"));
-			state->m_scn2674_irq_state = 1;
-			state->m_scn2674_irq_register |= 0x10;
-			update_mpu68_interrupts(machine);
-		}
-
-	}
-
-	if (state->m_linecounter==4)/* Ready - this triggers for the first scanline of the screen */
+	if (state->m_linecounter==0)/* Ready - this triggers for the first scanline of the screen */
 	{
 		state->m_scn2674_status_register |= 0x02;
 		if (state->m_scn2674_irq_mask&0x02)
@@ -2358,7 +2338,7 @@ static void scn2674_line(running_machine &machine)
 	}
 
 	// should be triggered at the start of each ROW (line zero for that row)
-	if ((state->m_linecounter+4)%8 == 0)
+	if ((state->m_linecounter)%8 == 0)
 	{
 		state->m_scn2674_status_register |= 0x08;
 		if (state->m_scn2674_irq_mask&0x08)
@@ -2368,16 +2348,11 @@ static void scn2674_line(running_machine &machine)
 			state->m_scn2674_irq_register |= 0x08;
 			update_mpu68_interrupts(machine);
 		}
-		state->m_rowcounter++;
+			state->m_rowcounter = ((state->m_rowcounter+1)% 38);//Not currently used
 	}
-		if (state->m_linecounter%7 == 0)
-		{
-			state->m_rowcounter++;
-		}
-
 
 	// this is ROWS not scanlines!!
-	if (state->m_linecounter+4 == state->m_IR12_scn2674_split_register_1*8)
+	if (state->m_linecounter == state->m_IR12_scn2674_split_register_1*8)
 	/* Split Screen 1 */
 	{
 		if (state->m_scn2674_spl1)
@@ -2391,12 +2366,12 @@ static void scn2674_line(running_machine &machine)
 			LOG2674(("SCN2674 Split Screen 1\n"));
 			state->m_scn2674_irq_state = 1;
 			update_mpu68_interrupts(machine);
-			machine.primary_screen->update_partial(machine.primary_screen->vpos());
+			machine.primary_screen->update_partial(state->m_linecounter);
 		}
 	}
 
 	// this is in ROWS not scanlines!!!
-	if (state->m_linecounter+4 == state->m_IR13_scn2674_split_register_2*8)
+	if (state->m_linecounter == state->m_IR13_scn2674_split_register_2*8)
 	/* Split Screen 2 */
 	{
 		if (state->m_scn2674_spl2)
@@ -2410,9 +2385,24 @@ static void scn2674_line(running_machine &machine)
 			state->m_scn2674_irq_state = 1;
 			state->m_scn2674_irq_register |= 0x01;
 			update_mpu68_interrupts(machine);
-			machine.primary_screen->update_partial(machine.primary_screen->vpos());
+			machine.primary_screen->update_partial(state->m_linecounter);
 		}
 	}
+
+	if (state->m_linecounter==296)//front porch
+	{
+
+		state->m_scn2674_status_register |= 0x10;
+		if (state->m_scn2674_irq_mask&0x10)
+		{
+			LOG2674(("vblank irq\n"));
+			state->m_scn2674_irq_state = 1;
+			state->m_scn2674_irq_register |= 0x10;
+			update_mpu68_interrupts(machine);
+		}
+
+	}
+
 }
 
 
@@ -2423,12 +2413,12 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	if ((state->m_scn2674_display_enabled_scanline)&&(!state->m_scn2674_display_enabled))
 	{
 		state->m_scn2674_display_enabled = 1;
-		//state->m_linecounter = 0;
 	}
 
 	if (state->m_scn2674_display_enabled)
 	{
 		state->m_linecounter = ((state->m_linecounter+1)%313);
+		//This represents the scanline counter in the SCN2674. Note that we ignore the horizontal blanking
 	}
 
 	scn2674_line(timer.machine());
@@ -2458,10 +2448,9 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE((63*8)+(17*8), (37*8)+17) // note this directly affects the scanline counters used below, and thus the timing of everything
-	MCFG_SCREEN_VISIBLE_AREA(4*8, (63*8)+(4*8)-1, 4, (37*8)+4-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, (63*8)+(0)-1, 0, (37*8)+0-1)
 
 	MCFG_SCREEN_REFRESH_RATE(50)
-//  MCFG_SCREEN_RAW_PARAMS(4000000*2, 80*8, 4, (63*8)+4, (37*8)+10+4+3, 4, (37*8)+4)//42*8, 0*8, 37*8) 3
 	MCFG_SCREEN_UPDATE(mpu4_vid)
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
@@ -2529,8 +2518,8 @@ static MACHINE_CONFIG_START( bwbvid, mpu4_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
+	MCFG_SCREEN_SIZE((63*8)+(17*8), (37*8)+17) // note this directly affects the scanline counters used below, and thus the timing of everything
+	MCFG_SCREEN_VISIBLE_AREA(0, (63*8)+(0)-1, 0, (37*8)+0-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE(mpu4_vid)
 
@@ -3588,9 +3577,9 @@ ROM_END
 
 
 /*Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
-and reel assembly with this kit and a supplied monitor.
-The real Deal 'Em ran on Summit Coin hardware, and was made by someone else.
-A further different release was made in 2000, running on the Barcrest MPU4 Video, rather than this one. */
+and reel assembly with this kit and a supplied monitor. This explains why the cabinet switch alters lamp data and buttons.
+The original Deal 'Em ran on Summit Coin hardware, and was made by someone else.
+Two further different releases were made, running on the Barcrest MPU4 Video, rather than this one. These are Deal 'Em Again and Deal 'Em 2000*/
 
 GAME( 1987,  dealem,    0,        dealem,   dealem,   0,        ROT0, "Zenitone",		"Deal 'Em (MPU4 Conversion Kit, v7.0)",								GAME_IMPERFECT_GRAPHICS )
 
@@ -3606,8 +3595,8 @@ GAME( 1993,  crmazed,   crmaze,   crmaze,   crmaze,   crmaze,   ROT0, "Barcrest"
 GAME( 1993,  crmazea,   crmaze,   crmaze,   crmaze,   crmazea,  ROT0, "Barcrest",		"The Crystal Maze (v0.1, AMLD)",									GAME_NOT_WORKING )//SWP 0.9
 
 GAME( 1993,  crmaze2,   bctvidbs, crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2)",					GAME_NOT_WORKING )//SWP 1.0
-GAME( 1993,  crmaze2d,  crmaze2,  crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak)",				GAME_NOT_WORKING )//SWP 1.0D
-GAME( 1993,  crmaze2a,  crmaze2,  crmaze,   crmaze,   crmaze2a, ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD)",			GAME_NOT_WORKING )//SWP 1.0 /* unprotected? bootleg? */
+GAME( 1993,  crmaze2d,  crmaze2,  crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak)",		GAME_NOT_WORKING )//SWP 1.0D
+GAME( 1993,  crmaze2a,  crmaze2,  crmaze,   crmaze,   crmaze2a, ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD)",			GAME_NOT_WORKING )//SWP 1.0 /* unprotected? proto? */
 
 GAME( 1994,  crmaze3,   bctvidbs, crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9)",							GAME_NOT_WORKING )//SWP 0.7
 GAME( 1994,  crmaze3d,  crmaze3,  crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9, Datapak)",					GAME_NOT_WORKING )//SWP 0.7D
@@ -3621,6 +3610,7 @@ GAME( 1989,  adders,    bctvidbs, mpu4_vid, adders,   adders,   ROT0, "Barcrest"
 
 GAME( 1989,  timemchn,  bctvidbs, mpu4_vid, skiltrek, timemchn, ROT0, "Barcrest",		"Time Machine (v2.0)",												GAME_NOT_WORKING )
 
+//Year is a guess, based on the use of the 'Coin Man' logo
 GAME( 1996?,  mating,    bctvidbs, mating,   mating,   mating,   ROT0, "Barcrest",		"The Mating Game (v0.4)",											GAME_NOT_WORKING )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
 GAME( 1996?,  matingd,   mating,   mating,   mating,   mating,   ROT0, "Barcrest",		"The Mating Game (v0.4, Datapak)",									GAME_NOT_WORKING )//SWP 0.2D
 
