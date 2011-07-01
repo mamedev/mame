@@ -2731,6 +2731,7 @@ src/mame/drivers/tank8.c svneol=native#text/plain
 src/mame/drivers/tankbatt.c svneol=native#text/plain
 src/mame/drivers/tankbust.c svneol=native#text/plain
 src/mame/drivers/taotaido.c svneol=native#text/plain
+src/mame/drivers/tapatune.c svneol=native#text/plain
 src/mame/drivers/targeth.c svneol=native#text/plain
 src/mame/drivers/tatsumi.c svneol=native#text/plain
 src/mame/drivers/tattack.c svneol=native#text/plain
