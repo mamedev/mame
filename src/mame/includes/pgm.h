@@ -85,6 +85,23 @@ public:
 	device_t *m_ics;
 };
 
+class oldsplus_state : public pgm_state
+{
+public:
+	oldsplus_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) { }
+
+public:
+	UINT16        m_oldsplus_key;
+	UINT16        m_oldsplus_int[2];
+	UINT32        m_oldsplus_val;
+	UINT16        m_oldsplus_ram[0x100];
+	UINT32        m_oldsplus_regs[0x100];
+};
+
+
+
+
 extern UINT16 *pgm_mainram;	// used by nvram handler, we cannot move it to driver data struct
 
 /*----------- defined in machine/pgmcrypt.c -----------*/
@@ -126,6 +143,11 @@ READ16_HANDLER( asic28_r );
 WRITE16_HANDLER( asic28_w );
 
 READ16_HANDLER( dw2_d80000_r );
+
+
+READ16_HANDLER( oldsplus_protram_r );
+READ16_HANDLER( oldsplus_r );
+WRITE16_HANDLER( oldsplus_w );
 
 
 /*----------- defined in video/pgm.c -----------*/

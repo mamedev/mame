@@ -1080,10 +1080,10 @@ static INPUT_PORTS_START( orlegend )
 
 	PORT_MODIFY("Region")
 	PORT_DIPNAME( 0x0003, 0x0000, DEF_STR( Region ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( World ) )
-    PORT_DIPSETTING(      0x0001, "World (duplicate)" ) // again?
-	PORT_DIPSETTING(      0x0002, "Korea" )
-	PORT_DIPSETTING(      0x0003, "China" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( World ) )
+    PORT_CONFSETTING(      0x0001, "World (duplicate)" ) // again?
+	PORT_CONFSETTING(      0x0002, "Korea" )
+	PORT_CONFSETTING(      0x0003, "China" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( orld105k )
@@ -1099,28 +1099,28 @@ static INPUT_PORTS_START( sango )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_DIPNAME( 0x000f, 0x0005, DEF_STR( Region ) )
-	PORT_DIPSETTING(      0x0000, "China" )
-	PORT_DIPSETTING(      0x0001, "Taiwan" )
-	PORT_DIPSETTING(      0x0002, "Japan (Alta License)" )
-	PORT_DIPSETTING(      0x0003, "Korea" )
-	PORT_DIPSETTING(      0x0004, "Hong Kong" )
-	PORT_DIPSETTING(      0x0005, DEF_STR( World ) )
+	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, "China" )
+	PORT_CONFSETTING(      0x0001, "Taiwan" )
+	PORT_CONFSETTING(      0x0002, "Japan (Alta License)" )
+	PORT_CONFSETTING(      0x0003, "Korea" )
+	PORT_CONFSETTING(      0x0004, "Hong Kong" )
+	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dw3 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_DIPNAME( 0x000f, 0x0006, DEF_STR( Region ) )
-	PORT_DIPSETTING(      0x0000, "0" )
-	PORT_DIPSETTING(      0x0001, "1" )
-	PORT_DIPSETTING(      0x0002, "2" )
-	PORT_DIPSETTING(      0x0003, "3" )
-	PORT_DIPSETTING(      0x0004, "4" )
-	PORT_DIPSETTING(      0x0005, "5" )
-	PORT_DIPSETTING(      0x0006, DEF_STR( World ) )
-	PORT_DIPSETTING(      0x0007, "7" )
+	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, "0" )
+	PORT_CONFSETTING(      0x0001, "1" )
+	PORT_CONFSETTING(      0x0002, "2" )
+	PORT_CONFSETTING(      0x0003, "3" )
+	PORT_CONFSETTING(      0x0004, "4" )
+	PORT_CONFSETTING(      0x0005, "5" )
+	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x0007, "7" )
 
 INPUT_PORTS_END
 
@@ -1129,16 +1129,16 @@ static INPUT_PORTS_START( olds )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_DIPNAME( 0x000f, 0x0006, DEF_STR( Region ) )
+	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
 	/* includes the following regions:
     1 = taiwan, 2 = china, 3 = japan (title = orlegend special),
     4 = korea, 5 = hong kong, 6 = world */
-	PORT_DIPSETTING(      0x0001, "Taiwan" )
-	PORT_DIPSETTING(      0x0002, "China" )
-	PORT_DIPSETTING(      0x0003, DEF_STR( Japan ) )
-	PORT_DIPSETTING(      0x0004, "Korea" )
-	PORT_DIPSETTING(      0x0005, "Hong Kong" )
-	PORT_DIPSETTING(      0x0006, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x0001, "Taiwan" )
+	PORT_CONFSETTING(      0x0002, "China" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Japan ) )
+	PORT_CONFSETTING(      0x0004, "Korea" )
+	PORT_CONFSETTING(      0x0005, "Hong Kong" )
+	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( killbld )
@@ -1164,13 +1164,13 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_DIPNAME( 0x000f, 0x0003, DEF_STR( Region ) )
-	PORT_DIPSETTING(      0x0000, "Taiwan" )
-	PORT_DIPSETTING(      0x0001, "China" )
-	PORT_DIPSETTING(      0x0002, "Japan (Alta License)" )
-	PORT_DIPSETTING(      0x0003, DEF_STR( World ))
-	PORT_DIPSETTING(      0x0004, "Korea" )
-	PORT_DIPSETTING(      0x0005, "Hong Kong" )
+	PORT_CONFNAME( 0x000f, 0x0003, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, "Taiwan" )
+	PORT_CONFSETTING(      0x0001, "China" )
+	PORT_CONFSETTING(      0x0002, "Japan (Alta License)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( World ))
+	PORT_CONFSETTING(      0x0004, "Korea" )
+	PORT_CONFSETTING(      0x0005, "Hong Kong" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddp2 )
@@ -1278,14 +1278,28 @@ static INPUT_PORTS_START( ddp2 )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 */
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_DIPNAME( 0x000f, 0x0005, DEF_STR( Region ) )
-	PORT_DIPSETTING(      0x0000, "China" )
-	PORT_DIPSETTING(      0x0001, "Taiwan" )
-	PORT_DIPSETTING(      0x0002, "Japan (Cave License)" )
-	PORT_DIPSETTING(      0x0003, "Korea" )
-	PORT_DIPSETTING(      0x0004, "Hong Kong" )
-	PORT_DIPSETTING(      0x0005, DEF_STR( World ) )
+	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, "China" )
+	PORT_CONFSETTING(      0x0001, "Taiwan" )
+	PORT_CONFSETTING(      0x0002, "Japan (Cave License)" )
+	PORT_CONFSETTING(      0x0003, "Korea" )
+	PORT_CONFSETTING(      0x0004, "Hong Kong" )
+	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( oldsplus )
+	PORT_INCLUDE ( pgm )
+
+	PORT_MODIFY("Region")	/* Region - supplied by protection device */
+	PORT_CONFNAME( 0x000f, 0x0001, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0001, "China" )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
+	PORT_CONFSETTING(      0x0003, "Korea" )
+	PORT_CONFSETTING(      0x0004, "Hong Kong" )
+	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x0006, "Taiwan" )
+INPUT_PORTS_END
+
 
 /*** GFX Decodes *************************************************************/
 
@@ -1369,8 +1383,8 @@ static MACHINE_RESET( pgm )
 	state->m_cal_cnt = 0;
 }
 
-static MACHINE_CONFIG_START( pgm, pgm_state )
 
+MACHINE_CONFIG_FRAGMENT( pgmbase )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
 	MCFG_CPU_PROGRAM_MAP(pgm_mem)
@@ -1402,10 +1416,13 @@ static MACHINE_CONFIG_START( pgm, pgm_state )
 	/*sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
     MCFG_ICS2115_ADD("ics", 0, sound_irq)
-//  MCFG_SOUND_ADD("ics", ICS2115, 0)
-//  MCFG_SOUND_CONFIG(pgm_ics2115_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( pgm, pgm_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( drgw2, pgm )
 
@@ -1491,6 +1508,18 @@ static MACHINE_CONFIG_DERIVED( svg, pgm )
 	MCFG_CPU_PROGRAM_MAP(svg_arm7_map)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_START( oldsplus, oldsplus_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+	
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+
+//  Simulated for now
+//	MCFG_CPU_ADD("prot", ARM7, 20000000)
+//	MCFG_CPU_PROGRAM_MAP(svg_arm7_map)
+MACHINE_CONFIG_END
+
 class cavepgm_state : public pgm_state
 {
 public:
@@ -1558,9 +1587,7 @@ static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 	/*sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
     MCFG_ICS2115_ADD("ics", 0, sound_irq)
-    //MCFG_SOUND_ADD("ics", ICS2115, 0)
-	//MCFG_SOUND_CONFIG(pgm_ics2115_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
+ 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
 /*** Rom Loading *************************************************************/
@@ -4613,12 +4640,6 @@ static DRIVER_INIT( kovshp )
 	kovsh_latch_init(machine);
 }
 
-static DRIVER_INIT( oldsplus )
-{
-	pgm_basic_init(machine);
-	pgm_oldsplus_decrypt(machine);
-	kovsh_latch_init(machine);
-}
 
 static void kov2_latch_init( running_machine &machine )
 {
@@ -5836,6 +5857,43 @@ static DRIVER_INIT( espgal )
 }
 
 
+static void oldsplus_latch_init( running_machine &machine )
+{
+	oldsplus_state *state = machine.driver_data<oldsplus_state>();
+
+	state->m_oldsplus_key = 0;
+	state->m_oldsplus_int[0] = 0;
+	state->m_oldsplus_int[1] = 0;
+	state->m_oldsplus_val = 0;
+	memset(state->m_oldsplus_ram, 0, 0x100);
+	memset(state->m_oldsplus_regs, 0, 0x100);
+
+	state_save_register_global(machine, state->m_oldsplus_key);
+	state_save_register_global(machine, state->m_oldsplus_val);
+	state_save_register_global_array(machine, state->m_oldsplus_int);
+	state_save_register_global_array(machine, state->m_oldsplus_ram);
+	state_save_register_global_array(machine, state->m_oldsplus_regs);
+}
+
+#if 0
+static DRIVER_INIT( oldsplus )
+{
+	pgm_basic_init(machine);
+	pgm_oldsplus_decrypt(machine);
+	kovsh_latch_init(machine);
+}
+#endif
+
+static DRIVER_INIT( oldsplus )
+{
+	pgm_basic_init(machine);
+	pgm_oldsplus_decrypt(machine);
+	oldsplus_latch_init(machine);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500003, FUNC(oldsplus_r), FUNC(oldsplus_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4fffff, FUNC(oldsplus_protram_r));
+}
+
 /*** GAME ********************************************************************/
 
 GAME( 1997, pgm,          0,         pgm,     pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", GAME_IS_BIOS_ROOT )
@@ -5932,7 +5990,7 @@ GAME( 2002, dmnfrnta,     dmnfrnt,   svg,     sango,    dmnfrnt,    ROT0,   "IGS
 GAME( 2003, theglad,      pgm,       svg,     sango,    theglad,    ROT0,   "IGS", "The Gladiator (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2003, theglada,     theglad,   svg,     sango,    theglad,    ROT0,   "IGS", "The Gladiator (ver. 101)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2004, oldsplus,     pgm,       kov,     olds,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, oldsplus,     pgm,       oldsplus,     oldsplus,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2004, kovshp,       pgm,       kov,     sango,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 // these bootlegs are clones of this instead
