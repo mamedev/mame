@@ -15,23 +15,19 @@ Memory Map:
 0xa00008-0xa0000d   EEPROM write/ctrl
 0xffc000-0xffc7ff   Screen      (8x8 tiles  32x32       (256x256))
 0xffc800-0xffc87f   Sprite RAM
+0xffc800-0xffc801   INT 2 ACK\Watchdog timer
+0xffc802-0xffc803   INT 6 ACK/Watchdog timer
 0xffc884-0xffffff   Work RAM
 
 Interrupts:
     Level 2 INT updates the timer
-    Level 6 INT drives the game
-
-Unmapped addresses in the driver:
-
-0xffc800-0xffc801   INT 2 ACK\Watchdog timer
-0xffc802-0xffc803   INT 6 ACK/Watchdog timer
+    Level 6 INT is vblank
 
 EEPROM chip: 93C46
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/saa1099.h"
@@ -69,6 +65,15 @@ static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 	eeprom->write_bit(data & 0x01);
 }
 
+static WRITE16_HANDLER( xorworld_irq2_ack_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
+}
+
+static WRITE16_HANDLER( xorworld_irq6_ack_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
+}
 
 static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
@@ -82,8 +87,8 @@ static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa0000c, 0xa0000d) AM_DEVWRITE("eeprom", eeprom_data_w)
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_BASE_MEMBER(xorworld_state, m_videoram)
 	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_BASE_MEMBER(xorworld_state, m_spriteram)
-	AM_RANGE(0xffc880, 0xffc881) AM_WRITENOP
-	AM_RANGE(0xffc882, 0xffc883) AM_WRITENOP
+	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(xorworld_irq2_ack_w)
+	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(xorworld_irq6_ack_w)
 	AM_RANGE(0xffc884, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -163,31 +168,18 @@ static GFXDECODE_START( xorworld )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( xorworld_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-	{
-		device_set_input_line(device, 2, HOLD_LINE);
-	}
-	else if (cpu_getiloops(device) % 2)
-	{
-		device_set_input_line(device, 6, HOLD_LINE);
-	}
-}
-
-
 static MACHINE_CONFIG_START( xorworld, xorworld_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	// 10 MHz
 	MCFG_CPU_PROGRAM_MAP(xorworld_map)
-	MCFG_CPU_VBLANK_INT_HACK(xorworld_interrupt, 4)	// 1 IRQ2 + 1 IRQ4 + 1 IRQ6
+	MCFG_CPU_VBLANK_INT("screen",irq6_line_assert) // irq 4 or 6
+	MCFG_CPU_PERIODIC_INT(irq2_line_assert,3*60) //timed irq, unknown timing
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	// video hardware
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
