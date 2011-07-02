@@ -21,10 +21,10 @@ public:
 	UINT16 *   m_xmen6p_tilemapleft;
 	UINT16 *   m_xmen6p_tilemapright;
 	UINT16 *   m_k053247_ram;
-	UINT16     m_current_frame;
 
 	/* misc */
 	UINT8       m_sound_curbank;
+	UINT8       m_vblank_irq_mask;
 
 	/* devices */
 	device_t *m_maincpu;

@@ -46,14 +46,10 @@ c001      YM2203 #2 write
 #include "includes/vulgus.h"
 
 
-static INTERRUPT_GEN( vulgus_interrupt )
+static INTERRUPT_GEN( vulgus_vblank_irq )
 {
-	if (cpu_getiloops(device) != 0)
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 }
-
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
@@ -222,7 +218,7 @@ static MACHINE_CONFIG_START( vulgus, vulgus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(vulgus_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",vulgus_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

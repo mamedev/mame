@@ -15,7 +15,6 @@ likewise be a 2 screen game
 ***************************************************************************/
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "video/konicdev.h"
 #include "machine/eeprom.h"
 #include "cpu/z80/z80.h"
@@ -55,6 +54,7 @@ static WRITE16_HANDLER( eeprom_w )
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
 		/* bit 4 is cs (active low) */
+		/* bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?) */
 		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
@@ -88,10 +88,12 @@ static WRITE16_HANDLER( sound_irq_w )
 
 static WRITE16_HANDLER( xmen_18fa00_w )
 {
+	xmen_state *state = space->machine().driver_data<xmen_state>();
+
 	if(ACCESSING_BITS_0_7)
 	{
 		/* bit 2 is interrupt enable */
-		interrupt_enable_w(space, 0, data & 0x04);
+		state->m_vblank_irq_mask = data & 0x04;
 	}
 }
 
@@ -258,8 +260,8 @@ INPUT_PORTS_END
 
 static CUSTOM_INPUT( xmen_frame_r )
 {
-	xmen_state *state = field.machine().driver_data<xmen_state>();
-	return state->m_current_frame;
+	//xmen_state *state = field.machine().driver_data<xmen_state>();
+	return field.machine().primary_screen->frame_number() & 1;
 }
 
 static INPUT_PORTS_START( xmen6p )
@@ -295,15 +297,6 @@ static INPUT_PORTS_START( xmen6p )
 INPUT_PORTS_END
 
 
-
-static INTERRUPT_GEN( xmen_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-		irq5_line_hold(device);
-	else
-		irq3_line_hold(device);
-}
-
 static MACHINE_START( xmen )
 {
 	xmen_state *state = machine.driver_data<xmen_state>();
@@ -325,6 +318,7 @@ static MACHINE_START( xmen )
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
 	state->save_item(NAME(state->m_layerpri));
+	state->save_item(NAME(state->m_vblank_irq_mask));
 	machine.save().register_postload(save_prepost_delegate(FUNC(sound_reset_bank), &machine));
 }
 
@@ -341,6 +335,7 @@ static MACHINE_RESET( xmen )
 
 	state->m_sprite_colorbase = 0;
 	state->m_sound_curbank = 0;
+	state->m_vblank_irq_mask = 0;
 }
 
 static const k052109_interface xmen_k052109_intf =
@@ -361,12 +356,26 @@ static const k053247_interface xmen_k053246_intf =
 	xmen_sprite_callback
 };
 
+static TIMER_DEVICE_CALLBACK( xmen_scanline )
+{
+	xmen_state *state = timer.machine().driver_data<xmen_state>();
+	int scanline = param;
+
+	if(scanline == 240 && state->m_vblank_irq_mask) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+
+	if(scanline == 0) // sprite DMA irq?
+		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
+
+}
+
+
 static MACHINE_CONFIG_START( xmen, xmen_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(xmen_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", xmen_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -404,41 +413,6 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-
-static MACHINE_START( xmen6p )
-{
-	xmen_state *state = machine.driver_data<xmen_state>();
-
-	MACHINE_START_CALL(xmen);
-
-	state->save_item(NAME(state->m_current_frame));
-}
-
-static MACHINE_RESET( xmen6p )
-{
-	xmen_state *state = machine.driver_data<xmen_state>();
-	state->m_current_frame = 0x00;
-}
-
-static INTERRUPT_GEN( xmen6p_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-	{
-		irq5_line_hold(device);
-
-
-	}
-	else
-	{
-//      if (xmen_irqenabled & 0x04)
-//      {
-			irq3_line_hold(device);
-//          state->m_current_frame = 0x00;
-
-//      }
-	}
-}
-
 static const k053247_interface xmen6p_k053246_intf =
 {
 	"lscreen",	/* is this correct? */
@@ -454,13 +428,13 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(6p_main_map)
-	MCFG_CPU_VBLANK_INT_HACK(xmen6p_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", xmen_scanline, "lscreen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000)	/* verified with M1, guessed but accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START(xmen6p)
-	MCFG_MACHINE_RESET(xmen6p)
+	MCFG_MACHINE_START(xmen)
+	MCFG_MACHINE_RESET(xmen)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
