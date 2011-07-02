@@ -1652,13 +1652,24 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 		if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
 			load_layout_file(driver_list::driver(cloneof).name, "default");
 
+	int screens = m_manager.machine().devicelist().count(SCREEN);
 	// now do the built-in layouts for single-screen games
-	if (m_manager.machine().devicelist().count(SCREEN) == 1)
+	if (screens == 1)
 	{
 		if (system.flags & ORIENTATION_SWAP_XY)
 			load_layout_file(NULL, layout_vertical);
 		else
 			load_layout_file(NULL, layout_horizont);
+		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
+	}
+	if (screens == 2)
+	{
+		load_layout_file(NULL, layout_dualhsxs);
+		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
+	}
+	if (screens == 3)
+	{
+		load_layout_file(NULL, layout_triphsxs);
 		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 	}
 }
