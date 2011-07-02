@@ -1407,6 +1407,18 @@ ROM_START( megat2 ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
 	ROM_RELOAD(                        0x380000, 0x080000)
 ROM_END
 
+ROM_START( megat2a ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "qs9235-01_u5oru32-r0a", 0x000000, 0x080000, CRC(ec0c18f6) SHA1(ae4f60f516097607249dbd902f8aacfe95acb065) ) /* Location U32 */
+	ROM_RELOAD(                        0x080000, 0x080000)
+	ROM_LOAD( "qs9235-01_u6oru36-r0",  0x100000, 0x080000, CRC(0a358743) SHA1(cc7c1b75e391204a7bdae2e1cecd9b55b572f8d5) ) /* Location U36 */
+	ROM_RELOAD(                        0x180000, 0x080000)
+	ROM_LOAD( "qs9235-01_u7oru37-r0",  0x200000, 0x080000, CRC(16643f83) SHA1(347af99f535a8b473c8780067d5132add7fa0d8c) ) /* Location U37 */
+	ROM_RELOAD(                        0x280000, 0x080000)
+	ROM_LOAD( "9255-10-01_u38-r0d",    0x300000, 0x080000, CRC(f43de55f) SHA1(456b4098e22982d5f1c6f872684eefb473939747) ) /* Location U38, 941123 514 - Standard version */
+	ROM_RELOAD(                        0x380000, 0x080000)
+ROM_END
+
 ROM_START( megat2ca ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "qs9235-01_u5oru32-r0b", 0x000000, 0x080000, CRC(f7ecd49b) SHA1(34c1293da7304e8a46a96f1dbd7add3291afe3fc) ) /* Location U32 */
@@ -1922,6 +1934,7 @@ GAME( 1994, pitbossma, pitbossm,  meritm_crt250_questions, pitbossa, 0,        R
 
 /* CRT 260 */
 GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, megat2,   ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROE, Standard version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2a ,  megat2, meritm_crt260, meritm_crt260, megat2,   ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROD, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, megat2ca,  megat2, meritm_crt260, meritm_crt260, megat2,   ROT0, "Merit", "Pit Boss Megatouch II (9255-10-06 ROG, California version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 RON, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, megat3a,   megat3, meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 ROF, Standard version)", GAME_IMPERFECT_GRAPHICS )
