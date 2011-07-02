@@ -4,7 +4,10 @@
 
     emulator by Samuele Zannoli and R. Belmont
     reverse engineering by ElSemi, Deunan Knute, Andreas Naive, Olivier Galibert, and Cah4e3
-
+ 
+    TODO: "M4" boards allow direct access to the flash chips' commands and IDs.
+          Can't implement this w/o access to the ROM test however.
+ 
 **************************************************************************/
 
 /*
@@ -175,12 +178,15 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #include "cdrom.h"
 #include "includes/naomi.h"
 #include "includes/naomibd.h"
+#include "naomim4decoder.h"
 
 #define NAOMIBD_FLAG_AUTO_ADVANCE	(8)	// address auto-advances on read
 #define NAOMIBD_FLAG_SPECIAL_MODE	(4)	// used to access protection registers
 #define NAOMIBD_FLAG_DMA_COMPRESSION    (2)	// 0 protection chip decompresses DMA data, 1 for normal DMA reads
 
 #define NAOMIBD_PRINTF_PROTECTION	(0)	// 1 to printf protection access details
+
+#define CART_RAM_SIZE (2*1024*1024) // must be the size of the largest encrypted M4 DMA transfer to be done
 
 /*************************************
  *
@@ -203,6 +209,7 @@ struct _naomibd_config_table
 	const char *name;
 	int m2m3_key;
     int m1_key;
+    int m4_key;
 };
 
 typedef struct _naomibd_prot naomibd_prot;
@@ -238,11 +245,13 @@ struct _naomibd_state
 	UINT32				aw_offset, aw_file_base, aw_file_offset;
 
 	// live decrypt vars
-	UINT32				dc_gamekey, dc_seqkey, dc_dmakey;
-	UINT8				dc_cart_ram[256*1024];	// internal cartridge RAM
+	UINT32				dc_gamekey, dc_seqkey, dc_dmakey, dc_m4key;
+	UINT8				dc_cart_ram[CART_RAM_SIZE];	// internal cartridge RAM
 	INT32				dc_m3_ptr;
 
 	naomibd_prot		prot;
+
+    NaomiM4Decoder      *m4_decoder;
 };
 
 // maps protection offsets to real addresses
@@ -254,6 +263,8 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "18wheelr", 0x07cf54, 0 },
 	{ "alpilota", 0x070e41, 0 },
 	{ "alpiltdx", 0x070e41, 0 },
+    { "asndynmt", 0xffffffff, 0, 0x00008784 },   // for M4 games, set the first key to 0xffffffff and the M4 key is the 3rd key
+    { "ausfache", 0xffffffff, 0, 0x092b6007 },   // for M4 games, set the first key to 0xffffffff and the M4 key is the 3rd key
 	{ "capsnk", 0, 0 },
 	{ "capsnka", 0, 0 },
 	{ "crackndj", 0x1c2347, 0 },
@@ -274,6 +285,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "gundmct", 0x0e8010, 0 },
 	{ "gwing2",  0x0b25d0, 0 },
 	{ "hmgeo",   0x038510, 0 },
+    { "illvelo", 0xffffffff, 0, 0xf3a5982c },   // for M4 games, set the first key to 0xffffffff and the M4 key is the 3rd key
 	{ "jambo",   0x0fab95, 0 },
     { "kick4csh", 0, 0x820857c9 },
     { "mvsc2", 0, 0xc18b6e7c },
@@ -290,6 +302,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
     { "shootopl", 0, 0xa0f37ca7 },
     { "shootpl", 0, 0x9d8de9cd },
     { "shootplm", 0, 0x9d8de9cd },
+    { "sl2007", 0xffffffff, 0, 0x88c274c7 },   // for M4 games, set the first key to 0xffffffff and the M4 key is the 3rd key
 	{ "slasho", 0x1a66ca, 0 },
 	{ "smlg99", 0x048a01, 0 },
 	{ "spawn", 0x078d01, 0 },
@@ -728,7 +741,7 @@ static UINT16 naomibd_get_data_stream(naomibd_state *naomibd)
 	return wordn;
 }
 
-void *naomibd_get_memory(device_t *device)
+void *naomibd_get_memory(device_t *device, UINT32 length)
 {
 	naomibd_state *naomibd = get_safe_token(device);
 
@@ -737,6 +750,28 @@ void *naomibd_get_memory(device_t *device)
     {
         // perform the M1 decode
         naomibd_m1_decode(naomibd);
+
+        // return the pointer to our output buffer
+        return naomibd->dc_cart_ram;
+    }
+    else if (!(naomibd->dma_offset_flags & NAOMIBD_FLAG_DMA_COMPRESSION) && (naomibd->type == ROM_BOARD) && (naomibd->dc_m4key != 0))
+    {
+        if (length > CART_RAM_SIZE)  // make sure we stay in bounds
+        {
+            fatalerror("M4 encrypted DMA length too large, adjust CART_RAM_SIZE: %d\n", length);
+            assert(0);
+        }
+
+        // decrypt the required number of bytes
+        naomibd->m4_decoder->init();
+        UINT8 *m4src = naomibd->memory + naomibd->dma_offset;
+        for (int i = 0; i < length; i+=2)
+        {
+            UINT16 temp = naomibd->m4_decoder->decrypt(m4src[i] | (m4src[i+1]<<8));
+
+            naomibd->dc_cart_ram[i] = temp & 0xff;
+            naomibd->dc_cart_ram[i+1] = (temp>>8) & 0xff;
+        }
 
         // return the pointer to our output buffer
         return naomibd->dc_cart_ram;
@@ -879,6 +914,17 @@ READ64_DEVICE_HANDLER( naomibd_r )
 			{
 				ret = (UINT64)naomibd_get_data_stream(v);
 			}
+            else if (v->dc_m4key != 0)
+            {
+                if (v->m4_decoder)
+                {
+                    ret = (UINT64)v->m4_decoder->decrypt(ROM[v->rom_offset] | (ROM[v->rom_offset+1]<<8));
+                }
+                else
+                {
+                    ret = U64(0);   // $$$M4 TODO
+                }
+            }
 			else
 			{
                 ret = U64(0);
@@ -910,34 +956,46 @@ READ64_DEVICE_HANDLER( naomibd_r )
 		//return (UINT64)0xffff << 32;
 		return (UINT64)actel_id << 32;
 	}
-	else if ((offset == 7) && ACCESSING_BITS_32_47)
-	{
-		// 5f703c
-		mame_printf_verbose("ROM: read 5f703c\n");
-		return (UINT64)0xffff << 32;
-	}
-	else if ((offset == 8) && ACCESSING_BITS_0_15)
-	{
-		// 5f7040
-		mame_printf_verbose("ROM: read 5f7040\n");
-		return 0;
-	}
+    else if ((offset == 6) && ACCESSING_BITS_32_47)
+    {
+        return (UINT64)0x5555<<32;  // flash ID for M4 carts?
+    }
+    else if ((offset == 7) && ACCESSING_BITS_32_47)
+    {
+        // 5f703c
+        mame_printf_verbose("ROM: read 5f703c\n");
+        return (UINT64)0xffff << 32;
+    }
+    else if ((offset == 8) && ACCESSING_BITS_0_15)
+    {
+        // 5f7040
+        #if NAOMIBD_PRINTF_PROTECTION
+        printf("ROM: read 5f7040\n");
+        #endif
+        return 0;
+    }
 	else if ((offset == 8) && ACCESSING_BITS_32_47)
 	{
 		// 5f7044
-		mame_printf_verbose("ROM: read 5f7044\n");
+        #if NAOMIBD_PRINTF_PROTECTION
+		printf("ROM: read 5f7044\n");
+        #endif
 		return 0;
 	}
 	else if ((offset == 9) && ACCESSING_BITS_0_15)
 	{
 		// 5f7048
-		mame_printf_verbose("ROM: read 5f7048\n");
+        #if NAOMIBD_PRINTF_PROTECTION
+		printf("ROM: read 5f7048\n");
+        #endif
 		return 0;
 	}
 	else if ((offset == 9) && ACCESSING_BITS_32_47)
 	{
 		// 5f704c
-		mame_printf_verbose("ROM: read 5f704c\n");
+        #if NAOMIBD_PRINTF_PROTECTION
+		printf("ROM: read 5f704c\n");
+        #endif
 		return (UINT64)1 << 32;
 	}
 	else if ((offset == 15) && ACCESSING_BITS_32_47) // boardid read
@@ -948,11 +1006,12 @@ READ64_DEVICE_HANDLER( naomibd_r )
 
 		return ret << 32;
 	}
+    #if NAOMIBD_PRINTF_PROTECTION
 	else
 	{
-		//mame_printf_verbose("%s:ROM: read mask %" I64FMT "x @ %x\n", machine.describe_context(), mem_mask, offset);
+		printf("%s:ROM: read mask %" I64FMT "x @ %x\n", device->machine().describe_context(), mem_mask, offset);
 	}
-
+    #endif
 	return U64(0xffffffffffffffff);
 }
 
@@ -1064,9 +1123,15 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 				v->rom_offset |= ((data >> 32) & 0xffff);
 			}
 
-			#if NAOMIBD_PRINTF_PROTECTION
-			printf("PIO: offset to %x\n", v->rom_offset);
-			#endif
+            if (v->m4_decoder)
+            {
+                v->m4_decoder->init();
+                v->rom_offset &= ~1;    // clear bit 0 on M4 carts
+            }
+
+            #if NAOMIBD_PRINTF_PROTECTION
+            printf("PIO: offset to %x (flags %x)\n", v->rom_offset, v->rom_offset_flags);
+            #endif
 		}
 		break;
 		case 1:
@@ -1170,28 +1235,6 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 			}
 		}
 		break;
-		case 7:
-		{
-			if(ACCESSING_BITS_32_47)
-				mame_printf_verbose("ROM: write 5f703c\n");
-		}
-		break;
-		case 8:
-		{
-			if(ACCESSING_BITS_0_15)
-				mame_printf_verbose("ROM: write 5f7040\n");
-			if(ACCESSING_BITS_32_47)
-				mame_printf_verbose("ROM: write 5f7044\n");
-		}
-		break;
-		case 9:
-		{
-			if(ACCESSING_BITS_0_15)
-				mame_printf_verbose("ROM: write 5f7048\n");
-			if(ACCESSING_BITS_32_47)
-				mame_printf_verbose("ROM: write 5f704c\n");
-		}
-		break;
 		case 15:
 		{
 			if(ACCESSING_BITS_0_15)
@@ -1203,10 +1246,16 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 				x76f100->scl_w((data >> 1) & 1);
 				x76f100->sda_w((data >> 0) & 1);
 			}
+            #if NAOMIBD_PRINTF_PROTECTION
+            else
+            {
+                printf("naomibd: case 15 unknown bits %llx mask %llx\n", data, mem_mask);
+            }
+            #endif
 		}
 		break;
 		default:
-			mame_printf_verbose("%s: ROM: write %" I64FMT "x to %x, mask %" I64FMT "x\n", device->machine().describe_context(), data, offset, mem_mask);
+			logerror("%s: ROM: write %" I64FMT "x to %x, mask %" I64FMT "x\n", device->machine().describe_context(), data, offset, mem_mask);
 			break;
 	}
 }
@@ -2008,6 +2057,7 @@ static DEVICE_START( naomibd )
 	v->device = device;
 
     v->dc_dmakey = 0;
+    v->m4_decoder = NULL;
 
 	for (i=0; i<ARRAY_LENGTH(naomibd_translate_tbl); i++)
 	{
@@ -2015,7 +2065,13 @@ static DEVICE_START( naomibd )
 		{
             v->dc_gamekey = naomibd_translate_tbl[i].m2m3_key;
             v->dc_dmakey = naomibd_translate_tbl[i].m1_key;
-			break;
+            v->dc_m4key = naomibd_translate_tbl[i].m4_key;
+
+            if (v->dc_m4key != 0)
+            {
+                v->m4_decoder = new NaomiM4Decoder(v->dc_m4key);
+            }
+            break;
 		}
 	}
 
@@ -2069,7 +2125,7 @@ static DEVICE_START( naomibd )
 
 static DEVICE_STOP( naomibd )
 {
-	//naomibd_state *v = get_safe_token(device);
+//    naomibd_state *v = get_safe_token(device);
 }
 
 

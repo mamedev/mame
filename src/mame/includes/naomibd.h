@@ -86,7 +86,7 @@ struct _naomibd_config
 
 int naomibd_interrupt_callback(device_t *device, naomibd_interrupt_func callback);
 int naomibd_get_type(device_t *device);
-void *naomibd_get_memory(device_t *device);
+void *naomibd_get_memory(device_t *device, UINT32 length);
 offs_t naomibd_get_dmaoffset(device_t *device);
 
 READ64_DEVICE_HANDLER( naomibd_r );

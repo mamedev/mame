@@ -540,8 +540,8 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 				return;
 			}
 			g1bus_regs[SB_GDST] = dat & 1;
-//          printf("ROM board DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(&space->device()));
-			ROM = (UINT8 *)naomibd_get_memory(space->machine().device("rom_board"));
+//            printf("Cart DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(&space->device()));
+			ROM = (UINT8 *)naomibd_get_memory(space->machine().device("rom_board"), g1bus_regs[SB_GDLEN]);
 			dmaoffset = naomibd_get_dmaoffset(space->machine().device("rom_board"));
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
 			ddtdata.length=g1bus_regs[SB_GDLEN] >> 5;		// words to transfer
