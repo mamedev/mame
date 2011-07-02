@@ -32,6 +32,7 @@ Bottom board notable:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
+#include "sound/bsmt2000.h"
 #include "machine/ticket.h"
 
 class tapatune_state : public driver_device
@@ -50,6 +51,10 @@ public:
 	UINT8	m_z80_to_68k_index;
 	UINT8	m_z80_to_68k_data;
 
+	UINT8	m_68k_to_z80_index;
+	UINT8	m_68k_to_z80_data;
+
+	UINT16	m_bsmt_data;
 };
 
 static WRITE16_HANDLER(palette_w)
@@ -87,7 +92,20 @@ static READ16_HANDLER(read_from_z80)
 
 static WRITE16_HANDLER(write_to_z80)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
+	tapatune_state *state = space->machine().driver_data<tapatune_state>();
+
+	switch( offset )
+	{
+		case 0:
+			//if ( (data >> 8) & 0xff )
+			//	logerror("Command to Z80: %04x\n", data);
+			state->m_68k_to_z80_index = data & 0xff;
+			state->m_68k_to_z80_data = (data >> 8) & 0xff;
+			cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
+			break;
+		case 1:
+			break;
+	}
 }
 
 static READ16_HANDLER(irq_ack_r)
@@ -149,6 +167,48 @@ static WRITE8_HANDLER(write_data_to_68k)
 	cputag_set_input_line(space->machine(), "maincpu", 3, ASSERT_LINE);
 }
 
+static READ8_HANDLER(read_index_from_68k)
+{
+	tapatune_state *state = space->machine().driver_data<tapatune_state>();
+	return state->m_68k_to_z80_index;
+}
+
+static READ8_HANDLER(read_data_from_68k)
+{
+	tapatune_state *state = space->machine().driver_data<tapatune_state>();
+	//if ( state->m_68k_to_z80_data != 0 )
+	//	logerror("Load command from 68K: %02x %02x\n", state->m_68k_to_z80_index, state->m_68k_to_z80_data);
+	return state->m_68k_to_z80_data;
+}
+
+static READ8_HANDLER(bsmt_status_r)
+{
+	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
+	return (bsmt->read_status() << 7) ^ 0x80;
+}
+
+static WRITE8_HANDLER(bsmt_data_lo_w)
+{
+	tapatune_state *state = space->machine().driver_data<tapatune_state>();
+	state->m_bsmt_data = (state->m_bsmt_data & 0xff00) | data;
+}
+
+static WRITE8_HANDLER(bsmt_data_hi_w)
+{
+	tapatune_state *state = space->machine().driver_data<tapatune_state>();
+	state->m_bsmt_data = (state->m_bsmt_data & 0x00ff) | (data << 8);
+}
+
+static WRITE8_HANDLER(bsmt_reg_w)
+{
+	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
+	tapatune_state *state = space->machine().driver_data<tapatune_state>();
+
+	//logerror("Writing BSMT reg: %02X data: %04X\n", data, state->m_bsmt_data);
+	bsmt->write_reg(data);
+	bsmt->write_data(state->m_bsmt_data);
+}
+
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -157,12 +217,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START ( sound_io_map, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(bsmt_data_lo_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(bsmt_data_hi_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(bsmt_reg_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(controls_mux)
 	AM_RANGE(0x20, 0x20) AM_READ(sound_irq_clear)
+	AM_RANGE(0x28, 0x28) AM_READ(bsmt_status_r)
 	AM_RANGE(0x30, 0x30) AM_READ(controls_r)
 	AM_RANGE(0x38, 0x38) AM_READ_PORT("COINS")
 	AM_RANGE(0x60, 0x60) AM_WRITE(write_index_to_68k)
 	AM_RANGE(0x61, 0x61) AM_WRITE(write_data_to_68k)
+	AM_RANGE(0x63, 0x63) AM_WRITENOP // leds? lamps?
+	AM_RANGE(0x68, 0x68) AM_READ(read_index_from_68k)
+	AM_RANGE(0x69, 0x69) AM_READ(read_data_from_68k)
 	AM_RANGE(0x6b, 0x6b) AM_READ_PORT("BUTTONS")
 ADDRESS_MAP_END
 
@@ -336,6 +403,12 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("bsmt", BSMT2000, XTAL_24MHz)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START(tapatune)
@@ -350,7 +423,7 @@ ROM_START(tapatune)
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "rom.u8", 0x0000, 0x10000, CRC(f5c571d7) SHA1(cb5ef3b2bce9a579b54678962082d0e2fc0f1cd9) )
 
-	ROM_REGION(0x80000, "bsmt", 0 )
+	ROM_REGION(0x1000000, "bsmt", 0 )
 	ROM_LOAD( "arom1.u16",  0x000000, 0x80000,  CRC(e51696bc) SHA1(b002f8705ad1877f91a860dddb0ae16b2e73dd15) )
 ROM_END
 
