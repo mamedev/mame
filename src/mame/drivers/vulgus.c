@@ -110,14 +110,13 @@ static INPUT_PORTS_START( vulgus )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	/* these are the settings for the second coin input, but it seems that the */
-	/* game only supports one */
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )
+	/* Only the parent set seems to use/see the second coin slot even if set to Cocktail mode */
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:6,5,4")
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
@@ -125,8 +124,8 @@ static INPUT_PORTS_START( vulgus )
 	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
-/*  PORT_DIPSETTING(    0x00, "Invalid" ) disables both coins */
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
+	/*  PORT_DIPSETTING(    0x00, "Invalid" ) disables both coins */
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,2,1")
 	PORT_DIPSETTING(    0x80, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
@@ -137,20 +136,15 @@ static INPUT_PORTS_START( vulgus )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 	PORT_START("DSW2")
-	/* Not sure about difficulty
-       Code perform a read and (& 0x03). NDMix */
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
-	PORT_DIPSETTING(    0x02, "Easy?" )
-	PORT_DIPSETTING(    0x03, "Normal?" )
-	PORT_DIPSETTING(    0x01, "Hard?" )
-	PORT_DIPSETTING(    0x00, "Hardest?" )
-	PORT_DIPNAME( 0x04, 0x04, "Demo Music" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:8" ) /* Shown as "Unused" in the manual, are 7 & 8 undocutmented Difficulty?? */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:7" ) /* Shown as "Unused" in the manual, Code performs a read then (& 0x03) */
+	PORT_DIPNAME( 0x04, 0x04, "Demo Music" )		PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,3,2")
 	PORT_DIPSETTING(    0x30, "10000 50000" )
 	PORT_DIPSETTING(    0x50, "10000 60000" )
 	PORT_DIPSETTING(    0x10, "10000 70000" )
@@ -159,7 +153,7 @@ static INPUT_PORTS_START( vulgus )
 	PORT_DIPSETTING(    0x20, "20000 80000" )
 	PORT_DIPSETTING(    0x40, "30000 70000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -258,10 +252,10 @@ MACHINE_CONFIG_END
 
 ROM_START( vulgus )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "v2",           0x0000, 0x2000, CRC(3e18ff62) SHA1(03f61cc25b4c258effac2172f25641b668a1ae97) )
-	ROM_LOAD( "v3",           0x2000, 0x2000, CRC(b4650d82) SHA1(4567dfe2b12c59f8c75f5198a136a9afe4975e09) )
-	ROM_LOAD( "v4",           0x4000, 0x2000, CRC(5b26355c) SHA1(4220b70ad2bdfe269d4ac4e957114dbd3cea0975) )
-	ROM_LOAD( "v5",           0x6000, 0x2000, CRC(4ca7f10e) SHA1(a3c278aecbb63063b660854ccef6fbaff7e58e32) )
+	ROM_LOAD( "vulgus.002",   0x0000, 0x2000, CRC(e49d6c5d) SHA1(48072aaa1f2603b6301d7542cc3df10ead2847bb) )
+	ROM_LOAD( "vulgus.003",   0x2000, 0x2000, CRC(51acef76) SHA1(14dda82b90f9c3a309561a73c300cb54b5fca77d) )
+	ROM_LOAD( "vulgus.004",   0x4000, 0x2000, CRC(489e7f60) SHA1(f3f685955fc42f238909dcdb5edc4c117e5543db) )
+	ROM_LOAD( "vulgus.005",   0x6000, 0x2000, CRC(de3a24a8) SHA1(6bc9dda7dbbbef82e9f61c9d5cf1555e5290b249) )
 	ROM_LOAD( "1-8n.bin",     0x8000, 0x2000, CRC(6ca5ca41) SHA1(6f28d143e984d3d6af3114702ec27d6e878cc35f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -295,12 +289,12 @@ ROM_START( vulgus )
 	ROM_LOAD( "82s129.8n",    0x0700, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )	/* video timing? (not used) */
 ROM_END
 
-ROM_START( vulgus2 )
+ROM_START( vulgusa )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "vulgus.002",   0x0000, 0x2000, CRC(e49d6c5d) SHA1(48072aaa1f2603b6301d7542cc3df10ead2847bb) )
-	ROM_LOAD( "vulgus.003",   0x2000, 0x2000, CRC(51acef76) SHA1(14dda82b90f9c3a309561a73c300cb54b5fca77d) )
-	ROM_LOAD( "vulgus.004",   0x4000, 0x2000, CRC(489e7f60) SHA1(f3f685955fc42f238909dcdb5edc4c117e5543db) )
-	ROM_LOAD( "vulgus.005",   0x6000, 0x2000, CRC(de3a24a8) SHA1(6bc9dda7dbbbef82e9f61c9d5cf1555e5290b249) )
+	ROM_LOAD( "v2",           0x0000, 0x2000, CRC(3e18ff62) SHA1(03f61cc25b4c258effac2172f25641b668a1ae97) )
+	ROM_LOAD( "v3",           0x2000, 0x2000, CRC(b4650d82) SHA1(4567dfe2b12c59f8c75f5198a136a9afe4975e09) )
+	ROM_LOAD( "v4",           0x4000, 0x2000, CRC(5b26355c) SHA1(4220b70ad2bdfe269d4ac4e957114dbd3cea0975) )
+	ROM_LOAD( "v5",           0x6000, 0x2000, CRC(4ca7f10e) SHA1(a3c278aecbb63063b660854ccef6fbaff7e58e32) )
 	ROM_LOAD( "1-8n.bin",     0x8000, 0x2000, CRC(6ca5ca41) SHA1(6f28d143e984d3d6af3114702ec27d6e878cc35f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -376,5 +370,5 @@ ROM_END
 
 
 GAME( 1984, vulgus,  0,      vulgus, vulgus, 0, ROT90,  "Capcom", "Vulgus (set 1)", 0 )
-GAME( 1984, vulgus2, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (set 2)", 0 )
+GAME( 1984, vulgusa, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (set 2)", 0 )
 GAME( 1984, vulgusj, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (Japan?)", 0 )
