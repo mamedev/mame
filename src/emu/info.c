@@ -1107,9 +1107,9 @@ void info_xml_creator::output_slots()
 		{
 			fprintf(m_output, "\t\t\t<slotoption");
 			fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
-			if (slot->get_default_card())
+			if (slot->get_default_card(m_drivlist.options()))
 			{
-				if (slot->get_default_card() == intf[i].name)
+				if (slot->get_default_card(m_drivlist.options()) == intf[i].name)
 					fprintf(m_output, " default=\"yes\"");
 			}
 			fprintf(m_output, "/>\n");

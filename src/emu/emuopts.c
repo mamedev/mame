@@ -251,7 +251,7 @@ bool emu_options::add_slot_options(bool isfirst)
 			entry[0].name = slot->device().tag();
 			entry[0].description = NULL;
 			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card() : NULL;
+			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card(*this) : NULL;
 			add_entries(entry, true);
 
 			added = true;
@@ -345,6 +345,7 @@ bool emu_options::parse_command_line(int argc, char *argv[], astring &error_stri
 		remove_device_options();
 		add_device_options(true);
 		bool isfirst = true;
+		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 		while (add_slot_options(isfirst)) {
 			result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 			add_device_options(false);
