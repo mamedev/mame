@@ -606,8 +606,8 @@ ROM_END
 
 ROM_START( galivan3 )
 	ROM_REGION( 0x14000, "maincpu", 0 )		/* main cpu code */
-	ROM_LOAD( "e-1",          0x00000, 0x8000, CRC(d8cc72b8) SHA1(73a46cd7dda3a912b14075b9b4ebc81a175a1461) )
-	ROM_LOAD( "e-2",          0x08000, 0x4000, CRC(9e5b3157) SHA1(1aa5f7f382468af815c929c63866bd39e7a9ac18) )
+	ROM_LOAD( "e-1.1b",       0x00000, 0x8000, CRC(d8cc72b8) SHA1(73a46cd7dda3a912b14075b9b4ebc81a175a1461) )
+	ROM_LOAD( "e-2.3b",       0x08000, 0x4000, CRC(9e5b3157) SHA1(1aa5f7f382468af815c929c63866bd39e7a9ac18) )
 	ROM_LOAD( "gv3.4b",       0x10000, 0x4000, CRC(82f0c5e6) SHA1(77dd3927c2161e4fce9e0adba81dc0c875d7e2f4) ) /* 2 banks at c000 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* sound cpu code */
