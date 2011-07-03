@@ -218,10 +218,9 @@ int cli_frontend::execute(int argc, char **argv)
 														// mount only if not already mounted
 														if (strlen(option)==0) {
 															astring val;
-															astring error;
 															val.printf("%s:%s",m_options.software_name(),swpart->name);
-															m_options.set_value(image->brief_instance_name(), val.cstr(), OPTION_PRIORITY_CMDLINE, error);
-															assert(!error);
+															// call this in order to set slot devices according to mounting
+															m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.cstr());
 														}
 														break;
 													}

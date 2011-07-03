@@ -215,6 +215,7 @@ public:
 	// parsing wrappers
 	bool parse_command_line(int argc, char *argv[], astring &error_string);
 	void parse_standard_inis(astring &error_string);
+	bool parse_slot_devices(int argc, char *argv[], astring &error_string, const char *name, const char *value);
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }

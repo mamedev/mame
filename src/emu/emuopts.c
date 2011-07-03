@@ -296,11 +296,13 @@ void emu_options::add_device_options(bool isfirst)
 		option_name.printf("%s;%s", image->instance_name(), image->brief_instance_name());
 
 		// add the option
-		entry[0].name = option_name;
-		entry[0].description = NULL;
-		entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-		entry[0].defvalue = NULL;
-		add_entries(entry, true);
+		if (!exists(image->instance_name())) {
+			entry[0].name = option_name;
+			entry[0].description = NULL;
+			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
+			entry[0].defvalue = NULL;
+			add_entries(entry, true);
+		}
 	}
 }
 
@@ -326,6 +328,32 @@ void emu_options::remove_device_options()
 
 
 //-------------------------------------------------
+//  parse_slot_devices - parse the command line
+//  and update slot and image devices
+//-------------------------------------------------
+
+bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_string, const char *name, const char *value)
+{
+	remove_device_options();
+	add_device_options(true);
+	if (name && exists(name)) {
+		set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
+	}
+	bool isfirst = true;
+	bool result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+	while (add_slot_options(isfirst)) {
+		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+		add_device_options(false);
+		if (name && exists(name)) {
+			set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
+		}		
+		isfirst = false;
+	}
+	result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+	return result;
+}
+
+//-------------------------------------------------
 //  parse_command_line - parse the command line
 //  and update the devices
 //-------------------------------------------------
@@ -342,16 +370,7 @@ bool emu_options::parse_command_line(int argc, char *argv[], astring &error_stri
 	if (old_system_name != system_name())
 	{
 		// remove any existing device options
-		remove_device_options();
-		add_device_options(true);
-		bool isfirst = true;
-		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-		while (add_slot_options(isfirst)) {
-			result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-			add_device_options(false);
-			isfirst = false;
-		}
-		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+		result = parse_slot_devices(argc, argv, error_string, NULL, NULL);
 	}
 	return result;
 }
