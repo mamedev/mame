@@ -39,14 +39,6 @@ const device_type ASC = &device_creator<asc_device>;
 //  LIVE DEVICE
 //**************************************************************************
 
-// does nothing, this timer exists only to make MAME sync itself at our audio rate
-static TIMER_CALLBACK( sync_timer_cb )
-{
-	asc_device *pDevice = (asc_device *)ptr;
-
-	pDevice->m_stream->update();
-}
-
 //-------------------------------------------------
 //  asc_device - constructor
 //-------------------------------------------------
@@ -94,7 +86,7 @@ void asc_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_sync_timer = this->machine().scheduler().timer_alloc(FUNC(sync_timer_cb), this);
+	m_timer = timer_alloc(0, NULL);
 
 	save_item(NAME(m_fifo_a_rdptr));
 	save_item(NAME(m_fifo_b_rdptr));
@@ -127,6 +119,15 @@ void asc_device::device_reset()
 	m_fifo_a_rdptr = m_fifo_b_rdptr = 0;
 	m_fifo_a_wrptr = m_fifo_b_wrptr = 0;
 	m_fifo_cap_a = m_fifo_cap_b = 0;
+}
+
+//-------------------------------------------------
+//  device_timer - called when our device timer expires
+//-------------------------------------------------
+
+void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+{
+	m_stream->update(); 
 }
 
 //-------------------------------------------------
@@ -467,11 +468,11 @@ WRITE8_MEMBER( asc_device::write )
 
 					if (data != 0)
 					{
-						m_sync_timer->adjust(attotime::zero, 0, attotime::from_hz(22257/4));
+						m_timer->adjust(attotime::zero, 0, attotime::from_hz(22257/4));
 					}
 					else
 					{
-						m_sync_timer->adjust(attotime::never);
+						m_timer->adjust(attotime::never);
 					}
 				}
 				break;

@@ -100,6 +100,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
@@ -118,7 +119,7 @@ protected:
 	int	m_fifo_a_wrptr, m_fifo_b_wrptr;
 	int 	m_fifo_cap_a, m_fifo_cap_b;
 
-	emu_timer *m_sync_timer;
+    emu_timer *m_timer;
 };
 
 
