@@ -375,7 +375,7 @@ void necdsp_device::exec_op(UINT32 opcode) {
     case  4: regs.idb = regs.dp; break;
     case  5: regs.idb = regs.rp; break;
     case  6: regs.idb = m_data->read_word(regs.rp<<1); break;
-    case  7: regs.idb = 0x8000 - regs.flaga.s1; break;
+    case  7: regs.idb = 0x8000 - regs.flaga.s1; break;  //SGN
     case  8: regs.idb = regs.dr; regs.sr.rqm = 1; break;
     case  9: regs.idb = regs.dr; break;
     case 10: regs.idb = regs.sr; break;
@@ -428,12 +428,13 @@ void necdsp_device::exec_op(UINT32 opcode) {
 
     flag.s0 = (r & 0x8000);
     flag.z = (r == 0);
+    flag.ov0pp = flag.ov0p;
+    flag.ov0p = flag.ov0;
 
     switch(alu) {
       case  1: case  2: case  3: case 10: case 13: case 14: case 15: {
         flag.c = 0;
-        flag.ov0 = 0;
-        flag.ov1 = 0;
+        flag.ov0 = flag.ov0p = flag.ov0pp = 0; // ASSUMPTION: previous ov0 values are nulled here to make ov1 zero
         break;
       }
       case  4: case  5: case  6: case  7: case  8: case  9: {
@@ -446,25 +447,23 @@ void necdsp_device::exec_op(UINT32 opcode) {
           flag.ov0 = (q ^ r) &  (q ^ p) & 0x8000;
           flag.c = (r > q);
         }
-        if(flag.ov0) {
-          flag.s1 = flag.ov1 ^ !(r & 0x8000);
-          flag.ov1 = !flag.ov1;
-        }
         break;
       }
       case 11: {
         flag.c = q & 1;
-        flag.ov0 = 0;
-        flag.ov1 = 0;
+        flag.ov0 = flag.ov0p = flag.ov0pp = 0; // ASSUMPTION: previous ov0 values are nulled here to make ov1 zero
         break;
       }
       case 12: {
         flag.c = q >> 15;
-        flag.ov0 = 0;
-        flag.ov1 = 0;
+        flag.ov0 = flag.ov0p = flag.ov0pp = 0; // ASSUMPTION: previous ov0 values are nulled here to make ov1 zero
         break;
       }
     }
+    // flag.ov1 is only set if the number of overflows of the past 3 opcodes (of type 4,5,6,7,8,9) is odd
+    flag.ov1 = (flag.ov0 + flag.ov0p + flag.ov0pp) & 1;
+    // flag.s1 is based on ov1: s1 = ov1 ^ s0;
+    flag.s1 = flag.ov1 ^ flag.s0;
 
     switch(asl) {
       case 0: regs.a = r; regs.flaga = flag; break;

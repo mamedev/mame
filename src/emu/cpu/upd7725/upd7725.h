@@ -97,6 +97,7 @@ private:
 	struct Flag
 	{
 		bool s1, s0, c, z, ov1, ov0;
+		bool ov0p, ov0pp; // these are the previous states of the ov0 bit and are used for updating ov1
 
 		inline operator unsigned() const
 		{
