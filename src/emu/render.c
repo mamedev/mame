@@ -1662,15 +1662,18 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 			load_layout_file(NULL, layout_horizont);
 		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 	}
-	if (screens == 2)
+	if (system.default_layout== NULL && m_manager.machine().config().m_default_layout==NULL) 
 	{
-		load_layout_file(NULL, layout_dualhsxs);
-		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
-	}
-	if (screens == 3)
-	{
-		load_layout_file(NULL, layout_triphsxs);
-		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
+		if (screens == 2)
+		{
+			load_layout_file(NULL, layout_dualhsxs);
+			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
+		}
+		if (screens == 3)
+		{
+			load_layout_file(NULL, layout_triphsxs);
+			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
+		}
 	}
 }
 
