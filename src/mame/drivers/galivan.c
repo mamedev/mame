@@ -532,6 +532,43 @@ MACHINE_CONFIG_END
 
 ROM_START( galivan )
 	ROM_REGION( 0x14000, "maincpu", 0 )	/* main cpu code */
+	ROM_LOAD( "1.1b",         0x00000, 0x8000, CRC(1e66b3f8) SHA1(f9d2ac8076aefd85ce6d2ed2d21941f1160767f5) )
+	ROM_LOAD( "2.3b",         0x08000, 0x4000, CRC(a45964f1) SHA1(4c4554ff484fbf70a38e1d89d3ae4d2eb4e93ed8) )
+	ROM_LOAD( "gv3.4b",       0x10000, 0x4000, CRC(82f0c5e6) SHA1(77dd3927c2161e4fce9e0adba81dc0c875d7e2f4) ) /* 2 banks at c000 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* sound cpu code */
+	ROM_LOAD( "gv11.14b",     0x0000, 0x4000, CRC(05f1a0e3) SHA1(c0f579130d64123c889c77d8f2f474ebcc3ba649) )
+	ROM_LOAD( "gv12.15b",     0x4000, 0x8000, CRC(5b7a0d6d) SHA1(0c15def9be8014aeb4e14b6967efe8f5abac51f2) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "gv4.13d",      0x00000, 0x4000, CRC(162490b4) SHA1(55592865f208bf1b8f49c8eedc22a3d91ca3578d) ) /* chars */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "gv7.14f",      0x00000, 0x8000, CRC(eaa1a0db) SHA1(ed3b125a7472c0c0a458b28df6476cb4c64b4aa3) ) /* tiles */
+	ROM_LOAD( "gv8.15f",      0x08000, 0x8000, CRC(f174a41e) SHA1(38aa7aa3d6ba026478d30b5e404614a0cc7aed52) )
+	ROM_LOAD( "gv9.17f",      0x10000, 0x8000, CRC(edc60f5d) SHA1(c743f4af0e0e2c60f59fd01ce0a153108e9f5414) )
+	ROM_LOAD( "gv10.19f",     0x18000, 0x8000, CRC(41f27fca) SHA1(3674dbecc2eb1c837159a8dfbb0086088631b2a5) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "gv14.4f",      0x00000, 0x8000, CRC(03e2229f) SHA1(9dace9e04867d1140eb3c794bd4ae54ec3bb4a83) ) /* sprites */
+	ROM_LOAD( "gv13.1f",      0x08000, 0x8000, CRC(bca9e66b) SHA1(d84840943748a7b9fd6e141be9971431f69ce1f9) )
+
+	ROM_REGION( 0x8000, "gfx4", 0 )	/* background tilemaps */
+	ROM_LOAD( "gv6.19d",      0x0000, 0x4000, CRC(da38168b) SHA1(a12decd55fd1cf32fd192f13bd33d2f1f4129d2c) )
+	ROM_LOAD( "gv5.17d",      0x4000, 0x4000, CRC(22492d2a) SHA1(c8d36949abc2fcc8f2b12276eb82b330a940bc38) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "mb7114e.9f",   0x0000, 0x0100, CRC(de782b3e) SHA1(c76da7d5cbd9170be93c9591e525646a4360203c) )	/* red */
+	ROM_LOAD( "mb7114e.10f",  0x0100, 0x0100, CRC(0ae2a857) SHA1(cdf84c0c75d483a81013dbc050e7aa8c8503c74c) )	/* green */
+	ROM_LOAD( "mb7114e.11f",  0x0200, 0x0100, CRC(7ba8b9d1) SHA1(5942b403eda046e2f2584062443472cbf559db5c) )	/* blue */
+	ROM_LOAD( "mb7114e.2d",   0x0300, 0x0100, CRC(75466109) SHA1(6196d12ab7103f6ef991b826d8b93303a61d4c48) )	/* sprite lookup table */
+
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "mb7114e.7f",   0x0000, 0x0100, CRC(06538736) SHA1(a2fb2ecb768686839f3087e691102e2dc2eb65b5) )	/* sprite palette bank */
+ROM_END
+
+ROM_START( galivan2 )
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "gv1.1b",       0x00000, 0x8000, CRC(5e480bfc) SHA1(f444de27d3d8aff579cf196a25b7f0c906617172) )
 	ROM_LOAD( "gv2.3b",       0x08000, 0x4000, CRC(0d1b3538) SHA1(aa1ee04ff3516e0121db0cf50cee849ba5058fd5) )
 	ROM_LOAD( "gv3.4b",       0x10000, 0x4000, CRC(82f0c5e6) SHA1(77dd3927c2161e4fce9e0adba81dc0c875d7e2f4) ) /* 2 banks at c000 */
@@ -567,7 +604,7 @@ ROM_START( galivan )
 	ROM_LOAD( "mb7114e.7f",   0x0000, 0x0100, CRC(06538736) SHA1(a2fb2ecb768686839f3087e691102e2dc2eb65b5) )	/* sprite palette bank */
 ROM_END
 
-ROM_START( galivan2 )
+ROM_START( galivan3 )
 	ROM_REGION( 0x14000, "maincpu", 0 )		/* main cpu code */
 	ROM_LOAD( "e-1",          0x00000, 0x8000, CRC(d8cc72b8) SHA1(73a46cd7dda3a912b14075b9b4ebc81a175a1461) )
 	ROM_LOAD( "e-2",          0x08000, 0x4000, CRC(9e5b3157) SHA1(1aa5f7f382468af815c929c63866bd39e7a9ac18) )
@@ -1068,8 +1105,9 @@ static DRIVER_INIT( youmab )
 
 }
 
-GAME( 1985, galivan,  0,        galivan,  galivan,  0, ROT270, "Nichibutsu", "Galivan - Cosmo Police (12/16/1985)", GAME_SUPPORTS_SAVE )
-GAME( 1985, galivan2, galivan,  galivan,  galivan,  0, ROT270, "Nichibutsu", "Galivan - Cosmo Police (12/11/1985)", GAME_SUPPORTS_SAVE )
+GAME( 1985, galivan,  0,        galivan,  galivan,  0, ROT270, "Nichibutsu", "Galivan - Cosmo Police (12/26/1985)", GAME_SUPPORTS_SAVE )
+GAME( 1985, galivan2, galivan,  galivan,  galivan,  0, ROT270, "Nichibutsu", "Galivan - Cosmo Police (12/16/1985)", GAME_SUPPORTS_SAVE )
+GAME( 1985, galivan3, galivan,  galivan,  galivan,  0, ROT270, "Nichibutsu", "Galivan - Cosmo Police (12/11/1985)", GAME_SUPPORTS_SAVE )
 GAME( 1986, dangar,   0,        galivan,  dangar,   0, ROT270, "Nichibutsu", "Dangar - Ufo Robo (12/1/1986)", GAME_SUPPORTS_SAVE )
 GAME( 1986, dangar2,  dangar,   galivan,  dangar2,  0, ROT270, "Nichibutsu", "Dangar - Ufo Robo (9/26/1986)", GAME_SUPPORTS_SAVE )
 GAME( 1986, dangarb,  dangar,   galivan,  dangarb,  0, ROT270, "bootleg", "Dangar - Ufo Robo (bootleg)", GAME_SUPPORTS_SAVE )
