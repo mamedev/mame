@@ -1,8 +1,6 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
-extern const char layout_pinball[];
-
 class micropin_state : public driver_device
 {
 public:
@@ -32,9 +30,6 @@ static MACHINE_CONFIG_START( micropin, micropin_state )
 	MCFG_CPU_PROGRAM_MAP(micropin_map)
 
 	MCFG_MACHINE_RESET( micropin )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

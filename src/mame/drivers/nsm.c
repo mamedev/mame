@@ -1,8 +1,6 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 
-extern const char layout_pinball[];
-
 class nsm_state : public driver_device
 {
 public:
@@ -32,9 +30,6 @@ static MACHINE_CONFIG_START( nsm, nsm_state )
 	MCFG_CPU_PROGRAM_MAP(nsm_map)
 
 	MCFG_MACHINE_RESET( nsm )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

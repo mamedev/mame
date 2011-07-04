@@ -8,8 +8,6 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/i86/i86.h"
 
-extern const char layout_pinball[];
-
 class gts80a_state : public driver_device
 {
 public:
@@ -54,9 +52,6 @@ static MACHINE_CONFIG_START( gts80a_s, gts80a_state )
 
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_s)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gts80a_ss, gts80a_state )
@@ -68,9 +63,6 @@ static MACHINE_CONFIG_START( gts80a_ss, gts80a_state )
 
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_ss)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( video_map, AS_PROGRAM, 16 )
@@ -96,9 +88,6 @@ static MACHINE_CONFIG_START( caveman, gts80a_state )
 	MCFG_CPU_ADD("video_cpu", I8086, 5000000)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 	MCFG_CPU_IO_MAP(video_io_map)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

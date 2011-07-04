@@ -91,6 +91,9 @@
     STANDARD LAYOUTS
 ***************************************************************************/
 
+// screenless layouts
+#include "noscreens.lh"
+
 // single screen layouts
 #include "horizont.lh"
 #include "vertical.lh"
@@ -116,9 +119,6 @@
 // LCD screen layouts
 #include "lcd.lh"
 #include "lcd_rot.lh"
-
-// generic dummy pinball layout
-#include "pinball.lh"
 
 
 

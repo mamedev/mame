@@ -1,8 +1,6 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
-extern const char layout_pinball[];
-
 class sleic_state : public driver_device
 {
 public:
@@ -34,9 +32,6 @@ static MACHINE_CONFIG_START( sleic, sleic_state )
 	MCFG_CPU_PROGRAM_MAP(sleic_map)
 
 	MCFG_MACHINE_RESET( sleic )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

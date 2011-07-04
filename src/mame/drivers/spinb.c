@@ -1,8 +1,6 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 
-extern const char layout_pinball[];
-
 class spinb_state : public driver_device
 {
 public:
@@ -32,9 +30,6 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	MCFG_CPU_PROGRAM_MAP(spinb_map)
 
 	MCFG_MACHINE_RESET( spinb )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

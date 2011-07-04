@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
-extern const char layout_pinball[];
-
 class techno_state : public driver_device
 {
 public:
@@ -35,9 +33,6 @@ static MACHINE_CONFIG_START( techno, techno_state )
 	MCFG_CPU_PROGRAM_MAP(techno_map)
 
 	MCFG_MACHINE_RESET( techno )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 ROM_START(xforce)

@@ -34,9 +34,6 @@ static MACHINE_CONFIG_START( de_3, de_3_state )
 	MCFG_CPU_PROGRAM_MAP(de_3_map)
 
 	MCFG_MACHINE_RESET( de_3 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------

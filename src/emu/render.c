@@ -1669,6 +1669,11 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 	}
 	if (!have_default) 
 	{
+		if (screens == 0)
+		{			
+			load_layout_file(NULL, layout_noscreens);
+			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
+		}
 		if (screens == 2)
 		{
 			load_layout_file(NULL, layout_dualhsxs);

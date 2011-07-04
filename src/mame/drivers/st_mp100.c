@@ -5,8 +5,6 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
-extern const char layout_pinball[];
-
 class st_mp100_state : public driver_device
 {
 public:
@@ -36,9 +34,6 @@ static MACHINE_CONFIG_START( st_mp100, st_mp100_state )
 	MCFG_CPU_PROGRAM_MAP(st_mp100_map)
 
 	MCFG_MACHINE_RESET( st_mp100 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------

@@ -7,8 +7,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
-extern const char layout_pinball[];
-
 class gts80b_state : public driver_device
 {
 public:
@@ -45,9 +43,6 @@ static MACHINE_CONFIG_START( gts80b_s, gts80b_state )
 
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_s)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gts80b_s1, gts80b_state )
@@ -59,9 +54,6 @@ static MACHINE_CONFIG_START( gts80b_s1, gts80b_state )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b1)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gts80b_s2, gts80b_state )
@@ -73,9 +65,6 @@ static MACHINE_CONFIG_START( gts80b_s2, gts80b_state )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b2)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gts80b_s3, gts80b_state )
@@ -87,9 +76,6 @@ static MACHINE_CONFIG_START( gts80b_s3, gts80b_state )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bonebstr, gts80b_state )
@@ -101,9 +87,6 @@ static MACHINE_CONFIG_START( bonebstr, gts80b_state )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3a)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 

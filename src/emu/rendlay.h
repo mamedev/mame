@@ -301,6 +301,9 @@ private:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+// no screens layouts
+extern const char layout_noscreens[];	// for screenless systems
+
 // single screen layouts
 extern const char layout_horizont[];	// horizontal 4:3 screens
 extern const char layout_vertical[];	// vertical 4:3 screens

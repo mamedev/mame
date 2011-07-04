@@ -5,8 +5,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-extern const char layout_pinball[];
-
 class gp_1_state : public driver_device
 {
 public:
@@ -36,9 +34,6 @@ static MACHINE_CONFIG_START( gp_1, gp_1_state )
 	MCFG_CPU_PROGRAM_MAP(gp_1_map)
 
 	MCFG_MACHINE_RESET( gp_1 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 

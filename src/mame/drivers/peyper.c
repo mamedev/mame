@@ -1,8 +1,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-extern const char layout_pinball[];
-
 class peyper_state : public driver_device
 {
 public:
@@ -39,9 +37,6 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_CPU_IO_MAP(peyper_io)
 
 	MCFG_MACHINE_RESET( peyper )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

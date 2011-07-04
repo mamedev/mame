@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 
-extern const char layout_pinball[];
-
 class play_5_state : public driver_device
 {
 public:
@@ -52,9 +50,6 @@ static MACHINE_CONFIG_START( play_5, play_5_state )
 	MCFG_CPU_CONFIG(cdp1802_config)
 
 	MCFG_MACHINE_RESET( play_5 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

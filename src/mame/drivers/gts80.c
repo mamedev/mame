@@ -7,8 +7,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
-extern const char layout_pinball[];
-
 class gts80_state : public driver_device
 {
 public:
@@ -45,9 +43,6 @@ static MACHINE_CONFIG_START( gts80_s, gts80_state )
 
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_s)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /* with Sound & Speech Board */
@@ -61,9 +56,6 @@ static MACHINE_CONFIG_START( gts80_ss, gts80_state )
 
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_ss)
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

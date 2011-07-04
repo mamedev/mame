@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 
-extern const char layout_pinball[];
-
 class wpc_an_state : public driver_device
 {
 public:
@@ -35,9 +33,6 @@ static MACHINE_CONFIG_START( wpc_an, wpc_an_state )
 	MCFG_CPU_PROGRAM_MAP(wpc_an_map)
 
 	MCFG_MACHINE_RESET( wpc_an )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 

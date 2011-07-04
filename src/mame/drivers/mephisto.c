@@ -1,8 +1,6 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
-extern const char layout_pinball[];
-
 class mephisto_state : public driver_device
 {
 public:
@@ -35,9 +33,6 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
 
 	MCFG_MACHINE_RESET( mephisto )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

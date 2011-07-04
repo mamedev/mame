@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "cpu/m6502/m65ce02.h"
 
-extern const char layout_pinball[];
-
 class gts3_state : public driver_device
 {
 public:
@@ -35,9 +33,6 @@ static MACHINE_CONFIG_START( gts3, gts3_state )
 	MCFG_CPU_PROGRAM_MAP(gts3_map)
 
 	MCFG_MACHINE_RESET( gts3 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

@@ -355,6 +355,6 @@ $(EMUOBJ)/rendlay.o:	$(EMULAYOUT)/dualhovu.lh \
 						$(EMULAYOUT)/voffff20.lh \
 						$(EMULAYOUT)/lcd.lh \
 						$(EMULAYOUT)/lcd_rot.lh \
-						$(EMULAYOUT)/pinball.lh \
+						$(EMULAYOUT)/noscreens.lh \
 
 $(EMUOBJ)/video.o:		$(EMULAYOUT)/snap.lh

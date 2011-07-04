@@ -37,9 +37,6 @@ static MACHINE_CONFIG_START( atari_s1, atari_s1_state )
 	MCFG_CPU_PROGRAM_MAP(atari_s1_map)
 
 	MCFG_MACHINE_RESET( atari_s1 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

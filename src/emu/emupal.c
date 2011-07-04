@@ -126,8 +126,11 @@ void palette_init(running_machine &machine)
 			break;
 
 		case BITMAP_FORMAT_INVALID:
-			/* invalid format means no palette - or at least it should */
-			assert(machine.total_colors() == 0);
+			/* invalid format means no palette - or at least it should */			
+			/* Do not assert for now, palette manager should be added  */
+			/* in order to make possible adding of palette items per   */
+			/* device otherwise we need to set total colors per driver */
+			//assert(machine.total_colors() == 0);
 			return;
 
 		default:

@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
-extern const char layout_pinball[];
-
 class atari_s2_state : public driver_device
 {
 public:
@@ -39,9 +37,6 @@ static MACHINE_CONFIG_START( atari_s2, atari_s2_state )
 	MCFG_CPU_PROGRAM_MAP(atari_s2_map)
 
 	MCFG_MACHINE_RESET( atari_s2 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

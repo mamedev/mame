@@ -6,8 +6,6 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 
-extern const char layout_pinball[];
-
 class by133_state : public driver_device
 {
 public:
@@ -46,9 +44,6 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	MCFG_CPU_PROGRAM_MAP(by133_video_map)
 
 	MCFG_MACHINE_RESET( by133 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-----------------------------------------------------

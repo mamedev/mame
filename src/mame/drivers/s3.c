@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
-extern const char layout_pinball[];
-
 class williams_s3_state : public driver_device
 {
 public:
@@ -37,9 +35,6 @@ static MACHINE_CONFIG_START( williams_s3, williams_s3_state )
 	MCFG_CPU_PROGRAM_MAP(williams_s3_map)
 
 	MCFG_MACHINE_RESET( williams_s3 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------

@@ -1,8 +1,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
-extern const char layout_pinball[];
-
 class allied_state : public driver_device
 {
 public:
@@ -33,9 +31,6 @@ static MACHINE_CONFIG_START( allied, allied_state )
 	MCFG_CPU_PROGRAM_MAP(allied_map)
 
 	MCFG_MACHINE_RESET( allied )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 ROM_START( allied )

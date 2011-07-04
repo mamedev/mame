@@ -1,8 +1,6 @@
 #include "emu.h"
 #include "cpu/i4004/i4004.h"
 
-extern const char layout_pinball[];
-
 class flicker_state : public driver_device
 {
 public:
@@ -44,9 +42,6 @@ static MACHINE_CONFIG_START( flicker, flicker_state )
 	MCFG_CPU_IO_MAP(flicker_io)
 
 	MCFG_MACHINE_RESET( flicker )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 ROM_START(flicker)

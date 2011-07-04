@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "cpu/pps4/pps4.h"
 
-extern const char layout_pinball[];
-
 class gts1_state : public driver_device
 {
 public:
@@ -35,9 +33,6 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
 	MCFG_CPU_PROGRAM_MAP(gts1_map)
 
 	MCFG_MACHINE_RESET( gts1 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 

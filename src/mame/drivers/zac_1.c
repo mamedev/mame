@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 
-extern const char layout_pinball[];
-
 class zac_1_state : public driver_device
 {
 public:
@@ -35,9 +33,6 @@ static MACHINE_CONFIG_START( zac_1, zac_1_state )
 	MCFG_CPU_PROGRAM_MAP(zac_1_map)
 
 	MCFG_MACHINE_RESET( zac_1 )
-
-	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*--------------------------------
