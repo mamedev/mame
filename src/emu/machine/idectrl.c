@@ -82,6 +82,7 @@
 #define IDE_COMMAND_VERIFY_NORETRY		0x41
 #define IDE_COMMAND_ATAPI_IDENTIFY		0xa1
 #define IDE_COMMAND_RECALIBRATE			0x10
+#define IDE_COMMAND_SEEK				0x70
 #define IDE_COMMAND_IDLE_IMMEDIATE		0xe1
 #define IDE_COMMAND_IDLE				0xe3
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_1 0xfe
@@ -1252,6 +1253,22 @@ static void handle_command(ide_state *ide, UINT8 command)
 			ide->status &= ~IDE_STATUS_ERROR;
 			signal_interrupt(ide);
 			break;
+			
+		case IDE_COMMAND_SEEK:
+			/*
+				cur_cylinder, cur_sector and cur_head
+				are all already set in this case so no need
+				so that implements actual seek
+			*/
+			/* clear the error too */
+			ide->error = IDE_ERROR_NONE;
+
+			/* for timeout disabled value is 0 */
+			ide->sector_count = 0;
+			/* signal an interrupt */
+			signal_interrupt(ide);
+			break;
+
 
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
