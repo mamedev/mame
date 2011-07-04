@@ -2144,11 +2144,11 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 // Japan bios is default, because most games require it.
 #define NAOMI_BIOS \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21576h (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576h.ic27",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576h.ic27",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21576g (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576g.ic27",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21576e (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576e.ic27",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576e.ic27",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
 	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21576d (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576d.ic27",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
 	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21576b (Japan)" ) \
@@ -4478,6 +4478,21 @@ ROM_START( ausfache )
 	ROM_LOAD( "ic9.bin",    0x4000000, 0x4000000, CRC(18c994d7) SHA1(159e1425b2fc645133814b0d26d93a90e9849b1a) )
 ROM_END
 
+ROM_START( pokasuka )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x14000000, "user1", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24365.ic8",  0x00000000, 0x4000000, CRC(11489cda) SHA1(d9902a61491061f522650f825f92e81541fcc772) ) 
+	ROM_LOAD( "fpr-24366.ic9",  0x04000000, 0x4000000, CRC(7429714a) SHA1(e45b442f447d24de0c746943a59c0dceb6e359cc) ) 
+	ROM_LOAD( "fpr-24367.ic10", 0x08000000, 0x4000000, CRC(dee87bab) SHA1(c5386cda2e84992e18b7959e7d9965c28c1185a4) ) 
+	ROM_LOAD( "fpr-24368.ic11", 0x0c000000, 0x4000000, CRC(124f55e2) SHA1(bc2cb9514acd98f116917ea771b06c4e03ffae73) ) 
+	ROM_LOAD( "fpr-24369.ic12", 0x10000000, 0x4000000, CRC(35b544ab) SHA1(270a75883a867318fd417ec819c40c36f2d296b8) ) 
+
+	ROM_REGION( 0x200000, "ioboard", 0)	// touch screen I/O board, program disassembles as little-endian SH-4
+	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) ) 
+ROM_END
 
 /*
 
@@ -7135,7 +7150,7 @@ ROM_END
 /* 0088 */ GAME( 2001, derbyocw, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0088 */ GAME( 2001, drbyocwc, derbyocw, naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0098 */ GAME( 2002, shootopl, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-// 0120 Poka Suka Ghost
+/* 0120 */ GAME( 2002, pokasuka, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Pokasuka Ghost", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
 /* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128 */ GAME( 2001, shootpl,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomi,   naomi,    kick4csh, ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7180,9 +7195,9 @@ ROM_END
 /* 0016 */ GAME( 2000, deathcox, naomi,    naomi,   naomi,    naomi,    ROT0, "Ecole Software",  "Death Crimson OX (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0017 */ GAME( 2001, gundmct,  naomi,    naomi,   naomi,    naomi,    ROT0, "Banpresto",       "Mobile Suit Gundam: Federation Vs. Zeon (2001-02-08)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0020 */ GAME( 2001, zerogu2,  naomi,    naomi,   naomi,    naomi,    ROT0, "Psikyo",          "Zero Gunner 2", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0057 */ GAME( 2007, sl2007,   naomi,    naomi,   naomi,    naomi,    ROT0, "Triangle Service", "Shooting Love 2007", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0057 */ GAME( 2007, sl2007,   naomi,    naomi,   naomi,    naomi,    ROT270, "Triangle Service", "Shooting Love 2007", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0058 */ GAME( 2008, ausfache, naomi,    naomi,   naomi,    naomi,    ROT0, "Subtle Style",    "Akatsuki Blitzkampf Ausf Achse", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0059 */ GAME( 2008, illvelo,  naomi,    naomi,   naomi,    naomi,    ROT0, "Milestone",       "Illvelo (Illmatic Envelope)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0059 */ GAME( 2008, illvelo,  naomi,    naomi,   naomi,    naomi,    ROT270, "Milestone",     "Illvelo (Illmatic Envelope)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0060 Mamonoro - Mamoru-kun wa Norowarete Shimatta!
 // 0061 Melty Blood Actress Again
 // 0061 Melty Blood Actress Again (Rev A)

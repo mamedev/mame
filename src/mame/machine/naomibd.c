@@ -291,6 +291,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
     { "mvsc2", 0, 0xc18b6e7c },
 	{ "otrigger", 0x0fea94, 0 },
 	{ "pjustic", 0x0725d0, 0 },
+	{ "pokasuka", 0xffffffff, 0, 0x4792bcde },   // for M4 games, set the first key to 0xffffffff and the M4 key is the 3rd key 
 	{ "pstone", 0x0e69c1, 0 },
 	{ "pstone2", 0x0b8dc0, 0 },
 	{ "puyoda", 0x0acd40, 0 },
@@ -762,6 +763,10 @@ void *naomibd_get_memory(device_t *device, UINT32 length)
             assert(0);
         }
 
+    	#if NAOMIBD_PRINTF_PROTECTION
+        printf("Doing M4 DMA of length %x\n", length);
+        #endif
+
         // decrypt the required number of bytes
         naomibd->m4_decoder->init();
         UINT8 *m4src = naomibd->memory + naomibd->dma_offset;
@@ -927,7 +932,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
             }
 			else
 			{
-                ret = U64(0);
+                ret = (UINT64)(ROM[v->rom_offset] | (ROM[v->rom_offset+1]<<8));
 			}
 		}
 		else
@@ -958,7 +963,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	}
     else if ((offset == 6) && ACCESSING_BITS_32_47)
     {
-        return (UINT64)0x5555<<32;  // flash ID for M4 carts?
+        return (UINT64)0x5500<<32;  // flash ID for M4 carts?
     }
     else if ((offset == 7) && ACCESSING_BITS_32_47)
     {
@@ -1123,10 +1128,11 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 				v->rom_offset |= ((data >> 32) & 0xffff);
 			}
 
+            v->rom_offset &= ~1;    // always clear bit 0 as per Deunan
+
             if (v->m4_decoder)
             {
                 v->m4_decoder->init();
-                v->rom_offset &= ~1;    // clear bit 0 on M4 carts
             }
 
             #if NAOMIBD_PRINTF_PROTECTION

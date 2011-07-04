@@ -25,7 +25,8 @@ UINT64 *naomi_ram64;
 int jvsboard_type;
 UINT16 actel_id;
 
-static READ64_HANDLER( naomi_bios_idle_skip_r )
+#if 0
+static READ64_HANDLER( naomi_biose_idle_skip_r )
 {
 	if (cpu_get_pc(&space->device())==0xc04173c)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
@@ -34,6 +35,17 @@ static READ64_HANDLER( naomi_bios_idle_skip_r )
 //      printf("%08x\n", cpu_get_pc(&space->device()));
 
 	return naomi_ram64[0x2ad238/8];
+}
+#endif
+
+static READ64_HANDLER( naomi_biosh_idle_skip_r )
+{
+	if (cpu_get_pc(&space->device())==0xc045ffc)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
+
+//	 printf("%08x\n", cpu_get_pc(&space->device()));
+
+	return naomi_ram64[0x2b0600/8];
 }
 
 static UINT8 asciihex_to_dec(UINT8 in)
@@ -171,7 +183,8 @@ static void create_pic_from_retdat(running_machine& machine)
 
 DRIVER_INIT(naomi)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_bios_idle_skip_r)); // rev e bios
+	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -188,7 +201,8 @@ DRIVER_INIT(naomi2)
 
 DRIVER_INIT(naomi_mp)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_bios_idle_skip_r)); // rev e bios
+	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
 	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
 
