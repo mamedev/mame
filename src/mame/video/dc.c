@@ -724,6 +724,8 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	/* Stride select is used only in the non-twiddled case */
 	t->stride = (t->mode & 1) && sa->strideselect ? t->sizex : (pvrta_regs[TEXT_CONTROL] & 0x1f) << 5;
 
+	/* FIXME: hack for test mode */
+	if(t->stride == 0) t->stride = 8;
 
 	t->blend_mode  = sa->blend_mode;
 	t->filter_mode = sa->filtermode;
