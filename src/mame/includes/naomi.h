@@ -38,6 +38,8 @@ extern DRIVER_INIT( vf4evoct );
 
 extern DRIVER_INIT( kick4csh );
 
+extern DRIVER_INIT( hotd2 );
+
 extern UINT64 *naomi_ram64;
 
 extern int jvsboard_type;

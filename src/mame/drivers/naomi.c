@@ -17,27 +17,14 @@
 
 Sega Naomi is Dreamcast based Arcade hardware.
 
-ToDo:
-- many games needs proper per-game JVS settings, at least to let them boot:
-  - lightgun games (confmiss, lupinsho, mok);
-  - dygolf (trackball + 4 buttons / not actually needed to let it boot, just press start to bypass the moan msg);
-  - wsbbgd (ad stick + 2 buttons);
-  - monkeyba (ad stick, not actually needed to let it boot, but crashes at the proper gameplay, so it might);
-  - otrigger ?
-  - smarinef ?
-  - crackndj ?
-  - shootpl / shootopl ?
-  - kick4csh ?
+TODO (general):
+	- all games that uses YUV just updates one frame then dies, why?
+	- SH to ARM sound streaming doesn't work (used by ADX compression system)
+	- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
 
-- tetkiwam, keyboard, vtennis2, vtennisg, monkeyba: they all crashes at some point, might be due of a bad FPU opcode;
-
-- meltybld, meltyb, meltyba: crashes in attract mode;
-
-- all games that uses YUV just updates one frame then dies, why?
-
-- SH to ARM sound streaming doesn't work (used by ADX compression system)
-
-- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
+TODO (game-specific):
+	- The House of the Dead 2: missing lightgun (shooting/reload works), game uses an earlier PVR so it has extra gfx issues;
+	(more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -7160,8 +7147,8 @@ ROM_END
 /* GDROM */ GAME( 2001, naomigd,  0,        naomi,   naomi,    naomi,   ROT0, "Sega", "Naomi GD-ROM Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 /* 834-xxxxx (Sega Naomi cart with game specific BIOS sets) */
-/* 13636 */ GAME( 1998, hotd2,    hod2bios, naomi,   naomi,    0,       ROT0, "Sega", "House of the Dead 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
-/* 13636 */ GAME( 1998, hotd2o,   hotd2,    naomi,   naomi,    0,       ROT0, "Sega", "House of the Dead 2 (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
+/* 13636 */ GAME( 1998, hotd2,    hod2bios, naomi,   naomi,    hotd2,   ROT0, "Sega", "House of the Dead 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
+/* 13636 */ GAME( 1998, hotd2o,   hotd2,    naomi,   naomi,    hotd2,   ROT0, "Sega", "House of the Dead 2 (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
 /* 13842 */ GAME( 1999, f355,     f355bios, naomi,   naomi,    0,       ROT0, "Sega", "Ferrari F355 Challenge", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
 /* 13950 */ GAME( 1999, f355twin, f355bios, naomi,   naomi,    0,       ROT0, "Sega", "Ferrari F355 Challenge (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
 

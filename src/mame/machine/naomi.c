@@ -331,3 +331,18 @@ DRIVER_INIT( kick4csh )
 	actel_id = 0; //FIXME: correct value
 }
 
+static READ64_HANDLER( hotd2_idle_skip_r )
+{
+	if (cpu_get_pc(&space->device())==0xc0cfcb0)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
+		//device_spin_until_interrupt(&space->device());
+//  else
+//	printf("%08x\n", cpu_get_pc(&space->device()));
+
+	return naomi_ram64[0xa25fb8/8];
+}
+
+DRIVER_INIT( hotd2 )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xca25fb8, 0xca25fbf, FUNC(hotd2_idle_skip_r));
+}
