@@ -2154,6 +2154,9 @@ void address_space::prepare_map()
 	// allocate the address map
 	m_map = global_alloc(address_map(m_device, m_spacenum));
 
+	// merge in the submaps
+	m_map->uplift_submaps(machine(), m_device);
+
 	// extract global parameters specified by the map
 	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;
 	if (m_map->m_globalmask != 0)
@@ -2366,6 +2369,9 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 							(readorwrite == ROW_READ) ? data.m_tag : NULL,
 							(readorwrite == ROW_WRITE) ? data.m_tag : NULL);
 			break;
+
+		case AMH_DEVICE_SUBMAP:
+			throw emu_fatalerror("Internal mapping error: leftover mapping of '%s'.\n", data.m_tag);
 	}
 }
 

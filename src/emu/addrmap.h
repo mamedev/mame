@@ -64,7 +64,8 @@ enum map_handler_type
 	AMH_LEGACY_SPACE_HANDLER,
 	AMH_LEGACY_DEVICE_HANDLER,
 	AMH_PORT,
-	AMH_BANK
+	AMH_BANK,
+	AMH_DEVICE_SUBMAP
 };
 
 
@@ -72,6 +73,9 @@ enum map_handler_type
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// submap retriever delegate
+typedef delegate<void (address_map &, const device_t &)> address_map_delegate;
 
 // address map handler data
 class map_handler_data
@@ -133,6 +137,9 @@ public:
 	void set_write_bank(const device_t &device, const char *tag);
 	void set_readwrite_bank(const device_t &device, const char *tag);
 
+	// submap referencing
+	void set_submap(const device_t &device, const char *tag, address_map_delegate func, int bits, UINT64 mask);
+
 	// public state
 	address_map_entry *		m_next;					// pointer to the next entry
 	address_map &			m_map;					// reference to our owning map
@@ -180,6 +187,9 @@ public:
 	write16_device_func		m_wdevice16;			// 16-bit legacy device handler
 	write32_device_func		m_wdevice32;			// 32-bit legacy device handler
 	write64_device_func		m_wdevice64;			// 64-bit legacy device handler
+
+	address_map_delegate	m_submap_delegate;
+	int						m_submap_bits;
 
 	// information used during processing
 	void *					m_memory;				// pointer to memory backing this entry
@@ -408,6 +418,7 @@ class address_map
 public:
 	// construction/destruction
 	address_map(const device_t &device, address_spacenum spacenum);
+	address_map(const device_t &device, address_map_entry *entry);
 	~address_map();
 
 	// configuration
@@ -429,8 +440,9 @@ public:
 	UINT8					m_unmapval;			// unmapped memory value
 	offs_t					m_globalmask;		// global mask
 	simple_list<address_map_entry> m_entrylist;	// list of entries
-};
 
+	void uplift_submaps(running_machine &machine, device_t &device);
+};
 
 
 //**************************************************************************
@@ -472,6 +484,10 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
 // use this to declare external references to an address map
 #define ADDRESS_MAP_EXTERN(_name, _bits) \
 	extern void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device)
+
+// use this to declare an address map as a member of a modern device class
+#define DECLARE_ADDRESS_MAP(_name, _bits) \
+	void _name(address_map &map, const device_t &device)
 
 
 // global controls
@@ -627,6 +643,21 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
 	curentry->set_handler(device, _tag, read32_delegate(&_class::_rhandler, #_class "::" #_rhandler, (_class *)0), write32_delegate(&_class::_whandler, #_class "::" #_whandler, (_class *)0), _unitmask); \
 
 
+// device mapping
+#define AM_DEVICE(_tag, _class, _handler) \
+	curentry->set_submap(device, _tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)0), 0, 0); \
+
+#define AM_DEVICE8(_tag, _class, _handler, _unitmask) \
+	curentry->set_submap(device, _tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)0), 8, _unitmask); \
+
+#define AM_DEVICE16(_tag, _class, _handler, _unitmask) \
+	curentry->set_submap(device, _tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)0), 16, _unitmask); \
+
+#define AM_DEVICE32(_tag, _class, _handler, _unitmask) \
+	curentry->set_submap(device, _tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)0), 32, _unitmask); \
+
+
+
 // special-case accesses
 #define AM_ROM \
 	curentry->set_read_type(AMH_ROM); \
@@ -736,12 +767,26 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
 	map.configure(_space, _bits); \
 	typedef _class drivdata_class; \
 
+#define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
+void _class :: _name(address_map &map, const device_t &device) \
+{ \
+	typedef read##_bits##_delegate read_delegate; \
+	typedef write##_bits##_delegate write_delegate; \
+	address_map_entry##_bits *curentry = NULL; \
+	(void)curentry; \
+	map.configure(AS_PROGRAM, _bits);  \
+	typedef _class drivdata_class; \
+
 #define ADDRESS_MAP_END \
 }
 
 // use this to declare external references to an address map
 #define ADDRESS_MAP_EXTERN(_name, _bits) \
 	extern void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device)
+
+// use this to declare an address map as a member of a modern device class
+#define DECLARE_ADDRESS_MAP(_name, _bits) \
+	void _name(address_map &map, const device_t &device)
 
 
 // global controls
@@ -979,6 +1024,20 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
 
 #define AM_DEVREADWRITE32(_tag, _class, _rhandler, _whandler, _unitmask) \
 	curentry->set_handler(device, _tag, read32_delegate(&_class::_rhandler, #_class "::" #_rhandler, (_class *)0), write32_delegate(&_class::_whandler, #_class "::" #_whandler, (_class *)0), _unitmask); \
+
+
+// device mapping
+#define AM_DEVICE(_tag, _class, _handler) \
+	curentry->set_submap(device, _tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)0), 0, 0); \
+
+#define AM_DEVICE8(_tag, _class, _handler, _unitmask) \
+	curentry->set_submap(device, _tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)0), 8, _unitmask); \
+
+#define AM_DEVICE16(_tag, _class, _handler, _unitmask) \
+	curentry->set_submap(device, _tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)0), 16, _unitmask); \
+
+#define AM_DEVICE32(_tag, _class, _handler, _unitmask) \
+	curentry->set_submap(device, _tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)0), 32, _unitmask); \
 
 
 // special-case accesses

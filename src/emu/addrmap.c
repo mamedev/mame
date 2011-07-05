@@ -188,7 +188,7 @@ void address_map_entry::set_write_bank(const device_t &device, const char *tag)
 
 //-------------------------------------------------
 //  set_readwrite_bank - set up a handler for
-//  writing to a memory bank
+//  reading and writing to a memory bank
 //-------------------------------------------------
 
 void address_map_entry::set_readwrite_bank(const device_t &device, const char *tag)
@@ -197,6 +197,29 @@ void address_map_entry::set_readwrite_bank(const device_t &device, const char *t
 	m_read.set_tag(device, tag);
 	m_write.m_type = AMH_BANK;
 	m_write.set_tag(device, tag);
+}
+
+
+//-------------------------------------------------
+//  set_submap - set up a handler for
+//  retrieve a submap from a device
+//-------------------------------------------------
+
+void address_map_entry::set_submap(const device_t &device, const char *tag, address_map_delegate func, int bits, UINT64 mask)
+{
+	if(!bits)
+		bits = m_map.m_databits;
+
+	assert(unitmask_is_appropriate(bits, mask, func.name()));
+
+	m_read.m_type = AMH_DEVICE_SUBMAP;
+	m_read.set_tag(device, tag);
+	m_read.m_mask = mask;
+	m_write.m_type = AMH_DEVICE_SUBMAP;
+	m_write.set_tag(device, tag);
+	m_write.m_mask = mask;
+	m_submap_delegate = func;
+	m_submap_bits = bits;
 }
 
 
@@ -724,6 +747,23 @@ address_map::address_map(const device_t &device, address_spacenum spacenum)
 }
 
 
+
+//-------------------------------------------------
+//  address_map - constructor in the submap case
+//-------------------------------------------------
+
+address_map::address_map(const device_t &device, address_map_entry *entry)
+	: m_spacenum(AS_PROGRAM),
+	  m_databits(0xff),
+	  m_unmapval(0),
+	  m_globalmask(0)
+{
+	// Retrieve the submap
+	entry->m_submap_delegate.late_bind(const_cast<device_t &>(device));
+	entry->m_submap_delegate(*this, device);
+}
+
+
 //-------------------------------------------------
 //  ~address_map - destructor
 //-------------------------------------------------
@@ -796,4 +836,136 @@ address_map_entry64 *address_map::add(offs_t start, offs_t end, address_map_entr
 	ptr = global_alloc(address_map_entry64(*this, start, end));
 	m_entrylist.append(*ptr);
 	return ptr;
+}
+
+
+//-------------------------------------------------
+//  uplift_submaps - propagate in the device submaps
+//-------------------------------------------------
+
+void address_map::uplift_submaps(running_machine &machine, device_t &device)
+{
+	address_map_entry *prev = 0;
+	address_map_entry *entry = m_entrylist.first();
+	while (entry)
+	{
+		if (entry->m_read.m_type == AMH_DEVICE_SUBMAP)
+		{
+			const char *tag = entry->m_read.m_tag;
+			device_t *mapdevice = machine.device(tag);
+			if (mapdevice == NULL)
+				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag, m_spacenum, device.tag());
+			// Grab the submap
+			address_map submap(*mapdevice, entry);
+
+			// Recursively uplift it if needed
+			submap.uplift_submaps(machine, *mapdevice);
+
+			// Compute the unit repartition characteristics
+			int entry_bits = entry->m_submap_bits;
+			if (!entry_bits)
+				entry_bits = m_databits;
+
+			int entry_bytes = entry_bits / 8;
+			int databytes = m_databits / 8;
+
+			offs_t mirror_address_mask = (databytes - 1) & ~(entry_bytes - 1);
+
+			UINT64 entry_mask = (2ULL << (entry_bits-1)) - 1;
+
+			int slot_offset[8];
+			int slot_count = 0;
+			int max_slot_count = m_databits / entry_bits;
+
+			UINT64 global_mask = entry->m_read.m_mask;
+			// zero means all
+			if (!global_mask)
+				global_mask = ~global_mask;
+
+			// mask consistency has already been checked in
+			// unitmask_is_appropriate, so one bit is enough
+			for (int slot=0; slot < max_slot_count; slot++)
+				if (global_mask & (1ULL << (slot * entry_bits)))
+					slot_offset[slot_count++] = slot * entry_bits;
+					
+			// Merge in all the map contents in order
+			while (submap.m_entrylist.count())
+			{
+				address_map_entry *subentry = submap.m_entrylist.detach_head();
+
+				// Remap start and end
+
+				int start_offset = subentry->m_addrstart / entry_bytes;
+				int start_slot = start_offset % slot_count;
+				subentry->m_addrstart = entry->m_addrstart + (start_offset / slot_count) * databytes;
+
+				// Drop the entry if it ends up outside the range
+				if (subentry->m_addrstart > entry->m_addrend)
+				{
+					global_free(subentry);
+					continue;
+				}
+
+				int end_offset = subentry->m_addrend / entry_bytes;
+				int end_slot = end_offset % slot_count;
+				subentry->m_addrend = entry->m_addrstart + (end_offset / slot_count) * databytes + databytes - 1;
+
+				// Clip the entry to the end of the range
+				if (subentry->m_addrend > entry->m_addrend)
+					subentry->m_addrend = entry->m_addrend;
+
+				// Detect special unhandled case (range straddling
+				// slots, requiring splitting in multiple entries and
+				// unimplemented offset-add subunit handler)
+				if (subentry->m_addrstart + databytes - 1 != subentry->m_addrend &&
+					(start_slot != 0 || end_slot != slot_count - 1))
+					throw emu_fatalerror("uplift_submaps unhandled case: range straddling slots.\n");
+
+				if (entry->m_addrmask || subentry->m_addrmask)
+					throw emu_fatalerror("uplift_submaps unhandled case: address masks.\n");
+
+				if (subentry->m_addrmirror & mirror_address_mask)
+					throw emu_fatalerror("uplift_submaps unhandled case: address mirror bit within subentry.\n");
+
+				subentry->m_addrmirror |= entry->m_addrmirror;
+
+				// Twiddle the unitmask on the data accessors that need it
+				for (int data_entry = 0; data_entry < 2; data_entry++)
+				{
+					map_handler_data &mdata = data_entry ? subentry->m_write : subentry->m_read;
+
+					if (mdata.m_type == AMH_NONE)
+						continue;
+
+					if (mdata.m_type != AMH_DEVICE_DELEGATE)
+						throw emu_fatalerror("Only normal read/write methods are accepted in device submaps.\n");
+
+					if (mdata.m_bits == 0 && entry_bits != m_databits)
+						mdata.m_bits = entry_bits;
+
+					UINT64 mask = 0;
+					if (entry_bits != m_databits)
+					{
+						UINT64 unitmask = mdata.m_mask ? mdata.m_mask : entry_mask;
+						for (int slot = start_slot; slot <= end_slot; slot++)
+							mask |= unitmask << slot_offset[slot];
+					}
+					mdata.m_mask = mask;
+				}
+					
+				// Insert the entry in the map
+				m_entrylist.insert_after(*subentry, prev);
+				prev = subentry;
+			}
+
+			address_map_entry *to_delete = entry;
+			entry = entry->next();
+			m_entrylist.remove(*to_delete);			
+		}
+		else
+		{
+			prev = entry;
+			entry = entry->next();
+		}
+	}
 }
