@@ -1547,6 +1547,65 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64 )
 	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
 ADDRESS_MAP_END
 
+/*
+ * Naomi 2 address map
+ */
+
+static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
+	/* Area 0 */
+	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
+
+	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6c00, 0x005f6c07) AM_MIRROR(0x02000000) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mdstar_r, sb_mdstar_w, U64(0xffffffff00000000) )
+	AM_RANGE(0x005f6c10, 0x005f6c17) AM_MIRROR(0x02000000) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mden_r, sb_mden_w, U64(0xffffffff00000000) )
+	AM_RANGE(0x005f6c18, 0x005f6c1f) AM_MIRROR(0x02000000) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mdst_r, sb_mdst_w, U64(0x00000000ffffffff) )
+	AM_RANGE(0x005f6c80, 0x005f6c87) AM_MIRROR(0x02000000) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_msys_r, sb_msys_w, U64(0x00000000ffffffff) )
+	AM_RANGE(0x005f6c88, 0x005f6c8f) AM_MIRROR(0x02000000) AM_DEVWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mdapro_w, U64(0xffffffff00000000) )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_READWRITE( pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE( dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+
+	/* External Device */
+	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM	// Naomi 2 BIOS tests this, needs to read back as written
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+
+	/* Area 1 */
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE( &dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+//	AM_RANGE(0x06000000, 0x06ffffff) AM_RAM // 32 bit access 2nd PVR RAM
+//	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM // 64 bit access 2nd PVR RAM
+
+	/* Area 2*/
+//	AM_RANGE(0x085f8000, 0x085f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w ) // 2nd PVR registers
+//	AM_RANGE(0x08800000, 0x0???????) // T&L chip registers
+//  AM_RANGE(0x0a000000, 0x0???????) // T&L chip RAM
+
+	/* Area 3 */
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_BASE(&naomi_ram64)
+
+	/* Area 4 */
+	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE( ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE( ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE( ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
+	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE( ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+
+	/* Area 5 */
+	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+
+	/* Area 6 */
+	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+
+	/* Area 7 */
+	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( naomi_port, AS_IO, 64 )
 	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("main_eeprom", eeprom_93c46a_r, eeprom_93c46a_w)
@@ -2030,7 +2089,10 @@ MACHINE_CONFIG_END
  * Naomi 2
  */
 
-// ...
+static MACHINE_CONFIG_DERIVED( naomi2, naomi )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(naomi2_map)
+MACHINE_CONFIG_END
 
 /*
  * Naomi 2 GD-Rom
@@ -4486,14 +4548,14 @@ ROM_START( pokasuka )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x14000000, "user1", ROMREGION_ERASEFF)
-	ROM_LOAD( "fpr-24365.ic8",  0x00000000, 0x4000000, CRC(11489cda) SHA1(d9902a61491061f522650f825f92e81541fcc772) ) 
-	ROM_LOAD( "fpr-24366.ic9",  0x04000000, 0x4000000, CRC(7429714a) SHA1(e45b442f447d24de0c746943a59c0dceb6e359cc) ) 
-	ROM_LOAD( "fpr-24367.ic10", 0x08000000, 0x4000000, CRC(dee87bab) SHA1(c5386cda2e84992e18b7959e7d9965c28c1185a4) ) 
-	ROM_LOAD( "fpr-24368.ic11", 0x0c000000, 0x4000000, CRC(124f55e2) SHA1(bc2cb9514acd98f116917ea771b06c4e03ffae73) ) 
-	ROM_LOAD( "fpr-24369.ic12", 0x10000000, 0x4000000, CRC(35b544ab) SHA1(270a75883a867318fd417ec819c40c36f2d296b8) ) 
+	ROM_LOAD( "fpr-24365.ic8",  0x00000000, 0x4000000, CRC(11489cda) SHA1(d9902a61491061f522650f825f92e81541fcc772) )
+	ROM_LOAD( "fpr-24366.ic9",  0x04000000, 0x4000000, CRC(7429714a) SHA1(e45b442f447d24de0c746943a59c0dceb6e359cc) )
+	ROM_LOAD( "fpr-24367.ic10", 0x08000000, 0x4000000, CRC(dee87bab) SHA1(c5386cda2e84992e18b7959e7d9965c28c1185a4) )
+	ROM_LOAD( "fpr-24368.ic11", 0x0c000000, 0x4000000, CRC(124f55e2) SHA1(bc2cb9514acd98f116917ea771b06c4e03ffae73) )
+	ROM_LOAD( "fpr-24369.ic12", 0x10000000, 0x4000000, CRC(35b544ab) SHA1(270a75883a867318fd417ec819c40c36f2d296b8) )
 
 	ROM_REGION( 0x200000, "ioboard", 0)	// touch screen I/O board, program disassembles as little-endian SH-4
-	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) ) 
+	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) )
 ROM_END
 
 /*
@@ -7158,7 +7220,7 @@ ROM_END
 // 0150 MushiKing - The King Of Beetle
 // 0166 Touch De Zunou (Japan)
 // 0166 Touch De Zunou (Japan) (Rev A)
-/* 0170 */ GAME( 2007, pokasuka, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Pokasuka Ghost", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
+/* 0170 */ GAME( 2007, pokasuka, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Pokasuka Ghost", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0175 */ GAME( 2007, asndynmt, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Asian Dynamite", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 00?? */ GAME( 1999, ringout,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Ring Out 4x4", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 00?? */ GAME( 1999, alpiltdx, airlbios, naomi,   naomi,    0,        ROT0, "Sega", "Airline Pilots Deluxe (Rev B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
@@ -7167,14 +7229,14 @@ ROM_END
 // 00?? Touch de Uno!
 
 /* 840-xxxxx (Sega Naomi 2 cart games) */
-/* 0046 */ GAME( 2001, wldrider, naomi2,   naomi,   naomi,    0,        ROT0, "Sega", "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0061 */ GAME( 2001, vstrik3c, naomi2,   naomi,   naomi,    0,        ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0061 */ GAME( 2001, vstrik3cb,vstrik3c, naomi,   naomi,    0,        ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0062 */ GAME( 2002, clubkrte, naomi2,   naomi,   naomi,    0,        ROT0, "Sega", "Club Kart: European Session (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0080 */ GAME( 2002, vf4cart,  naomi2,   naomi,   naomi,    0,        ROT0, "Sega", "Virtua Fighter 4 (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0087 */ GAME( 2002, kingrt66, naomi2,   naomi,   naomi,    0,        ROT0, "Sega", "King of Route 66 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0046 */ GAME( 2001, wldrider, naomi2,   naomi2,   naomi,    0,        ROT0, "Sega", "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0061 */ GAME( 2001, vstrik3c, naomi2,   naomi2,   naomi,    0,        ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0061 */ GAME( 2001, vstrik3cb,vstrik3c, naomi2,   naomi,    0,        ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0062 */ GAME( 2002, clubkrte, naomi2,   naomi2,   naomi,    0,        ROT0, "Sega", "Club Kart: European Session (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0080 */ GAME( 2002, vf4cart,  naomi2,   naomi2,   naomi,    0,        ROT0, "Sega", "Virtua Fighter 4 (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0087 */ GAME( 2002, kingrt66, naomi2,   naomi2,   naomi,    0,        ROT0, "Sega", "King of Route 66 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0095 Soul Surfer
-/* 0106 */ GAME( 2002, vf4evoct, naomi2,   naomi,   naomi,    vf4evoct, ROT0, "Sega", "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0106 */ GAME( 2002, vf4evoct, naomi2,   naomi2,   naomi,    vf4evoct, ROT0, "Sega", "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0129 Club Kart Prize
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/

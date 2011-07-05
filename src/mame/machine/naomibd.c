@@ -4,10 +4,10 @@
 
     emulator by Samuele Zannoli and R. Belmont
     reverse engineering by ElSemi, Deunan Knute, Andreas Naive, Olivier Galibert, and Cah4e3
- 
+
     TODO: "M4" boards allow direct access to the flash chips' commands and IDs.
           Can't implement this w/o access to the ROM test however.
- 
+
 **************************************************************************/
 
 /*
@@ -291,7 +291,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
     { "mvsc2", 0, 0xc18b6e7c },
 	{ "otrigger", 0x0fea94, 0 },
 	{ "pjustic", 0x0725d0, 0 },
-	{ "pokasuka", 0xffffffff, 0, 0x4792bcde },   // for M4 games, set the first key to 0xffffffff and the M4 key is the 3rd key 
+	{ "pokasuka", 0xffffffff, 0, 0x4792bcde },   // for M4 games, set the first key to 0xffffffff and the M4 key is the 3rd key
 	{ "pstone", 0x0e69c1, 0 },
 	{ "pstone2", 0x0b8dc0, 0 },
 	{ "puyoda", 0x0acd40, 0 },
@@ -2093,7 +2093,7 @@ static DEVICE_START( naomibd )
 			break;
 
 		case DIMM_BOARD:
-			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine(), UINT8, 0x40000000); // 0x40000000 is needed for some Chihiro sets, Naomi should be less, we should pass as device param
+			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine(), UINT8, 0x40000000/4); // 0x40000000 is needed for some Chihiro sets, Naomi should be less, we should pass as device param
 			v->gdromchd = get_disk_handle(device->machine(), config->gdromregiontag);
 			v->picdata = (UINT8 *)device->machine().region(config->picregiontag)->base();
 			if (v->memory != NULL && v->gdromchd != NULL && v->picdata != NULL)
