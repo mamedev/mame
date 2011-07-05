@@ -15,6 +15,8 @@
 
   The later revision games (released after GD-ROM had been discontinued) require the 'h' revision bios, which checks the SH-4 ID register.
 
+  Error 51 means that you need to change the cabinet to a different player arrangement in main test mode (usually 1p)
+
 Sega Naomi is Dreamcast based Arcade hardware.
 
 TODO (general):
@@ -24,14 +26,14 @@ TODO (general):
 
 TODO (game-specific):
 	- 18th Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
-	- Airline Pilots: Returns error 03 on Naomi logo, inputs are unimplemented;
 	- Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
 	- Ferrari 355 Challenge: dies at the network check;
 	- OutTrigger: crashes on naomibd_r();
 	- Samba de Amigo: doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related);
 	- Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
 	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
-	- Virtua Tennis: dies when accessing the gameplay or the attract mode (core bug, most likely);
+	- The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
+	- Virtua Tennis: dies when accessing the gameplay or the attract mode (PVR or SH-4 bug, most likely);
 	(more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1919,7 +1921,6 @@ static INPUT_PORTS_START( crzytaxi )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-/* Note: needs default calibration! */
 static INPUT_PORTS_START( dybbnao )
 	PORT_INCLUDE( naomi_mie )
 	PORT_INCLUDE( naomi_debug )
@@ -2068,6 +2069,46 @@ static INPUT_PORTS_START( 18wheelr )
 	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( alpilota )
+	PORT_INCLUDE( naomi_mie )
+	PORT_INCLUDE( naomi_debug )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Landing Gear Switch") PORT_TOGGLE
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("View Change")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Flap Switch") PORT_TOGGLE
+	PORT_BIT( 0x7c7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Elevator Wheel")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Aileron Wheel") PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A3")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Rudder Pedal")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A4")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever L")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A5")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever R") PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 /* JVS mahjong panel */
 static INPUT_PORTS_START( naomi_mp )
@@ -3364,7 +3405,7 @@ ROM_END
 
 ROM_START( alpilota )
 	ROM_REGION( 0x200000, "maincpu", 0)
-	AIRLINE_BIOS
+	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
@@ -6300,7 +6341,7 @@ ROM_START( luptype )
 ROM_END
 
 ROM_START( initdv2j )
-	NAOMIGD_BIOS
+	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
@@ -6315,7 +6356,7 @@ ROM_START( initdv2j )
 ROM_END
 
 ROM_START( initdv2jo )
-	NAOMIGD_BIOS
+	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
@@ -6327,7 +6368,7 @@ ROM_END
 
 
 ROM_START( initdv2e )
-	NAOMIGD_BIOS
+	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
@@ -6341,7 +6382,7 @@ ROM_START( initdv2e )
 ROM_END
 
 ROM_START( initdv3j )
-	NAOMIGD_BIOS
+	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
@@ -6355,7 +6396,7 @@ ROM_START( initdv3j )
 ROM_END
 
 ROM_START( initdv3jb )
-	NAOMIGD_BIOS
+	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
@@ -7387,7 +7428,7 @@ ROM_END
 /* 0001 */ GAME( 1998, dybbnao,  naomi,    naomi,   dybbnao,  naomi,    ROT0, "Sega", "Dynamite Baseball NAOMI (JPN)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0002 */ GAME( 1999, crzytaxi, naomi,    naomi,   crzytaxi, naomi,    ROT0, "Sega", "Crazy Taxi (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0003 */ GAME( 1999, zombrvn,  naomi,    naomi,   zombrvn,  naomi,    ROT0, "Sega", "Zombie Revenge (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0005 */ GAME( 1999, alpilota, alpiltdx, naomi,   naomi,    0,        ROT0, "Sega", "Airline Pilots (Rev A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
+/* 0005 */ GAME( 1999, alpilota, naomi,    naomi,   alpilota, naomi,    ROT0, "Sega", "Airline Pilots (Rev A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
 /* 0007 */ GAME( 1999, ggram2,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Giant Gram: All Japan Pro Wrestling 2 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0010 */ GAME( 1999, vs2_2k,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0011 */ GAME( 1999, toyfight, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Toy Fighter", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
