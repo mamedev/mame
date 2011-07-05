@@ -1,8 +1,18 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "maple-dc.h"
 #include "mie.h"
 
 const device_type MAPLE_DC = &device_creator<maple_dc_device>;
+
+DEVICE_ADDRESS_MAP_START(amap, 32, maple_dc_device)
+	AM_RANGE(0x04, 0x07) AM_READWRITE(sb_mdstar_r, sb_mdstar_w)
+	AM_RANGE(0x14, 0x17) AM_READWRITE(sb_mden_r, sb_mden_w)
+	AM_RANGE(0x18, 0x1b) AM_READWRITE(sb_mdst_r, sb_mdst_w)
+	AM_RANGE(0x80, 0x83) AM_READWRITE(sb_msys_r, sb_msys_w)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE(sb_mdapro_w)
+ADDRESS_MAP_END
 
 void maple_dc_device::static_set_maincpu_tag(device_t &device, const char *maincpu_tag)
 {
