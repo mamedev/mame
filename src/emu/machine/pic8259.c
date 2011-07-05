@@ -71,12 +71,14 @@ struct pic8259
 	UINT32 mode : 2;
 	UINT32 auto_eoi : 1;
 	UINT32 is_x86 : 1;
+	
+	UINT8 variant; // 0 - 8259, 1 - 8259A
 };
 
 
 INLINE pic8259_t *get_safe_token(device_t *device) {
 	assert( device != NULL );
-	assert( device->type() == PIC8259 );
+	assert( device->type() == PIC8259 || device->type() == PIC8259A);
 	return ( pic8259_t *) downcast<legacy_device_base *>(device)->token();
 }
 
@@ -146,7 +148,7 @@ static void pic8259_set_irq_line(device_t *device, int irq, int state)
 		pic8259->irq_lines &= ~mask;
 		pic8259->irr &= ~mask;
 	}
-
+	if (pic8259->variant==0) pic8259->irr = pic8259->irq_lines;
 	pic8259_set_timer(pic8259);
 }
 
@@ -422,8 +424,8 @@ static DEVICE_START( pic8259 )
 	pic8259->read_slave_ack_func.resolve(intf->read_slave_ack_func, *device);
 }
 
-
-static DEVICE_RESET( pic8259 ) {
+static void common_reset(device_t *device,int variant)
+{
 	pic8259_t	*pic8259 = get_safe_token(device);
 
 	pic8259->state = STATE_READY;
@@ -448,6 +450,13 @@ static DEVICE_RESET( pic8259 ) {
 	pic8259->vector_addr_high = 0;
 
 	pic8259->master = pic8259->sp_en_func();
+	
+	pic8259->variant = variant;
+}
+
+static DEVICE_RESET( pic8259 ) 
+{
+	common_reset(device, 0);
 }
 
 
@@ -471,5 +480,24 @@ DEVICE_GET_INFO( pic8259 ) {
 	}
 }
 
-
 DEFINE_LEGACY_DEVICE(PIC8259, pic8259);
+
+static DEVICE_RESET( pic8259a ) 
+{
+	common_reset(device, 1);
+}
+
+DEVICE_GET_INFO( pic8259a )
+{
+	switch ( state )
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_STR_NAME:						strcpy(info->s, "PIC8259A");	break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_RESET:						info->start = DEVICE_RESET_NAME(pic8259a);	break;
+
+		default:									DEVICE_GET_INFO_CALL(pic8259);				break;
+	}
+}
+DEFINE_LEGACY_DEVICE(PIC8259A, pic8259a);
