@@ -866,6 +866,9 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device)
 			if (!entry_bits)
 				entry_bits = m_databits;
 
+			if (submap.m_databits != entry_bits)
+				throw emu_fatalerror("AM_DEVICE wants a %d bits large address map and got a %d bits large one instead.\n", entry_bits, submap.m_databits);
+
 			int entry_bytes = entry_bits / 8;
 			int databytes = m_databits / 8;
 
@@ -952,7 +955,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device)
 					}
 					mdata.m_mask = mask;
 				}
-					
+
 				// Insert the entry in the map
 				m_entrylist.insert_after(*subentry, prev);
 				prev = subentry;
