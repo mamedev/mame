@@ -333,7 +333,7 @@ DRIVER_INIT( kick4csh )
 
 static READ64_HANDLER( hotd2_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc0cfcb0)
+	if (cpu_get_pc(&space->device())==0xc0cfcbc)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 		//device_spin_until_interrupt(&space->device());
 //  else
@@ -346,3 +346,5 @@ DRIVER_INIT( hotd2 )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xca25fb8, 0xca25fbf, FUNC(hotd2_idle_skip_r));
 }
+
+// f355 PC=0xc065f7c RAM=0xc26dafc
