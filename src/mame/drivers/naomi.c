@@ -1575,20 +1575,20 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE( &dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
-//	AM_RANGE(0x06000000, 0x06ffffff) AM_RAM // 32 bit access 2nd PVR RAM
-//	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM // 64 bit access 2nd PVR RAM
+	AM_RANGE(0x06000000, 0x06ffffff) AM_RAM AM_BASE( &pvr2_texture_ram )   // 32 bit access 2nd PVR RAM
+	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_BASE( &pvr2_framebuffer_ram )// 64 bit access 2nd PVR RAM
 
 	/* Area 2*/
-//	AM_RANGE(0x085f8000, 0x085f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w ) // 2nd PVR registers
-//	AM_RANGE(0x08800000, 0x0???????) // T&L chip registers
-//  AM_RANGE(0x0a000000, 0x0???????) // T&L chip RAM
+	AM_RANGE(0x085f8000, 0x085f9fff) AM_READWRITE( pvr2_ta_r, pvr2_ta_w ) // 2nd PVR registers
+	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32( elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
+    AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_BASE( &elan_ram ) // T&L chip RAM
 
 	/* Area 3 */
 	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_BASE(&naomi_ram64)
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE( ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE( ta_fifo_yuv_w )
+	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE( ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE( ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)

@@ -204,8 +204,16 @@ extern UINT32 pvrctrl_regs[0x100/4];
 extern UINT64 *dc_texture_ram;
 extern UINT64 *dc_framebuffer_ram;
 
+extern UINT64 *pvr2_texture_ram;
+extern UINT64 *pvr2_framebuffer_ram;
+extern UINT64 *elan_ram;
+
 READ64_HANDLER( pvr_ta_r );
 WRITE64_HANDLER( pvr_ta_w );
+READ64_HANDLER( pvr2_ta_r );
+WRITE64_HANDLER( pvr2_ta_w );
+READ32_HANDLER( elan_regs_r );
+WRITE32_HANDLER( elan_regs_w );
 WRITE64_HANDLER( ta_fifo_poly_w );
 WRITE64_HANDLER( ta_fifo_yuv_w );
 VIDEO_START(dc);

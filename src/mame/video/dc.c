@@ -134,6 +134,11 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 
 UINT64 *dc_framebuffer_ram; // '32-bit access area'
 UINT64 *dc_texture_ram; // '64-bit access area'
+UINT64 *pvr2_texture_ram;
+UINT64 *pvr2_framebuffer_ram;
+
+UINT64 *elan_ram;
+
 static UINT32 tafifo_buff[32];
 
 static emu_timer *vbout_timer;
@@ -2620,4 +2625,61 @@ SCREEN_UPDATE(dc)
 	debug_dip_status = input_port_read(screen->machine(), "MAMEDEBUG");
 
 	return 0;
+}
+
+
+/* Naomi 2 attempts (TBD) */
+
+READ64_HANDLER( pvr2_ta_r )
+{
+	int reg;
+	UINT64 shift;
+
+	reg = decode_reg_64(offset, mem_mask, &shift);
+
+	switch (reg)
+	{
+	}
+
+	printf("PVR2 %08x R\n",reg);
+
+	return 0;
+}
+
+WRITE64_HANDLER( pvr2_ta_w )
+{
+	int reg;
+	UINT64 shift;
+	UINT32 dat;
+
+	reg = decode_reg_64(offset, mem_mask, &shift);
+	dat = (UINT32)(data >> shift);
+
+	//printf("PVR2 %08x %08x\n",reg,dat);
+}
+
+READ32_HANDLER( elan_regs_r )
+{
+	switch(offset)
+	{
+		case 0: // ID chip (TODO: BIOS crashes / gives a black screen with this as per now!)
+			return 0xe1ad0000;
+
+		case 0x04/4:
+			return 0x12;
+		case 0x14/4:
+			return 0x2029;
+		case 0x74/4:
+			return space->machine().rand() & 0x3f;
+		default:
+			printf("%08x %08x\n",cpu_get_pc(&space->device()),offset*4);
+			break;
+	}
+
+	return 0;
+}
+
+WRITE32_HANDLER( elan_regs_w )
+{
+	// ...
 }
