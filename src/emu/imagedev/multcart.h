@@ -11,6 +11,9 @@
 
 #include "osdcore.h"
 
+#define TAG_PCB		"pcb"
+
+DECLARE_LEGACY_IMAGE_DEVICE(MULTICARTSLOT, multicartslot);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -65,6 +68,31 @@ struct _multicart_t
 	multicart_private *			data;
 };
 
+typedef struct _multicartslot_t multicartslot_t;
+struct _multicartslot_t
+{
+	device_t *pcb_device;
+	multicart_t *mc;
+};
+
+
+typedef struct _multicartslot_pcb_type multicartslot_pcb_type;
+struct _multicartslot_pcb_type
+{
+	const char *					name;
+	device_type						devtype;
+};
+
+
+typedef struct _multicartslot_config multicartslot_config;
+struct _multicartslot_config
+{
+	const char *					extensions;
+	device_start_func				device_start;
+	device_image_load_func			device_load;
+	device_image_unload_func		device_unload;
+	multicartslot_pcb_type			pcb_types[16];
+};
 
 enum _multicart_open_error
 {
@@ -96,5 +124,71 @@ multicart_open_error multicart_open(emu_options &options, const char *filename, 
 
 /* closes a multicart */
 void multicart_close(emu_options &options, multicart_t *cart);
+
+/* accesses the PCB associated with this cartslot */
+device_t *cartslot_get_pcb(device_t *device);
+
+/* accesses a particular socket */
+void *cartslot_get_socket(device_t *device, const char *socket_name);
+
+/* accesses a particular socket; gets the length of the associated resource */
+int cartslot_get_resource_length(device_t *device, const char *socket_name);
+
+#define DECLARE_LEGACY_CART_SLOT_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_cart_slot_device_base)
+#define DEFINE_LEGACY_CART_SLOT_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_cart_slot_device_base)
+
+#define MCFG_MULTICARTSLOT_ADD(_tag) 										\
+	MCFG_DEVICE_ADD(_tag, MULTICARTSLOT, 0)									\
+
+#define MCFG_MULTICARTSLOT_MODIFY(_tag)										\
+	MCFG_DEVICE_MODIFY(_tag)									\
+
+#define MCFG_MULTICARTSLOT_PCBTYPE(_index, _pcb_type_name, _pcb_devtype)			\
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(multicartslot_config, pcb_types, _index, multicartslot_pcb_type, name, _pcb_type_name) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(multicartslot_config, pcb_types, _index, multicartslot_pcb_type, devtype, _pcb_devtype)
+
+#define MCFG_MULTICARTSLOT_START(_start)										\
+	MCFG_DEVICE_CONFIG_DATAPTR(multicartslot_config, device_start, DEVICE_START_NAME(_start))
+
+#define MCFG_MULTICARTSLOT_LOAD(_load)										\
+	MCFG_DEVICE_CONFIG_DATAPTR(multicartslot_config, device_load, DEVICE_IMAGE_LOAD_NAME(_load))
+
+#define MCFG_MULTICARTSLOT_UNLOAD(_unload)									\
+	MCFG_DEVICE_CONFIG_DATAPTR(multicartslot_config, device_unload, DEVICE_IMAGE_UNLOAD_NAME(_unload))
+
+#define MCFG_MULTICARTSLOT_EXTENSION_LIST(_extensions)						\
+	MCFG_DEVICE_CONFIG_DATAPTR(multicartslot_config, extensions, _extensions)
+
+
+// ======================> device_cart_slot_interface
+
+// class representing interface-specific live cart_slot
+class device_cart_slot_interface : public device_interface
+{
+public:
+	// construction/destruction
+	device_cart_slot_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_cart_slot_interface();
+};
+
+
+// ======================> legacy_cart_slot_device
+
+// legacy_cart_slot_device is a legacy_device_base with a cart_slot interface
+class legacy_cart_slot_device_base :	public legacy_device_base,
+										public device_cart_slot_interface
+{
+protected:
+	// construction/destruction
+	legacy_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
+
+public:
+	using legacy_device_base::get_legacy_int;
+	using legacy_device_base::get_legacy_fct;
+	using legacy_device_base::get_legacy_ptr;
+
+	// device_cart_slot_interface overrides
+};
+
 
 #endif /* __MULTCART_H__ */

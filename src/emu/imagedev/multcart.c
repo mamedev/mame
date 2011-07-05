@@ -62,8 +62,159 @@ const char *multicart_error_text(multicart_open_error error)
 }
 
 /***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE multicartslot_t *get_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == MULTICARTSLOT);
+	return (multicartslot_t *) downcast<legacy_device_base *>(device)->token();
+}
+
+
+INLINE const multicartslot_config *get_config(const device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == MULTICARTSLOT);
+	return (const multicartslot_config *) downcast<const legacy_device_base *>(device)->inline_config();
+}
+
+
+/***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+
+/*-------------------------------------------------
+    cartslot_get_pcb
+-------------------------------------------------*/
+
+device_t *cartslot_get_pcb(device_t *device)
+{
+	multicartslot_t *cart = get_token(device);
+	return cart->pcb_device;
+}
+
+
+/*-------------------------------------------------
+    cartslot_get_socket
+-------------------------------------------------*/
+
+void *cartslot_get_socket(device_t *device, const char *socket_name)
+{
+	multicartslot_t *cart = get_token(device);
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
+	void *result = NULL;
+
+	if (cart->mc != NULL)
+	{
+		const multicart_socket *socket;
+		for (socket = cart->mc->sockets; socket != NULL; socket = socket->next)
+		{
+			if (!strcmp(socket->id, socket_name))
+				break;
+		}
+		result = socket ? socket->ptr : NULL;
+	}
+	else if (socket_name[0] == '\0')
+	{
+		result = image->ptr();
+	}
+	return result;
+}
+
+/*-------------------------------------------------
+    cartslot_get_resource_length
+-------------------------------------------------*/
+
+int cartslot_get_resource_length(device_t *device, const char *socket_name)
+{
+	multicartslot_t *cart = get_token(device);
+	int result = 0;
+
+	if (cart->mc != NULL)
+	{
+		const multicart_socket *socket;
+
+		for (socket = cart->mc->sockets; socket != NULL; socket = socket->next)
+		{
+			if (!strcmp(socket->id, socket_name)) {
+				break;
+			}
+		}
+		if (socket != NULL)
+			result = socket->resource->length;
+	}
+	else
+		result = 0;
+
+	return result;
+}
+/*-------------------------------------------------
+    identify_pcb
+-------------------------------------------------*/
+
+static const multicartslot_pcb_type *identify_pcb(device_image_interface &image)
+{
+	const multicartslot_config *config = get_config(&image.device());
+	astring pcb_name;
+	const multicartslot_pcb_type *pcb_type = NULL;
+	multicart_t *mc;
+	int i;
+
+	if (image.exists())
+	{
+		/* try opening this as if it were a multicart */
+		multicart_open_error me = multicart_open(image.device().machine().options(), image.filename(), image.device().machine().system().name, MULTICART_FLAGS_DONT_LOAD_RESOURCES, &mc);
+		if (me == MCERR_NONE)
+		{
+			/* this was a multicart - read from it */
+			astring_cpyc(&pcb_name, mc->pcb_type);
+			multicart_close(image.device().machine().options(), mc);
+		}
+		else
+		{
+			if (me != MCERR_NOT_MULTICART)
+				fatalerror("multicart error: %s", multicart_error_text(me));
+		}
+
+		/* look for PCB type with matching name */
+		for (i = 0; (i < ARRAY_LENGTH(config->pcb_types)) && (config->pcb_types[i].name != NULL); i++)
+		{
+			if ((config->pcb_types[i].name[0] == '\0') || !strcmp(astring_c(&pcb_name), config->pcb_types[i].name))
+			{
+				pcb_type = &config->pcb_types[i];
+				break;
+			}
+		}
+
+		/* check for unknown PCB type */
+		if ((mc != NULL) && (pcb_type == NULL))
+			fatalerror("Unknown PCB type \"%s\"", astring_c(&pcb_name));
+	}
+	else
+	{
+		/* no device loaded; use the default */
+		pcb_type = (config->pcb_types[0].name != NULL) ? &config->pcb_types[0] : NULL;
+	}
+	return pcb_type;
+}
+
+/*-------------------------------------------------
+    DEVICE_IMAGE_GET_DEVICES(cartslot)
+-------------------------------------------------*/
+static DEVICE_IMAGE_GET_DEVICES(multicartslot)
+{
+	const multicartslot_pcb_type *pcb_type;
+	device_t *device = &image.device();
+
+	pcb_type = identify_pcb(image);
+	if (pcb_type != NULL)
+	{
+		image_add_device_with_subdevices(device,pcb_type->devtype,TAG_PCB,0);
+	}
+}
+
 
 /*-------------------------------------------------
     find_file
@@ -605,4 +756,133 @@ void multicart_close(emu_options &options, multicart_t *cart)
 {
 	save_ram_resources(options, cart);
 	pool_free_lib(cart->data->pool);
+}
+
+/*-------------------------------------------------
+    DEVICE_START( multicartslot )
+-------------------------------------------------*/
+
+static DEVICE_START( multicartslot )
+{
+	const multicartslot_config *config = get_config(device);
+
+	/* if this cartridge has a custom DEVICE_START, use it */
+	if (config->device_start != NULL)
+	{
+		(*config->device_start)(device);
+	}
+}
+
+
+/*-------------------------------------------------
+    DEVICE_IMAGE_LOAD( cartslot )
+-------------------------------------------------*/
+
+static DEVICE_IMAGE_LOAD( multicartslot )
+{
+	device_t *device = &image.device();
+	const multicartslot_config *config = get_config(device);
+
+	/* if this cartridge has a custom DEVICE_IMAGE_LOAD, use it */
+	if (config->device_load != NULL)
+		return (*config->device_load)(image);
+
+	/* otherwise try the normal route */
+	return IMAGE_INIT_PASS;
+}
+
+
+/*-------------------------------------------------
+    DEVICE_IMAGE_UNLOAD( multicartslot )
+-------------------------------------------------*/
+
+static DEVICE_IMAGE_UNLOAD( multicartslot )
+{
+	device_t *device = &image.device();
+	const multicartslot_config *config = get_config(device);
+
+	/* if this cartridge has a custom DEVICE_IMAGE_UNLOAD, use it */
+	if (config->device_unload != NULL)
+	{
+		(*config->device_unload)(image);
+		return;
+	}
+}
+/*-------------------------------------------------
+    DEVICE_GET_INFO( multicartslot )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( multicartslot )
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(multicartslot_t); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = sizeof(multicartslot_config); break;
+		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_CARTSLOT; break;
+		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0; break;
+		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = 0; break;
+		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:		info->i = 1; break;
+		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:      info->i = 0; break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(multicartslot);					break;
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(multicartslot);		break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(multicartslot);		break;
+		case DEVINFO_FCT_IMAGE_GET_DEVICES:			info->f = (genf *) DEVICE_IMAGE_GET_DEVICES_NAME(multicartslot);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:						strcpy(info->s, "MultiCartslot"); break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "MultiCartslot"); break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config(device)->extensions )
+			{
+				strcpy(info->s, get_config(device)->extensions);
+			}
+			else
+			{
+				strcpy(info->s, "bin");
+			}
+			break;
+	}
+}
+
+DEFINE_LEGACY_IMAGE_DEVICE(MULTICARTSLOT, multicartslot);
+
+//**************************************************************************
+//  DEVICE CARTSLOT INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_cart_slot_interface - constructor
+//-------------------------------------------------
+
+device_cart_slot_interface::device_cart_slot_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device)
+{
+}
+
+
+//-------------------------------------------------
+//  ~device_cart_slot_interface - destructor
+//-------------------------------------------------
+
+device_cart_slot_interface::~device_cart_slot_interface()
+{
+}
+
+//**************************************************************************
+//  LIVE LEGACY cart_slot DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  legacy_cart_slot_device_base - constructor
+//-------------------------------------------------
+
+legacy_cart_slot_device_base::legacy_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config)
+	: legacy_device_base(mconfig, type, tag, owner, clock, get_config),
+	  device_cart_slot_interface(mconfig, *this)
+{
 }
