@@ -23,6 +23,7 @@ TODO (general):
 	- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
 
 TODO (game-specific):
+	- Airline Pilots: Returns error 03 on Naomi logo, inputs are unimplemented;
 	- Ferrari 355 Challenge: dies at the network check;
 	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
 	(more will come up soon ...)
@@ -1540,7 +1541,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6c07) AM_MIRROR(0x02000000) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mdstar_r, sb_mdstar_w, U64(0xffffffff00000000) )
 	AM_RANGE(0x005f6c10, 0x005f6c17) AM_MIRROR(0x02000000) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mden_r, sb_mden_w, U64(0xffffffff00000000) )
 	AM_RANGE(0x005f6c18, 0x005f6c1f) AM_MIRROR(0x02000000) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mdst_r, sb_mdst_w, U64(0x00000000ffffffff) )
@@ -1549,8 +1550,8 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_READWRITE( pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
 	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE( dc_rtc_r, dc_rtc_w )
@@ -1560,6 +1561,10 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM	// Naomi 2 BIOS tests this, needs to read back as written
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
+//	AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
+//	AM_RANGE(0x025f7c00, 0x025f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x025f8000, 0x025f9fff) AM_READWRITE( pvr2_ta_r, pvr2_ta_w )
+
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE( &dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
@@ -1567,8 +1572,10 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_BASE( &pvr2_framebuffer_ram )// 64 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	AM_RANGE(0x085f8000, 0x085f9fff) AM_READWRITE( pvr2_ta_r, pvr2_ta_w ) // 2nd PVR registers
+	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE( dc_sysctrl_w ) // writes to BOTH PVRs
+	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE( pvrs_ta_w ) // writes to BOTH PVRs
 	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32( elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
+//	AM_RANGE(0x09000000, 0x09??????) T&L command processing
     AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_BASE( &elan_ram ) // T&L chip RAM
 
 	/* Area 3 */

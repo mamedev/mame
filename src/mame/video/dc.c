@@ -2662,15 +2662,25 @@ READ32_HANDLER( elan_regs_r )
 {
 	switch(offset)
 	{
-		case 0: // ID chip (TODO: BIOS crashes / gives a black screen with this as per now!)
+		case 0x00/4: // ID chip (TODO: BIOS crashes / gives a black screen with this as per now!)
 			return 0xe1ad0000;
-
-		case 0x04/4:
-			return 0x12;
-		case 0x14/4:
-			return 0x2029;
-		case 0x74/4:
-			return space->machine().rand() & 0x3f;
+		case 0x04/4: // REVISION
+			return 0x12; //or 0x01?
+		case 0x10/4: // SH4 interface control (???)
+			/* ---- -x-- enable second PVR */
+			/* ---- --x- elan has channel 2 */
+			/* ---- ---x broadcast on cs1 (?) */
+			return 6;
+		case 0x14/4: // SDRAM refresh register
+			return 0x2029; //default 0x1429
+		case 0x1c/4: // SDRAM CFG
+			return 0xa7320961; //default 0xa7320961
+		case 0x30/4: // Macro tiler configuration, bit 0 is enable
+			return 0;
+		case 0x74/4: // IRQ STAT
+			return 0;
+		case 0x78/4: // IRQ MASK
+			return 0;
 		default:
 			printf("%08x %08x\n",cpu_get_pc(&space->device()),offset*4);
 			break;
@@ -2681,5 +2691,18 @@ READ32_HANDLER( elan_regs_r )
 
 WRITE32_HANDLER( elan_regs_w )
 {
-	// ...
+	switch(offset)
+	{
+		default:
+			printf("%08x %08x %08x W\n",cpu_get_pc(&space->device()),offset*4,data);
+			break;
+	}
+}
+
+
+WRITE64_HANDLER( pvrs_ta_w )
+{
+	pvr_ta_w(space,offset,data,mem_mask);
+	pvr2_ta_w(space,offset,data,mem_mask);
+	//printf("PVR2 %08x %08x\n",reg,dat);
 }

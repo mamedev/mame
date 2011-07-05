@@ -212,6 +212,8 @@ READ64_HANDLER( pvr_ta_r );
 WRITE64_HANDLER( pvr_ta_w );
 READ64_HANDLER( pvr2_ta_r );
 WRITE64_HANDLER( pvr2_ta_w );
+READ64_HANDLER( pvrs_ta_r );
+WRITE64_HANDLER( pvrs_ta_w );
 READ32_HANDLER( elan_regs_r );
 WRITE32_HANDLER( elan_regs_w );
 WRITE64_HANDLER( ta_fifo_poly_w );
