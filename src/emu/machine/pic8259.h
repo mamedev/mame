@@ -29,7 +29,6 @@
 #include "devcb.h"
 
 DECLARE_LEGACY_DEVICE(PIC8259, pic8259);
-DECLARE_LEGACY_DEVICE(PIC8259A, pic8259a);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -54,9 +53,6 @@ struct pic8259_interface
 	MCFG_DEVICE_ADD(_tag, PIC8259, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_PIC8259A_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, PIC8259A, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
 
 /* device interface */
 READ8_DEVICE_HANDLER( pic8259_r );
