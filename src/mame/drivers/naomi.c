@@ -23,10 +23,15 @@ TODO (general):
 	- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
 
 TODO (game-specific):
+	- 18th Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
 	- Airline Pilots: Returns error 03 on Naomi logo, inputs are unimplemented;
+	- Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
 	- Ferrari 355 Challenge: dies at the network check;
+	- OutTrigger: crashes on naomibd_r();
+	- Samba de Amigo: doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related);
 	- Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
 	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
+	- Virtua Tennis: dies when accessing the gameplay or the attract mode (core bug, most likely);
 	(more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1944,7 +1949,7 @@ static INPUT_PORTS_START( dybbnao )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A2")
-	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_PLAYER(1)
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_REVERSE PORT_PLAYER(1)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A4")
@@ -1956,7 +1961,7 @@ static INPUT_PORTS_START( dybbnao )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A6")
-	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_PLAYER(2)
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_REVERSE PORT_PLAYER(2)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -2015,6 +2020,41 @@ static INPUT_PORTS_START( jambo )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shift Down")
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Shift Up")
 	PORT_BIT( 0xcfff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A2")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( 18wheelr )
+	PORT_INCLUDE( naomi_mie )
+	PORT_INCLUDE( naomi_debug )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("View")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Horn")
+	PORT_BIT( 0x6dff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	// TODO: this is a tri-state shift lever, arrangement can be better.
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Shift H")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shift L")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shift R")
+	PORT_BIT( 0xc7ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A0")
 	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
@@ -7357,12 +7397,12 @@ ROM_END
 /* 0016 */ GAME( 1999, derbyoc,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club (JPN, USA, EXP, KOR, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0017 */ GAME( 1999, otrigger, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "OutTrigger (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0018 */ GAME( 1999, sgtetris, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Sega Tetris", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0019 */ GAME( 1999, dybb99,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Dynamite Baseball '99 (JPN) / World Series '99 (USA, EXP, KOR, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0019 */ GAME( 1999, dybb99,   naomi,    naomi,   dybbnao,  naomi,    ROT0, "Sega", "Dynamite Baseball '99 (JPN) / World Series '99 (USA, EXP, KOR, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0020 */ GAME( 1999, samba,    naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Samba De Amigo (JPN) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0021 */ GAME( 2000, virnbao,  virnba,   naomi,   naomi,    naomi,    ROT0, "Sega", "Virtua NBA (JPN, USA, EXP, KOR, AUS) (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0021-01 */ GAME( 2000,virnba, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0022 Touch de Uno! 2
-/* 0023 */ GAME( 2000, 18wheelr, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "18 Wheeler Deluxe (Rev A) (JPN)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0023 */ GAME( 2000, 18wheelr, naomi,    naomi,   18wheelr, naomi,    ROT0, "Sega", "18 Wheeler Deluxe (Rev A) (JPN)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0025 Mars TV
 /* 0026 */ GAME( 2000, totd,     naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "The Typing of the Dead (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0027 */ GAME( 2000, smarinef, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Sega Marine Fishing", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
