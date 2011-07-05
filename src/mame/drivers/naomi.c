@@ -23,7 +23,7 @@ TODO (general):
 	- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
 
 TODO (game-specific):
-	- The House of the Dead 2: missing lightgun (shooting/reload works), game uses an earlier PVR so it has extra gfx issues;
+	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
 	(more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1836,6 +1836,43 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x400f, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hotd2 )
+	PORT_INCLUDE( naomi_mie )
+	PORT_INCLUDE( naomi_debug )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Trigger") PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Screen-In") PORT_PLAYER(1) //reload
+	PORT_BIT( 0x7cff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Trigger") PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Screen-In") PORT_PLAYER(2) //reload
+	PORT_BIT( 0x7cff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0xff00, 0x8000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A2")
+	PORT_BIT( 0xff00, 0x8000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A3")
+	PORT_BIT( 0xff00, 0x8000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* JVS mahjong panel */
@@ -7147,8 +7184,8 @@ ROM_END
 /* GDROM */ GAME( 2001, naomigd,  0,        naomi,   naomi,    naomi,   ROT0, "Sega", "Naomi GD-ROM Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 /* 834-xxxxx (Sega Naomi cart with game specific BIOS sets) */
-/* 13636 */ GAME( 1998, hotd2,    hod2bios, naomi,   naomi,    hotd2,   ROT0, "Sega", "House of the Dead 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
-/* 13636 */ GAME( 1998, hotd2o,   hotd2,    naomi,   naomi,    hotd2,   ROT0, "Sega", "House of the Dead 2 (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
+/* 13636 */ GAME( 1998, hotd2,    hod2bios, naomi,   hotd2,    hotd2,   ROT0, "Sega", "House of the Dead 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
+/* 13636 */ GAME( 1998, hotd2o,   hotd2,    naomi,   hotd2,    hotd2,   ROT0, "Sega", "House of the Dead 2 (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
 /* 13842 */ GAME( 1999, f355,     f355bios, naomi,   naomi,    0,       ROT0, "Sega", "Ferrari F355 Challenge", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
 /* 13950 */ GAME( 1999, f355twin, f355bios, naomi,   naomi,    0,       ROT0, "Sega", "Ferrari F355 Challenge (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
 
