@@ -99,6 +99,14 @@ ROM_START( cristals )
 	ROM_LOAD32_WORD("u73 - (b0d2564e).bin", 0x0000002, 0x0400000, CRC(b52cac8a) SHA1(65bb5d73933df6d53a079e4efe00ea29649e3201) )
 ROM_END
 
+ROM_START( indianmm )
+	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("indianmm.u86", 0x0000000, 0x0400000, CRC(db13eaf5) SHA1(c2e743b72c2a280266d55642e40c3a7a740052db) )
+	ROM_LOAD32_WORD("indianmm.u73", 0x0000002, 0x0400000, CRC(a5e3dca5) SHA1(e585841064dc98398169bcd0cd04269bbcfaf77c) )
+	ROM_LOAD32_WORD("indianmm.u85", 0x0800000, 0x0400000, CRC(988f10da) SHA1(9c21cb8ebebcd603b25329331de89e9aaa36368a) )
+	ROM_LOAD32_WORD("indianmm.u72", 0x0800002, 0x0400000, CRC(efe15e58) SHA1(8ae7b1436664189a5d07f523d41611bca6d1936c) )
+ROM_END
+
 ROM_START( wheregld )
 	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("u86.bin", 0x0000000, 0x0400000, CRC(d09fd746) SHA1(6c805f7c535a6c08a836b94c0351d498751ac9e9) )
@@ -117,6 +125,14 @@ ROM_START( whalecsh )
 	ROM_LOAD32_WORD("u72.bin", 0x0800002, 0x0400000, CRC(e799e162) SHA1(aad5d6bff8afcb7f208326c4a663e8462d753f9f) )
 ROM_END
 
+ROM_START( wildways )
+	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("u86 - (00257141).bin", 0x0000000, 0x0400000, CRC(2968765c) SHA1(ba2c67c4be4063d8506cc8127c31b4df2609650b) )
+	ROM_LOAD32_WORD("u73 - (e7e29273).bin", 0x0000002, 0x0400000, CRC(a1e0d77e) SHA1(df4d45d8c4dcfdb1fae4b5d5a0adfa0464c61828) )
+	ROM_LOAD32_WORD("u85 - (101d515b).bin", 0x0800000, 0x0400000, CRC(d87426d5) SHA1(ba755f8fc426dcd8abf4f6ccee423ae0504bf6fe) )
+	ROM_LOAD32_WORD("u72 - (0f0e787b).bin", 0x0800002, 0x0400000, CRC(5f2c30d1) SHA1(dfc68903e8375597477acc2fc403dcd9b838ae6c) )
+ROM_END
+
 ROM_START( thaiprin )
 	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("thai princess (u86] -27v322.bin", 0x0000000, 0x0400000, CRC(3cb5124b) SHA1(70f6d66793c433054557da4c9f2f033bbb640bd6) )
@@ -125,23 +141,17 @@ ROM_START( thaiprin )
 	ROM_LOAD32_WORD("thai princess (u72) -27v322.bin", 0x0800002, 0x0100000, BAD_DUMP CRC(613cea6b) SHA1(f04a3ee53074b7cd84879d752df5dbb80437475e) ) // wrong size?!
 ROM_END
 
-ROM_START( indianmm )
-	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("indianmm.u86", 0x0000000, 0x0400000, CRC(db13eaf5) SHA1(c2e743b72c2a280266d55642e40c3a7a740052db) )
-	ROM_LOAD32_WORD("indianmm.u73", 0x0000002, 0x0400000, CRC(a5e3dca5) SHA1(e585841064dc98398169bcd0cd04269bbcfaf77c) )
-	ROM_LOAD32_WORD("indianmm.u85", 0x0800000, 0x0400000, CRC(988f10da) SHA1(9c21cb8ebebcd603b25329331de89e9aaa36368a) )
-	ROM_LOAD32_WORD("indianmm.u72", 0x0800002, 0x0400000, CRC(efe15e58) SHA1(8ae7b1436664189a5d07f523d41611bca6d1936c) )
-ROM_END
 
 GAME( 200?, aristmk6,  0,          aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Aristocrat MK-6 Base", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT) // 15011025
 GAME( 200?, antcleo,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Antony and Cleopatra", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10177211
 GAME( 200?, 50lions,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "50 Lions", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10156111
 GAME( 200?, choysun,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Choy Sun Doa", GAME_NOT_WORKING | GAME_NO_SOUND ) // 20131511
 GAME( 200?, cristals,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Cristal Springs", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10155811
+GAME( 200?, indianmm,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Indian Dreaming (Maximillion$ Jackpot Version)", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10130711
 GAME( 200?, wheregld,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Wheres The Gold", GAME_NOT_WORKING | GAME_NO_SOUND ) // 20177111
 GAME( 200?, whalecsh,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Whales Of Cash", GAME_NOT_WORKING | GAME_NO_SOUND ) // 20155711
+GAME( 200?, wildways,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Wild Ways", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10130111
 GAME( 200?, thaiprin,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Thai Princess", GAME_NOT_WORKING | GAME_NO_SOUND ) // 30127721
-GAME( 200?, indianmm,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Indian Dreaming (Maximillion$ Jackpot Version)", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10130711
 
 /* Other Games on this HW (are any dumped?)
 
