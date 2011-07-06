@@ -53,6 +53,7 @@ struct _romload_private
 
 	running_machine *m_machine;			/* machine object where needed */
 	int				system_bios;		/* the system BIOS we wish to load */
+	int				default_bios;		/* the default system BIOS */
 
 	int				warnings;			/* warning count during processing */
 	int				knownbad;			/* BAD_DUMP/NO_DUMP count during processing */
@@ -377,7 +378,7 @@ static void determine_bios_rom(rom_load_data *romdata)
 			/* set to default */
 			romdata->system_bios = default_no;
 		}
-
+		romdata->default_bios = default_no;
 		LOG(("Using System BIOS: %d\n", romdata->system_bios));
 	}
 }
@@ -1581,4 +1582,23 @@ int rom_load_warnings(running_machine &machine)
 int rom_load_knownbad(running_machine &machine)
 {
 	return machine.romload_data->knownbad;
+}
+
+
+/*-------------------------------------------------
+    rom_system_bios - return id of selected bios
+-------------------------------------------------*/
+
+int rom_system_bios(running_machine &machine)
+{
+	return machine.romload_data->system_bios;
+}
+
+/*-------------------------------------------------
+    rom_default_bios - return id of default bios
+-------------------------------------------------*/
+
+int rom_default_bios(running_machine &machine)
+{
+	return machine.romload_data->default_bios;
 }
