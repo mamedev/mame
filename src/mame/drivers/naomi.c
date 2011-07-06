@@ -28,6 +28,7 @@ TODO (general):
 	* Samba de Amigo
 	* Samba de Amigo Ver. 2000
 	* Shootout Pool
+	* Shootout Pool Medal
 	* Shootout Pool Prize
 	* Virtual On
 	* WWF Royal Rumble
@@ -44,6 +45,7 @@ TODO (general):
 
 TODO (game-specific):
 	- 18th Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
+	- Airline Pilots Deluxe: returns error 03
 	- Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
 	- Ferrari 355 Challenge: dies at the network check;
 	- Giant Gram 2: no VMU emulation;
@@ -2214,10 +2216,33 @@ INPUT_PORTS_END
 /* JVS mahjong panel */
 static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_mie )
+	PORT_INCLUDE( naomi_debug )
 
-	PORT_START("IN0")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_START("P1") /* inputs are all there, it needs a mux write mechanism of some sort ... */
+	PORT_DIPNAME( 0x0100, 0x0000, "SYSA" )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
 
 	PORT_START("KEY1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) //TODO: mahjong panel test & service buttons are presumably here
@@ -2258,8 +2283,6 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_H )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
-
-	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
 
 // Atomiswave - inputs are read as standard Dreamcast controllers.
