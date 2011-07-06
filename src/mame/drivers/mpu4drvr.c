@@ -183,6 +183,8 @@ TODO:
 #include "video/mc6845.h"
 #include "video/resnet.h"
 #include "machine/nvram.h"
+#include "crmaze2p.lh"
+#include "crmaze4p.lh"
 
 #ifdef MAME_DEBUG
 #define MPU4VIDVERBOSE 1
@@ -2338,7 +2340,7 @@ static void scn2674_line(running_machine &machine)
 	}
 
 	// should be triggered at the start of each ROW (line zero for that row)
-	if ((state->m_linecounter)%8 == 0)
+	if (( state->m_linecounter%8 == 0)&& (state->m_linecounter < 297) )
 	{
 		state->m_scn2674_status_register |= 0x08;
 		if (state->m_scn2674_irq_mask&0x08)
@@ -2348,11 +2350,11 @@ static void scn2674_line(running_machine &machine)
 			state->m_scn2674_irq_register |= 0x08;
 			update_mpu68_interrupts(machine);
 		}
-			state->m_rowcounter = ((state->m_rowcounter+1)% 38);//Not currently used
+			state->m_rowcounter = ((state->m_rowcounter+1)% 37);//Not currently used
 	}
 
 	// this is ROWS not scanlines!!
-	if (state->m_linecounter == state->m_IR12_scn2674_split_register_1*8)
+	if ((state->m_linecounter == state->m_IR12_scn2674_split_register_1*8)&&(state->m_linecounter != 0))
 	/* Split Screen 1 */
 	{
 		if (state->m_scn2674_spl1)
@@ -2362,16 +2364,17 @@ static void scn2674_line(running_machine &machine)
 		state->m_scn2674_status_register |= 0x04;
 		if (state->m_scn2674_irq_mask&0x04)
 		{
+						machine.primary_screen->update_partial(state->m_linecounter);
 			state->m_scn2674_irq_register |= 0x04;
 			LOG2674(("SCN2674 Split Screen 1\n"));
 			state->m_scn2674_irq_state = 1;
 			update_mpu68_interrupts(machine);
-			machine.primary_screen->update_partial(state->m_linecounter);
+//			machine.primary_screen->update_partial(state->m_linecounter);
 		}
 	}
 
 	// this is in ROWS not scanlines!!!
-	if (state->m_linecounter == state->m_IR13_scn2674_split_register_2*8)
+	if ((state->m_linecounter == state->m_IR13_scn2674_split_register_2*8)&&(state->m_linecounter != 0))
 	/* Split Screen 2 */
 	{
 		if (state->m_scn2674_spl2)
@@ -2381,11 +2384,12 @@ static void scn2674_line(running_machine &machine)
 		state->m_scn2674_status_register |= 0x01;
 		if (state->m_scn2674_irq_mask&0x01)
 		{
+			machine.primary_screen->update_partial(state->m_linecounter);
 			LOG2674(("SCN2674 Split Screen 2 irq\n"));
 			state->m_scn2674_irq_state = 1;
 			state->m_scn2674_irq_register |= 0x01;
 			update_mpu68_interrupts(machine);
-			machine.primary_screen->update_partial(state->m_linecounter);
+			//machine.primary_screen->update_partial(state->m_linecounter);
 		}
 	}
 
@@ -2410,17 +2414,20 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
 	mpu4_state *state = timer.machine().driver_data<mpu4_state>();
 
+	//This represents the scanline counter in the SCN2674. Note that we ignore the horizontal blanking
+
 	if ((state->m_scn2674_display_enabled_scanline)&&(!state->m_scn2674_display_enabled))
 	{
 		state->m_scn2674_display_enabled = 1;
 	}
-
 	if (state->m_scn2674_display_enabled)
 	{
-		state->m_linecounter = ((state->m_linecounter+1)%313);
-		//This represents the scanline counter in the SCN2674. Note that we ignore the horizontal blanking
+		state->m_linecounter =param;
 	}
-
+	else
+	{
+		state->m_linecounter =296;//hold the counter in the vsync point, it's not clear whether this is done or not
+	}
 	scn2674_line(timer.machine());
 	timer.machine().scheduler().synchronize();
 
@@ -3590,17 +3597,17 @@ GAME( 199?,  bctvidbs,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest"
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
 The AMLD versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
 
-GAME( 1993,  crmaze,    bctvidbs, crmaze,   crmaze,   crmaze,   ROT0, "Barcrest",		"The Crystal Maze (v1.3)",											GAME_NOT_WORKING )//SWP 0.9
-GAME( 1993,  crmazed,   crmaze,   crmaze,   crmaze,   crmaze,   ROT0, "Barcrest",		"The Crystal Maze (v1.3, Datapak)",									GAME_NOT_WORKING )//SWP 0.9D
-GAME( 1993,  crmazea,   crmaze,   crmaze,   crmaze,   crmazea,  ROT0, "Barcrest",		"The Crystal Maze (v0.1, AMLD)",									GAME_NOT_WORKING )//SWP 0.9
+GAMEL( 1993,  crmaze,    bctvidbs, crmaze,   crmaze,   crmaze,   ROT0, "Barcrest",		"The Crystal Maze (v1.3)",											GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993,  crmazed,   crmaze,   crmaze,   crmaze,   crmaze,   ROT0, "Barcrest",		"The Crystal Maze (v1.3, Datapak)",									GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9D
+GAMEL( 1993,  crmazea,   crmaze,   crmaze,   crmaze,   crmazea,  ROT0, "Barcrest",		"The Crystal Maze (v0.1, AMLD)",									GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9
 
-GAME( 1993,  crmaze2,   bctvidbs, crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2)",					GAME_NOT_WORKING )//SWP 1.0
-GAME( 1993,  crmaze2d,  crmaze2,  crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak)",		GAME_NOT_WORKING )//SWP 1.0D
-GAME( 1993,  crmaze2a,  crmaze2,  crmaze,   crmaze,   crmaze2a, ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD)",			GAME_NOT_WORKING )//SWP 1.0 /* unprotected? proto? */
+GAMEL( 1993,  crmaze2,   bctvidbs, crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2)",					GAME_NOT_WORKING,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993,  crmaze2d,  crmaze2,  crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak)",		GAME_NOT_WORKING,layout_crmaze4p )//SWP 1.0D
+GAMEL( 1993,  crmaze2a,  crmaze2,  crmaze,   crmaze,   crmaze2a, ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD)",			GAME_NOT_WORKING,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
 
-GAME( 1994,  crmaze3,   bctvidbs, crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9)",							GAME_NOT_WORKING )//SWP 0.7
-GAME( 1994,  crmaze3d,  crmaze3,  crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9, Datapak)",					GAME_NOT_WORKING )//SWP 0.7D
-GAME( 1994,  crmaze3a,  crmaze3,  crmaze,   crmaze,   crmaze3a, ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v1.2, AMLD)",						GAME_NOT_WORKING )//SWP 0.7
+GAMEL( 1994,  crmaze3,   bctvidbs, crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9)",							GAME_NOT_WORKING,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994,  crmaze3d,  crmaze3,  crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9, Datapak)",					GAME_NOT_WORKING,layout_crmaze4p )//SWP 0.7D
+GAMEL( 1994,  crmaze3a,  crmaze3,  crmaze,   crmaze,   crmaze3a, ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v1.2, AMLD)",						GAME_NOT_WORKING,layout_crmaze4p )//SWP 0.7
 
 GAME( 199?,  turnover,  bctvidbs, mpu4_vid, turnover, turnover, ROT0, "Barcrest",		"Turnover (v2.3)",													GAME_NOT_WORKING )
 
