@@ -2041,9 +2041,29 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 
 	switch (packmode)
 	{
-		case 0x00:
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (0555 KRGB)\n",x,y,packmode);
-			break;
+		// used by ringout
+		case 0x00: //0555 KRGB
+		{
+			int xcnt,ycnt;
+			for (ycnt=0;ycnt<32;ycnt++)
+			{
+				UINT32 realwriteoffs = 0x05000000 + writeoffs + (y+ycnt) * (stride<<3) + (x*2);
+				src = BITMAP_ADDR32(fake_accumulationbuffer_bitmap, y+ycnt, x);
+
+
+				for (xcnt=0;xcnt<32;xcnt++)
+				{
+					// data starts in 8888 format, downsample it
+					UINT32 data = src[xcnt];
+					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+					                ((((data & 0x0000f800) >> 11)) << 5)  |
+									((((data & 0x00f80000) >> 19)) << 10);
+
+					space->write_word(realwriteoffs+xcnt*2, newdat);
+				}
+			}
+		}
+		break;
 
 		// used by cleoftp
 		case 0x01: //565 RGB 16 bit

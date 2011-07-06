@@ -25,7 +25,6 @@ TODO (general):
 	- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
 
 	- Following games doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related):
-	* Ringout 4x4 (needs cabinet to 4p)
 	* Samba de Amigo
 	* Samba de Amigo Ver. 2000
 	* Shootout Pool
@@ -50,6 +49,7 @@ TODO (game-specific):
 	- Giant Gram 2: no VMU emulation;
 	- Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
 	- OutTrigger: crashes on naomibd_r();
+	- Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
 	- Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
 	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
 	- The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
