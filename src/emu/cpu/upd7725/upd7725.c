@@ -230,7 +230,9 @@ void necdsp_device::state_string_export(const device_state_entry &entry, astring
 						  regs.flaga.c ? "C" : "c",
 						  regs.flaga.z ? "Z" : "z",
 						  regs.flaga.ov1 ? "OV1" : "ov1",
-						  regs.flaga.ov0 ? "OV0" : "ov0");
+						  regs.flaga.ov0 ? "OV0" : "ov0",
+						  regs.flaga.ov0p ? "OV0P" : "ov0p",
+						  regs.flaga.ov0pp ? "OV0PP" : "ov0pp");
 			break;
 
 		case UPD7725_FLAGB:
@@ -240,7 +242,9 @@ void necdsp_device::state_string_export(const device_state_entry &entry, astring
 						  regs.flagb.c ? "C" : "c",
 						  regs.flagb.z ? "Z" : "z",
 						  regs.flagb.ov1 ? "OV1" : "ov1",
-						  regs.flagb.ov0 ? "OV0" : "ov0");
+						  regs.flagb.ov0 ? "OV0" : "ov0",
+						  regs.flagb.ov0p ? "OV0P" : "ov0p",
+						  regs.flagb.ov0pp ? "OV0PP" : "ov0pp");
 			break;
 	}
 }
@@ -395,6 +399,8 @@ void necdsp_device::exec_op(UINT32 opcode) {
 	flag.s1 = 0;
 	flag.ov0 = 0;
 	flag.ov1 = 0;
+	flag.ov0p = 0;
+	flag.ov0pp = 0;
 
     switch(pselect) {
       case 0: p = dataRAM[regs.dp]; break;
