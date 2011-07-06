@@ -753,6 +753,16 @@ static void I386OP(mov_sreg_rm16)(i386_state *cpustate)		// Opcode 0x8e
 		selector = READ16(cpustate,ea);
 		CYCLES(cpustate,CYCLES_MOV_MEM_SREG);
 	}
+
+	if(s == SS)
+	{
+		if(cpustate->IF != 0) // if external interrupts are enabled
+		{
+			cpustate->IF = 0;  // reset IF for the next instruction
+			cpustate->delayed_interrupt_enable = 1;
+		}
+	}
+
 	cpustate->sreg[s].selector = selector;
 	i386_load_segment_descriptor(cpustate, s );
 }
@@ -947,7 +957,10 @@ static void I386OP(ins_generic)(i386_state *cpustate, int size)
 		break;
 	}
 
-	REG32(EDI) += ((cpustate->DF) ? -1 : 1) * size;
+	if(cpustate->address_size)
+		REG32(EDI) += ((cpustate->DF) ? -1 : 1) * size;
+	else
+		REG16(DI) += ((cpustate->DF) ? -1 : 1) * size;
 	CYCLES(cpustate,CYCLES_INS);	// TODO: Confirm this value
 }
 
@@ -994,7 +1007,10 @@ static void I386OP(outs_generic)(i386_state *cpustate, int size)
 		break;
 	}
 
-	REG32(ESI) += ((cpustate->DF) ? -1 : 1) * size;
+	if(cpustate->address_size)
+		REG32(ESI) += ((cpustate->DF) ? -1 : 1) * size;
+	else
+		REG16(SI) += ((cpustate->DF) ? -1 : 1) * size;
 	CYCLES(cpustate,CYCLES_OUTS);	// TODO: Confirm this value
 }
 
@@ -1550,7 +1566,7 @@ static void I386OP(std)(i386_state *cpustate)				// Opcode 0xfd
 
 static void I386OP(sti)(i386_state *cpustate)				// Opcode 0xfb
 {
-	cpustate->IF = 1;
+	cpustate->delayed_interrupt_enable = 1;  // IF is set after the next instruction.
 	CYCLES(cpustate,CYCLES_STI);
 }
 
@@ -2336,7 +2352,9 @@ static void I386OP(aam)(i386_state *cpustate)				// Opcode 0xd4
 
 static void I386OP(clts)(i386_state *cpustate)				// Opcode 0x0f 0x06
 {
-	// TODO: #GP(0) is executed
+	// Privileged instruction, CPL must be zero.  Can be used in real or v86 mode.
+	if(PROTECTED_MODE && cpustate->CPL != 0)
+		FAULT(FAULT_GP,0)
 	cpustate->cr[0] &= ~0x08;	/* clear TS bit */
 	CYCLES(cpustate,CYCLES_CLTS);
 }
@@ -2361,6 +2379,12 @@ static void I386OP(mov_r32_tr)(i386_state *cpustate)		// Opcode 0x0f 24
 static void I386OP(mov_tr_r32)(i386_state *cpustate)		// Opcode 0x0f 26
 {
 	FETCH(cpustate);
+	CYCLES(cpustate,1);		// TODO: correct cycle count
+}
+
+static void I386OP(loadall)(i386_state *cpustate)		// Opcode 0x0f 0x07 (0x0f 0x05 on 80286), undocumented
+{
+	popmessage("LOADALL instruction hit!");
 	CYCLES(cpustate,1);		// TODO: correct cycle count
 }
 

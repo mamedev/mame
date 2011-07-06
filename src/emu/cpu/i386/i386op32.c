@@ -1445,6 +1445,12 @@ static void I386OP(pop_gs32)(i386_state *cpustate)			// Opcode 0x0f a9
 
 static void I386OP(pop_ss32)(i386_state *cpustate)			// Opcode 0x17
 {
+	if(cpustate->IF != 0) // if external interrupts are enabled
+	{
+		cpustate->IF = 0;  // reset IF for the next instruction
+		cpustate->delayed_interrupt_enable = 1;
+	}
+
 	cpustate->sreg[SS].selector = POP32(cpustate);
 	if( PROTECTED_MODE ) {
 		i386_load_segment_descriptor(cpustate,SS);
@@ -3144,7 +3150,15 @@ static void I386OP(lsl_r32_rm32)(i386_state *cpustate)  // Opcode 0x0f 0x03
 	if(PROTECTED_MODE)
 	{
 		memset(&seg, 0, sizeof(seg));
-		seg.selector = LOAD_RM32(modrm);
+		if(modrm >= 0xc0)
+		{
+			seg.selector = LOAD_RM32(modrm);
+		}
+		else
+		{
+			UINT32 ea = GetEA(cpustate,modrm);
+			seg.selector = READ32(cpustate,ea);
+		}
 		if(seg.selector == 0)
 		{
 			SetZF(0);  // not a valid segment

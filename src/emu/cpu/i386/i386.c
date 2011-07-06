@@ -790,6 +790,12 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 
 	/* Load incoming task state from the new task's TSS */
 	tss = cpustate->task.base;
+	cpustate->ldtr.segment = READ16(cpustate,tss+0x2a) & 0xffff;
+	seg.selector = cpustate->ldtr.segment;
+	i386_load_protected_mode_segment(cpustate,&seg);
+	cpustate->ldtr.limit = seg.limit;
+	cpustate->ldtr.base = seg.base;
+	cpustate->ldtr.flags = seg.flags;
 	cpustate->eip = READ16(cpustate,tss+0x0e);
 	set_flags(cpustate,READ16(cpustate,tss+0x10));
 	REG16(AX) = READ16(cpustate,tss+0x12);
@@ -808,12 +814,6 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	i386_load_segment_descriptor(cpustate, SS);
 	cpustate->sreg[DS].selector = READ16(cpustate,tss+0x28) & 0xffff;
 	i386_load_segment_descriptor(cpustate, DS);
-	cpustate->ldtr.segment = READ16(cpustate,tss+0x2a) & 0xffff;
-	seg.selector = cpustate->ldtr.segment;
-	i386_load_protected_mode_segment(cpustate,&seg);
-	cpustate->ldtr.limit = seg.limit;
-	cpustate->ldtr.base = seg.base;
-	cpustate->ldtr.flags = seg.flags;
 
 	/* Set the busy bit in the new task's descriptor */
 	if(selector & 0x0004)
@@ -900,6 +900,12 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 
 	/* Load incoming task state from the new task's TSS */
 	tss = cpustate->task.base;
+	cpustate->ldtr.segment = READ32(cpustate,tss+0x60) & 0xffff;
+	seg.selector = cpustate->ldtr.segment;
+	i386_load_protected_mode_segment(cpustate,&seg);
+	cpustate->ldtr.limit = seg.limit;
+	cpustate->ldtr.base = seg.base;
+	cpustate->ldtr.flags = seg.flags;
 	cpustate->cr[3] = READ32(cpustate,tss+0x1c);  // CR3 (PDBR)
 	cpustate->eip = READ32(cpustate,tss+0x20);
 	set_flags(cpustate,READ32(cpustate,tss+0x24));
@@ -923,12 +929,6 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	i386_load_segment_descriptor(cpustate, FS);
 	cpustate->sreg[GS].selector = READ32(cpustate,tss+0x5c) & 0xffff;
 	i386_load_segment_descriptor(cpustate, GS);
-	cpustate->ldtr.segment = READ32(cpustate,tss+0x60) & 0xffff;
-	seg.selector = cpustate->ldtr.segment;
-	i386_load_protected_mode_segment(cpustate,&seg);
-	cpustate->ldtr.limit = seg.limit;
-	cpustate->ldtr.base = seg.base;
-	cpustate->ldtr.flags = seg.flags;
 
 	/* Set the busy bit in the new task's descriptor */
 	if(selector & 0x0004)
@@ -1055,8 +1055,9 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 		{
 			switch(desc.flags & 0x000f)
 			{
+			case 0x01:  // 286 Available TSS
 			case 0x09:  // 386 Available TSS
-				popmessage("JMP: Available TSS.");
+				logerror("JMP: Available 386 TSS at %08x\n",cpustate->pc);
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = segment;
 				i386_load_protected_mode_segment(cpustate,&desc);
@@ -1084,7 +1085,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				break;
 			case 0x04:  // 286 Call Gate
 			case 0x0c:  // 386 Call Gate
-				popmessage("JMP: Call gate.");
+				logerror("JMP: Call gate at %08x\n",cpustate->pc);
 				SetRPL = 1;
 				memset(&call_gate, 0, sizeof(call_gate));
 				call_gate.segment = segment;
@@ -1167,7 +1168,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				offset = call_gate.offset;
 				break;
 			case 0x05:  // Task Gate
-				popmessage("JMP: Task gate.");
+				logerror("JMP: Task gate at %08x\n",cpustate->pc);
 				memset(&call_gate, 0, sizeof(call_gate));
 				call_gate.segment = segment;
 				i386_load_call_gate(cpustate,&call_gate);
@@ -1205,7 +1206,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 						FAULT(FAULT_GP,call_gate.selector & 0xfffc)
 					}
 				}
-				if((call_gate.ar & 0x000f) == 0x0009)
+				if((call_gate.ar & 0x000f) == 0x0009 || (call_gate.ar & 0x000f) == 0x0001)
 				{
 					logerror("JMP: Task Gate TSS: Segment is not an available TSS.\n");
 					FAULT(FAULT_GP,call_gate.selector & 0xfffc)
@@ -1344,8 +1345,9 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 		{
 			switch(desc.flags & 0x000f)
 			{
+			case 0x01:  // Available 286 TSS
 			case 0x09:  // Available 386 TSS
-				logerror("CALL: Available TSS (386) at %08x\n",cpustate->pc);
+				logerror("CALL: Available TSS at %08x\n",cpustate->pc);
 				if(DPL < CPL)
 				{
 					logerror("CALL: TSS: DPL is less than CPL.\n");
@@ -2579,7 +2581,7 @@ static CPU_RESET( i386 )
 
 	cpustate->a20_mask = ~0;
 
-	cpustate->cr[0] = 0x7ffffff0; // reserved bits set to 1
+	cpustate->cr[0] = 0x7fffffe0; // reserved bits set to 1
 	cpustate->eflags = 0;
 	cpustate->eflags_mask = 0x00030000;
 	cpustate->eip = 0xfff0;
@@ -2657,6 +2659,11 @@ static CPU_EXECUTE( i386 )
 		debugger_instruction_hook(device, cpustate->pc);
 
 		i386_check_irq_line(cpustate);
+		if(cpustate->delayed_interrupt_enable != 0)
+		{
+			cpustate->IF = 1;
+			cpustate->delayed_interrupt_enable = 0;
+		}
 		I386OP(decode_opcode)(cpustate);
 	}
 	cpustate->tsc += (cycles - cpustate->cycles);
