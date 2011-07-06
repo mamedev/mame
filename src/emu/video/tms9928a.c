@@ -227,11 +227,6 @@ static void TMS9928A_start (running_machine &machine, const TMS9928a_interface *
 	state_save_register_item_pointer(machine, "tms9928a", NULL, 0, tms.vMem, intf->vram);
 }
 
-const rectangle *TMS9928A_get_visarea (void)
-{
-	return &tms.visarea;
-}
-
 
 void TMS9928A_post_load (running_machine &machine) {
 	int i;
@@ -376,12 +371,6 @@ static void change_register (running_machine &machine, int reg, UINT8 val) {
 /*
 ** Interface functions
 */
-
-#ifdef UNUSED_FUNCTION
-void TMS9928A_int_callback (void (*callback)(int)) {
-    tms.INTCallback = callback;
-}
-#endif
 
 void TMS9928A_set_spriteslimit (int limit) {
     tms.LimitSprites = limit;

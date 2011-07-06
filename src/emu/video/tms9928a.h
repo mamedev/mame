@@ -55,11 +55,6 @@ typedef struct TMS9928a_interface
 extern void TMS9928A_configure (const TMS9928a_interface *intf);
 
 /*
-** visible area query
-*/
-extern const rectangle *TMS9928A_get_visarea (void);
-
-/*
 ** reset function
 */
 extern void TMS9928A_reset (void);
@@ -83,12 +78,6 @@ extern SCREEN_UPDATE( tms9928a );
 ** to generate the necessary interrupts
 */
 int TMS9928A_interrupt (running_machine &machine);
-
-/*
-** The parameter is a function pointer. This function is called whenever
-** the state of the INT output of the TMS9918A changes.
-*/
-/*void TMS9928A_int_callback (void (*callback)(int));*/
 
 /*
 ** Set display of illegal sprites on or off
