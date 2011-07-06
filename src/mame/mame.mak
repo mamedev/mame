@@ -390,6 +390,7 @@ $(MAMEOBJ)/amiga.a: \
 
 $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/aristmk4.o \
+	$(DRIVERS)/aristmk6.o \
 	$(DRIVERS)/caswin.o \
 
 $(MAMEOBJ)/ascii.a: \
