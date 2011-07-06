@@ -49,6 +49,7 @@ TODO (game-specific):
 	- Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
 	- Ferrari 355 Challenge: dies at the network check;
 	- Giant Gram 2: no VMU emulation;
+	- Idol Janshi Suchie-Pai 3: returns "i/o board error" msg in game mode;
 	- Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
 	- OutTrigger: crashes on naomibd_r();
 	- Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
