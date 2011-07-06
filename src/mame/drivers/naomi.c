@@ -24,12 +24,32 @@ TODO (general):
 	- SH to ARM sound streaming doesn't work (used by ADX compression system)
 	- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
 
+	- Following games doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related):
+	* Ringout 4x4 (needs cabinet to 4p)
+	* Samba de Amigo
+	* Samba de Amigo Ver. 2000
+	* Shootout Pool
+	* Shootout Pool Prize
+	* Virtual On
+	* WWF Royal Rumble
+
+	- missing inputs (needs rotary channels):
+	* Crakin' DJ
+	* Inu no Osampo
+
+	- wrong JVS I/O specs, doesn't boot due of it:
+	* Derby Owners Club II
+	* Kick '4' Cash (hopper)
+	* Sega Marine Fishing
+	* Wave Runner GP
+
 TODO (game-specific):
 	- 18th Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
 	- Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
 	- Ferrari 355 Challenge: dies at the network check;
+	- Giant Gram 2: no VMU emulation;
+	- Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
 	- OutTrigger: crashes on naomibd_r();
-	- Samba de Amigo: doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related);
 	- Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
 	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
 	- The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
@@ -1852,6 +1872,31 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x400f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* Dummy so we can easily get the analog ch # */
+	PORT_START("A0")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0x01ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A2")
+	PORT_BIT( 0x02ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A3")
+	PORT_BIT( 0x03ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A4")
+	PORT_BIT( 0x04ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A5")
+	PORT_BIT( 0x05ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A6")
+	PORT_BIT( 0x06ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A7")
+	PORT_BIT( 0x07ff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotd2 )
@@ -2109,6 +2154,62 @@ static INPUT_PORTS_START( alpilota )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sstrkfgt )
+	PORT_INCLUDE( naomi_mie )
+	PORT_INCLUDE( naomi_debug )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Missile Button")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Air Break")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("View Change")
+	PORT_BIT( 0x7c3f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Elevator Wheel")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Aileron Wheel") PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A2")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A3")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Rudder Pedal")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( crackndj )
+	PORT_INCLUDE( naomi_mie )
+	PORT_INCLUDE( naomi_debug )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x7fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_REVERSE PORT_NAME("Fader")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 /* JVS mahjong panel */
 static INPUT_PORTS_START( naomi_mp )
@@ -7449,13 +7550,13 @@ ROM_END
 /* 0027 */ GAME( 2000, smarinef, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Sega Marine Fishing", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0028 */ GAME( 2000, vonot,    naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0030 */ GAME( 2000, qmegamis, naomi,    naomi,   naomi,    qmegamis, ROT0, "Sega", "Quiz Ah Megamisama (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0035 */ GAME( 2000, sstrkfgt, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Sega Strike Fighter (Rev A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0035 */ GAME( 2000, sstrkfgt, naomi,    naomi,   sstrkfgt, naomi,    ROT0, "Sega", "Sega Strike Fighter (Rev A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0037 18 Wheeler - American Pro Trucker
 /* 0039 */ GAME( 2000, gram2000, naomi,    naomi,   naomi,    gram2000, ROT0, "Sega", "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0040 */ GAME( 2000, wwfroyal, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "WWF Royal Rumble (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0041 */ GAME( 2000, slasho,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0042 */ GAME( 2001, f355twn2, f355bios, naomi,   naomi,    0,        ROT0, "Sega", "Ferrari F355 Challenge 2 (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
-/* 0043 */ GAME( 2000, crackndj, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Crackin' DJ", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0043 */ GAME( 2000, crackndj, naomi,    naomi,   crackndj, naomi,    ROT0, "Sega", "Crackin' DJ", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0044 */ GAME( 2000, csmasho,  csmash,   naomi,   naomi,    naomi,    ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0044 */ GAME( 2000, csmash,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0047 */ GAME( 2000, samba2k,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Samba de Amigo ver. 2000", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7468,7 +7569,7 @@ ROM_END
 /* 0088 */ GAME( 2001, derbyocw, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0088 */ GAME( 2001, drbyocwc, derbyocw, naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0098 */ GAME( 2002, shootopl, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Oinori-Daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128 */ GAME( 2002, shootpl,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomi,   naomi,    kick4csh, ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0150 MushiKing - The King Of Beetle
