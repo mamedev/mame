@@ -59,6 +59,7 @@ TODO (game-specific):
 	- Ferrari 355 Challenge: dies at the network check;
 	- Giant Gram 2: no VMU emulation;
 	- Idol Janshi Suchie-Pai 3: returns "i/o board error" msg in game mode;
+	- Monkey Ball: dies when attempts to load the gameplay;
 	- Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
 	- OutTrigger: crashes on naomibd_r();
 	- Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
@@ -2221,6 +2222,30 @@ static INPUT_PORTS_START( crackndj )
 
 	PORT_START("A0")
 	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_REVERSE PORT_NAME("Fader")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( monkeyba )
+	PORT_INCLUDE( naomi_mie )
+	PORT_INCLUDE( naomi_debug )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x7fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_REVERSE
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_REVERSE
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -7669,9 +7694,9 @@ ROM_END
 /* 0003  */ GAME( 2000, sprtjam,   naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Sports Jam (GDS-0003)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0004  */ GAME( 2000, slashout,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Slashout (GDS-0004)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0005  */ GAME( 2001, spkrbtl,   naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Spikers Battle (GDS-0005)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0006  */ GAME( 2001, vstrik3,   naomi2,   naomi2gd, naomi,   naomi2,   ROT0, "Sega", "Virtua Striker 3 (GDS-0006)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0006  */ GAME( 2001, vstrik3,   naomi2,   naomi2gd, naomi,   naomi2,     ROT0, "Sega", "Virtua Striker 3 (GDS-0006)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0007  Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
-/* 0008  */ GAME( 2001, monkeyba,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Monkey Ball (GDS-0008)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0008  */ GAME( 2001, monkeyba,  naomigd,  naomigd, monkeyba, naomigd,    ROT0, "Sega", "Monkey Ball (GDS-0008)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0009  Dynamic Golf / Virtua Golf
 /* 0009A */ GAME( 2001, dygolf,    naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Dynamic Golf / Virtua Golf (Rev A) (GDS-0009A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0010  */ GAME( 2001, wsbbgd,    naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Super Major League / World Series Baseball (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
