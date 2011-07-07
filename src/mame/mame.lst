@@ -6147,8 +6147,9 @@ montecar		// 035763-035780    1980/04 [6502]
 soccer			// 035222-035260    1980/04 [6502]
 
 // Atari "Missile Command hardware" games
-missile			// 035820-035825    (c) 1980
+missile			// 035820-035825    (c) 1980, 1 ROM update to rev 2 board
 missile2		// 035820-035825    (c) 1980
+missile1		// 035820-035825    (c) 1980
 suprmatk		//                  (c) 1980 + (c) 1981 Gencomp
 suprmatkd		//                  (c) 1980 + (c) 1981 Gencomp
 mcombat
