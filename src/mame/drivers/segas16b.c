@@ -7262,6 +7262,6 @@ GAME( 2006, isgsm,  0,      isgsm, isgsm,  isgsm,         ROT0,  "ISG", "ISG Sel
 
 /* 01 */ // ?? unknown
 /* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm, tetrbx, tetrbx,        ROT0,  "ISG", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
-/* 03 */ GAME( 2006, shinfz, isgsm,  isgsm, shinfz, shinfz,        ROT0,  "ISG", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
+/* 03 */ GAME( 2008, shinfz, isgsm,  isgsm, shinfz, shinfz,        ROT0,  "ISG", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 ) // claims it's released in 2006, but set includes the PS2/S16 remake of Fantasy Zone II which is clearly from 2008
 
 
