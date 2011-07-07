@@ -66,6 +66,7 @@ TODO (game-specific):
 	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
 	- The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
 	- Virtua Tennis: dies when accessing the gameplay or the attract mode (PVR or SH-4 bug, most likely);
+	- World Kicks / Gun Survivor 2: both crashes at POST;
 	(more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -7663,18 +7664,18 @@ ROM_END
 // 25869812 Mazan : Flash of the Blade
 
 /* GDS-xxxx (Sega GD-ROM games) */
-/* 0001  */ GAME( 2000, confmiss,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0001  */ GAME( 2000, confmiss,  naomigd,  naomigd, hotd2,    naomigd,    ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0002  Shakatto Tambourine
-/* 0003  */ GAME( 2000, sprtjam,   naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Sports Jam (GDS-0003)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0004  */ GAME( 2000, slashout,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Slashout (GDS-0004)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0005  */ GAME( 2001, spkrbtl,   naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Spikers Battle (GDS-0005)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0003  */ GAME( 2000, sprtjam,   naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Sports Jam (GDS-0003)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0004  */ GAME( 2000, slashout,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Slashout (GDS-0004)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0005  */ GAME( 2001, spkrbtl,   naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Spikers Battle (GDS-0005)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0006  */ GAME( 2001, vstrik3,   naomi2,   naomi2gd, naomi,   naomi2,   ROT0, "Sega", "Virtua Striker 3 (GDS-0006)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0007  Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
-/* 0008  */ GAME( 2001, monkeyba,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Monkey Ball (GDS-0008)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0008  */ GAME( 2001, monkeyba,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Monkey Ball (GDS-0008)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0009  Dynamic Golf / Virtua Golf
-/* 0009A */ GAME( 2001, dygolf,    naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Dynamic Golf / Virtua Golf (Rev A) (GDS-0009A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0010  */ GAME( 2001, wsbbgd,    naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Super Major League / World Series Baseball (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0011  */ GAME( 1999, vtennisg,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Virtua Tennis / Power Smash (GDS-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0009A */ GAME( 2001, dygolf,    naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Dynamic Golf / Virtua Golf (Rev A) (GDS-0009A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0010  */ GAME( 2001, wsbbgd,    naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Super Major League / World Series Baseball (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0011  */ GAME( 1999, vtennisg,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Virtua Tennis / Power Smash (GDS-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0012  */ GAME( 2001, vf4,       naomi2,   naomi2gd, naomi,   naomi2,   ROT0, "Sega", "Virtua Fighter 4 (GDS-0012)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0012A Virtua Fighter 4 (Rev A)
 /* 0012B */ GAME( 2001, vf4b,      vf4,      naomi2gd, naomi,   naomi2,   ROT0, "Sega", "Virtua Fighter 4 (Rev B) (GDS-0012B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7682,22 +7683,22 @@ ROM_END
 // 0013
 /* 0014  */ GAME( 2001, beachspi,  naomi2,   naomi2gd, naomi,   naomi2,   ROT0, "Sega", "Beach Spikers (GDS-0014)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0015  Virtua Tennis 2 / Power Smash 2
-/* 0015A */ GAME( 2001, vtennis2,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0016  */ GAME( 2001, shaktamb,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu (GDS-0016)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0017  */ GAME( 2001, keyboard,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "La Keyboard (GDS-0017)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0018  */ GAME( 2001, lupinsho,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Lupin The Third - The Shooting (GDS-0018)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0015A */ GAME( 2001, vtennis2,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0016  */ GAME( 2001, shaktamb,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu (GDS-0016)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0017  */ GAME( 2001, keyboard,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "La Keyboard (GDS-0017)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0018  */ GAME( 2001, lupinsho,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Lupin The Third - The Shooting (GDS-0018)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0018A Lupin The Third - The Shooting (Rev A)
-/* 0019  */ GAME( 2002, vathlete,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0019  */ GAME( 2002, vathlete,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0020  Initial D Arcade Stage
 // 0020A Initial D Arcade Stage (Rev A)
 /* 0020B */ GAME( 2002, initd,     naomi2,   naomi2gd, naomi,   naomi2,   ROT0, "Sega", "Initial D Arcade Stage (Rev B) (Japan) (GDS-0020B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0021  Lupin The Third - The Typing
-/* 0021A */ GAME( 2002, luptype,   naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Lupin The Third - The Typing (Rev A) (GDS-0021A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0022  */ GAME( 2002, mok,       naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "The Maze of the Kings (GDS-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0021A */ GAME( 2002, luptype,   naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Lupin The Third - The Typing (Rev A) (GDS-0021A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0022  */ GAME( 2002, mok,       naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "The Maze of the Kings (GDS-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0023  Naomi DIMM Firmware Updater
-/* 0023A */ GAME( 2001, ngdup23a,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev A) (GDS-0023A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0023A */ GAME( 2001, ngdup23a,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev A) (GDS-0023A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0023B Naomi DIMM Firmware Updater (Rev B)
-/* 0023C */ GAME( 2001, ngdup23c,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev C) (GDS-0023C)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0023C */ GAME( 2001, ngdup23c,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev C) (GDS-0023C)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0023D Naomi DIMM Firmware Updater (Rev D)
 // 0023E Naomi DIMM Firmware Updater (Rev E)
 // 0024  Virtua Fighter 4 Evolution
@@ -7711,7 +7712,7 @@ ROM_END
 // 0028
 // 0029  Club Kart Cycraft Edition
 // 0030
-/* 0031  */ GAME( 2003, puyofev,   naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Puyo Puyo Fever (GDS-0031)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0031  */ GAME( 2003, puyofev,   naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Puyo Puyo Fever (GDS-0031)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0032  Initial D Arcade Stage Ver. 3 (Japan)
 // 0032A Initial D Arcade Stage Ver. 3 (Japan) (Rev A)
 /* 0032B */ GAME( 2004, initdv3jb, initdv3j, naomigd, naomi,    naomi2,   ROT0, "Sega", "Initial D Arcade Stage Ver. 3 (Japan) (Rev. B) (GDS-0032B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
