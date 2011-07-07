@@ -26,17 +26,23 @@ TODO (general):
 
 	- Following games doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related):
 	* Death Crimson OX
+	* La Keyboard
+	* Lupin the Third
+	* Moeru Casinyo
 	* Puyo Puyo DA!
+	* Puyo Puyo Fever
 	* Samba de Amigo
 	* Samba de Amigo Ver. 2000
 	* Shootout Pool
 	* Shootout Pool Medal
 	* Shootout Pool Prize
+	* Usagi Yamashiro Hen
 	* Virtual On
 	* WWF Royal Rumble
 
 	- missing inputs (needs rotary channels):
 	* Crakin' DJ
+	* Dynamic Golf
 	* Inu no Osampo
 
 	- wrong JVS I/O specs, doesn't boot due of it:
@@ -58,6 +64,7 @@ TODO (game-specific):
 	- Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
 	- Ferrari 355 Challenge: dies at the network check;
 	- Giant Gram 2: no VMU emulation;
+	- Gun Survivor 2: crashes during game loading;
 	- Idol Janshi Suchie-Pai 3: returns "i/o board error" msg in game mode;
 	- Monkey Ball: dies when attempts to load the gameplay;
 	- Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
@@ -67,7 +74,7 @@ TODO (game-specific):
 	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
 	- The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
 	- Virtua Tennis: dies when accessing the gameplay or the attract mode (PVR or SH-4 bug, most likely);
-	- World Kicks / Gun Survivor 2: both crashes at POST;
+	- World Kicks: MAME crashes even before showing Naomi logo;
 	(more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -7699,7 +7706,7 @@ ROM_END
 /* 0008  */ GAME( 2001, monkeyba,  naomigd,  naomigd, monkeyba, naomigd,    ROT0, "Sega", "Monkey Ball (GDS-0008)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0009  Dynamic Golf / Virtua Golf
 /* 0009A */ GAME( 2001, dygolf,    naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Dynamic Golf / Virtua Golf (Rev A) (GDS-0009A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0010  */ GAME( 2001, wsbbgd,    naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Super Major League / World Series Baseball (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0010  */ GAME( 2001, wsbbgd,    naomigd,  naomigd, dybbnao,  naomigd,    ROT0, "Sega", "Super Major League / World Series Baseball (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0011  */ GAME( 1999, vtennisg,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Virtua Tennis / Power Smash (GDS-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0012  */ GAME( 2001, vf4,       naomi2,   naomi2gd, naomi,   naomi2,   ROT0, "Sega", "Virtua Fighter 4 (GDS-0012)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0012A Virtua Fighter 4 (Rev A)
@@ -7711,7 +7718,7 @@ ROM_END
 /* 0015A */ GAME( 2001, vtennis2,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0016  */ GAME( 2001, shaktamb,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu (GDS-0016)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0017  */ GAME( 2001, keyboard,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "La Keyboard (GDS-0017)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0018  */ GAME( 2001, lupinsho,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Lupin The Third - The Shooting (GDS-0018)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0018  */ GAME( 2001, lupinsho,  naomigd,  naomigd, hotd2,    naomigd,    ROT0, "Sega", "Lupin The Third - The Shooting (GDS-0018)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0018A Lupin The Third - The Shooting (Rev A)
 /* 0019  */ GAME( 2002, vathlete,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0020  Initial D Arcade Stage
@@ -7719,7 +7726,7 @@ ROM_END
 /* 0020B */ GAME( 2002, initd,     naomi2,   naomi2gd, naomi,   naomi2,   ROT0, "Sega", "Initial D Arcade Stage (Rev B) (Japan) (GDS-0020B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0021  Lupin The Third - The Typing
 /* 0021A */ GAME( 2002, luptype,   naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Lupin The Third - The Typing (Rev A) (GDS-0021A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0022  */ GAME( 2002, mok,       naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "The Maze of the Kings (GDS-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0022  */ GAME( 2002, mok,       naomigd,  naomigd, hotd2,    naomigd,    ROT0, "Sega", "The Maze of the Kings (GDS-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0023  Naomi DIMM Firmware Updater
 /* 0023A */ GAME( 2001, ngdup23a,  naomigd,  naomigd, naomi,    naomigd,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev A) (GDS-0023A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0023B Naomi DIMM Firmware Updater (Rev B)
@@ -7796,7 +7803,7 @@ ROM_END
 /* 0022  */ GAME( 2003, usagiym,   naomigd,  naomigd, naomi_mp, naomigd_mp,ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (GDL-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0023  Border Down
 /* 0023A */ GAME( 2003, bdrdown,   naomigd,  naomigd, naomi,    naomigd,  ROT0,   "G-Rev",        "Border Down (Rev A) (GDL-0023A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0024  */ GAME( 2003, psyvar2,   naomigd,  naomigd, naomi,    naomigd,  ROT270, "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0024  */ GAME( 2003, psyvar2,   naomigd,  naomigd, naomi,    naomigd,  ROT270, "Success",      "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0025  */ GAME( 2004, cfield,    naomigd,  naomigd, naomi,    naomigd,  ROT0,   "Able",         "Chaos Field (GDL-0025)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0026  */ GAME( 2004, trizeal,   naomigd,  naomigd, naomi,    naomigd,  ROT270, "Taito",        "Trizeal (GDL-0026)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0027  Melty Blood Act Cadenza?
