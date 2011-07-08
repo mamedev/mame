@@ -38,7 +38,7 @@ struct _mjkjidai_adpcm_state
 	UINT8 m_nibble;
 	UINT8 m_playing;
 	UINT8 *m_base;
-};
+} _mjkjidai_adpcm_state_dummy;
 
 static STREAM_UPDATE( mjkjidai_adpcm_callback )
 {

@@ -122,7 +122,7 @@ struct _renegade_adpcm_state
 	UINT8 m_nibble;
 	UINT8 m_playing;
 	UINT8 *m_base;
-};
+} _renegade_adpcm_state_dummy;
 
 DECLARE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
 
