@@ -318,14 +318,10 @@ void coin_lockout_global_w(running_machine &machine, int on)
 
 static astring nvram_filename(running_machine &machine, astring &result)
 {
-	if (rom_default_bios(machine) == rom_system_bios(machine)) {
+	if (rom_system_bios(machine) == 0 || rom_default_bios(machine) == rom_system_bios(machine)) {
 		result.printf("%s",machine.basename());
 	} else {
-		if (rom_system_bios(machine)!=0) {
-			result.printf("%s_%d",machine.basename(),rom_system_bios(machine) - 1);
-		} else {
-			result.printf("%s",machine.basename());
-		}
+		result.printf("%s_%d",machine.basename(),rom_system_bios(machine) - 1);
 	}
 	return result;
 }
