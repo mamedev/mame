@@ -321,7 +321,11 @@ static astring nvram_filename(running_machine &machine, astring &result)
 	if (rom_default_bios(machine) == rom_system_bios(machine)) {
 		result.printf("%s",machine.basename());
 	} else {
-		result.printf("%s_%d",machine.basename(),rom_system_bios(machine) - 1);
+		if (rom_system_bios(machine)!=0) {
+			result.printf("%s_%d",machine.basename(),rom_system_bios(machine) - 1);
+		} else {
+			result.printf("%s",machine.basename());
+		}
 	}
 	return result;
 }
