@@ -118,7 +118,7 @@ INT32 osd_scalable_lock_acquire(osd_scalable_lock *lock)
 		: [haslock] "+m"  (lock->slot[myslot].haslock)
 		, [tmp]     "=&r" (tmp)
 		:
-		: "%cc"
+		: "cc"
 	);
 #elif defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
 	register INT32 tmp;
@@ -239,7 +239,7 @@ void osd_lock_acquire(osd_lock *lock)
 				: [spin]   "+c"  (spin)
 				, [tmp]    "=&r" (tmp)
 				: [holder] "m"   (lock->holder)
-				: "%cc"
+				: "cc"
 			);
 #elif defined(__ppc__) || defined(__PPC__)
 			__asm__ __volatile__ (
