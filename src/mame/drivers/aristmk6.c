@@ -70,6 +70,7 @@ ROM_START( aristmk6 )
 ROM_END
 
 // note the 32-bit checksums listed don't appear to be CRC32s (or everything is badly dumped?)
+// they apparently come from the eeprom programmer, the chips are marked with the game ID number instead
 
 ROM_START( antcleo )
 	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
@@ -84,6 +85,14 @@ ROM_START( 50lions )
 	ROM_LOAD32_WORD("u86 - 570ba079.bin", 0x0000000, 0x0400000, CRC(c3791531) SHA1(b9c60be9624463eb591f2baf421ff90b8763449b) )
 	ROM_LOAD32_WORD("u73 - 35634c6d.bin", 0x0000002, 0x0400000, CRC(ec1b699b) SHA1(5a6ad7c7eb02443e42ee6a88525ae95a2b0a3195) )
 ROM_END
+
+#if 0
+ROM_START( 50lionsa )
+	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("10120511.u86", 0x0000000, 0x0400000, CRC(0e5c86f1) SHA1(84e329e664ace697f9ea4ace08612089e0964732) )
+	ROM_LOAD32_WORD("10120511.u73", 0x0000002, 0x0400000, CRC(1c1f2297) SHA1(13fb8c83d8ce2340ef554490c21a38da7b47c666) )
+ROM_END
+#endif
 
 ROM_START( choysun )
 	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
@@ -142,23 +151,24 @@ ROM_START( thaiprin )
 ROM_END
 
 
-GAME( 200?, aristmk6,  0,          aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Aristocrat MK-6 Base", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT) // 15011025
-GAME( 200?, antcleo,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Antony and Cleopatra", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10177211
-GAME( 200?, 50lions,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "50 Lions", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10156111
-GAME( 200?, choysun,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Choy Sun Doa", GAME_NOT_WORKING | GAME_NO_SOUND ) // 20131511
-GAME( 200?, cristals,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Cristal Springs", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10155811
-GAME( 200?, indianmm,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Indian Dreaming (Maximillion$ Jackpot Version)", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10130711
-GAME( 200?, wheregld,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Wheres The Gold", GAME_NOT_WORKING | GAME_NO_SOUND ) // 20177111
-GAME( 200?, whalecsh,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Whales Of Cash", GAME_NOT_WORKING | GAME_NO_SOUND ) // 20155711
-GAME( 200?, wildways,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Wild Ways", GAME_NOT_WORKING | GAME_NO_SOUND ) // 10130111
-GAME( 200?, thaiprin,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Thai Princess", GAME_NOT_WORKING | GAME_NO_SOUND ) // 30127721
+GAME( 200?, aristmk6,  0,          aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Aristocrat MK-6 Base (15011025)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT)
+GAME( 200?, antcleo,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Antony and Cleopatra (10177211)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, 50lions,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "50 Lions (set 1, 10156111)", GAME_NOT_WORKING | GAME_NO_SOUND )
+//GAME( 200?, 50lionsa,  50lions,    aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "50 Lions (set 2, 10120511)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, choysun,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Choy Sun Doa (20131511)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, cristals,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Cristal Springs (10155811)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, indianmm,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Indian Dreaming (10130711) (Maximillion$ Jackpot Version)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, wheregld,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Wheres The Gold (20177111)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, whalecsh,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Whales Of Cash (20155711)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, wildways,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Wild Ways (10130111)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, thaiprin,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Thai Princess (30127721)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /* Other Games on this HW (are any dumped?)
 
 	AFRICAN DUSK
 	GOLDEN PYRAMIDS (also on Mk5)
 	SPRING CARNIVAL
-	LOUISE OLD
+	LOUISE GOLD
 	BIG RED
 	KING OF THE NILE
 	GEISHA
