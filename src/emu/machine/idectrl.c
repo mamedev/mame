@@ -1960,15 +1960,17 @@ static DEVICE_RESET( ide_controller )
 	ide_state *ide = get_safe_token(device);
 
 	LOG(("IDE controller reset performed\n"));
-
-	if (device->machine().device( "harddisk" )) {
+	astring hardtag;
+	device->siblingtag(hardtag, "harddisk");
+	
+	if (device->machine().device( hardtag.cstr() )) {
 		if (!ide->disk)
 		{
-			ide->handle = device->machine().device<harddisk_image_device>("harddisk")->get_chd_file();	// should be config->master
+			ide->handle = device->machine().device<harddisk_image_device>(hardtag.cstr())->get_chd_file();	// should be config->master
 
 			if (ide->handle)
 			{
-				ide->disk = device->machine().device<harddisk_image_device>("harddisk")->get_hard_disk_file();	// should be config->master
+				ide->disk = device->machine().device<harddisk_image_device>(hardtag.cstr())->get_hard_disk_file();	// should be config->master
 
 				if (ide->disk != NULL)
 				{
