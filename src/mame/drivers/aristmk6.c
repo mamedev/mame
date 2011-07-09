@@ -28,6 +28,7 @@ SCREEN_UPDATE(aristmk6)
 
 static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aristmk6_port, AS_IO, 64 )
@@ -38,7 +39,7 @@ static INPUT_PORTS_START( aristmk6 )
 INPUT_PORTS_END
 
 // ?
-#define ARISTMK6_CPU_CLOCK 200000000
+#define ARISTMK6_CPU_CLOCK XTAL_200MHz
 // ?
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, ARISTMK6_CPU_CLOCK };
 
@@ -86,13 +87,11 @@ ROM_START( 50lions )
 	ROM_LOAD32_WORD("u73 - 35634c6d.bin", 0x0000002, 0x0400000, CRC(ec1b699b) SHA1(5a6ad7c7eb02443e42ee6a88525ae95a2b0a3195) )
 ROM_END
 
-#if 0
 ROM_START( 50lionsa )
 	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10120511.u86", 0x0000000, 0x0400000, CRC(0e5c86f1) SHA1(84e329e664ace697f9ea4ace08612089e0964732) )
 	ROM_LOAD32_WORD("10120511.u73", 0x0000002, 0x0400000, CRC(1c1f2297) SHA1(13fb8c83d8ce2340ef554490c21a38da7b47c666) )
 ROM_END
-#endif
 
 ROM_START( choysun )
 	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
@@ -154,7 +153,7 @@ ROM_END
 GAME( 200?, aristmk6,  0,          aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Aristocrat MK-6 Base (15011025)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT)
 GAME( 200?, antcleo,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Antony and Cleopatra (10177211)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, 50lions,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "50 Lions (set 1, 10156111)", GAME_NOT_WORKING | GAME_NO_SOUND )
-//GAME( 200?, 50lionsa,  50lions,    aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "50 Lions (set 2, 10120511)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, 50lionsa,  50lions,    aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "50 Lions (set 2, 10120511)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, choysun,   aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Choy Sun Doa (20131511)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, cristals,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Cristal Springs (10155811)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, indianmm,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocrat", "Indian Dreaming (10130711) (Maximillion$ Jackpot Version)", GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -932,6 +932,9 @@ WRITE32_HANDLER( sh4_internal_w )
 	case SCBRR2:
 		break;
 
+	case SCSPTR2: //trips often in aristocrat mk-6
+		break;
+
 	default:
 		logerror("sh4_internal_w:  Unmapped write %08x, %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), data, mem_mask);
 		break;
