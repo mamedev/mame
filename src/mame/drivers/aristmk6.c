@@ -2,6 +2,10 @@
 Aristocrat MK6 hardware
 
   SH4 + PowerVR
+
+GFX data looks 8bpp with external palette
+
+Font is at 0x160000 onward in the BIOS set, in raw format
 */
 
 #include "emu.h"
@@ -14,6 +18,8 @@ public:
 	aristmk6_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	UINT32 m_test_x,m_test_y,m_start_offs;
+	UINT8 m_type;
 };
 
 
@@ -23,6 +29,82 @@ VIDEO_START(aristmk6)
 
 SCREEN_UPDATE(aristmk6)
 {
+	aristmk6_state *state = screen->machine().driver_data<aristmk6_state>();
+
+	int x,y,count;
+	const UINT8 *blit_ram = screen->machine().region("maincpu")->base();
+
+	if(screen->machine().input().code_pressed(KEYCODE_Z))
+		state->m_test_x++;
+
+	if(screen->machine().input().code_pressed(KEYCODE_X))
+		state->m_test_x--;
+
+	if(screen->machine().input().code_pressed(KEYCODE_A))
+		state->m_test_y++;
+
+	if(screen->machine().input().code_pressed(KEYCODE_S))
+		state->m_test_y--;
+
+	if(screen->machine().input().code_pressed(KEYCODE_Q))
+		state->m_start_offs+=0x2000;
+
+	if(screen->machine().input().code_pressed(KEYCODE_W))
+		state->m_start_offs-=0x2000;
+
+	if(screen->machine().input().code_pressed(KEYCODE_E))
+		state->m_start_offs++;
+
+	if(screen->machine().input().code_pressed(KEYCODE_R))
+		state->m_start_offs--;
+
+	if(screen->machine().input().code_pressed_once(KEYCODE_L))
+		state->m_type^=1;
+
+	popmessage("%d %d %04x %d",state->m_test_x,state->m_test_y,state->m_start_offs,state->m_type);
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+
+	count = (state->m_start_offs);
+
+	for(y=0;y<state->m_test_y;y++)
+	{
+		for(x=0;x<state->m_test_x;x++)
+		{
+			if(state->m_type)
+			{
+				UINT16 vram;
+				int r,g,b;
+
+				vram = blit_ram[count+0] | blit_ram[count+1]<<8;
+
+				r = (vram & 0x001f)>>0;
+				g = (vram & 0x07e0)>>5;
+				b = (vram & 0xf800)>>11;
+
+				r = (r << 3) | (r & 0x7);
+				g = (g << 2) | (g & 3);
+				b = (b << 3) | (b & 0x7);
+
+				if((x)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
+					*BITMAP_ADDR32(bitmap, y, x) = r | g<<8 | b<<16;
+
+				count+=2;
+			}
+			else
+			{
+				UINT8 color;
+
+				color = blit_ram[count];
+
+				if((x)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
+					*BITMAP_ADDR32(bitmap, y, x) = screen->machine().pens[color];
+
+				count++;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -49,6 +131,7 @@ static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(aristmk6_map)
 	MCFG_CPU_IO_MAP(aristmk6_port)
+	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
