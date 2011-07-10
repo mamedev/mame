@@ -33,6 +33,7 @@
   Super Pit Boss (c)1988
   Pit Boss Superstar (c)1990
   *Pit Boss Superstar 30 (c)1993
+  *Pit Boss Superstar III 30 (c)1993?
   Pit Boss Megastar (c)1994
   Pit Boss Supertouch 30 (c)1993/4
 
