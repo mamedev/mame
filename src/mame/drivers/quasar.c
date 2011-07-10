@@ -10,12 +10,8 @@
   ------
   - Sound (missing invader effect - still not sure all noise in correct places)
   - Phase 3 - seems awfully hard - dip settings ?
-
-
-  - Make Asto Wars to boot
-  - Make Cat'n Mouse to boot
-    (it jumps to unpopulated rom, check jump at 0x2e62 and 0x4076)
-  - ...
+  - Hook up Coin Counter
+  - Test/Service Mode - not working?
 
 ************************************************************************
 
@@ -28,32 +24,6 @@ Quasar by Zaccaria (1980)
 2650A CPU
 
 I8085 Sound Board
-
-************************************************************************
-
-Zaccaria "Cat 'N Mouse" 1982
-
-similar to "Quasar" execept it uses an 82s100 for color table lookup
-and has a larger program prom
-
-
-Cat N Mouse (Zaccaria 1982)
-
-CPU Board
-
-               2650    7b 6b 5b 3b 2b
-                       7c 6c 5c 3c 2c
-
-                       2636 2636 2636
-        11g 10g 8g
-     14l
-                  clr
-
-Sound Board 1b11107
-
-6802
-6821
-8910
 
 ************************************************************************/
 
@@ -198,17 +168,17 @@ static INPUT_PORTS_START( quasar )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )			/* switch collaudo */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )			/* test switch */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )			/* tavalino */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )			/* table (from manual) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )				/* count enable */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )			/* count enable (from manual) */
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_A ) )			/* confirmed */

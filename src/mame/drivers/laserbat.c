@@ -945,6 +945,32 @@ ROM_START( lazarian )
 	ROM_LOAD( "lz82s100.10m", 0x0000, 0x00f5, CRC(c3eb562a) SHA1(65dff81b2e5321d530e5171dab9aa3809ab38b4d) )
 ROM_END
 
+/*
+Zaccaria "Cat 'N Mouse" 1982
+
+similar to "Quasar" execept it uses an 82s100 for color table lookup
+and has a larger program prom
+
+
+Cat N Mouse (Zaccaria 1982)
+
+CPU Board
+
+               2650    7b 6b 5b 3b 2b
+                       7c 6c 5c 3c 2c
+
+                       2636 2636 2636
+        11g 10g 8g
+     14l
+                  clr
+
+Sound Board 1b11107
+
+6802
+6821
+8910
+*/
+
 ROM_START( catnmous )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "02-1.7c",      0x0000, 0x0400, CRC(d26ec566) SHA1(ceb16f64a3c1ff25a9eab6549f1ae24085bb9e27) )
