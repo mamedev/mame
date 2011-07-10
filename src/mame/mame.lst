@@ -10494,6 +10494,7 @@ cmkenospa		// (c) 2000 Coinmaster-Gaming, Ltd.
 
 // Igrosoft Original sets
 // Multifish
+goldfish		// (c) 2002 - Prototype of Multifish
 //mfish 		// (c) 2002
 //mfish_2		// (c) 2002
 mfish_3			// (c) 2002
@@ -10501,13 +10502,12 @@ mfish_3			// (c) 2002
 //mfish_5		// (c) 2002
 mfish_6			// (c) 2002
 //mfish_7		// (c) 2002
-mfish_8		// (c) 2002
+mfish_8			// (c) 2002
 //mfish_9		// (c) 2002
-//mfish_10  	// (c) 2002
+//mfish_10  		// (c) 2002
 mfish_11		// (c) 2002
 mfish_12		// (c) 2002
 mfish_13		// (c) 2002
-mfish_14	// (c) 2002
 
 // Crazy Monkey
 //crzmon		// (c) 2003
@@ -10608,6 +10608,10 @@ gnome_3			// (c) 2007
 // Sweet Life 2
 sweetl2			// (c) 2007
 sweetl2_2		// (c) 2007
+
+// Fruit Cocktail 2
+fcockt2			// (c) 2008
+
 
 // Igrosoft bootleg sets
 
@@ -10710,6 +10714,7 @@ sweetl2_2a		// bootleg - Sweet Life 2
 sweetl2_2b		// bootleg
 sweetl2_2c		// bootleg
 sweetl2_2d		// bootleg
+fcockt2a		// bootleg - Fruit Cocktail 2
 
 // TAB Austria
 //cdimono1		// Base unit (enabled below, see MESS drivers)

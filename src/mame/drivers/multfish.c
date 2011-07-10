@@ -1096,6 +1096,22 @@ xxxxxxxx_ent.00x    - entertainment sets
    Multifish
 **********************************************************/
 
+ROM_START( goldfish ) // Gold Fish 020903 prototype of Multi Fish
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gf_020903.rom", 0x00000, 0x40000, CRC(705304fc) SHA1(f02336066ba2ff394ac153107e308d5356e99eca) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	/* did it really use these graphic ROMs? they include the screens used by the games not included in 'Gold Fish' */
+	ROM_LOAD( "multi_fish.001", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
+	ROM_LOAD( "multi_fish.002", 0x100000, 0x80000, CRC(606acd73) SHA1(ce5f7b1366dbb16d57fe4b7f395f08725e3cf756) )
+	ROM_LOAD( "multi_fish.003", 0x200000, 0x80000, CRC(33759c2a) SHA1(6afcee2e00a27542fc9751702abcc84cd7d3a2a8) )
+	ROM_LOAD( "multi_fish.004", 0x300000, 0x80000, CRC(d0053546) SHA1(01c69be0c594947d57648f491904a3b6938a5570) )
+	ROM_LOAD( "multi_fish.005", 0x080000, 0x80000, CRC(6f632872) SHA1(949661cb234855a9c86403e9893c5d9f465ddd79) )
+	ROM_LOAD( "multi_fish.006", 0x180000, 0x80000, CRC(023c1193) SHA1(98cf2732f9542b0bb3bee324611f6d3143ef1dc4) )
+	ROM_LOAD( "multi_fish.007", 0x280000, 0x80000, CRC(9afdc2d3) SHA1(b112fd2005354c9f97d77030bdb6f99d7b5c8050) )
+	ROM_LOAD( "multi_fish.008", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
+ROM_END
+
 ROM_START( mfish ) // 021120
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021120.rom", 0x00000, 0x40000, MD5(6021e2bfa67abdfc0beb7f291fdc9d9c) SHA1(eb7eb5aae00a77edcf328f460970eb180d86d058) )
@@ -1280,21 +1296,6 @@ ROM_END
 ROM_START( mfish_13 ) // 040316
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf040316.rom", 0x00000, 0x40000, CRC(1acf9f4f) SHA1(c1f4d1c51632a45b533d19c8b6f63d337d84d9cd) )
-
-	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "multi_fish.001", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
-	ROM_LOAD( "multi_fish.002", 0x100000, 0x80000, CRC(606acd73) SHA1(ce5f7b1366dbb16d57fe4b7f395f08725e3cf756) )
-	ROM_LOAD( "multi_fish.003", 0x200000, 0x80000, CRC(33759c2a) SHA1(6afcee2e00a27542fc9751702abcc84cd7d3a2a8) )
-	ROM_LOAD( "multi_fish.004", 0x300000, 0x80000, CRC(d0053546) SHA1(01c69be0c594947d57648f491904a3b6938a5570) )
-	ROM_LOAD( "multi_fish.005", 0x080000, 0x80000, CRC(6f632872) SHA1(949661cb234855a9c86403e9893c5d9f465ddd79) )
-	ROM_LOAD( "multi_fish.006", 0x180000, 0x80000, CRC(023c1193) SHA1(98cf2732f9542b0bb3bee324611f6d3143ef1dc4) )
-	ROM_LOAD( "multi_fish.007", 0x280000, 0x80000, CRC(9afdc2d3) SHA1(b112fd2005354c9f97d77030bdb6f99d7b5c8050) )
-	ROM_LOAD( "multi_fish.008", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
-ROM_END
-
-ROM_START( mfish_14 ) // Gold Fish 020903 prototype of Multi Fish
-	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "gf_020903.rom", 0x00000, 0x40000, CRC(705304fc) SHA1(f02336066ba2ff394ac153107e308d5356e99eca) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "multi_fish.001", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
@@ -2484,8 +2485,20 @@ ROM_END
 
 **********************************************************/
 
-/* no supported sets */
+ROM_START( fcockt2 ) // 080707
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc2_080707.rom", 0x00000, 0x40000, CRC(3a42f27d) SHA1(7ba91f52b1b0ac4513caebc2989f3b9d6f9dfde4) ) /* Not officially listed on Igrosoft's web site hash page */
 
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail2.001",  0x000000, 0x80000, CRC(d1b9416d) SHA1(4d3cb0a6dbcf02bbd20d5c43df358882b2ad794d) )
+	ROM_LOAD( "fruitcocktail2.002",  0x100000, 0x80000, CRC(69236be1) SHA1(9a2e6c8f279714f79a606c0b118b6bf1d8442cda) )
+	ROM_LOAD( "fruitcocktail2.003",  0x200000, 0x80000, CRC(29aade8c) SHA1(bef42f8a25c90e3a1cccd13872a10eb8b2b2e276) )
+	ROM_LOAD( "fruitcocktail2.004",  0x300000, 0x80000, CRC(4b9646e7) SHA1(26548a018401f4e07383eb145f8f0847677f3272) )
+	ROM_LOAD( "fruitcocktail2_old.005", 0x080000, 0x80000, CRC(6b9e6b43) SHA1(c7fb17e91ec62b22da42f110d68b4f37e39de3ce) )
+	ROM_LOAD( "fruitcocktail2_old.006", 0x180000, 0x80000, CRC(2c9f712e) SHA1(c3118154eafca74b66b3325a2e07c85f86f3544d) )
+	ROM_LOAD( "fruitcocktail2_old.007", 0x280000, 0x80000, CRC(85ba9a86) SHA1(aa9b6170135e9e420509e8f7c1702c9896bc5d8e) )
+	ROM_LOAD( "fruitcocktail2_old.008", 0x380000, 0x80000, CRC(a27c49a2) SHA1(7c9ee0e01f76ca3ab6716579f5dde7036050970b) )
+ROM_END
 
 
 /*********************************************************
@@ -2550,6 +2563,7 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 
 
 #define mfish_parent mfish_3
+  GAME( 2002, goldfish,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Gold Fish (020903, prototype)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish,       mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (021120)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish_2,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (021121)", GAME_SUPPORTS_SAVE ) /* World */
   GAME( 2002, mfish_3,     0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (021124)", GAME_SUPPORTS_SAVE ) /* World */
@@ -2563,7 +2577,6 @@ Most games had a revision in early 2007 to meet the standards of the "Government
   GAME( 2002, mfish_11,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (031124)", GAME_SUPPORTS_SAVE ) /* World */
   GAME( 2002, mfish_12,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (040308)", GAME_SUPPORTS_SAVE ) /* World */
   GAME( 2002, mfish_13,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (040316)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_14,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Gold Fish (020903, prototype)", GAME_SUPPORTS_SAVE ) /* World */
 
 #define crzmon_parent crzmon_5
 //GAME( 2003, crzmon,      crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (030217 World)", GAME_SUPPORTS_SAVE ) /* World */
@@ -2674,6 +2687,8 @@ Most games had a revision in early 2007 to meet the standards of the "Government
   GAME( 2007, sweetl2,     0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Sweet Life 2 (071217 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
   GAME( 2007, sweetl2_2,   sweetl2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Sweet Life 2 (080320 World)", GAME_SUPPORTS_SAVE ) /* World */
 
+#define fcockt2_parent fcockt2
+  GAME( 2008, fcockt2,     0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080707 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 
 
@@ -4204,6 +4219,20 @@ ROM_START( gnome_3c ) // 080303 bank F9, payout percentage 60%
 	ROM_LOAD( "gnome.008", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
 ROM_END
 
+ROM_START( fcockt2a ) // 080707 bank F9
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "bootleg_fc2_080707a.rom", 0x00000, 0x40000, CRC(c4840b3c) SHA1(518079207bb3d13e492003b382d28a8cf3647f63) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail2.001",  0x000000, 0x80000, CRC(d1b9416d) SHA1(4d3cb0a6dbcf02bbd20d5c43df358882b2ad794d) )
+	ROM_LOAD( "fruitcocktail2.002",  0x100000, 0x80000, CRC(69236be1) SHA1(9a2e6c8f279714f79a606c0b118b6bf1d8442cda) )
+	ROM_LOAD( "fruitcocktail2.003",  0x200000, 0x80000, CRC(29aade8c) SHA1(bef42f8a25c90e3a1cccd13872a10eb8b2b2e276) )
+	ROM_LOAD( "fruitcocktail2.004",  0x300000, 0x80000, CRC(4b9646e7) SHA1(26548a018401f4e07383eb145f8f0847677f3272) )
+	ROM_LOAD( "fruitcocktail2_old.005", 0x080000, 0x80000, CRC(6b9e6b43) SHA1(c7fb17e91ec62b22da42f110d68b4f37e39de3ce) )
+	ROM_LOAD( "fruitcocktail2_old.006", 0x180000, 0x80000, CRC(2c9f712e) SHA1(c3118154eafca74b66b3325a2e07c85f86f3544d) )
+	ROM_LOAD( "fruitcocktail2_old.007", 0x280000, 0x80000, CRC(85ba9a86) SHA1(aa9b6170135e9e420509e8f7c1702c9896bc5d8e) )
+	ROM_LOAD( "fruitcocktail2_old.008", 0x380000, 0x80000, CRC(a27c49a2) SHA1(7c9ee0e01f76ca3ab6716579f5dde7036050970b) )
+ROM_END
 
 
 GAME( 2002, mfish_3a,    mfish_parent,    multfish, multfish,  0,             ROT0,  "bootleg", "Multi Fish (bootleg, 021124, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
@@ -4318,3 +4347,5 @@ GAME( 2007, sweetl2_2a,  sweetl2_parent,  multfish, multfish,  0,             RO
 GAME( 2007, sweetl2_2b,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9, some fixes
 GAME( 2007, sweetl2_2c,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, VIDEO GAME-1 MD01)", GAME_SUPPORTS_SAVE ) // modified graphics, bank F9, changed version text to "VIDEO GAME-1 MD01"
 GAME( 2007, sweetl2_2d,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+
+GAME( 2008, fcockt2a,    fcockt2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 080707, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
