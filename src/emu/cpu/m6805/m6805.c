@@ -74,7 +74,8 @@ INLINE m6805_Regs *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == M6805 ||
 		   device->type() == M68705 ||
-		   device->type() == HD63705);
+		   device->type() == HD63705 ||
+		   device->type() == M68HC05EG);
 	return (m6805_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
