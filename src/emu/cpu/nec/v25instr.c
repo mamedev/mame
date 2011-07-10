@@ -73,6 +73,7 @@ OP( 0x0f, i_pre_v25  ) { UINT32 ModRM, tmp, tmp2;
 		case 0x92 : FINT; CLK(2); nec_state->no_interrupt = 1; break;
 		case 0x94 : GetRB; TSKSW; CLK(20); break;
 		case 0x95 : GetRB; MOVSPB; CLK(11); break;
+		case 0x9e : logerror("%06x: STOP\n",PC(nec_state)); nec_state->icount=0; break;
 		default:    logerror("%06x: Unknown V25 instruction\n",PC(nec_state)); break;
 	}
 }

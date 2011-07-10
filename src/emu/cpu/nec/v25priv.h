@@ -92,6 +92,7 @@ struct _v25_state_t
 	UINT32	mode_state;
 	UINT32	intp_state[3];
 	UINT8	no_interrupt;
+	UINT8	halted;
 
 	/* timer related */
 	UINT16	TM0, MD0, TM1, MD1;

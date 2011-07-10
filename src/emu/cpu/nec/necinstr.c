@@ -608,7 +608,7 @@ OP( 0xf3, i_repe     ) { UINT32 next = fetchop(nec_state); UINT16 c = Wreg(CW);
 	}
 	nec_state->seg_prefix=FALSE;
 }
-OP( 0xf4, i_hlt ) { logerror("%06x: HALT\n",PC(nec_state)); nec_state->icount=0; }
+OP( 0xf4, i_hlt ) { logerror("%06x: HALT\n",PC(nec_state)); nec_state->halted=1; nec_state->icount=0; }
 OP( 0xf5, i_cmc ) { nec_state->CarryVal = !CF; CLK(2); }
 OP( 0xf6, i_f6pre ) { UINT32 tmp; UINT32 uresult,uresult2; INT32 result,result2;
 	GetModRM; tmp = GetRMByte(ModRM);

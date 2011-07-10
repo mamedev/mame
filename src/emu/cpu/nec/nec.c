@@ -215,6 +215,7 @@ static CPU_RESET( nec )
 	nec_state->nmi_state = 0;
 	nec_state->irq_state = 0;
 	nec_state->poll_state = 1;
+	nec_state->halted = 0;
 
 	Sreg(PS) = 0xffff;
 	Sreg(SS) = 0;
@@ -289,13 +290,19 @@ static void set_irq_line(nec_state_t *nec_state, int irqline, int state)
 			if (state == CLEAR_LINE)
 				nec_state->pending_irq &= ~INT_IRQ;
 			else
+			{
 				nec_state->pending_irq |= INT_IRQ;
+				nec_state->halted = 0;
+			}
 			break;
 		case INPUT_LINE_NMI:
 			if (nec_state->nmi_state == state) return;
 		    nec_state->nmi_state = state;
 			if (state != CLEAR_LINE)
+			{
 				nec_state->pending_irq |= NMI_IRQ;
+				nec_state->halted = 0;
+			}
 			break;
 		case NEC_INPUT_LINE_POLL:
 			nec_state->poll_state = state;
@@ -308,7 +315,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, NULL);
 }
 
-static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
+static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	nec_state_t *nec_state = get_safe_token(device);
 
@@ -356,6 +363,7 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 	device->save_item(NAME(nec_state->nmi_state));
 	device->save_item(NAME(nec_state->irq_state));
 	device->save_item(NAME(nec_state->poll_state));
+	device->save_item(NAME(nec_state->halted));
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;
@@ -370,6 +378,13 @@ static CPU_EXECUTE( necv )
 {
 	nec_state_t *nec_state = get_safe_token(device);
 	int prev_ICount;
+
+	if (nec_state->halted)
+	{
+		nec_state->icount = 0;
+		debugger_instruction_hook(device, (Sreg(PS)<<4) + nec_state->ip);
+		return;
+	}
 
 	while(nec_state->icount>0) {
 		/* Dispatch IRQ */
@@ -397,7 +412,7 @@ static CPU_INIT( v20 )
 {
 	nec_state_t *nec_state = get_safe_token(device);
 
-	nec_init(device, irqcallback, 0);
+	nec_init(device, irqcallback);
 	nec_state->fetch_xor = 0;
 	nec_state->chip_type=V20_TYPE;
 	nec_state->prefetch_size = 4;		/* 3 words */
@@ -408,7 +423,7 @@ static CPU_INIT( v30 )
 {
 	nec_state_t *nec_state = get_safe_token(device);
 
-	nec_init(device, irqcallback, 1);
+	nec_init(device, irqcallback);
 	nec_state->fetch_xor = BYTE_XOR_LE(0);
 	nec_state->chip_type=V30_TYPE;
 	nec_state->prefetch_size = 6;		/* 3 words */
@@ -420,7 +435,7 @@ static CPU_INIT( v33 )
 {
 	nec_state_t *nec_state = get_safe_token(device);
 
-	nec_init(device, irqcallback, 2);
+	nec_init(device, irqcallback);
 	nec_state->chip_type=V33_TYPE;
 	nec_state->prefetch_size = 6;
 	/* FIXME: Need information about prefetch size and cycles for V33.

@@ -181,6 +181,7 @@ static CPU_RESET( v25 )
 	nec_state->intp_state[0] = 0;
 	nec_state->intp_state[1] = 0;
 	nec_state->intp_state[2] = 0;
+	nec_state->halted = 0;
 
 	nec_state->TM0 = nec_state->MD0 = nec_state->TM1 = nec_state->MD1 = 0;
 	nec_state->TMC0 = nec_state->TMC1 = 0;
@@ -366,13 +367,19 @@ static void set_irq_line(v25_state_t *nec_state, int irqline, int state)
 			if (state == CLEAR_LINE)
 				nec_state->pending_irq &= ~INT_IRQ;
 			else
+			{	
 				nec_state->pending_irq |= INT_IRQ;
+				nec_state->halted = 0;
+			}
 			break;
 		case INPUT_LINE_NMI:
 			if (nec_state->nmi_state == state) return;
 		    nec_state->nmi_state = state;
 			if (state != CLEAR_LINE)
+			{
 				nec_state->pending_irq |= NMI_IRQ;
+				nec_state->halted = 0;
+			}
 			break;
 		case NEC_INPUT_LINE_INTP0:
 		case NEC_INPUT_LINE_INTP1:
@@ -396,7 +403,7 @@ static CPU_DISASSEMBLE( v25 )
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
-static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
+static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	const nec_config *config = device->static_config() ? (const nec_config *)device->static_config() : &default_config;
 	v25_state_t *nec_state = get_safe_token(device);
@@ -465,6 +472,7 @@ static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 	device->save_item(NAME(nec_state->irq_state));
 	device->save_item(NAME(nec_state->poll_state));
 	device->save_item(NAME(nec_state->mode_state));
+	device->save_item(NAME(nec_state->halted));
 	device->save_item(NAME(nec_state->TM0));
 	device->save_item(NAME(nec_state->MD0));
 	device->save_item(NAME(nec_state->TM1));
@@ -490,6 +498,41 @@ static CPU_EXECUTE( v25 )
 	v25_state_t *nec_state = get_safe_token(device);
 	int prev_ICount;
 
+	int pending = nec_state->pending_irq & nec_state->unmasked_irq;
+
+	if (nec_state->halted && pending)
+	{
+		for(int i = 0; i < 8; i++)
+		{
+			if (nec_state->ISPR & (1 << i)) break;
+
+			if (nec_state->priority_inttu == i && (pending & (INTTU0|INTTU1|INTTU2)))
+				nec_state->halted = 0;
+
+			if (nec_state->priority_intd == i && (pending & (INTD0|INTD1)))
+				nec_state->halted = 0;
+
+			if (nec_state->priority_intp == i && (pending & (INTP0|INTP1|INTP2)))
+				nec_state->halted = 0;
+
+			if (nec_state->priority_ints0 == i && (pending & (INTSER0|INTSR0|INTST0)))
+				nec_state->halted = 0;
+
+			if (nec_state->priority_ints1 == i && (pending & (INTSER1|INTSR1|INTST1)))
+				nec_state->halted = 0;
+
+			if (i == 7 && (pending & INTTB))
+				nec_state->halted = 0;
+		}
+	}
+
+	if (nec_state->halted)
+	{
+		nec_state->icount = 0;
+		debugger_instruction_hook(device, (Sreg(PS)<<4) + nec_state->ip);
+		return;
+	}
+	
 	while(nec_state->icount>0) {
 		/* Dispatch IRQ */
 		if (nec_state->no_interrupt==0 && (nec_state->pending_irq & nec_state->unmasked_irq))
@@ -516,7 +559,7 @@ static CPU_INIT( v25 )
 {
 	v25_state_t *nec_state = get_safe_token(device);
 
-	v25_init(device, irqcallback, 0);
+	v25_init(device, irqcallback);
 	nec_state->fetch_xor = 0;
 	nec_state->chip_type=V20_TYPE;
 	nec_state->prefetch_size = 4;		/* 3 words */
@@ -527,7 +570,7 @@ static CPU_INIT( v35 )
 {
 	v25_state_t *nec_state = get_safe_token(device);
 
-	v25_init(device, irqcallback, 1);
+	v25_init(device, irqcallback);
 	nec_state->fetch_xor = BYTE_XOR_LE(0);
 	nec_state->chip_type=V30_TYPE;
 	nec_state->prefetch_size = 6;		/* 3 words */

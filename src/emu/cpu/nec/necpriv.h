@@ -53,6 +53,7 @@ struct _nec_state_t
 	UINT32	irq_state;
 	UINT32	poll_state;
 	UINT8	no_interrupt;
+	UINT8	halted;
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
