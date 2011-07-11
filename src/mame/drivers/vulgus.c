@@ -369,6 +369,6 @@ ROM_END
 
 
 
-GAME( 1984, vulgus,  0,      vulgus, vulgus, 0, ROT90,  "Capcom", "Vulgus (set 1)", 0 )
+GAME( 1984, vulgus,  0,      vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (set 1)", 0 )
 GAME( 1984, vulgusa, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (set 2)", 0 )
 GAME( 1984, vulgusj, vulgus, vulgus, vulgus, 0, ROT270, "Capcom", "Vulgus (Japan?)", 0 )
