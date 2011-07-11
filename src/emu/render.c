@@ -1722,9 +1722,9 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	if (rootnode == NULL)
 	{
 		if (filename[0] != '<')
-			mame_printf_warning("Improperly formatted XML file '%s', ignorning\n", filename);
+			mame_printf_warning("Improperly formatted XML file '%s', ignoring\n", filename);
 		else
-			mame_printf_warning("Improperly formatted XML string, ignorning");
+			mame_printf_warning("Improperly formatted XML string, ignoring\n");
 		return false;
 	}
 
