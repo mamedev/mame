@@ -98,7 +98,7 @@ static WRITE16_HANDLER(write_to_z80)
 	{
 		case 0:
 			//if ( (data >> 8) & 0xff )
-			//	logerror("Command to Z80: %04x\n", data);
+			//  logerror("Command to Z80: %04x\n", data);
 			state->m_68k_to_z80_index = data & 0xff;
 			state->m_68k_to_z80_data = (data >> 8) & 0xff;
 			cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
@@ -177,7 +177,7 @@ static READ8_HANDLER(read_data_from_68k)
 {
 	tapatune_state *state = space->machine().driver_data<tapatune_state>();
 	//if ( state->m_68k_to_z80_data != 0 )
-	//	logerror("Load command from 68K: %02x %02x\n", state->m_68k_to_z80_index, state->m_68k_to_z80_data);
+	//  logerror("Load command from 68K: %02x %02x\n", state->m_68k_to_z80_index, state->m_68k_to_z80_data);
 	return state->m_68k_to_z80_data;
 }
 

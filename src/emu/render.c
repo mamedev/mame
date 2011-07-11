@@ -1640,7 +1640,7 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 	const game_driver &system = m_manager.machine().system();
 	if (!load_layout_file(basename, system.name))
 		have_default |= load_layout_file(basename, "default");
-	else 
+	else
 		have_default |= true;
 
 	// if a default view has been specified, use that as a fallback
@@ -1654,7 +1654,7 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 	if (cloneof != -1) {
 		if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
 			have_default |= load_layout_file(driver_list::driver(cloneof).name, "default");
-		else 
+		else
 			have_default |= true;
 	}
 	int screens = m_manager.machine().devicelist().count(SCREEN);
@@ -1667,10 +1667,10 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 			load_layout_file(NULL, layout_horizont);
 		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 	}
-	if (!have_default) 
+	if (!have_default)
 	{
 		if (screens == 0)
-		{			
+		{
 			load_layout_file(NULL, layout_noscreens);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}

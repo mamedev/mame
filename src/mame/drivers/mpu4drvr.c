@@ -171,7 +171,7 @@ TODO:
       - Find out what causes the games to hang/reset in service mode
         Probably down to AVDC interrupt timing, there seem to be a number of race conditions re: masks
         that need sorting out with proper blank handling, etc. I'm using a scanline timer to drive an
-		approximation of the SCN2674 scanline logic, but this is perhaps better served as a proper device.
+        approximation of the SCN2674 scanline logic, but this is perhaps better served as a proper device.
       - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
       - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
         to give black on green.
@@ -2369,7 +2369,7 @@ static void scn2674_line(running_machine &machine)
 			LOG2674(("SCN2674 Split Screen 1\n"));
 			state->m_scn2674_irq_state = 1;
 			update_mpu68_interrupts(machine);
-//			machine.primary_screen->update_partial(state->m_linecounter);
+//          machine.primary_screen->update_partial(state->m_linecounter);
 		}
 	}
 

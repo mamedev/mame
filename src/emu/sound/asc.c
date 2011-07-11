@@ -127,7 +127,7 @@ void asc_device::device_reset()
 
 void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	m_stream->update(); 
+	m_stream->update();
 }
 
 //-------------------------------------------------

@@ -1511,13 +1511,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( oldsplus, oldsplus_state )
 	MCFG_FRAGMENT_ADD(pgmbase)
-	
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
 
 //  Simulated for now
-//	MCFG_CPU_ADD("prot", ARM7, 20000000)
-//	MCFG_CPU_PROGRAM_MAP(svg_arm7_map)
+//  MCFG_CPU_ADD("prot", ARM7, 20000000)
+//  MCFG_CPU_PROGRAM_MAP(svg_arm7_map)
 MACHINE_CONFIG_END
 
 class cavepgm_state : public pgm_state
@@ -1587,7 +1587,7 @@ static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 	/*sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
     MCFG_ICS2115_ADD("ics", 0, sound_irq)
- 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
 /*** Rom Loading *************************************************************/

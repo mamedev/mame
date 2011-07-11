@@ -341,7 +341,7 @@ void cosmac_device::state_import(const device_state_entry &entry)
 		case STATE_GENPC:
 			R[P] = m_pc;
 			break;
-			
+
 		case STATE_GENFLAGS:
 			SET_FLAGS(m_flagsio);
 			break;

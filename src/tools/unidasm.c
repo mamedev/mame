@@ -442,7 +442,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 			pending_skip = FALSE;
 		}
 
-		// size 
+		// size
 		else if (pending_count)
 		{
 			if (sscanf(curarg, "%d", &opts->count) != 1)

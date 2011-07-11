@@ -367,7 +367,7 @@ static void set_irq_line(v25_state_t *nec_state, int irqline, int state)
 			if (state == CLEAR_LINE)
 				nec_state->pending_irq &= ~INT_IRQ;
 			else
-			{	
+			{
 				nec_state->pending_irq |= INT_IRQ;
 				nec_state->halted = 0;
 			}
@@ -532,7 +532,7 @@ static CPU_EXECUTE( v25 )
 		debugger_instruction_hook(device, (Sreg(PS)<<4) + nec_state->ip);
 		return;
 	}
-	
+
 	while(nec_state->icount>0) {
 		/* Dispatch IRQ */
 		if (nec_state->no_interrupt==0 && (nec_state->pending_irq & nec_state->unmasked_irq))

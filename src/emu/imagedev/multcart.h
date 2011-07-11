@@ -137,7 +137,7 @@ int cartslot_get_resource_length(device_t *device, const char *socket_name);
 #define DECLARE_LEGACY_CART_SLOT_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_cart_slot_device_base)
 #define DEFINE_LEGACY_CART_SLOT_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_cart_slot_device_base)
 
-#define MCFG_MULTICARTSLOT_ADD(_tag) 										\
+#define MCFG_MULTICARTSLOT_ADD(_tag)										\
 	MCFG_DEVICE_ADD(_tag, MULTICARTSLOT, 0)									\
 
 #define MCFG_MULTICARTSLOT_MODIFY(_tag)										\

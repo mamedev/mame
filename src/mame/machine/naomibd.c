@@ -2100,9 +2100,9 @@ static DEVICE_START( naomibd )
 			break;
 
 		case DIMM_BOARD:
- 			assert((config->size >= 256) && !(config->size & 255)); // size multiple of 256 megabytes ?
- 			v->size = config->size << 20;
- 			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine(), UINT8, v->size); // 0x40000000 is needed for some Chihiro sets, Naomi should be less
+			assert((config->size >= 256) && !(config->size & 255)); // size multiple of 256 megabytes ?
+			v->size = config->size << 20;
+			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine(), UINT8, v->size); // 0x40000000 is needed for some Chihiro sets, Naomi should be less
 			v->gdromchd = get_disk_handle(device->machine(), config->gdromregiontag);
 			v->picdata = (UINT8 *)device->machine().region(config->picregiontag)->base();
 			if (v->memory != NULL && v->gdromchd != NULL && v->picdata != NULL)

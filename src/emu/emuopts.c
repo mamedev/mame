@@ -346,7 +346,7 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_stri
 		add_device_options(false);
 		if (name && exists(name)) {
 			set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
-		}		
+		}
 		isfirst = false;
 	}
 	result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);

@@ -313,7 +313,7 @@ void coin_lockout_global_w(running_machine &machine, int on)
 
 /*-------------------------------------------------
     nvram_filename - returns filename of system's
-	NVRAM depending of selected BIOS
+    NVRAM depending of selected BIOS
 -------------------------------------------------*/
 
 static astring nvram_filename(running_machine &machine, astring &result)

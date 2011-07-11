@@ -634,7 +634,7 @@ UINT32 dmatcr, chcr, sar, dar;
 	{
 		if ((((chcr & CHCR_RS) >> 8) < 2) || (((chcr & CHCR_RS) >> 8) > 6))
 			return;
-		if (!sh4->dma_timer_active[channel] && !(chcr & CHCR_TE) && !(sh4->m[DMAOR] & (DMAOR_AE | DMAOR_NMIF))) 
+		if (!sh4->dma_timer_active[channel] && !(chcr & CHCR_TE) && !(sh4->m[DMAOR] & (DMAOR_AE | DMAOR_NMIF)))
 		{
 			if (((chcr & CHCR_RS) >> 8) > 3)
 				sh4_dma_transfer(sh4, channel, 1, chcr, &sar, &dar, &dmatcr);

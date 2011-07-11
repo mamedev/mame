@@ -890,7 +890,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device)
 			for (int slot=0; slot < max_slot_count; slot++)
 				if (global_mask & (1ULL << (slot * entry_bits)))
 					slot_offset[slot_count++] = slot * entry_bits;
-					
+
 			// Merge in all the map contents in order
 			while (submap.m_entrylist.count())
 			{
@@ -963,7 +963,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device)
 
 			address_map_entry *to_delete = entry;
 			entry = entry->next();
-			m_entrylist.remove(*to_delete);			
+			m_entrylist.remove(*to_delete);
 		}
 		else
 		{

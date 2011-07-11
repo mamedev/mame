@@ -1253,13 +1253,13 @@ static void handle_command(ide_state *ide, UINT8 command)
 			ide->status &= ~IDE_STATUS_ERROR;
 			signal_interrupt(ide);
 			break;
-			
+
 		case IDE_COMMAND_SEEK:
 			/*
-				cur_cylinder, cur_sector and cur_head
-				are all already set in this case so no need
-				so that implements actual seek
-			*/
+                cur_cylinder, cur_sector and cur_head
+                are all already set in this case so no need
+                so that implements actual seek
+            */
 			/* clear the error too */
 			ide->error = IDE_ERROR_NONE;
 
@@ -1962,7 +1962,7 @@ static DEVICE_RESET( ide_controller )
 	LOG(("IDE controller reset performed\n"));
 	astring hardtag;
 	device->siblingtag(hardtag, "harddisk");
-	
+
 	if (device->machine().device( hardtag.cstr() )) {
 		if (!ide->disk)
 		{

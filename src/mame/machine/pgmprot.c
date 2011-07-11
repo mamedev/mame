@@ -1111,7 +1111,7 @@ WRITE16_HANDLER( oldsplus_w )
 				state->m_oldsplus_val = oldsplus_ae[state->m_oldsplus_int[0]];
 				break;
 
- 			case 0x9d:
+			case 0x9d:
 				state->m_oldsplus_val = oldsplus_9d[state->m_oldsplus_int[0]];
 				break;
 

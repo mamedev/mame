@@ -20,62 +20,62 @@
 Sega Naomi is Dreamcast based Arcade hardware.
 
 TODO (general):
-	- all games that uses YUV just updates one frame then dies, why?
-	- SH to ARM sound streaming doesn't work (used by ADX compression system)
-	- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
+    - all games that uses YUV just updates one frame then dies, why?
+    - SH to ARM sound streaming doesn't work (used by ADX compression system)
+    - ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
 
-	- Following games doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related):
-	* Death Crimson OX
-	* La Keyboard
-	* Lupin the Third
-	* Moeru Casinyo
-	* Puyo Puyo DA!
-	* Puyo Puyo Fever
-	* Samba de Amigo
-	* Samba de Amigo Ver. 2000
-	* Shootout Pool
-	* Shootout Pool Medal
-	* Shootout Pool Prize
-	* Usagi Yamashiro Hen
-	* Virtual On
-	* WWF Royal Rumble
+    - Following games doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related):
+    * Death Crimson OX
+    * La Keyboard
+    * Lupin the Third
+    * Moeru Casinyo
+    * Puyo Puyo DA!
+    * Puyo Puyo Fever
+    * Samba de Amigo
+    * Samba de Amigo Ver. 2000
+    * Shootout Pool
+    * Shootout Pool Medal
+    * Shootout Pool Prize
+    * Usagi Yamashiro Hen
+    * Virtual On
+    * WWF Royal Rumble
 
-	- missing inputs (needs rotary channels):
-	* Crakin' DJ
-	* Dynamic Golf
-	* Inu no Osampo
+    - missing inputs (needs rotary channels):
+    * Crakin' DJ
+    * Dynamic Golf
+    * Inu no Osampo
 
-	- wrong JVS I/O specs, doesn't boot due of it:
-	* Derby Owners Club II
-	* Kick '4' Cash (hopper)
-	* Sega Marine Fishing
-	* Wave Runner GP
+    - wrong JVS I/O specs, doesn't boot due of it:
+    * Derby Owners Club II
+    * Kick '4' Cash (hopper)
+    * Sega Marine Fishing
+    * Wave Runner GP
 
-	- doesn't boot consistently (JVS checksum error?):
-	* Cannon Spike;
-	* Heavy Metal GeoMatrix;
-	* Moeru Justice Gakuen;
-	* Power Stone 2;
-	* Spawn;
+    - doesn't boot consistently (JVS checksum error?):
+    * Cannon Spike;
+    * Heavy Metal GeoMatrix;
+    * Moeru Justice Gakuen;
+    * Power Stone 2;
+    * Spawn;
 
 TODO (game-specific):
-	- 18th Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
-	- Airline Pilots Deluxe: returns error 03
-	- Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
-	- Ferrari 355 Challenge: dies at the network check;
-	- Giant Gram 2: no VMU emulation;
-	- Gun Survivor 2: crashes during game loading;
-	- Idol Janshi Suchie-Pai 3: returns "i/o board error" msg in game mode;
-	- Monkey Ball: dies when attempts to load the gameplay;
-	- Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
-	- OutTrigger: crashes on naomibd_r();
-	- Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
-	- Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
-	- The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
-	- The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
-	- Virtua Tennis: dies when accessing the gameplay or the attract mode (PVR or SH-4 bug, most likely);
-	- World Kicks: MAME crashes even before showing Naomi logo;
-	(more will come up soon ...)
+    - 18th Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
+    - Airline Pilots Deluxe: returns error 03
+    - Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
+    - Ferrari 355 Challenge: dies at the network check;
+    - Giant Gram 2: no VMU emulation;
+    - Gun Survivor 2: crashes during game loading;
+    - Idol Janshi Suchie-Pai 3: returns "i/o board error" msg in game mode;
+    - Monkey Ball: dies when attempts to load the gameplay;
+    - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
+    - OutTrigger: crashes on naomibd_r();
+    - Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
+    - Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
+    - The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
+    - The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
+    - Virtua Tennis: dies when accessing the gameplay or the attract mode (PVR or SH-4 bug, most likely);
+    - World Kicks: MAME crashes even before showing Naomi logo;
+    (more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1610,8 +1610,8 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM	// Naomi 2 BIOS tests this, needs to read back as written
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
-//	AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
-//	AM_RANGE(0x025f7c00, 0x025f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
+//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
+//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
 	AM_RANGE(0x025f8000, 0x025f9fff) AM_READWRITE( pvr2_ta_r, pvr2_ta_w )
 
 	/* Area 1 */
@@ -1624,7 +1624,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE( dc_sysctrl_w ) // writes to BOTH PVRs
 	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE( pvrs_ta_w ) // writes to BOTH PVRs
 	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32( elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
-//	AM_RANGE(0x09000000, 0x09??????) T&L command processing
+//  AM_RANGE(0x09000000, 0x09??????) T&L command processing
     AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_BASE( &elan_ram ) // T&L chip RAM
 
 	/* Area 3 */

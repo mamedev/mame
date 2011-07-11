@@ -41,7 +41,7 @@ static READ64_HANDLER( naomi_biosh_idle_skip_r )
 	if (cpu_get_pc(&space->device())==0xc045ffc)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
-//	 printf("%08x\n", cpu_get_pc(&space->device()));
+//   printf("%08x\n", cpu_get_pc(&space->device()));
 
 	return naomi_ram64[0x2b0600/8];
 }
@@ -337,7 +337,7 @@ static READ64_HANDLER( hotd2_idle_skip_r )
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 		//device_spin_until_interrupt(&space->device());
 //  else
-//	printf("%08x\n", cpu_get_pc(&space->device()));
+//  printf("%08x\n", cpu_get_pc(&space->device()));
 
 	return naomi_ram64[0xa25fb8/8];
 }

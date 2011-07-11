@@ -2668,12 +2668,12 @@ READ64_HANDLER( pvr2_ta_r )
 
 WRITE64_HANDLER( pvr2_ta_w )
 {
-//	int reg;
-//	UINT64 shift;
-//	UINT32 dat;
+//  int reg;
+//  UINT64 shift;
+//  UINT32 dat;
 
-//	reg = decode_reg_64(offset, mem_mask, &shift);
-//	dat = (UINT32)(data >> shift);
+//  reg = decode_reg_64(offset, mem_mask, &shift);
+//  dat = (UINT32)(data >> shift);
 
 	//printf("PVR2 %08x %08x\n",reg,dat);
 }
