@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chihirogd, chihiro_base )
-	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
+	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", NULL, 512, "picreturn")
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

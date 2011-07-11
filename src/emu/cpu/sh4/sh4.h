@@ -57,9 +57,10 @@ enum
 {
 	SH4_IOPORT_16=8*0,
 	SH4_IOPORT_4=8*1,
+	SH4_IOPORT_DMA=8*2,
 	// future use
-	SH4_IOPORT_SCI=8*2,
-	SH4_IOPORT_SCIF=8*3
+	SH4_IOPORT_SCI=8*3,
+	SH4_IOPORT_SCIF=8*4
 };
 
 struct sh4_config
@@ -74,6 +75,14 @@ struct sh4_config
   int md7;
   int md8;
   int clock;
+};
+
+struct sh4_device_dma
+{
+	UINT32 length;
+	UINT32 size;
+	void *buffer;
+	int channel;
 };
 
 struct sh4_ddt_dma
@@ -99,6 +108,7 @@ READ32_HANDLER( sh4_internal_r );
 void sh4_set_frt_input(device_t *device, int state);
 void sh4_set_irln_input(device_t *device, int value);
 void sh4_set_ftcsr_callback(device_t *device, sh4_ftcsr_callback callback);
+int sh4_dma_data(device_t *device, struct sh4_device_dma *s);
 void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s);
 
 /***************************************************************************

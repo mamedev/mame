@@ -83,6 +83,8 @@ struct _options
 	UINT8					flipped;
 	int						mode;
 	const dasm_table_entry *dasm;
+	UINT32					skip;
+	UINT32					count;
 };
 
 
@@ -356,6 +358,8 @@ static int parse_options(int argc, char *argv[], options *opts)
 	int pending_base = FALSE;
 	int pending_arch = FALSE;
 	int pending_mode = FALSE;
+	int pending_skip = FALSE;
+	int pending_count = FALSE;
 	int curarch;
 	int numrows;
 	int arg;
@@ -370,7 +374,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		// is it a switch?
 		if (curarg[0] == '-')
 		{
-			if (pending_base || pending_arch || pending_mode)
+			if (pending_base || pending_arch || pending_mode || pending_skip || pending_count)
 				goto usage;
 
 			if (tolower((UINT8)curarg[1]) == 'a')
@@ -383,6 +387,10 @@ static int parse_options(int argc, char *argv[], options *opts)
 				opts->lower = TRUE;
 			else if (tolower((UINT8)curarg[1]) == 'm')
 				pending_mode = TRUE;
+			else if (tolower((UINT8)curarg[1]) == 's')
+				pending_skip = TRUE;
+			else if (tolower((UINT8)curarg[1]) == 'c')
+				pending_count = TRUE;
 			else if (tolower((UINT8)curarg[1]) == 'n')
 				opts->norawbytes = TRUE;
 			else if (tolower((UINT8)curarg[1]) == 'u')
@@ -426,6 +434,22 @@ static int parse_options(int argc, char *argv[], options *opts)
 			pending_arch = FALSE;
 		}
 
+		// skip bytes
+		else if (pending_skip)
+		{
+			if (sscanf(curarg, "%d", &opts->skip) != 1)
+				goto usage;
+			pending_skip = FALSE;
+		}
+
+		// size 
+		else if (pending_count)
+		{
+			if (sscanf(curarg, "%d", &opts->count) != 1)
+				goto usage;
+			pending_count = FALSE;
+		}
+
 		// filename
 		else if (opts->filename == NULL)
 			opts->filename = curarg;
@@ -436,7 +460,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 	}
 
 	// if we have a dangling option, error
-	if (pending_base || pending_arch || pending_mode)
+	if (pending_base || pending_arch || pending_mode || pending_skip || pending_count)
 		goto usage;
 
 	// if no file or no architecture, fail
@@ -447,6 +471,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 usage:
 	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] \n", argv[0]);
 	printf("   [-mode <n>] [-norawbytes] [-flipped] [-upper] [-lower]\n");
+	printf("   [-skip <n>] [-count <n>]\n");
 	printf("\n");
 	printf("Supported architectures:");
 	numrows = (ARRAY_LENGTH(dasm_table) + 6) / 7;
@@ -504,10 +529,14 @@ int main(int argc, char *argv[])
 	// run it
 	try
 	{
+		if (length > opts.skip)
+			length = length - opts.skip;
+		if ((length > opts.count) && (opts.count != 0))
+			length = opts.count;
 		curpc = opts.basepc;
 		for (curbyte = 0; curbyte < length; curbyte += numbytes)
 		{
-			UINT8 *oprom = (UINT8 *)data + curbyte;
+			UINT8 *oprom = (UINT8 *)data + opts.skip + curbyte;
 			char buffer[1024];
 			UINT32 pcdelta;
 			int numchunks;

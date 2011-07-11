@@ -2545,7 +2545,7 @@ static MACHINE_CONFIG_DERIVED( naomigd, naomi_base )
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", "TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT")
 	MCFG_EEPROM_93C46_8BIT_ADD("mie_eeprom")
 
-	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
+	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", NULL, 512, "picreturn")
 	MCFG_X76F100_ADD("naomibd_eeprom")
 MACHINE_CONFIG_END
 

@@ -94,6 +94,13 @@ typedef struct
 	emu_timer *timer[3];
 	UINT32	refresh_timer_base;
 	int     dma_timer_active[4];
+	UINT32	dma_source[4];
+	UINT32	dma_destination[4];
+	UINT32	dma_count[4];
+	int		dma_wordsize[4];
+	int		dma_source_increment[4];
+	int		dma_destination_increment[4];
+	int		dma_mode[4];
 
 	int 	sh4_icount;
 	int     is_slave;

@@ -238,7 +238,9 @@ struct _naomibd_state
 
 	UINT8 *				memory;
 	chd_file *			gdromchd;
+	cdrom_file *		gdrom;
 	UINT8 *				picdata;
+	UINT32				size;				/* size of installed dimm memory */
 	UINT32				rom_offset, rom_offset_flags, dma_count;
 	UINT32				dma_offset, dma_offset_flags;
 	UINT32				prot_offset, prot_key;
@@ -351,11 +353,14 @@ INLINE naomibd_state *get_safe_token(device_t *device)
  *
  *************************************/
 
-int naomibd_interrupt_callback(device_t *device, naomibd_interrupt_func callback)
+// send interrupt to host system
+void output_interrupt(naomibd_state *st, int state)
 {
-	naomibd_config *config = (naomibd_config *)downcast<const legacy_device_base *>(device)->inline_config();
-	config->interrupt = callback;
-	return 0;
+	naomibd_config *config = (naomibd_config *)downcast<const legacy_device_base *>(st->device)->inline_config();
+
+	/* send out an interrupt */
+	if (config->signal != NULL)
+		(*config->signal)(st->device, 0, state); // 0: this signal is an interrupt
 }
 
 int naomibd_get_type(device_t *device)
@@ -1438,6 +1443,8 @@ static void load_rom_gdrom(running_machine& machine, naomibd_state *v)
 		}
 		if (start != 0)
 		{
+			// check for size
+			assert(size <= v->size);
 			// read encrypted data into memory
 			ptr = v->memory;
 			sectors = (size+2047)/2048;
@@ -2093,7 +2100,9 @@ static DEVICE_START( naomibd )
 			break;
 
 		case DIMM_BOARD:
-			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine(), UINT8, 0x40000000/4); // 0x40000000 is needed for some Chihiro sets, Naomi should be less, we should pass as device param
+ 			assert((config->size >= 256) && !(config->size & 255)); // size multiple of 256 megabytes ?
+ 			v->size = config->size << 20;
+ 			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine(), UINT8, v->size); // 0x40000000 is needed for some Chihiro sets, Naomi should be less
 			v->gdromchd = get_disk_handle(device->machine(), config->gdromregiontag);
 			v->picdata = (UINT8 *)device->machine().region(config->picregiontag)->base();
 			if (v->memory != NULL && v->gdromchd != NULL && v->picdata != NULL)
