@@ -5759,8 +5759,11 @@ nyanpani		// GX712 (c) 1988 (Japan)
 hcrash			// GX790 (c) 1987
 hcrashc			// GX790 (c) 1987
 
+// Bubble System
+bubsys
+
 // GX400 BIOS based games
-rf2				// GX561 (c) 1985
+rf2			// GX561 (c) 1985
 twinbee			// GX412 (c) 1985
 gradius			// GX456 (c) 1985
 gwarrior		// GX578 (c) 1985

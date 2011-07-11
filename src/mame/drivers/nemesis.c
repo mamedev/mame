@@ -2522,12 +2522,12 @@ ROM_END
 
 
 
-GAME( 1985, nemesis,   0,         nemesis,    nemesis,   0,    ROT0,   "Konami", "Nemesis",  GAME_SUPPORTS_SAVE )
-GAME( 1985, nemesisuk, nemesis,   nemesis,    nemesuk,   0,    ROT0,   "Konami", "Nemesis (World?)",  GAME_SUPPORTS_SAVE )
+GAME( 1985, nemesis,   0,         nemesis,    nemesis,   0,    ROT0,   "Konami", "Nemesis (ROM version)",  GAME_SUPPORTS_SAVE )
+GAME( 1985, nemesisuk, nemesis,   nemesis,    nemesuk,   0,    ROT0,   "Konami", "Nemesis (World?, ROM version)",  GAME_SUPPORTS_SAVE )
 GAME( 1985, konamigt,  0,         konamigt,   konamigt,  0,    ROT0,   "Konami", "Konami GT",  GAME_SUPPORTS_SAVE )
 GAME( 1985, rf2,       konamigt,  rf2_gx400,  rf2,       0,    ROT0,   "Konami", "Konami RF2 - Red Fighter",  GAME_SUPPORTS_SAVE )
-GAME( 1985, twinbee,   0,         gx400,      twinbee,   0,    ROT90,  "Konami", "TwinBee",  GAME_SUPPORTS_SAVE )
-GAME( 1985, gradius,   nemesis,   gx400,      gradius,   0,    ROT0,   "Konami", "Gradius",  GAME_SUPPORTS_SAVE )
+GAME( 1985, twinbee,   0,         gx400,      twinbee,   0,    ROT90,  "Konami", "TwinBee (ROM version)",  GAME_SUPPORTS_SAVE )
+GAME( 1985, gradius,   nemesis,   gx400,      gradius,   0,    ROT0,   "Konami", "Gradius (Japan, ROM version)",  GAME_SUPPORTS_SAVE )
 GAME( 1985, gwarrior,  0,         gx400,      gwarrior,  0,    ROT0,   "Konami", "Galactic Warriors",  GAME_SUPPORTS_SAVE )
 GAME( 1986, salamand,  0,         salamand,   salamand,  0,    ROT0,   "Konami", "Salamander (version D)",  GAME_SUPPORTS_SAVE )
 GAME( 1986, salamandj, salamand,  salamand,   salamand,  0,    ROT0,   "Konami", "Salamander (version J)",  GAME_SUPPORTS_SAVE )
@@ -2540,3 +2540,343 @@ GAME( 1987, hcrash,    0,         hcrash,     hcrash,    0,    ROT0,   "Konami",
 GAME( 1987, hcrashc,   hcrash,    hcrash,     hcrash,    0,    ROT0,   "Konami", "Hyper Crash (version C)",  GAME_SUPPORTS_SAVE )
 GAME( 1988, kittenk,   0,         nyanpani,   nyanpani,  0,    ROT0,   "Konami", "Kitten Kaboodle",  GAME_SUPPORTS_SAVE )
 GAME( 1988, nyanpani,  kittenk,   nyanpani,   nyanpani,  0,    ROT0,   "Konami", "Nyan Nyan Panic (Japan)",  GAME_SUPPORTS_SAVE )
+
+/*
+
+Konami Bubble System
+Konami, 1985
+
+A 68000/Z80-based arcade system PCB with an additional Bubble Memory Cassette
+containing the game data which can be changed easily. The data in the Bubble
+Cassette can be corrupted if subjected to magnetic interference.
+The bottom PCB appears to be exactly the same as used on Nemesis hardware.
+
+The boot sequence is....
+On power up, displays a blue screen containing some junk pixels and speech
+says....
+"Presented By Konami"
+then...
+"Getting Ready..... Fifty"
+"Getting Ready..... Forty Nine"
+etc, until about 30, then the screen displays some orange text 'WARMING UP NOW' on
+a black background and numbers that count down from 99 to 0, and below that text
+'PRESENTED BY KONAMI". A tune also plays while the numbers count down.
+When the counter reaches 0 the game boots.
+
+I suspect that the 'GETTING READY' stuff is actually warming up the bubble memory
+(which operates at 30-40 degrees C) and the 'WARMING UP NOW' part is actually copying
+data from the bubble memory to the 2x 6264 SRAMs on the small plug-in PCB or some other
+on-board RAM then the game runs entirely from RAM thereafter. This is assuming the
+bubble memory is not fast enough to be directly accessed in real time.
+This is speculation at this early stage.... it's entirely possible that the game does
+run from the bubble memory.
+
+Only two games were released on the 'Bubble Memory' version of the
+GX400 hardware ....
+1985/02 TwinBee
+1985/05 Gradius (Japan release) / Nemesis (International release)
+
+The harness pinout matches Scramble with 3 additional wires....
+-12V = A15 (pin 15 solder side)
+1P Fire 3 = A12 (pin 12 solder side)
+2P Fire 3 = B15 (pin 15 parts side)
+
+
+PCB Layouts
+-----------
+
+Top PCB
+
+GX400PWB(B)200207E                            Bubble Memory Cassette (above PCB)
+|----------------------------------------------------------||----------------------|
+|    400A1.2B  4066 UPC324 MB3761      |-------------------||--------------------| |
+| 400A2.1B         AN6914 VOL          |                   ||   2128             ||-|
+|                                      |                   \/                    || |
+|            AY3-8910   LA4460         |          68000         2128             || |
+|            AY3-8910                  |0005297                                  || |
+|-|                                    |                                         || |
+  |                                    |                                         || |
+|-|  0005289                           |                                         ||-|
+|                                      |                                         | |
+|               14.31818MHz            |                                         | |
+|1                                     |                                         | |
+|8         DSW3                        |                                         | |
+|W              3.579545MHz            |                        4416 4416 4416 4416|
+|A         DSW2                        |                                         | |
+|Y                                     |                        4416 4416 4416 4416|
+|          DSW1         400B03.8G      |                                         | |
+|-|                           Z80A   *2|                                         ||-|
+  |        VLM5030                  |-||                                         || |
+|-|                                 | ||                                         || |
+|                                   | ||                                         || |
+|          4416                2128 |12MHz                                       || |
+|                                   | ||                         2128            || |
+|          4416                     |-||                                         ||-|
+|                          *1          |-------------------------2128------------| |
+|--------------------|------------|------------------------------------------------|
+                     |6264    6264|
+                     |------------|
+Notes:
+      *1 - Small plug-in PCB containing two 8kx8 SRAMs. PCB number GX456 PWB(C)400327
+      *2 - Bubble Cassette connector
+      68000 - clock 9.216MHz [18.432/2]
+      Z80A - clock 3.579545MHz
+      VLM5030 - clock 1.7897725MHz [3.579545/2]
+      AY3-8910 - clock 3.579545MHz
+      400A1.2B / 400A2.1B - Texas Instruments TBP24S10 Bipolar PROMs
+                            Connected to 0005289, maybe MCU code?
+      400B03.8G - 2764 EPROM
+      2128 - 2kx8 SRAM
+      6264 - 8kx8 SRAM
+      4416 - 16kx4 DRAM
+      VSync - 60Hz
+      HSync - 15.52kHz
+
+      Custom Chips - 0005289 (DIP42, possibly MCU?), 0005297 (SDIP64)
+      NOTE! Removing the 0005289 results in the music at start-up having missing notes,
+      as if only one of the AY3-8910's is being used. The game otherwise boots fine and
+      appears to play perfectly without any noticable errors or missing graphics or sounds.
+
+
+Bottom PCB
+
+GX400PWB(A)200204C
+|----------------------------------------------------------------------------------|
+|                                                                                  |
+|                                      6264                                       |-|
+|                                                   0005292                       | |
+|                                                                                 | |
+|                                      6264                                       | |
+|                                                                                 | |
+|                                                                                 | |
+|                                                                                 |-|
+|                                                                                  |
+|                                                                  2128   2128     |
+|                                                                                  |
+|              0005290                 6264              0005291                   |
+|  0005294                   0005293                                               |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                                                                                 |-|
+|                                                                                 | |
+|                                                                                 | |
+|                                                                                 | |
+|4164 4164 4164 4164                             2128                             | |
+|4164 4164 4164 4164                                                              | |
+|4164 4164 4164 4164                                                              |-|
+|4164 4164 4164 4164         0005295                            18.432MHz          |
+|----------------------------------------------------------------------------------|
+Notes:
+      4164 - 64kx1 DRAM
+      2128 - 2kx8 SRAM
+      6264 - 8kx8 SRAM
+
+      Konami custom chips -
+      0005290 - SDIP64 package
+      0005291 - 64-pin Quad-In-Line (Spider-legs) package (possibly manufactured by Rockwell?)
+      0005292 - SDIP64 package
+      0005293 - SDIP64 package (manufactured by Toshiba, marked TC15G0144AP)
+      0005294 - 64-pin Quad-In-Line (Spider-legs) package (possibly manufactured by Rockwell?)
+      0005295 - SDIP64 package
+
+
+Bubble Cassette
+---------------
+The bubble cassette PCB is housed in a metal box. The PCB
+is about half the size of the box.
+
+     |-------------------------|
+     |C271C   MB3908   MB3908  |
+     |C271C   MB3908   MB3908  |
+     |74LS03                   |
+     |     |-------| |-------| |
+     |     |   F   | |   F   | |
+     |     |       | |       | |
+     |C2501|       | |       | |
+     |     |-------| |-------| |
+     |      RE65G      RE65G   |
+ |---|      25Ohms     25Ohms  |
+ |   |                         |
+ |   |MB466 MB466   MB466 MB466|
+ | *1|      MB3910     MB3910  |
+ |   |            74LS32       |
+ |---|        12000kHz MB14506 |
+     |-----|------------|------|
+           |-----*2-----|
+Notes:
+      All IC's shown
+      F - Fujitsu bubble memory. No part number given. Memory size unknown.
+          One stamped '4612125, with sticker 'KN - #01'
+          the other is stamped '3801105, with sticker 'KN - #01'
+          DIP24 package. Both have Fujitsu manufacturer symbol
+     *1 - Small plug-in PCB containing capacitors and resistors.
+     *2 - Connector joining to main PCB
+
+
+Controls
+--------
+2x 8-way joystick with 3 buttons each player
+
+
+DIPs
+----
+
+DSW1
+Default = *
+                1   2   3   4
+|-------------|---|---|---|---|
+|COIN1  1C 1P*|OFF|OFF|OFF|OFF|
+|       1C 2P |ON |OFF|OFF|OFF|
+|       1C 3P |OFF|ON |OFF|OFF|
+|       1C 4P |ON |ON |OFF|OFF|
+|       1C 5P |OFF|OFF|ON |OFF|
+|       1C 6P |ON |OFF|ON |OFF|
+|       1C 7P |OFF|ON |ON |OFF|
+|       2C 1P |ON |ON |ON |OFF|
+|       2C 3P |OFF|OFF|OFF|ON |
+|       2C 5P |ON |OFF|OFF|ON |
+|       3C 1P |OFF|ON |OFF|ON |
+|       3C 2P |ON |ON |OFF|ON |
+|       3C 4P |OFF|OFF|ON |ON |
+|       4C 1P |ON |OFF|ON |ON |
+|       4C 3P |OFF|ON |ON |ON |
+|    Freeplay |ON |ON |ON |ON |
+|-------------|---|---|---|---|
+
+                5   6   7   8
+|-------------|---|---|---|---|
+|COIN2  1C 1P*|OFF|OFF|OFF|OFF|
+|       1C 2P |ON |OFF|OFF|OFF|
+|       1C 3P |OFF|ON |OFF|OFF|
+|       1C 4P |ON |ON |OFF|OFF|
+|       1C 5P |OFF|OFF|ON |OFF|
+|       1C 6P |ON |OFF|ON |OFF|
+|       1C 7P |OFF|ON |ON |OFF|
+|       2C 1P |ON |ON |ON |OFF|
+|       2C 3P |OFF|OFF|OFF|ON |
+|       2C 5P |ON |OFF|OFF|ON |
+|       3C 1P |OFF|ON |OFF|ON |
+|       3C 2P |ON |ON |OFF|ON |
+|       3C 4P |OFF|OFF|ON |ON |
+|       4C 1P |ON |OFF|ON |ON |
+|       4C 3P |OFF|ON |ON |ON |
+|  Invalidity |ON |ON |ON |ON |
+|-------------|---|---|---|---|
+
+DSW2
+Default = *
+             1   2   3   4   5   6   7   8
+|----------|---|---|---|---|---|---|---|---|
+|LIVES   3*|OFF|OFF|   |   |   |   |   |   |
+|        4 |ON |OFF|   |   |   |   |   |   |
+|        5 |OFF|ON |   |   |   |   |   |   |
+|        7 |ON |ON |   |   |   |   |   |   |
+|----------|---|---|---|---|---|---|---|---|
+|CABINET     TABLE*|OFF|   |   |   |   |   |
+|          UPRIGHT |ON |   |   |   |   |   |
+|------------------|---|---|---|---|---|---|
+|BONUS 1ST/2ND         |   |   |   |   |   |
+|          20000/70000 |OFF|OFF|   |   |   |
+|          30000/80000*|ON |OFF|   |   |   |
+|          20000/NONE  |OFF|ON |   |   |   |
+|          30000/NONE  |ON |ON |   |   |   |
+|----------------------|---|---|---|---|---|
+|DIFFICULTY               EASY |OFF|OFF|   |
+|                       NORMAL*|ON |OFF|   |
+|                    DIFFICULT |OFF|ON |   |
+|                  V.DIFFICULT |ON |ON |   |
+|------------------------------|---|---|---|
+|DEMO SOUND                        OFF |OFF|
+|                                  ON* |ON |
+|--------------------------------------|---|
+
+DSW3
+Default = *
+             1   2   3
+|----------|---|---|---|
+|SCREEN    |   |   |   |
+|   NORMAL*|OFF|   |   |
+|     FLIP |ON |   |   |
+|----------|---|---|---|
+|CONTROLS          |   |
+|   SINGLE UPRIGHT*|OFF|
+|     DUAL UPRIGHT |ON |
+|------------------|---|
+|MODE         GAME*|OFF|
+|             TEST |ON |
+|------------------|---|
+Manual says SW4, 5, 6, 7 & 8 not used, leave off
+
+
+*/
+
+static MACHINE_CONFIG_START( bubsys, nemesis_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
+	MCFG_CPU_PROGRAM_MAP(gx400_map)
+	MCFG_CPU_VBLANK_INT_HACK(gx400_interrupt,3)
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
+	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+
+	MCFG_MACHINE_START(nemesis)
+	MCFG_MACHINE_RESET(nemesis)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(nemesis)
+
+	MCFG_GFXDECODE(nemesis)
+	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_VIDEO_START(nemesis)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)	/* verified with OST */
+
+	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	/* verified with OST */
+
+	MCFG_SOUND_ADD("k007232", K005289, 3579545/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)	/* verified with OST */
+
+	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)	/* unused */
+MACHINE_CONFIG_END
+
+
+
+ROM_START( bubsys )
+	ROM_REGION( 0x140000, "maincpu", ROMREGION_ERASE00 )
+	// no dump, MCU provides code there
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) // Fujitsu MCU, unknown type
+	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_LOAD( "400b03.8g",   0x00000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
+
+	ROM_REGION( 0x0200,  "k007232", 0 )      /* 2x 256 byte for 0005289 wavetable data */
+	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
+	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+
+	ROM_REGION( 0x4000, "sram", 0 ) // raw RAM dumps, just for emulation aid, to be removed ...
+	ROM_LOAD( "sram1.ic1", 0x0000, 0x2000, CRC(45fc9453) SHA1(eeb4ff2c2c9d3b6ea9d0f0e8fd4873f2cce2cff9) )
+	ROM_LOAD( "sram2.ic3", 0x2000, 0x2000, CRC(dda768be) SHA1(e98bae3ccf63eb67193346e9c40257a3ddb88e59) )
+ROM_END
+
+GAME( 1985, bubsys,   0,         bubsys,    nemesis,   0,    ROT0,   "Konami", "Bubble System BIOS", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
