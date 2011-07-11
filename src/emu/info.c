@@ -471,7 +471,7 @@ void info_xml_creator::output_rom()
 					else
 					{
 						fprintf(m_output, " index=\"%x\"", DISK_GETINDEX(rom));
-						fprintf(m_output, " writeable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
+						fprintf(m_output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
 					}
 
 					// add optional flag
