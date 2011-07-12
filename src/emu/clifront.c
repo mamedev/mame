@@ -183,7 +183,7 @@ int cli_frontend::execute(int argc, char **argv)
 			if (strlen(m_options.software_name()) > 0) {
 				machine_config config(*system, m_options);
 				if (!config.devicelist().first(SOFTWARE_LIST))
-					throw emu_fatalerror(MAMERR_FATALERROR, "No software lists defined for this system\n");
+					throw emu_fatalerror(MAMERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
 
 				bool found = FALSE;
 				for (device_t *swlists = config.devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
