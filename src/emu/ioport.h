@@ -1076,6 +1076,7 @@ void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &er
 /* name of table */
 #define DEVICE_INPUT_DEFAULTS_NAME(_name) device_iptdef_##_name
 
+#define device_iptdef_0 NULL
 #define device_iptdef___null NULL
 
 /* start of table */
