@@ -106,9 +106,9 @@ m_searchpath = combinedpath;
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
 				hash_collection hashes(ROM_GETHASHDATA(rom));
-				bool shared = also_used_by_parent(hashes) >= 0;
+				bool shared = also_used_by_parent(hashes) >= 0 || !source_is_gamedrv;
 
-				// if a dump exists, then at least one entry is required
+				// count the number of files with hashes
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 				{
 					required++;
@@ -127,12 +127,8 @@ m_searchpath = combinedpath;
 				else if (ROMREGION_ISDISKDATA(region))
 					record = audit_one_disk(rom);
 
-				// skip if no record
-				if (record == NULL)
-					continue;
-
-				// if we got a record back,
-				if (record->status() != audit_record::STATUS_NOT_FOUND && source_is_gamedrv)
+				// count the number of files that are found.
+				if (record != NULL && record->status() != audit_record::STATUS_NOT_FOUND)
 				{
 					found++;
 					if (shared)
@@ -144,11 +140,11 @@ m_searchpath = combinedpath;
 		}
 	}
 
-	// if there are no required roms then we have the set
+	// if there are no files with hashes then we have the set
 	if (required == 0)
 		return CORRECT;
 
-	// if we found nothing unique to this set & the set needs roms that aren't in the parent or the parent isn't found either, then we don't have the set at all
+	// if we only find files that are in the parent & either the set has no unique files or the parent is not found, then assume we don't have the set at all
 	if (found == sharedFound && (required != sharedRequired || sharedFound == 0))
 		m_record_list.reset();
 
