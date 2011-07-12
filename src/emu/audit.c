@@ -144,8 +144,12 @@ m_searchpath = combinedpath;
 		}
 	}
 
+	// if there are no required roms then we have the set
+	if (required == 0)
+		return CORRECT;
+
 	// if we found nothing unique to this set & the set needs roms that aren't in the parent or the parent isn't found either, then we don't have the set at all
-	if (found == sharedFound && required > 0 && (required != sharedRequired || sharedFound == 0))
+	if (found == sharedFound && (required != sharedRequired || sharedFound == 0))
 		m_record_list.reset();
 
 	// return a summary
