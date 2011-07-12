@@ -1193,7 +1193,7 @@ static const cem3394_interface cem_interface =
 static MACHINE_CONFIG_START( balsente, balsente_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_20MHz/4) /* xtal verified but not speed */
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_20MHz/16) /* xtal verified but not speed */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT("screen", balsente_update_analog_inputs)
 
