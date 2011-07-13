@@ -658,7 +658,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_CPU_IO_MAP(DSP_map_io)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START(taitoair)
 	MCFG_MACHINE_RESET(taitoair)
