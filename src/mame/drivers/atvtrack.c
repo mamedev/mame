@@ -119,11 +119,11 @@ static READ64_HANDLER( area1_r )
 
 static WRITE64_HANDLER( area1_w )
 {
-	UINT32 addr, dat, old;
+	UINT32 addr, dat; //, old;
 
 	addr = 0;
 	dat = decode64_32(offset, data, mem_mask, addr);
-	old = area1_data[addr];
+//	old = area1_data[addr];
 	area1_data[addr] = dat;
 	if (addr == (0x00020000-0x00020000)/4) {
 		if (data & 4) {
@@ -161,36 +161,36 @@ static READ64_HANDLER( area2_r )
 
 static WRITE64_HANDLER( area2_w )
 {
-	UINT32 addr, dat;
+//	UINT32 addr, dat;
 
-	addr = 0;
-	dat = decode64_32(offset, data, mem_mask, addr);
-	if (addr == 0)
-		;
-	else
-		;
+//	addr = 0;
+//	dat = decode64_32(offset, data, mem_mask, addr);
+//	if (addr == 0)
+//		;
+//	else
+//		;
 }
 
 static READ64_HANDLER( area3_r )
 {
-	UINT32 addr, dat;
+//	UINT32 addr, dat;
 
-	addr = 0;
-	dat = decode64_32(offset, 0, mem_mask, addr);
-	if (addr == 0)
-		;
-	else
-		;
+//	addr = 0;
+//	dat = decode64_32(offset, 0, mem_mask, addr);
+//	if (addr == 0)
+//		;
+//	else
+//		;
 	return 0;
 }
 
 static WRITE64_HANDLER( area3_w )
 {
-	UINT32 addr, dat;
+	UINT32 addr; //, dat;
 	int c;
 
 	addr = 0;
-	dat = decode64_32(offset, data, mem_mask, addr);
+//	dat = decode64_32(offset, data, mem_mask, addr);
 	if (addr == 0) {
 		for (c = 0;c < 4;c++) {
 			nandcommand[c] = data & 0xff;
@@ -219,24 +219,24 @@ static WRITE64_HANDLER( area3_w )
 
 static READ64_HANDLER( area4_r )
 {
-	UINT32 addr, dat;
+//	UINT32 addr, dat;
 
-	addr = 0;
-	dat = decode64_32(offset, 0, mem_mask, addr);
-	if (addr == 0)
-		;
-	else
-		;
+//	addr = 0;
+//	dat = decode64_32(offset, 0, mem_mask, addr);
+//	if (addr == 0)
+//		;
+//	else
+//		;
 	return 0;
 }
 
 static WRITE64_HANDLER( area4_w )
 {
-	UINT32 addr, dat;
+	UINT32 addr; //, dat;
 	int c;
 
 	addr = 0;
-	dat = decode64_32(offset, data, mem_mask, addr);
+//	dat = decode64_32(offset, data, mem_mask, addr);
 	if (addr == 0) {
 		for (c = 0;c < 4;c++) {
 			if (nandaddressstep == 0) {
