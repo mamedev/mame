@@ -432,7 +432,7 @@ static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback)
 		Mod_RM.RM.b[i] = breg_name[i & 7];
 	}
 
-	memset(nec_state, 0, sizeof(nec_state));
+	memset(nec_state, 0, sizeof(v25_state_t));
 
 	nec_state->config = config;
 

@@ -251,7 +251,7 @@ static CPU_INIT( esrip )
 	esrip_state *cpustate = get_safe_token(device);
 	esrip_config* _config = (esrip_config*)device->static_config();
 
-	memset(cpustate, 0, sizeof(cpustate));
+	memset(cpustate, 0, sizeof(esrip_state));
 
 	/* Register configuration structure callbacks */
 	cpustate->fdt_r = _config->fdt_r;

@@ -891,7 +891,7 @@ static CPU_INIT( m37710 )
 	m37710i_cpu_struct *cpustate = get_safe_token(device);
 	int i;
 
-	memset(cpustate, 0, sizeof(cpustate));
+	memset(cpustate, 0, sizeof(m37710i_cpu_struct));
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;
