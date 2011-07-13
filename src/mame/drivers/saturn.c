@@ -115,7 +115,7 @@ also has a DSP;
 
 /* TODO: do this in a verboselog style */
 #define LOG_CDB  0
-#define LOG_SCU  0
+#define LOG_SCU  1
 #define LOG_IRQ  0
 #define LOG_IOGA 0
 
@@ -520,55 +520,54 @@ static void scu_do_transfer(running_machine &machine,UINT8 event)
 static READ32_HANDLER( saturn_scu_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
+	UINT32 res;
 
 	/*TODO: write only registers must return 0...*/
-	//popmessage("%02x",DMA_STATUS);
-	//if (offset == 23)
-	//{
-		//Super Major League reads here???
-	//}
-	if (offset == 31)
+	switch(offset)
 	{
-		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
-		return state->m_scu_regs[offset];
-	}
-	else if ( offset == 35 )
-	{
-        if(LOG_SCU) logerror( "DSP mem read at %08X\n", state->m_scu_regs[34]);
-        return dsp_ram_addr_r();
-    }
-    else if( offset == 41) /*IRQ reg status read*/
-    {
-		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x\n",cpu_get_pc(&space->device()),mem_mask);
+		//case 0x5c/4:
+		//	Super Major League reads here???
+		//	break;
+	 	case 0x7c/4:
+			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
+			res = state->m_scu_regs[offset];
+			break;
+		case 0x8c/4:
+			if(LOG_SCU) logerror( "DSP mem read at %08X\n", state->m_scu_regs[34]);
+        	res = dsp_ram_addr_r();
+        	break;
+    	case 0xa4/4:
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x\n",cpu_get_pc(&space->device()),mem_mask);
 
-		state->m_scu_regs[41] = (state->m_scu_irq.vblank_in & 1)<<0;
-		state->m_scu_regs[41]|= (state->m_scu_irq.vblank_out & 1)<<1;
-		state->m_scu_regs[41]|= (state->m_scu_irq.hblank_in & 1)<<2;
-		state->m_scu_regs[41]|= (state->m_scu_irq.timer_0 & 1)<<3;
-		state->m_scu_regs[41]|= (state->m_scu_irq.timer_1 & 1)<<4;
-		state->m_scu_regs[41]|= (state->m_scu_irq.dsp_end & 1)<<5;
-		state->m_scu_regs[41]|= (state->m_scu_irq.sound_req & 1)<<6;
-		state->m_scu_regs[41]|= (state->m_scu_irq.smpc & 1)<<7;
-		state->m_scu_regs[41]|= (state->m_scu_irq.pad & 1)<<8;
-		state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[0] & 1)<<9;
-		state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[1] & 1)<<10;
-		state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[2] & 1)<<11;
-		state->m_scu_regs[41]|= (state->m_scu_irq.dma_ill & 1)<<12;
-		state->m_scu_regs[41]|= (state->m_scu_irq.vdp1_end & 1)<<13;
-		state->m_scu_regs[41]|= (state->m_scu_irq.abus & 1)<<15;
+			state->m_scu_regs[41] = (state->m_scu_irq.vblank_in & 1)<<0;
+			state->m_scu_regs[41]|= (state->m_scu_irq.vblank_out & 1)<<1;
+			state->m_scu_regs[41]|= (state->m_scu_irq.hblank_in & 1)<<2;
+			state->m_scu_regs[41]|= (state->m_scu_irq.timer_0 & 1)<<3;
+			state->m_scu_regs[41]|= (state->m_scu_irq.timer_1 & 1)<<4;
+			state->m_scu_regs[41]|= (state->m_scu_irq.dsp_end & 1)<<5;
+			state->m_scu_regs[41]|= (state->m_scu_irq.sound_req & 1)<<6;
+			state->m_scu_regs[41]|= (state->m_scu_irq.smpc & 1)<<7;
+			state->m_scu_regs[41]|= (state->m_scu_irq.pad & 1)<<8;
+			state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[0] & 1)<<9;
+			state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[1] & 1)<<10;
+			state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[2] & 1)<<11;
+			state->m_scu_regs[41]|= (state->m_scu_irq.dma_ill & 1)<<12;
+			state->m_scu_regs[41]|= (state->m_scu_irq.vdp1_end & 1)<<13;
+			state->m_scu_regs[41]|= (state->m_scu_irq.abus & 1)<<15;
 
-		return state->m_scu_regs[41] ^ 0xffffffff; //TODO: this is WRONG (Choice Cuts is a good test case)
+			res = state->m_scu_regs[41] ^ 0xffffffff; //TODO: this is WRONG (Choice Cuts is a good test case)
+			break;
+		case 0xc8/4:
+			logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(&space->device()));
+			res = 0x00000000;/*SCU Version 0, OK?*/
+			break;
+		default:
+	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(&space->device()),offset,state->m_scu_regs[offset]);
+	    	res = state->m_scu_regs[offset];
+			break;
 	}
-	else if( offset == 50 )
-	{
-		logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(&space->device()));
-		return 0x00000000;/*SCU Version 0*/
-	}
-    else
-    {
-    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(&space->device()),offset,state->m_scu_regs[offset]);
-    	return state->m_scu_regs[offset];
-	}
+
+	return res;
 }
 
 #define DMA_CH ((offset & 0x18) / 8)
@@ -582,140 +581,135 @@ static WRITE32_HANDLER( saturn_scu_w )
 	switch(offset)
 	{
 		/*LV 0 DMA*/
-		case 0:	case 8: case 16:  state->m_scu.src[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
-		case 1:	case 9: case 17:  state->m_scu.dst[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
-		case 2: case 10: case 18: state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0x1fff)) >> 0); break;
-		case 3: case 11: case 19:
+		case 0x00/4: case 0x20/4: case 0x40/4:  state->m_scu.src[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
+		case 0x04/4: case 0x24/4: case 0x44/4:  state->m_scu.dst[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
+		case 0x08/4: case 0x28/4: case 0x48/4:  state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0x1fff)) >> 0); break;
+		case 0x0c/4: case 0x2c/4: case 0x4c/4:
 			/*Read address add value for DMA lv 0*/
 			state->m_scu.src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 1;
 
 			/*Write address add value for DMA lv 0*/
 			state->m_scu.dst_add[DMA_CH] = 2 << (state->m_scu_regs[offset] & 7);
 			break;
-		case 4: case 12: case 20:
-/*
--state->m_scu_regs[4] bit 0 is DMA starting bit.
-    Used when the start factor is 7.Toggle after execution.
--state->m_scu_regs[4] bit 8 is DMA Enable bit.
-    This is an execution mask flag.
--state->m_scu_regs[5] bit 0,bit 1 and bit 2 is DMA starting factor.
-    It must be 7 for this specific condition.
--state->m_scu_regs[5] bit 24 is Indirect Mode/Direct Mode (0/1).
-*/
-		state->m_scu.enable_mask[DMA_CH] = (data & 0x100) >> 8;
-		if(state->m_scu.enable_mask[DMA_CH] && state->m_scu.start_factor[DMA_CH] == 7 && state->m_scu_regs[offset] & 1)
-		{
-			if(DIRECT_MODE(DMA_CH)) { scu_dma_direct(space,DMA_CH);   }
-			else				    { scu_dma_indirect(space,DMA_CH); }
-			state->m_scu_regs[offset]&=~1;//disable starting bit.
-		}
-		break;
-		case 5: case 13: case 21:
-		if(INDIRECT_MODE(DMA_CH))
-		{
-			if(LOG_SCU) logerror("Indirect Mode DMA lv %d set\n",DMA_CH);
-			if(!DWUP(DMA_CH)) state->m_scu.index[DMA_CH] = state->m_scu.dst[DMA_CH];
-		}
+		case 0x10/4: case 0x30/4: case 0x50/4:
+			state->m_scu.enable_mask[DMA_CH] = (data & 0x100) >> 8;
+			if(state->m_scu.enable_mask[DMA_CH] && state->m_scu.start_factor[DMA_CH] == 7 && state->m_scu_regs[offset] & 1)
+			{
+				if(DIRECT_MODE(DMA_CH)) { scu_dma_direct(space,DMA_CH);   }
+				else				    { scu_dma_indirect(space,DMA_CH); }
+				state->m_scu_regs[offset]&=~1;//disable starting bit.
+			}
+			break;
+		case 0x14/4: case 0x34/4: case 0x54/4:
+			if(INDIRECT_MODE(DMA_CH))
+			{
+				if(LOG_SCU) logerror("Indirect Mode DMA lv %d set\n",DMA_CH);
+				if(!DWUP(DMA_CH)) state->m_scu.index[DMA_CH] = state->m_scu.dst[DMA_CH];
+			}
 
-		/*Start factor enable bits,bit 2,bit 1 and bit 0*/
-		state->m_scu.start_factor[DMA_CH] = state->m_scu_regs[offset] & 7;
-		break;
+			/*Start factor enable bits,bit 2,bit 1 and bit 0*/
+			state->m_scu.start_factor[DMA_CH] = state->m_scu_regs[offset] & 7;
+			break;
 
-		case 24:
-		if(LOG_SCU) logerror("DMA Forced Stop Register set = %02x\n",state->m_scu_regs[24]);
-		break;
-		case 31: if(LOG_SCU) logerror("Warning: DMA status WRITE! Offset %02x(%d)\n",offset*4,offset); break;
+		case 0x60/4:
+			if(LOG_SCU) logerror("DMA Forced Stop Register set = %02x\n",state->m_scu_regs[24]);
+			break;
+		case 0x7c/4: if(LOG_SCU) logerror("Warning: DMA status WRITE! Offset %02x(%d)\n",offset*4,offset); break;
 		/*DSP section*/
 		/*Use functions so it is easier to work out*/
-		case 32:
-		dsp_prg_ctrl(space, data);
-		if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
-		break;
-		case 33:
-		dsp_prg_data(data);
-		if(LOG_SCU) logerror("SCU DSP: Program RAM Data Port Access %08x\n",data);
-		break;
-		case 34:
-		dsp_ram_addr_ctrl(data);
-		if(LOG_SCU) logerror("SCU DSP: Data RAM Address Port Access %08x\n",data);
-		break;
-		case 35:
-		dsp_ram_addr_w(data);
-		if(LOG_SCU) logerror("SCU DSP: Data RAM Data Port Access %08x\n",data);
-		break;
-		case 36: if(LOG_SCU) logerror("timer 0 compare data = %03x\n",state->m_scu_regs[36]);break;
-		case 37: if(LOG_SCU) logerror("timer 1 set data = %08x\n",state->m_scu_regs[37]); break;
-		case 38: if(LOG_SCU) logerror("timer 1 mode data = %08x\n",state->m_scu_regs[38]); break;
-		case 40:
+		case 0x80/4:
+			dsp_prg_ctrl(space, data);
+			if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
+			break;
+		case 0x84/4:
+			dsp_prg_data(data);
+			if(LOG_SCU) logerror("SCU DSP: Program RAM Data Port Access %08x\n",data);
+			break;
+		case 0x88/4:
+			dsp_ram_addr_ctrl(data);
+			if(LOG_SCU) logerror("SCU DSP: Data RAM Address Port Access %08x\n",data);
+			break;
+		case 0x8c/4:
+			dsp_ram_addr_w(data);
+			if(LOG_SCU) logerror("SCU DSP: Data RAM Data Port Access %08x\n",data);
+			break;
+		case 0x90/4: if(LOG_SCU) logerror("timer 0 compare data = %03x\n",state->m_scu_regs[36]);break;
+		case 0x94/4: if(LOG_SCU) logerror("timer 1 set data = %08x\n",state->m_scu_regs[37]); break;
+		case 0x98/4: if(LOG_SCU) logerror("timer 1 mode data = %08x\n",state->m_scu_regs[38]); break;
+		case 0xa0/4:
 		/*An interrupt is masked when his specific bit is 1.*/
 		/*Are bit 16-bit 31 for External A-Bus irq mask like the status register?*/
 
-		state->m_scu_irq.vblank_in =  (((state->m_scu_regs[40] & 0x0001)>>0) ^ 1);
-		state->m_scu_irq.vblank_out = (((state->m_scu_regs[40] & 0x0002)>>1) ^ 1);
-		state->m_scu_irq.hblank_in =  (((state->m_scu_regs[40] & 0x0004)>>2) ^ 1);
-		state->m_scu_irq.timer_0 =	 (((state->m_scu_regs[40] & 0x0008)>>3) ^ 1);
-		state->m_scu_irq.timer_1 =    (((state->m_scu_regs[40] & 0x0010)>>4) ^ 1);
-		state->m_scu_irq.dsp_end =    (((state->m_scu_regs[40] & 0x0020)>>5) ^ 1);
-		state->m_scu_irq.sound_req =  (((state->m_scu_regs[40] & 0x0040)>>6) ^ 1);
-		state->m_scu_irq.smpc =       (((state->m_scu_regs[40] & 0x0080)>>7) ^ 1); //NOTE: SCU bug
-		state->m_scu_irq.pad =        (((state->m_scu_regs[40] & 0x0100)>>8) ^ 1);
-		state->m_scu_irq.dma_end[2] = (((state->m_scu_regs[40] & 0x0200)>>9) ^ 1);
-		state->m_scu_irq.dma_end[1] = (((state->m_scu_regs[40] & 0x0400)>>10) ^ 1);
-		state->m_scu_irq.dma_end[0] = (((state->m_scu_regs[40] & 0x0800)>>11) ^ 1);
-		state->m_scu_irq.dma_ill =    (((state->m_scu_regs[40] & 0x1000)>>12) ^ 1);
-		state->m_scu_irq.vdp1_end =   (((state->m_scu_regs[40] & 0x2000)>>13) ^ 1);
-		state->m_scu_irq.abus =       (((state->m_scu_regs[40] & 0x8000)>>15) ^ 1);
+		state->m_scu_irq.vblank_in =  (((state->m_scu_regs[0xa0/4] & 0x0001)>>0) ^ 1);
+		state->m_scu_irq.vblank_out = (((state->m_scu_regs[0xa0/4] & 0x0002)>>1) ^ 1);
+		state->m_scu_irq.hblank_in =  (((state->m_scu_regs[0xa0/4] & 0x0004)>>2) ^ 1);
+		state->m_scu_irq.timer_0 =	  (((state->m_scu_regs[0xa0/4] & 0x0008)>>3) ^ 1);
+		state->m_scu_irq.timer_1 =    (((state->m_scu_regs[0xa0/4] & 0x0010)>>4) ^ 1);
+		state->m_scu_irq.dsp_end =    (((state->m_scu_regs[0xa0/4] & 0x0020)>>5) ^ 1);
+		state->m_scu_irq.sound_req =  (((state->m_scu_regs[0xa0/4] & 0x0040)>>6) ^ 1);
+		state->m_scu_irq.smpc =       (((state->m_scu_regs[0xa0/4] & 0x0080)>>7) ^ 1);
+		state->m_scu_irq.pad =        (((state->m_scu_regs[0xa0/4] & 0x0100)>>8) ^ 1);
+		state->m_scu_irq.dma_end[2] = (((state->m_scu_regs[0xa0/4] & 0x0200)>>9) ^ 1);
+		state->m_scu_irq.dma_end[1] = (((state->m_scu_regs[0xa0/4] & 0x0400)>>10) ^ 1);
+		state->m_scu_irq.dma_end[0] = (((state->m_scu_regs[0xa0/4] & 0x0800)>>11) ^ 1);
+		state->m_scu_irq.dma_ill =    (((state->m_scu_regs[0xa0/4] & 0x1000)>>12) ^ 1);
+		state->m_scu_irq.vdp1_end =   (((state->m_scu_regs[0xa0/4] & 0x2000)>>13) ^ 1);
+		state->m_scu_irq.abus =       (((state->m_scu_regs[0xa0/4] & 0x8000)>>15) ^ 1);
 
 		/*Take out the common settings to keep logging quiet.*/
-		if(state->m_scu_regs[40] != 0xfffffffe &&
-		   state->m_scu_regs[40] != 0xfffffffc &&
-		   state->m_scu_regs[40] != 0xffffffff)
+		if(state->m_scu_regs[0xa0/4] != 0xfffffffe &&
+		   state->m_scu_regs[0xa0/4] != 0xfffffffc &&
+		   state->m_scu_regs[0xa0/4] != 0xffffffff)
 		{
-			if(LOG_SCU) logerror("cpu %s (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
+			if(0) logerror("cpu %s (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
 			space->device().tag(), cpu_get_pc(&space->device()),
-			state->m_scu_regs[offset],
-			state->m_scu_regs[offset] & 0x8000 ? 1 : 0, /*A-Bus irq*/
-			state->m_scu_regs[offset] & 0x4000 ? 1 : 0, /*<reserved>*/
-			state->m_scu_regs[offset] & 0x2000 ? 1 : 0, /*Sprite draw end irq(VDP1)*/
-			state->m_scu_regs[offset] & 0x1000 ? 1 : 0, /*Illegal DMA irq*/
-			state->m_scu_regs[offset] & 0x0800 ? 1 : 0, /*Lv 0 DMA end irq*/
-			state->m_scu_regs[offset] & 0x0400 ? 1 : 0, /*Lv 1 DMA end irq*/
-			state->m_scu_regs[offset] & 0x0200 ? 1 : 0, /*Lv 2 DMA end irq*/
-			state->m_scu_regs[offset] & 0x0100 ? 1 : 0, /*PAD irq*/
-			state->m_scu_regs[offset] & 0x0080 ? 1 : 0, /*System Manager(SMPC) irq*/
-			state->m_scu_regs[offset] & 0x0040 ? 1 : 0, /*Snd req*/
-			state->m_scu_regs[offset] & 0x0020 ? 1 : 0, /*DSP irq end*/
-			state->m_scu_regs[offset] & 0x0010 ? 1 : 0, /*Timer 1 irq*/
-			state->m_scu_regs[offset] & 0x0008 ? 1 : 0, /*Timer 0 irq*/
-			state->m_scu_regs[offset] & 0x0004 ? 1 : 0, /*HBlank-IN*/
-			state->m_scu_regs[offset] & 0x0002 ? 1 : 0, /*VBlank-OUT*/
-			state->m_scu_regs[offset] & 0x0001 ? 1 : 0);/*VBlank-IN*/
+			state->m_scu_regs[0xa0/4],
+			state->m_scu_regs[0xa0/4] & 0x8000 ? 1 : 0, /*A-Bus irq*/
+			state->m_scu_regs[0xa0/4] & 0x4000 ? 1 : 0, /*<reserved>*/
+			state->m_scu_regs[0xa0/4] & 0x2000 ? 1 : 0, /*Sprite draw end irq(VDP1)*/
+			state->m_scu_regs[0xa0/4] & 0x1000 ? 1 : 0, /*Illegal DMA irq*/
+			state->m_scu_regs[0xa0/4] & 0x0800 ? 1 : 0, /*Lv 0 DMA end irq*/
+			state->m_scu_regs[0xa0/4] & 0x0400 ? 1 : 0, /*Lv 1 DMA end irq*/
+			state->m_scu_regs[0xa0/4] & 0x0200 ? 1 : 0, /*Lv 2 DMA end irq*/
+			state->m_scu_regs[0xa0/4] & 0x0100 ? 1 : 0, /*PAD irq*/
+			state->m_scu_regs[0xa0/4] & 0x0080 ? 1 : 0, /*System Manager(SMPC) irq*/
+			state->m_scu_regs[0xa0/4] & 0x0040 ? 1 : 0, /*Snd req*/
+			state->m_scu_regs[0xa0/4] & 0x0020 ? 1 : 0, /*DSP irq end*/
+			state->m_scu_regs[0xa0/4] & 0x0010 ? 1 : 0, /*Timer 1 irq*/
+			state->m_scu_regs[0xa0/4] & 0x0008 ? 1 : 0, /*Timer 0 irq*/
+			state->m_scu_regs[0xa0/4] & 0x0004 ? 1 : 0, /*HBlank-IN*/
+			state->m_scu_regs[0xa0/4] & 0x0002 ? 1 : 0, /*VBlank-OUT*/
+			state->m_scu_regs[0xa0/4] & 0x0001 ? 1 : 0);/*VBlank-IN*/
 		}
+
+		if((state->m_scu_regs[0xa0/4] ^ 0x1110) & 0x1110)
+			popmessage("Enabled funky IRQ %08x, contact MAMEdev",state->m_scu_regs[0xa0/4] & 0x1110);
+
 		break;
 		/*Interrupt Control reg Set*/
-		case 41:
+		case 0xa4/4:
 		/*This is r/w by introdon...*/
-		if(LOG_SCU) logerror("IRQ status reg set:%08x %08x\n",state->m_scu_regs[41],mem_mask);
+		if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",cpu_get_pc(&space->device()),state->m_scu_regs[41],mem_mask);
 
-		state->m_scu_irq.vblank_in =  ((state->m_scu_regs[41] & 0x0001)>>0);
-		state->m_scu_irq.vblank_out = ((state->m_scu_regs[41] & 0x0002)>>1);
-		state->m_scu_irq.hblank_in =  ((state->m_scu_regs[41] & 0x0004)>>2);
-		state->m_scu_irq.timer_0 =    ((state->m_scu_regs[41] & 0x0008)>>3);
-		state->m_scu_irq.timer_1 =    ((state->m_scu_regs[41] & 0x0010)>>4);
-		state->m_scu_irq.dsp_end =    ((state->m_scu_regs[41] & 0x0020)>>5);
-		state->m_scu_irq.sound_req =  ((state->m_scu_regs[41] & 0x0040)>>6);
-		state->m_scu_irq.smpc =       ((state->m_scu_regs[41] & 0x0080)>>7);
-		state->m_scu_irq.pad =        ((state->m_scu_regs[41] & 0x0100)>>8);
-		state->m_scu_irq.dma_end[2] = ((state->m_scu_regs[41] & 0x0200)>>9);
-		state->m_scu_irq.dma_end[1] = ((state->m_scu_regs[41] & 0x0400)>>10);
-		state->m_scu_irq.dma_end[0] = ((state->m_scu_regs[41] & 0x0800)>>11);
-		state->m_scu_irq.dma_ill =    ((state->m_scu_regs[41] & 0x1000)>>12);
-		state->m_scu_irq.vdp1_end =   ((state->m_scu_regs[41] & 0x2000)>>13);
-		state->m_scu_irq.abus =       ((state->m_scu_regs[41] & 0x8000)>>15);
+		state->m_scu_irq.vblank_in =  ((state->m_scu_regs[0xa4/4] & 0x0001)>>0);
+		state->m_scu_irq.vblank_out = ((state->m_scu_regs[0xa4/4] & 0x0002)>>1);
+		state->m_scu_irq.hblank_in =  ((state->m_scu_regs[0xa4/4] & 0x0004)>>2);
+		state->m_scu_irq.timer_0 =    ((state->m_scu_regs[0xa4/4] & 0x0008)>>3);
+		state->m_scu_irq.timer_1 =    ((state->m_scu_regs[0xa4/4] & 0x0010)>>4);
+		state->m_scu_irq.dsp_end =    ((state->m_scu_regs[0xa4/4] & 0x0020)>>5);
+		state->m_scu_irq.sound_req =  ((state->m_scu_regs[0xa4/4] & 0x0040)>>6);
+		state->m_scu_irq.smpc =       ((state->m_scu_regs[0xa4/4] & 0x0080)>>7);
+		state->m_scu_irq.pad =        ((state->m_scu_regs[0xa4/4] & 0x0100)>>8);
+		state->m_scu_irq.dma_end[2] = ((state->m_scu_regs[0xa4/4] & 0x0200)>>9);
+		state->m_scu_irq.dma_end[1] = ((state->m_scu_regs[0xa4/4] & 0x0400)>>10);
+		state->m_scu_irq.dma_end[0] = ((state->m_scu_regs[0xa4/4] & 0x0800)>>11);
+		state->m_scu_irq.dma_ill =    ((state->m_scu_regs[0xa4/4] & 0x1000)>>12);
+		state->m_scu_irq.vdp1_end =   ((state->m_scu_regs[0xa4/4] & 0x2000)>>13);
+		state->m_scu_irq.abus =       ((state->m_scu_regs[0xa4/4] & 0x8000)>>15);
 
 		break;
-		case 42: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
-		case 49: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",state->m_scu_regs[49]); break;
+		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
+		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",state->m_scu_regs[49]); break;
 		default: if(LOG_SCU) logerror("Warning: unused SCU reg set %d = %08x\n",offset,data);
 	}
 }
