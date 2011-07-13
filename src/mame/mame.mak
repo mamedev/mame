@@ -1817,7 +1817,8 @@ $(MAMEOBJ)/misc.a: \
 #-------------------------------------------------
 
 $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
-			$(LAYOUT)/shuttlei.lh
+			$(LAYOUT)/shuttlei.lh \
+			$(LAYOUT)/cosmicm.lh
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 
