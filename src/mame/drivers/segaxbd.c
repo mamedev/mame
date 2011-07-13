@@ -2691,8 +2691,8 @@ ROM_END
 */
 ROM_START( gprider )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-13408.ic63", 0x00001, 0x20000, NO_DUMP )	/* we have a key for this set but no program roms */
-	ROM_LOAD16_BYTE( "epr-13409.ic58", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "epr-13408.ic63", 0x00001, 0x20000, CRC(8e410e97) SHA1(2021d738064e57d175b59ba053d9ee35ed4516c8) )
+	ROM_LOAD16_BYTE( "epr-13409.ic58", 0x00000, 0x20000, CRC(9abb81b6) SHA1(f6308f3ec99ee66677e86f6a915e4dff8557d25f) )
 
 	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
 	ROM_LOAD( "317-0163.key", 0x0000, 0x2000, CRC(c1d4d207) SHA1(c35b0a49fb6a1e0e9a1c087f0ccd190ad5c2bb2c) )
@@ -2889,5 +2889,5 @@ GAME( 1989, smgpu3,   smgp,     smgp,    smgp,     smgp,           ROT0, "Sega",
 GAME( 1989, smgpj,    smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (set 2, Japan, Rev B, FD1094 317-0124a)", 0 )
 GAME( 1989, smgpja,   smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (set 1, Japan, Rev A, FD1094 317-0124a)", 0 )
 GAME( 1990, abcop,    0,        xboard,  abcop,    generic_xboard, ROT0, "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
-GAME( 1990, gprider,  0,        xboard,  gprider,  gprider,        ROT0, "Sega", "GP Rider (set 2, World, FD1094 317-0163)", GAME_NOT_WORKING ) // no prg roms
+GAME( 1990, gprider,  0,        xboard,  gprider,  gprider,        ROT0, "Sega", "GP Rider (set 2, World, FD1094 317-0163)", 0 )
 GAME( 1990, gprider1, gprider,  xboard,  gprider,  gprider,        ROT0, "Sega", "GP Rider (set 1, US, FD1094 317-0162)", 0 )
