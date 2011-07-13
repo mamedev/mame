@@ -667,8 +667,9 @@ static WRITE32_HANDLER( saturn_scu_w )
 
 		scu_test_irq(space->machine());
 
-		if((state->m_scu_regs[0xa0/4] ^ 0x1130) & 0x1130)
-			popmessage("Enabled funky IRQ %08x, contact MAMEdev",state->m_scu_regs[0xa0/4] & 0x1130);
+		if(state->m_scu_irq.dsp_end || state->m_scu_irq.pad)
+			if(state->m_scu_regs[0xa0/4] != 0x80)
+				popmessage("Enabled funky IRQ %08x, contact MAMEdev",state->m_scu_regs[0xa0/4] ^ 0xffffffff);
 
 		break;
 		/*Interrupt Control reg Set*/
