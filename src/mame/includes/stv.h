@@ -31,6 +31,7 @@ public:
 		UINT32    index[3];
 		int       start_factor[3];
 		UINT8     enable_mask[3];
+		UINT32    ist;
 	}m_scu;
 
 	int       m_minit_boost;

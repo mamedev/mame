@@ -366,6 +366,8 @@ static TIMER_CALLBACK( smpc_intback )
 	//if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 	if(state->m_scu_irq.smpc)
 		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
+	else
+		state->m_scu.ist |= (1 << 7);
 }
 
 static void smpc_rtc_write(running_machine &machine)

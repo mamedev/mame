@@ -517,6 +517,31 @@ static void scu_do_transfer(running_machine &machine,UINT8 event)
 	}
 }
 
+/* test pending irqs */
+static void scu_test_irq(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int i;
+	const int irq_level[32] = { 0x1, 0x1, 0x1, 0x1,
+								0x1, 0x1, 0x1, 0x1,
+								0x4, 0x4, 0x4, 0x4,
+								0x7, 0x7, 0x7, 0x7,
+								 -1,  -1, 0x2, 0x3,
+								0x5, 0x6, 0x6, 0x8,
+								0x8, 0x9, 0xa, 0xb,
+								0xc, 0xd, 0xe, 0xf };
+
+	for(i=0;i<31;i++)
+	{
+		if((state->m_scu_regs[0xa0/4] & 1 << i) && (state->m_scu.ist & 1 << i))
+		{
+			if(irq_level[i] != -1) /* TODO: cheap check for undefined irqs */
+				device_set_input_line_and_vector(state->m_maincpu, irq_level[i], HOLD_LINE, 0x40 + i);
+			state->m_scu.ist &= ~(1 << i);
+		}
+	}
+}
+
 static READ32_HANDLER( saturn_scu_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
@@ -537,25 +562,9 @@ static READ32_HANDLER( saturn_scu_r )
         	res = dsp_ram_addr_r();
         	break;
     	case 0xa4/4:
-    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x\n",cpu_get_pc(&space->device()),mem_mask);
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",cpu_get_pc(&space->device()),mem_mask,state->m_scu_regs[0xa0/4]);
 
-			state->m_scu_regs[41] = (state->m_scu_irq.vblank_in & 1)<<0;
-			state->m_scu_regs[41]|= (state->m_scu_irq.vblank_out & 1)<<1;
-			state->m_scu_regs[41]|= (state->m_scu_irq.hblank_in & 1)<<2;
-			state->m_scu_regs[41]|= (state->m_scu_irq.timer_0 & 1)<<3;
-			state->m_scu_regs[41]|= (state->m_scu_irq.timer_1 & 1)<<4;
-			state->m_scu_regs[41]|= (state->m_scu_irq.dsp_end & 1)<<5;
-			state->m_scu_regs[41]|= (state->m_scu_irq.sound_req & 1)<<6;
-			state->m_scu_regs[41]|= (state->m_scu_irq.smpc & 1)<<7;
-			state->m_scu_regs[41]|= (state->m_scu_irq.pad & 1)<<8;
-			state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[0] & 1)<<9;
-			state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[1] & 1)<<10;
-			state->m_scu_regs[41]|= (state->m_scu_irq.dma_end[2] & 1)<<11;
-			state->m_scu_regs[41]|= (state->m_scu_irq.dma_ill & 1)<<12;
-			state->m_scu_regs[41]|= (state->m_scu_irq.vdp1_end & 1)<<13;
-			state->m_scu_regs[41]|= (state->m_scu_irq.abus & 1)<<15;
-
-			res = state->m_scu_regs[41] ^ 0xffffffff; //TODO: this is WRONG (Choice Cuts is a good test case)
+			res = state->m_scu.ist;
 			break;
 		case 0xc8/4:
 			logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(&space->device()));
@@ -656,57 +665,17 @@ static WRITE32_HANDLER( saturn_scu_w )
 		state->m_scu_irq.vdp1_end =   (((state->m_scu_regs[0xa0/4] & 0x2000)>>13) ^ 1);
 		state->m_scu_irq.abus =       (((state->m_scu_regs[0xa0/4] & 0x8000)>>15) ^ 1);
 
-		/*Take out the common settings to keep logging quiet.*/
-		if(state->m_scu_regs[0xa0/4] != 0xfffffffe &&
-		   state->m_scu_regs[0xa0/4] != 0xfffffffc &&
-		   state->m_scu_regs[0xa0/4] != 0xffffffff)
-		{
-			if(0) logerror("cpu %s (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
-			space->device().tag(), cpu_get_pc(&space->device()),
-			state->m_scu_regs[0xa0/4],
-			state->m_scu_regs[0xa0/4] & 0x8000 ? 1 : 0, /*A-Bus irq*/
-			state->m_scu_regs[0xa0/4] & 0x4000 ? 1 : 0, /*<reserved>*/
-			state->m_scu_regs[0xa0/4] & 0x2000 ? 1 : 0, /*Sprite draw end irq(VDP1)*/
-			state->m_scu_regs[0xa0/4] & 0x1000 ? 1 : 0, /*Illegal DMA irq*/
-			state->m_scu_regs[0xa0/4] & 0x0800 ? 1 : 0, /*Lv 0 DMA end irq*/
-			state->m_scu_regs[0xa0/4] & 0x0400 ? 1 : 0, /*Lv 1 DMA end irq*/
-			state->m_scu_regs[0xa0/4] & 0x0200 ? 1 : 0, /*Lv 2 DMA end irq*/
-			state->m_scu_regs[0xa0/4] & 0x0100 ? 1 : 0, /*PAD irq*/
-			state->m_scu_regs[0xa0/4] & 0x0080 ? 1 : 0, /*System Manager(SMPC) irq*/
-			state->m_scu_regs[0xa0/4] & 0x0040 ? 1 : 0, /*Snd req*/
-			state->m_scu_regs[0xa0/4] & 0x0020 ? 1 : 0, /*DSP irq end*/
-			state->m_scu_regs[0xa0/4] & 0x0010 ? 1 : 0, /*Timer 1 irq*/
-			state->m_scu_regs[0xa0/4] & 0x0008 ? 1 : 0, /*Timer 0 irq*/
-			state->m_scu_regs[0xa0/4] & 0x0004 ? 1 : 0, /*HBlank-IN*/
-			state->m_scu_regs[0xa0/4] & 0x0002 ? 1 : 0, /*VBlank-OUT*/
-			state->m_scu_regs[0xa0/4] & 0x0001 ? 1 : 0);/*VBlank-IN*/
-		}
+		scu_test_irq(space->machine());
 
-		if((state->m_scu_regs[0xa0/4] ^ 0x1110) & 0x1110)
-			popmessage("Enabled funky IRQ %08x, contact MAMEdev",state->m_scu_regs[0xa0/4] & 0x1110);
+		if((state->m_scu_regs[0xa0/4] ^ 0x1130) & 0x1130)
+			popmessage("Enabled funky IRQ %08x, contact MAMEdev",state->m_scu_regs[0xa0/4] & 0x1130);
 
 		break;
 		/*Interrupt Control reg Set*/
 		case 0xa4/4:
-		/*This is r/w by introdon...*/
 		if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",cpu_get_pc(&space->device()),state->m_scu_regs[41],mem_mask);
 
-		state->m_scu_irq.vblank_in =  ((state->m_scu_regs[0xa4/4] & 0x0001)>>0);
-		state->m_scu_irq.vblank_out = ((state->m_scu_regs[0xa4/4] & 0x0002)>>1);
-		state->m_scu_irq.hblank_in =  ((state->m_scu_regs[0xa4/4] & 0x0004)>>2);
-		state->m_scu_irq.timer_0 =    ((state->m_scu_regs[0xa4/4] & 0x0008)>>3);
-		state->m_scu_irq.timer_1 =    ((state->m_scu_regs[0xa4/4] & 0x0010)>>4);
-		state->m_scu_irq.dsp_end =    ((state->m_scu_regs[0xa4/4] & 0x0020)>>5);
-		state->m_scu_irq.sound_req =  ((state->m_scu_regs[0xa4/4] & 0x0040)>>6);
-		state->m_scu_irq.smpc =       ((state->m_scu_regs[0xa4/4] & 0x0080)>>7);
-		state->m_scu_irq.pad =        ((state->m_scu_regs[0xa4/4] & 0x0100)>>8);
-		state->m_scu_irq.dma_end[2] = ((state->m_scu_regs[0xa4/4] & 0x0200)>>9);
-		state->m_scu_irq.dma_end[1] = ((state->m_scu_regs[0xa4/4] & 0x0400)>>10);
-		state->m_scu_irq.dma_end[0] = ((state->m_scu_regs[0xa4/4] & 0x0800)>>11);
-		state->m_scu_irq.dma_ill =    ((state->m_scu_regs[0xa4/4] & 0x1000)>>12);
-		state->m_scu_irq.vdp1_end =   ((state->m_scu_regs[0xa4/4] & 0x2000)>>13);
-		state->m_scu_irq.abus =       ((state->m_scu_regs[0xa4/4] & 0x8000)>>15);
-
+		state->m_scu.ist &= state->m_scu_regs[offset];
 		break;
 		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
 		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",state->m_scu_regs[49]); break;
@@ -719,7 +688,10 @@ static TIMER_CALLBACK( dma_lv0_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(state->m_scu_irq.dma_end[0]) device_set_input_line_and_vector(state->m_maincpu, 5, HOLD_LINE, 0x4b);
+	if(state->m_scu_irq.dma_end[0])
+		device_set_input_line_and_vector(state->m_maincpu, 5, HOLD_LINE, 0x4b);
+	else
+		state->m_scu.ist |= (1 << 11);
 
 	DnMV_0(0);
 }
@@ -729,7 +701,10 @@ static TIMER_CALLBACK( dma_lv1_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(state->m_scu_irq.dma_end[1]) device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x4a);
+	if(state->m_scu_irq.dma_end[1])
+		device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x4a);
+	else
+		state->m_scu.ist |= (1 << 10);
 
 	DnMV_0(1);
 }
@@ -739,7 +714,10 @@ static TIMER_CALLBACK( dma_lv2_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(state->m_scu_irq.dma_end[2]) device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
+	if(state->m_scu_irq.dma_end[2])
+		device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
+	else
+		state->m_scu.ist |= (1 << 9);
 
 	DnMV_0(2);
 }
@@ -1662,6 +1640,8 @@ static WRITE_LINE_DEVICE_HANDLER( scsp_to_main_irq )
 		device_set_input_line_and_vector(drvstate->m_maincpu, 9, HOLD_LINE, 0x46);
 		scu_do_transfer(device->machine(),5);
 	}
+	else
+		drvstate->m_scu.ist |= (1 << 6);
 }
 
 static const scsp_interface scsp_config =
@@ -1867,6 +1847,9 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 			device_set_input_line_and_vector(state->m_maincpu, 0xe, (state->m_scu_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
 			scu_do_transfer(timer.machine(),1);
 		}
+		else
+			state->m_scu.ist |= (1 << 1);
+
 	}
 	else if(scanline == vblank_line*y_step)
 	{
@@ -1875,12 +1858,17 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 			device_set_input_line_and_vector(state->m_maincpu, 0xf, HOLD_LINE ,0x40);
 			scu_do_transfer(timer.machine(),0);
 		}
+		else
+			state->m_scu.ist |= (1 << 0);
 
 		if(state->m_scu_irq.vdp1_end)
 		{
 			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
 			scu_do_transfer(timer.machine(),6);
 		}
+		else
+			state->m_scu.ist |= (1 << 13);
+
 		video_update_vdp1(timer.machine());
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
@@ -1890,6 +1878,8 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 			device_set_input_line_and_vector(state->m_maincpu, 0xd, HOLD_LINE, 0x42);
 			scu_do_transfer(timer.machine(),2);
 		}
+		else
+			state->m_scu.ist |= (1 << 2);
 	}
 
 	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
@@ -1899,6 +1889,8 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 			device_set_input_line_and_vector(state->m_maincpu, 0xc, HOLD_LINE, 0x43 );
 			scu_do_transfer(timer.machine(),3);
 		}
+		else
+			state->m_scu.ist |= (1 << 3);
 	}
 
 	/* TODO: this isn't completely correct */
@@ -1909,6 +1901,8 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 			device_set_input_line_and_vector(state->m_maincpu, 0xb, HOLD_LINE, 0x44 );
 			scu_do_transfer(timer.machine(),4);
 		}
+		else
+			state->m_scu.ist |= (1 << 4);
 	}
 }
 
