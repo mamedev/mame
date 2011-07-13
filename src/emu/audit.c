@@ -109,7 +109,7 @@ m_searchpath = combinedpath;
 				bool shared = also_used_by_parent(hashes) >= 0 || !source_is_gamedrv;
 
 				// count the number of files with hashes
-				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
+				if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
 				{
 					required++;
 					if (shared)
@@ -140,13 +140,12 @@ m_searchpath = combinedpath;
 		}
 	}
 
-	// if there are no files with hashes then we have the set
-	if (required == 0)
-		return CORRECT;
-
 	// if we only find files that are in the parent & either the set has no unique files or the parent is not found, then assume we don't have the set at all
-	if (found == sharedFound && (required != sharedRequired || sharedFound == 0))
+	if (found == sharedFound && required > 0 && (required != sharedRequired || sharedFound == 0))
+	{
 		m_record_list.reset();
+		return NOTFOUND;
+	}
 
 	// return a summary
 	return summarize();
@@ -203,6 +202,10 @@ media_auditor::summary media_auditor::audit_samples()
 			}
 		}
 
+	// no count AND no records means not found
+	if (m_record_list.count() == 0)
+		return NOTFOUND;
+
 	// return a summary
 	return summarize();
 }
@@ -215,10 +218,6 @@ media_auditor::summary media_auditor::audit_samples()
 
 media_auditor::summary media_auditor::summarize(astring *string)
 {
-	// no count AND no records means not found
-	if (m_record_list.count() == 0)
-		return NOTFOUND;
-
 	// loop over records
 	summary overall_status = CORRECT;
 	for (audit_record *record = m_record_list.first(); record != NULL; record = record->next())
