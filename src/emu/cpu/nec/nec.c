@@ -343,7 +343,7 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback)
 		Mod_RM.RM.b[i] = breg_name[i & 7];
 	}
 
-	memset(nec_state, 0, sizeof(nec_state_t));
+	memset(nec_state, 0, sizeof(*nec_state));
 
 	device->save_item(NAME(nec_state->regs.w));
 	device->save_item(NAME(nec_state->sregs));
