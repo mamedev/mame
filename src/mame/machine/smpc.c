@@ -364,10 +364,10 @@ static TIMER_CALLBACK( smpc_intback )
 
 	//  /*This is for RTC,cartridge code and similar stuff...*/
 	//if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-	if(state->m_scu_irq.smpc)
+	if(!(state->m_scu.ism & IRQ_SMPC))
 		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
 	else
-		state->m_scu.ist |= (1 << 7);
+		state->m_scu.ist |= (IRQ_SMPC);
 }
 
 static void smpc_rtc_write(running_machine &machine)
@@ -467,11 +467,6 @@ WRITE8_HANDLER( stv_SMPC_w )
 		//enable PAD irq & VDP2 external latch for port 1/2
 		state->m_smpc.EXLE1 = (state->m_smpc_ram[0x7f] & 1) >> 0;
 		state->m_smpc.EXLE2 = (state->m_smpc_ram[0x7f] & 2) >> 1;
-		if(state->m_smpc.EXLE1 || state->m_smpc.EXLE2)
-		{
-			//if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
-			//cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (state->m_scu_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
-		}
 	}
 
 	if (offset == 0x1f) // COMREG
@@ -648,8 +643,6 @@ WRITE8_HANDLER( saturn_SMPC_w )
 		//enable PAD irq & VDP2 external latch for port 1/2
 		state->m_smpc.EXLE1 = (state->m_smpc_ram[0x7f] & 1) >> 0;
 		state->m_smpc.EXLE2 = (state->m_smpc_ram[0x7f] & 2) >> 1;
-		//if(state->m_smpc.EXLE1 || state->m_smpc.EXLE2)
-		//  cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (state->m_scu_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
 	}
 
 	if (offset == 0x1f)

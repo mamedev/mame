@@ -32,6 +32,7 @@ public:
 		int       start_factor[3];
 		UINT8     enable_mask[3];
 		UINT32    ist;
+		UINT32    ism;
 	}m_scu;
 
 	int       m_minit_boost;
@@ -82,22 +83,6 @@ public:
         UINT8 intback;
 	}m_smpc;
 
-	struct {
-		UINT8 vblank_out;
-		UINT8 vblank_in;
-		UINT8 hblank_in;
-		UINT8 timer_0;
-		UINT8 timer_1;
-		UINT8 dsp_end;
-		UINT8 sound_req;
-		UINT8 smpc;
-		UINT8 pad;
-		UINT8 dma_end[3];
-		UINT8 dma_ill;
-		UINT8 vdp1_end;
-		UINT8 abus;
-	}m_scu_irq;
-
 	/* Saturn specific*/
 	int m_saturn_region;
 	UINT8 m_cart_type;
@@ -125,6 +110,21 @@ public:
 #define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
+#define IRQ_VBLANK_IN  1 << 0
+#define IRQ_VBLANK_OUT 1 << 1
+#define IRQ_HBLANK_IN  1 << 2
+#define IRQ_TIMER_0    1 << 3
+#define IRQ_TIMER_1    1 << 4
+#define IRQ_DSP_END    1 << 5
+#define IRQ_SOUND_REQ  1 << 6
+#define IRQ_SMPC       1 << 7
+#define IRQ_PAD        1 << 8
+#define IRQ_DMALV2     1 << 9
+#define IRQ_DMALV1     1 << 10
+#define IRQ_DMALV0     1 << 11
+#define IRQ_DMAILL     1 << 12
+#define IRQ_VDP1_END   1 << 13
+#define IRQ_ABUS       1 << 15
 
 DRIVER_INIT ( stv );
 

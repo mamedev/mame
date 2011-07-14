@@ -136,48 +136,9 @@ static int DectoBCD(int num)
 	return res;
 }
 
-
-/**************************************************************************************/
-/*to be added into a stv Header file,remember to remove all the static...*/
-
-//static void stv_dump_ram(void);
-
-/*VDP2 stuff*/
-/*SMPC stuff*/
-/*SCU stuff*/
-
 static void scu_do_transfer(running_machine &machine,UINT8 event);
 static void scu_dma_direct(address_space *space, UINT8 dma_ch);	/*DMA level 0 direct transfer function*/
 static void scu_dma_indirect(address_space *space, UINT8 dma_ch); /*DMA level 0 indirect transfer function*/
-
-
-
-//static int scanline;
-
-/*A-Bus IRQ checks,where they could be located these?*/
-#define ABUSIRQ(_irq_,_vector_) \
-	{ cputag_set_input_line_and_vector(device->machine(), "maincpu", _irq_, HOLD_LINE , _vector_); }
-#if 0
-if(state->m_scu_regs[42] & 1)//IRQ ACK
-{
-	ABUSIRQ(7,0x50,0x00010000);
-	ABUSIRQ(7,0x51,0x00020000);
-	ABUSIRQ(7,0x52,0x00040000);
-	ABUSIRQ(7,0x53,0x00080000);
-	ABUSIRQ(4,0x54,0x00100000);
-	ABUSIRQ(4,0x55,0x00200000);
-	ABUSIRQ(4,0x56,0x00400000);
-	ABUSIRQ(4,0x57,0x00800000);
-	ABUSIRQ(1,0x58,0x01000000);
-	ABUSIRQ(1,0x59,0x02000000);
-	ABUSIRQ(1,0x5a,0x04000000);
-	ABUSIRQ(1,0x5b,0x08000000);
-	ABUSIRQ(1,0x5c,0x10000000);
-	ABUSIRQ(1,0x5d,0x20000000);
-	ABUSIRQ(1,0x5e,0x40000000);
-	ABUSIRQ(1,0x5f,0x80000000);
-}
-#endif
 
 /**************************************************************************************/
 
@@ -533,7 +494,7 @@ static void scu_test_pending_irq(running_machine &machine)
 
 	for(i=0;i<31;i++)
 	{
-		if((!(state->m_scu_regs[0xa0/4] & 1 << i)) && (state->m_scu.ist & 1 << i))
+		if((!(state->m_scu.ism & 1 << i)) && (state->m_scu.ist & 1 << i))
 		{
 			if(irq_level[i] != -1) /* TODO: cheap check for undefined irqs */
 				device_set_input_line_and_vector(state->m_maincpu, irq_level[i], HOLD_LINE, 0x40 + i);
@@ -561,9 +522,12 @@ static READ32_HANDLER( saturn_scu_r )
 			if(LOG_SCU) logerror( "DSP mem read at %08X\n", state->m_scu_regs[34]);
         	res = dsp_ram_addr_r();
         	break;
+        case 0xa0/4:
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",cpu_get_pc(&space->device()),mem_mask,state->m_scu_regs[0xa0/4]);
+    		res = state->m_scu.ism;
+    		break;
     	case 0xa4/4:
     		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",cpu_get_pc(&space->device()),mem_mask,state->m_scu_regs[0xa0/4]);
-
 			res = state->m_scu.ist;
 			break;
 		case 0xc8/4:
@@ -649,28 +613,8 @@ static WRITE32_HANDLER( saturn_scu_w )
 		/*An interrupt is masked when his specific bit is 1.*/
 		/*Are bit 16-bit 31 for External A-Bus irq mask like the status register?*/
 
-		state->m_scu_irq.vblank_in =  (((state->m_scu_regs[0xa0/4] & 0x0001)>>0) ^ 1);
-		state->m_scu_irq.vblank_out = (((state->m_scu_regs[0xa0/4] & 0x0002)>>1) ^ 1);
-		state->m_scu_irq.hblank_in =  (((state->m_scu_regs[0xa0/4] & 0x0004)>>2) ^ 1);
-		state->m_scu_irq.timer_0 =	  (((state->m_scu_regs[0xa0/4] & 0x0008)>>3) ^ 1);
-		state->m_scu_irq.timer_1 =    (((state->m_scu_regs[0xa0/4] & 0x0010)>>4) ^ 1);
-		state->m_scu_irq.dsp_end =    (((state->m_scu_regs[0xa0/4] & 0x0020)>>5) ^ 1);
-		state->m_scu_irq.sound_req =  (((state->m_scu_regs[0xa0/4] & 0x0040)>>6) ^ 1);
-		state->m_scu_irq.smpc =       (((state->m_scu_regs[0xa0/4] & 0x0080)>>7) ^ 1);
-		state->m_scu_irq.pad =        (((state->m_scu_regs[0xa0/4] & 0x0100)>>8) ^ 1);
-		state->m_scu_irq.dma_end[2] = (((state->m_scu_regs[0xa0/4] & 0x0200)>>9) ^ 1);
-		state->m_scu_irq.dma_end[1] = (((state->m_scu_regs[0xa0/4] & 0x0400)>>10) ^ 1);
-		state->m_scu_irq.dma_end[0] = (((state->m_scu_regs[0xa0/4] & 0x0800)>>11) ^ 1);
-		state->m_scu_irq.dma_ill =    (((state->m_scu_regs[0xa0/4] & 0x1000)>>12) ^ 1);
-		state->m_scu_irq.vdp1_end =   (((state->m_scu_regs[0xa0/4] & 0x2000)>>13) ^ 1);
-		state->m_scu_irq.abus =       (((state->m_scu_regs[0xa0/4] & 0x8000)>>15) ^ 1);
-
+		state->m_scu.ism = state->m_scu_regs[0xa0/4];
 		scu_test_pending_irq(space->machine());
-
-		if(state->m_scu_irq.dsp_end || state->m_scu_irq.pad)
-			if(state->m_scu_regs[0xa0/4] != 0x80 || state->m_scu_regs[0xa0/4] != 0xacbab8be)
-				popmessage("Enabled funky IRQ %08x, contact MAMEdev",state->m_scu_regs[0xa0/4] ^ 0xffffffff);
-
 		break;
 		/*Interrupt Control reg Set*/
 		case 0xa4/4:
@@ -689,10 +633,10 @@ static TIMER_CALLBACK( dma_lv0_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(state->m_scu_irq.dma_end[0])
+	if(!(state->m_scu.ism & IRQ_DMALV0))
 		device_set_input_line_and_vector(state->m_maincpu, 5, HOLD_LINE, 0x4b);
 	else
-		state->m_scu.ist |= (1 << 11);
+		state->m_scu.ist |= (IRQ_DMALV0);
 
 	DnMV_0(0);
 }
@@ -702,10 +646,10 @@ static TIMER_CALLBACK( dma_lv1_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(state->m_scu_irq.dma_end[1])
+	if(!(state->m_scu.ism & IRQ_DMALV1))
 		device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x4a);
 	else
-		state->m_scu.ist |= (1 << 10);
+		state->m_scu.ist |= (IRQ_DMALV1);
 
 	DnMV_0(1);
 }
@@ -715,10 +659,10 @@ static TIMER_CALLBACK( dma_lv2_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(state->m_scu_irq.dma_end[2])
+	if(!(state->m_scu.ism & IRQ_DMALV2))
 		device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
 	else
-		state->m_scu.ist |= (1 << 9);
+		state->m_scu.ist |= (IRQ_DMALV2);
 
 	DnMV_0(2);
 }
@@ -1636,13 +1580,13 @@ static WRITE_LINE_DEVICE_HANDLER( scsp_to_main_irq )
 {
 	saturn_state *drvstate = device->machine().driver_data<saturn_state>();
 
-	if(drvstate->m_scu_irq.sound_req)
+	if(!(drvstate->m_scu.ism & IRQ_SOUND_REQ))
 	{
 		device_set_input_line_and_vector(drvstate->m_maincpu, 9, HOLD_LINE, 0x46);
 		scu_do_transfer(device->machine(),5);
 	}
 	else
-		drvstate->m_scu.ist |= (1 << 6);
+		drvstate->m_scu.ist |= (IRQ_SOUND_REQ);
 }
 
 static const scsp_interface scsp_config =
@@ -1843,67 +1787,67 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 
 	if(scanline == 0*y_step)
 	{
-		if(state->m_scu_irq.vblank_out)
+		if(!(state->m_scu.ism & IRQ_VBLANK_OUT))
 		{
-			device_set_input_line_and_vector(state->m_maincpu, 0xe, (state->m_scu_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
+			device_set_input_line_and_vector(state->m_maincpu, 0xe, HOLD_LINE, 0x41);
 			scu_do_transfer(timer.machine(),1);
 		}
 		else
-			state->m_scu.ist |= (1 << 1);
+			state->m_scu.ist |= (IRQ_VBLANK_OUT);
 
 	}
 	else if(scanline == vblank_line*y_step)
 	{
-		if(state->m_scu_irq.vblank_in)
+		if(!(state->m_scu.ism & IRQ_VBLANK_IN))
 		{
 			device_set_input_line_and_vector(state->m_maincpu, 0xf, HOLD_LINE ,0x40);
 			scu_do_transfer(timer.machine(),0);
 		}
 		else
-			state->m_scu.ist |= (1 << 0);
+			state->m_scu.ist |= (IRQ_VBLANK_IN);
 
-		if(state->m_scu_irq.vdp1_end)
+		if(!(state->m_scu.ism & IRQ_VDP1_END))
 		{
 			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
 			scu_do_transfer(timer.machine(),6);
 		}
 		else
-			state->m_scu.ist |= (1 << 13);
+			state->m_scu.ist |= (IRQ_VDP1_END);
 
 		video_update_vdp1(timer.machine());
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 	{
-		if(state->m_scu_irq.hblank_in)
+		if(!(state->m_scu.ism & IRQ_HBLANK_IN))
 		{
 			device_set_input_line_and_vector(state->m_maincpu, 0xd, HOLD_LINE, 0x42);
 			scu_do_transfer(timer.machine(),2);
 		}
 		else
-			state->m_scu.ist |= (1 << 2);
+			state->m_scu.ist |= (IRQ_HBLANK_IN);
 	}
 
 	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
 	{
-		if(state->m_scu_irq.timer_0)
+		if(!(state->m_scu.ism & IRQ_TIMER_0))
 		{
 			device_set_input_line_and_vector(state->m_maincpu, 0xc, HOLD_LINE, 0x43 );
 			scu_do_transfer(timer.machine(),3);
 		}
 		else
-			state->m_scu.ist |= (1 << 3);
+			state->m_scu.ist |= (IRQ_TIMER_0);
 	}
 
 	/* TODO: this isn't completely correct */
 	if((state->m_scu_regs[38] & 0x81) == 0x01 && ((scanline % y_step) == 0))
 	{
-		if(state->m_scu_irq.timer_1)
+		if(!(state->m_scu.ism & IRQ_TIMER_1))
 		{
 			device_set_input_line_and_vector(state->m_maincpu, 0xb, HOLD_LINE, 0x44 );
 			scu_do_transfer(timer.machine(),4);
 		}
 		else
-			state->m_scu.ist |= (1 << 4);
+			state->m_scu.ist |= (IRQ_TIMER_1);
 	}
 }
 
