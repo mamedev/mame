@@ -518,7 +518,7 @@ static void scu_do_transfer(running_machine &machine,UINT8 event)
 }
 
 /* test pending irqs */
-static void scu_test_irq(running_machine &machine)
+static void scu_test_pending_irq(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int i;
@@ -533,7 +533,7 @@ static void scu_test_irq(running_machine &machine)
 
 	for(i=0;i<31;i++)
 	{
-		if((state->m_scu_regs[0xa0/4] & 1 << i) && (state->m_scu.ist & 1 << i))
+		if((!(state->m_scu_regs[0xa0/4] & 1 << i)) && (state->m_scu.ist & 1 << i))
 		{
 			if(irq_level[i] != -1) /* TODO: cheap check for undefined irqs */
 				device_set_input_line_and_vector(state->m_maincpu, irq_level[i], HOLD_LINE, 0x40 + i);
@@ -665,10 +665,10 @@ static WRITE32_HANDLER( saturn_scu_w )
 		state->m_scu_irq.vdp1_end =   (((state->m_scu_regs[0xa0/4] & 0x2000)>>13) ^ 1);
 		state->m_scu_irq.abus =       (((state->m_scu_regs[0xa0/4] & 0x8000)>>15) ^ 1);
 
-		scu_test_irq(space->machine());
+		scu_test_pending_irq(space->machine());
 
 		if(state->m_scu_irq.dsp_end || state->m_scu_irq.pad)
-			if(state->m_scu_regs[0xa0/4] != 0x80)
+			if(state->m_scu_regs[0xa0/4] != 0x80 || state->m_scu_regs[0xa0/4] != 0xacbab8be)
 				popmessage("Enabled funky IRQ %08x, contact MAMEdev",state->m_scu_regs[0xa0/4] ^ 0xffffffff);
 
 		break;
@@ -676,7 +676,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0xa4/4:
 		if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",cpu_get_pc(&space->device()),state->m_scu_regs[41],mem_mask);
 
-		state->m_scu.ist &= state->m_scu_regs[offset];
+		state->m_scu.ist = state->m_scu_regs[offset];
 		break;
 		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
 		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",state->m_scu_regs[49]); break;
