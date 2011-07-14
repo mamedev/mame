@@ -357,7 +357,7 @@ static TIMER_CALLBACK( smpc_intback )
 		state->m_smpc.smpcSR = 0x60;		// peripheral data ready, no reset, etc.
 		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
 
-		state->m_smpc.intback_stage = 2;
+		state->m_smpc.intback_stage = 1;
 
 		smpc_intbackhelper(machine);
 	}
