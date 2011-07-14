@@ -16,6 +16,8 @@ public:
 	model3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+    int m_sound_irq_enable;
+    emu_timer *m_sound_timer;
 	UINT8 m_irq_enable;
 	UINT8 m_irq_state;
 	UINT8 m_scsi_irq_state;

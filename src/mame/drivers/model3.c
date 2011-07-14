@@ -1194,31 +1194,57 @@ static void configure_fast_ram(running_machine &machine)
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, state->m_work_ram);
 }
 
+static TIMER_CALLBACK(model3_sound_timer_tick)
+{
+	model3_state *state = machine.driver_data<model3_state>();
+
+	if (state->m_sound_irq_enable)
+	{
+		model3_set_irq_line(machine, 0x40, ASSERT_LINE);
+	}
+}
+
 static MACHINE_START(model3_10)
 {
 	lsi53c810_init(machine, &scsi_intf);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
 	configure_fast_ram(machine);
+
+	model3_state *state = machine.driver_data<model3_state>();
+	state->m_sound_timer = machine.scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
 }
 static MACHINE_START(model3_15)
 {
 	lsi53c810_init(machine, &scsi_intf);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
 	configure_fast_ram(machine);
+
+	model3_state *state = machine.driver_data<model3_state>();
+	state->m_sound_timer = machine.scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
 }
 static MACHINE_START(model3_20)
 {
 	configure_fast_ram(machine);
+
+	model3_state *state = machine.driver_data<model3_state>();
+	state->m_sound_timer = machine.scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
 }
 static MACHINE_START(model3_21)
 {
 	configure_fast_ram(machine);
+
+	model3_state *state = machine.driver_data<model3_state>();
+	state->m_sound_timer = machine.scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
 }
 
 static void model3_init(running_machine &machine, int step)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	state->m_step = step;
+
+	state->m_sound_irq_enable = 0;
+	state->m_sound_timer->adjust(attotime::never);
+
 	memory_set_bankptr(machine,  "bank1", machine.region( "user1" )->base() + 0x800000 ); /* banked CROM */
 
 	memory_set_bankptr(machine, "bank4", machine.region("samples")->base() + 0x200000);
@@ -1589,25 +1615,36 @@ static READ64_HANDLER(real3d_status_r)
 }
 
 /* SCSP interface */
-static READ64_HANDLER(model3_sound_r)
+static WRITE8_HANDLER(model3_sound_w)
 {
-	return U64(0xffffffffffffffff);
-}
+	model3_state *state = space->machine().driver_data<model3_state>();
 
-static WRITE64_HANDLER(model3_sound_w)
-{
-	if ((mem_mask & 0xff000000) == 0xff000000)
+	switch (offset)
 	{
-		model3_set_irq_line(space->machine(), 0x40, CLEAR_LINE);
-	}
+		case 0:
+			// clear the interrupt
+			model3_set_irq_line(space->machine(), 0x40, CLEAR_LINE);
 
-	// serial configuration writes
-	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
-	{
-		scsp_midi_in(space->machine().device("scsp1"), 0, (data>>56)&0xff, 0);
+			// send to the sound board
+			scsp_midi_in(space->machine().device("scsp1"), 0, data, 0);
 
-		// give the 68k time to notice
-		device_spin_until_time(&space->device(), attotime::from_usec(40));
+			if (state->m_sound_irq_enable)
+			{
+				state->m_sound_timer->adjust(attotime::from_msec(1));
+			}
+			break;
+
+		case 4:
+			if (data == 0x27)
+			{
+				state->m_sound_irq_enable = 1;
+				state->m_sound_timer->adjust(attotime::from_msec(1));
+			}
+			else if (data == 0x06)
+			{
+				state->m_sound_irq_enable = 0;
+			}
+			break;
 	}
 }
 
@@ -1799,7 +1836,7 @@ static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64)
 	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE( real3d_polygon_ram_w )
 
 	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE( model3_ctrl_r, model3_ctrl_w )
-	AM_RANGE(0xf0080000, 0xf0080007) AM_MIRROR(0x0e000000) AM_READWRITE( model3_sound_r, model3_sound_w )
+	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_WRITE8( model3_sound_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0xf00c0000, 0xf00dffff) AM_MIRROR(0x0e000000) AM_RAM AM_SHARE("backup")	/* backup SRAM */
 	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE( model3_sys_r, model3_sys_w )
 	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE( model3_rtc_r, model3_rtc_w )
@@ -5650,50 +5687,50 @@ static DRIVER_INIT( oceanhun )
 
 
 /* Model 3 Step 1.0 */
-GAME( 1996, vf3,            0, model3_10, model3,        vf3, ROT0, "Sega", "Virtua Fighter 3 (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1996, vf3a,         vf3, model3_10, model3,        vf3, ROT0, "Sega", "Virtua Fighter 3 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1996, vf3tb,        vf3, model3_10, model3,  model3_10, ROT0, "Sega", "Virtua Fighter 3 Team Battle", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1997, bass,           0, model3_10, bass,         bass, ROT0, "Sega", "Sega Bass Fishing", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1997, getbass,     bass, model3_10, bass,      getbass, ROT0, "Sega", "Get Bass", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1996, vf3,            0, model3_10, model3,        vf3, ROT0, "Sega", "Virtua Fighter 3 (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, vf3a,         vf3, model3_10, model3,        vf3, ROT0, "Sega", "Virtua Fighter 3 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, vf3tb,        vf3, model3_10, model3,  model3_10, ROT0, "Sega", "Virtua Fighter 3 Team Battle", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, bass,           0, model3_10, bass,         bass, ROT0, "Sega", "Sega Bass Fishing", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, getbass,     bass, model3_10, bass,      getbass, ROT0, "Sega", "Get Bass", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Model 3 Step 1.5 */
-GAME( 1996, scud,           0, model3_15, scud,         scud, ROT0, "Sega", "Scud Race (Australia)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1996, scudj,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1996, scuda,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1997, scudp,       scud, model3_15, scud,        scudp, ROT0, "Sega", "Scud Race Plus (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1997, lostwsga,       0, model3_15, lostwsga, lostwsga, ROT0, "Sega", "The Lost World", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1997, vs215,        vs2, model3_15, model3,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1997, lemans24,       0, model3_15, scud,     lemans24, ROT0, "Sega", "LeMans 24", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, vs29815,    vs298, model3_15, model3,    vs29815, ROT0, "Sega", "Virtua Striker 2 '98 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1996, scud,           0, model3_15, scud,         scud, ROT0, "Sega", "Scud Race (Australia)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, scudj,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, scuda,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, scudp,       scud, model3_15, scud,        scudp, ROT0, "Sega", "Scud Race Plus (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, lostwsga,       0, model3_15, lostwsga, lostwsga, ROT0, "Sega", "The Lost World", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, vs215,        vs2, model3_15, model3,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, lemans24,       0, model3_15, scud,     lemans24, ROT0, "Sega", "LeMans 24", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, vs29815,    vs298, model3_15, model3,    vs29815, ROT0, "Sega", "Virtua Striker 2 '98 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Model 3 Step 2.0 */
-GAME( 1997, vs2,            0, model3_20, model3,        vs2, ROT0, "Sega", "Virtua Striker 2 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1997, harley,         0, model3_20, harley,     harley, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1997, harleyb,   harley, model3_20, harley,    harleyb, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, lamachin,       0, model3_20, model3,  model3_20, ROT0, "Sega", "L.A. Machineguns", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, oceanhun,       0, model3_20, model3,   oceanhun, ROT0, "Sega", "The Ocean Hunter", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, skichamp,       0, model3_20, skichamp, skichamp, ROT0, "Sega", "Ski Champ", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, srally2,        0, model3_20, scud,      srally2, ROT0, "Sega", "Sega Rally 2", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, srally2x,       0, model3_20, scud,      srally2, ROT0, "Sega", "Sega Rally 2 DX", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, von2,           0, model3_20, model3,       von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, von254g,     von2, model3_20, model3,  model3_20, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (ver 5.4g)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, fvipers2,       0, model3_20, model3,  model3_20, ROT0, "Sega", "Fighting Vipers 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, vs298,          0, model3_20, model3,      vs298, ROT0, "Sega", "Virtua Striker 2 '98 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1999, vs2v991,        0, model3_20, model3,    vs2v991, ROT0, "Sega", "Virtua Striker 2 '99.1 (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1999, vs299b,   vs2v991, model3_20, model3,     vs299b, ROT0, "Sega", "Virtua Striker 2 '99 (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1999, vs299a,   vs2v991, model3_20, model3,     vs299a, ROT0, "Sega", "Virtua Striker 2 '99 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1999, vs299,    vs2v991, model3_20, model3,      vs299, ROT0, "Sega", "Virtua Striker 2 '99", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1997, vs2,            0, model3_20, model3,        vs2, ROT0, "Sega", "Virtua Striker 2 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, harley,         0, model3_20, harley,     harley, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, harleyb,   harley, model3_20, harley,    harleyb, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, lamachin,       0, model3_20, model3,  model3_20, ROT0, "Sega", "L.A. Machineguns", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, oceanhun,       0, model3_20, model3,   oceanhun, ROT0, "Sega", "The Ocean Hunter", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, skichamp,       0, model3_20, skichamp, skichamp, ROT0, "Sega", "Ski Champ", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, srally2,        0, model3_20, scud,      srally2, ROT0, "Sega", "Sega Rally 2", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, srally2x,       0, model3_20, scud,      srally2, ROT0, "Sega", "Sega Rally 2 DX", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, von2,           0, model3_20, model3,       von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, von254g,     von2, model3_20, model3,  model3_20, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (ver 5.4g)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, fvipers2,       0, model3_20, model3,  model3_20, ROT0, "Sega", "Fighting Vipers 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, vs298,          0, model3_20, model3,      vs298, ROT0, "Sega", "Virtua Striker 2 '98 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, vs2v991,        0, model3_20, model3,    vs2v991, ROT0, "Sega", "Virtua Striker 2 '99.1 (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, vs299b,   vs2v991, model3_20, model3,     vs299b, ROT0, "Sega", "Virtua Striker 2 '99 (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, vs299a,   vs2v991, model3_20, model3,     vs299a, ROT0, "Sega", "Virtua Striker 2 '99 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, vs299,    vs2v991, model3_20, model3,      vs299, ROT0, "Sega", "Virtua Striker 2 '99", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Model 3 Step 2.1 */
-GAME( 1998, daytona2,         0, model3_21, daytona2, daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, dayto2pe,         0, model3_21, daytona2, dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, dirtdvls,         0, model3_21, model3,   dirtdvls, ROT0, "Sega", "Dirt Devils (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, dirtdvlsa, dirtdvls, model3_21, model3,   dirtdvls, ROT0, "Sega", "Dirt Devils (alt) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, swtrilgy,         0, model3_21, swtrilgy, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, swtrilgya, swtrilgy, model3_21, swtrilgy, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, spikeout,         0, model3_21, model3,   spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, spikeofe,         0, model3_21, model3,   spikeofe, ROT0, "Sega", "Spikeout Final Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, magtruck,         0, model3_21, model3,        eca, ROT0, "Sega", "Magical Truck Adventure", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1999, eca,              0, model3_21, eca,           eca, ROT0, "Sega", "Emergency Call Ambulance", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1999, ecax,           eca, model3_21, eca,           eca, ROT0, "Sega", "Emergency Call Ambulance (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1998, daytona2,         0, model3_21, daytona2, daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dayto2pe,         0, model3_21, daytona2, dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvls,         0, model3_21, model3,   dirtdvls, ROT0, "Sega", "Dirt Devils (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsa, dirtdvls, model3_21, model3,   dirtdvls, ROT0, "Sega", "Dirt Devils (alt) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, swtrilgy,         0, model3_21, swtrilgy, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, swtrilgya, swtrilgy, model3_21, swtrilgy, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, spikeout,         0, model3_21, model3,   spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, spikeofe,         0, model3_21, model3,   spikeofe, ROT0, "Sega", "Spikeout Final Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, magtruck,         0, model3_21, model3,        eca, ROT0, "Sega", "Magical Truck Adventure", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, eca,              0, model3_21, eca,           eca, ROT0, "Sega", "Emergency Call Ambulance", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ecax,           eca, model3_21, eca,           eca, ROT0, "Sega", "Emergency Call Ambulance (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
