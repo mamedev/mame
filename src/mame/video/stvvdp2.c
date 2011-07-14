@@ -2839,6 +2839,139 @@ static void stv_vdp2_drawgfx_rgb555( bitmap_t *dest_bmp, const rectangle *clip, 
 
 }
 
+
+static void stv_vdp2_drawgfx_rgb888( bitmap_t *dest_bmp, const rectangle *clip, running_machine &machine, UINT32 code, int flipx, int flipy,
+									 int sx, int sy, int transparency, int alpha)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	rectangle myclip;
+	UINT8* gfxdata;
+	int t_pen;
+	int sprite_screen_width, sprite_screen_height;
+
+	gfxdata = state->m_vdp2.gfx_decode + code * 0x20;
+	sprite_screen_width = sprite_screen_height = 8;
+
+	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	if(clip)
+	{
+		myclip.min_x = clip->min_x;
+		myclip.max_x = clip->max_x;
+		myclip.min_y = clip->min_y;
+		myclip.max_y = clip->max_y;
+
+		if (myclip.min_x < 0) myclip.min_x = 0;
+		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
+		if (myclip.min_y < 0) myclip.min_y = 0;
+		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
+
+		clip=&myclip;
+	}
+	{
+		int dx = stv2_current_tilemap.incx;
+		int dy = stv2_current_tilemap.incy;
+
+		int ex = sx+sprite_screen_width;
+		int ey = sy+sprite_screen_height;
+
+		int x_index_base;
+		int y_index;
+
+		if( flipx )
+		{
+			x_index_base = (sprite_screen_width-1)*dx;
+			dx = -dx;
+		}
+		else
+		{
+			x_index_base = 0;
+		}
+
+		if( flipy )
+		{
+			y_index = (sprite_screen_height-1)*dy;
+			dy = -dy;
+		}
+		else
+		{
+			y_index = 0;
+		}
+
+		if( clip )
+		{
+			if( sx < clip->min_x)
+			{ /* clip left */
+				int pixels = clip->min_x-sx;
+				sx += pixels;
+				x_index_base += pixels*dx;
+			}
+			if( sy < clip->min_y )
+			{ /* clip top */
+				int pixels = clip->min_y-sy;
+				sy += pixels;
+				y_index += pixels*dy;
+			}
+			/* NS 980211 - fixed incorrect clipping */
+			if( ex > clip->max_x+1 )
+			{ /* clip right */
+				int pixels = ex-clip->max_x-1;
+				ex -= pixels;
+			}
+			if( ey > clip->max_y+1 )
+			{ /* clip bottom */
+				int pixels = ey-clip->max_y-1;
+				ey -= pixels;
+			}
+		}
+
+		if( ex>sx )
+		{ /* skip if inner loop doesn't draw anything */
+			int y;
+
+			for( y=sy; y<ey; y++ )
+			{
+				const UINT8 *source = gfxdata + (y_index>>16)*32;
+				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
+				UINT32 data;
+
+				int x, x_index = x_index_base;
+
+				for( x=sx; x<ex; x++ )
+				{
+					int r,g,b;
+
+					data = (source[(x_index>>16)*4+0] << 24) | (source[(x_index>>16)*4+1] << 16) | (source[(x_index>>16)*4+2] << 8) | (source[(x_index>>16)*4+3] << 0);
+					t_pen = (data & 0x80000000) || ( transparency == STV_TRANSPARENCY_NONE );
+					if (t_pen)
+					{
+						b = (data & 0xff0000) >> 16;
+						g = (data & 0x00ff00) >> 8;
+						r = (data & 0x0000ff);
+						/* HACK: downscale because we don't yet do true color */
+						b >>= 3;
+						g >>= 3;
+						r >>= 3;
+
+						if(stv2_current_tilemap.fade_control & 1)
+							stv_vdp2_compute_color_offset_RGB555(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+
+						if ( transparency == STV_TRANSPARENCY_ALPHA )
+							dest[x] = alpha_blend_r16( dest[x], b | g << 5 | r << 10, alpha );
+						else
+							dest[x] = b | g << 5 | r << 10;
+					}
+					x_index += dx;
+				}
+
+				y_index += dy;
+			}
+
+		}
+
+	}
+
+}
+
 static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -3747,7 +3880,16 @@ static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_t *bitm
 				olddrawypos = drawypos; drawypos >>= 16;
 				if (stv2_current_tilemap.tile_size==1)
 				{
-					if ( stv2_current_tilemap.colour_depth == 3 )
+					if ( stv2_current_tilemap.colour_depth == 4 )
+					{
+						/* normal */
+						stv_vdp2_drawgfx_rgb888(bitmap,cliprect,machine,tilecode+(0+(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos, drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_rgb888(bitmap,cliprect,machine,tilecode+(1-(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_rgb888(bitmap,cliprect,machine,tilecode+(2+(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos,drawypos+8,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_rgb888(bitmap,cliprect,machine,tilecode+(3-(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+
+					}
+					else if ( stv2_current_tilemap.colour_depth == 3 )
 					{
 						/* normal */
 						stv_vdp2_drawgfx_rgb555(bitmap,cliprect,machine,tilecode+(0+(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos, drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
@@ -3777,7 +3919,11 @@ static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_t *bitm
 				}
 				else
 				{
-					if ( stv2_current_tilemap.colour_depth == 3 )
+					if ( stv2_current_tilemap.colour_depth == 4)
+					{
+						stv_vdp2_drawgfx_rgb888(bitmap,cliprect,machine,tilecode,flipyx&1,flipyx&2,drawxpos,drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+					}
+					else if ( stv2_current_tilemap.colour_depth == 3)
 					{
 						stv_vdp2_drawgfx_rgb555(bitmap,cliprect,machine,tilecode,flipyx&1,flipyx&2,drawxpos,drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
 					}

@@ -676,7 +676,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0xa4/4:
 		if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",cpu_get_pc(&space->device()),state->m_scu_regs[41],mem_mask);
 
-		state->m_scu.ist = state->m_scu_regs[offset];
+		state->m_scu.ist &= state->m_scu_regs[offset];
 		break;
 		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
 		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",state->m_scu_regs[49]); break;
