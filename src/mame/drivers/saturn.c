@@ -768,9 +768,9 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 		/*TODO: this is completely wrong HW-wise ...  */
 		switch(dma_ch)
 		{
-			case 0: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv0_ended)); break;
-			case 1: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv1_ended)); break;
-			case 2: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv2_ended)); break;
+			case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
+			case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
+			case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
 		}
 	}
 
@@ -851,9 +851,9 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		/*TODO: this is completely wrong HW-wise ...  */
 		switch(dma_ch)
 		{
-			case 0: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv0_ended)); break;
-			case 1: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv1_ended)); break;
-			case 2: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv2_ended)); break;
+			case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
+			case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
+			case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
 		}
 	}
 }
@@ -1429,7 +1429,6 @@ DRIVER_INIT ( stv )
 //  state->m_smpc_ram[0x33] = input_port_read(machine, "FAKE");
 	state->m_smpc_ram[0x5f] = 0x10;
 
-	state->m_instadma_hack = 0;
 	state->m_vdp2.pal = 0;
 
 	#ifdef MAME_DEBUG
