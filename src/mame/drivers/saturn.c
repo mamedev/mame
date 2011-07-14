@@ -532,7 +532,7 @@ static READ32_HANDLER( saturn_scu_r )
 			break;
 		case 0xc8/4:
 			logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(&space->device()));
-			res = 0x00000000;/*SCU Version 0, OK?*/
+			res = 0x00000004;/*SCU Version 4, OK?*/
 			break;
 		default:
 	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(&space->device()),offset,state->m_scu_regs[offset]);
@@ -559,7 +559,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0x08/4: case 0x28/4: case 0x48/4:  state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0x1fff)) >> 0); break;
 		case 0x0c/4: case 0x2c/4: case 0x4c/4:
 			/*Read address add value for DMA lv 0*/
-			state->m_scu.src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 1;
+			state->m_scu.src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 0;
 
 			/*Write address add value for DMA lv 0*/
 			state->m_scu.dst_add[DMA_CH] = 2 << (state->m_scu_regs[offset] & 7);
@@ -672,9 +672,12 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 
+	if(0)
+	{
 	if(LOG_SCU) printf("DMA lv %d transfer START\n"
 			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
 	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
+	}
 
 	DnMV_1(dma_ch);
 
@@ -761,9 +764,6 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(!(DRUP(dma_ch))) state->m_scu.src[dma_ch] = tmp_src;
 	if(!(DWUP(dma_ch))) state->m_scu.dst[dma_ch] = tmp_dst;
 
-	if(dma_ch != 2)
-	if(LOG_SCU) logerror("DMA transfer END\n");
-
 	{
 		/*TODO: this is completely wrong HW-wise ...  */
 		switch(dma_ch)
@@ -808,9 +808,12 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		if(indirect_src & 0x80000000)
 			job_done = 1;
 
-		if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
-				           "Index %08x Start %08x End %08x Size %04x\n",dma_ch,tmp_src,indirect_src,indirect_dst,indirect_size);
-		if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
+		if(0)
+		{
+			if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
+					           "Index %08x Start %08x End %08x Size %04x\n",dma_ch,tmp_src,indirect_src,indirect_dst,indirect_size);
+			if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
+		}
 
 		//guess,but I believe it's right.
 		indirect_src &=0x07ffffff;

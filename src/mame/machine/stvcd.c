@@ -202,7 +202,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 	{
 		cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
 	}
-	cr3 = (cd_curfad>>16)&0xff;
+	cr3 = (0x01<<8)|((cd_curfad>>16)&0xff); /* put index to be always 1 for now */
 	cr4 = cd_curfad&0xffff;
 
 	timer.adjust(attotime::from_hz(CD_SPEED));
