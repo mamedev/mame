@@ -658,6 +658,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			hirqreg |= (CMOK);
 			break;
 
+		/* TODO: double check this */
 		case 0x0400:	// initialize CD system
 				// CR1 & 1 = reset software
 				// CR1 & 2 = decode RW subcode
