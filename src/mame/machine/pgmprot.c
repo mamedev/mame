@@ -514,7 +514,7 @@ READ16_HANDLER( asic28_r )
 			{
 			int y = state->m_asic_params[0xcc];
 			if (y & 0x400)    //y is signed (probably x too and it also applies to TXT, but I've never seen it used)
-				y =- (0x400 - (y & 0x3ff));
+				y -= (0x400 - (y & 0x3ff));
 			val = 0x900000 + (((state->m_asic_params[0xcb] + (y) * 64) * 4) /*&0x1fff*/);
 			}
 			break;
