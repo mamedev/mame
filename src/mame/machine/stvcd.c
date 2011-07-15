@@ -669,6 +669,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			hirqreg |= (CMOK|ESEL);
 			cd_stat = CD_STAT_PAUSE;
 			cd_curfad = 150;
+			fadstoplay = 0;
 			in_buffer = 0;
 			buffull = 0;
 			cr_standard_return(cd_stat);
