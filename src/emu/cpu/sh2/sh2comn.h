@@ -127,6 +127,7 @@ typedef struct
 	INT8  nmi_line_state;
 
 	UINT16	frc;
+	UINT16  frc_remainder;
 	UINT16	ocra, ocrb, icr;
 	UINT64	frc_base;
 
