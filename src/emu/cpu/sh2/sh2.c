@@ -2173,7 +2173,6 @@ static CPU_RESET( sh2 )
 	memset(&sh2->irq_queue[0], 0, sizeof(sh2->irq_queue[0])*16);
 	memset(&sh2->irq_line_state[0], 0, sizeof(sh2->irq_line_state[0])*17);
 	sh2->frc = sh2->ocra = sh2->ocrb = sh2->icr = 0;
-	sh2->frc_remainder = 0;
 	sh2->frc_base = 0;
 	sh2->frt_input = sh2->internal_irq_level = sh2->internal_irq_vector = 0;
 	sh2->dma_timer_active[0] = sh2->dma_timer_active[1] = 0;

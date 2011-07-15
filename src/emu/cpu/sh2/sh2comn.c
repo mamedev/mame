@@ -64,17 +64,7 @@ static void sh2_timer_resync(sh2_state *sh2)
 	UINT64 cur_time = sh2->device->total_cycles();
 
 	if(divider)
-	{
-		sh2->frc += (cur_time - sh2->frc_base) / (1 << divider);
-		sh2->frc_remainder += (cur_time - sh2->frc_base) % (1 << divider);
-
-		if(sh2->frc_remainder >= divider)
-		{
-			sh2->frc_remainder-=divider;
-			sh2->frc++;
-		}
-	}
-
+		sh2->frc += (cur_time - sh2->frc_base) >> divider;
 	sh2->frc_base = cur_time;
 }
 
@@ -129,7 +119,6 @@ static TIMER_CALLBACK( sh2_timer_callback )
 	if(frc == sh2->ocrb)
 		sh2->m[4] |= OCFB;
 
-	/* FIXME: frc increments isn't stable! */
 	if(frc == 0x0000)
 		sh2->m[4] |= OVF;
 
@@ -138,7 +127,7 @@ static TIMER_CALLBACK( sh2_timer_callback )
 		sh2->m[4] |= OCFA;
 
 		if(sh2->m[4] & 0x010000)
-			sh2->frc = sh2->frc_remainder = 0;
+			sh2->frc = 0;
 	}
 
 	sh2_recalc_irq(sh2);
@@ -539,7 +528,6 @@ WRITE32_HANDLER( sh2_internal_w )
 //      printf("SH2.%s: TIER write %04x @ %04x\n", sh2->device->tag(), data >> 16, mem_mask>>16);
 		sh2->m[4] = (sh2->m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh2->m[4] & (ICF|OCFA|OCFB|OVF));
 		COMBINE_DATA(&sh2->frc);
-		sh2->frc_remainder = 0;
 		if((mem_mask & 0x00ffffff) != 0)
 			sh2_timer_activate(sh2);
 		sh2_recalc_irq(sh2);
@@ -1000,7 +988,6 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 	device->save_pointer(NAME(sh2->m), 0x200/4);
 	device->save_item(NAME(sh2->nmi_line_state));
 	device->save_item(NAME(sh2->frc));
-	device->save_item(NAME(sh2->frc_remainder));
 	device->save_item(NAME(sh2->ocra));
 	device->save_item(NAME(sh2->ocrb));
 	device->save_item(NAME(sh2->icr));
