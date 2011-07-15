@@ -80,7 +80,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define CPU_TYPE_010    (0x00000004)
 #define CPU_TYPE_EC020  (0x00000008)
 #define CPU_TYPE_020    (0x00000010)
-#define CPU_TYPE_EC030  (0x00000020)
+#define CPU_TYPE_EC030  (0x00000020)	  
 #define CPU_TYPE_030    (0x00000040)
 #define CPU_TYPE_EC040  (0x00000080)
 #define CPU_TYPE_LC040  (0x00000100)
@@ -1566,6 +1566,8 @@ void m68ki_stack_frame_1000(m68ki_cpu_core *m68k, UINT32 pc, UINT32 sr, UINT32 v
  */
 void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
 {
+	int orig_rw = m68k->mmu_tmp_rw;	// this gets splatted by the following pushes, so save it now
+
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
 
@@ -1593,7 +1595,7 @@ void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	/* SPECIAL STATUS REGISTER */
 	// set bit for: Rerun Faulted bus Cycle, or run pending prefetch
 	// set FC
-	m68ki_push_16(m68k, 0x0100 | m68k->mmu_tmp_fc );
+	m68ki_push_16(m68k, 0x0100 | m68k->mmu_tmp_fc | orig_rw<<6);
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
@@ -1615,6 +1617,8 @@ void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
  */
 void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
 {
+	int orig_rw = m68k->mmu_tmp_rw;	// this gets splatted by the following pushes, so save it now
+
 	/* INTERNAL REGISTERS (18 words) */
 	m68ki_push_32(m68k, 0);
 	m68ki_push_32(m68k, 0);
@@ -1665,7 +1669,7 @@ void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	m68ki_push_16(m68k, 0);
 
 	/* SPECIAL STATUS REGISTER */
-	m68ki_push_16(m68k, 0x0100 | m68k->mmu_tmp_fc);
+	m68ki_push_16(m68k, 0x0100 | m68k->mmu_tmp_fc | orig_rw<<6);
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
