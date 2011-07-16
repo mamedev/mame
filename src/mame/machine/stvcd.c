@@ -181,6 +181,14 @@ static int firstfile;			// first non-directory file
 #define CD_STAT_WAIT     0x8000		// waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00		// ultra-fatal error.
 
+static void cr_standard_return(UINT16 cur_status)
+{
+	cr1 = cur_status | 0x00; //options << 4 | repeat & 0xf
+	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track);
+	cr3 = (0x01<<8) | (cd_curfad>>16); //index & 0xff00
+	cr4 = cd_curfad;
+}
+
 TIMER_DEVICE_CALLBACK( stv_sector_cb )
 {
 	if (fadstoplay)
@@ -193,17 +201,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 	}
 
 	cd_stat |= CD_STAT_PERI;
-	cr1 = cd_stat;
-	if (cur_track == 0xff)
-	{
-		cr2 = 0xffff;
-	}
-	else
-	{
-		cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
-	}
-	cr3 = (0x01<<8)|((cd_curfad>>16)&0xff); /* put index to be always 1 for now */
-	cr4 = cd_curfad&0xffff;
+	cr_standard_return(cd_stat);
 
 	timer.adjust(attotime::from_hz(CD_SPEED));
 }
@@ -540,14 +538,6 @@ static UINT32 cd_readLong(UINT32 addr)
 			CDROM_LOG(("CD: RL %08x\n", addr))
 			return 0xffff;
 	}
-}
-
-static void cr_standard_return(UINT16 cur_status)
-{
-	cr1 = cur_status | 0x00; //options << 4 | repeat & 0xf
-	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track);
-	cr3 = (0x01<<8) | (cd_curfad>>16); //index & 0xff00
-	cr4 = cd_curfad;
 }
 
 static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
@@ -1054,7 +1044,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				cr1 = cd_stat;
 				cr2 = 0;
 				cr3 = 0;
-				/* TODO: Akumajou Dracula X reads 0 there, why? */
+
 				// is the partition empty?
 				if (partitions[bufnum].size == -1)
 				{
@@ -1234,7 +1224,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
 
-				/* TODO: Cyber Doll crashes here with sectnum == 8*/
 				for (i = sectofs; i < (sectofs + sectnum); i++)
 				{
 					partitions[bufnum].size -= partitions[bufnum].blocks[i]->size;
@@ -1450,7 +1439,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			xfertype32 = XFERTYPE32_INVALID;
 			xferdnum = 0;
 			cd_stat = CD_STAT_PAUSE;	// force to pause
-			cr1 = cd_stat;
+			cr_standard_return(cd_stat);
 			break;
 
 		case 0xe000:	// appears to be copy protection check.  needs only to return OK.
