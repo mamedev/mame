@@ -2324,6 +2324,78 @@ ROM_START( jrking )
     ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
 ROM_END
 
+/*
+Donkey King Jr. PCB Layout
+
+DJR-00
+|-------------------------------------------------|
+|DSW(8)                  MB7052.6B        12.263MHz
+|                                                 |
+|                    2114             6148        |
+|  2114 Z80A         2114             6148        |
+|  2114                                           |
+|1 2114 D8257            ROM6              N82S09 |
+|8 2114       MB7051.8J  ROM5                     |
+|W 2114  MB7052.9K   ROM1                         |
+|A 2114  MB7052.9L   ROM2    MC10124              |
+|Y                   ROM3    MC10124              |
+|                    ROM4    MC10125              |
+|                    HM10422 MC10125              |
+|6MHZ    I8035       HM10422                ROM10 |
+|                            MC10124        ROM9  |
+|HA1368                      MC10124        ROM8  |
+|    VOL             V-POS  H-POS           ROM7  |
+|-------------------------------------------------|
+Notes:
+ Z80 clock   - 3.0659 MHz
+ D8257 clock - 3.0659 MHz
+ 8035 clock  - 6.000 MHz
+ N82S09      - 576-bit BIPOLAR RAM (64 X9)
+ 6148        - 1024-bit x4 SRAM
+ 2114        - 1024-bit x4 SRAM
+ MC10124     - Quad TTL to MECL Translator
+ MC10125     - Quad MECL to TTL Translator
+ HM10422     - 256 x 4 ECL RAM
+ V-POS/H-POS - Pot to adjust horizontal/vertical screen position 
+ Vsync       - 60.4862Hz
+ HSync       - 15.848kHz
+ Xtal 1      - 12.263 MHz
+ Xtal 2      - 6.000 MHz
+*/
+
+ROM_START( dkingjr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.7g",       0x0000, 0x1000, CRC(bd07bb8d) SHA1(a6d18f993c0469ad5db5bd546afab9a45677643a) )
+    ROM_CONTINUE(           0x3000, 0x1000 )
+    ROM_LOAD( "2.7h",       0x2000, 0x0800, CRC(01fbec11) SHA1(cf1aa88529c6c266ee5e924f83fd49d4a2766557) )
+    ROM_CONTINUE(           0x4800, 0x0800 )
+    ROM_CONTINUE(           0x1000, 0x0800 )
+    ROM_CONTINUE(           0x5800, 0x0800 )
+    ROM_LOAD( "3.7k",       0x4000, 0x0800, CRC(a81dd00c) SHA1(ec507d963151bb8fcee13a47d7f93aa4cd089b7e) )
+    ROM_CONTINUE(           0x2800, 0x0800 )
+    ROM_CONTINUE(           0x5000, 0x0800 )
+    ROM_CONTINUE(           0x1800, 0x0800 )
+
+    ROM_REGION( 0x1000, "soundcpu", 0 ) 
+    ROM_LOAD( "4.7l",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
+
+    ROM_REGION( 0x2000, "gfx1", 0 )
+    ROM_LOAD( "5.6g",       0x0000, 0x1000, CRC(cf14669d) SHA1(1ab9ceba49bff6d7bd00c89dae7018093e860eeb) )
+    ROM_LOAD( "6.6e",       0x1000, 0x1000, CRC(cefed15e) SHA1(7077951a3d239b8b34eb45ab959228cb93a957c5) )
+
+    ROM_REGION( 0x2000, "gfx2", 0 )
+    ROM_LOAD( "7.2t",       0x0000, 0x0800, CRC(dc7f4164) SHA1(07a6242e95b5c3b8dfdcd4b4950f463dba16dd77) )
+    ROM_LOAD( "8.2r",       0x0800, 0x0800, CRC(0ce7dcf6) SHA1(0654b77526c49f0dfa077ac4f1f69cf5cb2e2f64) )
+    ROM_LOAD( "9.2p",       0x1000, 0x0800, CRC(24d1ff17) SHA1(696854bf3dc5447d33b4815db357e6ce3834d867) )
+    ROM_LOAD( "10.2m",      0x1800, 0x0800, CRC(0f8c083f) SHA1(0b688ae9da296b2447fffa5e135fd6a56ec3e790) )
+	
+	ROM_REGION( 0x0320, "proms", 0 )
+    ROM_LOAD( "mb7052.9k",  0x0000, 0x0100, CRC(49f2d444) SHA1(6995d73222f71f880ab3ce6d54577802a6ef53ab) )   /* palette low 4 bits */
+    ROM_LOAD( "mb7052.9l",  0x0100, 0x0100, CRC(487513ab) SHA1(e686021bbd41ea8c9d1fd3a277333173ba50afdd) )   /* palette high 4 bits */
+    ROM_LOAD( "mb7052.6b",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
+	ROM_LOAD( "mb7051.8j",  0x0300, 0x0020, CRC(a5a6f2ca) SHA1(5507fb6f5c8845c4421c2996e9f76c818d987623) )   /* unknown */
+ROM_END
+
 ROM_START( dkongjre )
     ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "djr1-c.5b",    0x0000, 0x1000, CRC(ffe9e1a5) SHA1(715dc79d85169b4c1faf43458592e69b434afefd) )
@@ -3104,6 +3176,16 @@ static DRIVER_INIT( dkongx )
 	memory_set_bank(machine,"bank2", 0);
 }
 
+static DRIVER_INIT( dkingjr )
+{
+	UINT8 *prom = machine.region("proms")->base();
+	for( int i=0; i<0x200; ++i)
+	{
+		prom[i]^=0xff; // invert color data
+	}
+}
+
+
 /*************************************
  *
  *  Game drivers
@@ -3128,6 +3210,7 @@ GAME( 1982, dkongjnrj,dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo",
 GAME( 1982, dkongjrb, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjre, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (Easy)", GAME_SUPPORTS_SAVE )
 GAME( 1982, jrking,   dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "bootleg", "Junior King (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkingjr,  dkongjr,  dkongjr,  dkongjr,  dkingjr,  ROT90, "bootleg", "Donkey King Jr. (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
 
 GAME( 1983, dkong3,   0,        dkong3,   dkong3,         0,  ROT90, "Nintendo of America", "Donkey Kong 3 (US)", GAME_SUPPORTS_SAVE )
 GAME( 1983, dkong3j,  dkong3,   dkong3,   dkong3,         0,  ROT90, "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE )
