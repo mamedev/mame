@@ -272,32 +272,32 @@ MACHINE_CONFIG_END
 
 ROM_START( mx5000 )
 	ROM_REGION( 0x18000, "maincpu", 0 )		/* 6309 code */
-	ROM_LOAD( "r01",          0x010000, 0x006000, CRC(79b226fc) SHA1(3bc4d93717230fecd54bd08a0c3eeedc1c8f571d) )/* banked ROM */
-	ROM_CONTINUE(			  0x006000, 0x00a000 )			/* fixed ROM */
+	ROM_LOAD( "669_r01.16c", 0x010000, 0x006000, CRC(79b226fc) SHA1(3bc4d93717230fecd54bd08a0c3eeedc1c8f571d) ) /* banked ROM */
+	ROM_CONTINUE(            0x006000, 0x00a000 )			/* fixed ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for the SOUND CPU */
-	ROM_LOAD( "m02.bin",        0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
+	ROM_LOAD( "669_m02.16b", 0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "mask4m.bin",     0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) )/* tiles + sprites */
+	ROM_LOAD( "mask4m.5e",   0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) /* tiles + sprites */
 
 	ROM_REGION( 0x040000, "konami", 0 )	/* 007232 data (chip 1) */
-	ROM_LOAD( "mask2m.bin",     0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
+	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
 ROM_END
 
 ROM_START( flkatck )
 	ROM_REGION( 0x18000, "maincpu", 0 )		/* 6309 code */
-	ROM_LOAD( "gx669_p1.16c", 0x010000, 0x006000, CRC(c5cd2807) SHA1(22ddd911a23954ff2d52552e07323f5f0ddaeead) )/* banked ROM */
-	ROM_CONTINUE(			  0x006000, 0x00a000 )			/* fixed ROM */
+	ROM_LOAD( "669_p01.16c", 0x010000, 0x006000, CRC(c5cd2807) SHA1(22ddd911a23954ff2d52552e07323f5f0ddaeead) ) /* banked ROM */
+	ROM_CONTINUE(            0x006000, 0x00a000 )			/* fixed ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for the SOUND CPU */
-	ROM_LOAD( "m02.bin",        0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
+	ROM_LOAD( "669_m02.16b", 0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "mask4m.bin",     0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) )/* tiles + sprites */
+	ROM_LOAD( "mask4m.5e",   0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) /* tiles + sprites */
 
 	ROM_REGION( 0x040000, "konami", 0 )	/* 007232 data (chip 1) */
-	ROM_LOAD( "mask2m.bin",     0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
+	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
 ROM_END
 
 
