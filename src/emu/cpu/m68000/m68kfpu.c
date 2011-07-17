@@ -1484,19 +1484,49 @@ static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
 {
 	int ea = m68k->ir & 0x3f;
 	int dir = (w2 >> 13) & 0x1;
-	int reg = (w2 >> 10) & 0x7;
+	int regsel = (w2 >> 10) & 0x7;
+	int mode = (ea >> 3) & 0x7;
 
-	if (dir)	// From system control reg to <ea>
+	if ((mode == 5) || (mode == 6))
 	{
-		if (reg & 4) WRITE_EA_32(m68k, ea, REG_FPCR);
-		if (reg & 2) WRITE_EA_32(m68k, ea, REG_FPSR);
-		if (reg & 1) WRITE_EA_32(m68k, ea, REG_FPIAR);
+		UINT32 address = 0xffffffff;	// force a bus error if this doesn't get assigned
+
+		if (mode == 5)
+		{
+			address = EA_AY_DI_32(m68k);
+		}
+		else if (mode == 6) 
+		{
+			address = EA_AY_IX_32(m68k);
+		}
+
+		if (dir)	// From system control reg to <ea>
+		{
+			if (regsel & 4) { m68ki_write_32(m68k, address, REG_FPCR); address += 4; } 
+			if (regsel & 2) { m68ki_write_32(m68k, address, REG_FPSR); address += 4; } 
+			if (regsel & 1) { m68ki_write_32(m68k, address, REG_FPIAR); address += 4; } 
+		}
+		else		// From <ea> to system control reg
+		{
+			if (regsel & 4) { REG_FPCR = m68ki_read_32(m68k, address); address += 4; }
+			if (regsel & 2) { REG_FPSR = m68ki_read_32(m68k, address); address += 4; } 
+			if (regsel & 1) { REG_FPIAR = m68ki_read_32(m68k, address); address += 4; } 
+		}
 	}
-	else		// From <ea> to system control reg
+	else
 	{
-		if (reg & 4) REG_FPCR = READ_EA_32(m68k, ea);
-		if (reg & 2) REG_FPSR = READ_EA_32(m68k, ea);
-		if (reg & 1) REG_FPIAR = READ_EA_32(m68k, ea);
+		if (dir)	// From system control reg to <ea>
+		{
+			if (regsel & 4) WRITE_EA_32(m68k, ea, REG_FPCR);
+			if (regsel & 2) WRITE_EA_32(m68k, ea, REG_FPSR);
+			if (regsel & 1) WRITE_EA_32(m68k, ea, REG_FPIAR);
+		}
+		else		// From <ea> to system control reg
+		{
+			if (regsel & 4) REG_FPCR = READ_EA_32(m68k, ea);
+			if (regsel & 2) REG_FPSR = READ_EA_32(m68k, ea);
+			if (regsel & 1) REG_FPIAR = READ_EA_32(m68k, ea);
+		}
 	}
 
 	m68k->remaining_cycles -= 10;

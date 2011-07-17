@@ -16,6 +16,9 @@
 #define M68K_IRQ_6    6
 #define M68K_IRQ_7    7
 
+// special input lines
+#define M68K_LINE_BUSERROR 16
+
 /* CPU types for use in m68k_set_cpu_type() */
 enum
 {

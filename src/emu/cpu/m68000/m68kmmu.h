@@ -784,16 +784,17 @@ INLINE UINT32 hmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 	{
 		addr_out = addr_in & 0xffffff;
 
-		if ((addr_in >= 0x800000) && (addr_in <= 0x8fffff))
+		if ((addr_out >= 0x800000) && (addr_out <= 0x8fffff))
 		{
 			addr_out |= 0x40000000;	// ROM
 		}
-		else if ((addr_in >= 0x900000) && (addr_in <= 0xefffff))
+		else if ((addr_out >= 0x900000) && (addr_out <= 0xefffff))
 		{
-			addr_out |= 0xf0ff0000;	// NuBus
+			addr_out = 0xf0000000;	// NuBus
 			addr_out |= ((addr_in & 0xf00000)<<4);
+			addr_out |= (addr_in & 0xfffff);
 		}
-		else if (addr_in >= 0xf00000)
+		else if (addr_out >= 0xf00000)
 		{
 			addr_out |= 0x50000000;	// I/O
 		}

@@ -554,6 +554,31 @@ static void m68k_postload(m68ki_cpu_core *m68k)
 	m68ki_jump(m68k, REG_PC);
 }
 
+static void m68k_cause_bus_error(m68ki_cpu_core *m68k)
+{
+	UINT32 sr;
+
+	sr = m68ki_init_exception(m68k);
+
+	m68k->run_mode = RUN_MODE_BERR_AERR_RESET;
+
+	if (!CPU_TYPE_IS_020_PLUS(m68k->cpu_type))
+	{
+		/* Note: This is implemented for 68000 only! */
+		m68ki_stack_frame_buserr(m68k, sr);
+	}
+	else if (m68k->mmu_tmp_buserror_address == REG_PPC)
+	{
+		m68ki_stack_frame_1010(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC, m68k->mmu_tmp_buserror_address);
+	}
+	else
+	{
+		m68ki_stack_frame_1011(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC, m68k->mmu_tmp_buserror_address);
+	}
+
+	m68ki_jump_vector(m68k, EXCEPTION_BUS_ERROR);
+}
+
 /* translate logical to physical addresses */
 static CPU_TRANSLATE( m68k )
 {
@@ -930,6 +955,13 @@ static CPU_SET_INFO( m68k )
 		case CPUINFO_INT_INPUT_STATE + 7:
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
 			set_irq_line(m68k, state - CPUINFO_INT_INPUT_STATE, info->i);
+			break;
+
+		case CPUINFO_INT_INPUT_STATE + M68K_LINE_BUSERROR:
+			if (info->i == ASSERT_LINE)
+			{
+				m68k_cause_bus_error(m68k);
+			}
 			break;
 	}
 }
@@ -1827,7 +1859,7 @@ static CPU_INIT( m68020hmmu )
 // because we live in the device state which is allocated as bytes
 // remove me when we have a real C++ device
 	new(&m68k->memory) m68k_memory_interface;
-	m68k->memory.init32mmu(*m68k->program);
+	m68k->memory.init32hmmu(*m68k->program);
 }
 
 CPU_GET_INFO( m68020hmmu )
@@ -2126,7 +2158,7 @@ static CPU_INIT( m68lc040 )
 // because we live in the device state which is allocated as bytes
 // remove me when we have a real C++ device
 	new(&m68k->memory) m68k_memory_interface;
-	m68k->memory.init32(*m68k->program);
+	m68k->memory.init32mmu(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[4];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
