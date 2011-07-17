@@ -120,7 +120,10 @@ INLINE void unknown_attribute_value(parse_state *state,
     from the global pool. So they should be global_free'ed
     when they are not used anymore.
 -------------------------------------------------*/
-static void software_name_split(running_machine& machine, const char *swlist_swname, char **swlist_name, char **swname, char **swpart )
+
+#define global_strdup(s)				strcpy(global_alloc_array(char, strlen(s) + 1), s)
+
+static void software_name_split(const char *swlist_swname, char **swlist_name, char **swname, char **swpart )
 {
 	const char *split_1st_loc = strchr( swlist_swname, ':' );
 	const char *split_2nd_loc = ( split_1st_loc ) ? strchr( split_1st_loc + 1, ':' ) : NULL;
@@ -134,31 +137,31 @@ static void software_name_split(running_machine& machine, const char *swlist_swn
 		if ( split_2nd_loc )
 		{
 			int size = split_1st_loc - swlist_swname;
-			*swlist_name = auto_alloc_array_clear(machine,char,size+1);
+			*swlist_name = global_alloc_array_clear(char,size+1);
 			memcpy( *swlist_name, swlist_swname, size );
 
 			size = split_2nd_loc - ( split_1st_loc + 1 );
-			*swname = auto_alloc_array_clear(machine,char,size+1);
+			*swname = global_alloc_array_clear(char,size+1);
 			memcpy( *swname, split_1st_loc + 1, size );
 
 			size = strlen( swlist_swname ) - ( split_2nd_loc + 1 - swlist_swname );
-			*swpart = auto_alloc_array_clear(machine,char,size+1);
+			*swpart = global_alloc_array_clear(char,size+1);
 			memcpy( *swpart, split_2nd_loc + 1, size );
 		}
 		else
 		{
 			int size = split_1st_loc - swlist_swname;
-			*swname = auto_alloc_array_clear(machine,char,size+1);
+			*swname = global_alloc_array_clear(char,size+1);
 			memcpy( *swname, swlist_swname, size );
 
 			size = strlen( swlist_swname ) - ( split_1st_loc + 1 - swlist_swname );
-			*swpart = auto_alloc_array_clear(machine,char,size+1);
+			*swpart = global_alloc_array_clear(char,size+1);
 			memcpy( *swpart, split_1st_loc + 1, size );
 		}
 	}
 	else
 	{
-		*swname = auto_strdup(machine,swlist_swname);
+		*swname = global_strdup(swlist_swname);
 	}
 }
 
@@ -1372,6 +1375,138 @@ void software_display_matches(const device_list &devlist,emu_options &options, c
 		}
 	}
 }
+
+static void find_software_item(emu_options &options, const device_image_interface *image, const char *path, software_list **software_list_ptr, software_info **software_info_ptr,software_part **software_part_ptr, const char **sw_list_name)
+{
+	char *swlist_name, *swname, *swpart, *swname_bckp;
+	*software_list_ptr = NULL;
+	*software_info_ptr = NULL;
+	*software_part_ptr = NULL;
+
+	/* Split full software name into software list name and short software name */
+	software_name_split(path, &swlist_name, &swname, &swpart );
+	swname_bckp = swname;
+
+	const char *interface = image->image_interface();
+
+	machine_config config(*options.system(), options);
+	
+	if ( swlist_name )
+	{
+		/* Try to open the software list xml file explicitly named by the user */
+		*software_list_ptr = software_list_open( options, swlist_name, FALSE, NULL );
+
+		if ( *software_list_ptr )
+		{
+			*software_info_ptr = software_list_find( *software_list_ptr, swname, NULL );
+
+			if ( *software_info_ptr )
+			{
+				*software_part_ptr = software_find_part( *software_info_ptr, swpart, interface );
+			}
+		}
+	}
+	else
+	{
+		/* Loop through all the software lists named in the driver */
+		for (device_t *swlists = config.devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
+		{
+			if ( swlists )
+			{
+
+				software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
+				UINT32 i = DEVINFO_STR_SWLIST_0;
+
+				while ( ! *software_part_ptr && i <= DEVINFO_STR_SWLIST_MAX )
+				{
+					swlist_name = swlist->list_name[i-DEVINFO_STR_SWLIST_0];
+
+					if ( swlist_name && *swlist_name && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
+					{
+						if ( *software_list_ptr )
+						{
+							software_list_close( *software_list_ptr );
+						}
+
+						*software_list_ptr = software_list_open( options, swlist_name, FALSE, NULL );
+
+						if ( software_list_ptr )
+						{
+							*software_info_ptr = software_list_find( *software_list_ptr, swname, NULL );
+
+							if ( *software_info_ptr )
+							{
+								*software_part_ptr = software_find_part( *software_info_ptr, swpart, interface );
+							}
+						}
+					}
+					i++;
+				}
+			}
+		}
+
+		/* If not found try to load the software list using the driver name */
+		if ( ! *software_part_ptr )
+		{
+			swlist_name = (char *)options.system()->name;
+
+			if ( *software_list_ptr )
+			{
+				software_list_close( *software_list_ptr );
+			}
+
+			*software_list_ptr = software_list_open( options, swlist_name, FALSE, NULL );
+
+			if ( *software_list_ptr )
+			{
+				*software_info_ptr = software_list_find( *software_list_ptr, swname, NULL );
+
+				if ( *software_info_ptr )
+				{
+					*software_part_ptr = software_find_part( *software_info_ptr, swpart, interface );
+				}
+			}
+		}
+
+		/* If not found try to load the software list using the software name as software */
+		/* list name and software part name as software name. */
+		if ( ! *software_part_ptr )
+		{
+			swlist_name = swname;
+			swname = swpart;
+			swpart = NULL;
+
+			if ( *software_list_ptr )
+			{
+				software_list_close( *software_list_ptr );
+			}
+
+			*software_list_ptr = software_list_open( options, swlist_name, FALSE, NULL );
+
+			if ( software_list_ptr )
+			{
+				*software_info_ptr = software_list_find( *software_list_ptr, swname, NULL );
+
+				if ( *software_info_ptr )
+				{
+					*software_part_ptr = software_find_part( *software_info_ptr, swpart, interface );
+				}
+
+				if ( ! *software_part_ptr )
+				{
+					software_list_close( *software_list_ptr );
+					*software_list_ptr = NULL;
+				}
+			}
+		}
+	}
+	*sw_list_name = global_strdup(swlist_name);
+	
+	global_free( swlist_name );
+	global_free( swname );
+	global_free( swpart );
+}
+
 /*-------------------------------------------------
     load_software_part
 
@@ -1385,137 +1520,24 @@ void software_display_matches(const device_list &devlist,emu_options &options, c
     sw_info and sw_part are also set.
 -------------------------------------------------*/
 
-bool load_software_part(device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name)
+bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name)
 {
-	char *swlist_name, *swname, *swpart, *swname_bckp;
-	bool result = false;
 	software_list *software_list_ptr = NULL;
 	software_info *software_info_ptr = NULL;
 	software_part *software_part_ptr = NULL;
-
+	const char *swlist_name = NULL;
+	
+	bool result = false;
 	*sw_info = NULL;
 	*sw_part = NULL;
 
-	/* Split full software name into software list name and short software name */
-	software_name_split( image->device().machine(), path, &swlist_name, &swname, &swpart );
-	swname_bckp = swname;
-
-	const char *interface = image->image_interface();
-
-	if ( swlist_name )
-	{
-		/* Try to open the software list xml file explicitly named by the user */
-		software_list_ptr = software_list_open( image->device().machine().options(), swlist_name, FALSE, NULL );
-
-		if ( software_list_ptr )
-		{
-			software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
-
-			if ( software_info_ptr )
-			{
-				software_part_ptr = software_find_part( software_info_ptr, swpart, interface );
-			}
-		}
-	}
-	else
-	{
-		/* Loop through all the software lists named in the driver */
-		for (device_t *swlists = image->device().machine().devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
-		{
-			if ( swlists )
-			{
-
-				software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
-				UINT32 i = DEVINFO_STR_SWLIST_0;
-
-				while ( ! software_part_ptr && i <= DEVINFO_STR_SWLIST_MAX )
-				{
-					swlist_name = swlist->list_name[i-DEVINFO_STR_SWLIST_0];
-
-					if ( swlist_name && *swlist_name && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
-					{
-						if ( software_list_ptr )
-						{
-							software_list_close( software_list_ptr );
-						}
-
-						software_list_ptr = software_list_open( image->device().machine().options(), swlist_name, FALSE, NULL );
-
-						if ( software_list_ptr )
-						{
-							software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
-
-							if ( software_info_ptr )
-							{
-								software_part_ptr = software_find_part( software_info_ptr, swpart, interface );
-							}
-						}
-					}
-					i++;
-				}
-			}
-		}
-
-		/* If not found try to load the software list using the driver name */
-		if ( ! software_part_ptr )
-		{
-			swlist_name = (char *)image->device().machine().system().name;
-
-			if ( software_list_ptr )
-			{
-				software_list_close( software_list_ptr );
-			}
-
-			software_list_ptr = software_list_open( image->device().machine().options(), swlist_name, FALSE, NULL );
-
-			if ( software_list_ptr )
-			{
-				software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
-
-				if ( software_info_ptr )
-				{
-					software_part_ptr = software_find_part( software_info_ptr, swpart, interface );
-				}
-			}
-		}
-
-		/* If not found try to load the software list using the software name as software */
-		/* list name and software part name as software name. */
-		if ( ! software_part_ptr )
-		{
-			swlist_name = swname;
-			swname = swpart;
-			swpart = NULL;
-
-			if ( software_list_ptr )
-			{
-				software_list_close( software_list_ptr );
-			}
-
-			software_list_ptr = software_list_open( image->device().machine().options(), swlist_name, FALSE, NULL );
-
-			if ( software_list_ptr )
-			{
-				software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
-
-				if ( software_info_ptr )
-				{
-					software_part_ptr = software_find_part( software_info_ptr, swpart, interface );
-				}
-
-				if ( ! software_part_ptr )
-				{
-					software_list_close( software_list_ptr );
-					software_list_ptr = NULL;
-				}
-			}
-		}
-	}
-
+	find_software_item(options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
+	
 	// if no match has been found, we suggest similar shortnames
 	if (software_info_ptr == NULL)
-	{
-		software_display_matches(image->device().machine().devicelist(),image->device().machine().options(), image->image_interface(), swname_bckp);
+	{		
+		machine_config config(*options.system(), options);
+		software_display_matches(config.devicelist(), options, image->image_interface(), path);
 	}
 
 	if ( software_part_ptr )
@@ -1527,6 +1549,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 		catch (emu_fatalerror &fatal)
 		{
 			software_list_close( software_list_ptr );
+			global_free(swlist_name);
 			throw fatal;
 		}
 
@@ -1581,10 +1604,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 		software_info_ptr = NULL;
 		software_list_ptr = NULL;
 	}
-	auto_free( image->device().machine(), swlist_name );
-	auto_free( image->device().machine(), swname );
-	auto_free( image->device().machine(), swpart );
-
+	global_free(swlist_name);
 	return result;
 }
 
@@ -1610,6 +1630,33 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
 
 }
 
+/*-------------------------------------------------
+    software_get_default_slot
+ -------------------------------------------------*/
+
+ const char *software_get_default_slot(emu_options &options, const device_image_interface *image, const char *default_card, const char* default_card_slot)
+{
+	const char* retVal = default_card;
+	const char* path = options.value(image->instance_name());
+	software_list *software_list_ptr = NULL;
+	software_info *software_info_ptr = NULL;
+	software_part *software_part_ptr = NULL;
+	const char *swlist_name = NULL;
+	
+	if (strlen(path)>0) {
+		retVal = default_card_slot;
+		find_software_item(options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
+		if (software_part_ptr!=NULL) {
+			const char *slot = software_part_get_feature(software_part_ptr, "slot");
+			if (slot!=NULL) {
+				retVal = core_strdup(slot);
+			}
+		}
+		software_list_close(software_list_ptr);
+		global_free(swlist_name);
+	}
+	return retVal;	
+}
 
 /***************************************************************************
     DEVICE INTERFACE
