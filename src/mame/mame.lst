@@ -10793,9 +10793,100 @@ screenpl
 screenp1
 screenp2
 
+
 // MPU3
-mpu3utst
-m_hprvpr
+
+m3tst		// MPU3 Unit Test (Program 5) (Barcrest)
+
+m3autort	// Autoroute (Barcrest)
+m3big20j	// Big 20 Joker (Barcrest)
+m3bigsht	// Big Shot (Barcrest)
+m3blkhle	// Black Hole (Barcrest)
+m3cabret	// Cabaret (Barcrest)
+m3cabreta	//
+m3cunlim	// Chances Unlimited (Barcrest)
+m3cskill	// Circle Skill (Barcrest)
+m3cjoker	// Crazy Joker (Barcrest)
+m3xchngg	// Exchanges Galore (Barcrest)
+m3xchngu	// Exchanges Unlimited (Barcrest)
+m3xchngua	//
+m3fortun	// Fortune Numbers (Barcrest)
+m3fortuna	//
+m3fortund	//
+m3gaward	// Golden Award (Barcrest)
+m3hprvpr	// Hyper Viper (Barcrest)
+m3snappy	// Snappy Viper (Barcrest)
+m3replay	// Instant Replay (Barcrest)
+m3lineup	// Line Up (Barcrest)
+m3llotto	// Lucky Lotto (Barcrest)
+m3lstrik	// Lucky Strike Club (Barcrest)
+m3lstrika	//
+m3magrp		// Magic Replay (Barcrest)
+m3nnice		// Naughty But Nice (Barcrest)
+m3nudge		// Nudges Unlimited (Barcrest)
+m3oddson	// Odds On (Barcrest)
+m3optunl	// Options Unlimited (Barcrest)
+m3optunla	//
+m3razdaz	// Razzle Dazzle (Barcrest)
+m3razdaza	//
+m3razdazd	//
+m3rxchng	// Royal Exchange Club (Barcrest)
+m3circle	// Special Circle Club (Barcrest)
+m3circlea	//
+m3circleb	//
+m3slight	// Strike A Light (Barcrest)
+m3supadr	// Super Adders & Ladders (Barcrest)
+m3sdeal		// Super Deal (Barcrest)
+m3sexcu		// Super Exchanges Unlimited (Barcrest)
+m3suplin	// Super Line Up (Barcrest)
+m3suplina	//
+m3supnud	// Super Nudges Unlimited (Barcrest)
+m3supser	// Super Series (Barcrest)
+m3sweep		// Sweep Stake Club (Barcrest)
+m3sweepa	//
+m3topsht	// Top Shot (Barcrest)
+m3winstra	// Winstrike (Barcrest)
+
+/* Bwb */
+
+m3acech		// Ace Chase (Bwb)
+m3bankr		// Banker (Bwb)
+m3chase		// Chase It (Bwb)
+m3gmine		// Gold Mine (Bwb)
+m3ratrce	// Rat Race (Bwb)
+m3supasw	// Supaswop (Bwb)
+m3supwin	// Super Win (Bwb)
+m3supwina	//
+m3winagn	// Win-A-Gain (Bwb)
+m3winagna	// 
+m3winagnb	// 
+m3winstr	// Winstrike (Bwb)
+
+/* Pcp */
+
+m3cdash		// Cash Dash (Pcp)
+m3loony		// Loonybin (Pcp)
+m3online	// On Line (Pcp)
+m3rockpl	// Rock Pile (Pcp)
+m3rollem	// Roll 'Em (Pcp)
+m3snaphp	// Snap Happy (Pcp)
+m3spoof		// Spoof (Pcp)
+m3spoofa	//
+m3supspo	// Super Spoof (Pcp)
+m3supspoa	//
+m3toplin	// Top Line (Pcp)
+m3wigwam	// Wig Wam (Pcp)
+
+/* Mdm */
+
+m3gcrown	// Golden Crowns (Mdm)
+m3tfair		// Tuppenny Fair (Mdm)
+m3wacky		// Wacky Racer (Mdm)
+
+/* Others */
+
+m3minmax	// Mini Max (Associated Leisure)
+m3oxo		// Noughts 'n' Crosses (VFS)
 
 // MPU4
 m_oldtmr		// Barcrest - highly prelim
