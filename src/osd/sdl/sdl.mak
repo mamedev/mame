@@ -405,7 +405,7 @@ endif	# Win32
 #-------------------------------------------------
 
 ifeq ($(BASE_TARGETOS),macosx)
-#OSDCOREOBJS += $(SDLOBJ)/osxutils.o
+OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
