@@ -4339,7 +4339,7 @@ CPU_GET_INFO( ppc403gcx )
 
 static CPU_INIT( ppc601 )
 {
-	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, device, irqcallback);
+	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, device, irqcallback);
 }
 
 

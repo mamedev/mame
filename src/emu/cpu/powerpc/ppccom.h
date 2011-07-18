@@ -39,7 +39,8 @@
 #define PPCCAP_MISALIGNED			0x08		/* TRUE if misaligned accesses are supported */
 #define PPCCAP_4XX					0x10		/* TRUE if we are a non-OEA 4XX class chip */
 #define PPCCAP_603_MMU				0x20		/* TRUE if we have 603-class MMU features */
-
+#define PPCCAP_MFIOC                0x40        /* TRUE if we have memory-forced I/O controller interface accesses */
+#define PPCCAP_601BAT               0x80        /* TRUE if we're doing 601-style BATs (unified I/D, different bit layout) */
 
 /* PowerPC flavors */
 enum _powerpc_flavor

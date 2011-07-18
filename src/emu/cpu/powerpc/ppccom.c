@@ -465,7 +465,7 @@ offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *opr
 
 static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intention, offs_t *address)
 {
-	int transpriv = ((intention & TRANSLATE_USER_MASK) == 0);
+	int transpriv = ((intention & TRANSLATE_USER_MASK) == 0);	// 1 for supervisor, 0 for user
 	int transtype = intention & TRANSLATE_TYPE_MASK;
 	offs_t hash, hashbase, hashmask;
 	int batbase, batnum, hashnum;
@@ -502,28 +502,69 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 		return 0x001;
 
 	/* first scan the appropriate BAT */
-	batbase = (transtype == TRANSLATE_FETCH) ? SPROEA_IBAT0U : SPROEA_DBAT0U;
-	for (batnum = 0; batnum < 4; batnum++)
+	if (ppc->cap & PPCCAP_601BAT)
 	{
-		UINT32 upper = ppc->spr[batbase + 2*batnum + 0];
-
-		/* check user/supervisor valid bit */
-		if ((upper >> transpriv) & 0x01)
+		for (batnum = 0; batnum < 4; batnum++)
 		{
-			UINT32 mask = (~upper << 15) & 0xfffe0000;
+			UINT32 upper = ppc->spr[SPROEA_IBAT0U + 2*batnum + 0];
+			UINT32 lower = ppc->spr[SPROEA_IBAT0U + 2*batnum + 1];
+			int privbit = ((intention & TRANSLATE_USER_MASK) == 0) ? 3 : 2;
 
-			/* check for a hit against this bucket */
-			if ((*address & mask) == (upper & mask))
+//			printf("bat %d upper = %08x privbit %d\n", batnum, upper, privbit);
+
+			// is this pair valid?
+			if (lower & 0x40)
 			{
-				UINT32 lower = ppc->spr[batbase + 2*batnum + 1];
+				UINT32 mask = (~lower & 0x3f) << 17;
+				UINT32 addrout;
+				UINT32 key = (upper >> privbit) & 1;
 
-				/* verify protection; if we fail, return false and indicate a protection violation */
-				if (!page_access_allowed(transtype, 1, lower & 3))
-					return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+				/* check for a hit against this bucket */
+				if ((*address & 0xfffe0000) == (upper & 0xfffe0000))
+				{
+					/* verify protection; if we fail, return false and indicate a protection violation */
+					if (!page_access_allowed(transtype, key, upper & 3))
+					{
+						return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+					}
 
-				/* otherwise we're good */
-				*address = (lower & mask) | (*address & ~mask);
-				return 0x001;
+					/* otherwise we're good */
+					addrout = (lower & 0xff100000) | (*address & ~0xfffe0000);
+					addrout |= ((*address & mask) | (lower & mask));
+					*address = addrout; // top 9 bits from top 9 of PBN
+					return 0x001;
+				}
+			}
+		}
+	}
+	else
+	{
+		batbase = (transtype == TRANSLATE_FETCH) ? SPROEA_IBAT0U : SPROEA_DBAT0U;
+
+		for (batnum = 0; batnum < 4; batnum++)
+		{
+			UINT32 upper = ppc->spr[batbase + 2*batnum + 0];
+
+			/* check user/supervisor valid bit */
+			if ((upper >> transpriv) & 0x01)
+			{
+				UINT32 mask = (~upper << 15) & 0xfffe0000;
+
+				/* check for a hit against this bucket */
+				if ((*address & mask) == (upper & mask))
+				{
+					UINT32 lower = ppc->spr[batbase + 2*batnum + 1];
+
+					/* verify protection; if we fail, return false and indicate a protection violation */
+					if (!page_access_allowed(transtype, 1, lower & 3))
+					{
+						return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+					}
+
+					/* otherwise we're good */
+					*address = (lower & mask) | (*address & ~mask);
+					return 0x001;
+				}
 			}
 		}
 	}
@@ -532,6 +573,20 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	segreg = ppc->sr[*address >> 28];
 	if (transtype == TRANSLATE_FETCH && (segreg & 0x10000000))
 		return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+
+	/* check for memory-forced I/O */
+	if (ppc->cap & PPCCAP_MFIOC)
+	{
+		if ((transtype != TRANSLATE_FETCH) && ((segreg & 0x87f00000) == 0x87f00000))
+		{
+			*address = ((segreg & 0xf)<<28) | (*address & 0x0fffffff);
+			return 1;
+		}
+		else if (segreg & 0x80000000)
+		{
+			fatalerror("PPC: Unhandled segment register %08x with T=1\n", segreg);
+		}
+	}
 
 	/* get hash table information from SD1 */
 	hashbase = ppc->spr[SPROEA_SDR1] & 0xffff0000;
