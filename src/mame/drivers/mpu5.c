@@ -5281,7 +5281,7 @@ ROM_START( m5clowna ) // alt "m5clown" set?
 ROM_END
 
 
-ROM_START( m5winway ) // no idea..
+ROM_START( m5winway )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "wwa_sjs1.4_1", 0x000000, 0x080000, CRC(1a48966f) SHA1(694541a767cb62cecaa8d3d17245379f8f9425f8) )
 	ROM_LOAD16_BYTE( "wwa_sjs1.4_2", 0x000001, 0x080000, CRC(cf7b46d3) SHA1(b2b10f10b2757043ce0a45a9f304e8444771ad4d) )
@@ -5297,7 +5297,50 @@ ROM_START( m5winway ) // no idea..
 ROM_END
 
 
+/* More Empire Sets.. */
 
+ROM_START( m5bukroo )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "buck1_1.p1", 0x000000, 0x080000, CRC(d7723fac) SHA1(0188bb0b1b8ef42f9e2a23bcecba5ff2cab3231d) )
+	ROM_LOAD16_BYTE( "buck1_1.p2", 0x000001, 0x080000, CRC(f409a41d) SHA1(88c77751627779e29a7d96527a020cae203a328c) )
+ROM_END
+
+
+ROM_START( m5coloss )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "colo1_1.p1", 0x000000, 0x080000, CRC(f3bffd91) SHA1(12026c468b74216519abf979daf1547d58cac870) )
+	ROM_LOAD16_BYTE( "colo1_1.p2", 0x000001, 0x080000, CRC(7157bb5e) SHA1(3c208ced69e48b0fd236e5acb8f5d355cdcd1c8e) )
+ROM_END
+
+
+
+ROM_START( m5fatcat )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "fcat0_2.p1", 0x000000, 0x080000, CRC(7389859a) SHA1(6e54c2623c749b8559d329acc49c0bb6b0f0afff) )
+	ROM_LOAD16_BYTE( "fcat0_2.p2", 0x000001, 0x080000, CRC(b2c81b32) SHA1(69fcb8d89576a606c42af19b3988e1166b4e3d48) )
+ROM_END
+
+
+
+ROM_START( m5jmpgmc )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cgem1_0.p1", 0x000000, 0x080000, CRC(792fb276) SHA1(461c548c580eba1f4517abf06555a63aceb0e9f7) )
+	ROM_LOAD16_BYTE( "cgem1_0.p2", 0x000001, 0x080000, CRC(6d07827c) SHA1(154a5e87c87db4fc48074d35f32c0fbcb536f476) )
+ROM_END
+
+
+ROM_START( m5tomb )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tomb0_3.p1", 0x000000, 0x080000, CRC(33363c98) SHA1(228d92041a6f7069281a32203ac8c392f036d94e) )
+	ROM_LOAD16_BYTE( "tomb0_3.p2", 0x000001, 0x080000, CRC(6cc4b7b3) SHA1(69923823a363ea3b10c6a92b633841df7625b211) )
+ROM_END
+
+
+ROM_START( m5monjok )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "barcrestespanasl_monedinjoker_p1.bin", 0x000000, 0x080000, CRC(924bc734) SHA1(3cc2f865cf0d61131e19be89b94c7fe7a05dbb9e) )
+	ROM_LOAD16_BYTE( "barcrestespanasl_monedinjoker_p2.bin", 0x000001, 0x080000, CRC(bc9f3dbe) SHA1(95b90c5f13e9a7784e94469f53fed81338fc7f4c) )
+ROM_END
 
 
 
@@ -5380,6 +5423,7 @@ GAME( 199?, m5lotta		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Lotta Luck (Barcrest
 GAME( 199?, m5mega		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Mega Zone (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5martns	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5mmak		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5monjok	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5monty		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5mprio		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python Rio (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5mpfc		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python's Flying Circus (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5434,6 +5478,7 @@ GAME( 199?, m5ultimo	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ultimo (Barcrest) (M
 GAME( 199?, m5upover	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5vampup	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Vamp It Up (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5wking		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
 
 /* Barcrest / Red Gaming */
 
@@ -5526,6 +5571,7 @@ GAME( 199?, m5aceclba	,m5aceclb,	mpu5, mpu5, 0, ROT0, "Empire","Ace Of Clubs (Em
 GAME( 199?, m5aceclbb	,m5aceclb,	mpu5, mpu5, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5barxdx	,0,			mpu5, mpu5, 0, ROT0, "Empire","Bar X Deluxe (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5bnzclb	,0,			mpu5, mpu5, 0, ROT0, "Empire","Bonanza Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5bukroo	,0,			mpu5, mpu5, 0, ROT0, "Empire","Buckaroo (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5cbrun		,0,			mpu5, mpu5, 0, ROT0, "Empire","Cannonball Run (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5carou		,0,			mpu5, mpu5, 0, ROT0, "Empire","Carousel (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5casroc	,0,			mpu5, mpu5, 0, ROT0, "Empire","Casino Royale Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5533,6 +5579,7 @@ GAME( 199?, m5centcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Centurion Club (Empire
 GAME( 199?, m5cworan	,0,			mpu5, mpu5, 0, ROT0, "Empire","Clockwork Oranges (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5clbtro	,0,			mpu5, mpu5, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5cockdd	,0,			mpu5, mpu5, 0, ROT0, "Empire","Cock A Doodle Dough (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5coloss	,0,			mpu5, mpu5, 0, ROT0, "Empire","Colossus Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5crocrk	,0,			mpu5, mpu5, 0, ROT0, "Empire","Crocodile Rock (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5croclb	,0,			mpu5, mpu5, 0, ROT0, "Empire","Crocodile Rock Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5crsfir	,0,			mpu5, mpu5, 0, ROT0, "Empire","Crossfire (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5540,6 +5587,7 @@ GAME( 199?, m5dmnf		,0,			mpu5, mpu5, 0, ROT0, "Empire","Diamonds Are Forever (E
 GAME( 199?, m5dmnfcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Diamonds Are Forever Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5extrm		,0,			mpu5, mpu5, 0, ROT0, "Empire","Extreme (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5extrmm	,0,			mpu5, mpu5, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5fatcat	,0,			mpu5, mpu5, 0, ROT0, "Empire","Fat Cat (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fishdl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Fish Full Of Dollars (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fishcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Fish Full Of Dollars Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fmonty	,0,			mpu5, mpu5, 0, ROT0, "Empire","Full Monty (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5555,6 +5603,7 @@ GAME( 199?, m5hulacl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Hula Moolah Club (Empi
 GAME( 199?, m5jackbx	,0,			mpu5, mpu5, 0, ROT0, "Empire","Jack In The Box (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5jcy		,0,			mpu5, mpu5, 0, ROT0, "Empire","Juicy Fruits (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5jmpgem	,0,			mpu5, mpu5, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5jmpgmc	,0,			mpu5, mpu5, 0, ROT0, "Empire","Jumping Gems Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5kaleid	,0,			mpu5, mpu5, 0, ROT0, "Empire","Kaleidoscope Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5kcclb		,0,			mpu5, mpu5, 0, ROT0, "Empire","King Cobra Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5kingqc	,0,			mpu5, mpu5, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5570,6 +5619,7 @@ GAME( 199?, m5rthh		,0,			mpu5, mpu5, 0, ROT0, "Empire","Return To The Haunted H
 GAME( 199?, m5rollx		,0,			mpu5, mpu5, 0, ROT0, "Empire","Roll X (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5skulcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5tball		,0,			mpu5, mpu5, 0, ROT0, "Empire","Thunderball (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5tomb		,0,			mpu5, mpu5, 0, ROT0, "Empire","Tomb Raiders (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5trclb		,0,			mpu5, mpu5, 0, ROT0, "Empire","Tomb Raiders Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5ttop		,0,			mpu5, mpu5, 0, ROT0, "Empire","Treble Top (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5ttopcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Treble Top Club (Empire) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
