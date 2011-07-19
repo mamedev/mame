@@ -48,7 +48,7 @@
 
 
 // set to 1 to execute on cothread instead of directly
-#define USE_COTHREADS 0
+#define USE_COTHREADS 1
 
 
 //**************************************************************************
