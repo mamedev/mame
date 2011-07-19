@@ -182,6 +182,14 @@ static void I386OP(fpu_group_db)(i386_state *cpustate)		// Opcode 0xdb
 	{
 		switch (modrm & 0x3f)
 		{
+			case 0x22:		// FCLEX
+			{
+				// clears exception flags and busy bit.
+				cpustate->fpu_status_word &= ~0x80ff;
+
+				CYCLES(cpustate,1);		// TODO
+				break;
+			}
 			case 0x23:		// FINIT
 			{
 				cpustate->fpu_control_word = 0x37f;
