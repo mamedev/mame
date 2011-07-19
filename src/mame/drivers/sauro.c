@@ -470,6 +470,38 @@ ROM_START( sauro )
 	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
 ROM_END
 
+ROM_START( saurop )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "s2.3k",     0x00000, 0x8000, CRC(79846222) SHA1(59ccfbaad0251f771c0fd624d00d93a50bca67d8) )
+	ROM_LOAD( "s1.3f",     0x08000, 0x8000, CRC(3efd13ed) SHA1(3920d21d5d9c285c5bcf47aa12b4e9a42294f149) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "s3.5x",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "s6.7x",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) )
+	ROM_LOAD( "s7.7z",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "s4.7h",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) )
+	ROM_LOAD( "s5.7k",     0x08000, 0x8000, CRC(de5cd249) SHA1(e3752b88b539e1057a35619ffbad01720ab60d7d) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "s8.10l",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) )
+	ROM_LOAD( "s9.10p",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) )
+	ROM_LOAD( "s10.10r",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) )
+	ROM_LOAD( "s11.10t",    0x18000, 0x8000, CRC(f47982a8) SHA1(cbaeac272c015d9439f151cfb3449082f11a57a1) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "82s137-3.bin",    0x0000, 0x0400, CRC(d52c4cd0) SHA1(27d6126b46616c06b55d8018c97f6c3d7805ae9e) )  /* Red component */
+	ROM_LOAD( "82s137-2.bin",    0x0400, 0x0400, CRC(c3e96d5d) SHA1(3f6f21526a4357e4a9a9d56a6f4ef5911af2d120) )  /* Green component */
+	ROM_LOAD( "82s137-1.bin",    0x0800, 0x0400, CRC(bdfcf00c) SHA1(9faf4d7f8959b64faa535c9945eec59c774a3760) )  /* Blue component */
+
+	ROM_REGION( 0x10000, "speech", 0 )
+	/* SP0256 mask rom */
+	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
+ROM_END
+
 ROM_START( trckydoc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trckydoc.d9",  0x0000,  0x8000, CRC(c6242fc3) SHA1(c8a6f6abe8b51061a113ed75fead0479df68ec40) )
@@ -530,5 +562,6 @@ static DRIVER_INIT( tecfri )
 }
 
 GAME( 1987, sauro,    0,        sauro,    tecfri,    tecfri, ROT0, "Tecfri", "Sauro", 0 )
+GAME( 1987, saurop,   sauro,    sauro,    tecfri,    tecfri, ROT0, "Tecfri (Philko license)", "Sauro (Philko license)", 0 )
 GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", 0 )
 GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", 0 )
