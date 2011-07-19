@@ -1378,14 +1378,14 @@ void software_display_matches(const device_list &devlist,emu_options &options, c
 
 static void find_software_item(emu_options &options, const device_image_interface *image, const char *path, software_list **software_list_ptr, software_info **software_info_ptr,software_part **software_part_ptr, const char **sw_list_name)
 {
-	char *swlist_name, *swname, *swpart, *swname_bckp;
+	char *swlist_name, *swname, *swpart; //, *swname_bckp;
 	*software_list_ptr = NULL;
 	*software_info_ptr = NULL;
 	*software_part_ptr = NULL;
 
 	/* Split full software name into software list name and short software name */
 	software_name_split(path, &swlist_name, &swname, &swpart );
-	swname_bckp = swname;
+//	swname_bckp = swname;
 
 	const char *interface = image->image_interface();
 
