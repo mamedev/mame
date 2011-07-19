@@ -9074,56 +9074,6 @@ sltblgpo		// 1996
 sltblgp1		// 1996
 gldncrwn		// 1997
 
-// MPU4 Diagnostic ROMs
-mpu4utst
-mpu4tst2
-mpu4met0
-
-// MPU4 Non-Video SWPs
-connect4		// Dolbeck Systems
-
-// MPU4+Video Board Games
-bctvidbs
-dealem			// 1987
-adders			// 1989
-timemchn		// 1990
-turnover		// 199?
-skiltrek		// 1990
-crmaze			// 1994
-crmazed			// 1993
-crmazea			// 1993
-crmaze2			// 1993
-crmaze2d		// 1993
-crmaze2a		// 1993
-crmaze3			// 1993
-crmaze3d		// 1993
-crmaze3a		// 1993
-
-mating			// 199?
-matingd			// 199?
-
-strikeit		// 199?
-strikeitd		// 199?
-strikeit2		// 199?
-strikeit2d		// 199?
-
-quidgrid		// 199?
-quidgridd		// 199?
-quidgrid2		// 199?
-quidgrid2d		// 199?
-
-eyesdown		// 199?
-eyesdownd		// 199?
-
-// BwB games
-blox			// 199?
-bloxd			// 199?
-bwbtetrs		// 199?
-prizeinv		// 199?
-vgpoker			// 199?
-renoreel		// 199?
-redhtpkr		// 199?
-
 // ADP games
 backgamn		// (c) 1990
 quickjac		// (c) 1993
@@ -10891,12 +10841,253 @@ m3minmax	// Mini Max (Associated Leisure)
 m3oxo		// Noughts 'n' Crosses (VFS)
 
 // MPU4
-m_oldtmr		// Barcrest - highly prelim
-m_ccelbr
-m_gmball
-m_grtecp		// 199?
-m_blsbys		// BwB
-m_frkstn
+
+/* Barcrest */
+
+m4tst		// MPU4 Unit Test (Program 4)
+m4tst2		// MPU4 Unit Test (Program 2)
+m4clr       // MPU4 Meter Clear ROM
+
+/* Empire */
+
+m4apachg	// Apache Gold (Empire)
+m4apachga	//
+m4apachgb	//
+m4apachgc	//
+m4apachgd	//
+m4apachge	//
+m4apachgf	//
+m4bangrs	// Bangers 'n' Cash (Empire)
+m4bangrsa	//
+m4bangrsb	//
+m4bankrd	// Bank Raid (Empire)
+m4bankrda	//
+m4bankrdb	//
+m4bankrdc	//
+m4bankrdd	//
+m4bigchs	// Big Cheese (Empire)
+m4bigchsa	//
+m4bigchsb	//
+m4cstrik	// Cash Strike (Empire)
+m4cstrika	//
+m4cstrikb	//
+m4chacec	// Chase The Ace [Cards] (Empire)
+m4chaceca	//
+m4chacef	// Chase The Ace [Fruits] (Empire)
+m4chacefa	//
+m4chacefb	//
+m4chacefc	//
+m4crzcap	// Crazy Capers (Empire)
+m4crzcapa	//
+m4crzcapb	//
+m4crzcapc	//
+m4crfire	// Crossfire (Empire)
+m4crfirea	//
+m4eureka	// Eureka (Empire)
+m4eurekaa	//
+m4eurekab	//
+m4fright	// Fright Night (Empire)
+m4frighta	//
+m4frightb	//
+m4frightc	//
+m4gamblr	// The Gambler (Empire)
+m4gamblra	//
+m4gamblrb	//
+m4gtrain	// Ghost Train (Empire)
+m4gtraina	//
+m4gtrainb	//
+m4gtrainc	//
+m4goldfv	// Gold Fever (Empire)
+m4haunt		// Haunted House (Empire)
+m4haunta	//
+m4hauntb	//
+m4hauntc	//
+m4hauntd	//
+m4haunte	//
+m4hisprt	// High Spirits (Empire)
+m4hisprta	//
+m4hisprtb	//
+m4hisprtc	//
+m4hisprtd	//
+m4hisprte	//
+m4hotcsh	// Hot Cash (Empire)
+m4hotcsha	//
+m4hotcshb	//
+m4monspn	// Money Spinner (Empire)
+m4monspna	//
+m4monspnb	//
+m4pbnudg	// Pinball Nudger (Empire)
+m4pbnudga	//
+m4pbnudgb	//
+m4pitfal	// Pitfall (Empire)
+m4pitfala	//
+m4pitfalb	//
+m4pitfalc	//
+m4ttrail	// reasure Trail (Empire)
+m4ttraila	//
+m4ttrailb	//
+m4jne		// The Jackpot's Not Enough (Empire?)
+
+/* MDM */
+
+m42punlm	// 2p Unlimited (Mdm)
+m4bigapl	// Big Apple (Mdm)
+m4bigapla	// 
+m4bigaplb	// 
+m4bigaplc	// 
+m4bigapld	// 
+m4bigaple	// 
+m4blztrl	// Blazing Trails (Mdm)
+m4blztrla	// 
+m4bodymt	// Body Match (Mdm)
+m4coloss	// Colossus (Mdm)
+m4colossa	// 
+m4colossb	// 
+m4colossc	// 
+m4colossd	// 
+m4colosse	// 
+m4colossf	// 
+m4colossg	// 
+m4colossh	// 
+m4firebl	// Fireball (Mdm)
+m4firebla	// 
+m4fireblb	// 
+m4fireblc	// 
+m4firebld	// 
+m4mayhem	// Mayhem (Mdm)
+m4mayhema	//
+m4themob	// The Mob (Mdm)
+m4themoba	//
+m4themobb	//
+m4nudbon	// Nudge Bonanza (Mdm)
+m4nudbona	//
+m4nudgem	// Nudge Gems (Mdm)
+m4nudgema	//
+m4smshgb	// Smash 'n' Grab (Mdm)
+m4smshgba	//
+m4smshgbb	//
+m4smshgbc	//
+m4snklad	// Snakes & Ladders (Mdm)
+
+/* Union */
+
+m4cwalk		// Cake Walk (Union)
+m4eezee		// Eezee Fruits (Union)
+m4frdrop	// Fruit Drop (Union)
+m4gobana	// Go Bananas (Union)
+m4gobanaa	// 
+m4gobanab	// 
+m4gobanac	// 
+m4gobanad	// 
+m4lotty		// Lotty Time (Union)
+m4maxmze	// Maximize (Union)
+m4maxmzea	// 
+m4maxmzeb	// 
+m4maxmzec	// 
+m4maxmzed	// 
+m4mecca		// Mecca Money (Union)
+m4purmad	// Pure Madness (Union)
+m4revolv	// Revolva (Union)
+m4rotex		// Rotex (Union)
+m4select	// Select (Union)
+m4supfru	// Supafruits (Union)
+m4supfrua	//
+m4trimad	// Triple Madness (Union)
+m4unibox	// Unibox (Union)
+m4uniboxa	//
+m4unique	// Unique (Union)
+m4uniquep	//
+
+/* Union + Empire */
+
+m4gvibes	// Good Vibrations (Union - Empire)
+m4gvibesa	//
+m4rckrol	// Rock 'n' Roll (Union - Empire)
+m4rckrola	//
+m4rckrolb	//
+
+/* Others */
+
+m4aao		// Against All Odds (Eurotek)
+m4bandgd	// Bands Of Gold (Eurogames)
+m4bangin	// Bangin' Away (Global)
+m4bangina	// 
+m4banginb	// 
+m4bigben	// Big Ben (Coinworld)
+m4bigbena	// 
+m4bigbenb	// 
+m4bigbenc	// 
+m4bigbend	// 
+m4bigbene	// 
+m4kqclub	// Kings & Queens Club (Newby)
+m4snookr	// Snooker (Eurocoin)
+m4spnwin	// Spin A Win (Cotswold Microsystems)
+m4stakex	// Stake X (Leisurama)
+m4stakexa	// Stake X (Leisurama)
+m4sstrek	// Super Streak (bootleg)
+m4boltbl	// Bolt From The Blue (DJE)
+m4boltbla	// 
+m4boltblb	// 
+m4boltblc	// 
+m4dblchn	// Double Chance (DJE)
+m4stand2	// Stand To Deliver (DJE)
+
+/* Unsorted */
+
+m4oldtmr    // Old Timer
+m4ccelbr    // Club Celebration
+m4gmball    // Gamball
+m4grtecp    // Barcrest
+m4blsbys	// Blues Boys (Version 6)
+m4frkstn	// Frank 'n' Stein (unencrypted)
+m4conn4     // Connect 4
+
+// MPU4 + Video board
+
+/* Barcrest */
+
+v4bios		// MPU4 Video Firmware
+
+v4cmaze		// The Crystal Maze (v1.3)
+v4cmazed	// 
+v4cmazea	//
+v4cmaze2	// The New Crystal Maze Featuring Ocean Zone
+v4cmaze2d	//
+v4cmaze2a	//
+v4cmaze3	// The Crystal Maze Team Challenge
+v4cmaze3d	//
+v4cmaze3a	//
+v4turnov	// Turnover
+v4skltrk	// Skill Trek
+v4addlad	// Adders and Ladders
+v4time		// Time Machine
+v4mate		// The Mating Game
+v4mated		//
+v4strike	// Strike it Lucky
+v4striked	//
+v4strike2	//
+v4strike2d	//
+v4eyedwn	// Eyes Down
+v4eyedwnd	//
+v4quidgr	// Ten Quid Grid
+v4quidgrd	//
+v4quidgr2	//
+v4quidgr2d	//
+
+/* Bwb */
+
+v4vgpok		// Vegas Poker (prototype release 2)
+v4psi		// Prize Space Invaders
+v4blox		// Blox
+v4bloxd		//
+v4reno		// Reno Reels
+v4redhtp	// Red Hot Poker
+v4tetrs		// BwB Tetris v 2.2 (MPU4 Video)
+v4frfact	// Fruit Factory
+
+/* Zenitone (custom video board) */
+
+v4dealem	// Deal 'Em
 
 
 // MPU5
@@ -10980,7 +11171,8 @@ m5lotta		// Lotta Luck (Barcrest)
 m5mega		// Mega Zone (Barcrest) 
 m5martns	// Money Mad Martians (Barcrest) 
 m5mmak		// Money Maker (Barcrest) 
-m5monjok	// Monedin Poker (Spanish) (Barcrest)
+m5monjok	// Monedin Joker (Spanish) (Barcrest)
+m5monjoka	// 
 m5monty		// Monty Python (Barcrest) 
 m5mprio		// Monty Python Rio (Barcrest) 
 m5mpfc		// Monty Python's Flying Circus (Barcrest) 
@@ -11195,6 +11387,7 @@ m5clowna	//
 m5clubsn	// Club Sandwich (Bwb) 
 m5dick		// Dick Turnip (Bwb) 
 m5donna		// Donna Kebab (Bwb)
+m5donnad	//
 m5donnaa	//
 m5dblqts	// Double Or Quits (Bwb)
 m5dblqtsa   //

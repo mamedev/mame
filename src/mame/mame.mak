@@ -501,6 +501,7 @@ $(MAMEOBJ)/atlus.a: \
 $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu3.o \
 	$(DRIVERS)/mpu4.o \
+	$(DRIVERS)/mpu4vid.o \
 	$(DRIVERS)/mpu5.o \
 	$(VIDEO)/awpvid.o \
 	$(MACHINE)/meters.o \
@@ -2076,7 +2077,6 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 #-------------------------------------------------
 
 $(DRIVERS)/galaxian.o:	$(MAMESRC)/drivers/galdrvr.c
-$(DRIVERS)/mpu4.o:	$(MAMESRC)/drivers/mpu4drvr.c
 $(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c
 $(MACHINE)/snes.o:  	$(MAMESRC)/machine/snesobc1.c \
 			$(MAMESRC)/machine/snescx4.c \

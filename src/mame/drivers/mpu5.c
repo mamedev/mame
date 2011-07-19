@@ -420,6 +420,12 @@ ROM_START( m5atlan )
 	ROM_LOAD16_BYTE( "atlsjk1.4_1", 0x000000, 0x080000, CRC(95a6181e) SHA1(6de28e8bbbe45bd6bbee5516be306c9bf00086c7) )
 	ROM_LOAD16_BYTE( "atlsjs1.4_1", 0x000000, 0x080000, CRC(26696133) SHA1(63f870e2b77a0fc372e5c8f7df65d3a7ef08398f) )
 	ROM_LOAD16_BYTE( "atlsjs1.4d1", 0x000000, 0x080000, CRC(0947f381) SHA1(c1eeafe1fa08a2b72f0968acac57fdfc31abb764) )
+
+	// these were in an unknown set, but I guess from the code they belong with this game
+	ROM_LOAD16_BYTE( "atl_sjh1.2d1", 0x000000, 0x080000, CRC(7eb816e4) SHA1(18ce9463643fde976c16c4e9c1f178343fbf14a0) )
+	ROM_LOAD16_BYTE( "atl_sjk1.2_1", 0x000000, 0x080000, CRC(3bc99546) SHA1(f9349006f364ca668f28a586ddf2200bfefa994a) )
+	ROM_LOAD16_BYTE( "atl_sjs1.2_1", 0x000000, 0x080000, CRC(eec370e0) SHA1(160c07d6ce1cab68809a8c17d82a73b421384c98) )
+	ROM_LOAD16_BYTE( "atl_sjs1.2d1", 0x000000, 0x080000, CRC(abb2f342) SHA1(4ade9f4d8702f64f93fac019d1211d9abff7512a) )
 ROM_END
 
 ROM_START( m5austin )
@@ -4609,8 +4615,14 @@ ROM_END
 
 ROM_START( m5donna ) // donna_kebab_(bwb)_[dx01_1280_25jp].hex
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "m5donna_p1", 0x000000, 0x080000, CRC(287f43da) SHA1(5303f6a33ccca29164a20f808737346193e784fd) ) 
-	ROM_LOAD16_BYTE( "m5donna_p2", 0x000001, 0x080000, CRC(8d191415) SHA1(1f0d45c3af59e475a9573419c355ae9e4e240964) ) 
+	ROM_LOAD16_BYTE( "dkesj__0.6_1", 0x000000, 0x080000, CRC(287f43da) SHA1(5303f6a33ccca29164a20f808737346193e784fd) ) 
+	ROM_LOAD16_BYTE( "dkesj__0.6_2", 0x000001, 0x080000, CRC(8d191415) SHA1(1f0d45c3af59e475a9573419c355ae9e4e240964) ) 
+ROM_END
+
+ROM_START( m5donnad )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "dkesj_d0.6_1", 0x000000, 0x080000, CRC(460f903f) SHA1(895a64ee237da75b332cdd63fc0bc6c67b64dda1) ) 
+	ROM_LOAD16_BYTE( "dkesj__0.6_2", 0x000001, 0x080000, CRC(8d191415) SHA1(1f0d45c3af59e475a9573419c355ae9e4e240964) ) 
 ROM_END
 
 ROM_START( m5egr ) // elvis_gold_rush_(barcrest)_[c01_800_25jp].hex
@@ -5342,6 +5354,13 @@ ROM_START( m5monjok )
 	ROM_LOAD16_BYTE( "barcrestespanasl_monedinjoker_p2.bin", 0x000001, 0x080000, CRC(bc9f3dbe) SHA1(95b90c5f13e9a7784e94469f53fed81338fc7f4c) )
 ROM_END
 
+ROM_START( m5monjoka )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "jok05n_p1.bin", 0x000000, 0x080000, CRC(9295683a) SHA1(2a148a4eee9d3cfafbb9f0cb998b0d1b5f6e99bd) )
+	ROM_LOAD16_BYTE( "jok05n_p2.bin", 0x000001, 0x080000, NO_DUMP ) // missing?
+	ROM_LOAD16_BYTE( "jok00ss_p3.bin", 0x100000, 0x080000, CRC(577ae7fe) SHA1(f79a5f42ae1f1fbf762aff993ddd1b6b109f3e6b) )
+	ROM_LOAD16_BYTE( "jok00ss_p4.bin", 0x100001, 0x080000, CRC(4afc0bab) SHA1(82a71ac300c708eef249aed6fa3554014b7203f8) )
+ROM_END
 
 
 
@@ -5423,7 +5442,8 @@ GAME( 199?, m5lotta		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Lotta Luck (Barcrest
 GAME( 199?, m5mega		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Mega Zone (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5martns	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5mmak		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m5monjok	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5monjok	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5monjoka	,m5monjok,	mpu5, mpu5, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5monty		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5mprio		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python Rio (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5mpfc		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python's Flying Circus (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5478,7 +5498,6 @@ GAME( 199?, m5ultimo	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ultimo (Barcrest) (M
 GAME( 199?, m5upover	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5vampup	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Vamp It Up (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5wking		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-
 
 /* Barcrest / Red Gaming */
 
@@ -5639,7 +5658,8 @@ GAME( 199?, m5clowna	,m5clown,	mpu5, mpu5, 0, ROT0, "Bwb","Clown In Around (Bwb)
 GAME( 199?, m5clubsn	,0,			mpu5, mpu5, 0, ROT0, "Bwb","Club Sandwich (Bwb) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5dick		,0,			mpu5, mpu5, 0, ROT0, "Bwb","Dick Turnip (Bwb) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5donna		,0,			mpu5, mpu5, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m5donnaa	,m5donna,	mpu5, mpu5, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5donnad	,0,			mpu5, mpu5, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 1, Datapak)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5donnaa	,m5donna,	mpu5, mpu5, 0, ROT0, "Bwb","Donna Kebab (Bwb) (MPU5, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5dblqts	,0,			mpu5, mpu5, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5dblqtsa   ,m5dblqts,	mpu5, mpu5, 0, ROT0, "Bwb","Double Or Quits (Bwb) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5eggold	,0,			mpu5, mpu5, 0, ROT0, "Bwb","Egyptian Gold (Bwb) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
