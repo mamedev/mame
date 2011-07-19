@@ -35,6 +35,42 @@ Notes:
       All clocks unknown, PCB not working
       Possibly Z80's @ 4MHz and YM2203 @ 2MHz
       PCB marked 'Ducksan Trading Co. Ltd. Made In Korea'
+	  
+	  
+	  
+	  
+Quiz Punch (C)1988 Space Computer
+Ducksan 1989
+
+88-01-14-0775
+|--------------------------------------------------|
+|VOL  MC1455                        02.U2   01.U1  |
+|UPC1241                                           |
+|LM358  05.U22 04.U21  03.U20                      |
+|YM3014B  6116   10.U30 09.U29 08.U28 07.U27 06.U26|
+|YM2203  Z80A                                      |
+|                                                  |
+|J              6116   6116   6116   6116   6116   |
+|A                                                 |
+|M                                                 |
+|M                       |------------|            |
+|A                       |            |            |
+|                        |  EPOXY     |            |
+|                        |  MODULE    |            |
+|                        |            |            |
+|    6116       6116     |            |            |
+|                        |------------|    14.U120 |
+|                               GM76C88    13.U119 |
+|                                          12.U118 |
+|                                          11.U117 |
+|   DSW(8)                   8MHz 15.U111     32MHz|
+|--------------------------------------------------|
+Notes:
+       Z80A - clock 4.000MHz (8/2)
+     YM2203 - clock 4.000MHz (8/2)
+     Epoxy Module likely contains a Z80A (an input clock of 4.000MHz is present) and possibly a ROM
+     VSync - 59.3148Hz
+     HSync - 15.2526kHz	  
 
 ***************************************************************************/
 
@@ -230,6 +266,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 {
 	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	struct prot_t &prot = state->m_prot;
+	
 	switch ( prot.state )
 	{
 		case STATE_EEPROM_W:
@@ -518,4 +555,39 @@ ROM_START( quizpun2 )
 	ROM_LOAD( "u2a", 0x0000, 0x2000, CRC(13afc2bd) SHA1(0d9c8813525dfc7a844e72d2cf84261db3d10a23) )
 ROM_END
 
+ROM_START( quizpun )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "15.u111", 0x00000, 0x08000, CRC(0ffe42d9) SHA1(f91e499800923d185a5d3514fc4c50e5c86378bf) )
+	ROM_LOAD( "11.u117", 0x10000, 0x10000, CRC(13541476) SHA1(5e81e4143fbc8fa68c2c7d54792a432e97964d7f) )
+	ROM_LOAD( "12.u118", 0x20000, 0x10000, CRC(678b57c1) SHA1(83869e5b6fe528c0b072f7d97338febc31db9f8b) )
+	ROM_LOAD( "13.u119", 0x30000, 0x10000, CRC(9c0ee0de) SHA1(14b148f3ca951a5a9010b4d253e3ba7d35708403) )
+	ROM_LOAD( "14.u120", 0x40000, 0x10000, CRC(21c11262) SHA1(e50678fafdf775a49ef96f8837b124824a2d1ca2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "05.u22", 0x00000, 0x10000, CRC(515f337e) SHA1(21b2cca95b5da934fd8139892c2ee2c623d51a4e) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )	// 8x16x8
+    ROM_LOAD( "04.u21", 0x00000, 0x10000, CRC(fa8d64f4) SHA1(71badabf8f34f246dec83323a1cddbe74deb91bd) )
+    ROM_LOAD( "03.u20", 0x10000, 0x10000, CRC(8dda8167) SHA1(42838cf6866fb1d59c5bb3b477053aac448e7760) )
+	ROM_LOAD( "09.u29", 0x20000, 0x10000, CRC(b9f28569) SHA1(1395cd226d314ee57385eed25f28b68607bfda53) )
+    ROM_LOAD( "10.u30", 0x30000, 0x10000, CRC(db5762c0) SHA1(606dc4a3e6b8034f063f11dcf0a2b1db59838f4c) )
+
+	ROM_REGION( 0xc000, "gfx2", 0 )	// 8x16x2
+	ROM_LOAD( "06.u26", 0x1000, 0x1000, CRC(6d071b6d) SHA1(19565c8d768eeecd4119677915cc06f3ea18a47a) )
+	ROM_CONTINUE(    0x0000, 0x1000 )
+	ROM_LOAD( "07.u27", 0x3000, 0x1000, CRC(0f8b516e) SHA1(8bfabfd0bd28a1c7ddd01586fe9757b241feb59b) )
+	ROM_CONTINUE(    0x2000, 0x1000 )
+	ROM_CONTINUE(    0x6000, 0x6000 ) // ??
+	ROM_LOAD( "08.u28", 0x5000, 0x1000, CRC(51c0c5cb) SHA1(0c7bfc9b6b3ce0cdd5c0e36df2b4d90f9cff7fae) )
+	ROM_CONTINUE(    0x4000, 0x1000 )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )	// 8x16x2
+	ROM_LOAD( "01.u1", 0x00000, 0x10000, CRC(58506040) SHA1(9d8bed2585e8f188a20270fccd9cfbdb91e48599) )
+	ROM_LOAD( "02.u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
+
+	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASEFF )
+
+ROM_END
+
+GAME( 1988, quizpun, 0, quizpun2, quizpun2, 0, ROT270, "Space Computer", "Quiz Punch", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1989, quizpun2, 0, quizpun2, quizpun2, 0, ROT270, "Space Computer", "Quiz Punch 2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
