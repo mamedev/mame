@@ -1787,7 +1787,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 
 	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
 
-	//popmessage("%08x %d %08x %08x",state->m_scu_regs[40] ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
+//	popmessage("%08x %d %08x %08x",state->m_scu.ism ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
 
 	if(scanline == 0*y_step)
 	{

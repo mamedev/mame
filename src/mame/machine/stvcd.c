@@ -449,7 +449,7 @@ static UINT16 cd_readWord(UINT32 addr)
 					break;
 
 				case XFERTYPE_FILEINFO_254:
-					CDROM_LOG(("STVCD: Unhandled xfer type 254\n"))
+					printf("STVCD: Unhandled xfer type 254\n");
 					break;
 
 				default:
@@ -774,8 +774,21 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			else	// play until the end of the disc
 			{
-				fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
-				printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
+				UINT32 start_pos;
+
+				start_pos = ((cr1&0xff)<<16) | cr2;
+
+				if(start_pos != 0xffffff)
+				{
+					fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
+					printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
+				}
+				else /* Galaxy Fight calls 10ff ffff ffff ffff, resume/restart previously called track */
+				{
+					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+					fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
+					printf("track resume %08x %08x\n",cd_curfad,fadstoplay);
+				}
 			}
 
 			CDROM_LOG(("CD: Play Disc: start %x length %x\n", cd_curfad, fadstoplay))
@@ -820,7 +833,10 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 					cdda_pause_audio( machine.device( "cdda" ), 1 );
 				}
 				else
+				{
+					cd_curfad = ((cr1&0x7f)<<16) | cr2;
 					printf("disc seek with params %04x %04x\n",cr1,cr2); //Area 51 sets this up
+				}
 			}
 			else
 			{
@@ -2001,7 +2017,9 @@ static void cd_playdata(void)
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
 					cd_read_filtered_sector(cd_curfad);
 
-				//popmessage("%08x %08x",cd_curfad,fadstoplay);
+				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+					popmessage("%08x %08x",cd_curfad,fadstoplay);
+
 				cd_curfad++;
 				fadstoplay--;
 
