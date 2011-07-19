@@ -1797,6 +1797,11 @@ void device_debug::start_hook(attotime endtime)
 			else if (ui_input_pressed(m_device.machine(), IPT_UI_DEBUG_BREAK))
 				global->visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
 		}
+		// Check for screenless systems
+		if (m_device.machine().first_screen()==NULL) {
+			if (ui_input_pressed(m_device.machine(), IPT_UI_DEBUG_BREAK))
+				global->visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
+		}
 	}
 
 	// recompute the debugging mode
