@@ -2460,7 +2460,10 @@ static WRITE16_HANDLER( characteriser16_w )
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space->device()),offset,data));
 
 	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+	{
+		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+		return;
+	}
 
 	for (x = state->m_prot_col; x < 64; x++)
 	{
@@ -2489,7 +2492,10 @@ static READ16_HANDLER( characteriser16_r )
 	LOG_CHR(("Characteriser read data %02X \n",state->m_current_chr_table[state->m_prot_col].response));
 
 	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+	{
+		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+		return 0x00;
+	}
 
 
 	/* hack for 'invalid questions' error on time machine.. I guess it wants them to decode properly for startup check? */
@@ -2525,7 +2531,10 @@ static WRITE16_HANDLER( bwb_characteriser16_w )
 	int call=data &0xff;
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space->device()),offset,data));
 	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+	{
+		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+		return;
+	}
 
 	if (offset == 0)
 	{
@@ -2597,7 +2606,7 @@ static READ16_HANDLER( bwb_characteriser16_r )
 	}
 }
 
-static const mpu4_chr_table adders_data[64] = {
+static mpu4_chr_table adders_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x8C}, {0x04, 0x64}, {0x10, 0x84}, {0x18, 0x84}, {0x0F, 0xC4}, {0x13, 0x84}, {0x1B, 0x84},
 	{0x03, 0x9C}, {0x07, 0xF4}, {0x17, 0x04}, {0x1D, 0xCC}, {0x36, 0x24}, {0x35, 0x84}, {0x2B, 0xC4}, {0x28, 0x94},
 	{0x39, 0x54}, {0x21, 0x0C}, {0x22, 0x74}, {0x25, 0x0C}, {0x2C, 0x34}, {0x29, 0x04}, {0x31, 0x84}, {0x34, 0x84},
@@ -2608,7 +2617,7 @@ static const mpu4_chr_table adders_data[64] = {
 	{0x0D, 0x94}, {0x1F, 0x14}, {0x16, 0x44}, {0x05, 0x8C}, {0x13, 0x34}, {0x1C, 0x04}, {0x02, 0x9C}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table crmaze_data[64] = {
+static mpu4_chr_table crmaze_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x34}, {0x04, 0x14}, {0x10, 0x0C}, {0x18, 0x54}, {0x0F, 0x04}, {0x13, 0x24}, {0x1B, 0x34},
 	{0x03, 0x94}, {0x07, 0x94}, {0x17, 0x0C}, {0x1D, 0x5C}, {0x36, 0x6C}, {0x35, 0x44}, {0x2B, 0x24}, {0x28, 0x24},
 	{0x39, 0x3C}, {0x21, 0x6C}, {0x22, 0xCC}, {0x25, 0x4C}, {0x2C, 0xC4}, {0x29, 0xA4}, {0x31, 0x24}, {0x34, 0x24},
@@ -2619,7 +2628,7 @@ static const mpu4_chr_table crmaze_data[64] = {
 	{0x0D, 0xA4}, {0x1F, 0x24}, {0x16, 0x24}, {0x05, 0x34}, {0x13, 0x04}, {0x1C, 0x34}, {0x02, 0x94}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table crmazea_data[64] = {
+static mpu4_chr_table crmazea_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x0C}, {0x04, 0x90}, {0x10, 0xE0}, {0x18, 0xA4}, {0x0F, 0xAC}, {0x13, 0x78}, {0x1B, 0x5C},
 	{0x03, 0xDC}, {0x07, 0xD4}, {0x17, 0xA0}, {0x1D, 0xEC}, {0x36, 0x78}, {0x35, 0x54}, {0x2B, 0x48}, {0x28, 0x50},
 	{0x39, 0xC8}, {0x21, 0xF8}, {0x22, 0xDC}, {0x25, 0x94}, {0x2C, 0xE0}, {0x29, 0x24}, {0x31, 0x0C}, {0x34, 0xD8},
@@ -2630,7 +2639,7 @@ static const mpu4_chr_table crmazea_data[64] = {
 	{0x0D, 0x48}, {0x1F, 0xD8}, {0x16, 0xDC}, {0x05, 0x94}, {0x13, 0xE8}, {0x1C, 0x38}, {0x02, 0xDC}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table crmaze2_data[64] = {
+static mpu4_chr_table crmaze2_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x88}, {0x04, 0x54}, {0x10, 0x40}, {0x18, 0x88}, {0x0F, 0x54}, {0x13, 0x40}, {0x1B, 0x88},
 	{0x03, 0x74}, {0x07, 0x28}, {0x17, 0x30}, {0x1D, 0x60}, {0x36, 0x80}, {0x35, 0x84}, {0x2B, 0xC4}, {0x28, 0xA4},
 	{0x39, 0xC4}, {0x21, 0x8C}, {0x22, 0x74}, {0x25, 0x08}, {0x2C, 0x30}, {0x29, 0x00}, {0x31, 0x80}, {0x34, 0x84},
@@ -2641,7 +2650,7 @@ static const mpu4_chr_table crmaze2_data[64] = {
 	{0x0D, 0xA0}, {0x1F, 0x84}, {0x16, 0x84}, {0x05, 0x8C}, {0x13, 0x34}, {0x1C, 0x00}, {0x02, 0xA8}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table crmaze3_data[64] = {
+static mpu4_chr_table crmaze3_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x84}, {0x04, 0x94}, {0x10, 0x3C}, {0x18, 0xEC}, {0x0F, 0x5C}, {0x13, 0xEC}, {0x1B, 0x50},
 	{0x03, 0x2C}, {0x07, 0x68}, {0x17, 0x60}, {0x1D, 0xAC}, {0x36, 0x74}, {0x35, 0x00}, {0x2B, 0xAC}, {0x28, 0x58},
 	{0x39, 0xEC}, {0x21, 0x7C}, {0x22, 0xEC}, {0x25, 0x58}, {0x2C, 0xE0}, {0x29, 0x90}, {0x31, 0x18}, {0x34, 0xEC},
@@ -2652,7 +2661,7 @@ static const mpu4_chr_table crmaze3_data[64] = {
 	{0x0D, 0x20}, {0x1F, 0xAC}, {0x16, 0x74}, {0x05, 0x04}, {0x13, 0xA4}, {0x1C, 0x94}, {0x02, 0x3C}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table crmaze3a_data[64] = {
+static mpu4_chr_table crmaze3a_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x0C}, {0x04, 0x60}, {0x10, 0x84}, {0x18, 0x34}, {0x0F, 0x08}, {0x13, 0xC0}, {0x1B, 0x14},
 	{0x03, 0xA8}, {0x07, 0xF0}, {0x17, 0x10}, {0x1D, 0xA0}, {0x36, 0x1C}, {0x35, 0xE4}, {0x2B, 0x1C}, {0x28, 0xE4},
 	{0x39, 0x34}, {0x21, 0xA8}, {0x22, 0xF8}, {0x25, 0x64}, {0x2C, 0x8C}, {0x29, 0xF0}, {0x31, 0x30}, {0x34, 0x08},
@@ -2663,7 +2672,7 @@ static const mpu4_chr_table crmaze3a_data[64] = {
 	{0x0D, 0xBC}, {0x1F, 0xE4}, {0x16, 0x1C}, {0x05, 0x64}, {0x13, 0x8C}, {0x1C, 0x58}, {0x02, 0xEC}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table mating_data[64] = {
+static mpu4_chr_table mating_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x18}, {0x04, 0xC8}, {0x10, 0xA4}, {0x18, 0x0C}, {0x0F, 0x80}, {0x13, 0x0C}, {0x1B, 0x90},
 	{0x03, 0x34}, {0x07, 0x30}, {0x17, 0x00}, {0x1D, 0x58}, {0x36, 0xC8}, {0x35, 0x84}, {0x2B, 0x4C}, {0x28, 0xA0},
 	{0x39, 0x4C}, {0x21, 0xC0}, {0x22, 0x3C}, {0x25, 0xC8}, {0x2C, 0xA4}, {0x29, 0x4C}, {0x31, 0x80}, {0x34, 0x0C},
@@ -2674,7 +2683,7 @@ static const mpu4_chr_table mating_data[64] = {
 	{0x0D, 0x2C}, {0x1F, 0x90}, {0x16, 0x44}, {0x05, 0x18}, {0x13, 0xE8}, {0x1C, 0x84}, {0x02, 0x3C}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table skiltrek_data[64] = {
+static mpu4_chr_table skiltrek_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x1C}, {0x04, 0xCC}, {0x10, 0x64}, {0x18, 0x1C}, {0x0F, 0x4C}, {0x13, 0x64}, {0x1B, 0x1C},
 	{0x03, 0xEC}, {0x07, 0xE4}, {0x17, 0x0C}, {0x1D, 0xD4}, {0x36, 0x84}, {0x35, 0x0C}, {0x2B, 0x44}, {0x28, 0x2C},
 	{0x39, 0xD4}, {0x21, 0x14}, {0x22, 0x34}, {0x25, 0x14}, {0x2C, 0x24}, {0x29, 0x0C}, {0x31, 0x44}, {0x34, 0x0C},
@@ -2685,7 +2694,7 @@ static const mpu4_chr_table skiltrek_data[64] = {
 	{0x0D, 0x2C}, {0x1F, 0x54}, {0x16, 0x84}, {0x05, 0x1C}, {0x13, 0xEC}, {0x1C, 0x44}, {0x02, 0x3C}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table timemchn_data[64] = {
+static mpu4_chr_table timemchn_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x2C}, {0x04, 0x94}, {0x10, 0x14}, {0x18, 0x04}, {0x0F, 0x0C}, {0x13, 0xC4}, {0x1B, 0x0C},
 	{0x03, 0xD4}, {0x07, 0x64}, {0x17, 0x0C}, {0x1D, 0xB4}, {0x36, 0x04}, {0x35, 0x0C}, {0x2B, 0x84}, {0x28, 0x5C},
 	{0x39, 0xDC}, {0x21, 0x9C}, {0x22, 0xDC}, {0x25, 0x9C}, {0x2C, 0xDC}, {0x29, 0xCC}, {0x31, 0x84}, {0x34, 0x0C},
@@ -2696,7 +2705,7 @@ static const mpu4_chr_table timemchn_data[64] = {
 	{0x0D, 0xC4}, {0x1F, 0x0C}, {0x16, 0xC4}, {0x05, 0x2C}, {0x13, 0xC4}, {0x1C, 0x0C}, {0x02, 0xD4}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table strikeit_data[64] = {
+static mpu4_chr_table strikeit_data[64] = {
 	{0x00, 0x00}, {0x1A, 0xC4}, {0x04, 0xC4}, {0x10, 0x44}, {0x18, 0xC4}, {0x0F, 0x44}, {0x13, 0x44}, {0x1B, 0xC4},
 	{0x03, 0xCC}, {0x07, 0x3C}, {0x17, 0x5C}, {0x1D, 0x7C}, {0x36, 0x54}, {0x35, 0x24}, {0x2B, 0xC4}, {0x28, 0x4C},
 	{0x39, 0xB4}, {0x21, 0x84}, {0x22, 0xCC}, {0x25, 0x34}, {0x2C, 0x04}, {0x29, 0x4C}, {0x31, 0x14}, {0x34, 0x24},
@@ -2707,7 +2716,7 @@ static const mpu4_chr_table strikeit_data[64] = {
 	{0x0D, 0x5C}, {0x1F, 0x5C}, {0x16, 0x7C}, {0x05, 0x74}, {0x13, 0x04}, {0x1C, 0xC4}, {0x02, 0xCC}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table turnover_data[64] = {
+static mpu4_chr_table turnover_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x1C}, {0x04, 0x6C}, {0x10, 0xA4}, {0x18, 0x0C}, {0x0F, 0x24}, {0x13, 0x0C}, {0x1B, 0x34},
 	{0x03, 0x94}, {0x07, 0x94}, {0x17, 0x44}, {0x1D, 0x5C}, {0x36, 0x6C}, {0x35, 0x24}, {0x2B, 0x1C}, {0x28, 0xAC},
 	{0x39, 0x64}, {0x21, 0x1C}, {0x22, 0xEC}, {0x25, 0x64}, {0x2C, 0x0C}, {0x29, 0xA4}, {0x31, 0x0C}, {0x34, 0x24},
@@ -2718,7 +2727,7 @@ static const mpu4_chr_table turnover_data[64] = {
 	{0x0D, 0x0C}, {0x1F, 0x34}, {0x16, 0x04}, {0x05, 0x1C}, {0x13, 0xEC}, {0x1C, 0x24}, {0x02, 0x9C}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table eyesdown_data[64] = {
+static mpu4_chr_table eyesdown_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x8C}, {0x04, 0x64}, {0x10, 0x0C}, {0x18, 0xC4}, {0x0F, 0x0C}, {0x13, 0x54}, {0x1B, 0x14},
 	{0x03, 0x94}, {0x07, 0x94}, {0x17, 0x24}, {0x1D, 0xAC}, {0x36, 0x44}, {0x35, 0x0C}, {0x2B, 0x44}, {0x28, 0x1C},
 	{0x39, 0x7C}, {0x21, 0x6C}, {0x22, 0x74}, {0x25, 0x84}, {0x2C, 0x3C}, {0x29, 0x4C}, {0x31, 0x44}, {0x34, 0x0C},
@@ -2729,7 +2738,7 @@ static const mpu4_chr_table eyesdown_data[64] = {
 	{0x0D, 0x5C}, {0x1F, 0x5C}, {0x16, 0x7C}, {0x05, 0x6C}, {0x13, 0x54}, {0x1C, 0x04}, {0x02, 0x9C}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table quidgrid_data[64] = {
+static mpu4_chr_table quidgrid_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x64}, {0x04, 0x64}, {0x10, 0x24}, {0x18, 0x64}, {0x0F, 0x64}, {0x13, 0x24}, {0x1B, 0x64},
 	{0x03, 0x74}, {0x07, 0x54}, {0x17, 0x84}, {0x1D, 0xA4}, {0x36, 0x24}, {0x35, 0x24}, {0x2B, 0x64}, {0x28, 0x24},
 	{0x39, 0xE4}, {0x21, 0x64}, {0x22, 0x74}, {0x25, 0x44}, {0x2C, 0x34}, {0x29, 0x04}, {0x31, 0x24}, {0x34, 0x24},
@@ -2740,6 +2749,18 @@ static const mpu4_chr_table quidgrid_data[64] = {
 	{0x0D, 0x04}, {0x1F, 0x64}, {0x16, 0x24}, {0x05, 0x64}, {0x13, 0x24}, {0x1C, 0x64}, {0x02, 0x74}, {0x00, 0x00}
 };
 
+static mpu4_chr_table blank_data[72] = {
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},{-1, -1},
+};
+
 
 static const bwb_chr_table prizeinv_data1[5] = {
 //This is all wrong, but without BwB Vid booting,
@@ -2747,7 +2768,7 @@ static const bwb_chr_table prizeinv_data1[5] = {
 	{0x67},{0x17},{0x0f},{0x24},{0x3c},
 };
 
-static const mpu4_chr_table prizeinv_data[8] = {
+static mpu4_chr_table prizeinv_data[8] = {
 {0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
@@ -2858,6 +2879,34 @@ static DRIVER_INIT (prizeinv)
 	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = prizeinv_data;
 }
+
+void mpu4vid_char_cheat(running_machine& machine, int address)
+{
+	mpu4_state *state = machine.driver_data<mpu4_state>();
+	UINT8* cheattable = machine.region( "video" )->base()+address;
+	state->m_current_chr_table = blank_data;
+	for (int i=0;i<72;i++)
+	{
+		state->m_current_chr_table[i].response = cheattable++[0];
+		state->m_current_chr_table[i].call = cheattable++[0];
+	}
+}
+
+static DRIVER_INIT( v4barqst )
+{	   
+	mpu4vid_char_cheat(machine,0x154);
+}
+
+static DRIVER_INIT( v4barqst2 )
+{	   
+	mpu4vid_char_cheat(machine,0x15c);
+}
+
+static DRIVER_INIT( v4wize )
+{	   
+	mpu4vid_char_cheat(machine,0x16c);
+}
+
 
 ROM_START( v4dealem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
@@ -3407,6 +3456,66 @@ ROM_START( v4quidgr2d )
 ROM_END
 
 
+ROM_START( v4barqst )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "bqd.p1", 0x000000, 0x010000, CRC(b574ea46) SHA1(0eb446fbf4f7fcd1b30f35631b4b521730ce26b4) )
+	ROM_LOAD16_BYTE( "bq.p2", 0x000001, 0x010000, CRC(b9ce9f2e) SHA1(9407a83d1713b641dc551dd73f357d99baebbba2) )
+
+	ROM_LOAD( "barquest_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+ROM_END
+
+ROM_START( v4barqs2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "b2qs.p1", 0x000000, 0x010000, CRC(35c1a58b) SHA1(e2d07229e7136c462c48b6c77c9d26a33deb8e34) )
+	ROM_LOAD16_BYTE( "b2q.p2", 0x000001, 0x010000, CRC(28a0064a) SHA1(3751d9f3cc93994c44927ca3f72ade6bee22b20b) )
+
+	ROM_LOAD( "barquest2_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+ROM_END
+
+ROM_START( v4wize )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "wmd.p1", 0x000000, 0x010000, CRC(45d29045) SHA1(37911346753211801f8404d42b275f49764ba5f4) )
+	ROM_LOAD16_BYTE( "wm.p2",  0x000001, 0x010000, CRC(41b5fb2a) SHA1(e9ee484ec7445d58efa9bbfbd705202ef83656f2) )
+	ROM_LOAD16_BYTE( "wm.p3",  0x020000, 0x010000, CRC(934da7e4) SHA1(9cac87ccadbc871577640ec0bddd5e07aef139f8) )
+	ROM_LOAD16_BYTE( "wm.p4",  0x020001, 0x010000, CRC(463f6c0b) SHA1(ffee4cca73ebe7130e34118031cb16b3c42f03cb) )
+	ROM_LOAD16_BYTE( "wm.p5",  0x040000, 0x010000, CRC(eaea2502) SHA1(adeda7148ee4eee98870f4aa529b5c9f36417e2e) )
+	ROM_LOAD16_BYTE( "wm.p6",  0x040001, 0x010000, CRC(40a5e980) SHA1(e7bd49308b63a94a9ca0b138de0c48d2316d6aa0) )
+
+	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+
+
+	ROM_REGION( 0x800000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "w23.p1", 0x000000, 0x010000, CRC(a8d8fb2e) SHA1(cf5462b224a7960ade867cf76079d11084f13e4b) )
+	ROM_LOAD16_BYTE( "wm3.p1", 0x000000, 0x010000, CRC(0752f0f1) SHA1(2b0531312bf1d4b489394401c5d78c7f04e12aea) )
+	ROM_LOAD16_BYTE( "wm3d.p1", 0x000000, 0x010000, CRC(4e3ab877) SHA1(64408d1ac1f626390ffe93e024c672ba5acb42d6) )
+	ROM_LOAD16_BYTE( "wms.p1", 0x000000, 0x010000, CRC(712385c1) SHA1(075a98626eba2eae6a31b395c2a74541a31b2582) )
+ROM_END
+
+ROM_START( v4wizea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "wzm1&2p1", 0x000000, 0x010000, CRC(629e38d0) SHA1(bbc2688635c4cb9a1712a0a0d28017d1867417a4) )
+	ROM_LOAD16_BYTE( "wzm1&2p2", 0x000001, 0x010000, CRC(96b9c484) SHA1(b02595ba5a5c7d673bdc7675708a4d8f6d907779) )
+	ROM_LOAD16_BYTE( "wzm1&2p3", 0x020000, 0x010000, CRC(e545fac0) SHA1(4a3f9e5522bd666d5a1e9ac7878d3d78f3756762) )
+	ROM_LOAD16_BYTE( "wzm1&2p4", 0x020001, 0x010000, CRC(df7d4dba) SHA1(b892cfb807421c99ba98bfd9b34d717e17345d83) )
+	ROM_LOAD16_BYTE( "wzm1&2p5", 0x040000, 0x010000, NO_DUMP )
+	ROM_LOAD16_BYTE( "wzm1&2p6", 0x040001, 0x010000, CRC(3eecbdf8) SHA1(9ecc4fe25e1c1e167aaa413eaf601b55e1a432fb) )
+
+	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+
+ROM_END
+
 
 /*
 
@@ -3490,6 +3599,81 @@ ROM_END
 
 
 
+/* Nova */
+
+ROM_START( v4cybcas )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ccd_____.6_0", 0x0000, 0x010000, CRC(93aa1a3d) SHA1(dce4cc4bfc616163ca240c417d1ef9a0a19e5901) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "ccd_____.6_1", 0x000001, 0x080000, CRC(58c8ae96) SHA1(9f3aea47ae014c61bb2b75664210a3609996f983) )
+	ROM_LOAD16_BYTE( "ccd_____.6_2", 0x000000, 0x080000, CRC(f0556749) SHA1(2f35a9f9672219001c2a48d7f103ac99e1b21b32) )
+	ROM_LOAD16_BYTE( "ccd_____.6_3", 0x100001, 0x080000, CRC(4d2f5485) SHA1(a8c9b5843384ce55a10531b82766f5498dc0d334) )
+	ROM_LOAD16_BYTE( "ccd_____.6_4", 0x100000, 0x080000, CRC(87b29468) SHA1(89a3855754e8a720ca76fa16b11f791ade75fb78) )
+	ROM_LOAD16_BYTE( "ccd_____.6_5", 0x200001, 0x080000, CRC(bd8be9ff) SHA1(c5d620774e476e6ec00876e513ff838af102ecc9) )
+	ROM_LOAD16_BYTE( "ccd_____.6_6", 0x200000, 0x080000, CRC(faf65e25) SHA1(f50369348740ba4c878455c108ac3e8d2262ef5e) )
+	ROM_LOAD16_BYTE( "ccd_____.6_7", 0x300001, 0x080000, CRC(4cd1461c) SHA1(00379212130d5e9c1c364191f67a35cc5eca8b72) )
+	ROM_LOAD16_BYTE( "ccd_____.6_8", 0x300000, 0x080000, CRC(08ce378f) SHA1(035b0ff4d18c09a385002db73c54b8dac92dfa8a) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+ROM_START( v4miami )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mdd4_0.bin", 0x0000, 0x010000, CRC(0d868466) SHA1(3cea446f094ae3b4f56163ccf01cd31c15dca03f) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "md41.p1", 0x000001, 0x080000, CRC(9567347f) SHA1(5188b3f359ff26c0854d5745df37575851502ae9) )
+	ROM_LOAD16_BYTE( "md42.p2", 0x000000, 0x080000, CRC(e0dad693) SHA1(9768331a4a776906935b3c5501b68cb4dd1bd41f) )
+	ROM_LOAD16_BYTE( "md43.p3", 0x100001, 0x080000, CRC(9bceb3f6) SHA1(5be84d5f1635f80a9fe8072c2d94012ed00d97be) )
+	ROM_LOAD16_BYTE( "md44.p4", 0x100000, 0x080000, CRC(54b8fbfa) SHA1(ca2fb67972507a2eb33d2800a3b2d45d3ee49289) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "md41snd.p1", 0x000000, 0x080000, CRC(7a3ba770) SHA1(e620f521d16b39be9b41b934435812afff3993b2) )
+	ROM_LOAD( "md42snd.p2", 0x080000, 0x080000, CRC(8ebc7329) SHA1(82ce25c1486a8619355f363125a26d8cdeb05d33) )
+	ROM_LOAD( "md43snd.p3", 0x100000, 0x080000, CRC(14f4d838) SHA1(0508890a9884fbef0e194a38fe3afc5cf5282091) )
+ROM_END
+
+
+ROM_START( v4missis )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mldsf___.6_0", 0x0000, 0x010000, CRC(3f0fe40e) SHA1(6fd9ddede5f11c35d47c7ddd360b0021267e7e3f) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "mld_____.6_1", 0x000000, 0x080000, CRC(44e26e6e) SHA1(ba96757b74e75d094b6cda340c78754f1b8f6a7c) )
+	ROM_LOAD16_BYTE( "mld_____.6_2", 0x000001, 0x080000, CRC(e9219fff) SHA1(80c0211b98c4200ad9512e89b067018ce8600494) )
+	ROM_LOAD16_BYTE( "mld_____.6_3", 0x100000, 0x080000, CRC(680bd284) SHA1(33dfd0cb396c1466c2a5cfc474756b8a2d966518) )
+	ROM_LOAD16_BYTE( "mld_____.6_4", 0x100001, 0x080000, CRC(0e21022b) SHA1(30465321a976064f7841b2c3314244b744a45092) )
+	ROM_LOAD16_BYTE( "mld_____.6_5", 0x200000, 0x080000, CRC(cd6c39d2) SHA1(c4d4b5c7a1f3dcfdc464fff29f10ccee932f265a) )
+	ROM_LOAD16_BYTE( "mld_____.6_6", 0x200001, 0x080000, CRC(5ad997a3) SHA1(0fd75b4a9b5991fda9cc3373b86f466492c3b4bb) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "mld_snd_.1_1", 0x000000, 0x080000, CRC(8c26fe12) SHA1(0532126d8e283b4567a4cdf2bb807f5471c84832) )
+	ROM_LOAD( "mld_snd_.1_2", 0x080000, 0x080000, CRC(9ab841b6) SHA1(7828c6144777621859b85a3ec92760d353576527) )
+	ROM_LOAD( "mld_snd_.1_3", 0x100000, 0x080000, CRC(3f068632) SHA1(5e43da287b3aa163493c1be03ebee28ef58c44a1) )
+	ROM_LOAD( "mld_snd_.1_4", 0x180000, 0x080000, CRC(f78f7221) SHA1(dac88abee6a5fdf7b69c5d39345ee05c1ac47314) )
+ROM_END
+
+ROM_START( v4picdil )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pcdsf___.a_0", 0x0000, 0x010000, CRC(45a15082) SHA1(d7655722c7ad9f3b1b2663d85287ae185917d677) )
+	ROM_LOAD( "pcdsf__e.a_0", 0x0000, 0x010000, CRC(0ed1c7af) SHA1(c19ff141fba7fd1f2cf0b152e3c6df61c6b27b46) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "pcd_____.a_1", 0x000001, 0x080000, CRC(0ed561d4) SHA1(899c76d2a2352988a01bece2a229deb934a00892) )
+	ROM_LOAD16_BYTE( "pcd_____.a_2", 0x000000, 0x080000, CRC(bffe3863) SHA1(ea6fdcce470e8a50c35f43fd86e39524be2db3a3) )
+	ROM_LOAD16_BYTE( "pcd_____.a_3", 0x100001, 0x080000, CRC(3b64a328) SHA1(a9fa9dc30b352388906e6021bc0d1ad7c3a28746) )
+	ROM_LOAD16_BYTE( "pcd_____.a_4", 0x100000, 0x080000, CRC(25faba03) SHA1(572aaee3af3b915294ba057b7ceb653dd135098b) )
+	ROM_LOAD16_BYTE( "pcd_____.a_5", 0x200001, 0x080000, CRC(275f3c1c) SHA1(1d0f8f7d0388d5072ae404f10b2481153979a217) )
+	ROM_LOAD16_BYTE( "pcd_____.a_6", 0x200000, 0x080000, CRC(148ecba0) SHA1(2ae0f5529fa3951025539fe19f4e8fdf10f13374) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* none present */
+ROM_END
+
+
+
 /* Complete sets */
 /* Standard sets are the most common setups, while Datapak releases use a BACTA datalogger (not emulated) to record more information about the game operation, for security etc.
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
@@ -3536,6 +3720,14 @@ GAME(  199?,v4quidgrd,	v4quidgr,	mpu4_vid,	mpu4,		quidgrid,	ROT0, "Barcrest","Te
 GAME(  199?,v4quidgr2,	v4quidgr,	mpu4_vid,	mpu4,		quidgrid,	ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_NOT_WORKING )
 GAME(  199?,v4quidgr2d,	v4quidgr,	mpu4_vid,	mpu4,		quidgrid,	ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_NOT_WORKING )
 
+GAME(  199?,v4barqst,	v4bios,  	mpu4_vid,	mpu4,		v4barqst,	ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4barqs2,	v4bios,  	mpu4_vid,	mpu4,		v4barqst2,	ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_NOT_WORKING )
+
+GAME(  199?,v4wize,		v4bios,  	mpu4_vid,	mpu4,		v4wize,		ROT0, "Barcrest","Wize Move (v1.3d) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4wizea,	v4bios,  	mpu4_vid,	mpu4,		v4wize,		ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_NOT_WORKING )
+
+
+
 /* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
 
 GAME(  199?,v4vgpok,	0,			bwbvid,		mpu4,		0,			ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_NOT_WORKING )
@@ -3556,9 +3748,11 @@ Two further different releases were made, running on the Barcrest MPU4 Video, ra
 
 GAME(  1987,v4dealem,	0,			dealem,		dealem,		0,			ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",GAME_IMPERFECT_GRAPHICS )
 
-/* Other possible games on MPU4 Video based boards */
+/* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
+/* All contain BwB video in the BIOS rom tho */
+GAME(  199?,v4cybcas,	0,			bwbvid5,	mpu4,		0,			ROT0, "Nova","Cyber Casino (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4miami,	0,			bwbvid5,	mpu4,		0,			ROT0, "Nova","Miami Dice (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4missis,	0,			bwbvid5,	mpu4,		0,			ROT0, "Nova","Mississippi Lady (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4picdil,	0,			bwbvid5,	mpu4,		0,			ROT0, "Nova","Piccadilly Nights (MPU4 Video)",GAME_NOT_WORKING )
 
-/* Barquest */
-/* Barquest II */
-/* Wize Move */
 

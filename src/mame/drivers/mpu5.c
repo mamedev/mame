@@ -5363,6 +5363,13 @@ ROM_START( m5monjoka )
 ROM_END
 
 
+ROM_START( m5spins )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "spin0_1.p1", 0x000000, 0x080000, CRC(92e73a27) SHA1(9f247f4bbd0f0bfe0b18bbc820939821a5e12aae) )
+	ROM_LOAD16_BYTE( "spin0_1.p2", 0x000001, 0x080000, CRC(51d76f77) SHA1(47a7205bded87657e202b5dd3f842773ec300126) )
+	ROM_LOAD16_BYTE( "spin0_1.p3", 0x100000, 0x080000, CRC(e2bbd587) SHA1(038749be1b583d4d0d880ca97b91100458654be0) )
+	ROM_LOAD16_BYTE( "spin0_1.p4", 0x100001, 0x080000, CRC(df150570) SHA1(b635ff9884e0d60ca5828f0d4d84540ed05f1f32) )
+ROM_END
 
 
 /* Barcrest */
@@ -5483,6 +5490,7 @@ GAME( 199?, m5silver	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Silver Screen (Barcr
 GAME( 199?, m5sondr		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5spicer	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","The Spice Is Right (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5spiker	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5spins		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Spinsation (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5squids	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5stax		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Stax Of Cash (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5scharg	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5695,4 +5703,6 @@ GAME( 199?, m5scfinl	,0,			mpu5, mpu5, 0, ROT0, "Lowen","Super Cup Final (Lowen)
 /* Others / Uncertain */
 
 GAME( 199?, m5ppussy	,0,			mpu5, mpu5, 0, ROT0, "Mdm","Pink Pussy (Mdm) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
+
 
