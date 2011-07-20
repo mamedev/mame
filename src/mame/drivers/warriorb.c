@@ -337,6 +337,13 @@ static INPUT_PORTS_START( darius2d )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sagaia )
+	PORT_INCLUDE(darius2d)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_WORLD_LOC(SW1)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( warriorb )
 	PORT_INCLUDE(darius2d)
 
@@ -885,7 +892,7 @@ ROM_END
 
 /* Working Games */
 
-GAME( 1989, sagaia,    darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation Japan", "Sagaia (dual screen) (World)", 0 )
+GAME( 1989, sagaia,    darius2,  darius2d, sagaia,   0, ROT0, "Taito Corporation Japan", "Sagaia (dual screen) (World)", 0 )
 GAME( 1989, darius2d,  darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan, Rev 2)", 0 )
 GAME( 1989, darius2do, darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan, Rev 1)", 0 )
 GAME( 1991, warriorb,  0,        warriorb, warriorb, 0, ROT0, "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", 0 )
