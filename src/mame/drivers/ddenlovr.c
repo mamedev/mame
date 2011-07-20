@@ -25,6 +25,7 @@ Year + Game              Board              CPU   Sound              Custom     
 94 Super Hana Paradise   N8010178L1+N73RSUB Z80          YM2413 M6295 NL-002 1108F0406  1427F0071 4L02F2637
 95 Dai Chuuka Ken        D11107218L1        Z80   AY8910 YM2413 M6295 70C160F009
 95 Hana Gokou            N83061581L1        Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
+95 Hana Gokou Bangaihen  N10805078L1        Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
 95 Nettoh Quiz Champion                     68000 AY8910 YM2413 M6295
 95 Don Den Lover (J)     D1120901L8         68000 YMZ284 YM2413 M6295 NL-005
 96 Don Den Lover (HK)    D11309208L1        68000 YMZ284 YM2413 M6295 NL-005
@@ -3105,6 +3106,7 @@ static WRITE8_HANDLER( hgokou_input_w )
 			// bit 0 = coin counter
 			// bit 1 = out counter
 			// bit 2 = hopper
+			// bit 7 = ?
 			coin_counter_w(space->machine(), 0, data & 1);
 			state->m_hopper = data & 0x04;
 #ifdef MAME_DEBUG
@@ -3115,7 +3117,7 @@ static WRITE8_HANDLER( hgokou_input_w )
 
 		case 0x2d:	state->m_input_sel = data;	break;
 
-		case 0x2f:	break;	// ? written with 2f
+		case 0x2f:	break;	// ? written with 2f (hgokou)
 
 		default:
 			logerror("%04x: input_w with select = %02x, data = %02x\n", cpu_get_pc(&space->device()), state->m_dsw_sel, data);
@@ -3168,6 +3170,64 @@ static ADDRESS_MAP_START( hgokou_portmap, AS_IO, 8 )
 	AM_RANGE(0x86, 0x86) AM_DEVWRITE("aysnd", ay8910_data_w)
 	AM_RANGE(0x88, 0x88) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ(hanakanz_rand_r)
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+                        Hanafuda Hana Gokou Bangaihen
+***************************************************************************/
+
+static READ8_HANDLER( hgokbang_input_r )
+{
+	dynax_state *state = space->machine().driver_data<dynax_state>();
+
+	UINT8 ret;
+	switch (state->m_dsw_sel)
+	{
+		case 0x2d:
+			if (state->m_input_sel == 0xff)	// reset auto-incrementing input_sel
+				state->m_input_sel = 0xfe;
+			return 0;	// discarded
+		case 0xa1:
+			ret = hgokou_player_r(space, 1);
+			state->m_input_sel <<= 1;		// auto-increment input_sel
+			state->m_input_sel |= 1;
+			return ret;
+		case 0xa2:
+			ret = hgokou_player_r(space, 0);
+			state->m_input_sel <<= 1;		// auto-increment input_sel
+			state->m_input_sel |= 1;
+			return ret;
+	}
+	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", cpu_get_pc(&space->device()), state->m_dsw_sel);
+	return 0xff;
+}
+
+static ADDRESS_MAP_START( hgokbang_portmap, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_WRITE(hginga_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
+	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(mjmyster_rambank_w)		// ? ack on RTC int
+	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x24, 0x24) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x26, 0x26) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x28, 0x28) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(hgokou_dsw_sel_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE(hgokou_input_w)
+	AM_RANGE(0x42, 0x42) AM_READ(hgokou_input_r)
+	AM_RANGE(0x43, 0x43) AM_READ(hgokbang_input_r)
+	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
+	AM_RANGE(0xa0, 0xa3) AM_WRITE(ddenlovr_palette_base_w)
+	AM_RANGE(0xa4, 0xa7) AM_WRITE(ddenlovr_palette_mask_w)
+	AM_RANGE(0xa8, 0xab) AM_WRITE(ddenlovr_transparency_pen_w)
+	AM_RANGE(0xac, 0xaf) AM_WRITE(ddenlovr_transparency_mask_w)
+	AM_RANGE(0xb4, 0xb4) AM_WRITE(ddenlovr_bgcolor_w)
+	AM_RANGE(0xb5, 0xb5) AM_WRITE(ddenlovr_priority_w)
+	AM_RANGE(0xb6, 0xb6) AM_WRITE(ddenlovr_layer_enable_w)
+	AM_RANGE(0xb8, 0xb8) AM_READ(unk_r)									// ? must be 78 on startup
+	AM_RANGE(0xe0, 0xe0) AM_READ(hanakanz_rand_r)
 ADDRESS_MAP_END
 
 
@@ -6000,7 +6060,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPNAME( 0x08, 0x08, "Unknown 4-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Change Cards" )
+	PORT_DIPNAME( 0x10, 0x10, "Hint" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Unknown 4-5" )
@@ -6220,7 +6280,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPNAME( 0x08, 0x08, "Unknown 4-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Change Cards" )
+	PORT_DIPNAME( 0x10, 0x10, "Hint" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Unknown 4-5" )
@@ -8213,6 +8273,14 @@ static MACHINE_CONFIG_DERIVED( hgokou, quizchq )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hgokbang, hgokou )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(hgokbang_portmap)
+
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( mjmywrld, mjmyster )
 
 	/* basic machine hardware */
@@ -10043,6 +10111,70 @@ ROM_END
 
 /***************************************************************************
 
+Hanafuda Hana Gokou Bangaihen
+Dynax 1995
+
+PCB is almost identical to Hanafuda Hana Gokou by Dynax/Alba minus the CPLD
+
+PCB Layout
+----------
+N10805078L1
+|-------------------------------------------------------|
+|MB3713  VOL     DSW1(10)    M6242B   TC55257   BATTERY |
+|                   32.768kHz 1161.2D  1162.2B          |
+|   VOL          DSW2(10)    M6295                      |
+|   DSW5(4)                                      16MHz  |
+|        YM2413  DSW3(10)        PAL         TMPZ84C015 |
+|                                                       |
+|M               DSW4(10)                               |
+|A         YM2149                                       |
+|H                                                      |
+|J     NL-002                           28.63636MHz     |
+|O                                                 PAL  |
+|N                                                      |
+|G                                                      |
+|2                                                      |
+|8                                              1163.9A |
+|                                                       |
+|            &           %            #         1164.10A|
+|                                                       |
+|                      TC5588                    DIP32  |
+|       TC524258Z-10  TC524258Z-10               DIP32  |
+|       TC524258Z-10  TC524258Z-10               DIP32  |
+|-------------------------------------------------------|
+Notes:
+      TMPZ84C015   - Toshiba TMPZ84C015F-6 (QFP100). Clocks 16.000MHz (pins 65 & 66), 8.000MHz (pins 68 & 69)
+      TC55257      - 32k x8 SRAM (DIP28)
+      TC5588       - 8k x8 SRAM (DIP28)
+      TC524258Z-10 - Toshiba TC524258Z-10 256k x4 Dual Port VRAM (ZIP28)
+      &            - Unknown QFP64. Possibly Dynax Custom 1108F0406
+      %            - Unknown QFP100. Possibly Dynax Custom 4L02F2637
+      #            - Unknown QFP100. Possibly Dynax Custom 1427F0071
+      DIP32        - Empty sockets
+      M6295        - Oki M6295 (QFP44). Clock 1.02272MHz [28.63636/28]. pin 7 = HIGH
+      YM2413       - Clock 3.579545MHz [28.63636/8]
+      YM2149       - Clock 3.579545MHz [28.63636/8]
+      VSync        - 60Hz
+      HSync        - 15.36kHz
+
+***************************************************************************/
+
+ROM_START( hgokbang )
+	ROM_REGION( 0x90000+8*0x1000, "maincpu", 0 )	/* Z80 Code */
+	ROM_LOAD( "1162.2b",  0x00000, 0x40000, CRC(02414b42) SHA1(00346d4c750c7cbf490f0a5bb90d1b2b3879c979) )
+	ROM_RELOAD(           0x10000, 0x40000 )
+
+	ROM_REGION( 0x500000, "blitter", 0 )	/* blitter data */
+	// unused
+	ROM_LOAD( "1163.9a",  0x400000, 0x80000, CRC(054200c3) SHA1(7db457fa1f8639d15a6faa3e1e05d4302e7dd281) )
+	ROM_LOAD( "1164.10a", 0x480000, 0x80000, CRC(25b40754) SHA1(b660f174826a11cdcf9d61249012390f45f446e6) )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "1161.2d",  0x00000, 0x40000, CRC(74dede40) SHA1(d148f9ab9223b4c0b2f457a6f0e7fa3d173ab12b) )
+ROM_END
+
+/***************************************************************************
+
 Mahjong Jong-Tei
 Dynax 1999
 
@@ -10229,6 +10361,7 @@ GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, rongrong, ROT0, "Nakanihon
 GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Germany)",                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1994, hparadis,  0,        hparadis,  hparadis, 0,        ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, hgokou,    0,        hgokou,    hgokou,   0,        ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   0,        ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
