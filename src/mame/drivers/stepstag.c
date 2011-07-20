@@ -214,8 +214,12 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8
 };
 
+/* sprites are contained in 256x256 "tiles" */
+static GFXLAYOUT_RAW( spritelayout, 8, 256, 256, 256*8, 256*256*8 )
+
+
 static GFXDECODE_START( stepstag )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8, 0x0000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x8, 0x1000, 0x10 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8, 0x2000, 0x10 ) // [2] Rotation
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8, 0x6000, 0x10 ) // [3] Foreground
@@ -285,7 +289,7 @@ ROM_START( stepstag )
 	ROM_LOAD16_BYTE( "vj98348ver11.11", 0x00000, 0x80000, CRC(29b7f848) SHA1(c4d89e5c9be622b2d9038c359a5f65ce0dd461b0) )
 	ROM_LOAD16_BYTE( "vj98348ver11.14", 0x00001, 0x80000, CRC(e3314c6c) SHA1(61b0e9f9d0126d9f475304866a03cfa21701d9aa) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* */
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* sprites, TRUSTED */
 	ROM_LOAD( "mr99001-06", 0x00000, 0x400000, CRC(cfa27c93) SHA1(a0837877736e8e898f3acc64bc87ee0cc4d9f243) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* */
@@ -297,18 +301,18 @@ ROM_START( stepstag )
 	ROM_REGION( 0x400000, "gfx4", 0 ) /* FG tiles, TRUSTED */
 	ROM_LOAD( "mr99001-05", 0x00000, 0x400000, CRC(3958473b) SHA1(12279a587263290945744b22aafb80460eea77f7) )
 
-	ROM_REGION( 0x400000, "gfx5", 0 ) /* */
+	ROM_REGION( 0x400000, "gfx5", 0 ) /* vertical screen rom */
 	ROM_LOAD( "mr99001-02", 0x00000, 0x400000, CRC(12c65d86) SHA1(7fe5853fa3ba086f8da15702b126eb13c6ea30a9) )
 
-	ROM_REGION( 0x400000, "gfx6", 0 ) /* */
+	ROM_REGION( 0x800000, "gfx6", 0 ) /* vertical screen roms */
 	ROM_LOAD( "mr99001-01", 0x00000, 0x400000,  CRC(aa92cebf) SHA1(2ccc0d2ef9bc92c27f0a625819154bbcf9cfde0c) )
+	ROM_LOAD( "s.s.s._vj-98348_3_pr99021-01", 0x400000, 0x400000, CRC(e0fbc6f1) SHA1(7ca4507702f3f81bb9de3f9b5d270d379e439633) )
 
 	ROM_REGION( 0x400000, "gfx7", 0 ) /* */
 	ROM_LOAD( "s.s.s._vj-98348_19_pr99021-02", 0x00000, 0x400000, CRC(2d98da1a) SHA1(b09375fa1b4b2e0794632d6e237459009f40310d) )
 
-	ROM_REGION( 0x800000, "gfx8", 0 ) /* */
+	ROM_REGION( 0x400000, "gfx8", 0 ) /* */
 	ROM_LOAD( "s.s.s._vj-98348_26_pr99021-01", 0x000000, 0x400000, CRC(fefb3777) SHA1(df624e105ab1dea52317e318ad29caa02b900788) )
-	ROM_LOAD( "s.s.s._vj-98348_3_pr99021-01", 0x400000, 0x400000, CRC(e0fbc6f1) SHA1(7ca4507702f3f81bb9de3f9b5d270d379e439633) )
 
 	DISK_REGION( "disks" )
 	DISK_IMAGE("stepstag", 0, NO_DUMP)
