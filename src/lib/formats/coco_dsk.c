@@ -838,7 +838,7 @@ static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track
 done:
 	if (sector_map)
 		free(sector_map);
-	return FLOPPY_ERROR_SUCCESS;
+	return err;
 }
 
 
