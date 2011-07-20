@@ -1136,6 +1136,9 @@ BDIR BC1       |
 /* PSG function selected */
 static void update_ay(device_t *device)
 {
+	device_t *ay = device->machine().device("ay8913");
+	if (!ay) return;
+
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	pia6821_device *pia = downcast<pia6821_device *>(device);
 	if (!pia->cb2_output())
@@ -1181,7 +1184,7 @@ static void update_ay(device_t *device)
 
 WRITE_LINE_DEVICE_HANDLER( pia_ic5_cb2_w )
 {
-    update_ay(device);
+	update_ay(device);
 }
 
 
@@ -2872,7 +2875,7 @@ MACHINE_CONFIG_FRAGMENT( mpu4_common2 )
 MACHINE_CONFIG_END
 
 /* machine driver for MOD 2 board */
-MACHINE_CONFIG_START( mpu4mod2, mpu4_state )
+MACHINE_CONFIG_START( mpu4base, mpu4_state )
 
 	MCFG_MACHINE_START(mpu4mod2)
 	MCFG_MACHINE_RESET(mpu4)
@@ -2883,10 +2886,7 @@ MACHINE_CONFIG_START( mpu4mod2, mpu4_state )
 	MCFG_FRAGMENT_ADD(mpu4_common)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MCFG_SOUND_CONFIG(ay8910_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2902,39 +2902,46 @@ MACHINE_CONFIG_START( mpu4mod2, mpu4_state )
 	MCFG_DEFAULT_LAYOUT(layout_mpu4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mod4yam, mpu4mod2 )
-	MCFG_MACHINE_START(mpu4yam)
 
-	MCFG_DEVICE_REMOVE("ay8913")
-	MCFG_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+ MACHINE_CONFIG_DERIVED( mpu4mod2, mpu4base )
+	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mod4oki, mpu4mod2 )
+
+
+
+static MACHINE_CONFIG_DERIVED( mod4yam, mpu4base )
+	MCFG_MACHINE_START(mpu4yam)
+
+	MCFG_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mod4oki, mpu4base )
 	MCFG_MACHINE_START(mpu4oki)
 
 	MCFG_FRAGMENT_ADD(mpu4_common2)
 
-	MCFG_DEVICE_REMOVE("ay8913")
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)		//16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bwboki, mpu4mod2 )
+static MACHINE_CONFIG_DERIVED( bwboki, mod4oki )
 	MCFG_MACHINE_START(mpu4bwb)
-	
-	MCFG_FRAGMENT_ADD(mpu4_common2)
-
-	MCFG_DEVICE_REMOVE("ay8913")
-	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)		//16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(mpu4crys, mpu4mod2 )
 	MCFG_MACHINE_START(mpu4cry)
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
