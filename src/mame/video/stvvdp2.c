@@ -4410,21 +4410,40 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 
 				if ( x & clipxmask || y & clipymask ) continue;
 				pix = *BITMAP_ADDR16(roz_bitmap, y & planerenderedsizey, x & planerenderedsizex);
-				if(stv2_current_tilemap.fade_control & 1)
-					stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
 				switch( stv2_current_tilemap.transparency )
 				{
 					case STV_TRANSPARENCY_PEN:
-						if ( pix != 0x0000 ) line[hcnt] = pix;
+						if ( pix != 0x0000 )
+						{
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+
+							line[hcnt] = pix;
+						}
 						break;
 					case STV_TRANSPARENCY_NONE:
+						if(stv2_current_tilemap.fade_control & 1)
+							stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+
 						line[hcnt] = pix;
 						break;
 					case STV_TRANSPARENCY_ALPHA:
-						if ( pix != 0x000 ) line[hcnt] = alpha_blend_r16( line[hcnt], pix, stv2_current_tilemap.alpha );
+						if ( pix != 0x000 )
+						{
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+
+							line[hcnt] = alpha_blend_r16( line[hcnt], pix, stv2_current_tilemap.alpha );
+						}
 						break;
 					case STV_TRANSPARENCY_ADD_BLEND:
-						if ( pix != 0x0000 ) line[hcnt] = stv_add_blend( line[hcnt], pix );
+						if ( pix != 0x0000 )
+						{
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+
+							line[hcnt] = stv_add_blend( line[hcnt], pix );
+						}
 						break;
 				}
 
@@ -4502,21 +4521,40 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 				if ( x & clipxmask || y & clipymask ) continue;
 
 				pix = *BITMAP_ADDR16(roz_bitmap, y & planerenderedsizey, x & planerenderedsizex);
-				if(stv2_current_tilemap.fade_control & 1)
-					stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
 				switch( stv2_current_tilemap.transparency )
 				{
 					case STV_TRANSPARENCY_PEN:
-						if ( pix != 0x0000 ) line[hcnt] = pix;
+						if ( pix != 0x0000 )
+						{
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+
+							line[hcnt] = pix;
+						}
 						break;
 					case STV_TRANSPARENCY_NONE:
+						if(stv2_current_tilemap.fade_control & 1)
+							stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+
 						line[hcnt] = pix;
 						break;
 					case STV_TRANSPARENCY_ALPHA:
-						if ( pix != 0x000 ) line[hcnt] = alpha_blend_r16( line[hcnt], pix, stv2_current_tilemap.alpha );
+						if ( pix != 0x000 )
+						{
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+
+							line[hcnt] = alpha_blend_r16( line[hcnt], pix, stv2_current_tilemap.alpha );
+						}
 						break;
 					case STV_TRANSPARENCY_ADD_BLEND:
-						if ( pix != 0x0000 ) line[hcnt] = stv_add_blend( line[hcnt], pix );
+						if ( pix != 0x0000 )
+						{
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+
+							line[hcnt] = stv_add_blend( line[hcnt], pix );
+						}
 						break;
 				}
 			}

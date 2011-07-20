@@ -2017,7 +2017,7 @@ static void cd_playdata(void)
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
 					cd_read_filtered_sector(cd_curfad);
 
-				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO && 0)
 					popmessage("%08x %08x",cd_curfad,fadstoplay);
 
 				cd_curfad++;
