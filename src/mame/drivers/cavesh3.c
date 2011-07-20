@@ -181,10 +181,10 @@ ROM_END
 GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                   GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                    GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                    GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "EspGaluda 2 (2005/11/14 MASTER VER)",                       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                      GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",    GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro (2005/03/22 MASTER VER..)",                      GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara (2005/03/22 MASTER VER..)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",         GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                      GAME_NOT_WORKING | GAME_NO_SOUND )
 
@@ -209,9 +209,10 @@ ESPGALUDA II
 
 PINK SWEETS
 * "2006/04/06 MASTER VER."
+* "2006/04/06 MASTER VER..."
+* "2006/04/06 MASTER VER...."
 * "2006/05/18 MASTER VER."
 * "2006/xx/xx MASTER VER"
-* "2006/04/06 MASTER VER...."
 
 MUSHIHIMESAMA FUTARI 1.0
 * "2006/10/23 MASTER VER"  - Ultra unlockable
@@ -220,7 +221,7 @@ MUSHIHIMESAMA FUTARI 1.0
 
 MUSHIHIME SAMA FUTARI 1.5
   "2006/12/8 MASTER VER 1.54"
-* "2006/12/8.MASTER VER. 1.54."
+* "2006/12/8.MASTER VER.1.54."
 
 MUSHIHIMESAMA FUTARI BLACK LABEL
 * "2007/12/11 BLACK LABEL VER"
@@ -228,6 +229,7 @@ MUSHIHIMESAMA FUTARI BLACK LABEL
 
 MUCHI MUCHI PORK
 * "2007/ 4/17 MASTER VER."
+* 2 "period" ver, location of the periods unknown
 
 DEATH SMILES
   "2007/10/09 MASTER VER"
@@ -235,13 +237,20 @@ DEATH SMILES
 DEATH SMILES MEGA BLACK LABEL
 * "2008/10/06 MEGABLACK LABEL VER"
 
-DODONPACHI FUKKATSU
+DODONPACHI FUKKATSU 1.0
+* "2008/02/22 MASTER VER"
+
+DODONPACHI FUKKATSU 1.5
 * "2008/06/23 MASTER VER 1.5"
 
-Dodonpachi Daifukkatsu Black Label
-* Unknown revs
+DODONPACHI DAIFUKKATSU BLACK LABEL
+* "2010/1/18 BLACK LABEL"
 
-Akai Katana
-* Unknown revs
+AKAI KATANA
+* "2010/ 8/13 MASTER VER."
+*  Home/Limited version, unknown date line, different gameplay from regular version, doesn't accept coins - permanent freeplay
+
+MUSHIHIMESAMA 1.5 MATSURI VERSION
+* 2011/5/23 CAVEMATSURI VER 1.5
 
 */
