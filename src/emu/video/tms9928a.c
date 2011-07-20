@@ -16,7 +16,6 @@
 ** - Convert implementation to modern device.
 ** - The screen image is rendered in `one go'. Modifications during
 **   screen build up are not shown.
-** - Correctly emulate 4,8,16 kb VRAM if needed.
 ** - Colours are incorrect. [fixed by R Nabet ?]
 ** - Sprites 8-31 are ghosted/cloned in mode 3 when using less than
 **   three pattern tables. Exact behaviour is not known.
@@ -104,7 +103,6 @@ static void (*const ModeHandlers[])(device_t *screen, bitmap_t *bitmap, const re
 #define TOP_BORDER			tms.top_border
 #define BOTTOM_BORDER		tms.bottom_border
 
-#define TMS_SPRITES_ENABLED ((tms.Regs[1] & 0x50) == 0x40)
 #define TMS_50HZ ((tms.model == TMS9929) || (tms.model == TMS9929A))
 #define TMS_REVA ((tms.model == TMS99x8A) || (tms.model == TMS9929A))
 #define TMS_MODE ( (TMS_REVA ? (tms.Regs[0] & 2) : 0) | \
@@ -112,7 +110,7 @@ static void (*const ModeHandlers[])(device_t *screen, bitmap_t *bitmap, const re
 
 typedef struct {
     /* TMS9928A internal settings */
-    UINT8 ReadAhead,Regs[8],StatusReg,latch,INT;
+    UINT8 ReadAhead,Regs[8],StatusReg,FifthSprite,latch,INT;
     INT32 Addr;
     int colour,pattern,nametbl,spriteattribute,spritepattern;
     int colourmask,patternmask;
@@ -145,7 +143,7 @@ void TMS9928A_reset () {
     int  i;
 
     for (i=0;i<8;i++) tms.Regs[i] = 0;
-    tms.StatusReg = 0;
+    tms.StatusReg = 0; tms.FifthSprite = 0;
     tms.nametbl = tms.pattern = tms.colour = 0;
     tms.spritepattern = tms.spriteattribute = 0;
     tms.colourmask = tms.patternmask = 0;
@@ -197,6 +195,7 @@ static void TMS9928A_start (running_machine &machine, const TMS9928a_interface *
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[6]);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[7]);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.StatusReg);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.FifthSprite);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.ReadAhead);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.latch);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Addr);
@@ -221,16 +220,14 @@ void TMS9928A_post_load (running_machine &machine) {
 ** The I/O functions.
 */
 READ8_HANDLER (TMS9928A_vram_r) {
-    UINT8 b;
-    b = tms.ReadAhead;
+    UINT8 ret = tms.ReadAhead;
     tms.ReadAhead = tms.vMem[tms.Addr];
     tms.Addr = (tms.Addr + 1) & (tms.vramsize - 1);
     tms.latch = 0;
-    return b;
+    return ret;
 }
 
 WRITE8_HANDLER (TMS9928A_vram_w) {
-
     tms.vMem[tms.Addr] = data;
     tms.Addr = (tms.Addr + 1) & (tms.vramsize - 1);
     tms.ReadAhead = data;
@@ -238,15 +235,14 @@ WRITE8_HANDLER (TMS9928A_vram_w) {
 }
 
 READ8_HANDLER (TMS9928A_register_r) {
-    UINT8 b;
-    b = tms.StatusReg;
-    tms.StatusReg = 0x1f;
+    UINT8 ret = tms.StatusReg;
+    tms.StatusReg = tms.FifthSprite;
     if (tms.INT) {
         tms.INT = 0;
         if (tms.INTCallback) tms.INTCallback (space->machine(), tms.INT);
     }
     tms.latch = 0;
-    return b;
+    return ret;
 }
 
 WRITE8_HANDLER (TMS9928A_register_w) {
@@ -389,8 +385,7 @@ SCREEN_UPDATE( tms9928a )
 			rt.min_x = LEFT_BORDER+256; rt.max_x = LEFT_BORDER+256+RIGHT_BORDER-1;
 			bitmap_fill (bitmap, &rt, BackColour);
 		}
-		if (TMS_SPRITES_ENABLED)
-			draw_sprites(screen, bitmap, cliprect);
+		draw_sprites(screen, bitmap, cliprect);
 	}
 
 	return 0;
@@ -401,9 +396,7 @@ int TMS9928A_interrupt(running_machine &machine) {
 
     /* when skipping frames, calculate sprite collision */
     if (machine.video().skip_this_frame()) {
-		if (TMS_SPRITES_ENABLED) {
-			draw_sprites (machine.primary_screen, NULL, NULL);
-		}
+		draw_sprites (machine.primary_screen, NULL, NULL);
     }
 
     tms.StatusReg |= 0x80;
@@ -639,13 +632,19 @@ static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *c
     UINT16 line,line2;
     const pen_t *pens;
 
+    if ((tms.Regs[1] & 0x50) != 0x40) {
+        /* sprites are disabled */
+        tms.FifthSprite = 31;
+        return;
+    }
+
     pens = screen->machine().pens;
     attributeptr = tms.vMem + tms.spriteattribute;
     size = (tms.Regs[1] & 2) ? 16 : 8;
     large = (int)(tms.Regs[1] & 1);
 
     for (x=0;x<192;x++) limit[x] = 4;
-    tms.StatusReg = 0x80;
+    tms.StatusReg &= ~0x20; /* reset collision */
     illegalspriteline = 255;
     illegalsprite = 0;
 
@@ -759,10 +758,14 @@ static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *c
             }
         }
     }
-    if (illegalspriteline == 255) {
-        tms.StatusReg |= (p > 31) ? 31 : p;
-    } else {
-        tms.StatusReg |= 0x40 + illegalsprite;
+
+    /* The sprite number is only updated if the overflow bit is clear,
+    ** and the overflow bit will only be set if bit 6 and 7 are both clear. */
+    if (illegalspriteline == 255) tms.FifthSprite = (p > 31) ? 31 : p;
+    else tms.FifthSprite = illegalsprite;
+    if (~tms.StatusReg & 0x40) {
+        tms.StatusReg |= tms.FifthSprite;
+        if (~tms.StatusReg & 0x80) tms.StatusReg |= 0x40;
     }
 }
 
