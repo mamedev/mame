@@ -22,12 +22,12 @@ struct basicdsk_geometry
 	UINT32 sector_length;
 	UINT64 offset;
 
-	int (*translate_sector)(floppy_image *floppy, int sector);
-	UINT64 (*translate_offset)(floppy_image *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector);
-	UINT64 (*get_ddam)(floppy_image *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector);
+	int (*translate_sector)(floppy_image_legacy *floppy, int sector);
+	UINT64 (*translate_offset)(floppy_image_legacy *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector);
+	UINT64 (*get_ddam)(floppy_image_legacy *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector);
 };
 
-floperr_t basicdsk_construct(floppy_image *floppy, const struct basicdsk_geometry *geometry);
+floperr_t basicdsk_construct(floppy_image_legacy *floppy, const struct basicdsk_geometry *geometry);
 
 FLOPPY_IDENTIFY(basicdsk_identify_default);
 FLOPPY_CONSTRUCT(basicdsk_construct_default);

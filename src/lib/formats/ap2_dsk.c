@@ -20,22 +20,22 @@
 
 
 /* used in for all Apple II images */
-static UINT32 apple2_get_track_size(floppy_image *floppy, int head, int track);
+static UINT32 apple2_get_track_size(floppy_image_legacy *floppy, int head, int track);
 static int disk_decode_nib(UINT8 *data, const UINT8 *nibble, int *volume, int *track, int *sector);
 static void disk_encode_nib(UINT8 *nibble, const UINT8 *data, int volume, int track, int sector);
 
 /* used in DOS/ProDOS order images */
-static int apple2_do_translate_sector(floppy_image *floppy, int sector);
-static int apple2_po_translate_sector(floppy_image *floppy, int sector);
-static floperr_t apple2_dsk_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen);
-static floperr_t apple2_dsk_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen);
+static int apple2_do_translate_sector(floppy_image_legacy *floppy, int sector);
+static int apple2_po_translate_sector(floppy_image_legacy *floppy, int sector);
+static floperr_t apple2_dsk_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen);
+static floperr_t apple2_dsk_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen);
 
 /* used in nibble order images */
-static floperr_t apple2_nib_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen);
-static floperr_t apple2_nib_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen);
-static floperr_t apple2_nib_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen);
-static floperr_t apple2_nib_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
-static floperr_t apple2_nib_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length);
+static floperr_t apple2_nib_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen);
+static floperr_t apple2_nib_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen);
+static floperr_t apple2_nib_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen);
+static floperr_t apple2_nib_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
+static floperr_t apple2_nib_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length);
 
 
 static const UINT8 translate6[0x40] =
@@ -79,7 +79,7 @@ static const UINT8 *get_untranslate6_map(void)
  * ----------------------------------------------------------------------- */
 
 
-static floperr_t apple2_general_construct(floppy_image *floppy, int floppy_type)
+static floperr_t apple2_general_construct(floppy_image_legacy *floppy, int floppy_type)
 {
 	floperr_t err;
 	struct basicdsk_geometry geometry;
@@ -148,7 +148,7 @@ static FLOPPY_IDENTIFY(apple2_dsk_identify)
 
 
 
-static int apple2_do_translate_sector(floppy_image *floppy, int sector)
+static int apple2_do_translate_sector(floppy_image_legacy *floppy, int sector)
 {
 	static const UINT8 skewing[] =
 	{
@@ -161,7 +161,7 @@ static int apple2_do_translate_sector(floppy_image *floppy, int sector)
 
 
 
-static int apple2_po_translate_sector(floppy_image *floppy, int sector)
+static int apple2_po_translate_sector(floppy_image_legacy *floppy, int sector)
 {
 	static const UINT8 skewing[] =
 	{
@@ -188,7 +188,7 @@ static FLOPPY_CONSTRUCT(apple2_po_construct)
 
 
 
-static floperr_t apple2_dsk_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t apple2_dsk_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	UINT8 sector_buffer[APPLE2_SECTOR_SIZE];
 	int sector;
@@ -214,7 +214,7 @@ static floperr_t apple2_dsk_read_track(floppy_image *floppy, int head, int track
 
 
 
-static floperr_t apple2_dsk_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+static floperr_t apple2_dsk_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	int sector;
 	UINT8 sector_buffer[APPLE2_SECTOR_SIZE];
@@ -258,7 +258,7 @@ static FLOPPY_CONSTRUCT(apple2_nib_construct)
 
 
 
-static floperr_t apple2_nib_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t apple2_nib_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	if ((head != 0) || (track < 0) || (track >= APPLE2_TRACK_COUNT))
 		return FLOPPY_ERROR_SEEKERROR;
@@ -270,7 +270,7 @@ static floperr_t apple2_nib_read_track(floppy_image *floppy, int head, int track
 
 
 
-static floperr_t apple2_nib_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+static floperr_t apple2_nib_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	if ((head != 0) || (track < 0) || (track >= APPLE2_TRACK_COUNT))
 		return FLOPPY_ERROR_SEEKERROR;
@@ -360,7 +360,7 @@ static int disk_decode_nib(UINT8 *data, const UINT8 *nibble, int *volume, int *t
 
 
 
-static floperr_t apple2_nib_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t apple2_nib_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	const UINT8 *nibble;
@@ -450,7 +450,7 @@ static void disk_encode_nib(UINT8 *nibble, const UINT8 *data, int volume, int tr
 
 
 
-static floperr_t apple2_nib_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t apple2_nib_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT8 *track_data;
@@ -472,7 +472,7 @@ static floperr_t apple2_nib_write_sector(floppy_image *floppy, int head, int tra
 
 
 
-static floperr_t apple2_nib_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t apple2_nib_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	*sector_length = APPLE2_SECTOR_SIZE;
 	return FLOPPY_ERROR_SUCCESS;
@@ -480,7 +480,7 @@ static floperr_t apple2_nib_get_sector_length(floppy_image *floppy, int head, in
 
 
 
-static UINT32 apple2_get_track_size(floppy_image *floppy, int head, int track)
+static UINT32 apple2_get_track_size(floppy_image_legacy *floppy, int head, int track)
 {
 	return APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT;
 }

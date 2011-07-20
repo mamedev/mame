@@ -114,14 +114,14 @@ FLOPPY_IDENTIFY( coupe_mgt_identify )
 */
 
 
-static UINT64 coupe_sad_translate_offset(floppy_image *floppy,
+static UINT64 coupe_sad_translate_offset(floppy_image_legacy *floppy,
 	const struct basicdsk_geometry *geom, int track, int head, int sector)
 {
 	return head * geom->tracks * geom->sectors + geom->sectors * track + sector;
 }
 
 
-static void coupe_sad_interpret_header(floppy_image *floppy,
+static void coupe_sad_interpret_header(floppy_image_legacy *floppy,
 	int *heads, int *tracks, int *sectors, int *sector_size)
 {
 	UINT8 header[SAD_HEADER_LEN];
@@ -211,27 +211,27 @@ FLOPPY_IDENTIFY( coupe_sad_identify )
  *
  *************************************/
 
-static int coupe_sdf_get_heads_per_disk(floppy_image *floppy)
+static int coupe_sdf_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	struct sdf_tag *tag = (sdf_tag *)floppy_tag(floppy);
 	return tag->heads;
 }
 
 
-static int coupe_sdf_get_tracks_per_disk(floppy_image *floppy)
+static int coupe_sdf_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	struct sdf_tag *tag = (sdf_tag *)floppy_tag(floppy);
 	return tag->tracks;
 }
 
 
-static UINT32 coupe_sdf_get_track_size(floppy_image *floppy, int head, int track)
+static UINT32 coupe_sdf_get_track_size(floppy_image_legacy *floppy, int head, int track)
 {
 	return SDF_TRACKSIZE;
 }
 
 
-static floperr_t coupe_sdf_get_offset(floppy_image *floppy,
+static floperr_t coupe_sdf_get_offset(floppy_image_legacy *floppy,
 	int head, int track, UINT64 *offset)
 {
 	struct sdf_tag *tag = (sdf_tag *)floppy_tag(floppy);
@@ -245,7 +245,7 @@ static floperr_t coupe_sdf_get_offset(floppy_image *floppy,
 }
 
 
-static floperr_t coupe_sdf_read_track(floppy_image *floppy,
+static floperr_t coupe_sdf_read_track(floppy_image_legacy *floppy,
 	int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	floperr_t err;
@@ -262,7 +262,7 @@ static floperr_t coupe_sdf_read_track(floppy_image *floppy,
 }
 
 
-static floperr_t coupe_sdf_write_track(floppy_image *floppy,
+static floperr_t coupe_sdf_write_track(floppy_image_legacy *floppy,
 	int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	floperr_t err;
@@ -279,7 +279,7 @@ static floperr_t coupe_sdf_write_track(floppy_image *floppy,
 }
 
 
-static floperr_t coupe_sdf_get_sector_offset(floppy_image *floppy,
+static floperr_t coupe_sdf_get_sector_offset(floppy_image_legacy *floppy,
 	int head, int track, int sector, UINT64 *offset)
 {
 	floperr_t err;
@@ -312,7 +312,7 @@ static floperr_t coupe_sdf_get_sector_offset(floppy_image *floppy,
 }
 
 
-static floperr_t coupe_sdf_get_total_sector_offset(floppy_image *floppy,
+static floperr_t coupe_sdf_get_total_sector_offset(floppy_image_legacy *floppy,
 	int head, int track, int sector, UINT64 *offset)
 {
 	floperr_t err;
@@ -332,7 +332,7 @@ static floperr_t coupe_sdf_get_total_sector_offset(floppy_image *floppy,
 }
 
 
-static floperr_t coupe_sdf_get_sector_length(floppy_image *floppy,
+static floperr_t coupe_sdf_get_sector_length(floppy_image_legacy *floppy,
 	int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
@@ -354,7 +354,7 @@ static floperr_t coupe_sdf_get_sector_length(floppy_image *floppy,
 }
 
 
-static floperr_t coupe_sdf_get_indexed_sector_info(floppy_image *floppy,
+static floperr_t coupe_sdf_get_indexed_sector_info(floppy_image_legacy *floppy,
 	int head, int track, int sector_index,
 	int *cylinder, int *side, int *sector, UINT32 *sector_length,
 	unsigned long *flags)
@@ -382,7 +382,7 @@ static floperr_t coupe_sdf_get_indexed_sector_info(floppy_image *floppy,
 }
 
 
-static floperr_t coupe_sdf_read_indexed_sector(floppy_image *floppy,
+static floperr_t coupe_sdf_read_indexed_sector(floppy_image_legacy *floppy,
 	int head, int track, int sector, void *buffer, size_t buflen)
 {
 	floperr_t err;
@@ -398,7 +398,7 @@ static floperr_t coupe_sdf_read_indexed_sector(floppy_image *floppy,
 }
 
 
-static floperr_t coupe_sdf_write_indexed_sector(floppy_image *floppy,
+static floperr_t coupe_sdf_write_indexed_sector(floppy_image_legacy *floppy,
 	int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
@@ -414,7 +414,7 @@ static floperr_t coupe_sdf_write_indexed_sector(floppy_image *floppy,
 }
 
 
-static void coupe_sdf_interpret_header(floppy_image *floppy, int *heads, int *tracks)
+static void coupe_sdf_interpret_header(floppy_image_legacy *floppy, int *heads, int *tracks)
 {
 	UINT64 size = floppy_image_size(floppy);
 

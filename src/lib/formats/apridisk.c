@@ -63,7 +63,7 @@ struct apr_tag
  *    15: sector
  */
 
-static floperr_t apr_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t apr_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
 //  printf("apr_read_sector %d %d %d\n", head, track, sector);
@@ -71,7 +71,7 @@ static floperr_t apr_read_sector(floppy_image *floppy, int head, int track, int 
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static floperr_t apr_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t apr_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
 //  printf("apr_read_indexed_sector %d %d %d\n", head, track, sector);
@@ -80,25 +80,25 @@ static floperr_t apr_read_indexed_sector(floppy_image *floppy, int head, int tra
 }
 
 /* sector length is always 512 byte */
-static floperr_t apr_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t apr_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	*sector_length = 512;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static int apr_get_heads_per_disk(floppy_image *floppy)
+static int apr_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
 	return tag->heads;
 }
 
-static int apr_get_tracks_per_disk(floppy_image *floppy)
+static int apr_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
 	return tag->tracks;
 }
 
-static floperr_t apr_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t apr_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
 

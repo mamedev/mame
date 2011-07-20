@@ -26,7 +26,7 @@ static FLOPPY_IDENTIFY( trs80_jv1_identify )
 }
 
 
-static UINT64 trs80_jv1_get_ddam(floppy_image *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector)
+static UINT64 trs80_jv1_get_ddam(floppy_image_legacy *floppy, const struct basicdsk_geometry *geom, int track, int head, int sector)
 {
 	// directory track is protected
 	if ((track==17) && (head==0)) {

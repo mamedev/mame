@@ -38,7 +38,7 @@ struct oricdsk_tag
 };
 
 
-static struct oricdsk_tag *get_tag(floppy_image *floppy)
+static struct oricdsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	struct oricdsk_tag *tag;
 	tag = (oricdsk_tag *)floppy_tag(floppy);
@@ -65,7 +65,7 @@ static FLOPPY_IDENTIFY(oric_dsk_identify)
 	}
 	return FLOPPY_ERROR_SUCCESS;
 }
-static int oric_get_track_offset(floppy_image *floppy,int track, int head)
+static int oric_get_track_offset(floppy_image_legacy *floppy,int track, int head)
 {
 	if (get_tag(floppy)->geometry==1) {
 		return mfm_disk_header_size + (get_tag(floppy)->tracksize * track) + (head * get_tag(floppy)->tracksize * get_tag(floppy)->tracks);
@@ -74,17 +74,17 @@ static int oric_get_track_offset(floppy_image *floppy,int track, int head)
 	}
 }
 
-static int oric_get_heads_per_disk(floppy_image *floppy)
+static int oric_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->heads;
 }
 
-static int oric_get_tracks_per_disk(floppy_image *floppy)
+static int oric_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->tracks;
 }
 
-static void mfm_info_cache_sector_info(floppy_image *floppy,int track,int head)
+static void mfm_info_cache_sector_info(floppy_image_legacy *floppy,int track,int head)
 {
 	UINT8 track_data[TRACK_SIZE_MFM];
 
@@ -165,7 +165,7 @@ static void mfm_info_cache_sector_info(floppy_image *floppy,int track,int head)
 
 }
 
-static floperr_t get_offset(floppy_image *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
+static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
 {
 	UINT64 offs;
 
@@ -189,7 +189,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 
 
 
-static floperr_t internal_oric_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_oric_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -202,7 +202,7 @@ static floperr_t internal_oric_read_sector(floppy_image *floppy, int head, int t
 
 
 
-static floperr_t internal_oric_write_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
+static floperr_t internal_oric_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -217,27 +217,27 @@ static floperr_t internal_oric_write_sector(floppy_image *floppy, int head, int 
 
 
 
-static floperr_t oric_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t oric_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_oric_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t oric_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t oric_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return internal_oric_write_sector(floppy, head, track, sector, FALSE, buffer, buflen, ddam);
 }
 
-static floperr_t oric_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t oric_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_oric_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t oric_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t oric_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return internal_oric_write_sector(floppy, head, track, sector, TRUE, buffer, buflen, ddam);
 }
 
-static floperr_t oric_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t oric_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
 	err = get_offset(floppy, head, track, sector, FALSE, NULL);
@@ -252,7 +252,7 @@ static floperr_t oric_get_sector_length(floppy_image *floppy, int head, int trac
 
 
 
-static floperr_t oric_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t oric_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	floperr_t retVal;
 

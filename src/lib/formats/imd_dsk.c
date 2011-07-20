@@ -18,7 +18,7 @@ struct imddsk_tag
 };
 
 
-static struct imddsk_tag *get_tag(floppy_image *floppy)
+static struct imddsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	struct imddsk_tag *tag;
 	tag = (imddsk_tag *)floppy_tag(floppy);
@@ -40,22 +40,22 @@ FLOPPY_IDENTIFY( imd_dsk_identify )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static int imd_get_heads_per_disk(floppy_image *floppy)
+static int imd_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->heads;
 }
 
-static int imd_get_tracks_per_disk(floppy_image *floppy)
+static int imd_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->tracks;
 }
 
-static UINT64 imd_get_track_offset(floppy_image *floppy, int head, int track)
+static UINT64 imd_get_track_offset(floppy_image_legacy *floppy, int head, int track)
 {
 	return get_tag(floppy)->track_offsets[(track<<1) + head];
 }
 
-static floperr_t get_offset(floppy_image *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
+static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
 {
 	UINT64 offs = 0;
 	UINT8 header[5];
@@ -93,7 +93,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 
 
 
-static floperr_t internal_imd_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_imd_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -124,17 +124,17 @@ static floperr_t internal_imd_read_sector(floppy_image *floppy, int head, int tr
 }
 
 
-static floperr_t imd_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t imd_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_imd_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t imd_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t imd_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_imd_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t imd_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t imd_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
 	err = get_offset(floppy, head, track, sector, FALSE, NULL);
@@ -147,7 +147,7 @@ static floperr_t imd_get_sector_length(floppy_image *floppy, int head, int track
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static floperr_t imd_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t imd_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	UINT64 offset;
 	UINT8 header[5];

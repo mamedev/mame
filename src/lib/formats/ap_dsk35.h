@@ -14,7 +14,7 @@
 void sony_filltrack(UINT8 *buffer, size_t buffer_len, size_t *pos, UINT8 data);
 UINT8 sony_fetchtrack(const UINT8 *buffer, size_t buffer_len, size_t *pos);
 
-int apple35_sectors_per_track(floppy_image *image, int track);
+int apple35_sectors_per_track(floppy_image_legacy *image, int track);
 
 /**************************************************************************/
 

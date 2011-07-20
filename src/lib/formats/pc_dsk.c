@@ -36,7 +36,7 @@ static const struct pc_disk_sizes disk_sizes[] =
 
 
 
-static floperr_t pc_dsk_compute_geometry(floppy_image *floppy, struct basicdsk_geometry *geometry)
+static floperr_t pc_dsk_compute_geometry(floppy_image_legacy *floppy, struct basicdsk_geometry *geometry)
 {
 	int i;
 	UINT64 size;

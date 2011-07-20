@@ -128,7 +128,7 @@ struct fdi_pulse_track_header
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE struct fdidsk_tag *get_tag(floppy_image *floppy)
+INLINE struct fdidsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	return (fdidsk_tag *)floppy_tag(floppy);
 }
@@ -137,57 +137,57 @@ INLINE struct fdidsk_tag *get_tag(floppy_image *floppy)
     IMPLEMENTATION
 ***************************************************************************/
 
-static int fdi_get_heads_per_disk(floppy_image *floppy)
+static int fdi_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->heads;
 }
 
-static int fdi_get_tracks_per_disk(floppy_image *floppy)
+static int fdi_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->tracks;
 }
 
-static int fdi_get_sectors_per_track(floppy_image *floppy, int head, int track)
+static int fdi_get_sectors_per_track(floppy_image_legacy *floppy, int head, int track)
 {
 	return 0;
 }
 
-static floperr_t fdi_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t fdi_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	return FLOPPY_ERROR_SUCCESS;
 }
 /*
-static UINT32 fdi_get_sector_offset(floppy_image* floppy, int head, int track, int sector)
+static UINT32 fdi_get_sector_offset(floppy_image_legacy* floppy, int head, int track, int sector)
 {
     return 0;
 }
 */
-static floperr_t fdi_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t fdi_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
 
-static floperr_t fdi_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t fdi_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
 
-static floperr_t fdi_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t fdi_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
 
-static floperr_t fdi_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buffer_len)
+static floperr_t fdi_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buffer_len)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
 
-static floperr_t fdi_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t fdi_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }
 
-static floperr_t fdi_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t fdi_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }

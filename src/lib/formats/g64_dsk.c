@@ -47,7 +47,7 @@ struct g64dsk_tag
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE struct g64dsk_tag *get_tag(floppy_image *floppy)
+INLINE struct g64dsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	return (g64dsk_tag *)floppy_tag(floppy);
 }
@@ -66,7 +66,7 @@ INLINE float get_dos_track(int track)
     of heads in the disk image
 -------------------------------------------------*/
 
-static int g64_get_heads_per_disk(floppy_image *floppy)
+static int g64_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->heads;
 }
@@ -76,7 +76,7 @@ static int g64_get_heads_per_disk(floppy_image *floppy)
     of DOS tracks in the disk image
 -------------------------------------------------*/
 
-static int g64_get_tracks_per_disk(floppy_image *floppy)
+static int g64_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->tracks;
 }
@@ -86,7 +86,7 @@ static int g64_get_tracks_per_disk(floppy_image *floppy)
     the disk image for a given track
 -------------------------------------------------*/
 
-static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
+static floperr_t get_track_offset(floppy_image_legacy *floppy, int head, int track, UINT64 *offset)
 {
 	struct g64dsk_tag *tag = get_tag(floppy);
 	UINT64 offs = 0;
@@ -106,7 +106,7 @@ static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UIN
     g64_get_track_size - returns the track size
 -------------------------------------------------*/
 
-static UINT32 g64_get_track_size(floppy_image *floppy, int head, int track)
+static UINT32 g64_get_track_size(floppy_image_legacy *floppy, int head, int track)
 {
 	/* get track offset */
 	UINT64 track_offset;
@@ -128,7 +128,7 @@ static UINT32 g64_get_track_size(floppy_image *floppy, int head, int track)
     disk image
 -------------------------------------------------*/
 
-static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t g64_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	struct g64dsk_tag *tag = get_tag(floppy);
 	floperr_t err;
@@ -164,7 +164,7 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
     disk image
 -------------------------------------------------*/
 
-static floperr_t g64_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+static floperr_t g64_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	return FLOPPY_ERROR_UNSUPPORTED;
 }

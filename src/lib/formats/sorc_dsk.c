@@ -17,22 +17,22 @@ static FLOPPY_IDENTIFY(exi_dsk_identify)
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static int exi_get_heads_per_disk(floppy_image *floppy)
+static int exi_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return 1;
 }
 
-static int exi_get_tracks_per_disk(floppy_image *floppy)
+static int exi_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return 77;
 }
 
-static UINT64 exi_translate_offset(floppy_image *floppy, int track, int head, int sector)
+static UINT64 exi_translate_offset(floppy_image_legacy *floppy, int track, int head, int sector)
 {
 	return 13+270*(16*track+sector);
 }
 
-static floperr_t get_offset(floppy_image *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
+static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
 {
 	UINT64 offs;
 	/* translate the sector to a raw sector */
@@ -52,7 +52,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 
 
 
-static floperr_t internal_exi_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_exi_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -66,7 +66,7 @@ static floperr_t internal_exi_read_sector(floppy_image *floppy, int head, int tr
 
 
 
-static floperr_t internal_exi_write_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
+static floperr_t internal_exi_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -81,27 +81,27 @@ static floperr_t internal_exi_write_sector(floppy_image *floppy, int head, int t
 
 
 
-static floperr_t exi_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t exi_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_exi_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t exi_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t exi_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return internal_exi_write_sector(floppy, head, track, sector, FALSE, buffer, buflen, ddam);
 }
 
-static floperr_t exi_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t exi_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_exi_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t exi_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t exi_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return internal_exi_write_sector(floppy, head, track, sector, TRUE, buffer, buflen, ddam);
 }
 
-static floperr_t exi_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t exi_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
 	err = get_offset(floppy, head, track, sector, FALSE, NULL);
@@ -116,7 +116,7 @@ static floperr_t exi_get_sector_length(floppy_image *floppy, int head, int track
 
 
 
-static floperr_t exi_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t exi_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	sector_index += 1;
 	if (cylinder)

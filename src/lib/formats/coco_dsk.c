@@ -112,7 +112,7 @@
  *
  * ----------------------------------------------------------------------- */
 
-static int coco_jvc_decode_header(floppy_image *floppy, UINT64 size,
+static int coco_jvc_decode_header(floppy_image_legacy *floppy, UINT64 size,
 	struct basicdsk_geometry *geometry)
 {
 	UINT8 header[256];
@@ -294,7 +294,7 @@ static FLOPPY_CONSTRUCT(coco_jvc_construct)
  * $3F      1       value $02     LSN for start of this directory
  * ----------------------------------------------------------------------- */
 
-static floperr_t coco_os9_readheader(floppy_image *floppy, struct basicdsk_geometry *geometry)
+static floperr_t coco_os9_readheader(floppy_image_legacy *floppy, struct basicdsk_geometry *geometry)
 {
 	UINT8 header[0x20];
 	int total_sectors;
@@ -322,7 +322,7 @@ static floperr_t coco_os9_readheader(floppy_image *floppy, struct basicdsk_geome
 
 
 
-static floperr_t coco_os9_post_format(floppy_image *floppy, option_resolution *params)
+static floperr_t coco_os9_post_format(floppy_image_legacy *floppy, option_resolution *params)
 {
 	UINT8 header[0x0400];
 	floperr_t err;
@@ -484,7 +484,7 @@ static FLOPPY_CONSTRUCT(coco_os9_construct)
 
 
 
-static int coco_vdk_decode_header(floppy_image *floppy, struct basicdsk_geometry *geometry)
+static int coco_vdk_decode_header(floppy_image_legacy *floppy, struct basicdsk_geometry *geometry)
 {
 	UINT8 header[12];
 	int heads, tracks, sectors, sector_length, offset;
@@ -633,13 +633,13 @@ struct dmk_tag
 #define dmk_idam_set_crc(x, crc)	(x)[5] = ((crc) >> 8); (x)[6] = ((crc) >> 0);
 
 
-static struct dmk_tag *get_dmk_tag(floppy_image *floppy)
+static struct dmk_tag *get_dmk_tag(floppy_image_legacy *floppy)
 {
 	return (dmk_tag *)floppy_tag(floppy);
 }
 
 
-static floperr_t coco_dmk_get_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
+static floperr_t coco_dmk_get_offset(floppy_image_legacy *floppy, int head, int track, UINT64 *offset)
 {
 	struct dmk_tag *tag = get_dmk_tag(floppy);
 
@@ -665,7 +665,7 @@ static UINT32 coco_dmk_min_track_size(int sectors, int sector_length)
 
 
 
-static floperr_t coco_dmk_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t coco_dmk_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT64 track_offset;
@@ -680,7 +680,7 @@ static floperr_t coco_dmk_read_track(floppy_image *floppy, int head, int track, 
 
 
 
-static floperr_t coco_dmk_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+static floperr_t coco_dmk_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT64 track_offset;
@@ -695,7 +695,7 @@ static floperr_t coco_dmk_write_track(floppy_image *floppy, int head, int track,
 
 
 
-static floperr_t coco_dmk_get_track_data_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
+static floperr_t coco_dmk_get_track_data_offset(floppy_image_legacy *floppy, int head, int track, UINT64 *offset)
 {
 	*offset = DMK_TOC_LEN + 1;
 	return FLOPPY_ERROR_SUCCESS;
@@ -703,7 +703,7 @@ static floperr_t coco_dmk_get_track_data_offset(floppy_image *floppy, int head, 
 
 
 
-static floperr_t coco_dmk_format_track(floppy_image *floppy, int head, int track, option_resolution *params)
+static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params)
 {
 	int sectors;
 	int sector_length;
@@ -843,28 +843,28 @@ done:
 
 
 
-static int coco_dmk_get_heads_per_disk(floppy_image *floppy)
+static int coco_dmk_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_dmk_tag(floppy)->heads;
 }
 
 
 
-static int coco_dmk_get_tracks_per_disk(floppy_image *floppy)
+static int coco_dmk_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return get_dmk_tag(floppy)->tracks;
 }
 
 
 
-static UINT32 coco_dmk_get_track_size(floppy_image *floppy, int head, int track)
+static UINT32 coco_dmk_get_track_size(floppy_image_legacy *floppy, int head, int track)
 {
 	return get_dmk_tag(floppy)->track_size;
 }
 
 
 
-static floperr_t coco_dmk_seek_sector_in_track(floppy_image *floppy, int head, int track, int sector, int sector_is_index, int dirtify, UINT8 **sector_data, UINT32 *sector_length)
+static floperr_t coco_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, int dirtify, UINT8 **sector_data, UINT32 *sector_length)
 {
 	struct dmk_tag *tag = get_dmk_tag(floppy);
 	floperr_t err;
@@ -962,14 +962,14 @@ static floperr_t coco_dmk_seek_sector_in_track(floppy_image *floppy, int head, i
 
 
 
-static floperr_t coco_dmk_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t coco_dmk_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	return coco_dmk_seek_sector_in_track(floppy, head, track, sector, FALSE, FALSE, NULL, sector_length);
 }
 
 
 
-static floperr_t coco_dmk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t coco_dmk_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	floperr_t err;
 	UINT32 idam_offset;
@@ -1008,7 +1008,7 @@ static floperr_t coco_dmk_get_indexed_sector_info(floppy_image *floppy, int head
 
 
 
-static floperr_t internal_coco_dmk_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_coco_dmk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT32 sector_length;
@@ -1035,7 +1035,7 @@ static floperr_t internal_coco_dmk_read_sector(floppy_image *floppy, int head, i
 
 
 
-static floperr_t internal_coco_dmk_write_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
+static floperr_t internal_coco_dmk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT32 sector_length;
@@ -1059,29 +1059,29 @@ static floperr_t internal_coco_dmk_write_sector(floppy_image *floppy, int head, 
 
 
 
-static floperr_t coco_dmk_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t coco_dmk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_coco_dmk_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t coco_dmk_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t coco_dmk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return internal_coco_dmk_write_sector(floppy, head, track, sector, FALSE, buffer, buflen, ddam);
 }
 
-static floperr_t coco_dmk_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t coco_dmk_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_coco_dmk_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t coco_dmk_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t coco_dmk_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return internal_coco_dmk_write_sector(floppy, head, track, sector, TRUE, buffer, buflen, ddam);
 }
 
 
 
-static void coco_dmk_interpret_header(floppy_image *floppy, int *heads, int *tracks, int *track_size)
+static void coco_dmk_interpret_header(floppy_image_legacy *floppy, int *heads, int *tracks, int *track_size)
 {
 	UINT8 header[DMK_HEADER_LEN];
 

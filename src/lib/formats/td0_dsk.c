@@ -55,7 +55,7 @@ struct tdlzhuf {
 
 struct td0dsk_t
 {
-	floppy_image *floppy_file;
+	floppy_image_legacy *floppy_file;
 	UINT64 floppy_file_offset;
 
 	struct tdlzhuf tdctl;
@@ -90,7 +90,7 @@ struct td0dsk_t
 static td0dsk_t td0dsk;
 
 
-static struct td0dsk_tag *get_tag(floppy_image *floppy)
+static struct td0dsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	struct td0dsk_tag *tag;
 	tag = (td0dsk_tag *)floppy_tag(floppy);
@@ -114,22 +114,22 @@ FLOPPY_IDENTIFY( td0_dsk_identify )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static int td0_get_heads_per_disk(floppy_image *floppy)
+static int td0_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->heads;
 }
 
-static int td0_get_tracks_per_disk(floppy_image *floppy)
+static int td0_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->tracks;
 }
 
-static UINT64 td0_get_track_offset(floppy_image *floppy, int head, int track)
+static UINT64 td0_get_track_offset(floppy_image_legacy *floppy, int head, int track)
 {
 	return get_tag(floppy)->track_offsets[(track<<1) + head];
 }
 
-static floperr_t get_offset(floppy_image *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
+static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
 {
 	UINT64 offs;
 	UINT8 *header;
@@ -176,7 +176,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 
 
 
-static floperr_t internal_td0_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_td0_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -261,17 +261,17 @@ static floperr_t internal_td0_read_sector(floppy_image *floppy, int head, int tr
 }
 
 
-static floperr_t td0_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t td0_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_td0_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t td0_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t td0_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_td0_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t td0_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t td0_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
 	err = get_offset(floppy, head, track, sector, FALSE, NULL);
@@ -284,7 +284,7 @@ static floperr_t td0_get_sector_length(floppy_image *floppy, int head, int track
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static floperr_t td0_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t td0_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	floperr_t retVal;
 	UINT64 offset;

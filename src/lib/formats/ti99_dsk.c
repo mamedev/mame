@@ -152,7 +152,7 @@ static int find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size
     Queried by flopdrv. Instead of the image tracks, we return the tracks
     of the floppy drive. We assume we always have two heads.
 */
-static int ti99_get_heads_per_disk(floppy_image *floppy)
+static int ti99_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 //  struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
 //  return tag->heads;
@@ -163,7 +163,7 @@ static int ti99_get_heads_per_disk(floppy_image *floppy)
     Queried by flopdrv. Instead of the image tracks, we return the tracks
     of the floppy drive.
 */
-static int ti99_get_tracks_per_disk(floppy_image *floppy)
+static int ti99_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	int drivetracks = 42;
 
@@ -176,7 +176,7 @@ static int ti99_get_tracks_per_disk(floppy_image *floppy)
 	return drivetracks;
 }
 
-static floperr_t ti99_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t ti99_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	*sector_length=SECTOR_SIZE;
 	return FLOPPY_ERROR_SUCCESS;
@@ -186,7 +186,7 @@ static floperr_t ti99_get_sector_length(floppy_image *floppy, int head, int trac
     Return the track size. We do not allow different track
     sizes, so we store the track size in the tag.
 */
-static UINT32 ti99_get_track_size(floppy_image *floppy, int head, int track)
+static UINT32 ti99_get_track_size(floppy_image_legacy *floppy, int head, int track)
 {
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
 	return tag->track_size;
@@ -239,8 +239,8 @@ static void create_vib(UINT8 *sector0, option_resolution *params)
              Sector dump format
    =========================================================================*/
 
-static floperr_t ti99_sdf_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen);
-static floperr_t ti99_sdf_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
+static floperr_t ti99_sdf_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen);
+static floperr_t ti99_sdf_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
 
 /* -----------------------------------------------------------------------
  * Guess the geometry of the sector dump disk.
@@ -270,7 +270,7 @@ static floperr_t ti99_sdf_write_sector(floppy_image *floppy, int head, int track
  * returns 100 if recognized, 0 if not recognized
  * ----------------------------------------------------------------------- */
 
-static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
+static int ti99_sdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	struct ti99dsk_geometry *geometry)
 {
 	int totsecs;
@@ -478,7 +478,7 @@ static void guess_interleave(int sectors, int *step, int *initial)
     Total length (FM)  = 247 + sectors*334; (sectors=8 or 9)
     Total length (MFM) = 752 + sectors*340; (sectors=16 or 18)
 */
-static floperr_t ti99_sdf_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t ti99_sdf_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	int sector;
 	int startstep;
@@ -621,7 +621,7 @@ static floperr_t ti99_sdf_read_track(floppy_image *floppy, int head, int track, 
     Bytes written to locations beyond the image end will be droppped
     silently (as if the medium is unwritable from that point).
 */
-static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+static floperr_t ti99_sdf_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	int current_pos = 0;
 	UINT8 *track_image;
@@ -763,7 +763,7 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
     sector 0 =
     sector 1 = 256* 0x00
 */
-/* static floperr_t ti99_sdf_format_track(floppy_image *floppy, int head, int track, option_resolution *params)
+/* static floperr_t ti99_sdf_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params)
 {
     UINT8 *sector0 = (UINT8*)malloc(SECTOR_SIZE);
     create_vib(sector0, params);
@@ -796,7 +796,7 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
     1-0
     Note that we take the imgtrack, which may be half of the drive track.
 */
-static floperr_t ti99_sdf_get_offset(floppy_image *floppy, int head, int imgtrack, int sector, UINT64 *offset)
+static floperr_t ti99_sdf_get_offset(floppy_image_legacy *floppy, int head, int imgtrack, int sector, UINT64 *offset)
 {
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
 
@@ -819,7 +819,7 @@ static floperr_t ti99_sdf_get_offset(floppy_image *floppy, int head, int imgtrac
 /*
     Read one sector at the specified position.
 */
-static floperr_t ti99_sdf_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t ti99_sdf_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT64 offset;
@@ -846,7 +846,7 @@ static floperr_t ti99_sdf_read_sector(floppy_image *floppy, int head, int track,
     starting with the lowest numbered sector in each track. In other words,
     we have nothing to calculate here.
 */
-static floperr_t ti99_sdf_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t ti99_sdf_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return ti99_sdf_read_sector(floppy, head, track, sector, buffer, buflen);
 }
@@ -854,7 +854,7 @@ static floperr_t ti99_sdf_read_indexed_sector(floppy_image *floppy, int head, in
 /*
     Write one sector at the specified position.
 */
-static floperr_t ti99_sdf_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t ti99_sdf_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -880,7 +880,7 @@ static floperr_t ti99_sdf_write_sector(floppy_image *floppy, int head, int track
 /*
     See above; indexing and numbering coincide.
 */
-static floperr_t ti99_sdf_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t ti99_sdf_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return ti99_sdf_write_sector(floppy, head, track, sector, buffer, buflen, ddam);
 }
@@ -888,7 +888,7 @@ static floperr_t ti99_sdf_write_indexed_sector(floppy_image *floppy, int head, i
 /*
     Required for ReadAddress command
 */
-static floperr_t ti99_sdf_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t ti99_sdf_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
 
@@ -1222,7 +1222,7 @@ static int read_byte(int format, int first_idam, UINT8 *track, int position)
 /*
     Determine the position of this track in the image.
 */
-static floperr_t ti99_tdf_get_offset(floppy_image *floppy, int head, int imgtrack, UINT64 *offset)
+static floperr_t ti99_tdf_get_offset(floppy_image_legacy *floppy, int head, int imgtrack, UINT64 *offset)
 {
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
 
@@ -1241,7 +1241,7 @@ static floperr_t ti99_tdf_get_offset(floppy_image *floppy, int head, int imgtrac
     the CRC if it is the "blank" CRC as F7F7.
     This method assumes that the track division be done already.
 */
-static floperr_t ti99_tdf_read_track_internal(floppy_image *floppy, int head, int imgtrack, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t ti99_tdf_read_track_internal(floppy_image_legacy *floppy, int head, int imgtrack, UINT64 offset, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT64 track_offset;
@@ -1300,7 +1300,7 @@ static floperr_t ti99_tdf_read_track_internal(floppy_image *floppy, int head, in
     Reads a track. We just copy the contents from the format, without
     changes.
 */
-static floperr_t ti99_tdf_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t ti99_tdf_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	int imgtrack = track;
 
@@ -1315,7 +1315,7 @@ static floperr_t ti99_tdf_read_track(floppy_image *floppy, int head, int track, 
 /*
     Writes a track.
 */
-static floperr_t ti99_tdf_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+static floperr_t ti99_tdf_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT64 track_offset;
@@ -1339,7 +1339,7 @@ static floperr_t ti99_tdf_write_track(floppy_image *floppy, int head, int track,
 }
 
 /*
-static floperr_t ti99_tdf_format_track(floppy_image *floppy, int head, int track, option_resolution *params)
+static floperr_t ti99_tdf_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params)
 {
     int sectors;
     int sector_length;
@@ -1364,7 +1364,7 @@ static floperr_t ti99_tdf_format_track(floppy_image *floppy, int head, int track
     distinguish them from ordinary data, as we do not store the clock), we
     do not attempt to detect IDAM or DAM.
 */
-static floperr_t ti99_tdf_seek_sector_in_track(floppy_image *floppy, int head, int track, int sector, UINT8 *track_data, UINT8 **sector_data)
+static floperr_t ti99_tdf_seek_sector_in_track(floppy_image_legacy *floppy, int head, int track, int sector, UINT8 *track_data, UINT8 **sector_data)
 {
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
 
@@ -1411,7 +1411,7 @@ static floperr_t ti99_tdf_seek_sector_in_track(floppy_image *floppy, int head, i
 	return FLOPPY_ERROR_SEEKERROR;
 }
 
-static floperr_t ti99_tdf_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t ti99_tdf_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT8 *sector_data;
@@ -1445,7 +1445,7 @@ static floperr_t ti99_tdf_read_sector(floppy_image *floppy, int head, int track,
     may be used instead of this method, according to the implementation
     of flopimg/flopdrv.
 */
-static floperr_t ti99_tdf_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t ti99_tdf_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT8 *sector_data;
@@ -1489,7 +1489,7 @@ static floperr_t ti99_tdf_write_sector(floppy_image *floppy, int head, int track
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static floperr_t ti99_tdf_write_indexed_sector(floppy_image *floppy, int head, int track, int sector_index, const void *buffer, size_t buflen, int ddam)
+static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, const void *buffer, size_t buflen, int ddam)
 {
 	/* Read track, head */
 	int byte;
@@ -1594,7 +1594,7 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image *floppy, int head, i
 }
 
 
-static floperr_t ti99_tdf_find_indexed_sector(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, void *buffer, unsigned long *flags)
+static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, void *buffer, unsigned long *flags)
 {
 	/* Read track, head */
 	int byte = 0;
@@ -1699,12 +1699,12 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image *floppy, int head, in
     sector (and so on) from the track, not sector 1, 2, 3. That is, the
     returned sector info depends on the interleave and the start sector.
 */
-static floperr_t ti99_tdf_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t ti99_tdf_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	return ti99_tdf_find_indexed_sector(floppy, head, track, sector_index, cylinder, side, sector, sector_length, NULL, flags);
 }
 
-static floperr_t ti99_tdf_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t ti99_tdf_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return ti99_tdf_find_indexed_sector(floppy, head, track, sector, (int*)NULL, (int*)NULL, (int*)NULL, (UINT32*)NULL, buffer, (unsigned long*)NULL);
 }
@@ -1739,7 +1739,7 @@ static floperr_t ti99_tdf_read_indexed_sector(floppy_image *floppy, int head, in
      DSDD80 = 1099520
      DSHD80 = 2078720
 */
-static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
+static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	struct ti99dsk_geometry *geometry)
 {
 	int idamcnt, state, track, head, i, totalseclen = 0, format = 0, byte, tracklength, trackadd = 0;

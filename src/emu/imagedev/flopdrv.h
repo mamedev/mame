@@ -128,7 +128,7 @@ void floppy_drive_set_rpm(device_t *image, float rpm);
 
 void floppy_drive_set_controller(device_t *img, device_t *controller);
 
-floppy_image *flopimg_get_image(device_t *image);
+floppy_image_legacy *flopimg_get_image(device_t *image);
 
 /* hack for apple II; replace this when we think of something better */
 void floppy_install_unload_proc(device_t *image, void (*proc)(device_image_interface &image));

@@ -208,7 +208,7 @@ static const UINT8 blk3[] =
 
 
 
-static struct apple35_tag *get_apple35_tag(floppy_image *floppy)
+static struct apple35_tag *get_apple35_tag(floppy_image_legacy *floppy)
 {
 	struct apple35_tag *tag;
 	tag = (struct apple35_tag *) floppy_tag(floppy);
@@ -217,7 +217,7 @@ static struct apple35_tag *get_apple35_tag(floppy_image *floppy)
 
 
 
-int apple35_sectors_per_track(floppy_image *image, int track)
+int apple35_sectors_per_track(floppy_image_legacy *image, int track)
 {
 	int sectors;
 
@@ -440,7 +440,7 @@ UINT8 sony_fetchtrack(const UINT8 *buffer, size_t buffer_len, size_t *pos)
 
 
 
-static UINT32 apple35_get_offset(floppy_image *floppy, int head, int track, int sector, UINT32 *tag_offset)
+static UINT32 apple35_get_offset(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *tag_offset)
 {
 	int i;
 	UINT32 sector_index = 0;
@@ -473,7 +473,7 @@ static UINT32 apple35_get_offset(floppy_image *floppy, int head, int track, int 
 
 
 
-static floperr_t apple35_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t apple35_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	UINT32 data_offset;
 //  printf("Read sector: T %d S %d H %d\n", track, sector, head);
@@ -486,7 +486,7 @@ static floperr_t apple35_read_sector(floppy_image *floppy, int head, int track, 
 
 
 
-static floperr_t apple35_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t apple35_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	UINT32 data_offset;
 
@@ -499,7 +499,7 @@ static floperr_t apple35_write_sector(floppy_image *floppy, int head, int track,
 
 
 
-static floperr_t apple35_read_sector_td(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t apple35_read_sector_td(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT32 tag_offset = 0;
@@ -524,7 +524,7 @@ static floperr_t apple35_read_sector_td(floppy_image *floppy, int head, int trac
 
 
 
-static floperr_t apple35_write_sector_td(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t apple35_write_sector_td(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT32 tag_offset = 0;
@@ -546,7 +546,7 @@ static floperr_t apple35_write_sector_td(floppy_image *floppy, int head, int tra
 
 
 
-static floperr_t apple35_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t apple35_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	*sector_length = 512;
 	return FLOPPY_ERROR_SUCCESS;
@@ -554,21 +554,21 @@ static floperr_t apple35_get_sector_length(floppy_image *floppy, int head, int t
 
 
 
-static int apple35_get_heads_per_disk(floppy_image *floppy)
+static int apple35_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_apple35_tag(floppy)->sides;
 }
 
 
 
-static int apple35_get_tracks_per_disk(floppy_image *floppy)
+static int apple35_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return 80;
 }
 
 
 
-static UINT32 apple35_get_track_size(floppy_image *floppy, int head, int track)
+static UINT32 apple35_get_track_size(floppy_image_legacy *floppy, int head, int track)
 {
 	if ((track < 0) || (track >= 80))
 		return 0;
@@ -588,7 +588,7 @@ static UINT8 calculate_side(int head, int track)
 
 
 
-static floperr_t apple35_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	size_t pos = 0;
@@ -648,7 +648,7 @@ static floperr_t apple35_read_track(floppy_image *floppy, int head, int track, U
 
 
 
-static floperr_t apple35_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	floperr_t err;
 	size_t pos = 0;
@@ -771,7 +771,7 @@ static floperr_t apple35_write_track(floppy_image *floppy, int head, int track, 
 
 
 
-static floperr_t apple35_construct(floppy_image *floppy, UINT32 data_offset, UINT32 data_size,
+static floperr_t apple35_construct(floppy_image_legacy *floppy, UINT32 data_offset, UINT32 data_size,
 	UINT32 tag_offset, UINT32 tag_size, INT16 format_byte, UINT8 sides, int is_1440k)
 {
 	struct apple35_tag *tag;
@@ -889,7 +889,7 @@ struct header_diskcopy
 
 
 
-static floperr_t apple35_diskcopy_headerdecode(floppy_image *floppy, UINT32 *data_offset,
+static floperr_t apple35_diskcopy_headerdecode(floppy_image_legacy *floppy, UINT32 *data_offset,
 	UINT32 *data_size, UINT32 *tag_offset, UINT32 *tag_size, UINT8 *format_byte, UINT8 *sides)
 {
 	UINT64 size;
@@ -1032,7 +1032,7 @@ struct header_2img
 
 
 
-static floperr_t apple35_2img_decode(floppy_image *floppy, UINT32 *image_format,
+static floperr_t apple35_2img_decode(floppy_image_legacy *floppy, UINT32 *image_format,
 	UINT32 *data_offset, UINT32 *data_length)
 {
 	struct header_2img header;

@@ -658,7 +658,7 @@ static void wd17xx_command_restore(device_t *device)
 static void write_track(device_t *device)
 {
 	wd1770_state *w = get_safe_token(device);
-	floppy_image *floppy;
+	floppy_image_legacy *floppy;
 #if 0
 	int i;
 	for (i=0;i+4<w->data_offset;)
@@ -719,7 +719,7 @@ static void write_track(device_t *device)
 static void read_track(device_t *device)
 {
 	wd1770_state *w = get_safe_token(device);
-	floppy_image *floppy;
+	floppy_image_legacy *floppy;
 #if 0
 	UINT8 *psrc;		/* pointer to track format structure */
 	UINT8 *pdst;		/* pointer to track buffer */

@@ -26,7 +26,7 @@ struct cqmdsk_tag
 };
 
 
-static struct cqmdsk_tag *get_tag(floppy_image *floppy)
+static struct cqmdsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	struct cqmdsk_tag *tag;
 	tag = (cqmdsk_tag *)floppy_tag(floppy );
@@ -48,22 +48,22 @@ FLOPPY_IDENTIFY( cqm_dsk_identify )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static int cqm_get_heads_per_disk(floppy_image *floppy)
+static int cqm_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->heads;
 }
 
-static int cqm_get_tracks_per_disk(floppy_image *floppy)
+static int cqm_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return get_tag(floppy)->tracks;
 }
 
-static UINT64 cqm_get_track_offset(floppy_image *floppy, int head, int track)
+static UINT64 cqm_get_track_offset(floppy_image_legacy *floppy, int head, int track)
 {
 	return get_tag(floppy)->track_offsets[(track<<1) + head];
 }
 
-static floperr_t get_offset(floppy_image *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
+static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
 {
 	UINT64 pos = 0;
 	UINT8 data;
@@ -98,7 +98,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 
 
 
-static floperr_t internal_cqm_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_cqm_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	UINT64 offset;
 	floperr_t err;
@@ -112,17 +112,17 @@ static floperr_t internal_cqm_read_sector(floppy_image *floppy, int head, int tr
 }
 
 
-static floperr_t cqm_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t cqm_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_cqm_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t cqm_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t cqm_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_cqm_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t cqm_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t cqm_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
 	err = get_offset(floppy, head, track, sector, FALSE, NULL);
@@ -135,7 +135,7 @@ static floperr_t cqm_get_sector_length(floppy_image *floppy, int head, int track
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-static floperr_t cqm_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t cqm_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	if (sector_index >= get_tag(floppy)->sector_per_track) return FLOPPY_ERROR_SEEKERROR;
 

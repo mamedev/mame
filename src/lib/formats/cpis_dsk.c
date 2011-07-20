@@ -12,7 +12,7 @@
 #include "formats/basicdsk.h"
 
 
-static int compis_get_tracks_and_sectors(floppy_image *floppy, int *tracks, int *sectors)
+static int compis_get_tracks_and_sectors(floppy_image_legacy *floppy, int *tracks, int *sectors)
 {
 	switch(floppy_image_size(floppy)) {
 	case 0x50000:	/* 320 KB */

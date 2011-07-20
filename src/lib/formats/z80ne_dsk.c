@@ -92,13 +92,13 @@ static const char needle_deleted_data_fa[] = "\x00\x00\x00\x00\x00\x00\x00\x00\x
 static const char needle_deleted_data_f8[] = "\x00\x00\x00\x00\x00\x00\x00\x00\xF8\xF8";
 
 
-static struct dmk_tag *get_dmk_tag(floppy_image *floppy)
+static struct dmk_tag *get_dmk_tag(floppy_image_legacy *floppy)
 {
 	return (dmk_tag *)floppy_tag(floppy);
 }
 
 
-static floperr_t z80ne_dmk_get_track_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
+static floperr_t z80ne_dmk_get_track_offset(floppy_image_legacy *floppy, int head, int track, UINT64 *offset)
 {
 	struct dmk_tag *tag = get_dmk_tag(floppy);
 
@@ -123,7 +123,7 @@ static UINT32 z80ne_dmk_min_track_size(int sectors, int sector_length)
 
 
 
-static floperr_t z80ne_dmk_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
+static floperr_t z80ne_dmk_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT64 track_offset;
@@ -138,7 +138,7 @@ static floperr_t z80ne_dmk_read_track(floppy_image *floppy, int head, int track,
 
 
 
-static floperr_t z80ne_dmk_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
+static floperr_t z80ne_dmk_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT64 track_offset;
@@ -153,14 +153,14 @@ static floperr_t z80ne_dmk_write_track(floppy_image *floppy, int head, int track
 
 
 
-static floperr_t z80ne_dmk_get_track_data_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
+static floperr_t z80ne_dmk_get_track_data_offset(floppy_image_legacy *floppy, int head, int track, UINT64 *offset)
 {
 	*offset = DMK_TOC_LEN + 1;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
 
-static floperr_t z80ne_dmk_format_track(floppy_image *floppy, int head, int track, option_resolution *params)
+static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params)
 {
 	int sectors;
 	int sector_length;
@@ -338,21 +338,21 @@ done:
 
 
 
-static int z80ne_dmk_get_heads_per_disk(floppy_image *floppy)
+static int z80ne_dmk_get_heads_per_disk(floppy_image_legacy *floppy)
 {
 	return get_dmk_tag(floppy)->heads;
 }
 
 
 
-static int z80ne_dmk_get_tracks_per_disk(floppy_image *floppy)
+static int z80ne_dmk_get_tracks_per_disk(floppy_image_legacy *floppy)
 {
 	return get_dmk_tag(floppy)->tracks;
 }
 
 
 
-static UINT32 z80ne_dmk_get_track_size(floppy_image *floppy, int head, int track)
+static UINT32 z80ne_dmk_get_track_size(floppy_image_legacy *floppy, int head, int track)
 {
 	return get_dmk_tag(floppy)->track_size;
 }
@@ -381,7 +381,7 @@ static UINT8 * my_memmem(UINT8 *haystack, size_t haystacklen,
 
 
 
-static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image *floppy, int head, int track, int sector, int sector_is_index, int dirtify, UINT8 **sector_data, UINT32 *sector_length)
+static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, int dirtify, UINT8 **sector_data, UINT32 *sector_length)
 {
 	struct dmk_tag *tag = get_dmk_tag(floppy);
 	floperr_t err;
@@ -521,14 +521,14 @@ done:
 
 
 
-static floperr_t z80ne_dmk_get_sector_length(floppy_image *floppy, int head, int track, int sector, UINT32 *sector_length)
+static floperr_t z80ne_dmk_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	return z80ne_dmk_seek_sector_in_track(floppy, head, track, sector, FALSE, FALSE, NULL, sector_length);
 }
 
 
 
-static floperr_t z80ne_dmk_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+static floperr_t z80ne_dmk_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	floperr_t err;
 	size_t idam_offset;
@@ -580,7 +580,7 @@ static floperr_t z80ne_dmk_get_indexed_sector_info(floppy_image *floppy, int hea
 
 
 
-static floperr_t internal_z80ne_dmk_read_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_z80ne_dmk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
 {
 	floperr_t err;
 	UINT32 sector_length;
@@ -636,7 +636,7 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image *floppy, int head, 
 
 
 
-static floperr_t internal_z80ne_dmk_write_sector(floppy_image *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
+static floperr_t internal_z80ne_dmk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
 {
 	floperr_t err;
 	UINT32 sector_length;
@@ -693,29 +693,29 @@ static floperr_t internal_z80ne_dmk_write_sector(floppy_image *floppy, int head,
 
 
 
-static floperr_t z80ne_dmk_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t z80ne_dmk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_z80ne_dmk_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
 }
 
-static floperr_t z80ne_dmk_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t z80ne_dmk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return internal_z80ne_dmk_write_sector(floppy, head, track, sector, FALSE, buffer, buflen, ddam);
 }
 
-static floperr_t z80ne_dmk_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+static floperr_t z80ne_dmk_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_z80ne_dmk_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
 }
 
-static floperr_t z80ne_dmk_write_indexed_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
+static floperr_t z80ne_dmk_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
 	return internal_z80ne_dmk_write_sector(floppy, head, track, sector, TRUE, buffer, buflen, ddam);
 }
 
 
 
-static void z80ne_dmk_interpret_header(floppy_image *floppy, int *heads, int *tracks, int * sectors, int *track_size)
+static void z80ne_dmk_interpret_header(floppy_image_legacy *floppy, int *heads, int *tracks, int * sectors, int *track_size)
 {
 	UINT8 header[DMK_HEADER_LEN + DMK_TOC_LEN];
 	int i;
