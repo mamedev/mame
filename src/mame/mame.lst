@@ -11094,7 +11094,6 @@ m4sayno		// Say No More (Barcrest)
 m4showtm	// Show Timer (Barcrest) 
 m4shocm		// Showcase Crystal Maze (Barcrest) 
 m4shodf		// Showcase Duty Free (Barcrest) 
-m4silvlt	// Silver Lights (Barcrest) 
 m4silnud	// Silver Nudger (Barcrest) 
 m4silshd	// Silver Shadow (Barcrest) 
 m4sgrab		// Smash 'n' Grab (Barcrest) 
@@ -11150,7 +11149,6 @@ m421		// Twenty One (Barcrest)
 m4twilgt	// Twilight (Barcrest) 
 m4twintm	// Twin Timer (Barcrest) 
 m4twist		// Twist Again (Barcrest) 
-m4twistt	// Twist Trail (Barcrest) 
 m4univ		// Universe (Barcrest) 
 m4uuaw		// Up Up & Away (Barcrest) 
 m4vegast	// Vegas Strip (Barcrest) 
@@ -11168,9 +11166,8 @@ m4wildms	// Wild Mystery (Barcrest)
 m4wildtm	// Wild Timer (Barcrest) 
 m4wta		// Winner Takes All (Barcrest) 
 m4ch30		// Unknown MPU4 'CH30' (Barcrest) 
-m4sb5		// Unknown MPU4 'sb5pcz' (Barcrest) 
-m4stc		// Unknown MPU4 'stc01s' (Barcrest) 
-m4tov2		// Unknown MPU4 'tov2' (Barcrest) 
+m4sb5		// Unknown MPU4 'BSB 0.3' (Barcrest) 
+m4stc		// Unknown MPU4 'STC 0.1' (Barcrest) 
 
 
 
@@ -11373,6 +11370,7 @@ v4bios		// MPU4 Video Firmware
 v4cmaze		// The Crystal Maze (v1.3)
 v4cmazed	// 
 v4cmazea	//
+v4cmazeb	//
 v4cmaze2	// The New Crystal Maze Featuring Ocean Zone
 v4cmaze2d	//
 v4cmaze2a	//
@@ -11399,7 +11397,8 @@ v4barqst	// Barquest (v2.6d)
 v4barqs2	// Barquest 2 (v0.3)
 v4wize		// Wize Move (v1.3d)
 v4wizea		// Wize Move
-
+v4opt3		// Option 3
+v4opt3d		//
 
 /* Bwb */
 

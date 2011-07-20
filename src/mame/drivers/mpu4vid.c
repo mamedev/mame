@@ -2907,6 +2907,15 @@ static DRIVER_INIT( v4wize )
 	mpu4vid_char_cheat(machine,0x16c);
 }
 
+static DRIVER_INIT( v4cmazeb )
+{
+	mpu4vid_char_cheat(machine,0x4c6);
+}
+
+static DRIVER_INIT( v4opt3 )
+{	   
+	mpu4vid_char_cheat(machine,0x164);
+}
 
 ROM_START( v4dealem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
@@ -3017,6 +3026,8 @@ ROM_START( v4reno )
 
 ROM_END
 
+
+
 ROM_START( v4redhtp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("rp_20s__.3_0",  0x00000, 0x10000,  CRC(b7d02d22) SHA1(f9da1c6dde064bc39d0c48a165dac7acde933397))
@@ -3080,6 +3091,23 @@ ROM_START( v4cmazea )
 	ROM_LOAD16_BYTE( "am1g.p6",  0x300001, 0x80000,  CRC(a6b498ad) SHA1(117e1a4ec7e2d3c7d530c5a56cbc1d24b0ddc747) )
 	ROM_LOAD16_BYTE( "am1g.p7",  0x400000, 0x80000,  CRC(15882699) SHA1(b29a331e51a37554323b91330a7c2b62b33a943a) )
 	ROM_LOAD16_BYTE( "am1g.p8",  0x400001, 0x80000,  CRC(6f0f855b) SHA1(ab411d1af0f88049a6c435bafd4b1fa63f5519b1) )
+ROM_END
+
+ROM_START( v4cmazeb ) /* Was in a romset called 'Mad Money!' */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "cm1.2p1", 0x000000, 0x040000, CRC(481f2fe2) SHA1(7bff9476dbd8c0812a51cd648acf11ca42789e54) )
+	ROM_LOAD16_BYTE( "cm1.2p2", 0x000001, 0x040000, CRC(6e6dc121) SHA1(05b29ea935d54aa97279e0a80265412747a92a10) )
+	ROM_LOAD16_BYTE( "cry.p3",  0x100000, 0x80000,  CRC(e8cf8203) SHA1(e9f42e5c18b97807f51284ad2416346578ed73c4) )
+	ROM_LOAD16_BYTE( "cry.p4",  0x100001, 0x80000,  CRC(7b036151) SHA1(7b0040c296059b1e1798ddedf0ecb4582d67ee70) )
+	ROM_LOAD16_BYTE( "cry.p5",  0x200000, 0x80000,  CRC(48f17b20) SHA1(711c46fcfd86ded8ff7da883188d70560d20e42f) )
+	ROM_LOAD16_BYTE( "cry.p6",  0x200001, 0x80000,  CRC(2b3d9a97) SHA1(7468fffd90d840d245a70475b42308f1e48c5017) )
+	ROM_LOAD16_BYTE( "cry.p7",  0x300000, 0x80000,  CRC(20f73433) SHA1(593b40ac17591ac312ad41b4d3a5772626137bba) )
+	ROM_LOAD16_BYTE( "cry.p8",  0x300001, 0x80000,  CRC(835da1f2) SHA1(f93e075916d370466832871410591570ad7b9f3b) )
+	ROM_LOAD16_BYTE( "cry.p9",  0x400000, 0x80000,  CRC(c0e442ee) SHA1(a3877b200538642fe2bc96cfe8b33f04d8a82a98) )
+	ROM_LOAD16_BYTE( "cry.p10", 0x400001, 0x80000,  CRC(500172fa) SHA1(d83a37612daa79ba8425fdb28f39b8324b5736b6) )	
 ROM_END
 
 //The New Crystal Maze Featuring Ocean Zone
@@ -3517,6 +3545,43 @@ ROM_START( v4wizea )
 ROM_END
 
 
+
+
+ROM_START( v4opt3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "o3-s.p1",0x000000, 0x020000, CRC(9b825fa1) SHA1(c743bed32fa1af934f9610204a4f4062cfb85193) )
+	ROM_LOAD16_BYTE( "o3-.p2", 0x000001, 0x020000, CRC(9545a845) SHA1(24c6656c137baf74c8ea5d930220bf0d0c90b3ab) )
+	ROM_LOAD16_BYTE( "o3-.p3", 0x040000, 0x020000, CRC(2f3666cb) SHA1(94010eb56de7f3900fbe1c0b77a43752f9cf3ba6) )
+	ROM_LOAD16_BYTE( "o3-.p4", 0x040001, 0x020000, CRC(63b6aa70) SHA1(6f0bef67437caa150ee98f0349d0f6412665e36b) )
+	ROM_LOAD16_BYTE( "o3-.p5", 0x080000, 0x020000, CRC(750db328) SHA1(8442b32e2f70ba2e0849d994a1e2502634652c5e) )
+	ROM_LOAD16_BYTE( "o3-.p6", 0x080001, 0x020000, CRC(1fed469e) SHA1(351a8cd687c0e11300c498e45e4b6f3a35940615) )
+	ROM_LOAD16_BYTE( "o3-.p7", 0x0c0000, 0x020000, CRC(400e304f) SHA1(3abe30cf75990a5ce9066ccd4cfed680e5d4963c) )
+	ROM_LOAD16_BYTE( "o3-.p8", 0x0c0001, 0x020000, CRC(0fb22311) SHA1(2329520d4ce763ba10cc81314711d28b4a5fb192) )
+	ROM_LOAD16_BYTE( "o3-.p9", 0x100000, 0x020000, CRC(0d71b620) SHA1(103cf5700c876e94e2ca3b63ef71b768bd2d99a2) )
+	ROM_LOAD16_BYTE( "o3-.p10",0x100001, 0x020000, CRC(239fa03b) SHA1(c4c77ded07481746b041122a8538036a65a5abe6) )
+ROM_END
+
+ROM_START( v4opt3d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "o3-d.p1",0x000000, 0x020000, CRC(09eef902) SHA1(2ce68fe08c5a1be7daaf3a380aa5f5fef8401944) )
+	ROM_LOAD16_BYTE( "o3-.p2", 0x000001, 0x020000, CRC(9545a845) SHA1(24c6656c137baf74c8ea5d930220bf0d0c90b3ab) )
+	ROM_LOAD16_BYTE( "o3-.p3", 0x040000, 0x020000, CRC(2f3666cb) SHA1(94010eb56de7f3900fbe1c0b77a43752f9cf3ba6) )
+	ROM_LOAD16_BYTE( "o3-.p4", 0x040001, 0x020000, CRC(63b6aa70) SHA1(6f0bef67437caa150ee98f0349d0f6412665e36b) )
+	ROM_LOAD16_BYTE( "o3-.p5", 0x080000, 0x020000, CRC(750db328) SHA1(8442b32e2f70ba2e0849d994a1e2502634652c5e) )
+	ROM_LOAD16_BYTE( "o3-.p6", 0x080001, 0x020000, CRC(1fed469e) SHA1(351a8cd687c0e11300c498e45e4b6f3a35940615) )
+	ROM_LOAD16_BYTE( "o3-.p7", 0x0c0000, 0x020000, CRC(400e304f) SHA1(3abe30cf75990a5ce9066ccd4cfed680e5d4963c) )
+	ROM_LOAD16_BYTE( "o3-.p8", 0x0c0001, 0x020000, CRC(0fb22311) SHA1(2329520d4ce763ba10cc81314711d28b4a5fb192) )
+	ROM_LOAD16_BYTE( "o3-.p9", 0x100000, 0x020000, CRC(0d71b620) SHA1(103cf5700c876e94e2ca3b63ef71b768bd2d99a2) )
+	ROM_LOAD16_BYTE( "o3-.p10",0x100001, 0x020000, CRC(239fa03b) SHA1(c4c77ded07481746b041122a8538036a65a5abe6) )
+ROM_END
+
+
 /*
 
 FRUIT FACTORY					ID=FF_
@@ -3684,6 +3749,7 @@ GAME(  199?,v4bios,		0,			mpu4mod2,	mpu4,		0,			ROT0, "Barcrest","MPU4 Video Fir
 GAMEL( 1993,v4cmaze,	v4bios,		crmaze,		crmaze,		crmaze,		ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993,v4cmazed,	v4cmaze,	crmaze,		crmaze,		crmaze,		ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9D
 GAMEL( 1993,v4cmazea,	v4cmaze,	crmaze,		crmaze,		crmazea,	ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993,v4cmazeb,	v4cmaze,	crmaze,		crmaze,		v4cmazeb,	ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9
 
 GAMEL( 1993,v4cmaze2,	v4bios,		crmaze,		crmaze,		crmaze2,	ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_NOT_WORKING,layout_crmaze4p )//SWP 1.0
 GAMEL( 1993,v4cmaze2d,	v4cmaze2,	crmaze,		crmaze,		crmaze2,	ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_NOT_WORKING,layout_crmaze4p )//SWP 1.0D
@@ -3726,6 +3792,10 @@ GAME(  199?,v4barqs2,	v4bios,  	mpu4_vid,	mpu4,		v4barqst2,	ROT0, "Barcrest","Ba
 GAME(  199?,v4wize,		v4bios,  	mpu4_vid,	mpu4,		v4wize,		ROT0, "Barcrest","Wize Move (v1.3d) (MPU4 Video)",GAME_NOT_WORKING )
 GAME(  199?,v4wizea,	v4bios,  	mpu4_vid,	mpu4,		v4wize,		ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_NOT_WORKING )
 
+GAME(  1991,v4opt3,		v4bios,  	mpu4_vid,	mpu4,		v4opt3,		ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  1991,v4opt3d,	v4opt3,  	mpu4_vid,	mpu4,		v4opt3,		ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_NOT_WORKING )
+
+
 
 
 /* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
@@ -3735,6 +3805,9 @@ GAME(  199?,v4psi,		0,			bwbvid,		mpu4,		prizeinv,	ROT0, "BwB","Prize Space Inva
 GAME(  199?,v4blox,		0,			bwbvid,		mpu4,		0,			ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_NOT_WORKING )
 GAME(  199?,v4bloxd,	v4blox,		bwbvid,		mpu4,		0,			ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_NOT_WORKING )
 GAME(  1996,v4reno,		0,			bwbvid5,	mpu4,		prizeinv,	ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_NOT_WORKING )
+
+
+
 GAME(  199?,v4redhtp,	0,			bwbvid,		mpu4,		0,			ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_NOT_WORKING )
 GAME(  199?,v4tetrs,	0,			bwbvid,		mpu4,		0,			ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_NOT_WORKING )
 
