@@ -50,7 +50,7 @@ Notes:
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( tetrisp2_systemregs_w )
+WRITE16_HANDLER( tetrisp2_systemregs_w )
 {
 	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_0_7)
@@ -223,14 +223,14 @@ static READ16_HANDLER( tetrisp2_ip_1_word_r )
 
 
 /* The game only ever writes even bytes and reads odd bytes */
-static READ16_HANDLER( tetrisp2_nvram_r )
+READ16_HANDLER( tetrisp2_nvram_r )
 {
 	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	return	( (state->m_nvram[offset] >> 8) & 0x00ff ) |
 			( (state->m_nvram[offset] << 8) & 0xff00 ) ;
 }
 
-static WRITE16_HANDLER( tetrisp2_nvram_w )
+WRITE16_HANDLER( tetrisp2_nvram_w )
 {
 	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	COMBINE_DATA(&state->m_nvram[offset]);

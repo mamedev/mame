@@ -39,6 +39,9 @@ public:
 	tilemap_t *m_tilemap_sub_rot;
 };
 
+WRITE16_HANDLER( tetrisp2_systemregs_w );
+READ16_HANDLER( tetrisp2_nvram_r );
+WRITE16_HANDLER( tetrisp2_nvram_w );
 
 /*----------- defined in video/tetrisp2.c -----------*/
 

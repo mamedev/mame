@@ -15,7 +15,7 @@
 
  TODO:
  - clearly derived from Tetris Plus 2 HW
- -
+ - NVRAM is unchecked
 
  */
 
@@ -24,6 +24,7 @@
 #include "rendlay.h"
 #include "stepstag.lh"
 #include "includes/tetrisp2.h"
+#include "machine/nvram.h"
 
 
 class stepstag_state : public tetrisp2_state
@@ -41,31 +42,6 @@ static READ16_HANDLER( stepstag_ip_1_word_r )
 			(      1 << (8 + (space->machine().rand()&1)) );
 }
 
-
-static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)			// Object RAM
-	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
-	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff)		// Priority
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_BASE_GENERIC(paletteram)		// Palette
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE_MEMBER(tetrisp2_state, m_vram_fg)	// Foreground
-	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE_MEMBER(tetrisp2_state, m_vram_bg)	// Background
-	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE_MEMBER(tetrisp2_state, m_vram_rot)	// Rotation
-	AM_RANGE(0xa50000, 0xa50001) AM_READNOP // ???
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE_MEMBER(tetrisp2_state, m_scroll_fg)						// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE_MEMBER(tetrisp2_state, m_scroll_bg)						// Background Scrolling
-	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE_MEMBER(tetrisp2_state, m_rotregs)						// Rotation Registers
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
-	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")										// Inputs
-	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(stepstag_ip_1_word_r)									// Inputs & protection
-	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")											// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READNOP //watchdog
-ADDRESS_MAP_END
-
 static READ16_HANDLER( unknown_read_0xc00000 )
 {
 	return space->machine().rand();
@@ -80,6 +56,37 @@ static READ16_HANDLER( unknown_read_0xffff00 )
 {
 	return space->machine().rand();
 }
+
+static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)			// Object RAM
+	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
+	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff)		// Priority
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_BASE_GENERIC(paletteram)		// Palette
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE_MEMBER(tetrisp2_state, m_vram_fg)	// Foreground
+	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE_MEMBER(tetrisp2_state, m_vram_bg)	// Background
+	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE_MEMBER(tetrisp2_state, m_vram_rot)	// Rotation
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE_MEMBER(tetrisp2_state, m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x904000, 0x907fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w)				// NVRAM (mirror)
+//	AM_RANGE(0xa00000, 0xa7ffff) AM_READ( unknown_read_0xc00000 ) // presumably comms with slave CPU
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP								// Coin Counter plus other things
+	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// protection related?
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE_MEMBER(tetrisp2_state, m_scroll_fg)						// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE_MEMBER(tetrisp2_state, m_scroll_bg)						// Background Scrolling
+	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE_MEMBER(tetrisp2_state, m_rotregs)						// Rotation Registers
+	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(tetrisp2_systemregs_w)								// system param
+	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
+	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")										// Inputs
+	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(stepstag_ip_1_word_r)									// Inputs & protection
+	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")											// Inputs
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READNOP //watchdog
+ADDRESS_MAP_END
+
+
 
 
 static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16 )
@@ -232,7 +239,8 @@ static MACHINE_CONFIG_START( stepstag, stepstag_state )
 	MCFG_CPU_ADD("sub", M68000, 16000000 ) //??
 	MCFG_CPU_PROGRAM_MAP(stepstag_sub_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold) // 4 & 6 valid
-	MCFG_DEVICE_DISABLE()
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("lscreen", RASTER)
