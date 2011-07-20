@@ -4173,6 +4173,9 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
+static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int iRP);
+
+
 static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 									 running_machine &machine,
 									 bitmap_t *roz_bitmap,
@@ -4579,7 +4582,8 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const
        Column Scroll     : Yes
        Mosaic            : Yes
     */
-	stv2_current_tilemap.enabled = STV_VDP2_N0ON;
+
+   	stv2_current_tilemap.enabled = STV_VDP2_N0ON | STV_VDP2_R1ON;
 
 //  if (!stv2_current_tilemap.enabled) return; // stop right now if its disabled ...
 
@@ -4631,7 +4635,7 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N0LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N0LZMX;
 
-	stv2_current_tilemap.plane_size = STV_VDP2_N0PLSZ;
+	stv2_current_tilemap.plane_size = (STV_VDP2_R1ON) ? STV_VDP2_RBPLSZ : STV_VDP2_N0PLSZ;
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N0CAOS;
 	stv2_current_tilemap.fade_control = (STV_VDP2_N0COEN * 1) | (STV_VDP2_N0COSL * 2);
 	stv_vdp2_check_fade_control_for_layer(machine);
@@ -4645,12 +4649,15 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const
 
 	stv2_current_tilemap.layer_name=0;
 
-	if ( stv2_current_tilemap.enabled )
+	if ( stv2_current_tilemap.enabled && (!(STV_VDP2_R1ON))) /* TODO: check cycle pattern for RBG1 */
 	{
 		stv2_current_tilemap.enabled = stv_vdp2_check_vram_cycle_pattern_registers( machine, STV_VDP2_CP_NBG0_PNMDR, STV_VDP2_CP_NBG0_CPDR, stv2_current_tilemap.bitmap_enable );
 	}
 
-	stv_vdp2_check_tilemap(machine, bitmap, cliprect);
+	if(STV_VDP2_R1ON)
+		stv_vdp2_draw_rotation_screen(machine, bitmap, cliprect, 2 );
+	else
+		stv_vdp2_check_tilemap(machine, bitmap, cliprect);
 }
 
 static void stv_vdp2_draw_NBG1(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -5043,7 +5050,6 @@ static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t *bi
 			break;
 		}
 	}
-
 
 	if ( stv_vdp2_is_rotation_applied() == 0 )
 	{
