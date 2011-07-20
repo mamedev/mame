@@ -11,6 +11,7 @@
   * Magic Card (set 1),        Impera, 199?.
   * Magic Card (set 2),        Impera, 199?.
   * Magic Card (set 3),        Impera, 199?.
+  * Magic Card Export 94,      Impera, 1994.
   * Magic Card Jackpot (4.01), Impera, 1998.
   * Magic Lotto Export (5.03), Impera, 1998.
 
@@ -772,6 +773,37 @@ ROM_START( magicardj )
 	ROM_LOAD("24c02c.ic26",	0x0000, 0x0100, CRC(b5c86862) SHA1(0debc0f7e7c506e5a4e2cae152548d80ad72fc2e) )
 ROM_END
 
+/*
+    Magic Card Export 94
+  International Ver. 2.11a
+Vnr.29.07.94    CHECKSUM: A63D
+
+
+
+1 x Philips SCC66470CAB 383610
+1 x Philips SCC68070 CCA84 347141
+1 x ESI1 I9631
+1 x MUSIC TR9C1710-11PCA SA121X/9617
+1 x YAMAHA YM2149F 9614
+
+XTAL:
+
+Q1: 19.6608 Mhz
+Q2: 30.000 Mhz
+Q3: 3686.400  1Q08/95
+*/
+
+ROM_START( magicarde )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
+
+	ROM_REGION( 0x0200, "pic16c54", 0 ) /* protected */
+	ROM_LOAD("pic16c54.ic29",	0x0000, 0x0200, BAD_DUMP CRC(73224200) SHA1(c9a1038146647430759d570bb5626047a476a05b) )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_LOAD("st24c02.ic26",	0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
+ROM_END
+
 ROM_START( magicle )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(73328346) SHA1(fca5f8a93f25377e659c2b291674d706ca37400e) )
@@ -806,5 +838,6 @@ static DRIVER_INIT( magicard )
 GAME( 199?, magicard,  0,        magicard, magicard, magicard, ROT0, "Impera", "Magic Card (set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 199?, magicarda, magicard, magicard, magicard, magicard, ROT0, "Impera", "Magic Card (set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 199?, magicardb, magicard, magicard, magicard, magicard, ROT0, "Impera", "Magic Card (set 3)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1994, magicarde, magicard, magicard, magicard, magicard, ROT0, "Impera", "Magic Card Export 94",      GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1998, magicardj, magicard, magicard, magicard, magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)", GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 2001, magicle,   0,        magicard, magicard, magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", GAME_NO_SOUND | GAME_NOT_WORKING )
