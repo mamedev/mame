@@ -213,5 +213,86 @@ UINT64 floppy_image_size(floppy_image_legacy *floppy);
 /* misc */
 const char *floppy_error(floperr_t err);
 
+//////////////////////////////////////////////////////////
+/// New implementation
+//////////////////////////////////////////////////////////
+
+class floppy_image;
+
+class floppy_image_format_t
+{
+public:
+	floppy_image_format_t(const char *name,const char *extensions,const char *description,const char *param_guidelines);
+	virtual ~floppy_image_format_t();
+	
+	virtual int identify(floppy_image *image);
+	
+protected:	
+	const char *m_name;
+	const char *m_extensions;
+	const char *m_description;
+	const char *m_param_guidelines;
+};
+
+
+// a device_type is simply a pointer to its alloc function
+typedef floppy_image_format_t *(*floppy_format_type)(const char *name,const char *extensions,const char *description,const char *param_guidelines);
+
+// this template function creates a stub which constructs a image format
+template<class _FormatClass>
+floppy_image_format_t *floppy_image_format_creator(const char *name,const char *extensions,const char *description,const char *param_guidelines)
+{
+	return new _FormatClass(name, extensions, description, param_guidelines);
+}
+
+struct floppy_format_def
+{
+	const char *name;
+	const char *extensions;
+	const char *description;
+	const floppy_format_type type;
+	const char *param_guidelines;
+};
+
+#define FLOPPY_OPTIONS_START(name)												\
+	const struct floppy_format_def floppyoptions_##name[] =								\
+	{																			\
+
+#define FLOPPY_OPTIONS_END0 \
+		{ NULL, NULL, NULL, NULL, NULL }							\
+	};
+
+#define FLOPPY_OPTIONS_EXTERN(name)												\
+	extern const struct floppy_format_def floppyoptions_##name[]							\
+
+#define FLOPPY_OPTION(name, extensions_, description_, type_, ranges_)\
+	{ #name, extensions_, description_, type_, ranges_ },				\
+
+#define FLOPPY_OPTIONS_END													\
+	FLOPPY_OPTIONS_END0
+	
+// ======================> floppy_image
+
+// class representing floppy image
+class floppy_image
+{
+public:
+	// construction/destruction
+	floppy_image(void *fp, const struct io_procs *procs,const struct floppy_format_def *formats);
+	virtual ~floppy_image();
+	
+	void image_read(void *buffer, UINT64 offset, size_t length);
+	void image_write(const void *buffer, UINT64 offset, size_t length);
+	void image_write_filler(UINT8 filler, UINT64 offset, size_t length);
+	UINT64 image_size();
+	void close();
+	
+	const struct floppy_format_def *identify();
+private:
+	void close_internal(bool close_file);
+	struct io_generic 		m_io;
+	const struct floppy_format_def *m_formats;
+};
+
 #endif /* FLOPIMG_H */
 

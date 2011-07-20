@@ -932,3 +932,88 @@ const char *floppy_error(floperr_t err)
 
 LEGACY_FLOPPY_OPTIONS_START(default)
 LEGACY_FLOPPY_OPTIONS_END
+
+
+//////////////////////////////////////////////////////////
+/// New implementation
+//////////////////////////////////////////////////////////
+
+floppy_image::floppy_image(void *fp, const struct io_procs *procs,const struct floppy_format_def *formats)
+{
+	m_io.file = fp;
+	m_io.procs = procs;
+	m_io.filler = 0xFF;
+	m_formats = formats;
+}
+
+floppy_image::~floppy_image()
+{
+	close();
+}
+
+void floppy_image::image_read(void *buffer, UINT64 offset, size_t length)
+{
+	io_generic_read(&m_io, buffer, offset, length);
+}
+
+void floppy_image::image_write(const void *buffer, UINT64 offset, size_t length)
+{
+	io_generic_write(&m_io, buffer, offset, length);
+}
+
+void floppy_image::image_write_filler(UINT8 filler, UINT64 offset, size_t length)
+{
+	io_generic_write_filler(&m_io, filler, offset, length);
+}
+
+UINT64 floppy_image::image_size()
+{
+	return io_generic_size(&m_io);
+}
+
+void floppy_image::close_internal(bool close_file)
+{
+	if (close_file)
+		io_generic_close(&m_io);
+}
+
+void floppy_image::close()
+{
+	close_internal(TRUE);
+}
+
+
+floppy_image_format_t::floppy_image_format_t(const char *name,const char *extensions,const char *description,const char *param_guidelines)
+{
+	m_name = name;
+	m_extensions = extensions;
+	m_description = description;
+	m_param_guidelines = param_guidelines;
+}
+floppy_image_format_t::~floppy_image_format_t()
+{
+}
+
+int floppy_image_format_t::identify(floppy_image *image)
+{
+	return 0;
+}
+
+const struct floppy_format_def *floppy_image::identify()
+{
+	const struct floppy_format_def *retVal = NULL;
+	int best_vote = 0;
+	
+	for (int i = 0; m_formats[i].type; i++)
+	{
+		floppy_image_format_t *t = (m_formats[i].type)(m_formats[i].name,m_formats[i].extensions,m_formats[i].description,m_formats[i].param_guidelines);
+		int vote = t->identify(this);
+		/* is this option a better one? */
+		if (vote > best_vote)
+		{
+			best_vote = vote;
+			retVal = &m_formats[i];
+		}
+	}
+	return retVal;
+}

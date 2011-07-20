@@ -152,6 +152,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/x1_tap.o		\
 	$(LIBOBJ)/formats/z80ne_dsk.o	\
 	$(LIBOBJ)/formats/zx81_p.o		\
+	$(LIBOBJ)/formats/hxcmfm_dsk.o	\
 
 $(OBJ)/libformats.a: $(FORMATSOBJS)
 
