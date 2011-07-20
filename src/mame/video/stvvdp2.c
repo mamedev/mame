@@ -2372,16 +2372,15 @@ static UINT8 stv_vdp2_check_vram_cycle_pattern_registers(
 
 INLINE UINT16 stv_add_blend(UINT16 a, UINT16 b)
 {
-	UINT16 _r = (a & 0x7c00) + (b & 0x7c00);
-	UINT16 _g = (a & 0x03e0) + (b & 0x03e0);
-	UINT16 _b = (a & 0x001f) + (b & 0x001f);
+	UINT16 _r = ((a & 0x7c00) >> 10) + ((b & 0x7c00) >> 10);
+	UINT16 _g = ((a & 0x03e0) >>  5) + ((b & 0x03e0) >>  5);
+	UINT16 _b = ((a & 0x001f) >>  0) + ((b & 0x001f) >>  0);
 
-	if ( _r > 0x7c00 ) _r = 0x7c00;
-	if ( _g > 0x03e0 ) _g = 0x03e0;
-	if ( _b > 0x001f ) _b = 0x001f;
+	if ( _r > 0x1f ) _r = 0x1f;
+	if ( _g > 0x1f ) _g = 0x1f;
+	if ( _b > 0x1f ) _b = 0x1f;
 
-	return _r | _g | _b;
-
+	return (_r<<10) | (_g<<5) | (_b<<0);
 }
 
 static void stv_vdp2_drawgfxzoom(
