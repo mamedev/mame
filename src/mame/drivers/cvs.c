@@ -1582,6 +1582,26 @@ ROM_START( raiders )
 	CVS_COMMON_ROMS
 ROM_END
 
+ROM_START( raid3 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "raid3gp5.bin", 0x0000, CRC(e169b71c) SHA1(4e8cc8ee3032ab5a7cfc1caba83f01d6a062d0ae) )
+	ROM_LOAD_STAGGERED( "raid3gp4.bin", 0x0400, CRC(9bf717ca) SHA1(7109232b7f72a325538fe6d25b8ef55747d1948d) )
+	ROM_LOAD_STAGGERED( "raid3gp3.bin", 0x0800, CRC(ac304782) SHA1(01597c2808d8e33bf9f6510fa9d7a5520eebf179) )
+	ROM_LOAD_STAGGERED( "raid3gp2.bin", 0x0c00, CRC(1c0fd350) SHA1(df7e64ad77755da4abdc66b08c470dff018d4592) )
+	ROM_LOAD_STAGGERED( "raid3gp1.bin", 0x1000, CRC(5ea24ebf) SHA1(96f9b1f26d8f35a1505cf4d45e5d960a9bb8fb74) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "raidr1-6.bin", 0x0000, 0x0800, CRC(6f827e49) SHA1(4fb272616b60fcd468ed4074b94125e30aa46fd3) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "raidr1-8.bin", 0x0800, CRC(b6b90d2e) SHA1(a966fa208b72aec358b7fb277e603e47b6984aa7) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_LOAD( "raid4-11.bin", 0x0000, 0x0800, CRC(5eb7143b) SHA1(a19e803c15593b37ae2e61789f6e16f319620a37) )
+	ROM_LOAD( "raid4-10.bin", 0x0800, 0x0800, CRC(391948a4) SHA1(7e20ad4f7e5bf7ad5dcb08ba6475313e2b8b1f03) )
+	ROM_LOAD( "raid4-9b.bin", 0x1000, 0x0800, CRC(fecfde80) SHA1(23ea63080b8292fb00a743743cdff1a7ad0a8c6d) )
+
+	CVS_COMMON_ROMS
+ROM_END
 
 
 /*************************************
@@ -1715,5 +1735,6 @@ GAME( 1983, hunchbak,  0,        cvs,     hunchbak, 0,        ROT90, "Century El
 GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, hunchbaka,ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, superbik,  0,        cvs,     superbik, superbik, ROT90, "Century Electronics", "Superbike", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, raiders,   0,        cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, raid3,     raiders,  cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders (Rev.3)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1984, hero,      0,        cvs,     hero,     hero,     ROT90, "Century Electronics / Seatongrove Ltd", "Hero", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
 GAME( 1984, huncholy,  0,        cvs,     huncholy, huncholy, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
