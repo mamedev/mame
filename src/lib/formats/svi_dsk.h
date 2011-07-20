@@ -13,6 +13,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(svi318);
+LEGACY_FLOPPY_OPTIONS_EXTERN(svi318);
 
 #endif /* SVI_DSK_H */

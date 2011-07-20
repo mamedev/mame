@@ -11,6 +11,6 @@
 
 #include "flopimg.h"
 
-FLOPPY_OPTIONS_EXTERN(vz);
+LEGACY_FLOPPY_OPTIONS_EXTERN(vz);
 
 #endif /* VT_DSK_H */

@@ -11,6 +11,6 @@
 
 #include "flopimg.h"
 
-FLOPPY_OPTIONS_EXTERN(nes_only);
+LEGACY_FLOPPY_OPTIONS_EXTERN(nes_only);
 
 #endif /*NES_DSK_H_*/

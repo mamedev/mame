@@ -2021,16 +2021,16 @@ static FLOPPY_CONSTRUCT(ti99_tdf_construct)
 
 /* ----------------------------------------------------------------------- */
 
-FLOPPY_OPTIONS_START( ti99 )
-	FLOPPY_OPTION( ti99_sdf, "dsk",			"TI99 sector dump (v9t9)",	ti99_sdf_identify,	ti99_sdf_construct, NULL,
+LEGACY_FLOPPY_OPTIONS_START( ti99 )
+	LEGACY_FLOPPY_OPTION( ti99_sdf, "dsk",			"TI99 sector dump (v9t9)",	ti99_sdf_identify,	ti99_sdf_construct, NULL,
 		HEADS([1]-2)
 		TRACKS(35-[40]-80)
 		SECTORS(8/9/16/[18]/36)
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID(0))
-	FLOPPY_OPTION( ti99_tdf, "dsk,dtk",			"TI99 track dump (pc99)",	ti99_tdf_identify,	ti99_tdf_construct, NULL,
+	LEGACY_FLOPPY_OPTION( ti99_tdf, "dsk,dtk",			"TI99 track dump (pc99)",	ti99_tdf_identify,	ti99_tdf_construct, NULL,
 		TRACKS(35-[40]-80)
 		SECTORS(8/9/16/[18]/36)
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID(0))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END

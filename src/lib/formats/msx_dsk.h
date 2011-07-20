@@ -13,6 +13,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(msx);
+LEGACY_FLOPPY_OPTIONS_EXTERN(msx);
 
 #endif /* MSX_DSK_H */

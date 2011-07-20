@@ -74,9 +74,9 @@ static FLOPPY_CONSTRUCT( atarist_st_construct )
     FLOPPY_CONSTRUCT(atarist_dsk_construct)
 -------------------------------------------------*/
 
-FLOPPY_OPTIONS_START( atarist )
-	FLOPPY_OPTION( atarist, "st", "Atari ST floppy disk image", atarist_st_identify, atarist_st_construct, NULL, NULL )
-/*  FLOPPY_OPTION( atarist, "stt", "Atari ST floppy disk image", atarist_stt_identify, atarist_stt_construct, NULL, NULL )
-    FLOPPY_OPTION( atarist, "msa", "Atari ST floppy disk image", atarist_msa_identify, atarist_msa_construct, NULL, NULL )
-    FLOPPY_OPTION( atarist, "dim", "Atari ST floppy disk image", atarist_dim_identify, atarist_dim_construct, NULL, NULL )*/
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_START( atarist )
+	LEGACY_FLOPPY_OPTION( atarist, "st", "Atari ST floppy disk image", atarist_st_identify, atarist_st_construct, NULL, NULL )
+/*  LEGACY_FLOPPY_OPTION( atarist, "stt", "Atari ST floppy disk image", atarist_stt_identify, atarist_stt_construct, NULL, NULL )
+    LEGACY_FLOPPY_OPTION( atarist, "msa", "Atari ST floppy disk image", atarist_msa_identify, atarist_msa_construct, NULL, NULL )
+    LEGACY_FLOPPY_OPTION( atarist, "dim", "Atari ST floppy disk image", atarist_dim_identify, atarist_dim_construct, NULL, NULL )*/
+LEGACY_FLOPPY_OPTIONS_END

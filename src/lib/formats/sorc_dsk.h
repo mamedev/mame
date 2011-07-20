@@ -13,6 +13,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(exidy);
+LEGACY_FLOPPY_OPTIONS_EXTERN(exidy);
 
 #endif /* EXI_DSK_H */

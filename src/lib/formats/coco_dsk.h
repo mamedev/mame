@@ -14,7 +14,7 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(coco);
+LEGACY_FLOPPY_OPTIONS_EXTERN(coco);
 
 FLOPPY_IDENTIFY(coco_dmk_identify);
 FLOPPY_CONSTRUCT(coco_dmk_construct);

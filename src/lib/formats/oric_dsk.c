@@ -305,12 +305,12 @@ static FLOPPY_CONSTRUCT(oric_dsk_construct)
 }
 /* ----------------------------------------------------------------------- */
 
-FLOPPY_OPTIONS_START( oric )
-	FLOPPY_OPTION( oricmfm, "dsk", "Oric MFM floppy disk image",	oric_dsk_identify, oric_dsk_construct, NULL, NULL)
-	FLOPPY_OPTION( oric, "dsk", "Oric disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+LEGACY_FLOPPY_OPTIONS_START( oric )
+	LEGACY_FLOPPY_OPTION( oricmfm, "dsk", "Oric MFM floppy disk image",	oric_dsk_identify, oric_dsk_construct, NULL, NULL)
+	LEGACY_FLOPPY_OPTION( oric, "dsk", "Oric disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END

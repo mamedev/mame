@@ -13,6 +13,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(comx35);
+LEGACY_FLOPPY_OPTIONS_EXTERN(comx35);
 
 #endif /* COMX35_DSK_H */

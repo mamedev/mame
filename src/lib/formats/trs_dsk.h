@@ -13,6 +13,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN( trs80 );
+LEGACY_FLOPPY_OPTIONS_EXTERN( trs80 );
 
 #endif /* TRS_DSK_H */

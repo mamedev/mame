@@ -11,6 +11,6 @@
 
 #include "flopimg.h"
 
-FLOPPY_OPTIONS_EXTERN(atari_only);
+LEGACY_FLOPPY_OPTIONS_EXTERN(atari_only);
 
 #endif /* ATARI_DSK_H */

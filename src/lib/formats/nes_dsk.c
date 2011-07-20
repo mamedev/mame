@@ -59,8 +59,8 @@ static FLOPPY_CONSTRUCT( nes_dsk_construct )
  NES floppy options
 *****************************************************************************/
 
-FLOPPY_OPTIONS_START( nes_only )
-	FLOPPY_OPTION(
+LEGACY_FLOPPY_OPTIONS_START( nes_only )
+	LEGACY_FLOPPY_OPTION(
 		fds_dsk,
 		"fds",
 		"NES floppy disk image",
@@ -69,4 +69,4 @@ FLOPPY_OPTIONS_START( nes_only )
 		NULL,
 		NULL
 	)
-FLOPPY_OPTIONS_END0
+LEGACY_FLOPPY_OPTIONS_END0

@@ -73,6 +73,6 @@ static FLOPPY_CONSTRUCT( comx35_dsk_construct )
     FLOPPY_OPTIONS( comx35 )
 -------------------------------------------------*/
 
-FLOPPY_OPTIONS_START( comx35 )
-	FLOPPY_OPTION( comx35, "img", "COMX35 floppy disk image", comx35_dsk_identify, comx35_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_START( comx35 )
+	LEGACY_FLOPPY_OPTION( comx35, "img", "COMX35 floppy disk image", comx35_dsk_identify, comx35_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END

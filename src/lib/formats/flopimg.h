@@ -113,32 +113,32 @@ FLOPPY_CONSTRUCT(d88_dsk_construct);
 FLOPPY_IDENTIFY(fdi_dsk_identify);
 FLOPPY_CONSTRUCT(fdi_dsk_construct);
 
-#define FLOPPY_OPTIONS_NAME(name)	floppyoptions_##name
+#define LEGACY_FLOPPY_OPTIONS_NAME(name)	floppyoptions_##name
 
-#define FLOPPY_OPTIONS_START(name)												\
+#define LEGACY_FLOPPY_OPTIONS_START(name)												\
 	const struct FloppyFormat floppyoptions_##name[] =								\
 	{																			\
 
-#define FLOPPY_OPTIONS_END0 \
+#define LEGACY_FLOPPY_OPTIONS_END0 \
 		{ NULL }							\
 	};
 
-#define FLOPPY_OPTIONS_EXTERN(name)												\
+#define LEGACY_FLOPPY_OPTIONS_EXTERN(name)												\
 	extern const struct FloppyFormat floppyoptions_##name[]							\
 
-#define FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, destruct_, ranges_)\
+#define LEGACY_FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, destruct_, ranges_)\
 	{ #name, extensions_, description_, identify_, construct_, destruct_, ranges_ },				\
 
-#define FLOPPY_OPTIONS_END														\
-		FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, NULL, NULL) \
-		FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image",	td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL) \
-		FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",	imd_dsk_identify, imd_dsk_construct, NULL, NULL) \
-		FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",	cqm_dsk_identify, cqm_dsk_construct, NULL, NULL) \
-		FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",	dsk_dsk_identify, dsk_dsk_construct, NULL, NULL) \
-		FLOPPY_OPTION( d88, "d77,d88,1dd", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL, NULL) \
-	FLOPPY_OPTIONS_END0
+#define LEGACY_FLOPPY_OPTIONS_END														\
+		LEGACY_FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image",	td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL) \
+		LEGACY_FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",	imd_dsk_identify, imd_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",	cqm_dsk_identify, cqm_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",	dsk_dsk_identify, dsk_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( d88, "d77,d88,1dd", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL, NULL) \
+	LEGACY_FLOPPY_OPTIONS_END0
 
-FLOPPY_OPTIONS_EXTERN(default);
+LEGACY_FLOPPY_OPTIONS_EXTERN(default);
 
 #define PARAM_END				'\0'
 #define PARAM_HEADS				'H'
@@ -212,7 +212,6 @@ UINT64 floppy_image_size(floppy_image_legacy *floppy);
 
 /* misc */
 const char *floppy_error(floperr_t err);
-
 
 #endif /* FLOPIMG_H */
 

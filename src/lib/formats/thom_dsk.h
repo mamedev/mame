@@ -9,6 +9,6 @@
    - .sap   one-side double-density 5"1/4, 3"1/2
 */
 
-FLOPPY_OPTIONS_EXTERN(thomson);
+LEGACY_FLOPPY_OPTIONS_EXTERN(thomson);
 
 #endif

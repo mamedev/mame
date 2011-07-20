@@ -12,7 +12,7 @@
 
 #include "flopimg.h"
 
-FLOPPY_OPTIONS_EXTERN(ti99);
+LEGACY_FLOPPY_OPTIONS_EXTERN(ti99);
 
 void ti99_set_80_track_drives(int use80);
 

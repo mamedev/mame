@@ -13,6 +13,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(oric);
+LEGACY_FLOPPY_OPTIONS_EXTERN(oric);
 
 #endif /* ORIC_DSK_H */

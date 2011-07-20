@@ -20,8 +20,8 @@ static FLOPPY_CONSTRUCT( vtech1_dsk_construct )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-FLOPPY_OPTIONS_START( vtech1_only )
-	FLOPPY_OPTION(
+LEGACY_FLOPPY_OPTIONS_START( vtech1_only )
+	LEGACY_FLOPPY_OPTION(
 		vtech1_dsk,
 		"dsk",
 		"Laser floppy disk image",
@@ -30,4 +30,4 @@ FLOPPY_OPTIONS_START( vtech1_only )
 		NULL,
 		NULL
 	)
-FLOPPY_OPTIONS_END0
+LEGACY_FLOPPY_OPTIONS_END0

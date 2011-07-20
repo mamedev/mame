@@ -14,6 +14,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(compis);
+LEGACY_FLOPPY_OPTIONS_EXTERN(compis);
 
 #endif /* CPIS_DSK_H */

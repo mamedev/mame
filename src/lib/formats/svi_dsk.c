@@ -160,12 +160,12 @@ static FLOPPY_CONSTRUCT(svi_dsk_construct)
 
 /* ----------------------------------------------------------------------- */
 
-FLOPPY_OPTIONS_START( svi318 )
-	FLOPPY_OPTION( svi_dsk, "dsk", "SVI-318 floppy disk image",	svi_dsk_identify, svi_dsk_construct, NULL, NULL)
-	FLOPPY_OPTION( svi_cpm, "dsk", "SVI-728 DSDD CP/M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+LEGACY_FLOPPY_OPTIONS_START( svi318 )
+	LEGACY_FLOPPY_OPTION( svi_dsk, "dsk", "SVI-318 floppy disk image",	svi_dsk_identify, svi_dsk_construct, NULL, NULL)
+	LEGACY_FLOPPY_OPTION( svi_cpm, "dsk", "SVI-728 DSDD CP/M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([17])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END

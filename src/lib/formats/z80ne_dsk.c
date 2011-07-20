@@ -826,7 +826,7 @@ FLOPPY_IDENTIFY(z80ne_dmk_identify)
 
 /* ----------------------------------------------------------------------- */
 
-FLOPPY_OPTIONS_START( z80ne )
+LEGACY_FLOPPY_OPTIONS_START( z80ne )
 	/*
      * Single side
      * Single density
@@ -838,11 +838,11 @@ FLOPPY_OPTIONS_START( z80ne )
      * 3125 byte/track unformatted
      * Rotation speed 300 rpm (5 rps)
      */
-	FLOPPY_OPTION( z80ne_dmk, "zmk",		"Z80NE DMK disk image",	z80ne_dmk_identify,	z80ne_dmk_construct, NULL,
+	LEGACY_FLOPPY_OPTION( z80ne_dmk, "zmk",		"Z80NE DMK disk image",	z80ne_dmk_identify,	z80ne_dmk_construct, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([256])
 		INTERLEAVE([1])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END

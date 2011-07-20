@@ -152,6 +152,6 @@ static FLOPPY_CONSTRUCT(exi_dsk_construct)
 
 /* ----------------------------------------------------------------------- */
 
-FLOPPY_OPTIONS_START( exidy )
-	FLOPPY_OPTION( exi_dsk, "dsk", "Exidy Sorcerer floppy disk image", exi_dsk_identify, exi_dsk_construct, NULL, NULL)
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_START( exidy )
+	LEGACY_FLOPPY_OPTION( exi_dsk, "dsk", "Exidy Sorcerer floppy disk image", exi_dsk_identify, exi_dsk_construct, NULL, NULL)
+LEGACY_FLOPPY_OPTIONS_END

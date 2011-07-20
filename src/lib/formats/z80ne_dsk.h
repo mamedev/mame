@@ -14,7 +14,7 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(z80ne);
+LEGACY_FLOPPY_OPTIONS_EXTERN(z80ne);
 
 FLOPPY_IDENTIFY(z80ne_dmk_identify);
 FLOPPY_CONSTRUCT(z80ne_dmk_construct);

@@ -89,8 +89,8 @@ static FLOPPY_CONSTRUCT(hector_disc2_dsk800_construct)
 	return basicdsk_construct(floppy, &geometry);
 }
 
-FLOPPY_OPTIONS_START( hector_disc2 )
-	FLOPPY_OPTION( hector_dsk, "HE2", "hector disc2 floppy disk image 200K", hector_disc2_dsk200_identify, hector_disc2_dsk200_construct, NULL, NULL)
-	FLOPPY_OPTION( hector_dsk, "HE7", "hector disc2 floppy disk image 720K", hector_disc2_dsk720_identify, hector_disc2_dsk720_construct, NULL, NULL)
-	FLOPPY_OPTION( hector_dsk, "HE8", "hector disc2 floppy disk image 800K", hector_disc2_dsk800_identify, hector_disc2_dsk800_construct, NULL, NULL)
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_START( hector_disc2 )
+	LEGACY_FLOPPY_OPTION( hector_dsk, "HE2", "hector disc2 floppy disk image 200K", hector_disc2_dsk200_identify, hector_disc2_dsk200_construct, NULL, NULL)
+	LEGACY_FLOPPY_OPTION( hector_dsk, "HE7", "hector disc2 floppy disk image 720K", hector_disc2_dsk720_identify, hector_disc2_dsk720_construct, NULL, NULL)
+	LEGACY_FLOPPY_OPTION( hector_dsk, "HE8", "hector disc2 floppy disk image 800K", hector_disc2_dsk800_identify, hector_disc2_dsk800_construct, NULL, NULL)
+LEGACY_FLOPPY_OPTIONS_END

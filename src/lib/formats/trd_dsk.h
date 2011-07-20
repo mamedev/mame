@@ -13,6 +13,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(trd);
+LEGACY_FLOPPY_OPTIONS_EXTERN(trd);
 
 #endif /* TRD_DSK_H */

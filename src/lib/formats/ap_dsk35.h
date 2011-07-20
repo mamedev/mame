@@ -18,8 +18,8 @@ int apple35_sectors_per_track(floppy_image_legacy *image, int track);
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(apple35_mac);
-FLOPPY_OPTIONS_EXTERN(apple35_iigs);
+LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_mac);
+LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_iigs);
 
 
 #endif /* AP_DSK35_H */

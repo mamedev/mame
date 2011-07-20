@@ -28,6 +28,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(apple2);
+LEGACY_FLOPPY_OPTIONS_EXTERN(apple2);
 
 #endif /* AP2_DISK_H */

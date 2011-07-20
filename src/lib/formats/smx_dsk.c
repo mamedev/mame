@@ -154,6 +154,6 @@ static FLOPPY_CONSTRUCT(smx_dsk_construct)
 
 /* ----------------------------------------------------------------------- */
 
-FLOPPY_OPTIONS_START( specimx )
-	FLOPPY_OPTION( smx_dsk, "odi", "Specialist MX floppy disk image",	smx_dsk_identify, smx_dsk_construct, NULL, NULL)
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_START( specimx )
+	LEGACY_FLOPPY_OPTION( smx_dsk, "odi", "Specialist MX floppy disk image",	smx_dsk_identify, smx_dsk_construct, NULL, NULL)
+LEGACY_FLOPPY_OPTIONS_END

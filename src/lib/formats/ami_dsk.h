@@ -11,7 +11,7 @@
 
 #include "flopimg.h"
 
-FLOPPY_OPTIONS_EXTERN(amiga);
-FLOPPY_OPTIONS_EXTERN(amiga_only);
+LEGACY_FLOPPY_OPTIONS_EXTERN(amiga);
+LEGACY_FLOPPY_OPTIONS_EXTERN(amiga_only);
 
 #endif /*AMI_DSK_H_*/

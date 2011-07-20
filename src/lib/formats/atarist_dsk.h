@@ -13,6 +13,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(atarist);
+LEGACY_FLOPPY_OPTIONS_EXTERN(atarist);
 
 #endif /* ATARIST_DSK_H */

@@ -69,8 +69,8 @@ static FLOPPY_CONSTRUCT( amiga_dsk_construct )
 *****************************************************************************/
 
 
-FLOPPY_OPTIONS_START( amiga )
-	FLOPPY_OPTION(
+LEGACY_FLOPPY_OPTIONS_START( amiga )
+	LEGACY_FLOPPY_OPTION(
 		ami_dsk,
 		"adf",
 		"Amiga floppy disk image",
@@ -81,10 +81,10 @@ FLOPPY_OPTIONS_START( amiga )
 		TRACKS([80])
 		SECTORS([11]/22)
 	)
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
-FLOPPY_OPTIONS_START( amiga_only )
-	FLOPPY_OPTION(
+LEGACY_FLOPPY_OPTIONS_START( amiga_only )
+	LEGACY_FLOPPY_OPTION(
 		ami_dsk,
 		"adf",
 		"Amiga floppy disk image",
@@ -95,4 +95,4 @@ FLOPPY_OPTIONS_START( amiga_only )
 		TRACKS([80])
 		SECTORS([11]/22)
 	)
-FLOPPY_OPTIONS_END0
+LEGACY_FLOPPY_OPTIONS_END0

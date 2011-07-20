@@ -1155,33 +1155,33 @@ static FLOPPY_CONSTRUCT(apple35_2img_construct)
 
 
 
-FLOPPY_OPTIONS_START( apple35_mac )
-	FLOPPY_OPTION( apple35_raw, "dsk,img,image",	"Apple raw 3.5\" disk image",	apple35_raw_identify,		apple35_raw_construct, NULL,
+LEGACY_FLOPPY_OPTIONS_START( apple35_mac )
+	LEGACY_FLOPPY_OPTION( apple35_raw, "dsk,img,image",	"Apple raw 3.5\" disk image",	apple35_raw_identify,		apple35_raw_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",	"Apple DiskCopy disk image",	apple35_diskcopy_identify,	apple35_diskcopy_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",	"Apple DiskCopy disk image",	apple35_diskcopy_identify,	apple35_diskcopy_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
-FLOPPY_OPTIONS_START( apple35_iigs )
-	FLOPPY_OPTION( apple35_raw, "dsk,img,image",	"Apple raw 3.5\" disk image",	apple35_raw_identify,		apple35_raw_construct, NULL,
+LEGACY_FLOPPY_OPTIONS_START( apple35_iigs )
+	LEGACY_FLOPPY_OPTION( apple35_raw, "dsk,img,image",	"Apple raw 3.5\" disk image",	apple35_raw_identify,		apple35_raw_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",	"Apple DiskCopy disk image",	apple35_diskcopy_identify,	apple35_diskcopy_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",	"Apple DiskCopy disk image",	apple35_diskcopy_identify,	apple35_diskcopy_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION( apple35_2img, "2img,2mg",		"Apple ][gs 2IMG disk image",	apple35_2img_identify,		apple35_2img_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_2img, "2img,2mg",		"Apple ][gs 2IMG disk image",	apple35_2img_identify,		apple35_2img_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END

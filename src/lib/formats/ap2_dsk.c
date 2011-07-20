@@ -489,23 +489,23 @@ static UINT32 apple2_get_track_size(floppy_image_legacy *floppy, int head, int t
 
 /* ----------------------------------------------------------------------- */
 
-FLOPPY_OPTIONS_START( apple2 )
-	FLOPPY_OPTION( apple2_do, "do,dsk,bin",	"Apple ][ DOS order disk image",	apple2_dsk_identify,	apple2_do_construct, NULL,
+LEGACY_FLOPPY_OPTIONS_START( apple2 )
+	LEGACY_FLOPPY_OPTION( apple2_do, "do,dsk,bin",	"Apple ][ DOS order disk image",	apple2_dsk_identify,	apple2_do_construct, NULL,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION( apple2_po, "po,dsk,bin",	"Apple ][ ProDOS order disk image",	apple2_dsk_identify,	apple2_po_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple2_po, "po,dsk,bin",	"Apple ][ ProDOS order disk image",	apple2_dsk_identify,	apple2_po_construct, NULL,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION( apple2_nib, "dsk,nib",	"Apple ][ Nibble order disk image",	apple2_nib_identify,	apple2_nib_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple2_nib, "dsk,nib",	"Apple ][ Nibble order disk image",	apple2_nib_identify,	apple2_nib_construct, NULL,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END

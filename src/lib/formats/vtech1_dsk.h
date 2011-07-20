@@ -11,6 +11,6 @@
 
 #include "flopimg.h"
 
-FLOPPY_OPTIONS_EXTERN(vtech1_only);
+LEGACY_FLOPPY_OPTIONS_EXTERN(vtech1_only);
 
 #endif /* VTECH1_DSK_H */

@@ -14,6 +14,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(hector_disc2);
+LEGACY_FLOPPY_OPTIONS_EXTERN(hector_disc2);
 
 #endif /* HECT_DSK_H */

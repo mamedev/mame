@@ -14,6 +14,6 @@
 
 /**************************************************************************/
 
-FLOPPY_OPTIONS_EXTERN(pc);
+LEGACY_FLOPPY_OPTIONS_EXTERN(pc);
 
 #endif /* PC_DSK_H */
