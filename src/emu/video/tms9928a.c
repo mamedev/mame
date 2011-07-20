@@ -6,43 +6,20 @@
 ** All undocumented features as described in the following file
 ** should be emulated.
 **
-** http://www.msxnet.org/tech/tms9918a.txt
+** http://bifi.msxnet.org/msxnet/tech/tms9918a.txt
 **
 ** By Sean Young 1999 (sean@msxnet.org).
-** Based on code by Mike Balfour. Features added:
-** - read-ahead
-** - single read/write address
-** - AND mask for mode 2
-** - multicolor mode
-** - undocumented screen modes
-** - illegal sprites (max 4 on one line)
-** - vertical coordinate corrected -- was one to high (255 => 0, 0 => 1)
-** - errors in interrupt emulation
-** - back drop correctly emulated.
-**
-** 19 feb 2000, Sean:
-** - now uses plot _pixel (..), so -ror works properly
-** - fixed bug in tms.patternmask
-**
-** 3 nov 2000, Raphael Nabet:
-** - fixed a nasty bug in draw_sprites. A transparent sprite caused
-**   sprites at lower levels not to be displayed, which is wrong.
-**
-** 3 jan 2001, Sean Young:
-** - A few minor cleanups
-** - Changed TMS9928A_vram_[rw] and  TMS9928A_register_[rw] to READ8_HANDLER
-**   and WRITE8_HANDLER.
-** - Got rid of the color table, unused. Also got rid of the old colors,
-**   which were commented out anyway.
-**
+** Based on code by Mike Balfour.
+** Improved over the years by MESS and MAME teams.
 **
 ** Todo:
+** - Convert implementation to modern device.
 ** - The screen image is rendered in `one go'. Modifications during
 **   screen build up are not shown.
 ** - Correctly emulate 4,8,16 kb VRAM if needed.
-** - uses plot _pixel (...) in TMS_sprites (...), which is rended in
-**   in a back buffer created with malloc (). Hmm..
 ** - Colours are incorrect. [fixed by R Nabet ?]
+** - Sprites 8-31 are ghosted/cloned in mode 3 when using less than
+**   three pattern tables. Exact behaviour is not known.
 */
 
 #include "emu.h"
