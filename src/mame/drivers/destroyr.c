@@ -7,6 +7,8 @@ Atari Destroyer Driver
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
+#include "destroyr.lh"
+
 
 class destroyr_state : public driver_device
 {
@@ -279,7 +281,7 @@ static INPUT_PORTS_START( destroyr )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) /* actually a lever */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Speed Control") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -510,5 +512,5 @@ ROM_START( destroyr1 )
 ROM_END
 
 
-GAME( 1977, destroyr,  0,        destroyr, destroyr, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", GAME_NO_SOUND )
-GAME( 1977, destroyr1, destroyr, destroyr, destroyr, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", GAME_NO_SOUND )
+GAMEL( 1977, destroyr,  0,        destroyr, destroyr, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", GAME_NO_SOUND, layout_destroyr )
+GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", GAME_NO_SOUND, layout_destroyr )
