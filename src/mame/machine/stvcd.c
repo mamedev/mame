@@ -26,6 +26,7 @@
 #include "cdrom.h"
 #include "stvcd.h"
 #include "sound/cdda.h"
+#include "debugger.h"
 
 // super-verbose
 #if 0
@@ -892,6 +893,11 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			hirqreg |= CMOK|DRDY;
 			break;
 
+		/* these are ERRORS from our core and mustn't happen! */
+		case 0x2100:
+		case 0x2300:
+			debugger_break(machine);
+			break;
 
 		case 0x3000:	// Set CD Device connection
 			{
@@ -1301,8 +1307,9 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x6400:    // put sector data
-			/* TODO: Dungeon Master Nexus trips this */
+			/* TODO: After Burner 2 and Dungeon Master Nexus trips this */
 			// ...
+
 			hirqreg |= (CMOK|EHST);
 			break;
 

@@ -576,7 +576,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0x14/4: case 0x34/4: case 0x54/4:
 			if(INDIRECT_MODE(DMA_CH))
 			{
-				if(LOG_SCU) logerror("Indirect Mode DMA lv %d set\n",DMA_CH);
+				//if(LOG_SCU) logerror("Indirect Mode DMA lv %d set\n",DMA_CH);
 				if(!DWUP(DMA_CH)) state->m_scu.index[DMA_CH] = state->m_scu.dst[DMA_CH];
 			}
 
