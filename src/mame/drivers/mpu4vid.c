@@ -2404,7 +2404,7 @@ MACHINE_CONFIG_END
 
 /* machine driver for Zenitone Deal 'Em board */
 static MACHINE_CONFIG_START( dealem, mpu4_state )
-	MCFG_MACHINE_START(mpu4mod2)							/* main mpu4 board initialisation */
+	MCFG_MACHINE_START(mod2)							/* main mpu4 board initialisation */
 	MCFG_MACHINE_RESET(mpu4_vid)
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
@@ -3744,7 +3744,7 @@ ROM_END
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
 The AMLD versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
 
-GAME(  199?,v4bios,		0,			mpu4mod2,	mpu4,		0,			ROT0, "Barcrest","MPU4 Video Firmware",GAME_IS_BIOS_ROOT )
+GAME(  199?,v4bios,		0,			mod2,	mpu4,		0,			ROT0, "Barcrest","MPU4 Video Firmware",GAME_IS_BIOS_ROOT )
 
 GAMEL( 1993,v4cmaze,	v4bios,		crmaze,		crmaze,		crmaze,		ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993,v4cmazed,	v4cmaze,	crmaze,		crmaze,		crmaze,		ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_NOT_WORKING,layout_crmaze2p )//SWP 0.9D
