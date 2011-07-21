@@ -80,6 +80,9 @@ ifneq ($(filter ASC,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/asc.o
 endif
 
+ifneq ($(filter AWACS,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/awacs.o
+endif
 
 
 #-------------------------------------------------

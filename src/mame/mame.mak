@@ -230,6 +230,7 @@ SOUNDS += S2636
 SOUNDS += ASC
 SOUNDS += MAS3507D
 SOUNDS += LMC1992
+SOUNDS += AWACS
 
 
 #-------------------------------------------------
