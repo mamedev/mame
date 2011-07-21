@@ -17,6 +17,7 @@ public:
 	mfm_format(const char *name,const char *extensions,const char *description,const char *param_guidelines);
 	
 	virtual int identify(floppy_image *image);
+	virtual bool load(floppy_image *image);
 };
 
 extern const floppy_format_type FLOPPY_MFM_FORMAT;

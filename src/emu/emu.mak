@@ -287,6 +287,7 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/cassette.o	\
 	$(EMUIMAGEDEV)/chd_cd.o		\
 	$(EMUIMAGEDEV)/flopdrv.o	\
+	$(EMUIMAGEDEV)/floppy.o		\
 	$(EMUIMAGEDEV)/harddriv.o	\
 	$(EMUIMAGEDEV)/multcart.o	\
 	$(EMUIMAGEDEV)/printer.o	\

@@ -982,6 +982,39 @@ void floppy_image::close()
 	close_internal(TRUE);
 }
 
+void floppy_image::set_meta_data(UINT16 tracks, UINT8 sides, UINT16 rpm, UINT16 bitrate)
+{
+	m_tracks = tracks;
+	m_sides  = sides;
+	m_rpm    = rpm;
+	m_bitrate= bitrate;
+}
+
+const struct floppy_format_def *floppy_image::identify(int *best)
+{
+	const struct floppy_format_def *retVal = NULL;
+	int best_vote = 0;
+	*best = -1;
+	for (int i = 0; m_formats[i].type; i++)
+	{
+		floppy_image_format_t *t = (m_formats[i].type)(m_formats[i].name,m_formats[i].extensions,m_formats[i].description,m_formats[i].param_guidelines);
+		int vote = t->identify(this);
+		/* is this option a better one? */
+		if (vote > best_vote)
+		{
+			best_vote = vote;
+			*best = i;
+			retVal = &m_formats[i];
+		}
+	}
+	return retVal;
+}
+
+bool floppy_image::load(int num)
+{
+	floppy_image_format_t *t = (m_formats[num].type)(m_formats[num].name,m_formats[num].extensions,m_formats[num].description,m_formats[num].param_guidelines);
+	return t->load(this);
+}
 
 floppy_image_format_t::floppy_image_format_t(const char *name,const char *extensions,const char *description,const char *param_guidelines)
 {
@@ -992,28 +1025,4 @@ floppy_image_format_t::floppy_image_format_t(const char *name,const char *extens
 }
 floppy_image_format_t::~floppy_image_format_t()
 {
-}
-
-int floppy_image_format_t::identify(floppy_image *image)
-{
-	return 0;
-}
-
-const struct floppy_format_def *floppy_image::identify()
-{
-	const struct floppy_format_def *retVal = NULL;
-	int best_vote = 0;
-	
-	for (int i = 0; m_formats[i].type; i++)
-	{
-		floppy_image_format_t *t = (m_formats[i].type)(m_formats[i].name,m_formats[i].extensions,m_formats[i].description,m_formats[i].param_guidelines);
-		int vote = t->identify(this);
-		/* is this option a better one? */
-		if (vote > best_vote)
-		{
-			best_vote = vote;
-			retVal = &m_formats[i];
-		}
-	}
-	return retVal;
 }
