@@ -1847,7 +1847,7 @@ CPU_GET_INFO( m68020pmmu )
 	}
 }
 
-// 68020 with Apple HMMU
+// 68020 with Apple HMMU & 68881 FPU
 static CPU_INIT( m68020hmmu )
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
@@ -1855,6 +1855,7 @@ static CPU_INIT( m68020hmmu )
 	CPU_INIT_CALL(m68020);
 
 	m68k->has_hmmu = 1;
+	m68k->has_fpu  = 1;
 // hack alert: we use placement new to ensure we are properly initialized
 // because we live in the device state which is allocated as bytes
 // remove me when we have a real C++ device
