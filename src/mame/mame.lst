@@ -10744,12 +10744,20 @@ m_clattr		// (c) 1990 BFM,     Game Card 39-370-196
 m_tppokr		// (c) 1996 BFM/ELAM,Game Card 95-750-899, uses Adder board for feature gfx
 
 // Maygay Machines Ltd.
+
+// Maygay M1 A/B hardware
+
 m_sptlgt
+
+// Maygay MV1 hardware
 
 screenpl
 screenp1
 screenp2
 
+// Maygay EPOCH hardware
+
+ep_simp
 
 // MPU3
 
@@ -10929,7 +10937,6 @@ m4clbcls	// Club Classic (Barcrest)
 m4clbclm	// Club Climber (Barcrest) 
 m4clbcnt	// Club Connect (Barcrest) 
 m4clbdbl	// Club Double (Barcrest) 
-m4clbrpl	// Club Replay (Barcrest) 
 m4clbshf	// Club Shuffle (Barcrest) 
 m4clbtro	// Club Tropicana (Barcrest) 
 m4clbveg	// Club Vegas (Barcrest) 
@@ -11366,6 +11373,25 @@ m4smshgbb	//
 m4smshgbc	//
 m4snklad	// Snakes & Ladders (Mdm)
 
+/* Pcp */
+
+m4cshino	//Cashino Deluxe (Pcp)
+m4jjc		//Jumping Jack Cash (Pcp)
+m4spton		//Spot On (Pcp)
+m4clbrpl	//Club Replay (PCP)
+m4exlin		//Extra Lines (Pcp)
+m4supjst	//Super Jester (Pcp)
+
+/* Nova - German licensed Barcrest / Bwb sets? */
+
+m4bigban	//Big Bandit (Nova)
+m4crzcsn	//Crazy Casino (Nova)
+m4crzcav	//Crazy Cavern (Nova)
+m4dragon	//Dragon (Nova)
+m4hilonv	//Hi Lo Casino (Nova)
+m4octo		//Octopus (Nova)
+m4sctagt	//Secret Agent (Nova)
+
 /* Union */
 
 m4cwalk		// Cake Walk (Union)
@@ -11428,6 +11454,25 @@ m4boltblb	//
 m4boltblc	// 
 m4dblchn	// Double Chance (DJE)
 m4stand2	// Stand To Deliver (DJE)
+
+/* Unknown */
+
+m4barcrz	// Bar Crazy (unknown)
+m4bonzbn	// Bingo Bonanza (unknown)
+m4cld02		// Unknown MPU4 'CLD 0.2C'
+m4dnj		// Double Nudge (unknown)
+m4matdr		// Matador (unknown)
+m4ttak		// Tic Tac Take (unknown)
+m4hslo		// Unknown MPU4 'HOT 3.0'
+m4sbx		// Unknown MPU4 'SBX'
+m4unkjok	// Unknown MPU4 'Joker'
+m4remag		// Unknown MPU4 'ZTP 0.7' 
+m4rmg		// Unknown MPU4 'CTP 0.4'
+m4wnud		// Unknown MPU4 'W Nudge'
+m4t266		// Unknown MPU4 'TTO 1.1'
+m4brnze		// Bronze Voyage (unknown)
+m4riotrp	// Rio Tropico (unknown)
+
 
 /* Unsorted */
 

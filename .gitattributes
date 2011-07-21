@@ -2304,6 +2304,7 @@ src/mame/drivers/mastboy.c svneol=native#text/plain
 src/mame/drivers/matmania.c svneol=native#text/plain
 src/mame/drivers/maxaflex.c svneol=native#text/plain
 src/mame/drivers/maygay1b.c svneol=native#text/plain
+src/mame/drivers/maygayep.c svneol=native#text/plain
 src/mame/drivers/maygayv1.c svneol=native#text/plain
 src/mame/drivers/mayumi.c svneol=native#text/plain
 src/mame/drivers/mazerbla.c svneol=native#text/plain

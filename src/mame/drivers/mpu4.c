@@ -5843,6 +5843,7 @@ ROM_START( m4intcep )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "intx.p1", 0x0000, 0x010000, CRC(6e435db6) SHA1(17114fe54c74a140e116bec5a027219f7f5a70d6) )
+	ROM_LOAD( "int11.bin", 0x0000, 0x010000, CRC(0beb156f) SHA1(9ac318a524c549df907a995e896cd90434634e72) )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "int.chr", 0x0000, 0x000048, CRC(5915f545) SHA1(f8490a74aefe2a27d8e59b13dbd5fa78b8ab2166) )
@@ -12849,6 +12850,206 @@ ROM_START( m4uniquep )
 	ROM_LOAD( "uniquesnd.bin", 0x000000, 0x080000, CRC(177a4c07) SHA1(180f51ba982ccf7d19dfa50e94c295395799c360) )
 ROM_END
 
+
+
+
+ROM_START( m4cshino )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cashino.bin", 0x0000, 0x010000, CRC(0b269457) SHA1(835d28bf361fe9f1410a85f30aa919894c8d9a8e) )
+ROM_END
+
+
+ROM_START( m4exlin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "extra lines 10p 4.80-2.40 16.3.90.bin", 0x8000, 0x008000, CRC(5e9b81e9) SHA1(84d446542533495b28692ba5f12cfd4fa5deabdd) )
+	ROM_LOAD( "extra lines 2p 2.40 21.3.90.bin", 0x8000, 0x008000, CRC(b9736cd1) SHA1(c275e5c4ea550a6814b2b2143e4b84198739524c) )
+ROM_END
+
+ROM_START( m4jjc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jjc.bin", 0x0000, 0x010000, CRC(781095ce) SHA1(f6beee15b45abf4a4f550b527e512bc6a1b603d8) )
+	ROM_LOAD( "jjcash4pndv6.bin", 0x0000, 0x010000, CRC(3f28e657) SHA1(2382b96eb6f2b0580464c53a5122a48e25b4c002) )
+ROM_END
+
+ROM_START( m4spton )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "spot_on_v8 2_5_10_20p.bin", 0x0000, 0x010000, CRC(d0e27431) SHA1(cbcf637f2c8cf349e6386a54343d35da8aa24186) )
+ROM_END
+
+ROM_START( m4supjst )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super jester 16.2.90 2p 1.bin", 0x8000, 0x008000, CRC(a55dae4f) SHA1(c426a202c312e0aefc5718c844f70b0af9b1c724) )
+	ROM_LOAD( "super jester 19.2.90 5p 2.40.bin", 0x8000, 0x008000, CRC(754d821a) SHA1(9b00d0e028e46f8dfed60f3b49ef7c5cc40ac70c) )
+	ROM_LOAD( "super jester 2.1.90 10p 4.80 p1.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) )
+	ROM_LOAD( "super jester 20p.bin", 0x8000, 0x008000, CRC(be725101) SHA1(b2352e56bec5c8929075697f29526d25626cbc38) )
+	ROM_LOAD( "super jester 4.10.89 10p 4 cash.bin", 0x8000, 0x008000, CRC(ca1797b2) SHA1(afd6b365e7bef721084dc33442bb685fef6f7b76) )
+	ROM_LOAD( "super jester 4.10.89 10p 4 token.bin", 0x8000, 0x008000, CRC(3b4e4444) SHA1(a3cbbd2657be087c346a5ada7c301584125f8fbc) )
+	ROM_LOAD( "superjester", 0x8000, 0x008000, CRC(754d821a) SHA1(9b00d0e028e46f8dfed60f3b49ef7c5cc40ac70c) )
+	ROM_LOAD( "31.1.90cj10p4.80v6.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) ) // marked crown jester?
+ROM_END
+
+
+
+ROM_START( m4bigban )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "big04.p1", 0x0000, 0x020000, CRC(f7ead9c6) SHA1(46c10abb892cb6d427ad508aae96752c14b4cb83) )
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+ROM_START( m4crzcsn )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "crz03.bin", 0x0000, 0x020000, CRC(48610c4f) SHA1(a62ac8b3ee704ee4e98f9d56bfc723d4cbb25b54) )
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+ROM_START( m4crzcav )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "gcv05.p1", 0x0000, 0x020000, CRC(b9ba46f6) SHA1(78b745d85b36444c39747982987088a772b20a7e) )
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+ROM_START( m4dragon )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "dgl01.p1", 0x0000, 0x020000, CRC(d7d39c9b) SHA1(5350c9db549edee30815516b1ce74a018390ff3d) )
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+ROM_START( m4hilonv )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "hnc02.p1", 0x0000, 0x020000, CRC(33a8022b) SHA1(5168b8f32630aa2cb56f30c941695f1728e4fb7a) )
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+ROM_START( m4octo )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "oct03.p1", 0x0000, 0x020000, CRC(8df66e94) SHA1(e1ab93982846d83becae36b5814ebbd515b9078e) )
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+ROM_START( m4sctagt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gse3_0.p1", 0x0000, 0x010000, CRC(eff705ff) SHA1(6bf96872ef4bcc8f8041c5384d892f072c72be2b) )
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+
+
+
+
+
+
+
+
+
+ROM_START( m4cld02 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cru0_2.bin", 0x0000, 0x010000, CRC(e3c01944) SHA1(33a2b2c05686f53811349b2980e590fdc4b72756) )
+ROM_END
+
+ROM_START( m4barcrz )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "barcrazy.bin", 0x0000, 0x010000, CRC(917ad749) SHA1(cb0a3f6737b8f183d2efb0a3f8adbf86d40a38ff) )
+
+	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_LOAD( "barcrazysnd.bin", 0x0000, 0x080000, CRC(0e155193) SHA1(7583e9f3e3624f82f2329565bdcbdaa5a5b03ee0) )
+ROM_END
+
+ROM_START( m4bonzbn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bingo-bonanza_v1.bin", 0x0000, 0x010000, CRC(3d137ddf) SHA1(1ce23db111448e44a166554dd8853dc379e787da) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "bingo-bonanzasnd1.bin", 0x000000, 0x080000, CRC(e0eb2a92) SHA1(cbc0b3bba7857d87535d1c2a7459aed60709734a) )
+	ROM_LOAD( "bingo-bonanzasnd2.bin", 0x080000, 0x080000, CRC(7db27b28) SHA1(98c5fa4bf8c7f67fae90a1ca98b74057f5ed9b6b) )
+ROM_END
+
+ROM_START( m4dnj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d.n.j 1-02", 0x0000, 0x010000, CRC(5750843d) SHA1(b87923e84071ea4a1af7566a7f413f8e30e208e9) )
+	ROM_LOAD( "d.n.j 1-03", 0x0000, 0x010000, CRC(7b805255) SHA1(f62765bfa66e2422ac0a71ebaff27f1ccd470fe2) )
+	ROM_LOAD( "d.n.j 1-06", 0x0000, 0x010000, CRC(aab770c7) SHA1(f24fff8346915017bc43fef9fac356a067676d86) )
+ROM_END
+
+
+ROM_START( m4matdr )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "matador.bin", 0x0000, 0x020000, CRC(367788a4) SHA1(3c9b077a64f993cb60107558efdfcbee0fe5c958) )
+
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* missing */
+ROM_END
+
+
+ROM_START( m4ttak )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tictacp1.bin", 0x8000, 0x008000, CRC(7ae5d93c) SHA1(8066341a267be357b67b1c7e315989e9bda99856) )
+	ROM_LOAD( "tictacp2.bin", 0x4000, 0x004000, CRC(33f3d2d1) SHA1(fea9c5766bfb3fb49d88a76458450c15bf38b2b1) )
+ROM_END
+
+ROM_START( m4hslo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hot30", 0x0000, 0x010000, CRC(62f2c420) SHA1(5ae89a1b585738255e8d9ae153c3c63b4a2893e4) )
+ROM_END
+
+ROM_START( m4sbx )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbx-2.1-cash.bin", 0x8000, 0x008000, CRC(2dca703e) SHA1(aef398f4ed38ba34f28009058c9486a570f64e0f) )
+ROM_END
+
+ROM_START( m4unkjok )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "joker 10p 3.bin", 0x0000, 0x010000, CRC(009823ac) SHA1(5ab25da5876c87a8d8701f84446bb3d377e4c1ca) )
+	ROM_LOAD( "joker 10p 6.bin", 0x0000, 0x010000, CRC(f25f0704) SHA1(35298b49f79c5029277f4777fe88d5e4344c115f) )
+	ROM_LOAD( "joker 20p 3 or 6.bin", 0x0000, 0x010000, CRC(cae4397e) SHA1(53b61fd41c97a6ed29ce6a7b555e061ecf2b0ae2) )
+	ROM_LOAD( "joker new 20p 6 or 3.bin", 0x0000, 0x010000, CRC(b8d77b97) SHA1(54f69823bb3fd9c2cca014dc7c51913b2d6c8058) )
+ROM_END
+
+ROM_START( m4remag )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "remagv2", 0x0000, 0x010000, CRC(80d9c1c2) SHA1(c77d443d92084c324ef75575acca66ffbd9beef3) )
+ROM_END
+
+ROM_START( m4rmg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rmgicdd", 0x0000, 0x010000, CRC(bd64be0d) SHA1(772b80619c7d514a7a253f35137896d6a73bf4c6) )
+ROM_END
+
+ROM_START( m4wnud )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wnudge.bin", 0x8000, 0x008000, CRC(1d935575) SHA1(c4177c41473c0fb511e0ee035961f55ad43be14d) )
+ROM_END
+
+ROM_START( m4t266 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "t2 66.bin", 0x0000, 0x010000, CRC(5c99c6bb) SHA1(7b74e0e5207c00b31cb1859e0cc458c0412a1a07) )
+ROM_END
+
+ROM_START( m4brnze )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bv25", 0x0000, 0x010000, CRC(5c66f460) SHA1(c7587a6e992549ad8814f77c65b33a17a3641431) )
+	ROM_LOAD( "bv25v2", 0x0000, 0x010000, CRC(a675edb3) SHA1(a3c6ee6a0bfb301fed72b45ee8e363d77b8b8dbb) )
+	ROM_LOAD( "bv55", 0x0000, 0x010000, CRC(93905bc9) SHA1(e8d3cd125dced43fc2cf23cbccc59110561d2a40) )
+
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	/* missing */
+ROM_END
+
+ROM_START( m4riotrp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "drt10.bin", 0x0000, 0x010000, CRC(a1badb8a) SHA1(871786ea4e65ecbf61c9a776100321253922d11e) )
+
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "dblcsnd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
+ROM_END
+
+
 /* Barcrest */
 GAME( 198?, m4tst,        0, mod2    ,   mpu4,       m4tst,   ROT0, "Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
 GAME( 198?, m4tst2,       0, mod2    ,   mpu4,       m4tst2,  ROT0, "Barcrest","MPU4 Unit Test (Program 2)",GAME_MECHANICAL )
@@ -12930,7 +13131,6 @@ GAME(199?, m4clbcls	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Cl
 GAME(199?, m4clbclm	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Climber (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4clbcnt	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4clbdbl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Double (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4clbrpl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Replay (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4clbshf	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4clbtro	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4clbveg	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -13183,6 +13383,7 @@ GAME(199?, m4bingbl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Bingo B
 GAME(199?, m4bingbs	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Bingo Belle Showcase (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bingcl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Bingo Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4blflsh	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4blsbys	,0			,bwboki		,mpu4				,m_blsbys			,ROT0,   "Bwb","Blues Boys (Bwb) (MPU4)",			GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4cshenc	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Cash Encounters (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4czne	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Cash Zone (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4csoc	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Championship Soccer (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -13370,6 +13571,25 @@ GAME(199?, m4smshgbb,m4smshgb,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Smash 'n
 GAME(199?, m4smshgbc,m4smshgb,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4snklad, 0,			mod2    ,mpu4, m4default, ROT0,   "Mdm","Snakes & Ladders (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
+/* Pcp */
+
+GAME(199?, m4cshino	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Cashino Deluxe (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4jjc	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4spton	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Spot On (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4clbrpl	,0,			mod2   	,mpu4, m4default, ROT0,   "Pcp","Club Replay (PCP) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // was also marked as a barcrest set?
+GAME(199?, m4exlin	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Extra Lines (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4supjst	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+
+/* Nova - German licensed Barcrest / Bwb sets? */
+
+GAME(199?, m4bigban	,0			,mod4oki    	,mpu4				,m4default			,ROT0,   "Nova","Big Bandit (Nova) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4crzcsn	,0			,mod4oki    	,mpu4				,m4default			,ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4crzcav	,0			,mod4oki    	,mpu4				,m4default			,ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4dragon	,0			,mod4oki    	,mpu4				,m4default			,ROT0,   "Nova","Dragon (Nova) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4hilonv	,0			,mod4oki    	,mpu4				,m4default			,ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4octo	,0			,mod4oki    	,mpu4				,m4default			,ROT0,   "Nova","Octopus (Nova) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4sctagt	,0			,mod4oki    	,mpu4				,m4default			,ROT0,   "Nova","Secret Agent (Nova) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+
 /* Union
   these don't boot, at best you get a 'CLEAR' message */
 GAME(199?, m4cwalk,   0,		mod4oki, mpu4, m4default, ROT0,   "Union","Cake Walk (Union) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -13433,13 +13653,31 @@ GAME(199?, m4boltblc, m4boltbl,	mod2    ,mpu4, m4default, ROT0,   "DJE","Bolt Fr
 GAME(199?, m4dblchn,  0,		mod4oki, mpu4, m4default, ROT0,   "DJE","Double Chance (DJE) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4stand2,  0,		mod2    ,mpu4, m4default, ROT0,   "DJE","Stand To Deliver (DJE) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
+/* Unknown stuff that looks like it might be MPU4, but needs further verification, some could be bad */
+
+GAME(199?, m4barcrz	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Bar Crazy (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bonzbn	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Bingo Bonanza (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4cld02	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'CLD 0.2C' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4dnj	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Double Nudge (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4matdr	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Matador (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ttak	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Tic Tac Take (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4hslo	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'HOT 3.0' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4sbx	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'SBX' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4unkjok	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'Joker' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4remag	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'ZTP 0.7' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) 
+GAME(199?, m4rmg	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'CTP 0.4' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4wnud	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'W Nudge' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4t266	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'TTO 1.1' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4brnze	,  0,		mod4oki, mpu4, m4default, ROT0,   "unknown","Bronze Voyage (unknown) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4riotrp	,  0,		mod4oki, mpu4, m4default, ROT0,   "unknown","Rio Tropico (unknown) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+
+
 
 /* stuff that was already in the driver */
 
-GAME(199?,   m4blsbys,0,	  bwboki,   mpu4,	  m_blsbys, ROT0,   "Bwb",		 "Blues Boys (Version 6)",			GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
 
-GAME(199?,   m4frkstn,0,	  mpu4crys, mpu4,     m_frkstn, ROT0,   "Crystal Gaming","Frank 'n' Stein (unencrypted)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frnk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Crystal","Frank n' Stein (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // This is Crystal, not Barcrest!
+GAME(199?, m4frkstn	,0			,mpu4crys	,mpu4		,m_frkstn,	ROT0,   "Crystal Gaming","Frank 'n' Stein (Crystal Gaming) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frnk	,m4frkstn	,mpu4crys  	,mpu4		,m_frkstn,	ROT0,   "Crystal Gaming","Frank 'n' Stein (Crystal Gaming) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // was marked as barcrest
 
 //SWP
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )

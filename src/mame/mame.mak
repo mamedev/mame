@@ -910,6 +910,7 @@ $(MAMEOBJ)/konami.a: \
 $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \
 	$(DRIVERS)/maygayv1.o \
+	$(DRIVERS)/maygayep.o \
 
 $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/lazercmd.o $(VIDEO)/lazercmd.o \
