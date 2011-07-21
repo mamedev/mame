@@ -118,7 +118,6 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
-	int s = (insn & 0x180) >> 7;
 	prefix_p = (insn & 0x400) ? "p" : "";
 	prefix_d = (insn & 0x200) ? "d." : "";
 
@@ -159,8 +158,11 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 			suffix[s], get_fsrc1 (insn), get_fsrc2 (insn), get_fdest (insn));
 	}
 	else
+	{
+		int s = (insn & 0x180) >> 7;
 		sprintf(buf, "%s%s%s%s\t%%f%d,%%f%d,%%f%d", prefix_d, prefix_p, mnemonic,
 			suffix[s], get_fsrc1 (insn), get_fsrc2 (insn), get_fdest (insn));
+	}
 }
 
 

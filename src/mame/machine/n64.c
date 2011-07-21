@@ -1682,7 +1682,6 @@ static int pif_channel_handle_command(running_machine &machine, int channel, int
 		case 0x03:
 		{
 			UINT32 address;
-			int i;
 			/*mame_printf_debug("Write to mempack, rlength = %d, slength = %d\n", rlength, slength);
             for (i=0; i < slength; i++)
             {

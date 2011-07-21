@@ -1020,7 +1020,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 		/* count how many identical CPUs we have */
 		int count = 1;
 		device_execute_interface *scan = NULL;
-		for (bool gotone = exec->next(scan); gotone; gotone = scan->next(scan))
+		for (bool gotanother = exec->next(scan); gotanother; gotanother = scan->next(scan))
 		{
 			if (exec->device().type() != scan->device().type() || exec->device().clock() != scan->device().clock())
 				break;

@@ -788,17 +788,17 @@ void psxcpu_device::log_bioscall()
 			( address == 0xb0 && operation == 0x35 ) )
 		{
 			int fd = log_bioscall_parameter( 0 );
-			int buf = log_bioscall_parameter( 1 );
+			int buffer = log_bioscall_parameter( 1 );
 			int nbytes = log_bioscall_parameter( 2 );
 
 			if( fd == 1 )
 			{
 				while( nbytes > 0 )
 				{
-					UINT8 c = readbyte( buf );
+					UINT8 c = readbyte( buffer );
 					putchar( c );
 					nbytes--;
-					buf++;
+					buffer++;
 				}
 			}
 		}

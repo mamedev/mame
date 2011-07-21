@@ -89,7 +89,6 @@ static DEVICE_STOP( akiko )
 	akiko_state *state = get_safe_token(device);
 	if (!state->m_cdrom_is_device)
 	{
-		akiko_state *state = get_safe_token(device);
 		if( state->m_cdrom )
 		{
 			cdrom_close(state->m_cdrom);

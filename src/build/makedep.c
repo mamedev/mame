@@ -346,7 +346,7 @@ static int recurse_dir(int srcrootlen, const astring *srcdir)
 				if (core_filename_ends_with(astring_c(curlist->name), ".c"))
 				{
 					tagmap *depend_map = tagmap_alloc();
-					tagmap_entry *entry;
+					tagmap_entry *map_entry;
 					file_entry *file;
 					astring *target;
 					int taghash;
@@ -363,8 +363,8 @@ static int recurse_dir(int srcrootlen, const astring *srcdir)
 
 					/* iterate over the hashed dependencies and output them as well */
 					for (taghash = 0; taghash < TAGMAP_HASH_SIZE; taghash++)
-						for (entry = depend_map->table[taghash]; entry != NULL; entry = entry->next)
-							printf("\t%s \\\n", astring_c((astring *)entry->object));
+						for (map_entry = depend_map->table[taghash]; map_entry != NULL; map_entry = map_entry->next)
+							printf("\t%s \\\n", astring_c((astring *)map_entry->object));
 
 					astring_free(target);
 					tagmap_free(depend_map);
@@ -517,9 +517,9 @@ static astring *find_include_file(int srcrootlen, const astring *srcfile, const 
 			/* handle .. by removing a chunk from the incpath */
 			if (astring_cmpc(pathpart, "..") == 0)
 			{
-				int sepindex = astring_rchr(srcincpath, 0, PATH_SEPARATOR[0]);
-				if (sepindex != -1)
-					astring_substr(srcincpath, 0, sepindex);
+				int sepindex_part = astring_rchr(srcincpath, 0, PATH_SEPARATOR[0]);
+				if (sepindex_part != -1)
+					astring_substr(srcincpath, 0, sepindex_part);
 			}
 
 			/* otherwise, append a path separator and the pathpart */

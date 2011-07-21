@@ -223,10 +223,10 @@ INLINE void superfx_pixelcache_flush(superfx_state *cpustate, INT32 line)
 	{
 		UINT32 byte = ((n >> 1) << 4) + (n & 1);  // = [n]{ 0, 1, 16, 17, 32, 33, 48, 49 };
 		UINT8 data = 0x00;
-		UINT32 x = 0;
-		for(x = 0; x < 8; x++)
+		UINT32 x32 = 0;
+		for(x32 = 0; x32 < 8; x32++)
 		{
-			data |= ((cpustate->pixelcache[line].data[x] >> n) & 1) << x;
+			data |= ((cpustate->pixelcache[line].data[x32] >> n) & 1) << x32;
 		}
 		if(cpustate->pixelcache[line].bitpend != 0xff)
 		{

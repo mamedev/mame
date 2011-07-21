@@ -857,7 +857,7 @@ static void ui_menu_draw(running_machine &machine, ui_menu *menu, int customonly
 		for (linenum = 0; linenum < visible_lines; linenum++)
 		{
 			float line_y = visible_top + (float)linenum * line_height;
-			int itemnum = top_line + linenum;
+			itemnum = top_line + linenum;
 			const ui_menu_item *item = &menu->item[itemnum];
 			const char *itemtext = item->text;
 			rgb_t fgcolor = UI_TEXT_COLOR;
@@ -992,7 +992,7 @@ static void ui_menu_draw(running_machine &machine, ui_menu *menu, int customonly
 	{
 		const ui_menu_item *item = &menu->item[menu->selected];
 		int subitem_invert = item->flags & MENU_FLAG_INVERT;
-		int linenum = menu->selected - top_line;
+		linenum = menu->selected - top_line;
 		float line_y = visible_top + (float)linenum * line_height;
 		float target_width, target_height;
 		float target_x, target_y;
@@ -3883,7 +3883,7 @@ static void menu_select_game_custom_render(running_machine &machine, ui_menu *me
 	else
 	{
 		const char *s = COPYRIGHT;
-		int line = 0;
+		line = 0;
 		int col = 0;
 
 		/* first line is version string */

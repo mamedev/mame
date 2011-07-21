@@ -375,10 +375,10 @@ static void execute_one(scmp_state *cpustate, int opcode)
 			case 0x3c:	case 0x3d :case 0x3e: case 0x3f:
 						// XPPC
 						{
-							UINT16 tmp = ADD12(cpustate->PC.w.l,-1); // Since PC is incremented we need to fix it
+							UINT16 tmp16 = ADD12(cpustate->PC.w.l,-1); // Since PC is incremented we need to fix it
 							cpustate->icount -= 7;
 							cpustate->PC.w.l = GET_PTR_REG(cpustate,ptr)->w.l;
-							GET_PTR_REG(cpustate,ptr)->w.l = tmp;
+							GET_PTR_REG(cpustate,ptr)->w.l = tmp16;
 							// After exchange CPU increment PC
 							cpustate->PC.w.l = ADD12(cpustate->PC.w.l,1);
 						}

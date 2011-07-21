@@ -269,7 +269,7 @@ static void I486OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 					STORE_RM16(modrm, cpustate->cr[0]);
 					CYCLES(cpustate,CYCLES_SMSW_REG);
 				} else {
-					UINT32 ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm);
 					WRITE16(cpustate,ea, cpustate->cr[0]);
 					CYCLES(cpustate,CYCLES_SMSW_MEM);
 				}

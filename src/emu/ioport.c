@@ -3205,7 +3205,7 @@ static void load_config_callback(running_machine &machine, int config_type, xml_
 	/* what we will diff against */
 	if (config_type == CONFIG_TYPE_CONTROLLER)
 		for (input_type_entry *entry = portdata->typelist.first(); entry != NULL; entry = entry->next())
-			for (int seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
+			for (seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
 				entry->defseq[seqtype] = entry->seq[seqtype];
 }
 
@@ -3455,7 +3455,7 @@ static void save_default_inputs(running_machine &machine, xml_data_node *parentn
 					xml_set_attribute(portnode, "type", input_field_type_to_token(machine, entry->type, entry->player));
 
 					/* add only the sequences that have changed from the defaults */
-					for (int seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
+					for (seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
 						if (entry->seq[seqtype] != entry->defseq[seqtype])
 							save_sequence(machine, portnode, seqtype, entry->type, entry->seq[seqtype]);
 				}

@@ -1236,7 +1236,7 @@ static void mappings_update(tilemap_t *tmap)
 	{
 		UINT32 logical_col = logindex % tmap->cols;
 		UINT32 logical_row = logindex / tmap->cols;
-		tilemap_memory_index memindex = (*tmap->mapper)(logical_col, logical_row, tmap->cols, tmap->rows);
+		memindex = (*tmap->mapper)(logical_col, logical_row, tmap->cols, tmap->rows);
 		UINT32 flipped_logindex;
 
 		/* apply tilemap flip to get the final location to store */

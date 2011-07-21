@@ -172,7 +172,7 @@ static void load(const char *fname)
       }
     } else {
       char *name=0, *cat=0, *id=0, *cyc=0, *rep=0, *type=0;
-      char *p = buf;
+      p = buf;
       int pid, limit;
       instr *bi;
       unsigned int flags;

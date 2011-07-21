@@ -1798,11 +1798,11 @@ static DEVICE_VALIDITY_CHECK( software_list )
 
 						if (data->_name && data->_hashdata)
 						{
-							const char *s;
+							const char *str;
 
 							/* make sure it's all lowercase */
-							for (s = data->_name; *s; s++)
-								if (tolower((UINT8)*s) != *s)
+							for (str = data->_name; *str; str++)
+								if (tolower((UINT8)*str) != *str)
 								{
 									mame_printf_error("%s: %s has upper case ROM name %s\n", swlist->list_name[i], swinfo->shortname, data->_name);
 									error = TRUE;

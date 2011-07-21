@@ -112,8 +112,7 @@ char *osd_get_clipboard_text(void)
 	char *result = NULL;
 
 	// try to access unicode text
-	if (result == NULL)
-		result = get_clipboard_text_by_format(CF_UNICODETEXT, convert_wide);
+	result = get_clipboard_text_by_format(CF_UNICODETEXT, convert_wide);
 
 	// try to access ANSI text
 	if (result == NULL)

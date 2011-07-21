@@ -696,10 +696,10 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 	try
 	{
 		// allocate an array to hold the character data
-		UINT8 *chartable = auto_alloc_array_clear(m_manager.machine(), UINT8, numchars * CACHED_CHAR_SIZE);
+		chartable = auto_alloc_array_clear(m_manager.machine(), UINT8, numchars * CACHED_CHAR_SIZE);
 
 		// allocate a temp buffer to compress into
-		UINT8 *tempbuffer = auto_alloc_array(m_manager.machine(), UINT8, 65536);
+		tempbuffer = auto_alloc_array(m_manager.machine(), UINT8, 65536);
 
 		// write the header
 		UINT8 *dest = tempbuffer;

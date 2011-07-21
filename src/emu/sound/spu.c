@@ -776,7 +776,7 @@ bool spu_device::sample_cache::try_update(spu_device *spu)
 			#endif
 
 			signed short *dp=data+(((invalid_start-start)>>4)*28);
-			adpcm_packet *ap=(adpcm_packet *)(spu->spu_ram+invalid_start);
+			ap=(adpcm_packet *)(spu->spu_ram+invalid_start);
 			for (a=invalid_start; a<invalid_end; a+=16, ap++)
 				dp=update_decoder.decode_packet(ap,dp);
 
@@ -794,8 +794,8 @@ bool spu_device::sample_cache::try_update(spu_device *spu)
 				if (invalid_start==lc->loopstart)
 				{
 					adpcm_decoder tmp=decoder;
-					signed short *dp=lc->data,
-											 *dpend=dp+lc->len;
+					dp=lc->data;
+					signed short *dpend=dp+lc->len;
 					unsigned int adr=lc->loopstart;
 					for (unsigned int i=0; ((i<num_loop_cache_packets) && (dp<dpend)); i++, adr+=16)
 						dp=tmp.decode_packet((adpcm_packet *)(spu->spu_ram+adr),dp);
@@ -806,7 +806,7 @@ bool spu_device::sample_cache::try_update(spu_device *spu)
 			invalid_start=0xffffffff;
 			valid=true;
 
-			for (unsigned int a=start; a<end; a+=16, ap++)
+			for (a=start; a<end; a+=16, ap++)
 			{
 				spu->cache[a>>4]=this;
 			}

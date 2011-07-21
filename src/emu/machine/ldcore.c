@@ -1036,7 +1036,7 @@ static STREAM_UPDATE( custom_stream_callback )
 		/* clear out the rest of the buffer */
 		if (samples > 0)
 		{
-			int sampout = (ldcore->audiobufout == 0) ? ldcore->audiobufsize - 1 : ldcore->audiobufout - 1;
+			sampout = (ldcore->audiobufout == 0) ? ldcore->audiobufsize - 1 : ldcore->audiobufout - 1;
 			stream_sample_t fill0 = buffer0[sampout] & leftand;
 			stream_sample_t fill1 = buffer1[sampout] & rightand;
 

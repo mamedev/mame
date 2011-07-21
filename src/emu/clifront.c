@@ -1061,12 +1061,12 @@ void cli_frontend::listsoftware(const char *gamename)
 
 									if ( part->featurelist )
 									{
-										feature_list *list = part->featurelist;
+										feature_list *flist = part->featurelist;
 
-										while( list )
+										while( flist )
 										{
-											fprintf( out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", list->name, list->value );
-											list = list->next;
+											fprintf( out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist->name, flist->value );
+											flist = flist->next;
 										}
 									}
 

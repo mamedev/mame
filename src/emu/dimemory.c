@@ -313,8 +313,8 @@ bool device_memory_interface::interface_validity_check(emu_options &options, con
 					for (const rom_source *source = rom_first_source(device().mconfig()); source != NULL && !found; source = rom_next_source(*source))
 						for (const rom_entry *romp = rom_first_region(*source); !ROMENTRY_ISEND(romp) && !found; romp++)
 						{
-							const char *regiontag = ROMREGION_GETTAG(romp);
-							if (regiontag != NULL)
+							const char *regiontag_c = ROMREGION_GETTAG(romp);
+							if (regiontag_c != NULL)
 							{
 								astring fulltag;
 								astring regiontag;

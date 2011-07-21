@@ -1567,7 +1567,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			{
 				(*d3dintf->effect.begin_pass)(curr_effect, pass);
 				// add the primitives
-				HRESULT result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+				result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 				(*d3dintf->effect.end_pass)(curr_effect);
 			}
@@ -1590,7 +1590,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			{
 				(*d3dintf->effect.begin_pass)(curr_effect, pass);
 				// add the primitives
-				HRESULT result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+				result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 				(*d3dintf->effect.end_pass)(curr_effect);
 			}
@@ -1614,7 +1614,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		{
 			(*d3dintf->effect.begin_pass)(curr_effect, pass);
 			// add the primitives
-			HRESULT result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+			result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 			(*d3dintf->effect.end_pass)(curr_effect);
 		}

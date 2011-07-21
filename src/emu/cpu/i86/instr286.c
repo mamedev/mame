@@ -666,7 +666,6 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 		cpustate->regs.w[DX] = ReadWord(0x830);
 		cpustate->regs.w[CX] = ReadWord(0x832);
 		cpustate->regs.w[AX] = ReadWord(0x834);
-		UINT16 desc[3];
 // loadall uses base-rights-limit order
 #define LOADDESC(addr, sreg) {  desc[1] = ReadWord(addr); desc[2] = ReadWord(addr+2); desc[0] = ReadWord(addr+4); \
 				cpustate->base[sreg] = BASE(desc); cpustate->rights[sreg] = RIGHTS(desc); \
