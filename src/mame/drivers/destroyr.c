@@ -2,6 +2,11 @@
 
 Atari Destroyer Driver
 
+TODO:
+- discrete sound
+- accurate implementation of scanline counter as documented in schematics,
+  generate irqs from there, and refresh rate 15750/262 (~60.1) instead of 60
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -448,7 +453,7 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15750.0/262)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
