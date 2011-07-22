@@ -9090,6 +9090,150 @@ fstation		// (c) 2000
 // Other games on adp hardware
 funlddlx		// (c) 1999
 
+// JPM
+
+// JPM System 80
+
+// JPM MPS1/2 Hardware
+
+j2adnote	// Add A Note (Jpm)
+j2adnotea
+j2adnoteb
+j2adnotec
+j2adnoted
+j2adnotee
+j2adnotef
+j2adnoteg
+j2adnoteh
+j2adnotei
+j2bankch	// Bank Chase (Jpm)
+j2bigbnk	// Big Banker (Jpm)
+j2bigbox	// Big Box (Jpm)
+j2bigbuk	// Big Buck$ (Jpm)
+j2bigdl		// Big Deal (Jpm)
+j2blkchy	// Black Cherry (Jpm)
+j2cashbn	// Cash Bonus Club (Jpm)
+j2cashfl	// Cash Falls (Jpm)
+j2cashrl	// Cash Reels (Jpm)
+j2cashrv	// Cash Reserve (Jpm)
+j2cashro	// Cash Rolls (Jpm)
+j2cashtk	// Cash Track (Jpm)
+j2cashtd	// Cash Track Deluxe (Jpm)
+j2coppot	// Copper Pot (Jpm)
+j2coprun	// Copper Run (Jpm)
+j2crkbnk	// Crack The Bank (Jpm)
+j2droplt	// Drop The Lot (Jpm)
+j2dropld	// Drop The Lot Deluxe (Jpm)
+j2ewn		// Each Way Nudger (Jpm)
+j2ews		// Each Way Shuffle (Jpm)
+j2exec		// Executive Club (Jpm)
+j2fasttk	// Fast Trak (Jpm)
+j2fqueen	// Find The Queen (Jpm)
+j2fiveal	// Five Alive (Jpm)
+j2fiveln	// Five Liner (Jpm) [Mps]
+j2fws		// Five Way Shuffle (Jpm)
+j2frmtch	// Fruit Match (Jpm)
+j2fullhs	// Full House Club (Jpm)
+j2ghostb	// Ghostbuster (Jpm)
+j2goldrn	// Gold Run (Jpm)
+j2goldbr	// Golden Bars (Jpm)
+j2gldchy	// Golden Cherry (Jpm)
+j2gldwin	// Golden Win (Jpm)
+j2hinote	// Hi Note (Jpm)
+j2hiroll	// Hi Roller (Jpm) [Mps]
+j2hotpot	// Hot Pot (Jpm)
+j2hotptd	// Hot Pot Deluxe (Jpm)
+j2hotsht	// Hot Shot Club (Jpm)
+j2hypnot	// Hypernote (Jpm)
+j2jackbr	// Jackpot Bars (Jpm)
+j2jackdc	// Jackpot Dice (Jpm)
+j2jokers	// Jokers (Jpm)
+j2kingcl	// King Of Clubs (Jpm)
+j2litean	// Lite A Nudge (Jpm)
+j2lovsht	// Loot Shoot (Jpm)
+j2lovshd	// Loot Shoot Deluxe (Jpm)
+j2lucky2	// Lucky 2s (Jpm)
+j2monblt	// Money Belt (Jpm)
+j2mongam	// Money Game (Jpm)
+j2mongmd	// Money Game Deluxe (Jpm)
+j2multwn	// Multi Win (Jpm)
+j2notexc	// Note Exchange (Jpm)
+j2notesh	// Note Shoot (Jpm)
+j2nudbnz	// Nudge Bonanza Deluxe (Jpm)
+j2nuddup	// Nudge Double Up (Jpm)
+j2nuddud	// Nudge Double Up Deluxe (Jpm)
+j2nudup3	// Nudge Double Up MkIII (Jpm)
+j2nudshf	// Nudge Shuffler (Jpm)
+j2plsmon	// Plus Money (Jpm)
+j2plsmnd	// Plus Money Deluxe (Jpm)
+j2plsnud	// Plus Nudge (Jpm)
+j2potlck	// Pot Luck (Jpm)
+j2pndrsh	// Pound Rush (Jpm)
+j2pyramd	// Pyramid (Jpm)
+j2reelbn	// Reel Bingo Club (Jpm)
+j2reelbo	// Reel Bonus (Jpm)
+j2reelmg	// Reel Magic (Jpm)
+j2reelmgd	// Reel Magic (Jpm) [Dutch]
+j2reelmc	// Reel Magic Club (Jpm)
+j2reelmo	// Reel Money (Jpm) [Mps]
+j2rotnot	// Rota Note (Jpm)
+j2roulcl	// Roulette Club (Jpm)
+j2rdclb		// Royal Deal Club (Jpm)
+j2slvrgh	// Silver Ghost (Jpm)
+j2spcrsv	// Special Reserve (Jpm)
+j2stahed	// Streets Ahead (Jpm)
+j2supfrt	// Supa Fruit (Jpm)
+j2supfrc	// Supa Fruit Club (Jpm)
+j2supsft	// Supa Shifta (Jpm)
+j2supstp	// Supa Steppa (Jpm)
+j2suptrk	// Supa Track (Jpm)
+j2suprft	// Super Fruit (Jpm)
+j2supln		// Super Line (Jpm)
+j2suppot	// Super Pots (Jpm)
+j2suprl		// Super Reel (Jpm)
+j2suprsh	// Supershot (Jpm)
+j2supstr	// Superstars (Jpm)
+j2swbank	// Switch Back (Jpm)
+j2take2		// Take 2 (Jpm)
+j2topsht	// Top Shot (Jpm)
+j2westrn	// Western (Jpm)
+
+j2blustr	// Blue Streak (Pcp)
+j2cshalm	// Cash Alarm (Pcp)
+j2cshcrd	// Cash Cards (Pcp)
+j2cshfil	// Cash Filla (Pcp)
+j2cshsmh	// Cash Smash (Pcp)
+j2criscr	// Criss Cross Jackpot (Pcp)
+j2frucnx	// Fruit Connexion (Pcp)
+j2hitmon	// Hit Money (Pcp)
+j2penny		// In For A Penny In For A Pound (Pcp)
+j2maxima	// Maxima (Pcp)
+j2montrp	// Money Trapper (Pcp)
+j2nudmon	// Nudge Money (Pcp)
+j2paypkt	// Pay Packet (Pcp)
+j2silvcl	// Silver Classic (Pcp)
+j2silvsh	// Silver Shot (Pcp)
+j2sstrea	// Supa Streak (Pcp)
+j2tstplt	// Test Pilot (Pcp)
+
+j2bonanz	// Bonanza (Eurocoin)
+j2supchy	// Super Cherry (Eurocoin)
+
+j2hilocl	// Hi Lo Climber Club (Crystal)
+j2litnot	// Lite A Note Club (Crystal)
+j2missis	// Mississippi Gambler Club (Crystal)
+
+j2always	// Always Eight (Bwb)
+j2coinsh	// Coin Shoot (Bwb)
+j2nudfev	// Nudge Fever (Bwb)
+j2trail		// Trailblazer (Bwb)
+
+j2cshnud	// Cash Nudger (Mdm)
+j2fivepn	// Fivepenny Nudger (Mdm)
+j2nolimt	// No Limit Nudge (Mdm)
+
+j2strk10	// Strike Ten (Ace)
+
 // JPM Give us a Break hardware
 guab			// (c) 1986
 guab3a			// (c) 1986
