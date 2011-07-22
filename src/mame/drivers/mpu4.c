@@ -11854,7 +11854,7 @@ ROM_END
 
 ROM_START( m4colosse )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "col_0.6.bin", 0x0000, 0x010000, CRC(53d2431a) SHA1(44da207ce0ba24d110a1aaf6c0705f9c2245d212) )
+	ROM_LOAD( "coll10.bin", 0x0000, 0x010000, CRC(a2468607) SHA1(e926025548e4c0ad1e97b35215b2d28c058126dd) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "colsnd1.bin", 0x000000, 0x080000, CRC(a6fa2c68) SHA1(e5572b37086a28bee9ce4dfe549ed60ddbffe444) )
@@ -11863,15 +11863,6 @@ ROM_END
 
 ROM_START( m4colossf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "coll10.bin", 0x0000, 0x010000, CRC(a2468607) SHA1(e926025548e4c0ad1e97b35215b2d28c058126dd) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "colsnd1.bin", 0x000000, 0x080000, CRC(a6fa2c68) SHA1(e5572b37086a28bee9ce4dfe549ed60ddbffe444) )
-	ROM_LOAD( "colsnd2.bin", 0x080000, 0x080000, CRC(8b01f0cb) SHA1(990fb0b51ddf4eb3f436e11d01d0e5e3b2465ac5) )
-ROM_END
-
-ROM_START( m4colossg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "colossus-v1.0.bin", 0x0000, 0x010000, CRC(4fc41c62) SHA1(1c088dd278e414081e98689a49b8305c3d3d4db3) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -11879,7 +11870,7 @@ ROM_START( m4colossg )
 	ROM_LOAD( "colsnd2.bin", 0x080000, 0x080000, CRC(8b01f0cb) SHA1(990fb0b51ddf4eb3f436e11d01d0e5e3b2465ac5) )
 ROM_END
 
-ROM_START( m4colossh )
+ROM_START( m4colossg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "colossus_8.bin", 0x0000, 0x010000, CRC(4ab3ee66) SHA1(2b61b6f9b43592826f7cb755898fcbc4a381f9b3) )
 
@@ -12525,15 +12516,6 @@ ROM_START( m4nudgem )
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "nudgejems.p1", 0x0000, 0x080000, CRC(e875d82e) SHA1(50fb941ad801397ef3dee651be126c01c9423386) )
 ROM_END
-
-ROM_START( m4nudgema )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nudgejemsprg.p1", 0x0000, 0x010000, CRC(bbab66b8) SHA1(a3a7d40d0ca41e57cd0d6965c0306edca372da1d) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "nudgejems.p1", 0x0000, 0x080000, CRC(e875d82e) SHA1(50fb941ad801397ef3dee651be126c01c9423386) )
-ROM_END
-
 
 
 
@@ -13550,7 +13532,6 @@ GAME(199?, m4colossd, m4coloss, mod4oki, mpu4, m4default, ROT0,   "Mdm","Colossu
 GAME(199?, m4colosse, m4coloss, mod4oki, mpu4, m4default, ROT0,   "Mdm","Colossus (Mdm) (MPU4, set 6)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4colossf, m4coloss, mod4oki, mpu4, m4default, ROT0,   "Mdm","Colossus (Mdm) (MPU4, set 7)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4colossg, m4coloss, mod4oki, mpu4, m4default, ROT0,   "Mdm","Colossus (Mdm) (MPU4, set 8)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4colossh, m4coloss, mod4oki, mpu4, m4default, ROT0,   "Mdm","Colossus (Mdm) (MPU4, set 9)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4firebl,  0,		mod2    ,mpu4, m4default, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // hangs after spin (sound status?)
 GAME(199?, m4firebla, m4firebl,	mod2    ,mpu4, m4default, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // hangs after spin (sound status?)
 GAME(199?, m4fireblb, m4firebl,	mod2    ,mpu4, m4default, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // hangs after spin (sound status?)
@@ -13563,8 +13544,7 @@ GAME(199?, m4themoba, m4themob, mod4oki, mpu4, m4default, ROT0,   "Mdm","The Mob
 GAME(199?, m4themobb, m4themob, mod4oki, mpu4, m4default, ROT0,   "Mdm","The Mob (Mdm) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4nudbon,  0,		mod2    ,mpu4, m4default, ROT0,   "Mdm","Nudge Bonanza (Mdm) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4nudbona, m4nudbon,	mod2    ,mpu4, m4default, ROT0,   "Mdm","Nudge Bonanza (Mdm) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4nudgem,  0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","Nudge Gems (Mdm) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4nudgema, m4nudgem,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Nudge Gems (Mdm) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4nudgem,  0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","Nudge Gems (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4smshgb, 0,			mod4oki, mpu4, m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4smshgba,m4smshgb,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4smshgbb,m4smshgb,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )

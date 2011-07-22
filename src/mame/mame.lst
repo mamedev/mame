@@ -9094,6 +9094,24 @@ funlddlx		// (c) 1999
 
 // JPM System 80
 
+j80bac		// Bank A Coin (Jpm)
+j80bounc	// Bouncer (Jpm)
+j80frogh	// Frog Hop (Jpm)
+j80fruit	// Fruit Snappa (Jpm)
+j80golds	// Golden Steppa (Jpm)
+j80hotln	// Hot Lines (Jpm)
+j80myspn	// Mystery Spin (Jpm)
+j80nudg2	// Nudge Double Up MkII (Jpm)
+j80rr		// Road Runner (Jpm)
+j80rra		//
+j80r66		// Route 66 (Jpm)
+j80supst	// Supa Steppa (Jpm)
+j80supbk	// Superbank (Jpm)
+j80topsp	// Top Sprint (Jpm)
+j80topup	// Top Up (Jpm)
+j80tumbl	// Tumble (Jpm)
+j80wsprt	// Winsprint (Jpm)
+
 // JPM MPS1/2 Hardware
 
 j2adnote	// Add A Note (Jpm)
@@ -11496,7 +11514,6 @@ m4colossd	//
 m4colosse	// 
 m4colossf	// 
 m4colossg	// 
-m4colossh	// 
 m4firebl	// Fireball (Mdm)
 m4firebla	// 
 m4fireblb	// 
@@ -11510,7 +11527,6 @@ m4themobb	//
 m4nudbon	// Nudge Bonanza (Mdm)
 m4nudbona	//
 m4nudgem	// Nudge Gems (Mdm)
-m4nudgema	//
 m4smshgb	// Smash 'n' Grab (Mdm)
 m4smshgba	//
 m4smshgbb	//

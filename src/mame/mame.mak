@@ -801,6 +801,7 @@ $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/guab.o \
 	$(DRIVERS)/jpmsys5.o \
 	$(DRIVERS)/jpmmps.o \
+	$(DRIVERS)/jpms80.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 
 $(MAMEOBJ)/kaneko.a: \
