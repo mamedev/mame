@@ -64,7 +64,7 @@ class cothread
 public:
 	// construction/destruction
 	cothread(cothread_t existing_thread);
-	cothread(cothread_entry_delegate entry, size_t stack = 16384);
+	cothread(cothread_entry_delegate entry, size_t stack = 65536);
 	~cothread() { if (m_creator_cothread != NULL) co_delete(m_cothread); }
 
 	// switching
