@@ -1,9 +1,12 @@
 /******************************************************************************************
-System Control Unit - DSP emulator version 0.06
+System Control Unit - DSP emulator version 0.07
 
 Written by Angelo Salese & Mariusz Wojcieszek
 
 Changelog:
+110722: Angelo Salese
+- Added DSP IRQ command, tested with "The King of Boxing"
+
 110527: Angelo Salese
 - Fixed incorrectly setted execute flag clearance, allows animation of the Sega Saturn
   splash screen;
@@ -729,6 +732,18 @@ static void dsp_jump( address_space *space )
 	}
 }
 
+static TIMER_CALLBACK( dsp_ended )
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	if(!(state->m_scu.ism & IRQ_DSP_END))
+		device_set_input_line_and_vector(state->m_maincpu, 0xa, HOLD_LINE, 0x45);
+	else
+		state->m_scu.ist |= (IRQ_DSP_END);
+
+	EF_1;
+}
+
 static void dsp_end( address_space *dmaspace )
 {
 	saturn_state *state = dmaspace->machine().driver_data<saturn_state>();
@@ -736,7 +751,7 @@ static void dsp_end( address_space *dmaspace )
 	if(opcode & 0x08000000)
 	{
 		/*ENDI*/
-		EF_1;
+		dmaspace->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dsp_ended));
 	}
 
 	EXF_0; /* END / ENDI */
