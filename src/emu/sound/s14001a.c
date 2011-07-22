@@ -548,14 +548,9 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 
 static STREAM_UPDATE( s14001a_pcm_update )
 {
-	INT32 mix[48000];
-	//INT32 *mixp;
 	S14001AChip *chip = (S14001AChip *)param;
 	int i;
 
-	memset(mix, 0, sizeof(mix));
-
-	//mixp = &mix[0];
 	for (i = 0; i < samples; i++)
 	{
 		s14001a_clock(chip);
