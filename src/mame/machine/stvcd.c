@@ -43,7 +43,7 @@ static void cd_playdata(void);
 
 #define MAX_FILTERS	(24)
 #define MAX_BLOCKS	(200)
-#define MAX_DIR_SIZE	(128*1024)
+#define MAX_DIR_SIZE	(256*1024)
 #define CD_SPEED 75*1 /* TODO: should be x2 */
 
 typedef struct
