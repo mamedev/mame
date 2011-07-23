@@ -903,7 +903,7 @@ INLINE void m68ki_ic_clear(m68ki_cpu_core *m68k)
 
 INLINE UINT32 m68ki_ic_readimm16(m68ki_cpu_core *m68k, UINT32 address)
 {
-	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type) && (m68k->cacr & M68K_CACR_EI))
+/*	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type) && (m68k->cacr & M68K_CACR_EI))
 	{
 		UINT32 ic_offset = (address >> 1) % M68K_IC_SIZE;
 		if (m68k->ic_address[ic_offset] == address)
@@ -921,13 +921,13 @@ INLINE UINT32 m68ki_ic_readimm16(m68ki_cpu_core *m68k, UINT32 address)
 			return data;
 		}
 	}
-	else
+	else*/
 	{
 		return m68k->memory.readimm16(address);
 	}
 
 	// this can't happen, but Apple GCC insists
-	return 0;
+//	return 0;
 }
 
 /* Handles all immediate reads, does address error check, function code setting,
