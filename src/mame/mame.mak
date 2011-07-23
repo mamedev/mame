@@ -1650,6 +1650,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/buster.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
+	$(DRIVERS)/castle.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
 	$(DRIVERS)/cavesh3.o \
 	$(DRIVERS)/cb2001.o \
