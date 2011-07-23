@@ -142,16 +142,18 @@ WRITE8_MEMBER( awacs_device::write )
             break;
 
         case 0x10:
-            static const int rates[4] = { 22100, 29400, 44100, 22100 };
-            m_stream->set_sample_rate(rates[(data>>1)&3]);
-//            printf("rate %d, enable: %d\n", rates[(data>>1)&3], data & 1);
-            m_playback_enable = (data & 1) ? true : false;
+			{
+	            static const int rates[4] = { 22100, 29400, 44100, 22100 };
+		        m_stream->set_sample_rate(rates[(data>>1)&3]);
+//			      printf("rate %d, enable: %d\n", rates[(data>>1)&3], data & 1);
+				m_playback_enable = (data & 1) ? true : false;
 
-            if (m_playback_enable && !(m_regs[0x10]&1))
-            {
-                m_play_ptr = 0;
-                m_buffer_num = 0;
-            }
+				if (m_playback_enable && !(m_regs[0x10]&1))
+				{
+					m_play_ptr = 0;
+					m_buffer_num = 0;
+				}
+			}
             break;
 
         case 0x18:
