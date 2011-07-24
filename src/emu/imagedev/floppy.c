@@ -80,12 +80,29 @@ void floppy_image_device::device_config_complete()
 	update_names();
 }
 
+static TIMER_CALLBACK(floppy_drive_index_callback)
+{
+	floppy_image_device *image = (floppy_image_device *) ptr;
+	image->index_func();
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void floppy_image_device::device_start()
 {
+	// resolve callbacks
+	m_out_idx_func.resolve(m_out_idx_cb, *this);
+	
+	m_idx = 0;
+	
+	/* motor off */
+	m_mon = 1;
+
+	m_rpm = 300.0f;
+	
+	m_index_timer = machine().scheduler().timer_alloc(FUNC(floppy_drive_index_callback), (void *)this);
 }
 
 bool floppy_image_device::call_load()
@@ -110,4 +127,64 @@ void floppy_image_device::call_unload()
 		global_free(m_image);
 	if (m_unload_func)
 		m_unload_func(*this);
+}
+
+/* motor on, active low */
+void floppy_image_device::mon_w(int state)
+{
+	/* force off if there is no attached image */
+	if (!exists())
+		state = 1;
+
+	/* off -> on */
+	if (m_mon && state == 0)
+	{
+		m_idx = 0;
+		index_func();
+	}
+
+	/* on -> off */
+	else if (m_mon == 0 && state)
+		m_index_timer->adjust(attotime::zero);
+
+	m_mon = state;
+}
+
+/* index pulses at rpm/60 Hz, and stays high 1/20th of time */
+void floppy_image_device::index_func()
+{
+	double ms = 1000.0 / (m_rpm / 60.0);
+
+	if (m_idx)
+	{
+		m_idx = 0;
+		m_index_timer->adjust(attotime::from_double(ms*19/20/1000.0));
+	}
+	else
+	{
+		m_idx = 1;
+		m_index_timer->adjust(attotime::from_double(ms/20/1000.0));
+	}
+
+	m_out_idx_func(m_idx);
+
+	//if (drive->index_pulse_callback)
+//		drive->index_pulse_callback(drive->controller, img, drive->idx);
+}
+
+int floppy_image_device::ready_r()
+{
+	if (exists())
+	{
+		if (m_mon == 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+double floppy_image_device::get_pos()
+{
+	return m_index_timer->elapsed().as_double();
 }

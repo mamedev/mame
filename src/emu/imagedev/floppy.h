@@ -16,6 +16,8 @@
 
 struct floppy_interface
 {
+	devcb_write_line 				m_out_idx_cb;  /* index */
+
 	const struct floppy_format_def *m_formats;
 	const char *					m_interface;
 	device_image_display_info_func	m_device_displayinfo;
@@ -52,6 +54,11 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	UINT8* get_buffer(UINT16 track, UINT8 side) { return m_image->get_buffer(track,side); }
+	
+	void mon_w(int state);
+	void index_func();
+	int  ready_r();
+	double get_pos();
 protected:
 	// device-level overrides
     virtual void device_config_complete();
@@ -60,6 +67,27 @@ protected:
 	image_device_format m_format;
 	floppy_image 		*m_image;
 	char				m_extension_list[256];
+	
+	/* index pulse timer */
+	emu_timer	*m_index_timer;
+	
+	/* state of input lines */
+	int m_drtn; /* direction */
+	int m_stp;  /* step */
+	int m_wtg;  /* write gate */
+	int m_mon;  /* motor on */
+
+	/* state of output lines */
+	int m_idx;  /* index pulse */
+	int m_tk00; /* track 00 */
+	int m_wpt;  /* write protect */
+	int m_rdy;  /* ready */
+	int m_dskchg;		/* disk changed */
+	
+	/* rotation per minute => gives index pulse frequency */
+	float m_rpm;
+	
+	devcb_resolved_write_line m_out_idx_func;
 };
 
 // device type definition
