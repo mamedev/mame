@@ -177,7 +177,7 @@ private:
 	audit_record *audit_one_rom(const rom_entry *rom);
 	audit_record *audit_one_disk(const rom_entry *rom);
 	void compute_status(audit_record &record, const rom_entry *rom, bool found);
-	int also_used_by_parent(const hash_collection &romhashes);
+	int also_used_by_parent(const hash_collection &romhashes, UINT64 romlength);
 
 	// internal state
 	simple_list<audit_record>	m_record_list;
