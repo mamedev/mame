@@ -1,7 +1,9 @@
 /*
 
 Chack'n Pop driver by BUT
-                                                                     
+     
+Note: The 68705 MCU isn't dumped, becuase it's protected, however we simulate
+      it using data extracted with a trojan. See machine/chaknpop.c                                                                
                                              
 Chack'n Pop
 Taito 1983
@@ -218,57 +220,57 @@ static INPUT_PORTS_START( chaknpop )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWC")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) )		PORT_DIPLOCATION("SWC:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Super Chack'n" )
+	PORT_DIPNAME( 0x04, 0x04, "Super Chack'n" )		PORT_DIPLOCATION("SWC:3")
 	PORT_DIPSETTING(    0x04, "pi" )
 	PORT_DIPSETTING(    0x00, "1st Chance" )
-	PORT_DIPNAME( 0x08, 0x08, "Endless (Cheat)")
+	PORT_DIPNAME( 0x08, 0x08, "Endless (Cheat)")		PORT_DIPLOCATION("SWC:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Credit Info" )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Info" )		PORT_DIPLOCATION("SWC:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Show Year" )
+	PORT_DIPNAME( 0x20, 0x20, "Show Year" )			PORT_DIPLOCATION("SWC:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Infinite (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Infinite (Cheat)")		PORT_DIPLOCATION("SWC:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SWC:8")
 	PORT_DIPSETTING(    0x00, "1 Way" )
 	PORT_DIPSETTING(    0x80, "2 Way" )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x00, "80k and every 100k" )
 	PORT_DIPSETTING(    0x01, "60k and every 100k" )
 	PORT_DIPSETTING(    0x02, "40k and every 100k" )
 	PORT_DIPSETTING(    0x03, "20k and every 100k" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:4,5")
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x18, "1" )
-	PORT_DIPNAME( 0x20, 0x00, "Training/Difficulty" )
+	PORT_DIPNAME( 0x20, 0x00, "Training/Difficulty" )	PORT_DIPLOCATION("SWB:6")
 	PORT_DIPSETTING(    0x20, "Off/Every 10 Min." )
 	PORT_DIPSETTING(    0x00, "On/Every 7 Min." )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME(0x0f,  0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME(0x0f,  0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWA:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
@@ -285,7 +287,7 @@ static INPUT_PORTS_START( chaknpop )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME(0xf0,  0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME(0xf0,  0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SWA:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
@@ -416,28 +418,26 @@ MACHINE_CONFIG_END
 
 ROM_START( chaknpop )
 	ROM_REGION( 0x18000, "maincpu", 0 )			/* Main CPU */
-	ROM_LOAD( "a04-01.28",    0x00000, 0x2000, CRC(386fe1c8) SHA1(cca24abfb8a7f439251e7936036475c694002561) )
-	ROM_LOAD( "a04-02.27",    0x02000, 0x2000, CRC(5562a6a7) SHA1(0c5d81f9aaf858f88007a6bca7f83dc3ef59c5b5) )
-	ROM_LOAD( "a04-03.26",    0x04000, 0x2000, CRC(3e2f0a9c) SHA1(f1cf87a4cb07f77104d4a4d369807dac522e052c) )
-	ROM_LOAD( "a04-04.25",    0x06000, 0x2000, CRC(5209c7d4) SHA1(dcba785a697df55d84d65735de38365869a1da9d) )
-	ROM_LOAD( "a04-05.3",     0x0a000, 0x2000, CRC(8720e024) SHA1(99e445c117d1501a245f9eb8d014abc4712b4963) )
+	ROM_LOAD( "a04_01.ic28", 0x00000, 0x2000, CRC(386fe1c8) SHA1(cca24abfb8a7f439251e7936036475c694002561) )
+	ROM_LOAD( "a04_02.ic27", 0x02000, 0x2000, CRC(5562a6a7) SHA1(0c5d81f9aaf858f88007a6bca7f83dc3ef59c5b5) )
+	ROM_LOAD( "a04_03.ic26", 0x04000, 0x2000, CRC(3e2f0a9c) SHA1(f1cf87a4cb07f77104d4a4d369807dac522e052c) )
+	ROM_LOAD( "a04_04.ic25", 0x06000, 0x2000, CRC(5209c7d4) SHA1(dcba785a697df55d84d65735de38365869a1da9d) )
+	ROM_LOAD( "a04_05.ic3",  0x0a000, 0x2000, CRC(8720e024) SHA1(99e445c117d1501a245f9eb8d014abc4712b4963) )
 
-	ROM_REGION( 0x0800, "cpu1", 0 )	/* 2k for the microcontroller */
-	/* MCU isn't dumped (its protected) however we simulate it using data
-       extracted with a trojan, see machine/chaknpop.c */
-	ROM_LOAD( "68705.mcu",   0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the Motorola MC68705P5 Micro-controller */
+	ROM_LOAD( "a04_06.ic23", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )	/* Sprite */
-	ROM_LOAD( "a04-08.14",     0x0000, 0x2000, CRC(5575a021) SHA1(c2fad53fe6a12c19cec69d27c13fce6aea2502f2) )
-	ROM_LOAD( "a04-07.15",     0x2000, 0x2000, CRC(ae687c18) SHA1(65b25263da88d30cbc0dad94511869596e5c975a) )
+	ROM_LOAD( "a04_08.ic14", 0x0000, 0x2000, CRC(5575a021) SHA1(c2fad53fe6a12c19cec69d27c13fce6aea2502f2) )
+	ROM_LOAD( "a04_07.ic15", 0x2000, 0x2000, CRC(ae687c18) SHA1(65b25263da88d30cbc0dad94511869596e5c975a) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )	/* Text */
-	ROM_LOAD( "a04-09.98",     0x0000, 0x2000, CRC(757a723a) SHA1(62ab84d2aaa9bc1ea5aa9df8155aa3b5a1e93889) )
-	ROM_LOAD( "a04-10.97",     0x2000, 0x2000, CRC(3e3fd608) SHA1(053a8fbdb35bf1c142349f78a63e8cd1adb41ef6) )
+	ROM_LOAD( "a04_09.ic98", 0x0000, 0x2000, CRC(757a723a) SHA1(62ab84d2aaa9bc1ea5aa9df8155aa3b5a1e93889) )
+	ROM_LOAD( "a04_10.ic97", 0x2000, 0x2000, CRC(3e3fd608) SHA1(053a8fbdb35bf1c142349f78a63e8cd1adb41ef6) )
 
 	ROM_REGION( 0x0800, "proms", 0 )			/* Palette */
-	ROM_LOAD( "a04-11.bin",    0x0000, 0x0400, CRC(9bf0e85f) SHA1(44f0a4712c99a715dec54060afb0b27dc48998b4) )
-	ROM_LOAD( "a04-12.bin",    0x0400, 0x0400, CRC(954ce8fc) SHA1(e187f9e2cb754264d149c2896ca949dea3bcf2eb) )
+	ROM_LOAD( "a04_11.ic96", 0x0000, 0x0400, CRC(9bf0e85f) SHA1(44f0a4712c99a715dec54060afb0b27dc48998b4) )
+	ROM_LOAD( "a04_12.ic95", 0x0400, 0x0400, CRC(954ce8fc) SHA1(e187f9e2cb754264d149c2896ca949dea3bcf2eb) )
 ROM_END
 
 
