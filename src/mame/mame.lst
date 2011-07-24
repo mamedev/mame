@@ -9267,13 +9267,157 @@ crisscrs		// (c) 1986
 tenup			// (c) 1988
 tenup3			// (c) 1988
 
-// JPM System 5 Games
-m_popeye
 
-// JPM System 5 + video expansion 2 Games
-monopoly		// (c) 1994
-monoplcl		// (c) 1995
-monopldx		// (c) 1995
+// JPM System 5
+
+j5tstal		// JPM System 5 Alpha Display Test Utility (Jpm)
+j5tst1		// JPM System 5 Test Set (Jpm)
+j5tst2		//
+
+j5fifth		// 5th Avenue (Jpm)
+j5ar80		// Around The World In Eighty Days (Jpm)
+j5ar80a		//
+j5ar80b		//
+j5ar80c		//
+j5ar80d		//
+j5ar80cl	// Around The World Club (Jpm)
+j5ar80cla	//
+j5ar80clb	//
+j5ar80clc	//
+j5buc		// Buccaneer (Jpm)
+j5cir		// Circus (Jpm)
+j5cira		//
+j5cirb		//
+j5circ		//
+j5cird		//
+j5clbnud	// Club Nudger (Jpm)
+j5clbnuda	//
+j5daytn		// Daytona (Jpm)
+j5daytna	//
+j5daycls	// Daytona Classic (Jpm)
+j5dayclsa	//
+j5dirty		// Dirty Dozen (Jpm)
+j5dirtya	//
+j5dirtyb	//
+j5dirtyc	//
+j5fairgd	// Fairground Attraction Club (Jpm)
+j5fairgda	//
+j5fairgdb	//
+j5fairgdc	//
+j5fairgdd	//
+j5fairgde	//
+j5filth		// Filthy Rich (Jpm)
+j5filtha	//
+j5filthb	//
+j5filthc	//
+j5filthd	//
+j5filthe	//
+j5filthf	//
+j5filthg	//
+j5filthh	//
+j5filthi	//
+j5filthj	//
+j5firebl	// Fireball (Jpm)
+j5firebla	//
+j5fireblb	//
+j5frmag		// Fruit Magic (Jpm)
+j5hagar		// Hagar (Jpm)
+j5hagara	//
+j5hagarb	//
+j5hagarc	//
+j5hagard	//
+j5hagare	//
+j5hagarf	//
+j5hagarg	//
+j5hagarh	//
+j5hagari	//
+j5hagarj	//
+j5hagsho	// Hagar Showcase (Jpm)
+j5hagshoa	//
+j5hagshob	//
+j5hagshoc	//
+j5holly		// Hollywood Nights (Jpm)
+j5hollya	//
+j5hollyb	//
+j5hollyc	//
+j5hollyd	//
+j5hollye	//
+j5hotdog	// Hot Dogs (Jpm),
+j5hotdoga	//
+j5indsum	// Indian Summer (Jpm)
+j5indy		// Indy 500 (Jpm)
+j5intr		// Intrigue (Jpm)
+j5intra		//
+j5intrb		//
+j5intrc		//
+j5jokgld	// Jokers Gold (Jpm)
+j5jokglda	//
+j5jokgldb	//
+j5jokgldc	//
+j5jokgldd	//
+j5jokglde	//
+j5jokgldf	//
+j5jokgldg	//
+j5jokgldh	//
+j5nite		// Nite Club (Jpm)
+j5nitea		//
+j5palm		// Palm Springs (Jpm)
+j5palma		//
+j5phnx		// Phoenix (Jpm)
+j5phnxa		//
+j5popeye	// Popeye (Jpm)
+j5popeyea	//
+j5popeyeb	//
+j5popeyec	//
+j5popeyed	//
+j5popeyee	//
+j5popeyef	//
+j5popeyeg	//
+j5popeyeh	//
+j5popeyei	//
+j5popth		// Popeye's Treasure Hunt (Jpm)
+j5poptha	//
+j5popthb	//
+j5popprz	// Prize Popeye Vending (Jpm)
+j5popprza	//
+j5reelgh	// Reel Ghost (Jpm)
+j5roul		// Roulette (Jpm)
+j5roulcl	// Roulette Club (Jpm)
+j5roulcla	//
+j5roulclb	//
+j5roulclc	//
+j5slvree	// Silver Reels (Jpm)
+j5slvreea	//
+j5slvreeb	//
+j5slvstr	// Silver Streak (Jpm), set 1
+j5slvstra	//
+j5slvstrb	//
+j5street	// Streetwise (Jpm)
+j5sup4		// Super 4 (Jpm)
+j5supbar	// Super Bars (Jpm)
+j5supbara	//
+j5suphi		// Super Hi Lo (Jpm)
+j5swop		// Swop A Fruit Club (Jpm)
+j5term		// Terminator (Jpm)
+j5topshp	// Top Of The Shop Club (Jpm)
+j5trail		// Trailblazer Club (Jpm)
+j5traila	//
+j5trailb	//
+j5td		// Tumbling Dice (Jpm)
+j5uj		// Union Jackpot (Jpm)
+j5uja		//
+j5ujb		//
+j5wsc		// Wall Street Club (Jpm)
+j5wsca		//
+
+j5movie		// Movie Magic Club (Crystal?) 
+
+// JPM System 5 + Video Expansion 2
+
+monopoly	// Monopoly (Jpm)
+monoplcl	// Monopoly Classic (Jpm)
+monopldx	// Monopoly Deluxe (Jpm)
+cashcade	// Cashcade (Jpm)
 
 // JPM Impact Games
 cluedo			// (c) 1995
