@@ -13,27 +13,18 @@
 
     Here are the versions we have:
 
-    arkanoid    World version, probably an earlier revision
-    arkanoidu   USA version, probably a later revision; There has been code
-                inserted, NOT patched, so I don't think it's a bootleg
+    arkanoid    The earlier revisions. They each differ in the country byte. These
+    arkanoiduo    versions work fine with the current MCU rom which needs to be
+    arkanoidjo    verified against a genuine decapped A75-06.IC16 M68705 MCU.
+    arkanoidu   USA version. A later revision, code has been inserted NOT patched.
                 The 68705 code for this one was not available; I made it up from
-                the World version changing the level data pointer table.
-    arkanoiduo  USA version, probably an earlier revision
-                ROM a75-10.bin should be identical to the real World one.
-                (It only differs in the country byte from A75-11.ROM)
-                This version works fine with the real MCU ROM
-    arkatour    Tournament version
+                the current A75-06.IC16 changing the level data pointer table.
+    arkanoidj   Japanese version. A later revision with level selector.
                 The 68705 code for this one was not available; I made it up from
-                the World version changing the level data pointer table.
-    arkanoidj   Japanese version with level selector.
-                The 68705 code for this one was not available; I made it up from
-                the World version changing the level data pointer table.
-    arkbl2      Bootleg of the early Japanese version.
-                The only difference is that the warning text has been replaced
-                by "WAIT"
-                ROM E2.6F should be identical to the real Japanese one.
-                (It only differs in the country byte from A75-11.ROM)
-                This version works fine with the real MCU ROM
+                the current A75-06.IC16 changing the level data pointer table.
+    arkanoidjb  Bootleg of the early Japanese version. The only difference is
+                that the warning text has been replaced by "WAIT"
+                This version works fine with the current A75-06.IC16 MCU ROM
     arkatayt    Another bootleg of the early Japanese one, more heavily modified
     arkblock    Another bootleg of the early Japanese one, more heavily modified
     arkbloc2    Another bootleg
@@ -155,7 +146,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 1a) 'arkmcubl'
 
   - Region = 0x76 (Japan).
-  - The bootleg is based on a Japenese early version we don't have.
+  - The bootleg is based on the Japenese version.
   - The MCU is dumped, but the game doesn't run with it.
     However, there is no problem if I use the one from the World early version.
     Until I know what to do with it, I use the MCU from the World early version
@@ -1128,7 +1119,7 @@ ROM_START( arkanoid )
 	ROM_LOAD( "a75-11.ic16",   0x8000, 0x8000, CRC(eafd7191) SHA1(d2f8843b716718b1de209e97a874e8ce600f3f87) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "arkanoid.ic14",  0x0000, 0x0800, CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* The real MCU should be A75-06 @ IC14 */
+	ROM_LOAD( "a75-06.ic14",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* Possible bootleg code??, need the decapped data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1141,6 +1132,7 @@ ROM_START( arkanoid )
 	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )	/* blue component */
 
 	// these were decapped, sort them!
+	// None of these work with any genuine Arkanoid sets!
 	ROM_REGION( 0x0800, "alt_mcus", 0 )	/* 2k for the microcontroller */
 	ROM_LOAD( "arkanoid1_68705p3.ic14",  0x0000, 0x0800, CRC(1b68e2d8) SHA1(f642a7cb624ee14fb0e410de5ae1fc799d2fa1c2) ) // this is close to the supported MCU, is it a bootleg?
 	ROM_LOAD( "arkanoid_mcu.ic14",       0x0000, 0x0800, CRC(4e44b50a) SHA1(c61e7d158dc8e2b003c8158053ec139b904599af) ) // this has a more genuine Programmed By Yasu 1986 string in it with 0x00 fill near the end
@@ -1153,7 +1145,7 @@ ROM_START( arkanoidu )
 	ROM_LOAD( "a75-18.ic16",   0x8000, 0x8000, CRC(cdc08301) SHA1(05f54353cc8333af14fa985a2764960e20e8161a) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "arknoidu.ic14",  0x0000, 0x0800, BAD_DUMP CRC(de518e47) SHA1(b8eddd1c566505fb69e3d1207c7a9720dfb9f503)  ) /* The real MCU should be A75-15 @ IC14?? */
+	ROM_LOAD( "a75-20.ic14",  0x0000, 0x0800, BAD_DUMP CRC(de518e47) SHA1(b8eddd1c566505fb69e3d1207c7a9720dfb9f503)  ) /* Hand crafted, need the decapped data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1172,7 +1164,45 @@ ROM_START( arkanoiduo )
 	ROM_LOAD( "a75-10.ic16",   0x8000, 0x8000, CRC(a1769e15) SHA1(fbb45731246a098b29eb08de5d63074b496aaaba) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "arkanoid.ic14",  0x0000, 0x0800, CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* The real MCU should be A75-06 @ IC14 */
+	ROM_LOAD( "a75-06.ic14",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* Possible bootleg code??, need the decapped data here */
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
+	ROM_LOAD( "a75-04.ic63",   0x08000, 0x8000, CRC(71fae199) SHA1(5d253c46ccf4cd2976a5fb8b8713f0f345443d06) )
+	ROM_LOAD( "a75-05.ic62",   0x10000, 0x8000, CRC(c76374e2) SHA1(7520dd48de20db60a2038f134dcaa454988e7874) )
+
+	ROM_REGION( 0x0600, "proms", 0 ) /* BPROMs are silkscreened as 7621, actual BPROMs used are MMI 6306-1N */
+	ROM_LOAD( "a75-07.ic24",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )	/* red component */
+	ROM_LOAD( "a75-08.ic23",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )	/* green component */
+	ROM_LOAD( "a75-09.ic23",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )	/* blue component */
+ROM_END
+
+ROM_START( arkanoidj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a75-21.ic17",   0x0000, 0x8000, CRC(bf0455fc) SHA1(250522b84b9f491c3f4efc391bf6aa6124361369) )
+	ROM_LOAD( "a75-22.ic16",   0x8000, 0x8000, CRC(3a2688d3) SHA1(9633a661352def3d85f95ca830f6d761b0b5450e) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_LOAD( "a75-23.ic14",  0x0000, 0x0800, BAD_DUMP CRC(0a4abef6) SHA1(fdce0b7a2eab7fd4f1f4fc3b93120b1ebc16078e)  ) /* Hand crafted, need the decapped data here */
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
+	ROM_LOAD( "a75-04.ic63",   0x08000, 0x8000, CRC(71fae199) SHA1(5d253c46ccf4cd2976a5fb8b8713f0f345443d06) )
+	ROM_LOAD( "a75-05.ic62",   0x10000, 0x8000, CRC(c76374e2) SHA1(7520dd48de20db60a2038f134dcaa454988e7874) )
+
+	ROM_REGION( 0x0600, "proms", 0 ) /* BPROMs are silkscreened as 7621, actual BPROMs used are MMI 6306-1N */
+	ROM_LOAD( "a75-07.ic24",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )	/* red component */
+	ROM_LOAD( "a75-08.ic23",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )	/* green component */
+	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )	/* blue component */
+ROM_END
+
+ROM_START( arkanoidjo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a75-01-1.ic17", 0x0000, 0x8000, CRC(5bcda3b0) SHA1(52cadd38b5f8e8856f007a9c602d6b508f30be65) )
+	ROM_LOAD( "a75-02.ic16",   0x8000, 0x8000, CRC(bbc33ceb) SHA1(e9b6fef98d0d20e77c7a1c25eff8e9a8c668a258) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_LOAD( "a75-06.ic14",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* Possible bootleg code??, need the decapped data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1191,7 +1221,7 @@ ROM_START( arkatour )
 	ROM_LOAD( "a75-28.ic16",   0x8000, 0x8000, CRC(326aca4d) SHA1(5a194b7a0361236d471b24905dc6434372f81252) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "a75-32.ic14",  0x0000, 0x0800, BAD_DUMP CRC(d3249559) SHA1(b1542764450016614e9e03cedd6a2f1e59961789)  )
+	ROM_LOAD( "a75-32.ic14",  0x0000, 0x0800, BAD_DUMP CRC(d3249559) SHA1(b1542764450016614e9e03cedd6a2f1e59961789)  ) /* Hand crafted, need the decapped data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-29.ic64",   0x00000, 0x8000, CRC(5ddea3cf) SHA1(58f16515898b7cc2697bf7663a60d9ca0db6da95) )
@@ -1204,33 +1234,14 @@ ROM_START( arkatour )
 	ROM_LOAD( "a75-35.ic22",    0x0400, 0x0200, CRC(38acfd3b) SHA1(2841e9db047aa039eff8567a518b6250b355507b) )	/* blue component */
 ROM_END
 
-ROM_START( arkanoidj )
+ROM_START( arkanoidjb ) /* This set requires a MCU. The MCU code included doesn't seem to work??? See USER1 region below */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a75-21.ic17",   0x0000, 0x8000, CRC(bf0455fc) SHA1(250522b84b9f491c3f4efc391bf6aa6124361369) )
-	ROM_LOAD( "a75-22.ic16",   0x8000, 0x8000, CRC(3a2688d3) SHA1(9633a661352def3d85f95ca830f6d761b0b5450e) )
+	ROM_LOAD( "e1.6d",        0x0000, 0x8000, CRC(dd4f2b72) SHA1(399a8636030a702dafc1da926f115df6f045bef1) ) /* Hacked up Notice warning text */
+	ROM_LOAD( "e2.6f",        0x8000, 0x8000, CRC(bbc33ceb) SHA1(e9b6fef98d0d20e77c7a1c25eff8e9a8c668a258) ) /* == A75-02.IC16 */
 
+	/* Use the current A75-06.IC14 MCU code so the game is playable */
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "arknoidj.uc",  0x0000, 0x0800, BAD_DUMP CRC(0a4abef6) SHA1(fdce0b7a2eab7fd4f1f4fc3b93120b1ebc16078e)  )
-
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
-	ROM_LOAD( "a75-04.ic63",   0x08000, 0x8000, CRC(71fae199) SHA1(5d253c46ccf4cd2976a5fb8b8713f0f345443d06) )
-	ROM_LOAD( "a75-05.ic62",   0x10000, 0x8000, CRC(c76374e2) SHA1(7520dd48de20db60a2038f134dcaa454988e7874) )
-
-	ROM_REGION( 0x0600, "proms", 0 ) /* BPROMs are silkscreened as 7621, actual BPROMs used are MMI 6306-1N */
-	ROM_LOAD( "a75-07.ic24",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )	/* red component */
-	ROM_LOAD( "a75-08.ic23",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )	/* green component */
-	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )	/* blue component */
-ROM_END
-
-ROM_START( arkmcubl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "e1.6d",        0x0000, 0x8000, CRC(dd4f2b72) SHA1(399a8636030a702dafc1da926f115df6f045bef1) )
-	ROM_LOAD( "e2.6f",        0x8000, 0x8000, CRC(bbc33ceb) SHA1(e9b6fef98d0d20e77c7a1c25eff8e9a8c668a258) )
-
-      /* MCU from the World early version ('arkanoid'), so the game is playable */
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "arkmcubl.uc",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) )
+	ROM_LOAD( "a75-06.ic14",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* Possible bootleg code??, need the decapped data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.rom",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1247,14 +1258,14 @@ ROM_START( arkmcubl )
 	ROM_LOAD( "68705p3.6i",   0x0000, 0x0800, CRC(389a8cfb) SHA1(9530c051b61b5bdec7018c6fdc1ea91288a406bd) ) // this has the 1986 by Yasu copyright like some of the new decaps loaded in the parent set!
 ROM_END
 
-ROM_START( ark1ball )
+ROM_START( ark1ball ) /* This set requires a MCU. No MCU rom was supplied so we use current A75-06.IC14 for now */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a-1.7d",       0x0000, 0x8000, CRC(dd4f2b72) SHA1(399a8636030a702dafc1da926f115df6f045bef1) )
 	ROM_LOAD( "2palline.7f",  0x8000, 0x8000, CRC(ed6b62ab) SHA1(4d4991b422756bd304fc5ef236aac1422fe1f999) )
 
-      /* MCU from the World early version ('arkanoid'), so the game is playable */
+	/* Use the current A75-06.IC14 MCU code so the game is playable */
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "ark1ball.uc",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) )
+	ROM_LOAD( "a75-06.ic14",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* Possible bootleg code??, need the decapped data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a-3.3a",       0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1670,7 +1681,8 @@ GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, 0,        ROT90, "Taito Co
 GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkanoidj,  arkanoid, arkanoid, arkanoidj,0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkmcubl,   arkanoid, arkanoid, arkanoidj,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjo, arkanoid, arkanoid, arkanoidj,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, older)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjb, arkanoid, arkanoid, arkanoidj,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU)", GAME_SUPPORTS_SAVE )
 GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc,    arkanoid, bootleg,  arkangc,  arkangc,  ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkangc2, ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
