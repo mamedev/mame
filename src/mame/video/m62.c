@@ -233,7 +233,7 @@ PALETTE_INIT( battroad )
 	palette_set_colors(machine, 0x100, rgb, 0x100);
 	auto_free(machine, rgb);
 
-	rgb = compute_res_net_all(machine, color_prom, &battroad_char_decode_info, &m62_tile_net_info);
+	rgb = compute_res_net_all(machine, color_prom, &battroad_char_decode_info, &battroad_char_net_info);
 	palette_set_colors(machine, 0x200, rgb, 0x020);
 	auto_free(machine, rgb);
 
