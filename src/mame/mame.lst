@@ -10915,13 +10915,42 @@ m_sptlgt
 
 // Maygay MV1 hardware
 
-screenpl
-screenp1
-screenp2
+screenpl	// Screenplay
+screenp1	//
+screenp2	//
+mv1bon		// Believe It Or Not
+mv1cpc		// Caesar's Palace Club
+mv1cpca		//
+mv1cpcb		//
+mv1cwq		// Crossword Quiz
+mv1cwqa		// 
+mv1guac		// Give Us A Clue
+mv1guaca	// 
+mv1sfx		// Special Effects
+mv1sfxa		//
+mv1wc		// World Cup
+
 
 // Maygay EPOCH hardware
 
-ep_simp
+ep_simp		// The Simpsons (Maygay)
+// incomplete dumps
+ep_bingb	// Bingo Belle (Maygay)
+ep_calyp	// Calypso (Maygay)
+ep_cow		// Carry On Winning (Maygay)
+ep_cfall	// Cash Falls (Maygay)
+ep_cflow	// Cash Flow (Maygay)
+ep_doubl	// Double Top (Maygay)
+ep_evil		// Evil Streak (Maygay)
+ep_nyny		// New York New York (Maygay)
+ep_pizza	// Pizza The Action (Maygay)
+ep_crazy	// Reel Crazy (Maygay)
+ep_mario	// Super Mario (Maygay)
+ep_tincn	// Tin Can Alley (Maygay)
+ep_tonfn	// Tons Of Fun (Maygay)
+ep_tcrwn	// Triple Crown (Maygay)
+ep_word		// Word Up (Maygay)
+ep_xtra		// X-tra X-tra (Maygay)
 
 // MPU3
 
