@@ -99,9 +99,15 @@ void floppy_image_device::device_start()
 	
 	/* motor off */
 	m_mon = 1;
+	/* set write protect on */
+	m_wpt = 0;
 
 	m_rpm = 300.0f;
 	
+	m_cyl = 0;
+	m_ss  = 1;	
+	m_stp = 1;
+	m_dskchg = 0;
 	m_index_timer = machine().scheduler().timer_alloc(FUNC(floppy_drive_index_callback), (void *)this);
 }
 
@@ -111,6 +117,7 @@ bool floppy_image_device::call_load()
 	int best;
 	m_image = global_alloc(floppy_image((void *) image, &image_ioprocs, m_formats));
 	const struct floppy_format_def *format = m_image->identify(&best);
+	m_dskchg = 0;
 	if (format) {
 		m_image->load(best);
 		if (m_load_func)
@@ -123,6 +130,8 @@ bool floppy_image_device::call_load()
 
 void floppy_image_device::call_unload()
 {
+	m_dskchg = 0;
+	
 	if (m_image)
 		global_free(m_image);
 	if (m_unload_func)
@@ -167,9 +176,6 @@ void floppy_image_device::index_func()
 	}
 
 	m_out_idx_func(m_idx);
-
-	//if (drive->index_pulse_callback)
-//		drive->index_pulse_callback(drive->controller, img, drive->idx);
 }
 
 int floppy_image_device::ready_r()
@@ -178,13 +184,33 @@ int floppy_image_device::ready_r()
 	{
 		if (m_mon == 0)
 		{
-			return 1;
+			return 0;
 		}
 	}
-	return 0;
+	return 1;
 }
 
 double floppy_image_device::get_pos()
 {
 	return m_index_timer->elapsed().as_double();
+}
+
+void floppy_image_device::stp_w(int state)
+{
+    if ( m_stp != state ) {
+		m_stp = state;
+    	if ( m_stp == 0 ) {
+			if ( m_dir ) {
+				if ( m_cyl ) m_cyl--;
+			} else {
+				if ( m_cyl < 83 ) m_cyl++;			
+			}
+			/* Update disk detection if applicable */
+			if (exists())
+			{
+				if (m_dskchg==0) m_dskchg = 1;
+			}			
+		}
+	}
+
 }

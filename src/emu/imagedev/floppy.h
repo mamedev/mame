@@ -53,12 +53,21 @@ public:
 	virtual const char *file_extensions() const { return m_extension_list; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
-	UINT8* get_buffer(UINT16 track, UINT8 side) { return m_image->get_buffer(track,side); }
+	UINT8* get_buffer() { return m_image->get_buffer(m_cyl,m_ss ^ 1); }
 	
 	void mon_w(int state);
 	void index_func();
 	int  ready_r();
 	double get_pos();
+	
+	int wpt_r() { return m_wpt; }
+	int dskchg_r() { return m_dskchg; }
+	int trk00_r() { return (m_cyl==0) ? 0 : 1; }
+	
+	void stp_w(int state); 
+	void dir_w(int state) { m_dir = state; }
+	void ss_w(int state) { m_ss = state; } 
+
 protected:
 	// device-level overrides
     virtual void device_config_complete();
@@ -72,10 +81,11 @@ protected:
 	emu_timer	*m_index_timer;
 	
 	/* state of input lines */
-	int m_drtn; /* direction */
+	int m_dir;  /* direction */
 	int m_stp;  /* step */
 	int m_wtg;  /* write gate */
 	int m_mon;  /* motor on */
+	int m_ss;	/* side select */
 
 	/* state of output lines */
 	int m_idx;  /* index pulse */
@@ -87,6 +97,7 @@ protected:
 	/* rotation per minute => gives index pulse frequency */
 	float m_rpm;
 	
+	int m_cyl;
 	devcb_resolved_write_line m_out_idx_func;
 };
 
