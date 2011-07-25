@@ -1376,7 +1376,7 @@ void software_display_matches(const device_list &devlist,emu_options &options, c
 	}
 }
 
-static void find_software_item(emu_options &options, const device_image_interface *image, const char *path, software_list **software_list_ptr, software_info **software_info_ptr,software_part **software_part_ptr, const char **sw_list_name)
+static void find_software_item(const device_list &devlist, emu_options &options, const device_image_interface *image, const char *path, software_list **software_list_ptr, software_info **software_info_ptr,software_part **software_part_ptr, const char **sw_list_name)
 {
 	char *swlist_name, *swname, *swpart; //, *swname_bckp;
 	*software_list_ptr = NULL;
@@ -1388,8 +1388,6 @@ static void find_software_item(emu_options &options, const device_image_interfac
 //	swname_bckp = swname;
 
 	const char *interface = image->image_interface();
-
-	machine_config config(*options.system(), options);
 	
 	if ( swlist_name )
 	{
@@ -1409,7 +1407,7 @@ static void find_software_item(emu_options &options, const device_image_interfac
 	else
 	{
 		/* Loop through all the software lists named in the driver */
-		for (device_t *swlists = config.devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
+		for (device_t *swlists = devlist.first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
 		{
 			if ( swlists )
 			{
@@ -1531,13 +1529,12 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 	*sw_info = NULL;
 	*sw_part = NULL;
 
-	find_software_item(options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
+	find_software_item(image->device().machine().devicelist(), options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
 	
 	// if no match has been found, we suggest similar shortnames
 	if (software_info_ptr == NULL)
 	{		
-		machine_config config(*options.system(), options);
-		software_display_matches(config.devicelist(), options, image->image_interface(), path);
+		software_display_matches(image->device().machine().devicelist(),image->device().machine().options(), image->image_interface(), path);
 	}
 
 	if ( software_part_ptr )
@@ -1634,7 +1631,7 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
     software_get_default_slot
  -------------------------------------------------*/
 
- const char *software_get_default_slot(emu_options &options, const device_image_interface *image, const char *default_card, const char* default_card_slot)
+ const char *software_get_default_slot(const device_list &devlist, emu_options &options, const device_image_interface *image, const char *default_card, const char* default_card_slot)
 {
 	const char* retVal = default_card;
 	const char* path = options.value(image->instance_name());
@@ -1645,7 +1642,7 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
 	
 	if (strlen(path)>0) {
 		retVal = default_card_slot;
-		find_software_item(options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
+		find_software_item(devlist, options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
 		if (software_part_ptr!=NULL) {
 			const char *slot = software_part_get_feature(software_part_ptr, "slot");
 			if (slot!=NULL) {

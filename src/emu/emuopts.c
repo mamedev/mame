@@ -251,7 +251,7 @@ bool emu_options::add_slot_options(bool isfirst)
 			entry[0].name = slot->device().tag();
 			entry[0].description = NULL;
 			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card(*this) : NULL;
+			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card(config.devicelist(),*this) : NULL;
 			add_entries(entry, true);
 
 			added = true;
