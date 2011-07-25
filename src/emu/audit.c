@@ -454,11 +454,12 @@ int media_auditor::also_used_by_parent(const hash_collection &romhashes, UINT64 
 			for (const rom_source *source = rom_first_source(m_enumerator.config(drvindex)); source != NULL; source = rom_next_source(*source))
 				for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))
 					for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-					{
-						hash_collection hashes(ROM_GETHASHDATA(rom));
-						if (hashes == romhashes && ROM_GETLENGTH(rom) == romlength)
-							return drvindex;
-					}
+						if (ROM_GETLENGTH(rom) == romlength)
+						{
+							hash_collection hashes(ROM_GETHASHDATA(rom));
+							if (hashes == romhashes)
+								return drvindex;
+						}
 
 	// nope, return -1
 	return -1;
