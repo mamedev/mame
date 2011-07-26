@@ -183,7 +183,7 @@ static const res_net_decode_info spelunk2_sprite_decode_info =
 static void m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
 {
 	// m62 palette is very dark, so amplify default contrast
-	UINT32 i, ymax=0;
+	UINT32 i, ymax=1;
 	if (!numcolors) numcolors = palette_get_num_colors(palette);
 
 	// find maximum brightness
