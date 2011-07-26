@@ -180,6 +180,23 @@ static const res_net_decode_info spelunk2_sprite_decode_info =
 };
 
 
+static void m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
+{
+	// m62 palette is very dark, so amplify default contrast
+	UINT32 i, ymax=0;
+	if (!numcolors) numcolors = palette_get_num_colors(palette);
+
+	// find maximum brightness
+	for (i=0;i < numcolors;i++)
+	{
+		rgb_t rgb = palette_entry_get_color(palette,i);
+		UINT32 y = 299 * RGB_RED(rgb) + 587 * RGB_GREEN(rgb) + 114 * RGB_BLUE(rgb);
+		ymax = MAX(ymax, y);
+	}
+
+	palette_set_contrast(palette, 255000.0/ymax);
+}
+
 PALETTE_INIT( m62 )
 {
 	m62_state *state = machine.driver_data<m62_state>();
@@ -193,7 +210,7 @@ PALETTE_INIT( m62 )
 	palette_set_colors(machine, 0x100, rgb, 0x100);
 	auto_free(machine, rgb);
 
-	palette_normalize_range(machine.palette, 0x000, 0x1ff, 0x00, 0xff);
+	m62_amplify_contrast(machine.palette,0);
 
 	/* we'll need this at run time */
 	state->m_sprite_height_prom = color_prom + 0x600;
@@ -213,7 +230,7 @@ PALETTE_INIT( lotlot )
 	palette_set_colors(machine, 0x180, rgb, 0x180);
 	auto_free(machine, rgb);
 
-	palette_normalize_range(machine.palette, 0x000, 0x2ff, 0x00, 0xff);
+	m62_amplify_contrast(machine.palette,0);
 
 	/* we'll need this at run time */
 	state->m_sprite_height_prom = color_prom + 0x900;
@@ -225,6 +242,7 @@ PALETTE_INIT( battroad )
 	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 
+	// m62 palette
 	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
 	palette_set_colors(machine, 0x000, rgb, 0x100);
 	auto_free(machine, rgb);
@@ -233,13 +251,15 @@ PALETTE_INIT( battroad )
 	palette_set_colors(machine, 0x100, rgb, 0x100);
 	auto_free(machine, rgb);
 
+	m62_amplify_contrast(machine.palette,0x200);
+
+	// custom palette for foreground
 	rgb = compute_res_net_all(machine, color_prom, &battroad_char_decode_info, &battroad_char_net_info);
 	palette_set_colors(machine, 0x200, rgb, 0x020);
 	auto_free(machine, rgb);
 
-	palette_normalize_range(machine.palette, 0x000, 0x21f, 0x00, 0xff);
-
-	state->m_sprite_height_prom = color_prom + 0x620;	/* we'll need this at run time */
+	/* we'll need this at run time */
+	state->m_sprite_height_prom = color_prom + 0x620;
 }
 
 
@@ -256,7 +276,7 @@ PALETTE_INIT( spelunk2 )
 	palette_set_colors(machine, 0x200, rgb, 0x100);
 	auto_free(machine, rgb);
 
-	palette_normalize_range(machine.palette, 0x000, 0x2ff, 0x00, 0xff);
+	m62_amplify_contrast(machine.palette,0);
 
 	/* we'll need this at run time */
 	state->m_sprite_height_prom = color_prom + 0x700;
