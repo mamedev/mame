@@ -1186,6 +1186,30 @@ ROM_START( junglers )
 	ROM_LOAD( "6331-1.10a",   0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) /* video timing (not used) */
 ROM_END
 
+ROM_START( savanna )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sav1.bin",     0x0000, 0x1000, CRC(958c57eb) SHA1(b804ef99bb2f5658de508d3f9f83ca491012a51f) )
+	ROM_LOAD( "sav2.bin",     0x1000, 0x1000, CRC(61ea4d46) SHA1(575ffe9fc7d5777c8f2d2b449623c353f42a4249) )
+	ROM_LOAD( "sav3.bin",     0x2000, 0x1000, CRC(557c7925) SHA1(84d8eb2fdb7ee9098805be9f457a37f51e4bc3b8) )
+	ROM_LOAD( "sav4.bin",     0x3000, 0x1000, CRC(b38b6cbd) SHA1(76ab41097bceb3d73c95ab8a89df702e554ba403) )
+
+	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_LOAD( "1b",           0x0000, 0x1000, CRC(f86999c3) SHA1(4660bd7826219b1bad7d9178918823196d4fd8d6) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "5k",           0x0000, 0x0800, CRC(924262bf) SHA1(593f59630b3bd369aef0819992106b4e6e6a241f) )
+	ROM_LOAD( "5m",           0x0800, 0x0800, CRC(131a08ac) SHA1(167a0710a2a153f7f7c6839d2340e5aa725ef039) )
+
+	ROM_REGION( 0x0100, "gfx2", 0 )
+	ROM_LOAD( "82s129.10g",   0x0000, 0x0100, CRC(c59c51b7) SHA1(e8ac60fed9ba16c61a4c3c09e27f8c3f4e254014) ) /* dots */
+
+	ROM_REGION( 0x0160, "proms", 0 )
+	ROM_LOAD( "18s030.8b",    0x0000, 0x0020, CRC(55a7e6d1) SHA1(f9e4ff3b165235db2fd8dab94c43bc686c3ad29b) ) /* palette */
+	ROM_LOAD( "tbp24s10.9d",  0x0020, 0x0100, CRC(d223f7b8) SHA1(87b62f09d4eda09c16d99d1554017d18e52b5886) ) /* loookup table */
+	ROM_LOAD( "18s030.7a",    0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) ) /* video layout (not used) */
+	ROM_LOAD( "6331-1.10a",   0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) /* video timing (not used) */
+ROM_END
+
 ROM_START( tactcian )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tacticia.001", 0x0000, 0x1000, CRC(99163e39) SHA1(0a863f358a0bb065a9e2c41fcf4c20d370001dfe) )
@@ -1385,6 +1409,7 @@ GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  0, ROT0,  "Namco", "New Rall
 GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx,  0, ROT0,  "Namco", "New Rally X (bootleg?) ", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, jungler,  0,        jungler,  jungler,  0, ROT90, "Konami", "Jungler", GAME_SUPPORTS_SAVE )
 GAME( 1981, junglers, jungler,  jungler,  jungler,  0, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1981, savanna,  jungler,  jungler,  jungler,  0, ROT90, "Olympia", "Savanna (Jungler bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, tactcian, 0,        tactcian, tactcian, 0, ROT90, "Konami (Sega license)", "Tactician (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, tactcian2,tactcian, tactcian, tactcian, 0, ROT90, "Konami (Sega license)", "Tactician (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, locomotn, 0,        locomotn, locomotn, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", GAME_SUPPORTS_SAVE )
