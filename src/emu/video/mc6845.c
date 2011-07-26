@@ -987,7 +987,7 @@ void ams40041_device::device_start()
 	m_vert_disp        =  100;
 	m_vert_sync_pos    =  112;
 	m_mode_control     =  2;
-		
+
 	m_supports_disp_start_addr_r = false;
 	m_supports_vert_sync_width = false;
 	m_supports_status_reg_d5 = false;

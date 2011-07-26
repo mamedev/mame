@@ -2893,17 +2893,17 @@ void mpu4vid_char_cheat(running_machine& machine, int address)
 }
 
 static DRIVER_INIT( v4barqst )
-{	   
+{
 	mpu4vid_char_cheat(machine,0x154);
 }
 
 static DRIVER_INIT( v4barqst2 )
-{	   
+{
 	mpu4vid_char_cheat(machine,0x15c);
 }
 
 static DRIVER_INIT( v4wize )
-{	   
+{
 	mpu4vid_char_cheat(machine,0x16c);
 }
 
@@ -2913,7 +2913,7 @@ static DRIVER_INIT( v4cmazeb )
 }
 
 static DRIVER_INIT( v4opt3 )
-{	   
+{
 	mpu4vid_char_cheat(machine,0x164);
 }
 
@@ -3107,7 +3107,7 @@ ROM_START( v4cmazeb ) /* Was in a romset called 'Mad Money!' */
 	ROM_LOAD16_BYTE( "cry.p7",  0x300000, 0x80000,  CRC(20f73433) SHA1(593b40ac17591ac312ad41b4d3a5772626137bba) )
 	ROM_LOAD16_BYTE( "cry.p8",  0x300001, 0x80000,  CRC(835da1f2) SHA1(f93e075916d370466832871410591570ad7b9f3b) )
 	ROM_LOAD16_BYTE( "cry.p9",  0x400000, 0x80000,  CRC(c0e442ee) SHA1(a3877b200538642fe2bc96cfe8b33f04d8a82a98) )
-	ROM_LOAD16_BYTE( "cry.p10", 0x400001, 0x80000,  CRC(500172fa) SHA1(d83a37612daa79ba8425fdb28f39b8324b5736b6) )	
+	ROM_LOAD16_BYTE( "cry.p10", 0x400001, 0x80000,  CRC(500172fa) SHA1(d83a37612daa79ba8425fdb28f39b8324b5736b6) )
 ROM_END
 
 //The New Crystal Maze Featuring Ocean Zone
@@ -3584,13 +3584,13 @@ ROM_END
 
 /*
 
-FRUIT FACTORY					ID=FF_
+FRUIT FACTORY                   ID=FF_
 -------------
 
 GRAPHIC PROMS
 =============
 
-FF_GFX10.P3 	4mb
+FF_GFX10.P3     4mb
 FF_GFX10.P4     4MB
 FF_GFX10.P5     4MB
 FF_GFX10.P6     4MB
@@ -3600,25 +3600,25 @@ FF_GFX10.P8     4MB
 MPU4 PROM
 =========
 
-FFMPU416.P1	A209	27C512
+FFMPU416.P1 A209    27C512
 
 
 GAME PROMS
 ==========
-FF_293.P1	5F95	27C040	20p/œ15
-FF_293.P2	DCE6	27C040	20p/œ15
-FF_293D.P2	5F95	27C040	20p/œ15	data
-FF_293D.P2	DDE5	27C040	20p/œ15 data
+FF_293.P1   5F95    27C040  20p/?15
+FF_293.P2   DCE6    27C040  20p/?15
+FF_293D.P2  5F95    27C040  20p/?15 data
+FF_293D.P2  DDE5    27C040  20p/?15 data
 
-FF_393.P1	5F9F	27C040	25p/œ15
-FF_393.P2	DCE6	27C040	25p/œ15
-FF_393D.P2	5F9F	27C040	25p/œ15	data
-FF_393D.P2	DDE5	27C040	25p/œ15 data
+FF_393.P1   5F9F    27C040  25p/?15
+FF_393.P2   DCE6    27C040  25p/?15
+FF_393D.P2  5F9F    27C040  25p/?15 data
+FF_393D.P2  DDE5    27C040  25p/?15 data
 
-FF_493.P1	5EAA	27C040	30p/œ15
-FF_493.P2	DCE6	27C040	30p/œ15
-FF_493D.P2	5EAA	27C040	30p/œ15	data
-FF_493D.P2	DDE5	27C040	30p/œ15 data
+FF_493.P1   5EAA    27C040  30p/?15
+FF_493.P2   DCE6    27C040  30p/?15
+FF_493D.P2  5EAA    27C040  30p/?15 data
+FF_493D.P2  DDE5    27C040  30p/?15 data
 
 ---------------------------------------------------------------------
  END
@@ -3627,7 +3627,7 @@ FF_493D.P2	DDE5	27C040	30p/œ15 data
 
 ROM_START( v4frfact )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	VID_BIOS // should use FFMPU416.P1	A209	27C512 .. find out which that is, if it's dumped
+	VID_BIOS // should use FFMPU416.P1  A209    27C512 .. find out which that is, if it's dumped
 
 	ROM_REGION( 0x800000, "video", 0 )
 	/* p1/p2 load the wrong way around? */
@@ -3642,22 +3642,22 @@ ROM_START( v4frfact )
 	ROM_LOAD16_BYTE( "ff_gfx10.p8", 0x300000, 0x080000, CRC(1951a944) SHA1(b8eca580ae43be855d93cf9f50058b2fb9e8981b) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	// 30p/œ15
+	// 30p/?15
 	ROM_LOAD16_BYTE( "ff_493.p1", 0x000001, 0x080000, CRC(1a88e0e6) SHA1(198fffd0d98d557462485b1ca6e3460199e03924) )
 	ROM_LOAD16_BYTE( "ff_493.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
-	// 30p/œ15 data
+	// 30p/?15 data
 	ROM_LOAD16_BYTE( "ff_493d.p1", 0x000001, 0x080000, CRC(1a88e0e6) SHA1(198fffd0d98d557462485b1ca6e3460199e03924) )
 	ROM_LOAD16_BYTE( "ff_493d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
-	// 25p/œ15
+	// 25p/?15
 	ROM_LOAD16_BYTE( "ff_393.p1", 0x000001, 0x080000, CRC(35011cab) SHA1(9e381db93dbe1f71d40b152ae6c68ea7a7b9728c) )
 	ROM_LOAD16_BYTE( "ff_393.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
-	// 25p/œ15 data
+	// 25p/?15 data
 	ROM_LOAD16_BYTE( "ff_393d.p1", 0x000001, 0x080000, CRC(35011cab) SHA1(9e381db93dbe1f71d40b152ae6c68ea7a7b9728c) )
 	ROM_LOAD16_BYTE( "ff_393d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
-	// 20p/œ15
+	// 20p/?15
 	ROM_LOAD16_BYTE( "ff_293.p1", 0x000001, 0x080000, CRC(4787bc3d) SHA1(a1d53f1640c6d829c9fee8c72057b2801aac4cb2) )
 	ROM_LOAD16_BYTE( "ff_293.p2", 0x000000, 0x080000, CRC(1c948e83) SHA1(571f854c33a2ef68daa8633193b49486ff92d7e2) )
-	// 20p/œ15 data
+	// 20p/?15 data
 	ROM_LOAD16_BYTE( "ff_293d.p1", 0x000001, 0x080000, CRC(4787bc3d) SHA1(a1d53f1640c6d829c9fee8c72057b2801aac4cb2) )
 	ROM_LOAD16_BYTE( "ff_293d.p2", 0x000000, 0x080000, CRC(86830e6c) SHA1(9510bf42a8c2f8ffeafd1f2b0e027a0a59d80b20) )
 ROM_END
@@ -3786,14 +3786,14 @@ GAME(  199?,v4quidgrd,	v4quidgr,	mpu4_vid,	mpu4,		quidgrid,	ROT0, "Barcrest","Te
 GAME(  199?,v4quidgr2,	v4quidgr,	mpu4_vid,	mpu4,		quidgrid,	ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_NOT_WORKING )
 GAME(  199?,v4quidgr2d,	v4quidgr,	mpu4_vid,	mpu4,		quidgrid,	ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_NOT_WORKING )
 
-GAME(  199?,v4barqst,	v4bios,  	mpu4_vid,	mpu4,		v4barqst,	ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_NOT_WORKING )
-GAME(  199?,v4barqs2,	v4bios,  	mpu4_vid,	mpu4,		v4barqst2,	ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4barqst,	v4bios, 	mpu4_vid,	mpu4,		v4barqst,	ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4barqs2,	v4bios, 	mpu4_vid,	mpu4,		v4barqst2,	ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_NOT_WORKING )
 
-GAME(  199?,v4wize,		v4bios,  	mpu4_vid,	mpu4,		v4wize,		ROT0, "Barcrest","Wize Move (v1.3d) (MPU4 Video)",GAME_NOT_WORKING )
-GAME(  199?,v4wizea,	v4bios,  	mpu4_vid,	mpu4,		v4wize,		ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4wize,		v4bios, 	mpu4_vid,	mpu4,		v4wize,		ROT0, "Barcrest","Wize Move (v1.3d) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  199?,v4wizea,	v4bios, 	mpu4_vid,	mpu4,		v4wize,		ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_NOT_WORKING )
 
-GAME(  1991,v4opt3,		v4bios,  	mpu4_vid,	mpu4,		v4opt3,		ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_NOT_WORKING )
-GAME(  1991,v4opt3d,	v4opt3,  	mpu4_vid,	mpu4,		v4opt3,		ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  1991,v4opt3,		v4bios, 	mpu4_vid,	mpu4,		v4opt3,		ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  1991,v4opt3d,	v4opt3, 	mpu4_vid,	mpu4,		v4opt3,		ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_NOT_WORKING )
 
 
 

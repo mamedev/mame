@@ -510,7 +510,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 			UINT32 lower = ppc->spr[SPROEA_IBAT0U + 2*batnum + 1];
 			int privbit = ((intention & TRANSLATE_USER_MASK) == 0) ? 3 : 2;
 
-//			printf("bat %d upper = %08x privbit %d\n", batnum, upper, privbit);
+//          printf("bat %d upper = %08x privbit %d\n", batnum, upper, privbit);
 
 			// is this pair valid?
 			if (lower & 0x40)

@@ -249,17 +249,17 @@ GAME( 200?, thaiprin,  aristmk6,   aristmk6,    aristmk6,    0, ROT0, "Aristocra
 List of known MK6 games, excluding Hyperlink variations
 
 5 Dragons
-5 Koi - Power Pay			Same gameplay as 5 Dragons
+5 Koi - Power Pay           Same gameplay as 5 Dragons
 50 Lions
 100 Lions
-African Dusk - Mr. Cashman		Black Rhino with a bonus feature
-Alchemy					Same gameplay as Mystic Mermaid
+African Dusk - Mr. Cashman      Black Rhino with a bonus feature
+Alchemy                 Same gameplay as Mystic Mermaid
 Amazing Money Machine
 Antony and Cleopatra
 Arabian Nights
 Arctic Wins - Mr. Cashman
 Arishinko
-Asian Princess				Thai Princess with a bonus bet option
+Asian Princess              Thai Princess with a bonus bet option
 Atlantis
 Aztec Gold - Lady Luck
 Bachelorette Party
@@ -273,11 +273,11 @@ Black Rhino - Power Pay
 Brazil
 Buccaneer
 Buffalo
-Cactus Corral				Same gameplay as Shaman's Magic
-Canary Riches				Identical to Golden Canaries
+Cactus Corral               Same gameplay as Shaman's Magic
+Canary Riches               Identical to Golden Canaries
 Cash Carousel
 Centurion
-Cheeky Monkey				Same gameplay as Mystic Mermaid
+Cheeky Monkey               Same gameplay as Mystic Mermaid
 Choy Sun Doa
 Choy Sun Returns
 Commander K
@@ -290,15 +290,15 @@ Diamond Eyes
 Diamonds & Hearts - Power Pay
 Dinosaur
 Double Dolphins
-Dragon Lord				Similar to Red Baron
-Dream Catcher				Same gameplay as Asian Princess
+Dragon Lord             Similar to Red Baron
+Dream Catcher               Same gameplay as Asian Princess
 Dream of the Red Chamber
 Fan Dancer
 Fire Dancer
 Fortune of Athena
-Fortune King				Same gameplay as 5 Dragons
+Fortune King                Same gameplay as 5 Dragons
 Fortune Warrior
-Geisha					Geisha was only released on MK5 for NZ market as a one-off
+Geisha                  Geisha was only released on MK5 for NZ market as a one-off
 Genghis Khan
 Go For Green
 Good Fortune
@@ -306,45 +306,45 @@ Golden Archer
 Golden Canaries II - Lucky Devil
 Golden Incas
 Grizzly
-Heart of Gold				Same gameplay as 50 Lions
-Helen of Troy				Same gameplay as Peacock Flutter
+Heart of Gold               Same gameplay as 50 Lions
+Helen of Troy               Same gameplay as Peacock Flutter
 Hollywood Dreams
 Hot Cash
-House of Hearts				Same gameplay as Buccaneer
+House of Hearts             Same gameplay as Buccaneer
 Inca Chief
 Indian Dreaming - Lady Luck
 Indian Princess
 Island Delight
 Jailbird - Mr. Cashman
 Kakadu Dreaming
-Kenyan Gold				Similar to Show Me The Money
+Kenyan Gold             Similar to Show Me The Money
 King Neptune
-King of Asia				Identical to Choy Sun Doa
+King of Asia                Identical to Choy Sun Doa
 King of the Nile
 Kirin Warriors
-Knight's Challenge			Similar to Queen of the Nile, added jackpot bonus
-L.A. Gator				Same gameplay as 50 Lions
-Ladies Day				Similar to Spring Carnival
+Knight's Challenge          Similar to Queen of the Nile, added jackpot bonus
+L.A. Gator              Same gameplay as 50 Lions
+Ladies Day              Similar to Spring Carnival
 Lady of Fortune
 Let's Go Fish'n
-Line King				Similar to 50 Lions
-Louie's Gold - Mr. Cashman		Loco Loot with a bonus feature
-Love Stuck				Same gameplay as Sun Queen
+Line King               Similar to 50 Lions
+Louie's Gold - Mr. Cashman      Loco Loot with a bonus feature
+Love Stuck              Same gameplay as Sun Queen
 Lucky 88
 Luigi's Ball
-Macaw Magic				Same gameplay as King Galah
+Macaw Magic             Same gameplay as King Galah
 Margarita Rose
-Miss Kitty				Same gameplay as Pelican Pete
+Miss Kitty              Same gameplay as Pelican Pete
 Moon Festival
 Moonlight Waltz
 More Chilli
-Mr Woo					Similar to Zorro
+Mr Woo                  Similar to Zorro
 Mr Woo Moonlight Market
 Mystic Chief
-Mystic Eyes - Mr. Cashman		Enchanted Forest with a bonus feature
+Mystic Eyes - Mr. Cashman       Enchanted Forest with a bonus feature
 Mystic Forest
 Mystic Mermaid
-Mystic Power				Same gameplay as Indian Dreaming
+Mystic Power                Same gameplay as Indian Dreaming
 Nerds Gone Wild
 Orchid Magic
 Oriental Beauty
@@ -353,34 +353,34 @@ Owl Capone
 Paris Lights
 Peacock Magic
 Pelican Pete
-Phoenix Fantasy				Same gameplay as Tiki Torch
+Phoenix Fantasy             Same gameplay as Tiki Torch
 Pirates
-Player's Choice By Demand		Player's Choice is a series of 4-in-1 multi-game machines
+Player's Choice By Demand       Player's Choice is a series of 4-in-1 multi-game machines
 Player's Choice Platinum
 Player's Choice Super
-Pompeii					Same gameplay as Indian Dreaming
-Pride of Africa				Same gameplay as Indian Dreaming
+Pompeii                 Same gameplay as Indian Dreaming
+Pride of Africa             Same gameplay as Indian Dreaming
 Prophecy
-Queen of Atlantis			Identical to Atlantis
-Queen of Sheba				Same gameplay as King of the Nile
-Queen of the Nile Special Edition	Altered gameplay to original QOTN, more games won with 4 or 5 pyramids
+Queen of Atlantis           Identical to Atlantis
+Queen of Sheba              Same gameplay as King of the Nile
+Queen of the Nile Special Edition   Altered gameplay to original QOTN, more games won with 4 or 5 pyramids
 Rapid Riches
 Red Baron
 Reelin' N Boppin'
 Roamin' Italy
-Roll Up! Roll Up!!			Same gameplay as Spring Carnival
-Ruby Magic				Same gameplay as Wild Ways
+Roll Up! Roll Up!!          Same gameplay as Spring Carnival
+Ruby Magic              Same gameplay as Wild Ways
 Scatter Magic II
-Seal the Deal				Same gameplay as Helen of Troy
+Seal the Deal               Same gameplay as Helen of Troy
 Shaman's Magic
-Show Me The Money			Same gameplay as Money Tree
+Show Me The Money           Same gameplay as Money Tree
 Silk Road
-Silver & Gold				Identical to Sun & Moon
+Silver & Gold               Identical to Sun & Moon
 Sky Dancer
 Snap Shot
 Spring Carnival
 Spring Festival
-Star Drifter				Same gameplay as 50 Lions
+Star Drifter                Same gameplay as 50 Lions
 Sun & Moon
 Sun Chief
 Sun King
@@ -391,31 +391,31 @@ Sweet Hearts II - Lucky Devil
 Tahiti Magic
 Tequila Sunrise - Mr. Cashman
 Thai Princess
-The Magician				Same gameplay as Lady of Fortune
+The Magician                Same gameplay as Lady of Fortune
 The Game With No Name!
-The Golden Gong				Same gameplay as Big Ben
+The Golden Gong             Same gameplay as Big Ben
 Tigress
 Tiki Talk
 Tiki Torch
 Timber Wolf
-Torch of the Gods			Identical to Adonis
+Torch of the Gods           Identical to Adonis
 Turtle Treasure
 Viking Riches
 Water Margin
-Whale of a Time				Identical to Whales of Cash
+Whale of a Time             Identical to Whales of Cash
 Whales of Cash
 Where's The Gold
 White Tiger II - Lucky Devil
 Wicked Winnings - Lady Luck
 Wicked Winnings II - Power Pay
-Wild Cats				Same gameplay as Wild Waratah
-Wild Cougar - Power Pay			Same gameplay as Black Rhino - Power Pay
+Wild Cats               Same gameplay as Wild Waratah
+Wild Cougar - Power Pay         Same gameplay as Black Rhino - Power Pay
 Wild Goose
 Wild Gorilla - Power Pay
-Wild Hearts				Similar to Sun Chief
+Wild Hearts             Similar to Sun Chief
 Wild Panda
 Wild Stallion
-Wild Tepee - Power Pay			Similar to Indian Dreaming
+Wild Tepee - Power Pay          Similar to Indian Dreaming
 Wild Waratah
 Wild Ways
 Wings over Olympus
@@ -430,22 +430,22 @@ Additionally, many games on earlier (e.g. MK5) hardware were re-released on MK6,
 Confirmed 'older' games running on MK6 listed below; these games were also on MK5, and some even on MK4:
 
 Adonis
-Black Panther				Only seen in a multi-game system, 'Player's Choice By Demand'
-Desert Bloom				Same gameplay as Sweet Hearts II
+Black Panther               Only seen in a multi-game system, 'Player's Choice By Demand'
+Desert Bloom                Same gameplay as Sweet Hearts II
 Dolphin Treasure
 Enchantress
-Flame of Olympus			Identical to Adonis
-Golden Pyramids				Identical to Queen of the Nile
-Inca Sun				Cabinet photo noted, MK6 version never seen in the wild yet
-Indian Dreaming				Two formats exist, Reel Power (243 Ways) and Multi-line (usually 20 lines). Both game types play differenly but feature identicla graphics.
+Flame of Olympus            Identical to Adonis
+Golden Pyramids             Identical to Queen of the Nile
+Inca Sun                Cabinet photo noted, MK6 version never seen in the wild yet
+Indian Dreaming             Two formats exist, Reel Power (243 Ways) and Multi-line (usually 20 lines). Both game types play differenly but feature identicla graphics.
 Koala Mint
 Money Tree
 Panther Magic
-Prize Fight II				Only seen in a multi-game system, 'Player's Choice By Demand' - MK5 version was simply called 'Prize Fight'
+Prize Fight II              Only seen in a multi-game system, 'Player's Choice By Demand' - MK5 version was simply called 'Prize Fight'
 Queen of the Nile
 Return of the Samurai
-Super Bucks III				Only seen in a multi-game system, 'Player's Choice By Demand'
+Super Bucks III             Only seen in a multi-game system, 'Player's Choice By Demand'
 Sweet Hearts II
-Venetian Nights				MK5 version is possibly rare
-Wicked Winnings				Only seen a Cash Express Hyperlink version so far
+Venetian Nights             MK5 version is possibly rare
+Wicked Winnings             Only seen a Cash Express Hyperlink version so far
 */

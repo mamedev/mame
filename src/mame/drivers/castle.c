@@ -1,8 +1,8 @@
 /* Castle
  Mechanical Fruit Machines
- with LCD display 
- 
- see 
+ with LCD display
+
+ see
  http://www.youtube.com/watch?v=jNx1OwwS58I
  http://www.youtube.com/watch?v=m1QKaYh64-o
 

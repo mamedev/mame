@@ -224,10 +224,10 @@ class floppy_image_format_t
 public:
 	floppy_image_format_t(const char *name,const char *extensions,const char *description,const char *param_guidelines);
 	virtual ~floppy_image_format_t();
-	
+
 	virtual int identify(floppy_image *image) = 0;
 	virtual bool load(floppy_image *image) = 0;
-protected:	
+protected:
 	const char *m_name;
 	const char *m_extensions;
 	const char *m_description;
@@ -272,7 +272,7 @@ struct floppy_format_def
 
 #define FLOPPY_OPTIONS_END													\
 	FLOPPY_OPTIONS_END0
-	
+
 // ======================> floppy_image
 
 #define MAX_FLOPPY_SIDES   2
@@ -286,13 +286,13 @@ public:
 	// construction/destruction
 	floppy_image(void *fp, const struct io_procs *procs,const struct floppy_format_def *formats);
 	virtual ~floppy_image();
-	
+
 	void image_read(void *buffer, UINT64 offset, size_t length);
 	void image_write(const void *buffer, UINT64 offset, size_t length);
 	void image_write_filler(UINT8 filler, UINT64 offset, size_t length);
 	UINT64 image_size();
 	void close();
-	
+
 	void set_meta_data(UINT16 tracks, UINT8 sides, UINT16 rpm, UINT16 bitrate);
 	void set_track_size(UINT16 track, UINT8 side, UINT16 size) { m_track_size[(track << 1) + side] = size; }
 	const struct floppy_format_def *identify(int *best);
@@ -301,13 +301,13 @@ public:
 	bool load(int num);
 private:
 	void close_internal(bool close_file);
-	struct io_generic 		m_io;
+	struct io_generic		m_io;
 	const struct floppy_format_def *m_formats;
 	UINT16 m_tracks;
 	UINT8  m_sides;
 	UINT16 m_rpm;
 	UINT16 m_bitrate;
-	
+
 	UINT8 m_native_data[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS][MAX_TRACK_DATA];
 	UINT16 m_track_size[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
 };

@@ -46,7 +46,7 @@ void floppy_image_device::device_config_complete()
 
 	// or initialize to defaults if none provided
 	else
-	{    	
+	{
 		memset(&m_formats, 0, sizeof(m_formats));
 		memset(&m_interface, 0, sizeof(m_interface));
 		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
@@ -62,7 +62,7 @@ void floppy_image_device::device_config_complete()
 	while (m_formats[cnt].name)
 	{
 		// allocate a new format
-		format = global_alloc_clear(image_device_format);		
+		format = global_alloc_clear(image_device_format);
 		format->m_index 	  = cnt;
 		format->m_name        = m_formats[cnt].name;
 		format->m_description = m_formats[cnt].description;
@@ -75,7 +75,7 @@ void floppy_image_device::device_config_complete()
 		formatptr = &format->m_next;
 		cnt++;
 	}
-	
+
 	// set brief and instance name
 	update_names();
 }
@@ -94,18 +94,18 @@ void floppy_image_device::device_start()
 {
 	// resolve callbacks
 	m_out_idx_func.resolve(m_out_idx_cb, *this);
-	
+
 	m_idx = 0;
-	
+
 	/* motor off */
 	m_mon = 1;
 	/* set write protect on */
 	m_wpt = 0;
 
 	m_rpm = 300.0f;
-	
+
 	m_cyl = 0;
-	m_ss  = 1;	
+	m_ss  = 1;
 	m_stp = 1;
 	m_dskchg = 0;
 	m_index_timer = machine().scheduler().timer_alloc(FUNC(floppy_drive_index_callback), (void *)this);
@@ -131,7 +131,7 @@ bool floppy_image_device::call_load()
 void floppy_image_device::call_unload()
 {
 	m_dskchg = 0;
-	
+
 	if (m_image)
 		global_free(m_image);
 	if (m_unload_func)
@@ -203,13 +203,13 @@ void floppy_image_device::stp_w(int state)
 			if ( m_dir ) {
 				if ( m_cyl ) m_cyl--;
 			} else {
-				if ( m_cyl < 83 ) m_cyl++;			
+				if ( m_cyl < 83 ) m_cyl++;
 			}
 			/* Update disk detection if applicable */
 			if (exists())
 			{
 				if (m_dskchg==0) m_dskchg = 1;
-			}			
+			}
 		}
 	}
 

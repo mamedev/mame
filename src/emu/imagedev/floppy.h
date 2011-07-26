@@ -16,7 +16,7 @@
 
 struct floppy_interface
 {
-	devcb_write_line 				m_out_idx_cb;  /* index */
+	devcb_write_line				m_out_idx_cb;  /* index */
 
 	const struct floppy_format_def *m_formats;
 	const char *					m_interface;
@@ -54,19 +54,19 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	UINT8* get_buffer() { return m_image->get_buffer(m_cyl,m_ss ^ 1); }
-	
+
 	void mon_w(int state);
 	void index_func();
 	int  ready_r();
 	double get_pos();
-	
+
 	int wpt_r() { return m_wpt; }
 	int dskchg_r() { return m_dskchg; }
 	int trk00_r() { return (m_cyl==0) ? 0 : 1; }
-	
-	void stp_w(int state); 
+
+	void stp_w(int state);
 	void dir_w(int state) { m_dir = state; }
-	void ss_w(int state) { m_ss = state; } 
+	void ss_w(int state) { m_ss = state; }
 
 protected:
 	// device-level overrides
@@ -74,12 +74,12 @@ protected:
 	virtual void device_start();
 
 	image_device_format m_format;
-	floppy_image 		*m_image;
+	floppy_image		*m_image;
 	char				m_extension_list[256];
-	
+
 	/* index pulse timer */
 	emu_timer	*m_index_timer;
-	
+
 	/* state of input lines */
 	int m_dir;  /* direction */
 	int m_stp;  /* step */
@@ -93,10 +93,10 @@ protected:
 	int m_wpt;  /* write protect */
 	int m_rdy;  /* ready */
 	int m_dskchg;		/* disk changed */
-	
+
 	/* rotation per minute => gives index pulse frequency */
 	float m_rpm;
-	
+
 	int m_cyl;
 	devcb_resolved_write_line m_out_idx_func;
 };

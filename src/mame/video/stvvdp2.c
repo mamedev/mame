@@ -4583,7 +4583,7 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const
        Mosaic            : Yes
     */
 
-   	stv2_current_tilemap.enabled = STV_VDP2_N0ON | STV_VDP2_R1ON;
+	stv2_current_tilemap.enabled = STV_VDP2_N0ON | STV_VDP2_R1ON;
 
 //  if (!stv2_current_tilemap.enabled) return; // stop right now if its disabled ...
 

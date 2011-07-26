@@ -2356,7 +2356,7 @@ Notes:
  MC10124     - Quad TTL to MECL Translator
  MC10125     - Quad MECL to TTL Translator
  HM10422     - 256 x 4 ECL RAM
- V-POS/H-POS - Pot to adjust horizontal/vertical screen position 
+ V-POS/H-POS - Pot to adjust horizontal/vertical screen position
  Vsync       - 60.4862Hz
  HSync       - 15.848kHz
  Xtal 1      - 12.263 MHz
@@ -2376,7 +2376,7 @@ ROM_START( dkingjr )
     ROM_CONTINUE(           0x5000, 0x0800 )
     ROM_CONTINUE(           0x1800, 0x0800 )
 
-    ROM_REGION( 0x1000, "soundcpu", 0 ) 
+    ROM_REGION( 0x1000, "soundcpu", 0 )
     ROM_LOAD( "4.7l",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
     ROM_REGION( 0x2000, "gfx1", 0 )
@@ -2388,7 +2388,7 @@ ROM_START( dkingjr )
     ROM_LOAD( "8.2r",       0x0800, 0x0800, CRC(0ce7dcf6) SHA1(0654b77526c49f0dfa077ac4f1f69cf5cb2e2f64) )
     ROM_LOAD( "9.2p",       0x1000, 0x0800, CRC(24d1ff17) SHA1(696854bf3dc5447d33b4815db357e6ce3834d867) )
     ROM_LOAD( "10.2m",      0x1800, 0x0800, CRC(0f8c083f) SHA1(0b688ae9da296b2447fffa5e135fd6a56ec3e790) )
-	
+
 	ROM_REGION( 0x0320, "proms", 0 )
     ROM_LOAD( "mb7052.9k",  0x0000, 0x0100, CRC(49f2d444) SHA1(6995d73222f71f880ab3ce6d54577802a6ef53ab) )   /* palette low 4 bits */
     ROM_LOAD( "mb7052.9l",  0x0100, 0x0100, CRC(487513ab) SHA1(e686021bbd41ea8c9d1fd3a277333173ba50afdd) )   /* palette high 4 bits */

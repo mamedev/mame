@@ -80,7 +80,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define CPU_TYPE_010    (0x00000004)
 #define CPU_TYPE_EC020  (0x00000008)
 #define CPU_TYPE_020    (0x00000010)
-#define CPU_TYPE_EC030  (0x00000020)	  
+#define CPU_TYPE_EC030  (0x00000020)
 #define CPU_TYPE_030    (0x00000040)
 #define CPU_TYPE_EC040  (0x00000080)
 #define CPU_TYPE_LC040  (0x00000100)
@@ -669,7 +669,7 @@ struct _m68ki_cpu_core
 	UINT32 virq_state;
 	UINT32 nmi_pending;
 
-	void (**jump_table)(m68ki_cpu_core *m68k); 
+	void (**jump_table)(m68ki_cpu_core *m68k);
 	const UINT8* cyc_instruction;
 	const UINT8* cyc_exception;
 
@@ -904,31 +904,31 @@ INLINE void m68ki_ic_clear(m68ki_cpu_core *m68k)
 
 INLINE UINT32 m68ki_ic_readimm16(m68ki_cpu_core *m68k, UINT32 address)
 {
-/*	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type) && (m68k->cacr & M68K_CACR_EI))
-	{
-		UINT32 ic_offset = (address >> 1) % M68K_IC_SIZE;
-		if (m68k->ic_address[ic_offset] == address)
-		{
-			return m68k->ic_data[ic_offset];
-		}
-		else
-		{
-			UINT32 data = m68k->memory.readimm16(address);
-			if (!m68k->mmu_tmp_buserror_occurred)
-			{
-				m68k->ic_data[ic_offset] = data;
-				m68k->ic_address[ic_offset] = address;
-			}
-			return data;
-		}
-	}
-	else*/
+/*  if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type) && (m68k->cacr & M68K_CACR_EI))
+    {
+        UINT32 ic_offset = (address >> 1) % M68K_IC_SIZE;
+        if (m68k->ic_address[ic_offset] == address)
+        {
+            return m68k->ic_data[ic_offset];
+        }
+        else
+        {
+            UINT32 data = m68k->memory.readimm16(address);
+            if (!m68k->mmu_tmp_buserror_occurred)
+            {
+                m68k->ic_data[ic_offset] = data;
+                m68k->ic_address[ic_offset] = address;
+            }
+            return data;
+        }
+    }
+    else*/
 	{
 		return m68k->memory.readimm16(address);
 	}
 
 	// this can't happen, but Apple GCC insists
-//	return 0;
+//  return 0;
 }
 
 /* Handles all immediate reads, does address error check, function code setting,

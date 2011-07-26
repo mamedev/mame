@@ -5,7 +5,7 @@
   +
 
   4x 8255 - General I/O
-  
+
   TMS9902A - CPU -> Reel MCU communication
   TMS9902A - Printer / Black Box comms
 
@@ -127,7 +127,7 @@ ROM_START( j2adnote )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "adanote1.bin", 0x0000, 0x8000, CRC(a64352e7) SHA1(6b78abab21420b0e5c5f6e41c9d798d30d5942c5) )
 	ROM_LOAD( "adanote2.bin", 0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
-ROM_END	
+ROM_END
 
 ROM_START( j2adnotea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -140,7 +140,7 @@ ROM_START( j2adnoteb )
 	ROM_LOAD( "addanote 20p 1.1.bin", 0x0000, 0x8000, CRC(3f7365af) SHA1(734ed13c5943ff9b38ae061e3fb1b25e1cc9134c) )
 	ROM_LOAD( "addanote 20p 1.2.bin", 0x8000, 0x8000, CRC(ecfac3f4) SHA1(21f410e05cd30d3d936bba72dee6fabd709b32d1) )
 ROM_END
-	
+
 ROM_START( j2adnotec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "addanote 1.1.bin", 0x0000, 0x8000, CRC(67ff2728) SHA1(08bde11dcf20eaecac9b83072769b04dab465117) )
@@ -199,14 +199,14 @@ ROM_START( j2bankch )
 	ROM_LOAD( "bankchase 1.1 20p.bin", 0x0000, 0x8000, CRC(33aa388b) SHA1(1ba80be7523a9177a16dd5d0fb80a8dd0ea16b97) )
 	ROM_LOAD( "bankchase 1.2 20p.bin", 0x8000, 0x8000, CRC(6414cea1) SHA1(e6c147ecb7197c66e47f4d2435e65a64d35867e2) )
 
-//	ROM_LOAD( "bankchase f 99035 1.1.bin", 0x0000, 0x8000, CRC(5ccb3adc) SHA1(d0a0129474b0ba05ea979840b212f3854785b4b6) )
-//	ROM_LOAD( "bankchase f 98677 1.2.bin", 0x8000, 0x8000, CRC(c6602f9c) SHA1(d529bc07754bdd1cd0761bc42d8bde167a08236d) )
+//  ROM_LOAD( "bankchase f 99035 1.1.bin", 0x0000, 0x8000, CRC(5ccb3adc) SHA1(d0a0129474b0ba05ea979840b212f3854785b4b6) )
+//  ROM_LOAD( "bankchase f 98677 1.2.bin", 0x8000, 0x8000, CRC(c6602f9c) SHA1(d529bc07754bdd1cd0761bc42d8bde167a08236d) )
 
-//	ROM_LOAD( "bankchase1_20p.bin", 0x0000, 0x8000, CRC(33aa388b) SHA1(1ba80be7523a9177a16dd5d0fb80a8dd0ea16b97) )
-//	ROM_LOAD( "bankchase2_20p.bin", 0x8000, 0x8000, CRC(6414cea1) SHA1(e6c147ecb7197c66e47f4d2435e65a64d35867e2) )
+//  ROM_LOAD( "bankchase1_20p.bin", 0x0000, 0x8000, CRC(33aa388b) SHA1(1ba80be7523a9177a16dd5d0fb80a8dd0ea16b97) )
+//  ROM_LOAD( "bankchase2_20p.bin", 0x8000, 0x8000, CRC(6414cea1) SHA1(e6c147ecb7197c66e47f4d2435e65a64d35867e2) )
 
-//	ROM_LOAD( "bankchase 1.1.bin", 0x0000, 0x8000, CRC(5ccb3adc) SHA1(d0a0129474b0ba05ea979840b212f3854785b4b6) )
-//	ROM_LOAD( "bankchase 1.2.bin", 0x8000, 0x8000, CRC(c6602f9c) SHA1(d529bc07754bdd1cd0761bc42d8bde167a08236d) )
+//  ROM_LOAD( "bankchase 1.1.bin", 0x0000, 0x8000, CRC(5ccb3adc) SHA1(d0a0129474b0ba05ea979840b212f3854785b4b6) )
+//  ROM_LOAD( "bankchase 1.2.bin", 0x8000, 0x8000, CRC(c6602f9c) SHA1(d529bc07754bdd1cd0761bc42d8bde167a08236d) )
 
 	ROM_LOAD( "bankchase 1.1 a.bin", 0x0000, 0x8000, CRC(f40e2c1a) SHA1(be651adc06a03c63bb2c063da8a26947c21da5b9) )
 	ROM_LOAD( "bankchase 1.1 p.bin", 0x0000, 0x8000, CRC(6f1543fd) SHA1(9a1abc0b3f0072214de86fc76ad61bb0615695a4) )
@@ -222,11 +222,11 @@ ROM_START( j2bigbnk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bb3-1.bin", 0x0000, 0x4000, CRC(ff994a86) SHA1(baf79a39c2315ccc107b21a889ec7a90c1e1380e) )
 	ROM_LOAD( "bb3-2.bin", 0x4000, 0x4000, CRC(17488088) SHA1(560ca909115fa16d196027b4517b4c32f963abdf) )
-	
+
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
 	ROM_LOAD( "bigbankerb11548 3.1.bin", 0x0000, 0x4000, CRC(c28a0f9a) SHA1(33740a31d2688d39ed79deead9f26cc3b8f17253) )
 	//ROM_LOAD( "bigbankerb11554 3.2.bin", 0x4000, 0x4000, CRC(17488088) SHA1(560ca909115fa16d196027b4517b4c32f963abdf) )
-	
+
 	ROM_LOAD( "bigbankerb11593 3p1.bin", 0x0000, 0x4000, CRC(c8f291e0) SHA1(0f152c3e3797c04d50db417d4927c0671b6ae46c) )
 	ROM_LOAD( "bigbankerb12330 3y1.bin", 0x0000, 0x4000, CRC(eb687672) SHA1(d50b5153787f6cbd6c4dfe2bcfccde9aba57a9bf) )
 	ROM_LOAD( "bigbankerb12366 3x1.bin", 0x0000, 0x4000, CRC(d67b336e) SHA1(ddc97bab97f444cc914af1a0c997c17ad7635891) )
@@ -474,7 +474,7 @@ ROM_START( j2fasttk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fast_trak_3_1.bin", 0x0000, 0x8000, CRC(67b9ff41) SHA1(42f42aa49b6ca3a944d12ec8d351eee28f10725d) )
 	ROM_LOAD( "fast_trak_3_2.bin", 0x0000, 0x8000, CRC(cc05816c) SHA1(09504aca557e9c112ffc39b814d2a043bca36ea0) )
-	
+
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
 	ROM_LOAD( "fsttrk31.bin", 0x0000, 0x8000, CRC(59763417) SHA1(e59ff3f2594596d9523a3875ae51f00da9da5dde) )
 	ROM_LOAD( "fsttrk32.bin", 0x0000, 0x8000, CRC(157e2afe) SHA1(56ec9947214db23b13848d4dfcd606be0d0b424c) )
@@ -756,7 +756,7 @@ ROM_START( j2mongam )
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
 	//ROM_LOAD( "mongame2.bin", 0x0000, 0x2000, CRC(88bcce8a) SHA1(4d5c71b4807be72b7ecf99fbddf79d734e101832) )
 	//ROM_LOAD( "mongame3.bin", 0x0000, 0x4000, CRC(4a8d11a0) SHA1(fe7e00cfb10d83d9f521cf6dcd27d51a561af916) )
-	
+
 	// something else?
 	ROM_LOAD( "moneygame3.1.bin", 0x0000, 0x2000, CRC(14734a7e) SHA1(84bcfaaa3f59d8ef2acefe399b48f258e507f20a) )
 	ROM_LOAD( "moneygame3.2.bin", 0x0000, 0x2000, CRC(6c7ce60c) SHA1(c775925efbb44963d57aea5719d9a3aba181ab71) )
@@ -817,8 +817,8 @@ ROM_START( j2nuddup )
 	ROM_LOAD( "ndudp288", 0x8000, 0x8000, CRC(2168fbeb) SHA1(5e3475af6d1778ecf536fc6496ca1dc82b151b9d) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-//	ROM_LOAD( "5307.bin", 0x0000, 0x8000, CRC(13c743dd) SHA1(f818f97e4183d24bf565ed4874e46c217d6cb94d) )
-//	ROM_LOAD( "5308.bin", 0x0000, 0x8000, CRC(2168fbeb) SHA1(5e3475af6d1778ecf536fc6496ca1dc82b151b9d) )
+//  ROM_LOAD( "5307.bin", 0x0000, 0x8000, CRC(13c743dd) SHA1(f818f97e4183d24bf565ed4874e46c217d6cb94d) )
+//  ROM_LOAD( "5308.bin", 0x0000, 0x8000, CRC(2168fbeb) SHA1(5e3475af6d1778ecf536fc6496ca1dc82b151b9d) )
 	ROM_LOAD( "5310.bin", 0x0000, 0x8000, CRC(90cda2cb) SHA1(e2d8cfa5d6e475dc0cdda53530332019dce9d9df) )
 ROM_END
 
@@ -1102,9 +1102,9 @@ ROM_START( j2supstp )
 	ROM_LOAD( "supastepper10p2.2", 0x4000, 0x4000, CRC(1cf2d94b) SHA1(a57908c14b4214b4d84d94065359baaef641df6f) )
 
 // something else?
-//	ROM_LOAD( "supasteppa2-1.p1", 0x0000, 0x1000, CRC(aac5b165) SHA1(5bf4acb85be227e1f4979fea4552fa5f64e9b7b2) )
-//	ROM_LOAD( "supasteppa2-2.p2", 0x0000, 0x1000, CRC(3a93ea9e) SHA1(24e711a398d7f071fb904993ff0a974b4ac8b1d6) )
-	
+//  ROM_LOAD( "supasteppa2-1.p1", 0x0000, 0x1000, CRC(aac5b165) SHA1(5bf4acb85be227e1f4979fea4552fa5f64e9b7b2) )
+//  ROM_LOAD( "supasteppa2-2.p2", 0x0000, 0x1000, CRC(3a93ea9e) SHA1(24e711a398d7f071fb904993ff0a974b4ac8b1d6) )
+
 ROM_END
 
 

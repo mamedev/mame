@@ -1495,22 +1495,22 @@ static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
 		{
 			address = EA_AY_DI_32(m68k);
 		}
-		else if (mode == 6) 
+		else if (mode == 6)
 		{
 			address = EA_AY_IX_32(m68k);
 		}
 
 		if (dir)	// From system control reg to <ea>
 		{
-			if (regsel & 4) { m68ki_write_32(m68k, address, REG_FPCR); address += 4; } 
-			if (regsel & 2) { m68ki_write_32(m68k, address, REG_FPSR); address += 4; } 
-			if (regsel & 1) { m68ki_write_32(m68k, address, REG_FPIAR); address += 4; } 
+			if (regsel & 4) { m68ki_write_32(m68k, address, REG_FPCR); address += 4; }
+			if (regsel & 2) { m68ki_write_32(m68k, address, REG_FPSR); address += 4; }
+			if (regsel & 1) { m68ki_write_32(m68k, address, REG_FPIAR); address += 4; }
 		}
 		else		// From <ea> to system control reg
 		{
 			if (regsel & 4) { REG_FPCR = m68ki_read_32(m68k, address); address += 4; }
-			if (regsel & 2) { REG_FPSR = m68ki_read_32(m68k, address); address += 4; } 
-			if (regsel & 1) { REG_FPIAR = m68ki_read_32(m68k, address); address += 4; } 
+			if (regsel & 2) { REG_FPSR = m68ki_read_32(m68k, address); address += 4; }
+			if (regsel & 1) { REG_FPIAR = m68ki_read_32(m68k, address); address += 4; }
 		}
 	}
 	else

@@ -1385,10 +1385,10 @@ static void find_software_item(const device_list &devlist, emu_options &options,
 
 	/* Split full software name into software list name and short software name */
 	software_name_split(path, &swlist_name, &swname, &swpart );
-//	swname_bckp = swname;
+//  swname_bckp = swname;
 
 	const char *interface = image->image_interface();
-	
+
 	if ( swlist_name )
 	{
 		/* Try to open the software list xml file explicitly named by the user */
@@ -1499,7 +1499,7 @@ static void find_software_item(const device_list &devlist, emu_options &options,
 		}
 	}
 	*sw_list_name = global_strdup(swlist_name);
-	
+
 	global_free( swlist_name );
 	global_free( swname );
 	global_free( swpart );
@@ -1524,16 +1524,16 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 	software_info *software_info_ptr = NULL;
 	software_part *software_part_ptr = NULL;
 	const char *swlist_name = NULL;
-	
+
 	bool result = false;
 	*sw_info = NULL;
 	*sw_part = NULL;
 
 	find_software_item(image->device().machine().devicelist(), options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
-	
+
 	// if no match has been found, we suggest similar shortnames
 	if (software_info_ptr == NULL)
-	{		
+	{
 		software_display_matches(image->device().machine().devicelist(),image->device().machine().options(), image->image_interface(), path);
 	}
 
@@ -1639,7 +1639,7 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
 	software_info *software_info_ptr = NULL;
 	software_part *software_part_ptr = NULL;
 	const char *swlist_name = NULL;
-	
+
 	if (strlen(path)>0) {
 		retVal = default_card_slot;
 		find_software_item(devlist, options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
@@ -1652,7 +1652,7 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
 		software_list_close(software_list_ptr);
 		global_free(swlist_name);
 	}
-	return retVal;	
+	return retVal;
 }
 
 /***************************************************************************

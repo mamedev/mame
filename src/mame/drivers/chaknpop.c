@@ -1,10 +1,10 @@
 /*
 
 Chack'n Pop driver by BUT
-     
+
 Note: The 68705 MCU isn't dumped, becuase it's protected, however we simulate
-      it using data extracted with a trojan. See machine/chaknpop.c                                                                
-                                             
+      it using data extracted with a trojan. See machine/chaknpop.c
+
 Chack'n Pop
 Taito 1983
 
@@ -70,7 +70,7 @@ M4200367A (sticker)
 |-----------------------------------------------------|
 Notes:
            S - Flat cable connector joining to top PCB
-         416 - NEC uPC416C 16k x1 DRAM      
+         416 - NEC uPC416C 16k x1 DRAM
     AY3-8910 - Clock 1.500MHz [18/12]
        HSync - 15.1430kHz
        VSync - 59.1828Hz

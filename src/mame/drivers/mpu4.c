@@ -1,6 +1,6 @@
 /* Note 19/07/11 DH
  - added lots of sets
-  
+
    these are mostly unsorted and need to be split into clones
    the original source of these was a mess, assume things to be mislabled, bad, duplicated, or otherwise
    badly organized.  a lot of work is needed to sort them out, especially the Barcrest sets!  Some of this
@@ -2586,8 +2586,8 @@ static WRITE8_HANDLER( mpu4_ym2413_w )
 
 static READ8_HANDLER( mpu4_ym2413_r )
 {
-//	device_t *ym = space->machine().device("ym2413");
-//	return ym2413_read(ym,offset);
+//  device_t *ym = space->machine().device("ym2413");
+//  return ym2413_read(ym,offset);
 	return 0xff;
 }
 
@@ -3320,7 +3320,7 @@ ROM_START( m4addrc )
 	ROM_LOAD( "al10", 0x0000, 0x010000, CRC(3c3c82b6) SHA1(cc5ffdd0837c9af31d5737a70430a01d1989cdcc) )
 	ROM_LOAD( "alad58c", 0x0000, 0x010000, CRC(df9c46b8) SHA1(439ea1ce17aa89e19cedb78465b4388b72c8c5ed) )
 	ROM_LOAD( "nik56c", 0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366) )
-	
+
 ROM_END
 
 
@@ -3464,7 +3464,7 @@ ROM_START( m4andycp )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "ac.chr", 0x0000, 0x000048, CRC(87808826) SHA1(df0915a6f89295efcd10e6a06bfa3d3fe8fef160) )
-	
+
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "acapp1.bin",  0x000000, 0x080000, CRC(bda61fc6) SHA1(b94f39fa92d3d0cb580eaafa0f58bd5cde947e3a) )
 	ROM_LOAD( "andsnd.bin",  0x000000, 0x080000, CRC(7d568671) SHA1(3a0a6af3dc980f2ccff0b6ef85833eb2e352031a) )
@@ -3855,7 +3855,7 @@ ROM_START( m4bigchf )
 	ROM_LOAD( "b6cs.p1", 0x0000, 0x010000, CRC(4f45086b) SHA1(e1d639b068951df8f25b9c77d4fb86336ad19933) )
 	ROM_LOAD( "bchf20-6", 0x0000, 0x010000, CRC(7940eb01) SHA1(b23537e91842a0d9b25b9c76b245d2be3d9af57f) )
 	ROM_LOAD( "big chief 6.bin", 0x0000, 0x010000, CRC(edee08b7) SHA1(8de6160a4a4e5cd57f64c49d913f763aa87dc69a) )
-	
+
 	// 68k.. doesn't seem to be mpu4 video, so what is it?
 	ROM_LOAD( "b6cpl.p0", 0x0000, 0x020000, CRC(7fbb2efb) SHA1(c21136bf10407f1685f3933d426ef53925aca8d8) )
 	ROM_LOAD( "b6cpl.p1", 0x0000, 0x020000, CRC(a9f67f3e) SHA1(1309cc2dc8565ee79ac8cdc754187c8db6ddb3ea) )
@@ -3872,7 +3872,7 @@ ROM_END
 ROM_START( m4blkwht )
 	ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "b&wrom.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == oldtimer
-	
+
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "b&wchrt.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) )
 
@@ -4471,7 +4471,7 @@ ROM_START( m4cashmx )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "cashmat1.hex", 0x0000, 0x010000, CRC(36f1a4bb) SHA1(7eefcbb1be539fcc302d226fa567e8691e85c360) )
-	
+
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "cm.chr", 0x0000, 0x000048, CRC(3de2e6a6) SHA1(04e86e90561783f93d5e9d7a8b7f6dd3ea4f78f6) )
 ROM_END
@@ -4876,7 +4876,7 @@ ROM_START( m4crjwl )
 	ROM_LOAD( "cjn02.p1", 0x0000, 0x010000, CRC(a3d50e20) SHA1(15698e74a37d5f95a5634d48ae2a9a5d19faa2b6) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? or in above set? */	
+	/* Missing? or in above set? */
 ROM_END
 
 ROM_START( m4crjwl2 )
@@ -5337,7 +5337,7 @@ ROM_START( m4frnk )
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "frav3", 0x0000, 0x008000, CRC(06b1f6e2) SHA1(4f8013f1e07c2c41e4bac7883294d65e473f8ace) )
 
-	ROM_LOAD( "frav1", 0x0000, 0x10000, CRC(ea6f1b01) SHA1(74bcd36846e352e6d7f97e3c6b2479fd2abd76db) )// not prg	
+	ROM_LOAD( "frav1", 0x0000, 0x10000, CRC(ea6f1b01) SHA1(74bcd36846e352e6d7f97e3c6b2479fd2abd76db) )// not prg
 ROM_END
 
 ROM_START( m4frtlt )
@@ -5453,7 +5453,7 @@ ROM_START( m4gbust )
 	ROM_LOAD( "gb_20_d_.2a3", 0x0000, 0x010000, CRC(70f40688) SHA1(ed14f8f460825ffa087394ef5984ae064e02f7b6) )
 	ROM_LOAD( "gb_20_d_.2n3", 0x0000, 0x010000, CRC(431c2965) SHA1(eb24e560d5c4bf419465fc760621a4fa853fff95) )
 	ROM_LOAD( "gb_20_d_.3s3", 0x0000, 0x010000, CRC(4fc69155) SHA1(09a0f2122893d9fd90204a74c8862e01386503a4) )
-	
+
 ROM_END
 
 ROM_START( m4giant )
@@ -5948,7 +5948,7 @@ ROM_START( m4jpgem )
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-//	ROM_LOAD( "cg401.hex", 0x0000, 0x080000, CRC(e4addde8) SHA1(6b84de51cc5195d551e0787ff92bfa4371ab27a3) )
+//  ROM_LOAD( "cg401.hex", 0x0000, 0x080000, CRC(e4addde8) SHA1(6b84de51cc5195d551e0787ff92bfa4371ab27a3) )
 	ROM_LOAD( "cg4snd.p1", 0x000000, 0x080000, CRC(e4addde8) SHA1(6b84de51cc5195d551e0787ff92bfa4371ab27a3) )
 	ROM_LOAD( "jagsnd.p1", 0x080000, 0x080000, CRC(7488f7a7) SHA1(d581e9d6b5052ee8fee353a83e9d9031443d060a) )
 ROM_END
@@ -5956,7 +5956,7 @@ ROM_END
 ROM_START( m4jpgemc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gtc01ad.p1", 0x0000, 0x010000, CRC(e4f61afd) SHA1(36e007275cce0565c50b150dba4c8df272cd4c2e) )
-	
+
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "gtc01b.p1", 0x0000, 0x010000, CRC(e4e27c71) SHA1(b46da3f00134d3a2f17ceb35529adb598c75ee4e) )
 	ROM_LOAD( "gtc01bd.p1", 0x0000, 0x010000, CRC(d2ea77b7) SHA1(4f66fa8d692f26ffa92ae3aff4f43257fc573e93) )
@@ -6445,8 +6445,8 @@ ROM_START( m4luckst )
 	ROM_LOAD( "lst10s.p1", 0x0000, 0x020000, CRC(0e1ad810) SHA1(bd439f2857ebbde2b7941c411ac7edf7c66af7eb) )
 	ROM_LOAD( "lst10y.p1", 0x0000, 0x020000, CRC(62f4588b) SHA1(ee7c06e2cc79f7d18d45b0a1793e5279a46ffcc0) )
 	ROM_LOAD( "lstrikegame10-8t.bin", 0x0000, 0x020000, CRC(709c2dbf) SHA1(bba8d7af9502911ffa1c086b993484ab78ad38ac) )
-//	ROM_LOAD( "lstrikesnd-p1.bin", 0x0000, 0x020000, CRC(0c8f9dcd) SHA1(026be80620bd4afc3e45cb7a374b93fff4c13dd2) ) // bad
-//	ROM_LOAD( "lstrikesnd-p2.bin", 0x0000, 0x020000, CRC(2a746ba5) SHA1(7f9d727a849a7a1ecfd750f214deef150ec3d9eb) ) // bad
+//  ROM_LOAD( "lstrikesnd-p1.bin", 0x0000, 0x020000, CRC(0c8f9dcd) SHA1(026be80620bd4afc3e45cb7a374b93fff4c13dd2) ) // bad
+//  ROM_LOAD( "lstrikesnd-p2.bin", 0x0000, 0x020000, CRC(2a746ba5) SHA1(7f9d727a849a7a1ecfd750f214deef150ec3d9eb) ) // bad
 
 	ROM_REGION( 0x20000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "ls55", 0x0000, 0x020000, CRC(823e805b) SHA1(17f09fd53188950a8d98ac04cd94785947b52b01) )
@@ -6548,7 +6548,7 @@ ROM_START( m4luxor )
 	ROM_LOAD( "luxorsnd2.hex", 0x080000, 0x080000, CRC(860178e6) SHA1(705b1b0ad62a1b594bb123aec3c2b571a6500ce8) )
 
 	ROM_LOAD( "luxor-snd1.bin", 0x000000, 0x080000, CRC(d09394e9) SHA1(d3cbdbaf048d829271a6c2846b16ceee7775d767) )
-	ROM_LOAD( "luxor-snd2.bin", 0x080000, 0x080000, CRC(bc720cb9) SHA1(a83c25ecec602ba047dd21de2beec6cd7ac76cbe) )	
+	ROM_LOAD( "luxor-snd2.bin", 0x080000, 0x080000, CRC(bc720cb9) SHA1(a83c25ecec602ba047dd21de2beec6cd7ac76cbe) )
 ROM_END
 
 ROM_START( m4madhse )
@@ -6917,7 +6917,7 @@ ROM_END
 
 ROM_START( m4nudgew )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "naw0_4.bin", 0x0000, 0x010000, CRC(0201f6f9) SHA1(48772611db7ae0cda48b8d725fdc8ef50e64d6ad) ) 
+	ROM_LOAD( "naw0_4.bin", 0x0000, 0x010000, CRC(0201f6f9) SHA1(48772611db7ae0cda48b8d725fdc8ef50e64d6ad) )
 	ROM_IGNORE(0x10000) // rom too big?
 ROM_END
 
@@ -7070,7 +7070,7 @@ ROM_END
 ROM_START( m4nudshf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nus6", 0x0000, 0x010000, CRC(017c5354) SHA1(07491e4b03ab62ad923f8479300c1af4633e3e8c) )
-	
+
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "nuss.bin", 0x0000, 0x010000, CRC(d3b860ee) SHA1(d5d1262c715e4684748b0cae708eeed31b1dc50f) )
 	ROM_LOAD( "nusx.p1", 0x0000, 0x010000, CRC(87caab84) SHA1(e2492ad0d25ded4d760c4cbe05e9b51ca1a10544) )
@@ -8087,7 +8087,7 @@ ROM_START( m4reeltm )
 	ROM_LOAD( "charter.chr", 0x0000, 0x000048, CRC(4ff4eda2) SHA1(092435e34d79775910316a7bed0f90c4f086e5c4) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	
+
 ROM_END
 
 ROM_START( m4richfm )
@@ -8537,7 +8537,7 @@ ROM_START( m4sss )
 	ROM_LOAD( "sx_10a__.2_1", 0x0000, 0x010000, CRC(73e3bc13) SHA1(004097cc9cd62b8fa4c584fcb9874cf998c7b89d) )
 	ROM_LOAD( "sxi05___.2_1", 0x0000, 0x010000, CRC(a804a20b) SHA1(477d2a750c0c252ffa215c3cf89916cb3a296b92) )
 	ROM_LOAD( "sxi10___.2_1", 0x0000, 0x010000, CRC(bbb23438) SHA1(2cc4376f6393c69c1e18ad06be18933592b6bdae) )
-	
+
 ROM_END
 
 
@@ -8947,12 +8947,12 @@ ROM_START( m4tpcl )
 	ROM_LOAD( "ctp12s.p1", 0x0000, 0x020000, CRC(5f0bbd2a) SHA1(ba1fa09ea7b4713a99b2033bdbbf6b15f973dcca) )
 
 	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-//	ROM_LOAD( "ctp1.2", 0x0000, 0x00df8f, CRC(5b32661f) SHA1(905eed53c50e54d46ead04277072dde5cbb40510) ) // just a zipped version of other file
-//	ROM_LOAD( "ctp1.2s", 0x0000, 0x00e131, CRC(bca78748) SHA1(a6f03131dfaa4d7d7ee2f32b6fda7aa11dcf5dc9) ) // just a zipped version of other file
+//  ROM_LOAD( "ctp1.2", 0x0000, 0x00df8f, CRC(5b32661f) SHA1(905eed53c50e54d46ead04277072dde5cbb40510) ) // just a zipped version of other file
+//  ROM_LOAD( "ctp1.2s", 0x0000, 0x00e131, CRC(bca78748) SHA1(a6f03131dfaa4d7d7ee2f32b6fda7aa11dcf5dc9) ) // just a zipped version of other file
 	ROM_LOAD( "ctp13d.p1", 0x0000, 0x020000, CRC(a0f081b9) SHA1(794bba6ed86c3f332165c4b3224315256c939926) )
 	ROM_LOAD( "ctp13f.p1", 0x0000, 0x020000, CRC(dd7d94fd) SHA1(127ef8159facf647dff37109bcbb94311a8343f1) )
 	ROM_LOAD( "ctp13s.p1", 0x0000, 0x020000, CRC(f0a69f92) SHA1(cd34fb26ecbe6a6e8602a8549c5f331a525567df) )
-//	ROM_LOAD( "ntp0.2", 0x0000, 0x00d3b9, CRC(dfd82d90) SHA1(0c591780aed258627135c583c700b6d9a76908b5) )  // just a zipped version of other file
+//  ROM_LOAD( "ntp0.2", 0x0000, 0x00d3b9, CRC(dfd82d90) SHA1(0c591780aed258627135c583c700b6d9a76908b5) )  // just a zipped version of other file
 	ROM_LOAD( "ntp02.p1", 0x0000, 0x020000, CRC(6063e27d) SHA1(c99599fbc7146d8fcf62432994098dd51250b17b) )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
@@ -9062,7 +9062,7 @@ ROM_START( m4ttdia )
 	ROM_LOAD( "tda04y.p1", 0x0000, 0x020000, CRC(1151d6c2) SHA1(0048447537061d15c4173366ac1b431e4eef4d57) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-//	ROM_LOAD( "tda0.1 snd p1.bin", 0x0000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) )
+//  ROM_LOAD( "tda0.1 snd p1.bin", 0x0000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) )
 	ROM_LOAD( "tdasnd.p1", 0x000000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) )
 	ROM_LOAD( "tdasnd.p2", 0x080000, 0x080000, CRC(66cc2f87) SHA1(6d8af6090b2ab29039aa89a125512190e7e34a03) )
 ROM_END
@@ -9690,7 +9690,7 @@ ROM_END
 ROM_START( m4vivalv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5p5vivalasvegas6.bin", 0x0000, 0x010000, CRC(4d365b57) SHA1(69ff75ccc91f1f7b867a0914d350d1649834a48e) )
-	
+
 	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "v.las vegas 6 10p 10m.bin", 0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d) )
 	ROM_LOAD( "vegas15g", 0x0000, 0x020000, CRC(5b804e4d) SHA1(5967b9f4e28e5a5e5e7005a29ecb30fc661800e0) )
@@ -9893,7 +9893,7 @@ ROM_START( m4wta )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "wta_5p4c.bin", 0x0000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) ) // no 1st part?
-	
+
 	ROM_LOAD( "winsnd.p1", 0x000000, 0x080000, CRC(a913ad0d) SHA1(5f39b661912da903ce8d6658b7848081b191ea56) )
 	ROM_LOAD( "winsnd.p2", 0x080000, 0x080000, CRC(6a22b39f) SHA1(0e0dbeac4310e03490b665fff514392481ad265f) )
 ROM_END
@@ -10434,7 +10434,7 @@ ROM_START( m4kingq )
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "kingsnqueenssnd.bin", 0x0000, 0x080000, CRC(31d722d4) SHA1(efb7079a1036cad8d9c08106f97c70a248b31898) )
 	//ROM_LOAD( "knqsnd.bin", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) )
-	ROM_LOAD( "ee______.1_2", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) )	
+	ROM_LOAD( "ee______.1_2", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) )
 ROM_END
 
 
@@ -10479,7 +10479,7 @@ ROM_START( m4kingqc )
 
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "knqsnd.bin", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) )
-	ROM_LOAD( "cn______.5_a", 0x0000, 0x080000, CRC(7f82f113) SHA1(98851f8820cb39b45d477151982c80fc91b15e56) )	
+	ROM_LOAD( "cn______.5_a", 0x0000, 0x080000, CRC(7f82f113) SHA1(98851f8820cb39b45d477151982c80fc91b15e56) )
 ROM_END
 
 
@@ -10526,7 +10526,7 @@ ROM_START( m4ln7 )
 
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "l7______.1_2", 0x000000, 0x080000, CRC(216209e3) SHA1(af274a7f27ba0e7ac03400e9919537ab36464e64) )
-	ROM_LOAD( "l7______.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) )	
+	ROM_LOAD( "l7______.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) )
 ROM_END
 
 
@@ -10704,7 +10704,7 @@ ROM_START( m4rackem )
 	ROM_LOAD( "re_sj_d_.2_0", 0x0000, 0x040000, CRC(7a31658c) SHA1(4fade421b3a1a732a99f7cb6346279ad82f55362) )
 	ROM_LOAD( "re_sjs__.2_0", 0x0000, 0x040000, CRC(d7c499c8) SHA1(73542f54322f5ffb87d16f5f66cc3a22c2849f20) )
 	ROM_LOAD( "re_sjsw_.2_0", 0x0000, 0x040000, CRC(66355370) SHA1(d54aab7403e64a67edf2baeaf1321ee5c4aa553d) )
-	
+
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "re_snd.p1", 0x000000, 0x080000, CRC(aea88892) SHA1(457dab5cddfb9762f7e0bd61187b8052aee71c28) )
 	ROM_LOAD( "re_snd.p2", 0x080000, 0x080000, CRC(57394ec6) SHA1(cba7abebd3ab165e9531017168f51ada6cf35991) )
@@ -10752,7 +10752,7 @@ ROM_START( m4rhfev )
 	ROM_LOAD( "rf_____.1_1", 0x000000, 0x080000, CRC(ac8d539d) SHA1(8baf14bece50774f93ae9eaf3effabb6882d2c43) )
 	ROM_LOAD( "rf_____.1_2", 0x080000, 0x080000, CRC(cc2fadd8) SHA1(681850e2e6164cf8af8e7501ac44f475cc07b742) )
 	ROM_LOAD( "rf_____.1_3", 0x100000, 0x080000, CRC(165aaf9f) SHA1(815224fe94a77628cef1dd0d8a238edcb4813006) )
-	ROM_LOAD( "rf_____.1_4", 0x180000, 0x080000, CRC(4f7e7b49) SHA1(f9d421eeab73e0c795a08cf166c8807e0b14ec82) )	
+	ROM_LOAD( "rf_____.1_4", 0x180000, 0x080000, CRC(4f7e7b49) SHA1(f9d421eeab73e0c795a08cf166c8807e0b14ec82) )
 ROM_END
 
 
@@ -11012,7 +11012,7 @@ ROM_START( m4ssclas )
 	ROM_LOAD( "cs__xa_x.6_0", 0x0000, 0x010000, CRC(6657e810) SHA1(0860076cf01c732f419483876991fb42a838622a) )
 	ROM_LOAD( "cs__xb_x.5_0", 0x0000, 0x010000, CRC(a5f46ff5) SHA1(a068029f774bc6ed2e76acc2eb509bc6e2490945) )
 	ROM_LOAD( "cs__xb_x.6_0", 0x0000, 0x010000, CRC(801d543c) SHA1(f0905947312fb2a526765d17cde01af5095ef923) )
-	
+
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "ssbwb.chr", 0x0000, 0x000048, CRC(910b09db) SHA1(d54399660b1bf1a89712b25292ac99b740442e5c) )
 
@@ -11030,7 +11030,7 @@ ROM_START( m4sure )
 	ROM_LOAD( "su_xf_d_.3_1", 0x0000, 0x010000, CRC(5c4a5669) SHA1(55e1e853fdfdbb43e7b61b59ab642fb013a0db0e) )
 	ROM_LOAD( "suixf___.3_1", 0x0000, 0x010000, CRC(cae80b60) SHA1(23545aaf1cc3a0c8868beafb56eccedbbb6099de) )
 ROM_END
- 
+
 ROM_START( m4tic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tt_20a__.2_1", 0x0000, 0x010000, CRC(b923ac0d) SHA1(1237962af43c2c3f4ed0ad5bed21f24decfeae02) )
@@ -11389,7 +11389,7 @@ ROM_START( m4bandgd )
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "bandsofgoldsnd.bin", 0x0000, 0x080000, CRC(95c6235f) SHA1(a13afa048b73fabfad229b5c2f8ef5ee9948d9fb) )
 ROM_END
-  
+
 ROM_START( m4bangrs )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "bnc3_0.bin", 0x0000, 0x010000, CRC(c30f947a) SHA1(c734bd966142023e2b7b498ba939972ed32c9fd6) )
@@ -11643,7 +11643,7 @@ ROM_START( m4bigchsb )
 	ROM_LOAD( "bcsnd3.bin", 0x100000, 0x080000, CRC(cd6e26de) SHA1(d84274b3b4bc7126e19bf6c6e1aac561a7aaab77) )
 ROM_END
 
-  
+
 
 ROM_START( m4blztrl )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -11719,7 +11719,7 @@ ROM_START( m4cstrik )
 	ROM_LOAD( "cssnd2.bin", 0x080000, 0x080000, CRC(6160f67c) SHA1(c781d47fe3c6f230442e19ca26523b34808b44a1) )
 	ROM_LOAD( "cssnd3.bin", 0x100000, 0x080000, CRC(3911d57a) SHA1(2f0a3a15237876d04b5c9cb72648b27966cd7fb6) )
 ROM_END
-  
+
 ROM_START( m4cstrika )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cs3_1i.bin", 0x0000, 0x020000, CRC(cbf0041e) SHA1(9baf9f209f1c4bf59f31437d07051a6cb71e877c) )
@@ -11729,7 +11729,7 @@ ROM_START( m4cstrika )
 	ROM_LOAD( "cssnd2.bin", 0x080000, 0x080000, CRC(6160f67c) SHA1(c781d47fe3c6f230442e19ca26523b34808b44a1) )
 	ROM_LOAD( "cssnd3.bin", 0x100000, 0x080000, CRC(3911d57a) SHA1(2f0a3a15237876d04b5c9cb72648b27966cd7fb6) )
 ROM_END
-  
+
 ROM_START( m4cstrikb )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cs3_1x.bin", 0x0000, 0x020000, CRC(d01bda0b) SHA1(528df320593656040b7491a0f3f24cc489b45722) )
@@ -11739,7 +11739,7 @@ ROM_START( m4cstrikb )
 	ROM_LOAD( "cssnd2.bin", 0x080000, 0x080000, CRC(6160f67c) SHA1(c781d47fe3c6f230442e19ca26523b34808b44a1) )
 	ROM_LOAD( "cssnd3.bin", 0x100000, 0x080000, CRC(3911d57a) SHA1(2f0a3a15237876d04b5c9cb72648b27966cd7fb6) )
 ROM_END
-  
+
 
 
 ROM_START( m4chacec )
@@ -11762,7 +11762,7 @@ ROM_START( m4chaceca )
 	ROM_LOAD( "casnd3.bin", 0x100000, 0x080000, CRC(5764e36d) SHA1(6601946bda40886e3a606accd7c11b31efcdab28) )
 ROM_END
 
- 
+
 
 ROM_START( m4chacef )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -12013,11 +12013,11 @@ ROM_START( m4firebld ) // looks weird, bad dump?
 	ROM_REGION( 0x080000, "temp", 0 )
 	ROM_LOAD( "fba2_6", 0x0000, 0x080000, CRC(cf16b2d0) SHA1(32249fb15708dfa408c4642be7a41fba7aeda657) )
 
-	ROM_REGION( 0x010000, "maincpu", 0 ) 
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	// reports src/mame/drivers/mpu4.c: m4firebld has ROM fba2_6 extending past the defined memory region (bug)
 	//ROM_LOAD( "fba2_6", 0x0000, 0x010000, CRC(cf16b2d0) SHA1(32249fb15708dfa408c4642be7a41fba7aeda657) )
 	//ROM_IGNORE(0x070000)
-	ROM_COPY( "temp", 0x0000, 0x0000, 0x010000 )	
+	ROM_COPY( "temp", 0x0000, 0x0000, 0x010000 )
 ROM_END
 
 
@@ -12032,7 +12032,7 @@ ROM_START( m4fright )
 	ROM_LOAD( "fnsnd2.bin", 0x080000, 0x080000, CRC(f2d0c27c) SHA1(4d18049a926898f7fbca54dd30519199fe39f8ea) )
 	ROM_LOAD( "fnsnd3.bin", 0x100000, 0x080000, CRC(7ad8aecc) SHA1(8d10a27efbde41af8e04ebe7e8b4b921443bd560) )
 ROM_END
-  
+
 
 ROM_START( m4frighta )
 	ROM_REGION( 0x020000, "maincpu", 0 )
@@ -12179,7 +12179,7 @@ ROM_START( m4goldfv )
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "gfsnd.bin", 0x0000, 0x080000, CRC(1bb14a13) SHA1(44e888e625cce27bc550a93fce3747885802f5c2) )
 ROM_END
-  
+
 ROM_START( m4gvibes )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "gv0_1.bin", 0x0000, 0x010000, CRC(ba9a507b) SHA1(ba3b2038b50248ec1f3319e2b39d02313ce3ad08) )
@@ -12347,7 +12347,7 @@ ROM_END
 ROM_START( m4hotcshb )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "hc3_0kx.bin", 0x0000, 0x010000, CRC(3abebe72) SHA1(fec09ca41e8e43628140456bb44ce6e7c66f5270) )
-	
+
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
@@ -12497,7 +12497,7 @@ ROM_START( m4nudbon )
 	ROM_LOAD( "nb4_0.bin", 0x0000, 0x010000, CRC(c7802b0f) SHA1(6ebff8ccbd2baf6de55d764d2e7cb34f2ff2384f) )
 
 // something else? or sound related?
-//	ROM_LOAD( "nubnzdl1.bin", 0x0000, 0x002000, CRC(bae682d2) SHA1(650082af9210b0af8b08870a4cdf4196035ea8a5) )
+//  ROM_LOAD( "nubnzdl1.bin", 0x0000, 0x002000, CRC(bae682d2) SHA1(650082af9210b0af8b08870a4cdf4196035ea8a5) )
 //  ROM_LOAD( "nubnzdl2.bin", 0x0000, 0x002000, CRC(ff150af7) SHA1(02e25200560e8435ebbf19c3ae9c3e9cf00342c1) )
 //  ROM_LOAD( "nubnzdl3.bin", 0x0000, 0x004000, CRC(450d7fc9) SHA1(f82acb017e765f7188a874dade6fd1a5d6b2033e) )
 ROM_END
@@ -12706,7 +12706,7 @@ ROM_END
 ROM_START( m4snookr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "snooker.ts2", 0x8000, 0x004000, CRC(a6906eb3) SHA1(43b91e88f909b758f880d83df4f889f15aa17eb3) )
- 	ROM_LOAD( "snooker.ts1", 0xc000, 0x004000, CRC(3e3072dd) SHA1(9ea8b270044b48767a2e6c19e8ed257d5491c1d0) )
+	ROM_LOAD( "snooker.ts1", 0xc000, 0x004000, CRC(3e3072dd) SHA1(9ea8b270044b48767a2e6c19e8ed257d5491c1d0) )
 ROM_END
 
 
@@ -12766,7 +12766,7 @@ ROM_END
 ROM_START( m4ttrail )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tt3_0.bin", 0x0000, 0x010000, CRC(62f31f70) SHA1(e1b50b98cc90513c9fa06d0ea8f70aa45bddc0e6) )
-	
+
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "ttsnd1.bin", 0x000000, 0x080000, CRC(6af0c76f) SHA1(8587b499b88b609e48553e610a0ee539f98b70ce) )
 	ROM_LOAD( "ttsnd2.bin", 0x080000, 0x080000, CRC(9f243ed1) SHA1(c4b83a9b788e4fa2065ff7a270f0dcdecb125e66) )
@@ -12775,7 +12775,7 @@ ROM_END
 ROM_START( m4ttraila )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tt3_0i.bin", 0x0000, 0x010000, CRC(e5533a13) SHA1(0d23503d32c8156112676aaddece1a44614230eb) )
-	
+
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "ttsnd1.bin", 0x000000, 0x080000, CRC(6af0c76f) SHA1(8587b499b88b609e48553e610a0ee539f98b70ce) )
 	ROM_LOAD( "ttsnd2.bin", 0x080000, 0x080000, CRC(9f243ed1) SHA1(c4b83a9b788e4fa2065ff7a270f0dcdecb125e66) )
@@ -12784,7 +12784,7 @@ ROM_END
 ROM_START( m4ttrailb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tt3_0x.bin", 0x0000, 0x010000, CRC(7d00e4ae) SHA1(6bb30af001fc73e354c17a99633b6fa4c50b374d) )
-	
+
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "ttsnd1.bin", 0x000000, 0x080000, CRC(6af0c76f) SHA1(8587b499b88b609e48553e610a0ee539f98b70ce) )
 	ROM_LOAD( "ttsnd2.bin", 0x080000, 0x080000, CRC(9f243ed1) SHA1(c4b83a9b788e4fa2065ff7a270f0dcdecb125e66) )
@@ -12876,49 +12876,49 @@ ROM_START( m4bigban )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "big04.p1", 0x0000, 0x020000, CRC(f7ead9c6) SHA1(46c10abb892cb6d427ad508aae96752c14b4cb83) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 ROM_START( m4crzcsn )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "crz03.bin", 0x0000, 0x020000, CRC(48610c4f) SHA1(a62ac8b3ee704ee4e98f9d56bfc723d4cbb25b54) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 ROM_START( m4crzcav )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gcv05.p1", 0x0000, 0x020000, CRC(b9ba46f6) SHA1(78b745d85b36444c39747982987088a772b20a7e) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 ROM_START( m4dragon )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "dgl01.p1", 0x0000, 0x020000, CRC(d7d39c9b) SHA1(5350c9db549edee30815516b1ce74a018390ff3d) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 ROM_START( m4hilonv )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hnc02.p1", 0x0000, 0x020000, CRC(33a8022b) SHA1(5168b8f32630aa2cb56f30c941695f1728e4fb7a) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 ROM_START( m4octo )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "oct03.p1", 0x0000, 0x020000, CRC(8df66e94) SHA1(e1ab93982846d83becae36b5814ebbd515b9078e) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 ROM_START( m4sctagt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gse3_0.p1", 0x0000, 0x010000, CRC(eff705ff) SHA1(6bf96872ef4bcc8f8041c5384d892f072c72be2b) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 
@@ -13041,17 +13041,17 @@ GAME( 198?, m4clr,        0, mod2    ,   mpu4,       0,       ROT0, "Barcrest","
 GAME(199?, m4tenten	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","10 X 10 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )  // gives WRONG SOUND, NEEDS V1 (can be skipped with 1)
 GAME(199?, m421club	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","21 Club (Barcrest) [DTW, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // not english
 GAME(199?, m4actbnk	,0			,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) [ACT] (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK ) // set jackpot key to 8GBP TOKEN
-GAME(199?, m4actclb	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4actnot	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Action Note (Barcrest) [AN 1.2] (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4actpak	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Action Pack (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4addrd	,m4addr		,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders (Barcrest) [DAL, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4addr	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4addrc	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4addrcc	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4addrcb	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4alladv	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","All Cash Advance (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4alpha	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4ambass	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Ambassador (Barcrest) [DAM, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4actclb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4actnot	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Note (Barcrest) [AN 1.2] (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4actpak	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Pack (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4addrd	,m4addr		,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders (Barcrest) [DAL, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4addr	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4addrc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4addrcc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4addrcb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4alladv	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","All Cash Advance (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4alpha	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4ambass	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Ambassador (Barcrest) [DAM, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4amhiwy	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","American Highway (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // crash mame
 GAME(199?, m4andycpd,m4andycp	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Andy Capp (Barcrest) [DAC, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4andycp	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Andy Capp (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -13059,68 +13059,68 @@ GAME(199?, m4andyfl	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","And
 GAME(199?, m4andybt	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Andy's Big Time Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4andyfh	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Andy's Full House (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4andyge	,0			,mod4oki	,grtecp				,m_grtecp			,ROT0,   "Barcrest","Andy's Great Escape (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4apach	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Apache (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4atlan	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Atlantis (Barcrest) [DAT, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4apach	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Apache (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4atlan	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Atlantis (Barcrest) [DAT, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4bagtel	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Bagatelle (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bnknot	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Bank A Note (Barcrest) [BN 1.0] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bnknot	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Bank A Note (Barcrest) [BN 1.0] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4bnkrol	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Bank Roller Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4btclok	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4btclok	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4berser	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Berserk (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // crashes mame
-GAME(199?, m4bigbn	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Big Ben (Barcrest) [DBB, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bigchfd,m4bigchf	,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) [BCH, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // why code BCH on a dutch?
-GAME(199?, m4bigchf	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bigbn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Ben (Barcrest) [DBB, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bigchfd,m4bigchf	,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) [BCH, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // why code BCH on a dutch?
+GAME(199?, m4bigchf	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4blkwhd	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Black & White (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4blkbuld,m4blkbul	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Black Bull (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4blkbul	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Black Bull (Barcrest) [XSP] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // XSP??
+GAME(199?, m4blkbul	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Black Bull (Barcrest) [XSP] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // XSP??
 GAME(199?, m4blkcat	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Black Cat (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bj		,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Black Jack (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bjc	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Black Jack Club (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bja	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Blackjack (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bjac	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Blackjack Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bjsm	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4blstbk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Blast A Bank (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bj		,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Black Jack (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bjc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Black Jack Club (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bja	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Blackjack (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bjac	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Blackjack Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bjsm	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4blstbk	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Blast A Bank (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4bluedm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Blue Diamond (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bluemn	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bluemn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4bdash	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Boulder Dash (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // gives WRONG SOUND, NEEDS V1 (can be skipped with 1)
-GAME(199?, m4brktak	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4brdway	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Broadway (Barcrest) [DBR, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4brktak	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4brdway	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Broadway (Barcrest) [DBR, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4brook	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Brooklyn (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4buc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Buccaneer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4bucks	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4bucks	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4calamab,m4calama	,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Calamari Club (Barcrest - Bwb) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4calama	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Calamari Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4calicl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","California Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4cardcs	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Card Cash (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4calicl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","California Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4cardcs	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Card Cash (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4cojok	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Carry On Joker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4cashat	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Cash Attack (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4cashcn	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Connect (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4cashco	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Counter (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4cashcn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Connect (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4cashco	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Counter (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4cashln	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Cash Lines (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // gives WRONG SOUND, NEEDS V1 (can be skipped with 1)
 GAME(199?, m4cashmn	,0			,mod4oki	,mpu4jackpot8tkn	,m4default_bigbank	,ROT0,   "Barcrest","Cash Machine (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4cashmx	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Matrix (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4cashzn	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Zone (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4casmul	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Casino Multiplay (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // crashes mame
-GAME(199?, m4celclb	,0			,mod2    	,mpu4				,m_ccelbr			,ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4centpt	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4cashmx	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Matrix (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4cashzn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Zone (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4casmul	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Casino Multiplay (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // crashes mame
+GAME(199?, m4celclb	,0			,mod2   	,mpu4				,m_ccelbr			,ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4centpt	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4ceptr	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Ceptor (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4chasei	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4cheryo	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Cherryo (Barcrest) [DCH, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4cheryo	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cherryo (Barcrest) [DCH, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4click	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Clickety Click (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4c999	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4c999	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4c9		,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Cloud Nine (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4c9c	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4clbcls	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4clbclm	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Climber (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4clbcnt	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4clbdbl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Double (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4clbcls	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4clbclm	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Club Climber (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4clbcnt	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4clbdbl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Club Double (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4clbshf	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4clbtro	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4clbtro	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4clbveg	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4clbx	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Club X (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4copcsh	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Coppa Cash (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4copcsh	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Coppa Cash (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4coscas	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Cosmic Casino (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4crkpot	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Crackpot Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4crzjk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Crazy Jokers (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4crkpot	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Crackpot Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4crzjk	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Crazy Jokers (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4crzjwl	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4crjwl	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4crjwl2	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -13129,66 +13129,66 @@ GAME(199?, m4crmaze	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest
 GAME(199?, m4denmen	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Dennis The Menace (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4dbl9	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Double 9's (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4dbldmn	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Double Diamond Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4dblup	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Double Up (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4dblup	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Double Up (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4drac	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Dracula (Barcrest - Nova) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4dtyfre	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Duty Free (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4eighth	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Eighth Wonder (Barcrest) [WON 2.2] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4elite	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Elite (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4eighth	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Eighth Wonder (Barcrest) [WON 2.2] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4elite	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Elite (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4eaw	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Everyone's A Winner (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4exprs	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Express (Barcrest) [DXP, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4exprs	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Express (Barcrest) [DXP, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4exgam	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4fastfw	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Fast Forward (Barcrest - Bwb) [FFD 1.0] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4class	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","First Class (Barcrest) [DFC, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4flash	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Flash Cash (Barcrest) [FC 1.0] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4fastfw	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Fast Forward (Barcrest - Bwb) [FFD 1.0] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4class	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","First Class (Barcrest) [DFC, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4flash	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Flash Cash (Barcrest) [FC 1.0] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4fortcb	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4frtlt	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit & Loot (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4frtfl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Full (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4frtflc	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Full Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4frtfl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Full (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4frtflc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Full Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4frtgm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4frtlnk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4frtprs	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Preserve (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4frtlnk	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4frtprs	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Fruit Preserve (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAMEL(198?,m4gambal	,0			,mod4yam	,gamball			,m_gmball			,ROT0,   "Barcrest","Gamball (Barcrest) (MPU4)",							GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
 GAME(199?, m4gb006	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Games Bond 006 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4gbust	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Ghost Buster (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4giant	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Giant (Barcrest) [DGI, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4gbust	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Ghost Buster (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4giant	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Giant (Barcrest) [DGI, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4gclue	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Give Us A Clue (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4gldstr	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Gold Strike (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4gldgat	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Golden Gate (Barcrest) [DGG, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4gldstr	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Gold Strike (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4gldgat	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Golden Gate (Barcrest) [DGG, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4gldjok	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Golden Joker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // dutch?
 GAME(199?, m4gldnud	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Golden Nudger (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4grbbnk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Grab The Bank (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4grbbnk	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Grab The Bank (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4graff	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Graffiti (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4graffd	,m4graff	,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4grands	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Grandstand Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4grands	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Grandstand Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4gnsmk	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Gun Smoke (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4hpyjok	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Happy Joker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4hijinx	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Hi Jinx (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4hirise	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4hiroll	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","High Roller (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4hirise	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4hiroll	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","High Roller (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4hittop	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Hit The Top (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4thehit	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","The Hit (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4holdon	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Hold On (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4thehit	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","The Hit (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4holdon	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Hold On (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4holdtm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Hold Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4hotrod	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Hot Rod (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4hypvip	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Hyper Viper (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4hypclb	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Hyper Viper Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4intcep	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Interceptor (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4hypvip	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Hyper Viper (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4hypclb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Hyper Viper Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4intcep	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Interceptor (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4jpgem	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Jackpot Gems (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4jpgemc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4jpjmp	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Jackpot Jump (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4jpjmp	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Jackpot Jump (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4jwlcwn	,0			,mod4oki	,mpu4jackpot8tkn	,m4default_bigbank	,ROT0,   "Barcrest","Jewel In the Crown (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4jok300	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jokers 300 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4jokmil	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jokers Millenium (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4jok300	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jokers 300 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4jokmil	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jokers Millenium (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4jolgem	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jolly Gems (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )  // gives WRONG SOUND, NEEDS V1 (can be skipped with 1) (hangs)
-GAME(199?, m4joljok	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4joljok	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4joljokd,m4joljok	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4joljokh,m4joljok	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Hungarian] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4joltav	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4joltav	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4lastrp	,0			,mod4oki	,mpu4jackpot8tkn	,m4default_bigbank	,ROT0,   "Barcrest","Las Vegas Strip (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4goodtm	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Let The Good Times Roll (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4libty	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Liberty (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4lineup	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Line Up (Bwb - Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // no sound with any system?
-GAME(199?, m4loadmn	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4libty	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Liberty (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4lineup	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Line Up (Bwb - Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // no sound with any system?
+GAME(199?, m4loadmn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4luck7	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Lucky 7 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4luckdv	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Lucky Devil (Barcrest) [Czech] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4luckdvd,m4luckdv	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Lucky Devil (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -13204,55 +13204,55 @@ GAME(199?, m4magrep	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Mag
 GAME(199?, m4magtbo	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Magic Turbo  (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4mag7s	,0			,mod4oki	,mpu4jackpot8per	,m4default_bigbank	,ROT0,   "Barcrest","Magnificent 7's (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4makmnt	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Make A Mint (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4megbks	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4meglnk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Megalink (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4milclb	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4mirage	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Mirage (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4moneym	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Money Maker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4megbks	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4meglnk	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Megalink (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4milclb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4mirage	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Mirage (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4moneym	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Money Maker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4monte	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Monte Carlo (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4multcl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Multiplay Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4multwy	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Multiway (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4multcl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Multiplay Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4multwy	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Multiway (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4nhtt	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","New Hit the Top (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4nick	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4nifty	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4nspot	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4nick	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4nifty	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4nspot	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4nile	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Nile Jewels (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4nudgew	,0			,mod4yam   	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge A Win (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // no sound with any system?
+GAME(199?, m4nudgew	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge A Win (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // no sound with any system?
 GAME(199?, m4nudbnk	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Banker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4nnww	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4nnwwc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4nudqst	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Quest (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4nudshf	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4nudup	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Up (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4num1	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Number One (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4nudqst	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Quest (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4nudshf	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4nudup	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Nudge Up (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4num1	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Number One (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4oldtmr	,0			,mod4oki	,mpu4				,m_oldtmr			,ROT0,   "Barcrest","Old Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4casot	,m4oldtmr	,mod4oki	,mpu4				,m_oldtmr			,ROT0,   "Barcrest","Casino Old Timer (Old Timer Sound hack?) (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // uses the same program???
 GAME(199?, m4blkwht	,m4oldtmr	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Black & White (Old Timer Sound hack?) (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // uses the same program???
 GAME(199?, m4jpmcla	,m4oldtmr	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","JPM Classic (Old Timer Sound hack?) (Barcrest) (MPU4)",							GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // uses the same program???
-GAME(199?, m4omega	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Omega (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4omega	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Omega (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4ordmnd	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Oriental Diamonds (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4overmn	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Over The Moon (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4placbt	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Place Your Bets (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4pont	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4pont	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4potblk	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Pot Black (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4ptblkc	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Pot Black Casino (Bwb - Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // main cpu crashes?
-GAME(199?, m4potlck	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Pot Luck Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4potlck	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Pot Luck Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4prem	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Premier (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przdty	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Duty Free (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przfrt	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Fruit & Loot (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przhr	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Prize High Roller (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przlux	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Luxor (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przmon	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Money (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4przmns	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Money ShowCase (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4przmns	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Money ShowCase (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przmc	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Monte Carlo (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4przrf	,0			,mod2    	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Prize Rich And Famous (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4przrf	,0			,mod2   	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Prize Rich And Famous (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przrfm	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Prize Run For Your Money (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przsss	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przve	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Prize Viva Esapana (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przwo	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Prize What's On (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4przwta	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Prize Winner Takes All (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4randr	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Random Roulette (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4rsg	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (type 1) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4randr	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Random Roulette (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4rsg	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (type 1) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4rgsa	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4ra		,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Red Alert (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4rdht	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Red Heat (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -13260,10 +13260,10 @@ GAME(199?, m4rhr	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Red Ho
 GAME(199?, m4rhrc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4rhrcl	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Red Hot Roll Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4rwb	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Red White & Blue (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4r2r	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Reel 2 Reel (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4r2r	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Reel 2 Reel (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4rmtp	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Reel Magic Turbo Play (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4rmtpd	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Reel Magic Turbo Play Deluxe (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4reelpk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Reel Poker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4rmtpd	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Reel Magic Turbo Play Deluxe (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4reelpk	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Reel Poker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4reeltm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Reel Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4richfm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Rich & Famous (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4ringfr	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Ring Of Fire (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -13274,68 +13274,68 @@ GAME(199?, m4roadrn	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Roa
 GAME(199?, m4rockmn	,0			,mod4oki	,mpu4jackpot8tkn	,m4default_bigbank	,ROT0,   "Barcrest","Rocket Money (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4royjwl	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4rfym	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Run For Your Money (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4runawy	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Runaway Trail (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4runawy	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Runaway Trail (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4salsa	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Salsa (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4samu	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Samurai (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4sayno	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4samu	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Samurai (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4sayno	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4showtm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Show Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4shocm	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4shodf	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Showcase Duty Free (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4silshd	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Silver Shadow (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4sgrab	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Smash 'n' Grab (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4solsil	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Solid Silver Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4silshd	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Silver Shadow (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4sgrab	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Smash 'n' Grab (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4solsil	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Solid Silver Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4sss	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Spend Spend Spend (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(1999, m4squid	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Squids In (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4stakeu	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4stakeu	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4str300	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Star Play 300 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4stards	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Stardust (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4starbr	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Stars And Bars (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4stards	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Stardust (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4starbr	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Stars And Bars (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4steptm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Step Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4stopcl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Stop the Clock (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4sunset	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4supslt	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Supa Slot (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4suptrn	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Supatron (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4stopcl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Stop the Clock (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4sunset	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4supslt	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Supa Slot (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4suptrn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Supatron (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4supbj	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Super Blackjack (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4supbjc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4supbf	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4suphv	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Super Hyper Viper (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4supst	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Super Streak (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4suptub	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4suptwo	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Super Two (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4taj	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Taj Mahal (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4supbf	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4suphv	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Super Hyper Viper (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4supst	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Super Streak (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4suptub	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4suptwo	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Super Two (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4taj	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Taj Mahal (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4take5	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Take 5 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4take2	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4take2	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4takepk	,0			,mod4oki	,mpu4jackpot8per	,m4default_bigbank	,ROT0,   "Barcrest","Take Your Pick (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4tpcl	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Take Your Pick Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4techno	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4toot	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Ten Out Of Ten (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4ttdia	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Ten Ten Do It Again (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4tiktak	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Tic Tak Cash (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4toma	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Tomahawk (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4topact	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Top Action (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4topdk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Top Deck (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4topgr	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Top Gear (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4toprn	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Top Run (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4topst	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Top Stop (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4toptak	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Top Take (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4tiktak	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Tic Tak Cash (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4toma	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Tomahawk (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4topact	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Top Action (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4topdk	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Top Deck (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4topgr	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Top Gear (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4toprn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Top Run (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4topst	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Top Stop (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4toptak	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Top Take (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4topten	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Top Tenner (Barcrest) (type 1) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4toptena,m4topten	,mod2		,mpu4				,m4default			,ROT0,   "Barcrest","Top Tenner (Barcrest) (type 2) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4toplot	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Top The Lot (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4toplot	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Top The Lot (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4toptim	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Top Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4tricol	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Tricolor (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4tribnk	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Triple Bank (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4tridic	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Triple Dice (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4tropcl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4tupen	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Tuppenny Cracker (Barcrest - Bootleg) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4tricol	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Tricolor (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4tribnk	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Triple Bank (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4tridic	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Triple Dice (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4tropcl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4tupen	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Tuppenny Cracker (Barcrest - Bootleg) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4tbplay	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4tbreel	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4tbrldx	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Turbo Reel Deluxe (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4tbreel	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4tbrldx	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Turbo Reel Deluxe (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4tutfrt	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Tutti Fruity (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4tutcl	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m421		,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4twilgt	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Twilight (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m421		,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4twilgt	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Twilight (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4twintm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4twist	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Twist Again (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4twist	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Twist Again (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4univ	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Universe (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4uuaw	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Up Up & Away (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4vegast	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Vegas Strip (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -13346,86 +13346,86 @@ GAME(199?, m4vivalvd,m4vivalv	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest"
 GAME(199?, m4vivalv	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Viva Las Vegas (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4vivasx	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","Viva Las Vegas Six (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4viz	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Viz (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4voodoo	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4wayin	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Way In (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4voodoo	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4wayin	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Way In (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4whaton	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","What's On (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4wildms	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Wild Mystery (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4wildms	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Wild Mystery (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4wildtm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Wild Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4wta	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Winner Takes All (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4ch30	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Unknown MPU4 'CH3 0.1' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4sb5	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Unknown MPU4 'BSB 0.3' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4stc	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Barcrest","Unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4sb5	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Unknown MPU4 'BSB 0.3' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4stc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 
 /* Bwb */
 
 /* are all these really MPU4 hw? , check things like Daytona, doesn't boot at all. */
-GAME(199?, m4acechs	,0			,mod4yam   	,mpu4				,m4default			,ROT0,   "Bwb","Ace Chase (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bigmt	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","The Big Match (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bingbl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Bingo Belle (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bingbs	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Bingo Belle Showcase (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bingcl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Bingo Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4blflsh	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4acechs	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Bwb","Ace Chase (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bigmt	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","The Big Match (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bingbl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Bingo Belle (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bingbs	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Bingo Belle Showcase (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bingcl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Bingo Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4blflsh	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4blsbys	,0			,bwboki		,mpu4				,m_blsbys			,ROT0,   "Bwb","Blues Boys (Bwb) (MPU4)",			GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4cshenc	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Cash Encounters (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4czne	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Cash Zone (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4csoc	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Championship Soccer (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4cpycat	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Copy Cat (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4cpfinl	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Cup Final (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4cshenc	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Cash Encounters (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4czne	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Cash Zone (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4csoc	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Championship Soccer (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4cpycat	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Copy Cat (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4cpfinl	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Cup Final (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4danced	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Dancing Diamonds (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4daytn	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Daytona (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4excal	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Excalibur (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4exotic	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Exotic Fruits (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4firice	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Fire & Ice (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4flshlt	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4fourmr	,0			,mod4yam   	,mpu4				,m4default			,ROT0,   "Bwb","Four More (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // no sound with either system?
-GAME(199?, m4harle	,0			,mod4oki   	,mpu4				,m4default	        ,ROT0,   "Bwb","Harlequin (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4hvhel	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Heaven & Hell (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4holywd	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Hollywood (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4indycr	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Indy Cars (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4daytn	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Daytona (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4excal	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Excalibur (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4exotic	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Exotic Fruits (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4firice	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Fire & Ice (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4flshlt	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4fourmr	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Bwb","Four More (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // no sound with either system?
+GAME(199?, m4harle	,0			,mod4oki	,mpu4				,m4default	        ,ROT0,   "Bwb","Harlequin (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4hvhel	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Heaven & Hell (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4holywd	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Hollywood (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4indycr	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Indy Cars (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4jakjok	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4jflash	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jumping Jack Flash (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4kingq	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4kingqc	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4jflash	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jumping Jack Flash (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4kingq	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4kingqc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4lazy	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Lazy Bones (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4lvlcl	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Lucky Las Vegas Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4ln7	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Lucky No7 (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4lvlcl	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Lucky Las Vegas Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ln7	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Lucky No7 (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4madmon	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Mad Money (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4madmnc	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Mad Money Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4mmm	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Money Mummy Money (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4oadrac	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Ooh Aah Dracula (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4orland	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Orlando Magic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4pzbing	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Prize Bingo (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4quidin	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Quids In (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4quidis	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Quids In Showcase (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4rackem	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Rack Em Up (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4rbgold	,0			,mod2    	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Rainbow Gold (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4rhfev	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Red Hot Fever (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4rhs	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Rocky Horror Show (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4sinbd	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Sinbad (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4sky	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Sky Sports (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4souls	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Soul Sister (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4specu	,0			,mod4yam   	,mpu4				,m4default			,ROT0,   "Bwb","Speculator Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // no sound with either system
-GAME(199?, m4spinbt	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Spin The Bottle (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4starst	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Stars & Stripes (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4thestr	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","The Streak (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4sunclb	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Sun Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4sunscl	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Sunset Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4supleg	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Super League (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4pzbing	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Prize Bingo (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4quidin	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Quids In (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4quidis	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Quids In Showcase (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4rackem	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Rack Em Up (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4rbgold	,0			,mod2   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Rainbow Gold (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4rhfev	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Red Hot Fever (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4rhs	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Rocky Horror Show (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4sinbd	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Sinbad (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4sky	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Sky Sports (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4souls	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Soul Sister (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4specu	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Bwb","Speculator Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // no sound with either system
+GAME(199?, m4spinbt	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Spin The Bottle (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4starst	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Stars & Stripes (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4thestr	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","The Streak (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4sunclb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Sun Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4sunscl	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Sunset Club (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4supleg	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Super League (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4supscr	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Super Soccer (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4ssclas	,0			,mod4oki    ,mpu4				,m4default			,ROT0,   "Bwb","Super Streak Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4sure	,0			,mod2    	,mpu4				,m4default			,ROT0,   "Bwb","Sure Thing (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4tic	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4ticcla	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4ticgld	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe Gold (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4ticglc	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe Gold Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4topdog	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Top Dog (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4trex	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Trex (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4twzone	,0			,mod4oki   	,mpu4				,m4default			,ROT0,   "Bwb","Twilight Zone (Bwb) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // wrong hw? (is this the ACE game mislabeled?)
-GAME(199?, m4volcan	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Volcano (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4vdexpr	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Voodoo Express (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4xch	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-change (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4xs		,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-s (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4xtrm	,0			,mod4oki   	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-treme (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4sure	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Sure Thing (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4tic	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ticcla	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ticgld	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe Gold (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ticglc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe Gold Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4topdog	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Top Dog (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4trex	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Trex (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4twzone	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Twilight Zone (Bwb) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // wrong hw? (is this the ACE game mislabeled?)
+GAME(199?, m4volcan	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Volcano (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4vdexpr	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Voodoo Express (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4xch	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-change (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4xs		,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-s (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4xtrm	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-treme (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
 
 /* Empire
@@ -13556,7 +13556,7 @@ GAME(199?, m4snklad, 0,			mod2    ,mpu4, m4default, ROT0,   "Mdm","Snakes & Ladd
 GAME(199?, m4cshino	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Cashino Deluxe (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4jjc	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4spton	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Spot On (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4clbrpl	,0,			mod2   	,mpu4, m4default, ROT0,   "Pcp","Club Replay (PCP) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // was also marked as a barcrest set?
+GAME(199?, m4clbrpl	,0,			mod2	,mpu4, m4default, ROT0,   "Pcp","Club Replay (PCP) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // was also marked as a barcrest set?
 GAME(199?, m4exlin	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Extra Lines (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4supjst	,0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 
@@ -13644,7 +13644,7 @@ GAME(199?, m4ttak	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Tic Tac Take 
 GAME(199?, m4hslo	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'HOT 3.0' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4sbx	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'SBX' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4unkjok	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'Joker' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4remag	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'ZTP 0.7' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) 
+GAME(199?, m4remag	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'ZTP 0.7' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4rmg	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'CTP 0.4' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4wnud	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'W Nudge' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4t266	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'TTO 1.1' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -13657,7 +13657,7 @@ GAME(199?, m4riotrp	,  0,		mod4oki, mpu4, m4default, ROT0,   "unknown","Rio Trop
 
 
 GAME(199?, m4frkstn	,0			,mpu4crys	,mpu4		,m_frkstn,	ROT0,   "Crystal Gaming","Frank 'n' Stein (Crystal Gaming) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frnk	,m4frkstn	,mpu4crys  	,mpu4		,m_frkstn,	ROT0,   "Crystal Gaming","Frank 'n' Stein (Crystal Gaming) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // was marked as barcrest
+GAME(199?, m4frnk	,m4frkstn	,mpu4crys	,mpu4		,m_frkstn,	ROT0,   "Crystal Gaming","Frank 'n' Stein (Crystal Gaming) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // was marked as barcrest
 
 //SWP
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )

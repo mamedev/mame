@@ -16,7 +16,7 @@ adf_format::adf_format(const char *name,const char *extensions,const char *descr
 int adf_format::identify(floppy_image *image)
 {
 	UINT64 size = image->image_size();
-	if ((size == 901120) || (size == 1802240)) 
+	if ((size == 901120) || (size == 1802240))
 	{
 		return 100;
 	}
@@ -38,13 +38,13 @@ bool adf_format::load(floppy_image *image)
 	UINT8 *mfm = NULL;
 	UINT8	temp_cyl[512*11];
 	UINT16 sector_len = 512*11;
-	image->set_meta_data(80,2,300,(UINT16)253360);	
+	image->set_meta_data(80,2,300,(UINT16)253360);
 	for(int track=0; track < 80; track++) {
 		for(int side=0; side < 2; side++) {
 			UINT16 offset = ((track<<1)+side);
-			mfm = image->get_buffer(track,side);					
-			image->set_track_size(track, side, MAX_MFM_TRACK_LEN);			
-			image->image_read(temp_cyl, offset*sector_len, sector_len);		
+			mfm = image->get_buffer(track,side);
+			image->set_track_size(track, side, MAX_MFM_TRACK_LEN);
+			image->image_read(temp_cyl, offset*sector_len, sector_len);
 			memset( &mfm[ONE_SECTOR_BYTES*11], 0xaa, GAP_TRACK_BYTES );
 
 			for (int sector = 0; sector < 11; sector++ ) {

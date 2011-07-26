@@ -1,22 +1,22 @@
 /************************************************************************************************************
 
-	Maygay EPOCH hardware
-	 mechanical fruit machine HW
+    Maygay EPOCH hardware
+     mechanical fruit machine HW
 
-	H8 CPU
+    H8 CPU
 
-	YMZ280B sound
-	
-	2x PICs for security
-	the PIC marked 'Security' is apparently the RTC, and doesn't change
-	the other is per game / manufacturer and provides data needed for booting?
+    YMZ280B sound
+
+    2x PICs for security
+    the PIC marked 'Security' is apparently the RTC, and doesn't change
+    the other is per game / manufacturer and provides data needed for booting?
 
 
-	--------------------------------------------
-	MOST GAMES DO NOT HAVE ANY SOUND ROMS DUMPED
-	--------------------------------------------
+    --------------------------------------------
+    MOST GAMES DO NOT HAVE ANY SOUND ROMS DUMPED
+    --------------------------------------------
 
-	Some games have EPOCH NEVADA in the header, others have EPOCH APOLLO, is there a difference?
+    Some games have EPOCH NEVADA in the header, others have EPOCH APOLLO, is there a difference?
 
 ************************************************************************************************************/
 
@@ -40,7 +40,7 @@ static ADDRESS_MAP_START( maygayep_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0xfe8000, 0xfeffff ) AM_RAM // merln at least?
 
-	
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( maygayep )
@@ -247,7 +247,7 @@ ROM_START( ep_funny )
 	ROM_LOAD16_BYTE( "i99pfm19.g1", 0x000000, 0x020000, CRC(5707d943) SHA1(c64a29bfeb80ff4d8a7cef03261b40aea7e0b354) )
 	ROM_LOAD16_BYTE( "i99pfm21.g0", 0x000000, 0x020000, CRC(f71f8222) SHA1(51a7cdd47b674a639cb9de4e1252f17da9b583d9) )
 	ROM_LOAD16_BYTE( "i99pfm21.g1", 0x000000, 0x020000, CRC(5b4a7772) SHA1(428a51a604c74baec068c50e9daf5355ab469483) )
-	
+
 	EP_FUNNY_SOUND
 ROM_END
 
@@ -289,11 +289,11 @@ ROM_START( ep_bathl )
 	ROM_LOAD16_BYTE( "sbat4-1p.p1", 0x000000, 0x020000, CRC(6bbfca2f) SHA1(420c3a5632a0f69a2a92efd6fb9a1e408c390a80) )
 	ROM_LOAD16_BYTE( "sbat4-1p.p2", 0x000000, 0x020000, CRC(f251e681) SHA1(2890e01269e49837302d69dfd88f2f780e0d9211) )
 	ROM_LOAD16_BYTE( "sbat4-1p.p3", 0x000000, 0x020000, CRC(2b2fc591) SHA1(de194ed595a85c1bcf0c9cf469c84713aca279f8) )
-	
+
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "hellsnd.p0", 0x000000, 0x080000, CRC(c143174d) SHA1(7b86281a653d85e0020245e05db2489489c7fe55) )
 	ROM_LOAD( "hellsnd.p1", 0x080000, 0x080000, CRC(44af956b) SHA1(49ed8fde3aec64304090be795eaae09a78b3619d) )
-	
+
 ROM_END
 
 
@@ -574,10 +574,10 @@ ROM_START( ep_grun )
 	ROM_LOAD16_BYTE( "grid031p.p1", 0x000000, 0x020000, CRC(c33cbe0f) SHA1(4565288a67713f51313d4a3a5573d449470f20f8) )
 	ROM_LOAD16_BYTE( "grid031p.p2", 0x000000, 0x020000, CRC(0f2e2461) SHA1(51c8ee2bb352c7fe5af928017a2698debfe3aa26) )
 	ROM_LOAD16_BYTE( "grid031p.p3", 0x000000, 0x020000, CRC(78aa85ae) SHA1(65587da39d0d62d2dd34422df182dcad15fe734c) )
-//	ROM_LOAD16_BYTE( "gridrunnergame0.bin", 0x000000, 0x020000, CRC(02eae1b1) SHA1(68311fc3237da30cf96b42ae0cf16342ecf9cb45) )
-//	ROM_LOAD16_BYTE( "gridrunnergame1.bin", 0x000000, 0x020000, CRC(28a2ea37) SHA1(1c562c6b93f324752ade39aa40664ccc6c459bcd) )
-//	ROM_LOAD16_BYTE( "gridrunnergame2.bin", 0x000000, 0x020000, CRC(0f2e2461) SHA1(51c8ee2bb352c7fe5af928017a2698debfe3aa26) )
-//	ROM_LOAD16_BYTE( "gridrunnergame3.bin", 0x000000, 0x020000, CRC(78aa85ae) SHA1(65587da39d0d62d2dd34422df182dcad15fe734c) )
+//  ROM_LOAD16_BYTE( "gridrunnergame0.bin", 0x000000, 0x020000, CRC(02eae1b1) SHA1(68311fc3237da30cf96b42ae0cf16342ecf9cb45) )
+//  ROM_LOAD16_BYTE( "gridrunnergame1.bin", 0x000000, 0x020000, CRC(28a2ea37) SHA1(1c562c6b93f324752ade39aa40664ccc6c459bcd) )
+//  ROM_LOAD16_BYTE( "gridrunnergame2.bin", 0x000000, 0x020000, CRC(0f2e2461) SHA1(51c8ee2bb352c7fe5af928017a2698debfe3aa26) )
+//  ROM_LOAD16_BYTE( "gridrunnergame3.bin", 0x000000, 0x020000, CRC(78aa85ae) SHA1(65587da39d0d62d2dd34422df182dcad15fe734c) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
 	// there appears to be an older game (maygay m1ab? hardware) of the same name, these samples MIGHT come from that.
@@ -760,8 +760,8 @@ ROM_START( ep_sdclb )
 	ROM_LOAD16_BYTE( "sdcl1-3p.p2", 0x000000, 0x020000, CRC(aca34a7e) SHA1(3bfe6a5e7f5c54dd57159d63d9a0ae9bc56ee4d1) )
 
 	// different hw (bellfruit, or maygay m1ab?)
-//	ROM_LOAD16_BYTE( "spotd31", 0x000000, 0x010000, CRC(794cec5b) SHA1(91ba4fcc459194fcf89f27e9c687cbdb8a10bb78) )
-//	ROM_LOAD16_BYTE( "spotteddickeuro.bin", 0x000000, 0x010000, CRC(c3b68821) SHA1(d86e098c3f0aec4f8068942934134e394075473d) )
+//  ROM_LOAD16_BYTE( "spotd31", 0x000000, 0x010000, CRC(794cec5b) SHA1(91ba4fcc459194fcf89f27e9c687cbdb8a10bb78) )
+//  ROM_LOAD16_BYTE( "spotteddickeuro.bin", 0x000000, 0x010000, CRC(c3b68821) SHA1(d86e098c3f0aec4f8068942934134e394075473d) )
 
 
 	ROM_REGION( 0x200000, "ymz", 0 )
@@ -848,7 +848,7 @@ ROM_START( ep_milhr )
 	ROM_LOAD( "haresnd.p1", 0x080000, 0x080000, CRC(38ddf39f) SHA1(eec475b3329dc0f82a19a8f4134249d0803e7bc1) )
 	ROM_LOAD( "sound.0", 0x000000, 0x080000, CRC(093220bb) SHA1(064bf28aa031222f85c3c74a2693ad06df231a1c) )
 	ROM_LOAD( "sound.1", 0x080000, 0x080000, CRC(2eb13cda) SHA1(9343fe11a43e5d0213533cb81ad4a3c3d5476b85) )
-	
+
 ROM_END
 
 
@@ -2395,7 +2395,7 @@ ROM_START( ep_ozzie )
 	ROM_LOAD16_BYTE( "sb010007.g0", 0x000000, 0x020000, CRC(94f571fb) SHA1(9a07ce7da646fb44567caa7ed43ead14e19c2d91) )
 	ROM_LOAD16_BYTE( "sb010007.g1", 0x000000, 0x020000, CRC(6fc203e6) SHA1(ce3132b6fdc6a4ef6e8fa1e71a2da462dd971e8d) )
 	ROM_LOAD16_BYTE( "sb010008.g0", 0x000000, 0x020000, CRC(2e8bade6) SHA1(39b0b4f344876d9583167ed8b1b339a814fe35ba) )
-	ROM_LOAD16_BYTE( "sb010008.g1", 0x000000, 0x020000, CRC(dd537cfe) SHA1(804c52b74e307f5448eb61c5067fd6dd6794a722) )	
+	ROM_LOAD16_BYTE( "sb010008.g1", 0x000000, 0x020000, CRC(dd537cfe) SHA1(804c52b74e307f5448eb61c5067fd6dd6794a722) )
 	MISSING_SOUND
 ROM_END
 
@@ -2641,7 +2641,7 @@ ROM_START( ep_scrm )
 	ROM_LOAD16_BYTE( "scde10p.p0", 0x000000, 0x020000, CRC(8ba8757c) SHA1(730905662127262acd5029b77b6e62c99af83e4f) )
 	ROM_LOAD16_BYTE( "scde10p.p1", 0x000000, 0x020000, CRC(ffaa25db) SHA1(863ce966d78ad8c49297a47afa6d80283044475a) )
 	ROM_LOAD16_BYTE( "scde10p.p2", 0x000000, 0x020000, CRC(fc1aab67) SHA1(46ddcd4a38390635da35384514323ba46b0594dc) )
-	ROM_LOAD16_BYTE( "scde10p.p3", 0x000000, 0x020000, CRC(fce7cd4a) SHA1(b7cfdbbf95c9f89bd87688db870547d197205af6) )	
+	ROM_LOAD16_BYTE( "scde10p.p3", 0x000000, 0x020000, CRC(fce7cd4a) SHA1(b7cfdbbf95c9f89bd87688db870547d197205af6) )
 	MISSING_SOUND
 ROM_END
 

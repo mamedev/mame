@@ -11,11 +11,11 @@
 
 #include "flopimg.h"
 
-class adf_format : public floppy_image_format_t 
+class adf_format : public floppy_image_format_t
 {
 public:
 	adf_format(const char *name,const char *extensions,const char *description,const char *param_guidelines);
-	
+
 	virtual int identify(floppy_image *image);
 	virtual bool load(floppy_image *image);
 };

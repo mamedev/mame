@@ -1,8 +1,8 @@
 /***************************************************************************
 
     JPM System 5
-	and
-	JPM System 5 with Video Expansion 2 hardware
+    and
+    JPM System 5 with Video Expansion 2 hardware
 
     driver by Phil Bennett
 
@@ -17,14 +17,14 @@
         * Features used by the AWP games such as lamps, reels and
         meters are not emulated.
 
-	AWP game notes:
-	  The byte at 0x81 of the EVEN 68k rom appears to be some kind of
-	  control byte, probably region, or coin / machine type setting.
-	  Many sets differ only by this byte.
+    AWP game notes:
+      The byte at 0x81 of the EVEN 68k rom appears to be some kind of
+      control byte, probably region, or coin / machine type setting.
+      Many sets differ only by this byte.
 
-	  Many sets are probably missing sound roms, however due to the
-	  varying motherboard configurations (SAA vs. YM, with added UPD)
-	  it's hard to tell until they start doing more.
+      Many sets are probably missing sound roms, however due to the
+      varying motherboard configurations (SAA vs. YM, with added UPD)
+      it's hard to tell until they start doing more.
 
 ***************************************************************************/
 
@@ -938,7 +938,7 @@ ROM_END
 	ROM_REGION( 0x80000, "upd7759", 0 ) \
 	ROM_LOAD( "5652.bin", 0x000000, 0x040000, CRC(d0876512) SHA1(1bda1d640ca5ee6831d7a4ae948e3dce277e8a3e) )	 \
 
-//	ROM_LOAD( "atw80snd.bin", 0x000000, 0x020000, CRC(b002e11c) SHA1(f7133f4bb8c31feaad0a7b9ee88749f9b7877575) ) // this is just the first half of 5652/atworldsound.bin
+//  ROM_LOAD( "atw80snd.bin", 0x000000, 0x020000, CRC(b002e11c) SHA1(f7133f4bb8c31feaad0a7b9ee88749f9b7877575) ) // this is just the first half of 5652/atworldsound.bin
 
 ROM_START( j5ar80 )
 	ROM_REGION( 0x300000, "maincpu", 0 )
@@ -986,7 +986,7 @@ ROM_START( j5ar80d )
 ROM_END
 
 // also in these sets
-//	ROM_LOAD( "artwld80", 0x000000, 0x010000, CRC(3ff314c3) SHA1(345df80243953b35916449b0aa6ffaf9d3501d2b) ) // something by Crystal Leisure, 1994 (MPU4?)
+//  ROM_LOAD( "artwld80", 0x000000, 0x010000, CRC(3ff314c3) SHA1(345df80243953b35916449b0aa6ffaf9d3501d2b) ) // something by Crystal Leisure, 1994 (MPU4?)
 
 
 
@@ -1034,7 +1034,7 @@ ROM_START( j5circ )
 	J5CIR_SOUND
 ROM_END
 
-	
+
 ROM_START( j5cird )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "circ8ac", 0x000000, 0x010000, CRC(ac7fb376) SHA1(9dcbb1d27cbcdd7085b8e0d926a099fddabe6fc8) )
@@ -1161,11 +1161,11 @@ ROM_START( j5fairgde )
 ROM_END
 
 //  these are from FAST?TRAK on Impact HW!!! (found in Fairground set)
-//	ROM_LOAD16_BYTE( "9331.bin", 0x000000, 0x020000, CRC(54dbf894) SHA1(a3ffff82883cc192108f44d36a7465d4afeaf114) )
-//	ROM_LOAD16_BYTE( "9332.bin", 0x000001, 0x020000, CRC(ecf1632a) SHA1(5d82a46672adceb29744e82de1b0fa5fcf4dbc51) )
-//	ROM_LOAD16_BYTE( "9333.bin", 0x000000, 0x020000, CRC(bf45acac) SHA1(ec624bc2d135901ecbdb6c6b3dbd9cc4b618b4de) )
-//	ROM_LOAD16_BYTE( "9334.bin", 0x000000, 0x020000, CRC(061f38f5) SHA1(459b39d2380fcfdb763eeb6937752be192cb8244) )
-//	ROM_LOAD16_BYTE( "9335.bin", 0x000000, 0x020000, CRC(36b6891c) SHA1(013b663f2dc59a4d2834ef2f7e86bcc608e98b39) )
+//  ROM_LOAD16_BYTE( "9331.bin", 0x000000, 0x020000, CRC(54dbf894) SHA1(a3ffff82883cc192108f44d36a7465d4afeaf114) )
+//  ROM_LOAD16_BYTE( "9332.bin", 0x000001, 0x020000, CRC(ecf1632a) SHA1(5d82a46672adceb29744e82de1b0fa5fcf4dbc51) )
+//  ROM_LOAD16_BYTE( "9333.bin", 0x000000, 0x020000, CRC(bf45acac) SHA1(ec624bc2d135901ecbdb6c6b3dbd9cc4b618b4de) )
+//  ROM_LOAD16_BYTE( "9334.bin", 0x000000, 0x020000, CRC(061f38f5) SHA1(459b39d2380fcfdb763eeb6937752be192cb8244) )
+//  ROM_LOAD16_BYTE( "9335.bin", 0x000000, 0x020000, CRC(36b6891c) SHA1(013b663f2dc59a4d2834ef2f7e86bcc608e98b39) )
 
 
 // Not sure which is the right sound rom, there was an Impact HW set in here too
@@ -1175,8 +1175,8 @@ ROM_END
 	ROM_LOAD( "jgsnd.bin",  0x000000, 0x080000, CRC(8bc92c90) SHA1(bcbbe270ce42d5960ac37a2324e3fb37ff513147) ) \
 
 // Also with these roms: German Impact HW set?
-//	ROM_LOAD16_BYTE( "jg.p1", 0x00000, 0x010000, CRC(e5658ca2) SHA1(2d188899a4aa8124b7c492379331b8713913c69e) )
-//	ROM_LOAD16_BYTE( "jg.p2", 0x00001, 0x010000, CRC(efa0c84b) SHA1(ef511378904823ae66b7812eff13d9cef5fa621b) )
+//  ROM_LOAD16_BYTE( "jg.p1", 0x00000, 0x010000, CRC(e5658ca2) SHA1(2d188899a4aa8124b7c492379331b8713913c69e) )
+//  ROM_LOAD16_BYTE( "jg.p2", 0x00001, 0x010000, CRC(efa0c84b) SHA1(ef511378904823ae66b7812eff13d9cef5fa621b) )
 
 ROM_START( j5jokgld )
 	ROM_REGION( 0x300000, "maincpu", 0 )
@@ -1292,29 +1292,29 @@ ROM_START( j5filthf )
 	ROM_LOAD16_BYTE( "7181.bin", 0x000000, 0x010000, CRC(8e87eed4) SHA1(6776fe1b79a4607b7d848f6cfbbeac2aaf126a1b) )
 ROM_END
 
-	
+
 ROM_START( j5filthg )
-	ROM_REGION( 0x300000, "maincpu", 0 )	
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7182.bin", 0x000000, 0x010000, CRC(7aebff95) SHA1(bad1036590a566537c58a963a1e4f41a334a9481) ) // 0x81 = FE
 	ROM_LOAD16_BYTE( "7181.bin", 0x000000, 0x010000, CRC(8e87eed4) SHA1(6776fe1b79a4607b7d848f6cfbbeac2aaf126a1b) )
 ROM_END
 
 
 ROM_START( j5filthh )
-	ROM_REGION( 0x300000, "maincpu", 0 )	
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7501.bin", 0x000000, 0x010000, CRC(a984e6e9) SHA1(47a6625e7944cf1579227d3f6da03f9f54bd80ef) ) // 0x81 = FF
 	ROM_LOAD16_BYTE( "7502.bin", 0x000000, 0x010000, CRC(31837e3d) SHA1(0ebd49a5dbc4fc7f8272d471b135f62d050d51c4) )
 ROM_END
 
 
 ROM_START( j5filthi )
-	ROM_REGION( 0x300000, "maincpu", 0 )	
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7503.bin", 0x000000, 0x010000, CRC(5e14c4bb) SHA1(fd5570448cba167d7d6cdc41f132f72546d81458) ) // 0x81 = FE
 	ROM_LOAD16_BYTE( "7502.bin", 0x000000, 0x010000, CRC(31837e3d) SHA1(0ebd49a5dbc4fc7f8272d471b135f62d050d51c4) )
 ROM_END
 
 ROM_START( j5filthj )
-	ROM_REGION( 0x300000, "maincpu", 0 )	
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7504.bin", 0x000000, 0x010000, CRC(9519a50c) SHA1(a5828f9b03eda74befe39b60fe8f82226b253d8b) )  // 0x81 = BF
 	ROM_LOAD16_BYTE( "7502.bin", 0x000000, 0x010000, CRC(31837e3d) SHA1(0ebd49a5dbc4fc7f8272d471b135f62d050d51c4) )
 ROM_END
@@ -1405,7 +1405,7 @@ ROM_START( j5hollyb )
 	ROM_LOAD16_BYTE( "5044.bin", 0x010000, 0x008000, CRC(867a94c5) SHA1(3f6a46b0c1cc1b796f26cfddd35a8ac206f39b38) )
 	ROM_LOAD16_BYTE( "5045.bin", 0x010001, 0x008000, CRC(e280c98e) SHA1(a922cb1402a81366760490ee2724059081c3b5e5) )
 ROM_END
-	
+
 ROM_START( j5hollyc )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "5048.bin", 0x000000, 0x008000, CRC(a9a3b6a9) SHA1(93262c1284b7907dd3f13645882a036c981f8701) ) // 0x81 = FF
@@ -1518,7 +1518,7 @@ ROM_START( j5nitea )
 	ROM_LOAD16_BYTE( "nite_club_8-2.bin",  0x000001, 0x008000, CRC(09fe54f5) SHA1(aa5770d5fbf84b30b9e43a1407c7c0a532163757) )
 	ROM_LOAD16_BYTE( "nite_club_8_3.bin",  0x010000, 0x008000, CRC(08f23a8c) SHA1(dfee1f2734dab36932a3d7343ea24064cfffab50) )
 	ROM_LOAD16_BYTE( "nite_club_8_4a.bin", 0x010001, 0x008000, CRC(01d4158a) SHA1(f3748adfe3fc7e5b427593a5380b67f85c821669) )
-//	ROM_LOAD16_BYTE( "nite_club_8_4.bin", 0x000000, 0x008000, CRC(3a9de9f4) SHA1(7163a31aa2b9f8027199210885b47ad87d21a8c9) ) // clearly just a bad dump, random data missing, 2nd half partly mirrors first
+//  ROM_LOAD16_BYTE( "nite_club_8_4.bin", 0x000000, 0x008000, CRC(3a9de9f4) SHA1(7163a31aa2b9f8027199210885b47ad87d21a8c9) ) // clearly just a bad dump, random data missing, 2nd half partly mirrors first
 ROM_END
 
 
@@ -1624,7 +1624,7 @@ ROM_START( j5roulcl )
 	ROM_LOAD16_BYTE( "6618.bin", 0x000000, 0x010000, CRC(89d0db3a) SHA1(906aa9a5ccebe236c31470c8fd93ff5f4100c929) ) // 0x81 = FF
 	ROM_LOAD16_BYTE( "6619.bin", 0x000001, 0x010000, CRC(cae616f6) SHA1(1b71823a601aa5b826b0f19d11f6a5d5ce86a549) )
 ROM_END
-	
+
 ROM_START( j5roulcla )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "6620.bin", 0x000000, 0x010000, CRC(7e40f968) SHA1(89a5d9dbaa855533810957cecc242db277ee6746) ) // 0x81 = FE
@@ -1632,13 +1632,13 @@ ROM_START( j5roulcla )
 ROM_END
 
 ROM_START( j5roulclb )
-	ROM_REGION( 0x300000, "maincpu", 0 )	
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "6707.bin", 0x000000, 0x010000, CRC(655ff016) SHA1(335f3b0d4a4ffba55450bbf6360f8bb5dff69691) ) // 0x81 = FF
 	ROM_LOAD16_BYTE( "6708.bin", 0x000001, 0x010000, CRC(ca031aa6) SHA1(f7b6b7b04d04669f82afb13cb80c078f87ef1bbb) )
 ROM_END
 
 ROM_START( j5roulclc )
-	ROM_REGION( 0x300000, "maincpu", 0 )	
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "6709.bin", 0x000000, 0x010000, CRC(92cfd244) SHA1(6dc55008293b7e26e56e38dfedb456251fd24e2f) ) // 0x81 = FE
 	ROM_LOAD16_BYTE( "6708.bin", 0x000001, 0x010000, CRC(ca031aa6) SHA1(f7b6b7b04d04669f82afb13cb80c078f87ef1bbb) )
 ROM_END
@@ -1654,7 +1654,7 @@ ROM_START( j5slvree )
 	ROM_LOAD16_BYTE( "gstr_032002.bin", 0x000001, 0x010000, CRC(e7db2018) SHA1(163fd4e58da0a224e7a93619621efa4390960bc2) )
 	J5SLVREE_SOUND
 ROM_END
-	
+
 ROM_START( j5slvreea )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "silver_133001.b8", 0x000000, 0x010000, CRC(dc1c26d2) SHA1(e6443f53fc3e075b2fa13ab159b55a05c7e52740) ) // 0x81 = FF
@@ -1707,7 +1707,7 @@ ROM_END
 
 
 
-ROM_START( j5sup4 ) // doesn't use byte 0x81 stuff 
+ROM_START( j5sup4 ) // doesn't use byte 0x81 stuff
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "super4.71",  0x000000, 0x008000, CRC(88e50a99) SHA1(7b25a280c36732b02ee60b9348cf8bf39c19adc9) )
 	ROM_LOAD16_BYTE( "super4.7a2", 0x000001, 0x008000, CRC(757127ab) SHA1(7efc56dbc147814dedcb4e246d4147cbc0d8b44b) )
@@ -1780,14 +1780,14 @@ ROM_START( j5popeyed )
 	J5POPEYE_SOUND
 ROM_END
 
-ROM_START( j5popeyee ) 
+ROM_START( j5popeyee )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "6287.bin",         0x000000, 0x010000, CRC(8743b8e1) SHA1(964e5d535b588ac2c24d374226a8335775c803f5) ) // 0x81 = FD (popeye_6_a.bin)
 	ROM_LOAD16_BYTE( "popeye 6 3-2.bin", 0x000001, 0x010000, CRC(2858ea40) SHA1(36f33eba7cab61ea218baa17bc6540271da1632e) ) // BF<->FF unexpected 1 byte change vs popeye_6_b.bin @ EE28 (is one bad?)
 	J5POPEYE_SOUND
 ROM_END
 
-ROM_START( j5popeyef ) 	// this is very similar to the popeye(sys5)-p1.bin / popeye(sys5)-p2.bin combo, but with some extra (unused?) code?
+ROM_START( j5popeyef )	// this is very similar to the popeye(sys5)-p1.bin / popeye(sys5)-p2.bin combo, but with some extra (unused?) code?
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "popeye(sys5)-p1.bin", 0x000000, 0x010000, CRC(9396cf7b) SHA1(d4309869edd811e6cc108f90566a9313ef101636) ) // 0x81 = FF
 	ROM_LOAD16_BYTE( "popeye(sys5)-p2.bin", 0x000001, 0x010000, CRC(d9dc2cb6) SHA1(d2bf7a924a08c41a2cfc5caa32a4df0773f3a64a) )
@@ -1930,7 +1930,7 @@ ROM_START( j5hagar )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hagar_6_a.bin", 0x000000, 0x010000, CRC(f461d173) SHA1(1b991cef0e1480cf1ee390f9d1da521660263501) ) // 0x81 = FF
 	ROM_LOAD16_BYTE( "hagar_6_b.bin", 0x000001, 0x010000, CRC(bcb26e64) SHA1(17a4e53caa16263444cfe87b35c675da90736292) )
-	
+
 	J5HAGAR_SOUND
 ROM_END
 
@@ -1938,7 +1938,7 @@ ROM_START( j5hagara )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "6367.bin",      0x000000, 0x010000, CRC(03f1f321) SHA1(02ed908115814d5b50cc6d3edfb396d8c2af25a3) ) // 0x81 = FE
 	ROM_LOAD16_BYTE( "hagar_6_b.bin", 0x000001, 0x010000, CRC(bcb26e64) SHA1(17a4e53caa16263444cfe87b35c675da90736292) )
-	
+
 	J5HAGAR_SOUND
 ROM_END
 
@@ -1946,7 +1946,7 @@ ROM_START( j5hagarb )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "6369.bin",      0x000000, 0x010000, CRC(c0309396) SHA1(e4ac2c60953546c0b6e5ef150fb08d245cb6516f) ) // 0x81 = FD
 	ROM_LOAD16_BYTE( "hagar_6_b.bin", 0x000001, 0x010000, CRC(bcb26e64) SHA1(17a4e53caa16263444cfe87b35c675da90736292) )
-	
+
 	J5HAGAR_SOUND
 ROM_END
 
@@ -1954,7 +1954,7 @@ ROM_START( j5hagarc )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hagar_20p_6_quid_cash_p1.bin", 0x000000, 0x010000, CRC(c8fc9296) SHA1(c973ab18173ec0c33959b803347193e08ab53565) ) // 0x81 = BF
 	ROM_LOAD16_BYTE( "hagar_6_b.bin",                0x000001, 0x010000, CRC(bcb26e64) SHA1(17a4e53caa16263444cfe87b35c675da90736292) )
-	
+
 	J5HAGAR_SOUND
 ROM_END
 
@@ -2030,7 +2030,7 @@ ROM_START( j5tst1 )
 	ROM_LOAD16_BYTE( "4067.bin", 0x010000, 0x008000, CRC(e19dc859) SHA1(62d75e48be960e0e4006378cb9db6fc305c7eae9) )
 	ROM_LOAD16_BYTE( "4068.bin", 0x010001, 0x008000, CRC(60a3af9b) SHA1(02fc1db698833726e3de26671ef5bdc74aa1f749) )
 ROM_END
-	
+
 ROM_START( j5tst2 )
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "4519.bin", 0x000000, 0x008000, CRC(c3ecc4f2) SHA1(013368b0196c8aa4b10a4a365601be409dc81e0c) )
@@ -2106,17 +2106,17 @@ GAME( 199?, j5firebl	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Fireball (Jpm) (S
 GAME( 199?, j5firebla	, j5firebl	, jpmsys5, popeye, 0, ROT0, "JPM", "Fireball (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5fireblb	, j5firebl	, jpmsys5, popeye, 0, ROT0, "JPM", "Fireball (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5frmag		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Fruit Magic (Jpm) (SYSTEM5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, j5hagar		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagara	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagarb	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagarc	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 4)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagard	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagare	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 6)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagarf	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 7)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagarg	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 8)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagarh	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 9)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagari	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 10)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5hagarj	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 11)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
+GAME( 199?, j5hagar		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagara	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagarb	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagarc	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 4)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagard	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagare	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 6)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagarf	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 7)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagarg	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 8)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagarh	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 9)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagari	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 10)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hagarj	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 11)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5hagsho	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar Showcase (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5hagshoa	, j5hagsho	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar Showcase (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5hagshob	, j5hagsho	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar Showcase (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
@@ -2192,8 +2192,8 @@ GAME( 199?, j5td		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Tumbling Dice (Jpm) 
 GAME( 199?, j5uj		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Union Jackpot (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5uja		, j5uj		, jpmsys5, popeye, 0, ROT0, "JPM", "Union Jackpot (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5ujb		, j5uj		, jpmsys5, popeye, 0, ROT0, "JPM", "Union Jackpot (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, j5wsc		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Wall Street Club (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
-GAME( 199?, j5wsca		, j5wsc		, jpmsys5, popeye, 0, ROT0, "JPM", "Wall Street Club (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )	
+GAME( 199?, j5wsc		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Wall Street Club (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5wsca		, j5wsc		, jpmsys5, popeye, 0, ROT0, "JPM", "Wall Street Club (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 
 GAME( 199?, j5movie		, 0			, jpmsys5, popeye, 0, ROT0, "Crystal", "Movie Magic Club (Crystal) (SYSTEM5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND ) // apparently by Crystal
 

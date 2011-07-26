@@ -23,7 +23,7 @@ struct MFMTRACKIMG
 	UINT16 track_number;
 	UINT8 side_number;
 	UINT32 mfmtracksize;
-	UINT32 mfmtrackoffset; 
+	UINT32 mfmtrackoffset;
 };
 
 #pragma pack()
@@ -48,17 +48,17 @@ bool mfm_format::load(floppy_image *image)
 {
 	MFMIMG header;
 	MFMTRACKIMG trackdesc;
-  
+
 	// read header
-	image->image_read(&header,0, sizeof(header));	
-	
+	image->image_read(&header,0, sizeof(header));
+
 	image->set_meta_data(header.number_of_track,header.number_of_side,header.floppyRPM,header.floppyBitRate);
-	
+
 	for(int track=0; track < header.number_of_track; track++) {
 		for(int side=0; side < header.number_of_side; side++) {
-			// read location of 
+			// read location of
 			image->image_read(&trackdesc,(header.mfmtracklistoffset)+((( track << 1 ) + side)*sizeof(trackdesc)),sizeof(trackdesc));
-			
+
 			image->set_track_size(track, side, trackdesc.mfmtracksize);
 			// actual data read
 			image->image_read(image->get_buffer(track,side), trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);

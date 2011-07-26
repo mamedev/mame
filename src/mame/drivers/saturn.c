@@ -512,9 +512,9 @@ static READ32_HANDLER( saturn_scu_r )
 	switch(offset)
 	{
 		//case 0x5c/4:
-		//	Super Major League reads here???
-		//	break;
-	 	case 0x7c/4:
+		//  Super Major League reads here???
+		//  break;
+		case 0x7c/4:
 			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
 			res = state->m_scu_regs[offset];
 			break;
@@ -1787,7 +1787,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 
 	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
 
-//	popmessage("%08x %d %08x %08x",state->m_scu.ism ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
+//  popmessage("%08x %d %08x %08x",state->m_scu.ism ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
 
 	if(scanline == 0*y_step)
 	{

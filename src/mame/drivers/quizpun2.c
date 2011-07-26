@@ -35,10 +35,10 @@ Notes:
       All clocks unknown, PCB not working
       Possibly Z80's @ 4MHz and YM2203 @ 2MHz
       PCB marked 'Ducksan Trading Co. Ltd. Made In Korea'
-	  
-	  
-	  
-	  
+
+
+
+
 Quiz Punch (C)1988 Space Computer
 Ducksan 1989
 
@@ -70,7 +70,7 @@ Notes:
      YM2203 - clock 4.000MHz (8/2)
      Epoxy Module likely contains a Z80A (an input clock of 4.000MHz is present) and possibly a ROM
      VSync - 59.3148Hz
-     HSync - 15.2526kHz	  
+     HSync - 15.2526kHz
 
 ***************************************************************************/
 
@@ -266,7 +266,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 {
 	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	struct prot_t &prot = state->m_prot;
-	
+
 	switch ( prot.state )
 	{
 		case STATE_EEPROM_W:
