@@ -935,11 +935,6 @@ static void device_delete_resources(d3d_info *d3d)
 	d3d->vertexbuf = NULL;
 
 	global_free(d3d->default_texture);
-
-	// free our effects
-	d3d->hlsl->delete_resources();
-
-	global_free(d3d->hlsl);
 }
 
 
