@@ -31,7 +31,7 @@
         -- BLUE
   bit 0 -- RED
 
-  plus 270 ohm pullup and pulldown resistors on all lines
+  plus 270 ohm pulldown and 100 ohm pullup resistors on all lines
 
 ***************************************************************************/
 
@@ -50,9 +50,9 @@ static const res_net_info phoenix_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_OPEN_COL,
 	{
-		{ RES_NET_AMP_NONE, 270, 270, 2, { 270, 1 } },
-		{ RES_NET_AMP_NONE, 270, 270, 2, { 270, 1 } },
-		{ RES_NET_AMP_NONE, 270, 270, 2, { 270, 1 } }
+		{ RES_NET_AMP_NONE, 100, 270, 2, { 270, 1 } },
+		{ RES_NET_AMP_NONE, 100, 270, 2, { 270, 1 } },
+		{ RES_NET_AMP_NONE, 100, 270, 2, { 270, 1 } }
 	}
 };
 
@@ -70,9 +70,9 @@ static const res_net_info survival_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_OPEN_COL,
 	{
-		{ RES_NET_AMP_NONE, 270, 270, 2, { 180, 1 } },
-		{ RES_NET_AMP_NONE, 270, 270, 2, { 180, 1 } },
-		{ RES_NET_AMP_NONE, 270, 270, 2, { 180, 1 } }
+		{ RES_NET_AMP_NONE, 100, 270, 2, { 180, 1 } },
+		{ RES_NET_AMP_NONE, 100, 270, 2, { 180, 1 } },
+		{ RES_NET_AMP_NONE, 100, 270, 2, { 180, 1 } }
 	}
 };
 
