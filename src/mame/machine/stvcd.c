@@ -449,8 +449,37 @@ static UINT16 cd_readWord(UINT32 addr)
 					}
 					break;
 
-				case XFERTYPE_FILEINFO_254:
-					printf("STVCD: Unhandled xfer type 254\n");
+				case XFERTYPE_FILEINFO_254: // Lunar 2
+					if((xfercount % (6 * 2)) == 0)
+					{
+						UINT32 temp = 2 + (xfercount / (0x6 * 2));
+
+						// first 4 bytes = FAD
+						finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
+						finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
+						finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
+						finfbuf[3] = (curdir[temp].firstfad&0xff);
+						// second 4 bytes = length of file
+						finfbuf[4] = (curdir[temp].length>>24)&0xff;
+						finfbuf[5] = (curdir[temp].length>>16)&0xff;
+						finfbuf[6] = (curdir[temp].length>>8)&0xff;
+						finfbuf[7] = (curdir[temp].length&0xff);
+						finfbuf[8] = 0x00;
+						finfbuf[9] = 0x00;
+						finfbuf[10] = temp;
+						finfbuf[11] = curdir[temp].flags;
+					}
+
+					rv = finfbuf[xfercount % (6 * 2)]<<8 | finfbuf[(xfercount % (6 * 2)) +1];
+
+					xfercount += 2;
+					xferdnum += 2;
+
+					if (xfercount > (254 * 6 * 2))
+					{
+						xfercount = 0;
+						xfertype = XFERTYPE_INVALID;
+					}
 					break;
 
 				default:
@@ -560,6 +589,10 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0018:
 	case 0x001a:
 //              CDROM_LOG(("WW CR1: %04x\n", data))
+		/* these are ERRORS from our core and mustn't happen! */
+		if(data == 0x2100 || data == 0x2300)
+			debugger_break(machine);
+
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
 		break;
@@ -891,12 +924,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 					break;
 			}
 			hirqreg |= CMOK|DRDY;
-			break;
-
-		/* these are ERRORS from our core and mustn't happen! */
-		case 0x2100:
-		case 0x2300:
-			debugger_break(machine);
 			break;
 
 		case 0x3000:	// Set CD Device connection
@@ -1399,7 +1426,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 							// - file #
 							// attributes flags
 
-				cr3 = cr4 = 0;
+				cr3 = 0;
+				cr4 = 0;
 
 				// first 4 bytes = FAD
 				finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
