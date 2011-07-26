@@ -37,14 +37,17 @@ static WRITE8_HANDLER( sound_command_w )
 	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
+static WRITE8_HANDLER( irq_clear_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+}
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(tagteam_flipscreen_w)
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(tagteam_control_w)
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_WRITE(sound_command_w)
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x2003, 0x2003) AM_WRITENOP /* Appears to increment when you're out of the ring */
+	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2") AM_WRITE(irq_clear_w)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(tagteam_mirrorvideoram_r, tagteam_mirrorvideoram_w)
 	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(tagteam_mirrorcolorram_r, tagteam_mirrorcolorram_w)
 	AM_RANGE(0x4800, 0x4fff) AM_READONLY
@@ -64,91 +67,66 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static INTERRUPT_GEN( tagteam_interrupt )
+static INPUT_CHANGED( coin_inserted )
 {
-	tagteam_state *state = device->machine().driver_data<tagteam_state>();
-	int port;
-
-	port = input_port_read(device->machine(), "P1") & 0xc0;
-
-	if (port != 0xc0)    /* Coin */
-	{
-		if (state->m_coin == 0)
-		{
-			state->m_coin = 1;
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-		}
-	}
-	else state->m_coin = 0;
+	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( bigprowr )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_COCKTAIL PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_COCKTAIL PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_COCKTAIL PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_COCKTAIL PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )		PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )		PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )			// "Upright, Single Controls"
+	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )		// "Upright, Single Controls"
 	PORT_DIPSETTING(    0x40, "Upright, Dual Controls" )
 //  PORT_DIPSETTING(    0x20, "Cocktail, Single Controls" ) // IMPOSSIBLE !
-	PORT_DIPSETTING(    0x60, DEF_STR( Cocktail ) )			// "Cocktail, Dual Controls"
+	PORT_DIPSETTING(    0x60, DEF_STR( Cocktail ) )		// "Cocktail, Dual Controls"
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )
 INPUT_PORTS_END
 
 /* Same as 'bigprowr', but additional "Coin Mode" Dip Switch */
@@ -156,23 +134,24 @@ static INPUT_PORTS_START( tagteam )
 	PORT_INCLUDE( bigprowr )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW2", 0xe0, PORTCOND_NOTEQUALS, 0x80)	//Mode 1
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW2", 0xe0, PORTCOND_EQUALS, 0x80)	//Mode 2
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW2", 0xe0, PORTCOND_NOTEQUALS, 0x80)	//Mode 1
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW2", 0xe0, PORTCOND_EQUALS, 0x80)	//Mode 2
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW2", 0xe0, PORTCOND_NOTEQUALS, 0x80)	//Mode 1
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW2", 0xe0, PORTCOND_EQUALS, 0x80)	//Mode 2
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW2", 0xe0, PORTCOND_NOTEQUALS, 0x80)	//Mode 1
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW2", 0xe0, PORTCOND_EQUALS, 0x80)	//Mode 2
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0xe0, 0x00, "Coin Mode" )				// Check code at 0xff5c
+	PORT_DIPNAME( 0xe0, 0x00, "Coin Mode" )			PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x00, "Mode 1" )
 	PORT_DIPSETTING(    0x80, "Mode 2" )
+	/* Check code at 0xff5c */
 	/* Other values (0x20, 0x40, 0x60, 0xa0, 0xc0, 0xe0) : "Mode 1" */
 	/* Therefore the logic for DIPCONDITION is '=0x80' not '<>0x00'*/
 INPUT_PORTS_END
@@ -214,17 +193,17 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( tagteam, tagteam_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ?? */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", tagteam_interrupt)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,272/16*57) // connected to bit 3 of vcount (basically once every 16 scanlines)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 975000)  /* 975 kHz ?? */
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/2/6) // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,16*57)   /* IRQs are triggered by the main CPU */
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,272/16*57) // same source as maincpu irq
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_REFRESH_RATE(57) // measured?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -240,14 +219,14 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -279,8 +258,8 @@ ROM_START( bigprowr )
 	ROM_LOAD( "bf18.107",     0x10000, 0x2000, CRC(fd6f006d) SHA1(ad100ac8c0fed24f922a2cc908c88b4fced07eb0) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "fko.8",        0x0000, 0x0020, CRC(b6ee1483) SHA1(b2ea7be533e29da6cd7302532da2eb0410490e6a) )
-	ROM_LOAD( "fjo.25",       0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) ) /* What is this prom for? */
+	ROM_LOAD( "fko.8",        0x0000, 0x0020, CRC(b6ee1483) SHA1(b2ea7be533e29da6cd7302532da2eb0410490e6a) ) // palette
+	ROM_LOAD( "fjo.25",       0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) ) // hcount related, not implemented yet
 ROM_END
 
 ROM_START( tagteam )
@@ -310,8 +289,8 @@ ROM_START( tagteam )
 	ROM_LOAD( "prowbf18.bin", 0x10000, 0x2000, CRC(e73a4bba) SHA1(6dbc2d741ebf8fcce9144cfe6fe6f35acd25ceef) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "fko.8",        0x0000, 0x0020, CRC(b6ee1483) SHA1(b2ea7be533e29da6cd7302532da2eb0410490e6a) )
-	ROM_LOAD( "fjo.25",       0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) ) /* What is this prom for? */
+	ROM_LOAD( "fko.8",        0x0000, 0x0020, CRC(b6ee1483) SHA1(b2ea7be533e29da6cd7302532da2eb0410490e6a) ) // palette
+	ROM_LOAD( "fjo.25",       0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) ) // hcount related, not implemented yet
 ROM_END
 
 
