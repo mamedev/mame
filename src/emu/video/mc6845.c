@@ -39,6 +39,7 @@ const device_type HD6845 = &device_creator<hd6845_device>;
 const device_type SY6545_1 = &device_creator<sy6545_1_device>;
 const device_type SY6845E = &device_creator<sy6845e_device>;
 const device_type HD6345 = &device_creator<hd6345_device>;
+const device_type AMS40041 = &device_creator<ams40041_device>;
 
 
 /* mode macros */
@@ -973,6 +974,29 @@ void hd6345_device::device_start()
 }
 
 
+void ams40041_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_horiz_char_total =  113;
+	m_horiz_disp       =  80;
+	m_horiz_sync_pos   =  90;
+	m_sync_width       =  10;
+	m_vert_char_total  =  127;
+	m_vert_total_adj   =  6;
+	m_vert_disp        =  100;
+	m_vert_sync_pos    =  112;
+	m_mode_control     =  2;
+		
+	m_supports_disp_start_addr_r = false;
+	m_supports_vert_sync_width = false;
+	m_supports_status_reg_d5 = false;
+	m_supports_status_reg_d6 = false;
+	m_supports_status_reg_d7 = false;
+	m_supports_transparent = false;
+}
+
+
 void mc6845_device::device_reset()
 {
 	/* internal registers other than status remain unchanged, all outputs go low */
@@ -1007,6 +1031,7 @@ void c6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
 void hd6345_device::device_reset() { mc6845_device::device_reset(); }
+void ams40041_device::device_reset() { mc6845_device::device_reset(); }
 
 
 r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -1053,5 +1078,11 @@ sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, d
 
 hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, HD6345, "HD6345", tag, owner, clock)
+{
+}
+
+
+ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mc6845_device(mconfig, AMS40041, "40041", tag, owner, clock)
 {
 }

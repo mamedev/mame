@@ -99,7 +99,7 @@ class mc6845_device :	public device_t,
 	friend class sy6545_1_device;
 	friend class sy6845e_device;
 	friend class hd6345_device;
-
+	friend class ams40041_device;
 
 public:
     // construction/destruction
@@ -348,6 +348,16 @@ protected:
 	virtual void device_reset();
 };
 
+class ams40041_device : public mc6845_device
+{
+public:
+	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+};
+
 
 extern const device_type MC6845;
 extern const device_type MC6845_1;
@@ -358,6 +368,7 @@ extern const device_type HD6845;
 extern const device_type SY6545_1;
 extern const device_type SY6845E;
 extern const device_type HD6345;
+extern const device_type AMS40041;
 
 
 #endif
