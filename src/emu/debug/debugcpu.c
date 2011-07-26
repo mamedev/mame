@@ -1792,16 +1792,10 @@ void device_debug::start_hook(attotime endtime)
 				global->execution_state = EXECUTION_STATE_STOPPED;
 				debug_console_printf(m_device.machine(), "Stopped at VBLANK\n");
 			}
-
-			// check for debug keypresses
-			else if (ui_input_pressed(m_device.machine(), IPT_UI_DEBUG_BREAK))
-				global->visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
 		}
-		// Check for screenless systems
-		if (m_device.machine().first_screen()==NULL) {
-			if (ui_input_pressed(m_device.machine(), IPT_UI_DEBUG_BREAK))
-				global->visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
-		}
+		// check for debug keypresses
+		if (ui_input_pressed(m_device.machine(), IPT_UI_DEBUG_BREAK))
+			global->visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
 	}
 
 	// recompute the debugging mode
