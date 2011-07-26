@@ -622,7 +622,7 @@ static int get_oper_cycles(opcode_struct* op, int ea_mode, int cpu_type)
 	int size = g_size_select_table[op->size];
 
 	if(op->cpus[cpu_type] == '.')
-		return 0;
+		return 255;
 
 	if(cpu_type < CPU_TYPE_020)
 	{

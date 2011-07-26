@@ -667,7 +667,7 @@ static CPU_EXECUTE( m68k )
 			{
 				/* Read an instruction and call its handler */
 				m68k->ir = m68ki_read_imm_16(m68k);
-				m68ki_instruction_jump_table[m68k->ir](m68k);
+				m68k->jump_table[m68k->ir](m68k);
 				m68k->remaining_cycles -= m68k->cyc_instruction[m68k->ir];
 			}
 			else
@@ -688,7 +688,7 @@ static CPU_EXECUTE( m68k )
 
 				if (!m68k->mmu_tmp_buserror_occurred)
 				{
-					m68ki_instruction_jump_table[m68k->ir](m68k);
+					m68k->jump_table[m68k->ir](m68k);
 					m68k->remaining_cycles -= m68k->cyc_instruction[m68k->ir];
 				}
 
@@ -1624,6 +1624,7 @@ static CPU_INIT( m68000 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init16(*m68k->program);
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[0];
 	m68k->cyc_instruction  = m68ki_cycles[0];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[0];
 	m68k->cyc_bcc_notake_b = -2;
@@ -1675,6 +1676,7 @@ static CPU_INIT( m68008 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init8(*m68k->program);
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[0];
 	m68k->cyc_instruction  = m68ki_cycles[0];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[0];
 	m68k->cyc_bcc_notake_b = -2;
@@ -1729,6 +1731,7 @@ static CPU_INIT( m68010 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init16(*m68k->program);
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[1];
 	m68k->cyc_instruction  = m68ki_cycles[1];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[1];
 	m68k->cyc_bcc_notake_b = -4;
@@ -1779,6 +1782,7 @@ static CPU_INIT( m68020 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[2];
 	m68k->cyc_instruction  = m68ki_cycles[2];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[2];
 	m68k->cyc_bcc_notake_b = -2;
@@ -1896,6 +1900,7 @@ static CPU_INIT( m68ec020 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[2];
 	m68k->cyc_instruction  = m68ki_cycles[2];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[2];
 	m68k->cyc_bcc_notake_b = -2;
@@ -1948,6 +1953,7 @@ static CPU_INIT( m68030 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init32mmu(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[3];
 	m68k->cyc_instruction  = m68ki_cycles[3];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[3];
 	m68k->cyc_bcc_notake_b = -2;
@@ -2006,6 +2012,7 @@ static CPU_INIT( m68ec030 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[3];
 	m68k->cyc_instruction  = m68ki_cycles[3];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[3];
 	m68k->cyc_bcc_notake_b = -2;
@@ -2055,6 +2062,7 @@ static CPU_INIT( m68040 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init32mmu(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[4];
 	m68k->cyc_instruction  = m68ki_cycles[4];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
 	m68k->cyc_bcc_notake_b = -2;
@@ -2112,6 +2120,7 @@ static CPU_INIT( m68ec040 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[4];
 	m68k->cyc_instruction  = m68ki_cycles[4];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
 	m68k->cyc_bcc_notake_b = -2;
@@ -2161,6 +2170,7 @@ static CPU_INIT( m68lc040 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init32mmu(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[4];
 	m68k->cyc_instruction  = m68ki_cycles[4];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
 	m68k->cyc_bcc_notake_b = -2;

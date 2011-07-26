@@ -669,6 +669,7 @@ struct _m68ki_cpu_core
 	UINT32 virq_state;
 	UINT32 nmi_pending;
 
+	void (**jump_table)(m68ki_cpu_core *m68k); 
 	const UINT8* cyc_instruction;
 	const UINT8* cyc_exception;
 
