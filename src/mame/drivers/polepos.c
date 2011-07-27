@@ -493,15 +493,14 @@ static MACHINE_RESET( polepos )
 
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")	/* Battery Backup */
-	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)				/* Motion Object */
+	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")					/* Battery Backup */
+	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)			/* Motion Object */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(polepos_road_r, polepos_road_w)				/* Road Memory */
 	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(polepos_alpha_r, polepos_alpha_w)				/* Alphanumeric (char ram) */
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(polepos_view_r, polepos_view_w)				/* Background Memory */
 
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_READONLY						/* Sound Memory */
-	AM_RANGE(0x8000, 0x83bf) AM_MIRROR(0x0c00) AM_WRITEONLY						/* Sound Memory */
-	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVWRITE("namco", polepos_sound_w)	/* Sound data */
+	AM_RANGE(0x8000, 0x83bf) AM_MIRROR(0x0c00) AM_RAM									/* Sound Memory */
+	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVREADWRITE("namco", polepos_sound_r, polepos_sound_w)	/* Sound data */
 
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)

@@ -16,6 +16,7 @@ WRITE8_DEVICE_HANDLER( pacman_sound_enable_w );
 WRITE8_DEVICE_HANDLER( pacman_sound_w );
 
 void polepos_sound_enable(device_t *device, int enable);
+READ8_DEVICE_HANDLER( polepos_sound_r );
 WRITE8_DEVICE_HANDLER( polepos_sound_w );
 
 void mappy_sound_enable(device_t *device, int enable);

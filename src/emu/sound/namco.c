@@ -555,6 +555,12 @@ void polepos_sound_enable(device_t *device, int enable)
 	chip->sound_enable = enable;
 }
 
+READ8_DEVICE_HANDLER( polepos_sound_r )
+{
+	namco_sound *chip = get_safe_token(device);
+	return chip->soundregs[offset];
+}
+
 WRITE8_DEVICE_HANDLER( polepos_sound_w )
 {
 	namco_sound *chip = get_safe_token(device);
