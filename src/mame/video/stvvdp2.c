@@ -4166,10 +4166,9 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		}
 	}
 
-	if((STV_VDP2_MZCTL & 0x1f) != 0 && VDP2_ERR(2))
+	if(STV_VDP2_MZCTL & 0x1f)
 	{
-		VDP2_CHK(2);
-		mame_printf_debug("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
+		printf("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
 	}
 }
 

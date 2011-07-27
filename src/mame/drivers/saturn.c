@@ -1810,6 +1810,8 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		else
 			state->m_scu.ist |= (IRQ_VBLANK_IN);
 
+		video_update_vdp1(timer.machine());
+
 		if(!(state->m_scu.ism & IRQ_VDP1_END))
 		{
 			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
@@ -1818,7 +1820,6 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		else
 			state->m_scu.ist |= (IRQ_VDP1_END);
 
-		video_update_vdp1(timer.machine());
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 	{

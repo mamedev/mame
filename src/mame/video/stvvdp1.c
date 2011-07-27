@@ -309,6 +309,9 @@ WRITE16_HANDLER( saturn_vdp1_regs_w )
 		case 0x0a/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Erase lower-right coord set: %08X\n", data );
 			break;
+		case 0x0c/2:
+			if ( VDP1_LOG ) logerror( "VDP1: Draw forced termination register write: %08X\n", data );
+			break;
 		default:
 			printf("Warning: write to unknown VDP1 reg %08x %08x\n",offset*2,data);
 			break;

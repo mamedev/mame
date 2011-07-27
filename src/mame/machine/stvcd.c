@@ -611,7 +611,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
 		if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
-    		printf("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+    		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 		if (!cdrom)
 		{
@@ -808,13 +808,18 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			else	// play until the end of the disc
 			{
-				UINT32 start_pos;
+				UINT32 start_pos,end_pos;
 
 				start_pos = ((cr1&0xff)<<16) | cr2;
+				end_pos = ((cr3&0xff)<<16) | cr4;
 
 				if(start_pos != 0xffffff)
 				{
-					fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
+					/* Madou Monogatari sets 0xff80xxxx as end position, needs investigation ... */
+					if(end_pos & 0x800000)
+						fadstoplay = end_pos & 0xfffff;
+					else
+						fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
 					printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
 				}
 				else /* Galaxy Fight calls 10ff ffff ffff ffff, resume/restart previously called track */
@@ -1284,6 +1289,11 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				cd_defragblocks(&partitions[bufnum]);
 
 				partitions[bufnum].numblks -= sectnum;
+
+				if (freeblocks == 200)
+				{
+					sectorstore = 0;
+				}
 
 				cd_stat &= ~CD_STAT_TRANS;
 				cr_standard_return(cd_stat);
