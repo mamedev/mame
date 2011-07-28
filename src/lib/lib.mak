@@ -192,11 +192,13 @@ PROCESSOR_H = $(LIBSRC)/softfloat/processors/mamesf.h
 SOFTFLOAT_MACROS = $(LIBSRC)/softfloat/softfloat/bits64/softfloat-macros
 
 SOFTFLOATOBJS = \
-	$(LIBOBJ)/softfloat/softfloat.o
+	$(LIBOBJ)/softfloat/softfloat.o \
+    $(LIBOBJ)/softfloat/fsincos.o
 
 $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 
 $(LIBOBJ)/softfloat/softfloat.o: $(LIBSRC)/softfloat/softfloat.c $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
+$(LIBOBJ)/softfloat/fsincos.o: $(LIBSRC)/softfloat/fsincos.c $(LIBSRC)/softfloat/fpu_constant.h $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
 
 
 

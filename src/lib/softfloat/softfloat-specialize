@@ -331,6 +331,44 @@ static floatx80 propagateFloatx80NaN( floatx80 a, floatx80 b )
 
 }
 
+#define EXP_BIAS 0x3FFF
+
+/*----------------------------------------------------------------------------
+| Returns the fraction bits of the extended double-precision floating-point
+| value `a'.
+*----------------------------------------------------------------------------*/
+
+INLINE bits64 extractFloatx80Frac( floatx80 a )
+{
+
+    return a.low;
+
+}
+
+/*----------------------------------------------------------------------------
+| Returns the exponent bits of the extended double-precision floating-point
+| value `a'.
+*----------------------------------------------------------------------------*/
+
+INLINE int32 extractFloatx80Exp( floatx80 a )
+{
+
+    return a.high & 0x7FFF;
+
+}
+
+/*----------------------------------------------------------------------------
+| Returns the sign bit of the extended double-precision floating-point value
+| `a'.
+*----------------------------------------------------------------------------*/
+
+INLINE flag extractFloatx80Sign( floatx80 a )
+{
+
+    return a.high>>15;
+
+}
+
 #endif
 
 #ifdef FLOAT128

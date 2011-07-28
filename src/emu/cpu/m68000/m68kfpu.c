@@ -1318,11 +1318,22 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			m68k->remaining_cycles -= 109;
 			break;
 		}
-//      case 0x0e:      // FSIN
-//      {
-//          // TODO
-//          break;
-//      }
+		case 0x0e:      // FSIN
+		{
+			REG_FP[dst] = source;
+			floatx80_fsin(REG_FP[dst]);
+			SET_CONDITION_CODES(m68k, REG_FP[dst]);
+			m68k->remaining_cycles -= 75;
+			break;
+		}
+		case 0x0f:		// FTAN
+		{
+			REG_FP[dst] = source;
+			floatx80_ftan(REG_FP[dst]);
+			SET_CONDITION_CODES(m68k, REG_FP[dst]);
+			m68k->remaining_cycles -= 75;
+			break;
+		}
 		case 0x18:		// FABS
 		{
 			REG_FP[dst] = source;
@@ -1339,9 +1350,16 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			m68k->remaining_cycles -= 3;
 			break;
 		}
+		case 0x1d:      // FCOS
+		{
+			REG_FP[dst] = source;
+			floatx80_fcos(REG_FP[dst]);
+			SET_CONDITION_CODES(m68k, REG_FP[dst]);
+			m68k->remaining_cycles -= 75;
+			break;
+		}
 		case 0x1e:		// FGETEXP
 		{
-//          floatx80 temp = source;
 			INT16 temp2;
 
 			temp2 = source.high;	// get the exponent

@@ -543,7 +543,7 @@ INLINE void
 | unsigned integer is returned.
 *----------------------------------------------------------------------------*/
 
-static bits64 estimateDiv128To64( bits64 a0, bits64 a1, bits64 b )
+INLINE bits64 estimateDiv128To64( bits64 a0, bits64 a1, bits64 b )
 {
     bits64 b0, b1;
     bits64 rem0, rem1, term0, term1;
@@ -575,7 +575,7 @@ static bits64 estimateDiv128To64( bits64 a0, bits64 a1, bits64 b )
 | value.
 *----------------------------------------------------------------------------*/
 
-static bits32 estimateSqrt32( int16 aExp, bits32 a )
+INLINE bits32 estimateSqrt32( int16 aExp, bits32 a )
 {
     static const bits16 sqrtOddAdjustments[] = {
         0x0004, 0x0022, 0x005D, 0x00B1, 0x011D, 0x019F, 0x0236, 0x02E0,
@@ -716,5 +716,17 @@ INLINE flag ne128( bits64 a0, bits64 a1, bits64 b0, bits64 b1 )
 
     return ( a0 != b0 ) || ( a1 != b1 );
 
+}
+
+/*-----------------------------------------------------------------------------
+| Changes the sign of the extended double-precision floating-point value 'a'.
+| The operation is performed according to the IEC/IEEE Standard for Binary
+| Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+
+INLINE floatx80 floatx80_chs(floatx80 reg)
+{
+    reg.high ^= 0x8000;
+    return reg;
 }
 
