@@ -16,7 +16,7 @@
 struct slot_interface
 {
 	const char *	name;
-	device_type		devtype;
+	const device_type & devtype;
 };
 
 #define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
