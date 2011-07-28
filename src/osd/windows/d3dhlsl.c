@@ -1160,6 +1160,8 @@ void hlsl_info::init_effect_info(d3d_poly_info *poly)
 		// This is extremely slow, but we're not rendering models here,
 		// just post-processing.
 		curr_effect = post_effect;
+		
+		(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->scanline_offset);
 
 		if(options->params_dirty)
 		{
@@ -1188,7 +1190,7 @@ void hlsl_info::init_effect_info(d3d_poly_info *poly)
 			(*d3dintf->effect.set_float)(curr_effect, "ScanlineHeight", options->scanline_height);
 			(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", options->scanline_bright_scale);
 			(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", options->scanline_bright_offset);
-			(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->scanline_offset);
+			//(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->scanline_offset);
 			(*d3dintf->effect.set_vector)(curr_effect, "Power", 3, options->power);
 		}
 	}
