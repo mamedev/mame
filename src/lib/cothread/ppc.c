@@ -13,7 +13,7 @@ floating-point and AltiVec save/restore */
 #include <stdint.h>
 #include <string.h>
 
-#define LIBCO_MPROTECT defined(__unix__) && !defined(LIBCO_PPC_ASM)
+#define LIBCO_MPROTECT (defined(__unix__) && !defined(LIBCO_PPC_ASM)) || defined(SDLMAME_MACOSX)
 
 #if LIBCO_MPROTECT
 	#include <unistd.h>
@@ -46,9 +46,13 @@ static thread_local cothread_t co_active_handle = 0;
 /* Whether function calls are indirect through a descriptor,
 or are directly to function */
 #ifndef LIBCO_PPCDESC
+#ifdef SDLMAME_MACOSX
+	#define LIBCO_PPCDESC 0
+#else
 	#if !defined(_CALL_SYSV) && (defined(_CALL_AIX) || defined(_CALL_AIXDESC) || defined(LIBCO_PPC64))
 		#define LIBCO_PPCDESC 1
 	#endif
+#endif
 #endif
 
 #ifdef LIBCO_PPC_ASM
