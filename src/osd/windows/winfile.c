@@ -55,25 +55,13 @@
 #include "winutil.h"
 #include "winutf8.h"
 
-//============================================================
-//  TYPE DEFINITIONS
-//============================================================
-
-struct _osd_file
-{
-	HANDLE		handle;
-	TCHAR		filename[1];
-};
-
-
+#include "winfile.h"
 
 //============================================================
 //  FUNCTION PROTOTYPES
 //============================================================
 
 static DWORD create_path_recursive(const TCHAR *path);
-
-
 
 //============================================================
 //  INLINE FUNCTIONS
@@ -114,7 +102,16 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		filerr = FILERR_OUT_OF_MEMORY;
 		goto error;
 	}
+	
+	if (win_check_socket_path(path))
+	{
+		(*file)->type = WINFILE_SOCKET;
+		filerr = win_open_socket(path, openflags, file, filesize);
+		goto error;
+	}
 
+	(*file)->type = WINFILE_FILE;
+	
 	// convert the path into something Windows compatible
 	dst = (*file)->filename;
 	for (src = t_path; *src != 0; src++)
@@ -196,20 +193,29 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, 
 	LONG upper = offset >> 32;
 	DWORD result;
 
-	// attempt to set the file pointer
-	result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
-	if (result == INVALID_SET_FILE_POINTER)
-	{
-		DWORD error = GetLastError();
-		if (error != NO_ERROR)
-			return win_error_to_file_error(error);
-	}
+    switch (file->type)
+    {
+		case WINFILE_FILE:
+			// attempt to set the file pointer
+			result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
+			if (result == INVALID_SET_FILE_POINTER)
+			{
+				DWORD error = GetLastError();
+				if (error != NO_ERROR)
+					return win_error_to_mame_file_error(error);
+			}
 
-	// then perform the read
-	if (!ReadFile(file->handle, buffer, length, &result, NULL))
-		return win_error_to_file_error(GetLastError());
-	if (actual != NULL)
-		*actual = result;
+			// then perform the read
+			if (!ReadFile(file->handle, buffer, length, &result, NULL))
+				return win_error_to_mame_file_error(GetLastError());
+			if (actual != NULL)
+				*actual = result;
+			break;
+		case WINFILE_SOCKET:
+			return win_read_socket(file, buffer, offset, length, actual);
+			break;
+				
+	}
 	return FILERR_NONE;
 }
 
@@ -223,20 +229,29 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 	LONG upper = offset >> 32;
 	DWORD result;
 
-	// attempt to set the file pointer
-	result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
-	if (result == INVALID_SET_FILE_POINTER)
-	{
-		DWORD error = GetLastError();
-		if (error != NO_ERROR)
-			return win_error_to_file_error(error);
-	}
+    switch (file->type)
+    {
+		case WINFILE_FILE:
+			// attempt to set the file pointer
+			result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
+			if (result == INVALID_SET_FILE_POINTER)
+			{
+				DWORD error = GetLastError();
+				if (error != NO_ERROR)
+					return win_error_to_mame_file_error(error);
+			}
 
-	// then perform the read
-	if (!WriteFile(file->handle, buffer, length, &result, NULL))
-		return win_error_to_file_error(GetLastError());
-	if (actual != NULL)
-		*actual = result;
+			// then perform the read
+			if (!WriteFile(file->handle, buffer, length, &result, NULL))
+				return win_error_to_mame_file_error(GetLastError());
+			if (actual != NULL)
+				*actual = result;
+			break;
+		case WINFILE_SOCKET:
+			return win_write_socket(file, buffer, offset, length, actual);
+			break;
+				
+	}
 	return FILERR_NONE;
 }
 
@@ -247,10 +262,18 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 
 file_error osd_close(osd_file *file)
 {
-	// close the file handle and free the file structure
-	CloseHandle(file->handle);
-	free(file);
-	return FILERR_NONE;
+    switch (file->type)
+    {
+		case WINFILE_FILE:
+			// close the file handle and free the file structure
+			CloseHandle(file->handle);
+			free(file);
+			break;
+		case WINFILE_SOCKET:
+			return win_close_socket(file);
+			break;
+	}
+	return FILERR_NONE;	
 }
 
 
@@ -379,7 +402,7 @@ DWORD create_path_recursive(const TCHAR *path)
 //  win_error_to_mame_file_error
 //============================================================
 
-static file_error win_error_to_mame_file_error(DWORD error)
+file_error win_error_to_mame_file_error(DWORD error)
 {
 	file_error filerr;
 
