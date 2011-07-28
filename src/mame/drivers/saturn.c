@@ -437,7 +437,6 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 DMA TODO:
 -Add timings(but how fast are each DMA?).
 -Add level priority & DMA status register.
--Add byte data type transfer.
 -Set boundaries.
 */
 
@@ -532,7 +531,7 @@ static READ32_HANDLER( saturn_scu_r )
 			break;
 		case 0xc8/4:
 			logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(&space->device()));
-			res = 0x00000004;/*SCU Version 4, OK?*/
+			res = 0x00000004;/*SCU Version 4, OK? */
 			break;
 		default:
 	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(&space->device()),offset,state->m_scu_regs[offset]);
@@ -558,10 +557,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0x04/4: case 0x24/4: case 0x44/4:  state->m_scu.dst[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
 		case 0x08/4: case 0x28/4: case 0x48/4:  state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0x1fff)) >> 0); break;
 		case 0x0c/4: case 0x2c/4: case 0x4c/4:
-			/*Read address add value for DMA lv 0*/
 			state->m_scu.src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 0;
-
-			/*Write address add value for DMA lv 0*/
 			state->m_scu.dst_add[DMA_CH] = 2 << (state->m_scu_regs[offset] & 7);
 			break;
 		case 0x10/4: case 0x30/4: case 0x50/4:
@@ -580,7 +576,6 @@ static WRITE32_HANDLER( saturn_scu_w )
 				if(!DWUP(DMA_CH)) state->m_scu.index[DMA_CH] = state->m_scu.dst[DMA_CH];
 			}
 
-			/*Start factor enable bits,bit 2,bit 1 and bit 0*/
 			state->m_scu.start_factor[DMA_CH] = state->m_scu_regs[offset] & 7;
 			break;
 
@@ -589,7 +584,6 @@ static WRITE32_HANDLER( saturn_scu_w )
 			break;
 		case 0x7c/4: if(LOG_SCU) logerror("Warning: DMA status WRITE! Offset %02x(%d)\n",offset*4,offset); break;
 		/*DSP section*/
-		/*Use functions so it is easier to work out*/
 		case 0x80/4:
 			dsp_prg_ctrl(space, data);
 			if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
@@ -609,19 +603,14 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0x90/4: if(LOG_SCU) logerror("timer 0 compare data = %03x\n",state->m_scu_regs[36]);break;
 		case 0x94/4: if(LOG_SCU) logerror("timer 1 set data = %08x\n",state->m_scu_regs[37]); break;
 		case 0x98/4: if(LOG_SCU) logerror("timer 1 mode data = %08x\n",state->m_scu_regs[38]); break;
-		case 0xa0/4:
-		/*An interrupt is masked when his specific bit is 1.*/
-		/*Are bit 16-bit 31 for External A-Bus irq mask like the status register?*/
-
-		state->m_scu.ism = state->m_scu_regs[0xa0/4];
-		scu_test_pending_irq(space->machine());
-		break;
-		/*Interrupt Control reg Set*/
-		case 0xa4/4:
-		if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",cpu_get_pc(&space->device()),state->m_scu_regs[41],mem_mask);
-
-		state->m_scu.ist &= state->m_scu_regs[offset];
-		break;
+		case 0xa0/4: /* IRQ mask */
+			state->m_scu.ism = state->m_scu_regs[0xa0/4];
+			scu_test_pending_irq(space->machine());
+			break;
+		case 0xa4/4: /* IRQ control */
+			if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",cpu_get_pc(&space->device()),state->m_scu_regs[41],mem_mask);
+			state->m_scu.ist &= state->m_scu_regs[offset];
+			break;
 		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
 		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",state->m_scu_regs[49]); break;
 		default: if(LOG_SCU) logerror("Warning: unused SCU reg set %d = %08x\n",offset,data);
@@ -672,7 +661,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 
-	if(0)
+	if(state->m_scu.src_add[dma_ch] == 0)
 	{
 	if(LOG_SCU) printf("DMA lv %d transfer START\n"
 			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
@@ -741,7 +730,14 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 
 	for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=state->m_scu.dst_add[dma_ch])
 	{
-		if(state->m_scu.dst_add[dma_ch] == 2)
+		/* Mahou Tsukai ni Naru Houhou directly accesses CD-rom register 0x05818000, it must be a dword access otherwise it won't work */
+		if(state->m_scu.src_add[dma_ch] == 0)
+		{
+			space->write_dword(state->m_scu.dst[dma_ch],  space->read_dword(state->m_scu.src[dma_ch]  ));
+			if(state->m_scu.dst_add[dma_ch] == 8)
+				space->write_dword(state->m_scu.dst[dma_ch]+4,space->read_dword(state->m_scu.src[dma_ch]  ));
+		}
+		else if(state->m_scu.dst_add[dma_ch] == 2)
 			space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
 		else if(state->m_scu.dst_add[dma_ch] == 8)
 		{
@@ -808,7 +804,7 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		if(indirect_src & 0x80000000)
 			job_done = 1;
 
-		if(0)
+		if(state->m_scu.src_add[dma_ch] == 0)
 		{
 			if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
 					           "Index %08x Start %08x End %08x Size %04x\n",dma_ch,tmp_src,indirect_src,indirect_dst,indirect_size);
