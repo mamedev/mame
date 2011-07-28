@@ -784,19 +784,18 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_RESET( sasuke )
 {
-	//snk6502_set_music_clock(machine, M_LN2 * (RES_K(1) + RES_K(10) * 2) * CAP_U(1));
-	// adjusted
-	snk6502_set_music_clock(machine, 1 / 72.1);
+	snk6502_set_music_clock(machine, M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
 
-	// adjusted
-	snk6502_set_music_freq(machine, 38000);
+	// adjusted (measured through audio recording of pcb)
+	snk6502_set_music_freq(machine, 35300);
 
 	sasuke_start_counter(machine);
 }
 
 static MACHINE_RESET( satansat )
 {
-	// same as sasuke
+	// same as sasuke (assumption?)
+	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
 	snk6502_set_music_freq(machine, 38000);
 
 	sasuke_start_counter(machine);
