@@ -391,7 +391,7 @@ static const char *const sega005_sample_names[] =
 	"dropbomb.wav",		/* 2 */
 	"shoot.wav",		/* 3 */
 	"missile.wav",		/* 4 */
-	"heilcopt.wav",		/* 5 */
+	"helicopt.wav",		/* 5 */
 	"whistle.wav",		/* 6 */
 	0
 };
