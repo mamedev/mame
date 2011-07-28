@@ -452,7 +452,7 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 		if (!CODE(r) || !SEGDESC(r)) throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
 		if (DPL(r)>CPL) throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
 		if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,(IDXTBL(gatesel)+(hwint&&1)));
-		if (GATEOFF(desc) > LIMIT(gatedesc)) throw TRAP(GENERAL_PROTECTION_FAULT,(hwint&&1));
+		if (GATEOFF(desc) > LIMIT(gatedesc)) throw TRAP(GENERAL_PROTECTION_FAULT,(int)(hwint&&1));
 
 		if (!CONF(r)&&(DPL(r)<CPL)) {  // inner call
 			UINT16 tss_ss, tss_sp, oldss, oldsp;

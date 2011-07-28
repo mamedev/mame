@@ -101,7 +101,7 @@ static DEVICE_START( centronics )
 	centronics->strobe = TRUE;
 
 	/* get printer device */
-	centronics->printer = device->subdevice<printer_image_device>("printer");
+	centronics->printer =  downcast<printer_image_device *>(device->subdevice("printer"));
 
 	/* resolve callbacks */
 	centronics->out_ack_func.resolve(intf->out_ack_func, *device);

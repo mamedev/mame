@@ -105,7 +105,7 @@ file_error win_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 
 file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-	ssize_t result;
+	int result;
 	char line[80];
 	struct timeval timeout;
 	fd_set readfds;
@@ -116,7 +116,7 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 
 	if (select(file->socket + 1, &readfds, NULL, NULL, &timeout) < 0)
 	{
-		sprintf(line, "%s : %s : %d ", __func__, __FILE__,  __LINE__);
+		sprintf(line, "win_read_socket : %s : %d ", __FILE__,  __LINE__);
 		perror(line);
 		return win_error_to_mame_file_error(errno);
 	}
@@ -143,7 +143,7 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 
 file_error win_write_socket(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-	ssize_t result;
+	int result;
 	result = send(file->socket, (const char*)buffer, count, 0);
 	if (result < 0)
 	{
