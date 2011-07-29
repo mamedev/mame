@@ -9324,6 +9324,7 @@ j5firebl	// Fireball (Jpm)
 j5firebla	//
 j5fireblb	//
 j5frmag		// Fruit Magic (Jpm)
+j5goldbr	// Golden Bars (Jpm)
 j5hagar		// Hagar (Jpm)
 j5hagara	//
 j5hagarb	//
@@ -9594,6 +9595,12 @@ j6wildw		// Wild West (Ace)
 j6wizard	// Wizard Of Odds (Jpm)
 j6knight	// Your Lucky Knight (Jpm)
 j6svndb		// 7 Deadly Bins (Ace)
+j6ewn		// Each Way Nudger (Jpm)
+j6hikar		// Hi Karate (Crystal)
+j6hisprt	// High Spirits (Empire)
+j6rcclub	// Roller Coaster Club (Jpm)
+j6slvgst	// Silver Ghost (Jpm)
+j6footy		// Football Fever (Empire)
 
 // JPM Impact + Video Board
 cluedo			// (c) 1995
@@ -11236,13 +11243,128 @@ m_tppokr		// (c) 1996 BFM/ELAM,Game Card 95-750-899, uses Adder board for featur
 
 // Maygay M1 A/B hardware
 
-m_sptlgt
+
+m1albsq		// Albert Square (Maygay)
+m1alley		// Alley Cat (Maygay)
+m1apollo	// Apollo 9 (Maygay)
+m1bankbs	// Bank Buster Club (Maygay) 
+m1bankrl	// Bank Roll (Maygay)
+m1bargn		// Bargain (Maygay)
+m1bigdel	// Big Deal (Maygay)
+m1blkhol	// Black Hole (Maygay)
+m1bluemx	// Blue Max (Maygay)
+m1bondi		// Bondi Beach (Maygay)
+m1bounty	// Bounty Hunter (Maygay)
+m1bountc	// Bounty Hunter Club (Maygay) 
+m1cik		// Cash Is King (Maygay)
+m1casclb	// Casino Club (Maygay) 
+m1casgcl	// Casino Gambler Club (Maygay) 
+m1casroy	// Casino Royale Club (Maygay) 
+m1chain		// Chain Reaction (Maygay)
+m1clbfvr	// Club Fever (Maygay) 
+m1cluedo	// Cluedo (Maygay)
+m1cluecb	// Cluedo Club (Maygay) 
+m1cluesh	// Cluedo Showcase (Maygay)
+m1cluess	// Cluedo Super Sleuth (Maygay)
+m1coderd	// Code Red Club (Maygay) 
+m1coro		// Coronation Street (Maygay)
+m1cororr	// Coronation Street - Rovers Return (Maygay)
+m1corocb	// Coronation Street Club (Maygay) 
+m1corosh	// Coronation Street Showcase (Maygay)
+m1criss		// Criss Cross Club (Maygay)
+m1dxmono	// Deluxe Monopoly (Maygay)
+m1dmnhrt	// Diamond Hearts (Maygay)
+m1dm4ev		// Diamonds Are Forever Club (Maygay) 
+m1dkong		// Donkey Kong (Maygay)
+m1ee		// Eastenders (Bwb)
+m1eea		//
+m1eeb		//
+m1eeqv		// Eastenders - Queen Vic (Maygay - Whitbread)
+m1eeqva		//
+m1expclb	// Explorer Club (Maygay) 
+m1fantfb	// Fantasy Football (Maygay)
+m1fight		// Fight Night (Maygay)
+m1fivest	// Five Star (Maygay)
+m1frexpl	// Fruit Explosion (Maygay)
+m1glad		// Gladiators (Maygay)
+m1glada		// Gladiators Arcade (Maygay)
+m1gladsh	// Gladiators Showcase (Maygay)
+m1goldsv	// Gold & Silver (Maygay)
+m1gold10	// Golden 10 (Maygay)
+m1goldng	// Golden Nugget Club (Maygay) 
+m1gresc		// Great Escape, The (Maygay)
+m1guvnor	// The Guvnor (Maygay)
+m1htclb		// Hi Tension Club (Maygay) 
+m1hotpot	// Hot Pots (Maygay)
+m1infern	// Inferno (Maygay)
+m1imclb		// Instant Millionaire Club (Maygay) 
+m1inwin		// Instant Win (Maygay)
+m1itsko		// It's A Knockout (Maygay)
+m1itjob		// Italian Job (Maygay)
+m1jpmult	// Jackpot Multiplier (Maygay)
+m1jbond		// James Bond (Maygay)
+m1jdwins	// Jim Davison's Winning Streak (Maygay)
+m1liveam	// Living In America (Maygay)
+m1lotmil	// Lottery Millionaire Club (Maygay) 
+m1luckno	// Lucky Numbers (Maygay)
+m1magic		// Magic Squares (Maygay)
+m1manhat	// Manhattan Skylines (Maygay)
+m1bignit	// Mike Reid's Big Night Out (Maygay) 
+m1mongam	// Money Game Club (Maygay) 
+m1monmon	// Money Money Money (Maygay)
+m1monod		// Monopoly (Maygay) [Dutch]
+m1mono		// Monopoly (Maygay)
+m1moncls	// Monopoly Classic (Maygay)
+m1monclb	// Monopoly Club (Maygay) 
+m1monstr	// Monster Cash (Maygay)
+m1nhp		// Noel's House Party (Maygay)
+m1nudbnk	// Nudge Banker (Maygay)
+m1nudunl	// Nudges Unlimited (Maygay)
+m1omega		// Omega (Maygay)
+m1onbus		// On The Buses (Maygay)
+m1ott		// Over The Top (Maygay)
+m1piggy		// Piggy Bank (Maygay)
+m1ppd		// Pink Panther (Maygay) [Dutch]
+m1pp		// Pink Panther (Maygay)
+m1ppc		// Pink Panther Club (Maygay) 
+m1przclu	// Prize Cluedo (Maygay)
+m1przee		// Prize Eastenders (Maygay)
+m1reeldm	// Reel Diamonds (Maygay)
+m1retpp		// Return Of The Pink Panther (Maygay)
+m1search	// Search Light (Maygay)
+m1sixspn	// Six Spinner (Maygay)
+m1spid		// Spiderman (Maygay)
+m1spid2		// Spiderman 2 (Maygay)
+m1sptlgt	// Spotlight (Maygay)
+m1stair		// Stairway To Heaven (Maygay)
+m1sudnim	// Sudden Impact (Maygay)
+m1sprnov	// Super Nova (Maygay)
+m1suppot	// Super Pots (Maygay)
+m1taknot	// Take Note (Maygay)
+m1tstunt	// Test Unit (Maygay)
+m1thatlf	// That's Life (Maygay)
+m1topten	// Top Tenner (Maygay)
+m1tp		// Trivial Pursuit (Maygay)
+m1tpclb		// Trivial Pursuit Club (Maygay) 
+m1ultchl	// Ultimate Challenge (Maygay)
+m1undsie	// Under Siege (Maygay)
+m1vegas		// Vegas Gambler Club (Maygay) 
+m1wagon		// Wagon Trail (Maygay)
+m1wotw		// War Of The Worlds (Maygay)
+m1wldzne	// Wild Zone (Maygay)
+m1winenc	// Winners Enclosure (Maygay)
+
 
 // Maygay MV1 hardware
 
 screenpl	// Screenplay
 screenp1	//
+screenp1a	//
 screenp2	//
+screenp2a	//
+screenp3	//
+screenp3a	//
+screenp4	//
 mv1bon		// Believe It Or Not
 mv1cpc		// Caesar's Palace Club
 mv1cpca		//

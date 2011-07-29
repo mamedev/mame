@@ -885,7 +885,18 @@ ROM_START( cashcade )
 ROM_END
 
 
+
+
 /* Non-video */
+
+
+ROM_START( j5goldbr )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "jpmgoldenbars1.1.bin", 0x000000, 0x008000, CRC(45f91660) SHA1(1c6bc864e56c8c6ea61ebb5e181ad736aeab06cf) )
+	ROM_LOAD16_BYTE( "jpmgoldenbars1.2.bin", 0x000001, 0x008000, CRC(eb6595f0) SHA1(2b0aabb50a1d1f88249b733faf02194c0181f999) )
+	ROM_LOAD16_BYTE( "jpmgoldenbars1.3.bin", 0x020000, 0x008000, CRC(01c7dcfb) SHA1(9f00a14df5b2ea13d2bd4f3ff1ab5ee65d464709) )
+	ROM_LOAD16_BYTE( "jpmgoldenbars1.4.bin", 0x020001, 0x008000, CRC(88bf0d26) SHA1(ecbfa69ffde42dc4464f39fc641c98a8485e0218) )
+ROM_END
 
 ROM_START( j5fifth )
 	ROM_REGION( 0x300000, "maincpu", 0 )
@@ -2106,6 +2117,7 @@ GAME( 199?, j5firebl	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Fireball (Jpm) (S
 GAME( 199?, j5firebla	, j5firebl	, jpmsys5, popeye, 0, ROT0, "JPM", "Fireball (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5fireblb	, j5firebl	, jpmsys5, popeye, 0, ROT0, "JPM", "Fireball (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5frmag		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Fruit Magic (Jpm) (SYSTEM5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5goldbr	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Golden Bars (Jpm) (SYSTEM5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5hagar		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5hagara	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5hagarb	, j5hagar	, jpmsys5, popeye, 0, ROT0, "JPM", "Hagar (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

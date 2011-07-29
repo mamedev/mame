@@ -1110,10 +1110,106 @@ ROM_START( screenp1 )
 	ROM_LOAD( "dig2-001.u12", 0x00000, 0x20000, CRC(498dd74f) SHA1(80bb204b3e9cadcecbfa75c78c52fb9908566c5e) )
 ROM_END
 
-ROM_START( screenp2 )
+ROM_START( screenp1a ) // the same as screenp1 apart from the rom at u15
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sa4-378.u15", 0x00000, 0x20000, CRC(a5c0e623) SHA1(cd3215db924bbee80f5b3fbbd391c7246ad88c69) )
+	ROM_LOAD16_BYTE( "sa4-378.u16", 0x00001, 0x20000, CRC(b04588b7) SHA1(1f9b933e441969c95bbbabbfbe44349bd945c326) )
+	ROM_LOAD16_BYTE( "sa4-378.u17", 0x40000, 0x20000, CRC(4b6cdc43) SHA1(1d6a4796ce67d0d00fe74a6bafd8b731450cdaab) )
+	ROM_LOAD16_BYTE( "sa4-378.u18", 0x40001, 0x20000, CRC(d986355f) SHA1(86d3f1712cd1bcc90a54945a2baccae2596de691) )
+
+	ROM_LOAD16_BYTE( "sq3-458.u2",  0x80000, 0x20000, CRC(7091dfcd) SHA1(d28abd70db5c49baa93f0488e443f29c27a7a559) )
+	ROM_LOAD16_BYTE( "sq3-458.u1",  0x80001, 0x20000, CRC(1bb0efbf) SHA1(59d7e2e51928df149764502bc4bd5736463f40d7) )
+	ROM_LOAD16_BYTE( "sq3-458.u4",  0xc0000, 0x20000, CRC(0fb0fc84) SHA1(e7ef68130f9627a842849f41f67accf8593a0819) )
+	ROM_LOAD16_BYTE( "sq3-458.u3",  0xc0001, 0x20000, CRC(ef4617d8) SHA1(48231405a775585451bf970db5bb57ec2f238250) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "sr2-002", 0x0000, 0x10000, CRC(1319cf82) SHA1(7a233072890361bcf384de4f90170c2ca713b1de) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "dig2-001.u12", 0x00000, 0x20000, CRC(498dd74f) SHA1(80bb204b3e9cadcecbfa75c78c52fb9908566c5e) )
+ROM_END
+
+ROM_START( screenp2 ) // exactly the same set has been seen with code sa5-196
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sa4-280.u15", 0x00000, 0x20000, CRC(d7206438) SHA1(70e7dc7d58bfa7dfe00250ab46fa71e951dbf901) )
 	ROM_LOAD16_BYTE( "sa4-280.u16", 0x00001, 0x20000, CRC(f99e972f) SHA1(b01c8796967ff7f27269b31ef983b5fb26b03aab) )
+	ROM_LOAD16_BYTE( "sa4-280.u17", 0x40000, 0x20000, CRC(cbde5343) SHA1(e341d642d8537bc221b3ca9803c221dc0cdf86c3) )
+	ROM_LOAD16_BYTE( "sa4-280.u18", 0x40001, 0x20000, CRC(885b887b) SHA1(9cfb145c8cca49450fabbf4efab9c70f98ecd2af) )
+
+	ROM_LOAD16_BYTE( "u2.bin", 0x80000, 0x20000, CRC(7091dfcd) SHA1(d28abd70db5c49baa93f0488e443f29c27a7a559) )
+	ROM_LOAD16_BYTE( "u1.bin", 0x80001, 0x20000, CRC(1bb0efbf) SHA1(59d7e2e51928df149764502bc4bd5736463f40d7) )
+	ROM_LOAD16_BYTE( "u4.bin", 0xc0000, 0x20000, CRC(0fb0fc84) SHA1(e7ef68130f9627a842849f41f67accf8593a0819) )
+	ROM_LOAD16_BYTE( "u3.bin", 0xc0001, 0x20000, CRC(ef4617d8) SHA1(48231405a775585451bf970db5bb57ec2f238250) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "reels.bin", 0x00000, 0x10000, CRC(1319cf82) SHA1(7a233072890361bcf384de4f90170c2ca713b1de) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "dig2-001.u12", 0x00000, 0x20000, CRC(498dd74f) SHA1(80bb204b3e9cadcecbfa75c78c52fb9908566c5e) )
+ROM_END
+
+ROM_START( screenp2a ) // the same as screenp2 apart from the rom at u15
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sa5-197.u15", 0x00000, 0x20000, CRC(4c067b11) SHA1(2364421b2f92669c3c164a170017bdf255134004) )
+	ROM_LOAD16_BYTE( "sa5-197.u16", 0x00001, 0x20000, CRC(f99e972f) SHA1(b01c8796967ff7f27269b31ef983b5fb26b03aab) )
+	ROM_LOAD16_BYTE( "sa5-197.u17", 0x40000, 0x20000, CRC(cbde5343) SHA1(e341d642d8537bc221b3ca9803c221dc0cdf86c3) )
+	ROM_LOAD16_BYTE( "sa5-197.u18", 0x40001, 0x20000, CRC(885b887b) SHA1(9cfb145c8cca49450fabbf4efab9c70f98ecd2af) )
+
+	ROM_LOAD16_BYTE( "u2.bin", 0x80000, 0x20000, CRC(7091dfcd) SHA1(d28abd70db5c49baa93f0488e443f29c27a7a559) )
+	ROM_LOAD16_BYTE( "u1.bin", 0x80001, 0x20000, CRC(1bb0efbf) SHA1(59d7e2e51928df149764502bc4bd5736463f40d7) )
+	ROM_LOAD16_BYTE( "u4.bin", 0xc0000, 0x20000, CRC(0fb0fc84) SHA1(e7ef68130f9627a842849f41f67accf8593a0819) )
+	ROM_LOAD16_BYTE( "u3.bin", 0xc0001, 0x20000, CRC(ef4617d8) SHA1(48231405a775585451bf970db5bb57ec2f238250) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "reels.bin", 0x00000, 0x10000, CRC(1319cf82) SHA1(7a233072890361bcf384de4f90170c2ca713b1de) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "dig2-001.u12", 0x00000, 0x20000, CRC(498dd74f) SHA1(80bb204b3e9cadcecbfa75c78c52fb9908566c5e) )
+ROM_END
+
+ROM_START( screenp3 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sa5-082.u15", 0x00000, 0x20000, CRC(ef98977d) SHA1(1cbbd4024b2076adc672b2a53fc8696615ce6eac) )
+	ROM_LOAD16_BYTE( "sa5-082.u16", 0x00001, 0x20000, CRC(214823be) SHA1(db98ff915f1956e275425b48c4d829c407c81ed6) )
+	ROM_LOAD16_BYTE( "sa5-082.u17", 0x40000, 0x20000, CRC(6e3b5259) SHA1(fb0e42a995768dfc08549a75021306978740ff85) )
+	ROM_LOAD16_BYTE( "sa5-082.u18", 0x40001, 0x20000, CRC(fb1af777) SHA1(afc4123bc61900d41bd321aa7eb7fb0f982a9501) )
+
+	ROM_LOAD16_BYTE( "u2.bin", 0x80000, 0x20000, CRC(7091dfcd) SHA1(d28abd70db5c49baa93f0488e443f29c27a7a559) )
+	ROM_LOAD16_BYTE( "u1.bin", 0x80001, 0x20000, CRC(1bb0efbf) SHA1(59d7e2e51928df149764502bc4bd5736463f40d7) )
+	ROM_LOAD16_BYTE( "u4.bin", 0xc0000, 0x20000, CRC(0fb0fc84) SHA1(e7ef68130f9627a842849f41f67accf8593a0819) )
+	ROM_LOAD16_BYTE( "u3.bin", 0xc0001, 0x20000, CRC(ef4617d8) SHA1(48231405a775585451bf970db5bb57ec2f238250) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "reels.bin", 0x00000, 0x10000, CRC(1319cf82) SHA1(7a233072890361bcf384de4f90170c2ca713b1de) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "dig2-001.u12", 0x00000, 0x20000, CRC(498dd74f) SHA1(80bb204b3e9cadcecbfa75c78c52fb9908566c5e) )
+ROM_END
+
+ROM_START( screenp3a )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // only  u16 differs from above set
+	ROM_LOAD16_BYTE( "sa5-083.u15", 0x00000, 0x20000, CRC(ef98977d) SHA1(1cbbd4024b2076adc672b2a53fc8696615ce6eac) )
+	ROM_LOAD16_BYTE( "sa5-083.u16", 0x00001, 0x20000, CRC(84e17aa1) SHA1(cbc77315cb311a217d2b9092ffb3e3aee07a9633) )
+	ROM_LOAD16_BYTE( "sa5-083.u17", 0x40000, 0x20000, CRC(6e3b5259) SHA1(fb0e42a995768dfc08549a75021306978740ff85) )
+	ROM_LOAD16_BYTE( "sa5-083.u18", 0x40001, 0x20000, CRC(fb1af777) SHA1(afc4123bc61900d41bd321aa7eb7fb0f982a9501) )
+
+	ROM_LOAD16_BYTE( "u2.bin", 0x80000, 0x20000, CRC(7091dfcd) SHA1(d28abd70db5c49baa93f0488e443f29c27a7a559) )
+	ROM_LOAD16_BYTE( "u1.bin", 0x80001, 0x20000, CRC(1bb0efbf) SHA1(59d7e2e51928df149764502bc4bd5736463f40d7) )
+	ROM_LOAD16_BYTE( "u4.bin", 0xc0000, 0x20000, CRC(0fb0fc84) SHA1(e7ef68130f9627a842849f41f67accf8593a0819) )
+	ROM_LOAD16_BYTE( "u3.bin", 0xc0001, 0x20000, CRC(ef4617d8) SHA1(48231405a775585451bf970db5bb57ec2f238250) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "reels.bin", 0x00000, 0x10000, CRC(1319cf82) SHA1(7a233072890361bcf384de4f90170c2ca713b1de) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "dig2-001.u12", 0x00000, 0x20000, CRC(498dd74f) SHA1(80bb204b3e9cadcecbfa75c78c52fb9908566c5e) )
+ROM_END
+
+ROM_START( screenp4 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sply5p15", 0x00000, 0x20000, CRC(c1e956d8) SHA1(364bfa7d3d90bcbb50720e02b3330503002e6fe3) )
+	ROM_LOAD16_BYTE( "sply5p16", 0x00001, 0x20000, CRC(e23e7e33) SHA1(0c73a5da1e52ae74427222acdbe81c16f0ba334c) )
+	// not sure which other roms these pair with.. but the ones below work
 	ROM_LOAD16_BYTE( "sa4-280.u17", 0x40000, 0x20000, CRC(cbde5343) SHA1(e341d642d8537bc221b3ca9803c221dc0cdf86c3) )
 	ROM_LOAD16_BYTE( "sa4-280.u18", 0x40001, 0x20000, CRC(885b887b) SHA1(9cfb145c8cca49450fabbf4efab9c70f98ecd2af) )
 
@@ -1297,8 +1393,13 @@ static DRIVER_INIT( screenpl )
 }
 
 GAME( 1991, screenpl, 0,        maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 4.0)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
-GAME( 1991, screenp1, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
-GAME( 1991, screenp2, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp1, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 1)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp1a,screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 2)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp2, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 1)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp2a,screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 2)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp3, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-082)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp3a,screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-083)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp4 ,screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. ?.?)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
 
 // incomplete sets
 GAME( 199?, mv1bon	, 0			,maygayv1, screenpl, screenpl, ROT0, "Maygay", "Believe It Or Not (Maygay, MV1 Video)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )
