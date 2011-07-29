@@ -88,14 +88,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Simple Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform float RedPhosphor = 0.0f;
-uniform float GreenPhosphor = 0.0f;
-uniform float BluePhosphor = 0.0f;
+uniform float3 Phosphor = float3(0.0f, 0.0f, 0.0f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 CurrPix = tex2D(DiffuseSampler, Input.TexCoord);
-	float3 PrevPix = tex2D(PreviousSampler, Input.PrevCoord).rgb * float3(RedPhosphor, GreenPhosphor, BluePhosphor);
+	float3 PrevPix = tex2D(PreviousSampler, Input.PrevCoord).rgb * float3(Phosphor.r, Phosphor.g, Phosphor.b);
 	
 	float RedMax = max(CurrPix.r, PrevPix.r);
 	float GreenMax = max(CurrPix.g, PrevPix.g);
