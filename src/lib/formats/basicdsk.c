@@ -346,7 +346,7 @@ FLOPPY_IDENTIFY(basicdsk_identify_default)
 	expected_size *= geometry.heads;
 	expected_size *= geometry.tracks;
 	expected_size *= geometry.sectors;
-	*vote = (floppy_image_size(floppy) == expected_size) ? 100 : 0;
+	*vote = (floppy_image_size(floppy) == expected_size) ? 100 : 50;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
