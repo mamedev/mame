@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( vd, vd_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
-/ Break (1986)
+/ Break '86 (1986)
 /-------------------------------------------------------------------*/
-ROM_START(break)
+ROM_START(break86)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("break1.cpu", 0x0000, 0x2000, CRC(c187d263) SHA1(1790566799ccc41cd5445936e86f945150e24e8a))
 	ROM_LOAD("break2.cpu", 0x2000, 0x2000, CRC(ed8f84ab) SHA1(ff5d7e3c373ca345205e8b92c6ce7b02f36a3d95))
@@ -46,5 +46,6 @@ ROM_END
 / Papillon (1986)
 /-------------------------------------------------------------------*/
 
-GAME(1986,	break,	0,	vd,	vd,	vd,	ROT0,	"Videodens",	"Break",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+
+GAME(1986,	break86,	0,	vd,	vd,	vd,	ROT0,	"Videodens",	"Break '86",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 
