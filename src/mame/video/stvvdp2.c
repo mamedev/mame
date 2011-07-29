@@ -3024,7 +3024,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 	gfxdatalow = gfxdata + stv2_current_tilemap.bitmap_map * 0x20000;
 	gfxdata+=(
 	(stv2_current_tilemap.scrollx & (xlinesize-1)) +
-	((stv2_current_tilemap.scrolly & (ysize-1)) * (xlinesize)) +
+	((stv2_current_tilemap.scrolly & (ysize-1)) * (xlinesize)) + /* TODO: mask ysize, check me! */
 	(stv2_current_tilemap.bitmap_map * 0x20000)
 	);
 	gfxdatahigh = gfxdatalow + xlinesize*ysize;
@@ -3222,21 +3222,24 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 						int xs = xcnt & xsizemask;
 
 						t_pen = ((gfxdata[2*xs] & 0x80) >> 7) || (stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE);
-						if (!t_pen) continue;
-						b = ((gfxdata[2*xs] & 0x7c) >> 2);
-						g = ((gfxdata[2*xs] & 0x03) << 3) | ((gfxdata[2*xs+1] & 0xe0) >> 5);
-						r = ((gfxdata[2*xs+1] & 0x1f));
-						if(stv2_current_tilemap.fade_control & 1)
-							stv_vdp2_compute_color_offset_RGB555(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
-						tw = stv_vdp2_window_process(machine,xcnt,ycnt);
-						if(tw == 0)
+
+						if(t_pen)
 						{
-							if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+							b = ((gfxdata[2*xs] & 0x7c) >> 2);
+							g = ((gfxdata[2*xs] & 0x03) << 3) | ((gfxdata[2*xs+1] & 0xe0) >> 5);
+							r = ((gfxdata[2*xs+1] & 0x1f));
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset_RGB555(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+							tw = stv_vdp2_window_process(machine,xcnt,ycnt);
+							if(tw == 0)
 							{
-							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-								destline[xcnt] = b | g << 5 | r << 10;
-							else
-								destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
+								if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								{
+								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
+									destline[xcnt] = b | g << 5 | r << 10;
+								else
+									destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
+								}
 							}
 						}
 
@@ -3301,36 +3304,56 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
         B                              B
         --------BBBBBBBBGGGGGGGGRRRRRRRR
         */
-		case 4:
-			//popmessage("BITMAP type 4 enabled");
-			for (ycnt = 0; ycnt <ysize;ycnt++)
+        case 4:
+			/* adjust for cliprect */
+			gfxdata += xlinesize*(cliprect->min_y);
+
+			for (ycnt = cliprect->min_y; ycnt <= cliprect->max_y; ycnt++)
 			{
 				destline = BITMAP_ADDR16(bitmap, ycnt, 0);
 
-				for (xcnt = 0; xcnt <xsize;xcnt++)
+				for (xcnt = cliprect->min_x; xcnt <= cliprect->max_x; xcnt++)
 				{
 					int r,g,b;
+					int xs = xcnt & xsizemask;
+					UINT32 dot_data;
 
-					t_pen = ((gfxdata[0] & 0x80) >> 7);
+					dot_data = (gfxdata[4*xs+0]<<24)|(gfxdata[4*xs+1]<<16)|(gfxdata[4*xs+2]<<8)|(gfxdata[4*xs+3]<<0);
+
+					t_pen = (dot_data & 0x80000000) >> 31;
 					if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 
-					/*TODO: 8bpp*/
-					b = (gfxdata[1] & 0xf8) >> 3;
-					g = (gfxdata[2] & 0xf8) >> 3;
-					r = (gfxdata[3] & 0xf8) >> 3;
-
-					tw = stv_vdp2_window_process(machine,xcnt,ycnt);
-					if(tw == 0)
+					if(t_pen)
 					{
-						if(t_pen)
-							if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
-								destline[xcnt] = b | g << 5 | r << 10;
+						b = ((dot_data & 0x00ff0000) >> 16);
+						g = ((dot_data & 0x0000ff00) >> 8);
+						r = ((dot_data & 0x000000ff) >> 0);
+						b >>= 3;
+						g >>= 3;
+						r >>= 3;
+
+						if(stv2_current_tilemap.fade_control & 1)
+							stv_vdp2_compute_color_offset_RGB555(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+						tw = stv_vdp2_window_process(machine,xcnt,ycnt);
+						if(tw == 0)
+						{
+							if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
+							{
+								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
+									destline[xcnt] = b | g << 5 | r << 10;
+								else
+									destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
+							}
+						}
 					}
-					gfxdata+=4;
-					/*This is not used for this type,see shanhigw Sunsoft logo*/
-					//if ( gfxdata >= gfxdatahigh ) gfxdata = gfxdatalow;
+
+					if ( (gfxdata + 4*xs) >= gfxdatahigh ) gfxdata = gfxdatalow;
 				}
+
+				gfxdata += xlinesize;
+				if ( gfxdata >= gfxdatahigh ) gfxdata = gfxdatalow + (gfxdata - gfxdatahigh);
 			}
+
 			break;
 	}
 }
