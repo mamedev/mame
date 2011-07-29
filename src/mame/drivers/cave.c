@@ -18,23 +18,23 @@ Other        :  93C46 EEPROM
 -----------------------------------------------------------------------------------------
 Year + Game           License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
-94 Mazinger Z         Banpresto     ?           038 9335EX706   013 9341E7009   Z80
-94 Power Instinct 2   Atlus         ATG02?      038 9429WX709   013             Z80 NMK 112
+94 Mazinger Z         Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
+94 Power Instinct 2   Atlus         ATG02?      038 9429WX709   013 9341E7009   Z80 NMK 112
 95 Gogetsuji Legends  Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
 95 Metamoqester       Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
 95 Sailor Moon        Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
-95 Donpachi           Atlus         AT-C01DP-2  038 9429WX727   013 8647-01     NMK 112
+95 Donpachi           Atlus         AT-C01DP-2  038 9429WX727   013 9347E7003   NMK 112
 96 Air Gallet         Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
-96 Hotdog Storm       Marble        ASTC9501    038 9341EX702                   Z80
+96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
 96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
-97 Dodonpachi         Atlus         ATC03D2     ?
+97 Dodonpachi         Atlus         ATC03D2     038             013
 98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
-98 ESP Ra.De.         Atlus         ATC04       ?
+98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
 98 Uo Poko            Jaleco        CV02        038 9749WX001   013 9749EX004
-99 Guwange            Atlus         ATC05       ?
+99 Guwange            Atlus         ATC05       038 9919WX004   013
 99 Gaia Crusaders     Noise Factory ?           038 9838WX003   013 9918EX008
 99 Koro Koro Quest    Takumi        TUG-01B     038 9838WX004   013 9838EX004
-99 Crusher Makochan   Takumi        TUG-01B     ""              ""
+99 Crusher Makochan   Takumi        TUG-01B     038 9838WX004   013 9838EX004
 99 Tobikose! Jumpman  Namco         TJ0476      038 9919WX007   013 9934WX002
 01 Thunder Heroes     Primetek      ?           038 9838WX003   013 9918EX008
 -----------------------------------------------------------------------------------------
