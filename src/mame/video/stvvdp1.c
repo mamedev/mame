@@ -176,9 +176,23 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 			break;
 		case 0x12/2: return state->m_vdp1.lopr;
 		case 0x14/2: return state->m_vdp1.copr;
+		/* MODR register, read register for the other VDP1 regs
+		   (Shienryu SS version abuses of this during intro, otherwise you get vertical oriented VDP1 sprites on horizontal display) */
 		case 0x16/2:
-			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset*2);
+			UINT16 modr;
 
+			modr = 0x1000; //vdp1 VER
+			modr |= (STV_VDP1_PTM >> 1) << 8; // PTM1
+			modr |= STV_VDP1_EOS << 7; // EOS
+			modr |= STV_VDP1_DIE << 6; // DIE
+			modr |= STV_VDP1_DIL << 5; // DIL
+			modr |= STV_VDP1_FCM << 4; //FCM
+			modr |= STV_VDP1_VBE << 3; //VBE
+			modr |= STV_VDP1_TVM & 7; //TVM
+
+			return modr;
+		default:
+			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset*2);
 			break;
 	}
 

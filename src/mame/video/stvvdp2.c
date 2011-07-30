@@ -4173,8 +4173,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 	if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 	{
 		/*elandore doesn't like current cliprect code,will be worked on...*/
-		if ( window_applied && stv2_current_tilemap.colour_depth != 0)
-			stv2_current_tilemap.window_control = 0;
+		//if ( window_applied && stv2_current_tilemap.colour_depth != 4)
+		//	stv2_current_tilemap.window_control = 0;
 
 		stv_vdp2_draw_basic_bitmap(machine, bitmap, &mycliprect);
 	}

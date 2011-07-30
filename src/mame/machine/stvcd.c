@@ -589,10 +589,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0018:
 	case 0x001a:
 //              CDROM_LOG(("WW CR1: %04x\n", data))
-		/* these are ERRORS from our core and mustn't happen! */
-		if(data == 0x2100 || data == 0x2300)
-			debugger_break(machine);
-
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
 		break;
@@ -929,6 +925,12 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 					break;
 			}
 			hirqreg |= CMOK|DRDY;
+			break;
+
+		case 0x2100:
+		case 0x2300:
+			popmessage("%08x %08x",cd_curfad,fadstoplay);
+			hirqreg |= (CMOK);
 			break;
 
 		case 0x3000:	// Set CD Device connection
@@ -2061,9 +2063,6 @@ static void cd_playdata(void)
 			{
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
 					cd_read_filtered_sector(cd_curfad);
-
-				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO && 0)
-					popmessage("%08x %08x",cd_curfad,fadstoplay);
 
 				cd_curfad++;
 				fadstoplay--;

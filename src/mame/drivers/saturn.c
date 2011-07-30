@@ -600,9 +600,9 @@ static WRITE32_HANDLER( saturn_scu_w )
 			dsp_ram_addr_w(data);
 			if(LOG_SCU) logerror("SCU DSP: Data RAM Data Port Access %08x\n",data);
 			break;
-		case 0x90/4: if(LOG_SCU) logerror("timer 0 compare data = %03x\n",state->m_scu_regs[36]);break;
-		case 0x94/4: if(LOG_SCU) logerror("timer 1 set data = %08x\n",state->m_scu_regs[37]); break;
-		case 0x98/4: if(LOG_SCU) logerror("timer 1 mode data = %08x\n",state->m_scu_regs[38]); break;
+		case 0x90/4: /*if(LOG_SCU) logerror("timer 0 compare data = %03x\n",state->m_scu_regs[36]);*/ break;
+		case 0x94/4: /*if(LOG_SCU) logerror("timer 1 set data = %08x\n",state->m_scu_regs[37]);*/ break;
+		case 0x98/4: /*if(LOG_SCU) logerror("timer 1 mode data = %08x\n",state->m_scu_regs[38]);*/ break;
 		case 0xa0/4: /* IRQ mask */
 			state->m_scu.ism = state->m_scu_regs[0xa0/4];
 			scu_test_pending_irq(space->machine());
