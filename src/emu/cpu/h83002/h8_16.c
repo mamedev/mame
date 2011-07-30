@@ -567,6 +567,21 @@ static ADDRESS_MAP_START( h8_3007_internal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff20, 0xffffe9) AM_READWRITE( h8_3007_itu_r, h8_3007_itu_w )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( h8s_2241_internal_map, AS_PROGRAM, 16 )
+	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
+//	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2241_onchip_reg_r, h8s2241_onchip_reg_w ) // internal i/o registers
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( h8s_2246_internal_map, AS_PROGRAM, 16 )
+	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
+//	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2246_onchip_reg_r, h8s2246_onchip_reg_w ) // internal i/o registers
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( h8s_2323_internal_map, AS_PROGRAM, 16 )
+	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
+//	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2323_onchip_reg_r, h8s2323_onchip_reg_w ) // internal i/o registers
+ADDRESS_MAP_END
+
 CPU_GET_INFO( h8_3002 )
 {
 	h83xx_state *h8 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
@@ -666,6 +681,47 @@ CPU_GET_INFO( h8_3007 )
 	}
 }
 
+CPU_GET_INFO( h8s_2241 )
+{
+	switch (state)
+	{
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2241_internal_map);  break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2241");		break;
+		default:
+			CPU_GET_INFO_CALL(h8_3002);
+	}
+}
+
+CPU_GET_INFO( h8s_2246 )
+{
+	switch (state)
+	{
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2246_internal_map);  break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2246");		break;
+		default:
+			CPU_GET_INFO_CALL(h8_3002);
+	}
+}
+
+CPU_GET_INFO( h8s_2323 )
+{
+	switch (state)
+	{
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2323_internal_map);  break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2323");		break;
+		default:
+			CPU_GET_INFO_CALL(h8_3002);
+	}
+}
+
 DEFINE_LEGACY_CPU_DEVICE(H83002, h8_3002);
 DEFINE_LEGACY_CPU_DEVICE(H83007, h8_3007);
 DEFINE_LEGACY_CPU_DEVICE(H83044, h8_3044);
+
+DEFINE_LEGACY_CPU_DEVICE(H8S2241, h8s_2241);
+DEFINE_LEGACY_CPU_DEVICE(H8S2246, h8s_2246);
+DEFINE_LEGACY_CPU_DEVICE(H8S2323, h8s_2323);
+
