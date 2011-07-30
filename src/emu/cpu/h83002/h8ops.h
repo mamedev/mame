@@ -625,6 +625,9 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 				}
 			}
 			break;
+		case 0x8:	// sleep
+			H8_IFETCH_TIMING(1);
+			break;
 		case 0xc:
 			// mulxs
 			ext16 = h8_mem_read16(h8, h8->pc);
