@@ -64,10 +64,13 @@ static UINT8 h8_rotxl8(h83xx_state *h8, UINT8 src);
 static UINT16 h8_rotxl16(h83xx_state *h8, UINT16 src);
 static UINT32 h8_rotxl32(h83xx_state *h8, UINT32 src);
 
+static UINT8 h8_rotr8(h83xx_state *h8, UINT8 src);
 static UINT16 h8_rotr16(h83xx_state *h8, UINT16 src);
+static UINT32 h8_rotr32(h83xx_state *h8, UINT32 src);
 
 static UINT8 h8_rotxr8(h83xx_state *h8, UINT8 src);
 static UINT16 h8_rotxr16(h83xx_state *h8, UINT16 src);
+static UINT32 h8_rotxr32(h83xx_state *h8, UINT32 src);
 
 static UINT8 h8_shll8(h83xx_state *h8, UINT8 src);
 static UINT16 h8_shll16(h83xx_state *h8, UINT16 src);
@@ -235,7 +238,147 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 		H8_IFETCH_TIMING(1);
 		break;
 	case 0x1:
-		// 010x  where x should always be 0!
+		// 0140 = LDC/STC.W
+		if (opcode == 0x0140)
+		{
+			ext16 = h8_mem_read16(h8, h8->pc);
+			h8->pc+=2;
+			switch((ext16>>8) & 0xff)
+			{
+				case 0x69:
+					// ERd
+					if (ext16 & 0x80)
+					{
+						h8_setreg8(h8, (ext16>>4)&7, h8_get_ccr(h8));
+					}
+					else
+					{
+						udata8 = h8_getreg8(h8, (ext16>>4)&7);
+						h8_set_ccr(h8, udata8);
+					}
+					H8_IFETCH_TIMING(1);
+					break;
+
+				case 0x6f:
+					// @(disp, ERd)
+					sdata16=h8_mem_read16(h8, h8->pc); // sign extend displacements !
+					h8->pc += 2;
+					address24 = (h8_getreg32(h8, (ext16 >> 4)&7)) & H8_ADDR_MASK;
+					address24 += sdata16;
+					H8_IFETCH_TIMING(3);
+					H8_WORD_TIMING(2, address24);
+					if (ext16 & 0x80)
+					{
+						h8_mem_write8(address24, h8_get_ccr(h8));
+					}
+					else
+					{
+						udata8 = h8_mem_read8(address24);
+						h8_set_ccr(h8, udata8);
+					}
+					H8_BYTE_TIMING(1, sdata16);
+					break;
+
+				case 0x78:
+					// @(disp24, ERd)
+					srcreg = (ext16 >> 4) & 7;
+
+					// 6b20
+					udata16 = h8_mem_read16(h8, h8->pc);
+					h8->pc += 2;
+					dstreg = udata16 & 7;
+
+					address24 = h8_mem_read32(h8, h8->pc);
+					h8->pc += 4;
+					address24 += h8_getreg32(h8, srcreg);
+					address24 &= H8_ADDR_MASK;
+					if (udata16 == 0x6b20)
+					{
+						udata8 = h8_mem_read8(address24);
+						h8_set_ccr(h8, udata8);
+					}
+					else if (udata16 == 0x6ba0)
+					{
+						h8_mem_write8(address24, h8_get_ccr(h8));
+					}
+					else
+					{
+						h8->h8err = 1;
+					}
+					H8_IFETCH_TIMING(5);
+					H8_WORD_TIMING(2, address24);
+					break;
+
+				case 0x6d:
+					// stc.w ccr,-@ERd / ldc @ERd+, ccr
+					srcreg = (ext16>>4)&7;
+					if (ext16 & 0x80)
+					{
+						h8_setreg32(h8, srcreg, h8_getreg32(h8, srcreg)-2);
+						address24 = h8_getreg32(h8, srcreg) & H8_ADDR_MASK;
+						h8_mem_write8(address24, h8_get_ccr(h8));
+					}
+					else
+					{
+						address24 = h8_getreg32(h8, srcreg) & H8_ADDR_MASK;
+						h8_setreg32(h8, srcreg, h8_getreg32(h8, srcreg)+2);
+						udata8 = h8_mem_read8(address24);
+						h8_set_ccr(h8, udata8);
+					}
+					H8_IFETCH_TIMING(2);
+					H8_BYTE_TIMING(1, address24);
+					H8_IOP_TIMING(2);
+					break;
+
+				case 0x6b:
+					if ((ext16&0xff) == 0x00)	// 16 bit absolute
+					{
+						address24=h8_mem_read16(h8, h8->pc);
+						h8->pc += 2;
+						if (address24 & 0x8000)
+							address24 |= 0xff0000;
+						udata8 = h8_mem_read8(address24);
+						h8_set_ccr(h8, udata8);
+						H8_IFETCH_TIMING(4);
+						H8_BYTE_TIMING(1, address24);
+					}
+					else if ((ext16&0xff) == 0x20)	// 24 bit absolute
+					{
+						address24=h8_mem_read32(h8, h8->pc);
+						h8->pc += 4;
+						udata8 = h8_mem_read8(address24);
+						h8_set_ccr(h8, udata8);
+						H8_IFETCH_TIMING(4);
+						H8_BYTE_TIMING(1, address24);
+					}
+					else if ((ext16&0xff) == 0x80)	// 16 bit absolute
+					{
+						address24=h8_mem_read16(h8, h8->pc);
+						h8->pc += 2;
+						if (address24 & 0x8000)
+							address24 |= 0xff0000;
+						h8_mem_write8(address24, h8_get_ccr(h8));
+						H8_IFETCH_TIMING(3);
+						H8_BYTE_TIMING(1, address24);
+					}
+					else if ((ext16&0xff) == 0xa0)	// 24 bit absolute
+					{
+						address24=h8_mem_read32(h8, h8->pc);
+						h8->pc += 4;
+						h8_mem_write8(address24, h8_get_ccr(h8));
+						H8_IFETCH_TIMING(4);
+						H8_BYTE_TIMING(1, address24);
+					}
+					else
+					{
+						h8->h8err = 1;
+					}
+					break;
+			}
+			break;
+		}
+
+		// 01yx  where x should always be 0!
 		if((opcode & 0xf) != 0)
 		{
 			h8->h8err = 1;
@@ -300,10 +443,23 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 				break;
 			case 0x6b:
 				// mov.l rx, @xx / mov.l @xx, rx
+
 				switch((ext16 >> 4)&0xf)
 				{
+				case 0x0:
+					// mov.l @aa:16, ERx
+					address24=h8_mem_read16(h8, h8->pc);
+					h8->pc += 2;
+					if (address24 & 0x8000)
+						address24 |= 0xff0000;
+					udata32=h8_mem_read32(h8, address24);
+					h8_mov32(h8, udata32); // flags only
+					h8_setreg32(h8, ext16 & 0x7, udata32);
+					H8_IFETCH_TIMING(4);
+					H8_WORD_TIMING(2, address24);
+					break;
 				case 0x2:
-					// mov.l @aa:24, erx
+					// mov.l @aa:24, ERx
 					address24=h8_mem_read32(h8, h8->pc);
 					h8->pc += 4;
 					udata32=h8_mem_read32(h8, address24);
@@ -313,7 +469,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 					H8_WORD_TIMING(2, address24);
 					break;
 				case 0xa:
-					// mov.l erx, @aa:24
+					// mov.l ERx, @aa:24
 					address24=h8_mem_read32(h8, h8->pc);
 					h8->pc += 4;
 					udata32=h8_getreg32(h8, ext16 & 0x7);
@@ -323,7 +479,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 					H8_WORD_TIMING(2, address24);
 					break;
 				case 0x8:
-					// mov.l erx, @aa:16
+					// mov.l ERx, @aa:16
 					address24=h8_mem_read16(h8, h8->pc);
 					h8->pc += 2;
 					if (address24 & 0x8000)
@@ -427,6 +583,46 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 			default:
 				h8->h8err = 1;
 				break;
+			}
+			break;
+			// ldm/stm
+		case 0x1:
+		case 0x2:
+		case 0x3:
+			ext16 = h8_mem_read16(h8, h8->pc);
+			h8->pc+=2;
+
+			// # of registers to save
+			sdata8 = ((opcode>>4) & 0xf);
+
+			// check LDM or STM
+			if (ext16 & 0x80)	// STM
+			{
+				srcreg = (ext16 & 7);
+				for (int i = 0; i <= sdata8; i++)
+				{
+					h8_setreg32(h8, 7, h8_getreg32(h8, 7)-4);
+					address24 = h8_getreg32(h8, 7) & H8_ADDR_MASK;
+					udata32 = h8_getreg32(h8, srcreg+i);
+					h8_mem_write32(h8, address24, udata32);
+					H8_IFETCH_TIMING(2);
+					H8_WORD_TIMING(2, address24);
+					H8_IOP_TIMING(2);
+				}
+			}
+			else	// LDM
+			{
+				srcreg = (ext16 & 7);
+				for (int i = 0; i <= sdata8; i++)
+				{
+					address24 = h8_getreg32(h8, 7) & H8_ADDR_MASK;
+					h8_setreg32(h8, 7, h8_getreg32(h8, 7)+4);
+					udata32 = h8_mem_read32(h8, address24);
+					h8_setreg32(h8, srcreg-i, udata32);
+					H8_IFETCH_TIMING(2);
+					H8_WORD_TIMING(2, address24);
+					H8_IOP_TIMING(2);
+				}
 			}
 			break;
 		case 0xc:
@@ -733,8 +929,32 @@ static void h8_group1(h83xx_state *h8, UINT16 opcode)
 			H8_IFETCH_TIMING(1);
 			break;
 		case 0x3:
-			// shal.l Rx
+			// shll.l Rx
 			udata32 = h8_getreg32(h8, opcode & 0x7);
+			udata32 = h8_shll32(h8, udata32);
+			h8_setreg32(h8, opcode & 0x7, udata32);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0x4:
+			// shll.b #2, Rx
+			udata8 = h8_getreg8(h8, opcode & 0xf);
+			udata8 = h8_shll8(h8, udata8);
+			udata8 = h8_shll8(h8, udata8);
+			h8_setreg8(h8, opcode & 0xf, udata8);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0x5:
+			// shll.w #2, Rx
+			udata16 = h8_getreg16(h8, opcode & 0xf);
+			udata16 = h8_shll16(h8, udata16);
+			udata16 = h8_shll16(h8, udata16);
+			h8_setreg16(h8, opcode & 0xf, udata16);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0x7:
+			// shll.l #2, Rx
+			udata32 = h8_getreg32(h8, opcode & 0x7);
+			udata32 = h8_shll32(h8, udata32);
 			udata32 = h8_shll32(h8, udata32);
 			h8_setreg32(h8, opcode & 0x7, udata32);
 			H8_IFETCH_TIMING(1);
@@ -788,6 +1008,30 @@ static void h8_group1(h83xx_state *h8, UINT16 opcode)
 			// shlr.l rx
 		case 0x3:
 			udata32 = h8_getreg32(h8, opcode & 0x7);
+			udata32 = h8_shlr32(h8, udata32);
+			h8_setreg32(h8, opcode & 0x7, udata32);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0x4:
+			// shlr.b #2, rx
+			udata8 = h8_getreg8(h8, opcode & 0xf);
+			udata8 = h8_shlr8(h8, udata8);
+			udata8 = h8_shlr8(h8, udata8);
+			h8_setreg8(h8, opcode & 0xf, udata8);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0x5:
+			// shlr.w #2, rx
+			udata16 = h8_getreg16(h8, opcode & 0xf);
+			udata16 = h8_shlr16(h8, udata16);
+			udata16 = h8_shlr16(h8, udata16);
+			h8_setreg16(h8, opcode & 0xf, udata16);
+			H8_IFETCH_TIMING(1);
+			break;
+			// shlr.l #2, rx
+		case 0x7:
+			udata32 = h8_getreg32(h8, opcode & 0x7);
+			udata32 = h8_shlr32(h8, udata32);
 			udata32 = h8_shlr32(h8, udata32);
 			h8_setreg32(h8, opcode & 0x7, udata32);
 			H8_IFETCH_TIMING(1);
@@ -890,11 +1134,32 @@ static void h8_group1(h83xx_state *h8, UINT16 opcode)
 			h8_setreg16(h8, opcode & 0xf, udata16);
 			H8_IFETCH_TIMING(1);
 			break;
+		case 0x3:
+			// rotxr.l Rx
+			udata32 = h8_getreg32(h8, opcode & 0xf);
+			udata32 = h8_rotxr32(h8, udata32);
+			h8_setreg32(h8, opcode & 0xf, udata32);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0x8:
+			// rotr.b Rx
+			udata8 = h8_getreg8(h8, opcode & 0xf);
+			udata8 = h8_rotr8(h8, udata8);
+			h8_setreg8(h8, opcode & 0xf, udata8);
+			H8_IFETCH_TIMING(1);
+			break;
 		case 0x9:
 			// rotr.w Rx
 			udata16 = h8_getreg16(h8, opcode & 0xf);
 			udata16 = h8_rotr16(h8, udata16);
 			h8_setreg16(h8, opcode & 0xf, udata16);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0xb:
+			// rotr.l Rx
+			udata32 = h8_getreg32(h8, opcode & 0xf);
+			udata32 = h8_rotr32(h8, udata32);
+			h8_setreg32(h8, opcode & 0xf, udata32);
 			H8_IFETCH_TIMING(1);
 			break;
 		default:
@@ -1512,6 +1777,17 @@ static void h8_group6(h83xx_state *h8, UINT16 opcode)
 			h8_setreg8(h8, opcode & 0xf, udata8);
 			H8_IFETCH_TIMING(2);
 			H8_BYTE_TIMING(1, address24);
+			break;
+		case 0x3:	// bclr #x, @imm:24
+			address24=h8_mem_read32(h8, h8->pc);
+			h8->pc += 4;
+			udata16 = h8_mem_read16(h8, h8->pc);
+			h8->pc += 2;
+			udata8 = h8_mem_read8(address24);
+			udata8 = h8_bclr8(h8, (udata16>>4)&7, udata8);
+			h8_mem_write8(address24, udata8);
+			H8_IFETCH_TIMING(2);
+			H8_BYTE_TIMING(2, address24);
 			break;
 		case 0x8:
 			sdata16=h8_mem_read16(h8, h8->pc);
@@ -2839,6 +3115,32 @@ static UINT8 h8_rotxr8(h83xx_state *h8, UINT8 src)
 	return res;
 }
 
+static UINT8 h8_rotr8(h83xx_state *h8, UINT8 src)
+{
+	UINT8 res;
+
+	// rotate right, not through carry
+	res = src>>1;
+	if (src & 1) res |= 0x80; // put cflag in upper bit
+	h8->h8cflag = src & 1;
+
+	// N and Z modified
+	h8->h8nflag = (res>>7) & 1;
+	h8->h8vflag = 0;
+
+	// zflag
+	if(res==0)
+	{
+		h8->h8zflag = 1;
+	}
+	else
+	{
+		h8->h8zflag = 0;
+	}
+
+	return res;
+}
+
 static UINT16 h8_rotr16(h83xx_state *h8, UINT16 src)
 {
 	UINT16 res;
@@ -2865,6 +3167,32 @@ static UINT16 h8_rotr16(h83xx_state *h8, UINT16 src)
 	return res;
 }
 
+static UINT32 h8_rotr32(h83xx_state *h8, UINT32 src)
+{
+	UINT32 res;
+
+	// rotate right, not through carry
+	res = src>>1;
+	if (src & 1) res |= 0x80000000; // put cflag in upper bit
+	h8->h8cflag = src & 1;
+
+	// N and Z modified
+	h8->h8nflag = (res>>31) & 1;
+	h8->h8vflag = 0;
+
+	// zflag
+	if(res==0)
+	{
+		h8->h8zflag = 1;
+	}
+	else
+	{
+		h8->h8zflag = 0;
+	}
+
+	return res;
+}
+
 static UINT16 h8_rotxr16(h83xx_state *h8, UINT16 src)
 {
 	UINT16 res;
@@ -2876,6 +3204,32 @@ static UINT16 h8_rotxr16(h83xx_state *h8, UINT16 src)
 
 	// N and Z modified
 	h8->h8nflag = (res>>15) & 1;
+	h8->h8vflag = 0;
+
+	// zflag
+	if(res==0)
+	{
+		h8->h8zflag = 1;
+	}
+	else
+	{
+		h8->h8zflag = 0;
+	}
+
+	return res;
+}
+
+static UINT32 h8_rotxr32(h83xx_state *h8, UINT32 src)
+{
+	UINT32 res;
+
+	// rotate through carry right
+	res = src>>1;
+	if(h8->h8cflag)res |= 0x80000000; // put cflag in upper bit
+	h8->h8cflag = src & 1;
+
+	// N and Z modified
+	h8->h8nflag = (res>>31) & 1;
 	h8->h8vflag = 0;
 
 	// zflag
