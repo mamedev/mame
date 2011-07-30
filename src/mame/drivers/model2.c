@@ -3476,6 +3476,7 @@ ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C */
 	ROM_LOAD( "mpr-19505.34", 0x400000, 0x400000, CRC(eba7f41d) SHA1(f6e521bedf298808a768f6fdcb0b60b320a66d04) )
 ROM_END
 
+/* Sega Water Ski - There should be a version with program roms EPR-19965 & EPR-19966 (currently undumped) */
 ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19963a.15", 0x000000, 0x080000, CRC(89c9cb0d) SHA1(7f1f600222447effb28cf2d56193ea9f45fd0646) )
@@ -3572,6 +3573,7 @@ ROM_START( hotd ) /* House of the Dead, Model 2C */
 	ROM_LOAD("mpr-19722.34", 0x400000, 0x400000, CRC(a56fa539) SHA1(405a892bc368ba862ba71bda7525b421d6973c0e) )
 ROM_END
 
+/* Last Bronx - There should be a (USA?) version with program roms EPR-19059 & EPR-19060 (currently undumped) */
 ROM_START( lastbrnx ) /* Last Bronx Revision A (Export), Model 2B */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19061a.15", 0x000000, 0x080000, CRC(c0aebab2) SHA1(fa63081b0aa6f02c3d197485865ee38e9c78b43d) )
@@ -4088,6 +4090,7 @@ ROM_START( bel ) /* Behind Enemy Lines, Model 2C */
 	ROM_LOAD("mpr-20253.35",  0x0600000, 0x200000, CRC(ca6aa17c) SHA1(f6df2483ca75573449ba36638dbbed4be7843a44) )
 ROM_END
 
+/* Over Rev: There is known to be an undumped Model 2B version with EPR-19992 & EPR-19993 program roms */
 ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-20124a.15", 0x000000, 0x080000, CRC(74beb8d7) SHA1(c65c641138ecd7312c4930702d1498b8a346175a) )
