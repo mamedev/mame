@@ -174,12 +174,6 @@ static WRITE8_HANDLER( cliff_ldwire_w )
 
 /********************************************************/
 
-static INTERRUPT_GEN( cliff_vsync )
-{
-	/* clock the video chip every 60Hz */
-	TMS9928A_interrupt(device->machine());
-}
-
 static TIMER_CALLBACK( cliff_irq_callback )
 {
 	phillips_code = 0;
@@ -207,9 +201,9 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	irq_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
 }
 
-static void vdp_interrupt(running_machine &machine, int state)
+static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -237,13 +231,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mainport, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x44, 0x44) AM_WRITE(TMS9928A_vram_w)
-	AM_RANGE(0x45, 0x45) AM_READ(TMS9928A_vram_r)
+	AM_RANGE(0x44, 0x44) AM_DEVWRITE_MODERN("tms9928a", tms9928a_device, vram_write)
+	AM_RANGE(0x45, 0x45) AM_DEVREAD_MODERN("tms9928a", tms9928a_device, vram_read)
 	AM_RANGE(0x46, 0x46) AM_DEVWRITE("discrete", cliff_sound_overlay_w)
 	AM_RANGE(0x50, 0x52) AM_READ(cliff_phillips_code_r)
 	AM_RANGE(0x53, 0x53) AM_READ(cliff_irq_ack_r)
-	AM_RANGE(0x54, 0x54) AM_WRITE(TMS9928A_register_w)
-	AM_RANGE(0x55, 0x55) AM_READ(TMS9928A_register_r)
+	AM_RANGE(0x54, 0x54) AM_DEVWRITE_MODERN("tms9928a", tms9928a_device, register_write)
+	AM_RANGE(0x55, 0x55) AM_DEVREAD_MODERN("tms9928a", tms9928a_device, register_read)
 	AM_RANGE(0x57, 0x57) AM_WRITE(cliff_phillips_clear_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(cliff_port_bank_w)
 	AM_RANGE(0x62, 0x62) AM_READ(cliff_port_r)
@@ -667,13 +661,20 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(cliffhgr_tms9928a_interface)
 {
-	TMS99x8A,		/* TMS9128NL on the board */
+	"screen",
 	0x4000,
-	0,0,
-	vdp_interrupt
+	DEVCB_LINE(vdp_interrupt)
 };
+
+static SCREEN_UPDATE( cliffhgr )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
 
 DISCRETE_SOUND_EXTERN( cliffhgr );
 
@@ -690,7 +691,6 @@ static MACHINE_CONFIG_START( cliffhgr, driver_device )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmem)
 	MCFG_CPU_IO_MAP(mainport)
-	MCFG_CPU_VBLANK_INT("screen", cliff_vsync)
 
 	MCFG_MACHINE_START(cliffhgr)
 	MCFG_MACHINE_RESET(cliffhgr)
@@ -698,11 +698,11 @@ static MACHINE_CONFIG_START( cliffhgr, driver_device )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(tms9928a, 15+32*8+15, 27+24*8+24, BITMAP_FORMAT_INDEXED16)
-	MCFG_LASERDISC_OVERLAY_CLIP(15-12, 15+32*8+12-1, 27-9, 27+24*8+9-1)
+	MCFG_LASERDISC_OVERLAY(cliffhgr, 12+32*8+12, 12+24*8+12, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_OVERLAY_CLIP(TMS9928A_HORZ_DISPLAY_START-12, 12+32*8+12-1, TMS9928A_VERT_DISPLAY_START_NTSC - 12, 12+24*8+12-1)
 
 	/* start with the TMS9928a video configuration */
-	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9128, cliffhgr_tms9928a_interface )	/* TMS9128NL on the board */
 
 	/* override video rendering and raw screen info */
 	MCFG_DEVICE_REMOVE("screen")
@@ -773,7 +773,6 @@ ROM_END
 
 static DRIVER_INIT( cliff )
 {
-	TMS9928A_configure(&tms9928a_interface);
 }
 
 

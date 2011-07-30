@@ -45,8 +45,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_mem, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x98, 0x98) AM_READWRITE( TMS9928A_vram_r, TMS9928A_vram_w )
-	AM_RANGE(0x99, 0x99) AM_READWRITE( TMS9928A_register_r, TMS9928A_register_w )
+	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, vram_read, vram_write )
+	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, register_read, register_write )
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r)
 
@@ -93,39 +93,34 @@ static const ay8910_interface forte2_ay8910_interface =
 };
 
 
-static void vdp_interrupt(running_machine &machine, int i)
+static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 {
-	cputag_set_input_line(machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(forte2_tms9928a_interface)
 {
-	TMS99x8A,
+	"screen",
 	0x4000,
-	0, 0,
-	vdp_interrupt
+	DEVCB_LINE(vdp_interrupt)
 };
+
+static SCREEN_UPDATE( forte2 )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
 
 static MACHINE_START( forte2 )
 {
 	forte2_state *state = machine.driver_data<forte2_state>();
-	TMS9928A_configure(&tms9928a_interface);
 
 	state->m_input_mask = 0xff;
 
 	/* register for save states */
 	state_save_register_global(machine, state->m_input_mask);
-	machine.save().register_postload(save_prepost_delegate(FUNC(TMS9928A_post_load), &machine));
-}
-
-static MACHINE_RESET( forte2 )
-{
-	TMS9928A_reset();
-}
-
-static INTERRUPT_GEN( pesadelo_interrupt )
-{
-	TMS9928A_interrupt(device->machine());
 }
 
 
@@ -134,17 +129,13 @@ static MACHINE_CONFIG_START( pesadelo, forte2_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 Mhz */
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
-	MCFG_CPU_VBLANK_INT("screen",pesadelo_interrupt)
 
 	MCFG_MACHINE_START( forte2 )
-	MCFG_MACHINE_RESET( forte2 )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, forte2_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( forte2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

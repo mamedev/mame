@@ -140,8 +140,8 @@ static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8 )
     AM_RANGE(0xff04, 0xff04) AM_READ_PORT("DSW1")
     AM_RANGE(0xff06, 0xff06) AM_READ_PORT("DSW2")
     AM_RANGE(0xff08, 0xff08) AM_READ_PORT("DSW3")
-    AM_RANGE(0xff10, 0xff10) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
-    AM_RANGE(0xff12, 0xff12) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+    AM_RANGE(0xff10, 0xff10) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
+    AM_RANGE(0xff12, 0xff12) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
     AM_RANGE(0xff20, 0xff20) AM_DEVWRITE("sn76_1", sn76496_w)
     AM_RANGE(0xff30, 0xff30) AM_DEVWRITE("sn76_2", sn76496_w)
     AM_RANGE(0xff40, 0xff40) AM_WRITE(controls_w)
@@ -300,8 +300,6 @@ static MACHINE_RESET( pachifev )
 
 static INTERRUPT_GEN( pachifev_vblank_irq )
 {
-    TMS9928A_interrupt(device->machine());
-
     {
 		static const char *const inname[2] = { "PLUNGER_P1", "PLUNGER_P2" };
         pachifev_state *state = device->machine().driver_data<pachifev_state>();
@@ -332,27 +330,30 @@ static INTERRUPT_GEN( pachifev_vblank_irq )
 
 }
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(pachifev_tms9928a_interface)
 {
-    TMS99x8A,
+	"screen",
     0x4000,
-    0, 0,
-    0 /* no interrupt is generated */
+    DEVCB_NULL
 };
+
+static SCREEN_UPDATE( pachifev )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
 
 static MACHINE_START( pachifev)
 {
-    /* configure VDP */
-    TMS9928A_configure(&tms9928a_interface);
-    {
-        pachifev_state *state = machine.driver_data<pachifev_state>();
+	pachifev_state *state = machine.driver_data<pachifev_state>();
 
-        state->save_item(NAME(state->m_power));
-        state->save_item(NAME(state->m_max_power));
-        state->save_item(NAME(state->m_input_power));
-        state->save_item(NAME(state->m_previous_power));
-        state->save_item(NAME(state->m_cnt));
-    }
+	state->save_item(NAME(state->m_power));
+	state->save_item(NAME(state->m_max_power));
+	state->save_item(NAME(state->m_input_power));
+	state->save_item(NAME(state->m_previous_power));
+	state->save_item(NAME(state->m_cnt));
 }
 
 static const struct tms9995reset_param pachifev_processor_config =
@@ -373,11 +374,9 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
     MCFG_MACHINE_RESET(pachifev)
 
     /* video hardware */
-
-    MCFG_FRAGMENT_ADD(tms9928a)
-    MCFG_SCREEN_MODIFY("screen")
-    MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pachifev_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( pachifev )
 
     /* sound hardware */
     MCFG_SPEAKER_STANDARD_MONO("mono")

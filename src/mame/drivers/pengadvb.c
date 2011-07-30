@@ -172,8 +172,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_mem, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x98, 0x98) AM_READWRITE( TMS9928A_vram_r, TMS9928A_vram_w )
-	AM_RANGE(0x99, 0x99) AM_READWRITE( TMS9928A_register_r, TMS9928A_register_w )
+	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, vram_read, vram_write )
+	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, register_read, register_write )
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xa8, 0xab) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
@@ -237,29 +237,26 @@ static I8255A_INTERFACE(pengadvb_ppi8255_interface)
 	DEVCB_NULL
 };
 
-static void vdp_interrupt(running_machine &machine, int i)
+static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 {
-	cputag_set_input_line(machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(pengadvb_tms9928a_interface)
 {
-	TMS99x8A,
+	"screen",
 	0x4000,
-	0, 0,
-	vdp_interrupt
+	DEVCB_LINE(vdp_interrupt)
 };
 
 static void pengadvb_postload(running_machine &machine)
 {
-	TMS9928A_post_load(machine);
 	mem_map_banks(machine);
 }
 
 static MACHINE_START( pengadvb )
 {
 	pengadvb_state *state = machine.driver_data<pengadvb_state>();
-	TMS9928A_configure(&tms9928a_interface);
 
 	state_save_register_global_pointer(machine, state->m_main_mem, 0x4000);
 	state_save_register_global(machine, state->m_mem_map);
@@ -270,16 +267,18 @@ static MACHINE_START( pengadvb )
 static MACHINE_RESET( pengadvb )
 {
 	pengadvb_state *state = machine.driver_data<pengadvb_state>();
-	TMS9928A_reset();
 
 	state->m_mem_map = 0;
 	state->m_mem_banks[0] = state->m_mem_banks[1] = state->m_mem_banks[2] = state->m_mem_banks[3] = 0;
 	mem_map_banks(machine);
 }
 
-static INTERRUPT_GEN( pengadvb_interrupt )
+static SCREEN_UPDATE( pengadvb )
 {
-	TMS9928A_interrupt(device->machine());
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
 }
 
 
@@ -288,7 +287,6 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 Mhz */
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
-	MCFG_CPU_VBLANK_INT("screen",pengadvb_interrupt)
 
 	MCFG_MACHINE_START( pengadvb )
 	MCFG_MACHINE_RESET( pengadvb )
@@ -296,11 +294,9 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
     MCFG_I8255_ADD( "ppi8255", pengadvb_ppi8255_interface)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pengadvb_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( pengadvb )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

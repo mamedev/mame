@@ -228,8 +228,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mem_io, AS_IO, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ (rom_r)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(TMS9928A_vram_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(TMS9928A_register_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_MODERN("tms9128", tms9928a_device, vram_write)
+	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE_MODERN("tms9128", tms9928a_device, register_write)
 	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ay_re900", ay8910_address_data_w)
 	AM_RANGE(0xe802, 0xe802) AM_DEVREAD("ay_re900", ay8910_r)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(re900_watchdog_reset_w)
@@ -239,14 +239,9 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static INTERRUPT_GEN( re900_video_interrupt )
+static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 {
-	TMS9928A_interrupt(device->machine());
-}
-
-static void vdp_interrupt (running_machine &machine, int state)
-{
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -368,13 +363,20 @@ INPUT_PORTS_END
 *    TMS9928a Interfase    *
 ***************************/
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(re900_tms9928a_interface)
 {
-	TMS99x8A,		/* TMS9128NL on pcb */
+	"screen",
 	0x4000,
-	0, 0,
-	vdp_interrupt
+	DEVCB_LINE(vdp_interrupt)
 };
+
+static SCREEN_UPDATE( re900 )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9128" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
 
 
 /*************************
@@ -411,12 +413,11 @@ static MACHINE_CONFIG_START( re900, re900_state )
 	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
-	MCFG_CPU_VBLANK_INT("screen", re900_video_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_TMS9928A_ADD( "tms9128", TMS9128, re900_tms9928a_interface )	/* TMS9128NL on pcb */
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( re900 )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -458,7 +459,6 @@ ROM_END
 static DRIVER_INIT( re900 )
 {
 	re900_state *state = machine.driver_data<re900_state>();
-	TMS9928A_configure(&tms9928a_interface);
 	state->m_player = 1;
 	state->m_stat_a = 1;
 	state->m_psg_pa = state->m_psg_pb = state->m_mux_data = state->m_ledant = 0;

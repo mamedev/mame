@@ -143,8 +143,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76496_w)
-	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
@@ -234,22 +234,16 @@ static INPUT_PORTS_START( dokidoki )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( sg1000a_interrupt )
+static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 {
-	TMS9928A_interrupt(device->machine());
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, state);
 }
 
-static void vdp_interrupt(running_machine &machine, int state)
+static TMS9928A_INTERFACE(sg1000a_tms9928a_interface)
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, state);
-}
-
-static const TMS9928a_interface tms9928a_interface =
-{
-	TMS99x8A,
+	"screen",
 	0x4000,
-	0,0,
-	vdp_interrupt
+	DEVCB_LINE(vdp_interrupt)
 };
 
 static WRITE8_DEVICE_HANDLER( sg1000a_coin_counter_w )
@@ -267,6 +261,14 @@ static I8255_INTERFACE( ppi8255_intf )
 	DEVCB_HANDLER(sg1000a_coin_counter_w)
 };
 
+static SCREEN_UPDATE( sg1000a )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
+
 /*************************************
  *
  *  Machine drivers
@@ -278,16 +280,13 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", sg1000a_interrupt)
 
 	MCFG_I8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, sg1000a_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( sg1000a )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -331,7 +330,6 @@ ROM_END
 
 static DRIVER_INIT( sg1000a )
 {
-	TMS9928A_configure(&tms9928a_interface);
 }
 
 static DRIVER_INIT(chwrestl)

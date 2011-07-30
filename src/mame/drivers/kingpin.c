@@ -114,8 +114,8 @@ static ADDRESS_MAP_START( kingpin_io_map, AS_IO, 8 )
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
 /*  AM_RANGE(0x12, 0x12) AM_WRITE(NO IDEA) */
 /*  AM_RANGE(0x13, 0x13) AM_WRITE(NO IDEA) */
-	AM_RANGE(0x20, 0x20) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0x21, 0x21) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
 /*  AM_RANGE(0x30, 0x30) AM_WRITE(LIKELY LIGHTS) */
 /*  AM_RANGE(0x40, 0x40) AM_WRITE(LIKELY LIGHTS) */
 /*  AM_RANGE(0x50, 0x50) AM_WRITE(LIKELY LIGHTS) */
@@ -132,30 +132,31 @@ static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static INTERRUPT_GEN( kingpin_video_interrupt )
+static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 {
-	TMS9928A_interrupt(device->machine());
+	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
 }
 
-static void vdp_interrupt (running_machine &machine, int state)
+static TMS9928A_INTERFACE(kingpin_tms9928a_interface)
 {
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
-}
-
-static const TMS9928a_interface tms9928a_interface =
-{
-	TMS99x8A,
+	"screen",
 	0x4000,
-	0,0,
-	vdp_interrupt
+	DEVCB_LINE(vdp_interrupt)
 };
+
+static SCREEN_UPDATE( kingpin )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
 
 static MACHINE_CONFIG_START( kingpin, kingpin_state )
 /*  MAIN CPU */
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(kingpin_program_map)
 	MCFG_CPU_IO_MAP(kingpin_io_map)
-	MCFG_CPU_VBLANK_INT("screen", kingpin_video_interrupt)
 
 /*  SOUND CPU */
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
@@ -163,12 +164,9 @@ static MACHINE_CONFIG_START( kingpin, kingpin_state )
 	/*MCFG_CPU_IO_MAP(sound_io_map)*/
 
 /*  VIDEO */
-	MCFG_FRAGMENT_ADD(tms9928a)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, kingpin_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( kingpin )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -185,8 +183,6 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( kingpin )
 {
 	kingpin_state *state = machine.driver_data<kingpin_state>();
-
-	TMS9928A_configure(&tms9928a_interface);
 
 	/* Hacks to keep the emu a'runnin */
 	state->m_code_base = machine.region("maincpu")->base();

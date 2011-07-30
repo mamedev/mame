@@ -13,9 +13,6 @@
 ** Improved over the years by MESS and MAME teams.
 **
 ** Todo:
-** - Convert implementation to modern device.
-** - The screen image is rendered in `one go'. Modifications during
-**   screen build up are not shown.
 ** - Colours are incorrect. [fixed by R Nabet ?]
 ** - Sprites 8-31 are ghosted/cloned in mode 3 when using less than
 **   three pattern tables. Exact behaviour is not known.
@@ -23,6 +20,17 @@
 
 #include "emu.h"
 #include "tms9928a.h"
+#include "machine/devhelpr.h"
+
+
+const device_type TMS9928A = &device_creator<tms9928a_device>;
+const device_type TMS9918  = &device_creator<tms9918_device>;
+const device_type TMS9918A = &device_creator<tms9918a_device>;
+const device_type TMS9118  = &device_creator<tms9118_device>;
+const device_type TMS9128  = &device_creator<tms9128_device>;
+const device_type TMS9929  = &device_creator<tms9929_device>;
+const device_type TMS9929A = &device_creator<tms9929a_device>;
+const device_type TMS9129  = &device_creator<tms9129_device>;
 
 
 /*
@@ -53,7 +61,7 @@
     E Gray          0.80    0.47    0.47    0.80    0.80    0.80    204 204 204
     F White         1.00    0.47    0.47    1.00    1.00    1.00    255 255 255
 */
-static const rgb_t TMS9928A_palette[16] =
+static const rgb_t tms9928a_palette[16] =
 {
 	RGB_BLACK,
 	RGB_BLACK,
@@ -73,732 +81,578 @@ static const rgb_t TMS9928A_palette[16] =
 	RGB_WHITE
 };
 
-/*
-** Forward declarations of internal functions.
-*/
-static void draw_mode0 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode1 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode2 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode12 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_modebogus (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void change_register (running_machine &machine, int reg, UINT8 data);
-
-static void (*const ModeHandlers[])(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) = {
-        draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
-        draw_mode3, draw_modebogus, draw_mode23,
-        draw_modebogus
-};
-
-#define IMAGE_SIZE (256*192)        /* size of rendered image        */
-
-#define LEFT_BORDER			15		/* a bit less for 9918a??? */
-#define RIGHT_BORDER		15		/* 13 for 9929a */
-#define TOP_BORDER_60HZ		27
-#define BOTTOM_BORDER_60HZ	24
-#define TOP_BORDER_50HZ		51		/* unknown (102 for top+bottom?) */
-#define BOTTOM_BORDER_50HZ	51		/* unknown (102 for top+bottom?) */
-#define TOP_BORDER			tms.top_border
-#define BOTTOM_BORDER		tms.bottom_border
-
-#define TMS_50HZ ((tms.model == TMS9929) || (tms.model == TMS9929A))
-#define TMS_REVA ((tms.model == TMS99x8A) || (tms.model == TMS9929A))
-#define TMS_MODE ( (TMS_REVA ? (tms.Regs[0] & 2) : 0) | \
-	((tms.Regs[1] & 0x10)>>4) | ((tms.Regs[1] & 8)>>1))
-
-typedef struct {
-    /* TMS9928A internal settings */
-    UINT8 ReadAhead,Regs[8],StatusReg,FifthSprite,latch,INT;
-    INT32 Addr;
-    int colour,pattern,nametbl,spriteattribute,spritepattern;
-    int colourmask,patternmask;
-    void (*INTCallback)(running_machine &, int);
-    /* memory */
-    UINT8 *vMem, *dBackMem;
-    bitmap_t *tmpbmp;
-    int vramsize, model;
-    /* emulation settings */
-    int LimitSprites; /* max 4 sprites on a row, like original TMS9918A */
-    int top_border, bottom_border;
-    rectangle visarea;
-} TMS9928A;
-
-static TMS9928A tms;
 
 /*
 ** initialize the palette
 */
-static PALETTE_INIT( tms9928a )
+PALETTE_INIT( tms9928a )
 {
-	palette_set_colors(machine, 0, TMS9928A_palette, TMS9928A_PALETTE_SIZE);
+	palette_set_colors(machine, 0, tms9928a_palette, TMS9928A_PALETTE_SIZE);
 }
 
 
-/*
-** The init, reset and shutdown functions
-*/
-void TMS9928A_reset () {
-    int  i;
-
-    for (i=0;i<8;i++) tms.Regs[i] = 0;
-    tms.StatusReg = 0; tms.FifthSprite = 0;
-    tms.nametbl = tms.pattern = tms.colour = 0;
-    tms.spritepattern = tms.spriteattribute = 0;
-    tms.colourmask = tms.patternmask = 0;
-    tms.Addr = tms.ReadAhead = tms.INT = 0;
-	tms.latch = 0;
-}
-
-static void TMS9928A_start (running_machine &machine, const TMS9928a_interface *intf)
+tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva )
+	: device_t( mconfig, type, name, tag, owner, clock )
 {
-    assert_always(((intf->vram == 0x1000) || (intf->vram == 0x2000) || (intf->vram == 0x4000)), "4, 8 or 16 kB vram please");
-
-    tms.model = intf->model;
-
-	tms.top_border = TMS_50HZ ? TOP_BORDER_50HZ : TOP_BORDER_60HZ;
-	tms.bottom_border = TMS_50HZ ? BOTTOM_BORDER_50HZ : BOTTOM_BORDER_60HZ;
-
-	tms.INTCallback = intf->int_callback;
-
-	/* determine the visible area */
-	tms.visarea.min_x = LEFT_BORDER - MIN(intf->borderx, LEFT_BORDER);
-	tms.visarea.max_x = LEFT_BORDER + 32*8 - 1 + MIN(intf->borderx, RIGHT_BORDER);
-	tms.visarea.min_y = tms.top_border - MIN(intf->bordery, tms.top_border);
-	tms.visarea.max_y = tms.top_border + 24*8 - 1 + MIN(intf->bordery, tms.bottom_border);
-
-	/* configure the screen if we weren't overridden */
-	if (machine.primary_screen->width() == LEFT_BORDER+32*8+RIGHT_BORDER &&
-	    machine.primary_screen->height() == TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
-		machine.primary_screen->configure(LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, tms.visarea, machine.primary_screen->frame_period().attoseconds);
-
-    /* Video RAM */
-    tms.vramsize = intf->vram;
-    tms.vMem = auto_alloc_array_clear(machine, UINT8, intf->vram);
-
-    /* Sprite back buffer */
-    tms.dBackMem = auto_alloc_array(machine, UINT8, IMAGE_SIZE);
-
-    /* back bitmap */
-    tms.tmpbmp = auto_bitmap_alloc (machine, 256, 192, machine.primary_screen->format());
-
-    TMS9928A_reset ();
-    tms.LimitSprites = 1;
-
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[0]);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[1]);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[2]);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[3]);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[4]);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[5]);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[6]);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[7]);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.StatusReg);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.FifthSprite);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.ReadAhead);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.latch);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Addr);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.INT);
-	state_save_register_item_pointer(machine, "tms9928a", NULL, 0, tms.vMem, intf->vram);
+	m_50hz = is_50hz;
+	m_reva = is_reva;
 }
 
 
-void TMS9928A_post_load (running_machine &machine) {
-	int i;
-
-	/* all registers need to be re-written, so tables are recalculated */
-	for (i=0;i<8;i++)
-		change_register (machine, i, tms.Regs[i]);
-
-	/* make sure the interrupt request is set properly */
-	if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
+tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: device_t( mconfig, TMS9928A, "tms9928a", tag, owner, clock )
+{
+	m_50hz = false;
+	m_reva = true;
 }
 
 
-/*
-** The I/O functions.
-*/
-READ8_HANDLER (TMS9928A_vram_r) {
-    UINT8 ret = tms.ReadAhead;
-    tms.ReadAhead = tms.vMem[tms.Addr];
-    tms.Addr = (tms.Addr + 1) & (tms.vramsize - 1);
-    tms.latch = 0;
-    return ret;
+READ8_MEMBER( tms9928a_device::vram_read )
+{
+	UINT8 data = m_ReadAhead;
+
+	m_ReadAhead = m_vMem[ m_Addr ];
+	m_Addr = (m_Addr + 1) & (m_vram_size - 1);
+	m_latch = 0;
+
+	return data;
 }
 
-WRITE8_HANDLER (TMS9928A_vram_w) {
-    tms.vMem[tms.Addr] = data;
-    tms.Addr = (tms.Addr + 1) & (tms.vramsize - 1);
-    tms.ReadAhead = data;
-    tms.latch = 0;
+
+WRITE8_MEMBER( tms9928a_device::vram_write )
+{
+	m_vMem[ m_Addr ] = data;
+	m_Addr = (m_Addr + 1) & (m_vram_size - 1);
+	m_ReadAhead = data;
+	m_latch = 0;
 }
 
-READ8_HANDLER (TMS9928A_register_r) {
-    UINT8 ret = tms.StatusReg;
-    tms.StatusReg = tms.FifthSprite;
-    if (tms.INT) {
-        tms.INT = 0;
-        if (tms.INTCallback) tms.INTCallback (space->machine(), tms.INT);
-    }
-    tms.latch = 0;
-    return ret;
+
+READ8_MEMBER( tms9928a_device::register_read )
+{
+	UINT8 data = m_StatusReg;
+
+	m_StatusReg = m_FifthSprite;
+	if (m_INT) {
+		m_INT = 0;
+		if ( !m_irq_changed.isnull() )
+			m_irq_changed( m_INT );
+	}
+	m_latch = 0;
+
+	return data;
 }
 
-WRITE8_HANDLER (TMS9928A_register_w) {
-	int reg;
 
-	if (tms.latch) {
+void tms9928a_device::change_register(UINT8 reg, UINT8 val) {
+	static const UINT8 Mask[8] =
+		{ 0x03, 0xfb, 0x0f, 0xff, 0x07, 0x7f, 0x07, 0xff };
+	static const char *const modes[] =
+	{
+		"Mode 0 (GRAPHIC 1)", "Mode 1 (TEXT 1)", "Mode 2 (GRAPHIC 2)",
+		"Mode 1+2 (TEXT 1 variation)", "Mode 3 (MULTICOLOR)",
+		"Mode 1+3 (BOGUS)", "Mode 2+3 (MULTICOLOR variation)",
+		"Mode 1+2+3 (BOGUS)"
+	};
+	UINT8 b;
+
+	val &= Mask[reg];
+	m_Regs[reg] = val;
+
+	logerror("TMS9928A('%s'): Reg %d = %02xh\n", tag(), reg, (int)val);
+
+	switch (reg)
+	{
+	case 0:
+		/* re-calculate masks and pattern generator & colour */
+		if (val & 2)
+		{
+			m_colour = ((m_Regs[3] & 0x80) * 64) & (m_vram_size - 1);
+			m_colourmask = (m_Regs[3] & 0x7f) * 8 | 7;
+			m_pattern = ((m_Regs[4] & 4) * 2048) & (m_vram_size - 1);
+			m_patternmask = ( (m_Regs[4] & 3) << 8 ) | (m_colourmask & 0xff);
+		}
+		else
+		{
+			m_colour = (m_Regs[3] * 64) & (m_vram_size - 1);
+			m_pattern = (m_Regs[4] * 2048) & (m_vram_size - 1);
+		}
+		m_mode = ( (m_reva ? (m_Regs[0] & 2) : 0) | ((m_Regs[1] & 0x10)>>4) | ((m_Regs[1] & 8)>>1));
+		logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
+		break;
+	case 1:
+		/* check for changes in the INT line */
+		b = (val & 0x20) && (m_StatusReg & 0x80) ;
+		if (b != m_INT)
+		{
+			m_INT = b;
+			if ( !m_irq_changed.isnull() )
+				m_irq_changed( m_INT );
+		}
+		m_mode = ( (m_reva ? (m_Regs[0] & 2) : 0) | ((m_Regs[1] & 0x10)>>4) | ((m_Regs[1] & 8)>>1));
+		logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
+		break;
+	case 2:
+		m_nametbl = (val * 1024) & (m_vram_size - 1);
+		break;
+	case 3:
+		if (m_Regs[0] & 2)
+		{
+			m_colour = ((val & 0x80) * 64) & (m_vram_size - 1);
+			m_colourmask = ( (val & 0x7f) * 8 ) | 7;
+		}
+		else
+		{
+			m_colour = (val * 64) & (m_vram_size - 1);
+		}
+		m_patternmask = ( (m_Regs[4] & 3) * 256 ) | (m_colourmask & 255);
+		break;
+	case 4:
+		if (m_Regs[0] & 2)
+		{
+			m_pattern = ((val & 4) * 2048) & (m_vram_size - 1);
+			m_patternmask = ( (val & 3) * 256 ) | 255;
+		}
+		else
+		{
+			m_pattern = (val * 2048) & (m_vram_size - 1);
+		}
+		break;
+	case 5:
+		m_spriteattribute = (val * 128) & (m_vram_size - 1);
+		break;
+	case 6:
+		m_spritepattern = (val * 2048) & (m_vram_size - 1);
+		break;
+	case 7:
+		/* The backdrop is updated at TMS9928A_refresh() */
+		break;
+	}
+}
+
+
+WRITE8_MEMBER( tms9928a_device::register_write )
+{
+	if (m_latch) {
 		/* set high part of read/write address */
-		tms.Addr = ((UINT16)data << 8 | (tms.Addr & 0xff)) & (tms.vramsize - 1);
+		m_Addr = ((data << 8) | (m_Addr & 0xff)) & (m_vram_size - 1);
 
 		if (data & 0x80) {
 			/* register write */
-			reg = data & 7;
-			change_register (space->machine(), reg, tms.Addr & 0xff);
+			change_register (data & 7, m_Addr & 0xff);
 		} else {
 			if ( !(data & 0x40) ) {
 				/* read ahead */
-				TMS9928A_vram_r	(space,0);
+				vram_read(space, 0);
 			}
 		}
-		tms.latch = 0;
+		m_latch = 0;
 	} else {
 		/* set low part of read/write address */
-		tms.Addr = ((tms.Addr & 0xff00) | data) & (tms.vramsize - 1);
-		tms.latch = 1;
+		m_Addr = ((m_Addr & 0xff00) | data) & (m_vram_size - 1);
+		m_latch = 1;
 	}
 }
 
-static void change_register (running_machine &machine, int reg, UINT8 val) {
-    static const UINT8 Mask[8] =
-        { 0x03, 0xfb, 0x0f, 0xff, 0x07, 0x7f, 0x07, 0xff };
-    static const char *const modes[] = {
-        "Mode 0 (GRAPHIC 1)", "Mode 1 (TEXT 1)", "Mode 2 (GRAPHIC 2)",
-        "Mode 1+2 (TEXT 1 variation)", "Mode 3 (MULTICOLOR)",
-        "Mode 1+3 (BOGUS)", "Mode 2+3 (MULTICOLOR variation)",
-        "Mode 1+2+3 (BOGUS)"
-    };
-    UINT8 b;
 
-    val &= Mask[reg];
-    tms.Regs[reg] = val;
-
-    logerror("TMS9928A: Reg %d = %02xh\n", reg, (int)val);
-    switch (reg) {
-    case 0:
-		/* re-calculate masks and pattern generator & colour */
-		if (val & 2) {
-			tms.colour = ((tms.Regs[3] & 0x80) * 64) & (tms.vramsize - 1);
-			tms.colourmask = (tms.Regs[3] & 0x7f) * 8 | 7;
-			tms.pattern = ((tms.Regs[4] & 4) * 2048) & (tms.vramsize - 1);
-			tms.patternmask = (tms.Regs[4] & 3) * 256 |
-				(tms.colourmask & 255);
-		} else {
-			tms.colour = (tms.Regs[3] * 64) & (tms.vramsize - 1);
-			tms.pattern = (tms.Regs[4] * 2048) & (tms.vramsize - 1);
-		}
-        logerror("TMS9928A: %s\n", modes[TMS_MODE]);
-        break;
-    case 1:
-        /* check for changes in the INT line */
-        b = (val & 0x20) && (tms.StatusReg & 0x80) ;
-        if (b != tms.INT) {
-            tms.INT = b;
-            if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
-        }
-        logerror("TMS9928A: %s\n", modes[TMS_MODE]);
-        break;
-    case 2:
-        tms.nametbl = (val * 1024) & (tms.vramsize - 1);
-        break;
-    case 3:
-        if (tms.Regs[0] & 2) {
-            tms.colour = ((val & 0x80) * 64) & (tms.vramsize - 1);
-            tms.colourmask = (val & 0x7f) * 8 | 7;
-        } else {
-            tms.colour = (val * 64) & (tms.vramsize - 1);
-        }
-		tms.patternmask = (tms.Regs[4] & 3) * 256 | (tms.colourmask & 255);
-        break;
-    case 4:
-        if (tms.Regs[0] & 2) {
-            tms.pattern = ((val & 4) * 2048) & (tms.vramsize - 1);
-            tms.patternmask = (val & 3) * 256 | 255;
-        } else {
-            tms.pattern = (val * 2048) & (tms.vramsize - 1);
-        }
-        break;
-    case 5:
-        tms.spriteattribute = (val * 128) & (tms.vramsize - 1);
-        break;
-    case 6:
-        tms.spritepattern = (val * 2048) & (tms.vramsize - 1);
-        break;
-    case 7:
-        /* The backdrop is updated at TMS9928A_refresh() */
-        break;
-    }
-}
-
-/*
-** Interface functions
-*/
-
-void TMS9928A_set_spriteslimit (int limit) {
-    tms.LimitSprites = limit;
-}
-
-/*
-** Updates the screen (the dMem memory area).
-*/
-SCREEN_UPDATE( tms9928a )
+void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-    INT32 BackColour = tms.Regs[7] & 15;
-    rgb_t oldcolor = palette_get_color(screen->machine(), 0);
+	int vpos = m_screen->vpos();
+	UINT16 BackColour = m_Regs[7] & 15;
+	UINT16 *p = BITMAP_ADDR16( m_tmpbmp, vpos, 0 );
 
-	if (!BackColour) BackColour=1;
-	/* note we preserve the alpha here; this is so that it can be controlled independently */
-	/* see cliffhgr.c for an example */
-    palette_set_color(screen->machine(), 0, (TMS9928A_palette[BackColour] & MAKE_ARGB(0,255,255,255)) | (oldcolor & MAKE_ARGB(255,0,0,0)));
+	if (!BackColour)
+		BackColour=1;
 
-	if (! (tms.Regs[1] & 0x40))
-		bitmap_fill(bitmap, cliprect, screen->machine().pens[BackColour]);
+	if ( vpos == 0 )
+	{
+		rgb_t oldcolor = palette_get_color(machine(), 0);
+
+		/* note we preserve the alpha here; this is so that it can be controlled independently */
+		/* see cliffhgr.c for an example */
+		palette_set_color(machine(), 0, (tms9928a_palette[BackColour] & MAKE_ARGB(0,255,255,255)) | (oldcolor & MAKE_ARGB(255,0,0,0)));
+	}
+
+	int y = vpos - m_top_border;
+
+	if ( y < 0 || y >= 192 || ! (m_Regs[1] & 0x40) )
+	{
+		/* Draw backdrop colour */
+		for ( int i = 0; i < TMS9928A_TOTAL_HORZ; i++ )
+			p[i] = BackColour;
+
+		/* Check for end of active display */
+		if ( y == 192 )
+		{
+			UINT8 b;
+
+			m_StatusReg |= 0x80;
+			b = (m_Regs[1] & 0x20) != 0;
+			if (b != m_INT) {
+				m_INT = b;
+				if ( !m_irq_changed.isnull() )
+					m_irq_changed( m_INT );
+			}
+		}
+	}
 	else
 	{
-		(*ModeHandlers[TMS_MODE])(screen, tms.tmpbmp, cliprect);
+		/* Draw regular line */
 
-		copybitmap(bitmap, tms.tmpbmp, 0, 0, LEFT_BORDER, TOP_BORDER, cliprect);
+		/* Left border */
+		for ( int i = 0; i < TMS9928A_HORZ_DISPLAY_START; i++ )
+			p[i] = BackColour;
+
+		/* Active display */
+
+		switch( m_mode )
 		{
-			rectangle rt;
+		case 0:				/* MODE 0 */
+			// if (vpos==100 ) popmessage("TMS9928A MODE 0");
+			{
+				UINT16 addr = m_nametbl + ( ( y & 0xF8 ) << 2 );
 
-			/* set borders */
-			rt.min_x = 0; rt.max_x = LEFT_BORDER+256+RIGHT_BORDER-1;
-			rt.min_y = 0; rt.max_y = TOP_BORDER-1;
-			bitmap_fill (bitmap, &rt, BackColour);
-			rt.min_y = TOP_BORDER+192; rt.max_y = TOP_BORDER+192+BOTTOM_BORDER-1;
-			bitmap_fill (bitmap, &rt, BackColour);
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
+				{
+					UINT8 charcode = m_vMem[ addr ];
+					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
+					UINT8 colour = m_vMem[ m_colour + ( charcode >> 3 ) ];
+					UINT16 fg = colour >> 4;
+					UINT16 bg = colour & 15;
 
-			rt.min_y = TOP_BORDER; rt.max_y = TOP_BORDER+192-1;
-			rt.min_x = 0; rt.max_x = LEFT_BORDER-1;
-			bitmap_fill (bitmap, &rt, BackColour);
-			rt.min_x = LEFT_BORDER+256; rt.max_x = LEFT_BORDER+256+RIGHT_BORDER-1;
-			bitmap_fill (bitmap, &rt, BackColour);
+					for ( int i = 0; i < 8; pattern <<= 1, i++ )
+						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
+				}
+			}
+			break;
+
+		case 1:				/* MODE 1 */
+			//if (vpos==100 ) popmessage("TMS9928A MODE 1");
+			{
+				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
+				UINT16 fg = m_Regs[7] >> 4;
+				UINT16 bg = m_Regs[7] & 15;
+
+				/* Extra 8 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+					p[x] = bg;
+
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6, addr++ )
+				{
+					UINT16 charcode = m_vMem[ addr ];
+					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
+
+					for ( int i = 0; i < 6; pattern <<= 1, i++ )
+						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
+				}
+
+				/* Extra 8 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+					p[x] = bg;
+			}
+			break;
+
+		case 2:				/* MODE 2 */
+			//if (vpos==100 ) popmessage("TMS9928A MODE 2");
+			{
+				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 32 );
+
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
+				{
+					UINT16 charcode = m_vMem[ addr ] + ( ( y >> 6 ) << 8 );
+					UINT8 pattern = m_vMem[ m_pattern + ( ( charcode & m_patternmask ) << 3 ) + ( y & 7 ) ];
+					UINT8 colour = m_vMem[ m_colour + ( ( charcode & m_colourmask ) << 3 ) + ( y & 7 ) ];
+					UINT16 fg = colour >> 4;
+					UINT16 bg = colour & 15;
+
+					for ( int i = 0; i < 8; pattern <<= 1, i++ )
+						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
+				}
+			}
+			break;
+
+		case 3:				/* MODE 1+2 */
+			//if (vpos==100) popmessage("TMS9928A MODE1+2");
+			{
+				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
+				UINT16 fg = m_Regs[7] >> 4;
+				UINT16 bg = m_Regs[7] & 15;
+
+				/* Extra 8 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+					p[x] = bg;
+
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6, addr++ )
+				{
+					UINT16 charcode = ( m_vMem[ addr ] + ( ( y >> 6 ) << 8 ) ) & m_patternmask;
+					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
+
+					for ( int i = 0; i < 6; pattern <<= 1, i++ )
+						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
+				}
+
+				/* Extra 8 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+					p[x] = bg;
+			}
+			break;
+
+		case 4:				/* MODE 3 */
+			//if (vpos==100 ) popmessage("TMS9928A MODE 3");
+			{
+				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 32 );
+
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
+				{
+					UINT8 charcode = m_vMem[ addr ];
+					UINT8 colour = m_vMem[ m_pattern + ( charcode << 3 ) + ( ( y >> 2 ) & 7 ) ];
+					UINT16 fg = colour >> 4;
+					UINT16 bg = colour & 15;
+
+					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
+					p[x+4] = p[x+5] = p[x+6] = p[x+7] = bg;
+				}
+			}
+			break;
+
+		case 5:	case 7:		/* MODE bogus */
+			//if (vpos==100 ) popmessage("TMS9928A MODE bogus");
+			{
+				UINT16 fg = m_Regs[7] >> 4;
+				UINT16 bg = m_Regs[7] & 15;
+
+				/* Extra 8 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+					p[x] = bg;
+
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6 )
+				{
+					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
+					p[x+4] = p[x+5] = bg;
+				}
+
+				/* Extra 8 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+					p[x] = bg;
+			}
+			break;
+
+		case 6:				/* MODE 2+3 */
+			//if (vpos==100 ) popmessage("TMS9928A MODE 2+3");
+			{
+				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 32 );
+
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
+				{
+					UINT8 charcode = m_vMem[ addr ];
+					UINT8 colour = m_vMem[ m_pattern + ( ( ( charcode + ( ( y >> 2 ) & 7 ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask ) << 3 ) ];
+					UINT16 fg = colour >> 4;
+					UINT16 bg = colour & 15;
+
+					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
+					p[x+4] = p[x+5] = p[x+6] = p[x+7] = bg;
+				}
+			}
+			break;
 		}
-		draw_sprites(screen, bitmap, cliprect);
+
+		/* Draw sprites */
+		if ( ( m_Regs[1] & 0x50 ) != 0x40 )
+		{
+			/* sprites are disabled */
+			m_FifthSprite = 31;
+		}
+		else
+		{
+			UINT8 sprite_size = ( m_Regs[1] & 0x02 ) ? 16 : 8;
+			UINT8 sprite_mag = m_Regs[1] & 0x01;
+			UINT8 sprite_height = sprite_size * ( sprite_mag + 1 );
+			UINT8 spr_drawn[32+256+32] = { 0 };
+			UINT8 num_sprites = 0;
+
+			for ( UINT16 sprattr = 0; sprattr < 128; sprattr += 4 )
+			{
+				int spr_y = m_vMem[ m_spriteattribute + sprattr + 0 ];
+
+				/* Stop processing sprites */
+				if ( spr_y == 208 )
+					break;
+
+				if ( spr_y > 0xE0 )
+					spr_y -= 256;
+
+				/* vert pos 255 is displayed on the first line of the screen */
+				spr_y++;
+
+				/* is sprite enabled on this line? */
+				if ( spr_y <= y && y < spr_y + sprite_height )
+				{
+					int spr_x = m_vMem[ m_spriteattribute + sprattr + 1 ];
+					UINT8 sprcode = m_vMem[ m_spriteattribute + sprattr + 2 ];
+					UINT8 sprcol = m_vMem[ m_spriteattribute + sprattr + 3 ];
+					UINT16 pataddr = m_spritepattern + ( ( sprite_size == 16 ) ? sprcode & ~0x03 : sprcode ) * 8;
+
+					num_sprites++;
+
+					/* Fifth sprite encountered? */
+					if( num_sprites == 5 )
+					{
+						m_FifthSprite = sprattr / 4;
+
+						if (~m_StatusReg & 0x40)
+						{
+							m_StatusReg |= m_FifthSprite;
+							if (~m_StatusReg & 0x80) m_StatusReg |= 0x40;
+						}
+					}
+
+					if ( sprite_mag )
+						pataddr += ( ( ( y - spr_y ) & 0x1F ) >> 1 );
+					else
+						pataddr += ( ( y - spr_y ) & 0x0F );
+
+					UINT8 pattern = m_vMem[ pataddr ];
+
+					if ( sprcol & 0x80 )
+						spr_x -= 32;
+
+					sprcol &= 0x0f;
+
+					for ( int s = 0; s < sprite_size; s += 8 )
+					{
+						for ( int i = 0; i < 8; pattern <<= 1, i++ )
+						{
+							int colission_index = spr_x + ( sprite_mag ? i * 2 : i ) + 32;
+
+							for ( int z = 0; z <= sprite_mag; colission_index++, z++ )
+							{
+								/* Check for colission */
+								if ( spr_drawn[ colission_index ] )
+									m_StatusReg |= 0x20;
+								spr_drawn[ colission_index ] |= 0x01;
+
+								/* Check if pixel should be drawn */
+								if ( ( pattern & 0x80 ) && sprcol && num_sprites < 5 )
+								{
+									if ( colission_index >= 32 && colission_index < 32 + 256 )
+									{
+										/* Has another sprite already drawn here? */
+										if ( ! ( spr_drawn[ colission_index ] & 0x02 ) )
+										{
+											spr_drawn[ colission_index ] |= 0x02;
+											p[ TMS9928A_HORZ_DISPLAY_START + colission_index - 32 ] = sprcol;
+										}
+									}
+								}
+							}
+						}
+
+						pattern = m_vMem[ pataddr + 16 ];
+						spr_x += sprite_mag ? 16 : 8;
+					}
+				}
+			}
+		}
+
+		/* Right border */
+		for ( int i = TMS9928A_HORZ_DISPLAY_START + 256; i < TMS9928A_TOTAL_HORZ; i++ )
+			p[i] = BackColour;
 	}
 
-	return 0;
+	/* Schedule next callback */
+	m_line_timer->adjust( m_screen->time_until_pos( ( vpos + 1 ) % m_screen->height() , 0 ) );
 }
 
-int TMS9928A_interrupt(running_machine &machine) {
-    int b;
 
-    /* when skipping frames, calculate sprite collision */
-    if (machine.video().skip_this_frame()) {
-		draw_sprites (machine.primary_screen, NULL, NULL);
-    }
-
-    tms.StatusReg |= 0x80;
-    b = (tms.Regs[1] & 0x20) != 0;
-    if (b != tms.INT) {
-        tms.INT = b;
-        if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
-    }
-
-    return b;
-}
-
-static void draw_mode1 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
-    int pattern,x,y,yy,xx,name,charcode;
-    UINT8 fg,bg,*patternptr;
-    rectangle rt;
-    const pen_t *pens;
-
-    pens = screen->machine().pens;
-    fg = pens[tms.Regs[7] / 16];
-    bg = pens[tms.Regs[7] & 15];
-
-	/* colours at sides must be reset */
-	rt.min_y = 0; rt.max_y = 191;
-	rt.min_x = 0; rt.max_x = 7;
-	bitmap_fill (bitmap, &rt, bg);
-	rt.min_y = 0; rt.max_y = 191;
-	rt.min_x = 248; rt.max_x = 255;
-	bitmap_fill (bitmap, &rt, bg);
-
-    name = 0;
-    for (y=0;y<24;y++) {
-        for (x=0;x<40;x++) {
-            charcode = tms.vMem[tms.nametbl+name];
-            name++;
-            patternptr = tms.vMem + tms.pattern + (charcode*8);
-            for (yy=0;yy<8;yy++) {
-                pattern = *patternptr++;
-                for (xx=0;xx<6;xx++) {
-					*BITMAP_ADDR16(bitmap, y*8+yy, 8+x*6+xx) = (pattern & 0x80) ? fg : bg;
-                    pattern *= 2;
-                }
-            }
-        }
-    }
-}
-
-static void draw_mode12 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
-    int pattern,x,y,yy,xx,name,charcode;
-    UINT8 fg,bg,*patternptr;
-    const pen_t *pens;
-    rectangle rt;
-
-    pens = screen->machine().pens;
-    fg = pens[tms.Regs[7] / 16];
-    bg = pens[tms.Regs[7] & 15];
-
-	/* colours at sides must be reset */
-	rt.min_y = 0; rt.max_y = 191;
-	rt.min_x = 0; rt.max_x = 7;
-	bitmap_fill (bitmap, &rt, bg);
-	rt.min_y = 0; rt.max_y = 191;
-	rt.min_x = 248; rt.max_x = 255;
-	bitmap_fill (bitmap, &rt, bg);
-
-    name = 0;
-    for (y=0;y<24;y++) {
-        for (x=0;x<40;x++) {
-            charcode = (tms.vMem[tms.nametbl+name]+(y/8)*256)&tms.patternmask;
-            name++;
-            patternptr = tms.vMem + tms.pattern + (charcode*8);
-            for (yy=0;yy<8;yy++) {
-                pattern = *patternptr++;
-                for (xx=0;xx<6;xx++) {
-					*BITMAP_ADDR16(bitmap, y*8+yy, 8+x*6+xx) = (pattern & 0x80) ? fg : bg;
-                    pattern *= 2;
-                }
-            }
-        }
-    }
-}
-
-static void draw_mode0 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
-    int pattern,x,y,yy,xx,name,charcode,colour;
-    UINT8 fg,bg,*patternptr;
-    const pen_t *pens;
-
-    pens = screen->machine().pens;
-    name = 0;
-    for (y=0;y<24;y++) {
-        for (x=0;x<32;x++) {
-            charcode = tms.vMem[tms.nametbl+name];
-            name++;
-            patternptr = tms.vMem + tms.pattern + charcode*8;
-            colour = tms.vMem[tms.colour+charcode/8];
-            fg = pens[colour / 16];
-            bg = pens[colour & 15];
-            for (yy=0;yy<8;yy++) {
-                pattern=*patternptr++;
-                for (xx=0;xx<8;xx++) {
-					*BITMAP_ADDR16(bitmap, y*8+yy, x*8+xx) = (pattern & 0x80) ? fg : bg;
-                    pattern *= 2;
-                }
-            }
-        }
-    }
-}
-
-static void draw_mode2 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
-    int colour,name,x,y,yy,pattern,xx,charcode;
-    UINT8 fg,bg;
-    const pen_t *pens;
-    UINT8 *colourptr,*patternptr;
-
-    pens = screen->machine().pens;
-    name = 0;
-    for (y=0;y<24;y++) {
-        for (x=0;x<32;x++) {
-            charcode = tms.vMem[tms.nametbl+name]+(y/8)*256;
-            name++;
-            colour = (charcode&tms.colourmask);
-            pattern = (charcode&tms.patternmask);
-            patternptr = tms.vMem+tms.pattern+colour*8;
-            colourptr = tms.vMem+tms.colour+pattern*8;
-            for (yy=0;yy<8;yy++) {
-                pattern = *patternptr++;
-                colour = *colourptr++;
-                fg = pens[colour / 16];
-                bg = pens[colour & 15];
-                for (xx=0;xx<8;xx++) {
-					*BITMAP_ADDR16(bitmap, y*8+yy, x*8+xx) = (pattern & 0x80) ? fg : bg;
-                    pattern *= 2;
-                }
-            }
-        }
-    }
-}
-
-static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
-    int x,y,yy,yyy,name,charcode;
-    UINT8 fg,bg,*patternptr;
-    const pen_t *pens;
-
-    pens = screen->machine().pens;
-    name = 0;
-    for (y=0;y<24;y++) {
-        for (x=0;x<32;x++) {
-            charcode = tms.vMem[tms.nametbl+name];
-            name++;
-            patternptr = tms.vMem+tms.pattern+charcode*8+(y&3)*2;
-            for (yy=0;yy<2;yy++) {
-                fg = pens[(*patternptr / 16)];
-                bg = pens[((*patternptr++) & 15)];
-                for (yyy=0;yyy<4;yyy++) {
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+0) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+1) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+2) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+3) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+4) = bg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+5) = bg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+6) = bg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+7) = bg;
-                }
-            }
-        }
-    }
-}
-
-static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
-    int x,y,yy,yyy,name,charcode;
-    UINT8 fg,bg,*patternptr;
-    const pen_t *pens;
-
-    pens = screen->machine().pens;
-    name = 0;
-    for (y=0;y<24;y++) {
-        for (x=0;x<32;x++) {
-            charcode = tms.vMem[tms.nametbl+name];
-            name++;
-            patternptr = tms.vMem + tms.pattern +
-                ((charcode+(y&3)*2+(y/8)*256)&tms.patternmask)*8;
-            for (yy=0;yy<2;yy++) {
-                fg = pens[(*patternptr / 16)];
-                bg = pens[((*patternptr++) & 15)];
-                for (yyy=0;yyy<4;yyy++) {
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+0) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+1) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+2) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+3) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+4) = bg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+5) = bg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+6) = bg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+7) = bg;
-                }
-            }
-        }
-    }
-}
-
-static void draw_modebogus (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
-    UINT8 fg,bg;
-    int x,y,n,xx;
-    const pen_t *pens;
-
-    pens = screen->machine().pens;
-    fg = pens[tms.Regs[7] / 16];
-    bg = pens[tms.Regs[7] & 15];
-
-    for (y=0;y<192;y++) {
-        xx=0;
-        n=8; while (n--) *BITMAP_ADDR16(bitmap, y, xx++) = bg;
-        for (x=0;x<40;x++) {
-            n=4; while (n--) *BITMAP_ADDR16(bitmap, y, xx++) = fg;
-            n=2; while (n--) *BITMAP_ADDR16(bitmap, y, xx++) = bg;
-        }
-        n=8; while (n--) *BITMAP_ADDR16(bitmap, y, xx++) = bg;
-    }
-}
-
-/*
-** This function renders the sprites. Sprite collision is calculated in
-** in a back buffer (tms.dBackMem), because sprite collision detection
-** is rather complicated (transparent sprites also cause the sprite
-** collision bit to be set, and ``illegal'' sprites do not count
-** (they're not displayed)).
-**
-** This code should be optimized. One day.
-*/
-static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
-    UINT8 *attributeptr,*patternptr,c;
-    int p,x,y,size,i,j,large,yy,xx,limit[192],
-        illegalsprite,illegalspriteline;
-    UINT16 line,line2;
-    const pen_t *pens;
-
-    if ((tms.Regs[1] & 0x50) != 0x40) {
-        /* sprites are disabled */
-        tms.FifthSprite = 31;
-        return;
-    }
-
-    pens = screen->machine().pens;
-    attributeptr = tms.vMem + tms.spriteattribute;
-    size = (tms.Regs[1] & 2) ? 16 : 8;
-    large = (int)(tms.Regs[1] & 1);
-
-    for (x=0;x<192;x++) limit[x] = 4;
-    tms.StatusReg &= ~0x20; /* reset collision */
-    illegalspriteline = 255;
-    illegalsprite = 0;
-
-    memset (tms.dBackMem, 0, IMAGE_SIZE);
-    for (p=0;p<32;p++) {
-        y = *attributeptr++;
-        if (y == 208) break;
-        if (y > 208) {
-            y=-(~y&255);
-        } else {
-            y++;
-        }
-        x = *attributeptr++;
-        patternptr = tms.vMem + tms.spritepattern +
-            ((size == 16) ? *attributeptr & 0xfc : *attributeptr) * 8;
-        attributeptr++;
-        c = (*attributeptr & 0x0f);
-        if (*attributeptr & 0x80) x -= 32;
-        attributeptr++;
-
-        if (!large) {
-            /* draw sprite (not enlarged) */
-            for (yy=y;yy<(y+size);yy++) {
-                if ( (yy < 0) || (yy > 191) ) continue;
-                if (limit[yy] == 0) {
-                    /* illegal sprite line */
-                    if (yy < illegalspriteline) {
-                        illegalspriteline = yy;
-                        illegalsprite = p;
-                    } else if (illegalspriteline == yy) {
-                        if (illegalsprite > p) {
-                            illegalsprite = p;
-                        }
-                    }
-                    if (tms.LimitSprites) continue;
-                } else limit[yy]--;
-                line = 256*patternptr[yy-y] + patternptr[yy-y+16];
-                for (xx=x;xx<(x+size);xx++) {
-                    if (line & 0x8000) {
-                        if ((xx >= 0) && (xx < 256)) {
-                            if (tms.dBackMem[yy*256+xx]) {
-                                tms.StatusReg |= 0x20;
-                            } else {
-                                tms.dBackMem[yy*256+xx] = 0x01;
-                            }
-                            if (c && ! (tms.dBackMem[yy*256+xx] & 0x02))
-                            {
-                                tms.dBackMem[yy*256+xx] |= 0x02;
-                                if (bitmap)
-                                    *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = pens[c];
-                            }
-                        }
-                    }
-                    line *= 2;
-                }
-            }
-        } else {
-            /* draw enlarged sprite */
-            for (i=0;i<size;i++) {
-                yy=y+i*2;
-                line2 = 256*patternptr[i] + patternptr[i+16];
-                for (j=0;j<2;j++) {
-                    if ( (yy >= 0) && (yy <= 191) ) {
-                        if (limit[yy] == 0) {
-                            /* illegal sprite line */
-                            if (yy < illegalspriteline) {
-                                illegalspriteline = yy;
-                                illegalsprite = p;
-                            } else if (illegalspriteline == yy) {
-                                if (illegalsprite > p) {
-                                    illegalsprite = p;
-                                }
-                            }
-                            if (tms.LimitSprites) continue;
-                        } else limit[yy]--;
-                        line = line2;
-                        for (xx=x;xx<(x+size*2);xx+=2) {
-                            if (line & 0x8000) {
-                                if ((xx >=0) && (xx < 256)) {
-                                    if (tms.dBackMem[yy*256+xx]) {
-                                        tms.StatusReg |= 0x20;
-                                    } else {
-                                        tms.dBackMem[yy*256+xx] = 0x01;
-                                    }
-                                    if (c && ! (tms.dBackMem[yy*256+xx] & 0x02))
-                                    {
-                                        tms.dBackMem[yy*256+xx] |= 0x02;
-                                        if (bitmap)
-                                            *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = pens[c];
-                                    }
-                                }
-                                if (((xx+1) >=0) && ((xx+1) < 256)) {
-                                    if (tms.dBackMem[yy*256+xx+1]) {
-                                        tms.StatusReg |= 0x20;
-                                    } else {
-                                        tms.dBackMem[yy*256+xx+1] = 0x01;
-                                    }
-                                    if (c && ! (tms.dBackMem[yy*256+xx+1] & 0x02))
-                                    {
-                                        tms.dBackMem[yy*256+xx+1] |= 0x02;
-                                        if (bitmap)
-                                            *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx+1) = pens[c];
-                                    }
-                                }
-                            }
-                            line *= 2;
-                        }
-                    }
-                    yy++;
-                }
-            }
-        }
-    }
-
-    /* The sprite number is only updated if the overflow bit is clear,
-    ** and the overflow bit will only be set if bit 6 and 7 are both clear. */
-    if (illegalspriteline == 255) tms.FifthSprite = (p > 31) ? 31 : p;
-    else tms.FifthSprite = illegalsprite;
-    if (~tms.StatusReg & 0x40) {
-        tms.StatusReg |= tms.FifthSprite;
-        if (~tms.StatusReg & 0x80) tms.StatusReg |= 0x40;
-    }
-}
-
-static TMS9928a_interface sIntf;
-
-
-void TMS9928A_configure (const TMS9928a_interface *intf)
+void tms9928a_device::update( bitmap_t *bitmap, const rectangle *cliprect )
 {
-	sIntf = *intf;
+	copybitmap( bitmap, m_tmpbmp, 0, 0, 0, 0, cliprect );
 }
 
 
-VIDEO_START( tms9928a )
+void tms9928a_device::device_config_complete()
 {
-	assert(sIntf.model != TMS_INVALID_MODEL);
-	TMS9928A_start(machine, &sIntf);
+	const tms9928a_interface *intf = reinterpret_cast<const tms9928a_interface *>(static_config());
+
+	if ( intf != NULL )
+	{
+		*static_cast<tms9928a_interface *>(this) = *intf;
+	}
+	else
+	{
+		m_vram_size = 0;
+		memset(&m_out_int_line, 0, sizeof(m_out_int_line));
+	}
 }
 
 
-MACHINE_CONFIG_FRAGMENT( tms9928a )
+void tms9928a_device::device_start()
+{
+	assert_always(((m_vram_size == 0x1000) || (m_vram_size == 0x2000) || (m_vram_size == 0x4000)), "4, 8 or 16 kB vram please");
 
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	m_screen = machine().device<screen_device>( m_screen_tag );
+	assert( m_screen != NULL );
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(LEFT_BORDER+32*8+RIGHT_BORDER, TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
-	MCFG_SCREEN_VISIBLE_AREA(LEFT_BORDER-12, LEFT_BORDER+32*8+12-1, TOP_BORDER_60HZ-9, TOP_BORDER_60HZ+24*8+9-1)
-	MCFG_SCREEN_UPDATE(tms9928a)
+	m_top_border = m_50hz ? TMS9928A_VERT_DISPLAY_START_PAL : TMS9928A_VERT_DISPLAY_START_NTSC;
 
-	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(tms9928a)
+	m_irq_changed.resolve( m_out_int_line, *this );
 
-	MCFG_VIDEO_START(tms9928a)
-MACHINE_CONFIG_END
+	/* Video RAM */
+	m_vMem = auto_alloc_array_clear(machine(), UINT8, m_vram_size);
+
+	/* back bitmap */
+	m_tmpbmp = auto_bitmap_alloc(machine(), TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL, m_screen->format());
+
+	m_line_timer = timer_alloc(TIMER_LINE);
+
+	m_LimitSprites = 1;
+
+	save_item(NAME(m_Regs[0]));
+	save_item(NAME(m_Regs[1]));
+	save_item(NAME(m_Regs[2]));
+	save_item(NAME(m_Regs[3]));
+	save_item(NAME(m_Regs[4]));
+	save_item(NAME(m_Regs[5]));
+	save_item(NAME(m_Regs[6]));
+	save_item(NAME(m_Regs[7]));
+	save_item(NAME(m_StatusReg));
+	save_item(NAME(m_FifthSprite));
+	save_item(NAME(m_ReadAhead));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_Addr));
+	save_item(NAME(m_INT));
+	save_pointer(NAME(m_vMem), m_vram_size);
+	save_item(NAME(m_colour));
+	save_item(NAME(m_colourmask));
+	save_item(NAME(m_pattern));
+	save_item(NAME(m_patternmask));
+	save_item(NAME(m_nametbl));
+	save_item(NAME(m_spriteattribute));
+	save_item(NAME(m_spritepattern));
+	save_item(NAME(m_mode));
+}
+
+
+void tms9928a_device::device_reset()
+{
+	for ( int i = 0; i < 8; i++ )
+		m_Regs[i] = 0;
+
+	m_StatusReg = 0;
+	m_FifthSprite = 31;
+	m_nametbl = 0;
+	m_pattern = 0;
+	m_colour = 0;
+	m_spritepattern = 0;
+	m_spriteattribute = 0;
+	m_colourmask = 0;
+	m_patternmask = 0;
+	m_Addr = 0;
+	m_ReadAhead = 0;
+	m_INT = 0;
+	m_latch = 0;
+	m_mode = 0;
+
+	m_line_timer->adjust( m_screen->time_until_pos( 0, 0 ) );
+}
 
