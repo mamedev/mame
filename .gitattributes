@@ -163,6 +163,7 @@ src/emu/cpu/h83002/h8disasm.c svneol=native#text/plain
 src/emu/cpu/h83002/h8ops.h svneol=native#text/plain
 src/emu/cpu/h83002/h8periph.c svneol=native#text/plain
 src/emu/cpu/h83002/h8priv.h svneol=native#text/plain
+src/emu/cpu/h83002/h8speriph.c svneol=native#text/plain
 src/emu/cpu/hcd62121/hcd62121.c svneol=native#text/plain
 src/emu/cpu/hcd62121/hcd62121.h svneol=native#text/plain
 src/emu/cpu/hcd62121/hcd62121_ops.h svneol=native#text/plain

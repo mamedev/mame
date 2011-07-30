@@ -74,29 +74,18 @@ static void h8_check_irqs(h83xx_state *h8);
 
 /* implementation */
 
-static void h8_300_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 mode)
+static void h8_300_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state)
 {
-	if (source>31)
+	int request = source / 32;
+	int bit = source % 32;
+
+	if (state)
 	{
-		if (mode)
-		{
-			h8->h8_IRQrequestH |= (1<<(source-32));
-		}
-		else
-		{
-			h8->h8_IRQrequestH &= ~(1<<(source-32));
-		}
+		h8->irq_req[request] |= (1<<bit);
 	}
 	else
 	{
-		if (mode)
-		{
-			h8->h8_IRQrequestL |= (1<<source);
-		}
-		else
-		{
-			h8->h8_IRQrequestL &= ~(1<<source);
-		}
+		h8->irq_req[request] &= ~(1<<bit);
 	}
 }
 
@@ -248,8 +237,7 @@ static CPU_INIT(h8bit)
 	device->save_item(NAME(h8->regs));
 	device->save_item(NAME(h8->pc));
 	device->save_item(NAME(h8->ppc));
-	device->save_item(NAME(h8->h8_IRQrequestH));
-	device->save_item(NAME(h8->h8_IRQrequestL));
+	device->save_item(NAME(h8->irq_req));
 	device->save_item(NAME(h8->ccr));
 	device->save_item(NAME(h8->mode_8bit));
 
@@ -277,6 +265,8 @@ static CPU_RESET(h8bit)
 	h8->TCORA[0] = h8->TCORB[0] = 0;
 	h8->TCORA[1] = h8->TCORB[1] = 0;
 	h8->TCNT[0] = h8->TCNT[1] = 0;
+
+	h8->has_h8speriphs = false;
 }
 
 static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
@@ -350,13 +340,13 @@ static void h8_check_irqs(h83xx_state *h8)
 	}
 
 	// any interrupts wanted and can accept ?
-	if(((h8->h8_IRQrequestH != 0) || (h8->h8_IRQrequestL != 0)) && (lv >= 0))
+	if(((h8->irq_req[0] != 0) || (h8->irq_req[1]!= 0) || (h8->irq_req[2] != 0)) && (lv >= 0))
 	{
 		UINT8 bit, source;
 		// which one ?
 		for(bit = 0, source = 0xff; source == 0xff && bit < 32; bit++)
 		{
-			if( h8->h8_IRQrequestL & (1<<bit) )
+			if( h8->irq_req[0] & (1<<bit) )
 			{
 				if (h8_get_priority(h8, bit) >= lv)
 				{
@@ -368,7 +358,7 @@ static void h8_check_irqs(h83xx_state *h8)
 		// which one ?
 		for(bit = 0; source == 0xff && bit < 32; bit++)
 		{
-			if( h8->h8_IRQrequestH & (1<<bit) )
+			if( h8->irq_req[1] & (1<<bit) )
 			{
 				if (h8_get_priority(h8, bit + 32) >= lv)
 				{
@@ -438,7 +428,7 @@ static void timer_8bit_expire(h83xx_state *h8, int t, int sel)
 	// check for interrupts
 	if (h8->TCR[t] & (0x40<<sel))
 	{
-		h8->h8_IRQrequestL |= (1 << (irqbase[t] + sel));
+		h8->irq_req[0] |= (1 << (irqbase[t] + sel));
 	}
 
 	switch ((h8->TCR[t]>>3) & 3)
@@ -666,9 +656,9 @@ static WRITE8_HANDLER( h8330_itu_w )
 		break;
 	case 0xc9:
 		h8->TCSR[0] = data;
-		h8->h8_IRQrequestL &= ~(1 << 19);
-		h8->h8_IRQrequestL &= ~(1 << 20);
-		h8->h8_IRQrequestL &= ~(1 << 21);
+		h8->irq_req[0] &= ~(1 << 19);
+		h8->irq_req[0] &= ~(1 << 20);
+		h8->irq_req[0] &= ~(1 << 21);
 		recalc_8bit_timer(h8, 0);
 		break;
 	case 0xca:
@@ -696,9 +686,9 @@ static WRITE8_HANDLER( h8330_itu_w )
 		break;
 	case 0xd1:
 		h8->TCSR[1] = data;
-		h8->h8_IRQrequestL &= ~(1 << 22);
-		h8->h8_IRQrequestL &= ~(1 << 23);
-		h8->h8_IRQrequestL &= ~(1 << 24);
+		h8->irq_req[0] &= ~(1 << 22);
+		h8->irq_req[0] &= ~(1 << 23);
+		h8->irq_req[0] &= ~(1 << 24);
 		recalc_8bit_timer(h8, 1);
 		break;
 	case 0xd2:

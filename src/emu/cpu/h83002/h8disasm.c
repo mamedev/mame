@@ -679,6 +679,21 @@ static UINT32 h8disasm_1(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			sprintf(buffer, "%4.4x shar.l %s", opcode, reg_names32[opcode & 7]);
 			size = 2;
 			break;
+			// shar.b #2, rx
+		case 0xc:
+			sprintf(buffer, "%4.4x shar.b #2, %s", opcode, reg_names8[opcode & 0xf]);
+			size = 2;
+			break;
+			// shar.w #2, rx
+		case 0xd:
+			sprintf(buffer, "%4.4x shar.w #2, %s", opcode, reg_names16[opcode & 0xf]);
+			size = 2;
+			break;
+			// shar.l #2, rx
+		case 0xf:
+			sprintf(buffer, "%4.4x shar.l #2, %s", opcode, reg_names32[opcode & 7]);
+			size = 2;
+			break;
 		default:
 			sprintf(buffer, "%4.4x illegal ", opcode);
 			size = 2;

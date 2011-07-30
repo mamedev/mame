@@ -439,7 +439,7 @@ $(CPUOBJ)/hd6309/hd6309.o:	$(CPUSRC)/hd6309/hd6309.c \
 
 ifneq ($(filter H83002,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h83002
-CPUOBJS += $(CPUOBJ)/h83002/h8_16.o $(CPUOBJ)/h83002/h8periph.o
+CPUOBJS += $(CPUOBJ)/h83002/h8_16.o $(CPUOBJ)/h83002/h8periph.o $(CPUOBJ)/h83002/h8speriph.o
 DASMOBJS += $(CPUOBJ)/h83002/h8disasm.o
 endif
 
@@ -451,7 +451,12 @@ $(CPUOBJ)/h83002/h8_16.o:		$(CPUSRC)/h83002/h8_16.c \
 $(CPUOBJ)/h83002/h8disasm.o:	$(CPUSRC)/h83002/h8disasm.c
 
 $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
-								$(CPUSRC)/h83002/h8priv.h
+								$(CPUSRC)/h83002/h8priv.h \
+								$(CPUSRC)/h83002/h8.h
+
+$(CPUOBJ)/h83002/h8speriph.o:	$(CPUSRC)/h83002/h8speriph.c \
+								$(CPUSRC)/h83002/h8priv.h \
+								$(CPUSRC)/h83002/h8.h
 
 
 #-------------------------------------------------
@@ -460,7 +465,7 @@ $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 
 ifneq ($(filter H83334,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h83002
-CPUOBJS += $(CPUOBJ)/h83002/h8_8.o $(CPUOBJ)/h83002/h8periph.o
+CPUOBJS += $(CPUOBJ)/h83002/h8_8.o $(CPUOBJ)/h83002/h8periph.o $(CPUOBJ)/h83002/h8speriph.o
 DASMOBJS += $(CPUOBJ)/h83002/h8disasm.o
 endif
 
@@ -472,7 +477,12 @@ $(CPUOBJ)/h83002/h8_8.o:		$(CPUSRC)/h83002/h8_8.c \
 $(CPUOBJ)/h83002/h8disasm.o:	$(CPUSRC)/h83002/h8disasm.c
 
 $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
-								$(CPUSRC)/h83002/h8priv.h
+								$(CPUSRC)/h83002/h8priv.h \
+								$(CPUSRC)/h83002/h8.h
+
+$(CPUOBJ)/h83002/h8speriph.o:	$(CPUSRC)/h83002/h8speriph.c \
+								$(CPUSRC)/h83002/h8priv.h \
+								$(CPUSRC)/h83002/h8.h
 
 #-------------------------------------------------
 # Hitachi HCD62121

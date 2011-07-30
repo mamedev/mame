@@ -293,7 +293,7 @@ static UINT8 h8_ISR_r(h83xx_state *h8)
 
 	int i;
 	for (i = 0; i < 6; i++)
-		if (h8->h8_IRQrequestL & (1 << (12+i)))	res |= (1 << i);
+		if (h8->irq_req[0] & (1 << (12+i)))	res |= (1 << i);
 
 	return res;
 }
@@ -302,7 +302,7 @@ static void h8_ISR_w(h83xx_state *h8, UINT8 val)
 {
 	int i;
 	for (i = 0; i < 6; i++)
-		if ((~val) & (1 << i))	h8->h8_IRQrequestL &= ~(1 << (12+i));
+		if ((~val) & (1 << i))	h8->irq_req[0] &= ~(1 << (12+i));
 }
 
 

@@ -1057,6 +1057,30 @@ static void h8_group1(h83xx_state *h8, UINT16 opcode)
 			h8_setreg32(h8, opcode & 0x7, udata32);
 			H8_IFETCH_TIMING(1);
 			break;
+		case 0xc:
+			// shar.b #2, rx
+			udata8 = h8_getreg8(h8, opcode & 0xf);
+			udata8 = h8_shar8(h8, udata8);
+			udata8 = h8_shar8(h8, udata8);
+			h8_setreg8(h8, opcode & 0xf, udata8);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0xd:
+			// shar.w #2, rx
+			udata16 = h8_getreg16(h8, opcode & 0xf);
+			udata16 = h8_shar16(h8, udata16);
+			udata16 = h8_shar16(h8, udata16);
+			h8_setreg16(h8, opcode & 0xf, udata16);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0xf:
+			// shar.l #2, rx
+			udata32 = h8_getreg32(h8, opcode & 0x7);
+			udata32 = h8_shar32(h8, udata32);
+			udata32 = h8_shar32(h8, udata32);
+			h8_setreg32(h8, opcode & 0x7, udata32);
+			H8_IFETCH_TIMING(1);
+			break;
 		default:
 			logerror("H8/3xx: Unk. group 1 1 %x\n", opcode);
 			h8->h8err = 1;

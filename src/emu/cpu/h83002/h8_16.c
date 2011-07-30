@@ -57,30 +57,19 @@ static void h8_check_irqs(h83xx_state *h8);
 
 void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state)
 {
+	int request = source / 32;
+	int bit = source % 32;
+
 	// don't allow clear on external interrupts
 	if ((source <= 17) && (state == 0)) return;
 
 	if (state)
 	{
-		if (source>31)
-		{
-			h8->h8_IRQrequestH |= (1<<(source-32));
-		}
-		else
-		{
-			h8->h8_IRQrequestL |= (1<<source);
-		}
+		h8->irq_req[request] |= (1<<bit);
 	}
 	else
 	{
-		if (source>31)
-		{
-			h8->h8_IRQrequestH &= ~(1<<(source-32));
-		}
-		else
-		{
-			h8->h8_IRQrequestL &= ~(1<<source);
-		}
+		h8->irq_req[request] &= ~(1<<bit);
 	}
 }
 
@@ -226,8 +215,7 @@ static CPU_INIT(h8)
 	device->save_item(NAME(h8->regs));
 	device->save_item(NAME(h8->pc));
 	device->save_item(NAME(h8->ppc));
-	device->save_item(NAME(h8->h8_IRQrequestH));
-	device->save_item(NAME(h8->h8_IRQrequestL));
+	device->save_item(NAME(h8->irq_req));
 	device->save_item(NAME(h8->ccr));
 	device->save_item(NAME(h8->mode_8bit));
 
@@ -248,6 +236,17 @@ static CPU_INIT(h8_3007)
 	h8_3007_itu_init(h8);
 }
 
+static CPU_INIT(h8s_2xxx)
+{
+	h83xx_state *h8 = get_safe_token(device);
+
+	CPU_INIT_CALL(h8);
+
+	h8s_tmr_init(h8);
+	h8s_tpu_init(h8);
+	h8s_sci_init(h8);
+}
+
 static CPU_RESET(h8)
 {
 	h83xx_state *h8 = get_safe_token(device);
@@ -261,6 +260,19 @@ static CPU_RESET(h8)
 	h8->h8TSTR = 0;
 
 	h8_itu_reset(h8);
+
+	h8->has_h8speriphs = false;
+}
+
+static CPU_RESET(h8s_2xxx)
+{
+	h83xx_state *h8 = get_safe_token(device);
+
+	CPU_RESET_CALL(h8);
+
+	h8s_periph_reset(h8);
+	h8->has_h8speriphs = true;
+
 }
 
 static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
@@ -341,18 +353,18 @@ static void h8_check_irqs(h83xx_state *h8)
 	}
 
 	// any interrupts wanted and can accept ?
-	if(((h8->h8_IRQrequestH != 0) || (h8->h8_IRQrequestL != 0)) && (lv >= 0))
+	if(((h8->irq_req[0] != 0) || (h8->irq_req[1]!= 0) || (h8->irq_req[2] != 0)) && (lv >= 0))
 	{
 		UINT8 bit, source;
 		// which one ?
 		for(bit = 0, source = 0xff; source == 0xff && bit < 32; bit++)
 		{
-			if( h8->h8_IRQrequestL & (1<<bit) )
+			if( h8->irq_req[0] & (1<<bit) )
 			{
 				if (h8_get_priority(h8, bit) >= lv)
 				{
 					// mask off
-					h8->h8_IRQrequestL &= ~(1<<bit);
+					h8->irq_req[0] &= ~(1<<bit);
 					source = bit;
 				}
 			}
@@ -360,13 +372,26 @@ static void h8_check_irqs(h83xx_state *h8)
 		// which one ?
 		for(bit = 0; source == 0xff && bit < 32; bit++)
 		{
-			if( h8->h8_IRQrequestH & (1<<bit) )
+			if( h8->irq_req[1] & (1<<bit) )
 			{
 				if (h8_get_priority(h8, bit + 32) >= lv)
 				{
 					// mask off
-					h8->h8_IRQrequestH &= ~(1<<bit);
+					h8->irq_req[1] &= ~(1<<bit);
 					source = bit + 32;
+				}
+			}
+		}
+		// which one ?
+		for(bit = 0; source == 0xff && bit < 32; bit++)
+		{
+			if( h8->irq_req[2] & (1<<bit) )
+			{
+				if (h8_get_priority(h8, bit + 64) >= lv)
+				{
+					// mask off
+					h8->irq_req[2] &= ~(1<<bit);
+					source = bit + 64;
 				}
 			}
 		}
@@ -379,7 +404,13 @@ static void h8_check_irqs(h83xx_state *h8)
 		}
 
 		if (source != 0xff)
+		{
+			if (h8->has_h8speriphs)
+			{
+				h8s_dtce_check(h8, source);
+			}
 			h8_GenException(h8, source);
+		}
 	}
 
 	h8->incheckirqs = 0;
@@ -569,17 +600,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2241_internal_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
-//	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2241_onchip_reg_r, h8s2241_onchip_reg_w ) // internal i/o registers
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE8( h8s2241_per_regs_r_byte, h8s2241_per_regs_w_byte, 0xffff ) // internal i/o registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2246_internal_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
-//	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2246_onchip_reg_r, h8s2246_onchip_reg_w ) // internal i/o registers
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE8( h8s2246_per_regs_r_byte, h8s2246_per_regs_w_byte, 0xffff ) // internal i/o registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2323_internal_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
-//	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2323_onchip_reg_r, h8s2323_onchip_reg_w ) // internal i/o registers
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE8( h8s2323_per_regs_r_byte, h8s2323_per_regs_w_byte, 0xffff ) // internal i/o registers
 ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3002 )
@@ -686,7 +717,8 @@ CPU_GET_INFO( h8s_2241 )
 	switch (state)
 	{
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2241_internal_map);  break;
-		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8s_2xxx);		break;
+		case CPUINFO_FCT_RESET:	   			info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
 		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2241");		break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);
@@ -698,7 +730,8 @@ CPU_GET_INFO( h8s_2246 )
 	switch (state)
 	{
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2246_internal_map);  break;
-		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8s_2xxx);		break;
+		case CPUINFO_FCT_RESET:	   			info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
 		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2246");		break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);
@@ -710,7 +743,8 @@ CPU_GET_INFO( h8s_2323 )
 	switch (state)
 	{
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2323_internal_map);  break;
-		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8s_2xxx);		break;
+		case CPUINFO_FCT_RESET:	   			info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
 		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2323");		break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);
