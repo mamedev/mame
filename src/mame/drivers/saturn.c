@@ -510,9 +510,11 @@ static READ32_HANDLER( saturn_scu_r )
 	/*TODO: write only registers must return 0...*/
 	switch(offset)
 	{
-		//case 0x5c/4:
-		//  Super Major League reads here???
-		//  break;
+		case 0x5c/4:
+		//  Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
+			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
+			res = state->m_scu_regs[0x7c/4];
+			break;
 		case 0x7c/4:
 			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
 			res = state->m_scu_regs[offset];

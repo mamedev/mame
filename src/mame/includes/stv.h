@@ -67,6 +67,10 @@ public:
 	    bitmap_t  *roz_bitmap[2];
 	    UINT8     dotsel;
 	    UINT8     pal;
+	    UINT16    h_count;
+	    UINT16    v_count;
+	    UINT8     exltfg;
+	    UINT8     exsyfg;
 	}m_vdp2;
 
 	struct {

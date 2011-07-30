@@ -1892,17 +1892,29 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 
 			if (flt->mode & 2)	// channel number
 			{
-				mame_printf_error("STVCD: unimplemented channel number match\n");
+				if (curblock.chan != flt->chan)
+				{
+					logerror("channel number reject");
+					match = 0;
+				}
 			}
 
 			if (flt->mode & 4)	// sub mode
 			{
-				mame_printf_error("STVCD: unimplemented sub mode match\n");
+				if((curblock.subm & flt->smmask) != flt->smval)
+				{
+					logerror("sub mode reject");
+					match = 0;
+				}
 			}
 
 			if (flt->mode & 8)	// coding information
 			{
-				mame_printf_error("STVCD: unimplemented coding information match\n");
+				if((curblock.cinf & flt->cimask) != flt->cival)
+				{
+					logerror("coding information reject");
+					match = 0;
+				}
 			}
 
 			if (flt->mode & 0x10)	// reverse subheader conditions
