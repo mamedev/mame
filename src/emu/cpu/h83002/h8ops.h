@@ -1810,9 +1810,37 @@ static void h8_group6(h83xx_state *h8, UINT16 opcode)
 			h8->pc += 4;
 			udata16 = h8_mem_read16(h8, h8->pc);
 			h8->pc += 2;
-			udata8 = h8_mem_read8(address24);
-			udata8 = h8_bclr8(h8, (udata16>>4)&7, udata8);
-			h8_mem_write8(address24, udata8);
+			switch ((udata16 >> 8) & 0xff)
+			{
+				case 0x60 :
+					udata8 = h8_mem_read8(address24);
+					udata8 = h8_bset8(h8, h8_getreg8(h8, (udata16 >> 4) & 0xf), udata8);
+					h8_mem_write8(address24, udata8);
+					break;
+				case 0x62 :
+					udata8 = h8_mem_read8(address24);
+					udata8 = h8_bclr8(h8, h8_getreg8(h8, (udata16 >> 4) & 0xf), udata8);
+					h8_mem_write8(address24, udata8);
+					break;
+				case 0x70 :
+					udata8 = h8_mem_read8(address24);
+					udata8 = h8_bset8(h8, (udata16 >> 4) & 7, udata8);
+					h8_mem_write8(address24, udata8);
+					break;
+				case 0x71 :
+					udata8 = h8_mem_read8(address24);
+					udata8 = h8_bnot8(h8, (udata16 >> 4) & 7, udata8);
+					h8_mem_write8(address24, udata8);
+					break;
+				case 0x72 :
+					udata8 = h8_mem_read8(address24);
+					udata8 = h8_bclr8(h8, (udata16 >> 4) & 7, udata8);
+					h8_mem_write8(address24, udata8);
+					break;
+				case 0x73 :
+					h8_btst8(h8, (udata16 >> 4) & 7, udata8);
+					break;
+			}
 			H8_IFETCH_TIMING(2);
 			H8_BYTE_TIMING(2, address24);
 			break;
