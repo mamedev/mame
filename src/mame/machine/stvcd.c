@@ -321,7 +321,9 @@ static void cd_free_block(blockT *blktofree)
 	CDROM_LOG(("cd_free_block: %x\n", (UINT32)(FPTR)blktofree))
 
 	if(blktofree == NULL)
+	{
 		return;
+	}
 
 	for (i = 0; i < 200; i++)
 	{
@@ -685,14 +687,18 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				// CR1 & 4 = don't confirm mode 2 subheader
 				// CR1 & 8 = retry reading mode 2 sectors
 				// CR1 & 10 = force single-speed
+				// CR1 & 80 = no change flag (done by Assault Suit Leynos 2)
 			CDROM_LOG(("%s:CD: Initialize CD system\n", machine.describe_context()))
-			hirqreg &= 0xffe5;
+			if((cr1 & 0x80) == 0x00)
+			{
+				cd_stat = CD_STAT_PAUSE;
+				cd_curfad = 150;
+				fadstoplay = 0;
+				in_buffer = 0;
+				buffull = 0;
+				hirqreg &= 0xffe5;
+			}
 			hirqreg |= (CMOK|ESEL);
-			cd_stat = CD_STAT_PAUSE;
-			cd_curfad = 150;
-			fadstoplay = 0;
-			in_buffer = 0;
-			buffull = 0;
 			cr_standard_return(cd_stat);
 			break;
 
@@ -1049,12 +1055,14 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x4800:	// Reset Selector
+			{
+			int i,j;
+
 			CDROM_LOG(("%s:CD: Reset Selector\n",   machine.describe_context()))
 
 			if((cr1 & 0xff) == 0x00)
 			{
 				UINT8 bufnum = cr3>>8;
-				int i;
 
 				if(bufnum < MAX_FILTERS)
 				{
@@ -1078,9 +1086,59 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				return;
 			}
 
-			// ...
+			/* reset false filter output conditions */
+			if(cr1 & 0x80)
+			{
+				for(i=0;i<MAX_FILTERS;i++)
+					filters[i].condfalse = 0xff;
+			}
+
+			/* reset true filter output conditions */
+			if(cr1 & 0x40)
+			{
+				for(i=0;i<MAX_FILTERS;i++)
+					filters[i].condtrue = i;
+			}
+
+			/* reset filter conditions*/
+			if(cr1 & 0x10)
+			{
+				for(i=0;i<MAX_FILTERS;i++)
+				{
+					filters[i].fad = 0;
+					filters[i].range = 0xffffffff;
+					filters[i].mode = 0;
+					filters[i].chan = 0;
+					filters[i].smmask = 0;
+					filters[i].cimask = 0;
+					filters[i].fid = 0;
+					filters[i].smval = 0;
+					filters[i].cival = 0;
+				}
+			}
+
+			/* reset partition buffer data */
+			if(cr1 & 0x4)
+			{
+				for(i=0;i<MAX_FILTERS;i++)
+				{
+					for (j = 0; j < MAX_BLOCKS; j++)
+					{
+						cd_free_block(partitions[i].blocks[j]);
+						partitions[i].blocks[j] = (blockT *)NULL;
+						partitions[i].bnum[j] = 0xff;
+					}
+
+					partitions[i].size = -1;
+					partitions[i].numblks = 0;
+				}
+
+				buffull = sectorstore = 0;
+			}
+
 			hirqreg |= (CMOK|ESEL);
 			cr_standard_return(cd_stat);
+			}
 			break;
 
 		case 0x5000:	// get Buffer Size

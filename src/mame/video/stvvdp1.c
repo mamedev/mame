@@ -204,7 +204,7 @@ static void stv_clear_framebuffer( running_machine &machine, int which_framebuff
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	if ( VDP1_LOG ) logerror( "Clearing %d framebuffer\n", state->m_vdp1.framebuffer_current_draw );
-	memset( state->m_vdp1.framebuffer[ which_framebuffer ], 0, 1024 * 256 * sizeof(UINT16) * 2 );
+	memset( state->m_vdp1.framebuffer[ which_framebuffer ], state->m_vdp1.ewdr, 1024 * 256 * sizeof(UINT16) * 2 );
 }
 
 
@@ -226,7 +226,6 @@ static void stv_prepare_framebuffers( running_machine &machine )
 			state->m_vdp1.framebuffer_draw_lines[i] = &state->m_vdp1.framebuffer[0][0];
 			state->m_vdp1.framebuffer_display_lines[i] = &state->m_vdp1.framebuffer[1][0];
 		}
-
 	}
 	else
 	{
@@ -313,9 +312,7 @@ WRITE16_HANDLER( saturn_vdp1_regs_w )
 		case 0x06/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Erase data set %08X\n", data );
 
-			if(data && data != 0x8000)
-				popmessage("EWDR set %08x, contact MAMEdev",STV_VDP1_EWDR);
-
+			state->m_vdp1.ewdr = STV_VDP1_EWDR;
 			break;
 		case 0x08/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Erase upper-left coord set: %08X\n", data );

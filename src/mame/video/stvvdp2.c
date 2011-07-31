@@ -3028,7 +3028,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 	gfxdatalow = gfxdata + stv2_current_tilemap.bitmap_map * 0x20000;
 	gfxdata+=(
 	(stv2_current_tilemap.scrollx & (xlinesize-1)) +
-	((stv2_current_tilemap.scrolly) * (xlinesize)) + /* TODO: mask ysize, check me! */
+	((stv2_current_tilemap.scrolly & (ysize-1)) * (xlinesize)) + /* TODO: mask ysize, check me! */
 	(stv2_current_tilemap.bitmap_map * 0x20000)
 	);
 	gfxdatahigh = gfxdatalow + xlinesize*ysize;
@@ -4172,7 +4172,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		return;
 	}
 
-//	window_applied = 
+//	window_applied =
 	stv_vdp2_apply_window_on_layer(machine,&mycliprect);
 
 	if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap

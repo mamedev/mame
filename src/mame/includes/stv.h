@@ -57,6 +57,7 @@ public:
 	    UINT8     *gfx_decode;
 		UINT16    lopr;
 		UINT16    copr;
+		UINT16    ewdr;
 
 		int       local_x;
 		int       local_y;
