@@ -1674,14 +1674,22 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 			load_layout_file(NULL, layout_noscreens);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
+		else
 		if (screens == 2)
 		{
 			load_layout_file(NULL, layout_dualhsxs);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
+		else
 		if (screens == 3)
 		{
 			load_layout_file(NULL, layout_triphsxs);
+			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
+		}
+		else
+		if (screens == 4)
+		{
+			load_layout_file(NULL, layout_quadhsxs);
 			assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 		}
 	}

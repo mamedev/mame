@@ -106,6 +106,9 @@
 // triple screen layouts
 #include "triphsxs.lh"
 
+// quad screen layouts
+#include "quadhsxs.lh"
+
 // generic color overlay layouts
 #include "ho20ffff.lh"
 #include "ho2eff2e.lh"
