@@ -4905,21 +4905,21 @@ MTR5260-A
 |TA7222            3.579545MHz                  |
 |            YM3012                      6116   |
 |C3403  C3403      YM2151  M6295                |
-|       26.666MHz                JA-7     JA-8  |
+|       26.666MHz             DD_JA-7  DD_JA-8  |
 |            6264                               |
 |J           6264           |--------|  D78C10  |
 |A           6264           |IMAGETEK|          |
 |M                          |14220   |          |
 |M               MM1035     |        |          |
 |A         |------------|   |--------|          |
-|          |    68000   |                 JB-1  |
+|          |    68000   |              DD_JB-1  |
 |          |------------|                       |
-|                                         JB-2  |
+|                                      DD_JB-2  |
 |              24MHz                            |
-|       MACH110                           JB-3  |
+|       MACH110                        DD_JB-3  |
 |                  6264                         |
-|DSW1              6264                   JB-4  |
-|DSW2     JC-6      JC-5                        |
+|DSW1              6264                DD_JB-4  |
+|DSW2  DD_JC-6   DD_JC-5                        |
 |-----------------------------------------------|
 Notes:
       68000 clock     - 12.000MHz [24/2]
@@ -4931,26 +4931,38 @@ Notes:
 
 
 Korean version of Dharma runs on Metro hardware PCB Number - METRO CORP. MTR527
+There is known to be an international version of Dharma on the MTR527 PCB:
+
+DD WEA5 | Program roms
+DD WEA6 /
+
+DD WA 1 | Graphics roms
+DD WA 2 |
+DD WA 3 |
+DD WA 4/
+
+DD WA 7 - Samples rom
+DD WA 8 - 78C10 program rom
 
 ***************************************************************************/
 
 ROM_START( dharma )
 	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "jc-5", 0x000000, 0x020000, CRC(b5d44426) SHA1(d68aaf6b9976ccf5cb665d7ec0afa44e2453094d) )
-	ROM_LOAD16_BYTE( "jc-6", 0x000001, 0x020000, CRC(bc5a202e) SHA1(c2b6d2e44e3605e0525bde4030c5162badad4d4b) )
+	ROM_LOAD16_BYTE( "dd_jc-5", 0x000000, 0x020000, CRC(b5d44426) SHA1(d68aaf6b9976ccf5cb665d7ec0afa44e2453094d) )
+	ROM_LOAD16_BYTE( "dd_jc-6", 0x000001, 0x020000, CRC(bc5a202e) SHA1(c2b6d2e44e3605e0525bde4030c5162badad4d4b) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "ja-8", 0x000000, 0x004000, CRC(af7ebc4c) SHA1(6abf0036346da10be56932f9674f8c250a3ea592) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
-	ROM_CONTINUE(     0x010000, 0x01c000 )
+	ROM_LOAD( "dd_ja-8", 0x000000, 0x004000, CRC(af7ebc4c) SHA1(6abf0036346da10be56932f9674f8c250a3ea592) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
+	ROM_CONTINUE(        0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "jb-2", 0x000000, 0x080000, CRC(2c07c29b) SHA1(26244145139df1ffe2b6ec25a32e5009da6a5aba) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "jb-4", 0x000002, 0x080000, CRC(fe15538e) SHA1(a52ac04656783611ec5d5af01b18e22254decc0c) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "jb-1", 0x000004, 0x080000, CRC(e6ca9bf6) SHA1(0379250303eb6895a4dda080da8bf031d055ce8e) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "jb-3", 0x000006, 0x080000, CRC(6ecbe193) SHA1(33b799699d5d17705df36591cdc40032278388d1) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dd_jb-2", 0x000000, 0x080000, CRC(2c07c29b) SHA1(26244145139df1ffe2b6ec25a32e5009da6a5aba) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dd_jb-4", 0x000002, 0x080000, CRC(fe15538e) SHA1(a52ac04656783611ec5d5af01b18e22254decc0c) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dd_jb-1", 0x000004, 0x080000, CRC(e6ca9bf6) SHA1(0379250303eb6895a4dda080da8bf031d055ce8e) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dd_jb-3", 0x000006, 0x080000, CRC(6ecbe193) SHA1(33b799699d5d17705df36591cdc40032278388d1) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "ja-7", 0x000000, 0x040000, CRC(7ce817eb) SHA1(9dfb79021a552877fbc26049cca853c0b93735b5) )
+	ROM_LOAD( "dd_ja-7", 0x000000, 0x040000, CRC(7ce817eb) SHA1(9dfb79021a552877fbc26049cca853c0b93735b5) )
 ROM_END
 
 ROM_START( dharmak )
@@ -4960,7 +4972,7 @@ ROM_START( dharmak )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "8.bin", 0x000000, 0x004000, CRC(d0e0a8e2) SHA1(99a3142589a1763ba162ed5b1b6c44961a5aaabc) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
-	ROM_CONTINUE(     0x010000, 0x01c000 )
+	ROM_CONTINUE(      0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */ /* note, these are bitswapped, see init */
 	ROMX_LOAD( "2.bin", 0x000000, 0x080000, CRC(3cc0bb6c) SHA1(aaa063fa748e0f6fe3c07f2dfb510c1b69ea92af) , ROM_GROUPWORD | ROM_SKIP(6))
