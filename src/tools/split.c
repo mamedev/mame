@@ -379,7 +379,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 			printf(" verified\n");
 
 		// release allocated memory
-		free(splitbuffer);
+		osd_free(splitbuffer);
 		splitbuffer = NULL;
 	}
 	if (write_output)
@@ -402,7 +402,7 @@ cleanup:
 			remove(astring_c(outfilename));
 	}
 	if (splitbuffer != NULL)
-		free(splitbuffer);
+		osd_free(splitbuffer);
 	astring_free(outfilename);
 	astring_free(infilename);
 	astring_free(basepath);

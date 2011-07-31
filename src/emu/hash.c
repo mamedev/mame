@@ -41,7 +41,6 @@
 
 #include "emu.h"
 #include "zlib.h"
-#include "md5.h"
 #include "sha1.h"
 #include <ctype.h>
 
@@ -73,26 +72,6 @@ private:
 };
 
 
-// ======================> hash_md5
-
-// MD5 hash implementation
-class hash_md5 : public hash_base
-{
-public:
-	// construction/destruction
-    hash_md5();
-
-	// creation
-    virtual void begin();
-    virtual void buffer(const UINT8 *data, UINT32 length);
-    virtual void end();
-
-private:
-    // internal state
-    UINT8   m_buffer[16];
-    struct MD5Context m_context;
-};
-
 
 // ======================> hash_sha1
 
@@ -122,7 +101,7 @@ private:
 
 const char *hash_collection::HASH_TYPES_CRC = "R";
 const char *hash_collection::HASH_TYPES_CRC_SHA1 = "RS";
-const char *hash_collection::HASH_TYPES_ALL = "RSM";
+const char *hash_collection::HASH_TYPES_ALL = "RS";
 
 
 
@@ -287,53 +266,6 @@ void hash_crc::buffer(const UINT8 *data, UINT32 length)
 
 void hash_crc::end()
 {
-	m_in_progress = false;
-}
-
-
-
-//**************************************************************************
-//  HASH MD5
-//**************************************************************************
-
-//-------------------------------------------------
-//  hash_md5 - constructor
-//-------------------------------------------------
-
-hash_md5::hash_md5()
-	: hash_base(hash_collection::HASH_MD5, "md5", sizeof(m_buffer), m_buffer)
-{
-}
-
-
-//-------------------------------------------------
-//  begin - initialize state for hash computation
-//-------------------------------------------------
-
-void hash_md5::begin()
-{
-	m_in_progress = true;
-	MD5Init(&m_context);
-}
-
-
-//-------------------------------------------------
-//  buffer - hash a buffer's worth of data
-//-------------------------------------------------
-
-void hash_md5::buffer(const UINT8 *data, UINT32 length)
-{
-	MD5Update(&m_context, (md5byte *)data, length);
-}
-
-
-//-------------------------------------------------
-//  end - finish hash computation
-//-------------------------------------------------
-
-void hash_md5::end()
-{
-	MD5Final(m_buffer, &m_context);
 	m_in_progress = false;
 }
 
@@ -728,7 +660,6 @@ void hash_collection::begin(const char *types)
 	if (types == NULL)
 	{
 		m_hashlist.append(*alloc_by_id(HASH_CRC)).begin();
-		m_hashlist.append(*alloc_by_id(HASH_MD5)).begin();
 		m_hashlist.append(*alloc_by_id(HASH_SHA1)).begin();
 	}
 
@@ -785,7 +716,6 @@ hash_base *hash_collection::alloc_by_id(char id)
 	switch (id)
 	{
 		case HASH_CRC:	return global_alloc(hash_crc);
-		case HASH_MD5:	return global_alloc(hash_md5);
 		case HASH_SHA1:	return global_alloc(hash_sha1);
 		default:		return NULL;
 	}

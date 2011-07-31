@@ -44,8 +44,8 @@
 #include <windows.h>
 
 // MAME headers
-#include "osdepend.h"
 #include "emu.h"
+#include "osdepend.h"
 
 // MAMEOS headers
 #include "output.h"

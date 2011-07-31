@@ -51,7 +51,6 @@
 
 // use these to define compile-time internal-format hash strings
 #define CRC(x)				"R" #x
-#define MD5(x)				"M" #x
 #define SHA1(x)				"S" #x
 #define NO_DUMP				"!"
 #define BAD_DUMP			"^"
@@ -124,7 +123,6 @@ class hash_collection
 public:
 	// hash types are identified by non-hex alpha values (G-Z)
 	static const char HASH_CRC = 'R';
-	static const char HASH_MD5 = 'M';
 	static const char HASH_SHA1 = 'S';
 
 	// common combinations for requests

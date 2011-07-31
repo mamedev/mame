@@ -479,7 +479,7 @@ static file_entry *compute_dependencies(int srcrootlen, const astring *srcfile)
 			astring_free(filename);
 		}
 
-	free(filedata);
+	osd_free(filedata);
 	return file;
 }
 

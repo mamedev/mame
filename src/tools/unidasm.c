@@ -657,6 +657,8 @@ int main(int argc, char *argv[])
 	{
 		fprintf(stderr, "Caught unhandled exception\n");
 	}
+	
+	osd_free(data);
 
 	return result;
 }

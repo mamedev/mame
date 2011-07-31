@@ -59,8 +59,8 @@
 #include <stddef.h>
 
 // MAME headers
-#include "osdepend.h"
 #include "emu.h"
+#include "osdepend.h"
 #include "ui.h"
 
 // MAMEOS headers

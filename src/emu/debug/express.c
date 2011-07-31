@@ -58,8 +58,7 @@
 
 ***************************************************************************/
 
-#include "emucore.h"
-#include "emutempl.h"
+#include "emu.h"
 #include "express.h"
 #include <ctype.h>
 

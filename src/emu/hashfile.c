@@ -213,11 +213,6 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						/* crc32 attribute */
 						functions = hash_collection::HASH_CRC;
 					}
-					else if (!strcmp(attributes[0], "md5"))
-					{
-						/* md5 attribute */
-						functions = hash_collection::HASH_MD5;
-					}
 					else if (!strcmp(attributes[0], "sha1"))
 					{
 						/* sha1 attribute */

@@ -358,9 +358,7 @@ audit_record *media_auditor::audit_one_disk(const rom_entry *rom)
 		chd_header header = *chd_get_header(source);
 		hash_collection hashes;
 
-		// if there's an MD5 or SHA1 hash, add them to the output hash
-		if (memcmp(nullhash, header.md5, sizeof(header.md5)) != 0)
-			hashes.add_from_buffer(hash_collection::HASH_MD5, header.md5, sizeof(header.md5));
+		// if there's a SHA1 hash, add them to the output hash
 		if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
 			hashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
 

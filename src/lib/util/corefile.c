@@ -740,7 +740,7 @@ file_error core_fload(const char *filename, void **data, UINT32 *length)
 	}
 
 	/* allocate memory */
-	*data = malloc(size);
+	*data = osd_malloc(size);
 	if (length != NULL)
 		*length = (UINT32)size;
 

@@ -450,7 +450,7 @@ cleanup:
 	if (err != CHDERR_NONE)
 		osd_rmfile(outputfile);
 	if (identdata != NULL)
-		free(identdata);
+		osd_free(identdata);
 	return (err != CHDERR_NONE);
 }
 
@@ -592,7 +592,7 @@ cleanup:
 	if (err != CHDERR_NONE)
 		osd_rmfile(outputfile);
 	if (identdata != NULL)
-		free(identdata);
+		osd_free(identdata);
 	return (err != CHDERR_NONE);
 }
 
@@ -3084,7 +3084,7 @@ static int do_addmeta(int argc, char *argv[], int param)
 
 cleanup:
 	if (metadata != NULL)
-		free(metadata);
+		osd_free(metadata);
 	if (chd != NULL)
 		chd_close(chd);
 	if (err != CHDERR_NONE && was_readonly)

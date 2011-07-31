@@ -168,6 +168,9 @@ int parse_file(const char *srcfile)
 		strcpy(name, drivname);
 		drivlist[drivcount++] = name;
 	}
+	
+	osd_free(buffer);
+	
 	return 0;
 }
 

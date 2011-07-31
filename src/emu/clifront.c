@@ -980,7 +980,6 @@ void cli_frontend::listsoftware(const char *gamename)
 				"\t\t\t\t\t\t<!ATTLIST rom size CDATA #IMPLIED>\n"
 				"\t\t\t\t\t\t<!ATTLIST rom length CDATA #IMPLIED>\n"
 				"\t\t\t\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom md5 CDATA #IMPLIED>\n"
 				"\t\t\t\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
 				"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
 				"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n"
@@ -990,7 +989,6 @@ void cli_frontend::listsoftware(const char *gamename)
 				"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n"
 				"\t\t\t\t\t<!ELEMENT disk EMPTY>\n"
 				"\t\t\t\t\t\t<!ATTLIST disk name CDATA #REQUIRED>\n"
-				"\t\t\t\t\t\t<!ATTLIST disk md5 CDATA #IMPLIED>\n"
 				"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
 				"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
 				"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n"
@@ -1452,8 +1450,6 @@ void media_identifier::identify_file(const char *name)
 		static const UINT8 nullhash[20] = { 0 };
 		hash_collection hashes;
 
-		if (memcmp(nullhash, header.md5, sizeof(header.md5)) != 0)
-			hashes.add_from_buffer(hash_collection::HASH_MD5, header.md5, sizeof(header.md5));
 		if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
 			hashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
 
@@ -1473,7 +1469,10 @@ void media_identifier::identify_file(const char *name)
 		void *data;
 		file_error filerr = core_fload(name, &data, &length);
 		if (filerr == FILERR_NONE && length > 0)
+		{
 			identify_data(name, reinterpret_cast<UINT8 *>(data), length);
+			osd_free(data);
+		}
 	}
 }
 

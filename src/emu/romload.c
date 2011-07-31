@@ -1244,7 +1244,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 				continue;
 			}
 
-			/* get the header and extract the MD5/SHA1 */
+			/* get the header and extract the SHA1 */
 			header = *chd_get_header(chd.origchd);
 			hash_collection acthashes;
 			acthashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));

@@ -490,7 +490,7 @@ void device_image_interface::image_checkhash()
     if (m_hash.first() == NULL && m_readonly && !m_created)
     {
         /* do not cause a linear read of 600 megs please */
-        /* TODO: use SHA/MD5 in the CHD header as the hash */
+        /* TODO: use SHA1 in the CHD header as the hash */
         if (image_type() == IO_CDROM)
             return;
 

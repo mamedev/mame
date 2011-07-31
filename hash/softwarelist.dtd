@@ -31,7 +31,6 @@
 					<!ATTLIST rom size CDATA #IMPLIED>
 					<!ATTLIST rom length CDATA #IMPLIED>
 					<!ATTLIST rom crc CDATA #IMPLIED>
-					<!ATTLIST rom md5 CDATA #IMPLIED>
 					<!ATTLIST rom sha1 CDATA #IMPLIED>
 					<!ATTLIST rom offset CDATA #IMPLIED>
 					<!ATTLIST rom value CDATA #IMPLIED>
@@ -41,7 +40,6 @@
 				<!ATTLIST diskarea name CDATA #REQUIRED>
 				<!ELEMENT disk EMPTY>
 					<!ATTLIST disk name CDATA #REQUIRED>
-					<!ATTLIST disk md5 CDATA #IMPLIED>
 					<!ATTLIST disk sha1 CDATA #IMPLIED>
 					<!ATTLIST disk status (baddump|nodump|good) "good">
 					<!ATTLIST disk writeable (yes|no) "no">

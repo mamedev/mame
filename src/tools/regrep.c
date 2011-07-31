@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 	if (core_fload(astring_c(tempfilename), &buffer, &bufsize) == FILERR_NONE)
 	{
 		tempheader = astring_dupch((const char *)buffer, bufsize);
-		free(buffer);
+		osd_free(buffer);
 	}
 
 	/* verify the template */
