@@ -862,6 +862,11 @@ static void (*drawpixel)(running_machine &machine, int x, int y, int patterndata
 static void drawpixel_poly(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+
+	/* Capcom Collection Dai 4 uses a dummy polygon to clear VDP1 framebuffer that goes over our current max size ... */
+	if(x >= 1024 || y >= 512)
+		return;
+
 	state->m_vdp1.framebuffer_draw_lines[y][x] = stv2_current_sprite.CMDCOLR;
 }
 

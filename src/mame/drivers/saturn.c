@@ -557,7 +557,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		/*LV 0 DMA*/
 		case 0x00/4: case 0x20/4: case 0x40/4:  state->m_scu.src[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
 		case 0x04/4: case 0x24/4: case 0x44/4:  state->m_scu.dst[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
-		case 0x08/4: case 0x28/4: case 0x48/4:  state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0x1fff)) >> 0); break;
+		case 0x08/4: case 0x28/4: case 0x48/4:  state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0xfff)) >> 0); break;
 		case 0x0c/4: case 0x2c/4: case 0x4c/4:
 			state->m_scu.src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 0;
 			state->m_scu.dst_add[DMA_CH] = 2 << (state->m_scu_regs[offset] & 7);
@@ -673,7 +673,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	DnMV_1(dma_ch);
 
 	/* max size */
-	if(state->m_scu.size[dma_ch] == 0) { state->m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
+	if(state->m_scu.size[dma_ch] == 0) { state->m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x1000; }
 
 	/*set here the boundaries checks*/
 	/*...*/

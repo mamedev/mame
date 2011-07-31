@@ -779,22 +779,23 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x1000: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
+			UINT32 start_pos,end_pos;
+
 			CDROM_LOG(("%s:CD: Play Disc\n",   machine.describe_context()))
 			cd_stat = CD_STAT_PLAY;
 
+			//play_mode = cr3 >> 8;
+
 			if (!(cr3 & 0x8000))	// preserve current position if bit 7 set
 			{
-				cd_curfad = ((cr1&0xff)<<16) | cr2;
-				fadstoplay = ((cr3&0xff)<<16) | cr4;
+				start_pos = ((cr1&0xff)<<16) | cr2;
+				//fadstoplay = ((cr3&0xff)<<16) | cr4;
+				end_pos = ((cr3&0xff)<<16) | cr4;
 
-				if (cd_curfad & 0x800000)
+				if (start_pos & 0x800000)
 				{
-					if (cd_curfad != 0xffffff)
-					{
-						// fad mode
-						cd_curfad &= 0xfffff;
-						fadstoplay &= 0xfffff;
-					}
+					if (start_pos != 0xffffff)
+						cd_curfad = start_pos & 0xfffff;
 
 					printf("fad mode\n");
 					cur_track = cdrom_get_track(cdrom, cd_curfad-150);
@@ -802,16 +803,29 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				else
 				{
 					// track mode
-					cur_track = cd_curfad>>8;
+					cur_track = (start_pos)>>8;
 					printf("track mode %d\n",cur_track);
+					if(cur_track == 0)
+						cur_track = 1;
+
 					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
-					fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
+				}
+
+				if (end_pos & 0x800000)
+				{
+					if (end_pos != 0xffffff)
+						fadstoplay = end_pos & 0xfffff;
+				}
+				else
+				{
+					UINT8 end_track;
+
+					end_track = (end_pos)>>8;
+					fadstoplay = cdrom_get_track_start(cdrom, end_track) - cd_curfad;
 				}
 			}
 			else	// play until the end of the disc
 			{
-				UINT32 start_pos,end_pos;
-
 				start_pos = ((cr1&0xff)<<16) | cr2;
 				end_pos = ((cr3&0xff)<<16) | cr4;
 
