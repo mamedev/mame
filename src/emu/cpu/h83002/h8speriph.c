@@ -61,7 +61,6 @@ void h8s_dtce_execute(h83xx_state *h8, UINT32 addr_dtce, UINT8 mask_dtce, UINT32
 	UINT32 data[3], dtc_vect, dtc_sar, dtc_dar, cnt, i;
 	UINT8 dtc_mra, dtc_mrb, sz;
 	UINT16 dtc_cra, dtc_crb;
-	printf("dtce exec!\n");
 	// get dtc info
 	dtc_vect  = 0xFF0000 | h8->program->read_word(addr_dtvecr);
 	data[0]   = h8->program->read_dword( dtc_vect + 0);

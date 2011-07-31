@@ -383,9 +383,37 @@ static UINT32 h8disasm_0(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			break;
 			// mulxs
 		case 0xc:
+			data16 = h8_mem_read16(2);
+			size = 4;
+			if ((data16&0xff00) == 0x5000)
+			{
+				sprintf(buffer, "mulxs.b %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+			}
+			else if ((data16&0xff00) == 0x5200) 
+			{
+				sprintf(buffer, "mulxs.w %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+			}
+			else
+			{
+				sprintf(buffer, "%04x %04x unknown\n", opcode, data16);
+			}
 			break;
 			// divxs
 		case 0xd:
+			data16 = h8_mem_read16(2);
+			size = 4;
+			if ((data16&0xff00) == 0x5100)
+			{
+				sprintf(buffer, "divxs.b %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+			}
+			else if ((data16&0xff00) == 0x5300) 
+			{
+				sprintf(buffer, "divxs.w %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+			}
+			else
+			{
+				sprintf(buffer, "%04x %04x unknown\n", opcode, data16);
+			}
 			break;
 			// 01f0 and.l prefix
 		case 0xf:
@@ -624,6 +652,21 @@ static UINT32 h8disasm_1(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			sprintf(buffer, "%4.4x shal.l %s", opcode, reg_names32[opcode & 7]);
 			size = 2;
 			break;
+			// shal.b #2, Rx
+		case 0xc:
+			sprintf(buffer, "%4.4x shal.b #2, %s", opcode, reg_names8[opcode & 0xf]);
+			size = 2;
+			break;
+			// shal.w #2, Rx
+		case 0xd:
+			sprintf(buffer, "%4.4x shal.w #2, %s", opcode, reg_names16[opcode & 0xf]);
+			size = 2;
+			break;
+			// shal.l #2, Rx
+		case 0xf:
+			sprintf(buffer, "%4.4x shal.l #2, %s", opcode, reg_names32[opcode & 7]);
+			size = 2;
+			break;
 		default:
 			sprintf(buffer, "%4.4x default", opcode);
 			size = 2;
@@ -733,6 +776,21 @@ static UINT32 h8disasm_1(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			sprintf(buffer, "%4.4x rotl.l %s", opcode, reg_names32[opcode & 7]);
 			size = 2;
 			break;
+			// rotl.b #2, Rx
+		case 0xc:
+			sprintf(buffer, "%4.4x rotl.b #2, %s", opcode, reg_names8[opcode & 0xf]);
+			size = 2;
+			break;
+			// rotl.w #2, Rx
+		case 0xd:
+			sprintf(buffer, "%4.4x rotl.w #2, %s", opcode, reg_names16[opcode & 0xf]);
+			size = 2;
+			break;
+			// rotl.l #2, Rx
+		case 0xf:
+			sprintf(buffer, "%4.4x rotl.l #2, %s", opcode, reg_names32[opcode & 7]);
+			size = 2;
+			break;
 		default:
 			sprintf(buffer, "%4.4x  ? ", opcode);
 			size = 2;
@@ -770,6 +828,21 @@ static UINT32 h8disasm_1(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			// rotr.l Rx
 		case 0xb:
 			sprintf(buffer, "%4.4x rotr.l %s", opcode, reg_names32[opcode & 7]);
+			size = 2;
+			break;
+			// rotr.b #2, Rx
+		case 0xc:
+			sprintf(buffer, "%4.4x rotr.b #2, %s", opcode, reg_names8[opcode & 0xf]);
+			size = 2;
+			break;
+			// rotr.w #2, Rx
+		case 0xd:
+			sprintf(buffer, "%4.4x rotr.w #2, %s", opcode, reg_names16[opcode & 0xf]);
+			size = 2;
+			break;
+			// rotr.l #2, Rx
+		case 0xf:
+			sprintf(buffer, "%4.4x rotr.l #2, %s", opcode, reg_names32[opcode & 7]);
 			size = 2;
 			break;
 		default:
@@ -1202,7 +1275,33 @@ static UINT32 h8disasm_6(UINT32 address, UINT32 opcode, char *buffer, const UINT
 		case 0x3:	// bclr #imm, imm:32
 			data32=h8_mem_read32(2);
 			data16=h8_mem_read16(6);
-			sprintf(buffer, "%4.4x bclr #%d, @%8.8x", opcode, (data16>>4)&7, data32&addr_mask);
+			switch ((data16 >> 8) & 0xff)
+			{
+				case 0x60 :
+					sprintf(buffer, "%4.4x bset %s, @%8.8x", opcode, reg_names16[(data16>>4)&0xf], data32&addr_mask);
+					break;
+				case 0x61 :
+					sprintf(buffer, "%4.4x bnot %s, @%8.8x", opcode, reg_names16[(data16>>4)&0xf], data32&addr_mask);
+					break;
+				case 0x62 :
+					sprintf(buffer, "%4.4x bclr %s, @%8.8x", opcode, reg_names16[(data16>>4)&0xf], data32&addr_mask);
+					break;
+				case 0x63:
+					sprintf(buffer, "%4.4x btst %s, @%8.8x", opcode, reg_names16[(data16>>4)&0xf], data32&addr_mask);
+					break;
+				case 0x70 :
+					sprintf(buffer, "%4.4x bset #%d, @%8.8x", opcode, (data16>>4)&7, data32&addr_mask);
+					break;
+				case 0x71 :
+					sprintf(buffer, "%4.4x bnot #%d, @%8.8x", opcode, (data16>>4)&7, data32&addr_mask);
+					break;
+				case 0x72 :
+					sprintf(buffer, "%4.4x bclr #%d, @%8.8x", opcode, (data16>>4)&7, data32&addr_mask);
+					break;
+				case 0x73 :
+					sprintf(buffer, "%4.4x btst #%d, @%8.8x", opcode, (data16>>4)&7, data32&addr_mask);
+					break;
+			}
 			size = 8;
 			break;
 		case 0x8:
