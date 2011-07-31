@@ -226,9 +226,16 @@ static void draw_ball(running_machine &machine, bitmap_t *bitmap, const rectangl
 	warpwarp_state *state = machine.driver_data<warpwarp_state>();
 	if (state->m_ball_on)
 	{
-		int x = 256+8 - state->m_ball_h;
-		int y = 240 - state->m_ball_v;
-		int i,j;
+		int x,y,i,j;
+
+		if (flip_screen_get(machine) & 1) {
+			x = 376 - state->m_ball_h;
+			y = 280 - state->m_ball_v;
+		}
+		else {
+			x = 264 - state->m_ball_h;
+			y = 240 - state->m_ball_v;
+		}
 
 		for (i = state->m_ball_sizey;i > 0;i--)
 			for (j = state->m_ball_sizex;j > 0;j--)
