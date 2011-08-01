@@ -15,7 +15,7 @@ TODO:
 - hitice: ice trails are incorrect.
 - hitice: the pixel bitmap is not cleared on startup nor during attract mode. There's a
   kludge to fix it in the first case.
-- rambo3a: has a lot of unmapped writes in the VCU area (log up to end of
+- rambo3u: has a lot of unmapped writes in the VCU area (log up to end of
   round 2) [viofight also does a few]
 - The eprom games could have a single io handler if it's confirmed all
   3 use a special 4 player I/O chip. Puzzle Bobble and qzshowby use TC0640FIO
@@ -3018,7 +3018,7 @@ ROM_START( tetrista )
 	ROM_LOAD( "b72-01.rom", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
 
-ROM_START( hitice )
+ROM_START( hitice ) /* 4 Player version */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c59-10.42", 0x00000, 0x20000, CRC(e4ffad15) SHA1(87da85e1489fe57bd012177a70434152e5475009) )
 	ROM_LOAD16_BYTE( "c59-12.64", 0x00001, 0x20000, CRC(a080d7af) SHA1(9c68b78fbcc42a2f748d1b7f84f138be79f7c0c9) )
@@ -3043,7 +3043,7 @@ ROM_START( hitice )
 	ROM_LOAD( "pal16r4b-c59-07.61", 0x600, 0x104, CRC(cf64bd95) SHA1(5acada8bd6da40b5342bdd7ec494ee0e615492f0) )
 ROM_END
 
-ROM_START( hiticej )
+ROM_START( hiticej ) /* 2 Player version */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c59-23.42", 0x00000, 0x20000, CRC(01958fcc) SHA1(adaf9b0a4658d4d8eb8cdd343b40643b4c05d09e) )
 	ROM_LOAD16_BYTE( "c59-25.64", 0x00001, 0x20000, CRC(71984c76) SHA1(2e8bbfd01b0f229db5f10563a0864e8a2d1a515f) )
@@ -3110,9 +3110,9 @@ ROM_START( rambo3u )
 	ROM_LOAD( "ramb3-05.bin", 0x00000, 0x80000, CRC(0179dc40) SHA1(89feb708618ae7fa96883473d5c7a09dcc6f452a) )
 ROM_END
 
-ROM_START( rambo3p )
+ROM_START( rambo3p ) /* Is this set a prototype or possible bootleg? */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "r3-0e.rom",  0x00000, 0x10000, CRC(3efa4177) SHA1(5e4995e34b92f625f7825238dfbc9e76d4090871) ) /* Is this set a prototype or possible bootleg? */
+	ROM_LOAD16_BYTE( "r3-0e.rom",  0x00000, 0x10000, CRC(3efa4177) SHA1(5e4995e34b92f625f7825238dfbc9e76d4090871) )
 	ROM_LOAD16_BYTE( "r3-0o.rom",  0x00001, 0x10000, CRC(55c38d92) SHA1(4f712b4eb20ee176da83a5f1154d5890d1360398) )
 
 /*NOTE: there is a hole in address space here */
@@ -3186,12 +3186,11 @@ ROM_START( spacedx )
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
-	ROM_LOAD( "pal16l8b-d72-05.ic37",  0x0000, 0x0104, CRC(301bf435) SHA1(008112dba8385ef4caeb9300f4db5f079affc660) )
-	ROM_LOAD( "pal16l8b-d72-06.ic50",  0x0200, 0x0104, CRC(e4aa4b2b) SHA1(46710ec46e6753656e502007b5515a56b60deb55) )
-	ROM_LOAD( "palce20v8-d72-07.ic28", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) )
-	ROM_LOAD( "palce20v8-d72-09.ic47", 0x0600, 0x0157, CRC(de1760fd) SHA1(332156699408e5b0a698f031c01f8aa85c3d5d32) )
-	ROM_LOAD( "palce16v8-d72-10.ic12-read_1", 0x0800, 0x0117, BAD_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* One or both of these is bad */
-	ROM_LOAD( "palce16v8-d72-10.ic12-read_2", 0x0800, 0x0117, BAD_DUMP CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) ) /* we to need to verify this dump */
+	ROM_LOAD( "pal16l8-d72-05.ic37",   0x0000, 0x0104, CRC(c3d4cb7e) SHA1(1f3453a543dd98d02183595d66c67773fbf0ed07) ) /* Matches D72-05 in qzshowby */
+	ROM_LOAD( "pal16l8-d72-06.ic50",   0x0200, 0x0104, CRC(e96b7f37) SHA1(568087d0ab0ed55814deccc11630d3e26f765450) ) /* Differs from D72-06 in qzshowby */
+	ROM_LOAD( "palce20v8-d72-07.ic28", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) ) /* Matches D72-07 in qzshowby */
+	ROM_LOAD( "palce20v8-d72-09.ic47", 0x0600, 0x0157, CRC(de1760fd) SHA1(332156699408e5b0a698f031c01f8aa85c3d5d32) ) /* Differs from D72-09 in qzshowby */
+	ROM_LOAD( "palce16v8-d72-10.ic12", 0x0800, 0x0117, CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* Matches D72-10 in qzshowby */
 	ROM_LOAD( "pal20l8b-d89-04.ic40",  0x0a00, 0x0144, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
@@ -3212,12 +3211,11 @@ ROM_START( spacedxj )
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
-	ROM_LOAD( "pal16l8-d72-05.ic37",   0x0000, 0x0104, CRC(c3d4cb7e) SHA1(1f3453a543dd98d02183595d66c67773fbf0ed07) )
-	ROM_LOAD( "pal16l8-d72-06.ic50",   0x0200, 0x0104, CRC(e96b7f37) SHA1(568087d0ab0ed55814deccc11630d3e26f765450) )
-	ROM_LOAD( "palce20v8-d72-07.ic28", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) )
-	ROM_LOAD( "palce20v8-d72-09.ic47", 0x0600, 0x0157, CRC(de1760fd) SHA1(332156699408e5b0a698f031c01f8aa85c3d5d32) )
-	ROM_LOAD( "palce16v8-d72-10.ic12-read_1", 0x0800, 0x0117, BAD_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* One or both of these is bad */
-	ROM_LOAD( "palce16v8-d72-10.ic12-read_2", 0x0800, 0x0117, BAD_DUMP CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) ) /* we to need to verify this dump */
+	ROM_LOAD( "pal16l8-d72-05.ic37",   0x0000, 0x0104, CRC(c3d4cb7e) SHA1(1f3453a543dd98d02183595d66c67773fbf0ed07) ) /* Matches D72-05 in qzshowby */
+	ROM_LOAD( "pal16l8-d72-06.ic50",   0x0200, 0x0104, CRC(e96b7f37) SHA1(568087d0ab0ed55814deccc11630d3e26f765450) ) /* Differs from D72-06 in qzshowby */
+	ROM_LOAD( "palce20v8-d72-07.ic28", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) ) /* Matches D72-07 in qzshowby */
+	ROM_LOAD( "palce20v8-d72-09.ic47", 0x0600, 0x0157, CRC(de1760fd) SHA1(332156699408e5b0a698f031c01f8aa85c3d5d32) ) /* Differs from D72-09 in qzshowby */
+	ROM_LOAD( "palce16v8-d72-10.ic12", 0x0800, 0x0117, CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* Matches D72-10 in qzshowby */
 	ROM_LOAD( "pal20l8b-d89-04.ic40",  0x0a00, 0x0144, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
@@ -3256,11 +3254,11 @@ ROM_START( qzshowby )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-d72-05.bin",   0x0000, 0x0104, CRC(c3d4cb7e) SHA1(1f3453a543dd98d02183595d66c67773fbf0ed07) )
-	ROM_LOAD( "pal16l8-d72-06.bin",   0x0200, 0x0104, CRC(27580efc) SHA1(11b3c0e2b344926dd068672a952574f06989d30a) )
+	ROM_LOAD( "pal16l8-d72-06.bin",   0x0200, 0x0104, CRC(27580efc) SHA1(11b3c0e2b344926dd068672a952574f06989d30a) ) /* This one or spacedx's D72-06 is a bad dump, should match */
 	ROM_LOAD( "palce20v8-d72-07.bin", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) )
 	ROM_LOAD( "palce20v8-d72-08.bin", 0x0600, 0x0157, CRC(746a6474) SHA1(f6c45ff53a01c03b1fc622dc161843b5faf0d2e4) )
-	ROM_LOAD( "palce20v8-d72-09.bin", 0x0800, 0x0157, CRC(9f680800) SHA1(2fa41ead85136e851d465432a7b9d3ec848c7a22) )
-	ROM_LOAD( "palce16v8-d72-10.bin", 0x0a00, 0x0117, BAD_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* Matches possible bad dump in spacedx/spacedx */
+	ROM_LOAD( "palce20v8-d72-09.bin", 0x0800, 0x0157, CRC(9f680800) SHA1(2fa41ead85136e851d465432a7b9d3ec848c7a22) ) /* This one or spacedx's D72-09 is a bad dump, should match */
+	ROM_LOAD( "palce16v8-d72-10.bin", 0x0a00, 0x0117, CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) )
 ROM_END
 
 ROM_START( viofight )
@@ -3434,9 +3432,9 @@ ROM_START( silentdj )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
-ROM_START( silentdu )
+ROM_START( silentdu ) /* Dumped from an original Taito PCB (ET910000B) */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "east-12-1.ic32", 0x00000, 0x20000, CRC(5883d362) SHA1(21c3af053fa92c26f119466ecd655697cc72ff3a) ) /* Dumped from an original Taito PCB (ET910000B) */
+	ROM_LOAD16_BYTE( "east-12-1.ic32", 0x00000, 0x20000, CRC(5883d362) SHA1(21c3af053fa92c26f119466ecd655697cc72ff3a) )
 	ROM_LOAD16_BYTE( "east-14-1.ic10", 0x00001, 0x20000, CRC(3267bcd5) SHA1(358a717d0cdd22d84eb0d928c36e4e72a40c2882) )
 	ROM_LOAD16_BYTE( "east-11.ic31",   0x40000, 0x20000, CRC(35da4428) SHA1(5374bd97ad58aa2d67404cb05c862bb3aba40d6a) )
 	ROM_LOAD16_BYTE( "east-09.ic9",    0x40001, 0x20000, CRC(2f05b14a) SHA1(f9ae935612e95d8ac2596af1728a6062569e9a42) )
