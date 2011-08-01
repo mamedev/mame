@@ -5416,10 +5416,8 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 READ32_HANDLER ( saturn_vdp2_cram_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	UINT8 cmode0;
 
-	cmode0 = ((STV_VDP2_CRMD & 3) == 0) || (STV_VDP2_CRMD & 2);
-	offset &= (0xfff) >> (cmode0+2);
+	offset &= (0xfff) >> (2);
 
 	return state->m_vdp2_cram[offset];
 }
@@ -5440,6 +5438,9 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 
 	cmode0 = (STV_VDP2_CRMD & 3) == 0;
 
+	offset &= (0xfff) >> (2);
+	COMBINE_DATA(&state->m_vdp2_cram[offset]);
+
 	switch( STV_VDP2_CRMD )
 	{
 		/*Mode 2/3*/
@@ -5447,8 +5448,6 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 		case 3:
 		{
 			offset &= (0xfff) >> 3;
-
-			COMBINE_DATA(&state->m_vdp2_cram[offset]);
 
 			b = ((state->m_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((state->m_vdp2_cram[offset] & 0x0000ff00) >> 8);
@@ -5461,8 +5460,6 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 		case 1:
 		{
 			offset &= (0xfff) >> (cmode0+2);
-
-			COMBINE_DATA(&state->m_vdp2_cram[offset]);
 
 			b = ((state->m_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((state->m_vdp2_cram[offset] & 0x000003e0) >> 5);

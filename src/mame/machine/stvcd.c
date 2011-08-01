@@ -693,6 +693,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			{
 				cd_stat = CD_STAT_PAUSE;
 				cd_curfad = 150;
+				//cur_track = 1;
 				fadstoplay = 0;
 				in_buffer = 0;
 				buffull = 0;
@@ -838,10 +839,17 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 						fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
 					printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
 				}
-				else /* Galaxy Fight calls 10ff ffff ffff ffff, resume/restart previously called track */
+				else
 				{
-					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
-					fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
+					/* resume from a pause state */
+					/* TODO: Galaxy Fight calls 10ff ffff ffff ffff, but then it calls 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
+					   (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
+					   be countless possible combinations ... */
+					if(fadstoplay == 0)
+					{
+						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+						fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
+					}
 					printf("track resume %08x %08x\n",cd_curfad,fadstoplay);
 				}
 			}
