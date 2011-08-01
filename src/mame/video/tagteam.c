@@ -10,7 +10,8 @@
 #include "video/resnet.h"
 #include "includes/tagteam.h"
 
-
+// TODO: fix or confirm resnet implementation
+// schematics say emitter circuit with 47 ohm pullup and 470 ohm pulldown but this results in a bad palette
 static const res_net_info tagteam_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
@@ -39,6 +40,7 @@ PALETTE_INIT( tagteam )
 	palette_set_colors(machine, 0x00, rgb, 0x20);
 	auto_free(machine, rgb);
 }
+
 
 WRITE8_HANDLER( tagteam_videoram_w )
 {
