@@ -520,7 +520,7 @@ ADDRESS_MAP_END
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
 static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x1ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE_MEMBER(polepos_state, m_sprite16_memory)	/* Motion Object */
 	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_BASE_MEMBER(polepos_state, m_road16_memory)		/* Road Memory */
 	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_BASE_MEMBER(polepos_state, m_alpha16_memory)	/* Alphanumeric (char ram) */
