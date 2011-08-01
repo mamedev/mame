@@ -105,7 +105,8 @@ static void h8_btst8(h83xx_state *h8, UINT8 src, UINT8 dst);
 static void h8_bld8(h83xx_state *h8, UINT8 src, UINT8 dst); // loads to carry
 static void h8_bild8(h83xx_state *h8, UINT8 src, UINT8 dst); // inverts and loads to carry
 static void h8_bor8(h83xx_state *h8, UINT8 src, UINT8 dst); // result in carry
-//static void h8_bxor8(h83xx_state *h8, UINT8 src, UINT8 dst);
+static void h8_bxor8(h83xx_state *h8, UINT8 src, UINT8 dst);
+static void h8_band8(h83xx_state *h8, UINT8 src, UINT8 dst);
 
 static INT16 h8_mulxs8(h83xx_state *h8, INT8 src, INT8 dst);
 static INT32 h8_mulxs16(h83xx_state *h8, INT16 src, INT16 dst);
@@ -2143,8 +2144,12 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 				switch((opcode>>8)&0x7)
 				{
 				case 0:	udata8 = h8_bset8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
+				case 1:	udata8 = h8_bnot8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
 				case 2:	udata8 = h8_bclr8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8);H8_IFETCH_TIMING(1);break;
 				case 3:	h8_btst8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 4:	h8_bor8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 5:	h8_bxor8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 6:	h8_band8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
 				case 7:	h8_bld8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
 				default:
 					logerror("H8/3xx: Unk. group 7 0-7 def %x\n", opcode);
@@ -3055,21 +3060,26 @@ static UINT8 h8_bset8(h83xx_state *h8, UINT8 src, UINT8 dst)
 // does not affect result, res in C flag only
 static void h8_bor8(h83xx_state *h8, UINT8 src, UINT8 dst)
 {
-	// pass
-	UINT8 res;
-
-	res = dst & (1<<src);
-	h8->h8cflag |= res ? 1 : 0;
+	dst >>= src;
+	dst &= 0x1;
+	h8->h8cflag |= dst;
 }
 
-#ifdef UNUSED_FUNCTION
+// does not affect result, res in C flag only
+static void h8_band8(h83xx_state *h8, UINT8 src, UINT8 dst)
+{
+	dst >>= src;
+	dst &= 0x1;
+	h8->h8cflag &= dst;
+}
+
+// does not affect result, res in C flag only
 static void h8_bxor8(h83xx_state *h8, UINT8 src, UINT8 dst)
 {
 	dst >>= src;
 	dst &= 0x1;
 	h8->h8cflag ^= dst;
 }
-#endif
 
 static UINT8 h8_bclr8(h83xx_state *h8, UINT8 src, UINT8 dst)
 {

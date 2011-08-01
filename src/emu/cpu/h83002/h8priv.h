@@ -17,8 +17,8 @@ typedef struct
 typedef struct
 {
 	emu_timer *timer;
-	H8S2XXX_TPU_ITEM item[8];
-	int prescaler, tgrmax, tgrcur;
+	int cycles_per_tick;
+	UINT64 timer_cycles;
 } H8S2XXX_TPU;
 
 typedef struct
@@ -30,6 +30,8 @@ typedef struct
 typedef struct
 {
 	emu_timer *timer;
+	int cycles_per_tick;
+	UINT64 timer_cycles;
 } H8S2XXX_TMR;
 
 typedef struct _h83xx_state h83xx_state;
@@ -68,7 +70,7 @@ struct _h83xx_state
 	emu_timer *frctimer;
 
 	H8S2XXX_TMR tmr[2];
-	H8S2XXX_TPU tpu[3];
+	H8S2XXX_TPU tpu[6];
 	H8S2XXX_SCI sci[3];
 
 	int mode_8bit;
@@ -110,11 +112,20 @@ UINT8 h8_3007_itu_read8(h83xx_state *h8, UINT8 reg);
 void h8_itu_write8(h83xx_state *h8, UINT8 reg, UINT8 val);
 void h8_3007_itu_write8(h83xx_state *h8, UINT8 reg, UINT8 val);
 
-READ8_HANDLER( h8s2241_per_regs_r_byte );
-WRITE8_HANDLER( h8s2241_per_regs_w_byte );
-READ8_HANDLER( h8s2246_per_regs_r_byte );
-WRITE8_HANDLER( h8s2246_per_regs_w_byte );
-READ8_HANDLER( h8s2323_per_regs_r_byte );
-WRITE8_HANDLER( h8s2323_per_regs_w_byte );
+UINT8 h8s2241_per_regs_read_8(h83xx_state *h8, int offset);
+UINT8 h8s2246_per_regs_read_8(h83xx_state *h8, int offset);
+UINT8 h8s2323_per_regs_read_8(h83xx_state *h8, int offset);
+
+UINT16 h8s2241_per_regs_read_16(h83xx_state *h8, int offset);
+UINT16 h8s2246_per_regs_read_16(h83xx_state *h8, int offset);
+UINT16 h8s2323_per_regs_read_16(h83xx_state *h8, int offset);
+
+void h8s2241_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
+void h8s2246_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
+void h8s2323_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
+
+void h8s2241_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
+void h8s2246_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
+void h8s2323_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
 
 #endif /* __H8PRIV_H__ */

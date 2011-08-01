@@ -578,6 +578,111 @@ static WRITE16_HANDLER( h8_3007_itu1_w )
 	}
 }
 
+WRITE16_HANDLER( h8s2241_per_regs_w )
+{
+	h83xx_state *h8 = get_safe_token(&space->device());
+	if (mem_mask == 0xffff)
+	{
+		h8s2241_per_regs_write_16(h8, (offset << 1), data);
+	}
+	else if (mem_mask & 0xff00)
+	{
+		h8s2241_per_regs_write_8(h8, (offset << 1), (data >> 8) & 0xff);
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		h8s2241_per_regs_write_8(h8, (offset << 1) + 1, data & 0xff);
+	}
+}
+
+WRITE16_HANDLER( h8s2246_per_regs_w )
+{
+	h83xx_state *h8 = get_safe_token(&space->device());
+	if (mem_mask == 0xffff)
+	{
+		h8s2246_per_regs_write_16(h8, (offset << 1), data);
+	}
+	else if (mem_mask == 0xff00)
+	{
+		h8s2246_per_regs_write_8(h8, (offset << 1), (data >> 8) & 0xff);
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		h8s2246_per_regs_write_8(h8, (offset << 1) + 1, data & 0xff);
+	}
+}
+
+WRITE16_HANDLER( h8s2323_per_regs_w )
+{
+	h83xx_state *h8 = get_safe_token(&space->device());
+	if (mem_mask == 0xffff)
+	{
+		h8s2323_per_regs_write_16(h8, (offset << 1), data);
+	}
+	else if (mem_mask & 0xff00)
+	{
+		h8s2323_per_regs_write_8(h8, (offset << 1), (data >> 8) & 0xff);
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		h8s2323_per_regs_write_8(h8, (offset << 1) + 1, data & 0xff);
+	}
+}
+
+READ16_HANDLER( h8s2241_per_regs_r )
+{
+	h83xx_state *h8 = get_safe_token(&space->device());
+	if (mem_mask == 0xffff)
+	{
+		return h8s2241_per_regs_read_16(h8, (offset << 1));
+	}
+	else if (mem_mask == 0xff00)
+	{
+		return h8s2241_per_regs_read_8(h8, (offset << 1)) << 8;
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		return h8s2241_per_regs_read_8(h8, (offset << 1) + 1);
+	}
+	return 0;
+}
+
+READ16_HANDLER( h8s2246_per_regs_r )
+{
+	h83xx_state *h8 = get_safe_token(&space->device());
+	if (mem_mask == 0xffff)
+	{
+		return h8s2246_per_regs_read_16(h8, (offset << 1));
+	}
+	else if (mem_mask == 0xff00)
+	{
+		return h8s2246_per_regs_read_8(h8, (offset << 1)) << 8;
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		return h8s2246_per_regs_read_8(h8, (offset << 1) + 1);
+	}
+	return 0;
+}
+
+READ16_HANDLER( h8s2323_per_regs_r )
+{
+	h83xx_state *h8 = get_safe_token(&space->device());
+	if (mem_mask == 0xffff)
+	{
+		return h8s2323_per_regs_read_16(h8, (offset << 1));
+	}
+	else if (mem_mask == 0xff00)
+	{
+		return h8s2323_per_regs_read_8(h8, (offset << 1)) << 8;
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		return h8s2323_per_regs_read_8(h8, (offset << 1) + 1);
+	}
+	return 0;
+}
+
 // On-board RAM and peripherals
 static ADDRESS_MAP_START( h8_3002_internal_map, AS_PROGRAM, 16 )
 	// 512B RAM
@@ -599,18 +704,18 @@ static ADDRESS_MAP_START( h8_3007_internal_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2241_internal_map, AS_PROGRAM, 16 )
-	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
-	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE8( h8s2241_per_regs_r_byte, h8s2241_per_regs_w_byte, 0xffff ) // internal i/o registers
+	AM_RANGE( 0xFFEC00, 0xFFFBFF ) AM_RAM // on-chip ram
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2241_per_regs_r, h8s2241_per_regs_w ) // internal i/o registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2246_internal_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
-	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE8( h8s2246_per_regs_r_byte, h8s2246_per_regs_w_byte, 0xffff ) // internal i/o registers
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2246_per_regs_r, h8s2246_per_regs_w ) // internal i/o registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2323_internal_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
-	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE8( h8s2323_per_regs_r_byte, h8s2323_per_regs_w_byte, 0xffff ) // internal i/o registers
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2323_per_regs_r, h8s2323_per_regs_w ) // internal i/o registers
 ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3002 )
