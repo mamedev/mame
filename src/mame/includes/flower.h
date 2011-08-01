@@ -6,9 +6,8 @@ public:
 	flower_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8 *m_spriteram;
-	UINT8 *m_sn_irq_enable;
 	UINT8 *m_sn_nmi_enable;
+	UINT8 *m_spriteram;
 	UINT8 *m_textram;
 	UINT8 *m_bg0ram;
 	UINT8 *m_bg1ram;
