@@ -78,8 +78,8 @@ static void set_palette(running_machine &machine, mystston_state *state)
 	UINT8 *color_prom = machine.region("proms")->base();
 
 	compute_resistor_weights(0,	255, -1.0,
-			3, resistances_rg, weights_rg, 0, 1000,
-			2, resistances_b,  weights_b,  0, 1000,
+			3, resistances_rg, weights_rg, 0, 4700,
+			2, resistances_b,  weights_b,  0, 4700,
 			0, 0, 0, 0, 0);
 
 	for (i = 0; i < 0x40; i++)
