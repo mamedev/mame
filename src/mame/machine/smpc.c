@@ -173,7 +173,7 @@ READ8_HANDLER( stv_SMPC_r )
 //  if (offset == 0x33) //country code
 //      return_data = input_port_read(machine, "FAKE");
 
-	//if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, return_data);
+	//if(LOG_SMPC) printf ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, return_data);
 
 
 	return return_data;
@@ -363,11 +363,14 @@ static TIMER_CALLBACK( smpc_intback )
 	}
 
 	//  /*This is for RTC,cartridge code and similar stuff...*/
-	//if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
+	//if(LOG_SMPC) printf ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 	if(!(state->m_scu.ism & IRQ_SMPC))
 		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
 	else
 		state->m_scu.ist |= (IRQ_SMPC);
+
+	/* clear hand-shake flag */
+	state->m_smpc_ram[0x63] = 0x00;
 }
 
 static void smpc_rtc_write(running_machine &machine)
@@ -413,7 +416,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 	system_time systime;
 	space->machine().base_datetime(systime);
 
-//  if(LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
+//  if(LOG_SMPC) printf ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
 	state->m_smpc_ram[offset] = data;
 
 	if(offset == 0x75)
@@ -444,11 +447,11 @@ WRITE8_HANDLER( stv_SMPC_w )
         */
 		//popmessage("PDR2 = %02x",state->m_smpc_ram[0x77]);
 
-		if(LOG_SMPC) logerror("SMPC: M68k %s\n",(state->m_smpc_ram[0x77] & 0x10) ? "off" : "on");
+		if(LOG_SMPC) printf("SMPC: M68k %s\n",(state->m_smpc_ram[0x77] & 0x10) ? "off" : "on");
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (state->m_smpc_ram[0x77] & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		state->m_en_68k = ((state->m_smpc_ram[0x77] & 0x10) >> 4) ^ 1;
 
-		//if(LOG_SMPC) logerror("SMPC: ram [0x77] = %02x\n",state->m_smpc_ram[0x77]);
+		//if(LOG_SMPC) printf("SMPC: ram [0x77] = %02x\n",state->m_smpc_ram[0x77]);
 		state->m_smpc.PDR2 = (data & 0x60);
 	}
 
@@ -474,53 +477,53 @@ WRITE8_HANDLER( stv_SMPC_w )
 		switch (data)
 		{
 			case 0x00:
-				if(LOG_SMPC) logerror ("SMPC: Master ON\n");
+				if(LOG_SMPC) printf ("SMPC: Master ON\n");
 				smpc_master_on(space->machine());
 				break;
 			//in theory 0x01 is for Master OFF,but obviously is not used.
 			case 0x02:
 			case 0x03:
-				if(LOG_SMPC) logerror ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
+				if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
 				smpc_slave_enable(space->machine(),(data & 1));
 				break;
 			case 0x06:
 			case 0x07:
-				if(LOG_SMPC) logerror ("SMPC: Sound %s, ignored\n",(data & 1) ? "off" : "on");
+				if(LOG_SMPC) printf ("SMPC: Sound %s, ignored\n",(data & 1) ? "off" : "on");
 				break;
 			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
 			//case 0x08:
 			//case 0x09:
 			case 0x0d:
-				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
+				if(LOG_SMPC) printf ("SMPC: System Reset\n");
 				smpc_system_reset(space->machine());
 				break;
 			case 0x0e:
 			case 0x0f:
-				if(LOG_SMPC) logerror ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
+				if(LOG_SMPC) printf ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
 				smpc_change_clock(space->machine(),data & 1);
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
-				if(LOG_SMPC) logerror ("SMPC: Status Acquire\n");
+				if(LOG_SMPC) printf ("SMPC: Status Acquire\n");
 				space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(smpc_intback),1); //TODO: variable time
 				break;
 			/* RTC write*/
 			case 0x16:
-				if(LOG_SMPC) logerror("SMPC: RTC write\n");
+				if(LOG_SMPC) printf("SMPC: RTC write\n");
 				smpc_rtc_write(space->machine());
 				break;
 			/* SMPC memory setting*/
 			case 0x17:
-				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
+				if(LOG_SMPC) printf ("SMPC: memory setting\n");
 				//smpc_memory_setting(space->machine());
 				break;
 			case 0x18:
-				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
+				if(LOG_SMPC) printf ("SMPC: NMI request\n");
 				smpc_nmi_req(space->machine());
 				break;
 			case 0x19:
 			case 0x1a:
-				if(LOG_SMPC) logerror ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
+				if(LOG_SMPC) printf ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
 				smpc_nmi_set(space->machine(),data & 1);
 				break;
 			default:
@@ -650,54 +653,54 @@ WRITE8_HANDLER( saturn_SMPC_w )
 		switch (data)
 		{
 			case 0x00:
-				if(LOG_SMPC) logerror ("SMPC: Master ON\n");
+				if(LOG_SMPC) printf ("SMPC: Master ON\n");
 				smpc_master_on(space->machine());
 				break;
 			//in theory 0x01 is for Master OFF
 			case 0x02:
 			case 0x03:
-				if(LOG_SMPC) logerror ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
+				if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
 				smpc_slave_enable(space->machine(),data & 1);
 				break;
 			case 0x06:
 			case 0x07:
-				if(LOG_SMPC) logerror ("SMPC: Sound %s\n",(data & 1) ? "off" : "on");
+				if(LOG_SMPC) printf ("SMPC: Sound %s\n",(data & 1) ? "off" : "on");
 				smpc_sound_enable(space->machine(),data & 1);
 				break;
 			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
 			//case 0x08:
 			//case 0x09:
 			case 0x0d:
-				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
+				if(LOG_SMPC) printf ("SMPC: System Reset\n");
 				smpc_system_reset(space->machine());
 				break;
 			case 0x0e:
 			case 0x0f:
-				if(LOG_SMPC) logerror ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
+				if(LOG_SMPC) printf ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
 				smpc_change_clock(space->machine(),data & 1);
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
-                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
+                if(LOG_SMPC) printf ("SMPC: Status Acquire (IntBack)\n");
 				space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(smpc_intback),0); //TODO: variable time
 				break;
 			/* RTC write*/
 			case 0x16:
-				if(LOG_SMPC) logerror("SMPC: RTC write\n");
+				if(LOG_SMPC) printf("SMPC: RTC write\n");
 				smpc_rtc_write(space->machine());
 				break;
 			/* SMPC memory setting*/
 			case 0x17:
-				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
+				if(LOG_SMPC) printf ("SMPC: memory setting\n");
 				smpc_memory_setting(space->machine());
 				break;
 			case 0x18:
-				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
+				if(LOG_SMPC) printf ("SMPC: NMI request\n");
 				smpc_nmi_req(space->machine());
 				break;
 			case 0x19:
 			case 0x1a:
-				if(LOG_SMPC) logerror ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
+				if(LOG_SMPC) printf ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
 				smpc_nmi_set(space->machine(),data & 1);
 				break;
 			default:
@@ -706,7 +709,8 @@ WRITE8_HANDLER( saturn_SMPC_w )
 
 		// we've processed the command, clear status flag
 		state->m_smpc_ram[0x5f] = data; //read-back for last command issued
-		state->m_smpc_ram[0x63] = 0x00;
+		if(data != 0x10)
+			state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
 		/*TODO:emulate the timing of each command...*/
 	}
 }
