@@ -4337,9 +4337,6 @@ ROM_START( sc2motd )
 
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD( "modsndf.bin", 0x0000, 0x080000, CRC(088471f5) SHA1(49fb22daf04450186e9a83aee3312bb85ccf6842) )
-
-	ROM_REGION( 0x80000, "altupd", 0 ) // this one seems to say 'no thanks' when you insert a coin? for different rev?
-	ROM_LOAD( "match_of_the_day_sound.bin", 0x0000, 0x080000, CRC(5ce2fc50) SHA1(26533428582058f0cd618e3657f967bc64e551fc) )
 ROM_END
 
 
@@ -4608,7 +4605,7 @@ ROM_START( sc2wembl )
 	ROM_LOAD( "rtwn8arc.bin", 0x0000, 0x010000, CRC(b054b38e) SHA1(98aa68a4fb6db4a53a63a4976954277c082ee8bf) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* Nothing?? (missing?) */
+	ROM_LOAD( "wembley_sound.bin", 0x0000, 0x080000, CRC(5ce2fc50) SHA1(26533428582058f0cd618e3657f967bc64e551fc) )
 ROM_END
 
 
@@ -4633,6 +4630,216 @@ ROM_START( sc2prem )
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "premclubsnd.bin", 0x0000, 0x080000, CRC(b20c74f1) SHA1(b43a79f8f59387ef777fffd07a39b7333811d464) )
 ROM_END
+
+
+
+ROM_START( sc2downt )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "down-town_std_ar_20p_15rm_ass.bin", 0x0000, 0x010000, CRC(bffe2f17) SHA1(c9daeec2b715d318649c8883b4437fdd997d0dc8) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "down-town_dat_20p_15rm_ass.bin", 0x0000, 0x010000, CRC(3390da28) SHA1(80abda7a0d6913b701fb030b525db794d130df5b) )
+	ROM_LOAD( "down-town_dat_ac_10pnd-20p_15rm_ass.bin", 0x0000, 0x010000, CRC(b082210f) SHA1(cd8d18fc2dcaf6fc02bc05d4c9e4a76f2199ad8d) )
+	ROM_LOAD( "down-town_dat_ac_10pnd-20p_16rm_ass.bin", 0x0000, 0x010000, CRC(d6d95ff4) SHA1(55d2b97a0609e305d28c92f439eb3b834d29aff5) )
+	ROM_LOAD( "down-town_dat_ar_20p_15rm_ass.bin", 0x0000, 0x010000, CRC(39fc9af0) SHA1(3b3a2a2ada79fa822332c066d50d81e64860292b) )
+	ROM_LOAD( "down-town_dat_ar_20p_ass.bin", 0x0000, 0x010000, CRC(a84c92c7) SHA1(99519d3e6166ab80236f1c16be82f7b2648f0aff) )
+	ROM_LOAD( "down-town_dat_ss_20p_16rm_ass.bin", 0x0000, 0x010000, CRC(39a1cd5d) SHA1(bce1e1bfe4e9e3bc62bdf8a57b0b2db2b3accd4f) )
+	ROM_LOAD( "down-town_dat_wi_ac_10pnd_15rm_ass.bin", 0x0000, 0x010000, CRC(29a1a709) SHA1(6b2de1e7902ba5b678aebf04b0f8c3bceed8f637) )
+	ROM_LOAD( "down-town_dat_wi_ac_10pnd_16rm_ass.bin", 0x0000, 0x010000, CRC(6f6f8c71) SHA1(5fba18cc092a04b3b737bb17a03d5e37a33da985) )
+	ROM_LOAD( "down-town_std_20p_15rm_ass.bin", 0x0000, 0x010000, CRC(ef4c489f) SHA1(3b4e0c811edcb4f1f9c133ce92b7d965e167e51c) )
+	ROM_LOAD( "down-town_std_ac_10pnd-20p_15rm_ass.bin", 0x0000, 0x010000, CRC(7ef9d60d) SHA1(54000f31eac051efd2fd3fe485076f845ef3da30) )
+	ROM_LOAD( "down-town_std_ac_10pnd-20p_16rm_ass.bin", 0x0000, 0x010000, CRC(932e49d9) SHA1(05ae4751f55eefe9884444745bcf3f2ecb69e332) )
+	ROM_LOAD( "down-town_std_ar_20p_ass.bin", 0x0000, 0x010000, CRC(a162c04a) SHA1(516f754b2e9cc33d43bac37f1f0697c1a886027e) )
+	ROM_LOAD( "down-town_std_ss_20p_16rm_ass.bin", 0x0000, 0x010000, CRC(593f59a5) SHA1(578173ec26980072a00bb46370c2c1113916c279) )
+	ROM_LOAD( "down-town_std_wi_ac_10pnd_15rm_ass.bin", 0x0000, 0x010000, CRC(bb448916) SHA1(ed62858cb78c9f08a55679cfdb19a3fa951d1aed) )
+	ROM_LOAD( "down-town_std_wi_ac_10pnd_16rm_ass.bin", 0x0000, 0x010000, CRC(96ddfacd) SHA1(9085cdafc7b3ddf5ef77251a9ff4d4b4beff4ff1) )
+	ROM_LOAD( "dtown8c.bin", 0x0000, 0x010000, CRC(6b93171c) SHA1(90e01e827b473bb6ffb567a350d9d8de9119cf8d) )
+	ROM_LOAD( "dtwn20v", 0x0000, 0x010000, CRC(5e6f05e4) SHA1(78ba0636aca6d6f5d8aee0f27c337975c5680e98) )
+	ROM_LOAD( "dtwnac", 0x0000, 0x010000, CRC(f553e337) SHA1(1881912807e4d245b8f2455ca8ca6d0c158ac5a8) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "dtownsnd.dat", 0x0000, 0x080000, CRC(a41b109b) SHA1(22470d731741521321d004fc56ff8217e506ef69) )
+ROM_END
+
+ROM_START( sc2goldr )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "gold_reserve_game", 0x0000, 0x010000, CRC(581726a3) SHA1(7e122a9d48f49648feeeb3fe430013402a5dc8d7) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "gr1_3.bin", 0x0000, 0x010000, CRC(caed7c10) SHA1(3ea4b786d7574a3274131554885a372283eb1cf4) )
+	ROM_LOAD( "gr1_3d.bin", 0x0000, 0x010000, CRC(e5ad5d10) SHA1(8a2bf68b923848421b90af8a1c42f5cef1a02121) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "gold_reserve_snd", 0x0000, 0x080000, CRC(e8e7ab7b) SHA1(ce43e8ffccc0421548c6683a72267b7e5f805db4) )
+ROM_END
+
+ROM_START( sc2hifly )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "hiflyergame.bin", 0x0000, 0x010000, CRC(b3627b55) SHA1(105ff7da69eb2ca722ee251a4a6af49c46ab1bc8) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "hf2_1dat", 0x0000, 0x010000, CRC(6c1350eb) SHA1(062e4533c28c8129aae787805bdf99a2837f93f5) )
+	ROM_LOAD( "hf3_1.bin", 0x0000, 0x010000, CRC(0ec80578) SHA1(8bbe5aaefe7c5ab77e27daad3fe43d7bbe600a54) )
+	ROM_LOAD( "hf4_1.bin", 0x0000, 0x010000, CRC(ee58ed3b) SHA1(4372ca48854b5a4b2c9ac24b17afce899a88da15) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "hiflyersound.bin", 0x0000, 0x080000, CRC(acdef7dc) SHA1(c2cc219ca8f4a3e3cdcb1147ad49cd69adb3751b) )
+ROM_END
+
+
+ROM_START( sc2inst )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "instant-jackpot_std_ac_var_10pnd_ass.bin", 0x0000, 0x010000, CRC(81a235e9) SHA1(3ed26da7511b2b2324d74f8395215157c41850ce) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "instant-jackpot_dat_ac_var_10pnd_ass.bin", 0x0000, 0x010000, CRC(01034a5b) SHA1(c4f7b05d5c15c309d0c13f4bef72429e54e4fd5e) )
+	ROM_LOAD( "instant-jackpot_dat_var_8pnd_ass.bin", 0x0000, 0x010000, CRC(5ded0d95) SHA1(6f1f57e6883f4b0421ca4d49f7593a937918f9e4) )
+	ROM_LOAD( "instant-jackpot_dat_var_ass.bin", 0x0000, 0x010000, CRC(26f50252) SHA1(587ca9490e04247c8b93c4c931caadf0b5aea4b3) )
+	ROM_LOAD( "instant-jackpot_dat_var_to_htpa_ass.bin", 0x0000, 0x010000, CRC(0dcd87a1) SHA1(4d53a346665bf22e467cc0e0859ee44c177b7661) )
+	ROM_LOAD( "instant-jackpot_dat_wi_ac_10pnd_ass.bin", 0x0000, 0x010000, CRC(6d289dfa) SHA1(a1245373ad5a99e2794751dd8e4d3ea28dcb0a53) )
+	ROM_LOAD( "instant-jackpot_std_var_8pnd_ass.bin", 0x0000, 0x010000, CRC(f21c8970) SHA1(67ecb5202cc4a8f2568df6c0a4ed36f4c85b8bb4) )
+	ROM_LOAD( "instant-jackpot_std_var_ass.bin", 0x0000, 0x010000, CRC(ca8ab34a) SHA1(ecf5ccf0f95a8d149326d24ac468660dde073a16) )
+	ROM_LOAD( "instant-jackpot_std_var_to_htpa_ass.bin", 0x0000, 0x010000, CRC(1566696f) SHA1(c8cda3f1d15bcb8ba67fab8cb4b972c02106eceb) )
+	ROM_LOAD( "instant-jackpot_std_wi_ac_10pnd_ass.bin", 0x0000, 0x010000, CRC(641928a0) SHA1(8d68af148838987a4ebfd7927b8eda5cfa4bbb53) )
+	ROM_LOAD( "instantjackpotgame.bin", 0x0000, 0x010000, CRC(183d53bf) SHA1(4ceca64324a95580270b66d60e678996c79db965) )
+	ROM_LOAD( "instantjackpotgame21.bin", 0x0000, 0x010000, CRC(478a4ee9) SHA1(bb33c63d3db961dc14a02f9ab69908757b8ccd87) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "instantjackpotssnd.bin", 0x0000, 0x080000, CRC(ba922860) SHA1(7d84c7fa72b1fb567faccf8464e0fd859c76838d) )
+ROM_END
+
+
+ROM_START( sc2mam )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "make-a-million_std_ac_10pnd-20p-25p_ass.bin", 0x0000, 0x010000, CRC(33fce86f) SHA1(1fa06c834397f97e3723091eb331adab91e3d720) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "make-a-million_dat_ac_10pnd-25p-20p_ass.bin", 0x0000, 0x010000, CRC(b721a965) SHA1(23c8f3e98b7a2d7aa11593bff2caea26c893a98a) )
+	ROM_LOAD( "make-a-million_dat_ac_var_8pnd_ass.bin", 0x0000, 0x010000, CRC(722420ea) SHA1(7c3a8a7218770645f5644a68c65b8e2104857367) )
+	ROM_LOAD( "make-a-million_dat_ar_var_ass.bin", 0x0000, 0x010000, CRC(f9307781) SHA1(56bef9b7d4db0d4569a855dba49d931125f038a4) )
+	ROM_LOAD( "make-a-million_dat_ss_var_ass.bin", 0x0000, 0x010000, CRC(be526b6b) SHA1(e3e6eb91480015edc3ef46158a277c90d1bf5662) )
+	ROM_LOAD( "make-a-million_dat_wi_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(a63f1ae3) SHA1(37920ade2a162f6663a8384ff3cf55e1de71d3d6) )
+	ROM_LOAD( "make-a-million_std_ac_var_8pnd_a.bin", 0x0000, 0x010000, CRC(9150bd44) SHA1(0ef8884337c188c696a15cf2bc5a821bdc64d8ae) )
+	ROM_LOAD( "make-a-million_std_ac_var_8pnd_ass.bin", 0x0000, 0x010000, CRC(9150bd44) SHA1(0ef8884337c188c696a15cf2bc5a821bdc64d8ae) )
+	ROM_LOAD( "make-a-million_std_ar_var_ass.bin", 0x0000, 0x010000, CRC(06759280) SHA1(168743d4d116850c3c23db3cd0149c7f5f8b4da3) )
+	ROM_LOAD( "make-a-million_std_ss_var_ass.bin", 0x0000, 0x010000, CRC(4de6346a) SHA1(ae30a5adfad59dd282ca3c2e16e18cbd17d956e9) )
+	ROM_LOAD( "make-a-million_std_wi_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(d2dceb05) SHA1(f4dd4f0ce3aa97caba0356a19fe78e3c3455af54) )
+	ROM_LOAD( "mam8arc.bin", 0x0000, 0x010000, CRC(91ee99ca) SHA1(8e7e26e0ab518e55784b91b5d8c9780eb1f72525) )
+
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	// ROM_LOAD( "makeamillionsnd1.bin", 0x0000, 0x080000, CRC(9a80977a) SHA1(0a6dc9465efa9e3d12894daf88a2746e74409349) ) // this is in the club set too, belongs there instead?
+	ROM_LOAD( "mamsnd.bin", 0x0000, 0x080000, CRC(32537b18) SHA1(c26697162edde97ec999ed0459656edb85a01a50) )
+ROM_END
+
+ROM_START( sc2mamcl )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "club-make-a-million_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(f7b67981) SHA1(ccddb63cd24969fb74a3e4c51c8ab7453b3e99a1) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "club-make-a-million_dat_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(4a6a6e05) SHA1(684bb86de514e66409cc04255d4212569ad5f2e6) )
+	ROM_LOAD( "club-make-a-million_dat_ac_var_ass.bin", 0x0000, 0x010000, CRC(484ea479) SHA1(c1542dcd664508e4ebea3b66b9961680b7f4d711) )
+	ROM_LOAD( "club-make-a-million_dat_ac_var_p65_ass.bin", 0x0000, 0x010000, CRC(ee687364) SHA1(a414c71659a81fc464bc167c05e9426a37d33f82) )
+	ROM_LOAD( "club-make-a-million_std_ac_var_ass.bin", 0x0000, 0x010000, CRC(c0685075) SHA1(4906d1e81e7d9b43e6c147ebc72081634dd7cd45) )
+	ROM_LOAD( "club-make-a-million_std_ac_var_p65_ass.bin", 0x0000, 0x010000, CRC(296b5724) SHA1(437d789313960db9e4da147353da81d3e162e563) )
+	ROM_LOAD( "mmilclub", 0x0000, 0x010000, CRC(c3c6856a) SHA1(6163bfcf4271bef2517bdf16b526a882574c0bf1) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "cmamsnd.bin", 0x0000, 0x080000, CRC(9a80977a) SHA1(0a6dc9465efa9e3d12894daf88a2746e74409349) )
+ROM_END
+
+ROM_START( sc2scc )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "sc4_4t.bin", 0x0000, 0x010000, CRC(99235ed7) SHA1(f2d851ce1abe6c1dc4ab1ce3aea067c6434ef6ee) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "scsnd", 0x0000, 0x040000, CRC(5f201e1a) SHA1(cc67bcd3a59681b7eb535c966a1e100a17ca1acc) )
+ROM_END
+
+
+ROM_START( sc2showt )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "showtime-spectacular_std_ac_8-10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(44176459) SHA1(e7321fb659be162507f095e3b586706837892c2d) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "showtime-spectacular_dat_ac_8-10pnd20p_ass.bin", 0x0000, 0x010000, CRC(98111157) SHA1(ddc0e194d330348ce133467324155787f98bf8fd) )
+	ROM_LOAD( "showtime-spectacular_dat_ac_var_8pnd_ass.bin", 0x0000, 0x010000, CRC(99bddd9c) SHA1(256b11ffc0415c21ad20d7192cf5bb67dca38a54) )
+	ROM_LOAD( "showtime-spectacular_dat_ar_var_ass.bin", 0x0000, 0x010000, CRC(f70d696e) SHA1(5ddaa1323586dd7de87ee18f666c632a149b8c6c) )
+	ROM_LOAD( "showtime-spectacular_dat_ss_var_ass.bin", 0x0000, 0x010000, CRC(180984c3) SHA1(789cf4e7d99ad25d21ea02ec4de39f30fb6e7474) )
+	ROM_LOAD( "showtime-spectacular_dat_wi_ac_8-10pnd_ass.bin", 0x0000, 0x010000, CRC(9233e7e2) SHA1(fafc9fe99fb3b04e494302e2e1c566e611c1cd54) )
+	ROM_LOAD( "showtime-spectacular_std_ac_var_8pnd_ass.bin", 0x0000, 0x010000, CRC(c6760a9b) SHA1(bf85edd0a0d10da04b1a3608fa2f2f3c5d4ed7ec) )
+	ROM_LOAD( "showtime-spectacular_std_ar_var_ass.bin", 0x0000, 0x010000, CRC(b2a8470c) SHA1(43eecd76e6a028595ee91a7be92490bda9d8eef0) )
+	ROM_LOAD( "showtime-spectacular_std_ss_var_ass.bin", 0x0000, 0x010000, CRC(a42d951d) SHA1(e6c0491e69195043f0f228b80ded6c84116b8ddc) )
+	ROM_LOAD( "showtime-spectacular_std_wi_ac_8-10.pnd_ass.bin", 0x0000, 0x010000, CRC(d4867696) SHA1(7d8d9eed052ab6a84c52136bb604b91987f6120e) )
+	ROM_LOAD( "stspecss", 0x0000, 0x002000, CRC(e7f3c2ad) SHA1(9fe0cda10d1778d42ebc8db7d1f1e393c00848c4) ) // looks like a bad dump, first 0x2000 of some of the above roms?
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "stspec", 0x0000, 0x080000, CRC(01e4a017) SHA1(f2f0cadf2334edf35db98af0dcb6d827c991f3f2) )
+ROM_END
+
+
+ROM_START( sc2sstar )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "superstar_std_ac_var_4-8-10pnd_tri2_rot_ass.bin", 0x0000, 0x010000, CRC(1e294299) SHA1(c961be1289bc77e34535d913ff19c75b1edeaba7) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "superstar.bin", 0x0000, 0x010000, CRC(1e294299) SHA1(c961be1289bc77e34535d913ff19c75b1edeaba7) )
+	ROM_LOAD( "superstar_dat_ac_8pnd-20p_tri2_ass.bin", 0x0000, 0x010000, CRC(c1134d01) SHA1(d36ea1c58261353c86da562825ccadcdc2ddb9e8) )
+	ROM_LOAD( "superstar_dat_ac_tri3_ass.bin", 0x0000, 0x010000, CRC(caeaf463) SHA1(c07569da462de24f477a974f7d18368ea7b6b461) )
+	ROM_LOAD( "superstar_dat_ac_var_4-8-10pnd_tri2_rot_ass.bin", 0x0000, 0x010000, CRC(f65ed8c9) SHA1(c0322c63d02d11425518fdacb98d30e7e49e498b) )
+	ROM_LOAD( "superstar_dat_wi_ac_10pnd_tri2_rot_ass.bin", 0x0000, 0x010000, CRC(71ef63d6) SHA1(c0b1cbca8c801002a3eb7fd11474107c6bc6a1d1) )
+	ROM_LOAD( "superstar_std_ac_8pnd-20p_tri2_ass.bin", 0x0000, 0x010000, CRC(441b76ff) SHA1(46b1ac77798cee4dfdd703af768c83b5c246f135) )
+	ROM_LOAD( "superstar_std_ac_tri3_ass.bin", 0x0000, 0x010000, CRC(7a6c9f8d) SHA1(2a721823a95b2c324dd8500b32a04e8492e49f67) )
+	ROM_LOAD( "superstar_std_wi_ac_10pnd_tri2_rot_ass.bin", 0x0000, 0x010000, CRC(adca7b5a) SHA1(4c889a0cda94c2698a4102a53d04594f7f931ee5) )
+	ROM_LOAD( "supst20.15", 0x0000, 0x010000, CRC(c3446ec4) SHA1(3c1ad27385547a33993a839b53873d8b92214ade) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "superstarsnd.bin", 0x0000, 0x080000, CRC(9a2609b5) SHA1(d29a5029e39cd44739682954f034f2d1f2e1cebf) )
+ROM_END
+
+
+ROM_START( sc2pe1g )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "pe95750415proma.bin", 0x0000, 0x010000, CRC(e518f28e) SHA1(0f693814409b9aa69d736dc97f26d2a79afd06c5) ) // not scrambled?
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "pe95004031sound.bin", 0x0000, 0x080000, CRC(82f895b0) SHA1(888e172b24cb95c2723d9aa5cf1153a3af2ff2c7) )
+
+	ROM_REGION( 0x80000, "other", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal.bin", 0x0000, 0x000010, CRC(d33fb7d2) SHA1(6de1a205808bccb9bc86f630c0eda261041a3b00) )
+ROM_END
+
+
+ROM_START( sc2wwcl )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "club-wild-west_std_ac_var_250pnd_ass.bin", 0x0000, 0x010000, CRC(a4c33524) SHA1(34d46b912488f630ddec301bde5ee1d87661b2a4) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "club-wild-west_dat_ac_var_250pnd_ass.bin", 0x0000, 0x010000, CRC(deca21f2) SHA1(a79ef84271742f98e4557cba7b6b976f4d5b220f) )
+	ROM_LOAD( "club-wild-west_dat_ac_var_ffp_ass.bin", 0x0000, 0x010000, CRC(2361e6c7) SHA1(5277d8d784a358441b86f4b9e3999511c74b7b09) )
+	ROM_LOAD( "club-wild-west_std_ac_var_ffp_ass.bin", 0x0000, 0x010000, CRC(74b2592a) SHA1(f83a1fb5db69403a6b2922d2e3654fb753e0079c) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "club-wild-west_sound.bin", 0x0000, 0x080000, NO_DUMP ) // guessing it's missing
+ROM_END
+
+
+ROM_START( sc2dick )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "spotteddick2_2.bin", 0x0000, 0x010000, CRC(497ef3b2) SHA1(f5021e35397081c62e817b86ff9e8a49d78748a5) )
+
+	ROM_REGION( 0x12000, "altrevs", 0 )
+	ROM_LOAD( "sp151-4n.p1", 0x0000, 0x010000, CRC(ee18a5a1) SHA1(17c2984fb305a571df83c663c9e42164f2322938) )
+	ROM_LOAD( "sp151-4p.p1", 0x0000, 0x010000, CRC(94d96a28) SHA1(307e1cb5fe3c6050eb039dcd97e6ac88494707b3) )
+	ROM_LOAD( "spot3-1p.p1", 0x0000, 0x010000, CRC(fa027939) SHA1(7fc6d26d179d976add3ca18c5df71dd9df7af1f2) )
+//	ROM_LOAD( "spotd_v2_2.bin", 0x0000, 0x010000, CRC(497ef3b2) SHA1(f5021e35397081c62e817b86ff9e8a49d78748a5) )
+	ROM_LOAD( "global-spotted-dick_euro.bin", 0x0000, 0x010000, CRC(695a3ec4) SHA1(f9f2f47f74479ef444997e2deef1c5f4677368ca) ) // this one isn't scrambled
+
+	ROM_REGION( 0x100000, "upd", ROMREGION_ERASE00 ) // not upd?
+	ROM_LOAD( "global-spotted-dick_snd.bin", 0x0000, 0x100000, CRC(f2c66aab) SHA1(6fe94a193779c91711588365591cf42d197cb7b9) )
+ROM_END
+
+
 
 
 /* Video Based (Adder 2) */
@@ -4693,6 +4900,24 @@ GAME( 199?, sc2easy		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "E
 GAME( 199?, sc2majes	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Majestic Bells (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2dels		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Del's Millions (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2wembl	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Road To Wembley (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2downt	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",	     "Down Town (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2inst		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2mam		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2mamcl	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2showt	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Showtime Spectacular (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2sstar	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2wwcl		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Wild West Club (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+// this one is a bit strange (not encrypted, gives 'PROM ERROR 2'), is it really sc2? BFMemulator layout dat says it is
+GAME( 199?, sc2pe1g		, 0			,  scorpion2		, drwho		, drwhon	, 0,		 "BFM",      "Public Enemy No.1 (Bellfruit) [German] (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
+// these need inverted service door, and seem to have some issues with the reels jumping between 2 values?
+GAME( 199?, sc2goldr	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Mdm",      "Gold Reserve (Mdm) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2hifly	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Mdm",      "High Flyer (Mdm) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2scc		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Mdm",      "Safe Cracker Club (Mdm) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
+// custom Global sound system?
+GAME( 199?, sc2dick		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "Spotted Dick (Global) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
 
 // Games with Dot Matrix Displays */
 

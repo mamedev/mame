@@ -3,7 +3,7 @@
     Maygay EPOCH hardware
      mechanical fruit machine HW
 
-    H8 CPU
+    HD6413002FN16 (H8-3002) CPU
 
     YMZ280B sound
 
@@ -11,6 +11,8 @@
     the PIC marked 'Security' is apparently the RTC, and doesn't change
     the other is per game / manufacturer and provides data needed for booting?
 
+	The majority of system tasks are handled by a custom ASIC which is capable of reading and writing
+	directly from/to the main RAM.	This includes handling of the inputs, and lamps / LEDs
 
     -------------------------------------------------
     MOST GAMES DO NOT HAVE ANY SOUND ROMS DUMPED
@@ -61,7 +63,7 @@ static const ymz280b_interface ymz280b_config =
 
 
 static MACHINE_CONFIG_START( maygayep, maygayep_state )
-	MCFG_CPU_ADD("maincpu", H83044, 10000000 )
+	MCFG_CPU_ADD("maincpu", H83002, 16000000 )
 	MCFG_CPU_PROGRAM_MAP( maygayep_map )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
