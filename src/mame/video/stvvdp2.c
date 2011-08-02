@@ -1,6 +1,5 @@
 /* Sega Saturn VDP2 */
 
-/*Debug features,remember to zero it if you publish this file.*/
 #define DEBUG_MODE 0
 
 /*
@@ -380,8 +379,18 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 /*180024 - Special Function Code Select
 
-180026 - Special Function Code
+*/
 
+	#define STV_VDP2_SFSEL ((state->m_vdp2_regs[0x024/4] >> 16)&0x0000ffff)
+
+/*180026 - Special Function Code
+
+*/
+
+	#define STV_VDP2_SFCODE ((state->m_vdp2_regs[0x024/4] >> 0)&0x0000ffff)
+
+
+/*
 180028 - CHCTLA - Character Control (NBG0, NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    | N1CHCN1  | N1CHCN0  | N1BMSZ1  | N1BMSZ0  | N1BMEN   | N1CHSZ   |
@@ -674,7 +683,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 /*  Supplementary Character Bits (in 1 byte mode) */
 	#define STV_VDP2_R0SPCN ((STV_VDP2_PNCR & 0x001f) >> 0)
 
-/* 18003A - PLSZ - Plane Size (incomplete)
+/* 18003A - PLSZ - Plane Size
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
@@ -689,13 +698,13 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
     10 invalid
     11 2H Pages x 2V Pages  */
 	#define STV_VDP2_RBOVR	((STV_VDP2_PLSZ & 0xc000) >> 14)
-	#define STV_VDP2_RAOVR	((STV_VDP2_PLSZ & 0x0c00) >> 10)
-	#define STV_VDP2_N0PLSZ ((STV_VDP2_PLSZ & 0x0003) >> 0)
-	#define STV_VDP2_N1PLSZ ((STV_VDP2_PLSZ & 0x000c) >> 2)
-	#define STV_VDP2_N2PLSZ ((STV_VDP2_PLSZ & 0x0030) >> 4)
-	#define STV_VDP2_N3PLSZ ((STV_VDP2_PLSZ & 0x00c0) >> 6)
-	#define STV_VDP2_RAPLSZ ((STV_VDP2_PLSZ & 0x0300) >> 8)
 	#define STV_VDP2_RBPLSZ ((STV_VDP2_PLSZ & 0x3000) >> 12)
+	#define STV_VDP2_RAOVR	((STV_VDP2_PLSZ & 0x0c00) >> 10)
+	#define STV_VDP2_RAPLSZ ((STV_VDP2_PLSZ & 0x0300) >> 8)
+	#define STV_VDP2_N3PLSZ ((STV_VDP2_PLSZ & 0x00c0) >> 6)
+	#define STV_VDP2_N2PLSZ ((STV_VDP2_PLSZ & 0x0030) >> 4)
+	#define STV_VDP2_N1PLSZ ((STV_VDP2_PLSZ & 0x000c) >> 2)
+	#define STV_VDP2_N0PLSZ ((STV_VDP2_PLSZ & 0x0003) >> 0)
 
 /* 18003C - MPOFN - Map Offset (NBG0, NBG1, NBG2, NBG3)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -707,10 +716,10 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 	#define STV_VDP2_MPOFN_ ((state->m_vdp2_regs[0x03c/4] >> 16)&0x0000ffff)
 
 	/* Higher 3 bits of the map offset for each layer */
-	#define STV_VDP2_N0MP_ ((STV_VDP2_MPOFN_ & 0x0007) >> 0)
-	#define STV_VDP2_N1MP_ ((STV_VDP2_MPOFN_ & 0x0070) >> 4)
-	#define STV_VDP2_N2MP_ ((STV_VDP2_MPOFN_ & 0x0700) >> 8)
 	#define STV_VDP2_N3MP_ ((STV_VDP2_MPOFN_ & 0x7000) >> 12)
+	#define STV_VDP2_N2MP_ ((STV_VDP2_MPOFN_ & 0x0700) >> 8)
+	#define STV_VDP2_N1MP_ ((STV_VDP2_MPOFN_ & 0x0070) >> 4)
+	#define STV_VDP2_N0MP_ ((STV_VDP2_MPOFN_ & 0x0007) >> 0)
 
 
 
@@ -1321,12 +1330,18 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_VCSTAU ((state->m_vdp2_regs[0x09c/4] >> 16)&0x00000007)
+
+
 /* 18009e - Vertical Cell Table Address (NBG0, NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
+
+	#define STV_VDP2_VCSTAL ((state->m_vdp2_regs[0x09c/4] >> 0)&0x0000fffe)
+
 
 /* 1800a0 - LSTA0U - Line Scroll Table Address (NBG0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1336,7 +1351,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	/*bit 2 unused when VRAM = 4 Mbits*/
-	#define STV_VDP2_LSTA0U ((state->m_vdp2_regs[0x0a0/4] >> 16)&0x00000003)
+	#define STV_VDP2_LSTA0U ((state->m_vdp2_regs[0x0a0/4] >> 16)&0x00000007)
 
 /* 1800a2 - LSTA0L - Line Scroll Table Address (NBG0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1355,7 +1370,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	/*bit 2 unused when VRAM = 4 Mbits*/
-	#define STV_VDP2_LSTA1U ((state->m_vdp2_regs[0x0a4/4] >> 16)&0x00000003)
+	#define STV_VDP2_LSTA1U ((state->m_vdp2_regs[0x0a4/4] >> 16)&0x00000007)
 
 /* 1800a6 - LSTA1L - Line Scroll Table Address (NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1384,7 +1399,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 	#define STV_VDP2_LCTAL	((state->m_vdp2_regs[0x0a8/4] >> 0) & 0xffff)
 
-	#define STV_VDP2_LCTA	(state->m_vdp2_regs[0x0a8/4] & 0x0003ffff)
+	#define STV_VDP2_LCTA	(((STV_VDP2_LCTAU & 0x0007) << 16) | (STV_VDP2_LCTAL & 0xfffe))
 
 /* 1800ac - Back Screen Table Address
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1393,6 +1408,11 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |  BKTA18  |  BKTA17  |  BKTA16  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_BKTAU	((state->m_vdp2_regs[0x0ac/4] >> 16) & 0xffff)
+
+	#define STV_VDP2_BKCLMD ((STV_VDP2_BKTAU & 0x8000) >> 15)
+
+
 /* 1800ae - Back Screen Table Address
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |  BKTA15  |  BKTA14  |  BKTA13  |  BKTA12  |  BKTA11  |  BKTA10  |  BKTA9   |  BKTA8   |
@@ -1400,10 +1420,9 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |  BKTA7   |  BKTA7   |  BKTA6   |  BKTA5   |  BKTA4   |  BKTA3   |  BKTA2   |  BKTA0   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_BKTA_UL (state->m_vdp2_regs[0x0ac/4])
+	#define STV_VDP2_BKTAL	((state->m_vdp2_regs[0x0ac/4] >> 0) & 0xffff)
 
-	#define STV_VDP2_BKCLMD ((STV_VDP2_BKTA_UL & 0x80000000) >> 31)
-	#define STV_VDP2_BKTA   ((STV_VDP2_BKTA_UL & 0x0007ffff) >> 0)
+	#define STV_VDP2_BKTA	(((STV_VDP2_BKTAU & 0x0007) << 16) | (STV_VDP2_BKTAL & 0xfffe))
 
 /* 1800b0 - RPMD - Rotation Parameter Mode
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1656,12 +1675,30 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_WCTLD ((state->m_vdp2_regs[0x0d4/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CCLOG ((STV_VDP2_WCTLD & 0x8000) >> 15)
+	#define STV_VDP2_CCSWE ((STV_VDP2_WCTLD & 0x2000) >> 13)
+	#define STV_VDP2_CCSWA ((STV_VDP2_WCTLD & 0x1000) >> 12)
+	#define STV_VDP2_CCW1E ((STV_VDP2_WCTLD & 0x0800) >> 11)
+	#define STV_VDP2_CCW1A ((STV_VDP2_WCTLD & 0x0400) >> 10)
+	#define STV_VDP2_CCW0E ((STV_VDP2_WCTLD & 0x0200) >> 9)
+	#define STV_VDP2_CCW0A ((STV_VDP2_WCTLD & 0x0100) >> 8)
+	#define STV_VDP2_RPLOG ((STV_VDP2_WCTLD & 0x0080) >> 7)
+	#define STV_VDP2_RPW1E ((STV_VDP2_WCTLD & 0x0008) >> 3)
+	#define STV_VDP2_RPW1A ((STV_VDP2_WCTLD & 0x0004) >> 2)
+	#define STV_VDP2_RPW0E ((STV_VDP2_WCTLD & 0x0002) >> 1)
+	#define STV_VDP2_RPW0A ((STV_VDP2_WCTLD & 0x0001) >> 0)
+
 /* 1800d8 - Line Window Table Address (W0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
+
+	#define STV_VDP2_LWTA0U ((state->m_vdp2_regs[0x0d8/4] >> 16)&0x0000ffff)
+
+	#define STV_VDP2_W0LWE  ((STV_VDP2_LWTA0U & 0x8000) >> 15)
 
 /* 1800da - Line Window Table Address (W0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1670,6 +1707,12 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_LWTA0L ((state->m_vdp2_regs[0x0d8/4] >> 0)&0x0000ffff)
+
+	/* bit 19 isn't used when VRAM = 4 Mbit */
+	#define STV_VDP2_W0LWTA	(((STV_VDP2_LWTA0U & 0x0007) << 16) | (STV_VDP2_LWTA0L & 0xfffe))
+
+
 /* 1800dc - Line Window Table Address (W1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
@@ -1677,12 +1720,23 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_LWTA1U ((state->m_vdp2_regs[0x0dc/4] >> 16)&0x0000ffff)
+
+	#define STV_VDP2_W1LWE  ((STV_VDP2_LWTA0U & 0x8000) >> 15)
+
+
 /* 1800de - Line Window Table Address (W1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
+
+	#define STV_VDP2_LWTA1L ((state->m_vdp2_regs[0x0dc/4] >> 0)&0x0000ffff)
+
+	/* bit 19 isn't used when VRAM = 4 Mbit */
+	#define STV_VDP2_W1LWTA	(((STV_VDP2_LWTA1U & 0x0007) << 16) | (STV_VDP2_LWTA1L & 0xfffe))
+
 
 /* 1800e0 - Sprite Control
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1755,6 +1809,9 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_SFPRMD	((state->m_vdp2_regs[0x0e8/4] >> 0)&0x0000ffff)
+
+
 /* 1800ec - Colour Calculation Control
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |  BOKEN   |  BOKN2   |  BOKN1   |   BOKN0  |    --    |  EXCCEN  |  CCRTMD  |  CCMD    |
@@ -1779,6 +1836,8 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
+
+	#define STV_VDP2_SFCCMD     ((state->m_vdp2_regs[0xec/4]>>0)&0x0000ffff)
 
 /* 1800f0 - Priority Number (Sprite 0,1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -2040,16 +2099,6 @@ static struct stv_vdp2_debugging
 	UINT8 roz;   /*Debug roz on screen*/
 } debug;
 
-/*
-Errors are currently mapped as follows:
-x--- ---- ---- ---- ---- ---- ---- ---- VRAM Size = 8 Mbit
--x-- ---- ---- ---- ---- ---- ---- ---- CRKTE used
----- ---- ---- ---- ---- ---- ---- --x- Mosaic Control
----- ---- ---- ---- ---- ---- ---- ---x Window on tilemap
-*/
-#define VDP2_ERR(_bit_) (debug.error & _bit_)
-#define VDP2_CHK(_bit_) (debug.error^=_bit_)
-
 /* Not sure if to use this for the rotating tilemaps as well or just use different draw functions, might add too much bloat */
 static struct stv_vdp2_tilemap_capabilities
 {
@@ -2087,6 +2136,8 @@ static struct stv_vdp2_tilemap_capabilities
 	UINT8  colour_ram_address_offset;
 	UINT8  fade_control;
 	UINT8  window_control;
+
+	UINT8  line_screen_enabled;
 
 //  UINT8  real_map_offset[16];
 
@@ -4149,6 +4200,40 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 	}
 }
 
+static void stv_vdp2_draw_line(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int x,y;
+	UINT8* gfxdata = state->m_vdp2.gfx_decode;
+	UINT32 base_offs,base_mask;
+	UINT16 pix;
+	UINT8 interlace;
+
+	interlace = (STV_VDP2_LSMD == 3)+1;
+
+	{
+		base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+
+		for(y=cliprect->min_y;y<=cliprect->max_y;y++)
+		{
+			base_offs = (STV_VDP2_LCTA & base_mask) << 1;
+
+			if(STV_VDP2_LCCLMD)
+				base_offs += (y / interlace) << 1;
+
+			for(x=cliprect->min_x;x<=cliprect->max_x;x++)
+			{
+				UINT16 pen;
+
+				pen = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
+				pix = *BITMAP_ADDR16(bitmap, y,x);
+
+				*BITMAP_ADDR16(bitmap, y, x) = stv_add_blend(machine.pens[pen & 0x7ff],pix);
+			}
+		}
+	}
+}
+
 static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* the idea is here we check the tilemap capabilities / whats enabled and call an appropriate tilemap drawing routine, or
@@ -4184,17 +4269,50 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 	else
 	{
 		stv_vdp2_draw_basic_tilemap(machine, bitmap, &mycliprect);
-
-		if((stv2_current_tilemap.window_control & 6) != 0 && VDP2_ERR(1))
-		{
-			VDP2_CHK(1);
-			mame_printf_debug("Window control enabled on a tilemap plane = %02x\n",stv2_current_tilemap.window_control);
-		}
 	}
 
-	if(STV_VDP2_MZCTL & 0x1f)
+	if(stv2_current_tilemap.line_screen_enabled)
+		stv_vdp2_draw_line(machine,bitmap,cliprect);
+
+
 	{
-		//printf("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
+		/* Capcom Collection Dai 2 - Choh Makaimura (Duh!) */
+		if(STV_VDP2_MZCTL & 0x1f && 0)
+			popmessage("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
+
+		/* Bio Hazard bit 1 */
+		if(STV_VDP2_LNCLEN & ~2)
+			popmessage("Line Colour screen enabled %04x %08x, contact MAMEdev",STV_VDP2_LNCLEN,STV_VDP2_LCTAU<<16|STV_VDP2_LCTAL);
+
+		/* Bio Hazard 0x400 = extended color calculation enabled */
+		//if(STV_VDP2_CCCR & 0xf600)
+		if(STV_VDP2_CCCR & 0xf200)
+			popmessage("Gradation enabled %04x, contact MAMEdev",STV_VDP2_CCCR);
+
+		/* Advanced VG, Shining Force 3 */
+		if(STV_VDP2_SFCCMD && 0)
+			popmessage("Special Color Calculation enable %04x, contact MAMEdev",STV_VDP2_SFCCMD);
+
+		if(STV_VDP2_SDCTL & 0x0120)
+			popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
+
+		if(STV_VDP2_SFSEL)
+			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
+
+		if(STV_VDP2_ZMCTL)
+			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
+
+		if(STV_VDP2_SCRCTL & 0x0101)
+			popmessage("Vertical cell scroll enable %04x, contact MAMEdev",STV_VDP2_SCRCTL);
+
+		if(STV_VDP2_WCTLD & 0x2606)
+			popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
+
+		if(STV_VDP2_W0LWE || STV_VDP2_W1LWE)
+			popmessage("Line Window %s enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1");
+
+		if(STV_VDP2_SFPRMD)
+			popmessage("Special Priority Mode enabled %04x, contact MAMEdev",STV_VDP2_SFPRMD);
 	}
 }
 
@@ -4592,6 +4710,9 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+	UINT32 base_mask;
+
+	base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 
 	/*
        Colours           : 16, 256, 2048, 32768, 16770000
@@ -4656,7 +4777,7 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const
 
 	stv2_current_tilemap.linescroll_enable = STV_VDP2_N0LSCX;
 	stv2_current_tilemap.linescroll_interval = (((STV_VDP2_LSMD & 3) == 2) ? (2) : (1)) << (STV_VDP2_N0LSS);
-	stv2_current_tilemap.linescroll_table_address = ((STV_VDP2_LSTA0U << 16) | STV_VDP2_LSTA0L) * 2;
+	stv2_current_tilemap.linescroll_table_address = (((STV_VDP2_LSTA0U << 16) | STV_VDP2_LSTA0L) & base_mask) * 2;
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N0LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N0LZMX;
 
@@ -4671,6 +4792,8 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const
 										  (STV_VDP2_N0W0A << 4) |
 										  (STV_VDP2_N0W1A << 5) |
 										  (STV_VDP2_N0SWA << 6);
+
+	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N0LCEN;
 
 	stv2_current_tilemap.layer_name=0;
 
@@ -4688,6 +4811,9 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const
 static void stv_vdp2_draw_NBG1(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+	UINT32 base_mask;
+
+	base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 
 	/*
        Colours           : 16, 256, 2048, 32768
@@ -4751,7 +4877,7 @@ static void stv_vdp2_draw_NBG1(running_machine &machine, bitmap_t *bitmap, const
 
 	stv2_current_tilemap.linescroll_enable = STV_VDP2_N1LSCX;
 	stv2_current_tilemap.linescroll_interval = (((STV_VDP2_LSMD & 3) == 2) ? (2) : (1)) << (STV_VDP2_N1LSS);
-	stv2_current_tilemap.linescroll_table_address = ((STV_VDP2_LSTA1U << 16) | STV_VDP2_LSTA1L) * 2;
+	stv2_current_tilemap.linescroll_table_address = (((STV_VDP2_LSTA1U << 16) | STV_VDP2_LSTA1L) & base_mask) * 2;
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N1LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N1LZMX;
 
@@ -4766,6 +4892,8 @@ static void stv_vdp2_draw_NBG1(running_machine &machine, bitmap_t *bitmap, const
 										  (STV_VDP2_N1W0A << 4) |
 										  (STV_VDP2_N1W1A << 5) |
 										  (STV_VDP2_N1SWA << 6);
+
+	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N1LCEN;
 
 	stv2_current_tilemap.layer_name=1;
 
@@ -4867,6 +4995,8 @@ static void stv_vdp2_draw_NBG2(running_machine &machine, bitmap_t *bitmap, const
 										  (STV_VDP2_N2W1A << 5) |
 										  (STV_VDP2_N2SWA << 6);
 
+	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N2LCEN;
+
 	stv2_current_tilemap.layer_name=2;
 
 	stv2_current_tilemap.plane_size = STV_VDP2_N2PLSZ;
@@ -4967,6 +5097,8 @@ static void stv_vdp2_draw_NBG3(running_machine &machine, bitmap_t *bitmap, const
 										  (STV_VDP2_N3W0A << 4) |
 										  (STV_VDP2_N3W1A << 5) |
 										  (STV_VDP2_N3SWA << 6);
+
+	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N3LCEN;
 
 	stv2_current_tilemap.layer_name=3;
 
@@ -5240,6 +5372,8 @@ static void stv_vdp2_draw_RBG0(running_machine &machine, bitmap_t *bitmap, const
 	stv2_current_tilemap.vertical_linescroll_enable = 0;
 	stv2_current_tilemap.linezoom_enable = 0;
 
+	stv2_current_tilemap.line_screen_enabled = STV_VDP2_R0LCEN;
+
 	/*Use 0x80 as a normal/rotate switch*/
 	stv2_current_tilemap.layer_name=0x80;
 
@@ -5296,6 +5430,8 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 				b = (dot & 0x7c00) >> 10;
 				g = (dot & 0x03e0) >> 5;
 				r = (dot & 0x001f) >> 0;
+				if(STV_VDP2_BKCOEN)
+					stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_BKCOSL );
 
 				*BITMAP_ADDR16(bitmap, y,x) = b | g << 5 | r << 10;
 			}
@@ -6623,17 +6759,6 @@ SCREEN_UPDATE( stv_vdp2 )
 	}
 
 #if DEBUG_MODE
-	if(STV_VDP2_VRAMSZ && VDP2_ERR(0x80000000))
-	{
-		VDP2_CHK(0x80000000);
-		mame_printf_debug("Warning: VRAM Size = 8 MBit!\n");
-	}
-	if(STV_VDP2_CRKTE && VDP2_ERR(0x40000000))
-	{
-		VDP2_CHK(0x40000000);
-		mame_printf_debug("Warning: Color RAM Coefficient Table Ctrl used\n");
-	}
-
 	/*popmessage("N0 %02x %04x %02x %04x N1 %02x %04x %02x %04x"
     ,STV_VDP2_N0ZMXI,STV_VDP2_N0ZMXD
     ,STV_VDP2_N0ZMYI,STV_VDP2_N0ZMYD
