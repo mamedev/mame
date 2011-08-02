@@ -82,7 +82,7 @@ static WRITE8_HANDLER( flower_maincpu_irq_ack )
 
 static WRITE8_HANDLER( flower_subcpu_irq_ack )
 {
-	cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine(), "subcpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( flower_soundcpu_irq_ack )
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( flower )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Laser")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Missile")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Cutter")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -204,7 +204,7 @@ static INPUT_PORTS_START( flower )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Laser")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Missile")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Cutter")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -248,13 +248,13 @@ static MACHINE_CONFIG_START( flower, flower_state )
 	MCFG_CPU_PROGRAM_MAP(flower_cpu1_2)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,XTAL_18_432MHz/4)
+	MCFG_CPU_ADD("subcpu", Z80,XTAL_18_432MHz/4)
 	MCFG_CPU_PROGRAM_MAP(flower_cpu1_2)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 120)	// controls game speed? irqsource and frequency unknown
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_18_432MHz/4)
 	MCFG_CPU_PROGRAM_MAP(flower_sound_cpu)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 120)	// controls music freq, assume same irqsource as subcpu
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 90)	// controls music speed. irqsource and frequency unknown, same as subcpu perhaps?
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")	// tight sync, slowdowns otherwise
 
@@ -286,7 +286,7 @@ ROM_START( flower ) /* Komax version */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main cpu */
 	ROM_LOAD( "1.5j",   0x0000, 0x8000, CRC(a4c3af78) SHA1(d149b0e0d82318273dd9cc5a143b175cdc818d0d) )
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* sub cpu */
+	ROM_REGION( 0x10000, "subcpu", 0 ) /* sub cpu */
 	ROM_LOAD( "2.5f",   0x0000, 0x8000, CRC(7c7ee2d8) SHA1(1e67bfe0f3585be5a6e6719ccf9db764bafbcb01) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
@@ -329,7 +329,7 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main cpu */
 	ROM_LOAD( "1",   0x0000, 0x8000, CRC(63a2ef04) SHA1(0770f5a18d58b780abcda7e000c2a5e46f96d319) ) // hacked? "AKINA.N" changed to "JUKYUNG"
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* sub cpu */
+	ROM_REGION( 0x10000, "subcpu", 0 ) /* sub cpu */
 	ROM_LOAD( "2.5f",   0x0000, 0x8000, CRC(7c7ee2d8) SHA1(1e67bfe0f3585be5a6e6719ccf9db764bafbcb01) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
