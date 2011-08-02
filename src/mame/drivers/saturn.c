@@ -1932,6 +1932,9 @@ static MACHINE_RESET( saturn )
 	state->m_scu.start_factor[0] = -1;
 	state->m_scu.start_factor[1] = -1;
 	state->m_scu.start_factor[2] = -1;
+
+	state->m_vdp2.old_crmd = -1;
+	state->m_vdp2.old_tvmd = -1;
 }
 
 
@@ -1962,6 +1965,9 @@ static MACHINE_RESET( stv )
 	state->m_scu.start_factor[0] = -1;
 	state->m_scu.start_factor[1] = -1;
 	state->m_scu.start_factor[2] = -1;
+
+	state->m_vdp2.old_crmd = -1;
+	state->m_vdp2.old_tvmd = -1;
 }
 
 struct cdrom_interface saturn_cdrom =

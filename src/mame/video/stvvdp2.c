@@ -1,6 +1,7 @@
 /* Sega Saturn VDP2 */
 
 #define DEBUG_MODE 0
+#define TEST_FUNCTIONS 0
 
 /*
 
@@ -371,6 +372,8 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_MZCTL ((state->m_vdp2_regs[0x020/4] >> 0)&0x0000ffff)
 
+	#define STV_VDP2_MZSZV ((STV_VDP2_MZCTL & 0xf000) >> 12)
+	#define STV_VDP2_MZSZH ((STV_VDP2_MZCTL & 0x0f00) >> 8)
 	#define STV_VDP2_R0MZE ((STV_VDP2_MZCTL & 0x0010) >> 4)
 	#define STV_VDP2_N3MZE ((STV_VDP2_MZCTL & 0x0008) >> 3)
 	#define STV_VDP2_N2MZE ((STV_VDP2_MZCTL & 0x0004) >> 2)
@@ -2138,6 +2141,7 @@ static struct stv_vdp2_tilemap_capabilities
 	UINT8  window_control;
 
 	UINT8  line_screen_enabled;
+	UINT8  mosaic_screen_enabled;
 
 //  UINT8  real_map_offset[16];
 
@@ -4234,6 +4238,38 @@ static void stv_vdp2_draw_line(running_machine &machine, bitmap_t *bitmap, const
 	}
 }
 
+static void stv_vdp2_draw_mosaic(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 is_roz)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int x,y,xi,yi;
+	UINT8 h_size,v_size;
+	UINT16 pix;
+
+	h_size = STV_VDP2_MZSZH+1;
+	v_size = STV_VDP2_MZSZV+1;
+
+	if(is_roz)
+		v_size = 1;
+
+	if(h_size == 1 && v_size == 1)
+		return; // don't bother
+
+	if(STV_VDP2_LSMD == 3)
+		v_size <<= 1;
+
+	for(y=cliprect->min_y;y<=cliprect->max_y;y+=v_size)
+	{
+		for(x=cliprect->min_x;x<=cliprect->max_x;x+=h_size)
+		{
+			pix = *BITMAP_ADDR16(bitmap, y,x);
+
+			for(yi=0;yi<v_size;yi++)
+				for(xi=0;xi<h_size;xi++)
+					*BITMAP_ADDR16(bitmap, y+yi, x+xi) = pix;
+		}
+	}
+}
+
 static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* the idea is here we check the tilemap capabilities / whats enabled and call an appropriate tilemap drawing routine, or
@@ -4271,8 +4307,12 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		stv_vdp2_draw_basic_tilemap(machine, bitmap, &mycliprect);
 	}
 
-	if(stv2_current_tilemap.line_screen_enabled)
+	/* post-processing functions (TODO: needs layer bitmaps to be individual planes to work correctly) */
+	if(stv2_current_tilemap.line_screen_enabled && TEST_FUNCTIONS)
 		stv_vdp2_draw_line(machine,bitmap,cliprect);
+
+	if(stv2_current_tilemap.mosaic_screen_enabled && TEST_FUNCTIONS)
+		stv_vdp2_draw_mosaic(machine,bitmap,cliprect,stv2_current_tilemap.layer_name & 0x80);
 
 
 	{
@@ -4281,15 +4321,17 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 			popmessage("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
 
 		/* Bio Hazard bit 1 */
+		/* Airs Adventure 0x3e */
 		if(STV_VDP2_LNCLEN & ~2)
 			popmessage("Line Colour screen enabled %04x %08x, contact MAMEdev",STV_VDP2_LNCLEN,STV_VDP2_LCTAU<<16|STV_VDP2_LCTAL);
 
 		/* Bio Hazard 0x400 = extended color calculation enabled */
+		/* Advanced World War 0x200 = color calculation ratio mode */
 		//if(STV_VDP2_CCCR & 0xf600)
-		if(STV_VDP2_CCCR & 0xf200)
+		if(STV_VDP2_CCCR & 0xf000)
 			popmessage("Gradation enabled %04x, contact MAMEdev",STV_VDP2_CCCR);
 
-		/* Advanced VG, Shining Force 3 */
+		/* Advanced VG, Shining Force III */
 		if(STV_VDP2_SFCCMD && 0)
 			popmessage("Special Color Calculation enable %04x, contact MAMEdev",STV_VDP2_SFCCMD);
 
@@ -4299,19 +4341,26 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		if(STV_VDP2_SFSEL)
 			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
 
+		/* Albert Odyssey Gaiden 0x0001 */
+		/* Asuka 120% (doesn't make sense?) 0x0101 */
 		if(STV_VDP2_ZMCTL)
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
 
 		if(STV_VDP2_SCRCTL & 0x0101)
 			popmessage("Vertical cell scroll enable %04x, contact MAMEdev",STV_VDP2_SCRCTL);
 
-		if(STV_VDP2_WCTLD & 0x2606)
+		/* Magical Drop III 0x200 -> color calculation window */
+		if(STV_VDP2_WCTLD & 0x200a)
 			popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
 
+		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
 		if(STV_VDP2_W0LWE || STV_VDP2_W1LWE)
-			popmessage("Line Window %s enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1");
+			popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
 
-		if(STV_VDP2_SFPRMD)
+		/* Akumajou Dracula, bits 2-4 */
+		/* Arcana Strikes bit 5*/
+		/* Choh Makai Mura 0x0055 */
+		if(STV_VDP2_SFPRMD & ~0x0055)
 			popmessage("Special Priority Mode enabled %04x, contact MAMEdev",STV_VDP2_SFPRMD);
 	}
 }
@@ -4794,8 +4843,9 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t *bitmap, const
 										  (STV_VDP2_N0SWA << 6);
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N0LCEN;
+	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_N0MZE;
 
-	stv2_current_tilemap.layer_name=0;
+	stv2_current_tilemap.layer_name=(STV_VDP2_R1ON) ? 0x81 : 0;
 
 	if ( stv2_current_tilemap.enabled && (!(STV_VDP2_R1ON))) /* TODO: check cycle pattern for RBG1 */
 	{
@@ -4894,6 +4944,7 @@ static void stv_vdp2_draw_NBG1(running_machine &machine, bitmap_t *bitmap, const
 										  (STV_VDP2_N1SWA << 6);
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N1LCEN;
+	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_N1MZE;
 
 	stv2_current_tilemap.layer_name=1;
 
@@ -4996,6 +5047,7 @@ static void stv_vdp2_draw_NBG2(running_machine &machine, bitmap_t *bitmap, const
 										  (STV_VDP2_N2SWA << 6);
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N2LCEN;
+	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_N2MZE;
 
 	stv2_current_tilemap.layer_name=2;
 
@@ -5099,6 +5151,7 @@ static void stv_vdp2_draw_NBG3(running_machine &machine, bitmap_t *bitmap, const
 										  (STV_VDP2_N3SWA << 6);
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N3LCEN;
+	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_N3MZE;
 
 	stv2_current_tilemap.layer_name=3;
 
@@ -5373,6 +5426,7 @@ static void stv_vdp2_draw_RBG0(running_machine &machine, bitmap_t *bitmap, const
 	stv2_current_tilemap.linezoom_enable = 0;
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_R0LCEN;
+	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_R0MZE;
 
 	/*Use 0x80 as a normal/rotate switch*/
 	stv2_current_tilemap.layer_name=0x80;
@@ -5405,6 +5459,9 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 	int x,y;
 	UINT8* gfxdata = state->m_vdp2.gfx_decode;
 	UINT32 base_offs,base_mask;
+	UINT8 interlace;
+
+	interlace = (STV_VDP2_LSMD == 3)+1;
 
 	//popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
 
@@ -5419,7 +5476,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 		{
 			base_offs = (STV_VDP2_BKTA & base_mask) << 1;
 			if(STV_VDP2_BKCLMD)
-				base_offs += (y << 1);
+				base_offs += ((y / interlace) << 1);
 
 			for(x=cliprect->min_x;x<=cliprect->max_x;x++)
 			{
@@ -5583,12 +5640,13 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 		case 2:
 		case 3:
 		{
-			offset &= (0xfff) >> 3;
+			//offset &= (0xfff) >> 2;
 
 			b = ((state->m_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((state->m_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			r = ((state->m_vdp2_cram[offset] & 0x000000ff) >> 0);
 			palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+			palette_set_color(space->machine(),offset^0x400,MAKE_RGB(r,g,b));
 		}
 		break;
 		/*Mode 0*/
@@ -5626,15 +5684,13 @@ static void refresh_palette_data(running_machine &machine)
 		case 2:
 		case 3:
 		{
-			for(bank=0;bank<2;bank++)
+			for(c_i=0;c_i<0x400;c_i++)
 			{
-				for(c_i=0;c_i<0x400;c_i++)
-				{
-					b = ((state->m_vdp2_cram[c_i] & 0x00ff0000) >> 16);
-					g = ((state->m_vdp2_cram[c_i] & 0x0000ff00) >> 8);
-					r = ((state->m_vdp2_cram[c_i] & 0x000000ff) >> 0);
-					palette_set_color(machine,c_i+bank*0x400,MAKE_RGB(r,g,b));
-				}
+				b = ((state->m_vdp2_cram[c_i] & 0x00ff0000) >> 16);
+				g = ((state->m_vdp2_cram[c_i] & 0x0000ff00) >> 8);
+				r = ((state->m_vdp2_cram[c_i] & 0x000000ff) >> 0);
+				palette_set_color(machine,c_i,MAKE_RGB(r,g,b));
+				palette_set_color(machine,c_i+0x400,MAKE_RGB(r,g,b));
 			}
 		}
 		break;
@@ -5678,18 +5734,16 @@ static void refresh_palette_data(running_machine &machine)
 WRITE32_HANDLER ( saturn_vdp2_regs_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	static UINT8 old_crmd;
-	static UINT16 old_tvmd;
 	COMBINE_DATA(&state->m_vdp2_regs[offset]);
 
-	if(old_crmd != STV_VDP2_CRMD)
+	if(state->m_vdp2.old_crmd != STV_VDP2_CRMD)
 	{
-		old_crmd = STV_VDP2_CRMD;
+		state->m_vdp2.old_crmd = STV_VDP2_CRMD;
 		refresh_palette_data(space->machine());
 	}
-	if(old_tvmd != STV_VDP2_TVMD)
+	if(state->m_vdp2.old_tvmd != STV_VDP2_TVMD)
 	{
-		old_tvmd = STV_VDP2_TVMD;
+		state->m_vdp2.old_tvmd = STV_VDP2_TVMD;
 		stv_vdp2_dynamic_res_change(space->machine());
 	}
 }
@@ -5841,7 +5895,7 @@ static int stv_vdp2_start (running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stv_vdp2_exit), &machine));
 
 	state->m_vdp2_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
-	state->m_vdp2_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 ); // actually we only need half of it since we don't emulate extra 4mbit ram cart.
+	state->m_vdp2_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 );
 	state->m_vdp2_cram = auto_alloc_array_clear(machine, UINT32, 0x080000/4 );
 	state->m_vdp2.gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
 

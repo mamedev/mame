@@ -72,6 +72,8 @@ public:
 	    UINT16    v_count;
 	    UINT8     exltfg;
 	    UINT8     exsyfg;
+		int       old_crmd;
+		int       old_tvmd;
 	}m_vdp2;
 
 	struct {
