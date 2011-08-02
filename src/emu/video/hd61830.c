@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 
 // internal character generator ROM
 ROM_START( hd61830 )
-	ROM_REGION( 0x5c0, "hd61830", ROMREGION_LOADBYNAME ) // internal 7360-bit chargen ROM
+	ROM_REGION( 0x5c0, "hd61830", 0 ) // internal 7360-bit chargen ROM
 	ROM_LOAD( "hd61830.bin", 0x000, 0x5c0, BAD_DUMP CRC(06a934da) SHA1(bf3f074db5dc92e6f530cb18d6c013563099a87d) ) // typed in from manual
 ROM_END
 

@@ -1,8 +1,9 @@
-/***************************************************************************
+/******************************************************************************
 
-    info.h
+    tiny_dev.lst
 
-    Dumps the MAME internal data as an XML file.
+    List of all enabled devices in the system. This file is parsed by
+    makedev.exe, sorted, and output as C code describing the devices.
 
 ****************************************************************************
 
@@ -35,58 +36,4 @@
     IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 
-***************************************************************************/
-
-#pragma once
-
-#ifndef __INFO_H__
-#define __INFO_H__
-
-
-//**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
-
-// helper class to putput
-class info_xml_creator
-{
-public:
-	// construction/destruction
-	info_xml_creator(driver_enumerator &drivlist);
-
-	// output
-	void output(FILE *out);
-
-private:
-	// internal helper
-	void output_one();
-	void output_sampleof();
-	void output_bios();
-	void output_rom(const rom_source *source);
-	void output_sample();
-	void output_chips();
-	void output_display();
-	void output_sound();
-	void output_input(const ioport_list &portlist);
-	void output_switches(const ioport_list &portlist, int type, const char *outertag, const char *innertag);
-	void output_adjusters(const ioport_list &portlist);
-	void output_categories(const ioport_list &portlist);
-	void output_driver();
-	void output_images();
-	void output_slots();
-	void output_software_list();
-	void output_ramoptions();
-
-	void output_devices();
-	
-	const char *get_merge_name(const hash_collection &romhashes);
-
-	// internal state
-	FILE *					m_output;
-	driver_enumerator &		m_drivlist;
-
-	static const char s_dtd_string[];
-};
-
-
-#endif	/* __INFO_H__ */
+******************************************************************************/

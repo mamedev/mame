@@ -465,13 +465,6 @@ static bool validate_roms(driver_enumerator &drivlist, region_array *rgninfo, ga
 					error = true;
 				}
 
-				/* load by name entries must be 8 characters or less */
-				else if (ROMREGION_ISLOADBYNAME(romp) && strlen(regiontag) > 8)
-				{
-					mame_printf_error("%s: %s has load-by-name region '%s' with name >8 characters\n", driver.source_file, driver.name, regiontag);
-					error = true;
-				}
-
 				/* find any empty entry, checking for duplicates */
 				else
 				{

@@ -368,7 +368,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( namco_51xx )
-	ROM_REGION( 0x400, "mcu", ROMREGION_LOADBYNAME )
+	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "51xx.bin",     0x0000, 0x0400, CRC(c2f57ef8) SHA1(50de79e0d6a76bda95ffb02fcce369a79e6abfec) )
 ROM_END
 

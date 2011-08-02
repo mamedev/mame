@@ -96,10 +96,10 @@ const char *driverpath = m_enumerator.config().devicelist().find("root")->search
 		{
 // temporary hack: add the driver path & region name
 astring combinedpath(source->searchpath(), ";", driverpath);
-if(ROMREGION_ISLOADBYNAME(region))
+if(source->shortname())
 {
 	combinedpath=combinedpath.cat(";");
-	combinedpath=combinedpath.cat(ROMREGION_GETTAG(region));
+	combinedpath=combinedpath.cat(source->shortname());
 }
 m_searchpath = combinedpath;
 

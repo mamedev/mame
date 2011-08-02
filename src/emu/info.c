@@ -232,10 +232,49 @@ void info_xml_creator::output(FILE *out)
 	while (m_drivlist.next())
 		output_one();
 
+	// iterate through the devices, and output their roms 
+	output_devices();
 	// close the top level tag
 	fprintf(m_output, "</" XML_ROOT ">\n");
 }
 
+
+//-------------------------------------------------
+//  output_devices - print the XML information
+//  for one particular game driver
+//-------------------------------------------------
+
+void info_xml_creator::output_devices()
+{
+	extern const device_type *s_devices_sorted[];
+	extern int m_device_count;
+
+	m_drivlist.reset();
+	m_drivlist.next();
+	machine_config &config = m_drivlist.config();
+	device_t *owner = config.devicelist().first();
+	for(int i=0;i<m_device_count;i++) {
+		device_type type = *s_devices_sorted[i];
+		device_t *dev = (*type)(config, "dummy", owner, 0);
+		dev->config_complete();
+
+		// print the header and the game name
+		fprintf(m_output, "\t<" XML_TOP);
+		fprintf(m_output, " name=\"%s\"", xml_normalize_string(dev->shortname()));
+		fprintf(m_output, " runnable=\"no\"");
+		fprintf(m_output, ">\n");
+		
+		// output device description
+		if (dev->name() != NULL)
+			fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(dev->name()));
+
+		output_rom(dev);
+		
+		// close the topmost tag
+		fprintf(m_output, "\t</" XML_TOP ">\n");
+		global_free(dev);
+	}
+}
 
 //-------------------------------------------------
 //  output_one - print the XML information
@@ -301,7 +340,7 @@ void info_xml_creator::output_one()
 
 	// now print various additional information
 	output_bios();
-	output_rom();
+	output_rom(rom_first_source(m_drivlist.config()));
 	output_sample();
 	output_chips();
 	output_display();
@@ -381,13 +420,11 @@ void info_xml_creator::output_bios()
 //  the XML output
 //-------------------------------------------------
 
-void info_xml_creator::output_rom()
+void info_xml_creator::output_rom(const rom_source *source)
 {
 	// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
 	for (int rom_type = 0; rom_type < 3; rom_type++)
 	{
-		// iterate over ROM sources: first the game, then any devices
-		for (const rom_source *source = rom_first_source(m_drivlist.config()); source != NULL; source = rom_next_source(*source))
 			for (const rom_entry *region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 			{
 				bool is_disk = ROMREGION_ISDISKDATA(region);

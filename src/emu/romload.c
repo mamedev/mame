@@ -1489,7 +1489,7 @@ static void process_region_list(rom_load_data *romdata)
 #endif
 
 				/* now process the entries in the region */
-				process_rom_entries(romdata, ROMREGION_ISLOADBYNAME(region) ? ROMREGION_GETTAG(region) : NULL, region + 1);
+				process_rom_entries(romdata, (source->shortname()!=NULL) ? source->shortname() : NULL, region + 1);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 				process_disk_entries(romdata, ROMREGION_GETTAG(region), region + 1, NULL);
