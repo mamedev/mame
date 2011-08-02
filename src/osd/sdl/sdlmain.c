@@ -583,6 +583,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	/* Set the SDL environment variable for drivers wanting to load the
      * lib at startup.
      */
+#if USE_OPENGL     
 	/* FIXME: move lib loading code from drawogl.c here */
 
 	stemp = options.gl_lib();
@@ -591,6 +592,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
 		mame_printf_verbose("Setting SDL_VIDEO_GL_DRIVER = '%s' ...\n", stemp);
 	}
+#endif
 
 	/* get number of processors */
 	stemp = options.numprocessors();

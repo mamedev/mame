@@ -272,8 +272,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *) osd_malloc_array(sizeof(*result) + strlen(path)
- 1);
+	result = (osd_directory_entry *) osd_malloc_array(sizeof(*result) + strlen(path) + 1);
 	strcpy(((char *) result) + sizeof(*result), path);
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
@@ -329,3 +328,4 @@ file_error osd_get_full_path(char **dst, const char *path)
 
 	_abspath(*dst, path, CCHMAXPATH + 1);
 	return FILERR_NONE;
+}
