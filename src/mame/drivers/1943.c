@@ -478,7 +478,7 @@ ROM_END
 
 ROM_START( 1943kai )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for the banked ROMs images */
-	ROM_LOAD( "bmk01.12d", 0x00000, 0x08000, CRC(7d2211db) SHA1(b02a0b3daf7e1e224b7cad8fbe93439bd5ec9f0b) ) /* Rom labels/names + revision needs to be verified */
+	ROM_LOAD( "bmk01.12d", 0x00000, 0x08000, CRC(7d2211db) SHA1(b02a0b3daf7e1e224b7cad8fbe93439bd5ec9f0b) )
 	ROM_LOAD( "bmk02.13d", 0x10000, 0x10000, CRC(2ebbc8c5) SHA1(3be5ad061411642723e3f2bcb7b3c3caa11ee15f) )
 	ROM_LOAD( "bmk03.14d", 0x20000, 0x10000, CRC(475a6ac5) SHA1(fa07a855ba9173b6f81641c806ec7d938b0c282e) )
 
@@ -491,12 +491,12 @@ ROM_START( 1943kai )
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bmk05.4k", 0x00000, 0x8000, CRC(884a8692) SHA1(027aa8c868dc07ccd9e27705031107881aef4b91) )	/* characters */
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "bmk15.10f", 0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )	/* bg tiles */
+	ROM_REGION( 0x40000, "gfx2", 0 ) /* Yes, BM15 & BM19 are NOT BMK */
+	ROM_LOAD( "bm15.10f",  0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )	/* bg tiles */
 	ROM_LOAD( "bmk16.11f", 0x08000, 0x8000, CRC(9416fe0d) SHA1(92fbc8fffa4497747ab80abe20eef361f6525114) )
 	ROM_LOAD( "bmk17.12f", 0x10000, 0x8000, CRC(3d5acab9) SHA1(887d45b648fda952ae2137579f383ab8ede1facd) )
 	ROM_LOAD( "bmk18.14f", 0x18000, 0x8000, CRC(7b62da1d) SHA1(1926109a2ab2f550ca87b0d2af73abd2b4a7498d) )
-	ROM_LOAD( "bmk19.10j", 0x20000, 0x8000, CRC(868ababc) SHA1(1c7be905f53c63bad25fbbd9b3cf82d2c7749bc3) )
+	ROM_LOAD( "bm19.10j",  0x20000, 0x8000, CRC(868ababc) SHA1(1c7be905f53c63bad25fbbd9b3cf82d2c7749bc3) )
 	ROM_LOAD( "bmk20.11j", 0x28000, 0x8000, CRC(b90364c1) SHA1(104bc02237eeead84c7f35462186d0a1af8761bc) )
 	ROM_LOAD( "bmk21.12j", 0x30000, 0x8000, CRC(8c7fe74a) SHA1(8846b57d7f47c10ab1f505c359ecf36dcbacb011) )
 	ROM_LOAD( "bmk22.14j", 0x38000, 0x8000, CRC(d5ef8a0e) SHA1(2e42b1fbbfe823a33740a56d1334657db56d24d2) )
