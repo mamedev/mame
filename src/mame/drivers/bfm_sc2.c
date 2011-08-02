@@ -4187,7 +4187,7 @@ ROM_START( sc2gslam )
 
 	ROM_REGION( 0x80000, "altupd", 0 )
 	ROM_LOAD( "grandslamsnd.bin", 0x0000, 0x080000, CRC(e4af3787) SHA1(9aa40f7c4c4db3618b553505b02663c1d5f297c3) )
-	ROM_LOAD( "gslamsnd.bin", 0x0000, 0x080000, CRC(c9dfb6f5) SHA1(6e529c210b26e7ce164cebbff8ec314c6fa8f7bf) )
+	ROM_LOAD( "gslamsnda.bin", 0x0000, 0x080000, CRC(c9dfb6f5) SHA1(6e529c210b26e7ce164cebbff8ec314c6fa8f7bf) )
 ROM_END
 
 
