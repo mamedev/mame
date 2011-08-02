@@ -283,7 +283,7 @@ void stvcd_reset(running_machine &machine)
 	}
 
 	sector_timer = machine.device<timer_device>("sector_timer");
-	sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
+	//sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
 }
 
 static blockT *cd_alloc_block(UINT8 *blknum)
@@ -420,6 +420,7 @@ static UINT16 cd_readWord(UINT32 addr)
 		case 0x0024:
 		case 0x0026:
 //          CDROM_LOG(("RW CR4: %04x\n", cr4))
+			//popmessage("%04x %04x %04x %04x",cr1,cr2,cr3,cr4);
 			return cr4;
 
 		case 0x8000:
@@ -638,6 +639,9 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			cr2 = 0x0201;
 			cr3 = 0x0000;
 			cr4 = 0x0400;
+			/* wants a periodic response after this? */
+			sector_timer->reset();
+			sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x0200:	// Get TOC
@@ -875,8 +879,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			//else
 			//{
-			//  sector_timer->reset();
-			//  sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
+			sector_timer->reset();
+			sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
 			//}
 			break;
 
@@ -1571,7 +1575,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			playtype = 1;
 
 			// and do the disc I/O
-//          sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
+         	sector_timer->reset();
+         	sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x7500:

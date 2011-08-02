@@ -682,7 +682,17 @@ WRITE8_HANDLER( saturn_SMPC_w )
 			/*"Interrupt Back"*/
 			case 0x10:
                 if(LOG_SMPC) printf ("SMPC: Status Acquire (IntBack)\n");
-				space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(smpc_intback),0); //TODO: variable time
+				int timing;
+
+				timing = 100;
+
+				if(state->m_smpc_ram[1] == 0x01) // non-peripheral data
+					timing = 200;
+
+				if(state->m_smpc_ram[3] & 8) // peripheral data
+					timing = 15000;
+
+				space->machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(smpc_intback),0); //TODO: is variable time correct
 				break;
 			/* RTC write*/
 			case 0x16:

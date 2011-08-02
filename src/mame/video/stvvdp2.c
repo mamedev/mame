@@ -4194,7 +4194,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 
 	if(STV_VDP2_MZCTL & 0x1f)
 	{
-		printf("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
+		//printf("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
 	}
 }
 
@@ -5483,24 +5483,27 @@ static void refresh_palette_data(running_machine &machine)
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int r,g,b;
 	int c_i;
+	UINT8 bank;
 
 	switch( STV_VDP2_CRMD )
 	{
 		case 2:
 		case 3:
 		{
-			for(c_i=0;c_i<0x400;c_i++)
+			for(bank=0;bank<2;bank++)
 			{
-				b = ((state->m_vdp2_cram[c_i] & 0x00ff0000) >> 16);
-				g = ((state->m_vdp2_cram[c_i] & 0x0000ff00) >> 8);
-				r = ((state->m_vdp2_cram[c_i] & 0x000000ff) >> 0);
-				palette_set_color(machine,c_i,MAKE_RGB(r,g,b));
+				for(c_i=0;c_i<0x400;c_i++)
+				{
+					b = ((state->m_vdp2_cram[c_i] & 0x00ff0000) >> 16);
+					g = ((state->m_vdp2_cram[c_i] & 0x0000ff00) >> 8);
+					r = ((state->m_vdp2_cram[c_i] & 0x000000ff) >> 0);
+					palette_set_color(machine,c_i+bank*0x400,MAKE_RGB(r,g,b));
+				}
 			}
 		}
 		break;
 		case 0:
 		{
-			UINT8 bank;
 
 			for(bank=0;bank<2;bank++)
 			{
