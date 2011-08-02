@@ -253,13 +253,23 @@ int stepper_update(int which, UINT8 pattern)
 		if ( which ==1 )logerror("which %d Steps %d Phase %d Pattern Old %02X New %02X\n",which,steps,(step[which].phase),step[which].old_pattern,step[which].pattern);
 		#endif
 
-		if (step[which].reverse)
+		int max = step[which].max_steps;
+		pos = 0;
+
+		if (max!=0)
 		{
-			pos = (step[which].step_pos - steps + step[which].max_steps) % step[which].max_steps;
+			if (step[which].reverse)
+			{
+				pos = (step[which].step_pos - steps + max) % max;
+			}
+			else
+			{
+				pos = (step[which].step_pos + steps + max) % max;
+			}
 		}
 		else
 		{
-			pos = (step[which].step_pos + steps + step[which].max_steps) % step[which].max_steps;
+			logerror("step[which].max_steps == 0\n");
 		}
 
 		if (pos != step[which].step_pos)

@@ -38,6 +38,7 @@
 
 ******************************************************************************/
 
+
 // "Pacman hardware" games
 puckman			// (c) 1980 Namco
 puckmana		// (c) 1980 Namco
@@ -9068,20 +9069,6 @@ qos				// 1992 BFM
 qosa			// 1992 BFM
 qosb			// 1992 BFM
 
-// Scorpion 2+Video Board Games
-qntoondo		// 1993
-quintoon		// 1993
-quintond		// 1993
-quintono		// 1993
-qntoond			// 1993
-pokio			// 1994
-slotsnl			// 1995
-paradice		// 1995
-pyramid			// 1996
-sltblgtk		// 1996
-sltblgpo		// 1996
-sltblgp1		// 1996
-gldncrwn		// 1997
 
 // ADP games
 backgamn		// (c) 1990
@@ -11198,48 +11185,101 @@ orbatak
 
 */
 
-// Scorpion 2
-m_brkfst
-m_brkfs1
-m_brkfs2
-m_brkfs3
-m_brkfs4
-m_brkfs5
-
-m_bdrwho
-m_bdrwh1
-m_bdrwh2
-m_bdrwh3
-m_bdrwh4
-m_bdrwh5
-m_bdrwh6
-m_bdrwh7
-m_bdrwh8
-m_bdrwh9
-m_bdrw10
-m_bdrw11
-m_bdrw12
-m_bdrw13
-m_bdrw14
-m_bdrw15
-m_bdrw16
-m_bdrw17
-
-m_bfocus
-m_bcgslm
-m_luvjub
-m_cpeno1
+/* Bellfruit Hardware */
 
 // System85 games
+
 m_supcrd		// (c) 198? BFM
 
-// Scorpion1 games
+// Scorpion 1 games
+
 m_lotsse		// (c) 198? BFM Dutch ROMS, prelim
 m_roulet		// (c) 198? BFM Dutch ROMS, prelim
 m_clattr		// (c) 1990 BFM,     Game Card 39-370-196
+
+// Scorpion 1 + Adder Video board
+
 m_tppokr		// (c) 1996 BFM/ELAM,Game Card 95-750-899, uses Adder board for feature gfx
 
-// Maygay Machines Ltd.
+// Scorpion 2 / 3
+
+sc2brkfs	// The Big Breakfast
+sc2brkfs1	//
+sc2brkfs2	//
+sc2brkfs3	//
+sc2brkfs4	//
+sc2brkfs5	//
+sc2drwho	// Dr.Who The Timelord
+sc2drwho1	//
+sc2drwho2	//
+sc2drwho3	//
+sc2drwho4	//
+sc2drwho5	//
+sc2drwho6	//
+sc2drwho7	//
+sc2drwho8	//
+sc2drwho9	//
+sc2drwho10	//
+sc2drwho11	//
+sc2drwho12	//
+sc2drwho13	//
+sc2drwho14	//
+sc2drwho15	//
+sc2drwho16	//
+sc2drwho17	//
+sc2focus	// Focus (Dutch, Game Card 95-750-347) 
+sc2gslam	// Club Grandslam (UK, Game Card 95-750-843) 
+sc2cshcl	// Cashino Club (Bellfruit) 
+sc2catms	// Cat & Mouse (Bellfruit) 
+sc2eggs		// Eggs On Legs Tour (Bellfruit) 
+sc2gsclb	// The Game Show Club (Bellfruit) 
+sc2suprz	// Surprise Surprize (Bellfruit) 
+sc2cpg		// Pharaoh's Gold Club (Bellfruit) 
+sc2motd		// Match Of The Day (Bellfruit) 
+sc2easy		// Easy Money (Bellfruit) 
+sc2majes	// Majestic Bells (Bellfruit) 
+sc2dels		// Del's Millions (Bellfruit) 
+sc2wembl	// Road To Wembley (Bellfruit) 
+
+// Scorpion 2 + Dot Matrix Display
+
+sc2luvv		// Luvvly Jubbly (UK Multisite 10/25p, Game Card 95-750-808)
+sc2cpe		// Club Public Enemy No.1 (UK, Game Card 95-750-846)
+sc2town		// Round The Town (Bellfruit) 
+sc2ofool	// Only Fools & Horses (Bellfruit) 
+sc2ptytm	// Party Time (Bellfruit) 
+sc2cops		// Cops 'n' Robbers (Bellfruit) 
+sc2prem		// Premier Club Manager (Bellfruit) 
+
+// Scorpion 2 + Adder 2 Video Board
+qntoondo		// 1993
+quintoon		// 1993
+quintond		// 1993
+quintono		// 1993
+qntoond			// 1993
+pokio			// 1994
+slotsnl			// 1995
+paradice		// 1995
+pyramid			// 1996
+sltblgtk		// 1996
+sltblgpo		// 1996
+sltblgp1		// 1996
+gldncrwn		// 1997
+
+// Scorpion 4
+
+sc4bbust		// Blockbuster (Mazooma)
+sc4pstat		// Paystation (Qps) (Scorpion 4)
+sc4cvani		// Cashvania (Qps) (Scorpion 4)
+sc4cvclb		// Cashvania Club (Qps) (Scorpion 4)
+sc4spark		// South Park (Bellfruit) (Scorpion 4)
+sc4brkfs		// The Big Breakfast (BFM) (Scorpion 4)
+sc4gslam		// Grandslam Club (BFM) (Scorpion 4)
+
+// Scorpion 5
+
+
+/* Maygay Machines Ltd. */
 
 // Maygay M1 A/B hardware
 

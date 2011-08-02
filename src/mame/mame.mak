@@ -512,6 +512,8 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfcobra.o \
 	$(DRIVERS)/bfm_sc1.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
+	$(DRIVERS)/bfm_sc4.o \
+	$(DRIVERS)/bfm_sc5.o \
 	$(DRIVERS)/bfmsys85.o \
 	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
 
@@ -803,6 +805,7 @@ $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/jpmmps.o \
 	$(DRIVERS)/jpms80.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
+	$(DRIVERS)/pluto5.o \
 
 $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/airbustr.o $(VIDEO)/airbustr.o \

@@ -12,9 +12,11 @@
     the other is per game / manufacturer and provides data needed for booting?
 
 
-    --------------------------------------------
+    -------------------------------------------------
     MOST GAMES DO NOT HAVE ANY SOUND ROMS DUMPED
-    --------------------------------------------
+    -------------------------------------------------
+	SOME OF THESE GAMES USED HDDS, ONLY ONE IS DUMPED
+	-------------------------------------------------
 
     Some games have EPOCH NEVADA in the header, others have EPOCH APOLLO, is there a difference?
 
@@ -2446,7 +2448,21 @@ ROM_START( ep_pharo )
 	ROM_LOAD16_BYTE( "i01ppt10.g2", 0x000000, 0x020000, CRC(3c725456) SHA1(b6c6bb799f462c4e11760c5b0661a03cd2151091) )
 	ROM_LOAD16_BYTE( "i01ppt10.g3", 0x000000, 0x020000, CRC(7823eb6f) SHA1(0adf369ca240aa15256d03a591c9e0b78d92c01e) )
 	MISSING_SOUND
+	/*
+	Disk marked:
+
+	PHARAOH'S TREASURE
+	SS010003 DATA
+	VIDEO EPOCH
+
+	Fujistu MPF3102AT (10.2GB HDD)
+	*/
+	DISK_REGION( "ide" )
+	DISK_IMAGE( "ep_pharo", 0, SHA1(daf56705178bb2b6f3547418a98c361478702aed) )
+	
 ROM_END
+
+
 
 
 

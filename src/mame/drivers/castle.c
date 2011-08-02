@@ -1,13 +1,18 @@
-/* Castle
- Mechanical Fruit Machines
- with LCD display
+/* Castle Mach2000 Hardware
+  
+  Mechanical Fruit Machines with DMD display
+  
+  motherboard pic:
+  http://mamedev.emulab.it/haze/source_refs/mach2000.jpg
 
- see
- http://www.youtube.com/watch?v=jNx1OwwS58I
- http://www.youtube.com/watch?v=m1QKaYh64-o
+  videos:
+  http://www.youtube.com/watch?v=jNx1OwwS58I
+  http://www.youtube.com/watch?v=m1QKaYh64-o
 
- unknown HW (mac2000 platform?) predecessor to 'spACE' hardware?
- starts with an 'illegal' opcode if using m6800, which CPU / variant is it?
+  Note: MB contains an undumped 68705P3, used as the
+  reel controller!
+
+  CPU on the MB is a HD6303YP
 
 */
 
@@ -42,10 +47,10 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( castle, castle_state )
-	MCFG_CPU_ADD("maincpu", M6800, 1000000)
+	MCFG_CPU_ADD("maincpu", HD6301, 1000000)
 	MCFG_CPU_PROGRAM_MAP(mastermap)
 
-	MCFG_CPU_ADD("slavecpu", M6800, 1000000)
+	MCFG_CPU_ADD("slavecpu", HD6301, 1000000)
 	MCFG_CPU_PROGRAM_MAP(slavemap)
 MACHINE_CONFIG_END
 
