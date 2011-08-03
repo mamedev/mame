@@ -716,6 +716,7 @@ static void namcos1_bankswitch(running_machine &machine, int cpu, offs_t offset,
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
 	int bank = (cpu*8) + (( offset >> 9) & 0x07);
+	int old = state->m_chip[bank];
 
 	if (offset & 1)
 	{
@@ -728,13 +729,15 @@ static void namcos1_bankswitch(running_machine &machine, int cpu, offs_t offset,
 		state->m_chip[bank] |= (data & 0x03) << 8;
 	}
 
-	set_bank(machine, bank, &state->m_bank_element[state->m_chip[bank]]);
+	/* set_bank is slow, so only call it if uninitialized(unmapped) or changed */
+	if (state->m_active_bank[bank].bank_handler_r == unknown_r || state->m_chip[bank] != old)
+		set_bank(machine, bank, &state->m_bank_element[state->m_chip[bank]]);
 
 	/* unmapped bank warning */
 	if( state->m_active_bank[bank].bank_handler_r == unknown_r)
 	{
 		logerror("%s:warning unknown chip selected bank %x=$%04x\n", machine.describe_context(), bank , state->m_chip[bank] );
-//          if (state->m_chip) popmessage("%s:unknown chip selected bank %x=$%04x", cpu , machine.describe_context(), bank , state->m_chip[bank] );
+//		if (state->m_chip) popmessage("%s:unknown chip selected bank %x=$%04x", cpu , machine.describe_context(), bank , state->m_chip[bank] );
 	}
 }
 
@@ -852,6 +855,8 @@ MACHINE_RESET( namcos1 )
 	for (bank = 0; bank < 2*8 ; bank++)
 		set_bank(machine, bank, &unknown_handler);
 
+	memset(state->m_chip, 0, sizeof(state->m_chip));
+
 	/* Default MMU setup for Cpu 0 */
 	namcos1_bankswitch(machine, 0, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
 	namcos1_bankswitch(machine, 0, 0x0001, 0x80 );
@@ -880,7 +885,6 @@ MACHINE_RESET( namcos1 )
 
 	namcos1_init_DACs(machine);
 	memset(state->m_key, 0, sizeof(state->m_key));
-	memset(state->m_chip, 0, sizeof(state->m_chip));
 	state->m_wdog = 0;
 }
 
