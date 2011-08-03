@@ -4322,7 +4322,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 
 		/* Bio Hazard bit 1 */
 		/* Airs Adventure 0x3e */
-		if(STV_VDP2_LNCLEN & ~2)
+		/* Bakuretsu Hunter */
+		if(STV_VDP2_LNCLEN & ~2 && 0)
 			popmessage("Line Colour screen enabled %04x %08x, contact MAMEdev",STV_VDP2_LNCLEN,STV_VDP2_LCTAU<<16|STV_VDP2_LCTAL);
 
 		/* Bio Hazard 0x400 = extended color calculation enabled */
@@ -4335,7 +4336,9 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		if(STV_VDP2_SFCCMD && 0)
 			popmessage("Special Color Calculation enable %04x, contact MAMEdev",STV_VDP2_SFCCMD);
 
-		if(STV_VDP2_SDCTL & 0x0120)
+		/* Cleopatra Fortune Transparent Shadow */
+		//if(STV_VDP2_SDCTL & 0x0120)
+		if(STV_VDP2_SDCTL & 0x0020)
 			popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
 
 		/* Langrisser III bit 3 normal, bit 1 during battle field */
@@ -4344,7 +4347,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 
 		/* Albert Odyssey Gaiden 0x0001 */
 		/* Asuka 120% (doesn't make sense?) 0x0101 */
-		if(STV_VDP2_ZMCTL)
+		if(STV_VDP2_ZMCTL & 0x0202)
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
 
 		/* Burning Rangers FMV and friends */
