@@ -150,7 +150,7 @@ static TILE_GET_INFO( get_text_tile_info )
 VIDEO_START(flower)
 {
 	flower_state *state = machine.driver_data<flower_state>();
-	state->m_bg0_tilemap        = tilemap_create(machine, get_bg0_tile_info, tilemap_scan_rows,     16,16,16,16);
+	state->m_bg0_tilemap        = tilemap_create(machine, get_bg0_tile_info, tilemap_scan_rows,16,16,16,16);
 	state->m_bg1_tilemap        = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,16,16,16,16);
 	state->m_text_tilemap       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	state->m_text_right_tilemap = tilemap_create(machine, get_text_tile_info,tilemap_scan_cols, 8, 8, 2,32);
