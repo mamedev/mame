@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "includes/flower.h"
 
+#define FLOWER_VERBOSE		0		// show register writes
 
 #define MIXER_SAMPLERATE	48000	/* ? */
 #define MIXER_DEFGAIN		48
@@ -219,17 +220,77 @@ DEVICE_GET_INFO( flower_sound )
 
 /********************************************************************************/
 
+#if FLOWER_VERBOSE
+static void show_soundregs(device_t *device)
+{
+	flower_sound_state *state = get_safe_token(device);
+	int set,reg,chan;
+	char text[0x100];
+	char message[0x1000] = {0};
+	UINT8 *sregs = state->m_soundregs1;
+
+	for (set=0;set<2;set++)
+	{
+		for (reg=0;reg<8;reg++)
+		{
+			sprintf(text,"R%d%d:",set+1,reg);
+			strcat(message,text);
+		
+			for (chan=0;chan<8;chan++)
+			{
+				sprintf(text," %02X",sregs[reg + 8*chan]);
+				strcat(message,text);
+			}
+			strcat(message,"\n");
+		}
+		strcat(message,"\n");
+		sregs = state->m_soundregs2;
+	}
+	popmessage("%s",message);
+}
+#endif // FLOWER_VERBOSE
+
+
+/* register functions (preliminary):
+offset: cccrrr		c=channel, r=register
+
+set 1:
+R  76543210
+0  xxxxxxxx			frequency (which nibble?)
+1  xxxxxxxx			*
+2  xxxxxxxx			*
+3  xxxxxxxx			*
+4  ...x....			one-shot sample
+5  ...x....			??? same as R4?
+6  ........			unused?
+7  xxxx....			volume
+
+set 2:
+R  76543210
+0  ....xxxx			start address?
+1  ....xxxx			start address?
+2  ....xxxx			start address
+3  ....xxxx			start address
+4  xxxx    			??? effect? (volume/pitch slide) -- these bits are used by the stuck notes
+       xxxx			start address
+5  x...    			??? loop/one-shot related?
+       xxxx			start address
+6  ........			unused?
+7  ......xx			volume
+
+*/
+
 WRITE8_DEVICE_HANDLER( flower_sound1_w )
 {
 	flower_sound_state *state = get_safe_token(device);
 	sound_channel *voice;
 	int base;
 
-	/* update the streams */
 	state->m_stream->update();
-
-	/* set the register */
 	state->m_soundregs1[offset] = data;
+#if FLOWER_VERBOSE
+	show_soundregs(device);
+#endif
 
 	/* recompute all the voice parameters */
 	for (base = 0, voice = state->m_channel_list; voice < state->m_last_channel; voice++, base += 8)
@@ -259,11 +320,11 @@ WRITE8_DEVICE_HANDLER( flower_sound2_w )
 	sound_channel *voice;
 	int base = offset & 0xf8;
 
-	/* update the streams */
 	state->m_stream->update();
-
-	/* set the register */
 	state->m_soundregs2[offset] = data;
+#if FLOWER_VERBOSE
+	show_soundregs(device);
+#endif
 
 	/* recompute all the voice parameters */
 	voice = &state->m_channel_list[offset/8];
