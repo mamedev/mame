@@ -63,6 +63,8 @@ public:
 };
 
 
+extern const device_type *s_devices_sorted[];
+extern int m_device_count;
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -440,6 +442,8 @@ static bool validate_roms(driver_enumerator &drivlist, region_array *rgninfo, ga
 	int items_since_region = 1;
 	bool error = false;
 
+	const rom_source *first_source = rom_first_source(config);
+	
 	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
 	for (const rom_source *source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 	{
@@ -559,6 +563,30 @@ static bool validate_roms(driver_enumerator &drivlist, region_array *rgninfo, ga
 		/* final check for empty regions */
 		if (items_since_region == 0)
 			mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver.source_file, driver.name);
+		
+		if (source!=first_source) {
+			// check for device roms
+			device_type type = source->type();
+			int cnt = 0;
+			for (const rom_entry *romp = rom_first_region(*source); !ROMENTRY_ISEND(romp); romp++)
+			{
+				if (ROMENTRY_ISFILE(romp)) {
+					cnt++;
+				}
+			}
+			if (cnt > 0) {
+				bool found = false;
+				for(int i=0;i<m_device_count;i++) {
+					if (type==*s_devices_sorted[i]) 
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found) 
+					mame_printf_error("Device %s is not listed in device list\n", source->shortname());
+			}
+		}
 	}
 
 	return error;
@@ -1109,6 +1137,56 @@ static bool validate_devices(driver_enumerator &drivlist, const ioport_list &por
 
 
 /*-------------------------------------------------
+    validate_slots - run per-slot validity
+    checks
+-------------------------------------------------*/
+
+static bool validate_slots(driver_enumerator &drivlist)
+{
+	bool error = false;
+	const machine_config &config = drivlist.config();
+
+	const device_slot_interface *slot = NULL;
+	for (bool gotone = config.devicelist().first(slot); gotone; gotone = slot->next(slot))
+	{
+		const slot_interface* intf = slot->get_slot_interfaces();
+		for (int j = 0; intf[j].name != NULL; j++)
+		{
+			device_t *dev = (*intf[j].devtype)(config, "dummy", config.devicelist().first(), 0);
+			dev->config_complete();
+			if (dev->rom_region() != NULL) 
+			{			
+				int cnt = 0;
+				for (const rom_entry *romp = rom_first_region(*dev); !ROMENTRY_ISEND(romp); romp++)
+				{
+					if (ROMENTRY_ISFILE(romp)) {
+						cnt++;
+					}
+				}
+				
+				if (cnt > 0) {
+					bool found = false;
+					for(int i=0;i<m_device_count;i++) {
+						if (intf[j].devtype==*s_devices_sorted[i]) 
+						{
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						mame_printf_error("Device %s in slot %s is not listed in device list\n", dev->name(), intf[j].name);
+						error = true;
+					}
+				}
+			}
+			global_free(dev);			
+		}
+	}
+	return error;
+}
+
+
+/*-------------------------------------------------
     validate_drivers - master validity checker
 -------------------------------------------------*/
 
@@ -1215,6 +1293,7 @@ void validate_drivers(emu_options &options, const game_driver *curdriver)
 			/* validate devices */
 			device_checks -= get_profile_ticks();
 			error = validate_devices(drivlist, portlist, &rgninfo) || error;
+			error = validate_slots(drivlist) || error;
 			device_checks += get_profile_ticks();
 		}
 		catch (emu_fatalerror &err)
