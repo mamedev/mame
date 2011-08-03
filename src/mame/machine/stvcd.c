@@ -1451,31 +1451,27 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
-			#if 0
-			if(temp == 0xfffff8) /* TODO: Falcom Classics */
-				temp = 0;
-			#endif
+
 			read_new_dir(machine, temp);
 			cr_standard_return(cd_stat);
 			break;
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-			hirqreg |= (CMOK|EFLS);
+			UINT32 read_dir;
 
-			// TODO!
-			popmessage("X");
+			read_dir = ((cr3&0xff)<<16)|cr4;
 
-			//temp = (cr3&0xff)<<16;
-			//temp |= cr4;
-			#if 0
-			if(temp == 0xfffff8) /* TODO: Falcom Classics */
-				temp = 0;
-			#endif
-			//cr2 = 0x4101; // CTRL/track
-			//cr3 = (curdir[temp].firstfad>>16)&0xff;
-			//cr4 = (curdir[temp].firstfad&0xffff);
+			if((cr3 >> 8) < 0x24)
+				cddevice = &filters[cr3 >> 8];
+			else
+				cddevice = (filterT *)NULL;
+
+			/* TODO:  */
+			//read_dir_current(machine,read_dir);
+
 			cr_standard_return(cd_stat);
+			hirqreg |= (CMOK|EFLS);
 			break;
 
 		case 0x7200:	// Get file system scope
@@ -1494,11 +1490,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
-
-			#if 0
-			if(temp == 0xfffff8) /* TODO: Falcom Classics */
-				temp = 0;
-			#endif
 
 			if (temp == 0xffffff)	// special
 			{
@@ -1548,31 +1539,31 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 		case 0x7400:	// Read File
 			CDROM_LOG(("%s:CD: Read File\n",   machine.describe_context()))
-			temp = (cr3&0xff)<<16;
-			temp |= cr4;
+			UINT16 file_offset,file_filter,file_id,file_size;
+
+			file_offset = ((cr1 & 0xff)<<8)|(cr2 & 0xff); /* correct? */
+			file_filter = cr3 >> 8;
+			file_id = ((cr3 & 0xff) << 16)|(cr4);
+			file_size = ((curdir[file_id].length + sectlenin - 1) / sectlenin) - file_offset;
 
 			cd_stat = CD_STAT_PLAY|0x80;	// set "cd-rom" bit
-			cur_track = cdrom_get_track(cdrom, curdir[temp].firstfad-150);
-			cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
-			cr3 = (curdir[temp].firstfad>>16)&0xff;
-			cr4 = (curdir[temp].firstfad&0xffff);
-
-			cd_curfad = curdir[temp].firstfad;
-			if (curdir[temp].length / 2048)
-			{
-				fadstoplay = curdir[temp].length/2048;
-				fadstoplay++;
-			}
+			cd_curfad = (curdir[file_id].firstfad + file_offset);
+			fadstoplay = file_size;
+			if(file_filter < 0x24)
+				cddevice = &filters[file_filter];
 			else
-			{
-				fadstoplay = curdir[temp].length/2048;
-			}
+				cddevice = (filterT *)NULL;
 
-			hirqreg |= (CMOK|DRDY);
+			printf("Read file %08x (%08x %08x) %02x %d\n",curdir[file_id].firstfad,cd_curfad,fadstoplay,file_filter,sectlenin);
+
+			cr_standard_return(cd_stat);
+
 			oddframe = 0;
 			in_buffer = 0;
 
 			playtype = 1;
+
+			hirqreg |= (CMOK);
 
 			// and do the disc I/O
          	sector_timer->reset();
@@ -1714,6 +1705,9 @@ static void read_new_dir(running_machine &machine, UINT32 fileno)
 		foundpd = 0;	// search for primary vol. desc
 		while ((!foundpd) && (cfad < 200))
 		{
+			if(sectlenin != 2048)
+				popmessage("Sector Length %d, contact MAMEdev (0)",sectlenin);
+
 			memset(sect, 0, 2048);
 			cd_readblock(cfad++, sect);
 
@@ -1788,6 +1782,9 @@ static void make_dir_current(running_machine &machine, UINT32 fad)
 
 	sect = (UINT8 *)malloc(MAX_DIR_SIZE);
 	memset(sect, 0, MAX_DIR_SIZE);
+	if(sectlenin != 2048)
+		popmessage("Sector Length %d, contact MAMEdev (1)",sectlenin);
+
 	for (i = 0; i < (curroot.length/2048); i++)
 	{
 		cd_readblock(fad+i, &sect[2048*i]);

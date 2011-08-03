@@ -482,22 +482,25 @@ static void scu_test_pending_irq(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int i;
-	const int irq_level[32] = { 0x1, 0x1, 0x1, 0x1,
-								0x1, 0x1, 0x1, 0x1,
+	const int irq_level[32] = { 0xf, 0xe, 0xd, 0xc,
+								0xb, 0xa, 0x9, 0x8,
+								0x8, 0x6, 0x6, 0x5,
+								0x3, 0x2,  -1,  -1,
+   							    0x7, 0x7, 0x7, 0x7,
 								0x4, 0x4, 0x4, 0x4,
-								0x7, 0x7, 0x7, 0x7,
-								 -1,  -1, 0x2, 0x3,
-								0x5, 0x6, 0x6, 0x8,
-								0x8, 0x9, 0xa, 0xb,
-								0xc, 0xd, 0xe, 0xf };
+								0x1, 0x1, 0x1, 0x1,
+								0x1, 0x1, 0x1, 0x1  };
 
-	for(i=0;i<31;i++)
+	for(i=0;i<32;i++)
 	{
 		if((!(state->m_scu.ism & 1 << i)) && (state->m_scu.ist & 1 << i))
 		{
 			if(irq_level[i] != -1) /* TODO: cheap check for undefined irqs */
+			{
 				device_set_input_line_and_vector(state->m_maincpu, irq_level[i], HOLD_LINE, 0x40 + i);
-			state->m_scu.ist &= ~(1 << i);
+				state->m_scu.ist &= ~(1 << i);
+				return; /* avoid spurious irqs, correct? */
+			}
 		}
 	}
 }
@@ -1807,17 +1810,6 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		}
 		else
 			state->m_scu.ist |= (IRQ_VBLANK_IN);
-
-		video_update_vdp1(timer.machine());
-
-		if(!(state->m_scu.ism & IRQ_VDP1_END))
-		{
-			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
-			scu_do_transfer(timer.machine(),6);
-		}
-		else
-			state->m_scu.ist |= (IRQ_VDP1_END);
-
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 	{
@@ -1851,6 +1843,19 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		}
 		else
 			state->m_scu.ist |= (IRQ_TIMER_1);
+	}
+
+	if(scanline == vblank_line*y_step)
+	{
+		video_update_vdp1(timer.machine());
+
+		if(!(state->m_scu.ism & IRQ_VDP1_END))
+		{
+			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
+			scu_do_transfer(timer.machine(),6);
+		}
+		else
+			state->m_scu.ist |= (IRQ_VDP1_END);
 	}
 }
 

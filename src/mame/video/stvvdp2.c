@@ -4338,7 +4338,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		if(STV_VDP2_SDCTL & 0x0120)
 			popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
 
-		if(STV_VDP2_SFSEL)
+		/* Langrisser III bit 3 normal, bit 1 during battle field */
+		if(STV_VDP2_SFSEL & ~0xa)
 			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
 
 		/* Albert Odyssey Gaiden 0x0001 */
@@ -4346,7 +4347,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		if(STV_VDP2_ZMCTL)
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
 
-		if(STV_VDP2_SCRCTL & 0x0101)
+		/* Burning Rangers FMV and friends */
+		if(STV_VDP2_SCRCTL & 0x0101 && 0)
 			popmessage("Vertical cell scroll enable %04x, contact MAMEdev",STV_VDP2_SCRCTL);
 
 		/* Magical Drop III 0x200 -> color calculation window */
@@ -4360,7 +4362,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		/* Akumajou Dracula, bits 2-4 */
 		/* Arcana Strikes bit 5*/
 		/* Choh Makai Mura 0x0055 */
-		if(STV_VDP2_SFPRMD & ~0x0055)
+		/* Sega Rally 0x0155 */
+		if(STV_VDP2_SFPRMD & ~0x0155)
 			popmessage("Special Priority Mode enabled %04x, contact MAMEdev",STV_VDP2_SFPRMD);
 	}
 }
