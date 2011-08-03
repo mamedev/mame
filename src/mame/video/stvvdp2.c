@@ -6365,7 +6365,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	}
 
 	/* framebuffer interlace */
-	if ( (STV_VDP2_LSMD == 2 || STV_VDP2_LSMD == 3) && state->m_vdp1.framebuffer_double_interlace == 0 )
+	if ( (STV_VDP2_LSMD == 3) && state->m_vdp1.framebuffer_double_interlace == 0 )
 		interlace_framebuffer = 1;
 	else
 		interlace_framebuffer = 0;
