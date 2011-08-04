@@ -95,6 +95,11 @@ static WRITE8_HANDLER( flower_coin_counter_w )
 	coin_counter_w(space->machine(), 0, data & 1);
 }
 
+static WRITE8_HANDLER( flower_coin_lockout_w )
+{
+	coin_lockout_global_w(space->machine(), ~data & 1);
+}
+
 static WRITE8_HANDLER( sound_command_w )
 {
 	flower_state *state = space->machine().driver_data<flower_state>();
@@ -106,7 +111,7 @@ static WRITE8_HANDLER( sound_command_w )
 
 static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP	// ??? maybe coin lockout?
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(flower_coin_lockout_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(flower_flipscreen_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(flower_maincpu_irq_ack)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(flower_subcpu_irq_ack)
