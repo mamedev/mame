@@ -4350,12 +4350,13 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		if(STV_VDP2_ZMCTL & 0x0202)
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
 
-		/* Burning Rangers FMV and friends */
+		/* Burning Rangers and friends FMV, J.League Pro Soccer Club Wo Tsukurou!! backgrounds */
 		if(STV_VDP2_SCRCTL & 0x0101 && 0)
 			popmessage("Vertical cell scroll enable %04x, contact MAMEdev",STV_VDP2_SCRCTL);
 
 		/* Magical Drop III 0x200 -> color calculation window */
-		if(STV_VDP2_WCTLD & 0x200a)
+		/* Ide Yousuke Meijin No Shin Jissen Mahjong 0x0303 */
+		if(STV_VDP2_WCTLD & 0x2008)
 			popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
 
 		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */

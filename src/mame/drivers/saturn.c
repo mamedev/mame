@@ -664,7 +664,8 @@ static TIMER_CALLBACK( dma_lv2_ended )
 static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	static UINT32 tmp_src,tmp_dst,tmp_size;
+	UINT32 tmp_src,tmp_dst,tmp_size;
+	UINT8 single_dma_step;
 
 	if(state->m_scu.src_add[dma_ch] == 0)
 	{
@@ -688,54 +689,23 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 		scu_add_tmp |= 0x80000000;
 	}
 
-	#if 0
-
-	/*Let me know if you encounter any of these three*/
-	if(ABUS(dst_0))
-	{
-		logerror("A-Bus invalid write\n");
-		/*...*/
-	}
-	if(WORK_RAM_L(dst_0))
-	{
-		logerror("WorkRam-L invalid write\n");
-		/*...*/
-	}
-	if(VDP2(src_0))
-	{
-		logerror("VDP-2 invalid read\n");
-		/*...*/
-	}
-	if(VDP1_REGS(dst_0))
-	{
-		logerror("VDP1 register access,must be in word units\n");
-		scu_add_tmp = (state->m_scu.dst_add[0]*0x100) | (state->m_scu.src_add[0]);
-		state->m_scu.dst_add[0] = state->m_scu.src_add[0] = 2;
-		scu_add_tmp |= 0x80000000;
-	}
-	if(DRUP(0))
-	{
-		logerror("Data read update = 1,read address add value must be 1 too\n");
-		scu_add_tmp = (state->m_scu.dst_add[0]*0x100) | (state->m_scu.src_add[0]);
-		state->m_scu.src_add[0] = 4;
-		scu_add_tmp |= 0x80000000;
-	}
-
-	if (WORK_RAM_H(dst_0) && (state->m_scu.dst_add[0] != 4))
-	{
-		scu_add_tmp = (state->m_scu.dst_add[0]*0x100) | (state->m_scu.src_add[0]);
-		state->m_scu.dst_add[0] = 4;
-		scu_add_tmp |= 0x80000000;
-	}
-	#endif
+	tmp_src = tmp_dst = 0;
 
 	tmp_size = state->m_scu.size[dma_ch];
 	if(!(DRUP(dma_ch))) tmp_src = state->m_scu.src[dma_ch];
 	if(!(DWUP(dma_ch))) tmp_dst = state->m_scu.dst[dma_ch];
 
-	for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=state->m_scu.dst_add[dma_ch])
+	single_dma_step = state->m_scu.dst_add[dma_ch];
+
+	if(single_dma_step > 4)
+		single_dma_step = 4;
+
+	if(single_dma_step == 2)
+		popmessage("Single DMA step == 2??? Contact MAMEdev");
+
+	for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=single_dma_step)
 	{
-		/* Mahou Tsukai ni Naru Houhou directly accesses CD-rom register 0x05818000, it must be a dword access otherwise it won't work */
+		/* Many games directly accesses CD-ROM register 0x05818000, it must be a dword access with current implementation otherwise it won't work */
 		if(state->m_scu.src_add[dma_ch] == 0)
 		{
 			space->write_dword(state->m_scu.dst[dma_ch],  space->read_dword(state->m_scu.src[dma_ch]  ));
@@ -746,10 +716,21 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 			space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
 		else if(state->m_scu.dst_add[dma_ch] == 8)
 		{
+			/* TRUSTED, Battle Garegga and Batsugun graphics */
 			space->write_word(state->m_scu.dst[dma_ch],  space->read_word(state->m_scu.src[dma_ch]  ));
-			space->write_word(state->m_scu.dst[dma_ch]+2,space->read_word(state->m_scu.src[dma_ch]  ));
 			space->write_word(state->m_scu.dst[dma_ch]+4,space->read_word(state->m_scu.src[dma_ch]+2));
-			space->write_word(state->m_scu.dst[dma_ch]+6,space->read_word(state->m_scu.src[dma_ch]+2));
+		}
+		else if(state->m_scu.src[dma_ch] & 1) // odd address access? Road Blaster uses this for work-ram to color ram transfers ...
+		{
+			UINT16 src_data;
+
+			src_data = ((space->read_word(state->m_scu.src[dma_ch]-1) & 0xff) << 8);
+			src_data|= ((space->read_word(state->m_scu.src[dma_ch]+1) & 0xff00) >> 8);
+			space->write_word(state->m_scu.dst[dma_ch],  src_data);
+
+			src_data = ((space->read_word(state->m_scu.src[dma_ch]+1) & 0xff) << 8);
+			src_data|= ((space->read_word(state->m_scu.src[dma_ch]+3) & 0xff00) >> 8);
+			space->write_word(state->m_scu.dst[dma_ch]+2,src_data);
 		}
 		else
 		{
@@ -816,7 +797,6 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 			if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
 		}
 
-		//guess,but I believe it's right.
 		indirect_src &=0x07ffffff;
 		indirect_dst &=0x07ffffff;
 		indirect_size &= ((dma_ch == 0) ? 0xfffff : 0x3ffff); //TODO: Guardian Heroes sets up a 0x23000 transfer for the FMV?
