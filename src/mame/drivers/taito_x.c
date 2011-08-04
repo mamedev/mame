@@ -710,6 +710,11 @@ static INPUT_PORTS_START( ballbros )
 	PORT_DIPSETTING(    0x00, "Less" )		/* each pattern */
 	PORT_DIPSETTING(    0x40, "More" )		/* every 3 times */
 
+	PORT_MODIFY("IN0")
+	TAITO_JOY_UDLR_1_BUTTON_START( 1 )
+
+	PORT_MODIFY("IN1")
+	TAITO_JOY_UDLR_1_BUTTON_START( 2 )
 INPUT_PORTS_END
 
 
