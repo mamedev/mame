@@ -62,6 +62,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 "\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
 "\t\t<!ATTLIST " XML_TOP " isbios (yes|no) \"no\">\n"
+"\t\t<!ATTLIST " XML_TOP " isdevice (yes|no) \"no\">\n"
 "\t\t<!ATTLIST " XML_TOP " ismechanical (yes|no) \"no\">\n"
 "\t\t<!ATTLIST " XML_TOP " runnable (yes|no) \"yes\">\n"
 "\t\t<!ATTLIST " XML_TOP " cloneof CDATA #IMPLIED>\n"
@@ -94,6 +95,8 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST disk writable (yes|no) \"no\">\n"
 "\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
 "\t\t\t<!ATTLIST disk optional (yes|no) \"no\">\n"
+"\t\t<!ELEMENT device_ref EMPTY>\n"
+"\t\t\t<!ATTLIST rom name CDATA #REQUIRED>\n"
 "\t\t<!ELEMENT sample EMPTY>\n"
 "\t\t\t<!ATTLIST sample name CDATA #REQUIRED>\n"
 "\t\t<!ELEMENT chip EMPTY>\n"
@@ -187,6 +190,8 @@ const char info_xml_creator::s_dtd_string[] =
 "]>";
 
 
+extern const device_type *s_devices_sorted[];
+extern int m_device_count;
 
 //**************************************************************************
 //  INFO XML CREATOR
@@ -228,12 +233,17 @@ void info_xml_creator::output(FILE *out)
 		CONFIG_VERSION
 	);
 
+	m_device_used = global_alloc_array_clear(UINT8, m_device_count);
+
 	// iterate through the drivers, outputting one at a time
 	while (m_drivlist.next())
 		output_one();
 
 	// iterate through the devices, and output their roms 
 	output_devices();
+	
+	global_free(m_device_used);
+	
 	// close the top level tag
 	fprintf(m_output, "</" XML_ROOT ">\n");
 }
@@ -246,33 +256,35 @@ void info_xml_creator::output(FILE *out)
 
 void info_xml_creator::output_devices()
 {
-	extern const device_type *s_devices_sorted[];
-	extern int m_device_count;
-
 	m_drivlist.reset();
 	m_drivlist.next();
 	machine_config &config = m_drivlist.config();
 	device_t *owner = config.devicelist().first();
-	for(int i=0;i<m_device_count;i++) {
-		device_type type = *s_devices_sorted[i];
-		device_t *dev = (*type)(config, "dummy", owner, 0);
-		dev->config_complete();
+	// check if all are listed, note that empty one is included
+	bool display_all = driver_list::total() == (m_drivlist.count()+1);
+	for(int i=0;i<m_device_count;i++) {	
+		if (display_all || (m_device_used[i]!=0)) {
+			device_type type = *s_devices_sorted[i];
+			device_t *dev = (*type)(config, "dummy", owner, 0);
+			dev->config_complete();
 
-		// print the header and the game name
-		fprintf(m_output, "\t<" XML_TOP);
-		fprintf(m_output, " name=\"%s\"", xml_normalize_string(dev->shortname()));
-		fprintf(m_output, " runnable=\"no\"");
-		fprintf(m_output, ">\n");
-		
-		// output device description
-		if (dev->name() != NULL)
-			fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(dev->name()));
+			// print the header and the game name
+			fprintf(m_output, "\t<" XML_TOP);
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(dev->shortname()));
+			fprintf(m_output, " isdevice=\"yes\"");
+			fprintf(m_output, " runnable=\"no\"");
+			fprintf(m_output, ">\n");
+			
+			// output device description
+			if (dev->name() != NULL)
+				fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(dev->name()));
 
-		output_rom(dev);
-		
-		// close the topmost tag
-		fprintf(m_output, "\t</" XML_TOP ">\n");
-		global_free(dev);
+			output_rom(dev);
+			
+			// close the topmost tag
+			fprintf(m_output, "\t</" XML_TOP ">\n");
+			global_free(dev);
+		}
 	}
 }
 
@@ -341,6 +353,7 @@ void info_xml_creator::output_one()
 	// now print various additional information
 	output_bios();
 	output_rom(rom_first_source(m_drivlist.config()));
+	output_device_roms();
 	output_sample();
 	output_chips();
 	output_display();
@@ -360,6 +373,25 @@ void info_xml_creator::output_one()
 	fprintf(m_output, "\t</" XML_TOP ">\n");
 }
 
+//------------------------------------------------
+//  output_device_roms - print the device
+//  with roms, if appropriate
+//-------------------------------------------------
+
+void info_xml_creator::output_device_roms()
+{
+	int cnt=0;	
+	for (const rom_source *source = rom_first_source(m_drivlist.config()); source != NULL; source = rom_next_source(*source))
+	{
+		if (cnt!=0) {
+			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(source->shortname()));
+			for(int i=0;i<m_device_count;i++) {
+				if (source->type() == *s_devices_sorted[i]) m_device_used[i] = 1;
+			}
+		}
+		cnt++;
+	}
+}
 
 //------------------------------------------------
 //  output_sampleof - print the 'sampleof'

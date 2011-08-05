@@ -63,6 +63,7 @@ private:
 	void output_sampleof();
 	void output_bios();
 	void output_rom(const rom_source *source);
+	void output_device_roms();
 	void output_sample();
 	void output_chips();
 	void output_display();
@@ -84,6 +85,7 @@ private:
 	// internal state
 	FILE *					m_output;
 	driver_enumerator &		m_drivlist;
+	UINT8 * 				m_device_used;
 
 	static const char s_dtd_string[];
 };
