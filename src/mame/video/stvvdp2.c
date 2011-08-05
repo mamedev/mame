@@ -5470,7 +5470,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 
 	interlace = (STV_VDP2_LSMD == 3)+1;
 
-	popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
+	//popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
 
 	/* draw black if BDCLMD and DISP are cleared */
 	if(!(STV_VDP2_BDCLMD) && !(STV_VDP2_DISP))
