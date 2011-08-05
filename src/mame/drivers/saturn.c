@@ -1773,7 +1773,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 
 	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
 
-//  popmessage("%08x %d %08x %08x",state->m_scu.ism ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
+	//popmessage("%08x %d T0 %d T1 %d %08x",state->m_scu.ism ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[37],state->m_scu_regs[38]);
 
 	if(scanline == 0*y_step)
 	{
@@ -1819,15 +1819,19 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	}
 
 	/* TODO: this isn't completely correct */
-	if((state->m_scu_regs[38] & 0x81) == 0x01 && ((scanline % y_step) == 0))
+	if(state->m_scu_regs[38] & 0x1)
 	{
-		if(!(state->m_scu.ism & IRQ_TIMER_1))
+		if((!(state->m_scu_regs[38] & 0x100) && (scanline % y_step) == 0) ||
+		    ((state->m_scu_regs[38] & 0x100) && (scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)))
 		{
-			device_set_input_line_and_vector(state->m_maincpu, 0xb, HOLD_LINE, 0x44 );
-			scu_do_transfer(timer.machine(),4);
+			if(!(state->m_scu.ism & IRQ_TIMER_1))
+			{
+				device_set_input_line_and_vector(state->m_maincpu, 0xb, HOLD_LINE, 0x44 );
+				scu_do_transfer(timer.machine(),4);
+			}
+			else
+				state->m_scu.ist |= (IRQ_TIMER_1);
 		}
-		else
-			state->m_scu.ist |= (IRQ_TIMER_1);
 	}
 
 	if(scanline == vblank_line*y_step)
@@ -1842,6 +1846,26 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		else
 			state->m_scu.ist |= (IRQ_VDP1_END);
 	}
+}
+
+static TIMER_DEVICE_CALLBACK( saturn_slave_scanline )
+{
+	saturn_state *state = timer.machine().driver_data<saturn_state>();
+	int scanline = param;
+	int max_y = timer.machine().primary_screen->height();
+	int y_step,vblank_line;
+
+	y_step = 2;
+
+	if((max_y == 263 && state->m_vdp2.pal == 0) || (max_y == 313 && state->m_vdp2.pal == 1))
+		y_step = 1;
+
+	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
+
+	if(scanline == vblank_line*y_step)
+		device_set_input_line_and_vector(state->m_slave, 0x6, HOLD_LINE, 0x43);
+	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
+		device_set_input_line_and_vector(state->m_slave, 0x2, HOLD_LINE, 0x41);
 }
 
 static READ32_HANDLER( saturn_cart_dram0_r )
@@ -1977,6 +2001,7 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
+	MCFG_TIMER_ADD_SCANLINE("slave_scantimer", saturn_slave_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)

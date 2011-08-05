@@ -1425,7 +1425,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_BKTAL	((state->m_vdp2_regs[0x0ac/4] >> 0) & 0xffff)
 
-	#define STV_VDP2_BKTA	(((STV_VDP2_BKTAU & 0x0007) << 16) | (STV_VDP2_BKTAL & 0xfffe))
+	#define STV_VDP2_BKTA	(((STV_VDP2_BKTAU & 0x0007) << 16) | (STV_VDP2_BKTAL & 0xffff))
 
 /* 1800b0 - RPMD - Rotation Parameter Mode
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -4342,7 +4342,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		//	popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
 
 		/* Langrisser III bit 3 normal, bit 1 during battle field */
-		if(STV_VDP2_SFSEL & ~0xa)
+		/* Metal Slug bit 0 during gameplay */
+		if(STV_VDP2_SFSEL & ~0xb)
 			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
 
 		/* Albert Odyssey Gaiden 0x0001 */
@@ -5470,7 +5471,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 
 	interlace = (STV_VDP2_LSMD == 3)+1;
 
-	//popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
+//	popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
 
 	/* draw black if BDCLMD and DISP are cleared */
 	if(!(STV_VDP2_BDCLMD) && !(STV_VDP2_DISP))
@@ -5481,7 +5482,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 
 		for(y=cliprect->min_y;y<=cliprect->max_y;y++)
 		{
-			base_offs = ((STV_VDP2_BKTA + 1) & base_mask) << 1;
+			base_offs = ((STV_VDP2_BKTA ) & base_mask) << 1;
 			if(STV_VDP2_BKCLMD)
 				base_offs += ((y / interlace) << 1);
 

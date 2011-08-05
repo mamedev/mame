@@ -153,7 +153,7 @@ TODO:
 #include "machine/eeprom.h"
 
 #define LOG_SMPC 0
-#define LOG_PAD_CMD 1
+#define LOG_PAD_CMD 0
 
 READ8_HANDLER( stv_SMPC_r )
 {
@@ -324,12 +324,12 @@ static TIMER_CALLBACK( intback_peripheral )
 	static const char *const padnames[] = { "JOY1", "JOY2" };
 
 	/* doesn't work? */
-	pad_num = state->m_smpc.intback_stage - 1;
+	//pad_num = state->m_smpc.intback_stage - 1;
 
 	if(LOG_PAD_CMD) printf("%d\n",pad_num);
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
-	//for(pad_num=0;pad_num<2;pad_num++)
+	for(pad_num=0;pad_num<2;pad_num++)
 	{
 		pad = input_port_read(machine, padnames[pad_num]);
 		state->m_smpc_ram[0x21+pad_num*8] = 0xf1;	// no tap, direct connect
@@ -417,7 +417,6 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 		state->m_smpc.intback_stage = (state->m_smpc_ram[3] & 8) >> 3; // first peripheral
 		state->m_smpc.smpcSR = 0x40 | state->m_smpc.intback_stage << 5;
 		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
-		machine.scheduler().timer_set(attotime::from_usec(15000), FUNC(intback_peripheral),0);
 
 		if(!(state->m_scu.ism & IRQ_SMPC))
 			device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
