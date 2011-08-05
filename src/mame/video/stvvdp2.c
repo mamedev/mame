@@ -4337,9 +4337,9 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 			popmessage("Special Color Calculation enable %04x, contact MAMEdev",STV_VDP2_SFCCMD);
 
 		/* Cleopatra Fortune Transparent Shadow */
+		/* Pretty Fighter X Back & Transparent Shadow*/
 		//if(STV_VDP2_SDCTL & 0x0120)
-		if(STV_VDP2_SDCTL & 0x0020)
-			popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
+		//	popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
 
 		/* Langrisser III bit 3 normal, bit 1 during battle field */
 		if(STV_VDP2_SFSEL & ~0xa)

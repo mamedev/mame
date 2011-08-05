@@ -27,7 +27,7 @@ public:
 		UINT32    dst[3];		/* Destination DMA lv n address*/
 		UINT32    src_add[3];	/* Source Addition for DMA lv n*/
 		UINT32    dst_add[3];	/* Destination Addition for DMA lv n*/
-		INT32     size[3];		/* Transfer DMA size lv n*/
+		UINT32    size[3];		/* Transfer DMA size lv n*/
 		UINT32    index[3];
 		int       start_factor[3];
 		UINT8     enable_mask[3];

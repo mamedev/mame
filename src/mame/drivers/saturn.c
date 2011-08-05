@@ -563,7 +563,8 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0x08/4: case 0x28/4: case 0x48/4:  state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0xfff)) >> 0); break;
 		case 0x0c/4: case 0x2c/4: case 0x4c/4:
 			state->m_scu.src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 0;
-			state->m_scu.dst_add[DMA_CH] = 2 << (state->m_scu_regs[offset] & 7);
+			state->m_scu.dst_add[DMA_CH] = 1 << (state->m_scu_regs[offset] & 7);
+			if(state->m_scu.dst_add[DMA_CH] == 1) { state->m_scu.dst_add[DMA_CH] = 0; }
 			break;
 		case 0x10/4: case 0x30/4: case 0x50/4:
 			state->m_scu.enable_mask[DMA_CH] = (data & 0x100) >> 8;
@@ -661,14 +662,32 @@ static TIMER_CALLBACK( dma_lv2_ended )
 	DnMV_0(2);
 }
 
+static void scu_single_transfer(address_space *space, UINT32 src, UINT32 dst,UINT8 *src_shift)
+{
+	UINT32 src_data;
+
+	if(src & 1)
+	{
+		/* Road Blaster does a work ram h to color ram with offsetted source address, do some data rotation */
+		src_data = ((space->read_dword(src & 0x07fffffc) & 0x00ffffff)<<8);
+		src_data |= ((space->read_dword((src & 0x07fffffc)+4) & 0xff000000) >> 24);
+		src_data >>= (*src_shift)*16;
+	}
+	else
+		src_data = space->read_dword(src & 0x07fffffc) >> (*src_shift)*16;
+
+	space->write_word(dst,src_data);
+
+	*src_shift ^= 1;
+}
+
 static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	UINT32 tmp_src,tmp_dst,tmp_size;
-	UINT8 single_dma_step;
 	UINT8 cd_transfer_flag;
 
-	if(state->m_scu.src_add[dma_ch] == 0 || state->m_scu.dst_add[dma_ch] != 4)
+	if(state->m_scu.src_add[dma_ch] == 0 || state->m_scu.dst_add[dma_ch] != 2)
 	{
 	if(LOG_SCU) printf("DMA lv %d transfer START\n"
 			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
@@ -680,13 +699,12 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	/* max size */
 	if(state->m_scu.size[dma_ch] == 0) { state->m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x1000; }
 
-	/*set here the boundaries checks*/
-	/*...*/
-	if((state->m_scu.dst_add[dma_ch] != state->m_scu.src_add[dma_ch]) && (ABUS(dma_ch)))
+	/* Virtual Mahjong does transfers from A-Bus to work ram h with destination add value == 4, assume it's invalid */
+	if(state->m_scu.dst_add[dma_ch] >= 4 && (ABUS(dma_ch)))
 	{
-		logerror("A-Bus invalid transfer, sets to default\n");
+		printf("A-Bus invalid transfer, sets to default\n");
 		scu_add_tmp = (state->m_scu.dst_add[dma_ch]*0x100) | (state->m_scu.src_add[dma_ch]);
-		state->m_scu.dst_add[dma_ch] = state->m_scu.src_add[dma_ch] = 4;
+		state->m_scu.dst_add[dma_ch] = 2;
 		scu_add_tmp |= 0x80000000;
 	}
 
@@ -696,69 +714,39 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(!(DRUP(dma_ch))) tmp_src = state->m_scu.src[dma_ch];
 	if(!(DWUP(dma_ch))) tmp_dst = state->m_scu.dst[dma_ch];
 
-	single_dma_step = state->m_scu.dst_add[dma_ch];
 	cd_transfer_flag = state->m_scu.src_add[dma_ch] == 0 && state->m_scu.src[dma_ch] == 0x05818000;
 
-	if(single_dma_step > 4 && !cd_transfer_flag)
-		single_dma_step = 4;
-
-	if(single_dma_step == 2)
-		popmessage("Single DMA step == 2??? Contact MAMEdev");
-
-	/* Advanced World War screen */
-	if(state->m_scu.dst_add[dma_ch] == 0x40)
+	/* Many games directly accesses CD-ROM register 0x05818000, it must be a dword access with current implementation otherwise it won't work */
+	if(cd_transfer_flag)
 	{
-		for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=2)
+		int i;
+		state->m_scu.dst_add[dma_ch] <<= 1;
+
+		for (i = 0; i < state->m_scu.size[dma_ch];i+=state->m_scu.dst_add[dma_ch])
 		{
-			space->write_word(state->m_scu.dst[dma_ch],     space->read_word(state->m_scu.src[dma_ch]  ));
-			state->m_scu.dst[dma_ch]+=0x20;
-			state->m_scu.src[dma_ch]+=2;
+			space->write_dword(state->m_scu.dst[dma_ch],space->read_dword(state->m_scu.src[dma_ch]));
+			if(state->m_scu.dst_add[dma_ch] == 8)
+				space->write_dword(state->m_scu.dst[dma_ch]+4,space->read_dword(state->m_scu.src[dma_ch]));
+
+			state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
+			state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
 		}
 	}
 	else
 	{
-	for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=single_dma_step)
-	{
-		/* Many games directly accesses CD-ROM register 0x05818000, it must be a dword access with current implementation otherwise it won't work */
-		if(cd_transfer_flag)
-		{
-			space->write_dword(state->m_scu.dst[dma_ch],  space->read_dword(state->m_scu.src[dma_ch]  ));
-			if(state->m_scu.dst_add[dma_ch] == 8)
-				space->write_dword(state->m_scu.dst[dma_ch]+4,space->read_dword(state->m_scu.src[dma_ch]  ));
-		}
-		else if(state->m_scu.dst_add[dma_ch] == 2)
-			space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
-		else if(state->m_scu.dst_add[dma_ch] == 0x40)
-		{
-			space->write_word(state->m_scu.dst[dma_ch],     space->read_word(state->m_scu.src[dma_ch]  ));
-		}
-		else if(state->m_scu.dst_add[dma_ch] == 8)
-		{
-			/* TRUSTED, Battle Garegga and Batsugun graphics */
-			space->write_word(state->m_scu.dst[dma_ch],  space->read_word(state->m_scu.src[dma_ch]  ));
-			space->write_word(state->m_scu.dst[dma_ch]+4,space->read_word(state->m_scu.src[dma_ch]+2));
-		}
-		else if(state->m_scu.src[dma_ch] & 1) // odd address access? Road Blaster uses this for work-ram to color ram transfers ...
-		{
-			UINT16 src_data;
+		int i;
+		UINT8  src_shift;
 
-			src_data = ((space->read_word(state->m_scu.src[dma_ch]-1) & 0xff) << 8);
-			src_data|= ((space->read_word(state->m_scu.src[dma_ch]+1) & 0xff00) >> 8);
-			space->write_word(state->m_scu.dst[dma_ch],  src_data);
+		src_shift = ((state->m_scu.src[dma_ch] & 2) >> 1) ^ 1;
 
-			src_data = ((space->read_word(state->m_scu.src[dma_ch]+1) & 0xff) << 8);
-			src_data|= ((space->read_word(state->m_scu.src[dma_ch]+3) & 0xff00) >> 8);
-			space->write_word(state->m_scu.dst[dma_ch]+2,src_data);
-		}
-		else
+		for (i = 0; i < state->m_scu.size[dma_ch];i+=2)
 		{
-			space->write_word(state->m_scu.dst[dma_ch],  space->read_word(state->m_scu.src[dma_ch]  ));
-			space->write_word(state->m_scu.dst[dma_ch]+2,space->read_word(state->m_scu.src[dma_ch]+2));
-		}
+			scu_single_transfer(space,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],&src_shift);
 
-		state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
-		state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
-	}
+			if(src_shift)
+				state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
+			state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
+		}
 	}
 
 	state->m_scu.size[dma_ch] = tmp_size;
@@ -809,7 +797,7 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		if(indirect_src & 0x80000000)
 			job_done = 1;
 
-		if(state->m_scu.src_add[dma_ch] == 0 || state->m_scu.dst_add[dma_ch] != 4)
+		if(state->m_scu.src_add[dma_ch] == 0 || state->m_scu.dst_add[dma_ch] != 2)
 		{
 			if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
 					           "Index %08x Start %08x End %08x Size %04x\n",dma_ch,tmp_src,indirect_src,indirect_dst,indirect_size);
@@ -822,22 +810,20 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 
 		if(indirect_size == 0) { indirect_size = (dma_ch == 0) ? 0x00100000 : 0x2000; }
 
-		for (; indirect_size > 0; indirect_size-=state->m_scu.dst_add[dma_ch])
 		{
-			if(state->m_scu.dst_add[dma_ch] == 2)
-				space->write_word(indirect_dst,space->read_word(indirect_src));
-			else
+			int i;
+			UINT8  src_shift;
+
+			src_shift = ((indirect_src & 2) >> 1) ^ 1;
+
+			for (i = 0; i < indirect_size;i+=2)
 			{
-				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
-                  they start a dma on a 2 byte boundary in 4 byte add mode, using the dword reads we
-                  can't access 2 byte boundaries, and the end of the sprite list never gets marked,
-                  the length of the transfer is also set to a 2 byte boundary, maybe the add values
-                  should be different, I don't know */
-				space->write_word(indirect_dst,space->read_word(indirect_src));
-				space->write_word(indirect_dst+2,space->read_word(indirect_src+2));
+				scu_single_transfer(space,indirect_src,indirect_dst,&src_shift);
+
+				if(src_shift)
+					indirect_src+=state->m_scu.src_add[dma_ch];
+				indirect_dst+=state->m_scu.dst_add[dma_ch];
 			}
-			indirect_dst+=state->m_scu.dst_add[dma_ch];
-			indirect_src+=state->m_scu.src_add[dma_ch];
 		}
 
 		//if(DRUP(0))   space->write_dword(tmp_src+8,state->m_scu.src[0]|job_done ? 0x80000000 : 0);
