@@ -437,6 +437,8 @@ static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 
 static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
+	chip->stream->update();
+
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
 	{
