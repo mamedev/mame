@@ -510,6 +510,7 @@ $(MAMEOBJ)/barcrest.a: \
 
 $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfcobra.o \
+	$(MACHINE)/bfm_comn.o \
 	$(DRIVERS)/bfm_sc1.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
 	$(DRIVERS)/bfm_sc4.o \

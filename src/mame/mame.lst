@@ -11196,6 +11196,18 @@ m_supcrd		// (c) 198? BFM
 m_lotsse		// (c) 198? BFM Dutch ROMS, prelim
 m_roulet		// (c) 198? BFM Dutch ROMS, prelim
 m_clattr		// (c) 1990 BFM,     Game Card 39-370-196
+sc1actv8
+sc1armad
+sc1bartk
+sc1barcd
+sc1bigmt
+sc1calyp
+sc1carro
+sc1cshat
+sc1cshcd
+sc1cshcda
+sc1cshcdb
+sc1ccoin
 
 // Scorpion 1 + Adder Video board
 
@@ -12341,15 +12353,21 @@ m4conn4     // Connect 4
 v4bios		// MPU4 Video Firmware
 
 v4cmaze		// The Crystal Maze (v1.3)
-v4cmazed	//
+v4cmazedat	//
 v4cmazea	//
 v4cmazeb	//
+v4cmazec	//
+v4cmazed	//
 v4cmaze2	// The New Crystal Maze Featuring Ocean Zone
 v4cmaze2d	//
 v4cmaze2a	//
+v4cmaze2b	//
+v4cmaze2c	//
 v4cmaze3	// The Crystal Maze Team Challenge
 v4cmaze3d	//
 v4cmaze3a	//
+v4cmaze3b	//
+v4cmaze3c	//
 v4turnov	// Turnover
 v4skltrk	// Skill Trek
 v4addlad	// Adders and Ladders
@@ -12377,12 +12395,37 @@ v4opt3d		//
 
 v4vgpok		// Vegas Poker (prototype release 2)
 v4psi		// Prize Space Invaders
+v4psia		// 
 v4blox		// Blox
 v4bloxd		//
 v4reno		// Reno Reels
 v4redhtp	// Red Hot Poker
 v4tetrs		// BwB Tetris v 2.2
 v4frfact	// Fruit Factory
+v4bigfrt	// Big Fruits
+v4bubbnk	// Bubbly Bonk
+v4mazbel	// Mazooma Belle
+v4mazbla	//
+v4shpwnd	// Shop Window
+v4big40		// Big 40
+v4bulblx	// Bullion Blox
+v4cshinf	// Cash Inferno
+v4dbltak	// Double Take
+v4gldrsh	// Gold Rush
+v4mdice		// Miami Dice
+v4monte		// Monte Carlo Or Bust
+v4ovrmn3	// Over Moon Pt3
+v4pztet		// Prize Tetris
+v4pzteta	//
+v4rhmaz		// Red Hot Mazooma Belle
+v4sunbst	// Sunburst
+v4timebn	// Time Bandit
+v4sixx		// 6-X
+v4megbuk	// Megabucks Poker
+v4rencas	// Reno Casino
+
+
+
 
 /* Nova (Bwb board) */
 

@@ -94,6 +94,7 @@ Optional (on expansion card) (Viper)
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
+#include "machine/bfm_comn.h"
 #include "bfm_sc1.lh"
 
 
@@ -123,6 +124,8 @@ public:
 	int m_mux2_input;
 	UINT8 m_sc1_Inputs[64];
 	UINT8 m_codec_data[256];
+
+	int m_defaultbank;
 };
 
 #define VFD_RESET  0x20
@@ -155,6 +158,7 @@ static int Scorpion1_GetSwitchState(bfm_sc1_state *drvstate, int strobe, int dat
 
 static WRITE8_HANDLER( bankswitch_w )
 {
+//	printf("bankswitch %02x\n", data);
 	memory_set_bank(space->machine(),"bank1",data & 0x03);
 }
 
@@ -604,77 +608,7 @@ static READ8_HANDLER( vid_uart_ctrl_r )
 	return adder2_status();
 }
 
-// scorpion1 board init ///////////////////////////////////////////////////
 
-static const UINT16 AddressDecode[]=
-{
-	0x0800,0x1000,0x0001,0x0004,0x0008,0x0020,0x0080,0x0200,
-	0x0100,0x0040,0x0002,0x0010,0x0400,0x2000,0x4000,0x8000,
-
-	0
-};
-
-static const UINT8 DataDecode[]=
-{
-	0x02,0x08,0x20,0x40,0x10,0x04,0x01,0x80,
-
-	0
-};
-
-
-
-static void decode_sc1(running_machine &machine,const char *rom_region)
-{
-	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
-	UINT8 *tmp, *rom;
-
-	rom = machine.region(rom_region)->base();
-
-	tmp = auto_alloc_array(machine, UINT8, 0x10000);
-
-	{
-		int i;
-		long address;
-
-		memcpy(tmp, rom, 0x10000);
-
-		for ( i = 0; i < 256; i++ )
-		{
-			UINT8 data, pattern, newdata, *tab;
-			data    = i;
-
-			tab     = (UINT8*)DataDecode;
-			pattern = 0x01;
-			newdata = 0;
-
-			do
-			{
-				newdata |= data & pattern ? *tab : 0;
-				pattern <<= 1;
-			} while ( *(++tab) );
-
-		state->m_codec_data[i] = newdata;
-		}
-
-		for ( address = 0; address < 0x10000; address++)
-		{
-			int newaddress,pattern;
-			UINT16 *tab;
-
-			tab      = (UINT16*)AddressDecode;
-			pattern  = 0x0001;
-			newaddress = 0;
-			do
-			{
-				newaddress |= address & pattern ? *tab : 0;
-				pattern <<= 1;
-			} while ( *(++tab) );
-
-			rom[newaddress] = state->m_codec_data[ tmp[address] ];
-		}
-		auto_free( machine, tmp );
-	}
-}
 // machine start (called only once) /////////////////////////////////////////////////
 
 static MACHINE_RESET( bfm_sc1 )
@@ -721,10 +655,8 @@ static MACHINE_RESET( bfm_sc1 )
 	{
 		UINT8 *rom = machine.region("maincpu")->base();
 
-		memory_configure_bank(machine,"bank1", 0, 1, &rom[0x10000], 0);
-		memory_configure_bank(machine,"bank1", 1, 3, &rom[0x02000], 0x02000);
-
-		memory_set_bank(machine,"bank1",3);
+		memory_configure_bank(machine,"bank1", 0, 4, &rom[0x0000], 0x02000);
+		memory_set_bank(machine,"bank1",state->m_defaultbank);
 	}
 }
 
@@ -732,7 +664,7 @@ static MACHINE_RESET( bfm_sc1 )
 // scorpion1 board memory map ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)				// reel 2+3 latch
@@ -759,9 +691,6 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x3409, 0x3409) AM_READWRITE(mux2datlo_r,mux2datlo_w)
 	AM_RANGE(0x340A, 0x340A) AM_READWRITE(mux2dathi_r,mux2dathi_w)
 
-	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r )			// coin input on gamecard
-	AM_RANGE(0x3801, 0x3801) AM_READNOP						// uPD5579 status on soundcard (not installed)
-
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w) 		// write bank
 	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)				// reel 5+6 latch
 
@@ -775,48 +704,11 @@ ADDRESS_MAP_END
 // scorpion1 board + adder2 expansion memory map ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( memmap_adder2, AS_PROGRAM, 8 )
-
-	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
-	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)	  // reel 2+3 latch
-	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)	  // reel 1+2 latch
-	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)	  // vfd latch
-
-	AM_RANGE(0x2600, 0x27FF) AM_READWRITE(mmtr_r,mmtr_w)      // mechanical meters
-
-	AM_RANGE(0x2800, 0x2800) AM_READ(triac_r)     // payslide triacs
-	AM_RANGE(0x2800, 0x29FF) AM_WRITE(triac_w)
-
-	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE(mux1latch_r,mux1latch_w) // mux1
-	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux1datlo_r,mux1datlo_w)
-	AM_RANGE(0x2A02, 0x2A02) AM_READWRITE(mux1dathi_r,mux1dathi_w)
-
-	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)  // irq latch
-
-	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("aysnd", ay8910_address_w)
-
-	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
-	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
-
-	AM_RANGE(0x3408, 0x3408) AM_READWRITE(mux2latch_r,mux2latch_w) // mux2
-	AM_RANGE(0x3409, 0x3409) AM_READWRITE(mux2datlo_r,mux2datlo_w)
-	AM_RANGE(0x340A, 0x340A) AM_READWRITE(mux2dathi_r,mux2dathi_w)
-
-//  AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard
-	AM_RANGE(0x3801, 0x3801) AM_READNOP			 // uPD5579 status on soundcard (not installed)
-
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w) // write bank
-	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)	 // reel 5+6 latch
+static ADDRESS_MAP_START( sc1_adder2, AS_PROGRAM, 8 )
+	AM_IMPORT_FROM( sc1_base )
 
 	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE(vid_uart_ctrl_r,vid_uart_ctrl_w)	// video uart control reg read
 	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r,vid_uart_tx_w)		// video uart receive  reg
-
-	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE(watchdog_reset_w)	// 32k ROM
-
 ADDRESS_MAP_END
 
 
@@ -824,44 +716,12 @@ ADDRESS_MAP_END
 // scorpion1 board + upd7759 soundcard memory map ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_nec_uk, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc1_viper, AS_PROGRAM, 8 )
+	AM_IMPORT_FROM( sc1_base )
 
-	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
-	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)	  // reel 2+3 latch
-	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)	  // reel 1+2 latch
-	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)	  // vfd latch
-
-	AM_RANGE(0x2600, 0x27FF) AM_READWRITE(mmtr_r,mmtr_w)      // mechanical meters
-
-	AM_RANGE(0x2800, 0x2800) AM_READ(triac_r)     // payslide triacs
-	AM_RANGE(0x2800, 0x29FF) AM_WRITE(triac_w)
-
-	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE(mux1latch_r,mux1latch_w) // mux1
-	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux1datlo_r,mux1datlo_w)
-	AM_RANGE(0x2A02, 0x2A02) AM_READWRITE(mux1dathi_r,mux1dathi_w)
-
-	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)	  // irq latch
-
-	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("aysnd", ay8910_address_w)
-
-	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
-	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
-
-	AM_RANGE(0x3408, 0x3408) AM_READWRITE(mux2latch_r,mux2latch_w) // mux2
-	AM_RANGE(0x3409, 0x3409) AM_READWRITE(mux2datlo_r,mux2datlo_w)
-	AM_RANGE(0x340A, 0x340A) AM_READWRITE(mux2dathi_r,mux2dathi_w)
-
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w) // write bank
-
+	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard
 	AM_RANGE(0x3801, 0x3801) AM_DEVREAD("upd", nec_r)
 	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE("upd", nec_latch_w)
-
-	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE(watchdog_reset_w)	// 32k ROM
-
 ADDRESS_MAP_END
 
 // input ports for scorpion1 board //////////////////////////////////////////////////
@@ -889,24 +749,24 @@ static INPUT_PORTS_START( scorpion1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("STROBE2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // collect?
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON7 )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) // service?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON11 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON12 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON13 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON14 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON15 )
 
 	PORT_START("STROBE4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1212,7 +1072,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_MACHINE_RESET(bfm_sc1)							// main scorpion1 board initialisation
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
-	MCFG_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
+	MCFG_CPU_PROGRAM_MAP(sc1_base)						// setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
@@ -1231,7 +1091,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( scorpion1_adder2, scorpion1 )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(memmap_adder2)				// setup read and write memorymap
+	MCFG_CPU_PROGRAM_MAP(sc1_adder2)				// setup read and write memorymap
 
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc1)
 	MCFG_SCREEN_ADD("adder", RASTER)
@@ -1258,32 +1118,123 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_DERIVED( scorpion1_nec_uk, scorpion1 )
+static MACHINE_CONFIG_DERIVED( scorpion1_viper, scorpion1 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sc1_nec_uk)					// setup read and write memorymap
+	MCFG_CPU_PROGRAM_MAP(sc1_viper)					// setup read and write memorymap
 
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+
+static void sc1_common_init(running_machine &machine, int reels, int decrypt, int defaultbank)
+{
+	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
+	UINT8 *rom, i;
+
+	rom = machine.region("maincpu")->base();
+
+
+	memset(state->m_sc1_Inputs, 0, sizeof(state->m_sc1_Inputs));
+
+	// setup n default 96 half step reels ///////////////////////////////////////////
+	for ( i = 0; i < reels; i++ )
+	{
+		stepper_config(machine, i, &starpoint_interface_48step);
+	}
+	if (decrypt) bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);	// decode main rom
+	if (reels)
+	{
+		awp_reel_setup();
+	}
+
+
+	state->m_defaultbank = defaultbank;
+
+}
+
+static DRIVER_INIT(toppoker)
+{
+	sc1_common_init(machine,3,1, 3);
+	adder2_decode_char_roms(machine);	// decode GFX roms
+	MechMtr_config(machine,8);
+
+	BFM_BD1_init(0);
+}
+
+static DRIVER_INIT(lotse)
+{
+	sc1_common_init(machine,6,1, 3);
+	MechMtr_config(machine,8);
+
+	BFM_BD1_init(0);
+	BFM_BD1_init(1);
+}
+
+static DRIVER_INIT(nocrypt)
+{
+	sc1_common_init(machine,6,0, 3);
+	MechMtr_config(machine,8);
+
+	BFM_BD1_init(0);
+	BFM_BD1_init(1);
+}
+
+static DRIVER_INIT(nocrypt_bank0)
+{
+	sc1_common_init(machine,6,0, 0);
+	MechMtr_config(machine,8);
+
+	BFM_BD1_init(0);
+	BFM_BD1_init(1);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+static DRIVER_INIT(rou029)
+{
+	sc1_common_init(machine,6,0, 3);
+	MechMtr_config(machine,8);
+
+	BFM_BD1_init(0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+static DRIVER_INIT(clatt)
+{
+	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
+	sc1_common_init(machine,6,1, 3);
+	MechMtr_config(machine,8);
+
+	BFM_BD1_init(0);
+
+	Scorpion1_SetSwitchState(state,3,2,1);
+	Scorpion1_SetSwitchState(state,3,3,1);
+	Scorpion1_SetSwitchState(state,3,6,1);
+	Scorpion1_SetSwitchState(state,4,1,1);
+}
+
+
 // ROM definition ///////////////////////////////////////////////////////////////////
 
 ROM_START( m_lotsse )
-	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lotusse.bin",  0x0000, 0x10000,  CRC(636dadc4) SHA1(85bad5d76dac028fe9f3303dd09e8266aba7db4d))
 ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( m_roulet )
-	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rou029.bin",   0x8000, 0x08000,  CRC(31723f0A) SHA1(e220976116a0aaf24dc0c4af78a9311a360e8104))
 ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( m_clattr )
-	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "39370196.1",   0x8000, 0x08000,  CRC(4c2e465f) SHA1(101939d37d9c033f6d1dfb83b4beb54e4061aec2))
 	ROM_LOAD( "39370196.2",   0x0000, 0x08000,  CRC(c809c22d) SHA1(fca7515bc84d432150ffe5e32fccc6aed458b8b0))
 ROM_END
@@ -1291,7 +1242,7 @@ ROM_END
 /////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( m_tppokr )
-	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "95750899.bin", 0x0000, 0x10000,  CRC(639d1d62) SHA1(80620c14bf9f953588555510fc2e6e930140923f))
 
 	ROM_REGION( 0x20000, "adder2", 0 )
@@ -1303,80 +1254,136 @@ ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-static void sc1_common_init(running_machine &machine, int reels, int decrypt)
-{
-	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
-	UINT8 *rom, i;
+ROM_START( sc1actv8 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ac82019.bin", 0x00000, 0x10000, CRC(91855497) SHA1(dee8b6df953a3761fb67395842f701672e93a71e) )
 
-	rom = machine.region("maincpu")->base();
-	if ( rom )
-	{
-		memcpy(&rom[0x10000], &rom[0x00000], 0x2000);
-	}
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "95000600.bin", 0x00000, 0x10000, CRC(f324959a) SHA1(5be8c81dcfcf5f6b8b64a85891cd17e221e9ca08) )
+	ROM_LOAD( "95000601.bin", 0x10000, 0x10000, CRC(585323f3) SHA1(e2e83b16bbad24f748a7dc9313b722862a91e5a2) )
+ROM_END
 
-	memset(state->m_sc1_Inputs, 0, sizeof(state->m_sc1_Inputs));
+ROM_START( sc1armad )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "armada.bin", 0x0000, 0x010000, CRC(9a1be4ca) SHA1(d18b7c8779a8eb50321fbff4d6d8cf6d512bea8b) )
+ROM_END
 
-	// setup n default 96 half step reels ///////////////////////////////////////////
-	for ( i = 0; i < reels; i++ )
-	{
-		stepper_config(machine, i, &starpoint_interface_48step);
-	}
-	if (decrypt) decode_sc1(machine,"maincpu");	// decode main rom
-	if (reels)
-	{
-		awp_reel_setup();
-	}
-}
 
-static DRIVER_INIT(toppoker)
-{
-	sc1_common_init(machine,3,1);
-	adder2_decode_char_roms(machine);	// decode GFX roms
-	MechMtr_config(machine,8);
+ROM_START( sc1bartk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bartrekgameb.bin", 0x0000, 0x8000, CRC(24c7c803) SHA1(ab5051c8727cab44ad59913edab3d5d145728cb5) )
+	ROM_LOAD( "bartrekgamea.bin", 0x8000, 0x8000, CRC(a7a84c16) SHA1(8c5ab34268e932be12e85eed5a56386681f13da4) )
 
-	BFM_BD1_init(0);
-}
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "bartreksnd1.bin", 0x000000, 0x010000, CRC(690b18c3) SHA1(0a3ecadc8d47670bc0f36d76b4335f027ef68542) )
+	ROM_LOAD( "bartreksnd2.bin", 0x010000, 0x010000, CRC(4ff8201c) SHA1(859378b4bb8fc5d3497a53c9218302410884e091) )
+ROM_END
 
-static DRIVER_INIT(lotse)
-{
-	sc1_common_init(machine,6,1);
-	MechMtr_config(machine,8);
+ROM_START( sc1barcd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95740352 b.bin", 0x0000, 0x8000, CRC(6dc3cfd3) SHA1(d71d433ae560ac4db345630ee7f04a7cfb7e933e) )
+	ROM_LOAD( "95740351 a.bin", 0x8000, 0x8000, CRC(0891350b) SHA1(ea1295768738b9b89eac19d04411220a8c9d10c7) )
 
-	BFM_BD1_init(0);
-	BFM_BD1_init(1);
-}
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "barcode 5_10p a.bin", 0x0000, 0x008000, CRC(e864aba1) SHA1(b3f707b6d5f3d7236e4a5e9ed78c61a78c3e8196) )
+	ROM_LOAD( "barcode 5_10p b.bin", 0x0000, 0x008000, CRC(69d4d0b2) SHA1(bb73b917cf414623dcd239c5daeeccb4e0ccc2ed) )
+	ROM_LOAD( "barcode.p1", 0x0000, 0x008000, CRC(0be64bfb) SHA1(3b5cfee8825f2b7d2598f04411d50b8f1245ac65) )
+	ROM_LOAD( "barcode.p2", 0x0000, 0x008000, CRC(44b79b14) SHA1(ec0745be0dde818c673c62ca584e22871a73e66e) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "barsnd1.bin", 0x000000, 0x010000, CRC(c9de8ff4) SHA1(c3e77e84d4ecc1c779929a96d1c445a1af24865b) )
+	ROM_LOAD( "barsnd2.bin", 0x010000, 0x010000, CRC(56af984a) SHA1(aebd30f3ca767dc5fc77fb01765833ee627a5aee) )
+ROM_END
+
+ROM_START( sc1bigmt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigmatch.bin", 0x0000, 0x010000, CRC(3c81663c) SHA1(a9670a48059d35d6581ce3007c0a6223291e0a12) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "bigmsnd1.bin", 0x000000, 0x010000, CRC(51828aa0) SHA1(99b46c1c4b45f26a393bf3e658ad499c84bdf8f5) )
+	ROM_LOAD( "bigmsnd2.bin", 0x010000, 0x010000, CRC(cf1f0f6b) SHA1(6521f0fe52a0587af049940bb81846d40d8847b8) )
+ROM_END
+
+
+ROM_START( sc1calyp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "calypso.bin", 0x0000, 0x010000, CRC(b8194d31) SHA1(de7d374d8a1c18ec324daf92112652461e2a113e) )
+ROM_END
+
+ROM_START( sc1carro )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "carrousel.bin", 0x0000, 0x010000, CRC(d1f7ae57) SHA1(301727b95f30d8e934a9c790838daf65aadd6dc7) )
+ROM_END
+
+ROM_START( sc1cshat )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cash_attraction_b", 0x0000, 0x8000, CRC(79870574) SHA1(89e5db89064a9e24bc37389d78f4defb7d2f479b) )
+	ROM_LOAD( "cash_attraction_a", 0x8000, 0x8000, CRC(fab3283c) SHA1(669b425687faad0ebf88c1aaaafa40c446fa2e24) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "957172.20 std var% a.bin", 0x0000, 0x008000, CRC(e67fc9e1) SHA1(39ac2c30d605f2b3109a57c6633a597e77651e79) )
+	ROM_LOAD( "957172.21 var% b.bin", 0x0000, 0x008000, CRC(ea705443) SHA1(fdd941b5e6785d97e990f4ca74578e539512422b) )
+	ROM_LOAD( "957172.40 b std var%.bin", 0x0000, 0x008000, CRC(5e4381f9) SHA1(ae6d64c42ae7ddc2ed0ab5c3b56222090004d88a) )
+	ROM_LOAD( "95717270 20 n.p a.bin", 0x0000, 0x008000, CRC(4e90868a) SHA1(f88a1b578b2d9091f5e5212768547db19e6b5379) )
+	ROM_LOAD( "95717271 20p std b.bin", 0x0000, 0x008000, CRC(79870574) SHA1(89e5db89064a9e24bc37389d78f4defb7d2f479b) )
+	ROM_LOAD( "957182.20 var% proto a.bin", 0x0000, 0x008000, CRC(3a2dd72d) SHA1(29d962702095aa0f252210da68a89c557fa9db69) )
+	ROM_LOAD( "957182.39 74-78 proto a.bin", 0x0000, 0x008000, CRC(f890b2d3) SHA1(e714973c63486e6983912fb6aebee3a71e003be5) )
+	ROM_LOAD( "957182.39 proto var%.bin", 0x0000, 0x008000, CRC(43f452a7) SHA1(13ef94b4a4ecf729dfe481da26804f2e6f0631b0) )
+	ROM_LOAD( "957272.20 74-78 standard.bin", 0x0000, 0x008000, CRC(06def19d) SHA1(721d8ffc7e6b0e76f097d82b3be7618d97d73041) )
+	ROM_LOAD( "957272.21 74-78b.bin", 0x0000, 0x008000, CRC(531e97fb) SHA1(c7ae94c503f9e13d68ae463dd19212f146b0e8bc) )
+	ROM_LOAD( "957272.40 74-78b.bin", 0x0000, 0x008000, CRC(e72d4241) SHA1(487a00f49fa5451f39c2400f6f23a5f067afaa66) )
+	ROM_LOAD( "95728.20 74-78 proto a.bin", 0x0000, 0x008000, CRC(7e557f21) SHA1(49bbbbafff757acd078d156bae2c942991f055af) )
+	ROM_LOAD( "957282.20 74-78 proto a.bin", 0x0000, 0x008000, CRC(7e557f21) SHA1(49bbbbafff757acd078d156bae2c942991f055af) )
+ROM_END
+
+
+ROM_START( sc1cshcd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cascrd2.bin", 0x0000, 0x8000, CRC(862d5ea9) SHA1(f0c0334aed028ab995b4d092abe10ece90be40a5) )
+	ROM_LOAD( "cascrd1.bin", 0x8000, 0x8000, CRC(23142134) SHA1(40a900d190480677c883912e60f447e83b4a5c92) )
+ROM_END
+
+ROM_START( sc1cshcda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95717128 var% b.bin", 0x0000, 0x8000, CRC(10662200) SHA1(79a35b88eca408ae2f5daead498662303e0360e1) )
+	ROM_LOAD( "95717127 var% a.bin", 0x8000, 0x8000, CRC(1f7ef1ec) SHA1(9f8f43037788787f4f11501689cb82eeebc6d7f8) )
+ROM_END
+
+ROM_START( sc1cshcdb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95719104b c.cards 78%.bin", 0x0000, 0x8000, CRC(e9055e1b) SHA1(8c6b7e164c9998c3b932e16c3c4e4a95beb29f50) )
+	ROM_LOAD( "95719103a c.cards 78%.bin", 0x8000, 0x8000, CRC(af65962c) SHA1(d10dd9e1bbdd1e506d5f8732ffbb6521e34fbefe) )
+ROM_END
+
+ROM_START( sc1ccoin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cashcoin005.bin", 0x0000, 0x10000, CRC(5ce29d18) SHA1(c9e8d0aa52ba532177d912901a39e4fc8024810f) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "cashcoinic7.bin", 0x00000, 0x10000, CRC(7c2f52ed) SHA1(d435402459efc9311707ac691992874b56cbbeec) )
+	ROM_LOAD( "cashcoinic8.bin", 0x10000, 0x10000, CRC(23b99731) SHA1(7cc1c51d9b72480d8a1020fc3621a05ba83d7629) )
+ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-static DRIVER_INIT(rou029)
-{
-	sc1_common_init(machine,6,0);
-	MechMtr_config(machine,8);
+GAME( 1988, m_lotsse, 0,        scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1988, m_roulet, 0,        scorpion1			, scorpion1	, rou029		, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1990, m_clattr, 0,        scorpion1_viper		, clatt		, clatt			, 0,       "BFM",      "Club Attraction (UK, Game Card 39-370-196)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
-	BFM_BD1_init(0);
-}
+GAME( 198?, sc1actv8, 0,        scorpion1_viper		, scorpion1	, nocrypt		, 0,       "BFM",      "Active 8 (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1armad, 0,        scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Armada (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1bartk, 0,        scorpion1_viper		, clatt		, lotse			, 0,       "BFM",      "Bar Trek (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1barcd, 0,        scorpion1_viper		, clatt		, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1bigmt, 0,        scorpion1_viper		, clatt		, nocrypt		, 0,       "BFM",      "The Big Match (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1calyp, 0,        scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Calypso (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1carro, 0,        scorpion1			, scorpion1	, nocrypt_bank0	, 0,       "BFM/ELAM", "Carrousel (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshat, 0,        scorpion1			, scorpion1 , lotse  		, 0,       "BFM",      "Cash Attraction (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshcd, 0,        scorpion1			, scorpion1,  lotse			, 0,       "BFM/ELAM", "Cash Card (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshcda,sc1cshcd, scorpion1			, scorpion1,  lotse			, 0,       "BFM",    "Cash Card (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshcdb,sc1cshcd, scorpion1			, scorpion1,  lotse			, 0,       "BFM",    "Cash Card (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1ccoin, 0,        scorpion1			, scorpion1,  lotse			, 0,       "BFM",    "Cash Coin (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
-/////////////////////////////////////////////////////////////////////////////////////
+//Adder 2
+GAME( 1996, m_tppokr, 0,        scorpion1_adder2	, toppoker	, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 
-static DRIVER_INIT(clatt)
-{
-	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
-	sc1_common_init(machine,6,1);
-	MechMtr_config(machine,8);
 
-	BFM_BD1_init(0);
-
-	Scorpion1_SetSwitchState(state,3,2,1);
-	Scorpion1_SetSwitchState(state,3,3,1);
-	Scorpion1_SetSwitchState(state,3,6,1);
-	Scorpion1_SetSwitchState(state,4,1,1);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////
-
-GAME( 1988, m_lotsse, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Lotus SE (Dutch)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 1988, m_roulet, 0,        scorpion1,	 scorpion1,  rou029,	0,       "BFM/ELAM",    "Roulette (Dutch, Game Card 39-360-129?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 1990, m_clattr, 0,        scorpion1_nec_uk,clatt,	     clatt,	0,       "BFM",         "Club attraction (UK, Game Card 39-370-196)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-
-//Adder
-GAME( 1996, m_tppokr, 0,        scorpion1_adder2,toppoker,   toppoker,	0,       "BFM/ELAM",    "Toppoker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
