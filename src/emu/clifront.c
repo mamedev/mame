@@ -462,14 +462,14 @@ void cli_frontend::listcrc(const char *gamename)
 	while (drivlist.next())
 		for (const rom_source *source = rom_first_source(drivlist.config()); source != NULL; source = rom_next_source(*source)) 
 		{
-			bool isdiver = (source == rom_first_source(drivlist.config()));
+			bool isdriver = (source == rom_first_source(drivlist.config()));
 			for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// if we have a CRC, display it
 					UINT32 crc;
 					if (hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						mame_printf_info("%08x %-16s %s\n", crc, ROM_GETNAME(rom), isdiver ? drivlist.driver().description : source->name());
+						mame_printf_info("%08x %-16s %s\n", crc, ROM_GETNAME(rom), isdriver ? drivlist.driver().description : source->name());
 				}
 		}
 }
