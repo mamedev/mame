@@ -614,6 +614,8 @@ static INPUT_PORTS_START( taitox_east_tech ) /* The Dip Switches will be modifie
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( superman )
+	/* DSWA - 0x500000 (low) and 0x500002 (high) -> 0xf01c4a ($1c4a,A5) */
+	/* DSWB - 0x500004 (low) and 0x500006 (high) -> 0xf01c4c ($1c4c,A5) */
 	PORT_INCLUDE( taitox_generic )
 
 	PORT_MODIFY("DSWB")
@@ -632,6 +634,8 @@ static INPUT_PORTS_START( supermanj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( twinhawk )
+	/* DSWA - 0x500000 (low) and 0x500002 (high) -> 0xf001b8 */
+	/* DSWB - 0x500004 (low) and 0x500006 (high) -> 0xf001ba */
 	PORT_INCLUDE( taitox_generic )
 
 	PORT_MODIFY("DSWB")
@@ -662,14 +666,14 @@ static INPUT_PORTS_START( twinhawku )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daisenpu )
+	/* DSWA - 0x500000 (low) and 0x500002 (high) -> 0xf001a4 */
+	/* DSWB - 0x500004 (low) and 0x500006 (high) -> 0xf001a6 */
 	PORT_INCLUDE( twinhawk )
 
-	/* 0x500000 (low) and 0x500002 (high) -> 0xf001a4 */
 	PORT_MODIFY("DSWA")
 	TAITO_MACHINE_COCKTAIL_LOC(SW1)
 	TAITO_COINAGE_JAPAN_OLD_LOC(SW1)
 
-	/* 0x500004 (low) and 0x500006 (high) -> 0xf001a6 */
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "50k and every 150k" )
@@ -679,19 +683,31 @@ static INPUT_PORTS_START( daisenpu )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gigandes )
+	/* DSWA - 0x500000 (low) and 0x500002 (high) -> 0xf00a3c */
+	/* DSWB - 0x500004 (low) and 0x500006 (high) -> 0xf00a3e */
 	PORT_INCLUDE( taitox_east_tech )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kyustrkr )
+	/* DSWA - 0x500000 (low) and 0x500002 (high) -> 0xf028fe */
+	/* DSWB - 0x500004 (low) and 0x500006 (high) -> 0xf02900 */
 	PORT_INCLUDE( taitox_east_tech )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
+
+	PORT_MODIFY("IN0")
+	TAITO_JOY_UDLR_3_BUTTON_START( 1 )
+
+	PORT_MODIFY("IN1")
+	TAITO_JOY_UDLR_3_BUTTON_START( 2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ballbros )
+	/* DSWA - 0x500000 (low) and 0x500002 (high) -> 0xf028fe */
+	/* DSWB - 0x500004 (low) and 0x500006 (high) -> 0xf02900 */
 	PORT_INCLUDE( taitox_east_tech )
 
 	PORT_MODIFY("DSWB")
