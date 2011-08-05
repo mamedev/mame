@@ -1,9 +1,15 @@
 /******************************************************************************************
-System Control Unit - DSP emulator version 0.07
+System Control Unit - DSP emulator version 0.08
 
 Written by Angelo Salese & Mariusz Wojcieszek
 
 Changelog:
+110806: Angelo Salese
+- Allows reading from non-work ram h areas;
+- Fixed DMA add values;
+- Fixed a MVI condition shift flag bug, now Sega Saturn produces sound during splash screen;
+- Removed left-over IRQ;
+
 110722: Angelo Salese
 - Added DSP IRQ command, tested with "The King of Boxing"
 
@@ -328,8 +334,6 @@ void dsp_prg_ctrl(address_space *space, UINT32 data)
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	if(LEF) dsp_reg.pc = (data & 0xff);
 	if(EXF) dsp_execute_program(space);
-	if(EF && (!(state->m_scu_regs[40] & 0x0020)))
-		cputag_set_input_line_and_vector(space->machine(), "maincpu", 0xa, HOLD_LINE , 0x45);
 }
 
 void dsp_prg_data(UINT32 data)
@@ -587,7 +591,7 @@ static void dsp_move_immediate( address_space *space )
 
 	if ( opcode & 0x2000000 )
 	{
-		if ( dsp_compute_condition( space, (opcode & 0x3F80000 ) >> 18 ) )
+		if ( dsp_compute_condition( space, (opcode & 0x3F80000 ) >> 19 ) )
 		{
 			value = opcode & 0x7ffff;
 			if ( value & 0x40000 ) value |= 0xfff80000;
@@ -612,7 +616,7 @@ static void dsp_dma( address_space *space )
 	UINT32 dir_from_D0 = (opcode & 0x1000 ) >> 12;
 	UINT32 transfer_cnt = 0;
 	UINT32 source = 0, dest = 0;
-	UINT32 dsp_mem = (opcode & 0x700) >> 8;
+	UINT32 dsp_mem = (opcode & 0x300) >> 8;
 	UINT32 counter = 0;
 	UINT32 data;
 
@@ -622,10 +626,11 @@ static void dsp_dma( address_space *space )
 	if ( opcode & 0x2000 )
 	{
 		transfer_cnt = dsp_get_source_mem_value( opcode & 0xf );
-		switch ( add & 0x1 )
+		switch ( add & 0x7 )
 		{
-		  case 0: add = 2; break;
-		  case 1: add = 4; break;
+			case 0: add = 0; break;
+			case 1: add = 4; break;
+			default: add = 4; break;
 		}
 	}
 	else
@@ -668,17 +673,16 @@ static void dsp_dma( address_space *space )
 			}
 			else
 			{
-				data = 0;
+				data = (space->read_word(source)<<16) | space->read_word(source+2);
 				//popmessage( "Bad DSP DMA mem read = %08X", source );
 #if DEBUG_DSP
-				fprintf( log_file, "/*Bad DSP DMA mem read = %08X*/\n", source );
+				//fprintf( log_file, "/*Bad DSP DMA mem read = %08X*/\n", source );
 #endif
 			}
 
 #if DEBUG_DSP
             fprintf( log_file, "%08X,\n", data );
 #endif
-
 			dsp_set_dest_dma_mem( dsp_mem, data, counter );
 			source += add;
 		}
@@ -712,6 +716,7 @@ static void dsp_dma( address_space *space )
 		}
 	}
 
+	/* TODO: move this behind a timer */
 	T0F_0;
 }
 
