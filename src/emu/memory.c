@@ -2155,7 +2155,7 @@ void address_space::prepare_map()
 	m_map = global_alloc(address_map(m_device, m_spacenum));
 
 	// merge in the submaps
-	m_map->uplift_submaps(machine(), m_device);
+	m_map->uplift_submaps(machine(), m_device, endianness());
 
 	// extract global parameters specified by the map
 	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;

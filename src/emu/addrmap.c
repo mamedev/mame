@@ -843,7 +843,7 @@ address_map_entry64 *address_map::add(offs_t start, offs_t end, address_map_entr
 //  uplift_submaps - propagate in the device submaps
 //-------------------------------------------------
 
-void address_map::uplift_submaps(running_machine &machine, device_t &device)
+void address_map::uplift_submaps(running_machine &machine, device_t &device, endianness_t endian)
 {
 	address_map_entry *prev = 0;
 	address_map_entry *entry = m_entrylist.first();
@@ -859,7 +859,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device)
 			address_map submap(*mapdevice, entry);
 
 			// Recursively uplift it if needed
-			submap.uplift_submaps(machine, *mapdevice);
+			submap.uplift_submaps(machine, *mapdevice, endian);
 
 			// Compute the unit repartition characteristics
 			int entry_bits = entry->m_submap_bits;
@@ -879,6 +879,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device)
 			int slot_offset[8];
 			int slot_count = 0;
 			int max_slot_count = m_databits / entry_bits;
+			int slot_xor_mask = endian == ENDIANNESS_LITTLE ? 0 : max_slot_count - 1;
 
 			UINT64 global_mask = entry->m_read.m_mask;
 			// zero means all
@@ -889,7 +890,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device)
 			// unitmask_is_appropriate, so one bit is enough
 			for (int slot=0; slot < max_slot_count; slot++)
 				if (global_mask & (1ULL << (slot * entry_bits)))
-					slot_offset[slot_count++] = slot * entry_bits;
+					slot_offset[slot_count++] = (slot ^ slot_xor_mask) * entry_bits;
 
 			// Merge in all the map contents in order
 			while (submap.m_entrylist.count())
