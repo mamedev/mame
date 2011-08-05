@@ -714,7 +714,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			// clear the "transfer" flag
 			cd_stat &= ~CD_STAT_TRANS;
-			// hack for the bootloader (TODO: Falcom Classics doesn't want this!)
+			// hack for the bootloader
 			cd_stat |= CD_STAT_PERI;
 
 			if (xferdnum)
@@ -726,6 +726,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			else
 			{
+				printf("No xferdnum error\n");
 				cr1 = (cd_stat) | (0xff);	// is this right?
 				cr2 = 0xffff;
 				cr3 = 0;
@@ -1430,9 +1431,16 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x6400:    // put sector data
-			/* TODO: After Burner 2 and Dungeon Master Nexus trips this */
+			/* TODO: After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
 			// ...
+			{
+				//UINT8 sectnum = cr4 & 0xff;
+				//UINT8 filtnum = cr3>>8;
 
+
+			}
+
+			popmessage("Put sector data command issued, contact MAMEdev");
 			hirqreg |= (CMOK|EHST);
 			break;
 
@@ -1458,9 +1466,9 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-			UINT32 read_dir;
+//			UINT32 read_dir;
 
-			read_dir = ((cr3&0xff)<<16)|cr4;
+//			read_dir = ((cr3&0xff)<<16)|cr4;
 
 			if((cr3 >> 8) < 0x24)
 				cddevice = &filters[cr3 >> 8];
@@ -1976,7 +1984,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 			{
 				if (curblock.chan != flt->chan)
 				{
-					logerror("channel number reject");
+					logerror("channel number reject\n");
 					match = 0;
 				}
 			}
@@ -1985,7 +1993,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 			{
 				if((curblock.subm & flt->smmask) != flt->smval)
 				{
-					logerror("sub mode reject");
+					logerror("sub mode reject\n");
 					match = 0;
 				}
 			}
@@ -1994,7 +2002,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 			{
 				if((curblock.cinf & flt->cimask) != flt->cival)
 				{
-					logerror("coding information reject");
+					logerror("coding information reject\n");
 					match = 0;
 				}
 			}

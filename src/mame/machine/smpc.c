@@ -153,6 +153,7 @@ TODO:
 #include "machine/eeprom.h"
 
 #define LOG_SMPC 0
+#define LOG_PAD_CMD 0
 
 READ8_HANDLER( stv_SMPC_r )
 {
@@ -262,60 +263,13 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values */
 }
 
-static void smpc_intbackhelper(running_machine &machine)
-{
-	saturn_state *state = machine.driver_data<saturn_state>();
-	int pad,i;
-	static const char *const padnames[] = { "JOY1", "JOY2" };
-
-	if (state->m_smpc.intback_stage == 1)
-	{
-		state->m_smpc.intback_stage++;
-		return;
-	}
-
-//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
-	for(i=0;i<2;i++)
-	{
-		pad = input_port_read(machine, padnames[i]);
-		state->m_smpc_ram[0x21+i*8] = 0xf1;	// no tap, direct connect
-		state->m_smpc_ram[0x23+i*8] = 0x02;	// saturn pad
-		state->m_smpc_ram[0x25+i*8] = pad>>8;
-		state->m_smpc_ram[0x27+i*8] = pad & 0xff;
-	}
-
-	if (state->m_smpc.intback_stage == 3)
-	{
-		state->m_smpc.smpcSR = (0x80 | state->m_smpc.pmode);	// pad 2, no more data, echo back pad mode set by intback
-	}
-	else
-	{
-		state->m_smpc.smpcSR = (0xe0 | state->m_smpc.pmode);	// pad 1, more data, echo back pad mode set by intback
-	}
-
-	state->m_smpc.intback_stage++;
-}
-
-/* sys_type 1 == STV, 0 == SATURN */
-static TIMER_CALLBACK( smpc_intback )
+static TIMER_CALLBACK( stv_smpc_intback )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	system_time systime;
 	machine.base_datetime(systime);
-	UINT8 sys_type = param;
 
 	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
-
-	if(sys_type == 0)
-	{
-		state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
-    	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
-		state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-    	state->m_smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
-    	state->m_smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
-    	state->m_smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
-    	state->m_smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
-	}
 
 	state->m_smpc_ram[0x31]=0x00;  //?
 
@@ -331,10 +285,10 @@ static TIMER_CALLBACK( smpc_intback )
 	                         0 << 0;  //SOUNDRES
 	state->m_smpc_ram[0x37]= 0 << 6; //CDRES
 
-	state->m_smpc_ram[0x39]=sys_type ? 0xff : state->m_smpc.SMEM[0];
-	state->m_smpc_ram[0x3b]=sys_type ? 0xff : state->m_smpc.SMEM[1];
-	state->m_smpc_ram[0x3d]=sys_type ? 0xff : state->m_smpc.SMEM[2];
-	state->m_smpc_ram[0x3f]=sys_type ? 0xff : state->m_smpc.SMEM[3];
+	state->m_smpc_ram[0x39]=0xff;
+	state->m_smpc_ram[0x3b]=0xff;
+	state->m_smpc_ram[0x3d]=0xff;
+	state->m_smpc_ram[0x3f]=0xff;
 
 	state->m_smpc_ram[0x41]=0xff;
 	state->m_smpc_ram[0x43]=0xff;
@@ -352,16 +306,6 @@ static TIMER_CALLBACK( smpc_intback )
 	state->m_smpc_ram[0x5b]=0xff;
 	state->m_smpc_ram[0x5d]=0xff;
 
-	if(sys_type == 0)
-	{
-		state->m_smpc.smpcSR = 0x60;		// peripheral data ready, no reset, etc.
-		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
-
-		state->m_smpc.intback_stage = 1;
-
-		smpc_intbackhelper(machine);
-	}
-
 	//  /*This is for RTC,cartridge code and similar stuff...*/
 	//if(LOG_SMPC) printf ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 	if(!(state->m_scu.ism & IRQ_SMPC))
@@ -371,6 +315,128 @@ static TIMER_CALLBACK( smpc_intback )
 
 	/* clear hand-shake flag */
 	state->m_smpc_ram[0x63] = 0x00;
+}
+
+static TIMER_CALLBACK( intback_peripheral )
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int pad,pad_num;
+	static const char *const padnames[] = { "JOY1", "JOY2" };
+
+	/* doesn't work? */
+	//pad_num = state->m_smpc.intback_stage - 1;
+
+	if(LOG_PAD_CMD) printf("%d\n",pad_num);
+
+//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+	for(pad_num=0;pad_num<2;pad_num++)
+	{
+		pad = input_port_read(machine, padnames[pad_num]);
+		state->m_smpc_ram[0x21+pad_num*8] = 0xf1;	// no tap, direct connect
+		state->m_smpc_ram[0x23+pad_num*8] = 0x02;	// saturn pad
+		state->m_smpc_ram[0x25+pad_num*8] = pad>>8;
+		state->m_smpc_ram[0x27+pad_num*8] = pad & 0xff;
+	}
+
+	if (state->m_smpc.intback_stage == 2)
+	{
+		state->m_smpc.smpcSR = (0x80 | state->m_smpc.pmode);	// pad 2, no more data, echo back pad mode set by intback
+		state->m_smpc.intback_stage = 0;
+	}
+	else
+	{
+		state->m_smpc.smpcSR = (0xc0 | state->m_smpc.pmode);	// pad 1, more data, echo back pad mode set by intback
+		state->m_smpc.intback_stage ++;
+	}
+
+	if(!(state->m_scu.ism & IRQ_SMPC))
+		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
+	else
+		state->m_scu.ist |= (IRQ_SMPC);
+
+	/* clear hand-shake flag */
+	state->m_smpc_ram[0x63] = 0x00;
+
+}
+
+static TIMER_CALLBACK( saturn_smpc_intback )
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	system_time systime;
+	machine.base_datetime(systime);
+
+	if(state->m_smpc_ram[1] != 0)
+	{
+		{
+			state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+
+			state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+		   	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
+			state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+		   	state->m_smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
+		   	state->m_smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
+		   	state->m_smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
+		   	state->m_smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
+
+			state->m_smpc_ram[0x31]=0x00;  //?
+
+			//state->m_smpc_ram[0x33]=input_port_read(space->machine(), "FAKE");
+
+			state->m_smpc_ram[0x35]= 0 << 7 |
+			                         state->m_vdp2.dotsel << 6 |
+			                         1 << 5 |
+			                         1 << 4 |
+			                         0 << 3 | //MSHNMI
+			                         1 << 2 |
+			                         0 << 1 | //SYSRES
+			                         0 << 0;  //SOUNDRES
+			state->m_smpc_ram[0x37]= 0 << 6; //CDRES
+
+			state->m_smpc_ram[0x39]=state->m_smpc.SMEM[0];
+			state->m_smpc_ram[0x3b]=state->m_smpc.SMEM[1];
+			state->m_smpc_ram[0x3d]=state->m_smpc.SMEM[2];
+			state->m_smpc_ram[0x3f]=state->m_smpc.SMEM[3];
+
+			state->m_smpc_ram[0x41]=0xff;
+			state->m_smpc_ram[0x43]=0xff;
+			state->m_smpc_ram[0x45]=0xff;
+			state->m_smpc_ram[0x47]=0xff;
+			state->m_smpc_ram[0x49]=0xff;
+			state->m_smpc_ram[0x4b]=0xff;
+			state->m_smpc_ram[0x4d]=0xff;
+			state->m_smpc_ram[0x4f]=0xff;
+			state->m_smpc_ram[0x51]=0xff;
+			state->m_smpc_ram[0x53]=0xff;
+			state->m_smpc_ram[0x55]=0xff;
+			state->m_smpc_ram[0x57]=0xff;
+			state->m_smpc_ram[0x59]=0xff;
+			state->m_smpc_ram[0x5b]=0xff;
+			state->m_smpc_ram[0x5d]=0xff;
+		}
+
+		state->m_smpc.intback_stage = (state->m_smpc_ram[3] & 8) >> 3; // first peripheral
+		state->m_smpc.smpcSR = 0x40 | state->m_smpc.intback_stage << 5;
+		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
+
+		if(!(state->m_scu.ism & IRQ_SMPC))
+			device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
+		else
+			state->m_scu.ist |= (IRQ_SMPC);
+
+		/* clear hand-shake flag */
+		state->m_smpc_ram[0x63] = 0x00;
+	}
+	else if(state->m_smpc_ram[3] & 8)
+	{
+		state->m_smpc.intback_stage = (state->m_smpc_ram[3] & 8) >> 3; // first peripheral
+		state->m_smpc.smpcSR = 0x40;
+		machine.scheduler().timer_set(attotime::from_usec(0), FUNC(intback_peripheral),0);
+	}
+	else
+	{
+		printf("SMPC intback bogus behaviour called %02x %02x\n",state->m_smpc_ram[1],state->m_smpc_ram[3]);
+	}
+
 }
 
 static void smpc_rtc_write(running_machine &machine)
@@ -505,7 +571,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 			/*"Interrupt Back"*/
 			case 0x10:
 				if(LOG_SMPC) printf ("SMPC: Status Acquire\n");
-				space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(smpc_intback),1); //TODO: variable time
+				space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(stv_smpc_intback),0); //TODO: variable time
 				break;
 			/* RTC write*/
 			case 0x16:
@@ -606,21 +672,23 @@ WRITE8_HANDLER( saturn_SMPC_w )
 
 	last = state->m_smpc_ram[offset];
 
-	if ((state->m_smpc.intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
+	if (offset == 1)
 	{
-      if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", state->m_smpc.intback_stage);
-		if (state->m_smpc.intback_stage != 3)
+		if(state->m_smpc.intback_stage)
 		{
-			state->m_smpc.intback_stage = 2;
+			if(data & 0x40)
+			{
+				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
+				state->m_smpc.smpcSR &= 0x0f;
+				state->m_smpc.intback_stage = 0;
+			}
+			else if(data & 0x80)
+			{
+				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
+				space->machine().scheduler().timer_set(attotime::from_usec(200), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
+				state->m_smpc_ram[0x63] = 0x01; //TODO: set hand-shake flag?
+			}
 		}
-		smpc_intbackhelper(machine);
-		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
-	}
-
-	if ((offset == 1) && (data & 0x40))
-	{
-      if (LOG_SMPC) logerror("SMPC: BREAK request\n");
-		state->m_smpc.intback_stage = 0;
 	}
 
 	state->m_smpc_ram[offset] = data;
@@ -686,13 +754,15 @@ WRITE8_HANDLER( saturn_SMPC_w )
 
 				timing = 100;
 
-				if(state->m_smpc_ram[1] == 0x01) // non-peripheral data
+				if(state->m_smpc_ram[1] != 0) // non-peripheral data
 					timing = 200;
 
 				if(state->m_smpc_ram[3] & 8) // peripheral data
 					timing = 15000;
 
-				space->machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(smpc_intback),0); //TODO: is variable time correct
+				if(LOG_PAD_CMD) printf("INTBACK %02x %02x\n",state->m_smpc_ram[1],state->m_smpc_ram[3]);
+
+				space->machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?
 				break;
 			/* RTC write*/
 			case 0x16:
