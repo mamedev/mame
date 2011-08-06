@@ -88,9 +88,8 @@ M6295 clock: 1.200MHz (24 / 20), sample rate =  M6295 clock /165
 YM2413 clock: 3.579545MHz
 Vsync: 58Hz
 HSync: 15.16kHz
-
-Compared to the real PCB, MAME is too fast, so 60fps needs to be changed to 58fps (i.e 58Hz).
 --
+
 driver modified by Eisuke Watanabe
 ***************************************************************************/
 
