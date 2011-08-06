@@ -100,6 +100,7 @@ typedef struct
 
 typedef struct
 {
+	UINT8 pcmregs[256];
 	YMF278BSlot slots[24];
 	INT8 lsitest0;
 	INT8 lsitest1;
@@ -476,6 +477,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 	chip->timer_busy->adjust(attotime::from_hz(chip->clock / 88));
 
 	chip->stream->update();
+	chip->pcmregs[reg] = data;
 
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
@@ -671,6 +673,16 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 		}
 
+		// PCM/mixer
+		case 5:
+		{
+			UINT8 reg = chip->port_C;
+			if (reg == 2)
+				return (chip->pcmregs[reg] & 0x1f) | 0x20; // device ID in upper bits
+
+			return chip->pcmregs[reg];
+		}
+
 		default:
 			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
 			break;
@@ -733,6 +745,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 {
 	int i;
 
+	device->save_item(NAME(chip->pcmregs));
 	device->save_item(NAME(chip->lsitest0));
 	device->save_item(NAME(chip->lsitest1));
 	device->save_item(NAME(chip->wavetblhdr));
