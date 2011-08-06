@@ -109,6 +109,7 @@ typedef struct
 
 	UINT8 busy;
 	emu_timer *timer_busy;
+	UINT8 exp;
 
 	INT32 fm_l, fm_r;
 	INT32 pcm_l, pcm_r;
@@ -405,17 +406,21 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 {
 	switch(reg)
 	{
-		case 0x00:  	// TEST
+		// LSI TEST
+		case 0x00:
 		case 0x01:
 			break;
+
 		case 0x02:
 			chip->timer_a_count = data;
 			ymf278b_timer_a_reset(chip);
 			break;
+
 		case 0x03:
 			chip->timer_b_count = data;
 			ymf278b_timer_b_reset(chip);
 			break;
+
 		case 0x04:
 			if(data & 0x80)
 				chip->current_irq = 0;
@@ -431,14 +436,31 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 			}
 			ymf278b_irq_check(machine, chip);
 			break;
+
 		default:
 			logerror("YMF278B:  Port A write %02x, %02x\n", reg, data);
+			break;
 	}
 }
 
 static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
-	logerror("YMF278B:  Port B write %02x, %02x\n", reg, data);
+	switch(reg)
+	{
+		// LSI TEST
+		case 0x00:
+		case 0x01:
+			break;
+
+		// expansion register (NEW2/NEW)
+		case 0x05:
+			chip->exp = data;
+			break;
+
+		default:
+			logerror("YMF278B:  Port B write %02x, %02x\n", reg, data);
+			break;
+	}
 }
 
 static TIMER_CALLBACK( ymf278b_timer_busy_clear )
@@ -486,6 +508,9 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 						break;
 					case 0x80:
 						slot->bits = 16;
+						break;
+					case 0xc0:
+						// prohibited
 						break;
 				}
 
@@ -587,7 +612,8 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 		// All non-slot registers
 		switch (reg)
 		{
-			case 0x00:  	// TEST
+			// LSI TEST
+			case 0x00:
 			case 0x01:
 				break;
 
@@ -634,8 +660,16 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 
 	switch (offset)
 	{
+		// status register
 		case 0:
-			return chip->busy | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+		{
+			// bits 0 and 1 are only valid if NEW2 is set
+			UINT8 newbits = 0;
+			if (chip->exp & 2)
+				newbits = chip->busy;
+
+			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+		}
 
 		default:
 			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
@@ -705,6 +739,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 	device->save_item(NAME(chip->memmode));
 	device->save_item(NAME(chip->memadr));
 	device->save_item(NAME(chip->busy));
+	device->save_item(NAME(chip->exp));
 	device->save_item(NAME(chip->fm_l));
 	device->save_item(NAME(chip->fm_r));
 	device->save_item(NAME(chip->pcm_l));
