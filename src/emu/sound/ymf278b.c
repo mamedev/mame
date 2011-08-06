@@ -639,8 +639,10 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 				chip->memadr |= data;
 				break;
 
-			case 0x06:  // memory data (ignored, we don't support RAM)
-			case 0x07:	// unused
+			case 0x06:
+				// memory data (ignored, we don't support RAM)
+				chip->memadr++;
+				chip->memadr &= 0xffffff;
 				break;
 
 			case 0xf8:
@@ -675,13 +677,21 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 
 		// PCM/mixer
 		case 5:
-		{
-			UINT8 reg = chip->port_C;
-			if (reg == 2)
-				return (chip->pcmregs[reg] & 0x1f) | 0x20; // device ID in upper bits
+			switch (chip->port_C)
+			{
+				// special cases
+				case 2:
+					return (chip->pcmregs[chip->port_C] & 0x1f) | 0x20; // device ID in upper bits
+				case 6:
+					logerror("YMF278B:  Read memory data at %06x\n", chip->memadr); // memory data (ignored, we don't support RAM)
+					chip->memadr++;
+					chip->memadr &= 0xffffff;
+					break;
 
-			return chip->pcmregs[reg];
-		}
+				default:
+					return chip->pcmregs[chip->port_C];
+			}
+			break;
 
 		default:
 			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
