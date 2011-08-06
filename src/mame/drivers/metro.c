@@ -80,16 +80,6 @@ Notes:
 -   Sprite zoom in Mouja at the end of a match looks wrong, but it's been verified
     to be the same on the original board
 
-lastfort info from guru
----
-Master clock = 24.00MHz
-D7810 clock : 12.00MHz (24 / 2)
-M6295 clock: 1.200MHz (24 / 20), sample rate =  M6295 clock /165
-YM2413 clock: 3.579545MHz
-Vsync: 58Hz
-HSync: 15.16kHz
---
-
 driver modified by Eisuke Watanabe
 ***************************************************************************/
 
@@ -3700,7 +3690,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_12MHz/3)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -3743,7 +3733,7 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -3785,7 +3775,7 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -3827,7 +3817,7 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -3869,7 +3859,7 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -3895,7 +3885,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(360, 224)
@@ -3910,7 +3900,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -4101,7 +4091,7 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -4143,7 +4133,7 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -4229,7 +4219,7 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -4271,7 +4261,7 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -4307,7 +4297,7 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM6295_ADD("oki", 16000000/1024*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
@@ -4817,8 +4807,8 @@ Metro 1995
 
 MTR5260-A
 
-                                 12MHz  6116
-                   YM2151          DT7  DT8
+                      3.5759MHz  12MHz  6116
+   26.666MHz        YM2151          DT7  DT8
                             M6295
      7C199                             78C10
      7C199       Imagetek14220
@@ -4828,7 +4818,6 @@ MTR5260-A
                   32MHz    52258       DT2
    SW1                     52258       DT3
    SW2            DT6  DT5             DT4
-
 
 ********************************************************
 
@@ -4904,15 +4893,15 @@ MTR5260-A
 |-----------------------------------------------|
 |TA7222            3.579545MHz                  |
 |            YM3012                      6116   |
-|C3403  C3403      YM2151  M6295                |
+|C3403  C3403      YM2413  M6295                |
 |       26.666MHz             DD_JA-7  DD_JA-8  |
-|            6264                               |
-|J           6264           |--------|  D78C10  |
-|A           6264           |IMAGETEK|          |
+|            7C199                              |
+|J           7C199          |--------|  D78C10  |
+|A           7C199          |IMAGETEK|          |
 |M                          |14220   |          |
 |M               MM1035     |        |          |
 |A         |------------|   |--------|          |
-|          |    68000   |              DD_JB-1  |
+|          |  68000-12  |              DD_JB-1  |
 |          |------------|                       |
 |                                      DD_JB-2  |
 |              24MHz                            |
@@ -4924,7 +4913,7 @@ MTR5260-A
 Notes:
       68000 clock     - 12.000MHz [24/2]
       D78C10 clock    - 12.000MHz [24/2]
-      YM2151 clock    - 3.579545MHz
+      YM2413 clock    - 3.579545MHz
       Oki M6295 clock - 1.200MHz [24/20], sample rate = 1200000 / 132
       VSync - 60Hz
       HSync - 15.55kHz
@@ -5194,6 +5183,20 @@ VG420
     TR_  TR_  TR_  TR_  TR_  TR_  TR_  TR_
     JC08 JC07 JC06 JC05 JC04 JC03 JC02 JC01
 
+CPU     :MC68000P12
+Sound   :Yamaha YM2413, OKI M6295
+OSC     :24.0000MHz, 3.579545MHz
+other   :D78C10ACW, Imagetek Inc 14100 052
+
+Clock measurements by the Guru:
+Master clock: 24.00MHz
+ D7810 clock: 12.00MHz (24 / 2)
+ M6295 clock: 1.200MHz (24 / 20), sample rate =  M6295 clock /165
+YM2413 clock: 3.579545MHz
+
+Vsync: 58Hz
+HSync: 15.16kHz
+
 ***************************************************************************/
 
 ROM_START( lastfort )
@@ -5305,11 +5308,12 @@ Mahjong Doukyuhsei (JPN Ver.)
 
 (c)1995 make software/elf/media trading corp.
 
-CPU   :68000 16MHz
-Sound :YM2413 custom
-OSC   :16.0000MHz 3.579545MHz 26.666MHz
+Board: VG330-B
 
-Board Name?:VG330-B
+CPU   : 68000 16MHz
+Sound : YM2413, M6295
+OSC   : 16.0000MHz 3.579545MHz 26.666MHz
+Custom: Imagetek Inc 14300
 
 ***************************************************************************/
 
@@ -5342,7 +5346,7 @@ Sound:  M6295
 OSC:    32.0000MHz
         3.579545MHz
 EEPROM: 93C46
-Custom: 14300 095
+Custom: Imagetek Inc 14300 095
 
 ***************************************************************************/
 
@@ -5743,38 +5747,38 @@ Metro/Banpresto 1995
 
 MTR5260-A                3.5759MHz  12MHz
                YM2151                         6116
-   26.666MHz           M6295    PZ.JB7  PZ.JB8
+   26.666MHz           M6295    PZ_JB7  PZ_JB8
                                      78C10
       7C199         Imagetek
       7C199           14220
       61C64
 
-                                          PZ.JB1
-           68000-16                       PZ.JB2
-               32MHz   6164               PZ.JB3
-                       6164               PZ.JB4
-    SW      PZ.JB6 PZ.JB5
-    SW
+                                          PZ_JB1
+           68000-16                       PZ_JB2
+               32MHz   6164               PZ_JB3
+                       6164               PZ_JB4
+    SW1     PZ_JB6 PZ_JB5
+    SW2
 
 ***************************************************************************/
 
 ROM_START( puzzli )
 	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "pz.jb5",       0x000000, 0x020000, CRC(33bbbd28) SHA1(41a98cfbdd60a638e4aa08f15f1730a2436106f9) )
-	ROM_LOAD16_BYTE( "pz.jb6",       0x000001, 0x020000, CRC(e0bdea18) SHA1(9941a2cd88d7a3c1a640f837d9f34c39ba643ee5) )
+	ROM_LOAD16_BYTE( "pz_jb5.20e", 0x000000, 0x020000, CRC(33bbbd28) SHA1(41a98cfbdd60a638e4aa08f15f1730a2436106f9) )
+	ROM_LOAD16_BYTE( "pz_jb6.20c", 0x000001, 0x020000, CRC(e0bdea18) SHA1(9941a2cd88d7a3c1a640f837d9f34c39ba643ee5) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "pz.jb8",      0x000000, 0x004000, CRC(c652da32) SHA1(907eba5103373ca6204f9d62c426ccdeef0a3791) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
+	ROM_LOAD( "pz_jb8.3i", 0x000000, 0x004000, CRC(c652da32) SHA1(907eba5103373ca6204f9d62c426ccdeef0a3791) )
+	ROM_CONTINUE(          0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "pz.jb2",       0x000000, 0x080000, CRC(0c0997d4) SHA1(922d8553ef505f65238e5cc77b45861a80022d75) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "pz.jb4",       0x000002, 0x080000, CRC(576bc5c2) SHA1(08c10e0a3356ee1f79b78eff92395d8b18e43485) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "pz.jb1",       0x000004, 0x080000, CRC(29f01eb3) SHA1(1a56f0b8efb599ae4f3cd0a4f0b6a6152ea6b117) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "pz.jb3",       0x000006, 0x080000, CRC(6753e282) SHA1(49d092543db34f2cb54697897790df12ca3eda74) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "pz_jb2.14i", 0x000000, 0x080000, CRC(0c0997d4) SHA1(922d8553ef505f65238e5cc77b45861a80022d75) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "pz_jb4.18i", 0x000002, 0x080000, CRC(576bc5c2) SHA1(08c10e0a3356ee1f79b78eff92395d8b18e43485) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "pz_jb1.12i", 0x000004, 0x080000, CRC(29f01eb3) SHA1(1a56f0b8efb599ae4f3cd0a4f0b6a6152ea6b117) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "pz_jb3.16i", 0x000006, 0x080000, CRC(6753e282) SHA1(49d092543db34f2cb54697897790df12ca3eda74) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "pz.jb7",      0x000000, 0x040000, CRC(b3aab610) SHA1(9bcf1f98e19a7e26b22e152313dfbd43c882f008) )
+	ROM_LOAD( "pz_jb7.3g", 0x000000, 0x040000, CRC(b3aab610) SHA1(9bcf1f98e19a7e26b22e152313dfbd43c882f008) )
 ROM_END
 
 
@@ -5865,11 +5869,33 @@ ROM_END
 Sky Alert (JPN Ver.)
 (c)1992 Metro
 VG420
+                                     SA
+                     SW2 SW1         B12   4016
+                                           NEC78C10  3.579MHz
+
+                                                          6269
+                                                          SA
+                                                          A11
+  55328 55328 55328       24MHz
+
+                           4064   4064   SA   SA          68000-12
+       Imagetek                          C10  C09
+       14100
+
+
+    SA  SA  SA  SA  SA  SA  SA  SA 
+    A08 A07 A06 A05 A04 A03 A02 A01
 
 CPU     :MC68000P12
-Sound   :YM2413,OKI M6295
-OSC     :24.0000MHz,3.579545MHz
-other   :D78C10ACW,Imagetek Inc 14100 052
+Sound   :Yamaha YM2413, OKI M6295
+OSC     :24.0000MHz, 3.579545MHz
+other   :D78C10ACW, Imagetek Inc 14100 052
+
+Master clock: 24.00MHz
+ D7810 clock: 12.00MHz (24 / 2)
+ M6295 clock: 1.200MHz (24 / 20), sample rate =  M6295 clock /165
+YM2413 clock: 3.579545MHz
+
 
 ***************************************************************************/
 
