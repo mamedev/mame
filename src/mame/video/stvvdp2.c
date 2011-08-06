@@ -4368,10 +4368,11 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		//	popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
 
 		/* Akumajou Dracula, bits 2-4 */
-		/* Arcana Strikes bit 5*/
+		/* Arcana Strikes bit 5 */
 		/* Choh Makai Mura 0x0055 */
 		/* Sega Rally 0x0155 */
-		if(STV_VDP2_SFPRMD & ~0x0155)
+		/* Find Love  0x4400 */
+		if(STV_VDP2_SFPRMD & ~0x4555)
 			popmessage("Special Priority Mode enabled %04x, contact MAMEdev",STV_VDP2_SFPRMD);
 	}
 }
@@ -5571,7 +5572,7 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 
 	switch(offset)
 	{
-		case 0x0/4:
+		case 0x000/4:
 		{
 			/* latch h/v signals thru HV latch*/
 			if(!STV_VDP2_EXLTEN)
@@ -5585,11 +5586,18 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 
 			break;
 		}
-		case 0x4/4:
+		case 0x004/4:
 		{
 			/*Screen Status Register*/
 								       /*VBLANK              HBLANK            ODD               PAL    */
-			state->m_vdp2_regs[offset] = (state->m_vdp2.exltfg<<25) | (state->m_vdp2.exsyfg<<24) | (get_vblank(space->machine())<<19) | (get_hblank(space->machine())<<18) | (get_odd_bit(space->machine()) << 17) | (state->m_vdp2.pal << 16);
+			state->m_vdp2_regs[offset] = (state->m_vdp2.exltfg<<25) |
+										 (state->m_vdp2.exsyfg<<24) |
+										 (get_vblank(space->machine())<<19) |
+										 (get_hblank(space->machine())<<18) |
+										 (get_odd_bit(space->machine()) << 17) |
+										 (state->m_vdp2.pal << 16) |
+										 (STV_VDP2_VRAMSZ << 15) |
+										 ((0 << 0) & 0xf); // VDP2 version
 
 			/* vblank bit is always 1 if DISP bit is disabled */
 			if(!STV_VDP2_DISP)
@@ -5601,9 +5609,14 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 				state->m_vdp2.exltfg &= ~1;
 				state->m_vdp2.exsyfg &= ~1;
 			}
+			if(ACCESSING_BITS_0_15)
+			{
+				if(!space->debugger_access())
+					printf("Warning: VDP2 version read\n");
+			}
 			break;
 		}
-		case 0x8/4:
+		case 0x008/4:
 		/*H/V Counter Register*/
 		{
 			state->m_vdp2_regs[offset] = (state->m_vdp2.h_count<<16)|(state->m_vdp2.v_count);
@@ -5757,6 +5770,9 @@ WRITE32_HANDLER ( saturn_vdp2_regs_w )
 		state->m_vdp2.old_tvmd = STV_VDP2_TVMD;
 		stv_vdp2_dynamic_res_change(space->machine());
 	}
+
+	if(STV_VDP2_VRAMSZ)
+		printf("VDP2 sets up 8 Mbit VRAM!\n");
 }
 
 static int get_hblank_duration(running_machine &machine)
@@ -6049,11 +6065,11 @@ For tilemap and sprite layer, clipping rectangle is changed.
 Done:
 -Basic support(w0 or w1),bitmaps only.
 -W0 (outside) for tilemaps and sprite layer.
+-Window logic.
 
 Not Done:
 -Complete Windows on cells.A split between cells and bitmaps is in progress...
 -w0 & w1 at the same time.
--Window logic.
 -Line window.
 -Color Calculation.
 -Rotation parameter Window (already done?).
@@ -6167,74 +6183,54 @@ static void stv_vdp2_get_window1_coordinates(running_machine &machine,UINT16 *s_
 
 }
 
+static int get_window_pixel(UINT16 s_x,UINT16 e_x,UINT16 s_y,UINT16 e_y,int x, int y,UINT8 win_num)
+{
+	if(stv2_current_tilemap.window_control & (2 << win_num))
+	{
+		/*Outside Area*/
+		if(stv2_current_tilemap.window_control & (0x10 << win_num))
+		{
+			if(y < s_y || y > e_y)
+				return 1;
+			else
+			{
+				if(x < s_x || x > e_x)
+					return 1;
+				//else
+				//  return 0;
+			}
+		}
+		/*Inside Area*/
+		else
+		{
+			if(y > s_y && y < e_y)
+			{
+				if(x > s_x && x < e_x)
+					return 1;
+			}
+			//else
+			//  return 0;
+		}
+	}
+
+	return 0;
+}
+
 static int stv_vdp2_window_process(running_machine &machine,int x,int y)
 {
 	UINT16 s_x=0,e_x=0,s_y=0,e_y=0;
+	UINT8 w0_pix, w1_pix;
 
 	if ((stv2_current_tilemap.window_control & 6) == 0)
 		return 0;
 
 	stv_vdp2_get_window0_coordinates(machine,&s_x, &e_x, &s_y, &e_y);
-
-	if(stv2_current_tilemap.window_control & 2)
-	{
-		/*Outside Area*/
-		if(stv2_current_tilemap.window_control & 0x10)
-		{
-			if(y < s_y || y > e_y)
-				return 1;
-			else
-			{
-				if(x < s_x || x > e_x)
-					return 1;
-				//else
-				//  return 0;
-			}
-		}
-		/*Inside Area*/
-		else
-		{
-			if(y > s_y && y < e_y)
-			{
-				if(x > s_x && x < e_x)
-					return 1;
-			}
-			//else
-			//  return 0;
-		}
-	}
+	w0_pix = get_window_pixel(s_x,e_x,s_y,e_y,x,y,0);
 
 	stv_vdp2_get_window1_coordinates(machine,&s_x, &e_x, &s_y, &e_y);
+	w1_pix = get_window_pixel(s_x,e_x,s_y,e_y,x,y,1);
 
-	if(stv2_current_tilemap.window_control & 4)
-	{
-		/*Outside Area*/
-		if(stv2_current_tilemap.window_control & 0x20)
-		{
-			if(y < s_y || y > e_y)
-				return 1;
-			else
-			{
-				if(x < s_x || x > e_x)
-					return 1;
-				//else
-				//  return 0;
-			}
-		}
-		/*Inside Area*/
-		else
-		{
-			if(y > s_y && y < e_y)
-			{
-				if(x > s_x && x < e_x)
-					return 1;
-			}
-			//else
-			//  return 0;
-		}
-	}
-	return 0;
-//  return 1;
+	return stv2_current_tilemap.window_control & 1 ? (w0_pix & w1_pix) : (w0_pix | w1_pix);
 }
 
 static int stv_vdp2_apply_window_on_layer(running_machine &machine,rectangle *cliprect)
