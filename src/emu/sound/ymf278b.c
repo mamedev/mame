@@ -86,7 +86,7 @@ typedef struct
 	UINT32 step;	/* fixed-point frequency step */
 	UINT32 stepptr;	/* fixed-point pointer into the sample */
 
-	INT8 active;		/* slot keyed on */
+	INT8 active;	/* slot keyed on */
 	INT8 bits;		/* width of the samples */
 	UINT32 startaddr;
 	UINT32 loopaddr;
@@ -106,6 +106,9 @@ typedef struct
 	INT8 wavetblhdr;
 	INT8 memmode;
 	INT32 memadr;
+
+	UINT8 busy;
+	emu_timer *timer_busy;
 
 	INT32 fm_l, fm_r;
 	INT32 pcm_l, pcm_r;
@@ -402,6 +405,9 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 {
 	switch(reg)
 	{
+		case 0x00:  	// TEST
+		case 0x01:
+			break;
 		case 0x02:
 			chip->timer_a_count = data;
 			ymf278b_timer_a_reset(chip);
@@ -435,8 +441,18 @@ static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 	logerror("YMF278B:  Port B write %02x, %02x\n", reg, data);
 }
 
+static TIMER_CALLBACK( ymf278b_timer_busy_clear )
+{
+	YMF278BChip *chip = (YMF278BChip *)ptr;
+	chip->busy = 0;
+}
+
 static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
+	// statusreg busy bit is on for 88 cycles (56 for fm)
+	chip->busy = 1;
+	chip->timer_busy->adjust(attotime::from_hz(chip->clock / 88));
+
 	chip->stream->update();
 
 	// Handle slot registers specifically
@@ -619,7 +635,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 	switch (offset)
 	{
 		case 0:
-			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+			return chip->busy | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 
 		default:
 			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
@@ -670,8 +686,13 @@ static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_
 	chip->irq_callback = cb;
 	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
+	chip->timer_busy = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_busy_clear), chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = device->clock();
+
+	chip->timer_a->reset();
+	chip->timer_b->reset();
+	chip->timer_busy->reset();
 }
 
 static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
@@ -683,6 +704,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 	device->save_item(NAME(chip->wavetblhdr));
 	device->save_item(NAME(chip->memmode));
 	device->save_item(NAME(chip->memadr));
+	device->save_item(NAME(chip->busy));
 	device->save_item(NAME(chip->fm_l));
 	device->save_item(NAME(chip->fm_r));
 	device->save_item(NAME(chip->pcm_l));
@@ -786,10 +808,10 @@ DEVICE_GET_INFO( ymf278b )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMF278B");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Yamaha FM");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
