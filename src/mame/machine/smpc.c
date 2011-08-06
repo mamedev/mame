@@ -599,7 +599,8 @@ WRITE8_HANDLER( stv_SMPC_w )
 
 		// we've processed the command, clear status flag
 		state->m_smpc_ram[0x5f] = data; //read-back command
-		state->m_smpc_ram[0x63] = 0x00;
+		if(data != 0x10)
+			state->m_smpc_ram[0x63] = 0x00;
 		/*TODO:emulate the timing of each command...*/
 	}
 }

@@ -294,8 +294,6 @@ WRITE16_HANDLER( saturn_vdp1_regs_w )
 		case 0x00/2:
 			stv_set_framebuffer_config(space->machine());
 			if ( VDP1_LOG ) logerror( "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
-			if ( STV_VDP1_VBE && get_vblank(space->machine()) )
-				state->m_vdp1.framebuffer_clear_on_next_frame = 1;
 
 			break;
 		case 0x02/2:
@@ -364,7 +362,27 @@ WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w )
 	if ( STV_VDP1_TVM & 1 )
 	{
 		/* 8-bit mode */
-		printf("VDP1 8-bit mode %08x %02x\n",offset,data);
+		//printf("VDP1 8-bit mode %08x %02x\n",offset,data);
+		if ( ACCESSING_BITS_24_31 )
+		{
+			state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2] &= 0x00ff;
+			state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2] |= data & 0xff00;
+		}
+		if ( ACCESSING_BITS_16_23 )
+		{
+			state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2] &= 0xff00;
+			state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2] |= data & 0x00ff;
+		}
+		if ( ACCESSING_BITS_8_15 )
+		{
+			state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2+1] &= 0x00ff;
+			state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2+1] |= data & 0xff00;
+		}
+		if ( ACCESSING_BITS_0_7 )
+		{
+			state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2+1] &= 0xff00;
+			state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2+1] |= data & 0x00ff;
+		}
 	}
 	else
 	{
@@ -388,7 +406,15 @@ READ32_HANDLER ( saturn_vdp1_framebuffer0_r )
 	if ( STV_VDP1_TVM & 1 )
 	{
 		/* 8-bit mode */
-		printf("VDP1 8-bit mode %08x\n",offset);
+		//printf("VDP1 8-bit mode %08x\n",offset);
+		if ( ACCESSING_BITS_24_31 )
+			result |= ((state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2] & 0xff00) << 16);
+		if ( ACCESSING_BITS_16_23 )
+			result |= ((state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2] & 0x00ff) << 16);
+		if ( ACCESSING_BITS_8_15 )
+			result |= ((state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2+1] & 0xff00));
+		if ( ACCESSING_BITS_0_7 )
+			result |= ((state->m_vdp1.framebuffer[state->m_vdp1.framebuffer_current_draw][offset*2+1] & 0x00ff));
 	}
 	else
 	{

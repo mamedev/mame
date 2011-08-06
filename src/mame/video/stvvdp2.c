@@ -105,6 +105,7 @@ In other words,the first three types uses the offset and not the color allocated
 #include "profiler.h"
 #include "includes/stv.h"
 
+static UINT8 get_vblank(running_machine &machine);
 static UINT8 get_hblank(running_machine &machine);
 static int get_vblank_duration(running_machine &machine);
 static int get_hblank_duration(running_machine &machine);
@@ -4357,12 +4358,14 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 
 		/* Magical Drop III 0x200 -> color calculation window */
 		/* Ide Yousuke Meijin No Shin Jissen Mahjong 0x0303 */
-		if(STV_VDP2_WCTLD & 0x2008)
+		/* Decathlete 0x088 */
+		if(STV_VDP2_WCTLD & 0x2000)
 			popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
 
 		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
-		if(STV_VDP2_W0LWE || STV_VDP2_W1LWE)
-			popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
+		/* Layer Section */
+		//if(STV_VDP2_W0LWE || STV_VDP2_W1LWE)
+		//	popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
 
 		/* Akumajou Dracula, bits 2-4 */
 		/* Arcana Strikes bit 5*/

@@ -1793,6 +1793,9 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 			state->m_scu.ist |= (IRQ_HBLANK_IN);
 	}
 
+	if(scanline == (vblank_line+1)*y_step && STV_VDP1_VBE)
+		state->m_vdp1.framebuffer_clear_on_next_frame = 1;
+
 	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
 	{
 		if(!(state->m_scu.ism & IRQ_TIMER_0))
@@ -1820,7 +1823,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		}
 	}
 
-	if(scanline == vblank_line*y_step)
+	if(scanline == (vblank_line)*y_step)
 	{
 		video_update_vdp1(timer.machine());
 
@@ -2037,6 +2040,7 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
+	MCFG_TIMER_ADD_SCANLINE("slave_scantimer", saturn_slave_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
