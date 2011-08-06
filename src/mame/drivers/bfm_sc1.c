@@ -1130,9 +1130,9 @@ MACHINE_CONFIG_END
 static void sc1_common_init(running_machine &machine, int reels, int decrypt, int defaultbank)
 {
 	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
-	UINT8 *rom, i;
+	UINT8 i; //,*rom;
 
-	rom = machine.region("maincpu")->base();
+//	rom = machine.region("maincpu")->base();
 
 
 	memset(state->m_sc1_Inputs, 0, sizeof(state->m_sc1_Inputs));
