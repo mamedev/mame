@@ -4372,7 +4372,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		/* Choh Makai Mura 0x0055 */
 		/* Sega Rally 0x0155 */
 		/* Find Love  0x4400 */
-		if(STV_VDP2_SFPRMD & ~0x4555)
+		/* Dragon Ball Z 0x3800 - 0x2c00 */
+		if(STV_VDP2_SFPRMD & ~0x7d55)
 			popmessage("Special Priority Mode enabled %04x, contact MAMEdev",STV_VDP2_SFPRMD);
 	}
 }

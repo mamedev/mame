@@ -520,6 +520,9 @@ static READ32_HANDLER( saturn_scu_r )
 			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
 			res = state->m_scu_regs[offset];
 			break;
+		case 0x80/4:
+			res = dsp_prg_ctrl_r(space);
+			break;
 		case 0x8c/4:
 			if(LOG_SCU) logerror( "DSP mem read at %08X\n", state->m_scu_regs[34]);
         	res = dsp_ram_addr_r();
@@ -589,19 +592,20 @@ static WRITE32_HANDLER( saturn_scu_w )
 		case 0x7c/4: if(LOG_SCU) logerror("Warning: DMA status WRITE! Offset %02x(%d)\n",offset*4,offset); break;
 		/*DSP section*/
 		case 0x80/4:
-			dsp_prg_ctrl(space, data);
+			/* TODO: you can't overwrite some flags with this */
+			dsp_prg_ctrl(space, state->m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
 			break;
 		case 0x84/4:
-			dsp_prg_data(data);
+			dsp_prg_data(state->m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Program RAM Data Port Access %08x\n",data);
 			break;
 		case 0x88/4:
-			dsp_ram_addr_ctrl(data);
+			dsp_ram_addr_ctrl(state->m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Data RAM Address Port Access %08x\n",data);
 			break;
 		case 0x8c/4:
-			dsp_ram_addr_w(data);
+			dsp_ram_addr_w(state->m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Data RAM Data Port Access %08x\n",data);
 			break;
 		case 0x90/4: /*if(LOG_SCU) logerror("timer 0 compare data = %03x\n",state->m_scu_regs[36]);*/ break;

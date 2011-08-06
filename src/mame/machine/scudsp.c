@@ -4,6 +4,10 @@ System Control Unit - DSP emulator version 0.08
 Written by Angelo Salese & Mariusz Wojcieszek
 
 Changelog:
+110807: Angelo Salese
+- Allow the Program Counter to be read-backable from SH-2, needed by Virtua Fighter to not
+  get stuck on "round 1" announcement;
+
 110806: Angelo Salese
 - Allows reading from non-work ram h areas;
 - Fixed DMA add values;
@@ -329,9 +333,18 @@ static UINT32 dsp_get_mem_source_dma( UINT32 memcode, UINT32 counter )
 	return 0;
 }
 
-void dsp_prg_ctrl(address_space *space, UINT32 data)
+UINT32 dsp_prg_ctrl_r(address_space *space)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	return (state->m_scu_regs[0x80/4] & 0x06ff8000) | (dsp_reg.pc & 0xff);
+}
+
+void dsp_prg_ctrl_w(address_space *space, UINT32 data)
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+	data = state->m_scu_regs[0x80/4] & ;
+
 	if(LEF) dsp_reg.pc = (data & 0xff);
 	if(EXF) dsp_execute_program(space);
 }

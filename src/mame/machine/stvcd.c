@@ -124,6 +124,7 @@ static transT xfertype;
 static trans32T xfertype32;
 static UINT32 xfercount, calcsize;
 static UINT32 xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
+static UINT8 command;
 
 static filterT filters[MAX_FILTERS];
 static filterT *cddevice;
@@ -196,7 +197,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 	{
 		cd_playdata();
 	}
-	else
+	//else
 	{
 		hirqreg |= SCDQ;
 	}
@@ -594,21 +595,32 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 //              CDROM_LOG(("WW CR1: %04x\n", data))
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
+		command |= 1;
 		break;
 	case 0x001c:
 	case 0x001e:
 //              CDROM_LOG(("WW CR2: %04x\n", data))
 		cr2 = data;
+		command |= 2;
 		break;
 	case 0x0020:
 	case 0x0022:
 //              CDROM_LOG(("WW CR3: %04x\n", data))
 		cr3 = data;
+		command |= 4;
 		break;
 	case 0x0024:
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
+
+		command |= 8;
+
+		if(command != 0xf)
+			return;
+
+		command = 0;
+
 		if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
     		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
@@ -2166,8 +2178,14 @@ static void cd_playdata(void)
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
 					cd_read_filtered_sector(cd_curfad);
 
-				cd_curfad++;
-				fadstoplay--;
+				/* TODO: condition is wrong (should be "if partition isn't null") */
+				if(!buffull)
+				{
+					cd_curfad++;
+					fadstoplay--;
+				}
+				//else
+				//	hirqreg |= SCDQ;
 
 				hirqreg |= CSCT;
 
