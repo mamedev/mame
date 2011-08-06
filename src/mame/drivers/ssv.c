@@ -4359,8 +4359,8 @@ STS0003 TWIN EAGLE
 | SETA ST010                          |
 |-------------------------------------|
 
-SX002-13 is GAL16V8B (undumped)
-SETA ST010 is some type of MCU/Math chip?
+  SX002-13: GAL16V8B (undumped)
+SETA ST010: Custom programmed uPD96050 MCU used for math caculations
 All roms are 16M Mask roms
 
 ***************************************************************************/
