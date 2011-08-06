@@ -1,5 +1,5 @@
 /******************************************************************************************
-System Control Unit - DSP emulator version 0.08
+System Control Unit - DSP emulator version 0.09
 
 Written by Angelo Salese & Mariusz Wojcieszek
 
@@ -343,7 +343,6 @@ UINT32 dsp_prg_ctrl_r(address_space *space)
 void dsp_prg_ctrl_w(address_space *space, UINT32 data)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	data = state->m_scu_regs[0x80/4] & ;
 
 	if(LEF) dsp_reg.pc = (data & 0xff);
 	if(EXF) dsp_execute_program(space);

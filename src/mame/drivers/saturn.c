@@ -593,7 +593,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		/*DSP section*/
 		case 0x80/4:
 			/* TODO: you can't overwrite some flags with this */
-			dsp_prg_ctrl(space, state->m_scu_regs[offset]);
+			dsp_prg_ctrl_w(space, state->m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
 			break;
 		case 0x84/4:
