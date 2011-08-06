@@ -435,7 +435,7 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 **********************************************************************************/
 /*
 DMA TODO:
--fix src / dst add values
+-Remove CD transfer DMA hack (tied with CD block bug(s)?)
 -Add timings(but how fast are each DMA?).
 -Add level priority & DMA status register.
 */
@@ -450,15 +450,13 @@ DMA TODO:
 #define DnMV_1(_ch_) DMA_STATUS|=(0x10 << 4 * _ch_)
 #define DnMV_0(_ch_) DMA_STATUS&=~(0x10 << 4 * _ch_)
 
-static UINT32 scu_add_tmp;
-
 /*For area checking*/
 #define ABUS(_lv_)       ((state->m_scu.src[_lv_] & 0x07ffffff) >= 0x02000000) && ((state->m_scu.src[_lv_] & 0x07ffffff) <= 0x04ffffff)
 #define BBUS(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05ffffff)
 #define VDP1_REGS(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05d00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05dfffff)
 #define VDP2(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05e00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05fdffff)
 #define WORK_RAM_L(_lv_) ((scu_##_lv_ & 0x07ffffff) >= 0x00200000) && ((scu_##_lv_ & 0x07ffffff) <= 0x002fffff)
-#define WORK_RAM_H(_lv_) ((scu_##_lv_ & 0x07ffffff) >= 0x06000000) && ((scu_##_lv_ & 0x07ffffff) <= 0x060fffff)
+#define WORK_RAM_H(_lv_) (state->m_scu.dst[_lv_] & 0x07000000) == 0x06000000
 #define SOUND_RAM(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05afffff)
 
 static void scu_do_transfer(running_machine &machine,UINT8 event)
@@ -699,15 +697,6 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	/* max size */
 	if(state->m_scu.size[dma_ch] == 0) { state->m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x1000; }
 
-	/* Virtual Mahjong does transfers from A-Bus to work ram h with destination add value == 4, assume it's invalid */
-	if(state->m_scu.dst_add[dma_ch] >= 4 && (ABUS(dma_ch)))
-	{
-		printf("A-Bus invalid transfer, sets to default\n");
-		scu_add_tmp = (state->m_scu.dst_add[dma_ch]*0x100) | (state->m_scu.src_add[dma_ch]);
-		state->m_scu.dst_add[dma_ch] = 2;
-		scu_add_tmp |= 0x80000000;
-	}
-
 	tmp_src = tmp_dst = 0;
 
 	tmp_size = state->m_scu.size[dma_ch];
@@ -716,7 +705,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 
 	cd_transfer_flag = state->m_scu.src_add[dma_ch] == 0 && state->m_scu.src[dma_ch] == 0x05818000;
 
-	/* Many games directly accesses CD-ROM register 0x05818000, it must be a dword access with current implementation otherwise it won't work */
+	/* TODO: Many games directly accesses CD-ROM register 0x05818000, it must be a dword access with current implementation otherwise it won't work */
 	if(cd_transfer_flag)
 	{
 		int i;
@@ -745,7 +734,9 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 
 			if(src_shift)
 				state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
-			state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
+
+			/* if target is Work RAM H, the add value is fixed, behaviour confirmed by Final Romance 2, Virtual Mahjong and Burning Rangers */
+			state->m_scu.dst[dma_ch]+=(WORK_RAM_H(dma_ch)) ? 2 : state->m_scu.dst_add[dma_ch];
 		}
 	}
 
@@ -761,13 +752,6 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 			case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
 			case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
 		}
-	}
-
-	if(scu_add_tmp & 0x80000000)
-	{
-		state->m_scu.dst_add[dma_ch] = (scu_add_tmp & 0xff00) >> 8;
-		state->m_scu.src_add[dma_ch] = (scu_add_tmp & 0x00ff) >> 0;
-		scu_add_tmp&=~0x80000000;
 	}
 }
 
@@ -822,7 +806,8 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 
 				if(src_shift)
 					indirect_src+=state->m_scu.src_add[dma_ch];
-				indirect_dst+=state->m_scu.dst_add[dma_ch];
+
+				indirect_dst+= (WORK_RAM_H(dma_ch)) ? 2 : state->m_scu.dst_add[dma_ch];
 			}
 		}
 
@@ -966,6 +951,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("share3") AM_BASE_MEMBER(saturn_state,m_workram_h)
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
+	AM_RANGE(0x45000000, 0x46ffffff) AM_WRITENOP
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM, Dragon Ball Z sprites needs this
 ADDRESS_MAP_END
 
