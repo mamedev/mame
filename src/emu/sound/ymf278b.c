@@ -265,22 +265,24 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	}
 }
 
+INLINE UINT8 ymf278b_read_sample(const UINT8* buffer, UINT32 buffersize, UINT32 offset)
+{
+	if (offset >= buffersize)
+		return 0;
+	return buffer[offset];
+}
+
 static STREAM_UPDATE( ymf278b_pcm_update )
 {
 	YMF278BChip *chip = (YMF278BChip *)param;
 	int i, j;
 	YMF278BSlot *slot = NULL;
 	INT16 sample = 0;
-	const UINT8 *rombase;
-	UINT32 rommask;
 	INT32 *mixp;
 	INT32 vl, vr;
 	INT32 mix[44100*2];
 
 	memset(mix, 0, sizeof(mix[0])*samples*2);
-
-	rombase = chip->rom;
-	rommask = chip->romsize - 1;
 
 	for (i = 0; i < 24; i++)
 	{
@@ -309,20 +311,22 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 				switch (slot->bits)
 				{
-					case 8: 	// 8 bit
-						sample = rombase[(slot->startaddr + (slot->stepptr>>16)) & rommask]<<8;
+					case 8:
+						sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
-					case 12:	// 12 bit
+					case 12:
 						if (slot->stepptr & 1)
-							sample = rombase[(slot->startaddr + (slot->stepptr>>17)*3+2) & rommask]<<8 | (rombase[(slot->startaddr + (slot->stepptr>>17)*3 + 1) & rommask] << 4 & 0xf0);
+							sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
+								(ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
-							sample = rombase[(slot->startaddr + (slot->stepptr>>17)*3  ) & rommask]<<8 | (rombase[(slot->startaddr + (slot->stepptr>>17)*3 + 1) & rommask] & 0xf0);
+							sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3)<<8 |
+								(ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
-					case 16:	// 16 bit
-						sample = rombase[(slot->startaddr + ((slot->stepptr>>16)*2)  ) & rommask]<<8;
-						sample|= rombase[(slot->startaddr + ((slot->stepptr>>16)*2)+1) & rommask];
+					case 16:
+						sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
+							ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + ((slot->stepptr>>16)*2)+1);
 						break;
 				}
 
