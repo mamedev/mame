@@ -466,12 +466,6 @@ static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 	}
 }
 
-static TIMER_CALLBACK( ymf278b_timer_busy_clear )
-{
-	YMF278BChip *chip = (YMF278BChip *)ptr;
-	chip->busy = 0;
-}
-
 static TIMER_CALLBACK( ymf278b_timer_ld_clear )
 {
 	YMF278BChip *chip = (YMF278BChip *)ptr;
@@ -480,10 +474,6 @@ static TIMER_CALLBACK( ymf278b_timer_ld_clear )
 
 static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
-	// status register BUSY bit is on for 88 cycles (56 for fm)
-	chip->busy = 1;
-	chip->timer_busy->adjust(attotime::from_hz(chip->clock / 88));
-
 	chip->stream->update();
 	chip->pcmregs[reg] = data;
 
@@ -671,6 +661,62 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 	}
 }
 
+static TIMER_CALLBACK( ymf278b_timer_busy_clear )
+{
+	YMF278BChip *chip = (YMF278BChip *)ptr;
+	chip->busy = 0;
+}
+
+static void ymf278b_timer_busy_reset(YMF278BChip *chip, int is_pcm)
+{
+	// status register BUSY bit is on for 56(FM) or 88(PCM) cycles
+	chip->busy = 1;
+	chip->timer_busy->adjust(attotime::from_hz(chip->clock / (is_pcm ? 88 : 56)));
+}
+
+WRITE8_DEVICE_HANDLER( ymf278b_w )
+{
+	YMF278BChip *chip = get_safe_token(device);
+
+	switch (offset)
+	{
+		case 0:
+			ymf278b_timer_busy_reset(chip, 0);
+			chip->port_A = data;
+			break;
+
+		case 1:
+			ymf278b_timer_busy_reset(chip, 0);
+			ymf278b_A_w(device->machine(), chip, chip->port_A, data);
+			break;
+
+		case 2:
+			ymf278b_timer_busy_reset(chip, 0);
+			chip->port_B = data;
+			break;
+
+		case 3:
+			ymf278b_timer_busy_reset(chip, 0);
+			ymf278b_B_w(chip, chip->port_B, data);
+			break;
+
+		case 4:
+			ymf278b_timer_busy_reset(chip, 1);
+			chip->port_C = data;
+			break;
+
+		case 5:
+			ymf278b_timer_busy_reset(chip, 1);
+			ymf278b_C_w(chip, chip->port_C, data);
+			break;
+
+		default:
+			logerror("%s: unexpected write at offset %X to ymf278b = %02X\n", device->machine().describe_context(), offset, data);
+			break;
+	}
+}
+
+
 READ8_DEVICE_HANDLER( ymf278b_r )
 {
 	YMF278BChip *chip = get_safe_token(device);
@@ -713,41 +759,6 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 	return 0xff;
 }
 
-WRITE8_DEVICE_HANDLER( ymf278b_w )
-{
-	YMF278BChip *chip = get_safe_token(device);
-
-	switch (offset)
-	{
-		case 0:
-			chip->port_A = data;
-			break;
-
-		case 1:
-			ymf278b_A_w(device->machine(), chip, chip->port_A, data);
-			break;
-
-		case 2:
-			chip->port_B = data;
-			break;
-
-		case 3:
-			ymf278b_B_w(chip, chip->port_B, data);
-			break;
-
-		case 4:
-			chip->port_C = data;
-			break;
-
-		case 5:
-			ymf278b_C_w(chip, chip->port_C, data);
-			break;
-
-		default:
-			logerror("%s: unexpected write at offset %X to ymf278b = %02X\n", device->machine().describe_context(), offset, data);
-			break;
-	}
-}
 
 static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_t *, int))
 {
