@@ -741,7 +741,7 @@ static INPUT_PORTS_START( cybertnk )
 	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:6,5")
+	PORT_DIPNAME( 0x000c, 0x0004, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:6,5")
 	PORT_DIPSETTING(      0x000c, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
@@ -767,16 +767,16 @@ static INPUT_PORTS_START( cybertnk )
 |                |  every 1,000K thereafter.  |  every 1,000K thereafter.  |
 +----------------+----------------------------+----------------------------+
 */
-	PORT_DIPNAME( 0x0010, 0x0010, "Coin Value" )			PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(      0x0010, "Different Value" )
-	PORT_DIPSETTING(      0x0000, "Same Value" )
+	PORT_DIPNAME( 0x0010, 0x0000, "Coin B Value" )			PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0010, "Set by Dipswitches" )
+	PORT_DIPSETTING(      0x0000, "Same Value as Coin A" )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:3") /* Manual states "Off Not Use" */
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x0040, IP_ACTIVE_LOW, "SW2:2" )		/* Manual states "Off Not Use" */
-	PORT_DIPNAME( 0x0080, 0x0080, "1 Credit to Start Pair Play" )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x0080, 0x0080, "2 Credits to Start" )		PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )			/* 2 credits to start single player, 3 credits to start Pair Play, 1 credit to continue (or add 2nd player) */
 
 	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:8,7,6,5")
 	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
