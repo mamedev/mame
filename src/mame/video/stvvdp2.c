@@ -3082,7 +3082,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 	gfxdatalow = gfxdata + stv2_current_tilemap.bitmap_map * 0x20000;
 	gfxdata+=(
 	(stv2_current_tilemap.scrollx & (xlinesize-1)) +
-	((stv2_current_tilemap.scrolly & (ysize-1)) * (xlinesize)) + /* TODO: mask ysize, check me! */
+	((stv2_current_tilemap.scrolly) * (xlinesize)) + /* TODO: mask ysize, check me! */
 	(stv2_current_tilemap.bitmap_map * 0x20000)
 	);
 	gfxdatahigh = gfxdatalow + xlinesize*ysize;

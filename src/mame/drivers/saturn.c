@@ -1999,6 +1999,8 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
+	MCFG_TIMER_ADD_PERIODIC("sh1_cmd", stv_sh1_sim, attotime::from_hz(16667))
+
 	MCFG_MACHINE_START(saturn)
 	MCFG_MACHINE_RESET(saturn)
 
@@ -2048,6 +2050,8 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
+
+	MCFG_TIMER_ADD_PERIODIC("sh1_cmd", stv_sh1_sim, attotime::from_hz(16667))
 
 	MCFG_MACHINE_START(stv)
 	MCFG_MACHINE_RESET(stv)

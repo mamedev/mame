@@ -210,3 +210,4 @@ WRITE32_HANDLER ( saturn_vdp2_regs_w );
 VIDEO_START ( stv_vdp2 );
 SCREEN_UPDATE( stv_vdp2 );
 
+TIMER_DEVICE_CALLBACK( stv_sh1_sim );

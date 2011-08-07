@@ -44,7 +44,6 @@ static void cd_playdata(void);
 #define MAX_FILTERS	(24)
 #define MAX_BLOCKS	(200)
 #define MAX_DIR_SIZE	(256*1024)
-#define CD_SPEED 75*1 /* TODO: should be x2 */
 
 typedef struct
 {
@@ -124,7 +123,6 @@ static transT xfertype;
 static trans32T xfertype32;
 static UINT32 xfercount, calcsize;
 static UINT32 xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
-static UINT8 command;
 
 static filterT filters[MAX_FILTERS];
 static filterT *cddevice;
@@ -139,6 +137,8 @@ static int oddframe = 0;
 static UINT32 fadstoplay = 0;
 static int buffull, sectorstore, freeblocks;
 static int cur_track;
+static UINT8 cmd_pending;
+static UINT8 cd_speed;
 
 // iso9660 utilities
 static void read_new_dir(running_machine &machine, UINT32 fileno);
@@ -191,452 +191,30 @@ static void cr_standard_return(UINT16 cur_status)
 	cr4 = cd_curfad;
 }
 
-TIMER_DEVICE_CALLBACK( stv_sector_cb )
-{
-	if (fadstoplay)
-	{
-		cd_playdata();
-	}
-	//else
-	{
-		hirqreg |= SCDQ;
-	}
-
-	cd_stat |= CD_STAT_PERI;
-	cr_standard_return(cd_stat);
-
-	timer.adjust(attotime::from_hz(CD_SPEED));
-}
-
-// global functions
-void stvcd_reset(running_machine &machine)
-{
-	INT32 i, j;
-
-	hirqmask = 0xffff;
-	hirqreg = 0xffff;
-	cr1 = 'C';
-	cr2 = ('D'<<8) | 'B';
-	cr3 = ('L'<<8) | 'O';
-	cr4 = ('C'<<8) | 'K';
-	cd_stat = CD_STAT_PAUSE;
-	cur_track = 0xff;
-
-	if (curdir != (direntryT *)NULL)
-		auto_free(machine, curdir);
-	curdir = (direntryT *)NULL;		// no directory yet
-
-	xfertype = XFERTYPE_INVALID;
-	xfertype32 = XFERTYPE32_INVALID;
-
-	// reset flag vars
-	buffull = sectorstore = 0;
-
-	freeblocks = 200;
-
-	sectlenin = sectlenout = 2048;
-
-	lastbuf = 0xff;
-
-	// reset buffer partitions
-	for (i = 0; i < MAX_FILTERS; i++)
-	{
-		partitions[i].size = -1;
-		partitions[i].numblks = 0;
-
-		for (j = 0; j < MAX_BLOCKS; j++)
-		{
-			partitions[i].blocks[j] = (blockT *)NULL;
-			partitions[i].bnum[j] = 0xff;
-		}
-	}
-
-	// reset blocks
-	for (i = 0; i < MAX_BLOCKS; i++)
-	{
-		blocks[i].size = -1;
-		memset(&blocks[i].data, 0, CD_MAX_SECTOR_DATA);
-	}
-
-	// open device
-	if (cdrom)
-	{
-		cdrom_close(cdrom);
-		cdrom = (cdrom_file *)NULL;
-	}
-
-	#ifdef MESS
-	cdrom = machine.device<cdrom_image_device>("cdrom")->get_cdrom_file();
-	#else
-	cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
-	#endif
-
-	cdda_set_cdrom( machine.device("cdda"), cdrom );
-
-	if (cdrom)
-	{
-		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
-		read_new_dir(machine, 0xffffff);	// read root directory
-	}
-	else
-	{
-		cd_stat = CD_STAT_OPEN;
-	}
-
-	sector_timer = machine.device<timer_device>("sector_timer");
-	//sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
-}
-
-static blockT *cd_alloc_block(UINT8 *blknum)
-{
-	INT32 i;
-
-	// search the 200 available blocks for a free one
-	for (i = 0; i < 200; i++)
-	{
-		if (blocks[i].size == -1)
-		{
-			freeblocks--;
-			if (freeblocks <= 0)
-			{
-				buffull = 1;
-			}
-
-			blocks[i].size = sectlenin;
-			*blknum = i;
-
-			CDROM_LOG(("CD: allocating block %d, size %x\n", i, sectlenin))
-
-			return &blocks[i];
-		}
-	}
-
-	buffull = 1;
-	return (blockT *)NULL;
-}
-
-static void cd_free_block(blockT *blktofree)
-{
-	INT32 i;
-
-	CDROM_LOG(("cd_free_block: %x\n", (UINT32)(FPTR)blktofree))
-
-	if(blktofree == NULL)
-	{
-		return;
-	}
-
-	for (i = 0; i < 200; i++)
-	{
-		if (&blocks[i] == blktofree)
-		{
-			CDROM_LOG(("CD: freeing block %d\n", i))
-		}
-	}
-
-	blktofree->size = -1;
-	freeblocks++;
-	buffull = 0;
-	hirqreg &= ~BFUL;
-}
-
-static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum)
-{
-	if (*sectoffs == 0xffff)
-	{
-		// last sector
-		printf("CD: Don't know how to handle offset ffff\n");
-	}
-	else if (*sectnum == 0xffff)
-	{
-		*sectnum = partitions[bufnum].numblks - *sectoffs;
-	}
-}
-
-static void cd_defragblocks(partitionT *part)
-{
-	UINT32 i, j;
-	blockT *temp;
-	UINT8 temp2;
-
-	for (i = 0; i < (MAX_BLOCKS-1); i++)
-	{
-		for (j = i+1; j < MAX_BLOCKS; j++)
-		{
-			if ((part->blocks[i] == (blockT *)NULL) && (part->blocks[j] != (blockT *)NULL))
-			{
-				temp = part->blocks[i];
-				part->blocks[i] = part->blocks[j];
-				part->blocks[j] = temp;
-
-				temp2 = part->bnum[i];
-				part->bnum[i] = part->bnum[j];
-				part->bnum[j] = temp2;
-			}
-		}
-	}
-}
-
-static UINT16 cd_readWord(UINT32 addr)
-{
-	UINT16 rv;
-
-	switch (addr & 0xffff)
-	{
-		case 0x0008:	// read HIRQ register
-		case 0x000a:
-			rv = hirqreg;
-
-			rv &= ~DCHG;	// always clear bit 6 (tray open)
-
-			if (buffull) rv |= BFUL; else rv &= ~BFUL;
-			if (sectorstore) rv |= CSCT; else rv &= ~CSCT;
-
-			hirqreg = rv;
-
-//          CDROM_LOG(("RW HIRQ: %04x\n", rv))
-
-			return rv;
-
-		case 0x000c:
-		case 0x000e:
-			CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
-			return hirqmask;
-
-		case 0x0018:
-		case 0x001a:
-//          CDROM_LOG(("RW CR1: %04x\n", cr1))
-			return cr1;
-
-		case 0x001c:
-		case 0x001e:
-//          CDROM_LOG(("RW CR2: %04x\n", cr2))
-			return cr2;
-
-		case 0x0020:
-		case 0x0022:
-//          CDROM_LOG(("RW CR3: %04x\n", cr3))
-			return cr3;
-
-		case 0x0024:
-		case 0x0026:
-//          CDROM_LOG(("RW CR4: %04x\n", cr4))
-			//popmessage("%04x %04x %04x %04x",cr1,cr2,cr3,cr4);
-			return cr4;
-
-		case 0x8000:
-			rv = 0xffff;
-			switch (xfertype)
-			{
-				case XFERTYPE_TOC:
-					rv = tocbuf[xfercount]<<8 | tocbuf[xfercount+1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 102*4)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				case XFERTYPE_FILEINFO_1:
-					rv = finfbuf[xfercount]<<8 | finfbuf[xfercount+1];
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 6*2)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				case XFERTYPE_FILEINFO_254: // Lunar 2
-					if((xfercount % (6 * 2)) == 0)
-					{
-						UINT32 temp = 2 + (xfercount / (0x6 * 2));
-
-						// first 4 bytes = FAD
-						finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
-						finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
-						finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
-						finfbuf[3] = (curdir[temp].firstfad&0xff);
-						// second 4 bytes = length of file
-						finfbuf[4] = (curdir[temp].length>>24)&0xff;
-						finfbuf[5] = (curdir[temp].length>>16)&0xff;
-						finfbuf[6] = (curdir[temp].length>>8)&0xff;
-						finfbuf[7] = (curdir[temp].length&0xff);
-						finfbuf[8] = 0x00;
-						finfbuf[9] = 0x00;
-						finfbuf[10] = temp;
-						finfbuf[11] = curdir[temp].flags;
-					}
-
-					rv = finfbuf[xfercount % (6 * 2)]<<8 | finfbuf[(xfercount % (6 * 2)) +1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > (254 * 6 * 2))
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				default:
-					CDROM_LOG(("STVCD: Unhandled xfer type %d\n", (int)xfertype))
-					rv = 0;
-					break;
-			}
-
-			return rv;
-
-		default:
-			CDROM_LOG(("CD: RW %08x\n", addr))
-			return 0xffff;
-	}
-
-}
-
-static UINT32 cd_readLong(UINT32 addr)
-{
-	UINT32 rv = 0;
-
-	switch (addr & 0xffff)
-	{
-		case 0x8000:
-			switch (xfertype32)
-			{
-				case XFERTYPE32_GETSECTOR:
-				case XFERTYPE32_GETDELETESECTOR:
-					// make sure we have sectors left
-					if (xfersect < xfersectnum)
-					{
-						// get next longword
-						rv = transpart->blocks[xfersectpos+xfersect]->data[xferoffs]<<24 |
-						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16 |
-						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8 |
-						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3];
-
-						xferdnum += 4;
-						xferoffs += 4;
-
-						// did we run out of sector?
-						if (xferoffs >= transpart->blocks[xfersect]->size)
-						{
-							CDROM_LOG(("CD: finished xfer of block %d of %d\n", xfersect+1, xfersectnum))
-
-							xferoffs = 0;
-							xfersect++;
-						}
-					}
-					else	// sectors are done, kill 'em all if we can
-					{
-						if (xfertype32 == XFERTYPE32_GETDELETESECTOR)
-						{
-							INT32 i;
-
-							CDROM_LOG(("Killing sectors in done\n"))
-
-							// deallocate the blocks
-							for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
-							{
-								cd_free_block(transpart->blocks[i]);
-								transpart->blocks[i] = (blockT *)NULL;
-								transpart->bnum[i] = 0xff;
-							}
-
-							// defrag what's left
-							cd_defragblocks(transpart);
-
-							// clean up our state
-							transpart->size -= xferdnum;
-							transpart->numblks -= xfersectnum;
-
-							xfertype32 = XFERTYPE32_INVALID;
-						}
-					}
-					break;
-
-				default:
-					CDROM_LOG(("CD: unhandled 32-bit transfer type\n"))
-					break;
-			}
-
-			return rv;
-
-		default:
-			CDROM_LOG(("CD: RL %08x\n", addr))
-			return 0xffff;
-	}
-}
-
-static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
+static void cd_free_block(blockT *blktofree);
+static void cd_defragblocks(partitionT *part);
+static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum);
+
+static void cd_exec_command(running_machine &machine)
 {
 	UINT32 temp;
 
-	switch(addr & 0xffff)
+	if (!cdrom)
 	{
-	case 0x0008:
-	case 0x000a:
-//              CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine.describe_context(), hirqreg, data, hirqreg & data))
-		hirqreg &= data;
+		cd_stat = CD_STAT_OPEN;
+		cr1 = cd_stat | 0xff;
+		cr2 = 0xffff;
+		cr3 = 0xffff;
+		cr4 = 0xffff;
+		hirqreg |= CMOK;
 		return;
-	case 0x000c:
-	case 0x000e:
-    		CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
-		hirqmask = data;
-		return;
-	case 0x0018:
-	case 0x001a:
-//              CDROM_LOG(("WW CR1: %04x\n", data))
-		cr1 = data;
-		cd_stat &= ~CD_STAT_PERI;
-		command |= 1;
-		break;
-	case 0x001c:
-	case 0x001e:
-//              CDROM_LOG(("WW CR2: %04x\n", data))
-		cr2 = data;
-		command |= 2;
-		break;
-	case 0x0020:
-	case 0x0022:
-//              CDROM_LOG(("WW CR3: %04x\n", data))
-		cr3 = data;
-		command |= 4;
-		break;
-	case 0x0024:
-	case 0x0026:
-//              CDROM_LOG(("WW CR4: %04x\n", data))
-		cr4 = data;
+	}
 
-		command |= 8;
+	if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
+   		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
-		if(command != 0xf)
-			return;
-
-		command = 0;
-
-		if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
-    		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
-
-		if (!cdrom)
-		{
-			cd_stat = CD_STAT_OPEN;
-			cr1 = cd_stat | 0xff;
-			cr2 = 0xffff;
-			cr3 = 0xffff;
-			cr4 = 0xffff;
-			hirqreg |= CMOK;
-			return;
-		}
-
-		switch (cr1 & 0xff00)
-		{
+	switch (cr1 & 0xff00)
+	{
 		case 0x0000:
 			//CDROM_LOG(("%s:CD: Get Status\n", machine.describe_context()))
 			hirqreg |= CMOK;
@@ -651,9 +229,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			cr2 = 0x0201;
 			cr3 = 0x0000;
 			cr4 = 0x0400;
-			/* wants a periodic response after this? */
-			sector_timer->reset();
-			sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x0200:	// Get TOC
@@ -715,6 +290,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				buffull = 0;
 				hirqreg &= 0xffe5;
 			}
+			cd_speed = ((cr1 & 0x10) >> 4) + 1;
+
 			hirqreg |= (CMOK|ESEL);
 			cr_standard_return(cd_stat);
 			break;
@@ -726,8 +303,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			// clear the "transfer" flag
 			cd_stat &= ~CD_STAT_TRANS;
-			// hack for the bootloader
-			cd_stat |= CD_STAT_PERI;
 
 			if (xferdnum)
 			{
@@ -788,7 +363,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 
 			// and kick the CD if there's more to read
-			cd_playdata();
+			//cd_playdata();
 
 			xferdnum = 0;
 			hirqreg |= CMOK;
@@ -886,15 +461,14 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			{
 				cdda_pause_audio( machine.device( "cdda" ), 0 );
 				cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
+				cd_speed = 1;
 			}
 			else
+			{
 				cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
+				cd_speed = 2; //TODO: previous setting
+			}
 
-			//else
-			//{
-			sector_timer->reset();
-			sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
-			//}
 			break;
 
 		case 0x1100: // disc seek
@@ -1585,9 +1159,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			hirqreg |= (CMOK);
 
-			// and do the disc I/O
-         	sector_timer->reset();
-         	sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x7500:
@@ -1623,8 +1194,438 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			CDROM_LOG(("CD: Unknown command %04x\n", cr1))
 			hirqreg |= (CMOK);
 			break;
+	}
+}
+
+TIMER_DEVICE_CALLBACK( stv_sh1_sim )
+{
+	if(cmd_pending)
+	{
+		cd_exec_command(timer.machine());
+		return;
+	}
+
+	cd_stat |= CD_STAT_PERI;
+	cr_standard_return(cd_stat);
+	hirqreg |= SCDQ;
+}
+
+TIMER_DEVICE_CALLBACK( stv_sector_cb )
+{
+	//sector_timer->reset();
+
+	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);
+
+	if (fadstoplay)
+		cd_playdata();
+
+	sector_timer->adjust(attotime::from_hz(75*cd_speed));	// 150 sectors / second = 300kBytes/second
+}
+
+// global functions
+void stvcd_reset(running_machine &machine)
+{
+	INT32 i, j;
+
+	hirqmask = 0xffff;
+	hirqreg = 0xffff;
+	cr1 = 'C';
+	cr2 = ('D'<<8) | 'B';
+	cr3 = ('L'<<8) | 'O';
+	cr4 = ('C'<<8) | 'K';
+	cd_stat = CD_STAT_PAUSE;
+	cur_track = 0xff;
+
+	if (curdir != (direntryT *)NULL)
+		auto_free(machine, curdir);
+	curdir = (direntryT *)NULL;		// no directory yet
+
+	xfertype = XFERTYPE_INVALID;
+	xfertype32 = XFERTYPE32_INVALID;
+
+	// reset flag vars
+	buffull = sectorstore = 0;
+
+	freeblocks = 200;
+
+	sectlenin = sectlenout = 2048;
+
+	lastbuf = 0xff;
+
+	// reset buffer partitions
+	for (i = 0; i < MAX_FILTERS; i++)
+	{
+		partitions[i].size = -1;
+		partitions[i].numblks = 0;
+
+		for (j = 0; j < MAX_BLOCKS; j++)
+		{
+			partitions[i].blocks[j] = (blockT *)NULL;
+			partitions[i].bnum[j] = 0xff;
 		}
-//      CDROM_LOG(("ret: %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
+	}
+
+	// reset blocks
+	for (i = 0; i < MAX_BLOCKS; i++)
+	{
+		blocks[i].size = -1;
+		memset(&blocks[i].data, 0, CD_MAX_SECTOR_DATA);
+	}
+
+	// open device
+	if (cdrom)
+	{
+		cdrom_close(cdrom);
+		cdrom = (cdrom_file *)NULL;
+	}
+
+	#ifdef MESS
+	cdrom = machine.device<cdrom_image_device>("cdrom")->get_cdrom_file();
+	#else
+	cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
+	#endif
+
+	cdda_set_cdrom( machine.device("cdda"), cdrom );
+
+	if (cdrom)
+	{
+		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
+		read_new_dir(machine, 0xffffff);	// read root directory
+	}
+	else
+	{
+		cd_stat = CD_STAT_OPEN;
+	}
+
+	cd_speed = 2;
+
+	sector_timer = machine.device<timer_device>("sector_timer");
+	sector_timer->adjust(attotime::from_hz(150));	// 150 sectors / second = 300kBytes/second
+}
+
+static blockT *cd_alloc_block(UINT8 *blknum)
+{
+	INT32 i;
+
+	// search the 200 available blocks for a free one
+	for (i = 0; i < 200; i++)
+	{
+		if (blocks[i].size == -1)
+		{
+			freeblocks--;
+			if (freeblocks <= 0)
+			{
+				buffull = 1;
+			}
+
+			blocks[i].size = sectlenin;
+			*blknum = i;
+
+			CDROM_LOG(("CD: allocating block %d, size %x\n", i, sectlenin))
+
+			return &blocks[i];
+		}
+	}
+
+	buffull = 1;
+	return (blockT *)NULL;
+}
+
+static void cd_free_block(blockT *blktofree)
+{
+	INT32 i;
+
+	CDROM_LOG(("cd_free_block: %x\n", (UINT32)(FPTR)blktofree))
+
+	if(blktofree == NULL)
+	{
+		return;
+	}
+
+	for (i = 0; i < 200; i++)
+	{
+		if (&blocks[i] == blktofree)
+		{
+			CDROM_LOG(("CD: freeing block %d\n", i))
+		}
+	}
+
+	blktofree->size = -1;
+	freeblocks++;
+	buffull = 0;
+	hirqreg &= ~BFUL;
+}
+
+static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum)
+{
+	if (*sectoffs == 0xffff)
+	{
+		// last sector
+		printf("CD: Don't know how to handle offset ffff\n");
+	}
+	else if (*sectnum == 0xffff)
+	{
+		*sectnum = partitions[bufnum].numblks - *sectoffs;
+	}
+}
+
+static void cd_defragblocks(partitionT *part)
+{
+	UINT32 i, j;
+	blockT *temp;
+	UINT8 temp2;
+
+	for (i = 0; i < (MAX_BLOCKS-1); i++)
+	{
+		for (j = i+1; j < MAX_BLOCKS; j++)
+		{
+			if ((part->blocks[i] == (blockT *)NULL) && (part->blocks[j] != (blockT *)NULL))
+			{
+				temp = part->blocks[i];
+				part->blocks[i] = part->blocks[j];
+				part->blocks[j] = temp;
+
+				temp2 = part->bnum[i];
+				part->bnum[i] = part->bnum[j];
+				part->bnum[j] = temp2;
+			}
+		}
+	}
+}
+
+static UINT16 cd_readWord(UINT32 addr)
+{
+	UINT16 rv;
+
+	switch (addr & 0xffff)
+	{
+		case 0x0008:	// read HIRQ register
+		case 0x000a:
+			rv = hirqreg;
+
+			rv &= ~DCHG;	// always clear bit 6 (tray open)
+
+			if (buffull) rv |= BFUL; else rv &= ~BFUL;
+			if (sectorstore) rv |= CSCT; else rv &= ~CSCT;
+
+			hirqreg = rv;
+
+//          CDROM_LOG(("RW HIRQ: %04x\n", rv))
+
+			return rv;
+
+		case 0x000c:
+		case 0x000e:
+			CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
+			return hirqmask;
+
+		case 0x0018:
+		case 0x001a:
+//          CDROM_LOG(("RW CR1: %04x\n", cr1))
+			return cr1;
+
+		case 0x001c:
+		case 0x001e:
+//          CDROM_LOG(("RW CR2: %04x\n", cr2))
+			return cr2;
+
+		case 0x0020:
+		case 0x0022:
+//          CDROM_LOG(("RW CR3: %04x\n", cr3))
+			return cr3;
+
+		case 0x0024:
+		case 0x0026:
+//          CDROM_LOG(("RW CR4: %04x\n", cr4))
+			//popmessage("%04x %04x %04x %04x",cr1,cr2,cr3,cr4);
+			cmd_pending = 0;
+			return cr4;
+
+		case 0x8000:
+			rv = 0xffff;
+			switch (xfertype)
+			{
+				case XFERTYPE_TOC:
+					rv = tocbuf[xfercount]<<8 | tocbuf[xfercount+1];
+
+					xfercount += 2;
+					xferdnum += 2;
+
+					if (xfercount > 102*4)
+					{
+						xfercount = 0;
+						xfertype = XFERTYPE_INVALID;
+					}
+					break;
+
+				case XFERTYPE_FILEINFO_1:
+					rv = finfbuf[xfercount]<<8 | finfbuf[xfercount+1];
+					xfercount += 2;
+					xferdnum += 2;
+
+					if (xfercount > 6*2)
+					{
+						xfercount = 0;
+						xfertype = XFERTYPE_INVALID;
+					}
+					break;
+
+				case XFERTYPE_FILEINFO_254: // Lunar 2
+					if((xfercount % (6 * 2)) == 0)
+					{
+						UINT32 temp = 2 + (xfercount / (0x6 * 2));
+
+						// first 4 bytes = FAD
+						finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
+						finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
+						finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
+						finfbuf[3] = (curdir[temp].firstfad&0xff);
+						// second 4 bytes = length of file
+						finfbuf[4] = (curdir[temp].length>>24)&0xff;
+						finfbuf[5] = (curdir[temp].length>>16)&0xff;
+						finfbuf[6] = (curdir[temp].length>>8)&0xff;
+						finfbuf[7] = (curdir[temp].length&0xff);
+						finfbuf[8] = 0x00;
+						finfbuf[9] = 0x00;
+						finfbuf[10] = temp;
+						finfbuf[11] = curdir[temp].flags;
+					}
+
+					rv = finfbuf[xfercount % (6 * 2)]<<8 | finfbuf[(xfercount % (6 * 2)) +1];
+
+					xfercount += 2;
+					xferdnum += 2;
+
+					if (xfercount > (254 * 6 * 2))
+					{
+						xfercount = 0;
+						xfertype = XFERTYPE_INVALID;
+					}
+					break;
+
+				default:
+					CDROM_LOG(("STVCD: Unhandled xfer type %d\n", (int)xfertype))
+					rv = 0;
+					break;
+			}
+
+			return rv;
+
+		default:
+			CDROM_LOG(("CD: RW %08x\n", addr))
+			return 0xffff;
+	}
+
+}
+
+static UINT32 cd_readLong(UINT32 addr)
+{
+	UINT32 rv = 0;
+
+	switch (addr & 0xffff)
+	{
+		case 0x8000:
+			switch (xfertype32)
+			{
+				case XFERTYPE32_GETSECTOR:
+				case XFERTYPE32_GETDELETESECTOR:
+					// make sure we have sectors left
+					if (xfersect < xfersectnum)
+					{
+						// get next longword
+						rv = transpart->blocks[xfersectpos+xfersect]->data[xferoffs]<<24 |
+						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16 |
+						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8 |
+						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3];
+
+						xferdnum += 4;
+						xferoffs += 4;
+
+						// did we run out of sector?
+						if (xferoffs >= transpart->blocks[xfersect]->size)
+						{
+							CDROM_LOG(("CD: finished xfer of block %d of %d\n", xfersect+1, xfersectnum))
+
+							xferoffs = 0;
+							xfersect++;
+						}
+					}
+					else	// sectors are done, kill 'em all if we can
+					{
+						if (xfertype32 == XFERTYPE32_GETDELETESECTOR)
+						{
+							INT32 i;
+
+							CDROM_LOG(("Killing sectors in done\n"))
+
+							// deallocate the blocks
+							for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+							{
+								cd_free_block(transpart->blocks[i]);
+								transpart->blocks[i] = (blockT *)NULL;
+								transpart->bnum[i] = 0xff;
+							}
+
+							// defrag what's left
+							cd_defragblocks(transpart);
+
+							// clean up our state
+							transpart->size -= xferdnum;
+							transpart->numblks -= xfersectnum;
+
+							xfertype32 = XFERTYPE32_INVALID;
+						}
+					}
+					break;
+
+				default:
+					CDROM_LOG(("CD: unhandled 32-bit transfer type\n"))
+					break;
+			}
+
+			return rv;
+
+		default:
+			CDROM_LOG(("CD: RL %08x\n", addr))
+			return 0xffff;
+	}
+}
+
+static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
+{
+	switch(addr & 0xffff)
+	{
+	case 0x0008:
+	case 0x000a:
+//              CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine.describe_context(), hirqreg, data, hirqreg & data))
+		hirqreg &= data;
+		return;
+	case 0x000c:
+	case 0x000e:
+    		CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
+		hirqmask = data;
+		return;
+	case 0x0018:
+	case 0x001a:
+//              CDROM_LOG(("WW CR1: %04x\n", data))
+		cr1 = data;
+		cd_stat &= ~CD_STAT_PERI;
+		cmd_pending = 1;
+		break;
+	case 0x001c:
+	case 0x001e:
+//              CDROM_LOG(("WW CR2: %04x\n", data))
+		cr2 = data;
+		break;
+	case 0x0020:
+	case 0x0022:
+//              CDROM_LOG(("WW CR3: %04x\n", data))
+		cr3 = data;
+		break;
+	case 0x0024:
+	case 0x0026:
+//              CDROM_LOG(("WW CR4: %04x\n", data))
+		cr4 = data;
 		break;
 	default:
 		CDROM_LOG(("CD: WW %08x %04x\n", addr, data))
@@ -2116,12 +2117,13 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 }
 
 // read a single sector off the CD, applying the current filter(s) as necessary
-static partitionT *cd_read_filtered_sector(INT32 fad)
+static partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok)
 {
 	int trktype;
 
 	if ((cddevice != NULL) && (!buffull))
 	{
+		*p_ok = 1;
 		// find out the track's type
 		trktype = cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad-150));
 
@@ -2138,8 +2140,7 @@ static partitionT *cd_read_filtered_sector(INT32 fad)
 		{
 			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_AUDIO);
 		}
-		cr3 = 0x100 | (fad>>16);	// update cr3/4 with the current fad
-		cr4 = fad;
+
 		curblock.size = sectlenin;
 		curblock.FAD = fad;
 
@@ -2161,6 +2162,7 @@ static partitionT *cd_read_filtered_sector(INT32 fad)
 		return cd_filterdata(cddevice, trktype);
 	}
 
+	*p_ok = 0;
 	return (partitionT *)NULL;
 }
 
@@ -2175,33 +2177,35 @@ static void cd_playdata(void)
 
 			if (cdrom)
 			{
-				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
-					cd_read_filtered_sector(cd_curfad);
+				UINT8 p_ok;
 
-				/* TODO: condition is wrong (should be "if partition isn't null") */
-				if(!buffull)
+				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+					cd_read_filtered_sector(cd_curfad,&p_ok);
+				else
+					p_ok = 1; // TODO
+
+				if(p_ok)
 				{
 					cd_curfad++;
 					fadstoplay--;
-				}
-				//else
-				//	hirqreg |= SCDQ;
+					hirqreg |= CSCT;
+					sectorstore = 1;
 
-				hirqreg |= CSCT;
-
-				if (!fadstoplay)
-				{
-					CDROM_LOG(("cd_playdata: playback ended\n"))
-					cd_stat = CD_STAT_PAUSE;
-
-					hirqreg |= PEND;
-
-					if (playtype == 1)
+					if (!fadstoplay)
 					{
-						CDROM_LOG(("cd_playdata: setting EFLS\n"))
-						hirqreg |= EFLS;
+						CDROM_LOG(("cd_playdata: playback ended\n"))
+						cd_stat = CD_STAT_PAUSE;
+
+						hirqreg |= PEND;
+
+						if (playtype == 1)
+						{
+							CDROM_LOG(("cd_playdata: setting EFLS\n"))
+							hirqreg |= EFLS;
+						}
 					}
 				}
+
 			}
 		}
 	}
