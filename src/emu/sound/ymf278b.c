@@ -474,6 +474,10 @@ static TIMER_CALLBACK( ymf278b_timer_ld_clear )
 
 static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
+	// officially, these registers can't be accessed if NEW2 is 0
+	if (~chip->exp & 2)
+		logerror("YMF278B:  Port C illegal write %02x, %02x\n", reg, data);
+
 	chip->stream->update();
 	chip->pcmregs[reg] = data;
 
