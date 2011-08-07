@@ -628,28 +628,24 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 
 			case 0x02:
 				chip->wavetblhdr = (data>>2)&0x7;
-				chip->memmode = data&1;
+				chip->memmode = data&3;
 				break;
 
 			case 0x03:
-				chip->memadr &= 0xffff;
-				chip->memadr |= (data<<16);
+				chip->memadr = (chip->memadr & 0x00ffff) | ((data &0x3f) << 16);
 				break;
 
 			case 0x04:
-				chip->memadr &= 0xff00ff;
-				chip->memadr |= (data<<8);
+				chip->memadr = (chip->memadr & 0x3f00ff) | (data << 8);
 				break;
 
 			case 0x05:
-				chip->memadr &= 0xffff00;
-				chip->memadr |= data;
+				chip->memadr = (chip->memadr & 0x3fff00) | data;
 				break;
 
 			case 0x06:
 				// memory data (ignored, we don't support RAM)
-				chip->memadr++;
-				chip->memadr &= 0xffffff;
+				chip->memadr = (chip->memadr + 1) & 0x3fffff;
 				break;
 
 			case 0xf8:
@@ -747,8 +743,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 					return (chip->pcmregs[chip->port_C] & 0x1f) | 0x20; // device ID in upper bits
 				case 6:
 					logerror("YMF278B:  Read memory data at %06x\n", chip->memadr); // memory data (ignored, we don't support RAM)
-					chip->memadr++;
-					chip->memadr &= 0xffffff;
+					chip->memadr = (chip->memadr + 1) & 0x3fffff;
 					break;
 
 				default:
