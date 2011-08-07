@@ -735,7 +735,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			if (chip->exp & 2)
 				newbits = (chip->ld << 1) | chip->busy;
 
-			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+			return newbits | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 		}
 
 		// PCM/mixer
