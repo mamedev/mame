@@ -631,16 +631,9 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 				chip->memmode = data&3;
 				break;
 
-			case 0x03:
-				chip->memadr = (chip->memadr & 0x00ffff) | ((data &0x3f) << 16);
-				break;
-
-			case 0x04:
-				chip->memadr = (chip->memadr & 0x3f00ff) | (data << 8);
-				break;
-
 			case 0x05:
-				chip->memadr = (chip->memadr & 0x3fff00) | data;
+				// set memory address
+				chip->memadr = (chip->pcmregs[3] & 0x3f) << 16 | chip->pcmregs[4] << 8 | data;
 				break;
 
 			case 0x06:
