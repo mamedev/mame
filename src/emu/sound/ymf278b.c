@@ -109,7 +109,9 @@ typedef struct
 	INT32 memadr;
 
 	UINT8 busy;
+	UINT8 ld;
 	emu_timer *timer_busy;
+	emu_timer *timer_ld;
 	UINT8 exp;
 
 	INT32 fm_l, fm_r;
@@ -470,9 +472,15 @@ static TIMER_CALLBACK( ymf278b_timer_busy_clear )
 	chip->busy = 0;
 }
 
+static TIMER_CALLBACK( ymf278b_timer_ld_clear )
+{
+	YMF278BChip *chip = (YMF278BChip *)ptr;
+	chip->ld = 0;
+}
+
 static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
-	// statusreg busy bit is on for 88 cycles (56 for fm)
+	// status register BUSY bit is on for 88 cycles (56 for fm)
 	chip->busy = 1;
 	chip->timer_busy->adjust(attotime::from_hz(chip->clock / 88));
 
@@ -494,6 +502,11 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 
 				slot->wave &= 0x100;
 				slot->wave |= data;
+
+				// load wavetable header
+				// status register LD bit is on for approx 300us
+				chip->ld = 1;
+				chip->timer_ld->adjust(attotime::from_usec(300));
 
 				if(slot->wave < 384 || !chip->wavetblhdr)
 					p = chip->rom + (slot->wave * 12);
@@ -670,7 +683,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			// bits 0 and 1 are only valid if NEW2 is set
 			UINT8 newbits = 0;
 			if (chip->exp & 2)
-				newbits = chip->busy;
+				newbits = (chip->ld << 1) | chip->busy;
 
 			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 		}
@@ -743,12 +756,14 @@ static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_
 	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
 	chip->timer_busy = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_busy_clear), chip);
+	chip->timer_ld = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_ld_clear), chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = device->clock();
 
 	chip->timer_a->reset();
 	chip->timer_b->reset();
 	chip->timer_busy->reset();
+	chip->timer_ld->reset();
 }
 
 static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
@@ -762,6 +777,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 	device->save_item(NAME(chip->memmode));
 	device->save_item(NAME(chip->memadr));
 	device->save_item(NAME(chip->busy));
+	device->save_item(NAME(chip->ld));
 	device->save_item(NAME(chip->exp));
 	device->save_item(NAME(chip->fm_l));
 	device->save_item(NAME(chip->fm_r));
