@@ -11193,9 +11193,10 @@ m_supcrd		// (c) 198? BFM
 
 // Scorpion 1 games
 
-m_lotsse		// (c) 198? BFM Dutch ROMS, prelim
-m_roulet		// (c) 198? BFM Dutch ROMS, prelim
-m_clattr		// (c) 1990 BFM,     Game Card 39-370-196
+sc1lotus		// (c) 198? BFM Dutch ROMS, prelim
+sc1roul		// (c) 198? BFM Dutch ROMS, prelim
+sc1clatt		// (c) 1990 BFM,     Game Card 39-370-196
+sc1clatta
 sc1actv8
 sc1armad
 sc1bartk
@@ -11208,6 +11209,77 @@ sc1cshcd
 sc1cshcda
 sc1cshcdb
 sc1ccoin
+sc1cexpd	// Cash Explosion (Bellfruit) [Dutch]
+sc1cexpl	// Cash Explosion (Bellfruit)
+sc1cshwz	// Cash Wise (Bellfruit)
+sc1cshin	// Cashino (Bellfruit) [Dutch]
+sc1china	// China Town Club (Bellfruit)
+sc1class	// Classic (Bellfruit)
+sc1cwcl		// Clockwise Club (Bellfruit)
+sc1clown	// Clown Around (Bellfruit)
+sc1cl2k		// Club 2000 (Bellfruit)
+sc1cl2k1	// Club 2001 (Bellfruit)
+sc1cl65		// Club 65 Special (Bellfruit)
+sc1clbdm	// Club Diamond (Bellfruit)
+sc1clbxp	// Club Explosion (Bellfruit)
+sc1clbrn	// Club Runner (Bellfruit)
+sc1clbsp	// Club Spinner (Bellfruit)
+sc1clbtm	// Club Temptation (Bellfruit)
+sc1clbw		// Club Wise (Bellfruit)
+sc1copdd	// Cops 'n' Robbers Deluxe (Bellfruit) [Dutch]
+sc1copdx	// Cops 'n' Robbers Deluxe (Bellfruit)
+sc1count	// Count Cash Club (Bellfruit)
+sc1dago		// Dagobert's Vault (Bellfruit)
+sc1disc		// Discovey (Bellfruit)
+sc1dblch	// Double Chance (Bellfruit)
+sc1dream	// Dream Machine (Bellfruit)
+sc1final	// Final Touch (Bellfruit)
+sc1flash	// Flash (Bellfruit)
+sc1fruit	// Fruit Lines (Bellfruit)
+sc1frtln	// Fruitlines (Bellfruit)
+sc1funh		// Fun House Club (Bellfruit)
+sc1gtime	// Good Times (Bellfruit)
+sc1gprix	// Grand Prix (Bellfruit)
+sc1gslam	// Grand Slam (Bellfruit) [Dutch]
+sc1happy	// Happy Hour (Bellfruit - Elam)
+sc1impc		// Impact (Bellfruit)
+sc1kings	// Kings Club (Bellfruit)
+sc1linx		// Linx (Bellfruit)
+sc1magc		// Magic Circle (Bellfruit)
+sc1manha	// Manhattan (Bellfruit)
+sc1mast		// Master Club (Bellfruit)
+sc1quat		// Quatro (Bellfruit)
+sc1mist		// Mistral (Bellfruit)
+sc1olym		// Olympia (Bellfruit)
+sc1orac		// Oracle (Bellfruit)
+sc1pwrl		// Power Lines (Bellfruit)
+sc1rain		// Rainbow (Bellfruit)
+sc1re		// Reel Cash (Bellfruit)
+sc1rese		// Reel Cash SE (Bellfruit)
+sc1revo		// Revolution (Bellfruit) [Dutch]
+sc1rose		// Rose 'n' Crown (Bellfruit)
+sc1sant		// Santana (Bellfruit)
+sc1sat		// Satellite (Bellfruit)
+sc1shan		// Shanghai (Bellfruit)
+sc1spct		// Spectre (Bellfruit)
+sc1spit		// Spitfire (Elam)
+sc1ster		// Sterling (Bellfruit)
+sc1str4		// Strike 4 (Bellfruit)
+sc1str4a	// 
+sc1sir		// Strike It Rich (Bellfruit)
+sc1sups		// Superstar (Bellfruit) [Dutch]
+sc1torn		// Tornado (Bellfruit)
+sc1tri		// Tri Star (Bellfruit)
+sc1typ		// Typhoon Club (Bellfruit)
+sc1ult		// Ultimate (Bellfruit)
+sc1vent		// Ventura (Bellfruit)
+sc1vict		// Victory (Bellfruit)
+sc1voy		// Voyager (Bellfruit)
+sc1voya		//
+sc1winfl	// Winfalls (Bellfruit)
+sc1winst	// Winning Streak (Bellfruit)
+sc1zep		// Zeppelin (Bellfruit)
+
 
 // Scorpion 1 + Adder Video board
 
@@ -11513,6 +11585,7 @@ ep_icebg	// Ice Burger (Maygay)
 ep_inca		// Inca Dinka Do (Maygay - Extreme)
 ep_itjb2	// Italian Job 2 (Maygay)
 ep_ijcl		// Italian Job Club (Maygay)
+ep_ijob		// Italian Job (Maygay)
 ep_jakbn	// Jackpot & The Beanstreak (Extreme)
 ep_jsttt	// Just The Ticket (Maygay)
 ep_loadd	// Loaded (Maygay)
@@ -11626,6 +11699,7 @@ ep_wud		// What's Up Doc (Global)
 ep_milhr	// Who Wants To Be A Millionhare (Global)
 ep_mlhrc	// Who Whats To Be A Millionhare Club (Global)
 ep_wf		// Wildfire (Global)
+
 
 // MPU3
 
