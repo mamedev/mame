@@ -1560,7 +1560,7 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 						bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
 
 						// output information about the match
-						if (!found)
+						if (found)
 							mame_printf_info("                    ");
 						mame_printf_info("= %s%-20s  %-10s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), m_drivlist.driver().name, m_drivlist.driver().description);
 						found++;
@@ -1588,7 +1588,7 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 										bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
 
 										// output information about the match
-										if (!found)
+										if (found)
 											mame_printf_info("                    ");
 										mame_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlist->list_name[listnum], swinfo->shortname, swinfo->longname);
 										found++;
