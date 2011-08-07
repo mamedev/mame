@@ -735,57 +735,85 @@ static INPUT_PORTS_START( cybertnk )
 
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:6,5")
+	PORT_DIPSETTING(      0x000c, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+/*
++----------------+----------------------------+----------------------------+
+|Difficulty Level|        Single Play         |          Pair Play         |
++----------------+----------------------------+----------------------------+
+|                |  One Tank is increased at  |  One tank is increased at  |
+|  Very Easy     |  every 500K.               |  500K and 1,500K, and      |
+|                |                            |  every 1,000K thereafter.  |
++----------------+----------------------------+----------------------------+
+|                |  One Tank is increased at  |  One tank is increased at  |
+|    Easy        |  500K and 1,500K, and      |  500K and 2,000K, and      |
+|                |  every 1,000K thereafter.  |  every 1,000K thereafter.  |
++----------------+----------------------------+----------------------------+
+|                |  One Tank is increased at  |  One tank is increased at  |
+|    Hard        |  500K and 2,000K, and      |  500K and 2,500K, and      |
+|                |  every 1,000K thereafter.  |  every 1,000K thereafter.  |
++----------------+----------------------------+----------------------------+
+|                |  One Tank is increased at  |  One tank is increased at  |
+|  Very Hard     |  500K and 2,500K, and      |  500K and 3,000K, and      |
+|                |  every 1,000K thereafter.  |  every 1,000K thereafter.  |
++----------------+----------------------------+----------------------------+
+*/
+	PORT_DIPNAME( 0x0010, 0x0010, "Coin Value" )			PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0010, "Different Value" )
+	PORT_DIPSETTING(      0x0000, "Same Value" )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:3") /* Manual states "Off Not Use" */
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Test ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_SERVICE_DIPLOC(  0x0040, IP_ACTIVE_LOW, "SW2:2" )		/* Manual states "Off Not Use" */
+	PORT_DIPNAME( 0x0080, 0x0080, "1 Credit to Start Pair Play" )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(      0x0d00, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0b00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(      0x7000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(      0xd000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0xb000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x9000, DEF_STR( 1C_7C ) )
 
-	PORT_START("DSW2")
+	PORT_START("DSW2")	/* Manual states "Not Use" */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
