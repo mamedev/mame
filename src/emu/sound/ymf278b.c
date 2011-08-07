@@ -84,7 +84,7 @@ typedef struct
 	INT8 RR;
 
 	UINT32 step;	/* fixed-point frequency step */
-	UINT32 stepptr;	/* fixed-point pointer into the sample */
+	UINT64 stepptr;	/* fixed-point pointer into the sample */
 
 	INT8 active;	/* slot keyed on */
 	INT8 bits;		/* width of the samples */
@@ -126,6 +126,7 @@ typedef struct
 	device_t *device;
 
 	const UINT8 *rom;
+	UINT32 romsize;
 	int clock;
 
 	INT32 volume[256*4];			// precalculated attenuation values with some marging for enveloppe and pan levels
@@ -271,6 +272,7 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 	YMF278BSlot *slot = NULL;
 	INT16 sample = 0;
 	const UINT8 *rombase;
+	UINT32 rommask;
 	INT32 *mixp;
 	INT32 vl, vr;
 	INT32 mix[44100*2];
@@ -278,6 +280,7 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 	memset(mix, 0, sizeof(mix[0])*samples*2);
 
 	rombase = chip->rom;
+	rommask = chip->romsize - 1;
 
 	for (i = 0; i < 24; i++)
 	{
@@ -307,19 +310,19 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 				switch (slot->bits)
 				{
 					case 8: 	// 8 bit
-						sample = rombase[slot->startaddr + (slot->stepptr>>16)]<<8;
+						sample = rombase[(slot->startaddr + (slot->stepptr>>16)) & rommask]<<8;
 						break;
 
 					case 12:	// 12 bit
 						if (slot->stepptr & 1)
-							sample = rombase[slot->startaddr + (slot->stepptr>>17)*3 + 2]<<8 | ((rombase[slot->startaddr + (slot->stepptr>>17)*3 + 1] << 4) & 0xf0);
+							sample = rombase[(slot->startaddr + (slot->stepptr>>17)*3+2) & rommask]<<8 | (rombase[(slot->startaddr + (slot->stepptr>>17)*3 + 1) & rommask] << 4 & 0xf0);
 						else
-							sample = rombase[slot->startaddr + (slot->stepptr>>17)*3]<<8 | (rombase[slot->startaddr + (slot->stepptr>>17)*3 + 1] & 0xf0);
+							sample = rombase[(slot->startaddr + (slot->stepptr>>17)*3  ) & rommask]<<8 | (rombase[(slot->startaddr + (slot->stepptr>>17)*3 + 1) & rommask] & 0xf0);
 						break;
 
 					case 16:	// 16 bit
-						sample = rombase[slot->startaddr + ((slot->stepptr>>16)*2)]<<8;
-						sample |= rombase[slot->startaddr + ((slot->stepptr>>16)*2) + 1];
+						sample = rombase[(slot->startaddr + ((slot->stepptr>>16)*2)  ) & rommask]<<8;
+						sample|= rombase[(slot->startaddr + ((slot->stepptr>>16)*2)+1) & rommask];
 						break;
 				}
 
@@ -492,6 +495,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 		{
 			case 0:
 			{
+				attotime period;
 				const UINT8 *p;
 
 				slot->wave &= 0x100;
@@ -500,7 +504,10 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 				// load wavetable header
 				// status register LD bit is on for approx 300us
 				chip->ld = 1;
-				chip->timer_ld->adjust(attotime::from_usec(300));
+				period = attotime::from_usec(300);
+				if (chip->clock != YMF278B_STD_CLOCK)
+					period = (period * chip->clock) / YMF278B_STD_CLOCK;
+				chip->timer_ld->adjust(period);
 
 				if(slot->wave < 384 || !chip->wavetblhdr)
 					p = chip->rom + (slot->wave * 12);
@@ -755,6 +762,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_t *, int))
 {
 	chip->rom = *device->region();
+	chip->romsize = device->region()->bytes();
 	chip->irq_callback = cb;
 	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
