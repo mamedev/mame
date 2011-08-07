@@ -39,6 +39,7 @@
 ******************************************************************************/
 
 
+
 // "Pacman hardware" games
 puckman			// (c) 1980 Namco
 puckmana		// (c) 1980 Namco
@@ -10089,10 +10090,8 @@ videomat		// 1990 bootleg
 rabbitpk		// 1990 bootleg
 sigmapkr		// (c) 1995 Sigma
 sigma2k			// (c) 2000 Sigma
-sidewndr		// (c) 1981? ACE
-spellbnd		// (c) 1981? ACE
-starspnr		// (c) 1982? ACE
-acefruit		// (c) 1982? ACE
+
+
 attckufo		// (c) 1980 Ryoto Electric Co.
 fortecar
 jackpool		// (c) 1997 Electronic Projects
@@ -11189,7 +11188,33 @@ orbatak
 
 // System85 games
 
-m_supcrd		// (c) 198? BFM
+b85scard		// (c) 198? BFM
+b85cexpl
+b85royal
+b85bdclb
+b85bdclba
+b85bdclbb
+b85cblit
+b85cblita
+b85cblitb
+b85clbpm
+b85dbldl
+b85dbldla
+b85hilo
+b85hiloa
+b85ritz
+b85ritza
+b85ritzb
+b85ritzc
+b85ritzd
+b85jpclb
+b85jpclba
+b85jpclbb
+b85jpclbc
+b85jkwld
+b85lucky
+b85luckd
+b85sngam
 
 // Scorpion 1 games
 
@@ -11490,6 +11515,8 @@ m1wotw		// War Of The Worlds (Maygay)
 m1wldzne	// Wild Zone (Maygay)
 m1winenc	// Winners Enclosure (Maygay)
 
+m1bghou		// Big Ghoulies (Gemini)
+m1crzco		// Crazy Cobra (Gemini)
 
 // Maygay MV1 hardware
 
@@ -12853,6 +12880,101 @@ m5ppussy	// Pink Pussy (Mdm)
 
 // Castle
 castrev		// Revolution (Castle, Fruit Machine)
+
+// ACE
+
+sidewndr		// (c) 1981? ACE
+spellbnd		// (c) 1981? ACE
+starspnr		// (c) 1982? ACE
+acefruit		// (c) 1982? ACE
+
+// Ace System 1
+
+ac1cshtw		// Cash Towers (Ace)
+ac1clbmn		// Club Money (Ace)
+ac1gogld		// Go For Gold (Ace)
+ac1hotpf		// Hot Profit (Ace)
+ac1pster		// Pound Sterling (Ace)
+ac1pstrt		// Pound Stretcher (Pcp)
+ac1primt		// Primetime (Ace)
+ac1taklv		// Take It Or Leave It (Ace)
+
+// Ace 'sp.ACE system'
+
+sp_cbowl		// Cash Bowl (Ace)
+sp_crime		// Crime Watch (Ace)
+sp_emmrd		// Emmerdale (Ace)
+sp_goldm		// Golden Mile (Ace)
+sp_gnat			// Grand National (Ace)
+sp_gprix		// Grand Prix (Ace)
+sp_hideh		// Hi De Hi (Ace)
+sp_hifly		// Hi Flyer (Ace) [Mps]
+sp_juras		// Jurassic Trial (Ace)
+sp_openb		// Open The Box (Ace)
+sp_payrs		// Payrise (Ace)
+sp_playa		// Play It Again (Ace)
+sp_spell		// Spellbound (Ace)
+sp_swop			// Swop Shop (Ace)
+sp_timem		// Time Machine (Ace)
+sp_tz			// Twilight Zone (Ace)
+sp_tzfe			// Twilight Zone - Further Encounters (Ace)
+
+
+// Project - PROCONN
+
+pr_lday			// 'L' Of A Day (Project)
+pr_5xcsh		// 5x Cash (Project)
+pr_7hvn			// 777 Heaven (Project)
+pr_alwy9		// Always Nine (Pcp)
+pr_barbl		// Bars & Bells (Project)
+pr_batls		// Battleships (Project)
+pr_btwar		// Beat The Warden (Project)
+pr_bigdp		// Big Dipper (Project)
+pr_bulls		// Bullseye (Project)
+pr_bulbn		// Bully's Big Night (Project)
+pr_buljp		// Bully's Jackpot (Project)
+pr_cashb		// Cash Back (Project)
+pr_cas7			// Casino Jackpot 7s (Project)
+pr_chico		// Chico the Bandit (Project)
+pr_coolm		// Cool Million (Project)
+pr_crz77		// Crazy 777s (Project)
+pr_crzbr		// Crazy Bars (Project)
+pr_coyot		// Crazy Coyote (Pcp)
+pr_crzpy		// Crazy Pays (Project)
+pr_dblup		// Double Up (Project)
+pr_fire			// Fircecracker (Project)
+pr_flshc		// Flash The Cash (Project)
+pr_ftwhl		// Fortune Wheel (Project)
+pr_funrn		// Fun On The Run (Project)
+pr_gogld		// Go For Gold (Project)
+pr_gldnl		// Golden Nile (Project)
+pr_gldng		// Golden Nugget (Project)
+pr_gdft			// Good Fortune (Project)
+pr_happy		// Happy Days (Project)
+pr_heato		// The Heat Is On (Project)
+pr_hiclm		// Hi Climber (Project)
+pr_hit6			// Hit The Six (Project)
+pr_hotcs		// Hot Cash (Project)
+p4_hotsp		// Hot Spots (Project)
+pr_jkpt7		// Jackpot 7's (Project)
+pr_jkrwd		// Jokers Wild (Project)
+pr_jumpj		// Jumping Jacks (Project)
+pr_medl			// Medalist (Project)
+pr_megmn		// Mega Money (Project)
+pr_nudxs		// Nudge XS (Project)
+pr_rags			// Rags To Riches (Project)
+pr_reflx		// Reflex (Project)
+pr_roadr		// Road Riot (Project)
+pr_roll			// The Roll (Project)
+pr_sevab		// Seven's Above (Project)
+pr_sevml		// Sevens & Melons (Project)
+pr_theme		// Theme Park (Project)
+pr_ttrai		// Treasure Trail (Project)
+pr_trpx			// Triple X (Project)
+pr_walls		// Wall Street (Project)
+pr_whlft		// Wheel Of Fortune (Project)
+pr_wldkn		// Wild Kings (Project)
+
 
 // Leisure Ent.
 roul			// (c) 1990

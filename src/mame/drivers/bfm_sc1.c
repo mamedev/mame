@@ -1132,10 +1132,7 @@ MACHINE_CONFIG_END
 static void sc1_common_init(running_machine &machine, int reels, int decrypt, int defaultbank)
 {
 	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
-	UINT8 i; //,*rom;
-
-//	rom = machine.region("maincpu")->base();
-
+	UINT8 i;
 
 	memset(state->m_sc1_Inputs, 0, sizeof(state->m_sc1_Inputs));
 
@@ -1399,8 +1396,6 @@ ROM_START( sc1cexpl )
 	ROM_LOAD( "cashxpl1.bin", 0x8000, 0x008000, CRC(0fe62ead) SHA1(bd56a216292e9bf2b7753616a6cd25b37e22095f) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) // i think some of this is on different hw
-	ROM_LOAD( "2pceic1.bin", 0x0000, 0x008000, CRC(f90bebe0) SHA1(164b4b9c6fcf493933771d6fa29cbb654bfa3812) )
-	ROM_LOAD( "2pceic2.bin", 0x0000, 0x002000, CRC(935e1910) SHA1(8ecdfdccbc77534a68e4c7338882391751243a3a) )
 	ROM_LOAD( "95717083a mk1.bin", 0x0000, 0x008000, CRC(949c2d18) SHA1(26db983c7d8624c3fd0461dba2336d5c59be29f0) )
 	ROM_LOAD( "95717083a mk2 var%.bin", 0x0000, 0x008000, CRC(1fe1b3a1) SHA1(dd10d74c71a455900a2325ac9d7b3c8e45eb9c6c) )
 	ROM_LOAD( "95717083a.bin", 0x0000, 0x008000, CRC(1fe1b3a1) SHA1(dd10d74c71a455900a2325ac9d7b3c8e45eb9c6c) )

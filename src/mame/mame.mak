@@ -1638,6 +1638,8 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/5clown.o \
 	$(DRIVERS)/acefruit.o \
+	$(DRIVERS)/aces1.o \
+	$(DRIVERS)/acesp.o \
 	$(DRIVERS)/adp.o \
 	$(DRIVERS)/amaticmg.o \
 	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
@@ -1768,6 +1770,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
 	$(DRIVERS)/poker72.o \
 	$(DRIVERS)/poo.o \
+	$(DRIVERS)/proconn.o \
 	$(DRIVERS)/psattack.o \
 	$(DRIVERS)/quizo.o \
 	$(DRIVERS)/quizpun2.o \

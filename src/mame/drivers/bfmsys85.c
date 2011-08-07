@@ -5,8 +5,10 @@
     M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
     used under license from http://mamedev.org
 
+  ******************************************************************************************
 
-******************************************************************************************
+
+
 
      04-2011: J Wallace: Fixed lamping code.
   19-08-2005: Re-Animator
@@ -64,7 +66,7 @@ ___________________________________________________________________________
 #include "machine/steppers.h" // stepper motor
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
-
+#include "machine/bfm_comn.h"
 
 class bfmsys85_state : public driver_device
 {
@@ -85,6 +87,7 @@ public:
 	int m_mux_input_strobe;
 	int m_mux_input;
 	UINT8 m_Inputs[64];
+	UINT8 m_codec_data[256];
 	UINT8 m_sys85_data_line_r;
 	UINT8 m_sys85_data_line_t;
 };
@@ -460,9 +463,216 @@ INPUT_PORTS_END
 
 // ROM definition /////////////////////////////////////////////////////////
 
-ROM_START( m_supcrd )
+ROM_START( b85scard )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sc271.bin",  0x8000, 0x8000,  CRC(58e9c9df) SHA1(345c5aa279327d7142edc6823aad0cfd40cbeb73))
 ROM_END
 
-GAME( 1985,m_supcrd, 0, 	bfmsys85, bfmsys85, 		0,	  0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+
+
+
+ROM_START( b85cexpl ) // 350-190 B2LNCE21
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2pceic1.bin", 0x8000, 0x008000, CRC(f90bebe0) SHA1(164b4b9c6fcf493933771d6fa29cbb654bfa3812) )
+	ROM_LOAD( "2pceic2.bin", 0x6000, 0x002000, CRC(935e1910) SHA1(8ecdfdccbc77534a68e4c7338882391751243a3a) )
+ROM_END
+
+ROM_START( b85royal ) // LNRY11350-128 BE
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigdeal1.bin", 0x6000, 0x002000, CRC(bded44d2) SHA1(9983d9645aa2d205e07ff7245afc2d0253e7a861) )
+	ROM_LOAD( "bigdeal2.bin", 0x8000, 0x008000, CRC(d759641a) SHA1(1992ed59eef02bdb68db5fdaa179f37ed885882c) )
+ROM_END
+
+
+
+ROM_START( b85bdclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "39350055 5p 60.bin", 0x8000, 0x008000, CRC(252b6b25) SHA1(1dea905ff366e9519a38251127209964d388b67a) )
+	ROM_LOAD( "95715639 5p 60.bin", 0x6000, 0x002000, CRC(57734397) SHA1(3a51b902f93a2bec510029131887b50d0fe3f405) )
+ROM_END
+
+
+ROM_START( b85bdclba )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15632 5p 75.bin", 0x6000, 0x002000, CRC(6e00c17b) SHA1(43ec1ba1c90d2faf0874f7b43c246db639d85ac8) )
+	ROM_LOAD( "50045 5p 75.bin", 0x8000, 0x008000, CRC(2c6ce8f6) SHA1(21c1f078e6199ccf373b8db90dac87e2b28a5697) )
+ROM_END
+
+ROM_START( b85bdclbb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15634 20p 150.bin", 0x6000, 0x002000, CRC(e84e9716) SHA1(1e1383eb7ad251a720547225ac9e2204ba8d2dab) )
+	ROM_LOAD( "50047 20p 150.bin", 0x8000, 0x008000, CRC(bef6e8c0) SHA1(d7323ad745a5168a53809eb846d9b64a0f2d5702) )
+ROM_END
+
+ROM_START( b85cblit ) // 351-091 BELPCZ22
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cash blitz 39350091 protocol.bin", 0x6000, 0x002000, CRC(d6b99ee5) SHA1(7b70716fb8b592657fc9ce0a22aa12ab75690c79) )
+	ROM_LOAD( "cash blitz 39351091protocol.bin", 0x8000, 0x008000, CRC(41e87617) SHA1(ab3565939c296074ddcb3fb46fb364df8cbc47e0) )
+ROM_END
+
+ROM_START( b85cblita ) // 350-091 BELNCZ22
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cash blitz 39350091 protocol.bin", 0x6000, 0x002000, CRC(d6b99ee5) SHA1(7b70716fb8b592657fc9ce0a22aa12ab75690c79) ) // is this correct here?
+	ROM_LOAD( "39350091.bin", 0x8000, 0x008000, CRC(33eed09e) SHA1(a34861323c7256b7720613989a787049517c716f) )
+ROM_END
+
+ROM_START( b85cblitb ) // 350-102 BELNCZ23
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95715670.bin", 0x6000, 0x002000, CRC(d6b99ee5) SHA1(7b70716fb8b592657fc9ce0a22aa12ab75690c79) )  // is this correct here?
+	ROM_LOAD( "cash blitz 95717034 p1.bin", 0x8000, 0x008000, CRC(3208ba1d) SHA1(2913eeb09b3699871aedbff92c570affcef5bfcc) )
+ROM_END
+
+ROM_START( b85clbpm ) // 350-187 BILNCP11
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "club premier 39350187 a.bin", 0x8000, 0x008000, CRC(eafe52c5) SHA1(7aa9550e3adacd6864adf2928734b687ab5b55c6) )
+	ROM_LOAD( "club premier 95715167 b.bin", 0x6000, 0x002000, CRC(5cb13935) SHA1(cb79df5c7f57facc33682f582a8d34be6445927d) )
+ROM_END
+
+ROM_START( b85dbldl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d dealer 95717891a.bin", 0x8000, 0x008000, CRC(6adb9552) SHA1(bb586f85f89de6018427c4aceae30f6702cd147a) )
+	ROM_LOAD( "d dealer 95715153b.bin", 0x6000, 0x002000, CRC(ace28302) SHA1(887b13a12faf3913dca837c105c21d7fd6e274bd) )
+ROM_END
+
+ROM_START( b85dbldla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d dealer 95717910.bin", 0x8000, 0x008000, CRC(863710ce) SHA1(22463bfd1f2188c6de6ebf1ba89590359a6099f0) )
+	ROM_LOAD( "d dealer 95715161.bin", 0x6000, 0x002000, CRC(90517a9b) SHA1(958ccf624e00ed040f8da2cbaf614cc2ce3c9885) )
+ROM_END
+
+ROM_START( b85hilo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95715636 b.bin", 0x6000, 0x002000, CRC(4a4ee7d8) SHA1(a1e74d063d1a4be28548f70b4786ffb6417382dd) )
+	ROM_LOAD( "95717737 a.bin", 0x8000, 0x008000, CRC(75437be0) SHA1(f77e292b5835ab55a1f712dd516490e16b7d5b79) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "hilosil-bfm-95717737-p1.bin", 0x6000, 0x002000, CRC(3f9570e8) SHA1(cf9dfeb2d75833a1002b75b7348f6998124fbb70) ) // this doesn't seem to work with anything..
+	ROM_LOAD( "95718737 protocol a.bin", 0x8000, 0x008000, CRC(03fb44bc) SHA1(7054b404f1a35e434525ee19eca203c24b7cc60c) ) // alt 95717737
+ROM_END
+
+ROM_START( b85hiloa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95715122 b.bin", 0x6000, 0x002000, CRC(31eb023d) SHA1(1e4c4d3d7f9734a3b7956a8f3ffc2a88fce699b7) )
+	ROM_LOAD( "876 2p.bin", 0x8000, 0x008000, CRC(a68bf5f3) SHA1(33953f76f8199083131271290866ec5bb4dc51ba) )
+ROM_END
+
+ROM_START( b85ritz )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ritz 5p 95715117.bin", 0x6000, 0x002000, CRC(ba8efd16) SHA1(bdd00209e2d86e18930c100d4ae3d9d042a7afa6) )
+	ROM_LOAD( "ritz 5p 95717828.bin", 0x8000, 0x008000, CRC(09110c89) SHA1(3659f567aaab6c2d83a3ed94875843ccd43c0a27) )
+ROM_END
+
+ROM_START( b85ritza )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ritz 20p 95715118 2x1.bin", 0x6000, 0x002000, CRC(e24e4bb2) SHA1(6c189220866f057fa35801abc39880bf199c4646) )
+	ROM_LOAD( "ritz 20p 95717830 2x1.bin", 0x8000, 0x008000, CRC(b3d84f6c) SHA1(561172b5f729b64aa57b56078ef265de1172df38) )
+ROM_END
+
+ROM_START( b85ritzb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ritz 20p 95715116.bin", 0x6000, 0x002000, CRC(96cee69e) SHA1(60bbd48c6da1a5921206340788d9abbf59c10569) )
+	ROM_LOAD( "ritz 20p 95717827.bin", 0x8000, 0x008000, CRC(bf31303c) SHA1(820befceeef315e6cf6f43fe17404ab88bbd7926) )
+ROM_END
+
+ROM_START( b85ritzc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ritz 10p 95715119 2x1.bin", 0x6000, 0x002000, CRC(a558a02e) SHA1(bd1c2bf2f1eff10cc56abc3db3160576bd8351dc) )
+	ROM_LOAD( "ritz 10p 95717831 2x1.bin", 0x8000, 0x008000, CRC(6a8fbf83) SHA1(19c87e40541973e7fc59c76f2c96f0cf52ee74c1) )
+ROM_END
+
+ROM_START( b85ritzd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ritz 10p 95715662.bin", 0x6000, 0x002000, CRC(3b7fcc40) SHA1(ba60f91974cd02240822051dcdf1d13cbdaf3455) )
+	ROM_LOAD( "ritz 10p 95715798.bin", 0x8000, 0x008000, CRC(597088ac) SHA1(1c1c2a66494c64ba0ced129e044b87538d9d9a38) )
+ROM_END
+
+ROM_START( b85jpclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jkpot2.bin", 0x6000, 0x002000, CRC(1cd88c27) SHA1(126cc0eba69cce6bd3abad9d2eeff64de3ab2477) )
+	ROM_LOAD( "jkpot1.bin", 0x8000, 0x008000, CRC(bd63aaa9) SHA1(697d914c1d3a267ef69cfe854e028fdeb8136519) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	// sets below don't boot.. check why
+	ROM_LOAD( "5p b.bin", 0x6000, 0x002000, CRC(d39b2517) SHA1(e21b702779aff900f528c2a3002f1df77990e7fe) )
+	ROM_LOAD( "5p a.bin", 0x8000, 0x008000, CRC(23b4f619) SHA1(03bdb736b260d96435fe1eab028b4e03c5e733f7) )
+	ROM_LOAD( "95715692 jpot 100.bin", 0x6000, 0x002000, CRC(1cd88c27) SHA1(126cc0eba69cce6bd3abad9d2eeff64de3ab2477) )
+	ROM_LOAD( "39350115 jpot 100.bin", 0x8000, 0x008000, CRC(dfb05807) SHA1(2375f30e37c7350ccfeb0483e74b51f4c2a090a0) )
+
+	ROM_END
+
+ROM_START( b85jpclba )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95715690 20p.bin", 0x6000, 0x002000, CRC(84595df8) SHA1(42315df92c7e98655036e5314638e468a26699d0) )
+	ROM_LOAD( "39350112 20p.bin", 0x8000, 0x008000, CRC(59eb8649) SHA1(b42999d34fbf863e92098d08164d4624c576ab06) )
+ROM_END
+
+ROM_START( b85jpclbb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95715121 2x10p.bin", 0x6000, 0x002000, CRC(c63280a0) SHA1(db812676d64eb6fbffb80d0af457eb958b5bfc54) )
+	ROM_LOAD( "39350141 2x10p.bin", 0x8000, 0x008000, CRC(1088d262) SHA1(02da1bacb90d4e06f1fc97b5bcb9b2b90263d657) )
+ROM_END
+
+ROM_START( b85jpclbc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9715120 2x20p.bin", 0x6000, 0x002000, CRC(5a901360) SHA1(d134151f366a3a64e74fc3d350ec64548cb172b5) )
+	ROM_LOAD( "95717832 2x20p.bin", 0x8000, 0x008000, CRC(11622bc8) SHA1(6167238a00e738ea07b46cbf3f3dd5408731d248) )
+ROM_END
+
+ROM_START( b85jkwld )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jw345.bin", 0x8000, 0x008000, CRC(d32de80f) SHA1(0afac559ee5a0f0144b3cb449a7b18a8a26a7573) )
+ROM_END
+
+ROM_START( b85lucky )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lucky.bin", 0x0000, 0x010000, CRC(00673dc3) SHA1(2d9b839fa0c96dde728d10017dfa809497744453) )
+ROM_END
+
+ROM_START( b85luckd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "luckydice.bin", 0x8000, 0x008000, CRC(6cb54fe5) SHA1(ccdf32813ce8a8f1ef65ca65ce2cf9fe654e473e) )
+ROM_END
+
+
+ROM_START( b85sngam )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "supernudgegambler.bin", 0x8000, 0x008000, CRC(c7344abc) SHA1(c1417d9011d4ed94dd25b57bae2fb84a0129fdaf) )
+ROM_END
+
+
+
+
+DRIVER_INIT( decode )
+{
+	bfmsys85_state *state = machine.driver_data<bfmsys85_state>();
+	bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);	
+}
+
+GAME( 1989, b85scard	, 0			, bfmsys85, bfmsys85, 		0		,	  0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1989, b85cexpl	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Cash Explosion (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85royal	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Royal (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK ) // 'The Royal' ?? hack of the Ritz or Big Deal Club?
+GAME( 1987, b85bdclb	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85bdclba	, b85bdclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85bdclbb	, b85bdclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85cblit	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85cblita	, b85cblit	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85cblitb	, b85cblit	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1989, b85clbpm	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Club Premier (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1989, b85dbldl	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Double Dealer (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1985, b85dbldla	, b85dbldl	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Double Dealer (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85hilo		, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Hi Lo Silver (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85hiloa	, b85hilo	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Hi Lo Silver (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85ritz		, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK ) // alt version of Big Deal Club?
+GAME( 1988, b85ritza	, b85ritz	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85ritzb	, b85ritz	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85ritzc	, b85ritz	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85ritzd	, b85ritz	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 5)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85jpclb	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85jpclba	, b85jpclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85jpclbb	, b85jpclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85jpclbc	, b85jpclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1992, b85jkwld	, 0			, bfmsys85, bfmsys85, 		0		,	  0,       "BFM/ELAM",   "Jokers Wild (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1986, b85lucky	, 0			, bfmsys85, bfmsys85, 		0		,	  0,       "BFM/ELAM",   "Lucky Cards (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1992, b85luckd	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM/ELAM",   "Lucky Dice (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85sngam	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Super Nudge Gambler (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+
