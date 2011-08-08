@@ -2177,10 +2177,7 @@ void hlsl_info::delete_resources()
 		avi_final_target = NULL;
 	}
 
-	if (options != NULL)
-	{
-		global_free(options);
-	}
+	global_free(options);
 
 	registered_targets = 0;
 

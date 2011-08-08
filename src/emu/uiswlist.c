@@ -293,10 +293,7 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 			else
 			{
 				// otherwise, load the file
-				if (image != NULL)
-					image->load(entry->short_name);
-				else
-					popmessage("No matching device found for interface '%s'!", entry->interface);
+				image->load(entry->short_name);
 			}
 			software_list_close(tmp_list);
 

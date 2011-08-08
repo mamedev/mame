@@ -500,12 +500,12 @@ static void drawd3d_window_destroy(win_window_info *window)
 {
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
-	if (d3d->hlsl->recording())
-		d3d->hlsl->window_record();
-
 	// skip if nothing
 	if (d3d == NULL)
 		return;
+	
+	if (d3d->hlsl->recording())
+		d3d->hlsl->window_record();
 
 	// delete the device
 	device_delete(d3d);

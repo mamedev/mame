@@ -1295,7 +1295,7 @@ static void normalize_flags_for_device(running_machine &machine, const char *rgn
 	if (device->interface(memory))
 	{
 		const address_space_config *spaceconfig = memory->space_config();
-		if (device != NULL && spaceconfig != NULL)
+		if (spaceconfig != NULL)
 		{
 			int buswidth;
 
