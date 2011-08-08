@@ -291,7 +291,7 @@ static void cd_exec_command(running_machine &machine)
 				buffull = 0;
 				hirqreg &= 0xffe5;
 			}
-			cd_speed = ((cr1 & 0x10) >> 4) + 1;
+			cd_speed = (cr1 & 0x10) ? 1 : 2;
 
 			hirqreg |= (CMOK|ESEL);
 			cr_standard_return(cd_stat);
