@@ -296,7 +296,7 @@ ROM_START( pr_hotcs )
 	ROM_LOAD( "htcash55", 0x0000, 0x010000, CRC(d422ac0e) SHA1(57135b606eb0a3fc67385f5759e7a21f7182705a) )
 ROM_END
 
-ROM_START( p4_hotsp )
+ROM_START( pr_hotsp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "hot spots 5p.bin", 0x0000, 0x008000, CRC(456ba6bf) SHA1(b28d6fe63650e6ce17c279fdb217ce4e9cdd4f2f) )
 	ROM_LOAD( "hotspotsprocon5p(27256)", 0x0000, 0x008000, CRC(456ba6bf) SHA1(b28d6fe63650e6ce17c279fdb217ce4e9cdd4f2f) )
@@ -478,7 +478,7 @@ GAME( 199?, pr_heato		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "The Hea
 GAME( 199?, pr_hiclm		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hi Climber (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_hit6			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hit The Six (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_hotcs		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hot Cash (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, p4_hotsp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hot Spots (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, pr_hotsp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hot Spots (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_jkpt7		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jackpot 7's (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_jkrwd		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jokers Wild (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_jumpj		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -497,3 +497,5 @@ GAME( 199?, pr_trpx			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Triple 
 GAME( 199?, pr_walls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wall Street (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_whlft		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wheel Of Fortune (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_wldkn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wild Kings (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
+

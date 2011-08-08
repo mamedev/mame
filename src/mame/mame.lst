@@ -9404,6 +9404,12 @@ j5wsca		//
 
 j5movie		// Movie Magic Club (Crystal?)
 
+j5nudfic	// Nudge Fiction (Jpm)
+j5revo		// Revolver (Jpm)
+j5revoa		//
+j5sizl		// Sizzling (Jpm)
+
+
 // JPM System 5 + Video Expansion 2
 
 monopoly	// Monopoly (Jpm)
@@ -9590,6 +9596,41 @@ j6rcclub	// Roller Coaster Club (Jpm)
 j6slvgst	// Silver Ghost (Jpm)
 j6footy		// Football Fever (Empire)
 
+j6bbankr	// Big Banker (Crystal)
+j6bmc		// Big Money Club (Crystal)
+j6bno		// Big Nite Out (Crystal)
+j6btbw		// Born To Be Wild Club (Crystal)
+j6cpal		// Caesar's Palace (Crystal)
+j6cpala		// Caesar's Palace (Ace)
+j6cdivr		// Cash Diver (Crystal)
+j6ccc		// Casino Crazy Club (Crystal)
+j6colic		// Coliseum (Crystal)
+j6crakr		// Cracker (Crystal)
+j6ewndg		// Each Way Nudger (Crystal)
+j6easy		// Easy Money (Crystal)
+j6ffc		// Frame & Fortune Club (Crystal)
+j6grc		// Gold Rush Club (Crystal)
+j6hdc		// Hot Dogs Club (Crystal)
+j6impls		// Impulse (Crystal)
+j6kapang	// Kapang (Crystal)
+j6kfc		// Kung Fu Club (Crystal)
+j6lucklo	// Lucky Lottery Club (Crystal)
+j6monst		// Monster Cash Club (Crystal)
+j6pinfvr	// Pinball Fever (Crystal)
+j6pinwzdc	// Pinball Wizard (Crystal)
+j6potg		// Pot Of Gold (Crystal)
+j6ramese	// Rameses' Riches Club (Crystal)
+j6r2rum		// Ready To Rumble (Crystal)
+j6redal		// Red Alert (Crystal)
+j6reelb		// Reel Bingo Classic Club (Crystal)
+j6sl		// Snakes & Ladders (Crystal)
+j6sla		// Snakes & Ladders Slides Again (Crystal)
+j6thril		// Thriller (Crystal)
+j6tqust		// Treasure Quest (Crystal)
+
+
+
+
 // JPM Impact + Video Board
 cluedo			// (c) 1995
 cluedo2c		// (c) 1995
@@ -9598,7 +9639,7 @@ trivialp		// (c) 1996
 scrabble		// (c) 1997
 hngmnjpm		// (c) 1998
 coronatn		// (c) 1999
-
+tqst			// (c) ACE?
 
 // Other Games
 vega			// (c) 19?? Olympia?
@@ -12918,6 +12959,42 @@ sp_swop			// Swop Shop (Ace)
 sp_timem		// Time Machine (Ace)
 sp_tz			// Twilight Zone (Ace)
 sp_tzfe			// Twilight Zone - Further Encounters (Ace)
+sp_beau			//Beau Peep (Ace)
+sp_bigbd		//Big Break Deluxe Club (Ace)
+sp_brkbk		//Break The Bank (Ace)
+sp_camel		//Camelot (Ace)
+sp_clbna		//Club National (Ace)
+sp_coder		//Code Red (Ace)
+sp_criss		//Criss Cross Cash (Ace)
+sp_daytr		//Daytripper (Ace)
+sp_donky		//Donkey Derby (Ace)
+sp_dyour		//Double Your Money (Ace)
+sp_festi		//Festival (Ace)
+sp_beau2		//Further Adventures Of Beau Peep (Ace)
+sp_ghost		//Ghost Trapper (Ace)
+sp_globe		//Globe Trotter (Ace)
+sp_gol			//Gol (Ace)
+sp_golda		//Golden Arrow Club (Ace)
+sp_golds		//Golden Streak (Ace)
+sp_goldt		//Golden Touch (Golden Streak?) (Ace)
+sp_here			//Here We Go (Ace)
+sp_holid		//Holiday Club (Ace)
+sp_lotto		//Lotto (Ace)
+sp_magmo		//Magic Money (Ace)
+sp_megmo		//Mega Money (Ace)
+sp_monma		//Money Magic (Ace)
+sp_monmo		//Money Mountain (Ace)
+sp_nudex		//Nudge Explosion (Ace)
+sp_onbox		//On The Box (Ace)
+sp_piste		//On The Piste (Ace)
+sp_pound		//Pound For Pound (Ace)
+sp_przna		//Prize National (Ace)
+sp_road			//Road To Hell (Ace)
+sp_skylm		//Sky's The Limit Club, The (Ace)
+sp_tkpik		//Take Your Pick (Ace)
+sp_woolp		//Woolpack (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
+sp_zigzg		//Zig Zag (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
+
 
 
 // Project - PROCONN
@@ -12955,7 +13032,7 @@ pr_heato		// The Heat Is On (Project)
 pr_hiclm		// Hi Climber (Project)
 pr_hit6			// Hit The Six (Project)
 pr_hotcs		// Hot Cash (Project)
-p4_hotsp		// Hot Spots (Project)
+pr_hotsp		// Hot Spots (Project)
 pr_jkpt7		// Jackpot 7's (Project)
 pr_jkrwd		// Jokers Wild (Project)
 pr_jumpj		// Jumping Jacks (Project)
