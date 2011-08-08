@@ -69,6 +69,7 @@ typedef struct
 	INT16 FN;		/* f-number */
 	INT8 OCT;		/* octave */
 	INT8 PRVB;		/* pseudo-reverb */
+	INT8 DAMP;		/* damping */
 	INT8 LD;		/* level direct */
 	INT8 TL;		/* total level */
 	INT8 pan;		/* panpot */
@@ -474,13 +475,17 @@ static TIMER_CALLBACK( ymf278b_timer_ld_clear )
 	chip->status_ld = 0;
 }
 
-static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
+static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 {
-	// officially, these registers can't be accessed if NEW2 is 0
-	if (~chip->exp & 2)
-		logerror("YMF278B:  Port C illegal write %02x, %02x\n", reg, data);
+	if (!init)
+	{
+		// officially, these registers can't be accessed if NEW2 is 0
+		if (~chip->exp & 2)
+			logerror("YMF278B:  Port C illegal write %02x, %02x\n", reg, data);
 
-	chip->stream->update();
+		chip->stream->update();
+	}
+
 	chip->pcmregs[reg] = data;
 
 	// Handle slot registers specifically
@@ -564,6 +569,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 				break;
 			case 4:
 				slot->pan = data&0xf;
+				slot->DAMP = data&0x40;
 				if (data & 0x80)
 				{
 					unsigned int step;
@@ -706,7 +712,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 
 		case 5:
 			ymf278b_timer_busy_reset(chip, 1);
-			ymf278b_C_w(chip, chip->port_C, data);
+			ymf278b_C_w(chip, chip->port_C, data, 0);
 			break;
 
 		default:
@@ -759,6 +765,54 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 }
 
 
+static DEVICE_RESET( ymf278b )
+{
+	YMF278BChip *chip = get_safe_token(device);
+	int i;
+
+	// clear registers
+	for (i = 0; i <= 4; i++)
+		ymf278b_A_w(device->machine(), chip, i, 0);
+	ymf278b_B_w(chip, 5, 0);
+	for (i = 0; i < 8; i++)
+		ymf278b_C_w(chip, i, 0, 1);
+	for (i = 0xff; i >= 8; i--)
+		ymf278b_C_w(chip, i, 0, 1);
+	ymf278b_C_w(chip, 0xf8, 0x1b, 1);
+
+	chip->port_A = chip->port_B = chip->port_C = 0;
+
+	// init/silence channels
+	for (i = 0; i < 24 ; i++)
+	{
+		YMF278BSlot *slot = &chip->slots[i];
+
+		slot->lfo = 0;
+		slot->vib = 0;
+		slot->AR = 0;
+		slot->D1R = 0;
+		slot->DL = 0;
+		slot->D2R = 0;
+		slot->RC = 0;
+		slot->RR = 0;
+		slot->AM = 0;
+
+		slot->startaddr = 0;
+		slot->loopaddr = 0;
+		slot->endaddr = 0;
+
+		slot->env_step = 5;
+		ymf278b_envelope_next(slot);
+	}
+
+	chip->timer_a->reset();
+	chip->timer_b->reset();
+	chip->timer_busy->reset();	chip->status_busy = 0;
+	chip->timer_ld->reset();	chip->status_ld = 0;
+
+	chip->irq_line = CLEAR_LINE;
+}
+
 static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_t *, int))
 {
 	chip->rom = *device->region();
@@ -770,12 +824,6 @@ static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
 	chip->timer_busy = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_busy_clear), chip);
 	chip->timer_ld = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_ld_clear), chip);
-	chip->irq_line = CLEAR_LINE;
-
-	chip->timer_a->reset();
-	chip->timer_b->reset();
-	chip->timer_busy->reset();
-	chip->timer_ld->reset();
 }
 
 static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
@@ -810,6 +858,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 		device->save_item(NAME(chip->slots[i].FN), i);
 		device->save_item(NAME(chip->slots[i].OCT), i);
 		device->save_item(NAME(chip->slots[i].PRVB), i);
+		device->save_item(NAME(chip->slots[i].DAMP), i);
 		device->save_item(NAME(chip->slots[i].LD), i);
 		device->save_item(NAME(chip->slots[i].TL), i);
 		device->save_item(NAME(chip->slots[i].pan), i);
@@ -890,7 +939,7 @@ DEVICE_GET_INFO( ymf278b )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymf278b );		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->start = DEVICE_RESET_NAME( ymf278b );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMF278B");						break;
