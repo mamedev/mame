@@ -106,6 +106,7 @@ typedef enum
 
 // local variables
 static timer_device *sector_timer;
+static timer_device *sh1_timer;
 static partitionT partitions[MAX_FILTERS];
 static partitionT *transpart;
 
@@ -1196,6 +1197,8 @@ static void cd_exec_command(running_machine &machine)
 
 TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 {
+	sh1_timer->adjust(attotime::from_hz(16667));
+
 	if(cmd_pending)
 	{
 		cd_exec_command(timer.machine());
@@ -1301,6 +1304,8 @@ void stvcd_reset(running_machine &machine)
 
 	sector_timer = machine.device<timer_device>("sector_timer");
 	sector_timer->adjust(attotime::from_hz(150));	// 150 sectors / second = 300kBytes/second
+	sh1_timer = machine.device<timer_device>("sh1_cmd");
+	sh1_timer->adjust(attotime::from_hz(16667));
 }
 
 static blockT *cd_alloc_block(UINT8 *blknum)
@@ -1626,6 +1631,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
+		sh1_timer->reset();
+		sh1_timer->adjust(attotime::from_hz(16667));
 		break;
 	default:
 		CDROM_LOG(("CD: WW %08x %04x\n", addr, data))

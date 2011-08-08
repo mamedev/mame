@@ -1999,14 +1999,13 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-	MCFG_TIMER_ADD_PERIODIC("sh1_cmd", stv_sh1_sim, attotime::from_hz(16667))
-
 	MCFG_MACHINE_START(saturn)
 	MCFG_MACHINE_RESET(saturn)
 
 	MCFG_NVRAM_HANDLER(saturn)
 
 	MCFG_TIMER_ADD("sector_timer", stv_sector_cb)
+	MCFG_TIMER_ADD("sh1_cmd", stv_sh1_sim)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2051,14 +2050,13 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-	MCFG_TIMER_ADD_PERIODIC("sh1_cmd", stv_sh1_sim, attotime::from_hz(16667))
-
 	MCFG_MACHINE_START(stv)
 	MCFG_MACHINE_RESET(stv)
 
 	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MCFG_TIMER_ADD("sector_timer", stv_sector_cb)
+	MCFG_TIMER_ADD("sh1_cmd", stv_sh1_sim)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
