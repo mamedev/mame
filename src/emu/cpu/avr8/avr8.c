@@ -30,6 +30,7 @@ struct _avr8_state
     address_space *program;
     address_space *io;
     int icount;
+	UINT32 addr_mask;
 };
 
 enum
@@ -78,7 +79,7 @@ enum
 INLINE avr8_state *get_safe_token(device_t *device)
 {
     assert(device != NULL);
-    assert(device->type() == AVR8);
+    assert(device->type() == ATMEGA88 || device->type() == ATMEGA644);
     return (avr8_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -223,7 +224,7 @@ static CPU_EXECUTE( avr8 )
 
     while (cpustate->icount > 0)
     {
-        cpustate->pc &= 0x0fff;
+        cpustate->pc &= cpustate->addr_mask;
 
         debugger_instruction_hook(device, cpustate->pc << 1);
 
@@ -666,21 +667,22 @@ static CPU_EXECUTE( avr8 )
                                 break;
                             case 0x000c:
                             case 0x000d:    // JMP k
-                                //op <<= 8;
-                                //op |= oprom[pos++];
-                                //op <<= 8;
-                                //op |= oprom[pos++];
-                                //output += sprintf( output, "JMP     0x%06x", KCONST22(op) );
-                                unimplemented_opcode(cpustate, op);
+								offs = KCONST22(op) << 16;
+                                cpustate->pc++;
+                                offs |= READ_PRG_16(cpustate, cpustate->pc);
+                                cpustate->pc = offs;								
+								cpustate->pc--;
+								opcycles = 4;
                                 break;
                             case 0x000e:    // CALL k
                             case 0x000f:
-                                //op <<= 8;
-                                //op |= oprom[pos++];
-                                //op <<= 8;
-                                //op |= oprom[pos++];
-                                //output += sprintf( output, "CALL    0x%06x", KCONST22(op) );
-                                unimplemented_opcode(cpustate, op);
+								PUSH(cpustate, ((cpustate->pc + 1) >> 8) & 0x00ff);
+								PUSH(cpustate, (cpustate->pc + 1) & 0x00ff);
+								offs = KCONST22(op) << 16;
+                                cpustate->pc++;
+                                offs |= READ_PRG_16(cpustate, cpustate->pc);
+                                cpustate->pc = offs;								
+								cpustate->pc--;
                                 break;
                             default:
                                 unimplemented_opcode(cpustate, op);
@@ -1157,4 +1159,47 @@ CPU_GET_INFO( avr8 )
     }
 }
 
-DEFINE_LEGACY_CPU_DEVICE(AVR8, avr8);
+static CPU_INIT( atmega88 )
+{
+	CPU_INIT_CALL(avr8);
+    avr8_state *cpustate = get_safe_token(device);
+	cpustate->addr_mask = 0x0fff;	
+}
+
+static CPU_INIT( atmega644 )
+{
+	CPU_INIT_CALL(avr8);
+    avr8_state *cpustate = get_safe_token(device);
+	cpustate->addr_mask = 0xffff;	
+}
+
+CPU_GET_INFO( atmega88 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(atmega88);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ATmega88");				break;
+
+		default:										CPU_GET_INFO_CALL(avr8); break;
+	}
+}
+
+CPU_GET_INFO( atmega644 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(atmega644);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ATmega644");				break;
+
+		default:										CPU_GET_INFO_CALL(avr8); break;
+	}
+}
+
+DEFINE_LEGACY_CPU_DEVICE(ATMEGA88, atmega88);
+DEFINE_LEGACY_CPU_DEVICE(ATMEGA644, atmega644);

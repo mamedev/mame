@@ -28,7 +28,7 @@ CPU_DISASSEMBLE( avr8 )
     int pos = 0;
     UINT32 op = oprom[pos++];
     op |= oprom[pos++] << 8;
-
+	UINT32 addr = 0;
     switch(op & 0xf000)
     {
         case 0x0000:
@@ -325,17 +325,17 @@ CPU_DISASSEMBLE( avr8 )
                             break;
                         case 0x000c:
                         case 0x000d:
-                            op <<= 16;
-                            op |= oprom[pos++];
-                            op |= oprom[pos++] << 8;
-                            output += sprintf( output, "JMP     0x%06x", KCONST22(op) << 1 );
+                            addr = KCONST22(op) << 16;
+                            addr |= oprom[pos++];
+                            addr |= oprom[pos++] << 8;
+                            output += sprintf( output, "JMP     0x%06x", addr << 1 );
                             break;
                         case 0x000e:
                         case 0x000f:
-                            op <<= 16;
-                            op |= oprom[pos++];
-                            op |= oprom[pos++] << 8;
-                            output += sprintf( output, "CALL    0x%06x", KCONST22(op) << 1 );
+                            addr = KCONST22(op) << 16;
+                            addr |= oprom[pos++];
+                            addr |= oprom[pos++] << 8;
+                            output += sprintf( output, "CALL    0x%06x", addr << 1 );
                             break;
                         default:
                             output += sprintf( output, "Undefined (%08x)", op );
