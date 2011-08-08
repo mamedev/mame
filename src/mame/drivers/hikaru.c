@@ -341,25 +341,63 @@ static INPUT_PORTS_START( hikaru )
 	PORT_START("IN0")
 INPUT_PORTS_END
 
+/*
+ Area 0
+  00000000-00200000    boot ROM
+  00400000-00400003    ?
+  00800000-0083ffff    MIE + Service/Test switches and more
+  00c00000-00c0ffff    backup RAM
+  01000000-01000003    ?
+  01000100-01000103    ?
+  02000000-02ffffff    banked area (ROMBD+AICA+COMM+other devices)
+  03000000-03ffffff    banked area (ROMBD+EEPROM+COMM+other devices)
+ Area 1
+  04000000-0400003f    Memory controller (Master)
+ Area 3
+  0c000000-0dffffff    RAM
+ Area 5
+  14000000-140000ff    Master/Slave COMM
+  14000100-143fffff    GPU command RAM
+  15000000-150000ff    GPU Regs
+  16000000-163fffff x2 ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
+  16010000-17ffffff    Slave RAM /
+ Area 6
+  18001000-1800101f    ?
+  1a000000-1a000103    GPU Regs
+  1a000180-150001bf    GPU Texture Regs A
+  1a000200-1500023f    GPU Texture Regs B
+  1a040000-1a04000f    GPU Texture fIfO (?)
+  1b000000-1b7fffff    GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
+
+*/
+
 static ADDRESS_MAP_START( hikaru_map, AS_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_ROM AM_SHARE("share1")
-	AM_RANGE(0x00400000, 0x004000FF) AM_NOP // unknown
-	AM_RANGE(0x00800000, 0x008000FF) AM_NOP // unknown
-	AM_RANGE(0x00830000, 0x00831FFF) AM_NOP // unknown
-	AM_RANGE(0x00838000, 0x008380ff) AM_NOP // unknown
-	AM_RANGE(0x0082F000, 0x0082F0ff) AM_NOP // unknown
-	AM_RANGE(0x00C00000, 0x00C002FF) AM_RAM // unknown nvram?
-	AM_RANGE(0x01000000, 0x010001FF) AM_NOP // unknown
-	AM_RANGE(0x02000000, 0x020000FF) AM_NOP // unknown
-	AM_RANGE(0x02710000, 0x027100FF) AM_NOP // unknown
-	AM_RANGE(0x03000000, 0x030000FF) AM_NOP // unknown
-	AM_RANGE(0x04000000, 0x040000FF) AM_NOP // unknown
-	AM_RANGE(0x0C000000, 0x0DFFFFFF) AM_RAM
-	AM_RANGE(0x14000000, 0x140000FF) AM_NOP // unknown
-	AM_RANGE(0x14004000, 0x140041FF) AM_RAM // unknown
-	AM_RANGE(0x15000000, 0x150000FF) AM_NOP // unknown
-	AM_RANGE(0x16001000, 0x160010FF) AM_RAM // unknown
-	AM_RANGE(0x1A000000, 0x1A0000FF) AM_NOP // unknown
+//  Area 0
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1")  // boot ROM
+	AM_RANGE(0x00400000, 0x00400003) AM_NOP // unknown
+	AM_RANGE(0x00800000, 0x0083ffff) AM_NOP // MIE + Service/Test switches and more
+	AM_RANGE(0x00c00000, 0x00c0ffff) AM_RAM // backup RAM
+	AM_RANGE(0x01000000, 0x01000003) AM_NOP // unknown
+	AM_RANGE(0x01000100, 0x01000103) AM_NOP // unknown
+	AM_RANGE(0x02000000, 0x02ffffff) AM_NOP // banked area (ROMBD + AICA + COMM + other devices)
+	AM_RANGE(0x03000000, 0x03ffffff) AM_NOP // banked area (ROMBD + EEPROM + COMM + other devices)
+//  Area 1
+	AM_RANGE(0x04000000, 0x0400003f) AM_NOP // memory controller (Master)
+//  Area 3
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM // main Work RAM
+//  Area 5
+	AM_RANGE(0x14000000, 0x140000ff) AM_NOP // Master/Slave COMM
+	AM_RANGE(0x14000100, 0x143fffff) AM_RAM // GPU command RAM
+	AM_RANGE(0x15000000, 0x150000ff) AM_NOP // GPU Regs
+	AM_RANGE(0x16001000, 0x163fffff) AM_RAM // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
+	AM_RANGE(0x16010000, 0x17ffffff) AM_RAM // Slave Work RAM
+//  Area 6
+	AM_RANGE(0x18001000, 0x1800101f) AM_NOP // unknown
+	AM_RANGE(0x1a000000, 0x1a000103) AM_NOP // GPU Regs
+	AM_RANGE(0x1a000180, 0x150001bf) AM_NOP // GPU Texture Regs A
+	AM_RANGE(0x1a000200, 0x1500023f) AM_NOP // GPU Texture Regs B
+	AM_RANGE(0x1a040000, 0x1a04000f) AM_NOP // GPU Texture FIFO (?)
+	AM_RANGE(0x1b000000, 0x1b7fffff) AM_NOP // GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hikaru_map_slave, AS_PROGRAM, 64 )
