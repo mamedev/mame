@@ -455,18 +455,15 @@ static void cd_exec_command(running_machine &machine)
 
 			playtype = 0;
 
-			// and do the disc I/O
-			// make sure it doesn't come in too early
-			if (cdrom_get_track_type(cdrom, cur_track-1) == CD_TRACK_AUDIO)
+			// cdda
+			if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
 			{
 				cdda_pause_audio( machine.device( "cdda" ), 0 );
 				cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
-				cd_speed = 1;
 			}
 			else
 			{
 				cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
-				cd_speed = 2; //TODO: previous setting
 			}
 
 			break;
@@ -1010,7 +1007,7 @@ static void cd_exec_command(running_machine &machine)
 				xfersectnum = sectnum;
 				transpart = &partitions[bufnum];
 
-				cd_stat &= ~CD_STAT_TRANS;
+				cd_stat |= CD_STAT_TRANS;
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK|EHST|DRDY);
 			}
@@ -1219,7 +1216,10 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 	if (fadstoplay)
 		cd_playdata();
 
-	sector_timer->adjust(attotime::from_hz(75*cd_speed));	// 150 sectors / second = 300kBytes/second
+	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
+		sector_timer->adjust(attotime::from_hz(75));	// 75 sectors / second = 150kBytes/second (cdda track ignores cd_speed setting)
+	else
+		sector_timer->adjust(attotime::from_hz(75*cd_speed));	// 75 / 150 sectors / second = 150 / 300kBytes/second
 }
 
 // global functions

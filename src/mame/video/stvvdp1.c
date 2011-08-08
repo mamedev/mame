@@ -172,12 +172,14 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 
 	switch(offset)
 	{
+		case 0x02/2:
+			return 0;
 		case 0x10/2:
 			break;
 		case 0x12/2: return state->m_vdp1.lopr;
 		case 0x14/2: return state->m_vdp1.copr;
 		/* MODR register, read register for the other VDP1 regs
-		   (Shienryu SS version abuses of this during intro, otherwise you get vertical oriented VDP1 sprites on horizontal display) */
+		   (Shienryu SS version abuses of this during intro) */
 		case 0x16/2:
 			UINT16 modr;
 
