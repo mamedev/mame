@@ -108,8 +108,7 @@ typedef struct
 	INT8 memmode;
 	INT32 memadr;
 
-	UINT8 busy;
-	UINT8 ld;
+	UINT8 status_busy, status_ld;
 	emu_timer *timer_busy;
 	emu_timer *timer_ld;
 	UINT8 exp;
@@ -117,7 +116,9 @@ typedef struct
 	INT32 fm_l, fm_r;
 	INT32 pcm_l, pcm_r;
 
-	UINT8 timer_a_count, timer_b_count, enable, current_irq;
+	attotime timer_base;
+	UINT8 timer_a_count, timer_b_count;
+	UINT8 enable, current_irq;
 	emu_timer *timer_a, *timer_b;
 	int irq_line;
 
@@ -382,38 +383,9 @@ static TIMER_CALLBACK( ymf278b_timer_b_tick )
 	}
 }
 
-static void ymf278b_timer_a_reset(YMF278BChip *chip)
-{
-	if(chip->enable & 1)
-	{
-		attotime period = attotime::from_nsec((256-chip->timer_a_count) * 80800);
-
-		if (chip->clock != YMF278B_STD_CLOCK)
-			period = (period * chip->clock) / YMF278B_STD_CLOCK;
-
-		chip->timer_a->adjust(period, 0, period);
-	}
-	else
-		chip->timer_a->adjust(attotime::never);
-}
-
-static void ymf278b_timer_b_reset(YMF278BChip *chip)
-{
-	if(chip->enable & 2)
-	{
-		attotime period = attotime::from_nsec((256-chip->timer_b_count) * 323100);
-
-		if (chip->clock != YMF278B_STD_CLOCK)
-			period = (period * chip->clock) / YMF278B_STD_CLOCK;
-
-		chip->timer_b->adjust(period, 0, period);
-	}
-	else
-		chip->timer_b->adjust(attotime::never);
-}
-
 static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
+	// FM register array 0 (compatible with YMF262)
 	switch(reg)
 	{
 		// LSI TEST
@@ -421,28 +393,50 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 		case 0x01:
 			break;
 
+		// timer a count
 		case 0x02:
-			chip->timer_a_count = data;
-			ymf278b_timer_a_reset(chip);
+			if (data != chip->timer_a_count)
+			{
+				chip->timer_a_count = data;
+
+				// change period, ~80.8us * t
+				if (chip->enable & 1)
+					chip->timer_a->adjust(chip->timer_a->remaining(), 0, chip->timer_base * (256-data) * 4);
+			}
 			break;
 
+		// timer b count
 		case 0x03:
-			chip->timer_b_count = data;
-			ymf278b_timer_b_reset(chip);
+			if (data != chip->timer_b_count)
+			{
+				chip->timer_b_count = data;
+
+				// change period, ~323.1us * t
+				if (chip->enable & 2)
+					chip->timer_b->adjust(chip->timer_b->remaining(), 0, chip->timer_base * (256-data) * 16);
+			}
 			break;
 
+		// timer control
 		case 0x04:
 			if(data & 0x80)
 				chip->current_irq = 0;
 			else
 			{
-				UINT8 old_enable = chip->enable;
+				// reset timers
+				if((chip->enable ^ data) & 1)
+				{
+					attotime period = (data & 1) ? chip->timer_base * (256-chip->timer_a_count) * 4 : attotime::never;
+					chip->timer_a->adjust(period, 0, period);
+				}
+				if((chip->enable ^ data) & 2)
+				{
+					attotime period = (data & 2) ? chip->timer_base * (256-chip->timer_b_count) * 16 : attotime::never;
+					chip->timer_b->adjust(period, 0, period);
+				}
+
 				chip->enable = data;
 				chip->current_irq &= ~data;
-				if((old_enable ^ data) & 1)
-					ymf278b_timer_a_reset(chip);
-				if((old_enable ^ data) & 2)
-					ymf278b_timer_b_reset(chip);
 			}
 			ymf278b_irq_check(machine, chip);
 			break;
@@ -455,6 +449,7 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 
 static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
+	// FM register array 1 (compatible with YMF262)
 	switch(reg)
 	{
 		// LSI TEST
@@ -476,7 +471,7 @@ static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 static TIMER_CALLBACK( ymf278b_timer_ld_clear )
 {
 	YMF278BChip *chip = (YMF278BChip *)ptr;
-	chip->ld = 0;
+	chip->status_ld = 0;
 }
 
 static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
@@ -507,7 +502,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 
 				// load wavetable header
 				// status register LD bit is on for approx 300us
-				chip->ld = 1;
+				chip->status_ld = 1;
 				period = attotime::from_usec(300);
 				if (chip->clock != YMF278B_STD_CLOCK)
 					period = (period * chip->clock) / YMF278B_STD_CLOCK;
@@ -668,13 +663,13 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 static TIMER_CALLBACK( ymf278b_timer_busy_clear )
 {
 	YMF278BChip *chip = (YMF278BChip *)ptr;
-	chip->busy = 0;
+	chip->status_busy = 0;
 }
 
 static void ymf278b_timer_busy_reset(YMF278BChip *chip, int is_pcm)
 {
 	// status register BUSY bit is on for 56(FM) or 88(PCM) cycles
-	chip->busy = 1;
+	chip->status_busy = 1;
 	chip->timer_busy->adjust(attotime::from_hz(chip->clock / (is_pcm ? 88 : 56)));
 }
 
@@ -733,7 +728,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			// bits 0 and 1 are only valid if NEW2 is set
 			UINT8 newbits = 0;
 			if (chip->exp & 2)
-				newbits = (chip->ld << 1) | chip->busy;
+				newbits = (chip->status_ld << 1) | chip->status_busy;
 
 			return newbits | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 		}
@@ -759,7 +754,8 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
 			break;
 	}
-	return 0xff;
+
+	return 0;
 }
 
 
@@ -767,13 +763,14 @@ static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_
 {
 	chip->rom = *device->region();
 	chip->romsize = device->region()->bytes();
+	chip->clock = device->clock();
 	chip->irq_callback = cb;
+	chip->timer_base = attotime::from_hz(chip->clock) * (19*36);
 	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
 	chip->timer_busy = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_busy_clear), chip);
 	chip->timer_ld = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_ld_clear), chip);
 	chip->irq_line = CLEAR_LINE;
-	chip->clock = device->clock();
 
 	chip->timer_a->reset();
 	chip->timer_b->reset();
@@ -791,8 +788,8 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 	device->save_item(NAME(chip->wavetblhdr));
 	device->save_item(NAME(chip->memmode));
 	device->save_item(NAME(chip->memadr));
-	device->save_item(NAME(chip->busy));
-	device->save_item(NAME(chip->ld));
+	device->save_item(NAME(chip->status_busy));
+	device->save_item(NAME(chip->status_ld));
 	device->save_item(NAME(chip->exp));
 	device->save_item(NAME(chip->fm_l));
 	device->save_item(NAME(chip->fm_r));
