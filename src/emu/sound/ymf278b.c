@@ -129,7 +129,7 @@ typedef struct
 	emu_timer *timer_a, *timer_b;
 	int irq_line;
 
-	UINT8 port_A, port_B, port_C;
+	UINT8 port_C, port_AB, lastport;
 	void (*irq_callback)(device_t *, int);
 	device_t *device;
 
@@ -761,23 +761,17 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 	switch (offset)
 	{
 		case 0:
+		case 2:
 			ymf278b_timer_busy_reset(chip, 0);
-			chip->port_A = data;
+			chip->port_AB = data;
+			chip->lastport = offset>>1 & 1;
 			break;
 
 		case 1:
-			ymf278b_timer_busy_reset(chip, 0);
-			ymf278b_A_w(device->machine(), chip, chip->port_A, data);
-			break;
-
-		case 2:
-			ymf278b_timer_busy_reset(chip, 0);
-			chip->port_B = data;
-			break;
-
 		case 3:
 			ymf278b_timer_busy_reset(chip, 0);
-			ymf278b_B_w(chip, chip->port_B, data);
+			if (chip->lastport) ymf278b_B_w(chip, chip->port_AB, data);
+			else ymf278b_A_w(device->machine(), chip, chip->port_AB, data);
 			break;
 
 		case 4:
@@ -859,7 +853,8 @@ static DEVICE_RESET( ymf278b )
 		ymf278b_C_w(chip, i, 0, 1);
 	ymf278b_C_w(chip, 0xf8, 0x1b, 1);
 
-	chip->port_A = chip->port_B = chip->port_C = 0;
+	chip->port_AB = chip->port_C = 0;
+	chip->lastport = 0;
 	chip->memadr = 0;
 
 	// init/silence channels
@@ -928,9 +923,9 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 	device->save_item(NAME(chip->enable));
 	device->save_item(NAME(chip->current_irq));
 	device->save_item(NAME(chip->irq_line));
-	device->save_item(NAME(chip->port_A));
-	device->save_item(NAME(chip->port_B));
+	device->save_item(NAME(chip->port_AB));
 	device->save_item(NAME(chip->port_C));
+	device->save_item(NAME(chip->lastport));
 
 	for (i = 0; i < 24; ++i)
 	{
