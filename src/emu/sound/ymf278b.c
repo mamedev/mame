@@ -162,7 +162,7 @@ INLINE UINT8 ymf278b_read_memory(YMF278BChip *chip, UINT32 offset)
 	if (offset >= chip->romsize)
 	{
 		// logerror("YMF278B:  Memory read overflow %x\n", offset);
-		return 0;
+		return 0xff;
 	}
 	return chip->rom[offset];
 }
@@ -231,7 +231,7 @@ static UINT32 ymf278_compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 
 	// rate override with damping/pseudo reverb
 	if (slot->DAMP)
-		rate = 56;
+		rate = 56; // datasheet says it's slightly curved though
 	else if (slot->PRVB && slot->env_vol > ((6*8)<<23))
 	{
 		// pseudo reverb starts at -18dB (6 in voltab)
@@ -273,8 +273,8 @@ static void ymf278b_compute_envelope(YMF278BSlot *slot)
 		if (rate==63)
 		{
 			// immediate
+			LOG(("YMF278B: Attack skipped - "));
 			slot->env_vol = 0;
-			slot->env_vol_lim = 256U<<23;
 			slot->env_step++;
 			// ..fall through
 		}
@@ -764,7 +764,7 @@ static TIMER_CALLBACK( ymf278b_timer_busy_clear )
 	chip->status_busy = 0;
 }
 
-static void ymf278b_timer_busy_reset(YMF278BChip *chip, int is_pcm)
+static void ymf278b_timer_busy_start(YMF278BChip *chip, int is_pcm)
 {
 	// status register BUSY bit is on for 56(FM) or 88(PCM) cycles
 	chip->status_busy = 1;
@@ -779,25 +779,25 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 	{
 		case 0:
 		case 2:
-			ymf278b_timer_busy_reset(chip, 0);
+			ymf278b_timer_busy_start(chip, 0);
 			chip->port_AB = data;
 			chip->lastport = offset>>1 & 1;
 			break;
 
 		case 1:
 		case 3:
-			ymf278b_timer_busy_reset(chip, 0);
+			ymf278b_timer_busy_start(chip, 0);
 			if (chip->lastport) ymf278b_B_w(chip, chip->port_AB, data);
 			else ymf278b_A_w(device->machine(), chip, chip->port_AB, data);
 			break;
 
 		case 4:
-			ymf278b_timer_busy_reset(chip, 1);
+			ymf278b_timer_busy_start(chip, 1);
 			chip->port_C = data;
 			break;
 
 		case 5:
-			ymf278b_timer_busy_reset(chip, 1);
+			ymf278b_timer_busy_start(chip, 1);
 			ymf278b_C_w(chip, chip->port_C, data, 0);
 			break;
 
@@ -911,6 +911,7 @@ static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_
 	chip->romsize = device->region()->bytes();
 	chip->clock = device->clock();
 	chip->irq_callback = cb;
+
 	chip->timer_base = attotime::from_hz(chip->clock) * (19*36);
 	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
