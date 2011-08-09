@@ -580,13 +580,6 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				slot->wave |= data;
 
 				// load wavetable header
-				// status register LD bit is on for approx 300us
-				chip->status_ld = 1;
-				period = attotime::from_usec(300);
-				if (chip->clock != YMF278B_STD_CLOCK)
-					period = (period * chip->clock) / YMF278B_STD_CLOCK;
-				chip->timer_ld->adjust(period);
-
 				if(slot->wave < 384 || !chip->wavetblhdr)
 					offset = slot->wave * 12;
 				else
@@ -620,6 +613,13 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				for (i = 7; i < 12; i++)
 					ymf278b_C_w(chip, 8 + snum + (i-2) * 24, p[i], 1);
 
+				// status register LD bit is on for approx 300us
+				chip->status_ld = 1;
+				period = attotime::from_usec(300);
+				if (chip->clock != YMF278B_STD_CLOCK)
+					period = (period * chip->clock) / YMF278B_STD_CLOCK;
+				chip->timer_ld->adjust(period);
+
 				break;
 			}
 
@@ -635,8 +635,8 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 			case 2:
 				slot->FN &= 0x07f;
 				slot->FN |= ((data&0x07)<<7);
-				slot->PRVB = ((data&0x8)>>3);
-				slot->OCT = ((data&0xf0)>>4);
+				slot->PRVB = (data&0x8)>>3;
+				slot->OCT = (data&0xf0)>>4;
 				if (slot->active && data != chip->pcmregs[reg])
 				{
 					ymf278b_compute_step(slot);
@@ -645,7 +645,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				break;
 
 			case 3:
-				slot->TL = (data>>1);
+				slot->TL = data>>1;
 				slot->LD = data&0x1;
 				break;
 
@@ -654,20 +654,17 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				slot->DAMP = (data&0x40)>>6;
 				if (data & 0x80)
 				{
+					// note on
 					slot->active = 1;
 
 					slot->env_step = 0;
-					slot->env_vol = 256U<<23;
-					slot->env_vol_step = 0;
-					slot->env_vol_lim = 256U<<23;
 					slot->env_prvb = 0;
 					slot->stepptr = 0;
 
 					ymf278b_compute_step(slot);
 					ymf278b_compute_envelope(slot);
 
-					LOG(("YMF278B: slot %2d wave %3d lfo=%d vib=%d ar=%d d1r=%d dl=%d d2r=%d rc=%d rr=%d am=%d\n", snum, slot->wave,
-							 slot->lfo, slot->vib, slot->AR, slot->D1R, slot->DL, slot->D2R, slot->RC, slot->RR, slot->AM));
+					LOG(("YMF278B: slot %2d wave %3d lfo=%d vib=%d ar=%d d1r=%d dl=%d d2r=%d rc=%d rr=%d am=%d\n", snum, slot->wave,slot->lfo, slot->vib, slot->AR, slot->D1R, slot->DL, slot->D2R, slot->RC, slot->RR, slot->AM));
 					LOG(("              b=%d, start=%x, loop=%x, end=%x, oct=%d, fn=%d, step=%x\n", slot->bits, slot->startaddr, slot->loopaddr>>16, slot->endaddr>>16, slot->OCT, slot->FN, slot->step));
 				}
 				else
@@ -681,6 +678,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				}
 				break;
 
+			// envelope settings
 			case 5:
 				slot->vib = data&0x7;
 				slot->lfo = (data>>3)&0x7;
