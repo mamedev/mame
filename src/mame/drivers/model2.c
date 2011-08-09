@@ -3573,7 +3573,7 @@ ROM_START( hotd ) /* House of the Dead, Model 2C */
 	ROM_LOAD("mpr-19722.34", 0x400000, 0x400000, CRC(a56fa539) SHA1(405a892bc368ba862ba71bda7525b421d6973c0e) )
 ROM_END
 
-/* Last Bronx - There should be a (USA?) version with program roms EPR-19059 & EPR-19060 (currently undumped) */
+/* Last Bronx - There is known to be a version with program roms EPR-19059A & EPR-19060A (currently undumped) Should be USA */
 ROM_START( lastbrnx ) /* Last Bronx Revision A (Export), Model 2B */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19061a.15", 0x000000, 0x080000, CRC(c0aebab2) SHA1(fa63081b0aa6f02c3d197485865ee38e9c78b43d) )
