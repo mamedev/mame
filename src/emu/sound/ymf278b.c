@@ -151,6 +151,11 @@ INLINE YMF278BChip *get_safe_token(device_t *device)
 	return (YMF278BChip *)downcast<legacy_device_base *>(device)->token();
 }
 
+static void ymf278b_write_memory(YMF278BChip *chip, UINT32 offset, UINT8 data)
+{
+	logerror("YMF278B:  Memory write %02x to %x\n", data, offset);
+}
+
 INLINE UINT8 ymf278b_read_memory(YMF278BChip *chip, UINT32 offset)
 {
 	if (offset >= chip->romsize)
@@ -712,6 +717,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 
 			case 0x06:
 				// memory data (ignored, we don't support RAM)
+				ymf278b_write_memory(chip, chip->memadr, data);
 				chip->memadr = (chip->memadr + 1) & 0x3fffff;
 				break;
 
