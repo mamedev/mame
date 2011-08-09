@@ -40,6 +40,7 @@
 
 
 
+
 // "Pacman hardware" games
 puckman			// (c) 1980 Namco
 puckmana		// (c) 1980 Namco
@@ -11975,7 +11976,6 @@ m4fastfw	// Fast Forward (Barcrest - Bwb)
 m4class		// First Class (Barcrest)
 m4flash		// Flash Cash (Barcrest)
 m4fortcb	// Fortune Club (Barcrest)
-m4frnk		// Frank n' Stein (Barcrest)
 m4frtlt		// Fruit & Loot (Barcrest)
 m4frtfl		// Fruit Full (Barcrest)
 m4frtflc	// Fruit Full Club (Barcrest)
@@ -12463,6 +12463,36 @@ m4boltblc	//
 m4dblchn	// Double Chance (DJE)
 m4stand2	// Stand To Deliver (DJE)
 
+/* Crystal */
+
+m4frkstn	// Frank 'n' Stein (unencrypted)
+m4frkstna	//
+m4frkstnb	//
+m4aladn		// Aladdin's Cave (Crystal)
+m4bagcsh	// Bags Of Cash Club (Crystal)
+m4bucclb	// Buccaneer Club (Crystal)
+m4bullio	// Bullion Club (Crystal)
+m4carou		// Carousel Club (Crystal)
+m4cclimb	// Crazy Climber (Crystal)
+m4crzcl		// Crazy Climber Club (Crystal)
+m4crzclc	// Crazy Club Climber (Crystal)
+m4elitc		// Elite Club (Crystal)
+m4fairg		// Fairground (Crystal)
+m4frmani	// Fruit Mania (Crystal)
+m4goldxc	// Gold Exchange Club (Crystal)
+m4goldfc	// Gold Fever (Crystal)
+m4hirol		// Hi Roller Club (Crystal)
+m4kingqn	// Kings & Queens Club (Crystal)
+m4lotclb	// Lottery Club (Crystal)
+m4montrl	// Money Trail (Crystal)
+m4mystiq	// Mystique Club (Crystal)
+m4nudwin	// Nudge & Win (Crystal)
+m4paracl	// Paradise Club (Crystal)
+m4rlpick	// Reel Picks (Crystal)
+m4twstr		// Twister (Crystal)
+m4twstcl	// Twister Club (Crystal)
+
+
 /* Unknown */
 
 m4barcrz	// Bar Crazy (unknown)
@@ -12481,11 +12511,9 @@ m4t266		// Unknown MPU4 'TTO 1.1'
 m4brnze		// Bronze Voyage (unknown)
 m4riotrp	// Rio Tropico (unknown)
 
-
 /* Unsorted */
 
 m4blsbys	// Blues Boys (Version 6)
-m4frkstn	// Frank 'n' Stein (unencrypted)
 m4conn4     // Connect 4
 
 // MPU4 + Video board

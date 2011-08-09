@@ -1193,14 +1193,14 @@ void layout_element::component::draw_led14segsc(bitmap_t &dest, const rectangle 
 	// apply skew
 	apply_skew(*tempbitmap, 40);
 
-	// decimal point
-	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 14)) ? onpen : offpen);
-
 	// comma tail
 	draw_segment_diagonal_1(*tempbitmap,
 		bmwidth - (segwidth/2), bmwidth + segwidth,
 		bmheight - (segwidth), bmheight + segwidth*1.5,
 		segwidth/2, (pattern & (1 << 15)) ? onpen : offpen);
+
+	// decimal point
+	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 14)) ? onpen : offpen);
 
 	// resample to the target size
 	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &m_color);
@@ -1426,14 +1426,14 @@ void layout_element::component::draw_led16segsc(bitmap_t &dest, const rectangle 
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 15)) ? onpen : offpen);
 
-	// decimal point
-	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 16)) ? onpen : offpen);
-
 	// comma tail
 	draw_segment_diagonal_1(*tempbitmap,
 		bmwidth - (segwidth/2), bmwidth + segwidth,
 		bmheight - (segwidth), bmheight + segwidth*1.5,
 		segwidth/2, (pattern & (1 << 17)) ? onpen : offpen);
+
+	// decimal point (draw last for priority)
+	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 16)) ? onpen : offpen);
 
 	// apply skew
 	apply_skew(*tempbitmap, 40);

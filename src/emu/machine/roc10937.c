@@ -66,7 +66,7 @@ This means our segment maths needs to be more than 16-bit to work!
 */
 
 static const UINT32 roc10937charset[]=
-{           // 11 10 FEDC BA98 7654 3210
+{            // 11 10 FEDC BA98 7654 3210
 	0x0507F, //  0  0 0101 0000 0111 1111 @.
 	0x044CF, //  0  0 0100 0100 1100 1111 A.
 	0x0153F, //  0  0 0001 0101 0011 1111 B.
@@ -290,21 +290,21 @@ int ROC10937_newdata(int id, int data)
 	if ( data & 0x80 )
 	{ // Control data received
 		if ( (data & 0xF0) == 0xA0 ) // 1010 xxxx
-		{ // 1010 xxxx Buffer Pointer control
+		{ // 1 010 xxxx Buffer Pointer control
 			roc10937[id].cursor_pos = roc10937poslut[data & 0x0F];
 		}
 		else if ( (data & 0xF0) == 0xC0 ) // 1100 xxxx
 		{ // 1100 xxxx Set number of digits
-			data &= 0x07;
+			data &= 0x0F;
 
 			if ( data == 0 ) roc10937[id].window_size = 16;
-			else             roc10937[id].window_size = data+8;
+			else             roc10937[id].window_size = data;
 			roc10937[id].window_start = 0;
 			roc10937[id].window_end   = roc10937[id].window_size-1;
 		}
 		else if ( (data & 0xE0) == 0xE0 ) // 111x xxxx
 		{ // 111x xxxx Set duty cycle ( brightness )
-			roc10937[id].brightness = (data & 0xF)*2;
+			roc10937[id].brightness = (data & 0x1F);
 			change = 1;
 		}
 		else if ( (data & 0xE0) == 0x80 ) // 100x ---
@@ -319,27 +319,27 @@ int ROC10937_newdata(int id, int data)
 		switch ( data )
 		{
 			case 0x2C: // ;
-			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//.
-			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<18);//,
+			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<16);//.
+			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//,
 			break;
 			case 0x2E: //
-			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//.
+			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<16);//.
 			break;
 			case 0x6C: // ;
-			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//.
+			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<16);//.
 			if ( roc10937[id].type == ROCKWELL10937)
 			{
-				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<18);//,
+				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//,
 			}
 			break;
 			case 0x6E: //
 			if ( roc10937[id].type == ROCKWELL10937)
 			{
-				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//.
+				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<16);//.
 			}
 			else
 			{
-				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<18);//,
+				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//,
 			}
 			break;
 			default :
@@ -369,15 +369,6 @@ static void ROC10937_plot(int id, int power)
 	for (cursor = 0; cursor < 16; cursor++)
 	{
 		output_set_indexed_value("vfd", (id*16)+cursor, power?ROC10937_get_outputs(id)[cursor]:0x00000);
-
-		if (ROC10937_get_outputs(id)[cursor] & 0x40000)
-		{
-			//activate flashing (unimplemented, just toggle on and off)
-		}
-		else
-		{
-			//deactivate flashing (unimplemented)
-		}
 	}
 }
 static void ROC10937_draw(int id, int segs)
