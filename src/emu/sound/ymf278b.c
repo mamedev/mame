@@ -169,22 +169,32 @@ static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 	return res;
 }
 
+INLINE UINT32 ymf278_compute_attack_rate(int num)
+{
+	// estimated (less accurate on high rates)
+	UINT32 samples;
+
+	if (num <= 3 || num == 63)
+		samples = 0;
+	else if (num >= 60)
+		samples = 17;
+	else
+		samples = (67 << (15 - num / 4)) / (4 + num % 4);
+
+	return samples;
+}
+
 static UINT32 ymf278_compute_decay_rate(int num)
 {
-	int samples;
+	// estimated
+	UINT32 samples;
 
 	if (num <= 3)
 		samples = 0;
 	else if (num >= 60)
 		samples = 15 << 4;
 	else
-	{
 		samples = (15 << (21 - num / 4)) / (4 + num % 4);
-		if (num % 4 && num / 4 <= 11)
-			samples += 2;
-		else if (num == 51)
-			samples += 2;
-	}
 
 	return samples;
 }
@@ -194,10 +204,29 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	if(slot->env_step == 0)
 	{
 		// Attack
-		slot->env_vol = (256U << 23) - 1;
-		slot->env_vol_lim = 256U<<23;
-		LOG(("YMF278B: Skipping attack (rate = %d)\n", slot->AR));
+		int rate = ymf278b_compute_rate(slot, slot->AR);
+		slot->env_vol = 256U<<23;
+		slot->env_vol_lim = (256U<<23) - 1;
 		slot->env_step++;
+
+		if (rate==63)
+		{
+			// immediate
+			slot->env_vol = 0;
+			slot->env_vol_lim = 256U<<23;
+		}
+		else if (rate<4)
+		{
+			slot->env_vol_step = 0;
+			return;
+		}
+		else
+		{
+			// NOTE: attack rate is linear here, but datasheet shows a smooth curve
+			LOG(("YMF278B: Attack, val = %d, rate = %d, delay = %g\n", slot->AR, rate, ymf278_compute_attack_rate(rate)*1000.0));
+			slot->env_vol_step = ~((256U<<23) / ymf278_compute_attack_rate(rate));
+			return;
+		}
 	}
 	if(slot->env_step == 1)
 	{
