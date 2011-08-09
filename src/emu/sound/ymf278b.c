@@ -75,7 +75,6 @@ typedef struct
 	INT16 FN;		/* f-number */
 	INT8 OCT;		/* octave */
 	INT8 PRVB;		/* pseudo-reverb */
-	INT8 PRVB_active;
 	INT8 DAMP;		/* damping */
 	INT8 LD;		/* level direct */
 	INT8 TL;		/* total level */
@@ -104,6 +103,7 @@ typedef struct
 	UINT32 env_vol;
 	UINT32 env_vol_step;
 	UINT32 env_vol_lim;
+	INT8 env_prvb;
 } YMF278BSlot;
 
 typedef struct
@@ -189,6 +189,7 @@ static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 		res = 0;
 	else if(res > 63)
 		res = 63;
+
 	return res;
 }
 
@@ -201,11 +202,13 @@ static int ymf278b_compute_rate_d(YMF278BSlot *slot, int val)
 		res = 63;
 	else if (slot->PRVB && slot->env_vol > ((6*8)<<23))
 	{
-		slot->PRVB_active = 1;
+		// pseudo reverb starts at -18dB (6 in voltab)
+		slot->env_prvb = 1;
 		res = 5;
 	}
 	else
 		res = ymf278b_compute_rate(slot, val);
+
 	return res;
 }
 
@@ -411,7 +414,7 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 					slot->env_step++;
 					ymf278b_compute_envelope(slot);
 				}
-				else if (slot->PRVB && !slot->PRVB_active && slot->env_step && slot->env_vol > ((6*8)<<23))
+				else if (slot->PRVB && !slot->env_prvb && slot->env_step && slot->env_vol > ((6*8)<<23))
 					ymf278b_compute_envelope(slot);
 			}
 		}
@@ -652,12 +655,12 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				if (data & 0x80)
 				{
 					slot->active = 1;
-					slot->PRVB_active = 0;
 
 					slot->env_step = 0;
 					slot->env_vol = 256U<<23;
 					slot->env_vol_step = 0;
 					slot->env_vol_lim = 256U<<23;
+					slot->env_prvb = 0;
 					slot->stepptr = 0;
 
 					ymf278b_compute_step(slot);
@@ -952,7 +955,6 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 		device->save_item(NAME(chip->slots[i].FN), i);
 		device->save_item(NAME(chip->slots[i].OCT), i);
 		device->save_item(NAME(chip->slots[i].PRVB), i);
-		device->save_item(NAME(chip->slots[i].PRVB_active), i);
 		device->save_item(NAME(chip->slots[i].DAMP), i);
 		device->save_item(NAME(chip->slots[i].LD), i);
 		device->save_item(NAME(chip->slots[i].TL), i);
@@ -981,6 +983,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 		device->save_item(NAME(chip->slots[i].env_vol), i);
 		device->save_item(NAME(chip->slots[i].env_vol_step), i);
 		device->save_item(NAME(chip->slots[i].env_vol_lim), i);
+		device->save_item(NAME(chip->slots[i].env_prvb), i);
 	}
 }
 
@@ -1012,8 +1015,8 @@ static DEVICE_START( ymf278b )
 
 	// Mixing levels, units are -3dB, and add some margin to avoid clipping
 	for(i=0; i<7; i++)
-		chip->mix_level[i] = chip->volume[8*i+8];
-	chip->mix_level[7] = 0;
+		chip->mix_level[i] = chip->volume[8*i+13];
+	chip->mix_level[7] = 256;
 
 	// Register state for saving
 	ymf278b_register_save_state(device, chip);
