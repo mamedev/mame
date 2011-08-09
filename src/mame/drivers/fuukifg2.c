@@ -19,6 +19,17 @@ Year + Game
 96  Gyakuten!! Puzzle Bancho
 ---------------------------------------------------------------------------
 
+Do NOT trust the Service Mode for dipswitch settings for Go Go! Mile Smile:
+  Service Mode shows Coin A as SW2:3-5 & Coin B as SW2:6-8, but the game ignores the
+  setting of Coin B and only uses the settings for Coin A, except for Coin B "Free Play"
+  The game says Press 1 or 2, and will start the game, but jumps right to the Game Over
+  and "Continue" countdown.
+The Service Mode is WAY off on effects of dipswitches for the Japanese set!!! It reports
+  the effects of MAME's SW1:3-8 have been moved to SW1:2-7 and Demo Sound has moved to
+  SW2:7. What MAME shows as settings are according to actual game effect and reflect what
+  the manual states.
+
+
 To Do:
 
 - Raster effects (level 5 interrupt is used for that). In pbancho
@@ -182,31 +193,31 @@ static INPUT_PORTS_START( gogomile )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")		// $880000.w
-	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Demo Music" )		PORT_DIPLOCATION("SW1:2") /* Game play sounds still play, only effects Music */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0030, 0x0020, DEF_STR( Language ) )	/* Default Language: English */
+	PORT_DIPNAME( 0x0030, 0x0020, DEF_STR( Language ) )	PORT_DIPLOCATION("SW1:5,6") /* Default Language: English */
 	PORT_DIPSETTING(      0x0010, "Chinese" )
-	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) ) /* Only setting to give a "For use only in...." Copyright Notice */
+	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) )	/* Only setting to give a "For use only in...." Copyright Notice */
 	PORT_DIPSETTING(      0x0000, "Korean" )
 	PORT_DIPSETTING(      0x0020, DEF_STR( English ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x00c0, "3" )
 	PORT_DIPSETTING(      0x0080, "4" )
 	PORT_DIPSETTING(      0x0040, "5" )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x0200, 0x0200 ) /* Manual states this dip is "Unused" */
-	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_A ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW2:2" )	/* Manual states this dip is "Unused" */
+	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW2:3,4,5") 
 	PORT_DIPSETTING(      0x0400, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_1C ) )
@@ -215,7 +226,11 @@ static INPUT_PORTS_START( gogomile )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )
+	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )
+/*
+	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 2C_1C ) )
@@ -224,6 +239,7 @@ static INPUT_PORTS_START( gogomile )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+*/
 INPUT_PORTS_END
 
 /* Same as gogomile, but the default country is different and the coinage settings too. */
@@ -231,13 +247,13 @@ static INPUT_PORTS_START( gogomilej )
 	PORT_INCLUDE( gogomile )
 
 	PORT_MODIFY("DSW")		// $880000.w
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Language ) )	/* Default Language: Japanese */
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Language ) ) 	PORT_DIPLOCATION("SW1:5,6") /* Default Language: Japanese */
 	PORT_DIPSETTING(      0x0010, "Chinese" )
-	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) ) /* Only setting to give a "For use only in...." Copyright Notice */
+	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) )	/* Only setting to give a "For use only in...." Copyright Notice */
 	PORT_DIPSETTING(      0x0000, "Korean" )
 	PORT_DIPSETTING(      0x0020, DEF_STR( English ) )
 
-	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW2:3,4,5") 
 	PORT_DIPSETTING(      0x1800, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )
@@ -246,7 +262,8 @@ static INPUT_PORTS_START( gogomilej )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) ) /* Manual states these dips (6-8) are "Unused" */
+/*
+	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(      0xc000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 2C_1C ) )
@@ -255,6 +272,7 @@ static INPUT_PORTS_START( gogomilej )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+*/
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pbancho )
@@ -265,7 +283,7 @@ static INPUT_PORTS_START( pbancho )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_MODIFY("DSW")		// $880000.w
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easiest ) )	// 1
 	PORT_DIPSETTING(      0x0010, DEF_STR( Easy )    )	// 2
 	PORT_DIPSETTING(      0x001c, DEF_STR( Normal )  )	// 3
@@ -274,22 +292,22 @@ static INPUT_PORTS_START( pbancho )
 //  PORT_DIPSETTING(      0x0000, DEF_STR( Normal )  )  // 3
 //  PORT_DIPSETTING(      0x000c, DEF_STR( Normal )  )  // 3
 //  PORT_DIPSETTING(      0x0014, DEF_STR( Normal )  )  // 3
-	PORT_DIPNAME( 0x0060, 0x0060, "Lives (Vs Mode)" )
+	PORT_DIPNAME( 0x0060, 0x0060, "Lives (Vs Mode)" )	PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(      0x0000, "1" )	// 1 1
 	PORT_DIPSETTING(      0x0060, "2" )	// 2 3
 //  PORT_DIPSETTING(      0x0020, "2" ) // 2 3
 	PORT_DIPSETTING(      0x0040, "3" )	// 3 5
-	PORT_DIPNAME( 0x0080, 0x0080, "? Senin Mode ?" )
+	PORT_DIPNAME( 0x0080, 0x0080, "? Senin Mode ?" )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, "Allow Game Selection" )	// "unused" in the manual?
+	PORT_DIPNAME( 0x0200, 0x0200, "Allow Game Selection" )	PORT_DIPLOCATION("SW2:2") // "unused" in the manual?
 	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
 //  PORT_DIPSETTING(      0x0000, DEF_STR( No ) )   // Why cripple the game!?
-	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW2:3,4,5") 
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 2C_1C ) )
@@ -298,7 +316,7 @@ static INPUT_PORTS_START( pbancho )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(      0x6000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
