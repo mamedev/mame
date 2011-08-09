@@ -316,6 +316,7 @@ static TIMER_CALLBACK( stv_smpc_intback )
 		state->m_scu.ist |= (IRQ_SMPC);
 
 	/* clear hand-shake flag */
+	state->m_smpc_ram[0x5f] = 0x10;
 	state->m_smpc_ram[0x63] = 0x00;
 }
 
