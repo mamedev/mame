@@ -179,7 +179,8 @@ static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 	if(slot->RC != 15)
 	{
 		oct = slot->OCT;
-		if (oct & 8) oct |= -8;
+		if (oct & 8)
+			oct |= -8;
 
 		res = (oct+slot->RC)*2 + (slot->FN & 0x200 ? 1 : 0) + val*4;
 	}
@@ -189,25 +190,6 @@ static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 		res = 0;
 	else if(res > 63)
 		res = 63;
-
-	return res;
-}
-
-static int ymf278b_compute_rate_d(YMF278BSlot *slot, int val)
-{
-	int res;
-
-	// rate override with damping/pseudo reverb
-	if (slot->DAMP)
-		res = 63;
-	else if (slot->PRVB && slot->env_vol > ((6*8)<<23))
-	{
-		// pseudo reverb starts at -18dB (6 in voltab)
-		slot->env_prvb = 1;
-		res = 5;
-	}
-	else
-		res = ymf278b_compute_rate(slot, val);
 
 	return res;
 }
@@ -242,7 +224,31 @@ static UINT32 ymf278_compute_decay_rate(int num)
 	return samples;
 }
 
-static void ymf278b_compute_step(YMF278BSlot *slot)
+static UINT32 ymf278_compute_decay_env_vol_step(YMF278BSlot *slot, int val)
+{
+	int rate;
+	UINT32 res;
+
+	// rate override with damping/pseudo reverb
+	if (slot->DAMP)
+		rate = 56;
+	else if (slot->PRVB && slot->env_vol > ((6*8)<<23))
+	{
+		// pseudo reverb starts at -18dB (6 in voltab)
+		slot->env_prvb = 1;
+		rate = 5;
+	}
+	else
+		rate = ymf278b_compute_rate(slot, val);
+
+	if (rate < 4)
+		res = 0;
+	else res = (256U<<23) / ymf278_compute_decay_rate(rate);
+
+	return res;
+}
+
+static void ymf278b_compute_freq_step(YMF278BSlot *slot)
 {
 	unsigned int step;
 	int oct;
@@ -290,12 +296,8 @@ static void ymf278b_compute_envelope(YMF278BSlot *slot)
 		// Decay 1
 		if(slot->DL)
 		{
-			int rate = ymf278b_compute_rate_d(slot, slot->D1R);
-			LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g\n", slot->DL, slot->D1R, rate, ymf278_compute_decay_rate(rate)*1000.0));
-			if(rate<4)
-				slot->env_vol_step = 0;
-			else
-				slot->env_vol_step = ((slot->DL*8)<<23) / ymf278_compute_decay_rate(rate);
+			LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->DL, slot->D1R, ymf278b_compute_rate(slot, slot->D1R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D1R))*1000.0, slot->PRVB, slot->DAMP));
+			slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D1R);
 			slot->env_vol_lim = (slot->DL*8)<<23;
 			return;
 		}
@@ -306,12 +308,8 @@ static void ymf278b_compute_envelope(YMF278BSlot *slot)
 	if(slot->env_step == 2)
 	{
 		// Decay 2
-		int rate = ymf278b_compute_rate_d(slot, slot->D2R);
-		LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, current vol = %d\n", slot->D2R, rate, ymf278_compute_decay_rate(rate)*1000.0, slot->env_vol >> 23));
-		if(rate<4)
-			slot->env_vol_step = 0;
-		else
-			slot->env_vol_step = ((256U-slot->DL*8)<<23) / ymf278_compute_decay_rate(rate);
+		LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, , PRVB = %d, DAMP = %d, current vol = %d\n", slot->D2R, ymf278b_compute_rate(slot, slot->D2R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D2R))*1000.0, slot->PRVB, slot->DAMP, slot->env_vol >> 23));
+		slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D2R);
 		slot->env_vol_lim = 256U<<23;
 		return;
 	}
@@ -325,12 +323,8 @@ static void ymf278b_compute_envelope(YMF278BSlot *slot)
 	if(slot->env_step == 4)
 	{
 		// Release
-		int rate = ymf278b_compute_rate_d(slot, slot->RR);
-		LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g\n", slot->RR, rate, ymf278_compute_decay_rate(rate)*1000.0));
-		if(rate<4)
-			slot->env_vol_step = 0;
-		else
-			slot->env_vol_step = ((256U<<23)-slot->env_vol) / ymf278_compute_decay_rate(rate);
+		LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->RR, ymf278b_compute_rate(slot, slot->RR), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->RR))*1000.0, slot->PRVB, slot->DAMP));
+		slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->RR);
 		slot->env_vol_lim = 256U<<23;
 		return;
 	}
@@ -629,7 +623,10 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				slot->FN &= 0x380;
 				slot->FN |= (data>>1);
 				if (slot->active && data != chip->pcmregs[reg])
-					ymf278b_compute_step(slot);
+				{
+					ymf278b_compute_freq_step(slot);
+					ymf278b_compute_envelope(slot);
+				}
 				break;
 
 			case 2:
@@ -639,7 +636,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				slot->OCT = (data&0xf0)>>4;
 				if (slot->active && data != chip->pcmregs[reg])
 				{
-					ymf278b_compute_step(slot);
+					ymf278b_compute_freq_step(slot);
 					ymf278b_compute_envelope(slot);
 				}
 				break;
@@ -661,7 +658,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 					slot->env_prvb = 0;
 					slot->stepptr = 0;
 
-					ymf278b_compute_step(slot);
+					ymf278b_compute_freq_step(slot);
 					ymf278b_compute_envelope(slot);
 
 					LOG(("YMF278B: slot %2d wave %3d lfo=%d vib=%d ar=%d d1r=%d dl=%d d2r=%d rc=%d rr=%d am=%d\n", snum, slot->wave,slot->lfo, slot->vib, slot->AR, slot->D1R, slot->DL, slot->D2R, slot->RC, slot->RR, slot->AM));
