@@ -186,7 +186,7 @@ static int firstfile;			// first non-directory file
 
 static void cr_standard_return(UINT16 cur_status)
 {
-	cr1 = cur_status | 0x00; //options << 4 | repeat & 0xf
+	cr1 = cur_status | (playtype << 7) | 0x00; //options << 4 | repeat & 0xf
 	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track);
 	cr3 = (0x01<<8) | (cd_curfad>>16); //index & 0xff00
 	cr4 = cd_curfad;
@@ -255,20 +255,29 @@ static void cd_exec_command(running_machine &machine)
 				case 0:	// get total session info / disc end
 					cr3 = 0x0100 | tocbuf[(101*4)+1];
 					cr4 = tocbuf[(101*4)+2]<<8 | tocbuf[(101*4)+3];
+					cd_stat = CD_STAT_PAUSE;
+					cr1 = cd_stat;
+					cr2 = 0;
 					break;
 
 				case 1:	// get total session info / disc start
 					cr3 = 0x0100;	// sessions in high byte, session start in lower
 					cr4 = 0;
+					cd_stat = CD_STAT_PAUSE;
+					cr1 = cd_stat;
+					cr2 = 0;
 					break;
 
 				default:
+					/* TODO: Assault Suits Leynos 2 does spurious commands when does read file commands */
 					mame_printf_error("CD: Unknown request to Get Session Info %x\n", cr1 & 0xff);
+					cr1 = cd_stat;
+					cr2 = 0;
+					cr3 = 0;
+					cr4 = 0;
 					break;
 			}
-			cd_stat = CD_STAT_PAUSE;
-			cr1 = cd_stat;
-			cr2 = 0;
+
 			hirqreg |= (CMOK);
 			break;
 
@@ -290,8 +299,8 @@ static void cd_exec_command(running_machine &machine)
 				in_buffer = 0;
 				buffull = 0;
 				hirqreg &= 0xffe5;
+				cd_speed = (cr1 & 0x10) ? 1 : 2;
 			}
-			cd_speed = (cr1 & 0x10) ? 1 : 2;
 
 			hirqreg |= (CMOK|ESEL);
 			cr_standard_return(cd_stat);
@@ -383,7 +392,6 @@ static void cd_exec_command(running_machine &machine)
 			if (!(cr3 & 0x8000))	// preserve current position if bit 7 set
 			{
 				start_pos = ((cr1&0xff)<<16) | cr2;
-				//fadstoplay = ((cr3&0xff)<<16) | cr4;
 				end_pos = ((cr3&0xff)<<16) | cr4;
 
 				if (start_pos & 0x800000)
@@ -542,12 +550,6 @@ static void cd_exec_command(running_machine &machine)
 					break;
 			}
 			hirqreg |= CMOK|DRDY;
-			break;
-
-		case 0x2100:
-		case 0x2300:
-			popmessage("%08x %08x",cd_curfad,fadstoplay);
-			hirqreg |= (CMOK);
 			break;
 
 		case 0x3000:	// Set CD Device connection
@@ -1155,7 +1157,7 @@ static void cd_exec_command(running_machine &machine)
 
 			playtype = 1;
 
-			hirqreg |= (CMOK);
+			hirqreg |= (CMOK|EHST);
 
 			break;
 
@@ -1199,7 +1201,7 @@ TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 {
 	sh1_timer->adjust(attotime::from_hz(16667));
 
-	if(cmd_pending)
+	if(cmd_pending && (!(hirqreg & CMOK)))
 	{
 		cd_exec_command(timer.machine());
 		return;
@@ -1216,8 +1218,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 
 	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);
 
-	if (fadstoplay)
-		cd_playdata();
+	cd_playdata();
 
 	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
 		sector_timer->adjust(attotime::from_hz(75));	// 75 sectors / second = 150kBytes/second (cdda track ignores cd_speed setting)
@@ -1979,7 +1980,7 @@ static void cd_readTOC(void)
 	tocbuf[tocptr+11] = fad&0xff;
 }
 
-static partitionT *cd_filterdata(filterT *flt, int trktype)
+static partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 {
 	int match = 1, keepgoing = 2;
 	partitionT *filterprt = (partitionT *)NULL;
@@ -2057,6 +2058,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 			// reject sector if no match on either connector
 			if ((lastbuf == 0xff) || (keepgoing < 2))
 			{
+				*p_ok = 0;
 				return (partitionT *)NULL;
 			}
 
@@ -2074,6 +2076,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 	// did the allocation succeed?
 	if (filterprt->blocks[filterprt->numblks] == (blockT *)NULL)
 	{
+		*p_ok = 0;
 		return (partitionT *)NULL;
 	}
 
@@ -2120,6 +2123,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 	filterprt->size += filterprt->blocks[filterprt->numblks]->size;
 	filterprt->numblks++;
 
+	*p_ok = 1;
 	return filterprt;
 }
 
@@ -2130,7 +2134,6 @@ static partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok)
 
 	if ((cddevice != NULL) && (!buffull))
 	{
-		*p_ok = 1;
 		// find out the track's type
 		trktype = cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad-150));
 
@@ -2166,7 +2169,7 @@ static partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok)
 			}
 		}
 
-		return cd_filterdata(cddevice, trktype);
+		return cd_filterdata(cddevice, trktype, &*p_ok);
 	}
 
 	*p_ok = 0;

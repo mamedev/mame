@@ -713,7 +713,10 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(cd_transfer_flag)
 	{
 		int i;
-		state->m_scu.dst_add[dma_ch] <<= 1;
+		if((WORK_RAM_H(dma_ch)))
+			state->m_scu.dst_add[dma_ch] = 4;
+		else
+			state->m_scu.dst_add[dma_ch] <<= 1;
 
 		for (i = 0; i < state->m_scu.size[dma_ch];i+=state->m_scu.dst_add[dma_ch])
 		{
@@ -933,9 +936,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r, saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
-//  AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
-//  AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated

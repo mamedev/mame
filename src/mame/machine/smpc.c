@@ -211,11 +211,13 @@ static void smpc_master_on(running_machine &machine)
 	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static void smpc_slave_enable(running_machine &machine,UINT8 cmd)
+static TIMER_CALLBACK( smpc_slave_enable )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	device_set_input_line(state->m_slave, INPUT_LINE_RESET, cmd ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_slave, INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
+	state->m_smpc_ram[0x5f] = param + 0x02; //read-back for last command issued
+	state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
 }
 
 static void smpc_sound_enable(running_machine &machine,UINT8 cmd)
@@ -259,7 +261,7 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 	stv_vdp2_dynamic_res_change(machine);
 
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
-	smpc_slave_enable(machine,1);
+	device_set_input_line(state->m_slave, INPUT_LINE_RESET, ASSERT_LINE); // command also asserts slave cpu
 	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values */
 }
 
@@ -326,7 +328,7 @@ static TIMER_CALLBACK( intback_peripheral )
 	/* doesn't work? */
 	//pad_num = state->m_smpc.intback_stage - 1;
 
-	if(LOG_PAD_CMD) printf("%d\n",pad_num);
+	if(LOG_PAD_CMD) printf("%d\n",state->m_smpc.intback_stage - 1);
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	for(pad_num=0;pad_num<2;pad_num++)
@@ -354,9 +356,8 @@ static TIMER_CALLBACK( intback_peripheral )
 	else
 		state->m_scu.ist |= (IRQ_SMPC);
 
-	/* clear hand-shake flag */
-	state->m_smpc_ram[0x63] = 0x00;
-
+	state->m_smpc_ram[0x5f] = 0x10; /* callback for last command issued */
+	state->m_smpc_ram[0x63] = 0x00;	/* clear hand-shake flag */
 }
 
 static TIMER_CALLBACK( saturn_smpc_intback )
@@ -417,6 +418,7 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 		state->m_smpc.intback_stage = (state->m_smpc_ram[3] & 8) >> 3; // first peripheral
 		state->m_smpc.smpcSR = 0x40 | state->m_smpc.intback_stage << 5;
 		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
+		state->m_smpc_ram[0x5f] = 0x10;
 
 		if(!(state->m_scu.ism & IRQ_SMPC))
 			device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
@@ -551,7 +553,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 			case 0x02:
 			case 0x03:
 				if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
-				smpc_slave_enable(space->machine(),(data & 1));
+				space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
 				break;
 			case 0x06:
 			case 0x07:
@@ -598,9 +600,11 @@ WRITE8_HANDLER( stv_SMPC_w )
 		}
 
 		// we've processed the command, clear status flag
-		state->m_smpc_ram[0x5f] = data; //read-back command
-		if(data != 0x10)
+		if(data != 0x10 && data != 0x02 && data != 0x03)
+		{
+			state->m_smpc_ram[0x5f] = data; //read-back command
 			state->m_smpc_ram[0x63] = 0x00;
+		}
 		/*TODO:emulate the timing of each command...*/
 	}
 }
@@ -689,7 +693,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
 				space->machine().scheduler().timer_set(attotime::from_usec(200), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
 				state->m_smpc_ram[0x1f] = 0x10;
-				state->m_smpc_ram[0x63] = 0x01; //TODO: set hand-shake flag?
+				//state->m_smpc_ram[0x63] = 0x01; //TODO: set hand-shake flag?
 			}
 		}
 	}
@@ -731,7 +735,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 			case 0x02:
 			case 0x03:
 				if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
-				smpc_slave_enable(space->machine(),data & 1);
+				space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
 				break;
 			case 0x06:
 			case 0x07:
@@ -791,7 +795,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 		}
 
 		// we've processed the command, clear status flag
-		if(data != 0x10)
+		if(data != 0x10 && data != 2 && data != 3)
 		{
 			state->m_smpc_ram[0x5f] = data; //read-back for last command issued
 			state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag

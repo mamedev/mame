@@ -5579,10 +5579,13 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 			if(!STV_VDP2_EXLTEN)
 			{
 				/* TODO: handle various h/v settings. */
-				state->m_vdp2.h_count = space->machine().primary_screen->hpos() & 0x3ff;
-				state->m_vdp2.v_count = space->machine().primary_screen->vpos() & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
-				/* latch flag */
-				state->m_vdp2.exltfg |= 1;
+				if(!space->debugger_access())
+				{
+					state->m_vdp2.h_count = space->machine().primary_screen->hpos() & 0x3ff;
+					state->m_vdp2.v_count = space->machine().primary_screen->vpos() & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
+					/* latch flag */
+					state->m_vdp2.exltfg |= 1;
+				}
 			}
 
 			break;
@@ -5866,6 +5869,9 @@ static UINT8 get_odd_bit(running_machine &machine)
 	cur_v = machine.primary_screen->vpos();
 
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
+		return 1;
+
+	if(STV_VDP2_LSMD == 0) // same for non-interlace mode
 		return 1;
 
 	if(cur_v % 2)
