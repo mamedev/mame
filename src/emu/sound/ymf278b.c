@@ -151,6 +151,17 @@ INLINE YMF278BChip *get_safe_token(device_t *device)
 	return (YMF278BChip *)downcast<legacy_device_base *>(device)->token();
 }
 
+INLINE UINT8 ymf278b_read_memory(YMF278BChip *chip, UINT32 offset)
+{
+	if (offset >= chip->romsize)
+	{
+		// logerror("YMF278B:  Memory read overflow %x\n", offset);
+		return 0;
+	}
+	return chip->rom[offset];
+}
+
+
 static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 {
 	int res, oct;
@@ -220,6 +231,7 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 			// immediate
 			slot->env_vol = 0;
 			slot->env_vol_lim = 256U<<23;
+			// ..fall through
 		}
 		else if (rate<4)
 		{
@@ -256,6 +268,7 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 			slot->env_vol_lim = (slot->DL*8)<<23;
 			return;
 		}
+		// ..fall through
 	}
 	if(slot->env_step == 2)
 	{
@@ -278,12 +291,9 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	if(slot->env_step == 3)
 	{
 		// Decay 2 reached -96dB
-		LOG(("YMF278B: Voice cleared because of decay 2\n"));
-		slot->env_vol = 256U<<23;
-		slot->env_vol_step = 0;
-		slot->env_vol_lim = 0;
-		slot->active = 0;
-		return;
+		LOG(("YMF278B: Voice cleared because of decay 2 - "));
+		slot->env_step = 5;
+		// ..fall through
 	}
 	if(slot->env_step == 4)
 	{
@@ -313,13 +323,6 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 		slot->active = 0;
 		return;
 	}
-}
-
-INLINE UINT8 ymf278b_read_sample(const UINT8* buffer, UINT32 buffersize, UINT32 offset)
-{
-	if (offset >= buffersize)
-		return 0;
-	return buffer[offset];
 }
 
 static STREAM_UPDATE( ymf278b_pcm_update )
@@ -362,21 +365,21 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 				switch (slot->bits)
 				{
 					case 8:
-						sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>16))<<8;
+						sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
 					case 12:
 						if (slot->stepptr & 1)
-							sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
-								(ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
+							sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
+								(ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
-							sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3)<<8 |
-								(ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
+							sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3)<<8 |
+								(ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
 					case 16:
-						sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
-							ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + ((slot->stepptr>>16)*2)+1);
+						sample = ymf278b_read_memory(chip, slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
+							ymf278b_read_memory(chip, slot->startaddr + ((slot->stepptr>>16)*2)+1);
 						break;
 				}
 
@@ -548,7 +551,9 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 			case 0:
 			{
 				attotime period;
-				const UINT8 *p;
+				UINT32 offset;
+				UINT8 p[12];
+				int i;
 
 				slot->wave &= 0x100;
 				slot->wave |= data;
@@ -562,9 +567,11 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				chip->timer_ld->adjust(period);
 
 				if(slot->wave < 384 || !chip->wavetblhdr)
-					p = chip->rom + (slot->wave * 12);
+					offset = slot->wave * 12;
 				else
-					p = chip->rom + chip->wavetblhdr*0x80000 + ((slot->wave - 384) * 12);
+					offset = chip->wavetblhdr*0x80000 + (slot->wave - 384) * 12;
+				for (i = 0; i < 12; i++)
+					p[i] = ymf278b_read_memory(chip, offset+i);
 
 				switch (p[0]&0xc0)
 				{
@@ -582,7 +589,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 						break;
 				}
 
-				slot->lfo = (p[7] >> 2) & 7;
+				slot->lfo = (p[7] >> 3) & 7;
 				slot->vib = p[7] & 7;
 				slot->AR = p[8] >> 4;
 				slot->D1R = p[8] & 0xf;
@@ -674,6 +681,10 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 			case 9:
 				slot->AM = data & 0x7;
 				break;
+
+			default:
+				logerror("YMF278B:  Port C write %02x, %02x\n", reg, data);
+				break;
 		}
 	}
 	else
@@ -691,6 +702,9 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				chip->memmode = data&3;
 				break;
 
+			case 0x03:
+			case 0x04:
+				break;
 			case 0x05:
 				// set memory address
 				chip->memadr = (chip->pcmregs[3] & 0x3f) << 16 | chip->pcmregs[4] << 8 | data;
@@ -701,6 +715,9 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				chip->memadr = (chip->memadr + 1) & 0x3fffff;
 				break;
 
+			case 0x07:
+				break; // unused
+
 			case 0xf8:
 				chip->fm_l = data & 0x7;
 				chip->fm_r = (data>>3)&0x7;
@@ -709,6 +726,10 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 			case 0xf9:
 				chip->pcm_l = data & 0x7;
 				chip->pcm_r = (data>>3)&0x7;
+				break;
+
+			default:
+				logerror("YMF278B:  Port C write %02x, %02x\n", reg, data);
 				break;
 		}
 	}
@@ -773,6 +794,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 READ8_DEVICE_HANDLER( ymf278b_r )
 {
 	YMF278BChip *chip = get_safe_token(device);
+	UINT8 ret = 0;
 
 	switch (offset)
 	{
@@ -784,23 +806,26 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			if (chip->exp & 2)
 				newbits = (chip->status_ld << 1) | chip->status_busy;
 
-			return newbits | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+			ret = newbits | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+			break;
 		}
 
-		// PCM/mixer
+		// PCM/mixer (FM regs can't be read)
 		case 5:
 			switch (chip->port_C)
 			{
 				// special cases
 				case 2:
-					return (chip->pcmregs[chip->port_C] & 0x1f) | 0x20; // device ID in upper bits
+					ret = (chip->pcmregs[chip->port_C] & 0x1f) | 0x20; // device ID in upper bits
+					break;
 				case 6:
-					logerror("YMF278B:  Read memory data at %06x\n", chip->memadr); // memory data (ignored, we don't support RAM)
+					ret = ymf278b_read_memory(chip, chip->memadr);
 					chip->memadr = (chip->memadr + 1) & 0x3fffff;
 					break;
 
 				default:
-					return chip->pcmregs[chip->port_C];
+					ret = chip->pcmregs[chip->port_C];
+					break;
 			}
 			break;
 
@@ -809,7 +834,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			break;
 	}
 
-	return 0;
+	return ret;
 }
 
 
@@ -829,6 +854,7 @@ static DEVICE_RESET( ymf278b )
 	ymf278b_C_w(chip, 0xf8, 0x1b, 1);
 
 	chip->port_A = chip->port_B = chip->port_C = 0;
+	chip->memadr = 0;
 
 	// init/silence channels
 	for (i = 0; i < 24 ; i++)
