@@ -1822,6 +1822,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
+	$(DRIVERS)/astrafr.o \
 
 
 

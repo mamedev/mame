@@ -13080,6 +13080,36 @@ pr_walls		// Wall Street (Project)
 pr_whlft		// Wheel Of Fortune (Project)
 pr_wldkn		// Wild Kings (Project)
 
+/* Astra */
+
+as_party		// Party Time (Astra)
+as_partya		//
+as_partyb		//
+as_partyc		//
+as_partyd		//
+as_letsp		// Let's Party (Astra)
+as_topsl		// Top Slot (Astra)
+as_topsla		//
+as_topslb		//
+as_topslc		//
+as_topsld		//
+as_bigtm		// Big Time (Astra)
+as_acp			// unknown ACP (Astra)
+as_celeb		// Celebration (Astra)
+as_celeba		//
+as_celebb		//
+as_cshah		// Cash Ahoi (Lowen)
+as_srb			// Super Ring a Bell (Astra)
+as_srba			//
+as_srbb			//
+as_srbc			//
+as_srbd			//
+as_srbe			//
+as_hc			// Hokey Cokey (Astra)
+as_hca			//
+as_hcb			//
+as_hcc			//
+as_hcd			//
 
 // Leisure Ent.
 roul			// (c) 1990
