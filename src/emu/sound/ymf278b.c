@@ -55,6 +55,12 @@
    June 4, 2003 -  Changed to dual-license with LGPL for use in OpenMSX.
                    OpenMSX contributed a bugfix where looped samples were
             not being addressed properly, causing pitch fluctuation.
+   ......
+
+   TODO:
+   - accurate timing of envelopes
+   - LFO (vibrato, tremolo)
+   - integrate YMF262
 */
 
 #include "emu.h"
@@ -131,8 +137,8 @@ typedef struct
 	UINT32 romsize;
 	int clock;
 
-	INT32 volume[256*4];			// precalculated attenuation values with some marging for enveloppe and pan levels
-	int pan_left[16], pan_right[16];	// pan volume offsets
+	INT32 volume[256*4];			// precalculated attenuation values with some margin for envelope and pan levels
+	int pan_left[16],pan_right[16];	// pan volume offsets
 	INT32 mix_level[8];
 
 	sound_stream * stream;
@@ -235,9 +241,14 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 		slot->env_step++;
 		if(slot->DL)
 		{
-			int rate = ymf278b_compute_rate(slot, slot->D1R);
-			LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g\n", slot->DL, slot->D1R, rate, ymf278_compute_decay_rate(rate)*1000.0));
+			int rate;
+			// rate override with damping/pseudo reverb
+			// NOTE: pseudo reverb starts at 0dB here, but should start at -18dB (which is actually between D1 and D2)
+			if (slot->DAMP) rate = 63;
+			else if (slot->PRVB) rate = 5;
+			else rate = ymf278b_compute_rate(slot, slot->D1R);
 
+			LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g\n", slot->DL, slot->D1R, rate, ymf278_compute_decay_rate(rate)*1000.0));
 			if(rate<4)
 				slot->env_vol_step = 0;
 			else
@@ -249,7 +260,11 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	if(slot->env_step == 2)
 	{
 		// Decay 2
-		int rate = ymf278b_compute_rate(slot, slot->D2R);
+		int rate;
+		// rate override with damping/pseudo reverb
+		if (slot->DAMP) rate = 63;
+		else if (slot->PRVB) rate = 5;
+		else rate = ymf278b_compute_rate(slot, slot->D2R);
 
 		LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, current vol = %d\n", slot->D2R, rate, ymf278_compute_decay_rate(rate)*1000.0, slot->env_vol >> 23));
 		if(rate<4)
@@ -273,7 +288,11 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	if(slot->env_step == 4)
 	{
 		// Release
-		int rate = ymf278b_compute_rate(slot, slot->RR);
+		int rate;
+		// rate override with damping/pseudo reverb
+		if (slot->DAMP) rate = 63;
+		else if (slot->PRVB) rate = 5;
+		else rate = ymf278b_compute_rate(slot, slot->RR);
 
 		LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g\n", slot->RR, rate, ymf278_compute_decay_rate(rate)*1000.0));
 		if(rate<4)
@@ -598,7 +617,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				break;
 			case 4:
 				slot->pan = data&0xf;
-				slot->DAMP = data&0x40;
+				slot->DAMP = (data&0x40)>>6;
 				if (data & 0x80)
 				{
 					unsigned int step;
@@ -944,7 +963,7 @@ static DEVICE_START( ymf278b )
 		chip->pan_right[i] = i < 8 ? 0 : i < 10 ? 256 : (16-i)*8;
 	}
 
-	// Mixing levels, units are -3dB, and add some marging to avoid clipping
+	// Mixing levels, units are -3dB, and add some margin to avoid clipping
 	for(i=0; i<7; i++)
 		chip->mix_level[i] = chip->volume[8*i+8];
 	chip->mix_level[7] = 0;
