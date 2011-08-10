@@ -1225,7 +1225,7 @@ TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 {
 	sh1_timer->adjust(attotime::from_hz(16667));
 
-	if(cmd_pending && (!(hirqreg & CMOK)))
+	if((cmd_pending == 0xf) && (!(hirqreg & CMOK)))
 	{
 		cd_exec_command(timer.machine());
 		return;
@@ -1629,6 +1629,11 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x000a:
 //              CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine.describe_context(), hirqreg, data, hirqreg & data))
 		hirqreg &= data;
+		if(!(hirqreg & CMOK))
+		{
+			sh1_timer->reset();
+			sh1_timer->adjust(attotime::from_hz(16667));
+		}
 		return;
 	case 0x000c:
 	case 0x000e:
@@ -1640,24 +1645,25 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 //              CDROM_LOG(("WW CR1: %04x\n", data))
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
-		cmd_pending = 1;
+		cmd_pending |= 1;
 		break;
 	case 0x001c:
 	case 0x001e:
 //              CDROM_LOG(("WW CR2: %04x\n", data))
 		cr2 = data;
+		cmd_pending |= 2;
 		break;
 	case 0x0020:
 	case 0x0022:
 //              CDROM_LOG(("WW CR3: %04x\n", data))
 		cr3 = data;
+		cmd_pending |= 4;
 		break;
 	case 0x0024:
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
-		sh1_timer->reset();
-		sh1_timer->adjust(attotime::from_hz(16667));
+		cmd_pending |= 8;
 		break;
 	default:
 		CDROM_LOG(("CD: WW %08x %04x\n", addr, data))
