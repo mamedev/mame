@@ -253,15 +253,15 @@ static UINT32 ymf278_compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 
 static void ymf278b_compute_freq_step(YMF278BSlot *slot)
 {
-	unsigned int step;
+	UINT32 step;
 	int oct;
 
 	oct = slot->octave;
 	if(oct & 8)
 		oct |= -8;
 
-	step = (slot->F_NUMBER | 1024) << (oct + 7);
-	slot->step = step / 4;
+	step = (slot->F_NUMBER | 1024) << (oct + 8);
+	slot->step = step >> 3;
 }
 
 static void ymf278b_compute_envelope(YMF278BSlot *slot)
