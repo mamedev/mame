@@ -626,6 +626,12 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				// retrigger if key is on
 				if (slot->KEY_ON)
 					ymf278b_retrigger_note(slot);
+				else if (slot->active)
+				{
+					// deactivate channel
+					slot->env_step = 5;
+					ymf278b_compute_envelope(slot);
+				}
 
 				break;
 			}
@@ -670,7 +676,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 			case 4:
 				slot->CH = (data&0x10)>>4;
 				// CH bit note: output to DO1 pin (1) or DO2 pin (0), this may
-				// silence the channel depending on how it's wired up on game PCB.
+				// silence the channel depending on how it's wired up on the PCB.
 				// For now, it's always enabled.
 				// (bit 5 (LFO reset) is also not hooked up yet)
 
@@ -689,14 +695,11 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 
 					ymf278b_retrigger_note(slot);
 				}
-				else
+				else if (slot->active)
 				{
-					if (slot->active)
-					{
-						LOG(("YMF278B: slot %2d off - ", snum));
-						slot->env_step = 4;
-						ymf278b_compute_envelope(slot);
-					}
+					// release
+					slot->env_step = 4;
+					ymf278b_compute_envelope(slot);
 				}
 				slot->KEY_ON = (data&0x80)>>7;
 				break;
