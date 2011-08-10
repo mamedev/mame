@@ -8,12 +8,21 @@
 
  TODO:
 
- - finish 8275 CRT emulation
- - fix gfx glitches
+ - finish 8275 CRT emulation, split off as device
+ - fix gfx glitches and banking
  - correct colors
  - DIPs
  - layout(lamps)
  - NVRAM
+
+Notes: at least on dwarf's den hardware, the current card set/dwarf set can be swapped
+by pushing the buttons in this order: 1-4-1-4-2-1-3-5 ('zvzvxzcb' in mame)
+Doing this with the default dipswitches results in an error; The code needs to be investigated.
+Setting all dipswitches active and dipswitch 10 inactive allows game/gfx switching to work, but gfx
+are all corrupt/scrambled.
+Also the dipswitches are active low/inverted, since on the machine this was tested on dipswitches 2,3,5,6,8 were ON, and 1,4 and 7 were OFF. 
+There are only 8 dipswitches populated on the Dwarf's den boards seen so far.
+
 
 
 DD hardware is weird and complicated. There's no dedicated DMA controller
@@ -34,23 +43,22 @@ Gfx rom bank (6d/6b or 6a/6c pair) is switched by timer circuit - few 74161 coun
 Current implementations is just a guess, and doesn't work on test screen.
 
 
-                                               ______________
-  _____________________________________________||||||||||||||_______________________________________
-  |         1         2         3         4         5         6         7         8         9      |
+  __________________________________________   ___________   _______________________________________
+  |         1         2         3         4 |_|||||||||||||_| 6         7         8         9      |
   |                                                                                      ________  |
   ||| L                                                   SN7445N74  74LS224N  7404-PC   |9L    |  |
 D |||                                                                                    |______|  |
   |||                                                                   _____________    ________  |
-  ||| K                         BATTERY         16-1-471  7400-PC       | M5L8085AP |    |9K    |  |
+  ||| K  ULN2803                BATTERY         16-1-471  7400-PC       | M5L8085AP |    |9K    |  |
   |                                                                     |___________|    |______|  |
   |                                                                                      ________  |
-  ||| J           74LS273NA                     --------  --------             74LS373N  |9J    |  |
+  ||| J  ULN2803  74LS273NA                     MC14011   MC14011              74LS373N  |9J    |  |
 C |||                                                                                    |______|  |
-  |||                                                                                    ________  |
-  ||| H           74LS273NA  SN7442AN  74107N   74161N    SN7432N    M3-7602-5 MDP1603   |9H    |  |
+  |||                                                                _______             ________  |
+  ||| H  ULN2803  74LS273NA  SN7442AN  74107N   74161N    SN7432N    |7H   |   MDP1603   |9H    |  |
   |                                                                                      |______|  |
   |                                                                                                |
-  ||| F           74LS273NA  7408N     7486N    OSC       7404                 MM2114N   MM2114N   |
+  ||| F  ULN2803  74LS273NA  7408N     7486N    OSC       7404                 MM2114N   MM2114N   |
 P |||                                                                                              |
   |||                                  _____________                                               |
   ||| E                      SN7442AN  |iP8275     |      7400       74LS244N  MM2114N   MM2114N   |
@@ -62,7 +70,7 @@ B |||                                  |___________|      |______|              
   ||| C 16-1-471  MDP1603    7414      7414     7400      |6C    |   |7C   |   M3-6514-9 M3-6514-9 |
   |                                                       |______|                                 |
   |                                                       ________   __________________            |
-  ||| B SN74175N             74174N    74LS374N 74LS374N  |6B    |   |                |  6-1-471   |
+  ||| B SN74175N             74174N    74LS374N 74LS374N  |6B    |   |        (74LS257N) 6-1-471   |
 A |||                                                     |______|   |                |            |
   |||                        _______                      ________   |    ______      |            |
   ||| A DN74505N             |3A   |   74153N   74153N    |6A    |   |    LM324N      |  DIP-SW    |
@@ -70,14 +78,29 @@ A |||                                                     |______|   |          
   |                                                                  |________________|            |
   |________________________________________________________________________________________________|
 
-  OSC = 10.595 MHz
-  D,C,A = 20-pin connectors
-  B = 26-pin connector
-  P = 12-pin connector (seems power)
-  Edge connector (top) is not JAMMA
-  3A (63S080N) dumped as 82S123
+  OSC = 10.595 MHz (OR 10.738635 on Dwarf's den)
+  A = 20-pin connector for button panel
+  B = 26-pin connector for display
+  P = 12-pin connector for power, see pinout below
+  C = 20-pin connector for button lamps (connects to darlingtons at 1J and 1K)
+  D = 20-pin connector for coins/tilt/service?/hopper/payout?/key?
+  Edge connector (top) is not JAMMA (connects to cpu pins; debug connector?)
+  3A (63S080N or 74S188) dumped as 82S123
   7C = non populated
+  7H (M3-7602-5 or 74S188) dumped as 82S123
 
+  Power connector pinout:
+  ...-------------pcb edge----------------...
+         1 2 3 4 5 6 7 8 9 10 11 12
+1,2 = +5VDC
+3,4 = COM-2803 (only used by the four ULN2803 Darlington Arrays and connectors C and D)
+5,6 = N/C
+7 = +20VDC (goes to darlington at 1F)
+8,10 = GND
+9 = ? (may be composite aud/vid out or something to do with audio amp or vol control)
+11,12 = GND-2803 (only used by the four ULN2803 Darlington Arrays and connectors C and indirectly D)
+
+  
 =====================================================================================================
 (quarterh, quarterhb)
 
@@ -1195,7 +1218,7 @@ static DRIVER_INIT(qc)
 
 }
 
-GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Dwarfs Den",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Draw Poker III / Dwarfs Den",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1983, quarterh, 0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1983, quarterha, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1983, quarterhb, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
