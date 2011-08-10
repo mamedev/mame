@@ -244,7 +244,8 @@ static UINT32 ymf278_compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 
 	if (rate < 4)
 		res = 0;
-	else res = (256U<<23) / ymf278_compute_decay_rate(rate);
+	else
+		res = (256U<<23) / ymf278_compute_decay_rate(rate);
 
 	return res;
 }
@@ -370,16 +371,18 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 				{
 					slot->stepptr = slot->stepptr - slot->endaddr + slot->loopaddr;
 					if (slot->stepptr >= slot->endaddr)
-						slot->stepptr = slot->loopaddr;
+						slot->stepptr = slot->loopaddr; // loop overflow
 				}
 
 				switch (slot->bits)
 				{
-					case 8:
+					// 8 bit
+					case 0:
 						sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
-					case 12:
+					// 12 bit
+					case 1:
 						if (slot->stepptr & 1)
 							sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
 								(ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
@@ -388,9 +391,15 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 								(ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
-					case 16:
+					// 16 bit
+					case 2:
 						sample = ymf278b_read_memory(chip, slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
 							ymf278b_read_memory(chip, slot->startaddr + ((slot->stepptr>>16)*2)+1);
+						break;
+
+					// ?? bit, effect is unknown, datasheet says it's prohibited
+					case 3:
+						sample = 0;
 						break;
 				}
 
@@ -595,22 +604,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				for (i = 0; i < 12; i++)
 					p[i] = ymf278b_read_memory(chip, offset+i);
 
-				switch (p[0]&0xc0)
-				{
-					case 0:
-						slot->bits = 8;
-						break;
-					case 0x40:
-						slot->bits = 12;
-						break;
-					case 0x80:
-						slot->bits = 16;
-						break;
-					case 0xc0:
-						// prohibited, effect unknown
-						break;
-				}
-
+				slot->bits = (p[0]&0xc0)>>6;
 				slot->startaddr = (p[2] | (p[1]<<8) | ((p[0]&0x3f)<<16));
 				slot->loopaddr = (p[4]<<16) | (p[3]<<24);
 				slot->endaddr = (p[6]<<16) | (p[5]<<24);
