@@ -370,10 +370,7 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 				{
 					slot->stepptr = slot->stepptr - slot->endaddr + slot->loopaddr;
 					if (slot->stepptr >= slot->endaddr)
-					{
-						logerror("YMF278B:  Sample loop overflow\n");
-						// note: if the step is bigger than the loop, sample will become garbage but continue anyway!
-					}
+						slot->stepptr = slot->loopaddr;
 				}
 
 				switch (slot->bits)
