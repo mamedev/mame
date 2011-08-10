@@ -13110,6 +13110,151 @@ as_hca			//
 as_hcb			//
 as_hcc			//
 as_hcd			//
+as_big10		// Big 10 (Astra)
+as_big10a		//
+as_big10b		//
+as_big10c		//
+as_big10d		//
+as_big15		// Big 16 (Astra)
+as_bigcs		// Big Cash (Astra)
+as_bigcsa		//
+as_bbr			// Bullion Bars (Astra)
+as_bbra			//
+as_bbrb			//
+as_bbrc			//
+as_bbrd			//
+as_bbre			//
+as_bbrf			//
+as_dblcs		// Double Cash (Astra)
+as_dblcsa		//
+as_dblcsb		//
+as_dblcsc		//
+as_dblcsd		//
+as_dblcse		//
+as_dblcsf		//
+as_dblcsg		//
+as_dblcsh		//
+as_fortn		// Fortune Teller (Astra)
+as_gof			// Game Of Fortune (Lowen)
+as_hog			// Hearts Of Gold (Astra)
+as_hxr			// Hot Cross Run (Astra)
+as_hr			// Hot Reel (Astra)
+
+as_djp			// Double Jackpot (Astra)
+as_djpa			//
+as_djpb			//
+as_cshcs		// Cash Castle (Lowen)
+as_colmn		// Colour of Money (Astra)
+as_colmna		//
+as_colmnb		//
+as_colmnc		//
+as_colmnd		//
+as_jackb		// Jackpot Bell
+as_jpx			// Jackpot X
+as_jpxa			//
+as_jpxb			//
+as_jolly		// Jolly Roger
+as_jmpj			// Jumping Jackpots
+as_jmpja		//
+as_jjive		// Jungle Jive
+as_jjivea		// 
+as_jjiveb		// 
+as_jjivec		// 
+as_jjived		// 
+as_jjivee		// 
+as_jjivef		// 
+as_jjiveg		// 
+as_kingc		// King Cash
+as_kingca		//
+as_koc			// King Of Clubs
+as_koca			//
+as_lbt			// Little Big 10
+as_lbta			//
+as_ldl			//
+as_ldla			//
+as_ldlb			//
+as_ldlc			//
+as_ldld			//
+as_ldle			//
+as_mp			//
+as_mp2			//
+as_otr			//
+as_otra			//
+as_ptf			//
+as_ptfa			//
+as_ptfb			//
+as_pia			//
+as_piaa			//
+as_piab			//
+as_pharg		//
+as_pharga		//
+as_phargb		//
+as_phargc		//
+as_phargd		//
+as_pharge		//
+as_pb			//
+as_rtr			//
+as_rtra			//
+as_rtrb			//
+as_rtrc			//
+as_rtrd			//
+as_rtre			//
+as_rtrf			//
+as_rtrg			//
+as_rtrh			//
+as_rab			//
+as_raba			//
+as_rabb			//
+as_rabc			//
+as_rbg			//
+as_rbga			//
+as_rbgb			//
+as_rbgc			//
+as_rbgd			//
+as_rbge			//
+as_rbglo		//
+as_rox			//
+as_csv			//
+as_sltcl		//
+as_stp			//
+as_stpa			//
+as_stpb			//
+as_siu			//
+as_siua			//
+as_sld			//
+as_slda			//
+as_sldb			//
+as_sldc			//
+as_sldd			//
+as_slde			//
+as_tem			//
+as_tema			//
+as_tbl			//
+as_tbla			//
+as_tblb			//
+as_tblc			//
+as_tbld			//
+as_tble			//
+as_td			//
+as_twp			//
+as_twpa			//
+as_vn			//
+as_vcv			//
+as_vcva			//
+as_vcvb			//
+as_vcvc			//
+as_vcvd			//
+as_vcve			//
+as_ww			//
+as_wwa			//
+as_wwb			//
+as_wwc			//
+as_wwd			//
+as_wwe			//
+as_ws			//
+
+
+
 
 // Leisure Ent.
 roul			// (c) 1990
