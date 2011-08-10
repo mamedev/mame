@@ -384,7 +384,7 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 					// 12 bit
 					case 1:
-						if (slot->stepptr & 1)
+						if (slot->stepptr & 0x10000)
 							sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
 								(ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
