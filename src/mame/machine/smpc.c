@@ -268,10 +268,15 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 static TIMER_CALLBACK( stv_smpc_intback )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	system_time systime;
-	machine.base_datetime(systime);
 
 	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+
+	{
+		int i;
+
+		for(i=0;i<7;i++)
+			state->m_smpc_ram[0x23+i*2] = state->m_smpc.rtc_data[i];
+	}
 
 	state->m_smpc_ram[0x31]=0x00;  //?
 
@@ -364,21 +369,18 @@ static TIMER_CALLBACK( intback_peripheral )
 static TIMER_CALLBACK( saturn_smpc_intback )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	system_time systime;
-	machine.base_datetime(systime);
 
 	if(state->m_smpc_ram[1] != 0)
 	{
 		{
 			state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 
-			state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
-		   	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
-			state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-		   	state->m_smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
-		   	state->m_smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
-		   	state->m_smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
-		   	state->m_smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
+			{
+				int i;
+
+				for(i=0;i<7;i++)
+					state->m_smpc_ram[0x23+i*2] = state->m_smpc.rtc_data[i];
+			}
 
 			state->m_smpc_ram[0x31]=0x00;  //?
 
@@ -446,22 +448,19 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 static void smpc_rtc_write(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	state->m_smpc_ram[0x2f] = state->m_smpc_ram[0x0d];
-	state->m_smpc_ram[0x2d] = state->m_smpc_ram[0x0b];
-	state->m_smpc_ram[0x2b] = state->m_smpc_ram[0x09];
-	state->m_smpc_ram[0x29] = state->m_smpc_ram[0x07];
-	state->m_smpc_ram[0x27] = state->m_smpc_ram[0x05];
-	state->m_smpc_ram[0x25] = state->m_smpc_ram[0x03];
-	state->m_smpc_ram[0x23] = state->m_smpc_ram[0x01];
+	int i;
+
+	for(i=0;i<7;i++)
+		state->m_smpc.rtc_data[i] = state->m_smpc_ram[0x01+i*2];
 }
 
 static void smpc_memory_setting(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	state->m_smpc.SMEM[0] = state->m_smpc_ram[1];
-	state->m_smpc.SMEM[1] = state->m_smpc_ram[3];
-	state->m_smpc.SMEM[2] = state->m_smpc_ram[5];
-	state->m_smpc.SMEM[3] = state->m_smpc_ram[7];
+	int i;
+
+	for(i=0;i<4;i++)
+		state->m_smpc.SMEM[i] = state->m_smpc_ram[0x01+i*2];
 }
 
 static void smpc_nmi_req(running_machine &machine)

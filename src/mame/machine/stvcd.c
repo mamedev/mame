@@ -605,7 +605,6 @@ static void cd_exec_command(running_machine &machine)
 			break;
 
 		case 0x4200:	// Set Filter Subheader conditions
-		case 0x4300:    // (mirror for Astal)
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
@@ -623,9 +622,22 @@ static void cd_exec_command(running_machine &machine)
 			}
 			break;
 
+		case 0x4300:    // Get Filter Subheader conditions
+			{
+				UINT8 fnum = (cr3>>8)&0xff;
+
+				CDROM_LOG(("%s:CD: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine.describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4))
+
+				cr1 = cd_stat | (filters[fnum].chan & 0xff);
+				cr2 = (filters[fnum].smmask << 8) | (filters[fnum].cimask & 0xff);
+				cr3 = filters[fnum].fid;
+				cr4 = (filters[fnum].smval << 8) | (filters[fnum].cival & 0xff);
+
+				hirqreg |= (CMOK|ESEL);
+			}
+			break;
 
 		case 0x4400:	// Set Filter Mode
-		case 0x4500:    // (mirror for Astal)
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 				UINT8 mode = (cr1 & 0xff);
@@ -643,6 +655,18 @@ static void cd_exec_command(running_machine &machine)
 				CDROM_LOG(("%s:CD: Set Filter Mode filt %x mode %x\n", machine.describe_context(), fnum, mode))
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
+			}
+			break;
+
+		case 0x4500:    // Get Filter Mode
+			{
+				UINT8 fnum = (cr3>>8)&0xff;
+
+				cr1 = cd_stat | (filters[fnum].mode & 0xff);
+				cr2 = 0;
+				cr3 = 0;
+				cr4 = 0;
+				hirqreg |= (CMOK|ESEL);
 			}
 			break;
 

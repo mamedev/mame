@@ -14,14 +14,6 @@ Notes:
 -Memo: Some tests done on the original & working PCB,to be implemented:
  -The AD-Stick returns 0x00 or a similar value.
  -The Ports E,F & G must return 0xff
- -The regular BIOS tests (Memory Test) changes his background color at some point to
-  several gradients of red,green and blue.Current implementation remains black.I dunno
-  if this is a framebuffer write or a funky transparency issue (i.e TRANSPARENT_NONE
-  should instead show the back layer).
- -RBG0 rotating can be checked on the "Advanced Test" menu thru the VDP1/VDP2 check.
-  It rotates clockwise IIRC.Also the ST-V logo when the game is in Multi mode rotates too.
- -The MIDI communication check fails even on a ST-V board,somebody needs to check if there
-  is a MIDI port on the real PCB...
 
 TODO:
 (Main issues)
@@ -30,23 +22,21 @@ TODO:
 - The Cart-Dev mode hangs even with the -dev bios,I would like to see what it does on the real HW.
 - IC13 games on the bios dev doesn't even load the cartridge / crashes the emulation at start-up,
   rom rearrange needed?
-- finish the DSP core.
+- SCU DSP still has its fair share of issues, it also needs to be converted to CPU structure;
 - Add the RS232c interface (serial port),needed by fhboxers.
-- (PCB owners) check if the clocks documented in the manuals are really right for ST-V.
-- We need to check every game if can be completed or there are any hanging/crash/protection
-  issues on them.
-- Clean-ups and split the various chips(SCU,SMPC) into their respective files (in progress).
 - Video emulation bugs: check stvvdp2.c file.
 - Reimplement the idle skip if possible.
 - clean up the I/Os, by using per-game specific mapped ports and rewrite it by using 16-bit trampolines
 - Properly emulate the protection chips, used by several games (check stvprot.c for more info)
+- Move SCU device into its respective files;
+- Split ST-V and Saturn files properly;
+- completely rewrite IOGA for ST-V;
 
 (per-game issues)
-- stress: accesses the Sound Memory Expansion Area (0x05a00000-0x05afffff), unknown purpose;
+- stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
 - smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
   SH-2 synching.
 - suikoenb/shanhigw + others: why do we get 2 credits on startup? Cause might be by a communication with the M68k
-- bakubaku: sound part is largely incomplete,caused by a tight loop at location PC=1048 of the sound cpu part.
 - myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
   10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
   Likely to not be a bug but an in-game design issue.
@@ -55,10 +45,10 @@ TODO:
   the mahjong panel instead. Also the REACH and RON buttons are actually reversed.
 - danchih: hanafuda panel doesn't work.
 - findlove: controls doesn't work? Playing with the debugger at location $6063720 it makes it get furter,but controls
-  still doesn't work,missing irq?
+  still doesn't work, missing irq?
 - batmanfr: Missing sound,caused by an extra ADSP chip which is on the cart.The CPU is a
   ADSP-2181,and it's the same used by NBA Jam Extreme (ZN game).
-- vfremix: when you play Akira, there is a problem with third match: game doesn't upload all textures
+- vfremix: when you play as Akira, there is a problem with third match: game doesn't upload all textures
   and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
   to title screen after losing a match
 
@@ -689,7 +679,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	UINT32 tmp_src,tmp_dst,tmp_size;
 	UINT8 cd_transfer_flag;
 
-	if(state->m_scu.src_add[dma_ch] == 0 || state->m_scu.dst_add[dma_ch] != 2)
+	if(state->m_scu.src_add[dma_ch] == 0 || (state->m_scu.dst_add[dma_ch] != 2 && state->m_scu.dst_add[dma_ch] != 4))
 	{
 	if(LOG_SCU) printf("DMA lv %d transfer START\n"
 			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
@@ -877,48 +867,78 @@ static WRITE32_HANDLER( sinit_w )
 	sh2_set_frt_input(state->m_maincpu, PULSE_LINE);
 }
 
-static READ32_HANDLER(saturn_backupram_r)
+static READ8_HANDLER(saturn_backupram_r)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	return state->m_backupram[offset] & 0x00ff00ff;	// yes, it makes sure the "holes" are there.
+	if(!(offset & 1))
+		return 0; // yes, it makes sure the "holes" are there.
+
+	return state->m_backupram[offset >> 1] & 0xff;
 }
 
-static WRITE32_HANDLER(saturn_backupram_w)
+static WRITE8_HANDLER(saturn_backupram_w)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	COMBINE_DATA(&state->m_backupram[offset]);
+	if(!(offset & 1))
+		return;
+
+	state->m_backupram[offset >> 1] = data;
 }
 
 static NVRAM_HANDLER(saturn)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-
-	static const UINT32 init[8] =
+	static const UINT32 BUP_SIZE = 32*1024;
+	static const UINT32 EBUP_SIZE = 0x100000; // TODO: can't support more than 8 Mbit
+	UINT8 backup_file[(BUP_SIZE)+EBUP_SIZE+4];
+	static const UINT8 init[16] =
 	{
-		0x420061, 0x63006b, 0x550070, 0x520061, 0x6d0020, 0x46006f, 0x72006d, 0x610074,
+		'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't'
 	};
-	int i;
+	UINT32 i;
 
 	if (read_or_write)
-		file->write(state->m_backupram, 64*1024/4);
+	{
+		for(i=0;i<BUP_SIZE;i++)
+			backup_file[i] = state->m_backupram[i];
+		for(i=0;i<EBUP_SIZE;i++)
+			backup_file[i+BUP_SIZE] = state->m_cart_backupram[i];
+		for(i=0;i<4;i++)
+			backup_file[i+(BUP_SIZE)+EBUP_SIZE] = state->m_smpc.SMEM[i];
+
+		file->write(backup_file, (BUP_SIZE)+EBUP_SIZE+4);
+	}
 	else
 	{
 		if (file)
 		{
-			file->read(state->m_backupram, 64*1024/4);
+			file->read(backup_file, (BUP_SIZE)+EBUP_SIZE+4);
+
+			for(i=0;i<BUP_SIZE;i++)
+				state->m_backupram[i] = backup_file[i];
+			for(i=0;i<EBUP_SIZE;i++)
+				state->m_cart_backupram[i] = backup_file[i+BUP_SIZE];
+			for(i=0;i<4;i++)
+				state->m_smpc.SMEM[i] = backup_file[i+BUP_SIZE+EBUP_SIZE];
 		}
 		else
 		{
-			memset(state->m_backupram, 0, 64*1024/4);
-			for (i = 0; i < 8; i++)
+			UINT8 j;
+			memset(state->m_backupram, 0, BUP_SIZE);
+			for (i = 0; i < 4; i++)
 			{
-				state->m_backupram[i] = init[i];
-				state->m_backupram[i+8] = init[i];
-				state->m_backupram[i+16] = init[i];
-				state->m_backupram[i+24] = init[i];
+				for(j=0;j<16;j++)
+					state->m_backupram[i*16+j] = init[j];
 			}
+			memset(state->m_cart_backupram, 0, EBUP_SIZE);
+			for (i = 0; i < 32; i++)
+			{
+				for(j=0;j<16;j++)
+					state->m_cart_backupram[i*16+j] = init[j];
+			}
+			memset(state->m_smpc.SMEM, 0, 4); // TODO: default for each region
 		}
 	}
 }
@@ -926,7 +946,7 @@ static NVRAM_HANDLER(saturn)
 static READ8_HANDLER( saturn_cart_type_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	const int cart_ram_header[3] = { 0xff, 0x5a, 0x5c };
+	const int cart_ram_header[7] = { 0xff, 0x21, 0x22, 0x23, 0x24, 0x5a, 0x5c };
 
 	return cart_ram_header[state->m_cart_type];
 }
@@ -934,12 +954,13 @@ static READ8_HANDLER( saturn_cart_type_r )
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r, saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+//	AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
 	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
@@ -963,12 +984,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r,saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
 	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_io_r32, stv_io_w32) AM_BASE_MEMBER(saturn_state,m_ioga) AM_SHARE("share4") AM_MIRROR(0x20)
-//  AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
-//  AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("abus", 0) // cartridge
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
@@ -1081,10 +1100,14 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED ) //read '1' when direct mode is polled
 
 	PORT_START("CART_AREA")
-	PORT_CONFNAME( 0x03, 0x02, "Cart Type" )
+	PORT_CONFNAME( 0x07, 0x06, "Cart Type" )
 	PORT_CONFSETTING( 0x00, "None" )
-	PORT_CONFSETTING( 0x01, "8 Mbit Cart RAM" )
-	PORT_CONFSETTING( 0x02, "32 Mbit Cart RAM" )
+//	PORT_CONFSETTING( 0x01, "4 Mbit backup RAM" )
+	PORT_CONFSETTING( 0x02, "8 Mbit backup RAM" )
+//	PORT_CONFSETTING( 0x03, "16 Mbit backup RAM" )
+//	PORT_CONFSETTING( 0x04, "32 Mbit backup RAM" )
+	PORT_CONFSETTING( 0x05, "8 Mbit Cart RAM" )
+	PORT_CONFSETTING( 0x06, "32 Mbit Cart RAM" )
 INPUT_PORTS_END
 
 #define STV_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_)							\
@@ -1389,6 +1412,7 @@ DRIVER_INIT ( stv )
 	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
 	state->m_scsp_regs  = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_backupram = auto_alloc_array(machine, UINT8, 0x10000);
 
 	install_stvbios_speedups(machine);
 
@@ -1409,51 +1433,7 @@ DRIVER_INIT ( stv )
 	state->m_smpc_ram[0x5f] = 0x10;
 
 	state->m_vdp2.pal = 0;
-
-	#ifdef MAME_DEBUG
-	/*Uncomment this to enable header info*/
-	//print_game_info();
-	#endif
 }
-
-#define DATA_TRANSFER(_max_) \
-	for(dst_i=0;dst_i<_max_;dst_i++,src_i++)	\
-		STR[(dst_i & 0xfc) | (~dst_i & 3)] = ROM[src_i];
-
-#define DATA_DELETE \
-	for(dst_i=0;dst_i<0x100;dst_i++) \
-		STR[dst_i] = 0x00;
-
-#ifdef UNUSED_FUNCTION
-static void print_game_info(void)
-{
-	UINT8 *ROM = machine.region("game0")->base();
-	static FILE *print_file = NULL;
-	UINT8 STR[0x100];
-	UINT32 src_i,dst_i;
-
-	if(print_file == NULL)
-		print_file = fopen( "stvinfo.txt", "a" );
-
-	src_i = 0;
-
-	/*IC13?*/
-	if(ROM[src_i] == 0x00)
-		src_i+=0x200000;
-
-	DATA_TRANSFER(0x100);
-	for(src_i=0;src_i<0x100;src_i++)
-	{
-		if((src_i % 0x10) == 0) fprintf( print_file, "\n");
-		if(src_i < 0xc0)		fprintf( print_file, "%c",STR[src_i] );
-		else                    fprintf( print_file, "%02x",STR[src_i] );
-	}
-	DATA_DELETE;
-
-	fclose(print_file);
-	print_file = NULL;
-}
-#endif
 
 static const gfx_layout tiles8x8x4_layout =
 {
@@ -1593,58 +1573,58 @@ static TIMER_CALLBACK(stv_rtc_increment)
         state->m_smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
     */
 
-	state->m_smpc_ram[0x2f]++;
+	state->m_smpc.rtc_data[6]++;
 
 	/* seconds from 9 -> 10*/
-	if((state->m_smpc_ram[0x2f] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2f]+=0x10; state->m_smpc_ram[0x2f]&=0xf0; }
+	if((state->m_smpc.rtc_data[6] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[6]+=0x10; state->m_smpc.rtc_data[6]&=0xf0; }
 	/* seconds from 59 -> 0 */
-	if((state->m_smpc_ram[0x2f] & 0xf0) >= 0x60)			{ state->m_smpc_ram[0x2d]++;     state->m_smpc_ram[0x2f] = 0; }
+	if((state->m_smpc.rtc_data[6] & 0xf0) >= 0x60)			{ state->m_smpc.rtc_data[5]++;     state->m_smpc.rtc_data[6] = 0; }
 	/* minutes from 9 -> 10 */
-	if((state->m_smpc_ram[0x2d] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2d]+=0x10; state->m_smpc_ram[0x2d]&=0xf0; }
+	if((state->m_smpc.rtc_data[5] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[5]+=0x10; state->m_smpc.rtc_data[5]&=0xf0; }
 	/* minutes from 59 -> 0 */
-	if((state->m_smpc_ram[0x2d] & 0xf0) >= 0x60)			{ state->m_smpc_ram[0x2b]++;     state->m_smpc_ram[0x2d] = 0; }
+	if((state->m_smpc.rtc_data[5] & 0xf0) >= 0x60)			{ state->m_smpc.rtc_data[4]++;     state->m_smpc.rtc_data[5] = 0; }
 	/* hours from 9 -> 10 */
-	if((state->m_smpc_ram[0x2b] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2b]+=0x10; state->m_smpc_ram[0x2b]&=0xf0; }
+	if((state->m_smpc.rtc_data[4] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[4]+=0x10; state->m_smpc.rtc_data[4]&=0xf0; }
 	/* hours from 23 -> 0 */
-	if((state->m_smpc_ram[0x2b] & 0xff) >= 0x24)				{ state->m_smpc_ram[0x29]++; state->m_smpc_ram[0x27]+=0x10; state->m_smpc_ram[0x2b] = 0; }
+	if((state->m_smpc.rtc_data[4] & 0xff) >= 0x24)				{ state->m_smpc.rtc_data[3]++; state->m_smpc.rtc_data[2]+=0x10; state->m_smpc.rtc_data[4] = 0; }
 	/* week day name sunday -> monday */
-	if((state->m_smpc_ram[0x27] & 0xf0) >= 0x70)				{ state->m_smpc_ram[0x27]&=0x0f; }
+	if((state->m_smpc.rtc_data[2] & 0xf0) >= 0x70)				{ state->m_smpc.rtc_data[2]&=0x0f; }
 	/* day number 9 -> 10 */
-	if((state->m_smpc_ram[0x29] & 0x0f) >= 0x0a)				{ state->m_smpc_ram[0x29]+=0x10; state->m_smpc_ram[0x29]&=0xf0; }
+	if((state->m_smpc.rtc_data[3] & 0x0f) >= 0x0a)				{ state->m_smpc.rtc_data[3]+=0x10; state->m_smpc.rtc_data[3]&=0xf0; }
 
 	// year BCD to dec conversion (for the leap year stuff)
 	{
-		year_num = (state->m_smpc_ram[0x25] & 0xf);
+		year_num = (state->m_smpc.rtc_data[1] & 0xf);
 
-		for(year_count = 0; year_count < (state->m_smpc_ram[0x25] & 0xf0); year_count += 0x10)
+		for(year_count = 0; year_count < (state->m_smpc.rtc_data[1] & 0xf0); year_count += 0x10)
 			year_num += 0xa;
 
-		year_num += (state->m_smpc_ram[0x23] & 0xf)*0x64;
+		year_num += (state->m_smpc.rtc_data[0] & 0xf)*0x64;
 
-		for(year_count = 0; year_count < (state->m_smpc_ram[0x23] & 0xf0); year_count += 0x10)
+		for(year_count = 0; year_count < (state->m_smpc.rtc_data[0] & 0xf0); year_count += 0x10)
 			year_num += 0x3e8;
 	}
 
 	/* month +1 check */
 	/* the RTC have a range of 1980 - 2100, so we don't actually need to support the leap year special conditions */
-	if(((year_num % 4) == 0) && (state->m_smpc_ram[0x27] & 0xf) == 2)
+	if(((year_num % 4) == 0) && (state->m_smpc.rtc_data[2] & 0xf) == 2)
 	{
-		if((state->m_smpc_ram[0x29] & 0xff) >= dpm[(state->m_smpc_ram[0x27] & 0xf)-1]+1+1)
-			{ state->m_smpc_ram[0x27]++; state->m_smpc_ram[0x29] = 0x01; }
+		if((state->m_smpc.rtc_data[3] & 0xff) >= dpm[(state->m_smpc.rtc_data[2] & 0xf)-1]+1+1)
+			{ state->m_smpc.rtc_data[2]++; state->m_smpc.rtc_data[3] = 0x01; }
 	}
-	else if((state->m_smpc_ram[0x29] & 0xff) >= dpm[(state->m_smpc_ram[0x27] & 0xf)-1]+1){ state->m_smpc_ram[0x27]++; state->m_smpc_ram[0x29] = 0x01; }
+	else if((state->m_smpc.rtc_data[3] & 0xff) >= dpm[(state->m_smpc.rtc_data[2] & 0xf)-1]+1){ state->m_smpc.rtc_data[2]++; state->m_smpc.rtc_data[3] = 0x01; }
 	/* year +1 check */
-	if((state->m_smpc_ram[0x27] & 0x0f) > 12)				{ state->m_smpc_ram[0x25]++;  state->m_smpc_ram[0x27] = (state->m_smpc_ram[0x27] & 0xf0) | 0x01; }
+	if((state->m_smpc.rtc_data[2] & 0x0f) > 12)				{ state->m_smpc.rtc_data[1]++;  state->m_smpc.rtc_data[2] = (state->m_smpc.rtc_data[2] & 0xf0) | 0x01; }
 	/* year from 9 -> 10 */
-	if((state->m_smpc_ram[0x25] & 0x0f) >= 0x0a)				{ state->m_smpc_ram[0x25]+=0x10; state->m_smpc_ram[0x25]&=0xf0; }
+	if((state->m_smpc.rtc_data[1] & 0x0f) >= 0x0a)				{ state->m_smpc.rtc_data[1]+=0x10; state->m_smpc.rtc_data[1]&=0xf0; }
 	/* year from 99 -> 100 */
-	if((state->m_smpc_ram[0x25] & 0xf0) >= 0xa0)				{ state->m_smpc_ram[0x23]++; state->m_smpc_ram[0x25] = 0; }
+	if((state->m_smpc.rtc_data[1] & 0xf0) >= 0xa0)				{ state->m_smpc.rtc_data[0]++; state->m_smpc.rtc_data[1] = 0; }
 
 	// probably not SO precise, here just for reference ...
 	/* year from 999 -> 1000 */
-	//if((state->m_smpc_ram[0x23] & 0x0f) >= 0x0a)               { state->m_smpc_ram[0x23]+=0x10; state->m_smpc_ram[0x23]&=0xf0; }
+	//if((state->m_smpc.rtc_data[0] & 0x0f) >= 0x0a)               { state->m_smpc.rtc_data[0]+=0x10; state->m_smpc.rtc_data[0]&=0xf0; }
 	/* year from 9999 -> 0 */
-	//if((state->m_smpc_ram[0x23] & 0xf0) >= 0xa0)               { state->m_smpc_ram[0x23] = 0; } //roll over
+	//if((state->m_smpc.rtc_data[0] & 0xf0) >= 0xa0)               { state->m_smpc.rtc_data[0] = 0; } //roll over
 }
 
 static MACHINE_START( stv )
@@ -1680,13 +1660,13 @@ static MACHINE_START( stv )
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
 
-	state->m_smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-    state->m_smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-    state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-    state->m_smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-    state->m_smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-    state->m_smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-    state->m_smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+	state->m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
+    state->m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
+    state->m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+    state->m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
+    state->m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
+    state->m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
+    state->m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
 
 	state->m_stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
@@ -1695,6 +1675,8 @@ static MACHINE_START( stv )
 static MACHINE_START( saturn )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+	system_time systime;
+	machine.base_datetime(systime);
 
 	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
 	state->m_slave = downcast<legacy_cpu_device*>( machine.device("slave") );
@@ -1724,6 +1706,16 @@ static MACHINE_START( saturn )
 	state_save_register_global_pointer(machine, state->m_cart_dram, 0x400000/4);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
+
+	state->m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
+    state->m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
+    state->m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+    state->m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
+    state->m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
+    state->m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
+    state->m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
+
+	state->m_stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
 
 
@@ -1890,6 +1882,30 @@ static WRITE32_HANDLER( saturn_cart_dram1_w )
 	COMBINE_DATA(&state->m_cart_dram[offset+0x200000/4]);
 }
 
+static READ32_HANDLER( saturn_cs1_r )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+	UINT32 res;
+
+	res = 0;
+	//res  = state->m_cart_backupram[offset*4+0] << 24;
+	res |= state->m_cart_backupram[offset*2+0] << 16;
+	//res |= state->m_cart_backupram[offset*4+2] << 8;
+	res |= state->m_cart_backupram[offset*2+1] << 0;
+
+	return res;
+}
+
+static WRITE32_HANDLER( saturn_cs1_w )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	if(ACCESSING_BITS_16_23)
+		state->m_cart_backupram[offset*2+0] = (data & 0x00ff0000) >> 16;
+	if(ACCESSING_BITS_0_7)
+		state->m_cart_backupram[offset*2+1] = (data & 0x000000ff) >> 0;
+}
+
 static MACHINE_RESET( saturn )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -1913,12 +1929,12 @@ static MACHINE_RESET( saturn )
 
 	stvcd_reset( machine );
 
-	state->m_cart_type = input_port_read(machine,"CART_AREA") & 3;
+	state->m_cart_type = input_port_read(machine,"CART_AREA") & 7;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
 	machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
 
-	if(state->m_cart_type == 1)
+	if(state->m_cart_type == 5)
 	{
 		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
@@ -1927,7 +1943,7 @@ static MACHINE_RESET( saturn )
 		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
 	}
 
-	if(state->m_cart_type == 2)
+	if(state->m_cart_type == 6)
 	{
 		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
@@ -1936,6 +1952,23 @@ static MACHINE_RESET( saturn )
 		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
 	}
 
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x04000000, 0x047fffff);
+	machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x04000000, 0x047fffff);
+
+	if(state->m_cart_type > 0 && state->m_cart_type < 5)
+	{
+	//	AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
+		UINT32 mask;
+		mask = 0x7fffff >> (4-state->m_cart_type);
+		//mask = 0x7fffff >> 4-4 = 0x7fffff 32mbit
+		//mask = 0x7fffff >> 4-3 = 0x3fffff 16mbit
+		//mask = 0x7fffff >> 4-2 = 0x1fffff 8mbit
+		//mask = 0x7fffff >> 4-1 = 0x0fffff 4mbit
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
+		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
+	}
+
+
 	/* TODO: default value is probably 7 */
 	state->m_scu.start_factor[0] = -1;
 	state->m_scu.start_factor[1] = -1;
@@ -1943,6 +1976,8 @@ static MACHINE_RESET( saturn )
 
 	state->m_vdp2.old_crmd = -1;
 	state->m_vdp2.old_tvmd = -1;
+
+	state->m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
 
@@ -1997,7 +2032,7 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_CPU_CONFIG(sh2_conf_slave)
 	MCFG_TIMER_ADD_SCANLINE("slave_scantimer", saturn_slave_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
+	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_MACHINE_START(saturn)
@@ -2194,6 +2229,8 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
 	state->m_scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
 	state->m_cart_dram = auto_alloc_array(machine, UINT32, 0x400000/4);
+	state->m_backupram = auto_alloc_array(machine, UINT8, 0x10000);
+	state->m_cart_backupram = auto_alloc_array(machine, UINT8, 0x400000);
 
 	state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
 	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
@@ -2205,6 +2242,8 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	state->m_smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  state->m_smpc_ram[0x33] = input_port_read(machine, "???");
 	state->m_smpc_ram[0x5f] = 0x10;
+
+
 }
 
 static DRIVER_INIT( saturnus )
