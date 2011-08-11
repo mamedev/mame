@@ -488,21 +488,9 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
-	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE( 1024, 512 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE( psx )
-
-	MCFG_PALETTE_LENGTH( 65536 )
-
-	MCFG_PALETTE_INIT( psx )
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -515,30 +503,16 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zn1_2mb_vram, zn1_1mb_vram )
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE( 1024, 1024 )
+	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zn2, zn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
-	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE( 1024, 1024 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE( psx )
-
-	MCFG_PALETTE_LENGTH( 65536 )
-
-	MCFG_PALETTE_INIT( psx )
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2070,32 +2044,32 @@ static CUSTOM_INPUT( jdredd_gun_mux_read )
 	return state->m_jdredd_gun_mux;
 }
 
-static INTERRUPT_GEN( jdredd_vblank )
+void jdredd_vblank(zn_state *state, screen_device &screen, bool vblank_state)
 {
-	zn_state *state = device->machine().driver_data<zn_state>();
 	int x;
 	int y;
 
-	state->m_jdredd_gun_mux = !state->m_jdredd_gun_mux;
-
-	if( state->m_jdredd_gun_mux == 0 )
+	if( vblank_state )
 	{
-		x = input_port_read(device->machine(), "GUN1X");
-		y = input_port_read(device->machine(), "GUN1Y");
-	}
-	else
-	{
-		x = input_port_read(device->machine(), "GUN2X");
-		y = input_port_read(device->machine(), "GUN2Y");
-	}
+		state->m_jdredd_gun_mux = !state->m_jdredd_gun_mux;
 
-	if( x > 0x393 && x < 0xcb2 &&
-		y > 0x02d && y < 0x217 )
-	{
-		psx_lightgun_set( device->machine(), x, y );
-	}
+		if( state->m_jdredd_gun_mux == 0 )
+		{
+			x = input_port_read(state->machine(), "GUN1X");
+			y = input_port_read(state->machine(), "GUN1Y");
+		}
+		else
+		{
+			x = input_port_read(state->machine(), "GUN2X");
+			y = input_port_read(state->machine(), "GUN2Y");
+		}
 
-	psx_vblank( device );
+		if( x > 0x393 && x < 0xcb2 &&
+			y > 0x02d && y < 0x217 )
+		{
+			psx_lightgun_set( state->machine(), x, y );
+		}
+	}
 }
 
 static WRITE32_HANDLER( acpsx_00_w )
@@ -2179,8 +2153,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_VBLANK_INT("screen", jdredd_vblank)
+	MCFG_DEVICE_MODIFY( "gpu" )
+	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( jdredd_vblank ), (zn_state *) owner ) )
 
 	MCFG_MACHINE_RESET( coh1000a )
 

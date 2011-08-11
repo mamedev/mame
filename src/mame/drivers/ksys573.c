@@ -1258,39 +1258,6 @@ static void *atapi_get_device(running_machine &machine)
 	return ret;
 }
 
-static DRIVER_INIT( konami573 )
-{
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-
-	psx_driver_init(machine);
-	atapi_init(machine);
-
-	state->save_item( NAME(state->m_n_security_control) );
-
-	flash_init(machine);
-}
-
-static MACHINE_RESET( konami573 )
-{
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-
-	if( state->machine().device<device_secure_serial_flash>("install_eeprom") )
-	{
-		/* security cart */
-		psx_sio_input( machine, 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
-	}
-
-	state->m_flash_bank = -1;
-}
-
-static void spu_irq(device_t *device, UINT32 data)
-{
-	if (data)
-	{
-		psx_irq_set(device->machine(), 1<<9);
-	}
-}
-
 static void update_mode( running_machine &machine )
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
@@ -1323,14 +1290,48 @@ static void update_mode( running_machine &machine )
 	}
 }
 
-static INTERRUPT_GEN( sys573_vblank )
+static DRIVER_INIT( konami573 )
 {
-	ksys573_state *state = device->machine().driver_data<ksys573_state>();
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+
+	psx_driver_init(machine);
+	atapi_init(machine);
+
+	state->save_item( NAME(state->m_n_security_control) );
+
+	flash_init(machine);
+}
+
+static MACHINE_RESET( konami573 )
+{
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+
+	if( state->machine().device<device_secure_serial_flash>("install_eeprom") )
+	{
+		/* security cart */
+		psx_sio_input( machine, 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
+	}
+
+	state->m_flash_bank = -1;
+
+	update_mode(machine);
+}
+
+static void spu_irq(device_t *device, UINT32 data)
+{
+	if (data)
+	{
+		psx_irq_set(device->machine(), 1<<9);
+	}
+}
+
+void sys573_vblank(ksys573_state *state, screen_device &screen, bool vblank_state)
+{
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
 
-	update_mode(device->machine());
+	update_mode(state->machine());
 
-	if( strcmp( device->machine().system().name, "ddr2ml" ) == 0 )
+	if( strcmp( state->machine().system().name, "ddr2ml" ) == 0 )
 	{
 		/* patch out security-plate error */
 
@@ -1352,7 +1353,7 @@ static INTERRUPT_GEN( sys573_vblank )
 			p_n_psxram[ 0x1f850 / 4 ] = 0x08007e22;
 		}
 	}
-	else if( strcmp( device->machine().system().name, "ddr2mla" ) == 0 )
+	else if( strcmp( state->machine().system().name, "ddr2mla" ) == 0 )
 	{
 		/* patch out security-plate error */
 
@@ -1363,8 +1364,6 @@ static INTERRUPT_GEN( sys573_vblank )
 			p_n_psxram[ 0x1f850 / 4 ] = 0x08007e22;
 		}
 	}
-
-	psx_vblank(device);
 }
 
 /*
@@ -2959,7 +2958,6 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( konami573_map )
-	MCFG_CPU_VBLANK_INT("screen", sys573_vblank)
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( cdrom_dma_read ), (ksys573_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( cdrom_dma_write ), (ksys573_state *) owner ) )
@@ -2977,18 +2975,8 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_FUJITSU_29F016A_ADD("onboard.7")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE( 1024, 1024 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE( psx )
-
-	MCFG_PALETTE_LENGTH( 65536 )
-
-	MCFG_PALETTE_INIT( psx )
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( sys573_vblank ), (ksys573_state *) owner ) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

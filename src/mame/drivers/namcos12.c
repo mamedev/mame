@@ -1217,6 +1217,11 @@ static void namcos12_rom_read( namcos12_state *state, UINT32 n_address, INT32 n_
 	}
 }
 
+static void namcos12_sub_irq( namcos12_state *state, screen_device &screen, bool vblank_state )
+{
+	irq1_line_pulse( state->machine().device( "sub" ) );
+}
+
 static WRITE32_HANDLER( s12_dma_bias_w )
 {
 	namcos12_state *state = space->machine().driver_data<namcos12_state>();
@@ -1651,30 +1656,18 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
-	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_rom_read ), (namcos12_state *) owner ) )
 
 	MCFG_CPU_ADD("sub", H83002, 16737350 )
 	MCFG_CPU_PROGRAM_MAP( s12h8rwmap)
 	MCFG_CPU_IO_MAP( s12h8iomap)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MCFG_MACHINE_RESET( namcos12 )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE( 1024, 1024 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE( psx )
-
-	MCFG_PALETTE_LENGTH( 65536 )
-
-	MCFG_PALETTE_INIT( psx )
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos12_sub_irq ), (namcos12_state *) owner ) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

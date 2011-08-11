@@ -474,24 +474,12 @@ static MACHINE_RESET( namcos10 )
 static MACHINE_CONFIG_START( namcos10, namcos10_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
-	MCFG_CPU_PROGRAM_MAP( namcos10_map)
-	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
+	MCFG_CPU_PROGRAM_MAP( namcos10_map )
 
 	MCFG_MACHINE_RESET( namcos10 )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE( 1024, 1024 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE( psx )
-
-	MCFG_PALETTE_LENGTH( 65536 )
-
-	MCFG_PALETTE_INIT( psx )
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL_53_693175MHz )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

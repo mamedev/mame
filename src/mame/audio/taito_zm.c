@@ -54,7 +54,7 @@ MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
 	MCFG_CPU_ADD("mn10200", MN10200, 25000000/2)
 	MCFG_CPU_PROGRAM_MAP(taitozoom_map)
 	MCFG_CPU_IO_MAP(taitozoom_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_pulse)
+//	MCFG_CPU_VBLANK_INT("screen", irq0_line_pulse)
 
 	// we assume the parent machine has created lspeaker/rspeaker
 	MCFG_SOUND_ADD("zsg2", ZSG2, 25000000/2)

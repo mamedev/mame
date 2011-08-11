@@ -328,7 +328,6 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( konamigv_map )
-	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( scsi_dma_read ), (konamigv_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (konamigv_state *) owner ) )
@@ -339,18 +338,7 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE( 1024, 512 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE( psx )
-
-	MCFG_PALETTE_LENGTH( 65536 )
-
-	MCFG_PALETTE_INIT( psx )
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL_53_693175MHz )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

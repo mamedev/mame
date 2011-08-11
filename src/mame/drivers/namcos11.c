@@ -584,13 +584,12 @@ static READ32_HANDLER( keycus_c443_r )
 	return data;
 }
 
-static INTERRUPT_GEN( namcos11_vblank )
+void namcos11_vblank(namcos11_state *state, screen_device &screen, bool vblank_state)
 {
-	namcos11_state *state = device->machine().driver_data<namcos11_state>();
-	UINT32 *p_n_psxram = state->m_p_n_psxram;
-
-	if( strcmp( device->machine().system().name, "pocketrc" ) == 0 )
+	if( strcmp( screen.machine().system().name, "pocketrc" ) == 0 )
 	{
+		UINT32 *p_n_psxram = state->m_p_n_psxram;
+
 		if( p_n_psxram[ 0x12c74 / 4 ] == 0x1440fff9 )
 		{
 			p_n_psxram[ 0x12c74 / 4 ] = 0;
@@ -600,8 +599,6 @@ static INTERRUPT_GEN( namcos11_vblank )
 			p_n_psxram[ 0x64694 / 4 ] = 0;
 		}
 	}
-
-	psx_vblank(device);
 }
 
 INLINE void bankswitch_rom8( address_space *space, const char *bank, int n_data )
@@ -985,7 +982,6 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
-	MCFG_CPU_VBLANK_INT("screen", namcos11_vblank)
 
 	MCFG_CPU_ADD("c76", M37702, 16384000)
 	MCFG_CPU_PROGRAM_MAP(c76_map)
@@ -994,19 +990,8 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 
 	MCFG_MACHINE_RESET( namcos11 )
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE( 1024, 1024 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE( psx )
-
-	MCFG_PALETTE_LENGTH( 65536 )
-
-	MCFG_PALETTE_INIT( psx )
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos11_vblank ), (namcos11_state *) owner ) )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_C352_ADD("c352", 16384000)
@@ -1021,12 +1006,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( coh110, coh100 )
 	MCFG_CPU_REPLACE( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
-	MCFG_CPU_VBLANK_INT("screen", namcos11_vblank)
 
-	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0 )
+	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos11_vblank ), (namcos11_state *) owner ) )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE( 30 )
+	/// TODO: figure out why pocketrc runs too fast
+//	MCFG_SCREEN_MODIFY("screen")
+//	MCFG_SCREEN_REFRESH_RATE( 30 )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos11 )

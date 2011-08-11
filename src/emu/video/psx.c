@@ -34,7 +34,10 @@ void psxgpu_device::device_start( void )
 	{
 		psx_gpu_init( 2 );
 	}
+}
 
+void psxgpu_device::device_reset( void )
+{
 	gpu_reset();
 }
 
@@ -445,8 +448,8 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	int n_level2;
 	int n_shade;
 	int n_shaded;
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = 1024;
+	int height = ( vramSize / width ) / sizeof( UINT16 );
 
 	m_n_gputype = n_gputype;
 
@@ -461,8 +464,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	n_lightgun_y = 0;
 	b_reverseflag = 0;
 
-	n_vram_size = width * height;
-	p_vram = auto_alloc_array_clear( machine(), UINT16, n_vram_size );
+	p_vram = auto_alloc_array_clear( machine(), UINT16, width * height );
 
 	for( n_line = 0; n_line < 1024; n_line++ )
 	{
@@ -563,7 +565,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	// icky!!!
 	machine().save().save_memory( "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
-	state_save_register_global_pointer( machine(), p_vram, n_vram_size );
+	state_save_register_global_pointer( machine(), p_vram, width * height );
 	state_save_register_global( machine(), n_gpu_buffer_offset );
 	state_save_register_global( machine(), n_vramx );
 	state_save_register_global( machine(), n_vramy );
@@ -3631,15 +3633,27 @@ READ32_MEMBER( psxgpu_device::read )
 	return data;
 }
 
-void psxgpu_device::vblank( void )
+void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 {
-#if defined( MAME_DEBUG )
-	DebugCheckKeys();
-#endif
+	if( vblank_state )
+	{
+	#if defined( MAME_DEBUG )
+		DebugCheckKeys();
+	#endif
 
-	n_gpustatus ^= ( 1L << 31 );
+		psx_state *p_psx = screen.machine().driver_data<psx_state>();
+		if(p_psx->b_need_sianniv_vblank_hack)
+		{
+	/// HACK: find out what this is for?
+			UINT32 pc = cpu_get_pc(screen.machine().device("maincpu"));
+			if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0)
+				return;
+		}
 
-	psx_irq_set( machine(), 0x0001 );
+		n_gpustatus ^= ( 1L << 31 );
+
+		psx_irq_set( machine(), 0x0001 );
+	}
 }
 
 void psxgpu_device::gpu_reset( void )
@@ -3672,4 +3686,45 @@ void psxgpu_device::lightgun_set( int n_x, int n_y )
 {
 	n_lightgun_x = n_x;
 	n_lightgun_y = n_y;
+}
+
+PALETTE_INIT( psx )
+{
+	UINT32 n_colour;
+
+	for( n_colour = 0; n_colour < 0x10000; n_colour++ )
+	{
+		palette_set_color_rgb( machine, n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
+	}
+}
+
+SCREEN_UPDATE( psx )
+{
+	psxgpu_device *gpu = downcast<psxgpu_device *>(screen->owner());
+	gpu->update_screen( bitmap, cliprect );
+	return 0;
+}
+
+MACHINE_CONFIG_FRAGMENT( psxgpu )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 1024 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_UPDATE( psx )
+	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(FUNC(psxgpu_device::vblank), (psxgpu_device *) owner));
+
+	MCFG_PALETTE_LENGTH( 65536 )
+	driver_device::static_set_palette_init(*owner->owner(), PALETTE_INIT_NAME(psx)); // MCFG_PALETTE_INIT( psx )
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor psxgpu_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( psxgpu );
 }

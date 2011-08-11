@@ -12,15 +12,20 @@
 
 #include "emu.h"
 
-#define MCFG_PSXGPU_ADD( cputag, tag, type, clock ) \
+#define MCFG_PSXGPU_ADD( cputag, tag, type, _vramSize, clock ) \
 	MCFG_DEVICE_ADD( tag, type, clock ) \
+	((psxgpu_device *) device)->vramSize = _vramSize; \
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psx_dma_read_delegate( FUNC( psxgpu_device::dma_write ), (psxgpu_device *) device ) )
 
-#define MCFG_PSXGPU_REPLACE( cputag, tag, type, clock ) \
+#define MCFG_PSXGPU_REPLACE( cputag, tag, type, _vramSize, clock ) \
 	MCFG_DEVICE_REPLACE( tag, type, clock ) \
+	((psxgpu_device *) device)->vramSize = _vramSize; \
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psx_dma_read_delegate( FUNC( psxgpu_device::dma_write ), (psxgpu_device *) device ) )
+
+#define MCFG_PSXGPU_VBLANK_CALLBACK( _delegate ) \
+	((screen_device *) config.device_find( device, "screen" ))->register_vblank_callback( _delegate );
 
 extern const device_type CXD8514Q;
 extern const device_type CXD8538Q;
@@ -174,6 +179,7 @@ class psxgpu_device : public device_t
 public:
 	// construction/destruction
 	psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
 	WRITE32_MEMBER( write );
@@ -181,10 +187,12 @@ public:
 	void dma_read( UINT32 n_address, INT32 n_size );
 	void dma_write( UINT32 n_address, INT32 n_size );
 	void lightgun_set( int, int );
-	void vblank( void );
+	int vramSize;
+	void vblank(screen_device &screen, bool vblank_state);
 
 protected:
 	virtual void device_start();
+	virtual void device_reset();
 
 	void updatevisiblearea();
 	void decode_tpage( UINT32 tpage );
@@ -226,7 +234,6 @@ protected:
 	INT32 n_ti;
 
 	UINT16 *p_vram;
-	UINT32 n_vram_size;
 	UINT32 n_vramx;
 	UINT32 n_vramy;
 	UINT32 n_twy;
