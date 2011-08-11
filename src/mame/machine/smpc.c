@@ -220,12 +220,14 @@ static TIMER_CALLBACK( smpc_slave_enable )
 	state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
 }
 
-static void smpc_sound_enable(running_machine &machine,UINT8 cmd)
+static TIMER_CALLBACK( smpc_sound_enable )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, cmd ? ASSERT_LINE : CLEAR_LINE);
-	state->m_en_68k = cmd ^ 1;
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
+	state->m_en_68k = param ^ 1;
+	state->m_smpc_ram[0x5f] = param + 0x06; //read-back for last command issued
+	state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
 }
 
 static void smpc_system_reset(running_machine &machine)
@@ -517,7 +519,8 @@ WRITE8_HANDLER( stv_SMPC_w )
 		//popmessage("PDR2 = %02x",state->m_smpc_ram[0x77]);
 
 		if(LOG_SMPC) printf("SMPC: M68k %s\n",(state->m_smpc_ram[0x77] & 0x10) ? "off" : "on");
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (state->m_smpc_ram[0x77] & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),(state->m_smpc_ram[0x77] & 0x10) >> 4);
+
 		state->m_en_68k = ((state->m_smpc_ram[0x77] & 0x10) >> 4) ^ 1;
 
 		//if(LOG_SMPC) printf("SMPC: ram [0x77] = %02x\n",state->m_smpc_ram[0x77]);
@@ -740,7 +743,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 			case 0x06:
 			case 0x07:
 				if(LOG_SMPC) printf ("SMPC: Sound %s\n",(data & 1) ? "off" : "on");
-				smpc_sound_enable(space->machine(),data & 1);
+				space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),data & 1);
 				break;
 			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
 			//case 0x08:
@@ -795,7 +798,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 		}
 
 		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 2 && data != 3)
+		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7)
 		{
 			state->m_smpc_ram[0x5f] = data; //read-back for last command issued
 			state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
