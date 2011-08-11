@@ -11770,6 +11770,11 @@ ep_mlhrc	// Who Whats To Be A Millionhare Club (Global)
 ep_wf		// Wildfire (Global)
 
 
+// MPU2
+
+m2hilite	// Hi-Lights (Barcrest) (MPU2)
+m2svlite	// Silver Lights (Barcrest) (MPU2)
+
 // MPU3
 
 m3tst		// MPU3 Unit Test (Program 5) (Barcrest)
