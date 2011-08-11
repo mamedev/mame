@@ -2216,11 +2216,126 @@ ROM_START( sc1zep )
 	ROM_LOAD( "zepp1.bin", 0x0000, 0x008000, CRC(bfbbbc35) SHA1(5c28b6359d79c96d53319408fbc2d7cb2629185d) )
 ROM_END
 
+ROM_START( sc1wthn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wildthingprogamm1.bin", 0x0000, 0x010000, CRC(80157a9c) SHA1(ec8e217e17ac7f4c5bc05d9848bf5f37b2d82fac) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "wildthingsound1.bin", 0x00000, 0x010000, CRC(85389209) SHA1(029dda285b035525b730b4c72ff182554f5dbe47) )
+	ROM_LOAD( "wildthingsound2.bin", 0x010000, 0x010000, CRC(664ab695) SHA1(d4148ebffbe41eb1d265548991ad3cb984205497) )
+ROM_END
+
+
+ROM_START( sc1days )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "all2-5n.p2", 0x0000, 0x008000, CRC(fa75d835) SHA1(78e6b48bea8f1297530f08dff6bada4d228e090d) )
+	ROM_LOAD( "all2-5n.p1", 0x8000, 0x008000, CRC(7d58a415) SHA1(8bd0d23ac825ba0294f2fd26e9acb87eb1f3d10c) )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	ROM_LOAD( "allinv1-6b.bin", 0x0000, 0x008000, CRC(59589a00) SHA1(c73b45f383f908d1257f6d031f359f73e5b2f966) )
+	ROM_LOAD( "allinv1-6a.bin", 0x8000, 0x008000, CRC(36a83181) SHA1(a2cb6493efb00e9bcf76388f65098af9346f855e) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	/* missing? */
+ROM_END
+
+
+ROM_START( sc1cscl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cldl1-8n.p1", 0x8000, 0x008000, CRC(4cb5239d) SHA1(a0f22440a5453ea28093f32856ab5417a6c82037) )
+	ROM_LOAD( "cldl1-8n.p2", 0x0000, 0x008000, CRC(8feee244) SHA1(50c7eab298078def5d82bc3bebbe3e08b612bc47) )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	ROM_LOAD( "cash classic 2p sa1-083.bin", 0x0000, 0x010000, CRC(36a45c0d) SHA1(51eb91e42297894ae575502903833e219ac5add9) )
+	ROM_LOAD( "cash classic sa1-082 5p.bin", 0x0000, 0x010000, CRC(42d68675) SHA1(ed191e03bc7b42ae1884657b4559588eeedbdf31) )
+	ROM_LOAD( "clas2-0n.p2", 0x0000, 0x008000, CRC(45d40f1e) SHA1(03388a8ea809b088850865cb288af3181d3dd962) )
+	ROM_LOAD( "clas2-0n.p1", 0x8000, 0x008000, CRC(ebd514b1) SHA1(5267b49de98f8a93ac206f68d56ee12e1d228a7d) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	/* missing? */
+ROM_END
+
+ROM_START( sc1driv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ddslb1-3.p2", 0x0000, 0x008000, CRC(32896702) SHA1(1ef36daca6bf3f45dfff5edc401bdbd313ad9121) )
+	ROM_LOAD( "ddslb1-3.p1", 0x8000, 0x008000, CRC(81fc84a7) SHA1(f0d5a181d4ca027df2c5ca11573eb7687b3abf29) )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	ROM_LOAD( "ddsnl1-3.p1", 0x0000, 0x008000, CRC(96f8bc52) SHA1(de0d180d4640eef451984f466be8732d0a08cee8) )
+	ROM_LOAD( "ddsnl1-3.p2", 0x0000, 0x008000, CRC(a5b663c8) SHA1(5b6675874ff4e3a5c74dbd66c4a47c34d36f1222) )
+	ROM_LOAD( "dslb1-5.p1", 0x0000, 0x008000, CRC(6adaf17b) SHA1(8930daac71fbe3f7eb91358d7101f2b8d05d224e) )
+	ROM_LOAD( "dslb1-5.p2", 0x0000, 0x008000, CRC(193e6aaa) SHA1(f083747a9cad72690b01181cc46ae7bdc3de6ea6) )
+	ROM_LOAD( "dsnl1-6.p1", 0x0000, 0x008000, CRC(174c4432) SHA1(82519ede8220d3d717ee0ebe57374357afe38949) )
+	ROM_LOAD( "dsnl1-6.p2", 0x0000, 0x008000, CRC(0eb10c01) SHA1(16456ec1e32bfbd873bdebd6a760041bc9cd8648) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	/* missing? */
+ROM_END
+
+ROM_START( sc1vsd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "supd1-4n.p1", 0x8000, 0x008000, CRC(ad581f7d) SHA1(99b9bf1016cd52467f5c9f6e427305e81033e82f) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	/* missing? */
+ROM_END
+
+
+ROM_START( sc1moonl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "moon lite 5p 86var v5.1.bin", 0x8000, 0x008000, CRC(31db928a) SHA1(0e07c11bf85a13df62bb704a03a42712d6e7ff62) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1ltdv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "little devil v4 arcade.bin", 0x8000, 0x008000, CRC(ff32cdcf) SHA1(84bb86e30ace57aa8f591a3778801d44fb3f8fe1) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1t1k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "top1000b.bin", 0x8000, 0x008000, CRC(0124b7c0) SHA1(620196e7580f44423ede6644f76e37091fdf30b6) )
+	ROM_LOAD( "top1000a.bin", 0x0000, 0x008000, CRC(c986ee8b) SHA1(e5a600942e725d0ad6be10fbac7fb05eb0d2b07f) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
+ROM_START( sc1dip )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dip0111.bin", 0x0000, 0x010000, CRC(19632509) SHA1(69c9947da11892b99e9936675d0b1bdabdc16ae8) )
+
+	ROM_REGION( 0x200000, "ram", ROMREGION_ERASE00 ) // is this just some default settings?
+	ROM_LOAD( "ram.bin", 0x0000, 0x002000, CRC(3962d8cf) SHA1(b893a92d467e8f5ffc2cffa8a7121d92fe2492eb) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* missing? */	
+ROM_END
+
+ROM_START( sc1lamb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lambada.bin", 0x0000, 0x010000, CRC(4321495c) SHA1(d3ef15d2a1b2c7aec33ac226c89a7a0c0a18884a) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* missing? */	
+ROM_END
+
+ROM_START( sc1reply )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "repl0110.bin", 0x0000, 0x010000, CRC(b2bfa2fb) SHA1(9c704321428c05f97593ea7541ba1a08ff448571) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "repl0110snd.bin", 0x0000, 0x010000, CRC(86547dc7) SHA1(4bf64f22e84c0ee82d961b0ba64932b8bf6a521f) )
+ROM_END
 
 
 
 
 /////////////////////////////////////////////////////////////////////////////////////
+
 
 GAME( 1988, sc1lotus, 0,        scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 1988, sc1roul, 0,        scorpion1			, scorpion1	, rou029		, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -2310,10 +2425,25 @@ GAME( 198?, sc1winfl, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELA
 GAME( 198?, sc1winst, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Winning Streak (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1zep, 0,        scorpion1,	 scorpion1,  lotse,	0,       "ELAM",    "Zeppelin (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
+GAME( 198?, sc1wthn, 0,        scorpion1,	 scorpion1,  lotse,	0,       "Eurocoin",    "Wild Thing (Eurocoin) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, sc1moonl		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Bwb",   "Moon Lite (Bwb)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1ltdv		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Pcp",   "Little Devil (Pcp)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 198?, sc1t1k, 0,        scorpion1,	 scorpion1,  lotse,	0,       "Eurocoin",    "Top 1000 (Eurocoin) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
+// are these really SC1? they do more here than in SC2 at least!
+GAME( 199?, sc1days		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Global",   "All In A Days Work (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1cscl		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Global",   "Cash Classic (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1driv		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Global",   "Driving School (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1vsd		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Global",   "Vegas Super Deal (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1dip		, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocion",   "Diplomat (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
+GAME( 199?, sc1lamb		, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocion",   "Lambada (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
+GAME( 199?, sc1reply	, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocion",   "Replay (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
+
+
+
 
 //Adder 2
 GAME( 1996, m_tppokr, 0,        scorpion1_adder2	, toppoker	, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-
 
 
 

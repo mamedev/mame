@@ -11346,7 +11346,17 @@ sc1voya		//
 sc1winfl	// Winfalls (Bellfruit)
 sc1winst	// Winning Streak (Bellfruit)
 sc1zep		// Zeppelin (Bellfruit)
-
+sc1wthn		// Wild Thing (Eurocoin)
+sc1days		// All In A Days Work (Global)
+sc1cscl		// Cash Classic (Global)
+sc1driv		// Driving School (Global)
+sc1vsd		// Vegas Super Deal (Global)
+sc1moonl	// Moon Lite (Bwb)
+sc1ltdv		// Little Devil (Pcp)
+sc1t1k		// Top 1000 (Eurocoin)
+sc1dip		// Diplomat (Eurocoin)
+sc1lamb		// Lambada (Eurocoin)
+sc1reply	// Replay (Eurocoin)
 
 // Scorpion 1 + Adder Video board
 
@@ -11360,6 +11370,7 @@ sc2brkfs2	//
 sc2brkfs3	//
 sc2brkfs4	//
 sc2brkfs5	//
+sc2brkfsm	//
 sc2drwho	// Dr.Who The Timelord
 sc2drwho1	//
 sc2drwho2	//
@@ -11378,6 +11389,9 @@ sc2drwho14	//
 sc2drwho15	//
 sc2drwho16	//
 sc2drwho17	//
+sc2drwho18	// (Mazooma set)
+sc2drwho19	// (Mazooma set)
+sc2drwho20	// (Deluxe)
 sc2focus	// Focus (Dutch, Game Card 95-750-347) 
 sc2gslam	// Club Grandslam (UK, Game Card 95-750-843) 
 sc2cshcl	// Cashino Club (Bellfruit) 
@@ -11403,6 +11417,12 @@ sc2sstar	// Superstar (Bellfruit)
 sc2pe1g		// Public Enemy No1 (Bellfruit) [German]
 sc2wwcl		// Wild West Club (Bellfruit)
 sc2dick		// Spotted Dick (Global)
+sc2pick		// Pick Of The Bunch (Global)
+sc2rock		// How Bigs Your Rock (Global)
+sc2call		// It's Your Call (Glonal)
+sc2prom		// Along The Prom
+sc2payr		// Pay Roll (Mazooma)
+sc2smnud	// Super Multi Nudge (Concept)
 
 // Scorpion 2 + Dot Matrix Display
 
@@ -12520,6 +12540,14 @@ m4riotrp	// Rio Tropico (unknown)
 
 m4blsbys	// Blues Boys (Version 6)
 m4conn4     // Connect 4
+
+m4blkgd		// Black Gold (Gemini)
+m4excam		// Excalibur (Mdm)
+m4front		// Final Frontier (Mdm)
+m4pick		// Pick A Fruit (Jpm)
+m4safar		// Safari Club (Mdm)
+m4zill		// Zillionare's Challenge (Pure Leisure)
+
 
 // MPU4 + Video board
 

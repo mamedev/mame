@@ -46,6 +46,17 @@
     This method works with the following games:
     topgear  500
 
+	Method 3 :
+	* Key in with the Jackpot Key followed by the Audit Key
+    * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+    * Press Service (default A) 4 times until you are in the Setup Screen, with Printer Pay Limit.
+    * Press Bet 2 (default D) to change the Jackpot Win Limit. A higher value is better (3000 max)
+    * Key out both the Jackpot and Audit Keys
+	
+	This method works with the following games:
+	eforest
+	arcwins
+
     Technical Notes:
 
     68B09EP Motorola Processor
@@ -124,6 +135,25 @@
     Remapped the video poker buttons; holds are now keys S,D,F,G,H
     Un-mapped the unused inputs
 
+    06/08/2011 - FrasheR
+    Implement 'Printer Fault' fix.
+    
+	08/08/2011 - FrasheR
+	Implement Port '5005' for eforest. Changing this only works after performing memory reset.(delete nvram file)
+	First 3 bits
+	000 = $100 / Credit
+	001 = 50c  / Credit
+	010 = $5   / Credit
+	011 = 10c  / Credit
+	100 = $10  / Credit
+	101 = 25c  / Credit
+	110 = $1   / Credit
+	111 = 5c   / Credit (default)
+	Implement Bill Acceptor for eforest to add credits.
+	arcwins and eforest are now working.
+
+    ****************************************************************************
+
     When the games first power on (or when reset), they will display a TILT message on the screen. This doesn't affect gameplay, and if there are no pending errors the game should coin up and/or play immediately.
     The tilt message will also appear when an error code is displayed, such as the main door being opened/closed, or a hardware error/fault (such as hopper empty, coin yoyo, printer errors; none of which should happen MAME however).
     The tilt message will disappear if you turn the Audit Key on and off, or after you start playing.
@@ -146,7 +176,7 @@
 
     3. arcwins, eforest, fhunter, fhuntera and cgold2 do not work (these US-based games require note acceptor and printer support).
      - fhunter, fhuntera and cgold2 need DIP 5201-5 enabled to work (if disabled, it acts as a 'freeze' switch).
-     - The US games do work as such, however the unemulated items cause the games to end up disabled with the error (most notably, 70 - Printer Fault).
+     - The US games do work as such, however the unemulated items cause the games to end up disabled with the error (most notably, 70 - Printer Fault). ** Fixed 06/08/2011 **
      - These games possibly need a set chip, as it is currently impossible to set up denominations; the machines are stuck in $100 per credit mode, which is a highly unusual setting.
      - If you turn PTRHOM off (with PTRTAC on), this will give you a short amount of time to enter the audit menu, however the games will still lock up with a printer fault.
         To temporarily get around the lockup, keep triggering the main door switch (hit M twice). The machine will keep locking up every 2-3 seconds, however it is usable. If PTRHOM is on, the lockup happens immediately.
@@ -249,7 +279,9 @@ public:
 	UINT8 m_ripple;
 	int m_hopper_motor;
 	int m_inscrd;
+	int m_insnote;
 	int m_cashcade_c;
+	int m_printer_motor;
 };
 
 /* Partial Cashcade protocol */
@@ -339,7 +371,7 @@ static READ8_HANDLER(ldsw)
 	{
 	return 0;
 	}
-	return state->m_cgdrsw = input_port_read(space->machine(), "CGDRSW");
+	return state->m_cgdrsw = input_port_read(space->machine(), "5005");
 }
 
 static READ8_HANDLER(cgdrr)
@@ -365,6 +397,12 @@ static WRITE8_HANDLER(u3_p0)
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
 	state->m_u3_p0_w = data;
+
+	if ((data&0x80)==0) //Printer Motor Off
+	{
+		state->m_printer_motor = 1; // Set this so the next read of u3_p3 returns PTRHOM as OFF.
+	}
+
 	//logerror("u3_p0_w: %02X\n",state->m_u3_p0_w);
 }
 
@@ -394,6 +432,75 @@ static READ8_HANDLER(u3_p2)
 
 	return u3_p2_ret;
 }
+
+static READ8_HANDLER(u3_p3)
+{
+    aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
+
+    int u3_p3_ret= input_port_read(space->machine(), "5003");
+   
+    if ((state->m_printer_motor)==1) // Printer Motor Off
+  
+    {
+        u3_p3_ret = u3_p3_ret^0x80; // Printer Home Off
+	  state->m_printer_motor=0;
+
+    }
+    
+    return u3_p3_ret;
+    
+}
+
+static TIMER_CALLBACK(note_input_reset)
+{
+	aristmk4_state *state = machine.driver_data<aristmk4_state>();
+	state->m_insnote=0; //reset note input after 150msec
+}
+
+static READ8_HANDLER(bv_p0)
+{
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
+	
+	int bv_p0_ret=0x00;
+	
+	switch(state->m_insnote)
+	{
+	case 0x01:
+		bv_p0_ret=input_port_read(space->machine(), "NS")+0x81; //check note selector
+		state->m_insnote++;
+		break;
+	case 0x02:
+		bv_p0_ret=0x89;
+		state->m_insnote++;
+		space->machine().scheduler().timer_set(attotime::from_msec(150), FUNC(note_input_reset));
+		break;
+	default:
+		break; //timer will reset the input
+	}
+	
+	return bv_p0_ret;
+
+}
+
+static READ8_HANDLER(bv_p1)
+{
+	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
+
+	int bv_p1_ret=0x00;
+	
+	if (state->m_insnote==0)
+		state->m_insnote=input_port_read(space->machine(), "insertnote");
+	
+	if (state->m_insnote==1)
+			bv_p1_ret=0x08;
+		
+	if (state->m_insnote==2)
+			bv_p1_ret=0x08;
+		
+	return bv_p1_ret;
+
+}
+
 
 /******************************************************************************
 
@@ -775,7 +882,7 @@ static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
 	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
-	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("5003")
+	AM_RANGE(0x5003, 0x5003) AM_READ(u3_p3)
 	AM_RANGE(0x5005, 0x5005) AM_READ(ldsw)
 	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
 	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
@@ -783,6 +890,8 @@ static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE_MODERN("via6522_0",via6522_device,read,write)
 	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
+	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
+	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
 	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
 	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE_MODERN("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
@@ -824,6 +933,8 @@ static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE_MODERN("via6522_0",via6522_device,read,write)
 	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
+	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
+	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
 	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
 	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE_MODERN("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
@@ -842,6 +953,12 @@ INPUT PORTS
 static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("via_port_b")
+	PORT_DIPNAME( 0x10, 0x00, "1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) ) PORT_DIPLOCATION("AY:1")
+	PORT_DIPNAME( 0x20, 0x00, "2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) ) PORT_DIPLOCATION("AY:2")
 	PORT_DIPNAME( 0x40, 0x40, "HOPCO1" )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) ) PORT_DIPLOCATION("AY:3")
 	PORT_DIPNAME( 0x80, 0x00, "CBOPT1" )
@@ -886,8 +1003,32 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x40, 0x00, "PTRTAC") // printer taco
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "PTRHOM") // printer home
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:8")
+	PORT_DIPNAME( 0x80, 0x80, "PTRHOM") // printer home
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("5003:8")
+	
+	PORT_START("5005")
+	PORT_DIPNAME( 0x01, 0x01, "CREDIT SELECT 1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "CREDIT SELECT 2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "CREDIT SELECT 3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "5005-4") 
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "CGDRSW") // Logic Door (Security Cage)
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) ) PORT_DIPLOCATION("5005:5")
+	PORT_DIPNAME( 0x20, 0x00, "5005-6") 
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "5005-7") 
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "5005-8") 
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("5300")
@@ -1000,14 +1141,12 @@ static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("insertcoin")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Insert Credit")
-
+	
+	PORT_START("insertnote")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Insert Note")
+	
 	PORT_START("powerfail")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_COMMA)
-
-	PORT_START("CGDRSW") // Logic Door (Security Cage)
-	PORT_DIPNAME( 0x10, 0x10, "CGDRSW" ) PORT_DIPLOCATION("CGDRSW:1")	/* toggle switch */
-	PORT_DIPSETTING(    0x00, "Open" )
-	PORT_DIPSETTING(    0x10, "Closed" )
 
 	/************************************** LINKS ***************************************************************/
 
@@ -1133,6 +1272,18 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x80, 0x00, "DSW2 - Unconnected" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	/* Rotary switch for Note selection. I've done it like this so we can use 1 keyboard command (IPT_COIN2) to feed the bill acceptor */
+	PORT_START("NS")
+	PORT_DIPNAME( 0x0f, 0x00, "Note Selector" )
+	PORT_DIPSETTING(    0x00, "$1" )
+	PORT_DIPSETTING(    0x01, "$2" )
+	PORT_DIPSETTING(    0x02, "$5" )
+	PORT_DIPSETTING(    0x03, "$10" )
+	PORT_DIPSETTING(    0x04, "$20" )
+	PORT_DIPSETTING(    0x05, "$50" )
+	PORT_DIPSETTING(    0x06, "$100" )
+	
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(3bagflvt)
@@ -2160,7 +2311,7 @@ ROM_START( 86lions )
 ROM_END
 
 GAMEL( 1985, 86lions,  0,	 86lions,  aristmk4, aristmk4, ROT0, "Aristocrat", "86 Lions",					GAME_NOT_WORKING, layout_topgear  )
-GAMEL( 1996, eforest,  0,	 aristmk4, eforest,  aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",		GAME_NOT_WORKING, layout_eforest  ) // multiple denominations
+GAMEL( 1996, eforest,  0,	 aristmk4, eforest,  aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",		0, layout_eforest  ) // multiple denominations
 GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",		0,		  layout_aristmk4 ) // 10c, $1 = 10 credits
 GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
 GAMEL( 1996, 3bagflvt, 0,	 aristmk4, 3bagflvt, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",		0,		  layout_3bagflvt ) // 5c, $1 = 20 credits
@@ -2181,6 +2332,6 @@ GAMEL( 1986, clkwise,  0,	 aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nomine
 GAMEL( 1995, cgold2,   0,	 aristmk4, cgold2,   aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, US)",	GAME_NOT_WORKING, layout_cgold2   ) // multiple denominations
 GAMEL( 1996, fhunter,  0,	 aristmk4, fhunter,  aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, US)",		GAME_NOT_WORKING, layout_fhunter  ) // multiple denominations
 GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter,  aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, US)",		GAME_NOT_WORKING, layout_fhunter  ) // multiple denominations
-GAMEL( 1996, arcwins,  0,	 aristmk4, arcwins,  aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, US)",		GAME_NOT_WORKING, layout_arcwins  ) // multiple denominations
+GAMEL( 1996, arcwins,  0,	 aristmk4, arcwins,  aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, US)",		0, layout_arcwins  ) // multiple denominations
 GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",		0,		  layout_wildone  ) // 20c, $2 = 10 credits, video poker
 GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, NSW)",	0,		  layout_gldnpkr  ) // possibly 20c, 1 coin = 1 credit, video poker

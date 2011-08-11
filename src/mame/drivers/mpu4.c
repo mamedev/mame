@@ -5365,7 +5365,7 @@ ROM_START( m4frtgm )
 	ROM_LOAD( "fruit.bin", 0x0000, 0x010000, CRC(dbe44316) SHA1(15cd49dd2e6166f7a7668663f7fea802d6cbb12f) )
 
 	ROM_REGION( 0x800000, "msm6376", 0 ) /* this isn't OKI, or is corrupt (bad size) */
-	ROM_LOAD( "fruitsnd.bin", 0x0000, 0x010000, CRC(86547dc7) SHA1(4bf64f22e84c0ee82d961b0ba64932b8bf6a521f) )
+	ROM_LOAD( "fruitsnd.bin", 0x0000, 0x010000, CRC(86547dc7) SHA1(4bf64f22e84c0ee82d961b0ba64932b8bf6a521f) ) // matches 'Replay' on SC1 hardware, probably just belongs there.. or this is eurocoin with different sound hw here?
 ROM_END
 
 ROM_START( m4frtlnk )
@@ -13410,6 +13410,81 @@ ROM_END
 
 
 
+ROM_START( m4blkgd )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "blackgoldprg.bin", 0x0000, 0x080000, CRC(a04736b2) SHA1(9e060cc79e7922b38115f1412ed76f8c76deb917) )
+
+	ROM_REGION( 0x40000, "altrevs", 0 )
+	ROM_LOAD( "blackgoldversion2.4.bin", 0x0000, 0x040000, CRC(fad4e360) SHA1(23c6a13e8d1ca307b0ef22edffed536675985aca) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "blackgoldsnd1.bin", 0x000000, 0x080000, CRC(d251b59e) SHA1(960b81b87f0fb5000028c863892a273362cb897f) )
+	ROM_LOAD( "blackgoldsnd2.bin", 0x080000, 0x080000, CRC(87cbcd1e) SHA1(a6cd186af7c5682e216f549b77735b9bf1b985ae) )
+	ROM_LOAD( "blackgoldsnd3.bin", 0x100000, 0x080000, CRC(258f7b83) SHA1(a6df577d98ade8c5c5ff68ef891667e65e83ac17) )
+//	ROM_LOAD( "blackgoldsound 1.bin", 0x0000, 0x080000, CRC(d251b59e) SHA1(960b81b87f0fb5000028c863892a273362cb897f) )
+//	ROM_LOAD( "blackgoldsound 2.bin", 0x0000, 0x080000, CRC(87cbcd1e) SHA1(a6cd186af7c5682e216f549b77735b9bf1b985ae) )
+//	ROM_LOAD( "blackgoldsound 3.bin", 0x0000, 0x080000, CRC(258f7b83) SHA1(a6df577d98ade8c5c5ff68ef891667e65e83ac17) )
+ROM_END
+
+
+ROM_START( m4excam )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ex1_4.bin", 0x0000, 0x010000, CRC(34c4aee2) SHA1(c5487c5b0144ca188bc2e3926a0343fd4c9c565a) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "ex1_0d.bin", 0x0000, 0x010000, CRC(490c510e) SHA1(21a03d8e2dd4d2c7760acbff5705f925fe9f31be) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "mdmexcalibsnd.p1", 0x000000, 0x080000, CRC(8ea73366) SHA1(3ee45ad98e03177eeef97521df7b3d1945242076) )
+	ROM_LOAD( "mdmexcalibsnd.p2", 0x080000, 0x080000, CRC(0fca6ca2) SHA1(2029d15e3b51069f5847ab3846bf6c064f0a3381) )
+	ROM_LOAD( "mdmexcalibsnd.p3", 0x100000, 0x080000, CRC(43be816a) SHA1(a95f702ec1bb20f3e0f18984948963b56769f5ba) )
+	ROM_LOAD( "mdmexcalibsnd.p4", 0x180000, 0x080000, CRC(ef8a718c) SHA1(093a5fff5bab61fc9276a7f9f3c5b728a50603b3) )
+ROM_END
+
+
+ROM_START( m4front )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ff2_1.bin", 0x0000, 0x010000, CRC(3519cba1) SHA1(d83a5370ee82e258024d20ffacec7050950b1326) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "ffsnd2_1.bin", 0x000000, 0x080000, CRC(9b3cdf12) SHA1(1a209985493f686dd37e91693361ecbf32096f66) )
+	ROM_LOAD( "ffsnd2_2.bin", 0x080000, 0x080000, CRC(0fc33bdf) SHA1(6de715e33411050ee1d2a0f08bf1c9a8001ffb4f) )
+ROM_END
+
+
+
+ROM_START( m4pick )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "pickafr2.nl7", 0x0c000, 0x02000, CRC(7a174563) SHA1(83203392171ba09bd7201cdca5c70c52ec2e65bc) )
+	ROM_LOAD( "pickafr1.nl7", 0x0e000, 0x02000, CRC(6ae6e508) SHA1(a7da4151527d0c35f74e971e79ad1ce380315eac) )
+ROM_END
+
+
+
+
+ROM_START( m4safar )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "saf4_1.bin", 0x0000, 0x010000, CRC(ad726457) SHA1(4104be61d179024fae9fb9c631677b1ba56d3f00) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	
+ROM_END
+
+
+
+
+ROM_START( m4zill )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "zillprgh.bin", 0x0000, 0x080000, CRC(6f831f6d) SHA1(6ab6d7f1752d27bc216bc11533b90178ce188715) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "zillprog.bin", 0x0000, 0x080000, CRC(0f730bab) SHA1(3ea82c8f7d62c70897a5c132273820c9f192cd72) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "zillsnd.bin", 0x0000, 0x080000, CRC(171ed677) SHA1(25d63f4d9c64f13bec4feffa265c5b0c5f6be4ec) )
+ROM_END
+
+
 
 
 // thanks to Project Amber for descramble information
@@ -14098,11 +14173,11 @@ GAME(199?, m4twstcl	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Twis
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
 
 
-
-
-
-
-
-
+GAME(199?, m4blkgd, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Gemini","Black Gold (Gemini) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4excam, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4front, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Final Frontier (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4pick, 0,			mod2    ,mpu4, m4default, ROT0,   "Jpm","Pick A Fruit (Jpm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4safar, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Safari Club (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4zill, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Pure Leisure","Zillionare's Challenge (Pure Leisure) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
 

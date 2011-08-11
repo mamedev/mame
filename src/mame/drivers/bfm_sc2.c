@@ -3897,10 +3897,20 @@ ROM_START( sc2brkfs )
 	ROM_LOAD( "big-breakfast_dat_ar_var_a.bin", 0x0000, 0x010000, CRC(ade2834f) SHA1(54914fbc8416b2d08c13c56088b1665e267e6777) )
 	ROM_LOAD( "big-breakfast_dat_ss_var_a.bin", 0x0000, 0x010000, CRC(57aff227) SHA1(5d4c6190194719b3fa5c02d30e7c6b59978c93c3) )
 
-
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD("bigbreakfastsnd.bin", 0x00000, 0x80000, CRC(bf91aa2b) SHA1(40942165e65ff9b027015d500e5a9726c44ba1c5))
 ROM_END
+
+ROM_START( sc2brkfsm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigbreakfastcasino", 0x0000, 0x010000, CRC(db45b17b) SHA1(927513f6fe326b216b0f13f34bbbc9970ab4f0cc) )
+	ROM_LOAD( "98400022", 0x0000, 0x010000, CRC(66482cbb) SHA1(933d8ec98d5bc3026d547b657093e07f96fbdafa) )
+	ROM_LOAD( "98400020", 0x0000, 0x010000, CRC(7a18f268) SHA1(ad352d613333072c62c38a493cf3183d387b7562) )
+
+	ROM_REGION( 0x80000, "upd", 0 ) // might not be right for this version
+	ROM_LOAD("bigbreakfastsnd.bin", 0x00000, 0x80000, CRC(bf91aa2b) SHA1(40942165e65ff9b027015d500e5a9726c44ba1c5))
+ROM_END
+
 
 ROM_START( sc2brkfs1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3946,6 +3956,7 @@ ROM_END
 ROM_START( sc2drwho )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("95750288.bin",	0x00000, 0x10000, CRC(fe95b5a5) SHA1(876a812f69903fd99f896b35eeaf132c215b0035) ) // dr-who-time-lord_std_ss_20p_ass.bin
+
 
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
@@ -4074,6 +4085,30 @@ ROM_END
 ROM_START( sc2drwho16 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("tmld5pa",	0x00000, 0x10000, CRC(b9ddfd0d) SHA1(915afd83eab330a0e70635c35f031f2041b9f5ad) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
+ROM_END
+
+ROM_START( sc2drwho18 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "98401002.bin", 0x0000, 0x010000, CRC(e7c23331) SHA1(f6823fa206d28f53a13ef44c9e4cf37d6b8aa758) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
+ROM_END
+
+ROM_START( sc2drwho19 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "98400002.bin", 0x0000, 0x010000, CRC(40cc7d8b) SHA1(05f98e29bb92b3581691ee6df8ff5ae73e351d40) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
+ROM_END
+
+ROM_START( sc2drwho20 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tlrdx56c", 0x0000, 0x010000, CRC(80da4ba0) SHA1(0c725da5eead9371d895ca9650fbbec8aa1509b2) )
 
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
@@ -4514,7 +4549,7 @@ ROM_END
 ROM_START( sc2wembl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "road-to-wembley_std_ac_10pnd_15rm_ass.bin", 0x0000, 0x010000, CRC(7b8e7a47) SHA1(3026850a18ef9cb44584550e28f62165bfa690e9) )
-
+	
 	ROM_REGION( 0x10000, "altrevs", 0 )
 	ROM_LOAD( "95750499.p1", 0x0000, 0x010000, CRC(a2b11ca6) SHA1(cc1931504f8da98119f771499db616898d92e0d9) )
 	ROM_LOAD( "95750500.p1", 0x0000, 0x010000, CRC(bfe45926) SHA1(6a2814735e0894bb5152cba8f90d98cfa98c250b) )
@@ -4535,6 +4570,19 @@ ROM_START( sc2wembl )
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "wembley_sound.bin", 0x0000, 0x080000, CRC(5ce2fc50) SHA1(26533428582058f0cd618e3657f967bc64e551fc) )
 ROM_END
+
+ROM_START( sc2wemblm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "98400014", 0x0000, 0x010000, CRC(e4f3e02d) SHA1(ce2b961e6142ecfb1532daaa53746d785e2342eb) )
+	
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "wembley_sound.bin", 0x0000, 0x080000, CRC(5ce2fc50) SHA1(26533428582058f0cd618e3657f967bc64e551fc) )
+ROM_END
+
+
+
+
+
 
 
 ROM_START( sc2prem )
@@ -4767,6 +4815,83 @@ ROM_START( sc2dick )
 	ROM_LOAD( "global-spotted-dick_snd.bin", 0x0000, 0x100000, CRC(f2c66aab) SHA1(6fe94a193779c91711588365591cf42d197cb7b9) )
 ROM_END
 
+ROM_START( sc2pick )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pick2-3n.p1", 0x0000, 0x010000, CRC(b89c1dde) SHA1(8e1ece392dbb8e88daece79c5bea832149d8f442) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "pick2-3p.p1", 0x0000, 0x010000, CRC(53ced0cb) SHA1(113a5e9414a3fcf0dacb6024748681f2b8e8bb55) )
+
+	// club version roms
+	ROM_LOAD( "dpic1-9n.p1", 0x0000, 0x010000, CRC(89b24a0b) SHA1(f56a79258497bc787b50d37ddf75b5d4920848e8) )
+	ROM_LOAD( "dpic1-9p.p1", 0x0000, 0x010000, CRC(1c0adb51) SHA1(aeca44490c8b0517eddd69fcdc36cf2cafb4d844) )
+
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	ROM_LOAD( "pickofthebunchsnd1.bin", 0x000000, 0x100000, CRC(f717b9c7) SHA1(06c90cc9779d475100926e986c742f0acffa0dc3) )
+	ROM_LOAD( "pickofthebunchsnd2.bin", 0x100000, 0x100000, CRC(eaac3e67) SHA1(3aaed6514eeeb41c26f365789d8736908785b1c2) )
+ROM_END
+
+
+ROM_START( sc2rock )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hb151-6n.p1", 0x0000, 0x010000, CRC(982de54a) SHA1(20e65e163f0455d683eb47ac37bc1e3355548c9a) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "hb151-6p.p1", 0x0000, 0x010000, CRC(c9063e3c) SHA1(e47765ff56abb8d25c559cc5ebbe679ca40c498b) )
+	ROM_LOAD( "hbiyr_euro.bin", 0x0000, 0x010000, CRC(bc4f8ffe) SHA1(de51fda4fe1c57945133a25c2ad8fba48064a23c) )
+	ROM_LOAD( "rock1-4n.p1", 0x0000, 0x010000, CRC(e3888e8b) SHA1(7e394cbc219259a5eed9ccb283fff5f4b257e87f) )
+	ROM_LOAD( "rock1-4p.p1", 0x0000, 0x010000, CRC(a4b61df4) SHA1(ffbfab5fc976edc68bb599625387295df793f449) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	ROM_LOAD( "hbiyr_snd.bin", 0x0000, 0x100000, CRC(96cc0d54) SHA1(612f8c7f353bb847c1a28e2b76b64916d5b2d36a) )
+ROM_END
+
+ROM_START( sc2call )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "your2-7n.p1", 0x0000, 0x010000, CRC(9d3b4987) SHA1(131808aa90627b0aa830c6b49b12e15af96665a5) )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	ROM_LOAD( "dyor1-6p.p1", 0x0000, 0x010000, CRC(843edbd2) SHA1(67496753f3687800413418d65dcfc764695b4997) )
+	ROM_LOAD( "your2-7p.p1", 0x0000, 0x020000, CRC(32ba485b) SHA1(00d962ba30f029ee2cc4447c42d57d9bc2592000) ) // seems to contain a different game in the 2nd half??
+	
+	// club rom
+	ROM_LOAD( "dyor1-6n.p1", 0x0000, 0x010000, CRC(5e516bd1) SHA1(52a108e3d7aa9fdffb25e09922fa84c0155f18f5) )
+
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	/* missing? */
+ROM_END
+
+
+ROM_START( sc2prom )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "alongtheprom.bin", 0x0000, 0x010000, CRC(0f212ba9) SHA1(34dfe67f8cbdf1cba806dcc7a3e872a8b59747d3) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "alongthepromsnd.bin", 0x0000, 0x040000, CRC(380f56af) SHA1(9125c09e6585e6f4a2de9ea8715371662245aa9a) )
+ROM_END
+
+ROM_START( sc2payr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "98400023", 0x0000, 0x010000, CRC(9478e97a) SHA1(c269f2a8e7eb6d76bf51563c6588d21bd71c1acf) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* missing */	
+ROM_END
+
+
+ROM_START( sc2smnud )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "smn1.2", 0x8000, 0x008000, CRC(e2d2fdd9) SHA1(0e2f44fa64dfa342752e53e9d514ca64e70b3046) )
+
+	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
+	ROM_LOAD( "super_multi-nudge_game_(27512)", 0x0000, 0x010000, CRC(6a0de579) SHA1(308fec509371b93cb6ab957c83f2e041db449dfe) ) // both halves identical, but doesn't work, start vector is 4000?
+
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "super_multi-nudge_sound_(4meg)", 0x0000, 0x080000, CRC(efd87dab) SHA1(8b4b5de351ce3b1cefa4d0dc01072a942db072dc) )
+ROM_END
 
 
 
@@ -4807,6 +4932,9 @@ GAMEL( 1994, sc2drwho14	, sc2drwho	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",
 GAMEL( 1994, sc2drwho15	, sc2drwho	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 16) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 GAMEL( 1994, sc2drwho16	, sc2drwho	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 17) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 GAMEL( 1994, sc2drwho17	, sc2drwho	,  scorpion2		, drwho		, drwhon	, 0,		 "BFM",      "Dr.Who The Timelord (set 18, not encrypted) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, sc2drwho18	, sc2drwho	,  scorpion2		, drwho		, drwhon	, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (set 19) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // error 99
+GAMEL( 1994, sc2drwho19	, sc2drwho	,  scorpion2		, drwho		, drwhon	, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (set 20) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // error 99
+GAMEL( 1994, sc2drwho20	, sc2drwho	,  scorpion2		, drwho		, drwhon	, 0,		 "BFM",      "Dr.Who The Timelord Deluxe (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 
 GAME( 1994, sc2brkfs	, 0			,  scorpion2		, bbrkfst	, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 1 UK, Game Card 95-750-524) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 1994, sc2brkfs1	, sc2brkfs	,  scorpion2		, bbrkfst	, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 2) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
@@ -4814,6 +4942,7 @@ GAME( 1994, sc2brkfs2	, sc2brkfs	,  scorpion2		, bbrkfst	, bbrkfst	, 0,		 "BFM",
 GAME( 1994, sc2brkfs3	, sc2brkfs	,  scorpion2		, bbrkfst	, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 4) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 1994, sc2brkfs4	, sc2brkfs	,  scorpion2		, bbrkfst	, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 5) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 1994, sc2brkfs5	, sc2brkfs	,  scorpion2		, bbrkfst	, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 6) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, sc2brkfsm	, sc2brkfs	,  scorpion2		, bbrkfst	, bbrkfst	, 0,		 "BFM/Mazooma",      "The Big Breakfast Casino (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 GAME( 1995, sc2focus	, 0			,  scorpion3		, scorpion3	, focus		, 0,		 "BFM/ELAM", "Focus (Dutch, Game Card 95-750-347) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 GAME( 1996, sc2gslam	, 0			,  scorpion2		, bfmcgslm	, bfmcgslm	, 0,		 "BFM",      "Grandslam Club (UK, Game Card 95-750-843) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
@@ -4828,6 +4957,7 @@ GAME( 199?, sc2easy		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "E
 GAME( 199?, sc2majes	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Majestic Bells (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2dels		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Del's Millions (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2wembl	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Road To Wembley (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2wemblm	, sc2wembl	,  scorpion2		, drwho		, drwho		, 0,		 "BFM/Mazooma",      "Road To Wembley (Bellfruit/Mazooma) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // error 99
 GAME( 199?, sc2downt	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",	     "Down Town (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2inst		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2mam		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
@@ -4841,10 +4971,21 @@ GAME( 199?, sc2pe1g		, 0			,  scorpion2		, drwho		, drwhon	, 0,		 "BFM",      "P
 // these need inverted service door, and seem to have some issues with the reels jumping between 2 values?
 GAME( 199?, sc2goldr	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Mdm",      "Gold Reserve (Mdm) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2hifly	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Mdm",      "High Flyer (Mdm) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc2scc		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Mdm",      "Safe Cracker Club (Mdm) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2scc		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Mdm",      "Safe Cracker Club (Mdm) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // also marked as 'GLOBAL'?
 
 // custom Global sound system?
 GAME( 199?, sc2dick		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "Spotted Dick (Global) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2pick		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "Pick Of The Bunch (Global) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2rock		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "How Big's Your Rock (Global) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2call		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "It's Your Call (Global) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
+GAME( 199?, sc2prom		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
+GAME( 199?, sc2payr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM/Mazooma",   "Pay Roll Casino (Bellfruit/Mazooma) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
+
+
+GAME( 199?, sc2smnud	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Concept",   "Super Multi Nudge (Concept)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // illegal opcodes? wrong platform? definitely uses bfm crypt tho
+
+
 
 
 // Games with Dot Matrix Displays */
