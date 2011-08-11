@@ -13253,6 +13253,44 @@ as_wwd			//
 as_wwe			//
 as_ws			//
 
+/* Electrocoin */
+
+
+ec_bar5		// Bar 5
+ec_barx		// Bar X
+ec_barx7	// Bar X 7
+ec_barxd	// Bar X Deluxe
+ec_bxd7s	// Bar X Diamond 7s
+ec_big7		// Big 7
+ec_casbx	// Casino Bar X
+ec_casrb	// Casino Red Bar
+ec_cool7	// Cool 7
+ec_laby		// Labyrinth
+ec_mag7s	// Magic 7s
+ec_magbr	// Magic Bars
+ec_oxocg	// Oxo Classic Gold
+ec_oxocl	// Oxo Club 
+ec_oxogb	// Oxo Golden Bars
+ec_oxorl	// Oxo Reels
+ec_oxorv	// Oxo Revolution
+ec_penni	// Pennies From Heaven
+ec_pyram	// Pyramid
+ec_redbr	// Red Bar
+ec_rcc		// Royal Casino Club
+ec_secrt	// Secret Castle
+ec_sphin	// Sphinx
+ec_supb7	// Super Bar 7
+ec_supbx	// Super Bar X
+ec_spbxd	// Super Bar X Deluxe
+ec_spbg7	// Super Big 7
+ec_suprb	// Super Red Bar
+ec_suprl	// Super Reels
+ec_supsl	// Super Silver
+ec_unk1		// Unknown 'Electrocoin' Fruit Machine '300615'
+ec_unk2		// Unknown 'Electrocoin' Fruit Machine 'a3'
+ec_unk3		// Unknown 'Electrocoin' Fruit Machine 'a4'
+ec_unk4		// Unknown 'Electrocoin' Fruit Machine 'flat256'
+ec_unk5		// Unknown 'Electrocoin' Fruit Machine(s)
 
 
 

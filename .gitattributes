@@ -2035,6 +2035,7 @@ src/mame/drivers/dwarfd.c svneol=native#text/plain
 src/mame/drivers/dynadice.c svneol=native#text/plain
 src/mame/drivers/dynax.c svneol=native#text/plain
 src/mame/drivers/dynduke.c svneol=native#text/plain
+src/mame/drivers/ecoinfr.c svneol=native#text/plain
 src/mame/drivers/egghunt.c svneol=native#text/plain
 src/mame/drivers/embargo.c svneol=native#text/plain
 src/mame/drivers/enigma2.c svneol=native#text/plain
