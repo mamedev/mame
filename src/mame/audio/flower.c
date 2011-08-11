@@ -1,3 +1,13 @@
+/* Clarue Flower sound driver.
+Initial version was based on the Wiping sound driver, which was based on the old namco.c sound driver.
+
+TODO:
+- timing (see main driver file), but also of samplerate and effects counter
+- what do the unknown bits in soundregs do?
+- are channel effects correct? currently mostly guesswork
+
+*/
+
 #include "emu.h"
 #include "includes/flower.h"
 
@@ -96,6 +106,9 @@ static STREAM_UPDATE( flower_update_mono )
 		int f = voice->freq;
 		int v = voice->volume;
 
+		if (!voice->active)
+			continue;
+
 		// effects
 		// bit 0: volume slide down?
 		if (voice->effect & 1 && !voice->oneshot)
@@ -111,6 +124,7 @@ static STREAM_UPDATE( flower_update_mono )
 			f -= (voice->ecount << 7);
 			if (f < 0) f = 0;
 		}
+		// bit 3: not used much, maybe pitch slide the other way?
 
 		v |= voice->voltab;
 		mix = state->m_mixer_buffer;
