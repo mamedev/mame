@@ -1,27 +1,24 @@
-/***************************************************************************
-
-    Flower sound driver (quick hack of the Wiping sound driver)
-
-***************************************************************************/
-
 #include "emu.h"
 #include "includes/flower.h"
 
 #define FLOWER_VERBOSE		0		// show register writes
 
-#define MIXER_SAMPLERATE	48000	/* ? */
+#define MIXER_SAMPLERATE	48000	/* ? (native freq is probably in the MHz range: note the >>7 when reading a sample) */
 #define MIXER_DEFGAIN		48
 
 
 /* this structure defines the parameters for a channel */
 typedef struct
 {
-	UINT32 frequency;
-	UINT32 counter;
-	UINT16 volume;
+	UINT32 start;
+	UINT32 pos;
+	UINT16 freq;
+	UINT8 volume;
+	UINT8 voltab;
 	UINT8 oneshot;
-	UINT8 oneshotplaying;
-	UINT16 rom_offset;
+	UINT8 active;
+	UINT8 effect;
+	UINT32 ecount;
 
 } sound_channel;
 
@@ -29,6 +26,8 @@ typedef struct
 typedef struct _flower_sound_state flower_sound_state;
 struct _flower_sound_state
 {
+	emu_timer *m_effect_timer;
+
 	/* data about the sound system */
 	sound_channel m_channel_list[8];
 	sound_channel *m_last_channel;
@@ -74,7 +73,7 @@ static void make_mixer_table(device_t *device, int voices, int gain)
 		int val = i * gain * 16 / voices;
 		if (val > 32767) val = 32767;
 		state->m_mixer_lookup[ i] = val;
-		state->m_mixer_lookup[-i] = -val;
+		state->m_mixer_lookup[-i] =-val;
 	}
 }
 
@@ -94,50 +93,48 @@ static STREAM_UPDATE( flower_update_mono )
 	/* loop over each voice and add its contribution */
 	for (voice = state->m_channel_list; voice < state->m_last_channel; voice++)
 	{
-		int f = 256*voice->frequency;
+		int f = voice->freq;
 		int v = voice->volume;
 
-		/* only update if we have non-zero volume and frequency */
-		if (v && f)
+		// effects
+		// bit 0: volume slide down?
+		if (voice->effect & 1 && !voice->oneshot)
 		{
-			const UINT8 *w = &state->m_sample_rom[voice->rom_offset];
-			int c = voice->counter;
+			// note: one-shot samples are fixed volume
+			v -= (voice->ecount >> 4);
+			if (v < 0) v = 0;
+		}
+		// bit 1: used often, but hard to figure out what for
+		// bit 2: probably pitch slide
+		if (voice->effect & 4)
+		{
+			f -= (voice->ecount << 7);
+			if (f < 0) f = 0;
+		}
 
-			mix = state->m_mixer_buffer;
+		v |= voice->voltab;
+		mix = state->m_mixer_buffer;
 
-			/* add our contribution */
-			for (i = 0; i < samples; i++)
+		for (i = 0; i < samples; i++)
+		{
+			voice->pos += f;
+
+			if (voice->oneshot)
 			{
-				int offs;
-
-				c += f;
-
-				if (voice->oneshot)
+				if (voice->active)
 				{
-					if (voice->oneshotplaying)
-					{
-						offs = (c >> 15);
-						if (w[offs] == 0xff)
-						{
-							voice->oneshotplaying = 0;
-						}
-
-						else
-						{
-							*mix++ += state->m_volume_rom[v*256 + w[offs]] - 0x80;
-						}
-					}
-				}
-				else
-				{
-					offs = (c >> 15) & 0x1ff;
-
-					*mix++ += state->m_volume_rom[v*256 + w[offs]] - 0x80;
+					UINT8 sample = state->m_sample_rom[(voice->start + voice->pos) >> 7 & 0x7fff];
+					if (sample == 0xff)
+						voice->active = 0;
+					else
+						*mix++ += state->m_volume_rom[v << 8 | sample] - 0x80;
 				}
 			}
-
-			/* update the counter for this voice */
-			voice->counter = c;
+			else
+			{
+				UINT8 sample = state->m_sample_rom[(voice->start >> 7 & 0x7e00) | (voice->pos >> 7 & 0x1ff)];
+				*mix++ += state->m_volume_rom[v << 8 | sample] - 0x80;
+			}
 		}
 	}
 
@@ -145,6 +142,17 @@ static STREAM_UPDATE( flower_update_mono )
 	mix = state->m_mixer_buffer;
 	for (i = 0; i < samples; i++)
 		*buffer++ = state->m_mixer_lookup[*mix++];
+}
+
+/* clock sound channel effect counters */
+static TIMER_CALLBACK( flower_clock_effect )
+{
+	flower_sound_state *state = (flower_sound_state *)ptr;
+	sound_channel *voice;
+	state->m_stream->update();
+
+	for (voice = state->m_channel_list; voice < state->m_last_channel; voice++)
+		voice->ecount += (voice->ecount < (1<<22));
 }
 
 
@@ -156,6 +164,7 @@ static DEVICE_START( flower_sound )
 	sound_channel *voice;
 	int i;
 
+	state->m_effect_timer = machine.scheduler().timer_alloc(FUNC(flower_clock_effect), state);
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, MIXER_SAMPLERATE, 0, flower_update_mono);
 	state->m_mixer_buffer = auto_alloc_array(device->machine(), short, MIXER_SAMPLERATE);
 	make_mixer_table(device, 8, MIXER_DEFGAIN);
@@ -171,12 +180,15 @@ static DEVICE_START( flower_sound )
 	{
 		voice = &state->m_channel_list[i];
 
-		device->save_item(NAME(voice->frequency), i+1);
-		device->save_item(NAME(voice->counter), i+1);
+		device->save_item(NAME(voice->freq), i+1);
+		device->save_item(NAME(voice->pos), i+1);
 		device->save_item(NAME(voice->volume), i+1);
+		device->save_item(NAME(voice->voltab), i+1);
+		device->save_item(NAME(voice->effect), i+1);
+		device->save_item(NAME(voice->ecount), i+1);
 		device->save_item(NAME(voice->oneshot), i+1);
-		device->save_item(NAME(voice->oneshotplaying), i+1);
-		device->save_item(NAME(voice->rom_offset), i+1);
+		device->save_item(NAME(voice->active), i+1);
+		device->save_item(NAME(voice->start), i+1);
 	}
 }
 
@@ -184,19 +196,27 @@ static DEVICE_RESET( flower_sound )
 {
 	flower_sound_state *state = get_safe_token(device);
 	sound_channel *voice;
+	attotime period;
 	int i;
+
+	/* reset effect timer, period is unknown/guessed */
+	period = attotime::from_hz(MIXER_SAMPLERATE / 256);
+	state->m_effect_timer->adjust(period, 0, period);
 
 	/* reset all the voices */
 	for (i = 0; i < 8; i++)
 	{
 		voice = &state->m_channel_list[i];
 
-		voice->frequency = 0;
-		voice->counter = 0;
+		voice->freq = 0;
+		voice->pos = 0;
 		voice->volume = 0;
+		voice->voltab = 0;
+		voice->effect = 0;
+		voice->ecount = 0;
 		voice->oneshot = 1;
-		voice->oneshotplaying = 0;
-		voice->rom_offset = 0;
+		voice->active = 0;
+		voice->start = 0;
 	}
 }
 
@@ -214,6 +234,7 @@ DEVICE_GET_INFO( flower_sound )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Flower Custom");				break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -221,13 +242,14 @@ DEVICE_GET_INFO( flower_sound )
 /********************************************************************************/
 
 #if FLOWER_VERBOSE
+static int r_numwrites[2][8] = {{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}};
 static void show_soundregs(device_t *device)
 {
 	flower_sound_state *state = get_safe_token(device);
 	int set,reg,chan;
 	char text[0x100];
 	char message[0x1000] = {0};
-	UINT8 *sregs = state->m_soundregs1;
+	UINT8 *base = state->m_soundregs1;
 
 	for (set=0;set<2;set++)
 	{
@@ -238,13 +260,14 @@ static void show_soundregs(device_t *device)
 		
 			for (chan=0;chan<8;chan++)
 			{
-				sprintf(text," %02X",sregs[reg + 8*chan]);
+				sprintf(text," %02X",base[reg + 8*chan]);
 				strcat(message,text);
 			}
-			strcat(message,"\n");
+			sprintf(text," - %07d\n",r_numwrites[set][reg]);
+			strcat(message,text);
 		}
 		strcat(message,"\n");
-		sregs = state->m_soundregs2;
+		base = state->m_soundregs2;
 	}
 	popmessage("%s",message);
 }
@@ -262,99 +285,74 @@ R  76543210
 3  xxxxxxxx			*
 4  ...x....			one-shot sample
 5  ...x....			??? same as R4?
-6  ........			unused?
+6  ........			unused
 7  xxxx....			volume
 
 set 2:
 R  76543210
-0  ....xxxx			start address?
-1  ....xxxx			start address?
-2  ....xxxx			start address
-3  ....xxxx			start address
-4  xxxx    			??? effect? (volume/pitch slide) -- these bits are used by the stuck notes
+0  ....xxxx			start address
+1  ....xxxx			*
+2  ....xxxx			*
+3  ....xxxx			*
+4  xxxx    			assume it's channel pitch/volume effects
        xxxx			start address
-5  x...    			??? loop/one-shot related?
+5  x...    			???
        xxxx			start address
-6  ........			unused?
-7  ......xx			volume
+6  ........			unused
+7  ......xx			volume table + start trigger
 
 */
 
 WRITE8_DEVICE_HANDLER( flower_sound1_w )
 {
 	flower_sound_state *state = get_safe_token(device);
-	sound_channel *voice;
-	int base;
+	sound_channel *voice = &state->m_channel_list[offset >> 3 & 7];
+	int c = offset & 0xf8;
+	UINT8 *base1 = state->m_soundregs1;
+//	UINT8 *base2 = state->m_soundregs2;
 
 	state->m_stream->update();
-	state->m_soundregs1[offset] = data;
+	base1[offset] = data;
 #if FLOWER_VERBOSE
+	r_numwrites[0][offset & 7]++;
 	show_soundregs(device);
 #endif
 
-	/* recompute all the voice parameters */
-	for (base = 0, voice = state->m_channel_list; voice < state->m_last_channel; voice++, base += 8)
-	{
-		voice->frequency = state->m_soundregs1[2 + base] & 0x0f;
-		voice->frequency = voice->frequency * 16 + ((state->m_soundregs1[3 + base]) & 0x0f);
-		voice->frequency = voice->frequency * 16 + ((state->m_soundregs1[0 + base]) & 0x0f);
-		voice->frequency = voice->frequency * 16 + ((state->m_soundregs1[1 + base]) & 0x0f);
-
-		voice->volume = (state->m_soundregs1[7 + base] >> 4) | ((state->m_soundregs2[7 + base] & 0x03) << 4);
-
-		if (state->m_soundregs1[4 + base] & 0x10)
-		{
-			voice->oneshot = 0;
-			voice->oneshotplaying = 0;
-		}
-		else
-		{
-			voice->oneshot = 1;
-		}
-	}
+	// recompute voice parameters
+	voice->freq = (base1[c+2] & 0xf) << 12 | (base1[c+3] & 0xf) << 8 | (base1[c+0] & 0xf) << 4 | (base1[c+1] & 0xf);
+	voice->volume = base1[c+7] >> 4;
 }
 
 WRITE8_DEVICE_HANDLER( flower_sound2_w )
 {
 	flower_sound_state *state = get_safe_token(device);
-	sound_channel *voice;
-	int base = offset & 0xf8;
+	sound_channel *voice = &state->m_channel_list[offset >> 3 & 7];
+	int i, c = offset & 0xf8;
+	UINT8 *base1 = state->m_soundregs1;
+	UINT8 *base2 = state->m_soundregs2;
 
 	state->m_stream->update();
-	state->m_soundregs2[offset] = data;
+	base2[offset] = data;
 #if FLOWER_VERBOSE
+	r_numwrites[1][offset & 7]++;
 	show_soundregs(device);
 #endif
 
-	/* recompute all the voice parameters */
-	voice = &state->m_channel_list[offset/8];
-	if (voice->oneshot)
-	{
-		int start;
+	// reg 7 is start trigger!
+	if ((offset & 7) != 7)
+		return;
 
-		start = state->m_soundregs2[5 + base] & 0x0f;
-		start = start * 16 + ((state->m_soundregs2[4 + base]) & 0x0f);
-		start = start * 16 + ((state->m_soundregs2[3 + base]) & 0x0f);
-		start = start * 16 + ((state->m_soundregs2[2 + base]) & 0x0f);
-		start = start * 16 + ((state->m_soundregs2[1 + base]) & 0x0f);
-		start = start * 16 + ((state->m_soundregs2[0 + base]) & 0x0f);
+	voice->voltab = (base2[c+7] & 3) << 4;
+	voice->oneshot = (~base1[c+4] & 0x10) >> 4;
+	voice->effect = base2[c+4] >> 4;
+	voice->ecount = 0;
+	voice->pos = 0;
+	voice->active = 1;
 
-		voice->rom_offset = (start >> 7) & 0x7fff;
-
-		voice->counter = 0;
-		voice->oneshotplaying = 1;
-	}
-	else
-	{
-		int start;
-
-		start = state->m_soundregs2[5 + base] & 0x0f;
-		start = start * 16 + ((state->m_soundregs2[4 + base]) & 0x0f);
-
-		voice->rom_offset = (start << 9) & 0x7fff;	// ???
-		voice->oneshot = 0;
-		voice->oneshotplaying = 0;
-	}
+	// full start address is 6 nibbles
+	voice->start = 0;
+	for (i = 5; i >= 0; i--)
+		voice->start = (voice->start << 4) | (base2[c+i] & 0xf);
 }
 
 
