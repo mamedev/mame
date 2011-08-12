@@ -447,50 +447,47 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("DSW0")	/* DSW0 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) ) 		/* Manual shows 1C_5C */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")	/* DSW1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )                         /* "1" in the "test mode" */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "2" )                         /* "1" in the "test mode" but manual states "Infinite" */
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       /* table at 0x0ca3 - 4*30 bytes */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,6") /* table at 0x0ca3 - 4*30 bytes */
 	PORT_DIPSETTING(    0x10, "30k and 70k" )
 	PORT_DIPSETTING(    0x00, "50k and 100k" )
 	PORT_DIPSETTING(    0x30, "30k only" )
 	PORT_DIPSETTING(    0x20, "50k only" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START("COIN")	/* Connected to i8751 directly */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -503,10 +500,10 @@ static INPUT_PORTS_START( firetrapj )
 	PORT_INCLUDE( firetrap )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       /* table at 0x0ca3 - 4*30 bytes */
-	PORT_DIPSETTING(    0x30, "50k 120k 70k+" )             /* last bonus life at 960k */
-	PORT_DIPSETTING(    0x20, "60k 140k 80k+" )             /* last bonus life at 940k */
-	PORT_DIPSETTING(    0x10, "80k 180k 100k+" )            /* last bonus life at 980k */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,6") /* table at 0x0ca3 - 4*30 bytes */
+	PORT_DIPSETTING(    0x30, "50k & Every 70k" )             /* last bonus life at 960k */
+	PORT_DIPSETTING(    0x20, "60k & Every 80k" )             /* last bonus life at 940k */
+	PORT_DIPSETTING(    0x10, "80k & Every 100k" )            /* last bonus life at 980k */
 	PORT_DIPSETTING(    0x00, "50k only" )
 INPUT_PORTS_END
 
