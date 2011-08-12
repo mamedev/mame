@@ -140,50 +140,44 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( paradise )
 	PORT_START("DSW1")	/* port $2020 */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Fill Area" )
+	PORT_DIPNAME( 0x0c, 0x08, "Fill Area" )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "75%" )
 	PORT_DIPSETTING(    0x08, "80%" )
 	PORT_DIPSETTING(    0x04, "85%" )
 	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x60, 0x20, "Time" )
-	PORT_DIPSETTING(    0x00, "45" ) /* Listed as  90 Secs */
-	PORT_DIPSETTING(    0x20, "60" ) /* Listed as 120 Secs */
-	PORT_DIPSETTING(    0x40, "75" ) /* Listed as 150 Secs */
-	PORT_DIPSETTING(    0x60, "90" ) /* Listed as 180 Secs */
-	PORT_DIPNAME( 0x80, 0x80, "Sound Test" )
+	PORT_DIPNAME( 0x60, 0x20, "Time" )			PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, "45" )			/* Listed as  90 Secs */
+	PORT_DIPSETTING(    0x20, "60" )			/* Listed as 120 Secs */
+	PORT_DIPSETTING(    0x40, "75" )			/* Listed as 150 Secs */
+	PORT_DIPSETTING(    0x60, "90" )			/* Listed as 180 Secs */
+	PORT_DIPNAME( 0x80, 0x80, "Sound Test" )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")	/* port $2021 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) /* Listed as "Unused" */
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) /* Listed as "Unused" */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) /* Listed as "Unused" */
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Characters Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Slide Show" )		PORT_DIPLOCATION("SW2:8") /* Player1 button used to advance one time through ALL backgrounds */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -219,51 +213,59 @@ static INPUT_PORTS_START( paradise )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( para2dx )
+	PORT_INCLUDE(paradise)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* No Slide Show */
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tgtball )
 	PORT_START("DSW1")	/* port $2020 */
-	PORT_DIPNAME( 0x03, 0x02, "Time" )
-	PORT_DIPSETTING(    0x03, "60" )
-	PORT_DIPSETTING(    0x02, "80" )
-	PORT_DIPSETTING(    0x01, "100" )
-	PORT_DIPSETTING(    0x00, "120" )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x02, "Time for 1 Player" )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "1:00" )
+	PORT_DIPSETTING(    0x02, "1:20" )
+	PORT_DIPSETTING(    0x01, "1:40" )
+	PORT_DIPSETTING(    0x00, "2:00" )
+	PORT_DIPNAME( 0x0c, 0x08, "Bonus Time?" )		PORT_DIPLOCATION("SW1:3,4") /* Difficulty or Bonus (time)? */
 	PORT_DIPSETTING(    0x0c, "15" )
 	PORT_DIPSETTING(    0x08, "20" )
 	PORT_DIPSETTING(    0x04, "25" )
 	PORT_DIPSETTING(    0x00, "30" )
-	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x10, "6" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x40, 0x40, "Balls Sequence Length" )
+	PORT_DIPNAME( 0x40, 0x40, "Balls Sequence Length" )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x80, 0x80, "Game Goal" )
+	PORT_DIPNAME( 0x80, 0x80, "Game Goal" )			PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Target Score" )
 	PORT_DIPSETTING(    0x00, "Balls Sequence" )
 
 	PORT_START("DSW2")	/* port $2021 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0c, "120" )
-	PORT_DIPSETTING(    0x08, "160" )
-	PORT_DIPSETTING(    0x04, "200" )
-	PORT_DIPSETTING(    0x00, "240" )
-	PORT_DIPNAME( 0x10, 0x10, "Vs. Matches" )
+	PORT_DIPNAME( 0x0c, 0x08, "Time for 2 Players"  )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "2:00" )
+	PORT_DIPSETTING(    0x08, "2:40" )
+	PORT_DIPSETTING(    0x04, "3:20" )
+	PORT_DIPSETTING(    0x00, "4:00" )
+	PORT_DIPNAME( 0x10, 0x10, "Vs. Matches" )		PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Characters Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Slide Show" )		PORT_DIPLOCATION("SW2:8") /* Player1 button used to advance one time through ALL backgrounds */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -305,12 +307,11 @@ static INPUT_PORTS_START( torus )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Dropping Speed" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, "Fast" )
+	PORT_DIPSETTING(    0x04, "Faster" )
+	PORT_DIPSETTING(    0x00, "Fastest" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -346,7 +347,7 @@ static INPUT_PORTS_START( torus )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Characters Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Slide Show" )	/* Player1 Button to pull the blinds down in sections, continuous loop */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1068,7 +1069,7 @@ static DRIVER_INIT (torus)
 
 GAME( 1994+, paradise, 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise", GAME_SUPPORTS_SAVE )
 GAME( 1994+, paradlx,  0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994+, para2dx , 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994+, para2dx,  0,       paradise, para2dx,  paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995,  tgtball,  0,       tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
 GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball", GAME_SUPPORTS_SAVE )
 GAME( 1996,  torus,    0,       torus,    torus,    torus,    ROT90, "Yun Sung", "Torus", GAME_SUPPORTS_SAVE )
