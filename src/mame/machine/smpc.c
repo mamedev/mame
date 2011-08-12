@@ -519,8 +519,8 @@ WRITE8_HANDLER( stv_SMPC_w )
 		//popmessage("PDR2 = %02x",state->m_smpc_ram[0x77]);
 
 		if(LOG_SMPC) printf("SMPC: M68k %s\n",(state->m_smpc_ram[0x77] & 0x10) ? "off" : "on");
-		space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),(state->m_smpc_ram[0x77] & 0x10) >> 4);
-
+		//space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),(state->m_smpc_ram[0x77] & 0x10) >> 4);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (state->m_smpc_ram[0x77] & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		state->m_en_68k = ((state->m_smpc_ram[0x77] & 0x10) >> 4) ^ 1;
 
 		//if(LOG_SMPC) printf("SMPC: ram [0x77] = %02x\n",state->m_smpc_ram[0x77]);
