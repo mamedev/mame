@@ -13470,7 +13470,13 @@ ROM_START( m4safar )
 	
 ROM_END
 
+ROM_START( m4snowbl )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "sb_3.p2", 0x8000, 0x004000, CRC(c22fe04e) SHA1(233ee0795b0029389247a9550ef39af95f671870) )
+	ROM_LOAD( "sb_3.p1", 0xc000, 0x004000, CRC(98fdcaba) SHA1(f4a74d5550dd9fc8bff35a583b3289e1bb0be9d5) )
 
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
 
 
 ROM_START( m4zill )
@@ -13482,6 +13488,67 @@ ROM_START( m4zill )
 
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "zillsnd.bin", 0x0000, 0x080000, CRC(171ed677) SHA1(25d63f4d9c64f13bec4feffa265c5b0c5f6be4ec) )
+ROM_END
+
+ROM_START( m4hstr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "h_s_v1_2.bin", 0x0000, 0x010000, CRC(ef3d3461) SHA1(aa5b1934ab1c6739f36ac7b55d3fda2c640fe4f4) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "happystreak.p1", 0x0000, 0x080000, CRC(b1f328ff) SHA1(2bc6605965cb5743a2f8b813d68cf1646a4bcac1) )
+	ROM_LOAD( "hs2_5.bin", 0x0000, 0x010000, CRC(f669a4c9) SHA1(46813ba7104c97eaa851b50019af9b80046d03b3) )
+	ROM_LOAD( "hs2_5p.bin", 0x0000, 0x010000, CRC(71c981aa) SHA1(5effe7487e7216078127d3dc4a0a7ad02ad84390) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "happystreak.p1", 0x0000, 0x080000, CRC(b1f328ff) SHA1(2bc6605965cb5743a2f8b813d68cf1646a4bcac1) ) // alt sound rom
+
+	ROM_LOAD( "happystreaksnd.p1", 0x0000, 0x080000, CRC(76cda195) SHA1(21a985cd6cf1f63f4aa799563099a0527a7c0ea2) )
+	ROM_LOAD( "happystreaksnd.p2", 0x080000, 0x080000, CRC(f3b4c763) SHA1(7fd6230c13b66a16daad9d45935c7803a5a4c35c) )
+ROM_END
+
+ROM_START( m4hstrcs )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "chs3_6.bin", 0x0000, 0x010000, CRC(d097ae0c) SHA1(bd78c14e7f057f173859bcb1db5e6a142d0c4062) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "chs3_6p.bin", 0x0000, 0x010000, CRC(57378b6f) SHA1(cf1cf528b9790c1013d87ccf63dcbf59f365067f) )
+	ROM_LOAD( "chs3_6pk.bin", 0x0000, 0x010000, CRC(f95f1afe) SHA1(fffa409e8c7148a840d5dedf490fd9f6975e9476) )
+	ROM_LOAD( "chs3_6k.bin", 0x0000, 0x010000, CRC(7eff3f9d) SHA1(31dedb0d9476633e8eb947a687c7b8a94b0e182c) )
+	ROM_LOAD( "chs_4_2.bin", 0x0000, 0x010000, CRC(ec148b65) SHA1(2d6252ce68719281f5597955227a1f662743f006) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	/* might use the same roms as the normal version here */
+ROM_END
+
+
+ROM_START( m4ddb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "ddb3_1.bin", 0x0000, 0x010000, CRC(3b2da727) SHA1(8a677be3b82464d1bf1e97d22adad3b27374079f) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "ddb3_1p.bin", 0x0000, 0x010000, CRC(bc8d8244) SHA1(9b8e0706b3add42e5e4a8b6c6a2f80a333a2f49e) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "ddbsound1", 0x000000, 0x080000, CRC(47c87bd5) SHA1(c1578ae553c38e93235cea2142cb139170de2a7e) )
+	ROM_LOAD( "ddbsound2", 0x080000, 0x080000, CRC(9c733ab1) SHA1(a83c3ebe99703bb016370a8caf76bdeaff5f2f40) )
+ROM_END
+
+ROM_START( m4hapfrt )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "hf1_1.bin", 0x0000, 0x010000, CRC(6c16cb05) SHA1(421b164c8410629956177355e505859757c97a6b) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "hf1_1p.bin", 0x0000, 0x010000, CRC(ebb6ee66) SHA1(1f9b67260e5becd013d95358cc89acb1099d655d) )
+	ROM_LOAD( "hf1_4pk.bin", 0x0000, 0x010000, CRC(0944b3c6) SHA1(00cdb75dda4f8984f77806047ad79fe9a1a8760a) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( m4frcrak )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "fc_p1.bin", 0xe000, 0x002000, CRC(5716c8cf) SHA1(ddf2c6a70d67932310346bc042239fbe10069f52) )
+	ROM_LOAD( "fc_p2.bin", 0xc000, 0x002000, CRC(dc4669f4) SHA1(1112c50792e6976649e4be9314f103acec0c73b3) )
+	ROM_LOAD( "fc_p3.bin", 0xa000, 0x002000, CRC(067e3da7) SHA1(6dd0992e57bc68e39a9220a3513705f510f8e9b8) )
 ROM_END
 
 
@@ -14180,4 +14247,10 @@ GAME(199?, m4pick, 0,			mod2    ,mpu4, m4default, ROT0,   "Jpm","Pick A Fruit (J
 GAME(199?, m4safar, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Safari Club (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4zill, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Pure Leisure","Zillionare's Challenge (Pure Leisure) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
+GAME(199?, m4snowbl, 0,			mod2    ,mpu4, m4default, ROT0,   "Mdm","Snowball Bingo (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4hstr, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4hstrcs, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ddb,  0,			mod4oki    ,mpu4, m4default, ROT0,   "Coinworld","Ding Dong Bells (Coinworld) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4hapfrt,  0,			mod4oki    ,mpu4, m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
+GAME(199?, m4frcrak, 0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Fruit Cracker (Pcp) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )

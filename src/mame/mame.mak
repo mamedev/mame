@@ -1652,6 +1652,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/avt.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
+	$(DRIVERS)/bgt.o \
 	$(DRIVERS)/bingor.o \
 	$(DRIVERS)/blitz.o \
 	$(DRIVERS)/blitz68k.o \
@@ -1798,6 +1799,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ssingles.o \
 	$(DRIVERS)/sstrangr.o \
 	$(DRIVERS)/statriv2.o \
+	$(DRIVERS)/stellafr.o \
 	$(DRIVERS)/supertnk.o \
 	$(DRIVERS)/superwng.o \
 	$(DRIVERS)/tapatune.o \
@@ -1814,6 +1816,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/trvquest.o \
 	$(DRIVERS)/ttchamp.o \
 	$(DRIVERS)/tugboat.o \
+	$(DRIVERS)/unkpcp.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \

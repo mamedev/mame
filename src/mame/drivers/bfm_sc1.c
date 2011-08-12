@@ -2332,6 +2332,60 @@ ROM_START( sc1reply )
 ROM_END
 
 
+ROM_START( sc1smoke )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "sb6-3_0b.bin", 0x0000, 0x008000, CRC(31647e2f) SHA1(35dd1bef0dd72fd45c063f181cd190f8d21df207) )
+	ROM_LOAD( "sb6-3_0a.bin", 0x8000, 0x008000, CRC(45ca0067) SHA1(be1947d055320c101ea75c669733b19d2f61a0f9) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "sb8-5_0a.bin", 0x0000, 0x008000, CRC(eafe5fac) SHA1(4798a37ada523d078f2e10976c5f90cccab1c406) )
+	ROM_LOAD( "sb8-5_0b.bin", 0x0000, 0x008000, CRC(0aac6b91) SHA1(85b4dfe15d456b7d808295c890264163bc6115f1) )
+	ROM_LOAD( "svb58pa", 0x0000, 0x008000, CRC(4496ce3d) SHA1(400dee4249fd930473cb003d85b25bb991041bc6) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1ccroc )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cc6-4_0b.bin", 0x0000, 0x008000, CRC(4093cbe6) SHA1(6ea678d0e288bb075d58ef72089ae387d6285477) )
+	ROM_LOAD( "cc6-4_0a.bin", 0x8000, 0x008000, CRC(c3d963e8) SHA1(35688841e102c264124c23de526417db618ea898) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "cc8-7_0a.bin", 0x0000, 0x008000, CRC(4a6cd887) SHA1(27f394a63bdb68d35d6eecb6b0f6b3f3f61d36b5) )
+	ROM_LOAD( "cc8-7_0b.bin", 0x0000, 0x008000, CRC(a638c58a) SHA1(0a5d53a9c0f772263c7a726f90943a1ccfe5db20) )
+	ROM_LOAD( "cct-8_0a.bin", 0x0000, 0x008000, CRC(a90a5f23) SHA1(befb389cc6ff045462f02c2aa9025d92c47da0fa) )
+	ROM_LOAD( "cct-8_0b.bin", 0x0000, 0x008000, CRC(1e0e93f3) SHA1(e5ceef529bd406d2b395b6e24cff370422b0e1f2) )
+	ROM_LOAD( "crocs6a.bin", 0x0000, 0x008000, CRC(087330cb) SHA1(f143a8a44024f0f851a8b677f42b9d4011ab92d4) )
+	ROM_LOAD( "crocs6b.bin", 0x0000, 0x008000, CRC(42ad6fb0) SHA1(d60961d9993a8458668177013d7561d0b7423cda) )
+	ROM_LOAD( "cs1_1.rom", 0x0000, 0x040000, CRC(f4c6f9f1) SHA1(4277ff51dc91c35d4c6e9ab1c16e087ef7e8d140) )
+	ROM_LOAD( "cs1_2.rom", 0x0000, 0x040000, CRC(ba4dad49) SHA1(795342d5fd3deaa058a20d491206c028c529fd55) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1crocr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "croc58pb", 0x0000, 0x010000, CRC(95d2b0ac) SHA1(369a2f5efc981aa03780b80e0b14d5171c25e72b) ) // 2nd half empty
+	ROM_LOAD( "croc58pa", 0x8000, 0x010000, CRC(39501e80) SHA1(f03bc602df839374adf7722af295cee562353782) ) // 2nd half empty
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1btclk )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bc6-4_0b.bin", 0x0000, 0x008000, CRC(106265c8) SHA1(6465f7e868c5b04776fee69295a52197abb45ad0) )
+	ROM_LOAD( "bc6-4_0a.bin", 0x8000, 0x008000, CRC(750645e7) SHA1(65eee2a00a1914bb8dc989b131eaa39d2881105d) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "bc8-5_0a.bin", 0x0000, 0x008000, CRC(f8fafc49) SHA1(7d8109fdabe37c7e958696512d3c2c35f9890bee) )
+	ROM_LOAD( "bc8-5_0b.bin", 0x0000, 0x008000, CRC(4be7220f) SHA1(5eb2b3fd05ff06b645f16bf95f6766b8bea82525) )
+	ROM_LOAD( "btc58pa", 0x0000, 0x010000, CRC(d21e5ed9) SHA1(99c189fde84f5abbdcd85d1f816c61f8fe72554e) )
+	ROM_LOAD( "btc58pb", 0x0000, 0x010000, CRC(4cfde48a) SHA1(8567667f4af96fd00a807380a65fe809cd051c76) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -2435,15 +2489,17 @@ GAME( 199?, sc1days		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Global", 
 GAME( 199?, sc1cscl		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Global",   "Cash Classic (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1driv		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Global",   "Driving School (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1vsd		, 0			,  scorpion1		, scorpion1		, lotse		, 0,		 "Global",   "Vegas Super Deal (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1dip		, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocion",   "Diplomat (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
-GAME( 199?, sc1lamb		, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocion",   "Lambada (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
-GAME( 199?, sc1reply	, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocion",   "Replay (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
+GAME( 199?, sc1dip		, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocoin",   "Diplomat (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
+GAME( 199?, sc1lamb		, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocoin",   "Lambada (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
+GAME( 199?, sc1reply	, 0			,  scorpion1		, scorpion1		, nocrypt		, 0,		 "Eurocoin",   "Replay (Eurocoin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
 
+GAME(199?, sc1smoke, 0,			scorpion1    ,scorpion1, nocrypt, ROT0,   "Mdm","Smokey Vs The Bandit (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, sc1ccroc, 0,			scorpion1    ,scorpion1, nocrypt, ROT0,   "Mdm","Crazy Crocs (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, sc1crocr, 0,			scorpion1    ,scorpion1, nocrypt, ROT0,   "Mdm","Croc And Roll (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, sc1btclk, 0,			scorpion1    ,scorpion1, nocrypt, ROT0,   "Mdm","Beat The Clock (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
 
 
 //Adder 2
 GAME( 1996, m_tppokr, 0,        scorpion1_adder2	, toppoker	, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-
-
 

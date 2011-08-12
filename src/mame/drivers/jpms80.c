@@ -8,6 +8,12 @@
 
   AY8910?
 
+
+ ---
+
+ there are also older platforms also using the TMS CPU, we load some of those roms here too
+
+
 */
 
 #include "emu.h"
@@ -64,6 +70,38 @@ static MACHINE_CONFIG_START( jpms80, jpms80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
+
+
+static ADDRESS_MAP_START( jpms_older_e00_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0bff) AM_ROM
+	AM_RANGE(0x0e00, 0x0eff) AM_RAM 
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jpms_older_e00_io, AS_IO, 8 )
+ADDRESS_MAP_END
+
+
+static MACHINE_CONFIG_START( jpms_older_e00, jpms80_state )
+	MCFG_CPU_ADD("maincpu", TMS9995, MAIN_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(jpms_older_e00_map)
+	MCFG_CPU_IO_MAP(jpms_older_e00_io)
+MACHINE_CONFIG_END
+
+static ADDRESS_MAP_START( jpms_older_c00_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0bff) AM_ROM
+	AM_RANGE(0x0c00, 0x0eff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jpms_older_c00_io, AS_IO, 8 )
+ADDRESS_MAP_END
+
+
+static MACHINE_CONFIG_START( jpms_older_c00, jpms80_state )
+	MCFG_CPU_ADD("maincpu", TMS9995, MAIN_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(jpms_older_c00_map)
+	MCFG_CPU_IO_MAP(jpms_older_c00_io)
+MACHINE_CONFIG_END
+
 
 DRIVER_INIT( jpms80 )
 {
@@ -217,6 +255,35 @@ ROM_START( j80wsprt )
 	ROM_LOAD( "winsprint.p3", 0x2000, 0x1000, CRC(51d11f59) SHA1(756ba5f02c0733d082767cbdaa93105a7d3f31f3) )
 ROM_END
 
+ROM_START( j80alad )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "al_p1.bin", 0x0000, 0x001000, CRC(41134b85) SHA1(8d48af9e3eae8dcc5888a3fa8ae9681ff6047dbb) )
+	ROM_LOAD( "al_p2.bin", 0x1000, 0x001000, CRC(934248eb) SHA1(2abb23907acf5036b63185afb164117f1d1bab0c) )
+	ROM_LOAD( "al_p3.bin", 0x2000, 0x001000, CRC(da2a56a3) SHA1(1b125be1bd4f0d63c68f370a2a7202f68ff11577) )
+ROM_END
+
+ROM_START( j80fortr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fortunetrail1.1", 0x0000, 0x001000, CRC(1691b72f) SHA1(be0966c9560249f2529dd76421fe6646adaeeadb) )
+	ROM_LOAD( "fortunetrail1.2", 0x1000, 0x001000, CRC(02dfcfc4) SHA1(ae97b670a4d5b341ee150cabf3d264a02cd7a32c) )
+ROM_END
+
+ROM_START( j80mster )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "masterspyp1.bin", 0x0000, 0x001000, CRC(7264e304) SHA1(cd50fd116226de2980f31728faa6723dca0ac061) )
+	ROM_LOAD( "masterspyp2.bin", 0x1000, 0x001000, CRC(e6349ee9) SHA1(207a4089e7128143eaeebe1dc082b742b5dfab96) )
+	ROM_LOAD( "masterspyp3.bin", 0x2000, 0x001000, CRC(83868a58) SHA1(3264dfa7994c62615da2418d1667cb3bd2e00435) )
+ROM_END
+
+ROM_START( j80plsnd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "plus_p1.bin", 0x0000, 0x000400, CRC(02721d4f) SHA1(ea5da3f08098a9d12c71d41d70f09aca6660d6c5) )
+	ROM_LOAD( "plus_p2.bin", 0x0400, 0x000400, CRC(f58b492f) SHA1(569805044fa64c1d0c3620f380b4a09152ce2964) )
+	ROM_LOAD( "plus_p3.bin", 0x0800, 0x000400, CRC(e9584323) SHA1(7b2101626920bed533b392d1064fde305c8c18e8) )
+	ROM_LOAD( "plus_p4.bin", 0x0c00, 0x000400, CRC(67f9d05f) SHA1(1c441c775f2126861858c65c7634773a86f4fcc5) )
+	ROM_LOAD( "plus_p5.bin", 0x1000, 0x000400, CRC(d111b2c6) SHA1(c0182a4b163e4dbb67f1c98251b93fa878bff2e2) )
+ROM_END
+
 
 
 GAME(198?, j80bac	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Bank A Coin (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
@@ -236,3 +303,65 @@ GAME(198?, j80topsp	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Top Sprint (Jpm) (
 GAME(198?, j80topup	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Top Up (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j80tumbl	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Tumble (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j80wsprt	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Winsprint (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+// these look like they're probably SYSTEM80, not 100% sure tho
+GAME(198?, j80alad	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Aladdin's Cave (PCP)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j80fortr	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Fortune Trail (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j80mster	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Masterspy (Pcp)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j80plsnd	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Plus Nudge (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+
+
+/* Not 100% sure what the stuff below is on, the profiles don't quite match System 85 */
+
+
+
+ROM_START( j_ewnud )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ewn1a26", 0x0000, 0x000400, CRC(a92760b7) SHA1(dfef0dab7799a4b4975755c1584efca81a3798c4) )
+	ROM_LOAD( "ewn26.2", 0x0400, 0x000400, CRC(bd24e59e) SHA1(038ed23283a7b61e873f543de32b685630fcdb97) )
+	ROM_LOAD( "ewn26.3", 0x0800, 0x000400, CRC(a3280b35) SHA1(2771c81735c69ae3efb02715ac97901dae434e72) )
+ROM_END
+
+ROM_START( j_ewnda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ewn1.bin", 0x0000, 0x000400, CRC(84ce735e) SHA1(98bae928246050ae88518ca511447fbef5c810f5) )
+	ROM_LOAD( "ewn2.bin", 0x0400, 0x000400, CRC(4c121f5e) SHA1(1221ff91ff9e352efeabb26a60eab93aae5bca5e) )
+	ROM_LOAD( "ewn3.bin", 0x0800, 0x000400, CRC(bef3a938) SHA1(6a6844203c6361b65f5b07853d9dbe18a29ebc44) )
+ROM_END
+
+
+
+ROM_START( j_luckac )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "la1.bin", 0x0000, 0x000400, CRC(21076280) SHA1(d5cf25d289f03c743f4428273ac002df3164c344) )
+	ROM_LOAD( "la2.bin", 0x0400, 0x000400, CRC(cae10bc1) SHA1(a740946437a3b277b714f13d001783987f57bc77) )
+	ROM_LOAD( "la3.bin", 0x0800, 0x000400, CRC(cb9362ac) SHA1(a16d43ba01b24e1b515881957c1559d33a03bcc4) )
+ROM_END
+
+
+
+ROM_START( j_plus2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "plus2_1.bin", 0x0000, 0x000400, CRC(f635174d) SHA1(9478aabc0eaa25d4ae44d2385e738584f03f6647) )
+	ROM_LOAD( "plus2_2.bin", 0x0400, 0x000400, CRC(0999d32f) SHA1(e08c852f8f3aff8ab7b73e9c0b0502ab91f9e844) )
+	ROM_LOAD( "plus2_3.bin", 0x0800, 0x000400, CRC(d3dfd6ab) SHA1(4cf0f8977fb2c023bf2ccc8d9d74352ce32206bf) )
+	ROM_LOAD( "plus2_4.bin", 0x0c00, 0x000400, CRC(8b6922b4) SHA1(7b7fc7b0708bf96846860254fea957bcbc952923) )
+ROM_END
+
+
+
+ROM_START( j_super2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super2_1.bin", 0x0000, 0x000400, CRC(a1df2719) SHA1(eed80329c14ef6c272a8c622e8a4bc7d14ac87e6) )
+	ROM_LOAD( "super2_2.bin", 0x0400, 0x000400, CRC(0fd5ddd0) SHA1(e8d31b009b29486d36d11052af857c609a7f1f84) )
+	ROM_LOAD( "super2_3.bin", 0x0800, 0x000400, CRC(ddd998d3) SHA1(5964da70ae4c2f174dc3d1494fc67579c221a7b7) )
+ROM_END
+
+
+
+GAME(198?, j_ewnud	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j_ewnda	,j2ewnud	,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j_luckac	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Unknown","Lucky Aces (Unk)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j_super2	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Jpm","Super 2 (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+
+// this one is different again?
+GAME(198?, j_plus2	,0			,jpms_older_c00,jpms80,jpms80,ROT0,   "Jpm","Plus 2 (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

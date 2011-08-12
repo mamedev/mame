@@ -9086,6 +9086,15 @@ funlddlx		// (c) 1999
 
 // JPM
 
+// JPM older?
+
+j_ewnud		// Each Way Nudge
+j_ewnda		// Each Way Nudger
+j_luckac	// Lucky Aces
+j_super2	// Super 2
+j_plus2		// Plus 2
+
+
 // JPM System 80
 
 j80bac		// Bank A Coin (Jpm)
@@ -9105,6 +9114,13 @@ j80topsp	// Top Sprint (Jpm)
 j80topup	// Top Up (Jpm)
 j80tumbl	// Tumble (Jpm)
 j80wsprt	// Winsprint (Jpm)
+
+// Close to System 80
+j80alad	// Aladdin's Cave (PCP)
+j80fortr	// Fortune Trail (Jpm)
+j80mster	// Masterspy (Pcp)
+j80plsnd	// Plus Nudge (Jpm)
+
 
 // JPM MPS1/2 Hardware
 
@@ -9245,6 +9261,52 @@ j2fivepn	// Fivepenny Nudger (Mdm)
 j2nolimt	// No Limit Nudge (Mdm)
 
 j2strk10	// Strike Ten (Ace)
+
+j2bkroll	// Bank Roll (Jpm)
+j2bodym		// Body Match (Jpm)
+j2cvault	// Cash Vault (Jpm)
+j2cashab	// Cashablanca (Jpm)
+j2cashry	// Cashino Royale (Pcp)
+j2casino	// Casino Classic (Pcp)
+j2coinct	// Coin Count (Jpm)
+j2loots		// Loot Shoot (Pcp)
+j2match		// Match It (Jpm)
+j2monbnd	// Money Bands (Jpm)
+j2monmtx	// Money Matrix (Bwb)
+j2tst		// MPS 1 Test Rom (Jpm)
+j2nudnud	// Nudge Nudge (Jpm)
+j2pinac		// Pinnacle (Jpm)
+j2pinclb	// Pinnacle Club (Jpm)
+j2reelcz	// Reel Crazy (Jpm)
+j2reeldc	// Reel Deal Club (Jpm)
+j2topcd		// Top Card (Bwb)
+j2xxx		// Triple X (Bwb)
+j2tupnud	// Tuppenny Nudger (Jpm)
+j2wrb		// Wild Reel Bingo (Jpm)
+j2ncsp		// zzz_unk ncsp0pp (Bwb)
+j2nrrp		// zzz_unk nprpopp (Bwb)
+j2nsc15		// zzz_unk nsc15 (Pcp)
+j2nsw12		// zzz_unk nsw12 (Pcp)
+
+j2club77	// Club 77 (Unk) 
+j2contnd	// Continuous Nudger (Mdm)
+j2crown		// Crown Dealer (Unk)
+j2hirola	// Hi Roll (Unk)
+j2monmin	// Money Mine (Unk)
+j2notspn	// Note Spinner (Unk)
+j2pharo		// Pharoah (Unk)
+j2super7	// Super 7's (Unk)
+j2sex		// Super Exchanger (Unk)
+j2sng		// Super Nudge Gambler (Cotswold Microsystems)
+j2tupnd		// Tuppenny Nudger (Mdm)
+j2008		// zzz_unk 008 (Unk)
+j2chsn		// zzz_unk chsnsn05 (Unk)
+j2lhs		// zzz_unk lhs (Unk)
+j2nn2		// zzz_unk nn_2 (Unk)
+j2rm941		// zzz_unk rm941 (Unk)
+
+
+
 
 // JPM Give us a Break hardware
 guab			// (c) 1986
@@ -9629,9 +9691,6 @@ j6sla		// Snakes & Ladders Slides Again (Crystal)
 j6thril		// Thriller (Crystal)
 j6tqust		// Treasure Quest (Crystal)
 
-
-
-
 // JPM Impact + Video Board
 cluedo			// (c) 1995
 cluedo2c		// (c) 1995
@@ -9641,6 +9700,8 @@ scrabble		// (c) 1997
 hngmnjpm		// (c) 1998
 coronatn		// (c) 1999
 tqst			// (c) ACE?
+
+
 
 // Other Games
 vega			// (c) 19?? Olympia?
@@ -11357,6 +11418,10 @@ sc1t1k		// Top 1000 (Eurocoin)
 sc1dip		// Diplomat (Eurocoin)
 sc1lamb		// Lambada (Eurocoin)
 sc1reply	// Replay (Eurocoin)
+sc1smoke	//
+sc1ccroc	//
+sc1crocr	//
+sc1btclk	//
 
 // Scorpion 1 + Adder Video board
 
@@ -11877,6 +11942,7 @@ m3supspo	// Super Spoof (Pcp)
 m3supspoa	//
 m3toplin	// Top Line (Pcp)
 m3wigwam	// Wig Wam (Pcp)
+
 
 /* Mdm */
 
@@ -12547,7 +12613,12 @@ m4front		// Final Frontier (Mdm)
 m4pick		// Pick A Fruit (Jpm)
 m4safar		// Safari Club (Mdm)
 m4zill		// Zillionare's Challenge (Pure Leisure)
-
+m4snowbl	// 
+m4hstr		// Happy Streak (Coinworld)
+m4hstrcs	// Casino Happy Streak (Coinworld)
+m4ddb		// Ding Dong Bells (Coinworld)
+m4hapfrt	// Happy Fruits (Coinworld)
+m4frcrak	// Fruit Cracker
 
 // MPU4 + Video board
 
@@ -13001,6 +13072,7 @@ ac1pstrt		// Pound Stretcher (Pcp)
 ac1primt		// Primetime (Ace)
 ac1taklv		// Take It Or Leave It (Ace)
 
+
 // Ace 'sp.ACE system'
 
 sp_cbowl		// Cash Bowl (Ace)
@@ -13056,6 +13128,14 @@ sp_tkpik		//Take Your Pick (Ace)
 sp_woolp		//Woolpack (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
 sp_zigzg		//Zig Zag (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
 
+// Unknown PCP
+
+up_bluec		// Blue Chip (Pcp)
+up_dbldx		// Double Deluxe (Pcp)
+up_nudbk		// Nudge Break (Pcp)
+up_sstrk		// Starstruck (Pcp)
+up_xpres		// Xpress (Pcp)
+up_roll			// Roll Up (Pcp)
 
 
 // Project - PROCONN
@@ -13325,7 +13405,16 @@ ec_unk3		// Unknown 'Electrocoin' Fruit Machine 'a4'
 ec_unk4		// Unknown 'Electrocoin' Fruit Machine 'flat256'
 ec_unk5		// Unknown 'Electrocoin' Fruit Machine(s)
 
+/* BGT x86 based platform */
+bg_ddb		//
+bg_barmy	//
+bg_max		//
+bg_maxa		//
 
+/* Stella Mechanical */
+
+st_ohla
+st_vulkn
 
 // Leisure Ent.
 roul			// (c) 1990
