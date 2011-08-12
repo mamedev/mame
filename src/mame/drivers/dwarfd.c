@@ -78,27 +78,27 @@ A |||                                                     |______|   |          
   |                                                                  |________________|            |
   |________________________________________________________________________________________________|
 
-  OSC = 10.595 MHz (OR 10.738635 on Dwarf's den)
-  A = 20-pin connector for button panel
-  B = 26-pin connector for display
+  OSC = 10.595 MHz
+  A = 20-pin connector for video (r,g,b,hsync,vsync,csync on pins 5,7,9,11,13,15, the even pins are gnd, others are n/c)
+  B = 26-pin connector for bet/hold buttons and button lights (connects to one of the darlingtons)
   P = 12-pin connector for power, see pinout below
-  C = 20-pin connector for button lamps (connects to darlingtons at 1J and 1K)
-  D = 20-pin connector for coins/tilt/service?/hopper/payout?/key?
+  C = 20-pin connector for win lamps (connects to darlingtons at 1J and 1K)
+  D = 20-pin connector for the 3 coin slots, the test switch and service switch, as well as lockout coil and GI lamps
   Edge connector (top) is not JAMMA (connects to cpu pins; debug connector?)
-  3A (63S080N or 74S188) dumped as 82S123
-  7C = non populated
-  7H (M3-7602-5 or 74S188) dumped as 82S123
+  3A = (63S080N or 74S188) dumped as 82S(1)23
+  7C = non populated on original Dwarf's den, would be a prom if present.
+  7H = (M3-7602-5 or 74S188) dumped as 82S(1)23
 
   Power connector pinout:
   ...-------------pcb edge----------------...
          1 2 3 4 5 6 7 8 9 10 11 12
 1,2 = +5VDC
-3,4 = COM-2803 (only used by the four ULN2803 Darlington Arrays and connectors C and D)
+3,4 = LAMP POWER A and B (tied together, only used by the four ULN2803 Darlington Arrays and connectors C and D)
 5,6 = N/C
-7 = +20VDC (goes to darlington at 1F)
+7 = SENSE/RESET (PSU puts +20VDC? here, goes to darlington at 1F)
 8,10 = GND
-9 = ? (may be composite aud/vid out or something to do with audio amp or vol control)
-11,12 = GND-2803 (only used by the four ULN2803 Darlington Arrays and connectors C and indirectly D)
+9 = AUDIO OUTPUT (the audio amplifier is part of the PSU)
+11,12 = LAMP GROUND (tied together, only used by the four ULN2803 Darlington Arrays and connectors C and indirectly D)
 
   
 =====================================================================================================
@@ -626,6 +626,74 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dwarfd )
 	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x01, "Games Per Coin for slots 1/2/3" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "2/2/8" )
+	PORT_DIPSETTING(    0x02, "1/2/4" )
+	PORT_DIPSETTING(    0x01, "1/1/4" )
+	PORT_DIPSETTING(    0x00, ".5/.5/2" )
+	PORT_DIPNAME( 0x04, 0x00, "Multiple Coins Accepted Per Game" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Operator Settings Mode 1/2" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "Changes Allowed/Preset #2" )
+	PORT_DIPSETTING(    0x00, "Changes Locked/Preset #1" )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/*PORT_DIPNAME( 0x18, 0x00, "Operator Settings Mode" ) PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x18, "Changes Allowed" )
+	PORT_DIPSETTING(    0x10, "Preset #1" )
+	PORT_DIPSETTING(    0x08, "Preset #2" )
+	PORT_DIPSETTING(    0x00, "Changes locked" )
+	PORT_DIPNAME( 0x20, 0x00, "Dwarf's Den Gfx" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Large Character Gfx" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Full Card Gfx" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Operator Settings Mode 2/2" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x01, "Changes Allowed/Preset #1" )
+	PORT_DIPSETTING(    0x00, "Changes Locked/Preset #2" )
+	// note for these: dwarfd should have switch 6 and 8 on, dwarfda should have 7 and 8 on
+	PORT_DIPNAME( 0x02, 0x00, "Dwarf's Den Gfx" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Large Character Gfx" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Full Card Gfx" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Zap 1") //z1 zap 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Zap 2") //z2 zap 2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Zap 3") //z3 zap 3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) PORT_NAME("Zap 4") //z4 zap 4
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 ) PORT_NAME("Zap 5") //z5 zap 5
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	//PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) //PORT_NAME("Play Credit") PORT_CODE(KEYCODE_A) //pp (play credit)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // (deal)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) //PORT_NAME("Replace") PORT_CODE(KEYCODE_F) //rp replace (draw)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) //tk take (stand)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Unzap") //uz unzap (cancel)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( quarterh )
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1022,6 +1090,32 @@ static MACHINE_CONFIG_DERIVED( qc, dwarfd )
 	MCFG_CPU_IO_MAP(qc_io_map)
 MACHINE_CONFIG_END
 
+/* Dwarfs den PROM explanation:
+   The proms used in Dwarfs den are 74S188 (82s23 equivalent, 32x8 open collector)
+   
+	The prom at 7H controls the 8085 memory map:
+		The inputs are such:
+		A0 - 8085 A10
+		A1 - 8085 A11
+		A2 - 8085 A12
+		A3 - 8085 A13
+		A4 - 8085 A14
+		/CE - ? (maybe 8085 ALE * !8085 A15)? need to trace again
+		Outputs are as such:
+		O1 - /CE on ROM at 9L (also test point 36)
+		O2 - /CE on ROM at 9K (also test point 35)
+		O3 - /CE on ROM at 9J (also test point 34)
+		O4 - /CE on ROM at 9H (also test point 33)
+		O5 - /CE on 2114 SRAMs at 8F and 9F
+		O6 - /CE on 2114 SRAMs at 8E and 9E
+		O7 - /CE on 2114 SRAMs at 8D and 9D
+		O8 - indirectly, /CE on the 2114 srams at 8C and 9C, due to the fact that those two are battery-backed
+
+	The prom at 3A controls the color palette:
+		TODO: finish me!
+*/
+   
+
 ROM_START( dwarfd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9l_pd_50-3196_m5l2732k.bin", 0x0000, 0x1000, CRC(34e942ae) SHA1(d4f0ee7f29e1c1a93b4b30b950023dbf60596100) )
@@ -1043,6 +1137,29 @@ ROM_START( dwarfd )
 	ROM_LOAD( "3a_50-1381_63s080n.bin",0x00, 0x20, CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
 	/* memory map */
 	ROM_LOAD( "7h_7602.bin",0x20, 0x20, CRC(d5457333) SHA1(5872c868638c08faef7365d9c6e41dc3f070bd97) )
+ROM_END
+
+ROM_START( dwarfda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9l_pd_50-3196_m5l2732k.bin", 0x0000, 0x1000, CRC(34e942ae) SHA1(d4f0ee7f29e1c1a93b4b30b950023dbf60596100) )
+	ROM_LOAD( "9k_pd_50-3193_hn462732g.bin",0x1000, 0x1000, CRC(78f0c260) SHA1(d6c3b8b3ef4ce99a811e291f1396a47106683df9) )
+	ROM_LOAD( "9j_pd_50-3192_mbm2732.bin",  0x2000, 0x1000, CRC(9c66ee6e) SHA1(49c20fa276508b3c7b0134909295ae04ee46890f) )
+	ROM_LOAD( "9h_pd_50-3375_2732.bin",     0x3000, 0x1000, CRC(daf5551d) SHA1(933e3453c9e74ca6695137c9f6b1abc1569ad019) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "6a_pd_50_1991_2732.bin"      ,0x0000, 0x1000, CRC(6da494bc) SHA1(0323eaa5f81e3b8561225ccdd4654c9a11f2167c) )
+	ROM_LOAD16_BYTE( "50-1814-tms2732ajl.6b",0x2000, 0x1000, CRC(BAA78A2E) SHA1(F7B61BAE8919ED58C12D9F80F4133A722DF08AC4) )
+	ROM_LOAD16_BYTE( "6c_pd_50-1993_tms2732ajl.bin",0x0001, 0x1000, CRC(cd8e5e54) SHA1(0961739d72d80e0ac00e6cbf9643bcebfe74830d) )
+	ROM_LOAD16_BYTE( "50-1815-tms2732ajl.6d",0x2001, 0x1000, CRC(303D2D16) SHA1(885DF57F253D92F96692256325FFCF2CA71DC64F) )
+
+	ROM_REGION( 0x4000*2, "gfx2", 0 )
+	ROM_FILL(0,  0x4000*2, 0)
+
+	ROM_REGION( 0x40, "proms", 0 )
+	/* ??? colors */
+	ROM_LOAD( "74s188n.3a",0x00, 0x20, CRC(9951E47A) SHA1(D06DA09AF25DA06AC6BD0EE1FC99F7690B36B550) )
+	/* memory map */
+	ROM_LOAD( "74s188n.7h",0x20, 0x20, CRC(C9618DE2) SHA1(D5636546DBC57E6AAB01DAB79B2EAD1DFEF8FA5C) )
 ROM_END
 
 /*
@@ -1218,8 +1335,10 @@ static DRIVER_INIT(qc)
 
 }
 
-GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Draw Poker III / Dwarfs Den",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, quarterh, 0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1983, quarterha, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1983, quarterhb, quarterh, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1995, qc,       0,         qc,     dwarfd, qc,     ORIENTATION_FLIP_Y, "ArJay Exports/Prestige Games", "Quarter Horse Classic", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT     MACHINE INPUT   INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS */
+GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, dwarfda,   dwarfd,   dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",            GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, quarterh, 0,         dwarfd, quarterh, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1983, quarterha, quarterh, dwarfd, quarterh, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1983, quarterhb, quarterh, dwarfd, quarterh, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1995, qc,       0,         qc,     quarterh, qc,     ORIENTATION_FLIP_Y, "ArJay Exports/Prestige Games", "Quarter Horse Classic", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
