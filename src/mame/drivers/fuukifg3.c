@@ -27,7 +27,7 @@ Notes so far:
 - Dips are correct for game play. Asura Buster's service mode does show the effects of
   dipswitches and dipswitch state. For the "Round" listing, the 2 and 3 are shown in
   reverse of actual game play. Any reference below to "Service Mode" means Asura
-  Blaster's service mode.
+  Buster's service mode.
 
 - Raster Effects are imperfect, bad frames when lots of new sprites.
 
@@ -350,23 +350,23 @@ static INPUT_PORTS_START( asurabld )
 
 	PORT_START("DSW1")
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_DIPNAME( 0x0002, 0x0002, "Blood Color" )		PORT_DIPLOCATION("SW1:2") // Any other censorship? (Tested in 3 locations)
+	PORT_DIPNAME( 0x0002, 0x0002, "Blood Color" )			PORT_DIPLOCATION("SW1:2") // Any other censorship? (Tested in 3 locations)
 	PORT_DIPSETTING(      0x0002, "Red" )
 	PORT_DIPSETTING(      0x0000, "Green" )
 	PORT_DIPNAME( 0x000c, 0x000c, "Demo Sounds & Music" )	PORT_DIPLOCATION("SW1:3,4") // Tested @ 0917AC
 	PORT_DIPSETTING(      0x000c, "Both On" )
 	PORT_DIPSETTING(      0x0008, "Music Off" )
 	PORT_DIPSETTING(      0x0004, "Both Off" )
-	PORT_DIPSETTING(      0x0000, "Both Off" )		/* Duplicate setting */
-	PORT_DIPNAME( 0x0030, 0x0030, "Timer" )			PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(      0x0000, "Both Off" )				/* Duplicate setting */
+	PORT_DIPNAME( 0x0030, 0x0030, "Timer" )					PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0000, "Slow" )
 	PORT_DIPSETTING(      0x0030, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0010, "Fast" )
 	PORT_DIPSETTING(      0x0020, "Very Fast" )
-	PORT_DIPNAME( 0x00c0, 0x0000, "Coinage Mode" )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x00c0, 0x0000, "Coinage Mode" )			PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(      0x00c0, "Split" )
 	PORT_DIPSETTING(      0x0000, "Joint" )
-	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" )	/* DSW2 bank, not used for either game */
+	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" )		/* DSW2 bank, not used for either game */
 	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW2:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x0400, 0x0400, "SW2:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW2:4" )
@@ -381,24 +381,24 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW3:2,3,4") // AKA Computer Level, see @ 0917CC
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easiest ) )		// Level 1
-	PORT_DIPSETTING(      0x0008, DEF_STR( Very_Easy ) )		// Level 2
+	PORT_DIPSETTING(      0x0008, DEF_STR( Very_Easy ) )	// Level 2
 	PORT_DIPSETTING(      0x0004, DEF_STR( Easier ) )		// Level 3
 	PORT_DIPSETTING(      0x000c, DEF_STR( Easy ) )			// Level 4
 	PORT_DIPSETTING(      0x000e, DEF_STR( Normal ) )		// Level 5
 	PORT_DIPSETTING(      0x0002, DEF_STR( Hard ) )			// Level 6
-	PORT_DIPSETTING(      0x000a, DEF_STR( Very_Hard ) )		// Level 7
+	PORT_DIPSETTING(      0x000a, DEF_STR( Very_Hard ) )	// Level 7
 	PORT_DIPSETTING(      0x0006, DEF_STR( Hardest ) )		// Level 8
-	PORT_DIPNAME( 0x0030, 0x0030, "Damage" )		PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPNAME( 0x0030, 0x0030, "Damage" )				PORT_DIPLOCATION("SW3:5,6")
 	PORT_DIPSETTING(      0x0020, "75%" )
 	PORT_DIPSETTING(      0x0030, "100%" )
 	PORT_DIPSETTING(      0x0010, "125%" )
 	PORT_DIPSETTING(      0x0000, "150%" )
-	PORT_DIPNAME( 0x00c0, 0x0040, "Max Rounds" )		PORT_DIPLOCATION("SW3:7,8") /* Service Mode shows rounds needed to win the match */
-	PORT_DIPSETTING(      0x0000, "1" )				/* Service Mode Shows 1 */
-	PORT_DIPSETTING(      0x00c0, "3" )				/* Service Mode Shows 3, Service Mode has 2 & 3 reversed comparied to game play */
-	PORT_DIPSETTING(      0x0080, "5" )				/* Service Mode Shows 2, Service Mode has 2 & 3 reversed comparied to game play */
-//	PORT_DIPSETTING(      0x0040, "Error!!" )			/* Service Mode Shows "Error" */
-	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW4:1,2,3,4") /* Service Mode Shows Player 2 */
+	PORT_DIPNAME( 0x00c0, 0x0040, "Max Rounds" )			PORT_DIPLOCATION("SW3:7,8") /* Service Mode shows rounds needed to win the match */
+	PORT_DIPSETTING(      0x0000, "1" )						/* Service Mode Shows 1 */
+	PORT_DIPSETTING(      0x00c0, "3" )						/* Service Mode Shows 3, Service Mode has 2 & 3 reversed comparied to game play */
+	PORT_DIPSETTING(      0x0080, "5" )						/* Service Mode Shows 2, Service Mode has 2 & 3 reversed comparied to game play */
+//	PORT_DIPSETTING(      0x0040, "Error!!" )				/* Service Mode Shows "Error" */
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW4:1,2,3,4") /* Service Mode Shows Player 2 */
 	PORT_DIPSETTING(      0x8000, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x9000, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 6C_1C ) )
@@ -412,10 +412,10 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x2000, "2C Start / 1C Continue" )
-//	PORT_DIPSETTING(      0x7000, "Error!!" )			// Cuases graphics issues - Service Mode shows "Error"
-//	PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )		// Dulicate 2C_1C
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		// Set both for Free Play
-	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW4:5,6,7,8") /* Service Mode Shows Player 1 */
+//	PORT_DIPSETTING(      0x7000, "Error!!" )				// Causes graphics issues - Service Mode shows "Error"
+//	PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )		// Duplicate 2C_1C
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )	// Set both for Free Play
+	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW4:5,6,7,8") /* Service Mode Shows Player 1 */
 	PORT_DIPSETTING(      0x0800, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x0900, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 6C_1C ) )
@@ -429,9 +429,9 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0200, "2C Start / 1C Continue" )
-//	PORT_DIPSETTING(      0x0700, "Error!!" )			// Cuases graphics issues - Service Mode shows "Error"
-//	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )		// Dulicate 2C_1C
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		// Set both for Free Play
+//	PORT_DIPSETTING(      0x0700, "Error!!" )				// Causes graphics issues - Service Mode shows "Error"
+//	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )		// Duplicate 2C_1C
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )	// Set both for Free Play
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( asurabus )
