@@ -62,10 +62,15 @@ static void sh2_timer_resync(sh2_state *sh2)
 {
 	int divider = div_tab[(sh2->m[5] >> 8) & 3];
 	UINT64 cur_time = sh2->device->total_cycles();
+	UINT64 add = (cur_time - sh2->frc_base) >> divider; 
 
-	if(divider)
-		sh2->frc += (cur_time - sh2->frc_base) >> divider;
-	sh2->frc_base = cur_time;
+	if (add > 0)
+	{
+		if(divider)
+			sh2->frc += add;
+
+	   	sh2->frc_base = cur_time;
+	}
 }
 
 static void sh2_timer_activate(sh2_state *sh2)
@@ -524,7 +529,9 @@ WRITE32_HANDLER( sh2_internal_w )
 		// Timers
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0)
+		{
 			sh2_timer_resync(sh2);
+		}
 //      printf("SH2.%s: TIER write %04x @ %04x\n", sh2->device->tag(), data >> 16, mem_mask>>16);
 		sh2->m[4] = (sh2->m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh2->m[4] & (ICF|OCFA|OCFB|OVF));
 		COMBINE_DATA(&sh2->frc);
@@ -686,13 +693,17 @@ READ32_HANDLER( sh2_internal_r )
 #ifdef USE_SH2DRC
 	offset &= 0x7f;
 #endif
-	//  logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
+//	logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
 	switch( offset )
 	{
 	case 0x04: // TIER, FTCSR, FRC
 		if ( mem_mask == 0x00ff0000 )
+		{
 			if ( sh2->ftcsr_read_callback != NULL )
+			{
 				sh2->ftcsr_read_callback( (sh2->m[4] & 0xffff0000) | sh2->frc );
+			}
+		}
 		sh2_timer_resync(sh2);
 		return (sh2->m[4] & 0xffff0000) | sh2->frc;
 	case 0x05: // OCRx, TCR, TOCR
