@@ -6,7 +6,7 @@ Hardware is based on MSX1, excluding i8255 PPI:
  64KB EPROM (2764-15, contains hacked BIOS and game ROM)
  Z80 @ 3.58MHz
  GI AY-3-8910
- TI TMS9928
+ TI TMS9928A
  (no dipswitches)
 
 Games:
@@ -113,11 +113,15 @@ static SCREEN_UPDATE( forte2 )
 	return 0;
 }
 
+static MACHINE_RESET( forte2 )
+{
+	forte2_state *state = machine.driver_data<forte2_state>();
+	state->m_input_mask = 0xff;
+}
+
 static MACHINE_START( forte2 )
 {
 	forte2_state *state = machine.driver_data<forte2_state>();
-
-	state->m_input_mask = 0xff;
 
 	/* register for save states */
 	state_save_register_global(machine, state->m_input_mask);
@@ -126,11 +130,12 @@ static MACHINE_START( forte2 )
 
 static MACHINE_CONFIG_START( pesadelo, forte2_state )
 
-	MCFG_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
 
 	MCFG_MACHINE_START( forte2 )
+	MCFG_MACHINE_RESET( forte2 )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, forte2_tms9928a_interface )
