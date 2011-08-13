@@ -8,7 +8,6 @@ public:
 
 	UINT32    *m_workram_l;
 	UINT32    *m_workram_h;
-	UINT8     *m_smpc_ram;
 	UINT8     *m_backupram;
 	UINT8     *m_cart_backupram;
 	UINT32    *m_scu_regs;
@@ -84,8 +83,13 @@ public:
         UINT8 EXLE2;
         UINT8 PDR1;
         UINT8 PDR2;
+        UINT8 DDR1;
+        UINT8 DDR2;
+        UINT8 SF;
+        UINT8 SR;
+        UINT8 IREG[7];
+        UINT8 OREG[32];
         int   intback_stage;
-        int   smpcSR;
         int   pmode;
         UINT8 SMEM[4];
         UINT8 intback;

@@ -1416,7 +1416,6 @@ DRIVER_INIT ( stv )
 	state->m_minit_boost_timeslice = attotime::zero;
 	state->m_sinit_boost_timeslice = attotime::zero;
 
-	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
 	state->m_scsp_regs  = auto_alloc_array(machine, UINT16, 0x1000/2);
 	state->m_backupram = auto_alloc_array(machine, UINT8, 0x10000);
@@ -1434,10 +1433,6 @@ DRIVER_INIT ( stv )
 	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
 	//machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
 	//machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
-
-    state->m_smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  state->m_smpc_ram[0x33] = input_port_read(machine, "FAKE");
-	state->m_smpc_ram[0x5f] = 0x10;
 
 	state->m_vdp2.pal = 0;
 }
@@ -1571,13 +1566,13 @@ static TIMER_CALLBACK(stv_rtc_increment)
 	static int year_num, year_count;
 
 	/*
-        state->m_smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-        state->m_smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-        state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-        state->m_smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-        state->m_smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-        state->m_smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-        state->m_smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+        state->m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
+        state->m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
+        state->m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+        state->m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
+        state->m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
+        state->m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
+        state->m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
     */
 
 	state->m_smpc.rtc_data[6]++;
@@ -1647,7 +1642,6 @@ static MACHINE_START( stv )
 	scsp_set_ram_base(machine.device("scsp"), state->m_sound_ram);
 
 	// save states
-	state_save_register_global_pointer(machine, state->m_smpc_ram, 0x80);
 	state_save_register_global_pointer(machine, state->m_scu_regs, 0x100/4);
 	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
 	state_save_register_global(machine, state->m_NMI_reset);
@@ -1692,7 +1686,6 @@ static MACHINE_START( saturn )
 	scsp_set_ram_base(machine.device("scsp"), state->m_sound_ram);
 
 	// save states
-	state_save_register_global_pointer(machine, state->m_smpc_ram, 0x80);
 	state_save_register_global_pointer(machine, state->m_scu_regs, 0x100/4);
 	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
 	state_save_register_global(machine, state->m_NMI_reset);
@@ -1708,7 +1701,7 @@ static MACHINE_START( saturn )
 	state_save_register_global(machine, scsp_last_line);
 	state_save_register_global(machine, state->m_smpc.intback_stage);
 	state_save_register_global(machine, state->m_smpc.pmode);
-	state_save_register_global(machine, state->m_smpc.smpcSR);
+	state_save_register_global(machine, state->m_smpc.SR);
 	state_save_register_global_array(machine, state->m_smpc.SMEM);
 	state_save_register_global_pointer(machine, state->m_cart_dram, 0x400000/4);
 
@@ -1931,11 +1924,10 @@ static MACHINE_RESET( saturn )
 	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
-	state->m_smpc.smpcSR = 0x40;	// this bit is always on according to docs
+	state->m_smpc.SR = 0x40;	// this bit is always on according to docs
 
 	state->m_en_68k = 0;
 	state->m_NMI_reset = 1;
-	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 
 	DMA_STATUS = 0;
 
@@ -2015,7 +2007,6 @@ static MACHINE_RESET( stv )
 
 	state->m_en_68k = 0;
 	state->m_NMI_reset = 1;
-	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 
 	port_sel = mux_data = 0;
 	port_i = -1;
@@ -2231,7 +2222,6 @@ MACHINE_CONFIG_END
 static void saturn_init_driver(running_machine &machine, int rgn)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	system_time systime;
 
 	state->m_saturn_region = rgn;
 	state->m_vdp2.pal = (rgn == 12) ? 1 : 0;
@@ -2240,34 +2230,17 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 	sh2drc_set_options(machine.device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
-	/* get the current date/time from the core */
-	machine.current_datetime(systime);
-
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	state->m_minit_boost = 400;
 	state->m_sinit_boost = 400;
 	state->m_minit_boost_timeslice = attotime::zero;
 	state->m_sinit_boost_timeslice = attotime::zero;
 
-	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
 	state->m_scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
 	state->m_cart_dram = auto_alloc_array(machine, UINT32, 0x400000/4);
 	state->m_backupram = auto_alloc_array(machine, UINT8, 0x10000);
 	state->m_cart_backupram = auto_alloc_array(machine, UINT8, 0x400000);
-
-	state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
-	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
-	state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-	state->m_smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
-	state->m_smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
-	state->m_smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
-	state->m_smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
-	state->m_smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  state->m_smpc_ram[0x33] = input_port_read(machine, "???");
-	state->m_smpc_ram[0x5f] = 0x10;
-
-
 }
 
 static DRIVER_INIT( saturnus )

@@ -165,20 +165,20 @@ static int numfiles;			// # of entries in current directory
 static int firstfile;			// first non-directory file
 
 // HIRQ definitions
-#define CMOK 0x0001 // command ok / ready for new command
-#define DRDY 0x0002 // drive ready
-#define CSCT 0x0004 // sector ready (?)
-#define BFUL 0x0008 // buffer full
-#define PEND 0x0010 // command pending
+#define CMOK 0x0001 // command dispatch possible
+#define DRDY 0x0002 // data transfer preparations complete
+#define CSCT 0x0004 // finished reading 1 sector
+#define BFUL 0x0008 // CD buffer full
+#define PEND 0x0010 // CD playback completed
 #define DCHG 0x0020 // disc change / tray open
-#define ESEL 0x0040 // soft reset, end of blah
-#define EHST 0x0080 //
-#define ECPY 0x0100 //
-#define EFLS 0x0200 // stop execution of cd block filesystem
-#define SCDQ 0x0400 // subcode Q renewal complete
-#define MPED 0x0800 // MPEG
-#define MPCM 0x1000 // MPEG
-#define MPST 0x2000 // MPEG
+#define ESEL 0x0040 // selector settings processing complete
+#define EHST 0x0080 // host input/output processing complete
+#define ECPY 0x0100 // duplication/move processing complete
+#define EFLS 0x0200 // file system processing complete
+#define SCDQ 0x0400 // subcode Q update completed
+#define MPED 0x0800 // MPEG-related processing complete
+#define MPCM 0x1000 // MPEG action uncertain
+#define MPST 0x2000 // MPEG interrupt status report
 
 // CD status (hi byte of CR1) definitions:
 // (these defines are shifted up 8)
@@ -1146,9 +1146,9 @@ static void cd_exec_command(running_machine &machine)
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-			UINT32 read_dir;
+//			UINT32 read_dir;
 
-			read_dir = ((cr3&0xff)<<16)|cr4;
+//			read_dir = ((cr3&0xff)<<16)|cr4;
 
 			if((cr3 >> 8) < 0x24)
 				cddevice = &filters[cr3 >> 8];

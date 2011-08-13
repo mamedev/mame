@@ -9,8 +9,8 @@ MCU simulation by Angelo Salese & R. Belmont
 
 TODO:
 - timings;
-- fix intback issue with inputs;
-- better arrangement of variables;
+- fix intback issue with inputs (according to the docs, it should fall in between
+  VBLANK-IN and OUT, for obvious reasons);
 - clean-ups;
 
 *************************************************************************************/
@@ -155,31 +155,6 @@ TODO:
 #define LOG_SMPC 0
 #define LOG_PAD_CMD 0
 
-READ8_HANDLER( stv_SMPC_r )
-{
-	saturn_state *state = space->machine().driver_data<saturn_state>();
-	int return_data;
-
-	return_data = state->m_smpc_ram[offset];
-
-	if (offset == 0x61) // ?? many games need this or the controls don't work
-		return_data = 0x20 ^ 0xff;
-
-	if (offset == 0x75)//PDR1 read
-		return_data = input_port_read(space->machine(), "DSW1");
-
-	if (offset == 0x77)//PDR2 read
-		return_data=  (0xfe | space->machine().device<eeprom_device>("eeprom")->read_bit());
-
-//  if (offset == 0x33) //country code
-//      return_data = input_port_read(machine, "FAKE");
-
-	//if(LOG_SMPC) printf ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, return_data);
-
-
-	return return_data;
-}
-
 static TIMER_CALLBACK( stv_bankswitch_state )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -216,8 +191,8 @@ static TIMER_CALLBACK( smpc_slave_enable )
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	device_set_input_line(state->m_slave, INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
-	state->m_smpc_ram[0x5f] = param + 0x02; //read-back for last command issued
-	state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
+	state->m_smpc.OREG[31] = param + 0x02; //read-back for last command issued
+	state->m_smpc.SF = 0x00; //clear hand-shake flag
 }
 
 static TIMER_CALLBACK( smpc_sound_enable )
@@ -226,8 +201,8 @@ static TIMER_CALLBACK( smpc_sound_enable )
 
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 	state->m_en_68k = param ^ 1;
-	state->m_smpc_ram[0x5f] = param + 0x06; //read-back for last command issued
-	state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
+	state->m_smpc.OREG[31] = param + 0x06; //read-back for last command issued
+	state->m_smpc.SF = 0x00; //clear hand-shake flag
 }
 
 static void smpc_system_reset(running_machine &machine)
@@ -270,21 +245,18 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 static TIMER_CALLBACK( stv_smpc_intback )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+	int i;
 
-	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+	state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 
-	{
-		int i;
+	for(i=0;i<7;i++)
+		state->m_smpc.OREG[1+i] = state->m_smpc.rtc_data[i];
 
-		for(i=0;i<7;i++)
-			state->m_smpc_ram[0x23+i*2] = state->m_smpc.rtc_data[i];
-	}
+	state->m_smpc.OREG[8]=0x00;  // CTG0 / CTG1?
 
-	state->m_smpc_ram[0x31]=0x00;  //?
+	state->m_smpc.OREG[9]=0x00;  // TODO: system region on Saturn
 
-	//state->m_smpc_ram[0x33]=input_port_read(space->machine(), "FAKE");
-
-	state->m_smpc_ram[0x35]= 0 << 7 |
+	state->m_smpc.OREG[10]= 0 << 7 |
 	                         state->m_vdp2.dotsel << 6 |
 	                         1 << 5 |
 	                         1 << 4 |
@@ -292,28 +264,13 @@ static TIMER_CALLBACK( stv_smpc_intback )
 	                         1 << 2 |
 	                         0 << 1 | //SYSRES
 	                         0 << 0;  //SOUNDRES
-	state->m_smpc_ram[0x37]= 0 << 6; //CDRES
+	state->m_smpc.OREG[11]= 0 << 6; //CDRES
 
-	state->m_smpc_ram[0x39]=0xff;
-	state->m_smpc_ram[0x3b]=0xff;
-	state->m_smpc_ram[0x3d]=0xff;
-	state->m_smpc_ram[0x3f]=0xff;
+	for(i=0;i<4;i++)
+		state->m_smpc.OREG[12+i]=state->m_smpc.SMEM[i];
 
-	state->m_smpc_ram[0x41]=0xff;
-	state->m_smpc_ram[0x43]=0xff;
-	state->m_smpc_ram[0x45]=0xff;
-	state->m_smpc_ram[0x47]=0xff;
-	state->m_smpc_ram[0x49]=0xff;
-	state->m_smpc_ram[0x4b]=0xff;
-	state->m_smpc_ram[0x4d]=0xff;
-	state->m_smpc_ram[0x4f]=0xff;
-	state->m_smpc_ram[0x51]=0xff;
-	state->m_smpc_ram[0x53]=0xff;
-	state->m_smpc_ram[0x55]=0xff;
-	state->m_smpc_ram[0x57]=0xff;
-	state->m_smpc_ram[0x59]=0xff;
-	state->m_smpc_ram[0x5b]=0xff;
-	state->m_smpc_ram[0x5d]=0xff;
+	for(i=0;i<15;i++)
+		state->m_smpc.OREG[16+i]=0xff; // undefined
 
 	//  /*This is for RTC,cartridge code and similar stuff...*/
 	//if(LOG_SMPC) printf ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
@@ -322,9 +279,10 @@ static TIMER_CALLBACK( stv_smpc_intback )
 	else
 		state->m_scu.ist |= (IRQ_SMPC);
 
+	/* put issued command in OREG31 */
+	state->m_smpc.OREG[31] = 0x10; // TODO: doc says 0?
 	/* clear hand-shake flag */
-	state->m_smpc_ram[0x5f] = 0x10;
-	state->m_smpc_ram[0x63] = 0x00;
+	state->m_smpc.SF = 0x00;
 }
 
 static TIMER_CALLBACK( intback_peripheral )
@@ -342,20 +300,20 @@ static TIMER_CALLBACK( intback_peripheral )
 	for(pad_num=0;pad_num<2;pad_num++)
 	{
 		pad = input_port_read(machine, padnames[pad_num]);
-		state->m_smpc_ram[0x21+pad_num*8] = 0xf1;	// no tap, direct connect
-		state->m_smpc_ram[0x23+pad_num*8] = 0x02;	// saturn pad
-		state->m_smpc_ram[0x25+pad_num*8] = pad>>8;
-		state->m_smpc_ram[0x27+pad_num*8] = pad & 0xff;
+		state->m_smpc.OREG[0+pad_num*4] = 0xf1;	// no tap, direct connect
+		state->m_smpc.OREG[1+pad_num*4] = 0x02;	// saturn pad
+		state->m_smpc.OREG[2+pad_num*4] = pad>>8;
+		state->m_smpc.OREG[3+pad_num*4] = pad & 0xff;
 	}
 
 	if (state->m_smpc.intback_stage == 2)
 	{
-		state->m_smpc.smpcSR = (0x80 | state->m_smpc.pmode);	// pad 2, no more data, echo back pad mode set by intback
+		state->m_smpc.SR = (0x80 | state->m_smpc.pmode);	// pad 2, no more data, echo back pad mode set by intback
 		state->m_smpc.intback_stage = 0;
 	}
 	else
 	{
-		state->m_smpc.smpcSR = (0xc0 | state->m_smpc.pmode);	// pad 1, more data, echo back pad mode set by intback
+		state->m_smpc.SR = (0xc0 | state->m_smpc.pmode);	// pad 1, more data, echo back pad mode set by intback
 		state->m_smpc.intback_stage ++;
 	}
 
@@ -364,31 +322,29 @@ static TIMER_CALLBACK( intback_peripheral )
 	else
 		state->m_scu.ist |= (IRQ_SMPC);
 
-	state->m_smpc_ram[0x5f] = 0x10; /* callback for last command issued */
-	state->m_smpc_ram[0x63] = 0x00;	/* clear hand-shake flag */
+	state->m_smpc.OREG[31] = 0x10; /* callback for last command issued */
+	state->m_smpc.SF = 0x00;	/* clear hand-shake flag */
 }
 
 static TIMER_CALLBACK( saturn_smpc_intback )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(state->m_smpc_ram[1] != 0)
+	if(state->m_smpc.IREG[0] != 0)
 	{
 		{
-			state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+			int i;
 
-			{
-				int i;
+			state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6); // bit 7: SETTIME (RTC isn't setted up properly)
 
-				for(i=0;i<7;i++)
-					state->m_smpc_ram[0x23+i*2] = state->m_smpc.rtc_data[i];
-			}
+			for(i=0;i<7;i++)
+				state->m_smpc.OREG[1+i] = state->m_smpc.rtc_data[i];
 
-			state->m_smpc_ram[0x31]=0x00;  //?
+			state->m_smpc.OREG[8]=0x00;  //Cartridge code?
 
-			//state->m_smpc_ram[0x33]=input_port_read(space->machine(), "FAKE");
+			state->m_smpc.OREG[9] = state->m_saturn_region;
 
-			state->m_smpc_ram[0x35]= 0 << 7 |
+			state->m_smpc.OREG[10]= 0 << 7 |
 			                         state->m_vdp2.dotsel << 6 |
 			                         1 << 5 |
 			                         1 << 4 |
@@ -396,53 +352,39 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 			                         1 << 2 |
 			                         0 << 1 | //SYSRES
 			                         0 << 0;  //SOUNDRES
-			state->m_smpc_ram[0x37]= 0 << 6; //CDRES
+			state->m_smpc.OREG[11]= 0 << 6; //CDRES
 
-			state->m_smpc_ram[0x39]=state->m_smpc.SMEM[0];
-			state->m_smpc_ram[0x3b]=state->m_smpc.SMEM[1];
-			state->m_smpc_ram[0x3d]=state->m_smpc.SMEM[2];
-			state->m_smpc_ram[0x3f]=state->m_smpc.SMEM[3];
+			for(i=0;i<4;i++)
+				state->m_smpc.OREG[12+i]=state->m_smpc.SMEM[i];
 
-			state->m_smpc_ram[0x41]=0xff;
-			state->m_smpc_ram[0x43]=0xff;
-			state->m_smpc_ram[0x45]=0xff;
-			state->m_smpc_ram[0x47]=0xff;
-			state->m_smpc_ram[0x49]=0xff;
-			state->m_smpc_ram[0x4b]=0xff;
-			state->m_smpc_ram[0x4d]=0xff;
-			state->m_smpc_ram[0x4f]=0xff;
-			state->m_smpc_ram[0x51]=0xff;
-			state->m_smpc_ram[0x53]=0xff;
-			state->m_smpc_ram[0x55]=0xff;
-			state->m_smpc_ram[0x57]=0xff;
-			state->m_smpc_ram[0x59]=0xff;
-			state->m_smpc_ram[0x5b]=0xff;
-			state->m_smpc_ram[0x5d]=0xff;
+			for(i=0;i<15;i++)
+				state->m_smpc.OREG[16+i]=0xff; // undefined
 		}
 
-		state->m_smpc.intback_stage = (state->m_smpc_ram[3] & 8) >> 3; // first peripheral
-		state->m_smpc.smpcSR = 0x40 | state->m_smpc.intback_stage << 5;
-		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
-		state->m_smpc_ram[0x5f] = 0x10;
+		state->m_smpc.intback_stage = (state->m_smpc.IREG[1] & 8) >> 3; // first peripheral
+		state->m_smpc.SR = 0x40 | state->m_smpc.intback_stage << 5;
+		state->m_smpc.pmode = state->m_smpc.IREG[0]>>4;
 
 		if(!(state->m_scu.ism & IRQ_SMPC))
 			device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
 		else
 			state->m_scu.ist |= (IRQ_SMPC);
 
+		/* put issued command in OREG31 */
+		state->m_smpc.OREG[31] = 0x10;
 		/* clear hand-shake flag */
-		state->m_smpc_ram[0x63] = 0x00;
+		state->m_smpc.SF = 0x00;
 	}
-	else if(state->m_smpc_ram[3] & 8)
+	else if(state->m_smpc.IREG[1] & 8)
 	{
-		state->m_smpc.intback_stage = (state->m_smpc_ram[3] & 8) >> 3; // first peripheral
-		state->m_smpc.smpcSR = 0x40;
-		state->m_smpc_ram[0x5f] = 0x10;
+		state->m_smpc.intback_stage = (state->m_smpc.IREG[1] & 8) >> 3; // first peripheral
+		state->m_smpc.SR = 0x40;
+		state->m_smpc.OREG[31] = 0x10;
 		machine.scheduler().timer_set(attotime::from_usec(0), FUNC(intback_peripheral),0);
 	}
 	else
 	{
-		printf("SMPC intback bogus behaviour called %02x %02x\n",state->m_smpc_ram[1],state->m_smpc_ram[3]);
+		printf("SMPC intback bogus behaviour called %02x %02x\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1]);
 	}
 
 }
@@ -453,7 +395,7 @@ static void smpc_rtc_write(running_machine &machine)
 	int i;
 
 	for(i=0;i<7;i++)
-		state->m_smpc.rtc_data[i] = state->m_smpc_ram[0x01+i*2];
+		state->m_smpc.rtc_data[i] = state->m_smpc.IREG[i];
 }
 
 static void smpc_memory_setting(running_machine &machine)
@@ -462,7 +404,7 @@ static void smpc_memory_setting(running_machine &machine)
 	int i;
 
 	for(i=0;i<4;i++)
-		state->m_smpc.SMEM[i] = state->m_smpc_ram[0x01+i*2];
+		state->m_smpc.SMEM[i] = state->m_smpc.IREG[i];
 }
 
 static void smpc_nmi_req(running_machine &machine)
@@ -478,17 +420,127 @@ static void smpc_nmi_set(running_machine &machine,UINT8 cmd)
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	state->m_NMI_reset = cmd ^ 1;
-	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+	state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+}
+
+/********************************************
+ *
+ * ST-V handlers
+ *
+ *******************************************/
+
+READ8_HANDLER( stv_SMPC_r )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+	int return_data = 0;
+
+	if(!(offset & 1))
+		return 0;
+
+	if(offset >= 0x21 && offset <= 0x5f)
+		return_data = state->m_smpc.OREG[(offset-0x21) >> 1];
+
+	if (offset == 0x61) // TODO: SR
+		return_data = 0x20 ^ 0xff;
+
+	if (offset == 0x63)
+		return_data = state->m_smpc.SF;
+
+	if (offset == 0x75)//PDR1 read
+		return_data = input_port_read(space->machine(), "DSW1");
+
+	if (offset == 0x77)//PDR2 read
+		return_data = (0xfe | space->machine().device<eeprom_device>("eeprom")->read_bit());
+
+	return return_data;
+}
+
+static void stv_comreg_exec(address_space *space,UINT8 data)
+{
+	switch (data)
+	{
+		case 0x00:
+			if(LOG_SMPC) printf ("SMPC: Master ON\n");
+			smpc_master_on(space->machine());
+			break;
+		//in theory 0x01 is for Master OFF,but obviously is not used.
+		case 0x02:
+		case 0x03:
+			if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
+			space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
+			break;
+		case 0x06:
+		case 0x07:
+			if(LOG_SMPC) printf ("SMPC: Sound %s, ignored\n",(data & 1) ? "off" : "on");
+			break;
+		/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
+		//case 0x08:
+		//case 0x09:
+		case 0x0d:
+			if(LOG_SMPC) printf ("SMPC: System Reset\n");
+			smpc_system_reset(space->machine());
+			break;
+		case 0x0e:
+		case 0x0f:
+			if(LOG_SMPC) printf ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
+			smpc_change_clock(space->machine(),data & 1);
+			break;
+		/*"Interrupt Back"*/
+		case 0x10:
+			if(LOG_SMPC) printf ("SMPC: Status Acquire\n");
+			space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(stv_smpc_intback),0); //TODO: variable time
+			break;
+		/* RTC write*/
+		case 0x16:
+			if(LOG_SMPC) printf("SMPC: RTC write\n");
+			smpc_rtc_write(space->machine());
+			break;
+		/* SMPC memory setting*/
+		case 0x17:
+			if(LOG_SMPC) printf ("SMPC: memory setting\n");
+			//smpc_memory_setting(space->machine());
+			break;
+		case 0x18:
+			if(LOG_SMPC) printf ("SMPC: NMI request\n");
+			smpc_nmi_req(space->machine());
+			break;
+		case 0x19:
+		case 0x1a:
+			if(LOG_SMPC) printf ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
+			smpc_nmi_set(space->machine(),data & 1);
+			break;
+		default:
+			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
+	}
 }
 
 WRITE8_HANDLER( stv_SMPC_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	system_time systime;
-	space->machine().base_datetime(systime);
+
+	if (!(offset & 1)) // avoid writing to even bytes
+		return;
 
 //  if(LOG_SMPC) printf ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
-	state->m_smpc_ram[offset] = data;
+
+	if(offset >= 1 && offset <= 0xd)
+		state->m_smpc.IREG[offset >> 1] = data;
+
+	if (offset == 0x1f) // COMREG
+	{
+		stv_comreg_exec(space,data);
+
+		// we've processed the command, clear status flag
+		if(data != 0x10 && data != 0x02 && data != 0x03)
+		{
+			state->m_smpc.OREG[31] = data; //read-back command
+			state->m_smpc.SF = 0x00;
+		}
+		/*TODO:emulate the timing of each command...*/
+	}
+
+	if(offset == 0x63)
+		state->m_smpc.SF = data & 1;
 
 	if(offset == 0x75)
 	{
@@ -518,12 +570,12 @@ WRITE8_HANDLER( stv_SMPC_w )
         */
 		//popmessage("PDR2 = %02x",state->m_smpc_ram[0x77]);
 
-		if(LOG_SMPC) printf("SMPC: M68k %s\n",(state->m_smpc_ram[0x77] & 0x10) ? "off" : "on");
+		if(LOG_SMPC) printf("SMPC: M68k %s\n",(data & 0x10) ? "off" : "on");
 		//space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),(state->m_smpc_ram[0x77] & 0x10) >> 4);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (state->m_smpc_ram[0x77] & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-		state->m_en_68k = ((state->m_smpc_ram[0x77] & 0x10) >> 4) ^ 1;
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		state->m_en_68k = ((data & 0x10) >> 4) ^ 1;
 
-		//if(LOG_SMPC) printf("SMPC: ram [0x77] = %02x\n",state->m_smpc_ram[0x77]);
+		//if(LOG_SMPC) printf("SMPC: ram [0x77] = %02x\n",data);
 		state->m_smpc.PDR2 = (data & 0x60);
 	}
 
@@ -533,113 +585,43 @@ WRITE8_HANDLER( stv_SMPC_w )
         ---- --x- IOSEL2 direct (1) / control mode (0) port select
         ---- ---x IOSEL1 direct (1) / control mode (0) port select
         */
-		state->m_smpc.IOSEL1 = (state->m_smpc_ram[0x7d] & 1) >> 0;
-		state->m_smpc.IOSEL2 = (state->m_smpc_ram[0x7d] & 2) >> 1;
+		state->m_smpc.IOSEL1 = (data & 1) >> 0;
+		state->m_smpc.IOSEL2 = (data & 2) >> 1;
 	}
 
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
-		state->m_smpc.EXLE1 = (state->m_smpc_ram[0x7f] & 1) >> 0;
-		state->m_smpc.EXLE2 = (state->m_smpc_ram[0x7f] & 2) >> 1;
-	}
-
-	if (offset == 0x1f) // COMREG
-	{
-		switch (data)
-		{
-			case 0x00:
-				if(LOG_SMPC) printf ("SMPC: Master ON\n");
-				smpc_master_on(space->machine());
-				break;
-			//in theory 0x01 is for Master OFF,but obviously is not used.
-			case 0x02:
-			case 0x03:
-				if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
-				space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
-				break;
-			case 0x06:
-			case 0x07:
-				if(LOG_SMPC) printf ("SMPC: Sound %s, ignored\n",(data & 1) ? "off" : "on");
-				break;
-			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
-			//case 0x08:
-			//case 0x09:
-			case 0x0d:
-				if(LOG_SMPC) printf ("SMPC: System Reset\n");
-				smpc_system_reset(space->machine());
-				break;
-			case 0x0e:
-			case 0x0f:
-				if(LOG_SMPC) printf ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
-				smpc_change_clock(space->machine(),data & 1);
-				break;
-			/*"Interrupt Back"*/
-			case 0x10:
-				if(LOG_SMPC) printf ("SMPC: Status Acquire\n");
-				space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(stv_smpc_intback),0); //TODO: variable time
-				break;
-			/* RTC write*/
-			case 0x16:
-				if(LOG_SMPC) printf("SMPC: RTC write\n");
-				smpc_rtc_write(space->machine());
-				break;
-			/* SMPC memory setting*/
-			case 0x17:
-				if(LOG_SMPC) printf ("SMPC: memory setting\n");
-				//smpc_memory_setting(space->machine());
-				break;
-			case 0x18:
-				if(LOG_SMPC) printf ("SMPC: NMI request\n");
-				smpc_nmi_req(space->machine());
-				break;
-			case 0x19:
-			case 0x1a:
-				if(LOG_SMPC) printf ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
-				smpc_nmi_set(space->machine(),data & 1);
-				break;
-			default:
-				printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
-		}
-
-		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 0x02 && data != 0x03)
-		{
-			state->m_smpc_ram[0x5f] = data; //read-back command
-			state->m_smpc_ram[0x63] = 0x00;
-		}
-		/*TODO:emulate the timing of each command...*/
+		state->m_smpc.EXLE1 = (data & 1) >> 0;
+		state->m_smpc.EXLE2 = (data & 2) >> 1;
 	}
 }
+
+/********************************************
+ *
+ * Saturn handlers
+ *
+ *******************************************/
 
 READ8_HANDLER( saturn_SMPC_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	int return_data;
+	UINT8 return_data = 0;
 
-	return_data = state->m_smpc_ram[offset];
+	if (!(offset & 1)) // avoid reading to even bytes (TODO: is it 0s or 1s?)
+		return 0x00;
 
-	if ((offset == 0x61))
-		return_data = state->m_smpc.smpcSR;
+	if(offset >= 0x21 && offset <= 0x5f)
+		return_data = state->m_smpc.OREG[(offset-0x21) >> 1];
+
+	if (offset == 0x61)
+		return_data = state->m_smpc.SR;
+
+	if (offset == 0x63)
+		return_data = state->m_smpc.SF;
 
 	if (offset == 0x75 || offset == 0x77)//PDR1/2 read
 	{
-/*
-    PORT_START("JOY1")
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) // START
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1) // A
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1) // B
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1) // C
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1) // R
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 X") PORT_PLAYER(1) // X
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Y") PORT_PLAYER(1) // Y
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1) // Z
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1) // L
-*/
 		if ((state->m_smpc.IOSEL1 && offset == 0x75) || (state->m_smpc.IOSEL2 && offset == 0x77))
 		{
 			int hshake;
@@ -657,152 +639,157 @@ READ8_HANDLER( saturn_SMPC_r )
 		}
 	}
 
-	if (offset == 0x33) return_data = state->m_saturn_region;
-
 	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, offset>>1, return_data);
 
 
 	return return_data;
 }
 
+static void saturn_comreg_exec(address_space *space,UINT8 data)
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	switch (data)
+	{
+		case 0x00:
+			if(LOG_SMPC) printf ("SMPC: Master ON\n");
+			smpc_master_on(space->machine());
+			break;
+		//in theory 0x01 is for Master OFF
+		case 0x02:
+		case 0x03:
+			if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
+			space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
+			break;
+		case 0x06:
+		case 0x07:
+			if(LOG_SMPC) printf ("SMPC: Sound %s\n",(data & 1) ? "off" : "on");
+			space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),data & 1);
+			break;
+		/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
+		//case 0x08:
+		//case 0x09:
+		case 0x0d:
+			if(LOG_SMPC) printf ("SMPC: System Reset\n");
+			smpc_system_reset(space->machine());
+			break;
+		case 0x0e:
+		case 0x0f:
+			if(LOG_SMPC) printf ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
+			smpc_change_clock(space->machine(),data & 1);
+			break;
+		/*"Interrupt Back"*/
+		case 0x10:
+			if(LOG_SMPC) printf ("SMPC: Status Acquire (IntBack)\n");
+			int timing;
+
+			timing = 100;
+
+			if(state->m_smpc.IREG[0] != 0) // non-peripheral data
+				timing = 200;
+
+			if(state->m_smpc.IREG[1] & 8) // peripheral data
+				timing = 15000;
+
+			/* TODO: check if IREG[2] is setted to 0xf0 */
+
+			if(LOG_PAD_CMD) printf("INTBACK %02x %02x\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1]);
+			space->machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?
+			break;
+		/* RTC write*/
+		case 0x16:
+			if(LOG_SMPC) printf("SMPC: RTC write\n");
+			smpc_rtc_write(space->machine());
+			break;
+		/* SMPC memory setting*/
+		case 0x17:
+			if(LOG_SMPC) printf ("SMPC: memory setting\n");
+			smpc_memory_setting(space->machine());
+			break;
+		case 0x18:
+			if(LOG_SMPC) printf ("SMPC: NMI request\n");
+			smpc_nmi_req(space->machine());
+			break;
+		case 0x19:
+		case 0x1a:
+			if(LOG_SMPC) printf ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
+			smpc_nmi_set(space->machine(),data & 1);
+			break;
+		default:
+			printf ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
+	}
+}
+
 WRITE8_HANDLER( saturn_SMPC_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	system_time systime;
-//	UINT8 last;
-	running_machine &machine = space->machine();
 
-	/* get the current date/time from the core */
-	machine.current_datetime(systime);
+	if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x\n", offset, offset>>1, data);
 
-  if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, state->m_smpc_ram[offset]);
+	if (!(offset & 1)) // avoid writing to even bytes
+		return;
 
-//  if (offset == 0x7d) printf("IOSEL2 %d IOSEL1 %d\n", (data>>1)&1, data&1);
+	if(offset >= 1 && offset <= 0xd)
+		state->m_smpc.IREG[offset >> 1] = data;
 
-//	last = state->m_smpc_ram[offset];
-
-	if (offset == 1)
+	if(offset == 1) //IREG0, check if a BREAK / CONTINUE request for INTBACK command
 	{
 		if(state->m_smpc.intback_stage)
 		{
 			if(data & 0x40)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
-				state->m_smpc.smpcSR &= 0x0f;
+				state->m_smpc.SR &= 0x0f;
 				state->m_smpc.intback_stage = 0;
 			}
 			else if(data & 0x80)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
 				space->machine().scheduler().timer_set(attotime::from_usec(200), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
-				state->m_smpc_ram[0x1f] = 0x10;
-				//state->m_smpc_ram[0x63] = 0x01; //TODO: set hand-shake flag?
+				state->m_smpc.OREG[31] = 0x10;
+				//state->m_smpc.SF = 0x01; //TODO: set hand-shake flag?
 			}
 		}
 	}
 
-	state->m_smpc_ram[offset] = data;
-
-	if (offset == 0x75)	// PDR1
+	if (offset == 0x1f)
 	{
-		state->m_smpc.PDR1 = (data & state->m_smpc_ram[0x79]);
+		saturn_comreg_exec(space,data);
+
+		// we've processed the command, clear status flag
+		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7)
+		{
+			state->m_smpc.OREG[31] = data; //read-back for last command issued
+			state->m_smpc.SF = 0x00; //clear hand-shake flag
+		}
+		/*TODO:emulate the timing of each command...*/
 	}
 
-	if (offset == 0x77)	// PDR2
-	{
-		state->m_smpc.PDR2 = (data & state->m_smpc_ram[0x7b]);
-	}
+	if (offset == 0x63)
+		state->m_smpc.SF = data & 1; // hand-shake flag
+
+	if(offset == 0x75)	// PDR1
+		state->m_smpc.PDR1 = (data & state->m_smpc.DDR1);
+
+	if(offset == 0x77)	// PDR2
+		state->m_smpc.PDR2 = (data & state->m_smpc.DDR2);
+
+	if(offset == 0x79)
+		state->m_smpc.DDR1 = data & 0x7f;
+
+	if(offset == 0x7b)
+		state->m_smpc.DDR2 = data & 0x7f;
 
 	if(offset == 0x7d)
 	{
-		state->m_smpc.IOSEL1 = state->m_smpc_ram[0x7d] & 1;
-		state->m_smpc.IOSEL2 = (state->m_smpc_ram[0x7d] & 2) >> 1;
+		state->m_smpc.IOSEL1 = data & 1;
+		state->m_smpc.IOSEL2 = (data & 2) >> 1;
 	}
 
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
-		state->m_smpc.EXLE1 = (state->m_smpc_ram[0x7f] & 1) >> 0;
-		state->m_smpc.EXLE2 = (state->m_smpc_ram[0x7f] & 2) >> 1;
-	}
-
-	if (offset == 0x1f)
-	{
-		switch (data)
-		{
-			case 0x00:
-				if(LOG_SMPC) printf ("SMPC: Master ON\n");
-				smpc_master_on(space->machine());
-				break;
-			//in theory 0x01 is for Master OFF
-			case 0x02:
-			case 0x03:
-				if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
-				space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
-				break;
-			case 0x06:
-			case 0x07:
-				if(LOG_SMPC) printf ("SMPC: Sound %s\n",(data & 1) ? "off" : "on");
-				space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),data & 1);
-				break;
-			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
-			//case 0x08:
-			//case 0x09:
-			case 0x0d:
-				if(LOG_SMPC) printf ("SMPC: System Reset\n");
-				smpc_system_reset(space->machine());
-				break;
-			case 0x0e:
-			case 0x0f:
-				if(LOG_SMPC) printf ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
-				smpc_change_clock(space->machine(),data & 1);
-				break;
-			/*"Interrupt Back"*/
-			case 0x10:
-                if(LOG_SMPC) printf ("SMPC: Status Acquire (IntBack)\n");
-				int timing;
-
-				timing = 100;
-
-				if(state->m_smpc_ram[1] != 0) // non-peripheral data
-					timing = 200;
-
-				if(state->m_smpc_ram[3] & 8) // peripheral data
-					timing = 15000;
-
-				if(LOG_PAD_CMD) printf("INTBACK %02x %02x\n",state->m_smpc_ram[1],state->m_smpc_ram[3]);
-
-				space->machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?
-				break;
-			/* RTC write*/
-			case 0x16:
-				if(LOG_SMPC) printf("SMPC: RTC write\n");
-				smpc_rtc_write(space->machine());
-				break;
-			/* SMPC memory setting*/
-			case 0x17:
-				if(LOG_SMPC) printf ("SMPC: memory setting\n");
-				smpc_memory_setting(space->machine());
-				break;
-			case 0x18:
-				if(LOG_SMPC) printf ("SMPC: NMI request\n");
-				smpc_nmi_req(space->machine());
-				break;
-			case 0x19:
-			case 0x1a:
-				if(LOG_SMPC) printf ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
-				smpc_nmi_set(space->machine(),data & 1);
-				break;
-			default:
-				printf ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
-		}
-
-		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7)
-		{
-			state->m_smpc_ram[0x5f] = data; //read-back for last command issued
-			state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
-		}
-		/*TODO:emulate the timing of each command...*/
+		state->m_smpc.EXLE1 = (data & 1) >> 0;
+		state->m_smpc.EXLE2 = (data & 2) >> 1;
 	}
 }
