@@ -8470,6 +8470,25 @@ ROM_START( m4silnud )
 	ROM_LOAD( "ctnsnd.hex", 0x0000, 0x080000, CRC(150a4513) SHA1(97147e11b49d18225c527d8a0926118a83ee906c)) // == 2p Unlimited?
 ROM_END
 
+ROM_START( m4nud2p )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "classic 2p nudger v0-1 (27512)", 0x0000, 0x010000, CRC(9c22f5f8) SHA1(5391f5d5b3a0861b93702e476d9635ff304a02a2) )
+
+	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_LOAD( "ctnsnd.hex", 0x0000, 0x080000, CRC(150a4513) SHA1(97147e11b49d18225c527d8a0926118a83ee906c)) // == 2p Unlimited?
+ROM_END
+
+ROM_START( m4ctn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ctn0_3.hex", 0x0000, 0x010000, CRC(7573bbc7) SHA1(bc15b03c9fddbd0b93be259547c5420f0623fd58) )
+
+	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_LOAD( "ctnsnd.hex", 0x0000, 0x080000, CRC(150a4513) SHA1(97147e11b49d18225c527d8a0926118a83ee906c)) // == 2p Unlimited?
+ROM_END
+
+
+
+
 
 ROM_START( m4silshd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -13553,6 +13572,63 @@ ROM_END
 
 
 
+ROM_START( m4ewshft )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "each_way_shifter(mdm)_v1-0.bin", 0x0000, 0x010000, CRC(506b6cf0) SHA1(870e356b9785e51c5be5d6bc6af9ea7640b51ee8) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "each_way_shifter-snd1.bin", 0x000000, 0x080000, CRC(b21f9b09) SHA1(69ac3ca2874fc3aebd34dd225a195ad1c0305d00) )
+	ROM_LOAD( "each_way_shifter-snd2.bin", 0x080000, 0x080000, CRC(e3ce5ec5) SHA1(9c7eefa4042b1b1aca3d0fbefcad10db34992c43) )
+ROM_END
+
+ROM_START( m4jiggin )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "jig2-1n.p1", 0x0000, 0x010000, CRC(9ea16d00) SHA1(4b4f1519eb6565ce76665595154c58cd0d0ab6fd) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "jig2-1p.p1", 0x0000, 0x010000, CRC(09e6e111) SHA1(800a1dbc64c6a631cf3e53bd5f17b5d56955c92e) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "jigsnd1.oki", 0x000000, 0x080000, CRC(581fa143) SHA1(e35186597fc7932d306080ecc82c55af4b769367) )
+	ROM_LOAD( "jigsnd2.oki", 0x080000, 0x080000, CRC(34c6fc3a) SHA1(6bfe52a94d8bed5b30d9ed741db7816ddc712aa3) )
+ROM_END
+
+
+ROM_START( m4sunday )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "sunday_sport_v11", 0x0000, 0x010000, CRC(14147d59) SHA1(03b14f4f83a545b3252702267ac012b3be76013d) )
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( m4jp777 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "jpot71", 0x0000, 0x010000, CRC(f4564a05) SHA1(97d21e2268e5d99e6e51cb12c45e09445cff1f50) )
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( m4booze )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "boozecruise10_v10.bin", 0x0000, 0x010000, CRC(b37f752b) SHA1(166f7d17694689bd9d51d859c13ddafa1c6e5e7f) )
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( m4cbing )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cherrybingoprg.bin", 0x0000, 0x010000, CRC(00c1d4f3) SHA1(626df7f2f597ed13c32ce0fa8846f2e27ca68eae) )
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) // not oki!
+	ROM_LOAD( "cherrybingosnd.p1", 0x000000, 0x100000, CRC(11bed9f9) SHA1(63ed45122dda8e412bb1eaeb967d8a0f925d4bde) )
+	ROM_LOAD( "cherrybingosnd.p2", 0x100000, 0x100000, CRC(b2a7ec28) SHA1(307f19ffb46f4a2e8e93923ddb666e50de43a00e) )
+ROM_END
+
+
+ROM_START( m4supsl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "s2v1.0.lp2.64k.bin", 0x6000, 0x002000, CRC(8c622799) SHA1(ffe8a59d37c21c32fd16c812baff2c83b241a43d) )
+	ROM_LOAD( "s2v1.0.lp1.256k.bin", 0x8000, 0x008000, CRC(4d963ad0) SHA1(8ec45a33243868afb66d1ea1863124c005bad221) )
+ROM_END
+
+
+
 
 // thanks to Project Amber for descramble information
 void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
@@ -14072,6 +14148,8 @@ GAME(199?, m4jne,	  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","The Jackpot'
    most of these boot and act similar to the Empire games (ie bad text, but run OK) */
 GAME(199?, m42punlm,     0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","2p Unlimited (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4silnud,     0,		mod4oki, mpu4, m4default, ROT0,   "Mdm?","Silver Nudger (Mdm?) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // code is close to 2p Unlimited, same sound rom
+GAME(199?, m4nud2p,     0,		mod4oki, mpu4, m4default, ROT0,   "Mdm?","2p Nudger (Mdm?) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // code is close to 2p Unlimited, same sound rom
+GAME(199?, m4ctn,     0,		mod4oki, mpu4, m4default, ROT0,   "Mdm?","Tuppenny Nudger Classic (Mdm?) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // code is close to 2p Unlimited, same sound rom
 GAME(199?, m4bigapl,  0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigapla, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigaplb, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -14254,3 +14332,13 @@ GAME(199?, m4ddb,  0,			mod4oki    ,mpu4, m4default, ROT0,   "Coinworld","Ding D
 GAME(199?, m4hapfrt,  0,			mod4oki    ,mpu4, m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
 GAME(199?, m4frcrak, 0,			mod2    ,mpu4, m4default, ROT0,   "Pcp","Fruit Cracker (Pcp) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+
+GAME(199?, m4ewshft, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Each Way Shifter (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4jiggin, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4sunday, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Pcp","Sunday Sport (Pcp) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4jp777, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Cotswold Microsystems","Jackpot 777 (Cotswold Microsystems) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4booze, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Extreme","Booze Cruise (Extreme) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4cbing, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Redpoint Systems","Cherry Bingo (Redpoint Systems) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // custom sound system
+
+
+GAME( 1986, m4supsl	, 0			, mod2, mpu4, 		m4default		,	  ROT0,       "Unknown",   "Supa Silva (Bellfruit?) (MPU4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )

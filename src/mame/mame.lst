@@ -9304,6 +9304,10 @@ j2chsn		// zzz_unk chsnsn05 (Unk)
 j2lhs		// zzz_unk lhs (Unk)
 j2nn2		// zzz_unk nn_2 (Unk)
 j2rm941		// zzz_unk rm941 (Unk)
+j2nud5p		// 5p Nudger (JPM) 
+j2b7		// Bar 7? (JPM)
+j2ss		// Supa Stepper (JPM) 
+j2nbz		// Nudge Bonanza (JPM)
 
 
 
@@ -11318,6 +11322,7 @@ b85jkwld
 b85lucky
 b85luckd
 b85sngam
+b85cops		// Cops 'n' Robbers (Bellfruit) [Dutch]
 
 // Scorpion 1 games
 
@@ -11367,6 +11372,7 @@ sc1fruit	// Fruit Lines (Bellfruit)
 sc1frtln	// Fruitlines (Bellfruit)
 sc1funh		// Fun House Club (Bellfruit)
 sc1gtime	// Good Times (Bellfruit)
+sc1tiara	// Tiara (Elam)
 sc1gprix	// Grand Prix (Bellfruit)
 sc1gslam	// Grand Slam (Bellfruit) [Dutch]
 sc1happy	// Happy Hour (Bellfruit - Elam)
@@ -11422,6 +11428,36 @@ sc1smoke	//
 sc1ccroc	//
 sc1crocr	//
 sc1btclk	//
+sc1btbc		// Beat The Bank Club (Bellfruit) 
+sc1bee		// Bee Line (Bellfruit)
+sc1boncl	// Bonanza Club (Bellfruit) 
+sc1clins	// Cash Lines (Bellfruit)
+sc1clinsa	//
+sc1clinsb	//
+sc1clinsc	//
+sc1clinsd	//
+sc1clinse	//
+sc1clb3		// Club 3000 (Bellfruit) 
+sc1czbrk	// Crazy Break (Bellfruit)
+sc1dyncl	// Dynamite Club (Bellfruit) 
+sc1energ	// Energy (Bellfruit)
+sc1esc		// Every Second Counts (Bellfruit)
+sc1hipt		// High Point (Bellfruit)
+sc1hipta	//
+sc1satse	// Satellite SE (Bellfruit)
+sc1strk		// Strike (Bellfruit)
+sc1supfl	// Super Flush (Bellfruit)
+sc1ofs56	// zzz_unk ofs56cp (Bellfruit)
+sc1frpus	// Fruit Pursuit (Bellfruit)
+sc1wof		//
+sc1wofa		//
+sc1wofb		//
+sc1crzyc	//
+sc1crzyca	//
+sc1clbdy	//
+sc1clbdya	//
+sc1chqfl	//
+sc1s1000	//
 
 // Scorpion 1 + Adder Video board
 
@@ -11488,6 +11524,25 @@ sc2call		// It's Your Call (Glonal)
 sc2prom		// Along The Prom
 sc2payr		// Pay Roll (Mazooma)
 sc2smnud	// Super Multi Nudge (Concept)
+sc2cgc		// Carrot Gold Club (Bellfruit) 
+sc2cnile	// Cash On The Nile Club (Bellfruit) 
+sc2casr		// Casino Royale (Bellfruit)
+sc2cmbt		// Cat & Mouse & Bonzo Too (Bellfruit)
+sc2dbl		// Double Diamond (Bellfruit)
+sc2flaca	// Flash Cash (Bellfruit)
+sc2foot		// Football Club (Bellfruit) 
+sc2gcclb	// Golden Casino Club (Bellfruit) 
+sc2groul	// Golden Roulette (Bellfruit)
+sc2gldsh	// Golden Shot (Bellfruit)
+sc2gtr		// Great Train Robbery (Bellfruit)
+sc2heypr	// Hey Presto (Bellfruit)
+sc2hypr		// Hyperactive (Bellfruit)
+sc2kcclb	// King Cash Club (Bellfruit) 
+sc2maina	// Main Attraction (Bellfruit)
+sc2olgld	// Olympic Gold (Bellfruit)
+sc2relgm	// Reel Gems (Bellfruit)
+sc2topwk	// Top Wack (Bellfruit)
+sc2cb7		// Casino Bar 7 (Bellfruit)
 
 // Scorpion 2 + Dot Matrix Display
 
@@ -12207,7 +12262,9 @@ m4sayno		// Say No More (Barcrest)
 m4showtm	// Show Timer (Barcrest)
 m4shocm		// Showcase Crystal Maze (Barcrest)
 m4shodf		// Showcase Duty Free (Barcrest)
-m4silnud	// Silver Nudger (Barcrest)
+m4silnud	// Silver Nudger (Mdm?)
+m4nud2p		// 2p Nudger (Mdm?)
+m4ctn		// Tuppenny Nudger Classic (Mdm?)
 m4silshd	// Silver Shadow (Barcrest)
 m4sgrab		// Smash 'n' Grab (Barcrest)
 m4solsil	// Solid Silver Club (Barcrest)
@@ -12619,6 +12676,13 @@ m4hstrcs	// Casino Happy Streak (Coinworld)
 m4ddb		// Ding Dong Bells (Coinworld)
 m4hapfrt	// Happy Fruits (Coinworld)
 m4frcrak	// Fruit Cracker
+m4ewshft	// Each Way Shifter
+m4jiggin	// Jiggin' In The Riggin'
+m4sunday	// Sunday Sport
+m4jp777		// Jackpot 777
+m4booze		// Booze Cruise
+m4cbing		// Cherry Bingo
+m4supsl
 
 // MPU4 + Video board
 
@@ -13348,6 +13412,7 @@ as_tblb			//
 as_tblc			//
 as_tbld			//
 as_tble			//
+as_tblf			//
 as_td			//
 as_twp			//
 as_twpa			//

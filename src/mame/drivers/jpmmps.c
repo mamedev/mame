@@ -900,13 +900,6 @@ ROM_START( j2plsnud )
 	ROM_LOAD( "plusnudge2p2.1.bin", 0x0000, 0x8000, CRC(c506cd38) SHA1(a76177068a9c48dbf5155a6af548039560252ced) )
 	ROM_LOAD( "plusnudge5p2.404.802.1.bin", 0x0000, 0x8000, CRC(5d51671d) SHA1(5d0ee84ffebc3a1f2323a9358fce9a93193d9d2a) )
 	ROM_LOAD( "plusnudge5p241.1.bin", 0x0000, 0x8000, CRC(d5f8efb2) SHA1(481c3ce4bff55f121b44285bdc2cb1cf46db52b3) )
-
-	// something else 'nudge shuffle' ?
-	//	ROM_LOAD( "plus_p1.bin", 0x0000, 0x000400, CRC(02721d4f) SHA1(ea5da3f08098a9d12c71d41d70f09aca6660d6c5) )
-	//	ROM_LOAD( "plus_p2.bin", 0x0000, 0x000400, CRC(f58b492f) SHA1(569805044fa64c1d0c3620f380b4a09152ce2964) )
-	//	ROM_LOAD( "plus_p3.bin", 0x0000, 0x000400, CRC(e9584323) SHA1(7b2101626920bed533b392d1064fde305c8c18e8) )
-	//	ROM_LOAD( "plus_p4.bin", 0x0000, 0x000400, CRC(67f9d05f) SHA1(1c441c775f2126861858c65c7634773a86f4fcc5) )
-	//	ROM_LOAD( "plus_p5.bin", 0x0000, 0x000400, CRC(d111b2c6) SHA1(c0182a4b163e4dbb67f1c98251b93fa878bff2e2) )
 ROM_END
 
 
@@ -1483,8 +1476,8 @@ ROM_END
 ROM_START( j2strk10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "strkten1.bin", 0x0000, 0x4000, CRC(63f6d62b) SHA1(815683b253e5e8c3f4f974b3fea9290e021ba0d8) )
-	ROM_LOAD( "strkten2.bin", 0x2000, 0x4000, CRC(48aa4307) SHA1(36dd635459e0aef51a42a6b9d8312ab36fcef878) )
-	ROM_LOAD( "strkten3.bin", 0x4000, 0x4000, CRC(bef62dc7) SHA1(e4927998793b3b1ef86b8aec7f77e958a7ce40a8) )
+	ROM_LOAD( "strkten2.bin", 0x4000, 0x4000, CRC(48aa4307) SHA1(36dd635459e0aef51a42a6b9d8312ab36fcef878) )
+	ROM_LOAD( "strkten3.bin", 0x8000, 0x4000, CRC(bef62dc7) SHA1(e4927998793b3b1ef86b8aec7f77e958a7ce40a8) )
 ROM_END
 
 
@@ -1923,6 +1916,41 @@ ROM_START( j2rm941 )
 ROM_END
 
 
+ROM_START( j2nud5p )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cn_1_1.bin", 0x0000, 0x008000, CRC(e36fb53f) SHA1(f9072a8637440161c1e812b02a8325709e8c2e4c) )
+	ROM_LOAD( "cn_1_2.bin", 0x8000, 0x008000, CRC(9f8ed728) SHA1(abca9d0f0c4226187102950ce53719e766044259) )
+ROM_END
+
+ROM_START( j2b7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b7p1", 0x0000, 0x004000, CRC(65b13c64) SHA1(44de337d831c9b0e8fa8807e618ff5af74e501a7) )
+	ROM_LOAD( "b7p2", 0x4000, 0x004000, CRC(a3ec9702) SHA1(2b01e8c8e010e9d8d81eaa23b4fa7da446ac598a) )
+ROM_END
+
+
+
+ROM_START( j2ss )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "supastepper5p1.1", 0x0000, 0x004000, CRC(885c8509) SHA1(e727cf64a49d552d81eff15ce65af732e2d08609) )
+	ROM_LOAD( "supastepper5p1.2", 0x4000, 0x004000, CRC(debf6812) SHA1(2becbd336652224139365f9273d7b27687a7ac79) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "supastepper2p2.1", 0x0000, 0x004000, CRC(7120e1a8) SHA1(7daf69bf4bae1b07bebd4b9aa8f5096816c57803) )
+	ROM_LOAD( "supastepper2p2.2", 0x4000, 0x004000, CRC(60280d22) SHA1(de09d9a4edf75993ef36e309aececf8062702c11) )
+ROM_END
+
+ROM_START( j2nbz )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nubnzdl1.bin", 0x0000, 0x002000, CRC(bae682d2) SHA1(650082af9210b0af8b08870a4cdf4196035ea8a5) )
+	ROM_LOAD( "nubnzdl2.bin", 0x2000, 0x002000, CRC(ff150af7) SHA1(02e25200560e8435ebbf19c3ae9c3e9cf00342c1) )
+	ROM_LOAD( "nubnzdl3.bin", 0x4000, 0x004000, CRC(450d7fc9) SHA1(f82acb017e765f7188a874dade6fd1a5d6b2033e) )
+ROM_END
+
+
+
+
+
 GAME(198?, j2adnote	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Add A Note (Jpm) (MPS, set 1)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2adnotea,j2adnote	,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Add A Note (Jpm) (MPS, set 2)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2adnoteb,j2adnote	,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Add A Note (Jpm) (MPS, set 3)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
@@ -2107,3 +2135,8 @@ GAME(198?, j2lhs	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Unknown","Unknown 'lhs' (Un
 GAME(198?, j2nn2	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Unknown","Unknown 'nn_2' (Unk) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2rm941	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Unknown","Unknown 'rm941' (Unk) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2pharo	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Unknown","Pharoah (Unk) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+
+GAME(198?, j2nud5p	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","5p Nudger (JPM) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j2b7		,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Bar 7? (JPM) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j2ss		,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supa Stepper (JPM) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j2nbz	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Nudge Bonanza (JPM) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

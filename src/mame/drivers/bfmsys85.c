@@ -639,6 +639,10 @@ ROM_START( b85sngam )
 	ROM_LOAD( "supernudgegambler.bin", 0x8000, 0x008000, CRC(c7344abc) SHA1(c1417d9011d4ed94dd25b57bae2fb84a0129fdaf) )
 ROM_END
 
+ROM_START( b85cops )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cop215.bin", 0x8000, 0x008000, CRC(5600047c) SHA1(8d6ce9f75c45519838def8686586e55a913a0885) )
+ROM_END
 
 
 
@@ -675,4 +679,6 @@ GAME( 1992, b85jkwld	, 0			, bfmsys85, bfmsys85, 		0		,	  0,       "BFM/ELAM",  
 GAME( 1986, b85lucky	, 0			, bfmsys85, bfmsys85, 		0		,	  0,       "BFM/ELAM",   "Lucky Cards (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1992, b85luckd	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM/ELAM",   "Lucky Dice (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1988, b85sngam	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Super Nudge Gambler (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 199?, b85cops		, 0			, bfmsys85, bfmsys85,       0		, 0,		 "BFM",   "Cops 'n' Robbers (Bellfruit) (Dutch) (System 85)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
 

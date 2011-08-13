@@ -4895,6 +4895,224 @@ ROM_END
 
 
 
+ROM_START( sc2cgc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95751968.p1", 0x0000, 0x010000, CRC(e9eef2be) SHA1(61015e0c90fd516da56243a7eef3d5d2412d880f) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc2cnile )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "club-cash-on-the-nile_std_ac_var_200pnd_rot_ass.bin", 0x0000, 0x010000, CRC(41cbb60d) SHA1(4fede32a8d0957a46732f6851d4af7fd959d9fb5) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "cash-nile 150 047s.bin", 0x0000, 0x010000, CRC(2d8e9037) SHA1(b3d93488d662260cfaaf624baec68dbe92f71640) )
+	ROM_LOAD( "club-cash-on-the-nile_dat_ac_var_200pnd_rot_ass.bin", 0x0000, 0x010000, CRC(3bfac54c) SHA1(ecfd7607676c1620ee37718578675437911cf147) )
+	ROM_LOAD( "club-cash-on-the-nile_dat_ac_var_250pnd_rot_ass.bin", 0x0000, 0x010000, CRC(42d0a11d) SHA1(b38fa1360f0b8d465bb0e0759f73e0b98a545ad3) )
+	ROM_LOAD( "club-cash-on-the-nile_std_ac_var_150pnd_rot_ass.bin", 0x0000, 0x010000, CRC(4a5b4b9f) SHA1(aaeaa42cf42d91002c61e4c0df49d7ef97e00b2a) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2casr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "casino-royale_std_wit_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(11663ae8) SHA1(f8e0fb8b23c192f48df4e5d9fc94f8c625d4771c) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "casino-royale_dat_ac_var_8-10pnd_ass.bin", 0x0000, 0x010000, CRC(8c59c768) SHA1(fec9cfbd9a8c262d053ae84c09535a7d8331bfa2) )
+	ROM_LOAD( "casino-royale_dat_ac_var_tri3_ass.bin", 0x0000, 0x010000, CRC(bc805e51) SHA1(c6b0e2fc1011688ca9c374bb5cca5788e6dea005) )
+	ROM_LOAD( "casino-royale_dat_ss_ac_var_8pnd_ass.bin", 0x0000, 0x010000, CRC(341e69a8) SHA1(3b719a437e11ca71a9acccc76cd5f2b05325e203) )
+	ROM_LOAD( "casino-royale_dat_wit_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(8a6eab70) SHA1(ef2bb7f7fd534dfee1322b9fd151e24642cb28bf) )
+	ROM_LOAD( "casino-royale_dat_wit_ac_10pnd_tri3_ass.bin", 0x0000, 0x010000, CRC(6436974c) SHA1(419d4f58f518582f0fe334323d0d9fa68f9458a6) )
+	ROM_LOAD( "casino-royale_std_ac_var_8-10pnd_ass.bin", 0x0000, 0x010000, CRC(a25c051a) SHA1(6b7e954c53e3f1f90d24f88c7fd09606a1cd8630) )
+	ROM_LOAD( "casino-royale_std_ac_var_tri3ss.bin", 0x0000, 0x010000, CRC(5f47c57b) SHA1(5ce7baab279ee28c337a4ee72038b6d6cee1da9c) )
+	ROM_LOAD( "casino-royale_std_ss_ac_var_8pnd_ass.bin", 0x0000, 0x010000, CRC(6a585c28) SHA1(8ac91085efd8382544868b8b0b45fddede38b5ec) )
+	ROM_LOAD( "casino-royale_std_wit_ac_10pnd_tri3_ass.bin", 0x0000, 0x010000, CRC(cc2ef9dd) SHA1(9e85e319fbe74f31de1fddc4f15dd0ce49691d2c) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2cmbt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cat-and-mouse-and-bonzo-too_std_ac_10pnd_ass.bin", 0x0000, 0x010000, CRC(6d1612e7) SHA1(641104b4ebc99ec3b20a081fccbde70084cc329a) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "cat-and-mouse-and-bonzo-too_dat_ac_10pnd_ass.bin", 0x0000, 0x010000, CRC(14770ed7) SHA1(6e7a0f596063c28cad0ecc13241e53e4a5b025f9) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
+
+ROM_START( sc2dbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "double-diamond_std_ga_20p_ass.bin", 0x0000, 0x010000, CRC(eded5c38) SHA1(31a687de56f95f0ab730fed2b618e492fbc0c749) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "double-diamond_dat_ga_20p_ass.bin", 0x0000, 0x010000, CRC(7e117a69) SHA1(d73ec1cfe3d2b9d9e1f18a3979d76b13b5d89988) )
+	ROM_LOAD( "double-diamond_dat_ms_20p_ass.bin", 0x0000, 0x010000, CRC(d45b4a5c) SHA1(ccf33b36c01155e78492e861ae4a328b4086ade9) )
+	ROM_LOAD( "double-diamond_std_ms_20p_ass.bin", 0x0000, 0x010000, CRC(90a52fc4) SHA1(afb6078fc884e08afb4f6a9ac2a8abcb36fae2bd) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
+ROM_START( sc2flaca )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "flashcash_std_ac_var_10pnd_tri2_ass.bin", 0x0000, 0x010000, CRC(e7e0fe1f) SHA1(a6c1f6565d785aa36daecb55a5c33042a84117e6) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "flashcash_dat_ac_var_10pnd_tri2_ass.bin", 0x0000, 0x010000, CRC(89d6df7f) SHA1(cc8f6ca2233d77cbdcb0735cb31de9cdd9a66408) )
+	ROM_LOAD( "flashcash_dat_ac_var_10pnd_tri3_ass.bin", 0x0000, 0x010000, CRC(0d6d8eb2) SHA1(c47e61d08afbeb542132b2f8e157417a008e9387) )
+	ROM_LOAD( "flashcash_dat_wi_ac_10pnd_tri2_ass.bin", 0x0000, 0x010000, CRC(b781ecf9) SHA1(1d62a315f8292144d8129c1be9a83a5e717c6ed9) )
+	ROM_LOAD( "flashcash_std_ac_var_10pnd_tri3_ass.bin", 0x0000, 0x010000, CRC(2cb1802a) SHA1(ae7bc9374f5882ba4142d67ad83335d4d2accf0c) )
+	ROM_LOAD( "flashcash_std_wi_ac_10pnd_tri2_ass.bin", 0x0000, 0x010000, CRC(5f5b879b) SHA1(1b0f0cf54112615ea6b2ecdebc4076d132531a2c) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2foot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "football-club_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(b4d46ee2) SHA1(3cbe603c2703570eb49682ca9dbb6ad9ede020e6) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "95000590.mtx", 0x0000, 0x004d18, CRC(cc596be2) SHA1(190d9b9e3e06b933be7ff0b6bc69955709dedd7d) )
+	ROM_LOAD( "football-club_dat_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(fabaf221) SHA1(ddefc6f46339f83b6cfbacbe1ff6cf065d0157aa) )
+	ROM_LOAD( "football-club_dat_ac_var_100pnd-5p_ass.bin", 0x0000, 0x010000, CRC(7f6acf47) SHA1(b6e8254d4af1e5a85166e4eca1dc2b1ea2eed292) )
+	ROM_LOAD( "football-club_dat_var_ass.bin", 0x0000, 0x010000, CRC(ac088604) SHA1(d1db45aa19b645aad56bbf84e551dc1cca22f92d) )
+	ROM_LOAD( "football-club_mtx_ass.bin", 0x0000, 0x010000, CRC(6b78de57) SHA1(84638836cdbfa6e4b3b76cd38e238d12bb312c53) )
+	ROM_LOAD( "football-club_std_ac_var_100pnd-5p_ass.bin", 0x0000, 0x010000, CRC(bf35ad75) SHA1(c5e8906138184449b90eea2e280e6f75e6768776) )
+	ROM_LOAD( "football-club_std_var_ass.bin", 0x0000, 0x010000, CRC(cae35c7a) SHA1(2beda0150cd2d413269c350e34102c0e1d3ed007) )
+	ROM_LOAD( "footballclub_std_var_ass.bin", 0x0000, 0x010000, CRC(cae35c7a) SHA1(2beda0150cd2d413269c350e34102c0e1d3ed007) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc2gcclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "club-golden-casino_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(5f7fc343) SHA1(264c5bba36c820440c2ed97c04d4dd3592e111da) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "95004065.p1", 0x0000, 0x080000, CRC(2670726b) SHA1(0f8045c68131191fceea5728e14c901d159bfb57) )
+	ROM_LOAD( "club-golden-casino_dat_ac_100pnd-5p_ass.bin", 0x0000, 0x010000, CRC(1f5c2a2b) SHA1(facaab47716ae3c4a10839523f3249074ae8abb1) )
+	ROM_LOAD( "club-golden-casino_dat_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(b4dee6d2) SHA1(856672fb4767f66e976619392fc8e659fbca3c2e) )
+	ROM_LOAD( "club-golden-casino_dat_ac_var_ass.bin", 0x0000, 0x010000, CRC(2ad9647e) SHA1(d423c060996417f3f7f1b61e911b6e523ad08e7a) )
+	ROM_LOAD( "club-golden-casino_std_ac_100pnd-5p_ass.bin", 0x0000, 0x010000, CRC(bf7b9ff1) SHA1(890a6b96592e9d2e890bea95e711b890c1cda7ad) )
+	ROM_LOAD( "club-golden-casino_std_ac_var_ass.bin", 0x0000, 0x010000, CRC(2de27b80) SHA1(57f1c40ceeb6ab82e9bac547aa00d8c1c1c07dab) )
+	ROM_LOAD( "95000589.p1", 0x0000, 0x010000, CRC(36400074) SHA1(611b48650e59b52f661be2730afaef2e5772607c) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2groul )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "golden-roulette_std_ms_20p_ass.bin", 0x0000, 0x010000, CRC(d865188a) SHA1(c4318984b6abdb5671fe7c323608e4af84d1ae6e) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "golden-roulette_dat_ms_20p_ass.bin", 0x0000, 0x010000, CRC(c388fa79) SHA1(4ce7d183130fd2aae2c4ffeff652e2602208c3ff) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2gldsh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gsho1_3", 0x0000, 0x010000, CRC(783ee8cb) SHA1(b509f167fddc71e313ffbff0a3e1ce7d387c424e) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2gtr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtr.bin", 0x0000, 0x010000, CRC(b6cd277c) SHA1(4951bb6b4cc1bf655d3b63b7af4f1a6a297a201c) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "gtr_snd.bin", 0x0000, 0x080000, CRC(90eaa8b6) SHA1(9c15787d73889013717f01c6b11780b7f9314b05) )
+ROM_END
+
+ROM_START( sc2heypr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hey-presto_std_ac_4pnd-10p_ass.bin", 0x0000, 0x010000, CRC(7f3803fa) SHA1(56a12bb96fe7cce07734842f6c5581648154154e) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "hey-presto_dat_ac_4pnd-10p_ass.bin", 0x0000, 0x010000, CRC(cb8780ad) SHA1(a0a3cd2c9c3caf6607b55d2d14f6e3d581540808) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+ROM_START( sc2hypr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hyperactive_std_ac_var_10pnd_ass.bin", 0x0000, 0x010000, CRC(042b848c) SHA1(ceec2cb26ae9b969c5da3cc0be25455b1f89d09f) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "hyperactive_dat_ac_var_10pnd_ass.bin", 0x0000, 0x010000, CRC(e6956fec) SHA1(ea8e25e16a451a1f52f30567571090f635379f4c) )
+	ROM_LOAD( "hyperactive_dat_wi_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(6d11a9eb) SHA1(d68564a96984c5dde536add4507bc8bae75e19ea) )
+	ROM_LOAD( "hyperactive_std_wi_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(2d01bc08) SHA1(c2186fb639735d4e1d46ceaeae6eee63c7a740b7) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2kcclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "club-king-cash_std_ac_var_ass.bin", 0x0000, 0x010000, CRC(60c1eccd) SHA1(5b9f5c8c7cc501b557eadcf7e520967c58b8ce1a) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "club-king-cash_dat_ac_ds_rot_ass.bin", 0x0000, 0x010000, CRC(3fb9f61f) SHA1(176e517d049b4e588a2fe425041d701ff8e3e7b8) )
+	ROM_LOAD( "club-king-cash_dat_ac_var_ass.bin", 0x0000, 0x010000, CRC(c83be316) SHA1(9e87152977fdabb71ee6d8be1d382b978d856c83) )
+	ROM_LOAD( "club-king-cash_std_ac_ds_rot_ass.bin", 0x0000, 0x010000, CRC(cf13d7e4) SHA1(6b3bfc8e7e4877e7ab7e5d3adbd89a6bcc2ebde9) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2maina )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "game115s.rom", 0x0000, 0x010000, CRC(6f3b16d2) SHA1(b5c7796a4a87dc5ffa6243863ac3f9bc777228ca) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "snd2008.rom", 0x0000, 0x040000, CRC(9b2b5b33) SHA1(3ec9200529eba5bc4ef4a9a289d58312f29628a5) )
+ROM_END
+
+
+ROM_START( sc2olgld )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "olympic-gold_std_var_ac_8-10pnd_ass.bin", 0x0000, 0x010000, CRC(baa98b60) SHA1(2b73eb21d6b612fabf855edf9f6c46897714729b) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "olympic-gold_dat_var_ac_8-10pnd_ass.bin", 0x0000, 0x010000, CRC(1348a519) SHA1(e7a2434235347433522c55e4d4f89fbb97759765) )
+	ROM_LOAD( "olympic-gold_dat_wi_var_ac_10pnd_ass.bin", 0x0000, 0x010000, CRC(bb50e0a2) SHA1(b208053e114f7fb411f16f02aab3061f6075b42c) )
+	ROM_LOAD( "olympic-gold_std_wi_var_ac_10pnd_ass.bin", 0x0000, 0x010000, CRC(8a8b8429) SHA1(ba886878d4ef428653032d04e21a9031fdea68e0) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc2relgm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "reel-gems_std_ms_20p_ass.bin", 0x0000, 0x010000, CRC(ebbae111) SHA1(6372e19b0dd030aac517344449ce47e8f6f74b29) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "reel-gems_dat_ga_20p_ass.bin", 0x0000, 0x010000, CRC(86e81781) SHA1(7b59efa627f70b2c3598c5abd276a7c2737b0751) )
+	ROM_LOAD( "reel-gems_dat_ms_20p_ass.bin", 0x0000, 0x010000, CRC(5abde2bc) SHA1(74a745938934533b1b33c99828b79fa9d1e86a91) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc2topwk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "top-wack_std_wi_ac_10pnd_tri1_ass.bin", 0x0000, 0x010000, CRC(248080cf) SHA1(067077af93dd6a41bd6d84d9ace9ac4cea36f01b) )
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "top-wack_dat_wi_ac_10pnd_tri1_ass.bin", 0x0000, 0x010000, CRC(56fd3003) SHA1(37ef5c9a750f9bdc609fc78ea5131424eb74c79d) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc2cb7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bar7.bin", 0x0000, 0x010000, CRC(c5b426e8) SHA1(a60aed70f2a4cf4356fae61c1031124fd5987d86) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "casino-bar-7_std_10pnd_ass.bin", 0x0000, 0x010000, CRC(3d0ae920) SHA1(4c6575d979f686e928842afc3ee9b344e45e3a31) )
+	ROM_LOAD( "casino-bar-7_dat_10pnd_ass.bin", 0x0000, 0x010000, CRC(6960f4f8) SHA1(7274276d1d4032ed7fe660ac0f87eea1e9c6e4e4) )
+	ROM_LOAD( "casinobar7_bfm_allcash.bin", 0x0000, 0x010000, CRC(2d459734) SHA1(293cf250b7b71b55325b18a10be7dead1cddb565) )
+	ROM_LOAD( "bar7protocol.bin", 0x8000, 0x008000, CRC(e9c022ed) SHA1(e93b4506830a2f098eceb0b419d648bf3a9d02a4) ) // half size?
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "casinobar7_bfm_snd1.bin", 0x0000, 0x080000, CRC(9a2609b5) SHA1(d29a5029e39cd44739682954f034f2d1f2e1cebf) ) // == superstarsnd.bin
+ROM_END
+
+
 /* Video Based (Adder 2) */
 
 GAMEL( 1993, qntoondo, qntoond,	  scorpion2_vid, qntoond,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-136)",		GAME_SUPPORTS_SAVE,layout_quintoon )
@@ -4979,13 +5197,32 @@ GAME( 199?, sc2pick		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "P
 GAME( 199?, sc2rock		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "How Big's Your Rock (Global) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2call		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "It's Your Call (Global) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
-GAME( 199?, sc2prom		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
-GAME( 199?, sc2payr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM/Mazooma",   "Pay Roll Casino (Bellfruit/Mazooma) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
+GAME( 199?, sc2prom		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2payr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM/Mazooma",   "Pay Roll Casino (Bellfruit/Mazooma) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 
-GAME( 199?, sc2smnud	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Concept",   "Super Multi Nudge (Concept)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // illegal opcodes? wrong platform? definitely uses bfm crypt tho
+GAME( 199?, sc2smnud	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Concept",   "Super Multi Nudge (Concept)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 
+GAME( 199?, sc2cgc		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Carrot Gold Club (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2cnile		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Cash On The Nile Club (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2casr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Casino Royale (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2cmbt		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Cat & Mouse & Bonzo Too (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2dbl		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Double Diamond (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2flaca		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Flash Cash (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2foot		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2gcclb		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2groul		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Golden Roulette (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2gldsh		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Golden Shot (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2gtr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Great Train Robbery (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2heypr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Hey Presto (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2hypr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Hyperactive (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2kcclb		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "King Cash Club (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2maina		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Main Attraction (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2olgld		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Olympic Gold (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2relgm		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Reel Gems (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2topwk		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Top Wack (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2cb7		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 
 // Games with Dot Matrix Displays */
@@ -4997,3 +5234,4 @@ GAME( 199?, sc2ofool	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",    
 GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Party Time (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
