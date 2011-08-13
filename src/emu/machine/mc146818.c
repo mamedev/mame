@@ -5,7 +5,7 @@
     Implementation of the MC146818 chip
 
     Real time clock chip with battery buffered ram (or CMOS)
-    Used in IBM PC/AT, several PC clones, Amstrad NC200
+    Used in IBM PC/AT, several PC clones, Amstrad NC200, Apollo workstations
 
     Nathan Woods  (npwoods@mess.org)
     Peter Trauner (peter.trauner@jk.uni-linz.ac.at)
@@ -196,32 +196,9 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		return;
 	}
 
-	if (m_type == MC146818_UTC) {
-		// hack: set correct real time even for overloaded emulation
-		// (at least for apollo)
-		static osd_ticks_t t0 = 0;
-		osd_ticks_t t1 = osd_ticks();
-		int n_seconds;
-
-		if (t0 == 0) {
-			t0 = t1;
-		}
-
-		n_seconds =  (t1 - t0) / osd_ticks_per_second();
-		t0 = t1 - (t1 - t0) % osd_ticks_per_second();
-		if (n_seconds <= 0) {
-			// we were called to early
-			return;
-		}
-
-		m_data[0] += n_seconds;
-	} else {
-		m_data[0] += 1;
-	}
-
 	if (BCD_MODE)
 	{
-		m_data[0]=bcd_adjust(m_data[0]/*+1*/);
+		m_data[0]=bcd_adjust(m_data[0]+1);
 		if (m_data[0]>=0x60)
 		{
 			m_data[0]=0;
@@ -264,10 +241,10 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 	else
 	{
-		/*m_data[0]=m_data[0]+1;*/
+		m_data[0]=m_data[0]+1;
 		if (m_data[0]>=60)
 		{
-			m_data[0] -= 60;
+			m_data[0]=0;
 			m_data[2]=m_data[2]+1;
 			if (m_data[2]>=60) {
 				m_data[2]=0;
@@ -402,9 +379,6 @@ void mc146818_device::set_base_datetime()
 	machine().base_datetime(systime);
 
 	current_time = (m_type == MC146818_UTC) ? systime.utc_time: systime.local_time;
-
-	// temporary hack to go back 20 year (e.g. from 2010 -> 1990)
-	// current_time.year -= 20;
 
 //  logerror("mc146818_set_base_datetime %02d/%02d/%02d %02d:%02d:%02d\n",
 //          current_time.year % 100, current_time.month + 1, current_time.mday,
