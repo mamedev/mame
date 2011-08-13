@@ -233,7 +233,7 @@ static UINT32 ymf278_compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 
 	// rate override with damping/pseudo reverb
 	if (slot->DAMP)
-		rate = 56; // datasheet says it's slightly curved though
+		rate = 56; // approximate, datasheet says it's slightly curved though
 	else if (slot->preverb && slot->env_vol > ((6*8)<<23))
 	{
 		// pseudo reverb starts at -18dB (6 in voltab)
@@ -266,83 +266,88 @@ static void ymf278b_compute_freq_step(YMF278BSlot *slot)
 
 static void ymf278b_compute_envelope(YMF278BSlot *slot)
 {
-	if(slot->env_step == 0)
+	switch (slot->env_step)
 	{
 		// Attack
-		int rate = ymf278b_compute_rate(slot, slot->AR);
-		slot->env_vol = 256U<<23;
-		slot->env_vol_lim = (256U<<23) - 1;
+		case 0:
+		{
+			// Attack
+			int rate = ymf278b_compute_rate(slot, slot->AR);
+			slot->env_vol = 256U<<23;
+			slot->env_vol_lim = (256U<<23) - 1;
 
-		if (rate==63)
-		{
-			// immediate
-			LOG(("YMF278B: Attack skipped - "));
-			slot->env_vol = 0;
-			slot->env_step++;
-			// ..fall through
+			if (rate==63)
+			{
+				// immediate
+				LOG(("YMF278B: Attack skipped - "));
+				slot->env_vol = 0;
+				slot->env_step++;
+				ymf278b_compute_envelope(slot);
+			}
+			else if (rate<4)
+			{
+				slot->env_vol_step = 0;
+			}
+			else
+			{
+				// NOTE: attack rate is linear here, but datasheet shows a smooth curve
+				LOG(("YMF278B: Attack, val = %d, rate = %d, delay = %g\n", slot->AR, rate, ymf278_compute_attack_rate(rate)*1000.0));
+				slot->env_vol_step = ~((256U<<23) / ymf278_compute_attack_rate(rate));
+			}
+
+			break;
 		}
-		else if (rate<4)
-		{
-			slot->env_vol_step = 0;
-			return;
-		}
-		else
-		{
-			// NOTE: attack rate is linear here, but datasheet shows a smooth curve
-			LOG(("YMF278B: Attack, val = %d, rate = %d, delay = %g\n", slot->AR, rate, ymf278_compute_attack_rate(rate)*1000.0));
-			slot->env_vol_step = ~((256U<<23) / ymf278_compute_attack_rate(rate));
-			return;
-		}
-	}
-	if(slot->env_step == 1)
-	{
+
 		// Decay 1
-		if(slot->DL)
-		{
-			LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->DL, slot->D1R, ymf278b_compute_rate(slot, slot->D1R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D1R))*1000.0, slot->preverb, slot->DAMP));
-			slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D1R);
-			slot->env_vol_lim = (slot->DL*8)<<23;
-			return;
-		}
-		else
-			slot->env_step++;
-			// ..fall through
-	}
-	if(slot->env_step == 2)
-	{
+		case 1:
+			if(slot->DL)
+			{
+				LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->DL, slot->D1R, ymf278b_compute_rate(slot, slot->D1R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D1R))*1000.0, slot->preverb, slot->DAMP));
+				slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D1R);
+				slot->env_vol_lim = (slot->DL*8)<<23;
+			}
+			else
+			{
+				LOG(("YMF278B: Decay 1 skipped - "));
+				slot->env_step++;
+				ymf278b_compute_envelope(slot);
+			}
+
+			break;
+
 		// Decay 2
-		LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, , PRVB = %d, DAMP = %d, current vol = %d\n", slot->D2R, ymf278b_compute_rate(slot, slot->D2R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D2R))*1000.0, slot->preverb, slot->DAMP, slot->env_vol >> 23));
-		slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D2R);
-		slot->env_vol_lim = 256U<<23;
-		return;
-	}
-	if(slot->env_step == 3)
-	{
+		case 2:
+			LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, , PRVB = %d, DAMP = %d, current vol = %d\n", slot->D2R, ymf278b_compute_rate(slot, slot->D2R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D2R))*1000.0, slot->preverb, slot->DAMP, slot->env_vol >> 23));
+			slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D2R);
+			slot->env_vol_lim = 256U<<23;
+			break;
+
 		// Decay 2 reached -96dB
-		LOG(("YMF278B: Voice cleared because of decay 2\n"));
-		slot->env_vol = 256U<<23;
-		slot->env_vol_step = 0;
-		slot->env_vol_lim = 0;
-		slot->active = 0;
-		return;
-	}
-	if(slot->env_step == 4)
-	{
+		case 3:
+			LOG(("YMF278B: Voice cleared because of decay 2\n"));
+			slot->env_vol = 256U<<23;
+			slot->env_vol_step = 0;
+			slot->env_vol_lim = 0;
+			slot->active = 0;
+			break;
+
 		// Release
-		LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->RR, ymf278b_compute_rate(slot, slot->RR), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->RR))*1000.0, slot->preverb, slot->DAMP));
-		slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->RR);
-		slot->env_vol_lim = 256U<<23;
-		return;
-	}
-	if(slot->env_step == 5)
-	{
+		case 4:
+			LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->RR, ymf278b_compute_rate(slot, slot->RR), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->RR))*1000.0, slot->preverb, slot->DAMP));
+			slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->RR);
+			slot->env_vol_lim = 256U<<23;
+			break;
+
 		// Release reached -96dB
-		LOG(("YMF278B: Release ends\n"));
-		slot->env_vol = 256U<<23;
-		slot->env_vol_step = 0;
-		slot->env_vol_lim = 0;
-		slot->active = 0;
-		return;
+		case 5:
+			LOG(("YMF278B: Release ends\n"));
+			slot->env_vol = 256U<<23;
+			slot->env_vol_step = 0;
+			slot->env_vol_lim = 0;
+			slot->active = 0;
+			break;
+
+		default: break;
 	}
 }
 
@@ -857,7 +862,13 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			break;
 		}
 
-		// PCM regs (FM regs can't be read)
+		// FM regs can be read too (on contrary to what the datasheet says)
+		case 1:
+		case 3:
+			// but they're not implemented here yet
+			break;
+
+		// PCM regs
 		case 5:
 			// only accessible if NEW2 is set
 			if (~chip->exp & 2)
