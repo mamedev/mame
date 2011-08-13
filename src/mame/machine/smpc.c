@@ -285,25 +285,100 @@ static TIMER_CALLBACK( stv_smpc_intback )
 	state->m_smpc.SF = 0x00;
 }
 
+/*
+	[0] port status:
+		0x04 Sega-tap
+		0x16 Multi-tap
+		0x2x clock serial peripheral
+		0xf0 peripheral isn't connected
+	    0xf1 peripheral is connected
+	[1] Peripheral ID (note: lowest four bits determines the size of the input packet)
+		0x02 digital pad
+		0x25 (tested by Game Basic?)
+		0x34 keyboard
+*/
+
+static void smpc_digital_pad(running_machine &machine, UINT8 pad_num, UINT8 offset)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	static const char *const padnames[] = { "JOY1", "JOY2" };
+	UINT16 pad_data;
+
+	pad_data = input_port_read(machine, padnames[pad_num]);
+	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
+	state->m_smpc.OREG[1+pad_num*offset] = 0x02;
+	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
+	state->m_smpc.OREG[3+pad_num*offset] = pad_data & 0xff;
+}
+
+static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	UINT16 game_key;
+
+	game_key = 0xffff;
+
+	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x80) << 8); // right
+	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x40) << 8); // left
+	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x20) << 8); // down
+	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x10) << 8); // up
+	game_key ^= ((input_port_read(machine, "KEYF") & 0x80) << 4); // ESC -> START
+	game_key ^= ((input_port_read(machine, "KEY3") & 0x04) << 8); // Z / A trigger
+	game_key ^= ((input_port_read(machine, "KEY4") & 0x02) << 8); // C / C trigger
+	game_key ^= ((input_port_read(machine, "KEY6") & 0x04) << 6); // X / B trigger
+	game_key ^= ((input_port_read(machine, "KEY2") & 0x20) << 2); // Q / R trigger
+	game_key ^= ((input_port_read(machine, "KEY3") & 0x10) << 2); // A / X trigger
+	game_key ^= ((input_port_read(machine, "KEY3") & 0x08) << 2); // S / Y trigger
+	game_key ^= ((input_port_read(machine, "KEY4") & 0x08) << 1); // D / Z trigger
+	game_key ^= ((input_port_read(machine, "KEY4") & 0x10) >> 1); // E / L trigger
+
+	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
+	state->m_smpc.OREG[1+pad_num*offset] = 0x34;
+	state->m_smpc.OREG[2+pad_num*offset] = game_key>>8; // game buttons, TODO
+	state->m_smpc.OREG[3+pad_num*offset] = game_key & 0xff;
+	/*
+		x--- ---- 0
+		-x-- ---- caps lock
+		--x- ---- num lock
+		---x ---- scroll lock
+		---- x--- data ok
+		---- -x-- 1
+		---- --x- 1
+		---- ---x Break key
+	*/
+	state->m_smpc.OREG[4+pad_num*offset] = state->m_keyb.status | 6;
+	state->m_smpc.OREG[5+pad_num*offset] = state->m_keyb.data;
+}
+
 static TIMER_CALLBACK( intback_peripheral )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int pad,pad_num;
-	static const char *const padnames[] = { "JOY1", "JOY2" };
+	int pad_num;
+	static const UINT8 peri_id[10] = { 0x02, 0x13, 0x15, 0x23, 0x23, 0x34, 0xe1, 0xe2, 0xe3, 0xff };
+	UINT8 read_id[2];
+	UINT8 offset;
+
+//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+
+	read_id[0] = (input_port_read(machine, "INPUT_TYPE")) & 0x0f;
+	read_id[1] = (input_port_read(machine, "INPUT_TYPE")) >> 4;
 
 	/* doesn't work? */
 	//pad_num = state->m_smpc.intback_stage - 1;
 
 	if(LOG_PAD_CMD) printf("%d\n",state->m_smpc.intback_stage - 1);
 
-//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+	offset = 0;
+
 	for(pad_num=0;pad_num<2;pad_num++)
 	{
-		pad = input_port_read(machine, padnames[pad_num]);
-		state->m_smpc.OREG[0+pad_num*4] = 0xf1;	// no tap, direct connect
-		state->m_smpc.OREG[1+pad_num*4] = 0x02;	// saturn pad
-		state->m_smpc.OREG[2+pad_num*4] = pad>>8;
-		state->m_smpc.OREG[3+pad_num*4] = pad & 0xff;
+		switch(read_id[pad_num])
+		{
+			case 0: smpc_digital_pad(machine,pad_num,offset); break;
+			case 5: smpc_keyboard(machine,pad_num,offset); break;
+		}
+
+		offset += (peri_id[read_id[pad_num]] & 0xf) + 2; /* offset for pad 2 */
 	}
 
 	if (state->m_smpc.intback_stage == 2)
@@ -627,6 +702,12 @@ READ8_HANDLER( saturn_SMPC_r )
 			int hshake;
 			const int shift_bit[4] = { 4, 12, 8, 0 };
 			const char *const padnames[] = { "JOY1", "JOY2" };
+
+			if(input_port_read(space->machine(), "INPUT_TYPE") && !(space->debugger_access()))
+			{
+				popmessage("Warning: read with SH-2 direct mode with a non-pad device");
+				return 0;
+			}
 
 			if(offset == 0x75)
 				hshake = (state->m_smpc.PDR1>>5) & 3;

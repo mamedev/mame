@@ -96,6 +96,11 @@ public:
         UINT8 rtc_data[7];
 	}m_smpc;
 
+	struct {
+		UINT8 status;
+		UINT8 data;
+	}m_keyb;
+
 	/* Saturn specific*/
 	int m_saturn_region;
 	UINT8 m_cart_type;
