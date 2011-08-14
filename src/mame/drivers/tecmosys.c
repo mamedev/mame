@@ -514,7 +514,7 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr(space->machine(),  "bank1", space->machine().region("audiocpu")->base() + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bank(space->machine(), "bank1", data);
 }
 
 static WRITE8_HANDLER( tecmosys_oki_bank_w )
@@ -869,6 +869,11 @@ static const ymf262_interface tecmosys_ymf262_interface =
 	sound_irq		/* irq */
 };
 
+static MACHINE_START( tecmosys )
+{
+//	tecmosys_state *state = machine.driver_data<tecmosys_state>();
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("audiocpu")->base(), 0x4000);
+}
 
 static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
@@ -879,6 +884,8 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
+
+	MCFG_MACHINE_START(tecmosys)
 
 	MCFG_GFXDECODE(tecmosys)
 
@@ -923,9 +930,8 @@ ROM_START( deroon )
 	ROM_LOAD16_BYTE( "t001.upau1", 0x00000, 0x80000, CRC(14b92c18) SHA1(b47b8c828222a3f7c0fe9271899bd38171d972fb) )
 	ROM_LOAD16_BYTE( "t002.upal1", 0x00001, 0x80000, CRC(0fb05c68) SHA1(5140592e15414770fb46d5ac9ba8f76e3d4ab323) )
 
-	ROM_REGION( 0x048000, "audiocpu", 0 ) // Sound Porgram
-	ROM_LOAD( "t003.uz1", 0x000000, 0x008000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
-	ROM_CONTINUE(         0x010000, 0x038000 ) /* banked part */
+	ROM_REGION( 0x040000, "audiocpu", 0 ) // Sound Program
+	ROM_LOAD( "t003.uz1", 0x000000, 0x040000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
 
 	ROM_REGION( 0x2200, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
 	ROM_LOAD( "deroon_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
@@ -965,9 +971,9 @@ ROM_START( tkdensho )
 	ROM_LOAD16_BYTE( "aeprge-2.pal", 0x00000, 0x80000, CRC(25e453d6) SHA1(9c84e2af42eff5cc9b14c1759d5bab42fa7bb663) )
 	ROM_LOAD16_BYTE( "aeprgo-2.pau", 0x00001, 0x80000, CRC(22d59510) SHA1(5ade482d6ab9a22df2ee8337458c22cfa9045c73) )
 
-	ROM_REGION( 0x038000, "audiocpu", 0 ) // Sound Porgram
-	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
-	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
+	ROM_REGION( 0x040000, "audiocpu", 0 ) // Sound Program
+	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x020000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
+	ROM_RELOAD(              0x020000, 0x020000) // for banks
 
 	ROM_REGION( 0x2200, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
 	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
@@ -1009,9 +1015,9 @@ ROM_START( tkdenshoa )
 	ROM_LOAD16_BYTE( "aeprge.pal", 0x00000, 0x80000, CRC(17a209ff) SHA1(b5dbea9868cbb89d4e27bf19fdb616ac256985b4) )
 	ROM_LOAD16_BYTE( "aeprgo.pau", 0x00001, 0x80000, CRC(d265e6a1) SHA1(f39d8ce115f197a660f5210b2483108854eb12a9) )
 
-	ROM_REGION( 0x038000, "audiocpu", 0 ) // Sound Porgram
-	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
-	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
+	ROM_REGION( 0x040000, "audiocpu", 0 ) // Sound Program
+	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x020000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
+	ROM_RELOAD(              0x020000, 0x020000) // for banks
 
 	ROM_REGION( 0x2200, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
 	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )

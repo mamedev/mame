@@ -301,7 +301,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
-	AM_RANGE(0x30, 0x30) AM_WRITENOP
+	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related
 	AM_RANGE(0x40, 0x45) AM_DEVREAD("ymf1", ymf278b_r) AM_WRITE(snd_ymf278b_w)
 ADDRESS_MAP_END
 
