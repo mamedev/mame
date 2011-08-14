@@ -179,7 +179,7 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 		case 0x12/2: return state->m_vdp1.lopr;
 		case 0x14/2: return state->m_vdp1.copr;
 		/* MODR register, read register for the other VDP1 regs
-		   (Shienryu SS version abuses of this during intro) */
+           (Shienryu SS version abuses of this during intro) */
 		case 0x16/2:
 			UINT16 modr;
 

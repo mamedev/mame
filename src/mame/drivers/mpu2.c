@@ -21,16 +21,16 @@
 
   MPU2 info from Highwayman (this doesn't seem to match up well with what the roms expect?)
 
-	cartridge:0000-07ff
-	not used: 0800-0fff
-	eprom1: 1000-17ff
-	rom: 1800-1fff
-	eprom2: 2000-23ff
-	not used: 2400-27ff
-	sram (optional battery-backed 256x4 on d0-d3)
-	2800-2fff eprom1
-	3000-37ff rom
-	3800-3fff eprom2
+    cartridge:0000-07ff
+    not used: 0800-0fff
+    eprom1: 1000-17ff
+    rom: 1800-1fff
+    eprom2: 2000-23ff
+    not used: 2400-27ff
+    sram (optional battery-backed 256x4 on d0-d3)
+    2800-2fff eprom1
+    3000-37ff rom
+    3800-3fff eprom2
 
 */
 

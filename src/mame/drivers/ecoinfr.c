@@ -2,15 +2,15 @@
 
  WARNING: I have little faith in many of these sets being what they claim to be,
           the headers in the ROMs often indicate different titles, and sevearl of
-		  the sets contain what look to be games on different hardware, or entirely
-		  different game, there was even a Data East Pinball ROM in with this lot.
+          the sets contain what look to be games on different hardware, or entirely
+          different game, there was even a Data East Pinball ROM in with this lot.
 
-		  Proceed with caution if emulating this stuff, if in doubt, and things
-		  aren't acting as you expect, try one of the other ROMs from the sets!
+          Proceed with caution if emulating this stuff, if in doubt, and things
+          aren't acting as you expect, try one of the other ROMs from the sets!
 
-		  Most genuine Electrocoin sets seem to be Z80 based
+          Most genuine Electrocoin sets seem to be Z80 based
 
-		  Some roms are in HEX format and should be converted to binary.
+          Some roms are in HEX format and should be converted to binary.
 */
 
 
@@ -42,7 +42,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( ec_bar5 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bar5.5a2", 0x0000, 0x001000, CRC(82b994e6) SHA1(19e63cb6f689787b74cad610a185f20ae3881238) )
 	ROM_LOAD( "bar5.5a3", 0x0000, 0x001000, CRC(53185002) SHA1(9cd98ba871fdaa56dfcef0fc285c8537886ff4bd) )
 	ROM_LOAD( "bar5.5a4", 0x0000, 0x001000, CRC(0b12219d) SHA1(140a58afbf713e11f819e5154519b32e822bd1e3) )
@@ -50,7 +50,7 @@ ROM_END
 
 
 ROM_START( ec_barx )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "a20510.bin", 0x0000, 0x001000, CRC(b4a458a6) SHA1(acda6eece0c9e011bfb147a2f696dbdaa53ea9aa) )
 	ROM_LOAD( "a2054.bin", 0x0000, 0x001000, CRC(a77bcdb4) SHA1(bdb3fc19a933d609cea2a2a2dfc98d3589765484) )
 	ROM_LOAD( "a2058.bin", 0x0000, 0x001000, CRC(7b564e66) SHA1(eaec8efb566f9a017eb66cd2f4d8673971ab5db5) )
@@ -188,7 +188,7 @@ ROM_END
 
 
 ROM_START( ec_barx7 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "issa943", 0x0000, 0x008000, CRC(e13a597f) SHA1(ab833fb8cc9529fc307b0252b922a77911802abe) )
 	ROM_LOAD( "issa945", 0x0000, 0x008000, CRC(9c251b36) SHA1(319a82e9f0a5cd0e3c9d72ddb8203a9363cc3936) )
 	ROM_LOAD( "issa945 (dereg)", 0x0000, 0x008000, CRC(9c251b36) SHA1(319a82e9f0a5cd0e3c9d72ddb8203a9363cc3936) )
@@ -197,20 +197,20 @@ ROM_END
 
 
 ROM_START( ec_barxd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "issc289", 0x0000, 0x008000, CRC(31e8ae3a) SHA1(accc14b292f220dfc9695638c0402de28fe19bae) )
 ROM_END
 
 
 ROM_START( ec_bxd7s )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "issc193.dat", 0x0000, 0x008000, CRC(2f3fb9e2) SHA1(426f7436c8a22f1d8a05a5ccef6b6b5551441028) )
 	ROM_LOAD( "issc331", 0x0000, 0x008000, CRC(83c09f9d) SHA1(4ef9bb5ae779309d25bf673d8a59ea8cf65c84ba) )
 ROM_END
 
 
 ROM_START( ec_big7 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "b710", 0x0000, 0x008000, CRC(0cdae404) SHA1(e8d713e172e5ff37e31e68d096fac77fbe676006) )
 	ROM_LOAD( "b75p4", 0x0000, 0x008000, CRC(27ad1971) SHA1(4c1248d5815143dc0b23ada909c4f1fc16a1a18b) )
 	ROM_LOAD( "b78ac", 0x0000, 0x008000, CRC(454e9ac5) SHA1(a700a399632fa546473503f8e7e8dc3abc966ee6) )
@@ -278,7 +278,7 @@ ROM_END
 
 
 ROM_START( ec_casbx )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bx125p25", 0x0000, 0x010000, CRC(beff03e1) SHA1(d0bf997f9766a801274a02242755df3419879bd4) )
 	ROM_LOAD( "bx4c.a2", 0x0000, 0x001000, CRC(f86c221d) SHA1(99f6abd91870221a7d56a6dc062a687d0458546d) )
 	ROM_LOAD( "bx4c.a3", 0x0000, 0x001000, CRC(a472d49f) SHA1(4814b28ed46afa931c5e4f19d829374ebd1f20c9) )
@@ -293,13 +293,13 @@ ROM_END
 
 
 ROM_START( ec_casrb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss9409.rom", 0x0000, 0x008000, CRC(d35db982) SHA1(6f171e133a932c94843b6d03431bf6a3befaae86) )
 ROM_END
 
 
 ROM_START( ec_cool7 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "issa111", 0x0000, 0x008000, CRC(dd98d4b6) SHA1(a66bb771f7ce66f38033c2704830500e876b9043) )
 	ROM_LOAD( "issa112", 0x0000, 0x008000, CRC(14ba229d) SHA1(7506cb0e080643d33cdbf5d8c37743555fc117cd) )
 	ROM_LOAD( "issa116", 0x0000, 0x008000, CRC(a235cb7b) SHA1(4efa2b61203c2a4d01ecc0b0e4712c84eb7ad928) )
@@ -308,7 +308,7 @@ ROM_END
 
 
 ROM_START( ec_laby )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "lab1v8.bin", 0x0000, 0x008000, CRC(16f0eeac) SHA1(9e28a6ae9176f730234dd8a7a8e50bad2904b611) )
 	ROM_LOAD( "lab2v8.bin", 0x0000, 0x008000, CRC(14d7c58b) SHA1(e6b19523d96c9c1f39b743f8c52791465ab79637) )
 	ROM_LOAD( "laby10", 0x0000, 0x010000, CRC(a8b58fc3) SHA1(16e940b04fa85ff85a29197b4e45c8a39f5cad19) )
@@ -316,7 +316,7 @@ ROM_END
 
 
 ROM_START( ec_mag7s )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "issa933", 0x0000, 0x008000, CRC(ebb6b015) SHA1(1c02663f1193b9aa92183ac46146c49cdb9fa420) )
 	ROM_LOAD( "issa934", 0x0000, 0x008000, CRC(522c9ed5) SHA1(ae3f2760f10f8d884500d9fa67169bde9913fd52) )
 	ROM_LOAD( "issa935", 0x0000, 0x008000, CRC(407c02d0) SHA1(f6f0216c7f39da462649711259a692dd519191e4) )
@@ -378,13 +378,13 @@ ROM_END
 
 
 ROM_START( ec_magbr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "issc337", 0x0000, 0x008000, CRC(79b791aa) SHA1(ee6257b198b950d31690f1b12b98bdf483216b9d) )
 ROM_END
 
 
 ROM_START( ec_oxocg )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ocla-4.1", 0x0000, 0x010000, CRC(fe1db86d) SHA1(7718ecafc562bad39cefa15a0df46f081e6045af) )
 	ROM_LOAD( "ocla-4.1p", 0x0000, 0x010000, CRC(f24b2cac) SHA1(96f026df3f3915bee89ecc26725e4a7e861fddce) )
 	ROM_LOAD( "ocsd-5.2", 0x0000, 0x010000, CRC(28c86aae) SHA1(cafdff7ebc57ef4163b40381e84dd2ac2c24937d) )
@@ -396,7 +396,7 @@ ROM_END
 
 
 ROM_START( ec_oxocl )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ocn7 v18 non protocol.hex", 0x0000, 0x02680d, CRC(91755ca8) SHA1(38dea02258e4cf731680621c96ebd473e74ae0f6) )
 	ROM_LOAD( "oxo club.txt", 0x0000, 0x000127, CRC(2ae1750e) SHA1(e15bcc78bcdb4672a77dd46b8f40313dc4a88c59) )
 	ROM_LOAD( "oxo-1-2t.box", 0x0000, 0x010000, CRC(8fd03d19) SHA1(b3df92a8a4e0f4b8f813758aa4e881f45a04c8e4) )
@@ -410,13 +410,13 @@ ROM_END
 
 
 ROM_START( ec_oxogb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ocla54 non protocol.hex", 0x0000, 0x02680d, CRC(08c18728) SHA1(6cc004db3f7c43b8b7a685becc5de1c84c131048) )
 ROM_END
 
 
 ROM_START( ec_oxorl )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "or25 v4.2 dereg non protocol.hex", 0x0000, 0x02680d, CRC(9a9489f5) SHA1(4587fe7bb0123559930726d9b7197d7a525218f8) )
 	ROM_LOAD( "or25 v4.2 dereg protocol.hex", 0x0000, 0x02680d, CRC(4c3a2b4e) SHA1(e18c8c1b8c2fbc8c84c9632d6fcda76ed8a9303a) )
 	ROM_LOAD( "or5 np.hex", 0x0000, 0x02680d, CRC(15a501eb) SHA1(b66209c02183a222f82a4671962348ae137dc162) )
@@ -431,7 +431,7 @@ ROM_END
 
 
 ROM_START( ec_oxorv )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "nrev 13.0 gala compak.hex", 0x0000, 0x02680d, CRC(1537716f) SHA1(0f9d2cd7387fca7db355fea69bede0b15dcb9c2f) )
 	ROM_LOAD( "nrev 13.0 gala connexus.hex", 0x0000, 0x02680d, CRC(11eb0066) SHA1(4e836d1a05ba3d7b7ab2fa8e6decc7307daa0b6d) )
 	ROM_LOAD( "nrev 13.0 non protocol.hex", 0x0000, 0x02680d, CRC(bd2145d5) SHA1(a15cf6081e2b6f4763bf577f31b7b8cc06e8e3de) )
@@ -450,21 +450,21 @@ ROM_END
 
 
 ROM_START( ec_penni )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "pfh_8c.bin", 0x0000, 0x010000, CRC(282a42d8) SHA1(f985d238c72577e755090ce0f04dcc7850af6f3b) )
 	ROM_LOAD( "pfh_v6.bin", 0x0000, 0x00e000, CRC(febb3fce) SHA1(f8df085a563405ea5adcd15a4162a7ba56bcfad7) )
 ROM_END
 
 
 ROM_START( ec_pyram )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "pyramid 5p 3.bin", 0x0000, 0x010000, CRC(06a047d8) SHA1(4a1a15f1ab9defd3a0c5f2d333beae0daa16c6a4) )
 	ROM_LOAD( "pyramid.bin", 0x0000, 0x010000, CRC(370a6d2c) SHA1(ea4f899adeca734529b19ba8de0e371841982c20) )
 ROM_END
 
 
 ROM_START( ec_redbr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss2021.rom", 0x0000, 0x008000, CRC(71fffd80) SHA1(49cc502e54e135bb131b8ac096619df9f1f29055) )
 	ROM_LOAD( "iss3040.bin", 0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d) )
 	ROM_LOAD( "iss3046.rom", 0x0000, 0x008000, CRC(14109012) SHA1(d008488216d8e9c0dbe6d1c07d59b84637a8f41c) )
@@ -535,7 +535,7 @@ ROM_END
 
 
 ROM_START( ec_rcc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rcas20p4.5", 0x0000, 0x010000, CRC(54a1ddde) SHA1(e98b6dbf0256324fe1cdddbe4b89958d3d5f1233) )
 	ROM_LOAD( "rcas20p4.5d", 0x0000, 0x010000, CRC(b42e2415) SHA1(fcc76977a920b6116c5e9029340aa51abb2ab713) )
 	ROM_LOAD( "rcas25p4.5", 0x0000, 0x010000, CRC(0aeb0332) SHA1(1b2f2332ac30736892f72b7771fa0825a95f19ad) )
@@ -544,13 +544,13 @@ ROM_END
 
 
 ROM_START( ec_secrt )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "scastle1.bin", 0x0000, 0x010000, CRC(e6abb596) SHA1(35518c46f1ddf1d3a85af13e4ba8bee07e804f64) )
 ROM_END
 
 
 ROM_START( ec_sphin )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sphinx8c.bin", 0x0000, 0x00e000, CRC(f8e110fc) SHA1(4f55b5de87151f9127b84ffcf7f6f2e3ce34469f) )
 	ROM_LOAD( "spnx5p", 0x0000, 0x010000, CRC(b4b49259) SHA1(a26172b659b739564b25dcc0f3f31f131a144d52) )
 	ROM_LOAD( "spx10cv2.bin", 0x0000, 0x00e000, CRC(e2bf11a0) SHA1(f267385dbb06b2be8bcad7ae5e5804f5bb467f6d) )
@@ -558,13 +558,13 @@ ROM_END
 
 
 ROM_START( ec_supb7 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss3240.rom", 0x0000, 0x008000, CRC(e8e56ca4) SHA1(d16390b600f9966b779638e3bc2e7f9a72e8d1be) )
 ROM_END
 
 
 ROM_START( ec_supbx )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss129.rom", 0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b) )
 	ROM_LOAD( "iss173.rom", 0x0000, 0x008000, CRC(984f9c18) SHA1(f160eeee6ea70c79502fc68f70cb973e1ca029b8) )
 	ROM_LOAD( "iss2012.rom", 0x0000, 0x008000, CRC(455cfdcb) SHA1(53fb0748a544b432b88455fa597b7017e06b3059) )
@@ -653,7 +653,7 @@ ROM_END
 
 
 ROM_START( ec_spbxd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss132.rom", 0x0000, 0x008000, CRC(fd2ea535) SHA1(6deda1825bfce9481bf85a500e031242a2c9cf8c) )
 	ROM_LOAD( "iss133.rom", 0x0000, 0x008000, CRC(9522c295) SHA1(7b9f1c672c15b5e353c19ad5237ffd85f4c83fdb) )
 	ROM_LOAD( "iss134.rom", 0x0000, 0x008000, CRC(888809a6) SHA1(5e1163ef63616f4934a4894772457b70c5ef4fb2) )
@@ -662,7 +662,7 @@ ROM_END
 
 
 ROM_START( ec_spbg7 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss197.rom", 0x0000, 0x008000, CRC(45d975c8) SHA1(1ef7693fb000b85f661ebd06512f916297d0662c) )
 	ROM_LOAD( "sb7.58", 0x0000, 0x008000, CRC(0876d8bf) SHA1(b15584c7c994d29010652cdf8d9c79b661e01b01) )
 	ROM_LOAD( "sb710d", 0x0000, 0x008000, CRC(9d9d14fe) SHA1(acc4c92a800d0891ebace8a60d04df09b43bfb1c) )
@@ -678,7 +678,7 @@ ROM_END
 
 
 ROM_START( ec_suprb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss3037.rom", 0x0000, 0x008000, CRC(b1984539) SHA1(b8ff3690e47d10ef2d15ccc9198715a83d75a428) )
 	ROM_LOAD( "iss3038.rom", 0x0000, 0x008000, CRC(890109fe) SHA1(69c47284497ad3488cff8f36b1ec615bf043fc5f) )
 	ROM_LOAD( "iss3039.rom", 0x0000, 0x008000, CRC(25179e39) SHA1(6dd59e5eb3bb769d0018ae2691422108260a2c87) )
@@ -708,7 +708,7 @@ ROM_END
 
 
 ROM_START( ec_suprl )
-	ROM_REGION( 0x400000, "maincpu", 0 ) 
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "sr0520p.0 non protocol.hex", 0x0000, 0x02680d, CRC(864baa72) SHA1(3212dd51b5fe98b9c0b16f8285397c3d68ca4fd4) )
 	ROM_LOAD( "sr0520p.0 protocol.hex", 0x0000, 0x02680d, CRC(afbbbef4) SHA1(a060db1b8d648b8890ed68f0cf9934b64abdb9fa) )
 	ROM_LOAD( "sr05b1.8hex", 0x0000, 0x02680d, CRC(12fca690) SHA1(8408159ff7b4a5db6db5fcb08ae636a7e6a1a9b8) )
@@ -726,48 +726,48 @@ ROM_END
 
 
 ROM_START( ec_supsl )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "supersilver7_20p15_iss3040.bin", 0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d) )
 ROM_END
 
 
 ROM_START( ec_unk1 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "300615", 0x0000, 0x008000, CRC(8a5a4e35) SHA1(be3acfaf116ae23a61aac581d9f83287cddcdaab) )
 ROM_END
 
 
 ROM_START( ec_unk2 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "a3all.bin", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
 	ROM_LOAD( "a3csh.bin", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
 	ROM_LOAD( "a3low10", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
 ROM_END
 
 ROM_START( ec_unk3 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "a410p.bin", 0x0000, 0x001000, CRC(6c19d237) SHA1(9fa79bd0ab78685fed974e5b82ec419381337252) )
 	ROM_LOAD( "a410p~.bin", 0x0000, 0x001000, CRC(0f1020f1) SHA1(e29cd3954f3cd0ae5c4a113f8922bd1f3be0e740) )
 	ROM_LOAD( "a45p.bin", 0x0000, 0x001000, CRC(34b4d7cb) SHA1(b2ff3c79e635fff8f02edc9c953cc619fb409aa5) )
 ROM_END
 
 ROM_START( ec_unk4 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "flat256", 0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1) )
 ROM_END
 
 
 /* This is Last Action Hero - Data East Pinball!!!
-GAME( 19??, ec_xxxxx,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "zzz_unk lahroc5 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
 ROM_START( ec_xxxxx )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
-	ROM_LOAD( "lahroc5", 0x0000, 0x010000, CRC(94102fdd) SHA1(b741fe7a646225351148f5e675bd232881730221) )
+    ROM_REGION( 0x200000, "maincpu", 0 )
+    ROM_LOAD( "lahroc5", 0x0000, 0x010000, CRC(94102fdd) SHA1(b741fe7a646225351148f5e675bd232881730221) )
 ROM_END
 */
 
 
 ROM_START( ec_unk5 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss9016.rom", 0x0000, 0x008000, CRC(e8ebafd0) SHA1(fa9fc04d04f9ac2360c66727afaf567527e95e01) )
 	ROM_LOAD( "iss9207.rom", 0x0000, 0x008000, CRC(f646702a) SHA1(9e2e7da0edaecd021861145b6abd1498fc3b563a) )
 	ROM_LOAD( "iss9208.rom", 0x0000, 0x008000, CRC(b4c3c98a) SHA1(10aeeca8c7b2923e3768f82c672229898c51062d) )
@@ -787,38 +787,38 @@ DRIVER_INIT( ecoinfr )
 
 }
 
-GAME( 19??, ec_bar5,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Bar 5 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_barx,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_barx7,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Bar X 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_barxd,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_bxd7s,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Bar X Diamond 7s (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_big7,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Big 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_casbx,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Casino Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_casrb,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Casino Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_cool7,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Cool 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_laby,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Labyrinth (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_mag7s,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Magic 7s (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_magbr,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Magic Bars (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxocg,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Oxo Classic Gold (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxocl,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Oxo Club  (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxogb,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Oxo Golden Bars (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxorl,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Oxo Reels (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxorv,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Oxo Revolution (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_penni,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Pennies From Heaven (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_pyram,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Pyramid (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_redbr,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_rcc,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Royal Casino Club (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_secrt,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Secret Castle (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_sphin,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Sphinx (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supb7,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Super Bar 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supbx,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Super Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_spbxd,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Super Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_spbg7,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Super Big 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_suprb,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Super Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_suprl,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supsl,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Super Silver (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk1,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk2,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a3' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk3,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a4' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk4,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'flat256' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk5,   0		 , ecoinfr,   ecoinfr,   ecoinfr, 	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_bar5,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar 5 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_barx,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_barx7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar X 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_barxd,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_bxd7s,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar X Diamond 7s (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_big7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Big 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_casbx,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Casino Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_casrb,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Casino Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_cool7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Cool 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_laby,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Labyrinth (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_mag7s,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Magic 7s (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_magbr,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Magic Bars (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_oxocg,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Classic Gold (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_oxocl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Club  (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_oxogb,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Golden Bars (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_oxorl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Reels (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_oxorv,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Revolution (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_penni,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Pennies From Heaven (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_pyram,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Pyramid (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_redbr,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_rcc,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Royal Casino Club (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_secrt,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Secret Castle (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_sphin,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Sphinx (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supb7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supbx,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_spbxd,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_spbg7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Big 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_suprb,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_suprl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supsl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Silver (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk1,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk2,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a3' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk3,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a4' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk4,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'flat256' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk5,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

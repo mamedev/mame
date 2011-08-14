@@ -1586,8 +1586,8 @@ static INPUT_PORTS_START( plgirls2 )
 	PORT_DIPNAME( 0x20, 0x20, "Character Speed" )		PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" ) 		/* Listed as Not Used */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) 		/* Listed as Not Used */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as Not Used */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as Not Used */
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )

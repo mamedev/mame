@@ -46,16 +46,16 @@
     This method works with the following games:
     topgear  500
 
-	Method 3 :
-	* Key in with the Jackpot Key followed by the Audit Key
+    Method 3 :
+    * Key in with the Jackpot Key followed by the Audit Key
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
     * Press Service (default A) 4 times until you are in the Setup Screen, with Printer Pay Limit.
     * Press Bet 2 (default D) to change the Jackpot Win Limit. A higher value is better (3000 max)
     * Key out both the Jackpot and Audit Keys
-	
-	This method works with the following games:
-	eforest
-	arcwins
+
+    This method works with the following games:
+    eforest
+    arcwins
 
     Technical Notes:
 
@@ -137,20 +137,20 @@
 
     06/08/2011 - FrasheR
     Implement 'Printer Fault' fix.
-    
-	08/08/2011 - FrasheR
-	Implement Port '5005' for eforest. Changing this only works after performing memory reset.(delete nvram file)
-	First 3 bits
-	000 = $100 / Credit
-	001 = 50c  / Credit
-	010 = $5   / Credit
-	011 = 10c  / Credit
-	100 = $10  / Credit
-	101 = 25c  / Credit
-	110 = $1   / Credit
-	111 = 5c   / Credit (default)
-	Implement Bill Acceptor for eforest to add credits.
-	arcwins and eforest are now working.
+
+    08/08/2011 - FrasheR
+    Implement Port '5005' for eforest. Changing this only works after performing memory reset.(delete nvram file)
+    First 3 bits
+    000 = $100 / Credit
+    001 = 50c  / Credit
+    010 = $5   / Credit
+    011 = 10c  / Credit
+    100 = $10  / Credit
+    101 = 25c  / Credit
+    110 = $1   / Credit
+    111 = 5c   / Credit (default)
+    Implement Bill Acceptor for eforest to add credits.
+    arcwins and eforest are now working.
 
     ****************************************************************************
 
@@ -438,17 +438,17 @@ static READ8_HANDLER(u3_p3)
     aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
     int u3_p3_ret= input_port_read(space->machine(), "5003");
-   
+
     if ((state->m_printer_motor)==1) // Printer Motor Off
-  
+
     {
         u3_p3_ret = u3_p3_ret^0x80; // Printer Home Off
 	  state->m_printer_motor=0;
 
     }
-    
+
     return u3_p3_ret;
-    
+
 }
 
 static TIMER_CALLBACK(note_input_reset)
@@ -460,9 +460,9 @@ static TIMER_CALLBACK(note_input_reset)
 static READ8_HANDLER(bv_p0)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
-	
+
 	int bv_p0_ret=0x00;
-	
+
 	switch(state->m_insnote)
 	{
 	case 0x01:
@@ -477,7 +477,7 @@ static READ8_HANDLER(bv_p0)
 	default:
 		break; //timer will reset the input
 	}
-	
+
 	return bv_p0_ret;
 
 }
@@ -487,16 +487,16 @@ static READ8_HANDLER(bv_p1)
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
 	int bv_p1_ret=0x00;
-	
+
 	if (state->m_insnote==0)
 		state->m_insnote=input_port_read(space->machine(), "insertnote");
-	
+
 	if (state->m_insnote==1)
 			bv_p1_ret=0x08;
-		
+
 	if (state->m_insnote==2)
 			bv_p1_ret=0x08;
-		
+
 	return bv_p1_ret;
 
 }
@@ -1005,7 +1005,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "PTRHOM") // printer home
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("5003:8")
-	
+
 	PORT_START("5005")
 	PORT_DIPNAME( 0x01, 0x01, "CREDIT SELECT 1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:1")
@@ -1016,18 +1016,18 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x04, 0x04, "CREDIT SELECT 3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "5005-4") 
+	PORT_DIPNAME( 0x08, 0x00, "5005-4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "CGDRSW") // Logic Door (Security Cage)
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) ) PORT_DIPLOCATION("5005:5")
-	PORT_DIPNAME( 0x20, 0x00, "5005-6") 
+	PORT_DIPNAME( 0x20, 0x00, "5005-6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "5005-7") 
+	PORT_DIPNAME( 0x40, 0x00, "5005-7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "5005-8") 
+	PORT_DIPNAME( 0x80, 0x00, "5005-8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1141,10 +1141,10 @@ static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("insertcoin")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Insert Credit")
-	
+
 	PORT_START("insertnote")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Insert Note")
-	
+
 	PORT_START("powerfail")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_COMMA)
 
@@ -1283,7 +1283,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x04, "$20" )
 	PORT_DIPSETTING(    0x05, "$50" )
 	PORT_DIPSETTING(    0x06, "$100" )
-	
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(3bagflvt)

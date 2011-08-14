@@ -1154,7 +1154,7 @@ static WRITE8_HANDLER( vfd1_data_w )
 {
 	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
 	state->m_vfd1_latch = data;
-	
+
 	if (space->machine().device("matrix"))
 	{
 		BFM_dm01_writedata(space->machine(),data);
@@ -4541,7 +4541,7 @@ ROM_START( sc2dels )
 	ROM_LOAD( "dmsnd.bin", 0x0000, 0x080000, CRC(0a68550b) SHA1(82a4a8d2a754a59da553b3568df870107e33f978) )
 
 	ROM_REGION( 0x80000, "altupd", 0 )
-	ROM_LOAD( "delssnd.bin", 0x0000, 0x080000, CRC(cb298f06) SHA1(fdc857101ad15d58aeb7ffc4a489c3de9373fc80) )	
+	ROM_LOAD( "delssnd.bin", 0x0000, 0x080000, CRC(cb298f06) SHA1(fdc857101ad15d58aeb7ffc4a489c3de9373fc80) )
 ROM_END
 
 
@@ -4549,7 +4549,7 @@ ROM_END
 ROM_START( sc2wembl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "road-to-wembley_std_ac_10pnd_15rm_ass.bin", 0x0000, 0x010000, CRC(7b8e7a47) SHA1(3026850a18ef9cb44584550e28f62165bfa690e9) )
-	
+
 	ROM_REGION( 0x10000, "altrevs", 0 )
 	ROM_LOAD( "95750499.p1", 0x0000, 0x010000, CRC(a2b11ca6) SHA1(cc1931504f8da98119f771499db616898d92e0d9) )
 	ROM_LOAD( "95750500.p1", 0x0000, 0x010000, CRC(bfe45926) SHA1(6a2814735e0894bb5152cba8f90d98cfa98c250b) )
@@ -4574,7 +4574,7 @@ ROM_END
 ROM_START( sc2wemblm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "98400014", 0x0000, 0x010000, CRC(e4f3e02d) SHA1(ce2b961e6142ecfb1532daaa53746d785e2342eb) )
-	
+
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "wembley_sound.bin", 0x0000, 0x080000, CRC(5ce2fc50) SHA1(26533428582058f0cd618e3657f967bc64e551fc) )
 ROM_END
@@ -4808,7 +4808,7 @@ ROM_START( sc2dick )
 	ROM_LOAD( "sp151-4n.p1", 0x0000, 0x010000, CRC(ee18a5a1) SHA1(17c2984fb305a571df83c663c9e42164f2322938) )
 	ROM_LOAD( "sp151-4p.p1", 0x0000, 0x010000, CRC(94d96a28) SHA1(307e1cb5fe3c6050eb039dcd97e6ac88494707b3) )
 	ROM_LOAD( "spot3-1p.p1", 0x0000, 0x010000, CRC(fa027939) SHA1(7fc6d26d179d976add3ca18c5df71dd9df7af1f2) )
-//	ROM_LOAD( "spotd_v2_2.bin", 0x0000, 0x010000, CRC(497ef3b2) SHA1(f5021e35397081c62e817b86ff9e8a49d78748a5) )
+//  ROM_LOAD( "spotd_v2_2.bin", 0x0000, 0x010000, CRC(497ef3b2) SHA1(f5021e35397081c62e817b86ff9e8a49d78748a5) )
 	ROM_LOAD( "global-spotted-dick_euro.bin", 0x0000, 0x010000, CRC(695a3ec4) SHA1(f9f2f47f74479ef444997e2deef1c5f4677368ca) ) // this one isn't scrambled
 
 	ROM_REGION( 0x100000, "upd", ROMREGION_ERASE00 ) // not upd?
@@ -4854,7 +4854,7 @@ ROM_START( sc2call )
 	ROM_REGION( 0x20000, "altrevs", 0 )
 	ROM_LOAD( "dyor1-6p.p1", 0x0000, 0x010000, CRC(843edbd2) SHA1(67496753f3687800413418d65dcfc764695b4997) )
 	ROM_LOAD( "your2-7p.p1", 0x0000, 0x020000, CRC(32ba485b) SHA1(00d962ba30f029ee2cc4447c42d57d9bc2592000) ) // seems to contain a different game in the 2nd half??
-	
+
 	// club rom
 	ROM_LOAD( "dyor1-6n.p1", 0x0000, 0x010000, CRC(5e516bd1) SHA1(52a108e3d7aa9fdffb25e09922fa84c0155f18f5) )
 
@@ -4877,7 +4877,7 @@ ROM_START( sc2payr )
 	ROM_LOAD( "98400023", 0x0000, 0x010000, CRC(9478e97a) SHA1(c269f2a8e7eb6d76bf51563c6588d21bd71c1acf) )
 
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-	/* missing */	
+	/* missing */
 ROM_END
 
 

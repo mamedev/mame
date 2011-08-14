@@ -1,6 +1,6 @@
 /*
-	Unknown PCP platform
-	Z80 based
+    Unknown PCP platform
+    Z80 based
 */
 
 #include "emu.h"

@@ -2059,7 +2059,7 @@ ROM_START( j5movie )
 ROM_END
 
 ROM_START( j5nudfic )
-	ROM_REGION( 0x1000000, "maincpu", 0 ) 
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "nudge_fiction_alt_p1.bin", 0x0000, 0x010000, CRC(4ffc3d35) SHA1(50cce1719f1354798feb4a4fad184234d29a5f20) )
 	ROM_LOAD16_BYTE( "nudge_fiction_alt_p2.bin", 0x0001, 0x010000, CRC(c9854c0b) SHA1(7aee21ee2de5ddd74a99fc6dc176912eac6a8dd6) )
 ROM_END

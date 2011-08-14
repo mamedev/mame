@@ -10,65 +10,65 @@
 
     This only loads the basic stuff - there needs to be more done to make this run.
 
-	The sound ROM + OKIM6376 is on the game plug-in board, so not all games have it
-	(although in some cases it is just missing)
+    The sound ROM + OKIM6376 is on the game plug-in board, so not all games have it
+    (although in some cases it is just missing)
 
 
-	Gladiators
-	----------
+    Gladiators
+    ----------
 
-	Produttore
-		MayGay 
+    Produttore
+        MayGay
 
-	N.revisione
-		M1A 
+    N.revisione
+        M1A
 
-	CPU
-		on main board:
-			1x TMP82C79P-2
-			1x S22EA-EF68B21P
-			1x EP840034.A-P-80C51AVW
-			1x MC68681P
-			1x S22EB-EF68B09P
-			1x YM2149F
-			2x oscillator 8.000MHz
-			1x oscillator 12.000MHz
+    CPU
+        on main board:
+            1x TMP82C79P-2
+            1x S22EA-EF68B21P
+            1x EP840034.A-P-80C51AVW
+            1x MC68681P
+            1x S22EB-EF68B09P
+            1x YM2149F
+            2x oscillator 8.000MHz
+            1x oscillator 12.000MHz
 
-		on piggyback (SA5-029D):
-			1x OKIM6376
-	 
-	ROMs
-		on main board:
-			1x GAL16V8
+        on piggyback (SA5-029D):
+            1x OKIM6376
 
-		on piggyback (SA5-029D):
-			1x AM27C512
-			2x M27C4001
-			1x GAL16V8 
+    ROMs
+        on main board:
+            1x GAL16V8
 
-	Note	
-		on main board:
-			1x 26 pins dual line connector (serial pot?)
-			1x 2 legs connector (speaker)
-			2x 15 legs connector (coin mech, switch matrix)
-			3x 10 legs connector (meters, reel index, triacs)
-			1x 11 legs connector (spare stepper motors)
-			1x 20 legs connector (stepper motors)
-			1x 19 legs connector (aux display)
-			1x 9 legs connector (lamps)
-			1x 17 legs connector (P3)
-			1x 24 legs connector (lamps)
-			1x 14 legs connector (power supply)
-			1x 8 legs connector (control port)
-			1x trimmer (volume)
-			1x battery (2.4V 100mAh)
-			9x red leds
-			1x pushbutton
-			2x 8 switches dip
+        on piggyback (SA5-029D):
+            1x AM27C512
+            2x M27C4001
+            1x GAL16V8
 
-		on piggyback (SA5-029D):
-			1x 5 legs connector
-			3x trimmer 
+    Note
+        on main board:
+            1x 26 pins dual line connector (serial pot?)
+            1x 2 legs connector (speaker)
+            2x 15 legs connector (coin mech, switch matrix)
+            3x 10 legs connector (meters, reel index, triacs)
+            1x 11 legs connector (spare stepper motors)
+            1x 20 legs connector (stepper motors)
+            1x 19 legs connector (aux display)
+            1x 9 legs connector (lamps)
+            1x 17 legs connector (P3)
+            1x 24 legs connector (lamps)
+            1x 14 legs connector (power supply)
+            1x 8 legs connector (control port)
+            1x trimmer (volume)
+            1x battery (2.4V 100mAh)
+            9x red leds
+            1x pushbutton
+            2x 8 switches dip
+
+        on piggyback (SA5-029D):
+            1x 5 legs connector
+            3x trimmer
 
 
 ******************************************************************************************/
@@ -910,7 +910,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "m1a-mcu.bin", 0x0000, 0x1000, CRC(ae957b00) SHA1(83267b64335b4ab33cc033d5003c4c93c813fc37) ) \
 	ROM_END \
-	
+
 
 
 ROM_START( m1albsq )
@@ -1114,7 +1114,7 @@ ROM_START( m1clbfvr )
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
 	ROM_LOAD( "cl_fever.sn1", 0x000000, 0x080000, CRC(0a5df5d2) SHA1(d73778a415656cd3880d5a011e015a760386a676) )
 	ROM_LOAD( "cl_fever.sn2", 0x080000, 0x080000, CRC(1d0b5e44) SHA1(fd21e4658dcc6a919b326eed81ccec942c6f1989) )
-	
+
 ROM_END_M1A_MCU
 
 ROM_START( m1cluedo )
@@ -1585,7 +1585,7 @@ ROM_START( m1fight )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
 	ROM_LOAD( "fnsnd.p1", 0x000000, 0x080000, CRC(f6f1334f) SHA1(607b136a3d8cf4ae2e306a4332b69f564936d383) )
-	ROM_LOAD( "fnsnd.p2", 0x080000, 0x080000, CRC(13419292) SHA1(40f314b4f42384334e6929b0de6b6a899fa2c09f) )	
+	ROM_LOAD( "fnsnd.p2", 0x080000, 0x080000, CRC(13419292) SHA1(40f314b4f42384334e6929b0de6b6a899fa2c09f) )
 ROM_END_M1A_MCU
 
 ROM_START( m1fivest )
@@ -1665,10 +1665,10 @@ ROM_START( m1glad )
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
 	ROM_LOAD( "sound1.dig1-049.u2", 0x0000, 0x080000, CRC(ab0ef8aa) SHA1(e9cd8c7c0fd0bec44d0531eff6272aa10b88b08c) )
 	ROM_LOAD( "sound2.dig1-049.u3", 0x0000, 0x080000, CRC(44c05fb6) SHA1(8d40d62d7c55224ddca8ff2f90779d5fad2af3ba) )
-//	ROM_LOAD( "dig1-049.p1", 0x0000, 0x080000, CRC(ab0ef8aa) SHA1(e9cd8c7c0fd0bec44d0531eff6272aa10b88b08c) )
-//	ROM_LOAD( "dig1-049.p2", 0x0000, 0x080000, CRC(44c05fb6) SHA1(8d40d62d7c55224ddca8ff2f90779d5fad2af3ba) )
-//	ROM_LOAD( "dig1-049_u2.bin", 0x0000, 0x080000, CRC(ab0ef8aa) SHA1(e9cd8c7c0fd0bec44d0531eff6272aa10b88b08c) )
-//	ROM_LOAD( "dig1-049_u3.bin", 0x0000, 0x080000, CRC(44c05fb6) SHA1(8d40d62d7c55224ddca8ff2f90779d5fad2af3ba) )
+//  ROM_LOAD( "dig1-049.p1", 0x0000, 0x080000, CRC(ab0ef8aa) SHA1(e9cd8c7c0fd0bec44d0531eff6272aa10b88b08c) )
+//  ROM_LOAD( "dig1-049.p2", 0x0000, 0x080000, CRC(44c05fb6) SHA1(8d40d62d7c55224ddca8ff2f90779d5fad2af3ba) )
+//  ROM_LOAD( "dig1-049_u2.bin", 0x0000, 0x080000, CRC(ab0ef8aa) SHA1(e9cd8c7c0fd0bec44d0531eff6272aa10b88b08c) )
+//  ROM_LOAD( "dig1-049_u3.bin", 0x0000, 0x080000, CRC(44c05fb6) SHA1(8d40d62d7c55224ddca8ff2f90779d5fad2af3ba) )
 ROM_END_M1A_MCU
 
 ROM_START( m1glada )
@@ -2120,7 +2120,7 @@ ROM_START( m1mongam )
 	ROM_LOAD( "sc5-115", 0x0000, 0x010000, CRC(8b3329b8) SHA1(2c89ac10ad82d8425104a74a7bc24aa9c28cbe01) )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
-	ROM_LOAD( "mgamesnd", 0x0000, 0x040000, CRC(80ea7b3d) SHA1(a26dbc55ba205fc94c9b224c549516ba149627d7) )	
+	ROM_LOAD( "mgamesnd", 0x0000, 0x040000, CRC(80ea7b3d) SHA1(a26dbc55ba205fc94c9b224c549516ba149627d7) )
 ROM_END_M1A_MCU
 
 ROM_START( m1monmon )
@@ -2157,7 +2157,7 @@ ROM_START( m1monmon )
 	ROM_LOAD( "sa8-221", 0x0000, 0x020000, CRC(60f13207) SHA1(6cdd8a23e4b53f820a3b72dc728315b91193a786) )
 	ROM_LOAD( "sa9-015", 0x0000, 0x020000, CRC(a20db239) SHA1(437967107c18d647539eeabe17157dfcc9ab64a7) )
 	ROM_LOAD( "sa9-016", 0x0000, 0x020000, CRC(b1ca896f) SHA1(782ca31e42e8b0c2f2b1b792ec21c859ed3cf7d2) )
-//	ROM_LOAD( "mon55", 0x0000, 0x020000, CRC(f5506f09) SHA1(e4664a09f1a09f23363c07812cce93e9ac1acea4) ) // was in the monopoly set!
+//  ROM_LOAD( "mon55", 0x0000, 0x020000, CRC(f5506f09) SHA1(e4664a09f1a09f23363c07812cce93e9ac1acea4) ) // was in the monopoly set!
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
 	ROM_LOAD( "mmm.p1", 0x000000, 0x080000, CRC(687ccf90) SHA1(cd3fd5994b7809aa267eff419a54fddb38675947) )
@@ -2239,8 +2239,8 @@ ROM_START( m1monclb )
 	ROM_LOAD( "sc8-309", 0x0000, 0x020000, CRC(6f0270e9) SHA1(87c2f653a7297801410120de94618c71cb997efa) )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
-//	ROM_LOAD( "sound.u2", 0x0000, 0x080000, CRC(f7303657) SHA1(a66c1110b38d36ebbd0ec3a2d3a08d9164b9d4a0) )
-//	ROM_LOAD( "sound.u3", 0x0000, 0x080000, CRC(3881a59a) SHA1(e7f13152ff4c8e502bd97ea8ab90416126de73f3) )
+//  ROM_LOAD( "sound.u2", 0x0000, 0x080000, CRC(f7303657) SHA1(a66c1110b38d36ebbd0ec3a2d3a08d9164b9d4a0) )
+//  ROM_LOAD( "sound.u3", 0x0000, 0x080000, CRC(3881a59a) SHA1(e7f13152ff4c8e502bd97ea8ab90416126de73f3) )
 	ROM_LOAD( "monsnd1.bin", 0x0000, 0x080000, CRC(f7303657) SHA1(a66c1110b38d36ebbd0ec3a2d3a08d9164b9d4a0) )
 	ROM_LOAD( "monsnd2.bin", 0x0000, 0x080000, CRC(3881a59a) SHA1(e7f13152ff4c8e502bd97ea8ab90416126de73f3) )
 ROM_END_M1A_MCU
@@ -2452,7 +2452,7 @@ ROM_START( m1przee )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
 	ROM_LOAD( "dig1-033 snd u2.bin", 0x000000, 0x080000, CRC(3eaa138c) SHA1(ad7d6e3ffc8fe19ea8cb9188998c75c90a77e09e) )
-	ROM_LOAD( "dig1-033 snd u3.bin", 0x080000, 0x080000, CRC(89fde428) SHA1(f0942a2f1d3890ad18b01e8433333e5412c57644) )	
+	ROM_LOAD( "dig1-033 snd u3.bin", 0x080000, 0x080000, CRC(89fde428) SHA1(f0942a2f1d3890ad18b01e8433333e5412c57644) )
 ROM_END_M1A_MCU
 
 ROM_START( m1reeldm )
@@ -2591,7 +2591,7 @@ ROM_START( m1suppot )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
 	ROM_LOAD( "superpots.p1", 0x000000, 0x080000, CRC(a17067d7) SHA1(5fc774251ca13e9d97559b68e560a456c0c364a8) )
-	ROM_LOAD( "superpots.p2", 0x080000, 0x080000, CRC(4fa7759e) SHA1(7ba5099738ff3180eb9407b0772181c6cb6a81b8) )	
+	ROM_LOAD( "superpots.p2", 0x080000, 0x080000, CRC(4fa7759e) SHA1(7ba5099738ff3180eb9407b0772181c6cb6a81b8) )
 ROM_END_M1A_MCU
 
 ROM_START( m1taknot )
@@ -2800,7 +2800,7 @@ static WRITE8_HANDLER( m1ab_no_oki_w )
 
 static DRIVER_INIT( m1 )
 {
-	
+
 	//AM_RANGE(0x2420, 0x2421) AM_WRITE( latch_ch2_w ) // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 

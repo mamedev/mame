@@ -1011,8 +1011,8 @@ static MACHINE_CONFIG_DERIVED( coh110, coh100 )
 	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos11_vblank ), (namcos11_state *) owner ) )
 
 	/// TODO: figure out why pocketrc runs too fast
-//	MCFG_SCREEN_MODIFY("screen")
-//	MCFG_SCREEN_REFRESH_RATE( 30 )
+//  MCFG_SCREEN_MODIFY("screen")
+//  MCFG_SCREEN_REFRESH_RATE( 30 )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos11 )

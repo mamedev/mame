@@ -460,7 +460,7 @@ void cli_frontend::listcrc(const char *gamename)
 
 	// iterate through matches, and then through ROMs
 	while (drivlist.next())
-		for (const rom_source *source = rom_first_source(drivlist.config()); source != NULL; source = rom_next_source(*source)) 
+		for (const rom_source *source = rom_first_source(drivlist.config()); source != NULL; source = rom_next_source(*source))
 		{
 			bool isdriver = (source == rom_first_source(drivlist.config()));
 			for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))

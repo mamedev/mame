@@ -79,7 +79,7 @@ private:
 	void output_ramoptions();
 
 	void output_devices();
-	
+
 	const char *get_merge_name(const hash_collection &romhashes);
 
 	// internal state

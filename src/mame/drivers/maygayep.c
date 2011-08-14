@@ -11,14 +11,14 @@
     the PIC marked 'Security' is apparently the RTC, and doesn't change
     the other is per game / manufacturer and provides data needed for booting?
 
-	The majority of system tasks are handled by a custom ASIC which is capable of reading and writing
-	directly from/to the main RAM.	This includes handling of the inputs, and lamps / LEDs
+    The majority of system tasks are handled by a custom ASIC which is capable of reading and writing
+    directly from/to the main RAM.  This includes handling of the inputs, and lamps / LEDs
 
     -------------------------------------------------
     MOST GAMES DO NOT HAVE ANY SOUND ROMS DUMPED
     -------------------------------------------------
-	SOME OF THESE GAMES USED HDDS, ONLY ONE IS DUMPED
-	-------------------------------------------------
+    SOME OF THESE GAMES USED HDDS, ONLY ONE IS DUMPED
+    -------------------------------------------------
 
     Some games have EPOCH NEVADA in the header, others have EPOCH APOLLO, is there a difference?
 
@@ -1342,9 +1342,9 @@ ROM_START( ep_bubsq )
 	ROM_LOAD16_BYTE( "basq04.p3", 0x000000, 0x020000, CRC(61618588) SHA1(2cb0ea50f107cf2443bd1ff3dbf67959f07e1216) )
 
 	// junk?
-	//	ROM_LOAD( "bubl&squ.g0", 0x0000, 0x020000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )
-	//	ROM_LOAD( "bubl&squ.g1", 0x0000, 0x020000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )
-	//	ROM_LOAD( "buble&sq.go", 0x0000, 0x080000, CRC(b05323f5) SHA1(290d7716cb61f6788d052611d662575ffdcfd55a) )
+	//  ROM_LOAD( "bubl&squ.g0", 0x0000, 0x020000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )
+	//  ROM_LOAD( "bubl&squ.g1", 0x0000, 0x020000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )
+	//  ROM_LOAD( "buble&sq.go", 0x0000, 0x080000, CRC(b05323f5) SHA1(290d7716cb61f6788d052611d662575ffdcfd55a) )
 
 	MISSING_SOUND
 ROM_END
@@ -1655,7 +1655,7 @@ ROM_START( ep_duff )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "duff.s0", 0x000000, 0x080000, CRC(639b6528) SHA1(2ff6b84531f3a2a18e5c846b7a2b14102faf8864) )
-	ROM_LOAD( "duff.s1", 0x080000, 0x080000, CRC(5c18f8cb) SHA1(c850c386b0b00ba982bd473a2ba4d464bbfd57d0) )		
+	ROM_LOAD( "duff.s1", 0x080000, 0x080000, CRC(5c18f8cb) SHA1(c850c386b0b00ba982bd473a2ba4d464bbfd57d0) )
 ROM_END
 
 
@@ -1687,8 +1687,8 @@ ROM_START( ep_flash )
 
 
 	ROM_REGION( 0x100000, "ymz", 0 )
-//	ROM_LOAD( "flashback sound 1 imp99fl01.bin", 0x000000, 0x080000, CRC(4ff8b006) SHA1(bfe7b83b1bcc81f5980263db26e0c3dd8074518b) )
-//	ROM_LOAD( "flashback sound 2 imp99fl01.bin", 0x080000, 0x080000, CRC(acaa4b38) SHA1(6960e29181f67ca77fee9f6bce84dfa6bea4bdf7) )
+//  ROM_LOAD( "flashback sound 1 imp99fl01.bin", 0x000000, 0x080000, CRC(4ff8b006) SHA1(bfe7b83b1bcc81f5980263db26e0c3dd8074518b) )
+//  ROM_LOAD( "flashback sound 2 imp99fl01.bin", 0x080000, 0x080000, CRC(acaa4b38) SHA1(6960e29181f67ca77fee9f6bce84dfa6bea4bdf7) )
 	ROM_LOAD( "fl_back.s0", 0x0000, 0x080000, CRC(acaa4b38) SHA1(6960e29181f67ca77fee9f6bce84dfa6bea4bdf7) )
 	ROM_LOAD( "fl_back.s1", 0x0000, 0x080000, CRC(4ff8b006) SHA1(bfe7b83b1bcc81f5980263db26e0c3dd8074518b) )
 ROM_END
@@ -2105,7 +2105,7 @@ ROM_START( ep_huric )
 	ROM_LOAD16_BYTE( "i00phu27.g1", 0x000000, 0x020000, CRC(fab968b9) SHA1(e281309b414fdeaed2cc13eeef75f0a1ef733854) )
 	ROM_LOAD16_BYTE( "i00phu27.g2", 0x000000, 0x020000, CRC(fde78ab3) SHA1(9eb3a38bafaf2a10657421da00629c89723db93a) )
 	ROM_LOAD16_BYTE( "i00phu27.g3", 0x000000, 0x020000, CRC(18e3ec99) SHA1(0f79fc837afe1953e0e49c8a191baf44b5ac11be) )
-	
+
 	ROM_REGION( 0x100000, "ymz", 0 )
 	// one of these pairs is probably a different game
 	ROM_LOAD( "huricane.sn0", 0x000000, 0x080000, CRC(b34b4667) SHA1(8b0b7b3668506de8433aa662556118a8b0e203d6) )
@@ -2236,17 +2236,17 @@ ROM_START( ep_ijcl )
 	ROM_REGION( 0x080000, "altrevs", 0 ) /* split into clones later */
 	ROM_LOAD16_BYTE( "msc02047.g0", 0x000000, 0x020000, CRC(f77c368e) SHA1(baa1eda6ff55fa4acfb2cba1822025f747603328) )
 	ROM_LOAD16_BYTE( "msc02047.g1", 0x000000, 0x020000, CRC(0ea0e029) SHA1(610ff37e0e501bdf66c7d65dd10622acd7fd7126) )
-	
+
 	MISSING_SOUND
 ROM_END
 
 
 ROM_START( ep_ijob )
-	ROM_REGION( 0x200000, "maincpu", 0 )	
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "it_job.g0", 0x000000, 0x020000, CRC(92a63d81) SHA1(b21ebc02becf7db98887599c5632fade3b0dcbc5) )
 	ROM_LOAD16_BYTE( "it_job.g1", 0x000001, 0x020000, CRC(8b814e44) SHA1(276a8e99e70279e32c285be3e12032ae4c36802a) )
 
-	ROM_REGION( 0x100000, "ymz", 0 )	
+	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "it_job.s1", 0x000000, 0x080000, CRC(77ea2225) SHA1(fb02bccf4555797b60871070821afe2162be26c2) )
 	ROM_LOAD( "it_job.s2", 0x080000, 0x080000, CRC(b6f86703) SHA1(f09f9d88132919ca24fc1ed7094b5b22c1136eb8) )
 ROM_END
@@ -2528,7 +2528,7 @@ ROM_START( ep_nuns )
 	ROM_LOAD16_BYTE( "msa02153.g2", 0x000000, 0x020000, CRC(2b5e180c) SHA1(fad8f303d2d73eaf95d63955d7ed6712fee4dbce) )
 	ROM_LOAD16_BYTE( "msa02153.g3", 0x000000, 0x020000, CRC(b616e33d) SHA1(8f2f03d8f6b5a8c7fa0134b2eb4b420609029a21) )
 
-	ROM_REGION( 0x080000, "ymz", 0 ) 
+	ROM_REGION( 0x080000, "ymz", 0 )
 	ROM_LOAD( "nuns s0", 0x0000, 0x080000, CRC(158dadca) SHA1(e65dd64517f5e9ccf93a993ee22ab1b96d0a2a22) )
 ROM_END
 
@@ -2637,17 +2637,17 @@ ROM_START( ep_pharo )
 	ROM_LOAD16_BYTE( "i01ppt10.g3", 0x000000, 0x020000, CRC(7823eb6f) SHA1(0adf369ca240aa15256d03a591c9e0b78d92c01e) )
 	MISSING_SOUND
 	/*
-	Disk marked:
+    Disk marked:
 
-	PHARAOH'S TREASURE
-	SS010003 DATA
-	VIDEO EPOCH
+    PHARAOH'S TREASURE
+    SS010003 DATA
+    VIDEO EPOCH
 
-	Fujistu MPF3102AT (10.2GB HDD)
-	*/
+    Fujistu MPF3102AT (10.2GB HDD)
+    */
 	DISK_REGION( "ide" )
 	DISK_IMAGE( "ep_pharo", 0, SHA1(daf56705178bb2b6f3547418a98c361478702aed) )
-	
+
 ROM_END
 
 
@@ -2675,7 +2675,7 @@ ROM_START( ep_pesos )
 	ROM_LOAD16_BYTE( "gpk09_1.bin", 0x000000, 0x020000, CRC(1386ae4d) SHA1(d9f270793fa2f787649e6b3ad8396f311e580446) )
 	ROM_LOAD16_BYTE( "gpk09_2.bin", 0x000000, 0x020000, CRC(da400cf4) SHA1(763952a19736f34bcb2957e70a966cb6d5524313) )
 	ROM_LOAD16_BYTE( "gpk09_3.bin", 0x000000, 0x020000, CRC(5ea4d325) SHA1(c47cfe04f443039c69da15f773c556564b4cd6b9) )
-	
+
 	ROM_REGION( 0x100000, "ymz", 0 )
 	// guess based on filenames
 	ROM_LOAD( "p pesos.s0", 0x0000, 0x080000, CRC(970b2947) SHA1(14b0cc21a2fdb019143332869a656c4a4e3fb4a8) )
@@ -2702,7 +2702,7 @@ ROM_START( ep_baskr )
 	ROM_LOAD16_BYTE( "msa02168.g1", 0x000000, 0x020000, CRC(19e36866) SHA1(bd25abfecb6f3b02de3e96208453b92b252228d9) )
 	ROM_LOAD16_BYTE( "msa02168.g2", 0x000000, 0x020000, CRC(78dd9a42) SHA1(6e68ddca273b257f21f341a8ab3cb229bec08bd5) )
 	ROM_LOAD16_BYTE( "msa02168.g3", 0x000000, 0x020000, CRC(752e7847) SHA1(05f4aa3d6a0a0f0b3b29d3fe7644a67b9c3942ab) )
-	
+
 	ROM_LOAD16_BYTE( "pound_baskvi.g0", 0x0000, 0x020000, CRC(122edc2d) SHA1(051dce228e67335c72e75fcb92917a6c6e73b62f) )
 	ROM_LOAD16_BYTE( "pound_baskvi.g1", 0x0000, 0x020000, CRC(35bc00f2) SHA1(bfd9db95b78a0edee0a77960c0ac227cffc717b8) )
 
@@ -2829,7 +2829,7 @@ ROM_START( ep_royrl )
 	ROM_LOAD16_BYTE( "grr09_2.bin", 0x000000, 0x020000, CRC(26cdfb40) SHA1(fef75914c3268e997e73ca353524126a379df8e1) )
 	ROM_LOAD16_BYTE( "grr09_3.bin", 0x000000, 0x020000, CRC(6d9eae8d) SHA1(df0975f622772f35c0130245bfeb6037dfaf8c63) )
 
-	ROM_REGION( 0x100000, "ymz", 0 ) 
+	ROM_REGION( 0x100000, "ymz", 0 )
 	// guess based on filename
 	ROM_LOAD( "royal r.s0", 0x000000, 0x080000, CRC(a1060eac) SHA1(47b0383e4c0eb714eaba55014fbc5597233a5d53) )
 	ROM_LOAD( "royal r.s1", 0x080000, 0x080000, CRC(c0caaeb8) SHA1(79efa22844137a0326b5887df186a3220cd2577b) )
@@ -2880,7 +2880,7 @@ ROM_START( ep_secag )
 	ROM_LOAD( "s_agent.s0", 0x000000, 0x080000, CRC(58a509db) SHA1(339a69eab79c4e7886a18b92392a25ba2ccb7c9a) )
 	ROM_LOAD( "s_agent.s1", 0x080000, 0x080000, CRC(8e0117f8) SHA1(e7d1c64d995a7f7e2d4e2ed0bccb303fe5bb267e) )
 
-	
+
 ROM_END
 
 
@@ -2911,7 +2911,7 @@ ROM_START( ep_simbg )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "duff.s0", 0x000000, 0x080000, CRC(639b6528) SHA1(2ff6b84531f3a2a18e5c846b7a2b14102faf8864) )
-	ROM_LOAD( "duff.s1", 0x080000, 0x080000, CRC(5c18f8cb) SHA1(c850c386b0b00ba982bd473a2ba4d464bbfd57d0) )	
+	ROM_LOAD( "duff.s1", 0x080000, 0x080000, CRC(5c18f8cb) SHA1(c850c386b0b00ba982bd473a2ba4d464bbfd57d0) )
 ROM_END
 
 
@@ -3421,9 +3421,9 @@ ROM_START( ep_xspot )
 	ROM_LOAD16_BYTE( "xmar15g0", 0x000000, 0x020000, CRC(991d02e1) SHA1(5685cf9a21a7e442a12f5b25492df96ae76cd150) )
 	ROM_LOAD16_BYTE( "xmar15g1", 0x000000, 0x020000, CRC(48510488) SHA1(84c1189c92439e52f4afde21ea1ba0e0d62aebc7) )
 
-	ROM_REGION( 0x100000, "ymz", 0 ) 
+	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "x_marks.s0", 0x000000, 0x080000, CRC(2e6f4524) SHA1(8f3e0cf3bbdbb32c13b6bcaadee86ddb081e7e81) )
-	ROM_LOAD( "x_marks.s1", 0x080000, 0x080000, CRC(5f0315d4) SHA1(d6ef3060f382fbc8012635196497b764ce635181) )	
+	ROM_LOAD( "x_marks.s1", 0x080000, 0x080000, CRC(5f0315d4) SHA1(d6ef3060f382fbc8012635196497b764ce635181) )
 ROM_END
 
 

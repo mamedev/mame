@@ -682,8 +682,8 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// initialize sockets
-	win_init_sockets();	
-	
+	win_init_sockets();
+
 	// note the existence of a machine
 	g_current_machine = &machine;
 }
@@ -700,7 +700,7 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 
 	// cleanup sockets
 	win_cleanup_sockets();
-	
+
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
 	{

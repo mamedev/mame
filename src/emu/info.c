@@ -239,11 +239,11 @@ void info_xml_creator::output(FILE *out)
 	while (m_drivlist.next())
 		output_one();
 
-	// iterate through the devices, and output their roms 
+	// iterate through the devices, and output their roms
 	output_devices();
-	
+
 	global_free(m_device_used);
-	
+
 	// close the top level tag
 	fprintf(m_output, "</" XML_ROOT ">\n");
 }
@@ -262,7 +262,7 @@ void info_xml_creator::output_devices()
 	device_t *owner = config.devicelist().first();
 	// check if all are listed, note that empty one is included
 	bool display_all = driver_list::total() == (m_drivlist.count()+1);
-	for(int i=0;i<m_device_count;i++) {	
+	for(int i=0;i<m_device_count;i++) {
 		if (display_all || (m_device_used[i]!=0)) {
 			device_type type = *s_devices_sorted[i];
 			device_t *dev = (*type)(config, "dummy", owner, 0);
@@ -274,13 +274,13 @@ void info_xml_creator::output_devices()
 			fprintf(m_output, " isdevice=\"yes\"");
 			fprintf(m_output, " runnable=\"no\"");
 			fprintf(m_output, ">\n");
-			
+
 			// output device description
 			if (dev->name() != NULL)
 				fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(dev->name()));
 
 			output_rom(dev);
-			
+
 			// close the topmost tag
 			fprintf(m_output, "\t</" XML_TOP ">\n");
 			global_free(dev);
@@ -380,7 +380,7 @@ void info_xml_creator::output_one()
 
 void info_xml_creator::output_device_roms()
 {
-	int cnt=0;	
+	int cnt=0;
 	for (const rom_source *source = rom_first_source(m_drivlist.config()); source != NULL; source = rom_next_source(*source))
 	{
 		if (cnt!=0) {

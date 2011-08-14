@@ -74,7 +74,7 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( jpms_older_e00_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0e00, 0x0eff) AM_RAM 
+	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jpms_older_e00_io, AS_IO, 8 )

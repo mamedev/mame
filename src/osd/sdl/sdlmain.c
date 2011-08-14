@@ -583,7 +583,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	/* Set the SDL environment variable for drivers wanting to load the
      * lib at startup.
      */
-#if USE_OPENGL     
+#if USE_OPENGL
 	/* FIXME: move lib loading code from drawogl.c here */
 
 	stemp = options.gl_lib();

@@ -475,7 +475,7 @@ static void scu_test_pending_irq(running_machine &machine)
 								0xb, 0xa, 0x9, 0x8,
 								0x8, 0x6, 0x6, 0x5,
 								0x3, 0x2,  -1,  -1,
-   							    0x7, 0x7, 0x7, 0x7,
+							    0x7, 0x7, 0x7, 0x7,
 								0x4, 0x4, 0x4, 0x4,
 								0x1, 0x1, 0x1, 0x1,
 								0x1, 0x1, 0x1, 0x1  };
@@ -972,7 +972,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
-//	AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
+//  AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
 	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
@@ -1274,34 +1274,34 @@ static INPUT_PORTS_START( saturn )
 	PORT_START("CART_AREA")
 	PORT_CONFNAME( 0x07, 0x06, "Cart Type" )
 	PORT_CONFSETTING( 0x00, "None" )
-//	PORT_CONFSETTING( 0x01, "4 Mbit backup RAM" )
-//	PORT_CONFSETTING( 0x02, "8 Mbit backup RAM" )
-//	PORT_CONFSETTING( 0x03, "16 Mbit backup RAM" )
-//	PORT_CONFSETTING( 0x04, "32 Mbit backup RAM" )
+//  PORT_CONFSETTING( 0x01, "4 Mbit backup RAM" )
+//  PORT_CONFSETTING( 0x02, "8 Mbit backup RAM" )
+//  PORT_CONFSETTING( 0x03, "16 Mbit backup RAM" )
+//  PORT_CONFSETTING( 0x04, "32 Mbit backup RAM" )
 	PORT_CONFSETTING( 0x05, "8 Mbit Cart RAM" )
 	PORT_CONFSETTING( 0x06, "32 Mbit Cart RAM" )
 
 	PORT_START("INPUT_TYPE")
 	PORT_CATEGORY_CLASS(0x0f,0x00,"Port 1")
 	PORT_CATEGORY_ITEM(0x00,"Digital Device (standard Saturn pad)",10)
-//	PORT_CATEGORY_ITEM(0x01,"Racing Device",11)
-//	PORT_CATEGORY_ITEM(0x02,"Analog Device",12) //Nights pad?
-//	PORT_CATEGORY_ITEM(0x03,"Lightgun Device",13)
+//  PORT_CATEGORY_ITEM(0x01,"Racing Device",11)
+//  PORT_CATEGORY_ITEM(0x02,"Analog Device",12) //Nights pad?
+//  PORT_CATEGORY_ITEM(0x03,"Lightgun Device",13)
 	PORT_CATEGORY_ITEM(0x04,"Pointing Device",14)
 	PORT_CATEGORY_ITEM(0x05,"Keyboard Device",15)
-//	PORT_CATEGORY_ITEM(0x06,"Megadrive 3B Pad",16)
-//	PORT_CATEGORY_ITEM(0x07,"Megadrive 6B Pad",17)
+//  PORT_CATEGORY_ITEM(0x06,"Megadrive 3B Pad",16)
+//  PORT_CATEGORY_ITEM(0x07,"Megadrive 6B Pad",17)
 	PORT_CATEGORY_ITEM(0x08,"Saturn Mouse",14)
-//	PORT_CATEGORY_ITEM(0x09,"<unconnected>",19)
+//  PORT_CATEGORY_ITEM(0x09,"<unconnected>",19)
 	PORT_CATEGORY_CLASS(0xf0,0x00,"Port 2")
 	PORT_CATEGORY_ITEM(0x00,"Digital Device (standard Saturn pad)",20)
-//	PORT_CATEGORY_ITEM(0x10,"Racing Device",21)
-//	PORT_CATEGORY_ITEM(0x20,"Analog Device",22) //Nights pad?
-//	PORT_CATEGORY_ITEM(0x30,"Lightgun Device",23)
+//  PORT_CATEGORY_ITEM(0x10,"Racing Device",21)
+//  PORT_CATEGORY_ITEM(0x20,"Analog Device",22) //Nights pad?
+//  PORT_CATEGORY_ITEM(0x30,"Lightgun Device",23)
 	PORT_CATEGORY_ITEM(0x40,"Pointing Device",24)
-//	PORT_CATEGORY_ITEM(0x50,"Keyboard Device",25)
-//	PORT_CATEGORY_ITEM(0x60,"Megadrive 3B Pad",26)
-//	PORT_CATEGORY_ITEM(0x70,"Megadrive 6B Pad",27)
+//  PORT_CATEGORY_ITEM(0x50,"Keyboard Device",25)
+//  PORT_CATEGORY_ITEM(0x60,"Megadrive 3B Pad",26)
+//  PORT_CATEGORY_ITEM(0x70,"Megadrive 6B Pad",27)
 	PORT_CATEGORY_ITEM(0x80,"Saturn Mouse",24)
 	PORT_CATEGORY_ITEM(0x90,"<unconnected>",29)
 INPUT_PORTS_END
@@ -2162,7 +2162,7 @@ static MACHINE_RESET( saturn )
 
 	if(state->m_cart_type > 0 && state->m_cart_type < 5)
 	{
-	//	AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
+	//  AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
 		UINT32 mask;
 		mask = 0x7fffff >> (4-state->m_cart_type);
 		//mask = 0x7fffff >> 4-4 = 0x7fffff 32mbit

@@ -286,16 +286,16 @@ static TIMER_CALLBACK( stv_smpc_intback )
 }
 
 /*
-	[0] port status:
-		0x04 Sega-tap
-		0x16 Multi-tap
-		0x2x clock serial peripheral
-		0xf0 peripheral isn't connected
-	    0xf1 peripheral is connected
-	[1] Peripheral ID (note: lowest four bits determines the size of the input packet)
-		0x02 digital pad
-		0x25 (tested by Game Basic?)
-		0x34 keyboard
+    [0] port status:
+        0x04 Sega-tap
+        0x16 Multi-tap
+        0x2x clock serial peripheral
+        0xf0 peripheral isn't connected
+        0xf1 peripheral is connected
+    [1] Peripheral ID (note: lowest four bits determines the size of the input packet)
+        0x02 digital pad
+        0x25 (tested by Game Basic?)
+        0x34 keyboard
 */
 
 static void smpc_digital_pad(running_machine &machine, UINT8 pad_num, UINT8 offset)
@@ -337,15 +337,15 @@ static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
 	state->m_smpc.OREG[2+pad_num*offset] = game_key>>8; // game buttons, TODO
 	state->m_smpc.OREG[3+pad_num*offset] = game_key & 0xff;
 	/*
-		x--- ---- 0
-		-x-- ---- caps lock
-		--x- ---- num lock
-		---x ---- scroll lock
-		---- x--- data ok
-		---- -x-- 1
-		---- --x- 1
-		---- ---x Break key
-	*/
+        x--- ---- 0
+        -x-- ---- caps lock
+        --x- ---- num lock
+        ---x ---- scroll lock
+        ---- x--- data ok
+        ---- -x-- 1
+        ---- --x- 1
+        ---- ---x Break key
+    */
 	state->m_smpc.OREG[4+pad_num*offset] = state->m_keyb.status | 6;
 	state->m_smpc.OREG[5+pad_num*offset] = state->m_keyb.data;
 }

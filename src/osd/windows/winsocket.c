@@ -23,7 +23,7 @@
 
 const char *winfile_socket_identifier  = "socket.";
 
-bool win_init_sockets() 
+bool win_init_sockets()
 {
 	WSADATA wsaData;
 	WORD version;

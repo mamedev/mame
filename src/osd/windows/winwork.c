@@ -494,7 +494,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	// free the list
 	if (queue->thread != NULL)
 		free(queue->thread);
-	
+
 	scalable_lock_delete(&queue->lock);
 
 	// free all the events

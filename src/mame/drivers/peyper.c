@@ -7,7 +7,7 @@ class peyper_state : public driver_device
 public:
 	peyper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-   
+
     UINT8 irq_state;
 
     UINT8 display_block;
@@ -38,12 +38,12 @@ static WRITE8_HANDLER(disp_w)
 {
     peyper_state *state = space->machine().driver_data<peyper_state>();
     state->display[state->display_block] = data;
-   
+
     UINT8 a = data & 0x0f;
     UINT8 b = data >> 4;
     UINT8 hex_a = hex_to_7seg[a];
     UINT8 hex_b = hex_to_7seg[b];
-/*   
+/*
 0 -> XA0 DPL25,DPL27
 1 -> XA1 DPL26,DPL28
 2 -> DPL23,DPL5
@@ -54,38 +54,38 @@ static WRITE8_HANDLER(disp_w)
 7 -> DPL30,DPL33
 */
     switch(state->display_block) {
-        case 0 :                
+        case 0 :
                 output_set_indexed_value("dpl_",25,hex_a);
                 output_set_indexed_value("dpl_",27,hex_b);
                 break;
-        case 1 :                
+        case 1 :
                 output_set_indexed_value("dpl_",26,hex_a);
                 output_set_indexed_value("dpl_",28,hex_b);
                 break;
-        case 2 :                
+        case 2 :
                 output_set_indexed_value("dpl_",23,hex_a);
                 output_set_indexed_value("dpl_",5,hex_b);
                 break;
-        case 3 :                
+        case 3 :
                 output_set_indexed_value("dpl_",22,hex_a);
                 output_set_indexed_value("dpl_",4,hex_b);
                 break;
-        case 4 :                
+        case 4 :
                 output_set_indexed_value("dpl_",21,hex_a);
                 output_set_indexed_value("dpl_",3,hex_b);
                 break;
-        case 5 :                
+        case 5 :
                 output_set_indexed_value("dpl_",20,hex_a);
                 output_set_indexed_value("dpl_",2,hex_b);
                 break;
-        case 6 :                
+        case 6 :
                 output_set_indexed_value("dpl_",19,hex_a);
                 output_set_indexed_value("dpl_",1,hex_b);
                 break;
-        case 7 :                
+        case 7 :
                 output_set_indexed_value("dpl_",30,hex_a);
                 output_set_indexed_value("dpl_",33,hex_b);
-                break;   
+                break;
 /*
 8 ->  XB0
 9 ->  XB1
@@ -96,7 +96,7 @@ static WRITE8_HANDLER(disp_w)
 14 -> DPL07,DPL13
 15 -> DPL31,DPL32
 */
-        case 8 :                
+        case 8 :
                 /*
                 if (BIT(a,3)) logerror("TILT\n");
                 if (BIT(a,2)) logerror("ONC\n");
@@ -106,39 +106,39 @@ static WRITE8_HANDLER(disp_w)
                 output_set_indexed_value("led_",1,BIT(b,0)); // PLAYER 1
                 output_set_indexed_value("led_",2,BIT(b,1)); // PLAYER 2
                 output_set_indexed_value("led_",3,BIT(b,2)); // PLAYER 3
-                output_set_indexed_value("led_",4,BIT(b,3)); // PLAYER 4               
-                break;   
+                output_set_indexed_value("led_",4,BIT(b,3)); // PLAYER 4
+                break;
         case 9 :
                 if (!BIT(b,0)) output_set_indexed_value("dpl_",6,hex_to_7seg[0]);
                 if (!BIT(b,1)) output_set_indexed_value("dpl_",12,hex_to_7seg[0]);
                 if (!BIT(b,2)) output_set_indexed_value("dpl_",24,hex_to_7seg[0]);
                 if (!BIT(b,3)) output_set_indexed_value("dpl_",18,hex_to_7seg[0]);
-                output_set_indexed_value("dpl_",29,hex_a);       
-                break;   
-        case 10 :                
+                output_set_indexed_value("dpl_",29,hex_a);
+                break;
+        case 10 :
                 output_set_indexed_value("dpl_",11,hex_a);
                 output_set_indexed_value("dpl_",17,hex_b);
-                break;   
-        case 11 :                
+                break;
+        case 11 :
                 output_set_indexed_value("dpl_",10,hex_a);
                 output_set_indexed_value("dpl_",16,hex_b);
-                break;   
-        case 12 :                
+                break;
+        case 12 :
                 output_set_indexed_value("dpl_",9,hex_a);
                 output_set_indexed_value("dpl_",15,hex_b);
-                break;   
-        case 13 :                
+                break;
+        case 13 :
                 output_set_indexed_value("dpl_",8,hex_a);
                 output_set_indexed_value("dpl_",14,hex_b);
-                break;   
-        case 14 :                
+                break;
+        case 14 :
                 output_set_indexed_value("dpl_",7,hex_a);
                 output_set_indexed_value("dpl_",13,hex_b);
-                break;   
-        case 15 :                
+                break;
+        case 15 :
                 output_set_indexed_value("dpl_",31,hex_a);
                 output_set_indexed_value("dpl_",32,hex_b);
-                break;   
+                break;
     }
 
     state->display_block++;
@@ -180,26 +180,26 @@ static CUSTOM_INPUT( wolfman_replay_hs_r )
 
 
 static ADDRESS_MAP_START( peyper_map, AS_PROGRAM, 8 )
-//	AM_RANGE(0x0000, 0xffff) AM_NOP
+//  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5FFF) AM_ROM
 	AM_RANGE(0x6000, 0x67FF) AM_RAM //AM_BASE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peyper_io, AS_IO, 8 )
-//	AM_RANGE(0x0000, 0xffff) AM_NOP
+//  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(sw_r,disp_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(col_w)
-//	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay8910_0", ay8910_address_w)
-//	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay8910_0", ay8910_data_w)
-//	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay8910_1", ay8910_address_w)
-//	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay8910_1", ay8910_data_w)
+//  AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay8910_0", ay8910_address_w)
+//  AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay8910_0", ay8910_data_w)
+//  AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay8910_1", ay8910_address_w)
+//  AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay8910_1", ay8910_data_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(sol_w)
 	AM_RANGE(0x10, 0x18) AM_WRITE(lamp_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW1")   
+	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW1")
 	AM_RANGE(0x28, 0x28) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2c, 0x2c) AM_WRITE(lamp7_w)
 ADDRESS_MAP_END
@@ -246,7 +246,7 @@ static INPUT_PORTS_START( odin_dlx )
 	PORT_INCLUDE( pbsonic_generic )
 
 	/* SYSTEM : port 0x28 (cpl'ed) -> 0x00 in 0x6014..0x601b - 0x11 when pressed (code at 0x0190) */
-	
+
 	/* SW0 : port 0x00 (after 0x40 written to port 0x01) -> 0x00 in 0x601c..0x6023 - 0x11 when pressed (code at 0x019d) */
 	/* SW1 : port 0x00 (after 0x41 written to port 0x01) -> 0x00 in 0x6024..0x602b - 0x11 when pressed (code at 0x01af) */
 	/* SW2 : port 0x00 (after 0x42 written to port 0x01) -> 0x00 in 0x602c..0x6033 - 0x11 when pressed (code at 0x01bf) */
@@ -255,10 +255,10 @@ static INPUT_PORTS_START( odin_dlx )
 	/* DSW0 : port 0x20 - DSW0-1 is bit 7 ... DSW0-8 is bit 0 */
 	PORT_MODIFY("DSW0")
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
-//	PORT_DIPNAME( 0x40, 0x00, "Match Feature" )             // Loteria - code at 0x0aa5 - stored at 0x609e (0x00 YES / 0x01 NO) - then code at 0x0986
-//	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // Reclamo - code at 0x0ab2 - stored at 0x609d (0x00 ON / 0x01 OFF)
-//	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a84 - tables at 0x0b2f (4 * 3) - credits BCD stored at 0x6103
-//	PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a77 - stored at 0x6099
+//  PORT_DIPNAME( 0x40, 0x00, "Match Feature" )             // Loteria - code at 0x0aa5 - stored at 0x609e (0x00 YES / 0x01 NO) - then code at 0x0986
+//  PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // Reclamo - code at 0x0ab2 - stored at 0x609d (0x00 ON / 0x01 OFF)
+//  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a84 - tables at 0x0b2f (4 * 3) - credits BCD stored at 0x6103
+//  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a77 - stored at 0x6099
 	PORT_DIPNAME( 0x03, 0x00, "Replay at / High-score" )    // Puntos/Premios - code at 0x0a34 and 0x0a57 - tables at 0x0aff (4 * 9) and 0x0b23 (4 * 3)
 	PORT_DIPSETTING(    0x00, "800k 1200k and 8000k / 1400k" )
 	PORT_DIPSETTING(    0x01, "900k 1300k and 8000k / 1500k" )
@@ -287,7 +287,7 @@ static INPUT_PORTS_START( solarwap )
 	PORT_INCLUDE( pbsonic_generic )
 
 	/* SYSTEM : port 0x28 (cpl'ed) -> 0x00 in 0x6065..0x606c - 0x11 when pressed (code at 0x0193) */
-	
+
 	/* SW0 : port 0x00 (after 0x40 written to port 0x01) -> 0x00 in 0x606d..0x6074 - 0x11 when pressed (code at 0x01a0) */
 	/* SW1 : port 0x00 (after 0x41 written to port 0x01) -> 0x00 in 0x6075..0x605c - 0x11 when pressed (code at 0x01b0) */
 	/* SW2 : port 0x00 (after 0x42 written to port 0x01) -> 0x00 in 0x607d..0x6084 - 0x11 when pressed (code at 0x01c0) */
@@ -298,10 +298,10 @@ static INPUT_PORTS_START( solarwap )
 	PORT_DIPNAME( 0x80, 0x00, "DSW0-1 Unknown" )            // code at 0x1818 - stored at 0x6097 - manual says "unused"
 	PORT_DIPSETTING(    0x80, "00" )
 	PORT_DIPSETTING(    0x00, "FF" )
-//	PORT_DIPNAME( 0x40, 0x00, "Match Feature" )             // Loteria - code at 0x0a27 - stored at 0x60fc (0x00 YES / 0x01 NO) - then code at 0x0937
-//	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // Reclamo - code at 0x0a32 - stored at 0x60fb (0x00 ON / 0x01 OFF)
-//	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a06 - tables at 0x0ac2 (4 * 3) - credits BCD stored at 0x6162
-//	PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x09f9 - stored at 0x60f7
+//  PORT_DIPNAME( 0x40, 0x00, "Match Feature" )             // Loteria - code at 0x0a27 - stored at 0x60fc (0x00 YES / 0x01 NO) - then code at 0x0937
+//  PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // Reclamo - code at 0x0a32 - stored at 0x60fb (0x00 ON / 0x01 OFF)
+//  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a06 - tables at 0x0ac2 (4 * 3) - credits BCD stored at 0x6162
+//  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x09f9 - stored at 0x60f7
 	PORT_DIPNAME( 0x03, 0x00, "Replay at / High-score" )    // Puntos/Premios - code at 0x09b6 and 0x09d9 - tables at 0x0a92 (4 * 9) and 0x0ab6 (4 * 3)
 	PORT_DIPSETTING(    0x01, "1900k and 2500k / 3500k" )
 	PORT_DIPSETTING(    0x00, "2200k and 2800k / 3500k" )
@@ -334,7 +334,7 @@ static INPUT_PORTS_START( poleposn )
 	PORT_INCLUDE( pbsonic_generic )
 
 	/* SYSTEM : port 0x28 (cpl'ed) -> 0x00 in 0x604b..0x6052 - 0x11 when pressed (code at 0x019c) */
-	
+
 	/* SW0 : port 0x00 (after 0x40 written to port 0x01) -> 0x00 in 0x6053..0x605a - 0x11 when pressed (code at 0x01a9) */
 	/* SW1 : port 0x00 (after 0x41 written to port 0x01) -> 0x00 in 0x605b..0x6062 - 0x11 when pressed (code at 0x01b9) */
 	/* SW2 : port 0x00 (after 0x42 written to port 0x01) -> 0x00 in 0x6063..0x606a - 0x11 when pressed (code at 0x01c9) */
@@ -343,10 +343,10 @@ static INPUT_PORTS_START( poleposn )
 	/* DSW0 : port 0x20 - DSW0-1 is bit 7 ... DSW0-8 is bit 0 */
 	PORT_MODIFY("DSW0")
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
-//	PORT_DIPNAME( 0x40, 0x00, "Match Feature" )             // Loteria - code at 0x092f - stored at 0x60f5 (0x00 YES / 0x01 NO) - then code at 0x0859
-//	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // Reclamo - code at 0x093a - stored at 0x60f4 (0x00 ON / 0x01 OFF)
-//	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0915 - tables at 0x09ed (4 * 3) - credits BCD stored at 0x618c
-//	PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0901 - stored at 0x60f0
+//  PORT_DIPNAME( 0x40, 0x00, "Match Feature" )             // Loteria - code at 0x092f - stored at 0x60f5 (0x00 YES / 0x01 NO) - then code at 0x0859
+//  PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // Reclamo - code at 0x093a - stored at 0x60f4 (0x00 ON / 0x01 OFF)
+//  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0915 - tables at 0x09ed (4 * 3) - credits BCD stored at 0x618c
+//  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0901 - stored at 0x60f0
 	PORT_DIPNAME( 0x03, 0x00, "Replay at / High-score" )    // Puntos/Premios - code at 0x08b4 and 0x08e1 - tables at 0x09bd (4 * 9) and 0x09e1 (4 * 3)
 	PORT_DIPSETTING(    0x00, "1500k 2200k and 8000k / 3000k" )
 	PORT_DIPSETTING(    0x01, "1700k 2400k and 8000k / 3200k" )
@@ -377,7 +377,7 @@ static INPUT_PORTS_START( sonstwar )
 	PORT_INCLUDE( pbsonic_generic )
 
 	/* SYSTEM : port 0x28 (cpl'ed) -> 0x00 in 0x6013..0x601a - 0x11 when pressed (code at 0x0187) */
-	
+
 	/* SW0 : port 0x00 (after 0x40 written to port 0x01) -> 0x00 in 0x601b..0x6022 - 0x11 when pressed (code at 0x0194) */
 	/* SW1 : port 0x00 (after 0x41 written to port 0x01) -> 0x00 in 0x6023..0x602a - 0x11 when pressed (code at 0x01a4) */
 	/* SW2 : port 0x00 (after 0x42 written to port 0x01) -> 0x00 in 0x602b..0x6032 - 0x11 when pressed (code at 0x01b4) */
@@ -386,14 +386,14 @@ static INPUT_PORTS_START( sonstwar )
 	/* DSW0 : port 0x20 - DSW0-1 is bit 7 ... DSW0-8 is bit 0 */
 	PORT_MODIFY("DSW0")
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
-//	PORT_DIPNAME( 0x40, 0x00, "Match Feature" )             // Loteria - code at 0x08c3 - stored at 0x6096 (0x00 YES / 0x01 NO) - then code at 0x07cb
-//	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // Reclamo - code at 0x09cf - stored at 0x6094 (0x00 ON / 0x01 OFF)
+//  PORT_DIPNAME( 0x40, 0x00, "Match Feature" )             // Loteria - code at 0x08c3 - stored at 0x6096 (0x00 YES / 0x01 NO) - then code at 0x07cb
+//  PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // Reclamo - code at 0x09cf - stored at 0x6094 (0x00 ON / 0x01 OFF)
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x08a2 - tables at 0x0961 (4 * 3) - credits BCD stored at 0x617f
 	PORT_DIPSETTING(    0x18, "A 3/1 B 1/2 C 1/2" )                   // manual says "A 2/1 C 1/3"
 	PORT_DIPSETTING(    0x08, "A 2/1 B 1/3 C 1/3" )                   // manual says "A 1/1 C 1/6"
 	PORT_DIPSETTING(    0x10, "A 3/2 B 1/4 C 1/4" )                   // manual says "A 1/2 C 1/8"
 	PORT_DIPSETTING(    0x00, "A 1/1 B 1/5 C 1/5" )                   // manual says "A 1/1 C 1/5"
-//	PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0901 - stored at 0x60f0
+//  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0901 - stored at 0x60f0
 	PORT_DIPNAME( 0x03, 0x00, "Replay at / High-score" )    // Puntos/Premios - code at 0x0867 and 0x096d - tables at 0x0931 (4 * 9) and 0x0955 (4 * 3)
 	PORT_DIPSETTING(    0x00, "1400k 2200k and 9000k / 3300k" )       // manual says "1700k and 2500k / 3600k"
 	PORT_DIPSETTING(    0x01, "1700k 2500k and 9000k / 3600k" )       // manual says "2000k and 2800k / 3900k"
@@ -427,7 +427,7 @@ static INPUT_PORTS_START( wolfman )
 	PORT_INCLUDE( pbsonic_generic )
 
 	/* SYSTEM : port 0x28 (cpl'ed) -> 0x00 in 0x602a..0x6031 - 0x11 when pressed (code at 0x0173) */
-	
+
 	/* SW0 : port 0x00 (after 0x40 written to port 0x01) -> 0x00 in 0x6032..0x6039 - 0x11 when pressed (code at 0x0180) */
 	/* SW1 : port 0x00 (after 0x41 written to port 0x01) -> 0x00 in 0x603a..0x6041 - 0x11 when pressed (code at 0x0190) */
 	/* SW2 : port 0x00 (after 0x42 written to port 0x01) -> 0x00 in 0x6042..0x6049 - 0x11 when pressed (code at 0x01a0) */
@@ -444,8 +444,8 @@ static INPUT_PORTS_START( wolfman )
 	PORT_DIPNAME( 0x20, 0x00, "DSW0-3 Unknown" )            // Bola Reclamo - code at 0x0a94 - stored at 0x60c1 (0x00 ON / 0x01 OFF) - then code at 0x072e - sound related ?
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x20, "01" )
-//	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a69 - tables at 0x0b30 (4 * 3) - credits BCD stored at 0x6151
-//	PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a5c - stored at 0x60bd
+//  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a69 - tables at 0x0b30 (4 * 3) - credits BCD stored at 0x6151
+//  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a5c - stored at 0x60bd
 	PORT_BIT( 0x03, 0x00, IPT_SPECIAL) PORT_CUSTOM(wolfman_replay_hs_r, (void *)0x03)
 
 	/* DSW1 : port 0x24 - DSW1-1 is bit 7 ... DSW1-8 is bit 0 */
@@ -479,7 +479,7 @@ static INPUT_PORTS_START( odisea )
 	PORT_INCLUDE( pbsonic_generic )
 
 	/* SYSTEM : port 0x28 (cpl'ed) -> 0x00 in 0x6030..0x6037 - 0x11 when pressed (code at 0x0153) */
-	
+
 	/* SW0 : port 0x00 (after 0x40 written to port 0x01) -> 0x00 in 0x6038..0x603f - 0x11 when pressed (code at 0x0160) */
 	/* SW1 : port 0x00 (after 0x41 written to port 0x01) -> 0x00 in 0x6040..0x6047 - 0x11 when pressed (code at 0x0170) */
 	/* SW2 : port 0x00 (after 0x42 written to port 0x01) -> 0x00 in 0x6048..0x604f - 0x11 when pressed (code at 0x0180) */
@@ -496,8 +496,8 @@ static INPUT_PORTS_START( odisea )
 	PORT_DIPNAME( 0x20, 0x00, "DSW0-3 Unknown" )            // Bola Reclamo - code at 0x0a8f - stored at 0x60bf - then code at 0x06d8 (similar code in 'wolfman') - sound related ?
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x20, "01" )
-//	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a62 - tables at 0x0b17 (4 * 3) - credits BCD stored at 0x6173
-//	PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a55 - stored at 0x60bb
+//  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a62 - tables at 0x0b17 (4 * 3) - credits BCD stored at 0x6173
+//  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a55 - stored at 0x60bb
 	/* Replay at 2400k 2800k and 3200k / High-score 3210k - code at 0x09f3 and 0x0b23 - tables at 0x0aff (1 * 9) and 0x0b08 (1 * 3) */
 	PORT_DIPNAME( 0x02, 0x00, "DSW0-7 Unknown" )            // code at 0x0342 - stored at 0x60a7
 	PORT_DIPSETTING(    0x00, "14" )
@@ -512,7 +512,7 @@ static INPUT_PORTS_START( odisea )
 	PORT_DIPSETTING(    0x28, DEF_STR( Off ) )                        // does NOT clear RAM on reset
 	PORT_DIPSETTING(    0x20, "Displays Coins" )                      // Coin A (0x6176++) on player 3 and coin C (0x617c++) on player 1 - also clears RAM on reset
 	PORT_DIPSETTING(    0x08, "Displays Games, Replays & EB" )        // games started (0x617f++) on player 2, replays (0x6182++) on player 3 and EB (0x6185++) on player 4 - also clears RAM on reset
-//	PORT_DIPSETTING(    0x00, "INVALID" )
+//  PORT_DIPSETTING(    0x00, "INVALID" )
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )

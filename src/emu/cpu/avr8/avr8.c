@@ -670,7 +670,7 @@ static CPU_EXECUTE( avr8 )
 								offs = KCONST22(op) << 16;
                                 cpustate->pc++;
                                 offs |= READ_PRG_16(cpustate, cpustate->pc);
-                                cpustate->pc = offs;								
+                                cpustate->pc = offs;
 								cpustate->pc--;
 								opcycles = 4;
                                 break;
@@ -681,7 +681,7 @@ static CPU_EXECUTE( avr8 )
 								offs = KCONST22(op) << 16;
                                 cpustate->pc++;
                                 offs |= READ_PRG_16(cpustate, cpustate->pc);
-                                cpustate->pc = offs;								
+                                cpustate->pc = offs;
 								cpustate->pc--;
                                 break;
                             default:
@@ -1163,14 +1163,14 @@ static CPU_INIT( atmega88 )
 {
 	CPU_INIT_CALL(avr8);
     avr8_state *cpustate = get_safe_token(device);
-	cpustate->addr_mask = 0x0fff;	
+	cpustate->addr_mask = 0x0fff;
 }
 
 static CPU_INIT( atmega644 )
 {
 	CPU_INIT_CALL(avr8);
     avr8_state *cpustate = get_safe_token(device);
-	cpustate->addr_mask = 0xffff;	
+	cpustate->addr_mask = 0xffff;
 }
 
 CPU_GET_INFO( atmega88 )

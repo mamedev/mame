@@ -2555,8 +2555,8 @@ static INPUT_PORTS_START( dharma )
 
 	PORT_DIPNAME( 0x0300, 0x0300, "Time" )			PORT_DIPLOCATION("SW2:1,2")	// Check code at 0x00da0a and see notes
 	PORT_DIPSETTING(      0x0000, "Table 1" )	//   Table offset : 0x00e668
-//  PORT_DIPSETTING(      0x0100, "Table 1" )		//   Table offset : 0x00e6c0
-//  PORT_DIPSETTING(      0x0200, "Table 2" )		//   Table offset : 0x00e718
+//  PORT_DIPSETTING(      0x0100, "Table 1" )       //   Table offset : 0x00e6c0
+//  PORT_DIPSETTING(      0x0200, "Table 2" )       //   Table offset : 0x00e718
 	PORT_DIPSETTING(      0x0300, "Table 2" )	//   Table offset : 0x00e770
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4")	// Timer (crab) speed
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )		//   Slow
@@ -5883,7 +5883,7 @@ VG420
        14100
 
 
-    SA  SA  SA  SA  SA  SA  SA  SA 
+    SA  SA  SA  SA  SA  SA  SA  SA
     A08 A07 A06 A05 A04 A03 A02 A01
 
 CPU     :MC68000P12

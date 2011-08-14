@@ -1,6 +1,6 @@
 /*
 
-Stella 
+Stella
 German Fruit Machines / Gambling Machines
 
 Possibly related to ADP hardware?

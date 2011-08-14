@@ -409,7 +409,7 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0000, "1" )						/* Service Mode Shows 1 */
 	PORT_DIPSETTING(      0x00c0, "3" )						/* Service Mode Shows 3, Service Mode has 2 & 3 reversed compared to game play */
 	PORT_DIPSETTING(      0x0080, "5" )						/* Service Mode Shows 2, Service Mode has 2 & 3 reversed compared to game play */
-//	PORT_DIPSETTING(      0x0040, "Error!!" )				/* Service Mode Shows "Error" */
+//  PORT_DIPSETTING(      0x0040, "Error!!" )               /* Service Mode Shows "Error" */
 	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW4:1,2,3,4") /* Service Mode Shows Player 2 */
 	PORT_DIPSETTING(      0x8000, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x9000, DEF_STR( 7C_1C ) )
@@ -424,8 +424,8 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x2000, "2C Start / 1C Continue" )
-//	PORT_DIPSETTING(      0x7000, "Error!!" )				// Causes graphics issues - Service Mode shows "Error"
-//	PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )		// Duplicate 2C_1C
+//  PORT_DIPSETTING(      0x7000, "Error!!" )               // Causes graphics issues - Service Mode shows "Error"
+//  PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )        // Duplicate 2C_1C
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW2",0x0f00,PORTCOND_NOTEQUALS,0x0000)
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		PORT_CONDITION("DSW2",0x0f00,PORTCOND_EQUALS,0x0000)	// Set both for Free Play
 	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW4:5,6,7,8") /* Service Mode Shows Player 1 */
@@ -442,8 +442,8 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0200, "2C Start / 1C Continue" )
-//	PORT_DIPSETTING(      0x0700, "Error!!" )				// Causes graphics issues - Service Mode shows "Error"
-//	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )		// Duplicate 2C_1C
+//  PORT_DIPSETTING(      0x0700, "Error!!" )               // Causes graphics issues - Service Mode shows "Error"
+//  PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )        // Duplicate 2C_1C
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW2",0xf000,PORTCOND_NOTEQUALS,0x0000)
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		PORT_CONDITION("DSW2",0xf000,PORTCOND_EQUALS,0x0000)	// Set both for Free Play
 INPUT_PORTS_END

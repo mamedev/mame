@@ -90,7 +90,7 @@ INLINE h83xx_state *get_safe_token(device_t *device)
 	assert(device->type() == H83002 ||
 		   device->type() == H83007 ||
 		   device->type() == H83044 ||
-		   device->type() == H83334 || 
+		   device->type() == H83334 ||
 		   device->type() == H8S2241 ||
 		   device->type() == H8S2246 ||
 		   device->type() == H8S2323);

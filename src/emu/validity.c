@@ -443,7 +443,7 @@ static bool validate_roms(driver_enumerator &drivlist, region_array *rgninfo, ga
 	bool error = false;
 
 	const rom_source *first_source = rom_first_source(config);
-	
+
 	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
 	for (const rom_source *source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 	{
@@ -563,7 +563,7 @@ static bool validate_roms(driver_enumerator &drivlist, region_array *rgninfo, ga
 		/* final check for empty regions */
 		if (items_since_region == 0)
 			mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver.source_file, driver.name);
-		
+
 		if (source!=first_source) {
 			// check for device roms
 			device_type type = source->type();
@@ -577,13 +577,13 @@ static bool validate_roms(driver_enumerator &drivlist, region_array *rgninfo, ga
 			if (cnt > 0) {
 				bool found = false;
 				for(int i=0;i<m_device_count;i++) {
-					if (type==*s_devices_sorted[i]) 
+					if (type==*s_devices_sorted[i])
 					{
 						found = true;
 						break;
 					}
 				}
-				if (!found) 
+				if (!found)
 					mame_printf_error("Device %s is not listed in device list\n", source->shortname());
 			}
 		}
@@ -1154,8 +1154,8 @@ static bool validate_slots(driver_enumerator &drivlist)
 		{
 			device_t *dev = (*intf[j].devtype)(config, "dummy", config.devicelist().first(), 0);
 			dev->config_complete();
-			if (dev->rom_region() != NULL) 
-			{			
+			if (dev->rom_region() != NULL)
+			{
 				int cnt = 0;
 				for (const rom_entry *romp = rom_first_region(*dev); !ROMENTRY_ISEND(romp); romp++)
 				{
@@ -1163,11 +1163,11 @@ static bool validate_slots(driver_enumerator &drivlist)
 						cnt++;
 					}
 				}
-				
+
 				if (cnt > 0) {
 					bool found = false;
 					for(int i=0;i<m_device_count;i++) {
-						if (intf[j].devtype==*s_devices_sorted[i]) 
+						if (intf[j].devtype==*s_devices_sorted[i])
 						{
 							found = true;
 							break;
@@ -1179,7 +1179,7 @@ static bool validate_slots(driver_enumerator &drivlist)
 					}
 				}
 			}
-			global_free(dev);			
+			global_free(dev);
 		}
 	}
 	return error;

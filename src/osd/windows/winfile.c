@@ -102,7 +102,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		filerr = FILERR_OUT_OF_MEMORY;
 		goto error;
 	}
-	
+
 	if (win_check_socket_path(path))
 	{
 		(*file)->type = WINFILE_SOCKET;
@@ -111,7 +111,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	(*file)->type = WINFILE_FILE;
-	
+
 	// convert the path into something Windows compatible
 	dst = (*file)->filename;
 	for (src = t_path; *src != 0; src++)
@@ -214,7 +214,7 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, 
 		case WINFILE_SOCKET:
 			return win_read_socket(file, buffer, offset, length, actual);
 			break;
-				
+
 	}
 	return FILERR_NONE;
 }
@@ -250,7 +250,7 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 		case WINFILE_SOCKET:
 			return win_write_socket(file, buffer, offset, length, actual);
 			break;
-				
+
 	}
 	return FILERR_NONE;
 }
@@ -273,7 +273,7 @@ file_error osd_close(osd_file *file)
 			return win_close_socket(file);
 			break;
 	}
-	return FILERR_NONE;	
+	return FILERR_NONE;
 }
 
 

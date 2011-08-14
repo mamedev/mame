@@ -1,14 +1,14 @@
 /*
 
-	Pluto 5
+    Pluto 5
 
     Skeleton Driver - For note keeping, no sets currently supported.
 
-	68340 based system like MPU5/SC4
-	used by JPM? Manufactuered by Heber Ltd.
+    68340 based system like MPU5/SC4
+    used by JPM? Manufactuered by Heber Ltd.
 
-	Known games
-	Club DNA?
+    Known games
+    Club DNA?
 
 
 */

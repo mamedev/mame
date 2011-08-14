@@ -1,7 +1,7 @@
 /* Castle Mach2000 Hardware
-  
+
   Mechanical Fruit Machines with DMD display
-  
+
   motherboard pic:
   http://mamedev.emulab.it/haze/source_refs/mach2000.jpg
 

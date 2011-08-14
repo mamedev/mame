@@ -1,11 +1,11 @@
 /*
 
-	Scorpion 4
+    Scorpion 4
 
     Skeleton Driver
 
-	what's the difference between this and Scorpion 5? Later revisons of many games appear
-	to be on the latter.
+    what's the difference between this and Scorpion 5? Later revisons of many games appear
+    to be on the latter.
 */
 
 #include "emu.h"
@@ -41,9 +41,9 @@ ROM_START( sc4bbust )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "95406101.evn", 0x00000, 0x080000, CRC(b6accc1e) SHA1(dec2c3710967605f12a5e07d0fd43f11fc6e1f03) )
 	ROM_LOAD16_BYTE( "95406100.odd", 0x00001, 0x080000, CRC(b3b8ed69) SHA1(6c96e30add751b039b305983ef15cd2c68dfe430) )
-	
+
 	ROM_REGION( 0x100000, "ym", 0 )
-	ROM_LOAD( "95008050.bin", 0x0000, 0x0fc8a1, CRC(8f1a49b5) SHA1(9d75e7118c628b3665a31376a3e35797b7058f6b) )	
+	ROM_LOAD( "95008050.bin", 0x0000, 0x0fc8a1, CRC(8f1a49b5) SHA1(9d75e7118c628b3665a31376a3e35797b7058f6b) )
 ROM_END
 
 

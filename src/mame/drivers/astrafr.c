@@ -57,7 +57,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( astra_single, astrafr_state )
 
-	MCFG_CPU_ADD("maincpu", M68020, 16000000) 
+	MCFG_CPU_ADD("maincpu", M68020, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astra_map)
 MACHINE_CONFIG_END
 
@@ -967,7 +967,7 @@ ROM_END
 
 ROM_START( as_otra )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "otr102.u1", 0x00000, 0x040000, NO_DUMP )	
+	ROM_LOAD16_BYTE( "otr102.u1", 0x00000, 0x040000, NO_DUMP )
 	ROM_LOAD16_BYTE( "otr102.u2", 0x00001, 0x040000, CRC(57310d5e) SHA1(585ff22a52e8c2b0be43051cdd1c534a894a4d6f) )
 ROM_END
 
@@ -1557,7 +1557,7 @@ ROM_END
 ROM_START( as_twp )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "twp1_06.bin", 0x0000, 0x080000, CRC(c90090d1) SHA1(1abd0ed0182171b05d3d679e788d7849075783ee) )
-	
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "twp1_06g.bin", 0x0000, 0x080000, CRC(56b96be1) SHA1(f4640c2f2d2335c07eda546b03c7f5ed5ecf3143) )
 	ROM_LOAD( "twp1_06p.bin", 0x0000, 0x080000, CRC(c0fb0f62) SHA1(2e0ef0e5df3e261c3c42609fa5272e8257904ca8) )
@@ -1566,7 +1566,7 @@ ROM_END
 ROM_START( as_twpa )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "twp104.u1", 0x0000, 0x080000, CRC(c56576c1) SHA1(f72758a1a16fdc2083df3477cec93dacf3b24ba3) )
-		
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "twp104d.u1", 0x0000, 0x080000, CRC(cc9ee972) SHA1(1ca54e5528f882d089f9267f2a199c28915f5e73) )
 ROM_END
@@ -1648,7 +1648,7 @@ ROM_END
 ROM_START( as_ww )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "ww2_03.bin", 0x0000, 0x080000, CRC(8bb26a49) SHA1(9de143cde5578cb4fe0c9295e279d6f155b1337b) )
-		
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "ww2_03g.bin", 0x0000, 0x080000, CRC(140b9179) SHA1(6c01a42a76ab9733fd6775ae3b6fd795f408e2d0) )
 	ROM_LOAD( "wickedwilly.bin", 0x0000, 0x080000, CRC(8249f5fa) SHA1(d7739f7aeb529a82390c3104d032024fbe917213) )
@@ -1657,7 +1657,7 @@ ROM_END
 ROM_START( as_wwa )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "ww204.u1", 0x0000, 0x080000, CRC(0d161888) SHA1(55f1666b8c34da237280cbd266dd3839b428a5e9) )
-		
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "ww204d.u1", 0x0000, 0x080000, CRC(04ed873b) SHA1(fa00273952727cb78bf868a44f02888053c88515) )
 ROM_END
@@ -1665,7 +1665,7 @@ ROM_END
 ROM_START( as_wwb )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "ww205.u1", 0x0000, 0x080000, CRC(b0b34fe9) SHA1(f1fa8885768145191c72351b49b5da0d2091d502) )
-		
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "ww205d.u1", 0x0000, 0x080000, CRC(b948d05a) SHA1(a4d969683d77b04a762206c11dcebad74d402604) )
 ROM_END
@@ -1673,7 +1673,7 @@ ROM_END
 ROM_START( as_wwc )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "ww104.bin", 0x0000, 0x080000, CRC(791d09b4) SHA1(6852a6da56ed877add503762fba38af7fbe0dc06) )
-		
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "ww104d.bin", 0x0000, 0x080000, CRC(70e69607) SHA1(b3f223f82db44c50325a330f7654d3b621c470ec) )
 ROM_END
@@ -1681,7 +1681,7 @@ ROM_END
 ROM_START( as_wwd )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "ww103.bin", 0x0000, 0x080000, CRC(bc23b12e) SHA1(2ff1348d6b92c58d2c5475c16f52d41d8b14e62a) )
-		
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "ww103d.bin", 0x0000, 0x080000, CRC(b5d82e9d) SHA1(4b6a90480f9429f04cd349c1ea83da9f8cfa3f68) )
 ROM_END
@@ -1689,7 +1689,7 @@ ROM_END
 ROM_START( as_wwe )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "ww1_02.bin", 0x0000, 0x080000, CRC(ff3a167c) SHA1(fce5bd1cb593e71776d2724eda00f6f31843f495) )
-		
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "ww1_02g.bin", 0x0000, 0x080000, CRC(6083ed4c) SHA1(33b7b8752c10ebac239e153b317f8cae72a0b8ea) )
 	ROM_LOAD( "ww1_02p.bin", 0x0000, 0x080000, CRC(f6c189cf) SHA1(59c61a635b5021fad6afca67be1db0275f49f290) )
@@ -1716,7 +1716,7 @@ void astra_addresslines( UINT16* src, size_t srcsize, int small )
 
 	if (small) blocksize= 0x100000/2;
 	else blocksize= 0x100000;
-	
+
 	for (int block = 0; block < srcsize; block += blocksize)
 	{
 		for (int x = 0; x<blocksize/2;x+=2)
@@ -1727,7 +1727,7 @@ void astra_addresslines( UINT16* src, size_t srcsize, int small )
 	}
 
 	memcpy(src,dst, srcsize);
-	free(dst);	
+	free(dst);
 }
 
 
@@ -1839,117 +1839,117 @@ GAME( 200?, as_djp,       0			, astra_single,    astrafr,    astradec, ROT0,  "A
 GAME( 200?, as_djpa,      0			, astra_single,    astrafr,    astradec_sml, ROT0,  "Astra", "Double Jackpot (Astra, V004)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_djpb,      0			, astra_single,    astrafr,    astradec, ROT0,  "Astra", "Double Jackpot (Astra, V109)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_cshcs,     0			, astra_single,    astrafr,    0, ROT0,  "Lowen", "Cash Castle (Lowen, V006)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_colmn,     0			, astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Colour Of Money (Astra, V200)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_colmna,    as_colmn	, astra_single,    astrafr,    0, 				ROT0,  "Astra", "Colour Of Money (Astra, V107)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_colmnb,    as_colmn	, astra_single,    astrafr,    0, 				ROT0,  "Astra", "Colour Of Money (Astra, V108)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_colmnc,    as_colmn	, astra_single,    astrafr,    0, 				ROT0,  "Astra", "Colour Of Money (Astra, V109)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_colmnd,    as_colmn	, astra_single,    astrafr,    0, 				ROT0,  "Astra", "Colour Of Money (Astra, V908)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jackb,     0			, astra_single,    astrafr,    0, 	ROT0,  "Astra", "Jackpot Bell (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jpx,     0			, astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jackpot X (Astra, V100)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jpxa,    as_jpx		, astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jackpot X (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jpxb,    as_jpx		, astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jackpot X (Astra, V002)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jolly,    0		, astra_single,    astrafr,    0, 	ROT0,  "Astra", "Jolly Roger (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jmpj,    0		, astra_single,    astrafr,    0, 	ROT0,  "Astra", "Jumping Jackpots (Astra, V100)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jmpja,   as_jmpj , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Jumping Jackpots (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jjive,    0		  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jungle Jive (Astra, V107)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jjivea,   as_jjive , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jungle Jive (Astra, V106)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jjiveb,   as_jjive , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jungle Jive (Astra, V104)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jjivec,   as_jjive , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jungle Jive (Astra, V102)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jjived,   as_jjive , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jungle Jive (Astra, V101)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jjivee,   as_jjive , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jungle Jive (Astra, V101, alt)"	, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jjivef,   as_jjive , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jungle Jive (Astra, V004)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_jjiveg,   as_jjive , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Jungle Jive (Astra, V005)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_kingc,   0		 , astra_single,    astrafr,    0, 	ROT0,  "Astra", "King Cash (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_kingca,  as_kingc , astra_single,    astrafr,    0, 	ROT0,  "Astra", "King Cash (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_koc,   0		 , astra_single,    astrafr,    0, 	ROT0,  "Astra", "King Of Clubs (Astra, V200)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_koca,  as_koc , astra_single,    astrafr,    0, 	ROT0,  "Astra", "King Of Clubs (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_lbt,   0		 , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Little Big 10 (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_lbta,  as_lbt , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Little Big 10 (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_colmn,     0			, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Colour Of Money (Astra, V200)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_colmna,    as_colmn	, astra_single,    astrafr,    0,				ROT0,  "Astra", "Colour Of Money (Astra, V107)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_colmnb,    as_colmn	, astra_single,    astrafr,    0,				ROT0,  "Astra", "Colour Of Money (Astra, V108)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_colmnc,    as_colmn	, astra_single,    astrafr,    0,				ROT0,  "Astra", "Colour Of Money (Astra, V109)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_colmnd,    as_colmn	, astra_single,    astrafr,    0,				ROT0,  "Astra", "Colour Of Money (Astra, V908)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jackb,     0			, astra_single,    astrafr,    0,	ROT0,  "Astra", "Jackpot Bell (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jpx,     0			, astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jackpot X (Astra, V100)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jpxa,    as_jpx		, astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jackpot X (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jpxb,    as_jpx		, astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jackpot X (Astra, V002)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jolly,    0		, astra_single,    astrafr,    0,	ROT0,  "Astra", "Jolly Roger (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jmpj,    0		, astra_single,    astrafr,    0,	ROT0,  "Astra", "Jumping Jackpots (Astra, V100)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jmpja,   as_jmpj , astra_single,    astrafr,    0,	ROT0,  "Astra", "Jumping Jackpots (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jjive,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jungle Jive (Astra, V107)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jjivea,   as_jjive , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jungle Jive (Astra, V106)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jjiveb,   as_jjive , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jungle Jive (Astra, V104)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jjivec,   as_jjive , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jungle Jive (Astra, V102)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jjived,   as_jjive , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jungle Jive (Astra, V101)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jjivee,   as_jjive , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jungle Jive (Astra, V101, alt)"	, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jjivef,   as_jjive , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jungle Jive (Astra, V004)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_jjiveg,   as_jjive , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Jungle Jive (Astra, V005)"			, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_kingc,   0		 , astra_single,    astrafr,    0,	ROT0,  "Astra", "King Cash (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_kingca,  as_kingc , astra_single,    astrafr,    0,	ROT0,  "Astra", "King Cash (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_koc,   0		 , astra_single,    astrafr,    0,	ROT0,  "Astra", "King Of Clubs (Astra, V200)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_koca,  as_koc , astra_single,    astrafr,    0,	ROT0,  "Astra", "King Of Clubs (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_lbt,   0		 , astra_single,    astrafr,    0,	ROT0,  "Astra", "Little Big 10 (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_lbta,  as_lbt , astra_single,    astrafr,    0,	ROT0,  "Astra", "Little Big 10 (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
-GAME( 200?, as_ldl,     0			, astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Little Devils (Astra, V700)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_ldla,    as_ldl		, astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Little Devils (Astra, V600)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_ldlb,    as_ldl		, astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Little Devils (Astra, V312)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_ldlc,    as_ldl		, astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Little Devils (Astra, V003)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_ldld,    as_ldl		, astra_single,    astrafr,    0, 				ROT0,  "Astra", "Little Devils (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_ldle,    as_ldl		, astra_single,    astrafr,    0, 				ROT0,  "Astra", "Little Devils (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_mp,     0			, astra_single,    astrafr,    astradec, 	ROT0,  "Lowen", "Mission Possible (Lowen, V118)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_mp2,     0			, astra_single,    astrafr,    0, 	ROT0,  "Lowen", "Mission Possible 2 (Lowen, V114)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_otr,     0			, astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Over The Rainbow (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_otra,    as_otr		, astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Over The Rainbow (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // incomplete set
-GAME( 200?, as_ptf,    0		, astrafr_dual,    astrafr,    astradec_sml_dual, 	ROT0,  "Astra", "Party Fruits (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // strange extra sound(?) roms in here
-GAME( 200?, as_ptfa,   as_ptf	, astrafr_dual,    astrafr,    astradec_sml_dual, 	ROT0,  "Astra", "Party Fruits (Astra, V803)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_ptfb,   as_ptf	, astrafr_dual,    astrafr,    astradec_sml_dual, 	ROT0,  "Astra", "Party Fruits (Astra, V905)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_pia,     0			, astra_single,    astrafr,    0, 	ROT0,  "Astra", "Pay It Again (Astra, V202)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_piaa,    as_pia		, astra_single,    astrafr,    0, 	ROT0,  "Astra", "Pay It Again (Astra, V206)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_piab,    as_pia		, astra_single,    astrafr,    0, 	ROT0,  "Astra", "Pay It Again (Astra, V904)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_pharg,    0	 	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Pharaoh's Gold (Astra, V005)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_pharga,   as_pharg , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Pharaoh's Gold (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_phargb,   as_pharg , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Pharaoh's Gold (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_phargc,   as_pharg , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Pharaoh's Gold (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_phargd,   as_pharg , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Pharaoh's Gold (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_pharge,   as_pharg , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Pharaoh's Gold (Astra, V107)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_pb,   0 , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Piggy Banking (Astra, V105)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ldl,     0			, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V700)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ldla,    as_ldl		, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V600)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ldlb,    as_ldl		, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V312)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ldlc,    as_ldl		, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V003)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ldld,    as_ldl		, astra_single,    astrafr,    0,				ROT0,  "Astra", "Little Devils (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ldle,    as_ldl		, astra_single,    astrafr,    0,				ROT0,  "Astra", "Little Devils (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_mp,     0			, astra_single,    astrafr,    astradec,	ROT0,  "Lowen", "Mission Possible (Lowen, V118)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_mp2,     0			, astra_single,    astrafr,    0,	ROT0,  "Lowen", "Mission Possible 2 (Lowen, V114)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_otr,     0			, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Over The Rainbow (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_otra,    as_otr		, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Over The Rainbow (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // incomplete set
+GAME( 200?, as_ptf,    0		, astrafr_dual,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // strange extra sound(?) roms in here
+GAME( 200?, as_ptfa,   as_ptf	, astrafr_dual,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V803)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ptfb,   as_ptf	, astrafr_dual,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V905)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_pia,     0			, astra_single,    astrafr,    0,	ROT0,  "Astra", "Pay It Again (Astra, V202)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_piaa,    as_pia		, astra_single,    astrafr,    0,	ROT0,  "Astra", "Pay It Again (Astra, V206)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_piab,    as_pia		, astra_single,    astrafr,    0,	ROT0,  "Astra", "Pay It Again (Astra, V904)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_pharg,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V005)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_pharga,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_phargb,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_phargc,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_phargd,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_pharge,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V107)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_pb,   0 , astra_single,    astrafr,    0,	ROT0,  "Astra", "Piggy Banking (Astra, V105)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 // this might be another mix of master / slave sets, and multiple games....
-GAME( 200?, as_rtr,    0	 	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rtra,   as_rtr	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 1)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rtrb,   as_rtr	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 2)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rtrc,   as_rtr	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 3)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rtrd,   as_rtr	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V100, )"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rtre,   as_rtr	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V100, alt)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rtrf,   as_rtr	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V200)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rtrg,   as_rtr	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V200, alt)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rtrh,   as_rtr	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Ready To Roll (Astra, V202)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtr,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtra,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 1)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtrb,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 2)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtrc,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 3)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtrd,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V100, )"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtre,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V100, alt)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtrf,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V200)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtrg,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V200, alt)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rtrh,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V202)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
-GAME( 200?, as_rab,    0	 	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V105)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rab,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V105)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_raba,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_rabb,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V107)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_rabc,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rbg,    0	 	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V304)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rbg,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V304)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_rbga,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V303)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_rbgb,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_rbgc,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_rbgd,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_rbge,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V008)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rbglo,    0	 	  , astrafr_dual,    astrafr,    astradec_sml_dual, 	ROT0,  "Lowen", "River Boat Gambler (Lowen, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_rox,    0	 	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Roll X (Astra, V006)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_csv,    0	 	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Slot Slant (?) (Astra, V202)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_sltcl,    0	 	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Slots Classic (?) (Astra)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_stp,    0	 	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Stampede (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_stpa,   as_stp 	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Stampede (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_stpb,   as_stp	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Stampede (Astra, V105)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_siu,    0	 	  , astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Step It Up (Astra, V202)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // extra sound roms(?) in this set
-GAME( 200?, as_siua,   as_siu	  , astra_single,    astrafr,    astradec_sml, 	ROT0,  "Astra", "Step It Up (Astra, V203)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_sld,    0	 	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V700)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rbglo,    0		  , astrafr_dual,    astrafr,    astradec_sml_dual, 	ROT0,  "Lowen", "River Boat Gambler (Lowen, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_rox,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Roll X (Astra, V006)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_csv,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Slot Slant (?) (Astra, V202)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_sltcl,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Slots Classic (?) (Astra)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_stp,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_stpa,   as_stp	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_stpb,   as_stp	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V105)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_siu,    0		  , astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Step It Up (Astra, V202)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // extra sound roms(?) in this set
+GAME( 200?, as_siua,   as_siu	  , astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Step It Up (Astra, V203)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_sld,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V700)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_slda,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V600)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_sldb,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V500)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_sldc,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V400)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_sldd,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V200)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_slde,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_tem,   0     	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Temptation (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_tema,  as_tem	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Temptation (Astra, V006)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_tem,   0     	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Temptation (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_tema,  as_tem	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Temptation (Astra, V006)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_tbl,   0				  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_tbla,  as_tbl	   	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V105)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_tblb,  as_tbl	   	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_tblc,  as_tbl	   	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_tbld,  as_tbl	   	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V304)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_tble,  as_tbl	   	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V303)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_tblf,  as_tbl	   	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V301)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_td,   0     	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Twin Dragons (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_tbla,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V105)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_tblb,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_tblc,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_tbld,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V304)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_tble,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V303)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_tblf,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V301)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_td,   0  	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Twin Dragons (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 GAME( 200?, as_twp,   0     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_twpa,  as_twp      , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_vn,    0	 	  , astrafr_dual,    astrafr,    astradec_dual, 	ROT0,  "Astra", "Vegas Nights (Astra, V205)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_vcv,    0	 	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Viva Cash Vegas (Astra, V005)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_vcva,   as_vcv	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Viva Cash Vegas (Astra, V107)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_vcvb,   as_vcv	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Viva Cash Vegas (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_vcvc,   as_vcv	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Viva Cash Vegas (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_vcvd,   as_vcv	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Viva Cash Vegas (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_vcve,   as_vcv	  , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Viva Cash Vegas (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_ww,   0       	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V203)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_wwa,  as_ww     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V204)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_wwb,  as_ww     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V205)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_wwc,  as_ww     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_wwd,  as_ww     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_wwe,  as_ww     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_ws,   0		 , astra_single,    astrafr,    astradec, 	ROT0,  "Astra", "Win Streak (Astra, V100)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // incomplete dump
+GAME( 200?, as_vn,    0		  , astrafr_dual,    astrafr,    astradec_dual, 	ROT0,  "Astra", "Vegas Nights (Astra, V205)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_vcv,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V005)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_vcva,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V107)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_vcvb,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V106)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_vcvc,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_vcvd,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_vcve,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V101)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ww,   0      	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V203)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_wwa,  as_ww  	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V204)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_wwb,  as_ww  	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V205)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_wwc,  as_ww  	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V104)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_wwd,  as_ww  	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V103)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_wwe,  as_ww  	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Wicked Willy (Astra, V102)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 200?, as_ws,   0		 , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Win Streak (Astra, V100)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // incomplete dump
 

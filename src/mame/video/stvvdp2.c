@@ -4277,7 +4277,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
       at the very list throw up a few errors if the tilemaps want to do something we don't support yet */
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-//	int window_applied = 0;
+//  int window_applied = 0;
 	rectangle mycliprect;
 	mycliprect.min_x = cliprect->min_x;
 	mycliprect.max_x = cliprect->max_x;
@@ -4292,14 +4292,14 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		return;
 	}
 
-//	window_applied =
+//  window_applied =
 	stv_vdp2_apply_window_on_layer(machine,&mycliprect);
 
 	if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 	{
 		/*elandore doesn't like current cliprect code,will be worked on...*/
 		//if ( window_applied && stv2_current_tilemap.colour_depth != 4)
-		//	stv2_current_tilemap.window_control = 0;
+		//  stv2_current_tilemap.window_control = 0;
 
 		stv_vdp2_draw_basic_bitmap(machine, bitmap, &mycliprect);
 	}
@@ -4340,7 +4340,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		/* Cleopatra Fortune Transparent Shadow */
 		/* Pretty Fighter X Back & Transparent Shadow*/
 		//if(STV_VDP2_SDCTL & 0x0120)
-		//	popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
+		//  popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
 
 		/* Langrisser III bit 3 normal, bit 1 during battle field */
 		/* Metal Slug bit 0 during gameplay */
@@ -4365,7 +4365,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
 		/* Layer Section */
 		//if(STV_VDP2_W0LWE || STV_VDP2_W1LWE)
-		//	popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
+		//  popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
 
 		/* Akumajou Dracula, bits 2-4 */
 		/* Arcana Strikes bit 5 */
@@ -5476,7 +5476,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 
 	interlace = (STV_VDP2_LSMD == 3)+1;
 
-//	popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
+//  popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
 
 	/* draw black if BDCLMD and DISP are cleared */
 	if(!(STV_VDP2_BDCLMD) && !(STV_VDP2_DISP))

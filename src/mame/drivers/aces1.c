@@ -81,7 +81,7 @@ ROM_END
 
 ROM_START( ac1pster )
 	ROM_REGION( 0x80000, "maincpu", 0 )
- 	ROM_LOAD( "pstrling.bin", 0x0000, 0x008000, CRC(ae46e199) SHA1(4cbe1205fa22e54b730f1fa5c01151368f35ed5f) )
+	ROM_LOAD( "pstrling.bin", 0x0000, 0x008000, CRC(ae46e199) SHA1(4cbe1205fa22e54b730f1fa5c01151368f35ed5f) )
 ROM_END
 
 ROM_START( ac1pstrt )

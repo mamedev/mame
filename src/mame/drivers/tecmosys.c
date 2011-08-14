@@ -871,7 +871,7 @@ static const ymf262_interface tecmosys_ymf262_interface =
 
 static MACHINE_START( tecmosys )
 {
-//	tecmosys_state *state = machine.driver_data<tecmosys_state>();
+//  tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	memory_configure_bank(machine, "bank1", 0, 16, machine.region("audiocpu")->base(), 0x4000);
 }
 

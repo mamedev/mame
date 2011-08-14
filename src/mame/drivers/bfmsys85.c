@@ -649,36 +649,36 @@ ROM_END
 DRIVER_INIT( decode )
 {
 	bfmsys85_state *state = machine.driver_data<bfmsys85_state>();
-	bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);	
+	bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);
 }
 
-GAME( 1989, b85scard	, 0			, bfmsys85, bfmsys85, 		0		,	  0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1989, b85cexpl	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Cash Explosion (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, b85royal	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Royal (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK ) // 'The Royal' ?? hack of the Ritz or Big Deal Club?
-GAME( 1987, b85bdclb	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85bdclba	, b85bdclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85bdclbb	, b85bdclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85cblit	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85cblita	, b85cblit	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85cblitb	, b85cblit	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1989, b85clbpm	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Club Premier (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1989, b85dbldl	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Double Dealer (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1985, b85dbldla	, b85dbldl	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Double Dealer (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85hilo		, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Hi Lo Silver (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, b85hiloa	, b85hilo	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Hi Lo Silver (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, b85ritz		, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK ) // alt version of Big Deal Club?
-GAME( 1988, b85ritza	, b85ritz	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, b85ritzb	, b85ritz	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, b85ritzc	, b85ritz	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85ritzd	, b85ritz	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "The Ritz (System 85, set 5)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85jpclb	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1987, b85jpclba	, b85jpclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, b85jpclbb	, b85jpclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, b85jpclbc	, b85jpclb	, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1992, b85jkwld	, 0			, bfmsys85, bfmsys85, 		0		,	  0,       "BFM/ELAM",   "Jokers Wild (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1986, b85lucky	, 0			, bfmsys85, bfmsys85, 		0		,	  0,       "BFM/ELAM",   "Lucky Cards (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1992, b85luckd	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM/ELAM",   "Lucky Dice (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, b85sngam	, 0			, bfmsys85, bfmsys85, 		decode	,	  0,       "BFM",   "Super Nudge Gambler (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1989, b85scard	, 0			, bfmsys85, bfmsys85,		0		,	  0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1989, b85cexpl	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Cash Explosion (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85royal	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "The Royal (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK ) // 'The Royal' ?? hack of the Ritz or Big Deal Club?
+GAME( 1987, b85bdclb	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85bdclba	, b85bdclb	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85bdclbb	, b85bdclb	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85cblit	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85cblita	, b85cblit	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85cblitb	, b85cblit	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Cash Blitz (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1989, b85clbpm	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Club Premier (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1989, b85dbldl	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Double Dealer (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1985, b85dbldla	, b85dbldl	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Double Dealer (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85hilo		, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Hi Lo Silver (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85hiloa	, b85hilo	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Hi Lo Silver (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85ritz		, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "The Ritz (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK ) // alt version of Big Deal Club?
+GAME( 1988, b85ritza	, b85ritz	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "The Ritz (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85ritzb	, b85ritz	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "The Ritz (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85ritzc	, b85ritz	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "The Ritz (System 85, set 4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85ritzd	, b85ritz	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "The Ritz (System 85, set 5)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85jpclb	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1987, b85jpclba	, b85jpclb	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85jpclbb	, b85jpclb	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85jpclbc	, b85jpclb	, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1992, b85jkwld	, 0			, bfmsys85, bfmsys85,		0		,	  0,       "BFM/ELAM",   "Jokers Wild (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1986, b85lucky	, 0			, bfmsys85, bfmsys85,		0		,	  0,       "BFM/ELAM",   "Lucky Cards (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1992, b85luckd	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM/ELAM",   "Lucky Dice (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, b85sngam	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Super Nudge Gambler (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 199?, b85cops		, 0			, bfmsys85, bfmsys85,       0		, 0,		 "BFM",   "Cops 'n' Robbers (Bellfruit) (Dutch) (System 85)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 

@@ -20,7 +20,7 @@ by pushing the buttons in this order: 1-4-1-4-2-1-3-5 ('zvzvxzcb' in mame)
 Doing this with the default dipswitches results in an error; The code needs to be investigated.
 Setting all dipswitches active and dipswitch 10 inactive allows game/gfx switching to work, but gfx
 are all corrupt/scrambled.
-Also the dipswitches are active low/inverted, since on the machine this was tested on dipswitches 2,3,5,6,8 were ON, and 1,4 and 7 were OFF. 
+Also the dipswitches are active low/inverted, since on the machine this was tested on dipswitches 2,3,5,6,8 were ON, and 1,4 and 7 were OFF.
 There are only 8 dipswitches populated on the Dwarf's den boards seen so far.
 
 
@@ -100,7 +100,7 @@ A |||                                                     |______|   |          
 9 = AUDIO OUTPUT (the audio amplifier is part of the PSU)
 11,12 = LAMP GROUND (tied together, only used by the four ULN2803 Darlington Arrays and connectors C and indirectly D)
 
-  
+
 =====================================================================================================
 (quarterh, quarterhb)
 
@@ -639,19 +639,19 @@ static INPUT_PORTS_START( dwarfd )
 	PORT_DIPSETTING(    0x00, "Changes Locked/Preset #1" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/*PORT_DIPNAME( 0x18, 0x00, "Operator Settings Mode" ) PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    0x18, "Changes Allowed" )
-	PORT_DIPSETTING(    0x10, "Preset #1" )
-	PORT_DIPSETTING(    0x08, "Preset #2" )
-	PORT_DIPSETTING(    0x00, "Changes locked" )
-	PORT_DIPNAME( 0x20, 0x00, "Dwarf's Den Gfx" ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Large Character Gfx" ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Full Card Gfx" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
+    PORT_DIPSETTING(    0x18, "Changes Allowed" )
+    PORT_DIPSETTING(    0x10, "Preset #1" )
+    PORT_DIPSETTING(    0x08, "Preset #2" )
+    PORT_DIPSETTING(    0x00, "Changes locked" )
+    PORT_DIPNAME( 0x20, 0x00, "Dwarf's Den Gfx" ) PORT_DIPLOCATION("SW1:6")
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, "Large Character Gfx" ) PORT_DIPLOCATION("SW1:7")
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, "Full Card Gfx" ) PORT_DIPLOCATION("SW1:8")
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Operator Settings Mode 2/2" ) PORT_DIPLOCATION("SW1:5")
@@ -1092,29 +1092,29 @@ MACHINE_CONFIG_END
 
 /* Dwarfs den PROM explanation:
    The proms used in Dwarfs den are 74S188 (82s23 equivalent, 32x8 open collector)
-   
-	The prom at 7H controls the 8085 memory map:
-		The inputs are such:
-		A0 - 8085 A10
-		A1 - 8085 A11
-		A2 - 8085 A12
-		A3 - 8085 A13
-		A4 - 8085 A14
-		/CE - ? (maybe 8085 ALE * !8085 A15)? need to trace again
-		Outputs are as such:
-		O1 - /CE on ROM at 9L (also test point 36)
-		O2 - /CE on ROM at 9K (also test point 35)
-		O3 - /CE on ROM at 9J (also test point 34)
-		O4 - /CE on ROM at 9H (also test point 33)
-		O5 - /CE on 2114 SRAMs at 8F and 9F
-		O6 - /CE on 2114 SRAMs at 8E and 9E
-		O7 - /CE on 2114 SRAMs at 8D and 9D
-		O8 - indirectly, /CE on the 2114 srams at 8C and 9C, due to the fact that those two are battery-backed
 
-	The prom at 3A controls the color palette:
-		TODO: finish me!
+    The prom at 7H controls the 8085 memory map:
+        The inputs are such:
+        A0 - 8085 A10
+        A1 - 8085 A11
+        A2 - 8085 A12
+        A3 - 8085 A13
+        A4 - 8085 A14
+        /CE - ? (maybe 8085 ALE * !8085 A15)? need to trace again
+        Outputs are as such:
+        O1 - /CE on ROM at 9L (also test point 36)
+        O2 - /CE on ROM at 9K (also test point 35)
+        O3 - /CE on ROM at 9J (also test point 34)
+        O4 - /CE on ROM at 9H (also test point 33)
+        O5 - /CE on 2114 SRAMs at 8F and 9F
+        O6 - /CE on 2114 SRAMs at 8E and 9E
+        O7 - /CE on 2114 SRAMs at 8D and 9D
+        O8 - indirectly, /CE on the 2114 srams at 8C and 9C, due to the fact that those two are battery-backed
+
+    The prom at 3A controls the color palette:
+        TODO: finish me!
 */
-   
+
 
 ROM_START( dwarfd )
 	ROM_REGION( 0x10000, "maincpu", 0 )

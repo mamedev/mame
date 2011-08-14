@@ -275,7 +275,7 @@ static void show_soundregs(device_t *device)
 		{
 			sprintf(text,"R%d%d:",set+1,reg);
 			strcat(message,text);
-		
+
 			for (chan=0;chan<8;chan++)
 			{
 				sprintf(text," %02X",base[reg + 8*chan]);
@@ -293,31 +293,31 @@ static void show_soundregs(device_t *device)
 
 
 /* register functions (preliminary):
-offset: cccrrr		c=channel, r=register
+offset: cccrrr      c=channel, r=register
 
 set 1:
 R  76543210
-0  xxxxxxxx			frequency (which nibble?)
-1  xxxxxxxx			*
-2  xxxxxxxx			*
-3  xxxxxxxx			*
-4  ...x....			one-shot sample
-5  ...x....			??? same as R4?
-6  ........			unused
-7  xxxx....			volume
+0  xxxxxxxx         frequency (which nibble?)
+1  xxxxxxxx         *
+2  xxxxxxxx         *
+3  xxxxxxxx         *
+4  ...x....         one-shot sample
+5  ...x....         ??? same as R4?
+6  ........         unused
+7  xxxx....         volume
 
 set 2:
 R  76543210
-0  ....xxxx			start address
-1  ....xxxx			*
-2  ....xxxx			*
-3  ....xxxx			*
-4  xxxx    			assume it's channel pitch/volume effects
-       xxxx			start address
-5  x...    			???
-       xxxx			start address
-6  ........			unused
-7  ......xx			volume table + start trigger
+0  ....xxxx         start address
+1  ....xxxx         *
+2  ....xxxx         *
+3  ....xxxx         *
+4  xxxx             assume it's channel pitch/volume effects
+       xxxx         start address
+5  x...             ???
+       xxxx         start address
+6  ........         unused
+7  ......xx         volume table + start trigger
 
 */
 
@@ -327,7 +327,7 @@ WRITE8_DEVICE_HANDLER( flower_sound1_w )
 	sound_channel *voice = &state->m_channel_list[offset >> 3 & 7];
 	int c = offset & 0xf8;
 	UINT8 *base1 = state->m_soundregs1;
-//	UINT8 *base2 = state->m_soundregs2;
+//  UINT8 *base2 = state->m_soundregs2;
 
 	state->m_stream->update();
 	base1[offset] = data;

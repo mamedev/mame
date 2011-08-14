@@ -1,14 +1,14 @@
 /*
 
-	Scorpion 5
+    Scorpion 5
 
     Skeleton Driver - For note keeping, no sets currently supported pending a better
-	 understanding of the system.
+     understanding of the system.
 
-	Several sets have large roms, containing strings which mention Compact Flash cards
-	 - Are these CF card dumps
-	 - Should *All* games have them?
-	 - Do the Program roms just override parts of this, or do they work together?
+    Several sets have large roms, containing strings which mention Compact Flash cards
+     - Are these CF card dumps
+     - Should *All* games have them?
+     - Do the Program roms just override parts of this, or do they work together?
 
 
 */

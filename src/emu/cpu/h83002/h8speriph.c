@@ -1,12 +1,12 @@
 /*
 
-	Hitachi H8S/2xxx MCU peripherals
+    Hitachi H8S/2xxx MCU peripherals
 
-	(c) 2001-2007 Tim Schuerewegen
+    (c) 2001-2007 Tim Schuerewegen
 
-	H8S/2241
-	H8S/2246
-	H8S/2323
+    H8S/2241
+    H8S/2246
+    H8S/2323
 
 */
 
@@ -467,7 +467,7 @@ void h8s_tmr_x_update( h83xx_state *h8, int x)
 		case 1  : div = 8; break;
 		case 2  : div = 64; break;
 		case 3  : div = 8192; break;
-//		default : OS_MessageBox( NULL, "tmr_x_update", "error", 0); break;
+//      default : OS_MessageBox( NULL, "tmr_x_update", "error", 0); break;
 	}
 	tmr->cycles_per_tick = div;
 	tcnt = h8->per_regs[H8S_IO_TCNT[x]];

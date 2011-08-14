@@ -4233,13 +4233,13 @@ ROM_START( v4monte )
 
 	/* Some roms were simply in a set marked as Monte Carlo, but the 2 letter code mn) is the same */
 	/* The roms were a mixture of
-	    VIDEO 5 - MONTE CARLO OR BUST!
-	    others contain
-		NM4 Monte Carlo on Options4
+        VIDEO 5 - MONTE CARLO OR BUST!
+        others contain
+        NM4 Monte Carlo on Options4
 
-		is the latter just an later revision, or a different game? (date suggests it isn't earlier)
+        is the latter just an later revision, or a different game? (date suggests it isn't earlier)
 
-	*/
+    */
 
 	ROM_REGION( 0x10000, "altmain", 0 ) // alt MPU4 interface ROMS
 	// Monte Carlo Or Bust Release B (c)1995
@@ -4336,7 +4336,7 @@ ROM_START( v4monte )
 	ROM_LOAD( "montecarloorbustvideoboardp2.bin", 0x0000, 0x020000, CRC(7f6747cb) SHA1(0a85c0199583c5c48012f627ec3e4c3d12e39859) )
 	ROM_LOAD( "montecarloorbustvideoboardp3.bin", 0x0000, 0x020000, CRC(f3d4a37d) SHA1(e81df776bb220832b45a5f6d12e8831f17dbd10b) )
 	ROM_LOAD( "montecarloorbustvideoboardp4.bin", 0x0000, 0x020000, CRC(94be9981) SHA1(fe5803102e5e301ad6659ed83d319f55aa62c33e) )
-	
+
 	// this seems to be an alt (incomplete? set)
 	ROM_LOAD( "mn______.f_1", 0x0000, 0x080000, CRC(1a81b3fb) SHA1(bbf0fe7e48404962a2f2120734efe71dc1eed64c) ) // unmatched rom? (significant changes)
 	ROM_LOAD( "mcop3vd", 0x0000, 0x080000, CRC(721e9ad1) SHA1(fb926debd57301c9c0c3ecb9bb1ac36b0b60ee40) ) // alt p3 (significant changes)
@@ -4360,9 +4360,9 @@ ROM_START( v4ovrmn3 )
 	ROM_LOAD( "o3_20sd_.4_0", 0x0000, 0x010000, CRC(b11548f1) SHA1(59585394c57a0441817d2bea424abe0bcf09f7ff) )
 	ROM_LOAD( "o3_20sk_.4_0", 0x0000, 0x010000, CRC(4791df62) SHA1(c3d8ecf5f35a95aa5b2fd0a4085aa80b0b6d4447) )
 	ROM_LOAD( "o3i20s__.4_0", 0x0000, 0x010000, CRC(9bc8c0c6) SHA1(19ea9614ca2a9c28e1819d1451bc3117360f143f) )
-	
+
 	ROM_REGION( 0x800000, "video", 0 )
-	// these 2 match Bubbly Bonk ?? 
+	// these 2 match Bubbly Bonk ??
 	ROM_LOAD16_BYTE( "o3______.4_1", 0x000000, 0x010000,  CRC(1e85dd5d) SHA1(0f3c35d9f75d3495e2d0cc1fcf0e96dcbbeeacc8)) // == bu______.4_1
 	ROM_LOAD16_BYTE( "o3______.4_2", 0x000001, 0x010000,  CRC(989db70a) SHA1(e44f8900392db51cc3f0a5bf0391bde0d71b9878)) // == bu______.4_2
 	ROM_LOAD16_BYTE( "o3______.4_3", 0x020000, 0x010000, CRC(e6adda98) SHA1(176df97e3f0b22531a4c7b30e951bab0bc6403ad) )

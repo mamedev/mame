@@ -823,7 +823,7 @@ CPU_GET_INFO( h8s_2241 )
 	{
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2241_internal_map);  break;
 		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8s_2xxx);		break;
-		case CPUINFO_FCT_RESET:	   			info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
+		case CPUINFO_FCT_RESET:				info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
 		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2241");		break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);
@@ -836,7 +836,7 @@ CPU_GET_INFO( h8s_2246 )
 	{
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2246_internal_map);  break;
 		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8s_2xxx);		break;
-		case CPUINFO_FCT_RESET:	   			info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
+		case CPUINFO_FCT_RESET:				info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
 		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2246");		break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);
@@ -849,7 +849,7 @@ CPU_GET_INFO( h8s_2323 )
 	{
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2323_internal_map);  break;
 		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8s_2xxx);		break;
-		case CPUINFO_FCT_RESET:	   			info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
+		case CPUINFO_FCT_RESET:				info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
 		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2323");		break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);

@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( flower, flower_state )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 90)	// controls music speed. irqsource and frequency unknown, same as subcpu perhaps?
 
 	// tight sync, slowdowns otherwise
-//	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */

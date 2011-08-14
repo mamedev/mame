@@ -226,7 +226,7 @@ static void cd_exec_command(running_machine &machine)
 	}
 
 	if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
-   		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 	switch (cr1 & 0xff00)
 	{
@@ -481,8 +481,8 @@ static void cd_exec_command(running_machine &machine)
 				{
 					/* resume from a pause state */
 					/* TODO: Galaxy Fight calls 10ff ffff ffff ffff, but then it calls 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
-					   (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
-					   be countless possible combinations ... */
+                       (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
+                       be countless possible combinations ... */
 					if(fadstoplay == 0)
 					{
 						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
@@ -1146,9 +1146,9 @@ static void cd_exec_command(running_machine &machine)
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-//			UINT32 read_dir;
+//          UINT32 read_dir;
 
-//			read_dir = ((cr3&0xff)<<16)|cr4;
+//          read_dir = ((cr3&0xff)<<16)|cr4;
 
 			if((cr3 >> 8) < 0x24)
 				cddevice = &filters[cr3 >> 8];

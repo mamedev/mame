@@ -208,7 +208,7 @@ static INPUT_PORTS_START( skylancr )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) 		PORT_DIPLOCATION("SW1:4,3") /* Also affects bonus life */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:4,3") /* Also affects bonus life */
 	PORT_DIPSETTING(    0x30, "1" )				/* Bonus life at 20000 and 50000 */
 	PORT_DIPSETTING(    0x20, "2" )				/* Bonus life at 20000 and 50000 */
 	PORT_DIPSETTING(    0x10, "3" )				/* Bonus life at 40000 and 70000 */

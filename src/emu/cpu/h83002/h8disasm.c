@@ -389,7 +389,7 @@ static UINT32 h8disasm_0(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			{
 				sprintf(buffer, "mulxs.b %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
 			}
-			else if ((data16&0xff00) == 0x5200) 
+			else if ((data16&0xff00) == 0x5200)
 			{
 				sprintf(buffer, "mulxs.w %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
 			}
@@ -406,7 +406,7 @@ static UINT32 h8disasm_0(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			{
 				sprintf(buffer, "divxs.b %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
 			}
-			else if ((data16&0xff00) == 0x5300) 
+			else if ((data16&0xff00) == 0x5300)
 			{
 				sprintf(buffer, "divxs.w %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
 			}

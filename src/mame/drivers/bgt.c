@@ -49,7 +49,7 @@ ROM_START( bg_ddb )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
 	/* there were sound roms in the 'CoinWorld Ding Dong Bells' set which might belong here, otherwise
-	   roms are probably missing */
+       roms are probably missing */
 ROM_END
 
 ROM_START( bg_barmy )

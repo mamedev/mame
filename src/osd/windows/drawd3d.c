@@ -503,7 +503,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 	// skip if nothing
 	if (d3d == NULL)
 		return;
-	
+
 	if (d3d->hlsl->recording())
 		d3d->hlsl->window_record();
 

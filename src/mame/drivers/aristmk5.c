@@ -86,61 +86,61 @@ static TIMER_CALLBACK( mk5_VSYNC_callback )
 
 static WRITE32_HANDLER(Ns5w48)
 {
-    
-    
+
+
     /*
     There is one writeable register which is written with the Ns5w48 strobe. It contains four bits which are
     taken from bits 16 to 19 of the word being written. The register is cleared whenever the chip is reset. The
     register controls part of the video system. Bit 3(from data bus bit 19) controls the eorv output. If the bit is
-    one, eorv outputs the NV/CSYNC signal from VIDC. If the bit is zero, eorv outputs inverted NV/CSYNC. Bit 2 of 
+    one, eorv outputs the NV/CSYNC signal from VIDC. If the bit is zero, eorv outputs inverted NV/CSYNC. Bit 2 of
     the register controls the eorh output. If the bit is zero, eorh is the NHSYNC output of VIDC. If the bit is one,
     eorh is inverted NHSYNC. Bits 1 and 0 control what is fed to the vidclk output as follows:
-         
+
          Bit1     Bit0     vidclk
          0        0        24 Mhz clock
          0        1        25 Mhz clock ;// external video crystal
          1        0        36 Mhz clock
          1        1        24 Mhz clock
-    
-    
+
+
     */
-    
+
     /*
     Golden Pyramids disassembly
-    
+
     MOV     R0, #0x3200000
     ROM:03400948                 MOV     R1, #8
     ROM:0340094C                 STRB    R1, [R0,#0x14]  ; clear vsync
     ROM:03400950                 LDR     R2, =0xC350     ; 50000
     ROM:03400954
-    ROM:03400954 loc_3400954                             ; CODE XREF: sub_3400944+18j
+    ROM:03400954 loc_3400954                             ; CODE XREF: sub_3400944+18?j
     ROM:03400954                 NOP
-    ROM:03400958                 SUBS    R2, R2, #1      
+    ROM:03400958                 SUBS    R2, R2, #1
     ROM:0340095C                 BNE     loc_3400954     ; does this 50000 times, presumably to wait for vsync
     ROM:03400960                 MOV     R0, #0x3200000
     ROM:03400964                 LDRB    R1, [R0,#0x10]  ; reads the irq status a
     ROM:03400968                 TST     R1, #8          ; test vsync
     */
-    
+
     aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	ioc_regs[IRQ_STATUS_A] &= ~0x08;
-	
+
 	/*          bit 1              bit 0 */
 	if((data &~(0x02)) && (data & (0x01))) // external video crystal is enabled. 25 mhz
     {
-	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure but see above 
+	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure but see above
     }
     if((data &~(0x02)) && (data &~(0x01))) // video clock is enabled. 24 mhz
     {
-	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure 
+	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
     }
     if((data & (0x02)) && (data &~(0x01))) // video clock is enabled. 36 mhz
     {
-	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure 
+	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
     }
     if((data &(0x02)) && (data &(0x01))) // video clock is enabled. 24 mhz
     {
-	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure 
+	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
     }
 }
 
@@ -149,32 +149,32 @@ static TIMER_CALLBACK( mk5_2KHz_callback )
 	aristmk5_state *state = machine.driver_data<aristmk5_state>();
 	ioc_regs[IRQ_STATUS_A] |= 0x01;
 	state->m_mk5_2KHz_timer->adjust(attotime::never);
-	
+
 }
 
 static READ32_HANDLER(Ns5x58)
 {
     /*
         1953.125 Hz for the operating system timer interrupt
-    
-    The pintr pin ( printer interrupt ) is connected to an interrupt latch in IOEB. 
-    A rising edge on pintr causes an interrupt to be latched in IOEB. The latch output 
-    is connected to the NIL[6] interrupt input on IOC and goes low when the rising edge is detected. 
+
+    The pintr pin ( printer interrupt ) is connected to an interrupt latch in IOEB.
+    A rising edge on pintr causes an interrupt to be latched in IOEB. The latch output
+    is connected to the NIL[6] interrupt input on IOC and goes low when the rising edge is detected.
     The interrupt is cleared (NIL[6] is set high) by resetting the chip or by the NS5x58
     strobe.
-    
+
     NIL[6] IOEB/1pintr - Interrupt Input ( OS Tick Interrput )
-    
+
     Rising edge signal
     010101010101  .-------.   logic 0      .-------------.
     ------------->|pint   |---1pintr------>|NIL[6]       |
                   | IOEB  |                |     IOC     |
                   `-------'                `-------------'
     */
-    
+
 	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
-	// reset 2KHz timer 
-    state->m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125)); 
+	// reset 2KHz timer
+    state->m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125));
     ioc_regs[IRQ_STATUS_A] &= ~0x01;
     cputag_set_input_line(space->machine(), "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
 	return 0xffffffff;
@@ -270,20 +270,20 @@ static WRITE32_HANDLER( sram_banksel_w )
     write: 03010420 C0  ...
     read:  3220000 03   ...
     write: 03010420 00  select bank 0
-    
-    
+
+
          Bit 0 - Page 1
          Bit 1 - Page 2
          Bit 2 - Page 3
          NC
          NC
          NC
-         Bit 6 - SRAM 1     
-         Bit 7 - SRAM 2 
-         
+         Bit 6 - SRAM 1
+         Bit 7 - SRAM 2
+
          Bit 1 and 2 on select Page 4.
          Bit 6 and 7 on select SRAM 3.
-    
+
          4 pages of 32k for each sram chip.
     */
     memory_set_bank(space->machine(),"sram_bank", (data & 0xc0) >> 6);
@@ -303,7 +303,7 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x03010810, 0x03010813) AM_READWRITE(watchdog_reset32_r,watchdog_reset32_w) //MK-5 specific, watchdog
 //  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
 	AM_RANGE(0x03220000, 0x0323ffff) AM_RAMBANK("sram_bank") //AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3
-	
+
 	// bank5 slow
 	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x03010810, 0x03010813) AM_READWRITE(watchdog_reset32_r,watchdog_reset32_w) //MK-5 specific, watchdog
 //  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
 	AM_RANGE(0x03220000, 0x0323ffff) AM_RAMBANK("sram_bank") //AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3
-    
+
 	// bank5 slow
 	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
@@ -358,7 +358,7 @@ static DRIVER_INIT( aristmk5 )
 {
 	UINT8 *SRAM    = machine.region("sram")->base();
 	UINT8 *SRAM_NZ = machine.region("sram")->base();
-	
+
 	archimedes_driver_init(machine);
 
 	memory_configure_bank(machine, "sram_bank", 0, 4,    &SRAM[0],    0x20000);
