@@ -109,7 +109,7 @@ public:
 		UINT32				m_output;			// output index, or ALL_OUTPUTS
 		UINT32				m_input;			// target input index
 		float				m_gain;				// gain
-		const char *		m_target;			// target tag
+		astring				m_target;			// target tag
 	};
 
 	// construction/destruction

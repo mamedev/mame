@@ -224,7 +224,11 @@ core_options::~core_options()
 {
 	// delete all entries from the list
 	while (m_entrylist != NULL)
+	{
+		core_options::entry *e = m_entrylist;
 		remove_entry(*m_entrylist);
+		delete e;
+	}
 }
 
 
@@ -290,7 +294,11 @@ void core_options::add_entries(const options_entry *entrylist, bool override_exi
 			{
 				// if we're overriding existing entries, then remove the old one
 				if (override_existing)
+				{
+					core_options::entry *e = m_entrylist;
 					remove_entry(*existing);
+					delete e;
+				}
 
 				// otherwise, just override the default and current values and throw out the new entry
 				else
@@ -608,7 +616,11 @@ void core_options::reset()
 {
 	// remove all entries from the list
 	while (m_entrylist != NULL)
+	{
+		core_options::entry *e = m_entrylist;
 		remove_entry(*m_entrylist);
+		delete e;
+	}
 
 	// reset the map
 	m_entrymap.reset();

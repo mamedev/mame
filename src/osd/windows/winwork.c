@@ -279,6 +279,14 @@ INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 }
 
 
+INLINE void scalable_lock_delete(scalable_lock *lock)
+{
+#if USE_SCALABLE_LOCKS
+#else
+	DeleteCriticalSection(&lock->section);
+#endif
+}
+
 
 //============================================================
 //  osd_work_queue_alloc
@@ -486,6 +494,8 @@ void osd_work_queue_free(osd_work_queue *queue)
 	// free the list
 	if (queue->thread != NULL)
 		free(queue->thread);
+	
+	scalable_lock_delete(&queue->lock);
 
 	// free all the events
 	if (queue->doneevent != NULL)

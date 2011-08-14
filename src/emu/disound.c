@@ -81,7 +81,7 @@ void device_sound_interface::static_add_route(device_t &device, UINT32 output, c
 	// append a new route to the list
 	astring devtag;
 	device.siblingtag(devtag, target);
-	sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, core_strdup(devtag.cstr()))));
+	sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, devtag.cstr())));
 }
 
 
@@ -229,10 +229,10 @@ bool device_sound_interface::interface_validity_check(emu_options &options, cons
 	for (const sound_route *route = first_route(); route != NULL; route = route->next())
 	{
 		// find a device with the requested tag
-		const device_t *target = device().mconfig().devicelist().find(route->m_target);
+		const device_t *target = device().mconfig().devicelist().find(route->m_target.cstr());
 		if (target == NULL)
 		{
-			mame_printf_error("%s: %s attempting to route sound to non-existant device '%s'\n", driver.source_file, driver.name, route->m_target);
+			mame_printf_error("%s: %s attempting to route sound to non-existant device '%s'\n", driver.source_file, driver.name, route->m_target.cstr());
 			error = true;
 		}
 
@@ -240,7 +240,7 @@ bool device_sound_interface::interface_validity_check(emu_options &options, cons
 		const device_sound_interface *sound;
 		if (target != NULL && target->type() != SPEAKER && !target->interface(sound))
 		{
-			mame_printf_error("%s: %s attempting to route sound to a non-sound device '%s' (%s)\n", driver.source_file, driver.name, route->m_target, target->name());
+			mame_printf_error("%s: %s attempting to route sound to a non-sound device '%s' (%s)\n", driver.source_file, driver.name, route->m_target.cstr(), target->name());
 			error = true;
 		}
 	}
@@ -316,13 +316,13 @@ void device_sound_interface::interface_post_start()
 						int streamoutputnum;
 						sound_stream *outputstream = sound->output_to_stream_output(outputnum, streamoutputnum);
 						if (outputstream == NULL)
-							fatalerror("Sound device '%s' specifies route for non-existant output #%d", route->m_target, outputnum);
+							fatalerror("Sound device '%s' specifies route for non-existant output #%d", route->m_target.cstr(), outputnum);
 
 						// find the input stream to connect to
 						int streaminputnum;
 						sound_stream *inputstream = input_to_stream_input(inputnum++, streaminputnum);
 						if (inputstream == NULL)
-							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d", route->m_target, outputnum, m_device.tag(), inputnum - 1);
+							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d", route->m_target.cstr(), outputnum, m_device.tag(), inputnum - 1);
 
 						// set the input
 						inputstream->set_input(streaminputnum, outputstream, streamoutputnum, route->m_gain);

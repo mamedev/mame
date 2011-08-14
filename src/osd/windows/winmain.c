@@ -642,8 +642,10 @@ void windows_osd_interface::init(running_machine &machine)
 	astring tempstring;
 	for (win_window_info *info = win_window_list; info != NULL; info = info->next)
 	{
-		tempstring.printf("Orientation(%s)", utf8_from_tstring(info->monitor->info.szDevice));
+		char *tmp = utf8_from_tstring(info->monitor->info.szDevice);
+		tempstring.printf("Orientation(%s)", tmp);
 		output_set_value(tempstring, info->targetorient);
+		osd_free(tmp);
 	}
 
 	// hook up the debugger log
