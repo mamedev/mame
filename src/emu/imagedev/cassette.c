@@ -242,6 +242,11 @@ void cassette_image_device::device_start()
 	m_state = m_default_state;
 }
 
+bool cassette_image_device::call_create(int format_type, option_resolution *format_options)
+{
+	return call_load();
+}
+
 bool cassette_image_device::call_load()
 {
 	casserr_t err;

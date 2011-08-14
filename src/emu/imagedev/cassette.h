@@ -64,6 +64,7 @@ public:
 
 	// image-level overrides
 	virtual bool call_load();
+	virtual bool call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display();
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
