@@ -410,10 +410,10 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0030, "100%" )
 	PORT_DIPSETTING(      0x0010, "125%" )
 	PORT_DIPSETTING(      0x0000, "150%" )
-	PORT_DIPNAME( 0x00c0, 0x0040, "Max Rounds" )			PORT_DIPLOCATION("SW3:7,8") /* Service Mode shows rounds needed to win the match */
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Max Rounds" )			PORT_DIPLOCATION("SW3:7,8") /* Service Mode shows rounds needed to win the match */
 	PORT_DIPSETTING(      0x0000, "1" )						/* Service Mode Shows 1 */
-	PORT_DIPSETTING(      0x00c0, "3" )						/* Service Mode Shows 3, Service Mode has 2 & 3 reversed comparied to game play */
-	PORT_DIPSETTING(      0x0080, "5" )						/* Service Mode Shows 2, Service Mode has 2 & 3 reversed comparied to game play */
+	PORT_DIPSETTING(      0x00c0, "3" )						/* Service Mode Shows 3, Service Mode has 2 & 3 reversed compared to game play */
+	PORT_DIPSETTING(      0x0080, "5" )						/* Service Mode Shows 2, Service Mode has 2 & 3 reversed compared to game play */
 //	PORT_DIPSETTING(      0x0040, "Error!!" )				/* Service Mode Shows "Error" */
 	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW4:1,2,3,4") /* Service Mode Shows Player 2 */
 	PORT_DIPSETTING(      0x8000, DEF_STR( 8C_1C ) )
@@ -634,10 +634,10 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 
 	MCFG_SOUND_ADD("ymf2", YMF262, 14180000) // should be YMF278B_STD_CLOCK/2? but that makes music very off-tune
 	MCFG_SOUND_CONFIG(fuuki32_ymf262_interface)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.35)
 
 MACHINE_CONFIG_END
 
