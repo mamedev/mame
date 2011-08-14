@@ -49,6 +49,7 @@ void archimedes_clear_irq_a(running_machine &machine, int mask);
 void archimedes_clear_irq_b(running_machine &machine, int mask);
 void archimedes_clear_fiq(running_machine &machine, int mask);
 
+extern READ32_HANDLER(aristmk5_drame_memc_logical_r);
 extern READ32_HANDLER(archimedes_memc_logical_r);
 extern WRITE32_HANDLER(archimedes_memc_logical_w);
 extern READ32_HANDLER(archimedes_memc_r);

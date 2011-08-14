@@ -212,7 +212,7 @@ static void a310_set_timer(int tmr)
 	{
 		case 0:
 		case 1:
-			timer[tmr]->adjust(attotime::from_usec(ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
+            timer[tmr]->adjust(attotime::from_usec(ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
 			break;
 		case 2:
 			freq = 1000000.0 / (double)(ioc_timercnt[tmr]+1);
@@ -318,6 +318,8 @@ READ32_HANDLER(archimedes_memc_logical_r)
 	return 0;
 }
 
+
+
 WRITE32_HANDLER(archimedes_memc_logical_w)
 {
 	UINT32 page, poffs;
@@ -344,6 +346,55 @@ WRITE32_HANDLER(archimedes_memc_logical_w)
 			//printf("ARCHIMEDES_MEMC: Writing unmapped page %02x, what do we do?\n",page);
 		}
 	}
+}
+
+/* Aristocrat Mark 5 - same as normal AA except with Dram emulator */
+READ32_HANDLER(aristmk5_drame_memc_logical_r)
+{
+	UINT32 page, poffs;
+
+	// are we mapping in the boot ROM?
+	if (memc_latchrom)
+	{
+		UINT32 *rom;
+
+		rom = (UINT32 *)space->machine().region("maincpu")->base();
+
+		return rom[offset & 0x1fffff];
+	}
+	else
+	{
+		// figure out the page number and offset in the page
+		page = (offset<<2) / page_sizes[memc_pagesize];
+		poffs = (offset<<2) % page_sizes[memc_pagesize];
+
+
+
+		if (memc_pages[page] != -1)
+		{
+            /******************* DRAM Emulator - gal20v - Aristocrat Mark 5 ************************
+            A Dynamic RAM emulator is provided which avoids the need to execute code
+            in DRAM in those regulatory environments where it is not needed.
+
+            When pin 5 of U36 ( gal20v ) is low, the pin 25 output is high and enables the
+            logic buffer inputs and provides a fixed jmp address to a plurality
+            of rom addresses ( 0xEAD0000A  shown on logic buffer arrangement in schematics )
+
+            In this state, DRAM memory space is disabled.
+
+            ****************************************************************************************/
+            if(!(memc_pages[page] & 0x10)  && (offset <= 0x3ff))
+                return 0xEAD0000A;
+            return archimedes_memc_physmem[((memc_pages[page] * page_sizes[memc_pagesize]) + poffs)>>2];
+		}
+		else
+		{
+			//printf("ARCHIMEDES_MEMC: Reading unmapped page %02x\n",page);
+			return 0xdeadbeef;
+		}
+	}
+
+	return 0;
 }
 
 #if 0
