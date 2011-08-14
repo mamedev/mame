@@ -638,8 +638,8 @@ void cli_frontend::listslots(const char *gamename)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// print header
-	printf(" SYSTEM      SLOT NAME             SLOT OPTIONS SUPPORTED     \n");
-	printf("----------  --------------------  ------------------------------------\n");
+	printf(" SYSTEM      SLOT NAME    SLOT OPTIONS    SLOT DEVICE NAME     \n");
+	printf("----------  -----------  --------------  ----------------------\n");
 
 	// iterate over drivers
 	while (drivlist.next())
@@ -650,19 +650,21 @@ void cli_frontend::listslots(const char *gamename)
 		for (bool gotone = drivlist.config().devicelist().first(slot); gotone; gotone = slot->next(slot))
 		{
 			// output the line, up to the list of extensions
-			printf("%-13s%-20s   ", first ? drivlist.driver().name : "", slot->device().tag());
+			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag());
 
 			// get the options and print them
 			const slot_interface* intf = slot->get_slot_interfaces();
 			for (int i = 0; intf[i].name != NULL; i++)
 			{
+				device_t *dev = (*intf[i].devtype)(drivlist.config(), "dummy", drivlist.config().devicelist().first(), 0);
+				dev->config_complete();
 				if (i==0) {
-					printf("%s\n", intf[i].name);
+					printf("%-15s %s\n", intf[i].name,dev->name());
 				} else {
-					printf("%-33s   %s\n", "",intf[i].name);
+					printf("%-23s   %-15s %s\n", "",intf[i].name,dev->name());
 				}
+				global_free(dev);
 			}
-
 			// end the line
 			printf("\n");
 			first = false;
