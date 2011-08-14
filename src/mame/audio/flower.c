@@ -4,7 +4,9 @@ Initial version was based on the Wiping sound driver, which was based on the old
 TODO:
 - timing (see main driver file), but also of samplerate and effects counter
 - what do the unknown bits in soundregs do?
-- are channel effects correct? currently mostly guesswork
+- Are channel effects correct? It's currently mostly guesswork, the pitch effects sound pretty convincing though.
+  Considering that the game sound hardware isn't complicated (no dedicated soundchip) these bits are possibly
+  for something way simpler, such as a length counter. PCB sound recordings would be useful!
 
 */
 
@@ -13,7 +15,7 @@ TODO:
 
 #define FLOWER_VERBOSE		0		// show register writes
 
-#define MIXER_SAMPLERATE	48000	/* ? (native freq is probably in the MHz range: note the >>7 when reading a sample) */
+#define MIXER_SAMPLERATE	48000	/* ? (native freq is probably in the MHz range) */
 #define MIXER_DEFGAIN		48
 
 
