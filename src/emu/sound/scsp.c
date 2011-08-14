@@ -844,7 +844,7 @@ static void SCSP_UpdateRegR(scsp_state *scsp, int reg)
 				v&=0xff00;
 				v|=scsp->MidiStack[scsp->MidiR];
 				scsp->Int68kCB(scsp->device, -scsp->IrqMidi);	// cancel the IRQ
-                printf("Read %x from SCSP MIDI\n", v);
+                logerror("Read %x from SCSP MIDI\n", v);
 				if(scsp->MidiR!=scsp->MidiW)
 				{
 					++scsp->MidiR;

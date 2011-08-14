@@ -365,6 +365,7 @@ static MACHINE_RESET(model2_scsp)
 	// copy the 68k vector table into RAM
 	memcpy(state->m_soundram, machine.region("audiocpu")->base() + 0x80000, 16);
 	machine.device("audiocpu")->reset();
+	scsp_set_ram_base(machine.device("scsp"), state->m_soundram);
 }
 
 static MACHINE_RESET(model2)
