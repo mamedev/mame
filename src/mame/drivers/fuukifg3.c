@@ -553,7 +553,7 @@ static MACHINE_START( fuuki32 )
 	fuuki32_state *state = machine.driver_data<fuuki32_state>();
 	UINT8 *ROM = machine.region("soundcpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 0x3e, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("soundcpu");
@@ -629,12 +629,12 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymf2", YMF262, 14180000) // should be YMF278B_STD_CLOCK/2? but that makes music very off-tune
+	MCFG_SOUND_ADD("ymf2", YMF262, 14318180) // 14.31818MHz is the standard OPL3 clock, YMF278B_STD_CLOCK/2 makes music off-tune
 	MCFG_SOUND_CONFIG(fuuki32_ymf262_interface)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.35)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 
 MACHINE_CONFIG_END
 
@@ -707,7 +707,7 @@ ROM_START( asurabus )
 	ROM_LOAD32_BYTE( "pgm0.u4", 0x000003, 0x80000, CRC(9b71e9d8) SHA1(9b705b5b6fff549f5679890422b481b5cf1d7bd7) )
 
 	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
-	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
+	ROM_LOAD( "srom.u7", 0x00000, 0x80000, BAD_DUMP CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) ) // BAD_DUMP note: 2 same halves, and many songs off-tune
 	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
 
 	ROM_REGION( 0x2000000, "gfx1", 0 )
