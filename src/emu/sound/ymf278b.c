@@ -60,7 +60,8 @@
    TODO:
    - accurate timing of envelopes
    - LFO (vibrato, tremolo)
-   - integrate YMF262
+   - integrate YMF262 (used by Fuuki games, not used by Psikyo and Metro games)
+   - able to hook up "Moonsound", supporting mixed ROM+RAM (for MSX driver in MESS)
 */
 
 #include "emu.h"
