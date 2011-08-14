@@ -282,11 +282,6 @@ static WRITE8_HANDLER( snd_z80_w )
 	state->m_shared_ram[offset] = data;
 }
 
-static READ8_HANDLER( snd_ymf278b_r )
-{
-	return ymf278b_r(space->machine().device("ymf1"), offset);
-}
-
 static WRITE8_HANDLER( snd_ymf278b_w )
 {
 	ymf278b_w(space->machine().device("ymf1"), offset, data);
@@ -307,7 +302,7 @@ static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP
-	AM_RANGE(0x40, 0x45) AM_READWRITE(snd_ymf278b_r, snd_ymf278b_w)
+	AM_RANGE(0x40, 0x45) AM_DEVREAD("ymf1", ymf278b_r) AM_WRITE(snd_ymf278b_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
