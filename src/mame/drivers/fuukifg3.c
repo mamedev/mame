@@ -33,6 +33,8 @@ Notes so far:
 
 - The scroll values are generally wrong when flip screen is on and rasters are often incorrect
 
+- YMF278B and YMF262 are hooked up in an awkward way (real chip has YMF262 integrated)
+
 Asura Blade
 Fuuki Co. Ltd., 1998
 
@@ -155,6 +157,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymf278b.h"
+#include "sound/262intf.h"
 #include "includes/fuukifg3.h"
 
 
@@ -279,6 +282,20 @@ static WRITE8_HANDLER( snd_z80_w )
 	state->m_shared_ram[offset] = data;
 }
 
+static READ8_HANDLER( snd_ymf278b_r )
+{
+	return ymf278b_r(space->machine().device("ymf1"), offset);
+}
+
+static WRITE8_HANDLER( snd_ymf278b_w )
+{
+	ymf278b_w(space->machine().device("ymf1"), offset, data);
+
+	// also write to ymf262
+	if (offset < 4)
+		ymf262_w(space->machine().device("ymf2"), offset, data);
+}
+
 static ADDRESS_MAP_START( fuuki32_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
@@ -290,7 +307,7 @@ static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP
-	AM_RANGE(0x40, 0x45) AM_DEVREADWRITE("ymf", ymf278b_r, ymf278b_w)
+	AM_RANGE(0x40, 0x45) AM_READWRITE(snd_ymf278b_r, snd_ymf278b_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -573,6 +590,11 @@ static const ymf278b_interface fuuki32_ymf278b_interface =
 	irqhandler		/* irq */
 };
 
+static const ymf262_interface fuuki32_ymf262_interface =
+{
+	NULL			/* irq, already hooked up via ymf278b */
+};
+
 static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 
 	/* basic machine hardware */
@@ -605,10 +627,18 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) /* YMF278B_STD_CLOCK = OSC 33.8688MHz */
+	MCFG_SOUND_ADD("ymf1", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
 	MCFG_SOUND_CONFIG(fuuki32_ymf278b_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+
+	MCFG_SOUND_ADD("ymf2", YMF262, 14180000) // should be YMF278B_STD_CLOCK/2? but that makes music very off-tune
+	MCFG_SOUND_CONFIG(fuuki32_ymf262_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
+
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -658,7 +688,9 @@ ROM_START( asurabld )
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
 	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(e681155e) SHA1(458845b9c86df72685d92d0d4052aacc2fa7d1bd) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf1", 0 ) // shared OPL4 data (for pcm)
+	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
+	ROM_REGION( 0x400000, "ymf2", 0 ) // shared OPL4 data (for fm)
 	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
 ROM_END
 
@@ -702,7 +734,9 @@ ROM_START( asurabus )
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
 	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf1", 0 ) // shared OPL4 data (for pcm)
+	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
+	ROM_REGION( 0x400000, "ymf2", 0 ) // shared OPL4 data (for fm)
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 
