@@ -133,24 +133,26 @@ static STREAM_UPDATE( flower_update_mono )
 
 		for (i = 0; i < samples; i++)
 		{
-			voice->pos += f;
-
+			// add sample
 			if (voice->oneshot)
 			{
-				if (voice->active)
+				UINT8 sample = state->m_sample_rom[(voice->start + voice->pos) >> 7 & 0x7fff];
+				if (sample == 0xff)
 				{
-					UINT8 sample = state->m_sample_rom[(voice->start + voice->pos) >> 7 & 0x7fff];
-					if (sample == 0xff)
-						voice->active = 0;
-					else
-						*mix++ += state->m_volume_rom[v << 8 | sample] - 0x80;
+					voice->active = 0;
+					break;
 				}
+				else
+					*mix++ += state->m_volume_rom[v << 8 | sample] - 0x80;
 			}
 			else
 			{
 				UINT8 sample = state->m_sample_rom[(voice->start >> 7 & 0x7e00) | (voice->pos >> 7 & 0x1ff)];
 				*mix++ += state->m_volume_rom[v << 8 | sample] - 0x80;
 			}
+
+			// update counter
+			voice->pos += f;
 		}
 	}
 
