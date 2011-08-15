@@ -1,11 +1,11 @@
 /* Tecmo System
  Driver by Farfetch, David Haywood & Tomasz Slanina
-  Protection simulation by nuapete
+ Protection simulation by nuapete
 
  ToDo:
-  Dump / Decap MCUs to allow for proper protection emulation.
-  Fix Sound (sound roms should be good, do they need descrambling, or is our sound core bad?
-     some YMZ280B samples sound -terrible-)
+  - Dump / Decap MCUs to allow for proper protection emulation.
+  - Fix Sound (sound roms should be good, do they need descrambling, or is our sound core bad?
+    YMZ280B samples sound -terrible-, deroon has lots of "bad" noises but tkdensho only has a few.
 
 
 T.Slanina 20040530 :
@@ -512,7 +512,7 @@ static GFXDECODE_START( tecmosys )
 
 GFXDECODE_END
 
-static WRITE8_HANDLER( deroon_bankswitch_w )
+static WRITE8_HANDLER( tecmosys_bankswitch_w )
 {
 	memory_set_bank(space->machine(), "bank1", data);
 }
@@ -538,14 +538,14 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_r, ymf262_w)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 
 
-static VIDEO_START(deroon)
+static VIDEO_START(tecmosys)
 {
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	state->m_sprite_bitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
@@ -569,7 +569,6 @@ static VIDEO_START(deroon)
 
 	state->m_bg2tilemap = tilemap_create(machine, get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
 	tilemap_set_transparent_pen(state->m_bg2tilemap,0);
-
 }
 
 static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
@@ -667,7 +666,6 @@ static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_t
 
 			}
 		}
-
 	}
 }
 
@@ -761,7 +759,7 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_t* bitmap)
 	}
 }
 
-static SCREEN_UPDATE(deroon)
+static SCREEN_UPDATE(tecmosys)
 {
 	tecmosys_state *state = screen->machine().driver_data<tecmosys_state>();
 
@@ -823,40 +821,6 @@ static SCREEN_UPDATE(deroon)
 	return 0;
 }
 
-/*
->>> R.Belmont wrote:
-> Here's the sound info (I got it playing in M1, I
-> didn't bother "porting" it since the main game doesn't
-> even boot).
->
-> memory map:
-> 0000-7fff: fixed program ROM
-> 8000-bfff: banked ROM
-> e000-f7ff: work RAM
->
-> I/O ports:
-
-> 0-3: YMF262 OPL3
-> 0x10: OKIM6295
-> 0x30: bank select, in 0x4000 byte units based at the
-> start of the ROM (so 2 = 0x8000).
-> 0x40: latch from 68000
-> 0x50: latch to 68000
-> 0x60/0x61: YMZ280B
->
-> IRQ from YMF262 goes to Z80 IRQ.
->
-> NMI is asserted when the 68000 writes a command.
->
-> Z80 clock appears to be 8 MHz (music slows down in
-> "intense" sections if it's 4 MHz, and the crystals are
-> all in the area of 16 MHz).
->
-> The YMZ280B samples for both games may be misdumped,
-> deroon has lots of "bad" noises but tkdensho only has
-> a few.
-*/
-
 
 static void sound_irq(device_t *device, int irq)
 {
@@ -881,7 +845,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 	MCFG_WATCHDOG_VBLANK_INIT(400) // guess
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8MHz ??? (slowdowns on 4MHz) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -899,11 +863,11 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(deroon)
+	MCFG_SCREEN_UPDATE(tecmosys)
 
 	MCFG_PALETTE_LENGTH(0x4000+0x800)
 
-	MCFG_VIDEO_START(deroon)
+	MCFG_VIDEO_START(tecmosys)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1054,20 +1018,20 @@ ROM_START( tkdenshoa )
 	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-static void tecmosys_decramble(running_machine &machine)
+static void tecmosys_descramble(running_machine &machine)
 {
-	UINT8 *gfxsrc    = machine.region       ( "gfx1" )->base();
-	size_t  srcsize = machine.region( "gfx1" )->bytes();
+	UINT8 *gfxsrc  = machine.region( "gfx1" )->base();
+	size_t srcsize = machine.region( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)
 	{
 		UINT8 tmp[4];
 
-		tmp[2] = ((gfxsrc[i+0]&0xf0)>>0) | ((gfxsrc[i+1]&0xf0)>>4); //  0,1,2,3  8,9,10, 11
-		tmp[3] = ((gfxsrc[i+0]&0x0f)<<4) | ((gfxsrc[i+1]&0x0f)<<0); // 4,5,6,7, 12,13,14,15
-		tmp[0] = ((gfxsrc[i+2]&0xf0)>>0) | ((gfxsrc[i+3]&0xf0)>>4);// 16,17,18,19,24,25,26,27
-		tmp[1] = ((gfxsrc[i+2]&0x0f)<<4) | ((gfxsrc[i+3]&0x0f)>>0);// 20,21,22,23, 28,29,30,31
+		tmp[2] = ((gfxsrc[i+0]&0xf0)>>0) | ((gfxsrc[i+1]&0xf0)>>4); //  0, 1, 2, 3   8, 9,10,11
+		tmp[3] = ((gfxsrc[i+0]&0x0f)<<4) | ((gfxsrc[i+1]&0x0f)<<0); //  4, 5, 6, 7, 12,13,14,15
+		tmp[0] = ((gfxsrc[i+2]&0xf0)>>0) | ((gfxsrc[i+3]&0xf0)>>4); // 16,17,18,19, 24,25,26,27
+		tmp[1] = ((gfxsrc[i+2]&0x0f)<<4) | ((gfxsrc[i+3]&0x0f)>>0); // 20,21,22,23, 28,29,30,31
 
 		gfxsrc[i+0] = tmp[0];
 		gfxsrc[i+1] = tmp[1];
@@ -1075,24 +1039,23 @@ static void tecmosys_decramble(running_machine &machine)
 		gfxsrc[i+3] = tmp[3];
 
 	}
-
 }
 
 static DRIVER_INIT( deroon )
 {
-	tecmosys_decramble(machine);
-	tecmosys_prot_init(machine, 0);
+	tecmosys_descramble(machine);
+	tecmosys_prot_init(machine, 0); // machine/tecmosys.c
 }
 
 static DRIVER_INIT( tkdensho )
 {
-	tecmosys_decramble(machine);
+	tecmosys_descramble(machine);
 	tecmosys_prot_init(machine, 1);
 }
 
 static DRIVER_INIT( tkdensha )
 {
-	tecmosys_decramble(machine);
+	tecmosys_descramble(machine);
 	tecmosys_prot_init(machine, 2);
 }
 
