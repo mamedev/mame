@@ -1330,9 +1330,13 @@ static INPUT_PORTS_START( wcbowl )
 	PORT_INCLUDE( itech32_base_16bit )
 
 	PORT_MODIFY("P1")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Hook Left") PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Hook Right") PORT_PLAYER(1)
 	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Hook Left") PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Hook Right") PORT_PLAYER(2)
 	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRACKX1")
@@ -1397,9 +1401,13 @@ static INPUT_PORTS_START( wcbowln ) /* WCB version 1.66 supports cocktail mode *
 	PORT_INCLUDE( itech32_base_32bit )
 
 	PORT_MODIFY("P1")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Hook Left") PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Hook Right") PORT_PLAYER(1)
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P2")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Hook Left") PORT_PLAYER(2)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Hook Right") PORT_PLAYER(2)
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P3")
@@ -1444,6 +1452,19 @@ static INPUT_PORTS_START( wcbowldx )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( wcbowlo ) /* Earlier versions of World Class Bowling do NOT support a cocktail mode */
+	PORT_INCLUDE( wcbowln )
+
+	PORT_MODIFY("DIPS")	/* 280000 */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")	/* Verified */
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00400000, 0x00000000, "Freeze Screen" )	 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00400000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sftm )
 	PORT_INCLUDE( itech32_base_32bit )
 
@@ -1468,9 +1489,13 @@ static INPUT_PORTS_START( shufshot ) /* ShuffleShot v1.39 & v1.40 support cockta
 	PORT_INCLUDE( itech32_base_32bit )
 
 	PORT_MODIFY("P1")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Zoom") PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Wax") PORT_PLAYER(1)
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P2")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Zoom") PORT_PLAYER(2)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Wax") PORT_PLAYER(2)
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P3")
@@ -1496,39 +1521,16 @@ static INPUT_PORTS_START( shufshot ) /* ShuffleShot v1.39 & v1.40 support cockta
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( shufbowl )
-	/*
-    Earlier versions of Shuffleshot & World Class Bowling share the same input
-    port set up. IE: "Freeze Screen" and no support for a cocktail mode
-    */
-	PORT_INCLUDE( itech32_base_32bit )
-
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("P3")
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x00fb0000, IP_ACTIVE_LOW, IPT_UNUSED )
+static INPUT_PORTS_START( shufshto ) /* Earlier versions of Shuffleshot do NOT support a cocktail mode */
+	PORT_INCLUDE( shufshot )
 
 	PORT_MODIFY("DIPS")
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")	/* Verified */
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00400000, 0x00000000, "Freeze Screen" )	 PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( On ) )
-
-	PORT_START("TRACKX1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
-
-	PORT_START("TRACKY1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
-
-	PORT_START("TRACKX2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
-
-	PORT_START("TRACKY2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1536,9 +1538,13 @@ static INPUT_PORTS_START( gt3d )
 	PORT_INCLUDE( itech32_base_32bit )
 
 	PORT_MODIFY("P1")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Face Left") PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Face Right") PORT_PLAYER(1)
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P2")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Face Left") PORT_PLAYER(2)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Face Right") PORT_PLAYER(2)
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P3")
@@ -4250,9 +4256,9 @@ GAME( 1994, hotmemry,    pairs,    bloodstm, pairs,    bloodstm, ROT0, "Tuning/I
 GAME( 1994, hotmemry11,  pairs,    bloodstm, pairs,    bloodstm, ROT0, "Tuning/Incredible Technologies",   "Hot Memory (V1.1, Germany)", 0 )
 GAME( 1994, drivedge,    0,        drivedge, drivedge, drivedge, ROT0, "Strata/Incredible Technologies",   "Driver's Edge", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, wcbowl,      0,        sftm,     wcbowln,  wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.66)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl165,   wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.65)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl161,   wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl16,    wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.6)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl165,   wcbowl,   sftm,     wcbowlo,  wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.65)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl161,   wcbowl,   sftm,     wcbowlo,  wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl16,    wcbowl,   sftm,     wcbowlo,  wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.6)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1995, wcbowl15,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.5)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl14,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.4)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl13,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.3)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
@@ -4263,7 +4269,7 @@ GAME( 1995, sftm110,     sftm,     sftm,     sftm,     sftm110,  ROT0, "Capcom /
 GAME( 1995, sftmj,       sftm,     sftm,     sftm,     sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , 0) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1997, shufshot,    0,        sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, shufshot139, shufshot, sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, shufshot137, shufshot, sftm,     shufbowl, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, shufshot137, shufshot, sftm,     shufshto, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, wcbowl140,   wcbowldx, tourny,   wcbowldx, wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1999, wcbowldx,    0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , 0) /* PIC 16C54 labeled as ITBWL-4 */
 
