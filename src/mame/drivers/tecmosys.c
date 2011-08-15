@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( tecmosys_bankswitch_w )
+static WRITE8_HANDLER( tecmosys_z80_bank_w )
 {
 	memory_set_bank(space->machine(), "bank1", data);
 }
@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_r, ymf262_w)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_bankswitch_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_z80_bank_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_r, ymz280b_w)
@@ -455,12 +455,12 @@ static MACHINE_START( tecmosys )
 }
 
 static MACHINE_CONFIG_START( deroon, tecmosys_state )
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 	MCFG_WATCHDOG_VBLANK_INIT(400) // guess
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8MHz ??? (slowdowns on 4MHz) */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2 )	/* 8MHz ??? (slowdowns on 4MHz) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -487,18 +487,18 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymf", YMF262, 14318180)
+	MCFG_SOUND_ADD("ymf", YMF262, XTAL_14_31818MHz)
 	MCFG_SOUND_CONFIG(tecmosys_ymf262_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", 16000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/8, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16900000)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -652,7 +652,6 @@ static void tecmosys_descramble(running_machine &machine)
 		gfxsrc[i+1] = tmp[1];
 		gfxsrc[i+2] = tmp[2];
 		gfxsrc[i+3] = tmp[3];
-
 	}
 }
 
