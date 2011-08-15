@@ -226,7 +226,7 @@ static void cd_exec_command(running_machine &machine)
 	}
 
 	if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
-		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+   		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 	switch (cr1 & 0xff00)
 	{
@@ -419,7 +419,7 @@ static void cd_exec_command(running_machine &machine)
 			CDROM_LOG(("%s:CD: Play Disc\n",   machine.describe_context()))
 			cd_stat = CD_STAT_PLAY;
 
-			play_mode = cr3 >> 8;
+			play_mode = (cr3 >> 8) & 0x7f;
 
 			if (!(cr3 & 0x8000))	// preserve current position if bit 7 set
 			{
@@ -437,12 +437,22 @@ static void cd_exec_command(running_machine &machine)
 				else
 				{
 					// track mode
-					cur_track = (start_pos)>>8;
-					printf("track mode %d\n",cur_track);
-					if(cur_track == 0)
-						cur_track = 1;
+					if(((start_pos)>>8) != 0)
+					{
+						cur_track = (start_pos)>>8;
+						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+					}
+					else
+					{
+						/* TODO: Waku Waku 7 sets up track 0, that basically doesn't make any sense. Just skip it for now. */
+						popmessage("Warning: track mode == 0, contact MAMEdev");
+						cr_standard_return(cd_stat);
+						hirqreg |= (CMOK);
+						return;
+					}
 
-					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+					printf("track mode %d\n",cur_track);
+
 				}
 
 				if (end_pos & 0x800000)
@@ -481,8 +491,8 @@ static void cd_exec_command(running_machine &machine)
 				{
 					/* resume from a pause state */
 					/* TODO: Galaxy Fight calls 10ff ffff ffff ffff, but then it calls 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
-                       (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
-                       be countless possible combinations ... */
+					   (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
+					   be countless possible combinations ... */
 					if(fadstoplay == 0)
 					{
 						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
@@ -857,6 +867,7 @@ static void cd_exec_command(running_machine &machine)
 				{
 					cr4 = partitions[bufnum].numblks;
 				}
+
 				hirqreg |= (CMOK|DRDY);
 			}
 			break;
@@ -1112,7 +1123,7 @@ static void cd_exec_command(running_machine &machine)
 			break;
 
 		case 0x6600:    // move sector data
-			/* TODO: Sword & Sorcery */
+			/* TODO: Sword & Sorcery / Riglord Saga 2 */
 			{
 				//UINT8 src_filter = (cr3>>8)&0xff;
 				//UINT8 dst_filter = cr4;
@@ -1146,9 +1157,9 @@ static void cd_exec_command(running_machine &machine)
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-//          UINT32 read_dir;
+//			UINT32 read_dir;
 
-//          read_dir = ((cr3&0xff)<<16)|cr4;
+//			read_dir = ((cr3&0xff)<<16)|cr4;
 
 			if((cr3 >> 8) < 0x24)
 				cddevice = &filters[cr3 >> 8];
