@@ -374,11 +374,11 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( hikaru_map, AS_PROGRAM, 64 )
 //  Area 0
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1")  // boot ROM
-	AM_RANGE(0x00400000, 0x00400003) AM_NOP // unknown
+	AM_RANGE(0x00400000, 0x00400007) AM_NOP // unknown
 	AM_RANGE(0x00800000, 0x0083ffff) AM_NOP // MIE + Service/Test switches and more
 	AM_RANGE(0x00c00000, 0x00c0ffff) AM_RAM // backup RAM
-	AM_RANGE(0x01000000, 0x01000003) AM_NOP // unknown
-	AM_RANGE(0x01000100, 0x01000103) AM_NOP // unknown
+	AM_RANGE(0x01000000, 0x01000007) AM_NOP // unknown
+	AM_RANGE(0x01000100, 0x01000107) AM_NOP // unknown
 	AM_RANGE(0x02000000, 0x02ffffff) AM_NOP // banked area (ROMBD + AICA + COMM + other devices)
 	AM_RANGE(0x03000000, 0x03ffffff) AM_NOP // banked area (ROMBD + EEPROM + COMM + other devices)
 //  Area 1
@@ -393,9 +393,9 @@ static ADDRESS_MAP_START( hikaru_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x16010000, 0x17ffffff) AM_RAM // Slave Work RAM
 //  Area 6
 	AM_RANGE(0x18001000, 0x1800101f) AM_NOP // unknown
-	AM_RANGE(0x1a000000, 0x1a000103) AM_NOP // GPU Regs
-	AM_RANGE(0x1a000180, 0x150001bf) AM_NOP // GPU Texture Regs A
-	AM_RANGE(0x1a000200, 0x1500023f) AM_NOP // GPU Texture Regs B
+	AM_RANGE(0x1a000000, 0x1a000107) AM_NOP // GPU Regs
+	AM_RANGE(0x1a000180, 0x1a0001bf) AM_NOP // GPU Texture Regs A
+	AM_RANGE(0x1a000200, 0x1a00023f) AM_NOP // GPU Texture Regs B
 	AM_RANGE(0x1a040000, 0x1a04000f) AM_NOP // GPU Texture FIFO (?)
 	AM_RANGE(0x1b000000, 0x1b7fffff) AM_NOP // GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
 ADDRESS_MAP_END
