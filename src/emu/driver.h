@@ -126,7 +126,7 @@ public:
 	static const game_driver &driver(int index) { assert(index >= 0 && index < s_driver_count); return *s_drivers_sorted[index]; }
 	static int clone(int index) { return find(driver(index).parent); }
 	static int non_bios_clone(int index) { int result = find(driver(index).parent); return (result != -1 && (driver(result).flags & GAME_IS_BIOS_ROOT) == 0) ? result : -1; }
-	static int compatible_with(int index) { int result = clone(index); return (result != -1) ? result : find(driver(index).compatible_with); }
+	static int compatible_with(int index) { int result = find(driver(index).compatible_with); return (result != -1) ? result : -1; }
 
 	// any item by driver
 	static int clone(const game_driver &driver) { int index = find(driver); assert(index != -1); return clone(index); }
