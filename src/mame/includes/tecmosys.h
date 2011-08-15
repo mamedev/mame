@@ -49,5 +49,16 @@ READ16_HANDLER(tecmosys_prot_data_r);
 WRITE16_HANDLER(tecmosys_prot_data_w);
 
 
+/*----------- defined in video/tecmosys.c -----------*/
 
+WRITE16_HANDLER( bg0_tilemap_w );
+WRITE16_HANDLER( bg1_tilemap_w );
+WRITE16_HANDLER( bg2_tilemap_w );
+WRITE16_HANDLER( fg_tilemap_w );
+WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w );
+WRITE16_HANDLER( bg0_tilemap_lineram_w );
+WRITE16_HANDLER( bg1_tilemap_lineram_w );
+WRITE16_HANDLER( bg2_tilemap_lineram_w );
 
+SCREEN_UPDATE(tecmosys);
+VIDEO_START(tecmosys);
