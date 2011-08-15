@@ -4189,12 +4189,6 @@ ROM_START( sc2catms )
 	ROM_LOAD( "cm20std", 0x0000, 0x010000, CRC(74ca0fd5) SHA1(2345bf3810820a12c613013fedad936ab9134b22) )
 	ROM_LOAD( "cnm20mk2", 0x0000, 0x010000, CRC(0604a78a) SHA1(c75b90f93b1d36928ad46643cfce03dda2b20408) )
 
-	// are these something else? different hw?
-	ROM_LOAD( "catmouse1.bin", 0x0000, 0x002000, CRC(fa2f26a1) SHA1(a85cfde6e2f14d49f627fd8c0bf2c34b331a24b5) )
-	ROM_LOAD( "catmouse2.bin", 0x0000, 0x002000, CRC(51f1ad0a) SHA1(a21196553bb41a025d26fe91ead6282dfc61afe5) )
-	ROM_LOAD( "catmouse3.bin", 0x0000, 0x002000, CRC(5eb5e699) SHA1(ca78a29b607ecf2367d7213e37d5894973fe2a09) )
-	ROM_LOAD( "catmouse4.bin", 0x0000, 0x002000, CRC(e96f1ea7) SHA1(d7c6d0f5852e0ee56e3316840fed034ddd7bf242) )
-
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD( "catandmousesnd.bin", 0x0000, 0x080000, CRC(00d3b224) SHA1(5ae35a7bfa65e8343564e6f6a219bc674710fadc) )
 ROM_END

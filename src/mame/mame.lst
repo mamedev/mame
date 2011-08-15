@@ -11283,15 +11283,14 @@ raaspec			// (c) Roy Abel & Associates 1984
 //3do_pal
 orbatak
 
-/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
-  These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
-  emulation for pinball machiens.
-
-  the m_ prefix is used to identify them as many have very generic names.
-
-*/
+/* Drivers below are mostly mechanical games, usually with no video display, requiring external artwork to function. */
 
 /* Bellfruit Hardware */
+
+// System83 games
+
+b83catms
+b83cops
 
 // System85 games
 
@@ -11582,6 +11581,10 @@ sc4gslam		// Grandslam Club (BFM) (Scorpion 4)
 
 
 /* Maygay Machines Ltd. */
+
+// Triple M (MMM) Hardware?
+
+mmm_ldip	// Lucky Dip
 
 // Maygay M1 A/B hardware
 
@@ -13472,9 +13475,6 @@ ec_suprb	// Super Red Bar
 ec_suprl	// Super Reels
 ec_supsl	// Super Silver
 ec_unk1		// Unknown 'Electrocoin' Fruit Machine '300615'
-ec_unk2		// Unknown 'Electrocoin' Fruit Machine 'a3'
-ec_unk3		// Unknown 'Electrocoin' Fruit Machine 'a4'
-ec_unk4		// Unknown 'Electrocoin' Fruit Machine 'flat256'
 ec_unk5		// Unknown 'Electrocoin' Fruit Machine(s)
 
 /* BGT x86 based platform */
@@ -13487,6 +13487,10 @@ bg_maxa		//
 
 st_ohla
 st_vulkn
+
+/* Hazel Grove */
+
+hg_frd		// Fruit Deuce
 
 // Leisure Ent.
 roul			// (c) 1990

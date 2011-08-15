@@ -516,6 +516,7 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
 	$(DRIVERS)/bfm_sc4.o \
 	$(DRIVERS)/bfm_sc5.o \
+	$(DRIVERS)/bfmsys83.o \
 	$(DRIVERS)/bfmsys85.o \
 	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
 
@@ -919,6 +920,7 @@ $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \
 	$(DRIVERS)/maygayv1.o \
 	$(DRIVERS)/maygayep.o \
+	$(DRIVERS)/mmm.o \
 
 $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/lazercmd.o $(VIDEO)/lazercmd.o \
@@ -1706,6 +1708,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gstream.o \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
 	$(DRIVERS)/gunpey.o \
+	$(DRIVERS)/hazelgr.o \
 	$(DRIVERS)/highvdeo.o \
 	$(DRIVERS)/himesiki.o $(VIDEO)/himesiki.o \
 	$(DRIVERS)/hitpoker.o \
