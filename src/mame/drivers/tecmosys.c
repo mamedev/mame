@@ -196,6 +196,7 @@ static READ16_HANDLER( sound_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		space->machine().scheduler().synchronize();
 		return soundlatch2_r( space,  0 );
 	}
 
@@ -206,6 +207,7 @@ static WRITE16_HANDLER( sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		space->machine().scheduler().synchronize();
 		soundlatch_w(space, 0x00, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -349,7 +351,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_r, ymf262_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
