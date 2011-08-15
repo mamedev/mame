@@ -107,7 +107,7 @@
 
 #include "emu.h"
 #include "machine/fd1094.h"
-#include "cpu/m68000/m68kcpu.h"
+#include "cpu/m68000/m68000.h"
 
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"

@@ -1834,6 +1834,10 @@ ROM_START( escounts )
 //  ROM_LOAD( "escint1b", 0x08000, 0x08000, CRC(96918aae) SHA1(849ce7b8eccc89c45aacc840a73935f95788a141) )
 	ROM_LOAD( "esc12int", 0x08000, 0x08000, CRC(741a1fe6) SHA1(e741d0ae0d2f11036a358120381e4b0df4a560a1) )
 
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "bfm_esc.bin", 0x8000, 0x008000, CRC(27acb5a5) SHA1(da50d650ab6456d61d0fb7f89247f2040b4bb9a8) )
+
+
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "esccobpa", 0x00000, 0x10000, CRC(d8eadeb7) SHA1(9b94f1454e6a17bf8321b0ef4ddd0ed1a56150f7) )
 
@@ -1861,6 +1865,10 @@ ROM_END
 ROM_START( beeline )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bln12int.a", 0x08000, 0x08000, CRC(cb97905e) SHA1(9725156bf64e53a56bc0f90795d4b07db41d059e) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "beeint12", 0x8000, 0x008000, CRC(0a77d0be) SHA1(8e55e7b4eb85cc2521d8fdf7ede02131ed80372e) )
+
 
 	ROM_REGION( 0x20000, "user1", 0 )
 	ROM_LOAD( "blncob.pa", 0x00000, 0x10000, CRC(8abc0017) SHA1(ecf6e7a4021b35295eb9bb9aed1b88fff27ffbd1) )

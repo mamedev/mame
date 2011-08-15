@@ -14,7 +14,7 @@ make more configurable (select caches per game?)
 #include "machine/fddebug.h"
 #include "includes/segas16.h"
 
-
+#define KEY_DEBUGGING 0
 #define CACHE_ENTRIES	8
 
 static UINT8 *fd1094_key; // the memory region containing key
@@ -173,7 +173,7 @@ static void fd1094_postload(running_machine &machine)
 	}
 }
 
-
+#if KEY_DEBUGGING
 static void key_changed(running_machine &machine)
 {
 	int addr;
@@ -194,7 +194,7 @@ static void key_changed(running_machine &machine)
 	/* flush the prefetch queue */
 	cpu_set_reg(machine.device(fd1094_cputag), M68K_PREF_ADDR, 0x0010);
 }
-
+#endif
 
 /* startup function, to be called from DRIVER_INIT (once on startup) */
 void fd1094_driver_init(running_machine &machine, const char* tag, void (*set_decrypted)(running_machine &, UINT8 *))
@@ -221,10 +221,12 @@ void fd1094_driver_init(running_machine &machine, const char* tag, void (*set_de
 	fd1094_state = -1;
 
 	/* key debugging */
+#if KEY_DEBUGGING
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0 && machine.region("user2")->base() != NULL)
 	{
 		fd1094_init_debugging(machine, fd1094_cputag, "user1", "user2", key_changed);
 	}
+#endif
 
 	state_save_register_global(machine, fd1094_selected_state);
 	state_save_register_global(machine, fd1094_state);
