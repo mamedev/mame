@@ -300,7 +300,12 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 			/* next! */
 			position++;
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -349,7 +354,12 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 				}
 			}
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -390,7 +400,12 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer,
 			/* next! */
 			position += 2;
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -415,7 +430,12 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer,
 					position = voice->loop_start;
 			}
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -454,7 +474,12 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 			/* next! */
 			position += 4;
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -479,7 +504,12 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 					position = voice->loop_start;
 			}
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -568,9 +598,10 @@ static STREAM_UPDATE( ymz280b_update )
 		/* if there are leftovers, ramp back to 0 */
 		if (samples_left)
 		{
-			int base = new_samples - samples_left;
+			/* note: samples_left bit 16 is set if the voice was finished at the same time the function ended */
+			int base = new_samples - (samples_left & 0xffff);
 			int i, t = (base == 0) ? curr : chip->scratch[base - 1];
-			for (i = 0; i < samples_left; i++)
+			for (i = 0; i < (samples_left & 0xffff); i++)
 			{
 				if (t < 0) t = -((-t * 15) >> 4);
 				else if (t > 0) t = (t * 15) >> 4;
@@ -656,6 +687,7 @@ static DEVICE_START( ymz280b )
 	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
 
 	/* allocate memory */
+	assert(MAX_SAMPLE_CHUNK < 0x10000);
 	chip->scratch = auto_alloc_array(device->machine(), INT16, MAX_SAMPLE_CHUNK);
 
 	/* state save */
