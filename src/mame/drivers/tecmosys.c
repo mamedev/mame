@@ -136,7 +136,7 @@ t501.uad1       23c4001 dip32 maskrom
 
 /*
 
-Touki Denshou -Angel Eyes-
+Toukidenshou -Angel Eyes-
 (c)1996 Tecmo
 Tecmo System Board
 
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 	MCFG_WATCHDOG_VBLANK_INIT(400) // guess
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2 )	/* 8MHz ??? (slowdowns on 4MHz) */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2 )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -674,5 +674,5 @@ static DRIVER_INIT( tkdensha )
 }
 
 GAME( 1995, deroon,           0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
-GAME( 1996, tkdensho,         0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960614)", 0 )
-GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960427)", 0 )
+GAME( 1996, tkdensho,         0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", 0 )
+GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", 0 )
