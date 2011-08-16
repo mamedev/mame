@@ -280,7 +280,7 @@ static INPUT_PORTS_START( tbowl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")	/* 0xfc08 -> 0xffb4 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING (   0x00, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING (   0x02, DEF_STR( 6C_1C ) )
@@ -289,7 +289,7 @@ static INPUT_PORTS_START( tbowl )
 	PORT_DIPSETTING (   0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING (   0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (   0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xf8, 0xb8, "Time (Players)" )
+	PORT_DIPNAME( 0xf8, 0xb8, "Time (Players)" )		PORT_DIPLOCATION("SW1:4,5,6,7,8")
 	PORT_DIPSETTING (   0x00, "7:00" )
 	PORT_DIPSETTING (   0x08, "6:00" )
 	PORT_DIPSETTING (   0x10, "5:00" )
@@ -324,58 +324,52 @@ static INPUT_PORTS_START( tbowl )
 //  PORT_DIPSETTING (   0xf8, "1:00" )
 
 	PORT_START("DSW2")	/* 0xfc09 -> 0xffb5 */
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty (unused ?)" )	// To be checked again
-	PORT_DIPSETTING (   0x00, "0x00" )
-	PORT_DIPSETTING (   0x01, "0x01" )
-	PORT_DIPSETTING (   0x02, "0x02" )
-	PORT_DIPSETTING (   0x03, "0x03" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Extra Time (Players)" )	// For multiple "credits"
-	PORT_DIPSETTING (   0x00, "0:30" )
-	PORT_DIPSETTING (   0x04, "0:20" )
-	PORT_DIPSETTING (   0x08, "0:10" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2") // To be checked again
+	PORT_DIPSETTING (   0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING (   0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING (   0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Extra Time (Players)" )	PORT_DIPLOCATION("SW2:3,4") // For multiple "credits"
+	PORT_DIPSETTING (   0x00, "0:30" )			/* manual shows 0:10 */
+	PORT_DIPSETTING (   0x04, "0:20" )			/* manual shows 0:05 */
+	PORT_DIPSETTING (   0x08, "0:10" )			/* manual shows 0:02 */
 	PORT_DIPSETTING (   0x0c, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, "Timer Speed" )
-	PORT_DIPSETTING (   0x00, "56/60" )
-	PORT_DIPSETTING (   0x10, "51/60" )
-	PORT_DIPSETTING (   0x30, "47/60" )
-	PORT_DIPSETTING (   0x20, "42/60" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	// Check code at 0x0393
+	PORT_DIPNAME( 0x30, 0x30, "Timer Speed" )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING (   0x00, "Slowest" )			/* manual shows 1 Count = 60/60 Second - was 56/60 */
+	PORT_DIPSETTING (   0x10, "Slow" )			/* manual shows 1 Count = 54/60 Second - was 51/60 */
+	PORT_DIPSETTING (   0x30, DEF_STR( Normal ) )		/* manual shows 1 Count = 50/60 Second - was 47/60 */
+	PORT_DIPSETTING (   0x20, "Fast" )			/* manual shows 1 Count = 45/60 Second - was 42/60 */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:7") // Check code at 0x0393
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hi-Score Reset" )		// Only if P1 buttons 1 and 2 are pressed during P.O.S.T. !
+	PORT_DIPNAME( 0x80, 0x80, "Hi-Score Reset" )		PORT_DIPLOCATION("SW2:8") // Only if P1 buttons 1 and 2 are pressed during P.O.S.T. !
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
 
 	PORT_START("DSW3")	/* 0xfc0a -> 0xffb6 */
-	PORT_DIPNAME( 0x03, 0x03, "Time (Quarter)" )
+	PORT_DIPNAME( 0x03, 0x03, "Time (Quarter)" )		PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING (   0x00, "8:00" )
 	PORT_DIPSETTING (   0x01, "5:00" )
 	PORT_DIPSETTING (   0x03, "4:00" )
 	PORT_DIPSETTING (   0x02, "3:00" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Unknown (in 0x8126.w)" )	// Check code at 0x6e16
-	PORT_DIPSETTING (   0x00, "0x00 = 0x54f3" )
-	PORT_DIPSETTING (   0x04, "0x04 = 0x54e1" )
-	PORT_DIPSETTING (   0x08, "0x08 = 0x54cf" )
-	PORT_DIPSETTING (   0x0c, "0x0c = 0x54bd" )
+	PORT_DIPNAME( 0x0c, 0x08, "Bonus Frequency" )		PORT_DIPLOCATION("SW3:3,4") // Check code at 0x6e16, each step is + 0x12
+	PORT_DIPSETTING (   0x00, "Most" )			/* Value in 0x8126.w = 0x54f3 (0x5414 for tbowlj) */
+	PORT_DIPSETTING (   0x04, "More" )			/* Value in 0x8126.w = 0x54e1 (0x5402 for tbowlj) */
+	PORT_DIPSETTING (   0x08, DEF_STR( Normal ) ) 		/* Value in 0x8126.w = 0x54cf (0x54f0 for tbowlj), manual shows this is Least, but values is > least */
+	PORT_DIPSETTING (   0x0c, "Least" ) 			/* Value in 0x8126.w = 0x54bd (0x54de for tbowlj), manual shows this is Normal, but value is least */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/* same as 'tbowl', but different "Quarter Time" Dip Switch
-   ("3:00" and "4:00" are inverted) */
-static INPUT_PORTS_START( tbowlj )
+
+static INPUT_PORTS_START( tbowlj ) /* "Quarter Time" Dip Switch for "3:00" and "4:00" are inverted */
 	PORT_INCLUDE( tbowl )
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Time (Quarter)" )
+	PORT_DIPNAME( 0x03, 0x03, "Time (Quarter)" )		PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING (   0x00, "8:00" )
 	PORT_DIPSETTING (   0x01, "5:00" )
 	PORT_DIPSETTING (   0x02, "4:00" )
 	PORT_DIPSETTING (   0x03, "3:00" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Unknown (in 0x8126.w)" )	// Check code at 0x6e37
-	PORT_DIPSETTING (   0x00, "0x00 = 0x5414" )
-	PORT_DIPSETTING (   0x04, "0x04 = 0x5402" )
-	PORT_DIPSETTING (   0x08, "0x08 = 0x54f0" )
-	PORT_DIPSETTING (   0x0c, "0x0c = 0x54de" )
 INPUT_PORTS_END
 
 
@@ -683,5 +677,5 @@ ROM_START( tbowlj )
 	ROM_LOAD( "6206a.2",	0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END
 
-GAME( 1987, tbowl,    0,        tbowl,    tbowl,    0, ROT0,  "Tecmo", "Tecmo Bowl (World?)", 0 )
+GAME( 1987, tbowl,    0,        tbowl,    tbowl,    0, ROT0,  "Tecmo", "Tecmo Bowl (World)", 0 )
 GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)", 0 )
