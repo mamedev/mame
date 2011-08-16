@@ -555,10 +555,10 @@ static STREAM_UPDATE( ymz280b_update )
 			switch (voice->mode)
 			{
 				case 1:	samples_left = generate_adpcm(voice, chip->region_base, chip->scratch, new_samples);	break;
-				case 2:	samples_left = generate_pcm8(voice, chip->region_base, chip->scratch, new_samples);	break;
+				case 2:	samples_left = generate_pcm8(voice, chip->region_base, chip->scratch, new_samples);		break;
 				case 3:	samples_left = generate_pcm16(voice, chip->region_base, chip->scratch, new_samples);	break;
 				default:
-				case 0:	samples_left = 0; memset(chip->scratch, 0, new_samples * sizeof(chip->scratch[0]));			break;
+				case 0:	samples_left = 0; memset(chip->scratch, 0, new_samples * sizeof(chip->scratch[0]));		break;
 			}
 		}
 
@@ -823,6 +823,13 @@ static void write_to_register(ymz280b_state *chip, int data)
 	{
 		switch (chip->current_register)
 		{
+			/* DSP related (not implemented yet) */
+			case 0x80: // d0-2: DSP Rch, d3: enable Rch (0: yes, 1: no), d4-6: DSP Lch, d7: enable Lch (0: yes, 1: no)
+			case 0x81: // d0: enable control of $82 (0: yes, 1: no)
+			case 0x82: // DSP data
+				logerror("YMZ280B: DSP register write %02X = %02X\n", chip->current_register, data);
+				break;
+
 			case 0x84:		/* ROM readback / RAM write (high) */
 				chip->rom_readback_addr &= 0xffff;
 				chip->rom_readback_addr |= (data<<16);
@@ -843,6 +850,7 @@ static void write_to_register(ymz280b_state *chip, int data)
 					chip->ext_ram_write(chip->rom_readback_addr, data);
 				else
 					logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
+				chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
 				break;
 
 			case 0xfe:		/* IRQ mask */
@@ -925,7 +933,11 @@ READ8_DEVICE_HANDLER( ymz280b_r )
 	ymz280b_state *chip = get_safe_token(device);
 
 	if ((offset & 1) == 0)
-		return chip->ext_ram_read(chip->rom_readback_addr++ - 1);
+	{
+		UINT8 read = chip->ext_ram_read.isnull() ? 0 : chip->ext_ram_read(chip->rom_readback_addr);
+		chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
+		return read;
+	}
 	else
 		return compute_status(chip);
 }
@@ -952,7 +964,7 @@ DEVICE_GET_INFO( ymz280b )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ymz280b_state);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ymz280b_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymz280b );		break;
@@ -961,10 +973,10 @@ DEVICE_GET_INFO( ymz280b )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ280B");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha Wavetable");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Yamaha Wavetable");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
