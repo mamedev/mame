@@ -524,28 +524,30 @@ static STREAM_UPDATE( ymz280b_update )
 		int rvol = voice->output_right;
 
 		/* quick out if we're not playing and we're at 0 */
-		if (!voice->playing && curr == 0)
+		if (!voice->playing && curr == 0 && prev == 0)
+		{
+			/* make sure next sound plays immediately */
+			voice->output_pos = FRAC_ONE;
+
 			continue;
+		}
 
 		/* finish off the current sample */
-//      if (voice->output_pos > 0)
+		/* interpolate */
+		while (remaining > 0 && voice->output_pos < FRAC_ONE)
 		{
-			/* interpolate */
-			while (remaining > 0 && voice->output_pos < FRAC_ONE)
-			{
-				int interp_sample = (((INT32)prev * (FRAC_ONE - voice->output_pos)) + ((INT32)curr * voice->output_pos)) >> FRAC_BITS;
-				*ldest++ += interp_sample * lvol;
-				*rdest++ += interp_sample * rvol;
-				voice->output_pos += voice->output_step;
-				remaining--;
-			}
-
-			/* if we're over, continue; otherwise, we're done */
-			if (voice->output_pos >= FRAC_ONE)
-				voice->output_pos -= FRAC_ONE;
-			else
-				continue;
+			int interp_sample = (((INT32)prev * (FRAC_ONE - voice->output_pos)) + ((INT32)curr * voice->output_pos)) >> FRAC_BITS;
+			*ldest++ += interp_sample * lvol;
+			*rdest++ += interp_sample * rvol;
+			voice->output_pos += voice->output_step;
+			remaining--;
 		}
+
+		/* if we're over, continue; otherwise, we're done */
+		if (voice->output_pos >= FRAC_ONE)
+			voice->output_pos -= FRAC_ONE;
+		else
+			continue;
 
 		/* compute how many new samples we need */
 		final_pos = voice->output_pos + remaining * voice->output_step;
@@ -555,16 +557,12 @@ static STREAM_UPDATE( ymz280b_update )
 		samples_left = new_samples;
 
 		/* generate them into our buffer */
-		if (voice->playing)
+		switch (voice->playing << 7 | voice->mode)
 		{
-			switch (voice->mode)
-			{
-				case 1:	samples_left = generate_adpcm(voice, chip->region_base, chip->scratch, new_samples);	break;
-				case 2:	samples_left = generate_pcm8(voice, chip->region_base, chip->scratch, new_samples);		break;
-				case 3:	samples_left = generate_pcm16(voice, chip->region_base, chip->scratch, new_samples);	break;
-				default:
-				case 0:	samples_left = 0; memset(chip->scratch, 0, new_samples * sizeof(chip->scratch[0]));		break;
-			}
+			case 0x81:	samples_left = generate_adpcm(voice, chip->region_base, chip->scratch, new_samples);	break;
+			case 0x82:	samples_left = generate_pcm8(voice, chip->region_base, chip->scratch, new_samples);		break;
+			case 0x83:	samples_left = generate_pcm16(voice, chip->region_base, chip->scratch, new_samples);	break;
+			default:	samples_left = 0; memset(chip->scratch, 0, new_samples * sizeof(chip->scratch[0]));		break;
 		}
 
 		/* if there are leftovers, ramp back to 0 */
@@ -719,6 +717,17 @@ static DEVICE_RESET( ymz280b )
 
 	chip->current_register = 0;
 	chip->status_register = 0;
+
+	/* clear other voice parameters */
+	for (i = 0; i < 8; i++)
+	{
+		struct YMZ280BVoice *voice = &chip->voice[i];
+
+		voice->curr_sample = 0;
+		voice->last_sample = 0;
+		voice->output_pos = FRAC_ONE;
+		voice->playing = 0;
+	}
 }
 
 
