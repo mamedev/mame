@@ -544,11 +544,13 @@ static void update_pcm(YMF271Chip *chip, int slotnum, INT32 *mixp, int length)
 	{
 		if (slot->bits == 8)
 		{
+			// 8bit
 			sample = rombase[slot->startaddr + (slot->stepptr>>16)]<<8;
 		}
 		else
 		{
-			if (slot->stepptr & 1)
+			// 12bit
+			if (slot->stepptr & 0x10000)
 				sample = rombase[slot->startaddr + (slot->stepptr>>17)*3 + 2]<<8 | ((rombase[slot->startaddr + (slot->stepptr>>17)*3 + 1] << 4) & 0xf0);
 			else
 				sample = rombase[slot->startaddr + (slot->stepptr>>17)*3]<<8 | (rombase[slot->startaddr + (slot->stepptr>>17)*3 + 1] & 0xf0);
