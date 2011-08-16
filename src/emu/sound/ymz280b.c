@@ -86,19 +86,22 @@ struct _ymz280b_state
 	UINT8 irq_enable;				/* current IRQ enable */
 	UINT8 keyon_enable;				/* key on enable */
 	double master_clock;			/* master clock frequency */
-	void (*irq_callback)(device_t *, int);		/* IRQ callback */
+	void (*irq_callback)(device_t *, int);	/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
 	devcb_resolved_read8 ext_ram_read;		/* external RAM read handler */
 	devcb_resolved_write8 ext_ram_write;	/* external RAM write handler */
 
 #if MAKE_WAVS
-	void *		wavresample;			/* resampled waveform */
+	void *		wavresample;		/* resampled waveform */
 #endif
 
 	INT16 *scratch;
 	device_t *device;
 };
+
+static void write_to_register(ymz280b_state *, int);
+
 
 /* step size index shift table */
 static const int index_scale[8] = { 0x0e6, 0x0e6, 0x0e6, 0x0e6, 0x133, 0x199, 0x200, 0x266 };
@@ -627,7 +630,7 @@ static STREAM_UPDATE( ymz280b_update )
 
 /**********************************************************************************************
 
-     DEVICE_START( ymz280b ) -- start emulation of the YMZ280B
+     DEVICE_START/RESET( ymz280b ) -- start/reset emulation of the YMZ280B
 
 ***********************************************************************************************/
 
@@ -700,6 +703,22 @@ static DEVICE_START( ymz280b )
 #endif
 }
 
+static DEVICE_RESET( ymz280b )
+{
+	int i;
+	ymz280b_state *chip = get_safe_token(device);
+
+	/* initial clear registers */
+	for (i = 0xff; i >= 0; i--)
+	{
+		chip->current_register = 0;
+		write_to_register(chip, 0);
+	}
+
+	chip->current_register = 0;
+	chip->status_register = 0;
+}
+
 
 
 /**********************************************************************************************
@@ -712,9 +731,6 @@ static void write_to_register(ymz280b_state *chip, int data)
 {
 	struct YMZ280BVoice *voice;
 	int i;
-
-	/* force an update */
-	chip->stream->update();
 
 	/* lower registers follow a pattern */
 	if (chip->current_register < 0x80)
@@ -924,7 +940,7 @@ static int compute_status(ymz280b_state *chip)
 
 /**********************************************************************************************
 
-     ymz280b_status_0_r/ymz280b_status_1_r -- handle a read from the status register
+     ymz280b_r/ymz280b_w -- handle external accesses
 
 ***********************************************************************************************/
 
@@ -934,6 +950,7 @@ READ8_DEVICE_HANDLER( ymz280b_r )
 
 	if ((offset & 1) == 0)
 	{
+		/* read from external memory */
 		UINT8 read = chip->ext_ram_read.isnull() ? 0 : chip->ext_ram_read(chip->rom_readback_addr);
 		chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
 		return read;
@@ -950,7 +967,12 @@ WRITE8_DEVICE_HANDLER( ymz280b_w )
 	if ((offset & 1) == 0)
 		chip->current_register = data;
 	else
+	{
+		/* force an update */
+		chip->stream->update();
+
 		write_to_register(chip, data);
+	}
 }
 
 
@@ -969,7 +991,7 @@ DEVICE_GET_INFO( ymz280b )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymz280b );		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->start = DEVICE_RESET_NAME( ymz280b );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ280B");						break;
