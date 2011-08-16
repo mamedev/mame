@@ -67,6 +67,7 @@ const int TM_SEARCH_TRANSFER	= 0x03;
 //**************************************************************************
 
 #define LOG 0
+#define DMA_LOG 0
 
 #define REGNUM(_m, _s)			(((_m)<<3) + (_s))
 #define GET_REGNUM(_r)			(&(_r) - &(WR0))
@@ -397,8 +398,7 @@ void z80dma_device::do_read()
 				else
 					m_latch = m_in_iorq_func(m_addressA);
 
-				if (LOG) logerror("Z80DMA '%s' A src: %04x %s -> data: %02x\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o", m_latch);
-				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
+				if (DMA_LOG) logerror("Z80DMA '%s' A src: %04x %s -> data: %02x\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o", m_latch);
 			}
 			else
 			{
@@ -407,8 +407,7 @@ void z80dma_device::do_read()
 				else
 					m_latch = m_in_iorq_func(m_addressB);
 
-				if (LOG) logerror("Z80DMA '%s' B src: %04x %s -> data: %02x\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o", m_latch);
-				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
+				if (DMA_LOG) logerror("Z80DMA '%s' B src: %04x %s -> data: %02x\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o", m_latch);
 			}
 			break;
 		case TM_SEARCH_TRANSFER:
@@ -444,8 +443,7 @@ int z80dma_device::do_write()
 				else
 					m_out_iorq_func(m_addressB, m_latch);
 
-				if (LOG) logerror("Z80DMA '%s' B dst: %04x %s\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o");
-				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
+				if (DMA_LOG) logerror("Z80DMA '%s' B dst: %04x %s\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o");
 			}
 			else
 			{
@@ -454,11 +452,9 @@ int z80dma_device::do_write()
 				else
 					m_out_iorq_func(m_addressA, m_latch);
 
-				if (LOG) logerror("Z80DMA '%s' A dst: %04x %s\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o");
-				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
+				if (DMA_LOG) logerror("Z80DMA '%s' A dst: %04x %s\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o");
 			}
-			m_count--;
-			done = (m_count == 0xFFFF);
+
 			break;
 
 		case TM_SEARCH:
@@ -475,8 +471,6 @@ int z80dma_device::do_write()
 					}
 				}
 
-				m_count--;
-				done = (m_count == 0xFFFF); //correct?
 			}
 			break;
 
@@ -488,6 +482,13 @@ int z80dma_device::do_write()
 			logerror("z80dma_do_operation: invalid mode %d!\n", mode);
 			break;
 	}
+
+	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
+	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
+
+	m_count--;
+	done = (m_count == 0xFFFF); //correct?
+
 	if (done)
 	{
 		//FIXME: interrupt ?
@@ -513,6 +514,7 @@ void z80dma_device::timerproc()
 
 	if (m_is_read)
 	{
+		/* TODO: there's a nasty recursion bug with Alpha for Sharp X1 Turbo on the transfers with this function! */
 		do_read();
 		done = 0;
 		m_is_read = false;
@@ -528,7 +530,7 @@ void z80dma_device::timerproc()
 	if (done)
 	{
 		m_dma_enabled = 0; //FIXME: Correct?
-        m_status = 0x19;
+        m_status = 0x09;
 
 		m_status |= !is_ready() << 1; // ready line status
 
@@ -594,6 +596,9 @@ void z80dma_device::update_status()
 UINT8 z80dma_device::read()
 {
 	UINT8 res;
+
+	if(m_read_num_follow == 0) /* TODO: should return the status, but let me know WHAT uses this first */
+		fatalerror("Z80DMA '%s' Read without anything setted into stack", tag());
 
 	res = m_read_regs_follow[m_read_cur_follow];
 	m_read_cur_follow++;
@@ -678,7 +683,8 @@ void z80dma_device::write(UINT8 data)
 					break;
 				case COMMAND_READ_STATUS_BYTE:
 					if (LOG) logerror("Z80DMA '%s' CMD Read status Byte\n", tag());
-        			READ_MASK = 0;
+        			READ_MASK = 1;
+        			m_read_regs_follow[m_read_num_follow++] = m_status;
         			break;
 				case COMMAND_RESET_AND_DISABLE_INTERRUPTS:
 					WR3 &= ~0x20;
@@ -691,12 +697,12 @@ void z80dma_device::write(UINT8 data)
 					if (LOG) logerror("Z80DMA '%s' Initiate Read Sequence\n", tag());
 					m_read_cur_follow = m_read_num_follow = 0;
 					if(READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
-					if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = BLOCKLEN_L; } //byte counter (low)
-					if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = BLOCKLEN_H; } //byte counter (high)
-					if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = PORTA_ADDRESS_L; } //port A address (low)
-					if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = PORTA_ADDRESS_H; } //port A address (high)
-					if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = PORTB_ADDRESS_L; } //port B address (low)
-					if(READ_MASK & 0x40) { m_read_regs_follow[m_read_num_follow++] = PORTB_ADDRESS_H; } //port B address (high)
+					if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_count & 0xff; } //byte counter (low)
+					if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_count >> 8; } //byte counter (high)
+					if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
+					if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
+					if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)
+					if(READ_MASK & 0x40) { m_read_regs_follow[m_read_num_follow++] = m_addressB >> 8; } //port B address (high)
 					break;
 				case COMMAND_RESET:
 					if (LOG) logerror("Z80DMA '%s' Reset\n", tag());
@@ -723,6 +729,7 @@ void z80dma_device::write(UINT8 data)
 					m_addressB = PORTB_ADDRESS;
 					m_count = BLOCKLEN;
 					m_status |= 0x30;
+
 					if (LOG) logerror("Z80DMA '%s' Load A: %x B: %x N: %x\n", tag(), m_addressA, m_addressB, m_count);
 					break;
 				case COMMAND_DISABLE_DMA:
@@ -799,6 +806,18 @@ void z80dma_device::write(UINT8 data)
 			if (data & 0x10)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(INTERRUPT_VECTOR);
 			m_cur_follow = 0;
+		}
+		else if(m_regs_follow[m_num_follow] == GET_REGNUM(READ_MASK))
+		{
+			m_read_cur_follow = m_read_num_follow = 0;
+
+			if(READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
+			if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_count & 0xff; } //byte counter (low)
+			if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_count >> 8; } //byte counter (high)
+			if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
+			if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
+			if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)
+			if(READ_MASK & 0x40) { m_read_regs_follow[m_read_num_follow++] = m_addressB >> 8; } //port B address (high)
 		}
 
 		m_reset_pointer++;

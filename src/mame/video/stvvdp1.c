@@ -179,7 +179,7 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 		case 0x12/2: return state->m_vdp1.lopr;
 		case 0x14/2: return state->m_vdp1.copr;
 		/* MODR register, read register for the other VDP1 regs
-		   (Shienryu SS version abuses of this during intro) */
+           (Shienryu SS version abuses of this during intro) */
 		case 0x16/2:
 			UINT16 modr;
 
@@ -2171,8 +2171,11 @@ int stv_vdp1_start ( running_machine &machine )
 
 	state->m_vdp1.system_cliprect.min_x = state->m_vdp1.system_cliprect.max_x = 0;
 	state->m_vdp1.system_cliprect.min_y = state->m_vdp1.system_cliprect.max_y = 0;
-	state->m_vdp1.user_cliprect.min_x = state->m_vdp1.user_cliprect.max_x = 0;
-	state->m_vdp1.user_cliprect.min_y = state->m_vdp1.user_cliprect.max_y = 0;
+	/* Kidou Senshi Z Gundam - Zenpen Zeta no Kodou loves to use the user cliprect vars in an undefined state ... */
+	state->m_vdp1.user_cliprect.min_x = 0;
+	state->m_vdp1.user_cliprect.min_y = 0;
+	state->m_vdp1.user_cliprect.max_x = 512;
+	state->m_vdp1.user_cliprect.max_y = 256;
 
 	// save state
 	state_save_register_global_pointer(machine, state->m_vdp1_regs, 0x020/2);

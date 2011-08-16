@@ -4317,6 +4317,10 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 
 
 	{
+		/* Pukunpa */
+		if(STV_VDP2_SPWINEN)
+			popmessage("Sprite Window enabled");
+
 		/* Capcom Collection Dai 2 - Choh Makaimura (Duh!) */
 		if(STV_VDP2_MZCTL & 0x1f && 0)
 			popmessage("Mosaic control enabled = %04x\n",STV_VDP2_MZCTL);
@@ -6424,13 +6428,19 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 							stv_sprite_priorities_in_fb_line[y][sprite_priorities[0]] = 1;
 							continue;
 						};
+
+						if(STV_VDP2_SPWINEN && pix == 0x8000) /* Pukunpa */
+							continue;
+
 						b = (pix & 0x7c00) >> 10;
 						g = (pix & 0x03e0) >> 5;
 						r = (pix & 0x1f);
+
 						if ( color_offset_pal )
 						{
 							stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_SPCOSL );
 						}
+
 						bitmap_line[x] = b | g << 5 | r << 10;
 					}
 					else

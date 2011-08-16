@@ -286,16 +286,16 @@ static TIMER_CALLBACK( stv_smpc_intback )
 }
 
 /*
-	[0] port status:
-		0x04 Sega-tap
-		0x16 Multi-tap
-		0x2x clock serial peripheral
-		0xf0 peripheral isn't connected
-	    0xf1 peripheral is connected
-	[1] Peripheral ID (note: lowest four bits determines the size of the input packet)
-		0x02 digital pad
-		0x25 (tested by Game Basic?)
-		0x34 keyboard
+    [0] port status:
+        0x04 Sega-tap
+        0x16 Multi-tap
+        0x2x clock serial peripheral
+        0xf0 peripheral isn't connected
+        0xf1 peripheral is connected
+    [1] Peripheral ID (note: lowest four bits determines the size of the input packet)
+        0x02 digital pad
+        0x25 (tested by Game Basic?)
+        0x34 keyboard
 */
 
 static void smpc_digital_pad(running_machine &machine, UINT8 pad_num, UINT8 offset)
@@ -309,6 +309,27 @@ static void smpc_digital_pad(running_machine &machine, UINT8 pad_num, UINT8 offs
 	state->m_smpc.OREG[1+pad_num*offset] = 0x02;
 	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
 	state->m_smpc.OREG[3+pad_num*offset] = pad_data & 0xff;
+}
+
+static void smpc_analog_pad(running_machine &machine, UINT8 pad_num, UINT8 offset, UINT8 id)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	static const char *const padnames[] = { "AN_JOY1", "AN_JOY2" };
+	static const char *const annames[2][3] = { { "AN_X1", "AN_Y1", "AN_Z1" },
+											   { "AN_X2", "AN_Y2", "AN_Z2" }};
+	UINT16 pad_data;
+
+	pad_data = input_port_read(machine, padnames[pad_num]);
+	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
+	state->m_smpc.OREG[1+pad_num*offset] = id;
+	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
+	state->m_smpc.OREG[3+pad_num*offset] = pad_data & 0xff;
+	state->m_smpc.OREG[4+pad_num*offset] = input_port_read(machine, annames[pad_num][0]);
+	if(id == 0x15)
+	{
+		state->m_smpc.OREG[5+pad_num*offset] = input_port_read(machine, annames[pad_num][1]);
+		state->m_smpc.OREG[6+pad_num*offset] = input_port_read(machine, annames[pad_num][2]);
+	}
 }
 
 static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
@@ -337,15 +358,15 @@ static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
 	state->m_smpc.OREG[2+pad_num*offset] = game_key>>8; // game buttons, TODO
 	state->m_smpc.OREG[3+pad_num*offset] = game_key & 0xff;
 	/*
-		x--- ---- 0
-		-x-- ---- caps lock
-		--x- ---- num lock
-		---x ---- scroll lock
-		---- x--- data ok
-		---- -x-- 1
-		---- --x- 1
-		---- ---x Break key
-	*/
+        x--- ---- 0
+        -x-- ---- caps lock
+        --x- ---- num lock
+        ---x ---- scroll lock
+        ---- x--- data ok
+        ---- -x-- 1
+        ---- --x- 1
+        ---- ---x Break key
+    */
 	state->m_smpc.OREG[4+pad_num*offset] = state->m_keyb.status | 6;
 	state->m_smpc.OREG[5+pad_num*offset] = state->m_keyb.data;
 }
@@ -355,13 +376,45 @@ static void smpc_mouse(running_machine &machine, UINT8 pad_num, UINT8 offset, UI
 	saturn_state *state = machine.driver_data<saturn_state>();
 	static const char *const mousenames[2][3] = { { "MOUSEB1", "MOUSEX1", "MOUSEY1" },
 												  { "MOUSEB2", "MOUSEX2", "MOUSEY2" }};
-	/* TODO: xy over / sign flags */
+	UINT8 mouse_ctrl;
+	INT16 mouse_x, mouse_y;
+
+	mouse_ctrl = input_port_read(machine, mousenames[pad_num][0]);
+	mouse_x = input_port_read(machine, mousenames[pad_num][1]);
+	mouse_y = input_port_read(machine, mousenames[pad_num][2]);
+
+	if(mouse_x < 0)
+		mouse_ctrl |= 0x10;
+
+	if(mouse_y < 0)
+		mouse_ctrl |= 0x20;
+
+	if((mouse_x & 0xff00) != 0xff00 && (mouse_x & 0xff00) != 0x0000)
+		mouse_ctrl |= 0x40;
+
+	if((mouse_y & 0xff00) != 0xff00 && (mouse_y & 0xff00) != 0x0000)
+		mouse_ctrl |= 0x80;
 
 	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
 	state->m_smpc.OREG[1+pad_num*offset] = id; // 0x23 / 0xe3
-	state->m_smpc.OREG[2+pad_num*offset] = input_port_read(machine, mousenames[pad_num][0]);
-	state->m_smpc.OREG[3+pad_num*offset] = input_port_read(machine, mousenames[pad_num][1]);
-	state->m_smpc.OREG[4+pad_num*offset] = input_port_read(machine, mousenames[pad_num][2]);
+	state->m_smpc.OREG[2+pad_num*offset] = mouse_ctrl;
+	state->m_smpc.OREG[3+pad_num*offset] = mouse_x & 0xff;
+	state->m_smpc.OREG[4+pad_num*offset] = mouse_y & 0xff;
+}
+
+/* TODO: is there ANY game on which the MD pad works? */
+static void smpc_md_pad(running_machine &machine, UINT8 pad_num, UINT8 offset, UINT8 id)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	static const char *const padnames[] = { "MD_JOY1", "MD_JOY2" };
+	UINT16 pad_data;
+
+	pad_data = input_port_read(machine, padnames[pad_num]);
+	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
+	state->m_smpc.OREG[1+pad_num*offset] = id;
+	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
+	if(id == 0xe2) // MD 6 Button PAD
+		state->m_smpc.OREG[3+pad_num*offset] = pad_data & 0xff;
 }
 
 static void smpc_unconnected(running_machine &machine, UINT8 pad_num, UINT8 offset)
@@ -396,8 +449,12 @@ static TIMER_CALLBACK( intback_peripheral )
 		switch(read_id[pad_num])
 		{
 			case 0: smpc_digital_pad(machine,pad_num,offset); break;
+			case 1: smpc_analog_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Steering Wheel */
+			case 2: smpc_analog_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Analog Pad */
 			case 4: smpc_mouse(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Pointing Device */
 			case 5: smpc_keyboard(machine,pad_num,offset); break;
+			case 6: smpc_md_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* MD 3B PAD */
+			case 7: smpc_md_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* MD 6B PAD */
 			case 8: smpc_mouse(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Saturn Mouse */
 			case 9: smpc_unconnected(machine,pad_num,offset); break;
 		}
