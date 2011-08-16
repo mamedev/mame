@@ -189,11 +189,13 @@ INLINE void update_volumes(struct YMZ280BVoice *voice)
 	else if (voice->pan < 8)
 	{
 		voice->output_left = voice->level;
-		voice->output_right = voice->level * voice->pan / 8;
+
+		/* pan 1 is hard-left, what's pan 0? for now assume same as pan 1 */
+		voice->output_right = (voice->pan == 0) ? 0 : voice->level * (voice->pan - 1) / 7;
 	}
 	else
 	{
-		voice->output_left = voice->level * (15 - voice->pan) / 8;
+		voice->output_left = voice->level * (15 - voice->pan) / 7;
 		voice->output_right = voice->level;
 	}
 }
