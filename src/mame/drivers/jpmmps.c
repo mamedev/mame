@@ -1947,6 +1947,10 @@ ROM_START( j2nbz )
 	ROM_LOAD( "nubnzdl3.bin", 0x4000, 0x004000, CRC(450d7fc9) SHA1(f82acb017e765f7188a874dade6fd1a5d6b2033e) )
 ROM_END
 
+ROM_START( j2clbbin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "club bingo 3.1.bin", 0x0000, 0x008000, CRC(ad6d6c23) SHA1(247e2117e5285d1309a8a92be96ee67e46279aa6) )
+ROM_END
 
 
 
@@ -2140,3 +2144,5 @@ GAME(198?, j2nud5p	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","5p Nudger (JPM) (MP
 GAME(198?, j2b7		,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Bar 7? (JPM) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2ss		,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supa Stepper (JPM) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2nbz	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Nudge Bonanza (JPM) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+
+GAME(198?, j2clbbin	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Crystal?","Club Bingo (Crystal) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

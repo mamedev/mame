@@ -2611,6 +2611,39 @@ ROM_START( sc1s1000 )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( sc1cdm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dd13b.bin", 0x0000, 0x008000, CRC(7a663587) SHA1(6d03a34047ba5f995b1877fc4c0ab9703aa4defc) )
+	ROM_LOAD( "dd13a.bin", 0x8000, 0x008000, CRC(e674bca9) SHA1(31481d791f3aaf1d4ba790924f0f9e4100a82da5) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "dd13ap.bin", 0x0000, 0x008000, CRC(84a51666) SHA1(89cf10c7e732b5f77b798bf58fe8ebfc701da57b) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "dd_snd1.bin", 0x000000, 0x010000, CRC(c00a70ab) SHA1(c0014b3e4308281203921994f41f19e0243148e0) )
+	ROM_LOAD( "dd_snd2.bin", 0x010000, 0x010000, CRC(c03827f6) SHA1(16e844fb83d79d1e4fbb0069debaf71af5ad6814) )
+ROM_END
+
+ROM_START( sc1hfcc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cz14b.bin", 0x0000, 0x008000, CRC(976233ca) SHA1(554da440a0fe1d66fa95bef51ac168cec35d1636) )
+	ROM_LOAD( "cz14a.bin", 0x8000, 0x008000, CRC(34324f0b) SHA1(946ff8fa40788748a0caabd48d125f2a4f9c36c3) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "cz14ap.bin", 0x0000, 0x008000, CRC(56e3e5c4) SHA1(3017007e03139204732f7945ded61d35499055ac) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+ROM_START( sc1twice )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "twiceasnice-arcstd.bin", 0x8000, 0x008000, CRC(4ba39f58) SHA1(185513023e0c87d926e0e821ed94f121182880c1) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
 
 
 
@@ -2751,17 +2784,16 @@ GAME( 1992, sc1s1000		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "D
 
 
 
-GAME( 199?, sc1dip			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Diplomat (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
+GAME( 199?, sc1dip			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Diplomat (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // 53 RY error
 GAME( 199?, sc1lamb			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Lambada (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
 GAME( 199?, sc1reply		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Replay (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
 
+GAME( 199?, sc1cdm		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Crystal",   "Club Diamond (Crystal) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1hfcc		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Crystal",   "Hi Flyer Club (Crystal) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
+GAME( 199?, sc1twice		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Associated Leisure",   "Twice As Nice (Associated Leisure) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
 
 //Adder 2
 GAME( 1996, m_tppokr, 0,        scorpion1_adder2	, toppoker	, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-
-
-
-
-
 
 

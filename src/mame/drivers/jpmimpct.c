@@ -1655,7 +1655,6 @@ ROM_START( j6arcade )
 	ROM_LOAD16_BYTE( "arca-9n1.bin", 0x000000, 0x020000, CRC(38b53b94) SHA1(a28d7ac1eb594251d9534901ee38b797cd563dc7) )
 	ROM_LOAD16_BYTE( "arca-9np.bin", 0x000000, 0x020000, CRC(d32b6fac) SHA1(1cb16c214da888adacba090d59f88694d1d9e25b) )
 	ROM_LOAD16_BYTE( "arca-9p1.bin", 0x000000, 0x020000, CRC(e21dd768) SHA1(94132c7ba9b90ab6b52a56e60b68bf4e5d30e063) )
-	ROM_LOAD16_BYTE( "arca.bin", 0x000000, 0x010000, CRC(5cbb8a0f) SHA1(bee8b2b7d70c24f98b7626caa278cb84136941a4) )
 	ROM_LOAD16_BYTE( "arca10_1.bin", 0x000000, 0x020000, CRC(4c632e9e) SHA1(1e76e26941b164ba3a51c1c3caaa3b4d384a90d3) )
 	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000000, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
 	ROM_LOAD16_BYTE( "arca10a1.bin", 0x000000, 0x020000, CRC(1ea7eeff) SHA1(8b8a1b0543d53d95fd2fd44add1114c6ad48b6c7) )
@@ -1813,6 +1812,11 @@ ROM_START( j6bigwhl )
 	ROM_LOAD16_BYTE( "9542.bin", 0x000000, 0x020000, CRC(28529fe6) SHA1(2b110dd8c1f99545025ad354857fef849a9f7ace) )
 	ROM_LOAD16_BYTE( "bwheelp1", 0x000000, 0x020000, CRC(fc8a8aa3) SHA1(13949e37a89eab9c906d91ca93398b778839011c) )
 	ROM_LOAD16_BYTE( "bwheelp2", 0x000000, 0x020000, CRC(67ee23ae) SHA1(0059c40e7379958a71e0d5ba3e17622a879b59ba) )
+
+	ROM_LOAD16_BYTE( "bigwheel8cash-p1.bin", 0x0000, 0x020000, CRC(9fa585a9) SHA1(10c6c42772bec0e974c86a96029e8cf42c14c983) )
+	ROM_LOAD16_BYTE( "bigwheel8cash-p2.bin", 0x0000, 0x020000, CRC(3375b0e0) SHA1(f1d85364ec2dee48ddf1891c96d4059e38e8902e) )
+
+
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "bigwheelsnd.bin", 0x000000, 0x080000, CRC(90a19aaa) SHA1(7b17e9fda01d4fb163e09107759a6bf473fc6dc0) )
@@ -2071,8 +2075,9 @@ ROM_START( j6cas5 )
 	ROM_LOAD16_BYTE( "cfli-5p1.bin", 0x000000, 0x020000, CRC(526fece4) SHA1(cb407bb9de53ac0b967e5568db1dd20672be37c1) )
 	ROM_LOAD16_BYTE( "cfli-5w1.bin", 0x000000, 0x020000, CRC(db9cc954) SHA1(da44fb85c15c970c0e0fb75ed0cd0f652d1b8d82) )
 	// these two just look like random garabage, or are encrypted, something else?
-	ROM_LOAD16_BYTE( "c-1.bin", 0x000000, 0x020000, CRC(fc45950a) SHA1(8721758e8f2ac41f26700965ed942cd1a311bb22) )
-	ROM_LOAD16_BYTE( "c-2.bin", 0x000001, 0x020000, CRC(e36aaf42) SHA1(c9da129f85c7b8ce27ea8cb9f090ae647eeac10d) )
+	//  see note with j6fbcrz set
+	//ROM_LOAD16_BYTE( "c-1.bin", 0x000000, 0x020000, CRC(fc45950a) SHA1(8721758e8f2ac41f26700965ed942cd1a311bb22) )
+	//ROM_LOAD16_BYTE( "c-2.bin", 0x000001, 0x020000, CRC(e36aaf42) SHA1(c9da129f85c7b8ce27ea8cb9f090ae647eeac10d) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "cfl-snd.bin", 0x000000, 0x080000, CRC(0016ab04) SHA1(82d133f485b325b29db901f6254c80ca959abd3e) )
@@ -5120,7 +5125,65 @@ ROM_START( j6cpala )
 ROM_END
 
 
+ROM_START( j6fbcrz )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "fc.p1", 0x00000, 0x020000, CRC(6493c4c6) SHA1(ae4c18b35a55ef08b02fdabb8021eb008660543e) )
+	ROM_LOAD16_BYTE( "fc.p2", 0x00001, 0x020000, CRC(2563c918) SHA1(7b5a58892019d59aff02f982cafd8617f116a812) )
 
+	ROM_REGION( 0x1000000, "encrypted", ROMREGION_ERASE00 )
+	// these both seem encrypted with the same scheme, the data becomes the same in the place where the normal
+	// program roms have a 0xff fill.  Encryption is atypical of Impact tho, so what's going on here??
+
+	// edit: Apparently the public release of JPeMu v1.45 required the author to specifically encrypt any ROMs
+	//       before they would run on the emulator, as a way of 'controlling' the users, and what they could run.
+	//       These are therefore worthless garbage.
+//	ROM_LOAD16_BYTE( "fce.p1", 0x00000, 0x020000, CRC(57220618) SHA1(7bd717e438e2bf230179b0f5bb358888a3501c59) )0
+//	ROM_LOAD16_BYTE( "fce.p2", 0x00001, 0x020000, CRC(16d20bc6) SHA1(0e8ac586ccf3d02189e24bdd2ed88052491aceb6) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "fcsnd.bin", 0x0000, 0x080000, CRC(53806516) SHA1(e5689759ccba30ac974eee4361330ad503a29909) )
+ROM_END
+
+ROM_START( j6h5clb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8872.bin", 0x00000, 0x020000, CRC(3a3be2e9) SHA1(9078fd612cb5f195f0d9bddc5f04e1389b4f7233) )
+	ROM_LOAD16_BYTE( "8873.bin", 0x00001, 0x020000, CRC(6fbe7ca4) SHA1(d7fbd1d83f165f899c5ae8ec3243ec3d8be5563d) )
+
+	ROM_REGION( 0x1000000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "8874.bin", 0x0000, 0x020000, CRC(d1a5b6d1) SHA1(54300e459cc3ea756528424f08da5505f629abd4) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	/* missing? */	
+ROM_END
+
+
+DRIVER_INIT( j6fbcrz )
+{
+	#if 0
+
+	int i;
+
+	UINT8 *src1 = machine.region( "maincpu" )->base();
+	UINT8 *src2 = machine.region( "encrypted" )->base();
+	
+	for (i=0;i<0x040000;i++)
+	{
+		src2[i] = src2[i]^src1[i];
+	}
+
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"%s", machine.system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(src2, 0x040000, 1, fp);
+			fclose(fp);
+		}
+	}
+	#endif
+}
 
 
 /************************************
@@ -5318,6 +5381,11 @@ GAME( 199?, j6hisprt	, 0			, impctawp, tbirds, 0, ROT0, "Empire", "High Spirits 
 GAME( 199?, j6rcclub	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Roller Coaster Club (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6slvgst	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Silver Ghost (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6footy		, 0			, impctawp, tbirds, 0, ROT0, "Empire", "Football Fever (Empire) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j6fbcrz		, 0			, impctawp, tbirds, j6fbcrz, ROT0, "JPM", "Football Crazy (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j6h5clb		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "High Five Club (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+
+
+
 
 GAME( 199?, j6bbankr	, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Big Banker (Crystal) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6bmc		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Big Money Club (Crystal) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

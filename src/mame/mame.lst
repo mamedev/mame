@@ -9308,7 +9308,7 @@ j2nud5p		// 5p Nudger (JPM)
 j2b7		// Bar 7? (JPM)
 j2ss		// Supa Stepper (JPM) 
 j2nbz		// Nudge Bonanza (JPM)
-
+j2clbbin	// Club Bingo (Crystal)
 
 
 
@@ -9364,6 +9364,24 @@ j5fairgdb	//
 j5fairgdc	//
 j5fairgdd	//
 j5fairgde	//
+j5fair		// Fairground
+j5faira		//
+j5fairb		//
+j5fairc		//
+j5faird		//
+j5faire		//
+j5fairf		//
+j5fairg		//
+j5fairh		//
+j5fairi		//
+j5fairj		//
+j5fairk		//
+j5fairl		//
+j5fairm		//
+j5fairn		//
+j5fairo		//
+j5fairp		//
+j5fairq		//
 j5filth		// Filthy Rich (Jpm)
 j5filtha	//
 j5filthb	//
@@ -9662,6 +9680,8 @@ j6hisprt	// High Spirits (Empire)
 j6rcclub	// Roller Coaster Club (Jpm)
 j6slvgst	// Silver Ghost (Jpm)
 j6footy		// Football Fever (Empire)
+j6fbcrz		// Football Crazy (Jpm)
+j6h5clb		// High Five Club (Jpm)
 
 j6bbankr	// Big Banker (Crystal)
 j6bmc		// Big Money Club (Crystal)
@@ -10901,7 +10921,6 @@ atworlde1		// (c) 2007 Amcoe
 amclink			// (c) 200? Amcoe - Amcoe Link Control Box?
 fbdeluxe		// (c) 200? Amcoe - Fruit Bonus Deluxe
 fbdeluxeo		// (c) 200? Amcoe
-
 act2000			// (c) 1999 Amcoe - Action 2000
 act2000v1		// (c) 1999 Amcoe
 act2000d1		// (c) 1999 Amcoe
@@ -11322,6 +11341,8 @@ b85lucky
 b85luckd
 b85sngam
 b85cops		// Cops 'n' Robbers (Bellfruit) [Dutch]
+b85koc
+b85koca
 
 // Scorpion 1 games
 
@@ -11455,6 +11476,9 @@ sc1clbdy	//
 sc1clbdya	//
 sc1chqfl	//
 sc1s1000	//
+sc1cdm		// Club Diamond (Crystal)
+sc1hfcc		// Hi-Flyer Club (Crystal)
+sc1twice
 
 // Scorpion 1 + Adder Video board
 
@@ -11698,6 +11722,7 @@ m1wagon		// Wagon Trail (Maygay)
 m1wotw		// War Of The Worlds (Maygay)
 m1wldzne	// Wild Zone (Maygay)
 m1winenc	// Winners Enclosure (Maygay)
+m1simps		// The Simpsons (Maygay - Bwb)
 
 m1bghou		// Big Ghoulies (Gemini)
 m1crzco		// Crazy Cobra (Gemini)
@@ -12667,6 +12692,7 @@ m4riotrp	// Rio Tropico (unknown)
 m4ccop
 m4ccc
 m4treel
+m4nod
 
 /* Unsorted */
 
@@ -13125,7 +13151,8 @@ m5scfinl	// Super Cup Final (Lowen)
 m5ppussy	// Pink Pussy (Mdm)
 
 // Castle
-castrev		// Revolution (Castle, Fruit Machine)
+castrev		// Revolution
+castfpt		// Fortune Pot
 
 // ACE
 

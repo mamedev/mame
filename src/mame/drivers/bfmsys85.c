@@ -645,6 +645,17 @@ ROM_START( b85cops )
 ROM_END
 
 
+ROM_START( b85koc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "king of clubs 39340026.bin", 0x8000, 0x008000, CRC(d3b0746e) SHA1(2847cec108a99747a7e3e31a0f7bcf766cdc1546) )
+ROM_END
+
+
+ROM_START( b85koca )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "king of clubs 39340002.bin", 0x8000, 0x008000, CRC(028708bf) SHA1(9e6942f6a25b260faa4c14c4d61a373be1518f40) )
+ROM_END
+
 
 DRIVER_INIT( decode )
 {
@@ -679,6 +690,6 @@ GAME( 1992, b85jkwld	, 0			, bfmsys85, bfmsys85,		0		,	  0,       "BFM/ELAM",   
 GAME( 1986, b85lucky	, 0			, bfmsys85, bfmsys85,		0		,	  0,       "BFM/ELAM",   "Lucky Cards (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1992, b85luckd	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM/ELAM",   "Lucky Dice (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1988, b85sngam	, 0			, bfmsys85, bfmsys85,		decode	,	  0,       "BFM",   "Super Nudge Gambler (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 199?, b85cops		, 0			, bfmsys85, bfmsys85,       0		, 0,		 "BFM",   "Cops 'n' Robbers (Bellfruit) (Dutch) (System 85)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-
-
+GAME( 199?, b85cops		, 0			, bfmsys85, bfmsys85,       0		,	  0,	   "BFM",   "Cops 'n' Robbers (Bellfruit) (Dutch) (System 85)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, b85koc		, 0			, bfmsys85, bfmsys85,		decode	,	  0,	   "BFM",   "King of Clubs (Bellfruit) (System 85, set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+GAME( 199?, b85koca		, b85koc	, bfmsys85, bfmsys85,		decode	,	  0,	   "BFM",   "King of Clubs (Bellfruit) (System 85, set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
