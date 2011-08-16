@@ -713,7 +713,7 @@ static DEVICE_RESET( ymz280b )
 	/* initial clear registers */
 	for (i = 0xff; i >= 0; i--)
 	{
-		chip->current_register = 0;
+		chip->current_register = i;
 		write_to_register(chip, 0);
 	}
 
