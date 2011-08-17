@@ -75,7 +75,7 @@ static const int volume_table[3] =
 
 /* divisor lookup table. When an individual word is selected, it can be assigned one of three different 'rates'.
    These are implemented as clock divisors, and are looked up in the ROM header. More often than not, this value is 0,
-   relating to a division by 8, or nominally 8KHz sampling (based on the datasheet exampleof a 64KHz clock).*/
+   relating to a division by 8, or nominally 8KHz sampling (based on the datasheet example of a 64KHz clock).*/
 static const int divisor_table[3] =
 {
 	8,
@@ -219,8 +219,11 @@ static void oki_process(okim6376_state *info, int channel, int command)
 
 						/* also reset the ADPCM parameters */
 						reset_adpcm(voice);
-						/* FIX: no attenuation for now, handle for channel 2 separately */
-						voice->volume = volume_table[0];
+						if (channel == 0)
+						{
+							/* We set channel 2's audio separately */
+							voice->volume = volume_table[0];
+						}
 					}
 					else
 					{
@@ -574,6 +577,7 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_st_w )
 			{
 
 				info->st_pulses ++;
+				MSM6376LOG(("OKIM6376:'%s' ST pulses %x\n",device->tag(),info->st_pulses));
 				if (info->st_pulses > 3)
 				{
 					info->st_pulses = 3; //undocumented behaviour beyond 3 pulses
