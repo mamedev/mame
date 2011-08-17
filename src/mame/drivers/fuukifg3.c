@@ -33,6 +33,9 @@ Notes so far:
 
 - The scroll values are generally wrong when flip screen is on and rasters are often incorrect
 
+- PCM channels of music in asurabus is sometimes off-tune, check Chen-Mao's stage for example
+  note: srom.u7 (z80 prg) is a good dump
+
 - YMF278B and YMF262 are hooked up in an awkward way (real chip has YMF262 integrated)
 
 Asura Blade
@@ -201,6 +204,7 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 static READ32_HANDLER( snd_020_r )
 {
 	fuuki32_state *state = space->machine().driver_data<fuuki32_state>();
+	space->machine().scheduler().synchronize();
 	UINT32 retdata = state->m_shared_ram[offset * 2] << 16 | state->m_shared_ram[(offset * 2) + 1];
 	return retdata;
 }
@@ -208,6 +212,7 @@ static READ32_HANDLER( snd_020_r )
 static WRITE32_HANDLER( snd_020_w )
 {
 	fuuki32_state *state = space->machine().driver_data<fuuki32_state>();
+	space->machine().scheduler().synchronize();
 
 	if (ACCESSING_BITS_16_23)
 		state->m_shared_ram[offset * 2] = data >> 16;
@@ -707,7 +712,7 @@ ROM_START( asurabus )
 	ROM_LOAD32_BYTE( "pgm0.u4", 0x000003, 0x80000, CRC(9b71e9d8) SHA1(9b705b5b6fff549f5679890422b481b5cf1d7bd7) )
 
 	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
-	ROM_LOAD( "srom.u7", 0x00000, 0x80000, BAD_DUMP CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) ) // BAD_DUMP note: 2 same halves, and many songs off-tune
+	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
 	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
 
 	ROM_REGION( 0x2000000, "gfx1", 0 )
