@@ -305,7 +305,7 @@ static void cd_exec_command(running_machine &machine)
 			CDROM_LOG(("%s:CD: Initialize CD system\n", machine.describe_context()))
 			if((cr1 & 0x81) == 0x00) //guess
 			{
-				int i;
+				//int i;
 				cd_stat = CD_STAT_PAUSE;
 				cd_curfad = 150;
 				//cur_track = 1;
@@ -318,6 +318,7 @@ static void cd_exec_command(running_machine &machine)
 				/* reset filter connections */
 				/* Guess: X-Men COTA sequence is 0x48->0x48->0x04(01)->0x04(00)->0x30 then 0x10, without this game throws a FAD reject error */
 				/* X-Men vs. SF is even fussier, sequence is  0x04 (1) 0x04 (0) 0x03 (0) 0x03 (1) 0x30 */
+				#if 0
 				for(i=0;i<MAX_FILTERS;i++)
 				{
 					filters[i].fad = 0;
@@ -330,6 +331,7 @@ static void cd_exec_command(running_machine &machine)
 					filters[i].smval = 0;
 					filters[i].cival = 0;
 				}
+				#endif
 
 				/* reset CD device connection */
 				//cddevice = (filterT *)NULL;
@@ -652,6 +654,8 @@ static void cd_exec_command(running_machine &machine)
 				UINT8 fnum = (cr3>>8)&0xff;
 
 				CDROM_LOG(("%s:CD: Set Filter Range\n",   machine.describe_context()))
+
+				printf("%08x %08x %d\n",filters[fnum].fad,filters[fnum].range,fnum);
 
 				filters[fnum].fad = ((cr1 & 0xff)<<16) | cr2;
 				filters[fnum].range = ((cr3 & 0xff)<<16) | cr4;
@@ -2142,6 +2146,21 @@ static partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 	// loop on the filters
 	do
 	{
+		// FAD range check?
+		/* according to an obscure document note, this switches the filter connector to be false if the range fails ... I think ... */
+		if (flt->mode & 0x40)
+		{
+			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))
+			{
+				printf("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
+				//match = 0;
+				lastbuf = flt->condfalse;
+				flt = &filters[lastbuf];
+
+				keepgoing--;
+			}
+		}
+
 		if ((trktype != CD_TRACK_AUDIO) && (curblock.data[15] == 2))
 		{
 			if (flt->mode & 1)	// file number
@@ -2183,16 +2202,6 @@ static partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 			if (flt->mode & 0x10)	// reverse subheader conditions
 			{
 				match ^= 1;
-			}
-		}
-
-		// FAD range check?
-		if (flt->mode & 0x40)
-		{
-			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))
-			{
-				printf("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
-				match = 0;
 			}
 		}
 

@@ -3930,6 +3930,9 @@ static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_t *bitm
 			}
 /* TILES ARE NOW DECODED */
 
+			if(!STV_VDP2_VRAMSZ)
+				tilecode &= 0x3fff;
+
 /* DRAW! */
 			if(stv2_current_tilemap.incx != 0x10000 ||
 			   stv2_current_tilemap.incy != 0x10000 ||
