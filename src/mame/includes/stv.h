@@ -146,7 +146,7 @@ public:
 DRIVER_INIT ( stv );
 
 
-/*----------- defined in drivers/stvinit.c -----------*/
+/*----------- defined in drivers/stv.c -----------*/
 
 void install_stvbios_speedups(running_machine &machine);
 DRIVER_INIT(mausuke);
