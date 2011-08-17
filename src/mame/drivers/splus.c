@@ -106,10 +106,10 @@ static WRITE8_HANDLER( splus_io_w )
 
 static WRITE8_HANDLER( splus_load_pulse_w )
 {
-	splus_state *state = space->machine().driver_data<splus_state>();
+//	splus_state *state = space->machine().driver_data<splus_state>();
 
-	UINT8 out = 0;
-    out = ((~state->m_io_port[1] & 0xf0)>>4); // Output Bank
+//	UINT8 out = 0;
+//    out = ((~state->m_io_port[1] & 0xf0)>>4); // Output Bank
 }
 
 static WRITE8_HANDLER( splus_serial_w )
