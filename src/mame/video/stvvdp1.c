@@ -1959,19 +1959,25 @@ static void stv_vdp1_process_list(running_machine &machine)
 			switch (stv2_current_sprite.CMDCTRL & 0x000f)
 			{
 				case 0x0000:
-					if (VDP1_LOG) logerror ("Sprite List Normal Sprite\n");
+					if (VDP1_LOG) logerror ("Sprite List Normal Sprite (%d %d)\n",stv2_current_sprite.CMDXA,stv2_current_sprite.CMDYA);
 					stv2_current_sprite.ispoly = 0;
 					stv_vpd1_draw_normal_sprite(machine, cliprect, 0);
 					break;
 
 				case 0x0001:
-					if (VDP1_LOG) logerror ("Sprite List Scaled Sprite\n");
+					if (VDP1_LOG) logerror ("Sprite List Scaled Sprite (%d %d)\n",stv2_current_sprite.CMDXA,stv2_current_sprite.CMDYA);
 					stv2_current_sprite.ispoly = 0;
 					stv_vpd1_draw_scaled_sprite(machine, cliprect);
 					break;
 
 				case 0x0002:
 					if (VDP1_LOG) logerror ("Sprite List Distorted Sprite\n");
+					if (VDP1_LOG) logerror ("(A: %d %d)\n",stv2_current_sprite.CMDXA,stv2_current_sprite.CMDYA);
+					if (VDP1_LOG) logerror ("(B: %d %d)\n",stv2_current_sprite.CMDXB,stv2_current_sprite.CMDYB);
+					if (VDP1_LOG) logerror ("(C: %d %d)\n",stv2_current_sprite.CMDXC,stv2_current_sprite.CMDYC);
+					if (VDP1_LOG) logerror ("(D: %d %d)\n",stv2_current_sprite.CMDXD,stv2_current_sprite.CMDYD);
+					if (VDP1_LOG) logerror ("CMDPMOD = %04x\n",stv2_current_sprite.CMDPMOD);
+
 					stv2_current_sprite.ispoly = 0;
 					stv_vpd1_draw_distorted_sprite(machine, cliprect);
 					break;
@@ -2011,7 +2017,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				case 0x000a:
-					if (VDP1_LOG) logerror ("Sprite List Local Co-Ordinate Set\n");
+					if (VDP1_LOG) logerror ("Sprite List Local Co-Ordinate Set (%d %d)\n",(INT16)stv2_current_sprite.CMDXA,(INT16)stv2_current_sprite.CMDYA);
 					state->m_vdp1.local_x = (INT16)stv2_current_sprite.CMDXA;
 					state->m_vdp1.local_y = (INT16)stv2_current_sprite.CMDYA;
 					break;
@@ -2112,7 +2118,7 @@ void video_update_vdp1(running_machine &machine)
 		case 1:/*Draw by request*/
 			break;
 		case 2:/*Automatic Draw*/
-			if ( framebuffer_changed )
+			if ( framebuffer_changed || VDP1_LOG )
 			{
 				/*set CEF to 1*/
 				stv_vdp1_process_list(machine);

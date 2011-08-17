@@ -18,9 +18,9 @@ Notes:
 TODO:
 (Main issues)
 - decap the SH-1, used for CD block (needed especially for Sega Saturn)
-- IRQs: some games have some issues with timing accurate IRQs,check/fix all of them.
+- IRQs: some games have some issues with timing accurate IRQs, check/fix all of them.
 - The Cart-Dev mode hangs even with the -dev bios,I would like to see what it does on the real HW.
-- IC13 games on the bios dev doesn't even load the cartridge / crashes the emulation at start-up,
+- IC13 games on the dev bios doesn't even load the cartridge / crashes the emulation at start-up,
   rom rearrange needed?
 - SCU DSP still has its fair share of issues, it also needs to be converted to CPU structure;
 - Add the RS232c interface (serial port),needed by fhboxers.
@@ -28,15 +28,14 @@ TODO:
 - Reimplement the idle skip if possible.
 - clean up the I/Os, by using per-game specific mapped ports and rewrite it by using 16-bit trampolines
 - Properly emulate the protection chips, used by several games (check stvprot.c for more info)
-- Move SCU device into its respective files;
+- Move SCU device into its respective file;
 - Split ST-V and Saturn files properly;
-- completely rewrite IOGA for ST-V;
 
 (per-game issues)
 - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
 - smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
   SH-2 synching.
-- suikoenb/shanhigw + others: why do we get 2 credits on startup? Cause might be by a communication with the M68k
+- groovef / myfairld: why do we get 2 credits on startup? Cause might be by a communication with the M68k
 - myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
   10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
   Likely to not be a bug but an in-game design issue.
@@ -500,7 +499,7 @@ static READ32_HANDLER( saturn_scu_r )
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	UINT32 res;
 
-	/*TODO: write only registers must return 0...*/
+	/*TODO: write only registers must return 0 or open bus */
 	switch(offset)
 	{
 		case 0x5c/4:
@@ -2038,9 +2037,6 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	{
 		video_update_vdp1(timer.machine());
 
-		if(STV_VDP1_VBE)
-			state->m_vdp1.framebuffer_clear_on_next_frame = 1;
-
 		if(!(state->m_scu.ism & IRQ_VDP1_END))
 		{
 			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
@@ -2070,6 +2066,9 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		}
 		else
 			state->m_scu.ist |= (IRQ_VBLANK_IN);
+
+		if(STV_VDP1_VBE)
+			state->m_vdp1.framebuffer_clear_on_next_frame = 1;
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 	{
