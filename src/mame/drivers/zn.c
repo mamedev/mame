@@ -2511,16 +2511,19 @@ static WRITE32_HANDLER( coh1002m_bank_w )
 static READ32_HANDLER( cbaj_z80_r )
 {
 	zn_state *state = space->machine().driver_data<zn_state>();
-	int ready = state->m_cbaj_to_r3k;
+	int ready;
 
+	space->machine().scheduler().synchronize();
+
+	ready = state->m_cbaj_to_r3k;
 	state->m_cbaj_to_r3k &= ~2;
-
 	return soundlatch2_r(space,0) | ready<<24;
 }
 
 static WRITE32_HANDLER( cbaj_z80_w )
 {
 	zn_state *state = space->machine().driver_data<zn_state>();
+	space->machine().scheduler().synchronize();
 
 	state->m_cbaj_to_z80 |= 2;
 	state->m_latch_to_z80 = data;
@@ -2528,7 +2531,7 @@ static WRITE32_HANDLER( cbaj_z80_w )
 
 static DRIVER_INIT( coh1002m )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank     ( 0x1f000000, 0x1f7fffff, "bank1" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank               ( 0x1f000000, 0x1f7fffff, "bank1" );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1fb00000, 0x1fb00003, FUNC(cbaj_z80_r), FUNC(cbaj_z80_w) );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler    ( 0x1fb00004, 0x1fb00007, FUNC(coh1002m_bank_w) );
 
@@ -3595,8 +3598,8 @@ ROM_START( cbaj )
 	ROM_LOAD( "cbaj_z80.3118",       0x0000000, 0x040000, CRC(92b02ad2) SHA1(f72317679ecbd8a0c3b081baaf9ff20a8c9ec00f) )
 
 	ROM_REGION( 0x800000, "ymz", 0 ) /* YMZ280B Sound Samples */
-	ROM_LOAD( "cb-se.5121",   0x000000, 0x400000, CRC(f12b3db9) SHA1(d5231ad664603050bdca2081b114b07fc905ddc2) )
-	ROM_LOAD( "cb-vo.5120",   0x400000, 0x400000, CRC(afb05d6d) SHA1(0c08010579813814fbf8a978cf4376bab18697a4) )
+	ROM_LOAD( "cb-vo.5120",   0x000000, 0x400000, CRC(afb05d6d) SHA1(0c08010579813814fbf8a978cf4376bab18697a4) )
+	ROM_LOAD( "cb-se.5121",   0x400000, 0x400000, CRC(f12b3db9) SHA1(d5231ad664603050bdca2081b114b07fc905ddc2) )
 ROM_END
 
 ROM_START( shngmtkb )
