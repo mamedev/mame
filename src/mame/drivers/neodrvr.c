@@ -2909,7 +2909,7 @@ ROM_START( fightfeva ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "060-p1.p1", 0x0000000, 0x100000, CRC(2a104b50) SHA1(3eb663d3df7074e1cdf4c0e450a35c9cf55d8979) ) /* VIC940800 */
 	/* the rom below acts as a patch to the program rom in the cart, replacing the first 512kb */
-	ROM_LOAD16_WORD_SWAP( "060-epr.sp2", BAD_DUMP 0x000000, 0x080000, CRC(3032041b) SHA1(4b8ed2e6f74579ea35a53e06ccac42d6905b0f51) )
+	ROM_LOAD16_WORD_SWAP( "060-epr.sp2", 0x000000, 0x080000, BAD_DUMP CRC(3032041b) SHA1(4b8ed2e6f74579ea35a53e06ccac42d6905b0f51) )
 	/* P is on eprom, correct chip label unknown */
 
 	NEO_SFIX_128K( "060-s1.s1", CRC(7f012104) SHA1(f366dcc3923655dff16ec08a40d5fce22a84257d) ) /* VIC930100 */
