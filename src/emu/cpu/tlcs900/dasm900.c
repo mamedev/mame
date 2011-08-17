@@ -8,30 +8,29 @@ Toshiba TLCS-900/H disassembly
 #include "debugger.h"
 #include "tlcs900.h"
 
-
 enum e_mnemonics
 {
-	_ADC, _ADD, _AND, _ANDCF, _BIT, _BS1B,
-	_BS1F, _CALL, _CALR, _CCF, _CHG, _CP,
-	_CPD, _CPDW, _CPDR, _CPDRW, _CPI, _CPIR,
-	_CPIRW, _CPIW, _CPL, _DAA, _DB, _DEC,
-	_DECF, _DECW, _DIV, _DIVS, _DJNZ, _EI,
-	_EX, _EXTS, _EXTZ, _HALT, _INC, _INCF,
-	_INCW, _JP, _JR, _JRL, _LD, _LDA,
-	_LDC, _LDCF, _LDD, _LDDR, _LDDRW, _LDDW,
-	_LDF, _LDI, _LDIR, _LDIRW, _LDIW, _LDW,
-	_LDX, _LINK, _MAX, _MDEC1, _MDEC2, _MDEC4,
-	_MINC1, _MINC2, _MINC4, _MIRR, _MUL, _MULA,
-	_MULS, _NEG, _NOP, _NORMAL, _OR, _ORCF,
-	_PAA, _POP, _POPW, _PUSH, _PUSHW, _RCF,
-	_RES, _RET, _RETD, _RETI, _RL, _RLC,
-	_RLCW, _RLD, _RLW, _RR, _RRC, _RRCW,
-	_RRD, _RRW, _SBC, _SCC, _SCF, _SET,
-	_SLA, _SLAW, _SLL, _SLLW, _SRA, _SRAW,
-	_SRL, _SRLW, _STCF, _SUB, _SWI, _TSET,
-	_UNLK, _XOR, _XORCF, _ZCF,
-	_80, _88, _90, _98, _A0, _A8, _B0, _B8,
-	_C0, oC8, _D0, oD8, _E0, _E8, _F0
+	M_ADC, M_ADD, M_AND, M_ANDCF, M_BIT, M_BS1B,
+	M_BS1F, M_CALL, M_CALR, M_CCF, M_CHG, M_CP,
+	M_CPD, M_CPDW, M_CPDR, M_CPDRW, M_CPI, M_CPIR,
+	M_CPIRW, M_CPIW, M_CPL, M_DAA, M_DB, M_DEC,
+	M_DECF, M_DECW, M_DIV, M_DIVS, M_DJNZ, M_EI,
+	M_EX, M_EXTS, M_EXTZ, M_HALT, M_INC, M_INCF,
+	M_INCW, M_JP, M_JR, M_JRL, M_LD, M_LDA,
+	M_LDC, M_LDCF, M_LDD, M_LDDR, M_LDDRW, M_LDDW,
+	M_LDF, M_LDI, M_LDIR, M_LDIRW, M_LDIW, M_LDW,
+	M_LDX, M_LINK, M_MAX, M_MDEC1, M_MDEC2, M_MDEC4,
+	M_MINC1, M_MINC2, M_MINC4, M_MIRR, M_MUL, M_MULA,
+	M_MULS, M_NEG, M_NOP, M_NORMAL, M_OR, M_ORCF,
+	M_PAA, M_POP, M_POPW, M_PUSH, M_PUSHW, M_RCF,
+	M_RES, M_RET, M_RETD, M_RETI, M_RL, M_RLC,
+	M_RLCW, M_RLD, M_RLW, M_RR, M_RRC, M_RRCW,
+	M_RRD, M_RRW, M_SBC, M_SCC, M_SCF, M_SET,
+	M_SLA, M_SLAW, M_SLL, M_SLLW, M_SRA, M_SRAW,
+	M_SRL, M_SRLW, M_STCF, M_SUB, M_SWI, M_TSET,
+	M_UNLK, M_XOR, M_XORCF, M_ZCF,
+	M_80, M_88, M_90, M_98, M_A0, M_A8, M_B0, M_B8,
+	M_C0, oC8, M_D0, oD8, M_E0, M_E8, M_F0
 };
 
 
@@ -63,1297 +62,1298 @@ static const char *const s_mnemonic[] =
 
 enum e_operand
 {
-	_A=1,		/* currect register set register A */
-	_C8,		/* current register set byte */
-	_C16,		/* current register set word */
-	_C32,		/* current register set long word */
-	_MC16,		/* current register set mul/div register word */
-	_CC,		/* condition */
-	_CR8,		/* byte control register */
-	_CR16,		/* word control register */
-	_CR32,		/* long word control register */
-	_D8,		/* byte displacement */
-	_D16,		/* word displacement */
-	_F,			/* F register */
-	_I3,		/* immediate 3 bit (part of last byte) */
-	_I8,		/* immediate byte */
-	_I16,		/* immediate word */
-	_I24,		/* immediate 3 byte address */
-	_I32,		/* immediate long word */
-	_M,			/* memory location (defined by extension) */
-	_M8,		/* (8) */
-	_M16,		/* (i16) */
-	_R,			/* register */
-	_SR,		/* status register */
+        O_NONE,
+	O_A,		/* currect register set register A */
+	O_C8,		/* current register set byte */
+	O_C16,		/* current register set word */
+	O_C32,		/* current register set long word */
+	O_MC16,		/* current register set mul/div register word */
+	O_CC,		/* condition */
+	O_CR8,		/* byte control register */
+	O_CR16,		/* word control register */
+	O_CR32,		/* long word control register */
+	O_D8,		/* byte displacement */
+	O_D16,		/* word displacement */
+	O_F,			/* F register */
+	O_I3,		/* immediate 3 bit (part of last byte) */
+	O_I8,		/* immediate byte */
+	O_I16,		/* immediate word */
+	O_I24,		/* immediate 3 byte address */
+	O_I32,		/* immediate long word */
+	O_M,			/* memory location (defined by extension) */
+	O_M8,		/* (8) */
+	O_M16,		/* (i16) */
+	O_R,			/* register */
+	O_SR,		/* status register */
 };
 
 
 typedef struct
 {
-	int		mnemonic;
-	int		operand1;
-	int		operand2;
+	e_mnemonics	mnemonic;
+	e_operand	operand1;
+	e_operand	operand2;
 } tlcs900inst;
 
 
 static const tlcs900inst mnemonic_80[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _PUSH, _M, 0 }, { _DB, 0, 0 }, { _RLD, _A, _M }, { _RRD, _A, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LDI, 0, 0 }, { _LDIR, 0, 0 }, { _LDD, 0, 0 }, { _LDDR, 0, 0 },
-	{ _CPI, 0, 0 }, { _CPIR, 0, 0 }, { _CPD, 0, 0 }, { _CPDR, 0, 0 },
-	{ _DB, 0, 0 }, { _LD, _M16, _M }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_PUSH, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_RLD, O_A, O_M }, { M_RRD, O_A, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LDI, O_NONE, O_NONE }, { M_LDIR, O_NONE, O_NONE }, { M_LDD, O_NONE, O_NONE }, { M_LDDR, O_NONE, O_NONE },
+	{ M_CPI, O_NONE, O_NONE }, { M_CPIR, O_NONE, O_NONE }, { M_CPD, O_NONE, O_NONE }, { M_CPDR, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_LD, O_M16, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M },
-	{ _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 },
-	{ _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 },
-	{ _ADD, _M, _I8 }, { _ADC, _M, _I8 }, { _SUB, _M, _I8 }, { _SBC, _M, _I8 },
-	{ _AND, _M, _I8 }, { _XOR, _M, _I8 }, { _OR, _M, _I8 }, { _CP, _M, _I8 },
+	{ M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M },
+	{ M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 },
+	{ M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 },
+	{ M_ADD, O_M, O_I8 }, { M_ADC, O_M, O_I8 }, { M_SUB, O_M, O_I8 }, { M_SBC, O_M, O_I8 },
+	{ M_AND, O_M, O_I8 }, { M_XOR, O_M, O_I8 }, { M_OR, O_M, O_I8 }, { M_CP, O_M, O_I8 },
 
 	/* 40 - 5F */
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
-	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
-	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
-	{ _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M },
-	{ _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M },
-	{ _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M },
-	{ _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M },
+	{ M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M },
+	{ M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M },
+	{ M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M },
+	{ M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M },
+	{ M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M },
+	{ M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M },
+	{ M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M },
+	{ M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M },
 
 	/* 60 - 7F */
-	{ _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M },
-	{ _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M },
-	{ _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M },
-	{ _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _RLC, _M, 0 }, { _RRC, _M, 0 }, { _RL, _M, 0 }, { _RR, _M, 0 },
-	{ _SLA, _M, 0 }, { _SRA, _M, 0 }, { _SLL, _M, 0 }, { _SRL, _M, 0 },
+	{ M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M },
+	{ M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M },
+	{ M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M },
+	{ M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_RLC, O_M, O_NONE }, { M_RRC, O_M, O_NONE }, { M_RL, O_M, O_NONE }, { M_RR, O_M, O_NONE },
+	{ M_SLA, O_M, O_NONE }, { M_SRA, O_M, O_NONE }, { M_SLL, O_M, O_NONE }, { M_SRL, O_M, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M },
-	{ _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M },
-	{ _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 },
-	{ _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 },
-	{ _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M },
-	{ _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M },
-	{ _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 },
-	{ _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 },
+	{ M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M },
+	{ M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M },
+	{ M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 },
+	{ M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 },
+	{ M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M },
+	{ M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M },
+	{ M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 },
+	{ M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 },
 
 	/* A0 - BF */
-	{ _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M },
-	{ _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M },
-	{ _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 },
-	{ _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 },
-	{ _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M },
-	{ _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M },
-	{ _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 },
-	{ _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 },
+	{ M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M },
+	{ M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M },
+	{ M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 },
+	{ M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 },
+	{ M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M },
+	{ M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M },
+	{ M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 },
+	{ M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 },
 
 	/* C0 - DF */
-	{ _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M },
-	{ _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M },
-	{ _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 },
-	{ _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 },
-	{ _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M },
-	{ _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M },
-	{ _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 },
-	{ _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 },
+	{ M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M },
+	{ M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M },
+	{ M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 },
+	{ M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 },
+	{ M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M },
+	{ M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M },
+	{ M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 },
+	{ M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 },
 
 	/* E0 - FF */
-	{ _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M },
-	{ _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M },
-	{ _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 },
-	{ _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 },
-	{ _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M },
-	{ _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M },
-	{ _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 },
-	{ _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 },
+	{ M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M },
+	{ M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M },
+	{ M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 },
+	{ M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 },
+	{ M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M },
+	{ M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M },
+	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
+	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
 };
 
 
 static const tlcs900inst mnemonic_88[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _PUSH, _M, 0 }, { _DB, 0, 0 }, { _RLD, _A, _M }, { _RRD, _A, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _LD, _M16, _M }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_PUSH, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_RLD, O_A, O_M }, { M_RRD, O_A, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_LD, O_M16, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M },
-	{ _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 },
-	{ _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 },
-	{ _ADD, _M, _I8 }, { _ADC, _M, _I8 }, { _SUB, _M, _I8 }, { _SBC, _M, _I8 },
-	{ _AND, _M, _I8 }, { _XOR, _M, _I8 }, { _OR, _M, _I8 }, { _CP, _M, _I8 },
+	{ M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M },
+	{ M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 },
+	{ M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 },
+	{ M_ADD, O_M, O_I8 }, { M_ADC, O_M, O_I8 }, { M_SUB, O_M, O_I8 }, { M_SBC, O_M, O_I8 },
+	{ M_AND, O_M, O_I8 }, { M_XOR, O_M, O_I8 }, { M_OR, O_M, O_I8 }, { M_CP, O_M, O_I8 },
 
 	/* 40 - 5F */
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
-	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
-	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
-	{ _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M },
-	{ _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M },
-	{ _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M },
-	{ _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M },
+	{ M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M },
+	{ M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M },
+	{ M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M },
+	{ M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M },
+	{ M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M },
+	{ M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M },
+	{ M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M },
+	{ M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M },
 
 	/* 60 - 7F */
-	{ _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M },
-	{ _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M },
-	{ _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M },
-	{ _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _RLC, _M, 0 }, { _RRC, _M, 0 }, { _RL, _M, 0 }, { _RR, _M, 0 },
-	{ _SLA, _M, 0 }, { _SRA, _M, 0 }, { _SLL, _M, 0 }, { _SRL, _M, 0 },
+	{ M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M },
+	{ M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M },
+	{ M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M },
+	{ M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_RLC, O_M, O_NONE }, { M_RRC, O_M, O_NONE }, { M_RL, O_M, O_NONE }, { M_RR, O_M, O_NONE },
+	{ M_SLA, O_M, O_NONE }, { M_SRA, O_M, O_NONE }, { M_SLL, O_M, O_NONE }, { M_SRL, O_M, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M },
-	{ _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M },
-	{ _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 },
-	{ _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 },
-	{ _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M },
-	{ _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M },
-	{ _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 },
-	{ _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 },
+	{ M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M },
+	{ M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M },
+	{ M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 },
+	{ M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 },
+	{ M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M },
+	{ M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M },
+	{ M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 },
+	{ M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 },
 
 	/* A0 - BF */
-	{ _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M },
-	{ _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M },
-	{ _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 },
-	{ _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 },
-	{ _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M },
-	{ _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M },
-	{ _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 },
-	{ _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 },
+	{ M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M },
+	{ M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M },
+	{ M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 },
+	{ M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 },
+	{ M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M },
+	{ M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M },
+	{ M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 },
+	{ M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 },
 
 	/* C0 - DF */
-	{ _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M },
-	{ _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M },
-	{ _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 },
-	{ _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 },
-	{ _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M },
-	{ _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M },
-	{ _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 },
-	{ _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 },
+	{ M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M },
+	{ M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M },
+	{ M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 },
+	{ M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 },
+	{ M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M },
+	{ M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M },
+	{ M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 },
+	{ M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 },
 
 	/* E0 - FF */
-	{ _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M },
-	{ _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M },
-	{ _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 },
-	{ _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 },
-	{ _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M },
-	{ _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M },
-	{ _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 },
-	{ _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 },
+	{ M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M },
+	{ M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M },
+	{ M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 },
+	{ M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 },
+	{ M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M },
+	{ M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M },
+	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
+	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
 };
 
 
 static const tlcs900inst mnemonic_90[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _PUSHW, _M, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LDIW, 0, 0 }, { _LDIRW, 0, 0 }, { _LDDW, 0, 0 }, { _LDDRW, 0, 0 },
-	{ _CPIW, 0, 0 }, { _CPIRW, 0, 0 }, { _CPDW, 0, 0 }, { _CPDRW, 0, 0 },
-	{ _DB, 0, 0 }, { _LDW, _M16, _M }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_PUSHW, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LDIW, O_NONE, O_NONE }, { M_LDIRW, O_NONE, O_NONE }, { M_LDDW, O_NONE, O_NONE }, { M_LDDRW, O_NONE, O_NONE },
+	{ M_CPIW, O_NONE, O_NONE }, { M_CPIRW, O_NONE, O_NONE }, { M_CPDW, O_NONE, O_NONE }, { M_CPDRW, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_LDW, O_M16, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M },
-	{ _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 },
-	{ _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 },
-	{ _ADD, _M, _I16 }, { _ADC, _M, _I16 }, { _SUB, _M, _I16 }, { _SBC, _M, _I16 },
-	{ _AND, _M, _I16 }, { _XOR, _M, _I16 }, { _OR, _M, _I16 }, { _CP, _M, _I16 },
+	{ M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M },
+	{ M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 },
+	{ M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 },
+	{ M_ADD, O_M, O_I16 }, { M_ADC, O_M, O_I16 }, { M_SUB, O_M, O_I16 }, { M_SBC, O_M, O_I16 },
+	{ M_AND, O_M, O_I16 }, { M_XOR, O_M, O_I16 }, { M_OR, O_M, O_I16 }, { M_CP, O_M, O_I16 },
 
 	/* 40 - 5F */
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
-	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
-	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
-	{ _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M },
-	{ _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M },
-	{ _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M },
-	{ _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M },
+	{ M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M },
+	{ M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M },
+	{ M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M },
+	{ M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M },
+	{ M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M },
+	{ M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M },
+	{ M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M },
+	{ M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M },
 
 	/* 60 - 7F */
-	{ _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M },
-	{ _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M },
-	{ _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M },
-	{ _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _RLCW, _M, 0 }, { _RRCW, _M, 0 }, { _RLW, _M, 0 }, { _RRW, _M, 0 },
-	{ _SLAW, _M, 0 }, { _SRAW, _M, 0 }, { _SLLW, _M, 0 }, { _SRLW, _M, 0 },
+	{ M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M },
+	{ M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M },
+	{ M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M },
+	{ M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_RLCW, O_M, O_NONE }, { M_RRCW, O_M, O_NONE }, { M_RLW, O_M, O_NONE }, { M_RRW, O_M, O_NONE },
+	{ M_SLAW, O_M, O_NONE }, { M_SRAW, O_M, O_NONE }, { M_SLLW, O_M, O_NONE }, { M_SRLW, O_M, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M },
-	{ _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M },
-	{ _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 },
-	{ _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 },
-	{ _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M },
-	{ _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M },
-	{ _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 },
-	{ _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 },
+	{ M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M },
+	{ M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M },
+	{ M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 },
+	{ M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 },
+	{ M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M },
+	{ M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M },
+	{ M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 },
+	{ M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 },
 
 	/* A0 - BF */
-	{ _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M },
-	{ _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M },
-	{ _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 },
-	{ _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 },
-	{ _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M },
-	{ _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M },
-	{ _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 },
-	{ _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 },
+	{ M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M },
+	{ M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M },
+	{ M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 },
+	{ M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 },
+	{ M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M },
+	{ M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M },
+	{ M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 },
+	{ M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 },
 
 	/* C0 - DF */
-	{ _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M },
-	{ _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M },
-	{ _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 },
-	{ _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 },
-	{ _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M },
-	{ _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M },
-	{ _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 },
-	{ _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 },
+	{ M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M },
+	{ M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M },
+	{ M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 },
+	{ M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 },
+	{ M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M },
+	{ M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M },
+	{ M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 },
+	{ M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 },
 
 	/* E0 - FF */
-	{ _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M },
-	{ _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M },
-	{ _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 },
-	{ _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 },
-	{ _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M },
-	{ _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M },
-	{ _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 },
-	{ _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 },
+	{ M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M },
+	{ M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M },
+	{ M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 },
+	{ M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 },
+	{ M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M },
+	{ M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M },
+	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
+	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
 };
 
 
 static const tlcs900inst mnemonic_98[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _PUSHW, _M, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _LDW, _M16, _M }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_PUSHW, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_LDW, O_M16, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M },
-	{ _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 },
-	{ _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 },
-	{ _ADD, _M, _I16 }, { _ADC, _M, _I16 }, { _SUB, _M, _I16 }, { _SBC, _M, _I16 },
-	{ _AND, _M, _I16 }, { _XOR, _M, _I16 }, { _OR, _M, _I16 }, { _CP, _M, _I16 },
+	{ M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M },
+	{ M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 },
+	{ M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 },
+	{ M_ADD, O_M, O_I16 }, { M_ADC, O_M, O_I16 }, { M_SUB, O_M, O_I16 }, { M_SBC, O_M, O_I16 },
+	{ M_AND, O_M, O_I16 }, { M_XOR, O_M, O_I16 }, { M_OR, O_M, O_I16 }, { M_CP, O_M, O_I16 },
 
 	/* 40 - 5F */
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
-	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
-	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
-	{ _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M },
-	{ _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M },
-	{ _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M },
-	{ _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M },
+	{ M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M },
+	{ M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M },
+	{ M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M },
+	{ M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M },
+	{ M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M },
+	{ M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M },
+	{ M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M },
+	{ M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M },
 
 	/* 60 - 7F */
-	{ _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M },
-	{ _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M },
-	{ _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M },
-	{ _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _RLCW, _M, 0 }, { _RRCW, _M, 0 }, { _RLW, _M, 0 }, { _RRW, _M, 0 },
-	{ _SLAW, _M, 0 }, { _SRAW, _M, 0 }, { _SLLW, _M, 0 }, { _SRLW, _M, 0 },
+	{ M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M },
+	{ M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M },
+	{ M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M },
+	{ M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_RLCW, O_M, O_NONE }, { M_RRCW, O_M, O_NONE }, { M_RLW, O_M, O_NONE }, { M_RRW, O_M, O_NONE },
+	{ M_SLAW, O_M, O_NONE }, { M_SRAW, O_M, O_NONE }, { M_SLLW, O_M, O_NONE }, { M_SRLW, O_M, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M },
-	{ _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M },
-	{ _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 },
-	{ _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 },
-	{ _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M },
-	{ _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M },
-	{ _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 },
-	{ _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 },
+	{ M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M },
+	{ M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M },
+	{ M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 },
+	{ M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 },
+	{ M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M },
+	{ M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M },
+	{ M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 },
+	{ M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 },
 
 	/* A0 - BF */
-	{ _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M },
-	{ _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M },
-	{ _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 },
-	{ _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 },
-	{ _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M },
-	{ _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M },
-	{ _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 },
-	{ _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 },
+	{ M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M },
+	{ M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M },
+	{ M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 },
+	{ M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 },
+	{ M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M },
+	{ M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M },
+	{ M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 },
+	{ M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 },
 
 	/* C0 - DF */
-	{ _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M },
-	{ _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M },
-	{ _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 },
-	{ _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 },
-	{ _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M },
-	{ _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M },
-	{ _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 },
-	{ _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 },
+	{ M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M },
+	{ M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M },
+	{ M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 },
+	{ M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 },
+	{ M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M },
+	{ M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M },
+	{ M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 },
+	{ M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 },
 
 	/* E0 - FF */
-	{ _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M },
-	{ _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M },
-	{ _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 },
-	{ _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 },
-	{ _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M },
-	{ _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M },
-	{ _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 },
-	{ _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 },
+	{ M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M },
+	{ M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M },
+	{ M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 },
+	{ M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 },
+	{ M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M },
+	{ M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M },
+	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
+	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
 };
 
 
 static const tlcs900inst mnemonic_a0[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C32, _M }, { _LD, _C32, _M }, { _LD, _C32, _M }, { _LD, _C32, _M },
-	{ _LD, _C32, _M }, { _LD, _C32, _M }, { _LD, _C32, _M }, { _LD, _C32, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_C32, O_M }, { M_LD, O_C32, O_M }, { M_LD, O_C32, O_M }, { M_LD, O_C32, O_M },
+	{ M_LD, O_C32, O_M }, { M_LD, O_C32, O_M }, { M_LD, O_C32, O_M }, { M_LD, O_C32, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 40 - 5F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 60 - 7F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C32, _M }, { _ADD, _C32, _M }, { _ADD, _C32, _M }, { _ADD, _C32, _M },
-	{ _ADD, _C32, _M }, { _ADD, _C32, _M }, { _ADD, _C32, _M }, { _ADD, _C32, _M },
-	{ _ADD, _M, _C32 }, { _ADD, _M, _C32 }, { _ADD, _M, _C32 }, { _ADD, _M, _C32 },
-	{ _ADD, _M, _C32 }, { _ADD, _M, _C32 }, { _ADD, _M, _C32 }, { _ADD, _M, _C32 },
-	{ _ADC, _C32, _M }, { _ADC, _C32, _M }, { _ADC, _C32, _M }, { _ADC, _C32, _M },
-	{ _ADC, _C32, _M }, { _ADC, _C32, _M }, { _ADC, _C32, _M }, { _ADC, _C32, _M },
-	{ _ADC, _M, _C32 }, { _ADC, _M, _C32 }, { _ADC, _M, _C32 }, { _ADC, _M, _C32 },
-	{ _ADC, _M, _C32 }, { _ADC, _M, _C32 }, { _ADC, _M, _C32 }, { _ADC, _M, _C32 },
+	{ M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M },
+	{ M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M },
+	{ M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 },
+	{ M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 },
+	{ M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M },
+	{ M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M },
+	{ M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 },
+	{ M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 },
 
 	/* A0 - BF */
-	{ _SUB, _C32, _M }, { _SUB, _C32, _M }, { _SUB, _C32, _M }, { _SUB, _C32, _M },
-	{ _SUB, _C32, _M }, { _SUB, _C32, _M }, { _SUB, _C32, _M }, { _SUB, _C32, _M },
-	{ _SUB, _M, _C32 }, { _SUB, _M, _C32 }, { _SUB, _M, _C32 }, { _SUB, _M, _C32 },
-	{ _SUB, _M, _C32 }, { _SUB, _M, _C32 }, { _SUB, _M, _C32 }, { _SUB, _M, _C32 },
-	{ _SBC, _C32, _M }, { _SBC, _C32, _M }, { _SBC, _C32, _M }, { _SBC, _C32, _M },
-	{ _SBC, _C32, _M }, { _SBC, _C32, _M }, { _SBC, _C32, _M }, { _SBC, _C32, _M },
-	{ _SBC, _M, _C32 }, { _SBC, _M, _C32 }, { _SBC, _M, _C32 }, { _SBC, _M, _C32 },
-	{ _SBC, _M, _C32 }, { _SBC, _M, _C32 }, { _SBC, _M, _C32 }, { _SBC, _M, _C32 },
+	{ M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M },
+	{ M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M },
+	{ M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 },
+	{ M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 },
+	{ M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M },
+	{ M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M },
+	{ M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 },
+	{ M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 },
 
 	/* C0 - DF */
-	{ _AND, _C32, _M }, { _AND, _C32, _M }, { _AND, _C32, _M }, { _AND, _C32, _M },
-	{ _AND, _C32, _M }, { _AND, _C32, _M }, { _AND, _C32, _M }, { _AND, _C32, _M },
-	{ _AND, _M, _C32 }, { _AND, _M, _C32 }, { _AND, _M, _C32 }, { _AND, _M, _C32 },
-	{ _AND, _M, _C32 }, { _AND, _M, _C32 }, { _AND, _M, _C32 }, { _AND, _M, _C32 },
-	{ _XOR, _C32, _M }, { _XOR, _C32, _M }, { _XOR, _C32, _M }, { _XOR, _C32, _M },
-	{ _XOR, _C32, _M }, { _XOR, _C32, _M }, { _XOR, _C32, _M }, { _XOR, _C32, _M },
-	{ _XOR, _M, _C32 }, { _XOR, _M, _C32 }, { _XOR, _M, _C32 }, { _XOR, _M, _C32 },
-	{ _XOR, _M, _C32 }, { _XOR, _M, _C32 }, { _XOR, _M, _C32 }, { _XOR, _M, _C32 },
+	{ M_AND, O_C32, O_M }, { M_AND, O_C32, O_M }, { M_AND, O_C32, O_M }, { M_AND, O_C32, O_M },
+	{ M_AND, O_C32, O_M }, { M_AND, O_C32, O_M }, { M_AND, O_C32, O_M }, { M_AND, O_C32, O_M },
+	{ M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 },
+	{ M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 },
+	{ M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M },
+	{ M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M },
+	{ M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 },
+	{ M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 },
 
 	/* E0 - FF */
-	{ _OR, _C32, _M }, { _OR, _C32, _M }, { _OR, _C32, _M }, { _OR, _C32, _M },
-	{ _OR, _C32, _M }, { _OR, _C32, _M }, { _OR, _C32, _M }, { _OR, _C32, _M },
-	{ _OR, _M, _C32 }, { _OR, _M, _C32 }, { _OR, _M, _C32 }, { _OR, _M, _C32 },
-	{ _OR, _M, _C32 }, { _OR, _M, _C32 }, { _OR, _M, _C32 }, { _OR, _M, _C32 },
-	{ _CP, _C32, _M }, { _CP, _C32, _M }, { _CP, _C32, _M }, { _CP, _C32, _M },
-	{ _CP, _C32, _M }, { _CP, _C32, _M }, { _CP, _C32, _M }, { _CP, _C32, _M },
-	{ _CP, _M, _C32 }, { _CP, _M, _C32 }, { _CP, _M, _C32 }, { _CP, _M, _C32 },
-	{ _CP, _M, _C32 }, { _CP, _M, _C32 }, { _CP, _M, _C32 }, { _CP, _M, _C32 },
+	{ M_OR, O_C32, O_M }, { M_OR, O_C32, O_M }, { M_OR, O_C32, O_M }, { M_OR, O_C32, O_M },
+	{ M_OR, O_C32, O_M }, { M_OR, O_C32, O_M }, { M_OR, O_C32, O_M }, { M_OR, O_C32, O_M },
+	{ M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 },
+	{ M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 },
+	{ M_CP, O_C32, O_M }, { M_CP, O_C32, O_M }, { M_CP, O_C32, O_M }, { M_CP, O_C32, O_M },
+	{ M_CP, O_C32, O_M }, { M_CP, O_C32, O_M }, { M_CP, O_C32, O_M }, { M_CP, O_C32, O_M },
+	{ M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 },
+	{ M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 },
 };
 
 
 static const tlcs900inst mnemonic_b0[256] =
 {
 	/* 00 - 1F */
-	{ _LD, _M, _I8 }, { _DB, 0, 0 }, { _LD, _M, _I16 }, { _DB, 0, 0 },
-	{ _POP, _M, 0 }, { _DB, 0, 0 }, { _POPW, _M, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LD, _M, _M16 }, { _DB, 0, 0 }, { _LDW, _M, _M16 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_I8 }, { M_DB, O_NONE, O_NONE }, { M_LD, O_M, O_I16 }, { M_DB, O_NONE, O_NONE },
+	{ M_POP, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_POPW, O_M, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LD, O_M, O_M16 }, { M_DB, O_NONE, O_NONE }, { M_LDW, O_M, O_M16 }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M },
-	{ _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M },
-	{ _ANDCF, _A, _M }, { _ORCF, _A, _M }, { _XORCF, _A, _M }, { _LDCF, _A, _M },
-	{ _STCF, _A, _M }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M },
-	{ _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M },
+	{ M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M },
+	{ M_ANDCF, O_A, O_M }, { M_ORCF, O_A, O_M }, { M_XORCF, O_A, O_M }, { M_LDCF, O_A, O_M },
+	{ M_STCF, O_A, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M },
+	{ M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 40 - 5F */
-	{ _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 },
-	{ _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 },
-	{ _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 },
+	{ M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 },
+	{ M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 60 - 7F */
-	{ _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 },
-	{ _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 },
+	{ M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 80 - 9F */
-	{ _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M },
-	{ _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M },
-	{ _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M },
-	{ _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M },
-	{ _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M },
-	{ _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M },
-	{ _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M },
-	{ _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M },
+	{ M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M },
+	{ M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M },
+	{ M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M },
+	{ M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M },
+	{ M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M },
+	{ M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M },
+	{ M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M },
+	{ M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M },
 
 	/* A0 - BF */
-	{ _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M },
-	{ _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M },
-	{ _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M },
-	{ _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M },
-	{ _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M },
-	{ _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M },
-	{ _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M },
-	{ _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M },
+	{ M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M },
+	{ M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M },
+	{ M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M },
+	{ M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M },
+	{ M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M },
+	{ M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M },
+	{ M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M },
+	{ M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M },
 
 	/* C0 - DF */
-	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
+	{ M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M },
+	{ M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M },
+	{ M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M },
+	{ M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
 
 	/* E0 - FF */
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _RET, _CC, 0 }, { _RET, _CC, 0 }, { _RET, _CC, 0 }, { _RET, _CC, 0 },
-	{ _RET, _CC, 0 }, { _RET, _CC, 0 }, { _RET, _CC, 0 }, { _RET, _CC, 0 },
-	{ _RET, _CC, 0 }, { _RET, _CC, 0 }, { _RET, _CC, 0 }, { _RET, _CC, 0 },
-	{ _RET, _CC, 0 }, { _RET, _CC, 0 }, { _RET, _CC, 0 }, { _RET, _CC, 0 }
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE },
+	{ M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE },
+	{ M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE },
+	{ M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }
 };
 
 
 static const tlcs900inst mnemonic_b8[256] =
 {
 	/* 00 - 1F */
-	{ _LD, _M, _I8 }, { _DB, 0, 0 }, { _LD, _M, _I16 }, { _DB, 0, 0 },
-	{ _POP, _M, 0 }, { _DB, 0, 0 }, { _POPW, _M, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LD, _M, _M16 }, { _DB, 0, 0 }, { _LDW, _M, _M16 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_I8 }, { M_DB, O_NONE, O_NONE }, { M_LD, O_M, O_I16 }, { M_DB, O_NONE, O_NONE },
+	{ M_POP, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_POPW, O_M, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LD, O_M, O_M16 }, { M_DB, O_NONE, O_NONE }, { M_LDW, O_M, O_M16 }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M },
-	{ _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M },
-	{ _ANDCF, _A, _M }, { _ORCF, _A, _M }, { _XORCF, _A, _M }, { _LDCF, _A, _M },
-	{ _STCF, _A, _M }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M },
-	{ _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M },
+	{ M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M },
+	{ M_ANDCF, O_A, O_M }, { M_ORCF, O_A, O_M }, { M_XORCF, O_A, O_M }, { M_LDCF, O_A, O_M },
+	{ M_STCF, O_A, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M },
+	{ M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 40 - 5F */
-	{ _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 },
-	{ _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 },
-	{ _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 },
+	{ M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 },
+	{ M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 60 - 7F */
-	{ _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 },
-	{ _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 },
+	{ M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 80 - 9F */
-	{ _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M },
-	{ _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M },
-	{ _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M },
-	{ _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M },
-	{ _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M },
-	{ _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M },
-	{ _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M },
-	{ _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M },
+	{ M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M },
+	{ M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M },
+	{ M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M },
+	{ M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M },
+	{ M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M },
+	{ M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M },
+	{ M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M },
+	{ M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M },
 
 	/* A0 - BF */
-	{ _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M },
-	{ _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M },
-	{ _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M },
-	{ _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M },
-	{ _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M },
-	{ _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M },
-	{ _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M },
-	{ _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M },
+	{ M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M },
+	{ M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M },
+	{ M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M },
+	{ M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M },
+	{ M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M },
+	{ M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M },
+	{ M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M },
+	{ M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M },
 
 	/* C0 - DF */
-	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
+	{ M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M },
+	{ M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M },
+	{ M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M },
+	{ M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
 
 	/* E0 - FF */
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }
 };
 
 
 static const tlcs900inst mnemonic_c0[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _PUSH, _M, 0 }, { _DB, 0, 0 }, { _RLD, _A, _M }, { _RRD, _A, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _LD, _M16, _M }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_PUSH, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_RLD, O_A, O_M }, { M_RRD, O_A, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_LD, O_M16, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M },
-	{ _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M }, { _LD, _C8, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 },
-	{ _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 }, { _EX, _M, _C8 },
-	{ _ADD, _M, _I8 }, { _ADC, _M, _I8 }, { _SUB, _M, _I8 }, { _SBC, _M, _I8 },
-	{ _AND, _M, _I8 }, { _XOR, _M, _I8 }, { _OR, _M, _I8 }, { _CP, _M, _I8 },
+	{ M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M },
+	{ M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M }, { M_LD, O_C8, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 },
+	{ M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 }, { M_EX, O_M, O_C8 },
+	{ M_ADD, O_M, O_I8 }, { M_ADC, O_M, O_I8 }, { M_SUB, O_M, O_I8 }, { M_SBC, O_M, O_I8 },
+	{ M_AND, O_M, O_I8 }, { M_XOR, O_M, O_I8 }, { M_OR, O_M, O_I8 }, { M_CP, O_M, O_I8 },
 
 	/* 40 - 5F */
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
-	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
-	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
-	{ _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M },
-	{ _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M }, { _DIV, _MC16, _M },
-	{ _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M },
-	{ _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M }, { _DIVS, _MC16, _M },
+	{ M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M },
+	{ M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M }, { M_MUL, O_MC16, O_M },
+	{ M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M },
+	{ M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M }, { M_MULS, O_MC16, O_M },
+	{ M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M },
+	{ M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M }, { M_DIV, O_MC16, O_M },
+	{ M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M },
+	{ M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M }, { M_DIVS, O_MC16, O_M },
 
 	/* 60 - 7F */
-	{ _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M },
-	{ _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M }, { _INC, _I3, _M },
-	{ _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M },
-	{ _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M }, { _DEC, _I3, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _RLC, _M, 0 }, { _RRC, _M, 0 }, { _RL, _M, 0 }, { _RR, _M, 0 },
-	{ _SLA, _M, 0 }, { _SRA, _M, 0 }, { _SLL, _M, 0 }, { _SRL, _M, 0 },
+	{ M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M },
+	{ M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M }, { M_INC, O_I3, O_M },
+	{ M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M },
+	{ M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M }, { M_DEC, O_I3, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_RLC, O_M, O_NONE }, { M_RRC, O_M, O_NONE }, { M_RL, O_M, O_NONE }, { M_RR, O_M, O_NONE },
+	{ M_SLA, O_M, O_NONE }, { M_SRA, O_M, O_NONE }, { M_SLL, O_M, O_NONE }, { M_SRL, O_M, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M },
-	{ _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M }, { _ADD, _C8, _M },
-	{ _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 },
-	{ _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 }, { _ADD, _M, _C8 },
-	{ _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M },
-	{ _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M }, { _ADC, _C8, _M },
-	{ _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 },
-	{ _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 }, { _ADC, _M, _C8 },
+	{ M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M },
+	{ M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M }, { M_ADD, O_C8, O_M },
+	{ M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 },
+	{ M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 }, { M_ADD, O_M, O_C8 },
+	{ M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M },
+	{ M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M }, { M_ADC, O_C8, O_M },
+	{ M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 },
+	{ M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 }, { M_ADC, O_M, O_C8 },
 
 	/* A0 - BF */
-	{ _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M },
-	{ _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M }, { _SUB, _C8, _M },
-	{ _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 },
-	{ _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 }, { _SUB, _M, _C8 },
-	{ _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M },
-	{ _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M }, { _SBC, _C8, _M },
-	{ _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 },
-	{ _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 }, { _SBC, _M, _C8 },
+	{ M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M },
+	{ M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M }, { M_SUB, O_C8, O_M },
+	{ M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 },
+	{ M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 }, { M_SUB, O_M, O_C8 },
+	{ M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M },
+	{ M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M }, { M_SBC, O_C8, O_M },
+	{ M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 },
+	{ M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 }, { M_SBC, O_M, O_C8 },
 
 	/* C0 - DF */
-	{ _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M },
-	{ _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M }, { _AND, _C8, _M },
-	{ _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 },
-	{ _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 }, { _AND, _M, _C8 },
-	{ _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M },
-	{ _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M }, { _XOR, _C8, _M },
-	{ _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 },
-	{ _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 }, { _XOR, _M, _C8 },
+	{ M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M },
+	{ M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M }, { M_AND, O_C8, O_M },
+	{ M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 },
+	{ M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 }, { M_AND, O_M, O_C8 },
+	{ M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M },
+	{ M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M }, { M_XOR, O_C8, O_M },
+	{ M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 },
+	{ M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 }, { M_XOR, O_M, O_C8 },
 
 	/* E0 - FF */
-	{ _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M },
-	{ _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M }, { _OR, _C8, _M },
-	{ _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 },
-	{ _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 }, { _OR, _M, _C8 },
-	{ _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M },
-	{ _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M }, { _CP, _C8, _M },
-	{ _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 },
-	{ _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 }, { _CP, _M, _C8 },
+	{ M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M },
+	{ M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M }, { M_OR, O_C8, O_M },
+	{ M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 },
+	{ M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 }, { M_OR, O_M, O_C8 },
+	{ M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M },
+	{ M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M }, { M_CP, O_C8, O_M },
+	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
+	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
 };
 
 
-/* TODO: _MUL_M_I8, _MULS_M_I8, _DIV_M_I8, _DIVS_M_i8 need to be fixed */
+/* TODO: M_MUL_O_I8, M_MULS_O_I8, M_DIV_O_I8, M_DIVS_O_i8 need to be fixed */
 static const tlcs900inst mnemonic_c8[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _LD, _R, _I8 },
-	{ _PUSH, _R, 0 }, { _POP, _R, 0 }, { _CPL, _R, 0 }, { _NEG, _R, 0 },
-	{ _MUL, _R, _I8 }, { _MULS, _R, _I8 }, { _DIV, _R, _I8 }, { _DIVS, _R, _I8 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DAA, _R, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DJNZ, _R, _D8 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_LD, O_R, O_I8 },
+	{ M_PUSH, O_R, O_NONE }, { M_POP, O_R, O_NONE }, { M_CPL, O_R, O_NONE }, { M_NEG, O_R, O_NONE },
+	{ M_MUL, O_R, O_I8 }, { M_MULS, O_R, O_I8 }, { M_DIV, O_R, O_I8 }, { M_DIVS, O_R, O_I8 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DAA, O_R, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DJNZ, O_R, O_D8 }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _ANDCF, _I8, _R }, { _ORCF, _I8, _R }, { _XORCF, _I8, _R }, { _LDCF, _I8, _R },
-	{ _STCF, _I8, _R }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _ANDCF, _A, _R }, { _ORCF, _A, _R }, { _XORCF, _A, _R }, { _LDCF, _A, _R },
-	{ _STCF, _A, _R }, { _DB, 0, 0 }, { _LDC, _CR8, _R }, { _LDC, _R, _CR8 },
-	{ _RES, _I8, _R }, { _SET, _I8, _R }, { _CHG, _I8, _R }, { _BIT, _I8, _R },
-	{ _TSET, _I8, _R }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_ANDCF, O_I8, O_R }, { M_ORCF, O_I8, O_R }, { M_XORCF, O_I8, O_R }, { M_LDCF, O_I8, O_R },
+	{ M_STCF, O_I8, O_R }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_ANDCF, O_A, O_R }, { M_ORCF, O_A, O_R }, { M_XORCF, O_A, O_R }, { M_LDCF, O_A, O_R },
+	{ M_STCF, O_A, O_R }, { M_DB, O_NONE, O_NONE }, { M_LDC, O_CR8, O_R }, { M_LDC, O_R, O_CR8 },
+	{ M_RES, O_I8, O_R }, { M_SET, O_I8, O_R }, { M_CHG, O_I8, O_R }, { M_BIT, O_I8, O_R },
+	{ M_TSET, O_I8, O_R }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 40 - 5F */
-	{ _MUL, _MC16, _R }, { _MUL, _MC16, _R }, { _MUL, _MC16, _R }, { _MUL, _MC16, _R },
-	{ _MUL, _MC16, _R }, { _MUL, _MC16, _R }, { _MUL, _MC16, _R }, { _MUL, _MC16, _R },
-	{ _MULS, _MC16, _R }, { _MULS, _MC16, _R }, { _MULS, _MC16, _R }, { _MULS, _MC16, _R },
-	{ _MULS, _MC16, _R }, { _MULS, _MC16, _R }, { _MULS, _MC16, _R }, { _MULS, _MC16, _R },
-	{ _DIV, _MC16, _R }, { _DIV, _MC16, _R }, { _DIV, _MC16, _R }, { _DIV, _MC16, _R },
-	{ _DIV, _MC16, _R }, { _DIV, _MC16, _R }, { _DIV, _MC16, _R }, { _DIV, _MC16, _R },
-	{ _DIVS, _MC16, _R }, { _DIVS, _MC16, _R }, { _DIVS, _MC16, _R }, { _DIVS, _MC16, _R },
-	{ _DIVS, _MC16, _R }, { _DIVS, _MC16, _R }, { _DIVS, _MC16, _R }, { _DIVS, _MC16, _R },
+	{ M_MUL, O_MC16, O_R }, { M_MUL, O_MC16, O_R }, { M_MUL, O_MC16, O_R }, { M_MUL, O_MC16, O_R },
+	{ M_MUL, O_MC16, O_R }, { M_MUL, O_MC16, O_R }, { M_MUL, O_MC16, O_R }, { M_MUL, O_MC16, O_R },
+	{ M_MULS, O_MC16, O_R }, { M_MULS, O_MC16, O_R }, { M_MULS, O_MC16, O_R }, { M_MULS, O_MC16, O_R },
+	{ M_MULS, O_MC16, O_R }, { M_MULS, O_MC16, O_R }, { M_MULS, O_MC16, O_R }, { M_MULS, O_MC16, O_R },
+	{ M_DIV, O_MC16, O_R }, { M_DIV, O_MC16, O_R }, { M_DIV, O_MC16, O_R }, { M_DIV, O_MC16, O_R },
+	{ M_DIV, O_MC16, O_R }, { M_DIV, O_MC16, O_R }, { M_DIV, O_MC16, O_R }, { M_DIV, O_MC16, O_R },
+	{ M_DIVS, O_MC16, O_R }, { M_DIVS, O_MC16, O_R }, { M_DIVS, O_MC16, O_R }, { M_DIVS, O_MC16, O_R },
+	{ M_DIVS, O_MC16, O_R }, { M_DIVS, O_MC16, O_R }, { M_DIVS, O_MC16, O_R }, { M_DIVS, O_MC16, O_R },
 
 	/* 60 - 7F */
-	{ _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R },
-	{ _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R },
-	{ _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R },
-	{ _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R },
-	{ _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R },
-	{ _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R },
-	{ _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R },
-	{ _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R },
+	{ M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R },
+	{ M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R },
+	{ M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R },
+	{ M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R },
+	{ M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R },
+	{ M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R },
+	{ M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R },
+	{ M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R },
 
 	/* 80 - 9F */
-	{ _ADD, _C8, _R }, { _ADD, _C8, _R }, { _ADD, _C8, _R }, { _ADD, _C8, _R },
-	{ _ADD, _C8, _R }, { _ADD, _C8, _R }, { _ADD, _C8, _R }, { _ADD, _C8, _R },
-	{ _LD, _C8, _R }, { _LD, _C8, _R }, { _LD, _C8, _R }, { _LD, _C8, _R },
-	{ _LD, _C8, _R }, { _LD, _C8, _R }, { _LD, _C8, _R }, { _LD, _C8, _R },
-	{ _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R },
-	{ _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R },
-	{ _LD, _R, _C8 }, { _LD, _R, _C8 }, { _LD, _R, _C8 }, { _LD, _R, _C8 },
-	{ _LD, _R, _C8 }, { _LD, _R, _C8 }, { _LD, _R, _C8 }, { _LD, _R, _C8 },
+	{ M_ADD, O_C8, O_R }, { M_ADD, O_C8, O_R }, { M_ADD, O_C8, O_R }, { M_ADD, O_C8, O_R },
+	{ M_ADD, O_C8, O_R }, { M_ADD, O_C8, O_R }, { M_ADD, O_C8, O_R }, { M_ADD, O_C8, O_R },
+	{ M_LD, O_C8, O_R }, { M_LD, O_C8, O_R }, { M_LD, O_C8, O_R }, { M_LD, O_C8, O_R },
+	{ M_LD, O_C8, O_R }, { M_LD, O_C8, O_R }, { M_LD, O_C8, O_R }, { M_LD, O_C8, O_R },
+	{ M_ADC, O_C8, O_R }, { M_ADC, O_C8, O_R }, { M_ADC, O_C8, O_R }, { M_ADC, O_C8, O_R },
+	{ M_ADC, O_C8, O_R }, { M_ADC, O_C8, O_R }, { M_ADC, O_C8, O_R }, { M_ADC, O_C8, O_R },
+	{ M_LD, O_R, O_C8 }, { M_LD, O_R, O_C8 }, { M_LD, O_R, O_C8 }, { M_LD, O_R, O_C8 },
+	{ M_LD, O_R, O_C8 }, { M_LD, O_R, O_C8 }, { M_LD, O_R, O_C8 }, { M_LD, O_R, O_C8 },
 
 	/* A0 - BF */
-	{ _SUB, _C8, _R }, { _SUB, _C8, _R }, { _SUB, _C8, _R }, { _SUB, _C8, _R },
-	{ _SUB, _C8, _R }, { _SUB, _C8, _R }, { _SUB, _C8, _R }, { _SUB, _C8, _R },
-	{ _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 },
-	{ _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 },
-	{ _SBC, _C8, _R }, { _SBC, _C8, _R }, { _SBC, _C8, _R }, { _SBC, _C8, _R },
-	{ _SBC, _C8, _R }, { _SBC, _C8, _R }, { _SBC, _C8, _R }, { _SBC, _C8, _R },
-	{ _EX, _C8, _R }, { _EX, _C8, _R }, { _EX, _C8, _R }, { _EX, _C8, _R },
-	{ _EX, _C8, _R }, { _EX, _C8, _R }, { _EX, _C8, _R }, { _EX, _C8, _R },
+	{ M_SUB, O_C8, O_R }, { M_SUB, O_C8, O_R }, { M_SUB, O_C8, O_R }, { M_SUB, O_C8, O_R },
+	{ M_SUB, O_C8, O_R }, { M_SUB, O_C8, O_R }, { M_SUB, O_C8, O_R }, { M_SUB, O_C8, O_R },
+	{ M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 },
+	{ M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 },
+	{ M_SBC, O_C8, O_R }, { M_SBC, O_C8, O_R }, { M_SBC, O_C8, O_R }, { M_SBC, O_C8, O_R },
+	{ M_SBC, O_C8, O_R }, { M_SBC, O_C8, O_R }, { M_SBC, O_C8, O_R }, { M_SBC, O_C8, O_R },
+	{ M_EX, O_C8, O_R }, { M_EX, O_C8, O_R }, { M_EX, O_C8, O_R }, { M_EX, O_C8, O_R },
+	{ M_EX, O_C8, O_R }, { M_EX, O_C8, O_R }, { M_EX, O_C8, O_R }, { M_EX, O_C8, O_R },
 
 	/* C0 - DF */
-	{ _AND, _C8, _R }, { _AND, _C8, _R }, { _AND, _C8, _R }, { _AND, _C8, _R },
-	{ _AND, _C8, _R }, { _AND, _C8, _R }, { _AND, _C8, _R }, { _AND, _C8, _R },
-	{ _ADD, _R, _I8 }, { _ADC, _R, _I8 }, { _SUB, _R, _I8 }, { _SBC, _R, _I8 },
-	{ _AND, _R, _I8 }, { _XOR, _R, _I8 }, { _OR, _R, _I8 }, { _CP, _R, _I8 },
-	{ _XOR, _C8, _R }, { _XOR, _C8, _R }, { _XOR, _C8, _R }, { _XOR, _C8, _R },
-	{ _XOR, _C8, _R }, { _XOR, _C8, _R }, { _XOR, _C8, _R }, { _XOR, _C8, _R },
-	{ _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 },
-	{ _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 },
+	{ M_AND, O_C8, O_R }, { M_AND, O_C8, O_R }, { M_AND, O_C8, O_R }, { M_AND, O_C8, O_R },
+	{ M_AND, O_C8, O_R }, { M_AND, O_C8, O_R }, { M_AND, O_C8, O_R }, { M_AND, O_C8, O_R },
+	{ M_ADD, O_R, O_I8 }, { M_ADC, O_R, O_I8 }, { M_SUB, O_R, O_I8 }, { M_SBC, O_R, O_I8 },
+	{ M_AND, O_R, O_I8 }, { M_XOR, O_R, O_I8 }, { M_OR, O_R, O_I8 }, { M_CP, O_R, O_I8 },
+	{ M_XOR, O_C8, O_R }, { M_XOR, O_C8, O_R }, { M_XOR, O_C8, O_R }, { M_XOR, O_C8, O_R },
+	{ M_XOR, O_C8, O_R }, { M_XOR, O_C8, O_R }, { M_XOR, O_C8, O_R }, { M_XOR, O_C8, O_R },
+	{ M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 },
+	{ M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 },
 
 	/* E0 - FF */
-	{ _OR, _C8, _R }, { _OR, _C8, _R }, { _OR, _C8, _R }, { _OR, _C8, _R },
-	{ _OR, _C8, _R }, { _OR, _C8, _R }, { _OR, _C8, _R }, { _OR, _C8, _R },
-	{ _RLC, _I8, _R }, { _RRC, _I8, _R }, { _RL, _I8, _R }, { _RR, _I8, _R },
-	{ _SLA, _I8, _R }, { _SRA, _I8, _R }, { _SLL, _I8, _R }, { _SRL, _I8, _R },
-	{ _CP, _C8, _R }, { _CP, _C8, _R }, { _CP, _C8, _R }, { _CP, _C8, _R },
-	{ _CP, _C8, _R }, { _CP, _C8, _R }, { _CP, _C8, _R }, { _CP, _C8, _R },
-	{ _RLC, _A, _R }, { _RRC, _A, _R }, { _RL, _A, _R }, { _RR, _A, _R },
-	{ _SLA, _A, _R }, { _SRA, _A, _R }, { _SLL, _A, _R }, { _SRL, _A, _R }
+	{ M_OR, O_C8, O_R }, { M_OR, O_C8, O_R }, { M_OR, O_C8, O_R }, { M_OR, O_C8, O_R },
+	{ M_OR, O_C8, O_R }, { M_OR, O_C8, O_R }, { M_OR, O_C8, O_R }, { M_OR, O_C8, O_R },
+	{ M_RLC, O_I8, O_R }, { M_RRC, O_I8, O_R }, { M_RL, O_I8, O_R }, { M_RR, O_I8, O_R },
+	{ M_SLA, O_I8, O_R }, { M_SRA, O_I8, O_R }, { M_SLL, O_I8, O_R }, { M_SRL, O_I8, O_R },
+	{ M_CP, O_C8, O_R }, { M_CP, O_C8, O_R }, { M_CP, O_C8, O_R }, { M_CP, O_C8, O_R },
+	{ M_CP, O_C8, O_R }, { M_CP, O_C8, O_R }, { M_CP, O_C8, O_R }, { M_CP, O_C8, O_R },
+	{ M_RLC, O_A, O_R }, { M_RRC, O_A, O_R }, { M_RL, O_A, O_R }, { M_RR, O_A, O_R },
+	{ M_SLA, O_A, O_R }, { M_SRA, O_A, O_R }, { M_SLL, O_A, O_R }, { M_SRL, O_A, O_R }
 };
 
 
 static const tlcs900inst mnemonic_d0[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _PUSHW, _M, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _LDW, _M16, _M }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_PUSHW, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_LDW, O_M16, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M },
-	{ _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M }, { _LD, _C16, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 },
-	{ _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 }, { _EX, _M, _C16 },
-	{ _ADD, _M, _I16 }, { _ADC, _M, _I16 }, { _SUB, _M, _I16 }, { _SBC, _M, _I16 },
-	{ _AND, _M, _I16 }, { _XOR, _M, _I16 }, { _OR, _M, _I16 }, { _CP, _M, _I16 },
+	{ M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M },
+	{ M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M }, { M_LD, O_C16, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 },
+	{ M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 }, { M_EX, O_M, O_C16 },
+	{ M_ADD, O_M, O_I16 }, { M_ADC, O_M, O_I16 }, { M_SUB, O_M, O_I16 }, { M_SBC, O_M, O_I16 },
+	{ M_AND, O_M, O_I16 }, { M_XOR, O_M, O_I16 }, { M_OR, O_M, O_I16 }, { M_CP, O_M, O_I16 },
 
 	/* 40 - 5F */
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
-	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
-	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
-	{ _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M },
-	{ _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M }, { _DIV, _C32, _M },
-	{ _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M },
-	{ _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M }, { _DIVS, _C32, _M },
+	{ M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M },
+	{ M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M }, { M_MUL, O_C32, O_M },
+	{ M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M },
+	{ M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M }, { M_MULS, O_C32, O_M },
+	{ M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M },
+	{ M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M }, { M_DIV, O_C32, O_M },
+	{ M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M },
+	{ M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M }, { M_DIVS, O_C32, O_M },
 
 	/* 60 - 7F */
-	{ _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M },
-	{ _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M }, { _INCW, _I3, _M },
-	{ _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M },
-	{ _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M }, { _DECW, _I3, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _RLCW, _M, 0 }, { _RRCW, _M, 0 }, { _RLW, _M, 0 }, { _RRW, _M, 0 },
-	{ _SLAW, _M, 0 }, { _SRAW, _M, 0 }, { _SLLW, _M, 0 }, { _SRLW, _M, 0 },
+	{ M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M },
+	{ M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M }, { M_INCW, O_I3, O_M },
+	{ M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M },
+	{ M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M }, { M_DECW, O_I3, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_RLCW, O_M, O_NONE }, { M_RRCW, O_M, O_NONE }, { M_RLW, O_M, O_NONE }, { M_RRW, O_M, O_NONE },
+	{ M_SLAW, O_M, O_NONE }, { M_SRAW, O_M, O_NONE }, { M_SLLW, O_M, O_NONE }, { M_SRLW, O_M, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M },
-	{ _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M }, { _ADD, _C16, _M },
-	{ _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 },
-	{ _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 }, { _ADD, _M, _C16 },
-	{ _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M },
-	{ _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M }, { _ADC, _C16, _M },
-	{ _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 },
-	{ _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 }, { _ADC, _M, _C16 },
+	{ M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M },
+	{ M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M }, { M_ADD, O_C16, O_M },
+	{ M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 },
+	{ M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 }, { M_ADD, O_M, O_C16 },
+	{ M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M },
+	{ M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M }, { M_ADC, O_C16, O_M },
+	{ M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 },
+	{ M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 }, { M_ADC, O_M, O_C16 },
 
 	/* A0 - BF */
-	{ _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M },
-	{ _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M }, { _SUB, _C16, _M },
-	{ _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 },
-	{ _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 }, { _SUB, _M, _C16 },
-	{ _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M },
-	{ _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M }, { _SBC, _C16, _M },
-	{ _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 },
-	{ _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 }, { _SBC, _M, _C16 },
+	{ M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M },
+	{ M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M }, { M_SUB, O_C16, O_M },
+	{ M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 },
+	{ M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 }, { M_SUB, O_M, O_C16 },
+	{ M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M },
+	{ M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M }, { M_SBC, O_C16, O_M },
+	{ M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 },
+	{ M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 }, { M_SBC, O_M, O_C16 },
 
 	/* C0 - DF */
-	{ _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M },
-	{ _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M }, { _AND, _C16, _M },
-	{ _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 },
-	{ _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 }, { _AND, _M, _C16 },
-	{ _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M },
-	{ _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M }, { _XOR, _C16, _M },
-	{ _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 },
-	{ _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 }, { _XOR, _M, _C16 },
+	{ M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M },
+	{ M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M }, { M_AND, O_C16, O_M },
+	{ M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 },
+	{ M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 }, { M_AND, O_M, O_C16 },
+	{ M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M },
+	{ M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M }, { M_XOR, O_C16, O_M },
+	{ M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 },
+	{ M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 }, { M_XOR, O_M, O_C16 },
 
 	/* E0 - FF */
-	{ _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M },
-	{ _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M }, { _OR, _C16, _M },
-	{ _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 },
-	{ _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 }, { _OR, _M, _C16 },
-	{ _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M },
-	{ _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M }, { _CP, _C16, _M },
-	{ _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 },
-	{ _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 }, { _CP, _M, _C16 },
+	{ M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M },
+	{ M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M }, { M_OR, O_C16, O_M },
+	{ M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 },
+	{ M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 }, { M_OR, O_M, O_C16 },
+	{ M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M },
+	{ M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M }, { M_CP, O_C16, O_M },
+	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
+	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
 };
 
 
 static const tlcs900inst mnemonic_d8[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _LD, _R, _I16 },
-	{ _PUSH, _R, 0 }, { _POP, _R, 0 }, { _CPL, _R, 0 }, { _NEG, _R, 0 },
-	{ _MUL, _R, _I16 }, { _MULS, _R, _I16 }, { _DIV, _R, _I16 }, { _DIVS, _R, _I16 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _BS1F, _A, _R }, { _BS1B, _A, _R },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _EXTZ, _R, 0 }, { _EXTS, _R, 0 },
-	{ _PAA, _R, 0 }, { _DB, 0, 0 }, { _MIRR, _R, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _MULA, _R, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DJNZ, _R, _D8 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_LD, O_R, O_I16 },
+	{ M_PUSH, O_R, O_NONE }, { M_POP, O_R, O_NONE }, { M_CPL, O_R, O_NONE }, { M_NEG, O_R, O_NONE },
+	{ M_MUL, O_R, O_I16 }, { M_MULS, O_R, O_I16 }, { M_DIV, O_R, O_I16 }, { M_DIVS, O_R, O_I16 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_BS1F, O_A, O_R }, { M_BS1B, O_A, O_R },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_EXTZ, O_R, O_NONE }, { M_EXTS, O_R, O_NONE },
+	{ M_PAA, O_R, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_MIRR, O_R, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_MULA, O_R, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DJNZ, O_R, O_D8 }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _ANDCF, _I8, _R }, { _ORCF, _I8, _R }, { _XORCF, _I8, _R }, { _LDCF, _I8, _R },
-	{ _STCF, _I8, _R }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _ANDCF, _A, _R }, { _ORCF, _A, _R }, { _XORCF, _A, _R }, { _LDCF, _A, _R },
-	{ _STCF, _A, _R }, { _DB, 0, 0 }, { _LDC, _CR16, _R }, { _LDC, _R, _CR16 },
-	{ _RES, _I8, _R }, { _SET, _I8, _R }, { _CHG, _I8, _R }, { _BIT, _I8, _R },
-	{ _TSET, _I8, _R }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _MINC1, _I16, _R }, { _MINC2, _I16, _R }, { _MINC4, _I16, _R }, { _DB, 0, 0 },
-	{ _MDEC1, _I16, _R }, { _MDEC2, _I16, _R }, { _MDEC4, _I16, _R }, { _DB, 0, 0 },
+	{ M_ANDCF, O_I8, O_R }, { M_ORCF, O_I8, O_R }, { M_XORCF, O_I8, O_R }, { M_LDCF, O_I8, O_R },
+	{ M_STCF, O_I8, O_R }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_ANDCF, O_A, O_R }, { M_ORCF, O_A, O_R }, { M_XORCF, O_A, O_R }, { M_LDCF, O_A, O_R },
+	{ M_STCF, O_A, O_R }, { M_DB, O_NONE, O_NONE }, { M_LDC, O_CR16, O_R }, { M_LDC, O_R, O_CR16 },
+	{ M_RES, O_I8, O_R }, { M_SET, O_I8, O_R }, { M_CHG, O_I8, O_R }, { M_BIT, O_I8, O_R },
+	{ M_TSET, O_I8, O_R }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_MINC1, O_I16, O_R }, { M_MINC2, O_I16, O_R }, { M_MINC4, O_I16, O_R }, { M_DB, O_NONE, O_NONE },
+	{ M_MDEC1, O_I16, O_R }, { M_MDEC2, O_I16, O_R }, { M_MDEC4, O_I16, O_R }, { M_DB, O_NONE, O_NONE },
 
 	/* 40 - 5F */
-	{ _MUL, _C32, _R }, { _MUL, _C32, _R }, { _MUL, _C32, _R }, { _MUL, _C32, _R },
-	{ _MUL, _C32, _R }, { _MUL, _C32, _R }, { _MUL, _C32, _R }, { _MUL, _C32, _R },
-	{ _MULS, _C32, _R }, { _MULS, _C32, _R }, { _MULS, _C32, _R }, { _MULS, _C32, _R },
-	{ _MULS, _C32, _R }, { _MULS, _C32, _R }, { _MULS, _C32, _R }, { _MULS, _C32, _R },
-	{ _DIV, _C32, _R }, { _DIV, _C32, _R }, { _DIV, _C32, _R }, { _DIV, _C32, _R },
-	{ _DIV, _C32, _R }, { _DIV, _C32, _R }, { _DIV, _C32, _R }, { _DIV, _C32, _R },
-	{ _DIVS, _C32, _R }, { _DIVS, _C32, _R }, { _DIVS, _C32, _R }, { _DIVS, _C32, _R },
-	{ _DIVS, _C32, _R }, { _DIVS, _C32, _R }, { _DIVS, _C32, _R }, { _DIVS, _C32, _R },
+	{ M_MUL, O_C32, O_R }, { M_MUL, O_C32, O_R }, { M_MUL, O_C32, O_R }, { M_MUL, O_C32, O_R },
+	{ M_MUL, O_C32, O_R }, { M_MUL, O_C32, O_R }, { M_MUL, O_C32, O_R }, { M_MUL, O_C32, O_R },
+	{ M_MULS, O_C32, O_R }, { M_MULS, O_C32, O_R }, { M_MULS, O_C32, O_R }, { M_MULS, O_C32, O_R },
+	{ M_MULS, O_C32, O_R }, { M_MULS, O_C32, O_R }, { M_MULS, O_C32, O_R }, { M_MULS, O_C32, O_R },
+	{ M_DIV, O_C32, O_R }, { M_DIV, O_C32, O_R }, { M_DIV, O_C32, O_R }, { M_DIV, O_C32, O_R },
+	{ M_DIV, O_C32, O_R }, { M_DIV, O_C32, O_R }, { M_DIV, O_C32, O_R }, { M_DIV, O_C32, O_R },
+	{ M_DIVS, O_C32, O_R }, { M_DIVS, O_C32, O_R }, { M_DIVS, O_C32, O_R }, { M_DIVS, O_C32, O_R },
+	{ M_DIVS, O_C32, O_R }, { M_DIVS, O_C32, O_R }, { M_DIVS, O_C32, O_R }, { M_DIVS, O_C32, O_R },
 
 	/* 60 - 7F */
-	{ _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R },
-	{ _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R },
-	{ _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R },
-	{ _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R },
-	{ _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R },
-	{ _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R },
-	{ _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R },
-	{ _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R }, { _SCC, _CC, _R },
+	{ M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R },
+	{ M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R },
+	{ M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R },
+	{ M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R },
+	{ M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R },
+	{ M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R },
+	{ M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R },
+	{ M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R }, { M_SCC, O_CC, O_R },
 
 	/* 80 - 9F */
-	{ _ADD, _C16, _R }, { _ADD, _C16, _R }, { _ADD, _C16, _R }, { _ADD, _C16, _R },
-	{ _ADD, _C16, _R }, { _ADD, _C16, _R }, { _ADD, _C16, _R }, { _ADD, _C16, _R },
-	{ _LD, _C16, _R }, { _LD, _C16, _R }, { _LD, _C16, _R }, { _LD, _C16, _R },
-	{ _LD, _C16, _R }, { _LD, _C16, _R }, { _LD, _C16, _R }, { _LD, _C16, _R },
-	{ _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R },
-	{ _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R },
-	{ _LD, _R, _C16 }, { _LD, _R, _C16 }, { _LD, _R, _C16 }, { _LD, _R, _C16 },
-	{ _LD, _R, _C16 }, { _LD, _R, _C16 }, { _LD, _R, _C16 }, { _LD, _R, _C16 },
+	{ M_ADD, O_C16, O_R }, { M_ADD, O_C16, O_R }, { M_ADD, O_C16, O_R }, { M_ADD, O_C16, O_R },
+	{ M_ADD, O_C16, O_R }, { M_ADD, O_C16, O_R }, { M_ADD, O_C16, O_R }, { M_ADD, O_C16, O_R },
+	{ M_LD, O_C16, O_R }, { M_LD, O_C16, O_R }, { M_LD, O_C16, O_R }, { M_LD, O_C16, O_R },
+	{ M_LD, O_C16, O_R }, { M_LD, O_C16, O_R }, { M_LD, O_C16, O_R }, { M_LD, O_C16, O_R },
+	{ M_ADC, O_C16, O_R }, { M_ADC, O_C16, O_R }, { M_ADC, O_C16, O_R }, { M_ADC, O_C16, O_R },
+	{ M_ADC, O_C16, O_R }, { M_ADC, O_C16, O_R }, { M_ADC, O_C16, O_R }, { M_ADC, O_C16, O_R },
+	{ M_LD, O_R, O_C16 }, { M_LD, O_R, O_C16 }, { M_LD, O_R, O_C16 }, { M_LD, O_R, O_C16 },
+	{ M_LD, O_R, O_C16 }, { M_LD, O_R, O_C16 }, { M_LD, O_R, O_C16 }, { M_LD, O_R, O_C16 },
 
 	/* A0 - BF */
-	{ _SUB, _C16, _R }, { _SUB, _C16, _R }, { _SUB, _C16, _R }, { _SUB, _C16, _R },
-	{ _SUB, _C16, _R }, { _SUB, _C16, _R }, { _SUB, _C16, _R }, { _SUB, _C16, _R },
-	{ _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 },
-	{ _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 },
-	{ _SBC, _C16, _R }, { _SBC, _C16, _R }, { _SBC, _C16, _R }, { _SBC, _C16, _R },
-	{ _SBC, _C16, _R }, { _SBC, _C16, _R }, { _SBC, _C16, _R }, { _SBC, _C16, _R },
-	{ _EX, _C16, _R }, { _EX, _C16, _R }, { _EX, _C16, _R }, { _EX, _C16, _R },
-	{ _EX, _C16, _R }, { _EX, _C16, _R }, { _EX, _C16, _R }, { _EX, _C16, _R },
+	{ M_SUB, O_C16, O_R }, { M_SUB, O_C16, O_R }, { M_SUB, O_C16, O_R }, { M_SUB, O_C16, O_R },
+	{ M_SUB, O_C16, O_R }, { M_SUB, O_C16, O_R }, { M_SUB, O_C16, O_R }, { M_SUB, O_C16, O_R },
+	{ M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 },
+	{ M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 },
+	{ M_SBC, O_C16, O_R }, { M_SBC, O_C16, O_R }, { M_SBC, O_C16, O_R }, { M_SBC, O_C16, O_R },
+	{ M_SBC, O_C16, O_R }, { M_SBC, O_C16, O_R }, { M_SBC, O_C16, O_R }, { M_SBC, O_C16, O_R },
+	{ M_EX, O_C16, O_R }, { M_EX, O_C16, O_R }, { M_EX, O_C16, O_R }, { M_EX, O_C16, O_R },
+	{ M_EX, O_C16, O_R }, { M_EX, O_C16, O_R }, { M_EX, O_C16, O_R }, { M_EX, O_C16, O_R },
 
 	/* C0 - DF */
-	{ _AND, _C16, _R }, { _AND, _C16, _R }, { _AND, _C16, _R }, { _AND, _C16, _R },
-	{ _AND, _C16, _R }, { _AND, _C16, _R }, { _AND, _C16, _R }, { _AND, _C16, _R },
-	{ _ADD, _R, _I16 }, { _ADC, _R, _I16 }, { _SUB, _R, _I16 }, { _SBC, _R, _I16 },
-	{ _AND, _R, _I16 }, { _XOR, _R, _I16 }, { _OR, _R, _I16 }, { _CP, _R, _I16 },
-	{ _XOR, _C16, _R }, { _XOR, _C16, _R }, { _XOR, _C16, _R }, { _XOR, _C16, _R },
-	{ _XOR, _C16, _R }, { _XOR, _C16, _R }, { _XOR, _C16, _R }, { _XOR, _C16, _R },
-	{ _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 },
-	{ _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 },
+	{ M_AND, O_C16, O_R }, { M_AND, O_C16, O_R }, { M_AND, O_C16, O_R }, { M_AND, O_C16, O_R },
+	{ M_AND, O_C16, O_R }, { M_AND, O_C16, O_R }, { M_AND, O_C16, O_R }, { M_AND, O_C16, O_R },
+	{ M_ADD, O_R, O_I16 }, { M_ADC, O_R, O_I16 }, { M_SUB, O_R, O_I16 }, { M_SBC, O_R, O_I16 },
+	{ M_AND, O_R, O_I16 }, { M_XOR, O_R, O_I16 }, { M_OR, O_R, O_I16 }, { M_CP, O_R, O_I16 },
+	{ M_XOR, O_C16, O_R }, { M_XOR, O_C16, O_R }, { M_XOR, O_C16, O_R }, { M_XOR, O_C16, O_R },
+	{ M_XOR, O_C16, O_R }, { M_XOR, O_C16, O_R }, { M_XOR, O_C16, O_R }, { M_XOR, O_C16, O_R },
+	{ M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 },
+	{ M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 },
 
 	/* E0 - FF */
-	{ _OR, _C16, _R }, { _OR, _C16, _R }, { _OR, _C16, _R }, { _OR, _C16, _R },
-	{ _OR, _C16, _R }, { _OR, _C16, _R }, { _OR, _C16, _R }, { _OR, _C16, _R },
-	{ _RLC, _I8, _R }, { _RRC, _I8, _R }, { _RL, _I8, _R }, { _RR, _I8, _R },
-	{ _SLA, _I8, _R }, { _SRA, _I8, _R }, { _SLL, _I8, _R }, { _SRL, _I8, _R },
-	{ _CP, _C16, _R }, { _CP, _C16, _R }, { _CP, _C16, _R }, { _CP, _C16, _R },
-	{ _CP, _C16, _R }, { _CP, _C16, _R }, { _CP, _C16, _R }, { _CP, _C16, _R },
-	{ _RLC, _A, _R }, { _RRC, _A, _R }, { _RL, _A, _R }, { _RR, _A, _R },
-	{ _SLA, _A, _R }, { _SRA, _A, _R }, { _SLL, _A, _R }, { _SRL, _A, _R }
+	{ M_OR, O_C16, O_R }, { M_OR, O_C16, O_R }, { M_OR, O_C16, O_R }, { M_OR, O_C16, O_R },
+	{ M_OR, O_C16, O_R }, { M_OR, O_C16, O_R }, { M_OR, O_C16, O_R }, { M_OR, O_C16, O_R },
+	{ M_RLC, O_I8, O_R }, { M_RRC, O_I8, O_R }, { M_RL, O_I8, O_R }, { M_RR, O_I8, O_R },
+	{ M_SLA, O_I8, O_R }, { M_SRA, O_I8, O_R }, { M_SLL, O_I8, O_R }, { M_SRL, O_I8, O_R },
+	{ M_CP, O_C16, O_R }, { M_CP, O_C16, O_R }, { M_CP, O_C16, O_R }, { M_CP, O_C16, O_R },
+	{ M_CP, O_C16, O_R }, { M_CP, O_C16, O_R }, { M_CP, O_C16, O_R }, { M_CP, O_C16, O_R },
+	{ M_RLC, O_A, O_R }, { M_RRC, O_A, O_R }, { M_RL, O_A, O_R }, { M_RR, O_A, O_R },
+	{ M_SLA, O_A, O_R }, { M_SRA, O_A, O_R }, { M_SLL, O_A, O_R }, { M_SRL, O_A, O_R }
 };
 
 
 static const tlcs900inst mnemonic_e0[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C32, _M }, { _LD, _C32, _M }, { _LD, _C32, _M }, { _LD, _C32, _M },
-	{ _LD, _C32, _M }, { _LD, _C32, _M }, { _LD, _C32, _M }, { _LD, _C32, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_C32, O_M }, { M_LD, O_C32, O_M }, { M_LD, O_C32, O_M }, { M_LD, O_C32, O_M },
+	{ M_LD, O_C32, O_M }, { M_LD, O_C32, O_M }, { M_LD, O_C32, O_M }, { M_LD, O_C32, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 40 - 5F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 60 - 7F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C32, _M }, { _ADD, _C32, _M }, { _ADD, _C32, _M }, { _ADD, _C32, _M },
-	{ _ADD, _C32, _M }, { _ADD, _C32, _M }, { _ADD, _C32, _M }, { _ADD, _C32, _M },
-	{ _ADD, _M, _C32 }, { _ADD, _M, _C32 }, { _ADD, _M, _C32 }, { _ADD, _M, _C32 },
-	{ _ADD, _M, _C32 }, { _ADD, _M, _C32 }, { _ADD, _M, _C32 }, { _ADD, _M, _C32 },
-	{ _ADC, _C32, _M }, { _ADC, _C32, _M }, { _ADC, _C32, _M }, { _ADC, _C32, _M },
-	{ _ADC, _C32, _M }, { _ADC, _C32, _M }, { _ADC, _C32, _M }, { _ADC, _C32, _M },
-	{ _ADC, _M, _C32 }, { _ADC, _M, _C32 }, { _ADC, _M, _C32 }, { _ADC, _M, _C32 },
-	{ _ADC, _M, _C32 }, { _ADC, _M, _C32 }, { _ADC, _M, _C32 }, { _ADC, _M, _C32 },
+	{ M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M },
+	{ M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M }, { M_ADD, O_C32, O_M },
+	{ M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 },
+	{ M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 }, { M_ADD, O_M, O_C32 },
+	{ M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M },
+	{ M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M }, { M_ADC, O_C32, O_M },
+	{ M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 },
+	{ M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 }, { M_ADC, O_M, O_C32 },
 
 	/* A0 - BF */
-	{ _SUB, _C32, _M }, { _SUB, _C32, _M }, { _SUB, _C32, _M }, { _SUB, _C32, _M },
-	{ _SUB, _C32, _M }, { _SUB, _C32, _M }, { _SUB, _C32, _M }, { _SUB, _C32, _M },
-	{ _SUB, _M, _C32 }, { _SUB, _M, _C32 }, { _SUB, _M, _C32 }, { _SUB, _M, _C32 },
-	{ _SUB, _M, _C32 }, { _SUB, _M, _C32 }, { _SUB, _M, _C32 }, { _SUB, _M, _C32 },
-	{ _SBC, _C32, _M }, { _SBC, _C32, _M }, { _SBC, _C32, _M }, { _SBC, _C32, _M },
-	{ _SBC, _C32, _M }, { _SBC, _C32, _M }, { _SBC, _C32, _M }, { _SBC, _C32, _M },
-	{ _SBC, _M, _C32 }, { _SBC, _M, _C32 }, { _SBC, _M, _C32 }, { _SBC, _M, _C32 },
-	{ _SBC, _M, _C32 }, { _SBC, _M, _C32 }, { _SBC, _M, _C32 }, { _SBC, _M, _C32 },
+	{ M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M },
+	{ M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M }, { M_SUB, O_C32, O_M },
+	{ M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 },
+	{ M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 }, { M_SUB, O_M, O_C32 },
+	{ M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M },
+	{ M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M }, { M_SBC, O_C32, O_M },
+	{ M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 },
+	{ M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 }, { M_SBC, O_M, O_C32 },
 
 	/* C0 - DF */
-	{ _AND, _C32, _M }, { _AND, _C32, _M }, { _AND, _C32, _M }, { _AND, _C32, _M },
-	{ _AND, _C32, _M }, { _AND, _C32, _M }, { _AND, _C32, _M }, { _AND, _C32, _M },
-	{ _AND, _M, _C32 }, { _AND, _M, _C32 }, { _AND, _M, _C32 }, { _AND, _M, _C32 },
-	{ _AND, _M, _C32 }, { _AND, _M, _C32 }, { _AND, _M, _C32 }, { _AND, _M, _C32 },
-	{ _XOR, _C32, _M }, { _XOR, _C32, _M }, { _XOR, _C32, _M }, { _XOR, _C32, _M },
-	{ _XOR, _C32, _M }, { _XOR, _C32, _M }, { _XOR, _C32, _M }, { _XOR, _C32, _M },
-	{ _XOR, _M, _C32 }, { _XOR, _M, _C32 }, { _XOR, _M, _C32 }, { _XOR, _M, _C32 },
-	{ _XOR, _M, _C32 }, { _XOR, _M, _C32 }, { _XOR, _M, _C32 }, { _XOR, _M, _C32 },
+	{ M_AND, O_C32, O_M }, { M_AND, O_C32, O_M }, { M_AND, O_C32, O_M }, { M_AND, O_C32, O_M },
+	{ M_AND, O_C32, O_M }, { M_AND, O_C32, O_M }, { M_AND, O_C32, O_M }, { M_AND, O_C32, O_M },
+	{ M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 },
+	{ M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 }, { M_AND, O_M, O_C32 },
+	{ M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M },
+	{ M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M }, { M_XOR, O_C32, O_M },
+	{ M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 },
+	{ M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 }, { M_XOR, O_M, O_C32 },
 
 	/* E0 - FF */
-	{ _OR, _C32, _M }, { _OR, _C32, _M }, { _OR, _C32, _M }, { _OR, _C32, _M },
-	{ _OR, _C32, _M }, { _OR, _C32, _M }, { _OR, _C32, _M }, { _OR, _C32, _M },
-	{ _OR, _M, _C32 }, { _OR, _M, _C32 }, { _OR, _M, _C32 }, { _OR, _M, _C32 },
-	{ _OR, _M, _C32 }, { _OR, _M, _C32 }, { _OR, _M, _C32 }, { _OR, _M, _C32 },
-	{ _CP, _C32, _M }, { _CP, _C32, _M }, { _CP, _C32, _M }, { _CP, _C32, _M },
-	{ _CP, _C32, _M }, { _CP, _C32, _M }, { _CP, _C32, _M }, { _CP, _C32, _M },
-	{ _CP, _M, _C32 }, { _CP, _M, _C32 }, { _CP, _M, _C32 }, { _CP, _M, _C32 },
-	{ _CP, _M, _C32 }, { _CP, _M, _C32 }, { _CP, _M, _C32 }, { _CP, _M, _C32 },
+	{ M_OR, O_C32, O_M }, { M_OR, O_C32, O_M }, { M_OR, O_C32, O_M }, { M_OR, O_C32, O_M },
+	{ M_OR, O_C32, O_M }, { M_OR, O_C32, O_M }, { M_OR, O_C32, O_M }, { M_OR, O_C32, O_M },
+	{ M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 },
+	{ M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 }, { M_OR, O_M, O_C32 },
+	{ M_CP, O_C32, O_M }, { M_CP, O_C32, O_M }, { M_CP, O_C32, O_M }, { M_CP, O_C32, O_M },
+	{ M_CP, O_C32, O_M }, { M_CP, O_C32, O_M }, { M_CP, O_C32, O_M }, { M_CP, O_C32, O_M },
+	{ M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 },
+	{ M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 },
 };
 
 
 static const tlcs900inst mnemonic_e8[256] =
 {
 	/* 00 - 1F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _LD, _R, _I32 },
-	{ _PUSH, _R, 0 }, { _POP, _R, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LINK, _R, _I16 }, { _UNLK, _R, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _EXTZ, _R, 0 }, { _EXTS, _R, 0 },
-	{ _PAA, _R, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_LD, O_R, O_I32 },
+	{ M_PUSH, O_R, O_NONE }, { M_POP, O_R, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LINK, O_R, O_I16 }, { M_UNLK, O_R, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_EXTZ, O_R, O_NONE }, { M_EXTS, O_R, O_NONE },
+	{ M_PAA, O_R, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _LDC, _CR32, _R }, { _LDC, _R, _CR32 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_LDC, O_CR32, O_R }, { M_LDC, O_R, O_CR32 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 40 - 5F */
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 60 - 7F */
-	{ _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R },
-	{ _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R }, { _INC, _I3, _R },
-	{ _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R },
-	{ _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R }, { _DEC, _I3, _R },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R },
+	{ M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R }, { M_INC, O_I3, O_R },
+	{ M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R },
+	{ M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R }, { M_DEC, O_I3, O_R },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 80 - 9F */
-	{ _ADD, _C32, _R }, { _ADD, _C32, _R }, { _ADD, _C32, _R }, { _ADD, _C32, _R },
-	{ _ADD, _C32, _R }, { _ADD, _C32, _R }, { _ADD, _C32, _R }, { _ADD, _C32, _R },
-	{ _LD, _C32, _R }, { _LD, _C32, _R }, { _LD, _C32, _R }, { _LD, _C32, _R },
-	{ _LD, _C32, _R }, { _LD, _C32, _R }, { _LD, _C32, _R }, { _LD, _C32, _R },
-	{ _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R },
-	{ _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R },
-	{ _LD, _R, _C32 }, { _LD, _R, _C32 }, { _LD, _R, _C32 }, { _LD, _R, _C32 },
-	{ _LD, _R, _C32 }, { _LD, _R, _C32 }, { _LD, _R, _C32 }, { _LD, _R, _C32 },
+	{ M_ADD, O_C32, O_R }, { M_ADD, O_C32, O_R }, { M_ADD, O_C32, O_R }, { M_ADD, O_C32, O_R },
+	{ M_ADD, O_C32, O_R }, { M_ADD, O_C32, O_R }, { M_ADD, O_C32, O_R }, { M_ADD, O_C32, O_R },
+	{ M_LD, O_C32, O_R }, { M_LD, O_C32, O_R }, { M_LD, O_C32, O_R }, { M_LD, O_C32, O_R },
+	{ M_LD, O_C32, O_R }, { M_LD, O_C32, O_R }, { M_LD, O_C32, O_R }, { M_LD, O_C32, O_R },
+	{ M_ADC, O_C32, O_R }, { M_ADC, O_C32, O_R }, { M_ADC, O_C32, O_R }, { M_ADC, O_C32, O_R },
+	{ M_ADC, O_C32, O_R }, { M_ADC, O_C32, O_R }, { M_ADC, O_C32, O_R }, { M_ADC, O_C32, O_R },
+	{ M_LD, O_R, O_C32 }, { M_LD, O_R, O_C32 }, { M_LD, O_R, O_C32 }, { M_LD, O_R, O_C32 },
+	{ M_LD, O_R, O_C32 }, { M_LD, O_R, O_C32 }, { M_LD, O_R, O_C32 }, { M_LD, O_R, O_C32 },
 
 	/* A0 - BF */
-	{ _SUB, _C32, _R }, { _SUB, _C32, _R }, { _SUB, _C32, _R }, { _SUB, _C32, _R },
-	{ _SUB, _C32, _R }, { _SUB, _C32, _R }, { _SUB, _C32, _R }, { _SUB, _C32, _R },
-	{ _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 },
-	{ _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 }, { _LD, _R, _I3 },
-	{ _SBC, _C32, _R }, { _SBC, _C32, _R }, { _SBC, _C32, _R }, { _SBC, _C32, _R },
-	{ _SBC, _C32, _R }, { _SBC, _C32, _R }, { _SBC, _C32, _R }, { _SBC, _C32, _R },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_SUB, O_C32, O_R }, { M_SUB, O_C32, O_R }, { M_SUB, O_C32, O_R }, { M_SUB, O_C32, O_R },
+	{ M_SUB, O_C32, O_R }, { M_SUB, O_C32, O_R }, { M_SUB, O_C32, O_R }, { M_SUB, O_C32, O_R },
+	{ M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 },
+	{ M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 }, { M_LD, O_R, O_I3 },
+	{ M_SBC, O_C32, O_R }, { M_SBC, O_C32, O_R }, { M_SBC, O_C32, O_R }, { M_SBC, O_C32, O_R },
+	{ M_SBC, O_C32, O_R }, { M_SBC, O_C32, O_R }, { M_SBC, O_C32, O_R }, { M_SBC, O_C32, O_R },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* C0 - DF */
-	{ _AND, _C32, _R }, { _AND, _C32, _R }, { _AND, _C32, _R }, { _AND, _C32, _R },
-	{ _AND, _C32, _R }, { _AND, _C32, _R }, { _AND, _C32, _R }, { _AND, _C32, _R },
-	{ _ADD, _R, _I32 }, { _ADC, _R, _I32 }, { _SUB, _R, _I32 }, { _SBC, _R, _I32 },
-	{ _AND, _R, _I32 }, { _XOR, _R, _I32 }, { _OR, _R, _I32 }, { _CP, _R, _I32 },
-	{ _XOR, _C32, _R }, { _XOR, _C32, _R }, { _XOR, _C32, _R }, { _XOR, _C32, _R },
-	{ _XOR, _C32, _R }, { _XOR, _C32, _R }, { _XOR, _C32, _R }, { _XOR, _C32, _R },
-	{ _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 },
-	{ _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 }, { _CP, _R, _I3 },
+	{ M_AND, O_C32, O_R }, { M_AND, O_C32, O_R }, { M_AND, O_C32, O_R }, { M_AND, O_C32, O_R },
+	{ M_AND, O_C32, O_R }, { M_AND, O_C32, O_R }, { M_AND, O_C32, O_R }, { M_AND, O_C32, O_R },
+	{ M_ADD, O_R, O_I32 }, { M_ADC, O_R, O_I32 }, { M_SUB, O_R, O_I32 }, { M_SBC, O_R, O_I32 },
+	{ M_AND, O_R, O_I32 }, { M_XOR, O_R, O_I32 }, { M_OR, O_R, O_I32 }, { M_CP, O_R, O_I32 },
+	{ M_XOR, O_C32, O_R }, { M_XOR, O_C32, O_R }, { M_XOR, O_C32, O_R }, { M_XOR, O_C32, O_R },
+	{ M_XOR, O_C32, O_R }, { M_XOR, O_C32, O_R }, { M_XOR, O_C32, O_R }, { M_XOR, O_C32, O_R },
+	{ M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 },
+	{ M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 }, { M_CP, O_R, O_I3 },
 
 	/* E0 - FF */
-	{ _OR, _C32, _R }, { _OR, _C32, _R }, { _OR, _C32, _R }, { _OR, _C32, _R },
-	{ _OR, _C32, _R }, { _OR, _C32, _R }, { _OR, _C32, _R }, { _OR, _C32, _R },
-	{ _RLC, _I8, _R }, { _RRC, _I8, _R }, { _RL, _I8, _R }, { _RR, _I8, _R },
-	{ _SLA, _I8, _R }, { _SRA, _I8, _R }, { _SLL, _I8, _R }, { _SRL, _I8, _R },
-	{ _CP, _C32, _R }, { _CP, _C32, _R }, { _CP, _C32, _R }, { _CP, _C32, _R },
-	{ _CP, _C32, _R }, { _CP, _C32, _R }, { _CP, _C32, _R }, { _CP, _C32, _R },
-	{ _RLC, _A, _R }, { _RRC, _A, _R }, { _RL, _A, _R }, { _RR, _A, _R },
-	{ _SLA, _A, _R }, { _SRA, _A, _R }, { _SLL, _A, _R }, { _SRL, _A, _R }
+	{ M_OR, O_C32, O_R }, { M_OR, O_C32, O_R }, { M_OR, O_C32, O_R }, { M_OR, O_C32, O_R },
+	{ M_OR, O_C32, O_R }, { M_OR, O_C32, O_R }, { M_OR, O_C32, O_R }, { M_OR, O_C32, O_R },
+	{ M_RLC, O_I8, O_R }, { M_RRC, O_I8, O_R }, { M_RL, O_I8, O_R }, { M_RR, O_I8, O_R },
+	{ M_SLA, O_I8, O_R }, { M_SRA, O_I8, O_R }, { M_SLL, O_I8, O_R }, { M_SRL, O_I8, O_R },
+	{ M_CP, O_C32, O_R }, { M_CP, O_C32, O_R }, { M_CP, O_C32, O_R }, { M_CP, O_C32, O_R },
+	{ M_CP, O_C32, O_R }, { M_CP, O_C32, O_R }, { M_CP, O_C32, O_R }, { M_CP, O_C32, O_R },
+	{ M_RLC, O_A, O_R }, { M_RRC, O_A, O_R }, { M_RL, O_A, O_R }, { M_RR, O_A, O_R },
+	{ M_SLA, O_A, O_R }, { M_SRA, O_A, O_R }, { M_SLL, O_A, O_R }, { M_SRL, O_A, O_R }
 };
 
 
 static const tlcs900inst mnemonic_f0[256] =
 {
 	/* 00 - 1F */
-	{ _LD, _M, _I8 }, { _DB, 0, 0 }, { _LD, _M, _I16 }, { _DB, 0, 0 },
-	{ _POP, _M, 0 }, { _DB, 0, 0 }, { _POPW, _M, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LD, _M, _M16 }, { _DB, 0, 0 }, { _LDW, _M, _M16 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_I8 }, { M_DB, O_NONE, O_NONE }, { M_LD, O_M, O_I16 }, { M_DB, O_NONE, O_NONE },
+	{ M_POP, O_M, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_POPW, O_M, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LD, O_M, O_M16 }, { M_DB, O_NONE, O_NONE }, { M_LDW, O_M, O_M16 }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M },
-	{ _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M }, { _LDA, _C16, _M },
-	{ _ANDCF, _A, _M }, { _ORCF, _A, _M }, { _XORCF, _A, _M }, { _LDCF, _A, _M },
-	{ _STCF, _A, _M }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M },
-	{ _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M }, { _LDA, _C32, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M },
+	{ M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M }, { M_LDA, O_C16, O_M },
+	{ M_ANDCF, O_A, O_M }, { M_ORCF, O_A, O_M }, { M_XORCF, O_A, O_M }, { M_LDCF, O_A, O_M },
+	{ M_STCF, O_A, O_M }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M },
+	{ M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M }, { M_LDA, O_C32, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 40 - 5F */
-	{ _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 },
-	{ _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 }, { _LD, _M, _C8 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 },
-	{ _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 }, { _LD, _M, _C16 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 },
+	{ M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 }, { M_LD, O_M, O_C8 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 },
+	{ M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 }, { M_LD, O_M, O_C16 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 60 - 7F */
-	{ _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 },
-	{ _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 }, { _LD, _M, _C32 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
+	{ M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 },
+	{ M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 }, { M_LD, O_M, O_C32 },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 80 - 9F */
-	{ _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M },
-	{ _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M }, { _ANDCF, _I3, _M },
-	{ _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M },
-	{ _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M }, { _ORCF, _I3, _M },
-	{ _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M },
-	{ _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M }, { _XORCF, _I3, _M },
-	{ _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M },
-	{ _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M }, { _LDCF, _I3, _M },
+	{ M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M },
+	{ M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M }, { M_ANDCF, O_I3, O_M },
+	{ M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M },
+	{ M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M }, { M_ORCF, O_I3, O_M },
+	{ M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M },
+	{ M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M }, { M_XORCF, O_I3, O_M },
+	{ M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M },
+	{ M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M }, { M_LDCF, O_I3, O_M },
 
 	/* A0 - BF */
-	{ _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M },
-	{ _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M }, { _STCF, _I3, _M },
-	{ _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M },
-	{ _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M }, { _TSET, _I3, _M },
-	{ _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M },
-	{ _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M }, { _RES, _I3, _M },
-	{ _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M },
-	{ _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M }, { _SET, _I3, _M },
+	{ M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M },
+	{ M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M }, { M_STCF, O_I3, O_M },
+	{ M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M },
+	{ M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M }, { M_TSET, O_I3, O_M },
+	{ M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M },
+	{ M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M }, { M_RES, O_I3, O_M },
+	{ M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M },
+	{ M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M }, { M_SET, O_I3, O_M },
 
 	/* C0 - DF */
-	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
-	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
+	{ M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M },
+	{ M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M }, { M_CHG, O_I3, O_M },
+	{ M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M },
+	{ M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M }, { M_BIT, O_I3, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
+	{ M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M }, { M_JP, O_CC, O_M },
 
 	/* E0 - FF */
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M }, { _CALL, _CC, _M },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M }, { M_CALL, O_CC, O_M },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }
 };
 
 
 static const tlcs900inst mnemonic[256] =
 {
 	/* 00 - 1F */
-	{ _NOP, 0, 0 }, { _NORMAL, 0, 0 }, { _PUSH, _SR, 0 }, { _POP, _SR, 0 },
-	{ _MAX, 0, 0 }, { _HALT, 0, 0 }, { _EI, _I8, 0 }, { _RETI, 0, 0 },
-	{ _LD, _M8, _I8 }, { _PUSH, _I8, 0 }, { _LD, _M8, _I16 }, { _PUSH, _I16, 0 },
-	{ _INCF, 0, 0 }, { _DECF, 0, 0 }, { _RET, 0, 0 }, { _RETD, _I16, 0 },
-	{ _RCF, 0, 0 }, { _SCF, 0, 0 }, { _CCF, 0, 0 }, { _ZCF, 0, 0 },
-	{ _PUSH, _A, 0 }, { _POP, _A, 0 }, { _EX, _F, _F }, { _LDF, _I8, 0 },
-	{ _PUSH, _F, 0 }, { _POP, _F, 0 }, { _JP, _I16, 0 }, { _JP, _I24, 0 },
-	{ _CALL, _I16, 0 }, { _CALL, _I24, 0 }, { _CALR, _D16, 0 }, { _DB, 0, 0 },
+	{ M_NOP, O_NONE, O_NONE }, { M_NORMAL, O_NONE, O_NONE }, { M_PUSH, O_SR, O_NONE }, { M_POP, O_SR, O_NONE },
+	{ M_MAX, O_NONE, O_NONE }, { M_HALT, O_NONE, O_NONE }, { M_EI, O_I8, O_NONE }, { M_RETI, O_NONE, O_NONE },
+	{ M_LD, O_M8, O_I8 }, { M_PUSH, O_I8, O_NONE }, { M_LD, O_M8, O_I16 }, { M_PUSH, O_I16, O_NONE },
+	{ M_INCF, O_NONE, O_NONE }, { M_DECF, O_NONE, O_NONE }, { M_RET, O_NONE, O_NONE }, { M_RETD, O_I16, O_NONE },
+	{ M_RCF, O_NONE, O_NONE }, { M_SCF, O_NONE, O_NONE }, { M_CCF, O_NONE, O_NONE }, { M_ZCF, O_NONE, O_NONE },
+	{ M_PUSH, O_A, O_NONE }, { M_POP, O_A, O_NONE }, { M_EX, O_F, O_F }, { M_LDF, O_I8, O_NONE },
+	{ M_PUSH, O_F, O_NONE }, { M_POP, O_F, O_NONE }, { M_JP, O_I16, O_NONE }, { M_JP, O_I24, O_NONE },
+	{ M_CALL, O_I16, O_NONE }, { M_CALL, O_I24, O_NONE }, { M_CALR, O_D16, O_NONE }, { M_DB, O_NONE, O_NONE },
 
 	/* 20 - 3F */
-	{ _LD, _C8, _I8 }, { _LD, _C8, _I8 }, { _LD, _C8, _I8 }, { _LD, _C8, _I8 },
-	{ _LD, _C8, _I8 }, { _LD, _C8, _I8 }, { _LD, _C8, _I8 }, { _LD, _C8, _I8 },
-	{ _PUSH, _C16, 0 }, { _PUSH, _C16, 0 }, { _PUSH, _C16, 0 }, { _PUSH, _C16, 0 },
-	{ _PUSH, _C16, 0 }, { _PUSH, _C16, 0 }, { _PUSH, _C16, 0 }, { _PUSH, _C16, 0 },
-	{ _LD, _C16, _I16 }, { _LD, _C16, _I16 }, { _LD, _C16, _I16 }, { _LD, _C16, _I16 },
-	{ _LD, _C16, _I16 }, { _LD, _C16, _I16 }, { _LD, _C16, _I16 }, { _LD, _C16, _I16 },
-	{ _PUSH, _C32, 0 }, { _PUSH, _C32, 0 }, { _PUSH, _C32, 0 }, { _PUSH, _C32, 0 },
-	{ _PUSH, _C32, 0 }, { _PUSH, _C32, 0 }, { _PUSH, _C32, 0 }, { _PUSH, _C32, 0 },
+	{ M_LD, O_C8, O_I8 }, { M_LD, O_C8, O_I8 }, { M_LD, O_C8, O_I8 }, { M_LD, O_C8, O_I8 },
+	{ M_LD, O_C8, O_I8 }, { M_LD, O_C8, O_I8 }, { M_LD, O_C8, O_I8 }, { M_LD, O_C8, O_I8 },
+	{ M_PUSH, O_C16, O_NONE }, { M_PUSH, O_C16, O_NONE }, { M_PUSH, O_C16, O_NONE }, { M_PUSH, O_C16, O_NONE },
+	{ M_PUSH, O_C16, O_NONE }, { M_PUSH, O_C16, O_NONE }, { M_PUSH, O_C16, O_NONE }, { M_PUSH, O_C16, O_NONE },
+	{ M_LD, O_C16, O_I16 }, { M_LD, O_C16, O_I16 }, { M_LD, O_C16, O_I16 }, { M_LD, O_C16, O_I16 },
+	{ M_LD, O_C16, O_I16 }, { M_LD, O_C16, O_I16 }, { M_LD, O_C16, O_I16 }, { M_LD, O_C16, O_I16 },
+	{ M_PUSH, O_C32, O_NONE }, { M_PUSH, O_C32, O_NONE }, { M_PUSH, O_C32, O_NONE }, { M_PUSH, O_C32, O_NONE },
+	{ M_PUSH, O_C32, O_NONE }, { M_PUSH, O_C32, O_NONE }, { M_PUSH, O_C32, O_NONE }, { M_PUSH, O_C32, O_NONE },
 
 	/* 40 - 5F */
-	{ _LD, _C32, _I32 }, { _LD, _C32, _I32 }, { _LD, _C32, _I32 }, { _LD, _C32, _I32 },
-	{ _LD, _C32, _I32 }, { _LD, _C32, _I32 }, { _LD, _C32, _I32 }, { _LD, _C32, _I32 },
-	{ _POP, _C16, 0 }, { _POP, _C16, 0 }, { _POP, _C16, 0 }, { _POP, _C16, 0 },
-	{ _POP, _C16, 0 }, { _POP, _C16, 0 }, { _POP, _C16, 0 }, { _POP, _C16, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 }, { _DB, 0, 0 },
-	{ _POP, _C32, 0 }, { _POP, _C32, 0 }, { _POP, _C32, 0 }, { _POP, _C32, 0 },
-	{ _POP, _C32, 0 }, { _POP, _C32, 0 }, { _POP, _C32, 0 }, { _POP, _C32, 0 },
+	{ M_LD, O_C32, O_I32 }, { M_LD, O_C32, O_I32 }, { M_LD, O_C32, O_I32 }, { M_LD, O_C32, O_I32 },
+	{ M_LD, O_C32, O_I32 }, { M_LD, O_C32, O_I32 }, { M_LD, O_C32, O_I32 }, { M_LD, O_C32, O_I32 },
+	{ M_POP, O_C16, O_NONE }, { M_POP, O_C16, O_NONE }, { M_POP, O_C16, O_NONE }, { M_POP, O_C16, O_NONE },
+	{ M_POP, O_C16, O_NONE }, { M_POP, O_C16, O_NONE }, { M_POP, O_C16, O_NONE }, { M_POP, O_C16, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
+	{ M_POP, O_C32, O_NONE }, { M_POP, O_C32, O_NONE }, { M_POP, O_C32, O_NONE }, { M_POP, O_C32, O_NONE },
+	{ M_POP, O_C32, O_NONE }, { M_POP, O_C32, O_NONE }, { M_POP, O_C32, O_NONE }, { M_POP, O_C32, O_NONE },
 
 	/* 60 - 7F */
-	{ _JR, _CC, _D8 }, { _JR, _CC, _D8 }, { _JR, _CC, _D8 }, { _JR, _CC, _D8 },
-	{ _JR, _CC, _D8 }, { _JR, _CC, _D8 }, { _JR, _CC, _D8 }, { _JR, _CC, _D8 },
-	{ _JR, _CC, _D8 }, { _JR, _CC, _D8 }, { _JR, _CC, _D8 }, { _JR, _CC, _D8 },
-	{ _JR, _CC, _D8 }, { _JR, _CC, _D8 }, { _JR, _CC, _D8 }, { _JR, _CC, _D8 },
-	{ _JRL, _CC, _D16 }, { _JRL, _CC, _D16 }, { _JRL, _CC, _D16 }, { _JRL, _CC, _D16 },
-	{ _JRL, _CC, _D16 }, { _JRL, _CC, _D16 }, { _JRL, _CC, _D16 }, { _JRL, _CC, _D16 },
-	{ _JRL, _CC, _D16 }, { _JRL, _CC, _D16 }, { _JRL, _CC, _D16 }, { _JRL, _CC, _D16 },
-	{ _JRL, _CC, _D16 }, { _JRL, _CC, _D16 }, { _JRL, _CC, _D16 }, { _JRL, _CC, _D16 },
+	{ M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 },
+	{ M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 },
+	{ M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 },
+	{ M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 }, { M_JR, O_CC, O_D8 },
+	{ M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 },
+	{ M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 },
+	{ M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 },
+	{ M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 }, { M_JRL, O_CC, O_D16 },
 
 	/* 80 - 9F */
-	{ _80, 0, 0 }, { _80, 0, 0 }, { _80, 0, 0 }, { _80, 0, 0 },
-	{ _80, 0, 0 }, { _80, 0, 0 }, { _80, 0, 0 }, { _80, 0, 0 },
-	{ _88, 0, 0 }, { _88, 0, 0 }, { _88, 0, 0 }, { _88, 0, 0 },
-	{ _88, 0, 0 }, { _88, 0, 0 }, { _88, 0, 0 }, { _88, 0, 0 },
-	{ _90, 0, 0 }, { _90, 0, 0 }, { _90, 0, 0 }, { _90, 0, 0 },
-	{ _90, 0, 0 }, { _90, 0, 0 }, { _90, 0, 0 }, { _90, 0, 0 },
-	{ _98, 0, 0 }, { _98, 0, 0 }, { _98, 0, 0 }, { _98, 0, 0 },
-	{ _98, 0, 0 }, { _98, 0, 0 }, { _98, 0, 0 }, { _98, 0, 0 },
+	{ M_80, O_NONE, O_NONE }, { M_80, O_NONE, O_NONE }, { M_80, O_NONE, O_NONE }, { M_80, O_NONE, O_NONE },
+	{ M_80, O_NONE, O_NONE }, { M_80, O_NONE, O_NONE }, { M_80, O_NONE, O_NONE }, { M_80, O_NONE, O_NONE },
+	{ M_88, O_NONE, O_NONE }, { M_88, O_NONE, O_NONE }, { M_88, O_NONE, O_NONE }, { M_88, O_NONE, O_NONE },
+	{ M_88, O_NONE, O_NONE }, { M_88, O_NONE, O_NONE }, { M_88, O_NONE, O_NONE }, { M_88, O_NONE, O_NONE },
+	{ M_90, O_NONE, O_NONE }, { M_90, O_NONE, O_NONE }, { M_90, O_NONE, O_NONE }, { M_90, O_NONE, O_NONE },
+	{ M_90, O_NONE, O_NONE }, { M_90, O_NONE, O_NONE }, { M_90, O_NONE, O_NONE }, { M_90, O_NONE, O_NONE },
+	{ M_98, O_NONE, O_NONE }, { M_98, O_NONE, O_NONE }, { M_98, O_NONE, O_NONE }, { M_98, O_NONE, O_NONE },
+	{ M_98, O_NONE, O_NONE }, { M_98, O_NONE, O_NONE }, { M_98, O_NONE, O_NONE }, { M_98, O_NONE, O_NONE },
 
 	/* A0 - BF */
-	{ _A0, 0, 0 }, { _A0, 0, 0 }, { _A0, 0, 0 }, { _A0, 0, 0 },
-	{ _A0, 0, 0 }, { _A0, 0, 0 }, { _A0, 0, 0 }, { _A0, 0, 0 },
-	{ _A8, 0, 0 }, { _A8, 0, 0 }, { _A8, 0, 0 }, { _A8, 0, 0 },
-	{ _A8, 0, 0 }, { _A8, 0, 0 }, { _A8, 0, 0 }, { _A8, 0, 0 },
-	{ _B0, 0, 0 }, { _B0, 0, 0 }, { _B0, 0, 0 }, { _B0, 0, 0 },
-	{ _B0, 0, 0 }, { _B0, 0, 0 }, { _B0, 0, 0 }, { _B0, 0, 0 },
-	{ _B8, 0, 0 }, { _B8, 0, 0 }, { _B8, 0, 0 }, { _B8, 0, 0 },
-	{ _B8, 0, 0 }, { _B8, 0, 0 }, { _B8, 0, 0 }, { _B8, 0, 0 },
+	{ M_A0, O_NONE, O_NONE }, { M_A0, O_NONE, O_NONE }, { M_A0, O_NONE, O_NONE }, { M_A0, O_NONE, O_NONE },
+	{ M_A0, O_NONE, O_NONE }, { M_A0, O_NONE, O_NONE }, { M_A0, O_NONE, O_NONE }, { M_A0, O_NONE, O_NONE },
+	{ M_A8, O_NONE, O_NONE }, { M_A8, O_NONE, O_NONE }, { M_A8, O_NONE, O_NONE }, { M_A8, O_NONE, O_NONE },
+	{ M_A8, O_NONE, O_NONE }, { M_A8, O_NONE, O_NONE }, { M_A8, O_NONE, O_NONE }, { M_A8, O_NONE, O_NONE },
+	{ M_B0, O_NONE, O_NONE }, { M_B0, O_NONE, O_NONE }, { M_B0, O_NONE, O_NONE }, { M_B0, O_NONE, O_NONE },
+	{ M_B0, O_NONE, O_NONE }, { M_B0, O_NONE, O_NONE }, { M_B0, O_NONE, O_NONE }, { M_B0, O_NONE, O_NONE },
+	{ M_B8, O_NONE, O_NONE }, { M_B8, O_NONE, O_NONE }, { M_B8, O_NONE, O_NONE }, { M_B8, O_NONE, O_NONE },
+	{ M_B8, O_NONE, O_NONE }, { M_B8, O_NONE, O_NONE }, { M_B8, O_NONE, O_NONE }, { M_B8, O_NONE, O_NONE },
 
 	/* C0 - DF */
-	{ _C0, 0, 0 }, { _C0, 0, 0 }, { _C0, 0, 0 }, { _C0, 0, 0 },
-	{ _C0, 0, 0 }, { _C0, 0, 0 }, { _DB, 0, 0 }, { oC8, 0, 0 },
-	{ oC8, 0, 0 }, { oC8, 0, 0 }, { oC8, 0, 0 }, { oC8, 0, 0 },
-	{ oC8, 0, 0 }, { oC8, 0, 0 }, { oC8, 0, 0 }, { oC8, 0, 0 },
-	{ _D0, 0, 0 }, { _D0, 0, 0 }, { _D0, 0, 0 }, { _D0, 0, 0 },
-	{ _D0, 0, 0 }, { _D0, 0, 0 }, { _DB, 0, 0 }, { oD8, 0, 0 },
-	{ oD8, 0, 0 }, { oD8, 0, 0 }, { oD8, 0, 0 }, { oD8, 0, 0 },
-	{ oD8, 0, 0 }, { oD8, 0, 0 }, { oD8, 0, 0 }, { oD8, 0, 0 },
+	{ M_C0, O_NONE, O_NONE }, { M_C0, O_NONE, O_NONE }, { M_C0, O_NONE, O_NONE }, { M_C0, O_NONE, O_NONE },
+	{ M_C0, O_NONE, O_NONE }, { M_C0, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { oC8, O_NONE, O_NONE },
+	{ oC8, O_NONE, O_NONE }, { oC8, O_NONE, O_NONE }, { oC8, O_NONE, O_NONE }, { oC8, O_NONE, O_NONE },
+	{ oC8, O_NONE, O_NONE }, { oC8, O_NONE, O_NONE }, { oC8, O_NONE, O_NONE }, { oC8, O_NONE, O_NONE },
+	{ M_D0, O_NONE, O_NONE }, { M_D0, O_NONE, O_NONE }, { M_D0, O_NONE, O_NONE }, { M_D0, O_NONE, O_NONE },
+	{ M_D0, O_NONE, O_NONE }, { M_D0, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { oD8, O_NONE, O_NONE },
+	{ oD8, O_NONE, O_NONE }, { oD8, O_NONE, O_NONE }, { oD8, O_NONE, O_NONE }, { oD8, O_NONE, O_NONE },
+	{ oD8, O_NONE, O_NONE }, { oD8, O_NONE, O_NONE }, { oD8, O_NONE, O_NONE }, { oD8, O_NONE, O_NONE },
 
 	/* E0 - FF */
-	{ _E0, 0, 0 }, { _E0, 0, 0 }, { _E0, 0, 0 }, { _E0, 0, 0 },
-	{ _E0, 0, 0 }, { _E0, 0, 0 }, { _DB, 0, 0 }, { _E8, 0, 0 },
-	{ _E8, 0, 0 }, { _E8, 0, 0 }, { _E8, 0, 0 }, { _E8, 0, 0 },
-	{ _E8, 0, 0 }, { _E8, 0, 0 }, { _E8, 0, 0 }, { _E8, 0, 0 },
-	{ _F0, 0, 0 }, { _F0, 0, 0 }, { _F0, 0, 0 }, { _F0, 0, 0 },
-	{ _F0, 0, 0 }, { _F0, 0, 0 }, { _DB, 0, 0 }, { _LDX, 0, 0 },
-	{ _SWI, _I3, 0 }, { _SWI, _I3, 0 }, { _SWI, _I3, 0 }, { _SWI, _I3, 0 },
-	{ _SWI, _I3, 0 }, { _SWI, _I3, 0 }, { _SWI, _I3, 0 }, { _SWI, _I3, 0 }
+	{ M_E0, O_NONE, O_NONE }, { M_E0, O_NONE, O_NONE }, { M_E0, O_NONE, O_NONE }, { M_E0, O_NONE, O_NONE },
+	{ M_E0, O_NONE, O_NONE }, { M_E0, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_E8, O_NONE, O_NONE },
+	{ M_E8, O_NONE, O_NONE }, { M_E8, O_NONE, O_NONE }, { M_E8, O_NONE, O_NONE }, { M_E8, O_NONE, O_NONE },
+	{ M_E8, O_NONE, O_NONE }, { M_E8, O_NONE, O_NONE }, { M_E8, O_NONE, O_NONE }, { M_E8, O_NONE, O_NONE },
+	{ M_F0, O_NONE, O_NONE }, { M_F0, O_NONE, O_NONE }, { M_F0, O_NONE, O_NONE }, { M_F0, O_NONE, O_NONE },
+	{ M_F0, O_NONE, O_NONE }, { M_F0, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_LDX, O_NONE, O_NONE },
+	{ M_SWI, O_I3, O_NONE }, { M_SWI, O_I3, O_NONE }, { M_SWI, O_I3, O_NONE }, { M_SWI, O_I3, O_NONE },
+	{ M_SWI, O_I3, O_NONE }, { M_SWI, O_I3, O_NONE }, { M_SWI, O_I3, O_NONE }, { M_SWI, O_I3, O_NONE }
 };
 
 
@@ -1448,59 +1448,61 @@ CPU_DISASSEMBLE( tlcs900 )
 	/* Check for extended addressing modes */
 	switch( dasm->mnemonic )
 	{
-	case _80:
+        default:
+                break;
+	case M_80:
 		sprintf( buf, "%s", s_reg32[op & 0x07] );
 		op = oprom[ pos++ ];
 		dasm = &mnemonic_80[ op ];
 		break;
 
-	case _88:
+	case M_88:
 		imm = oprom[ pos++ ];
 		sprintf( buf, "%s+0x%02x", s_reg32[op & 0x07], imm );
 		op = oprom[ pos++ ];
 		dasm = &mnemonic_88[ op ];
 		break;
 
-	case _90:
+	case M_90:
 		sprintf( buf, "%s", s_reg32[op & 0x07] );
 		op = oprom[ pos++ ];
 		dasm = &mnemonic_90[ op ];
 		break;
 
-	case _98:
+	case M_98:
 		imm = oprom[ pos++ ];
 		sprintf( buf, "%s+0x%02x", s_reg32[op & 0x07], imm );
 		op = oprom[ pos++ ];
 		dasm = &mnemonic_98[ op ];
 		break;
 
-	case _A0:
+	case M_A0:
 		sprintf( buf, "%s", s_reg32[op & 0x07] );
 		op = oprom[ pos++ ];
 		dasm = &mnemonic_a0[ op ];
 		break;
 
-	case _A8:
+	case M_A8:
 		imm = oprom[ pos++ ];
 		sprintf( buf, "%s+0x%02x", s_reg32[op & 0x07], imm );
 		op = oprom[ pos++ ];
 		dasm = &mnemonic_a0[ op ];
 		break;
 
-	case _B0:
+	case M_B0:
 		sprintf( buf, "%s", s_reg32[op & 0x07] );
 		op = oprom[ pos++ ];
 		dasm = &mnemonic_b0[ op ];
 		break;
 
-	case _B8:
+	case M_B8:
 		imm = oprom[ pos++ ];
 		sprintf( buf, "%s+0x%02x", s_reg32[op & 0x07], imm );
 		op = oprom[ pos++ ];
 		dasm = &mnemonic_b8[ op ];
 		break;
 
-	case _C0:
+	case M_C0:
 		switch( op & 0x07 )
 		{
 		case 0x00:	/* 0xC0 */
@@ -1593,7 +1595,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		dasm = &mnemonic_c8[ op ];
 		break;
 
-	case _D0:
+	case M_D0:
 		switch( op & 0x07 )
 		{
 		case 0x00:	/* 0xD0 */
@@ -1687,7 +1689,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		dasm = &mnemonic_d8[ op ];
 		break;
 
-	case _E0:
+	case M_E0:
 		switch( op & 0x07 )
 		{
 		case 0x00:	/* 0xE0 */
@@ -1766,7 +1768,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		dasm = &mnemonic_e0[ op ];
 		break;
 
-	case _E8:
+	case M_E8:
 		if ( op & 0x08 )
 		{
 			sprintf( buf, "%s", s_reg32[ op & 0x07 ] );
@@ -1780,7 +1782,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		dasm = &mnemonic_e8[ op ];
 		break;
 
-	case _F0:
+	case M_F0:
 		switch( op & 0x07 )
 		{
 		case 0x00:	/* 0xF0 */
@@ -1864,44 +1866,50 @@ CPU_DISASSEMBLE( tlcs900 )
 
 	switch( dasm->mnemonic )
 	{
-	case _CALL:
-	case _CALR:
+        default:
+                /* maybe assert */
+                break;
+	case M_CALL:
+	case M_CALR:
 		flags = DASMFLAG_STEP_OVER;
 		break;
-	case _RET:
-	case _RETD:
-	case _RETI:
+	case M_RET:
+	case M_RETD:
+	case M_RETI:
 		flags = DASMFLAG_STEP_OUT;
 		break;
 	}
 
 	switch( dasm->operand1 )
 	{
-	case _A:
+        case O_NONE:
+                break;
+
+	case O_A:
 		dst += sprintf( dst, " A" );
 		break;
 
-	case _C8:
+	case O_C8:
 		dst += sprintf( dst, " %s", s_reg8[op & 0x07] );
 		break;
 
-	case _C16:
+	case O_C16:
 		dst += sprintf( dst, " %s", s_reg16[op & 0x07] );
 		break;
 
-	case _C32:
+	case O_C32:
 		dst += sprintf( dst, " %s", s_reg32[op & 0x07] );
 		break;
 
-	case _MC16:
+	case O_MC16:
 		dst += sprintf( dst, " %s", s_mulreg16[op & 0x07] );
 		break;
 
-	case _CC:
+	case O_CC:
 		dst += sprintf( dst, " %s", s_cond[op & 0x0F] );
 		break;
 
-	case _CR8:
+	case O_CR8:
 		imm = oprom[ pos++ ];
 		switch( imm )
 		{
@@ -1923,7 +1931,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		}
 		break;
 
-	case _CR16:
+	case O_CR16:
 		imm = oprom[ pos++ ];
 		switch( imm )
 		{
@@ -1945,7 +1953,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		}
 		break;
 
-	case _CR32:
+	case O_CR32:
 		imm = oprom[ pos++ ];
 		switch( imm )
 		{
@@ -1979,44 +1987,44 @@ CPU_DISASSEMBLE( tlcs900 )
 		}
 		break;
 
-	case _D8:
+	case O_D8:
 		imm = oprom[ pos++ ];
 		dst += sprintf( dst, " 0x%06x", ( pc + pos + (INT8)imm ) & 0xFFFFFF );
 		break;
 
-	case _D16:
+	case O_D16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		dst += sprintf( dst, " 0x%06x", ( pc + pos + (INT16)imm ) & 0xFFFFFF );
 		break;
 
-	case _F:
+	case O_F:
 		dst += sprintf( dst, " F" );
 		break;
 
-	case _I3:
+	case O_I3:
 		dst += sprintf( dst, " %d", op & 0x07 );
 		break;
 
-	case _I8:
+	case O_I8:
 		imm = oprom[ pos++ ];
 		dst += sprintf( dst, " 0x%02x", imm );
 		break;
 
-	case _I16:
+	case O_I16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		dst += sprintf( dst, " 0x%04x", imm );
 		break;
 
-	case _I24:
+	case O_I24:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		imm = imm | ( oprom[ pos++ ] << 16 );
 		dst += sprintf( dst, " 0x%06x", imm );
 		break;
 
-	case _I32:
+	case O_I32:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		imm = imm | ( oprom[ pos++ ] << 16 );
@@ -2024,12 +2032,12 @@ CPU_DISASSEMBLE( tlcs900 )
 		dst += sprintf( dst, "0x%08x", imm );
 		break;
 
-	case _M:
+	case O_M:
 		switch( dasm->mnemonic )
 		{
-		case _CALL:
-		case _JP:
-		case _LDA:
+		case M_CALL:
+		case M_JP:
+		case M_LDA:
 			dst += sprintf( dst, " %s", buf );
 			break;
 		default:
@@ -2038,53 +2046,56 @@ CPU_DISASSEMBLE( tlcs900 )
 		}
 		break;
 
-	case _M8:
+	case O_M8:
 		imm = oprom[ pos++ ];
 		dst += sprintf( dst, " (0x%02x)", imm );
 		break;
 
-	case _M16:
+	case O_M16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		dst += sprintf( dst, " (0x%04x)", imm );
 		break;
 
-	case _R:
+	case O_R:
 		dst += sprintf( dst, " %s", buf );
 		break;
 
-	case _SR:
+	case O_SR:
 		dst += sprintf( dst, " SR" );
 		break;
 	}
 
 	switch( dasm->operand2 )
 	{
-	case _A:
+        case O_NONE:
+                break;
+
+        case O_A:
 		dst += sprintf( dst, ",A" );
 		break;
 
-	case _C8:
+	case O_C8:
 		dst += sprintf( dst, ",%s", s_reg8[op & 0x07] );
 		break;
 
-	case _C16:
+	case O_C16:
 		dst += sprintf( dst, ",%s", s_reg16[op & 0x07] );
 		break;
 
-	case _C32:
+	case O_C32:
 		dst += sprintf( dst, ",%s", s_reg32[op & 0x07] );
 		break;
 
-	case _MC16:
+	case O_MC16:
 		dst += sprintf( dst, ",%s", s_mulreg16[op & 0x07] );
 		break;
 
-	case _CC:
+	case O_CC:
 		dst += sprintf( dst, ",%s", s_cond[op & 0x0F] );
 		break;
 
-	case _CR8:
+	case O_CR8:
 		imm = oprom[ pos++ ];
 		switch( imm )
 		{
@@ -2106,7 +2117,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		}
 		break;
 
-	case _CR16:
+	case O_CR16:
 		imm = oprom[ pos++ ];
 		switch( imm )
 		{
@@ -2128,7 +2139,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		}
 		break;
 
-	case _CR32:
+	case O_CR32:
 		imm = oprom[ pos++ ];
 		switch( imm )
 		{
@@ -2162,44 +2173,44 @@ CPU_DISASSEMBLE( tlcs900 )
 		}
 		break;
 
-	case _D8:
+	case O_D8:
 		imm = oprom[ pos++ ];
 		dst += sprintf( dst, ",0x%06x", ( pc + pos + (INT8)imm ) & 0xFFFFFF );
 		break;
 
-	case _D16:
+	case O_D16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		dst += sprintf( dst, ",0x%06x", ( pc + pos + (INT16)imm ) & 0xFFFFFF );
 		break;
 
-	case _F:
+	case O_F:
 		dst += sprintf( dst, ",F'" );
 		break;
 
-	case _I3:
+	case O_I3:
 		dst += sprintf( dst, ",%d", op & 0x07 );
 		break;
 
-	case _I8:
+	case O_I8:
 		imm = oprom[ pos++ ];
 		dst += sprintf( dst, ",0x%02x", imm );
 		break;
 
-	case _I16:
+	case O_I16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		dst += sprintf( dst, ",0x%04x", imm );
 		break;
 
-	case _I24:
+	case O_I24:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		imm = imm | ( oprom[ pos++ ] << 16 );
 		dst += sprintf( dst, ",0x%06x", imm );
 		break;
 
-	case _I32:
+	case O_I32:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		imm = imm | ( oprom[ pos++ ] << 16 );
@@ -2207,12 +2218,12 @@ CPU_DISASSEMBLE( tlcs900 )
 		dst += sprintf( dst, ",0x%08x", imm );
 		break;
 
-	case _M:
+	case O_M:
 		switch( dasm->mnemonic )
 		{
-		case _CALL:
-		case _JP:
-		case _LDA:
+		case M_CALL:
+		case M_JP:
+		case M_LDA:
 			dst += sprintf( dst, ",%s", buf );
 			break;
 		default:
@@ -2221,26 +2232,25 @@ CPU_DISASSEMBLE( tlcs900 )
 		}
 		break;
 
-	case _M8:
+	case O_M8:
 		imm = oprom[ pos++ ];
 		dst += sprintf( dst, ",(0x%02x)", imm );
 		break;
 
-	case _M16:
+	case O_M16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		dst += sprintf( dst, ",(0x%04x)", imm );
 		break;
 
-	case _R:
+	case O_R:
 		dst += sprintf( dst, ",%s", buf );
 		break;
 
-	case _SR:
+	case O_SR:
 		dst += sprintf( dst, ",SR" );
 		break;
 	}
 
 	return pos | flags | DASMFLAG_SUPPORTED;
 }
-

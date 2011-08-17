@@ -31,7 +31,7 @@
 #define ALFO_MAX		(+65536)
 #define ALFO_MIN		(0)
 
-#define log2(n) (log((float) n)/log((float) 2))
+//#define log2(n) (log((float) n)/log((float) 2))
 
 typedef struct
 {

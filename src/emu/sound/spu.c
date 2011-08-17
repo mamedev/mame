@@ -135,7 +135,7 @@ static const unsigned int sound_buffer_size=65536*4,
 													num_loop_cache_packets=4,
 													num_loop_cache_samples=num_loop_cache_packets*28,
 													spu_ram_size=512*1024,
-													infinity=0xffffffff,
+													spu_infinity=0xffffffff,
 
 													output_buffer_size=65536/8,
 
@@ -1492,9 +1492,9 @@ unsigned int spu_device::get_irq_distance(const voiceinfo *vi)
 		}
 	}
 
-	// IRQs not enabled, or IRQ address not reachable by voice, distance is infinity
+	// IRQs not enabled, or IRQ address not reachable by voice, distance is spu_infinity
 
-	return infinity;
+	return spu_infinity;
 }
 
 //
@@ -1520,20 +1520,20 @@ void spu_device::update_voice_events(voiceinfo *vi)
 		// Calculate time until next IRQ in output samples
 
 		unsigned int irqdist=get_irq_distance(vi);
-		if (irqdist!=infinity)
+		if (irqdist!=spu_infinity)
 		{
 			// Convert IRQ input sample distance to output samples
 
 			vi->samplestoirq=(unsigned int)(((((INT64)irqdist)<<12)-vi->dptr)+(vi->pitch-1))/vi->pitch;
 		} else
 		{
-			vi->samplestoirq=infinity;
+			vi->samplestoirq=spu_infinity;
 		}
 	} else
 	{
-		// Voice pitch is 0, distance to sample end and IRQ is infinity
+		// Voice pitch is 0, distance to sample end and IRQ is spu_infinity
 
-		vi->samplestoend=vi->samplestoirq=infinity;
+		vi->samplestoend=vi->samplestoirq=spu_infinity;
 	}
 }
 
@@ -1759,8 +1759,8 @@ bool spu_device::process_voice(const unsigned int v,
 			off+=ntoplay;
 
 			vi->samplestoend-=ntoplay;
-			if (vi->samplestoirq!=infinity) vi->samplestoirq-=ntoplay;
-			if (vi->envsamples!=infinity) vi->envsamples-=ntoplay;
+			if (vi->samplestoirq!=spu_infinity) vi->samplestoirq-=ntoplay;
+			if (vi->envsamples!=spu_infinity) vi->envsamples-=ntoplay;
 			vi->hitirq=false;
 		}
 
@@ -1860,7 +1860,7 @@ bool spu_device::process_voice(const unsigned int v,
 			// Went past IRQ address, trigger IRQ
 			m_irq_cb(this, 1);
 
-			vi->samplestoirq=infinity;
+			vi->samplestoirq=spu_infinity;
 			vi->hitirq=true;
 		}
 
@@ -2231,7 +2231,7 @@ bool spu_device::update_envelope(const int v)
 					voice[v].envsamples=(unsigned int)((voice[v].env_sl-1.0f)/voice[v].env_dr);
 				} else
 				{
-					voice[v].envsamples=infinity;
+					voice[v].envsamples=spu_infinity;
 				}
 				break;
 
@@ -2248,12 +2248,12 @@ bool spu_device::update_envelope(const int v)
 					voice[v].envsamples=(unsigned int)(voice[v].env_level/-voice[v].env_sr);
 				} else
 				{
-					voice[v].envsamples=infinity;
+					voice[v].envsamples=spu_infinity;
 				}
 				break;
 
 			case 3: // sustain end
-				voice[v].envsamples=infinity;
+				voice[v].envsamples=spu_infinity;
 				voice[v].env_delta=0.0f;
 				if (voice[v].env_sr<=0.0f)
 				{
@@ -2270,7 +2270,7 @@ bool spu_device::update_envelope(const int v)
 				voice[v].env_delta=voice[v].env_rr;
 				if (voice[v].env_rr == -0.0f)	// 0.0 release means infinite time
 				{
-					voice[v].envsamples=infinity;
+					voice[v].envsamples=spu_infinity;
 				}
 				else
 				{
@@ -2281,7 +2281,7 @@ bool spu_device::update_envelope(const int v)
 			case 5: // release end
 				voice[v].env_level=0.0f;
 				voice[v].env_delta=0.0f;
-				voice[v].envsamples=infinity;
+				voice[v].envsamples=spu_infinity;
 				return false;
 		}
 	}
@@ -2650,15 +2650,15 @@ void spu_device::update_irq_event()
 {
 	if (spureg.ctrl&spuctrl_irq_enable)
 	{
-		unsigned int samplestoirq=infinity;
+		unsigned int samplestoirq=spu_infinity;
 		for (int i=0; i<24; i++)
-			if (voice[i].samplestoirq!=infinity)
+			if (voice[i].samplestoirq!=spu_infinity)
 			{
 				if (voice[i].samplestoirq==0)
 				{
 					m_irq_cb(this, 1);
 
-					voice[i].samplestoirq=infinity;
+					voice[i].samplestoirq=spu_infinity;
 					voice[i].hitirq=true;
 				} else
 				{
