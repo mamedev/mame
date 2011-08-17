@@ -3955,7 +3955,15 @@ int input_machine_has_keyboard(running_machine &machine)
 	{
 		for (field = port->first_field(); field != NULL; field = field->next())
 		{
-			if (field->type == IPT_KEYBOARD)
+			// if we are at init, check IPT_KEYBOARD for inputx_init
+			if (!port->machine().input_port_data->safe_to_read && field->type == IPT_KEYBOARD)
+			{
+				have_keyboard = TRUE;
+				break;
+			}
+
+			// else, check if there is a keyboard and if such a keyboard is enabled
+			if (field->type == IPT_KEYBOARD && input_condition_true(field->machine(), &field->condition, field->port().owner()))
 			{
 				have_keyboard = TRUE;
 				break;
