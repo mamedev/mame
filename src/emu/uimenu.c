@@ -286,7 +286,6 @@ static int CLIB_DECL menu_input_compare_items(const void *i1, const void *i2);
 static void menu_input_populate_and_sort(running_machine &machine, ui_menu *menu, input_item_data *itemlist, input_menu_state *menustate);
 static void menu_settings_dip_switches(running_machine &machine, ui_menu *menu, void *parameter, void *state);
 static void menu_settings_driver_config(running_machine &machine, ui_menu *menu, void *parameter, void *state);
-static void menu_settings_categories(running_machine &machine, ui_menu *menu, void *parameter, void *state);
 static void menu_settings_common(running_machine &machine, ui_menu *menu, void *state, UINT32 type);
 static void menu_settings_populate(running_machine &machine, ui_menu *menu, settings_menu_state *menustate, UINT32 type);
 static void menu_analog(running_machine &machine, ui_menu *menu, void *parameter, void *state);
@@ -1636,7 +1635,6 @@ static void menu_main_populate(running_machine &machine, ui_menu *menu, void *st
 {
 	input_field_config *field;
 	input_port_config *port;
-	int has_categories = FALSE;
 	int has_configs = FALSE;
 	int has_analog = FALSE;
 	int has_dips = FALSE;
@@ -1649,8 +1647,6 @@ static void menu_main_populate(running_machine &machine, ui_menu *menu, void *st
 				has_dips = TRUE;
 			if (field->type == IPT_CONFIG)
 				has_configs = TRUE;
-			if (field->category > 0)
-				has_categories = TRUE;
 			if (input_type_is_analog(field->type))
 				has_analog = TRUE;
 		}
@@ -1664,8 +1660,6 @@ static void menu_main_populate(running_machine &machine, ui_menu *menu, void *st
 		ui_menu_item_append(menu, "Dip Switches", NULL, 0, (void *)menu_settings_dip_switches);
 	if (has_configs)
 		ui_menu_item_append(menu, "Driver Configuration", NULL, 0, (void *)menu_settings_driver_config);
-	if (has_categories)
-		ui_menu_item_append(menu, "Categories", NULL, 0, (void *)menu_settings_categories);
 	if (has_analog)
 		ui_menu_item_append(menu, "Analog Controls", NULL, 0, (void *)menu_analog);
 
@@ -1870,7 +1864,6 @@ static void menu_input_specific_populate(running_machine &machine, ui_menu *menu
 
 			/* add if we match the group and we have a valid name */
 			if (name != NULL && input_condition_true(machine, &field->condition, port->owner()) &&
-				(field->category == 0 || input_category_active(machine, field->category)) &&
 				((field->type == IPT_OTHER && field->name != NULL) || input_type_group(machine, field->type, field->player) != IPG_INVALID))
 			{
 				input_seq_type seqtype;
@@ -2125,17 +2118,6 @@ static void menu_settings_dip_switches(running_machine &machine, ui_menu *menu, 
 static void menu_settings_driver_config(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	menu_settings_common(machine, menu, state, IPT_CONFIG);
-}
-
-
-/*-------------------------------------------------
-    menu_settings_categories - handle the
-    categories menu
--------------------------------------------------*/
-
-static void menu_settings_categories(running_machine &machine, ui_menu *menu, void *parameter, void *state)
-{
-	menu_settings_common(machine, menu, state, IPT_CATEGORY);
 }
 
 

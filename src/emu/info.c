@@ -58,7 +58,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t<!ATTLIST " XML_ROOT " build CDATA #IMPLIED>\n"
 "\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
 "\t<!ATTLIST " XML_ROOT " mameconfig CDATA #REQUIRED>\n"
-"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, slot*, softwarelist*, ramoption*)>\n"
+"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, adjuster*, driver?, device*, slot*, softwarelist*, ramoption*)>\n"
 "\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 "\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
 "\t\t<!ATTLIST " XML_TOP " isbios (yes|no) \"no\">\n"
@@ -149,11 +149,6 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t\t<!ATTLIST confsetting name CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST confsetting value CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST confsetting default (yes|no) \"no\">\n"
-"\t\t<!ELEMENT category (item*)>\n"
-"\t\t\t<!ATTLIST category name CDATA #REQUIRED>\n"
-"\t\t\t<!ELEMENT item EMPTY>\n"
-"\t\t\t\t<!ATTLIST item name CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST item default (yes|no) \"no\">\n"
 "\t\t<!ELEMENT adjuster EMPTY>\n"
 "\t\t\t<!ATTLIST adjuster name CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST adjuster default CDATA #REQUIRED>\n"
@@ -361,7 +356,6 @@ void info_xml_creator::output_one()
 	output_input(portlist);
 	output_switches(portlist, IPT_DIPSWITCH, "dipswitch", "dipvalue");
 	output_switches(portlist, IPT_CONFIG, "configuration", "confsetting");
-	output_categories(portlist);
 	output_adjusters(portlist);
 	output_driver();
 	output_images();
@@ -1068,36 +1062,6 @@ void info_xml_creator::output_driver()
 	fprintf(m_output, " palettesize=\"%d\"", m_drivlist.config().m_total_colors);
 
 	fprintf(m_output, "/>\n");
-}
-
-
-//-------------------------------------------------
-//  output_categories - print the Categories
-//  settings for a system
-//-------------------------------------------------
-
-void info_xml_creator::output_categories(const ioport_list &portlist)
-{
-	// iterate looking for Categories
-	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->type == IPT_CATEGORY)
-			{
-				// output the category name information
-				fprintf(m_output, "\t\t<category name=\"%s\">\n", xml_normalize_string(input_field_name(field)));
-
-				// loop over item settings
-				for (input_setting_config *setting = field->settinglist().first(); setting != NULL; setting = setting->next())
-				{
-					fprintf(m_output, "\t\t\t<item name=\"%s\"", xml_normalize_string(setting->name));
-					if (setting->value == field->defvalue)
-						fprintf(m_output, " default=\"yes\"");
-					fprintf(m_output, "/>\n");
-				}
-
-				// terminate the category entry
-				fprintf(m_output, "\t\t</category>\n");
-			}
 }
 
 

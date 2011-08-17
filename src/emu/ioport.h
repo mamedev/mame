@@ -113,7 +113,6 @@ enum
 	IPT_DIPSWITCH,
 	IPT_VBLANK,
 	IPT_CONFIG,
-	IPT_CATEGORY,				/* MESS only */
 
 	/* start buttons */
 	IPT_START1,
@@ -504,7 +503,6 @@ enum
 	INPUT_CLASS_CONTROLLER,
 	INPUT_CLASS_CONFIG,
 	INPUT_CLASS_DIPSWITCH,
-	INPUT_CLASS_CATEGORIZED,
 	INPUT_CLASS_MISC
 };
 
@@ -573,7 +571,6 @@ public:
 	input_port_value			value;			/* value of the bits in this setting */
 	input_condition				condition;		/* condition under which this setting is valid */
 	const char *				name;			/* user-friendly name to display */
-	UINT16						category;		/* (MESS-specific) category */
 
 private:
 	input_field_config &		m_field;			/* pointer back to the field that owns us */
@@ -623,7 +620,6 @@ public:
 	input_condition				condition;		/* condition under which this field is relevant */
 	UINT32						type;			/* IPT_* type for this port */
 	UINT8						player;			/* player number (0-based) */
-	UINT16						category;		/* (MESS-specific) category */
 	UINT32						flags;			/* combination of FIELD_FLAG_* and ANALOG_FLAG_* above */
 	UINT8						impulse;		/* number of frames before reverting to defvalue */
 	const char *				name;			/* user-friendly name to display */
@@ -1060,18 +1056,6 @@ void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &er
 #define PORT_CHAR(_ch) \
 	ioconfig_field_add_char(*curfield, _ch, errorbuf);
 
-/* categories */
-#define PORT_CATEGORY(_category) \
-	curfield->category = (_category);
-
-#define PORT_CATEGORY_CLASS(_mask, _default, _name) \
-	curfield = ioconfig_alloc_field(*curport, IPT_CATEGORY, (_default), (_mask), (_name)); \
-	cursetting = NULL;
-
-#define PORT_CATEGORY_ITEM(_default, _name, _category) \
-	cursetting = ioconfig_alloc_setting(*curfield, (_default) & curfield->mask, (_name)); \
-	cursetting->category = (_category);
-
 
 /* name of table */
 #define DEVICE_INPUT_DEFAULTS_NAME(_name) device_iptdef_##_name
@@ -1279,7 +1263,6 @@ int input_classify_port(const input_field_config *field);
 int input_has_input_class(running_machine &machine, int inputclass);
 int input_player_number(const input_field_config *field);
 int input_count_players(running_machine &machine);
-int input_category_active(running_machine &machine, int category);
 
 
 inline running_machine &input_field_config::machine() const

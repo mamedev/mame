@@ -669,5 +669,4 @@ void construct_core_types(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, ADJUSTER,            NULL,                     input_seq() )
 	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, DIPSWITCH,           NULL,                     input_seq() )
 	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, CONFIG,              NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, CATEGORY,            NULL,                     input_seq() )
 }

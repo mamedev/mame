@@ -2859,7 +2859,6 @@ input_field_config::input_field_config(input_port_config &port, int _type, input
 	  defvalue(_defvalue & _maskbits),
 	  type(_type),
 	  player(0),
-	  category(0),
 	  flags(0),
 	  impulse(0),
 	  name(_name),
@@ -2895,7 +2894,6 @@ input_field_config::input_field_config(input_port_config &port, int _type, input
 input_setting_config::input_setting_config(input_field_config &field, input_port_value _value, const char *_name)
 	: value(_value),
 	  name(_name),
-	  category(0),
 	  m_field(field),
 	  m_next(NULL)
 {
@@ -4574,9 +4572,6 @@ int input_classify_port(const input_field_config *field)
 {
 	int result;
 
-	if (field->category && (field->type != IPT_CATEGORY))
-		return INPUT_CLASS_CATEGORIZED;
-
 	switch(field->type)
 	{
 		case IPT_JOYSTICK_UP:
@@ -4702,45 +4697,6 @@ int input_count_players(running_machine &machine)
 
 
 
-/*-------------------------------------------------
-    input_category_active - checks to see if a
-    specific category is active
--------------------------------------------------*/
-
-int input_category_active(running_machine &machine, int category)
-{
-	const input_port_config *port;
-	const input_field_config *field = NULL;
-	const input_setting_config *setting;
-	input_field_user_settings settings;
-
-	assert(category >= 1);
-
-	/* loop through the input ports */
-	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
-	{
-		for (field = port->first_field(); field != NULL; field = field->next())
-		{
-			/* is this field a category? */
-			if (field->type == IPT_CATEGORY)
-			{
-				/* get the settings value */
-				input_field_get_user_settings(field, &settings);
-
-				for (setting = field->settinglist().first(); setting != NULL; setting = setting->next())
-				{
-					/* is this the category we want?  if so, is this settings value correct? */
-					if ((setting->category == category) && (settings.value == setting->value))
-						return TRUE;
-				}
-			}
-		}
-	}
-	return FALSE;
-}
-
-
-
 /***************************************************************************
     DEBUGGER SUPPORT
 ***************************************************************************/
@@ -4856,7 +4812,7 @@ input_field_config *ioconfig_alloc_field(input_port_config &port, int type, inpu
 		throw emu_fatalerror("INPUT_TOKEN_FIELD encountered with no active port (mask=%X defval=%X)\n", mask, defval); \
 	if (type != IPT_UNKNOWN && type != IPT_UNUSED)
 		port.active |= mask;
-	if (type == IPT_DIPSWITCH || type == IPT_CONFIG || type == IPT_CATEGORY)
+	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
 		defval = port_default_value(port.tag(), mask, defval, port.owner());
 	return &port.fieldlist().append(*global_alloc(input_field_config(port, type, defval, mask, input_port_string_from_token(name))));
 }
