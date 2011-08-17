@@ -920,6 +920,7 @@ $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \
 	$(DRIVERS)/maygayv1.o \
 	$(DRIVERS)/maygayep.o \
+	$(DRIVERS)/maygaysw.o \
 	$(DRIVERS)/mmm.o \
 
 $(MAMEOBJ)/meadows.a: \
@@ -1701,6 +1702,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
 	$(DRIVERS)/gei.o \
+	$(DRIVERS)/globalfr.o \
 	$(DRIVERS)/goldngam.o \
 	$(DRIVERS)/goldnpkr.o \
 	$(DRIVERS)/good.o \
@@ -1797,6 +1799,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/slotcarn.o \
 	$(DRIVERS)/sms.o \
 	$(DRIVERS)/sothello.o \
+	$(DRIVERS)/splus.o \
 	$(DRIVERS)/spool99.o \
 	$(DRIVERS)/sprcros2.o $(VIDEO)/sprcros2.o \
 	$(DRIVERS)/ssingles.o \
@@ -2031,6 +2034,8 @@ $(DRIVERS)/segasms.o:	$(LAYOUT)/sms1.lh
 $(DRIVERS)/segaybd.o:	$(LAYOUT)/pdrift.lh
 
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
+
+$(DRIVERS)/splus.o:	$(LAYOUT)/splus.lh
 
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 

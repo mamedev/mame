@@ -9900,7 +9900,7 @@ ROM_START( m4wta )
 	ROM_LOAD( "wn5s.chr", 0x0000, 0x000048, CRC(b90e5068) SHA1(14c57dcd7242104eb48a9be36192170b97bc5110) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "wta_5p4c.bin", 0x0000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) ) // no 1st part?
+	//ROM_LOAD( "wta_5p4c.bin", 0x0000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) ) // no 1st part? this appears to belong to wacky weekend club (global)
 
 	ROM_LOAD( "winsnd.p1", 0x000000, 0x080000, CRC(a913ad0d) SHA1(5f39b661912da903ce8d6658b7848081b191ea56) )
 	ROM_LOAD( "winsnd.p2", 0x080000, 0x080000, CRC(6a22b39f) SHA1(0e0dbeac4310e03490b665fff514392481ad265f) )
@@ -11461,6 +11461,44 @@ ROM_START( m4banginb )
 	ROM_LOAD( "bangs2.hex", 0x080000, 0x080000, CRC(518ebd38) SHA1(6eaaf0cb34dd430f16b88f9d1ed97d6fb59d00ea) )
 	ROM_LOAD( "bangs3.hex", 0x100000, 0x080000, CRC(2da78a75) SHA1(95975bc76fc32d05bd998bb75dcafc6eef7661b3) )
 ROM_END
+
+
+ROM_START( m4wwc )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "wack1-9n.p1", 0x0000, 0x020000, CRC(7ba6fd92) SHA1(3a5c7f9b3ebd8593c76132b46163c9d1299e210e) )
+
+	ROM_REGION( 0x020000, "altrevs", 0 )
+	ROM_LOAD( "wack1-9p.p1", 0x0000, 0x020000, CRC(4046b5eb) SHA1(e1ec9158810387b41b574202e9f27e7b741ac81c) )
+	ROM_LOAD( "wacky.hex", 0x0000, 0x020000, CRC(a94a06fd) SHA1(a5856b6903fdd35f9dca19b114ca56c106a308f2) )
+
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	/* 2 sets of sound roms, one contains an extra sample */
+	ROM_LOAD( "wacky1.hex", 0x000000, 0x080000, CRC(379d7af6) SHA1(3b1988c1ab570c075572d0e9bf03fcb331ea4a2c) )
+	/* rom 2? should it match? */
+	ROM_LOAD( "wacky3.hex", 0x100000, 0x080000, CRC(c7def11a) SHA1(6aab2b7f7e4c852891ee09e91a8a085e9b28803f) )
+
+	ROM_LOAD( "wacky1snd.bin", 0x000000, 0x080000, CRC(45d6869a) SHA1(c1294522d190d22852b5c6006c92911f9e89cfac) )
+	ROM_LOAD( "wacky2snd.bin", 0x080000, 0x080000, CRC(18b5f8c8) SHA1(e4dc312eea777c2375ba8c2be2f3c2be71bea5c4) )
+	ROM_LOAD( "wacky3snd.bin", 0x100000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) )
+ROM_END
+
+
+ROM_START( m4screw )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "scre0-8n.p1", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
+
+	ROM_REGION( 0x020000, "altrevs", 0 )
+	ROM_LOAD( "scre0-8p.p1", 0x0000, 0x020000, CRC(34a70a77) SHA1(f76de47f6919d380eb0d0eeffc0e5dda72345038) )
+	ROM_LOAD( "screwinaroundv0-7.bin", 0x0000, 0x020000, CRC(78a1e3ca) SHA1(a3d6e76a474a3a5cd74e4b527aa575f21825a7aa) )
+	//ROM_LOAD( "screwing.bin", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
+
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
+	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
+	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
+ROM_END
+
+
 
 
 ROM_START( m4bankrd )
@@ -14357,6 +14395,8 @@ GAME(199?, m4bandgd,  0,		mod4oki, mpu4, m4default, ROT0,   "Eurogames","Bands O
 GAME(199?, m4bangin,  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bangina, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4banginb, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4wwc,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screw,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigben,  0,		mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigbena, m4bigben,	mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigbenb, m4bigben,	mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )

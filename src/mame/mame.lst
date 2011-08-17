@@ -9309,7 +9309,7 @@ j2b7		// Bar 7? (JPM)
 j2ss		// Supa Stepper (JPM) 
 j2nbz		// Nudge Bonanza (JPM)
 j2clbbin	// Club Bingo (Crystal)
-
+j2sirich	// Strike It Rich? (Maygay?) 
 
 
 // JPM Give us a Break hardware
@@ -11727,6 +11727,27 @@ m1simps		// The Simpsons (Maygay - Bwb)
 m1bghou		// Big Ghoulies (Gemini)
 m1crzco		// Crazy Cobra (Gemini)
 
+m1hiloc		// Hi Lo Casino (Global)
+m1jtjob		// Just The Job (Global)
+m1kingsw	// King Of The Swingers (Global)
+m1lca		// Lights Camera Action (Global)
+m1mb		// Monkey Business (Global)
+m1mbclb		// Monkey Business Club (Global)
+m1sycc		// Stake Yer Claim Club (Global)
+m1thrill	// Thrills 'n' Spills (Global)
+m1trtr		// Trick Or Treat (Global)
+m1trtrcl	// Trick Or Treat Club (Global)
+m1vegcrw	// Vegetable Crew (Global)
+
+m1calyps	// Calypso (Maygay) 
+m1cashln	// Cash Lines (Maygay) 
+m1races		// A Day At The Races (Maygay) 
+m1digdel	// Diggers Delight (Global) 
+m1startr	// Star Trekking (Mdm) 
+m1ttcash	// Tick Tock Cash (Empire) 
+m1topstr	// Top Strike (Maygay - Bwb) 
+m1sirich	// Strike It Rich
+
 // Maygay MV1 hardware
 
 screenpl	// Screenplay
@@ -11748,6 +11769,19 @@ mv1guaca	//
 mv1sfx		// Special Effects
 mv1sfxa		//
 mv1wc		// World Cup
+
+// Maygay 68K based SWP hardware
+
+mg_gbr		// Guinness Book Of Records
+mg_ewg		// Each Way Gambler
+mg_jv		// Jack & Vera
+mg_alad		// Aladdin's Cave
+mg_bb		// Big Break
+mg_lug		// London Underground
+mg_pbw		// Pinball Wizard
+mg_risk		// Risk
+mg_scl		// Super Clue
+mg_kf		// Krypton Factor
 
 
 // Maygay EPOCH hardware
@@ -11935,7 +11969,11 @@ ep_wud		// What's Up Doc (Global)
 ep_milhr	// Who Wants To Be A Millionhare (Global)
 ep_mlhrc	// Who Whats To Be A Millionhare Club (Global)
 ep_wf		// Wildfire (Global)
-
+ep_bbars	// Balloon Bars (Maygay)
+ep_cslay	// Cash Slayer (Global)
+ep_monky	// Monkey Business (Global)
+ep_makmv	// Make Your Move (Global)
+ep_lug		// London Underground (Maygay)
 
 // MPU2
 
@@ -12619,6 +12657,8 @@ m4bandgd	// Bands Of Gold (Eurogames)
 m4bangin	// Bangin' Away (Global)
 m4bangina	//
 m4banginb	//
+m4wwc		// Wacky Weekend Club (Global)
+m4screw		// Screwin' Around (Global)
 m4bigben	// Big Ben (Coinworld)
 m4bigbena	//
 m4bigbenb	//
@@ -13518,6 +13558,20 @@ st_vulkn
 /* Hazel Grove */
 
 hg_frd		// Fruit Deuce
+
+/* Global Games 'Stealth' */
+
+gl_dow		// Deals On Wheels (Global)
+gl_dowcl	// Deals On Wheels Club (Global)
+gl_wywh		// Wish You Were Here Club (Global)
+gl_coc		// Carry On Clubbin' (Global)
+gl_uyr		// Up Yer Riggin Club (Global)
+gl_hbh		// Heartbreak Hotel (Global)
+gl_hbhcl	// Heartbreak Hotel Club (Global)
+
+/* IGT SPlus */
+
+spss4240
 
 // Leisure Ent.
 roul			// (c) 1990

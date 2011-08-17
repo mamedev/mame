@@ -1953,6 +1953,11 @@ ROM_START( j2clbbin )
 ROM_END
 
 
+ROM_START( j2sirich )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "strikerich1_1.bin", 0x0000, 0x008000, CRC(8b3295c5) SHA1(2f228575e96e574f28627668cb979cdd58307e12) )
+ROM_END
+
 
 
 GAME(198?, j2adnote	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Add A Note (Jpm) (MPS, set 1)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
@@ -2146,3 +2151,6 @@ GAME(198?, j2ss		,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supa Stepper (JPM) (M
 GAME(198?, j2nbz	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Nudge Bonanza (JPM) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 
 GAME(198?, j2clbbin	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Crystal?","Club Bingo (Crystal) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+
+GAME(198?, j2sirich	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Maygay?","Strike It Rich (Maygay?) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND ) // I don't think this is MayGay, it was just in a MayGay set with some actual MayGay roms
+

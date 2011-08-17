@@ -2322,7 +2322,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	}
 	else
 	{
-		state->m_linecounter =296;//hold the counter in the vsync point, it's not clear whether this is done or not
+		state->m_linecounter =297;//hold the counter in the vsync point, it's not clear whether this is done or not
 	}
 	scn2674_line(timer.machine());
 	timer.machine().scheduler().synchronize();
@@ -3035,6 +3035,44 @@ ROM_START( v4reno )
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+
+	ROM_REGION( 0x800000, "altvideo", 0 ) // alt revs of the video roms?
+	ROM_LOAD16_BYTE( "reno reels 5-1",    0x000000, 0x080000,  CRC(9ebd0eaf) SHA1(3d326509240fe8a83df9d2369f184838bee2b407) )
+	ROM_LOAD16_BYTE( "reno reels 5-2",    0x000001, 0x080000,  CRC(1cbcd9b5) SHA1(989d64e10c67dab7d20229e5c63d24111d556138) )
+	ROM_LOAD16_BYTE( "reno_71_27c040.bin",0x000000, 0x080000,  CRC(c1125c51) SHA1(a461049cd3768096c03f3a5149cdef31d0ab447e) )
+	ROM_LOAD16_BYTE( "reno_72_27c040.bin",0x000001, 0x080000,  CRC(31773743) SHA1(e1245f6b35c9049b3d1478e93fb1b6cfff34733e) )
+	ROM_LOAD16_BYTE( "rr8p1",			  0x000000, 0x080000,  CRC(68992dd3) SHA1(75ab1cd02ac627b6191e9b61ee7c072029becaeb) )
+	ROM_LOAD16_BYTE( "rr8p2",			  0x000001, 0x080000,  CRC(b859020e) SHA1(811ccac82d022ceccc83f1bf6c6b4de6cc313e14) )
+	ROM_LOAD16_BYTE( "rr______.8_1",	  0x000000, 0x080000,  CRC(eca43ed4) SHA1(e2e4e5d3d4b659ddd74c120316b9658708e188f1) )
+	ROM_LOAD16_BYTE( "rr______.8_2",	  0x000001, 0x080000,  CRC(c3f25586) SHA1(7335708a7d90c7fbd0088bb6ee5ce0255b9b18ab) )
+
+	ROM_REGION( 0x800000, "altmain", 0 ) // alt revs of MPU4 interface ROM
+	ROM_LOAD("rri20s__.a_0",	0x00000, 0x10000,   CRC(0fb9686a) SHA1(a403d4424897fcdc343b277aa0caa032ed970747) )
+	ROM_LOAD("rrixes__.a_0",	0x00000, 0x10000,   CRC(3f055fa1) SHA1(ee6561d6849e5150d7b7b5585e8ed8176e706aeb) )
+	ROM_LOAD("rrv8ss",			0x00000, 0x10000,   CRC(a37383a5) SHA1(6c2563967546d810f2c50aa9a269bb1369014c18) )
+	ROM_LOAD("rr_20ab_.a_0",	0x00000, 0x10000,   CRC(6da308aa) SHA1(c1f418592942a9f68aac9a5a6f91911b96861d48) )
+	ROM_LOAD("rr_20a_p.a_0",	0x00000, 0x10000,   CRC(0dc6b163) SHA1(5a666dec859807cab6478b06f38473997fe49cd6) )
+	ROM_LOAD("rr_20a__.a_0",	0x00000, 0x10000,   CRC(9b279f39) SHA1(9e9e80fdc8517a314bac15a5087d7619a84c1e00) )
+	ROM_LOAD("rr_20bgp.a_0",	0x00000, 0x10000,   CRC(7175112b) SHA1(799c822a6dabcf2a7d67b2ef81273a0fba6cf3d9) )
+	ROM_LOAD("rr_20bg_.a_0",	0x00000, 0x10000,   CRC(e7943f71) SHA1(490af3fc7d3506ca9c5c049a6fcffb856bf28d1e) )
+	ROM_LOAD("rr_20btp.a_0",	0x00000, 0x10000,   CRC(c73e1c28) SHA1(37c5b984311439906cae2ba48aab249caeb1f2ab) )
+	ROM_LOAD("rr_20bt_.a_0",	0x00000, 0x10000,   CRC(51df3272) SHA1(c9cc06556e79e09b9b3cd9816b6f7dde92dadfe7) )
+	ROM_LOAD("rr_20sbp.a_0",	0x00000, 0x10000,   CRC(0ea4be35) SHA1(2e3950bcc01f4c1ce53873b552cb156a91c74e85) )
+	ROM_LOAD("rr_20sb_.a_0",	0x00000, 0x10000,   CRC(9845906f) SHA1(693e480d548482c073644513803ddd4e5ed0694c) )
+	ROM_LOAD("rr_20s__.a_0",	0x00000, 0x10000,   CRC(6ec107fc) SHA1(46ac2bbb19ff4d562fa2e0029e9831be0bec5def) )
+	ROM_LOAD("rr_27sd_.a60",	0x00000, 0x10000,   CRC(0f6c18e6) SHA1(23f07d1ed2340e73abcf6b86581bc5dd768dbab5) )
+	ROM_LOAD("rr_37sd_.a60",	0x00000, 0x10000,   CRC(807e73c8) SHA1(202d621cead9b2af8fef12ea0d07a6fce6262518) )
+	ROM_LOAD("rr_37s__.a60",	0x00000, 0x10000,   CRC(cbdb9469) SHA1(bc802b4c15451feebc332944f6bc09c7fb20ea20) )
+	ROM_LOAD("rr_x7sd_.a60",	0x00000, 0x10000,   CRC(3fd02f2d) SHA1(49ae60e8bdc6681482272d31eefc0098cc6c9667) )
+	ROM_LOAD("rr_x7s__.a60",	0x00000, 0x10000,   CRC(7475c88c) SHA1(0425e722321d4f365f6e90de5159721ac8a9d0d2) )
+	ROM_LOAD("rr_xeadp.a_0",	0x00000, 0x10000,   CRC(76df6109) SHA1(fbc76a9612a48f1b589e43e2f920459ed6c32c57) )
+	ROM_LOAD("rr_xead_.a_0",	0x00000, 0x10000,   CRC(e03e4f53) SHA1(17b4bdf82393aacf74765f04fc0d9b1f683114cc) )
+	ROM_LOAD("rr_xea_p.a_0",	0x00000, 0x10000,   CRC(3d7a86a8) SHA1(98bb8b2c0705219536720eef404c7bbc14a85793) )
+	ROM_LOAD("rr_xea__.a_0",	0x00000, 0x10000,   CRC(ab9ba8f2) SHA1(52b77aa66980fa552d286225919fca9910f48326) )
+
+
+	ROM_REGION( 0x800000, "altsnd", 0 ) // alt revs of the sound roms?
+	ROM_LOAD( "reno reels sound 1a",  0x000000, 0x080000,  CRC(a8b7bba7) SHA1(5fa3512a6fdcf512fafa6261b3a99922a00d6874) ) // bad dump, only one ROM?
 
 ROM_END
 
