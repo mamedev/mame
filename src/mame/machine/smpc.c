@@ -155,6 +155,25 @@ TODO:
 #define LOG_SMPC 0
 #define LOG_PAD_CMD 0
 
+#if 0
+/* TODO: move this into video functions */
+static int vblank_line(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int max_y = machine.primary_screen->height();
+	int y_step,vblank_line;
+
+	y_step = 2;
+
+	if((max_y == 263 && state->m_vdp2.pal == 0) || (max_y == 313 && state->m_vdp2.pal == 1))
+		y_step = 1;
+
+	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
+
+	return vblank_line*y_step;
+}
+#endif
+
 static TIMER_CALLBACK( stv_bankswitch_state )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -224,22 +243,31 @@ static void smpc_system_reset(running_machine &machine)
 	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
-static void smpc_change_clock(running_machine &machine, UINT8 cmd)
+static TIMER_CALLBACK( smpc_change_clock )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	UINT32 xtal;
 
-	xtal = cmd ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
+	if(LOG_SMPC) printf ("Clock change execute at (%d %d)\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
+
+	xtal = param ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
 	machine.device("maincpu")->set_unscaled_clock(xtal/2);
 	machine.device("slave")->set_unscaled_clock(xtal/2);
 
-	state->m_vdp2.dotsel = cmd ^ 1;
+	state->m_vdp2.dotsel = param ^ 1;
 	stv_vdp2_dynamic_res_change(machine);
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+	if(state->m_NMI_reset)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	device_set_input_line(state->m_slave, INPUT_LINE_RESET, ASSERT_LINE); // command also asserts slave cpu
-	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values */
+
+	/* put issued command in OREG31 */
+	state->m_smpc.OREG[31] = 0x0e + param;
+	/* clear hand-shake flag */
+	state->m_smpc.SF = 0x00;
+
+	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values? */
 }
 
 static TIMER_CALLBACK( stv_smpc_intback )
@@ -567,7 +595,7 @@ static void smpc_nmi_req(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	/*NMI is unconditionally requested?*/
+	/*NMI is unconditionally requested */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -638,13 +666,24 @@ static void stv_comreg_exec(address_space *space,UINT8 data)
 			break;
 		case 0x0e:
 		case 0x0f:
-			if(LOG_SMPC) printf ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
-			smpc_change_clock(space->machine(),data & 1);
+			if(LOG_SMPC) printf ("SMPC: Change Clock to %s (%d %d)\n",data & 1 ? "320" : "352",space->machine().primary_screen->hpos(),space->machine().primary_screen->vpos());
+
+			/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
+			   sokyugurentai threshold is 74 lines
+			   shanhigw threshold is 90 lines
+ 			   I assume that it needs ~100 lines, so 6666,(6) usecs. Obviously needs HW tests ... */
+
+			space->machine().scheduler().timer_set(attotime::from_usec(6666), FUNC(smpc_change_clock),data & 1);
 			break;
 		/*"Interrupt Back"*/
 		case 0x10:
-			if(LOG_SMPC) printf ("SMPC: Status Acquire\n");
-			space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(stv_smpc_intback),0); //TODO: variable time
+			if(LOG_SMPC)
+			{
+				saturn_state *state = space->machine().driver_data<saturn_state>();
+				printf ("SMPC: Status Acquire %02x %02x %02x %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],state->m_smpc.IREG[2],space->machine().primary_screen->vpos());
+			}
+
+			space->machine().scheduler().timer_set(attotime::from_usec(700), FUNC(stv_smpc_intback),0); //TODO: variable time
 			break;
 		/* RTC write*/
 		case 0x16:
@@ -687,7 +726,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 		stv_comreg_exec(space,data);
 
 		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 0x02 && data != 0x03)
+		if(data != 0x10 && data != 0x02 && data != 0x03 && data != 0xe && data != 0xf)
 		{
 			state->m_smpc.OREG[31] = data; //read-back command
 			state->m_smpc.SF = 0x00;
@@ -838,7 +877,7 @@ static void saturn_comreg_exec(address_space *space,UINT8 data)
 		case 0x0e:
 		case 0x0f:
 			if(LOG_SMPC) printf ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
-			smpc_change_clock(space->machine(),data & 1);
+			space->machine().scheduler().timer_set(attotime::from_usec(6666), FUNC(smpc_change_clock),data & 1);
 			break;
 		/*"Interrupt Back"*/
 		case 0x10:
@@ -919,7 +958,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 		saturn_comreg_exec(space,data);
 
 		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7)
+		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7 && data != 0x0e && data != 0x0f)
 		{
 			state->m_smpc.OREG[31] = data; //read-back for last command issued
 			state->m_smpc.SF = 0x00; //clear hand-shake flag

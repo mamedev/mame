@@ -176,7 +176,7 @@ static READ32_HANDLER ( stv_io_r32 )
 //  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, mem_mask);
 //  popmessage("SEL: %02x MUX: %02x OFF: %02x",port_sel,mux_data,offset*4);
 
-//  printf("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, mem_mask);
+//	printf("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, mem_mask);
 
 	switch(offset)
 	{
@@ -292,7 +292,8 @@ static WRITE32_HANDLER ( stv_io_w32 )
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 //  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
 
-//  printf("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+//	if(data != 0x0c)
+//	printf("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
 
 	switch(offset)
 	{
@@ -1693,7 +1694,7 @@ DRIVER_INIT ( stv )
 
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
 	state->m_scsp_regs  = auto_alloc_array(machine, UINT16, 0x1000/2);
-	state->m_backupram = auto_alloc_array(machine, UINT8, 0x10000);
+	state->m_backupram = auto_alloc_array_clear(machine, UINT8, 0x8000);
 
 	install_stvbios_speedups(machine);
 
@@ -2202,7 +2203,7 @@ static MACHINE_RESET( saturn )
 	state->m_smpc.SR = 0x40;	// this bit is always on according to docs
 
 	state->m_en_68k = 0;
-	state->m_NMI_reset = 1;
+	state->m_NMI_reset = 0;
 
 	DMA_STATUS = 0;
 
@@ -2281,7 +2282,7 @@ static MACHINE_RESET( stv )
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	state->m_en_68k = 0;
-	state->m_NMI_reset = 1;
+	state->m_NMI_reset = 0;
 
 	port_sel = mux_data = 0;
 	port_i = -1;
@@ -2514,7 +2515,7 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
 	state->m_scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
 	state->m_cart_dram = auto_alloc_array(machine, UINT32, 0x400000/4);
-	state->m_backupram = auto_alloc_array(machine, UINT8, 0x10000);
+	state->m_backupram = auto_alloc_array(machine, UINT8, 0x8000);
 	state->m_cart_backupram = auto_alloc_array(machine, UINT8, 0x400000);
 }
 

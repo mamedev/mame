@@ -4321,8 +4321,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 
 	{
 		/* Pukunpa */
-		if(STV_VDP2_SPWINEN)
-			popmessage("Sprite Window enabled");
+		//if(STV_VDP2_SPWINEN)
+		//	popmessage("Sprite Window enabled");
 
 		/* Capcom Collection Dai 2 - Choh Makaimura (Duh!) */
 		if(STV_VDP2_MZCTL & 0x1f && 0)
