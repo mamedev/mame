@@ -1822,21 +1822,29 @@ ROM_START( inquiztr )
 	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
 	ROM_REGION( 0x20000, "user1", 0 )
-	ROM_LOAD( "9576028.bin", 0x00000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
-	ROM_LOAD( "9576002.bin", 0x10000, 0x10000, CRC(5b8c8a04) SHA1(af5328fee79c370f45bff36f534aaf50964b6900) )
+	ROM_LOAD( "9576002.bin", 0x00000, 0x10000, CRC(5b8c8a04) SHA1(af5328fee79c370f45bff36f534aaf50964b6900) )
+
+	ROM_REGION( 0x20000, "altuser1", 0 )
+	ROM_LOAD( "9576028.bin", 0x10000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
+
+	 // these look quite different.. (like they belong together) but booting with these gives a checksum error (banking?)
+	ROM_LOAD( "inqvypp1", 0x00000, 0x010000, CRC(9bac8c6e) SHA1(15e24d60c2f3997e637694f60daa552b22628766) )
+	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
 
 	ROM_REGION( 0x1c2000, "user2", 0 )
 	ROM_LOAD( "inqdisk.img", 0x000000, 0x1c2000, NO_DUMP )
 ROM_END
 
+
+
+
 ROM_START( escounts )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-//  ROM_LOAD( "escint1b", 0x08000, 0x08000, CRC(96918aae) SHA1(849ce7b8eccc89c45aacc840a73935f95788a141) )
 	ROM_LOAD( "esc12int", 0x08000, 0x08000, CRC(741a1fe6) SHA1(e741d0ae0d2f11036a358120381e4b0df4a560a1) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 )
-	ROM_LOAD( "bfm_esc.bin", 0x8000, 0x008000, CRC(27acb5a5) SHA1(da50d650ab6456d61d0fb7f89247f2040b4bb9a8) )
-
+	ROM_LOAD( "bfm_esc.bin", 0x08000, 0x08000, CRC(27acb5a5) SHA1(da50d650ab6456d61d0fb7f89247f2040b4bb9a8) )
+	ROM_LOAD( "escint1b",    0x08000, 0x08000, CRC(fde413c9) SHA1(18724a1b771ba4c72e571c356591c5be32948d7a) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "esccobpa", 0x00000, 0x10000, CRC(d8eadeb7) SHA1(9b94f1454e6a17bf8321b0ef4ddd0ed1a56150f7) )
@@ -1849,6 +1857,9 @@ ROM_END
 ROM_START( trebltop )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "95740078.bin", 0x08000, 0x08000, CRC(aca1980b) SHA1(3d4ed1dc545cc80f56d7daa13028fb10a12a718b) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "ttopint", 0x08000, 0x08000, CRC(cc798f90) SHA1(c3f541ebbb3a2c29cc4f00bbd47e289bcff50ecb) )
 
 	ROM_REGION( 0x20000, "user1", 0 )
 	ROM_LOAD( "95760031.bin", 0x00000, 0x10000, CRC(8e75edb8) SHA1(0aaa3834d5ac20f92bdf1f2b8f1eb71854469cbe) )
@@ -1881,6 +1892,9 @@ ROM_END
 ROM_START( quizvadr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "q6809.bin", 0x08000, 0x8000, CRC(a74dff10) SHA1(87578694a022dc3d7ade9cc76d387c1ae5fc74d9) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "qvadrint", 0x08000, 0x08000, CRC(4c729943) SHA1(ab4e0fb6cfc66540ea1e9e36eebdf85f65c5fd2a) )
 
 	ROM_REGION( 0x200000, "user1", 0 )
 	ROM_LOAD( "5947011r.0", 0x000000, 0x80000, CRC(cac43c97) SHA1(3af529cd0f8ec57dd3596f5bca7b9c74cff171e4) )
@@ -1936,13 +1950,26 @@ ROM_START( qosb )
 	ROM_REGION( 0x20000, "upd", 0 )
 	ROM_LOAD( "snd1_218.ic7", 0x00000, 0x10000, CRC(061f496d) SHA1(653d16454d909c034191813b37d14010da7258c6) )
 	ROM_LOAD( "snd2_219.ic8", 0x10000, 0x10000, CRC(d7874a47) SHA1(5bbd4040c7c0299e8cc135e6c6cd05370b260e9b) )
+
+	/* there is a set close to this with 
+	
+		ROM_LOAD( "qosrom0", 0x0000, 0x080000, CRC(4f150634) SHA1(beb1d3c212b189f3baa08fe454e83f30108be08e) )
+		qosrom1 = rom1_307.bin          qosb       A Question of Sport (39-960-089)
+		ROM_LOAD( "qosrom2", 0x0000, 0x080000, CRC(c39737db) SHA1(ccfdb19dab3af064db44e6022248aef98749bc97) )
+		ROM_LOAD( "qosrom3", 0x0000, 0x080000, CRC(785b8ff9) SHA1(61b31e0e60c31ecb4b179bfe008a96155d939709) )
+		ROM_LOAD( "qossnd1", 0x0000, 0x010000, CRC(888a29f8) SHA1(0e5aa9db54e783708ece1e8c7bffb10d994ab384) )
+	
+	   but it simply looks like a bad dump, rom3 is an alt 'rom 2' and the others are mostly the same as qosb
+    */
+
 ROM_END
 
-GAME( 1989, inquiztr, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Inquizitor",                       GAME_NOT_WORKING )
-GAME( 1990, escounts, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,  0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,      0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "A Question of Sport (39-960-107)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,     qos, bfcobra, bfcobra, bfcobra, ROT0, "BFM", "A Question of Sport (39-960-099)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,     qos, bfcobra, bfcobra, bfcobra, ROT0, "BFM", "A Question of Sport (39-960-089)", GAME_IMPERFECT_GRAPHICS )
+
+GAME( 1989, inquiztr, 0			,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Inquizitor",                       GAME_NOT_WORKING )
+GAME( 1990, escounts, 0			,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop, 0			,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,  0			,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr, 0			,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,      0			,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "A Question of Sport (set 1, 39-960-107)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,     qos		,	bfcobra, bfcobra, bfcobra, ROT0, "BFM", "A Question of Sport (set 2, 39-960-099)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,     qos		,	bfcobra, bfcobra, bfcobra, ROT0, "BFM", "A Question of Sport (set 3, 39-960-089)", GAME_IMPERFECT_GRAPHICS )

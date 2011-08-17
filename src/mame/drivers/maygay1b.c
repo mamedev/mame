@@ -2870,6 +2870,18 @@ ROM_START( m1winenc )
 	ROM_LOAD( "sa6-372", 0x0000, 0x010000, CRC(580285b8) SHA1(f0589184a60c73078c3cef9f89ca279fc67f9813) )
 	ROM_LOAD( "sa7-573", 0x0000, 0x010000, CRC(a597cd98) SHA1(3d28306004b1937e7d04380fe3f9afc5ec321b7b) )
 	ROM_LOAD( "sa7-574", 0x0000, 0x010000, CRC(a98f9521) SHA1(6fa2ba09dcadfb2164dbea376abc88d0187d02c8) )
+
+	// these were from a set marked as 'John Francombe (Maygay)' which some have said is Epoch hardware,
+	// however what we have here clearly isn't Epoch.  Apparently the John Francombe game actually had
+	// 'Winners Enclosure' on the cabinet, along with a Dot Matrix Display.  The 'encdot' rom here
+	// appears to be for a Dot Matrix Display, rather than being a main program rom, although I can't
+	// recognize the CPU.  I'm tempted to say that these simply belong with this Winners Enclosure set
+	// and it was never on Epoch hardware at all.
+	ROM_REGION( 0x080000, "altroms", ROMREGION_ERASE00  )
+	ROM_LOAD( "encdot.bin", 0x0000, 0x010000, CRC(3b707399) SHA1(9bc9522625e97c7d60cc104a96f7312b1d88ec01) )
+	ROM_LOAD( "encsnd.u2", 0x0000, 0x080000, CRC(5568117a) SHA1(198aaead5a624902f31248e050231380b37167d4) )
+	ROM_LOAD( "encsnd.u3", 0x0000, 0x080000, CRC(d78bee50) SHA1(dc4663efc795f7c518ebb9f17124f09d263d0585) )
+
 ROM_END_M1A_MCU
 
 

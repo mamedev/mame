@@ -9061,15 +9061,6 @@ ddz				// (c) 200?
 
 psattack		// 2004 Uniana
 
-// Bell Fruit Cobra Hardware
-inquiztr		// 1989 BFM
-escounts		// 1990 BFM
-trebltop		// 1991 BFM
-beeline			// 1991 BFM
-quizvadr		// 1991 BFM
-qos				// 1992 BFM
-qosa			// 1992 BFM
-qosb			// 1992 BFM
 
 
 // ADP games
@@ -11484,6 +11475,16 @@ sc1twice
 
 m_tppokr		// (c) 1996 BFM/ELAM,Game Card 95-750-899, uses Adder board for feature gfx
 
+// Cobra Hardware (SC1 expansion?)
+inquiztr		// 1989 BFM
+escounts		// 1990 BFM
+trebltop		// 1991 BFM
+beeline			// 1991 BFM
+quizvadr		// 1991 BFM
+qos				// 1992 BFM
+qosa			// 1992 BFM
+qosb			// 1992 BFM
+
 // Scorpion 2 / 3
 
 sc2brkfs	// The Big Breakfast
@@ -11590,6 +11591,12 @@ sltblgtk		// 1996
 sltblgpo		// 1996
 sltblgp1		// 1996
 gldncrwn		// 1997
+
+// Cobra 3?
+
+c3_rtime		// Radio Times
+c3_telly		// Telly Addicts
+c3_totp			// Top of the Pops
 
 // Scorpion 4
 
