@@ -83,7 +83,7 @@ const char *driverpath = m_enumerator.config().devicelist().find("root")->search
 	int required = 0;
 	int sharedFound = 0;
 	int sharedRequired = 0;
-	//for (const rom_source *source = rom_first_source(m_enumerator.config()); source != NULL; source = rom_next_source(*source))
+
 	const rom_source *source = rom_first_source(m_enumerator.config());
 	{
 		// determine the search path for this source and iterate through the regions
@@ -164,11 +164,6 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 
 	// store validation for later
 	m_validation = validation;
-
-	// iterate over ROM sources and regions
-	int found = 0;
-	int required = 0;
-	// determine the search path for this source and iterate through the regions
 	m_searchpath = device->shortname();
 
 	// now iterate over regions and ROMs within
@@ -176,14 +171,6 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 	{
 		for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 		{
-			hash_collection hashes(ROM_GETHASHDATA(rom));
-			
-			// count the number of files with hashes
-			if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
-			{
-				required++;
-			}
-
 			// audit a file
 			audit_record *record = NULL;
 			if (ROMREGION_ISROMDATA(region))
@@ -192,12 +179,6 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 			// audit a disk
 			else if (ROMREGION_ISDISKDATA(region))
 				record = audit_one_disk(rom);
-
-			// count the number of files that are found.
-			if (record != NULL && (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && also_used_by_parent(record->actual_hashes(), record->actual_length()) < 0)))
-			{
-				found++;
-			}
 		}
 	}
 
