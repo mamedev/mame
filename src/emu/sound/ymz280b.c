@@ -146,7 +146,7 @@ INLINE UINT8 ymz280b_read_memory(UINT8 *base, UINT32 size, UINT32 offset)
 	if (offset < size)
 		return base[offset];
 
-	/* 16MB chip limit */
+	/* 16MB chip limit (shouldn't happen) */
 	else if (offset > 0xffffff)
 		return base[offset & 0xffffff];
 
@@ -480,7 +480,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 1) << 8) + ymz280b_read_memory(base, size, position / 2));
+			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 1) << 8) + ymz280b_read_memory(base, size, position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -505,7 +505,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 1) << 8) + ymz280b_read_memory(base, size, position / 2));
+			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 1) << 8) + ymz280b_read_memory(base, size, position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -806,7 +806,8 @@ static void write_to_register(ymz280b_state *chip, int data)
 			case 0x01:		/* pitch upper 1 bit, loop, key on, mode */
 				voice->fnum = (voice->fnum & 0xff) | ((data & 0x01) << 8);
 				voice->looping = (data & 0x10) >> 4;
-				voice->mode = (data & 0x60) >> 5;
+				if ((data & 0x60) == 0) data &= 0x7f; /* ignore mode setting and set to same state as KON=0 */
+				else voice->mode = (data & 0x60) >> 5;
 				if (!voice->keyon && (data & 0x80) && chip->keyon_enable)
 				{
 					voice->playing = 1;
@@ -818,7 +819,7 @@ static void write_to_register(ymz280b_state *chip, int data)
 					/* if update_irq_state_timer is set, cancel it. */
 					voice->irq_schedule = 0;
 				}
-				if (voice->keyon && !(data & 0x80) && !voice->looping)
+				else if (voice->keyon && !(data & 0x80))
 				{
 					voice->playing = 0;
 

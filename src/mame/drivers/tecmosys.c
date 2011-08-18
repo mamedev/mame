@@ -4,8 +4,6 @@
 
  ToDo:
   - Dump / Decap MCUs to allow for proper protection emulation.
-  - Fix Sound (sound roms should be good, do they need descrambling, or is our sound core bad?
-    YMZ280B samples sound -terrible-, deroon has lots of "bad" noises but tkdensho only has a few.
 
 
 T.Slanina 20040530 :
