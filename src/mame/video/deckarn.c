@@ -52,8 +52,9 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_t
 
 		fx = spriteram[offs + 1];
 
-		// the 8-bit implementation had this, why?
-		//if ((fx & 0x1) == 0) continue;
+		/* the 8-bit implementation had this.
+                   illustrated by enemy projectile explosions in Shackled being left on screen. */
+		if ((fx & 0x1) == 0) continue;
 
 		extra = (fx & 0x10) ? 1 : 0;
 		fy = fx & 0x2;
