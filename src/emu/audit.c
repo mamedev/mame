@@ -166,11 +166,15 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 	m_validation = validation;
 	m_searchpath = device->shortname();
 
+	int notfound = 0;
+
 	// now iterate over regions and ROMs within
 	for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 	{
 		for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 		{
+			hash_collection hashes(ROM_GETHASHDATA(rom));
+
 			// audit a file
 			audit_record *record = NULL;
 			if (ROMREGION_ISROMDATA(region))
@@ -179,9 +183,19 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 			// audit a disk
 			else if (ROMREGION_ISDISKDATA(region))
 				record = audit_one_disk(rom);
+
+			// count the number of files that are found.
+			if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom) && (record->status() == audit_record::STATUS_NOT_FOUND))
+			{
+				notfound++;
+			}
 		}
 	}
 
+	if (notfound > 0)
+	{
+		return NOTFOUND;
+	}
 	// return a summary
 	return summarize(device->shortname());
 }

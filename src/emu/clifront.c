@@ -824,36 +824,34 @@ void cli_frontend::verifyroms(const char *gamename)
 			auditor.summarize(dev->shortname(),&summary_string);
 			mame_printf_info("%s", summary_string.cstr());
 
-			// if not found, count that and leave it at that
-			if (summary == media_auditor::NOTFOUND)
-				notfound++;
+			// display information about what we discovered
+			mame_printf_info("romset %s ", dev->shortname());
 
-			// else display information about what we discovered
-			else
+			// switch off of the result
+			switch (summary)
 			{
-				mame_printf_info("romset %s ", dev->shortname());
+				case media_auditor::INCORRECT:
+					mame_printf_info("is bad\n");
+					incorrect++;
+					break;
 
-				// switch off of the result
-				switch (summary)
-				{
-					case media_auditor::INCORRECT:
-						mame_printf_info("is bad\n");
-						incorrect++;
-						break;
+				case media_auditor::NOTFOUND:
+					mame_printf_info("not found!\n");
+					incorrect++;
+					break;
 
-					case media_auditor::CORRECT:
-						mame_printf_info("is good\n");
-						correct++;
-						break;
+				case media_auditor::CORRECT:
+					mame_printf_info("is good\n");
+					correct++;
+					break;
 
-					case media_auditor::BEST_AVAILABLE:
-						mame_printf_info("is best available\n");
-						correct++;
-						break;
+				case media_auditor::BEST_AVAILABLE:
+					mame_printf_info("is best available\n");
+					correct++;
+					break;
 
-					default:
-						break;
-				}
+				default:
+					break;
 			}
 
 			global_free(dev);
