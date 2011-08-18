@@ -14,6 +14,213 @@
 
 
 /*
+I/O overview:
+    PORT-A  1st player inputs
+    PORT-B  2nd player inputs
+    PORT-C  system input
+    PORT-D  system output
+    PORT-E  I/O 1
+    PORT-F  I/O 2
+    PORT-G  I/O 3
+    PORT-AD AD-Stick inputs?(Fake for now...)
+    SERIAL COM
+
+offsets:
+    0h PORT-A
+    0l PORT-B
+    1h PORT-C
+    1l PORT-D
+    2h PORT-E
+    2l PORT-F (extra button layout)
+    3h PORT-G
+    3l
+    4h PORT-SEL
+    4l
+    5h SERIAL COM WRITE
+    5l
+    6h SERIAL COM READ
+    6l
+    7h
+    7l PORT-AD
+*/
+static const UINT8 port_ad[] =
+{
+	0xcc,0xb2,0x99,0x7f,0x66,0x4c,0x33,0x19
+};
+
+READ32_HANDLER ( stv_io_r32 )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+//  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, mem_mask);
+//  popmessage("SEL: %02x MUX: %02x OFF: %02x",state->m_port_sel,state->m_mux_data,offset*4);
+
+//	printf("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, mem_mask);
+
+	switch(offset)
+	{
+		case 0x00/4:
+		switch(state->m_port_sel)
+		{
+			case 0x77: return 0xff000000|(input_port_read(space->machine(), "P1") << 16) |0x0000ff00|(input_port_read(space->machine(), "P2"));
+			case 0x67:
+			{
+				switch(state->m_mux_data)
+				{
+					/*Mahjong panel interface,bit wise(ACTIVE LOW)*/
+					case 0xfe:	return 0xff000000 | (input_port_read_safe(space->machine(), "KEY0", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY5", 0));
+					case 0xfd:  return 0xff000000 | (input_port_read_safe(space->machine(), "KEY1", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY6", 0));
+					case 0xfb:	return 0xff000000 | (input_port_read_safe(space->machine(), "KEY2", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY7", 0));
+					case 0xf7:	return 0xff000000 | (input_port_read_safe(space->machine(), "KEY3", 0) << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY8", 0));
+					case 0xef:  return 0xff000000 | (input_port_read_safe(space->machine(), "KEY4", 0) << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY9", 0));
+					/*Joystick panel*/
+					default:
+					//popmessage("%02x MUX DATA",state->m_mux_data);
+				    return (input_port_read(space->machine(), "P1") << 16) | (input_port_read(space->machine(), "P2"));
+				}
+			}
+			case 0x47:
+			{
+				if ( strcmp(space->machine().system().name,"critcrsh") == 0 )
+				{
+					int data1 = 0, data2 = 0;
+
+					/* Critter Crusher */
+					data1 = input_port_read(space->machine(), "LIGHTX");
+					data1 = BITSWAP8(data1, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
+					data1 |= (input_port_read(space->machine(), "P1") & 1) ? 0x0 : 0x4;
+					data2 = input_port_read(space->machine(), "LIGHTY");
+					data2 = BITSWAP8(data2, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
+					data2 |= (input_port_read(space->machine(), "P1") & 1) ? 0x0 : 0x4;
+
+					return 0xff000000 | data1 << 16 | 0x0000ff00 | data2;
+				}
+			}
+			//default:
+			//case 0x40: return space->machine().rand();
+			default:
+			//popmessage("%02x PORT SEL",state->m_port_sel);
+			return (input_port_read(space->machine(), "P1") << 16) | (input_port_read(space->machine(), "P2"));
+		}
+		case 0x04/4:
+		if ( strcmp(space->machine().system().name,"critcrsh") == 0 )
+			return ((input_port_read(space->machine(), "SYSTEM") << 16) & ((input_port_read(space->machine(), "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (state->m_ioga[1]);
+		else
+			return (input_port_read(space->machine(), "SYSTEM") << 16) | (state->m_ioga[1]);
+
+		case 0x08/4:
+		switch(state->m_port_sel)
+		{
+			case 0x77:	return (input_port_read(space->machine(), "UNUSED") << 16) | (input_port_read(space->machine(), "EXTRA"));
+			case 0x67:	return 0xffffffff;/**/
+			case 0x20:  return 0xffff0000 | (state->m_ioga[2] & 0xffff);
+			case 0x10:  return ((state->m_ioga[2] & 0xffff) << 16) | 0xffff;
+			case 0x60:  return 0xffffffff;/**/
+			default:
+			return 0xffffffff;
+		}
+		case 0x0c/4:
+		switch(state->m_port_sel)
+		{
+			case 0x60:  return ((state->m_ioga[2] & 0xffff) << 16) | 0xffff;
+			default:
+			//popmessage("offs: 3 %02x",state->m_port_sel);
+			return 0xffffffff;
+		}
+		//case 0x10/4:
+		case 0x14/4:
+		switch(state->m_port_sel)
+		{
+			case 0x77:
+			{
+				//popmessage("(PC=%06x) offs 5 %04x %02x",cpu_get_pc(&space->device()),state->m_port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
+				logerror("(PC=%06x) offs 5 %04x %02x\n",cpu_get_pc(&space->device()),state->m_port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
+
+				//stv_m_workram_h[0x8e830/4] = ((state->m_ioga[5] & 0xff0000) >> 16) ^ 0x3;
+				//stv_m_workram_h[0x8e834/4] = ((state->m_ioga[5] & 0xff0000) >> 16) ^ 0x3;
+				return (state->m_ioga[5] & 0xff0000) >> 16;//stv_m_workram_h[0x8e830/4];//sound board data
+			}
+			default: return 0xffffffff;
+		}
+		case 0x18/4:
+		switch(state->m_port_sel)
+		{
+			case 0x60:  return state->m_ioga[5];
+			case 0x77:
+			{
+				//popmessage("(PC=%06x) offs 6 %04x %02x",cpu_get_pc(&space->device()),state->m_port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
+				logerror("(PC=%06x) offs 6 %04x %02x\n",cpu_get_pc(&space->device()),state->m_port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
+				return 0;//sound board status,non-zero = processing
+			}
+			default:
+			//popmessage("offs: 6 %02x",state->m_port_sel);
+			return 0xffffffff;
+		}
+		case 0x1c/4:
+		if(LOG_IOGA) logerror("(PC %s=%06x) Warning: READ from PORT_AD\n", space->device().tag(), cpu_get_pc(&space->device()));
+		popmessage("Read from PORT_AD");
+		state->m_port_i++;
+		return port_ad[state->m_port_i & 7];
+		default:
+		return state->m_ioga[offset];
+	}
+}
+
+WRITE32_HANDLER ( stv_io_w32 )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+//  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+
+//	if(data != 0x0c)
+//	printf("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+
+	switch(offset)
+	{
+		case 0x04/4:
+			if(ACCESSING_BITS_0_7)
+			{
+				/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
+				state->m_ioga[1] = (data) & 0xff;
+				coin_counter_w(space->machine(), 0,~data & 0x01);
+				coin_counter_w(space->machine(), 1,~data & 0x02);
+				coin_lockout_w(space->machine(), 0,~data & 0x04);
+				coin_lockout_w(space->machine(), 1,~data & 0x08);
+				/*
+                other bits reserved
+                */
+			}
+			break;
+		case 0x08/4:
+			if(ACCESSING_BITS_16_23)
+			{
+				state->m_ioga[2] = data >> 16;
+				state->m_mux_data = state->m_ioga[2];
+			}
+			else if(ACCESSING_BITS_0_7)
+				state->m_ioga[2] = data;
+			break;
+		case 0x0c/4:
+			if(ACCESSING_BITS_16_23)
+				state->m_ioga[3] = data;
+			break;
+		case 0x10/4:
+			if(ACCESSING_BITS_16_23)
+				state->m_port_sel = (data & 0xffff0000) >> 16;
+			break;
+		case 0x14/4:
+			if(ACCESSING_BITS_16_23)
+				state->m_ioga[5] = data;
+			break;
+		//case 0x18/4:
+		case 0x1c/4:
+			//technical bowling tests here
+			if(ACCESSING_BITS_16_23)
+				state->m_ioga[7] = data;
+			break;
+
+	}
+}
+
+/*
 EEPROM write 0000 to address 2d
 EEPROM write 0000 to address 2e
 EEPROM write 0000 to address 2f

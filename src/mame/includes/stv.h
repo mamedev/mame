@@ -111,6 +111,8 @@ public:
 	UINT8     m_prev_bankswitch;
     emu_timer *m_stv_rtc_timer;
 	UINT32    *m_ioga;
+	UINT8     m_port_sel,m_mux_data;
+	int 	  m_port_i;
 
 	legacy_cpu_device* m_maincpu;
 	legacy_cpu_device* m_slave;
@@ -220,3 +222,7 @@ WRITE32_HANDLER ( saturn_vdp2_regs_w );
 
 VIDEO_START ( stv_vdp2 );
 SCREEN_UPDATE( stv_vdp2 );
+
+READ32_HANDLER ( stv_io_r32 );
+WRITE32_HANDLER ( stv_io_w32 );
+
