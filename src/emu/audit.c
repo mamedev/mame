@@ -83,7 +83,8 @@ const char *driverpath = m_enumerator.config().devicelist().find("root")->search
 	int required = 0;
 	int sharedFound = 0;
 	int sharedRequired = 0;
-	for (const rom_source *source = rom_first_source(m_enumerator.config()); source != NULL; source = rom_next_source(*source))
+	//for (const rom_source *source = rom_first_source(m_enumerator.config()); source != NULL; source = rom_next_source(*source))
+	const rom_source *source = rom_first_source(m_enumerator.config());
 	{
 		// determine the search path for this source and iterate through the regions
 		m_searchpath = source->searchpath();
@@ -148,7 +149,60 @@ m_searchpath = combinedpath;
 	}
 
 	// return a summary
-	return summarize();
+	return summarize(m_enumerator.driver().name);
+}
+
+
+//-------------------------------------------------
+//  audit_device - audit the device 
+//-------------------------------------------------
+
+media_auditor::summary media_auditor::audit_device(device_t *device, const char *validation)
+{
+	// start fresh
+	m_record_list.reset();
+
+	// store validation for later
+	m_validation = validation;
+
+	// iterate over ROM sources and regions
+	int found = 0;
+	int required = 0;
+	// determine the search path for this source and iterate through the regions
+	m_searchpath = device->shortname();
+
+	// now iterate over regions and ROMs within
+	for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
+	{
+		for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+		{
+			hash_collection hashes(ROM_GETHASHDATA(rom));
+			
+			// count the number of files with hashes
+			if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
+			{
+				required++;
+			}
+
+			// audit a file
+			audit_record *record = NULL;
+			if (ROMREGION_ISROMDATA(region))
+				record = audit_one_rom(rom);
+
+			// audit a disk
+			else if (ROMREGION_ISDISKDATA(region))
+				record = audit_one_disk(rom);
+
+			// count the number of files that are found.
+			if (record != NULL && (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && also_used_by_parent(record->actual_hashes(), record->actual_length()) < 0)))
+			{
+				found++;
+			}
+		}
+	}
+
+	// return a summary
+	return summarize(device->shortname());
 }
 
 
@@ -207,7 +261,7 @@ media_auditor::summary media_auditor::audit_samples()
 		return NOTFOUND;
 
 	// return a summary
-	return summarize();
+	return summarize(m_enumerator.driver().name);
 }
 
 
@@ -216,7 +270,7 @@ media_auditor::summary media_auditor::audit_samples()
 //  string format
 //-------------------------------------------------
 
-media_auditor::summary media_auditor::summarize(astring *string)
+media_auditor::summary media_auditor::summarize(const char *name, astring *string)
 {
 	// loop over records
 	summary overall_status = CORRECT;
@@ -231,7 +285,7 @@ media_auditor::summary media_auditor::summarize(astring *string)
 		// output the game name, file name, and length (if applicable)
 		if (string != NULL)
 		{
-			string->catprintf("%-12s: %s", m_enumerator.driver().name, record->name());
+			string->catprintf("%-12s: %s", name, record->name());
 			if (record->expected_length() > 0)
 				string->catprintf(" (%d bytes)", record->expected_length());
 			string->catprintf(" - ");

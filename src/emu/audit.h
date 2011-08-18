@@ -169,8 +169,9 @@ public:
 
 	// audit operations
 	summary audit_media(const char *validation = AUDIT_VALIDATE_FULL);
+	summary audit_device(device_t *device, const char *validation = AUDIT_VALIDATE_FULL);
 	summary audit_samples();
-	summary summarize(astring *output = NULL);
+	summary summarize(const char *name,astring *output = NULL);
 
 private:
 	// internal helpers

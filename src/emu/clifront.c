@@ -734,6 +734,8 @@ void cli_frontend::listmedia(const char *gamename)
 //  verifyroms - verify the ROM sets of one or
 //  more games
 //-------------------------------------------------
+extern int m_device_count;
+extern const device_type *s_devices_sorted[];
 
 void cli_frontend::verifyroms(const char *gamename)
 {
@@ -748,6 +750,7 @@ void cli_frontend::verifyroms(const char *gamename)
 
 	// iterate over drivers
 	media_auditor auditor(drivlist);
+	UINT8* device_used = global_alloc_array_clear(UINT8, m_device_count);
 	while (drivlist.next())
 	{
 		// audit the ROMs in this set
@@ -755,8 +758,14 @@ void cli_frontend::verifyroms(const char *gamename)
 
 		// output the summary of the audit
 		astring summary_string;
-		auditor.summarize(&summary_string);
+		auditor.summarize(drivlist.driver().name,&summary_string);
 		mame_printf_info("%s", summary_string.cstr());
+		for (const rom_source *source = rom_first_source(drivlist.config()); source != NULL; source = rom_next_source(*source))
+		{
+			for(int i=0;i<m_device_count;i++) {
+					if (source->type() == *s_devices_sorted[i]) device_used[i] = 1;
+			}
+		}
 
 		// if not found, count that and leave it at that
 		if (summary == media_auditor::NOTFOUND)
@@ -794,7 +803,65 @@ void cli_frontend::verifyroms(const char *gamename)
 			}
 		}
 	}
+	
+	drivlist.reset();
+	drivlist.next();
+	machine_config &config = drivlist.config();
+	device_t *owner = config.devicelist().first();
+	// check if all are listed, note that empty one is included
+	bool display_all = driver_list::total() == (drivlist.count()+1);
+	for(int i=0;i<m_device_count;i++) {
+		if (display_all || (device_used[i]!=0)) {
+			device_type type = *s_devices_sorted[i];
+			device_t *dev = (*type)(config, "dummy", owner, 0);
+			dev->config_complete();
+	
+			// audit the ROMs in this set
+			media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
 
+			// output the summary of the audit
+			astring summary_string;
+			auditor.summarize(dev->shortname(),&summary_string);
+			mame_printf_info("%s", summary_string.cstr());
+
+			// if not found, count that and leave it at that
+			if (summary == media_auditor::NOTFOUND)
+				notfound++;
+
+			// else display information about what we discovered
+			else
+			{
+				mame_printf_info("romset %s ", dev->shortname());
+
+				// switch off of the result
+				switch (summary)
+				{
+					case media_auditor::INCORRECT:
+						mame_printf_info("is bad\n");
+						incorrect++;
+						break;
+
+					case media_auditor::CORRECT:
+						mame_printf_info("is good\n");
+						correct++;
+						break;
+
+					case media_auditor::BEST_AVAILABLE:
+						mame_printf_info("is best available\n");
+						correct++;
+						break;
+
+					default:
+						break;
+				}
+			}
+
+			global_free(dev);
+		}
+	}
+
+	global_free(device_used);
+	
 	// clear out any cached files
 	zip_file_cache_clear();
 
@@ -842,7 +909,7 @@ void cli_frontend::verifysamples(const char *gamename)
 
 		// output the summary of the audit
 		astring summary_string;
-		auditor.summarize(&summary_string);
+		auditor.summarize(drivlist.driver().name,&summary_string);
 		mame_printf_info("%s", summary_string.cstr());
 
 		// if not found, print a message and set the flag
