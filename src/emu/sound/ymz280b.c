@@ -473,6 +473,9 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 	int position = voice->position;
 	int val;
 
+	/* is it even used in any MAME game? */
+	popmessage("YMZ280B 16-bit PCM contact MAMEDEV");
+
 	/* two cases: first cases is non-looping */
 	if (!voice->looping)
 	{
