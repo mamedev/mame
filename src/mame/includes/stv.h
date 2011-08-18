@@ -110,9 +110,9 @@ public:
 	UINT8     m_stv_multi_bank;
 	UINT8     m_prev_bankswitch;
     emu_timer *m_stv_rtc_timer;
-	//UINT32    *m_ioga;
 	UINT8     m_port_sel,m_mux_data;
 	UINT8     m_system_output;
+	UINT16    m_serial_tx;
 
 	legacy_cpu_device* m_maincpu;
 	legacy_cpu_device* m_slave;

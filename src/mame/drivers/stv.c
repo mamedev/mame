@@ -113,6 +113,44 @@ static READ8_HANDLER( critcrsh_ioga_r )
 	return res;
 }
 
+static READ8_HANDLER( magzun_ioga_r )
+{
+	//saturn_state *state = space->machine().driver_data<saturn_state>();
+	UINT8 res;
+
+	res = 0xff;
+
+	//if(offset > 0x0b)
+	//	printf("%08x\n",offset);
+
+	// 0x4a 0x40 0x47
+
+	switch(offset)
+	{
+		//case 0x17:
+		//	res = 'K';
+		//	break;
+		//case 0x19:
+		//	res = 'a';
+		//	break;
+		default: res = stv_ioga_r(space,offset); break;
+	}
+
+	return res;
+}
+
+static WRITE8_HANDLER( magzun_ioga_w )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	switch(offset)
+	{
+		case 0x13: state->m_serial_tx = (data << 8) | (state->m_serial_tx & 0xff); break;
+		case 0x15: state->m_serial_tx = (data & 0xff) | (state->m_serial_tx & 0xff00); break;
+		default: stv_ioga_w(space,offset,data); break;
+	}
+}
+
 static READ8_HANDLER( stvmp_ioga_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
@@ -232,6 +270,33 @@ static WRITE32_HANDLER( stvmp_ioga_w32 )
 			printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
+static READ32_HANDLER( magzun_ioga_r32 )
+{
+	UINT32 res;
+
+	res = 0;
+	if(ACCESSING_BITS_16_23)
+		res |= magzun_ioga_r(space,offset*4+1) << 16;
+	if(ACCESSING_BITS_0_7)
+		res |= magzun_ioga_r(space,offset*4+3);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		if(!space->debugger_access())
+			printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
+
+	return res;
+}
+
+static WRITE32_HANDLER( magzun_ioga_w32 )
+{
+	if(ACCESSING_BITS_16_23)
+		magzun_ioga_w(space,offset*4+1,data >> 16);
+	if(ACCESSING_BITS_0_7)
+		magzun_ioga_w(space,offset*4+3,data);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		if(!space->debugger_access())
+			printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
+}
+
 /*
 
 06013AE8: MOV.L   @($D4,PC),R5
@@ -299,6 +364,54 @@ DRIVER_INIT(critcrsh)
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(critcrsh_ioga_r32), FUNC(stv_ioga_w32));
 	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(critcrsh_ioga_r32), FUNC(stv_ioga_w32));
+}
+
+/*
+	- if pc==604bf20 && 608e832 <- 1 (HWEF)
+	- if pc==604bfbe && 608e832 <- 2 (HREF)
+	- if pc==604c006 && 60ff3b7 <- 0x40 (they tries to read-back 0x40?)
+
+	TODO: game doesn't work if not in debugger?
+*/
+
+static READ32_HANDLER( magzun_hef_hack_r )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	if(cpu_get_pc(&space->device())==0x604bf20) return 0x00000001; //HWEF
+
+	if(cpu_get_pc(&space->device())==0x604bfbe) return 0x00000002; //HREF
+
+	return state->m_workram_h[0x08e830/4];
+}
+
+static READ32_HANDLER( magzun_rx_hack_r )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	if(cpu_get_pc(&space->device())==0x604c006) return 0x40;
+
+	return state->m_workram_h[0x0ff3b4/4];
+}
+
+DRIVER_INIT(magzun)
+{
+	DRIVER_INIT_CALL(stv);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(magzun_ioga_r32), FUNC(magzun_ioga_w32));
+	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(magzun_ioga_r32), FUNC(magzun_ioga_w32));
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x608e830, 0x608e833, FUNC(magzun_hef_hack_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60ff3b4, 0x60ff3b7, FUNC(magzun_rx_hack_r) );
+
+	/* Program ROM patches, don't understand how to avoid these two checks ... */
+	{
+		UINT32 *ROM = (UINT32 *)machine.region("game0")->base();
+
+		ROM[0x90054/4] = 0x00e00001; // END error
+
+		ROM[0x34f4/4] = 0x00000009; // Time Out sub-routine
+	}
 }
 
 
@@ -1907,6 +2020,9 @@ ROM_START( magzun )
 	ROM_LOAD16_WORD_SWAP( "mpr-19358.ic6",    0x1400000, 0x0400000, CRC(0969f1ec) SHA1(25b9671f0975172f283458d46e160080dd1d19e9) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr-19359.ic1",    0x1800000, 0x0400000, CRC(b0d06f9c) SHA1(19e04c9c3a0bea5950aba8e1975962fa37722f32) ) // good
 
+	ROM_REGION(0x1000, "subboard", ROMREGION_ERASE00 )
+	ROM_LOAD("microm", 0x0000, 0x1000, NO_DUMP ) // we are missing the driver ROM for sub-board (used to control the mic)
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 3 players
 	ROM_LOAD( "magzun.nv", 0x0000, 0x0080, CRC(42700321) SHA1(1f2ba760c410312539c8677223edcd1cda3b51d4) )
 ROM_END
@@ -2101,7 +2217,7 @@ GAME( 1996, decathlt,  stvbios, stv,      stv,		decathlt,	ROT0,   "Sega", 	    	
 GAME( 1996, decathlto, decathlt,stv,      stv,		decathlt,	ROT0,	"Sega", 	    				"Decathlete (JUET 960424 V1.000)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 
 /* Gives I/O errors */
-GAME( 1996, magzun,    stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 	    				"Magical Zunou Power (J 961031 V1.000)", GAME_NOT_WORKING )
+GAME( 1996, magzun,    stvbios, stv,      stv,		magzun,    	ROT0,   "Sega", 	    				"Magical Zunou Power (J 961031 V1.000)", GAME_NOT_WORKING )
 GAME( 1997, techbowl,  stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 	    				"Technical Bowling (J 971212 V1.000)", GAME_NOT_WORKING )
 GAME( 1999, micrombc,  stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 	    				"Microman Battle Charge (J 990326 V1.000)", GAME_NOT_WORKING )
 
