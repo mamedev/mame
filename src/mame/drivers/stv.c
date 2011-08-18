@@ -43,19 +43,147 @@ offsets:
     7h
     7l PORT-AD
 */
-static const UINT8 port_ad[] =
-{
-	0xcc,0xb2,0x99,0x7f,0x66,0x4c,0x33,0x19
-};
 
-READ32_HANDLER ( stv_io_r32 )
+static READ8_HANDLER( stv_ioga_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-//  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, mem_mask);
-//  popmessage("SEL: %02x MUX: %02x OFF: %02x",state->m_port_sel,state->m_mux_data,offset*4);
+	UINT8 res;
 
-//	printf("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, mem_mask);
+	res = 0xff;
+	offset &= 0x1f; // mirror?
 
+	switch(offset)
+	{
+		case 0x01: res = input_port_read(space->machine(), "P1"); break; // port A
+		case 0x03: res = input_port_read(space->machine(), "P2"); break; // port B
+		case 0x05: res = input_port_read(space->machine(), "SYSTEM"); break; // port C
+		case 0x07: res = state->m_system_output | 0xf0; break; // port D, read-backs value written
+		case 0x1b: res = 0; break; // Serial COM READ status
+	}
+
+	return res;
+}
+
+static WRITE8_HANDLER( stv_ioga_w )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+	offset &= 0x1f; // mirror?
+
+	switch(offset)
+	{
+		case 7:
+			state->m_system_output = data & 0xf;
+			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
+			coin_counter_w(space->machine(), 0,~data & 0x01);
+			coin_counter_w(space->machine(), 1,~data & 0x02);
+			coin_lockout_w(space->machine(), 0,~data & 0x04);
+			coin_lockout_w(space->machine(), 1,~data & 0x08);
+			break;
+	}
+}
+
+static READ8_HANDLER( stv6b_ioga_r )
+{
+	UINT8 res;
+
+	res = 0xff;
+
+	switch(offset)
+	{
+		case 0x9: res = input_port_read(space->machine(), "UNUSED"); break;
+		case 0xb: res = input_port_read(space->machine(), "EXTRA"); break;
+		default: res = stv_ioga_r(space,offset); break;
+	}
+
+	return res;
+}
+
+static READ8_HANDLER( critcrsh_ioga_r )
+{
+	UINT8 res;
+	const char *const lgnames[] = { "LIGHTX", "LIGHTY" };
+
+	res = 0xff;
+
+	switch(offset)
+	{
+		case 0x1:
+		case 0x3:
+			res = input_port_read(space->machine(), lgnames[offset >> 1]);
+			res = BITSWAP8(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
+			res |= (input_port_read(space->machine(), "SYSTEM") & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
+			break;
+		default: res = stv_ioga_r(space,offset); break;
+	}
+
+	return res;
+}
+
+static READ8_HANDLER( stvmp_ioga_r )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+	const char *const mpnames[2][5] = {
+		{"KEY0", "KEY1", "KEY2", "KEY3", "KEY4"},
+		{"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"} }; /* TODO: improve names */
+	UINT8 res;
+
+	res = 0xff;
+
+	switch(offset)
+	{
+		case 1:
+		case 3:
+			/* TODO: I actually don't think that this variable selects what to use there ... */
+			if(state->m_port_sel & 0x10) // joystick select
+				res = stv_ioga_r(space,offset);
+			else // mahjong panel select
+			{
+				int i;
+
+				res = 0;
+				for(i=0;i<5;i++)
+				{
+					if(state->m_mux_data & 1 << i)
+						res |= input_port_read(space->machine(), mpnames[offset >> 1][i]);
+				}
+			}
+			break;
+		default: res = stv_ioga_r(space,offset); break;
+	}
+
+	return res;
+}
+
+static WRITE8_HANDLER( stvmp_ioga_w )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	switch(offset)
+	{
+		case 0x09: state->m_mux_data = data ^ 0xff; break;
+		case 0x11: state->m_port_sel = data; break;
+		default: stv_ioga_w(space,offset,data); break;
+	}
+}
+
+/* remaps with a 8-bit handler because MAME can't install r/w handlers with a different bus parallelism than the CPU native one, shrug ... */
+static READ32_HANDLER( stv_ioga_r32 )
+{
+	//saturn_state *state = space->machine().driver_data<saturn_state>();
+	UINT32 res;
+
+	res = 0;
+	if(ACCESSING_BITS_16_23)
+		res |= stv_ioga_r(space,offset*4+1) << 16;
+	if(ACCESSING_BITS_0_7)
+		res |= stv_ioga_r(space,offset*4+3);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
+
+	return res;
+
+	#if 0
+	/* reference, to be removed ... */
 	switch(offset)
 	{
 		case 0x00/4:
@@ -163,31 +291,27 @@ READ32_HANDLER ( stv_io_r32 )
 		default:
 		return state->m_ioga[offset];
 	}
+	#endif
 }
 
-WRITE32_HANDLER ( stv_io_w32 )
+static WRITE32_HANDLER ( stv_ioga_w32 )
 {
-	saturn_state *state = space->machine().driver_data<saturn_state>();
-//  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+	//saturn_state *state = space->machine().driver_data<saturn_state>();
 
-//	if(data != 0x0c)
-//	printf("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+	if(ACCESSING_BITS_16_23)
+		stv_ioga_w(space,offset*4+1,data >> 16);
+	if(ACCESSING_BITS_0_7)
+		stv_ioga_w(space,offset*4+3,data);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 
+	return;
+
+	#if 0
+	/* reference, to be removed ... */
 	switch(offset)
 	{
 		case 0x04/4:
-			if(ACCESSING_BITS_0_7)
-			{
-				/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
-				state->m_ioga[1] = (data) & 0xff;
-				coin_counter_w(space->machine(), 0,~data & 0x01);
-				coin_counter_w(space->machine(), 1,~data & 0x02);
-				coin_lockout_w(space->machine(), 0,~data & 0x04);
-				coin_lockout_w(space->machine(), 1,~data & 0x08);
-				/*
-                other bits reserved
-                */
-			}
 			break;
 		case 0x08/4:
 			if(ACCESSING_BITS_16_23)
@@ -218,6 +342,66 @@ WRITE32_HANDLER ( stv_io_w32 )
 			break;
 
 	}
+	#endif
+}
+
+static READ32_HANDLER( stv6b_ioga_r32 )
+{
+	UINT32 res;
+
+	res = 0;
+	if(ACCESSING_BITS_16_23)
+		res |= stv6b_ioga_r(space,offset*4+1) << 16;
+	if(ACCESSING_BITS_0_7)
+		res |= stv6b_ioga_r(space,offset*4+3);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		if(!space->debugger_access())
+			printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
+
+	return res;
+}
+
+static READ32_HANDLER( critcrsh_ioga_r32 )
+{
+	UINT32 res;
+
+	res = 0;
+	if(ACCESSING_BITS_16_23)
+		res |= critcrsh_ioga_r(space,offset*4+1) << 16;
+	if(ACCESSING_BITS_0_7)
+		res |= critcrsh_ioga_r(space,offset*4+3);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		if(!space->debugger_access())
+			printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
+
+	return res;
+}
+
+static READ32_HANDLER( stvmp_ioga_r32 )
+{
+	UINT32 res;
+
+	res = 0;
+	if(ACCESSING_BITS_16_23)
+		res |= stvmp_ioga_r(space,offset*4+1) << 16;
+	if(ACCESSING_BITS_0_7)
+		res |= stvmp_ioga_r(space,offset*4+3);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		if(!space->debugger_access())
+			printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
+
+	return res;
+}
+
+static WRITE32_HANDLER( stvmp_ioga_w32 )
+{
+	if(ACCESSING_BITS_16_23)
+		stvmp_ioga_w(space,offset*4+1,data >> 16);
+	if(ACCESSING_BITS_0_7)
+		stvmp_ioga_w(space,offset*4+3,data);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		if(!space->debugger_access())
+			printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
 /*
@@ -291,6 +475,69 @@ void install_stvbios_speedups(running_machine &machine)
 	sh2drc_add_pcflush(machine.device("slave"), 0x60154b2);
 	sh2drc_add_pcflush(machine.device("slave"), 0x6013aee);
 }
+
+DRIVER_INIT( stv )
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	system_time systime;
+
+	machine.base_datetime(systime);
+
+	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
+	state->m_minit_boost = 400;
+	state->m_sinit_boost = 400;
+	state->m_minit_boost_timeslice = attotime::zero;
+	state->m_sinit_boost_timeslice = attotime::zero;
+
+	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
+	state->m_scsp_regs  = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_backupram = auto_alloc_array_clear(machine, UINT8, 0x8000);
+
+	install_stvbios_speedups(machine);
+
+	// do strict overwrite verification - maruchan and rsgun crash after coinup without this.
+	// cottonbm needs strict PCREL
+	// todo: test what games need this and don't turn it on for them...
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine.device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+
+	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
+	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
+	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
+	//machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
+	//machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stv_ioga_r32), FUNC(stv_ioga_w32));
+	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stv_ioga_r32), FUNC(stv_ioga_w32));
+
+	state->m_vdp2.pal = 0;
+}
+
+DRIVER_INIT(stv6b)
+{
+	DRIVER_INIT_CALL(stv);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stv6b_ioga_r32), FUNC(stv_ioga_w32));
+	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stv6b_ioga_r32), FUNC(stv_ioga_w32));
+}
+
+DRIVER_INIT(critcrsh)
+{
+	DRIVER_INIT_CALL(stv);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(critcrsh_ioga_r32), FUNC(stv_ioga_w32));
+	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(critcrsh_ioga_r32), FUNC(stv_ioga_w32));
+}
+
+
+DRIVER_INIT(stvmp)
+{
+	DRIVER_INIT_CALL(stv);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stvmp_ioga_r32), FUNC(stvmp_ioga_w32));
+	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stvmp_ioga_r32), FUNC(stvmp_ioga_w32));
+}
+
 
 DRIVER_INIT(shienryu)
 {
@@ -478,7 +725,7 @@ DRIVER_INIT( groovef )
 
 	sh2drc_add_pcflush(machine.device("slave"), 0x60060c2);
 
-	DRIVER_INIT_CALL(stv);
+	DRIVER_INIT_CALL(stv6b);
 
 	state->m_minit_boost = state->m_sinit_boost = 0;
 	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
@@ -492,7 +739,7 @@ DRIVER_INIT( danchih )
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6028c8e);
 	sh2drc_add_pcflush(machine.device("slave"), 0x602ae26);
 
-	DRIVER_INIT_CALL(stv);
+	DRIVER_INIT_CALL(stvmp);
 
 	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(5);
 }
@@ -542,7 +789,7 @@ DRIVER_INIT( astrass )
 
 	install_astrass_protection(machine);
 
-	DRIVER_INIT_CALL(stv);
+	DRIVER_INIT_CALL(stv6b);
 }
 
 DRIVER_INIT(thunt)
@@ -681,16 +928,16 @@ DRIVER_INIT(sasissu)
 
 DRIVER_INIT(gaxeduel)
 {
-	sh2drc_add_pcflush(machine.device("maincpu"), 0x6012ee4);
+//	sh2drc_add_pcflush(machine.device("maincpu"), 0x6012ee4);
 
-	DRIVER_INIT_CALL(stv);
+	DRIVER_INIT_CALL(stv6b);
 }
 
 DRIVER_INIT(suikoenb)
 {
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6013f7a);
 
-	DRIVER_INIT_CALL(stv);
+	DRIVER_INIT_CALL(stv6b);
 }
 
 
@@ -794,7 +1041,7 @@ DRIVER_INIT(elandore)
 
 	install_elandore_protection(machine);
 
-	DRIVER_INIT_CALL(stv);
+	DRIVER_INIT_CALL(stv6b);
 	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(0);
 }
 
@@ -2006,28 +2253,28 @@ GAME( 1996, stvbios,   0,       stv_slot, stv,      stv,        ROT0,   "Sega", 
 
 //GAME YEAR, NAME,     PARENT,  MACH, INP, INIT,      MONITOR
 /* Playable */
-GAME( 1998, astrass,   stvbios, stv,      stv,      astrass,	ROT0,   "Sunsoft",  					"Astra SuperStars (J 980514 V1.002)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, astrass,   stvbios, stv,      stv6b,    astrass,	ROT0,   "Sunsoft",  					"Astra SuperStars (J 980514 V1.002)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, bakubaku,  stvbios, stv,      stv,	    stv,    	ROT0,   "Sega",     					"Baku Baku Animal (J 950407 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, batmanfr,  stvbios, stv,      batmanfr,	batmanfr,	ROT0,	"Acclaim",  					"Batman Forever (JUE 960507 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, batmanfr,  stvbios, stv,      stv,		batmanfr,	ROT0,	"Acclaim",  					"Batman Forever (JUE 960507 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, colmns97,  stvbios, stv,      stv,		colmns97,	ROT0,   "Sega", 						"Columns '97 (JET 961209 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, cotton2,   stvbios, stv,      stv,		cotton2,	ROT0,   "Success",  					"Cotton 2 (JUET 970902 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, cottonbm,  stvbios, stv,      stv,		cottonbm,	ROT0,   "Success",  					"Cotton Boomerang (JUET 980709 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, critcrsh,  stvbios, stv,      critcrsh,	stv,		ROT0,   "Sega", 	    				"Critter Crusher (EA 951204 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, critcrsh,  stvbios, stv,      critcrsh,	critcrsh,	ROT0,   "Sega", 	    				"Critter Crusher (EA 951204 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, danchih,   stvbios, stv,      stvmp,	danchih,	ROT0,   "Altron (Tecmo license)",   	"Danchi de Hanafuda (J 990607 V1.400)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, danchiq,   stvbios, stv,      stv,		danchih,	ROT0,   "Altron",   					"Danchi de Quiz Okusan Yontaku Desuyo! (J 001128 V1.200)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv,      stv,		diehard,	ROT0,   "Sega", 						"Die Hard Arcade (UET 960515 V1.000)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND  )
 GAME( 1996, dnmtdeka,  diehard, stv,      stv,		dnmtdeka,	ROT0,   "Sega", 						"Dynamite Deka (J 960515 V1.000)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 						"Ejihon Tantei Jimusyo (J 950613 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, fhboxers,  stvbios, stv,      stv,		fhboxers,	ROT0,   "Sega", 						"Funky Head Boxers (JUETBKAL 951218 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, gaxeduel,  stvbios, stv,      stv,		gaxeduel,	ROT0,   "Sega", 	    				"Golden Axe - The Duel (JUETL 950117 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
+GAME( 1994, gaxeduel,  stvbios, stv,      stv6b,	gaxeduel,	ROT0,   "Sega", 	    				"Golden Axe - The Duel (JUETL 950117 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
 GAME( 1998, grdforce,  stvbios, stv,      stv,		grdforce,	ROT0,   "Success",  					"Guardian Force (JUET 980318 V0.105)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, groovef,   stvbios, stv,      stv,		groovef,	ROT0,   "Atlus",    					"Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, groovef,   stvbios, stv,      stv6b,	groovef,	ROT0,   "Atlus",    					"Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, hanagumi,  stvbios, stv,      stv,		hanagumi,	ROT0,   "Sega",     					"Hanagumi Taisen Columns - Sakura Wars (J 971007 V1.010)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, introdon,  stvbios, stv,      stv,		stv,    	ROT0,   "Sunsoft / Success",			"Karaoke Quiz Intro Don Don! (J 960213 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, kiwames,   stvbios, stv,      stvmp,	stv,    	ROT0,   "Athena",   					"Pro Mahjong Kiwame S (J 951020 V1.208)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, kiwames,   stvbios, stv,      stvmp,	stvmp,    	ROT0,   "Athena",   					"Pro Mahjong Kiwame S (J 951020 V1.208)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, maruchan,  stvbios, stv,      stv,		maruchan,	ROT0,   "Sega / Toyosuisan",	    	"Maru-Chan de Goo! (J 971216 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, mausuke,   stvbios, stv,      stv,		mausuke,	ROT0,   "Data East",					"Mausuke no Ojama the World (J 960314 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, myfairld,  stvbios, stv,      stvmp,	stv,    	ROT0,   "Micronet",                 	"Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, myfairld,  stvbios, stv,      stvmp,	stvmp,    	ROT0,   "Micronet",                 	"Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, othellos,  stvbios, stv,      stv,		othellos,	ROT0,   "Success",  					"Othello Shiyouyo (J 980423 V1.002)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, pblbeach,  stvbios, stv,      stv,		pblbeach,	ROT0,   "T&E Soft",                 	"Pebble Beach - The Great Shot (JUE 950913 V0.990)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, prikura,   stvbios, stv,      stv,		prikura,	ROT0,   "Atlus",    					"Princess Clara Daisakusen (J 960910 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
@@ -2045,15 +2292,15 @@ GAME( 1997, thuntk,    sandor,  stv,      stv,		sandor, 	ROT0,   "Sega / Deniam"
 GAME( 1995, smleague,  stvbios, stv,      stv,		smleague,	ROT0,   "Sega", 	    				"Super Major League (U 960108 V1.000)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, finlarch,  smleague,stv,      stv,		finlarch,	ROT0,   "Sega", 	    				"Final Arch (J 950714 V1.001)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sokyugrt,  stvbios, stv,      stv,		sokyugrt,	ROT0,   "Raizing / Eighting",   		"Soukyugurentai / Terra Diver (JUET 960821 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, suikoenb,  stvbios, stv,      stv,		suikoenb,	ROT0,   "Data East",                	"Suikoenbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, suikoenb,  stvbios, stv,      stv6b,	suikoenb,	ROT0,   "Data East",                	"Suikoenbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, vfkids,    stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 						"Virtua Fighter Kids (JUET 960319 V0.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, vmahjong,  stvbios, stv,      stvmp,	stv,    	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, vmahjong,  stvbios, stv,      stvmp,	stvmp,    	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, winterht,  stvbios, stv,      stv,		winterht,	ROT0,   "Sega", 						"Winter Heat (JUET 971012 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv,      stv,		znpwfv, 	ROT0,   "Sega", 	    				"Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* Almost */
 GAME( 1998, twcup98,   stvbios, stv,      stv,		twcup98,	ROT0,   "Tecmo",                    	"Tecmo World Cup '98 (JUET 980410 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // player movement
-GAME( 1998, elandore,  stvbios, stv,      stv,		elandore,	ROT0,   "Sai-Mate", 					"Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, elandore,  stvbios, stv,      stv6b,	elandore,	ROT0,   "Sai-Mate", 					"Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* Unemulated printer device */
 GAME( 1998, stress,    stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 	    				"Stress Busters (J 981020 V1.000)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
