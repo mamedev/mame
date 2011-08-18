@@ -22,26 +22,28 @@ I/O overview:
     PORT-E  I/O 1
     PORT-F  I/O 2
     PORT-G  I/O 3
-    PORT-AD AD-Stick inputs?(Fake for now...)
+    PORT-AD AD-Stick inputs?
     SERIAL COM
 
 offsets:
-    0h PORT-A
-    0l PORT-B
-    1h PORT-C
-    1l PORT-D
-    2h PORT-E
-    2l PORT-F (extra button layout)
-    3h PORT-G
-    3l
-    4h PORT-SEL
-    4l
-    5h SERIAL COM WRITE
-    5l
-    6h SERIAL COM READ
-    6l
-    7h
-    7l PORT-AD
+    0x0001 PORT-A (P1)
+    0x0003 PORT-B (P2)
+    0x0005 PORT-C (SYSTEM)
+    0x0007 PORT-D (OUTPUT)
+    0x0009 PORT-E (P3)
+    0x000b PORT-F (P4 / Extra 6B layout)
+    0x000d PORT-G
+    0x000f
+    0x0011 PORT_SEL?
+    ---x ---- joystick/mahjong panel select
+    ---- x--- used in danchih (different mux scheme for the hanafuda panel?)
+    0x0013
+    0x0015 SERIAL COM Tx
+    0x0017
+    0x0019 SERIAL COM Rx
+    0x001b
+    0x001d <Technical Bowling>
+    0x001f PORT-AD
 */
 
 static READ8_HANDLER( stv_ioga_r )
@@ -52,12 +54,17 @@ static READ8_HANDLER( stv_ioga_r )
 	res = 0xff;
 	offset &= 0x1f; // mirror?
 
+	if(offset & 0x20 && !space->debugger_access())
+		printf("Reading from mirror %08x?\n",offset);
+
 	switch(offset)
 	{
-		case 0x01: res = input_port_read(space->machine(), "P1"); break; // port A
-		case 0x03: res = input_port_read(space->machine(), "P2"); break; // port B
-		case 0x05: res = input_port_read(space->machine(), "SYSTEM"); break; // port C
+		case 0x01: res = input_port_read(space->machine(), "PORTA"); break; // P1
+		case 0x03: res = input_port_read(space->machine(), "PORTB"); break; // P2
+		case 0x05: res = input_port_read(space->machine(), "PORTC"); break; // SYSTEM
 		case 0x07: res = state->m_system_output | 0xf0; break; // port D, read-backs value written
+		case 0x09: res = input_port_read(space->machine(), "PORTE"); break; // P3
+		case 0x0b: res = input_port_read(space->machine(), "PORTF"); break; // P4
 		case 0x1b: res = 0; break; // Serial COM READ status
 	}
 
@@ -69,9 +76,12 @@ static WRITE8_HANDLER( stv_ioga_w )
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	offset &= 0x1f; // mirror?
 
+	if(offset & 0x20 && !space->debugger_access())
+		printf("Reading from mirror %08x?\n",offset);
+
 	switch(offset)
 	{
-		case 7:
+		case 0x07:
 			state->m_system_output = data & 0xf;
 			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
 			coin_counter_w(space->machine(), 0,~data & 0x01);
@@ -80,22 +90,6 @@ static WRITE8_HANDLER( stv_ioga_w )
 			coin_lockout_w(space->machine(), 1,~data & 0x08);
 			break;
 	}
-}
-
-static READ8_HANDLER( stv6b_ioga_r )
-{
-	UINT8 res;
-
-	res = 0xff;
-
-	switch(offset)
-	{
-		case 0x9: res = input_port_read(space->machine(), "UNUSED"); break;
-		case 0xb: res = input_port_read(space->machine(), "EXTRA"); break;
-		default: res = stv_ioga_r(space,offset); break;
-	}
-
-	return res;
 }
 
 static READ8_HANDLER( critcrsh_ioga_r )
@@ -107,11 +101,11 @@ static READ8_HANDLER( critcrsh_ioga_r )
 
 	switch(offset)
 	{
-		case 0x1:
-		case 0x3:
+		case 0x01:
+		case 0x03:
 			res = input_port_read(space->machine(), lgnames[offset >> 1]);
 			res = BITSWAP8(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-			res |= (input_port_read(space->machine(), "SYSTEM") & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
+			res |= (input_port_read(space->machine(), "PORTC") & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
 			break;
 		default: res = stv_ioga_r(space,offset); break;
 	}
@@ -123,28 +117,26 @@ static READ8_HANDLER( stvmp_ioga_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	const char *const mpnames[2][5] = {
-		{"KEY0", "KEY1", "KEY2", "KEY3", "KEY4"},
-		{"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"} }; /* TODO: improve names */
+		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
+		{"P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4"} };
 	UINT8 res;
 
 	res = 0xff;
 
 	switch(offset)
 	{
-		case 1:
-		case 3:
-			/* TODO: I actually don't think that this variable selects what to use there ... */
+		case 0x01:
+		case 0x03:
 			if(state->m_port_sel & 0x10) // joystick select
 				res = stv_ioga_r(space,offset);
 			else // mahjong panel select
 			{
 				int i;
 
-				res = 0;
 				for(i=0;i<5;i++)
 				{
 					if(state->m_mux_data & 1 << i)
-						res |= input_port_read(space->machine(), mpnames[offset >> 1][i]);
+						res = input_port_read(space->machine(), mpnames[offset >> 1][i]);
 				}
 			}
 			break;
@@ -162,7 +154,7 @@ static WRITE8_HANDLER( stvmp_ioga_w )
 	{
 		case 0x09: state->m_mux_data = data ^ 0xff; break;
 		case 0x11: state->m_port_sel = data; break;
-		default: stv_ioga_w(space,offset,data); break;
+		default:   stv_ioga_w(space,offset,data); break;
 	}
 }
 
@@ -181,117 +173,6 @@ static READ32_HANDLER( stv_ioga_r32 )
 		printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
-
-	#if 0
-	/* reference, to be removed ... */
-	switch(offset)
-	{
-		case 0x00/4:
-		switch(state->m_port_sel)
-		{
-			case 0x77: return 0xff000000|(input_port_read(space->machine(), "P1") << 16) |0x0000ff00|(input_port_read(space->machine(), "P2"));
-			case 0x67:
-			{
-				switch(state->m_mux_data)
-				{
-					/*Mahjong panel interface,bit wise(ACTIVE LOW)*/
-					case 0xfe:	return 0xff000000 | (input_port_read_safe(space->machine(), "KEY0", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY5", 0));
-					case 0xfd:  return 0xff000000 | (input_port_read_safe(space->machine(), "KEY1", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY6", 0));
-					case 0xfb:	return 0xff000000 | (input_port_read_safe(space->machine(), "KEY2", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY7", 0));
-					case 0xf7:	return 0xff000000 | (input_port_read_safe(space->machine(), "KEY3", 0) << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY8", 0));
-					case 0xef:  return 0xff000000 | (input_port_read_safe(space->machine(), "KEY4", 0) << 16) | 0x0000ff00 | (input_port_read_safe(space->machine(), "KEY9", 0));
-					/*Joystick panel*/
-					default:
-					//popmessage("%02x MUX DATA",state->m_mux_data);
-				    return (input_port_read(space->machine(), "P1") << 16) | (input_port_read(space->machine(), "P2"));
-				}
-			}
-			case 0x47:
-			{
-				if ( strcmp(space->machine().system().name,"critcrsh") == 0 )
-				{
-					int data1 = 0, data2 = 0;
-
-					/* Critter Crusher */
-					data1 = input_port_read(space->machine(), "LIGHTX");
-					data1 = BITSWAP8(data1, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-					data1 |= (input_port_read(space->machine(), "P1") & 1) ? 0x0 : 0x4;
-					data2 = input_port_read(space->machine(), "LIGHTY");
-					data2 = BITSWAP8(data2, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-					data2 |= (input_port_read(space->machine(), "P1") & 1) ? 0x0 : 0x4;
-
-					return 0xff000000 | data1 << 16 | 0x0000ff00 | data2;
-				}
-			}
-			//default:
-			//case 0x40: return space->machine().rand();
-			default:
-			//popmessage("%02x PORT SEL",state->m_port_sel);
-			return (input_port_read(space->machine(), "P1") << 16) | (input_port_read(space->machine(), "P2"));
-		}
-		case 0x04/4:
-		if ( strcmp(space->machine().system().name,"critcrsh") == 0 )
-			return ((input_port_read(space->machine(), "SYSTEM") << 16) & ((input_port_read(space->machine(), "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (state->m_ioga[1]);
-		else
-			return (input_port_read(space->machine(), "SYSTEM") << 16) | (state->m_ioga[1]);
-
-		case 0x08/4:
-		switch(state->m_port_sel)
-		{
-			case 0x77:	return (input_port_read(space->machine(), "UNUSED") << 16) | (input_port_read(space->machine(), "EXTRA"));
-			case 0x67:	return 0xffffffff;/**/
-			case 0x20:  return 0xffff0000 | (state->m_ioga[2] & 0xffff);
-			case 0x10:  return ((state->m_ioga[2] & 0xffff) << 16) | 0xffff;
-			case 0x60:  return 0xffffffff;/**/
-			default:
-			return 0xffffffff;
-		}
-		case 0x0c/4:
-		switch(state->m_port_sel)
-		{
-			case 0x60:  return ((state->m_ioga[2] & 0xffff) << 16) | 0xffff;
-			default:
-			//popmessage("offs: 3 %02x",state->m_port_sel);
-			return 0xffffffff;
-		}
-		//case 0x10/4:
-		case 0x14/4:
-		switch(state->m_port_sel)
-		{
-			case 0x77:
-			{
-				//popmessage("(PC=%06x) offs 5 %04x %02x",cpu_get_pc(&space->device()),state->m_port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
-				logerror("(PC=%06x) offs 5 %04x %02x\n",cpu_get_pc(&space->device()),state->m_port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
-
-				//stv_m_workram_h[0x8e830/4] = ((state->m_ioga[5] & 0xff0000) >> 16) ^ 0x3;
-				//stv_m_workram_h[0x8e834/4] = ((state->m_ioga[5] & 0xff0000) >> 16) ^ 0x3;
-				return (state->m_ioga[5] & 0xff0000) >> 16;//stv_m_workram_h[0x8e830/4];//sound board data
-			}
-			default: return 0xffffffff;
-		}
-		case 0x18/4:
-		switch(state->m_port_sel)
-		{
-			case 0x60:  return state->m_ioga[5];
-			case 0x77:
-			{
-				//popmessage("(PC=%06x) offs 6 %04x %02x",cpu_get_pc(&space->device()),state->m_port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
-				logerror("(PC=%06x) offs 6 %04x %02x\n",cpu_get_pc(&space->device()),state->m_port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
-				return 0;//sound board status,non-zero = processing
-			}
-			default:
-			//popmessage("offs: 6 %02x",state->m_port_sel);
-			return 0xffffffff;
-		}
-		case 0x1c/4:
-		if(LOG_IOGA) logerror("(PC %s=%06x) Warning: READ from PORT_AD\n", space->device().tag(), cpu_get_pc(&space->device()));
-		popmessage("Read from PORT_AD");
-		state->m_port_i++;
-		return port_ad[state->m_port_i & 7];
-		default:
-		return state->m_ioga[offset];
-	}
-	#endif
 }
 
 static WRITE32_HANDLER ( stv_ioga_w32 )
@@ -306,59 +187,6 @@ static WRITE32_HANDLER ( stv_ioga_w32 )
 		printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 
 	return;
-
-	#if 0
-	/* reference, to be removed ... */
-	switch(offset)
-	{
-		case 0x04/4:
-			break;
-		case 0x08/4:
-			if(ACCESSING_BITS_16_23)
-			{
-				state->m_ioga[2] = data >> 16;
-				state->m_mux_data = state->m_ioga[2];
-			}
-			else if(ACCESSING_BITS_0_7)
-				state->m_ioga[2] = data;
-			break;
-		case 0x0c/4:
-			if(ACCESSING_BITS_16_23)
-				state->m_ioga[3] = data;
-			break;
-		case 0x10/4:
-			if(ACCESSING_BITS_16_23)
-				state->m_port_sel = (data & 0xffff0000) >> 16;
-			break;
-		case 0x14/4:
-			if(ACCESSING_BITS_16_23)
-				state->m_ioga[5] = data;
-			break;
-		//case 0x18/4:
-		case 0x1c/4:
-			//technical bowling tests here
-			if(ACCESSING_BITS_16_23)
-				state->m_ioga[7] = data;
-			break;
-
-	}
-	#endif
-}
-
-static READ32_HANDLER( stv6b_ioga_r32 )
-{
-	UINT32 res;
-
-	res = 0;
-	if(ACCESSING_BITS_16_23)
-		res |= stv6b_ioga_r(space,offset*4+1) << 16;
-	if(ACCESSING_BITS_0_7)
-		res |= stv6b_ioga_r(space,offset*4+3);
-	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
-		if(!space->debugger_access())
-			printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
-
-	return res;
 }
 
 static READ32_HANDLER( critcrsh_ioga_r32 )
@@ -403,48 +231,6 @@ static WRITE32_HANDLER( stvmp_ioga_w32 )
 		if(!space->debugger_access())
 			printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
-
-/*
-EEPROM write 0000 to address 2d
-EEPROM write 0000 to address 2e
-EEPROM write 0000 to address 2f
-EEPROM write 0000 to address 30
-EEPROM write ffff to address 31
-EEPROM write ffff to address 32
-EEPROM write ffff to address 33
-EEPROM write ffff to address 34
-EEPROM write ffff to address 35
-EEPROM write ffff to address 36
-EEPROM write ffff to address 37
-EEPROM write ffff to address 38
-EEPROM write ffff to address 39
-EEPROM write ffff to address 3a
-EEPROM write ffff to address 3b
-EEPROM write ffff to address 3c
-EEPROM write ffff to address 3d
-EEPROM write ffff to address 3e
-EEPROM write ffff to address 3f
-*/
-#if 0
-static const UINT8 stv_default_eeprom[128] = {
-    0x53,0x45,0xff,0xff,0xff,0xff,0x3b,0xe2,
-    0x00,0x00,0x00,0x00,0x00,0x02,0x01,0x00,
-    0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x08,
-    0x08,0xfd,0x10,0x04,0x23,0x2a,0x00,0x00,
-    0x00,0x00,0x00,0x00,0xff,0xff,0xff,0xff,
-    0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-    0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-    0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-    0xff,0xff,0x3b,0xe2,0xff,0xff,0x00,0x00,
-    0x00,0x01,0x01,0x00,0x01,0x01,0x00,0x00,
-    0x00,0x00,0x00,0x08,0x08,0xfd,0x10,0x04,
-    0x23,0x2a,0x00,0x00,0x00,0x00,0x00,0x00,
-    0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-    0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-    0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-    0xff,0xff,0xff,0xff
-};
-#endif
 
 /*
 
@@ -501,24 +287,10 @@ DRIVER_INIT( stv )
 	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 	sh2drc_set_options(machine.device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
-	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
-	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
-	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
-	//machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
-	//machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
-
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stv_ioga_r32), FUNC(stv_ioga_w32));
 	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stv_ioga_r32), FUNC(stv_ioga_w32));
 
 	state->m_vdp2.pal = 0;
-}
-
-DRIVER_INIT(stv6b)
-{
-	DRIVER_INIT_CALL(stv);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stv6b_ioga_r32), FUNC(stv_ioga_w32));
-	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(stv6b_ioga_r32), FUNC(stv_ioga_w32));
 }
 
 DRIVER_INIT(critcrsh)
@@ -725,7 +497,7 @@ DRIVER_INIT( groovef )
 
 	sh2drc_add_pcflush(machine.device("slave"), 0x60060c2);
 
-	DRIVER_INIT_CALL(stv6b);
+	DRIVER_INIT_CALL(stv);
 
 	state->m_minit_boost = state->m_sinit_boost = 0;
 	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
@@ -740,6 +512,19 @@ DRIVER_INIT( danchih )
 	sh2drc_add_pcflush(machine.device("slave"), 0x602ae26);
 
 	DRIVER_INIT_CALL(stvmp);
+
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(5);
+}
+
+DRIVER_INIT( danchiq )
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x6028b28);
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x6028c8e);
+	sh2drc_add_pcflush(machine.device("slave"), 0x602ae26);
+
+	DRIVER_INIT_CALL(stv);
 
 	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(5);
 }
@@ -789,7 +574,7 @@ DRIVER_INIT( astrass )
 
 	install_astrass_protection(machine);
 
-	DRIVER_INIT_CALL(stv6b);
+	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(thunt)
@@ -930,14 +715,14 @@ DRIVER_INIT(gaxeduel)
 {
 //	sh2drc_add_pcflush(machine.device("maincpu"), 0x6012ee4);
 
-	DRIVER_INIT_CALL(stv6b);
+	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(suikoenb)
 {
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6013f7a);
 
-	DRIVER_INIT_CALL(stv6b);
+	DRIVER_INIT_CALL(stv);
 }
 
 
@@ -1041,7 +826,7 @@ DRIVER_INIT(elandore)
 
 	install_elandore_protection(machine);
 
-	DRIVER_INIT_CALL(stv6b);
+	DRIVER_INIT_CALL(stv);
 	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(0);
 }
 
@@ -2261,7 +2046,7 @@ GAME( 1997, cotton2,   stvbios, stv,      stv,		cotton2,	ROT0,   "Success",  			
 GAME( 1998, cottonbm,  stvbios, stv,      stv,		cottonbm,	ROT0,   "Success",  					"Cotton Boomerang (JUET 980709 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, critcrsh,  stvbios, stv,      critcrsh,	critcrsh,	ROT0,   "Sega", 	    				"Critter Crusher (EA 951204 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, danchih,   stvbios, stv,      stvmp,	danchih,	ROT0,   "Altron (Tecmo license)",   	"Danchi de Hanafuda (J 990607 V1.400)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, danchiq,   stvbios, stv,      stv,		danchih,	ROT0,   "Altron",   					"Danchi de Quiz Okusan Yontaku Desuyo! (J 001128 V1.200)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, danchiq,   stvbios, stv,      stv,		danchiq,	ROT0,   "Altron",   					"Danchi de Quiz Okusan Yontaku Desuyo! (J 001128 V1.200)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv,      stv,		diehard,	ROT0,   "Sega", 						"Die Hard Arcade (UET 960515 V1.000)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND  )
 GAME( 1996, dnmtdeka,  diehard, stv,      stv,		dnmtdeka,	ROT0,   "Sega", 						"Dynamite Deka (J 960515 V1.000)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 						"Ejihon Tantei Jimusyo (J 950613 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
@@ -2274,7 +2059,7 @@ GAME( 1996, introdon,  stvbios, stv,      stv,		stv,    	ROT0,   "Sunsoft / Succ
 GAME( 1995, kiwames,   stvbios, stv,      stvmp,	stvmp,    	ROT0,   "Athena",   					"Pro Mahjong Kiwame S (J 951020 V1.208)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, maruchan,  stvbios, stv,      stv,		maruchan,	ROT0,   "Sega / Toyosuisan",	    	"Maru-Chan de Goo! (J 971216 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, mausuke,   stvbios, stv,      stv,		mausuke,	ROT0,   "Data East",					"Mausuke no Ojama the World (J 960314 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, myfairld,  stvbios, stv,      stvmp,	stvmp,    	ROT0,   "Micronet",                 	"Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, myfairld,  stvbios, stv,      myfairld,	stvmp,    	ROT0,   "Micronet",                 	"Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, othellos,  stvbios, stv,      stv,		othellos,	ROT0,   "Success",  					"Othello Shiyouyo (J 980423 V1.002)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, pblbeach,  stvbios, stv,      stv,		pblbeach,	ROT0,   "T&E Soft",                 	"Pebble Beach - The Great Shot (JUE 950913 V0.990)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, prikura,   stvbios, stv,      stv,		prikura,	ROT0,   "Atlus",    					"Princess Clara Daisakusen (J 960910 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
@@ -2294,7 +2079,7 @@ GAME( 1995, finlarch,  smleague,stv,      stv,		finlarch,	ROT0,   "Sega", 	    	
 GAME( 1996, sokyugrt,  stvbios, stv,      stv,		sokyugrt,	ROT0,   "Raizing / Eighting",   		"Soukyugurentai / Terra Diver (JUET 960821 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, suikoenb,  stvbios, stv,      stv6b,	suikoenb,	ROT0,   "Data East",                	"Suikoenbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, vfkids,    stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 						"Virtua Fighter Kids (JUET 960319 V0.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, vmahjong,  stvbios, stv,      stvmp,	stvmp,    	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, vmahjong,  stvbios, stv,      myfairld,	stvmp,    	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, winterht,  stvbios, stv,      stv,		winterht,	ROT0,   "Sega", 						"Winter Heat (JUET 971012 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv,      stv,		znpwfv, 	ROT0,   "Sega", 	    				"Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
