@@ -127,12 +127,12 @@ static READ8_HANDLER( magzun_ioga_r )
 
 	switch(offset)
 	{
-		//case 0x17:
-		//	res = 'K';
-		//	break;
-		//case 0x19:
-		//	res = 'a';
-		//	break;
+		case 0x17:
+			res = 0;
+			break;
+		case 0x19:
+			res = 0;
+			break;
 		default: res = stv_ioga_r(space,offset); break;
 	}
 

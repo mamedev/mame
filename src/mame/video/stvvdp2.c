@@ -183,7 +183,7 @@ enum
        | LSMD1    | LSMD0    | VRESO1   | VRESO0   |    --    | HRESO2   | HRESO1   | HRESO0   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_TVMD	((state->m_vdp2_regs[0x000/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_TVMD	(state->m_vdp2_regs[0x000/2])
 
 	#define STV_VDP2_DISP   ((STV_VDP2_TVMD & 0x8000) >> 15)
 	#define STV_VDP2_BDCLMD	((STV_VDP2_TVMD & 0x0100) >> 8)
@@ -198,7 +198,7 @@ enum
        |    --    |    --    |    --    |    --    |    --    |    --    | DASEL    | EXBGEN   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_EXTEN  ((state->m_vdp2_regs[0x000/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_EXTEN  (state->m_vdp2_regs[0x002/2])
 
 	#define STV_VDP2_EXLTEN ((STV_VDP2_EXTEN & 0x0200) >> 9)
 
@@ -216,7 +216,7 @@ enum
        |    --    |    --    |    --    |    --    | VER3     | VER2     | VER1     | VER0     |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_VRSIZE ((state->m_vdp2_regs[0x004/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_VRSIZE (state->m_vdp2_regs[0x006/2])
 
 	#define STV_VDP2_VRAMSZ ((STV_VDP2_VRSIZE & 0x8000) >> 15)
 
@@ -227,7 +227,7 @@ enum
        | HCT7     | HCT6     | HCT5     | HCT4     | HCT3     | HCT2     | HCT1     | HCT0     |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_HCNT ((state->m_vdp2_regs[0x008/4] >> 16)&0x000003ff)
+	#define STV_VDP2_HCNT (state->m_vdp2_regs[0x008/2])
 
 /* 18000A - r/o - VCNT - V-Counter
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -236,7 +236,7 @@ enum
        | VCT7     | VCT6     | VCT5     | VCT4     | VCT3     | VCT2     | VCT1     | VCT0     |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_VCNT ((state->m_vdp2_regs[0x008/4] >> 0)&0x000003ff)
+	#define STV_VDP2_VCNT (state->m_vdp2_regs[0x00a/2])
 
 /* 18000C - RESERVED
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -252,7 +252,7 @@ enum
        | RDBSB11  | RDBSB10  | RDBSB01  | RDBSB00  | RDBSA11  | RDBSA10  | RDBSA01  | RDBSA00  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_RAMCTL ((state->m_vdp2_regs[0x00c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_RAMCTL (state->m_vdp2_regs[0x00e/2])
 
 	#define STV_VDP2_CRKTE ((STV_VDP2_RAMCTL & 0x8000) >> 15)
 	#define STV_VDP2_CRMD  ((STV_VDP2_RAMCTL & 0x3000) >> 12)
@@ -269,7 +269,7 @@ enum
        | VCP2A03  | VCP2A02  | VCP2A01  | VCP2A00  | VCP3A03  | VCP3A02  | VCP3A01  | VCP3A00  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CYCA0L	((state->m_vdp2_regs[0x010/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CYCA0L	(state->m_vdp2_regs[0x010/2])
 
 /* 180012 - r/w - -CYCA0U - VRAM CYCLE PATTERN (BANK A0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -278,7 +278,7 @@ enum
        | VCP6A03  | VCP6A02  | VCP6A01  | VCP6A00  | VCP7A03  | VCP7A02  | VCP7A01  | VCP7A00  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CYCA0U	((state->m_vdp2_regs[0x10/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CYCA0U	(state->m_vdp2_regs[0x012/2])
 
 /* 180014 - r/w - -CYCA1L - VRAM CYCLE PATTERN (BANK A1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -287,7 +287,7 @@ enum
        | VCP2A13  | VCP2A12  | VCP2A11  | VCP2A10  | VCP3A13  | VCP3A12  | VCP3A11  | VCP3A10  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CYCA1L	((state->m_vdp2_regs[0x014/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CYCA1L	(state->m_vdp2_regs[0x014/2])
 
 /* 180016 - r/w - -CYCA1U - VRAM CYCLE PATTERN (BANK A1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -296,7 +296,7 @@ enum
        | VCP6A13  | VCP6A12  | VCP6A11  | VCP6A10  | VCP7A13  | VCP7A12  | VCP7A11  | VCP7A10  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CYCA1U	((state->m_vdp2_regs[0x14/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CYCA1U	(state->m_vdp2_regs[0x016/2])
 
 /* 180018 - r/w - -CYCB0L - VRAM CYCLE PATTERN (BANK B0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -305,7 +305,7 @@ enum
        | VCP2B03  | VCP2B02  | VCP2B01  | VCP2B00  | VCP3B03  | VCP3B02  | VCP3B01  | VCP3B00  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CYCA2L	((state->m_vdp2_regs[0x018/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CYCA2L	(state->m_vdp2_regs[0x018/2])
 
 /* 18001A - r/w - -CYCB0U - VRAM CYCLE PATTERN (BANK B0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -314,7 +314,7 @@ enum
        | VCP6B03  | VCP6B02  | VCP6B01  | VCP6B00  | VCP7B03  | VCP7B02  | VCP7B01  | VCP7B00  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CYCA2U	((state->m_vdp2_regs[0x18/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CYCA2U	(state->m_vdp2_regs[0x01a/2])
 
 /* 18001C - r/w - -CYCB1L - VRAM CYCLE PATTERN (BANK B1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -323,7 +323,7 @@ enum
        | VCP2B13  | VCP2B12  | VCP2B11  | VCP2B10  | VCP3B13  | VCP3B12  | VCP3B11  | VCP3B10  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CYCA3L	((state->m_vdp2_regs[0x01c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CYCA3L	(state->m_vdp2_regs[0x01c/2])
 
 /* 18001E - r/w - -CYCB1U - VRAM CYCLE PATTERN (BANK B1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -332,7 +332,7 @@ enum
        | VCP6B13  | VCP6B12  | VCP6B11  | VCP6B10  | VCP7B13  | VCP7B12  | VCP7B11  | VCP7B10  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CYCA3U	((state->m_vdp2_regs[0x1c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CYCA3U	(state->m_vdp2_regs[0x01e/2])
 
 /* 180020 - r/w - BGON - SCREEN DISPLAY ENABLE
 
@@ -344,7 +344,7 @@ enum
        |    --    |    --    | R1ON     | R0ON     | N3ON     | N2ON     | N1ON     | N0ON     |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_BGON ((state->m_vdp2_regs[0x020/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_BGON (state->m_vdp2_regs[0x020/2])
 
 	// NxOn - Layer Enable Register
 	#define STV_VDP2_xxON ((STV_VDP2_BGON & 0x001f) >> 0) /* to see if anything is enabled */
@@ -371,7 +371,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MZCTL ((state->m_vdp2_regs[0x020/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MZCTL (state->m_vdp2_regs[0x022/2])
 
 	#define STV_VDP2_MZSZV ((STV_VDP2_MZCTL & 0xf000) >> 12)
 	#define STV_VDP2_MZSZH ((STV_VDP2_MZCTL & 0x0f00) >> 8)
@@ -385,13 +385,13 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 */
 
-	#define STV_VDP2_SFSEL ((state->m_vdp2_regs[0x024/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_SFSEL (state->m_vdp2_regs[0x024/2])
 
 /*180026 - Special Function Code
 
 */
 
-	#define STV_VDP2_SFCODE ((state->m_vdp2_regs[0x024/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_SFCODE (state->m_vdp2_regs[0x026/2])
 
 
 /*
@@ -402,7 +402,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    | N0CHCN2  | N0CHCN1  | N0CHCN0  | N0BMSZ1  | N0BMSZ0  | N0BMEN   | N0CHSZ   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CHCTLA ((state->m_vdp2_regs[0x028/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CHCTLA (state->m_vdp2_regs[0x028/2])
 
 /* -------------------------- NBG0 Character Control Registers -------------------------- */
 
@@ -468,7 +468,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    | N3CHCN   | N3CHSZ   |    --    |    --    | N2CHCN   | N2CHSZ   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CHCTLB ((state->m_vdp2_regs[0x028/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CHCTLB (state->m_vdp2_regs[0x02a/2])
 
 /* -------------------------- RBG0 Character Control Registers -------------------------- */
 
@@ -513,7 +513,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_BMPNA ((state->m_vdp2_regs[0x02c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_BMPNA (state->m_vdp2_regs[0x02c/2])
 
 	#define STV_VDP2_N1BMP ((STV_VDP2_BMPNA & 0x0700) >> 8)
 	#define STV_VDP2_N0BMP ((STV_VDP2_BMPNA & 0x0007) >> 0)
@@ -525,7 +525,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_BMPNB ((state->m_vdp2_regs[0x02c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_BMPNB (state->m_vdp2_regs[0x02e/2])
 
 	#define STV_VDP2_R0BMP ((STV_VDP2_BMPNB & 0x0007) >> 0)
 
@@ -536,7 +536,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        | N0SPLT6  | N0SPLT5  | N0SPLT4  | N0SPCN4  | N0SPCN3  | N0SPCN2  | N0SPCN1  | N0SPCN0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PNCN0 ((state->m_vdp2_regs[0x030/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_PNCN0 (state->m_vdp2_regs[0x030/2])
 
 /*  Pattern Data Size
     0 = 2 bytes
@@ -567,7 +567,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PNCN1 ((state->m_vdp2_regs[0x030/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_PNCN1 (state->m_vdp2_regs[0x032/2])
 
 /*  Pattern Data Size
     0 = 2 bytes
@@ -599,7 +599,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PNCN2 ((state->m_vdp2_regs[0x034/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_PNCN2 (state->m_vdp2_regs[0x034/2])
 
 /*  Pattern Data Size
     0 = 2 bytes
@@ -631,7 +631,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        | N3SPLT6  | N3SPLT5  | N3SPLT4  | N3SPCN4  | N3SPCN3  | N3SPCN2  | N3SPCN1  | N3SPCN0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PNCN3 ((state->m_vdp2_regs[0x034/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_PNCN3 (state->m_vdp2_regs[0x036/2])
 
 /*  Pattern Data Size
     0 = 2 bytes
@@ -663,7 +663,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PNCR ((state->m_vdp2_regs[0x038/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_PNCR (state->m_vdp2_regs[0x038/2])
 
 /*  Pattern Data Size
     0 = 2 bytes
@@ -694,7 +694,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        | N3PLSZ1  | N3PLSZ0  |    --    |    --    | N1PLSZ1  | N1PLSZ0  | N0PLSZ1  | N0PLSZ0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PLSZ ((state->m_vdp2_regs[0x038/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_PLSZ (state->m_vdp2_regs[0x03a/2])
 
 	/* NBG0 Plane Size
     00 1H Page x 1V Page
@@ -717,7 +717,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    | N1MP8    | N1MP7    | N1MP6    |    --    | N0MP8    | N0MP7    | N0MP6    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPOFN_ ((state->m_vdp2_regs[0x03c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPOFN_ (state->m_vdp2_regs[0x03c/2])
 
 	/* Higher 3 bits of the map offset for each layer */
 	#define STV_VDP2_N3MP_ ((STV_VDP2_MPOFN_ & 0x7000) >> 12)
@@ -735,7 +735,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPOFR_ ((state->m_vdp2_regs[0x03c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPOFR_ (state->m_vdp2_regs[0x03e/2])
 
 	#define STV_VDP2_RAMP_ ((STV_VDP2_MPOFR_ & 0x0007) >> 0)
 	#define STV_VDP2_RBMP_ ((STV_VDP2_MPOFR_ & 0x0070) >> 4)
@@ -747,7 +747,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    | N0MPA5   | N0MPA4   | N0MPA3   | N0MPA2   | N0MPA1   | N0MPA0   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPABN0 ((state->m_vdp2_regs[0x040/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPABN0 (state->m_vdp2_regs[0x040/2])
 
 	/* N0MPB5 = lower 6 bits of Map Address of Plane B of Tilemap NBG0 */
 	#define STV_VDP2_N0MPB ((STV_VDP2_MPABN0 & 0x3f00) >> 8)
@@ -763,7 +763,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    | N0MPC5   | N0MPC4   | N0MPC3   | N0MPC2   | N0MPC1   | N0MPC0   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPCDN0 ((state->m_vdp2_regs[0x040/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPCDN0 (state->m_vdp2_regs[0x042/2])
 
 	/* N0MPB5 = lower 6 bits of Map Address of Plane D of Tilemap NBG0 */
 	#define STV_VDP2_N0MPD ((STV_VDP2_MPCDN0 & 0x3f00) >> 8)
@@ -779,7 +779,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPABN1 ((state->m_vdp2_regs[0x044/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPABN1 (state->m_vdp2_regs[0x044/2])
 
 	/* N0MPB5 = lower 6 bits of Map Address of Plane B of Tilemap NBG1 */
 	#define STV_VDP2_N1MPB ((STV_VDP2_MPABN1 & 0x3f00) >> 8)
@@ -794,7 +794,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPCDN1 ((state->m_vdp2_regs[0x044/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPCDN1 (state->m_vdp2_regs[0x046/2])
 
 	/* N0MPB5 = lower 6 bits of Map Address of Plane D of Tilemap NBG0 */
 	#define STV_VDP2_N1MPD ((STV_VDP2_MPCDN1 & 0x3f00) >> 8)
@@ -810,7 +810,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPABN2 ((state->m_vdp2_regs[0x048/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPABN2 (state->m_vdp2_regs[0x048/2])
 
 	/* N0MPB5 = lower 6 bits of Map Address of Plane B of Tilemap NBG2 */
 	#define STV_VDP2_N2MPB ((STV_VDP2_MPABN2 & 0x3f00) >> 8)
@@ -825,7 +825,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPCDN2 ((state->m_vdp2_regs[0x048/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPCDN2 (state->m_vdp2_regs[0x04a/2])
 
 	/* N0MPB5 = lower 6 bits of Map Address of Plane D of Tilemap NBG2 */
 	#define STV_VDP2_N2MPD ((STV_VDP2_MPCDN2 & 0x3f00) >> 8)
@@ -840,7 +840,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPABN3 ((state->m_vdp2_regs[0x04c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPABN3 (state->m_vdp2_regs[0x04c/2])
 
 	/* N0MPB5 = lower 6 bits of Map Address of Plane B of Tilemap NBG1 */
 	#define STV_VDP2_N3MPB ((STV_VDP2_MPABN3 & 0x3f00) >> 8)
@@ -856,7 +856,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPCDN3 ((state->m_vdp2_regs[0x04c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPCDN3 (state->m_vdp2_regs[0x04e/2])
 
 	/* N0MPB5 = lower 6 bits of Map Address of Plane B of Tilemap NBG0 */
 	#define STV_VDP2_N3MPD ((STV_VDP2_MPCDN3 & 0x3f00) >> 8)
@@ -871,7 +871,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPABRA ((state->m_vdp2_regs[0x050/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPABRA (state->m_vdp2_regs[0x050/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane B of Tilemap RBG0 */
 	#define STV_VDP2_RAMPB ((STV_VDP2_MPABRA & 0x3f00) >> 8)
@@ -887,7 +887,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_MPCDRA ((state->m_vdp2_regs[0x050/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPCDRA (state->m_vdp2_regs[0x052/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane D of Tilemap RBG0 */
 	#define STV_VDP2_RAMPD ((STV_VDP2_MPCDRA & 0x3f00) >> 8)
@@ -901,7 +901,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_MPEFRA ((state->m_vdp2_regs[0x054/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPEFRA (state->m_vdp2_regs[0x054/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane F of Tilemap RBG0 */
 	#define STV_VDP2_RAMPF ((STV_VDP2_MPEFRA & 0x3f00) >> 8)
@@ -915,7 +915,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_MPGHRA ((state->m_vdp2_regs[0x054/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPGHRA (state->m_vdp2_regs[0x056/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane H of Tilemap RBG0 */
 	#define STV_VDP2_RAMPH ((STV_VDP2_MPGHRA & 0x3f00) >> 8)
@@ -929,7 +929,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_MPIJRA ((state->m_vdp2_regs[0x058/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPIJRA (state->m_vdp2_regs[0x058/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane J of Tilemap RBG0 */
 	#define STV_VDP2_RAMPJ ((STV_VDP2_MPIJRA & 0x3f00) >> 8)
@@ -943,7 +943,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_MPKLRA ((state->m_vdp2_regs[0x058/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPKLRA (state->m_vdp2_regs[0x05a/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane L of Tilemap RBG0 */
 	#define STV_VDP2_RAMPL ((STV_VDP2_MPKLRA & 0x3f00) >> 8)
@@ -957,7 +957,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_MPMNRA ((state->m_vdp2_regs[0x05c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPMNRA (state->m_vdp2_regs[0x05c/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane N of Tilemap RBG0 */
 	#define STV_VDP2_RAMPN ((STV_VDP2_MPMNRA & 0x3f00) >> 8)
@@ -971,7 +971,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_MPOPRA ((state->m_vdp2_regs[0x05c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPOPRA (state->m_vdp2_regs[0x05e/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane P of Tilemap RBG0 */
 	#define STV_VDP2_RAMPP ((STV_VDP2_MPOPRA & 0x3f00) >> 8)
@@ -986,7 +986,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPABRB ((state->m_vdp2_regs[0x060/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPABRB (state->m_vdp2_regs[0x060/2])
 
 	/* R0MPB5 = lower 6 bits of Map Address of Plane B of Tilemap RBG0 */
 	#define STV_VDP2_RBMPB ((STV_VDP2_MPABRB & 0x3f00) >> 8)
@@ -1002,7 +1002,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPCDRB ((state->m_vdp2_regs[0x060/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPCDRB (state->m_vdp2_regs[0x062/2])
 
 	/* R0MPD5 = lower 6 bits of Map Address of Plane D of Tilemap RBG0 */
 	#define STV_VDP2_RBMPD ((STV_VDP2_MPCDRB & 0x3f00) >> 8)
@@ -1017,7 +1017,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPEFRB ((state->m_vdp2_regs[0x064/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPEFRB (state->m_vdp2_regs[0x064/2])
 
 	/* R0MPF5 = lower 6 bits of Map Address of Plane F of Tilemap RBG0 */
 	#define STV_VDP2_RBMPF ((STV_VDP2_MPEFRB & 0x3f00) >> 8)
@@ -1032,7 +1032,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPGHRB ((state->m_vdp2_regs[0x064/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPGHRB (state->m_vdp2_regs[0x066/2])
 
 	/* R0MPH5 = lower 6 bits of Map Address of Plane H of Tilemap RBG0 */
 	#define STV_VDP2_RBMPH ((STV_VDP2_MPGHRB & 0x3f00) >> 8)
@@ -1047,7 +1047,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPIJRB ((state->m_vdp2_regs[0x068/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPIJRB (state->m_vdp2_regs[0x068/2])
 
 	/* R0MPJ5 = lower 6 bits of Map Address of Plane J of Tilemap RBG0 */
 	#define STV_VDP2_RBMPJ ((STV_VDP2_MPIJRB & 0x3f00) >> 8)
@@ -1062,7 +1062,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPKLRB ((state->m_vdp2_regs[0x068/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPKLRB (state->m_vdp2_regs[0x06a/2])
 
 	/* R0MPL5 = lower 6 bits of Map Address of Plane L of Tilemap RBG0 */
 	#define STV_VDP2_RBMPL ((STV_VDP2_MPKLRB & 0x3f00) >> 8)
@@ -1077,7 +1077,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPMNRB ((state->m_vdp2_regs[0x06c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_MPMNRB (state->m_vdp2_regs[0x06c/2])
 
 	/* R0MPN5 = lower 6 bits of Map Address of Plane N of Tilemap RBG0 */
 	#define STV_VDP2_RBMPN ((STV_VDP2_MPMNRB & 0x3f00) >> 8)
@@ -1092,7 +1092,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_MPOPRB ((state->m_vdp2_regs[0x06c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_MPOPRB (state->m_vdp2_regs[0x06e/2])
 
 	/* R0MPP5 = lower 6 bits of Map Address of Plane P of Tilemap RBG0 */
 	#define STV_VDP2_RBMPP ((STV_VDP2_MPOPRB & 0x3f00) >> 8)
@@ -1107,7 +1107,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SCXIN0 ((state->m_vdp2_regs[0x070/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_SCXIN0 (state->m_vdp2_regs[0x070/2])
 
 
 /* 180072 - Screen Scroll (NBG0, Horizontal Fractional Part)
@@ -1123,7 +1123,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_SCYIN0 ((state->m_vdp2_regs[0x074/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_SCYIN0 (state->m_vdp2_regs[0x074/2])
 
 
 /* 180076 - Screen Scroll (NBG0, Vertical Fractional Part)
@@ -1140,8 +1140,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMXIN0 ((state->m_vdp2_regs[0x078/4] >> 16)&0x0000ffff)
-	#define STV_VDP2_ZMXN0	(state->m_vdp2_regs[0x078/4] & 0x007ff00)
+	#define STV_VDP2_ZMXIN0 (state->m_vdp2_regs[0x078/2])
 
 	#define STV_VDP2_N0ZMXI ((STV_VDP2_ZMXIN0 & 0x0007) >> 0)
 
@@ -1152,9 +1151,11 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMXDN0 ((state->m_vdp2_regs[0x078/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_ZMXDN0 (state->m_vdp2_regs[0x07a/2])
 
 	#define STV_VDP2_N0ZMXD ((STV_VDP2_ZMXDN0 >> 8)& 0xff)
+	#define STV_VDP2_ZMXN0	(((STV_VDP2_N0ZMXI<<16) | (STV_VDP2_N0ZMXD<<8))  & 0x0007ff00)
+
 
 /* 18007c - Coordinate Inc (NBG0, Vertical Integer Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1163,8 +1164,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMYIN0 ((state->m_vdp2_regs[0x07c/4] >> 16)&0x0000ffff)
-	#define STV_VDP2_ZMYN0	(state->m_vdp2_regs[0x07c/4] & 0x007ff00)
+	#define STV_VDP2_ZMYIN0 (state->m_vdp2_regs[0x07c/2])
 
 	#define STV_VDP2_N0ZMYI ((STV_VDP2_ZMYIN0 & 0x0007) >> 0)
 
@@ -1175,9 +1175,10 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMYDN0 ((state->m_vdp2_regs[0x07c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_ZMYDN0 (state->m_vdp2_regs[0x07e/2])
 
 	#define STV_VDP2_N0ZMYD ((STV_VDP2_ZMYDN0 >> 8)& 0xff)
+	#define STV_VDP2_ZMYN0	(((STV_VDP2_N0ZMYI<<16) | (STV_VDP2_N0ZMYD<<8))  & 0x0007ff00)
 
 /* 180080 - SCXIN1 - Screen Scroll (NBG1, Horizontal Integer Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1186,7 +1187,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SCXIN1 ((state->m_vdp2_regs[0x080/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_SCXIN1 (state->m_vdp2_regs[0x080/2])
 
 /* 180082 - Screen Scroll (NBG1, Horizontal Fractional Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1202,7 +1203,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SCYIN1 ((state->m_vdp2_regs[0x084/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_SCYIN1 (state->m_vdp2_regs[0x084/2])
 
 /* 180086 - Screen Scroll (NBG1, Vertical Fractional Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1218,8 +1219,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMXIN1 ((state->m_vdp2_regs[0x088/4] >> 16)&0x0000ffff)
-	#define STV_VDP2_ZMXN1	(state->m_vdp2_regs[0x088/4] & 0x007ff00)
+	#define STV_VDP2_ZMXIN1 (state->m_vdp2_regs[0x088/2])
 
 	#define STV_VDP2_N1ZMXI ((STV_VDP2_ZMXIN1 & 0x0007) >> 0)
 
@@ -1230,9 +1230,10 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMXDN1 ((state->m_vdp2_regs[0x088/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_ZMXDN1 (state->m_vdp2_regs[0x08a/2])
 
 	#define STV_VDP2_N1ZMXD ((STV_VDP2_ZMXDN1 >> 8)& 0xff)
+	#define STV_VDP2_ZMXN1	(((STV_VDP2_N1ZMXI<<16) | (STV_VDP2_N1ZMXD<<8)) & 0x0007ff00)
 
 /* 18008c - Coordinate Inc (NBG1, Vertical Integer Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1241,8 +1242,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMYIN1 ((state->m_vdp2_regs[0x08c/4] >> 16)&0x0000ffff)
-	#define STV_VDP2_ZMYN1	(state->m_vdp2_regs[0x08c/4] & 0x007ff00)
+	#define STV_VDP2_ZMYIN1 (state->m_vdp2_regs[0x08c/2])
 
 	#define STV_VDP2_N1ZMYI ((STV_VDP2_ZMYIN1 & 0x0007) >> 0)
 
@@ -1253,9 +1253,10 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMYDN1 ((state->m_vdp2_regs[0x08c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_ZMYDN1 (state->m_vdp2_regs[0x08e/2])
 
 	#define STV_VDP2_N1ZMYD ((STV_VDP2_ZMYDN1 >> 8)& 0xff)
+	#define STV_VDP2_ZMYN1	(((STV_VDP2_N1ZMYI<<16) | (STV_VDP2_N1ZMYD<<8)) & 0x007ff00)
 
 /* 180090 - SCXN2 - Screen Scroll (NBG2, Horizontal)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1264,7 +1265,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SCXN2 ((state->m_vdp2_regs[0x090/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_SCXN2 (state->m_vdp2_regs[0x090/2])
 
 /* 180092 - SCYN2 - Screen Scroll (NBG2, Vertical)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1273,7 +1274,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SCYN2 ((state->m_vdp2_regs[0x090/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_SCYN2 (state->m_vdp2_regs[0x092/2])
 
 /* 180094 - SCXN3 - Screen Scroll (NBG3, Horizontal)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1282,7 +1283,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SCXN3 ((state->m_vdp2_regs[0x094/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_SCXN3 (state->m_vdp2_regs[0x094/2])
 
 /* 180096 - SCYN3 - Screen Scroll (NBG3, Vertical)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1291,7 +1292,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SCYN3 ((state->m_vdp2_regs[0x094/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_SCYN3 (state->m_vdp2_regs[0x096/2])
 
 /* 180098 - Reduction Enable
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1300,7 +1301,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    | N0ZMQT   | N0ZMHF   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_ZMCTL ((state->m_vdp2_regs[0x098/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_ZMCTL (state->m_vdp2_regs[0x098/2])
 
 	#define STV_VDP2_N1ZMQT  ((STV_VDP2_ZMCTL & 0x0200) >> 9)
 	#define STV_VDP2_N1ZMHF  ((STV_VDP2_ZMCTL & 0x0100) >> 8)
@@ -1314,7 +1315,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SCRCTL ((state->m_vdp2_regs[0x098/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_SCRCTL (state->m_vdp2_regs[0x09a/2])
 
 	#define STV_VDP2_N1LSS  ((STV_VDP2_SCRCTL & 0x3000) >> 12)
 	#define STV_VDP2_N1LZMX ((STV_VDP2_SCRCTL & 0x0800) >> 11)
@@ -1334,7 +1335,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_VCSTAU ((state->m_vdp2_regs[0x09c/4] >> 16)&0x00000007)
+	#define STV_VDP2_VCSTAU (state->m_vdp2_regs[0x09c/2] & 7)
 
 
 /* 18009e - Vertical Cell Table Address (NBG0, NBG1)
@@ -1344,7 +1345,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_VCSTAL ((state->m_vdp2_regs[0x09c/4] >> 0)&0x0000fffe)
+	#define STV_VDP2_VCSTAL (state->m_vdp2_regs[0x09e/2])
 
 
 /* 1800a0 - LSTA0U - Line Scroll Table Address (NBG0)
@@ -1355,7 +1356,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	/*bit 2 unused when VRAM = 4 Mbits*/
-	#define STV_VDP2_LSTA0U ((state->m_vdp2_regs[0x0a0/4] >> 16)&0x00000007)
+	#define STV_VDP2_LSTA0U (state->m_vdp2_regs[0x0a0/2] & 7)
 
 /* 1800a2 - LSTA0L - Line Scroll Table Address (NBG0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1364,7 +1365,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_LSTA0L ((state->m_vdp2_regs[0x0a0/4] >> 0)&0x0000fffe)
+	#define STV_VDP2_LSTA0L (state->m_vdp2_regs[0x0a2/2])
 
 /* 1800a4 - LSTA1U - Line Scroll Table Address (NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1374,7 +1375,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	/*bit 2 unused when VRAM = 4 Mbits*/
-	#define STV_VDP2_LSTA1U ((state->m_vdp2_regs[0x0a4/4] >> 16)&0x00000007)
+	#define STV_VDP2_LSTA1U (state->m_vdp2_regs[0x0a4/2] & 7)
 
 /* 1800a6 - LSTA1L - Line Scroll Table Address (NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1383,7 +1384,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_LSTA1L ((state->m_vdp2_regs[0x0a4/4] >> 0)&0x0000fffe)
+	#define STV_VDP2_LSTA1L (state->m_vdp2_regs[0x0a6/2])
 
 /* 1800a8 - LCTAU - Line Colour Screen Table Address
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1392,7 +1393,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_LCTAU	((state->m_vdp2_regs[0x0a8/4] >> 16) & 0xffff)
+	#define STV_VDP2_LCTAU	(state->m_vdp2_regs[0x0a8/2])
 	#define STV_VDP2_LCCLMD	((STV_VDP2_LCTAU & 0x8000) >> 15)
 
 /* 1800aa - LCTAL - Line Colour Screen Table Address
@@ -1401,9 +1402,9 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_LCTAL	((state->m_vdp2_regs[0x0a8/4] >> 0) & 0xffff)
+	#define STV_VDP2_LCTAL	(state->m_vdp2_regs[0x0aa/2])
 
-	#define STV_VDP2_LCTA	(((STV_VDP2_LCTAU & 0x0007) << 16) | (STV_VDP2_LCTAL & 0xfffe))
+	#define STV_VDP2_LCTA	(((STV_VDP2_LCTAU & 0x0007) << 16) | (STV_VDP2_LCTAL & 0xffff))
 
 /* 1800ac - Back Screen Table Address
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1412,7 +1413,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |  BKTA18  |  BKTA17  |  BKTA16  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_BKTAU	((state->m_vdp2_regs[0x0ac/4] >> 16) & 0xffff)
+	#define STV_VDP2_BKTAU	(state->m_vdp2_regs[0x0ac/2])
 
 	#define STV_VDP2_BKCLMD ((STV_VDP2_BKTAU & 0x8000) >> 15)
 
@@ -1424,7 +1425,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |  BKTA7   |  BKTA7   |  BKTA6   |  BKTA5   |  BKTA4   |  BKTA3   |  BKTA2   |  BKTA0   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_BKTAL	((state->m_vdp2_regs[0x0ac/4] >> 0) & 0xffff)
+	#define STV_VDP2_BKTAL	(state->m_vdp2_regs[0x0ae/2])
 
 	#define STV_VDP2_BKTA	(((STV_VDP2_BKTAU & 0x0007) << 16) | (STV_VDP2_BKTAL & 0xffff))
 
@@ -1435,7 +1436,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_RPMD	((state->m_vdp2_regs[0x0b0/4] >> 16) & 0x00000003)
+	#define STV_VDP2_RPMD	((state->m_vdp2_regs[0x0b0/2]) & 0x0003)
 
 /* 1800b2 - RPRCTL - Rotation Parameter Read Control
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1444,7 +1445,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    | RAKASTRE | RAYSTRE  | RBXSTRE  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_RPRCTL		((state->m_vdp2_regs[0x0b0/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_RPRCTL		(state->m_vdp2_regs[0x0b2/2])
 	#define STV_VDP2_RBKASTRE	((STV_VDP2_RPRCTL & 0x0400) >> 10)
 	#define STV_VDP2_RBYSTRE	((STV_VDP2_RPRCTL & 0x0200) >> 9)
 	#define STV_VDP2_RBXSTRE	((STV_VDP2_RPRCTL & 0x0100) >> 8)
@@ -1459,7 +1460,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |  RAKLCE  |  RAKMD1  |  RAKMD0  |  RAKDBS  |   RAKTE  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define	STV_VDP2_KTCTL	((state->m_vdp2_regs[0x0b4/4] >> 16) & 0x0000ffff)
+	#define	STV_VDP2_KTCTL	(state->m_vdp2_regs[0x0b4/2])
 	#define STV_VDP2_RBKLCE	((STV_VDP2_KTCTL & 0x1000) >> 12)
 	#define STV_VDP2_RBKMD	((STV_VDP2_KTCTL & 0x0c00) >> 10)
 	#define STV_VDP2_RBKDBS	((STV_VDP2_KTCTL & 0x0200) >> 9)
@@ -1476,7 +1477,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    | RAKTAOS2 | RAKTAOS1 | RAKTAOS0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_KTAOF	((state->m_vdp2_regs[0x0b4/4] >> 0) & 0x0000ffff)
+	#define STV_VDP2_KTAOF	(state->m_vdp2_regs[0x0b6/2])
 	#define STV_VDP2_RBKTAOS ((STV_VDP2_KTAOF & 0x0700) >> 8)
 	#define STV_VDP2_RAKTAOS ((STV_VDP2_KTAOF & 0x0007) >> 0)
 
@@ -1487,7 +1488,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_OVPNRA	((state->m_vdp2_regs[0x0b8/4] >> 16) & 0x0000ffff)
+	#define STV_VDP2_OVPNRA	(state->m_vdp2_regs[0x0b8/2])
 
 /* 1800ba - Screen Over Pattern Name (Rotation Parameter B)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1496,7 +1497,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_OVPNRB ((state->m_vdp2_regs[0x0b8/4] >> 0) & 0x0000ffff)
+	#define STV_VDP2_OVPNRB (state->m_vdp2_regs[0x0ba/2])
 
 /* 1800bc - RPTAU - Rotation Parameter Table Address (Rotation Parameter A,B)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1504,7 +1505,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |  RPTA18  |  RPTA17  |  RPTA16  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_RPTAU	((state->m_vdp2_regs[0x0bc/4] >> 16) & 0x00000007)
+	#define STV_VDP2_RPTAU	(state->m_vdp2_regs[0x0bc/2] & 7)
 
 /* 1800be - RPTAL - Rotation Parameter Table Address (Rotation Parameter A,B)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1513,7 +1514,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |   RPTA7  |   RPTA6  |   RPTA5  |   RPTA4  |   RPTA3  |   RPTA2  |   RPTA1  |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_RPTAL	((state->m_vdp2_regs[0x0bc/4] >> 0) & 0x0000fffe)
+	#define STV_VDP2_RPTAL	(state->m_vdp2_regs[0x0be/2] & 0x0000ffff)
 
 /* 1800c0 - Window Position (W0, Horizontal Start Point)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1522,7 +1523,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WPSX0 ((state->m_vdp2_regs[0x0c0/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_WPSX0 (state->m_vdp2_regs[0x0c0/2])
 
 	#define STV_VDP2_W0SX ((STV_VDP2_WPSX0 & 0x03ff) >> 0)
 
@@ -1533,7 +1534,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WPSY0 ((state->m_vdp2_regs[0x0c0/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_WPSY0 (state->m_vdp2_regs[0x0c2/2])
 
 	#define STV_VDP2_W0SY ((STV_VDP2_WPSY0 & 0x03ff) >> 0)
 
@@ -1544,7 +1545,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WPEX0 ((state->m_vdp2_regs[0x0c4/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_WPEX0 (state->m_vdp2_regs[0x0c4/2])
 
 	#define STV_VDP2_W0EX ((STV_VDP2_WPEX0 & 0x03ff) >> 0)
 
@@ -1555,7 +1556,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WPEY0 ((state->m_vdp2_regs[0x0c4/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_WPEY0 (state->m_vdp2_regs[0x0c6/2])
 
 	#define STV_VDP2_W0EY ((STV_VDP2_WPEY0 & 0x03ff) >> 0)
 
@@ -1566,7 +1567,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WPSX1 ((state->m_vdp2_regs[0x0c8/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_WPSX1 (state->m_vdp2_regs[0x0c8/2])
 
 	#define STV_VDP2_W1SX ((STV_VDP2_WPSX1 & 0x03ff) >> 0)
 
@@ -1577,7 +1578,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WPSY1 ((state->m_vdp2_regs[0x0c8/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_WPSY1 (state->m_vdp2_regs[0x0ca/2])
 
 	#define STV_VDP2_W1SY ((STV_VDP2_WPSY1 & 0x03ff) >> 0)
 
@@ -1588,7 +1589,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WPEX1 ((state->m_vdp2_regs[0x0cc/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_WPEX1 (state->m_vdp2_regs[0x0cc/2])
 
 	#define STV_VDP2_W1EX ((STV_VDP2_WPEX1 & 0x03ff) >> 0)
 
@@ -1599,7 +1600,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WPEY1 ((state->m_vdp2_regs[0x0cc/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_WPEY1 (state->m_vdp2_regs[0x0ce/2])
 
 	#define STV_VDP2_W1EY ((STV_VDP2_WPEY1 & 0x03ff) >> 0)
 
@@ -1610,7 +1611,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WCTLA ((state->m_vdp2_regs[0x0d0/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_WCTLA (state->m_vdp2_regs[0x0d0/2])
 	#define STV_VDP2_N1LOG ((STV_VDP2_WCTLA & 0x8000) >> 15)
 	#define STV_VDP2_N1SWE ((STV_VDP2_WCTLA & 0x2000) >> 13)
 	#define STV_VDP2_N1SWA ((STV_VDP2_WCTLA & 0x1000) >> 12)
@@ -1633,7 +1634,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WCTLB ((state->m_vdp2_regs[0x0d0/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_WCTLB (state->m_vdp2_regs[0x0d2/2])
 	#define STV_VDP2_N3LOG ((STV_VDP2_WCTLB & 0x8000) >> 15)
 	#define STV_VDP2_N3SWE ((STV_VDP2_WCTLB & 0x2000) >> 13)
 	#define STV_VDP2_N3SWA ((STV_VDP2_WCTLB & 0x1000) >> 12)
@@ -1656,7 +1657,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WCTLC ((state->m_vdp2_regs[0x0d4/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_WCTLC (state->m_vdp2_regs[0x0d4/2])
 	#define STV_VDP2_SPLOG ((STV_VDP2_WCTLC & 0x8000) >> 15)
 	#define STV_VDP2_SPSWE ((STV_VDP2_WCTLC & 0x2000) >> 13)
 	#define STV_VDP2_SPSWA ((STV_VDP2_WCTLC & 0x1000) >> 12)
@@ -1679,7 +1680,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_WCTLD ((state->m_vdp2_regs[0x0d4/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_WCTLD (state->m_vdp2_regs[0x0d6/2])
 	#define STV_VDP2_CCLOG ((STV_VDP2_WCTLD & 0x8000) >> 15)
 	#define STV_VDP2_CCSWE ((STV_VDP2_WCTLD & 0x2000) >> 13)
 	#define STV_VDP2_CCSWA ((STV_VDP2_WCTLD & 0x1000) >> 12)
@@ -1700,7 +1701,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_LWTA0U ((state->m_vdp2_regs[0x0d8/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_LWTA0U (state->m_vdp2_regs[0x0d8/2])
 
 	#define STV_VDP2_W0LWE  ((STV_VDP2_LWTA0U & 0x8000) >> 15)
 
@@ -1711,7 +1712,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_LWTA0L ((state->m_vdp2_regs[0x0d8/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_LWTA0L (state->m_vdp2_regs[0x0da/2])
 
 	/* bit 19 isn't used when VRAM = 4 Mbit */
 	#define STV_VDP2_W0LWTA	(((STV_VDP2_LWTA0U & 0x0007) << 16) | (STV_VDP2_LWTA0L & 0xfffe))
@@ -1724,7 +1725,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_LWTA1U ((state->m_vdp2_regs[0x0dc/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_LWTA1U (state->m_vdp2_regs[0x0dc/2])
 
 	#define STV_VDP2_W1LWE  ((STV_VDP2_LWTA0U & 0x8000) >> 15)
 
@@ -1736,7 +1737,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_LWTA1L ((state->m_vdp2_regs[0x0dc/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_LWTA1L (state->m_vdp2_regs[0x0de/2])
 
 	/* bit 19 isn't used when VRAM = 4 Mbit */
 	#define STV_VDP2_W1LWTA	(((STV_VDP2_LWTA1U & 0x0007) << 16) | (STV_VDP2_LWTA1L & 0xfffe))
@@ -1749,7 +1750,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |  SPCLMD  | SPWINEN  |  SPTYPE3 |  SPTYPE2 |  SPTYPE1 |  SPTYPE0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SPCTL		((state->m_vdp2_regs[0xe0/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_SPCTL	(state->m_vdp2_regs[0xe0/2])
 	#define STV_VDP2_SPCCCS		((STV_VDP2_SPCTL & 0x3000) >> 12)
 	#define STV_VDP2_SPCCN		((STV_VDP2_SPCTL & 0x700) >> 8)
 	#define STV_VDP2_SPCLMD		((STV_VDP2_SPCTL & 0x20) >> 5)
@@ -1763,7 +1764,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SDCTL		((state->m_vdp2_regs[0x0e0/4] >> 0) & 0x0000ffff)
+	#define STV_VDP2_SDCTL	(state->m_vdp2_regs[0x0e2/2])
 
 /* 1800e4 - CRAOFA - Colour Ram Address Offset (NBG0 - NBG3)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1772,7 +1773,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    | N1CAOS2  | N1CAOS1  | N1CAOS0  |    --    | N0CAOS2  | N0CAOS1  | N0CAOS0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CRAOFA ((state->m_vdp2_regs[0x0e4/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CRAOFA (state->m_vdp2_regs[0x0e4/2])
 
 	/* NxCAOS =  */
 	#define STV_VDP2_N0CAOS ((STV_VDP2_CRAOFA & 0x0007) >> 0)
@@ -1787,7 +1788,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_CRAOFB ((state->m_vdp2_regs[0x0e4/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CRAOFB (state->m_vdp2_regs[0x0e6/2])
 	#define STV_VDP2_R0CAOS ((STV_VDP2_CRAOFB & 0x0007) >> 0)
 	#define STV_VDP2_SPCAOS ((STV_VDP2_CRAOFB & 0x0070) >> 4)
 
@@ -1798,7 +1799,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |  SPLCEN  |  R0LCEN  |  N3LCEN  |  N2LCEN  |  N1LCEN  | N0LCEN   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_LNCLEN	((state->m_vdp2_regs[0x0e8/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_LNCLEN	(state->m_vdp2_regs[0x0e8/2])
 	#define STV_VDP2_SPLCEN	((STV_VDP2_LNCLEN & 0x0020) >> 5)
 	#define STV_VDP2_R0LCEN	((STV_VDP2_LNCLEN & 0x0010) >> 4)
 	#define STV_VDP2_N3LCEN	((STV_VDP2_LNCLEN & 0x0008) >> 3)
@@ -1813,7 +1814,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SFPRMD	((state->m_vdp2_regs[0x0e8/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_SFPRMD	(state->m_vdp2_regs[0x0ea/2])
 
 
 /* 1800ec - Colour Calculation Control
@@ -1823,7 +1824,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |  SPCCEN  |  LCCCEN  |  R0CCEN  |  N3CCEN  |  N2CCEN  |  N1CCEN  |  N0CCEN  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CCCR		((state->m_vdp2_regs[0xec/4]>>16)&0x0000ffff)
+	#define STV_VDP2_CCCR		(state->m_vdp2_regs[0x0ec/2])
 	#define STV_VDP2_CCMD		((STV_VDP2_CCCR & 0x100) >> 8)
 	#define STV_VDP2_SPCCEN		((STV_VDP2_CCCR & 0x40) >> 6)
 	#define STV_VDP2_LCCCEN		((STV_VDP2_CCCR & 0x20) >> 5)
@@ -1841,7 +1842,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SFCCMD     ((state->m_vdp2_regs[0xec/4]>>0)&0x0000ffff)
+	#define STV_VDP2_SFCCMD     (state->m_vdp2_regs[0x0ee/2])
 
 /* 1800f0 - Priority Number (Sprite 0,1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1850,7 +1851,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |  S0PRIN2 |  S0PRIN1 |  S0PRIN0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PRISA		((state->m_vdp2_regs[0xf0/4] >> 16) & 0x0000ffff)
+	#define STV_VDP2_PRISA		(state->m_vdp2_regs[0x0f0/2])
 	#define STV_VDP2_S1PRIN		((STV_VDP2_PRISA & 0x0700) >> 8)
 	#define STV_VDP2_S0PRIN		((STV_VDP2_PRISA & 0x0007) >> 0)
 
@@ -1861,7 +1862,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |  S2PRIN2 |  S2PRIN1 |  S2PRIN0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PRISB		((state->m_vdp2_regs[0xf0/4] >> 0) & 0x0000ffff)
+	#define STV_VDP2_PRISB		(state->m_vdp2_regs[0x0f2/2])
 	#define STV_VDP2_S3PRIN		((STV_VDP2_PRISB & 0x0700) >> 8)
 	#define STV_VDP2_S2PRIN		((STV_VDP2_PRISB & 0x0007) >> 0)
 
@@ -1872,7 +1873,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |  S4PRIN2 |  S4PRIN1 |  S4PRIN0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PRISC		((state->m_vdp2_regs[0xf4/4] >> 16) & 0x0000ffff)
+	#define STV_VDP2_PRISC		(state->m_vdp2_regs[0x0f4/2])
 	#define STV_VDP2_S5PRIN		((STV_VDP2_PRISC & 0x0700) >> 8)
 	#define STV_VDP2_S4PRIN		((STV_VDP2_PRISC & 0x0007) >> 0)
 
@@ -1883,7 +1884,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |  S6PRIN2 |  S6PRIN1 |  S6PRIN0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PRISD		((state->m_vdp2_regs[0xf4/4] >> 0) & 0x0000ffff)
+	#define STV_VDP2_PRISD		(state->m_vdp2_regs[0x0f6/2])
 	#define STV_VDP2_S7PRIN		((STV_VDP2_PRISD & 0x0700) >> 8)
 	#define STV_VDP2_S6PRIN		((STV_VDP2_PRISD & 0x0007) >> 0)
 
@@ -1895,7 +1896,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PRINA ((state->m_vdp2_regs[0x0f8/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_PRINA (state->m_vdp2_regs[0x0f8/2])
 
 	#define STV_VDP2_N1PRIN ((STV_VDP2_PRINA & 0x0700) >> 8)
 	#define STV_VDP2_N0PRIN ((STV_VDP2_PRINA & 0x0007) >> 0)
@@ -1907,7 +1908,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_PRINB ((state->m_vdp2_regs[0x0f8/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_PRINB (state->m_vdp2_regs[0x0fa/2])
 
 	#define STV_VDP2_N3PRIN ((STV_VDP2_PRINB & 0x0700) >> 8)
 	#define STV_VDP2_N2PRIN ((STV_VDP2_PRINB & 0x0007) >> 0)
@@ -1918,7 +1919,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_PRIR ((state->m_vdp2_regs[0x0fc/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_PRIR (state->m_vdp2_regs[0x0fc/2])
 
 	#define STV_VDP2_R0PRIN ((STV_VDP2_PRIR & 0x0007) >> 0)
 
@@ -1936,7 +1937,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |  S0CCRT4 |  S0CCRT3 |  S0CCRT2 |  S0CCRT1 |  S0CCRT0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CCRSA		((state->m_vdp2_regs[0x100/4] >> 16) & 0x0000ffff)
+	#define STV_VDP2_CCRSA		(state->m_vdp2_regs[0x100/2])
 	#define STV_VDP2_S1CCRT		((STV_VDP2_CCRSA & 0x1f00) >> 8)
 	#define STV_VDP2_S0CCRT		((STV_VDP2_CCRSA & 0x001f) >> 0)
 
@@ -1947,7 +1948,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |  S2CCRT4 |  S2CCRT3 |  S2CCRT2 |  S2CCRT1 |  S2CCRT0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CCRSB		((state->m_vdp2_regs[0x100/4] >> 0) & 0x0000ffff)
+	#define STV_VDP2_CCRSB		(state->m_vdp2_regs[0x102/2])
 	#define STV_VDP2_S3CCRT		((STV_VDP2_CCRSB & 0x1f00) >> 8)
 	#define STV_VDP2_S2CCRT		((STV_VDP2_CCRSB & 0x001f) >> 0)
 
@@ -1958,7 +1959,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |  S4CCRT4 |  S4CCRT3 |  S4CCRT2 |  S4CCRT1 |  S4CCRT0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CCRSC		((state->m_vdp2_regs[0x104/4 ]>> 16) & 0x0000ffff)
+	#define STV_VDP2_CCRSC		(state->m_vdp2_regs[0x104/2])
 	#define STV_VDP2_S5CCRT		((STV_VDP2_CCRSC & 0x1f00) >> 8)
 	#define STV_VDP2_S4CCRT		((STV_VDP2_CCRSC & 0x001f) >> 0)
 
@@ -1969,7 +1970,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |  S6CCRT4 |  S6CCRT3 |  S6CCRT2 |  S6CCRT1 |  S6CCRT0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CCRSD		((state->m_vdp2_regs[0x104/4 ]>> 0) & 0x0000ffff)
+	#define STV_VDP2_CCRSD		(state->m_vdp2_regs[0x106/2])
 	#define STV_VDP2_S7CCRT		((STV_VDP2_CCRSD & 0x1f00) >> 8)
 	#define STV_VDP2_S6CCRT		((STV_VDP2_CCRSD & 0x001f) >> 0)
 
@@ -1980,7 +1981,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    | N0CCRT4  | N0CCRT3  | N0CCRT2  | N0CCRT1  | N0CCRT0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CCRNA	((state->m_vdp2_regs[0x108/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CCRNA	(state->m_vdp2_regs[0x108/2])
 	#define STV_VDP2_N1CCRT	((STV_VDP2_CCRNA & 0x1f00) >> 8)
 	#define STV_VDP2_N0CCRT (STV_VDP2_CCRNA & 0x1f)
 
@@ -1991,7 +1992,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    | N2CCRT4  | N2CCRT3  | N2CCRT2  | N2CCRT1  | N2CCRT0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CCRNB	((state->m_vdp2_regs[0x108/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CCRNB	(state->m_vdp2_regs[0x10a/2])
 	#define STV_VDP2_N3CCRT	((STV_VDP2_CCRNB & 0x1f00) >> 8)
 	#define STV_VDP2_N2CCRT (STV_VDP2_CCRNB & 0x1f)
 
@@ -2002,7 +2003,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CCRR	((state->m_vdp2_regs[0x10c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CCRR	(state->m_vdp2_regs[0x10c/2])
 	#define STV_VDP2_R0CCRT (STV_VDP2_CCRR & 0x1f)
 
 /* 18010e - Colour Calculation Ratio (Line Colour Screen, Back Colour Screen)
@@ -2019,7 +2020,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CLOFEN ((state->m_vdp2_regs[0x110/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_CLOFEN (state->m_vdp2_regs[0x110/2])
 	#define STV_VDP2_N0COEN ((STV_VDP2_CLOFEN & 0x01) >> 0)
 	#define STV_VDP2_N1COEN ((STV_VDP2_CLOFEN & 0x02) >> 1)
 	#define STV_VDP2_N2COEN ((STV_VDP2_CLOFEN & 0x04) >> 2)
@@ -2035,7 +2036,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_CLOFSL ((state->m_vdp2_regs[0x110/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_CLOFSL (state->m_vdp2_regs[0x112/2])
 	#define STV_VDP2_N0COSL ((STV_VDP2_CLOFSL & 0x01) >> 0)
 	#define STV_VDP2_N1COSL ((STV_VDP2_CLOFSL & 0x02) >> 1)
 	#define STV_VDP2_N2COSL ((STV_VDP2_CLOFSL & 0x04) >> 2)
@@ -2051,7 +2052,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_COAR ((state->m_vdp2_regs[0x114/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_COAR (state->m_vdp2_regs[0x114/2])
 
 /* 180116 - Colour Offset A (Green)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -2059,7 +2060,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_COAG ((state->m_vdp2_regs[0x114/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_COAG (state->m_vdp2_regs[0x116/2])
 
 /* 180118 - Colour Offset A (Blue)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -2068,7 +2069,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_COAB ((state->m_vdp2_regs[0x118/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_COAB (state->m_vdp2_regs[0x118/2])
 
 /* 18011a - Colour Offset B (Red)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -2076,23 +2077,23 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_COBR ((state->m_vdp2_regs[0x118/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_COBR (state->m_vdp2_regs[0x11a/2])
 
-/* 18011b - Colour Offset B (Green)
+/* 18011c - Colour Offset B (Green)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_COBG ((state->m_vdp2_regs[0x11c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_COBG (state->m_vdp2_regs[0x11c/2])
 
-/* 18011c - Colour Offset B (Blue)
+/* 18011e - Colour Offset B (Blue)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_COBB ((state->m_vdp2_regs[0x11c/4] >> 0)&0x0000ffff)
+	#define STV_VDP2_COBB (state->m_vdp2_regs[0x11e/2])
 
 /*For Debug purposes only*/
 static struct stv_vdp2_debugging
@@ -5574,13 +5575,13 @@ WRITE32_HANDLER ( saturn_vdp2_vram_w )
 
 }
 
-READ32_HANDLER ( saturn_vdp2_regs_r )
+READ16_HANDLER ( saturn_vdp2_regs_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
 	switch(offset)
 	{
-		case 0x000/4:
+		case 0x002/2:
 		{
 			/* latch h/v signals thru HV latch*/
 			if(!STV_VDP2_EXLTEN)
@@ -5597,47 +5598,59 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 
 			break;
 		}
-		case 0x004/4:
+		case 0x004/2:
 		{
 			/*Screen Status Register*/
 								       /*VBLANK              HBLANK            ODD               PAL    */
-			state->m_vdp2_regs[offset] = (state->m_vdp2.exltfg<<25) |
-										 (state->m_vdp2.exsyfg<<24) |
-										 (get_vblank(space->machine())<<19) |
-										 (get_hblank(space->machine())<<18) |
-										 (get_odd_bit(space->machine()) << 17) |
-										 (state->m_vdp2.pal << 16) |
-										 (STV_VDP2_VRAMSZ << 15) |
-										 ((0 << 0) & 0xf); // VDP2 version
+			state->m_vdp2_regs[offset] = (state->m_vdp2.exltfg<<9) |
+										 (state->m_vdp2.exsyfg<<8) |
+										 (get_vblank(space->machine()) << 3) |
+										 (get_hblank(space->machine()) << 2) |
+										 (get_odd_bit(space->machine()) << 1) |
+										 (state->m_vdp2.pal << 0);
 
 			/* vblank bit is always 1 if DISP bit is disabled */
 			if(!STV_VDP2_DISP)
-				state->m_vdp2_regs[offset] |= 1 << 19;
+				state->m_vdp2_regs[offset] |= 1 << 3;
 
 			/* HV latches clears if this register is read */
-			if(ACCESSING_BITS_16_31)
+			if(!space->debugger_access())
 			{
 				state->m_vdp2.exltfg &= ~1;
 				state->m_vdp2.exsyfg &= ~1;
 			}
-			if(ACCESSING_BITS_0_15)
-			{
-				if(!space->debugger_access())
-					printf("Warning: VDP2 version read\n");
-			}
 			break;
 		}
-		case 0x008/4:
-		/*H/V Counter Register*/
+		case 0x006/2:
 		{
-			state->m_vdp2_regs[offset] = (state->m_vdp2.h_count<<16)|(state->m_vdp2.v_count);
+			state->m_vdp2_regs[offset] = (STV_VDP2_VRAMSZ << 15) |
+										 ((0 << 0) & 0xf); // VDP2 version
+
+			if(!space->debugger_access())
+				printf("Warning: VDP2 version read\n");
 			break;
 		}
+
+		/* HCNT */
+		case 0x008/2:
+		{
+			state->m_vdp2_regs[offset] = (state->m_vdp2.h_count);
+			break;
+		}
+
+		/* VCNT */
+		case 0x00a/2:
+		{
+			state->m_vdp2_regs[offset] = (state->m_vdp2.v_count);
+			break;
+		}
+
 		default:
 			//if(!space->debugger_access())
 			//	printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}
+
 	return state->m_vdp2_regs[offset];
 }
 
@@ -5766,7 +5779,7 @@ static void refresh_palette_data(running_machine &machine)
 	}
 }
 
-WRITE32_HANDLER ( saturn_vdp2_regs_w )
+WRITE16_HANDLER ( saturn_vdp2_regs_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	COMBINE_DATA(&state->m_vdp2_regs[offset]);
@@ -5935,7 +5948,7 @@ static int stv_vdp2_start (running_machine &machine)
 	saturn_state *state = machine.driver_data<saturn_state>();
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stv_vdp2_exit), &machine));
 
-	state->m_vdp2_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
+	state->m_vdp2_regs = auto_alloc_array_clear(machine, UINT16, 0x040000/2 );
 	state->m_vdp2_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 );
 	state->m_vdp2_cram = auto_alloc_array_clear(machine, UINT32, 0x080000/4 );
 	state->m_vdp2.gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
@@ -5947,7 +5960,7 @@ static int stv_vdp2_start (running_machine &machine)
 	stv_rbg_cache_data.is_cache_dirty = 3;
 	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
 
-	state_save_register_global_pointer(machine, state->m_vdp2_regs, 0x040000/4);
+	state_save_register_global_pointer(machine, state->m_vdp2_regs, 0x040000/2);
 	state_save_register_global_pointer(machine, state->m_vdp2_vram, 0x100000/4);
 	state_save_register_global_pointer(machine, state->m_vdp2_cram, 0x080000/4);
 	machine.save().register_postload(save_prepost_delegate(FUNC(stv_vdp2_state_save_postload), &machine));
