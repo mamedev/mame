@@ -6,6 +6,14 @@
 
     what's the difference between this and Scorpion 5? Later revisons of many games appear
     to be on the latter.
+
+	Main CPU is a MC68307FG16, present on Motherboard
+
+	Configuration is SC4 motherboard + game card
+
+	The game card contains the program roms, sound rom and YMZ280B 
+
+	Adder 4 video board adds an additional card with a MC68340PV25E (25.175Mhz)
 */
 
 #include "emu.h"
@@ -26,16 +34,46 @@ static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sc4_addre4_map, AS_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x2fffff) AM_ROM
+ADDRESS_MAP_END
+
+
+
 static INPUT_PORTS_START(  sc4 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( sc4, sc4_state )
-	MCFG_CPU_ADD("maincpu", M68020, 16000000)	 // 68340!
+	MCFG_CPU_ADD("maincpu", M68020, 16000000)	 // 68307! (EC000 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( sc4_adder4, sc4 )
+	MCFG_CPU_ADD("adder4", M68020, 25175000)	 // 68340 (CPU32 core)
+	MCFG_CPU_PROGRAM_MAP(sc4_addre4_map)
+MACHINE_CONFIG_END
+
+
+
+ROM_START( ad4skill )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "skilldicegame_hi.bin", 0x00000, 0x080000, CRC(83d10f1b) SHA1(383a337e924313b1aa1e62451227218a82cd6cd3) )
+	ROM_LOAD16_BYTE( "skilldicegame_lo.bin", 0x00001, 0x080000, CRC(e8d35560) SHA1(30efb6dabfc98cf89766bb33e249fed661219798) )
+
+	ROM_REGION( 0x400000, "adder4", 0 )
+	ROM_LOAD16_BYTE( "skilldiceadder_hi.bin", 0x00000, 0x080000, CRC(14da612d) SHA1(ad33ef3736538374b9f81868f0041d6b736e2375) )
+	ROM_LOAD16_BYTE( "skilldiceadder_lo.bin", 0x00001, 0x080000, CRC(93a2aaf5) SHA1(c6b7c2ac56a9980e01e059f54048472f3e6d8b5b) )
+
+	ROM_REGION( 0x100000, "ym", 0 )
+	ROM_LOAD( "skilldicesound.bin", 0x0000, 0x080000, CRC(aeccd210) SHA1(ee88f67b436092854cc6719cc91db91d905ffc6f) )
+ROM_END
+
+
+
 
 ROM_START( sc4bbust )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -217,6 +255,7 @@ ROM_START( sc4gslam )
 	ROM_LOAD( "95004170.bin", 0x080000, 0x080000, CRC(1da0db8f) SHA1(b3c37b5e02efe7267556d8603c362298ed55bb88) )
 ROM_END
 
+/* Scorpion 4 */
 
 GAME( 200?, sc4bbust	,0,			sc4, sc4, 0, ROT0, "Mazooma","Blockbuster (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4pstat	,0,			sc4, sc4, 0, ROT0, "QPS","Paystation (Qps) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -226,5 +265,8 @@ GAME( 200?, sc4spark	,0,			sc4, sc4, 0, ROT0, "BFM","South Park (BFM) (Scorpion 
 GAME( 200?, sc4brkfs	,0,			sc4, sc4, 0, ROT0, "BFM","The Big Breakfast (BFM) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gslam	,0,			sc4, sc4, 0, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
+/* Scorpion 4 + Adder 4 */
+
+GAME( 200?, ad4skill	,0,			sc4_adder4, sc4, 0, ROT0, "BFM","Skill Dice (BFM) (Scorpion 4 + Adder 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 

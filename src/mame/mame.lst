@@ -11592,7 +11592,7 @@ sltblgpo		// 1996
 sltblgp1		// 1996
 gldncrwn		// 1997
 
-// Cobra 3?
+// Cobra 3
 
 c3_rtime		// Radio Times
 c3_telly		// Telly Addicts
@@ -11607,6 +11607,10 @@ sc4cvclb		// Cashvania Club (Qps) (Scorpion 4)
 sc4spark		// South Park (Bellfruit) (Scorpion 4)
 sc4brkfs		// The Big Breakfast (BFM) (Scorpion 4)
 sc4gslam		// Grandslam Club (BFM) (Scorpion 4)
+
+// Scorpion 4 + Adder 4
+
+ad4skill
 
 // Scorpion 5
 

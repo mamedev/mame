@@ -1,22 +1,97 @@
-/* MayGay SWP (Skill With Prizes) Video hardware */
+/* MayGay M2 hardware
+  SWP (Skill With Prizes) Video based games */
 
 /*
-	Unknown SWP 68k hardware
-	I think these are all video games
+	Guniess Book of Records by Maygay 1996 - M2 Hardware
+
+	CPU - MC68306FC16 (On M2 Active CPU Board)
+	Sound - OKIM6650 (ON MPEG Sound Board)
+	Graphics - CL-GD5429-86QC-C (On Video Card)
+	QUARTZ OSCILLATORS AT 3.6864Mhz (by 16c64), 16.0000Mhz (by MC68306FC16), 4.00000Mhz (by OKIM6650), 4.0000Mhz (by 16c55) and 14.31818Mhz (by CL-GD5429-86QC-C)
+	RAM HY6264A x 2 (On M2 Active CPU Board), HM514260CJ7 x3 (On Video Card)
+
+	Other
+
+	M62405P (ON MPEG Sound Board)
+	MC14514BCP (On M2 Active I/O Board)
+	MAX1232 (On M2 Active CPU Board)
+	MC1488P and MC1489P (On M2 Active CPU Board)
+
+	Custom
+
+	MAYGAY MACHINES EP840150 5261ES-A46528A ASG9605 84PIN PLCC?
+	 
+	PIC's
+
+	16c64.u6 - PIC16C64-20/P M2 VER2.2 I/O CPU PIC  CRC32 6AE364A2 SHA1 56DDE3D270C2CF81D9592C7C2284767188409B56 (On M2 Active CPU Board)
+
+	16C55.u5 - PIC16C55-XT/P M2 Sound PIC version 1 CRC32 0BD92C3E SHA1 596F4D0A83EBC879EC64BA3038D2E9448D2F8901 (ON MPEG Sound Board)
+
+
+	Other
+
+	0819a.u17 - GAL16V8B Not Dumped (On Video Memory Board)
+	0190a.u6 - GAL16V8B Not Dumped (On Video Card)
+	45a.u12 - GAL16V8B Not Dumped (On Video Card)
+	o146a.u4 - GAL16V8B Not Dumped (On MPEG Sound Board)
+
+	Roms
+
+	Video Memory Board
+
+	dg70014.u01 - TMS27C040 CRC32 EA24D687 SHA1 6B2A069681236EED67F54ED6B1117416DB7DE9AA
+
+	dg70014.u02 - TMS27C040 CRC32 31E151AA SHA1 2DD99973D829910A6AF54D0A46AB37BA36B159B1
+
+	dg70014.u03 - TMS27C040 CRC32 18EA3CF1 SHA1 5A20597906B0209666BF937E0A4975A250EAACED
+
+	dg70014.u04 - TMS27C040 CRC32 96A05459 SHA1 CDC12733DFD9AE50C2D33397A2CF3831C1B275BF
+
+	da70014.u05 - TMS27C040 CRC32 5ACEB7D6 SHA1 C3099D3C83BE2F5DD3E474557CA17A2C5385ED1F
+
+	dq70014.u06 - TMS27C040 CRC32 568AD7C7 SHA1 078FCEEF241AC4C74B20A07718837973EE6402A5
+
+	dg70014.u07 - TMS27C040 CRC32 602D79F1 SHA1 EA873C42E93FAFF6DF8C05A98B52B79E52CAA28B
+
+	dg70014.u08 - TMS27C040 CRC32 EB12693D SHA1 8D894A56BD7E280AB3D4456EF180C42EE87D6F3B
+
+	dg70014.u09 - TMS27C040 CRC32 85534E69 SHA1 1165E43C02DCE8FE048DFB863B9EB61BE7F68A48
+
+	dg70014.u10 - TMS27C040 CRC32 6174F684 SHA1 33EF0E28F69B810F3DF899B15AC36577025B7B59
+
+	da70014.u11 - TMS27C040 CRC32 6CD1ADCD SHA1 A803A4B9945498CC1A772B6B9D6948669782149D
+
+	dq70014.u12 - TMS27C040 CRC32 7BD17C0B SHA1 395A0F72DB64648BD5D953868AA42ED6A4C9E2EC
+
+
+	Video Card
+
+	std961d.u27 - TMS27C010A CRC32 7BD17C0B SHA1 395A0F72DB64648BD5D953868AA42ED6A4C9E2EC
+
+	std951d.u28 - TMS27C010A CRC32 D4A8686A SHA1 D25D4C7ED32874F33DA787DFAE1F661D06531359
+
+
+	MPEG Sound Board
+
+	dig1127.u3 - TMS27C040 CRC32 45A2275D SHA1 8AF08B5C007BB2BFE927DF53BD167EA6045D8694
+
+	dig1127.u2 - TMS27C040 CRC32 220B38FE SHA1 8FF20A9353736CDA44EC11A99AC94B36F9DB7430
+
+	Dumped By Dang_Spot 18/02/04
+
+----------------------------------------------
 
 	Complete dumps?
 
 	Guiness Book of Records
 	Risk
+	Big Break (except the PICs)
 
 	Incomplete dumps?
 
 	everything else :-(
 	
-
-	HW seems different to the standard MayGay M1 Video.
- 
-*/
+ */
 
 
 
@@ -47,7 +122,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( maygayew, maygayew_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,8000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", M68000,8000000)	// MC68306FC16 - standard 68000 core + peripherals
 	MCFG_CPU_PROGRAM_MAP(maygayew_map)
 MACHINE_CONFIG_END
 
@@ -121,6 +196,43 @@ ROM_START( mg_risk )
 ROM_END
 
 
+ROM_START( mg_bb )
+	ROM_REGION( 0x040000, "mainrom", 0 )
+	ROM_LOAD16_BYTE( "bigbreaku27603asw6-618.bin", 0x00000, 0x020000, CRC(2c91fe59) SHA1(320127facb8ac8ea5adbf1eb66938b9211c0ba21) )
+	ROM_LOAD16_BYTE( "bigbreaku28gfdbsa6-618std.bin", 0x00001, 0x020000, CRC(100aebe6) SHA1(360967d692e590271e4975b2203b5545c7af3540) )
+
+	ROM_REGION( 0x1000000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "656u27", 0x00000, 0x020000, CRC(b9992edb) SHA1(7a5a0e029b6aaa94c32560f1170bdee0d42ddd62) )
+	ROM_LOAD16_BYTE( "656u28", 0x00001, 0x020000, CRC(19004505) SHA1(992d66d2e35c2f232cc01aaca656cccbd55bc401) )
+	ROM_LOAD16_BYTE( "657u27", 0x00000, 0x020000, CRC(26532336) SHA1(cdf21b6d20b93065a38868834fd49642c3f87443) )
+	ROM_LOAD16_BYTE( "657u28", 0x00001, 0x020000, CRC(8d1406bf) SHA1(570a208152c51e647eb9cef61009e848cb144ae7) )
+
+	ROM_REGION( 0x800000, "dataroms", 0 )
+	ROM_LOAD16_BYTE( "bigbreakdg6-001-4-u01.bin", 0x000000, 0x080000, CRC(9a271e70) SHA1(68478367156acf7ed9b343e3130d365f59dafa3e) )
+	ROM_LOAD16_BYTE( "bigbreakdg6-001-4-u07.bin", 0x000001, 0x080000, CRC(b9029538) SHA1(4809867015d4525e2b8f012e48038a4e8b59cae8) )
+	ROM_LOAD16_BYTE( "bigbreakdg6-001-4-u02.bin", 0x100000, 0x080000, CRC(5882625d) SHA1(5d4b2e8ce8b25e87a71b44bd5536e970872cbc08) )
+	ROM_LOAD16_BYTE( "bigbreakdg6-001-4-u08.bin", 0x100001, 0x080000, CRC(eac30ceb) SHA1(93c56c18908701e702819cdb806da9d27892f5be) )
+	ROM_LOAD16_BYTE( "bigbreakdg6-001-4-u03.bin", 0x200000, 0x080000, CRC(eb163259) SHA1(cd5ed150ee040b374fd5a09cd52a6d19681c01a9) )
+	ROM_LOAD16_BYTE( "bigbreakdg6-001-4-u09.bin", 0x200001, 0x080000, CRC(cc81e702) SHA1(5768d67fdf75a9d6ad09bcf0d35dc52e4b8dd2c8) )
+	ROM_LOAD16_BYTE( "bigbreakda8-001-4-u04.bin", 0x300000, 0x080000, CRC(78267f8d) SHA1(fb5deeabcee2c32e5c7ec645bbeaae6fcf8c2c7b) )
+	ROM_LOAD16_BYTE( "bigbreakda6-001-4-u10.bin", 0x300001, 0x080000, CRC(9a0460a5) SHA1(f39a41895c6cadbaf1984ee2b31cac40c3d9ed6e) )
+	/* no 05/11 pair? - unpopulated? */
+	ROM_LOAD16_BYTE( "bigbreakdq6-001-4-u06.bin", 0x500000, 0x080000, CRC(a57ea42a) SHA1(7946f1f3b9ac7d9fab4b76b03c56fafc33571e1b) )
+	ROM_LOAD16_BYTE( "bigbreakdq6-001-4-u12.bin", 0x500001, 0x080000, CRC(fb15d7ad) SHA1(44c1bbfce527bcffabf14d7735ad08ce292af745) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "bigbreaksoudnv3dig1-106.bin", 0x0000, 0x080000, CRC(65790dfa) SHA1(5dbcec93a77dd96e5f4b42db8ab25afed9a27c9e) )
+
+	ROM_REGION( 0x100000, "16c55", 0 ) 	// PIC dump?
+	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, NO_DUMP )
+	ROM_REGION( 0x100000, "16c64", 0 ) 	// PIC dump?
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, NO_DUMP )
+ROM_END
+
+
+
+
+
 ROM_START( mg_ewg )
 	ROM_REGION( 0x040000, "mainrom", 0 )
 	ROM_LOAD16_BYTE( "sa6-127.u1", 0x00000, 0x020000, CRC(ffea277b) SHA1(e0f4b3b613a4545f8d5e7ec9a422af4c718243fb) )
@@ -181,15 +293,6 @@ ROM_START( mg_alad )
 	ROM_LOAD16_BYTE( "al_c_swp.u28", 0x00001, 0x020000, CRC(02662b47) SHA1(4d94fbca0b1fafc482be009faec7749551a8da24) )	
 ROM_END
 
-ROM_START( mg_bb )
-	ROM_REGION( 0x040000, "mainrom", 0 )
-	ROM_LOAD16_BYTE( "656u27", 0x00000, 0x020000, CRC(b9992edb) SHA1(7a5a0e029b6aaa94c32560f1170bdee0d42ddd62) )
-	ROM_LOAD16_BYTE( "656u28", 0x00001, 0x020000, CRC(19004505) SHA1(992d66d2e35c2f232cc01aaca656cccbd55bc401) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "657u27", 0x00000, 0x020000, CRC(26532336) SHA1(cdf21b6d20b93065a38868834fd49642c3f87443) )
-	ROM_LOAD16_BYTE( "657u28", 0x00001, 0x020000, CRC(8d1406bf) SHA1(570a208152c51e647eb9cef61009e848cb144ae7) )
-ROM_END
 
 ROM_START( mg_lug )
 	ROM_REGION( 0x040000, "mainrom", 0 )
@@ -231,15 +334,15 @@ ROM_START( mg_scl )
 ROM_END
 
 // complete(?) dump
-GAME( 199?, mg_gbr		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Guinness Book Of Records (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_gbr		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Guinness Book Of Records (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_risk		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Risk (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_bb		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Big Break (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 // incomplete dumps
-GAME( 199?, mg_ewg		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Each Way Gambler (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_jv		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Jack & Vera (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_alad		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Aladdin's Cave (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_bb		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Big Break (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_lug		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "London Underground (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_pbw		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Pinball Wizard (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_risk		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Risk (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_scl		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Super Clue (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_kf		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Krypton Factor (Maygay SWP)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_ewg		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Each Way Gambler (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_jv		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Jack & Vera (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_alad		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Aladdin's Cave (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_lug		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "London Underground (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_pbw		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Pinball Wizard (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_scl		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Super Clue (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_kf		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Krypton Factor (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
