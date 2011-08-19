@@ -396,6 +396,10 @@ static READ32_HANDLER( magzun_rx_hack_r )
 
 DRIVER_INIT(magzun)
 {
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x604bf20);
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x604bfbe);
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x604c006);
+
 	DRIVER_INIT_CALL(stv);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x00400000, 0x0040003f, FUNC(magzun_ioga_r32), FUNC(magzun_ioga_w32));
