@@ -10,7 +10,6 @@
 
     TODO:
 
-    - fix MAX_ERROR_SECTORS, it is too small for d80/d82
     - write to disk
     - disk errors 24, 25, 26, 28, 74
     - variable gaps
@@ -31,7 +30,7 @@
 
 #define MAX_HEADS			2
 #define MAX_TRACKS			84
-#define MAX_ERROR_SECTORS	802 // TODO this is too small for .d80 files
+#define MAX_ERROR_SECTORS	4166
 #define SECTOR_SIZE			256
 #define SECTOR_SIZE_GCR		368
 
@@ -47,7 +46,9 @@
 #define D71_SIZE_70_TRACKS				 349696
 #define D71_SIZE_70_TRACKS_WITH_ERRORS	 351062
 #define D80_SIZE_77_TRACKS				 533248
+#define D80_SIZE_77_TRACKS_WITH_ERRORS	 535331
 #define D82_SIZE_154_TRACKS				1066496
+#define D82_SIZE_154_TRACKS_WITH_ERRORS	1070662
 
 enum
 {
@@ -573,9 +574,11 @@ static void d64_identify(floppy_image_legacy *floppy, int *dos, int *heads, int 
 
 	/* 8050 */
 	case D80_SIZE_77_TRACKS:				*dos = DOS25; *heads = 1; *tracks = 77; *has_errors = false; break;
+	case D80_SIZE_77_TRACKS_WITH_ERRORS:	*dos = DOS25; *heads = 1; *tracks = 77; *has_errors = true;  break;
 
 	/* 8250/SFD1001 */
 	case D82_SIZE_154_TRACKS:				*dos = DOS25; *heads = 2; *tracks = 77; *has_errors = false; break;
+	case D82_SIZE_154_TRACKS_WITH_ERRORS:	*dos = DOS25; *heads = 2; *tracks = 77; *has_errors = true;  break;
 	}
 }
 
@@ -643,9 +646,13 @@ FLOPPY_IDENTIFY( d71_dsk_identify )
 
 FLOPPY_IDENTIFY( d80_dsk_identify )
 {
+	int heads = 0, tracks = 0, dos = -1;
+	bool has_errors = false;
 	*vote = 0;
 
-	if (floppy_image_size(floppy) == D80_SIZE_77_TRACKS)
+	d64_identify(floppy, &dos, &heads, &tracks, &has_errors);
+
+	if (dos == DOS25 && heads == 1)
 	{
 		*vote = 100;
 	}
@@ -659,9 +666,13 @@ FLOPPY_IDENTIFY( d80_dsk_identify )
 
 FLOPPY_IDENTIFY( d82_dsk_identify )
 {
+	int heads = 0, tracks = 0, dos = -1;
+	bool has_errors = false;
 	*vote = 0;
 
-	if (floppy_image_size(floppy) == D82_SIZE_154_TRACKS)
+	d64_identify(floppy, &dos, &heads, &tracks, &has_errors);
+
+	if (dos == DOS25 && heads == 2)
 	{
 		*vote = 100;
 	}
