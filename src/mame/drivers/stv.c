@@ -676,15 +676,14 @@ static READ32_HANDLER( astrass_hack_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	/*PC reads at 0x60011ba if -debug is active?*/
-	if(cpu_get_pc(&space->device())==0x60011b8 || cpu_get_pc(&space->device()) == 0x60011ba) return 0x00000000;
+	if(cpu_get_pc(&space->device()) == 0x60011ba) return 0x00000000;
 
 	return state->m_workram_h[0x000770/4];
 }
 
 DRIVER_INIT( astrass )
 {
-	sh2drc_add_pcflush(machine.device("maincpu"), 0x60011b8);
+	sh2drc_add_pcflush(machine.device("maincpu"), 0x60011ba);
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x605b9da);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x06000770, 0x06000773, FUNC(astrass_hack_r) );
