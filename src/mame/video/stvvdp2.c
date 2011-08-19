@@ -494,7 +494,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
     1 - use bitmap mode   */
 	#define STV_VDP2_R0BMEN ((STV_VDP2_CHCTLB & 0x0200) >> 9)
 
-/*  R0CHSZ - NBG0 Character (Tile) Size
+/*  R0CHSZ - RBG0 Character (Tile) Size
     0 - 1 cell  x 1 cell  (8x8)
     1 - 2 cells x 2 cells (16x16)  */
 	#define STV_VDP2_R0CHSZ ((STV_VDP2_CHCTLB & 0x0100) >> 8)
@@ -2094,6 +2094,10 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 	#define STV_VDP2_COBB (state->m_vdp2_regs[0x11e/2])
+
+#if NEW_VIDEO_CODE
+static void saturn_vdp2_assign_variables(running_machine &machine,UINT32 offset,UINT16 data);
+#endif
 
 /*For Debug purposes only*/
 static struct stv_vdp2_debugging
@@ -5797,6 +5801,10 @@ WRITE16_HANDLER ( saturn_vdp2_regs_w )
 
 	if(STV_VDP2_VRAMSZ)
 		printf("VDP2 sets up 8 Mbit VRAM!\n");
+
+	#if NEW_VIDEO_CODE
+	saturn_vdp2_assign_variables(space->machine(),offset,state->m_vdp2_regs[offset]);
+	#endif
 }
 
 static int get_hblank_duration(running_machine &machine)
@@ -7016,29 +7024,220 @@ static void stv_dump_ram()
 	[1] NBG1
 	[2] NBG2
 	[3] NBG3
+	[4] RBG0
+	[5] BACK
 */
-static UINT32 layer_buffer[4][704*512];
 
+#define XB_SIZE 1024
+#define YB_SIZE 1024
+
+static UINT32 layer_buffer[6][XB_SIZE*YB_SIZE];
+static UINT8  layer_tpen[6][XB_SIZE*YB_SIZE];
+
+/* TODO: move in state machine */
+static struct{
+	UINT8 bitmap_en;
+	UINT8 bpp;
+	UINT8 color_offset_en;
+	UINT8 color_offset_sel;
+}m_vdp2_state[6];
+
+static void saturn_vdp2_assign_variables(running_machine &machine,UINT32 offset,UINT16 data)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	switch(offset)
+	{
+		case 0x028/2:
+			m_vdp2_state[0].bpp = STV_VDP2_N0CHCN;
+			m_vdp2_state[1].bpp = STV_VDP2_N1CHCN;
+			break;
+		case 0x02a/2:
+			m_vdp2_state[2].bpp = STV_VDP2_N2CHCN;
+			m_vdp2_state[3].bpp = STV_VDP2_N3CHCN;
+			break;
+		case 0x02c/2:
+			m_vdp2_state[0].bitmap_en = STV_VDP2_N0BMP;
+			m_vdp2_state[1].bitmap_en = STV_VDP2_N1BMP;
+			break;
+		case 0x110/2:
+			m_vdp2_state[0].color_offset_en = STV_VDP2_N0COEN;
+			m_vdp2_state[1].color_offset_en = STV_VDP2_N1COEN;
+			m_vdp2_state[2].color_offset_en = STV_VDP2_N2COEN;
+			m_vdp2_state[3].color_offset_en = STV_VDP2_N3COEN;
+			m_vdp2_state[4].color_offset_en = STV_VDP2_R0COEN;
+			m_vdp2_state[5].color_offset_en = STV_VDP2_BKCOEN;
+//			STV_VDP2_SPCOEN
+			break;
+		case 0x112/2:
+			m_vdp2_state[0].color_offset_sel = STV_VDP2_N0COSL;
+			m_vdp2_state[1].color_offset_sel = STV_VDP2_N1COSL;
+			m_vdp2_state[2].color_offset_sel = STV_VDP2_N2COSL;
+			m_vdp2_state[3].color_offset_sel = STV_VDP2_N3COSL;
+			m_vdp2_state[4].color_offset_sel = STV_VDP2_R0COSL;
+			m_vdp2_state[5].color_offset_sel = STV_VDP2_BKCOSL;
+//			STV_VDP2_SPCOEN
+			break;
+	}
+}
+
+static void vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int x,y;
+	UINT8* gfxdata = state->m_vdp2.gfx_decode;
+	UINT32 base_offs,base_mask;
+	UINT8 interlace;
+
+	interlace = (STV_VDP2_LSMD == 3)+1;
+
+	/* draw black if BDCLMD and DISP are cleared */
+	if(!(STV_VDP2_BDCLMD) && !(STV_VDP2_DISP))
+		bitmap_fill(bitmap, cliprect, get_black_pen(machine));
+	else
+	{
+		base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+
+		for(y=cliprect->min_y;y<=cliprect->max_y;y++)
+		{
+			base_offs = ((STV_VDP2_BKTA ) & base_mask) << 1;
+			if(STV_VDP2_BKCLMD)
+				base_offs += ((y / interlace) << 1);
+
+			for(x=cliprect->min_x;x<=cliprect->max_x;x++)
+			{
+				int r,g,b;
+				UINT16 dot;
+
+				dot = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
+				b = (dot & 0x7c00) >> 10;
+				g = (dot & 0x03e0) >> 5;
+				r = (dot & 0x001f) >> 0;
+				b <<= 3;
+				g <<= 3;
+				r <<= 3;
+
+				//if(STV_VDP2_BKCOEN)
+				//	stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_BKCOSL );
+
+				/* TODO: this needs post-processing too! */
+				*BITMAP_ADDR32(bitmap, y,x) = b | g << 8 | r << 16;
+			}
+		}
+	}
+}
 
 static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b, UINT16 offset);
+
+static void get_vdp2_pixel(running_machine &machine, UINT8 layer_name, UINT16 tile,UINT8 color, int xi, int yi, int *r, int *g, int *b, int *tp)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	UINT8 *vram = state->m_vdp2.gfx_decode;
+	UINT32 vram_offset;
+	UINT32 vram_mask;
+	int pix;
+
+	vram_mask = 0x7ffff;
+
+	switch(m_vdp2_state[layer_name].bpp)
+	{
+		case 0:  //2 bpp
+			if(m_vdp2_state[layer_name].bitmap_en)
+				vram_offset = tile;
+			else
+				vram_offset = tile*0x20+(yi*4)+(xi >> 1);
+
+			pix = (vram[vram_offset & vram_mask] >> ((xi & 1) ^ 1)*4) & 0xf;
+
+			vdp2_palette_entry(machine,&*r,&*g,&*b,(color<<4|pix) & 0x7ff);
+
+			*tp = (pix != 0);
+			break;
+		case 1:  //4 bpp
+			if(m_vdp2_state[layer_name].bitmap_en)
+				vram_offset = tile;
+			else
+				vram_offset = tile*0x40+(yi*8)+(xi);
+
+			pix = (vram[vram_offset & vram_mask]) & 0xff;
+
+			vdp2_palette_entry(machine,&*r,&*g,&*b,(color<<8|pix) & 0x7ff);
+
+			*tp = (pix != 0);
+			break;
+		case 2:  //11 bpp
+			popmessage("bpp == 2 in tilemap");
+
+			if(m_vdp2_state[layer_name].bitmap_en)
+				vram_offset = tile;
+			else
+				vram_offset = tile*0x40+(yi*8)+(xi);
+
+			/* confused over this, but I should have done correctly: */
+			pix = (vram[((vram_offset)*2+0) & vram_mask]<<8)|
+				  (vram[((vram_offset)*2+1) & vram_mask]);
+
+			vdp2_palette_entry(machine,&*r,&*g,&*b,(pix) & 0x7ff);
+
+			*tp = (pix != 0);
+			break;
+		case 3:  //RGB5
+			if(m_vdp2_state[layer_name].bitmap_en)
+				vram_offset = tile;
+			else
+				vram_offset = tile*0x40+(yi*8)+(xi);
+
+			pix = (vram[((vram_offset)*2+0) & vram_mask]<<8)|
+				  (vram[((vram_offset)*2+1) & vram_mask]);
+
+			*tp= ((pix & 0x8000) >> 15);
+//			*cc= *tp;
+			*b = ((pix & 0x7c00) >> 10);
+			*g = ((pix & 0x03e0) >> 5);
+			*r = ((pix & 0x001f) >> 0);
+			*b <<= 3;
+			*g <<= 3;
+			*r <<= 3;
+			break;
+		case 4:  //RGB8
+			if(m_vdp2_state[layer_name].bitmap_en)
+				vram_offset = tile;
+			else
+				vram_offset = tile*0x80+(yi*8)+(xi);
+
+			pix = (vram[((vram_offset)*4+0) & vram_mask]<<24)|
+				  (vram[((vram_offset)*4+1) & vram_mask]<<16) |
+				  (vram[((vram_offset)*4+2) & vram_mask]<<8)|
+				  (vram[((vram_offset)*4+3) & vram_mask]);
+
+  			*tp= ((pix & 0x80000000) >> 31);
+//			*cc= *tp;
+			*b = ((pix & 0x00ff0000) >> 16);
+			*g = ((pix & 0x0000ff00) >> 8);
+			*r = ((pix & 0x000000ff) >> 0);
+			break;
+		default:
+			popmessage("Setting invalid for NBG%d!",layer_name);
+			*tp = *b = *g = *r = 0;
+			break;
+ 	}
+}
 
 /* copy the vram data into the vram buffer */
 static void vdp2_tile_draw(running_machine &machine, UINT8 layer_name, UINT16 tile, UINT8 color, int x, int y)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
-	UINT8 *vram = state->m_vdp2.gfx_decode;
+	//saturn_state *state = machine.driver_data<saturn_state>();
 	int xi,yi;
-	int r,g,b;
-	UINT8 dot_data;
+	int r,g,b,tp;
 
 	for(yi=0;yi<8;yi++)
 	{
 		for(xi=0;xi<8;xi++)
 		{
-			dot_data = (vram[tile*0x20+(yi*4)+(xi >> 1)] >> ((xi & 1) ^ 1)*4) & 0xf;
-			vdp2_palette_entry(machine,&r,&g,&b,(color<<4|dot_data));
+			get_vdp2_pixel(machine,layer_name,tile,color,xi,yi, &r, &g, &b, &tp);
 
-			layer_buffer[layer_name][(x*8+xi)+((y*8+yi)*512)] = (r << 16) | (g << 8) | (b);
+			layer_buffer[layer_name][(x*8+xi)+((y*8+yi)*XB_SIZE)] = (r << 16) | (g << 8) | (b);
+			layer_tpen[layer_name][(x*8+xi)+((y*8+yi)*XB_SIZE)] = tp;
 		}
 	}
 }
@@ -7051,14 +7250,14 @@ static void copy_plane(running_machine &machine, UINT8 layer_name)
 	int x,y;
 	UINT16 datax;
 
-	for(y=0;y<32;y++)
+	for(y=0;y<64;y++)
 	{
-		for(x=0;x<32;x++)
+		for(x=0;x<64;x++)
 		{
 			UINT16 tile;
 			UINT8 color;
 
-			datax = (vram[(x+y*32+0x31000)*2+0]<<8)|(vram[(x+y*32+0x31000)*2+1]&0xff);
+			datax = (vram[(x+y*64+0x31000)*2+0]<<8)|(vram[(x+y*64+0x31000)*2+1]&0xff);
 			tile = (datax & 0xff) | 0x3000;
 			color = ((datax & 0xf000) >> 12) | 0x40;
 
@@ -7067,16 +7266,52 @@ static void copy_plane(running_machine &machine, UINT8 layer_name)
 	}
 }
 
-/* now copy the vram buffer to the screen buffer */
+static void vdp2_calc_color_offset(running_machine &machine, UINT8 layer_name, int *r, int *g, int *b)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int base_offs;
+	int cor,cog,cob;
+
+	base_offs = (0x114 + m_vdp2_state[layer_name].color_offset_sel*6);
+
+	cor = (state->m_vdp2_regs[(base_offs+0)/2]) & 0x1ff;
+	cog = (state->m_vdp2_regs[(base_offs+2)/2]) & 0x1ff;
+	cob = (state->m_vdp2_regs[(base_offs+4)/2]) & 0x1ff;
+
+	*r = (cor & 0x100) ? *r - (0x100 - (cor & 0xff)) : (*r + (cor & 0xff));
+	*g = (cog & 0x100) ? *g - (0x100 - (cog & 0xff)) : (*g + (cog & 0xff));
+	*b = (cob & 0x100) ? *b - (0x100 - (cob & 0xff)) : (*b + (cob & 0xff));
+
+	if(*r > 0xff) { *r = 0xff; }
+	if(*g > 0xff) { *g = 0xff; }
+	if(*b > 0xff) { *b = 0xff; }
+	if(*r < 0) { *r = 0; }
+	if(*g < 0) { *g = 0; }
+	if(*b < 0) { *b = 0; }
+}
+
+/* now copy the vram buffer to the screen buffer, apply post-processing at this stage */
 static void draw_normal_screen(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, UINT8 layer_name)
 {
 	int x,y;
+	int r,g,b;
 
-	for(y=0;y<cliprect->max_y;y++)
+	for(y=0;y<=cliprect->max_y;y++)
 	{
-		for(x=0;x<cliprect->max_x;x++)
+		for(x=0;x<=cliprect->max_x;x++)
 		{
-			*BITMAP_ADDR32(bitmap, y, x) = layer_buffer[layer_name][(x)+(y)*512];
+			if(layer_tpen[layer_name][(x)+(y)*XB_SIZE])
+			{
+				b = (layer_buffer[layer_name][(x)+(y)*XB_SIZE] & 0x0000ff);
+				g = (layer_buffer[layer_name][(x)+(y)*XB_SIZE] & 0x00ff00) >> 8;
+				r = (layer_buffer[layer_name][(x)+(y)*XB_SIZE] & 0xff0000) >> 16;
+
+				/* apply color offset*/
+				if(m_vdp2_state[layer_name].color_offset_en)
+					vdp2_calc_color_offset(machine,layer_name,&r,&g,&b);
+
+				*BITMAP_ADDR32(bitmap, y, x) = b | g << 8 | r << 16;
+			}
 		}
 	}
 }
@@ -7104,7 +7339,7 @@ static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b,
 			break;
 		}
 		case 2: // RGB8: 1024 color pens
-		case 3: // (reserved mode but identical to above)
+		case 3: // (mode 3 is reserved but seems to be identical to above)
 		{
 //			*cc= ((state->m_vdp2_cram[offset] & 0x80000000) >> 31);
 			*b = ((state->m_vdp2_cram[offset] & 0x00ff0000) >> 16);
@@ -7117,7 +7352,17 @@ static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b,
 
 SCREEN_UPDATE( saturn )
 {
+	saturn_state *state = screen->machine().driver_data<saturn_state>();
 	static UINT8 disclaimer;
+
+	vdp2_draw_back(screen->machine(),bitmap,cliprect);
+
+	if(STV_VDP2_DISP)
+	{
+		copy_plane(screen->machine(),3);
+
+		draw_normal_screen(screen->machine(),bitmap,cliprect,3);
+	}
 
 	if(disclaimer == 0)
 	{
@@ -7125,10 +7370,8 @@ SCREEN_UPDATE( saturn )
 		popmessage("NEW Video code, rm me");
 	}
 
-	copy_plane(screen->machine(),3);
-
-	draw_normal_screen(screen->machine(),bitmap,cliprect,3);
 
 	return 0;
 }
+
 #endif
