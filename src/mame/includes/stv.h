@@ -1,4 +1,5 @@
 /*----------- defined in drivers/stv.c -----------*/
+#define NEW_VIDEO_CODE 0
 
 class saturn_state : public driver_device
 {
@@ -222,3 +223,6 @@ WRITE16_HANDLER ( saturn_vdp2_regs_w );
 
 VIDEO_START ( stv_vdp2 );
 SCREEN_UPDATE( stv_vdp2 );
+#if NEW_VIDEO_CODE
+SCREEN_UPDATE( saturn );
+#endif

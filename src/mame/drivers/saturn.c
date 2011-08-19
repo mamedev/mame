@@ -2150,11 +2150,17 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224)
+	#if NEW_VIDEO_CODE
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_UPDATE(saturn)
+	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness. (TODO: remove AT LEAST the latter)
+	#else
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_UPDATE(stv_vdp2)
-
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
+	#endif
+
 	MCFG_GFXDECODE(stv)
 
 	MCFG_VIDEO_START(stv_vdp2)
@@ -2201,13 +2207,18 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224)
+	#if NEW_VIDEO_CODE
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_UPDATE(saturn)
+	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness. (TODO: remove AT LEAST the latter)
+	#else
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_UPDATE(stv_vdp2)
-
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
+	#endif
+
 	MCFG_GFXDECODE(stv)
 
 	MCFG_VIDEO_START(stv_vdp2)

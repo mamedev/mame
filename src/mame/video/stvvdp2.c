@@ -152,7 +152,7 @@ enum
 | Pattern Name     | 1 word , 2 words                                                                        |
 | Data Size        |                                                                                         |
 -------------------------------------------------|-----------------------------|------------------------------
-| Plane Size       | 1 H x 1 V 1 Pages ; 2 H x 1 V 1 Pages ; 2 H x 2 V Pages (I don't understand ... )       |
+| Plane Size       | 1 H x 1 V 1 Pages ; 2 H x 1 V 1 Pages ; 2 H x 2 V Pages                                 |
 -------------------------------------------------|-----------------------------|------------------------------
 | Plane Count      | 4                                                         | 16                          |
 -------------------------------------------------|-----------------------------|------------------------------
@@ -6999,4 +6999,136 @@ static void stv_dump_ram()
 }
 
 
+#endif
+
+#if NEW_VIDEO_CODE
+
+/*
+	Rewrite of VDP2 video code (VDP1 will follow up after this).
+
+	Keyword there is use CUSTOM CODE for everything!
+
+	we do a two-pass buffer copy so we can safely do post-processing stuff at some point.
+*/
+
+/*
+	[0] NBG0
+	[1] NBG1
+	[2] NBG2
+	[3] NBG3
+*/
+static UINT32 layer_buffer[4][704*512];
+
+
+static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b, UINT16 offset);
+
+/* copy the vram data into the vram buffer */
+static void vdp2_tile_draw(running_machine &machine, UINT8 layer_name, UINT16 tile, UINT8 color, int x, int y)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	UINT8 *vram = state->m_vdp2.gfx_decode;
+	int xi,yi;
+	int r,g,b;
+	UINT8 dot_data;
+
+	for(yi=0;yi<8;yi++)
+	{
+		for(xi=0;xi<8;xi++)
+		{
+			dot_data = (vram[tile*0x20+(yi*4)+(xi >> 1)] >> ((xi & 1) ^ 1)*4) & 0xf;
+			vdp2_palette_entry(machine,&r,&g,&b,(color<<4|dot_data));
+
+			layer_buffer[layer_name][(x*8+xi)+((y*8+yi)*512)] = (r << 16) | (g << 8) | (b);
+		}
+	}
+}
+
+/* tile grid of NxN is copied there */
+static void copy_plane(running_machine &machine, UINT8 layer_name)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	UINT8 *vram = state->m_vdp2.gfx_decode;
+	int x,y;
+	UINT16 datax;
+
+	for(y=0;y<32;y++)
+	{
+		for(x=0;x<32;x++)
+		{
+			UINT16 tile;
+			UINT8 color;
+
+			datax = (vram[(x+y*32+0x31000)*2+0]<<8)|(vram[(x+y*32+0x31000)*2+1]&0xff);
+			tile = (datax & 0xff) | 0x3000;
+			color = ((datax & 0xf000) >> 12) | 0x40;
+
+			vdp2_tile_draw(machine,layer_name,tile,color,x,y);
+		}
+	}
+}
+
+/* now copy the vram buffer to the screen buffer */
+static void draw_normal_screen(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, UINT8 layer_name)
+{
+	int x,y;
+
+	for(y=0;y<cliprect->max_y;y++)
+	{
+		for(x=0;x<cliprect->max_x;x++)
+		{
+			*BITMAP_ADDR32(bitmap, y, x) = layer_buffer[layer_name][(x)+(y)*512];
+		}
+	}
+}
+
+/* translated cram into RGB32 format color pen */
+static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b, UINT16 offset)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	switch( STV_VDP2_CRMD )
+	{
+		case 0: // RGB5, 1024 color pens
+			offset &= 0x7ff;
+		case 1: // RGB5: 2048 color pens
+		{
+			UINT16 datax = (state->m_vdp2_cram[offset/2] >> (((offset & 1) ^ 1)*16)) & 0xffff;
+
+//			*cc= ((datax & 0x8000) >> 15);
+			*b = ((datax & 0x7c00) >> 10);
+			*g = ((datax & 0x03e0) >> 5);
+			*r = ((datax & 0x001f) >> 0);
+			*b <<= 3;
+			*g <<= 3;
+			*r <<= 3;
+			break;
+		}
+		case 2: // RGB8: 1024 color pens
+		case 3: // (reserved mode but identical to above)
+		{
+//			*cc= ((state->m_vdp2_cram[offset] & 0x80000000) >> 31);
+			*b = ((state->m_vdp2_cram[offset] & 0x00ff0000) >> 16);
+			*g = ((state->m_vdp2_cram[offset] & 0x0000ff00) >> 8);
+			*r = ((state->m_vdp2_cram[offset] & 0x000000ff) >> 0);
+		}
+		break;
+	}
+}
+
+SCREEN_UPDATE( saturn )
+{
+	static UINT8 disclaimer;
+
+	if(disclaimer == 0)
+	{
+		disclaimer++;
+		popmessage("NEW Video code, rm me");
+	}
+
+	copy_plane(screen->machine(),3);
+
+	draw_normal_screen(screen->machine(),bitmap,cliprect,3);
+
+	return 0;
+}
 #endif
