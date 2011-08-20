@@ -1029,3 +1029,277 @@ floppy_image_format_t::floppy_image_format_t(const char *name,const char *extens
 floppy_image_format_t::~floppy_image_format_t()
 {
 }
+
+bool floppy_image_format_t::type_no_data(int type) const
+{
+	return type == CRC_CCITT_START ||
+		type == CRC_AMIGA_START ||
+		type == CRC_END ||
+		type == SECTOR_LOOP_START ||
+		type == SECTOR_LOOP_END ||
+		type == END;
+}
+
+bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs) const
+{
+	return !type_no_data(type) && 
+		type != RAW &&
+		type != RAWBITS &&
+		(type != CRC || (crcs[p1].type != CRC_CCITT && crcs[p1].type != CRC_AMIGA));
+}
+
+void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
+{
+	memset(crcs, 0, MAX_CRC_COUNT * sizeof(*crcs));
+	for(int i=0; i != MAX_CRC_COUNT; i++)
+		crcs[i].write = -1;
+
+	for(int i=0; desc[i].type != END; i++)
+		switch(desc[i].type) {
+		case CRC_CCITT_START:
+			crcs[desc[i].p1].type = CRC_CCITT;
+			break;
+		case CRC_AMIGA_START:
+			crcs[desc[i].p1].type = CRC_AMIGA;
+			break;
+		}
+
+	for(int i=0; desc[i].type != END; i++)
+		if(desc[i].type == CRC) {
+			int j;
+			for(j = i+1; desc[j].type != END && type_no_data(desc[j].type); j++);
+			crcs[desc[i].p1].fixup_mfm_clock = type_data_mfm(desc[j].type, desc[j].p1, crcs);
+		}
+}
+
+int floppy_image_format_t::crc_cells_size(int type) const
+{
+	switch(type) {
+	case CRC_CCITT: return 32;
+	case CRC_AMIGA: return 64;
+	default: return 0;
+	}
+}
+
+bool floppy_image_format_t::bit_r(UINT8 *buffer, int offset)
+{
+	return (buffer[offset >> 3] >> ((offset & 7) ^ 7)) & 1;
+}
+
+void floppy_image_format_t::bit_w(UINT8 *buffer, int offset, bool val)
+{
+	if(val)
+		buffer[offset >> 3] |= 0x80 >> (offset & 7);
+	else
+		buffer[offset >> 3] &= ~(0x80 >> (offset & 7));
+}
+
+void floppy_image_format_t::raw_w(UINT8 *buffer, int &offset, int n, UINT32 val)
+{
+	for(int i=n-1; i>=0; i--)
+		bit_w(buffer, offset++, (val >> i) & 1);
+}
+
+void floppy_image_format_t::mfm_w(UINT8 *buffer, int &offset, int n, UINT32 val)
+{
+	int prec = offset ? bit_r(buffer, offset-1) : 0;
+	for(int i=n-1; i>=0; i--) {
+		int bit = (val >> i) & 1;
+		bit_w(buffer, offset++, !(prec || bit));
+		bit_w(buffer, offset++, bit);
+		prec = bit;
+	}
+}
+
+void floppy_image_format_t::mfm_half_w(UINT8 *buffer, int &offset, int start_bit, UINT32 val)
+{
+	int prec = offset ? bit_r(buffer, offset-1) : 0;
+	for(int i=start_bit; i>=0; i-=2) {
+		int bit = (val >> i) & 1;
+		bit_w(buffer, offset++, !(prec || bit));
+		bit_w(buffer, offset++, bit);
+		prec = bit;
+	}
+}
+
+void floppy_image_format_t::fixup_crc_amiga(UINT8 *buffer, const gen_crc_info *crc)
+{
+	UINT16 res = 0;
+	int size = crc->end - crc->start;
+	for(int i=1; i<size; i+=2)
+		if(bit_r(buffer, crc->start + i))
+			res = res ^ (0x8000 >> ((i >> 1) & 15));
+	int offset = crc->write;
+	mfm_w(buffer, offset, 16, 0);
+	mfm_w(buffer, offset, 16, res);
+}
+
+void floppy_image_format_t::fixup_crc_ccitt(UINT8 *buffer, const gen_crc_info *crc)
+{
+	UINT32 res = 0xffff;
+	int size = crc->end - crc->start;
+	for(int i=1; i<size; i+=2) {
+		res <<= 1;
+		if(bit_r(buffer, crc->start + i))
+			res ^= 0x10000;
+		if(res & 0x10000)
+			res ^= 0x11021;
+	}
+	int offset = crc->write;
+	mfm_w(buffer, offset, 16, res);
+}
+
+void floppy_image_format_t::fixup_crcs(UINT8 *buffer, gen_crc_info *crcs)
+{
+	for(int i=0; i != MAX_CRC_COUNT; i++)
+		if(crcs[i].write != -1) {
+			switch(crcs[i].type) {
+			case CRC_AMIGA: fixup_crc_amiga(buffer, crcs+i); break;
+			case CRC_CCITT: fixup_crc_ccitt(buffer, crcs+i); break;
+			}
+			if(crcs[i].fixup_mfm_clock) {
+				int offset = crcs[i].write + crc_cells_size(crcs[i].type);
+				bit_w(buffer, offset, !((offset ? bit_r(buffer, offset-1) : false) || bit_r(buffer, offset+1)));
+			}
+			crcs[i].write = -1;
+		}
+}
+
+void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, UINT8 *buffer)
+{
+	memset(buffer, 0, (track_size+7)/8);
+
+	gen_crc_info crcs[MAX_CRC_COUNT];
+	collect_crcs(desc, crcs);
+
+	int offset = 0;
+	int index = 0;
+	int sector_loop_start = 0;
+	int sector_id = 0;
+	int sector_limit = 0;
+
+	while(desc[index].type != END) {
+		//		printf("%d.%d.%d (%d) - %d %d\n", desc[index].type, desc[index].p1, desc[index].p2, index, offset, offset/8);
+		switch(desc[index].type) {
+		case MFM:
+			for(int i=0; i<desc[index].p2; i++)
+				mfm_w(buffer, offset, 8, desc[index].p1);
+			break;
+
+		case MFMBITS:
+			mfm_w(buffer, offset, desc[index].p2, desc[index].p1);
+			break;
+
+		case RAW:
+			for(int i=0; i<desc[index].p2; i++)
+				raw_w(buffer, offset, 16, desc[index].p1);
+			break;
+
+		case RAWBITS:
+			raw_w(buffer, offset, desc[index].p2, desc[index].p1);
+			break;
+
+		case TRACK_ID:
+			mfm_w(buffer, offset, 8, track);
+			break;
+
+		case HEAD_ID:
+			mfm_w(buffer, offset, 8, head);
+			break;
+
+		case SECTOR_ID:
+			mfm_w(buffer, offset, 8, sector_id);
+			break;
+
+		case SIZE_ID: {
+			int size = sect[sector_id].size;
+			int id;
+			for(id = 0; size > 128; size >>=1, id++);
+			mfm_w(buffer, offset, 8, id);
+			break;
+		}
+
+		case OFFSET_ID_O:
+			mfm_half_w(buffer, offset, 7, track*2+head);
+			break;
+
+		case OFFSET_ID_E:
+			mfm_half_w(buffer, offset, 6, track*2+head);
+			break;
+
+		case SECTOR_ID_O:
+			mfm_half_w(buffer, offset, 7, sector_id);
+			break;
+
+		case SECTOR_ID_E:
+			mfm_half_w(buffer, offset, 6, sector_id);
+			break;
+
+		case REMAIN_O:
+			mfm_half_w(buffer, offset, 7, desc[index].p1 - sector_id);
+			break;
+
+		case REMAIN_E:
+			mfm_half_w(buffer, offset, 6, desc[index].p1 - sector_id);
+			break;
+
+		case SECTOR_LOOP_START:
+			fixup_crcs(buffer, crcs);
+			sector_loop_start = index;
+			sector_id = desc[index].p1;
+			sector_limit = desc[index].p2;
+			break;
+
+		case SECTOR_LOOP_END:
+			fixup_crcs(buffer, crcs);
+			if(sector_id < sector_limit) {
+				sector_id++;
+				index = sector_loop_start;
+			}
+			break;
+
+		case CRC_AMIGA_START:
+		case CRC_CCITT_START:
+			crcs[desc[index].p1].start = offset;
+			break;
+
+		case CRC_END:
+			crcs[desc[index].p1].end = offset;
+			break;
+
+		case CRC:
+			crcs[desc[index].p1].write = offset;
+			offset += crc_cells_size(crcs[desc[index].p1].type);
+			break;
+
+		case SECTOR_DATA: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_id);
+			for(int i=0; i != csect->size; i++)
+				mfm_w(buffer, offset, 8, csect->data[i]);
+			break;
+		}
+
+		case SECTOR_DATA_O: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_id);
+			for(int i=0; i != csect->size; i++)
+				mfm_half_w(buffer, offset, 7, csect->data[i]);
+			break;
+		}
+
+		case SECTOR_DATA_E: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_id);
+			for(int i=0; i != csect->size; i++)
+				mfm_half_w(buffer, offset, 6, csect->data[i]);
+			break;
+		}
+
+		default:
+			printf("%d.%d.%d (%d) unhandled\n", desc[index].type, desc[index].p1, desc[index].p2, index);
+			break;
+		}
+		index++;
+	}
+
+	fixup_crcs(buffer, crcs);
+}
+

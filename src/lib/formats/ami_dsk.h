@@ -18,6 +18,8 @@ public:
 
 	virtual int identify(floppy_image *image);
 	virtual bool load(floppy_image *image);
+
+	static const desc_e desc[];
 };
 
 extern const floppy_format_type FLOPPY_ADF_FORMAT;

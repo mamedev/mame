@@ -228,10 +228,84 @@ public:
 	virtual int identify(floppy_image *image) = 0;
 	virtual bool load(floppy_image *image) = 0;
 protected:
+	// Struct designed for easy track data description
+	// Optional, you can always do things by hand, but useful nevertheless
+	// A vector of these structures describes one track.
+
+	struct desc_e {
+		int type, p1, p2;
+	};
+
+	enum {
+		END,               // End of description
+		MFM,               // One byte in p1 to be mfm-encoded, msb first, repeated p2 times
+		MFMBITS,           // A value of p2 bits in p1 to be mfm-encoded, msb first
+		RAW,               // One 16 bits word in p1 to be written raw, msb first, repeated p2 times
+		RAWBITS,           // A value of p2 bits in p1 to be copied as-is, msb first
+		TRACK_ID,          // Track id byte, mfm-encoded
+		HEAD_ID,           // Head id byte, mfm-encoded
+		SECTOR_ID,         // Sector id byte, mfm-encoded
+		SIZE_ID,           // Sector size code on one byte [log2(size/128)], mfm-encoded
+		OFFSET_ID_O,       // Offset (track*2+head) byte, odd bits, mfm-encoded
+		OFFSET_ID_E,       // Offset (track*2+head) byte, even bits, mfm-encoded
+		SECTOR_ID_O,       // Sector id byte, odd bits, mfm-encoded
+		SECTOR_ID_E,       // Sector id byte, even bits, mfm-encoded
+		REMAIN_O,          // Remaining sector count, odd bits, mfm-encoded, total sector count in p1
+		REMAIN_E,          // Remaining sector count, even bits, mfm-encoded, total sector count in p1
+
+		SECTOR_DATA,       // Sector data to mfm-encode, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_O,     // Sector data to mfm-encode, odd bits only, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_E,     // Sector data to mfm-encode, even bits only, which in p1, -1 for the current one per the sector id
+
+		CRC_CCITT_START,   // Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id, p2 = init value
+		CRC_AMIGA_START,   // Start an amiga checksum calculation, p1 = crc id
+		CRC_END,           // End the checksum, p1 = crc id
+		CRC,               // Write a checksum in the apporpriate format, p1 = crc id
+
+		SECTOR_LOOP_START, // Start of the per-sector loop, sector number goes from p1 to p2 inclusive
+		SECTOR_LOOP_END,   // End of the per-sector loop
+	};
+
+	// Sector data description
+	struct desc_s {
+		int size;          // Sector size, int bytes
+		const UINT8 *data; // Sector data
+	};
+		
+	
+	// Generate one track according to the description vector
+	// "sect" is a vector indexed by sector id
+	// "track_size" is in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm
+
+	void generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, UINT8 *buffer);
+
 	const char *m_name;
 	const char *m_extensions;
 	const char *m_description;
 	const char *m_param_guidelines;
+
+private:
+	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT };
+	enum { MAX_CRC_COUNT = 64 };
+	struct gen_crc_info {
+		int type, start, end, write;
+		bool fixup_mfm_clock;
+	};
+
+	bool type_no_data(int type) const;
+	bool type_data_mfm(int type, int p1, const gen_crc_info *crcs) const;
+
+	bool bit_r(UINT8 *buffer, int offset);
+	void bit_w(UINT8 *buffer, int offset, bool val);
+
+	int crc_cells_size(int type) const;
+	void fixup_crc_amiga(UINT8 *buffer, const gen_crc_info *crc);
+	void fixup_crc_ccitt(UINT8 *buffer, const gen_crc_info *crc);
+	void fixup_crcs(UINT8 *buffer, gen_crc_info *crcs);
+	void raw_w(UINT8 *buffer, int &offset, int n, UINT32 val);
+	void mfm_w(UINT8 *buffer, int &offset, int n, UINT32 val);
+	void mfm_half_w(UINT8 *buffer, int &offset, int start_bit, UINT32 val);
+	void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
 };
 
 
@@ -299,6 +373,7 @@ public:
 	UINT8* get_buffer(UINT16 track, UINT8 side) { return m_native_data[(track << 1) + side]; }
 	UINT16 get_track_size(UINT16 track, UINT8 side) { return m_track_size[(track << 1) + side]; }
 	bool load(int num);
+
 private:
 	void close_internal(bool close_file);
 	struct io_generic		m_io;
