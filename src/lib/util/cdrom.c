@@ -290,9 +290,12 @@ void cdrom_close(cdrom_file *file)
 	if (file->cache)
 		free(file->cache);
 		
-	for (int i = 0; i < file->cdtoc.numtrks; i++)
+	if (file->chd == NULL) 
 	{
-		core_fclose(file->fhandle[i]);
+		for (int i = 0; i < file->cdtoc.numtrks; i++)
+		{
+			core_fclose(file->fhandle[i]);
+		}
 	}
 		
 	free(file);
