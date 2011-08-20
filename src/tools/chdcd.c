@@ -37,6 +37,17 @@ static char linebuffer[512];
     IMPLEMENTATION
 ***************************************************************************/
 
+static astring get_file_path(astring &path)
+{	
+	int pos = path.rchr( 0, '\\');
+	if (pos!=-1) {
+		path = path.substr(0,pos+1);
+	} else {
+		pos = path.rchr( 0, '/');
+		path = path.substr(0,pos+1);
+	}
+	return path;
+}
 /*-------------------------------------------------
     get_file_size - get the size of a file
 -------------------------------------------------*/
@@ -300,7 +311,10 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 	UINT32 chain_offs, chunk_size;
 	int done = 0;
 
-	infile = fopen(tocfname, "rt");
+	astring path = astring(tocfname);
+
+	infile = fopen(tocfname, "rt");	
+	path = get_file_path(path);
 
 	if (infile == (FILE *)NULL)
 	{
@@ -374,8 +388,8 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 				index2 = read_uint64(infile);
 
 //              printf("Track %d: sector size %d mode %x index0 %llx index1 %llx index2 %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, index2, (UINT32)(index1-index0)/size, (UINT32)(index2-index1)/size);
-
-				strcpy(outinfo->fname[track-1], tocfname);
+				strncpy(outinfo->fname[track-1], path.cstr(), 256);
+				strncat(outinfo->fname[track-1], tocfname, 256);
 				outinfo->offset[track-1] = offset + (UINT32)(index1-index0);
 				outinfo->idx0offs[track-1] = 0;
 				outinfo->idx1offs[track-1] = 0;
@@ -444,7 +458,10 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 	int i, numtracks;
 	//int chdpos=0;
 
-	infile = fopen(tocfname, "rt");
+	astring path = astring(tocfname);
+
+	infile = fopen(tocfname, "rt");	
+	path = get_file_path(path);
 
 	if (infile == (FILE *)NULL)
 	{
@@ -508,8 +525,23 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 			outtoc->tracks[trknum].datasize=2352;
 		}
 
-		tok=strtok(NULL," ");
-		strcpy(&(outinfo->fname[trknum][0]),tok);
+		astring name;
+		
+		tok=strtok(NULL," ");		
+		name = tok;
+		if (tok[0]=='"') {
+			do {
+				tok=strtok(NULL," ");				
+				if (tok!=NULL) {
+					name += " ";
+					name += tok;
+				}
+			} while(tok!=NULL && (strrchr(tok,'"')-tok !=(strlen(tok)-1)));
+			name = name.delchr('"');
+		}
+		strncpy(outinfo->fname[trknum], path.cstr(), 256);
+		strncat(outinfo->fname[trknum], name, 256);
+		
 		sz=get_file_size(outinfo->fname[trknum]);
 
 		outtoc->tracks[trknum].frames=sz/trksize;
@@ -557,11 +589,12 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	FILE *infile;
 	int i, trknum;
 	static char token[128];
-	static char lastfname[128];
+	static char lastfname[256];
 	UINT32 wavlen, wavoffs;
+	astring path = astring(tocfname);
 
-	infile = fopen(tocfname, "rt");
-
+	infile = fopen(tocfname, "rt");	
+	path = get_file_path(path);
 	if (infile == (FILE *)NULL)
 	{
 		return CHDERR_FILE_NOT_FOUND;
@@ -592,7 +625,8 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				TOKENIZE
 
 				/* keep the filename */
-				strncpy(lastfname, token, 128);
+				strncpy(lastfname, path.cstr(), 256);
+				strncat(lastfname, token, 256);
 
 				/* get the file type */
 				TOKENIZE
@@ -654,7 +688,8 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				outtoc->tracks[trknum].pregap = 0;
 				outinfo->idx0offs[trknum] = -1;
 				outinfo->idx1offs[trknum] = 0;
-				strcpy(&outinfo->fname[trknum][0], lastfname);	// default filename to the last one
+
+				strncpy(outinfo->fname[trknum], lastfname, 256); // default filename to the last one
 //              printf("trk %d: fname %s offset %d\n", trknum, &outinfo->fname[trknum][0], outinfo->offset[trknum]);
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc->tracks[trknum]);
@@ -832,7 +867,10 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 		return chdcd_parse_nero(tocfname, outtoc, outinfo);
 	}
 
-	infile = fopen(tocfname, "rt");
+	astring path = astring(tocfname);
+
+	infile = fopen(tocfname, "rt");	
+	path = get_file_path(path);
 
 	if (infile == (FILE *)NULL)
 	{
@@ -865,7 +903,8 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				TOKENIZE
 
 				/* keep the filename */
-				strncpy(&outinfo->fname[trknum][0], token, strlen(token));
+				strncpy(outinfo->fname[trknum], path.cstr(), 256);
+				strncat(outinfo->fname[trknum], token, 256);
 
 				/* get either the offset or the length */
 				TOKENIZE
