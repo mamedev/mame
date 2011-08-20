@@ -96,8 +96,8 @@ void cdrom_image_device::device_config_complete()
 	image_device_format *format = global_alloc_clear(image_device_format);;
 	format->m_index 	  = 0;
 	format->m_name        = "chdcd";
-	format->m_description = "CHD CD-ROM drive";
-	format->m_extensions  = "chd";
+	format->m_description = "CD-ROM drive";
+	format->m_extensions  = "chd,cue,toc,nrg,gdi";
 	format->m_optspec     = cd_option_spec;
 	format->m_next		  = NULL;
 
@@ -129,15 +129,21 @@ bool cdrom_image_device::call_load()
 
 	if (software_entry() == NULL)
 	{
-		err = chd_open_file( image_core_file(), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */
-		if ( err )
-			goto error;
+		if (strstr(m_image_name,".chd")) {
+			err = chd_open_file( image_core_file(), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */
+			if ( err )
+				goto error;
+		}
 	} else {
 		chd  = get_disk_handle(device().machine(), device().subtag(tempstring,"cdrom"));
 	}
 
 	/* open the CHD file */
-	m_cdrom_handle = cdrom_open( chd );
+	if (chd) {
+		m_cdrom_handle = cdrom_open( chd );
+	} else {
+		m_cdrom_handle = cdrom_open( m_image_name );
+	}
 	if ( ! m_cdrom_handle )
 		goto error;
 

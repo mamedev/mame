@@ -130,6 +130,8 @@ struct _cdrom_toc
 cdrom_file *cdrom_open(chd_file *chd);
 void cdrom_close(cdrom_file *file);
 
+cdrom_file *cdrom_open(const char *inputfile);
+
 /* core read access */
 UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype);
 UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer);

@@ -34,6 +34,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/bitmap.o \
 	$(LIBOBJ)/util/cdrom.o \
 	$(LIBOBJ)/util/chd.o \
+	$(LIBOBJ)/util/chdcd.o \
 	$(LIBOBJ)/util/corefile.o \
 	$(LIBOBJ)/util/corestr.o \
 	$(LIBOBJ)/util/coreutil.o \

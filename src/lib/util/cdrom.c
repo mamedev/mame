@@ -48,7 +48,7 @@
 #include "cdrom.h"
 
 #include <stdlib.h>
-
+#include "chdcd.h"
 
 
 /***************************************************************************
@@ -74,9 +74,11 @@ struct _cdrom_file
 {
 	chd_file *			chd;				/* CHD file */
 	cdrom_toc			cdtoc;				/* TOC for the CD */
+	chdcd_track_input_info track_info;		/* track info */
 	UINT32				hunksectors;		/* sectors per hunk */
 	UINT32				cachehunk;			/* which hunk is cached */
 	UINT8 *				cache;				/* cache of the current hunk */
+	core_file *			fhandle[CD_MAX_TRACKS];/* file handle */
 };
 
 
@@ -121,6 +123,80 @@ INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 *trac
 /***************************************************************************
     BASE FUNCTIONALITY
 ***************************************************************************/
+
+cdrom_file *cdrom_open(const char *inputfile)
+{	
+	int i;
+	cdrom_file *file;
+	UINT32 physofs, chdofs;	
+	
+	/* allocate memory for the CD-ROM file */
+	file = (cdrom_file *)malloc(sizeof(cdrom_file));
+	if (file == NULL)
+		return NULL;
+
+	/* setup the CDROM module and get the disc info */
+	chd_error err = chdcd_parse_toc(inputfile, &file->cdtoc, &file->track_info);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error reading input file: %s\n", chd_error_string(err));
+		return NULL;
+	}
+
+	/* fill in the data */
+	file->chd = NULL;
+	file->hunksectors = 1;
+	file->cachehunk = -1;
+
+	LOG(("CD has %d tracks\n", file->cdtoc.numtrks));
+
+	for (i = 0; i < file->cdtoc.numtrks; i++)
+	{
+		file_error filerr = core_fopen(file->track_info.fname[i], OPEN_FLAG_READ, &file->fhandle[i]);
+		if (filerr != FILERR_NONE)
+		{
+			fprintf(stderr, "Unable to open file: %s\n", file->track_info.fname[i]);
+			return NULL;
+		}
+	}
+	/* calculate the starting frame for each track, keeping in mind that CHDMAN
+       pads tracks out with extra frames to fit hunk size boundries
+    */
+	physofs = chdofs = 0;
+	for (i = 0; i < file->cdtoc.numtrks; i++)
+	{
+		file->cdtoc.tracks[i].physframeofs = physofs;
+		file->cdtoc.tracks[i].chdframeofs = chdofs;
+
+		physofs += file->cdtoc.tracks[i].frames;
+		chdofs  += file->cdtoc.tracks[i].frames;
+		chdofs  += file->cdtoc.tracks[i].extraframes;
+
+		LOG(("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d physofs %d chdofs %d\n", i+1,
+			file->cdtoc.tracks[i].trktype,
+			file->cdtoc.tracks[i].subtype,
+			file->cdtoc.tracks[i].datasize,
+			file->cdtoc.tracks[i].subsize,
+			file->cdtoc.tracks[i].frames,
+			file->cdtoc.tracks[i].extraframes,
+			file->cdtoc.tracks[i].physframeofs,
+			file->cdtoc.tracks[i].chdframeofs));
+	}
+
+	/* fill out dummy entries for the last track to help our search */
+	file->cdtoc.tracks[i].physframeofs = physofs;
+	file->cdtoc.tracks[i].chdframeofs = chdofs;
+
+	/* allocate a cache */
+	file->cache = (UINT8 *)malloc(CD_FRAME_SIZE);
+	if (file->cache == NULL)
+	{
+		free(file);
+		return NULL;
+	}
+
+	return file;	
+}
 
 /*-------------------------------------------------
     cdrom_open - "open" a CD-ROM file from an
@@ -215,6 +291,12 @@ void cdrom_close(cdrom_file *file)
 	/* free the cache */
 	if (file->cache)
 		free(file->cache);
+		
+	for (int i = 0; i < file->cdtoc.numtrks; i++)
+	{
+		core_fclose(file->fhandle[i]);
+	}
+		
 	free(file);
 }
 
@@ -639,9 +721,32 @@ static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT
 	/* if we haven't cached this hunk, read it now */
 	if (file->cachehunk != hunknum)
 	{
-		err = chd_read(file->chd, hunknum, file->cache);
-		if (err != CHDERR_NONE)
-			return err;
+		if (file->chd) {
+			err = chd_read(file->chd, hunknum, file->cache);
+			if (err != CHDERR_NONE)
+				return err;
+		} else {		
+			core_file *srcfile = file->fhandle[*tracknum];
+
+			UINT64 sourcefileoffset = file->track_info.offset[*tracknum];
+			int bytespersector = file->cdtoc.tracks[*tracknum].datasize + file->cdtoc.tracks[*tracknum].subsize;			
+
+			sourcefileoffset += chdsector * bytespersector;
+
+			core_fseek(srcfile, sourcefileoffset, SEEK_SET);
+			core_fread(srcfile, file->cache, bytespersector);
+
+			if (file->track_info.swap[*tracknum])					
+			{
+				for (int swapindex = 0; swapindex < 2352; swapindex += 2 )
+				{
+					int swaptemp = file->cache[ swapindex ];
+					file->cache[ swapindex ] = file->cache[ swapindex + 1 ];
+					file->cache[ swapindex + 1 ] = swaptemp;
+				}
+			}
+		}
+		
 		file->cachehunk = hunknum;
 	}
 	return CHDERR_NONE;
