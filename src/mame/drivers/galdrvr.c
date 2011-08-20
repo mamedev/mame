@@ -5259,7 +5259,6 @@ ROM_START( amidars )
 	ROM_LOAD( "amidar.clr",   0x0000, 0x0020, CRC(f940dcc3) SHA1(1015e56f37c244a850a8f4bf0e36668f047fd46d) )
 ROM_END
 
-
 ROM_START( theend )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic13_1t.bin",  0x0000, 0x0800, CRC(93e555ba) SHA1(f684927cecabfbd7544f7549a6152c0a6a436019) )
@@ -5297,6 +5296,23 @@ ROM_START( theends )
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "ic30",         0x0000, 0x0800, CRC(527fd384) SHA1(92a384899d5acd2c689f637da16a0e2d11a9d9c6) )
 	ROM_LOAD( "ic31",         0x0800, 0x0800, CRC(af6d09b6) SHA1(f3ad51dc88aa58fd39195ead978b039e0b0b585c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
+ROM_END
+
+ROM_START( theendb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0p.t.o.10l",   0x0000, 0x1000, CRC(46712d43) SHA1(e1b84494b530dd96d8a51a3f8bd7d7d3ba7560a9) )
+	ROM_LOAD( "1p.t.o.9l",    0x1000, 0x1000, CRC(10256742) SHA1(3748bf82e410ba763cc10a546b566f1d9efb8307) )
+	ROM_LOAD( "2p.t.o.8l",    0x2000, 0x1000, CRC(5ee6660a) SHA1(092d5da074c15743e619e3d9e0b5f5bd16ea7159) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "0s.t.o.3b",    0x0000, 0x1000, CRC(cdc9da78) SHA1(b52d5b67b8e0dfb76216d7b3e6e51a027ef4b20e) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "ic30",         0x0000, 0x0800, CRC(527fd384) SHA1(92a384899d5acd2c689f637da16a0e2d11a9d9c6) ) // 0gc.t.o.5h
+	ROM_LOAD( "ic31",         0x0800, 0x0800, CRC(af6d09b6) SHA1(f3ad51dc88aa58fd39195ead978b039e0b0b585c) ) // 1gc.t.o.3h
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
@@ -6307,6 +6323,7 @@ GAME( 1982, amidars,  amidar,   scramble, amidars,  scramble, ROT90,  "Konami", 
 /* The End/Scramble based hardware */
 GAME( 1980, theend,   0,        theend,   theend,   theend,   ROT90,  "Konami", "The End", GAME_SUPPORTS_SAVE )
 GAME( 1980, theends,  theend,   theend,   theend,   theend,   ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1980, theendb,  theend,   theend,   theend,   theend,   ROT90,  "bootleg?", "The End (bootleg?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 GAME( 1981, scramble, 0,        scramble, scramble, scramble, ROT90,  "Konami", "Scramble", GAME_SUPPORTS_SAVE )
 GAME( 1981, scrambles,scramble, scramble, scramble, scramble, ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics)", GAME_SUPPORTS_SAVE )

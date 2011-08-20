@@ -738,6 +738,35 @@ ROM_START( phoenixc )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
+ROM_START( phoenixc2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "phoenix.45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) ) // 01.ic45
+	ROM_LOAD( "phoenix.46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) ) // 01.ic46
+	ROM_LOAD( "phoenix.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) ) // 01.ic47
+	ROM_LOAD( "01.ic48",      0x1800, 0x0800, CRC(f28e16d8) SHA1(65a7592f9589bcd094ffc9b2b44ca3257bcf5e5c) )
+	ROM_LOAD( "phoenixc.49",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) ) // 01.1c49
+	ROM_LOAD( "h6-ic50.6a",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) ) // 01.ic50
+	ROM_LOAD( "h7-ic51.7a",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) ) // 01.ic51
+	ROM_LOAD( "phoenixc.52",  0x3800, 0x0800, CRC(8424d7c4) SHA1(1b5fa7d8be9e8750a4148dfefc17e96c86ed084d) ) // 01.ic52
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "ic23.3d",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) ) // 01.ic23
+	ROM_LOAD( "ic24.4d",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) ) // 01.ic24
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "phoenixc.39",  0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) ) // 01.ic39
+	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) ) // 01.ic40
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits - 01.ic40 */
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits - 01.ic41 */
+
+	ROM_REGION( 0x0300, "plds", 0 )
+	ROM_LOAD( "tbp24sa10n.183.bin",   0x0000, 0x0100, CRC(47f5e887) SHA1(786d5a599b919ce6f06fe5c568ab6fa6c87b1002) )
+	ROM_LOAD( "tbp24sa10n.184.bin",   0x0100, 0x0100, CRC(931f3292) SHA1(94b0d65e909389a2c0c0aac2e16a55e60b14f3bc) )
+	ROM_LOAD( "tbp24sa10n.185.bin",   0x0200, 0x0100, CRC(0a06bd1b) SHA1(8c5debc5502e88af8019266fedcbe4bad1e2e214) )
+ROM_END
+
 ROM_START( condor )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cond01c.bin",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
@@ -1068,6 +1097,7 @@ GAME( 1980, phoenixt, phoenix,  phoenix,  phoenixt, 0,        ROT90, "Amstar (Ta
 GAME( 1980, phoenixj, phoenix,  phoenix,  phoenixt, 0,        ROT90, "Amstar (Taito Japan license)", "Phoenix (Taito Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1980, phoenix3, phoenix,  phoenix,  phoenix3, 0,        ROT90, "bootleg (T.P.N.)",   "Phoenix (T.P.N.)", GAME_SUPPORTS_SAVE )
 GAME( 1981, phoenixc, phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",  "Phoenix (Irecsa / G.G.I Corp)", GAME_SUPPORTS_SAVE )
+GAME( 1981, phoenixc2,phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",  "Phoenix (Irecsa / G.G.I Corp - set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, condor,   phoenix,  condor,   condor,   condor,   ROT90, "bootleg",   "Condor (bootleg of Phoenix)", GAME_SUPPORTS_SAVE )
 // the following 2 were common bootlegs in england & france respectively
 GAME( 1980, falcon,   phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg",   "Falcon (bootleg of Phoenix) (8085A CPU)", GAME_SUPPORTS_SAVE )

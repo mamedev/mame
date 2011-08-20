@@ -981,6 +981,26 @@ ROM_START( rescue )
 	ROM_LOAD( "rescue.clr",   0x0000, 0x0020, CRC(40c6bcbd) SHA1(cb0c058eadc37eba4b1a99be095da81a14099d8d) )
 ROM_END
 
+ROM_START( rescueb )  /* VIDEL GAMES @ ($079A-$07A4) */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p1.2c",        0x0000, 0x1000, CRC(d3661258) SHA1(41782097f6acb1d76067e7d727837a5a5297e43f) )
+	ROM_LOAD( "p2.2e",        0x1000, 0x1000, CRC(47464506) SHA1(53a2a3ff307ad49ead8a7fcf897c8650f56eeb19) )
+	ROM_LOAD( "p3.2f",        0x2000, 0x1000, CRC(7dc03ec3) SHA1(9aa5fda48a40c977d15e51bbcfe9b155705a6941) )
+	ROM_LOAD( "p4.2h",        0x3000, 0x1000, CRC(a11eaf78) SHA1(dfbc6ea5894493fd74fe3f75cd1793bd31673319) )
+	ROM_LOAD( "rb15ecpu.bin", 0x4000, 0x1000, CRC(604df3a4) SHA1(15790fa442538632f232280c096ac788d9bf8117) ) // p5.2j
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "rb15csnd.bin", 0x0000, 0x0800, CRC(8b24bf17) SHA1(cc49fef3c629c12f1a7eb9886fdc2df4b08f4b37) ) // s1.5c
+	ROM_LOAD( "rb15dsnd.bin", 0x0800, 0x0800, CRC(d96e4fb3) SHA1(8bb023c7c668f93d2333d648fc3cefdbd66f92db) ) // s1.5d
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "rb15fcpu.bin", 0x0000, 0x0800, CRC(4489d20c) SHA1(c7a2afbd2e5645a1a25dec6147d61a38ba12380f) ) // c1.5f
+	ROM_LOAD( "rb15hcpu.bin", 0x0800, 0x0800, CRC(5512c547) SHA1(e0f1c994daaa8933230cbc4bb88d459a698e0d8e) ) // c2.5h
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "rescue.clr",   0x0000, 0x0020, CRC(40c6bcbd) SHA1(cb0c058eadc37eba4b1a99be095da81a14099d8d) )
+ROM_END
+
 ROM_START( aponow )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "aponow01.rom", 0x0000, 0x1000, CRC(33011579) SHA1(62bd821f6e0968a5ed9cbab26a8bff31e707f07a) )
@@ -1173,6 +1193,7 @@ GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  stratgyx,     ROT0,   "bo
 GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
 GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, rescue,    0,        rescue,    rescue,    rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
+GAME( 1982, rescueb,   rescue,   rescue,    rescue,    rescue,       ROT90,  "bootleg", "Rescue (Videl Games bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1982, aponow,    rescue,   rescue,    rescue,    rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
 GAME( 1983, minefld,   0,        minefld,   minefld,   minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustler,   0,        hustler,   hustler,   hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
