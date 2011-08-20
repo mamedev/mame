@@ -97,8 +97,6 @@ public:
 		SUBSTATUS_NOT_FOUND,
 		SUBSTATUS_NOT_FOUND_NODUMP,
 		SUBSTATUS_NOT_FOUND_OPTIONAL,
-		SUBSTATUS_NOT_FOUND_PARENT,
-		SUBSTATUS_NOT_FOUND_BIOS,
 		SUBSTATUS_ERROR = 100
 	};
 
@@ -116,6 +114,7 @@ public:
 	UINT64 actual_length() const { return m_length; }
 	const hash_collection &expected_hashes() const { return m_exphashes; }
 	const hash_collection &actual_hashes() const { return m_hashes; }
+	const rom_source *shared_source() const { return m_shared_source; }
 
 	// setters
 	void set_status(audit_status status, audit_substatus substatus)
@@ -130,6 +129,11 @@ public:
 		m_length = length;
 	}
 
+	void set_shared_source(const rom_source *shared_source)
+	{
+		m_shared_source = shared_source;
+	}
+
 private:
 	// internal state
 	audit_record *		m_next;
@@ -141,6 +145,7 @@ private:
 	UINT64				m_length;				/* actual length of item */
 	hash_collection		m_exphashes;    		/* expected hash data */
 	hash_collection		m_hashes;				/* actual hash information */
+	const rom_source *	m_shared_source;		/* rom_source that shares the rom */
 };
 
 
@@ -178,7 +183,7 @@ private:
 	audit_record *audit_one_rom(const rom_entry *rom);
 	audit_record *audit_one_disk(const rom_entry *rom);
 	void compute_status(audit_record &record, const rom_entry *rom, bool found);
-	int also_used_by_parent(const hash_collection &romhashes, UINT64 romlength);
+	const rom_source *find_shared_source(const rom_source *source, const hash_collection &romhashes, UINT64 romlength);
 
 	// internal state
 	simple_list<audit_record>	m_record_list;

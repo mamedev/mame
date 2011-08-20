@@ -89,9 +89,6 @@ const char *driverpath = m_enumerator.config().devicelist().find("root")->search
 		// determine the search path for this source and iterate through the regions
 		m_searchpath = source->searchpath();
 
-		// also determine if this is the driver's specific ROMs or not
-		bool source_is_gamedrv = (dynamic_cast<const driver_device *>(source) != NULL);
-
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 		{
@@ -107,13 +104,13 @@ m_searchpath = combinedpath;
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
 				hash_collection hashes(ROM_GETHASHDATA(rom));
-				bool shared = !source_is_gamedrv || also_used_by_parent(hashes, ROM_GETLENGTH(rom)) >= 0;
+				const rom_source *shared_source = find_shared_source(source, hashes, ROM_GETLENGTH(rom));
 
 				// count the number of files with hashes
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
 				{
 					required++;
-					if (shared)
+					if (shared_source != NULL)
 					{
 						sharedRequired++;
 					}
@@ -128,14 +125,19 @@ m_searchpath = combinedpath;
 				else if (ROMREGION_ISDISKDATA(region))
 					record = audit_one_disk(rom);
 
-				// count the number of files that are found.
-				if (record != NULL && (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && also_used_by_parent(record->actual_hashes(), record->actual_length()) < 0)))
+				if (record != NULL)
 				{
-					found++;
-					if (shared)
+					// count the number of files that are found.
+					if (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && find_shared_source(source,record->actual_hashes(), record->actual_length()) != NULL))
 					{
-						sharedFound++;
+						found++;
+						if (shared_source != NULL)
+						{
+							sharedFound++;
+						}
 					}
+
+					record->set_shared_source(shared_source);
 				}
 			}
 		}
@@ -323,7 +325,12 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *strin
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND:
-				if (string != NULL) string->catprintf("NOT FOUND\n");
+				if (string != NULL)
+				{
+					const rom_source *shared_source = record->shared_source();
+					if (shared_source == NULL) string->catprintf("NOT FOUND\n");
+					else string->catprintf("NOT FOUND (%s)\n", shared_source->shortname());
+				}
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND_NODUMP:
@@ -334,14 +341,6 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *strin
 			case audit_record::SUBSTATUS_NOT_FOUND_OPTIONAL:
 				if (string != NULL) string->catprintf("NOT FOUND BUT OPTIONAL\n");
 				best_new_status = BEST_AVAILABLE;
-				break;
-
-			case audit_record::SUBSTATUS_NOT_FOUND_PARENT:
-				if (string != NULL) string->catprintf("NOT FOUND (shared with parent)\n");
-				break;
-
-			case audit_record::SUBSTATUS_NOT_FOUND_BIOS:
-				if (string != NULL) string->catprintf("NOT FOUND (BIOS)\n");
 				break;
 
 			default:
@@ -444,8 +443,6 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 	// if not found, provide more details
 	if (!found)
 	{
-		int parent;
-
 		// no good dump
 		if (record.expected_hashes().flag(hash_collection::FLAG_NO_DUMP))
 			record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND_NODUMP);
@@ -453,15 +450,6 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 		// optional ROM
 		else if (ROM_ISOPTIONAL(rom))
 			record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND_OPTIONAL);
-
-		// not found and used by parent
-		else if ((parent = also_used_by_parent(record.expected_hashes(), record.expected_length())) != -1)
-		{
-			if (m_enumerator.driver(parent).flags & GAME_IS_BIOS_ROOT)
-				record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND_BIOS);
-			else
-				record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND_PARENT);
-		}
 
 		// just plain old not found
 		else
@@ -495,30 +483,43 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 
 
 //-------------------------------------------------
-//  also_used_by_parent - return the index in the
-//  enumerator of the parent who also owns a media
-//  entry with the same hashes
+//  find_shared_source - return the source that
+//  shares a media entry with the same hashes
 //-------------------------------------------------
-
-int media_auditor::also_used_by_parent(const hash_collection &romhashes, UINT64 romlength)
+const rom_source *media_auditor::find_shared_source(const rom_source *source, const hash_collection &romhashes, UINT64 romlength)
 {
+	const rom_source *highest_source = NULL;
+
 	if (!romhashes.flag(hash_collection::FLAG_NO_DUMP))
-		// iterate up the parent chain
-		for (int drvindex = m_enumerator.find(m_enumerator.driver().parent); drvindex != -1; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
+	{
+		if (dynamic_cast<const driver_device *>(source) == NULL)
+		{
+			for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))
+				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+					if (ROM_GETLENGTH(rom) == romlength)
+					{
+						hash_collection hashes(ROM_GETHASHDATA(rom));
+						if (hashes == romhashes)
+							highest_source = source;
+					}
+		}
+		else
+		{
+			// iterate up the parent chain
+			for (int drvindex = m_enumerator.find(m_enumerator.driver().parent); drvindex != -1; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
+				for (const rom_source *source = rom_first_source(m_enumerator.config(drvindex)); source != NULL; source = rom_next_source(*source))
+					for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))
+						for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+							if (ROM_GETLENGTH(rom) == romlength)
+							{
+								hash_collection hashes(ROM_GETHASHDATA(rom));
+								if (hashes == romhashes)
+									highest_source = source;
+							}
+		}
+	}
 
-			// see if the parent has the same ROM or not
-			for (const rom_source *source = rom_first_source(m_enumerator.config(drvindex)); source != NULL; source = rom_next_source(*source))
-				for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))
-					for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-						if (ROM_GETLENGTH(rom) == romlength)
-						{
-							hash_collection hashes(ROM_GETHASHDATA(rom));
-							if (hashes == romhashes)
-								return drvindex;
-						}
-
-	// nope, return -1
-	return -1;
+	return highest_source;
 }
 
 
