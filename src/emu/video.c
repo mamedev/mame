@@ -647,7 +647,7 @@ inline bool video_manager::effective_throttle() const
 
 inline int video_manager::original_speed_setting() const
 {
-	return machine().options().speed() * 100.0 + 0.5;
+	return machine().options().speed() * 1000.0 + 0.5;
 }
 
 
@@ -743,10 +743,10 @@ void video_manager::update_throttle(attotime emutime)
 	while (1)
 	{
 		// apply speed factor to emu time
-		if (m_speed != 0 && m_speed != 100)
+		if (m_speed != 0 && m_speed != 1000)
 		{
-			// multiply emutime by 100, then divide by the global speed factor
-			emutime = (emutime * 100) / m_speed;
+			// multiply emutime by 1000, then divide by the global speed factor
+			emutime = (emutime * 1000) / m_speed;
 		}
 
 		// compute conversion factors up front
@@ -906,7 +906,7 @@ void video_manager::update_frameskip()
 	if (effective_throttle() && effective_autoframeskip() && m_frameskip_counter == 0)
 	{
 		// if we're too fast, attempt to increase the frameskip
-		double speed = m_speed * 0.01;
+		double speed = m_speed * 0.001;
 		if (m_speed_percent >= 0.995 * speed)
 		{
 			// but only after 3 consecutive frames where we are too fast
@@ -971,14 +971,14 @@ void video_manager::update_refresh_speed()
 			// compute a target speed as an integral percentage
 			// note that we lop 0.25Hz off of the minrefresh when doing the computation to allow for
             // the fact that most refresh rates are not accurate to 10 digits...
-			UINT32 target_speed = floor((minrefresh - 0.25f) * 100.0 / ATTOSECONDS_TO_HZ(min_frame_period));
+			UINT32 target_speed = floor((minrefresh - 0.25f) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
 			UINT32 original_speed = original_speed_setting();
 			target_speed = MIN(target_speed, original_speed);
 
 			// if we changed, log that verbosely
 			if (target_speed != m_speed)
 			{
-				mame_printf_verbose("Adjusting target speed to %d%% (hw=%.2fHz, game=%.2fHz, adjusted=%.2fHz)\n", target_speed, minrefresh, ATTOSECONDS_TO_HZ(min_frame_period), ATTOSECONDS_TO_HZ(min_frame_period * 100 / target_speed));
+				mame_printf_verbose("Adjusting target speed to %d%% (hw=%.2fHz, game=%.2fHz, adjusted=%.2fHz)\n", target_speed, minrefresh, ATTOSECONDS_TO_HZ(min_frame_period), ATTOSECONDS_TO_HZ(min_frame_period * 1000 / target_speed));
 				m_speed = target_speed;
 			}
 		}

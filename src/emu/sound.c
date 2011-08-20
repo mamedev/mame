@@ -1011,9 +1011,9 @@ void sound_manager::update()
 	UINT32 finalmix_offset = 0;
 	INT16 *finalmix = m_finalmix;
 	int sample;
-	for (sample = m_finalmix_leftover; sample < samples_this_update * 100; sample += finalmix_step)
+	for (sample = m_finalmix_leftover; sample < samples_this_update * 1000; sample += finalmix_step)
 	{
-		int sampindex = sample / 100;
+		int sampindex = sample / 1000;
 
 		// clamp the left side
 		INT32 samp = m_leftmix[sampindex];
@@ -1031,7 +1031,7 @@ void sound_manager::update()
 			samp = 32767;
 		finalmix[finalmix_offset++] = samp;
 	}
-	m_finalmix_leftover = sample - samples_this_update * 100;
+	m_finalmix_leftover = sample - samples_this_update * 1000;
 
 	// play the result
 	if (finalmix_offset > 0)
