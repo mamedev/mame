@@ -896,7 +896,37 @@ static INPUT_CHANGED( key_stroke )
 
 #define SATURN_KEYBOARD	PORT_CONDITION("INPUT_TYPE", 0x0f, PORTCOND_EQUALS, 0x05)
 
+static INPUT_CHANGED( nmi_reset )
+{
+	saturn_state *state = field.machine().driver_data<saturn_state>();
+
+	/* TODO: correct? */
+	if(!state->m_NMI_reset)
+		return;
+
+	/* TODO: NMI doesn't stay held on SH-2 core so we can't use ASSERT_LINE/CLEAR_LINE with that yet */
+	if(newval)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static INPUT_CHANGED( tray_open )
+{
+	if(newval)
+		stvcd_set_tray_open(field.machine());
+}
+
+static INPUT_CHANGED( tray_close )
+{
+	if(newval)
+		stvcd_set_tray_close(field.machine());
+}
+
 static INPUT_PORTS_START( saturn )
+	PORT_START("RESET") /* hardwired buttons */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED(nmi_reset,0) PORT_NAME("Reset Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED(tray_open,0) PORT_NAME("Tray Open Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED(tray_close,0) PORT_NAME("Tray Close")
+
 	PORT_START("JOY1")
 	SATURN_PAD_P1(0x0f, 0)
 

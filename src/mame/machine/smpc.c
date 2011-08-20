@@ -271,7 +271,7 @@ static TIMER_CALLBACK( smpc_change_clock )
 	state->m_vdp2.dotsel = param ^ 1;
 	stv_vdp2_dynamic_res_change(machine);
 
-	if(state->m_NMI_reset)
+	if(!state->m_NMI_reset)
 		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	device_set_input_line(state->m_slave, INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -616,8 +616,8 @@ static void smpc_nmi_set(running_machine &machine,UINT8 cmd)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	state->m_NMI_reset = cmd ^ 1;
-	state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+	state->m_NMI_reset = cmd;
+	//state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 }
 
 
@@ -670,7 +670,7 @@ static void smpc_comreg_exec(address_space *space, UINT8 data, UINT8 is_stv)
 			break;
 		/*"Interrupt Back"*/
 		case 0x10:
-			if(LOG_SMPC)
+			if(0)
 			{
 				saturn_state *state = space->machine().driver_data<saturn_state>();
 				printf ("SMPC: Status Acquire %02x %02x %02x %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],state->m_smpc.IREG[2],space->machine().primary_screen->vpos());
