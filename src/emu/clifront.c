@@ -835,11 +835,6 @@ void cli_frontend::verifyroms(const char *gamename)
 					incorrect++;
 					break;
 
-				case media_auditor::NOTFOUND:
-					mame_printf_info("not found!\n");
-					incorrect++;
-					break;
-
 				case media_auditor::CORRECT:
 					mame_printf_info("is good\n");
 					correct++;
