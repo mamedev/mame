@@ -128,7 +128,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 {	
 	int i;
 	cdrom_file *file;
-	UINT32 physofs, chdofs;	
+	UINT32 physofs;	
 	
 	/* allocate memory for the CD-ROM file */
 	file = (cdrom_file *)malloc(sizeof(cdrom_file));
@@ -162,15 +162,13 @@ cdrom_file *cdrom_open(const char *inputfile)
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
        pads tracks out with extra frames to fit hunk size boundries
     */
-	physofs = chdofs = 0;
+	physofs = 0;
 	for (i = 0; i < file->cdtoc.numtrks; i++)
 	{
 		file->cdtoc.tracks[i].physframeofs = physofs;
-		file->cdtoc.tracks[i].chdframeofs = chdofs;
+		file->cdtoc.tracks[i].chdframeofs = 0;
 
 		physofs += file->cdtoc.tracks[i].frames;
-		chdofs  += file->cdtoc.tracks[i].frames;
-		chdofs  += file->cdtoc.tracks[i].extraframes;
 
 		LOG(("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d physofs %d chdofs %d\n", i+1,
 			file->cdtoc.tracks[i].trktype,
@@ -185,7 +183,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 	/* fill out dummy entries for the last track to help our search */
 	file->cdtoc.tracks[i].physframeofs = physofs;
-	file->cdtoc.tracks[i].chdframeofs = chdofs;
+	file->cdtoc.tracks[i].chdframeofs = 0;
 
 	/* allocate a cache */
 	file->cache = (UINT8 *)malloc(CD_FRAME_SIZE);
