@@ -420,6 +420,11 @@ ROM_START( ep_bjclb )
 	ROM_LOAD16_BYTE( "bkjk0-1n.p0", 0x000000, 0x020000, CRC(a031107f) SHA1(ac6437824193661bffcc0cc5a29cf1d2786615ca) )
 	ROM_LOAD16_BYTE( "bkjk0-1n.p1", 0x000001, 0x020000, CRC(2db7c862) SHA1(3d729128fe93e0400fc0b683fd9189342db7cf89) )
 
+	//ROM_REGION( 0x080000, "altrevs", 0 ) /* split into clones later */
+	//ROM_LOAD16_BYTE( "blackjak.p1", 0x000000, 0x020000, BAD_DUMP CRC(31660bf5) SHA1(225c8ef7138b642cbf07a0cb8a575b1e768463ca) ) // FIXED BITS (xxxxxx1x)
+	//ROM_LOAD16_BYTE( "blackjak.p2", 0x000001, 0x020000, BAD_DUMP CRC(cacfcadb) SHA1(b6af22664abffe853007a6fa62631431220f46ac) ) // FIXED BITS (xxxxxx1x)
+
+
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "bkjksnd.p0", 0x000000, 0x0ab42c, CRC(8f574d3f) SHA1(3ce26f0bd7e88baddcf80abeebf190eb2a5f8333) )
 ROM_END

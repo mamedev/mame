@@ -12232,6 +12232,9 @@ sc_u1337		// zzz_unk 39211337 (Mazooma)
 sc_u1396		// zzz_unk 95411396 (Mazooma)
 sc_u6606		// zzz_unk 95416606 (Mazooma)
 sc_u7606		// zzz_unk 95417606 (Mazooma)
+sc_rhr			// Red Hot Reels (Qps)
+sc_po8			// Pieces of Eight (Qps)
+sc_wag			// Win-A-Gain (Nova)
 sc_unsrt		// unsorted
 
 
@@ -13383,6 +13386,7 @@ m4dcrazy	// D' Crazy Reels (Qps)
 m4ftladn	// Find the Lady (Nova)
 m4goldnn	// Golden Years (Nova)
 m4jungjk	// Jungle Jackpots (Mazooma - Qps)
+m4clab		// Cash Lab (Mazooma - Qps)
 m4looplt	// Loop The Loot (Qps)
 m4mgpn		// Monaco Grand Prix (Nova)
 m4olygn		// Olympic Gold (Nova)
@@ -13663,6 +13667,8 @@ m5ultimo	// Ultimo (Barcrest)
 m5upover	// Up & Over (Barcrest)
 m5vampup	// Vamp It Up (Barcrest)
 m5wking		// Wild King (Barcrest)
+m5costa		// Costa Del Cash (Barcrest)
+m5ttwo		// Take Two (Barcrest)
 
 /* Barcrest / Red Gaming */
 
@@ -13689,7 +13695,8 @@ m5rampg		// Rampage (Barcrest - Red Gaming)
 m5rdwarf	// Red Dwarf (Barcrest - Red Gaming)
 m5redx		// Red X (Barcrest - Red Gaming)
 m5topdol	// Top Dollar (Barcrest - Red Gaming)
-
+m5dbubl		// Double Bubble (Barcrest - Red Gaming)
+m5ddrag		// Double Dragon (Barcrest - Red Gaming)
 
 /* Vivid */
 
@@ -13882,6 +13889,17 @@ ac1pster		// Pound Sterling (Ace)
 ac1pstrt		// Pound Stretcher (Pcp)
 ac1primt		// Primetime (Ace)
 ac1taklv		// Take It Or Leave It (Ace)
+
+ac1bbclb		// Big Break Club (Ace)
+ac1clbsv		// Club Sovereign (Ace)
+ac1clbxt		// Club Xtra (Ace)
+ac1piaca		// Play It Again Casino (Ace)
+ac1piacl		// Play It Again Club (Ace)
+ac1piadx		// Play It Again Deluxe (Ace)
+ac1prmcl		// Premier Club (Ace)
+ac1rundx		// Runner Deluxe Club (Ace)
+ac1totb			// Top Of The Bill (Ace)
+ac1shid			// Super Hi De Hi (Ace)
 
 
 // Ace 'sp.ACE system'

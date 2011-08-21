@@ -4804,6 +4804,8 @@ ROM_START( sc2dick )
 	ROM_LOAD( "spot3-1p.p1", 0x0000, 0x010000, CRC(fa027939) SHA1(7fc6d26d179d976add3ca18c5df71dd9df7af1f2) )
 //  ROM_LOAD( "spotd_v2_2.bin", 0x0000, 0x010000, CRC(497ef3b2) SHA1(f5021e35397081c62e817b86ff9e8a49d78748a5) )
 	ROM_LOAD( "global-spotted-dick_euro.bin", 0x0000, 0x010000, CRC(695a3ec4) SHA1(f9f2f47f74479ef444997e2deef1c5f4677368ca) ) // this one isn't scrambled
+	ROM_LOAD( "spotd31", 0x0000, 0x010000, CRC(794cec5b) SHA1(91ba4fcc459194fcf89f27e9c687cbdb8a10bb78) )
+	ROM_LOAD( "spotteddickeuro.bin", 0x0000, 0x010000, CRC(c3b68821) SHA1(d86e098c3f0aec4f8068942934134e394075473d) )
 
 	ROM_REGION( 0x100000, "upd", ROMREGION_ERASE00 ) // not upd?
 	ROM_LOAD( "global-spotted-dick_snd.bin", 0x0000, 0x100000, CRC(f2c66aab) SHA1(6fe94a193779c91711588365591cf42d197cb7b9) )

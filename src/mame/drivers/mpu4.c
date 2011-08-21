@@ -13882,9 +13882,46 @@ ROM_END
 ROM_START( m4jungjk )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "jjsoft_v550_1346_e7a3_lv.bin", 0x0000, 0x040000, CRC(c5315a0c) SHA1(5fd2115e033e0310ded3cfb39f31dc31b4d6bb5a) )
+
+	ROM_REGION( 0x40000, "altrevs", 0 )
+	ROM_LOAD( "70000102.bin", 0x0000, 0x040000, CRC(e5f03540) SHA1(9a14cb4eade9f6b1c6d6cf78306259dbc108f1a5) )
+	ROM_LOAD( "jj.bin", 0x0000, 0x040000, CRC(9e15c1b6) SHA1(9d4f3707f2cc2f0e8eb9051181bf8b368be3cbcf) )
+	ROM_LOAD( "jjlump_v400_19a3.bin", 0x0000, 0x040000, CRC(bc86c415) SHA1(6cd828578835dafe5d8d46810dc70d47abd4e8b2) )
+	ROM_LOAD( "70000092.bin", 0x0000, 0x040000, CRC(6530bc6c) SHA1(27819e760c84fbb40f354e87910fb15b3058e2a8) )
+
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "71000080.lo.hex", 0x0000, 0x134084, CRC(f3866082) SHA1(f33f6d7e078d7072cc7c67672b3afa3e90e1f805) )
+	ROM_LOAD( "71000080.hi.hex", 0x0000, 0x12680f, CRC(2a9db1df) SHA1(73823c3db5c68068dadf6d9b4c93b47c0cf13bd3) )
+	ROM_LOAD( "71000080.p1", 0x000000, 0x080000, CRC(b39d5e03) SHA1(94c9208601ea230463b460f5b6ea668363d239f4) )
+	ROM_LOAD( "71000080.p2", 0x080000, 0x080000, CRC(ad6da9af) SHA1(9ec8c8fd7b9bcd1d4c6ed93726fafe9a50a15894) )
 ROM_END
 
+ROM_START( m4clab )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "70000019.bin", 0x0000, 0x040000, CRC(23a12863) SHA1(4047cb8cbc03f96f2b8681b6276e100e8e9194a5) )
+
+	ROM_REGION( 0x40000, "altrevs", 0 )
+	ROM_LOAD( "70000020.bin", 0x0000, 0x040000, CRC(88af7368) SHA1(14dea4267a4365286eea1e02b9b44d4053618cbe) )
+	ROM_LOAD( "70000052.bin", 0x0000, 0x040000, CRC(99e60d45) SHA1(ec28bdd4ffb9674c2e9f8ab72aac3cb6011e7d6f) )
+	ROM_LOAD( "70000053.bin", 0x0000, 0x040000, CRC(3ddf8b29) SHA1(0087ccd3429c081a3121e97d649914ab2cf8caa6) )
+	ROM_LOAD( "clab_v300_1028_c23a_lv_10p.bin", 0x0000, 0x040000, CRC(c2ca098a) SHA1(e2bf80366af925a4c880a3377b79d494760f286f) )
+	ROM_LOAD( "clab_v300_1031_3fb7_nlv_10p.bin", 0x0000, 0x040000, CRC(1502527f) SHA1(8a3dd5600ad9a073ea6fb8412178daa575002e56) )
+	ROM_LOAD( "clab_v300_1033_1175_nlv_20p.bin", 0x0000, 0x040000, CRC(ba26efd7) SHA1(bf9c0dbf6882ddc42680c7d23c9b858eb12e5646) )
+	ROM_LOAD( "clab_v400_1249_0162_nlv.bin", 0x0000, 0x040000, CRC(df256c84) SHA1(f4d0fc5acd7d0ac770cae548744ce18dfb9ec67c) )
+	ROM_LOAD( "clab_v410_1254_1ca2_lv.bin", 0x0000, 0x040000, CRC(6e2ee8a9) SHA1(e64a01c93b879c9ade441bd4f1ce381f6e65a655) )
+	ROM_LOAD( "clab_v410_1254_6e11_nlv.bin", 0x0000, 0x040000, CRC(efe4fcb9) SHA1(8a2f02593c7fbea060c78a98abd82fd970661e05) )
+	ROM_LOAD( "clabrom", 0x0000, 0x040000, CRC(d80ecff5) SHA1(2608e95b718ecd49d880fd9911cb97e6644a307d) )
+	// clearly don't belong here
+	// 95407596.lo = 95407596.lo           sc_cexpl   Cash Explosion (Mazooma) (Scorpion ?)
+	// 95407597.hi = 95407597.hi           sc_cexpl   Cash Explosion (Mazooma) (Scorpion ?)
+
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "71000010.lo", 0x0000, 0x134084, CRC(c39bbae4) SHA1(eee333376612a96a4c344729a96cc60c217bfde3) )
+	ROM_LOAD( "71000010.hi", 0x0000, 0x091c0b, CRC(d0d3cb4f) SHA1(eaacf9ed3a6b6dcda8e1a3edbc3a9a2a51ffcbd8) )
+	ROM_LOAD( "clab_snd1_c8a6.bin", 0x0000, 0x080000, CRC(cf9de981) SHA1(e5c73e9b9db9ac512602c2dd586ca5cf65f98bc1) )
+	ROM_LOAD( "clab_snd2_517a.bin", 0x080000, 0x080000, CRC(d4eb949e) SHA1(0ebbd1b5e3c86da94f35c69d9d60e36844cc4d7e) )
+ROM_END
 
 
 
@@ -13989,6 +14026,7 @@ ROM_START( m4rhwhl )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "rhw_v100_1333_6d40_lv.bin", 0x0000, 0x080000, CRC(9ef7b655) SHA1(605822eaee44bebf554218ef7346192a6a84077e) )
+//	ROM_LOAD( "rhw_v100_1333_6d40_lv_bad.bin", 0x0000, 0x05420d, CRC(a4ef87c5) SHA1(6768fddb8046fb35a2bba3d26bd4650b6e7a4fa7) ) // I think this is just a bad dump of the above?
 	ROM_LOAD( "rhw_v310_0925_0773_lv_p.bin", 0x0000, 0x080000, CRC(11880908) SHA1(0165bacf73dd54959975b3f186e256fd8d690d34) )
 	ROM_LOAD( "rhw_v310_0931_fa02_lv.bin", 0x0000, 0x080000, CRC(5642892e) SHA1(7a80edf9aefac9731751afa8250de07004c55e77) )
 
@@ -14889,6 +14927,7 @@ GAME( 199?, m4cfinln		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Nova",   "C
 GAME( 199?, m4dcrazy		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Qps",   "D' Crazy Reels (Qps) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, m4goldnn		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Nova",   "Golden Years (Nova) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, m4jungjk		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Qps",   "Jungle Jackpots (Mazooma - Qps) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, m4clab		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Qps",   "Cash Lab (Mazooma - Qps) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, m4looplt		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Qps",   "Loop The Loot (Qps) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, m4mgpn		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Nova",   "Monaco Grand Prix (Nova) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, m4olygn		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Nova",   "Olympic Gold (Nova) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
