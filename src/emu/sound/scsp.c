@@ -703,8 +703,13 @@ static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 {
 	/* temporary hack until this is converted to a device */
 	address_space *space = scsp->device->machine().firstcpu->memory().space(AS_PROGRAM);
+
 	switch(reg&0x3f)
 	{
+		case 0x0:
+			scsp->stream->set_output_gain(0,MVOL(scsp) / 15.0);
+			scsp->stream->set_output_gain(1,MVOL(scsp) / 15.0);
+			break;
 		case 0x2:
 		case 0x3:
 			{
