@@ -252,7 +252,7 @@ SCREEN_UPDATE( taitojc )
 	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
 		popmessage("%08x, contact MAMEdev",state->m_objlist[0xfc4/4]);
 
-	popmessage("%08x %08x %08x %08x",state->m_objlist[0xd20/4],state->m_objlist[0xd24/4],state->m_objlist[0xd28/4],state->m_objlist[0xd2c/4]);
+	//popmessage("%08x %08x %08x %08x",state->m_objlist[0xd20/4],state->m_objlist[0xd24/4],state->m_objlist[0xd28/4],state->m_objlist[0xd2c/4]);
 
 	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
 	{
