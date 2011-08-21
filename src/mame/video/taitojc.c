@@ -81,10 +81,19 @@ WRITE32_HANDLER(taitojc_char_w)
 
 /*
 	Object RAM is grouped in three different banks (0-0x400 / 0x400-0x800 / 0x800-0xc00),
-	Initial 6 dwords of each bank aren't for object stuff (individual vregs for each bank?)
-	0xc00-0xfbf seems to be a clut, while 0xfc0-0xfff is global vregs. 0xfc6 bit 13 is used to swap between
-	bank 0 and bank 1
+	Initial 6 dwords aren't surely for object stuff (setting global object flags?)
+	0xd00-0xdff seems to be a per-bank vregister. Usage of this is mostly unknown, the only
+	clue we have so far is this config change in dendeg:
+	0x2000db3f 0x3f3f3f3f 0xfec00090 0x403f00ff 0xd20-0xd2f on Taito logo
+	0x2000db3f 0x3f3f3f3f 0xff600090 0x207f00ff 0xd20-0xd2f on intro FMV
+
+	dword 0 bits 14-15 looks up to the object RAM for the given bank. (it's mostly fixed to 0,
+	1 and 2 for each bank). Then dwords 2 and 3 should presumably configure bank 1 to a bigger
+	(doubled?) height and width and a different x/y start point.
+
+	0xfc0-0xfff is global vregs. 0xfc6 bit 13 is used to swap between bank 0 and bank 1.
 	It's unknown at current time how bank 2 should show up.
+
 */
 
 static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 w1, UINT32 w2)
@@ -242,6 +251,8 @@ SCREEN_UPDATE( taitojc )
 	/* 0xf000 used on Densya de Go disclaimer screen(s) (disable object RAM?) */
 	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
 		popmessage("%08x, contact MAMEdev",state->m_objlist[0xfc4/4]);
+
+	popmessage("%08x %08x %08x %08x",state->m_objlist[0xd20/4],state->m_objlist[0xd24/4],state->m_objlist[0xd28/4],state->m_objlist[0xd2c/4]);
 
 	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
 	{

@@ -340,6 +340,7 @@ Notes:
 
     TODO:
         - dendeg2 hangs on init step 10.
+        - dendeg intro object RAM usage looks suspicious (needs reference)
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
         - dendeg2x usually crashes when starting the game (lots of read and writes to invalid addresses).
