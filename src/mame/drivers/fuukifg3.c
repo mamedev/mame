@@ -634,7 +634,7 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymf2", YMF262, 14318180) // 14.31818MHz is the standard OPL3 clock, YMF278B_STD_CLOCK/2 makes music off-tune
+	MCFG_SOUND_ADD("ymf2", YMF262, YMF278B_STD_CLOCK / (19/8.0))
 	MCFG_SOUND_CONFIG(fuuki32_ymf262_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
