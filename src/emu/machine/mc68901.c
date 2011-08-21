@@ -844,6 +844,14 @@ void mc68901_device::device_start()
 
 void mc68901_device::device_reset()
 {
+	m_xmit_state = XMIT_OFF;
+	m_rx_state = SERIAL_STOP;
+	m_rx_buffer = 0;
+	m_tx_buffer = 0;
+
+	// Avoid read-before-write
+	m_ipr = m_imr = 0;
+
 	register_w(REGISTER_GPIP, 0);
 	register_w(REGISTER_AER, 0);
 	register_w(REGISTER_DDR, 0);
