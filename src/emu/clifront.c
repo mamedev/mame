@@ -853,9 +853,9 @@ void cli_frontend::verifyroms(const char *gamename)
 						break;
 				}
 			}
-
-			global_free(dev);
 		}
+
+		global_free(dev);
 	}
 
 	// clear out any cached files
