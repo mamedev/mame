@@ -192,7 +192,7 @@ class tms9929_device : public tms9928a_device
 {
 public:
 	tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9929, "tms9929", tag, owner, clock, false, true ) { }
+		: tms9928a_device( mconfig, TMS9929, "tms9929", tag, owner, clock, true, false ) { }
 };
 
 
