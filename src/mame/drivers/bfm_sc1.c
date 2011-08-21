@@ -2644,6 +2644,41 @@ ROM_END
 
 
 
+ROM_START( sc1chain )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+//	ROM_LOAD( "95717174 b.bin", 0x0000, 0x008000, CRC(6cdc8d15) SHA1(582e5e7bcefe0085917d3499b7c83e27c19662d2) )
+//	ROM_LOAD( "95717173 a.bin", 0x8000, 0x008000, CRC(4989e6c6) SHA1(17184c6a3624dfaa61bc4ddb3ac1813949eaf834) )
+	ROM_LOAD( "95717174.bin", 0x0000, 0x008000, CRC(6cdc8d15) SHA1(582e5e7bcefe0085917d3499b7c83e27c19662d2) )
+	ROM_LOAD( "95717173.bin", 0x8000, 0x008000, CRC(4989e6c6) SHA1(17184c6a3624dfaa61bc4ddb3ac1813949eaf834) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "95716173 proto.bin", 0x0000, 0x008000, CRC(4f806f1d) SHA1(cfa8bcc2afbb47e549836d968c3390bef04c6c30) )
+	ROM_LOAD( "95717210.bin", 0x0000, 0x008000, CRC(102d2bc8) SHA1(8ed5f44e6014e21f677762e40076d648901d1ff2) )
+	ROM_LOAD( "95717211.bin", 0x0000, 0x008000, CRC(ed781e00) SHA1(67ebb58beda5123f061a22dacd008f1feb75b8d9) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* Missing? */	
+ROM_END
+
+ROM_START( sc1potp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "potp 95715159 2x1.bin", 0x6000, 0x002000, CRC(b47cd8f3) SHA1(bf26fdc440a111dc1326b200281c2dff5c517c67) )
+	ROM_LOAD( "potp 95717908 2x1.bin", 0x8000, 0x008000, CRC(953c3e78) SHA1(f14ab2c4337e93605be4baac51b8ad3b9bf0e155) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1potpa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "potp 95715146.bin", 0x6000, 0x002000, CRC(9557ebc4) SHA1(a9d3b2d901875b9d53ac9500acdb9b725b4edcb5) )
+	ROM_LOAD( "potp 95350166.bin", 0x8000, 0x008000, CRC(45f0effa) SHA1(afd7aabac7da04b5960c2cc55863b917a2692c4f) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
 
 
 
@@ -2792,6 +2827,9 @@ GAME( 199?, sc1cdm		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Crys
 GAME( 199?, sc1hfcc		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Crystal",   "Hi Flyer Club (Crystal) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 GAME( 199?, sc1twice		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Associated Leisure",   "Twice As Nice (Associated Leisure) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+GAME( 199?, sc1chain			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //was mixed with the sc4/5 potp roms..  System status 98
+GAME( 199?, sc1potpa			, sc1potp			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
 //Adder 2
 GAME( 1996, m_tppokr, 0,        scorpion1_adder2	, toppoker	, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )

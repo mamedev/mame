@@ -5107,6 +5107,37 @@ ROM_START( sc2cb7 )
 ROM_END
 
 
+ROM_START( sc2cgcas )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "club-grand-casino_std_ac_p65_ass.bin", 0x0000, 0x010000, CRC(6ca2cccb) SHA1(762e0809e70d4dd2161a2ffcc30d191720e8ad9a) )
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "club-grand-casino_dat_ac_250pnd-25p_ass.bin", 0x0000, 0x010000, CRC(77cf0f11) SHA1(88da3f2e18f621033a8d32428b1422d5e3873ab5) )
+	ROM_LOAD( "club-grand-casino_dat_ac_var_ass.bin", 0x0000, 0x010000, CRC(15c3b640) SHA1(94a4e105b9fbd4b12ec246a0f1a6751acf25eac2) )
+	ROM_LOAD( "club-grand-casino_std_ac_250pnd-25p_ass.bin", 0x0000, 0x010000, CRC(edfc3d74) SHA1(192a893b5a9b188de094d0f45881788306523e0b) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc2cvega )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cash_vegas_std_ac_var_a.bin", 0x0000, 0x010000, CRC(88dd09b9) SHA1(36b4f3504794b638a31e45d1f155360166f77ab2) )
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "cash_vegas_dat_ac_var_10pnd_a.bin", 0x0000, 0x010000, CRC(e880c6b6) SHA1(387f7e3659e42ac488db9a4768c2035f7c870c44) )
+	ROM_LOAD( "cash_vegas_dat_ac_var_10pnd_tri3.bin", 0x0000, 0x010000, CRC(ab3e503c) SHA1(2c26865eab6cf128d8f3ff09077daa3c4d2aee30) )
+	ROM_LOAD( "cash_vegas_dat_to_8pnd_a.bin", 0x0000, 0x010000, CRC(cabec1cd) SHA1(acbe41e0d5fa77f11df8d119ad09aeccd421f603) )
+	ROM_LOAD( "cash_vegas_dat_wi_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(99ee9eef) SHA1(c4b325a39e898f069ac3471af8ea955c62c488a5) )
+	ROM_LOAD( "cash_vegas_std_ac_var_10pnd_tri3_a.bin", 0x0000, 0x010000, CRC(3d808af5) SHA1(db29c03a33dce6342fec4da3664590ab072dd6d9) )
+	ROM_LOAD( "cash_vegas_std_to_var_8pnd_a.bin", 0x0000, 0x010000, CRC(c8e98a0e) SHA1(1436f3a464b2f298b161e5328f0540cf23441803) )
+	ROM_LOAD( "cash_vegas_std_w_i_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(521b918d) SHA1(4d9b94d561d89aa1dd8746a33eb27d89b53b6ba9) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
+
+
+
 /* Video Based (Adder 2) */
 
 GAMEL( 1993, qntoondo, qntoond,	  scorpion2_vid, qntoond,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-136)",		GAME_SUPPORTS_SAVE,layout_quintoon )
@@ -5217,6 +5248,8 @@ GAME( 199?, sc2olgld		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Oly
 GAME( 199?, sc2relgm		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Reel Gems (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2topwk		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Top Wack (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2cb7		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2cgcas		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Club Grand Casino (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2cvega		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Cash Vegas (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 
 // Games with Dot Matrix Displays */

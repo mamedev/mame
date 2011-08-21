@@ -810,6 +810,7 @@ $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/jpms80.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 	$(DRIVERS)/pluto5.o \
+	$(DRIVERS)/jpmsys7.o \
 
 $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/airbustr.o $(VIDEO)/airbustr.o \
