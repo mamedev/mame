@@ -4365,8 +4365,8 @@ M68KMAKE_OP(cpbcc, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
-		logerror( "%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
-					 m68k->device->tag(), REG_PC - 2, m68k->ir);
+		//logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
+		//			 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4413,8 +4413,8 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
-					 m68k->device->tag(), REG_PC - 2, m68k->ir);
+		//logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
+		//			 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);

@@ -79,6 +79,14 @@ WRITE32_HANDLER(taitojc_char_w)
 // 0x01:   -------- --x----- -------- --------   Priority (0 = below 3D, 1 = above 3D)
 // 0x01:   -------- -------- -xxxxxxx xxxxxxxx   VRAM data address
 
+/*
+	Object RAM is grouped in three different banks (0-0x400 / 0x400-0x800 / 0x800-0xc00),
+	Initial 6 dwords of each bank aren't for object stuff (individual vregs for each bank?)
+	0xc00-0xfbf seems to be a clut, while 0xfc0-0xfff is global vregs. 0xfc6 bit 13 is used to swap between
+	bank 0 and bank 1
+	It's unknown at current time how bank 2 should show up.
+*/
+
 static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 w1, UINT32 w2)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
@@ -210,6 +218,7 @@ SCREEN_UPDATE( taitojc )
 {
 	taitojc_state *state = screen->machine().driver_data<taitojc_state>();
 	int i;
+	UINT16 start_offs;
 
 #if 0
     tick++;
@@ -228,7 +237,13 @@ SCREEN_UPDATE( taitojc )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	for (i=(0xc00/4)-2; i >= 0; i-=2)
+	start_offs = state->m_objlist[0xfc4/4] & 0x2000 ? (0x800/4) : (0x400/4);
+
+	/* 0xf000 used on Densya de Go disclaimer screen(s) (disable object RAM?) */
+	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
+		popmessage("%08x, contact MAMEdev",state->m_objlist[0xfc4/4]);
+
+	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
 	{
 		UINT32 w1 = state->m_objlist[i + 0];
 		UINT32 w2 = state->m_objlist[i + 1];
@@ -241,7 +256,7 @@ SCREEN_UPDATE( taitojc )
 
 	copybitmap_trans(bitmap, state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
-	for (i=(0xc00/4)-2; i >= 0; i-=2)
+	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
 	{
 		UINT32 w1 = state->m_objlist[i + 0];
 		UINT32 w2 = state->m_objlist[i + 1];

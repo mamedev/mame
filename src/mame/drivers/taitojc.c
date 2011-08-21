@@ -340,13 +340,15 @@ Notes:
 
     TODO:
         - dendeg2 hangs on init step 10.
-        - The analog controls don't seem to work in landgear. They work in test mode though.
-        - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode)
+        - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
+        - landgear has huge 3d problems on gameplay (CPU comms?)
         - dendeg2x usually crashes when starting the game (lots of read and writes to invalid addresses).
-        - All dendeg games have random wrong textures/palettes.
+        - All dendeg games have random wrong textures/palettes. (can't see any ... -AS)
         - Train board (external sound board with OKI6295) is not emulated.
         - dangcurv hangs on its DSP test. DSP execution may be jumping into internal ROM space?
         - dangcurv needs correct controls hooking up.
+        - add idle skips if possible
+		- dendeg and clones needs output lamps and an artwork for the inputs (helps with the playability);
 */
 
 #include "emu.h"
@@ -449,6 +451,7 @@ static READ32_HANDLER ( jc_control_r )
 static WRITE32_HANDLER ( jc_control_w )
 {
 	//mame_printf_debug("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+
 	switch(offset)
 	{
 		case 0x3:
@@ -457,13 +460,15 @@ static WRITE32_HANDLER ( jc_control_w )
 			{
 				input_port_write(space->machine(), "EEPROMOUT", data >> 24, 0xff);
 			}
+			else
+				popmessage("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 			return;
 		}
 
 		default:
+			popmessage("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 			break;
 	}
-	logerror("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
 static WRITE32_HANDLER (jc_control1_w)
@@ -792,7 +797,7 @@ static WRITE32_HANDLER(f3_share_w)
 static WRITE32_HANDLER(jc_output_w)
 {
 	// speed and brake meter outputs in Densya De Go!
-	//mame_printf_debug("jc_output_w: %d, %d\n", offset, (data >> 16) & 0xffff);
+	// logerror("jc_output_w: %08x, %08x %08x\n", offset, data,mem_mask);
 }
 
 static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
@@ -1116,15 +1121,15 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dendeg )
 	PORT_START("COINS")
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("START")
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START( "EEPROMOUT" )
@@ -1133,34 +1138,34 @@ static INPUT_PORTS_START( dendeg )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )		// Horn
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Horn")		// Horn
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 )		// Mascon 5
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )		// Mascon 3
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Mascon 1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")		// Mascon 5
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")		// Mascon 3
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")		// Mascon 1
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )		// Mascon 4
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Mascon 2
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )		// Mascon 0
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")		// Mascon 4
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")		// Mascon 2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")		// Mascon 0
 
 	PORT_START("ANALOG1")		// Brake
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Brake")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( landgear )
 	PORT_START("COINS")
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("START")
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START( "EEPROMOUT" )
@@ -1176,28 +1181,26 @@ static INPUT_PORTS_START( landgear )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ANALOG1")		// Lever X
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
 	PORT_START("ANALOG2")		// Lever Y
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y )  PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG3")		// Throttle
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sidebs )
 	PORT_START("COINS")
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("START")
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START( "EEPROMOUT" )
@@ -1207,37 +1210,35 @@ static INPUT_PORTS_START( sidebs )
 
 	PORT_START("UNUSED")
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View button
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("View button")
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift down
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift up
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift down")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift up")
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ANALOG1")		// Steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG2")		// Acceleration
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(25)
 
 	PORT_START("ANALOG3")		// Brake
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(25)
 INPUT_PORTS_END
 
 // TODO
 static INPUT_PORTS_START( dangcurv )
 	PORT_START("COINS")
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("START")
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START( "EEPROMOUT" )
@@ -1827,8 +1828,8 @@ ROM_START( dangcurv )
 ROM_END
 
 
-GAME( 1996, dendeg,   0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go (Japan)", GAME_NOT_WORKING )
-GAME( 1996, dendegx,  dendeg,  taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex (Japan)", GAME_NOT_WORKING )
+GAME( 1996, dendeg,   0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, dendegx,  dendeg,  taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dendeg2,  0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_NOT_WORKING )
 GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_NOT_WORKING )
 GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side (Japan)", GAME_IMPERFECT_GRAPHICS )
