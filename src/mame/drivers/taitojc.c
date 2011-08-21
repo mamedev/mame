@@ -340,14 +340,14 @@ Notes:
 
     TODO:
         - dendeg2 hangs on init step 10.
-        - dendeg intro object RAM usage looks suspicious (needs reference)
+        - dendeg intro object RAM usage has various gfx bugs (check video file)
+        - dendeg title screen builds up and it shouldn't
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
         - dendeg2x usually crashes when starting the game (lots of read and writes to invalid addresses).
         - All dendeg games have random wrong textures/palettes. (can't see any ... -AS)
         - Train board (external sound board with OKI6295) is not emulated.
-        - dangcurv hangs on its DSP test. DSP execution may be jumping into internal ROM space?
-        - dangcurv needs correct controls hooking up.
+        - dangcurv DSP program crashes very soon, so no 3d is currently shown.
         - add idle skips if possible
 		- dendeg and clones needs output lamps and an artwork for the inputs (helps with the playability);
 */
@@ -598,10 +598,10 @@ static READ32_HANDLER(dsp_shared_r)
 
 #if DEBUG_DSP
 
-static void debug_dsp_command(void)
+static void debug_dsp_command(running_machine &machine)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
-	UINT16 *cmd = &dsp_shared_ram[0x7f0];
+	UINT16 *cmd = &state->m_dsp_shared_ram[0x1fc0/2];
 
 	switch (cmd[0])
 	{
@@ -640,7 +640,7 @@ static void debug_dsp_command(void)
 #endif
 					for (i=0; i < ll; i++)
 					{
-						UINT16 d = dsp_shared_ram[saddr++];
+						UINT16 d = state->m_dsp_shared_ram[saddr++];
 						if (daddr >= 0x8000 && daddr < 0x10000)
 						{
 							state->m_debug_dsp_ram[daddr-0x8000] = d;
@@ -746,7 +746,7 @@ static WRITE32_HANDLER(dsp_shared_w)
 #if DEBUG_DSP
 	if (offset == 0x1fc0/4)
 	{
-		debug_dsp_command();
+		debug_dsp_command(space->machine());
 	}
 #endif
 
@@ -754,7 +754,17 @@ static WRITE32_HANDLER(dsp_shared_w)
 	{
 		if ((data & 0x80000) == 0)
 		{
-			if (!state->m_first_dsp_reset)
+			/*
+			All games minus Dangerous Curves tests if the DSP is alive with this code snippet:
+
+			0008C370: 4A79 1000 1FC0                                      tst.w   $10001fc0.l
+			0008C376: 33FC 0000 0660 0000                                 move.w  #$0, $6600000.l
+			0008C37E: 66F0                                                bne     $8c370
+
+			Problem is: that move.w in the middle makes the SR to always return a zero flag result,
+			hence it never branches like it should. CPU bug?
+			*/
+			if (!state->m_first_dsp_reset || !state->m_has_dsp_hack)
 			{
 				cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE);
 			}
@@ -801,6 +811,11 @@ static WRITE32_HANDLER(jc_output_w)
 	// logerror("jc_output_w: %08x, %08x %08x\n", offset, data,mem_mask);
 }
 
+static READ32_HANDLER( jc_lan_r )
+{
+	return 0xffffffff;
+}
+
 static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
 	AM_RANGE(0x00400000, 0x01bfffff) AM_ROM AM_REGION("gfx1", 0)
@@ -814,12 +829,12 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
 	//AM_RANGE(0x05fc0000, 0x05fc3fff)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_BASE_MEMBER(taitojc_state,m_palette_ram)
 	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
-	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w)
+	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog
 	AM_RANGE(0x06600010, 0x06600013) AM_NOP		// unknown
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
 	AM_RANGE(0x06800000, 0x06801fff) AM_NOP		// unknown
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE_MEMBER(taitojc_state,m_f3_shared_ram)
-	//AM_RANGE(0x06c00000, 0x06c0ffff) AM_RAM
+	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
 	AM_RANGE(0x06e00000, 0x06e0ffff) AM_WRITE(jc_output_w)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_main_ram)
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
@@ -1059,7 +1074,6 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16 )
-	//AM_RANGE(0x1400, 0x1401) AM_RAM
 	AM_RANGE(0x6a01, 0x6a02) AM_WRITE(dsp_unk2_w)
 	AM_RANGE(0x6a11, 0x6a12) AM_NOP		// same as 0x6a01..02 for the second renderer chip?
 	AM_RANGE(0x6b20, 0x6b20) AM_WRITE(dsp_polygon_fifo_w)
@@ -1175,7 +1189,7 @@ static INPUT_PORTS_START( landgear )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View button
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("View button")
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -1248,22 +1262,23 @@ static INPUT_PORTS_START( dangcurv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View button
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Rear button")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("View button")
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift down
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift up
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift down")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift up")
 
 	PORT_START("ANALOG1")		// Steering
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
 	PORT_START("ANALOG2")		// Acceleration
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(25) PORT_REVERSE
 
 	PORT_START("ANALOG3")		// Brake
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 
@@ -1357,6 +1372,17 @@ static DRIVER_INIT( taitojc )
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 
 	state->m_polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
+
+	state->m_has_dsp_hack = 1;
+}
+
+static DRIVER_INIT( dangcurv )
+{
+	taitojc_state *state = machine.driver_data<taitojc_state>();
+
+	DRIVER_INIT_CALL( taitojc );
+
+	state->m_has_dsp_hack = 0;
 }
 
 ROM_START( sidebs )
@@ -1837,4 +1863,4 @@ GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side
 GAME( 1997, sidebs2,  0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2j, sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, landgear, 0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_NOT_WORKING )
-GAME( 1995, dangcurv, 0,       taitojc, dangcurv, taitojc,  ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
+GAME( 1995, dangcurv, 0,       taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
