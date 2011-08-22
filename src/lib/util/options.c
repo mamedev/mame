@@ -484,10 +484,24 @@ const char *core_options::output_ini(astring &buffer, const core_options *diff)
 	// INI files are complete, so always start with a blank buffer
 	buffer.reset();
 
-	// loop over all items
+	int num_valid_headers = 0;
+	int unadorned_index = 0;
 	const char *last_header = NULL;
+
+	// loop over all items
 	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
 	{
+		const char *name = curentry->name();
+		const char *value = curentry->value();
+		bool is_unadorned = false;
+
+		// check if it's unadorned
+		if (name && strlen(name) && !strcmp(name, core_options::unadorned(unadorned_index)))
+		{
+			unadorned_index++;
+			is_unadorned = true;
+		}
+
 		// header: record description
 		if (curentry->is_header())
 			last_header = curentry->description();
@@ -496,22 +510,25 @@ const char *core_options::output_ini(astring &buffer, const core_options *diff)
 		else if (!curentry->is_command())
 		{
 			// look up counterpart in diff, if diff is specified
-			const char *name = curentry->name();
-			const char *value = curentry->value();
 			if (diff == NULL || strcmp(value, diff->value(name)) != 0)
 			{
 				// output header, if we have one
 				if (last_header != NULL)
 				{
-					buffer.catprintf("\n#\n# %s\n#\n", last_header);
+					if (num_valid_headers++)
+						buffer.catprintf("\n");
+					buffer.catprintf("#\n# %s\n#\n", last_header);
 					last_header = NULL;
 				}
 
-				// and finally output the data
-				if (strchr(value, ' ') != NULL)
-					buffer.catprintf("%-25s \"%s\"\n", name, value);
-				else
-					buffer.catprintf("%-25s %s\n", name, value);
+				// and finally output the data, skip if unadorned
+				if (!is_unadorned)
+				{
+					if (strchr(value, ' ') != NULL)
+						buffer.catprintf("%-25s \"%s\"\n", name, value);
+					else
+						buffer.catprintf("%-25s %s\n", name, value);
+				}
 			}
 		}
 	}
