@@ -4395,7 +4395,12 @@ ROM_START( ep_crzbn )
 ROM_END
 
 
-
+ROM_START( ep_cascz )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ccst0-2p.p0", 0x00000, 0x020000, CRC(b95f9d85) SHA1(00f9f568f28ffaff6bea0b8c06afb69459fff1de) )
+	ROM_LOAD16_BYTE( "ccst0-2p.p1", 0x00001, 0x020000, CRC(d348b0be) SHA1(ea41d845d92886634eba43e304acd457cba89213) )
+	MISSING_SOUND
+ROM_END
 
 
 /* These have sound roms dumped */
@@ -4593,5 +4598,5 @@ GAME( 199?, ep_monky	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",     
 GAME( 199?, ep_makmv	,  0,		 maygayep,  maygayep,  0,  ROT0, "Global",		  "Make Your Move (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_lug		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "London Underground (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_crzbn	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Crazy Bingo (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
-
+GAME( 199?, ep_cascz	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",        "Casino Crazy (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 

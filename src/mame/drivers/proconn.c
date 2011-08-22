@@ -297,6 +297,8 @@ ROM_END
 ROM_START( pr_crzbr )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "crazybars.bin", 0x0000, 0x010000, CRC(896ad5d3) SHA1(6df42dc8016d50239f9467af016e3a4224065599) )
+	ROM_REGION( 0x80000, "altrevs", 0 ) // 'PCP' Super Bars seems to be the same thing
+	ROM_LOAD( "s bars 052a20p0.050 procon.bin", 0x0000, 0x010000, CRC(037a6a82) SHA1(6f804e80e529293f9de540623cd4e4c5a4fd1022) )	
 ROM_END
 
 ROM_START( pr_coyot )
@@ -632,6 +634,20 @@ ROM_START( pr_wldkn )
 	ROM_LOAD( "wk_sound", 0x0000, 0x020000, CRC(71c32280) SHA1(3f6e44b9b43515e08db7266c52b94c5b0a2a7d17) )
 ROM_END
 
+ROM_START( pr_nifty )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "391a30pn.130", 0x0000, 0x010000, CRC(76253ec1) SHA1(56bc49fe7e4e33dda25533e31586cbf0653ee91a) )
+	ROM_REGION( 0x80000, "snd", 0 )
+	ROM_LOAD( "nf50snd.000", 0x0000, 0x020000, CRC(4ed90aab) SHA1(6f8a4afe3e4717563272ce8575e64d1b0144a1c8) )
+ROM_END
+
+ROM_START( pr_upnun )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "up&underprojectcoin.bin", 0x0000, 0x010000, CRC(053a394f) SHA1(8d7e55092dfba2ce49ee009ed388be027be2ff28) )
+ROM_END
+
+
+
 DRIVER_INIT( proconn )
 {
 
@@ -653,7 +669,7 @@ GAME( 199?, pr_cas7			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Casino 
 GAME( 199?, pr_chico		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Chico the Bandit (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_coolm		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Cool Million (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_crz77		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Crazy 777s (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, pr_crzbr		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Crazy Bars (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, pr_crzbr		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Crazy Bars / Super Bars (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_coyot		,0			,proconn	,proconn	,proconn	,ROT0	,"PCP"    , "Crazy Coyote (Pcp) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_crzpy		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Crazy Pays (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_dblup		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Double Up (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -689,6 +705,8 @@ GAME( 199?, pr_trpx			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Triple 
 GAME( 199?, pr_walls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wall Street (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_whlft		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wheel Of Fortune (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, pr_wldkn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wild Kings (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, pr_nifty		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Nifty Fifty (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, pr_upnun		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Up & Under (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // Some of these are PC98 hardware.. I don't know how / if that differs
 GAME( 199?, pr_bears		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (Coinworld)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

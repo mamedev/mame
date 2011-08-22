@@ -10241,6 +10241,7 @@ quizmstr		// (c) 1985 Coinmaster
 trailblz		// (c) 1987 Coinmaster
 supnudg2		// (c) 1989 Coinmaster
 pokeroul		// (c) 1990 Coinmaster
+jpcoin			// (c) 19?? Coinmaster
 egghunt			// (c) 1995 Invi Image
 magic10			// (c) 1995 A.W.P. Games
 magic10a		// (c) 1995 A.W.P. Games
@@ -11600,6 +11601,8 @@ sc2town		// Round The Town (Bellfruit)
 sc2ofool	// Only Fools & Horses (Bellfruit) 
 sc2ptytm	// Party Time (Bellfruit) 
 sc2cops		// Cops 'n' Robbers (Bellfruit) 
+sc2copcl	//
+sc2copdc	//
 sc2prem		// Premier Club Manager (Bellfruit) 
 
 // Scorpion 2 + Adder 2 Video Board
@@ -12621,6 +12624,7 @@ ep_monky	// Monkey Business (Global)
 ep_makmv	// Make Your Move (Global)
 ep_lug		// London Underground (Maygay)
 ep_crzbn	// Crazy Bingo (Maygay)
+ep_cascz	// Casino Crazy (Global)
 
 // MPU2
 
@@ -13444,6 +13448,9 @@ m4jp777		// Jackpot 777
 m4booze		// Booze Cruise
 m4cbing		// Cherry Bingo
 m4supsl
+m4abra		// Abracadabra (Bwb)
+m4wcnov		// World Cup (Nova)
+m4excaln	// Excalibur (Nova)
 
 // MPU4 + Video board
 
@@ -13470,6 +13477,7 @@ v4cmaze3c	//
 v4turnov	// Turnover
 v4skltrk	// Skill Trek
 v4addlad	// Adders and Ladders
+v4addlad20	//
 v4time		// Time Machine
 v4mate		// The Mating Game
 v4mated		//
@@ -13495,6 +13503,7 @@ v4opt3d		//
 v4vgpok		// Vegas Poker (prototype release 2)
 v4psi		// Prize Space Invaders
 v4psia		// 
+v4psib		//
 v4blox		// Blox
 v4bloxd		//
 v4reno		// Reno Reels
@@ -14037,6 +14046,8 @@ pr_trpx			// Triple X (Project)
 pr_walls		// Wall Street (Project)
 pr_whlft		// Wheel Of Fortune (Project)
 pr_wldkn		// Wild Kings (Project)
+pr_nifty		// Nifty Fifty (Project)
+pr_upnun		// Up & Under (Project)
 pr_bears		// Bear Streak (Coinworld)
 pr_bearx		// Bear X (Coinworld)
 pr_fspot		// Fun Spot (Coinworld)
@@ -14301,6 +14312,10 @@ hb_rhv		// Red Hot Voucher (Qps)
 hb_ringb	// Ring A Bell (Jpm)
 hb_rckrl	// Rock 'n' Roll (Qps)
 hb_ydd		// Yabba Dabba Dough (Qps)
+
+/* Summit Coin */
+
+pushover	// (c)1981 Summit Coin
 
 /* IGT SPlus */
 

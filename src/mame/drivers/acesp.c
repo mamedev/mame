@@ -233,6 +233,9 @@ ROM_START( sp_gnat )
 	ROM_LOAD( "gncash2.bin", 0x0000, 0x008000, CRC(131a5a4c) SHA1(15da21be15655f3779671ab5948cf6f850df0d05) )
 	// Hex format?
 	ROM_LOAD( "grand_national", 0x0000, 0x01681e, CRC(3390b136) SHA1(a7ebbd260ac2e36cb5ad52efc43ac88058e4cd55) )
+
+	// from a bwb set, paired with gn597p6a
+	ROM_LOAD( "597 gnsk all cash p6.2.bin", 0x0000, 0x008000, CRC(2bd1c9c6) SHA1(4b1249fc7aca548e8acd4ee75bf2260dd512ac72) )	
 ROM_END
 
 

@@ -4506,6 +4506,62 @@ ROM_START( sc2cops )
 ROM_END
 
 
+ROM_START( sc2copcl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "club-cops-and-robbers_std_fe_ac_ass.bin", 0x0000, 0x010000, CRC(c7461e95) SHA1(f4088056e848742d3795f5b067476b56071f99bd) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "club-cops-and-robbers_dat_ac_200pnd-20p_ass.bin", 0x0000, 0x010000, CRC(b4071611) SHA1(2596ccee2b94bb56aa629ee892bd357b706005b0) )
+	ROM_LOAD( "club-cops-and-robbers_dat_ac_250pnd-20p_rot_ass.bin", 0x0000, 0x010000, CRC(05635f8b) SHA1(d3cf98e3858189db725621d4ba07728a585d7a3b) )
+	ROM_LOAD( "club-cops-and-robbers_dat_ac_250pnd-25p_phx_ass.bin", 0x0000, 0x010000, CRC(f6e9a013) SHA1(02b6c203c3facdd7015ba1119bcb70bf34b4ec00) )
+	ROM_LOAD( "club-cops-and-robbers_dat_ac_ffp_ass.bin", 0x0000, 0x010000, CRC(ec92b62d) SHA1(f10bc8fa55cd59127f179a35a61c1a57597856b6) )
+	ROM_LOAD( "club-cops-and-robbers_dat_fe_ac_ass.bin", 0x0000, 0x010000, CRC(ead8cbe5) SHA1(5594eb9a736e0f15a6f0f097a8cbbd8352e46fc4) )
+	ROM_LOAD( "club-cops-and-robbers_dat_fe_ac_p67_ass.bin", 0x0000, 0x010000, CRC(327db998) SHA1(aa8583cedd52a3cd06be6423a32e48273ec6218a) )
+	ROM_LOAD( "club-cops-and-robbers_dat_fr_ac_p63_ass.bin", 0x0000, 0x010000, CRC(93965bfc) SHA1(52af75234f56a77f082132d9532d3ffcaef5d271) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_200pnd-20p_ass.bin", 0x0000, 0x010000, CRC(214cda40) SHA1(fc585f211256495bfaaa6cb6c4d9c8a110ab5051) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(229c65c1) SHA1(8052c4b8702275235545807e7b075571fc97d4f3) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_250pnd-20p_rot_ass.bin", 0x0000, 0x010000, CRC(078651b5) SHA1(2acc45e5d66625753e5869f6f3ac1379d0c9dfcd) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_250pnd-25p_phx_a.bin", 0x0000, 0x010000, CRC(668def2e) SHA1(802ca565a20d0fce2f5e4340c646429af6aadff6) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_250pnd-25p_phx_ass.bin", 0x0000, 0x010000, CRC(668def2e) SHA1(802ca565a20d0fce2f5e4340c646429af6aadff6) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_ffp_ass.bin", 0x0000, 0x010000, CRC(347255bf) SHA1(7f96277579e68bdf1e21788cc5e35941d98df87f) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_npr_ass.bin", 0x0000, 0x010000, CRC(b9c0bcb4) SHA1(c1a398bd58097411b80d36030760e7820dc346f4) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_var_200pnd_ijf_ass.bin", 0x0000, 0x010000, CRC(db5a287e) SHA1(5615480767348061b7f08a709a16aa0b9cf0658e) )
+	ROM_LOAD( "club-cops-and-robbers_std_ac_var_p65_ass.bin", 0x0000, 0x010000, CRC(23d80392) SHA1(d7f5bab4fc8f42c1a38e26b54bc519e0f03d20bc) )
+	ROM_LOAD( "club-cops-and-robbers_std_fe_ac_p63_ass.bin", 0x0000, 0x010000, CRC(fc7f9b85) SHA1(d9f940bca29919d097fa7d128869725e01d6dbc3) )
+	ROM_LOAD( "club-cops-and-robbers_std_fe_ac_p67_ass.bin", 0x0000, 0x010000, CRC(4906d170) SHA1(c304a2986560d675b2e776965fdf444e4d56f104) )
+	ROM_LOAD( "cop200.hex", 0x0000, 0x010000, CRC(db5a287e) SHA1(5615480767348061b7f08a709a16aa0b9cf0658e) )
+	ROM_LOAD( "cops200", 0x0000, 0x010000, CRC(05d29adc) SHA1(06a986356c1b48ad5ee92c9a7f6fb2531e1806af) )
+
+	ROM_REGION( 0x20000, "matrix", 0 ) // based on the name this would belong with the deluxe set below...
+	ROM_LOAD( "club-deluxe-cops-and-robbers_mtx_250pnd-25p.bin", 0x0000, 0x010000, CRC(e1e4c10d) SHA1(5c508fe8ed96191eb1fa7156a09441f2f840544f) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "club-cops-and-robbers-sound.bin", 0x0000, 0x040000, CRC(b5ba009d) SHA1(806b1d739fbf00b7e55ed0b8056440e47bfba87a) )
+ROM_END
+
+ROM_START( sc2copdc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_std_ac_20p_p63_ass.bin", 0x0000, 0x010000, CRC(cb2c995c) SHA1(2a618eb611637e048dc054de0d8f6466f5071617) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_dat_ac_20p_p63_ass.bin", 0x0000, 0x010000, CRC(5c97d505) SHA1(6ade77a6dcf1cc57afe879502534f855f6bd4cc8) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_dat_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(c5f6c4f6) SHA1(69be1c6f134406a5457cf4bd7ed78dc4524bac6d) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_dat_ac_250pnd-25p_p65_ass.bin", 0x0000, 0x010000, CRC(f2433167) SHA1(88c90c047f67361e1974ea29a887f11c79c78b55) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_dat_ac_250pnd-25p_p67_ass.bin", 0x0000, 0x010000, CRC(734c5e16) SHA1(e6a6a31ef5156e207dd77c40f5b29b10ef4f9def) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_dat_ac_250pnd_ass.bin", 0x0000, 0x010000, CRC(6b899a10) SHA1(58b7e2e9eda0d3715de8a4af31b49e059942b6f2) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_dat_ac_var_200pnd_ass.bin", 0x0000, 0x010000, CRC(a914cb23) SHA1(cd3332506229184cf0c3db37c43d2fa4cd2e54d9) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(4e7da1cb) SHA1(1c61f47f30a9d27f558548c23ddf6de2e5366344) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_std_ac_250pnd-25p_p65_ass.bin", 0x0000, 0x010000, CRC(8f5396a6) SHA1(c7cd83bdeca3a852a8203330ca14574608b9a9e9) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_std_ac_250pnd-25p_p67_ass.bin", 0x0000, 0x010000, CRC(fd19db9a) SHA1(441d80b8463ffd5f8783b3cb80d8321f64e8fcc5) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_std_ac_250pnd_ass.bin", 0x0000, 0x010000, CRC(10a9d7d3) SHA1(7d147ce9c2c98f10694ee99e14286be3f74bbdf4) )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_std_ac_var_200pnd_ass.bin", 0x0000, 0x010000, CRC(23d239fa) SHA1(44dae2cd2be573df71b60ba3918cc2d728cde4b4) )
+	ROM_LOAD( "clubcopsnrobbersdeluxe.bin", 0x0000, 0x010000, CRC(055e0f2c) SHA1(8aa7386031fd381deb7d79ce3217bab0d01671f0) )
+
+	ROM_REGION( 0x20000, "matrix", 0 )
+	ROM_LOAD( "club-deluxe-cops-and-robbers_mtx_250pnd-25pss.hex", 0x0000, 0x01cfbf, CRC(b2abbab4) SHA1(40e202e1678f637f7c0097b4f8f4884de439935e) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+ROM_END
 
 ROM_START( sc2dels )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5262,5 +5318,7 @@ GAME( 199?, sc2town		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",    
 GAME( 199?, sc2ofool	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Party Time (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2copcl	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc2copdc	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 

@@ -1209,6 +1209,16 @@ ROM_START( pokeroul )
 ROM_END
 
 
+ROM_START( jpcoin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x002000, CRC(67e1aa60) SHA1(32301f60a7325f23047d84bb1e9416ea05753493) )
+	ROM_LOAD( "1.bin", 0x2000, 0x002000, CRC(6c79e430) SHA1(56e026329ea6aba122d1f66c375bf4c3cc829feb) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "3.bin", 0x0000, 0x004000, CRC(4984053e) SHA1(e0f7c56160f48f7b1c2c407f448c13a191770adc) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "4.bin", 0x4000, 0x004000, CRC(2bac1c0b) SHA1(3e45fc38ed6d332e1d49b2b66bf8001610f914c5) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
 static DRIVER_INIT( coinmstr )
 {
 	UINT8 *rom = machine.region("user1")->base();
@@ -1228,7 +1238,10 @@ static DRIVER_INIT( coinmstr )
 }
 
 
+
+
 GAME( 1985, quizmstr, 0, quizmstr, quizmstr, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",            GAME_UNEMULATED_PROTECTION )
 GAME( 1987, trailblz, 0, trailblz, trailblz, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                   GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
 GAME( 1989, supnudg2, 0, supnudg2, supnudg2, coinmstr, ROT0, "Coinmaster",            "Super Nudger II (Version 5.21)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1990, pokeroul, 0, pokeroul, pokeroul, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_NOT_WORKING )
+GAME( 1990, jpcoin,   0, pokeroul, pokeroul, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster)",  GAME_NOT_WORKING ) // io stuff is different at least
