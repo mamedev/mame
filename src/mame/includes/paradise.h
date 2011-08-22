@@ -22,6 +22,8 @@ public:
 	UINT8 m_palbank;
 	UINT8 m_priority;
 	int m_sprite_inc;
+
+	int irq_count;
 };
 
 /*----------- defined in video/paradise.c -----------*/

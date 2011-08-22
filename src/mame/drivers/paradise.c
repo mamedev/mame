@@ -17,6 +17,7 @@ Year + Game          Board#
 95  Target Ball      YS-2002
 96  Torus            YS-0402? Looks identical
 98  Mad Ball         YS-0402
+	Penky*
 ---------------------------------------------------------------------------
 
 Notes:
@@ -26,6 +27,13 @@ paradise: I'm not sure it's working correctly:
 - The high scores table can't be entered !?
 - The chance to play a bonus game is very slim. I think I got to play
   a couple in total. Is there a way to trigger them !?
+
+penky: we need to delay the irqs at startup or it won't boot
+       the initial palette for the bitmap layer gets set to all black
+	   until a single game / attract demo is complete, this makes it
+	   impossible to know which areas you have covered.  is this related
+	   to the boot up problem?  For this reason I've left it marked as
+	   not working.
 
 ***************************************************************************/
 
@@ -560,6 +568,19 @@ static MACHINE_RESET( paradise )
 
 	state->m_palbank = 0;
 	state->m_priority = 0;
+
+	state->irq_count = 0;
+
+}
+
+static INTERRUPT_GEN(paradise_irq)
+{
+	paradise_state *state = device->machine().driver_data<paradise_state>();
+
+	if (state->irq_count<300)
+		state->irq_count++;
+	else
+		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( paradise, paradise_state )
@@ -568,7 +589,7 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MCFG_CPU_PROGRAM_MAP(paradise_map)
 	MCFG_CPU_IO_MAP(paradise_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* No nmi routine */
+	MCFG_CPU_PERIODIC_INT(paradise_irq,4*54)	/* No nmi routine */
 
 	MCFG_MACHINE_START(paradise)
 	MCFG_MACHINE_RESET(paradise)
@@ -632,6 +653,16 @@ static MACHINE_CONFIG_DERIVED( madball, paradise )
 
 	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( penky, paradise )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(torus_map)
+	MCFG_CPU_IO_MAP(paradise_io_map)
+MACHINE_CONFIG_END
+
+
 
 
 /***************************************************************************
@@ -866,6 +897,71 @@ ROM_START( tgtballa )
 	ROM_LOAD( "yunsung.u113", 0x00000, 0x40000, CRC(150a6cc6) SHA1(b435fcf8ba48006f506db6b63ba54a30a6b3eade) )
 ROM_END
 
+/***************************************************************************
+
+                          Penky
+
+YS951004
+  CPU: Z8400B PS (Z80 6Mhz)
+Sound: OKI M6295 x 2
+Video: Actel A1020A PL84C
+  OSC: 12.000MHz & 4.000MHz
+
+YS951004
++--------------------------------------------+
+|    M6295 M6295   Z80    4MHz    U110  U111 |
+|        U113*    U128                  U92  |
+|        U85     6264                   U93  |
+|                                       U94  |
+|               6116                         |
+|J                     +-------+             |
+|A                     | Actel |  6116       |
+|M              6116   |A1020A |             |
+|M                     | PL84C |             |
+|A              6116   +-------+             |
+|       12MHz                                |
+| DSW1                                  6116 |
+|                     4464              6116 |
+|                     4464  U114        6116 |
+| DSW2                4464  U115             |
+|                     4464                   |
++--------------------------------------------+
+
+U113 is not populated on this PCB
+
+Notes, the clocks should be the same as other boards of this era/type. IE:
+      Z80 clock: 6.000MHz
+     6295 clock: 1.000MHz (both), sample rate = 1000000/132 (both)
+
+***************************************************************************/
+
+ROM_START( penky )
+	ROM_REGION( 0x44000, "maincpu", 0 )		/* Z80 Code */
+	ROM_LOAD( "yunsung.u128", 0x00000, 0x0c000, CRC(57baeada) SHA1(360fd2d352b201e57436ed9c9f0510a052452738) )
+	ROM_CONTINUE(             0x10000, 0x34000 )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT)	/* 16x16x8 Sprites */
+	ROM_LOAD( "yunsung.u114", 0x00000, 0x80000, CRC(cb6b1cfd) SHA1(22406f70fc2ad839d5ca4d00d503a2857b295cf5) )
+	ROM_LOAD( "yunsung.u115", 0x80000, 0x80000, CRC(55c5ff90) SHA1(f68a22628b9da77c3e301fa57bf673c572760869) )
+
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)	/* 8x8x4 Background */
+	ROM_LOAD( "yunsung.u94", 0x00000, 0x20000, CRC(58b31c0e) SHA1(eea9a0c17737ce071895f818499edee7790d98f7) )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT)	/* 8x8x8 Foreground */
+	ROM_LOAD( "yunsung.u92", 0x00000, 0x80000, CRC(31993a6c) SHA1(8cdcae52472768f40dc7cbefaa459982d008deaa) )
+	ROM_LOAD( "yunsung.u93", 0x80000, 0x80000, CRC(b570dc0c) SHA1(1f55681412db144e2d5cbb7a89783edc5059add7) )
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT)	/* 8x8x8 Midground */
+	ROM_LOAD( "yunsung.u110", 0x00000, 0x80000, CRC(ba3173a1) SHA1(6667bced70eb6be9853239feb69d4b30daf2d0c1) )
+	ROM_LOAD( "yunsung.u111", 0x80000, 0x80000, CRC(9223ef85) SHA1(f8da8fc5c8178165e8142eb52889b4ef1c710e24) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
+	ROM_LOAD( "yunsung.u85", 0x00000, 0x40000, CRC(c664d0cc) SHA1(52d5122407e727d4c98bc6f2f939534de4b725ae) )
+
+	ROM_REGION( 0x80000, "oki2", 0 )	/* Samples (banked) */
+	/* not populated for this game */
+ROM_END
+
 /*
 
 Yun Sung Torus (c) 1996
@@ -1051,6 +1147,7 @@ static DRIVER_INIT (tgtball)
 	paradise_state *state = machine.driver_data<paradise_state>();
 	state->m_sprite_inc = 4;
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2001, 0x2001, FUNC(tgtball_flipscreen_w) );
+
 }
 
 static DRIVER_INIT (torus)
@@ -1072,6 +1169,7 @@ GAME( 1994+, paradlx,  0,       paradise, paradise, paradise, ROT90, "Yun Sung",
 GAME( 1994+, para2dx,  0,       paradise, para2dx,  paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995,  tgtball,  0,       tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
 GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball", GAME_SUPPORTS_SAVE )
+GAME( 1995,  penky,    0,       penky,    paradise, tgtball,  ROT0,  "Yun Sung", "Penky", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1996,  torus,    0,       torus,    torus,    torus,    ROT90, "Yun Sung", "Torus", GAME_SUPPORTS_SAVE )
 GAME( 1998,  madball,  0,       madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", GAME_SUPPORTS_SAVE )
 GAME( 1997,  madballn, madball, madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", GAME_SUPPORTS_SAVE )
