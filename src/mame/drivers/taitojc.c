@@ -339,13 +339,12 @@ Notes:
 
 
     TODO:
-        - dendeg2 hangs on init step 10.
         - dendeg intro object RAM usage has various gfx bugs (check video file)
         - dendeg title screen builds up and it shouldn't
         - dendeg doesn't show credit display
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
-        - dendeg2x usually crashes when starting the game (lots of read and writes to invalid addresses).
+        - dendeg2/dendeg2x usually crashes when starting the game (lots of read and writes to invalid addresses).
         - All dendeg games have random wrong textures/palettes. (can't see any ... -AS)
         - Train board (external sound board with OKI6295) is not emulated.
         - dangcurv DSP program crashes very soon, so no 3d is currently shown.
@@ -1193,7 +1192,7 @@ static INPUT_PORTS_START( dendeg )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Horn")		// Horn
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Horn")		// Horn
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -1717,10 +1716,10 @@ ROM_START( dendeg2 )
 	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "e52-17.052",  0x0000002, 0x200000, CRC(4ac11921) SHA1(c4816e1d68bb52ee59e7a2e6de617c1093020944) )
-	ROM_LOAD32_WORD_SWAP( "e52-18.053",  0x0000000, 0x200000, CRC(7f3e4af7) SHA1(ab35744014175a802e73c8b70de4e7508f0a1cd1) )
-	ROM_LOAD32_WORD_SWAP( "e52-19.054",  0x0400002, 0x200000, CRC(2e5ff408) SHA1(91f95721b98198082e950c50f33324820719e9ed) )
-	ROM_LOAD32_WORD_SWAP( "e52-20.055",  0x0400000, 0x200000, CRC(e90eb71e) SHA1(f07518c718f773e20412393c0ebb3243f9b1d96c) )
+	ROM_LOAD32_WORD( "e52-17.052",  0x0000002, 0x200000, CRC(4ac11921) SHA1(c4816e1d68bb52ee59e7a2e6de617c1093020944) )
+	ROM_LOAD32_WORD( "e52-18.053",  0x0000000, 0x200000, CRC(7f3e4af7) SHA1(ab35744014175a802e73c8b70de4e7508f0a1cd1) )
+	ROM_LOAD32_WORD( "e52-19.054",  0x0400002, 0x200000, CRC(2e5ff408) SHA1(91f95721b98198082e950c50f33324820719e9ed) )
+	ROM_LOAD32_WORD( "e52-20.055",  0x0400000, 0x200000, CRC(e90eb71e) SHA1(f07518c718f773e20412393c0ebb3243f9b1d96c) )
 	ROM_LOAD32_WORD( "e52-05.009",  0x0800002, 0x200000, CRC(1ad0c612) SHA1(4ffc373fca8c1e1a5edbad3305b08f0867e9809c) )
 	ROM_LOAD32_WORD( "e52-13.022",  0x0800000, 0x200000, CRC(943af3f4) SHA1(bfc81aa5e5c22e44601428b9e980f09d0c65e38e) )
 	ROM_LOAD32_WORD( "e52-06.010",  0x0c00002, 0x200000, CRC(aa35e536) SHA1(2c1b2ee0d2587db6d6dd60b081bfcef3bb0dd9fa) )
