@@ -21,6 +21,7 @@ public:
 	bitmap_t *m_tmpbitmap;
 	UINT8 m_palbank;
 	UINT8 m_priority;
+	UINT8 m_pixbank;
 	int m_sprite_inc;
 
 	int irq_count;

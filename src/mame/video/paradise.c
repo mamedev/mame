@@ -38,6 +38,16 @@ WRITE8_HANDLER( tgtball_flipscreen_w )
 	flip_screen_set(space->machine(), data ? 1 : 0);
 }
 
+/* Note: Penky updates pixel palette bank register BEFORE actually writing to the paletteram. */
+static void update_pix_palbank(running_machine &machine)
+{
+	paradise_state *state = machine.driver_data<paradise_state>();
+	int i;
+
+	for (i = 0; i < 15; i++)
+		palette_set_color_rgb(machine, 0x800 + i, state->m_paletteram[0x200 + state->m_pixbank + i + 0x800 * 0], state->m_paletteram[0x200 + state->m_pixbank + i + 0x800 * 1],
+								state->m_paletteram[0x200 + state->m_pixbank + i + 0x800 * 2]);
+}
 
 /* 800 bytes for red, followed by 800 bytes for green & 800 bytes for blue */
 WRITE8_HANDLER( paradise_palette_w )
@@ -47,6 +57,8 @@ WRITE8_HANDLER( paradise_palette_w )
 	offset %= 0x800;
 	palette_set_color_rgb(space->machine(), offset, state->m_paletteram[offset + 0x800 * 0], state->m_paletteram[offset + 0x800 * 1],
 		state->m_paletteram[offset + 0x800 * 2]);
+
+	update_pix_palbank(space->machine());
 }
 
 /***************************************************************************
@@ -72,13 +84,12 @@ WRITE8_HANDLER( paradise_vram_0_w )
 WRITE8_HANDLER( paradise_palbank_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
-	int i;
 	int bank1 = (data & 0x0e) | 1;
 	int bank2 = (data & 0xf0);
 
-	for (i = 0; i < 15; i++)
-		palette_set_color_rgb(space->machine(), 0x800 + i, state->m_paletteram[0x200 + bank2 + i + 0x800 * 0], state->m_paletteram[0x200 + bank2 + i + 0x800 * 1],
-								state->m_paletteram[0x200 + bank2 + i + 0x800 * 2]);
+	state->m_pixbank = bank2;
+
+	update_pix_palbank(space->machine());
 
 	if (state->m_palbank != bank1)
 	{
