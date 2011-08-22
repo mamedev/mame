@@ -679,9 +679,33 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 				ptr += 6;
 				break;
 			}
-			case 0x01: // Landing Gear
+			case 0x01: // Landing Gear, Goraud Shaded Triangle
 			{
-				ptr += 12;
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+
+				extra->zbuffer = state->m_zbuffer;
+
+				for (i=0; i < 3; i++)
+				{
+					vert[i].p[1] = polygon_fifo[ptr++];
+					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
+					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
+					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
+				}
+
+				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
+				{
+					if (vert[0].p[1] == vert[1].p[1] &&
+						vert[1].p[1] == vert[2].p[1])
+					{
+						// optimization: all colours the same -> render solid
+						poly_render_triangle(state->m_poly, state->m_framebuffer, &machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2]);
+					}
+					else
+					{
+						poly_render_triangle(state->m_poly, state->m_framebuffer, &machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2]);
+					}
+				}
 				break;
 			}
 			default:
