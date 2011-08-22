@@ -15,9 +15,9 @@ Year + Game          Board#
 94+ Paradise         YS-1600
 94+ Paradise Deluxe  YS-1604
 95  Target Ball      YS-2002
+96  Penky            YS951004
 96  Torus            YS-0402? Looks identical
 98  Mad Ball         YS-0402
-    Penky*           YS951004
 ---------------------------------------------------------------------------
 
 Notes:
@@ -30,10 +30,10 @@ paradise: I'm not sure it's working correctly:
 
 penky: we need to delay the irqs at startup or it won't boot
        the initial palette for the bitmap layer gets set to all black
-	   until a single game / attract demo is complete, this makes it
-	   impossible to know which areas you have covered.  is this related
-	   to the boot up problem?  For this reason I've left it marked as
-	   not working.
+       until a single game / attract demo is complete, this makes it
+       impossible to know which areas you have covered.  is this related
+       to the boot up problem?  For this reason I've left it marked as
+       not working.
 
 ***************************************************************************/
 
@@ -310,19 +310,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( penky )
 	PORT_START("DSW1")	/* port $2020 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1") /* Switches 1-3 are difficulty, one setting cuases player's trail to be black */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x03, 0x03, "Time for 1 Player" )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "0:40" )
+	PORT_DIPSETTING(    0x01, "0:50" )
+	PORT_DIPSETTING(    0x02, "1:00" )
+	PORT_DIPSETTING(    0x03, "1:10" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3") /* One of these sets/pairs should be diffculty or timer speed */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x20, "Fill % to Win" )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Fill % to Win" )		PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "Majority at Time Over" )
 	PORT_DIPSETTING(    0x20, "Majority at Time or 90%" )
 	PORT_DIPSETTING(    0x10, "Majority at Time or 85%" )
