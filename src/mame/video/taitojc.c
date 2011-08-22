@@ -674,12 +674,32 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 				}
 				break;
 			}
-			case 0x00:
+			case 0x00: // almost certainly screen global clipping for 3d
 			{
+				static UINT16 min_x,min_y,min_z,max_x,max_y,max_z;
+
+				min_x = polygon_fifo[ptr+1];
+				min_y = polygon_fifo[ptr+0];
+				min_z = polygon_fifo[ptr+2];
+				max_x = polygon_fifo[ptr+4];
+				max_y = polygon_fifo[ptr+3];
+				max_z = polygon_fifo[ptr+5];
+
+				/* let's check if we need to implement this ... */
+				if(min_x != 0 || min_y != 0 || min_z != 0 || max_x != 512 || max_y != 400 || max_z != 0x7fff)
+				{
+					printf("CMD %04x\n",cmd);
+					printf("MIN Y %04x\n",polygon_fifo[ptr+0]);
+					printf("MIN X %04x\n",polygon_fifo[ptr+1]);
+					printf("MIN Z %04x\n",polygon_fifo[ptr+2]);
+					printf("MAX Y %04x\n",polygon_fifo[ptr+3]);
+					printf("MAX X %04x\n",polygon_fifo[ptr+4]);
+					printf("MAX Z %04x\n",polygon_fifo[ptr+5]);
+				}
 				ptr += 6;
 				break;
 			}
-			case 0x01: // Landing Gear, Goraud Shaded Triangle
+			case 0x01: // Landing Gear, Gouraud Shaded Triangle
 			{
 				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
 
