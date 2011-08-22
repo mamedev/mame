@@ -167,7 +167,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 		y2 = cliprect->max_y;
 	}
 
-	if(!color_depth) // Densya de Go 2X "credit text", 4bpp
+	if(!color_depth) // Densya de Go 2/2X "credit text", 4bpp
 	{
 		for (j=y1; j < y2; j++)
 		{
@@ -355,8 +355,16 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 	int color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
 	UINT16 *fb = BITMAP_ADDR16(destmap, scanline, 0);
-	UINT16 *zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
+	UINT16 *zb;// = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
 	int x;
+
+	// avoid crash in dendeg2
+	if (!extra->zbuffer)
+	{
+		return;
+	}
+
+	zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
 
 	for (x = extent->startx; x < extent->stopx; x++)
 	{
