@@ -1155,6 +1155,25 @@ static INPUT_PORTS_START( taitojc )
 INPUT_PORTS_END
 #endif
 
+/* Mascon must always be in a defined state, Densya de Go 2 in particular returns black screen if the Mascon input is undefined
+   We convert the 6 lever "shifter" into a fake analog port for now. */
+static CUSTOM_INPUT( mascon_state_r )
+{
+	static const UINT8 mascon_table[6] = { 0x01, 0x10, 0x02, 0x20, 0x04, 0x40 };
+	UINT8 res = input_port_read(field.machine(), "MASCON");
+	int i;
+
+	//popmessage("%02x",res);
+
+	for(i=0;i<6;i++)
+	{
+		if((res & 0x70) == (0x10*i))
+			return mascon_table[i];
+	}
+
+	return mascon_table[5];
+}
+
 static INPUT_PORTS_START( dendeg )
 	PORT_START("COINS")
 	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1179,17 +1198,20 @@ static INPUT_PORTS_START( dendeg )
 
 	PORT_START("BUTTONS")
 	/* TODO: fix this */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")		// Mascon 5
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")		// Mascon 3
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")		// Mascon 1
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")		// Mascon 4
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")		// Mascon 2
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")		// Mascon 0
+	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x77, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(mascon_state_r,NULL)
+//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")		// Mascon 5
+//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")		// Mascon 3
+//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")		// Mascon 1
+//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")		// Mascon 4
+//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")		// Mascon 2
+//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")		// Mascon 0
+
+	PORT_START("MASCON")
+	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(0x60) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CENTERDELTA(5)
 
 	PORT_START("ANALOG1")		// Brake
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Brake")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CENTERDELTA(5) PORT_NAME("Brake")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( landgear )
