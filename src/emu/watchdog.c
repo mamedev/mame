@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 
 
 
@@ -71,9 +72,12 @@ static TIMER_CALLBACK( watchdog_callback )
 {
 	logerror("Reset caused by the watchdog!!!\n");
 
+	int verbose = machine.options().verbose();
 #ifdef MAME_DEBUG
-	popmessage("Reset caused by the watchdog!!!\n");
+	verbose = 1;
 #endif
+	if (verbose)
+		popmessage("Reset caused by the watchdog!!!\n");
 
 	machine.schedule_soft_reset();
 }

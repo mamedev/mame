@@ -2793,7 +2793,12 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 	/* skip locked-out coin inputs */
 	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN12 && coin_lockout_get_state(field->machine(), field->type - IPT_COIN1) && field->machine().options().coin_lockout())
 	{
-		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
+		int verbose = field->machine().options().verbose();
+#ifdef MAME_DEBUG
+		verbose = 1;
+#endif
+		if (verbose)
+			ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
 		return FALSE;
 	}
 	return curstate;
