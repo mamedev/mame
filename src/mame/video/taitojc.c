@@ -359,10 +359,10 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 	int x;
 
 	// avoid crash in dendeg2
-	if (!extra->zbuffer)
-	{
-		return;
-	}
+	//if (!extra->zbuffer)
+	//{
+	//	return;
+	//}
 
 	zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
 
@@ -393,10 +393,10 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 	int x;
 
 	// avoid crash in landgear/dangcurv
-	if (!extra->zbuffer)
-	{
-		return;
-	}
+	//if (!extra->zbuffer)
+	//{
+	//	return;
+	//}
 
 	zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
 
@@ -579,6 +579,9 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
                 }
                 printf("\n");
                 */
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+
+				extra->zbuffer = state->m_zbuffer;
 
 				for (i=0; i < 4; i++)
 				{
