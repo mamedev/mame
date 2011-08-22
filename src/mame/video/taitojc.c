@@ -77,6 +77,7 @@ WRITE32_HANDLER(taitojc_char_w)
 // 0x00:   -------- -------- ------xx xxxxxxxx   X
 // 0x01:   ---xxxxx xx------ -------- --------   Palette
 // 0x01:   -------- --x----- -------- --------   Priority (0 = below 3D, 1 = above 3D)
+// 0x01:   -------- -------x -------- --------   Color depth (0) 4bpp / (1) 8bpp
 // 0x01:   -------- -------- -xxxxxxx xxxxxxxx   VRAM data address
 
 /*
@@ -105,6 +106,9 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	int ix, iy;
 	UINT32 address;
 	UINT8 *v;
+	UINT8 color_depth;
+
+	color_depth = (w2 & 0x10000) >> 16;
 
 	address		= (w2 & 0x7fff) * 0x20;
 	if (w2 & 0x4000)
@@ -163,22 +167,50 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 		y2 = cliprect->max_y;
 	}
 
-	for (j=y1; j < y2; j++)
+	if(!color_depth) // Densya de Go 2X "credit text", 4bpp
 	{
-		UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
-		int index = (iy * width) + ix;
-
-		for (i=x1; i < x2; i++)
+		for (j=y1; j < y2; j++)
 		{
-			UINT8 pen = v[BYTE4_XOR_BE(index)];
-			if (pen != 0)
-			{
-				d[i] = palette + pen;
-			}
-			index++;
-		}
+			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+			int index = (iy * (width / 2)) + ix;
 
-		iy++;
+			for (i=x1; i < x2; i+=2)
+			{
+				UINT8 pen = (v[BYTE4_XOR_BE(index)] & 0xf0) >> 4;
+				if (pen != 0)
+				{
+					d[i] = palette + pen;
+				}
+				pen = (v[BYTE4_XOR_BE(index)] & 0x0f);
+				if (pen != 0)
+				{
+					d[i+1] = palette + pen;
+				}
+				index++;
+			}
+
+			iy++;
+		}
+	}
+	else // 8bpp
+	{
+		for (j=y1; j < y2; j++)
+		{
+			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+			int index = (iy * width) + ix;
+
+			for (i=x1; i < x2; i++)
+			{
+				UINT8 pen = v[BYTE4_XOR_BE(index)];
+				if (pen != 0)
+				{
+					d[i] = palette + pen;
+				}
+				index++;
+			}
+
+			iy++;
+		}
 	}
 }
 
