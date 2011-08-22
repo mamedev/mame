@@ -342,6 +342,7 @@ Notes:
         - dendeg2 hangs on init step 10.
         - dendeg intro object RAM usage has various gfx bugs (check video file)
         - dendeg title screen builds up and it shouldn't
+        - dendeg doesn't show credit display
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
         - dendeg2x usually crashes when starting the game (lots of read and writes to invalid addresses).
@@ -750,6 +751,9 @@ static WRITE32_HANDLER(dsp_shared_w)
 	}
 #endif
 
+	if (offset == 0x1ff8/4)
+		cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
+
 	if (offset == 0x1ffc/4)
 	{
 		if ((data & 0x80000) == 0)
@@ -1069,6 +1073,22 @@ static READ16_HANDLER(dsp_intersection_r)
     0x7030: Unknown write
 */
 
+static READ16_HANDLER( dsp_to_main_r )
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+
+	return state->m_dsp_shared_ram[0x7fe];
+}
+
+static WRITE16_HANDLER( dsp_to_main_w )
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+
+	cputag_set_input_line(space->machine(), "maincpu", 6, ASSERT_LINE);
+
+	COMBINE_DATA(&state->m_dsp_shared_ram[0x7fe]);
+}
+
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1086,6 +1106,7 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16 )
 	AM_RANGE(0x701b, 0x701b) AM_READ(dsp_intersection_r)
 	AM_RANGE(0x701d, 0x701f) AM_READ(dsp_projection_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_unk_r)
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r,dsp_to_main_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_dsp_shared_ram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -1157,6 +1178,7 @@ static INPUT_PORTS_START( dendeg )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
+	/* TODO: fix this */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")		// Mascon 5
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")		// Mascon 3
@@ -1318,10 +1340,12 @@ static INTERRUPT_GEN( taitojc_vblank )
 	device_set_input_line_and_vector(device, 2, HOLD_LINE, 130);
 }
 
+#if 0
 static INTERRUPT_GEN( taitojc_int6 )
 {
-	device_set_input_line(device, 6, HOLD_LINE);
+//	device_set_input_line(device, 6, HOLD_LINE);
 }
+#endif
 
 static const hc11_config taitojc_config =
 {
@@ -1335,7 +1359,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
-	MCFG_CPU_PERIODIC_INT(taitojc_int6, 1000)
+//	MCFG_CPU_PERIODIC_INT(taitojc_int6, 1000)
 
 	MCFG_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
