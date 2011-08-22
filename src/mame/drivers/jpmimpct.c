@@ -1586,6 +1586,22 @@ ROM_START( tqst ) // this looks like a video game.. but probably incomplete
 	ROM_LOAD( "025rs1-0.bin", 0x0000, 0x080000, CRC(c4dbff24) SHA1(2e4d1d1905b9cd8254989d1653beb6756664839e) )
 ROM_END
 
+ROM_START( snlad ) // probably incomplete
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8718.bin", 0x00000, 0x080000, CRC(599ca023) SHA1(fe6792ac97d18e2a04dbe8700d9f16b95be0f486) )
+	ROM_LOAD16_BYTE( "8719.bin", 0x00001, 0x080000, CRC(155156dc) SHA1(7f43d52413c31c5f44907ebb9eb419ccb8047c68) )
+
+	ROM_REGION( 0x1000000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "8720.bin", 0x0000, 0x080000, CRC(316d2230) SHA1(f2e330bcbc55dc0a47571f10d8c31e0e272ef8a9) )
+
+	ROM_REGION16_LE( 0x200000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "gr1.bin", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD16_BYTE( "gr2.bin", 0x000001, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "slswpsnd.bin", 0x0000, 0x080000, CRC(9a48b772) SHA1(d8fbaa60f09a1d31cf6c61c6dd02ad1bd7b7ffc9) )
+ROM_END
+
 
 
 /* Mechanical Below */
@@ -5203,6 +5219,7 @@ GAME( 1997, scrabble, 0,      jpmimpct, scrabble, 0, ROT0, "JPM", "Scrabble (rev
 GAME( 1998, hngmnjpm, 0,      jpmimpct, hngmnjpm, 0, ROT0, "JPM", "Hangman (JPM)",               GAME_SUPPORTS_SAVE )
 GAME( 1999, coronatn, 0,      jpmimpct, coronatn, 0, ROT0, "JPM", "Coronation Street Quiz Game", GAME_SUPPORTS_SAVE )
 GAME( 199?, tqst,	  0,	  jpmimpct, cluedo	, 0, ROT0, "JPM", "Treasure Quest"			   , GAME_NOT_WORKING) // seems to be a video set (different to the games below), but probably incomplete, was marked as 'ACE' ?
+GAME( 199?, snlad,	  0,	  jpmimpct, cluedo	, 0, ROT0, "JPM", "Snake & Ladders"			   , GAME_NOT_WORKING) // probably incomplete
 
 /* Mechanical Below */
 

@@ -9251,6 +9251,7 @@ j2always	// Always Eight (Bwb)
 j2coinsh	// Coin Shoot (Bwb)
 j2nudfev	// Nudge Fever (Bwb)
 j2trail		// Trailblazer (Bwb)
+j2wag		// Win-A-Gain (Bwb)
 
 j2cshnud	// Cash Nudger (Mdm)
 j2fivepn	// Fivepenny Nudger (Mdm)
@@ -9306,7 +9307,7 @@ j2ss		// Supa Stepper (JPM)
 j2nbz		// Nudge Bonanza (JPM)
 j2clbbin	// Club Bingo (Crystal)
 j2sirich	// Strike It Rich? (Maygay?) 
-
+j2hcash		// Hot Cash
 
 // JPM Give us a Break hardware
 guab			// (c) 1986
@@ -9720,6 +9721,7 @@ scrabble		// (c) 1997
 hngmnjpm		// (c) 1998
 coronatn		// (c) 1999
 tqst			// (c) ACE?
+snlad			// (c) 199?
 
 // Unknown JPM platform
 
@@ -12618,6 +12620,7 @@ ep_cslay	// Cash Slayer (Global)
 ep_monky	// Monkey Business (Global)
 ep_makmv	// Make Your Move (Global)
 ep_lug		// London Underground (Maygay)
+ep_crzbn	// Crazy Bingo (Maygay)
 
 // MPU2
 
@@ -12767,6 +12770,7 @@ m4bj		// Black Jack (Barcrest) [Dutch]
 m4bjc		// Black Jack Club (Barcrest) [Dutch]
 m4bja		// Blackjack (Barcrest)
 m4bjac		// Blackjack Club (Barcrest)
+m4bjack
 m4bjsm		// Blackjack Super Multi (Barcrest)
 m4blstbk	// Blast A Bank (Barcrest)
 m4bluedm	// Blue Diamond (Barcrest)
@@ -13142,6 +13146,7 @@ m4bigchsb	//
 m4cstrik	// Cash Strike (Empire)
 m4cstrika	//
 m4cstrikb	//
+m4cstrikc	//
 m4chacec	// Chase The Ace [Cards] (Empire)
 m4chaceca	//
 m4chacef	// Chase The Ace [Fruits] (Empire)
@@ -13285,6 +13290,7 @@ m4unibox	// Unibox (Union)
 m4uniboxa	//
 m4unique	// Unique (Union)
 m4uniquep	//
+m4crzbn		// Crazy Bingo
 
 /* Union + Empire */
 
@@ -13351,6 +13357,11 @@ m4rlpick	// Reel Picks (Crystal)
 m4twstr		// Twister (Crystal)
 m4twstcl	// Twister Club (Crystal)
 m4dz		// Danger Zone (Crystal?)
+m4tylb		// Thank Your Lucky Bars (Crystal)
+m4magi7		// Magic 7s (Crystal)
+m4rags		// Rags to Riches Club (Crystal)
+m4riocr		// Rio Grande (Grystal)
+m4ndup		// Nudge Double Up (Crystal)
 
 /* Unknown */
 
@@ -13408,7 +13419,6 @@ m4spotln	// Spotlight (Nova)
 m4sdquid	// Sundance Quid (Qps)
 m4tornad	// Tornado (Qps - Mazooma)
 m4vivan		// Viva Las Vegas (Nova)
-
 
 /* Unsorted */
 
@@ -13917,6 +13927,7 @@ sp_juras		// Jurassic Trial (Ace)
 sp_openb		// Open The Box (Ace)
 sp_payrs		// Payrise (Ace)
 sp_playa		// Play It Again (Ace)
+sp_playaa		//
 sp_spell		// Spellbound (Ace)
 sp_swop			// Swop Shop (Ace)
 sp_timem		// Time Machine (Ace)
@@ -13957,6 +13968,10 @@ sp_skylm		//Sky's The Limit Club, The (Ace)
 sp_tkpik		//Take Your Pick (Ace)
 sp_woolp		//Woolpack (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
 sp_zigzg		//Zig Zag (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
+sp_cw			//Crime Watch (Ace)
+sp_atw
+sp_five
+sp_crun
 
 // Unknown PCP
 
@@ -14022,6 +14037,12 @@ pr_trpx			// Triple X (Project)
 pr_walls		// Wall Street (Project)
 pr_whlft		// Wheel Of Fortune (Project)
 pr_wldkn		// Wild Kings (Project)
+pr_bears		// Bear Streak (Coinworld)
+pr_bearx		// Bear X (Coinworld)
+pr_fspot		// Fun Spot (Coinworld)
+pr_gnuc			// Golden Nugget (Coinworld)
+pr_magln		// Magic Lines (Coinworld)
+pr_swop			// Swop It (Ace)
 
 /* Astra */
 

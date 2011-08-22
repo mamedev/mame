@@ -2831,6 +2831,8 @@ GAME( 199?, sc1chain			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM", 
 GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //was mixed with the sc4/5 potp roms..  System status 98
 GAME( 199?, sc1potpa			, sc1potp			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
+
+
 //Adder 2
 GAME( 1996, m_tppokr, 0,        scorpion1_adder2	, toppoker	, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 

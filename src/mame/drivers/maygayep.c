@@ -4379,8 +4379,20 @@ ROM_START( ep_lug )
 	MISSING_SOUND
 ROM_END
 
+ROM_START( ep_crzbn )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "msb01007.g0", 0x00000, 0x020000, CRC(3b3e2c4f) SHA1(6669e661fad6994a9b866aa2eb62a2eeff445831) )
+	ROM_LOAD16_BYTE( "msb01007.g1", 0x00001, 0x020000, CRC(fcf6baa3) SHA1(53d07d6146046bcef2d43806c8601671483e453c) )
 
-
+	ROM_REGION( 0x200000, "altrevs", 0 ) /* split into clones later */
+	ROM_LOAD16_BYTE( "msb01008.g0", 0x00000, 0x020000, CRC(17480519) SHA1(084a74f94e3ed424715e6ed2ecee57e9d8c014ee) )
+	ROM_LOAD16_BYTE( "msb01008.g1", 0x00001, 0x020000, CRC(e9bee688) SHA1(2f5a014cbe0d80e42cc94c21a3fe8095a89feb19) )
+	ROM_LOAD16_BYTE( "msb01009.g0", 0x00000, 0x020000, CRC(075fd0a3) SHA1(e8e665410d334a9a68fb65f9d5e2b948101810a4) )
+	ROM_LOAD16_BYTE( "msb01009.g1", 0x00001, 0x020000, CRC(162d469b) SHA1(8feb622b835c5cb7dcd7e528b6ae05d9c00e704b) )
+	ROM_LOAD16_BYTE( "msb01010.g0", 0x00000, 0x020000, CRC(162a795e) SHA1(b74d3b75b49791b548c2b6bcf09bb0a0ddada7b2) )
+	ROM_LOAD16_BYTE( "msb01010.g1", 0x00001, 0x020000, CRC(cba57dda) SHA1(8b2511333e0e6dd93920c9a7370a239175d528f6) )
+	MISSING_SOUND
+ROM_END
 
 
 
@@ -4580,3 +4592,6 @@ GAME( 199?, ep_cslay	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",     
 GAME( 199?, ep_monky	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",        "Monkey Business (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_makmv	,  0,		 maygayep,  maygayep,  0,  ROT0, "Global",		  "Make Your Move (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_lug		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "London Underground (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
+GAME( 199?, ep_crzbn	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Crazy Bingo (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
+
+
