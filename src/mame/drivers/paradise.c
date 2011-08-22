@@ -958,7 +958,7 @@ ROM_START( penky )
 	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
 	ROM_LOAD( "yunsung.u85", 0x00000, 0x40000, CRC(c664d0cc) SHA1(52d5122407e727d4c98bc6f2f939534de4b725ae) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )	/* Samples (banked) */
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )	/* Samples (banked) */
 	/* not populated for this game */
 ROM_END
 
