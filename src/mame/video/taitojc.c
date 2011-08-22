@@ -679,9 +679,14 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 				ptr += 6;
 				break;
 			}
+			case 0x01: // Landing Gear
+			{
+				ptr += 12;
+				break;
+			}
 			default:
 			{
-				//printf("render_polygons: unknown command %04X\n", cmd);
+				printf("render_polygons: unknown command %04X %d\n", cmd,ptr);
 			}
 		}
 	}

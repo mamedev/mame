@@ -1907,5 +1907,5 @@ GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   taitojc,  ROT0, "Taito", "Dens
 GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2,  0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2j, sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, landgear, 0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_NOT_WORKING )
+GAME( 1995, landgear, 0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, dangcurv, 0,       taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
