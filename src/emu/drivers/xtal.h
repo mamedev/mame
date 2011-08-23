@@ -172,7 +172,7 @@ enum
 	XTAL_36MHz  		= 36000000,		/* Sega Model 1 video board */
 	XTAL_38_76922MHz	= 38769220,		/* Namco System 21 video board */
 	XTAL_40MHz  		= 40000000,
-	XTAL_42_9545MHz 	= 42954500,		/* CPS3 */
+	XTAL_42_9545MHz 	= 42954545,		/* CPS3 */
 	XTAL_44_1MHz		= 44100000,		/* Subsino's Bishou Jan */
 	XTAL_45MHz  		= 45000000,		/* Eolith with Hyperstone CPUs */
 	XTAL_45_158MHz  	= 45158000,		/* Sega Model 2A video board, Model 3 CPU board */
@@ -184,7 +184,7 @@ enum
 	XTAL_52MHz  		= 52000000,		/* Cojag */
 	XTAL_53_693175MHz	= 53693175,		/* PSX-based h/w, Sony ZN1-2-based */
 	XTAL_54MHz  		= 54000000,		/* Taito JC */
-	XTAL_57_2727MHz 	= 57272700,		/* Psikyo SH2 with /2 divider */
+	XTAL_57_2727MHz 	= 57272727,		/* Psikyo SH2 with /2 divider */
 	XTAL_60MHz  		= 60000000,
 	XTAL_61_44MHz		= 61440000,		/* dkong */
 	XTAL_64MHz  		= 64000000,		/* BattleToads */
