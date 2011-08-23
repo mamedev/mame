@@ -807,7 +807,7 @@ static WRITE32_HANDLER(f3_share_w)
 	}
 }
 
-static WRITE32_HANDLER(jc_output_w)
+static WRITE32_HANDLER(jc_meters_w)
 {
 	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 	static const double odometer_table[0x100] =
@@ -837,7 +837,8 @@ static WRITE32_HANDLER(jc_output_w)
 	else if(offset == 1 && ACCESSING_BITS_16_31)
 		state->m_break_meter = data >> 16; //TODO
 
-	popmessage("%f",state->m_speed_meter);
+	if(input_port_read_safe(space->machine(), "METER", 0))
+		popmessage("%f",state->m_speed_meter);
 }
 
 static READ32_HANDLER( jc_lan_r )
@@ -864,7 +865,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x06800000, 0x06801fff) AM_NOP		// unknown
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE_MEMBER(taitojc_state,m_f3_shared_ram)
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
-	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE(jc_output_w)
+	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE(jc_meters_w)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_main_ram)
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
 ADDRESS_MAP_END
@@ -1237,6 +1238,11 @@ static INPUT_PORTS_START( dendeg )
 
 	PORT_START("ANALOG1")		// Brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CENTERDELTA(5) PORT_NAME("Brake")
+
+	PORT_START("METER")
+	PORT_CONFNAME( 0x01, 0x01, "Show Meters" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( No )  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( landgear )
@@ -1438,6 +1444,33 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
+static READ16_HANDLER( taitojc_dsp_idle_skip_r )
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+
+	if(cpu_get_pc(&space->device())==0x404c)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
+
+	return state->m_dsp_shared_ram[0x7f0];
+}
+
+static READ16_HANDLER( dendeg2_dsp_idle_skip_r )
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+
+	if(cpu_get_pc(&space->device())==0x402e)
+		device_spin_until_time(&space->device(), attotime::from_usec(500));
+
+	return state->m_dsp_shared_ram[0x7f0];
+}
+
+static WRITE16_HANDLER( dsp_idle_skip_w )
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+
+	COMBINE_DATA(&state->m_dsp_shared_ram[0x7f0]);
+}
+
 static DRIVER_INIT( taitojc )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
@@ -1445,7 +1478,17 @@ static DRIVER_INIT( taitojc )
 	state->m_polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
 
 	state->m_has_dsp_hack = 1;
+
+	machine.device("dsp")->memory().space(AS_DATA)->install_legacy_readwrite_handler(0x7ff0, 0x7ff0, FUNC(taitojc_dsp_idle_skip_r), FUNC(dsp_idle_skip_w));
 }
+
+static DRIVER_INIT( dendeg2 )
+{
+	DRIVER_INIT_CALL( taitojc );
+
+	machine.device("dsp")->memory().space(AS_DATA)->install_legacy_readwrite_handler(0x7ff0, 0x7ff0, FUNC(dendeg2_dsp_idle_skip_r), FUNC(dsp_idle_skip_w));
+}
+
 
 static DRIVER_INIT( dangcurv )
 {
@@ -1928,8 +1971,8 @@ ROM_END
 
 GAME( 1996, dendeg,   0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, dendegx,  dendeg,  taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2,  0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendeg2,  0,       taitojc, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2,  0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2j, sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
