@@ -342,7 +342,7 @@ int	floppy_drive_get_flag_state(device_t *img, int flag)
 
 	drive_flags = drv->flags;
 
-	/* these flags are independant of a real drive/disk image */
+	/* these flags are independent of a real drive/disk image */
     flags |= drive_flags & (FLOPPY_DRIVE_READY | FLOPPY_DRIVE_INDEX);
 
     flags &= flag;

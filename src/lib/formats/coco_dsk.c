@@ -92,7 +92,7 @@
  *      there are no extra bytes in front of the sector data.
  *
  *  H. Sector attribute byte
- *      This byte is put at the begining of every sector if the header flag
+ *      This byte is put at the beginning of every sector if the header flag
  *      is turned on. The information this byte contains is the same as the
  *      status register (of the wd179x) would contain when a 'Read Sector'
  *      command was issued. The bit fields are defined as:
@@ -603,7 +603,7 @@ static FLOPPY_CONSTRUCT(coco_vdk_construct)
  *
  * Each track begins with a track TOC, consisting of 64 little endian 16-bit
  * integers.  Each integer has the following format:
- *      bit 0-13:   Offset from begining of track to 'FE' byte of IDAM
+ *      bit 0-13:   Offset from beginning of track to 'FE' byte of IDAM
  *                  Note these are always sorted from first to last. All empty
  *                  entries are 0x00
  *      bit 14:     Undefined (reserved)

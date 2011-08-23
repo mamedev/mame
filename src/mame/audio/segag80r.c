@@ -83,7 +83,7 @@ static SOUND_START( astrob );
         about 12V - 0.5V (diode drop in low current circuit) =
         11.5V.
 
-        Now you need to calculate the refrence voltage on the
+        Now you need to calculate the reference voltage on the
         + input (pin 5).  Depending on the state of WARP...
 
         If the warp data is 0, then U31 inverts it to an Open

@@ -381,7 +381,7 @@ static const UINT32 lfo_samples_per_step[8] = {108, 77, 71, 67, 62, 44, 8, 5};
    5.9 dB = 0, 1, 2, 3, 4, 5, 6, 7, 8....63, 63, 62, 61, 60, 59,.....2,1,0
    1.4 dB = 0, 0, 0, 0, 1, 1, 1, 1, 2,...15, 15, 15, 15, 14, 14,.....0,0,0
 
-  (1.4 dB is loosing precision as you can see)
+  (1.4 dB is losing precision as you can see)
 
   It's implemented as generator from 0..126 with step 2 then a shift
   right N times, where N is:
@@ -2297,7 +2297,7 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 		bufL[i] = lt;
 		bufR[i] = rt;
 
-		/* CSM mode: if CSM Key ON has occured, CSM Key OFF need to be sent       */
+		/* CSM mode: if CSM Key ON has occurred, CSM Key OFF need to be sent       */
 		/* only if Timer A does not overflow again (i.e CSM Key ON not set again) */
 		OPN->SL3.key_csm <<= 1;
 

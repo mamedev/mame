@@ -117,7 +117,7 @@ static INPUT_PORTS_START( mrdo )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	/* settings 0x01 thru 0x05 all give 1 Coin/1 Credit */
+	/* settings 0x01 through 0x05 all give 1 Coin/1 Credit */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:4,3,2,1")
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
@@ -130,7 +130,7 @@ static INPUT_PORTS_START( mrdo )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	/* settings 0x10 thru 0x50 all give 1 Coin/1 Credit */
+	/* settings 0x10 through 0x50 all give 1 Coin/1 Credit */
 INPUT_PORTS_END
 
 

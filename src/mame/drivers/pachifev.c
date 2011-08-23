@@ -48,13 +48,13 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
   - Gameplay :
       * On levels 1 to 3, your number of balls must reach the limit based on DSW2 bits 6 and 7
         to complete the level; once this is done, you go to next level or bonus stage (after level 3).
-        Time is reset to value based on DSW2 bits 6 and 7 only at the begining of level 1,
+        Time is reset to value based on DSW2 bits 6 and 7 only at the beginning of level 1,
         while balls are reset on each level to value based on DSW1 bits 4 and 5.
       * On the bonus stage, you only have 3 balls (which are decremented from your number of balls)
         to get maximum bonus time, bonus balls, and points. During this stage, time is not decremented.
       * On level 4, your number of balls must reach the limit based on DSW2 bits 4 and 5 (making the game
         sometimes harder) to complete the level; once this is done, the game is over for current player.
-        The main difference with levels 1 to 3 is that balls are not reset at the begining of the level.
+        The main difference with levels 1 to 3 is that balls are not reset at the beginning of the level.
       * Once time or game is over, the game switches player 2 (if available). When all players have ended
         their game, they can decide to continue : a message is displayed but you don't see any timer.
         When you continue, only the balls aren't reset, while score, time and level (GASP !) are.

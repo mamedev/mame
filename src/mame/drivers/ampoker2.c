@@ -636,7 +636,7 @@ ADDRESS_MAP_END
 
   Rabbit Poker writes...
 
-  12dc W \ Writting to the PIC?... The program doesn't seems to poll it.
+  12dc W \ Writing to the PIC?... The program doesn't seems to poll it.
   12dd W /
 
   Something is going wrong here. 12xx is ROM space. Put a BP on 12e5 and

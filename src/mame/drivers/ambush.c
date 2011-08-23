@@ -168,7 +168,7 @@ static const gfx_layout charlayout =
 	8,8,    /* 8*8 chars */
 	1024,   /* 2048 characters */
 	2,      /* 2 bits per pixel */
-	{ 0, 0x2000*8 },  /* The bitplanes are seperate */
+	{ 0, 0x2000*8 },  /* The bitplanes are separate */
 	{ 0, 1, 2, 3, 4, 5, 6, 7},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
 	8*8     /* every char takes 8 consecutive bytes */
@@ -179,7 +179,7 @@ static const gfx_layout spritelayout =
 	16,16,  /* 8*8 chars */
 	256,    /* 2048 characters */
 	2,      /* 2 bits per pixel */
-	{ 0, 0x2000*8 },  /* The bitplanes are seperate */
+	{ 0, 0x2000*8 },  /* The bitplanes are separate */
 	{     0,     1,     2,     3,     4,     5,     6,     7,
 	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,

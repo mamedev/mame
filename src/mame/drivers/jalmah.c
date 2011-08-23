@@ -3,7 +3,7 @@
 MJ-8956 HW games (c) 1989 Jaleco / NMK / UPL
 
 driver by Angelo Salese, based on early work by David Haywood
-Special thanks to Uki and Yasu for the priority system explaination.
+Special thanks to Uki and Yasu for the priority system explanation.
 
 Similar to the NMK16 / Jaleco Mega System 1 boards but without sprites.
 

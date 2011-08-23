@@ -5,7 +5,7 @@
 
     References:
 
-        HD63B09EP Technical Refrence Guide, by Chet Simpson with addition
+        HD63B09EP Technical Reference Guide, by Chet Simpson with addition
                             by Alan Dekok
         6809 Simulator V09, By L.C. Benschop, Eidnhoven The Netherlands.
 
@@ -225,7 +225,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 
 #define M6809_CWAI	8	/* set when CWAI is waiting for an interrupt */
 #define M6809_SYNC	16	/* set when SYNC is waiting for an interrupt */
-#define M6809_LDS		32	/* set when LDS occured at least once */
+#define M6809_LDS		32	/* set when LDS occurred at least once */
 
 /****************************************************************************/
 /* Read a byte from given memory location                                   */

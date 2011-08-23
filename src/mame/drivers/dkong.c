@@ -866,7 +866,7 @@ static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8 )
     AM_RANGE(0x1580, 0x1580) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)     /* DSW0 */
     AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x1583, 0x1583) AM_WRITE(dkong_spritebank_w)                         /* 2 PSL Signal */
-    AM_RANGE(0x1584, 0x1584) AM_NOP                                               /* Possibly still interupt enable */
+    AM_RANGE(0x1584, 0x1584) AM_NOP                                               /* Possibly still interrupt enable */
     AM_RANGE(0x1585, 0x1585) AM_DEVWRITE("dma8257", p8257_drq_w)          /* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x1586, 0x1587) AM_WRITE(dkong_palettebank_w)
     AM_RANGE(0x1600, 0x17ff) AM_RAM                                               /* 0x6400  spriteram location */

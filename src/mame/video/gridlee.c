@@ -129,7 +129,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
  *
  *************************************/
 
-/* all the GRIDLEE_VBEND adjustments are needed because the hardware has a seperate counting chain
+/* all the GRIDLEE_VBEND adjustments are needed because the hardware has a separate counting chain
    to address the video memory instead of using the video chain directly */
 
 SCREEN_UPDATE( gridlee )

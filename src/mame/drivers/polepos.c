@@ -196,7 +196,7 @@ Notes:
   change the shifter from LO to HI
 
 - Pole Position II reports 'Manual Start' on the Test Mode. This is ok,
-  because they had to accomodate the hardware from Pole Position I to allow
+  because they had to accommodate the hardware from Pole Position I to allow
   track selection.
 
 - Change POLEPOS_TOGGLE to 0 if you are using the original gearshift.

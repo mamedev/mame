@@ -2,7 +2,7 @@
 
 Chack'n Pop driver by BUT
 
-Note: The 68705 MCU isn't dumped, becuase it's protected, however we simulate
+Note: The 68705 MCU isn't dumped, because it's protected, however we simulate
       it using data extracted with a trojan. See machine/chaknpop.c
 
 Chack'n Pop

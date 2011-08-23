@@ -1454,7 +1454,7 @@ static void SetPostShortcuts( running_machine &machine, int reg )
 
     case 7:
       ygv608.na8_mask = ((ygv608.regs.s.r7 & r7_flip) ? 0x03 : 0x0f );
-      /* fall thru */
+      /* fall through */
 
   case 8 :
     ygv608.bits16 = ((ygv608.regs.s.r7 & r7_md) == MD_2PLANE_8BIT ? 0 : 1 );

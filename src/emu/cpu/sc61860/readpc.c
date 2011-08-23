@@ -24,7 +24,7 @@
 nearly all sharp pocket pc's system roms should be readable
 this way.
 
-for some early pocket pc's it would be neccessary to load
+for some early pocket pc's it would be necessary to load
 this program into memory.
 (they don't have poke/peek/call instructions,
 so this program can't be typed in)
@@ -38,7 +38,7 @@ adapter sharp - cteprommer
 5 f1    handshake -->      8 bit textool data 1 pin 18
 6 save
 7 load
-8 ib7   <--handshake       8 bit textool adress 0 pin 16
+8 ib7   <--handshake       8 bit textool address 0 pin 16
 9 ib9
 10
 11

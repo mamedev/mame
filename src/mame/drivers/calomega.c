@@ -360,7 +360,7 @@
     $0000 - $07FF   NVRAM           ; All registers and settings.
     $0840 - $0840   AY-8912         ; Read/Control.
     $0841 - $0841   AY-8912         ; Write.
-    $0880 - $0880   CRTC6845        ; MC6845 adressing.
+    $0880 - $0880   CRTC6845        ; MC6845 addressing.
     $0881 - $0881   CRTC6845        ; MC6845 Read/Write.
     $08C4 - $08C7   PIA0            ; I/O Ports 0 to 3 (multiplexed).
     $08C8 - $08CB   PIA1            ; I/O Port 4.
@@ -379,7 +379,7 @@
     $0000 - $07FF   NVRAM           ; All registers and settings.
     $1040 - $1040   AY-8912         ; Read/Control.
     $1041 - $1041   AY-8912         ; Write.
-    $1080 - $1080   CRTC6845        ; MC6845 adressing.
+    $1080 - $1080   CRTC6845        ; MC6845 addressing.
     $1081 - $1081   CRTC6845        ; MC6845 Read/Write.
     $10C4 - $10C7   PIA0            ; I/O Ports 0 to 3 (multiplexed).
     $10C8 - $10CB   PIA1            ; I/O Port 4.
@@ -399,7 +399,7 @@
     $2C09 - $2C09   AY-8912         ; Write.
     $280C - $280F   PIAT0           ; I/O unknown.
     $2824 - $2827   PIAT1           ; I/O unknown.
-    $2C04 - $2C04   CRTC6845        ; MC6845 adressing.
+    $2C04 - $2C04   CRTC6845        ; MC6845 addressing.
     $2C05 - $2C05   CRTC6845        ; MC6845 Read/Write.
 
     $2000 - $23FF   VideoRAM
@@ -488,8 +488,8 @@
     [2008-06-23]
 
     - Lots of improvements on the input system.
-    - Adjusted the CPU adressing to 14 bits for systems 903/904.
-    - Adjusted the CPU adressing to 15 bits for system 905.
+    - Adjusted the CPU addressing to 14 bits for systems 903/904.
+    - Adjusted the CPU addressing to 15 bits for system 905.
     - Rewrote all the ROM loads based on these changes.
     - Defined CPU, UART and sound clocks.
     - Splitted the sound interface to cover different systems.

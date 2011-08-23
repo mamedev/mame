@@ -4096,7 +4096,7 @@ static DRIVER_INIT( shufshot )	/* PIC 16C54 labeled as ITSHF-1 (ITBWL-4 for WCB 
 
 static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 {
-	/* The security PROM is NOT interchangable between the Deluxe and "normal" versions. */
+	/* The security PROM is NOT interchangeable between the Deluxe and "normal" versions. */
 	init_shuffle_bowl_common(machine, 0x1116);
 }
 

@@ -9,7 +9,7 @@ excellent info in Hamarsoft's 86BUGS list
 
 8086/8088
 ---------
-20 bit adress bus, 16 bit data bus and registers
+20 bit address bus, 16 bit data bus and registers
 many 8080 assembler sources should be compilable/reusable
 
 8086 

@@ -260,7 +260,7 @@ notes:
   crush roller roms.  It is slightly different from a Make Trax board in that the sync inverter chip is missing and
   there are no jumper wires.
 
-- jumpshotp: This board was aquired by Pokemame from a former midway employee.  The hardware is identical to normal boards
+- jumpshotp: This board was acquired by Pokemame from a former midway employee.  The hardware is identical to normal boards
   except the daughterboard is missing the epoxy potting.  Board was labeled engineering sample. Code differences
   include dips, starting position and cheerleader text.
 
@@ -400,13 +400,13 @@ static WRITE8_HANDLER( pacman_interrupt_vector_w )
 
 /*
    The piranha board has a sync bus controler card similar to Midway's pacman. It
-   stores the LSB of the interupt vector using port 00 but it alters the byte to prevent
+   stores the LSB of the interrupt vector using port 00 but it alters the byte to prevent
    it from running on normal pacman hardware and vice versa. I wrote a program to print
    out the even numbers and the vectors they convert to.  Thanks to Dave France for
    burning the roms.  The numbers that didn't print here convert to odd numbers.  It's
    slightly possible some numbers listed converted to odd numbers and coincidentally
    printed a valid even number.  Since it only uses 2 vectors($fa,$fc) I didn't complete
-   the table or attempt to find the algorythm.
+   the table or attempt to find the algorithm.
 
    David Widel
    Pacman@mailblocks.com
@@ -2470,7 +2470,7 @@ INPUT_PORTS_END
    Annoyingly enough, you can't get into service mode on bwcasino if the
    cocktail mode is set. To test player 2's inputs, select Upright Mode on
    the dipswitches, and enter test mode. Now select cocktail mode and you
-   can test everything. Wierd. */
+   can test everything. Weird. */
 
 static INPUT_PORTS_START( bwcasino )
 	PORT_START("IN0")

@@ -428,7 +428,7 @@ void okim9810_device::okim_voice::generate_audio(direct_read_data &direct,
 	if (!m_playing)
 		return;
 
-	// seperate out left and right channels
+	// separate out left and right channels
 	stream_sample_t *outL = buffers[0];
     stream_sample_t *outR = buffers[1];
 

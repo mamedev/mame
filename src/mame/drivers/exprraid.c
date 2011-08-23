@@ -98,7 +98,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
     It is tested though via code at 0xe794.
     When this Dip Switch is set to "On", pressing COIN1 or COIN2 always
     adds 1 credit regardless of the "Coinage" and "Coin Mode" settings.
-  - At the begining of each level, you have text in upper case
+  - At the beginning of each level, you have text in upper case
     which gives you some hints to pass the level or some advice.
   - In this version, due to extra code at 0xfd80, you only have 4 wagons
     for the "shoot" stages instead of 5.
@@ -153,7 +153,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
     Coinage tables :
       * 0xe7dc : COIN1 - 0xe7e4 : COIN2 (Mode 1)
       * 0xe7ec : COIN1 - 0xe7f4 : COIN2 (Mode 2)
-  - At the begining of each level, you have text in lower case
+  - At the beginning of each level, you have text in lower case
     which doesn't give you any hints to pass the level nor advice.
   - In this version, you always have 5 wagons for the "shoot" stages.
   - Continue play is always available but score is reset to 0.
@@ -188,7 +188,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
   - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
   - Original Warning screen
-  - "CREDIT" mispelled to "CRDDIT".
+  - "CREDIT" misspelled to "CRDDIT".
   - This version is heavily based on 'exprrada' (even if I think
     that there shall exist a "better" Japan undumped version)
     so all comments also fit for this set. The main difference is

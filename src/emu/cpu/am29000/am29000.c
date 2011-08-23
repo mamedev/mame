@@ -259,7 +259,7 @@ static void external_irq_check(am29000_state *am29000)
 					return;
 				}
 			}
-			/* Set interrupt pending bit if interupt was disabled */
+			/* Set interrupt pending bit if interrupt was disabled */
 			am29000->cps |= CPS_IP;
 		}
 		else

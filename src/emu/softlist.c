@@ -109,7 +109,7 @@ INLINE void unknown_attribute_value(parse_state *state,
 /*-------------------------------------------------
     software_name_split
     helper; splits a software_list:software:part
-    string into seperate software_list, software,
+    string into separate software_list, software,
     and part strings.
 
     str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3

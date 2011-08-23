@@ -36,7 +36,7 @@ int main(int argc,char *argv[])
 		printf("                <input-file>  source file data must be MSB first\n");
 		printf("                <start-addr>  starting address to disassemble from (decimal)\n");
 		printf("                <num-of-addr> number of addresses to disassemble (decimal)\n");
-		printf("                              Preceed values with 0x if HEX values preffered\n");
+		printf("                              Precede values with 0x if HEX values preffered\n");
 		exit(1);
 	}
 

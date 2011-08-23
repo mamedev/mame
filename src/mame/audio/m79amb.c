@@ -160,7 +160,7 @@ DISCRETE_SOUND_START( m79amb )
 	DISCRETE_RCDISC2(NODE_21,
 				NODE_20,					/* Q1 base */
 				0,							/* Q1 off, C3 discharges */
-				M79AMB_R9 + M79AMB_R10,		/* discharges thru amp/filter circuit */
+				M79AMB_R9 + M79AMB_R10,		/* discharges through amp/filter circuit */
 				12,							/* Q1 on, C3 charges */
 				M79AMB_R6,					/* Q2 on  */
 				M79AMB_C3)					/* controls amplitude */
@@ -181,7 +181,7 @@ DISCRETE_SOUND_START( m79amb )
 	DISCRETE_RCDISC2(NODE_31,
 				NODE_30,					/* Q4 base */
 				0,							/* Q4 off, C9 discharges */
-				M79AMB_R19 + M79AMB_R20,	/* discharges thru amp/filter circuit */
+				M79AMB_R19 + M79AMB_R20,	/* discharges through amp/filter circuit */
 				12,							/* Q4 on, C9 charges */
 				M79AMB_R16,					/* Q5 on  */
 				M79AMB_C9)					/* controls amplitude */
@@ -202,7 +202,7 @@ DISCRETE_SOUND_START( m79amb )
 	DISCRETE_RCDISC2(NODE_41,
 				NODE_40,					/* Q7 base */
 				0,							/* Q7 off, C15 discharges */
-				M79AMB_R29 + M79AMB_R30,	/* discharges thru amp/filter circuit */
+				M79AMB_R29 + M79AMB_R30,	/* discharges through amp/filter circuit */
 				12,							/* Q7 on, C15 charges */
 				M79AMB_R26,					/* Q8 on  */
 				M79AMB_C15)					/* controls amplitude */

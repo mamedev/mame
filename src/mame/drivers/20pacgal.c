@@ -29,8 +29,8 @@
         * There is a minor board difference that the program code can detect through the Z80
           ports to prevent ROM swaps to upgrade Ms. Pac-Man/Galaga - 20th Anniversary Class
           of 1981 Reunion boards.
-        * The above listed joystick manuver for the built-in speed up still works.
-        * The above listed joystick manuver to enable Pac-Man will still play a tone, but
+        * The above listed joystick maneuver for the built-in speed up still works.
+        * The above listed joystick maneuver to enable Pac-Man will still play a tone, but
           the effect (if any) is unknown.
 
         * CPU is a Z8S18020VSC (20MHz part), OSC is 73.728MHz

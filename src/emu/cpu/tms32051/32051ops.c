@@ -38,7 +38,7 @@ INLINE INT32 SUB(tms32051_state *cpustate, INT32 a, INT32 b, int shift16)
 	}
 	else				// normal mode, result is not modified
 	{
-		// set OV flag if overflow occured, this is a sticky flag
+		// set OV flag if overflow occurred, this is a sticky flag
 		if (((a) ^ (b)) & ((a) ^ ((INT32)res)) & 0x80000000)
 		{
 			cpustate->st0.ov = 1;
@@ -86,7 +86,7 @@ INLINE INT32 ADD(tms32051_state *cpustate, INT32 a, INT32 b, int shift16)
 	}
 	else				// normal mode, result is not modified
 	{
-		// set OV flag if overflow occured, this is a sticky flag
+		// set OV flag if overflow occurred, this is a sticky flag
 		if (((res) ^ (b)) & ((res) ^ (a)) & 0x80000000)
 		{
 			cpustate->st0.ov = 1;

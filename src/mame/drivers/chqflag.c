@@ -75,7 +75,7 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	coin_counter_w(space->machine(), 1, data & 0x01);
 	coin_counter_w(space->machine(), 0, data & 0x02);
 
-	/* bit 4 = enable rom reading thru K051316 #1 & #2 */
+	/* bit 4 = enable rom reading through K051316 #1 & #2 */
 	state->m_k051316_readroms = (data & 0x10);
 
 	if (state->m_k051316_readroms)

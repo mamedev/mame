@@ -1877,7 +1877,7 @@ static void OPLLWriteReg(YM2413 *chip, int r, int v)
 		SLOT->TLL = SLOT->TL + (CH->ksl_base>>SLOT->ksl);
 
 
-		/*check wether we are in rhythm mode and handle instrument/volume register accordingly*/
+		/*check whether we are in rhythm mode and handle instrument/volume register accordingly*/
 		if ((chan>=6) && (chip->rhythm&0x20))
 		{
 			/* we're in rhythm mode*/

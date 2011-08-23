@@ -2635,7 +2635,7 @@ Notes:
       Custom Chips - 0005289 (DIP42, possibly MCU?), 0005297 (SDIP64)
       NOTE! Removing the 0005289 results in the music at start-up having missing notes,
       as if only one of the AY3-8910's is being used. The game otherwise boots fine and
-      appears to play perfectly without any noticable errors or missing graphics or sounds.
+      appears to play perfectly without any noticeable errors or missing graphics or sounds.
 
 
 Bottom PCB

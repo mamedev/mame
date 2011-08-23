@@ -620,7 +620,7 @@ static void addh(tms32025_state *cpustate)
 	if ( ((INT16)(cpustate->oldacc.w.h) < 0) && ((INT16)(cpustate->ACC.w.h) >= 0) ) {
 		SET1(cpustate, C_FLAG);
 	}
-	/* Carry flag is not cleared, if no carry occured */
+	/* Carry flag is not cleared, if no carry occurred */
 }
 static void addk(tms32025_state *cpustate)
 {
@@ -1537,7 +1537,7 @@ static void subh(tms32025_state *cpustate)
 	if ( ((INT16)(cpustate->oldacc.w.h) >= 0) && ((INT16)(cpustate->ACC.w.h) < 0) ) {
 		CLR1(cpustate, C_FLAG);
 	}
-	/* Carry flag is not affected, if no borrow occured */
+	/* Carry flag is not affected, if no borrow occurred */
 }
 static void subk(tms32025_state *cpustate)
 {

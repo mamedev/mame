@@ -45,8 +45,8 @@
 /* explanations for the sharp mnemonics
    d data: external memory
    m memory: internal memory (address in p register)
-   p register (internal memory adress)
-   q register (internal memory adress), internally used in several opcodes!?
+   p register (internal memory address)
+   q register (internal memory address), internally used in several opcodes!?
    r stack pointer (internal memory)
    c carry flag
    z zero flag

@@ -48,7 +48,7 @@ Video Registers: at 0x305ffe0 for ps3 or 0x405ffe0 for ps5/ps5v2:
 
 /*
 TODO:
-* Correct sprite-sprite priority? Currently this is strictly in the order of the sprites in the sprite list. However, there's an additional priority parameter which looks to split the sprites into 4 discrete sets with decreasing priority. In addition to the sprite-tilemap mixing the only way I can think to emulate this is how the hardware would work. Iterate over the sprite list 4 times rendering the sprites to a bitmap, and then mix each pixel against the tilemaps and other elements with comparable priority. This will be pretty slow though. Justification: The unknown priority bits are used to seperate score/enemy bullets from ships/enemies from incidental effects. daraku appears to have a black, screen-filling srite which it uses for a flash immediately efore the screen fade/white flash when doing special moves. Currently obscured behind the other sprites.
+* Correct sprite-sprite priority? Currently this is strictly in the order of the sprites in the sprite list. However, there's an additional priority parameter which looks to split the sprites into 4 discrete sets with decreasing priority. In addition to the sprite-tilemap mixing the only way I can think to emulate this is how the hardware would work. Iterate over the sprite list 4 times rendering the sprites to a bitmap, and then mix each pixel against the tilemaps and other elements with comparable priority. This will be pretty slow though. Justification: The unknown priority bits are used to separate score/enemy bullets from ships/enemies from incidental effects. daraku appears to have a black, screen-filling srite which it uses for a flash immediately efore the screen fade/white flash when doing special moves. Currently obscured behind the other sprites.
 * Perform tests on real hardware to document limits and remaining registers
 ** Fix background line zoom to be pixel-correct. There must be an internal LUT.
 ** Confirm existence of 4th tilemap layer on real hw by configuring it. No games ever get as far as enabling it.
@@ -113,7 +113,7 @@ do																									\
 }																									\
 while (0)																							\
 
-// take RGB pixel with seperate alpha and blend in to RGB32 bitmap
+// take RGB pixel with separate alpha and blend in to RGB32 bitmap
 #define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, PRIORITY, SOURCE)								\
 do																									\
 {																									\
@@ -565,7 +565,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 		clip = &myclip;
 	}
 
-	/* Temporary fallback for non-zoomed, needs z-buffer. Note that this is probably a lot slower than drawgfx.c, especially if there was seperate code for flipped cases */
+	/* Temporary fallback for non-zoomed, needs z-buffer. Note that this is probably a lot slower than drawgfx.c, especially if there was separate code for flipped cases */
 	if (zoomx == 0x400 && zoomy == 0x400)
 	{
 		int xstart, ystart, xend, yend, xinc, yinc;

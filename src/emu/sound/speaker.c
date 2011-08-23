@@ -21,7 +21,7 @@
  * For faithful reproduction of the sound, this must be carefully handled
  * with anti-alias filtering when converting a high-rate low-resolution signal
  * to a moderate-rate high-resolution signal suitable for the DAC in the emulator's sound card.
- * (Originally, removal of any redundant high frequency content occured on the analog side
+ * (Originally, removal of any redundant high frequency content occurred on the analog side
  *  with no aliasing effects.)
  *
  * The most straightforward, naive way to handle this is to use two streams;
@@ -32,7 +32,7 @@
  * The stream system has features to handle rate conversion from stream 1 to 2.
  *
  * I tried it out of curiosity; it works fine conceptually, but
- *  - it puts an unneccessary burden on system resources
+ *  - it puts an unnecessary burden on system resources
  *  - sound quality is still not satisfactory, though better than without anti-alias
  *  - "stream 1" properties are machine specific and so should be configured
  *    individually in each machine driver using this approach.

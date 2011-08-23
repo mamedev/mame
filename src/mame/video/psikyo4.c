@@ -14,9 +14,9 @@ Vid Regs:
 0x3003fe8 -- c0c0???? flipscreen for screen 1 and 2 resp.
              ????8080 Screen size select
 0x3003fec -- a0000xxx always? is in two working games. 0x00000fff is bank select for gfx test
-0x3003ff0 -- 000000ff brightness for screen 1, ffffff00 are probably seperate rgb brightness (not used)
+0x3003ff0 -- 000000ff brightness for screen 1, ffffff00 are probably separate rgb brightness (not used)
 0x3003ff4 -- ffffff00 screen 1 clear colour
-0x3003ff8 -- 000000ff brightness for screen 2, ffffff00 are probably seperate rgb brightness (not used)
+0x3003ff8 -- 000000ff brightness for screen 2, ffffff00 are probably separate rgb brightness (not used)
 0x3003ffc -- ffffff00 screen 2 clear colour
 
 HotDebut: 86010000 00009998 80000000 Small Screen

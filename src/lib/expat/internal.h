@@ -16,7 +16,7 @@
    inline      - Used for selected internal functions for which inlining
                  may improve performance on some platforms.
 
-   Note: Use of these macros is based on judgement, not hard rules,
+   Note: Use of these macros is based on judgment, not hard rules,
          and therefore subject to change.
 */
 

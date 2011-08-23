@@ -36,7 +36,7 @@ bool win_init_sockets()
 	/* check for error */
 	if ( error != 0 )
 	{
-		/* error occured */
+		/* error occurred */
 		return FALSE;
 	}
 

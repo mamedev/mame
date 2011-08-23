@@ -655,7 +655,7 @@ static INPUT_PORTS_START( karatblz )
 	/*  With 4 player (Team) selected and Same Coin Slot:
         Coin A & B credit together for use by _only_ player 1 or player 2
         Coin C & D credit together for use by _only_ player 3 or player 4
-        Otherwise with Individual selected, everyone is seperate  */
+        Otherwise with Individual selected, everyone is separate  */
 	PORT_DIPNAME( 0x0080, 0x0080, "Coin Slot" )					PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, "Same" )
 	PORT_DIPSETTING(      0x0000, "Individual" )

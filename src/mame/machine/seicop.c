@@ -1636,7 +1636,7 @@ x/y check [2]
 //then reads at $580
 
 sine cosine has a weird math problem, it needs that the amp is multiplied by two when the direction is TOTALLY left or TOTALLY up.
-No known explaination to this so far ...
+No known explanation to this so far ...
 
 003306: move.w  #$8100, ($100,A0)
 00330C: move.w  #$8900, ($100,A0)
@@ -1739,7 +1739,7 @@ static struct
 	UINT16 hitbox;
 }cop_collision_info[2];
 
-/* Taken from Seibu Cup Soccer bootleg (TODO: understand the algorythm and remove this) */
+/* Taken from Seibu Cup Soccer bootleg (TODO: understand the algorithm and remove this) */
 static const UINT8 fade_table[0x400] = {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -2130,7 +2130,7 @@ static WRITE16_HANDLER( generic_cop_w )
               dword ^= 0
               word ^= 2
               byte ^= 3
-            - some macro commands here have a commented algorythm, it's how Seibu Cup Bootleg version handles maths inside the 14/15 roms.
+            - some macro commands here have a commented algorithm, it's how Seibu Cup Bootleg version handles maths inside the 14/15 roms.
               The ROMs map tables in the following arrangement:
               0x00000 - 0x1ffff Sine math results
               0x20000 - 0x3ffff Cosine math results
@@ -2512,7 +2512,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				UINT32 src,dst,size,i;
 
 				/*
-                Apparently all of those are just different DMA channels, brightness effects are done thru a RAM table and the pal_brightness_val / mode
+                Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the pal_brightness_val / mode
                 0x80 is used by Legionnaire
                 0x81 is used by SD Gundam and Godzilla
                 0x82 is used by Zero Team and X Se Dae
@@ -2522,7 +2522,7 @@ static WRITE16_HANDLER( generic_cop_w )
                 TODO:
                 - Denjin Makai mode 4 is totally guessworked.
                 - SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
-                  presumably bad RAM table or bad algorythm
+                  presumably bad RAM table or bad algorithm
                 */
 
 				//if(dma_trigger != 0x87)
@@ -2683,7 +2683,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				UINT32 addri,addrj;
 				UINT16 vali,valj;
 
-				/* TODO: use a better algorythm than bubble sort! */
+				/* TODO: use a better algorithm than bubble sort! */
 				for(i=2;i<sort_size;i+=2)
 				{
 					for(j=i-2;j<sort_size;j+=2)

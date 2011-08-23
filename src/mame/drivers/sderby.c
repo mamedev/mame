@@ -113,7 +113,7 @@ static READ16_HANDLER( roulette_input_r )
     Offset: 0x70800e - 0x70800f.
 
     Writes to the MCU are always the same values.
-    At begining, the code writes 3 values: 0x53, 0x5a and 0x0d.
+    At beginning, the code writes 3 values: 0x53, 0x5a and 0x0d.
     Then, whith each placed bet the code normally writes 0x4e.
     After that, there are 2 reads expecting the MCU response.
 

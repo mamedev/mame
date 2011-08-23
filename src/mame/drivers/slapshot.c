@@ -101,7 +101,7 @@ MB8421-90LP  D74-02  84256A-70L             26.6860MHz  TCO640FIO
 
 
 Sub Board K91X0488A
- Basicly a few connectors, Caps, resistors & ADC0809CNN
+ basically a few connectors, Caps, resistors & ADC0809CNN
 
 Chips:
  Main: MC68000P12F

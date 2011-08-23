@@ -18,7 +18,7 @@
 
  Sound Chips : YM2151, M6295
 
- 4 Layers from now on if mentioned will be refered to as
+ 4 Layers from now on if mentioned will be referred to as
 
  BG0 - Background Layer 0
  BG1 - Background Layer 1
@@ -177,7 +177,7 @@ static WRITE16_HANDLER ( wwfwfest_soundwrite )
  There are 4 players, 2 sets of dipswitches and 2 misc
 *******************************************************************************/
 
-/* DIPs are spread accross the other input ports */
+/* DIPs are spread across the other input ports */
 static CUSTOM_INPUT( dsw_3f_r )
 {
 	const char *tag = (const char *)param;

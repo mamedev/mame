@@ -65,7 +65,7 @@ Known issues:
 
 History:
     KT - 14-Jun-2000 - Improved Interrupt setting/clearing
-    KT - moved into seperate file so it can be used in Super I/O emulation and
+    KT - moved into separate file so it can be used in Super I/O emulation and
         any other system which uses a PC type COM port
     KT - 24-Jun-2000 - removed pc specific input port tests. More compatible
         with PCW16 and PCW16 doesn't requre the PC input port definitions

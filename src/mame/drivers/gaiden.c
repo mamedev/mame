@@ -568,8 +568,8 @@ static INPUT_PORTS_START( tknight )
 	PORT_INCLUDE(  wildfang )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SWB:3" ) /* No seperate difficulty option like parent set */
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SWB:4" ) /* No seperate difficulty option like parent set */
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SWB:3" ) /* No separate difficulty option like parent set */
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SWB:4" ) /* No separate difficulty option like parent set */
 	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SWB:8" ) /* No title change option */
 INPUT_PORTS_END
 

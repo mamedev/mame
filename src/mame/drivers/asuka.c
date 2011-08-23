@@ -425,7 +425,7 @@ Right now, the z180 is too fast, so it never checks it properly ... maybe I'm mi
 
 Internal I/O Asynchronous SCI regs are then checked ... we can't emulate this at the current time, needs two MAME instances.
 
-m68k M communicates with z180 M thru shared ram, then the z180 M communicates with z180 S thru these ASCI regs ... finally, the z180 S
+m68k M communicates with z180 M through shared ram, then the z180 M communicates with z180 S through these ASCI regs ... finally, the z180 S
 communicates with m68k S with its own shared ram. In short:
 
 m68k M -> z180 M <-> z180 S <- m68k S

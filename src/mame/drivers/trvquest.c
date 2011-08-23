@@ -18,9 +18,9 @@ Two Crystals:
 
 Two 8 position DIPS
 
-rom3 thru rom7 - Main pcb PRG.
+rom3 through rom7 - Main pcb PRG.
 
-roma thru romi - Sub pcb Questions.
+roma through romi - Sub pcb Questions.
 
 The main pcb had empty sockets for
 rom0, rom1 and rom2.

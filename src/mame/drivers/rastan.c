@@ -95,7 +95,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Game name : "RASTAN"
   - No notice screen
   - In "demo mode", you get a scrolling screen with what the various items do
-  - No begining screen when you start a new game
+  - No beginning screen when you start a new game
   - Same "YOU ARE A BRAVE FIGHTER ..." message between levels
   - No message after beating level 6 boss
   - No copyright message on scrolling credits screen
@@ -135,7 +135,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Game name : "RASTAN SAGA"
   - Notice screen
   - In "demo mode", you get no scrolling screen with what the various items do
-  - Begining screen when you start a new game
+  - beginning screen when you start a new game
   - Different messages between levels
   - Message after beating level 6 boss
   - Copyright message on scrolling credits screen

@@ -130,7 +130,7 @@ static WRITE8_HANDLER( laserbat_cntmov_w )
     A10 SHPC
 
     The output of the 2716.14L is sent to the 82S100.10M
-    thru a parallel-to-serial shift register that is clocked
+    through a parallel-to-serial shift register that is clocked
     on (1H && 2H). The serial data sent is as follows:
 
     NAV0    D6, D4, D2, D0, 0, 0, 0, 0

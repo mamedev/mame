@@ -10,7 +10,7 @@
 
 // file will be included in all cpu variants
 // put non i86 instructions in own files (i286, i386, nec)
-// function renaming will be added when neccessary
+// function renaming will be added when necessary
 // timing value should move to separate array
 
 static void PREFIX86(_add_br8)(i8086_state *cpustate);

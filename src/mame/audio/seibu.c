@@ -5,7 +5,7 @@
     The Seibu sound system comprises of a Z80A, a YM3812, a YM3931*, and
     an Oki MSM6295.  As well as sound the Z80 can controls coins and pass
     data to the main cpu.  There are a few little quirks that make it
-    worthwhile emulating in a seperate file:
+    worthwhile emulating in a separate file:
 
     * The YM3812 generates interrupt RST10, by asserting the interrupt line,
     and placing 0xd7 on the data bus.

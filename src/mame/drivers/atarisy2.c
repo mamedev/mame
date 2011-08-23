@@ -459,7 +459,7 @@ static READ8_HANDLER( leta_r )
 
 				/* make offset 0 return 0xff when the controller blocks one of two gaps */
 				/* this is not accurate, as a counter should count up/down 2 counts as it passes through each gap */
-				/* this is close enough to pass the service mode controller test the first couple of trys. */
+				/* this is close enough to pass the service mode controller test the first couple of tries. */
 				if (offset == 0)
 				{
 					/* original controller had two gaps 10 degrees apart, each 2.5 degrees wide */

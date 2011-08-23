@@ -138,9 +138,9 @@ static READ8_DEVICE_HANDLER( upscope_cia_0_portb_r )
  *  PA5 = com line /carrier detect
  *  PA4 = com line /CTS
  *  PA3 = com line /DSR
- *  PA2 = SEL (Centronics parellel control)
- *  PA1 = POUT (Centronics parellel control)
- *  PA0 = BUSY (Centronics parellel control)
+ *  PA2 = SEL (Centronics parallel control)
+ *  PA1 = POUT (Centronics parallel control)
+ *  PA0 = BUSY (Centronics parallel control)
  *
  *************************************/
 

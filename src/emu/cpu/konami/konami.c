@@ -117,7 +117,7 @@ INLINE konami_state *get_safe_token(device_t *device)
 
 #define KONAMI_CWAI		8	/* set when CWAI is waiting for an interrupt */
 #define KONAMI_SYNC		16	/* set when SYNC is waiting for an interrupt */
-#define KONAMI_LDS		32	/* set when LDS occured at least once */
+#define KONAMI_LDS		32	/* set when LDS occurred at least once */
 
 #define RM(cs,Addr)				(cs)->program->read_byte(Addr)
 #define WM(cs,Addr,Value)		(cs)->program->write_byte(Addr,Value)

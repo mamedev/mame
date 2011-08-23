@@ -215,7 +215,7 @@ DISCRETE_STEP(dsd_555_astbl)
 				}
 				else
 				{
-					/* no discharge resistor so we imediately discharge */
+					/* no discharge resistor so we immediately discharge */
 					v_cap_next = trigger;
 				}
 
@@ -1012,7 +1012,7 @@ DISCRETE_RESET(dsd_555_cc)
      * | i |         --- C              cap_voltage = cap_voltage + dv
      * '---'          |
      *   |            |               DISCHARGING:
-     *  gnd          gnd                thru rDischarge
+     *  gnd          gnd                through rDischarge
      *
      * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      * !!!!! IMPORTANT NOTE ABOUT TYPES 3 - 7 !!!!!
@@ -1053,7 +1053,7 @@ DISCRETE_RESET(dsd_555_cc)
      * .---.         ---     Z                  Rc = rGnd
      * | i |         --- C   Z rGnd
      * '---'          |      |                DISCHARGING:
-     *   |            |      |                  thru rDischarge || rGnd  ( || means in parallel)
+     *   |            |      |                  through rDischarge || rGnd  ( || means in parallel)
      *  gnd          gnd    gnd
      *
      * [4]
@@ -1072,7 +1072,7 @@ DISCRETE_RESET(dsd_555_cc)
      * | vBias |   | i |         --- C                        v = vBias + vi
      * '-------'   '---'          |
      *     |         |            |                         DISCHARGING:
-     *    gnd       gnd          gnd                          thru rDischarge
+     *    gnd       gnd          gnd                          through rDischarge
      *
      * [6]
      *     .---ZZZ---+------------+------+------> cap_voltage      CHARGING:
@@ -1090,7 +1090,7 @@ DISCRETE_RESET(dsd_555_cc)
      * | vBias |   | i |         --- C   Z rGnd               v = vBias * (rGnd / (rBias + rDischarge + rGnd)) + vi
      * '-------'   '---'          |      |
      *     |         |            |      |                  DISCHARGING:
-     *    gnd       gnd          gnd    gnd                   thru rDischarge || rGnd
+     *    gnd       gnd          gnd    gnd                   through rDischarge || rGnd
      */
 
     /*
@@ -1370,9 +1370,9 @@ DISCRETE_RESET(dsd_555_vco1)
  * depending on B+, so they will be simulated with a table.
  *
  * The data sheets show Vmod should be no less then 3/4*B+.  In reality
- * you can go to close to 1/2*B+ before you loose linearity.  Below 1/2,
+ * you can go to close to 1/2*B+ before you lose linearity.  Below 1/2,
  * oscillation stops.  When Vmod is 0V to 0.1V less then B+, it also
- * looses linearity, and stops oscillating when >= B+.  This is because
+ * loses linearity, and stops oscillating when >= B+.  This is because
  * there is no voltage difference to create a current source.
  *
  * The current source is dependant on the voltage difference between B+

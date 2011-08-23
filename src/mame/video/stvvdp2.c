@@ -5590,7 +5590,7 @@ READ16_HANDLER ( saturn_vdp2_regs_r )
 	{
 		case 0x002/2:
 		{
-			/* latch h/v signals thru HV latch*/
+			/* latch h/v signals through HV latch*/
 			if(!STV_VDP2_EXLTEN)
 			{
 				/* TODO: handle various h/v settings. */

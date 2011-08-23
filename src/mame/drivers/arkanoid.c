@@ -58,7 +58,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * 0x2056 : HL += A; DE = (HL);
       * 0x21f1 : Display string :
                    Inputs : DE = string address in ROM
-                            HL = adress where the string will be displayed
+                            HL = address where the string will be displayed
                                  (most of the times in video RAM)
                             A = colour
                    String begins with the number of chars to display
@@ -66,7 +66,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * 0x210d : Display 1 char (called by previous routine)
       * 0x264a : Display score :
                    Inputs : DE = score address
-                            HL = adress where the score will be displayed
+                            HL = address where the score will be displayed
                                  (most of the times in video RAM)
       * 0x266f : Display 1 digit (called by previous routine)
       * 0x67ae : Play sound (input : register A) - to be confirmed !
@@ -155,7 +155,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Displays the "Arkanoid" title.
   - "HARDWARE TEST" message is written, tests are performed, countdown 11 to 0.
   - "NOTICE" screen replaces by "WAIT" without any more text.
-    However, the text is still in the ROM at 0x7b81 with changes at the begining :
+    However, the text is still in the ROM at 0x7b81 with changes at the beginning :
       * "NOTICE" -> "WAIT  "
       * 0xbe "THIS GAME IS" -> 0x01 " " 0x7b "IS" 0xde "GAME" 0x6d "IS"
     IMO these changes are made to bypass the checksums
@@ -392,7 +392,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Displays the "Arkanoid" title.
   - "HARDWARE TEST" message is written, tests are performed, but no countdown.
   - "NOTICE" screen replaces by "WAIT" without any more text.
-    However, the text is still in the ROM at 0x7b81 with changes at the begining :
+    However, the text is still in the ROM at 0x7b81 with changes at the beginning :
       * "NOTICE" -> "WAIT  "
       * 0xbe "THIS" -> 0x01 " HIS"
     IMO these changes are made to bypass the checksums
@@ -420,7 +420,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 TO DO (2006.09.12) :
 
-  - Check the following Taito sets (adresses, routines and Dip Switches) :
+  - Check the following Taito sets (addresses, routines and Dip Switches) :
       * 'arkanoid' = 'arkanoiduo'
       * 'arkanoidj'
       * 'arkanoidu'
@@ -484,7 +484,7 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
     so if you insert too many coins, it can be reset to 0 !
   - Routines :
       * 0x56e3 : Play sound (input : register A) - to be confirmed !
-  - Adresses :
+  - addresses :
       * 0xc52b : credits
       * 0xc541 : ~(IN5) - test for coins "buttons" (code at 0x0232)
       * 0xc516 : ~(IN5)

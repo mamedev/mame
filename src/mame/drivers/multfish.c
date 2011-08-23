@@ -92,7 +92,7 @@ Edge Connector is 36 count dual (IE: both sides) JAMMA-like connection (standard
 
   NOTE:
   Revision information comes from Igrosoft's website, not all of them can be
-  tested becuase some program rom revisions don't seem to be dumped.
+  tested because some program rom revisions don't seem to be dumped.
 
   For sets where the program rom hasn't been verified, the MD5 hash is given
   but not the CRC32 hash.
@@ -106,10 +106,10 @@ below are simply made to the banking address to run on other boards.
   Island 2           E1
   Gnome              E5
   Sweet Life 2       E8
-  Fruit Coctail 2    EA
+  Fruit Cocktail 2   EA
   Multi Fish         F8
   Crazy Monkey       F9
-  Fruit Coctail      F9
+  Fruit Cocktail     F9
   Garage             F9
   Resident           F9
   Lucky Hunter       F9

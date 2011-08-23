@@ -53,7 +53,7 @@ correctly.
 
 0x10 is the video retrace. This controls the speed of the game and generally
      drives the code. This must be triggerd for each video retrace.
-0x08 is the sound card service interupt. The game uses this to throw sounds
+0x08 is the sound card service interrupt. The game uses this to throw sounds
      at the sound CPU.
 
 

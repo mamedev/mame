@@ -72,7 +72,7 @@ DE-0359-2 PCB Layout - Same PCB as used for Dragon Gun, see comment below:
 
 2M-4 through 2M-7 are empty sockets for additional program ROMs (used by dragon Gun)
 Odd numbered 8M are empty sockets
-AUX edge connector is a 48 pin type simular to those used on Namco System 11, 12, ect
+AUX edge connector is a 48 pin type similar to those used on Namco System 11, 12, ect
 
 
 DE-0360-4 ROM board Layout:

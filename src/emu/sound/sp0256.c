@@ -26,7 +26,7 @@
     This emulation flips the bits on every byte of the memory map during
     the sp0256_start() call.
 
-    If the memory map contents is modified during execution (becuase of ROM
+    If the memory map contents is modified during execution (accross of ROM
     bank switching) the sp0256_bitrevbuff() call must be called after the
     section of ROM is modified.
 */

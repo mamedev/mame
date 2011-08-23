@@ -348,7 +348,7 @@ static INPUT_PORTS_START( cprogolf )
 	PORT_DIPSETTING(    0x02, "6 Under" )
 	PORT_DIPSETTING(    0x04, "3 Under" )
 	PORT_DIPSETTING(    0x06, "1 Under" )
-	PORT_DIPNAME( 0x08, 0x08, "Number of Strokes" )		PORT_DIPLOCATION("SW2:4") /* You must shoot equal to or under to continue, else you loose a life */
+	PORT_DIPNAME( 0x08, 0x08, "Number of Strokes" )		PORT_DIPLOCATION("SW2:4") /* You must shoot equal to or under to continue, else you lose a life */
 	PORT_DIPSETTING(    0x00, "Par +2" )
 	PORT_DIPSETTING(    0x08, "Par +3" )
 	PORT_DIPNAME( 0x10, 0x10, "Show Stroke Power/Ball Direction" )		PORT_DIPLOCATION("SW2:5")

@@ -212,7 +212,7 @@
     907D    BITA $1800  ( crtc )
     9080    BNE  $907D  ; is zero
     9082    BITA $1800
-    9085    BEQ  $9082  ; branches to 9082 indefinately, value is always zero.
+    9085    BEQ  $9082  ; branches to 9082 indefinitely, value is always zero.
     9087    LDA  #$40
 
     If the PC ( program counter ) is set to 9087 then the game runs.

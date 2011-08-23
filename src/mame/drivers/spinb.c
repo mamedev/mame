@@ -33,7 +33,7 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
-/ Bushido (1993) - ( Last game by Inder - before becomming Spinball - but same hardware)
+/ Bushido (1993) - ( Last game by Inder - before becoming Spinball - but same hardware)
 /-------------------------------------------------------------------*/
 ROM_START(bushido)
 	ROM_REGION(0x10000, "maincpu", 0)

@@ -1746,7 +1746,7 @@ static int calc3_decompress_table(running_machine& machine, int tabnum, UINT8* d
 				// this, or it can remember addresses and restore those
 
 				// hack, set it to a known address instead of trying to restore to anywhere specific..
-				// might break at some point tho, eg if it doesn't write command 06 often enough because it trys to use another one like 07...
+				// might break at some point tho, eg if it doesn't write command 06 often enough because it tries to use another one like 07...
 				// need to understand the meaning of this (test hw?)
 
 				// !dstram is used because we don't want to process these during our initial table scan, only when the game asks!

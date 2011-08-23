@@ -87,7 +87,7 @@ struct chrn_id
 
 /* set if drive is ready */
 #define FLOPPY_DRIVE_READY						0x0010
-/* set if index has just occured */
+/* set if index has just occurred */
 #define FLOPPY_DRIVE_INDEX						0x0020
 
 /* a callback which will be executed if the ready state of the drive changes e.g. not ready->ready, ready->not ready */

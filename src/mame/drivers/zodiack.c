@@ -535,7 +535,7 @@ static const gfx_layout charlayout_2 =
 	8,8,    /* 8*8 chars */
 	256,    /* 256 characters */
 	2,      /* 2 bits per pixel */
-	{ 0, 512*8*8 },  /* The bitplanes are seperate */
+	{ 0, 512*8*8 },  /* The bitplanes are separate */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8     /* every char takes 8 consecutive bytes */

@@ -24,7 +24,7 @@ OBVIOUS SPEED PROBLEMS...
 
 Port 0x2800 on the Sub CPU.
 - All those I/O looking ports on the main CPU (0x3exx and 0x3fxx)
-- One's scroll control. Prolly other video control as well.
+- One's scroll control. Probably other video control as well.
 - Location 0x1a2ec in cgate51.bin (The main CPU's ROM) is 88. This is
   copied to videoram, and causes that minor visual discrepancy on
   the title screen. But the CPU tests that part of the ROM and passes

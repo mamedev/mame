@@ -3968,7 +3968,7 @@ static void menu_render_triangle(bitmap_t &dest, const bitmap_t &source, const r
 		{
 			int dalpha;
 
-			/* first colum we only consume one pixel */
+			/* first column we only consume one pixel */
 			if (x == 0)
 			{
 				dalpha = MIN(0xff, linewidth);

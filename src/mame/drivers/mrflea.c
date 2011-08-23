@@ -45,7 +45,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * ......10 : 20000 points
       * ......01 : 30000 points
       * ......00 : 40000 points
-  - DSW1 bit 2 determines the "Bonus life" occurence (1 OFF - 0 ON) :
+  - DSW1 bit 2 determines the "Bonus life" occurrence (1 OFF - 0 ON) :
       * .....1.. : many extra lives can be awarded every "value" points
       * .....0.. : only one extra life can be awarded at "value" points
   - When DSW1 bit 3 is OFF, you can't get any extra lives (code at 0x3368).

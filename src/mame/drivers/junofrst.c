@@ -16,7 +16,7 @@ $8100-$8FFF = Work RAM
 
 Write memory
 
-$8030   - interrupt control register D0 = interupts on or off
+$8030   - interrupt control register D0 = interrupts on or off
 $8031   - unknown
 $8032   - unknown
 $8033   - unknown

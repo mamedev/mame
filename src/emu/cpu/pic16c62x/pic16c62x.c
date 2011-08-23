@@ -33,7 +33,7 @@
  *   - Opcode disassembly                                                   *
  *                                                                          *
  *  **** Notes (from PIC16C5X): ****                                        *
- *  PIC WatchDog Timer has a seperate internal clock. For the moment, we're *
+ *  PIC WatchDog Timer has a separate internal clock. For the moment, we're *
  *     basing the count on a 4MHz input clock, since 4MHz is the typical    *
  *     input frequency (but by no means always).                            *
  *  A single scaler is available for the Counter/Timer or WatchDog Timer.   *

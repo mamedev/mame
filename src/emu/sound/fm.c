@@ -365,7 +365,7 @@ static const UINT32 lfo_samples_per_step[8] = {108, 77, 71, 67, 62, 44, 8, 5};
    5.9 dB = 0, 1, 2, 3, 4, 5, 6, 7, 8....63, 63, 62, 61, 60, 59,.....2,1,0
    1.4 dB = 0, 0, 0, 0, 1, 1, 1, 1, 2,...15, 15, 15, 15, 14, 14,.....0,0,0
 
-  (1.4 dB is loosing precision as you can see)
+  (1.4 dB is losing precision as you can see)
 
   It's implemented as generator from 0..126 with step 2 then a shift
   right N times, where N is:
@@ -1080,7 +1080,7 @@ INLINE void advance_lfo(FM_OPN *OPN)
 
 		/* update AM when LFO output changes */
 
-		/* actually I can't optimize is this way without rewritting chan_calc()
+		/* actually I can't optimize is this way without rewriting chan_calc()
         to use chip->lfo_am instead of global lfo_am */
 		{
 
@@ -3462,7 +3462,7 @@ static void YM2608_save_state(YM2608 *F2608, device_t *device)
 	device->save_item(NAME(F2608->OPN.SL3.kcode));
 	/* address register1 */
 	device->save_item(NAME(F2608->addr_A1));
-	/* rythm(ADPCMA) */
+	/* rhythm(ADPCMA) */
 	FMsave_state_adpcma(device,F2608->adpcm);
 	/* Delta-T ADPCM unit */
 	YM_DELTAT_savestate(device,&F2608->deltaT);
@@ -4144,7 +4144,7 @@ static void YM2610_save_state(YM2610 *F2610, device_t *device)
 	device->save_item(NAME(F2610->addr_A1));
 
 	device->save_item(NAME(F2610->adpcm_arrivedEndAddress));
-	/* rythm(ADPCMA) */
+	/* rhythm(ADPCMA) */
 	FMsave_state_adpcma(device,F2610->adpcm);
 	/* Delta-T ADPCM unit */
 	YM_DELTAT_savestate(device,&F2610->deltaT);

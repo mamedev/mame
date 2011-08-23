@@ -6,7 +6,7 @@
     AMD/Fujitsu 29F016 (byte-wide)
     Sharp LH28F400 (word-wide)
 
-    Flash ROMs use a standardized command set accross manufacturers,
+    Flash ROMs use a standardized command set across manufacturers,
     so this emulation should work even for non-Intel and non-Sharp chips
     as long as the game doesn't query the maker ID.
 */

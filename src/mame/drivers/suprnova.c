@@ -28,7 +28,7 @@ ToDo:
 
 galpanis: Are the priorities correct on the KANEKO logo at the start, the invisible faded logo obscures the rotating white lines
 
-video:   Sprite Zooming - the current algorithm is leaving gaps, most noticable in Gals Panic 4, and Jackie Chan which is sharing
+video:   Sprite Zooming - the current algorithm is leaving gaps, most noticeable in Gals Panic 4, and Jackie Chan which is sharing
          the video code.
 
 video:   Sprite positions still kludged slightly (see skns_sprite_kludge)

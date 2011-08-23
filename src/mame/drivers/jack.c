@@ -752,7 +752,7 @@ static const gfx_layout charlayout =
 	8,8,	/* 8*8 characters */
 	RGN_FRAC(1,2),	/* 1024 characters */
 	2,	/* 2 bits per pixel */
-	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },	/* the two bitplanes are seperated */
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },	/* the two bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8	/* every char takes 16 bytes */

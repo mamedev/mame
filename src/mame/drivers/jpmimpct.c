@@ -5274,7 +5274,7 @@ GAME( 199?, j6crack		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Cracker (Jpm) (I
 GAME( 199?, j6crzclb	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Crazy Club (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6crsfir	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Cross Fire (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6daygld	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Daytona Gold (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, j6dayml		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Daytona Millenium (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j6dayml		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Daytona Millennium (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6dmnjkr	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Demon Jokers (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6dmngz		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Diamond Geezer (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6dyfl		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Do You Feel Lucky (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

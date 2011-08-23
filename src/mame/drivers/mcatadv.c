@@ -60,7 +60,7 @@ U92 & U93 are unpopulated
 NOS-SN-00.U53 Sound samples (Near the YMF286-K)
 
 NOS-B0-00.U58-
-NOS-B0-01.U59 \ Background (Seperate for each 038 chip?)
+NOS-B0-01.U59 \ Background (separate for each 038 chip?)
 NOS-B1-00.U60 /
 NOS-B1-01.U61-
 

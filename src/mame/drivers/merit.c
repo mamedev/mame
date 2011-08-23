@@ -835,9 +835,9 @@ static INPUT_PORTS_START( dtrvwh5 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Coctail Type" )
-	PORT_DIPSETTING(    0x80, "Regular Coctail" )
-	PORT_DIPSETTING(    0x00, "Single Side Coctail" )
+	PORT_DIPNAME( 0x80, 0x80, "Cocktail Type" )
+	PORT_DIPSETTING(    0x80, "Regular Cocktail" )
+	PORT_DIPSETTING(    0x00, "Single Side Cocktail" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pitboss )

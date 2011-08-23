@@ -84,7 +84,7 @@ Stephh's additional notes :
         with the other set. I don't know if there are some other unmapped
         reads, but the game seems to run fine with what I've done.
       * When you press the "Tilt" button, the game enters in an endless
-        loop, but this isn't a bug ! Check code begining at 0x000e02 and
+        loop, but this isn't a bug ! Check code beginning at 0x000e02 and
         ending at 0x000976 for more infos.
           -Expects watchdog to reset it- pjp
       * Sound hasn't been tested.

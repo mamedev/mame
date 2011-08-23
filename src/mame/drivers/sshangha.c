@@ -133,7 +133,7 @@ WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites2_w )
 
 WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
 {
-	// hack??? we have to call this otherwise the sprite colours for some selected tiles are wrong (most noticable on the 2nd level of quest mode)
+	// hack??? we have to call this otherwise the sprite colours for some selected tiles are wrong (most noticeable on the 2nd level of quest mode)
 	// however if we simply mirror the memory both ways the how to play screen ends up with bad colours
 	// we use the 2nd copy of palette ram for low priority tiles only..
 	// is this related to the bootleg only, or does the original have this issue too?

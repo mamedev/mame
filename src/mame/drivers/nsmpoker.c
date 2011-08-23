@@ -170,7 +170,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nsmpoker_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_READ(debug_r)	// kind of trap at begining
+	AM_RANGE(0xf0, 0xf0) AM_READ(debug_r)	// kind of trap at beginning
 ADDRESS_MAP_END
 
 /* I/O byte R/W

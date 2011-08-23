@@ -60,7 +60,7 @@
             - has the main B&W video generation logic on it
             - has the larger connection to the PSU, and B&W composite output "T" connector
         * 2 layer pcb set details:
-          * This pcb set came in one version: PVN, and is entirely exchangable
+          * This pcb set came in one version: PVN, and is entirely exchangeable
             with the 3 layer PVN pcb set.
           * Top pcb is same as 3 layer pcb set
           * Bottom pcb combines the function of the Middle and Bottom pcbs
@@ -2361,7 +2361,7 @@ This game was officially only distributed in Brazil.
 Not much information is avaliable. It is speculated that the original is "Space Missile", whose manufacturer was sued by Taito in Japan.
 Release date is unknown, maybe even before Galaxian?!
 
-ROM dump came from a collection of old 5 1/4 disks (Apple II) that used to be in the posession of an arcade operator in the early 80s.
+ROM dump came from a collection of old 5 1/4 disks (Apple II) that used to be in the possession of an arcade operator in the early 80s.
 
 TODO sound (currently same as invaders):
 - sound mutes when a few aliens are left?

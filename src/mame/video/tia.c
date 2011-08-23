@@ -664,7 +664,7 @@ static void update_bitmap(int next_x, int next_y)
 				redraw_line = 1;
 			}
 
-			/* Redraw line if a RESPx or NUSIZx occured during the last line */
+			/* Redraw line if a RESPx or NUSIZx occurred during the last line */
 			if ( ! startP0 || ! startP1 || ! startM0 || ! startM1) {
 				startP0 = 1;
 				startP1 = 1;

@@ -194,7 +194,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 1) 'topspeed' and 'topspedu'
 
-  - All adresses are for 2nd M68000 CPU !
+  - All addresses are for 2nd M68000 CPU !
   - Region stored at 0x01fffe.w
   - Sets :
       * 'topspeed' : region = 0x0003
@@ -214,13 +214,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - There is sort of built-in cheat (code at 0x015332) :
       * set "Allow Continue" Dip Switch to "No"
       * set "Continue Price" Dip Switch to 1C_1C
-      * set contents of 0x000402.b to 0x55 (be aware that this adress is in ROM area)
+      * set contents of 0x000402.b to 0x55 (be aware that this address is in ROM area)
       * you'll then be awarded infinite time :)
 
 
 2) 'fullthrl'
 
-  - All adresses are for 2nd M68000 CPU !
+  - All addresses are for 2nd M68000 CPU !
   - Region stored at 0x01fffe.w
   - Sets :
       * 'fullthrl' : region = 0x0001

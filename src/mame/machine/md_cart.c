@@ -91,7 +91,7 @@ enum
 	POKEMON,                     /* Pocket Monster */
 	POKEMON2,                    /* Pocket Monster 2 */
 	KAIJU,                       /* Pokemon Stadium */
-	RADICA,                      /* Radica TV games.. these probably should be a seperate driver since they are a seperate 'console' */
+	RADICA,                      /* Radica TV games.. these probably should be a separate driver since they are a separate 'console' */
 	REALTEC,                     /* Whac a Critter/Mallet legend, Defend the Earth, Funnyworld/Ballonboy */
 	REDCLIFF,                    /* Romance of the Three Kingdoms - Battle of Red Cliffs, already decoded from .mdx format */
 	REDCL_EN,                    /* The encoded version... */

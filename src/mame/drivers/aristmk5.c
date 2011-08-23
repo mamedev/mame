@@ -11,7 +11,7 @@
     TODO (MK-5 specific):
     - Fix remaining errors
     - If all tests passes, this msg is printed on the keyboard serial port:
-    "System Startup Code Entered \n Gos_create could not allocate stack for the new process \n Unrecoverable error occured. System will now restart"
+    "System Startup Code Entered \n Gos_create could not allocate stack for the new process \n Unrecoverable error occurred. System will now restart"
     Apparently it looks like some sort of protection device ...
 
     code DASMing of POST (adonis):
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32 )
 	// bank5 slow
 	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
-	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB Interupt Latch
+	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
 
 	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_RAMBANK("sram_bank_nz") // AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3 NZ
@@ -333,7 +333,7 @@ static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32 )
 	// bank5 slow
 	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
-	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB Interupt Latch
+	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
 
 
 	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)

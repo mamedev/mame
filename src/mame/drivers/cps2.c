@@ -521,7 +521,7 @@ Known problems with this driver.
   - The network adapter used in Super Street Fighter II: The Tournament Battle is
     not currently emulated though the ports it uses are setup in the memory map.
 
-  - Giga Wing's attract mode seems to loose sync with music. The problem seems to
+  - Giga Wing's attract mode seems to lose sync with music. The problem seems to
     happen due to gfx drawing slowing to much when screen colors fade out. This
     problem could be due to the 68k being clocked at 11.8mhz when the hardware
     has a 16mhz crystal on it. Various timing loops show 11.8 being the average

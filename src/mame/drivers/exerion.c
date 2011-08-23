@@ -38,7 +38,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
     If checksum doesn't match the hardcoded value (0xb5), you get one more credit
     and you are allowed to continue the game with an extra life (score, charge and
     level are not reset to original values).
-  - At the begining of each life of each player, a checksum is computed from 0x4100
+  - At the beginning of each life of each player, a checksum is computed from 0x4100
     to 0x4dff (code at 0x07d8) if 1st score in the high-score table is >= 80000.
     If checksum doesn't match the hardcoded value (0x63), you get 255 credits !
     Notice that the displayed number of credits won't be correct as the game
@@ -63,7 +63,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
     match, its only effect is to set lives to 0, which is always the case when the
     game is over, so it doesn't seem to have any real effect.
     Was it supposed to be called at another time ?
-  - The routine at 0x5f90 writes to adresses 0x6008-0x600c values read from AY port A
+  - The routine at 0x5f90 writes to addresses 0x6008-0x600c values read from AY port A
     (one write after one read). This routine is called by the 2 unknown routines.
 
 2) 'exeriont'
@@ -112,7 +112,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - The first unknown routine at 0x5f70 has been patched, so the game can't reset.
   - The second unknown routine at 0x414e has been patched, so lives can't be set to 0.
   - The routine at 0x5f90 is completely different : it reads values from AY port A,
-    but nothing is written to adresses 0x6008-0x600c, and there are lots of writes
+    but nothing is written to addresses 0x6008-0x600c, and there are lots of writes
     to AY port B (0xd001) due to extra code at 0x0050 and extra data at 0x0040.
 
 ***************************************************************************/

@@ -563,7 +563,7 @@ static INPUT_PORTS_START( llander )
 	PORT_DIPSETTING (	0xd0, "1800" )
 
 	/* The next one is a potentiometer */
-	/* The way the DAC/counter circuit always trys to self center at the voltage derived from the thrust control, */
+	/* The way the DAC/counter circuit always tries to self center at the voltage derived from the thrust control, */
 	/* I don't think it ever expected to get to 0xff. We can not emulate the external DAC circuit exactly, */
 	/* so changing the range to 0xfe seems to solve the problem. */
 	/* The thrust control is basically a hand operated pedal. */

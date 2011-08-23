@@ -581,8 +581,8 @@
     - Added discrete sound support to Golden Poker hardware games based on schematics.
     - Added discrete sound support to Potten's Poker hardware games based on PCB analysis.
     - Added discrete circuitry diagrams for both hardware types.
-    - Adjusted the CPU adressing to 15 bits for pmpoker/goldenpkr hardware.
-    - Adjusted the CPU adressing to 14 bits for pottnpkr hardware.
+    - Adjusted the CPU addressing to 15 bits for pmpoker/goldenpkr hardware.
+    - Adjusted the CPU addressing to 14 bits for pottnpkr hardware.
     - Rewrote all the ROM loads based on these changes.
     - Defined MASTER Xtal & CPU clock.
     - Fixed the visible area based on M6845 registers.

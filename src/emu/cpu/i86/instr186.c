@@ -4,7 +4,7 @@
 ****************************************************************************/
 
 // file will be included in all cpu variants
-// function renaming will be added when neccessary
+// function renaming will be added when necessary
 // timing value should move to separate array
 
 #undef ICOUNT

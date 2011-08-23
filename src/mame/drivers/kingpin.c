@@ -5,7 +5,7 @@ Driver by Andrew Gardner
 Notes:
     There are some writes around 0xe000 in the multi-game set that can't
         possibly go anywhere on the board I own.  A bigger RAM chip would
-        accomodate them though.
+        accommodate them though.
     There are 6 pots labeled vr2-vr7.  Color adjustments?
     The edge-connectors are non-jamma on this board.
 

@@ -1818,7 +1818,7 @@ static WRITE16_HANDLER( puzzlet_irq_enable_w )
 		*state->m_irq_enable = data ^ 0xffff;
 }
 
- /* FIXME: algorythm not yet understood. */
+ /* FIXME: algorithm not yet understood. */
 static WRITE16_HANDLER( vram_0_clr_w )
 {
 	static int i;

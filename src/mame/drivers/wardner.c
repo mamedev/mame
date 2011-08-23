@@ -108,7 +108,7 @@ c000-cfff Sound RAM, $C000-C7FF shared with $C000-C7FF in Z80(0) ram
 
 
 
-TMS320C10 DSP: Harvard type architecture. RAM and ROM on seperate data buses.
+TMS320C10 DSP: Harvard type architecture. RAM and ROM on separate data buses.
 0000-05ff ROM 16-bit opcodes (word access only).
 0000-0090 Internal RAM (words).
 

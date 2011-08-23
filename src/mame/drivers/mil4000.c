@@ -1,6 +1,6 @@
 /*******************************************************************************************
 
-Millenium Nuovo 4000 / Nuovo Millenium 4000 (c) 2000 Sure Milano
+Millennium Nuovo 4000 / Nuovo Millennium 4000 (c) 2000 Sure Milano
 
 driver by David Haywood and Angelo Salese
 

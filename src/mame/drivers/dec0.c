@@ -2161,7 +2161,7 @@ of big snow! 02/02/09
 http://www.andys-arcade.com
 
 *************************************************
-**Do not seperate this text file from the roms.**
+**Do not separate this text file from the roms.**
 *************************************************
 
 Take a look at the photos in the archive, the roms

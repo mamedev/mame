@@ -374,7 +374,7 @@ void k053250_t::draw( bitmap_t *bitmap, const rectangle *cliprect, int colorbase
 		pal_ptr = pal_base + ((color & 0x1f) << 4);
 
 		// calculate physical pixel location
-		// each offset unit represents two hundred and fifty six pixels and should wrap at ROM boundary for safty
+		// each offset unit represents two hundred and fifty six pixels and should wrap at ROM boundary for safety
 		pix_ptr = unpacked + ((offset << 8) % unpacked_size);
 
 		// get scanline zoom factor

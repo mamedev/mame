@@ -117,7 +117,7 @@ static void snes_hirq_tick( running_machine &machine )
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
 	snes_latch_counters(machine);
-	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
+	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occurred */
 	device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, ASSERT_LINE);
 
 	// don't happen again
@@ -175,7 +175,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	{
 		if (snes_ppu.beam.current_vert == state->m_vtime)
 		{
-			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
+			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
 			snes_latch_counters(machine);
 			device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, ASSERT_LINE );
@@ -216,7 +216,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert, 10), FUNC(snes_reset_oam_address));
 
 		snes_ram[HVBJOY] |= 0x81;		/* Set vblank bit to on & indicate controllers being read */
-		snes_ram[RDNMI] |= 0x80;		/* Set NMI occured bit */
+		snes_ram[RDNMI] |= 0x80;		/* Set NMI occurred bit */
 
 		if (snes_ram[NMITIMEN] & 0x80)	/* NMI only signaled if this bit set */
 		{
@@ -238,7 +238,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	if (snes_ppu.beam.current_vert == 0)
 	{	/* VBlank is over, time for a new frame */
 		snes_ram[HVBJOY] &= 0x7f;		/* Clear vblank bit */
-		snes_ram[RDNMI]  &= 0x7f;		/* Clear nmi occured bit */
+		snes_ram[RDNMI]  &= 0x7f;		/* Clear nmi occurred bit */
 		snes_ram[STAT78] ^= 0x80;		/* Toggle field flag */
 		snes_ppu.stat77_flags &= 0x3f;	/* Clear Time Over and Range Over bits */
 
@@ -2171,7 +2171,7 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 		{
 			//illegal WRAM->WRAM transfer (bus conflict)
 			//read most likely occurs; no write occurs
-			//read is irrelevent, as it cannot be observed by software
+			//read is irrelevant, as it cannot be observed by software
 			return;
 		}
 		else

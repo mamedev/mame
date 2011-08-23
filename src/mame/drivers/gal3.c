@@ -109,7 +109,7 @@ The pcb set i have dumped here is for a plain Galaxian 3 : Project Dragoon,
 all my rom labels differ from his, and they are different games.
 
 Of the 11 pcbs, 7 of them contain unique game roms. In order to keep
-things clear, i have kept the roms apart in seperate folders, each
+things clear, i have kept the roms apart in separate folders, each
 folder contains a photo of the pcb itself and another text file
 containing location descriptions.
 

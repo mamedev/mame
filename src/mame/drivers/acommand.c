@@ -314,7 +314,7 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- x--- COIN2
                 ---- ---- ---- -x-- COIN1
                 ---- ---- ---- --x- (Activate Test)
-                ---- ---- ---- ---x (Advance Thru Tests)
+                ---- ---- ---- ---x (Advance through Tests)
             */
 			return input_port_read(space->machine(), "IN0");
 		case 0x0014/2:

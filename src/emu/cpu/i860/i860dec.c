@@ -2738,7 +2738,7 @@ static void insn_fmul (i860s *cpustate, UINT32 insn)
 	/* FIXME: Set result-status bits besides MRP. And copy to fsr from
               last stage.  */
 	/* FIXME: Scalar version flows through all stages.  */
-	/* FIXME: Mixed precision (only wierd for pfmul).  */
+	/* FIXME: Mixed precision (only weird for pfmul).  */
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
@@ -3279,7 +3279,7 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 
 	/* FIXME: Set result-status bits besides MRP. And copy to fsr from
               last stage.  */
-	/* FIXME: Mixed precision (only wierd for pfmul).  */
+	/* FIXME: Mixed precision (only weird for pfmul).  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 	/* Copy 3rd stage MRP to FSR.  */
 	if (cpustate->M[num_mul_stages - 2	/* 1 */].stat.mrp)

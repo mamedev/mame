@@ -301,7 +301,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 					UINT16 end, start;
 					LOG_FORMATS("got end of filename\n");
 
-					/* 100 1 bits to seperate header from data */
+					/* 100 1 bits to separate header from data */
                                         for (i=0; i<100; i++)
                                         {
                                             count+=oric_get_bit_size_in_samples(1);

@@ -588,7 +588,7 @@ DISCRETE_SOUND_START(polaris)
  *  0     0   no sound
  *  0     1   NOISE_HI_FILT while enabled
  *  1     0   NOISE_LO_FILT while enabled (When a regular plane is hit)
- *  1     1   NOISE_HI_FILT & NOISE_LO_FILT decaying imediately @ 680k, 0.22uF
+ *  1     1   NOISE_HI_FILT & NOISE_LO_FILT decaying immediately @ 680k, 0.22uF
  *
  ******************************************************************************/
 	DISCRETE_OP_AMP_TRIG_VCA(POLARIS_HITSND, POLARIS_SX10_EN, POLARIS_SX9_EN, 0, POLARIS_NOISE_LO_FILT, POLARIS_NOISE_HI_FILT, &polaris_hit_tvca_info)

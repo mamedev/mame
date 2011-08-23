@@ -106,7 +106,7 @@ Notes:
 
  Sound Chips : YM2151, M6295
 
- 3 Layers from now on if mentioned will be refered to as
+ 3 Layers from now on if mentioned will be referred to as
 
  BG0 - Background
  SPR - Sprites

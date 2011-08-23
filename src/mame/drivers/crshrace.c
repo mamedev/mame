@@ -46,7 +46,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
       Off On  On       1C_5C
       On  On  On       1C_6C
 
-  - DSW 3 bit 7 is tested only if an error has occured during P.O.S.T. :
+  - DSW 3 bit 7 is tested only if an error has occurred during P.O.S.T. :
       * when Off, the game is reset
       * when On,  don't bother with the error and continue
 

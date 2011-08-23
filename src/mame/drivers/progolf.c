@@ -18,8 +18,8 @@ PCB version (not cassette)
 
 All eproms 2732
 
-g0-m thru g6-m on top pcb.
-g7-m thru g9-m on bottom pcb.
+g0-m through g6-m on top pcb.
+g7-m through g9-m on bottom pcb.
 
 Three Proms are 82S123 or equivalents.
 

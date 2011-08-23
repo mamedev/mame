@@ -30,7 +30,7 @@ Changes:
 
     0.94 (2007-06-14):
             Zsolt Vasvari
-            - Removed unneccessary checks from MVP and MVN
+            - Removed unnecessary checks from MVP and MVN
 
     0.93 (2003-07-05):
             Angelo Salese

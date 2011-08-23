@@ -60,7 +60,7 @@ Known Info
 ----------
 
 2K Character RAM at write only address $f000-$f7fff looks to be organised
-64x32 chars with the screen rotated thru 90 degrees clockwise. There
+64x32 chars with the screen rotated through 90 degrees clockwise. There
 appears to be some kind of attribute(?) RAM above at $f800-$ffff organised
 in the same manner.
 

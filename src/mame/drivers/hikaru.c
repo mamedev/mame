@@ -7,7 +7,7 @@ Sega Hikaru Hardware Overview (last updated 5th August 2009 at 3:45pm)
 
 Note! This document will be updated from time to time when more dumps are available.
 
-This document covers all the known Sega Hikaru games. The graphics are quite breath-taking
+This document covers all the known Sega Hikaru games. The graphics are quite breathtaking
 and this system is said to be one of the most expensive arcade boards developed by Sega.
 The games on this system include....
 Air Trix                     (C) Sega, 2001

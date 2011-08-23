@@ -80,7 +80,7 @@ static DISCRETE_SOUND_START(frogs)
 	/* Q11 & Q12 transform the voltage from the oneshot U4, to what is
      * needed by the 555CC circuit.  Vin to R29 must be > 1V for things
      * to change.  <=1 then The Vout of this circuit is 12V.
-     * The Current thru R28 equals current thru R51. iR28 = iR51
+     * The Current through R28 equals current through R51. iR28 = iR51
      * So when Vin>.5, iR51 = (Vin-.5)/39k.  =0 when Vin<=.5
      * So the voltage drop across R28 is vR28 = iR51 * 22k.
      * Finally the Vout = 12 - vR28.

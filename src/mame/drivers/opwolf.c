@@ -231,7 +231,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Sets :
       * 'opwolfa' : region = 0x0003
   - There is only ONE byte of difference at 0x03fff5.b with 'opwolf'
-    but its effect is unknown as this adress doesn't seem to be read !
+    but its effect is unknown as this address doesn't seem to be read !
 
 3) 'opwolfb'
 

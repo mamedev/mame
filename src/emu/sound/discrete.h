@@ -474,7 +474,7 @@
  *                           DISC_CLK_IS_FREQ   - internally clock at this frequency.
  *
  *               x_time options: you can also | these x_time features to the basic
- *                               types above if needed, or use seperately with 7492.
+ *                               types above if needed, or use separately with 7492.
  *                           DISC_OUT_IS_ENERGY - This will uses the x_time to
  *                                                anti-alias the count.  Might be
  *                                                usefull if not connected to other
@@ -2141,8 +2141,8 @@
  ***********************************************************************
  *
  * DISCRETE_OP_AMP_TRIG_VCA - Triggered Norton op amp voltage controlled amplifier.
- *                            This means the cap is rapidly charged thru r5 when F2=1.
- *                            Then it discharges thru r6+r7 when F2=0.
+ *                            This means the cap is rapidly charged through r5 when F2=1.
+ *                            Then it discharges through r6+r7 when F2=0.
  *                            This voltage controls the amplitude.
  *                            While the diagram looks complex, usually only parts of it are used.
  *
@@ -2260,7 +2260,7 @@
  ***********************************************************************
  *
  * DISCRETE_CRFILTER - Simple single pole CR filter network (vRef = 0)
- * DISCRETE_CRFILTER_VREF - Same but refrenced to vRef not 0V
+ * DISCRETE_CRFILTER_VREF - Same but referenced to vRef not 0V
  *
  *                        .------------.
  *                        |            |
@@ -2815,7 +2815,7 @@
  ***********************************************************************
  *
  * DISCRETE_RCFILTER - Simple single pole RC filter network (vRef = 0)
- * DISCRETE_RCFILTER_VREF - Same but refrenced to vRef not 0V
+ * DISCRETE_RCFILTER_VREF - Same but referenced to vRef not 0V
  *
  *                        .------------.
  *                        |            |

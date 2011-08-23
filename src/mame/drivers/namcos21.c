@@ -1950,7 +1950,7 @@ ROM_START( driveyes )
 
 	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
 /*
-There are 3 seperate complete boards used for this 3 screen version....
+There are 3 separate complete boards used for this 3 screen version....
 "Set2" (center screen board?) has de1_snd0 while the other 2 sets have de1_snd0r (rear speakers??)
 Only "Set2" has voice roms present/dumped?
 We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom in the set

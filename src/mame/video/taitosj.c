@@ -312,7 +312,7 @@ static int check_sprite_sprite_bitpattern(running_machine &machine,
 		miny = sy1;
 	}
 
-	/* draw the sprites into seperate bitmaps and check overlapping region */
+	/* draw the sprites into separate bitmaps and check overlapping region */
 	bitmap_fill(state->m_sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
 	drawgfx_transpen(state->m_sprite_sprite_collbitmap1, 0, get_sprite_gfx_element(machine, which1),
 			state->m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 3] & 0x3f,

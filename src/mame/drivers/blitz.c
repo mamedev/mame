@@ -538,7 +538,7 @@ ADDRESS_MAP_END
   FEE7: 4C 3F 62      jmp  $623F     ; transfer the control to $623f (no valid code there. RTS in the alt program)
 
 
-  Some routines are writting to $47xx that should be ROM space.
+  Some routines are writing to $47xx that should be ROM space.
 
   Also some pieces of code are copying code to the first 0x80 bytes of the stack and execute from there.
   The code is so obfuscated. The copied code is using undocumented opcodes as LAX.

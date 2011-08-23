@@ -164,7 +164,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
   - I can't determine what's the effect of DSW 1-7 to DSW 1-5 :(
     All I can tell is that the computed value (from 0x0000 to 0x0007) is stored at 0x12279c.w
-    and it is compared with the contents of adresses 0x1207c6.w and 0x12153c.w .
+    and it is compared with the contents of addresses 0x1207c6.w and 0x12153c.w .
 
   - DSW 1-4 changes the color of the field, but I don't know if it has
     some other effects. Please check this out and let me know.
@@ -2686,7 +2686,7 @@ ROM_END
 
             SemiCom Games
 
- Uses simular hardware with 87c52 MCU for protection
+ Uses similar hardware with 87c52 MCU for protection
 
  SemiCom used the name "Mijin" in 1995
 

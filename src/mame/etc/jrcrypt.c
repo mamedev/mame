@@ -171,7 +171,7 @@ int jrpacman_romdecodeB(int offset)
     This function would look suprisingly similiar to the source code to
 the encoder pals, I imagine. I wrote is based on the jedec file that I
 got from VideoDoctor. It needs to be run during the game, since the
-logic is kind of wierd and state based. This is slow. So you'll see
+logic is kind of weird and state based. This is slow. So you'll see
 that I made it store its "decrypted" opcodes in another array. When I
 ran the program and was satisfied that it had decrypted enough code, I
 dumped this new array out into some ROM files.  These ROM files are

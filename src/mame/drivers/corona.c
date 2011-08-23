@@ -612,7 +612,7 @@ static ADDRESS_MAP_START( winner81_cpu_io_map, AS_IO, 8 )
 	AM_RANGE(0x75, 0x75) AM_READ(blitter_status_r)
 	AM_RANGE(0x76, 0x76) AM_WRITE(blitter_aux_w)
 
-	AM_RANGE(0xd8, 0xd8) AM_WRITENOP			/* dunno, but is writting 0's very often */
+	AM_RANGE(0xd8, 0xd8) AM_WRITENOP			/* dunno, but is writing 0's very often */
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(sound_latch_w)
 
 	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("IN0")	/* credits for players A, B, C, D */

@@ -157,7 +157,7 @@ Their effect is completely unknown but I need to set some bits to 1 so the games
   - 'arkblock' : NO read from 0xd008 !
   - 'arkbloc2' :
        * bit 5 must sometimes be set to 1 or you can't reach right side of the screen
-         nor select all levels at the begining of the game
+         nor select all levels at the beginning of the game
   - 'arkgcbl' :
        * bit 1 must be set to 1 or you enter sort of endless "demo mode" when you start :
            . you can't select your starting level (it always starts at level 1)
@@ -166,12 +166,12 @@ Their effect is completely unknown but I need to set some bits to 1 so the games
            . you are awarded points as in a normal game
            . sounds are played
        * bit 5 must sometimes be set to 1 or you can't reach right side of the screen
-         nor select all levels at the begining of the game
+         nor select all levels at the beginning of the game
   - 'paddle2' :
        * bits 0 and 1 must be set to 1 or the paddle goes up   (joystick issue ?)
        * bits 2 and 3 must be set to 1 or the paddle goes down (joystick issue ?)
        * bit 5 must sometimes be set to 1 or you can't reach right side of the screen
-         nor select all levels at the begining of the game
+         nor select all levels at the beginning of the game
 
 
 TO DO (2006.09.12) :

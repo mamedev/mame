@@ -223,7 +223,7 @@ static READ16_HANDLER( hotslot_copro_r )
 
 static WRITE16_HANDLER( hotslot_copro_w )
 {
-	logerror("Writting to copro: %d \n", data);
+	logerror("Writing to copro: %d \n", data);
 }
 
 static WRITE16_HANDLER( magic10_out_w )

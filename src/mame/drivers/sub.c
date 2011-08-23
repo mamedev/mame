@@ -336,7 +336,7 @@ static INPUT_PORTS_START( sub )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )	/* Seperate controls for each player */
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )	/* separate controls for each player */
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) ) /* Controls via player 1 for both, but need to get x/y screen flip working to fully test */
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

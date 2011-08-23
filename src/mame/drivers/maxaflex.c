@@ -76,7 +76,7 @@ static WRITE8_HANDLER( mcu_portA_w )
 /* Port B:
     0   (out)   Select 7-segment display to control by writing port C
     1   (out)
-    2   (out)   clear coin interupt
+    2   (out)   clear coin interrupt
     3   (out)   STRKEY - line connected to keyboard input in 600XL, seems to be not used
     4   (out)   RES600 - reset 600
     5   (out)   AUDMUTE - mutes audio

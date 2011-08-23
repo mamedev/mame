@@ -36,7 +36,7 @@ properties], and a text plane with character definitions held in ram.
 older TC0100SCN tilemap generator used in previous Taito Z games. The
 hardware for Taito's Super Chase was a further development of this, with a
 68020 for main CPU and Ensoniq sound - standard features of Taito's F3
-system. Taito's F3 system superceded both Taito B and F2 systems, but the
+system. Taito's F3 system superseded both Taito B and F2 systems, but the
 Taito Z system was enhanced with F3 features and continued in games like
 Super Chase and Under Fire up to the mid 1990s.)
 
@@ -384,15 +384,15 @@ Notes:
                TD62003 : PNP 50V 0.5A Quad Darlinton Switch (for driving coin meters)
                   D633 : Si NPN POWER transistor used in 68k reset circuit (TIP122 compatible)
       ROMs:
-            C09-12 thru C09-14 - MB834100
+            C09-12 through C09-14 - MB834100
             C09-07             - HN62404
-            C09-32 thru C09-33 - AM27C512
-            C09-30 thru C09-31 - TC571000
+            C09-32 through C09-33 - AM27C512
+            C09-30 through C09-31 - TC571000
             C09-38 and C09-36  - TC571000
             C09-23             - AM27S21
             C09-22 and C09-26  - MMI PAL16L8B
             C09-21 and
-            C09-24 thru C09-25 - MMI PAL20L8B
+            C09-24 through C09-25 - MMI PAL20L8B
 
 PINOUT CONNECTOR D (Note: All pinouts typed from an original Taito document)
 ------------------
@@ -468,9 +468,9 @@ VIDEO PCB  K1100491A  J1100210A
 
 Notes:
       ROMs:
-            C09-01 thru C09-05 - 234000
+            C09-01 through C09-05 - 234000
             C09-06             - HN62404
-            C09-17 thru C09-18 - MMI 63S441
+            C09-17 through C09-18 - MMI 63S441
             C09-19             - MMI PAL16L8B
             C09-20             - AM27S21
 

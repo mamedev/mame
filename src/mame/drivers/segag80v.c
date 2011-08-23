@@ -122,7 +122,7 @@
 
     Known problems:
 
-    1 The games seem to run too fast. This is most noticable
+    1 The games seem to run too fast. This is most noticeable
       with the speech samples in Zektor - they don't match the mouth.
       Slowing down the Z80 doesn't help and in fact hurts performance.
 

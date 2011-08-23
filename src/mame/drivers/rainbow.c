@@ -203,7 +203,7 @@ Notes on Rainbow Islands Extra by Robert Gallagher
    In Rainbow Islands Extra (as in Rainbow Islands), if you collect 2 of any colour 'cane'...
      (canes are collected for collecting 7 of one colour of diamond, WITHOUT 'complete' happening, or
      if 'complete', you must collect 7 of the same colour diamond within one round. (the diamond
-     counters are reset to one at the beginning of each round once 'complete' has occured).
+     counters are reset to one at the beginning of each round once 'complete' has occurred).
    ...you will receive a 'Potion' (not Rainbow powerup potions)
    of the appropriate colour. Once collected, you will receive a
    100,000pts. large fruit item at 'GOAL IN' for that round. Although the code for this is present in

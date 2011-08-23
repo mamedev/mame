@@ -155,14 +155,14 @@
 
 
     This hardware doesn't seems to be designed for a game like Lucky 74. The co-processor
-    existence, the aparently unused 2x SN76489, the YM2149 used only for input port and
+    existence, the apparently unused 2x SN76489, the YM2149 used only for input port and
     NMI trigger purposes and the USART communication system (among other things) indicate
     that a more elaborated kind of games were meant to be running on this hardware.
     For Lucky 74, is a big waste of resources.
 
 
     Regular sounds and music are driven through one SN76489 mapped at 0xf100. The other two
-    (mapped at 0xf300 & 0xf500) seems to be only initialized at the begining but not used.
+    (mapped at 0xf300 & 0xf500) seems to be only initialized at the beginning but not used.
 
     Samples are driven through a custom DIP-40 IC silkscreened '09R81P'.
 
@@ -207,7 +207,7 @@
     So, you can easily see that writes to ports 0x00-0x01 define the start (pos) offset,
     and writes to ports 0x03-0x04 the ending offset of each sample to be played.
 
-    Then, writting 0x01 to port 0x05 (bit 0 activated) just trigger the sample.
+    Then, writing 0x01 to port 0x05 (bit 0 activated) just trigger the sample.
 
     Once finished, the M5205 is ready again and the 09R81P clear the /Busy flag (port 0x00,
     bit 0 activated).

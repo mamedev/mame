@@ -714,11 +714,11 @@ static const UINT8 tms1000_next_pc[64] = {
 /* emulator for the program counter increment on the tms0980/tmc0980 mcu;
  see patent 4064554 figure 19 (on page 13) for an explanation of feedback:
 
-  nand324 = NAND of PC0 thru pc4, i.e. output is true if ((pc&0x1f) != 0x1f)
+  nand324 = NAND of PC0 through pc4, i.e. output is true if ((pc&0x1f) != 0x1f)
   nand323 = NAND of pc5, pc6 and nand324
       i.e. output is true, if ((pc&0x1f)==0x1f) || pc5 is 0 || pc 6 is 0
   or321 = OR of pc5 and pc6, i.e. output is true if ((pc&0x60) != 0)
-  nand322 = NAND of pc0 thru pc5 plus /pc6,
+  nand322 = NAND of pc0 through pc5 plus /pc6,
       i.e. output is true if (pc != 0x3f)
   nand325 = nand pf nand323, or321 and nand322
       This one is complex:

@@ -78,7 +78,7 @@ resistors or other PWM fun) it should be possible to get:
      mc1488 to shift to rs232 voltage levels)
 
 * The 8255 PPI at U13 (connected to the 8088) is connected to 75451
-  drivers on all pins EXCEPT pins PC3 thru PC0.
+  drivers on all pins EXCEPT pins PC3 through PC0.
   (schematic page 3)
   PA7 - Display Light 1
   PA6 - Display Light 2

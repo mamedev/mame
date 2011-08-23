@@ -28,9 +28,9 @@
     Bubbles, etc. by HIGHWAYMAN, all decoder proms are 512x8.
     defender original pcb's used a single prom(decoder1).
     newer defender pcb's used 2 proms(decoder2,decoder3) this was to allow
-    video inversion for the coctail table, decoders 1 & 2 are the same code.
+    video inversion for the cocktail table, decoders 1 & 2 are the same code.
     white was first romset, then green/blue the only difference was the chips used,
-    the final version was red, only red can run in a coctail table.
+    the final version was red, only red can run in a cocktail table.
     (red also has *much* improved enemy AI and is harder to play)
     Colony7 uses a different chip for decoder2(cs10), but decoder3 is the same.
     early stargate pcb's used decoder4, and decoder5.

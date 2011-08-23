@@ -318,7 +318,7 @@ Memory Map
 
 40dc00 - 40dfff: Active Sprites list
 
-    Each word is a sprite number, 0x0 thru 0x1bf. If !=0
+    Each word is a sprite number, 0x0 through 0x1bf. If !=0
     a word makes active the 0x10 bytes of sprite data at
     (40c000 + sprite_num * 0x10). (Wgp2 fills this in reverse).
 
@@ -371,7 +371,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 			y = spriteram[i + 1];
 			bigsprite = spriteram[i + 2] & 0x3fff;
 
-			/* The last five words [i + 3 thru 7] must be zoom/rotation
+			/* The last five words [i + 3 through 7] must be zoom/rotation
                control: for time being we kludge zoom using 1 word.
                Timing problems are causing many glitches. */
 

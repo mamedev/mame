@@ -32,7 +32,7 @@ READ8_DEVICE_HANDLER( k054539_r );
 void k054539_init_flags(device_t *device, int flags);
 
 /*
-    Note that the eight PCM channels of a K054539 do not have seperate
+    Note that the eight PCM channels of a K054539 do not have separate
     volume controls. Considering the global attenuation equation may not
     be entirely accurate, k054539_set_gain() provides means to control
     channel gain. It can be called anywhere but preferrably from

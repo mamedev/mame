@@ -277,10 +277,10 @@ static PALETTE_INIT( nightgal )
 
 /*
 (note:when I say "0x80" I just mean a negative result)
-master-slave algorythm
+master-slave algorithm
 -z80 writes the data for the mcu;
 -z80 writes 0 to c200;
--it waits with the bit 0x80 on c100 clears (i.e. the z80 halts),when this happens the z80 continues his logic algorythm (so stop it until we are done!!!)
+-it waits with the bit 0x80 on c100 clears (i.e. the z80 halts),when this happens the z80 continues his logic algorithm (so stop it until we are done!!!)
 
 -nsc takes an irq
 -puts ff to [1100]

@@ -4876,7 +4876,7 @@ ROM_END
 */
 ROM_START( goldnaxej )
 	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
-	/* fails rom test on 8 & 6 ?! roms verfied from two seperate sources */
+	/* fails rom test on 8 & 6 ?! roms verfied from two separate sources */
 	ROM_LOAD16_BYTE( "epr-12540.a7", 0x00000, 0x20000, CRC(0c7ccc6d) SHA1(25bc29eee731befc665472c2c1998cac8447cc21) )
 	ROM_LOAD16_BYTE( "epr-12539.a5", 0x00001, 0x20000, CRC(1f24f7d0) SHA1(a09cdf394c03069707f7ed400b8fbdc13674fa74) )
 	/* emtpy 0x40000 - 0x80000 */
@@ -4918,7 +4918,7 @@ ROM_END
 */
 ROM_START( goldnaxe3 )
 	ROM_REGION( 0xc0000, "maincpu", 0) /* 68000 code */
-	/* fails rom test on 8 & 6 ?! roms verfied from two seperate sources */
+	/* fails rom test on 8 & 6 ?! roms verfied from two separate sources */
 	ROM_LOAD16_BYTE( "epr-12525.a7", 0x00000, 0x20000, CRC(48332c76) SHA1(4cdf7dc2f504a030ae63b4854bb76a3f2cc1d96b) )
 	ROM_LOAD16_BYTE( "epr-12524.a5", 0x00001, 0x20000, CRC(8e58f342) SHA1(a972b05f7d5d7228067f97724191fce1aeb0371d) )
 	/* emtpy 0x40000 - 0x80000 */

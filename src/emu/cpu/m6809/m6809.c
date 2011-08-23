@@ -162,7 +162,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 
 #define M6809_CWAI		8	/* set when CWAI is waiting for an interrupt */
 #define M6809_SYNC		16	/* set when SYNC is waiting for an interrupt */
-#define M6809_LDS		32	/* set when LDS occured at least once */
+#define M6809_LDS		32	/* set when LDS occurred at least once */
 
 
 /****************************************************************************/

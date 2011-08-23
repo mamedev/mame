@@ -2497,9 +2497,9 @@ static void contextswitchX(tms99xx_state *cpustate, UINT16 addr)
 #endif
 
 /*
- * decipheraddr : compute and return the effective adress in word instructions.
+ * decipheraddr : compute and return the effective address in word instructions.
  *
- * NOTA : the LSBit is always ignored in word adresses,
+ * NOTA : the LSBit is always ignored in word addresses,
  * but we do not set it to 0 because of XOP...
  */
 static UINT16 decipheraddr(tms99xx_state *cpustate, UINT16 opcode)
@@ -2548,7 +2548,7 @@ static UINT16 decipheraddr(tms99xx_state *cpustate, UINT16 opcode)
 	}
 }
 
-/* decipheraddrbyte : compute and return the effective adress in byte instructions. */
+/* decipheraddrbyte : compute and return the effective address in byte instructions. */
 static UINT16 decipheraddrbyte(tms99xx_state *cpustate, UINT16 opcode)
 {
 	register UINT16 ts = opcode & 0x30;
@@ -2919,7 +2919,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 			/* Used by the memory mapper on ti990/10 with mapping option, ti990/12, and the TIM99610
             mapper chip to be associated with tms99000.
             Syntax: "LMF Rn,m" loads map file m (0 or 1) with six words of memory, starting at address
-            specified in workspace register Rn (0 thru 15). */
+            specified in workspace register Rn (0 through 15). */
 			#if HAS_PRIVILEGE
 				if (cpustate->STATUS & ST_PR)
 				{

@@ -524,7 +524,7 @@ DISCRETE_STEP(dss_note)
 	}
 	else
 	{
-		/* Seperate clock info from x_time info. */
+		/* separate clock info from x_time info. */
 		clock = (int)DSS_NOTE__CLOCK;
 		x_time = DSS_NOTE__CLOCK - clock;
 	}

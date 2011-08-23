@@ -11,7 +11,7 @@
 
 /**************************************************************/
 /* The S2636 is a standard sprite chip used by several boards */
-/* Emulation of this chip may be moved into a seperate unit   */
+/* Emulation of this chip may be moved into a separate unit   */
 /* once it's workings are fully understood.                   */
 /**************************************************************/
 

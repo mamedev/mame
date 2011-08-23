@@ -2117,7 +2117,7 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 		case 2:  device_set_input_line(device, 2, HOLD_LINE); break;
 		case 1:  device_set_input_line(device, 3, HOLD_LINE); break;
 
-		// the code for this interupt is provided by the MCU..
+		// the code for this interrupt is provided by the MCU..
 		case 0:  device_set_input_line(device, 4, HOLD_LINE);
 
 				calc3_mcu_run(device->machine());
@@ -2517,7 +2517,7 @@ After about level 5 or so, if you insert a coin when the continue screen
 pops up, an error message "Copy Board" pops up.
 ----------------------------------------
 Happened to me when player dies, at level 4.
-The message is not written in ROM, its sprite ram adress is (always?)
+The message is not written in ROM, its sprite ram address is (always?)
 $30fd40
 Routine $337d2 writes it (and routine $5c8c erases it)
 The 'COPY BOARD!' message in stored in ROM directly as sprite number

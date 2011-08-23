@@ -197,7 +197,7 @@ static int firstfile;			// first non-directory file
 #define CD_STAT_OPEN     0x0600		// tray is open
 #define CD_STAT_NODISC   0x0700		// no disc present
 #define CD_STAT_RETRY    0x0800		// read retry in progress
-#define CD_STAT_ERROR    0x0900		// read data error occured
+#define CD_STAT_ERROR    0x0900		// read data error occurred
 #define CD_STAT_FATAL    0x0a00		// fatal error (hard reset required)
 #define CD_STAT_PERI     0x2000		// periodic response if set, else command response
 #define CD_STAT_TRANS    0x4000		// data transfer request if set

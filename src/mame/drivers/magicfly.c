@@ -442,7 +442,7 @@ static TILE_GET_INFO( get_magicfly_tile_info )
     ---- -xxx   Tiles color.
     ---- x---   Seems to be a kind of attribute (maybe related to color). Not totally understood yet.
     ---x ----   Tiles bank.
-    -xx- ----   Aparently not used.
+    -xx- ----   Apparently not used.
     x--- ----   Mirrored from bit 3. The code check this one to boot the game.
 
 */
@@ -474,7 +474,7 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
     ---- -xxx   Tiles color.
     ---- x---   Seems to be a kind of attribute (maybe related to color). Not totally understood yet.
     ---x ----   Tiles bank.
-    -xx- ----   Aparently not used.
+    -xx- ----   Apparently not used.
     x--- ----   Mirrored from bit 2. The code check this one to boot the game.
 
 */

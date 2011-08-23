@@ -283,8 +283,8 @@
   D, E, F     N/C                    D             AC Hot
   04, 05, 06  N/C                    04            Lockout
   H, 07       Lamp +                 E             AC Hot
-  J, K, L     N/C                    05 thru 21    N/C
-  08, 09      N/C                    F thru Y      N/C
+  J, K, L     N/C                    05 through 21    N/C
+  08, 09      N/C                    F through Y      N/C
   10          Lamp #0                Z, 22         Audio -
   M           Not Used               a, 23         Audio +
   11          Lamp #1                b, 24         N/C

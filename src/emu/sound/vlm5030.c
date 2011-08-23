@@ -12,7 +12,7 @@
         OSC2  ck |  3     _     38 | ??    TST3
         OSC1  ck |  4    (_)    37 | ??    TST2
         D0    -> |  5           36 | ->    DAO
-        D1    -> |  6           35 | --    VREF (+5v thru 5.6k resistor)
+        D1    -> |  6           35 | --    VREF (+5v through 5.6k resistor)
         D2    -> |  7           34 | ->    MTE
         D3    -> |  8      V    33 | ->    /ME
         D4    -> |  9      L    32 | <-    VCU

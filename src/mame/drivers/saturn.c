@@ -1841,7 +1841,7 @@ static MACHINE_START( saturn )
 
 
 /*
-(Preliminary) explaination about this:
+(Preliminary) explanation about this:
 VBLANK-OUT is used at the start of the vblank period.It also sets the timer zero
 variable to 0.
 If the Timer Compare register is zero too,the Timer 0 irq is triggered.

@@ -54,7 +54,7 @@ The Following Section of Code in Gunbird causes reads from the
 
 This causes Gunbird to crash if the ROM Region Size
 allocated during loading is smaller than the ROM
-region as it trys to read beyond the allocated rom region
+region as it tries to read beyond the allocated rom region
 
 This was pointed out by Bart Puype
 

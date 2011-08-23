@@ -266,7 +266,7 @@
   C1C6: 91 06         sta  ($06),y    ; store value in PIA port, indexed (Y).
   C1C8: C8            iny             ; increment Y
   C1C9: C0 0C         cpy  #$0C       ; finish?
-  C1CB: D0 DD         bne  $C1AA      ; if not, branch to load a new PIA adress.
+  C1CB: D0 DD         bne  $C1AA      ; if not, branch to load a new PIA address.
 
   In this example, as soon as Y register increments, the indexed writes go out of range.
   To get this piece of code working and initialize the PIAs properly, the instruction 0x91 should be
@@ -359,7 +359,7 @@
   $0A00 - $0A03   PIA2            // Input Ports 2 & 3.
   $0C00 - $0C00   AY-8910 (R/C)   // Read/Control.
   $0C01 - $0C01   AY-8910 (W)     // Write. Lamps through output ports.
-  $0E00 - $0E00   CRTC6845 (A)    // MC6845 adressing.
+  $0E00 - $0E00   CRTC6845 (A)    // MC6845 addressing.
   $0E01 - $0E01   CRTC6845 (R/W)  // MC6845 Read/Write.
 
   $2000 - $2FFF   VideoRAM (funworld/bigdeal)
@@ -713,7 +713,7 @@
      (delete the old .cfg and .nv files to have them working properly).
   - Splitted the Royal Card machine driver. This is needed to access
      different halves of the bipolar PROM.
-  - Now principal Royal Card sets have a working bet button.
+  - Now principle Royal Card sets have a working bet button.
   - Added default NVRAM to the new sets.
 
   [2011/04/04]
@@ -782,7 +782,7 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
 
 static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
 {
-/* TAB and Impera games are writting 0x01 constantly, and 0x00 with each screen change.
+/* TAB and Impera games are writing 0x01 constantly, and 0x00 with each screen change.
    This line is tied to sort of reset circuitery.
 */
 //  popmessage("PIA1 CA2: %02X", data);
@@ -2696,7 +2696,7 @@ ROM_END
 
 
 ROM_START( jolycdab )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* program is testing/writting RAM in offset $8800-$BFFF (ROM)...?? */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* program is testing/writing RAM in offset $8800-$BFFF (ROM)...?? */
 	ROM_LOAD( "ig1poker.run", 0x8000, 0x8000, CRC(c96e6542) SHA1(ed6c0cf9fe8597dba9149b2225320d8d9c39219a) )
 //  ROM_RELOAD(               0x4000, 0x4000 )
 

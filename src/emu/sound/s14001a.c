@@ -95,7 +95,7 @@ TTL/CMOS compatible voltage. The AUDIO OUT pin also outputs a voltage below GND,
 and the TEST pins may do so too.
 
 START is pulled high when a word is to be said and the word number is on the
-word select/speech address input lines. The Canon 'Canola' uses a seperate 'rom
+word select/speech address input lines. The Canon 'Canola' uses a separate 'rom
 strobe' signal independent of the chip to either enable or clock the speech rom.
 Its likely that they did this to be able to force the speech chip to stop talking,
 which is normally impossible. The later 'version 3' TSI speech board as featured in

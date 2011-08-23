@@ -273,7 +273,7 @@ static void vga_bitmap_layer(running_machine &machine, bitmap_t *bitmap,const re
 	UINT8 *region = machine.region("user1")->base();
 	UINT32 cur_bank;
 
-	/*TODO: might be a different descramble algorythm plus plain bg bank*/
+	/*TODO: might be a different descramble algorithm plus plain bg bank*/
 	cur_bank = (((8-state->m_vga_bg_bank[0]) & 0x1f)*0x10000);
 
 	for(y=0;y<200;y+=8)

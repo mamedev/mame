@@ -490,7 +490,7 @@ SCREEN_UPDATE( warlords )
 
 		/* The four quadrants have different colors. This is not 100% accurate,
            because right on the middle the sprite could actually have two or more
-           different color, but this is not noticable, as the color that
+           different color, but this is not noticeable, as the color that
            changes between the quadrants is mostly used on the paddle sprites */
 		int color = ((y & 0x80) >> 6) | ((x & 0x80) >> 7) | (upright_mode >> 5);
 

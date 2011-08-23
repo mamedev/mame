@@ -445,7 +445,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			break;
 
 		case 1:
-			/* preceeded by writing 0xD1 to port 60h
+			/* preceded by writing 0xD1 to port 60h
              *  |7|6|5|4|3|2|1|0|  8042 Output Port
              *   | | | | | | | `---- system reset line
              *   | | | | | | `----- gate A20
@@ -459,24 +459,24 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			break;
 
 		case 2:
-			/* preceeded by writing 0xD2 to port 60h */
+			/* preceded by writing 0xD2 to port 60h */
 			kbdc8042.data = data;
 			kbdc8042.sending=1;
 			at_keyboard_write(space->machine(), data);
 			break;
 
 		case 3:
-			/* preceeded by writing 0xD3 to port 60h */
+			/* preceded by writing 0xD3 to port 60h */
 			kbdc8042.data = data;
 			break;
 
 		case 4:
-			/* preceeded by writing 0xD4 to port 60h */
+			/* preceded by writing 0xD4 to port 60h */
 			kbdc8042.data = data;
 			break;
 
 		case 5:
-			/* preceeded by writing 0x60 to port 60h */
+			/* preceded by writing 0x60 to port 60h */
 			kbdc8042.command = data;
 			break;
 		}

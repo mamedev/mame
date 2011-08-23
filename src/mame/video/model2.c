@@ -37,7 +37,7 @@
     - The Z-Sort algorithm is not entirely understood. The manual states that the Z-Sort works internally in 1.4.8 bit format,
     but then it states that the Z-Sort Mode register value is added to the floating point z value, and converted to a 16 bit
     format (most likely 4.12).
-    - The system allows for Z-Sort override, by means of specifying wether a polygon will use the same Z value ordinal as the
+    - The system allows for Z-Sort override, by means of specifying whether a polygon will use the same Z value ordinal as the
     previous polygon, or the calculated minimum or maximum from it's points. This allows for a full object to be in front of
     another, even though the first object might have some z coordinates that are bigger than the second object's z coordinates.
     - The current implementation takes the effective computed z value for the polygon and converts it into a 4.12 fixed point
@@ -439,7 +439,7 @@ static void model2_3d_process_quad( raster_state *raster, UINT32 attr )
 	/* set the luma value of this quad */
 	object.luma = (raster->command_buffer[9] >> 15) & 0xFF;
 
-	/* determine wether we can cull this quad */
+	/* determine whether we can cull this quad */
 	cull = 0;
 
 	/* if doubleside is disabled */
@@ -675,7 +675,7 @@ static void model2_3d_process_triangle( raster_state *raster, UINT32 attr )
 	/* set the luma value of this quad */
 	object.luma = (raster->command_buffer[9] >> 15) & 0xFF;
 
-	/* determine wether we can cull this quad */
+	/* determine whether we can cull this quad */
 	cull = 0;
 
 	/* if doubleside is disabled */
@@ -1411,7 +1411,7 @@ static void geo_parse_np_ns( geo_state *geo, UINT32 *input, UINT32 count )
 			point.x *= geo->focus.x;
 			point.y *= geo->focus.y;
 
-			/* determine wether this is the front or the back of the polygon */
+			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
 
@@ -1563,7 +1563,7 @@ static void geo_parse_np_s( geo_state *geo, UINT32 *input, UINT32 count )
 			point.x *= geo->focus.x;
 			point.y *= geo->focus.y;
 
-			/* determine wether this is the front or the back of the polygon */
+			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
 
@@ -1734,7 +1734,7 @@ static void geo_parse_nn_ns( geo_state *geo, UINT32 *input, UINT32 count )
 			point.x *= geo->focus.x;
 			point.y *= geo->focus.y;
 
-			/* determine wether this is the front or the back of the polygon */
+			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
 
@@ -1929,7 +1929,7 @@ static void geo_parse_nn_s( geo_state *geo, UINT32 *input, UINT32 count )
 			point.x *= geo->focus.x;
 			point.y *= geo->focus.y;
 
-			/* determine wether this is the front or the back of the polygon */
+			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
 
@@ -2592,7 +2592,7 @@ static UINT32 * geo_code_upload( geo_state *geo, UINT32 opcode, UINT32 *input )
 	}
 
 	/*
-        Bit 10 of flags indicate wether to run iummediately after upload
+        Bit 10 of flags indicate whether to run iummediately after upload
     */
 
 /*

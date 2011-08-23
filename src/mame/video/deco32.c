@@ -883,7 +883,7 @@ SCREEN_UPDATE( nslasher )
 	screen->machine().device<decospr_device>("spritegen2")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_2_buffered, 0x800, true);
 
 
-	/* Render alpha-blended tilemap to seperate buffer for proper mixing */
+	/* Render alpha-blended tilemap to separate buffer for proper mixing */
 	bitmap_fill(state->m_tilemap_alpha_bitmap,cliprect,0);
 
 	/* Draw playfields & sprites */

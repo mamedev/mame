@@ -18,7 +18,7 @@
     Since the only assembler for the APEXC that I know of uses numerical data
     (yes, mnemonics are numbers), I do not know if there is an official way of writing
     APEXC assembly on a text terminal.  The format I chose is closely inspired by
-    the assembly format found in Booth, but was slightly adapted to accomodate
+    the assembly format found in Booth, but was slightly adapted to accommodate
     the lack of subscripts and of a 'greater or equal' character.
 
         Printed format                      Name

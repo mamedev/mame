@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_tile_info_glass_screen1 )
 ***************************************************************************/
 
 /*
-    The blitter is accessed writting 5 consecutive bits. The stream is: P0 P1 B2 B1 B0
+    The blitter is accessed writing 5 consecutive bits. The stream is: P0 P1 B2 B1 B0
 
     if P0 is set, the hardware selects the first half of ROM H9 (girls)
     if P1 is set, the hardware selects the second half of ROM H9 (boys)

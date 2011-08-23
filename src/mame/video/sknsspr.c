@@ -8,7 +8,7 @@
 
   - ToDo:
     Get rid of sprite position kludges
-    Fix zooming precision/rounding (most noticable on jchan backgrounds)
+    Fix zooming precision/rounding (most noticeable on jchan backgrounds)
 
 */
 

@@ -3,7 +3,7 @@
  drawing sprites in a single pass with pdrawgfx breaks Thunder Dragon 2,
   which seems to expect the sprite priority values to affect sprite-sprite
   priority.  Thunder Dragon 2 also breaks if you support sprite flipping,
-  the collectable point score / power up names appear flipped..
+  the collectible point score / power up names appear flipped..
 
 */
 

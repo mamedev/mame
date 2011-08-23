@@ -353,7 +353,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	nemesis_state *state = machine.driver_data<nemesis_state>();
 	UINT16 *spriteram = state->m_spriteram;
-	int adress;	/* start of sprite in spriteram */
+	int address;	/* start of sprite in spriteram */
 	int sx;	/* sprite X-pos */
 	int sy;	/* sprite Y-pos */
 	int code;	/* start of sprite in obj RAM */
@@ -368,30 +368,30 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	for (priority = 256 - 1; priority >= 0; priority--)
 	{
-		for (adress = state->m_spriteram_words - 8; adress >= 0; adress -= 8)
+		for (address = state->m_spriteram_words - 8; address >= 0; address -= 8)
 		{
-			if((spriteram[adress] & 0xff) != priority)
+			if((spriteram[address] & 0xff) != priority)
 				continue;
 
-			zoom = spriteram[adress + 2] & 0xff;
-			if (!(spriteram[adress + 2] & 0xff00) && ((spriteram[adress + 3] & 0xff00) != 0xff00))
-				code = spriteram[adress + 3] + ((spriteram[adress + 4] & 0xc0) << 2);
+			zoom = spriteram[address + 2] & 0xff;
+			if (!(spriteram[address + 2] & 0xff00) && ((spriteram[address + 3] & 0xff00) != 0xff00))
+				code = spriteram[address + 3] + ((spriteram[address + 4] & 0xc0) << 2);
 			else
-				code = (spriteram[adress + 3] & 0xff) + ((spriteram[adress + 4] & 0xc0) << 2);
+				code = (spriteram[address + 3] & 0xff) + ((spriteram[address + 4] & 0xc0) << 2);
 
 			if (zoom != 0xff || code != 0)
 			{
-				size = spriteram[adress + 1];
+				size = spriteram[address + 1];
 				zoom += (size & 0xc0) << 2;
 
-				sx = spriteram[adress + 5] & 0xff;
-				sy = spriteram[adress + 6] & 0xff;
-				if (spriteram[adress + 4] & 0x01)
+				sx = spriteram[address + 5] & 0xff;
+				sy = spriteram[address + 6] & 0xff;
+				if (spriteram[address + 4] & 0x01)
 					sx-=0x100;	/* fixes left side clip */
 
-				color = (spriteram[adress + 4] & 0x1e) >> 1;
-				flipx = spriteram[adress + 1] & 0x01;
-				flipy = spriteram[adress + 4] & 0x20;
+				color = (spriteram[address + 4] & 0x1e) >> 1;
+				flipx = spriteram[address + 1] & 0x01;
+				flipy = spriteram[address + 4] & 0x20;
 
 				idx = (size >> 3) & 7;
 				w = sprite_data[idx].width;

@@ -22,7 +22,7 @@ SCREEN_UPDATE( archimds_vidc )
 	/* border color */
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[0x10]);
 
-	/* define X display area thru BPP mode register */
+	/* define X display area through BPP mode register */
 	calc_dxs = (vidc_regs[VIDC_HDSR]*2)+x_step[vidc_bpp_mode & 3];
 	calc_dxe = (vidc_regs[VIDC_HDER]*2)+x_step[vidc_bpp_mode & 3];
 

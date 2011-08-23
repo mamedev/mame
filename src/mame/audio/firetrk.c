@@ -283,7 +283,7 @@ DISCRETE_SOUND_START(firetrk)
 	/************************************************/
 	DISCRETE_RCDISC2(NODE_70, FIRETRUCK_BELL_EN,
 				4.4, 10,		// Q3 instantally charges C42
-				0, RES_K(33),	// discharges thru R66
+				0, RES_K(33),	// discharges through R66
 				CAP_U(10))		// C42
 	DISCRETE_TRANSFORM2(NODE_71, NODE_70,
 				5.0 * 680 / (RES_K(10) + 680),	// vRef = 5V * R64 / (R65 + R64)

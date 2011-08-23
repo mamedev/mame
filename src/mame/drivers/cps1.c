@@ -113,7 +113,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
       * set the debug Dip Switches to what you want
       * start a 1 player game
   - Some debug features :
-      * "Armor on New Life" is effective at the begining of a new life
+      * "Armor on New Life" is effective at the beginning of a new life
         Note that even when you start without armor, you need to be hit twice
       * "Starting Weapon" is effective only when you start a new game
         or when you continue play

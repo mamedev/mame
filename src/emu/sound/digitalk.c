@@ -168,7 +168,7 @@ period.
         - Rom organization
 
 The rom starts with a vector of 16-bits little endian values which are
-the adresses of the segments table for the samples.  The segments data
+the addresses of the segments table for the samples.  The segments data
 is a vector of 24-bits little-endian values organized as such:
 
       adr+2    adr+1    adr

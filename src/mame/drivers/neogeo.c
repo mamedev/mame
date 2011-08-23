@@ -870,7 +870,7 @@ static void audio_cpu_banking_init( running_machine &machine )
 	}
 
 	/* set initial audio banks --
-       how does this really work, or is it even neccessary? */
+       how does this really work, or is it even necessary? */
 	state->m_audio_cpu_banks[0] = 0x1e;
 	state->m_audio_cpu_banks[1] = 0x0e;
 	state->m_audio_cpu_banks[2] = 0x06;

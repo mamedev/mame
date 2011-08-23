@@ -52,8 +52,8 @@ MAIN PCB - This is the mother board PCB. It holds the main CPU/GPU & SPU and all
            controller/input logic and video output circuitry. Basically everything except the ROMs.
            There are three known revisions of this PCB so far. The differences seem very minor. The 2nd and 3rd revision
            have an updated CPLD revision.
-           The 3rd revision has an updated model Sony chip. The only other _noticable_ difference is some component
-           shuffling in the sound amplification section to accomodate two extra 1000uF capacitors and one 470uF capacitor
+           The 3rd revision has an updated model Sony chip. The only other _noticeable_ difference is some component
+           shuffling in the sound amplification section to accommodate two extra 1000uF capacitors and one 470uF capacitor
            has been replaced by a 1000uF capacitor. Everything else, including all the PLDs appears to be identical.
            Note there are no ROMs on the Main PCB and also no custom Namco chips on System10, which seem to have been
            phased out. Instead, they have been replaced by (custom programmed) CPLDs, probably due to cost-cutting

@@ -3,7 +3,7 @@
 UEF format support (for electron driver)
 
 The UEF format supports gzipped images, i'm doing the gunzip step during uef_cas_to_wav_size
-because that is when the length of the orignal file is known. This is needed to determine
+because that is when the length of the original file is known. This is needed to determine
 the size of memory to alloc for the decoding.
 
 Not nice, but it works...

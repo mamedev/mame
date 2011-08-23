@@ -668,7 +668,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 	// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board
 	// generates the timing in those cases.  With this change, rushing heroes and rng2 boot :)
 
-	// maybe this interupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
+	// maybe this interrupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
 	// the real hardware should output the display for each screen on alternate frames
 //  if(device->machine().primary_screen->frame_number() & 1)
 	if (1) // gx_syncen & 0x20)

@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( hustlerb_sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
-/* stratgyx coinage DIPs are spread accross two input ports */
+/* stratgyx coinage DIPs are spread across two input ports */
 static CUSTOM_INPUT( stratgyx_coinage_r )
 {
 	int bit_mask = (FPTR)param;

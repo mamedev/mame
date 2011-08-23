@@ -3795,7 +3795,7 @@ ADDRESS_MAP_END
  Sega CD related
 *************************************************************************************************/
 
-// The perfect syncs should make this unneccessary: forcing syncs on reads is a flawed design pattern anyway,
+// The perfect syncs should make this unnecessary: forcing syncs on reads is a flawed design pattern anyway,
 // because the sync will only happen AFTER the read, by which time it's too late.
 #define SEGACD_FORCE_SYNCS 0
 

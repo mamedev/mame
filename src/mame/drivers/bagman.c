@@ -374,7 +374,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-/* squaitsa doesn't map the dial directly, instead it polls the results of the dial thru an external circuitry.
+/* squaitsa doesn't map the dial directly, instead it polls the results of the dial through an external circuitry.
    I don't know if the following is correct, there can possbily be multiple solutions for the same problem. */
 static READ8_DEVICE_HANDLER( dial_input_p1_r )
 {

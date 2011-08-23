@@ -166,7 +166,7 @@ Topland
 Sprite/tile priority bad.
 
 After demo game in attract, palette seems too dark for a while.
-Palette corruption has occured with areas not restored after a fade.
+Palette corruption has occurred with areas not restored after a fade.
 Don't know why. (Perhaps 68000 relies on feedback from co-processor
 in determining what parts of palette ram to write... but this would
 then be fixed by hookup of 32025 core, which it isn't.)

@@ -656,7 +656,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 			K5_FILL_0( 1800 );
 	}
 
-	/* dump trailing bytes, but also look for beginings of blocks */
+	/* dump trailing bytes, but also look for beginnings of blocks */
 	if ( pos < size )
 	{
 		invalid++;

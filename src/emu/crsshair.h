@@ -61,7 +61,7 @@ struct _crosshair_user_settings
 /* initializes the crosshair system */
 void crosshair_init(running_machine &machine);
 
-/* draws crosshair(s) in a given screen, if neccessary */
+/* draws crosshair(s) in a given screen, if necessary */
 void crosshair_render(screen_device &screen);
 
 /* sets the screen(s) for a given player's crosshair */

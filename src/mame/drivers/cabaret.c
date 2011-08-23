@@ -7,7 +7,7 @@ TODO:
 - This game should have an NVRAM.  There is trace of System Reset so need
   to find how to reset its content.
 - DSW3 is read, not sure where it's used
-- Keyboard is mapped thru test mode, but some bits are unknown, and hopper
+- Keyboard is mapped through test mode, but some bits are unknown, and hopper
   is not emulated
 - Map Leds and Coin counters
 - Remove patches after finding why there are so many pitfalls.  Maybe the

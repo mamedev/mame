@@ -49,7 +49,7 @@
     pixel ratio seems to be different on pal and ntsc
 
     commodore vic20 notes
-    6560 adress line 13 is connected inverted to address line 15 of the board
+    6560 address line 13 is connected inverted to address line 15 of the board
     1 K 4 bit ram at 0x9400 is additional connected as 4 higher bits
     of the 6560 (colorram) without decoding the 6560 address line a8..a13
 

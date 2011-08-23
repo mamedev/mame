@@ -33,8 +33,8 @@ Difference between Twin Cobra and Kyukyoko Tiger:
          for this reason, it also supports Table Top cabinets.
     T.C. stores 3 characters for high scores.
     K.T. stores 6 characters for high scores.
-    T.C. heros are Red and Blue for player 1 and 2 respectively.
-    K.T. heros are grey for both players.
+    T.C. heroes are Red and Blue for player 1 and 2 respectively.
+    K.T. heroes are grey for both players.
     T.C. dead remains of ground tanks are circular.
     K.T. dead remains of ground tanks always vary in shape.
     T.C. does not use DSW1-1 and DSW2-8.
@@ -196,7 +196,7 @@ out:
 01        YM3812 data
 20        Coin counters / Coin lockouts
 
-TMS320C10 DSP: Harvard type architecture. RAM and ROM on seperate data buses.
+TMS320C10 DSP: Harvard type architecture. RAM and ROM on separate data buses.
 0000-07ff ROM 16-bit opcodes (word access only). Moved to $8000-8fff for
                  MAME compatibility. View this ROM in the debugger at $8000h
 0000-0090 Internal RAM (words).

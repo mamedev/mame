@@ -129,7 +129,7 @@ static void wizdfire_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
         over non-alpha'd sprites, plus sprites underneath and above an alpha'd background layer.
 
         Hence, we rely on the hardware sorting everything correctly and not relying on any orthoganality
-        effects (it doesn't seem to), and instead draw seperate passes for each sprite priority.  :(
+        effects (it doesn't seem to), and instead draw separate passes for each sprite priority.  :(
         */
 		switch (mode)
 		{

@@ -58,7 +58,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
   - Difficulty Dip Switch also affects "Bonus Life" Dip Switch
   - There are less degrees of difficulty in this version
   - DSW2 bit 5 effect remains unknown :
-      * it is checked at address 0x008d16 at the begining of each sub-level
+      * it is checked at address 0x008d16 at the beginning of each sub-level
       * it is checked at address 0x00c382 when you quickly push the joystick left or right twice
     Any info is welcome !
 

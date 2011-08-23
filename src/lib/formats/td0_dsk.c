@@ -140,7 +140,7 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 			|| (sector < 0) )
 		return FLOPPY_ERROR_SEEKERROR;
 
-	// position on begining of track data
+	// position on beginning of track data
 	offs = td0_get_track_offset(floppy, head, track);
 
 	// read track header

@@ -972,7 +972,7 @@ DISCRETE_STEP(dst_lookup_table)
  *
  * There are 3 basic types of mixers, defined by the 2 types.  The
  * op amp mixer is further defined by the prescence of rI.  This is a
- * brief explaination.
+ * brief explanation.
  *
  * DISC_MIXER_IS_RESISTOR
  * The inputs are high pass filtered if needed, using (rX || rF) * cX.
@@ -1968,13 +1968,13 @@ DISCRETE_RESET(dst_tvca_op_amp)
 	m_i_fixed   = m_v_out_max / info->r1;
 
 	m_v_cap1 = 0;
-	/* Charge rate thru r5 */
+	/* Charge rate through r5 */
 	/* There can be a different charge rates depending on function F3. */
 	m_exponent_c[0] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r5, info->r6) * info->c1);
 	m_exponent_c[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r5, m_r67) * info->c1);
-	/* Discharge rate thru r6 + r7 */
+	/* Discharge rate through r6 + r7 */
 	m_exponent_d[1] = RC_CHARGE_EXP(m_r67 * info->c1);
-	/* Discharge rate thru r6 */
+	/* Discharge rate through r6 */
 	if (info->r6 != 0)
 	{
 		m_exponent_d[0] = RC_CHARGE_EXP(info->r6 * info->c1);

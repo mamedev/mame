@@ -620,7 +620,7 @@ Etched in copper on back    FAB 550595-C
 
 .h7 IM560?      handwritten HM0-CG  hard to read
 
-All chips we read as 82s141 - guessed becuase of 24 pin pinout and 512x8 rom according to mame
+All chips we read as 82s141 - guessed because of 24 pin pinout and 512x8 rom according to mame
 */
 
 ROM_START( hitme )

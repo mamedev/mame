@@ -2216,7 +2216,7 @@ static DRIVER_INIT( pclubjv5 )
 
     Dates are all verified correct from Ingame display, some of the Titles
     such as Ichidant-R, Tant-R might be slightly incorrect as I've seen the
-    games refered to by other names such as Ichident-R, Tanto-R, Tanto Arle
+    games referred to by other names such as Ichident-R, Tanto-R, Tanto Arle
     etc.
 
     bloxeedc is set as as clone of bloxeed as it is the same game but running

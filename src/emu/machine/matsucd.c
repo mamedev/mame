@@ -21,7 +21,7 @@ can be expanded with support for the other drives as needed.
 #define MATSU_STATUS_READY		( 1 << 0 )	/* driver ready */
 #define MATSU_STATUS_DOORLOCKED	( 1 << 1 )	/* door locked */
 #define MATSU_STATUS_PLAYING	( 1 << 2 )	/* drive playing */
-#define MATSU_STATUS_SUCCESS	( 1 << 3 )	/* last command was succesful */
+#define MATSU_STATUS_SUCCESS	( 1 << 3 )	/* last command was successful */
 #define MATSU_STATUS_ERROR		( 1 << 4 )	/* last command failed */
 #define MATSU_STATUS_MOTOR		( 1 << 5 )	/* spinning */
 #define MATSU_STATUS_MEDIA		( 1 << 6 )	/* media present (in caddy or tray) */

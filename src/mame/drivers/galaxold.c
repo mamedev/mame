@@ -909,7 +909,7 @@ static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-/* Lives Dips are spread accross two input ports */
+/* Lives Dips are spread across two input ports */
 static CUSTOM_INPUT( vpool_lives_r )
 {
 	int bit_mask = (FPTR)param;
@@ -1056,7 +1056,7 @@ static INPUT_PORTS_START( rockclim )
 INPUT_PORTS_END
 
 
-/* Coinage Dips are spread accross two input ports */
+/* Coinage Dips are spread across two input ports */
 static CUSTOM_INPUT( ckongg_coinage_r )
 {
 	int bit_mask = (FPTR)param;
@@ -1424,7 +1424,7 @@ static INPUT_PORTS_START( bagmanmc )
 INPUT_PORTS_END
 
 
-/* Coinage Dips are spread accross two input ports */
+/* Coinage Dips are spread across two input ports */
 static CUSTOM_INPUT( dkongjrm_coinage_r )
 {
 	int bit_mask = (FPTR)param;

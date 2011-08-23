@@ -1400,7 +1400,7 @@ Also printed on the board near the ROMs is....
 Notes:
       CAT702              - protection chip labelled 'TW02' (DIP20)
       JGUN1, JGUN2        - Connector for optional gun controllers
-      ROMs U14 thru U17   - 27C040 EPROM
+      ROMs U14 through U17   - 27C040 EPROM
       DS1232S             - Dallas DS1232 (reset IC, SOIC16)
       VT83C461            - VIA VT83C461 (IDE Hard Drive controller, QFP100)
       EPM7160ELC84        - Altera MAX EPM7160ELC84-10 (PLCC84 CPLD, labelled 'PSX PiD 9-19-96 2FDA')
@@ -1571,7 +1571,7 @@ Notes:
       CAT702              - protection chip labelled 'ET02' (DIP20)
       ROMs 217, 216 & 326 - surface mounted 32MBit MASK ROM (SOP44)
       ROMs 042 & 046      - 27C2001 EPROM
-      ROMs 212 thru 215   - 27C4001 EPROM
+      ROMs 212 through 215   - 27C4001 EPROM
       MAIN_IF2 & SUB_IF2  - AMD Mach211 CPLD (PLCC44)
       M628032             - 32K x8 SRAM, equivalent to 62256 SRAM (SOJ28)
       68000 clock         - 12MHz
@@ -1825,7 +1825,7 @@ data.
 Disk Drive is a Quantum ????2.1 GB??
 
 connectors CN506 and CN505 are the gun inputs pins 13, 14, 15
-white/blue/ black respectively.   The + 5 (red) is seperate source (not
+white/blue/ black respectively.   The + 5 (red) is separate source (not
 from the CN506 or Cn505).
 
 You'll have to get the +5 for the guns from the jamma harness.
@@ -1930,10 +1930,10 @@ Notes:
       U35, U36 - 27C080 DIP32 EPROM
       U21, U22 - Unpopulated positions for DIP32 EPROM
       U6, U20  - Unpopulated position for SOP44 MaskROM
-      U3 thru U6    \
-      U17 thru U19  |  surface mounted 32MBit SOP44 MaskROM
-      U28 thru U31  |
-      U41 thru U44  /
+      U3 through U6    \
+      U17 through U19  |  surface mounted 32MBit SOP44 MaskROM
+      U28 through U31  |
+      U41 through U44  /
 
 
 Sound Board
@@ -2451,7 +2451,7 @@ Notes:
       3 logic chips near main program ROMs.
       2x 4MBit EPROMs labelled 'CBAJ1' and 'CBAJ2'
       1x 2MBit EPROM labelled 'CBAJZ80'
-      9x 32MBit smt SOP44 MASKROMs labelled 'CB-00' thru 'CB-08' (Graphics)
+      9x 32MBit smt SOP44 MASKROMs labelled 'CB-00' through 'CB-08' (Graphics)
       2x 32MBit smt SOP44 MASKROMs labelled 'CB-SE' and 'CB-V0' (connected to the YMZ280B)
       LH540202 - CMOS 1024 x 9 Asyncronous FIFO (PLCC32)
       D43001   - 32K x8 SRAM, equivalent to 62256 SRAM

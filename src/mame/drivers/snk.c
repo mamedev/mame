@@ -105,7 +105,7 @@ Notes:
 - the only difference between hal21 and hal21j is the audio ROM.
 
 - there are no "Bonus Lives" settings in alphamis and arian (always 50k 100k)
-  and only an "Occurence" Dip Switch.
+  and only an "Occurrence" Dip Switch.
 
 - when test mode displays 80k 160k in athena, it is in fact 60k 120k.
 
@@ -840,12 +840,12 @@ static CUSTOM_INPUT( snk_bonus_r )
 
 	switch (bit_mask)
 	{
-		case 0x01:  /* older games : "Occurence" Dip Switch (DSW2:1) */
+		case 0x01:  /* older games : "Occurrence" Dip Switch (DSW2:1) */
 			return ((input_port_read(field.machine(), "BONUS") & bit_mask) >> 0);
 		case 0xc0:  /* older games : "Bonus Life" Dip Switches (DSW1:7,8) */
 			return ((input_port_read(field.machine(), "BONUS") & bit_mask) >> 6);
 
-		case 0x04:  /* later games : "Occurence" Dip Switch (DSW1:3) */
+		case 0x04:  /* later games : "Occurrence" Dip Switch (DSW1:3) */
 			return ((input_port_read(field.machine(), "BONUS") & bit_mask) >> 2);
 		case 0x30:  /* later games : "Bonus Life" Dip Switches (DSW2:5,6) */
 			return ((input_port_read(field.machine(), "BONUS") & bit_mask) >> 4);
@@ -1674,7 +1674,7 @@ static INPUT_PORTS_START( vangrd2 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )			PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bonus Life Occurence" )		PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bonus Life Occurrence" )		PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x00, "Every bonus" )
 	PORT_DIPSETTING(    0x10, "Bonus only" )
 	PORT_DIPNAME( 0x20, 0x20, "Infinite Lives (Cheat)")		PORT_DIPLOCATION("DSW2:6")
@@ -1744,7 +1744,7 @@ static INPUT_PORTS_START( madcrash )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "Bonus Life Occurence" )		PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bonus Life Occurrence" )		PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x01, "1st, 2nd, then every 2nd" )	/* Check the "Non Bugs" page */
 	PORT_DIPSETTING(    0x00, "1st and 2nd only" )
 	PORT_DIPNAME( 0x06, 0x04, "Scroll Speed" )				PORT_DIPLOCATION("DSW2:2,3")

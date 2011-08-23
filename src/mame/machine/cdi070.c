@@ -411,7 +411,7 @@ READ16_HANDLER( scc68070_periphs_r )
 
     switch(offset)
     {
-        // Interupts: 80001001
+        // interrupts: 80001001
         case 0x1000/2: // LIR priority level
             return scc68070->lir;
 
@@ -703,7 +703,7 @@ WRITE16_HANDLER( scc68070_periphs_w )
 
     switch(offset)
     {
-        // Interupts: 80001001
+        // interrupts: 80001001
         case 0x1000/2: // LIR priority level
             verboselog(space->machine(), 2, "scc68070_periphs_w: LIR: %04x & %04x\n", data, mem_mask);
             COMBINE_DATA(&scc68070->lir);

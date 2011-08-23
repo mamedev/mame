@@ -228,7 +228,7 @@ static INPUT_PORTS_START( skylancre )
 	PORT_DIPSETTING(	0x20, "4" )
 	PORT_DIPSETTING(	0x10, "5" )
 	PORT_DIPSETTING(	0x00, "6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:2") /* Manual calls this "Excent Play" (Excelent or extended?) */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:2") /* Manual calls this "Excent Play" (Excellent or extended?) */
 	PORT_DIPSETTING(	0x40, "20000 50000" )		/* Manual calls this "Normal Level" */
 	PORT_DIPSETTING(	0x00, "40000 70000" )		/* Manual calls this "High Level" */
 INPUT_PORTS_END

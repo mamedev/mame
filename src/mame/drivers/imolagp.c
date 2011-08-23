@@ -29,7 +29,7 @@ it was the bank of 4116 rams that made me take a closer look.
 I hooked it up and saw some video on my scope, then it died.
 The +12v had shorted.. Suspecting the godamn tantalum capacitors
 (often short out for no reason) i found a shorted one, removed
-it and away we went. It had seperate H + V sync, so i loaded
+it and away we went. It had separate H + V sync, so i loaded
 a 74ls08 into a spare ic space and AND'ed the two signals to get
 composite, voila, i got a stable picture. The colours aren't right,
 and maybe the video isn't quite right either, but it worked enough

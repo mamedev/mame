@@ -18,7 +18,7 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
   - On chip real time digital filters                              - Loop start and stop posistions for each voice
   - Frequency interpolation                                        - Bidirectional and reverse looping
   - 32 independent voices (up from 25 in DOCII)                    - 68000 compatibility for asynchronous bus communication
-  - Loop start and stop positions for each voice                   - Seperate host and sound memory interface
+  - Loop start and stop positions for each voice                   - separate host and sound memory interface
   - Bidirectional and reverse looping                              - 6 channel stereo serial communication port
   - 68000 compatibility for asynchronous bus communication         - Programmable clocks for defining serial protocol
   - On board pulse width modulation D to A                         - Internal volume multiplication and stereo panning

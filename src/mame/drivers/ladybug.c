@@ -9,7 +9,7 @@ driver by Nicola Salmoria
     Snap Jack
     Cosmic Avenger
 
-  Simular or bootleg PCB:
+  Similar or bootleg PCB:
     Dorodon (by Falcon)
     Space Raider
 
@@ -286,7 +286,7 @@ static INPUT_PORTS_START( ladybug )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	/* settings 0x00 thru 0x05 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
@@ -298,7 +298,7 @@ static INPUT_PORTS_START( ladybug )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	/* settings 0x00 thru 0x50 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")	/* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin1_inserted, 0)
@@ -387,7 +387,7 @@ static INPUT_PORTS_START( snapjack )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	/* settings 0x00 thru 0x04 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x04 all give 1 Coin/1 Credit */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 3C_1C ) )
@@ -400,7 +400,7 @@ static INPUT_PORTS_START( snapjack )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	/* settings 0x00 thru 0x04 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x04 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")	/* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin1_inserted, 0)
@@ -472,7 +472,7 @@ static INPUT_PORTS_START( cavenger )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	/* settings 0x00 thru 0x05 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
@@ -484,7 +484,7 @@ static INPUT_PORTS_START( cavenger )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	/* settings 0x00 thru 0x50 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")	/* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin1_inserted, 0)
@@ -558,7 +558,7 @@ static INPUT_PORTS_START( dorodon )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	/* settings 0x00 thru 0x05 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
@@ -570,7 +570,7 @@ static INPUT_PORTS_START( dorodon )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	/* settings 0x00 thru 0x50 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")	/* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin1_inserted, 0)
@@ -625,7 +625,7 @@ static INPUT_PORTS_START( sraider )
 	/* Free Play setting works when it's set for both */
 	PORT_START("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
-	/* settings 0x00 thru 0x05 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
@@ -638,7 +638,7 @@ static INPUT_PORTS_START( sraider )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
-	/* settings 0x00 thru 0x50 all give 1 Coin/1 Credit */
+	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )

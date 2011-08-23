@@ -36,7 +36,7 @@ work RAM are redirected to CRT:
 0087: 0F         rrc
 0088: 30         sim
 
-$4c00-$4fff part of work RAM is adressed in different way than other blocks. No idea why
+$4c00-$4fff part of work RAM is addressed in different way than other blocks. No idea why
 (this part of the pcb is a bit damaged).
 Gfx decode is strange - may be wrong.
 Gfx rom bank (6d/6b or 6a/6c pair) is switched by timer circuit - few 74161 counters connected to xtal.

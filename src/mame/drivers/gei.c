@@ -1263,7 +1263,7 @@ Sets will be listed by "series" - the program code version
  is not as important as maintaining the correct questions
  sets as per known series
 Missing sets will be filled as dumped, as question roms
- are interchangable, operators did thier own swaps
+ are interchangeable, operators did thier own swaps
 
 Note: Question roms that contain "#1" (or 2 ect)
       are corrected roms (spelling and / or answers)
