@@ -4,6 +4,16 @@
 
     Driver by Manuel Abadia
 
+Games supported:
+
+Year   Game                PCB            NOTES
+-------------------------------------------------------------
+1991   Big Karnak          REF 901112-1   Unprotected
+1992   Squash              REF 922804/1   Encrypted Video RAM
+1992   Thunder Hoop        REF 922804/1   Encrypted Video RAM
+1995   Biomechanical Toy   REF 922804/2   Unprotected
+1996   Maniac Square       REF 922804/2   Prototype
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -658,7 +668,7 @@ ROM_START( bigkarnk ) /* PCB silkscreened REF.901112 */
 	ROM_LOAD( "d1",	0x000000, 0x040000, CRC(26444ad1) SHA1(804101b9bbb6e1b6d43a1e9d91737f9c3b27802a) )
 ROM_END
 
-ROM_START( maniacsp )
+ROM_START( maniacsp ) /* PCB - REF 922804/2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"d18",	0x000000, 0x020000, CRC(740ecab2) SHA1(8d8583364cc6aeea58ea2b9cb9a2aab2a43a44df) )
 	ROM_LOAD16_BYTE(	"d16",	0x000001, 0x020000, CRC(c6c42729) SHA1(1aac9f93d47a4eb57e06e206e9f50e349b1817da) )
@@ -685,10 +695,42 @@ ROM_START( maniacsp )
 ROM_END
 
 
-ROM_START( biomtoy )
+ROM_START( biomtoy ) /* PCB - REF 922804/2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE(	"d18",	0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) )
-	ROM_LOAD16_BYTE(	"d16",	0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) )
+	ROM_LOAD16_BYTE(	"d18",	0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) ) /* v1.0.1885 */
+	ROM_LOAD16_BYTE(	"d16",	0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) ) /* v1.0.1885 */
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	/* weird gfx ordering */
+	ROM_LOAD( "h6",		0x040000, 0x040000, CRC(9416a729) SHA1(425149b3041554579791fc23c09fda6be054e89d) )
+	ROM_CONTINUE(		0x0c0000, 0x040000 )
+	ROM_LOAD( "j6",		0x000000, 0x040000, CRC(e923728b) SHA1(113eac1de73c74ef7c9d3e2e72599a1ff775176d) )
+	ROM_CONTINUE(		0x080000, 0x040000 )
+	ROM_LOAD( "h7",		0x140000, 0x040000, CRC(9c984d7b) SHA1(98d43a9c3fa93c9ea55f41475ecab6ca25713087) )
+	ROM_CONTINUE(		0x1c0000, 0x040000 )
+	ROM_LOAD( "j7",		0x100000, 0x040000, CRC(0e18fac2) SHA1(acb0a3699395a6c68cacdeadda42a785aa4020f5) )
+	ROM_CONTINUE(		0x180000, 0x040000 )
+	ROM_LOAD( "h9",		0x240000, 0x040000, CRC(8c1f6718) SHA1(9377e838ebb1e16d24072b9b4ed278408d7a808f) )
+	ROM_CONTINUE(		0x2c0000, 0x040000 )
+	ROM_LOAD( "j9",		0x200000, 0x040000, CRC(1c93f050) SHA1(fabeffa05dae7a83a199a57022bd318d6ad02c4d) )
+	ROM_CONTINUE(		0x280000, 0x040000 )
+	ROM_LOAD( "h10",	0x340000, 0x040000, CRC(aca1702b) SHA1(6b36b230722270dbfc2f69bd7eb07b9e718db089) )
+	ROM_CONTINUE(		0x3c0000, 0x040000 )
+	ROM_LOAD( "j10",	0x300000, 0x040000, CRC(8e3e96cc) SHA1(761009f3f32b18139e98f20a22c433b6a49d9168) )
+	ROM_CONTINUE(		0x380000, 0x040000 )
+
+	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "c1",	0x000000, 0x080000, CRC(0f02de7e) SHA1(a8779370cc36290616794ff11eb3eebfdea5b1a9) )
+	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	ROM_RELOAD(		0x040000, 0x080000 )
+	ROM_LOAD( "c3",	0x0c0000, 0x080000, CRC(914e4bbc) SHA1(ca82b7481621a119f05992ed093b963da70d748a) )
+ROM_END
+
+
+ROM_START( biomtoya ) /* PCB - REF 922804/2 */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "biomtoya.d18", 0x000000, 0x080000, CRC(39b6cdbd) SHA1(3a22eb2e304d85ecafff677d83c3c4fca3f869d5) ) /* v1.0.1884 */
+	ROM_LOAD16_BYTE( "biomtoya.d16", 0x000001, 0x080000, CRC(ab340671) SHA1(83f708a535048e927fd1c7de85a65282e460f98a) ) /* v1.0.1884 */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* weird gfx ordering */
@@ -765,21 +807,20 @@ Notes:
            SQUASH_SOUND.1D   27C040      Sound
 */
 
-/* encrypted video ram */
 ROM_START( squash )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "squash.d18", 0x000000, 0x20000, CRC(ce7aae96) SHA1(4fe8666ae571bffc5a08fa68346c0623282989eb) )
 	ROM_LOAD16_BYTE( "squash.d16", 0x000001, 0x20000, CRC(8ffaedd7) SHA1(f4aada17ba67dd8b6c5a395e832bcbba2764c59d) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "squash.c09", 0x300000, 0x80000, CRC(0bb91c69) SHA1(8be945049ab411a4d49bd64bd3937542ec9ef9fb) )
-	ROM_RELOAD(		        0x380000, 0x80000 )
-	ROM_LOAD( "squash.c10", 0x200000, 0x80000, CRC(892a035c) SHA1(d0156ceb9aa6639a1124c17fb12389be319bb51f) )
-	ROM_RELOAD(		        0x280000, 0x80000 )
-	ROM_LOAD( "squash.c11", 0x100000, 0x80000, CRC(9e19694d) SHA1(1df4646f3147719fef516a37aa361ae26d9b23a2) )
-	ROM_RELOAD(		        0x180000, 0x80000 )
-	ROM_LOAD( "squash.c12", 0x000000, 0x80000, CRC(5c440645) SHA1(4f2fc1647ffc549fa079f2dc0aaaceb447afdf44) )
-	ROM_RELOAD(		        0x080000, 0x80000 )
+	ROM_LOAD( "squash.c09", 0x300000, 0x80000, CRC(0bb91c69) SHA1(8be945049ab411a4d49bd64bd3937542ec9ef9fb) ) /* encrypted video ram */
+	ROM_RELOAD(		          0x380000, 0x80000 )
+	ROM_LOAD( "squash.c10", 0x200000, 0x80000, CRC(892a035c) SHA1(d0156ceb9aa6639a1124c17fb12389be319bb51f) ) /* encrypted video ram */
+	ROM_RELOAD(		          0x280000, 0x80000 )
+	ROM_LOAD( "squash.c11", 0x100000, 0x80000, CRC(9e19694d) SHA1(1df4646f3147719fef516a37aa361ae26d9b23a2) ) /* encrypted video ram */
+	ROM_RELOAD(		          0x180000, 0x80000 )
+	ROM_LOAD( "squash.c12", 0x000000, 0x80000, CRC(5c440645) SHA1(4f2fc1647ffc549fa079f2dc0aaaceb447afdf44) ) /* encrypted video ram */
+	ROM_RELOAD(		          0x080000, 0x80000 )
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "squash.d01",   0x000000, 0x80000, CRC(a1b9651b) SHA1(a396ba94889f70ea06d6330e3606b0f2497ff6ce) )
@@ -789,26 +830,25 @@ ROM_START( squash )
 ROM_END
 
 
-/* encrypted video ram */
 ROM_START( thoop )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "th18dea1.040", 0x000000, 0x80000, CRC(59bad625) SHA1(28e058b2290bc5f7130b801014d026432f9e7fd5) )
 	ROM_LOAD16_BYTE( "th161eb4.020", 0x000001, 0x40000, CRC(6add61ed) SHA1(0e789d9a0ac19b6143044fbc04ab2227735b2a8f) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "c09", 0x300000, 0x040000, CRC(06f0edbf) SHA1(3cf2e5c29cd00b43d49a106084076f2ac0dbad98) )
+	ROM_LOAD( "c09", 0x300000, 0x040000, CRC(06f0edbf) SHA1(3cf2e5c29cd00b43d49a106084076f2ac0dbad98) ) /* encrypted video ram */
 	ROM_CONTINUE(    0x380000, 0x040000 )
 	ROM_CONTINUE(    0x340000, 0x040000 )
 	ROM_CONTINUE(    0x3c0000, 0x040000 )
-	ROM_LOAD( "c10", 0x200000, 0x040000, CRC(2d227085) SHA1(b224efd59ec83bb786fa92a23ef2d27ed36cab6c) )
+	ROM_LOAD( "c10", 0x200000, 0x040000, CRC(2d227085) SHA1(b224efd59ec83bb786fa92a23ef2d27ed36cab6c) ) /* encrypted video ram */
 	ROM_CONTINUE(    0x280000, 0x040000 )
 	ROM_CONTINUE(    0x240000, 0x040000 )
 	ROM_CONTINUE(    0x2c0000, 0x040000 )
-	ROM_LOAD( "c11", 0x100000, 0x040000, CRC(7403ef7e) SHA1(52a737816e25a07ada070ed3a5f40bbbd22ac8e0) )
+	ROM_LOAD( "c11", 0x100000, 0x040000, CRC(7403ef7e) SHA1(52a737816e25a07ada070ed3a5f40bbbd22ac8e0) ) /* encrypted video ram */
 	ROM_CONTINUE(    0x180000, 0x040000 )
 	ROM_CONTINUE(    0x140000, 0x040000 )
 	ROM_CONTINUE(    0x1c0000, 0x040000 )
-	ROM_LOAD( "c12", 0x000000, 0x040000, CRC(29a5ca36) SHA1(fdcfdefb3b02bfe34781fdd0295640caabe2a5fb) )
+	ROM_LOAD( "c12", 0x000000, 0x040000, CRC(29a5ca36) SHA1(fdcfdefb3b02bfe34781fdd0295640caabe2a5fb) ) /* encrypted video ram */
 	ROM_CONTINUE(    0x080000, 0x040000 )
 	ROM_CONTINUE(    0x040000, 0x040000 )
 	ROM_CONTINUE(    0x0c0000, 0x040000 )
@@ -828,7 +868,8 @@ ROM_END
  *************************************/
 
 GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, 0, ROT0, "Gaelco", "Big Karnak", GAME_SUPPORTS_SAVE )
-GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  0, ROT0, "Gaelco", "Biomechanical Toy (unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)", GAME_SUPPORTS_SAVE )
+GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)", GAME_SUPPORTS_SAVE )
 GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, 0, ROT0, "Gaelco", "Maniac Square (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1992, squash,   0,        squash,   squash,   0, ROT0, "Gaelco", "Squash (Ver. 1.0)", GAME_SUPPORTS_SAVE )
 GAME( 1992, thoop,    0,        thoop,    thoop,    0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1)", GAME_SUPPORTS_SAVE )
