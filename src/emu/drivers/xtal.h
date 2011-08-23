@@ -32,6 +32,10 @@
     tolerance so be sure to reference existing parts only and not just
     accept direct readings as 100% true.
 
+    MAME doesn't yet support fractions in crystal frequencies. For example,
+    XTAL_3_579545MHz should actually be 3579545.454545...Hz (39375000/11).
+    This is no problem though: see above note about tolerance.
+
     (Thanks to Guru for starting this documentation.)
 
 **************************************************************************/
@@ -113,7 +117,7 @@ enum
 	XTAL_13_4952MHz		= 13495200,		/* Used on Shadow Force pcb and maybe other Technos pcbs? */
 	XTAL_14MHz  		= 14000000,
 	XTAL_14_112MHz  	= 14112000,		/* Timex/Sinclair TS2068 */
-	XTAL_14_31818MHz	= 14318180,		/* Extremely common, used on 100's of PCBs */
+	XTAL_14_31818MHz	= 14318181,		/* Extremely common, used on 100's of PCBs */
 	XTAL_14_705882MHz	= 14705882,		/* Aleck64 */
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
 	XTAL_15MHz			= 15000000,		/* Sinclair QL */
@@ -148,7 +152,7 @@ enum
 	XTAL_25_590906MHz	= 25590906,		/* Atari Jaguar NTSC */
 	XTAL_25_593900MHz	= 25593900,		/* Atari Jaguar PAL */
 	XTAL_25_601712MHz	= 25601712,		/* Astro Corp.'s Show Hand */
-	XTAL_26_66666MHz	= 26666660,		/* Irem M92 but most use 27MHz */
+	XTAL_26_66666MHz	= 26666666,		/* Irem M92 but most use 27MHz */
 	XTAL_26_686MHz		= 26686000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_27MHz  		= 27000000,		/* Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
 	XTAL_27_164MHz  	= 27164000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
@@ -156,7 +160,7 @@ enum
 	XTAL_28MHz  		= 28000000,
 	XTAL_28_37516MHz	= 28375160,		/* Amiga PAL systems */
 	XTAL_28_48MHz		= 28480000,		/* Chromatics CGC-7900 */
-	XTAL_28_63636MHz	= 28636360,		/* Later Leland games and Atari GT, Amiga NTSC , Raiden2 h/w */
+	XTAL_28_63636MHz	= 28636363,		/* Later Leland games and Atari GT, Amiga NTSC , Raiden2 h/w */
 	XTAL_30MHz  		= 30000000,		/* Impera Magic Card */
 	XTAL_30_4761MHz 	= 30476100,		/* Taito JC */
 	XTAL_32MHz  		= 32000000,
