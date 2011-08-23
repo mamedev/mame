@@ -57,11 +57,13 @@ extern const pia6821_interface williams_49way_pia_0_intf;
 extern const pia6821_interface williams_49way_muxed_pia_0_intf;
 extern const pia6821_interface williams_pia_1_intf;
 extern const pia6821_interface williams_snd_pia_intf;
+extern const pia6821_interface williams_snd_pia_b_intf;
 
 /* Game-specific old-Williams PIA interfaces */
 extern const pia6821_interface lottofun_pia_0_intf;
 extern const pia6821_interface sinistar_snd_pia_intf;
 extern const pia6821_interface playball_pia_1_intf;
+extern const pia6821_interface blaster_pia_1_intf;
 extern const pia6821_interface spdball_pia_3_intf;
 
 /* Generic later-Williams PIA interfaces */

@@ -19,8 +19,10 @@
 static void williams_main_irq(device_t *device, int state);
 static void williams_main_firq(device_t *device, int state);
 static void williams_snd_irq(device_t *device, int state);
+static void williams_snd_irq_b(device_t *device, int state);
 static WRITE8_DEVICE_HANDLER( williams_snd_cmd_w );
 static WRITE8_DEVICE_HANDLER( playball_snd_cmd_w );
+static WRITE8_DEVICE_HANDLER( blaster_snd_cmd_w );
 
 /* input port mapping */
 static WRITE8_DEVICE_HANDLER( williams_port_select_w );
@@ -100,6 +102,13 @@ const pia6821_interface williams_snd_pia_intf =
 	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
+/* Same as above, but for second sound board */
+const pia6821_interface williams_snd_pia_b_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("wmsdac_b", dac_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq_b), DEVCB_LINE(williams_snd_irq_b)
+};
 
 
 
@@ -130,6 +139,14 @@ const pia6821_interface playball_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(playball_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
+	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
+};
+
+/* Special PIA 1 for Blaster, to support two sound boards */
+const pia6821_interface blaster_pia_1_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(blaster_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
@@ -300,6 +317,15 @@ static void williams_snd_irq(device_t *device, int state)
 
 	/* IRQ to the sound CPU */
 	cputag_set_input_line(device->machine(), "soundcpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+}
+/* Same as above, but for second sound board */
+static void williams_snd_irq_b(device_t *device, int state)
+{
+	pia6821_device *pia_2 = device->machine().device<pia6821_device>("pia_2b");
+	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
+
+	/* IRQ to the sound CPU */
+	cputag_set_input_line(device->machine(), "soundcpu_b", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -546,6 +572,22 @@ WRITE8_DEVICE_HANDLER( williams_snd_cmd_w )
 WRITE8_DEVICE_HANDLER( playball_snd_cmd_w )
 {
 	device->machine().scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data);
+}
+
+static TIMER_CALLBACK( blaster_deferred_snd_cmd_w )
+{
+	pia6821_device *pia_2l = machine.device<pia6821_device>("pia_2");
+	pia6821_device *pia_2r = machine.device<pia6821_device>("pia_2b");
+	UINT8 l_data = param | 0x80;
+	UINT8 r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
+
+	pia_2l->portb_w(l_data); pia_2l->cb1_w((l_data == 0xff) ? 0 : 1);
+	pia_2r->portb_w(r_data); pia_2r->cb1_w((r_data == 0xff) ? 0 : 1);
+}
+
+WRITE8_DEVICE_HANDLER( blaster_snd_cmd_w )
+{
+	device->machine().scheduler().synchronize(FUNC(blaster_deferred_snd_cmd_w), data);
 }
 
 
