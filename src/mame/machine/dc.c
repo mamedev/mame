@@ -9,7 +9,6 @@
 #include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
-#include "includes/naomibd.h"
 #include "includes/naomi.h"
 #include "machine/mie.h"
 
@@ -120,9 +119,8 @@ static TIMER_CALLBACK( pvr_dma_irq )
 	dc_update_interrupt_status(machine);
 }
 
-static TIMER_CALLBACK( gdrom_dma_irq )
+void naomi_g1_irq(running_machine &machine)
 {
-	g1bus_regs[SB_GDST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 	dc_update_interrupt_status(machine);
 }
@@ -501,67 +499,6 @@ WRITE64_HANDLER( dc_gdrom_w )
 	}
 
 	mame_printf_verbose("GDROM: [%08x=%x]write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7000+off*4, dat, data, offset, mem_mask);
-}
-
-READ64_HANDLER( dc_g1_ctrl_r )
-{
-	int reg;
-	UINT64 shift;
-
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
-	mame_printf_verbose("G1CTRL:  Unmapped read %08x\n", 0x5f7400+reg*4);
-	return (UINT64)g1bus_regs[reg] << shift;
-}
-
-WRITE64_HANDLER( dc_g1_ctrl_w )
-{
-	int reg;
-	UINT64 shift;
-	UINT32 old,dat;
-	struct sh4_ddt_dma ddtdata;
-	UINT8 *ROM;
-	UINT32 dmaoffset;
-
-	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
-	old = g1bus_regs[reg];
-
-	g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
-	mame_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
-	switch (reg)
-	{
-	case SB_GDST:
-		g1bus_regs[SB_GDST] = old;
-		if (((old & 1) == 0) && (dat & 1) && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
-		{
-			if (g1bus_regs[SB_GDDIR] == 0)
-			{
-				printf("G1CTRL: unsupported transfer\n");
-				return;
-			}
-			g1bus_regs[SB_GDST] = dat & 1;
-//            printf("Cart DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(&space->device()));
-			ROM = (UINT8 *)naomibd_get_memory(space->machine().device("rom_board"), g1bus_regs[SB_GDLEN]);
-			dmaoffset = naomibd_get_dmaoffset(space->machine().device("rom_board"));
-			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
-			ddtdata.length=g1bus_regs[SB_GDLEN] >> 5;		// words to transfer
-			/* data in the lower 5 bits makes the length size to round by 32 bytes, this'll be needed by Virtua Tennis to boot (according to Deunan) */
-			if(g1bus_regs[SB_GDLEN] & 0x1c)
-				ddtdata.length++;
-
-			ddtdata.size=32;			// bytes per word
-			ddtdata.buffer=ROM+dmaoffset;	// buffer address
-			ddtdata.direction=1;	// 0 source to buffer, 1 buffer to destination
-			ddtdata.channel= -1;	// not used
-			ddtdata.mode= -1;		// copy from/to buffer
-			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
-			sh4_dma_ddt(space->machine().device("maincpu"), &ddtdata);
-			/* Note: KOF Neowave definitely wants this to be delayed (!) */
-			/* FIXME: timing of this */
-			space->machine().scheduler().timer_set(attotime::from_usec(500), FUNC(gdrom_dma_irq));
-		}
-		break;
-	}
 }
 
 READ64_HANDLER( dc_g2_ctrl_r )

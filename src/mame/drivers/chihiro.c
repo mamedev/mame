@@ -362,7 +362,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
-#include "includes/naomibd.h"
+#include "machine/naomigd.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chihirogd, chihiro_base )
-	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", NULL, 512, "picreturn")
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", "gdrom", "picreturn", NULL, "maincpu", NULL)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

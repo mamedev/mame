@@ -44,3 +44,5 @@ extern UINT64 *naomi_ram64;
 
 extern int jvsboard_type;
 extern UINT16 actel_id;
+
+void naomi_g1_irq(running_machine &machine);

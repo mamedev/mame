@@ -39,6 +39,7 @@ void maple_dc_device::register_port(int port, maple_device *device)
 
 void maple_dc_device::device_start()
 {
+	fprintf(stderr, "Device started\n");
 	cpu = machine().device<sh4_device>(maincpu_tag);
 	timer = timer_alloc(0);
 

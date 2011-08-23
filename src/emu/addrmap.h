@@ -804,6 +804,10 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_IMPORT_FROM(_name) \
 	ADDRESS_MAP_NAME(_name)(map, device); \
 
+// importing data from inherited address maps
+#define AM_INHERIT_FROM(_name) \
+	_name(map, device); \
+
 
 // address ranges
 #define AM_RANGE(_start, _end) \

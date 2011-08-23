@@ -401,7 +401,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "includes/naomibd.h"
+#include "machine/naomigd.h"
 
 static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")	/* Program ROM */
@@ -443,7 +443,7 @@ static MACHINE_CONFIG_START( triforce_base, driver_device )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( triforcegd, triforce_base )
-	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", NULL, 256, "picreturn")
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", "gdrom", "picreturn", NULL, "maincpu", NULL)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
