@@ -310,7 +310,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( penky )
 	PORT_START("DSW1")	/* port $2020 */
-	PORT_DIPNAME( 0x03, 0x03, "Time for 1 Player" )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Time" )			PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "0:40" )
 	PORT_DIPSETTING(    0x01, "0:50" )
 	PORT_DIPSETTING(    0x02, "1:00" )
@@ -322,7 +322,7 @@ static INPUT_PORTS_START( penky )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x30, "Fill % to Win" )		PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x30, "Majority at Time Over" )
+	PORT_DIPSETTING(    0x30, "Majority at Time or 99.9%" )
 	PORT_DIPSETTING(    0x20, "Majority at Time or 90%" )
 	PORT_DIPSETTING(    0x10, "Majority at Time or 85%" )
 	PORT_DIPSETTING(    0x00, "Majority at Time or 80%" )
