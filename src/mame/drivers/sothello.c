@@ -57,9 +57,9 @@ public:
 
 #define VDP_MEM             0x40000
 
-#define MAINCPU_CLOCK       (XTAL_21_477MHz/6)
-#define SOUNDCPU_CLOCK      (XTAL_21_477MHz/6)
-#define YM_CLOCK            (XTAL_21_477MHz/12)
+#define MAINCPU_CLOCK       (XTAL_21_4772MHz/6)
+#define SOUNDCPU_CLOCK      (XTAL_21_4772MHz/6)
+#define YM_CLOCK            (XTAL_21_4772MHz/12)
 #define MSM_CLOCK           (XTAL_384kHz)
 #define SUBCPU_CLOCK        (XTAL_8MHz/4)
 
