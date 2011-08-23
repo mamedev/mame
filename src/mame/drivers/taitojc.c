@@ -341,10 +341,9 @@ Notes:
     TODO:
         - dendeg intro object RAM usage has various gfx bugs (check video file)
         - dendeg title screen builds up and it shouldn't
-  		- dendeg/dendeg2 doesn't show the odometer;
+  		- dendeg/dendeg2 doesn't show the odometer (btanb, thanks ANY);
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
-        - All dendeg games have random wrong textures/palettes. (can't see any ... -AS)
 		- dendeg2 shows a debug string during gameplay?
         - Train board (external sound board with OKI6295) is not emulated.
         - dangcurv DSP program crashes very soon, so no 3d is currently shown.

@@ -107,8 +107,10 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	UINT32 address;
 	UINT8 *v;
 	UINT8 color_depth;
+	UINT8 mask_screen;
 
 	color_depth = (w2 & 0x10000) >> 16;
+	mask_screen = (w2 & 0x20000) >> 17;
 
 	address		= (w2 & 0x7fff) * 0x20;
 	if (w2 & 0x4000)
@@ -127,6 +129,8 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	palette		= ((w2 >> 22) & 0x7f) << 8;
 
 	/* TODO: untangle this! */
+	if(address >= 0xff000)
+		v = (UINT8*)&state->m_objlist[(address-0xff000)/4];
 	if(address >= 0xfc000)
 		v = (UINT8*)&state->m_char_ram[(address-0xfc000)/4];
 	else if(address >= 0xf8000)
@@ -177,7 +181,25 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 		y2 = cliprect->max_y;
 	}
 
-	if(!color_depth) // Densya de Go 2/2X "credit text", 4bpp
+	/* this bit seems to set up border at left/right of screen (reads at 0xffc00) */
+	if(mask_screen)
+	{
+		for (j=y1; j < y2; j++)
+		{
+			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+			//int index = (iy * (width / 8)) + ix;
+
+			for (i=x1; i < x2; i++)
+			{
+				d[i] = v[0];
+
+				//index++;
+			}
+
+			//iy++;
+		}
+	}
+	else if(!color_depth) // Densya de Go 2/2X "credit text", 4bpp
 	{
 		for (j=y1; j < y2; j++)
 		{
@@ -216,6 +238,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 				{
 					d[i] = palette + pen;
 				}
+
 				index++;
 			}
 
@@ -277,8 +300,8 @@ static void draw_object_bank(running_machine &machine, bitmap_t *bitmap, const r
 		UINT32 w1 = state->m_objlist[i + 0];
 		UINT32 w2 = state->m_objlist[i + 1];
 
-		if(i < 6) // don't try to draw non-video stuff
-			return;
+		//if(i < 6) // don't try to draw non-video stuff
+		//	return;
 
 		if (((w2 & 0x200000) >> 21) == pri)
 		{
