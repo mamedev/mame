@@ -349,6 +349,7 @@ Notes:
         - dangcurv DSP program crashes very soon, so no 3d is currently shown.
         - add idle skips if possible
 		- dendeg and clones needs output lamps and an artwork for the inputs (helps with the playability);
+		- POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 */
 
 #include "emu.h"
@@ -356,6 +357,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"
+#include "sound/okim6295.h"
 #include "machine/eeprom.h"
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
@@ -387,8 +389,11 @@ static WRITE32_HANDLER( taitojc_palette_w )
 
 static READ32_HANDLER ( jc_control_r )
 {
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 	UINT32 r = 0;
-//  mame_printf_debug("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
+
+	if(ACCESSING_BITS_0_15)
+		printf("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
 	switch(offset)
 	{
 		case 0x0:
@@ -425,9 +430,9 @@ static READ32_HANDLER ( jc_control_r )
 		}
 		case 0x4:
 		{
-			if (ACCESSING_BITS_24_31)
+			if (ACCESSING_BITS_16_31)
 			{
-				//r |= (space->machine().rand() & 0xff) << 24;
+				r |= state->m_outputs << 16;
 			}
 			return r;
 		}
@@ -446,6 +451,18 @@ static READ32_HANDLER ( jc_control_r )
 
 	logerror("jc_control_r: %08X, %08X\n", offset, mem_mask);
 	return 0;
+}
+
+static WRITE32_HANDLER( jc_coin_counters_w )
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+
+	COMBINE_DATA(&state->m_outputs);
+
+	coin_lockout_w(space->machine(), 0, !(data & 0x01000000));
+	coin_lockout_w(space->machine(), 1, !(data & 0x02000000));
+	coin_counter_w(space->machine(), 0, data & 0x04000000);
+	coin_counter_w(space->machine(), 1, data & 0x08000000);
 }
 
 static WRITE32_HANDLER ( jc_control_w )
@@ -580,9 +597,12 @@ static WRITE32_HANDLER(mcu_comm_w)
 	}
 }
 
-static READ32_HANDLER(jc_unknown1_r)
+static READ8_HANDLER(jc_pcbid_r)
 {
-	return 0;
+	static const char pcb_id[0x40] =
+	{ "Needs proper PCB ID here!"};
+
+	return pcb_id[offset];
 }
 
 static READ32_HANDLER(dsp_shared_r)
@@ -838,7 +858,11 @@ static WRITE32_HANDLER(jc_meters_w)
 		state->m_break_meter = data >> 16; //TODO
 
 	if(input_port_read_safe(space->machine(), "METER", 0))
-		popmessage("%f",state->m_speed_meter);
+	{
+		UINT8 mascon_lv = (input_port_read(space->machine(), "MASCON") & 0x70) >> 4;
+
+		popmessage("%d %02f",mascon_lv,state->m_speed_meter);
+	}
 }
 
 static READ32_HANDLER( jc_lan_r )
@@ -853,16 +877,16 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x040f8000, 0x040fbfff) AM_READWRITE(taitojc_tile_r, taitojc_tile_w)
 	AM_RANGE(0x040fc000, 0x040fefff) AM_READWRITE(taitojc_char_r, taitojc_char_w)
 	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_objlist)
-	AM_RANGE(0x05800000, 0x05801fff) AM_READ(jc_unknown1_r)
+	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r,0xffffffff)
 	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
 	//AM_RANGE(0x05a00000, 0x05a01fff)
 	//AM_RANGE(0x05fc0000, 0x05fc3fff)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_BASE_MEMBER(taitojc_state,m_palette_ram)
 	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
 	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog
-	AM_RANGE(0x06600010, 0x06600013) AM_NOP		// unknown
+	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
-	AM_RANGE(0x06800000, 0x06801fff) AM_NOP		// unknown
+	//AM_RANGE(0x06800000, 0x06801fff) AM_NOP		// unknown
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE_MEMBER(taitojc_state,m_f3_shared_ram)
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
 	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE(jc_meters_w)
@@ -882,6 +906,7 @@ static READ8_HANDLER(hc11_comm_r)
 
 static WRITE8_HANDLER(hc11_comm_w)
 {
+
 }
 
 static READ8_HANDLER(hc11_data_r)
@@ -1234,10 +1259,10 @@ static INPUT_PORTS_START( dendeg )
 //	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")		// Mascon 0
 
 	PORT_START("MASCON")
-	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(0x60) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CENTERDELTA(5)
+	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(0x60) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 
 	PORT_START("ANALOG1")		// Brake
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CENTERDELTA(5) PORT_NAME("Brake")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Brake")
 
 	PORT_START("METER")
 	PORT_CONFNAME( 0x01, 0x01, "Show Meters" )
@@ -1393,13 +1418,6 @@ static INTERRUPT_GEN( taitojc_vblank )
 	device_set_input_line_and_vector(device, 2, HOLD_LINE, 130);
 }
 
-#if 0
-static INTERRUPT_GEN( taitojc_int6 )
-{
-//	device_set_input_line(device, 6, HOLD_LINE);
-}
-#endif
-
 static const hc11_config taitojc_config =
 {
 	1, //has extended I/O
@@ -1442,6 +1460,12 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( dendeg, taitojc )
+	MCFG_OKIM6295_ADD("oki", 32000000/32, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 static READ16_HANDLER( taitojc_dsp_idle_skip_r )
@@ -1710,7 +1734,7 @@ ROM_START( dendeg )
 	ROM_LOAD( "e35-11.020",  0x0c00000, 0x200000, CRC(dc8f5e88) SHA1(e311252db8a7232a5325a3eff5c1890d20bd3f8f) )
 	ROM_LOAD( "e35-12.021",  0x0e00000, 0x200000, CRC(039b604c) SHA1(7e394e7cddc6bf42f3834d5331203e8496597a90) )
 
-	ROM_REGION( 0x40000, "user3", 0 )		/* train board, OKI6295 sound samples */
+	ROM_REGION( 0x40000, "oki", 0 )		/* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
@@ -1757,7 +1781,7 @@ ROM_START( dendegx )
 	ROM_LOAD( "e35-11.020",  0x0c00000, 0x200000, CRC(dc8f5e88) SHA1(e311252db8a7232a5325a3eff5c1890d20bd3f8f) )
 	ROM_LOAD( "e35-12.021",  0x0e00000, 0x200000, CRC(039b604c) SHA1(7e394e7cddc6bf42f3834d5331203e8496597a90) )
 
-	ROM_REGION( 0x40000, "user3", 0 )		/* train board, OKI6295 sound samples */
+	ROM_REGION( 0x40000, "oki", 0 )		/* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
@@ -1808,7 +1832,7 @@ ROM_START( dendeg2 )
 	ROM_LOAD( "e52-11.020",  0x0c00000, 0x200000, CRC(1bc22680) SHA1(1f71db88d6df3b4bdf090b77bc83a67906bb31da) )
 	ROM_LOAD( "e52-12.021",  0x0e00000, 0x200000, CRC(a8bb91c5) SHA1(959a9fedb7839e1e4e7658d920bd5da4fd8cae48) )
 
-	ROM_REGION( 0x40000, "user3", 0 )		/* train board, OKI6295 sound samples */
+	ROM_REGION( 0x40000, "oki", 0 )		/* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
@@ -1859,7 +1883,7 @@ ROM_START( dendeg2x )
 	ROM_LOAD( "e52-11.020",  0x0c00000, 0x200000, CRC(1bc22680) SHA1(1f71db88d6df3b4bdf090b77bc83a67906bb31da) )
 	ROM_LOAD( "e52-12.021",  0x0e00000, 0x200000, CRC(a8bb91c5) SHA1(959a9fedb7839e1e4e7658d920bd5da4fd8cae48) )
 
-	ROM_REGION( 0x40000, "user3", 0 )		/* train board, OKI6295 sound samples */
+	ROM_REGION( 0x40000, "oki", 0 )		/* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
@@ -1969,10 +1993,10 @@ ROM_START( dangcurv )
 ROM_END
 
 
-GAME( 1996, dendeg,   0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, dendegx,  dendeg,  taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2,  0,       taitojc, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, dendeg,   0,       dendeg, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, dendegx,  dendeg,  dendeg, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendeg2,  0,       dendeg, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendeg2x, dendeg2, dendeg, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2,  0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2j, sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )

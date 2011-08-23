@@ -59,6 +59,7 @@ public:
 
 	double m_speed_meter;
 	UINT16 m_break_meter;
+	UINT32 m_outputs;
 };
 
 
