@@ -3146,6 +3146,11 @@ ROM_START( m1sirich )
 	ROM_LOAD( "sa4-105.bin", 0x0000, 0x010000, CRC(c1669088) SHA1(96ede015a26d75f2b85d615df0ffbce4a5f9f8d4) )
 ROM_END
 
+ROM_START( m1gskill )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "greekskill.bin", 0x0000, 0x010000, CRC(ac5b7f65) SHA1(9fd73c53173b3291684de3d1067a115e5f78a336) )
+ROM_END
+
 static WRITE8_HANDLER( m1ab_no_oki_w )
 {
 	popmessage("write to OKI, but no OKI rom");
@@ -3299,5 +3304,6 @@ GAME( 199?, m1startr	,0			,m1,m1,m1, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B)",
 GAME( 199?, m1ttcash	,0			,m1,m1,m1, ROT0, "Empire", "Tick Tock Cash (Empire) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m1topstr	,0			,m1,m1,m1, ROT0, "Maygay", "Top Strike (Maygay - Bwb) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m1sirich	,0			,m1,m1,m1, ROT0, "Maygay", "Strike It Rich (Maygay) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m1gskill	,0			,m1,m1,m1, ROT0, "Hitech Amusement", "Greek Skill (Hitech Amusement)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // no idea if this is m1ab but the code starts at 2800
 
 

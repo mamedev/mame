@@ -2977,7 +2977,7 @@ ROM_START( v4psib )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "psi20int", 0x0000, 0x004000, CRC(20ee94b4) SHA1(4c77be34e20a843add2bba23c092fd5bba90bc45) )
 	
-	ROM_REGION( 0x800000, "altvideo", 0 )
+	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD16_BYTE( "psi20p1", 0x000000, 0x010000, CRC(1795fe9c) SHA1(c93e0815d76ab4e55e7659d5c332db9d847a00b0) )
 	ROM_LOAD16_BYTE( "psi20p2", 0x000001, 0x010000, CRC(c1497581) SHA1(f6b64df97d90aa13ed7b5d42608b9014326a880b) )
 	ROM_LOAD16_BYTE( "psi20p3", 0x020000, 0x10000, NO_DUMP )
@@ -3460,6 +3460,10 @@ ROM_START( v4turnov )
 	// seems to be an unmatched 2.2 revision rom
 	ROM_LOAD16_BYTE( "tov2.2p1", 0x0000, 0x010000, CRC(460a5dd0) SHA1(42bc54b0ca206606b980dd80ccf0cbfb3210769d) )
 
+	ROM_LOAD16_BYTE( "to3.p1", 0x0000, 0x010000, CRC(09751994) SHA1(72d4aa40f14411ef8064822de3f5a13bcc84aea3) )
+	ROM_LOAD16_BYTE( "todo.p1", 0x0000, 0x010000, CRC(9111e702) SHA1(fa408e1c8fa56a96ffc3422335f105ef328a6edd) )
+	ROM_LOAD16_BYTE( "too.p1", 0x0000, 0x010000, CRC(919b5207) SHA1(770be6e3b00e666c6f939167d35d43bb2d793e14) )
+
 ROM_END
 
 ROM_START( v4skltrk )
@@ -3467,6 +3471,8 @@ ROM_START( v4skltrk )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
+
+
 	ROM_LOAD16_BYTE( "st.p1",  0x000000, 0x010000,  CRC(d9de47a5) SHA1(625bf40780203293fc34cd8cea8278b4b4a52a75) )
 	ROM_LOAD16_BYTE( "st.p2",  0x000001, 0x010000,  CRC(b62575c2) SHA1(06d75e8a364750663d329650720021279e195236) )
 	ROM_LOAD16_BYTE( "st.p3",  0x020000, 0x010000,  CRC(9506da76) SHA1(6ef28ab8ec1af455be8ecfab20243f0823dca7c1) )
@@ -3480,8 +3486,46 @@ ROM_START( v4skltrk )
 	ROM_LOAD16_BYTE( "st.q7",  0x0a0000, 0x010000,  CRC(f3b8fe7f) SHA1(52d5be3f8cab419103f4727d0fb9d30f34c8f651) )
 	ROM_LOAD16_BYTE( "st.q8",  0x0a0001, 0x010000,  CRC(b85e75a2) SHA1(b7b03b090c0ec6d92e9a25abb7fec0507356bdfc) )
 	ROM_LOAD16_BYTE( "st.q9",  0x0c0000, 0x010000,  CRC(835f6001) SHA1(2cd9084c102d74bcb578c8ea22bbc9ea58f0ceab) )
+	ROM_LOAD16_BYTE( "st.qa",  0x0c0001, 0x010000,  CRC(3fc62a0e) SHA1(0628de4b962d3fcca3757cd4e89b3005c9bfd218) )	
+ROM_END
+
+ROM_START( v4skltrka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "sws.p1",0x000000, 0x010000, CRC(a96f11ea) SHA1(5e5c548e96674f8f98c1c4eb0a590979371f6f10) )
+	ROM_LOAD16_BYTE( "sw.p2", 0x000001, 0x010000, CRC(2598ba38) SHA1(30509bd2f987949bb423600e13a464edaa7f9ce5) )
+	ROM_LOAD16_BYTE( "sw.p3", 0x020000, 0x010000, CRC(1290cef3) SHA1(5cf63940c164becf64902846aa4fd5bc628f9ebe) )
+	ROM_LOAD16_BYTE( "sw.p4", 0x020001, 0x010000, CRC(176f23c3) SHA1(e64460818329f23e449f65781e3dc56d3a1710a3) )
+	ROM_LOAD16_BYTE( "st.q1",  0x040000, 0x010000,  CRC(4faca475) SHA1(69b498c543600b8e37ab0ed1863ba57845648f3c) )
+	ROM_LOAD16_BYTE( "st.q2",  0x040001, 0x010000,  CRC(9f2c5938) SHA1(85527c4c0b7a1e66576d56607d89750fab082580) )
+	ROM_LOAD16_BYTE( "st.q3",  0x060000, 0x010000,  CRC(6b6cb194) SHA1(aeac5dcc0827c17e758e3e821ae8a78a3a16ddce) )
+	ROM_LOAD16_BYTE( "st.q4",  0x060001, 0x010000,  CRC(ec57bc17) SHA1(d9f522739dbb190fb941ca654299bbedbb8fb703) )
+	ROM_LOAD16_BYTE( "st.q5",  0x080000, 0x010000,  CRC(7740a88b) SHA1(d9a683d3e0d6c1b4b59520f90f825124b7a61168) )
+	ROM_LOAD16_BYTE( "st.q6",  0x080001, 0x010000,  CRC(95e97796) SHA1(f1a8de0ad02aca31f79a4fe8ba5044546163e3c4) )
+	ROM_LOAD16_BYTE( "st.q7",  0x0a0000, 0x010000,  CRC(f3b8fe7f) SHA1(52d5be3f8cab419103f4727d0fb9d30f34c8f651) )
+	ROM_LOAD16_BYTE( "st.q8",  0x0a0001, 0x010000,  CRC(b85e75a2) SHA1(b7b03b090c0ec6d92e9a25abb7fec0507356bdfc) )
+	ROM_LOAD16_BYTE( "st.q9",  0x0c0000, 0x010000,  CRC(835f6001) SHA1(2cd9084c102d74bcb578c8ea22bbc9ea58f0ceab) )
 	ROM_LOAD16_BYTE( "st.qa",  0x0c0001, 0x010000,  CRC(3fc62a0e) SHA1(0628de4b962d3fcca3757cd4e89b3005c9bfd218) )
 ROM_END
+
+
+ROM_START( v4sklcsh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "scs.p1", 0x000000, 0x010000, CRC(3181524e) SHA1(e801a036b9d509d8e2e5f7c9c6ccd9d9ddf76b2f) )
+	ROM_LOAD16_BYTE( "scs.p2", 0x000001, 0x010000, CRC(a7596804) SHA1(f27fc3ee7a17904ea08baa421e14d02226428c42) )
+	ROM_LOAD16_BYTE( "scs.p3", 0x020000, 0x010000, CRC(b3ded2bc) SHA1(39cb15fde4aea1187668120d548bfe022835b600) )
+	ROM_LOAD16_BYTE( "scs.p4", 0x020001, 0x010000, CRC(2ce2e9d1) SHA1(c492fea2e179796a360131c19a9cba5bbfe3c7fd) )	
+
+	/* missing questions */	
+ROM_END
+
+
+
 
 ROM_START( v4time )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4730,7 +4774,9 @@ GAMEL( 1994,v4cmaze3c,	v4cmaze3,	crmaze,		crmaze,		v4cmazeb,	ROT0, "Barcrest","T
 
 GAME(  199?,v4turnov,	v4bios,		mpu4_vid,	turnover,	turnover,	ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_NOT_WORKING )
 
-GAME(  1990,v4skltrk,	v4bios,		mpu4_vid,	skiltrek,	skiltrek,	ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video)",GAME_NOT_WORKING )
+GAME(  1990,v4skltrk,	v4bios,		mpu4_vid,	skiltrek,	skiltrek,	ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_NOT_WORKING ) // 10 pound max
+GAME(  1990,v4skltrka,	v4skltrk,	mpu4_vid,	skiltrek,	skiltrek,	ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_NOT_WORKING ) // 12 pound max
+GAME(  1990,v4sklcsh,	v4bios,		mpu4_vid,	skiltrek,	v4barqst,	ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_NOT_WORKING )
 
 GAME(  1989,v4addlad,	v4bios,		mpu4_vid,	adders,		adders,		ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_NOT_WORKING )
 GAME(  1989,v4addlad20,	v4addlad,	mpu4_vid,	adders,		adders,		ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_NOT_WORKING )

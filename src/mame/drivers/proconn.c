@@ -508,6 +508,7 @@ ROM_START( pr_megmn )
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "mega money.bin", 0x0000, 0x010000, CRC(16b42417) SHA1(dfa49f973dfeda40c6d2a26a26f7e588832c23c3) )
 	ROM_LOAD( "mm05.bin", 0x0000, 0x008000, CRC(93b9b992) SHA1(7a93444d004f01b9205f3105e4ea06e48e6f5ec4) )
+	ROM_LOAD( "954p206n.066 (labelled - mm pro).bin", 0x0000, 0x008000, CRC(9162f89b) SHA1(8134eaff3211a2423794875ebdb25c5412b54e96) )
 ROM_END
 
 ROM_START( pr_nudxs )
@@ -645,6 +646,8 @@ ROM_START( pr_upnun )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "up&underprojectcoin.bin", 0x0000, 0x010000, CRC(053a394f) SHA1(8d7e55092dfba2ce49ee009ed388be027be2ff28) )
 ROM_END
+
+
 
 
 

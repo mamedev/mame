@@ -845,9 +845,35 @@ ROM_START( monopoly )
 	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
 	ROM_LOAD16_BYTE( "6671.bin", 0x200001, 0x80000, CRC(b2a3cedd) SHA1(e3a5dd028b0769e08a796a96665b31491c3b18ca) )
 
+
+
+	ROM_REGION( 0x300000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "7400.bin", 0x00001, 0x080000, CRC(d6f1f98c) SHA1(f20c788a31a8fe339aed701866180a3eb16fafb9) )
+
+	// this version doesn't work too well, missing other roms, or just bad?
+	ROM_LOAD16_BYTE( "monov3p1", 0x00000, 0x080000, CRC(a66fc610) SHA1(fddd3b37a6aebf5c402942d26a2fa1fa130326dd) )
+	ROM_LOAD16_BYTE( "monov3p2", 0x00001, 0x080000, CRC(2d629723) SHA1(c5584113e50dc5f636dbcf80e4689d2bbfe98e71) )
+	// mismastched?
+	ROM_LOAD16_BYTE( "monov4p2", 0x00001, 0x080000, CRC(3c2dd9b7) SHA1(01c87584b3599763a0c37040199014c2902dc6f3) )
+
+
 	ROM_REGION( 0x80000, "upd7759", 0 )
-	ROM_LOAD16_BYTE( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
+	ROM_LOAD( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
 ROM_END
+
+ROM_START( monopolya )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mono4e1",  0x000000, 0x80000, CRC(0338b165) SHA1(fdc0fcf0fddcf88d593a22885779e8224484e7e4) )
+	ROM_LOAD16_BYTE( "mono4e2",  0x000001, 0x80000, CRC(c8aa21d8) SHA1(257ecf85e1d41b15bb2bbe2157e9d3f72b7e0317) )
+	ROM_LOAD16_BYTE( "6668.bin", 0x100000, 0x80000, CRC(30bf082a) SHA1(29ba67a86e82f0eb4feb816a2031d62028eb11b0) )
+	ROM_LOAD16_BYTE( "6669.bin", 0x100001, 0x80000, CRC(85d38c2d) SHA1(2f1a394df243e5fbbad31507b9074c997c473106) )
+	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
+	ROM_LOAD16_BYTE( "6671.bin", 0x200001, 0x80000, CRC(b2a3cedd) SHA1(e3a5dd028b0769e08a796a96665b31491c3b18ca) )
+
+	ROM_REGION( 0x80000, "upd7759", 0 )
+	ROM_LOAD( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
+ROM_END
+
 
 ROM_START( monoplcl )
 	ROM_REGION( 0x300000, "maincpu", 0 )
@@ -858,8 +884,17 @@ ROM_START( monoplcl )
 	ROM_LOAD16_BYTE( "6670.bin", 0x200000, 0x80000, CRC(66e2a5e1) SHA1(04d4b55d6ad121cdc3592d33e9d953affa24f01a) )
 	ROM_LOAD16_BYTE( "6671.bin", 0x200001, 0x80000, CRC(b2a3cedd) SHA1(e3a5dd028b0769e08a796a96665b31491c3b18ca) )
 
+	ROM_REGION( 0x300000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "7403.bin", 0x000001, 0x080000, CRC(95dbacb6) SHA1(bd551ccad95440a669a547092ab126178b0d0bf9) )
+
+	ROM_LOAD( "mdlxv1p1", 0x0000, 0x080000, CRC(48ab1691) SHA1(6df2aad02548d5239e3974a11228bc9aad8c9170) )
+	ROM_LOAD( "mdlxv1p2", 0x0000, 0x080000, CRC(107c3e65) SHA1(e298b3a2826f92ba6119348a36bc4735e1799797) )
+	/* p3 missing? */
+	ROM_LOAD( "mdlxv1p4", 0x0000, 0x080000, CRC(e3fd1a27) SHA1(6bba70ff27a6d068febcbdfa1b1f8ff2ef86ef03) )
+
+
 	ROM_REGION( 0x80000, "upd7759", 0 )
-	ROM_LOAD16_BYTE( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
+	ROM_LOAD( "6538.bin", 0x00000, 0x40000, CRC(ccdd4ce3) SHA1(dbb24682cea8081a447ca2c53395964fc46e7f56) )
 ROM_END
 
 ROM_START( monopldx )
@@ -871,8 +906,12 @@ ROM_START( monopldx )
 	ROM_LOAD16_BYTE( "6881.bin", 0x200000, 0x80000, CRC(8418ee17) SHA1(5666b90db00d9e88a37655bb9a714f076e2689d6) )
 	ROM_LOAD16_BYTE( "6882.bin", 0x200001, 0x80000, CRC(400f5fb4) SHA1(80b1d3902fc9f6db24f49055b07bc31c0c74a993) )
 
+	ROM_REGION( 0x300000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "8441.bin", 0x000001, 0x080000, CRC(d0825af4) SHA1(a7291806893c42a115763e404337976b8c30e9e0) ) // 1 byte change from 8440 (doesn't boot, but might want additional hw)
+
+
 	ROM_REGION( 0x80000, "upd7759", 0 )
-	ROM_LOAD16_BYTE( "modl-snd.bin", 0x000000, 0x80000, CRC(f761da41) SHA1(a07d1b4cb7ce7a24b6fb84843543b95c3aec470f) )
+	ROM_LOAD( "modl-snd.bin", 0x000000, 0x80000, CRC(f761da41) SHA1(a07d1b4cb7ce7a24b6fb84843543b95c3aec470f) )
 ROM_END
 
 
@@ -883,6 +922,7 @@ ROM_START( cashcade )
 	ROM_LOAD16_BYTE( "cashcade_2_3.bin", 0x020000, 0x010000, CRC(a4caddd1) SHA1(074e4aa870c3d28c2f120936ef6928c3b5e14301) )
 	ROM_LOAD16_BYTE( "cashcade_2_4.bin", 0x020001, 0x010000, CRC(b0f595e8) SHA1(5ca12839b87d092504d8b7cc579b8f1b2406cea1) )
 ROM_END
+
 
 
 
@@ -2253,7 +2293,8 @@ ROM_END
 
 
 /* Video based titles */
-GAME( 1994, monopoly	, 0			, jpmsys5v, monopoly, 0, ROT0, "JPM", "Monopoly (Jpm) (SYSTEM5 VIDEO)",         0 )
+GAME( 1994, monopoly	, 0			, jpmsys5v, monopoly, 0, ROT0, "JPM", "Monopoly (Jpm) (SYSTEM5 VIDEO, set 1)",         0 )
+GAME( 1994, monopolya	, monopoly	, jpmsys5v, monopoly, 0, ROT0, "JPM", "Monopoly (Jpm) (SYSTEM5 VIDEO, set 2)",         0 )
 GAME( 1995, monoplcl	, monopoly	, jpmsys5v, monopoly, 0, ROT0, "JPM", "Monopoly Classic (Jpm) (SYSTEM5 VIDEO)", 0 )
 GAME( 1995, monopldx	, 0			, jpmsys5v, monopoly, 0, ROT0, "JPM", "Monopoly Deluxe (Jpm) (SYSTEM5 VIDEO)",  0 )
 GAME( 199?, cashcade	, 0			, jpmsys5v, monopoly, 0, ROT0, "JPM", "Cashcade (Jpm) (SYSTEM5 VIDEO)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND ) // shows a loading error.. is the set incomplete?

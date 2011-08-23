@@ -500,6 +500,16 @@ ROM_START( sp_tz )
 	ROM_LOAD( "tz576p4i", 0x0000, 0x008000, CRC(aa591f7a) SHA1(3f491677d6725e7bbb76d735a7e7ca4c157edfd7) )
 ROM_END
 
+ROM_START( sp_tzbwb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "tz_x6s__.2_2", 0x0000, 0x8000, CRC(303e40ac) SHA1(fa8f6f33c142909b8d407533768d79157fbe67cd) ) // overdump?
+	ROM_IGNORE(0x8000)
+	ROM_LOAD( "tz______.2_1", 0x8000, 0x8000, CRC(8f6f5895) SHA1(8caedfd10b20cc7885893d07aeef8ff317bd7e40) ) // overdump?
+	ROM_IGNORE(0x8000)
+ROM_END
+
+
+
 ROM_START( sp_tzfe )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "tz679d8b", 0x0000, 0x008000, CRC(b5f66994) SHA1(869a6a4c784a320b17d6552032e45d170af0e95f) )
@@ -542,6 +552,8 @@ ROM_START( sp_tzfe )
 	ROM_REGION( 0x100000, "oki", 0 ) // from the filename and size I'm going to guess this isn't genuine
 	ROM_LOAD( "tzfe_hacksound.bin", 0x0000, 0x05ea7c, CRC(e333e740) SHA1(332106987943d3043902887a0f4b2aea75d3fb04) )
 ROM_END
+
+
 
 
 
@@ -1192,6 +1204,21 @@ ROM_START( sp_five )
 	ROM_LOAD( "fn19p.bin", 0x0000, 0x010000, CRC(ac2de72f) SHA1(61263944fe29b5f5c79c987989a784b32700c902) )
 ROM_END
 
+ROM_START( sp_carry )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "carry on 10p payout p2.bin", 0x0000, 0x8000, CRC(1db4062c) SHA1(92098a145c9cdf04758b92998dd4fca7945cf991) )
+	ROM_LOAD( "carry on p1.bin", 0x8000, 0x8000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) )
+//	ROM_LOAD( "carry on v6 p1.bin", 0x0000, 0x008000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "carry on 20p payout p2.bin", 0x0000, 0x008000, CRC(ae1b2c66) SHA1(47a17c5178520d7ed6bc3aaaef111e8188d9a6b0) )
+ROM_END
+
+ROM_START( sp_front )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bwb_final_frontier_p2.bin", 0x0000, 0x008000, CRC(f5a963d8) SHA1(433ffe6e45ef92dd15f3fd7942567b21ec064c78) )
+	ROM_LOAD( "bwb_final_frontier_p1.bin", 0x8000, 0x008000, CRC(2e835304) SHA1(ebc8286c70c286a8f4aa196e996540790742917e) )
+ROM_END
 
 
 // mpu4.c
@@ -1225,6 +1252,7 @@ GAME( 199?, sp_spell		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbound (Ac
 GAME( 199?, sp_swop			,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Swop Shop (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sp_timem		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Time Machine (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sp_tz			,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Twilight Zone (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, sp_tzbwb		,sp_tz		,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Twilight Zone (Ace/Bwb?) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // set marked as Bwb
 GAME( 199?, sp_tzfe			,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Twilight Zone - Further Encounters (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 // these look like sp.ACE roms too
 GAME( 199?, sp_beau			,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Beau Peep (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -1262,6 +1290,11 @@ GAME( 199?, sp_skylm		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Sky's The Limi
 GAME( 199?, sp_tkpik		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Take Your Pick (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sp_woolp		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Woolpack (Emmerdale?) (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // roms all contain Emmerdale strings??
 GAME( 199?, sp_zigzg		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Zig Zag (Emmerdale?) (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // roms all contain Emmerdale strings??
+
+GAME( 199?, sp_carry		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Pcp", "Carry On (Pcp) (sp.ACE?)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // not sure.. looks like 6303 code to me
+GAME( 199?, sp_front		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Bwb", "Final Frontier (Bwb) (sp.ACE?)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // not sure.. looks like 6303 code to me
+
+
 
 // I'm not 100% sure if these are Space hardware.. but they seem to be 6303 code at least
 GAME(199?, sp_atw	,0			,ace_sp	,ace_sp		,ace_sp,	ROT0,   "Crystal","Around The World In Eighty Days (Crystal) (sp.ACE?)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

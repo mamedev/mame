@@ -9497,9 +9497,11 @@ j5sizl		// Sizzling (Jpm)
 // JPM System 5 + Video Expansion 2
 
 monopoly	// Monopoly (Jpm)
+monopolya	// Monopoly (Jpm)
 monoplcl	// Monopoly Classic (Jpm)
 monopldx	// Monopoly Deluxe (Jpm)
 cashcade	// Cashcade (Jpm)
+
 
 // JPM Impact
 
@@ -9687,7 +9689,8 @@ j6bmc		// Big Money Club (Crystal)
 j6bno		// Big Nite Out (Crystal)
 j6btbw		// Born To Be Wild Club (Crystal)
 j6cpal		// Caesar's Palace (Crystal)
-j6cpala		// Caesar's Palace (Ace)
+j6cpala		// Caesar's Palace (Crystal)
+j6cpalb		// Caesar's Palace (Ace)
 j6cdivr		// Cash Diver (Crystal)
 j6ccc		// Casino Crazy Club (Crystal)
 j6colic		// Coliseum (Crystal)
@@ -9713,6 +9716,7 @@ j6sl		// Snakes & Ladders (Crystal)
 j6sla		// Snakes & Ladders Slides Again (Crystal)
 j6thril		// Thriller (Crystal)
 j6tqust		// Treasure Quest (Crystal)
+j6milln		// Millionaire / Who Wants To Be A Millionaire (Jpm)?
 
 // JPM Impact + Video Board
 cluedo			// (c) 1995
@@ -11627,7 +11631,8 @@ gldncrwn		// 1997
 c3_rtime		// Radio Times
 c3_telly		// Telly Addicts
 c3_totp			// Top of the Pops
-
+c3_ppays		// The Phrase That Pays
+	
 // Scorpion 4 (& 5 & Adder 5)
 
 sc4tst			// Scorpion 4 Test Rig (Bellfruit)
@@ -12398,6 +12403,7 @@ m1startr	// Star Trekking (Mdm)
 m1ttcash	// Tick Tock Cash (Empire) 
 m1topstr	// Top Strike (Maygay - Bwb) 
 m1sirich	// Strike It Rich
+m1gskill	// Greek Skill
 
 // Maygay MV1 hardware
 
@@ -13121,7 +13127,6 @@ m4ticgld	// Tic Tac Toe Gold (Bwb)
 m4ticglc	// Tic Tac Toe Gold Classic (Bwb)
 m4topdog	// Top Dog (Bwb)
 m4trex		// Trex (Bwb)
-m4twzone	// Twilight Zone (Bwb)
 m4volcan	// Volcano (Bwb)
 m4vdexpr	// Voodoo Express (Bwb)
 m4xch		// X-change (Bwb)
@@ -13478,6 +13483,8 @@ v4cmaze3b	//
 v4cmaze3c	//
 v4turnov	// Turnover
 v4skltrk	// Skill Trek
+v4skltrka	//
+v4sklcsh	// Skill Cash
 v4addlad	// Adders and Ladders
 v4addlad20	//
 v4time		// Time Machine
@@ -13943,6 +13950,7 @@ sp_spell		// Spellbound (Ace)
 sp_swop			// Swop Shop (Ace)
 sp_timem		// Time Machine (Ace)
 sp_tz			// Twilight Zone (Ace)
+sp_tzbwb		//
 sp_tzfe			// Twilight Zone - Further Encounters (Ace)
 sp_beau			//Beau Peep (Ace)
 sp_bigbd		//Big Break Deluxe Club (Ace)
@@ -13983,6 +13991,8 @@ sp_cw			//Crime Watch (Ace)
 sp_atw
 sp_five
 sp_crun
+sp_carry
+sp_front
 
 // Unknown PCP
 

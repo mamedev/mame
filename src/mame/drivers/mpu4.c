@@ -11213,14 +11213,6 @@ ROM_END
 
 
 
-ROM_START( m4twzone )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tz_x6s__.2_2", 0x0000, 0x010000, CRC(303e40ac) SHA1(fa8f6f33c142909b8d407533768d79157fbe67cd) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "tz______.2_1", 0x0000, 0x010000, CRC(8f6f5895) SHA1(8caedfd10b20cc7885893d07aeef8ff317bd7e40) )
-ROM_END
-
 
 
 
@@ -13896,6 +13888,10 @@ ROM_START( m4cfinln )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cfd_7_1.bin", 0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945) )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	// 'Jackpot Version'
+	ROM_LOAD( "cfd_d0.bin", 0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef) )	
 ROM_END
 
 
@@ -14747,7 +14743,6 @@ GAME(199?, m4ticgld	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac 
 GAME(199?, m4ticglc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe Gold Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4topdog	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Top Dog (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4trex	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Trex (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4twzone	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Twilight Zone (Bwb) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // wrong hw? (is this the ACE game mislabeled?)
 GAME(199?, m4volcan	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Volcano (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4vdexpr	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Voodoo Express (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4xch	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-change (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
