@@ -341,7 +341,7 @@ Notes:
     TODO:
         - dendeg intro object RAM usage has various gfx bugs (check video file)
         - dendeg title screen builds up and it shouldn't
-        - dendeg doesn't show credit display
+  		- dendeg/dendeg2 doesn't show the odometer;
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
         - All dendeg games have random wrong textures/palettes. (can't see any ... -AS)

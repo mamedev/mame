@@ -97,7 +97,7 @@ WRITE32_HANDLER(taitojc_char_w)
 
 */
 
-static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 w1, UINT32 w2)
+static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 	int x, y, width, height, palette;
@@ -126,9 +126,19 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	height		= ((w1 >> 26) & 0x3f) * 16;
 	palette		= ((w2 >> 22) & 0x7f) << 8;
 
-	v = (UINT8*)&state->m_vram[address/4];
+	/* TODO: untangle this! */
+	if(address >= 0xfc000)
+		v = (UINT8*)&state->m_char_ram[(address-0xfc000)/4];
+	else if(address >= 0xf8000)
+		v = (UINT8*)&state->m_tile_ram[(address-0xf8000)/4];
+	else
+		v = (UINT8*)&state->m_vram[address/4];
 
-	if (address >= 0xf8000 || width == 0 || height == 0)
+	/* guess, but it's probably doable via a vreg ... */
+	if ((width == 0 || height == 0) && bank_type == 2)
+		width = height = 16;
+
+	if(width == 0 || height == 0)
 		return;
 
 	x1 = x;
@@ -254,12 +264,33 @@ VIDEO_START( taitojc )
 	state->m_zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
+static void draw_object_bank(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 bank_type, UINT8 pri)
+{
+	taitojc_state *state = machine.driver_data<taitojc_state>();
+	UINT16 start_offs;
+	int i;
+
+	start_offs = ((bank_type+1)*0x400)/4;
+
+	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
+	{
+		UINT32 w1 = state->m_objlist[i + 0];
+		UINT32 w2 = state->m_objlist[i + 1];
+
+		if(i < 6) // don't try to draw non-video stuff
+			return;
+
+		if (((w2 & 0x200000) >> 21) == pri)
+		{
+			draw_object(machine, bitmap, cliprect, w1, w2, bank_type);
+		}
+	}
+}
+
 //static int tick = 0;
 SCREEN_UPDATE( taitojc )
 {
 	taitojc_state *state = screen->machine().driver_data<taitojc_state>();
-	int i;
-	UINT16 start_offs;
 
 #if 0
     tick++;
@@ -278,37 +309,19 @@ SCREEN_UPDATE( taitojc )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	start_offs = state->m_objlist[0xfc4/4] & 0x2000 ? (0x800/4) : (0x400/4);
-
 	/* 0xf000 used on Densya de Go disclaimer screen(s) (disable object RAM?) */
 	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
 		popmessage("%08x, contact MAMEdev",state->m_objlist[0xfc4/4]);
 
 	//popmessage("%08x %08x %08x %08x",state->m_objlist[0xd20/4],state->m_objlist[0xd24/4],state->m_objlist[0xd28/4],state->m_objlist[0xd2c/4]);
 
-	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
-	{
-		UINT32 w1 = state->m_objlist[i + 0];
-		UINT32 w2 = state->m_objlist[i + 1];
-
-		if ((w2 & 0x200000) == 0)
-		{
-			draw_object(screen->machine(), bitmap, cliprect, w1, w2);
-		}
-	}
+	draw_object_bank(screen->machine(), bitmap, cliprect, ((state->m_objlist[0xfc4/4] & 0x2000) >> 13), 0);
+	draw_object_bank(screen->machine(), bitmap, cliprect, 2, 0);
 
 	copybitmap_trans(bitmap, state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
-	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
-	{
-		UINT32 w1 = state->m_objlist[i + 0];
-		UINT32 w2 = state->m_objlist[i + 1];
-
-		if ((w2 & 0x200000) != 0)
-		{
-			draw_object(screen->machine(), bitmap, cliprect, w1, w2);
-		}
-	}
+	draw_object_bank(screen->machine(), bitmap, cliprect, ((state->m_objlist[0xfc4/4] & 0x2000) >> 13), 1);
+	draw_object_bank(screen->machine(), bitmap, cliprect, 2, 1);
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0,0);
 
