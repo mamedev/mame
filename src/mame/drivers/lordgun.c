@@ -861,7 +861,7 @@ DIP Switch-1 (4 Position DIP)
        Ranking        | Exciting |       |off|   |
       Background      |  Tender  |       |on |   |
 --------------------------------------------------
-      Coin Slots      | separate |           |off|
+      Coin Slots      | Separate |           |off|
                       |  Common  |           |on |
 --------------------------------------------------
      Settings Upon Shipping      |off|off|off|off|

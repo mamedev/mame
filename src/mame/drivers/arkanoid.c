@@ -484,7 +484,7 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
     so if you insert too many coins, it can be reset to 0 !
   - Routines :
       * 0x56e3 : Play sound (input : register A) - to be confirmed !
-  - addresses :
+  - Addresses :
       * 0xc52b : credits
       * 0xc541 : ~(IN5) - test for coins "buttons" (code at 0x0232)
       * 0xc516 : ~(IN5)

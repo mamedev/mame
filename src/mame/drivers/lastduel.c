@@ -69,7 +69,7 @@ Notes:
                       LS-07    - 27C512 EPROM (DIP28)
                       LS-08    - 27C256 EPROM (DIP28)
                       LS-05/06 - 128kx8 mask ROM (DIP28)
-                      LS-01 through 04 - 27C1000 EPROM (DIP32)
+                      LS-01-04 - 27C1000 EPROM (DIP32)
       Measurements  -
                       VSync 57.4444Hz
                       HSync 15.1432kHz

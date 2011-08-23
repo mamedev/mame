@@ -132,7 +132,7 @@ Notes:
       H     - 12 pin connector for power input
       J     - 15 pin connector
       G     - 22-way edge connector
-      B31-12 through B31-17 - PALs
+      B31-12 to B31-17 - PALs
 
 
 K9100162A
@@ -174,8 +174,8 @@ OBJECT BOARD
 |                  MB81461 MB81461 MB81461 MB81461             |
 |--------------------------------------------------------------|
 Notes:
-      B31-04 through 06 - 234000 mask ROM (DIP40)
-      B31-18 through 24 - PALs
+      B31-04 to 06   - 234000 mask ROM (DIP40)
+      B31-18 to 24   - PALs
       MB81461        - 64kx4 dual-port DRAM (ZIP24)
       TMM2064        - 8kx8 SRAM (DIP28)
 

@@ -62,7 +62,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - 0xff7e16.b to 0xff7e19.b = ??? (range 0x30-0x33 * 3 + 0x00) - MSDigit first - see below
   - 0xff7e21.b = difficulty (range 0x00-0x02) - see below
 
-2) addresses notes
+2) Addresses notes
 
   - I can't tell what addresses 0xff7r12.l and 0xff7e16.l are supposed to be designed for :
     they are written once at the beginning of each level (code at 0x1a9030) but I haven't found

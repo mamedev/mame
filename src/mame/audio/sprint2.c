@@ -118,7 +118,7 @@ DISCRETE_SOUND_START(sprint2)
 	/* with the input frequency set by the MotorSND */
 	/* latch (4 bit). This freqency is then used to */
 	/* drive three counters, that are summed up     */
-	/* and are output through a DAC                    */
+	/* and are output through a DAC                 */
 	/************************************************/
 
 	DISCRETE_ADJUSTMENT(NODE_20,
@@ -241,7 +241,7 @@ DISCRETE_SOUND_START(sprint1)
 	/* with the input frequency set by the MotorSND */
 	/* latch (4 bit). This freqency is then used to */
 	/* drive three counters, that are summed up     */
-	/* and are output through a DAC                    */
+	/* and are output through a DAC                 */
 	/************************************************/
 
 	DISCRETE_ADJUSTMENT(NODE_20,

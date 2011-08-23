@@ -189,7 +189,7 @@ Model No. S2000C SALTIRE
 +-+          |  VGA  |           H3                  |
   +----------+-------+-------------------------------+
 
-basically the same as the VCG-1 SALTIRE below, but the
+Basically the same as the VCG-1 SALTIRE below, but the
 XILINX chip is socketted and no H1 or H2 connector.
 
 ------------------------------------------------------------

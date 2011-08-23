@@ -12,7 +12,7 @@
 
   Convert the color PROMs into a more useable format.
 
-  Break through has one 256x8 and one 256x4 palette PROMs.
+  Break Thru has one 256x8 and one 256x4 palette PROMs.
   I don't know for sure how the palette PROMs are connected to the RGB
   output, but it's probably the usual:
 

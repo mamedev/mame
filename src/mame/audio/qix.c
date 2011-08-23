@@ -61,7 +61,7 @@ static DISCRETE_SOUND_START(qix)
 	DISCRETE_INPUTX_DATA(QIX_DAC_DATA, 128, -128*128, 128)
 	DISCRETE_INPUT_DATA (QIX_VOL_DATA)
 
-	/* separate the two 4-bit channels. */
+	/* Separate the two 4-bit channels. */
 	DISCRETE_TRANSFORM3(QIX_VOL_DATA_L, QIX_VOL_DATA, 16, 0x0f, "01/2&")
 	DISCRETE_TRANSFORM2(QIX_VOL_DATA_R, QIX_VOL_DATA, 0x0f, "01&")
 

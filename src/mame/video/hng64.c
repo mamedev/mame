@@ -310,7 +310,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			pal&=0xf;
 		}
 
-		// accommodate for chaining and flipping
+		// Accommodate for chaining and flipping
 		if(xflip)
 		{
 			xinc=-(int)(16.0f*foomX);

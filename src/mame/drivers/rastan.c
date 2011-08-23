@@ -135,7 +135,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Game name : "RASTAN SAGA"
   - Notice screen
   - In "demo mode", you get no scrolling screen with what the various items do
-  - beginning screen when you start a new game
+  - Beginning screen when you start a new game
   - Different messages between levels
   - Message after beating level 6 boss
   - Copyright message on scrolling credits screen

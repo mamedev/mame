@@ -116,18 +116,18 @@ Notes:
             JP9 -       64M O O-O 32M&16M
            JP10 -   64M&32M O-O O 16M
            JP11 -       64M O O-O 32M&16M
-           JP12 -      through O-O O SP
-           JP13 -      through O-O O SP
+           JP12 -   through O-O O SP
+           JP13 -   through O-O O SP
            JP14 -       WDT O O
            JP15 -      MONO O-O O SURR
            JP16 -      HIGH O O O MID (N/C LOW)
-   CN1 through CN3 - D-SUB Connectors
+    CN1 to  CN3 - D-SUB Connectors
             CN4 - Multi-pin Connector for Network PCB
             CN5 - DIN96 connector (pads only, not used)
             CN6 - DIN96 joining connector to lower PCB
             CN7 - Multi-pin connector (pads only, not used)
-  CN9 through CN13 - Power Connectors
- CN14 through CN17 - RCA Stereo Audio OUT
+    CN9 to CN13 - Power Connectors
+   CN14 to CN17 - RCA Stereo Audio OUT
            CN18 - RCA Mono Audio OUT
            CN19 - USB Connector
 

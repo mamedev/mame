@@ -4299,9 +4299,9 @@ void tc0150rod_draw( device_t *device, bitmap_t *bitmap, const rectangle *clipre
 // ChaseHQ glitches on right when road rejoins:
 // 0a6 and lower => 0x5ff 5fe etc.
 // 35c => 575 right road edge wraps back onto other side of screen
-// 5ff-54a     through    5ff-331
-// b6          through    2ce
-// 2a6 through 0 through 5a7 ??
+// 5ff-54a       through    5ff-331
+// b6            through    2ce
+// 2a6 through 0 through    5a7 ??
 
 		left_edge = road_center - (roadb_clipl & 0x3ff);		/* start pixel for left edge */
 		right_edge = road_center + 1 + (roadb_clipr & 0x3ff);	/* start pixel for right edge */

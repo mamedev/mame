@@ -67,7 +67,7 @@ Notes:
 
       ROMs
       ----
-      32J1 through 32J8  - 16M mask ROM (DIP42)
+      32J1 to 32J8    - 16M mask ROM (DIP42)
       32A12/13/14/J15 - 27C2001 EPROM (DIP32)
       32J9            - 4M mask ROM (DIP32)
       32J10           - 27C512 EPROM (DIP28)

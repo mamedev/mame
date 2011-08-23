@@ -121,17 +121,17 @@
                 JP9 -       64M O O-O 32M&16M
                JP10 -   64M&32M O-O O 16M
                JP11 -       64M O O-O 32M&16M
-               JP12 -      through O-O O SP
-               JP13 -      through O-O O SP
+               JP12 -   through O-O O SP
+               JP13 -   through O-O O SP
                JP14 - WDT       O O
                JP15 -      MONO O-O O SURR
                JP16 -      HIGH O O O MID (N/C LOW)
-       CN1 through CN3 - Multi-pin Flat Cable Connector
+        CN1 to  CN3 - Multi-pin Flat Cable Connector
                 CN4 - Multi-pin Connector for Network PCB
                 CN5 - Multi-pin Flat Cable Connector
                 CN6 - 96-Pin To Lower PCB, Joining Connector
-       CN7 through CN8 - Not used
-      CN9 through CN11 - 6-Pin Power Connectors
+        CN7 to  CN8 - Not used
+        CN9 to CN11 - 6-Pin Power Connectors
                CN19 - USB Connector
                CN21 - 5-Pin Analog Controls Connector (Tied to USB Connector via the Filter Board)
                CN18 - RCA Mono Audio OUT
