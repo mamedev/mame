@@ -134,8 +134,6 @@ ROMs -
 #include "rendlay.h"
 #include "includes/psikyo4.h"
 
-#define ROMTEST 1 /* Does necessary stuff to perform rom test, uses RAM as it doesn't dispose of GFX after decoding */
-
 
 static const gfx_layout layout_16x16x8 =
 {
@@ -325,25 +323,12 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	COMBINE_DATA(&state->m_vidregs[offset]);
 
-#if ROMTEST
 	if (offset == 2) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
-		{
-//          memory_set_bank(space->machine(), "bank2", state->m_vidregs[offset] & 0x1fff);  /* Bank comes from vidregs */
-			memory_set_bankptr(space->machine(), "bank2", space->machine().region("gfx1")->base() + 0x2000 * (state->m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */		}
+			memory_set_bankptr(space->machine(), "bank2", space->machine().region("gfx1")->base() + 0x2000 * (state->m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
 	}
-#endif
 }
-
-#if ROMTEST
-static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
-{
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
-	UINT8 *ROM = space->machine().region("ymf")->base();
-	return ROM[state->m_sample_offs++] << 16;
-}
-#endif
 
 #define PCM_BANK_NO(n)	((state->m_io_select[0] >> (n * 4 + 24)) & 0x07)
 
@@ -388,18 +373,14 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE(ps4_screen2_brt_w) // screen 2 brightness
 	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE(ps4_bgpen_2_dword_w) AM_BASE_MEMBER(psikyo4_state, m_bgpen_2) // screen 2 clear colour
 	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyo4_state, m_paletteram) // palette
-	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
-	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
+	AM_RANGE(0x03006000, 0x03007fff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x05800004, 0x05800007) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x05800008, 0x0580000b) AM_WRITEONLY AM_BASE_MEMBER(psikyo4_state, m_io_select) // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
 
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyo4_state, m_ram) // main RAM (1 meg)
 
-#if ROMTEST
-	AM_RANGE(0x05000004, 0x05000007) AM_READ(ps4_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x03006000, 0x03007fff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
-#endif
 ADDRESS_MAP_END
 
 
@@ -425,13 +406,9 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Screen 1
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW)
-#if ROMTEST
 	PORT_DIPNAME( 0x40, 0x40, "Debug" ) /* Unknown effects */
 	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-#else
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-#endif
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )	// Screen 2
 
 	PORT_START("KEY0")	/* fake player 1 controls 1st bank */
@@ -523,13 +500,9 @@ static INPUT_PORTS_START( loderndf )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN4 )	// Screen 2 - 2nd slot
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Screen 1
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW)
-#if ROMTEST
 	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" ) /* Must be high for rom test, unknown other side-effects */
 	PORT_DIPSETTING(	      0x00000040, DEF_STR( Off ) )
 	PORT_DIPSETTING(	      0x00000000, DEF_STR( On ) )
-#else
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-#endif
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 )	// Screen 2
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -611,13 +584,9 @@ static INPUT_PORTS_START( hotdebut )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN4 )	// Screen 2 - 2nd slot
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Screen 1
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW)
-#if ROMTEST
 	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" ) /* Must be high for rom test, unknown other side-effects */
 	PORT_DIPSETTING(	      0x00000040, DEF_STR( Off ) )
 	PORT_DIPSETTING(	      0x00000000, DEF_STR( On ) )
-#else
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-#endif
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 )	// Screen 2
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -703,14 +672,6 @@ static MACHINE_START( psikyo4 )
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
 
 	state->m_maincpu = machine.device("maincpu");
-
-#if ROMTEST
-//  FIXME: Too many banks! it cannot be handled in this way, currently
-//  memory_configure_bank(machine, "bank2", 0, 0x2000, machine.region("gfx1")->base(), 0x2000);
-
-	state->m_sample_offs = 0;
-	state->save_item(NAME(state->m_sample_offs));
-#endif
 
 	state->save_item(NAME(state->m_oldbrt1));
 	state->save_item(NAME(state->m_oldbrt2));

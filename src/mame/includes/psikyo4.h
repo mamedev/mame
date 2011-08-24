@@ -27,9 +27,6 @@ public:
 	double         m_oldbrt1;
 	double         m_oldbrt2;
 
-	/* misc */
-	UINT32         m_sample_offs;	// only used if ROMTEST = 1
-
 	/* devices */
 	device_t *m_maincpu;
 };
