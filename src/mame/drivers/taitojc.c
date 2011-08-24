@@ -1121,6 +1121,7 @@ static WRITE16_HANDLER( dsp_to_main_w )
 }
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
+//	AM_RANGE(0x0000, 0x1fff) AM_READ(dsp_internal_rom_r) // TODO: Dangerous Curves tries to access 0x207?
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1944,6 +1945,9 @@ ROM_START( dangcurv )
 
 	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
 	ROM_FILL( 0x0000, 0x0080, 0 )
+
+	ROM_REGION( 0x2000, "dsprom", ROMREGION_ERASE00 ) /* this almost likely uses an internal ROM :/ */
+	ROM_LOAD( "tms320lc51", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e09-05.009",  0x0800002, 0x200000, CRC(a948782f) SHA1(2a2b0d2955e036ddf424c54131435a20dbba3dd4) )

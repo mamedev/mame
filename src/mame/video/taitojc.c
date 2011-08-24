@@ -196,7 +196,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 
 			for (i=x1; i < x2; i++)
 			{
-				d[i] = 8; //TODO: black
+				d[i] = 0x78; //TODO: black
 
 				//index++;
 			}
