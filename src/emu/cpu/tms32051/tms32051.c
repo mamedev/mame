@@ -560,13 +560,14 @@ static CPU_SET_INFO( tms )
 static CPU_READ( tms )
 {
 	tms32051_state *cpustate = get_safe_token(device);
+	/* TODO: alignment if offset is odd */
 	if (space == AS_PROGRAM)
 	{
-		*value = (PM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
+		*value = (PM_READ16(cpustate, offset>>1));
 	}
 	else if (space == AS_DATA)
 	{
-		*value = (DM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
+		*value = (DM_READ16(cpustate, offset>>1));
 	}
 	return 1;
 }

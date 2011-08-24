@@ -841,7 +841,7 @@ static WRITE32_HANDLER(jc_meters_w)
 	{
 		UINT8 mascon_lv = (input_port_read(space->machine(), "MASCON") & 0x70) >> 4;
 
-		popmessage("%d %.02f Km/h %.02f kPa",mascon_lv,state->m_speed_meter,state->m_brake_meter);
+		popmessage("%d %.02f Km/h %.02f mPa",mascon_lv,state->m_speed_meter,state->m_brake_meter/10);
 	}
 }
 
