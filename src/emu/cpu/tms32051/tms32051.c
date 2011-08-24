@@ -241,20 +241,21 @@ static CPU_RESET( tms )
 
 	CHANGE_PC(cpustate, dst);
 
-	for (i=0; i < length; i++)
+	/* TODO: if you soft reset on Taito JC it tries to do a 0x7802->0x9007 (0xff00) transfer. */
+	for (i=0; i < (length & 0x7ff); i++)
 	{
 		UINT16 data = DM_READ16(cpustate, src++);
 		PM_WRITE16(cpustate, dst++, data);
 	}
 
 	cpustate->st0.intm	= 1;
-	cpustate->st0.ov		= 0;
+	cpustate->st0.ov	= 0;
 	cpustate->st1.c		= 1;
-	cpustate->st1.cnf		= 0;
-	cpustate->st1.hm		= 1;
-	cpustate->st1.pm		= 0;
-	cpustate->st1.sxm		= 1;
-	cpustate->st1.xf		= 1;
+	cpustate->st1.cnf	= 0;
+	cpustate->st1.hm	= 1;
+	cpustate->st1.pm	= 0;
+	cpustate->st1.sxm	= 1;
+	cpustate->st1.xf	= 1;
 	cpustate->pmst.avis	= 0;
 	cpustate->pmst.braf	= 0;
 	cpustate->pmst.iptr	= 0;
@@ -262,7 +263,7 @@ static CPU_RESET( tms )
 	cpustate->pmst.ovly	= 0;
 	cpustate->pmst.ram	= 0;
 	cpustate->pmst.trm	= 0;
-	cpustate->ifr			= 0;
+	cpustate->ifr		= 0;
 	cpustate->cbcr		= 0;
 	cpustate->rptc		= -1;
 }

@@ -194,11 +194,9 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 		{
 			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
 
-			UINT8 pen = state->m_objlist[(address-0xff000)/4];
-
 			for (i=x1; i < x2; i++)
 			{
-				d[i] = pen;
+				d[i] = 8; //TODO: black
 
 				//index++;
 			}
