@@ -22,7 +22,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |           (QFP208)   E23-30.40             E23-34.72      93C46.87              |
 |E23-26.4                                                                         |
 |                              MC68040RC25            CXD1178Q    TCO640FIO       |
-|424260     TMS320C31          (PGA TYPE)                         (QFP120)        |
+|424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
 |           labelled                                              TEST_SW         |
 |424260     "Taito E07-11"                                      MB3771   RESET_SW |
@@ -158,7 +158,7 @@ Top board: MOTHER PCB  K11X0835A  M43E0304A
 |TC514260 (QFP208)   uPD424210             E07-08.65              (QFP120)        |
 |E07-02.4                                                                         |
 |                                                                                 |
-|TMS320C31  43256                                                                 |
+|TMS320C51  43256                                                                 |
 |(QFP132)   43256              MC68040RC25          E07-10.116  93C46.91          |
 |labelled          TCO770CMU   (PGA TYPE)                    E07-04.115  TEST_SW  |
 |"Taito E07-11"    (QFP208)                         E07-09.82      MB3771         |
@@ -252,7 +252,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |           (QFP208)   E23-30.40             E23-34.72      93C46.87              |
 |E23-26.4                                                                         |
 |                              MC68040RC25            CXD1178Q    TCO640FIO       |
-|424260     TMS320C31          (PGA TYPE)                         (QFP120)        |
+|424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
 |           labelled                                              TEST_SW         |
 |424260     "Taito E07-11"                                      MB3771   RESET_SW |

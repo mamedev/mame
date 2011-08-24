@@ -447,7 +447,9 @@ static READ16_HANDLER( cpuregs_r )
 		}
 
 		case 0x28:	return 0;	// PDWSR
-		default:	fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, cpustate->pc-1);
+		default:
+		if(!space->debugger_access())
+			fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, cpustate->pc-1);
 	}
 
 	return 0;
@@ -523,7 +525,9 @@ static WRITE16_HANDLER( cpuregs_w )
 		}
 
 		case 0x28:	break;		// PDWSR
-		default:	fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, cpustate->pc-1);
+		default:
+		if(!space->debugger_access())
+			fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, cpustate->pc-1);
 	}
 }
 
