@@ -28,10 +28,10 @@
 
     Taito custom chips on motherboard:
 
-        TC0630 FDP - Playfield generator?  (Nearest tile roms)
-        TC0640 FI0 - I/O & watchdog?
-        TC0650 FDA - Priority mixer?  (Near paletteram & video output)
-        TC0660 FCM - Sprites? (Nearest sprite roms)
+        TC0630FDP - Playfield generator?  (Nearest tile roms)
+        TC0640FIO - I/O & watchdog?
+        TC0650FDA - Priority mixer?  (Near paletteram & video output)
+        TC0660FCM - Sprites? (Nearest sprite roms)
 
 ***************************************************************************/
 

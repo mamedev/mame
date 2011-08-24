@@ -184,14 +184,21 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	/* this bit seems to set up border at left/right of screen (reads at 0xffc00) */
 	if(mask_screen)
 	{
+		if(address != 0xffc00)
+		{
+			popmessage("mask screen with %08x, contact MAMEdev",address);
+			return;
+		}
+
 		for (j=y1; j < y2; j++)
 		{
 			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
-			//int index = (iy * (width / 8)) + ix;
+
+			UINT8 pen = state->m_objlist[(address-0xff000)/4];
 
 			for (i=x1; i < x2; i++)
 			{
-				d[i] = v[0];
+				d[i] = pen;
 
 				//index++;
 			}
@@ -210,14 +217,12 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 			{
 				UINT8 pen = (v[BYTE4_XOR_BE(index)] & 0xf0) >> 4;
 				if (pen != 0)
-				{
 					d[i] = palette + pen;
-				}
+
 				pen = (v[BYTE4_XOR_BE(index)] & 0x0f);
 				if (pen != 0)
-				{
 					d[i+1] = palette + pen;
-				}
+
 				index++;
 			}
 
@@ -226,23 +231,25 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	}
 	else // 8bpp
 	{
-		for (j=y1; j < y2; j++)
 		{
-			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
-			int index = (iy * width) + ix;
-
-			for (i=x1; i < x2; i++)
+			for (j=y1; j < y2; j++)
 			{
-				UINT8 pen = v[BYTE4_XOR_BE(index)];
-				if (pen != 0)
+				UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+				int index = (iy * width) + ix;
+
+				for (i=x1; i < x2; i++)
 				{
-					d[i] = palette + pen;
+					UINT8 pen = v[BYTE4_XOR_BE(index)];
+					if (pen != 0)
+					{
+						d[i] = palette + pen;
+					}
+
+					index++;
 				}
 
-				index++;
+				iy++;
 			}
-
-			iy++;
 		}
 	}
 }
@@ -291,17 +298,20 @@ static void draw_object_bank(running_machine &machine, bitmap_t *bitmap, const r
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 	UINT16 start_offs;
+//	UINT8 double_xy;
 	int i;
 
 	start_offs = ((bank_type+1)*0x400)/4;
+//	double_xy = (state->m_objlist[(0xd1c+bank_type*0x10)/4] & 0x20000000) >> 29;
+
+	/* probably a core bug in there (otherwise objects sticks on screen in Densya de Go) */
+	if(bank_type == 1 && (!(state->m_objlist[0xfc4/4] & 0x2000)))
+		return;
 
 	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
 	{
 		UINT32 w1 = state->m_objlist[i + 0];
 		UINT32 w2 = state->m_objlist[i + 1];
-
-		//if(i < 6) // don't try to draw non-video stuff
-		//	return;
 
 		if (((w2 & 0x200000) >> 21) == pri)
 		{
@@ -338,12 +348,14 @@ SCREEN_UPDATE( taitojc )
 
 	//popmessage("%08x %08x %08x %08x",state->m_objlist[0xd20/4],state->m_objlist[0xd24/4],state->m_objlist[0xd28/4],state->m_objlist[0xd2c/4]);
 
-	draw_object_bank(screen->machine(), bitmap, cliprect, ((state->m_objlist[0xfc4/4] & 0x2000) >> 13), 0);
+	draw_object_bank(screen->machine(), bitmap, cliprect, 0, 0);
+	draw_object_bank(screen->machine(), bitmap, cliprect, 1, 0);
 	draw_object_bank(screen->machine(), bitmap, cliprect, 2, 0);
 
 	copybitmap_trans(bitmap, state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
-	draw_object_bank(screen->machine(), bitmap, cliprect, ((state->m_objlist[0xfc4/4] & 0x2000) >> 13), 1);
+	draw_object_bank(screen->machine(), bitmap, cliprect, 0, 1);
+	draw_object_bank(screen->machine(), bitmap, cliprect, 1, 1);
 	draw_object_bank(screen->machine(), bitmap, cliprect, 2, 1);
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0,0);
