@@ -212,7 +212,7 @@ SCREEN_UPDATE( blaster )
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
 	if (cliprect->min_y == screen->visible_area().min_y || !(state->m_blaster_video_control & 1))
-		state->m_blaster_color0 = pens[0];
+		state->m_blaster_color0 = state->m_palette_lookup[state->m_blaster_palette_0[0] ^ 0xff];
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -235,8 +235,8 @@ SCREEN_UPDATE( blaster )
 				source[(x/2) * 256] = 0;
 
 			/* now draw */
-			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : state->m_blaster_color0;
-			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : state->m_blaster_color0;
+			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : state->m_blaster_color0 | pens[0];
+			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : state->m_blaster_color0 | pens[0];
 		}
 	}
 	return 0;
@@ -294,7 +294,7 @@ static void create_palette_lookup(running_machine &machine)
 
 	/* compute palette information */
 	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
-	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */
+	/* by the use of transistors, so we ignore that and just use the relative resistor weights */
 	compute_resistor_weights(0,	255, -1.0,
 			3, resistances_rg, weights_r, 0, 0,
 			3, resistances_rg, weights_g, 0, 0,

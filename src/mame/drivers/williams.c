@@ -77,7 +77,7 @@
     9800-BFFF RAM
         0xBB00 Blaster only, Color 0 for each line (256 entry)
         0xBC00 Blaster only, Color 0 flags, latch color only if bit 0 = 1 (256 entry)
-            Do something else with the bit 1, I do not know what
+                             Erase background only if bit 1 = 1
     C000-CFFF I/O
     D000-FFFF ROM
 
@@ -87,7 +87,7 @@
     c805 widget_pia_ctrla
     c806 widget_pia_datab
     c807 widget_pia_ctrlb (CB2 select between player 1 and player 2
-                   controls if Table or Joust)
+                          controls if Table or Joust)
           bits 5-3 = 110 = player 2
           bits 5-3 = 111 = player 1
 
@@ -104,7 +104,7 @@
     C940 Blaster only: Select bank in the color Prom for color remap
     C980 Blaster only: Select which ROM is at 0000-3FFF
     C9C0 Blaster only: bit 0 = enable the color 0 changing each lines
-               bit 1 = erase back each frame
+                       bit 1 = erase back each frame
 
 ****************************************************************************
 
@@ -1436,7 +1436,7 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
 	MCFG_CPU_PROGRAM_MAP(defender_map)
 
-	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK)
+	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
 	MCFG_CPU_PROGRAM_MAP(defender_sound_map)
 
 	MCFG_MACHINE_START(defender)
@@ -1447,7 +1447,7 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	MCFG_TIMER_ADD("240_timer", williams_count240_callback)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1601,7 +1601,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu_b", M6808, SOUND_CLOCK)
+	MCFG_CPU_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
 	MCFG_CPU_PROGRAM_MAP(sound_map_b)
 
 	/* pia */
@@ -1638,7 +1638,7 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	MCFG_TIMER_ADD("254_timer", williams2_endscreen_callback)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
 	MCFG_PALETTE_LENGTH(1024)
 	MCFG_GFXDECODE(williams2)
 
@@ -2392,8 +2392,8 @@ ROM_START( blaster )
 	ROM_LOAD( "18.sb10",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )		/* color & video-decoder PROM data */
-	ROM_LOAD( "decoder.4",    0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",    0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "4.u42",        0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
+	ROM_LOAD( "6.u23",        0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
 	ROM_LOAD( "blaster.col",  0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) )
 ROM_END
 
@@ -2425,8 +2425,8 @@ ROM_START( blaster30 )
 	ROM_LOAD( "sb10.18",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )		/* color & video-decoder PROM data */
-	ROM_LOAD( "decoder.4",    0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",    0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "4.u42",        0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
+	ROM_LOAD( "6.u23",        0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
 	ROM_LOAD( "blaster.col",  0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) )
 ROM_END
 
@@ -2456,8 +2456,8 @@ ROM_START( blasterkit )
 	ROM_LOAD( "blastkit.18", 0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )		/* color & video-decoder PROM data */
-	ROM_LOAD( "decoder.4",    0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",    0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "4.u42",        0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
+	ROM_LOAD( "6.u23",        0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
 	ROM_LOAD( "blaster.col",  0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) )
 ROM_END
 
@@ -2907,17 +2907,17 @@ static DRIVER_INIT( joust2 )
  *************************************/
 
 /* Defender hardware games */
-GAME( 1980, defender,   0,        defender,            defender, defender, ROT0,   "Williams", "Defender (Red label)", GAME_SUPPORTS_SAVE )
+GAME( 1980, defender,   0,        defender,            defender, defender, ROT0,   "Williams", "Defender (Red label)", GAME_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
 GAME( 1980, defenderg,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (Green label)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defenderb,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (Blue label)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defenderw,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (White label)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defndjeu,   defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Defender (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1980, tornado1,   defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, tornado2,   defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (bootleg set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // bad dump?
-GAME( 1980, zero,       defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Zero (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, zero2,      defender, defender,            defender, defndjeu, ROT0,   "bootleg (Amtec)", "Zero (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, defcmnd,    defender, defender,            defender, defender, ROT0,   "bootleg", "Defense Command", GAME_SUPPORTS_SAVE )
-GAME( 1981, defence,    defender, defender,            defender, defender, ROT0,   "bootleg (Outer Limits)", "Defence Command", GAME_SUPPORTS_SAVE )
+GAME( 1980, tornado1,   defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 1, Defender bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, tornado2,   defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 2, Defender bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // bad dump?
+GAME( 1980, zero,       defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Zero (set 1, Defender bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, zero2,      defender, defender,            defender, defndjeu, ROT0,   "bootleg (Amtec)", "Zero (set 2, Defender bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, defcmnd,    defender, defender,            defender, defender, ROT0,   "bootleg", "Defense Command (Defender bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, defence,    defender, defender,            defender, defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,            defender, defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mayday,     0,        defender,            mayday,   mayday,   ROT0,   "Hoei", "Mayday (set 1)", GAME_SUPPORTS_SAVE ) // original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
 GAME( 1980, maydaya,    mayday,   defender,            mayday,   mayday,   ROT0,   "Hoei", "Mayday (set 2)", GAME_SUPPORTS_SAVE )
@@ -2927,9 +2927,9 @@ GAME( 1981, colony7a,   colony7,  defender,            colony7,  defender, ROT27
 GAME( 1982, jin,        0,        jin,                 jin,      defender, ROT90,  "Falcon", "Jin", GAME_SUPPORTS_SAVE )
 
 /* Standard Williams hardware */
-GAME( 1981, stargate,   0,        williams,            stargate, stargate, ROT0,   "Williams", "Stargate", GAME_SUPPORTS_SAVE )
-GAME( 1982, robotron,   0,        williams,            robotron, robotron, ROT0,   "Williams", "Robotron: 2084 (Solid Blue label)", GAME_SUPPORTS_SAVE )
-GAME( 1982, robotronyo, robotron, williams,            robotron, robotron, ROT0,   "Williams", "Robotron: 2084 (Yellow/Orange label)", GAME_SUPPORTS_SAVE )
+GAME( 1981, stargate,   0,        williams,            stargate, stargate, ROT0,   "Williams / Vid Kidz", "Stargate", GAME_SUPPORTS_SAVE )
+GAME( 1982, robotron,   0,        williams,            robotron, robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Solid Blue label)", GAME_SUPPORTS_SAVE )
+GAME( 1982, robotronyo, robotron, williams,            robotron, robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Yellow/Orange label)", GAME_SUPPORTS_SAVE )
 GAME( 1982, joust,      0,        williams_muxed,      joust,    joust,    ROT0,   "Williams", "Joust (White/Green label)", GAME_SUPPORTS_SAVE )
 GAME( 1982, joustr,     joust,    williams_muxed,      joust,    joust,    ROT0,   "Williams", "Joust (Solid Red label)", GAME_SUPPORTS_SAVE )
 GAME( 1982, joustwr,    joust,    williams_muxed,      joust,    joust,    ROT0,   "Williams", "Joust (White/Red label)", GAME_SUPPORTS_SAVE )
@@ -2941,9 +2941,9 @@ GAME( 1982, sinistar,   0,        sinistar,            sinistar, sinistar, ROT27
 GAME( 1982, sinistar1,  sinistar, sinistar,            sinistar, sinistar, ROT270, "Williams", "Sinistar (prototype version)", GAME_SUPPORTS_SAVE )
 GAME( 1982, sinistar2,  sinistar, sinistar,            sinistar, sinistar, ROT270, "Williams", "Sinistar (revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1983, playball,   0,        playball,            playball, playball, ROT270, "Williams", "PlayBall! (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1983, blaster,    0,        blaster,             blaster,  blaster,  ROT0,   "Williams", "Blaster", GAME_SUPPORTS_SAVE )
-GAME( 1983, blaster30,  blaster,  blaster,             blaster,  blaster,  ROT0,   "Williams", "Blaster (early version with 30 waves)", GAME_SUPPORTS_SAVE )
-GAME( 1983, blasterkit, blaster,  blastkit,            blastkit, blaster,  ROT0,   "Williams", "Blaster (kit)", GAME_SUPPORTS_SAVE )
+GAME( 1983, blaster,    0,        blaster,             blaster,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster", GAME_SUPPORTS_SAVE )
+GAME( 1983, blaster30,  blaster,  blaster,             blaster,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (early version with 30 waves)", GAME_SUPPORTS_SAVE )
+GAME( 1983, blasterkit, blaster,  blastkit,            blastkit, blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (kit)", GAME_SUPPORTS_SAVE )
 GAME( 1985, spdball,    0,        spdball,             spdball,  spdball,  ROT0,   "Williams", "Speed Ball (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1985, alienar,    0,        alienar,             alienar,  alienar,  ROT0,   "Duncan Brown", "Alien Arena", GAME_SUPPORTS_SAVE )
 GAME( 1985, alienaru,   alienar,  alienar,             alienar,  alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate Upgrade)", GAME_SUPPORTS_SAVE )
