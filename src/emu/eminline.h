@@ -14,7 +14,7 @@
 #define __EMINLINE__
 
 /* we come with implementations for GCC x86 and PPC */
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(SDLMAME_NOASM)
 
 #if defined(__i386__) || defined(__x86_64__)
 #include "eigccx86.h"
