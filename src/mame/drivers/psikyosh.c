@@ -387,14 +387,6 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 	}
 }
 
-static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
-{
-	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
-	UINT8 *ROM = space->machine().region("ymf")->base();
-
-	return ROM[state->m_sample_offs++] << 16;
-}
-
 /* Mahjong Panel */
 static READ32_HANDLER( mjgtaste_input_r )
 {
@@ -534,9 +526,7 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32 )
 // rom mapping
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
 // sound chip
-	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
-	AM_RANGE(0x05000004, 0x05000007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
+	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 // inputs/eeprom
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x05800004, 0x05800007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
@@ -552,9 +542,7 @@ static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x03000004, 0x03000007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
 // sound chip
-	AM_RANGE(0x03100000, 0x03100003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff)
-	AM_RANGE(0x03100004, 0x03100007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
+	AM_RANGE(0x03100000, 0x03100007) AM_DEVREADWRITE8("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 // video chip
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // video banks0-7 (sprites and sprite list)
 	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_bgram) // video banks 7-0x1f (backgrounds and other effects)
@@ -806,9 +794,6 @@ static MACHINE_START( psikyosh )
 	state->m_maincpu = machine.device("maincpu");
 
 	memory_configure_bank(machine, "bank2", 0, 0x1000, machine.region("gfx1")->base(), 0x20000);
-
-	state->m_sample_offs = 0;
-	state->save_item(NAME(state->m_sample_offs));
 }
 
 

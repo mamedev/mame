@@ -38,9 +38,6 @@ public:
 	UINT16         *m_bg_zoom;
 	UINT8          m_alphatable[256];
 
-	/* misc */
-	UINT32         m_sample_offs;	// only used if ROMTEST = 1
-
 	/* devices */
 	device_t *m_maincpu;
 };
