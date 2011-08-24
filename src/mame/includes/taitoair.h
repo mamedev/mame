@@ -40,6 +40,8 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_dsp;
 	device_t *m_tc0080vco;
+
+	UINT16 *      m_gradram;
 };
 
 

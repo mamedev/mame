@@ -347,7 +347,7 @@ SCREEN_UPDATE( taitoair )
 
 	tc0080vco_tilemap_update(state->m_tc0080vco);
 
-	bitmap_fill(bitmap, cliprect, 0x41);
+	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
 	if (!screen->machine().input().code_pressed(KEYCODE_A))
