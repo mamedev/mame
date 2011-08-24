@@ -2397,7 +2397,7 @@ ROM_START( blaster )
 	ROM_LOAD( "blaster.col",  0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) )
 ROM_END
 
-ROM_START( blaster30 )
+ROM_START( blastero )
 	ROM_REGION( 0x54000, "maincpu", 0 )
 	ROM_LOAD( "16.ic39",     0x0d000, 0x1000, CRC(2db032d2) SHA1(287769361639695b1c1ceae0fe6899d83b4575d5) )
 	ROM_LOAD( "13.ic27",     0x0e000, 0x2000, CRC(c99213c7) SHA1(d1c1549c053de3d862d8ef3ebca02811ed289464) )
@@ -2942,15 +2942,15 @@ GAME( 1982, sinistar1,  sinistar, sinistar,            sinistar, sinistar, ROT27
 GAME( 1982, sinistar2,  sinistar, sinistar,            sinistar, sinistar, ROT270, "Williams", "Sinistar (revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1983, playball,   0,        playball,            playball, playball, ROT270, "Williams", "PlayBall! (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1983, blaster,    0,        blaster,             blaster,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster", GAME_SUPPORTS_SAVE )
-GAME( 1983, blaster30,  blaster,  blaster,             blaster,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (early version with 30 waves)", GAME_SUPPORTS_SAVE )
-GAME( 1983, blasterkit, blaster,  blastkit,            blastkit, blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (kit)", GAME_SUPPORTS_SAVE )
+GAME( 1983, blastero,   blaster,  blaster,             blaster,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (early version)", GAME_SUPPORTS_SAVE ) // location test?
+GAME( 1983, blasterkit, blaster,  blastkit,            blastkit, blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", GAME_SUPPORTS_SAVE ) // mono sound
 GAME( 1985, spdball,    0,        spdball,             spdball,  spdball,  ROT0,   "Williams", "Speed Ball (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1985, alienar,    0,        alienar,             alienar,  alienar,  ROT0,   "Duncan Brown", "Alien Arena", GAME_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  alienar,             alienar,  alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate Upgrade)", GAME_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  alienar,             alienar,  alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", GAME_SUPPORTS_SAVE )
 GAME( 1987, lottofun,   0,        lottofun,            lottofun, lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", GAME_SUPPORTS_SAVE )
 
 /* 2nd Generation Williams hardware with tilemaps */
 GAME( 1983, mysticm,    0,        mysticm,             mysticm,  mysticm,  ROT0,   "Williams", "Mystic Marathon", GAME_SUPPORTS_SAVE )
 GAME( 1984, tshoot,     0,        tshoot,              tshoot,   tshoot,   ROT0,   "Williams", "Turkey Shoot", GAME_SUPPORTS_SAVE )
 GAME( 1984, inferno,    0,        williams2_extra_ram, inferno,  inferno,  ROT0,   "Williams", "Inferno (Williams)", GAME_SUPPORTS_SAVE )
-GAME( 1986, joust2,     0,        joust2,              joust2,   joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, joust2,     0,        joust2,              joust2,   joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest", GAME_SUPPORTS_SAVE )
