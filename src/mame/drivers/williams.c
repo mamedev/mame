@@ -2942,7 +2942,7 @@ GAME( 1982, sinistar1,  sinistar, sinistar,            sinistar, sinistar, ROT27
 GAME( 1982, sinistar2,  sinistar, sinistar,            sinistar, sinistar, ROT270, "Williams", "Sinistar (revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1983, playball,   0,        playball,            playball, playball, ROT270, "Williams", "PlayBall! (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1983, blaster,    0,        blaster,             blaster,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster", GAME_SUPPORTS_SAVE )
-GAME( 1983, blastero,   blaster,  blaster,             blaster,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (early version)", GAME_SUPPORTS_SAVE ) // location test?
+GAME( 1983, blastero,   blaster,  blaster,             blaster,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (location test)", GAME_SUPPORTS_SAVE )
 GAME( 1983, blasterkit, blaster,  blastkit,            blastkit, blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", GAME_SUPPORTS_SAVE ) // mono sound
 GAME( 1985, spdball,    0,        spdball,             spdball,  spdball,  ROT0,   "Williams", "Speed Ball (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1985, alienar,    0,        alienar,             alienar,  alienar,  ROT0,   "Duncan Brown", "Alien Arena", GAME_SUPPORTS_SAVE )
