@@ -891,6 +891,30 @@ ROM_START( shocking )
 
 ROM_END
 
+ROM_START( shockingk )
+
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "u33.bin", 0x000000, 0x040000, CRC(870108ad) SHA1(2d059ee0f189ed404211f6041cd382f90b53d0cd) )
+	ROM_LOAD16_BYTE( "u32.bin", 0x000001, 0x040000, CRC(be2125f4) SHA1(fab38697266a1f95b8ebfff0c692d8e8239710aa) )
+
+	ROM_REGION( 0x200000*8, "gfx1", ROMREGION_ERASEFF )	/* 16x16x8 */
+	ROMX_LOAD( "u67.bin", 0x000000, 0x080000, CRC(7b0f3944) SHA1(0954610e0a1b39e8e68411b98c3fe487da6bd77a) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u68.bin", 0x000002, 0x080000, CRC(aa736da6) SHA1(0d8bbfc1fb014c6e662e4dc376bcd87b4157a7aa) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u69.bin", 0x000004, 0x080000, CRC(292bb626) SHA1(78a7ecc72dde6d397d2137e528dabcd247d382bd) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u70.bin", 0x000006, 0x080000, CRC(2f9eeb81) SHA1(4e84c4451cbe3feee95a828790830e95f278f2e7) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* 16x16x4 */
+	ROM_LOAD( "u20.bin", 0x000000, 0x040000, CRC(3502a477) SHA1(f317c12491b35470ceb178793c6e332c3afcf2b5) )
+	ROM_LOAD( "u21.bin", 0x040000, 0x040000, CRC(ffe0af85) SHA1(124d8375fd366333fb3cb16bb94d7fa3c79534b3) )
+	ROM_LOAD( "u22.bin", 0x080000, 0x040000, CRC(59260de1) SHA1(2dd2d7ab93fa751cb9142400a3ff91391477d555) )
+	ROM_LOAD( "u23.bin", 0x0c0000, 0x040000, CRC(00e4af23) SHA1(a4d23f16748385dd8c87cae3e16593e5a0195c24) )
+
+	ROM_REGION( 0x080000 * 2, "oki", 0 )	/* Samples */
+	ROM_LOAD( "yunsun16.131", 0x000000, 0x080000, CRC(d0a1bb8c) SHA1(10f33521bd6031ed73ee5c7be1382165925aa8f8) )
+	ROM_RELOAD(               0x080000, 0x080000 )
+
+ROM_END
+
 
 /***************************************************************************
 
@@ -931,8 +955,9 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 199?, magicbub, 0,        magicbub, magicbub, magicbub, ROT0,   "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 199?, magicbuba,magicbub, magicbub, magicbua, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, paprazzi, 0,        shocking, paprazzi, 0,        ROT270, "Yun Sung", "Paparazzi",    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking",     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0,   "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 199?, magicbub,  0,        magicbub, magicbub, magicbub, ROT0,   "Yun Sung", "Magic Bubble",                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 199?, magicbuba, magicbub, magicbub, magicbua, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, paprazzi,  0,        shocking, paprazzi, 0,        ROT270, "Yun Sung", "Paparazzi",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, shocking,  0,        shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, shockingk, shocking, shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking (Korea)",             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1998, bombkick,  0,        shocking, bombkick, 0,        ROT0,   "Yun Sung", "Bomb Kick",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
