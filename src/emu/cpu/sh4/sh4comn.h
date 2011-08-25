@@ -185,16 +185,16 @@ private:
 INLINE sh4_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SH3 ||
-		   device->type() == SH4);
+	assert(device->type() == SH3LE || device->type() == SH3BE ||
+		   device->type() == SH4LE || device->type() == SH4BE );
 	return *(sh4_state **)downcast<legacy_cpu_device *>(device)->token();
 }
 #else
 INLINE sh4_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SH3 ||
-		   device->type() == SH4);
+	assert(device->type() == SH3LE || device->type() == SH3BE ||
+		   device->type() == SH4LE || device->type() == SH4BE );
 	return (sh4_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 #endif
