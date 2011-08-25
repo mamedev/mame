@@ -63,7 +63,7 @@ static MACHINE_RESET( alien )
 
 static MACHINE_CONFIG_START( alien, alien_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4, MASTER_CLOCK)	/* 200MHz */
+	MCFG_CPU_ADD("maincpu", SH4LE, MASTER_CLOCK)	/* 200MHz */
 	MCFG_CPU_PROGRAM_MAP(alien_map)
 
 	/* video hardware */

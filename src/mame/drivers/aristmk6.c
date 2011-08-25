@@ -127,7 +127,7 @@ static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,
 
 static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4, ARISTMK6_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", SH4LE, ARISTMK6_CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(aristmk6_map)
 	MCFG_CPU_IO_MAP(aristmk6_port)

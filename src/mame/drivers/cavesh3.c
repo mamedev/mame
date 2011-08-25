@@ -43,7 +43,7 @@ static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,
 
 static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH3, CAVE_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", SH3LE, CAVE_CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(cavesh3_map)
 	MCFG_CPU_IO_MAP(cavesh3_port)

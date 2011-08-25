@@ -2489,7 +2489,7 @@ static MACHINE_RESET( naomi )
 
 static MACHINE_CONFIG_START( naomi_aw_base, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4, CPU_CLOCK) // SH4!!!
+	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(naomi_map)
 	MCFG_CPU_IO_MAP(naomi_port)

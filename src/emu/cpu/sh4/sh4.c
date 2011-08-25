@@ -3818,7 +3818,35 @@ CPU_GET_INFO( sh3 )
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(SH3, sh3);
-DEFINE_LEGACY_CPU_DEVICE(SH4, sh4);
+CPU_GET_INFO( sh3be )
+{
+	switch (state)
+	{
+	/* --- the following bits of info are returned as pointers to data or functions --- */
+	case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh3);				break;
+
+	/* --- the following bits of info are returned as NULL-terminated strings --- */
+	case DEVINFO_STR_NAME:						strcpy(info->s, "SH-3");				break;
+	case DEVINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7700");		break;
+
+	case DEVINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;				break;
+
+	default:									CPU_GET_INFO_CALL(sh4);					break;
+	}
+}
+
+CPU_GET_INFO( sh4be )
+{
+	switch (state)
+	{
+	case DEVINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;				break;
+	default:									CPU_GET_INFO_CALL(sh4);					break;
+	}
+}
+
+DEFINE_LEGACY_CPU_DEVICE(SH3LE, sh3);
+DEFINE_LEGACY_CPU_DEVICE(SH3BE, sh3be);
+DEFINE_LEGACY_CPU_DEVICE(SH4LE, sh4);
+DEFINE_LEGACY_CPU_DEVICE(SH4BE, sh4be);
 
 #endif	// USE_SH4DRC
