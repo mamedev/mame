@@ -1096,8 +1096,8 @@ GAME( 1980, phoenixb, phoenix,  phoenix,  phoenixa, 0,        ROT90, "Amstar (Ce
 GAME( 1980, phoenixt, phoenix,  phoenix,  phoenixt, 0,        ROT90, "Amstar (Taito license)", "Phoenix (Taito)", GAME_SUPPORTS_SAVE )
 GAME( 1980, phoenixj, phoenix,  phoenix,  phoenixt, 0,        ROT90, "Amstar (Taito Japan license)", "Phoenix (Taito Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1980, phoenix3, phoenix,  phoenix,  phoenix3, 0,        ROT90, "bootleg (T.P.N.)",   "Phoenix (T.P.N.)", GAME_SUPPORTS_SAVE )
-GAME( 1981, phoenixc, phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",  "Phoenix (Irecsa / G.G.I Corp)", GAME_SUPPORTS_SAVE )
-GAME( 1981, phoenixc2,phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",  "Phoenix (Irecsa / G.G.I Corp - set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, phoenixc, phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",  "Phoenix (Irecsa / G.G.I Corp, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, phoenixc2,phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",  "Phoenix (Irecsa / G.G.I Corp, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, condor,   phoenix,  condor,   condor,   condor,   ROT90, "bootleg",   "Condor (bootleg of Phoenix)", GAME_SUPPORTS_SAVE )
 // the following 2 were common bootlegs in england & france respectively
 GAME( 1980, falcon,   phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg",   "Falcon (bootleg of Phoenix) (8085A CPU)", GAME_SUPPORTS_SAVE )

@@ -1193,7 +1193,7 @@ GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  stratgyx,     ROT0,   "bo
 GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
 GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, rescue,    0,        rescue,    rescue,    rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
-GAME( 1982, rescueb,   rescue,   rescue,    rescue,    rescue,       ROT90,  "bootleg", "Rescue (Videl Games bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1982, rescueb,   rescue,   rescue,    rescue,    rescue,       ROT90,  "bootleg (Videl Games)", "Rescue (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1982, aponow,    rescue,   rescue,    rescue,    rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
 GAME( 1983, minefld,   0,        minefld,   minefld,   minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustler,   0,        hustler,   hustler,   hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
