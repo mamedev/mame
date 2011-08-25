@@ -28,12 +28,8 @@ paradise: I'm not sure it's working correctly:
 - The chance to play a bonus game is very slim. I think I got to play
   a couple in total. Is there a way to trigger them !?
 
-penky: we need to delay the irqs at startup or it won't boot
-       the initial palette for the bitmap layer gets set to all black
-       until a single game / attract demo is complete, this makes it
-       impossible to know which areas you have covered.  is this related
-       to the boot up problem?  For this reason I've left it marked as
-       not working.
+penky: we need to delay the irqs at startup or it won't boot. Either one of
+       ports 0x2003.r or 0x2005.w starts up the irq timer (confirmed via trojan)
 
 ***************************************************************************/
 
@@ -670,7 +666,7 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MCFG_CPU_PROGRAM_MAP(paradise_map)
 	MCFG_CPU_IO_MAP(paradise_io_map)
-	MCFG_CPU_PERIODIC_INT(paradise_irq,4*54)	/* No nmi routine */
+	MCFG_CPU_PERIODIC_INT(paradise_irq,4*54)	/* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
 
 	MCFG_MACHINE_START(paradise)
 	MCFG_MACHINE_RESET(paradise)
@@ -1251,7 +1247,7 @@ GAME( 1994+, paradlx,  0,       paradise, paradise, paradise, ROT90, "Yun Sung",
 GAME( 1994+, para2dx,  0,       paradise, para2dx,  paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995,  tgtball,  0,       tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
 GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball", GAME_SUPPORTS_SAVE )
-GAME( 1996,  penky,    0,       penky,    penky,    tgtball,  ROT0,  "Yun Sung", "Penky", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1996,  penky,    0,       penky,    penky,    tgtball,  ROT0,  "Yun Sung", "Penky", GAME_SUPPORTS_SAVE )
 GAME( 1996,  torus,    0,       torus,    torus,    torus,    ROT90, "Yun Sung", "Torus", GAME_SUPPORTS_SAVE )
 GAME( 1998,  madball,  0,       madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", GAME_SUPPORTS_SAVE )
 GAME( 1997,  madballn, madball, madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", GAME_SUPPORTS_SAVE )
