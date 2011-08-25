@@ -919,7 +919,7 @@ ROM_START( loderndf )
 	ROM_LOAD32_WORD( "1l.u3",  0x1000000, 0x800000, CRC(7a9cd21e) SHA1(dfb36625c2aae3e774ec2451051b7038e0767b6d) )
 	ROM_LOAD32_WORD( "1h.u12", 0x1000002, 0x800000, CRC(78f40d0d) SHA1(243acb73a183a41a3e35a2c746ad31dd6fcd3ef4) )
 
-	ROM_REGION( 0x800000, "ymf", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "ymf", 0 )
 	ROM_LOAD( "snd0.u10", 0x000000, 0x800000, CRC(2da3788f) SHA1(199d4d750a107cbdf8c16cd5b097171743769d9c) ) // Fails hidden rom test (banking problem?)
 ROM_END
 
@@ -934,7 +934,7 @@ ROM_START( loderndfa )
 	ROM_LOAD32_WORD( "1l.u3",  0x1000000, 0x800000, CRC(7a9cd21e) SHA1(dfb36625c2aae3e774ec2451051b7038e0767b6d) )
 	ROM_LOAD32_WORD( "1h.u12", 0x1000002, 0x800000, CRC(78f40d0d) SHA1(243acb73a183a41a3e35a2c746ad31dd6fcd3ef4) )
 
-	ROM_REGION( 0x800000, "ymf", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "ymf", 0 )
 	ROM_LOAD( "snd0.u10", 0x000000, 0x800000, CRC(2da3788f) SHA1(199d4d750a107cbdf8c16cd5b097171743769d9c) ) // Fails hidden rom test (banking problem?)
 ROM_END
 
@@ -951,71 +951,10 @@ ROM_START( hotdebut )
 	ROM_LOAD32_WORD( "2l.u4",  0x1000000, 0x400000, CRC(9d2d1bb1) SHA1(33b41aa50be3040871b6dc6faee0bd99c5e46cd3) )
 	ROM_LOAD32_WORD( "2h.u13", 0x1000002, 0x400000, CRC(a7753c4d) SHA1(adb33de478064cc9255d1bb5c63acc5d8bfbb8eb) )
 
-	ROM_REGION( 0x400000, "ymf", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "ymf", 0 )
 	ROM_LOAD( "snd0.u10", 0x000000, 0x400000, CRC(eef28aa7) SHA1(d10d3f62a2e4c2a8e5fccece9c272f8ead50e5ed) )
 ROM_END
 
-/* are these right? should i fake the counter return?
-   'speedups / idle skipping isn't needed for 'hotgmck, hgkairak'
-   as the core catches and skips the idle loops automatically'
-*/
-
-static READ32_HANDLER( loderndf_speedup_r )
-{
-/*
-PC  :00001B3C: MOV.L   @R14,R3  R14 = 0x6000020
-PC  :00001B3E: ADD     #$01,R3
-PC  :00001B40: MOV.L   R3,@R14
-PC  :00001B42: MOV.L   @($54,PC),R1
-PC  :00001B44: MOV.L   @R1,R2
-PC  :00001B46: TST     R2,R2
-PC  :00001B48: BT      $00001B3C
-*/
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
-
-	if (cpu_get_pc(&space->device()) == 0x00001b3e)
-		device_spin_until_interrupt(&space->device());
-
-	return state->m_ram[0x000020 / 4];
-}
-
-static READ32_HANDLER( loderdfa_speedup_r )
-{
-/*
-PC  :00001B48: MOV.L   @R14,R3  R14 = 0x6000020
-PC  :00001B4A: ADD     #$01,R3
-PC  :00001B4C: MOV.L   R3,@R14
-PC  :00001B4E: MOV.L   @($54,PC),R1
-PC  :00001B50: MOV.L   @R1,R2
-PC  :00001B52: TST     R2,R2
-PC  :00001B54: BT      $00001B48
-*/
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
-
-	if (cpu_get_pc(&space->device()) == 0x00001b4a)
-		device_spin_until_interrupt(&space->device());
-
-	return state->m_ram[0x000020 / 4];
-}
-
-static READ32_HANDLER( hotdebut_speedup_r )
-{
-/*
-PC  :000029EC: MOV.L   @R14,R2
-PC  :000029EE: ADD     #$01,R2
-PC  :000029F0: MOV.L   R2,@R14
-PC  :000029F2: MOV.L   @($64,PC),R1
-PC  :000029F4: MOV.L   @R1,R3
-PC  :000029F6: TST     R3,R3
-PC  :000029F8: BT      $000029EC
-*/
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
-
-	if (cpu_get_pc(&space->device()) == 0x000029ee)
-		device_spin_until_interrupt(&space->device());
-
-	return state->m_ram[0x00001c / 4];
-}
 
 static void hotgmck_pcm_bank_postload(running_machine &machine)
 {
@@ -1046,29 +985,13 @@ static DRIVER_INIT( hotgmck )
 	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
 }
 
-static DRIVER_INIT( loderndf )
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000020, 0x6000023, FUNC(loderndf_speedup_r) );
-}
 
-static DRIVER_INIT( loderdfa )
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000020, 0x6000023, FUNC(loderdfa_speedup_r) );
-}
-
-static DRIVER_INIT( hotdebut )
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x600001c, 0x600001f, FUNC(hotdebut_speedup_r) );
-}
-
-
-/*     YEAR  NAME      PARENT    MACHINE    INPUT     INIT      MONITOR COMPANY   FULLNAME FLAGS */
-
+/*    YEAR  NAME      PARENT    MACHINE    INPUT     INIT      MONITOR COMPANY   FULLNAME     FLAGS */
 GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick (Japan)", 0 )
 GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick Kairakuten (Japan)", 0 )
 GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 3 Digital Surfing (Japan)", 0 )
 GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 4 Ever (Japan)", 0 )
 GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Mahjong Hot Gimmick Integral (Japan)", 0 )
-GAME( 2000, loderndf, 0,        ps4small,  loderndf, loderndf, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", 0 )
-GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, loderdfa, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", 0 )
-GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, hotdebut, ROT0,   "Psikyo / Moss", "Quiz de Idol! Hot Debut (Japan)", 0 )
+GAME( 2000, loderndf, 0,        ps4small,  loderndf, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", 0 )
+GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", 0 )
+GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, 0,        ROT0,   "Psikyo / Moss", "Quiz de Idol! Hot Debut (Japan)", 0 )

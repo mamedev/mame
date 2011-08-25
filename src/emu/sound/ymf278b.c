@@ -55,7 +55,8 @@
    June 4, 2003 -  Changed to dual-license with LGPL for use in OpenMSX.
                    OpenMSX contributed a bugfix where looped samples were
             not being addressed properly, causing pitch fluctuation.
-   ......
+
+   With further improvements over the years by MAME team.
 
    TODO:
    - accurate timing of envelopes
