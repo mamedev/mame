@@ -53,11 +53,6 @@ VIDEO_START( pbillian )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
 	state->m_bg_tilemap = tilemap_create(machine, pb_get_bg_tile_info, tilemap_scan_rows,  8, 8,32,32);
-
-	/* Need to do save state here */
-	state->save_item(NAME(state->m_last_power[0]));
-	state->save_item(NAME(state->m_last_power[1]));
-	state->save_item(NAME(state->m_pbillian_show_power));
 }
 
 VIDEO_START( superqix )
@@ -235,24 +230,6 @@ SCREEN_UPDATE( pbillian )
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	pbillian_draw_sprites(screen->machine(), bitmap,cliprect);
 
-	if (state->m_pbillian_show_power)
-	{
-		int curr_power;
-
-		curr_power = ((input_port_read(screen->machine(), "PADDLE1") & 0x3f) * 100) / 0x3f;
-		if (state->m_last_power[0] != curr_power)
-		{
-			popmessage	("Power %d%%", curr_power);
-			state->m_last_power[0] = curr_power;
-		}
-
-		curr_power = ((input_port_read(screen->machine(), "PADDLE2") & 0x3f) * 100) / 0x3f;
-		if (state->m_last_power[1] != curr_power)
-		{
-			popmessage	("Power %d%%", curr_power);
-			state->m_last_power[1] = curr_power;
-		}
-	}
 	return 0;
 }
 

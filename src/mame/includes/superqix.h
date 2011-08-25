@@ -24,12 +24,10 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_bitmapram;
 	UINT8 *m_bitmapram2;
-	int m_pbillian_show_power;
 	int m_gfxbank;
 	bitmap_t *m_fg_bitmap[2];
 	int m_show_bitmap;
 	tilemap_t *m_bg_tilemap;
-	int m_last_power[2];
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
 };
