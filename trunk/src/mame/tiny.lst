@@ -1,0 +1,68 @@
+/******************************************************************************
+
+    tiny.lst
+
+    List of all enabled drivers in the system. This file is parsed by
+    makelist.exe, sorted, and output as C code describing the drivers.
+
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+******************************************************************************/
+
+robby			// (c) 1981 Bally Midway
+gridlee			// [1983 Videa] prototype - no copyright notice
+alienar			// (c) 1985 Duncan Brown
+
+carpolo			// (c) 1977 Exidy
+sidetrac		// (c) 1979 Exidy
+targ			// (c) 1980 Exidy
+spectar			// (c) 1980 Exidy
+teetert			// (c) 1982 Exidy
+hardhat			// (c) 1982
+fax				// (c) 1983
+fax2			// (c) 1983
+circus			// (c) 1977 Exidy
+robotbwl		// (c) 197? Exidy
+crash			// (c) 1979 Exidy
+ripcord			// (c) 1979 Exidy
+starfire		// (c) 1979 Exidy
+starfirea		// (c) 1979 Exidy
+fireone			// (c) 1979 Exidy
+starfir2		// (c) 1979 Exidy
+victory			// (c) 1982
+victorba		// (c) 1982
+topgunnr		// (c) 1986
+
+looping			// (c) 1982 Video Games GMBH
+supertnk		// (c) 1981 VIDEO GAMES GmbH, W.-GERMANY
+
+wrally			// (c) 1993 - Ref 930705

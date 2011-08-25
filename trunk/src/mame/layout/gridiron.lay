@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<view name="With LEDs">
+		<bounds left="-20" right="186" top="0" bottom="248" />
+
+		<screen index="0">
+			<bounds left="0" top="0" right="186" bottom="248" />
+		</screen>
+
+		<bezel name="digit0" element="digit">
+			<bounds left="-15" top="18" right="-8" bottom="31" />
+		</bezel>
+
+		<bezel name="digit1" element="digit">
+			<bounds left="-15" top="50" right="-8" bottom="63" />
+		</bezel>
+	</view>
+</mamelayout>

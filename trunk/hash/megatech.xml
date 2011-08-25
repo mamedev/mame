@@ -1,0 +1,693 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+    This list should be kept up to date with any changes made
+    to drivers/megatech.c
+
+    This is considered an alternate way of launching the titles, in order to support mult-cart mode.
+
+    It is not intended to replace the primary MAME launch system!
+-->
+
+<softwarelist name="megatech" description="Sega MegaTech cartridges">
+
+
+  <!-- Game 01 : Altered Beast -->
+  <software name="mt_beast">
+    <description>Altered Beast</description>
+    <year>1988</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12538.ic1"      size="0x080000" crc="3bea3dce" sha1="ec72e4fde191dedeb3f148f132603ed3c23f0f86" offset="0x000000"/>
+        <rom name="epr-12368-01.ic2" size="0x008000" crc="40cb0088" sha1="e1711532c29f395a35a1cb34d789015881b5a1ed" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 02 : Space Harrier II -->
+  <software name="mt_shar2">
+    <description>Space Harrier II</description>
+    <year>1988</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11934.ic1"      size="0x080000" crc="932daa09" sha1="a2d7a76f3604c6227d43229908bfbd02b0ef5fd9" offset="0x000000"/>
+        <rom name="epr-12368-02.ic2" size="0x008000" crc="c129c66c" sha1="e7c0c97db9df9eb04e2f9ff561b64305219b8f1f" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 03 : Super Thunder Blade -->
+  <software name="mt_stbld">
+    <description>Super Thunder Blade</description>
+    <year>1988</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11996f.ic1"     size="0x080000" crc="9355c34e" sha1="26ff91c2921408673c644b0b1c8931d98524bf63" offset="0x000000"/>
+        <rom name="epr-12368-03.ic2" size="0x008000" crc="1ba4ac5d" sha1="9bde57d70189d159ebdc537a9026001abfd0deae" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 04 : Great Golf (SMS based) -->
+  <software name="mt_ggolf">
+    <description>Great Golf (SMS based)</description>
+    <year>1987</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11129f.ic1"     size="0x020000" crc="c6611c84" sha1="eab0eed872dd26b13bcf0b2dd74fcbbc078812c9" offset="0x000000"/>
+        <rom name="epr-12368-04.ic2" size="0x008000" crc="62e5579b" sha1="e1f531be5c40a1216d4192baeda9352384444410" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 05 : Great Soccer (SMS based) -->
+  <software name="mt_gsocr">
+    <description>Great Soccer (SMS based)</description>
+    <year>198?</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp10747f.ic1"     size="0x020000" crc="9cf53703" sha1="c6b4d1de56bd5bf067ec7fc80449c07686d01337" status="baddump" offset="0x000000"/>
+        <rom name="epr-12368-05.ic2" size="0x008000" crc="bab91fcc" sha1="a160c9d34b253e93ac54fdcef33f95f44d8fa90c" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 06 : Out Run (SMS based) -->
+  <software name="mt_orun">
+    <description>Out Run (SMS based)</description>
+    <year>1987</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-11078.ic1"    size="0x040000" crc="5589d8d2" sha1="4f9b61b24f0d9fee0448cdbbe8fc05411dbb1102" offset="0x000000"/>
+        <rom name="epr-12368-06.ic2" size="0x008000" crc="c7c74429" sha1="22ee261a653e10d66e0d6703c988bb7f236a7571" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 07 : Alien Syndrome (SMS based) -->
+  <software name="mt_asyn">
+    <description>Alien Syndrome (SMS based)</description>
+    <year>1987</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-11194.ic1"    size="0x040000" crc="4cc11df9" sha1="5d786476b275de34efb95f576dd556cf4b335a83" offset="0x000000"/>
+        <rom name="epr-12368-07.ic2" size="0x008000" crc="14f4a17b" sha1="0fc010ac95762534892f1ae16986dbf1c25399d3" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 08 : Shinobi (SMS based) -->
+  <software name="mt_shnbi">
+    <description>Shinobi (SMS based)</description>
+    <year>1987</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11706.ic1"      size="0x040000" crc="0c6fac4e" sha1="7c0778c055dc9c2b0aae1d166dbdb4734e55b9d1" offset="0x000000"/>
+        <rom name="epr-12368-08.ic2" size="0x008000" crc="103a0459" sha1="d803ddf7926b83785e8503c985b8c78e7ccb5dac" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 09 : Fantasy Zone (SMS based) -->
+  <software name="mt_fz">
+    <description>Fantasy Zone (SMS based)</description>
+    <year>1987</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-10118.ic1"    size="0x020000" crc="65d7e4e0" sha1="0278cd120dc3a7707eda9314c46c7f27f9e8fdda" offset="0x000000"/>
+        <rom name="epr-12368-09.bin" size="0x008000" crc="373d2a70" sha1="c39dd1003d71a417b12a359126bfef64c7a2fd00" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 10 : After Burner (SMS based) -->
+  <software name="mt_aftrb">
+    <description>After Burner (SMS based)</description>
+    <year>1987</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11271.ic1"      size="0x080000" crc="1c951f8e" sha1="51531df038783c84640a0cab93122e0b59e3b69a" offset="0x000000"/>
+        <rom name="epr-12368-10.ic2" size="0x008000" crc="2a7cb590" sha1="2236963bddc89ca9045b530259cc7b5ccf889eaf" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 11 : Thunder Force II MD -->
+  <software name="mt_tfor2">
+    <description>Thunder Force II MD</description>
+    <year>1989</year>
+    <publisher>Tecno Soft / Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12559.ic1"      size="0x080000" crc="b093bee3" sha1="0bf6194c3d228425f8cf1903ed70d8da1b027b6a" offset="0x000000"/>
+        <rom name="epr-12368-11.ic2" size="0x008000" crc="f4f27e8d" sha1="ae1a2823deb416c53838115966f1833d5dac72d4" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 13 : Astro Warrior (SMS based) -->
+  <software name="mt_astro">
+    <description>Astro Warrior (SMS based)</description>
+    <year>1986</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="ep13817.ic2"      size="0x020000" crc="299cbb74" sha1="901697a3535ad70190647f34ad5b30b695d54542" offset="0x000000"/>
+        <rom name="epr-12368-13.ic1" size="0x008000" crc="4038cbd1" sha1="696bc1efce45d9f0052b2cf0332a232687c8d6ab" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 19 : Great Football (SMS based) -->
+  <software name="mt_gfoot">
+    <description>Great Football (SMS based)</description>
+    <year>1987</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-10576f.ic1"   size="0x020000" crc="2055825f" sha1="a768f44ce7e50083ffe8c4b5e3ac93ceb7bd3266" offset="0x000000"/>
+        <rom name="epr-12368-19.ic2" size="0x008000" crc="e27cb37a" sha1="2b6259957e86d033a5689fd716a9efcfeff7d5ba" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 20 : Last Battle -->
+  <software name="mt_lastb">
+    <description>Last Battle</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12578f.ic1"     size="0x080000" crc="531191a0" sha1="f6bc26e975c01a3e10ab4033e4c5f494627a1e2f" offset="0x000000"/>
+        <rom name="epr-12368-20.ic2" size="0x008000" crc="e1a71c91" sha1="c250da18660d8aea86eb2abace41ba46130dabc8" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 21 : World Championship Soccer -->
+  <software name="mt_wcsoc">
+    <description>World Championship Soccer</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12607b.ic1"     size="0x080000" crc="bc591b30" sha1="55e8577171c0933eee53af1dabd0f4c6462d5fc8" offset="0x000000"/>
+        <rom name="epr-12368-21.ic2" size="0x008000" crc="028ee46b" sha1="cd8f81d66e5ae62107eb20e0ca5db4b66d4b2987" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 22 : Tetris -->
+  <software name="mt_tetri">
+    <description>Tetris</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-12356f.ic1"   size="0x020000" crc="1e71c1a0" sha1="44b2312792e49d46d71e0417a7f022e5ffddbbfe" offset="0x000000" loadflag="load16_byte"/>
+        <rom name="mpr-12357f.ic2"   size="0x020000" crc="d52ca49c" sha1="a9159892eee2c0cf28ebfcfa99f81f80781851c6" offset="0x000001" loadflag="load16_byte"/>
+        <rom name="epr-12368-22.ic3" size="0x008000" crc="1c1b6468" sha1="568a38f4186167486e39ab4aa2c1ceffd0b81156" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 23 : Ghouls'n Ghosts -->
+  <software name="mt_gng">
+    <description>Ghouls'n Ghosts</description>
+    <year>1989</year>
+    <publisher>Capcom / Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12605.ic1"      size="0x020000" crc="1066c6ab" sha1="c30e4442732bdb38c96d780542f8550a94d127b0" offset="0x000000"/>
+        <rom name="mpr12606.ic2"     size="0x020000" crc="d0be7777" sha1="a44b2a3d427f6973b5c1a3dcd8d1776366acb9f7" offset="0x080000"/>
+        <rom                         size="0x060000"                                                                offset="0x020000" loadflag="continue" />
+        <rom name="epr-12368-23.ic3" size="0x008000" crc="7ee58546" sha1="ad5bb0934475eacdc5e354f67c96fe0d2512d33b" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 24 : Super Hang-On -->
+  <software name="mt_shang">
+    <description>Super Hang-On</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-12640.ic1"    size="0x080000" crc="2fe2cf62" sha1="4728bcc847deb38b16338cbd0154837cd4a07b7d" offset="0x000000"/>
+        <rom name="epr-12368-24.ic2" size="0x008000" crc="6c2db7e3" sha1="8de0a10ed9185c9e98f17784811a79d3ce8c4c03" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 25 : Golden Axe -->
+  <software name="mt_gaxe">
+    <description>Golden Axe</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="12806.ic1"        size="0x080000" crc="43456820" sha1="2f7f1fcd979969ac99426f11ab99999a5494a121" offset="0x000000"/>
+        <rom name="epr-12368-25.ic2" size="0x008000" crc="1f07ed28" sha1="9d54192f4c6c1f8a51c38a835c1dd1e4e3e8279e" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 26 : Forgotten Worlds -->
+  <software name="mt_fwrld">
+    <description>Forgotten Worlds</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <!-- This ROM is byteswapped like a MD dump targetted at console emulators, is it correct? -->
+        <rom name="mpr-12672-h.ic1"  size="0x080000" crc="d0ee6434" sha1="8b9a37c206c332ef23dc71f09ec40e1a92b1f83a" offset="0x000000" loadflag="load16_word_swap"/>
+        <rom name="epr-12368-26.ic2" size="0x008000" crc="4623b573" sha1="29df4a5c5de66cd9cb7519e4f30000f7dddc2138" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 27 : Mystic Defender -->
+  <software name="mt_mystd">
+    <description>Mystic Defender</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12707.1"        size="0x080000" crc="4f2c513d" sha1="f9bb548b3688170fe18bb3f1b5b54182354143cf" offset="0x000000"/>
+        <rom name="epr-12368-27.ic2" size="0x008000" crc="caf46f78" sha1="a9659e86a6a223646338cd8f29c346866e4406c7" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 28 : The Revenge of Shinobi -->
+  <software name="mt_revsh">
+    <description>The Revenge of Shinobi</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12675.ic1"      size="0x080000" crc="672a1d4d" sha1="5fd0af14c8f2cf8ceab1ae61a5a19276d861289a" offset="0x000000"/>
+        <rom name="epr-12368-28.ic2" size="0x008000" crc="0d30bede" sha1="73a090d84b78a570e02fb54a33666dcada52849b" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 29 : Parlour Games (SMS based) -->
+  <software name="mt_parlg">
+    <description>Parlour Games (SMS based)</description>
+    <year>1987</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11404.ic1"      size="0x020000" crc="e030e66c" sha1="06664daf208f07cb00b603b12eccfc3f01213a17" offset="0x000000"/>
+        <rom name="epr-12368-29.ic2" size="0x008000" crc="534151e8" sha1="219238d90c1d3ac07ff64c9a2098b490fff68f04" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 31 : Arnold Palmer Tournament Golf -->
+  <software name="mt_tgolf">
+    <description>Arnold Palmer Tournament Golf</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12645f.ic1"     size="0x080000" crc="c07ef8d2" sha1="9d111fdc7bb92d52bfa048cd134aa488b4f475ef" offset="0x000000"/>
+        <rom name="epr-12368-31.ic2" size="0x008000" crc="30af7e4a" sha1="baf91d527393dc90aba9371abcb1e690bcc83c7e" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 32 : Super Real Basketball -->
+  <software name="mt_srbb">
+    <description>Super Real Basketball</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <!-- This ROM is byteswapped like a MD dump targetted at console emulators, is it correct? -->
+        <rom name="mpr-12904f.ic1"   size="0x080000" crc="4346e11a" sha1="c86725780027ef9783cb7884c8770cc030b0cd0d" offset="0x000000" loadflag="load16_word_swap"/>
+        <rom name="epr-12368-32.ic2" size="0x008000" crc="f70adcbe" sha1="d4412a7cd59fe282a1c6619aa1051a2a2e00e1aa" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 35 : Tommy Lasorda Baseball -->
+  <software name="mt_tlbba">
+    <description>Tommy Lasorda Baseball</description>
+    <year>1989</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12706.ic1"      size="0x080000" crc="8901214f" sha1="f5ec166be1cf9b86623b9d7a78ec903b899da32a" offset="0x000000"/>
+        <rom name="epr-12368-35.ic2" size="0x008000" crc="67bbe482" sha1="6fc283b22e68befabb44b2cc61a7f82a71d6f029" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 36 : Columns -->
+  <software name="mt_cols">
+    <description>Columns</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp13193-t.ic1"    size="0x080000" crc="8c770e2f" sha1="02a3626025c511250a3f8fb3176eebccc646cda9" offset="0x000000"/>
+        <rom name="epr-12368-36.ic3" size="0x008000" crc="a4b29bac" sha1="c9be866ac96243897d09612fe17562e0481f66e3" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 38 : Cyber Police ESWAT: Enhanced Special Weapons and Tactics -->
+  <software name="mt_eswat">
+    <description>Cyber Police ESWAT: Enhanced Special Weapons and Tactics</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp13192-h.ic1"    size="0x080000" crc="82f458ef" sha1="58444b783312def71ecffc4ad021b72a609685cb" offset="0x000000"/>
+        <rom name="epr-12368-38.ic2" size="0x008000" crc="43c5529b" sha1="104f85adea6da1612c0aa96d553efcaa387d7aaf" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 39 : Super Monaco GP -->
+  <software name="mt_smgp">
+    <description>Super Monaco GP</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="13250.ic1"        size="0x080000" crc="189b885f" sha1="31c06ffcb48b1604989a94e584261457de4f1f46" offset="0x000000"/>
+        <rom name="epr-12368-39.ic2" size="0x008000" crc="64b3ce25" sha1="83a9f2432d146a712b037f96f261742f7dc810bb" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 40 : Michael Jackson's Moonwalker -->
+  <software name="mt_mwalk">
+    <description>Michael Jackson's Moonwalker</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp13285a.ic1"     size="0x080000" crc="189516e4" sha1="2a79e07da2e831832b8d448cae87a833c85e67c9" offset="0x000000"/>
+        <rom name="epr-12368-40.ic2" size="0x008000" crc="0482378c" sha1="734772f3ddb5ff82b76c3514d18a464b2bce8381" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 41 : Crack Down -->
+  <software name="mt_crack">
+    <description>Crack Down</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp13578a-s.ic1"   size="0x080000" crc="23f19893" sha1="09aca793871e2246af4dc24925bc1eda8ff34446" offset="0x000000"/>
+        <rom name="epr-12368-41.ic2" size="0x008000" crc="3014acec" sha1="07953e9ae5c23fc7e7d08993b215f4dfa88aa5d7" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 43 : Shadow Dancer -->
+  <software name="mt_shado">
+    <description>Shadow Dancer</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-13571-s.ic1"  size="0x080000" crc="56a29310" sha1="55836177e4a1e2deb68408976b29d0282cf661a9" offset="0x000000"/>
+        <rom name="epr-12368-43.ic2" size="0x008000" crc="1116cbc7" sha1="ba6dd21ceadeedf730b71b67acbd20d9067114f3" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 44 : Arrow Flash -->
+  <software name="mt_arrow">
+    <description>Arrow Flash</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr13396h.ic1"    size="0x080000" crc="091226e3" sha1="cb15c6277314f3c4a86b5ae5823f72811d5d269d" offset="0x000000"/>
+        <rom name="epr-12368-44.ic2" size="0x008000" crc="e653065d" sha1="96b014fc4df8eb2188ac94ed0a778d974fe6dcad" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 47 : Alien Storm -->
+  <software name="mt_astrm">
+    <description>Alien Storm</description>
+    <year>1990</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp13941.ic1"      size="0x080000" crc="d71b3ee6" sha1="05f272dad243d132d517c303388248dc4c0482ed" offset="0x000000"/>
+        <rom name="epr-12368-47.ic2" size="0x008000" crc="31fb683d" sha1="e356da020bbf817b97fb10c27f75cf5931edf4fc" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 48 : Wrestle War -->
+  <software name="mt_wwar">
+    <description>Wrestle War</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-14025-f.ic1"  size="0x080000" crc="26e899fe" sha1="6d28e154ae2e4196097a2aa96c5acd5dfe7e3d2b" offset="0x000000"/>
+        <rom name="epr-12368-48.ic2" size="0x008000" crc="25817bc2" sha1="ba1bbb952aff12fb4d3ecfb10d82c54128439395" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 49 : Bonanza Bros. -->
+  <software name="mt_bbros">
+    <description>Bonanza Bros.</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp13905a.ic1"     size="0x100000" crc="68a88d60" sha1="2f56e8a2b0999de4fa0d14a1527f4e1df0f9c7a2" offset="0x000000"/>
+        <rom name="epr-12368-49.ic2" size="0x008000" crc="c5101da2" sha1="636f30043e2e9291e193ef9a2ead2e97a0bf7380" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 51 : Streets of Rage -->
+  <software name="mt_srage">
+    <description>Streets of Rage</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-13571-s.ic1"  size="0x080000" crc="db4ac746" sha1="c7cc24e2329f279574513fa32bbf79f72f75aeea" offset="0x000000"/>
+        <rom name="epr-12368-51.ic2" size="0x008000" crc="49b7d6f4" sha1="96e69851c92715e7daf35b184cf374147a8d2880" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 52 : Sonic The Hedgehog (set 1) -->
+  <software name="mt_sonic">
+    <description>Sonic The Hedgehog (set 1)</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp13913.ic1"      size="0x080000" crc="480b4b5c" sha1="ab1dc1f738e3b2d0898a314b123fa71182bf572e" offset="0x000000"/>
+        <rom name="epr-12368-52.ic2" size="0x008000" crc="6a69d20c" sha1="e483b39ff6eca37dc192dc296d004049e220554a" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 52 : Sonic The Hedgehog (set 2) -->
+  <software name="mt_sonia" cloneof="mt_sonic">
+    <description>Sonic The Hedgehog (set 2)</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp13933.ic1"      size="0x080000" crc="13775004" sha1="5decfd35944a2d0e7b996b9a4a12b616a309fd5e" offset="0x000000"/>
+        <rom name="epr-12368-52.ic2" size="0x008000" crc="6a69d20c" sha1="e483b39ff6eca37dc192dc296d004049e220554a" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 53 : Fire Shark -->
+  <software name="mt_fshrk">
+    <description>Fire Shark</description>
+    <year>1990</year>
+    <publisher>Toaplan / Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp14341.ic1"      size="0x080000" crc="04d65ebc" sha1="24338aecdc52b6f416548be722ca475c83dbae96" offset="0x000000"/>
+        <rom name="epr-12368-53.ic2" size="0x008000" crc="4fa61044" sha1="7810deea221c10b0b2f5233443d81f4f1998ee58" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 54 : Spider-Man vs The Kingpin -->
+  <software name="mt_spman">
+    <description>Spider-Man vs The Kingpin</description>
+    <year>1991</year>
+    <publisher>Marvel / Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp14027-sm.ic1"   size="0x080000" crc="e2c08a06" sha1="39e592eafd47e2aa6edbb4845d44750057bff890" offset="0x000000"/>
+        <rom name="epr-12368-54.ic2" size="0x008000" crc="30b68988" sha1="04eeb0fad732a791b6bc0c0846306d567573649f" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 55? : California Games -->
+  <software name="mt_calga">
+    <description>California Games</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="epr-14494.ic1"   size="0x040000" crc="cbe58b1b" sha1="ea067fc08e644c993f8d13731425c9296c1a2a75" offset="0x000000" loadflag="load16_byte"/>
+        <rom name="epr-14495.ic2"   size="0x040000" crc="cb956f4f" sha1="3574c496b79aefdec7d02975490ebe3bb373bc60" offset="0x000001" loadflag="load16_byte"/>
+        <rom name="epr-12368-55.ic3" size="0x008000" crc="6f7dd8f5" sha1="a6cb1aa8c3635738dd9e4d3e0d729d089fd9b599" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 57 : Golden Axe II -->
+  <software name="mt_gaxe2">
+    <description>Golden Axe II</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp14272.ic1"      size="0x080000" crc="d4784cae" sha1="b6c286027d06fd850016a2a1ee1f1aeea080c3bb" offset="0x000000"/>
+        <rom name="epr-12368-57.ic2" size="0x008000" crc="dc9b4433" sha1="efd3a598569010cdc4bf38ecbf9ed1b4e14ffe36" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 58 : Joe Montana II: Sports Talk Football -->
+  <software name="mt_stf">
+    <description>Joe Montana II: Sports Talk Football</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp14356a-f.ic1"   size="0x100000" crc="20cf32f6" sha1="752314346a7a98b3808b3814609e024dc0a4108c" offset="0x000000"/>
+        <rom name="epr-12368-58.ic2" size="0x008000" crc="dce2708e" sha1="fcebb1899ee11468f6bda705899f074e7de9d723" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 59 : Mario Lemieux Hockey -->
+  <software name="mt_mlh">
+    <description>Mario Lemieux Hockey</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-14376-h.ic1"  size="0x080000" crc="aa9be87e" sha1="dceed94eaeb30e534f6953a4bc25ff37673b1e6b" offset="0x000000"/>
+        <rom name="epr-12368-59.ic2" size="0x008000" crc="6d47b438" sha1="0a145f6438e4e55c957ae559663c37662b685246" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 60 : Kid Chameleon -->
+  <software name="mt_kcham">
+    <description>Kid Chameleon</description>
+    <year>1992</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp14557.ic1"      size="0x100000" crc="e1a889a4" sha1="a2768eacafc47d371e5276f0cce4b12b6041337a" offset="0x000000"/>
+        <rom name="epr-12368-60.ic2" size="0x008000" crc="a8e4af18" sha1="dfa49f6ec4047718f33dba1180f6204dbaff884c" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 61 : Turbo Outrun -->
+  <software name="mt_tout">
+    <description>Turbo Outrun</description>
+    <year>1992</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="epr-14674.ic1"    size="0x080000" crc="453712a2" sha1="5d2c8430a9a14aac7f19c22617539b0503ab92cd" offset="0x000000"/>
+        <rom name="epr-12368-61.ic2" size="0x008000" crc="4aa0b2a2" sha1="bce03f88d6cfd02683d51c28058f6229fda13b49" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 62 : Sonic The Hedgehog 2 -->
+  <software name="mt_soni2">
+    <description>Sonic The Hedgehog 2</description>
+    <year>1992</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp15000a-f.ic1"   size="0x100000" crc="679ebb49" sha1="557482064677702454562f753460993067ef9e16" offset="0x000000"/>
+        <rom name="epr-12368-62.ic2" size="0x008000" crc="14a8566f" sha1="d1d14162144bf068ddd19e9736477ff98fb43f9e" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
+</softwarelist>
