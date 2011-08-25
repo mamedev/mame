@@ -125,11 +125,11 @@ INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 *trac
 ***************************************************************************/
 
 cdrom_file *cdrom_open(const char *inputfile)
-{	
+{
 	int i;
 	cdrom_file *file;
-	UINT32 physofs;	
-	
+	UINT32 physofs;
+
 	/* allocate memory for the CD-ROM file */
 	file = (cdrom_file *)malloc(sizeof(cdrom_file));
 	if (file == NULL)
@@ -193,7 +193,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 		return NULL;
 	}
 
-	return file;	
+	return file;
 }
 
 /*-------------------------------------------------
@@ -289,15 +289,15 @@ void cdrom_close(cdrom_file *file)
 	/* free the cache */
 	if (file->cache)
 		free(file->cache);
-		
-	if (file->chd == NULL) 
+
+	if (file->chd == NULL)
 	{
 		for (int i = 0; i < file->cdtoc.numtrks; i++)
 		{
 			core_fclose(file->fhandle[i]);
 		}
 	}
-		
+
 	free(file);
 }
 
@@ -726,18 +726,18 @@ static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT
 			err = chd_read(file->chd, hunknum, file->cache);
 			if (err != CHDERR_NONE)
 				return err;
-		} else {		
+		} else {
 			core_file *srcfile = file->fhandle[*tracknum];
 
 			UINT64 sourcefileoffset = file->track_info.offset[*tracknum];
-			int bytespersector = file->cdtoc.tracks[*tracknum].datasize + file->cdtoc.tracks[*tracknum].subsize;			
+			int bytespersector = file->cdtoc.tracks[*tracknum].datasize + file->cdtoc.tracks[*tracknum].subsize;
 
 			sourcefileoffset += chdsector * bytespersector;
 
 			core_fseek(srcfile, sourcefileoffset, SEEK_SET);
 			core_fread(srcfile, file->cache, bytespersector);
 
-			if (file->track_info.swap[*tracknum])					
+			if (file->track_info.swap[*tracknum])
 			{
 				for (int swapindex = 0; swapindex < 2352; swapindex += 2 )
 				{
@@ -747,7 +747,7 @@ static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT
 				}
 			}
 		}
-		
+
 		file->cachehunk = hunknum;
 	}
 	return CHDERR_NONE;

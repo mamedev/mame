@@ -1042,7 +1042,7 @@ bool floppy_image_format_t::type_no_data(int type) const
 
 bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs) const
 {
-	return !type_no_data(type) && 
+	return !type_no_data(type) &&
 		type != RAW &&
 		type != RAWBITS &&
 		(type != CRC || (crcs[p1].type != CRC_CCITT && crcs[p1].type != CRC_AMIGA));
@@ -1179,7 +1179,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT
 	int sector_limit = 0;
 
 	while(desc[index].type != END) {
-		//		printf("%d.%d.%d (%d) - %d %d\n", desc[index].type, desc[index].p1, desc[index].p2, index, offset, offset/8);
+		//      printf("%d.%d.%d (%d) - %d %d\n", desc[index].type, desc[index].p1, desc[index].p2, index, offset, offset/8);
 		switch(desc[index].type) {
 		case MFM:
 			for(int i=0; i<desc[index].p2; i++)

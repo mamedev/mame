@@ -156,7 +156,7 @@ m_searchpath = combinedpath;
 
 
 //-------------------------------------------------
-//  audit_device - audit the device 
+//  audit_device - audit the device
 //-------------------------------------------------
 
 media_auditor::summary media_auditor::audit_device(device_t *device, const char *validation)

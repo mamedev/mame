@@ -73,9 +73,9 @@ ROM_START( ec_barx )
 	ROM_LOAD( "bx54a3", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
 	ROM_LOAD( "bx54a2", 0x0000, 0x001000, CRC(5b2d42ec) SHA1(abc394cad55786df99d8bea7a4497a338ec180d8) )
 // same as above
-//	ROM_LOAD( "bx54a4up", 0x0000, 0x001000, CRC(7dc2d19e) SHA1(ad012de848b586ae8355ea300edce96d0f0ce2a8) )
-//	ROM_LOAD( "bx54a3up", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
-//	ROM_LOAD( "bx54a2up", 0x0000, 0x001000, CRC(5b2d42ec) SHA1(abc394cad55786df99d8bea7a4497a338ec180d8) )
+//  ROM_LOAD( "bx54a4up", 0x0000, 0x001000, CRC(7dc2d19e) SHA1(ad012de848b586ae8355ea300edce96d0f0ce2a8) )
+//  ROM_LOAD( "bx54a3up", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
+//  ROM_LOAD( "bx54a2up", 0x0000, 0x001000, CRC(5b2d42ec) SHA1(abc394cad55786df99d8bea7a4497a338ec180d8) )
 
 	ROM_LOAD( "bx5pa4", 0x0000, 0x001000, CRC(34b4d7cb) SHA1(b2ff3c79e635fff8f02edc9c953cc619fb409aa5) )
 	ROM_LOAD( "bx5pa3", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
@@ -106,7 +106,7 @@ ROM_START( ec_barx )
 
 	/* Unique ROM containing 1993 Electrocoin Copyright */
 	ROM_LOAD( "bxc1&6c.rom", 0x0000, 0x008000, CRC(356964c3) SHA1(68522a0d379ab49f5975e0628f3e813cfe3287a3) )
-	
+
 	/* 32Kb With Header / Space for Header */
 
 	// Some Roms below use a header at the start, containing 8x8 Byte strings to describe what type of set it is
@@ -142,7 +142,7 @@ ROM_START( ec_barx )
 	ROM_LOAD( "issa794", 0x0000, 0x008000, CRC(47334130) SHA1(08204545d20fa017321183126a856446b08e09b9) ) // -1-- ----
 	ROM_LOAD( "issa795", 0x0000, 0x008000, CRC(d24936fd) SHA1(f0efa2d30c71285d31ae2c47ce2baef3bb72bc66) ) // --2S K---
 	ROM_LOAD( "issa796", 0x0000, 0x008000, CRC(0d5c020d) SHA1(f41e015773c908228f55f1ce3e35b22ad4b6bf33) ) // -1-S K---
-	ROM_LOAD( "issa797", 0x0000, 0x008000, CRC(57cf216a) SHA1(070297c07404f92928581d73751e82158e9567d7) ) // ---S K--- 
+	ROM_LOAD( "issa797", 0x0000, 0x008000, CRC(57cf216a) SHA1(070297c07404f92928581d73751e82158e9567d7) ) // ---S K---
 
 	ROM_LOAD( "issa798", 0x0000, 0x008000, CRC(c15f25e2) SHA1(b7a32876a7f8512451d911f0611cbdc8a083a79e) ) // -1-- ----
 	ROM_LOAD( "issa799", 0x0000, 0x008000, CRC(9682ca8c) SHA1(a6846bff4aaa9ccf997f7049300b62138a405e20) ) // --2S K---
@@ -240,7 +240,7 @@ ROM_START( ec_barx )
 	ROM_LOAD( "issa872", 0x0000, 0x008000, CRC(957536b1) SHA1(4ca031ba9b3bd5e178abe7951498f8202fa4cd48) ) // P1-- ---G
 	ROM_LOAD( "issa873", 0x0000, 0x008000, CRC(171cdb19) SHA1(f0f7cb81b220d757c5dadbe9e2cc0dbc6aa02962) ) // P-2S K--G
 	ROM_LOAD( "issa874", 0x0000, 0x008000, CRC(704f999c) SHA1(259430d175c22a33f222ab1138159b8fc838c98f) ) // P1-S K--G
-	
+
 	/****** Other Stuff in here ******/
 
 	// there two look closer to Bellfruit scramble, but aren't.  They're probably something else tho...
@@ -287,7 +287,7 @@ ROM_END
 
 ROM_START( ec_big7 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	
+
 	/* No indication, no space for header */
 	ROM_LOAD( "b710", 0x0000, 0x008000, CRC(0cdae404) SHA1(e8d713e172e5ff37e31e68d096fac77fbe676006) )
 	ROM_LOAD( "b75p4", 0x0000, 0x008000, CRC(27ad1971) SHA1(4c1248d5815143dc0b23ada909c4f1fc16a1a18b) )
@@ -307,9 +307,9 @@ ROM_START( ec_big7 )
 	ROM_LOAD( "iss2017.rom", 0x0000, 0x008000, CRC(165dc63c) SHA1(f820bc99755f38a911357e705075d24d3aac43b7) )
 	ROM_LOAD( "iss2019.rom", 0x0000, 0x008000, CRC(475b224a) SHA1(c837aa0c73cf5947b6b4d106d4f0967da040e5dc) )
 	ROM_LOAD( "iss513.rom", 0x0000, 0x008000, CRC(ca302c47) SHA1(9fb9cdd140baa0ec36250b4ebd0a25450348075f) )
-	
+
 	/* All have 'BIG7' and type info in header */
-	ROM_LOAD( "big7.bin", 0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6) )	
+	ROM_LOAD( "big7.bin", 0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6) )
 	ROM_LOAD( "iss3025.rom", 0x0000, 0x008000, CRC(26c9382a) SHA1(8c4fe06a8e5171e6f2c91b0aee14484aca386a9c) )
 	ROM_LOAD( "iss3027.rom", 0x0000, 0x008000, CRC(7dc5ccbe) SHA1(2e904f6dced08ed38c4e5c0adfa6904b80a0a0fa) )
 	ROM_LOAD( "iss3033.rom", 0x0000, 0x008000, CRC(52e6c6b7) SHA1(9ff5c6cca014735f8cffffb56a85657b0941e9f8) )
@@ -412,7 +412,7 @@ ROM_END
 
 ROM_START( ec_mag7s )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	
+
 	// These are '2001 COOL7' (newer header type)
 	ROM_LOAD( "issa933", 0x0000, 0x008000, CRC(ebb6b015) SHA1(1c02663f1193b9aa92183ac46146c49cdb9fa420) )
 	ROM_LOAD( "issa934", 0x0000, 0x008000, CRC(522c9ed5) SHA1(ae3f2760f10f8d884500d9fa67169bde9913fd52) )
@@ -470,7 +470,7 @@ ROM_START( ec_mag7s )
 	ROM_LOAD( "issa988", 0x0000, 0x008000, CRC(0e5d421e) SHA1(b61fc2d7651dc684168be2f0c8f0739a442a062c) )
 	ROM_LOAD( "issa989", 0x0000, 0x008000, CRC(a469a2f8) SHA1(351f6e2849b2d5778fb96c96b2bb356f4b02787c) )
 	ROM_LOAD( "issa990", 0x0000, 0x008000, CRC(ad90f5a5) SHA1(2b09f7eb46f054550c5f638bc83708231c34e189) )
-	
+
 	// This just has 'Cool7' with no other header information (all 0x00)
 	ROM_LOAD( "majic.dat", 0x0000, 0x008000, CRC(a1ca176f) SHA1(90dc3204091c6328764122dc583e47ea8ac314e4) )
 ROM_END
@@ -498,21 +498,21 @@ ROM_END
 /*
      ELECTROCOIN  OXO  CLUB
 
-  Oxo-2.3n ---------- 54AE     £25
-  Oxo-2.3p ---------- 55AD    £25
-  Oxo-2-2T.box ----  9976     £25
-  Oxo-nv7.2-3 ------  3E15    £25
+  Oxo-2.3n ---------- 54AE     ?25
+  Oxo-2.3p ---------- 55AD    ?25
+  Oxo-2-2T.box ----  9976     ?25
+  Oxo-nv7.2-3 ------  3E15    ?25
 
-  Oxo-1.6n ---------- EC97      £5 / £15
-  Oxo-1.8p ---------- 13BD     £5 / £15
-  Oxo-1-2T.box ---- 9D35      £5 / £15 
+  Oxo-1.6n ---------- EC97      ?5 / ?15
+  Oxo-1.8p ---------- 13BD     ?5 / ?15
+  Oxo-1-2T.box ---- 9D35      ?5 / ?15
 */
 
 ROM_START( ec_oxocl )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	// looks like a similar config to set above, the 't' roms being the TOP roms
 	ROM_LOAD( "ocn7 v18 non protocol.hex", 0x0000, 0x02680d, CRC(91755ca8) SHA1(38dea02258e4cf731680621c96ebd473e74ae0f6) ) // convert from HEX and check
-//	ROM_LOAD( "oxo club.txt", 0x0000, 0x000127, CRC(2ae1750e) SHA1(e15bcc78bcdb4672a77dd46b8f40313dc4a88c59) )
+//  ROM_LOAD( "oxo club.txt", 0x0000, 0x000127, CRC(2ae1750e) SHA1(e15bcc78bcdb4672a77dd46b8f40313dc4a88c59) )
 	ROM_LOAD( "oxo-1-2t.box", 0x0000, 0x010000, CRC(8fd03d19) SHA1(b3df92a8a4e0f4b8f813758aa4e881f45a04c8e4) )
 	ROM_LOAD( "oxo-1.6n", 0x0000, 0x010000, CRC(5c4637c5) SHA1(923a8d50b2b8a7d97d6d1994dafde3aafe0f8c45) )
 	ROM_LOAD( "oxo-1.8p", 0x0000, 0x010000, CRC(26a40f47) SHA1(2c61fa010efc4684e2c53d58a81bd8071246b3f1) )
@@ -586,7 +586,7 @@ ROM_END
 
 ROM_START( ec_redbr )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	
+
 	// These are 'REDBAR' they use the same header format as ec_big7
 	ROM_LOAD( "iss2021.rom", 0x0000, 0x008000, CRC(71fffd80) SHA1(49cc502e54e135bb131b8ac096619df9f1f29055) )
 	ROM_LOAD( "iss3040.bin", 0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d) )
@@ -598,7 +598,7 @@ ROM_START( ec_redbr )
 	ROM_LOAD( "issa102", 0x0000, 0x008000, CRC(9aebf74c) SHA1(4da5d9240a2dcfdaa96a8a784ea5745c90108f9e) )
 	ROM_LOAD( "issa106", 0x0000, 0x008000, CRC(77219ea1) SHA1(e4432e7c16b8911b272ae0bf3daf993649c4fd5f) )
 	ROM_LOAD( "issa107", 0x0000, 0x008000, CRC(e6e84ed9) SHA1(2151304bf7c2032edefd84ceb91a02af9df09c64) )
-	
+
 	// These are '2001 REDBAR' (newer header type)
 	ROM_LOAD( "issa875", 0x0000, 0x008000, CRC(44cf12be) SHA1(4b9f001c9776989b4b21ed589b1dceb6cb040096) )
 	ROM_LOAD( "issa876", 0x0000, 0x008000, CRC(ef5d1343) SHA1(a609377a3dcfa7914a7a548e80e31fee3a6237fd) )
@@ -667,7 +667,7 @@ ROM_START( ec_rcc )
 	ROM_LOAD( "rcas20p4.5", 0x0000, 0x010000, CRC(54a1ddde) SHA1(e98b6dbf0256324fe1cdddbe4b89958d3d5f1233) )
 	ROM_LOAD( "rcas20p4.5d", 0x0000, 0x010000, CRC(b42e2415) SHA1(fcc76977a920b6116c5e9029340aa51abb2ab713) )
 	ROM_LOAD( "rcas25p4.5", 0x0000, 0x010000, CRC(0aeb0332) SHA1(1b2f2332ac30736892f72b7771fa0825a95f19ad) )
-	
+
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "rcas4-5.snd", 0x0000, 0x100000, CRC(8d9403e1) SHA1(8a8da6f99a524646a8c689861a5cd6aafeef700b) )
 ROM_END
@@ -708,7 +708,7 @@ ROM_START( ec_supbx )
 	ROM_LOAD( "sbx8elac", 0x0000, 0x008000, CRC(102a3f38) SHA1(5f4f55904b00dde47e9841de313ed76a56e711df) )
 	ROM_LOAD( "superbarx_issue129_10cash.bin", 0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b) )
 	ROM_LOAD( "superbarx_issue158_sitdown10cash.bin", 0x0000, 0x008000, CRC(80c2d523) SHA1(1252bf66987aa9ac610c3e9f0919f29a6ad6cc52) )
-	
+
 	/* No Header, type 2 - closer to the BRUNEL sets */
 	ROM_LOAD( "sbx5nc.10", 0x0000, 0x008000, CRC(beb7254a) SHA1(137e91e0b92d970d09d165a42b890a5d31d795d9) )
 	ROM_LOAD( "sbx5nc.20", 0x0000, 0x008000, CRC(0ceb3e29) SHA1(e96e1470292208825407ba64750121dd3c7bf857) )
@@ -874,8 +874,8 @@ ROM_START( ec_suprl )
 	ROM_LOAD( "sr25b16.hex", 0x0000, 0x02680d, CRC(87c33f5f) SHA1(f1ff058b8f670503f73b1fddb5a58becd671294b) ) // convert from HEX and check
 	ROM_LOAD( "srle v1.0 protocol.hex", 0x0000, 0x02680d, CRC(57bec009) SHA1(ebf99f6ca5f20e9a30ba694cb3d17f6c8b5827f5) ) // convert from HEX and check
 	ROM_LOAD( "srt30.hex", 0x0000, 0x02680d, CRC(d6b970fa) SHA1(d31cc4ae7a920b73f2b377d4e36be56422bc3632) ) // convert from HEX and check
-	
-	
+
+
 	ROM_LOAD( "srv11.btm", 0x0000, 0x010000, CRC(e68b5a8a) SHA1(b9a1b76f93ab62b5c5d8d56a1210e2d8194bb5b6) )
 	ROM_LOAD( "srv11.top", 0x0000, 0x010000, CRC(05712727) SHA1(b2e29faa7babe560ba928870e96afa3893ba8955) )
 	ROM_LOAD( "srv3-0.btm", 0x0000, 0x010000, CRC(d629133b) SHA1(2a25540885d34bf38528cecd360953818beb6197) )
@@ -903,29 +903,29 @@ ROM_END
 
 /*
 ROM_START( ec_unk2 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// These are just BARX roms
-	ROM_LOAD( "a3all.bin", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
-	ROM_LOAD( "a3csh.bin", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
-	ROM_LOAD( "a3low10", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
+    ROM_REGION( 0x200000, "maincpu", 0 )
+    // These are just BARX roms
+    ROM_LOAD( "a3all.bin", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
+    ROM_LOAD( "a3csh.bin", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
+    ROM_LOAD( "a3low10", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
 ROM_END
 */
 
 /*
 ROM_START( ec_unk3 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// These also look like BARX roms, one matches, and the others are clearly just variations of it
-	ROM_LOAD( "a410p.bin", 0x0000, 0x001000, CRC(6c19d237) SHA1(9fa79bd0ab78685fed974e5b82ec419381337252) )
-	ROM_LOAD( "a410p~.bin", 0x0000, 0x001000, CRC(0f1020f1) SHA1(e29cd3954f3cd0ae5c4a113f8922bd1f3be0e740) )
-	ROM_LOAD( "a45p.bin", 0x0000, 0x001000, CRC(34b4d7cb) SHA1(b2ff3c79e635fff8f02edc9c953cc619fb409aa5) ) // bx5pa4 from ec_barx
+    ROM_REGION( 0x200000, "maincpu", 0 )
+    // These also look like BARX roms, one matches, and the others are clearly just variations of it
+    ROM_LOAD( "a410p.bin", 0x0000, 0x001000, CRC(6c19d237) SHA1(9fa79bd0ab78685fed974e5b82ec419381337252) )
+    ROM_LOAD( "a410p~.bin", 0x0000, 0x001000, CRC(0f1020f1) SHA1(e29cd3954f3cd0ae5c4a113f8922bd1f3be0e740) )
+    ROM_LOAD( "a45p.bin", 0x0000, 0x001000, CRC(34b4d7cb) SHA1(b2ff3c79e635fff8f02edc9c953cc619fb409aa5) ) // bx5pa4 from ec_barx
 ROM_END
 */
 
 /*
 ROM_START( ec_unk4 )
-	// Contains a (c)1993/97 ELECTROCOIN near the end, build date of Sept 03 1998 - already in the BarX set
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "flat256", 0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1) )
+    // Contains a (c)1993/97 ELECTROCOIN near the end, build date of Sept 03 1998 - already in the BarX set
+    ROM_REGION( 0x200000, "maincpu", 0 )
+    ROM_LOAD( "flat256", 0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1) )
 ROM_END
 */
 
@@ -957,7 +957,7 @@ ROM_START( ec_unk5 )
 
 	// 2001 COOL7
 	ROM_LOAD( "issa998.rom", 0x0000, 0x008000, CRC(7314e2a8) SHA1(3a108bf2ba0173ecab85fe7110174f5db8f75e17) )
-	
+
 	// 2006 COOL7
 	ROM_LOAD( "issc325.rom", 0x0000, 0x008000, CRC(153f90a2) SHA1(df250a02e6b9c130b5f8856c1fdb9012517d15ce) )
 
@@ -1001,7 +1001,7 @@ GAME( 19??, ec_suprb,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin
 GAME( 19??, ec_suprl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_supsl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Silver (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_unk1,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-//GAME( 19??, ec_unk2,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a3' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-//GAME( 19??, ec_unk3,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a4' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-//GAME( 19??, ec_unk4,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'flat256' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+//GAME( 19??, ec_unk2,   0       , ecoinfr,   ecoinfr,   ecoinfr,   ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a3' (Electrocoin) (?)"      , GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+//GAME( 19??, ec_unk3,   0       , ecoinfr,   ecoinfr,   ecoinfr,   ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a4' (Electrocoin) (?)"      , GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+//GAME( 19??, ec_unk4,   0       , ecoinfr,   ecoinfr,   ecoinfr,   ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'flat256' (Electrocoin) (?)"     , GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_unk5,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

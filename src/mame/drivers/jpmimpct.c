@@ -5182,8 +5182,8 @@ ROM_START( j6fbcrz )
 	// edit: Apparently the public release of JPeMu v1.45 required the author to specifically encrypt any ROMs
 	//       before they would run on the emulator, as a way of 'controlling' the users, and what they could run.
 	//       These are therefore worthless garbage.
-//	ROM_LOAD16_BYTE( "fce.p1", 0x00000, 0x020000, CRC(57220618) SHA1(7bd717e438e2bf230179b0f5bb358888a3501c59) )0
-//	ROM_LOAD16_BYTE( "fce.p2", 0x00001, 0x020000, CRC(16d20bc6) SHA1(0e8ac586ccf3d02189e24bdd2ed88052491aceb6) )
+//  ROM_LOAD16_BYTE( "fce.p1", 0x00000, 0x020000, CRC(57220618) SHA1(7bd717e438e2bf230179b0f5bb358888a3501c59) )0
+//  ROM_LOAD16_BYTE( "fce.p2", 0x00001, 0x020000, CRC(16d20bc6) SHA1(0e8ac586ccf3d02189e24bdd2ed88052491aceb6) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "fcsnd.bin", 0x0000, 0x080000, CRC(53806516) SHA1(e5689759ccba30ac974eee4361330ad503a29909) )
@@ -5198,7 +5198,7 @@ ROM_START( j6h5clb )
 	ROM_LOAD16_BYTE( "8874.bin", 0x0000, 0x020000, CRC(d1a5b6d1) SHA1(54300e459cc3ea756528424f08da5505f629abd4) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */	
+	/* missing? */
 ROM_END
 
 ROM_START( j6milln )
@@ -5210,7 +5210,7 @@ ROM_START( j6milln )
 	ROM_LOAD16_BYTE( "ljc-g2.bin", 0x00001, 0x020000, CRC(e42c5cc0) SHA1(612973ba3dac2b1098dd746fd4fd6e7bb0246949) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */	
+	/* missing? */
 ROM_END
 
 
@@ -5223,7 +5223,7 @@ DRIVER_INIT( j6fbcrz )
 
 	UINT8 *src1 = machine.region( "maincpu" )->base();
 	UINT8 *src2 = machine.region( "encrypted" )->base();
-	
+
 	for (i=0;i<0x040000;i++)
 	{
 		src2[i] = src2[i]^src1[i];

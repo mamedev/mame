@@ -240,7 +240,7 @@ static void cd_exec_command(running_machine &machine)
 	UINT32 temp;
 
 	if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
-   		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 	switch (cr1 & 0xff00)
 	{
@@ -509,8 +509,8 @@ static void cd_exec_command(running_machine &machine)
 				{
 					/* resume from a pause state */
 					/* TODO: Galaxy Fight calls 10ff ffff ffff ffff, but then it calls 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
-					   (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
-					   be countless possible combinations ... */
+                       (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
+                       be countless possible combinations ... */
 					if(fadstoplay == 0)
 					{
 						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
@@ -610,23 +610,23 @@ static void cd_exec_command(running_machine &machine)
 					cr4 = 0;
 
 					/*
-					Subcode Q info should be:
-					---- --x- S0
-					---- ---x S1
-					xxxx ---- [0] Control (bit 7 Pre-emphasis, bit 6: copy permitted, bit 5 undefined, bit 4 number of channels)
-					---- xxxx [0] address (0x0001 Mode 1)
-					xxxx xxxx [1] track number (1-99, AA lead-out), BCD format
-					xxxx xxxx [2] index (01 lead-out), BCD format
-					xxxx xxxx [3] Time within' track M
-					xxxx xxxx [4] Time within' track S
-					xxxx xxxx [5] Time within' track F
-					xxxx xxxx [6] Zero
-					xxxx xxxx [7] Absolute M
-					xxxx xxxx [8] Absolute S
-					xxxx xxxx [9] Absolute F
-					xxxx xxxx [10] CRCC
-					xxxx xxxx [11] CRCC
-					*/
+                    Subcode Q info should be:
+                    ---- --x- S0
+                    ---- ---x S1
+                    xxxx ---- [0] Control (bit 7 Pre-emphasis, bit 6: copy permitted, bit 5 undefined, bit 4 number of channels)
+                    ---- xxxx [0] address (0x0001 Mode 1)
+                    xxxx xxxx [1] track number (1-99, AA lead-out), BCD format
+                    xxxx xxxx [2] index (01 lead-out), BCD format
+                    xxxx xxxx [3] Time within' track M
+                    xxxx xxxx [4] Time within' track S
+                    xxxx xxxx [5] Time within' track F
+                    xxxx xxxx [6] Zero
+                    xxxx xxxx [7] Absolute M
+                    xxxx xxxx [8] Absolute S
+                    xxxx xxxx [9] Absolute F
+                    xxxx xxxx [10] CRCC
+                    xxxx xxxx [11] CRCC
+                    */
 
 					msf_abs = lba_to_msf_alt( cd_curfad - 150 );
 					track = cdrom_get_track( cdrom, cd_curfad );
@@ -1224,9 +1224,9 @@ static void cd_exec_command(running_machine &machine)
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-//			UINT32 read_dir;
+//          UINT32 read_dir;
 
-//			read_dir = ((cr3&0xff)<<16)|cr4;
+//          read_dir = ((cr3&0xff)<<16)|cr4;
 
 			if((cr3 >> 8) < 0x24)
 				cddevice = &filters[cr3 >> 8];
@@ -2537,7 +2537,7 @@ void stvcd_set_tray_close(running_machine &machine)
 	if (cdrom)
 	{
 		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
-		//read_new_dir(machine, 0xffffff);	// read root directory
+		//read_new_dir(machine, 0xffffff);  // read root directory
 		cd_stat = CD_STAT_PAUSE;
 	}
 	else

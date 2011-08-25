@@ -1945,7 +1945,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 			if ( stv2_current_sprite.CMDPMOD & 0x0400 )
 			{
 				//if(stv2_current_sprite.CMDPMOD & 0x0200) /* TODO: Bio Hazard inventory screen uses outside cliprect */
-				//	cliprect = &state->m_vdp1.system_cliprect;
+				//  cliprect = &state->m_vdp1.system_cliprect;
 				//else
 					cliprect = &state->m_vdp1.user_cliprect;
 			}

@@ -129,7 +129,7 @@ void naomi_m4_board::board_advance(UINT32 size)
 		} else
 			buffer_actual_size = 0;
 		enc_fill();
-			
+
 	} else
 		rom_cur_address += size;
 }

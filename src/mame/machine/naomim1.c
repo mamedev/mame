@@ -99,7 +99,7 @@ void naomi_m1_board::board_advance(UINT32 size)
 			buffer_actual_size = 0;
 		}
 		enc_fill();
-			
+
 	} else
 		rom_cur_address += size;
 }
@@ -215,7 +215,7 @@ void naomi_m1_board::enc_fill()
 				wb(dict[addr]);
 			break;
 		}
-		}			
+		}
 	}
 
 	while(buffer_actual_size < BUFFER_SIZE)

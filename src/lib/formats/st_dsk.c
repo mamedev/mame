@@ -41,7 +41,7 @@ st_gen_format::st_gen_format(const char *name,const char *extensions,const char 
 	{   MFM, 0xfb, 1 },         \
 	{   SECTOR_DATA, -1 },      \
 	{ CRC_END, cid+1 },         \
- 	{ CRC, cid+1 }
+	{ CRC, cid+1 }
 
 const floppy_image_format_t::desc_e st_gen_format::desc_fcp_9[] = {
 	{ MFM, 0x4e, 501 },

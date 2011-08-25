@@ -662,9 +662,9 @@ static void smpc_comreg_exec(address_space *space, UINT8 data, UINT8 is_stv)
 			if(LOG_SMPC) printf ("SMPC: Change Clock to %s (%d %d)\n",data & 1 ? "320" : "352",space->machine().primary_screen->hpos(),space->machine().primary_screen->vpos());
 
 			/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
-			   sokyugurentai threshold is 74 lines
-			   shanhigw threshold is 90 lines
- 			   I assume that it needs ~100 lines, so 6666,(6) usecs. Obviously needs HW tests ... */
+               sokyugurentai threshold is 74 lines
+               shanhigw threshold is 90 lines
+               I assume that it needs ~100 lines, so 6666,(6) usecs. Obviously needs HW tests ... */
 
 			space->machine().scheduler().timer_set(attotime::from_usec(6666), FUNC(smpc_change_clock),data & 1);
 			break;

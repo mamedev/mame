@@ -16,7 +16,7 @@ public:
 
 	DECLARE_ADDRESS_MAP(submap, 16);
 
-	DECLARE_WRITE16_MEMBER(epr_offsetl_w);          // 5f7000 
+	DECLARE_WRITE16_MEMBER(epr_offsetl_w);          // 5f7000
 	DECLARE_WRITE16_MEMBER(epr_offseth_w);          // 5f7004
 	DECLARE_WRITE16_MEMBER(mpr_record_index_w);     // 5f700c
 	DECLARE_WRITE16_MEMBER(mpr_first_file_index_w); // 5f7010

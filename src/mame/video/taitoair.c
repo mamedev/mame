@@ -343,8 +343,8 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 }
 
 /*
-	TODO: still don't know how this works. It calls three values (0x1fff-0x5fff-0xdfff), for two or three offsets.
-	In theory this should fit into framebuffer draw, display, clear and swap in some way.
+    TODO: still don't know how this works. It calls three values (0x1fff-0x5fff-0xdfff), for two or three offsets.
+    In theory this should fit into framebuffer draw, display, clear and swap in some way.
 */
 WRITE16_HANDLER( dsp_flags_w )
 {
@@ -354,7 +354,7 @@ WRITE16_HANDLER( dsp_flags_w )
 	if(data == 0x1fff)
 		state->m_cur_fb = 0;
 	//else if(data == 0xdfff)
-	//	state->m_cur_fb = 1;
+	//  state->m_cur_fb = 1;
 
 	cliprect.min_x = 0;
 	cliprect.min_y = 3*16;
@@ -363,14 +363,14 @@ WRITE16_HANDLER( dsp_flags_w )
 
 	{
 		//if(offset == 0)
-		//	bitmap_fill(state->m_framebuffer[state->m_cur_fb], &cliprect, 0);
+		//  bitmap_fill(state->m_framebuffer[state->m_cur_fb], &cliprect, 0);
 
 		//if(offset == 1)
 		{
 			if (state->m_line_ram[0x3fff])
 			{
 				int adr = 0x3fff;
-// 			    struct taitoair_poly q;
+//              struct taitoair_poly q;
 
 				while (adr >= 0 && state->m_line_ram[adr] && state->m_line_ram[adr] != 0x4000)
 				{
@@ -423,11 +423,11 @@ SCREEN_UPDATE( taitoair )
 		int x,y;
 
 		/*
-		[0x980000-3] dword for Y 0
-		[0x980004-7] dword for rotation param 0
-		[0x980008-b] dword for Y 1
-		[0x98000c-f] dword for rotation param 1
-		*/
+        [0x980000-3] dword for Y 0
+        [0x980004-7] dword for rotation param 0
+        [0x980008-b] dword for Y 1
+        [0x98000c-f] dword for rotation param 1
+        */
 
 		for(y=cliprect->min_y;y<cliprect->max_y/2;y++)
 		{

@@ -534,9 +534,9 @@ static INPUT_PORTS_START( silkworm )
 	PORT_DIPSETTING(    0x06, "200000" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
 	PORT_DIPNAME( 0x70, 0x30, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:!5,!6,!7")
-//	PORT_DIPSETTING(    0x60, "0" )				/* Not listed in manual */
-//	PORT_DIPSETTING(    0x70, "0" )				/* Not listed in manual */
-//	PORT_DIPSETTING(    0x00, "0" )				/* Not listed in manual */
+//  PORT_DIPSETTING(    0x60, "0" )             /* Not listed in manual */
+//  PORT_DIPSETTING(    0x70, "0" )             /* Not listed in manual */
+//  PORT_DIPSETTING(    0x00, "0" )             /* Not listed in manual */
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )

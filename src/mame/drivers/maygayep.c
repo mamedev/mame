@@ -1138,7 +1138,7 @@ ROM_START( ep_mario )
 	ROM_LOAD16_BYTE( "sa990033.g1", 0x00001, 0x020000, CRC(3e0ac4bb) SHA1(99ead4110f5a90a9a5f41481f528ccb234a1ebf2) )
 	ROM_LOAD16_BYTE( "sa990034.g0", 0x00000, 0x020000, CRC(0bba0aa7) SHA1(21850b73fa8001a31ebea2d524396c0e62e1c0ce) )
 	ROM_LOAD16_BYTE( "sa990034.g1", 0x00001, 0x020000, CRC(802cd278) SHA1(45d547790093cb98890979220b1d4efc37c200c4) )
-	
+
 	ROM_LOAD16_BYTE( "15smg0", 0x00000, 0x020000, CRC(e66591c1) SHA1(e8c9b8ca3634d1a0847f9b243344a3bc6f2c9719) )
 	ROM_LOAD16_BYTE( "15smg1", 0x00001, 0x020000, CRC(8a8f8b5d) SHA1(850a72917046b94a800ade94d097e8262b3a49e7) )
 
@@ -4359,7 +4359,7 @@ ROM_START( ep_makmv )
 	/* code doesn't end.. missing other roms? */
 
 	ROM_REGION( 0x200000, "altrevs", 0 ) /* split into clones later */
-//	ROM_LOAD16_BYTE( "make1-1n.p1", 0x00000, 0x020000, CRC(09323ee2) SHA1(f853d6d27b94cb7c2a19eae1868eed0ea1541b69) ) // this is wrong, can't be the same as p2!
+//  ROM_LOAD16_BYTE( "make1-1n.p1", 0x00000, 0x020000, CRC(09323ee2) SHA1(f853d6d27b94cb7c2a19eae1868eed0ea1541b69) ) // this is wrong, can't be the same as p2!
 	ROM_LOAD16_BYTE( "make1-1n.p2", 0x00001, 0x020000, CRC(09323ee2) SHA1(f853d6d27b94cb7c2a19eae1868eed0ea1541b69) )
 
 	MISSING_SOUND

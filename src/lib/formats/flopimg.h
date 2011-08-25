@@ -271,8 +271,8 @@ protected:
 		int size;          // Sector size, int bytes
 		const UINT8 *data; // Sector data
 	};
-		
-	
+
+
 	// Generate one track according to the description vector
 	// "sect" is a vector indexed by sector id
 	// "track_size" is in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm

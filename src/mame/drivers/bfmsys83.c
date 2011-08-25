@@ -38,8 +38,8 @@ MACHINE_CONFIG_END
 /*
 static DRIVER_INIT( decode )
 {
-	bfmsys83_state *state = machine.driver_data<bfmsys83_state>();
-	bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);
+    bfmsys83_state *state = machine.driver_data<bfmsys83_state>();
+    bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);
 }
 */
 

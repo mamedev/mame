@@ -994,7 +994,7 @@ ROM_START( m3blkhle )
 	ROM_REGION( 0x10000, "altrevs", ROMREGION_ERASE00  )
 	// missing rom 1, or is it the same?
 	ROM_LOAD( "bh2p2.bin", 0x6000, 0x001000, CRC(30325800) SHA1(4d49e20e53e46e33d1f4f9008d7943e8595aa81c) )
-	ROM_LOAD( "bh2p3.bin", 0x5000, 0x001000, CRC(6a1dcb32) SHA1(23614d366f2c04494d73f4ff36aba4e444a06b3a) )	
+	ROM_LOAD( "bh2p3.bin", 0x5000, 0x001000, CRC(6a1dcb32) SHA1(23614d366f2c04494d73f4ff36aba4e444a06b3a) )
 ROM_END
 
 

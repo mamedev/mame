@@ -15,7 +15,7 @@ public:
 	static void static_set_tags(device_t &device, const char *_key_tag);
 
 	virtual DECLARE_ADDRESS_MAP(submap, 16);
-	
+
 	DECLARE_READ16_MEMBER(actel_id_r);
 
 protected:

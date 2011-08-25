@@ -81,19 +81,19 @@ WRITE32_HANDLER(taitojc_char_w)
 // 0x01:   -------- -------- -xxxxxxx xxxxxxxx   VRAM data address
 
 /*
-	Object RAM is grouped in three different banks (0-0x400 / 0x400-0x800 / 0x800-0xc00),
-	Initial 6 dwords aren't surely for object stuff (setting global object flags?)
-	0xd00-0xdff seems to be a per-bank vregister. Usage of this is mostly unknown, the only
-	clue we have so far is this config change in dendego:
-	0x2000db3f 0x3f3f3f3f 0xfec00090 0x403f00ff 0xd20-0xd2f on Taito logo
-	0x2000db3f 0x3f3f3f3f 0xff600090 0x207f00ff 0xd20-0xd2f on intro FMV
+    Object RAM is grouped in three different banks (0-0x400 / 0x400-0x800 / 0x800-0xc00),
+    Initial 6 dwords aren't surely for object stuff (setting global object flags?)
+    0xd00-0xdff seems to be a per-bank vregister. Usage of this is mostly unknown, the only
+    clue we have so far is this config change in dendego:
+    0x2000db3f 0x3f3f3f3f 0xfec00090 0x403f00ff 0xd20-0xd2f on Taito logo
+    0x2000db3f 0x3f3f3f3f 0xff600090 0x207f00ff 0xd20-0xd2f on intro FMV
 
-	dword 0 bits 14-15 looks up to the object RAM for the given bank. (it's mostly fixed to 0,
-	1 and 2 for each bank). Then dwords 2 and 3 should presumably configure bank 1 to a bigger
-	(doubled?) height and width and a different x/y start point.
+    dword 0 bits 14-15 looks up to the object RAM for the given bank. (it's mostly fixed to 0,
+    1 and 2 for each bank). Then dwords 2 and 3 should presumably configure bank 1 to a bigger
+    (doubled?) height and width and a different x/y start point.
 
-	0xfc0-0xfff is global vregs. 0xfc6 bit 13 is used to swap between bank 0 and bank 1.
-	It's unknown at current time how bank 2 should show up.
+    0xfc0-0xfff is global vregs. 0xfc6 bit 13 is used to swap between bank 0 and bank 1.
+    It's unknown at current time how bank 2 should show up.
 
 */
 
@@ -296,11 +296,11 @@ static void draw_object_bank(running_machine &machine, bitmap_t *bitmap, const r
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 	UINT16 start_offs;
-//	UINT8 double_xy;
+//  UINT8 double_xy;
 	int i;
 
 	start_offs = ((bank_type+1)*0x400)/4;
-//	double_xy = (state->m_objlist[(0xd1c+bank_type*0x10)/4] & 0x20000000) >> 29;
+//  double_xy = (state->m_objlist[(0xd1c+bank_type*0x10)/4] & 0x20000000) >> 29;
 
 	/* probably a core bug in there (otherwise objects sticks on screen in Densha de Go) */
 	if(bank_type == 1 && (!(state->m_objlist[0xfc4/4] & 0x2000)))
@@ -407,7 +407,7 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 	// avoid crash in dendego2
 	//if (!extra->zbuffer)
 	//{
-	//	return;
+	//  return;
 	//}
 
 	zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
@@ -441,7 +441,7 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 	// avoid crash in landgear/dangcurv
 	//if (!extra->zbuffer)
 	//{
-	//	return;
+	//  return;
 	//}
 
 	zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);

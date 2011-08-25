@@ -808,7 +808,7 @@ void cli_frontend::verifyroms(const char *gamename)
 		device_type type = *s_devices_sorted[i];
 		device_t *dev = (*type)(config, "dummy", owner, 0);
 		dev->config_complete();
-	
+
 		if (mame_strwildcmp(gamename, dev->shortname()) == 0)
 		{
 			matched++;

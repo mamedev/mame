@@ -23,8 +23,8 @@
   whereas the V2 REV A board only has a single 6303
 
               CPUs     PIA?                  SOUND           CMOSRAM    RTC       REEL CONTROLLER
-	V1 rv E - 2x6303 + HD6321 +              2xAY-3-8912A +  2xTC5516 + ICM7170 + 68705   
-	V2 rv A - 1x6303 + HD468821P/HD68821P +  2xAY-3-8912A +   TC5??4  + none?   + 68705
+    V1 rv E - 2x6303 + HD6321 +              2xAY-3-8912A +  2xTC5516 + ICM7170 + 68705
+    V2 rv A - 1x6303 + HD468821P/HD68821P +  2xAY-3-8912A +   TC5??4  + none?   + 68705
 
   In both cases the 68705 is marked the same way
   'REEL CONTROLLER V1 (C) CASTLE (1987) MACH 2000 SYSTEM'

@@ -146,7 +146,7 @@ ROM_START( j80fruit )
 
 	ROM_REGION( 0x10000, "altrevs", 0 )
 	// from 'fruit chaser' set, other roms matched.
-	ROM_LOAD( "fruit31.p1", 0x0000, 0x001000, CRC(406ff4c1) SHA1(10ef59e66debb15b22d25b66ed19f45a242e30ac) )	
+	ROM_LOAD( "fruit31.p1", 0x0000, 0x001000, CRC(406ff4c1) SHA1(10ef59e66debb15b22d25b66ed19f45a242e30ac) )
 ROM_END
 
 

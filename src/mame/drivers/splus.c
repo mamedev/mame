@@ -1,6 +1,6 @@
 /**********************************************************************************
 
-	needs modernizing, see "#if 0 //" fixme comments
+    needs modernizing, see "#if 0 //" fixme comments
 
     S-PLUS (S+)
 
@@ -18,7 +18,7 @@
     SND =  AY-3-8912         ; AY8910 compatible
 
     History:
-    
+
 ***********************************************************************************/
 #include "emu.h"
 #include "sound/ay8910.h"
@@ -101,14 +101,14 @@ static WRITE8_HANDLER( splus_io_w )
 {
 	splus_state *state = space->machine().driver_data<splus_state>();
 
-  	state->m_io_port[offset] = data;
+	state->m_io_port[offset] = data;
 }
 
 static WRITE8_HANDLER( splus_load_pulse_w )
 {
-//	splus_state *state = space->machine().driver_data<splus_state>();
+//  splus_state *state = space->machine().driver_data<splus_state>();
 
-//	UINT8 out = 0;
+//  UINT8 out = 0;
 //    out = ((~state->m_io_port[1] & 0xf0)>>4); // Output Bank
 }
 
@@ -296,7 +296,7 @@ static READ8_HANDLER( splus_serial_r )
             // Reserved
             // Reserved
             // Reserved
-            // Reserved            
+            // Reserved
             break;
 		case 0x01: // Bank 40
             // Reel #1 - 0=Low State, 1=High State
@@ -505,7 +505,7 @@ static MACHINE_CONFIG_START( splus, splus_state )	// basic machine hardware
 	MCFG_CPU_DATA_MAP(splus_datamap)
 	MCFG_CPU_IO_MAP(splus_iomap)
     MCFG_CPU_VBLANK_INT("scrn", irq0_line_hold)
-	
+
 	MCFG_NVRAM_HANDLER(splus)
 
 	// video hardware (ALL FAKE, NO VIDEO)

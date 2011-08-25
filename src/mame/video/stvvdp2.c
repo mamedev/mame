@@ -4285,7 +4285,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
       at the very list throw up a few errors if the tilemaps want to do something we don't support yet */
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-//	int window_applied = 0;
+//  int window_applied = 0;
 	rectangle mycliprect;
 	mycliprect.min_x = cliprect->min_x;
 	mycliprect.max_x = cliprect->max_x;
@@ -4300,14 +4300,14 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		return;
 	}
 
-//	window_applied =
+//  window_applied =
 	stv_vdp2_apply_window_on_layer(machine,&mycliprect);
 
 	if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 	{
 		/*elandore doesn't like current cliprect code,will be worked on...*/
 		//if ( window_applied && stv2_current_tilemap.colour_depth != 4)
-		//	stv2_current_tilemap.window_control = 0;
+		//  stv2_current_tilemap.window_control = 0;
 
 		stv_vdp2_draw_basic_bitmap(machine, bitmap, &mycliprect);
 	}
@@ -4330,7 +4330,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 
 		/* Pukunpa */
 		//if(STV_VDP2_SPWINEN)
-		//	popmessage("Sprite Window enabled");
+		//  popmessage("Sprite Window enabled");
 
 		/* Capcom Collection Dai 2 - Choh Makaimura (Duh!) */
 		if(STV_VDP2_MZCTL & 0x1f && 0)
@@ -4355,7 +4355,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		/* Cleopatra Fortune Transparent Shadow */
 		/* Pretty Fighter X Back & Transparent Shadow*/
 		//if(STV_VDP2_SDCTL & 0x0120)
-		//	popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
+		//  popmessage("%s shadow select bit enabled, contact MAMEdev",STV_VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
 
 		/* Langrisser III bit 3 normal, bit 1 during battle field */
 		/* Metal Slug bit 0 during gameplay */
@@ -4380,7 +4380,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
 		/* Layer Section */
 		//if(STV_VDP2_W0LWE || STV_VDP2_W1LWE)
-		//	popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
+		//  popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
 
 		/* Akumajou Dracula, bits 2-4 */
 		/* Arcana Strikes bit 5 */
@@ -5491,7 +5491,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 
 	interlace = (STV_VDP2_LSMD == 3)+1;
 
-//	popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
+//  popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
 
 	/* draw black if BDCLMD and DISP are cleared */
 	if(!(STV_VDP2_BDCLMD) && !(STV_VDP2_DISP))
@@ -5654,7 +5654,7 @@ READ16_HANDLER ( saturn_vdp2_regs_r )
 
 		default:
 			//if(!space->debugger_access())
-			//	printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
+			//  printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}
 
@@ -7015,20 +7015,20 @@ static void stv_dump_ram()
 #if NEW_VIDEO_CODE
 
 /*
-	Rewrite of VDP2 video code (VDP1 will follow up after this).
+    Rewrite of VDP2 video code (VDP1 will follow up after this).
 
-	Keyword there is use CUSTOM CODE for everything!
+    Keyword there is use CUSTOM CODE for everything!
 
-	we do a two-pass buffer copy so we can safely do post-processing stuff at some point.
+    we do a two-pass buffer copy so we can safely do post-processing stuff at some point.
 */
 
 /*
-	[0] NBG0
-	[1] NBG1
-	[2] NBG2
-	[3] NBG3
-	[4] RBG0
-	[5] BACK
+    [0] NBG0
+    [1] NBG1
+    [2] NBG2
+    [3] NBG3
+    [4] RBG0
+    [5] BACK
 */
 
 #define XB_SIZE 1024
@@ -7070,7 +7070,7 @@ static void saturn_vdp2_assign_variables(running_machine &machine,UINT32 offset,
 			m_vdp2_state[3].color_offset_en = STV_VDP2_N3COEN;
 			m_vdp2_state[4].color_offset_en = STV_VDP2_R0COEN;
 			m_vdp2_state[5].color_offset_en = STV_VDP2_BKCOEN;
-//			STV_VDP2_SPCOEN
+//          STV_VDP2_SPCOEN
 			break;
 		case 0x112/2:
 			m_vdp2_state[0].color_offset_sel = STV_VDP2_N0COSL;
@@ -7079,7 +7079,7 @@ static void saturn_vdp2_assign_variables(running_machine &machine,UINT32 offset,
 			m_vdp2_state[3].color_offset_sel = STV_VDP2_N3COSL;
 			m_vdp2_state[4].color_offset_sel = STV_VDP2_R0COSL;
 			m_vdp2_state[5].color_offset_sel = STV_VDP2_BKCOSL;
-//			STV_VDP2_SPCOEN
+//          STV_VDP2_SPCOEN
 			break;
 	}
 }
@@ -7121,7 +7121,7 @@ static void vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const rec
 				r <<= 3;
 
 				//if(STV_VDP2_BKCOEN)
-				//	stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_BKCOSL );
+				//  stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_BKCOSL );
 
 				/* TODO: this needs post-processing too! */
 				*BITMAP_ADDR32(bitmap, y,x) = b | g << 8 | r << 16;
@@ -7194,7 +7194,7 @@ static void get_vdp2_pixel(running_machine &machine, UINT8 layer_name, UINT16 ti
 				  (vram[((vram_offset)*2+1) & vram_mask]);
 
 			*tp= ((pix & 0x8000) >> 15);
-//			*cc= *tp;
+//          *cc= *tp;
 			*b = ((pix & 0x7c00) >> 10);
 			*g = ((pix & 0x03e0) >> 5);
 			*r = ((pix & 0x001f) >> 0);
@@ -7213,8 +7213,8 @@ static void get_vdp2_pixel(running_machine &machine, UINT8 layer_name, UINT16 ti
 				  (vram[((vram_offset)*4+2) & vram_mask]<<8)|
 				  (vram[((vram_offset)*4+3) & vram_mask]);
 
-  			*tp= ((pix & 0x80000000) >> 31);
-//			*cc= *tp;
+			*tp= ((pix & 0x80000000) >> 31);
+//          *cc= *tp;
 			*b = ((pix & 0x00ff0000) >> 16);
 			*g = ((pix & 0x0000ff00) >> 8);
 			*r = ((pix & 0x000000ff) >> 0);
@@ -7223,7 +7223,7 @@ static void get_vdp2_pixel(running_machine &machine, UINT8 layer_name, UINT16 ti
 			popmessage("Setting invalid for NBG%d!",layer_name);
 			*tp = *b = *g = *r = 0;
 			break;
- 	}
+	}
 }
 
 /* copy the vram data into the vram buffer */
@@ -7333,7 +7333,7 @@ static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b,
 		{
 			UINT16 datax = (state->m_vdp2_cram[offset/2] >> (((offset & 1) ^ 1)*16)) & 0xffff;
 
-//			*cc= ((datax & 0x8000) >> 15);
+//          *cc= ((datax & 0x8000) >> 15);
 			*b = ((datax & 0x7c00) >> 10);
 			*g = ((datax & 0x03e0) >> 5);
 			*r = ((datax & 0x001f) >> 0);
@@ -7345,7 +7345,7 @@ static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b,
 		case 2: // RGB8: 1024 color pens
 		case 3: // (mode 3 is reserved but seems to be identical to above)
 		{
-//			*cc= ((state->m_vdp2_cram[offset] & 0x80000000) >> 31);
+//          *cc= ((state->m_vdp2_cram[offset] & 0x80000000) >> 31);
 			*b = ((state->m_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			*g = ((state->m_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			*r = ((state->m_vdp2_cram[offset] & 0x000000ff) >> 0);

@@ -225,12 +225,12 @@ ROM_START( j2bigbnk )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
 	ROM_LOAD( "bigbankerb11548 3.1.bin", 0x0000, 0x4000, CRC(c28a0f9a) SHA1(33740a31d2688d39ed79deead9f26cc3b8f17253) )
-	//	ROM_LOAD( "bigbankerb11554 3.2.bin", 0x4000, 0x4000, CRC(17488088) SHA1(560ca909115fa16d196027b4517b4c32f963abdf) )
+	//  ROM_LOAD( "bigbankerb11554 3.2.bin", 0x4000, 0x4000, CRC(17488088) SHA1(560ca909115fa16d196027b4517b4c32f963abdf) )
 
 	ROM_LOAD( "bigbankerb11593 3p1.bin", 0x0000, 0x4000, CRC(c8f291e0) SHA1(0f152c3e3797c04d50db417d4927c0671b6ae46c) )
 	ROM_LOAD( "bigbankerb12330 3y1.bin", 0x0000, 0x4000, CRC(eb687672) SHA1(d50b5153787f6cbd6c4dfe2bcfccde9aba57a9bf) )
 	ROM_LOAD( "bigbankerb12366 3x1.bin", 0x0000, 0x4000, CRC(d67b336e) SHA1(ddc97bab97f444cc914af1a0c997c17ad7635891) )
-	//	ROM_LOAD( "bigbankerb12394 3a1.bin", 0x0000, 0x4000, CRC(ff994a86) SHA1(baf79a39c2315ccc107b21a889ec7a90c1e1380e) )
+	//  ROM_LOAD( "bigbankerb12394 3a1.bin", 0x0000, 0x4000, CRC(ff994a86) SHA1(baf79a39c2315ccc107b21a889ec7a90c1e1380e) )
 ROM_END
 
 
@@ -554,10 +554,10 @@ ROM_START( j2goldbr )
 	ROM_LOAD( "jpmgoldenbars2.2.bin", 0x8000, 0x8000, CRC(d94d1c30) SHA1(f26c4eb158c8291521b23c091bf45475b70cc3ae) )
 
 	// this is a 68k rom
-	//	ROM_LOAD( "jpmgoldenbars1.1.bin", 0x0000, 0x8000, CRC(45f91660) SHA1(1c6bc864e56c8c6ea61ebb5e181ad736aeab06cf) )
-	//	ROM_LOAD( "jpmgoldenbars1.2.bin", 0x0000, 0x8000, CRC(eb6595f0) SHA1(2b0aabb50a1d1f88249b733faf02194c0181f999) )
-	//	ROM_LOAD( "jpmgoldenbars1.3.bin", 0x0000, 0x8000, CRC(01c7dcfb) SHA1(9f00a14df5b2ea13d2bd4f3ff1ab5ee65d464709) )
-	//	ROM_LOAD( "jpmgoldenbars1.4.bin", 0x0000, 0x8000, CRC(88bf0d26) SHA1(ecbfa69ffde42dc4464f39fc641c98a8485e0218) )
+	//  ROM_LOAD( "jpmgoldenbars1.1.bin", 0x0000, 0x8000, CRC(45f91660) SHA1(1c6bc864e56c8c6ea61ebb5e181ad736aeab06cf) )
+	//  ROM_LOAD( "jpmgoldenbars1.2.bin", 0x0000, 0x8000, CRC(eb6595f0) SHA1(2b0aabb50a1d1f88249b733faf02194c0181f999) )
+	//  ROM_LOAD( "jpmgoldenbars1.3.bin", 0x0000, 0x8000, CRC(01c7dcfb) SHA1(9f00a14df5b2ea13d2bd4f3ff1ab5ee65d464709) )
+	//  ROM_LOAD( "jpmgoldenbars1.4.bin", 0x0000, 0x8000, CRC(88bf0d26) SHA1(ecbfa69ffde42dc4464f39fc641c98a8485e0218) )
 ROM_END
 
 
@@ -679,8 +679,8 @@ ROM_START( j2kingcl )
 	ROM_LOAD( "koc2v4.bin", 0x8000, 0x8000, CRC(6f9b132f) SHA1(14154898fcd2c75e15eeec282b2452c81234b00e) )
 
 	// these look like bellfruit (encrypted) roms
-	//	ROM_LOAD( "king of clubs 39340002.bin", 0x0000, 0x8000, CRC(028708bf) SHA1(9e6942f6a25b260faa4c14c4d61a373be1518f40) )
-	//	ROM_LOAD( "king of clubs 39340026.bin", 0x0000, 0x8000, CRC(d3b0746e) SHA1(2847cec108a99747a7e3e31a0f7bcf766cdc1546) )
+	//  ROM_LOAD( "king of clubs 39340002.bin", 0x0000, 0x8000, CRC(028708bf) SHA1(9e6942f6a25b260faa4c14c4d61a373be1518f40) )
+	//  ROM_LOAD( "king of clubs 39340026.bin", 0x0000, 0x8000, CRC(d3b0746e) SHA1(2847cec108a99747a7e3e31a0f7bcf766cdc1546) )
 ROM_END
 
 
@@ -754,8 +754,8 @@ ROM_START( j2mongam )
 	ROM_LOAD( "mongam63.bin", 0x4000, 0x4000, CRC(4a8d11a0) SHA1(fe7e00cfb10d83d9f521cf6dcd27d51a561af916) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	//	ROM_LOAD( "mongame2.bin", 0x0000, 0x2000, CRC(88bcce8a) SHA1(4d5c71b4807be72b7ecf99fbddf79d734e101832) )
-	//	ROM_LOAD( "mongame3.bin", 0x0000, 0x4000, CRC(4a8d11a0) SHA1(fe7e00cfb10d83d9f521cf6dcd27d51a561af916) )
+	//  ROM_LOAD( "mongame2.bin", 0x0000, 0x2000, CRC(88bcce8a) SHA1(4d5c71b4807be72b7ecf99fbddf79d734e101832) )
+	//  ROM_LOAD( "mongame3.bin", 0x0000, 0x4000, CRC(4a8d11a0) SHA1(fe7e00cfb10d83d9f521cf6dcd27d51a561af916) )
 
 	// something else?
 	ROM_LOAD( "moneygame3.1.bin", 0x0000, 0x2000, CRC(14734a7e) SHA1(84bcfaaa3f59d8ef2acefe399b48f258e507f20a) )

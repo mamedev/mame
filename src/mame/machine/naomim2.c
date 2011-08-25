@@ -525,12 +525,12 @@ int naomi_m2_board::feistel_function(int input, const struct sbox *sboxes, UINT3
 		for (k=0, aux=0; k<6; ++k)
 			if (sboxes[m].inputs[k]!=-1)
 				aux |= BIT(input, sboxes[m].inputs[k]) << k;
-			
+
 		aux = sboxes[m].table[(aux^subkeys)&0x3f];
 
 		for (k=0; k<2; ++k)
 			result |= BIT(aux,k) << sboxes[m].outputs[k];
-		
+
 		subkeys >>=6;
 	}
 
@@ -807,10 +807,10 @@ void naomi_m2_board::line_fill()
 				tmp = trees[slot][0][tmp];
 		if(tmp != 0xff) {
 			int count = (tmp & 7) + 1;
-			
+
             if(tmp&0x40) {
 				// Copy from previous line
-				
+
                static int offsets[4] = {0, 1, 0, -1};
 			   int offset = offsets[(tmp & 0x18) >> 3];
 			   for(int j=0; j != count; j++) {

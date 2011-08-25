@@ -224,8 +224,8 @@ ROM_START( pr_bulls )
 	ROM_LOAD( "bb10p1", 0x0000, 0x020000, CRC(afe7b7bb) SHA1(dcf65e2113354171dc8858c6bfd8b97955b470a0) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
-//	ROM_LOAD( "bullseyesnd.p1", 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )
-//	ROM_LOAD( "bullseyesnd.p2", 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )
+//  ROM_LOAD( "bullseyesnd.p1", 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )
+//  ROM_LOAD( "bullseyesnd.p2", 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )
 	ROM_LOAD( "010snd1 316e.bin", 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )
 	ROM_LOAD( "010snd2 9e9a.bin", 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )
 ROM_END
@@ -298,7 +298,7 @@ ROM_START( pr_crzbr )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "crazybars.bin", 0x0000, 0x010000, CRC(896ad5d3) SHA1(6df42dc8016d50239f9467af016e3a4224065599) )
 	ROM_REGION( 0x80000, "altrevs", 0 ) // 'PCP' Super Bars seems to be the same thing
-	ROM_LOAD( "s bars 052a20p0.050 procon.bin", 0x0000, 0x010000, CRC(037a6a82) SHA1(6f804e80e529293f9de540623cd4e4c5a4fd1022) )	
+	ROM_LOAD( "s bars 052a20p0.050 procon.bin", 0x0000, 0x010000, CRC(037a6a82) SHA1(6f804e80e529293f9de540623cd4e4c5a4fd1022) )
 ROM_END
 
 ROM_START( pr_coyot )
@@ -327,7 +327,7 @@ ROM_START( pr_dblup )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "double up 5p.bin", 0x0000, 0x008000, CRC(bd7802ad) SHA1(0d4a2f91a687bd38dcae9ffaf07f2bbd4c2690a7) )
-//	ROM_LOAD( "doubleupprocon5p(27256)", 0x0000, 0x008000, CRC(bd7802ad) SHA1(0d4a2f91a687bd38dcae9ffaf07f2bbd4c2690a7) )
+//  ROM_LOAD( "doubleupprocon5p(27256)", 0x0000, 0x008000, CRC(bd7802ad) SHA1(0d4a2f91a687bd38dcae9ffaf07f2bbd4c2690a7) )
 ROM_END
 
 ROM_START( pr_fire )
@@ -603,7 +603,7 @@ ROM_END
 ROM_START( pr_trpx )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "triplex", 0x0000, 0x010000, CRC(5d80421d) SHA1(90b3336d185d7af67cca0ea30e574b1abd1db385) )
-	
+
 	ROM_REGION( 0x80000, "snd", 0 )
 	ROM_LOAD( "triplexsnd", 0x0000, 0x020000, CRC(fad44418) SHA1(af41e6eb07f1b0665c7cd6d1a31b168532f5dbff) )
 ROM_END

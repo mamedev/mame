@@ -215,7 +215,7 @@ void aw_rom_board::decrypt_region()
 
 	const memory_region *kr = machine().region(keyregion);
 	if(!kr)
-		return;	
+		return;
 
 	if(kr->bytes() != 4)
 		throw emu_fatalerror("AW-ROM-BOARD: key region %s has incorrect size (%d, expected 4)\n", keyregion, kr->bytes());

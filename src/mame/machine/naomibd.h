@@ -17,7 +17,7 @@ public:
 	// Can be patched in the underlying class
 	virtual DECLARE_ADDRESS_MAP(submap, 16);
 
-	DECLARE_WRITE16_MEMBER(rom_offseth_w);          // 5f7000 
+	DECLARE_WRITE16_MEMBER(rom_offseth_w);          // 5f7000
 	DECLARE_WRITE16_MEMBER(rom_offsetl_w);          // 5f7004
 	DECLARE_READ16_MEMBER( rom_data_r);             // 5f7008
 	DECLARE_WRITE16_MEMBER(rom_data_w);             // 5f7008

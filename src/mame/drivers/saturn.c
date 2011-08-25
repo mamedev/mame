@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
-//	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_ioga_r32, stv_io_w32) AM_BASE_MEMBER(saturn_state,m_ioga) AM_SHARE("share4") AM_MIRROR(0x20) /* installed with per-game specific */
+//  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_ioga_r32, stv_io_w32) AM_BASE_MEMBER(saturn_state,m_ioga) AM_SHARE("share4") AM_MIRROR(0x20) /* installed with per-game specific */
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("abus", 0) // cartridge
@@ -1196,7 +1196,7 @@ static INPUT_PORTS_START( saturn )
 //  PORT_CONFSETTING(0x03,"Lightgun Device")
 	PORT_CONFSETTING(0x04,"Trackball") // TODO: according to the docs this ID is labeled "Pointing Device"
 	PORT_CONFSETTING(0x05,"Keyboard Device")
-  	PORT_CONFSETTING(0x06,"Megadrive 3B Pad")
+	PORT_CONFSETTING(0x06,"Megadrive 3B Pad")
 	PORT_CONFSETTING(0x07,"Megadrive 6B Pad")
 	PORT_CONFSETTING(0x08,"Saturn Mouse")
 //  PORT_CONFSETTING(0x09,"<unconnected>")

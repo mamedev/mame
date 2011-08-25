@@ -156,7 +156,7 @@ READ16_MEMBER(naomi_board::rom_data_r)
 	UINT16 res;
 	board_get_buffer(buffer, size);
 	assert(size > 1);
-	res = buffer[0] | (buffer[1] << 8); 
+	res = buffer[0] | (buffer[1] << 8);
 	if(rom_offset & 0x80000000)
 		board_advance(2);
 	return res;

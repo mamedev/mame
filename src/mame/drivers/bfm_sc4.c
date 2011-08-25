@@ -4,44 +4,44 @@
 
     Skeleton Driver
 
-	THIS DRIVER IS NONE FUNCTIONAL, THERE IS NO EMULATION CODE.
+    THIS DRIVER IS NONE FUNCTIONAL, THERE IS NO EMULATION CODE.
 
-	-----------------
+    -----------------
 
     what's the difference between this and Scorpion 5? Later revisons of many games appear
     to be on the latter.
 
-	Scorpion 4:::
+    Scorpion 4:::
 
-	Main CPU is a MC68307FG16, present on Motherboard
+    Main CPU is a MC68307FG16, present on Motherboard
 
-	Configuration is SC4 motherboard + game card
+    Configuration is SC4 motherboard + game card
 
-	The game card contains the program roms, sound rom and YMZ280B 
+    The game card contains the program roms, sound rom and YMZ280B
 
-	Adder 4 video board adds an additional card with a MC68340PV25E (25.175Mhz)
+    Adder 4 video board adds an additional card with a MC68340PV25E (25.175Mhz)
 
-	-------------------------------
+    -------------------------------
 
-	This is currently a mess of Scorpion 4, Scorpion 5 and Scorpion 5 Adder 5 games.
-	I think some games might use multiple boards of different techs linked up via
-	serial ports, but I'm not sure
+    This is currently a mess of Scorpion 4, Scorpion 5 and Scorpion 5 Adder 5 games.
+    I think some games might use multiple boards of different techs linked up via
+    serial ports, but I'm not sure
 
-	THIS NEEDS SORTING OUT, TIDYING UP and PROPERLY DOCUMENTING
+    THIS NEEDS SORTING OUT, TIDYING UP and PROPERLY DOCUMENTING
 
-	Sorting Tips:
-	Scorpion 5 sets seem to have SC5 as the first bytes (when interleaved)
-	Larger roms seem to be Adder 5 (and also have SC5 at the start)
+    Sorting Tips:
+    Scorpion 5 sets seem to have SC5 as the first bytes (when interleaved)
+    Larger roms seem to be Adder 5 (and also have SC5 at the start)
 
-	Other roms are SC4? Some games are on both platforms - check.. 
-	even within many 'SC5' sets there are roms without SC5 in the header
-	these are either SC4 versions, or maybe some additional HW? - check...
+    Other roms are SC4? Some games are on both platforms - check..
+    even within many 'SC5' sets there are roms without SC5 in the header
+    these are either SC4 versions, or maybe some additional HW? - check...
 
-	SC5 stuff seems to use opcodes which don't exist in the 68020, are these
-	68340 based, or something else with additional opcodes (coldfire?)
+    SC5 stuff seems to use opcodes which don't exist in the 68020, are these
+    68340 based, or something else with additional opcodes (coldfire?)
 
 
-	-------------------------------
+    -------------------------------
 */
 
 #include "emu.h"
@@ -2667,10 +2667,10 @@ ROM_START( sc_cf )
 	// 3 different sets of sound!
 	ROM_LOAD( "crazy sound 1.bin", 0x0000, 0x080000, CRC(31e5785a) SHA1(8da2bd3571640b0ae23e9fdcc2235dcf9d2de122) )
 	ROM_LOAD( "crazy sound 2.bin", 0x0000, 0x080000, CRC(bf059b21) SHA1(89a96c593e5385e9b40f694768986691eed4b5c5) )
-	
+
 	ROM_LOAD( "95004150.bin", 0x0000, 0x080000, CRC(7707ea0d) SHA1(efe187a4c64a3a5f8d10e21c269afbb603186ae7) )
 	ROM_LOAD( "95004151.bin", 0x0000, 0x080000, CRC(54845756) SHA1(e53dfa8f836044232ee1a8006051ef586ac24d8c) )
-	
+
 	ROM_LOAD( "95004280.sn1", 0x0000, 0x080000, CRC(44d1b0d9) SHA1(2e361a1b65955acecbc26ba47000e4ef6316a22d) )
 	//ROM_LOAD( "95004281.bin", 0x0000, 0x080000, CRC(31f057f3) SHA1(a6415eee8499ada43225901dee2d12c93d494658) )
 	ROM_LOAD( "95004281.sn2", 0x0000, 0x080000, CRC(31f057f3) SHA1(a6415eee8499ada43225901dee2d12c93d494658) )
@@ -3277,23 +3277,23 @@ ROM_START( sc_dnd )
 	ROM_LOAD16_BYTE( "p3003p42.lo", 0x00001, 0x080000, CRC(46fd164a) SHA1(c7c70773a1327200fa58818f3d23cabb48ab4ba5) )
 	ROM_LOAD16_BYTE( "p3003s42.hi", 0x00000, 0x080000, CRC(f04b7cd3) SHA1(b3b2c77d6458d901da4aa7057f2c4a9bf67df759) )
 	ROM_LOAD16_BYTE( "p3003s42.lo", 0x00001, 0x080000, CRC(71d96983) SHA1(e896334a9ea517bbc20eb06eb8682b7a884b37e6) )
-	
+
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 	// Regular
 	ROM_LOAD( "95008606.bin", 0x0000, 0x100000, CRC(c63c8663) SHA1(4718baf87340fe93ccfe642a1a0cdb9d9dcac57f) ) // 0 (1907)  DOND SOUNDS 11
 	ROM_LOAD( "95008607.bin", 0x0000, 0x100000, CRC(a615514f) SHA1(d4ff7d4fe6f1dd1d7b00cc504f90b2921aa5e8fb) ) // 1
-	
+
 	//  Casino
 	ROM_LOAD( "95008631.bin", 0x0000, 0x100000, CRC(7208854a) SHA1(a02de60cfcbafe5da4f67596ab65237f5b5f41b7) ) // 0 (1954) DOND SOUNDS 11
-	
+
 	ROM_LOAD( "95008632.bin", 0x0000, 0x100000, CRC(fd81a317) SHA1(1e597fd58aab5a7a8321dc4daf138ee07b42c094) ) // 0 (1945) DOND SOUNDS 11
 	ROM_LOAD( "95008633.bin", 0x0000, 0x100000, CRC(a7a445d4) SHA1(dbb1938c33ce654c2d4aa3b6af8c210f5aad2ae3) ) // 1
-	
+
 	//  Casino
 	ROM_LOAD( "95008661.bin", 0x0000, 0x100000, CRC(2d9ebcd5) SHA1(d824a227420cbe616aca6e2fd279af691ddfd87a) ) // 0 (1945) DOND SOUNDS 12
-	
+
 	ROM_LOAD( "95008680.bin", 0x0000, 0x100000, CRC(9bd439d1) SHA1(5e71d04e5697e92998bae28f7352ea7742cafe07) ) // 0 (1964) DOND SOUNDS 11
-	
+
 	ROM_LOAD( "95008698.bin", 0x0000, 0x100000, CRC(8eea7754) SHA1(7612c128d6c062bba3477d55aee3089e1255f61e) ) // 0 (1964) DOND SOUNDS 12
 
 	ROM_REGION( 0x1000000, "adder5", ROMREGION_ERASE00 )
@@ -3877,10 +3877,10 @@ ROM_START( sc_dndcc )
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 	ROM_LOAD( "95008746.bin", 0x0000, 0x100000, CRC(ef3c39b9) SHA1(21b9788080de68acd436608d7d46fd9663d1589b) )
 	ROM_LOAD( "95008747.bin", 0x0000, 0x100000, CRC(9f9b638f) SHA1(5eae49f8a9571f8fade9acf0fc80ea3d70cc9e18) )
-	
+
 	ROM_LOAD( "95008840.bin", 0x0000, 0x100000, CRC(2aa17d67) SHA1(43bdee1b3d0a0bf28f672620867fa3dc95727fbc) )
 	ROM_LOAD( "95008841.bin", 0x0000, 0x100000, CRC(594a9cd7) SHA1(667fa3106327ce4ff23877f2d48d3e3e360848d0) )
-	
+
 	ROM_LOAD( "95009131.bin", 0x0000, 0x100000, CRC(59a9e50a) SHA1(15d79b177a1e926cd5aee0f969f5ef8b30fac203) )
 	ROM_LOAD( "95009132.bin", 0x0000, 0x100000, CRC(5e8a7ca6) SHA1(419ecc6ac15004bdd83bcd5b3e00d9dcd0d24936) )
 ROM_END
@@ -6620,7 +6620,7 @@ ROM_START( sc_hotdg )
 	ROM_LOAD16_BYTE( "p1916p42.lo", 0x00001, 0x080000, CRC(2e33fc1a) SHA1(a0d9d0935e2c2bb3eb4b5a6c2d34e21d124b8376) )
 	ROM_LOAD16_BYTE( "p1916p43.hi", 0x00000, 0x080000, CRC(7ddda754) SHA1(347d0586b054f463a3572b78c38237da4e9f46b9) )
 	ROM_LOAD16_BYTE( "p1916p43.lo", 0x00001, 0x080000, CRC(63edfe15) SHA1(986bf6845a084d2a06ffc94765b1e56d3dd0a5a4) )
-//	ROM_LOAD16_BYTE( "p1916p43.txt", 0x0000, 0x0000e6, CRC(927a6140) SHA1(24263491ea82ba45dc3bc2560df1773e0bb76ead) )
+//  ROM_LOAD16_BYTE( "p1916p43.txt", 0x0000, 0x0000e6, CRC(927a6140) SHA1(24263491ea82ba45dc3bc2560df1773e0bb76ead) )
 	ROM_LOAD16_BYTE( "p1916s12.hi", 0x00000, 0x080000, CRC(53ead733) SHA1(2f7ddca4662078fd1f221274cf420f0bc2fce714) )
 	ROM_LOAD16_BYTE( "p1916s12.lo", 0x00001, 0x080000, CRC(2e6a0755) SHA1(62db870df95deb645e22925f6ce234598bbbefeb) )
 	ROM_LOAD16_BYTE( "p1916s42.hi", 0x00000, 0x080000, CRC(0f72d194) SHA1(52dd33c58d720dfb97d008715dda2965786db129) )
@@ -6771,7 +6771,7 @@ ROM_START( sc_hotwd )
 	ROM_LOAD16_BYTE( "95411742.lo", 0x00001, 0x080000, CRC(5e52421a) SHA1(faa1c38a9f57c79e417fa3fda40a7e2f5f50a4f9) )
 	ROM_LOAD16_BYTE( "95411743.hi", 0x00000, 0x080000, CRC(fe4b57d3) SHA1(26d3924f7a298fc5b3a23ad1cb54cf5593c5af4a) )
 	ROM_LOAD16_BYTE( "95411744.lo", 0x00001, 0x080000, CRC(4e133d64) SHA1(939cbc5e4e28c5c519b2c0288f64220fcb1a4cd2) )
-//	ROM_LOAD16_BYTE( "95411744.txt", 0x0000, 0x0000ce, CRC(af120df5) SHA1(65c0f5b10cb80024f455d54514cbb077ac6f3d32) )
+//  ROM_LOAD16_BYTE( "95411744.txt", 0x0000, 0x0000ce, CRC(af120df5) SHA1(65c0f5b10cb80024f455d54514cbb077ac6f3d32) )
 	ROM_LOAD16_BYTE( "95411745.hi", 0x00000, 0x080000, CRC(5437310d) SHA1(1b02985c32e9e381a85c57da8c8e1bf79e1ad7a6) )
 	ROM_LOAD16_BYTE( "p1311p11.hi", 0x00000, 0x080000, CRC(0cffb3d1) SHA1(15f11f612f2fc7d5b1b418c2c55cb14ca8b023a2) )
 	ROM_LOAD16_BYTE( "p1311p11.lo", 0x00001, 0x080000, CRC(f5584b61) SHA1(f2a4bab089a574a93ca26571cda82e4c1275663a) )
@@ -8773,7 +8773,7 @@ ROM_START( sc_mr2r )
 	ROM_LOAD16_BYTE( "95424571.hi", 0x00000, 0x080000, CRC(757f8d60) SHA1(1d0918a5c34528d905e7ecf62abb1412d28b40d9) )
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 	ROM_LOAD( "95008893.bin", 0x0000, 0x0f2fe8, CRC(a7f64802) SHA1(8a667ebf29feaffb2676ebd770b570c1015f3c2a) )
-//	ROM_LOAD( "95008983.bin", 0x0000, 0x0f2fe8, CRC(a7f64802) SHA1(8a667ebf29feaffb2676ebd770b570c1015f3c2a) )
+//  ROM_LOAD( "95008983.bin", 0x0000, 0x0f2fe8, CRC(a7f64802) SHA1(8a667ebf29feaffb2676ebd770b570c1015f3c2a) )
 	ROM_REGION( 0x5000, "pics", 0 )
 	ROM_LOAD( "95890480.bin", 0x0000, 0x5000, CRC(3618777f) SHA1(97ab5be3bcdbe1c94e638c4dceac69bbfe359a0e) )
 	ROM_LOAD( "95890481.bin", 0x0000, 0x5000, CRC(438e334b) SHA1(69b132ea3cbe31d31fd6fa6b915ddc2f4e66f068) )
@@ -9512,7 +9512,7 @@ ROM_START( sc_pipe )
 	ROM_LOAD( "95408732", 0x0000, 0x100000, CRC(f283b171) SHA1(6976f32bc88ec58c897df41aef51508f5fd92e9f) )
 	ROM_LOAD( "95408732.bin", 0x0000, 0x100000, CRC(f283b171) SHA1(6976f32bc88ec58c897df41aef51508f5fd92e9f) )
 	ROM_LOAD( "pipingsnd.bin", 0x0000, 0x0c50d9, CRC(ff240faa) SHA1(f0961b3207c0c8779479c773d1453ac4ff376bd2) )
-	
+
 	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 )
 	ROM_LOAD( "95409732.bin", 0x0000, 0x100000, CRC(1d3875c0) SHA1(73a59320cf3ef30535bb5617106354ca271e3db4) ) // combined?
 ROM_END
@@ -11919,7 +11919,7 @@ ROM_END
 
 ROM_START( sc_ticlb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-//	ROM_LOAD16_BYTE( "95000599.mtx", 0x0000, 0x0074cc, CRC(b0f669d4) SHA1(9703a5e2d7ddbffab304316dc09b225f9cfd1664) )
+//  ROM_LOAD16_BYTE( "95000599.mtx", 0x0000, 0x0074cc, CRC(b0f669d4) SHA1(9703a5e2d7ddbffab304316dc09b225f9cfd1664) )
 	ROM_LOAD16_BYTE( "club-treasure-island_dat_ac_p65ss.hi", 0x00000, 0x080000, CRC(3529018b) SHA1(aa49f68bb3ca550c77d4667b8373f94856a70cf3) )
 	ROM_LOAD16_BYTE( "club-treasure-island_dat_ac_p65ss.lo", 0x00001, 0x080000, CRC(180fcb0a) SHA1(17400ae744af37b5a17389e4f7a639a5e5743b2d) )
 
@@ -12144,20 +12144,20 @@ ROM_END
 ROM_START( sc_ufi )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95400723.lo", 0x00001, 0x080000, CRC(5a08e5e2) SHA1(4cba2a450be3ac78294a94a8964b03d243dd73f0) )
-//	ROM_LOAD16_BYTE( "95400723.sum", 0x0000, 0x00003a, CRC(49657b66) SHA1(54d16ea33e8b932854b0d19f2dd87fdc026f7cd2) )
+//  ROM_LOAD16_BYTE( "95400723.sum", 0x0000, 0x00003a, CRC(49657b66) SHA1(54d16ea33e8b932854b0d19f2dd87fdc026f7cd2) )
 	ROM_LOAD16_BYTE( "95400724.hi", 0x00000, 0x080000, CRC(a47a8c15) SHA1(0996c613d49bea0fdb156a54c9704852f79735e2) )
 
 	ROM_REGION( 0x400000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "95400725.lo", 0x00001, 0x080000, CRC(abd57573) SHA1(8851454c8d253d862f81af44c7541a110e331873) )
-//	ROM_LOAD16_BYTE( "95400725.sum", 0x0000, 0x00003a, CRC(d1302953) SHA1(b1cdb277b9a9be554d32a8f48f488887bc147aaa) )
+//  ROM_LOAD16_BYTE( "95400725.sum", 0x0000, 0x00003a, CRC(d1302953) SHA1(b1cdb277b9a9be554d32a8f48f488887bc147aaa) )
 	ROM_LOAD16_BYTE( "95400726.hi", 0x00000, 0x080000, CRC(26b1a723) SHA1(a64129046c2db33c7df96165b2591c056f5fbb0d) )
 	ROM_LOAD16_BYTE( "95400912.hi", 0x00000, 0x080000, CRC(d1a24394) SHA1(03d6561f8e66bbaaabd18fb9d5244f12b2202c0d) )
 	ROM_LOAD16_BYTE( "95401701.lo", 0x00001, 0x080000, CRC(5c09007e) SHA1(d69290225f08ed5dcf0204bd96f7f09a73c2f243) )
 	ROM_LOAD16_BYTE( "95401723.lo", 0x00001, 0x080000, CRC(38d4e8c8) SHA1(d238bda3b5bc407933575230a1640bd1cc789491) )
-//	ROM_LOAD16_BYTE( "95401723.sum", 0x0000, 0x00003a, CRC(6819e743) SHA1(cdbd8f66fb42301fccb086718cdccc058ef820b0) )
+//  ROM_LOAD16_BYTE( "95401723.sum", 0x0000, 0x00003a, CRC(6819e743) SHA1(cdbd8f66fb42301fccb086718cdccc058ef820b0) )
 	ROM_LOAD16_BYTE( "95401724.hi", 0x00000, 0x080000, CRC(92ea4a31) SHA1(a9b42e039f89ae7ecfcc0b87b9715772e1a06696) )
 	ROM_LOAD16_BYTE( "95401725.lo", 0x00001, 0x080000, CRC(09ad97c6) SHA1(9c9628156d2220ad6b1bab490d48fde1ecd6c2c3) )
-//	ROM_LOAD16_BYTE( "95401725.sum", 0x0000, 0x00003a, CRC(4fb81c41) SHA1(d1f385452dacd6aad76e5357b7e8dd4de589fda7) )
+//  ROM_LOAD16_BYTE( "95401725.sum", 0x0000, 0x00003a, CRC(4fb81c41) SHA1(d1f385452dacd6aad76e5357b7e8dd4de589fda7) )
 	ROM_LOAD16_BYTE( "95401726.hi", 0x00000, 0x080000, CRC(2ab46ce2) SHA1(60f74cc855c35a3dc07a32640c14835c1cfe1827) )
 	ROM_LOAD16_BYTE( "95401911.lo", 0x00001, 0x080000, CRC(ae68b469) SHA1(de77f117a3d688f0feb9415f00b534d3651f52c7) )
 	ROM_LOAD16_BYTE( "95401912.hi", 0x00000, 0x080000, CRC(87b73871) SHA1(598764a0a73705475f15263a79106f22b6d1abe8) )
@@ -12212,8 +12212,8 @@ ROM_START( sc_vrgcl )
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 	ROM_LOAD( "95008143.bin", 0x0000, 0x100000, CRC(8bf35d69) SHA1(0a5017d02ba839f2f21402df99e7684ce559d931) )
 	ROM_LOAD( "95008144.bin", 0x0000, 0x100000, CRC(1ce7f671) SHA1(ccca34515217e72ef1879a3cbad77c7adea3a665) )
-//	ROM_LOAD( "very rich geezer club sound 1 bfg 70f5.bin", 0x0000, 0x100000, CRC(8bf35d69) SHA1(0a5017d02ba839f2f21402df99e7684ce559d931) )
-//	ROM_LOAD( "very rich geezer club sound 2 bfg 7202.bin", 0x0000, 0x100000, CRC(1ce7f671) SHA1(ccca34515217e72ef1879a3cbad77c7adea3a665) )
+//  ROM_LOAD( "very rich geezer club sound 1 bfg 70f5.bin", 0x0000, 0x100000, CRC(8bf35d69) SHA1(0a5017d02ba839f2f21402df99e7684ce559d931) )
+//  ROM_LOAD( "very rich geezer club sound 2 bfg 7202.bin", 0x0000, 0x100000, CRC(1ce7f671) SHA1(ccca34515217e72ef1879a3cbad77c7adea3a665) )
 ROM_END
 
 
@@ -12766,10 +12766,10 @@ ROM_START( sc_adsnt )
 	ROM_LOAD16_BYTE( "95413703.hi", 0x00000, 0x080000, CRC(3e5a472c) SHA1(f7395f63ab59492d0684734d95c63893e4a2b438) )
 	ROM_LOAD16_BYTE( "95413756.lo", 0x00001, 0x080000, CRC(6b3054d4) SHA1(b3d6d599df4c08b88926469fc8fb4a8d03d6627d) )
 	ROM_LOAD16_BYTE( "95413757.hi", 0x00000, 0x080000, CRC(222f32a0) SHA1(1b6a8f90b56c19cbcf82dc0d037a1381b5489a52) )
-//	p1920p44.hi = p1920p44.hi           sc4adwta   Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4)
-//	p1920p44.lo = p1920p44.lo           sc4adwta   Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4)
-//	p1920s44.hi = p1920s44.hi           sc4adwta   Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4)
-//	p1920s44.lo = p1920s44.lo           sc4adwta   Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4)
+//  p1920p44.hi = p1920p44.hi           sc4adwta   Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4)
+//  p1920p44.lo = p1920p44.lo           sc4adwta   Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4)
+//  p1920s44.hi = p1920s44.hi           sc4adwta   Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4)
+//  p1920s44.lo = p1920s44.lo           sc4adwta   Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4)
 
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 	ROM_LOAD( "95008478.bin", 0x0000, 0x100000, CRC(d8aa3daf) SHA1(dafeb014f04179882921622df9b5c9917279bd02) )
@@ -13226,7 +13226,7 @@ ROM_START( sc_clbtm )
 	ROM_LOAD16_BYTE( "95404683.hi", 0x00000, 0x080000, CRC(f84b37ad) SHA1(4430c7fe6274d25de58342d255c4c4a52966b0b3) )
 	ROM_LOAD16_BYTE( "95405682.lo", 0x00001, 0x080000, CRC(12d4bf1a) SHA1(2b28c5fdca13e7a70496984e02bfd3b98d60a9ac) )
 	ROM_LOAD16_BYTE( "95405683.hi", 0x00000, 0x080000, CRC(b9aba368) SHA1(ec6404447c9e23e179ec1200848d966d5f3f846b) )
-	
+
 	ROM_REGION( 0x800000, "ymz", ROMREGION_ERASE00 )
 	// very large sound roms!
 	ROM_LOAD( "95008055.p1", 0x0000, 0x800000, CRC(ef474fd3) SHA1(e7427184683603b57a3a8b37452fa6ec7a41e34c) )
@@ -13738,7 +13738,7 @@ ROM_START( sc_dndbe )
 	ROM_LOAD16_BYTE( "95419563.hi", 0x00000, 0x080000, CRC(a521350c) SHA1(45dddd7791b0ac76ed6d39450624c8e2140fed3f) )
 	ROM_LOAD16_BYTE( "95422007.hi", 0x00000, 0x080000, CRC(7ae82867) SHA1(60c02d9abc05e1655eef71d5ddfc9b8e6dd3c4aa) )
 	ROM_LOAD16_BYTE( "95422008.lo", 0x00001, 0x080000, CRC(1071a6bf) SHA1(1ccd638a4899707f024575bf30db2ffd17b63d3c) )
-//	95422009.hi = 95422009.hi           sc4dndtp   Deal Or No Deal The Power (Bellfruit) (Scorpion 4)
+//  95422009.hi = 95422009.hi           sc4dndtp   Deal Or No Deal The Power (Bellfruit) (Scorpion 4)
 	ROM_LOAD16_BYTE( "95422094.lo", 0x00001, 0x080000, CRC(4b3cce67) SHA1(1e85f125308ffcbdc1564d2b00ce07db83a7b5ba) )
 	ROM_LOAD16_BYTE( "95422095.hi", 0x00000, 0x080000, CRC(e4fa031f) SHA1(7438d213055bd5f26ac6c2e3798a0db1a11c1dc5) )
 	ROM_LOAD16_BYTE( "95422136.lo", 0x00001, 0x080000, CRC(0ed927b0) SHA1(6dc5b1d4668d5849a84fd43d05ea293ce0ff333f) )
@@ -13761,7 +13761,7 @@ ROM_START( sc_dndbe )
 	ROM_LOAD16_BYTE( "95422893.hi", 0x00000, 0x080000, CRC(34e1a059) SHA1(0dfae3d49562750ff161fc25285e097a727298af) )
 	ROM_LOAD16_BYTE( "95423007.hi", 0x00000, 0x080000, CRC(1858f222) SHA1(679f6c35e9953caf738660c67c372d9bd09e086b) )
 	ROM_LOAD16_BYTE( "95423008.lo", 0x00001, 0x080000, CRC(90b98909) SHA1(e37f728fbd3aabeef4109778daf992314a2884a6) )
-//	95423009.hi = 95423009.hi           sc4dndtp   Deal Or No Deal The Power (Bellfruit) (Scorpion 4)
+//  95423009.hi = 95423009.hi           sc4dndtp   Deal Or No Deal The Power (Bellfruit) (Scorpion 4)
 	ROM_LOAD16_BYTE( "95423094.lo", 0x00001, 0x080000, CRC(69bd6da4) SHA1(96cdc3f4a05eca4fc4f650fc1dbf9b2c20247916) )
 	ROM_LOAD16_BYTE( "95423095.hi", 0x00000, 0x080000, CRC(f117c581) SHA1(cc4404b587f30e77e73860b57156ef8e57baab58) )
 	ROM_LOAD16_BYTE( "95423136.lo", 0x00001, 0x080000, CRC(0a58892d) SHA1(a034a3adfa6cc6d367124fa339bd54f45601671f) )
@@ -15361,7 +15361,7 @@ ROM_START( sc_pking )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "adder5", ROMREGION_ERASEFF )
 	ROM_LOAD( "39211031.bin", 0x0000, 0x1000000, CRC(ec68ef4b) SHA1(2f00afa1ac3b6776f9e8cb44e861d572025c72b2) )
-//	ROM_LOAD( "39211031.txt", 0x0000, 0x0000d0, CRC(05e5443e) SHA1(2cbfa749b976c733195ddfc1afd715d0e97963fa) )
+//  ROM_LOAD( "39211031.txt", 0x0000, 0x0000d0, CRC(05e5443e) SHA1(2cbfa749b976c733195ddfc1afd715d0e97963fa) )
 	ROM_LOAD( "39212031.bin", 0x0000, 0x1000000, CRC(08811e4d) SHA1(983c39b09ad3d33546a9873e1d77dd6be50b9b2e) )
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 	ROM_LOAD( "95008495.bin", 0x0000, 0x080000, CRC(dac8c4a8) SHA1(0192e1d2b9558a789753a5e58d97503cc09dfa27) )
@@ -15489,7 +15489,7 @@ ROM_END
 ROM_START( sc_rwclb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "adder5", ROMREGION_ERASEFF )
-//	ROM_LOAD( "39211073.txt", 0x0000, 0x0000d1, CRC(7e897cdf) SHA1(9444d6b08d3c61e878512dc761e669d0f7b93717) )
+//  ROM_LOAD( "39211073.txt", 0x0000, 0x0000d1, CRC(7e897cdf) SHA1(9444d6b08d3c61e878512dc761e669d0f7b93717) )
 	ROM_LOAD( "39211073.bin", 0x0000, 0x1000000, CRC(bd3e0d73) SHA1(063058051dd5d774e2755f3fd0fb3f83277221db) )
 	ROM_LOAD( "39211074.bin", 0x0000, 0x1000000, CRC(917dbae6) SHA1(87c664beba60054c0349861f4bd19393cf993bf1) )
 	ROM_LOAD( "39212073.bin", 0x0000, 0x1000000, CRC(64d98913) SHA1(b207d411a007079ac2a46df3d801f933635fc55f) )

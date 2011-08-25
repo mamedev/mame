@@ -3,7 +3,7 @@
 
   Global Games 'Stealth' Hardware
 
-  CPU is a M37702S 1AFP  /7231 
+  CPU is a M37702S 1AFP  /7231
 
   Motherboard contains very few major components
 
@@ -15,7 +15,7 @@
 #include "cpu/m37710/m37710.h"
 
 
- 
+
 /******************************************************************************/
 
 class globalfr_state : public driver_device
@@ -48,7 +48,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( gl_dow )
-	ROM_REGION( 0x80000, "maincpu", 0 ) 
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "deal1-4n.p1", 0x0000, 0x080000, CRC(2bcc595b) SHA1(d22e1d25784f536ec12a534eee12bcc1abad4a5e) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
@@ -56,7 +56,7 @@ ROM_START( gl_dow )
 ROM_END
 
 ROM_START( gl_dowcl )
-	ROM_REGION( 0x80000, "maincpu", 0 ) 
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "deal1-6n.p1", 0x0000, 0x080000, CRC(0844fa2c) SHA1(76ac663b260bfba1c1dcf446ce611628c7276e89) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
@@ -64,7 +64,7 @@ ROM_START( gl_dowcl )
 ROM_END
 
 ROM_START( gl_wywh )
-	ROM_REGION( 0x80000, "maincpu", 0 ) 
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "wish2-9n.p1", 0x0000, 0x020000, CRC(4b248e64) SHA1(24f27d7742b89893ac5ac5e73b11bcc417a304be) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
@@ -74,7 +74,7 @@ ROM_START( gl_wywh )
 ROM_END
 
 ROM_START( gl_coc )
-	ROM_REGION( 0x80000, "maincpu", 0 ) 
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "clbd2-9n.p1", 0x0000, 0x020000, CRC(f2c5387d) SHA1(72210686ea29ca8d5f9514c30ede342fdc146a38) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
@@ -84,7 +84,7 @@ ROM_START( gl_coc )
 ROM_END
 
 ROM_START( gl_uyr )
-	ROM_REGION( 0x80000, "maincpu", 0 ) 
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "rigm2-8n.p1", 0x0000, 0x080000, CRC(6226a3e7) SHA1(84feafc1c630e466142fcd5ef32af09b6d15b5d8) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
@@ -92,12 +92,12 @@ ROM_START( gl_uyr )
 ROM_END
 
 ROM_START( gl_hbh )
-	ROM_REGION( 0x80000, "maincpu", 0 ) 
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "hote1-0n.p1", 0x0000, 0x080000, CRC(7d0b2f21) SHA1(bcdfe920d71973b8d9769e80635cf0149fd06b1d) )
 ROM_END
 
 ROM_START( gl_hbhcl )
-	ROM_REGION( 0x80000, "maincpu", 0 ) 
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "mhot1-9n.p1", 0x0000, 0x080000, CRC(769ed4b8) SHA1(b725d1d2942521e145580ae3103ddecdd557b447) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )

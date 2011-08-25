@@ -341,15 +341,15 @@ Notes:
     TODO:
         - dendego intro object RAM usage has various gfx bugs (check video file)
         - dendego title screen builds up and it shouldn't
-  		- dendego/dendego2 doesn't show the odometer (btanb, thanks ANY);
+        - dendego/dendego2 doesn't show the odometer (btanb, thanks ANY);
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
-		- dendego2 shows a debug string during gameplay?
+        - dendego2 shows a debug string during gameplay?
         - Train board (external sound board with OKI6295) is not emulated.
         - dangcurv DSP program crashes very soon, so no 3d is currently shown.
         - add idle skips if possible
-		- dendego and clones needs output lamps and an artwork for the inputs (helps with the playability);
-		- POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
+        - dendego and clones needs output lamps and an artwork for the inputs (helps with the playability);
+        - POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 */
 
 #include "emu.h"
@@ -777,15 +777,15 @@ static WRITE32_HANDLER(dsp_shared_w)
 		if ((data & 0x80000) == 0)
 		{
 			/*
-			All games minus Dangerous Curves tests if the DSP is alive with this code snippet:
+            All games minus Dangerous Curves tests if the DSP is alive with this code snippet:
 
-			0008C370: 4A79 1000 1FC0                                      tst.w   $10001fc0.l
-			0008C376: 33FC 0000 0660 0000                                 move.w  #$0, $6600000.l
-			0008C37E: 66F0                                                bne     $8c370
+            0008C370: 4A79 1000 1FC0                                      tst.w   $10001fc0.l
+            0008C376: 33FC 0000 0660 0000                                 move.w  #$0, $6600000.l
+            0008C37E: 66F0                                                bne     $8c370
 
-			Problem is: that move.w in the middle makes the SR to always return a zero flag result,
-			hence it never branches like it should. CPU bug?
-			*/
+            Problem is: that move.w in the middle makes the SR to always return a zero flag result,
+            hence it never branches like it should. CPU bug?
+            */
 			if (!state->m_first_dsp_reset || !state->m_has_dsp_hack)
 			{
 				cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE);
@@ -866,7 +866,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog
 	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
-	//AM_RANGE(0x06800000, 0x06801fff) AM_NOP		// unknown
+	//AM_RANGE(0x06800000, 0x06801fff) AM_NOP       // unknown
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE_MEMBER(taitojc_state,m_f3_shared_ram)
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
 	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE(jc_meters_w)
@@ -1121,7 +1121,7 @@ static WRITE16_HANDLER( dsp_to_main_w )
 }
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
-//	AM_RANGE(0x0000, 0x1fff) AM_READ(dsp_internal_rom_r) // TODO: Dangerous Curves tries to access 0x207?
+//  AM_RANGE(0x0000, 0x1fff) AM_READ(dsp_internal_rom_r) // TODO: Dangerous Curves tries to access 0x207?
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1232,12 +1232,12 @@ static INPUT_PORTS_START( dendego )
 	/* TODO: fix this */
 	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x77, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(mascon_state_r,NULL)
-//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")		// Mascon 5
-//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")		// Mascon 3
-//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")		// Mascon 1
-//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")		// Mascon 4
-//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")		// Mascon 2
-//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")		// Mascon 0
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")      // Mascon 5
+//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")      // Mascon 3
+//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")      // Mascon 1
+//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")      // Mascon 4
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")      // Mascon 2
+//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")      // Mascon 0
 
 	PORT_START("MASCON")
 	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(0x60) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
@@ -1411,7 +1411,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
-//	MCFG_CPU_PERIODIC_INT(taitojc_int6, 1000)
+//  MCFG_CPU_PERIODIC_INT(taitojc_int6, 1000)
 
 	MCFG_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)

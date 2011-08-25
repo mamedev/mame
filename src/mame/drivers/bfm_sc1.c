@@ -160,7 +160,7 @@ static int Scorpion1_GetSwitchState(bfm_sc1_state *drvstate, int strobe, int dat
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-//	printf("bankswitch %02x\n", data);
+//  printf("bankswitch %02x\n", data);
 	memory_set_bank(space->machine(),"bank1",data & 0x03);
 }
 
@@ -1570,27 +1570,27 @@ ROM_END
 
 ROM_START( sc1clbtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	
+
 	/* these are other hw (SC4?)
-	ROM_LOAD( "95008055.bin", 0x0000, 0x100000, CRC(df9ae6e3) SHA1(5766cb1749aa92c34a76270a641f7a9302cc44d7) )
-	ROM_LOAD( "95008055.p1", 0x0000, 0x800000, CRC(ef474fd3) SHA1(e7427184683603b57a3a8b37452fa6ec7a41e34c) )
-	ROM_LOAD( "95008056.p2", 0x0000, 0x800000, CRC(39b1b566) SHA1(937ec27964124b92b75d4b37d09a35585baa68c6) )
-	ROM_LOAD( "95402149.lo", 0x0000, 0x080000, CRC(f5eee630) SHA1(102ef766562a67cd5c339d755f527252aee924be) )
-	ROM_LOAD( "95402150.hi", 0x0000, 0x080000, CRC(19ada5f4) SHA1(3719e29465249026c781fe5226d05770c2e8ce99) )
-	ROM_LOAD( "95402257.lo", 0x0000, 0x080000, CRC(fca966af) SHA1(63aa17640405fb858d776799e2388679dfe02a26) )
-	ROM_LOAD( "95402258.hi", 0x0000, 0x080000, CRC(24ca572a) SHA1(5daa89c4427e70d0fbebfca116ea6932716f38f8) )
-	ROM_LOAD( "95403149.lo", 0x0000, 0x080000, CRC(a62d1945) SHA1(197f9245d46cb156987cbacc1ac0c8230030fdcd) )
-	ROM_LOAD( "95403150.hi", 0x0000, 0x080000, CRC(9f79e460) SHA1(0162d5fc54361c5853dc865d61849f766f833545) )
-	ROM_LOAD( "95403257.lo", 0x0000, 0x080000, CRC(5aada808) SHA1(e24bc5e523961abdedfb27ec5cff2cbb6f45bddd) )
-	ROM_LOAD( "95403258.hi", 0x0000, 0x080000, CRC(2b133e43) SHA1(805ca1ddf1ebcf6cbbd4b8b41baf5c2056b5bf17) )
-	ROM_LOAD( "95404682.lo", 0x0000, 0x080000, CRC(3b9e429f) SHA1(01046d8671a287b2a1c739f84d28c69ba2c8c80f) )
-	ROM_LOAD( "95404683.hi", 0x0000, 0x080000, CRC(f84b37ad) SHA1(4430c7fe6274d25de58342d255c4c4a52966b0b3) )
-	ROM_LOAD( "95405682.lo", 0x0000, 0x080000, CRC(12d4bf1a) SHA1(2b28c5fdca13e7a70496984e02bfd3b98d60a9ac) )
-	ROM_LOAD( "95405683.hi", 0x0000, 0x080000, CRC(b9aba368) SHA1(ec6404447c9e23e179ec1200848d966d5f3f846b) )
-	ROM_LOAD( "95717692a.bin", 0x0000, 0x008000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) )
-	ROM_LOAD( "club-temptation_mtx_(ihex)ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) )
-	ROM_LOAD( "clubtempdot.bin", 0x0000, 0x010000, CRC(283d2d9c) SHA1(5b76a13ad674f8a40c270e5dbc61dac04d411d02) )
-	*/
+    ROM_LOAD( "95008055.bin", 0x0000, 0x100000, CRC(df9ae6e3) SHA1(5766cb1749aa92c34a76270a641f7a9302cc44d7) )
+    ROM_LOAD( "95008055.p1", 0x0000, 0x800000, CRC(ef474fd3) SHA1(e7427184683603b57a3a8b37452fa6ec7a41e34c) )
+    ROM_LOAD( "95008056.p2", 0x0000, 0x800000, CRC(39b1b566) SHA1(937ec27964124b92b75d4b37d09a35585baa68c6) )
+    ROM_LOAD( "95402149.lo", 0x0000, 0x080000, CRC(f5eee630) SHA1(102ef766562a67cd5c339d755f527252aee924be) )
+    ROM_LOAD( "95402150.hi", 0x0000, 0x080000, CRC(19ada5f4) SHA1(3719e29465249026c781fe5226d05770c2e8ce99) )
+    ROM_LOAD( "95402257.lo", 0x0000, 0x080000, CRC(fca966af) SHA1(63aa17640405fb858d776799e2388679dfe02a26) )
+    ROM_LOAD( "95402258.hi", 0x0000, 0x080000, CRC(24ca572a) SHA1(5daa89c4427e70d0fbebfca116ea6932716f38f8) )
+    ROM_LOAD( "95403149.lo", 0x0000, 0x080000, CRC(a62d1945) SHA1(197f9245d46cb156987cbacc1ac0c8230030fdcd) )
+    ROM_LOAD( "95403150.hi", 0x0000, 0x080000, CRC(9f79e460) SHA1(0162d5fc54361c5853dc865d61849f766f833545) )
+    ROM_LOAD( "95403257.lo", 0x0000, 0x080000, CRC(5aada808) SHA1(e24bc5e523961abdedfb27ec5cff2cbb6f45bddd) )
+    ROM_LOAD( "95403258.hi", 0x0000, 0x080000, CRC(2b133e43) SHA1(805ca1ddf1ebcf6cbbd4b8b41baf5c2056b5bf17) )
+    ROM_LOAD( "95404682.lo", 0x0000, 0x080000, CRC(3b9e429f) SHA1(01046d8671a287b2a1c739f84d28c69ba2c8c80f) )
+    ROM_LOAD( "95404683.hi", 0x0000, 0x080000, CRC(f84b37ad) SHA1(4430c7fe6274d25de58342d255c4c4a52966b0b3) )
+    ROM_LOAD( "95405682.lo", 0x0000, 0x080000, CRC(12d4bf1a) SHA1(2b28c5fdca13e7a70496984e02bfd3b98d60a9ac) )
+    ROM_LOAD( "95405683.hi", 0x0000, 0x080000, CRC(b9aba368) SHA1(ec6404447c9e23e179ec1200848d966d5f3f846b) )
+    ROM_LOAD( "95717692a.bin", 0x0000, 0x008000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) )
+    ROM_LOAD( "club-temptation_mtx_(ihex)ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) )
+    ROM_LOAD( "clubtempdot.bin", 0x0000, 0x010000, CRC(283d2d9c) SHA1(5b76a13ad674f8a40c270e5dbc61dac04d411d02) )
+    */
 	ROM_LOAD( "temp11a.bin", 0x8000, 0x008000, CRC(37c8b73e) SHA1(f718572d170be7b582c3818df7163309cea232b5) )
 	ROM_LOAD( "temp12b.bin", 0x0000, 0x008000, CRC(3c27c592) SHA1(081d61f974e2ae5c64729b32be4c0e5067a20550) )
 
@@ -1618,7 +1618,7 @@ ROM_START( sc1clbw )
 	ROM_LOAD( "cwise_a.bin", 0x0000, 0x008000, CRC(5b305f11) SHA1(592ea71fcb72eaa90fd421e3bd3761cfd686b019) )
 	ROM_LOAD( "cwise_b.bin", 0x0000, 0x008000, CRC(0528a718) SHA1(27f4225c948d93ce1c833679f97e045f3b7a6aac) )
 
-	ROM_REGION( 0x20000, "upd", 0 )	
+	ROM_REGION( 0x20000, "upd", 0 )
 	ROM_LOAD( "wisesnd.bin", 0x0000, 0x020000, CRC(35cb0314) SHA1(6ceec1fc17015d8228d55331fcffb77390161136) )
 	ROM_LOAD( "wisesnd1.bin", 0x0000, 0x010000, CRC(204605a6) SHA1(193a60878ed46f122e5d2d8f35fc6ea967b8734f) )
 	ROM_LOAD( "wisesnd2.bin", 0x010000, 0x010000, CRC(6aa66166) SHA1(2e7cc67afdce2febb541bb1d0e7c107876d4233d) )
@@ -1893,7 +1893,7 @@ ROM_START( sc1mast )
 
 	ROM_REGION( 0x40000, "upd", 0 )
 	ROM_LOAD( "asnd1.bin", 0x0000, 0x010000, CRC(229d0666) SHA1(68650c920d60df1eff00cd77e0308f5c2fd88baf) )
-	ROM_LOAD( "asnd2.bin", 0x0000, 0x010000, CRC(3b286391) SHA1(0e0cd818d23d73b681905db98c0b9890809b25f6) )	
+	ROM_LOAD( "asnd2.bin", 0x0000, 0x010000, CRC(3b286391) SHA1(0e0cd818d23d73b681905db98c0b9890809b25f6) )
 ROM_END
 
 
@@ -2090,7 +2090,7 @@ ROM_START( sc1torn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tor930a", 0x8000, 0x008000, CRC(c645212d) SHA1(0cb0a6f15b22e3174a1600fe15a742d5f63d9ab2) )
 	ROM_LOAD( "tor930b", 0x0000, 0x008000, CRC(f6181dd5) SHA1(44b12e6f66bf45e2b2a91424941b10ea5e75428f) )
-	
+
 	ROM_REGION( 0x40000, "altrevs", 0 )
 	ROM_LOAD( "tornado.792", 0x0000, 0x010000, CRC(7e8e8ad1) SHA1(0e093b81f4ab3d202f89215b26b360aac7f32218) )
 
@@ -2129,7 +2129,7 @@ ROM_START( sc1typ )
 	ROM_REGION( 0x40000, "xxxx", 0 )
 	ROM_LOAD( "club-typhoon_snd_a_(inhex)ss.hex", 0x0000, 0x026efc, CRC(c913008a) SHA1(9b75a40670db0fbe8a0f6fc54784d3b415a975f5) )
 	ROM_LOAD( "club-typhoon_snd_b_(inhex)ss.hex", 0x0000, 0x023972, CRC(2106a5f1) SHA1(17e0f24c4e9a8ba227c5a6ec63bcba3d8796f7f7) )
-	
+
 	ROM_REGION( 0x20000, "upd", 0 )
 	ROM_LOAD( "club-typhoon_snd_a.bin", 0x000000, 0x010000, CRC(ffec0dde) SHA1(a8c66a6ebb4d805e04d7eb7d1fe2ecd90e7eee54) )
 	ROM_LOAD( "club-typhoon_snd_b.bin", 0x010000, 0x010000, CRC(52e36599) SHA1(4bc003a08e666f9e1abfe00e82bb43a33009b6f2) )
@@ -2321,7 +2321,7 @@ ROM_START( sc1dip )
 	ROM_LOAD( "ram.bin", 0x0000, 0x002000, CRC(3962d8cf) SHA1(b893a92d467e8f5ffc2cffa8a7121d92fe2492eb) )
 
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-	/* missing? */	
+	/* missing? */
 ROM_END
 
 ROM_START( sc1lamb )
@@ -2329,7 +2329,7 @@ ROM_START( sc1lamb )
 	ROM_LOAD( "lambada.bin", 0x0000, 0x010000, CRC(4321495c) SHA1(d3ef15d2a1b2c7aec33ac226c89a7a0c0a18884a) )
 
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-	/* missing? */	
+	/* missing? */
 ROM_END
 
 ROM_START( sc1reply )
@@ -2429,7 +2429,7 @@ ROM_END
 
 ROM_START( sc1clinsb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-//	ROM_LOAD( "95718066 proto.bin", 0x0000, 0x008000, CRC(0977e287) SHA1(e937a3787d4cd056c5f9944bca1532b84ed335f6) )
+//  ROM_LOAD( "95718066 proto.bin", 0x0000, 0x008000, CRC(0977e287) SHA1(e937a3787d4cd056c5f9944bca1532b84ed335f6) )
 	ROM_LOAD( "clines proto a.bin", 0x8000, 0x008000, CRC(0977e287) SHA1(e937a3787d4cd056c5f9944bca1532b84ed335f6) )
 	ROM_LOAD( "clines proto b.bin", 0x0000, 0x008000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
@@ -2439,7 +2439,7 @@ ROM_START( sc1clinsc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "39370028a.bin", 0x8000, 0x008000, CRC(e0250ea4) SHA1(01cc9013c37bc22f5ab69565d453ece99f739e6b) )
 	ROM_LOAD( "39370028b.bin", 0x0000, 0x008000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
-//	ROM_LOAD( "95717067b.bin", 0x0000, 0x008000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
+//  ROM_LOAD( "95717067b.bin", 0x0000, 0x008000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2633,7 +2633,7 @@ ROM_START( sc1hfcc )
 	ROM_LOAD( "cz14ap.bin", 0x0000, 0x008000, CRC(56e3e5c4) SHA1(3017007e03139204732f7945ded61d35499055ac) )
 
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 ROM_START( sc1twice )
@@ -2646,8 +2646,8 @@ ROM_END
 
 ROM_START( sc1chain )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-//	ROM_LOAD( "95717174 b.bin", 0x0000, 0x008000, CRC(6cdc8d15) SHA1(582e5e7bcefe0085917d3499b7c83e27c19662d2) )
-//	ROM_LOAD( "95717173 a.bin", 0x8000, 0x008000, CRC(4989e6c6) SHA1(17184c6a3624dfaa61bc4ddb3ac1813949eaf834) )
+//  ROM_LOAD( "95717174 b.bin", 0x0000, 0x008000, CRC(6cdc8d15) SHA1(582e5e7bcefe0085917d3499b7c83e27c19662d2) )
+//  ROM_LOAD( "95717173 a.bin", 0x8000, 0x008000, CRC(4989e6c6) SHA1(17184c6a3624dfaa61bc4ddb3ac1813949eaf834) )
 	ROM_LOAD( "95717174.bin", 0x0000, 0x008000, CRC(6cdc8d15) SHA1(582e5e7bcefe0085917d3499b7c83e27c19662d2) )
 	ROM_LOAD( "95717173.bin", 0x8000, 0x008000, CRC(4989e6c6) SHA1(17184c6a3624dfaa61bc4ddb3ac1813949eaf834) )
 
@@ -2657,7 +2657,7 @@ ROM_START( sc1chain )
 	ROM_LOAD( "95717211.bin", 0x0000, 0x008000, CRC(ed781e00) SHA1(67ebb58beda5123f061a22dacd008f1feb75b8d9) )
 
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-	/* Missing? */	
+	/* Missing? */
 ROM_END
 
 ROM_START( sc1potp )
@@ -2696,9 +2696,9 @@ GAME( 198?, sc1barcd		, 0			, scorpion1_viper	, clatt		, lotse			, 0,       "BFM
 GAME( 198?, sc1bigmt		, 0			, scorpion1_viper	, clatt		, nocrypt		, 0,       "BFM",      "The Big Match (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1calyp		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Calypso (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1carro		, 0			, scorpion1			, scorpion1	, nocrypt_bank0	, 0,       "BFM/ELAM", "Carrousel (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cshat		, 0			, scorpion1			, scorpion1 , lotse  		, 0,       "BFM",      "Cash Attraction (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshat		, 0			, scorpion1			, scorpion1 , lotse 		, 0,       "BFM",      "Cash Attraction (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1cshcd		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Cash Card (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cshcda		, sc1cshcd	, scorpion1			, scorpion1	, lotse			, 0,       "BFM", 	   "Cash Card (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshcda		, sc1cshcd	, scorpion1			, scorpion1	, lotse			, 0,       "BFM",	   "Cash Card (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1cshcdb		, sc1cshcd	, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Card (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1ccoin		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Coin (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1cexpd		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Cash Explosion (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -2806,8 +2806,8 @@ GAME( 199?, sc1cscl			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global"
 GAME( 199?, sc1driv			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Driving School (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1vsd			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Vegas Super Deal (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
-GAME( 199?, sc1wof			, 0			, scorpion1			, scorpion1	, lotse	  	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1wofa			, sc1wof	, scorpion1			, scorpion1	, lotse	  	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1wof			, 0			, scorpion1			, scorpion1	, lotse		    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1wofa			, sc1wof	, scorpion1			, scorpion1	, lotse		    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1wofb			, sc1wof	, scorpion1			, scorpion1	, nocrypt	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1crzyc		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1crzyca		, sc1crzyc	, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

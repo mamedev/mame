@@ -235,7 +235,7 @@ ROM_START( sp_gnat )
 	ROM_LOAD( "grand_national", 0x0000, 0x01681e, CRC(3390b136) SHA1(a7ebbd260ac2e36cb5ad52efc43ac88058e4cd55) )
 
 	// from a bwb set, paired with gn597p6a
-	ROM_LOAD( "597 gnsk all cash p6.2.bin", 0x0000, 0x008000, CRC(2bd1c9c6) SHA1(4b1249fc7aca548e8acd4ee75bf2260dd512ac72) )	
+	ROM_LOAD( "597 gnsk all cash p6.2.bin", 0x0000, 0x008000, CRC(2bd1c9c6) SHA1(4b1249fc7aca548e8acd4ee75bf2260dd512ac72) )
 ROM_END
 
 
@@ -386,7 +386,7 @@ ROM_START( sp_playa )
 ROM_END
 
 
-ROM_START( sp_playaa ) 	// these seem overdumped (all have identical halves) but there are more revisions here than above
+ROM_START( sp_playaa )	// these seem overdumped (all have identical halves) but there are more revisions here than above
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "pia05a_a.3_2", 0x0000, 0x008000, CRC(44c7116b) SHA1(09aaa635c1985f5d5d83a969760b12502b751daa) )
 	ROM_IGNORE(0x8000)
@@ -1199,7 +1199,7 @@ ROM_END
 ROM_START( sp_five )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fn19.bin", 0x0000, 0x010000, CRC(4721ccf8) SHA1(a6b7b238df7e7cf45c049b4fb16bf0c05fb95b41) )
-	
+
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "fn19p.bin", 0x0000, 0x010000, CRC(ac2de72f) SHA1(61263944fe29b5f5c79c987989a784b32700c902) )
 ROM_END
@@ -1208,7 +1208,7 @@ ROM_START( sp_carry )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "carry on 10p payout p2.bin", 0x0000, 0x8000, CRC(1db4062c) SHA1(92098a145c9cdf04758b92998dd4fca7945cf991) )
 	ROM_LOAD( "carry on p1.bin", 0x8000, 0x8000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) )
-//	ROM_LOAD( "carry on v6 p1.bin", 0x0000, 0x008000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) )
+//  ROM_LOAD( "carry on v6 p1.bin", 0x0000, 0x008000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "carry on 20p payout p2.bin", 0x0000, 0x008000, CRC(ae1b2c66) SHA1(47a17c5178520d7ed6bc3aaaef111e8188d9a6b0) )

@@ -4,7 +4,7 @@
 
     Skeleton Driver - For note keeping
 
-	THIS SYSTEM IS NOT EMULATED!!!
+    THIS SYSTEM IS NOT EMULATED!!!
 
     68340 based system like MPU5/SC4?
     used by JPM? + Others? Manufactuered by Heber Ltd.
@@ -13,13 +13,13 @@
     Club DNA?
 
 
-	I'm not sure if the sets in this driver are actually this platform
-	it's just based guessed on structure*, and some ebay notes which
-	inidicate at least one or two should be..
+    I'm not sure if the sets in this driver are actually this platform
+    it's just based guessed on structure*, and some ebay notes which
+    inidicate at least one or two should be..
 
-	* 2 roms only, with what looks to be some modified address lines,
-	  and the roms containing a large amount of data, presmuably because
-	  they have the sound integrated, and the sound hw is just DAC style
+    * 2 roms only, with what looks to be some modified address lines,
+      and the roms containing a large amount of data, presmuably because
+      they have the sound integrated, and the sound hw is just DAC style
 
 
 */
@@ -55,12 +55,12 @@ ROM_START( hb_cr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "80000504.p1", 0x00000, 0x080000, CRC(a982dd06) SHA1(f3de6ec7d538709961d8e1118c29ef3515415b25) )
 	ROM_LOAD16_BYTE( "80000504.p2", 0x00001, 0x080000, CRC(76e867e3) SHA1(a088029c3a8fdbbc2b90ae3e33a07e41dcf7daee) )
-	
+
 	ROM_REGION( 0x400000, "altrevs", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "80000550.p1", 0x0000, 0x080000, CRC(d800e216) SHA1(deb65ceec634a006dc510f908bccb383cbd3fadf) )
 	ROM_LOAD16_BYTE( "80000550.p2", 0x0000, 0x080000, CRC(dede7764) SHA1(96ce329a6351c5d6a5d434cea67b3bb7a26d443e) )
 	ROM_LOAD16_BYTE( "80001504.p1", 0x0000, 0x080000, CRC(13d32b07) SHA1(aa263d17aab0e1155d020bcebfaa8dea31a525e9) )
-	ROM_LOAD16_BYTE( "80001504.p2", 0x0000, 0x080000, CRC(8e3687b3) SHA1(d80c79c8283927e206437f4ff3208d1be00c2558) )	
+	ROM_LOAD16_BYTE( "80001504.p2", 0x0000, 0x080000, CRC(8e3687b3) SHA1(d80c79c8283927e206437f4ff3208d1be00c2558) )
 ROM_END
 
 

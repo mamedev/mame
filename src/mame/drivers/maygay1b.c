@@ -995,7 +995,7 @@ ROM_START( m1bargn )
 	ROM_LOAD( "sa4-078.bin", 0x0000, 0x010000, CRC(dcc0b83e) SHA1(a85e3f60decb7dbc2de77b93dd8a79ff137d85b7) )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  ) // I don't think this is correct, or at least it's not OKI, no header.
-	ROM_LOAD( "bgsnd", 0x0000, 0x020000, CRC(abe7c01d) SHA1(21caadcd149772dfd79a9d30ebc1d8da91ff36f4) )	
+	ROM_LOAD( "bgsnd", 0x0000, 0x020000, CRC(abe7c01d) SHA1(21caadcd149772dfd79a9d30ebc1d8da91ff36f4) )
 ROM_END_M1A_MCU
 
 ROM_START( m1bigdel )
@@ -1569,7 +1569,7 @@ ROM_START( m1eeqva )
 	ROM_LOAD( "vic15f", 0x0000, 0x020000, CRC(01fb6767) SHA1(83885fed9f7272c49b581fdce1720a6464dfc9c7) )
 	ROM_LOAD( "vic15r", 0x0000, 0x010000, CRC(2659aad7) SHA1(456cfbc6ac7924871756138d1fd3353c7a236191) )
 	ROM_LOAD( "15qvro", 0x0000, 0x020000, CRC(fb5da3dd) SHA1(9043276c782e4e2eb51366cbb6fb98ead5c02c67) )
-	
+
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
 	ROM_LOAD( "queenvic.p1", 0x000000, 0x080000, CRC(af665967) SHA1(b87b13e759765eeb701ff8ead41eb3c09bec1e92) )
 	ROM_LOAD( "queenvic.p2", 0x080000, 0x080000, CRC(92ce90ce) SHA1(9fca67429b9f1496dc745818b3ed7747b8eedf5d) )
@@ -1826,7 +1826,7 @@ ROM_START( m1htclb )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "hitensionclubv1-2.rom", 0x0000, 0x010000, CRC(b33fa7a9) SHA1(9aa2b61bac96441a3aa9da254c54636d29a895e2) )
 	ROM_LOAD( "hitensio.bin", 0x0000, 0x010000, CRC(b8c8edc9) SHA1(1f989a3a72fb7c7747fc6deeb08e06da429620ee) )
-	
+
 	ROM_REGION( 0x20000, "altrevs", ROMREGION_ERASE00  )
 	ROM_LOAD( "sc3-057.bin", 0x0000, 0x010000, CRC(b33fa7a9) SHA1(9aa2b61bac96441a3aa9da254c54636d29a895e2) )
 ROM_END_M1A_MCU

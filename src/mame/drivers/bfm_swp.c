@@ -1,50 +1,50 @@
 /* Bellfruit SWP (Skill With Prizes) Video hardware */
 
 /*
-	This is 'Cobra 3' ?
-	is that an expansion board for Scorpion 4, or somehow related?
-	The CPU is the same (68340)
+    This is 'Cobra 3' ?
+    is that an expansion board for Scorpion 4, or somehow related?
+    The CPU is the same (68340)
 
-	Radio Times is probably the only *COMPLETE* dump here, as it
-	includes the CD.  Other games probably have CDs or HDDs too.
+    Radio Times is probably the only *COMPLETE* dump here, as it
+    includes the CD.  Other games probably have CDs or HDDs too.
 
-	Telly Addicts has a HDD dump (I'm assuming it's the same
-	platform) but no sound roms.
- 
+    Telly Addicts has a HDD dump (I'm assuming it's the same
+    platform) but no sound roms.
+
 */
- 
+
 /* Radio Times readme #1
 ---------------------------------------------
 
 Music TR9C1710 (Video RAMDAC)
 
-Part number :   STV8438CV 
- Manufacture :  ST Microelectronics     
-Specification(s)  
- Description :   8-Bit Triple DAC with Analog Switch 
- Package :   PQFP44 
- 
-MC68340 : Integrated Processor with DMA  
+Part number :   STV8438CV
+ Manufacture :  ST Microelectronics
+Specification(s)
+ Description :   8-Bit Triple DAC with Analog Switch
+ Package :   PQFP44
+
+MC68340 : Integrated Processor with DMA
  The MC68340 is a high-performance 32-bit integrated processor with direct memory access (DMA), combining an enhanced M68000-compatible processor, 32-bit DMA, and other peripheral subsystems on a single integrated circuit. The MC68340 CPU32 delivers 32-bit CISC processor performance from a lower cost 16-bit memory system. The combination of peripherals offered in the MC68340 can be found in a diverse range of microprocessor-based systems. Systems requiring very high-speed block transfers of data can benefit from the MC68340.
 
 
- Block Diagram 
+ Block Diagram
 
 
 MC68340 Features
-CPU32 Core 
-Two-Channel DMA Controller 
-DUART Compatible with 68681 
-Two 16-Bit Timer/Counters 
-Four Chip Selects 
-System Integration 
-32 Address Lines, 16 Data Lines 
-Low Power Management 
-4.8 MIPS @ 25 MHz 
-Available in 16 and 25 MHz 
-Available in 3.3 and 5V 
- 
- 
+CPU32 Core
+Two-Channel DMA Controller
+DUART Compatible with 68681
+Two 16-Bit Timer/Counters
+Four Chip Selects
+System Integration
+32 Address Lines, 16 Data Lines
+Low Power Management
+4.8 MIPS @ 25 MHz
+Available in 16 and 25 MHz
+Available in 3.3 and 5V
+
+
 l5380 -scsi controller
 
 ymz280b - in MAME - sound chip
@@ -60,8 +60,8 @@ DSPs (about $14).
 roms
 
 game 95 400 009 type swp left ver. radt 1.1 - ST 27C4001
-game 95 400 010 type swp right ver. radt 1.1 - ST 27C4001 
-95 004 056 sound left - ST 27C4001 
+game 95 400 010 type swp right ver. radt 1.1 - ST 27C4001
+95 004 056 sound left - ST 27C4001
 95 004 057 sound right - AM 27C040
 
 cd
@@ -72,7 +72,7 @@ version 95-100-302
 /* Radio Times readme #2
 ---------------------------------------------
 
-Board 
+Board
 Difficult to make things out on this one, but the SCSI socket is clear to see - this is where the CDROM drive hooks in
 
 CPU

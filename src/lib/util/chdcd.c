@@ -38,7 +38,7 @@ static char linebuffer[512];
 ***************************************************************************/
 
 static astring get_file_path(astring &path)
-{	
+{
 	int pos = path.rchr( 0, '\\');
 	if (pos!=-1) {
 		path = path.substr(0,pos+1);
@@ -313,7 +313,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 
 	astring path = astring(tocfname);
 
-	infile = fopen(tocfname, "rt");	
+	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
 
 	if (infile == (FILE *)NULL)
@@ -460,7 +460,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 
 	astring path = astring(tocfname);
 
-	infile = fopen(tocfname, "rt");	
+	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
 
 	if (infile == (FILE *)NULL)
@@ -526,12 +526,12 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 		}
 
 		astring name;
-		
-		tok=strtok(NULL," ");		
+
+		tok=strtok(NULL," ");
 		name = tok;
 		if (tok[0]=='"') {
 			do {
-				tok=strtok(NULL," ");				
+				tok=strtok(NULL," ");
 				if (tok!=NULL) {
 					name += " ";
 					name += tok;
@@ -541,7 +541,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 		}
 		strncpy(outinfo->fname[trknum], path.cstr(), 256);
 		strncat(outinfo->fname[trknum], name, 256);
-		
+
 		sz=get_file_size(outinfo->fname[trknum]);
 
 		outtoc->tracks[trknum].frames=sz/trksize;
@@ -593,7 +593,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	UINT32 wavlen, wavoffs;
 	astring path = astring(tocfname);
 
-	infile = fopen(tocfname, "rt");	
+	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
 	if (infile == (FILE *)NULL)
 	{
@@ -869,7 +869,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 	astring path = astring(tocfname);
 
-	infile = fopen(tocfname, "rt");	
+	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
 
 	if (infile == (FILE *)NULL)
