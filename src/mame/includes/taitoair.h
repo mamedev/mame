@@ -42,9 +42,16 @@ public:
 	device_t *m_tc0080vco;
 
 	UINT16 *      m_gradram;
+	UINT16 *      m_backregs;
+
+	bitmap_t *m_framebuffer[2];
+	UINT8         m_cur_fb;
 };
 
 
 /*----------- defined in video/taitoair.c -----------*/
 
 SCREEN_UPDATE( taitoair );
+VIDEO_START( taitoair );
+
+WRITE16_HANDLER( dsp_flags_w );

@@ -85,6 +85,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
+		/* TODO: remove this aberration of nature */
 		if (offs <  0x01b0 && priority == 0)	continue;
 		if (offs >= 0x01b0 && priority == 1)	continue;
 
@@ -341,6 +342,75 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 	}
 }
 
+/*
+	TODO: still don't know how this works. It calls three values (0x1fff-0x5fff-0xdfff), for two or three offsets.
+	In theory this should fit into framebuffer draw, display, clear and swap in some way.
+*/
+WRITE16_HANDLER( dsp_flags_w )
+{
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
+	rectangle cliprect;
+
+	if(data == 0x1fff)
+		state->m_cur_fb = 0;
+	//else if(data == 0xdfff)
+	//	state->m_cur_fb = 1;
+
+	cliprect.min_x = 0;
+	cliprect.min_y = 3*16;
+	cliprect.max_x = space->machine().primary_screen->width() - 1;
+	cliprect.max_y = space->machine().primary_screen->height() - 1;
+
+	{
+		//if(offset == 0)
+		//	bitmap_fill(state->m_framebuffer[state->m_cur_fb], &cliprect, 0);
+
+		//if(offset == 1)
+		{
+			if (state->m_line_ram[0x3fff])
+			{
+				int adr = 0x3fff;
+// 			    struct taitoair_poly q;
+
+				while (adr >= 0 && state->m_line_ram[adr] && state->m_line_ram[adr] != 0x4000)
+				{
+					int pcount;
+					if (!(state->m_line_ram[adr] & 0x8000) || adr < 10)
+					{
+						logerror("quad: unknown value %04x at %04x\n", state->m_line_ram[adr], adr);
+						break;
+					}
+					state->m_q.col = (state->m_line_ram[adr] & 0x007f) + 0x300;
+					adr--;
+					pcount = 0;
+					while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(state->m_line_ram[adr] & 0xc000))
+					{
+						state->m_q.p[pcount].y = state->m_line_ram[adr] + 3 * 16;
+						state->m_q.p[pcount].x = state->m_line_ram[adr - 1];
+						pcount++;
+						adr -= 2;
+					}
+					adr--;
+					state->m_q.pcount = pcount;
+					fill_poly(state->m_framebuffer[state->m_cur_fb], &cliprect, &state->m_q);
+				}
+			}
+		}
+	}
+}
+
+VIDEO_START( taitoair )
+{
+	taitoair_state *state = machine.driver_data<taitoair_state>();
+	int width, height;
+
+	width = machine.primary_screen->width();
+	height = machine.primary_screen->height();
+	state->m_framebuffer[0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_framebuffer[1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_cur_fb = 0;
+}
+
 SCREEN_UPDATE( taitoair )
 {
 	taitoair_state *state = screen->machine().driver_data<taitoair_state>();
@@ -349,51 +419,46 @@ SCREEN_UPDATE( taitoair )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-#ifdef MAME_DEBUG
-	if (!screen->machine().input().code_pressed(KEYCODE_A))
-		tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, 0, 0);
-	if (!screen->machine().input().code_pressed(KEYCODE_S))
-		draw_sprites(screen->machine(), bitmap, cliprect, 0);
-	if (!screen->machine().input().code_pressed(KEYCODE_D))
-		tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
-	if (!screen->machine().input().code_pressed(KEYCODE_F))
-		draw_sprites(screen->machine(), bitmap, cliprect, 1);
-#else
+	{
+		int x,y;
+
+		/*
+		[0x980000-3] dword for Y 0
+		[0x980004-7] dword for rotation param 0
+		[0x980008-b] dword for Y 1
+		[0x98000c-f] dword for rotation param 1
+		*/
+
+		for(y=cliprect->min_y;y<cliprect->max_y/2;y++)
+		{
+			for(x=cliprect->min_x;x<cliprect->max_x;x++)
+			{
+				*BITMAP_ADDR16(bitmap,y,x) = 0x2000 + (0x3f - ((y >> 2) & 0x3f));
+			}
+		}
+
+		#if 0
+		for(y=cliprect->max_y/2;y<cliprect->max_y;y++)
+		{
+			for(x=cliprect->min_x;x<cliprect->max_x;x++)
+			{
+				*BITMAP_ADDR16(bitmap,y,x) = 0x2040 + (0x3f - ((y >> 2) & 0x3f));
+			}
+		}
+		#endif
+	}
+
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, 0, 0);
+
 	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+
+	copybitmap_trans(bitmap, state->m_framebuffer[state->m_cur_fb], 0, 0, 0, 0, cliprect, 0);
+
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
+
 	draw_sprites(screen->machine(), bitmap, cliprect, 1);
-#endif
 
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 
-	if (state->m_line_ram[0x3fff])
-	{
-		int adr = 0x3fff;
-//      struct taitoair_poly q;
-
-		while (adr >= 0 && state->m_line_ram[adr] && state->m_line_ram[adr] != 0x4000)
-		{
-			int pcount;
-			if (!(state->m_line_ram[adr] & 0x8000) || adr < 10)
-			{
-				logerror("quad: unknown value %04x at %04x\n", state->m_line_ram[adr], adr);
-				break;
-			}
-			state->m_q.col = (state->m_line_ram[adr] & 0x7fff) + 0x300;
-			adr--;
-			pcount = 0;
-			while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(state->m_line_ram[adr] & 0xc000))
-			{
-				state->m_q.p[pcount].y = state->m_line_ram[adr] + 3 * 16;
-				state->m_q.p[pcount].x = state->m_line_ram[adr - 1];
-				pcount++;
-				adr -= 2;
-			}
-			adr--;
-			state->m_q.pcount = pcount;
-			fill_poly(bitmap, cliprect, &state->m_q);
-		}
-	}
 	return 0;
 }
