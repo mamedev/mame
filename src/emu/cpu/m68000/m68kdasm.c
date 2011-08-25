@@ -1336,17 +1336,19 @@ static void d68040_cinv(void)
 	LIMIT_CPU_TYPES(M68040_PLUS);
 	switch((g_cpu_ir>>3)&3)
 	{
+		static const char *cachetype[4] = { "nop", "data", "inst", "both" };
+
 		case 0:
 			sprintf(g_dasm_str, "cinv (illegal scope); (4)");
 			break;
 		case 1:
-			sprintf(g_dasm_str, "cinvl   %d, (A%d); (4)", (g_cpu_ir>>6)&3, g_cpu_ir&7);
+			sprintf(g_dasm_str, "cinvl   %s, (A%d); (4)", cachetype[(g_cpu_ir>>6)&3], g_cpu_ir&7);
 			break;
 		case 2:
-			sprintf(g_dasm_str, "cinvp   %d, (A%d); (4)", (g_cpu_ir>>6)&3, g_cpu_ir&7);
+			sprintf(g_dasm_str, "cinvp   %s, (A%d); (4)", cachetype[(g_cpu_ir>>6)&3], g_cpu_ir&7);
 			break;
 		case 3:
-			sprintf(g_dasm_str, "cinva   %d; (4)", (g_cpu_ir>>6)&3);
+			sprintf(g_dasm_str, "cinva   %s; (4)", cachetype[(g_cpu_ir>>6)&3]);
 			break;
 	}
 }
@@ -1580,6 +1582,8 @@ static void d68020_cptrapcc_32(void)
 
 static void d68040_cpush(void)
 {
+	static const char *cachetype[4] = { "nop", "data", "inst", "both" };
+
 	LIMIT_CPU_TYPES(M68040_PLUS);
 	switch((g_cpu_ir>>3)&3)
 	{
@@ -1587,13 +1591,13 @@ static void d68040_cpush(void)
 			sprintf(g_dasm_str, "cpush (illegal scope); (4)");
 			break;
 		case 1:
-			sprintf(g_dasm_str, "cpushl  %d, (A%d); (4)", (g_cpu_ir>>6)&3, g_cpu_ir&7);
+			sprintf(g_dasm_str, "cpushl  %s, (A%d); (4)", cachetype[(g_cpu_ir>>6)&3], g_cpu_ir&7);
 			break;
 		case 2:
-			sprintf(g_dasm_str, "cpushp  %d, (A%d); (4)", (g_cpu_ir>>6)&3, g_cpu_ir&7);
+			sprintf(g_dasm_str, "cpushp  %s, (A%d); (4)", cachetype[(g_cpu_ir>>6)&3], g_cpu_ir&7);
 			break;
 		case 3:
-			sprintf(g_dasm_str, "cpusha  %d; (4)", (g_cpu_ir>>6)&3);
+			sprintf(g_dasm_str, "cpusha  %s; (4)", cachetype[(g_cpu_ir>>6)&3]);
 			break;
 	}
 }
