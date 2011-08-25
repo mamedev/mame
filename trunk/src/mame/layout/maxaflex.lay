@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="coin" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<text string="COIN" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="play" defstate="0">
+		<rect>
+			<color red="1.0" green="0.5" blue="0.13" />
+		</rect>
+		<text string="PLAY" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="start" defstate="0">
+		<rect>
+			<color red="0.9" green="0.42" blue="0.69" />
+		</rect>
+		<text string="START" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="over" defstate="0">
+		<rect>
+			<color red="0.42" green="0.85" blue="0.87" />
+		</rect>
+		<text string="OVER" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="digit" defstate="10">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<view name="Lamps and Timer">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		<bezel name="lamp0" element="coin">
+			<bounds x="0" y="3.2" width="0.4444" height="0.12" />
+		</bezel>
+		<bezel name="lamp1" element="play">
+			<bounds x="0.8888" y="3.2" width="0.4444" height="0.12" />
+		</bezel>
+		<bezel name="lamp2" element="start">
+			<bounds x="2.6666" y="3.2" width="0.4444" height="0.12" />
+		</bezel>
+		<bezel name="lamp3" element="over">
+			<bounds x="3.5555" y="3.2" width="0.4444" height="0.12" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="2.070" y="3.1" width="0.145" height="0.2" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="1.925" y="3.1" width="0.145" height="0.2" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="1.780" y="3.1" width="0.145" height="0.2" />
+		</bezel>
+	</view>
+</mamelayout>

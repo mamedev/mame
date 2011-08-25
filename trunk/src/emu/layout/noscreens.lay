@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="warning">
+		<text string="No screens attached to the system">
+			<color red="1.0" green="0.5" blue="0.5" />
+		</text>
+	</element>
+	<view name="No screens attached">
+		<bezel element="background">
+			<bounds left="0" top="0" right="280" bottom="150" />
+		</bezel>
+		<bezel name="warning_txt" element="warning">
+			<bounds left="50" right="230" top="50" bottom="65" />
+		</bezel>
+	</view>
+</mamelayout>

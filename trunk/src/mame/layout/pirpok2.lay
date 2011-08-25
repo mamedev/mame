@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="CARD1" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="CARD1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.6" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="CARD2" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="CARD2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="BIG">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.6" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="CARD3" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="CARD3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.6" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="CARD4" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="CARD4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="SMALL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.6" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="CARD5" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="CARD5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="     ">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.6" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="START" defstate="1">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.6" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		<bezel name="lamp0" element="CARD1">
+			<bounds x="0.0" y="3.15" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="CARD2">
+			<bounds x="0.5" y="3.15" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="CARD3">
+			<bounds x="1.0" y="3.15" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="CARD4">
+			<bounds x="1.5" y="3.15" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp4" element="CARD5">
+			<bounds x="2.0" y="3.15" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp5" element="START">
+			<bounds x="2.5" y="3.15" width="0.40" height="0.24" />
+		</bezel>
+	</view>
+</mamelayout>

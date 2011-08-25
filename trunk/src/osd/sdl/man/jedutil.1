@@ -1,0 +1,36 @@
+.\"  -*- nroff -*-
+.\"
+.\" jedutil.1
+.\"
+.\" Man page created from source and usage information
+.\" Cesare Falco <cesare.falco@gmail.com>, February 2007
+.\" 
+.\" References
+.\" http://aarongiles.com/?p=159
+.\"
+.TH JEDUTIL 1 2010-06-26 0.138u4 "jedutil"
+.\"
+.\" NAME chapter
+.SH NAME
+jedutil \- convert a .JED file into its binary form, and vice\-versa
+.\"
+.\" SYNOPSIS chapter
+.SH SYNOPSIS
+.B jedutil
+.IR source ".jed " target .bin
+.br
+.B jedutil
+.IR source ".bin " target .jed
+.\"
+.\" DESCRIPTION chapter
+.SH DESCRIPTION
+Data for Programmable Logic Devices (PLDs) are usually stored in a format known
+as JEDEC, basically a text file allowing insertion of further information by
+programmers.
+.PP
+MAME uses a raw binary representation of the same data, in order to
+achieve correct identification of PLD data through CRC and SHA1 algorithms
+(i.e. with the \-romident option).
+.PP
+.B jedutil
+provides an easy way to convert PLDs data between these two formats.

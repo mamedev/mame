@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<view name="s0">
+		<screen index="0">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+	</view>
+
+	<view name="s1">
+		<screen index="1">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+	</view>
+
+	<view name="s2">
+		<screen index="2">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+	</view>
+
+	<view name="s3">
+		<screen index="3">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+	</view>
+
+	<view name="s4">
+		<screen index="4">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+	</view>
+
+	<view name="s5">
+		<screen index="5">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+	</view>
+
+	<view name="s6">
+		<screen index="6">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+	</view>
+
+	<view name="s7">
+		<screen index="7">
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</screen>
+	</view>
+</mamelayout>
