@@ -2420,9 +2420,9 @@ ROM_START( blastero )
 	ROM_LOAD( "3.ic6",       0x44000, 0x4000, CRC(054c9f1c) SHA1(c21e3493f1ae506ab9fd28ed9ecc67d3305e9d7a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sb13.18",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
+	ROM_LOAD( "18.sb13",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
 	ROM_REGION( 0x10000, "soundcpu_b", 0 )
-	ROM_LOAD( "sb10.18",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
+	ROM_LOAD( "18.sb10",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )		/* color & video-decoder PROM data */
 	ROM_LOAD( "4.u42",        0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
