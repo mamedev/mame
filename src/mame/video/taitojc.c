@@ -84,7 +84,7 @@ WRITE32_HANDLER(taitojc_char_w)
 	Object RAM is grouped in three different banks (0-0x400 / 0x400-0x800 / 0x800-0xc00),
 	Initial 6 dwords aren't surely for object stuff (setting global object flags?)
 	0xd00-0xdff seems to be a per-bank vregister. Usage of this is mostly unknown, the only
-	clue we have so far is this config change in dendeg:
+	clue we have so far is this config change in dendego:
 	0x2000db3f 0x3f3f3f3f 0xfec00090 0x403f00ff 0xd20-0xd2f on Taito logo
 	0x2000db3f 0x3f3f3f3f 0xff600090 0x207f00ff 0xd20-0xd2f on intro FMV
 
@@ -204,7 +204,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 			//iy++;
 		}
 	}
-	else if(!color_depth) // Densya de Go 2/2X "credit text", 4bpp
+	else if(!color_depth) // Densha de Go 2/2X "credit text", 4bpp
 	{
 		for (j=y1; j < y2; j++)
 		{
@@ -302,7 +302,7 @@ static void draw_object_bank(running_machine &machine, bitmap_t *bitmap, const r
 	start_offs = ((bank_type+1)*0x400)/4;
 //	double_xy = (state->m_objlist[(0xd1c+bank_type*0x10)/4] & 0x20000000) >> 29;
 
-	/* probably a core bug in there (otherwise objects sticks on screen in Densya de Go) */
+	/* probably a core bug in there (otherwise objects sticks on screen in Densha de Go) */
 	if(bank_type == 1 && (!(state->m_objlist[0xfc4/4] & 0x2000)))
 		return;
 
@@ -340,7 +340,7 @@ SCREEN_UPDATE( taitojc )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	/* 0xf000 used on Densya de Go disclaimer screen(s) (disable object RAM?) */
+	/* 0xf000 used on Densha de Go disclaimer screen(s) (disable object RAM?) */
 	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
 		popmessage("%08x, contact MAMEdev",state->m_objlist[0xfc4/4]);
 
@@ -404,7 +404,7 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 	UINT16 *zb;// = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
 	int x;
 
-	// avoid crash in dendeg2
+	// avoid crash in dendego2
 	//if (!extra->zbuffer)
 	//{
 	//	return;

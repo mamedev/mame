@@ -108,21 +108,21 @@ SIDE BY SIDE  / 2       JC-SYSTEM TYPE-C
  ROMKIT : E38-01 to 21 , 23* to 26*
 
 --------------------------------------------------------------------------
-DENSYA DE GO (E35)     JC-SYSTEM TYPE-C with TRAIN BOARD (Ext.Sound)
+DENSHA DE GO! (E35)     JC-SYSTEM TYPE-C with TRAIN BOARD (Ext.Sound)
 --------------------------------------------------------------------------
- DENSYA DE GO VER 2.2J 1997/2/4
+ DENSHA DE GO! VER 2.2J 1997/2/4
  E35-01 to 26 + E35-28(TRAIN BOARD) + E17-23(BIOS?)
 
- DENSYA DE GO EX VER 2.4J 1997/4/18 13:38:34
+ DENSHA DE GO! EX VER 2.4J 1997/4/18 13:38:34
  ROMKIT : E35-30 to 33
 
 --------------------------------------------------------------------------
-DENSYA DE GO 2 (E52)   JC-SYSTEM TYPE-C with TRAIN BOARD (Ext.Sound)
+DENSHA DE GO! 2 (E52)   JC-SYSTEM TYPE-C with TRAIN BOARD (Ext.Sound)
 --------------------------------------------------------------------------
- DENSYA DE GO 2 (KOUSOKUHEN RYOUSANSYA) VER 2.5 J 1998/3/2 15:30:55
+ DENSHA DE GO! 2 (KOUSOKUHEN RYOUSANSYA) VER 2.5 J 1998/3/2 15:30:55
  E52-01 to 24 , 25-1 to 28-1, 29, 30 + E35-28(TRAIN BOARD) + E17-23(BIOS?)
 
- DENSYA DE GO! 2 EX (3000BANDAI KOUSOKUHEN) VER 2.20 J 1998/7/15 17:42:38
+ DENSHA DE GO! 2 (3000BANDAI KOUSOKUHEN) VER 2.20 J 1998/7/15 17:42:38
  ROMKIT :  E52-31 to 38
 
 ----
@@ -339,16 +339,16 @@ Notes:
 
 
     TODO:
-        - dendeg intro object RAM usage has various gfx bugs (check video file)
-        - dendeg title screen builds up and it shouldn't
-  		- dendeg/dendeg2 doesn't show the odometer (btanb, thanks ANY);
+        - dendego intro object RAM usage has various gfx bugs (check video file)
+        - dendego title screen builds up and it shouldn't
+  		- dendego/dendego2 doesn't show the odometer (btanb, thanks ANY);
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
-		- dendeg2 shows a debug string during gameplay?
+		- dendego2 shows a debug string during gameplay?
         - Train board (external sound board with OKI6295) is not emulated.
         - dangcurv DSP program crashes very soon, so no 3d is currently shown.
         - add idle skips if possible
-		- dendeg and clones needs output lamps and an artwork for the inputs (helps with the playability);
+		- dendego and clones needs output lamps and an artwork for the inputs (helps with the playability);
 		- POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 */
 
@@ -1187,7 +1187,7 @@ static INPUT_PORTS_START( taitojc )
 INPUT_PORTS_END
 #endif
 
-/* Mascon must always be in a defined state, Densya de Go 2 in particular returns black screen if the Mascon input is undefined
+/* Mascon must always be in a defined state, Densha de Go 2 in particular returns black screen if the Mascon input is undefined
    We convert the 6 lever "shifter" into a fake analog port for now. */
 static CUSTOM_INPUT( mascon_state_r )
 {
@@ -1206,7 +1206,7 @@ static CUSTOM_INPUT( mascon_state_r )
 	return mascon_table[5];
 }
 
-static INPUT_PORTS_START( dendeg )
+static INPUT_PORTS_START( dendego )
 	PORT_START("COINS")
 	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1443,7 +1443,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dendeg, taitojc )
+static MACHINE_CONFIG_DERIVED( dendego, taitojc )
 	MCFG_OKIM6295_ADD("oki", 32000000/32, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
@@ -1459,7 +1459,7 @@ static READ16_HANDLER( taitojc_dsp_idle_skip_r )
 	return state->m_dsp_shared_ram[0x7f0];
 }
 
-static READ16_HANDLER( dendeg2_dsp_idle_skip_r )
+static READ16_HANDLER( dendego2_dsp_idle_skip_r )
 {
 	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
@@ -1487,11 +1487,11 @@ static DRIVER_INIT( taitojc )
 	machine.device("dsp")->memory().space(AS_DATA)->install_legacy_readwrite_handler(0x7ff0, 0x7ff0, FUNC(taitojc_dsp_idle_skip_r), FUNC(dsp_idle_skip_w));
 }
 
-static DRIVER_INIT( dendeg2 )
+static DRIVER_INIT( dendego2 )
 {
 	DRIVER_INIT_CALL( taitojc );
 
-	machine.device("dsp")->memory().space(AS_DATA)->install_legacy_readwrite_handler(0x7ff0, 0x7ff0, FUNC(dendeg2_dsp_idle_skip_r), FUNC(dsp_idle_skip_w));
+	machine.device("dsp")->memory().space(AS_DATA)->install_legacy_readwrite_handler(0x7ff0, 0x7ff0, FUNC(dendego2_dsp_idle_skip_r), FUNC(dsp_idle_skip_w));
 }
 
 
@@ -1678,7 +1678,7 @@ ROM_START( sidebs2j )
     */
 ROM_END
 
-ROM_START( dendeg )
+ROM_START( dendego )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e35-21.036", 0x000000, 0x80000, CRC(bc70ca97) SHA1(724a24da9d6f163c26e7528ee2c15bd06f2c4382) )
 	ROM_LOAD32_BYTE( "e35-22.037", 0x000001, 0x80000, CRC(83b17de8) SHA1(538ddc16727e08e9a2a8ff6b4f030dc044993aa0) )
@@ -1725,7 +1725,7 @@ ROM_START( dendeg )
 	ROM_LOAD16_BYTE( "e35-20.035",  0xc00000, 0x200000, CRC(a1d4b30d) SHA1(e02f613b93d3b3ee1eb23f5b7f62c5448ed3966d) )
 ROM_END
 
-ROM_START( dendegx )
+ROM_START( dendegox )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e35-30.036", 0x000000, 0x80000, CRC(57ee0975) SHA1(c7741a7e0e9c1fdebc6b942587d7ac5a6f26f66d) )//ex
 	ROM_LOAD32_BYTE( "e35-31.037", 0x000001, 0x80000, CRC(bd5f2651) SHA1(73b760df351170ace019e4b61c82d8c6296a3632) )//ex
@@ -1772,7 +1772,7 @@ ROM_START( dendegx )
 	ROM_LOAD16_BYTE( "e35-20.035",  0xc00000, 0x200000, CRC(a1d4b30d) SHA1(e02f613b93d3b3ee1eb23f5b7f62c5448ed3966d) )
 ROM_END
 
-ROM_START( dendeg2 )
+ROM_START( dendego2 )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e52-25-1.036", 0x000000, 0x80000, CRC(fadf5b4c) SHA1(48f3e1425bb9552d472a2720e1c9a752db2b43ed) )
 	ROM_LOAD32_BYTE( "e52-26-1.037", 0x000001, 0x80000, CRC(7cf5230d) SHA1(b3416886d7cfc88520f6bf378529086bf0095db5) )
@@ -1819,11 +1819,11 @@ ROM_START( dendeg2 )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e52-21.032",  0x000000, 0x200000, CRC(ba58081d) SHA1(bcb6c8781191d48f906ed404a3e7388097a64781) )
 	ROM_LOAD16_BYTE( "e52-22.033",  0x400000, 0x200000, CRC(dda281b1) SHA1(4851a6bf7902548c5033090a0e5c15f74c00ef58) )
-	ROM_LOAD16_BYTE( "e52-23.034",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.034 from dendeg
+	ROM_LOAD16_BYTE( "e52-23.034",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.034 from dendego
 	ROM_LOAD16_BYTE( "e52-24.035",  0xc00000, 0x200000, CRC(a9a678da) SHA1(b980ae644ef0312acd63b017028af9bf2b084c29) )
 ROM_END
 
-ROM_START( dendeg2x )
+ROM_START( dendego23k )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e52-35.036", 0x000000, 0x80000, CRC(d5b33eb8) SHA1(e05ad73986741827b7bbeac72af0a8324384bf6b) ) //2ex
 	ROM_LOAD32_BYTE( "e52-36.037", 0x000001, 0x80000, CRC(f3f3fabd) SHA1(4f88080091af2208d671c491284d992b5036908c) ) //2ex
@@ -1870,7 +1870,7 @@ ROM_START( dendeg2x )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e52-21.032",  0x000000, 0x200000, CRC(ba58081d) SHA1(bcb6c8781191d48f906ed404a3e7388097a64781) )
 	ROM_LOAD16_BYTE( "e52-22.033",  0x400000, 0x200000, CRC(dda281b1) SHA1(4851a6bf7902548c5033090a0e5c15f74c00ef58) )
-	ROM_LOAD16_BYTE( "e52-23.034",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.034 from dendeg
+	ROM_LOAD16_BYTE( "e52-23.034",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.034 from dendego
 	ROM_LOAD16_BYTE( "e52-24.035",  0xc00000, 0x200000, CRC(a9a678da) SHA1(b980ae644ef0312acd63b017028af9bf2b084c29) )
 ROM_END
 
@@ -1977,12 +1977,12 @@ ROM_START( dangcurv )
 ROM_END
 
 
-GAME( 1996, dendeg,   0,       dendeg, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, dendegx,  dendeg,  dendeg, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2,  0,       dendeg, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2x, dendeg2, dendeg, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sidebs2,  0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sidebs2j, sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, landgear, 0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, dangcurv, 0,       taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
+GAME( 1996, dendego,   0,       dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO!", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, dendegox,  dendego, dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO! EX", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendego2,  0,       dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendego23k,dendego2,dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, sidebs,    0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sidebs2,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sidebs2j,  sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, landgear,  0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, dangcurv,  0,       taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
