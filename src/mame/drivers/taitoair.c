@@ -308,18 +308,27 @@ static WRITE16_HANDLER( airsys_gradram_w )
 	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 	UINT32 pen;
 	int r,g,b;
+	//int pal_r,pal_g,pal_b;
 
 	COMBINE_DATA(&state->m_gradram[offset]);
 
 	pen = (state->m_gradram[offset])|(state->m_gradram[(offset+0x2000)]<<16);
 	/* TODO: correct? */
-	r = (pen & 0x00007f) >> 0;
-	g = (pen & 0x007f00) >> (8);
-	b = (pen & 0x7f0000) >> (16);
+	r = (pen & 0x00007e) >> 0;
+	g = (pen & 0x007e00) >> (8);
+	b = (pen & 0x7e0000) >> (16);
 
 	r = (r << 1) | (r & 1);
 	g = (g << 1) | (g & 1);
 	b = (b << 1) | (b & 1);
+
+	//pal_r = ((state->m_paletteram[(offset >> 5) + 0x300] & 0x000f) >> 0) * 0x11;
+	//pal_g = ((state->m_paletteram[(offset >> 5) + 0x300] & 0x01e0) >> 5) * 0x11;
+	//pal_b = ((state->m_paletteram[(offset >> 5) + 0x300] & 0x7c00) >> 10) * 0x11;
+
+	//if(r == 0) { r = (pal_r); }
+	//if(g == 0) { g = (pal_g); }
+	//if(b == 0) { b = (pal_b); }
 
 	palette_set_color_rgb(space->machine(), offset+0x2000, r, g, b);
 }
@@ -344,7 +353,10 @@ static READ16_HANDLER( stick_input_r )
 			return input_port_read(space->machine(), STICK2_PORT_TAG);
 
 		case 0x02:	/* "counter 1" hi */
-			return (input_port_read(space->machine(), STICK1_PORT_TAG) & 0xff00) >> 8;
+			if(input_port_read(space->machine(), STICK1_PORT_TAG) & 0x80)
+				return 0xff;
+
+			return 0;
 
 		case 0x03:	/* "counter 2" hi */
 			return (input_port_read(space->machine(), STICK2_PORT_TAG) & 0xff00) >> 8;
@@ -486,13 +498,8 @@ static INPUT_PORTS_START( topland )
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	/* The range of these sticks reflects the range test mode displays.
-       Eventually we want standard 0-0xff input range and a scale-up later
-       in the stick_r routines.  And fake DSW with self-centering option
-       to make keyboard control feasible! */
-
 	PORT_START(STICK1_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0000,0xffff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
+	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START(STICK2_PORT_TAG)
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xf800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
@@ -551,12 +558,6 @@ static INPUT_PORTS_START( ainferno )
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	/* The range of these sticks reflects the range test mode displays.
-       Eventually we want standard 0-0xff input range and a scale-up later
-       in the stick_r routines. And fake DSW with self-centering option
-       to make keyboard control feasible! */
-
-	/* TODO: these are mostly likely wrong (needs some working video to understand) */
 	PORT_START(STICK1_PORT_TAG)
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
 
