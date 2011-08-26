@@ -382,7 +382,7 @@ WRITE16_HANDLER( dsp_flags_w )
 						logerror("quad: unknown value %04x at %04x\n", state->m_line_ram[adr], adr);
 						break;
 					}
-					state->m_q.col = (((state->m_line_ram[adr] & 0x007f)+8) * 0x20) + 0x2000;
+					state->m_q.col = (state->m_line_ram[adr] & 0x007f) + 0x300;
 					adr--;
 					pcount = 0;
 					while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(state->m_line_ram[adr] & 0xc000))

@@ -436,6 +436,32 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /********************************** TMS32025 ********************************/
+
+/*
+Air Inferno:
+
+write to 0x3404 - almost always 0x00fd / 0xff38
+write to 0x3408 /
+
+write to 0x341b - divisor?
+
+write to 0x3418 - X value
+write to 0x3419 - Y value
+write to 0x341a - Z value
+read to 0x341b, puts data to internal RAM 0x380 - 0x384 - 0x388 - 0x38c
+
+checks 0x341c - if != to 0 then skip ... ?
+checks 0x341d - if == to 0 then skip ... ?
+
+write to 0x3405 ; X value
+write to 0x3409 ; Y value
+write to 0x3406 ; Z value
+write to 0x340a ; Z value
+read to 0x340b, puts to line RAM (y) with offset + 0x160
+read to 0x3407, puts to line RAM (x) with offset + 0x5d
+
+*/
+
 static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -443,6 +469,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16 )
 	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
 	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
+//	AM_RANGE(0x3404, 0x3404) AM_WRITE(x_w)
+//	AM_RANGE(0x3405, 0x3406) AM_WRITE(dsp_projection_x_w)
+//	AM_RANGE(0x3407, 0x3407) AM_READ(dsp_projection_x_r)
+//	AM_RANGE(0x3408, 0x3408) AM_WRITE(x2_w)
+//	AM_RANGE(0x3409, 0x340a) AM_WRITE(dsp_projection_y_w)
+//	AM_RANGE(0x340b, 0x340b) AM_READ(dsp_projection_y_r)
+//	AM_RANGE(0x3418, 0x341a) AM_WRITE(dsp_sqrt_w)
+//	AM_RANGE(0x341b, 0x341b) AM_WRITE(dsp_sqrt_r)
+//	AM_RANGE(0x341c, 0x341c) AM_READ(dsp_sqrt_flags1_r)
+//	AM_RANGE(0x341d, 0x341d) AM_READ(dsp_sqrt_flags2_r)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(lineram_r, lineram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
 ADDRESS_MAP_END
