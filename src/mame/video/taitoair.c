@@ -351,6 +351,8 @@ WRITE16_HANDLER( dsp_flags_w )
 	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 	rectangle cliprect;
 
+	printf("%04x -> %d\n",data,offset);
+
 	if(data == 0x1fff)
 		state->m_cur_fb = 0;
 	//else if(data == 0xdfff)
@@ -362,10 +364,10 @@ WRITE16_HANDLER( dsp_flags_w )
 	cliprect.max_y = space->machine().primary_screen->height() - 1;
 
 	{
-		//if(offset == 0)
-		//  bitmap_fill(state->m_framebuffer[state->m_cur_fb], &cliprect, 0);
+		if(offset == 1)
+		  bitmap_fill(state->m_framebuffer[state->m_cur_fb], &cliprect, 0);
 
-		//if(offset == 1)
+		if(offset)
 		{
 			if (state->m_line_ram[0x3fff])
 			{

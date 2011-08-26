@@ -256,6 +256,9 @@ static WRITE16_HANDLER( lineram_w )
 
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		state->m_line_ram[offset] = data;
+
+	if(offset == 0x3fff)
+		printf("LineRAM go %d\n",(int)space->machine().primary_screen->frame_number());
 }
 
 static READ16_HANDLER( dspram_r )
@@ -426,6 +429,7 @@ static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16 )
+	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
 	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(lineram_r, lineram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
