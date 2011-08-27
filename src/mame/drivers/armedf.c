@@ -1720,9 +1720,9 @@ ROM_START( terrafj )
 	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
 	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 ) /* stolen from the japan bootleg set, needs PCB verification */
-	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, BAD_DUMP CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
-	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, BAD_DUMP CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
+	ROM_REGION( 0x20000, "gfx4", 0 )
+	ROM_LOAD( "tfj-12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD( "tfj-13.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
 	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
 	ROM_LOAD( "10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
@@ -1788,9 +1788,8 @@ ROM_START( terrafjb )
 	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
 	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
-	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
-
+	ROM_LOAD( "tfj-12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD( "tfj-13.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
@@ -1820,8 +1819,8 @@ ROM_START( terrafb ) /* Seems to be a bootleg of the Japanese version with the r
 	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
 	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
-	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
+	ROM_LOAD( "tfj-12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD( "tfj-13.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
 	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter, shouldn't be loaded? */
 	ROM_LOAD( "tf-10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
