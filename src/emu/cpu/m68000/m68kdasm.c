@@ -82,19 +82,20 @@
 #define TYPE_68020 8
 #define TYPE_68030 16
 #define TYPE_68040 32
+#define TYPE_68340 64
 
 #define M68000_ONLY		(TYPE_68000 | TYPE_68008)
 
 #define M68010_ONLY		TYPE_68010
 #define M68010_LESS		(TYPE_68000 | TYPE_68008 | TYPE_68010)
-#define M68010_PLUS		(TYPE_68010 | TYPE_68020 | TYPE_68030 | TYPE_68040)
+#define M68010_PLUS		(TYPE_68010 | TYPE_68020 | TYPE_68030 | TYPE_68040 | TYPE_68340)
 
-#define M68020_ONLY 	TYPE_68020
-#define M68020_LESS 	(TYPE_68010 | TYPE_68020)
-#define M68020_PLUS		(TYPE_68020 | TYPE_68030 | TYPE_68040)
+#define M68020_ONLY 	(TYPE_68020 | TYPE_68340)
+#define M68020_LESS 	(TYPE_68010 | TYPE_68020 | TYPE_68340)
+#define M68020_PLUS		(TYPE_68020 | TYPE_68030 | TYPE_68040 | TYPE_68340)
 
 #define M68030_ONLY 	TYPE_68030
-#define M68030_LESS 	(TYPE_68010 | TYPE_68020 | TYPE_68030)
+#define M68030_LESS 	(TYPE_68010 | TYPE_68020 | TYPE_68030 | TYPE_68340 )
 #define M68030_PLUS		(TYPE_68030 | TYPE_68040)
 
 #define M68040_PLUS		TYPE_68040
@@ -3754,6 +3755,9 @@ static unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned i
 		case M68K_CPU_TYPE_68LC040:
 			g_cpu_type = TYPE_68040;
 			break;
+		case M68K_CPU_TYPE_68340:
+			g_cpu_type = TYPE_68340;
+			break;
 		default:
 			return 0;
 	}
@@ -3945,6 +3949,7 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 		case M68K_CPU_TYPE_68020:
 		case M68K_CPU_TYPE_68030:
 		case M68K_CPU_TYPE_68EC030:
+		case M68K_CPU_TYPE_68340:
 			if(g_instruction_table[instruction] == d68040_cinv)
 				return 0;
 			if(g_instruction_table[instruction] == d68040_cpush)
@@ -4022,6 +4027,11 @@ CPU_DISASSEMBLE( m68030 )
 CPU_DISASSEMBLE( m68040 )
 {
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68040);
+}
+
+CPU_DISASSEMBLE( m68340 )
+{
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68340);
 }
 
 // f028 2215 0008

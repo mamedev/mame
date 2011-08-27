@@ -56,7 +56,7 @@ static UINT32 DECODE_EA_32(m68ki_cpu_core *m68k, int ea)
 	{
 		case 2:		// (An)
 		{
-			return REG_A[reg];
+			return REG_A(m68k)[reg];
 		}
 		case 3:		// (An)+
 		{
@@ -94,11 +94,11 @@ static UINT32 DECODE_EA_32(m68ki_cpu_core *m68k, int ea)
 					UINT32 ea = EA_PCDI_32(m68k);
 					return ea;
 				}
-				default:	fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+				default:	fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC(m68k));
 			}
 			break;
 		}
-		default:	fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+		default:	fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC(m68k));
 	}
 	return 0;
 }
@@ -166,7 +166,7 @@ void pmmu_atc_add(m68ki_cpu_core *m68k, UINT32 logical, UINT32 physical, int fc)
 void pmmu_atc_flush(m68ki_cpu_core *m68k)
 {
 	int i;
-    // logerror("ATC flush: pc=%08x\n", REG_PPC);
+    // logerror("ATC flush: pc=%08x\n", REG_PPC(m68k));
 
 	for (i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
@@ -298,7 +298,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 				m68k->mmu_tmp_sr = M68K_MMU_SR_MODIFIED;
 			}
 			addr_out = (m68k->mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
-//          logerror("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, REG_PPC, fc);
+//          logerror("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, REG_PPC(m68k), fc);
 //          pmmu_atc_count++;
 			return addr_out;
 		}
@@ -514,7 +514,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 //  if (m68k->mmu_tmp_buserror_occurred > 0) {
 //      logerror("PMMU: pc=%08x sp=%08x va=%08x pa=%08x - invalid Table mode for level=%d (buserror %d)\n",
-//              REG_PPC, REG_A[7], addr_in, addr_out, m68k->mmu_tmp_sr & M68K_MMU_SR_LEVEL_3,
+//              REG_PPC(m68k), REG_A(m68k)[7], addr_in, addr_out, m68k->mmu_tmp_sr & M68K_MMU_SR_LEVEL_3,
 //              m68k->mmu_tmp_buserror_occurred);
 //  }
 
@@ -597,7 +597,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 						fc = fc == 0 ? m68k->sfc :  m68k->dfc;
 						break;
 					case 1:
-						fc = REG_D[fc &7] &7;
+						fc = REG_D(m68k)[fc &7] &7;
 						break;
 					case 2:
 						fc &=7;
@@ -608,7 +608,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 					m68k->mmu_sr = m68k->mmu_tmp_sr;
 
 //                  logerror("PMMU: pc=%08x sp=%08x va=%08x pa=%08x PTEST fc=%x level=%x mmu_sr=%04x\n",
-//                          m68k->ppc, REG_A[7], v_addr, p_addr, fc, (modes >> 10) & 0x07, m68k->mmu_sr);
+//                          m68k->ppc, REG_A(m68k)[7], v_addr, p_addr, fc, (modes >> 10) & 0x07, m68k->mmu_sr);
 
 					if (modes & 0x100)
 					{
@@ -642,12 +642,12 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 
 										case 0x12: // supervisor root pointer
 											WRITE_EA_64(m68k, ea, (UINT64)m68k->mmu_srp_limit<<32 | (UINT64)m68k->mmu_srp_aptr);
-//                                          logerror("PMMU: pc=%x PMOVE from SRP limit = %08x, aptr = %08x\n", REG_PPC, m68k->mmu_srp_limit, m68k->mmu_srp_aptr);
+//                                          logerror("PMMU: pc=%x PMOVE from SRP limit = %08x, aptr = %08x\n", REG_PPC(m68k), m68k->mmu_srp_limit, m68k->mmu_srp_aptr);
 											break;
 
 										case 0x13: // CPU root pointer
 											WRITE_EA_64(m68k, ea, (UINT64)m68k->mmu_crp_limit<<32 | (UINT64)m68k->mmu_crp_aptr);
-//                                          logerror("PMMU: pc=%x PMOVE from CRP limit = %08x, aptr = %08x\n", REG_PPC, m68k->mmu_crp_limit, m68k->mmu_crp_aptr);
+//                                          logerror("PMMU: pc=%x PMOVE from CRP limit = %08x, aptr = %08x\n", REG_PPC(m68k), m68k->mmu_crp_limit, m68k->mmu_crp_aptr);
 											break;
 
 										default:
