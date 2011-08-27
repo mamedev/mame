@@ -690,10 +690,8 @@ ROM_START( asurabld )
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
 	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(e681155e) SHA1(458845b9c86df72685d92d0d4052aacc2fa7d1bd) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // shared OPL4 data (for pcm)
+	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
 	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
-	ROM_REGION( 0x400000, "ymf2", 0 ) // shared OPL4 data (for fm)
-	ROM_COPY( "ymf1",   0x00000, 0x000000, 0x400000 )
 ROM_END
 
 /***************************************************************************
@@ -736,10 +734,8 @@ ROM_START( asurabus )
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
 	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // shared OPL4 data (for pcm)
+	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
-	ROM_REGION( 0x400000, "ymf2", 0 ) // shared OPL4 data (for fm)
-	ROM_COPY( "ymf1",   0x00000, 0x000000, 0x400000 )
 ROM_END
 
 
