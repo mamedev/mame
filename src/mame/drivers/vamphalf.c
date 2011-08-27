@@ -33,6 +33,14 @@
  Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB
  that Semicom also used for Date Quiz Go Go Episode 2 game.
 
+ Undumped Semicom games on similar hardware:
+   Wivern Wings - Semicom's orginal release with alt spelling of title
+   Red Wyvern - A semi-sequel or update?
+   Toy Land Adventure (c) 2001 - PCB photo shows Hyperstone based hardware
+ Same time era, but unknown hardware:
+   Gaia The last Choice of the Earth (c) 1998 (might be Byron Future Assault type hardware)
+   Diet Family (c) 2001
+   Choice III: Joker's Dream (c) 2001
 
 *********************************************************************/
 
