@@ -356,7 +356,7 @@ ROM_START( raidena )
 	ROM_LOAD16_BYTE( "raiden06.rom",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "raiden08.rom", 0x000000, 0x08000, CRC(731adb43) SHA1(d460ffc5dbec25482c695e6c4ac7b66655a67304) )
+	ROM_LOAD( "raiden08.rom", 0x000000, 0x08000, CRC(731adb43) SHA1(d460ffc5dbec25482c695e6c4ac7b66655a67304) ) // possible bad dump (see MT bug #961)
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
@@ -600,6 +600,6 @@ static DRIVER_INIT( raidena )
 GAME( 1990, raiden,  0,      raiden,  raiden, raiden,  ROT270, "Seibu Kaihatsu", "Raiden", 0 ) // main/sub/sound not encrypted
 GAME( 1990, raidenu, raiden, raidenu, raiden, raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US, set 1, SEI8904 + SEI9008 PCBs)", 0 ) // main/sub not encrypted
 GAME( 1990, raidenua,raiden, raidena, raiden, raidena, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US, set 2)", 0 )
-GAME( 1990, raidena, raiden, raidena, raiden, raidena, ROT270, "Seibu Kaihatsu", "Raiden (Alternate Hardware)", 0 )
+GAME( 1990, raidena, raiden, raidena, raiden, raidena, ROT270, "Seibu Kaihatsu", "Raiden (alternate hardware)", 0 )
 GAME( 1990, raidenk, raiden, raidena, raiden, raidenk, ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", 0 ) // sound not encrypted
 GAME( 1990, raident, raiden, raidena, raiden, raidena, ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", 0 )
