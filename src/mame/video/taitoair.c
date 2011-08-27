@@ -229,6 +229,8 @@ static void fill_slope( bitmap_t *bitmap, const rectangle *cliprect, int color, 
 		{
 			int xx1 = x1 >> TAITOAIR_FRAC_SHIFT;
 			int xx2 = x2 >> TAITOAIR_FRAC_SHIFT;
+			int grad_col;
+
 			if (xx1 <= cliprect->max_x || xx2 >= cliprect->min_x)
 			{
 				if (xx1 < cliprect->min_x)
@@ -236,9 +238,12 @@ static void fill_slope( bitmap_t *bitmap, const rectangle *cliprect, int color, 
 				if (xx2 > cliprect->max_x)
 					xx2 = cliprect->max_x;
 
+				/* TODO: it's unknown if gradient color applies by global screen Y coordinate or there's a calculation to somewhere ... */
+				grad_col = (y1 >> 3) & 0x3f;
+
 				while (xx1 <= xx2)
 				{
-					*BITMAP_ADDR16(bitmap, y1, xx1) = color;
+					*BITMAP_ADDR16(bitmap, y1, xx1) = color + grad_col;
 					xx1++;
 				}
 			}
@@ -353,20 +358,24 @@ WRITE16_HANDLER( dsp_flags_w )
 
 	printf("%04x -> %d\n",data,offset);
 
-	if(data == 0x1fff)
-		state->m_cur_fb = 0;
-	//else if(data == 0xdfff)
-	//  state->m_cur_fb = 1;
-
 	cliprect.min_x = 0;
 	cliprect.min_y = 3*16;
 	cliprect.max_x = space->machine().primary_screen->width() - 1;
 	cliprect.max_y = space->machine().primary_screen->height() - 1;
 
 	{
+		/* clear and copy operation if offset is 0x3001 */
 		if(offset == 1)
-		  bitmap_fill(state->m_framebuffer[state->m_cur_fb], &cliprect, 0);
+		{
+			/* clear screen fb */
+			bitmap_fill(state->m_framebuffer[1], &cliprect, 0);
+			/* copy buffer fb into screen fb (at this stage we are ready to draw) */
+			copybitmap_trans(state->m_framebuffer[1], state->m_framebuffer[0], 0, 0, 0, 0, &cliprect, 0);
+		 	/* now clear buffer fb */
+		 	bitmap_fill(state->m_framebuffer[0], &cliprect, 0);
+		}
 
+		/* if offset 0x3001 OR 0x3002 we put data in the buffer fb */
 		if(offset)
 		{
 			if (state->m_line_ram[0x3fff])
@@ -382,7 +391,7 @@ WRITE16_HANDLER( dsp_flags_w )
 						logerror("quad: unknown value %04x at %04x\n", state->m_line_ram[adr], adr);
 						break;
 					}
-					state->m_q.col = (state->m_line_ram[adr] & 0x007f) + 0x300;
+					state->m_q.col = ((state->m_line_ram[adr] & 0x007f) * 0x80) + 0x2040;
 					adr--;
 					pcount = 0;
 					while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(state->m_line_ram[adr] & 0xc000))
@@ -394,7 +403,7 @@ WRITE16_HANDLER( dsp_flags_w )
 					}
 					adr--;
 					state->m_q.pcount = pcount;
-					fill_poly(state->m_framebuffer[state->m_cur_fb], &cliprect, &state->m_q);
+					fill_poly(state->m_framebuffer[0], &cliprect, &state->m_q);
 				}
 			}
 		}
@@ -410,7 +419,6 @@ VIDEO_START( taitoair )
 	height = machine.primary_screen->height();
 	state->m_framebuffer[0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	state->m_framebuffer[1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	state->m_cur_fb = 0;
 }
 
 SCREEN_UPDATE( taitoair )
@@ -454,7 +462,7 @@ SCREEN_UPDATE( taitoair )
 
 	draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
-	copybitmap_trans(bitmap, state->m_framebuffer[state->m_cur_fb], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, state->m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 

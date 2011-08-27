@@ -45,7 +45,6 @@ public:
 	UINT16 *      m_backregs;
 
 	bitmap_t *m_framebuffer[2];
-	UINT8         m_cur_fb;
 };
 
 

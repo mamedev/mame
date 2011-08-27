@@ -311,20 +311,22 @@ static WRITE16_HANDLER( airsys_gradram_w )
 	//int pal_r,pal_g,pal_b;
 
 	COMBINE_DATA(&state->m_gradram[offset]);
+	offset &= 0x1fff;
 
 	pen = (state->m_gradram[offset])|(state->m_gradram[(offset+0x2000)]<<16);
 	/* TODO: correct? */
-	r = (pen & 0x00007e) >> 0;
-	g = (pen & 0x007e00) >> (8);
-	b = (pen & 0x7e0000) >> (16);
+	r = (pen & 0x00007f) >> 0;
+	g = (pen & 0x007f00) >> (8);
+	b = (pen & 0x7f0000) >> (16);
 
 	r = (r << 1) | (r & 1);
 	g = (g << 1) | (g & 1);
 	b = (b << 1) | (b & 1);
 
-	//pal_r = ((state->m_paletteram[(offset >> 5) + 0x300] & 0x000f) >> 0) * 0x11;
-	//pal_g = ((state->m_paletteram[(offset >> 5) + 0x300] & 0x01e0) >> 5) * 0x11;
-	//pal_b = ((state->m_paletteram[(offset >> 5) + 0x300] & 0x7c00) >> 10) * 0x11;
+	/* TODO: I'm sure that normal paletteram and gradiation ram mixes in some way ... */
+	//pal_r = ((state->m_paletteram[(offset >> 7) + 0x300] & 0x000f) >> 0) * 0x11;
+	//pal_g = ((state->m_paletteram[(offset >> 7) + 0x300] & 0x01e0) >> 5) * 0x11;
+	//pal_b = ((state->m_paletteram[(offset >> 7) + 0x300] & 0x7c00) >> 10) * 0x11;
 
 	//if(r == 0) { r = (pal_r); }
 	//if(g == 0) { g = (pal_g); }
