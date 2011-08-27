@@ -8,9 +8,9 @@ must fix:
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 3.32
+ *                                Version 4.80
  *
- * A portable Motorola M680x0 processor emulation engine.
+ * A portable Motorola M68xxx processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
  *
  * This code may be freely used for non-commercial purposes as long as this
@@ -195,6 +195,17 @@ void m68ki_build_opcode_table(void)
 			m68ki_set_one(ostruct->match | i, ostruct);
 		ostruct++;
 	}
+	while(ostruct->mask == 0xff20)
+	{
+		for(i = 0;i < 4;i++)
+		{
+			for(j = 0;j < 32;j++)
+			{
+				m68ki_set_one(ostruct->match | (i << 6) | j, ostruct);
+			}
+		}
+		ostruct++;
+	}
 	while(ostruct->mask == 0xf1f8)
 	{
 		for(i = 0;i < 8;i++)
@@ -333,9 +344,9 @@ cpu cycles:  Base number of cycles required to execute this opcode on the
 */
 
 
-              spec  spec                    allowed ea  mode       cpu cycles
-name    size  proc   ea   bit pattern       A+-DXWLdxI  0 1 2 3 4  000 010 020 030 040 340 comments
-======  ====  ====  ====  ================  ==========  = = = = =  === === === === === === ==========
+              spec  spec                    allowed ea  mode      3  cpu cycles
+name    size  proc   ea   bit pattern       A+-DXWLdxI  0 1 2 3 4 2  000 010 020 030 040 340 comments
+======  ====  ====  ====  ================  ==========  = = = = = =  === === === === === === ==========
 M68KMAKE_TABLE_START
 1010       0  .     .     1010............  ..........  U U U U U U   4   4   4   4   4   4
 1111       0  .     .     1111............  ..........  U U U U U U   4   4   4   4   4   4
@@ -516,11 +527,13 @@ cmpm       8  .     axy7  1011111100001111  ..........  U U U U U U  12  12   9 
 cmpm       8  .     .     1011...100001...  ..........  U U U U U U  12  12   9   9   9   9
 cmpm      16  .     .     1011...101001...  ..........  U U U U U U  12  12   9   9   9   9
 cmpm      32  .     .     1011...110001...  ..........  U U U U U U  20  20   9   9   9   9
-cpbcc     32  .     .     1111...01.......  ..........  . . U U U U   .   .   4   4   4   4  unemulated
-cpdbcc    32  .     .     1111...001001...  ..........  . . U U U U   .   .   4   4   4   4  unemulated
-cpgen     32  .     .     1111...000......  ..........  . . U U U U   .   .   4   4   4   4  unemulated
-cpscc     32  .     .     1111...001......  ..........  . . U U U U   .   .   4   4   4   4  unemulated
-cptrapcc  32  .     .     1111...001111...  ..........  . . U U U U   .   .   4   4   4   4  unemulated
+cinv      32  .     .     11110100..0.....  ..........  . . . . U .   .   .   .   .  16   .  040 only
+cpush     32  .     .     11110100..1.....  ..........  . . . . U .   .   .   .   .  16   .  040 only
+cpbcc     32  .     .     1111...01.......  ..........  . . U U . .   .   .   4   4   .   .  cpXXX only for 020/030, not on 040!
+cpdbcc    32  .     .     1111...001001...  ..........  . . U U . .   .   .   4   4   .   .  
+cpgen     32  .     .     1111...000......  ..........  . . U U . .   .   .   4   4   .   .  
+cpscc     32  .     .     1111...001......  ..........  . . U U . .   .   .   4   4   .   .  
+cptrapcc  32  .     .     1111...001111...  ..........  . . U U . .   .   .   4   4   .   .  
 dbt       16  .     .     0101000011001...  ..........  U U U U U U  12  12   6   6   6   6
 dbf       16  .     .     0101000111001...  ..........  U U U U U U  12  12   6   6   6   6
 dbcc      16  .     .     0101....11001...  ..........  U U U U U U  12  12   6   6   6   6
@@ -4416,7 +4429,6 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 	}
 	m68ki_exception_1111(mc68kcpu);
 }
-
 
 M68KMAKE_OP(dbt, 16, ., .)
 {
@@ -10223,6 +10235,27 @@ M68KMAKE_OP(unpk, 16, mm, .)
 }
 
 
+M68KMAKE_OP(cinv, 32, ., .)
+{
+	if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
+	{
+		logerror("%s at %08x: called unimplemented instruction %04x (cinv)\n",
+					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+		return;
+	}
+	m68ki_exception_1111(mc68kcpu);
+}
+
+M68KMAKE_OP(cpush, 32, ., .)
+{
+	if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
+	{
+		logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
+					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+		return;
+	}
+	m68ki_exception_1111(mc68kcpu);
+}
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 M68KMAKE_END

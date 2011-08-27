@@ -3,7 +3,7 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 4.70
+ *                                Version 4.80
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
@@ -56,7 +56,7 @@
  */
 
 
-static const char g_version[] = "4.70";
+static const char g_version[] = "4.80";
 
 /* ======================================================================== */
 /* =============================== INCLUDES =============================== */
@@ -133,12 +133,12 @@ static const char g_version[] = "4.70";
 
 enum
 {
-	CPU_TYPE_000 = 0,
-	CPU_TYPE_010,
-	CPU_TYPE_020,
-	CPU_TYPE_030,
-	CPU_TYPE_040,
-	CPU_TYPE_68340,
+	CPU_TYPE_000 = 0,   // 0
+	CPU_TYPE_010,       // 1
+	CPU_TYPE_020,       // 2
+	CPU_TYPE_030,       // 3
+	CPU_TYPE_040,       // 4
+	CPU_TYPE_68340,     // 5
 	NUM_CPUS
 };
 

@@ -5,8 +5,8 @@
 #if 0
 static const char copyright_notice[] =
 "MUSASHI\n"
-"Version 4.70 (2010-11-06)\n"
-"A portable Motorola M680x0 processor emulation engine.\n"
+"Version 4.80 (2010-08-27)\n"
+"A portable Motorola M68xxx processor emulation engine.\n"
 "Copyright Karl Stenerud.  All rights reserved.\n"
 "\n"
 "This code may be freely used for non-commercial purpooses as long as this\n"
@@ -2325,9 +2325,9 @@ static CPU_INIT( m68340 )
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m68k->jump_table       = m68ki_instruction_jump_table[2];
-	m68k->cyc_instruction  = m68ki_cycles[2];
-	m68k->cyc_exception    = m68ki_exception_cycle_table[2];
+	m68k->jump_table       = m68ki_instruction_jump_table[5];
+	m68k->cyc_instruction  = m68ki_cycles[5];
+	m68k->cyc_exception    = m68ki_exception_cycle_table[5];
 	m68k->cyc_bcc_notake_b = -2;
 	m68k->cyc_bcc_notake_w = 0;
 	m68k->cyc_dbcc_f_noexp = 0;
