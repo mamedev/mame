@@ -356,7 +356,7 @@ ROM_START( raidena )
 	ROM_LOAD16_BYTE( "raiden06.rom",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "raiden08.rom", 0x000000, 0x08000, CRC(731adb43) SHA1(d460ffc5dbec25482c695e6c4ac7b66655a67304) ) // possible bad dump (see MT bug #961)
+	ROM_LOAD( "raiden08.rom", 0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
