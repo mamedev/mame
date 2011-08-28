@@ -298,7 +298,7 @@ struct _input_port_private
     MACROS
 ***************************************************************************/
 
-#define APPLY_SENSITIVITY(x,s)		(((INT64)(x) * (s)) / 100)
+#define APPLY_SENSITIVITY(x,s)		(((INT64)(x) * (s)) / 100.0 + 0.5)
 #define APPLY_INVERSE_SENSITIVITY(x,s) (((INT64)(x) * 100) / (s))
 
 #define COMPUTE_SCALE(num,den)		(((INT64)(num) << 24) / (den))
@@ -846,11 +846,11 @@ INLINE INT32 apply_analog_min_max(const analog_field_state *analog, INT32 value)
 
 		while (value >= adjmax)
 		{
-			value -= range;;
+			value -= range;
 		}
 		while (value <= adjmin)
 		{
-			value += range;;
+			value += range;
 		}
 	}
 
