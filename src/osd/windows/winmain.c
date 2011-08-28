@@ -330,8 +330,10 @@ const options_entry windows_options::s_option_entries[] =
 	// post-processing options
 	{ NULL,                                             		NULL,        OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },
 	{ WINOPTION_HLSL_ENABLE";hlsl",         					"0",         OPTION_BOOLEAN,    "enable HLSL post-processing (PS3.0 required)" },
-	{ WINOPTION_HLSL_INI_NAME,      							"%g",        OPTION_STRING,     "HLSL INI file path" },
 	{ WINOPTION_HLSLPATH,                                   	"hlsl",      OPTION_STRING,     "path to hlsl files" },
+	{ WINOPTION_HLSL_INI_READ,									"0",		 OPTION_BOOLEAN,	"enable HLSL INI reading" },
+	{ WINOPTION_HLSL_INI_WRITE,									"0",		 OPTION_BOOLEAN,	"enable HLSL INI writing" },
+	{ WINOPTION_HLSL_INI_NAME,      							"%g",        OPTION_STRING,     "HLSL INI file name for this game" },
 	{ WINOPTION_HLSL_PRESCALE_X,        						"0",         OPTION_INTEGER,    "HLSL pre-scale override factor for X (0 for auto)" },
 	{ WINOPTION_HLSL_PRESCALE_Y,        						"0",         OPTION_INTEGER,    "HLSL pre-scale override factor for Y (0 for auto)" },
 	{ WINOPTION_HLSL_PRESET";(-1-3)",                           "-1",        OPTION_INTEGER,    "HLSL preset to use (0-3)" },

@@ -82,6 +82,8 @@
 #define WINOPTION_HLSL_ENABLE				"hlsl_enable"
 #define WINOPTION_HLSLPATH					"hlslpath"
 #define WINOPTION_HLSL_INI_NAME				"hlslini"
+#define WINOPTION_HLSL_INI_WRITE			"hlsl_ini_write"
+#define WINOPTION_HLSL_INI_READ				"hlsl_ini_read"
 #define WINOPTION_HLSL_PRESCALE_X			"hlsl_prescale_x"
 #define WINOPTION_HLSL_PRESCALE_Y			"hlsl_prescale_y"
 #define WINOPTION_HLSL_PRESET				"hlsl_preset"
@@ -195,6 +197,8 @@ public:
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
 	const char *hlsl_ini_name() const { return value(WINOPTION_HLSL_INI_NAME); }
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
+	bool hlsl_write_ini() const { return bool_value(WINOPTION_HLSL_INI_WRITE); }
+	bool hlsl_read_ini() const { return bool_value(WINOPTION_HLSL_INI_READ); }
 	const char *d3d_hlsl_write() const { return value(WINOPTION_HLSL_WRITE); }
 	int d3d_hlsl_prescale_x() const { return int_value(WINOPTION_HLSL_PRESCALE_X); }
 	int d3d_hlsl_prescale_y() const { return int_value(WINOPTION_HLSL_PRESCALE_Y); }

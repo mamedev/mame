@@ -58,8 +58,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.x -= 0.5f;
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
-
-	Output.TexCoord = Input.TexCoord;
+	
+	Output.TexCoord = Input.TexCoord + 0.5f / float2(TargetWidth, TargetHeight);
 
 	return Output;
 }

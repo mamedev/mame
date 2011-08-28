@@ -146,7 +146,8 @@ private:
 	win_window_info *       window;						// D3D window info
 
 	bool					master_enable;				// overall enable flag
-	bool					external_ini;				// external ini flag
+	bool					write_ini;					// enable external ini saving
+	bool					read_ini;					// enable external ini loading
 	int						prescale_force_x;			// prescale force x
 	int						prescale_force_y;			// prescale force y
 	int						prescale_size_x;			// prescale size x
@@ -192,6 +193,8 @@ private:
 	// render targets
 	int						target_use_count[9];		// Whether or not a target has been used yet
 	d3d_texture_info *		target_in_use[9];			// Target texture that is currently in use
+	int						target_width[9];			// Render target width
+	int						target_height[9];			// Render target height
 	d3d_surface *			last_target[9];				// Render target surface pointer for each screen's previous frame
 	d3d_texture *			last_texture[9];			// Render target texture pointer for each screen's previous frame
 	d3d_surface *			prescaletarget0[9];			// Render target surface pointer (prescale, if necessary)

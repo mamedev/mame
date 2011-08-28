@@ -64,6 +64,14 @@ uniform float TargetHeight;
 uniform float RawWidth;
 uniform float RawHeight;
 
+uniform float WidthRatio;
+uniform float HeightRatio;
+
+uniform float TextureWidth;
+uniform float TextureHeight;
+
+uniform float Passthrough;
+
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
@@ -77,8 +85,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
 	
-	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
-	Output.TexCoord = Input.TexCoord + 0.5f * InvTexSize; 
+	float2 InvTexSize = float2(1.0f / TextureWidth, 1.0f / TextureHeight);
+	Output.TexCoord = Input.TexCoord + float2(0.5f, 0.5f) * InvTexSize;
 	Output.PrevCoord = Output.TexCoord;
 	
 	return Output;
@@ -99,7 +107,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float GreenMax = max(CurrPix.g, PrevPix.g);
 	float BlueMax = max(CurrPix.b, PrevPix.b);
 
-	return float4(RedMax, GreenMax, BlueMax, CurrPix.a);
+	return lerp(float4(RedMax, GreenMax, BlueMax, CurrPix.a), CurrPix, Passthrough);
 }
 
 //-----------------------------------------------------------------------------

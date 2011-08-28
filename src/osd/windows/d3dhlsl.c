@@ -653,25 +653,30 @@ void hlsl_info::init_fsfx_quad(void *vertbuf)
 	fsfx_vertices[1].y = 0.0f;
 	fsfx_vertices[2].x = 0.0f;
 	fsfx_vertices[2].y = d3d->height;
-	fsfx_vertices[3].x = d3d->width + 1.5f;
-	fsfx_vertices[3].y = 0.0f - 1.5f;
-	fsfx_vertices[4].x = 0.0f + 1.5f;
-	fsfx_vertices[4].y = d3d->height - 1.5f;
-	fsfx_vertices[5].x = d3d->width + 1.5f;
-	fsfx_vertices[5].y = d3d->height - 1.5f;
+	fsfx_vertices[3].x = d3d->width;
+	fsfx_vertices[3].y = 0.0f;
+	fsfx_vertices[4].x = 0.0f;
+	fsfx_vertices[4].y = d3d->height;
+	fsfx_vertices[5].x = d3d->width;
+	fsfx_vertices[5].y = d3d->height;
 
 	fsfx_vertices[0].u0 = 0.0f;
 	fsfx_vertices[0].v0 = 0.0f;
+
 	fsfx_vertices[1].u0 = 1.0f;
 	fsfx_vertices[1].v0 = 0.0f;
+
 	fsfx_vertices[2].u0 = 0.0f;
 	fsfx_vertices[2].v0 = 1.0f;
-	fsfx_vertices[3].u0 = 1.0f + 1.5f / d3d->width;
-	fsfx_vertices[3].v0 = 0.0f - 1.5f / d3d->height;
-	fsfx_vertices[4].u0 = 0.0f + 1.5f / d3d->width;
-	fsfx_vertices[4].v0 = 1.0f - 1.5f / d3d->height;
-	fsfx_vertices[5].u0 = 1.0f + 1.5f / d3d->width;
-	fsfx_vertices[5].v0 = 1.0f - 1.5f / d3d->height;
+
+	fsfx_vertices[3].u0 = 1.0f;
+	fsfx_vertices[3].v0 = 0.0f;
+
+	fsfx_vertices[4].u0 = 0.0f;
+	fsfx_vertices[4].v0 = 1.0f;
+
+	fsfx_vertices[5].u0 = 1.0f;
+	fsfx_vertices[5].v0 = 1.0f;
 
 	// set the color, Z parameters to standard values
 	for (int i = 0; i < 6; i++)
@@ -715,173 +720,180 @@ int hlsl_info::create_resources()
 	options = (hlsl_options*)global_alloc_clear(hlsl_options);
 
 	options->params_dirty = true;
+	strcpy(options->shadow_mask_texture, downcast<windows_options &>(window->machine().options()).screen_shadow_mask_texture()); // unsafe
 
-	emu_file ini_file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_READ | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = open_next((d3d_info*)window->drawdata, ini_file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
+	write_ini = downcast<windows_options &>(window->machine().options()).hlsl_write_ini();
+	read_ini = downcast<windows_options &>(window->machine().options()).hlsl_read_ini();
 
-	external_ini = false;
-	if (filerr == FILERR_NONE)
+	if(read_ini)
 	{
-		ini_file.seek(0, SEEK_END);
-		if (ini_file.tell() >= 1000)
+		emu_file ini_file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_READ | OPEN_FLAG_CREATE_PATHS);
+		file_error filerr = open_next((d3d_info*)window->drawdata, ini_file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
+
+		read_ini = false;
+		if (filerr == FILERR_NONE)
 		{
-			external_ini = true;
-			ini_file.seek(0, SEEK_SET);
+			ini_file.seek(0, SEEK_END);
+			if (ini_file.tell() >= 1000)
+			{
+				read_ini = true;
+				ini_file.seek(0, SEEK_SET);
 
-			int en = 0;
-			char buf[1024];
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "hlsl_enable %d\n", &en);
-			master_enable = en == 1;
+				int en = 0;
+				char buf[1024];
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "hlsl_enable %d\n", &en);
+				master_enable = en == 1;
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "hlsl_prescale_x %d\n", &prescale_force_x);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "hlsl_prescale_x %d\n", &prescale_force_x);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "hlsl_prescale_y %d\n", &prescale_force_y);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "hlsl_prescale_y %d\n", &prescale_force_y);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "hlsl_preset %d\n", &preset);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "hlsl_preset %d\n", &preset);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "hlsl_snap_width %d\n", &snap_width);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "hlsl_snap_width %d\n", &snap_width);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "hlsl_snap_height %d\n", &snap_height);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "hlsl_snap_height %d\n", &snap_height);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "shadow_mask_alpha %f\n", &options->shadow_mask_alpha);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "shadow_mask_alpha %f\n", &options->shadow_mask_alpha);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "shadow_mask_texture %s\n", options->shadow_mask_texture);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "shadow_mask_texture %s\n", options->shadow_mask_texture);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "shadow_mask_x_count %d\n", &options->shadow_mask_count_x);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "shadow_mask_x_count %d\n", &options->shadow_mask_count_x);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "shadow_mask_y_count %d\n", &options->shadow_mask_count_y);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "shadow_mask_y_count %d\n", &options->shadow_mask_count_y);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "shadow_mask_usize %f\n", &options->shadow_mask_u_size);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "shadow_mask_usize %f\n", &options->shadow_mask_u_size);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "shadow_mask_vsize %f\n", &options->shadow_mask_v_size);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "shadow_mask_vsize %f\n", &options->shadow_mask_v_size);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "curvature %f\n", &options->curvature);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "curvature %f\n", &options->curvature);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "pincushion %f\n", &options->pincushion);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "pincushion %f\n", &options->pincushion);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "scanline_alpha %f\n", &options->scanline_alpha);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "scanline_alpha %f\n", &options->scanline_alpha);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "scanline_size %f\n", &options->scanline_scale);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "scanline_size %f\n", &options->scanline_scale);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "scanline_height %f\n", &options->scanline_height);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "scanline_height %f\n", &options->scanline_height);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "scanline_bright_scale %f\n", &options->scanline_bright_scale);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "scanline_bright_scale %f\n", &options->scanline_bright_scale);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "scanline_bright_offset %f\n", &options->scanline_bright_offset);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "scanline_bright_offset %f\n", &options->scanline_bright_offset);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "scanline_jitter %f\n", &options->scanline_offset);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "scanline_jitter %f\n", &options->scanline_offset);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "defocus %f %f\n", &options->defocus[0], &options->defocus[1]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "defocus %f %f\n", &options->defocus[0], &options->defocus[1]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "converge_x %f %f %f\n", &options->converge_x[0], &options->converge_x[1], &options->converge_x[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "converge_x %f %f %f\n", &options->converge_x[0], &options->converge_x[1], &options->converge_x[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "converge_y %f %f %f\n", &options->converge_y[0], &options->converge_y[1], &options->converge_y[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "converge_y %f %f %f\n", &options->converge_y[0], &options->converge_y[1], &options->converge_y[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "radial_converge_x %f %f %f\n", &options->radial_converge_x[0], &options->radial_converge_x[1], &options->radial_converge_x[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "radial_converge_x %f %f %f\n", &options->radial_converge_x[0], &options->radial_converge_x[1], &options->radial_converge_x[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "radial_converge_y %f %f %f\n", &options->radial_converge_y[0], &options->radial_converge_y[1], &options->radial_converge_y[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "radial_converge_y %f %f %f\n", &options->radial_converge_y[0], &options->radial_converge_y[1], &options->radial_converge_y[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "red_ratio %f %f %f\n", &options->red_ratio[0], &options->red_ratio[1], &options->red_ratio[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "red_ratio %f %f %f\n", &options->red_ratio[0], &options->red_ratio[1], &options->red_ratio[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "grn_ratio %f %f %f\n", &options->grn_ratio[0], &options->grn_ratio[1], &options->grn_ratio[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "grn_ratio %f %f %f\n", &options->grn_ratio[0], &options->grn_ratio[1], &options->grn_ratio[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "blu_ratio %f %f %f\n", &options->blu_ratio[0], &options->blu_ratio[1], &options->blu_ratio[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "blu_ratio %f %f %f\n", &options->blu_ratio[0], &options->blu_ratio[1], &options->blu_ratio[2]);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "saturation %f\n", &options->saturation);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "saturation %f\n", &options->saturation);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "offset %f %f %f\n", &options->offset[0], &options->offset[1], &options->offset[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "offset %f %f %f\n", &options->offset[0], &options->offset[1], &options->offset[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "scale %f %f %f\n", &options->scale[0], &options->scale[1], &options->scale[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "scale %f %f %f\n", &options->scale[0], &options->scale[1], &options->scale[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "power %f %f %f\n", &options->power[0], &options->power[1], &options->power[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "power %f %f %f\n", &options->power[0], &options->power[1], &options->power[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "floor %f %f %f\n", &options->floor[0], &options->floor[1], &options->floor[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "floor %f %f %f\n", &options->floor[0], &options->floor[1], &options->floor[2]);
 
-			ini_file.gets(buf, 1024);
-			for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-			sscanf(buf, "phosphor_life %f %f %f\n", &options->phosphor[0], &options->phosphor[1], &options->phosphor[2]);
+				ini_file.gets(buf, 1024);
+				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+				sscanf(buf, "phosphor_life %f %f %f\n", &options->phosphor[0], &options->phosphor[1], &options->phosphor[2]);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_enable %d\n", &en);
-			options->yiq_enable = en == 1;
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_enable %d\n", &en);
+				options->yiq_enable = en == 1;
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_cc %f\n", &options->yiq_cc);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_cc %f\n", &options->yiq_cc);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_a %f\n", &options->yiq_a);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_a %f\n", &options->yiq_a);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_b %f\n", &options->yiq_b);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_b %f\n", &options->yiq_b);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_o %f\n", &options->yiq_o);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_o %f\n", &options->yiq_o);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_p %f\n", &options->yiq_p);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_p %f\n", &options->yiq_p);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_n %f\n", &options->yiq_n);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_n %f\n", &options->yiq_n);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_y %f\n", &options->yiq_y);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_y %f\n", &options->yiq_y);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_i %f\n", &options->yiq_i);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_i %f\n", &options->yiq_i);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_q %f\n", &options->yiq_q);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_q %f\n", &options->yiq_q);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_scan_time %f\n", &options->yiq_scan_time);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_scan_time %f\n", &options->yiq_scan_time);
 
-			ini_file.gets(buf, 1024);
-			sscanf(buf, "yiq_phase_count %d\n", &options->yiq_phase_count);
+				ini_file.gets(buf, 1024);
+				sscanf(buf, "yiq_phase_count %d\n", &options->yiq_phase_count);
+			}
 		}
 	}
 
@@ -907,7 +919,7 @@ int hlsl_info::create_resources()
 		shadow_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
-	if(!external_ini)
+	if(!read_ini)
 	{
 		prescale_force_x = winoptions.d3d_hlsl_prescale_x();
 		prescale_force_y = winoptions.d3d_hlsl_prescale_y();
@@ -1140,7 +1152,7 @@ void hlsl_info::begin()
 
 
 //============================================================
-//  hlsl_info::render_quad
+//  hlsl_info::init_effect_info
 //============================================================
 
 void hlsl_info::init_effect_info(d3d_poly_info *poly)
@@ -1217,10 +1229,11 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 	if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags) && poly->texture != NULL)
 	{
-		screen_encountered[poly->texture->target_index] = true;
-		target_in_use[poly->texture->target_index] = poly->texture;
+		int targetidx = poly->texture->target_index;
+		screen_encountered[targetidx] = true;
+		target_in_use[targetidx] = poly->texture;
 
-		target_use_count[poly->texture->target_index] = 60;
+		target_use_count[targetidx] = 60;
 
 		if(options->yiq_enable)
 		{
@@ -1246,7 +1259,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 				(*d3dintf->effect.set_float)(curr_effect, "ScanTime", options->yiq_scan_time);
 			}
 
-			HRESULT result = (*d3dintf->device.set_render_target)(d3d->device, 0, target4[poly->texture->target_index]);
+			HRESULT result = (*d3dintf->device.set_render_target)(d3d->device, 0, target4[targetidx]);
 
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 			result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
@@ -1268,7 +1281,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			/* Convert our signal from YIQ */
 			curr_effect = yiq_decode_effect;
 
-			(*d3dintf->effect.set_texture)(curr_effect, "Composite", texture4[poly->texture->target_index]);
+			(*d3dintf->effect.set_texture)(curr_effect, "Composite", texture4[targetidx]);
 			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dfinaltex);
 			if(options->params_dirty)
 			{
@@ -1290,7 +1303,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 				(*d3dintf->effect.set_float)(curr_effect, "ScanTime", options->yiq_scan_time);
 			}
 
-			result = (*d3dintf->device.set_render_target)(d3d->device, 0, target3[poly->texture->target_index]);
+			result = (*d3dintf->device.set_render_target)(d3d->device, 0, target3[targetidx]);
 
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 			result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
@@ -1311,7 +1324,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			curr_effect = color_effect;
 
-			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture3[poly->texture->target_index]);
+			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture3[targetidx]);
 		}
 
 		curr_effect = color_effect;
@@ -1334,7 +1347,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			(*d3dintf->effect.set_float)(curr_effect, "Saturation", options->saturation);
 		}
 
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->device, 0, smalltarget0[poly->texture->target_index]);
+		HRESULT result = (*d3dintf->device.set_render_target)(d3d->device, 0, smalltarget0[targetidx]);
 
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 		result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
@@ -1355,7 +1368,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		/* Pre-scaling pass */
 		curr_effect = prescale_effect;
-		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", smalltexture0[poly->texture->target_index]);
+		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", smalltexture0[targetidx]);
 
 		if(options->params_dirty)
 		{
@@ -1369,7 +1382,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
-		result = (*d3dintf->device.set_render_target)(d3d->device, 0, prescaletarget0[poly->texture->target_index]);
+		result = (*d3dintf->device.set_render_target)(d3d->device, 0, prescaletarget0[targetidx]);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 		result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1385,10 +1398,9 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		(*d3dintf->effect.end)(curr_effect);
 
-
 		/* Deconverge pass */
 		curr_effect = deconverge_effect;
-		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", prescaletexture0[poly->texture->target_index]);
+		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", prescaletexture0[targetidx]);
 
 		if(options->params_dirty)
 		{
@@ -1406,7 +1418,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
-		result = (*d3dintf->device.set_render_target)(d3d->device, 0, target2[poly->texture->target_index]);
+		result = (*d3dintf->device.set_render_target)(d3d->device, 0, target2[targetidx]);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
 		result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1430,7 +1442,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			/* Defocus pass 1 */
 			curr_effect = focus_effect;
 
-			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture2[poly->texture->target_index]);
+			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture2[targetidx]);
 
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
@@ -1443,7 +1455,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
-			result = (*d3dintf->device.set_render_target)(d3d->device, 0, target0[poly->texture->target_index]);
+			result = (*d3dintf->device.set_render_target)(d3d->device, 0, target0[targetidx]);
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
 			result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1461,7 +1473,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			/* Defocus pass 2 */
 
-			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[poly->texture->target_index]);
+			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[targetidx]);
 
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
@@ -1474,7 +1486,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
-			result = (*d3dintf->device.set_render_target)(d3d->device, 0, target1[poly->texture->target_index]);
+			result = (*d3dintf->device.set_render_target)(d3d->device, 0, target1[targetidx]);
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 7\n", (int)result);
 
 			for (UINT pass = 0; pass < num_passes; pass++)
@@ -1492,6 +1504,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		// Simulate phosphorescence. This should happen after the shadow/scanline pass, but since
 		// the phosphors are a direct result of the incoming texture, might as well just change the
 		// input texture.
+		int num_screens = registered_targets / 2;
 		curr_effect = phosphor_effect;
 
 		if(options->params_dirty)
@@ -1500,13 +1513,18 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
 			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 			(*d3dintf->effect.set_vector)(curr_effect, "Phosphor", 3, options->phosphor);
 		}
+		(*d3dintf->effect.set_float)(curr_effect, "TextureWidth", (float)target_width[targetidx]);
+		(*d3dintf->effect.set_float)(curr_effect, "TextureHeight", (float)target_height[targetidx]);
+		(*d3dintf->effect.set_float)(curr_effect, "Passthrough", 0.0f);
 
-		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? texture1[poly->texture->target_index] : texture2[poly->texture->target_index]);
-		(*d3dintf->effect.set_texture)(curr_effect, "LastPass", last_texture[poly->texture->target_index]);
+		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? texture1[targetidx] : texture2[targetidx]);
+		(*d3dintf->effect.set_texture)(curr_effect, "LastPass", last_texture[num_screens > 0 ? (targetidx % num_screens) : targetidx]); // Avoid changing targets due to page flipping
 
-		result = (*d3dintf->device.set_render_target)(d3d->device, 0, target0[poly->texture->target_index]);
+		result = (*d3dintf->device.set_render_target)(d3d->device, 0, target0[targetidx]);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 4\n", (int)result);
 		result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1527,15 +1545,11 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		/* Pass along our phosphor'd screen */
 		curr_effect = phosphor_effect;
 
-		(*d3dintf->effect.set_float)(curr_effect, "FixedAlpha", 1.0f);
+		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[targetidx]);
+		(*d3dintf->effect.set_texture)(curr_effect, "LastPass", texture0[targetidx]);
+		(*d3dintf->effect.set_float)(curr_effect, "Passthrough", 1.0f);
 
-		if(options->params_dirty)
-		{
-			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? texture1[poly->texture->target_index] : texture2[poly->texture->target_index]);
-			(*d3dintf->effect.set_texture)(curr_effect, "LastPass", focus_enable ? texture1[poly->texture->target_index] : texture2[poly->texture->target_index]);
-		}
-
-		result = (*d3dintf->device.set_render_target)(d3d->device, 0, last_target[poly->texture->target_index]);
+		result = (*d3dintf->device.set_render_target)(d3d->device, 0, last_target[num_screens > 0 ? (targetidx % num_screens) : targetidx]); // Avoid changing targets due to page flipping
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
 		result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1558,7 +1572,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		{
 			curr_effect = post_effect;
 
-			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[poly->texture->target_index]);
+			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[targetidx]);
 
 			result = (*d3dintf->device.set_render_target)(d3d->device, 0, avi_final_target);
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
@@ -1581,7 +1595,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		{
 			curr_effect = post_effect;
 
-			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[poly->texture->target_index]);
+			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[targetidx]);
 
 			result = (*d3dintf->device.set_render_target)(d3d->device, 0, snap_target);
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
@@ -1605,7 +1619,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		/* Scanlines and shadow mask */
 		curr_effect = post_effect;
 
-		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[poly->texture->target_index]);
+		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture0[targetidx]);
 
 		result = (*d3dintf->device.set_render_target)(d3d->device, 0, backbuffer);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
@@ -1865,12 +1879,14 @@ int hlsl_info::register_prescaled_texture(d3d_texture_info *texture, int scwidth
 		return 1;
 	(*d3dintf->texture.get_surface_level)(prescaletexture0[idx], 0, &prescaletarget0[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, d3d->width, d3d->height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, scwidth * hlsl_prescale_x, scheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(last_texture[idx], 0, &last_target[idx]);
 
 	texture->target_index = registered_targets;
+	target_width[idx] = scwidth * hlsl_prescale_x;
+	target_height[idx] = scheight * hlsl_prescale_y;
 	target_use_count[texture->target_index] = 60;
 	target_in_use[texture->target_index] = texture;
 	registered_targets++;
@@ -1942,12 +1958,14 @@ int hlsl_info::register_texture(d3d_texture_info *texture)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(prescaletexture0[idx], 0, &prescaletarget0[idx]);
 
-	result = (*d3dintf->device.create_texture)(d3d->device, d3d->width, d3d->height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture[idx]);
+	result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * hlsl_prescale_x, texture->rawheight * hlsl_prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture[idx]);
 	if (result != D3D_OK)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(last_texture[idx], 0, &last_target[idx]);
 
 	texture->target_index = registered_targets;
+	target_width[idx] = texture->rawwidth * hlsl_prescale_x;
+	target_height[idx] = texture->rawheight * hlsl_prescale_y;
 	target_use_count[texture->target_index] = 60;
 	target_in_use[texture->target_index] = texture;
 	registered_targets++;
@@ -1965,58 +1983,61 @@ void hlsl_info::delete_resources()
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	emu_file file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = open_next((d3d_info*)window->drawdata, file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
+	if(write_ini)
+	{
+		emu_file file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		file_error filerr = open_next((d3d_info*)window->drawdata, file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
 
-	if (filerr != FILERR_NONE)
-		return;
+		if (filerr != FILERR_NONE)
+			return;
 
-	file.printf("hlsl_enable            %d\n", master_enable ? 1 : 0);
-	file.printf("hlsl_prescale_x        %d\n", prescale_force_x);
-	file.printf("hlsl_prescale_y        %d\n", prescale_force_y);
-	file.printf("hlsl_preset            %d\n", preset);
-	file.printf("hlsl_snap_width        %d\n", snap_width);
-	file.printf("hlsl_snap_height       %d\n", snap_height);
-	file.printf("shadow_mask_alpha      %f\n", options->shadow_mask_alpha);
-	file.printf("shadow_mask_texture    %s\n", options->shadow_mask_texture);
-	file.printf("shadow_mask_x_count    %d\n", options->shadow_mask_count_x);
-	file.printf("shadow_mask_y_count    %d\n", options->shadow_mask_count_y);
-	file.printf("shadow_mask_usize      %f\n", options->shadow_mask_u_size);
-	file.printf("shadow_mask_vsize      %f\n", options->shadow_mask_v_size);
-	file.printf("curvature              %f\n", options->curvature);
-	file.printf("pincushion             %f\n", options->pincushion);
-	file.printf("scanline_alpha         %f\n", options->scanline_alpha);
-	file.printf("scanline_size          %f\n", options->scanline_scale);
-	file.printf("scanline_height        %f\n", options->scanline_height);
-	file.printf("scanline_bright_scale  %f\n", options->scanline_bright_scale);
-	file.printf("scanline_bright_offset %f\n", options->scanline_bright_offset);
-	file.printf("scanline_jitter        %f\n", options->scanline_offset);
-	file.printf("defocus                %f,%f\n", options->defocus[0], options->defocus[1]);
-	file.printf("converge_x             %f,%f,%f\n", options->converge_x[0], options->converge_x[1], options->converge_x[2]);
-	file.printf("converge_y             %f,%f,%f\n", options->converge_y[0], options->converge_y[1], options->converge_y[2]);
-	file.printf("radial_converge_x      %f,%f,%f\n", options->radial_converge_x[0], options->radial_converge_x[1], options->radial_converge_x[2]);
-	file.printf("radial_converge_y      %f,%f,%f\n", options->radial_converge_y[0], options->radial_converge_y[1], options->radial_converge_y[2]);
-	file.printf("red_ratio              %f,%f,%f\n", options->red_ratio[0], options->red_ratio[1], options->red_ratio[2]);
-	file.printf("grn_ratio              %f,%f,%f\n", options->grn_ratio[0], options->grn_ratio[1], options->grn_ratio[2]);
-	file.printf("blu_ratio              %f,%f,%f\n", options->blu_ratio[0], options->blu_ratio[1], options->blu_ratio[2]);
-	file.printf("saturation             %f\n", options->saturation);
-	file.printf("offset                 %f,%f,%f\n", options->offset[0], options->offset[1], options->offset[2]);
-	file.printf("scale                  %f,%f,%f\n", options->scale[0], options->scale[1], options->scale[2]);
-	file.printf("power                  %f,%f,%f\n", options->power[0], options->power[1], options->power[2]);
-	file.printf("floor                  %f,%f,%f\n", options->floor[0], options->floor[1], options->floor[2]);
-	file.printf("phosphor_life          %f,%f,%f\n", options->phosphor[0], options->phosphor[1], options->phosphor[2]);
-	file.printf("yiq_enable             %d\n", options->yiq_enable ? 1 : 0);
-	file.printf("yiq_cc                 %f\n", options->yiq_cc);
-	file.printf("yiq_a                  %f\n", options->yiq_a);
-	file.printf("yiq_b                  %f\n", options->yiq_b);
-	file.printf("yiq_o                  %f\n", options->yiq_o);
-	file.printf("yiq_p                  %f\n", options->yiq_p);
-	file.printf("yiq_n                  %f\n", options->yiq_n);
-	file.printf("yiq_y                  %f\n", options->yiq_y);
-	file.printf("yiq_i                  %f\n", options->yiq_i);
-	file.printf("yiq_q                  %f\n", options->yiq_q);
-	file.printf("yiq_scan_time          %f\n", options->yiq_scan_time);
-	file.printf("yiq_phase_count        %d\n", options->yiq_phase_count);
+		file.printf("hlsl_enable            %d\n", master_enable ? 1 : 0);
+		file.printf("hlsl_prescale_x        %d\n", prescale_force_x);
+		file.printf("hlsl_prescale_y        %d\n", prescale_force_y);
+		file.printf("hlsl_preset            %d\n", preset);
+		file.printf("hlsl_snap_width        %d\n", snap_width);
+		file.printf("hlsl_snap_height       %d\n", snap_height);
+		file.printf("shadow_mask_alpha      %f\n", options->shadow_mask_alpha);
+		file.printf("shadow_mask_texture    %s\n", options->shadow_mask_texture);
+		file.printf("shadow_mask_x_count    %d\n", options->shadow_mask_count_x);
+		file.printf("shadow_mask_y_count    %d\n", options->shadow_mask_count_y);
+		file.printf("shadow_mask_usize      %f\n", options->shadow_mask_u_size);
+		file.printf("shadow_mask_vsize      %f\n", options->shadow_mask_v_size);
+		file.printf("curvature              %f\n", options->curvature);
+		file.printf("pincushion             %f\n", options->pincushion);
+		file.printf("scanline_alpha         %f\n", options->scanline_alpha);
+		file.printf("scanline_size          %f\n", options->scanline_scale);
+		file.printf("scanline_height        %f\n", options->scanline_height);
+		file.printf("scanline_bright_scale  %f\n", options->scanline_bright_scale);
+		file.printf("scanline_bright_offset %f\n", options->scanline_bright_offset);
+		file.printf("scanline_jitter        %f\n", options->scanline_offset);
+		file.printf("defocus                %f,%f\n", options->defocus[0], options->defocus[1]);
+		file.printf("converge_x             %f,%f,%f\n", options->converge_x[0], options->converge_x[1], options->converge_x[2]);
+		file.printf("converge_y             %f,%f,%f\n", options->converge_y[0], options->converge_y[1], options->converge_y[2]);
+		file.printf("radial_converge_x      %f,%f,%f\n", options->radial_converge_x[0], options->radial_converge_x[1], options->radial_converge_x[2]);
+		file.printf("radial_converge_y      %f,%f,%f\n", options->radial_converge_y[0], options->radial_converge_y[1], options->radial_converge_y[2]);
+		file.printf("red_ratio              %f,%f,%f\n", options->red_ratio[0], options->red_ratio[1], options->red_ratio[2]);
+		file.printf("grn_ratio              %f,%f,%f\n", options->grn_ratio[0], options->grn_ratio[1], options->grn_ratio[2]);
+		file.printf("blu_ratio              %f,%f,%f\n", options->blu_ratio[0], options->blu_ratio[1], options->blu_ratio[2]);
+		file.printf("saturation             %f\n", options->saturation);
+		file.printf("offset                 %f,%f,%f\n", options->offset[0], options->offset[1], options->offset[2]);
+		file.printf("scale                  %f,%f,%f\n", options->scale[0], options->scale[1], options->scale[2]);
+		file.printf("power                  %f,%f,%f\n", options->power[0], options->power[1], options->power[2]);
+		file.printf("floor                  %f,%f,%f\n", options->floor[0], options->floor[1], options->floor[2]);
+		file.printf("phosphor_life          %f,%f,%f\n", options->phosphor[0], options->phosphor[1], options->phosphor[2]);
+		file.printf("yiq_enable             %d\n", options->yiq_enable ? 1 : 0);
+		file.printf("yiq_cc                 %f\n", options->yiq_cc);
+		file.printf("yiq_a                  %f\n", options->yiq_a);
+		file.printf("yiq_b                  %f\n", options->yiq_b);
+		file.printf("yiq_o                  %f\n", options->yiq_o);
+		file.printf("yiq_p                  %f\n", options->yiq_p);
+		file.printf("yiq_n                  %f\n", options->yiq_n);
+		file.printf("yiq_y                  %f\n", options->yiq_y);
+		file.printf("yiq_i                  %f\n", options->yiq_i);
+		file.printf("yiq_q                  %f\n", options->yiq_q);
+		file.printf("yiq_scan_time          %f\n", options->yiq_scan_time);
+		file.printf("yiq_phase_count        %d\n", options->yiq_phase_count);
+	}
 
 	if (effect != NULL)
 	{
