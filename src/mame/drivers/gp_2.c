@@ -141,6 +141,16 @@ ROM_START(ladyshot)
 	ROM_CONTINUE(0x7800, 0x0800)
 	ROM_RELOAD (0xf000, 0x1000)
 ROM_END
+ROM_START(ladyshota)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "830a2.716", 0x0000, 0x0800, CRC(2c1f1629) SHA1(9233ce4328d779ff6548cdd5d6819cd368bef313))
+	ROM_LOAD( "830b2.716", 0x0800, 0x0800, CRC(2105a538) SHA1(0360d3e740d8b6f816cfe7fe1fb32ac476251b9f))
+	ROM_LOAD( "830c2.716", 0x1000, 0x0800, CRC(2d96bdde) SHA1(7c03a29a91f03fba9ed5e53a93335113a7cbafb3))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD ("830.snd", 0x3800, 0x0800, NO_DUMP)
+	ROM_CONTINUE(0x7800, 0x0800)
+	ROM_RELOAD (0xf000, 0x1000)
+ROM_END
 
 /*-------------------------------------------------------------------
 / Loch Ness Monster (November 1985) - Model #???
@@ -235,6 +245,7 @@ GAME(1985,	cpthook,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Captain Hook",			
 GAME(1985,	cyclopes,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Cyclopes",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	gwarfare,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Global Warfare",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	ladyshot,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Lady Sharpshooter",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	ladyshota,	ladyshot,	gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Lady Sharpshooter (alternate set)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	mbossy,		0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Mike Bossy",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	coneyis,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Old Coney Island!",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	lizard,		0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Pinball Lizard",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

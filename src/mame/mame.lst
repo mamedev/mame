@@ -14672,6 +14672,7 @@ stwr_a14
 stwr_102
 stwr_e12
 tftc_303
+tftc_302
 tftc_300
 tftc_200
 tftc_104
@@ -14742,6 +14743,7 @@ cpthook
 cyclopes
 gwarfare
 ladyshot
+ladyshota
 mbossy
 coneyis
 lizard
@@ -14923,8 +14925,12 @@ brvteam
 canasta
 pinclown
 corsario
+mundial
 lapbylap
 
+// jeutel.c
+leking
+olympic
 
 // jp.c
 america
@@ -14933,6 +14939,7 @@ faeton
 lortium
 petaco
 petaco2
+halley
 olympus
 
 
@@ -15024,6 +15031,8 @@ rdkng_l2
 rdkng_l3
 tdawg_l1
 shfin_l1
+tts_l2
+tts_l1
 
 
 // s11a.c
@@ -15206,6 +15215,10 @@ szone_l2
 sleicpin
 
 
+// spectra.c
+spectra
+
+
 // spinb.c
 bushido
 bushidoa
@@ -15320,6 +15333,11 @@ harl_f13
 harl_g13
 harl_i13
 harl_l13
+harl_a40
+harl_f40
+harl_g40
+harl_i40
+harl_l40
 harl_a30
 harl_f30
 harl_g30
@@ -15407,6 +15425,7 @@ shrkyfr_207
 shrkyit
 shrkyit_207
 sprk_103
+sprk_096
 sprk_090
 spacejam
 spacejmg
@@ -15594,6 +15613,7 @@ cv_11
 cv_13
 congo_21
 congo_20
+congo_13
 jy_12
 jy_11
 jy_03
@@ -15628,6 +15648,7 @@ ss_15
 ss_14
 ss_12
 ss_03
+ss_01
 totan_14
 totan_13
 totan_12
@@ -15808,6 +15829,7 @@ ts_lm6
 tom_13
 tom_14h
 tom_12
+tom_10f
 tom_06
 wd_12
 wd_12g

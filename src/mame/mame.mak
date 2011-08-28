@@ -1587,6 +1587,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/hankin.o  \
 	$(DRIVERS)/icecold.o  \
 	$(DRIVERS)/inder.o  \
+	$(DRIVERS)/jeutel.o  \
 	$(DRIVERS)/jp.o  \
 	$(DRIVERS)/jvh.o  \
 	$(DRIVERS)/kissproto.o  \
@@ -1613,6 +1614,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/s8.o  \
 	$(DRIVERS)/s9.o  \
 	$(DRIVERS)/sleic.o  \
+	$(DRIVERS)/spectra.o  \
 	$(DRIVERS)/spinb.o  \
 	$(DRIVERS)/st_mp100.o  \
 	$(DRIVERS)/st_mp200.o  \

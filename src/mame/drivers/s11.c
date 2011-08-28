@@ -185,6 +185,29 @@ ROM_START(shfin_l1)
 	ROM_LOAD("u22snd-2.rv1", 0x8000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
 ROM_END
 
+/*--------------------
+/ Tic-Tac-Strike (#919)
+/--------------------*/
+ROM_START(tts_l2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u27_l2.128", 0x8000, 0x4000, CRC(edbcab92) SHA1(0f6b2dc01874984f9a17ee873f2fa0b6c9bba5be))
+	ROM_RELOAD( 0xc000, 0x4000)
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "sound2", 0)
+	ROM_LOAD("tts_u21.256", 0x0000, 0x8000, NO_DUMP)
+	ROM_LOAD("tts_u22.256", 0x8000, 0x8000, NO_DUMP)
+ROM_END
+
+ROM_START(tts_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("tts_u27.128", 0x8000, 0x4000, CRC(f540c53c) SHA1(1c7a318278ad1afdcbe6aaf81f9b774882b069d6))
+	ROM_RELOAD( 0xc000, 0x4000)
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "sound2", 0)
+	ROM_LOAD("tts_u21.256", 0x0000, 0x8000, NO_DUMP)
+	ROM_LOAD("tts_u22.256", 0x8000, 0x8000, NO_DUMP)
+ROM_END
+
 GAME(1987,	gmine_l2,	0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Gold Mine (Shuffle) (L-2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	grand_l4,	0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Grand Lizard (L-4)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	hs_l4,		0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"High Speed (L-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
@@ -195,4 +218,6 @@ GAME(1986,	rdkng_l2,	rdkng_l4,	williams_s11,	williams_s11,	williams_s11,	ROT0,	"
 GAME(1986,	rdkng_l3,	rdkng_l4,	williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Road Kings (L-3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1987,	tdawg_l1,	0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Top Dawg (Shuffle) (L-1)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1987,	shfin_l1,	0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Shuffle Inn (Shuffle) (L-1)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,	tts_l2,		0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Tic-Tac-Strike (Shuffle) (L-2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,	tts_l1,		tts_l2,		williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Tic-Tac-Strike (Shuffle) (L-1)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 

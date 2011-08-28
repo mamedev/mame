@@ -236,6 +236,18 @@ ROM_START(congo_20)
 	ROM_LOAD("cgs3v1_0.rom", 0x100000, 0x100000, CRC(6cfd9fe0) SHA1(a76267f865c645648c8cb27aec2d05062a4a20b5))
 	ROM_LOAD("cgs4v1_0.rom", 0x200000, 0x100000, CRC(2a1980e7) SHA1(0badf27c2b8bc7b0074dc5e606d64490470bc108))
 ROM_END
+ROM_START(congo_13)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x2000, "user1",  ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "user2", 0)
+	ROM_LOAD("cong1_30.rom", 0x00000, 0x80000, CRC(e68c0404) SHA1(e851f42e6bd0e910fc87b9500cbacac3c088b488))
+	ROM_REGION(0x20000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x1000*2, "user3", ROMREGION_ERASEFF)
+	ROM_REGION(0x800000, "sound1", 0)
+	ROM_LOAD("cgs2v1_1.rom", 0x000000, 0x100000, CRC(2b7637ae) SHA1(5b5d7214c632a506b986c892b39b1356b2909598))
+	ROM_LOAD("cgs3v1_0.rom", 0x100000, 0x100000, CRC(6cfd9fe0) SHA1(a76267f865c645648c8cb27aec2d05062a4a20b5))
+	ROM_LOAD("cgs4v1_0.rom", 0x200000, 0x100000, CRC(2a1980e7) SHA1(0badf27c2b8bc7b0074dc5e606d64490470bc108))
+ROM_END
 
 /*-----------------
 /  Junk Yard
@@ -740,6 +752,18 @@ ROM_START(ss_03)
 	ROM_LOAD("sssnd_s3.21", 0x100000, 0x100000, CRC(c4f2e08a) SHA1(e20ff622a3f475db11f1f44d36a6669e160437a3))
 	ROM_LOAD("sssnd_s4.21", 0x200000, 0x100000, CRC(258b0a27) SHA1(83763b98907cf38e6f7b9fe4f26ce93a54ba3568))
 ROM_END
+ROM_START(ss_01)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x2000, "user1",  ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "user2", 0)
+	ROM_LOAD("ss_g11.rom", 0x00000, 0x80000, CRC(affd278f) SHA1(e6f41da169fa15c25cfaac22057f3e491da18fc5))
+	ROM_REGION(0x20000, "cpu2", ROMREGION_ERASEFF)
+	ROM_REGION(0x1000*2, "user3", ROMREGION_ERASEFF)
+	ROM_REGION(0x800000, "sound1", 0)
+	ROM_LOAD("ss_s2.rom", 0x000000, 0x100000, CRC(ad079cbc) SHA1(77c7f676fc2f46e22b74b381638725269f7d23f4))
+	ROM_LOAD("sssnd_s3.21", 0x100000, 0x100000, CRC(c4f2e08a) SHA1(e20ff622a3f475db11f1f44d36a6669e160437a3))
+	ROM_LOAD("sssnd_s4.21", 0x200000, 0x100000, CRC(258b0a27) SHA1(83763b98907cf38e6f7b9fe4f26ce93a54ba3568))
+ROM_END
 
 /*-----------------
 /  Tales Of The Arabian Nights
@@ -881,6 +905,7 @@ GAME(1997,	cv_11,		cv_14,		wpc_95,	wpc_95,	wpc_95,	ROT0,	"Bally",				"Cirqus Vol
 GAME(1997,	cv_13,		cv_14,		wpc_95,	wpc_95,	wpc_95,	ROT0,	"Bally",				"Cirqus Voltaire (1.3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	congo_21,	0,			wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Congo (2.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	congo_20,	congo_21,	wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Congo (2.0)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,	congo_13,	congo_21,	wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Congo (1.3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	jy_12,		0,			wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Junk Yard (1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	jy_11,		jy_12,		wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Junk Yard (1.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	jy_03,		jy_12,		wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Junk Yard (0.3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
@@ -915,6 +940,7 @@ GAME(1996,	ss_15,		0,			wpc_95,	wpc_95,	wpc_95,	ROT0,	"Bally",				"Scared Stiff 
 GAME(1996,	ss_14,		ss_15,		wpc_95,	wpc_95,	wpc_95,	ROT0,	"Bally",				"Scared Stiff (1.4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	ss_12,		ss_15,		wpc_95,	wpc_95,	wpc_95,	ROT0,	"Bally",				"Scared Stiff (1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	ss_03,		ss_15,		wpc_95,	wpc_95,	wpc_95,	ROT0,	"Bally",				"Scared Stiff (0.3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1996,	ss_01,		ss_15,		wpc_95,	wpc_95,	wpc_95,	ROT0,	"Bally",				"Scared Stiff (D0.1R with sound rev.25)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	totan_14,	0,			wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Tales Of The Arabian Nights (1.4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	totan_13,	totan_14,	wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Tales Of The Arabian Nights (1.3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	totan_12,	totan_14,	wpc_95,	wpc_95,	wpc_95,	ROT0,	"Williams",				"Tales Of The Arabian Nights (1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
