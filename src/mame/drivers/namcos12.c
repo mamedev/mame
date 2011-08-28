@@ -1728,6 +1728,20 @@ static INPUT_PORTS_START( namcos12 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mrdrillr )
+	PORT_INCLUDE( namcos12 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ptblank2 )
 	PORT_INCLUDE( namcos12 )
 
@@ -2787,7 +2801,7 @@ GAME( 1999, tektagtjb, tektagt,  coh700,   namcos12, namcos12, ROT0, "Namco",   
 GAME( 1999, tektagtja, tektagt,  coh700,   namcos12, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
 GAME( 1999, ghlpanic,  0,        coh700,   ghlpanic, ghlpanic, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (Asia, OB2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC045 */
 GAME( 1999, pacapp2,   0,        coh700,   namcos12, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC046 */
-GAME( 1999, mrdrillr,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC048 */
+GAME( 1999, mrdrillr,  0,        coh700,   mrdrillr, namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC048 */
 GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC050 */
 GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC052 */
 GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC053 */
