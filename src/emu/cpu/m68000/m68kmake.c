@@ -321,7 +321,7 @@ static const int g_size_select_table[33] =
 /* Extra cycles required for certain EA modes */
 /* TODO: correct timings for 030, 040 */
 static const int g_ea_cycle_table[13][NUM_CPUS][3] =
-{/*       000           010           020           030           040  */
+{/*       000           010           020           030           040        CPU*/
 	{{ 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}}, /* EA_MODE_NONE */
 	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_AI   */
 	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_PI   */
@@ -960,8 +960,8 @@ static void generate_opcode_ea_variants(FILE* filep, body_struct* body, replace_
 /* Generate variants of condition code opcodes */
 static void generate_opcode_cc_variants(FILE* filep, body_struct* body, replace_struct* replace, opcode_struct* op_in, int offset)
 {
-	char repl[20];
-	char replnot[20];
+	char repl[32];
+	char replnot[32];
 	int i;
 	int old_length = replace->length;
 	opcode_struct* op = (opcode_struct *)malloc(sizeof(opcode_struct));
