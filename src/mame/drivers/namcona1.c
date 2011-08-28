@@ -1168,6 +1168,7 @@ ROM_START( emeraldaja ) /* NA-1 Game PCB, parent is NA-2 version listed below */
         ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
+/* Known to exist, but not dumped is an English Exvania with progrom roms labeled EX2-EP0L & EX2-EPOU, unknown if NA-1 or NA-2 main */
 ROM_START( exvania )
 	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ex1-ep0l.bin", 0x080001, 0x080000, CRC(18c12015) SHA1(e4f3524e798545c434549719b377c8b5863f580f) ) /* 0xc00000 */
