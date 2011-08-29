@@ -469,10 +469,14 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			UINT8 sprite_height = sprite_size * ( sprite_mag + 1 );
 			UINT8 spr_drawn[32+256+32] = { 0 };
 			UINT8 num_sprites = 0;
+			bool fifth_encountered = false;
 
 			for ( UINT16 sprattr = 0; sprattr < 128; sprattr += 4 )
 			{
 				int spr_y = m_vMem[ m_spriteattribute + sprattr + 0 ];
+
+				if (!fifth_encountered)
+					m_FifthSprite = sprattr / 4;
 
 				/* Stop processing sprites */
 				if ( spr_y == 208 )
@@ -496,15 +500,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 					/* Fifth sprite encountered? */
 					if( num_sprites == 5 )
-					{
-						m_FifthSprite = sprattr / 4;
-
-						if (~m_StatusReg & 0x40)
-						{
-							m_StatusReg |= m_FifthSprite;
-							if (~m_StatusReg & 0x80) m_StatusReg |= 0x40;
-						}
-					}
+						fifth_encountered = true;
 
 					if ( sprite_mag )
 						pataddr += ( ( ( y - spr_y ) & 0x1F ) >> 1 );
@@ -551,6 +547,14 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 						spr_x += sprite_mag ? 16 : 8;
 					}
 				}
+			}
+
+			/* Update sprite overflow bits */
+			if (~m_StatusReg & 0x40)
+			{
+				m_StatusReg |= m_FifthSprite;
+				if (fifth_encountered && ~m_StatusReg & 0x80)
+					m_StatusReg |= 0x40;
 			}
 		}
 
