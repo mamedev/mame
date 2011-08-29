@@ -51,6 +51,8 @@ struct _k051649_state
 	INT16 *mixer_lookup;
 	short *mixer_buffer;
 
+	/* misc */
+	UINT8 test;
 	int f[10];
 };
 
@@ -101,8 +103,8 @@ static STREAM_UPDATE( k051649_update )
 		v=voice[j].volume;
 		f=voice[j].frequency;
 		k=voice[j].key;
-		/* SY 20040109: the SCC produces no sound for freq < 9 */
-		if (v && f > 8 && k)
+		/* SY 20040109: the SCC produces no sound for freq < 9 (channel is halted) */
+		if (f > 8)
 		{
 			const signed char *w = voice[j].waveform;			/* 19991207.CAB */
 			int c=voice[j].counter;
@@ -117,8 +119,8 @@ static STREAM_UPDATE( k051649_update )
 				/* Amuse source:  Cab suggests this method gives greater resolution */
 				/* Sean Young 20010417: the formula is really: f = clock/(16*(f+1))*/
 				c+=(long)((((float)info->mclock / (float)((f+1) * 16))*(float)(1<<FREQBASEBITS)) / (float)(info->rate / 32));
-				offs = (c >> 16) & 0x1f;
-				*mix++ += (w[offs] * v)>>3;
+				offs = (c >> FREQBASEBITS) & 0x1f;
+				*mix++ += (w[offs] * v * k)>>3;
 			}
 
 			/* update the counter for this voice */
@@ -157,9 +159,15 @@ static DEVICE_RESET( k051649 )
 	/* reset all the voices */
 	for (i = 0; i < 5; i++) {
 		voice[i].frequency = 0;
-		voice[i].volume = 0;
+		voice[i].volume = 0xf;
 		voice[i].counter = 0;
+		voice[i].key = 0;
 	}
+
+	/* other parameters */
+	info->test = 0;
+	for (i = 0; i < 5; i++)
+		info->f[i] = 0;
 }
 
 /********************************************************************************/
@@ -167,25 +175,69 @@ static DEVICE_RESET( k051649 )
 WRITE8_DEVICE_HANDLER( k051649_waveform_w )
 {
 	k051649_state *info = get_safe_token(device);
+	if (info->test & 0x40)
+		return;
+
 	info->stream->update();
-	info->channel_list[offset>>5].waveform[offset&0x1f]=data;
-	/* SY 20001114: Channel 5 shares the waveform with channel 4 */
+
     if (offset >= 0x60)
+    {
+		if (info->test & 0x80)
+			return;
+
+		/* SY 20001114: Channel 5 shares the waveform with channel 4 */
+		info->channel_list[3].waveform[offset&0x1f]=data;
 		info->channel_list[4].waveform[offset&0x1f]=data;
+	}
+	else
+		info->channel_list[offset>>5].waveform[offset&0x1f]=data;
 }
 
 READ8_DEVICE_HANDLER ( k051649_waveform_r )
 {
 	k051649_state *info = get_safe_token(device);
+
+	if (offset >= 0x60)
+	{
+		if (info->test & 0xc0)
+		{
+			info->stream->update();
+			offset += (info->channel_list[3 + (info->test >> 6 & 1)].counter >> FREQBASEBITS);
+		}
+	}
+	else
+	{
+		if (info->test & 0x40)
+		{
+			info->stream->update();
+			offset += (info->channel_list[offset>>5].counter >> FREQBASEBITS);
+		}
+	}
 	return info->channel_list[offset>>5].waveform[offset&0x1f];
 }
 
-/* SY 20001114: Channel 5 doesn't share the waveform with channel 4 on this chip */
 WRITE8_DEVICE_HANDLER( k052539_waveform_w )
 {
 	k051649_state *info = get_safe_token(device);
+	if (info->test & 0x40)
+		return;
+
 	info->stream->update();
+
+	/* SY 20001114: Channel 5 doesn't share the waveform with channel 4 on this chip */
 	info->channel_list[offset>>5].waveform[offset&0x1f]=data;
+}
+
+READ8_DEVICE_HANDLER ( k052539_waveform_r )
+{
+	k051649_state *info = get_safe_token(device);
+
+	if (info->test & 0x40)
+	{
+		info->stream->update();
+		offset += (info->channel_list[offset>>5].counter >> FREQBASEBITS);
+	}
+	return info->channel_list[offset>>5].waveform[offset&0x1f];
 }
 
 WRITE8_DEVICE_HANDLER( k051649_volume_w )
@@ -201,18 +253,40 @@ WRITE8_DEVICE_HANDLER( k051649_frequency_w )
 	info->f[offset]=data;
 
 	info->stream->update();
+
+	if (info->test & 0x20)
+		info->channel_list[offset>>1].counter = ~0;
+	else if (info->channel_list[offset>>1].frequency < 9)
+		info->channel_list[offset>>1].counter |= ((1 << FREQBASEBITS) - 1);
+
 	info->channel_list[offset>>1].frequency=(info->f[offset&0xe] + (info->f[offset|1]<<8))&0xfff;
 }
 
 WRITE8_DEVICE_HANDLER( k051649_keyonoff_w )
 {
+	int i;
 	k051649_state *info = get_safe_token(device);
 	info->stream->update();
-	info->channel_list[0].key=data&1;
-	info->channel_list[1].key=data&2;
-	info->channel_list[2].key=data&4;
-	info->channel_list[3].key=data&8;
-	info->channel_list[4].key=data&16;
+
+	for (i = 0; i < 5; i++) {
+		info->channel_list[i].key=data&1;
+		data >>= 1;
+	}
+}
+
+WRITE8_DEVICE_HANDLER( k051649_test_w )
+{
+	k051649_state *info = get_safe_token(device);
+	info->test = data;
+}
+
+READ8_DEVICE_HANDLER ( k051649_test_r )
+{
+	k051649_state *info = get_safe_token(device);
+
+	/* reading the test register sets it to $ff! */
+	info->test = 0xff;
+	return 0xff;
 }
 
 
@@ -236,10 +310,10 @@ DEVICE_GET_INFO( k051649 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "K051649");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Konami custom");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Konami custom");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
