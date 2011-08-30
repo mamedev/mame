@@ -52,8 +52,8 @@
            instruments in hotdebut).
                    Thanks to Team Japump! for MP3s from a real PCB.
            fixed crash if MAME is run with no sound.
-   June 4, 2003 -  Changed to dual-license with LGPL for use in OpenMSX.
-                   OpenMSX contributed a bugfix where looped samples were
+   June 4, 2003 -  Changed to dual-license with LGPL for use in openMSX.
+                   openMSX contributed a bugfix where looped samples were
             not being addressed properly, causing pitch fluctuation.
 
    With further improvements over the years by MAME team.
@@ -108,14 +108,15 @@ typedef struct
 	UINT32 env_vol_step;
 	UINT32 env_vol_lim;
 	INT8 env_preverb;
+
+	int num;		/* slot number (for debug only) */
+	struct _YMF278BChip *chip;	/* pointer back to parent chip */
 } YMF278BSlot;
 
-typedef struct
+typedef struct _YMF278BChip
 {
 	UINT8 pcmregs[256];
 	YMF278BSlot slots[24];
-	INT8 lsitest0;
-	INT8 lsitest1;
 	INT8 wavetblhdr;
 	INT8 memmode;
 	INT32 memadr;
@@ -142,6 +143,9 @@ typedef struct
 	UINT32 romsize;
 	int clock;
 
+	// precomputed tables
+	UINT32 lut_ar[64];				// attack rate
+	UINT32 lut_dr[64];				// decay rate
 	INT32 volume[256*4];			// precalculated attenuation values with some margin for envelope and pan levels
 	int pan_left[16],pan_right[16];	// pan volume offsets
 	INT32 mix_level[8];
@@ -172,6 +176,8 @@ INLINE UINT8 ymf278b_read_memory(YMF278BChip *chip, UINT32 offset)
 }
 
 
+/**************************************************************************/
+
 static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 {
 	int res, oct;
@@ -198,36 +204,6 @@ static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 	return res;
 }
 
-INLINE UINT32 ymf278_compute_attack_rate(int num)
-{
-	// estimated (less accurate on high rates)
-	UINT32 samples;
-
-	if (num <= 3 || num == 63)
-		samples = 0;
-	else if (num >= 60)
-		samples = 17;
-	else
-		samples = (67 << (15 - num / 4)) / (4 + num % 4);
-
-	return samples;
-}
-
-static UINT32 ymf278_compute_decay_rate(int num)
-{
-	// estimated
-	UINT32 samples;
-
-	if (num <= 3)
-		samples = 0;
-	else if (num >= 60)
-		samples = 15 << 4;
-	else
-		samples = (15 << (21 - num / 4)) / (4 + num % 4);
-
-	return samples;
-}
-
 static UINT32 ymf278_compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 {
 	int rate;
@@ -248,7 +224,7 @@ static UINT32 ymf278_compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 	if (rate < 4)
 		res = 0;
 	else
-		res = (256U<<23) / ymf278_compute_decay_rate(rate);
+		res = (256U<<23) / slot->chip->lut_dr[rate];
 
 	return res;
 }
@@ -293,8 +269,8 @@ static void ymf278b_compute_envelope(YMF278BSlot *slot)
 			else
 			{
 				// NOTE: attack rate is linear here, but datasheet shows a smooth curve
-				LOG(("YMF278B: Attack, val = %d, rate = %d, delay = %g\n", slot->AR, rate, ymf278_compute_attack_rate(rate)*1000.0));
-				slot->env_vol_step = ~((256U<<23) / ymf278_compute_attack_rate(rate));
+				LOG(("YMF278B: Attack, val = %d, rate = %d, delay = %g\n", slot->AR, rate, slot->chip->lut_ar[rate]*1000.0));
+				slot->env_vol_step = ~((256U<<23) / slot->chip->lut_ar[rate]);
 			}
 
 			break;
@@ -304,7 +280,7 @@ static void ymf278b_compute_envelope(YMF278BSlot *slot)
 		case 1:
 			if(slot->DL)
 			{
-				LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->DL, slot->D1R, ymf278b_compute_rate(slot, slot->D1R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D1R))*1000.0, slot->preverb, slot->DAMP));
+				LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->DL, slot->D1R, ymf278b_compute_rate(slot, slot->D1R), slot->chip->lut_dr[ymf278b_compute_rate(slot, slot->D1R)]*1000.0, slot->preverb, slot->DAMP));
 				slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D1R);
 				slot->env_vol_lim = (slot->DL*8)<<23;
 			}
@@ -319,7 +295,7 @@ static void ymf278b_compute_envelope(YMF278BSlot *slot)
 
 		// Decay 2
 		case 2:
-			LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, , PRVB = %d, DAMP = %d, current vol = %d\n", slot->D2R, ymf278b_compute_rate(slot, slot->D2R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D2R))*1000.0, slot->preverb, slot->DAMP, slot->env_vol >> 23));
+			LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, , PRVB = %d, DAMP = %d, current vol = %d\n", slot->D2R, ymf278b_compute_rate(slot, slot->D2R), slot->chip->lut_dr[ymf278b_compute_rate(slot, slot->D2R)]*1000.0, slot->preverb, slot->DAMP, slot->env_vol >> 23));
 			slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D2R);
 			slot->env_vol_lim = 256U<<23;
 			break;
@@ -335,7 +311,7 @@ static void ymf278b_compute_envelope(YMF278BSlot *slot)
 
 		// Release
 		case 4:
-			LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->RR, ymf278b_compute_rate(slot, slot->RR), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->RR))*1000.0, slot->preverb, slot->DAMP));
+			LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->RR, ymf278b_compute_rate(slot, slot->RR), slot->chip->lut_dr[ymf278b_compute_rate(slot, slot->RR)]*1000.0, slot->preverb, slot->DAMP));
 			slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->RR);
 			slot->env_vol_lim = 256U<<23;
 			break;
@@ -467,6 +443,9 @@ static TIMER_CALLBACK( ymf278b_timer_b_tick )
 		ymf278b_irq_check(machine, chip);
 	}
 }
+
+
+/**************************************************************************/
 
 static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
@@ -902,6 +881,8 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 }
 
 
+/**************************************************************************/
+
 static DEVICE_RESET( ymf278b )
 {
 	YMF278BChip *chip = get_safe_token(device);
@@ -954,6 +935,8 @@ static DEVICE_RESET( ymf278b )
 
 static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_t *, int))
 {
+	int i;
+
 	chip->rom = *device->region();
 	chip->romsize = device->region()->bytes();
 	chip->clock = device->clock();
@@ -964,6 +947,39 @@ static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
 	chip->timer_busy = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_busy_clear), chip);
 	chip->timer_ld = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_ld_clear), chip);
+
+	for (i = 0; i < 24; i++)
+	{
+		chip->slots[i].num = i;
+		chip->slots[i].chip = chip;
+	}
+}
+
+static void precompute_rate_tables(YMF278BChip *chip)
+{
+	int i;
+
+	// decay rate
+	for (i = 0; i < 64; i++)
+	{
+		if (i <= 3)
+			chip->lut_dr[i] = 0;
+		else if (i >= 60)
+			chip->lut_dr[i] = 15 << 4;
+		else
+			chip->lut_dr[i] = (15 << (21 - i / 4)) / (4 + i % 4);
+	}
+
+	// attack rate (manual shows curve instead of linear though, so this is not entirely accurate)
+	for (i = 0; i < 64; i++)
+	{
+		if (i <= 3 || i == 63)
+			chip->lut_ar[i] = 0;
+		else if (i >= 60)
+			chip->lut_ar[i] = 17;
+		else
+			chip->lut_ar[i] = (67 << (15 - i / 4)) / (4 + i % 4);
+	}
 }
 
 static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
@@ -971,8 +987,6 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 	int i;
 
 	device->save_item(NAME(chip->pcmregs));
-	device->save_item(NAME(chip->lsitest0));
-	device->save_item(NAME(chip->lsitest1));
 	device->save_item(NAME(chip->wavetblhdr));
 	device->save_item(NAME(chip->memmode));
 	device->save_item(NAME(chip->memadr));
@@ -1044,6 +1058,9 @@ static DEVICE_START( ymf278b )
 
 	ymf278b_init(device, chip, intf->irq_callback);
 	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/768, chip, ymf278b_pcm_update);
+
+	// rate tables
+	precompute_rate_tables(chip);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB
 	for(i = 0; i < 256; i++)
