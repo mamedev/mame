@@ -838,6 +838,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/bottom9.o $(VIDEO)/bottom9.o \
 	$(DRIVERS)/chqflag.o $(VIDEO)/chqflag.o \
 	$(DRIVERS)/circusc.o $(VIDEO)/circusc.o \
+    $(DRIVERS)/cobra.o \
 	$(DRIVERS)/combatsc.o $(VIDEO)/combatsc.o \
 	$(DRIVERS)/contra.o $(VIDEO)/contra.o \
 	$(DRIVERS)/crimfght.o $(VIDEO)/crimfght.o \
