@@ -149,6 +149,11 @@ m_searchpath = combinedpath;
 		m_record_list.reset();
 		return NOTFOUND;
 	}
+	else if (required == 0)
+	{
+		m_record_list.reset();
+		return NONE_NEEDED;
+	}
 
 	// return a summary
 	return summarize(m_enumerator.driver().name);
@@ -205,6 +210,11 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 	{
 		m_record_list.reset();
 		return NOTFOUND;
+	}
+	else if (required == 0)
+	{
+		m_record_list.reset();
+		return NONE_NEEDED;
 	}
 
 	// return a summary

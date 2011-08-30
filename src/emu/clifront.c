@@ -755,6 +755,8 @@ void cli_frontend::verifyroms(const char *gamename)
 
 		// audit the ROMs in this set
 		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+		if (summary == media_auditor::NONE_NEEDED)
+			continue;
 
 		// if not found, count that and leave it at that
 		if (summary == media_auditor::NOTFOUND)
@@ -803,7 +805,7 @@ void cli_frontend::verifyroms(const char *gamename)
 	machine_config &config = dummy_drivlist.config();
 	device_t *owner = config.devicelist().first();
 	// check if all are listed, note that empty one is included
-	for (int i=0;i<m_device_count;i++)
+	for (int i = 0; i < m_device_count; i++)
 	{
 		device_type type = *s_devices_sorted[i];
 		device_t *dev = (*type)(config, "dummy", owner, 0);
@@ -862,7 +864,7 @@ void cli_frontend::verifyroms(const char *gamename)
 	zip_file_cache_clear();
 
 	// return an error if none found
-	if (matched==0)
+	if (matched == 0)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
@@ -871,7 +873,7 @@ void cli_frontend::verifyroms(const char *gamename)
 		if (notfound > 0)
 			throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename);
 		else
-			throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" not supported!\n", gamename);
+			throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" has no roms!\n", gamename);
 	}
 
 	// otherwise, print a summary
