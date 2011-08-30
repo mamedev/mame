@@ -233,12 +233,12 @@ media_auditor::summary media_auditor::audit_samples()
 	m_record_list.reset();
 
 	int required = 0;
+	int found = 0;
 
 	// iterate over sample entries
 	for (const device_t *device = m_enumerator.config().first_device(); device != NULL; device = device->next())
 		if (device->type() == SAMPLES)
 		{
-			required++;
 			const samples_interface *intf = reinterpret_cast<const samples_interface *>(device->static_config());
 			if (intf->samplenames != NULL)
 			{
@@ -255,6 +255,8 @@ media_auditor::summary media_auditor::audit_samples()
 						continue;
 					}
 
+					required++;
+
 					// create a new record
 					audit_record &record = m_record_list.append(*global_alloc(audit_record(intf->samplenames[sampnum], audit_record::MEDIA_SAMPLE)));
 
@@ -267,17 +269,18 @@ media_auditor::summary media_auditor::audit_samples()
 						// attempt to access the file
 						file_error filerr = file.open(curpath);
 						if (filerr == FILERR_NONE)
+						{
 							record.set_status(audit_record::STATUS_GOOD, audit_record::SUBSTATUS_GOOD);
+							found++;
+						}
 						else
 							record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND);
 					}
-					record.set_shared_source(NULL);
 				}
 			}
 		}
 
-	// no count AND no records means not found
-	if (m_record_list.count() == 0 && required > 0)
+	if (found == 0 && required > 0)
 	{
 		m_record_list.reset();
 		return NOTFOUND;
@@ -350,7 +353,7 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *strin
 				if (string != NULL)
 				{
 					const rom_source *shared_source = record->shared_source();
-					if (shared_source == NULL || shared_source->shortname() == NULL) string->catprintf("NOT FOUND\n");
+					if (shared_source == NULL) string->catprintf("NOT FOUND\n");
 					else string->catprintf("NOT FOUND (%s)\n", shared_source->shortname());
 				}
 				break;
@@ -556,7 +559,8 @@ audit_record::audit_record(const rom_entry &media, media_type type)
 	  m_substatus(SUBSTATUS_ERROR),
 	  m_name(ROM_GETNAME(&media)),
 	  m_explength(rom_file_size(&media)),
-	  m_length(0)
+	  m_length(0),
+	  m_shared_source(NULL)
 {
 	m_exphashes.from_internal_string(ROM_GETHASHDATA(&media));
 }
@@ -568,6 +572,7 @@ audit_record::audit_record(const char *name, media_type type)
 	  m_substatus(SUBSTATUS_ERROR),
 	  m_name(name),
 	  m_explength(0),
-	  m_length(0)
+	  m_length(0),
+	  m_shared_source(NULL)
 {
 }
