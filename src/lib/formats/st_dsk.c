@@ -8,8 +8,7 @@
 
 #include "formats/st_dsk.h"
 
-st_gen_format::st_gen_format(const char *name,const char *extensions,const char *description,const char *param_guidelines) :
-	floppy_image_format_t(name,extensions,description,param_guidelines)
+st_gen_format::st_gen_format() : floppy_image_format_t()
 {
 }
 

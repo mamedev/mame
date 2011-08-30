@@ -8,9 +8,28 @@
 
 #include "formats/ami_dsk.h"
 
-adf_format::adf_format(const char *name,const char *extensions,const char *description,const char *param_guidelines) :
-	floppy_image_format_t(name,extensions,description,param_guidelines)
+adf_format::adf_format() : floppy_image_format_t()
 {
+}
+
+const char *adf_format::name() const
+{
+	return "adf";
+}
+
+const char *adf_format::description() const
+{
+	return "Amiga ADF floppy disk image";
+}
+
+const char *adf_format::extensions() const
+{
+	return "adf";
+}
+
+bool adf_format::supports_save() const
+{
+	return false;
 }
 
 int adf_format::identify(floppy_image *image)

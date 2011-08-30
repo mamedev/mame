@@ -28,9 +28,28 @@ struct MFMTRACKIMG
 
 #pragma pack()
 
-mfm_format::mfm_format(const char *name,const char *extensions,const char *description,const char *param_guidelines) :
-	floppy_image_format_t(name,extensions,description,param_guidelines)
+mfm_format::mfm_format() : floppy_image_format_t()
 {
+}
+
+const char *mfm_format::name() const
+{
+	return "mfm";
+}
+
+const char *mfm_format::description() const
+{
+	return "HxCFloppyEmulator floppy disk image";
+}
+
+const char *mfm_format::extensions() const
+{
+	return "mfm";
+}
+
+bool mfm_format::supports_save() const
+{
+	return false;
 }
 
 int mfm_format::identify(floppy_image *image)

@@ -57,19 +57,21 @@ void floppy_image_device::device_config_complete()
 	image_device_format **formatptr;
     image_device_format *format;
     formatptr = &m_formatlist;
-	int cnt = 0;
 	m_extension_list[0] = '\0';
-	while (m_formats[cnt].name)
+	m_fif_list = 0;
+	for(int cnt=0; m_formats[cnt]; cnt++)
 	{
 		// allocate a new format
+		floppy_image_format_t *fif = m_formats[cnt]();
+
 		format = global_alloc_clear(image_device_format);
 		format->m_index 	  = cnt;
-		format->m_name        = m_formats[cnt].name;
-		format->m_description = m_formats[cnt].description;
-		format->m_extensions  = m_formats[cnt].extensions;
-		format->m_optspec     = (m_formats[cnt].param_guidelines) ? m_formats[cnt].param_guidelines : "";
+		format->m_name        = fif->name();
+		format->m_description = fif->description();
+		format->m_extensions  = fif->extensions();
+		format->m_optspec     = "";
 
-		image_specify_extension( m_extension_list, 256, m_formats[cnt].extensions );
+		image_specify_extension( m_extension_list, 256, fif->extensions() );
 		// and append it to the list
 		*formatptr = format;
 		formatptr = &format->m_next;
@@ -116,10 +118,10 @@ bool floppy_image_device::call_load()
 	device_image_interface *image = this;
 	int best;
 	m_image = global_alloc(floppy_image((void *) image, &image_ioprocs, m_formats));
-	const struct floppy_format_def *format = m_image->identify(&best);
+	floppy_image_format_t *format = m_image->identify(&best);
 	m_dskchg = 0;
 	if (format) {
-		m_image->load(best);
+		format->load(m_image);
 		if (m_load_func)
 			return m_load_func(*this);
 	} else {

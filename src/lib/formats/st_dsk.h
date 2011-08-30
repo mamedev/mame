@@ -14,7 +14,7 @@
 class st_gen_format : public floppy_image_format_t
 {
 public:
-	st_gen_format(const char *name,const char *extensions,const char *description,const char *param_guidelines);
+	st_gen_format();
 
 	static const desc_e desc_fcp_9[];
 

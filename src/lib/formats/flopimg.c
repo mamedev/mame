@@ -941,16 +941,26 @@ LEGACY_FLOPPY_OPTIONS_END
 /// New implementation
 //////////////////////////////////////////////////////////
 
-floppy_image::floppy_image(void *fp, const struct io_procs *procs,const struct floppy_format_def *formats)
+floppy_image::floppy_image(void *fp, const struct io_procs *procs, const floppy_format_type *formats)
 {
 	m_io.file = fp;
 	m_io.procs = procs;
 	m_io.filler = 0xFF;
-	m_formats = formats;
+	m_formats = 0;
+	for(int i=0; formats[i]; i++)
+	{
+		floppy_image_format_t *fif = formats[i]();
+		if(m_formats)
+			m_formats->append(fif);
+		else
+			m_formats = fif;
+	}
 }
 
 floppy_image::~floppy_image()
 {
+	if(m_formats)
+		delete m_formats;
 	close();
 }
 
@@ -993,41 +1003,47 @@ void floppy_image::set_meta_data(UINT16 tracks, UINT8 sides, UINT16 rpm, UINT16 
 	m_bitrate= bitrate;
 }
 
-const struct floppy_format_def *floppy_image::identify(int *best)
+floppy_image_format_t *floppy_image::identify(int *best)
 {
-	const struct floppy_format_def *retVal = NULL;
+	floppy_image_format_t *retVal = NULL;
 	int best_vote = 0;
 	*best = -1;
-	for (int i = 0; m_formats[i].type; i++)
+	int id = 0;
+	for(floppy_image_format_t *fif = m_formats; fif; fif = fif->next)
 	{
-		floppy_image_format_t *t = (m_formats[i].type)(m_formats[i].name,m_formats[i].extensions,m_formats[i].description,m_formats[i].param_guidelines);
-		int vote = t->identify(this);
+		int vote = fif->identify(this);
 		/* is this option a better one? */
 		if (vote > best_vote)
 		{
 			best_vote = vote;
-			*best = i;
-			retVal = &m_formats[i];
+			*best = id;
+			retVal = fif;
 		}
+		id++;
 	}
 	return retVal;
 }
 
-bool floppy_image::load(int num)
+floppy_image_format_t::floppy_image_format_t()
 {
-	floppy_image_format_t *t = (m_formats[num].type)(m_formats[num].name,m_formats[num].extensions,m_formats[num].description,m_formats[num].param_guidelines);
-	return t->load(this);
+	next = 0;
 }
 
-floppy_image_format_t::floppy_image_format_t(const char *name,const char *extensions,const char *description,const char *param_guidelines)
-{
-	m_name = name;
-	m_extensions = extensions;
-	m_description = description;
-	m_param_guidelines = param_guidelines;
-}
 floppy_image_format_t::~floppy_image_format_t()
 {
+}
+
+void floppy_image_format_t::append(floppy_image_format_t *_next)
+{
+	if(next)
+		next->append(_next);
+	else
+		next = _next;
+}
+
+bool floppy_image_format_t::save(floppy_image *)
+{
+	return false;
 }
 
 bool floppy_image_format_t::type_no_data(int type) const
