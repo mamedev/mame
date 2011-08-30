@@ -41,7 +41,7 @@
   taken here is to assume the 2V DC offset for all outputs for the YM2149.
   For the AY-3-8910, an offset is used if envelope is active for a channel.
   This is backed by oscilloscope pictures from the datasheet. If a fixed volume
-  is set, i.e. enveloppe is disabled, the output voltage is set to 0V. Recordings
+  is set, i.e. envelope is disabled, the output voltage is set to 0V. Recordings
   I found on the web for gyruss indicate, that the AY-3-8910 offset should
   be around 0.2V. This will also make sound levels more compatible with
   user observations for scramble.
@@ -736,6 +736,7 @@ static void ay8910_statesave(ay8910_context *psg, device_t *device)
 void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, int clock, const ay8910_interface *intf)
 {
 	ay8910_context *info = (ay8910_context *)infoptr;
+	int master_clock = clock;
 
 	if (info == NULL)
 		info = auto_alloc_clear(device->machine(), ay8910_context);
@@ -769,15 +770,19 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 		info->par_env = &ym2149_param_env;
 		info->zero_is_off = 0;
 		info->env_step_mask = 0x1F;
+
+		/* YM2149 master clock divider? */
+		if (info->intf->flags & YM2149_PIN26_LOW)
+			master_clock /= 2;
 	}
 
 	build_mixer_table(info);
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
-	info->channel = device->machine().sound().stream_alloc(*device, 0, info->streams, device->clock() / 8, info, ay8910_update);
+	info->channel = device->machine().sound().stream_alloc(*device, 0, info->streams, master_clock / 8, info, ay8910_update);
 
-	ay8910_set_clock_ym(info,device->clock());
+	ay8910_set_clock_ym(info, master_clock);
 	ay8910_statesave(info, device);
 
 	return info;
@@ -960,7 +965,7 @@ DEVICE_GET_INFO( ay8910 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ay8910_context);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ay8910_context);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ay8910 );			break;
@@ -968,11 +973,11 @@ DEVICE_GET_INFO( ay8910 )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( ay8910 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8910A");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "PSG");							break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8910A");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "PSG");								break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -981,7 +986,7 @@ DEVICE_GET_INFO( ay8912 )
 	switch (state)
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ay8910 );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8912A");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8912A");						break;
 		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
@@ -991,7 +996,7 @@ DEVICE_GET_INFO( ay8913 )
 	switch (state)
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ay8910 );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8913A");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8913A");						break;
 		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
@@ -1001,7 +1006,7 @@ DEVICE_GET_INFO( ay8930 )
 	switch (state)
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ay8910 );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "AY8930");						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "AY8930");							break;
 		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
@@ -1011,7 +1016,7 @@ DEVICE_GET_INFO( ym2149 )
 	switch (state)
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2149 );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "YM2149");						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YM2149");							break;
 		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
@@ -1021,7 +1026,7 @@ DEVICE_GET_INFO( ym3439 )
 	switch (state)
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2149 );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "YM3439");						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YM3439");							break;
 		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
@@ -1031,7 +1036,7 @@ DEVICE_GET_INFO( ymz284 )
 	switch (state)
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2149 );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ284");						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ284");							break;
 		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
@@ -1041,7 +1046,7 @@ DEVICE_GET_INFO( ymz294 )
 	switch (state)
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2149 );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ294");						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ294");							break;
 		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
 	}
 }
