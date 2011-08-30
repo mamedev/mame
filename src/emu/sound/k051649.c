@@ -6,26 +6,28 @@
     Namco Sound, Amuse by Cab, Haunted Castle schematics and whoever first
     figured out SCC!
 
-    The 051649 is a 5 channel sound generator, each channel gets it's
+    The 051649 is a 5 channel sound generator, each channel gets its
     waveform from RAM (32 bytes per waveform, 8 bit signed data).
 
     This sound chip is the same as the sound chip in some Konami
     megaROM cartridges for the MSX. It is actually well researched
     and documented:
 
-        http://www.msxnet.org/tech/scc
+        http://bifi.msxnet.org/msxnet/tech/scc.html
 
     Thanks to Sean Young (sean@mess.org) for some bugfixes.
 
-    K052539 is equivalent to this chip except channel 5 does not share
-    waveforms with channel 4.
+    K052539 is more or less equivalent to this chip except channel 5
+    does not share waveram with channel 4.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "k051649.h"
 
-#define FREQBASEBITS	16
+#define FREQ_BITS	16
+#define DEF_GAIN	8
+
 
 /* this structure defines the parameters for a channel */
 typedef struct
@@ -34,7 +36,7 @@ typedef struct
 	int frequency;
 	int volume;
 	int key;
-	signed char waveform[32];		/* 19991207.CAB */
+	signed char waveram[32];
 } k051649_sound_channel;
 
 typedef struct _k051649_state k051649_state;
@@ -51,9 +53,8 @@ struct _k051649_state
 	INT16 *mixer_lookup;
 	short *mixer_buffer;
 
-	/* misc */
+	/* chip registers */
 	UINT8 test;
-	int f[10];
 };
 
 INLINE k051649_state *get_safe_token(device_t *device)
@@ -66,9 +67,7 @@ INLINE k051649_state *get_safe_token(device_t *device)
 /* build a table to divide by the number of voices */
 static void make_mixer_table(running_machine &machine, k051649_state *info, int voices)
 {
-	int count = voices * 256;
 	int i;
-	int gain = 8;
 
 	/* allocate memory */
 	info->mixer_table = auto_alloc_array(machine, INT16, 512 * voices);
@@ -77,9 +76,9 @@ static void make_mixer_table(running_machine &machine, k051649_state *info, int 
 	info->mixer_lookup = info->mixer_table + (256 * voices);
 
 	/* fill in the table - 16 bit case */
-	for (i = 0; i < count; i++)
+	for (i = 0; i < (voices * 256); i++)
 	{
-		int val = i * gain * 16 / voices;
+		int val = i * DEF_GAIN * 16 / voices;
 		if (val > 32767) val = 32767;
 		info->mixer_lookup[ i] = val;
 		info->mixer_lookup[-i] = -val;
@@ -94,20 +93,19 @@ static STREAM_UPDATE( k051649_update )
 	k051649_sound_channel *voice=info->channel_list;
 	stream_sample_t *buffer = outputs[0];
 	short *mix;
-	int i,v,f,j,k;
+	int i,j;
 
 	/* zap the contents of the mixer buffer */
 	memset(info->mixer_buffer, 0, samples * sizeof(short));
 
-	for (j=0; j<5; j++) {
-		v=voice[j].volume;
-		f=voice[j].frequency;
-		k=voice[j].key;
-		/* SY 20040109: the SCC produces no sound for freq < 9 (channel is halted) */
-		if (f > 8)
+	for (j = 0; j < 5; j++) {
+		/* channel is halted for freq < 9 */
+		if (voice[j].frequency > 8)
 		{
-			const signed char *w = voice[j].waveform;			/* 19991207.CAB */
+			const signed char *w = voice[j].waveram;
+			int v=voice[j].volume * voice[j].key;
 			int c=voice[j].counter;
+			int step = ((INT64)info->mclock * (1 << FREQ_BITS)) / (float)((voice[j].frequency + 1) * 16 * (info->rate / 32)) + 0.5;
 
 			mix = info->mixer_buffer;
 
@@ -116,11 +114,9 @@ static STREAM_UPDATE( k051649_update )
 			{
 				int offs;
 
-				/* Amuse source:  Cab suggests this method gives greater resolution */
-				/* Sean Young 20010417: the formula is really: f = clock/(16*(f+1))*/
-				c+=(long)((((float)info->mclock / (float)((f+1) * 16))*(float)(1<<FREQBASEBITS)) / (float)(info->rate / 32));
-				offs = (c >> FREQBASEBITS) & 0x1f;
-				*mix++ += (w[offs] * v * k)>>3;
+				c += step;
+				offs = (c >> FREQ_BITS) & 0x1f;
+				*mix++ += (w[offs] * v)>>3;
 			}
 
 			/* update the counter for this voice */
@@ -166,8 +162,6 @@ static DEVICE_RESET( k051649 )
 
 	/* other parameters */
 	info->test = 0;
-	for (i = 0; i < 5; i++)
-		info->f[i] = 0;
 }
 
 /********************************************************************************/
@@ -175,69 +169,63 @@ static DEVICE_RESET( k051649 )
 WRITE8_DEVICE_HANDLER( k051649_waveform_w )
 {
 	k051649_state *info = get_safe_token(device);
-	if (info->test & 0x40)
+
+	/* waveram is read-only? */
+	if (info->test & 0x40 || (info->test & 0x80 && offset >= 0x60))
 		return;
 
 	info->stream->update();
 
     if (offset >= 0x60)
     {
-		if (info->test & 0x80)
-			return;
-
-		/* SY 20001114: Channel 5 shares the waveform with channel 4 */
-		info->channel_list[3].waveform[offset&0x1f]=data;
-		info->channel_list[4].waveform[offset&0x1f]=data;
+		/* channel 5 shares waveram with channel 4 */
+		info->channel_list[3].waveram[offset&0x1f]=data;
+		info->channel_list[4].waveram[offset&0x1f]=data;
 	}
 	else
-		info->channel_list[offset>>5].waveform[offset&0x1f]=data;
+		info->channel_list[offset>>5].waveram[offset&0x1f]=data;
 }
 
 READ8_DEVICE_HANDLER ( k051649_waveform_r )
 {
 	k051649_state *info = get_safe_token(device);
 
-	if (offset >= 0x60)
+	/* test-register bits 6/7 expose the internal counter */
+	if (info->test & 0xc0)
 	{
-		if (info->test & 0xc0)
-		{
-			info->stream->update();
-			offset += (info->channel_list[3 + (info->test >> 6 & 1)].counter >> FREQBASEBITS);
-		}
+		info->stream->update();
+		
+		if (offset >= 0x60)
+			offset += (info->channel_list[3 + (info->test >> 6 & 1)].counter >> FREQ_BITS);
+		else if (info->test & 0x40)
+			offset += (info->channel_list[offset>>5].counter >> FREQ_BITS);
 	}
-	else
-	{
-		if (info->test & 0x40)
-		{
-			info->stream->update();
-			offset += (info->channel_list[offset>>5].counter >> FREQBASEBITS);
-		}
-	}
-	return info->channel_list[offset>>5].waveform[offset&0x1f];
+	return info->channel_list[offset>>5].waveram[offset&0x1f];
 }
 
 WRITE8_DEVICE_HANDLER( k052539_waveform_w )
 {
 	k051649_state *info = get_safe_token(device);
+
+	/* waveram is read-only? */
 	if (info->test & 0x40)
 		return;
 
 	info->stream->update();
-
-	/* SY 20001114: Channel 5 doesn't share the waveform with channel 4 on this chip */
-	info->channel_list[offset>>5].waveform[offset&0x1f]=data;
+	info->channel_list[offset>>5].waveram[offset&0x1f]=data;
 }
 
 READ8_DEVICE_HANDLER ( k052539_waveform_r )
 {
 	k051649_state *info = get_safe_token(device);
 
+	/* test-register bit 6 exposes the internal counter */
 	if (info->test & 0x40)
 	{
 		info->stream->update();
-		offset += (info->channel_list[offset>>5].counter >> FREQBASEBITS);
+		offset += (info->channel_list[offset>>5].counter >> FREQ_BITS);
 	}
-	return info->channel_list[offset>>5].waveform[offset&0x1f];
+	return info->channel_list[offset>>5].waveram[offset&0x1f];
 }
 
 WRITE8_DEVICE_HANDLER( k051649_volume_w )
@@ -250,16 +238,22 @@ WRITE8_DEVICE_HANDLER( k051649_volume_w )
 WRITE8_DEVICE_HANDLER( k051649_frequency_w )
 {
 	k051649_state *info = get_safe_token(device);
-	info->f[offset]=data;
+	int freq_hi = offset & 1;
+	offset >>= 1;
 
 	info->stream->update();
 
+	/* test-register bit 5 resets the internal counter */
 	if (info->test & 0x20)
-		info->channel_list[offset>>1].counter = ~0;
-	else if (info->channel_list[offset>>1].frequency < 9)
-		info->channel_list[offset>>1].counter |= ((1 << FREQBASEBITS) - 1);
+		info->channel_list[offset].counter = ~0;
+	else if (info->channel_list[offset].frequency < 9)
+		info->channel_list[offset].counter |= ((1 << FREQ_BITS) - 1);
 
-	info->channel_list[offset>>1].frequency=(info->f[offset&0xe] + (info->f[offset|1]<<8))&0xfff;
+	/* update frequency */
+	if (freq_hi)
+		info->channel_list[offset].frequency = (info->channel_list[offset].frequency & 0x0ff) | (data << 8 & 0xf00);
+	else
+		info->channel_list[offset].frequency = (info->channel_list[offset].frequency & 0xf00) | data;
 }
 
 WRITE8_DEVICE_HANDLER( k051649_keyonoff_w )
@@ -282,10 +276,8 @@ WRITE8_DEVICE_HANDLER( k051649_test_w )
 
 READ8_DEVICE_HANDLER ( k051649_test_r )
 {
-	k051649_state *info = get_safe_token(device);
-
 	/* reading the test register sets it to $ff! */
-	info->test = 0xff;
+	k051649_test_w(device, offset, 0xff);
 	return 0xff;
 }
 
