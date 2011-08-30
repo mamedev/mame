@@ -906,6 +906,8 @@ void cli_frontend::verifysamples(const char *gamename)
 	{
 		// audit the samples in this set
 		media_auditor::summary summary = auditor.audit_samples();
+		if (summary == media_auditor::NONE_NEEDED)
+			continue;
 
 		// output the summary of the audit
 		astring summary_string;

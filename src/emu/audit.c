@@ -222,10 +222,13 @@ media_auditor::summary media_auditor::audit_samples()
 	// start fresh
 	m_record_list.reset();
 
+	int required = 0;
+
 	// iterate over sample entries
 	for (const device_t *device = m_enumerator.config().first_device(); device != NULL; device = device->next())
 		if (device->type() == SAMPLES)
 		{
+			required++;
 			const samples_interface *intf = reinterpret_cast<const samples_interface *>(device->static_config());
 			if (intf->samplenames != NULL)
 			{
@@ -263,8 +266,16 @@ media_auditor::summary media_auditor::audit_samples()
 		}
 
 	// no count AND no records means not found
-	if (m_record_list.count() == 0)
+	if (m_record_list.count() == 0 && required > 0)
+	{
+		m_record_list.reset();
 		return NOTFOUND;
+	}
+	else if (required == 0)
+	{
+		m_record_list.reset();
+		return NONE_NEEDED;
+	}
 
 	// return a summary
 	return summarize(m_enumerator.driver().name);
