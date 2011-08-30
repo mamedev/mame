@@ -261,6 +261,7 @@ media_auditor::summary media_auditor::audit_samples()
 						else
 							record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND);
 					}
+					record.set_shared_source(NULL);
 				}
 			}
 		}
@@ -339,7 +340,7 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *strin
 				if (string != NULL)
 				{
 					const rom_source *shared_source = record->shared_source();
-					if (shared_source == NULL) string->catprintf("NOT FOUND\n");
+					if (shared_source == NULL || shared_source->shortname() == NULL) string->catprintf("NOT FOUND\n");
 					else string->catprintf("NOT FOUND (%s)\n", shared_source->shortname());
 				}
 				break;
