@@ -1695,6 +1695,9 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/dwarfd.o \
 	$(DRIVERS)/dynadice.o \
 	$(DRIVERS)/ecoinfr.o \
+	$(DRIVERS)/ecoinf1.o \
+	$(DRIVERS)/ecoinf2.o \
+	$(DRIVERS)/ecoinf3.o \
 	$(DRIVERS)/epos.o $(VIDEO)/epos.o \
 	$(DRIVERS)/esd16.o $(VIDEO)/esd16.o \
 	$(DRIVERS)/esh.o \

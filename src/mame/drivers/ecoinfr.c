@@ -1,4 +1,18 @@
 /* Electrocoin Fruit Machines
+ 
+ This seems to be the most common Electrocoin hardware type, used
+ extensively by Electrocoin with a number of 3rd party sets running on
+ the same boards / same cabinets to provide different gameplay features.
+ Some of these are scrambled (see the MAB sets)
+
+ Build dates in the sets seem to range from 1991 - 2007
+  (todo, put correct dates for each rom in the driver)
+
+ A PIC16C54A is used for security.
+
+ the UART chips in the board are either an NEC D71051C-10 or an OKI M82C51A-2
+
+------------------------------
 
  WARNING: I have little faith in many of these sets being what they claim to be,
           the headers in the ROMs often indicate different titles, and sevearl of
@@ -8,14 +22,20 @@
           Proceed with caution if emulating this stuff, if in doubt, and things
           aren't acting as you expect, try one of the other ROMs from the sets!
 
-          Most genuine Electrocoin sets seem to be Z80 based
-
           Some roms are in HEX format and should be converted to binary.
+
+
+  30/08/11 - Started to sort out the roms by header type, some things are clearly
+             just newer revisions / alt titles of other things. DH
 */
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+//#include "machine/msm8251.h"
+
+#define UPD8251_TAG      "upd8251"
+
 
 class ecoinfr_state : public driver_device
 {
@@ -23,86 +43,607 @@ public:
 	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	int irq_toggle;
+
+	UINT8 port09_value;
+	UINT8 port10_value;
+	UINT8 port11_value;
+	UINT8 port12_value;
+	UINT8 port13_value;
+	UINT8 port14_value;
+	UINT8 port15_value;
+	UINT8 port16_value;
+	UINT8 port17_value;
+
 };
 
 
+
+TIMER_DEVICE_CALLBACK( ecoinfr_irq_timer )
+{
+
+	ecoinfr_state *state = timer.machine().driver_data<ecoinfr_state>();
+	state->irq_toggle^=1;
+
+	//printf("blah %d\n", state->irq_toggle);
+
+	/* What are the IRQ sources / freq?
+	 It runs in IM2
+	 0xe0 / 0xe4 seem to be the valid interrupts
+	 0xf0 / 0xf4 mirror those
+
+	 NMI is also valid
+	
+	*/
+
+	if (state->irq_toggle==0)
+	{
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xe4);
+	}
+	else
+	{
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xe0);
+	}
+
+
+}
+
+
+WRITE8_HANDLER( ec_port00_out_w )
+{
+	// Reel 1 Control
+}
+
+WRITE8_HANDLER( ec_port01_out_w )
+{
+	// Reel 2 Control
+}
+
+WRITE8_HANDLER( ec_port02_out_w )
+{
+	// Reel 3 Control
+}
+
+WRITE8_HANDLER( ec_port03_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port04_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port05_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port06_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port07_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port08_out_w )
+{
+
+}
+
+// we could do the same thing here with input ports configured to outputs, however
+// I've done it with handlers for now as it allows greater flexibility while the driver
+// is developed
+WRITE8_HANDLER( ec_port09_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port09_value = state->port09_value;
+	state->port09_value = data;
+
+	if ((state->port09_value&0x01) != (old_port09_value&0x01)) printf("port09 0x01 changed %02x\n", state->port09_value&0x01);
+	if ((state->port09_value&0x02) != (old_port09_value&0x02)) printf("port09 0x02 changed %02x\n", state->port09_value&0x02);
+	if ((state->port09_value&0x04) != (old_port09_value&0x04)) printf("port09 0x04 changed %02x (REEL3 ENABLE)\n", state->port09_value&0x04);
+	if ((state->port09_value&0x08) != (old_port09_value&0x08)) printf("port09 0x08 changed %02x (REEL2 ENABLE)\n", state->port09_value&0x08);
+	if ((state->port09_value&0x10) != (old_port09_value&0x10)) printf("port09 0x10 changed %02x (REEL1 ENABLE)\n", state->port09_value&0x10);
+	if ((state->port09_value&0x20) != (old_port09_value&0x20)) printf("port09 0x20 changed %02x\n", state->port09_value&0x20);
+	if ((state->port09_value&0x40) != (old_port09_value&0x40)) printf("port09 0x40 changed %02x\n", state->port09_value&0x40);
+	if ((state->port09_value&0x80) != (old_port09_value&0x80)) printf("port09 0x80 changed %02x\n", state->port09_value&0x80);
+}
+
+WRITE8_HANDLER( ec_port0a_out_w )
+{
+
+}
+
+
+WRITE8_HANDLER( ec_port0b_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port0c_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port0d_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port0e_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port0f_out_w )
+{
+
+}
+
+WRITE8_HANDLER( ec_port10_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port10_value = state->port10_value;
+	state->port10_value = data;
+
+	if ((state->port10_value&0x01) != (old_port10_value&0x01)) printf("port10 0x01 changed %02x\n", state->port10_value&0x01);
+	if ((state->port10_value&0x02) != (old_port10_value&0x02)) printf("port10 0x02 changed %02x\n", state->port10_value&0x02);
+	if ((state->port10_value&0x04) != (old_port10_value&0x04)) printf("port10 0x04 changed %02x\n", state->port10_value&0x04);
+	if ((state->port10_value&0x08) != (old_port10_value&0x08)) printf("port10 0x08 changed %02x\n", state->port10_value&0x08);
+	if ((state->port10_value&0x10) != (old_port10_value&0x10)) printf("port10 0x10 changed %02x\n", state->port10_value&0x10);
+	if ((state->port10_value&0x20) != (old_port10_value&0x20)) printf("port10 0x20 changed %02x\n", state->port10_value&0x20);
+	if ((state->port10_value&0x40) != (old_port10_value&0x40)) printf("port10 0x40 changed %02x\n", state->port10_value&0x40);
+	if ((state->port10_value&0x80) != (old_port10_value&0x80)) printf("port10 0x80 changed %02x\n", state->port10_value&0x80);
+}
+
+WRITE8_HANDLER( ec_port11_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port11_value = state->port11_value;
+	state->port11_value = data;
+
+	if ((state->port11_value&0x01) != (old_port11_value&0x01)) printf("port11 0x01 changed %02x\n", state->port11_value&0x01);
+	if ((state->port11_value&0x02) != (old_port11_value&0x02)) printf("port11 0x02 changed %02x\n", state->port11_value&0x02);
+	if ((state->port11_value&0x04) != (old_port11_value&0x04)) printf("port11 0x04 changed %02x\n", state->port11_value&0x04);
+	if ((state->port11_value&0x08) != (old_port11_value&0x08)) printf("port11 0x08 changed %02x\n", state->port11_value&0x08);
+	if ((state->port11_value&0x10) != (old_port11_value&0x10)) printf("port11 0x10 changed %02x\n", state->port11_value&0x10);
+	if ((state->port11_value&0x20) != (old_port11_value&0x20)) printf("port11 0x20 changed %02x\n", state->port11_value&0x20);
+	if ((state->port11_value&0x40) != (old_port11_value&0x40)) printf("port11 0x40 changed %02x\n", state->port11_value&0x40);
+	if ((state->port11_value&0x80) != (old_port11_value&0x80)) printf("port11 0x80 changed %02x\n", state->port11_value&0x80);
+}
+
+WRITE8_HANDLER( ec_port12_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port12_value = state->port12_value;
+	state->port12_value = data;
+
+	if ((state->port12_value&0x01) != (old_port12_value&0x01)) printf("port12 0x01 changed %02x\n", state->port12_value&0x01);
+	if ((state->port12_value&0x02) != (old_port12_value&0x02)) printf("port12 0x02 changed %02x\n", state->port12_value&0x02);
+	if ((state->port12_value&0x04) != (old_port12_value&0x04)) printf("port12 0x04 changed %02x\n", state->port12_value&0x04);
+	if ((state->port12_value&0x08) != (old_port12_value&0x08)) printf("port12 0x08 changed %02x\n", state->port12_value&0x08);
+	if ((state->port12_value&0x10) != (old_port12_value&0x10)) printf("port12 0x10 changed %02x\n", state->port12_value&0x10);
+	if ((state->port12_value&0x20) != (old_port12_value&0x20)) printf("port12 0x20 changed %02x\n", state->port12_value&0x20);
+	if ((state->port12_value&0x40) != (old_port12_value&0x40)) printf("port12 0x40 changed %02x\n", state->port12_value&0x40);
+	if ((state->port12_value&0x80) != (old_port12_value&0x80)) printf("port12 0x80 changed %02x\n", state->port12_value&0x80);
+}
+
+WRITE8_HANDLER( ec_port13_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port13_value = state->port13_value;
+	state->port13_value = data;
+
+	if ((state->port13_value&0x01) != (old_port13_value&0x01)) printf("port13 0x01 changed %02x\n", state->port13_value&0x01);
+	if ((state->port13_value&0x02) != (old_port13_value&0x02)) printf("port13 0x02 changed %02x\n", state->port13_value&0x02);
+	if ((state->port13_value&0x04) != (old_port13_value&0x04)) printf("port13 0x04 changed %02x\n", state->port13_value&0x04);
+	if ((state->port13_value&0x08) != (old_port13_value&0x08)) printf("port13 0x08 changed %02x\n", state->port13_value&0x08);
+	if ((state->port13_value&0x10) != (old_port13_value&0x10)) printf("port13 0x10 changed %02x\n", state->port13_value&0x10);
+	if ((state->port13_value&0x20) != (old_port13_value&0x20)) printf("port13 0x20 changed %02x\n", state->port13_value&0x20);
+	if ((state->port13_value&0x40) != (old_port13_value&0x40)) printf("port13 0x40 changed %02x\n", state->port13_value&0x40);
+	if ((state->port13_value&0x80) != (old_port13_value&0x80)) printf("port13 0x80 changed %02x\n", state->port13_value&0x80);
+}
+
+WRITE8_HANDLER( ec_port14_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port14_value = state->port14_value;
+	state->port14_value = data;
+
+	if ((state->port14_value&0x01) != (old_port14_value&0x01)) printf("port14 0x01 changed %02x\n", state->port14_value&0x01);
+	if ((state->port14_value&0x02) != (old_port14_value&0x02)) printf("port14 0x02 changed %02x\n", state->port14_value&0x02);
+	if ((state->port14_value&0x04) != (old_port14_value&0x04)) printf("port14 0x04 changed %02x\n", state->port14_value&0x04);
+	if ((state->port14_value&0x08) != (old_port14_value&0x08)) printf("port14 0x08 changed %02x\n", state->port14_value&0x08);
+	if ((state->port14_value&0x10) != (old_port14_value&0x10)) printf("port14 0x10 changed %02x\n", state->port14_value&0x10);
+	if ((state->port14_value&0x20) != (old_port14_value&0x20)) printf("port14 0x20 changed %02x\n", state->port14_value&0x20);
+	if ((state->port14_value&0x40) != (old_port14_value&0x40)) printf("port14 0x40 changed %02x\n", state->port14_value&0x40);
+	if ((state->port14_value&0x80) != (old_port14_value&0x80)) printf("port14 0x80 changed %02x\n", state->port14_value&0x80);
+}
+
+WRITE8_HANDLER( ec_port15_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port15_value = state->port15_value;
+	state->port15_value = data;
+
+	if ((state->port15_value&0x01) != (old_port15_value&0x01)) printf("port15 0x01 changed %02x\n", state->port15_value&0x01);
+	if ((state->port15_value&0x02) != (old_port15_value&0x02)) printf("port15 0x02 changed %02x\n", state->port15_value&0x02);
+	if ((state->port15_value&0x04) != (old_port15_value&0x04)) printf("port15 0x04 changed %02x\n", state->port15_value&0x04);
+	if ((state->port15_value&0x08) != (old_port15_value&0x08)) printf("port15 0x08 changed %02x\n", state->port15_value&0x08);
+	if ((state->port15_value&0x10) != (old_port15_value&0x10)) printf("port15 0x10 changed %02x\n", state->port15_value&0x10);
+	if ((state->port15_value&0x20) != (old_port15_value&0x20)) printf("port15 0x20 changed %02x\n", state->port15_value&0x20);
+	if ((state->port15_value&0x40) != (old_port15_value&0x40)) printf("port15 0x40 changed %02x\n", state->port15_value&0x40);
+	if ((state->port15_value&0x80) != (old_port15_value&0x80)) printf("port15 0x80 changed %02x\n", state->port15_value&0x80);
+
+	// some 3rd party stuff has VDF
+	//	printf("ec_port15_out_w data %02x - VDF reset %02x clock %02x\n", data, data & 0x80, data & 0x40);
+}
+
+WRITE8_HANDLER( ec_port16_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port16_value = state->port16_value;
+	state->port16_value = data;
+
+	if ((state->port16_value&0x01) != (old_port16_value&0x01)) printf("port16 0x01 changed %02x\n", state->port16_value&0x01);
+	if ((state->port16_value&0x02) != (old_port16_value&0x02)) printf("port16 0x02 changed %02x\n", state->port16_value&0x02);
+	if ((state->port16_value&0x04) != (old_port16_value&0x04)) printf("port16 0x04 changed %02x\n", state->port16_value&0x04);
+	if ((state->port16_value&0x08) != (old_port16_value&0x08)) printf("port16 0x08 changed %02x\n", state->port16_value&0x08);
+	if ((state->port16_value&0x10) != (old_port16_value&0x10)) printf("port16 0x10 changed %02x\n", state->port16_value&0x10);
+	if ((state->port16_value&0x20) != (old_port16_value&0x20)) printf("port16 0x20 changed %02x\n", state->port16_value&0x20);
+	if ((state->port16_value&0x40) != (old_port16_value&0x40)) printf("port16 0x40 changed %02x\n", state->port16_value&0x40);
+	if ((state->port16_value&0x80) != (old_port16_value&0x80)) printf("port16 0x80 changed %02x\n", state->port16_value&0x80);
+}
+
+WRITE8_HANDLER( ec_port17_out_w )
+{
+	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
+	int old_port17_value = state->port17_value;
+	state->port17_value = data;
+
+	if ((state->port17_value&0x01) != (old_port17_value&0x01)) printf("port17 0x01 changed %02x\n", state->port17_value&0x01);
+	if ((state->port17_value&0x02) != (old_port17_value&0x02)) printf("port17 0x02 changed %02x\n", state->port17_value&0x02);
+	if ((state->port17_value&0x04) != (old_port17_value&0x04)) printf("port17 0x04 changed %02x\n", state->port17_value&0x04);
+	if ((state->port17_value&0x08) != (old_port17_value&0x08)) printf("port17 0x08 changed %02x\n", state->port17_value&0x08);
+	if ((state->port17_value&0x10) != (old_port17_value&0x10)) printf("port17 0x10 changed %02x\n", state->port17_value&0x10);
+	if ((state->port17_value&0x20) != (old_port17_value&0x20)) printf("port17 0x20 changed %02x\n", state->port17_value&0x20);
+	if ((state->port17_value&0x40) != (old_port17_value&0x40)) printf("port17 0x40 changed %02x\n", state->port17_value&0x40);
+	if ((state->port17_value&0x80) != (old_port17_value&0x80)) printf("port17 0x80 changed %02x\n", state->port17_value&0x80);
+
+	// some 3rd party stuff has VDF
+	//	printf("ec_port17_out_w data %02x - VDF data %02x\n", data, data & 0x40);
+}
+
+WRITE8_HANDLER( ec_port18_out_w )
+{
+	// Kick Me (Watchdog)
+}
+
+
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+
+//	AM_RANGE(0xa000, 0xa000) AM_DEVREADWRITE(UPD8251_TAG, msm8251_data_r, msm8251_data_w)
+// 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE(UPD8251_TAG, msm8251_status_r, msm8251_control_w)
+
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( ecoinfr )
+
+
+static ADDRESS_MAP_START( portmap, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ec_port00_out_w) AM_READ_PORT("IN0") // Reel 1 Write
+	AM_RANGE(0x01, 0x01) AM_WRITE(ec_port01_out_w) AM_READ_PORT("IN1") // Reel 2 Write + Reels Opto Read
+	AM_RANGE(0x02, 0x02) AM_WRITE(ec_port02_out_w) AM_READ_PORT("IN2") // Reel 3 Write
+	AM_RANGE(0x03, 0x03) AM_WRITE(ec_port03_out_w) AM_READ_PORT("IN3")
+	AM_RANGE(0x04, 0x04) AM_WRITE(ec_port04_out_w) AM_READ_PORT("IN4")
+	AM_RANGE(0x05, 0x05) AM_WRITE(ec_port05_out_w) AM_READ_PORT("IN5")
+	AM_RANGE(0x06, 0x06) AM_WRITE(ec_port06_out_w) AM_READ_PORT("IN6")
+	AM_RANGE(0x07, 0x07) AM_WRITE(ec_port07_out_w) AM_READ_PORT("IN7")
+	AM_RANGE(0x08, 0x08) AM_WRITE(ec_port08_out_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ec_port09_out_w) // 09 Reel Enables
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ec_port0a_out_w) // 10 (Sound 1)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ec_port0b_out_w) // 11 (Sound 2)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(ec_port0c_out_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(ec_port0d_out_w)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE(ec_port0f_out_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ec_port10_out_w) // 16 (Meter)
+	AM_RANGE(0x11, 0x11) AM_WRITE(ec_port11_out_w) // SEC
+	AM_RANGE(0x12, 0x12) AM_WRITE(ec_port12_out_w) // SEC
+	AM_RANGE(0x13, 0x13) AM_WRITE(ec_port13_out_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE(ec_port14_out_w)
+	AM_RANGE(0x15, 0x15) AM_WRITE(ec_port15_out_w) // SEC + VDF (3rd party)
+	AM_RANGE(0x16, 0x16) AM_WRITE(ec_port16_out_w)
+	AM_RANGE(0x17, 0x17) AM_WRITE(ec_port17_out_w) // Hopper + VDF (3rd party)
+	AM_RANGE(0x18, 0x18) AM_WRITE(ec_port18_out_w) // 24 (Watchdog)
+ADDRESS_MAP_END
+
+static CUSTOM_INPUT( ecoinfr_reel1_opto_r )
+{
+	return 0;
+}
+
+static CUSTOM_INPUT( ecoinfr_reel2_opto_r )
+{
+	return 0;
+}
+
+static CUSTOM_INPUT( ecoinfr_reel3_opto_r )
+{
+	return 0;
+}
+
+static INPUT_PORTS_START( ecoinfr_barx )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN0:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN0:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN0:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN0:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN0:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN0:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN0:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ecoinfr_reel1_opto_r, NULL)
+	PORT_DIPNAME( 0x02, 0x02, "IN1:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ecoinfr_reel3_opto_r, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ecoinfr_reel2_opto_r, NULL)
+	PORT_DIPNAME( 0x10, 0x10, "IN1:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN1:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN1:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN1:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN2:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN2:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN2:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN2:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN2:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN2:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN2:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN3:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN3:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN3:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN3:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN3:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN3:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN3:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x01, 0x01, "IN4:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN4:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN4:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN4:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN4:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN4:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN4:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN4:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN5")
+	PORT_DIPNAME( 0x01, 0x01, "IN5:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN5:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN5:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN5:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN5:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN5:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN5:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN5:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN6")
+	PORT_DIPNAME( 0x01, 0x01, "IN6:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN6:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN6:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN6:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN6:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN6:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN6:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN6:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN7")
+	PORT_DIPNAME( 0x01, 0x01, "IN7:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN7:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN7:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN7:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN7:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN7:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN7:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN7:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
+
+static MACHINE_RESET( ecoinfr )
+{
+	ecoinfr_state *state = machine.driver_data<ecoinfr_state>();
+
+//	state->port00_value = 0x00;
+//	state->port01_value = 0x00;
+//	state->port02_value = 0x00;
+//	state->port03_value = 0x00;
+//	state->port04_value = 0x00;
+//	state->port05_value = 0x00;
+//	state->port06_value = 0x00;
+//	state->port07_value = 0x00;
+//	state->port08_value = 0x00;
+	state->port09_value = 0x00;
+//	state->port0a_value = 0x00;
+//	state->port0b_value = 0x00;
+//	state->port0c_value = 0x00;
+//	state->port0d_value = 0x00;
+//	state->port0e_value = 0x00;
+//	state->port0f_value = 0x00;
+	state->port10_value = 0x00;
+	state->port11_value = 0x00;
+	state->port12_value = 0x00;
+	state->port13_value = 0x00;
+	state->port14_value = 0x00;
+	state->port15_value = 0x00;
+	state->port16_value = 0x00;
+	state->port17_value = 0x00;
+
+	state->irq_toggle = 0;
+}
 
 static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_IO_MAP(portmap)
+	MCFG_TIMER_ADD_PERIODIC("ectimer",ecoinfr_irq_timer, attotime::from_hz(250))
+	MCFG_MACHINE_RESET(ecoinfr)
+
+//	MCFG_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
 MACHINE_CONFIG_END
 
 
 
-ROM_START( ec_bar5 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "bar5.5a2", 0x0000, 0x001000, CRC(82b994e6) SHA1(19e63cb6f689787b74cad610a185f20ae3881238) )
-	ROM_LOAD( "bar5.5a3", 0x0000, 0x001000, CRC(53185002) SHA1(9cd98ba871fdaa56dfcef0fc285c8537886ff4bd) )
-	ROM_LOAD( "bar5.5a4", 0x0000, 0x001000, CRC(0b12219d) SHA1(140a58afbf713e11f819e5154519b32e822bd1e3) )
-ROM_END
+
+
+
+
+/********************************************************************************************************************
+ ROMs for REGULAR Hw type
+********************************************************************************************************************/
 
 
 ROM_START( ec_barx )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "barxprog4.bin", 0x0000, 0x001000, CRC(b1a6924e) SHA1(e20f71073a74d0e26bb7abfa03b0bf5e977a4bfd) )
-	ROM_LOAD( "barxprog3.bin", 0x0000, 0x001000, CRC(7febfb4e) SHA1(a9777db5a7ce43ab86fbdd1169a0fa129fda7774) )
-	ROM_LOAD( "barxprog2.bin", 0x0000, 0x001000, CRC(f7abc4ee) SHA1(6996471bb45f7ad58ea28dcbe1270b7f7d844be7) )
-
-	ROM_LOAD( "bx2010a4", 0x0000, 0x001000, CRC(1d29d010) SHA1(b3f7a8b839770402b463d8ec72787c6ddade34bd) )
-	ROM_LOAD( "bx2010a3", 0x0000, 0x001000, CRC(21903339) SHA1(7b515269a08ed3f181e1cd35bf4896a011f77806) )
-	ROM_LOAD( "bx2010a2", 0x0000, 0x001000, CRC(6a28ea78) SHA1(bcdeabff309346103050f1da427913a23198c699) )
-	ROM_LOAD( "bx2010ha", 0x0000, 0x001000, CRC(db267418) SHA1(d4cc325aba62b0da5f63af37c64ea959ca77d91e) ) // close to bx2010a2
-
-	ROM_LOAD( "barx5a4", 0x0000, 0x001000, CRC(7baa7ac3) SHA1(b8124ed5be68f9c4e81977018003f707064bbd58) )
-	ROM_LOAD( "barx5a3", 0x0000, 0x001000, CRC(82bf22c7) SHA1(0b31c0f38181f3523776b44b211ee6b2f0fde341) )
-	ROM_LOAD( "barx5a2", 0x0000, 0x001000, CRC(0f1839b9) SHA1(ab0f0dfa887d9c113a4971392b12a768b5b5977f) )
-
-	ROM_LOAD( "barx44c", 0x0000, 0x001000, CRC(bd8c9431) SHA1(b8393ec87969541ff56243b7ea1e5c908d8bf027) )
-	ROM_LOAD( "barx34c", 0x0000, 0x001000, CRC(d105cbaa) SHA1(a38ed5fa437fbdd2d9efc575fe05a94180dbd90f) )
-	ROM_LOAD( "barx24c", 0x0000, 0x001000, CRC(a513263e) SHA1(f83008ff34bc67bcf15f5433cfe2f6051763b75f) )
+	ROM_LOAD( "iss354.rom", 0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483) )
+//	ROM_LOAD( "rom1.bin", 0x0000, 0x008000, CRC(1) SHA1(1) ) // testing only
 
 
-	ROM_LOAD( "bx54a4", 0x0000, 0x001000, CRC(7dc2d19e) SHA1(ad012de848b586ae8355ea300edce96d0f0ce2a8) )
-	ROM_LOAD( "bx54a3", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
-	ROM_LOAD( "bx54a2", 0x0000, 0x001000, CRC(5b2d42ec) SHA1(abc394cad55786df99d8bea7a4497a338ec180d8) )
-// same as above
-//  ROM_LOAD( "bx54a4up", 0x0000, 0x001000, CRC(7dc2d19e) SHA1(ad012de848b586ae8355ea300edce96d0f0ce2a8) )
-//  ROM_LOAD( "bx54a3up", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
-//  ROM_LOAD( "bx54a2up", 0x0000, 0x001000, CRC(5b2d42ec) SHA1(abc394cad55786df99d8bea7a4497a338ec180d8) )
-
-	ROM_LOAD( "bx5pa4", 0x0000, 0x001000, CRC(34b4d7cb) SHA1(b2ff3c79e635fff8f02edc9c953cc619fb409aa5) )
-	ROM_LOAD( "bx5pa3", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
-	ROM_LOAD( "bx5pa2", 0x0000, 0x001000, CRC(a77bcdb4) SHA1(bdb3fc19a933d609cea2a2a2dfc98d3589765484) )
-
-	// alt 'ROM4' roms.. for above set?
-	ROM_LOAD( "a410p.bin", 0x0000, 0x001000, CRC(6c19d237) SHA1(9fa79bd0ab78685fed974e5b82ec419381337252) )
-	ROM_LOAD( "a410p~.bin", 0x0000, 0x001000, CRC(0f1020f1) SHA1(e29cd3954f3cd0ae5c4a113f8922bd1f3be0e740) )
-	//ROM_LOAD( "a45p.bin", 0x0000, 0x001000, CRC(34b4d7cb) SHA1(b2ff3c79e635fff8f02edc9c953cc619fb409aa5) ) // bx5pa4 from ec_barx
-
-
-	/* incomplete set(?), no ROM 4 */
-	ROM_LOAD( "barx6a3", 0x0000, 0x001000, CRC(8884d188) SHA1(64716d214ada873cca64a511fa569e96f1ade062) )
-	ROM_LOAD( "barx6a2", 0x0000, 0x001000, CRC(522950ec) SHA1(89daf57b53d4752a4f5f4f0bef8d976a9fc877ce) )
-	//ROM_LOAD( "barx6", 0x0000, 0x001000, CRC(522950ec) SHA1(89daf57b53d4752a4f5f4f0bef8d976a9fc877ce) )  // == barx6a2
-
-	/* Alt 'rom 2' roms similar to sets above */
-	ROM_LOAD( "a20510.bin", 0x0000, 0x001000, CRC(b4a458a6) SHA1(acda6eece0c9e011bfb147a2f696dbdaa53ea9aa) )
-	ROM_LOAD( "a2054.bin", 0x0000, 0x001000, CRC(a77bcdb4) SHA1(bdb3fc19a933d609cea2a2a2dfc98d3589765484) )
-	ROM_LOAD( "a2058.bin", 0x0000, 0x001000, CRC(7b564e66) SHA1(eaec8efb566f9a017eb66cd2f4d8673971ab5db5) )
-	ROM_LOAD( "a21010.bin", 0x0000, 0x001000, CRC(384b6bcf) SHA1(e9beba847b613ae881a3c7be637c2c38b8c1410f) )
-	ROM_LOAD( "a2104.bin", 0x0000, 0x001000, CRC(2b94fedd) SHA1(d5da5604b1db9fadbae0a6bb7a1d76b1d80a19df) )
-	ROM_LOAD( "a2108.bin", 0x0000, 0x001000, CRC(f7b97d0f) SHA1(a21512cf92a61fcdd9856f017fce06d280c222b7) )
-
-
-	/* Unique ROM */
-	ROM_LOAD( "barxsnd.bin", 0x0000, 0x001000, CRC(7d37fda1) SHA1(fb906615067887d9daecdbc741cfa4ac710c4627) )
+	ROM_REGION( 0x200000, "altrevs", 0 )
 
 	/* Unique ROM containing 1993 Electrocoin Copyright */
 	ROM_LOAD( "bxc1&6c.rom", 0x0000, 0x008000, CRC(356964c3) SHA1(68522a0d379ab49f5975e0628f3e813cfe3287a3) )
@@ -124,7 +665,7 @@ ROM_START( ec_barx )
 	ROM_LOAD( "barx5ft", 0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1) )
 	ROM_LOAD( "bx503cas", 0x0000, 0x008000, CRC(ac974ac2) SHA1(d317730506c075b108c68b3fc5628837b12863fe) )
 
-	ROM_LOAD( "iss354.rom", 0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483) )
+	//ROM_LOAD( "iss354.rom", 0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483) ) // loaded as maincpu
 	ROM_LOAD( "iss9007.rom", 0x0000, 0x008000, CRC(c73b7c4e) SHA1(2d1fecb8efd4b80d1249034efc5ea9c1d3cb660b) )
 	ROM_LOAD( "iss9011.rom", 0x0000, 0x008000, CRC(7b69ff3c) SHA1(f13e71fa2ae997fd2c80ca060cdbe2115468df6b) )
 	ROM_LOAD( "iss9015.rom", 0x0000, 0x008000, CRC(fd2fabe8) SHA1(2a0261c39187746a53ff7c32a759ba1311ec56a9) )
@@ -138,6 +679,7 @@ ROM_START( ec_barx )
 	ROM_LOAD( "issa097", 0x0000, 0x008000, CRC(0650275f) SHA1(eb06a7b245103aeb53973897128063b04e599fde) ) // PN-- ---0
 
 	// 2001 BARX (newer header type?)
+	// Are these actually 'Super Bar X'? They have SBARX strings in them near build dates etc.
 	ROM_LOAD( "issa793", 0x0000, 0x008000, CRC(e3de7b43) SHA1(5d33d39f59e30510ac89d9a03979f17a4a3707eb) ) // ---- ----
 	ROM_LOAD( "issa794", 0x0000, 0x008000, CRC(47334130) SHA1(08204545d20fa017321183126a856446b08e09b9) ) // -1-- ----
 	ROM_LOAD( "issa795", 0x0000, 0x008000, CRC(d24936fd) SHA1(f0efa2d30c71285d31ae2c47ce2baef3bb72bc66) ) // --2S K---
@@ -243,38 +785,16 @@ ROM_START( ec_barx )
 
 	/****** Other Stuff in here ******/
 
-	// there two look closer to Bellfruit scramble, but aren't.  They're probably something else tho...
-	ROM_LOAD( "mab-bx15", 0x0000, 0x020000, CRC(a58dba57) SHA1(50131ac706c5b0baa793e79e7a0b42eb28c2c61d) )
-	ROM_LOAD( "barx5p5", 0x0000, 0x020000, CRC(374a83a1) SHA1(6151e6d2e7cdd3997dc009dd4a11a1e8fd405ac5) )
-
+	ROM_REGION( 0x200000, "pal", 0 )
 	// Pal dump? check it..
 	ROM_LOAD( "bxpal", 0x0000, 0x000c80, CRC(e30cd1ff) SHA1(4a1ee1703a677143412aa367cfe7d7d346812d87) )
 
-
-	// 1 byte roms? must be bad
-	//ROM_LOAD( "barx52", 0x0000, 0x000001, CRC(f26d6a3e) SHA1(51e69892ab49df85c6230ccc57f8e1d1606caccc) )
-	//ROM_LOAD( "barx53", 0x0000, 0x000001, CRC(84b12bae) SHA1(ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4) )
-	//ROM_LOAD( "barx54", 0x0000, 0x000001, CRC(f6b64c2b) SHA1(0a80baa1797615faddb0ccfaa6d46382a6b3e0e2) )
+	ROM_REGION( 0x200000, "sndz80", 0 )
+	// apparently all games using these PCBs had the same sound rom..
+	ROM_LOAD( "barxsnd.bin", 0x0000, 0x001000, CRC(7d37fda1) SHA1(fb906615067887d9daecdbc741cfa4ac710c4627) )
 ROM_END
 
 
-ROM_START( ec_barx7 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// These are '2001 COOL7'
-	ROM_LOAD( "issa943", 0x0000, 0x008000, CRC(e13a597f) SHA1(ab833fb8cc9529fc307b0252b922a77911802abe) ) // P--- ----
-	ROM_LOAD( "issa945", 0x0000, 0x008000, CRC(9c251b36) SHA1(319a82e9f0a5cd0e3c9d72ddb8203a9363cc3936) ) // P-2S K---
-	//ROM_LOAD( "issa945 (dereg)", 0x0000, 0x008000, CRC(9c251b36) SHA1(319a82e9f0a5cd0e3c9d72ddb8203a9363cc3936) )
-
-	// These are '2006 COOL7'
-	ROM_LOAD( "issc330", 0x0000, 0x008000, CRC(4a8231ff) SHA1(470813fff14eeff3caad2cde710d4d1361231299) ) // -1-- ----
-ROM_END
-
-
-ROM_START( ec_barxd )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// These are '2006 BARX'
-	ROM_LOAD( "issc289", 0x0000, 0x008000, CRC(31e8ae3a) SHA1(accc14b292f220dfc9695638c0402de28fe19bae) ) // P-2S K---
-ROM_END
 
 
 ROM_START( ec_bxd7s )
@@ -282,11 +802,18 @@ ROM_START( ec_bxd7s )
 	// These are '2006 COOL7'
 	ROM_LOAD( "issc193.dat", 0x0000, 0x008000, CRC(2f3fb9e2) SHA1(426f7436c8a22f1d8a05a5ccef6b6b5551441028) )  // P-2S K---
 	ROM_LOAD( "issc331",     0x0000, 0x008000, CRC(83c09f9d) SHA1(4ef9bb5ae779309d25bf673d8a59ea8cf65c84ba) )  // --2S K---
+	ROM_LOAD( "issc330", 0x0000, 0x008000, CRC(4a8231ff) SHA1(470813fff14eeff3caad2cde710d4d1361231299) ) // -1-- ----
+	ROM_LOAD( "issc325.rom", 0x0000, 0x008000, CRC(153f90a2) SHA1(df250a02e6b9c130b5f8856c1fdb9012517d15ce) ) // in an unknown set
+	ROM_LOAD( "issc337", 0x0000, 0x008000, CRC(79b791aa) SHA1(ee6257b198b950d31690f1b12b98bdf483216b9d) ) // P-2S K---   in a set marked 'magic bars'
 ROM_END
 
 
+// This is almost certainly a mix of 'Big7' and 'Super Big7' ROMs
 ROM_START( ec_big7 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "big7.bin", 0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6) )
+
+	ROM_REGION( 0x200000, "altrevs", 0 )
 
 	/* No indication, no space for header */
 	ROM_LOAD( "b710", 0x0000, 0x008000, CRC(0cdae404) SHA1(e8d713e172e5ff37e31e68d096fac77fbe676006) )
@@ -307,6 +834,8 @@ ROM_START( ec_big7 )
 	ROM_LOAD( "iss2017.rom", 0x0000, 0x008000, CRC(165dc63c) SHA1(f820bc99755f38a911357e705075d24d3aac43b7) )
 	ROM_LOAD( "iss2019.rom", 0x0000, 0x008000, CRC(475b224a) SHA1(c837aa0c73cf5947b6b4d106d4f0967da040e5dc) )
 	ROM_LOAD( "iss513.rom", 0x0000, 0x008000, CRC(ca302c47) SHA1(9fb9cdd140baa0ec36250b4ebd0a25450348075f) )
+
+	// I think all the roms below are 'Super Big 7'
 
 	/* All have 'BIG7' and type info in header */
 	ROM_LOAD( "big7.bin", 0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6) )
@@ -356,22 +885,23 @@ ROM_START( ec_big7 )
 	ROM_LOAD( "iss3238.rom", 0x0000, 0x008000, CRC(c7d1d398) SHA1(3b37b9596bc3771a6f1a698bee4dce8d642d982f) )
 	ROM_LOAD( "iss3239.rom", 0x0000, 0x008000, CRC(f62450a6) SHA1(d2c88483cb0d3a83a2974550e8e8e71642bb28ce) )
 
-	/* Unique ROM */
+//	ROM_LOAD( "sbig7_5_3025.bin", 0x0000, 0x008000, CRC(26c9382a) SHA1(8c4fe06a8e5171e6f2c91b0aee14484aca386a9c) ) // 'Super Big 7' ?
+	ROM_LOAD( "iss3240.rom", 0x0000, 0x008000, CRC(e8e56ca4) SHA1(d16390b600f9966b779638e3bc2e7f9a72e8d1be) ) // 'Super Big 7' ?
+
+	// No Header - Taken from a Super Big 7 Set
+	ROM_LOAD( "iss197.rom", 0x0000, 0x008000, CRC(45d975c8) SHA1(1ef7693fb000b85f661ebd06512f916297d0662c) ) // 'Super Big 7' ?
+	ROM_LOAD( "sb7.58", 0x0000, 0x008000, CRC(0876d8bf) SHA1(b15584c7c994d29010652cdf8d9c79b661e01b01) )  // 'Super Big 7' ?
+	// Different Code structure, no space for header */
+	ROM_LOAD( "sb710d", 0x0000, 0x008000, CRC(9d9d14fe) SHA1(acc4c92a800d0891ebace8a60d04df09b43bfb1c) )  // 'Super Big 7' ?
+
+
+	ROM_REGION( 0x200000, "sndz80", 0 )
 	ROM_LOAD( "big7snd", 0x0000, 0x002000, CRC(b530d91f) SHA1(f4e70e05d11e92a82f4bf8d78859b2a94fa5f22b) )
 ROM_END
 
 
 ROM_START( ec_casbx )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	/* Smaller roms */
-	ROM_LOAD( "bx4c.a4", 0x0000, 0x001000, CRC(f3da815d) SHA1(5eb20a0c384f9bd864bceb5e8f8b622e17b907fd) )
-	ROM_LOAD( "bx4c.a3", 0x0000, 0x001000, CRC(a472d49f) SHA1(4814b28ed46afa931c5e4f19d829374ebd1f20c9) )
-	ROM_LOAD( "bx4c.a2", 0x0000, 0x001000, CRC(f86c221d) SHA1(99f6abd91870221a7d56a6dc062a687d0458546d) )
-
-	ROM_LOAD( "bx5c10p.a4", 0x0000, 0x001000, CRC(0c7df970) SHA1(25fb113a28fd446467bf9a7edf97dc8aaf936eb6) )
-	ROM_LOAD( "bx5c10p.a3", 0x0000, 0x001000, CRC(12640d16) SHA1(fd30abe0551734eea83cefcb5cac15a380a97586) )
-	ROM_LOAD( "bx5c10p.a2", 0x0000, 0x001000, CRC(0bd21303) SHA1(eb60749d3097ce77f0955586fc8ed1d16993286a) )
-
 	/* No header space, Z80 code */
 	ROM_LOAD( "bx125p25", 0x0000, 0x010000, CRC(beff03e1) SHA1(d0bf997f9766a801274a02242755df3419879bd4) )
 	ROM_LOAD( "x125n34.bin", 0x0000, 0x010000, CRC(5ab73808) SHA1(f857bd9a9a2f1c7c795a7203f2932acac051ae55) )
@@ -379,39 +909,22 @@ ROM_START( ec_casbx )
 	// These are '2006 BARX'
 	ROM_LOAD( "issc287", 0x0000, 0x008000, CRC(fe528b9f) SHA1(ac2a7648b9a706de780a059e7f77573be1d6b9cd) ) // P--- ----
 	ROM_LOAD( "issc293", 0x0000, 0x008000, CRC(93c83913) SHA1(b4cfed0836f57d7f6c828273468a89532607cde2) ) // P-2S K---
+
+	// These are '2006 BARX' (from Bar X Deluxe set)
+	ROM_LOAD( "issc289", 0x0000, 0x008000, CRC(31e8ae3a) SHA1(accc14b292f220dfc9695638c0402de28fe19bae) ) // P-2S K---
 ROM_END
 
 
-ROM_START( ec_casrb )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// These are 'REDBAR'  Header area is all 0x00
-	ROM_LOAD( "iss9409.rom", 0x0000, 0x008000, CRC(d35db982) SHA1(6f171e133a932c94843b6d03431bf6a3befaae86) )
-ROM_END
 
-
-ROM_START( ec_cool7 )
+ROM_START( ec_mag7s )
 	ROM_REGION( 0x200000, "maincpu", 0 )
+
 	// These are '2001 COOL7' (older header type with 0 at end)
 	ROM_LOAD( "issa111", 0x0000, 0x008000, CRC(dd98d4b6) SHA1(a66bb771f7ce66f38033c2704830500e876b9043) ) // ---- ---0
 	ROM_LOAD( "issa112", 0x0000, 0x008000, CRC(14ba229d) SHA1(7506cb0e080643d33cdbf5d8c37743555fc117cd) ) // -N-- ---0
 	ROM_LOAD( "issa116", 0x0000, 0x008000, CRC(a235cb7b) SHA1(4efa2b61203c2a4d01ecc0b0e4712c84eb7ad928) ) // P--- ---0
 	ROM_LOAD( "issa117", 0x0000, 0x008000, CRC(9e30c9bf) SHA1(b9af56ff70d5740c2adde06e26458a2b024a5a57) ) // PN-- ---0
-ROM_END
 
-
-ROM_START( ec_laby ) // no header info with these
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	/* one revision */
-	ROM_LOAD( "lab1v8.bin", 0x0000, 0x008000, CRC(16f0eeac) SHA1(9e28a6ae9176f730234dd8a7a8e50bad2904b611) )
-	ROM_LOAD( "lab2v8.bin", 0x8000, 0x008000, CRC(14d7c58b) SHA1(e6b19523d96c9c1f39b743f8c52791465ab79637) )
-
-	/* another, larger rom size */
-	ROM_LOAD( "laby10", 0x0000, 0x010000, CRC(a8b58fc3) SHA1(16e940b04fa85ff85a29197b4e45c8a39f5cad19) )
-ROM_END
-
-
-ROM_START( ec_mag7s )
-	ROM_REGION( 0x200000, "maincpu", 0 )
 
 	// These are '2001 COOL7' (newer header type)
 	ROM_LOAD( "issa933", 0x0000, 0x008000, CRC(ebb6b015) SHA1(1c02663f1193b9aa92183ac46146c49cdb9fa420) )
@@ -471,128 +984,21 @@ ROM_START( ec_mag7s )
 	ROM_LOAD( "issa989", 0x0000, 0x008000, CRC(a469a2f8) SHA1(351f6e2849b2d5778fb96c96b2bb356f4b02787c) )
 	ROM_LOAD( "issa990", 0x0000, 0x008000, CRC(ad90f5a5) SHA1(2b09f7eb46f054550c5f638bc83708231c34e189) )
 
+	// These are '2001 COOL7' (from Bar X 7 set)
+	ROM_LOAD( "issa943", 0x0000, 0x008000, CRC(e13a597f) SHA1(ab833fb8cc9529fc307b0252b922a77911802abe) ) // P--- ----
+	ROM_LOAD( "issa945", 0x0000, 0x008000, CRC(9c251b36) SHA1(319a82e9f0a5cd0e3c9d72ddb8203a9363cc3936) ) // P-2S K---
+	//ROM_LOAD( "issa945 (dereg)", 0x0000, 0x008000, CRC(9c251b36) SHA1(319a82e9f0a5cd0e3c9d72ddb8203a9363cc3936) )
+	// 2001 COOL7 (from Unknown set)
+	ROM_LOAD( "issa998.rom", 0x0000, 0x008000, CRC(7314e2a8) SHA1(3a108bf2ba0173ecab85fe7110174f5db8f75e17) )
+
 	// This just has 'Cool7' with no other header information (all 0x00)
 	ROM_LOAD( "majic.dat", 0x0000, 0x008000, CRC(a1ca176f) SHA1(90dc3204091c6328764122dc583e47ea8ac314e4) )
 ROM_END
 
 
-ROM_START( ec_magbr )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// These are '2006 COOL7' (newer header type)
-	ROM_LOAD( "issc337", 0x0000, 0x008000, CRC(79b791aa) SHA1(ee6257b198b950d31690f1b12b98bdf483216b9d) ) // P-2S K---
-ROM_END
-
-
-ROM_START( ec_oxocg )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// all just Z80 roms, no header information the 'TOP' rom is rather different to the rest
-	ROM_LOAD( "ocla-4.1", 0x0000, 0x010000, CRC(fe1db86d) SHA1(7718ecafc562bad39cefa15a0df46f081e6045af) )
-	ROM_LOAD( "ocla-4.1p", 0x0000, 0x010000, CRC(f24b2cac) SHA1(96f026df3f3915bee89ecc26725e4a7e861fddce) )
-	ROM_LOAD( "ocsd-5.2", 0x0000, 0x010000, CRC(28c86aae) SHA1(cafdff7ebc57ef4163b40381e84dd2ac2c24937d) )
-	ROM_LOAD( "ocsd-5.3p", 0x0000, 0x010000, CRC(9d422e21) SHA1(9e71ca53054c02c9fb6b23055fa7a5747648bac3) )
-	ROM_LOAD( "oxo-btm4.0", 0x0000, 0x010000, CRC(70c8e340) SHA1(4219a493215e2e296a867a3c7ea4cf48356a8842) )
-	ROM_LOAD( "oxo-btm4.1p", 0x0000, 0x010000, CRC(b970d6f2) SHA1(df2896bb8e540b67b7427c26f247b0627f6f5f15) )
-	ROM_LOAD( "oxo-top4.0", 0x0000, 0x010000, CRC(1b3d8225) SHA1(1951849b3b6966019d5c4c7debef8c5cc6b0259c) )
-ROM_END
-
-/*
-     ELECTROCOIN  OXO  CLUB
-
-  Oxo-2.3n ---------- 54AE     ?25
-  Oxo-2.3p ---------- 55AD    ?25
-  Oxo-2-2T.box ----  9976     ?25
-  Oxo-nv7.2-3 ------  3E15    ?25
-
-  Oxo-1.6n ---------- EC97      ?5 / ?15
-  Oxo-1.8p ---------- 13BD     ?5 / ?15
-  Oxo-1-2T.box ---- 9D35      ?5 / ?15
-*/
-
-ROM_START( ec_oxocl )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// looks like a similar config to set above, the 't' roms being the TOP roms
-	ROM_LOAD( "ocn7 v18 non protocol.hex", 0x0000, 0x02680d, CRC(91755ca8) SHA1(38dea02258e4cf731680621c96ebd473e74ae0f6) ) // convert from HEX and check
-//  ROM_LOAD( "oxo club.txt", 0x0000, 0x000127, CRC(2ae1750e) SHA1(e15bcc78bcdb4672a77dd46b8f40313dc4a88c59) )
-	ROM_LOAD( "oxo-1-2t.box", 0x0000, 0x010000, CRC(8fd03d19) SHA1(b3df92a8a4e0f4b8f813758aa4e881f45a04c8e4) )
-	ROM_LOAD( "oxo-1.6n", 0x0000, 0x010000, CRC(5c4637c5) SHA1(923a8d50b2b8a7d97d6d1994dafde3aafe0f8c45) )
-	ROM_LOAD( "oxo-1.8p", 0x0000, 0x010000, CRC(26a40f47) SHA1(2c61fa010efc4684e2c53d58a81bd8071246b3f1) )
-	ROM_LOAD( "oxo-2-2t.box", 0x0000, 0x010000, CRC(5fac6c82) SHA1(94b9db912fe85dd4bff099492dedd0b2edbec954) )
-	ROM_LOAD( "oxo-2.3n", 0x0000, 0x010000, CRC(37bdce39) SHA1(5f38a09a4acfddd63b9fb88eb429390bccec6d9c) )
-	ROM_LOAD( "oxo-2.3p", 0x0000, 0x010000, CRC(123e733d) SHA1(41fcb8a15742115ad69d861685f9dffb6242c563) )
-	ROM_LOAD( "oxo-nv7.2-3", 0x0000, 0x010000, CRC(7d53520b) SHA1(33af51b9e3ae9f4d923058a79850cb95a141a9a6) )
-ROM_END
-
-
-ROM_START( ec_oxogb )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "ocla54 non protocol.hex", 0x0000, 0x02680d, CRC(08c18728) SHA1(6cc004db3f7c43b8b7a685becc5de1c84c131048) ) // convert from HEX and check
-ROM_END
-
-
-ROM_START( ec_oxorl )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// again same type of thing as ec_oxocg / ec_oxocl
-	ROM_LOAD( "or25 v4.2 dereg non protocol.hex", 0x0000, 0x02680d, CRC(9a9489f5) SHA1(4587fe7bb0123559930726d9b7197d7a525218f8) ) // convert from HEX and check
-	ROM_LOAD( "or25 v4.2 dereg protocol.hex", 0x0000, 0x02680d, CRC(4c3a2b4e) SHA1(e18c8c1b8c2fbc8c84c9632d6fcda76ed8a9303a) ) // convert from HEX and check
-	ROM_LOAD( "or5 np.hex", 0x0000, 0x02680d, CRC(15a501eb) SHA1(b66209c02183a222f82a4671962348ae137dc162) ) // convert from HEX and check
-	ROM_LOAD( "oxo-btm4.0", 0x0000, 0x010000, CRC(70c8e340) SHA1(4219a493215e2e296a867a3c7ea4cf48356a8842) )
-	ROM_LOAD( "oxo-btm4.1p", 0x0000, 0x010000, CRC(b970d6f2) SHA1(df2896bb8e540b67b7427c26f247b0627f6f5f15) )
-	ROM_LOAD( "oxo-top4.0", 0x0000, 0x010000, CRC(1b3d8225) SHA1(1951849b3b6966019d5c4c7debef8c5cc6b0259c) )
-	ROM_LOAD( "oxoreels.2bt", 0x0000, 0x010000, CRC(bfa178ff) SHA1(d433c1f5bc216d76f311566cc80d148fb76eab71) )
-	ROM_LOAD( "oxoreels.3dr", 0x0000, 0x010000, CRC(d629133b) SHA1(2a25540885d34bf38528cecd360953818beb6197) )
-	ROM_LOAD( "oxoreels.btm", 0x0000, 0x010000, CRC(db408784) SHA1(e53d3419fc6fa04970c7ce52bf7afb9baf022a27) )
-	ROM_LOAD( "oxoreels.top", 0x0000, 0x010000, CRC(1b3d8225) SHA1(1951849b3b6966019d5c4c7debef8c5cc6b0259c) )
-ROM_END
-
-
-ROM_START( ec_oxorv )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// again same type of thing as ec_oxocg / ec_oxocl
-	ROM_LOAD( "nrev 13.0 gala compak.hex", 0x0000, 0x02680d, CRC(1537716f) SHA1(0f9d2cd7387fca7db355fea69bede0b15dcb9c2f) ) // convert from HEX and check
-	ROM_LOAD( "nrev 13.0 gala connexus.hex", 0x0000, 0x02680d, CRC(11eb0066) SHA1(4e836d1a05ba3d7b7ab2fa8e6decc7307daa0b6d) ) // convert from HEX and check
-	ROM_LOAD( "nrev 13.0 non protocol.hex", 0x0000, 0x02680d, CRC(bd2145d5) SHA1(a15cf6081e2b6f4763bf577f31b7b8cc06e8e3de) ) // convert from HEX and check
-	ROM_LOAD( "nrev 13.0 protocol.hex", 0x0000, 0x02680d, CRC(5ae33e51) SHA1(fdabedec9c9adde51fcd3a2ebe000b15c663bcfb) ) // convert from HEX and check
-	ROM_LOAD( "nrev 13.0 rank non protocol.hex", 0x0000, 0x02680d, CRC(35d14c07) SHA1(a7a4a1dc71fe197e97704bcc971893123eb2bc55) ) // convert from HEX and check
-	ROM_LOAD( "nrev 13.0 rank protocol.hex", 0x0000, 0x02680d, CRC(e37feebc) SHA1(185dc87b0187b89cc9bc66c8bd8b83217bdff82a) ) // convert from HEX and check
-	ROM_LOAD( "rev-10-0.btm", 0x0000, 0x010000, CRC(dea90334) SHA1(1023e193fa0973e09e8fbbc559935ce5dd32a093) )
-	ROM_LOAD( "rev-10-0.top", 0x0000, 0x010000, CRC(7ed49cd2) SHA1(45fc13d4fbd3d9839ad0c5ac1db391199f1d571e) )
-	ROM_LOAD( "rev12-0.top", 0x0000, 0x010000, CRC(029b2036) SHA1(f94409de013d189074d1f64f80d211c888413c28) )
-	ROM_LOAD( "rev13-0.bin", 0x0000, 0x010000, CRC(90741b8d) SHA1(5496e6e79efae6a657524b5ce050cae9ccbdd981) )
-	ROM_LOAD( "rev13-0p.bin", 0x0000, 0x010000, CRC(9fafd48c) SHA1(f34130233e68fe84e5d4941619a93ebbb6c4f900) )
-	ROM_LOAD( "revo120 top.hex", 0x0000, 0x02680d, CRC(0b578ff6) SHA1(956e5ce9fe91d28043fbcff83163663f5aa71909) )
-	ROM_LOAD( "revo2-1.btm", 0x0000, 0x010000, CRC(5d30662f) SHA1(f808c925732c5802ba377034d88c3840cae11cb0) )
-	ROM_LOAD( "revo2-1p.btm", 0x0000, 0x010000, CRC(52eba92e) SHA1(5223e69d5c9fa7b8819e7a0267c25fa79c020c64) )
-ROM_END
-
-
-ROM_START( ec_penni )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// Z80 code, contains scandisk / windows garbage at the end
-	ROM_LOAD( "pfh_8c.bin", 0x0000, 0x010000, CRC(282a42d8) SHA1(f985d238c72577e755090ce0f04dcc7850af6f3b) )
-	ROM_LOAD( "pfh_v6.bin", 0x0000, 0x00e000, CRC(febb3fce) SHA1(f8df085a563405ea5adcd15a4162a7ba56bcfad7) ) // this set is truncated, but that area just seems to be garbage anyway, so should be fine
-ROM_END
-
-
-ROM_START( ec_pyram )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// Z80 Program
-	ROM_LOAD( "pyramid 5p 3.bin", 0x0000, 0x010000, CRC(06a047d8) SHA1(4a1a15f1ab9defd3a0c5f2d333beae0daa16c6a4) )
-
-	ROM_REGION( 0x200000, "other", 0 )
-	// this seems to be half of a 16-bit pair, possibly for a 68k.  It might come from a different game, it's definitely missing the other part of the pair
-	ROM_LOAD( "pyramid.bin", 0x0000, 0x010000, CRC(370a6d2c) SHA1(ea4f899adeca734529b19ba8de0e371841982c20) )
-ROM_END
-
 
 ROM_START( ec_redbr )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-
-	// These are 'REDBAR' they use the same header format as ec_big7
-	ROM_LOAD( "iss2021.rom", 0x0000, 0x008000, CRC(71fffd80) SHA1(49cc502e54e135bb131b8ac096619df9f1f29055) )
-	ROM_LOAD( "iss3040.bin", 0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d) )
-	ROM_LOAD( "iss3046.rom", 0x0000, 0x008000, CRC(14109012) SHA1(d008488216d8e9c0dbe6d1c07d59b84637a8f41c) )
-	ROM_LOAD( "iss9013.rom", 0x0000, 0x008000, CRC(d18d50b2) SHA1(7c471a15f33d22d8d1eb4971c8e3d2c360ec8db9) )
-
 	// These are '2001 REDBAR' (older header type with 0 at end)
 	ROM_LOAD( "issa101", 0x0000, 0x008000, CRC(05bba52d) SHA1(fe1f80a6621564f8ea0fd741618ebd80a78a0055) )
 	ROM_LOAD( "issa102", 0x0000, 0x008000, CRC(9aebf74c) SHA1(4da5d9240a2dcfdaa96a8a784ea5745c90108f9e) )
@@ -658,44 +1064,57 @@ ROM_START( ec_redbr )
 	ROM_LOAD( "issa930", 0x0000, 0x008000, CRC(b24d4e38) SHA1(36eb0415b19e0abaa7eab45c1121c0757509e4eb) )
 	ROM_LOAD( "issa931", 0x0000, 0x008000, CRC(5047eb2d) SHA1(dbd57dbf6a0ca6f2f532811700dfa8f5e2d96810) )
 	ROM_LOAD( "issa932", 0x0000, 0x008000, CRC(5577e4b6) SHA1(85ce8761d7ea37b5e5bca213a655e40af98594e1) )
+
+	// Header 'REDBAR' - From 'Suepr Red Bar' sets
+	ROM_LOAD( "iss3037.rom", 0x0000, 0x008000, CRC(b1984539) SHA1(b8ff3690e47d10ef2d15ccc9198715a83d75a428) )
+	ROM_LOAD( "iss3038.rom", 0x0000, 0x008000, CRC(890109fe) SHA1(69c47284497ad3488cff8f36b1ec615bf043fc5f) )
+	ROM_LOAD( "iss3039.rom", 0x0000, 0x008000, CRC(25179e39) SHA1(6dd59e5eb3bb769d0018ae2691422108260a2c87) )
+	ROM_LOAD( "iss3041.rom", 0x0000, 0x008000, CRC(eefe3086) SHA1(971e71026b8d519fa424180ecf029b6ba9abf5c2) )
+	ROM_LOAD( "iss3042.rom", 0x0000, 0x008000, CRC(e5f69b11) SHA1(8de839b74dd3eea85b956ae0cb1d535926ce9489) )
+	ROM_LOAD( "iss3043.rom", 0x0000, 0x008000, CRC(276fa423) SHA1(a69962ad6fa38d45b36da6bcff95f69f7175fff0) )
+	ROM_LOAD( "iss3044.rom", 0x0000, 0x008000, CRC(9ce127a6) SHA1(2f223b37d0c6aca27b001c0ec81e413ff04dca86) )
+	ROM_LOAD( "iss3045.rom", 0x0000, 0x008000, CRC(a79742a3) SHA1(42950e9e61bdf134753cd3fdc6e65446586530fd) )
+	ROM_LOAD( "iss3047.rom", 0x0000, 0x008000, CRC(6f9defbe) SHA1(52c9791225373f109f63d5476a5b19aaeceb5058) )
+	ROM_LOAD( "iss3048.rom", 0x0000, 0x008000, CRC(f26fcfe5) SHA1(0176366fb46d897a5e106611da885065655df576) )
+	ROM_LOAD( "iss3256.rom", 0x0000, 0x008000, CRC(e9909913) SHA1(b53466238b8e39a45cdbc09dd18e19aab9044027) )
+	ROM_LOAD( "iss3257.rom", 0x0000, 0x008000, CRC(27837c49) SHA1(4408a2066ae427b6f66b2d2be3928d85213c3dcf) )
+	ROM_LOAD( "iss3258.rom", 0x0000, 0x008000, CRC(5a8214b9) SHA1(40cf50468157020ffd52f69308210cb93d94e6ab) )
+	ROM_LOAD( "iss3259.rom", 0x0000, 0x008000, CRC(170a2827) SHA1(2d5f9991468e999c3874f04ef0396abc18c5de1d) )
+	ROM_LOAD( "iss3260.rom", 0x0000, 0x008000, CRC(5f27fa81) SHA1(27d4463211f824abfb3a09270b38ddb68da75691) )
+	ROM_LOAD( "iss3261.rom", 0x0000, 0x008000, CRC(38dbbb65) SHA1(184dc9257db5cbf255fc997547be72c27ad9179b) )
+	ROM_LOAD( "iss3262.rom", 0x0000, 0x008000, CRC(a51a240a) SHA1(fce1a96b15726bd08acd487c61776f7f805880c6) )
+	ROM_LOAD( "iss3263.rom", 0x0000, 0x008000, CRC(e672b24d) SHA1(f33b750b2ede7d107684cea05903266ae98d8203) )
+	ROM_LOAD( "iss3264.rom", 0x0000, 0x008000, CRC(a6c6efb7) SHA1(9ea95ee91745008edd1bed3c83e40325d92d6fb0) )
+	ROM_LOAD( "iss3265.rom", 0x0000, 0x008000, CRC(10948d89) SHA1(bb503c895777dee197ad8fba49c3b52a5380a06e) )
+	ROM_LOAD( "iss3266.rom", 0x0000, 0x008000, CRC(8228a9bf) SHA1(42f44bc7708703905f55143107395c7c10d4e150) )
+	ROM_LOAD( "iss3267.rom", 0x0000, 0x008000, CRC(5398a151) SHA1(e1d37141707c703b5f6c13fd839bfd3c2da632a3) )
+	ROM_LOAD( "srb15_iss3040.bin", 0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d) )
+	ROM_LOAD( "srb58.bin", 0x0000, 0x008000, CRC(b2855bc7) SHA1(c9bc47250077050fb689fc552abc0f60c2acb8ea) )
+	ROM_LOAD( "srb_10cash_ver153.bin", 0x0000, 0x008000, CRC(96f966f9) SHA1(82a87f8eb4914ed7fcc90751b119f72dda29532e) )
+
+	// Header 'REDBAR' - From Super Big 7 sets
+	ROM_LOAD( "sb78ac", 0x0000, 0x008000, CRC(1eee47a4) SHA1(ebf5a535cddc50299ed07a2c424b4a46f5cf2b27) )
+	ROM_LOAD( "sbig.710", 0x0000, 0x008000, CRC(1220cea2) SHA1(97a8f6d1221acc1a6c3f84dd8e14693a40bd8de7) )
+	ROM_LOAD( "sbig7.bin", 0x0000, 0x008000, CRC(1220cea2) SHA1(97a8f6d1221acc1a6c3f84dd8e14693a40bd8de7) )
+	ROM_LOAD( "sbig78d", 0x0000, 0x008000, CRC(bd5af5f2) SHA1(d1efaf21aad9869f593a9cb3732a7d120f2ff55b) )
+	ROM_LOAD( "sbig78t", 0x0000, 0x008000, CRC(598b2bc3) SHA1(e9bc7dac5328e1973e56a4d8f3929d9cb7c606f1) )
+
+	// These are 'REDBAR' they use the same header format as ec_big7
+	ROM_LOAD( "iss2021.rom", 0x0000, 0x008000, CRC(71fffd80) SHA1(49cc502e54e135bb131b8ac096619df9f1f29055) )
+	ROM_LOAD( "iss3040.bin", 0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d) )
+	ROM_LOAD( "iss3046.rom", 0x0000, 0x008000, CRC(14109012) SHA1(d008488216d8e9c0dbe6d1c07d59b84637a8f41c) )
+	ROM_LOAD( "iss9013.rom", 0x0000, 0x008000, CRC(d18d50b2) SHA1(7c471a15f33d22d8d1eb4971c8e3d2c360ec8db9) )
+
+	// These are 'REDBAR'  Header area is all 0x00
+	ROM_LOAD( "iss9409.rom", 0x0000, 0x008000, CRC(d35db982) SHA1(6f171e133a932c94843b6d03431bf6a3befaae86) ) // from 'Casino Red Bar' set
+
+	ROM_LOAD( "iss9403.rom", 0x0000, 0x008000, CRC(b82c3ce7) SHA1(a13d9ea7dd6dd5172240dc51ccdfb8dabdc8f5b2) )
+	ROM_LOAD( "iss9407.rom", 0x0000, 0x008000, CRC(e48992cf) SHA1(5d8dcf7be0d1f86ad795b2722f62009641d92528) )
+	ROM_LOAD( "iss9410.rom", 0x0000, 0x008000, CRC(3711d488) SHA1(2455bc5635d9d318e0b2716547405e18a2d71bbe) )
+	ROM_LOAD( "iss9411.rom", 0x0000, 0x008000, CRC(3ea6f32b) SHA1(e489c6a210f37e9c3c755321bfe979bf2f4898f5) )
+	ROM_LOAD( "iss9412.rom", 0x0000, 0x008000, CRC(ddde37fb) SHA1(8a3a61bbe75e2d0e916a31a55fbd03ec38ed0c3e) )
 ROM_END
 
-
-ROM_START( ec_rcc )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// Just Z80 roms, no identification
-	ROM_LOAD( "rcas20p4.5", 0x0000, 0x010000, CRC(54a1ddde) SHA1(e98b6dbf0256324fe1cdddbe4b89958d3d5f1233) )
-	ROM_LOAD( "rcas20p4.5d", 0x0000, 0x010000, CRC(b42e2415) SHA1(fcc76977a920b6116c5e9029340aa51abb2ab713) )
-	ROM_LOAD( "rcas25p4.5", 0x0000, 0x010000, CRC(0aeb0332) SHA1(1b2f2332ac30736892f72b7771fa0825a95f19ad) )
-
-	ROM_REGION( 0x200000, "oki", 0 )
-	ROM_LOAD( "rcas4-5.snd", 0x0000, 0x100000, CRC(8d9403e1) SHA1(8a8da6f99a524646a8c689861a5cd6aafeef700b) )
-ROM_END
-
-
-ROM_START( ec_secrt )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// similar to ec_rcc
-	ROM_LOAD( "scastle1.bin", 0x0000, 0x010000, CRC(e6abb596) SHA1(35518c46f1ddf1d3a85af13e4ba8bee07e804f64) )
-ROM_END
-
-
-ROM_START( ec_sphin )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// z80 ROMS but truncated, seem to just contain garbage at the end tho, so probably OK
-	ROM_LOAD( "sphinx8c.bin", 0x0000, 0x00e000, CRC(f8e110fc) SHA1(4f55b5de87151f9127b84ffcf7f6f2e3ce34469f) )
-	ROM_LOAD( "spx10cv2.bin", 0x0000, 0x00e000, CRC(e2bf11a0) SHA1(f267385dbb06b2be8bcad7ae5e5804f5bb467f6d) )
-
-	// like Pyramid this looks more like half a 16-bit pair (68k?) ROM...
-	ROM_LOAD( "spnx5p", 0x0000, 0x010000, CRC(b4b49259) SHA1(a26172b659b739564b25dcc0f3f31f131a144d52) )
-ROM_END
-
-
-ROM_START( ec_supb7 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// 'BIG7'  Looks the same as the ordinary BIG7 sets..
-	ROM_LOAD( "iss3240.rom", 0x0000, 0x008000, CRC(e8e56ca4) SHA1(d16390b600f9966b779638e3bc2e7f9a72e8d1be) )
-ROM_END
 
 
 ROM_START( ec_supbx )
@@ -727,11 +1146,6 @@ ROM_START( ec_supbx )
 	/* 1993 Electrocoin Copyright */
 	ROM_LOAD( "sbarx6c.bin", 0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f) )
 	ROM_LOAD( "sbarx6t", 0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f) )
-
-	/* These look more like BFM scramble, but aren't.. */
-	ROM_LOAD( "sbx1.3v", 0x0000, 0x020000, CRC(375795fb) SHA1(3dbc95aba850ef3e307e6b4c6d58a40a1e8ee8f1) )
-	ROM_LOAD( "sbx1.6", 0x0000, 0x020000, CRC(e8cfb340) SHA1(d37f0a72c7b59836c5abec8b58066ff4bbd85723) )
-	ROM_LOAD( "sbx1.9", 0x0000, 0x020000, CRC(521098a1) SHA1(b8e5a05b085015c7b3b5964471a5ee784a3362d7) )
 
 	/* Identified as 'SBARX2' header like BIG7 */
 	ROM_LOAD( "iss3001.rom", 0x0000, 0x008000, CRC(01390318) SHA1(e01a4160f774e376b5527ddee084a0be3eef865e) )
@@ -795,7 +1209,9 @@ ROM_START( ec_supbx )
 	ROM_LOAD( "iss3286.rom", 0x0000, 0x008000, CRC(50fe610b) SHA1(18aa1f884933606bbb5e970aaee89ca7f31cb177) )
 	ROM_LOAD( "iss3287.rom", 0x0000, 0x008000, CRC(694aa6a5) SHA1(a679bfd98b105028a87ec8366af67ffaefde6711) )
 	ROM_LOAD( "iss9401.rom", 0x0000, 0x008000, CRC(abe83480) SHA1(581fab39096b6327b8e88c7ce848126123f524b8) )
+	ROM_LOAD( "iss9405.rom", 0x0000, 0x008000, CRC(6435586d) SHA1(95f2cda1bc80bb8f7c3d2d2b41abbfd634a88237) ) // from unknown set
 ROM_END
+
 
 
 ROM_START( ec_spbxd )
@@ -808,135 +1224,12 @@ ROM_START( ec_spbxd )
 ROM_END
 
 
-ROM_START( ec_spbg7 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// No Header
-	ROM_LOAD( "iss197.rom", 0x0000, 0x008000, CRC(45d975c8) SHA1(1ef7693fb000b85f661ebd06512f916297d0662c) )
-	ROM_LOAD( "sb7.58", 0x0000, 0x008000, CRC(0876d8bf) SHA1(b15584c7c994d29010652cdf8d9c79b661e01b01) )
-
-	// Header 'REDBAR'
-	ROM_LOAD( "sb78ac", 0x0000, 0x008000, CRC(1eee47a4) SHA1(ebf5a535cddc50299ed07a2c424b4a46f5cf2b27) )
-	ROM_LOAD( "sbig.710", 0x0000, 0x008000, CRC(1220cea2) SHA1(97a8f6d1221acc1a6c3f84dd8e14693a40bd8de7) )
-	ROM_LOAD( "sbig7.bin", 0x0000, 0x008000, CRC(1220cea2) SHA1(97a8f6d1221acc1a6c3f84dd8e14693a40bd8de7) )
-	ROM_LOAD( "sbig78d", 0x0000, 0x008000, CRC(bd5af5f2) SHA1(d1efaf21aad9869f593a9cb3732a7d120f2ff55b) )
-	ROM_LOAD( "sbig78t", 0x0000, 0x008000, CRC(598b2bc3) SHA1(e9bc7dac5328e1973e56a4d8f3929d9cb7c606f1) )
-
-	// Header 'BIG7'
-	ROM_LOAD( "sbig7_5_3025.bin", 0x0000, 0x008000, CRC(26c9382a) SHA1(8c4fe06a8e5171e6f2c91b0aee14484aca386a9c) )
-
-	// Different Code structure, no space for header */
-	ROM_LOAD( "sb710d", 0x0000, 0x008000, CRC(9d9d14fe) SHA1(acc4c92a800d0891ebace8a60d04df09b43bfb1c) )
-
-	/* Look Bellfruit-like but aren't */
-	ROM_LOAD( "sb73.8", 0x0000, 0x020000, CRC(01353cd1) SHA1(5f603280096ce5ad3f7bbe5548deb2452a7168e7) )
-	ROM_LOAD( "sb73.9", 0x0000, 0x020000, CRC(f253f61d) SHA1(28bd8628681fef865e984b9284a5e445b3b0cce7) )
-ROM_END
-
-
-ROM_START( ec_suprb )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// Header 'REDBAR'
-	ROM_LOAD( "iss3037.rom", 0x0000, 0x008000, CRC(b1984539) SHA1(b8ff3690e47d10ef2d15ccc9198715a83d75a428) )
-	ROM_LOAD( "iss3038.rom", 0x0000, 0x008000, CRC(890109fe) SHA1(69c47284497ad3488cff8f36b1ec615bf043fc5f) )
-	ROM_LOAD( "iss3039.rom", 0x0000, 0x008000, CRC(25179e39) SHA1(6dd59e5eb3bb769d0018ae2691422108260a2c87) )
-	ROM_LOAD( "iss3041.rom", 0x0000, 0x008000, CRC(eefe3086) SHA1(971e71026b8d519fa424180ecf029b6ba9abf5c2) )
-	ROM_LOAD( "iss3042.rom", 0x0000, 0x008000, CRC(e5f69b11) SHA1(8de839b74dd3eea85b956ae0cb1d535926ce9489) )
-	ROM_LOAD( "iss3043.rom", 0x0000, 0x008000, CRC(276fa423) SHA1(a69962ad6fa38d45b36da6bcff95f69f7175fff0) )
-	ROM_LOAD( "iss3044.rom", 0x0000, 0x008000, CRC(9ce127a6) SHA1(2f223b37d0c6aca27b001c0ec81e413ff04dca86) )
-	ROM_LOAD( "iss3045.rom", 0x0000, 0x008000, CRC(a79742a3) SHA1(42950e9e61bdf134753cd3fdc6e65446586530fd) )
-	ROM_LOAD( "iss3047.rom", 0x0000, 0x008000, CRC(6f9defbe) SHA1(52c9791225373f109f63d5476a5b19aaeceb5058) )
-	ROM_LOAD( "iss3048.rom", 0x0000, 0x008000, CRC(f26fcfe5) SHA1(0176366fb46d897a5e106611da885065655df576) )
-	ROM_LOAD( "iss3256.rom", 0x0000, 0x008000, CRC(e9909913) SHA1(b53466238b8e39a45cdbc09dd18e19aab9044027) )
-	ROM_LOAD( "iss3257.rom", 0x0000, 0x008000, CRC(27837c49) SHA1(4408a2066ae427b6f66b2d2be3928d85213c3dcf) )
-	ROM_LOAD( "iss3258.rom", 0x0000, 0x008000, CRC(5a8214b9) SHA1(40cf50468157020ffd52f69308210cb93d94e6ab) )
-	ROM_LOAD( "iss3259.rom", 0x0000, 0x008000, CRC(170a2827) SHA1(2d5f9991468e999c3874f04ef0396abc18c5de1d) )
-	ROM_LOAD( "iss3260.rom", 0x0000, 0x008000, CRC(5f27fa81) SHA1(27d4463211f824abfb3a09270b38ddb68da75691) )
-	ROM_LOAD( "iss3261.rom", 0x0000, 0x008000, CRC(38dbbb65) SHA1(184dc9257db5cbf255fc997547be72c27ad9179b) )
-	ROM_LOAD( "iss3262.rom", 0x0000, 0x008000, CRC(a51a240a) SHA1(fce1a96b15726bd08acd487c61776f7f805880c6) )
-	ROM_LOAD( "iss3263.rom", 0x0000, 0x008000, CRC(e672b24d) SHA1(f33b750b2ede7d107684cea05903266ae98d8203) )
-	ROM_LOAD( "iss3264.rom", 0x0000, 0x008000, CRC(a6c6efb7) SHA1(9ea95ee91745008edd1bed3c83e40325d92d6fb0) )
-	ROM_LOAD( "iss3265.rom", 0x0000, 0x008000, CRC(10948d89) SHA1(bb503c895777dee197ad8fba49c3b52a5380a06e) )
-	ROM_LOAD( "iss3266.rom", 0x0000, 0x008000, CRC(8228a9bf) SHA1(42f44bc7708703905f55143107395c7c10d4e150) )
-	ROM_LOAD( "iss3267.rom", 0x0000, 0x008000, CRC(5398a151) SHA1(e1d37141707c703b5f6c13fd839bfd3c2da632a3) )
-	ROM_LOAD( "srb15_iss3040.bin", 0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d) )
-	ROM_LOAD( "srb58.bin", 0x0000, 0x008000, CRC(b2855bc7) SHA1(c9bc47250077050fb689fc552abc0f60c2acb8ea) )
-	ROM_LOAD( "srb_10cash_ver153.bin", 0x0000, 0x008000, CRC(96f966f9) SHA1(82a87f8eb4914ed7fcc90751b119f72dda29532e) )
-ROM_END
-
-
-ROM_START( ec_suprl )
-	ROM_REGION( 0x400000, "maincpu", 0 )
-	// again same type of thing as ec_oxocg / ec_oxocl with the top / bottom roms
-
-	ROM_LOAD( "sr0520p.0 non protocol.hex", 0x0000, 0x02680d, CRC(864baa72) SHA1(3212dd51b5fe98b9c0b16f8285397c3d68ca4fd4) ) // convert from HEX and check
-	ROM_LOAD( "sr0520p.0 protocol.hex", 0x0000, 0x02680d, CRC(afbbbef4) SHA1(a060db1b8d648b8890ed68f0cf9934b64abdb9fa) ) // convert from HEX and check
-	ROM_LOAD( "sr05b1.8hex", 0x0000, 0x02680d, CRC(12fca690) SHA1(8408159ff7b4a5db6db5fcb08ae636a7e6a1a9b8) ) // convert from HEX and check
-	ROM_LOAD( "sr25b16.hex", 0x0000, 0x02680d, CRC(87c33f5f) SHA1(f1ff058b8f670503f73b1fddb5a58becd671294b) ) // convert from HEX and check
-	ROM_LOAD( "srle v1.0 protocol.hex", 0x0000, 0x02680d, CRC(57bec009) SHA1(ebf99f6ca5f20e9a30ba694cb3d17f6c8b5827f5) ) // convert from HEX and check
-	ROM_LOAD( "srt30.hex", 0x0000, 0x02680d, CRC(d6b970fa) SHA1(d31cc4ae7a920b73f2b377d4e36be56422bc3632) ) // convert from HEX and check
-
-
-	ROM_LOAD( "srv11.btm", 0x0000, 0x010000, CRC(e68b5a8a) SHA1(b9a1b76f93ab62b5c5d8d56a1210e2d8194bb5b6) )
-	ROM_LOAD( "srv11.top", 0x0000, 0x010000, CRC(05712727) SHA1(b2e29faa7babe560ba928870e96afa3893ba8955) )
-	ROM_LOAD( "srv3-0.btm", 0x0000, 0x010000, CRC(d629133b) SHA1(2a25540885d34bf38528cecd360953818beb6197) )
-	ROM_LOAD( "srv3-0.top", 0x0000, 0x010000, CRC(05712727) SHA1(b2e29faa7babe560ba928870e96afa3893ba8955) )
-
-	ROM_REGION( 0x400000, "oki", 0 )
-	ROM_LOAD( "supersnd.hex", 0x0000, 0x26812e, CRC(90d96c92) SHA1(18d73c1dc9fe6c26ff832d024ddb9824ddeacf90) )
-	ROM_LOAD( "srv3-0.snd", 0x0000, 0x100000, CRC(c40e0609) SHA1(00a2fe56786517b7fa3338918cb8a3bb226f09d8) )
-	ROM_LOAD( "srv11.snd", 0x0000, 0x100000, CRC(cf4d217a) SHA1(28eec63bd0c8bab7524e4e939485d174a6852b10) )
-ROM_END
-
-
-ROM_START( ec_supsl )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// Header 'REDBAR' - Rom is also in the RedBar and Super Red Bar sets!
-	ROM_LOAD( "supersilver7_20p15_iss3040.bin", 0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d) )
-ROM_END
-
 
 ROM_START( ec_unk1 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	// (c)1993 ELECTROCOIN string near end, although the start seems missing? bad dump of something else?
 	ROM_LOAD( "300615", 0x0000, 0x008000, CRC(8a5a4e35) SHA1(be3acfaf116ae23a61aac581d9f83287cddcdaab) )
 ROM_END
-
-/*
-ROM_START( ec_unk2 )
-    ROM_REGION( 0x200000, "maincpu", 0 )
-    // These are just BARX roms
-    ROM_LOAD( "a3all.bin", 0x0000, 0x001000, CRC(96cb0c73) SHA1(6fa1fc61cb2761871999516c6663b3948b35f6dc) )
-    ROM_LOAD( "a3csh.bin", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
-    ROM_LOAD( "a3low10", 0x0000, 0x001000, CRC(2f3c45ed) SHA1(f18aba5ceb9385e37b5857ba28f80230388d0cd2) )
-ROM_END
-*/
-
-/*
-ROM_START( ec_unk3 )
-    ROM_REGION( 0x200000, "maincpu", 0 )
-    // These also look like BARX roms, one matches, and the others are clearly just variations of it
-    ROM_LOAD( "a410p.bin", 0x0000, 0x001000, CRC(6c19d237) SHA1(9fa79bd0ab78685fed974e5b82ec419381337252) )
-    ROM_LOAD( "a410p~.bin", 0x0000, 0x001000, CRC(0f1020f1) SHA1(e29cd3954f3cd0ae5c4a113f8922bd1f3be0e740) )
-    ROM_LOAD( "a45p.bin", 0x0000, 0x001000, CRC(34b4d7cb) SHA1(b2ff3c79e635fff8f02edc9c953cc619fb409aa5) ) // bx5pa4 from ec_barx
-ROM_END
-*/
-
-/*
-ROM_START( ec_unk4 )
-    // Contains a (c)1993/97 ELECTROCOIN near the end, build date of Sept 03 1998 - already in the BarX set
-    ROM_REGION( 0x200000, "maincpu", 0 )
-    ROM_LOAD( "flat256", 0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1) )
-ROM_END
-*/
-
-/* This is Last Action Hero - Data East Pinball!!!
-
-ROM_START( ec_xxxxx )
-    ROM_REGION( 0x200000, "maincpu", 0 )
-    ROM_LOAD( "lahroc5", 0x0000, 0x010000, CRC(94102fdd) SHA1(b741fe7a646225351148f5e675bd232881730221) )
-ROM_END
-*/
-
 
 ROM_START( ec_unk5 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -945,63 +1238,69 @@ ROM_START( ec_unk5 )
 	ROM_LOAD( "iss9207.rom", 0x0000, 0x008000, CRC(f646702a) SHA1(9e2e7da0edaecd021861145b6abd1498fc3b563a) )
 	ROM_LOAD( "iss9208.rom", 0x0000, 0x008000, CRC(b4c3c98a) SHA1(10aeeca8c7b2923e3768f82c672229898c51062d) )
 
-	// REDBAR
-	ROM_LOAD( "iss9403.rom", 0x0000, 0x008000, CRC(b82c3ce7) SHA1(a13d9ea7dd6dd5172240dc51ccdfb8dabdc8f5b2) )
-	ROM_LOAD( "iss9407.rom", 0x0000, 0x008000, CRC(e48992cf) SHA1(5d8dcf7be0d1f86ad795b2722f62009641d92528) )
-	ROM_LOAD( "iss9410.rom", 0x0000, 0x008000, CRC(3711d488) SHA1(2455bc5635d9d318e0b2716547405e18a2d71bbe) )
-	ROM_LOAD( "iss9411.rom", 0x0000, 0x008000, CRC(3ea6f32b) SHA1(e489c6a210f37e9c3c755321bfe979bf2f4898f5) )
-	ROM_LOAD( "iss9412.rom", 0x0000, 0x008000, CRC(ddde37fb) SHA1(8a3a61bbe75e2d0e916a31a55fbd03ec38ed0c3e) )
-
-	// SBARX2
-	ROM_LOAD( "iss9405.rom", 0x0000, 0x008000, CRC(6435586d) SHA1(95f2cda1bc80bb8f7c3d2d2b41abbfd634a88237) )
-
-	// 2001 COOL7
-	ROM_LOAD( "issa998.rom", 0x0000, 0x008000, CRC(7314e2a8) SHA1(3a108bf2ba0173ecab85fe7110174f5db8f75e17) )
-
-	// 2006 COOL7
-	ROM_LOAD( "issc325.rom", 0x0000, 0x008000, CRC(153f90a2) SHA1(df250a02e6b9c130b5f8856c1fdb9012517d15ce) )
-
 	// No header.. no space for header
 	ROM_LOAD( "v1.1non_protocol.hex", 0x0000, 0x02680d, CRC(0b76e2de) SHA1(1bc330558e69b316a26d659463406324f24b5978) ) // convert from HEX and check
 ROM_END
+
+
+/********************************************************************************************************************
+ ROMs with MAB scramble
+********************************************************************************************************************/
+
+// these are scrambled roms using 'MAB' hw.
+ROM_START( ec_barxmab )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "mab-bx15", 0x0000, 0x020000, CRC(a58dba57) SHA1(50131ac706c5b0baa793e79e7a0b42eb28c2c61d) )
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "barx5p5", 0x0000, 0x020000, CRC(374a83a1) SHA1(6151e6d2e7cdd3997dc009dd4a11a1e8fd405ac5) )
+ROM_END
+
+
+ROM_START( ec_supbxmab )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// use the MAB scramble
+	ROM_LOAD( "sbx1.3v", 0x0000, 0x020000, CRC(375795fb) SHA1(3dbc95aba850ef3e307e6b4c6d58a40a1e8ee8f1) )
+	
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "sbx1.6", 0x0000, 0x020000, CRC(e8cfb340) SHA1(d37f0a72c7b59836c5abec8b58066ff4bbd85723) )
+	ROM_LOAD( "sbx1.9", 0x0000, 0x020000, CRC(521098a1) SHA1(b8e5a05b085015c7b3b5964471a5ee784a3362d7) )
+ROM_END
+
+ROM_START( ec_spbg7mab )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "sb73.8", 0x0000, 0x020000, CRC(01353cd1) SHA1(5f603280096ce5ad3f7bbe5548deb2452a7168e7) )
+
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "sb73.9", 0x0000, 0x020000, CRC(f253f61d) SHA1(28bd8628681fef865e984b9284a5e445b3b0cce7) )
+ROM_END
+
+
 
 DRIVER_INIT( ecoinfr )
 {
 
 }
 
-GAME( 19??, ec_bar5,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar 5 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_barx,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_barx7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar X 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_barxd,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_bxd7s,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Bar X Diamond 7s (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_big7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Big 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_casbx,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Casino Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_casrb,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Casino Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_cool7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Cool 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_laby,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Labyrinth (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_mag7s,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Magic 7s (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_magbr,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Magic Bars (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxocg,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Classic Gold (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxocl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Club  (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxogb,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Golden Bars (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxorl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Reels (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_oxorv,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Oxo Revolution (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_penni,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Pennies From Heaven (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_pyram,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Pyramid (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_redbr,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_rcc,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Royal Casino Club (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_secrt,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Secret Castle (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_sphin,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Sphinx (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supb7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supbx,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_spbxd,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_spbg7,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Big 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_suprb,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_suprl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supsl,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Super Silver (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk1,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-//GAME( 19??, ec_unk2,   0       , ecoinfr,   ecoinfr,   ecoinfr,   ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a3' (Electrocoin) (?)"      , GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-//GAME( 19??, ec_unk3,   0       , ecoinfr,   ecoinfr,   ecoinfr,   ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'a4' (Electrocoin) (?)"      , GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-//GAME( 19??, ec_unk4,   0       , ecoinfr,   ecoinfr,   ecoinfr,   ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine 'flat256' (Electrocoin) (?)"     , GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk5,   0		 , ecoinfr,   ecoinfr,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+DRIVER_INIT( ecoinfrmab )
+{
+	// descramble here
+}
+
+// Regular HW Type (there are all rather jumbled up and need sorting properly at some point)
+GAME( 19??, ec_barx,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Bar X (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_mag7s,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Magic 7s / Cool 7 / Bar X 7 (2001 COOL7) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // roms had various labels, but all seem to be the same thing / mixed up.
+GAME( 19??, ec_bxd7s,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Bar X Diamond 7s (2006 COOL7) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_big7,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Big 7 / Super Big 7 (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // these sets were all mixed up, so I've just put them together for now.
+GAME( 19??, ec_casbx,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Casino Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_redbr,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // a mix of REDBAR and 2001 REDBAR
+GAME( 19??, ec_supbx,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_spbxd,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk1,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
+// 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
+GAME( 19??, ec_barxmab, ec_barx	 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Bar X (MAB PCB) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // scrambled roms
+GAME( 19??, ec_spbg7mab,ec_big7  , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Big 7 (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supbxmab,ec_supb	 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Bar X (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+

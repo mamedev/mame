@@ -14249,39 +14249,46 @@ as_ws			//
 
 /* Electrocoin */
 
+// Oldest PCB
 
-ec_bar5		// Bar 5
-ec_barx		// Bar X
-ec_barx7	// Bar X 7
-ec_barxd	// Bar X Deluxe
-ec_bxd7s	// Bar X Diamond 7s
-ec_big7		// Big 7
-ec_casbx	// Casino Bar X
-ec_casrb	// Casino Red Bar
-ec_cool7	// Cool 7
-ec_laby		// Labyrinth
-ec_mag7s	// Magic 7s
-ec_magbr	// Magic Bars
-ec_oxocg	// Oxo Classic Gold
-ec_oxocl	// Oxo Club
-ec_oxogb	// Oxo Golden Bars
-ec_oxorl	// Oxo Reels
-ec_oxorv	// Oxo Revolution
-ec_penni	// Pennies From Heaven
-ec_pyram	// Pyramid
-ec_redbr	// Red Bar
-ec_rcc		// Royal Casino Club
-ec_secrt	// Secret Castle
-ec_sphin	// Sphinx
-ec_supb7	// Super Bar 7
-ec_supbx	// Super Bar X
-ec_spbxd	// Super Bar X Deluxe
-ec_spbg7	// Super Big 7
-ec_suprb	// Super Red Bar
-ec_suprl	// Super Reels
-ec_supsl	// Super Silver
-ec_unk1		// Unknown 'Electrocoin' Fruit Machine '300615'
-ec_unk5		// Unknown 'Electrocoin' Fruit Machine(s)
+ec_bar5		// Bar 5 (older PCB) (Electrocoin)
+ec_barxo	// Bar X (older PCB) (Electrocoin)
+ec_casbxo	// Casino Bar X (older PCB) (Electrocoin)
+
+// Regular PCB
+
+ec_barx		// Bar X (Electrocoin)
+ec_mag7s	// Magic 7s / Cool 7 / Bar X 7 (2001 COOL7) (Electrocoin)
+ec_bxd7s	// Bar X Diamond 7s (2006 COOL7) (Electrocoin)
+ec_big7		// Big 7 / Super Big 7 (Electrocoin)
+ec_casbx	// Casino Bar X (Electrocoin)
+ec_redbr	// Red Bar (Electrocoin)
+ec_supbx	// Super Bar X (Electrocoin)
+ec_spbxd	// Super Bar X Deluxe (Electrocoin)
+ec_unk1		// Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin)
+ec_unk5		// Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin)
+ec_barxmab  // Bar X (MAB PCB) (Electrocoin)
+ec_spbg7mab	// Super Big 7 (MAB PCB) (Electrocoin)
+ec_supbxmab // Super Bar X (MAB PCB) (Electrocoin)
+
+// OXO PCB
+
+ec_oxocg	// Oxo Classic Gold (Electrocoin)
+ec_oxocl	// Oxo Club  (Electrocoin)
+ec_oxogb	// Oxo Golden Bars (Electrocoin)
+ec_oxorl	// Oxo Reels (Electrocoin)
+ec_oxorv	// Oxo Revolution (Electrocoin)
+ec_suprl	// Super Reels (Electrocoin)
+ec_rcc		// Royal Casino Club (Electrocoin)
+
+// Pyramid PCB
+
+ec_pyram	// Pyramid (Electrocoin)
+ec_sphin	// Sphinx (Electrocoin)
+ec_penni	// Pennies From Heaven (Electrocoin)
+ec_laby		// Labyrinth (Electrocoin)
+ec_secrt	// Secret Castle (Electrocoin)
+
 
 /* BGT x86 based platform */
 bg_ddb		//
