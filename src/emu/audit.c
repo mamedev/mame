@@ -128,7 +128,7 @@ m_searchpath = combinedpath;
 				if (record != NULL)
 				{
 					// count the number of files that are found.
-					if (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && find_shared_source(source,record->actual_hashes(), record->actual_length()) != NULL))
+					if (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && find_shared_source(source, record->actual_hashes(), record->actual_length()) == NULL))
 					{
 						found++;
 						if (shared_source != NULL)
