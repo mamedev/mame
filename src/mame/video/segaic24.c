@@ -637,7 +637,7 @@ void segas24_sprite::draw(bitmap_t *bitmap, const rectangle *cliprect, const int
 
 		curspr = source[0];
 		type = curspr & 0xc000;
-		curspr &= 0x03ff;
+		curspr &= 0x1fff;
 
 		if(type == 0xc000)
 			break;
