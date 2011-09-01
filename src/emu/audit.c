@@ -149,9 +149,8 @@ m_searchpath = combinedpath;
 		m_record_list.reset();
 		return NOTFOUND;
 	}
-	else if (required == 0)
+	else if (required == 0 && found == 0 && m_record_list.count() == 0)
 	{
-		m_record_list.reset();
 		return NONE_NEEDED;
 	}
 
@@ -211,9 +210,8 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 		m_record_list.reset();
 		return NOTFOUND;
 	}
-	else if (required == 0)
+	else if (required == 0 && found == 0 && m_record_list.count() == 0)
 	{
-		m_record_list.reset();
 		return NONE_NEEDED;
 	}
 
@@ -285,9 +283,8 @@ media_auditor::summary media_auditor::audit_samples()
 		m_record_list.reset();
 		return NOTFOUND;
 	}
-	else if (required == 0)
+	else if (required == 0 && found == 0 && m_record_list.count() == 0)
 	{
-		m_record_list.reset();
 		return NONE_NEEDED;
 	}
 
