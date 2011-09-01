@@ -3637,18 +3637,16 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 {
 	if( vblank_state )
 	{
-	#if defined( MAME_DEBUG )
+#if defined( MAME_DEBUG )
 		DebugCheckKeys();
-	#endif
+#endif
 
-		psx_state *p_psx = screen.machine().driver_data<psx_state>();
-		if(p_psx->b_need_sianniv_vblank_hack)
-		{
-	/// HACK: find out what this is for?
-			UINT32 pc = cpu_get_pc(screen.machine().device("maincpu"));
-			if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0)
-				return;
-		}
+#if 0
+		// HACK for sianniv: find out what this is for?
+		UINT32 pc = cpu_get_pc(screen.machine().device("maincpu"));
+		if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0)
+			return;
+#endif
 
 		n_gpustatus ^= ( 1L << 31 );
 

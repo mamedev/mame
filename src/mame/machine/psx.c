@@ -28,8 +28,6 @@ void psx_driver_init( running_machine &machine )
 {
 	psx_state *p_psx = machine.driver_data<psx_state>();
 
-	p_psx->b_need_sianniv_vblank_hack = !strcmp(machine.system().name, "sianniv");
-
 	p_psx->m_p_n_psxram = (UINT32 *)memory_get_shared(machine, "share1", p_psx->m_n_psxramsize);
 }
 
