@@ -40,7 +40,6 @@
 
 
 
-
 // "Pacman hardware" games
 puckman			// (c) 1980 Namco
 puckmana		// (c) 1980 Namco
@@ -12408,6 +12407,7 @@ m1ttcash	// Tick Tock Cash (Empire)
 m1topstr	// Top Strike (Maygay - Bwb)
 m1sirich	// Strike It Rich
 m1gskill	// Greek Skill
+m1luxor		// Luxor Casino
 
 // Maygay MV1 hardware
 
@@ -12446,7 +12446,6 @@ mg_kf		// Krypton Factor
 
 
 // Maygay EPOCH hardware
-
 ep_simp		// The Simpsons (Maygay)
 ep_dblim	// Double Impact (Maygay - Impulse)
 ep_itjb3	// Italian Job 3 (Maygay)
@@ -12637,6 +12636,10 @@ ep_makmv	// Make Your Move (Global)
 ep_lug		// London Underground (Maygay)
 ep_crzbn	// Crazy Bingo (Maygay)
 ep_cascz	// Casino Crazy (Global)
+ep_wside	// Wildside (Global)
+ep_goldf	// Gold Fever (Impulse)
+ep_imj		// I'm A Jackpot (Global)
+ep_unsrt	// unsorted stuff
 
 // MPU2
 
@@ -13320,6 +13323,7 @@ m4rckrolb	//
 m4aao		// Against All Odds (Eurotek)
 m4bandgd	// Bands Of Gold (Eurogames)
 m4bangin	// Bangin' Away (Global)
+m4vfm		// Value For Money (Global)
 m4bangina	//
 m4banginb	//
 m4wwc		// Wacky Weekend Club (Global)
@@ -13440,6 +13444,7 @@ m4vivan		// Viva Las Vegas (Nova)
 m4blsbys	// Blues Boys (Version 6)
 m4conn4     // Connect 4
 
+m4surf		// Super Surfin' (Gemini)
 m4blkgd		// Black Gold (Gemini)
 m4excam		// Excalibur (Mdm)
 m4front		// Final Frontier (Mdm)

@@ -5053,6 +5053,8 @@ ROM_START( sc2gcclb )
 	ROM_LOAD( "club-golden-casino_std_ac_var_ass.bin", 0x0000, 0x010000, CRC(2de27b80) SHA1(57f1c40ceeb6ab82e9bac547aa00d8c1c1c07dab) )
 	ROM_LOAD( "95000589.p1", 0x0000, 0x010000, CRC(36400074) SHA1(611b48650e59b52f661be2730afaef2e5772607c) )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	// guess
+	ROM_LOAD( "gold_cas.snd", 0x0000, 0x080000, CRC(d93d39fb) SHA1(ce0c0c1430a6136ce39ffae018b009e629cbad61) )
 ROM_END
 
 ROM_START( sc2groul )
