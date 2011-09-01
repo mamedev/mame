@@ -285,7 +285,6 @@ public:
 	UINT32 *m_sharedram;
 	UINT32 *m_keycus;
 	size_t m_keycus_size;
-	UINT8 m_su_83;
 
 	UINT32 m_n_bankoffset;
 };
@@ -730,25 +729,6 @@ static WRITE16_HANDLER( c76_shared_w )
 	COMBINE_DATA(&share16[offset]);
 }
 
-static READ16_HANDLER( c76_speedup_r )
-{
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-
-	if ((cpu_get_pc(&space->device()) == 0xc153) && (!(state->m_su_83 & 0xff00)))
-	{
-		device_spin_until_interrupt(&space->device());
-	}
-
-	return state->m_su_83;
-}
-
-static WRITE16_HANDLER( c76_speedup_w )
-{
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-
-	COMBINE_DATA(&state->m_su_83);
-}
-
 static READ16_HANDLER( c76_inputs_r )
 {
 //  logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(&space->device()));
@@ -901,8 +881,6 @@ static DRIVER_INIT( namcos11 )
 {
 	namcos11_state *state = machine.driver_data<namcos11_state>();
 	int n_game;
-
-	machine.device("c76")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(c76_speedup_r), FUNC(c76_speedup_w));
 
 	if( strcmp( machine.system().name, "pocketrc" ) == 0 )
 	{
