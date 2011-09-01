@@ -1877,13 +1877,6 @@ ROM_START( j5slvreea )
 	J5SLVREE_SOUND
 ROM_END
 
-ROM_START( j5slvreeb )
-	ROM_REGION( 0x300000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "silver_137501.b8", 0x000000, 0x010000, CRC(e84d6437) SHA1(565b625ddb0693cd59ca1b1e07cd25ff1cb5c8f6) ) // 0x81 = FD
-	ROM_LOAD16_BYTE( "silver_137502.b8", 0x000001, 0x010000, CRC(e7db2018) SHA1(163fd4e58da0a224e7a93619621efa4390960bc2) ) // == silver_133002.b8
-	J5SLVREE_SOUND
-ROM_END
-
 
 #define J5SLVSTR_SOUND \
 	ROM_REGION( 0x80000, "upd7759", 0 ) \
@@ -2437,7 +2430,6 @@ GAME( 199?, j5roulclb	, j5roulcl	, jpmsys5, popeye, 0, ROT0, "JPM", "Roulette Cl
 GAME( 199?, j5roulclc	, j5roulcl	, jpmsys5, popeye, 0, ROT0, "JPM", "Roulette Club (Jpm) (SYSTEM5, set 4)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvree	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Reels (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvreea	, j5slvree	, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Reels (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, j5slvreeb	, j5slvree	, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Reels (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvstr	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Streak (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvstra	, j5slvstr	, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Streak (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvstrb	, j5slvstr	, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Streak (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
