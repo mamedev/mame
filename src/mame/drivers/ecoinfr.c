@@ -1302,5 +1302,5 @@ GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electr
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
 GAME( 19??, ec_barxmab, ec_barx	 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Bar X (MAB PCB) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // scrambled roms
 GAME( 19??, ec_spbg7mab,ec_big7  , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Big 7 (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supbxmab,ec_supb	 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Bar X (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supbxmab,ec_supbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Bar X (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
