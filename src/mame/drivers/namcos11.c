@@ -10,7 +10,6 @@
   Issues:
    Random draw list corruption in soul edge v2 & dunkmania.
    soul edge, dunk mania & prime goal ex try to access joypads/memory cards. It is unknown what they would do if they found one.
-   Pocket Racer can't enter service menus with proper C76 hookup, runs 60 FPS when it looks like it should be 30
 
 Known Dumps
 -----------
@@ -583,23 +582,6 @@ static READ32_HANDLER( keycus_c443_r )
 	return data;
 }
 
-void namcos11_vblank(namcos11_state *state, screen_device &screen, bool vblank_state)
-{
-	if( strcmp( screen.machine().system().name, "pocketrc" ) == 0 )
-	{
-		UINT32 *p_n_psxram = state->m_p_n_psxram;
-
-		if( p_n_psxram[ 0x12c74 / 4 ] == 0x1440fff9 )
-		{
-			p_n_psxram[ 0x12c74 / 4 ] = 0;
-		}
-		if( p_n_psxram[ 0x64694 / 4 ] == 0x1443000c )
-		{
-			p_n_psxram[ 0x64694 / 4 ] = 0;
-		}
-	}
-}
-
 INLINE void bankswitch_rom8( address_space *space, const char *bank, int n_data )
 {
 	memory_set_bank( space->machine(), bank, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
@@ -981,7 +963,6 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_MACHINE_RESET( namcos11 )
 
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos11_vblank ), (namcos11_state *) owner ) )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_C352_ADD("c352", 16384000)
@@ -998,11 +979,6 @@ static MACHINE_CONFIG_DERIVED( coh110, coh100 )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos11_vblank ), (namcos11_state *) owner ) )
-
-	/// TODO: figure out why pocketrc runs too fast
-//  MCFG_SCREEN_MODIFY("screen")
-//  MCFG_SCREEN_REFRESH_RATE( 30 )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos11 )
