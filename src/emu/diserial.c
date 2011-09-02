@@ -337,7 +337,7 @@ bool device_serial_interface::is_transmit_register_empty()
 	return m_tra_flags & TRANSMIT_REGISTER_EMPTY;
 }
 
-void device_serial_interface::set_callback(device_serial_interface *other_connection)
+void device_serial_interface::set_other_connection(device_serial_interface *other_connection)
 {
 	m_other_connection = other_connection;
 }
@@ -348,8 +348,8 @@ void device_serial_interface::connect(device_serial_interface *other_connection)
 	/* both connections should have their in connection setup! */
 	/* the in connection is the callback they use to update their state based
     on the output from the other side */
-	set_callback(other_connection);
-	other_connection->set_callback(this);
+	set_other_connection(other_connection);
+	other_connection->set_other_connection(this);
 
 	/* let b know the state of a */
 	serial_connection_out();

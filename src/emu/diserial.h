@@ -109,7 +109,7 @@ public:
 	
 	UINT8 get_received_char() { return m_rcv_byte_received; }
 	
-	void set_callback(device_serial_interface *other_connection);
+	void set_other_connection(device_serial_interface *other_connection);
 	
 	void connect(device_serial_interface *other_connection);
 protected:
