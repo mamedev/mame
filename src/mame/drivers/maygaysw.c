@@ -85,7 +85,9 @@
 
     Guiness Book of Records
     Risk
+	London Underground
     Big Break (except the PICs)
+	Aladdins Cave (except the PICs)
 
     Incomplete dumps?
 
@@ -155,9 +157,9 @@ ROM_START( mg_gbr )
 	ROM_LOAD( "dig1127.u3", 0x000000, 0x080000, CRC(45a2275d) SHA1(8af08b5c007bb2bfe927df53bd167ea6045d8694) )
 	ROM_LOAD( "dig1127.u2", 0x080000, 0x080000, CRC(220b38fe) SHA1(8ff20a9353736cda44ec11a99ac94b36f9db7430) )
 
-	ROM_REGION( 0x100000, "16c55", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "sound_16c55", 0 )	// PIC dump?
 	ROM_LOAD( "16c55.u5", 0x0000, 0x0023ff, CRC(0bd92c3e) SHA1(596f4d0a83ebc879ec64ba3038d2e9448d2f8901) )
-	ROM_REGION( 0x100000, "16c64", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "io_16c64", 0 )	// PIC dump?
 	ROM_LOAD( "16c64.u6", 0x0000, 0x008fff, CRC(6ae364a2) SHA1(56dde3d270c2cf81d9592c7c2284767188409b56) )
 ROM_END
 
@@ -189,9 +191,9 @@ ROM_START( mg_risk )
 	ROM_LOAD( "d1g1-145.u3", 0x000000, 0x080000, CRC(a428be45) SHA1(ccce7274ea25423e34c5be35706271501781bd08) )
 	ROM_LOAD( "d1g1-145.u2", 0x080000, 0x080000, CRC(6a3a6e26) SHA1(449eadbbee291c94a0f1f32a860dafd64e6143bb) )
 
-	ROM_REGION( 0x100000, "16c55", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "sound_16c55", 0 )	// PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, CRC(c1c0bd5b) SHA1(a1364de27f747d5531cb57757852f75cbb0cd520) )
-	ROM_REGION( 0x100000, "16c64", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "io_16c64", 0 )	// PIC dump?
 	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, CRC(64eca658) SHA1(77e9aa586a16cf1e88da4bb53866242ab1ece3cd) )
 ROM_END
 
@@ -223,12 +225,130 @@ ROM_START( mg_bb )
 	ROM_REGION( 0x100000, "snd", 0 )
 	ROM_LOAD( "bigbreaksoudnv3dig1-106.bin", 0x0000, 0x080000, CRC(65790dfa) SHA1(5dbcec93a77dd96e5f4b42db8ab25afed9a27c9e) )
 
-	ROM_REGION( 0x100000, "16c55", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "sound_16c55", 0 )	// PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, NO_DUMP )
-	ROM_REGION( 0x100000, "16c64", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "io_16c64", 0 )	// PIC dump?
 	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, NO_DUMP )
 ROM_END
 
+
+ROM_START( mg_alad )
+	ROM_REGION( 0x040000, "mainrom", 0 )
+	ROM_LOAD16_BYTE( "sw7-536s.u27", 0x00000, 0x020000, CRC(a16bb22b) SHA1(19a0f74cf6558a33895dd8079221dfaf64a397c3) )
+	ROM_LOAD16_BYTE( "sw7-536s.u28", 0x00001, 0x020000, CRC(5dfe53fa) SHA1(6b71ae36204bdde8354e78c9ecbc4c35f46bd529) )
+
+	ROM_REGION( 0x1000000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "sw8-323.u27", 0x00000, 0x020000, CRC(9a159893) SHA1(7289261f9956392e9823791bf9c979c47d7def44) )
+	ROM_LOAD16_BYTE( "sw8-323.u28", 0x00001, 0x020000, CRC(0d439b33) SHA1(12f8e9e466da52e91208363000f8271293f08c8a) )
+	ROM_LOAD16_BYTE( "sw8-322.u27", 0x00000, 0x020000, CRC(9a159893) SHA1(7289261f9956392e9823791bf9c979c47d7def44) )
+	ROM_LOAD16_BYTE( "sw8-322.u28", 0x00001, 0x020000, CRC(5dcf60f5) SHA1(b3f5a1bcdf95c2476b4ab57293fd676e1a31f8f6) )
+	ROM_LOAD16_BYTE( "al_c_swp.u27", 0x00000, 0x020000, CRC(8edd6aa0) SHA1(85adbe00c2925dc87cfe80e457ba671f46272ab2) )
+	ROM_LOAD16_BYTE( "al_c_swp.u28", 0x00001, 0x020000, CRC(02662b47) SHA1(4d94fbca0b1fafc482be009faec7749551a8da24) )
+
+	ROM_REGION( 0x800000, "dataroms", 0 )
+	ROM_LOAD( "dg-001-4.u01", 0x0000, 0x080000, CRC(7796ca47) SHA1(6afb22e7934a60712e5dbae862b63032d61d6095) )
+	ROM_LOAD( "dg-001-4.u07", 0x0000, 0x080000, CRC(2b1d7818) SHA1(f580b7f488d919580049b448720e76cc6b8d35ff) )
+	ROM_LOAD( "dg-001-4.u02", 0x0000, 0x080000, CRC(c18935ad) SHA1(d1a09591cee49f6e163257fdbfdb4c163fa68959) )
+	ROM_LOAD( "dg-001-4.u08", 0x0000, 0x080000, CRC(8214a2f1) SHA1(31358b416e14400a75a327ca4b83b94cd18d6365) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "d1g1-144.u3", 0x0000, 0x080000, CRC(30941180) SHA1(cafcddcec359c217016bfd86b84b358fc0b1e618) )
+	
+	ROM_REGION( 0x100000, "sound_16c55", 0 )
+	ROM_LOAD( "sound_16c55.u5", 0x0000, 0x080000, NO_DUMP )
+	ROM_REGION( 0x100000, "io_16c64", 0 )
+	ROM_LOAD( "io_16c64.u6", 0x0000, 0x080000, NO_DUMP )
+	
+ROM_END
+
+/*
+
+MAYGAY M2 - London Underground SWP game
+---------------------------------------
+
+Dumped by Andy Welburn on a sunny morning 10/03/07
+
+*************************************************
+**Do not seperate this text file from the roms.**
+*************************************************
+
+filename:	label: 			location	type
+============================================================
+M2_U9.bin	Final 4 M2 I/O		IOB U9		27C512
+VMB_U6.bin	DQ8-002-4 U6		VMB U6 even	27C040
+VMB_U12.bin	DQ8-002-4 U12		VMB U12	odd	27C040
+VMB_U4.bin	DG8-001-4 U4		VMB U4 even	27C040
+VMB_U10.bin	DG8-001-4 U10		VMB U10 odd	27C040
+VMB_U3.bin	DG8-001-4 U3		VMB U3 even	27C040
+VMB_U9.bin	DG8-001-4 U9		VMB U9 odd	27C040
+VMB_U2.bin	DG8-001-4 U2		VMB U2 even 	27C040
+VMB_U1.bin	DG8-001-4 U1		VMB U1 even  	27C040
+VMB_U7.bin	DG8-001-4 U7		VMB U7 odd	27C040
+VC_U27.bin	SW8-232 NON DATA U27	VC U27		27C010
+VC_U28.bin	SW8-232 NON DATA U28	VC U28		27C010
+MSB_U3.bin	DIG1-155 U3		MSB U3		27C040
+MSB_U2.bin	DIG1-155 U2		MSB U2		27C040
+MSB_U5.bin	M2 SOUND PIC Ver 1.0	MSB U5		PIC16C55
+CPU_U6.bin	M2 CPU I/O PIC Ver 2.2	CPU U6		PIC16C64
+
+
+location:
+IOB = M2 Active I/O Board 
+VMB = Video Memory Board
+VC = Video Card
+MSB = MPEG Sound Board
+CPU = M2 Active CPU Board
+
+
+NOTES:
+- Video Memory Board and MPEG Sound Board rom labels were prefixed 
+  with "L/UNDERGROUND", these have been omitted in the table above 
+  to keep it brief.
+- All Videocard roms were prefixed with LONDON UNDERGROUND
+- se enclosed jpegs for pictures of the pcb and roms in situ.
+
+enjoy..
+
+Andy
+
+*/
+
+
+
+ROM_START( mg_lug )
+	ROM_REGION( 0x040000, "mainrom", 0 )
+	ROM_LOAD16_BYTE( "sw8-232.u27", 0x00000, 0x020000, CRC(38c91eb5) SHA1(5a9a7d97999e8e261854fb9e8cf4ff056c351e87) )
+	ROM_LOAD16_BYTE( "sw8-232.u28", 0x00001, 0x020000, CRC(5766291f) SHA1(715a1269576a8b83a75be4922ef92976c96e70f7) )
+
+	ROM_REGION( 0x1000000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "sw8-233.u27", 0x00000, 0x020000, CRC(13fca198) SHA1(8e259ffaba795bcbe7097a44049966b63e743413) )
+	ROM_LOAD16_BYTE( "sw8-233.u28", 0x00001, 0x020000, CRC(72f12dae) SHA1(d0f41a164647f4b375baa35a929c5d1e9c9b82f4) )
+
+	ROM_REGION( 0x1000000, "io", 0 ) // none of the others have this?
+	ROM_LOAD( "m2.u9", 0x0000, 0x010000, CRC(1466debb) SHA1(9e403d8427031fcb07bc109138ada8f83af9c9dd) )
+
+	ROM_REGION( 0x800000, "dataroms", 0 )
+	ROM_LOAD16_BYTE( "vmb.u1", 0x000000, 0x080000, CRC(12bacc08) SHA1(091c5eacdf18e1b6e6a20ae0a6b8f0627dae7d14) )
+	ROM_LOAD16_BYTE( "vmb.u7", 0x000001, 0x080000, CRC(89c8e923) SHA1(575274126176c25015bfeb1da4e0586050c03e4c) )
+	ROM_LOAD16_BYTE( "vmb.u2", 0x100000, 0x080000, CRC(18505bc3) SHA1(910e258700568f76459b6ebe65debacf258c2ee6) )
+	ROM_LOAD16_BYTE( "vmb.u8", 0x100001, 0x080000, CRC(8a126378) SHA1(279beb550106c4fe91a41f2ad0b8930c4f99402e) )
+	ROM_LOAD16_BYTE( "vmb.u3", 0x200000, 0x080000, CRC(3a6a98a0) SHA1(aef73c9526ac7849e192b4a6f140336746d17bb9) )
+	ROM_LOAD16_BYTE( "vmb.u9", 0x200001, 0x080000, CRC(7f79cc2b) SHA1(e8303be1ce08ac879525c49429f5248d8f684e58) )
+	ROM_LOAD16_BYTE( "vmb.u4", 0x300000, 0x080000, CRC(e94282fb) SHA1(a9c494d43ac2905b3689c940a4013be7dd3fe166) )
+	ROM_LOAD16_BYTE( "vmb.u10",0x300001, 0x080000, CRC(e8e17be9) SHA1(99cf5ed63614b772107d38eb9a2028860d275a4f) )
+	/* no 05/11 pair? - unpopulated? */
+	ROM_LOAD16_BYTE( "vmb.u6", 0x500000, 0x080000, CRC(6a409048) SHA1(cd76c144afcf5eba6080f34770db4081a168201b) )
+	ROM_LOAD16_BYTE( "vmb.u12",0x500001, 0x080000, CRC(85d1ebad) SHA1(85f80c962f95d3d1af1efa7af9e8d06482146b95) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "msb.u3", 0x000000, 0x080000, CRC(18fbf244) SHA1(20c6b6b644d24dc477c859a300e357914f2cfe72) )
+	ROM_LOAD( "msb.u2", 0x080000, 0x080000, CRC(d802d345) SHA1(2b5acce2922fee3da924dc1291c2778de947218e) )
+
+	ROM_REGION( 0x100000, "sound_16c55", 0 )	// PIC dump?
+	ROM_LOAD( "msb.u5", 0x0000, 0x080000, CRC(e0335ce9) SHA1(a4a6d7cc79eaceab8949767860c7849d8b24d7d5) )
+	ROM_REGION( 0x100000, "io_16c64", 0 )	// PIC dump?
+	ROM_LOAD( "cpu.u6", 0x0000, 0x080000, CRC(24e25be1) SHA1(241f9c217e73586ab590f33ae4c8ec554e312f8c) )
+ROM_END
 
 
 
@@ -280,38 +400,6 @@ ROM_START( mg_kf )
 ROM_END
 
 
-ROM_START( mg_alad )
-	ROM_REGION( 0x040000, "mainrom", 0 )
-	ROM_LOAD16_BYTE( "sw8-322.u27", 0x00000, 0x020000, CRC(9a159893) SHA1(7289261f9956392e9823791bf9c979c47d7def44) )
-	ROM_LOAD16_BYTE( "sw8-322.u28", 0x00001, 0x020000, CRC(5dcf60f5) SHA1(b3f5a1bcdf95c2476b4ab57293fd676e1a31f8f6) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "sw8-323.u27", 0x00000, 0x020000, CRC(9a159893) SHA1(7289261f9956392e9823791bf9c979c47d7def44) )
-	ROM_LOAD16_BYTE( "sw8-323.u28", 0x00001, 0x020000, CRC(0d439b33) SHA1(12f8e9e466da52e91208363000f8271293f08c8a) )
-
-	ROM_LOAD16_BYTE( "al_c_swp.u27", 0x00000, 0x020000, CRC(8edd6aa0) SHA1(85adbe00c2925dc87cfe80e457ba671f46272ab2) )
-	ROM_LOAD16_BYTE( "al_c_swp.u28", 0x00001, 0x020000, CRC(02662b47) SHA1(4d94fbca0b1fafc482be009faec7749551a8da24) )
-ROM_END
-
-
-ROM_START( mg_lug )
-	ROM_REGION( 0x040000, "mainrom", 0 )
-	ROM_LOAD16_BYTE( "sw8-232.u27", 0x00000, 0x020000, CRC(38c91eb5) SHA1(5a9a7d97999e8e261854fb9e8cf4ff056c351e87) )
-	ROM_LOAD16_BYTE( "sw8-232.u28", 0x00001, 0x020000, CRC(5766291f) SHA1(715a1269576a8b83a75be4922ef92976c96e70f7) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "sw8-233.u27", 0x00000, 0x020000, CRC(13fca198) SHA1(8e259ffaba795bcbe7097a44049966b63e743413) )
-	ROM_LOAD16_BYTE( "sw8-233.u28", 0x00001, 0x020000, CRC(72f12dae) SHA1(d0f41a164647f4b375baa35a929c5d1e9c9b82f4) )
-
-	/* these are EPOCH roms */
-//  ROM_LOAD16_BYTE( "lond09g0", 0x0000, 0x020000, CRC(2d3343e0) SHA1(7618ab08c23f8f0e748a7b85ec3c7a52f1f64602) )
-//  ROM_LOAD16_BYTE( "lond09g1", 0x0000, 0x020000, CRC(0f36cfbb) SHA1(61c9df9247ede89734f24a2838c49f5e44884993) )
-//  ROM_LOAD16_BYTE( "msa02176.g0", 0x0000, 0x020000, CRC(12c5414a) SHA1(a570093adb67da2c7a3bdab38a419848ee188cdc) )
-//  ROM_LOAD16_BYTE( "msa02176.g1", 0x0000, 0x020000, CRC(c2aae470) SHA1(51e0523b68b0c45e80a7553ae5cadc74b7497b19) )
-//  ROM_LOAD16_BYTE( "msa02177.g0", 0x0000, 0x020000, CRC(a97b9047) SHA1(362ad27401fc2ae889761349af7dcf403318a6b6) )
-//  ROM_LOAD16_BYTE( "msa02177.g1", 0x0000, 0x020000, CRC(8f0d6b71) SHA1(83d81c528e72d5c0a754e47b0f0cbde7156ad908) )
-ROM_END
-
 ROM_START( mg_pbw )
 	ROM_REGION( 0x040000, "mainrom", 0 )
 	ROM_LOAD16_BYTE( "sw8-148.u27", 0x00000, 0x020000, CRC(d416dbd8) SHA1(114d8529807f2895123e9438c6a3b3a0a3be5d4a) )
@@ -341,12 +429,12 @@ ROM_END
 GAME( 199?, mg_gbr		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Guinness Book Of Records (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, mg_risk		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Risk (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, mg_bb		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Big Break (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_lug		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "London Underground (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, mg_alad		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Aladdin's Cave (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 // incomplete dumps
 GAME( 199?, mg_ewg		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Each Way Gambler (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, mg_jv		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Jack & Vera (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_alad		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Aladdin's Cave (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, mg_lug		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "London Underground (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, mg_pbw		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Pinball Wizard (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, mg_scl		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Super Clue (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, mg_kf		, 0			, maygayew, maygayew, 0, ROT0, "Maygay", "Krypton Factor (Maygay M2)", GAME_NOT_WORKING|GAME_NO_SOUND )
