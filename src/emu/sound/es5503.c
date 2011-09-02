@@ -31,78 +31,88 @@
   0.4 (RB) - major fixes to IRQ semantics and end-of-sample handling.
   0.5 (RB) - more flexible wave memory hookup (incl. banking) and save state support.
   1.0 (RB) - properly respects the input clock
+  2.0 (RB) - C++ conversion, more accurate oscillator IRQ timing
 */
 
 #include "emu.h"
 #include "es5503.h"
 
-typedef struct
-{
-	void *chip;
+// device type definition
+const device_type ES5503 = &device_creator<es5503_device>;
 
-	UINT16 freq;
-	UINT16 wtsize;
-	UINT8  control;
-	UINT8  vol;
-	UINT8  data;
-	UINT32 wavetblpointer;
-	UINT8  wavetblsize;
-	UINT8  resolution;
-
-	UINT32 accumulator;
-	UINT8  irqpend;
-	emu_timer *timer;
-} ES5503Osc;
-
-typedef struct
-{
-	ES5503Osc oscillators[32];
-
-	UINT8 *docram;
-
-	sound_stream * stream;
-
-	void (*irq_callback)(device_t *, int);	// IRQ callback
-
-	read8_device_func adc_read;		// callback for the 5503's built-in analog to digital converter
-
-	INT8  oscsenabled;		// # of oscillators enabled
-
-	int   rege0;			// contents of register 0xe0
-
-	UINT32 clock;
-	UINT32 output_rate;
-	device_t *device;
-} ES5503Chip;
-
-INLINE ES5503Chip *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == ES5503);
-	return (ES5503Chip *)downcast<legacy_device_base *>(device)->token();
-}
-
+// useful constants
 static const UINT16 wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
 static const UINT32 wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
 static const UINT32 accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
 static const int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 
-enum
+// default address map
+static ADDRESS_MAP_START( es5503, AS_0, 8 )
+	AM_RANGE(0x000000, 0x1ffff) AM_ROM
+ADDRESS_MAP_END
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  es5503_device - constructor
+//-------------------------------------------------
+
+es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ES5503, "Ensoniq ES5503", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("es5503_samples", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(es5503)),
+	  m_irq_func(NULL),
+	  m_adc_func(NULL)
 {
-	MODE_FREE = 0,
-	MODE_ONESHOT = 1,
-	MODE_SYNCAM = 2,
-	MODE_SWAP = 3
-};
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *es5503_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
+
+//-------------------------------------------------
+//  static_set_type - configuration helper to set
+//  the IRQ callback
+//-------------------------------------------------
+
+void es5503_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state))
+{
+	es5503_device &es5503 = downcast<es5503_device &>(device);
+	es5503.m_irq_func = irqf;
+}
+
+void es5503_device::static_set_adcf(device_t &device, UINT8 (*adcf)(device_t *device))
+{
+	es5503_device &es5503 = downcast<es5503_device &>(device);
+	es5503.m_adc_func = adcf;
+}
+
+//-------------------------------------------------
+//  device_timer - called when our device timer expires
+//-------------------------------------------------
+
+void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+{
+	m_stream->update();
+}
 
 // halt_osc: handle halting an oscillator
 // chip = chip ptr
 // onum = oscillator #
 // type = 1 for 0 found in sample data, 0 for hit end of table size
-static void es5503_halt_osc(ES5503Chip *chip, int onum, int type, UINT32 *accumulator)
+void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator)
 {
-	ES5503Osc *pOsc = &chip->oscillators[onum];
-	ES5503Osc *pPartner = &chip->oscillators[onum^1];
+	ES5503Osc *pOsc = &oscillators[onum];
+	ES5503Osc *pPartner = &oscillators[onum^1];
 	int mode = (pOsc->control>>1) & 3;
 
 	// if 0 found in sample data or mode is not free-run, halt this oscillator
@@ -128,36 +138,27 @@ static void es5503_halt_osc(ES5503Chip *chip, int onum, int type, UINT32 *accumu
 	{
 		pOsc->irqpend = 1;
 
-		if (chip->irq_callback)
+		if (m_irq_func)
 		{
-			chip->irq_callback(chip->device, 1);
+			m_irq_func(this, 1);
 		}
 	}
 }
 
-static TIMER_CALLBACK( es5503_timer_cb )
-{
-	ES5503Osc *osc = (ES5503Osc *)ptr;
-	ES5503Chip *chip = (ES5503Chip *)osc->chip;
-
-	chip->stream->update();
-}
-
-static STREAM_UPDATE( es5503_pcm_update )
+void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	INT32 mix[48000*2];
 	INT32 *mixp;
 	int osc, snum, i;
 	UINT32 ramptr;
-	ES5503Chip *chip = (ES5503Chip *)param;
 
 	memset(mix, 0, sizeof(mix));
 
-	for (osc = 0; osc < (chip->oscsenabled+1); osc++)
+	for (osc = 0; osc < (oscsenabled+1); osc++)
 	{
-		ES5503Osc *pOsc = &chip->oscillators[osc];
+		ES5503Osc *pOsc = &oscillators[osc];
 
-		mixp = &mix[0];
+		mixp = &mix[0];  
 
 		if (!(pOsc->control & 1))
 		{
@@ -178,11 +179,13 @@ static STREAM_UPDATE( es5503_pcm_update )
 
 				acc += freq;
 
-				data = (INT32)chip->docram[ramptr + wtptr] ^ 0x80;
+				// channel strobe is always valid when reading; this allows potentially banking per voice
+				m_channel_strobe = (ctrl>>4) & 0xf;
+				data = (INT32)m_direct->read_raw_byte(ramptr + wtptr) ^ 0x80;
 
-				if (chip->docram[ramptr + wtptr] == 0x00)
+				if (m_direct->read_raw_byte(ramptr + wtptr) == 0x00)
 				{
-					es5503_halt_osc(chip, osc, 1, &acc);
+					halt_osc(osc, 1, &acc);
 				}
 				else
 				{
@@ -199,7 +202,7 @@ static STREAM_UPDATE( es5503_pcm_update )
 
 					if (altram >= wtsize)
 					{
-						es5503_halt_osc(chip, osc, 0, &acc);
+						halt_osc(osc, 0, &acc);
 					}
 				}
 
@@ -226,56 +229,60 @@ static STREAM_UPDATE( es5503_pcm_update )
 }
 
 
-static DEVICE_START( es5503 )
+void es5503_device::device_start()
 {
-	const es5503_interface *intf;
 	int osc;
-	ES5503Chip *chip = get_safe_token(device);
 
-	intf = (const es5503_interface *)device->static_config();
+	// find our direct access
+	m_direct = &space()->direct();
 
-	chip->irq_callback = intf->irq_callback;
-	chip->adc_read = intf->adc_read;
-	chip->docram = intf->wave_memory;
-	chip->clock = device->clock();
-	chip->device = device;
-
-	chip->rege0 = 0x80;
+	rege0 = 0x80;
 
 	for (osc = 0; osc < 32; osc++)
 	{
-		device->save_item(NAME(chip->oscillators[osc].freq), osc);
-		device->save_item(NAME(chip->oscillators[osc].wtsize), osc);
-		device->save_item(NAME(chip->oscillators[osc].control), osc);
-		device->save_item(NAME(chip->oscillators[osc].vol), osc);
-		device->save_item(NAME(chip->oscillators[osc].data), osc);
-		device->save_item(NAME(chip->oscillators[osc].wavetblpointer), osc);
-		device->save_item(NAME(chip->oscillators[osc].wavetblsize), osc);
-		device->save_item(NAME(chip->oscillators[osc].resolution), osc);
-		device->save_item(NAME(chip->oscillators[osc].accumulator), osc);
-		device->save_item(NAME(chip->oscillators[osc].irqpend), osc);
-
-		chip->oscillators[osc].data = 0x80;
-		chip->oscillators[osc].irqpend = 0;
-		chip->oscillators[osc].accumulator = 0;
-
-		chip->oscillators[osc].timer = device->machine().scheduler().timer_alloc(FUNC(es5503_timer_cb), &chip->oscillators[osc]);
-		chip->oscillators[osc].chip = (void *)chip;
+		save_item(NAME(oscillators[osc].freq), osc);
+		save_item(NAME(oscillators[osc].wtsize), osc);
+		save_item(NAME(oscillators[osc].control), osc);
+		save_item(NAME(oscillators[osc].vol), osc);
+		save_item(NAME(oscillators[osc].data), osc);
+		save_item(NAME(oscillators[osc].wavetblpointer), osc);
+		save_item(NAME(oscillators[osc].wavetblsize), osc);
+		save_item(NAME(oscillators[osc].resolution), osc);
+		save_item(NAME(oscillators[osc].accumulator), osc);
+		save_item(NAME(oscillators[osc].irqpend), osc);
 	}
 
-	chip->oscsenabled = 1;
+	output_rate = (clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, output_rate, this);
 
-	chip->output_rate = (device->clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
-	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
+	m_timer = timer_alloc(0, NULL);
+	m_timer->adjust(attotime::from_hz(output_rate));
 }
 
-READ8_DEVICE_HANDLER( es5503_r )
+void es5503_device::device_reset()
+{
+	rege0 = 0x80;
+
+	for (int osc = 0; osc < 32; osc++)
+	{
+		oscillators[osc].data = 0x80;
+		oscillators[osc].irqpend = 0;
+		oscillators[osc].accumulator = 0;
+	}
+
+	oscsenabled = 1;
+
+	m_channel_strobe = 0;
+
+	output_rate = (clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
+}
+
+READ8_MEMBER( es5503_device::read )
 {
 	UINT8 retval;
 	int i;
-	ES5503Chip *chip = get_safe_token(device);
 
-	chip->stream->update();
+	m_stream->update();
 
 	if (offset < 0xe0)
 	{
@@ -284,32 +291,32 @@ READ8_DEVICE_HANDLER( es5503_r )
 		switch(offset & 0xe0)
 		{
 			case 0:		// freq lo
-				return (chip->oscillators[osc].freq & 0xff);
+				return (oscillators[osc].freq & 0xff);
 
 			case 0x20:  	// freq hi
-				return (chip->oscillators[osc].freq >> 8);
+				return (oscillators[osc].freq >> 8);
 
 			case 0x40:	// volume
-				return chip->oscillators[osc].vol;
+				return oscillators[osc].vol;
 
 			case 0x60:	// data
-				return chip->oscillators[osc].data;
+				return oscillators[osc].data;
 
 			case 0x80:	// wavetable pointer
-				return (chip->oscillators[osc].wavetblpointer>>8) & 0xff;
+				return (oscillators[osc].wavetblpointer>>8) & 0xff;
 
 			case 0xa0:	// oscillator control
-				return chip->oscillators[osc].control;
+				return oscillators[osc].control;
 
 			case 0xc0:	// bank select / wavetable size / resolution
 				retval = 0;
-				if (chip->oscillators[osc].wavetblpointer & 0x10000)
+				if (oscillators[osc].wavetblpointer & 0x10000)
 				{
 					retval |= 0x40;
 				}
 
-				retval |= (chip->oscillators[osc].wavetblsize<<3);
-				retval |= chip->oscillators[osc].resolution;
+				retval |= (oscillators[osc].wavetblsize<<3);
+				retval |= oscillators[osc].resolution;
 				return retval;
 		}
 	}
@@ -318,37 +325,37 @@ READ8_DEVICE_HANDLER( es5503_r )
 		switch (offset)
 		{
 			case 0xe0:	// interrupt status
-				retval = chip->rege0;
+				retval = rege0;
 
 				// scan all oscillators
-				for (i = 0; i < chip->oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled+1; i++)
 				{
-					if (chip->oscillators[i].irqpend)
+					if (oscillators[i].irqpend)
 					{
 						// signal this oscillator has an interrupt
 						retval = i<<1;
 
-						chip->rege0 = retval | 0x80;
+						rege0 = retval | 0x80;
 
 						// and clear its flag
-						chip->oscillators[i].irqpend--;
+						oscillators[i].irqpend--;
 
-						if (chip->irq_callback)
+						if (m_irq_func)
 						{
-							chip->irq_callback(chip->device, 0);
+							m_irq_func(this, 0);
 						}
 						break;
 					}
 				}
 
 				// if any oscillators still need to be serviced, assert IRQ again immediately
-				for (i = 0; i < chip->oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled+1; i++)
 				{
-					if (chip->oscillators[i].irqpend)
+					if (oscillators[i].irqpend)
 					{
-						if (chip->irq_callback)
+						if (m_irq_func)
 						{
-							chip->irq_callback(chip->device, 1);
+							m_irq_func(this, 1);
 						}
 						break;
 					}
@@ -357,12 +364,12 @@ READ8_DEVICE_HANDLER( es5503_r )
 				return retval;
 
 			case 0xe1:	// oscillator enable
-				return chip->oscsenabled<<1;
+				return oscsenabled<<1;
 
 			case 0xe2:	// A/D converter
-				if (chip->adc_read)
+				if (m_adc_func)
 				{
-					return chip->adc_read(chip->device, 0);
+					return m_adc_func(this);
 				}
 				break;
 		}
@@ -371,11 +378,9 @@ READ8_DEVICE_HANDLER( es5503_r )
 	return 0;
 }
 
-WRITE8_DEVICE_HANDLER( es5503_w )
+WRITE8_MEMBER( es5503_device::write )
 {
-	ES5503Chip *chip = get_safe_token(device);
-
-	chip->stream->update();
+	m_stream->update();
 
 	if (offset < 0xe0)
 	{
@@ -384,93 +389,49 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 		switch(offset & 0xe0)
 		{
 			case 0:		// freq lo
-				chip->oscillators[osc].freq &= 0xff00;
-				chip->oscillators[osc].freq |= data;
+				oscillators[osc].freq &= 0xff00;
+				oscillators[osc].freq |= data;
 				break;
 
 			case 0x20:  	// freq hi
-				chip->oscillators[osc].freq &= 0x00ff;
-				chip->oscillators[osc].freq |= (data<<8);
+				oscillators[osc].freq &= 0x00ff;
+				oscillators[osc].freq |= (data<<8);
 				break;
 
 			case 0x40:	// volume
-				chip->oscillators[osc].vol = data;
+				oscillators[osc].vol = data;
 				break;
 
 			case 0x60:	// data - ignore writes
 				break;
 
 			case 0x80:	// wavetable pointer
-				chip->oscillators[osc].wavetblpointer = (data<<8);
+				oscillators[osc].wavetblpointer = (data<<8);
 				break;
 
 			case 0xa0:	// oscillator control
 				// if a fresh key-on, reset the ccumulator
-				if ((chip->oscillators[osc].control & 1) && (!(data&1)))
+				if ((oscillators[osc].control & 1) && (!(data&1)))
 				{
-					chip->oscillators[osc].accumulator = 0;
-
-					// if this voice generates interrupts, set a timer to make sure we service it on time
-					if (((data & 0x09) == 0x08) && (chip->oscillators[osc].freq > 0))
-					{
-						UINT32 length, run;
-						UINT32 wtptr = chip->oscillators[osc].wavetblpointer & wavemasks[chip->oscillators[osc].wavetblsize];
-						UINT32 acc = 0;
-						UINT16 wtsize = chip->oscillators[osc].wtsize-1;
-						UINT16 freq = chip->oscillators[osc].freq;
-						INT8 data = -128;
-						int resshift = resshifts[chip->oscillators[osc].resolution] - chip->oscillators[osc].wavetblsize;
-						UINT32 sizemask = accmasks[chip->oscillators[osc].wavetblsize];
-						UINT32 ramptr, altram;
-						attotime period;
-
-						run = 1;
-						length = 0;
-						while (run)
-						{
-							ramptr = (acc >> resshift) & sizemask;
-							altram = (acc >> resshift);
-							acc += freq;
-							data = (INT32)chip->docram[ramptr + wtptr];
-
-							if ((data == 0) || (altram >= wtsize))
-							{
-								run = 0;
-							}
-							else
-							{
-								length++;
-							}
-						}
-
-						// ok, we run for this long
-						period = attotime::from_hz(chip->output_rate) * length;
-
-						chip->oscillators[osc].timer->adjust(period, 0, period);
-					}
-				}
-				else if (!(chip->oscillators[osc].control & 1) && (data&1))
-				{
-					// key off
-					chip->oscillators[osc].timer->adjust(attotime::never);
+					oscillators[osc].accumulator = 0;
 				}
 
-				chip->oscillators[osc].control = data;
+				oscillators[osc].control = data;
 				break;
 
 			case 0xc0:	// bank select / wavetable size / resolution
 				if (data & 0x40)	// bank select - not used on the Apple IIgs
 				{
-					chip->oscillators[osc].wavetblpointer |= 0x10000;
+					oscillators[osc].wavetblpointer |= 0x10000;
 				}
 				else
 				{
-					chip->oscillators[osc].wavetblpointer &= 0xffff;
+					oscillators[osc].wavetblpointer &= 0xffff;
 				}
 
-				chip->oscillators[osc].wavetblsize = ((data>>3) & 7);
-				chip->oscillators[osc].wtsize = wavesizes[chip->oscillators[osc].wavetblsize];
-				chip->oscillators[osc].resolution = (data & 7);
+				oscillators[osc].wavetblsize = ((data>>3) & 7);
+				oscillators[osc].wtsize = wavesizes[oscillators[osc].wavetblsize];
+				oscillators[osc].resolution = (data & 7);
 				break;
 		}
 	}
@@ -482,10 +443,11 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 				break;
 
 			case 0xe1:	// oscillator enable
-				chip->oscsenabled = (data>>1) & 0x1f;
+				oscsenabled = (data>>1);
 
-				chip->output_rate = (chip->clock/8)/(2+chip->oscsenabled);
-				chip->stream->set_sample_rate(chip->output_rate);
+				output_rate = (clock()/8)/(2+oscsenabled);
+				m_stream->set_sample_rate(output_rate);
+				m_timer->adjust(attotime::from_hz(output_rate));
 				break;
 
 			case 0xe2:	// A/D converter
@@ -494,37 +456,3 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 	}
 }
 
-void es5503_set_base(device_t *device, UINT8 *wavemem)
-{
-	ES5503Chip *chip = get_safe_token(device);
-
-	chip->docram = wavemem;
-}
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( es5503 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ES5503Chip);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( es5503 );			break;
-		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							/* Nothing */									break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "ES5503");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Ensoniq ES550x");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright R. Belmont");		break;
-	}
-}
-
-
-DEFINE_LEGACY_SOUND_DEVICE(ES5503, es5503);

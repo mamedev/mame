@@ -84,25 +84,17 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( mquake_es5503_w )
+static READ8_HANDLER( es5503_sample_r )
 {
-	// 5503 ROM is banked by the output channel (it's a handy 4-bit output from the 5503)
-	if (offset < 0xe0)
-	{
-		// if it's an oscillator control register
-		if ((offset & 0xe0) == 0xa0)
-		{
-			// if not writing a "halt", set the bank
-			if (!(data & 1))
-			{
-				es5503_set_base(device, device->machine().region("ensoniq")->base() + ((data>>4)*0x10000));
-			}
-		}
-	}
+	UINT8 *rom = space->machine().region("es5503")->base();
+	es5503_device *es5503 = space->machine().device<es5503_device>("es5503");
 
-	es5503_w(device, offset, data);
+	return rom[offset + (es5503->get_channel_strobe() * 0x10000)];
 }
 
+static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8 )
+	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
+ADDRESS_MAP_END
 
 static WRITE16_HANDLER( output_w )
 {
@@ -147,7 +139,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8("ensoniq", es5503_r, mquake_es5503_w, 0x00ff)
+	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8_MODERN("es5503", es5503_device, read, write, 0x00ff)
 	AM_RANGE(0x282000, 0x282001) AM_READ_PORT("SW.LO")
 	AM_RANGE(0x282002, 0x282003) AM_READ_PORT("SW.HI")
 	AM_RANGE(0x284000, 0x28400f) AM_WRITE(output_w)
@@ -309,19 +301,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const es5503_interface es5503_intf =
-{
-	NULL,
-	NULL,
-	NULL
-};
-
-
 static MACHINE_RESET(mquake)
 {
-	/* set ES5503 wave memory (this is banked in 64k increments) */
-	es5503_set_base(machine.device("ensoniq"), machine.region("ensoniq")->base());
-
 	MACHINE_RESET_CALL(amiga);
 }
 
@@ -391,8 +372,8 @@ static MACHINE_CONFIG_START( mquake, amiga_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ensoniq", ES5503, 7159090)		/* ES5503 is likely mono due to channel strobe used as bank select */
-	MCFG_SOUND_CONFIG(es5503_intf)
+	MCFG_ES5503_ADD("es5503", 7159090, NULL, NULL)		/* ES5503 is likely mono due to channel strobe used as bank select */
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, mquake_es5503_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
@@ -430,7 +411,7 @@ ROM_START( mquake )
 	ROM_LOAD16_BYTE( "rom5l.bin",    0xa0000, 0x10000, CRC(7b6ec532) SHA1(e19005269673134431eb55053d650f747f614b89) )
 	ROM_LOAD16_BYTE( "rom5h.bin",    0xa0001, 0x10000, CRC(ed8ec9b7) SHA1(510416bc88382e7a548635dcba53a2b615272e0f) )
 
-	ROM_REGION(0x040000, "ensoniq", 0)
+	ROM_REGION(0x040000, "es5503", 0)
 	ROM_LOAD( "qrom0.bin",    0x000000, 0x010000, CRC(753e29b4) SHA1(4c7ccff02d310c7c669aa170e8efb6f2cb996432) )
 	ROM_LOAD( "qrom1.bin",    0x010000, 0x010000, CRC(e9e15629) SHA1(a0aa60357a13703f69a2a13e83f2187c9a1f63c1) )
 	ROM_LOAD( "qrom2.bin",    0x020000, 0x010000, CRC(837294f7) SHA1(99e383998105a63896096629a51b3a0e9eb16b17) )
