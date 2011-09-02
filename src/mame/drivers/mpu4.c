@@ -4726,6 +4726,7 @@ ROM_START( m4clbcnt )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "con1_0.bin", 0x0000, 0x010000, CRC(2a758619) SHA1(77f993090b7d01901635c56fd9256f57d2371c6d) )
+	ROM_LOAD( "con1-1.bin", 0x0000, 0x010000, CRC(9fc1fefc) SHA1(5638c978687526858cbcb105bdb499dce2d234d3) )
 	ROM_LOAD( "conf.p1", 0x0000, 0x010000, CRC(7900cee0) SHA1(afcd77e5bc05a21b5eb7b26c66d94ce21f2ce501) )
 	ROM_LOAD( "cons.p1", 0x0000, 0x010000, CRC(afe71a40) SHA1(b0065e131eb8fcf7a2fd420f60e2174d927db450) )
 ROM_END
@@ -5015,6 +5016,7 @@ ROM_START( m4denmen )
 	ROM_LOAD( "dmts.p1", 0x0000, 0x010000, CRC(1a2776e3) SHA1(4d5029a5abafb3945d533ca5ca23b32c036fbb31) )
 	ROM_LOAD( "dmty.p1", 0x0000, 0x010000, CRC(dbfa78a5) SHA1(edd9a1f286f3aa56a919e9e0c0013e9940d139ac) )
 	ROM_LOAD( "dtm205", 0x0000, 0x010000, CRC(af76a460) SHA1(325021a92042c87e804bc17d6a7ccfda8bf865b8) )
+	ROM_LOAD( "denm2010", 0x0000, 0x010000, CRC(dbed5e48) SHA1(f374f01aeefca7cc19fc46c93e2ca7a10606b183) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "densnd1.hex", 0x000000, 0x080000, CRC(468a8ec7) SHA1(ec450cd86fda09bc94caf913e9ee7900cfeaa0f2) )

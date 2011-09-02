@@ -9313,6 +9313,7 @@ j2nbz		// Nudge Bonanza (JPM)
 j2clbbin	// Club Bingo (Crystal)
 j2sirich	// Strike It Rich? (Maygay?)
 j2hcash		// Hot Cash
+j2sset
 
 // JPM Give us a Break hardware
 guab			// (c) 1986
@@ -9494,7 +9495,7 @@ j5nudfic	// Nudge Fiction (Jpm)
 j5revo		// Revolver (Jpm)
 j5revoa		//
 j5sizl		// Sizzling (Jpm)
-
+j5hilos		// Hi Lo Silver (Jpm)
 
 // JPM System 5 + Video Expansion 2
 
@@ -11504,6 +11505,7 @@ sc1chain	//
 sc1potp		//
 sc1potpa	//
 
+
 // Scorpion 1 + Adder Video board
 
 m_tppokr		// (c) 1996 BFM/ELAM,Game Card 95-750-899, uses Adder board for feature gfx
@@ -12639,7 +12641,6 @@ ep_cascz	// Casino Crazy (Global)
 ep_wside	// Wildside (Global)
 ep_goldf	// Gold Fever (Impulse)
 ep_imj		// I'm A Jackpot (Global)
-ep_unsrt	// unsorted stuff
 
 // MPU2
 
@@ -14348,6 +14349,11 @@ pushover	// (c)1981 Summit Coin
 /* IGT SPlus */
 
 spss4240
+
+/* Unknown Fruit Machines */
+
+unkfr
+unkfra
 
 // Leisure Ent.
 roul			// (c) 1990

@@ -1831,6 +1831,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/trvquest.o \
 	$(DRIVERS)/ttchamp.o \
 	$(DRIVERS)/tugboat.o \
+	$(DRIVERS)/unkfr.o \
 	$(DRIVERS)/unkpcp.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \

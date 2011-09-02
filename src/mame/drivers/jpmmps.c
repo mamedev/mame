@@ -1972,6 +1972,13 @@ ROM_START( j2hcash ) // was in a 'Project' 'Hot Cash' set..
 	ROM_LOAD( "hotcash2.bin", 0x8000, 0x008000, CRC(ee7c082c) SHA1(2f75e20755b24e5e86bfc4d5bf2b064149224d28) )
 ROM_END
 
+ROM_START( j2sset )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sunset_strip_v2_0.bin", 0x0000, 0x008000, CRC(cbd2adea) SHA1(5c7d324d690a2ef0b85f3db323a0b4608b9e59b6) )
+ROM_END
+
+
+
 GAME(198?, j2adnote	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Add A Note (Jpm) (MPS, set 1)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2adnotea,j2adnote	,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Add A Note (Jpm) (MPS, set 2)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2adnoteb,j2adnote	,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Add A Note (Jpm) (MPS, set 3)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
@@ -2168,3 +2175,4 @@ GAME(198?, j2clbbin	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Crystal?","Club Bingo (C
 GAME(198?, j2sirich	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Maygay?","Strike It Rich (Maygay?) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND ) // I don't think this is MayGay, it was just in a MayGay set with some actual MayGay roms
 
 GAME(198?, j2hcash	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Unknown","Hot Cash (Unk) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j2sset	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Unknown","Sunset Strip (v2.0) (Unk) (MPS?)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
