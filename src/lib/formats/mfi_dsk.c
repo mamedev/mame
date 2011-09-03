@@ -22,11 +22,12 @@
   simple "compress" function.
 
   Track data consists of a series of 32-bits lsb-first values
-  representing magnetic cells.  Bits 0-27 indicate the sizes, and bits
-  28-31 the types.  Type can be:
-  - 0 -> 0-level bit
-  - 1 -> 1-level bit
-  - 2 -> weak bit, randomly appears at 0 or 1
+  representing magnetic cells.  Bits 0-27 indicate the sizes, and bit
+  31 the orientation.  Bits 28-30 are currently unused and must be 0.
+
+  Remember that the fdcs detect transitions, not absolute levels, so
+  the actual physical significance of the orientation bit is
+  arbitrary.
 
   Tracks data is aligned so that the index pulse is at the start,
   whether the disk is hard-sectored or not.
@@ -97,13 +98,9 @@ UINT32 mfi_format::get_next_edge(const UINT32 *trackbuf, UINT32 cur_cell, UINT32
 	if(cur_cell == cell_count)
 		return 200000000;
 	UINT32 cur_bit = trackbuf[cur_cell] & BIT_MASK;
-	if(cur_bit == BIT_WEAK)
-		cur_bit = BIT_0;
 	cur_cell++;
 	while(cur_cell != cell_count) {
 		UINT32 next_bit = trackbuf[cur_cell] & BIT_MASK;
-		if(next_bit == BIT_WEAK)
-			next_bit = BIT_0;
 		if(next_bit != cur_bit)
 			break;
 	}
@@ -179,37 +176,40 @@ bool mfi_format::load(floppy_image *image)
 
 			UINT32 cur_cell = 0;
 			UINT32 pll_period = 2000;
-			UINT32 pll_phase = 1000;
+			UINT32 pll_phase = 0;
 			for(;;) {
 				advance(trackbuf, cur_cell, cell_count, pll_phase);
 				if(cur_cell == cell_count)
 					break;
-
-				if((trackbuf[cur_cell] & BIT_MASK) == BIT_1)
-					mfm[bit >> 3] |= 0x80 >> (bit & 7);
-				bit++;
 
 #if 0
 				printf("%09d: (%d, %09d) - (%d, %09d) - (%d, %09d)\n",
 					   pll_phase,
 					   trackbuf[cur_cell] >> BIT_SHIFT, trackbuf[cur_cell] & TIME_MASK,
 					   trackbuf[cur_cell+1] >> BIT_SHIFT, trackbuf[cur_cell+1] & TIME_MASK,
-					   trackbuf[cur_cell]+2 >> BIT_SHIFT, trackbuf[cur_cell+2] & TIME_MASK);
+					   trackbuf[cur_cell+2] >> BIT_SHIFT, trackbuf[cur_cell+2] & TIME_MASK);
 #endif
 
 				UINT32 next_edge = get_next_edge(trackbuf, cur_cell, cell_count);
+
 				if(next_edge > pll_phase + pll_period) {
-					// free run
+					// free run, zero bit
 					//					printf("%09d: %4d - Free run\n", pll_phase, pll_period);
 					pll_phase += pll_period;
 				} else {
-					// Adjust
+					// Transition in the window, one bit, adjust the period
+
+					mfm[bit >> 3] |= 0x80 >> (bit & 7);
+
 					INT32 delta = next_edge - (pll_phase + pll_period/2);
 					//					printf("%09d: %4d - Delta = %d\n", pll_phase, pll_period, delta);
+
 					// The deltas should be lowpassed, the amplification factor tuned...
 					pll_period += delta/2;
 					pll_phase += pll_period;
 				}
+
+				bit++;
 			}
 			image->set_track_size(cyl, head, (bit+7)/8);
 
