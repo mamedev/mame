@@ -89,41 +89,14 @@ int mfi_format::identify(floppy_image *image)
 	return 0;
 }
 
-void mfi_format::advance(const UINT32 *trackbuf, UINT32 &cur_cell, UINT32 cell_count, UINT32 time)
-{
-	if(time >= 200000000) {
-		cur_cell = cell_count;
-		return;
-	}
-
-	while(cur_cell != cell_count-1 && (trackbuf[cur_cell+1] & TIME_MASK) < time)
-		cur_cell++;
-}
-
-UINT32 mfi_format::get_next_edge(const UINT32 *trackbuf, UINT32 cur_cell, UINT32 cell_count)
-{
-	if(cur_cell == cell_count)
-		return 200000000;
-	UINT32 cur_bit = trackbuf[cur_cell] & MG_MASK;
-	cur_cell++;
-	while(cur_cell != cell_count) {
-		UINT32 next_bit = trackbuf[cur_cell] & MG_MASK;
-		if(next_bit != cur_bit)
-			break;
-	}
-	return cur_cell == cell_count ? 200000000 : trackbuf[cur_cell] & TIME_MASK;
-}
-
 bool mfi_format::load(floppy_image *image)
 {
 	header h;
 	entry entries[84*2];
 	image->image_read(&h, 0, sizeof(header));
 	image->image_read(&entries, sizeof(header), h.cyl_count*h.head_count*sizeof(entry));
-	image->set_meta_data(h.cyl_count, h.head_count, 300, (UINT16)253360);
+	image->set_meta_data(h.cyl_count, h.head_count);
 
-	UINT32 *trackbuf = 0;
-	int trackbuf_size = 0;
 	UINT8 *compressed = 0;
 	int compressed_size = 0;
 
@@ -143,34 +116,16 @@ bool mfi_format::load(floppy_image *image)
 				compressed = global_alloc_array(UINT8, compressed_size);
 			}
 
-			if(ent->uncompressed_size > trackbuf_size) {
-				if(trackbuf)
-					global_free(trackbuf);
-				trackbuf_size = ent->uncompressed_size;
-				trackbuf = global_alloc_array(UINT32, trackbuf_size/4);
-			}
-
 			image->image_read(compressed, ent->offset, ent->compressed_size);
+
+			unsigned int cell_count = ent->uncompressed_size/4;
+			image->set_track_size(cyl, head, cell_count);
+			UINT32 *trackbuf = image->get_buffer(cyl, head);
 
 			uLongf size = ent->uncompressed_size;
 			if(uncompress((Bytef *)trackbuf, &size, compressed, ent->compressed_size) != Z_OK)
 				return true;
 
-			UINT8 *mfm = image->get_buffer(cyl, head);
-			image->set_track_size(cyl, head, 16384);
-			memset(mfm, 0, 16384);
-			int bit = 0;
-
-			// Extract the bits using a quick-n-dirty software pll
-			// expecting mfm 2us data.  Eventually the plls will end
-			// up in the fdc simulations themselves.
-
-			// Neutral/damaged bits are not really taken into account
-
-			//  Start by turning the cell times into absolute
-			//  positions, it's easier to use that way.
-
-			unsigned int cell_count = ent->uncompressed_size/4;
 			UINT32 cur_time = 0;
 			for(unsigned int i=0; i != cell_count; i++) {
 				UINT32 next_cur_time = cur_time + (trackbuf[i] & TIME_MASK);
@@ -180,50 +135,12 @@ bool mfi_format::load(floppy_image *image)
 			if(cur_time != 200000000)
 				return true;
 
-			//  Then pll the hell out of the bits
-
-			UINT32 cur_cell = 0;
-			UINT32 pll_period = 2000;
-			UINT32 pll_phase = 0;
-			for(;;) {
-				advance(trackbuf, cur_cell, cell_count, pll_phase);
-				if(cur_cell == cell_count)
-					break;
-
-#if 0
-				printf("%09d: (%d, %09d) - (%d, %09d) - (%d, %09d)\n",
-					   pll_phase,
-					   trackbuf[cur_cell] >> MG_SHIFT, trackbuf[cur_cell] & TIME_MASK,
-					   trackbuf[cur_cell+1] >> MG_SHIFT, trackbuf[cur_cell+1] & TIME_MASK,
-					   trackbuf[cur_cell+2] >> MG_SHIFT, trackbuf[cur_cell+2] & TIME_MASK);
-#endif
-
-				UINT32 next_edge = get_next_edge(trackbuf, cur_cell, cell_count);
-
-				if(next_edge > pll_phase + pll_period) {
-					// free run, zero bit
-					//					printf("%09d: %4d - Free run\n", pll_phase, pll_period);
-					pll_phase += pll_period;
-				} else {
-					// Transition in the window, one bit, adjust the period
-
-					mfm[bit >> 3] |= 0x80 >> (bit & 7);
-
-					INT32 delta = next_edge - (pll_phase + pll_period/2);
-					//					printf("%09d: %4d - Delta = %d\n", pll_phase, pll_period, delta);
-
-					// The deltas should be lowpassed, the amplification factor tuned...
-					pll_period += delta/2;
-					pll_phase += pll_period;
-				}
-
-				bit++;
-			}
-			image->set_track_size(cyl, head, (bit+7)/8);
-
 			ent++;
 		}
 			
+	if(compressed)
+		global_free(compressed);
+
 	return false;
 }
 

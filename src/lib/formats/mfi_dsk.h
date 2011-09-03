@@ -38,9 +38,6 @@ private:
 	struct entry {
 		unsigned int offset, compressed_size, uncompressed_size;
 	};
-
-	void advance(const UINT32 *trackbuf, UINT32 &cur_cell, UINT32 cell_count, UINT32 time);
-	UINT32 get_next_edge(const UINT32 *trackbuf, UINT32 cur_cell, UINT32 cell_count);	
 };
 
 extern const floppy_format_type FLOPPY_MFI_FORMAT;

@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <limits.h>
 
+#include "emu.h"
 #include "osdcore.h"
 #include "ioprocs.h"
 #include "flopimg.h"
@@ -955,13 +956,30 @@ floppy_image::floppy_image(void *fp, const struct io_procs *procs, const floppy_
 		else
 			m_formats = fif;
 	}
+
+	memset(cell_data, 0, sizeof(cell_data));
+	memset(track_size, 0, sizeof(track_size));
+	memset(track_alloc_size, 0, sizeof(track_alloc_size));
 }
 
 floppy_image::~floppy_image()
 {
-	if(m_formats)
-		delete m_formats;
 	close();
+}
+
+void floppy_image::ensure_alloc(UINT16 track, UINT8 side)
+{
+	int idx = (track << 1) + side;
+	if(track_size[idx] > track_alloc_size[idx]) {
+		UINT32 new_size = track_size[idx]*11/10;
+		UINT32 *new_array = global_alloc_array(UINT32, new_size);
+		if(track_alloc_size[idx]) {
+			memcpy(new_array, cell_data[idx], track_alloc_size[idx]*4);
+			global_free(cell_data[idx]);
+		}
+		cell_data[idx] = new_array;
+		track_alloc_size[idx] = new_size;
+	}
 }
 
 void floppy_image::image_read(void *buffer, UINT64 offset, size_t length)
@@ -995,12 +1013,10 @@ void floppy_image::close()
 	close_internal(TRUE);
 }
 
-void floppy_image::set_meta_data(UINT16 tracks, UINT8 sides, UINT16 rpm, UINT16 bitrate)
+void floppy_image::set_meta_data(UINT16 _tracks, UINT8 _sides)
 {
-	m_tracks = tracks;
-	m_sides  = sides;
-	m_rpm    = rpm;
-	m_bitrate= bitrate;
+	tracks = _tracks;
+	sides  = _sides;
 }
 
 floppy_image_format_t *floppy_image::identify(int *best)
@@ -1181,9 +1197,9 @@ void floppy_image_format_t::fixup_crcs(UINT8 *buffer, gen_crc_info *crcs)
 		}
 }
 
-void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, UINT8 *buffer)
+void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, floppy_image *image)
 {
-	memset(buffer, 0, (track_size+7)/8);
+	UINT8 *buffer = global_alloc_array_clear(UINT8, (track_size+7)/8);
 
 	gen_crc_info crcs[MAX_CRC_COUNT];
 	collect_crcs(desc, crcs);
@@ -1317,5 +1333,47 @@ void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT
 	}
 
 	fixup_crcs(buffer, crcs);
+
+	generate_track_from_bitstream(track, head, buffer, track_size, image);
+	global_free(buffer);
+}
+
+void floppy_image_format_t::normalize_times(UINT32 *buffer, int bitlen)
+{
+	unsigned int total_sum = 0;
+	for(int i=0; i != bitlen; i++)
+		total_sum += buffer[i] & floppy_image::TIME_MASK;
+
+	unsigned int current_sum = 0;
+	for(int i=0; i != bitlen; i++) {
+		UINT32 time = buffer[i] & floppy_image::TIME_MASK;
+		buffer[i] = (buffer[i] & floppy_image::MG_MASK) | (200000000ULL * current_sum / total_sum);
+		current_sum += time;
+	}
+}
+
+void floppy_image_format_t::generate_track_from_bitstream(UINT8 track, UINT8 head, const UINT8 *trackbuf, int track_size, floppy_image *image)
+{
+	// Maximal number of cells which happens when the buffer is all 1
+	image->set_track_size(track, head, track_size+1);
+	UINT32 *dest = image->get_buffer(track, head);
+	UINT32 *base = dest;
+
+	UINT32 cbit = floppy_image::MG_A;
+	UINT32 count = 0;
+	for(int i=0; i != track_size; i++)
+		if(trackbuf[i >> 3] & (0x80 >> (i & 7))) {
+			*dest++ = cbit | (count+1);
+			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
+			count = 1;
+		} else
+			count += 2;
+
+	if(count)
+		*dest++ = cbit | count;
+
+	int size = dest - base;
+	normalize_times(base, size);
+	image->set_track_size(track, head, size);
 }
 

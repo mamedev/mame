@@ -37,7 +37,7 @@ int adf_format::identify(floppy_image *image)
 	UINT64 size = image->image_size();
 	if ((size == 901120) || (size == 1802240))
 	{
-		return 100;
+		return 50;
 	}
 	return 0;
 }
@@ -78,13 +78,11 @@ bool adf_format::load(floppy_image *image)
 	}
 
 	UINT8 *mfm = NULL;
-	image->set_meta_data(80,2,300,(UINT16)253360);
+	image->set_meta_data(80, 2);
 	for(int track=0; track < 80; track++) {
 		for(int side=0; side < 2; side++) {
-			mfm = image->get_buffer(track,side);
-			image->set_track_size(track, side, 16384);
 			image->image_read(sectdata, (track*2 + side)*512*11, 512*11);
-			generate_track(desc, track, side, sectors, 11, 100000, mfm);
+			generate_track(desc, track, side, sectors, 11, 100000, image);
 		}
 	}
 

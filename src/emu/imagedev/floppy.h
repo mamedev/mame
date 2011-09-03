@@ -61,7 +61,8 @@ public:
 	void setup_unload_cb(unload_cb cb);
 	void setup_index_pulse_cb(index_pulse_cb cb);
 
-	UINT8* get_buffer() { return m_image->get_buffer(m_cyl,m_ss ^ 1); }
+	UINT32* get_buffer() { return m_image->get_buffer(m_cyl,m_ss ^ 1); }
+	UINT32 get_len() { return m_image->get_track_size(m_cyl,m_ss ^ 1); }
 
 	void mon_w(int state);
 	void index_func();

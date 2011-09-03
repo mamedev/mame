@@ -287,7 +287,9 @@ protected:
 	// "sect" is a vector indexed by sector id
 	// "track_size" is in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm
 
-	void generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, UINT8 *buffer);
+	void generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
+	void generate_track_from_bitstream(UINT8 track, UINT8 head, const UINT8 *trackbuf, int track_size, floppy_image *image);
+	void normalize_times(UINT32 *buffer, int bitlen);
 
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT };
@@ -325,14 +327,38 @@ floppy_image_format_t *floppy_image_format_creator()
 
 // ======================> floppy_image
 
-#define MAX_FLOPPY_SIDES   2
-#define MAX_FLOPPY_TRACKS  84
-#define MAX_TRACK_DATA     16384
-
 // class representing floppy image
 class floppy_image
 {
 public:
+	// Internal format is close but not identical to the mfi format.
+	//
+	//
+	// Track data consists of a series of 32-bits lsb-first values
+	// representing magnetic cells.  Bits 0-27 indicate the absolute
+	// position of the start of the cell (not the size), and bits
+	// 28-31 the type.  Type can be:
+	// - 0, MG_A -> Magnetic orientation A
+	// - 1, MG_B -> Magnetic orientation B
+	// - 2, MG_N -> Non-magnetized zone (neutral)
+	// - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
+	//
+	// The position is in angular units of 1/200,000,000th of a turn.
+	// The last cell implicit end position is of course 200,000,000.
+	//
+	// Unformatted tracks are encoded as zero-size.
+
+	enum {
+		TIME_MASK = 0x0fffffff,
+		MG_MASK   = 0xf0000000,
+		MG_SHIFT  = 28,
+
+		MG_A      = (0 << MG_SHIFT),
+		MG_B      = (1 << MG_SHIFT),
+		MG_N      = (2 << MG_SHIFT),
+		MG_D      = (3 << MG_SHIFT)
+	};
+
 	// construction/destruction
 	floppy_image(void *fp, const struct io_procs *procs, const floppy_format_type *formats);
 	virtual ~floppy_image();
@@ -343,23 +369,31 @@ public:
 	UINT64 image_size();
 	void close();
 
-	void set_meta_data(UINT16 tracks, UINT8 sides, UINT16 rpm, UINT16 bitrate);
-	void set_track_size(UINT16 track, UINT8 side, UINT16 size) { m_track_size[(track << 1) + side] = size; }
+	void set_meta_data(UINT16 tracks, UINT8 sides);
+	void set_track_size(UINT16 track, UINT8 side, UINT32 size) { track_size[(track << 1) + side] = size; ensure_alloc(track, side); }
 	floppy_image_format_t *identify(int *best);
-	UINT8* get_buffer(UINT16 track, UINT8 side) { return m_native_data[(track << 1) + side]; }
-	UINT16 get_track_size(UINT16 track, UINT8 side) { return m_track_size[(track << 1) + side]; }
+	UINT32 *get_buffer(UINT16 track, UINT8 side) { return cell_data[(track << 1) + side]; }
+	UINT32 get_track_size(UINT16 track, UINT8 side) { return track_size[(track << 1) + side]; }
 
 private:
+	enum {
+		MAX_FLOPPY_SIDES = 2,
+		MAX_FLOPPY_TRACKS = 84
+	};
+
 	void close_internal(bool close_file);
 	struct io_generic		m_io;
 	floppy_image_format_t *m_formats;
-	UINT16 m_tracks;
-	UINT8  m_sides;
-	UINT16 m_rpm;
-	UINT16 m_bitrate;
 
-	UINT8 m_native_data[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS][MAX_TRACK_DATA];
-	UINT16 m_track_size[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
+	UINT16 tracks;
+	UINT8  sides;
+	UINT16 rpm;
+
+	UINT32 *cell_data[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
+	UINT32 track_size[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
+	UINT32 track_alloc_size[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
+
+	void ensure_alloc(UINT16 track, UINT8 side);
 };
 
 #endif /* FLOPIMG_H */
