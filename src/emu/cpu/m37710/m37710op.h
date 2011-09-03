@@ -517,81 +517,85 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #if FLAG_SET_X
 #define OP_PSH(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
+	CLK(12); \
 	if (SRC&0x1)	\
-		m37710i_push_8(cpustate, REG_A);	\
+		m37710i_push_8(cpustate, REG_A);  CLK(2);  \
 	if (SRC&0x2)	\
-		m37710i_push_8(cpustate, REG_BA);	\
+		m37710i_push_8(cpustate, REG_BA); CLK(2);  \
 	if (SRC&0x4)	\
-		m37710i_push_8(cpustate, REG_X);	\
+		m37710i_push_8(cpustate, REG_X);  CLK(2);  \
 	if (SRC&0x8)	\
-		m37710i_push_8(cpustate, REG_Y);	\
+		m37710i_push_8(cpustate, REG_Y);  CLK(2);  \
 	if (SRC&0x10)	\
-		m37710i_push_16(cpustate, REG_D);	\
+		m37710i_push_16(cpustate, REG_D); CLK(2);  \
 	if (SRC&0x20)	\
-		m37710i_push_8(cpustate, REG_DB>>16);	\
+		m37710i_push_8(cpustate, REG_DB>>16); CLK(1);  \
 	if (SRC&0x40)	\
-		m37710i_push_8(cpustate, REG_PB>>16);	\
+		m37710i_push_8(cpustate, REG_PB>>16); CLK(1);  \
 	if (SRC&0x80)	\
-		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
+		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2);
 #else	// FLAG_SET_X
 #define OP_PSH(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
+	CLK(12); \
 	if (SRC&0x1)	\
-		m37710i_push_8(cpustate, REG_A);	\
+		m37710i_push_8(cpustate, REG_A); CLK(2);   \
 	if (SRC&0x2)	\
-		m37710i_push_8(cpustate, REG_BA);	\
+		m37710i_push_8(cpustate, REG_BA); CLK(2);  \
 	if (SRC&0x4)	\
-		m37710i_push_16(cpustate, REG_X);	\
+		m37710i_push_16(cpustate, REG_X); CLK(2);  \
 	if (SRC&0x8)	\
-		m37710i_push_16(cpustate, REG_Y);	\
+		m37710i_push_16(cpustate, REG_Y); CLK(2);  \
 	if (SRC&0x10)	\
-		m37710i_push_16(cpustate, REG_D);	\
+		m37710i_push_16(cpustate, REG_D); CLK(2);  \
 	if (SRC&0x20)	\
-		m37710i_push_8(cpustate, REG_DB>>16);	\
+		m37710i_push_8(cpustate, REG_DB>>16); CLK(1);  \
 	if (SRC&0x40)	\
-		m37710i_push_8(cpustate, REG_PB>>16);	\
+		m37710i_push_8(cpustate, REG_PB>>16); CLK(1);  \
 	if (SRC&0x80)	\
-		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
+		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2);
 #endif	// FLAG_SET_X
 #else	// FLAG_SET_M
 #if FLAG_SET_X
 #define OP_PSH(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
+	CLK(12); \
 	if (SRC&0x1)	\
-		m37710i_push_16(cpustate, REG_A);	\
+		m37710i_push_16(cpustate, REG_A); CLK(2);  \
 	if (SRC&0x2)	\
-		m37710i_push_16(cpustate, REG_BA);	\
+		m37710i_push_16(cpustate, REG_BA); CLK(2); \
 	if (SRC&0x4)	\
-		m37710i_push_8(cpustate, REG_X);	\
+		m37710i_push_8(cpustate, REG_X); CLK(2);   \
 	if (SRC&0x8)	\
-		m37710i_push_8(cpustate, REG_Y);	\
+		m37710i_push_8(cpustate, REG_Y); CLK(2);   \
 	if (SRC&0x10)	\
-		m37710i_push_16(cpustate, REG_D);	\
+		m37710i_push_16(cpustate, REG_D); CLK(2);  \
 	if (SRC&0x20)	\
-		m37710i_push_8(cpustate, REG_DB>>16);	\
+		m37710i_push_8(cpustate, REG_DB>>16); CLK(1);  \
 	if (SRC&0x40)	\
-		m37710i_push_8(cpustate, REG_PB>>16);	\
+		m37710i_push_8(cpustate, REG_PB>>16); CLK(1);  \
 	if (SRC&0x80)	\
-		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
+		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2);
 #else	// FLAG_SET_X
 #define OP_PSH(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
+	CLK(12); \
 	if (SRC&0x1)	\
-		m37710i_push_16(cpustate, REG_A);	\
+		m37710i_push_16(cpustate, REG_A); CLK(2);  \
 	if (SRC&0x2)	\
-		m37710i_push_16(cpustate, REG_BA);	\
+		m37710i_push_16(cpustate, REG_BA); CLK(2); \
 	if (SRC&0x4)	\
-		m37710i_push_16(cpustate, REG_X);	\
+		m37710i_push_16(cpustate, REG_X); CLK(2);  \
 	if (SRC&0x8)	\
-		m37710i_push_16(cpustate, REG_Y);	\
+		m37710i_push_16(cpustate, REG_Y); CLK(2);  \
 	if (SRC&0x10)	\
-		m37710i_push_16(cpustate, REG_D);	\
+		m37710i_push_16(cpustate, REG_D); CLK(2);  \
 	if (SRC&0x20)	\
-		m37710i_push_8(cpustate, REG_DB>>16);	\
+		m37710i_push_8(cpustate, REG_DB>>16); CLK(1);  \
 	if (SRC&0x40)	\
-		m37710i_push_8(cpustate, REG_PB>>16);	\
+		m37710i_push_8(cpustate, REG_PB>>16); CLK(1);  \
 	if (SRC&0x80)	\
-		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
+		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2);
 #endif	// FLAG_SET_X
 #endif	// FLAG_SET_M
 
@@ -599,41 +603,42 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_PUL
 #define OP_PUL(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
+	CLK(14); \
 	if (SRC&0x80)	\
-		m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate));	\
+		m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate)); CLK(3); \
 	if (SRC&0x40)	\
-		REG_PB = m37710i_pull_8(cpustate) << 16;	\
+		REG_PB = m37710i_pull_8(cpustate) << 16; CLK(3);   \
 	if (SRC&0x20)	\
-		REG_DB = m37710i_pull_8(cpustate) << 16;	\
+		REG_DB = m37710i_pull_8(cpustate) << 16; CLK(3);   \
 	if (SRC&0x10)	\
-		REG_D  = m37710i_pull_16(cpustate);	\
+		REG_D  = m37710i_pull_16(cpustate); CLK(4);	\
 	if (m37710i_get_reg_p(cpustate) & XFLAG_SET) \
 	{ \
 		if (SRC&0x8)	\
-			REG_Y = m37710i_pull_8(cpustate);	\
+			REG_Y = m37710i_pull_8(cpustate); CLK(3);  \
 		if (SRC&0x4)	\
-			REG_X = m37710i_pull_8(cpustate);	\
+			REG_X = m37710i_pull_8(cpustate); CLK(3);  \
 	}  \
 	else \
 	{ \
 		if (SRC&0x8)	\
-			REG_Y = m37710i_pull_16(cpustate);	\
+			REG_Y = m37710i_pull_16(cpustate); CLK(3); \
 		if (SRC&0x4)	\
-			REG_X = m37710i_pull_16(cpustate);	\
+			REG_X = m37710i_pull_16(cpustate); CLK(3); \
 	} \
 	if (m37710i_get_reg_p(cpustate) & MFLAG_SET) \
 	{ \
 		if (SRC&0x2)	\
-			REG_BA = m37710i_pull_8(cpustate);	\
+			REG_BA = m37710i_pull_8(cpustate); CLK(3); \
 		if (SRC&0x1)	\
-			REG_A = m37710i_pull_8(cpustate); \
+			REG_A = m37710i_pull_8(cpustate); CLK(3); \
 	}  \
 	else \
 	{ \
 		if (SRC&0x2)	\
-			REG_BA = m37710i_pull_16(cpustate);	\
+			REG_BA = m37710i_pull_16(cpustate);	CLK(3); \
 		if (SRC&0x1)	\
-			REG_A = m37710i_pull_16(cpustate); \
+			REG_A = m37710i_pull_16(cpustate); CLK(3); \
 	}
 
 /* M37710   Multiply */
