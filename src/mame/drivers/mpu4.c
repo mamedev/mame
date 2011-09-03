@@ -12141,6 +12141,23 @@ ROM_START( m4frightc )
 	ROM_LOAD( "fnsnd3.bin", 0x100000, 0x080000, CRC(7ad8aecc) SHA1(8d10a27efbde41af8e04ebe7e8b4b921443bd560) )
 ROM_END
 
+ROM_START( m4frightd )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "frite.nig",  0x000000, 0x020000, CRC(57febdc0) SHA1(001b134be59367c332df4df14930045d9437111a) )
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "fnsnd1.bin", 0x000000, 0x080000, CRC(0f7a6d97) SHA1(f812631af8eb46e188d457d567f42aecceb9e5d2) )
+	ROM_LOAD( "fnsnd2.bin", 0x080000, 0x080000, CRC(f2d0c27c) SHA1(4d18049a926898f7fbca54dd30519199fe39f8ea) )
+	ROM_LOAD( "fnsnd3.bin", 0x100000, 0x080000, CRC(7ad8aecc) SHA1(8d10a27efbde41af8e04ebe7e8b4b921443bd560) )
+ROM_END
+
+ROM_START( m4frighte )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "fr_ngt._pound5", 0x0000, 0x020000, CRC(3f2570c2) SHA1(98cc2438eb3fbf07481e2f68cac744e9e0a63e0b) )
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "fnsnd1.bin", 0x000000, 0x080000, CRC(0f7a6d97) SHA1(f812631af8eb46e188d457d567f42aecceb9e5d2) )
+	ROM_LOAD( "fnsnd2.bin", 0x080000, 0x080000, CRC(f2d0c27c) SHA1(4d18049a926898f7fbca54dd30519199fe39f8ea) )
+	ROM_LOAD( "fnsnd3.bin", 0x100000, 0x080000, CRC(7ad8aecc) SHA1(8d10a27efbde41af8e04ebe7e8b4b921443bd560) )
+ROM_END
 
 ROM_START( m4frdrop )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -14820,10 +14837,12 @@ GAME(199?, m4crfirea, m4crfire,	mod4oki, mpu4, m4default, ROT0,   "Empire","Cros
 GAME(199?, m4eureka,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Eureka (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4eurekaa, m4eureka,	mod4oki, mpu4, m4default, ROT0,   "Empire","Eureka (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4eurekab, m4eureka,	mod4oki, mpu4, m4default, ROT0,   "Empire","Eureka (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4fright,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frighta, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frightb, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frightc, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, set 4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // bad dump
+GAME(199?, m4fright,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v4.1X)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frighta, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v4.1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frightb, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v4.1i)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frightc, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v?.?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // bad dump
+GAME(199?, m4frightd, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v3.3)",GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frighte, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v3.0)",GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4gamblr,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","The Gambler (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4gamblra, m4gamblr, mod4oki, mpu4, m4default, ROT0,   "Empire","The Gambler (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4gamblrb, m4gamblr, mod4oki, mpu4, m4default, ROT0,   "Empire","The Gambler (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )

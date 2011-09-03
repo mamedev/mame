@@ -9723,12 +9723,17 @@ j6milln		// Millionaire / Who Wants To Be A Millionaire (Jpm)?
 
 // JPM Impact + Video Board
 cluedo			// (c) 1995
+cluedod			// (c) 1995
 cluedo2c		// (c) 1995
 cluedo2			// (c) 1995
 trivialp		// (c) 1996
+trivalpd		// (c) 1996
 scrabble		// (c) 1997
+scrabbld		// (c) 1997
 hngmnjpm		// (c) 1998
+hngmjpmd		// (c) 1998
 coronatn		// (c) 1999
+corontnd		// (c) 1999
 tqst			// (c) ACE?
 snlad			// (c) 199?
 
@@ -13185,6 +13190,8 @@ m4fright	// Fright Night (Empire)
 m4frighta	//
 m4frightb	//
 m4frightc	//
+m4frightd	//
+m4frighte	//
 m4gamblr	// The Gambler (Empire)
 m4gamblra	//
 m4gamblrb	//
