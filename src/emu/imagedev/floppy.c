@@ -20,7 +20,6 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, const ch
 	  device_image_interface(mconfig, *this),
 	  m_image(NULL)
 {
-
 }
 
 //-------------------------------------------------
@@ -81,6 +80,21 @@ void floppy_image_device::device_config_complete()
 	update_names();
 }
 
+void floppy_image_device::setup_load_cb(load_cb cb)
+{
+	cur_load_cb = cb;
+}
+
+void floppy_image_device::setup_unload_cb(unload_cb cb)
+{
+	cur_unload_cb = cb;
+}
+
+void floppy_image_device::setup_index_pulse_cb(index_pulse_cb cb)
+{
+	cur_index_pulse_cb = cb;
+}
+
 static TIMER_CALLBACK(floppy_drive_index_callback)
 {
 	floppy_image_device *image = (floppy_image_device *) ptr;
@@ -123,10 +137,12 @@ bool floppy_image_device::call_load()
 		format->load(m_image);
 		if (m_load_func)
 			return m_load_func(*this);
+		if (!cur_load_cb.isnull())
+			return cur_load_cb(this);
+		return IMAGE_INIT_PASS;
 	} else {
 		return IMAGE_INIT_FAIL;
 	}
-	return IMAGE_INIT_PASS;
 }
 
 void floppy_image_device::call_unload()
@@ -137,6 +153,8 @@ void floppy_image_device::call_unload()
 		global_free(m_image);
 	if (m_unload_func)
 		m_unload_func(*this);
+	if (!cur_unload_cb.isnull())
+		cur_unload_cb(this);
 }
 
 /* motor on, active low */
@@ -177,6 +195,8 @@ void floppy_image_device::index_func()
 	}
 
 	m_out_idx_func(m_idx);
+	if (!cur_index_pulse_cb.isnull())
+		cur_index_pulse_cb(this, m_idx);
 }
 
 int floppy_image_device::ready_r()

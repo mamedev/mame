@@ -32,6 +32,10 @@ class floppy_image_device :	public device_t,
 							public device_image_interface
 {
 public:
+	typedef delegate<int (floppy_image_device *)> load_cb;
+	typedef delegate<void (floppy_image_device *)> unload_cb;
+	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
+
 	// construction/destruction
 	floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_image_device();
@@ -52,6 +56,10 @@ public:
 	virtual const char *image_interface() const { return m_interface; }
 	virtual const char *file_extensions() const { return m_extension_list; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
+
+	void setup_load_cb(load_cb cb);
+	void setup_unload_cb(unload_cb cb);
+	void setup_index_pulse_cb(index_pulse_cb cb);
 
 	UINT8* get_buffer() { return m_image->get_buffer(m_cyl,m_ss ^ 1); }
 
@@ -100,6 +108,10 @@ protected:
 
 	int m_cyl;
 	devcb_resolved_write_line m_out_idx_func;
+
+	load_cb cur_load_cb;
+	unload_cb cur_unload_cb;
+	index_pulse_cb cur_index_pulse_cb;
 };
 
 // device type definition
