@@ -387,7 +387,6 @@ private:
 
 	UINT16 tracks;
 	UINT8  sides;
-	UINT16 rpm;
 
 	UINT32 *cell_data[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
 	UINT32 track_size[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
