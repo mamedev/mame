@@ -75,7 +75,6 @@ void floppy_image_device::device_config_complete()
 		// and append it to the list
 		*formatptr = format;
 		formatptr = &format->m_next;
-		cnt++;
 	}
 
 	// set brief and instance name
