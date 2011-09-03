@@ -1242,9 +1242,9 @@ static DRIVER_INIT (torus)
 
 ***************************************************************************/
 
-GAME( 1994+, paradise, 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise", GAME_SUPPORTS_SAVE )
-GAME( 1994+, paradlx,  0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994+, para2dx,  0,       paradise, para2dx,  paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 199?,  paradise, 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise", GAME_SUPPORTS_SAVE )	// year not shown, but should be >=1994
+GAME( 199?,  paradlx,  0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )		// "
+GAME( 199?,  para2dx,  0,       paradise, para2dx,  paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )	// "
 GAME( 1995,  tgtball,  0,       tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
 GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball", GAME_SUPPORTS_SAVE )
 GAME( 1996,  penky,    0,       penky,    penky,    tgtball,  ROT0,  "Yun Sung", "Penky", GAME_SUPPORTS_SAVE )
