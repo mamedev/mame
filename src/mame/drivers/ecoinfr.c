@@ -32,7 +32,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "machine/msm8251.h"
+#include "machine/i8251.h"
 
 #define UPD8251_TAG      "upd8251"
 
@@ -328,8 +328,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
-//	AM_RANGE(0xa000, 0xa000) AM_DEVREADWRITE(UPD8251_TAG, msm8251_data_r, msm8251_data_w)
-// 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE(UPD8251_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREADWRITE_MODERN(UPD8251_TAG, i8251_device, data_r, data_w)
+ 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_MODERN(UPD8251_TAG, i8251_device, status_r, control_w)
 
 ADDRESS_MAP_END
 
@@ -623,7 +623,7 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	MCFG_TIMER_ADD_PERIODIC("ectimer",ecoinfr_irq_timer, attotime::from_hz(250))
 	MCFG_MACHINE_RESET(ecoinfr)
 
-//	MCFG_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
+	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
 MACHINE_CONFIG_END
 
 
