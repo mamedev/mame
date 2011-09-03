@@ -19,11 +19,13 @@ public:
 private:
 	enum {
 		TIME_MASK = 0x0fffffff,
-		BIT_MASK  = 0x80000000,
-		BIT_SHIFT = 31,
+		MG_MASK   = 0xf0000000,
+		MG_SHIFT  = 28,
 
-		BIT_0     = (0 << BIT_SHIFT),
-		BIT_1     = (1 << BIT_SHIFT),
+		MG_A      = (0 << MG_SHIFT),
+		MG_B      = (1 << MG_SHIFT),
+		MG_N      = (2 << MG_SHIFT),
+		MG_D      = (3 << MG_SHIFT)
 	};
 
 	static const char sign[16];

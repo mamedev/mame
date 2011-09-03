@@ -22,11 +22,15 @@
   simple "compress" function.
 
   Track data consists of a series of 32-bits lsb-first values
-  representing magnetic cells.  Bits 0-27 indicate the sizes, and bit
-  31 the orientation.  Bits 28-30 are currently unused and must be 0.
+  representing magnetic cells.  Bits 0-27 indicate the sizes, and bits
+  28-31 the types.  Type can be:
+  - 0, MG_A -> Magnetic orientation A
+  - 1, MG_B -> Magnetic orientation B
+  - 2, MG_N -> Non-magnetized zone (neutral)
+  - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
 
   Remember that the fdcs detect transitions, not absolute levels, so
-  the actual physical significance of the orientation bit is
+  the actual physical significance of the orientation A and B is
   arbitrary.
 
   Tracks data is aligned so that the index pulse is at the start,
@@ -40,6 +44,9 @@
   drives).
 
   The sum of all sizes must of course be 200,000,000.
+
+  An unformatted track is equivalent to one big MG_N cell covering a
+  whole turn, but is encoded as zero-size.
 
   TODO: big-endian support, cleanup pll, move it where it belongs.
 */
@@ -97,10 +104,10 @@ UINT32 mfi_format::get_next_edge(const UINT32 *trackbuf, UINT32 cur_cell, UINT32
 {
 	if(cur_cell == cell_count)
 		return 200000000;
-	UINT32 cur_bit = trackbuf[cur_cell] & BIT_MASK;
+	UINT32 cur_bit = trackbuf[cur_cell] & MG_MASK;
 	cur_cell++;
 	while(cur_cell != cell_count) {
-		UINT32 next_bit = trackbuf[cur_cell] & BIT_MASK;
+		UINT32 next_bit = trackbuf[cur_cell] & MG_MASK;
 		if(next_bit != cur_bit)
 			break;
 	}
@@ -156,8 +163,9 @@ bool mfi_format::load(floppy_image *image)
 
 			// Extract the bits using a quick-n-dirty software pll
 			// expecting mfm 2us data.  Eventually the plls will end
-			// up in the fdc simulations themselves.  Weak bits are
-			// always 0 for now.
+			// up in the fdc simulations themselves.
+
+			// Neutral/damaged bits are not really taken into account
 
 			//  Start by turning the cell times into absolute
 			//  positions, it's easier to use that way.
@@ -166,7 +174,7 @@ bool mfi_format::load(floppy_image *image)
 			UINT32 cur_time = 0;
 			for(unsigned int i=0; i != cell_count; i++) {
 				UINT32 next_cur_time = cur_time + (trackbuf[i] & TIME_MASK);
-				trackbuf[i] = (trackbuf[i] & BIT_MASK) | cur_time;
+				trackbuf[i] = (trackbuf[i] & MG_MASK) | cur_time;
 				cur_time = next_cur_time;
 			}
 			if(cur_time != 200000000)
@@ -185,9 +193,9 @@ bool mfi_format::load(floppy_image *image)
 #if 0
 				printf("%09d: (%d, %09d) - (%d, %09d) - (%d, %09d)\n",
 					   pll_phase,
-					   trackbuf[cur_cell] >> BIT_SHIFT, trackbuf[cur_cell] & TIME_MASK,
-					   trackbuf[cur_cell+1] >> BIT_SHIFT, trackbuf[cur_cell+1] & TIME_MASK,
-					   trackbuf[cur_cell+2] >> BIT_SHIFT, trackbuf[cur_cell+2] & TIME_MASK);
+					   trackbuf[cur_cell] >> MG_SHIFT, trackbuf[cur_cell] & TIME_MASK,
+					   trackbuf[cur_cell+1] >> MG_SHIFT, trackbuf[cur_cell+1] & TIME_MASK,
+					   trackbuf[cur_cell+2] >> MG_SHIFT, trackbuf[cur_cell+2] & TIME_MASK);
 #endif
 
 				UINT32 next_edge = get_next_edge(trackbuf, cur_cell, cell_count);
