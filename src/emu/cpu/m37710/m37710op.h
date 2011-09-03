@@ -597,8 +597,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 
 /* M37710  Pull all */
 #undef OP_PUL
-#if FLAG_SET_M
-#if FLAG_SET_X
 #define OP_PUL(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
 	if (SRC&0x80)	\
@@ -609,75 +607,34 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 		REG_DB = m37710i_pull_8(cpustate) << 16;	\
 	if (SRC&0x10)	\
 		REG_D  = m37710i_pull_16(cpustate);	\
-	if (SRC&0x8)	\
-		REG_Y = m37710i_pull_8(cpustate);	\
-	if (SRC&0x4)	\
-		REG_X = m37710i_pull_8(cpustate);	\
-	if (SRC&0x2)	\
-		REG_BA = m37710i_pull_8(cpustate);	\
-	if (SRC&0x1)	\
-		REG_A = m37710i_pull_8(cpustate);
-#else
-#define OP_PUL(MODE)	\
-	SRC	= OPER_8_##MODE(cpustate);	\
-	if (SRC&0x80)	\
-		m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate));	\
-	if (SRC&0x40)	\
-		REG_PB = m37710i_pull_8(cpustate) << 16;	\
-	if (SRC&0x20)	\
-		REG_DB = m37710i_pull_8(cpustate) << 16;	\
-	if (SRC&0x10)	\
-		REG_D  = m37710i_pull_16(cpustate);	\
-	if (SRC&0x8)	\
-		REG_Y = m37710i_pull_16(cpustate);	\
-	if (SRC&0x4)	\
-		REG_X = m37710i_pull_16(cpustate);	\
-	if (SRC&0x2)	\
-		REG_BA = m37710i_pull_8(cpustate);	\
-	if (SRC&0x1)	\
-		REG_A = m37710i_pull_8(cpustate);
-#endif
-#else
-#if FLAG_SET_X
-#define OP_PUL(MODE)	\
-	SRC	= OPER_8_##MODE(cpustate);	\
-	if (SRC&0x80)	\
-		m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate));	\
-	if (SRC&0x40)	\
-		REG_PB = m37710i_pull_8(cpustate) << 16;	\
-	if (SRC&0x20)	\
-		REG_DB = m37710i_pull_8(cpustate) << 16;	\
-	if (SRC&0x10)	\
-		REG_D  = m37710i_pull_16(cpustate);	\
-	if (SRC&0x8)	\
-		REG_Y = m37710i_pull_8(cpustate);	\
-	if (SRC&0x4)	\
-		REG_X = m37710i_pull_8(cpustate);	\
-	if (SRC&0x2)	\
-		REG_BA = m37710i_pull_16(cpustate);	\
-	if (SRC&0x1)	\
-		REG_A = m37710i_pull_16(cpustate);
-#else
-#define OP_PUL(MODE)	\
-	SRC	= OPER_8_##MODE(cpustate);	\
-	if (SRC&0x80)	\
-		m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate));	\
-	if (SRC&0x40)	\
-		REG_PB = m37710i_pull_8(cpustate) << 16;	\
-	if (SRC&0x20)	\
-		REG_DB = m37710i_pull_8(cpustate) << 16;	\
-	if (SRC&0x10)	\
-		REG_D  = m37710i_pull_16(cpustate);	\
-	if (SRC&0x8)	\
-		REG_Y = m37710i_pull_16(cpustate);	\
-	if (SRC&0x4)	\
-		REG_X = m37710i_pull_16(cpustate);	\
-	if (SRC&0x2)	\
-		REG_BA = m37710i_pull_16(cpustate);	\
-	if (SRC&0x1)	\
-		REG_A = m37710i_pull_16(cpustate);
-#endif
-#endif
+	if (m37710i_get_reg_p(cpustate) & XFLAG_SET) \
+	{ \
+		if (SRC&0x8)	\
+			REG_Y = m37710i_pull_8(cpustate);	\
+		if (SRC&0x4)	\
+			REG_X = m37710i_pull_8(cpustate);	\
+	}  \
+	else \
+	{ \
+		if (SRC&0x8)	\
+			REG_Y = m37710i_pull_16(cpustate);	\
+		if (SRC&0x4)	\
+			REG_X = m37710i_pull_16(cpustate);	\
+	} \
+	if (m37710i_get_reg_p(cpustate) & MFLAG_SET) \
+	{ \
+		if (SRC&0x2)	\
+			REG_BA = m37710i_pull_8(cpustate);	\
+		if (SRC&0x1)	\
+			REG_A = m37710i_pull_8(cpustate); \
+	}  \
+	else \
+	{ \
+		if (SRC&0x2)	\
+			REG_BA = m37710i_pull_16(cpustate);	\
+		if (SRC&0x1)	\
+			REG_A = m37710i_pull_16(cpustate); \
+	}
 
 /* M37710   Multiply */
 #undef OP_MPY
