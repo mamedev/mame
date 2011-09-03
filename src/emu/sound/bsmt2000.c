@@ -127,6 +127,7 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 	  m_right_data(0),
 	  m_write_pending(false)
 {
+	m_shortname = "bsmt2000";
 }
 
 
