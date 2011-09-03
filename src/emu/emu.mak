@@ -293,6 +293,7 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/harddriv.o	\
 	$(EMUIMAGEDEV)/multcart.o	\
 	$(EMUIMAGEDEV)/printer.o	\
+	$(EMUIMAGEDEV)/serial.o		\
 	$(EMUIMAGEDEV)/snapquik.o	\
 
 
