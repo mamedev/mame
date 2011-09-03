@@ -121,6 +121,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/kim1_cas.o	\
 	$(LIBOBJ)/formats/lviv_lvt.o	\
 	$(LIBOBJ)/formats/msx_dsk.o		\
+	$(LIBOBJ)/formats/mfi_dsk.o		\
 	$(LIBOBJ)/formats/mz_cas.o		\
 	$(LIBOBJ)/formats/nes_dsk.o		\
 	$(LIBOBJ)/formats/orao_cas.o	\
