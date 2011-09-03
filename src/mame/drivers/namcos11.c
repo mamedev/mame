@@ -273,6 +273,7 @@ Notes:
 #include "machine/at28c16.h"
 #include "sound/c352.h"
 
+#define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
 #define VERBOSE_LEVEL ( 0 )
 
 class namcos11_state : public psx_state
@@ -284,6 +285,7 @@ public:
 	UINT32 *m_sharedram;
 	UINT32 *m_keycus;
 	size_t m_keycus_size;
+	UINT8 m_su_83;
 
 	UINT32 m_n_bankoffset;
 };
@@ -826,11 +828,36 @@ static INTERRUPT_GEN( c76_interrupt )
 	}
 }
 
+static READ16_HANDLER( c76_speedup_r )
+{
+	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
-static void namcos11_init_common(running_machine &machine, int n_daughterboard)
+	if ((cpu_get_pc(&space->device()) == 0xc153) && (!(state->m_su_83 & 0xff00)))
+	{
+		device_spin_until_interrupt(&space->device());
+	}
+
+	return state->m_su_83;
+}
+
+static WRITE16_HANDLER( c76_speedup_w )
+{
+	namcos11_state *state = space->machine().driver_data<namcos11_state>();
+
+	COMBINE_DATA(&state->m_su_83);
+}
+
+static void namcos11_init_common(running_machine &machine, int n_daughterboard, int c76_speedup)
 {
 	namcos11_state *state = machine.driver_data<namcos11_state>();
 	psx_driver_init(machine);
+
+	// C76 idle skipping, large speedboost
+	if (c76_speedup && C76_SPEEDUP)
+	{
+		state->save_item( NAME(state->m_su_83) );
+		machine.device("c76")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(c76_speedup_r), FUNC(c76_speedup_w));
+	}
 
 	if (!n_daughterboard)
 	{
@@ -874,43 +901,43 @@ static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 
 static DRIVER_INIT( tekken )
 {
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine, 32, 1);
 }
 
 static DRIVER_INIT( tekken2 )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c406_r) );
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine, 32, 1);
 }
 
 static DRIVER_INIT( souledge )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c409_r) );
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine, 32, 1);
 }
 
 static DRIVER_INIT( dunkmnia )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c410_r) );
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine, 32, 1);
 }
 
 static DRIVER_INIT( primglex )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c411_r) );
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine, 32, 1);
 }
 
 static DRIVER_INIT( xevi3dg )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c430_r) );
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine, 32, 1);
 }
 
 static DRIVER_INIT( danceyes )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c431_r) );
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine, 32, 1);
 }
 
 static DRIVER_INIT( pocketrc )
@@ -919,25 +946,25 @@ static DRIVER_INIT( pocketrc )
 	machine.device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC1_L, M37710_ADC1_L, FUNC(pocketrc_gas_r));
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c432_r) );
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine, 32, 0); // (speedup hack breaks testmode and analog steering)
 }
 
 static DRIVER_INIT( starswep )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c442_r) );
-	namcos11_init_common(machine, 0);
+	namcos11_init_common(machine, 0, 1);
 }
 
 static DRIVER_INIT( myangel3 )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c443_r) );
-	namcos11_init_common(machine, 64);
+	namcos11_init_common(machine, 64, 1);
 }
 
 static DRIVER_INIT( ptblank2ua )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c443_r) );
-	namcos11_init_common(machine, 64);
+	namcos11_init_common(machine, 64, 1);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(lightgun_w) );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(lightgun_r) );
