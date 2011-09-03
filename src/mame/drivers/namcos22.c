@@ -3214,8 +3214,8 @@ static INTERRUPT_GEN( namcos22_interrupt )
 
 	case NAMCOS22_RIDGE_RACER2:
 		HandleDrivingIO(device->machine());
-		irq_level1 = 1;
-		irq_level2 = 5;
+		irq_level1 = 5;
+		irq_level2 = 6;
 		//1:0d10c  40000005
 		//2:0cfa2 (rte)
 		//3:0cfa2 (rte)
@@ -6006,9 +6006,9 @@ GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,  ridgeraj, ROT0, "Namco", "
 GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,  ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) /* 1993-10-07 */
 GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,  ridgeraj, ROT0, "Namco", "Ridge Racer (3 Screen? Rev. RR2, World)"   , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) /* 1993-10-28 */
 GAME( 1993, rrf      , ridgerac, namcos22,  rrf,      ridgeraj, ROT0, "Namco", "Ridge Racer (Full Scale, 1993-12-13, World)"   , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // very different version, incomplete dump.
-GAME( 1994, ridgera2,  0,        namcos22,  ridgera,  ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, US)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) /* POSTs but doesn's start */
-GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera,  ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Ver.B, Japan)"   , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
-GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera,  ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1994, ridgera2,  0,        namcos22,  ridgera,  ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, US)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera,  ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Ver.B, Japan)"   , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera,  ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,  acedrvr,  ROT0, "Namco", "Ace Driver (Rev. AD2, World)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, victlapw,  0,        namcos22,  victlap,  victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 
