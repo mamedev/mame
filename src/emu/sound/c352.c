@@ -366,13 +366,16 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 				{
 					if ( m_c352_ch[i].flag & C352_FLG_KEYON )
 					{
-						m_c352_ch[i].current_addr = (m_c352_ch[i].bank << 16) + m_c352_ch[i].start_addr;
-						m_c352_ch[i].start = m_c352_ch[i].start_addr;
-						m_c352_ch[i].repeat = m_c352_ch[i].repeat_addr;
-						m_c352_ch[i].noisebuf = 0;
-						m_c352_ch[i].noisecnt = 0;
-						m_c352_ch[i].flag &= ~(C352_FLG_KEYON | C352_FLG_LOOPHIST);
-						m_c352_ch[i].flag |= C352_FLG_BUSY;
+						if (m_c352_ch[i].start_addr != m_c352_ch[i].end_addr)
+						{
+							m_c352_ch[i].current_addr = (m_c352_ch[i].bank << 16) + m_c352_ch[i].start_addr;
+							m_c352_ch[i].start = m_c352_ch[i].start_addr;
+							m_c352_ch[i].repeat = m_c352_ch[i].repeat_addr;
+							m_c352_ch[i].noisebuf = 0;
+							m_c352_ch[i].noisecnt = 0;
+							m_c352_ch[i].flag &= ~(C352_FLG_KEYON | C352_FLG_LOOPHIST);
+							m_c352_ch[i].flag |= C352_FLG_BUSY;
+						}
 					}
 					else if ( m_c352_ch[i].flag & C352_FLG_KEYOFF )
 					{
