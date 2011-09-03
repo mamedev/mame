@@ -2302,7 +2302,7 @@ OP(dd,d9) { illegal_1(z80); op_d9(z80);												} /* DB   DD          */
 OP(dd,da) { illegal_1(z80); op_da(z80);												} /* DB   DD          */
 OP(dd,db) { illegal_1(z80); op_db(z80);												} /* DB   DD          */
 OP(dd,dc) { illegal_1(z80); op_dc(z80);												} /* DB   DD          */
-OP(dd,dd) { illegal_1(z80); op_dd(z80);												} /* DB   DD          */
+OP(dd,dd) { illegal_1(z80); z80->PC--;												} /* DB   DD          */
 OP(dd,de) { illegal_1(z80); op_de(z80);												} /* DB   DD          */
 OP(dd,df) { illegal_1(z80); op_df(z80);												} /* DB   DD          */
 
@@ -2320,7 +2320,7 @@ OP(dd,e9) { z80->PC = z80->IX;														} /* JP   (IX)        */
 OP(dd,ea) { illegal_1(z80); op_ea(z80);												} /* DB   DD          */
 OP(dd,eb) { illegal_1(z80); op_eb(z80);												} /* DB   DD          */
 OP(dd,ec) { illegal_1(z80); op_ec(z80);												} /* DB   DD          */
-OP(dd,ed) { illegal_1(z80); op_ed(z80);												} /* DB   DD          */
+OP(dd,ed) { illegal_1(z80); z80->PC--;												} /* DB   DD          */
 OP(dd,ee) { illegal_1(z80); op_ee(z80);												} /* DB   DD          */
 OP(dd,ef) { illegal_1(z80); op_ef(z80);												} /* DB   DD          */
 
@@ -2338,7 +2338,7 @@ OP(dd,f9) { z80->SP = z80->IX;														} /* LD   SP,IX       */
 OP(dd,fa) { illegal_1(z80); op_fa(z80);												} /* DB   DD          */
 OP(dd,fb) { illegal_1(z80); op_fb(z80);												} /* DB   DD          */
 OP(dd,fc) { illegal_1(z80); op_fc(z80);												} /* DB   DD          */
-OP(dd,fd) { illegal_1(z80); op_fd(z80);												} /* DB   DD          */
+OP(dd,fd) { illegal_1(z80); z80->PC--;												} /* DB   DD          */
 OP(dd,fe) { illegal_1(z80); op_fe(z80);												} /* DB   DD          */
 OP(dd,ff) { illegal_1(z80); op_ff(z80);												} /* DB   DD          */
 
@@ -2593,7 +2593,7 @@ OP(fd,d9) { illegal_1(z80); op_d9(z80);												} /* DB   FD          */
 OP(fd,da) { illegal_1(z80); op_da(z80);												} /* DB   FD          */
 OP(fd,db) { illegal_1(z80); op_db(z80);												} /* DB   FD          */
 OP(fd,dc) { illegal_1(z80); op_dc(z80);												} /* DB   FD          */
-OP(fd,dd) { illegal_1(z80); op_dd(z80);												} /* DB   FD          */
+OP(fd,dd) { illegal_1(z80); z80->PC--;												} /* DB   FD          */
 OP(fd,de) { illegal_1(z80); op_de(z80);												} /* DB   FD          */
 OP(fd,df) { illegal_1(z80); op_df(z80);												} /* DB   FD          */
 
@@ -2611,7 +2611,7 @@ OP(fd,e9) { z80->PC = z80->IY;														} /* JP   (IY)        */
 OP(fd,ea) { illegal_1(z80); op_ea(z80);												} /* DB   FD          */
 OP(fd,eb) { illegal_1(z80); op_eb(z80);												} /* DB   FD          */
 OP(fd,ec) { illegal_1(z80); op_ec(z80);												} /* DB   FD          */
-OP(fd,ed) { illegal_1(z80); op_ed(z80);												} /* DB   FD          */
+OP(fd,ed) { illegal_1(z80); z80->PC--;												} /* DB   FD          */
 OP(fd,ee) { illegal_1(z80); op_ee(z80);												} /* DB   FD          */
 OP(fd,ef) { illegal_1(z80); op_ef(z80);												} /* DB   FD          */
 
@@ -2629,7 +2629,7 @@ OP(fd,f9) { z80->SP = z80->IY;														} /* LD   SP,IY       */
 OP(fd,fa) { illegal_1(z80); op_fa(z80);												} /* DB   FD          */
 OP(fd,fb) { illegal_1(z80); op_fb(z80);												} /* DB   FD          */
 OP(fd,fc) { illegal_1(z80); op_fc(z80);												} /* DB   FD          */
-OP(fd,fd) { illegal_1(z80); op_fd(z80);												} /* DB   FD          */
+OP(fd,fd) { illegal_1(z80); z80->PC--;												} /* DB   FD          */
 OP(fd,fe) { illegal_1(z80); op_fe(z80);												} /* DB   FD          */
 OP(fd,ff) { illegal_1(z80); op_ff(z80);												} /* DB   FD          */
 
@@ -2890,7 +2890,7 @@ OP(ed,d9) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,da) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,db) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,dc) { illegal_2(z80);															} /* DB   ED          */
-OP(ed,dd) { illegal_2(z80);															} /* DB   ED          */
+OP(ed,dd) { illegal_2(z80); z80->PC--;												} /* DB   ED          */
 OP(ed,de) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,df) { illegal_2(z80);															} /* DB   ED          */
 
@@ -2908,7 +2908,7 @@ OP(ed,e9) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,ea) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,eb) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,ec) { illegal_2(z80);															} /* DB   ED          */
-OP(ed,ed) { illegal_2(z80);															} /* DB   ED          */
+OP(ed,ed) { illegal_2(z80); z80->PC--;												} /* DB   ED          */
 OP(ed,ee) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,ef) { illegal_2(z80);															} /* DB   ED          */
 
@@ -2926,7 +2926,7 @@ OP(ed,f9) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,fa) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,fb) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,fc) { illegal_2(z80);															} /* DB   ED          */
-OP(ed,fd) { illegal_2(z80);															} /* DB   ED          */
+OP(ed,fd) { illegal_2(z80); z80->PC--;												} /* DB   ED          */
 OP(ed,fe) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,ff) { illegal_2(z80);															} /* DB   ED          */
 
