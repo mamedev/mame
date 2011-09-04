@@ -647,34 +647,44 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_MPY(MODE)														\
 	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
 	SRC = OPER_8_##MODE(cpustate);			\
-	{ int temp = SRC * REG_A;  REG_A = temp & 0xff; REG_BA = (temp>>8)&0xff; FLAG_Z = temp; FLAG_N = (temp & 0x8000) ? 1 : 0; FLAG_C = 0; }
+	{ UINT16 temp = SRC * (REG_A&0xff);  REG_A = temp & 0xff; REG_BA = (temp>>8)&0xff; FLAG_Z = temp; FLAG_N = (temp & 0x8000) ? 1 : 0; FLAG_C = 0; }
 #else
 #define OP_MPY(MODE)														\
 	CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
 	SRC = OPER_16_##MODE(cpustate);			\
-	{ int temp = SRC * REG_A;  REG_A = temp & 0xffff;  REG_BA = (temp>>16)&0xffff; FLAG_Z = temp; FLAG_N = (temp & 0x80000000) ? 1 : 0; FLAG_C = 0; }
+	{ UINT32 temp = SRC * REG_A;  REG_A = temp & 0xffff;  REG_BA = (temp>>16)&0xffff; FLAG_Z = temp; FLAG_N = (temp & 0x80000000) ? 1 : 0; FLAG_C = 0; }
 #endif
 
 /* M37710   Divide */
 #undef OP_DIV
 #if FLAG_SET_M
 #define OP_DIV(MODE)	\
-	CLK(CLK_OP + CLK_R8 + CLK_##MODE + 25);	\
+	CLK(CLK_OP + CLK_R8 + CLK_##MODE + 17);	\
 	SRC = (REG_BA&0xff)<<8 | (REG_A & 0xff);	\
 	DST = OPER_8_##MODE(cpustate);			\
-	if (DST != 0) {	REG_A = SRC / DST; REG_BA = SRC % DST; SRC /= DST; }		\
-	FLAG_N = (SRC & 0x80) ? 1 : 0;	\
-	FLAG_Z = MAKE_UINT_8(SRC);	\
-	if (DST != 0) {	FLAG_V = 0; FLAG_C = 0; }
+	if (DST != 0)	\
+	{		\
+		UINT16 tempa = SRC / DST; UINT16 tempb = SRC % DST;		\
+		FLAG_V = ((tempa | tempb) & 0xff00) ? VFLAG_SET : 0;	\
+		FLAG_C = FLAG_V ? CFLAG_SET : 0;	\
+		if (!FLAG_V) { FLAG_N = (tempa & 0x80) ? 1 : 0; }		\
+		FLAG_Z = REG_A = tempa & 0xff; REG_BA = tempb & 0xff;	\
+		CLK(8);		\
+	} else m37710i_interrupt_software(cpustate, 0xfffc)
 #else
 #define OP_DIV(MODE)	\
-	CLK(CLK_OP + CLK_R16 + CLK_##MODE + 25);	\
+	CLK(CLK_OP + CLK_R16 + CLK_##MODE + 17);	\
 	SRC = (REG_BA<<16) | REG_A;	\
 	DST = OPER_16_##MODE(cpustate);		\
-	if (DST != 0) { REG_A = SRC / DST; REG_BA = SRC % DST; SRC /= DST; }	\
-	FLAG_N = (SRC & 0x8000) ? 1 : 0;	\
-	FLAG_Z = SRC;	\
-	if (DST != 0) {	FLAG_V = 0; FLAG_C = 0; }
+	if (DST != 0)	\
+	{		\
+		UINT32 tempa = SRC / DST; UINT32 tempb = SRC % DST;		\
+		FLAG_V = ((tempa | tempb) & 0xffff0000) ? VFLAG_SET : 0;	\
+		FLAG_C = FLAG_V ? CFLAG_SET : 0;	\
+		if (!FLAG_V) { FLAG_N = (tempa & 0x8000) ? 1 : 0; }		\
+		FLAG_Z = REG_A = tempa & 0xffff; REG_BA = tempb & 0xffff;	\
+		CLK(8+15);	\
+	} else m37710i_interrupt_software(cpustate, 0xfffc)
 #endif
 
 /* M37710   Add With Carry */
@@ -893,8 +903,8 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 /* M37710   Cause a Break interrupt */
 #undef OP_BRK
 #define OP_BRK()															\
-			REG_PC++;													\
-			logerror("fatalerror M37710: BRK at PC=%06x", REG_PB|REG_PC);									\
+			REG_PC++; CLK(CLK_OP + CLK_R8 + CLK_IMM + 5);						\
+			logerror("fatalerror M37710: BRK at PC=%06x", REG_PB|REG_PC);		\
 			m37710i_interrupt_software(cpustate, 0xfffa)
 
 /* M37710  Branch Always */
@@ -986,12 +996,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_N = NFLAG_16(FLAG_C);										\
 			FLAG_C = ~CFLAG_16(FLAG_C)
 #endif
-
-/* M37710  Coprocessor operation */
-#undef OP_COP
-#define OP_COP()															\
-			REG_PC++;														\
-			m37710i_interrupt_software(cpustate, VECTOR_COP)
 
 /* M37710   Decrement accumulator */
 #undef OP_DEC
