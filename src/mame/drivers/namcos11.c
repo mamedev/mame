@@ -8,8 +8,9 @@
   Thanks to the original Zinc Team.
 
   Issues:
-   Random draw list corruption in soul edge v2 & dunkmania.
-   soul edge, dunk mania & prime goal ex try to access joypads/memory cards. It is unknown what they would do if they found one.
+   - Random draw list corruption in soul edge v2 & dunkmania.
+   - soul edge, dunk mania & prime goal ex try to access joypads/memory cards. It is unknown what they would do if they found one.
+   - pocketrc locks up if you try to exit testmode (note: it is not related to unimplemented C76 internal watchdog timer or software reset)
 
 Known Dumps
 -----------
