@@ -147,11 +147,12 @@ void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator)
 
 void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	INT32 mix[48000*2];
+	static INT32 mix[(44100/60)*4];
 	INT32 *mixp;
 	int osc, snum, i;
 	UINT32 ramptr;
 
+	assert(samples < (44100/60)*2);
 	memset(mix, 0, sizeof(mix));
 
 	for (osc = 0; osc < (oscsenabled+1); osc++)
@@ -443,7 +444,7 @@ WRITE8_MEMBER( es5503_device::write )
 				break;
 
 			case 0xe1:	// oscillator enable
-				oscsenabled = (data>>1);
+				oscsenabled = (data>>1) & 0x1f;
 
 				output_rate = (clock()/8)/(2+oscsenabled);
 				m_stream->set_sample_rate(output_rate);
