@@ -11004,6 +11004,9 @@ ROM_START( m4supleg )
 	ROM_LOAD( "sl_vc.hex", 0x0000, 0x040000, CRC(1940d117) SHA1(ae7338483ac39e9e1973dde5eb837443512630dd) )
 	ROM_LOAD( "sl_vcd.hex", 0x0000, 0x040000, CRC(7aab16d1) SHA1(6da4e0d9883a48937d00bfc5929b3557de51f60e) )
 	ROM_LOAD( "sls.hex", 0x0000, 0x040000, CRC(5ad6dbb9) SHA1(ff6f9dcf14df22c7bb2b949fcd5c70f31d4c1928) )
+	ROM_LOAD( "s_leag._pound5", 0x0000, 0x040000, CRC(4c6bd78e) SHA1(f67793a2a16adacc8d92b57050f02cffa50a1283) ) //Whitbread?
+	ROM_REGION( 0x80000, "altsnd", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "s_leag.s1", 0x0000, 0x080000, CRC(e8d90896) SHA1(4c67507f18b5dc966e2df3685dc6c257f5053e61) ) //alt first sound rom, connected to whitbread set
 
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "sls1.hex", 0x000000, 0x080000, CRC(341e3d3e) SHA1(b42ec737e95e766b1b26d6225416ee0c5cad2663) )
@@ -11512,14 +11515,42 @@ ROM_START( m4screw )
 	ROM_LOAD( "screwinaroundv0-7.bin", 0x0000, 0x020000, CRC(78a1e3ca) SHA1(a3d6e76a474a3a5cd74e4b527aa575f21825a7aa) )
 	//ROM_LOAD( "screwing.bin", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
 
+
 	ROM_REGION( 0x180000, "msm6376", 0 )
 	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
 	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
 	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
 ROM_END
 
+ROM_START( m4screwp )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "scre0-8p.p1", 0x0000, 0x020000, CRC(34a70a77) SHA1(f76de47f6919d380eb0d0eeffc0e5dda72345038) )
 
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
+	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
+	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
+ROM_END
 
+ROM_START( m4screwa )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "screwinaroundv0-7.bin", 0x0000, 0x020000, CRC(78a1e3ca) SHA1(a3d6e76a474a3a5cd74e4b527aa575f21825a7aa) )
+
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
+	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
+	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
+ROM_END
+
+ROM_START( m4screwb )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "screw0_5.p1", 0x000000, 0x020000, CRC(4c0e8300) SHA1(1fea75f3cb1a96c14bd0e56a95bafd22996d002d) )
+
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
+	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
+	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
+ROM_END
 
 ROM_START( m4bankrd )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -14991,7 +15022,10 @@ GAME(199?, m4bangin,  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Aw
 GAME(199?, m4bangina, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4banginb, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4wwc,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4screw,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screw,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screwp,  m4screw,	mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8) (Protocol)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screwa,  m4screw,	mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.7)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screwb,  m4screw,	mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.5)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4vfm,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Value For Money (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigben,  0,		mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigbena, m4bigben,	mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )

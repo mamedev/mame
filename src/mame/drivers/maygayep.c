@@ -167,8 +167,15 @@ ROM_START( ep_itjb3 )
 	EP_ITJB3_SOUND
 ROM_END
 
+ROM_START( ep_itj3a )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "itj3_dr.g0", 0x000000, 0x020000, CRC(1e62e440) SHA1(f7300a786efdb33d08aaa4348d93b8dd9707cbd2) )
+	ROM_LOAD16_BYTE( "itj3_dr.g1", 0x000001, 0x020000, CRC(93086180) SHA1(e17647ebbe613fd830ad17d455840882e797f54a) )
+	ROM_LOAD16_BYTE( "itj3_dr.g2", 0x040000, 0x020000, CRC(5a736057) SHA1(92c04470b204d290e7450a6dabf68ec260cb3a29) )
+	ROM_LOAD16_BYTE( "itj3_dr.g3", 0x040001, 0x020000, CRC(3c5a59a3) SHA1(a9507daa3af93f44ae829d4ce94581f0ba633c8b) )
 
-
+	EP_ITJB3_SOUND
+ROM_END
 
 #define EP_MERLN_SOUND \
 	ROM_REGION( 0x100000, "ymz", 0 ) \
@@ -2284,6 +2291,15 @@ ROM_START( ep_ijob )
 ROM_END
 
 
+ROM_START( ep_ijoba )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "i_job.g0", 0x000000, 0x020000, CRC(d3133b25) SHA1(b30268ab21a9e0c7193ae697710ff37d27af0a5b) )
+	ROM_LOAD16_BYTE( "i_job.g1", 0x000001, 0x020000, CRC(0765b48b) SHA1(32eaa458e7f693c7bbbed94342f5f78906137c49) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "it_job.s1", 0x000000, 0x080000, CRC(77ea2225) SHA1(fb02bccf4555797b60871070821afe2162be26c2) )
+	ROM_LOAD( "it_job.s2", 0x080000, 0x080000, CRC(b6f86703) SHA1(f09f9d88132919ca24fc1ed7094b5b22c1136eb8) )
+ROM_END
 
 
 
@@ -4489,6 +4505,7 @@ GAME( 1999, ep_simp,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",       
 // roms below don't contain epoch in the header, but appear to be anyway
 GAME( 199?, ep_dblim	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Double Impact (Maygay - Impulse) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_itjb3	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Italian Job 3 (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
+GAME( 199?, ep_itj3a	,  ep_itjb3, maygayep,  maygayep,  0,  ROT0, "Maygay",        "Italian Job 3 (Maygay) (EPOCH, Set 2)",  GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_merln	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Merlin's Magic (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_wipeo	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Wipeout (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 
@@ -4559,7 +4576,8 @@ GAME( 199?, ep_icebg	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",     
 GAME( 199?, ep_inca		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Inca Dinka Do (Maygay - Extreme) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_itjb2	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Italian Job 2 (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_ijcl		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Italian Job Club (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
-GAME( 199?, ep_ijob		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Italian Job (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
+GAME( 2001, ep_ijob		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Italian Job (Maygay) (EPOCH, v2.1)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
+GAME( 2001, ep_ijoba	,  ep_ijob,  maygayep,  maygayep,  0,  ROT0, "Maygay",        "Italian Job (Maygay) (EPOCH, v1.1)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_jakbn	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Jackpot & The Beanstreak (Extreme) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_jsttt	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Just The Ticket (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_loadd	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Loaded (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )

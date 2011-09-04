@@ -9571,6 +9571,7 @@ j6framft	// Frame & Fortune Club (Jpm)
 j6frtmch	// Fruit Machine, The (Jpm)
 j6frtpot	// Fruitpots (Qps)
 j6gforce	// G Force (Jpm)
+j6gfrceb	// G Force (Jpm) 15GBP
 j6gidogh	// G.I. Dough (Ace)
 j6guab		// Give Us A Break (Jpm)
 j6guabcl	// Give Us A Break Club (Jpm)
@@ -9583,6 +9584,7 @@ j6goldgl	// Golden Goal (Jpm)
 j6hapyhr	// Happy Hour (Jpm)
 j6hifly		// Hi Flyer (Ace)
 j6impact	// Hi Impact (Jpm)
+j6impctb	// Hi Impact (Jpm) 15GBP
 j6hilosv	// Hi Lo Silver (Jpm)
 j6hirol		// Hi Roller (Jpm)
 j6hirlcl	// Hi Roller Club (Jpm)
@@ -9613,6 +9615,8 @@ j6montlk	// Money Talks (Jpm)
 j6mono60	// Monopoly 60th Anniversary Edition (Jpm)
 j6monobn	// Monopoly Bingo (Jpm)
 j6outlaw	// Outlaw (Jpm)
+j6outlwc	// Outlaw (Jpm) Club?
+j6outlwd	// Outlaw (Jpm) Protocol
 j6oxo		// Oxo (Jpm)
 j6oxobin	// Oxo Bingo (Jpm)
 j6pacman	// Pac Man Plus (Qps)
@@ -9633,6 +9637,7 @@ j6rager		// Red Alert (Jpm) [German]
 j6ra		// Red Alert (Jpm)
 j6raclb		// Red Alert Club (Jpm)
 j6redarw	// Red Arrow (Jpm)
+j6rdarww	// Red Arrow (Whitbread / Jpm)
 j6reddmn	// Red Demon (Jpm)
 j6rh6		// Red Hot 6 (Jpm)
 j6rhchil	// Red Hot Chili Stepper (Ace)
@@ -12522,7 +12527,8 @@ ep_icebg	// Ice Burger (Maygay)
 ep_inca		// Inca Dinka Do (Maygay - Extreme)
 ep_itjb2	// Italian Job 2 (Maygay)
 ep_ijcl		// Italian Job Club (Maygay)
-ep_ijob		// Italian Job (Maygay)
+ep_ijob		// Italian Job (Maygay) v2.1
+ep_ijoba	// Italian Job (Maygay) v1.1
 ep_jakbn	// Jackpot & The Beanstreak (Extreme)
 ep_jsttt	// Just The Ticket (Maygay)
 ep_loadd	// Loaded (Maygay)
@@ -13336,6 +13342,9 @@ m4bangina	//
 m4banginb	//
 m4wwc		// Wacky Weekend Club (Global)
 m4screw		// Screwin' Around (Global)
+m4screwp
+m4screwa
+m4screwb
 m4bigben	// Big Ben (Coinworld)
 m4bigbena	//
 m4bigbenb	//
