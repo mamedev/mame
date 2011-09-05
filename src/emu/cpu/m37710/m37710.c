@@ -66,22 +66,22 @@ extern const int m37710_irq_levels[M37710_LINE_MAX];
 const int m37710_irq_levels[M37710_LINE_MAX] =
 {
 	// maskable
-	0x70,	// ADC
-	0x73,	// UART 1 XMIT
-	0x74,	// UART 1 RECV
-	0x71,	// UART 0 XMIT
-	0x72,	// UART 0 RECV
-	0x7c,	// Timer B2
-	0x7b,	// Timer B1
-	0x7a,	// Timer B0
-	0x79,	// Timer A4
-	0x78,	// Timer A3
-	0x77,	// Timer A2
-	0x76,	// Timer A1
-	0x75,	// Timer A0
-	0x7f,	// IRQ 2
-	0x7e,	// IRQ 1
-	0x7d,	// IRQ 0
+	0x70,	// ADC  		 0
+	0x73,	// UART 1 XMIT   1
+	0x74,	// UART 1 RECV   2
+	0x71,	// UART 0 XMIT   3
+	0x72,	// UART 0 RECV   4
+	0x7c,	// Timer B2 	 5
+	0x7b,	// Timer B1 	 6
+	0x7a,	// Timer B0 	 7
+	0x79,	// Timer A4 	 8
+	0x78,	// Timer A3 	 9
+	0x77,	// Timer A2 	 10
+	0x76,	// Timer A1 	 11
+	0x75,	// Timer A0 	 12
+	0x7f,	// IRQ 2		 13
+	0x7e,	// IRQ 1		 14
+	0x7d,	// IRQ 0		 15
 
 	// non-maskable
 	0,	// watchdog
@@ -93,23 +93,23 @@ const int m37710_irq_levels[M37710_LINE_MAX] =
 
 static const int m37710_irq_vectors[M37710_LINE_MAX] =
 {
-	// maskable          C74
-	0xffd6, // A-D converter     c68b
-	0xffd8, // UART1 transmit    c68e
-	0xffda, // UART1 receive     c691
-	0xffdc, // UART0 transmit    c694
-	0xffde,	// UART0 receive     c697
-	0xffe0, // Timer B2      c69a
-	0xffe2, // Timer B1      c69d
-	0xffe4, // Timer B0      c6a0
-	0xffe6, // Timer A4      c6a3
-	0xffe8, // Timer A3      c6a6
-	0xffea, // Timer A2      c6a9
-	0xffec, // Timer A1      c6ac
-	0xffee, // Timer A0      c6af
-	0xfff0, // external INT2 pin c6b2
-	0xfff2, // external INT1 pin c6b5
-	0xfff4, // external INT0 pin c6b8
+	// maskable
+	0xffd6, // A-D converter 
+	0xffd8, // UART1 transmit
+	0xffda, // UART1 receive 
+	0xffdc, // UART0 transmit
+	0xffde,	// UART0 receive 
+	0xffe0, // Timer B2
+	0xffe2, // Timer B1
+	0xffe4, // Timer B0
+	0xffe6, // Timer A4
+	0xffe8, // Timer A3
+	0xffea, // Timer A2
+	0xffec, // Timer A1
+	0xffee, // Timer A0
+	0xfff0, // external INT2 pin
+	0xfff2, // external INT1 pin
+	0xfff4, // external INT0 pin
 
 	// non-maskable
 	0xfff6, // watchdog timer
@@ -140,7 +140,7 @@ static const char *const m37710_rnames[128] =
 	"Port P5 dir reg",
 	"Port P6 reg",
 	"Port P7 reg",
-	"Port P6 dir reg",	// 16
+	"Port P6 dir reg",	// 16 (0x10)
 	"Port P7 dir reg",
 	"Port P8 reg",
 	"",
@@ -188,13 +188,13 @@ static const char *const m37710_rnames[128] =
 	"UART1 transmit/recv ctrl 1",
 	"UART1 recv buf L",
 	"UART1 recv buf H",
-	"Count start",
+	"Count start",          // 0x40
 	"",
 	"One-shot start",
 	"",
 	"Up-down register",
 	"",
-	"Timer A0 L",
+	"Timer A0 L",       // 0x46
 	"Timer A0 H",
 	"Timer A1 L",
 	"Timer A1 H",
@@ -205,7 +205,7 @@ static const char *const m37710_rnames[128] =
 	"Timer A4 L",
 	"Timer A4 H",
 	"Timer B0 L",
-	"Timer B0 H",
+	"Timer B0 H",       // 0x50
 	"Timer B1 L",
 	"Timer B1 H",
 	"Timer B2 L",
@@ -221,7 +221,7 @@ static const char *const m37710_rnames[128] =
 	"Processor mode",
 	"",
 	"Watchdog reset",
-	"Watchdog frequency",
+	"Watchdog frequency",   // 0x60
 	"",
 	"",
 	"",
@@ -237,15 +237,15 @@ static const char *const m37710_rnames[128] =
 	"",
 	"",
 	"A/D IRQ ctrl",
-	"UART0 xmit IRQ ctrl",
+	"UART0 xmit IRQ ctrl",      // 0x70
 	"UART0 recv IRQ ctrl",
 	"UART1 xmit IRQ ctrl",
 	"UART1 recv IRQ ctrl",
-	"Timer A0 IRQ ctrl",
-	"Timer A1 IRQ ctrl",
-	"Timer A2 IRQ ctrl",
+	"Timer A0 IRQ ctrl",        // 0x74
+	"Timer A1 IRQ ctrl",        // 0x75
+	"Timer A2 IRQ ctrl",        // 0x76
 	"Timer A3 IRQ ctrl",
-	"Timer A4 IRQ ctrl",
+	"Timer A4 IRQ ctrl",        // 0x78
 	"Timer B0 IRQ ctrl",
 	"Timer B1 IRQ ctrl",
 	"Timer B2 IRQ ctrl",
@@ -268,7 +268,7 @@ static TIMER_CALLBACK( m37710_timer_cb )
 
 	cpustate->timers[which]->adjust(cpustate->reload[which], param);
 
-	cpustate->m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
+	cpustate->m37710_regs[m37710_irq_levels[curirq]] |= 0x08;
 	m37710_set_irq_line(cpustate, curirq, PULSE_LINE);
 	device_triggerint(cpustate->device);
 }
@@ -314,7 +314,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 	if (cpustate->m37710_regs[0x40] & (1<<timer))
 	{
 		#if M37710_DEBUG
-		mame_printf_debug("Timer %d (%s) is enabled\n", timer, m37710_tnames[timer]);
+		logerror("Timer %d (%s) is enabled\n", timer, m37710_tnames[timer]);
 		#endif
 
 		// set the timer's value
@@ -331,7 +331,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 					time *= tval + 1;
 
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
+					logerror("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
 					#endif
 
 					cpustate->timers[timer]->adjust(time, timer);
@@ -340,19 +340,19 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 
 				case 1:	    	// event counter mode
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in event counter mode\n", timer);
+					logerror("Timer %d in event counter mode\n", timer);
 					#endif
 					break;
 
 				case 2:		// one-shot pulse mode
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in one-shot mode\n", timer);
+					logerror("Timer %d in one-shot mode\n", timer);
 					#endif
 					break;
 
 				case 3:	    	// PWM mode
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in PWM mode\n", timer);
+					logerror("Timer %d in PWM mode\n", timer);
 					#endif
 					break;
 			}
@@ -366,7 +366,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 					time *= tval + 1;
 
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
+					logerror("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
 					#endif
 
 					cpustate->timers[timer]->adjust(time, timer);
@@ -375,19 +375,19 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 
 				case 1:	    	// event counter mode
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in event counter mode\n", timer);
+					logerror("Timer %d in event counter mode\n", timer);
 					#endif
 					break;
 
 				case 2:		// pulse period/pulse width measurement mode
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in pulse period/width measurement mode\n", timer);
+					logerror("Timer %d in pulse period/width measurement mode\n", timer);
 					#endif
 					break;
 
 				case 3:
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in unknown mode!\n", timer);
+					logerror("Timer %d in unknown mode!\n", timer);
 					#endif
 					break;
 			}
@@ -520,7 +520,7 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 	cpustate->m37710_regs[offset] = data;
 
 	#if M37710_DEBUG
-	if (offset >= 0x1e && offset <= 0x40)
+	if (offset != 0x60)	// filter out watchdog
 	logerror("m37710_internal_w %x to %02x: %s = %x\n", data, (int)offset, m37710_rnames[(int)offset], cpustate->m37710_regs[offset]);
 	#endif
 }

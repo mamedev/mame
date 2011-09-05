@@ -1234,7 +1234,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_BBS(MODE)														\
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
 			REG_IM2 = read_8_NORM(EA_##MODE(cpustate)); 	\
-			REG_IM = read_8_NORM(REG_PC);		\
+			REG_IM = read_8_NORM(REG_PB | REG_PC);		\
 			REG_PC++;				\
 			DST = OPER_8_IMM(cpustate);			\
 			if ((REG_IM2 & REG_IM) == REG_IM)	\
@@ -1247,7 +1247,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_BBS(MODE)														\
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
 			REG_IM2 = read_16_NORM(EA_##MODE(cpustate));	\
-			REG_IM = read_16_NORM(REG_PC);		\
+			REG_IM = read_16_NORM(REG_PB | REG_PC);		\
 			REG_PC++;				\
 			REG_PC++;				\
 			DST = OPER_8_IMM(cpustate);			\
@@ -1265,7 +1265,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_BBC(MODE)														\
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
 			REG_IM2 = read_8_NORM(EA_##MODE(cpustate)); 	\
-			REG_IM = read_8_NORM(REG_PC);		\
+			REG_IM = read_8_NORM(REG_PB | REG_PC);		\
 			REG_PC++;				\
 			DST = OPER_8_IMM(cpustate);			\
 			if ((REG_IM2 & REG_IM) == 0)		\
@@ -1278,7 +1278,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_BBC(MODE)														\
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
 			REG_IM2 = read_16_NORM(EA_##MODE(cpustate));	\
-			REG_IM = read_16_NORM(REG_PC);		\
+			REG_IM = read_16_NORM(REG_PB | REG_PC);		\
 			REG_PC++;				\
 			REG_PC++;				\
 			DST = OPER_8_IMM(cpustate);			\
@@ -2828,7 +2828,7 @@ TABLE_FUNCTION(void, set_line, (m37710i_cpu_struct *cpustate, int line, int stat
 					LINE_IRQ &= ~(1 << line);
 					if (m37710_irq_levels[line])
 					{
-						cpustate->m37710_regs[m37710_irq_levels[line]] |= 8;
+						cpustate->m37710_regs[m37710_irq_levels[line]] &= ~8;
 					}
 					return;
 				case ASSERT_LINE:
@@ -2837,7 +2837,7 @@ TABLE_FUNCTION(void, set_line, (m37710i_cpu_struct *cpustate, int line, int stat
 					LINE_IRQ |= (1 << line);
 					if (m37710_irq_levels[line])
 					{
-						cpustate->m37710_regs[m37710_irq_levels[line]] &= ~8;
+						cpustate->m37710_regs[m37710_irq_levels[line]] |= 8;
 					}
 					break;
 			}
