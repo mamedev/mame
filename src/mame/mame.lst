@@ -13110,6 +13110,7 @@ m4hvhel		// Heaven & Hell (Bwb)
 m4holywd	// Hollywood (Bwb)
 m4indycr	// Indy Cars (Bwb)
 m4jakjok	// Jackpot Jokers (Bwb)
+m4jakjka
 m4jflash	// Jumping Jack Flash (Bwb)
 m4kingq		// Kings & Queens (Bwb)
 m4kingqc	// Kings & Queens Classic (Bwb)
@@ -13705,6 +13706,7 @@ m5sheik		// Sheik Yer Money (Barcrest)
 m5showtm	// Showtime (Barcrest)
 m5silver	// Silver Screen (Barcrest)
 m5sondr		// Son Of Dracula (Barcrest)
+m5sondra
 m5spicer	// The Spice Is Right (Barcrest)
 m5spiker	// Spiker The Biker (Barcrest)
 m5spins		// Spinsation (Barcrest)
@@ -13715,6 +13717,7 @@ m5supstr	// Super Star (Barcrest)
 m5sstrk		// Super Streak (Barcrest)
 m5supnov	// Supernova (Barcrest)
 m5tempt		// Temple Of Treasure (Barcrest)
+m5tempt2	// Temple Of Treasure 2 (Barcrest)
 m5tempcl	// Temple Of Treasure Club (Barcrest)
 m5tbird		// Thunderbird (Barcrest)
 m5topdog	// Top Dog (Barcrest)
@@ -13735,24 +13738,31 @@ m5bbank		// Break The Bank (Barcrest - Red Gaming)
 m5casfev	// Casino Fever (Red Gaming)
 m5dmnstr	// Demon Streak (Barcrest - Red Gaming)
 m5dmnstra	//
+m5dbubl		// Double Bubble (Barcrest - Red Gaming)
+m5ddrag		// Double Dragon (Barcrest - Red Gaming)
+m5fnfair	// Funfair (Barcrest - Red Gaming)
+m5fnfard	//
 m5fusir		// Fruits U Sir (Barcrest - Red Gaming)
 m5fusira	//
 m5hypalx	// Hypalinx (Barcrest - Red Gaming)
 m5invad		// Invaders (Barcrest - Red Gaming)
+m5jcptgn	// Jackpot Genie (Barcrest - Red Gaming)
+m5jlstrk	// Jewel Strike (Barcrest - Red Gaming)
 m5lock		// Lock 'n' Load (Barcrest - Red Gaming)
 m5locka		//
 m5lockcl	// Lock 'n' Load Club (Barcrest - Red Gaming)
 m5lockcla	//
 m5nitro		// Nitro (Barcrest - Red Gaming)
 m5paint		// Paint The Town Red (Barcrest - Red Gaming)
+m5quake		// Quake (Barcrest - Red Gaming)
 m5rainrn	// Rainbow Runner (Barcrest - Red Gaming)
 m5rainrna	//
 m5rampg		// Rampage (Barcrest - Red Gaming)
 m5rdwarf	// Red Dwarf (Barcrest - Red Gaming)
 m5redx		// Red X (Barcrest - Red Gaming)
+m5thtsmg	// That's Magic (Barcrest - Red Gaming)
 m5topdol	// Top Dollar (Barcrest - Red Gaming)
-m5dbubl		// Double Bubble (Barcrest - Red Gaming)
-m5ddrag		// Double Dragon (Barcrest - Red Gaming)
+m5zigzag	// Zig Zag
 
 /* Vivid */
 
@@ -13807,6 +13817,7 @@ m5supro		// Super Roulette (Vivid)
 m5tempp		// Temple Of Pleasure (Vivid)
 m5tictac	// Tic Tac Tut (Vivid)
 m5tictaca	//
+m5whdres	// Who Dares Spins (Vivid)
 m5winway	// Winning Ways (Vivid)
 
 /* Empire */

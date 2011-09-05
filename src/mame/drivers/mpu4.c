@@ -10418,8 +10418,15 @@ ROM_START( m4jakjok )
 	ROM_LOAD( "jj_____.1_3", 0x100000, 0x080000, CRC(03c0ffc3) SHA1(2572f62362325df8b235b487d4a764218e7f1589) )
 ROM_END
 
+ROM_START( m4jakjka )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "j_joker", 0x0000, 0x040000, CRC(4f0c7ab8) SHA1(af962863ee55f6c2752bbe8a997e3b2102e42431) )
 
-
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "j_joker.s1", 0x0000, 0x080000, CRC(4ad711d2) SHA1(500381ac2a5075acd606a131cd1b382342cc3a80) )
+	ROM_LOAD( "j_joker.s2", 0x0000, 0x080000, CRC(840ba491) SHA1(f7f43d5d8e521a59fdccbd5f22935c525c3d43c2) )
+	ROM_LOAD( "j_joker.s3", 0x0000, 0x080000, CRC(2ed74890) SHA1(a3d039b4c3c9dd792300eb045e542a212d4d50ae) )
+ROM_END
 
 ROM_START( m4jflash )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -14783,6 +14790,7 @@ GAME(199?, m4hvhel	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Hea
 GAME(199?, m4holywd	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Hollywood (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4indycr	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Indy Cars (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4jakjok	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4jakjka	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4, alternate)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4jflash	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jumping Jack Flash (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4kingq	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4kingqc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
