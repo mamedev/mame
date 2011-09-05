@@ -667,7 +667,7 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 	int wantedIRQ = -1;
 	int curpri = 0;
 
-	for (curirq = 0; curirq < M37710_LINE_MAX; curirq++)
+	for (curirq = M37710_LINE_MAX - 1; curirq >= 0; curirq--)
 	{
 		if ((pending & (1 << curirq)))
 		{
