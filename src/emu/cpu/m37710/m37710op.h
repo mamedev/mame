@@ -289,24 +289,12 @@ INLINE void m37710i_set_reg_ipl(m37710i_cpu_struct *cpustate, uint value)
 /* =============================== INTERRUPTS ============================= */
 /* ======================================================================== */
 
-INLINE void m37710i_interrupt_hardware(m37710i_cpu_struct *cpustate, uint vector)
-{
-	CLK(8);
-	m37710i_push_8(cpustate, REG_PB>>16);
-	m37710i_push_16(cpustate, REG_PC);
-	m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
-	FLAG_D = DFLAG_CLEAR;
-	m37710i_set_flag_i(cpustate, IFLAG_SET);
-	REG_PB = 0;
-	m37710i_jump_16(cpustate, m37710i_read_16_normal(cpustate, vector));
-	if(INT_ACK) INT_ACK(cpustate->device, 0);
-}
-
 INLINE void m37710i_interrupt_software(m37710i_cpu_struct *cpustate, uint vector)
 {
 	CLK(8);
 	m37710i_push_8(cpustate, REG_PB>>16);
 	m37710i_push_16(cpustate, REG_PC);
+	m37710i_push_8(cpustate, cpustate->ipl);
 	m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
 	FLAG_D = DFLAG_CLEAR;
 	m37710i_set_flag_i(cpustate, IFLAG_SET);
@@ -533,7 +521,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	if (SRC&0x40)	\
 		{ m37710i_push_8(cpustate, REG_PB>>16); CLK(1); }  \
 	if (SRC&0x80)	\
-		{ m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
+		{ m37710i_push_8(cpustate, cpustate->ipl); m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
 #else	// FLAG_SET_X
 #define OP_PSH(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
@@ -553,7 +541,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	if (SRC&0x40)	\
 		{ m37710i_push_8(cpustate, REG_PB>>16); CLK(1); }  \
 	if (SRC&0x80)	\
-		{ m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
+		{ m37710i_push_8(cpustate, cpustate->ipl); m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
 #endif	// FLAG_SET_X
 #else	// FLAG_SET_M
 #if FLAG_SET_X
@@ -575,7 +563,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	if (SRC&0x40)	\
 		{ m37710i_push_8(cpustate, REG_PB>>16); CLK(1); }  \
 	if (SRC&0x80)	\
-		{ m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
+		{ m37710i_push_8(cpustate, cpustate->ipl); m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
 #else	// FLAG_SET_X
 #define OP_PSH(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
@@ -595,7 +583,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	if (SRC&0x40)	\
 		{ m37710i_push_8(cpustate, REG_PB>>16); CLK(1); }  \
 	if (SRC&0x80)	\
-		{ m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
+		{ m37710i_push_8(cpustate, cpustate->ipl); m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
 #endif	// FLAG_SET_X
 #endif	// FLAG_SET_M
 
@@ -605,7 +593,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	SRC	= OPER_8_##MODE(cpustate);	\
 	CLK(14); \
 	if (SRC&0x80)	\
-		{ m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate)); CLK(3); } \
+		{ m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate)); m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate)); CLK(3); } \
 	if (SRC&0x40)	\
 		{ REG_PB = m37710i_pull_8(cpustate) << 16; CLK(3); }   \
 	if (SRC&0x20)	\
@@ -639,7 +627,8 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			{ REG_BA = m37710i_pull_16(cpustate); CLK(3); } \
 		if (SRC&0x1)	\
 			{ REG_A = m37710i_pull_16(cpustate); CLK(3); } \
-	}
+	}	\
+	m37710i_update_irqs(cpustate)
 
 /* M37710   Multiply */
 #undef OP_MPY
@@ -1670,8 +1659,9 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_PLP
 #define OP_PLP()															\
 			CLK(CLK_OP + CLK_R8 + 2);										\
-			m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate));									\
-			m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate))
+			m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate));			\
+			m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate));		\
+			m37710i_update_irqs(cpustate)
 
 /* M37710  Reset Program status word */
 #undef OP_REP
@@ -1810,7 +1800,8 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate));					\
 			m37710i_jump_16(cpustate, m37710i_pull_16(cpustate));					\
 			REG_PB = m37710i_pull_8(cpustate) << 16;					\
-			m37710i_jumping(REG_PB | REG_PC)
+			m37710i_jumping(REG_PB | REG_PC);							\
+			m37710i_update_irqs(cpustate)
 
 /* M37710  Return from Subroutine Long */
 #undef OP_RTL

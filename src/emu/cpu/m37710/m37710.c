@@ -220,8 +220,8 @@ static const char *const m37710_rnames[128] =
 	"Timer B2 mode",
 	"Processor mode",
 	"",
-	"Watchdog reset",
-	"Watchdog frequency",   // 0x60
+	"Watchdog reset",       // 0x60
+	"Watchdog frequency",   // 0x61
 	"",
 	"",
 	"",
@@ -268,7 +268,6 @@ static TIMER_CALLBACK( m37710_timer_cb )
 
 	cpustate->timers[which]->adjust(cpustate->reload[which], param);
 
-	cpustate->m37710_regs[m37710_irq_levels[curirq]] |= 0x08;
 	m37710_set_irq_line(cpustate, curirq, PULSE_LINE);
 	device_triggerint(cpustate->device);
 }
@@ -665,15 +664,8 @@ INLINE uint m37710i_get_reg_p(m37710i_cpu_struct *cpustate)
 void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 {
 	int curirq, pending = LINE_IRQ;
-	int wantedIRQ, curpri;
-
-	if (FLAG_I)
-	{
-		return;
-	}
-
-	curpri = -1;
-	wantedIRQ = -1;
+	int wantedIRQ = -1;
+	int curpri = -1;
 
 	for (curirq = M37710_LINE_MAX - 1; curirq >= 0; curirq--)
 	{
@@ -682,17 +674,14 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 			// this IRQ is set
 			if (m37710_irq_levels[curirq])
 			{
-//              logerror("line %d set, level %x curpri %x IPL %x\n", curirq, cpustate->m37710_regs[m37710_irq_levels[curirq]] & 7, curpri, cpustate->ipl);
-				// it's maskable, check if the level works
-				if ((cpustate->m37710_regs[m37710_irq_levels[curirq]] & 7) > curpri)
+				int thispri = cpustate->m37710_regs[m37710_irq_levels[curirq]] & 7;
+				// logerror("line %d set, level %x curpri %x IPL %x\n", curirq, thispri, curpri, cpustate->ipl);
+				// it's maskable, check if the level works, also make sure it's acceptable for the current CPU level
+				if (!FLAG_I && thispri > curpri && thispri > cpustate->ipl)
 				{
-					// also make sure it's acceptable for the current CPU level
-					if ((cpustate->m37710_regs[m37710_irq_levels[curirq]] & 7) > cpustate->ipl)
-					{
-						// mark us as the best candidate
-						wantedIRQ = curirq;
-						curpri = cpustate->m37710_regs[m37710_irq_levels[curirq]] & 7;
-					}
+					// mark us as the best candidate
+					wantedIRQ = curirq;
+					curpri = thispri;
 				}
 			}
 			else
@@ -711,12 +700,6 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 
 		// make sure we're running to service the interrupt
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;
-
-		// indicate we're servicing it now
-		if (m37710_irq_levels[wantedIRQ])
-		{
-			cpustate->m37710_regs[m37710_irq_levels[wantedIRQ]] &= ~8;
-		}
 
 		// auto-clear if it's an internal line
 		if (wantedIRQ <= 12)
