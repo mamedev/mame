@@ -2909,7 +2909,7 @@ TABLE_FUNCTION(int, execute, (m37710i_cpu_struct *cpustate, int clocks))
 		do
 		{
 			REG_PPC = REG_PC;
-			M37710_CALL_DEBUGGER(REG_PC);
+			M37710_CALL_DEBUGGER(REG_PB | REG_PC);
 			REG_PC++;
 			REG_IR = read_8_IMM(REG_PB | REG_PPC);
 			cpustate->opcodes[REG_IR](cpustate);
