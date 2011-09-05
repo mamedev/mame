@@ -1,4 +1,3 @@
-
 /*******************************************************************************
 
   Global Games 'Stealth' Hardware
@@ -11,10 +10,10 @@
 
 *******************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m37710/m37710.h"
-
-
 
 /******************************************************************************/
 
@@ -22,14 +21,19 @@ class globalfr_state : public driver_device
 {
 public:
 	globalfr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+    { }
+
+	required_device<cpu_device> m_maincpu;
 };
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( globalfr_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x001ff) AM_RAM
-	AM_RANGE(0x000200, 0x7ffff) AM_ROM
+static ADDRESS_MAP_START( globalfr_map, AS_PROGRAM, 8, globalfr_state )
+    AM_RANGE(0x002000, 0x002fff) AM_RAM
+	AM_RANGE(0x008000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0x8000)
+    AM_RANGE(0x0a0000, 0x0a01ff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( globalfr )
@@ -38,9 +42,8 @@ INPUT_PORTS_END
 /******************************************************************************/
 
 static MACHINE_CONFIG_START( globalfr, globalfr_state )
-
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M37710,4000000)
+	MCFG_CPU_ADD("maincpu", M37710, 4000000)
 	MCFG_CPU_PROGRAM_MAP(globalfr_map)
 MACHINE_CONFIG_END
 
