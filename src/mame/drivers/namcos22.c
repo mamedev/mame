@@ -1145,7 +1145,9 @@
 #include "cpu/m37710/m37710.h"
 #include "sound/c352.h"
 
-#define SS22_MASTER_CLOCK (49152000)	/* info from Guru */
+#define SS22_MASTER_CLOCK	(XTAL_49_152MHz)	/* info from Guru */
+
+#define MCU_SPEEDUP 	 	1					/* mcu idle skipping */
 
 /**
  * helper function used to read a byte from a chunk of 32 bit memory
@@ -5785,19 +5787,22 @@ static READ16_HANDLER( mcuc74_speedup_r )
 
 static void install_c74_speedup(running_machine &machine)
 {
-	machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x80, 0x81, FUNC(mcuc74_speedup_r), FUNC(mcu_speedup_w));
+	if (MCU_SPEEDUP)
+		machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x80, 0x81, FUNC(mcuc74_speedup_r), FUNC(mcu_speedup_w));
 }
 
 static void install_130_speedup(running_machine &machine)
 {
 	// install speedup cheat for 1.30 MCU BIOS
-	machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu130_speedup_r), FUNC(mcu_speedup_w));
+	if (MCU_SPEEDUP)
+		machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu130_speedup_r), FUNC(mcu_speedup_w));
 }
 
 static void install_141_speedup(running_machine &machine)
 {
 	// install speedup cheat for 1.41 MCU BIOS
-	machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu141_speedup_r), FUNC(mcu_speedup_w));
+	if (MCU_SPEEDUP)
+		machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu141_speedup_r), FUNC(mcu_speedup_w));
 }
 
 static void namcos22_init( running_machine &machine, int game_type )
@@ -5969,7 +5974,7 @@ static DRIVER_INIT( timecris )
 {
 	namcos22s_init(machine, NAMCOS22_TIME_CRISIS);
 
-	// install_130_speedup(machine); // with speed up the SUBCPU START WAIT test fails
+	install_130_speedup(machine);
 }
 
 static DRIVER_INIT( tokyowar )
