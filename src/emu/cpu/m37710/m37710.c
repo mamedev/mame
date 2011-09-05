@@ -665,9 +665,9 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 {
 	int curirq, pending = LINE_IRQ;
 	int wantedIRQ = -1;
-	int curpri = -1;
+	int curpri = 0;
 
-	for (curirq = M37710_LINE_MAX - 1; curirq >= 0; curirq--)
+	for (curirq = 0; curirq < M37710_LINE_MAX; curirq++)
 	{
 		if ((pending & (1 << curirq)))
 		{
@@ -688,7 +688,7 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 			{
 				// non-maskable
 				wantedIRQ = curirq;
-				curirq = -1;
+				curpri = 7;
 				break;	// no more processing, NMIs always win
 			}
 		}
