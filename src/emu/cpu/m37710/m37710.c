@@ -305,7 +305,6 @@ static void m37710_external_tick(m37710i_cpu_struct *cpustate, int timer, int st
 static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 {
 	int tval;
-	static const int tcr[8] = { 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d };
 	attotime time;
 	static const int tscales[4] = { 2, 16, 64, 512 };
 
@@ -319,6 +318,9 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 		// set the timer's value
 		tval = cpustate->m37710_regs[0x46+(timer*2)] | (cpustate->m37710_regs[0x47+(timer*2)]<<8);
 
+		// HACK: ignore if timer is 8MHz (MAME slows down to a crawl)
+		if (tval == 0 && (cpustate->m37710_regs[0x56+timer]&0xc0) == 0) return;
+
 		// check timer's mode
 		// modes are slightly different between timer groups A and B
 		if (timer < 5)
@@ -326,8 +328,8 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 			switch (cpustate->m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	    	// timer mode
-					time = attotime::from_hz(cpustate->device->unscaled_clock()) * tscales[cpustate->m37710_regs[tcr[timer]]>>6];
-					time *= tval + 1;
+					time = attotime::from_hz(cpustate->device->unscaled_clock()) * tscales[cpustate->m37710_regs[0x56+timer]>>6];
+					time *= (tval + 1);
 
 					#if M37710_DEBUG
 					logerror("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
@@ -361,8 +363,8 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 			switch (cpustate->m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	    	// timer mode
-					time = attotime::from_hz(cpustate->device->unscaled_clock()) * tscales[cpustate->m37710_regs[tcr[timer]]>>6];
-					time *= tval + 1;
+					time = attotime::from_hz(cpustate->device->unscaled_clock()) * tscales[cpustate->m37710_regs[0x56+timer]>>6];
+					time *= (tval + 1);
 
 					#if M37710_DEBUG
 					logerror("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
@@ -403,25 +405,27 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 
 	switch (offset)
 	{
-		case 2: // p0
+		// ports
+		case 0x02:
 			return cpustate->io->read_byte(M37710_PORT0);
-		case 3: // p1
+		case 0x03: // p1
 			return cpustate->io->read_byte(M37710_PORT1);
-		case 6: // p2
+		case 0x06: // p2
 			return cpustate->io->read_byte(M37710_PORT2);
-		case 7: // p3
+		case 0x07: // p3
 			return cpustate->io->read_byte(M37710_PORT3);
-		case 0xa: // p4
+		case 0x0a: // p4
 			return cpustate->io->read_byte(M37710_PORT4);
-		case 0xb: // p5
+		case 0x0b: // p5
 			return cpustate->io->read_byte(M37710_PORT5);
-		case 0xe: // p6
+		case 0x0e: // p6
 			return cpustate->io->read_byte(M37710_PORT6);
-		case 0xf: // p7
+		case 0x0f: // p7
 			return cpustate->io->read_byte(M37710_PORT7);
 		case 0x12: // p8
 			return cpustate->io->read_byte(M37710_PORT8);
 
+		// A-D regs
 		case 0x20:
 			return cpustate->io->read_byte(M37710_ADC0_L);
 		case 0x21:
@@ -467,31 +471,41 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 data)
 {
 	int i;
+	UINT8 prevdata;
+
+	#if M37710_DEBUG
+	if (offset != 0x60)	// filter out watchdog
+	logerror("m37710_internal_w %x to %02x: %s = %x\n", data, (int)offset, m37710_rnames[(int)offset], cpustate->m37710_regs[offset]);
+	#endif
+
+	prevdata = cpustate->m37710_regs[offset];
+	cpustate->m37710_regs[offset] = data;
 
 	switch(offset)
 	{
-		case 2: // p0
+		// ports
+		case 0x02: // p0
 			cpustate->io->write_byte(M37710_PORT0, data);
 			return;
-		case 3: // p1
+		case 0x03: // p1
 			cpustate->io->write_byte(M37710_PORT1, data);
 			return;
-		case 6: // p2
+		case 0x06: // p2
 			cpustate->io->write_byte(M37710_PORT2, data);
 			return;
-		case 7: // p3
+		case 0x07: // p3
 			cpustate->io->write_byte(M37710_PORT3, data);
 			return;
-		case 0xa: // p4
+		case 0x0a: // p4
 			cpustate->io->write_byte(M37710_PORT4, data);
 			return;
-		case 0xb: // p5
+		case 0x0b: // p5
 			cpustate->io->write_byte(M37710_PORT5, data);
 			return;
-		case 0xe: // p6
+		case 0x0e: // p6
 			cpustate->io->write_byte(M37710_PORT6, data);
 			return;
-		case 0xf: // p7
+		case 0x0f: // p7
 			cpustate->io->write_byte(M37710_PORT7, data);
 			return;
 		case 0x12: // p8
@@ -501,27 +515,30 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 		case 0x40:	// count start
 			for (i = 0; i < 8; i++)
 			{
-				if ((data & (1<<i)) && !(cpustate->m37710_regs[offset] & (1<<i)))
-				{
-					cpustate->m37710_regs[offset] |= (1<<i);
+				if ((data & (1<<i)) && !(prevdata & (1<<i)))
 					m37710_recalc_timer(cpustate, i);
-				}
 			}
+			break;
 
-			cpustate->m37710_regs[offset] = data;
+		// internal interrupt control
+		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75:
+		case 0x76: case 0x77: case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c:
+			m37710_set_irq_line(cpustate, offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
+			m37710i_update_irqs(cpustate);
+			break;
 
-			return;
+		// external interrupt control
+		case 0x7d: case 0x7e: case 0x7f:
+			m37710_set_irq_line(cpustate, offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
+			m37710i_update_irqs(cpustate);
 
-		case 0x60:  	// watchdog reset
-			return;
+			// level-sense interrupts are not implemented yet
+			if (data & 0x20) logerror("error M37710: INT%d level-sense\n",offset-0x7d);
+			break;
+
+		default:
+			break;
 	}
-
-	cpustate->m37710_regs[offset] = data;
-
-	#if M37710_DEBUG
-	if (offset != 0x60)	// filter out watchdog
-	logerror("m37710_internal_w %x to %02x: %s = %x\n", data, (int)offset, m37710_rnames[(int)offset], cpustate->m37710_regs[offset]);
-	#endif
 }
 
 static READ16_HANDLER( m37710_internal_word_r )
@@ -674,7 +691,8 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 			// this IRQ is set
 			if (m37710_irq_levels[curirq])
 			{
-				int thispri = cpustate->m37710_regs[m37710_irq_levels[curirq]] & 7;
+				int control = cpustate->m37710_regs[m37710_irq_levels[curirq]];
+				int thispri = control & 7;
 				// logerror("line %d set, level %x curpri %x IPL %x\n", curirq, thispri, curpri, cpustate->ipl);
 				// it's maskable, check if the level works, also make sure it's acceptable for the current CPU level
 				if (!FLAG_I && thispri > curpri && thispri > cpustate->ipl)

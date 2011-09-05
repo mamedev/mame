@@ -924,7 +924,8 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_CLI
 #define OP_CLI()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
-			m37710i_set_flag_i(cpustate, IFLAG_CLEAR)
+			m37710i_set_flag_i(cpustate, IFLAG_CLEAR);						\
+			m37710i_update_irqs(cpustate)
 
 /* M37710   Clear oVerflow flag */
 #undef OP_CLV
@@ -1667,7 +1668,8 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_REP
 #define OP_REP()															\
 			CLK(CLK_OP + CLK_R8 + 1);										\
-			m37710i_set_reg_p(cpustate, m37710i_get_reg_p(cpustate) & ~OPER_8_IMM(cpustate))
+			m37710i_set_reg_p(cpustate, m37710i_get_reg_p(cpustate) & ~OPER_8_IMM(cpustate));	\
+			m37710i_update_irqs(cpustate)
 
 /* M37710  Clear "M" status bit */
 #undef OP_CLM
