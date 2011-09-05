@@ -291,7 +291,7 @@ INLINE void m37710i_set_reg_ipl(m37710i_cpu_struct *cpustate, uint value)
 
 INLINE void m37710i_interrupt_software(m37710i_cpu_struct *cpustate, uint vector)
 {
-	CLK(8);
+	CLK(13);
 	m37710i_push_8(cpustate, REG_PB>>16);
 	m37710i_push_16(cpustate, REG_PC);
 	m37710i_push_8(cpustate, cpustate->ipl);
@@ -892,7 +892,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 /* M37710   Cause a Break interrupt */
 #undef OP_BRK
 #define OP_BRK()															\
-			REG_PC++; CLK(CLK_OP + CLK_R8 + CLK_IMM + 5);						\
+			REG_PC++; CLK(CLK_OP + CLK_R8 + CLK_IMM);						\
 			logerror("error M37710: BRK at PC=%06x\n", REG_PB|REG_PC);		\
 			m37710i_interrupt_software(cpustate, 0xfffa)
 

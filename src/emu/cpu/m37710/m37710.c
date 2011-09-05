@@ -268,7 +268,7 @@ static TIMER_CALLBACK( m37710_timer_cb )
 
 	cpustate->timers[which]->adjust(cpustate->reload[which], param);
 
-	m37710_set_irq_line(cpustate, curirq, PULSE_LINE);
+	m37710_set_irq_line(cpustate, curirq, HOLD_LINE);
 	device_triggerint(cpustate->device);
 }
 
@@ -701,15 +701,12 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 		// make sure we're running to service the interrupt
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;
 
-		// auto-clear if it's an internal line
-		if (wantedIRQ <= 12)
-		{
-			m37710_set_irq_line(cpustate, wantedIRQ, CLEAR_LINE);
-		}
+		// auto-clear line
+		m37710_set_irq_line(cpustate, wantedIRQ, CLEAR_LINE);
 
 		// let's do it...
 		// push PB, then PC, then status
-		CLK(8);
+		CLK(13);
 //      mame_printf_debug("taking IRQ %d: PC = %06x, SP = %04x, IPL %d\n", wantedIRQ, REG_PB | REG_PC, REG_S, cpustate->ipl);
 		m37710i_push_8(cpustate, REG_PB>>16);
 		m37710i_push_16(cpustate, REG_PC);
