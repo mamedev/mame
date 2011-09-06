@@ -406,7 +406,7 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 	switch (offset)
 	{
 		// ports
-		case 0x02:
+		case 0x02: // p0
 			return cpustate->io->read_byte(M37710_PORT0);
 		case 0x03: // p1
 			return cpustate->io->read_byte(M37710_PORT1);
@@ -459,14 +459,19 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 		case 0x2f:
 			return cpustate->io->read_byte(M37710_ADC7_H);
 
-		case 0x35:
-			return 0xff;	// UART control
+		// UART control (not hooked up yet)
+		case 0x34: case 0x3c:
+			return 0x08;
+		case 0x35: case 0x3d:
+			return 0xff;
 
-		case 0x70:	// A/D IRQ control
+		// A-D IRQ control (also not properly hooked up yet)
+		case 0x70:
 			return cpustate->m37710_regs[offset] | 8;
-	}
 
-	return cpustate->m37710_regs[offset];
+		default:
+			return cpustate->m37710_regs[offset];
+	}
 }
 
 static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 data)
@@ -487,31 +492,31 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 		// ports
 		case 0x02: // p0
 			cpustate->io->write_byte(M37710_PORT0, data);
-			return;
+			break;
 		case 0x03: // p1
 			cpustate->io->write_byte(M37710_PORT1, data);
-			return;
+			break;
 		case 0x06: // p2
 			cpustate->io->write_byte(M37710_PORT2, data);
-			return;
+			break;
 		case 0x07: // p3
 			cpustate->io->write_byte(M37710_PORT3, data);
-			return;
+			break;
 		case 0x0a: // p4
 			cpustate->io->write_byte(M37710_PORT4, data);
-			return;
+			break;
 		case 0x0b: // p5
 			cpustate->io->write_byte(M37710_PORT5, data);
-			return;
+			break;
 		case 0x0e: // p6
 			cpustate->io->write_byte(M37710_PORT6, data);
-			return;
+			break;
 		case 0x0f: // p7
 			cpustate->io->write_byte(M37710_PORT7, data);
-			return;
+			break;
 		case 0x12: // p8
 			cpustate->io->write_byte(M37710_PORT8, data);
-			return;
+			break;
 
 		case 0x40:	// count start
 			for (i = 0; i < 8; i++)
@@ -748,10 +753,71 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 
 static CPU_RESET( m37710 )
 {
+	int i;
 	m37710i_cpu_struct *cpustate = get_safe_token(device);
+
+	/* Reset MAME timers */
+	for (i = 0; i < 8; i++)
+	{
+		cpustate->timers[i]->reset();
+		cpustate->reload[i] = attotime::zero;
+	}
 
 	/* Start the CPU */
 	CPU_STOPPED = 0;
+
+	/* Reset internal registers */
+	// port direction
+	cpustate->m37710_regs[0x04] = 0;
+	cpustate->m37710_regs[0x05] = 0;
+	cpustate->m37710_regs[0x08] = 0;
+	cpustate->m37710_regs[0x09] = 0;
+	cpustate->m37710_regs[0x0c] = 0;
+	cpustate->m37710_regs[0x0d] = 0;
+	cpustate->m37710_regs[0x10] = 0;
+	cpustate->m37710_regs[0x11] = 0;
+	cpustate->m37710_regs[0x14] = 0;
+
+	cpustate->m37710_regs[0x1e] &= 7; // A-D control
+	cpustate->m37710_regs[0x1f] |= 3; // A-D sweep
+
+	// UART
+	cpustate->m37710_regs[0x30] = 0;
+	cpustate->m37710_regs[0x38] = 0;
+	cpustate->m37710_regs[0x34] = (cpustate->m37710_regs[0x34] & 0xf0) | 8;
+	cpustate->m37710_regs[0x3c] = (cpustate->m37710_regs[0x3c] & 0xf0) | 8;
+	cpustate->m37710_regs[0x35] = 2;
+	cpustate->m37710_regs[0x3d] = 2;
+	cpustate->m37710_regs[0x37]&= 1;
+	cpustate->m37710_regs[0x3f]&= 1;
+
+	// timer
+	cpustate->m37710_regs[0x40] = 0;
+	cpustate->m37710_regs[0x42]&= 0x1f;
+	cpustate->m37710_regs[0x44] = 0;
+	for (i = 0x56; i < 0x5e; i++)
+		cpustate->m37710_regs[i] = 0;
+
+	cpustate->m37710_regs[0x5e] = 0; // processor mode
+	cpustate->m37710_regs[0x61]&= 1; // watchdog frequency
+
+	// interrupt control
+	cpustate->m37710_regs[0x7d] &= 0x3f;
+	cpustate->m37710_regs[0x7e] &= 0x3f;
+	cpustate->m37710_regs[0x7f] &= 0x3f;
+	for (i = 0x70; i < 0x7d; i++)
+		cpustate->m37710_regs[i] &= 0xf;
+
+	/* Clear IPL, m, x, D and set I */
+	cpustate->ipl = 0;
+	FLAG_M = MFLAG_CLEAR;
+	FLAG_X = XFLAG_CLEAR;
+	FLAG_D = DFLAG_CLEAR;
+	FLAG_I = IFLAG_SET;
+
+	/* Clear all pending interrupts (should we really do this?) */
+	LINE_IRQ = 0;
+	IRQ_DELAY = 0;
 
 	/* 37710 boots in full native mode */
 	REG_D = 0;
@@ -760,27 +826,11 @@ static CPU_RESET( m37710 )
 	REG_S = (REG_S & 0xff) | 0x100;
 	REG_X &= 0xff;
 	REG_Y &= 0xff;
-	if(!FLAG_M)
-	{
-		REG_B = REG_A & 0xff00;
-		REG_A &= 0xff;
-	}
-	FLAG_M = MFLAG_CLEAR;
-	FLAG_X = XFLAG_CLEAR;
-
-	/* Clear D and set I */
-	FLAG_D = DFLAG_CLEAR;
-	FLAG_I = IFLAG_SET;
-
-	/* Clear all pending interrupts (should we really do this?) */
-	LINE_IRQ = 0;
-	IRQ_DELAY = 0;
+	REG_B = REG_A & 0xff00;
+	REG_A &= 0xff;
 
 	/* Set the function tables to emulation mode */
 	m37710i_set_execution_mode(cpustate, EXECUTION_MODE_M0X0);
-
-	FLAG_Z = ZFLAG_CLEAR;
-	REG_S = 0x1ff;
 
 	/* Fetch the reset vector */
 	REG_PC = m37710_read_8(0xfffe) | (m37710_read_8(0xffff)<<8);
