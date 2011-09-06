@@ -460,16 +460,17 @@ void multVecMtx(const INT16* vec4, const float* m, float* result)
 #undef M
 }
 
-void projectEyeCoordToScreen(float* projectionMatrix,
-							 const int xRes, const int yRes,
+int projectEyeCoordToScreen(float* projectionMatrix,
+							 const int Res,
 							 INT16* eyePoint3d,
-							 int* result)
+							 int type)
 {
+	int res;
 	/* Return (-1, -1) if the eye point is behind camera */
-	result[0] = -1;
-	result[1] = -1;
+	res = -1;
+
 	if (eyePoint3d[2] <= 0.0)
-		return;
+		return res;
 
 	/* Coordinate system flip */
 	eyePoint3d[0] *= -1;
@@ -481,12 +482,10 @@ void projectEyeCoordToScreen(float* projectionMatrix,
 	multVecMtx(eyePoint3d, projectionMatrix, deviceCoordinates);
 
 	/* We're only interested if it projects within the device */
-	if ( ( deviceCoordinates[0] >= -1.0) && ( deviceCoordinates[0] <= 1.0) &&
-		 ( deviceCoordinates[1] >= -1.0) && ( deviceCoordinates[1] <= 1.0) )
-	{
-		result[0] = (int)( ((deviceCoordinates[0] + 1.0f) / 2.0) * (xRes-1) );
-		result[1] = (int)( ((deviceCoordinates[1] + 1.0f) / 2.0) * (yRes-1) );
-	}
+	if ( ( deviceCoordinates[type] >= -1.0) && ( deviceCoordinates[type] <= 1.0))
+		res = (int)( ((deviceCoordinates[type] + 0.0f) / 1.0) * (Res-1) );
+
+	return res;
 }
 
 void airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* m)
@@ -548,15 +547,13 @@ READ16_HANDLER( dsp_x_return_r )
 	/* Construct a frustum from the system's most recently set left and bottom extents */
 	float m[16];
 	airInfernoFrustum(state->m_frustumLeft, state->m_frustumBottom, m);
+	int res;
 
-	int result[2];
-	projectEyeCoordToScreen(m,
-							32*16,	/* These are defined in the machine ctor */
-							28*16,  /* not sure how to get them here or if they're even correct */
-							state->m_eyecoordBuffer,
-							result);
+	res = projectEyeCoordToScreen(m,
+							32*16, /* x max screen size */
+							state->m_eyecoordBuffer,0);
 
-	return result[0];
+	return res;
 }
 
 READ16_HANDLER( dsp_y_return_r )
@@ -566,15 +563,13 @@ READ16_HANDLER( dsp_y_return_r )
 	/* Construct a frustum from the system's most recently set left and bottom extents */
 	float m[16];
 	airInfernoFrustum(state->m_frustumLeft, state->m_frustumBottom, m);
+	int res;
 
-	int result[2];
-	projectEyeCoordToScreen(m,
-							32*16,	/* These are defined in the machine ctor */
-							28*16,  /* not sure how to get them here or if they're even correct */
-							state->m_eyecoordBuffer,
-							result);
+	res = projectEyeCoordToScreen(m,
+							32*16, /* y max screen size */
+							state->m_eyecoordBuffer,1);
 
-	return result[1];
+	return res;
 }
 
 VIDEO_START( taitoair )
