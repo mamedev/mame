@@ -77,7 +77,7 @@ bool adf_format::load(floppy_image *image)
 		sectors[i].size = 512;
 	}
 
-//	UINT8 *mfm = NULL;
+//  UINT8 *mfm = NULL;
 	image->set_meta_data(80, 2);
 	for(int track=0; track < 80; track++) {
 		for(int side=0; side < 2; side++) {

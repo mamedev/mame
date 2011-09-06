@@ -14,12 +14,12 @@
     CONSTANTS
 ***************************************************************************/
 
-#define I8251_EXPECTING_MODE 		0x01
-#define I8251_EXPECTING_SYNC_BYTE 	0x02
+#define I8251_EXPECTING_MODE		0x01
+#define I8251_EXPECTING_SYNC_BYTE	0x02
 
-#define I8251_STATUS_FRAMING_ERROR 	0x20
-#define I8251_STATUS_OVERRUN_ERROR 	0x10
-#define I8251_STATUS_PARITY_ERROR 	0x08
+#define I8251_STATUS_FRAMING_ERROR	0x20
+#define I8251_STATUS_OVERRUN_ERROR	0x10
+#define I8251_STATUS_PARITY_ERROR	0x08
 #define I8251_STATUS_TX_EMPTY		0x04
 #define I8251_STATUS_RX_READY		0x02
 #define I8251_STATUS_TX_READY		0x01
@@ -57,7 +57,7 @@ struct i8251_interface
 // ======================> i8251_device
 
 class i8251_device :  public device_t,
-  					  public device_serial_interface,
+					  public device_serial_interface,
 					  public i8251_interface
 {
 public:
@@ -83,7 +83,7 @@ public:
 	void receive_clock();
 
 	void receive_character(UINT8 ch);
-	
+
 	virtual void input_callback(UINT8 state);
 protected:
     // device-level overrides

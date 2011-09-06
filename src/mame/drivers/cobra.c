@@ -99,23 +99,23 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 	{
 		int iu, iv;
 		UINT32 texel;
-		
+
 		iu = (int)(u * texture_width);
 		iv = (int)(v * texture_height);
 
 		texel = gfx_texture[((iv * texture_width) + iu) / 2];
-		
+
 		if (iu & 1)
 		{
 			texel &= 0xffff;
 		}
 		else
 		{
-			texel >>= 16;	
+			texel >>= 16;
 		}
 
 		fb[x] = texel ? 0xffffffff : 0xff000000;
-		
+
 		u += du;
 		v += dv;
 	}
@@ -135,7 +135,7 @@ VIDEO_START( cobra )
 
 	cobra->poly = poly_alloc(machine, 4000, 10, POLYFLAG_ALLOW_QUADS);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine));
-	
+
 	cobra->framebuffer = auto_bitmap_alloc(machine, 64*8, 32*8, BITMAP_FORMAT_RGB32);
 }
 
@@ -149,13 +149,13 @@ SCREEN_UPDATE( cobra )
 
 		for (i=0; i < cobra->polybuffer_ptr; i++)
 		{
-			poly_render_triangle(cobra->poly, cobra->framebuffer, &screen->machine().primary_screen->visible_area(), render_texture_scan, 2, 
+			poly_render_triangle(cobra->poly, cobra->framebuffer, &screen->machine().primary_screen->visible_area(), render_texture_scan, 2,
 								 &cobra->polybuffer[i].v[0], &cobra->polybuffer[i].v[1], &cobra->polybuffer[i].v[2]);
 			poly_wait(cobra->poly, "Finished render");
 		}
 		cobra->polybuffer_ptr = 0;
 	}
-	
+
 	copybitmap_trans(bitmap, cobra->framebuffer, 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
@@ -203,7 +203,7 @@ static int decode_debug_state_value(int v)
 		case 0xb0: return 14;
 		case 0xb8: return 15;
 		default: return 0;
-	}	
+	}
 }
 
 
@@ -238,7 +238,7 @@ static void fifo_init(running_machine &machine, int id, int size, const char *na
 	fifo[id].fifo_rpos = 0;
 	fifo[id].fifo_num = 0;
 	fifo[id].fifo_size = size;
-	
+
 	fifo[id].verbose = verbose;
 	fifo[id].name = (char*)name;
 }
@@ -249,7 +249,7 @@ static void fifo_push(const device_t *cpu, int id, UINT64 data)
 	{
 		char accessor_location[50];
 		if (cpu != NULL)
-		{	
+		{
 			// cpu has a name and a PC
 			sprintf(accessor_location, "(%s) %08X", cpu->tag(), cpu_get_pc((device_t *)cpu));
 		}
@@ -258,7 +258,7 @@ static void fifo_push(const device_t *cpu, int id, UINT64 data)
 			// non-cpu
 			sprintf(accessor_location, "(non-cpu)");
 		}
-		
+
 		printf("%s: push %08X%08X (%d) at %s\n", fifo[id].name, (UINT32)(data >> 32), (UINT32)(data), fifo[id].fifo_num, accessor_location);
 	}
 
@@ -267,7 +267,7 @@ static void fifo_push(const device_t *cpu, int id, UINT64 data)
 		int i, j;
 		char accessor_location[50];
 		if (cpu != NULL)
-		{	
+		{
 			// cpu has a name and a PC
 			sprintf(accessor_location, "(%s) %08X", cpu->tag(), cpu_get_pc((device_t *)cpu));
 		}
@@ -279,7 +279,7 @@ static void fifo_push(const device_t *cpu, int id, UINT64 data)
 
 		printf("%s overflow at %s\n", fifo[id].name, accessor_location);
 		printf("%s dump:\n", fifo[id].name);
-		
+
 		for (j=0; j < 128; j+=4)
 		{
 			printf("    ");
@@ -291,20 +291,20 @@ static void fifo_push(const device_t *cpu, int id, UINT64 data)
 			}
 			printf("\n");
 		}
-		
+
 		logerror("\n");
 		return;
 	}
-	
+
 	fifo[id].data[fifo[id].fifo_wpos] = data;
-	
+
 	fifo[id].fifo_wpos++;
-	
+
 	if (fifo[id].fifo_wpos == fifo[id].fifo_size)
 	{
 		fifo[id].fifo_wpos = 0;
 	}
-	
+
 	fifo[id].fifo_num++;
 }
 
@@ -316,7 +316,7 @@ static int fifo_pop(const device_t *cpu, int id, UINT64 *result)
 	{
 		char accessor_location[50];
 		if (cpu != NULL)
-		{	
+		{
 			// cpu has a name and a PC
 			sprintf(accessor_location, "(%s) %08X", cpu->tag(), cpu_get_pc((device_t *)cpu));
 		}
@@ -331,12 +331,12 @@ static int fifo_pop(const device_t *cpu, int id, UINT64 *result)
 	}
 
 	r = fifo[id].data[fifo[id].fifo_rpos];
-	
+
 	if (fifo[id].verbose)
 	{
 		char accessor_location[50];
 		if (cpu != NULL)
-		{	
+		{
 			// cpu has a name and a PC
 			sprintf(accessor_location, "(%s) %08X", cpu->tag(), cpu_get_pc((device_t *)cpu));
 		}
@@ -345,10 +345,10 @@ static int fifo_pop(const device_t *cpu, int id, UINT64 *result)
 			// non-cpu
 			sprintf(accessor_location, "(non-cpu)");
 		}
-		
+
 		printf("%s: pop %08X%08X (%d) at %s\n", fifo[id].name, (UINT32)(r >> 32), (UINT32)(r), fifo[id].fifo_num-1, accessor_location);
 	}
-	
+
 	fifo[id].fifo_rpos++;
 
 	if (fifo[id].fifo_rpos == fifo[id].fifo_size)
@@ -373,19 +373,19 @@ static int fifo_pop_float(const device_t *cpu, int id, float *result)
 
 /*static UINT64 fifo_peek_top(int id)
 {
-	return fifo[id].data[fifo[id].fifo_rpos];
+    return fifo[id].data[fifo[id].fifo_rpos];
 }
 
 static UINT64 fifo_peek_next(int id)
 {
-	int pos = fifo[id].fifo_rpos + 1;
-	
-	if (pos == fifo[id].fifo_size)
-	{
-		pos = 0;	
-	}
-	
-	return fifo[id].data[pos];
+    int pos = fifo[id].fifo_rpos + 1;
+
+    if (pos == fifo[id].fifo_size)
+    {
+        pos = 0;
+    }
+
+    return fifo[id].data[pos];
 }*/
 
 static int fifo_current_num(int id)
@@ -395,29 +395,29 @@ static int fifo_current_num(int id)
 
 static int fifo_space_left(int id)
 {
-	return fifo[id].fifo_size - fifo[id].fifo_num;	
+	return fifo[id].fifo_size - fifo[id].fifo_num;
 }
 
 static int fifo_is_empty(int id)
 {
-	return (fifo[id].fifo_num == 0) ? 1 : 0;	
+	return (fifo[id].fifo_num == 0) ? 1 : 0;
 }
 
 static int fifo_is_half_full(int id)
 {
-	return (fifo[id].fifo_num > (fifo[id].fifo_size / 2)) ? 1 : 0;	
+	return (fifo[id].fifo_num > (fifo[id].fifo_size / 2)) ? 1 : 0;
 }
 
 static int fifo_is_full(int id)
 {
-	return (fifo[id].fifo_num >= fifo[id].fifo_size) ? 1 : 0;	
+	return (fifo[id].fifo_num >= fifo[id].fifo_size) ? 1 : 0;
 }
 
 static void fifo_flush(int id)
 {
 	fifo[id].fifo_num = 0;
 	fifo[id].fifo_rpos = 0;
-	fifo[id].fifo_wpos = 0;	
+	fifo[id].fifo_wpos = 0;
 }
 
 
@@ -449,14 +449,14 @@ static void fifo_flush(int id)
 // Bank 6: start 0x86, end 0x86
 // Bank 7: start 0x87, end 0x87
 
-// IBAT0 U: 0xfff00003 L: 0xfff00001	(0xfff00000, 128K)
-// IBAT1 U: 0x0000007f L: 0x00000001	(0x00000000, 4MB)
-// IBAT2 U: 0x0040007f L: 0x07c00001	(0x07c00000, 4MB)
-// IBAT3 U: 0x00000000 L: 0x00000001	unused
-// DBAT0 U: 0xfff0001f L: 0xfff0002a	(0xfff00000, 1MB)
-// DBAT1 U: 0x0000007f L: 0x00000002	(0x00000000, 4MB)
-// DBAT2 U: 0x0040007f L: 0x07c00002	(0x07c00000, 4MB)
-// DBAT3 U: 0xc0000fff L: 0xc0000002	(0xc0000000, 128MB)
+// IBAT0 U: 0xfff00003 L: 0xfff00001    (0xfff00000, 128K)
+// IBAT1 U: 0x0000007f L: 0x00000001    (0x00000000, 4MB)
+// IBAT2 U: 0x0040007f L: 0x07c00001    (0x07c00000, 4MB)
+// IBAT3 U: 0x00000000 L: 0x00000001    unused
+// DBAT0 U: 0xfff0001f L: 0xfff0002a    (0xfff00000, 1MB)
+// DBAT1 U: 0x0000007f L: 0x00000002    (0x00000000, 4MB)
+// DBAT2 U: 0x0040007f L: 0x07c00002    (0x07c00000, 4MB)
+// DBAT3 U: 0xc0000fff L: 0xc0000002    (0xc0000000, 128MB)
 
 // RPA: 0x8010C000
 
@@ -498,7 +498,7 @@ static WRITE64_DEVICE_HANDLER(main_mpc106_w)
 READ64_MEMBER(cobra_state::main_fifo_r)
 {
 	UINT64 r = 0;
-	
+
 	if (ACCESSING_BITS_56_63)
 	{
 		// Register 0xffff0000:
@@ -507,24 +507,24 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		//
 		// 7 6 5 4 3 2 1 0
 		//----------------
-		//               x		M2S FIFO full flag
+		//               x      M2S FIFO full flag
 		//             x        M2S FIFO empty flag
 		//           x          M2S FIFO half-full flag
 		//       x              S2M FIFO full flag
 		//     x                S2M FIFO empty flag
 		//   x                  S2M FIFO half-full flag
-		
+
 		int value = 0x00;
 		value |= fifo_is_full(M2SFIFO) ? 0x00 : 0x01;
 		value |= fifo_is_empty(M2SFIFO) ? 0x00 : 0x02;
 		value |= fifo_is_half_full(M2SFIFO) ? 0x00 : 0x04;
-			
+
 		value |= fifo_is_full(S2MFIFO) ? 0x00 : 0x10;
 		value |= fifo_is_empty(S2MFIFO) ? 0x00 : 0x20;
 		value |= fifo_is_half_full(S2MFIFO) ? 0x00 : 0x40;
-			
+
 		value |= comram_page ? 0x80 : 0x00;
-		
+
 		r |= (UINT64)(value) << 56;
 	}
 	if (ACCESSING_BITS_48_55)
@@ -536,19 +536,19 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 	{
 		// Register 0xffff0002:
 		// Sub-to-Main FIFO read data
-		
+
 		UINT64 value;
 		fifo_pop(&space.device(), S2MFIFO, &value);
-		
+
 		if (fifo_is_empty(S2MFIFO))
 		{
 			s2mfifo_unk_flag = 1;
 		}
 		else if (fifo_is_full(S2MFIFO))
 		{
-			s2mfifo_unk_flag = 0;	
+			s2mfifo_unk_flag = 0;
 		}
-		
+
 		r |= (UINT64)(value & 0xff) << 40;
 	}
 	if (ACCESSING_BITS_32_39)
@@ -560,26 +560,26 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		//             x     S2M FIFO unknown flag
 		//           x       Graphics board/FIFO busy flag
 		//         x         M2S FIFO unknown flag
-		
+
 		int value = 0x01;
 		//value |= s2mfifo_unk_flag ? 0x2 : 0x0;
-		
+
 		if (fifo_is_empty(S2MFIFO))
 		{
 			value |= 0x2;
 		}
 		else if (!fifo_is_full(S2MFIFO) && !fifo_is_half_full(S2MFIFO))
 		{
-			//value |= s2mfifo_unk_flag ? 0x2 : 0x0;	
+			//value |= s2mfifo_unk_flag ? 0x2 : 0x0;
 		}
-		
+
 		value |= m2sfifo_unk_flag ? 0x8 : 0x0;
-			
+
 		value |= (gfx_unk_flag & 0x80) ? 0x00 : 0x04;
-		
+
 		r |= (UINT64)(value) << 32;
 	}
-	
+
 	return r;
 }
 
@@ -589,13 +589,13 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 	{
 		// Register 0xffff0002:
 		// Main-to-Sub FIFO write data
-		
+
 		//printf("MAIN: M2S FIFO data write %02X\n", (UINT8)(data >> 40) & 0xff);
-		
+
 		fifo_push(&space.device(), M2SFIFO, (UINT8)(data >> 40));
-		
+
 		cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, ASSERT_LINE);
-		
+
 		// this is a hack...
 		// MAME has a small interrupt latency, which prevents the IRQ bit from being set in
 		// the EXISR at the same time as the FIFO status updates.....
@@ -605,12 +605,12 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 	{
 		// Register 0xffff0003:
 		// Main-to-Sub FIFO unknown
-		
+
 		if (!fifo_is_empty(M2SFIFO))
 		{
 			if (fifo_is_half_full(M2SFIFO))
 			{
-				m2sfifo_unk_flag = 0x8;	
+				m2sfifo_unk_flag = 0x8;
 			}
 			else
 			{
@@ -619,15 +619,15 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		}
 		else
 		{
-			m2sfifo_unk_flag = 0x0;	
+			m2sfifo_unk_flag = 0x0;
 		}
-		
+
 		comram_page = ((data >> 32) & 0x80) ? 1 : 0;
 	}
-	
+
 	// Register 0xffff0000,1
 	// Debug state write
-	
+
 	if (ACCESSING_BITS_56_63)
 	{
 		main_debug_state |= decode_debug_state_value((data >> 56) & 0xff) << 4;
@@ -638,14 +638,14 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		main_debug_state |= decode_debug_state_value((data >> 48) & 0xff);
 		main_debug_state_wc++;
 	}
-	
+
 	if (main_debug_state_wc >= 2)
 	{
 		if (main_debug_state != 0)
 		{
 			printf("MAIN: debug state %02X\n", main_debug_state);
 		}
-		
+
 		main_debug_state = 0;
 		main_debug_state_wc = 0;
 	}
@@ -655,7 +655,7 @@ READ64_MEMBER(cobra_state::main_comram_r)
 {
 	UINT64 r = 0;
 	int page = comram_page;
-	
+
 	if (ACCESSING_BITS_32_63)
 	{
 		r |= (UINT64)(comram[page][(offset << 1) + 0]) << 32;
@@ -664,21 +664,21 @@ READ64_MEMBER(cobra_state::main_comram_r)
 	{
 		r |= (UINT64)(comram[page][(offset << 1) + 1]);
 	}
-	
+
 	return r;
 }
 
 WRITE64_MEMBER(cobra_state::main_comram_w)
-{	
+{
 	int page = comram_page;
-	
+
 	UINT32 w1 = comram[page][(offset << 1) + 0];
 	UINT32 w2 = comram[page][(offset << 1) + 1];
 	UINT32 d1 = (UINT32)(data >> 32);
 	UINT32 d2 = (UINT32)(data);
 	UINT32 m1 = (UINT32)(mem_mask >> 32);
 	UINT32 m2 = (UINT32)(mem_mask);
-	
+
 	comram[page][(offset << 1) + 0] = (w1 & m1) | (d1 & ~m1);
 	comram[page][(offset << 1) + 1] = (w2 & m2) | (d2 & ~m2);
 }
@@ -710,54 +710,54 @@ static UINT8 sub_interrupt = 0xff;
 READ32_MEMBER(cobra_state::sub_unk1_r)
 {
 	UINT32 r = 0;
-	
+
 	if (ACCESSING_BITS_16_23)
 	{
 		r |= 0x10000;
 	}
-	
+
 	return r;
 }
 
 WRITE32_MEMBER(cobra_state::sub_unk1_w)
 {
 	/*
-	if (!(mem_mask & 0xff000000))
-	{
-		printf("%02X", data >> 24);
-		ucount++;
-		
-		if (ucount >= 4)
-		{
-			ucount = 0;
-			printf("\n");
-		}
-	}
-	*/	
+    if (!(mem_mask & 0xff000000))
+    {
+        printf("%02X", data >> 24);
+        ucount++;
+
+        if (ucount >= 4)
+        {
+            ucount = 0;
+            printf("\n");
+        }
+    }
+    */
 }
 
 READ32_MEMBER(cobra_state::sub_mainbd_r)
 {
 	UINT32 r = 0;
-	
+
 	if (ACCESSING_BITS_24_31)
 	{
 		// Register 0x7E380000
 		// M2S FIFO read
-		
+
 		UINT64 value;
 		fifo_pop(&space.device(), M2SFIFO, &value);
-		
+
 		if (fifo_is_empty(M2SFIFO))
 		{
 			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
-			
+
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
 			// the EXISR at the same time as the FIFO status updates.....
 			cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x10);
 		}
-		
+
 		r |= (value & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
@@ -774,21 +774,21 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		//       x            M2S FIFO full flag
 		//     x              M2S FIFO empty flag
 		//   x                M2S FIFO half-full flag
-		
+
 		UINT32 value = 0x00;
 		value |= fifo_is_full(S2MFIFO) ? 0x00 : 0x01;
 		value |= fifo_is_empty(S2MFIFO) ? 0x00 : 0x02;
 		value |= fifo_is_half_full(S2MFIFO) ? 0x00 : 0x04;
-		
+
 		value |= fifo_is_full(M2SFIFO) ? 0x00 : 0x10;
 		value |= fifo_is_empty(M2SFIFO) ? 0x00 : 0x20;
 		value |= fifo_is_half_full(M2SFIFO) ? 0x00 : 0x40;
-			
+
 		value |= comram_page ? 0x80 : 0x00;
-		
-		r |= (value) << 16;	
+
+		r |= (value) << 16;
 	}
-	
+
 	return r;
 }
 
@@ -798,13 +798,13 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 	{
 		// Register 0x7E380000
 		// Sub-to-Main FIFO data
-		
-		fifo_push(&space.device(), S2MFIFO, (UINT8)(data >> 24));	
+
+		fifo_push(&space.device(), S2MFIFO, (UINT8)(data >> 24));
 	}
 	if (ACCESSING_BITS_16_23)
 	{
 		// Register 0x7E380001
-		
+
 		if (!fifo_is_empty(S2MFIFO))
 		{
 			if (fifo_is_half_full(S2MFIFO))
@@ -820,11 +820,11 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		{
 			s2mfifo_unk_flag = 0;
 		}
-		
+
 		if (!s2mfifo_unk_flag)
 		{
 			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, ASSERT_LINE);
-		
+
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being set in
 			// the EXISR at the same time as the FIFO status updates.....
@@ -833,7 +833,7 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		else
 		{
 			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, CLEAR_LINE);
-		
+
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
 			// the EXISR at the same time as the FIFO status updates.....
@@ -854,14 +854,14 @@ WRITE32_MEMBER(cobra_state::sub_debug_w)
 		sub_debug_state |= decode_debug_state_value((data >> 16) & 0xff);
 		sub_debug_state_wc++;
 	}
-	
+
 	if (sub_debug_state_wc >= 2)
 	{
 		if (sub_debug_state != 0)
 		{
 			printf("SUB: debug state %02X\n", sub_debug_state);
 		}
-		
+
 		sub_debug_state = 0;
 		sub_debug_state_wc = 0;
 	}
@@ -870,7 +870,7 @@ WRITE32_MEMBER(cobra_state::sub_debug_w)
 READ32_MEMBER(cobra_state::sub_config_r)
 {
 	UINT32 r = 0;
-	
+
 	if (ACCESSING_BITS_8_15)
 	{
 		r |= (0x2) << 8;		// if bit 0x2 is zero, maskrom boot
@@ -879,19 +879,19 @@ READ32_MEMBER(cobra_state::sub_config_r)
 	{
 		r |= sub_interrupt;
 	}
-	
+
 	return r;
 }
 
 WRITE32_MEMBER(cobra_state::sub_config_w)
 {
-	
+
 }
 
 static READ32_DEVICE_HANDLER(sub_ata_r)
 {
 	UINT32 r = 0;
-	
+
 	if (ACCESSING_BITS_16_31)
 	{
 		UINT16 v = ide_bus_r(device, 0, (offset << 1) + 0);
@@ -902,66 +902,66 @@ static READ32_DEVICE_HANDLER(sub_ata_r)
 		UINT16 v = ide_bus_r(device, 0, (offset << 1) + 1);
 		r |= ((v << 8) | (v >> 8)) << 0;
 	}
-	
-	return r;	
+
+	return r;
 }
 
 static WRITE32_DEVICE_HANDLER(sub_ata_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		ide_bus_w(device, 0, (offset << 1) + 0, (UINT16)(data >> 24));	
+		ide_bus_w(device, 0, (offset << 1) + 0, (UINT16)(data >> 24));
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		ide_bus_w(device, 0, (offset << 1) + 1, (UINT16)(data >> 8));	
+		ide_bus_w(device, 0, (offset << 1) + 1, (UINT16)(data >> 8));
 	}
 }
 
 READ32_MEMBER(cobra_state::sub_comram_r)
 {
 	int page = comram_page ^ 1;
-	
-	return comram[page][offset];	
+
+	return comram[page][offset];
 }
 
 WRITE32_MEMBER(cobra_state::sub_comram_w)
 {
 	int page = comram_page ^ 1;
-	
+
 	COMBINE_DATA(comram[page] + offset);
 }
 
 READ32_MEMBER(cobra_state::sub_sound_r)
 {
 	UINT32 r = 0;
-	
+
 	/*
-	if (!(mem_mask & 0xffff0000))
-	{
-		r |= RF5C400_0_r((offset << 1) + 0, 0x0000);
-	}
-	if (!(mem_mask & 0x0000ffff))
-	{
-		r |= RF5C400_0_r((offset << 1) + 1, 0x0000);
-	}
-	*/
-	
+    if (!(mem_mask & 0xffff0000))
+    {
+        r |= RF5C400_0_r((offset << 1) + 0, 0x0000);
+    }
+    if (!(mem_mask & 0x0000ffff))
+    {
+        r |= RF5C400_0_r((offset << 1) + 1, 0x0000);
+    }
+    */
+
 	return r;
 }
 
 WRITE32_MEMBER(cobra_state::sub_sound_w)
 {
 	/*
-	if (!(mem_mask & 0xffff0000))
-	{
-		RF5C400_0_w((offset << 1) + 0, (UINT16)(data >> 16), 0x0000);	
-	}
-	if (!(mem_mask & 0x0000ffff))
-	{
-		RF5C400_0_w((offset << 1) + 1, (UINT16)(data), 0x0000);
-	}
-	*/
+    if (!(mem_mask & 0xffff0000))
+    {
+        RF5C400_0_w((offset << 1) + 0, (UINT16)(data >> 16), 0x0000);
+    }
+    if (!(mem_mask & 0x0000ffff))
+    {
+        RF5C400_0_w((offset << 1) + 1, (UINT16)(data), 0x0000);
+    }
+    */
 }
 
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
@@ -991,16 +991,16 @@ ADDRESS_MAP_END
 // Bank 6: start 0x180, end 0x1bf
 // Bank 7: start 0x1e0, end 0x1ef
 
-// IBAT0 U: 0xfff00003 L: 0xfff00001	(0xfff00000, 0xfff00000, 128KB)
-// IBAT1 U: 0x0000007f L: 0x00000001	(0x00000000, 0x00000000, 4MB)
-// IBAT2 U: 0x0040007f L: 0x07c00001	(0x00400000, 0x07c00000, 4MB)
-// IBAT3 U: 0x00000000 L: 0x00000001	unused
-// DBAT0 U: 0xfff0001f L: 0xfff0002a	(0xfff00000, 0xfff00000, 1MB)
-// DBAT1 U: 0x0000007f L: 0x00000002	(0x00000000, 0x00000000, 4MB)
-// DBAT2 U: 0x0040007f L: 0x07c00002	(0x00400000, 0x07c00000, 4MB)
-// DBAT3 U: 0xf8fe0003 L: 0xf8fe002a	(0xf8fe0000, 0xf8fe0000, 128KB)
+// IBAT0 U: 0xfff00003 L: 0xfff00001    (0xfff00000, 0xfff00000, 128KB)
+// IBAT1 U: 0x0000007f L: 0x00000001    (0x00000000, 0x00000000, 4MB)
+// IBAT2 U: 0x0040007f L: 0x07c00001    (0x00400000, 0x07c00000, 4MB)
+// IBAT3 U: 0x00000000 L: 0x00000001    unused
+// DBAT0 U: 0xfff0001f L: 0xfff0002a    (0xfff00000, 0xfff00000, 1MB)
+// DBAT1 U: 0x0000007f L: 0x00000002    (0x00000000, 0x00000000, 4MB)
+// DBAT2 U: 0x0040007f L: 0x07c00002    (0x00400000, 0x07c00000, 4MB)
+// DBAT3 U: 0xf8fe0003 L: 0xf8fe002a    (0xf8fe0000, 0xf8fe0000, 128KB)
 
-// DBAT3 U: 0x10001fff L: 0x1000000a	(0x10000000, 0x10000000, 256MB)
+// DBAT3 U: 0x10001fff L: 0x1000000a    (0x10000000, 0x10000000, 256MB)
 
 // SR0:  0x00000000  SR1:  0x00000001  SR2:  0x00000002  SR3:  0x00000003
 // SR4:  0x00000004  SR5:  0x00000005  SR6:  0x00000006  SR7:  0x00000007
@@ -1034,18 +1034,18 @@ static void push_poly(cobra_state *cobra, poly_vertex *v1, poly_vertex *v2, poly
 	memcpy(&cobra->polybuffer[cobra->polybuffer_ptr].v[0], v1, sizeof(poly_vertex));
 	memcpy(&cobra->polybuffer[cobra->polybuffer_ptr].v[1], v2, sizeof(poly_vertex));
 	memcpy(&cobra->polybuffer[cobra->polybuffer_ptr].v[2], v3, sizeof(poly_vertex));
-	
+
 	cobra->polybuffer_ptr++;
-	
+
 	if (cobra->polybuffer_ptr >= 4096)
 	{
-		logerror("push_poly() overflow\n");	
+		logerror("push_poly() overflow\n");
 	}
 }
 
 static void cobra_gfx_init(running_machine *machine)
 {
-	//gfx_gram = auto_malloc(0x100000);	
+	//gfx_gram = auto_malloc(0x100000);
 	gfx_gram = auto_alloc_array(*machine, UINT8, 0x100000);
 }
 
@@ -1053,23 +1053,23 @@ static void gfx_fifo_exec(cobra_state *cobra)
 {
 	if (gfx_fifo_loopback != 0)
 		return;
-	
+
 	while (fifo_current_num(GFXFIFO_IN) >= 2)
 	{
 		UINT64 in1, in2;
 		UINT32 w1, w2;
-		
+
 		if (gfx_re_status == RE_STATUS_IDLE)
 		{
 			fifo_pop(NULL, GFXFIFO_IN, &in1);
 			fifo_pop(NULL, GFXFIFO_IN, &in2);
 			w1 = (UINT32)(in1);
 			w2 = (UINT32)(in2);
-			
+
 			gfx_re_command_word1 = w1;
 			gfx_re_command_word2 = w2;
 			gfx_re_word_count = 0;
-			
+
 			gfx_re_status = RE_STATUS_COMMAND;
 		}
 		else
@@ -1077,47 +1077,47 @@ static void gfx_fifo_exec(cobra_state *cobra)
 			w1 = gfx_re_command_word1;
 			w2 = gfx_re_command_word2;
 		}
-		
-	//	fifo_pop(GFXFIFO_IN, &in1);
-	//	fifo_pop(GFXFIFO_IN, &in2);
-	
-	//	in1 = fifo_peek_top(GFXFIFO_IN);
-	//	in2 = fifo_peek_next(GFXFIFO_IN);
-		
-	//	w1 = (UINT32)(in1);
-	//	w2 = (UINT32)(in2);
-		
+
+	//  fifo_pop(GFXFIFO_IN, &in1);
+	//  fifo_pop(GFXFIFO_IN, &in2);
+
+	//  in1 = fifo_peek_top(GFXFIFO_IN);
+	//  in2 = fifo_peek_next(GFXFIFO_IN);
+
+	//  w1 = (UINT32)(in1);
+	//  w2 = (UINT32)(in2);
+
 		switch ((w1 >> 24) & 0xff)
 		{
 			case 0x00:
 			{
 				UINT64 param[6];
 				UINT32 w[6];
-				
+
 				if (fifo_current_num(GFXFIFO_IN) < 6)
 				{
 					// wait until there's enough data in FIFO
 					return;
 				}
-				
+
 				fifo_pop(NULL, GFXFIFO_IN, &param[0]);
 				fifo_pop(NULL, GFXFIFO_IN, &param[1]);
 				fifo_pop(NULL, GFXFIFO_IN, &param[2]);
 				fifo_pop(NULL, GFXFIFO_IN, &param[3]);
 				fifo_pop(NULL, GFXFIFO_IN, &param[4]);
 				fifo_pop(NULL, GFXFIFO_IN, &param[5]);
-				
+
 				w[0] = (UINT32)param[0];	w[1] = (UINT32)param[1];	w[2] = (UINT32)param[2];
 				w[3] = (UINT32)param[3];	w[4] = (UINT32)param[4];	w[5] = (UINT32)param[5];
-				
+
 				// mbuslib_pumpkin(): 0x00600000 0x10500010
 				//                    0x00600000 0x10500018
-				
+
 				if (w2 == 0x10500010)
 				{
 					// GFX register select?
 					gfx_register_select = w[3];		// word 3 is the only non-zero so far...
-					
+
 					printf("GFX: register select %04X\n", gfx_register_select);
 				}
 				else if (w2 == 0x10500018)
@@ -1125,7 +1125,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 					// register write to the register selected above?
 					// 64-bit registers, top 32-bits in word 2, low 32-bit in word 3
 					printf("GFX: register write %04X: %08X %08X\n", gfx_register_select, w[2], w[3]);
-					
+
 					gfx_register[gfx_register_select] = ((UINT64)(w[2]) << 32) | w[3];
 				}
 				else if (w2 == 0x10521000)
@@ -1137,37 +1137,37 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				{
 					logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
 				}
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
 			case 0x0f:
 			case 0xf0:
 			{
 				UINT64 in3, in4, ignore;
-				
+
 				// check_mergebus_self(): 0x0F600000 0x10520C00
-				
+
 				if (fifo_current_num(GFXFIFO_IN) < 6)
 				{
 					// wait until there's enough data in FIFO
 					return;
 				}
-				
+
 				if (w1 != 0x0f600000 && w1 != 0xf0600000)
 				{
 					logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
 				}
-				
+
 				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
-				
+
 				fifo_pop(NULL, GFXFIFO_IN, &in3);
 				fifo_pop(NULL, GFXFIFO_IN, &in4);
 				fifo_pop(NULL, GFXFIFO_IN, &ignore);
 				fifo_pop(NULL, GFXFIFO_IN, &ignore);
 				fifo_pop(NULL, GFXFIFO_IN, &ignore);
 				fifo_pop(NULL, GFXFIFO_IN, &ignore);
-				
+
 				if (w1 == 0x0f600000 && w2 == 0x10520c00)
 				{
 					fifo_push(NULL, GFXFIFO_OUT, w1);
@@ -1175,9 +1175,9 @@ static void gfx_fifo_exec(cobra_state *cobra)
 					fifo_push(NULL, GFXFIFO_OUT, in3);
 					fifo_push(NULL, GFXFIFO_OUT, in4);
 				}
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
 			case 0x80:
 			case 0xa4:
@@ -1185,35 +1185,35 @@ static void gfx_fifo_exec(cobra_state *cobra)
 			case 0xac:
 			{
 				// 0xAxxxxxxx is different form in mbuslib_regwrite()
-				
+
 				// mbuslib_regwrite(): 0x800000FF 0x00000001
 				//                     0xa40000FF 0x00000001
-				
+
 				int reg = (w1 >> 8) & 0xfffff;
-				
+
 				gfx_gram[reg + 0] = (w2 >> 24) & 0xff;
 				gfx_gram[reg + 1] = (w2 >> 16) & 0xff;
 				gfx_gram[reg + 2] = (w2 >>  8) & 0xff;
 				gfx_gram[reg + 3] = (w2 >>  0) & 0xff;
-				
+
 				if (reg != 0x118 && reg != 0x114 && reg != 0x11c)
 				{
 					printf("gfxfifo_exec: ram write %05X: %08X\n", reg, w2);
 				}
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
-			
+
 			case 0xf1:
 			case 0xf4:
 			{
 				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
-			
+
 			case 0xe0:
 			case 0xe2:
 			case 0xe3:
@@ -1237,10 +1237,10 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				// E3400002 58C003C1 - 20 params
 				// E0C00003 18F803C1 - 36 params
 				// E0C00001 58F803C0 - 12 params
-				
+
 				// These seem to be 3d graphics polygon packets...
 				// The low part of the first word could be number of vertices...
-				
+
 				int i;
 				int num = 0;
 				int units = w1 & 0xff;
@@ -1251,7 +1251,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				}
 				//else if (w2 == 0x18c003c1)
 				//{
-				//	num = units * 12;
+				//  num = units * 12;
 				//}
 				else if (w2 == 0x38c003c1 || w2 == 0x58c003c1 || w2 == 0x78c003c0)
 				{
@@ -1263,23 +1263,23 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				}
 				else if (w2 == 0x78f803c1)
 				{
-					num = units * 14;	
+					num = units * 14;
 				}
 				else
 				{
 					int c = 0;
-					printf("gfxfifo_exec: E0 unhandled %08X %08X\n", w1, w2);	
+					printf("gfxfifo_exec: E0 unhandled %08X %08X\n", w1, w2);
 					while (fifo_current_num(GFXFIFO_IN) > 0)
 					{
 						UINT64 param;
 						fifo_pop(NULL, GFXFIFO_IN, &param);
-					
+
 						if (c == 0)
 							printf("              ");
 						printf("%08X ", (UINT32)(param));
-					
+
 						c++;
-					
+
 						if (c == 4)
 						{
 							printf("\n");
@@ -1288,47 +1288,47 @@ static void gfx_fifo_exec(cobra_state *cobra)
 					};
 					logerror("\n");
 				}
-				
+
 				if (fifo_current_num(GFXFIFO_IN) < num)
 				{
 					// wait until there's enough data in FIFO
 					return;
 				}
-				
+
 				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
-				
+
 				// make sure the FIFO has fresh data at top...
 				fifo_flush(GFXFIFO_OUT);
-				
+
 				if (w1 == 0xe0c00004 && w2 == 0x18f803c1)
 				{
 					// Quad poly packet
 					poly_vertex vert[4];
-					
+
 					for (i=0; i < 4; i++)
 					{
 						UINT64 in;
 						fifo_pop_float(NULL, GFXFIFO_IN, &vert[i].x);		// X coord
 						fifo_pop_float(NULL, GFXFIFO_IN, &vert[i].y);		// Y coord
-						
+
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
-						
+
 						fifo_pop_float(NULL, GFXFIFO_IN, &vert[i].p[0]);	// texture U coord
 						fifo_pop_float(NULL, GFXFIFO_IN, &vert[i].p[1]);	// texture V coord
-						
+
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 					}
-					
+
 					//poly_render_triangle(poly, framebuffer, video_screen_get_visible_area(machine->primary_screen), render_texture_scan, 2, &vert[0], &vert[1], &vert[2]);
 					//poly_render_triangle(poly, framebuffer, video_screen_get_visible_area(machine->primary_screen), render_texture_scan, 2, &vert[2], &vert[1], &vert[3]);
 					//poly_wait(poly, "Finished render");
-				
+
 					push_poly(cobra, &vert[0], &vert[1], &vert[2]);
 					push_poly(cobra, &vert[2], &vert[1], &vert[3]);
 				}
@@ -1336,31 +1336,31 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				{
 					// Triangle poly packet?
 					poly_vertex vert[3];
-					
+
 					for (i=0; i < 3; i++)
 					{
 						UINT64 in;
-						fifo_pop(NULL, GFXFIFO_IN, &in);	
-						
 						fifo_pop(NULL, GFXFIFO_IN, &in);
-						
+
+						fifo_pop(NULL, GFXFIFO_IN, &in);
+
 						vert[i].x = (u2f((UINT32)(in)) / 8.0f) + 256.0f;
-						
+
 						fifo_pop(NULL, GFXFIFO_IN, &in);
-						
+
 						vert[i].y = (u2f((UINT32)(in)) / 8.0f) + 192.0f;
-						
-						fifo_pop(NULL, GFXFIFO_IN, &in);	
-						
+
+						fifo_pop(NULL, GFXFIFO_IN, &in);
+
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 					}
-					
+
 					//poly_render_triangle(poly, framebuffer, video_screen_get_visible_area(machine->primary_screen), render_scan, 0, &vert[0], &vert[1], &vert[2]);
 					//poly_wait(poly, "Finished render");
-					
+
 					push_poly(cobra, &vert[0], &vert[1], &vert[2]);
 				}
 				else
@@ -1371,140 +1371,140 @@ static void gfx_fifo_exec(cobra_state *cobra)
 						fifo_pop(NULL, GFXFIFO_IN, &in3);
 						fifo_pop(NULL, GFXFIFO_IN, &in4);
 						printf("                        %08X %08X (%f, %f)\n", (UINT32)(in3), (UINT32)(in4), u2f((UINT32)(in3)), u2f((UINT32)(in4)));
-						
+
 						fifo_push(NULL, GFXFIFO_OUT, (UINT32)(in3));
 						fifo_push(NULL, GFXFIFO_OUT, (UINT32)(in4));
 					}
 				}
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
-			
+
 			case 0xe8:
 			{
 				int num = w2;
 				int i;
-			//	int c=0;
-				
+			//  int c=0;
+
 				if (fifo_current_num(GFXFIFO_IN) < num)
 				{
 					// wait until there's enough data in FIFO
 					return;
 				}
-				
+
 				/*
+                printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+
+                for (i=0; i < num; i++)
+                {
+                    UINT64 in3;
+                    fifo_pop(GFXFIFO_IN, &in3);
+                    printf("                        %08X\n", (UINT32)(in3));
+                }*/
+
 				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
-				
-				for (i=0; i < num; i++)
-				{
-					UINT64 in3;
-					fifo_pop(GFXFIFO_IN, &in3);
-					printf("                        %08X\n", (UINT32)(in3));
-				}*/
-				
-				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
-				
+
 				for (i=0; i < num; i++)
 				{
 					UINT64 param;
 					fifo_pop(NULL, GFXFIFO_IN, &param);
-					
+
 					/*if (c == 0)
-						printf("       ");
-					printf("%08X ", (UINT32)(param));
-					
-					c++;
-					
-					if (c == 8)
-					{
-						printf("\n");
-						c = 0;
-					}*/
+                        printf("       ");
+                    printf("%08X ", (UINT32)(param));
+
+                    c++;
+
+                    if (c == 8)
+                    {
+                        printf("\n");
+                        c = 0;
+                    }*/
 				}
 				//printf("\n");
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
-			
+
 			case 0xe9:
-			{				
-			//	printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
-			
+			{
+			//  printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+
 				/*{
-					int y = (gfx_gram[0x11c] << 8) | (gfx_gram[0x11d]);
-					int x = (gfx_gram[0x11e] << 8) | (gfx_gram[0x11f]);
-					printf("GFX: E9 on X: %d, Y: %d\n", x, y);
-				}*/
-				
+                    int y = (gfx_gram[0x11c] << 8) | (gfx_gram[0x11d]);
+                    int x = (gfx_gram[0x11e] << 8) | (gfx_gram[0x11f]);
+                    printf("GFX: E9 on X: %d, Y: %d\n", x, y);
+                }*/
+
 				fifo_push(NULL, GFXFIFO_OUT, 0);
 				fifo_push(NULL, GFXFIFO_OUT, 0);
 				fifo_push(NULL, GFXFIFO_OUT, 0);
 				fifo_push(NULL, GFXFIFO_OUT, 0);
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
-			
+
 			case 0x8f:
 			{
 				// buf_flush(): 0x8FFF0000 0x00000000
-				
+
 				if (w1 != 0x8fff0000 || w2 != 0x00000000)
 				{
-					logerror("gfxfifo_exec: buf_flush: %08X %08X\n", w1, w2);	
+					logerror("gfxfifo_exec: buf_flush: %08X %08X\n", w1, w2);
 				}
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
 			case 0xb0:
 			{
 				// mbuslib_pip_ints(): 0xB0300800 0x000001FE
-				
+
 				int reg = (w1 >> 8) & 0xfffff;
 				int num = w2;
 				int i;
-				
+
 				if (fifo_current_num(GFXFIFO_IN) < num)
 				{
 					return;
 				}
-				
+
 				printf("gfxfifo_exec: pip_ints %d\n", num);
-				
+
 				/*
-				if (reg != 0x3008)
-				{
-					fatalerror("gfxfifo_exec: pip_ints: %08X %08X\n", w1, w2);	
-				}
-				
-				printf("gfxfifo_exec: pip_ints %d\n", num);
-				
-				for (i = 0; i < num; i++)
-				{
-					UINT64 value;
-					fifo_pop(GFXFIFO_IN, &value);
-					
-					gfx_unk_reg[i] = value;
-				}
-				*/
-				
+                if (reg != 0x3008)
+                {
+                    fatalerror("gfxfifo_exec: pip_ints: %08X %08X\n", w1, w2);
+                }
+
+                printf("gfxfifo_exec: pip_ints %d\n", num);
+
+                for (i = 0; i < num; i++)
+                {
+                    UINT64 value;
+                    fifo_pop(GFXFIFO_IN, &value);
+
+                    gfx_unk_reg[i] = value;
+                }
+                */
+
 				// writes to n ram location starting from x?
 				for (i = 0; i < num; i++)
 				{
 					UINT64 value;
 					fifo_pop(NULL, GFXFIFO_IN, &value);
-					
+
 					gfx_gram[reg + (i*4) + 0] = (value >> 24) & 0xff;
 					gfx_gram[reg + (i*4) + 1] = (value >> 16) & 0xff;
 					gfx_gram[reg + (i*4) + 2] = (value >>  8) & 0xff;
 					gfx_gram[reg + (i*4) + 3] = (value >>  0) & 0xff;
 				}
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
 			case 0xc0:
 			case 0xc4:
@@ -1512,104 +1512,104 @@ static void gfx_fifo_exec(cobra_state *cobra)
 			case 0xcc:
 			{
 				// mbuslib_regread(): 0xC0300800 0x00000000
-				
+
 				/*
-				if (reg == 0x3008)
-				{
-					// TODO...
-					fifo_push(GFXFIFO_OUT, gfx_unk_reg[0]);
-					
-				}
-				else if (reg == 0x300c)
-				{
-					// TODO...
-					fifo_push(GFXFIFO_OUT, gfx_unk_reg[1]);
-				}
-				else
-				{
-					fatalerror("gfxfifo_exec: regread: %08X %08X\n", w1, w2);
-				}
-				*/
-				
+                if (reg == 0x3008)
+                {
+                    // TODO...
+                    fifo_push(GFXFIFO_OUT, gfx_unk_reg[0]);
+
+                }
+                else if (reg == 0x300c)
+                {
+                    // TODO...
+                    fifo_push(GFXFIFO_OUT, gfx_unk_reg[1]);
+                }
+                else
+                {
+                    fatalerror("gfxfifo_exec: regread: %08X %08X\n", w1, w2);
+                }
+                */
+
 				// returns ram location x?
-				
+
 				int reg = (w1 >> 8) & 0xfffff;
 				UINT32 ret = 0;
-				
+
 				ret |= gfx_gram[reg + 0] << 24;
 				ret |= gfx_gram[reg + 1] << 16;
 				ret |= gfx_gram[reg + 2] <<  8;
 				ret |= gfx_gram[reg + 3] <<  0;
-				
+
 				fifo_push(NULL, GFXFIFO_OUT, ret);
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
 			case 0xd0:
 			{
 				// register readback of some sort
-				
+
 				// 0xD0301000 0x000001FC
-				
+
 				int reg = (w1 >> 8) & 0xfffff;
 				int num = w2;
 				int i;
-				
+
 				if (fifo_space_left(GFXFIFO_OUT) < num)
 				{
-					return;	
+					return;
 				}
-				
+
 				/*
-				if (reg == 0x3010)
-				{
-					for (i = 0; i < num; i++)
-					{
-						fifo_push(GFXFIFO_OUT, gfx_unk_reg[2+i]);	
-					}
-				}
-				else
-				{
-					fatalerror("gfxfifo_exec: 0xD0: %08X %08X\n", w1, w2);
-				}
-				*/
-				
+                if (reg == 0x3010)
+                {
+                    for (i = 0; i < num; i++)
+                    {
+                        fifo_push(GFXFIFO_OUT, gfx_unk_reg[2+i]);
+                    }
+                }
+                else
+                {
+                    fatalerror("gfxfifo_exec: 0xD0: %08X %08X\n", w1, w2);
+                }
+                */
+
 				// reads back n ram locations starting from x?
 				for (i=0; i < num; i++)
 				{
 					UINT32 value = 0;
-					
+
 					value |= gfx_gram[reg + (i*4) + 0] << 24;
 					value |= gfx_gram[reg + (i*4) + 1] << 16;
 					value |= gfx_gram[reg + (i*4) + 2] <<  8;
 					value |= gfx_gram[reg + (i*4) + 3] <<  0;
-					
+
 					fifo_push(NULL, GFXFIFO_OUT, value);
 				}
-				
+
 				gfx_re_status = RE_STATUS_IDLE;
-				break;	
+				break;
 			}
 			case 0xed:
 			{
 				// mbuslib_tex_ints()?
-				
+
 				//int reg = (w1 >> 8) & 0xff;
 				int num = w2;
-				
+
 				int c = 0;
 				int i;
-				
+
 				int num_left = num - gfx_re_word_count;
 				int start = gfx_re_word_count;
-				
+
 				if (fifo_current_num(GFXFIFO_IN) < num_left)
 				{
 					num_left = fifo_current_num(GFXFIFO_IN);
 				}
-				
-				
+
+
 				if (num >= 0x100000)
 				{
 					printf("gfxfifo_exec: tex_ints %d words left\n", num-gfx_re_word_count);
@@ -1621,23 +1621,23 @@ static void gfx_fifo_exec(cobra_state *cobra)
 					}
 				}
 				else
-				{	
+				{
 					printf("gfxfifo_exec: tex_ints %08X %08X\n", w1, w2);
-				
+
 					for (i=0; i < num_left; i++)
 					{
 						UINT64 param;
 						fifo_pop(NULL, GFXFIFO_IN, &param);
 						gfx_re_word_count++;
-					
+
 						gfx_texture[start+i] = (UINT32)(param);
-					
+
 						if (c == 0)
 							printf("              ");
 						printf("%08X ", (UINT32)(param));
-						
+
 						c++;
-					
+
 						if (c == 4)
 						{
 							printf("\n");
@@ -1646,7 +1646,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 					}
 					printf("\n");
 				}
-				
+
 				if (gfx_re_word_count >= num)
 				{
 					gfx_re_status = RE_STATUS_IDLE;
@@ -1658,23 +1658,23 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				int k = 0;
 				int c = 0;
 				printf("gfxfifo_exec: unknown command %08X %08X\n", w1, w2);
-				
+
 				if (fifo_current_num(GFXFIFO_IN) < 0)
 				{
 					return;
 				}
-				
+
 				while (fifo_current_num(GFXFIFO_IN) > 0)
 				{
 					UINT64 param;
 					fifo_pop(NULL, GFXFIFO_IN, &param);
-					
+
 					if (c == 0)
 						printf("              ");
 					printf("%08X ", (UINT32)(param));
-					
+
 					c++;
-					
+
 					if (c == 4)
 					{
 						printf("\n");
@@ -1685,37 +1685,37 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				logerror("\n");
 			}
 		}
-		
-//		printf("gfxfifo_exec: %08X %08X\n", w1, w2);
+
+//      printf("gfxfifo_exec: %08X %08X\n", w1, w2);
 	};
 }
 
 READ64_MEMBER(cobra_state::gfx_fifo_r)
 {
 	UINT64 r = 0;
-	
+
 	gfx_fifo_exec(this);
-	
+
 	if (ACCESSING_BITS_32_63)
 	{
 		UINT64 data;
 		fifo_pop(&space.device(), GFXFIFO_OUT, &data);
-		
+
 		data &= 0xffffffff;
-		
+
 		r |= (UINT64)(data) << 32;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
 		UINT64 data;
 		fifo_pop(&space.device(), GFXFIFO_OUT, &data);
-		
+
 		data &= 0xffffffff;
-		
+
 		r |= (UINT64)(data);
 	}
-//	printf("GFX FIFO read %08X%08X\n", (UINT32)(r >> 32), (UINT32)(r));
-	
+//  printf("GFX FIFO read %08X%08X\n", (UINT32)(r >> 32), (UINT32)(r));
+
 	return r;
 }
 
@@ -1743,67 +1743,67 @@ static int gfx_status_byte = 0;
 READ64_MEMBER(cobra_state::gfx_unk1_r)
 {
 	UINT64 r = 0;
-	
+
 	if (ACCESSING_BITS_56_63)
 	{
 		UINT64 v = 0;
 		// mbuslib_init fails if bits 3-7 (0x78) are not set
-		
-		v |= 0x78; 
-		
+
+		v |= 0x78;
+
 		// the low 2 bits are vblank flags
 		// bit 3 (0x8) may be graphics engine idle flag
-		
+
 		v |= gfx_status_byte;
 		gfx_status_byte ^= 1;
-		
+
 		r |= v << 56;
 	}
 	if (ACCESSING_BITS_40_47)
 	{
 		// mbuslib_init fails if this is not 0x7f
-		
+
 		r |= U64(0x7f) << 40;
 	}
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= (gfx_unknown_v1 & 3) << 24;
 	}
-	
+
 	return r;
 }
 
 WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 {
-//	printf("gfx_unk1_w: %08X %08X, %08X%08X\n", (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
-	
+//  printf("gfx_unk1_w: %08X %08X, %08X%08X\n", (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+
 	if (ACCESSING_BITS_56_63)
 	{
 		if ((data >> 63) & 1)
 		{
-			gfx_fifo_loopback = 0;	
+			gfx_fifo_loopback = 0;
 		}
 	}
-	
+
 	if (ACCESSING_BITS_24_31)
 	{
 		UINT64 in1, in2;
 		int value = (data >> 24) & 0xff;
 		// used in check_fifo(). fifo loopback or something?
-		
+
 		if (value == 0xc0)
-		{			
+		{
 			fifo_pop(&space.device(), GFXFIFO_IN, &in1);
 			fifo_pop(&space.device(), GFXFIFO_IN, &in2);
 			gfx_unknown_v1 = (UINT32)(in1 >> 32);
-		
+
 			fifo_push(&space.device(), GFXFIFO_OUT, in1 & 0xffffffff);
 			fifo_push(&space.device(), GFXFIFO_OUT, in2 & 0xffffffff);
 		}
 		else if (value == 0x80)
 		{
 			// used in check_fifo() before the fifo test...
-			gfx_fifo_loopback = 1;	
+			gfx_fifo_loopback = 1;
 		}
 		else
 		{
@@ -1814,23 +1814,23 @@ WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 
 WRITE64_MEMBER(cobra_state::gfx_buf_w)
 {
-//	printf("buf_w: top = %08X\n", gfxfifo_get_top());
+//  printf("buf_w: top = %08X\n", gfxfifo_get_top());
 
 	// buf_prc_read: 0x00A00001 0x10520200
 	//               0x00A00001 0x10500018
-	
-	// teximage_load() / mbuslib_prc_read():	0x00A00001 0x10520800
 
-//	printf("prc_read %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), activecpu_get_pc());
-	
+	// teximage_load() / mbuslib_prc_read():    0x00A00001 0x10520800
+
+//  printf("prc_read %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), activecpu_get_pc());
+
 	gfx_fifo_exec(this);
-	
+
 	if (data == U64(0x00a0000110500018))
 	{
 		fifo_flush(GFXFIFO_OUT);
-		
+
 		// reads back the register selected by gfx register select
-		
+
 		fifo_push(&space.device(), GFXFIFO_OUT, (UINT32)((gfx_register[gfx_register_select] >> 32)));
 		fifo_push(&space.device(), GFXFIFO_OUT, (UINT32)(gfx_register[gfx_register_select]));
 	}
@@ -1838,15 +1838,15 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 	{
 		// in teximage_load()
 		// some kind of busy flag for mbuslib_tex_ints()...
-		
+
 		// the code waits for bit 0x400 to be set
-		
-		fifo_push(&space.device(), GFXFIFO_OUT, 0x400);	
+
+		fifo_push(&space.device(), GFXFIFO_OUT, 0x400);
 	}
 	else if (data != U64(0x00a0000110520200))
 	{
 		// prc_read always expects a value...
-		
+
 		fifo_push(&space.device(), GFXFIFO_OUT, 0);
 	}
 }
@@ -1856,7 +1856,7 @@ static void gfx_cpu_dc_store(const device_t *device, UINT32 address)
 	if (address == 0x10000000 || address == 0x18000000 || address == 0x1e000000)
 	{
 		UINT64 i = (UINT64)(gfx_fifo_cache_addr) << 32;
-		
+
 		fifo_push(device, GFXFIFO_IN, (UINT32)(gfx_fifo_mem[0] >> 32) | i);
 		fifo_push(device, GFXFIFO_IN, (UINT32)(gfx_fifo_mem[0] >>  0) | i);
 		fifo_push(device, GFXFIFO_IN, (UINT32)(gfx_fifo_mem[1] >> 32) | i);
@@ -1865,7 +1865,7 @@ static void gfx_cpu_dc_store(const device_t *device, UINT32 address)
 		fifo_push(device, GFXFIFO_IN, (UINT32)(gfx_fifo_mem[2] >>  0) | i);
 		fifo_push(device, GFXFIFO_IN, (UINT32)(gfx_fifo_mem[3] >> 32) | i);
 		fifo_push(device, GFXFIFO_IN, (UINT32)(gfx_fifo_mem[3] >>  0) | i);
-		
+
 		gfx_fifo_exec();
 	}
 	else
@@ -1875,12 +1875,12 @@ static void gfx_cpu_dc_store(const device_t *device, UINT32 address)
 }
 #endif
 WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
-{   					
+{
 	if (ACCESSING_BITS_40_47)
 	{
 		gfx_unk_flag = (UINT8)(data >> 40);
 	}
-	
+
 	if (ACCESSING_BITS_56_63)
 	{
 		gfx_debug_state |= decode_debug_state_value((data >> 56) & 0xff) << 4;
@@ -1891,14 +1891,14 @@ WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
 		gfx_debug_state |= decode_debug_state_value((data >> 48) & 0xff);
 		gfx_debug_state_wc++;
 	}
-	
+
 	if (gfx_debug_state_wc >= 2)
 	{
 		if (gfx_debug_state != 0)
 		{
 			printf("GFX: debug state %02X\n", gfx_debug_state);
 		}
-		
+
 		gfx_debug_state = 0;
 		gfx_debug_state_wc = 0;
 	}
@@ -1936,32 +1936,32 @@ INPUT_PORTS_END
 
 //static struct RF5C400interface rf5c400_interface =
 //{
-//	REGION_SOUND1
+//  REGION_SOUND1
 //};
 
 /*
 #if ENABLE_MAIN_CPU
 static ppc_config main_ppc_cfg =
 {
-	PPC_MODEL_603EV,
-	0x40,
-	BUS_FREQUENCY_33MHZ
+    PPC_MODEL_603EV,
+    0x40,
+    BUS_FREQUENCY_33MHZ
 };
 #endif
 
 #if ENABLE_SUB_CPU
 static ppc_config sub_ppc_cfg =
 {
-	PPC_MODEL_403GA
+    PPC_MODEL_403GA
 };
 #endif
 
 #if ENABLE_GFX_CPU
 static ppc_config gfx_ppc_cfg =
 {
-	PPC_MODEL_604,
-	0x40,
-	BUS_FREQUENCY_33MHZ,
+    PPC_MODEL_604,
+    0x40,
+    BUS_FREQUENCY_33MHZ,
 };
 #endif
 */
@@ -1970,11 +1970,11 @@ static void ide_interrupt(int state)
 {
 	if (state)
 	{
-		sub_interrupt &= ~0x80;	
+		sub_interrupt &= ~0x80;
 	}
 	else
 	{
-		sub_interrupt |= 0x80;	
+		sub_interrupt |= 0x80;
 	}
 }
 
@@ -2001,13 +2001,13 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_CPU_PROGRAM_MAP(cobra_main_map)
 	MCFG_CPU_VBLANK_INT("screen", cobra_vblank)
 #endif
-	
+
 #if ENABLE_SUB_CPU
 	MCFG_CPU_ADD("subcpu", PPC403GA, 33000000)		/* 403GA, 33? MHz */
 	//MCFG_CPU_CONFIG(sub_ppc_cfg)
 	MCFG_CPU_PROGRAM_MAP(cobra_sub_map)
 #endif
-	
+
 #if ENABLE_GFX_CPU
 	MCFG_CPU_ADD("gfxcpu", PPC604, 100000000)		/* 604, 100? MHz */
 	//MCFG_CPU_CONFIG(gfx_ppc_cfg)
@@ -2017,13 +2017,13 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET( cobra )
-	
+
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
-	
+
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
- 	/* video hardware */
+	/* video hardware */
 	MCFG_VIDEO_START(cobra)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2036,10 +2036,10 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-//	MCFG_SOUND_ADD(RF5C400, 64000000/4)
-//	MCFG_SOUND_CONFIG(rf5c400_interface)
-//	MCFG_SOUND_ROUTE(0, "left", 1.0)
-//	MCFG_SOUND_ROUTE(1, "right", 1.0)
+//  MCFG_SOUND_ADD(RF5C400, 64000000/4)
+//  MCFG_SOUND_CONFIG(rf5c400_interface)
+//  MCFG_SOUND_ROUTE(0, "left", 1.0)
+//  MCFG_SOUND_ROUTE(1, "right", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -2049,33 +2049,33 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(cobra)
 {
-//	cobra_state *cobra = machine.driver_data<cobra_state>();
+//  cobra_state *cobra = machine.driver_data<cobra_state>();
 
 	fifo_init(machine, GFXFIFO_IN, 8192, "GFXFIFO_IN", GFXFIFO_IN_VERBOSE);
 	fifo_init(machine, GFXFIFO_OUT, 8192, "GFXFIFO_OUT", GFXFIFO_OUT_VERBOSE);
 	fifo_init(machine, M2SFIFO, 2048, "M2SFIFO", M2SFIFO_VERBOSE);
 	fifo_init(machine, S2MFIFO, 2048, "S2MFIFO", S2MFIFO_VERBOSE);
-	
+
 #if ENABLE_GFX_CPU
-//	ppc_set_dcstore_handler(cobra->m_gfxcpu, gfx_cpu_dc_store);
-	
+//  ppc_set_dcstore_handler(cobra->m_gfxcpu, gfx_cpu_dc_store);
+
 	cobra_gfx_init(&machine);
 #endif
 
 	comram[0] = auto_alloc_array(machine, UINT32, 0x40000/4);
 	comram[1] = auto_alloc_array(machine, UINT32, 0x40000/4);
-	
+
 	// rom hacks for main board...
 	{
 		int i;
 		UINT32 sum = 0;
 		UINT32 *rom = (UINT32*)machine.region("user1")->base();
-		
-		//rom[(0x02218^4) / 4] = 0x60000000;		// skip connect_grphcpu()...
-		
+
+		//rom[(0x02218^4) / 4] = 0x60000000;        // skip connect_grphcpu()...
+
 		rom[(0x2b7c^4) / 4] = 0x60000000;		// this fails because the value in ram gets changed too soon...
 		rom[(0x3de8^4) / 4] = 0x48000020;		// same here...
-		
+
 		// calculate the checksum of the patched rom...
 		for (i=0; i < 0x20000/4; i++)
 		{
@@ -2084,16 +2084,16 @@ static DRIVER_INIT(cobra)
 			sum += (UINT8)((rom[i] >>  8) & 0xff);
 			sum += (UINT8)((rom[i] >>  0) & 0xff);
 		}
-		
+
 		rom[(0x0001fff0^4) / 4] = sum;
 		rom[(0x0001fff4^4) / 4] = ~sum;
 	}
-	
+
 
 	// rom hacks for sub board...
 	{
 		UINT32 *rom = (UINT32*)machine.region("user2")->base();
-		
+
 		rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
 	}
 
@@ -2102,11 +2102,11 @@ static DRIVER_INIT(cobra)
 	{
 		int i;
 		UINT32 sum = 0;
-		
+
 		UINT32 *rom = (UINT32*)machine.region("user3")->base();
-		
+
 		rom[(0x022d4^4) / 4] = 0x60000000;		// skip init_raster() for now ...
-		
+
 		// calculate the checksum of the patched rom...
 		for (i=0; i < 0x20000/4; i++)
 		{
@@ -2115,7 +2115,7 @@ static DRIVER_INIT(cobra)
 			sum += (UINT8)((rom[i] >>  8) & 0xff);
 			sum += (UINT8)((rom[i] >>  0) & 0xff);
 		}
-		
+
 		rom[(0x0001fff0^4) / 4] = sum;
 		rom[(0x0001fff4^4) / 4] = ~sum;
 	}
@@ -2126,10 +2126,10 @@ static DRIVER_INIT(cobra)
 ROM_START(bujutsu)
 	ROM_REGION64_BE(0x80000, "user1", 0)		/* Main CPU program (PPC603) */
 	ROM_LOAD("645a01.33d", 0x00000, 0x80000, CRC(cb1a8683) SHA1(77b7dece84dc17e9d63242347b7202e879b9a10e) )
-	
+
 	ROM_REGION32_BE(0x80000, "user2", 0)		/* Sub CPU program (PPC403) */
 	ROM_LOAD("645a02.24r", 0x00000, 0x80000, CRC(7d1c31bd) SHA1(94907c4068a488a74b2fa9a486c832d380c5b184) )
-	
+
 	ROM_REGION64_BE(0x80000, "user3", 0)		/* Gfx CPU program (PPC604) */
 	ROM_LOAD("645a03.u17", 0x00000, 0x80000, CRC(086abd0b) SHA1(24df439eb9828ed3842f43f5f4014a3fc746e1e3) )
 

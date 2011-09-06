@@ -21,7 +21,7 @@
 
 // ======================> es5503_device
 
-class es5503_device : public device_t, 
+class es5503_device : public device_t,
                       public device_sound_interface,
                       public device_memory_interface
 {
@@ -77,7 +77,7 @@ private:
     	UINT32 wavetblpointer;
     	UINT8  wavetblsize;
     	UINT8  resolution;
-    
+
     	UINT32 accumulator;
     	UINT8  irqpend;
     } ES5503Osc;

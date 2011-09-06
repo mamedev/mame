@@ -215,7 +215,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define REG_DA(M)           (M)->dar /* easy access to data and address regs */
 #define REG_D(M)            (M)->dar
 #define REG_A(M)            ((M)->dar+8)
-#define REG_PPC(M) 			(M)->ppc
+#define REG_PPC(M)			(M)->ppc
 #define REG_PC(M)           (M)->pc
 #define REG_SP_BASE(M)      (M)->sp
 #define REG_USP(M)          (M)->sp[0]

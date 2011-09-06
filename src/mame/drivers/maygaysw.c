@@ -85,9 +85,9 @@
 
     Guiness Book of Records
     Risk
-	London Underground
+    London Underground
     Big Break (except the PICs)
-	Aladdins Cave (except the PICs)
+    Aladdins Cave (except the PICs)
 
     Incomplete dumps?
 
@@ -253,12 +253,12 @@ ROM_START( mg_alad )
 
 	ROM_REGION( 0x100000, "snd", 0 )
 	ROM_LOAD( "d1g1-144.u3", 0x0000, 0x080000, CRC(30941180) SHA1(cafcddcec359c217016bfd86b84b358fc0b1e618) )
-	
+
 	ROM_REGION( 0x100000, "sound_16c55", 0 )
 	ROM_LOAD( "sound_16c55.u5", 0x0000, 0x080000, NO_DUMP )
 	ROM_REGION( 0x100000, "io_16c64", 0 )
 	ROM_LOAD( "io_16c64.u6", 0x0000, 0x080000, NO_DUMP )
-	
+
 ROM_END
 
 /*
@@ -272,28 +272,28 @@ Dumped by Andy Welburn on a sunny morning 10/03/07
 **Do not seperate this text file from the roms.**
 *************************************************
 
-filename:	label: 			location	type
+filename:   label:          location    type
 ============================================================
-M2_U9.bin	Final 4 M2 I/O		IOB U9		27C512
-VMB_U6.bin	DQ8-002-4 U6		VMB U6 even	27C040
-VMB_U12.bin	DQ8-002-4 U12		VMB U12	odd	27C040
-VMB_U4.bin	DG8-001-4 U4		VMB U4 even	27C040
-VMB_U10.bin	DG8-001-4 U10		VMB U10 odd	27C040
-VMB_U3.bin	DG8-001-4 U3		VMB U3 even	27C040
-VMB_U9.bin	DG8-001-4 U9		VMB U9 odd	27C040
-VMB_U2.bin	DG8-001-4 U2		VMB U2 even 	27C040
-VMB_U1.bin	DG8-001-4 U1		VMB U1 even  	27C040
-VMB_U7.bin	DG8-001-4 U7		VMB U7 odd	27C040
-VC_U27.bin	SW8-232 NON DATA U27	VC U27		27C010
-VC_U28.bin	SW8-232 NON DATA U28	VC U28		27C010
-MSB_U3.bin	DIG1-155 U3		MSB U3		27C040
-MSB_U2.bin	DIG1-155 U2		MSB U2		27C040
-MSB_U5.bin	M2 SOUND PIC Ver 1.0	MSB U5		PIC16C55
-CPU_U6.bin	M2 CPU I/O PIC Ver 2.2	CPU U6		PIC16C64
+M2_U9.bin   Final 4 M2 I/O      IOB U9      27C512
+VMB_U6.bin  DQ8-002-4 U6        VMB U6 even 27C040
+VMB_U12.bin DQ8-002-4 U12       VMB U12 odd 27C040
+VMB_U4.bin  DG8-001-4 U4        VMB U4 even 27C040
+VMB_U10.bin DG8-001-4 U10       VMB U10 odd 27C040
+VMB_U3.bin  DG8-001-4 U3        VMB U3 even 27C040
+VMB_U9.bin  DG8-001-4 U9        VMB U9 odd  27C040
+VMB_U2.bin  DG8-001-4 U2        VMB U2 even     27C040
+VMB_U1.bin  DG8-001-4 U1        VMB U1 even     27C040
+VMB_U7.bin  DG8-001-4 U7        VMB U7 odd  27C040
+VC_U27.bin  SW8-232 NON DATA U27    VC U27      27C010
+VC_U28.bin  SW8-232 NON DATA U28    VC U28      27C010
+MSB_U3.bin  DIG1-155 U3     MSB U3      27C040
+MSB_U2.bin  DIG1-155 U2     MSB U2      27C040
+MSB_U5.bin  M2 SOUND PIC Ver 1.0    MSB U5      PIC16C55
+CPU_U6.bin  M2 CPU I/O PIC Ver 2.2  CPU U6      PIC16C64
 
 
 location:
-IOB = M2 Active I/O Board 
+IOB = M2 Active I/O Board
 VMB = Video Memory Board
 VC = Video Card
 MSB = MPEG Sound Board
@@ -301,8 +301,8 @@ CPU = M2 Active CPU Board
 
 
 NOTES:
-- Video Memory Board and MPEG Sound Board rom labels were prefixed 
-  with "L/UNDERGROUND", these have been omitted in the table above 
+- Video Memory Board and MPEG Sound Board rom labels were prefixed
+  with "L/UNDERGROUND", these have been omitted in the table above
   to keep it brief.
 - All Videocard roms were prefixed with LONDON UNDERGROUND
 - se enclosed jpegs for pictures of the pcb and roms in situ.

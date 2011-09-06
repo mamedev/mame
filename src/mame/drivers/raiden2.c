@@ -1824,11 +1824,11 @@ YM2151   OKI M6295 VOI2  Z8400A
 
 */
 
-/* Note: some raiden 2 fabtek usa boards (the one Hammad sent to LN and Balrog, at least) have the 
-	ROM_LOAD( "seibu5.u1110",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
-	z80 sound rom as used in raiden2a instead of the
-	ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
-	rom from raiden2. Slight version difference, and I don't know which is older/newer. - LN
+/* Note: some raiden 2 fabtek usa boards (the one Hammad sent to LN and Balrog, at least) have the
+    ROM_LOAD( "seibu5.u1110",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
+    z80 sound rom as used in raiden2a instead of the
+    ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
+    rom from raiden2. Slight version difference, and I don't know which is older/newer. - LN
 */
 
 ROM_START( raiden2 )

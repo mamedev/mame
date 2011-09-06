@@ -137,7 +137,7 @@ bool mfi_format::load(floppy_image *image)
 
 			ent++;
 		}
-			
+
 	if(compressed)
 		global_free(compressed);
 

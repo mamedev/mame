@@ -1147,7 +1147,7 @@
 
 #define SS22_MASTER_CLOCK	(XTAL_49_152MHz)	/* info from Guru */
 
-#define MCU_SPEEDUP 	 	1					/* mcu idle skipping */
+#define MCU_SPEEDUP 		1					/* mcu idle skipping */
 
 /**
  * helper function used to read a byte from a chunk of 32 bit memory

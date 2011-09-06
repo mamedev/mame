@@ -45,7 +45,7 @@ public:
 	UINT16 *      m_backregs;
 
 	bitmap_t *m_framebuffer[2];
-    
+
     /* 3d info */
     INT16 m_frustumLeft;
     INT16 m_frustumBottom;

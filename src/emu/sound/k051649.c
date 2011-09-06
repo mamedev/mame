@@ -194,7 +194,7 @@ READ8_DEVICE_HANDLER ( k051649_waveform_r )
 	if (info->test & 0xc0)
 	{
 		info->stream->update();
-		
+
 		if (offset >= 0x60)
 			offset += (info->channel_list[3 + (info->test >> 6 & 1)].counter >> FREQ_BITS);
 		else if (info->test & 0x40)

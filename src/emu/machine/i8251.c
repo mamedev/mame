@@ -2,7 +2,7 @@
 
     i8251.c
 
-	Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
+    Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
 
 *********************************************************************/
 
@@ -278,7 +278,7 @@ void i8251_device::update_tx_empty()
 //-------------------------------------------------
 
 void i8251_device::device_reset()
-{ 
+{
 	LOG(("I8251: Reset\n"));
 
 	/* what is the default setup when the 8251 has been reset??? */

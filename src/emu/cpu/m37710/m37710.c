@@ -66,22 +66,22 @@ extern const int m37710_irq_levels[M37710_LINE_MAX];
 const int m37710_irq_levels[M37710_LINE_MAX] =
 {
 	// maskable
-	0x70,	// ADC  		 0
+	0x70,	// ADC           0
 	0x73,	// UART 1 XMIT   1
 	0x74,	// UART 1 RECV   2
 	0x71,	// UART 0 XMIT   3
 	0x72,	// UART 0 RECV   4
-	0x7c,	// Timer B2 	 5
-	0x7b,	// Timer B1 	 6
-	0x7a,	// Timer B0 	 7
-	0x79,	// Timer A4 	 8
-	0x78,	// Timer A3 	 9
-	0x77,	// Timer A2 	 10
-	0x76,	// Timer A1 	 11
-	0x75,	// Timer A0 	 12
-	0x7f,	// IRQ 2		 13
-	0x7e,	// IRQ 1		 14
-	0x7d,	// IRQ 0		 15
+	0x7c,	// Timer B2      5
+	0x7b,	// Timer B1      6
+	0x7a,	// Timer B0      7
+	0x79,	// Timer A4      8
+	0x78,	// Timer A3      9
+	0x77,	// Timer A2      10
+	0x76,	// Timer A1      11
+	0x75,	// Timer A0      12
+	0x7f,	// IRQ 2         13
+	0x7e,	// IRQ 1         14
+	0x7d,	// IRQ 0         15
 
 	// non-maskable
 	0,	// watchdog
@@ -94,11 +94,11 @@ const int m37710_irq_levels[M37710_LINE_MAX] =
 static const int m37710_irq_vectors[M37710_LINE_MAX] =
 {
 	// maskable
-	0xffd6, // A-D converter 
+	0xffd6, // A-D converter
 	0xffd8, // UART1 transmit
-	0xffda, // UART1 receive 
+	0xffda, // UART1 receive
 	0xffdc, // UART0 transmit
-	0xffde,	// UART0 receive 
+	0xffde,	// UART0 receive
 	0xffe0, // Timer B2
 	0xffe2, // Timer B1
 	0xffe4, // Timer B0

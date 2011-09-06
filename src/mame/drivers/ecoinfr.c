@@ -1,5 +1,5 @@
 /* Electrocoin Fruit Machines
- 
+
  This seems to be the most common Electrocoin hardware type, used
  extensively by Electrocoin with a number of 3rd party sets running on
  the same boards / same cabinets to provide different gameplay features.
@@ -68,13 +68,13 @@ TIMER_DEVICE_CALLBACK( ecoinfr_irq_timer )
 	//printf("blah %d\n", state->irq_toggle);
 
 	/* What are the IRQ sources / freq?
-	 It runs in IM2
-	 0xe0 / 0xe4 seem to be the valid interrupts
-	 0xf0 / 0xf4 mirror those
+     It runs in IM2
+     0xe0 / 0xe4 seem to be the valid interrupts
+     0xf0 / 0xf4 mirror those
 
-	 NMI is also valid
-	
-	*/
+     NMI is also valid
+
+    */
 
 	if (state->irq_toggle==0)
 	{
@@ -280,7 +280,7 @@ WRITE8_HANDLER( ec_port15_out_w )
 	if ((state->port15_value&0x80) != (old_port15_value&0x80)) printf("port15 0x80 changed %02x\n", state->port15_value&0x80);
 
 	// some 3rd party stuff has VDF
-	//	printf("ec_port15_out_w data %02x - VDF reset %02x clock %02x\n", data, data & 0x80, data & 0x40);
+	//  printf("ec_port15_out_w data %02x - VDF reset %02x clock %02x\n", data, data & 0x80, data & 0x40);
 }
 
 WRITE8_HANDLER( ec_port16_out_w )
@@ -315,7 +315,7 @@ WRITE8_HANDLER( ec_port17_out_w )
 	if ((state->port17_value&0x80) != (old_port17_value&0x80)) printf("port17 0x80 changed %02x\n", state->port17_value&0x80);
 
 	// some 3rd party stuff has VDF
-	//	printf("ec_port17_out_w data %02x - VDF data %02x\n", data, data & 0x40);
+	//  printf("ec_port17_out_w data %02x - VDF data %02x\n", data, data & 0x40);
 }
 
 WRITE8_HANDLER( ec_port18_out_w )
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
 	AM_RANGE(0xa000, 0xa000) AM_DEVREADWRITE_MODERN(UPD8251_TAG, i8251_device, data_r, data_w)
- 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_MODERN(UPD8251_TAG, i8251_device, status_r, control_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_MODERN(UPD8251_TAG, i8251_device, status_r, control_w)
 
 ADDRESS_MAP_END
 
@@ -587,22 +587,22 @@ static MACHINE_RESET( ecoinfr )
 {
 	ecoinfr_state *state = machine.driver_data<ecoinfr_state>();
 
-//	state->port00_value = 0x00;
-//	state->port01_value = 0x00;
-//	state->port02_value = 0x00;
-//	state->port03_value = 0x00;
-//	state->port04_value = 0x00;
-//	state->port05_value = 0x00;
-//	state->port06_value = 0x00;
-//	state->port07_value = 0x00;
-//	state->port08_value = 0x00;
+//  state->port00_value = 0x00;
+//  state->port01_value = 0x00;
+//  state->port02_value = 0x00;
+//  state->port03_value = 0x00;
+//  state->port04_value = 0x00;
+//  state->port05_value = 0x00;
+//  state->port06_value = 0x00;
+//  state->port07_value = 0x00;
+//  state->port08_value = 0x00;
 	state->port09_value = 0x00;
-//	state->port0a_value = 0x00;
-//	state->port0b_value = 0x00;
-//	state->port0c_value = 0x00;
-//	state->port0d_value = 0x00;
-//	state->port0e_value = 0x00;
-//	state->port0f_value = 0x00;
+//  state->port0a_value = 0x00;
+//  state->port0b_value = 0x00;
+//  state->port0c_value = 0x00;
+//  state->port0d_value = 0x00;
+//  state->port0e_value = 0x00;
+//  state->port0f_value = 0x00;
 	state->port10_value = 0x00;
 	state->port11_value = 0x00;
 	state->port12_value = 0x00;
@@ -640,7 +640,7 @@ MACHINE_CONFIG_END
 ROM_START( ec_barx )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "iss354.rom", 0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483) )
-//	ROM_LOAD( "rom1.bin", 0x0000, 0x008000, CRC(1) SHA1(1) ) // testing only
+//  ROM_LOAD( "rom1.bin", 0x0000, 0x008000, CRC(1) SHA1(1) ) // testing only
 
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -885,7 +885,7 @@ ROM_START( ec_big7 )
 	ROM_LOAD( "iss3238.rom", 0x0000, 0x008000, CRC(c7d1d398) SHA1(3b37b9596bc3771a6f1a698bee4dce8d642d982f) )
 	ROM_LOAD( "iss3239.rom", 0x0000, 0x008000, CRC(f62450a6) SHA1(d2c88483cb0d3a83a2974550e8e8e71642bb28ce) )
 
-//	ROM_LOAD( "sbig7_5_3025.bin", 0x0000, 0x008000, CRC(26c9382a) SHA1(8c4fe06a8e5171e6f2c91b0aee14484aca386a9c) ) // 'Super Big 7' ?
+//  ROM_LOAD( "sbig7_5_3025.bin", 0x0000, 0x008000, CRC(26c9382a) SHA1(8c4fe06a8e5171e6f2c91b0aee14484aca386a9c) ) // 'Super Big 7' ?
 	ROM_LOAD( "iss3240.rom", 0x0000, 0x008000, CRC(e8e56ca4) SHA1(d16390b600f9966b779638e3bc2e7f9a72e8d1be) ) // 'Super Big 7' ?
 
 	// No Header - Taken from a Super Big 7 Set
@@ -1260,7 +1260,7 @@ ROM_START( ec_supbxmab )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	// use the MAB scramble
 	ROM_LOAD( "sbx1.3v", 0x0000, 0x020000, CRC(375795fb) SHA1(3dbc95aba850ef3e307e6b4c6d58a40a1e8ee8f1) )
-	
+
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "sbx1.6", 0x0000, 0x020000, CRC(e8cfb340) SHA1(d37f0a72c7b59836c5abec8b58066ff4bbd85723) )
 	ROM_LOAD( "sbx1.9", 0x0000, 0x020000, CRC(521098a1) SHA1(b8e5a05b085015c7b3b5964471a5ee784a3362d7) )

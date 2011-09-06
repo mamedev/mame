@@ -18,7 +18,7 @@ struct floppy_interface
 {
 	devcb_write_line				m_out_idx_cb;  /* index */
 
-	const floppy_format_type 		*m_formats;
+	const floppy_format_type		*m_formats;
 	const char *					m_interface;
 	device_image_display_info_func	m_device_displayinfo;
 	device_image_load_func			m_load_func;

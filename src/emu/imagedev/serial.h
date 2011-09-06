@@ -75,7 +75,7 @@ public:
 	void sent_char();
 	void set_transmit_state(int state);
 	int load_internal(unsigned char **ptr, int *pDataSize);
-	
+
 	// data stream
 	int data_stream_get_data_bit_from_data_byte(serial_data_stream *stream);
 	void data_stream_reset(serial_data_stream *stream);
@@ -85,17 +85,17 @@ protected:
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
-	
+
 private:
 	/* transmit data bit-stream */
 	serial_data_stream m_transmit;
 	/* receive data bit-stream */
 	serial_data_stream m_receive;
-	
+
 	int m_transmit_state;
 
 	/* baud rate timer */
-	emu_timer	*m_timer;	
+	emu_timer	*m_timer;
 };
 
 

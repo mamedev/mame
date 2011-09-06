@@ -186,7 +186,7 @@ ROM_START(michigan)
 	ROM_LOAD16_BYTE( "c9925_1.o", 0x80001, 0x10000, CRC(7a0d6c70) SHA1(1d410b9f5df69cc9cbf17dbc9c73fee928e167d7))
 	ROM_RELOAD(0xe0001, 0x10000)
 ROM_END
-  
+
 ROM_START(montana)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "m0128.e", 0x80000, 0x20000, CRC(51a56929) SHA1(4a1d9939ff441f82661e1adcb0d698061f383429))
@@ -253,7 +253,7 @@ ROM_START(ggate)
 	ROM_LOAD( "13006-1.epr", 0x8000, 0x8000, CRC(6a451fc6) SHA1(93287937c8a679dfca1a162977a62357134673b6))
 	ROM_LOAD( "13006-2.epr", 0x0000, 0x4000, CRC(217299b0) SHA1(ef3ee8811183dca43699a7c2d75fb99bc3668ae2))
 ROM_END
-  
+
 ROM_START(ggatea)
     ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "12906-1.epr", 0x8000, 0x8000, CRC(3792fc4c) SHA1(4ab88b6c73ce1b49e1a4d12cc9fa61c7d74ed780))
@@ -265,7 +265,7 @@ ROM_START(tripjok)
 	ROM_LOAD( "13006-1", 0x8000, 0x8000, CRC(5682ac90) SHA1(c9fa13c56e9178eb861991fcad6b09fd27cca3cb))
 	ROM_LOAD( "13006-2", 0x0000, 0x4000, CRC(c7104e8f) SHA1(a3737f70cb9c97df24b5da915ef53b6d30f2470d))
 ROM_END
-  
+
 GAME(1980,	cntinntl,		0,			bingo,	bingo,	bingo,	ROT0,	"Bally",		"Continental (Bingo)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(19??,	goldgame,		0,			splin,	splin,	splin,	ROT0,	"Splin",		"Golden Game (Bingo)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(19??,	goldgkitb,		goldgame,	splin,	splin,	splin,	ROT0,	"Splin",		"Golden Game Kit Bingo Stake 6/10 (Bingo)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

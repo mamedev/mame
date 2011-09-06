@@ -49,7 +49,7 @@ void device_serial_interface::set_data_frame(int num_data_bits, int stop_bit_cou
 	m_df_word_length = num_data_bits;
 	m_df_stop_bit_count = stop_bit_count;
 	m_df_parity = parity_code;
-	
+
 	m_rcv_bit_count = m_df_word_length + m_df_stop_bit_count;
 
 	if (m_df_parity != SERIAL_PARITY_NONE)
@@ -280,7 +280,7 @@ void device_serial_interface::transmit_register_send_bit()
 
 	data = transmit_register_get_data_bit();
 
-	/* set tx data bit */	
+	/* set tx data bit */
 	m_connection_state &=~SERIAL_STATE_TX_DATA;
 	m_connection_state|=(data<<5);
 
@@ -318,13 +318,13 @@ static UINT8 serial_connection_spin_bits(UINT8 input_status)
 
 void device_serial_interface::serial_connection_out()
 {
-	
+
 	if (m_other_connection!=NULL)
 	{
 		UINT8 state_at_other_end = serial_connection_spin_bits(m_connection_state);
 
 		m_other_connection->input_callback(state_at_other_end);
-	}	
+	}
 }
 
 bool device_serial_interface::is_receive_register_full()
@@ -376,12 +376,12 @@ void serial_source_device::device_start()
 }
 
 void serial_source_device::input_callback(UINT8 state)
-{	
+{
 	m_input_state = state;
 }
 
 void serial_source_device::send_bit(UINT8 data)
-{	
+{
 	set_out_data_bit(data);
 	serial_connection_out();
 }

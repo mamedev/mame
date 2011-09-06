@@ -18,7 +18,7 @@ public:
 static ADDRESS_MAP_START( spectra_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( spectra )
 INPUT_PORTS_END
 
@@ -34,7 +34,7 @@ static MACHINE_CONFIG_START( spectra, spectra_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(spectra_map)
-	
+
 	MCFG_MACHINE_RESET( spectra )
 MACHINE_CONFIG_END
 

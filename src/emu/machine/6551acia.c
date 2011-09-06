@@ -41,7 +41,7 @@ acia6551_device::acia6551_device(const machine_config &mconfig, const char *tag,
     has updated state
 -------------------------------------------------*/
 void acia6551_device::input_callback(UINT8 state)
-{	
+{
 	m_input_state = state;
 }
 
@@ -230,7 +230,7 @@ READ8_MEMBER(acia6551_device::read)
 -------------------------------------------------*/
 
 void acia6551_device::update_data_form()
-{	
+{
 	int word_length = 8-((m_control_register>>5) & 0x03);
 	int stop_bit_count = (m_control_register>>7)+1;
 	int parity = 0;
@@ -242,7 +242,7 @@ void acia6551_device::update_data_form()
 	{
 		parity = SERIAL_PARITY_NONE;
 	}
-	
+
 	set_data_frame(word_length, stop_bit_count, parity);
 }
 

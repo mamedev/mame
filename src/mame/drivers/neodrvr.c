@@ -1073,7 +1073,7 @@ ROM_END
 ROM_START( ridheroh )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "006-pg1.p1", 0x000000, 0x080000, BAD_DUMP CRC(52445646) SHA1(647bb31f2f68453c1366cb6e2e867e37d1df7a54) ) /* MB834200 */
-	/* Chip label p1h doesn´t exist, renamed temporarly to pg1, marked BAD_DUMP. This needs to be verified. */
+	/* Chip label p1h doesn?t exist, renamed temporarly to pg1, marked BAD_DUMP. This needs to be verified. */
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
 	ROM_LOAD( "hd6301v1p.com", 0x0000, 0x1000, NO_DUMP )
@@ -4179,16 +4179,16 @@ ROM_END
 /* ID range from 100 - 199 is used for Korean (some) and Neo Print carts */
 
 /*
-	The following ID's are used by Korean releases:
+    The following ID's are used by Korean releases:
 
-	ID-0122 - Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)
-	ID-0123 - Quiz Daisousa Sen - The Last Count Down (Korean release)
-	ID-0124 - Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special (Korean release)
-	ID-0134 - The Last Soldier (Korean release of The Last Blade)
-	ID-0152 - The King of Fighters '99 - Millennium Battle (Korean release)
-	ID-0163 - Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II)
-	ID-0187 - Fighters Swords (Korean release of Samurai Shodown III)
-	ID-0196 - Art of Fighting 3 - The Path of the Warrior (Korean release)
+    ID-0122 - Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)
+    ID-0123 - Quiz Daisousa Sen - The Last Count Down (Korean release)
+    ID-0124 - Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special (Korean release)
+    ID-0134 - The Last Soldier (Korean release of The Last Blade)
+    ID-0152 - The King of Fighters '99 - Millennium Battle (Korean release)
+    ID-0163 - Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II)
+    ID-0187 - Fighters Swords (Korean release of Samurai Shodown III)
+    ID-0196 - Art of Fighting 3 - The Path of the Warrior (Korean release)
 */
 
 

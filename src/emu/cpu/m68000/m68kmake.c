@@ -805,7 +805,7 @@ static void add_opcode_output_table_entry(opcode_struct* op, char* name)
 
 	*ptr = *op;
 
-	sprintf( ptr->name, "_m68ki_cpu_core::%s", name); 
+	sprintf( ptr->name, "_m68ki_cpu_core::%s", name);
 	ptr->bits = num_bits(ptr->op_mask);
 }
 

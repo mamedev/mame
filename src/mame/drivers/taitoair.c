@@ -258,7 +258,7 @@ static WRITE16_HANDLER( lineram_w )
 		state->m_line_ram[offset] = data;
 
 	//if(offset == 0x3fff)
-	//	printf("LineRAM go %d\n",(int)space->machine().primary_screen->frame_number());
+	//  printf("LineRAM go %d\n",(int)space->machine().primary_screen->frame_number());
 }
 
 static READ16_HANDLER( dspram_r )
@@ -445,7 +445,7 @@ Air Inferno:
 write to 0x3404 - almost always 0x00fd / 0xff38  (253, -200)
 write to 0x3408 /
 
-write to 0x341b - May not be numeric - it's weird.  stays stable, 
+write to 0x341b - May not be numeric - it's weird.  stays stable,
                   then freaks out just before "quad: unknown value 0066"
                   This function seems to break things up into different polygon
                   'classes'
@@ -477,15 +477,15 @@ static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16 )
 	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_frustum_left_w)
 	AM_RANGE(0x3405, 0x3405) AM_WRITE(dsp_x_eyecoord_w)
 	AM_RANGE(0x3406, 0x3406) AM_WRITE(dsp_z_eyecoord_w)
-//	AM_RANGE(0x3407, 0x3407) AM_READ(?)
+//  AM_RANGE(0x3407, 0x3407) AM_READ(?)
 	AM_RANGE(0x3408, 0x3408) AM_WRITE(dsp_frustum_bottom_w)
 	AM_RANGE(0x3409, 0x3409) AM_WRITE(dsp_y_eyecoord_w)
 	AM_RANGE(0x340a, 0x340a) AM_WRITE(dsp_rasterize_w)      /* Just a (lame) guess */
-//	AM_RANGE(0x340b, 0x340b) AM_READ(dsp_projection_y_r)
-//	AM_RANGE(0x3418, 0x341a) AM_WRITE(dsp_sqrt_w)
-//	AM_RANGE(0x341b, 0x341b) AM_WRITE(dsp_sqrt_r)
-//	AM_RANGE(0x341c, 0x341c) AM_READ(dsp_sqrt_flags1_r)
-//	AM_RANGE(0x341d, 0x341d) AM_READ(dsp_sqrt_flags2_r)
+//  AM_RANGE(0x340b, 0x340b) AM_READ(dsp_projection_y_r)
+//  AM_RANGE(0x3418, 0x341a) AM_WRITE(dsp_sqrt_w)
+//  AM_RANGE(0x341b, 0x341b) AM_WRITE(dsp_sqrt_r)
+//  AM_RANGE(0x341c, 0x341c) AM_READ(dsp_sqrt_flags1_r)
+//  AM_RANGE(0x341d, 0x341d) AM_READ(dsp_sqrt_flags2_r)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(lineram_r, lineram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
 ADDRESS_MAP_END

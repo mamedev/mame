@@ -32,22 +32,22 @@ public:
 
 	/* read data register */
 	DECLARE_READ8_MEMBER(read);
-	
+
 	/* write data register */
 	DECLARE_WRITE8_MEMBER(write);
-		
+
 	void receive_character(UINT8 ch);
-	
+
 	void timer_callback();
-	
+
 	virtual void input_callback(UINT8 state);
 protected:
     // device-level overrides
     virtual void device_start();
-	
+
 	void refresh_ints();
 	void update_data_form();
-	
+
 private:
 	UINT8 m_transmit_data_register;
 	UINT8 m_receive_data_register;

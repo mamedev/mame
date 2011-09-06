@@ -236,7 +236,7 @@ public:
 
 	floppy_image_format_t *next;
 	void append(floppy_image_format_t *_next);
-		
+
 protected:
 	// Struct designed for easy track data description
 	// Optional, you can always do things by hand, but useful nevertheless

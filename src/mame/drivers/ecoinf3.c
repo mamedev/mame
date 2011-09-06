@@ -22,13 +22,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	
+
 	AM_RANGE(0x58, 0x58) AM_WRITE(py_port58_out_w)
 ADDRESS_MAP_END
 
 /*
 static ADDRESS_MAP_START( pyramid_submap, AS_PROGRAM, 8 )
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+    AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 */
 
@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	MCFG_CPU_ADD("maincpu", Z180,4000000) // certainly not a plain z80 at least, invalid opcodes for that
 	MCFG_CPU_PROGRAM_MAP(pyramid_memmap)
 	MCFG_CPU_IO_MAP(pyramid_portmap)
-	
+
 	// sphinx and pyramid on this hw contain a weird rom, looks almost like half a pair for a 16-bit cpu, but contains
 	// what looks like vectors at the end, no idea what it is.
 	//MCFG_CPU_ADD("subcpu", HD6301, 4000000) // ??

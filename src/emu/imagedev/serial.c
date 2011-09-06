@@ -71,7 +71,7 @@ static TIMER_CALLBACK(serial_device_baud_rate_callback)
     has updated state
 -------------------------------------------------*/
 void serial_image_device::input_callback(UINT8 state)
-{	
+{
 	m_input_state = state;
 }
 
@@ -82,7 +82,7 @@ void serial_image_device::input_callback(UINT8 state)
 void serial_image_device::device_start()
 {
 	set_data_frame(m_data_bits, m_stop_bits,m_parity);
-	
+
 	m_timer = machine().scheduler().timer_alloc(FUNC(serial_device_baud_rate_callback), this);
 
 	/* signal to other end it is clear to send! */
@@ -92,14 +92,14 @@ void serial_image_device::device_start()
 	/* signal to other end data is ready to be accepted */
 	/* set /dtr */
 	m_connection_state |= SERIAL_STATE_DTR;
-	
+
 	set_out_data_bit(1);
 	serial_connection_out();
 	transmit_register_reset();
 	receive_register_reset();
-	
+
 	set_transmit_state(m_transmit_on_start ? 1 :0);
-	
+
 	device_serial_interface *intf = NULL;
 	device_t *dev = machine().device(m_tag_connected);
 	if (dev!=NULL && dev->interface(intf)) {
@@ -283,7 +283,7 @@ int serial_image_device::load_internal(unsigned char **ptr, int *pDataSize)
     call_load
 -------------------------------------------------*/
 bool serial_image_device::call_load()
-{	
+{
 	int data_length;
 	unsigned char *data;
 	/* load file and setup transmit data */
@@ -304,7 +304,7 @@ void serial_image_device::call_unload()
 {
 	/* stop transmit */
 	set_transmit_state(0);
-	
+
 	/* free streams */
 	data_stream_free(&m_transmit);
 	data_stream_free(&m_receive);

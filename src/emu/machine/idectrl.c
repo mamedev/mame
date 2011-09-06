@@ -1893,7 +1893,7 @@ static DEVICE_START( ide_controller )
 	} else if (config->hardware != NULL) {
 		ide->hardware = (ide_hardware *)config->hardware;
 		ide->hardware->get_info(ide->device, ide->features, ide->num_cylinders, ide->num_sectors, ide->num_heads);
-	  	ide_generate_features (ide);
+		ide_generate_features (ide);
 	}
 
 	/* create a timer for timing status */
@@ -2003,7 +2003,7 @@ static DEVICE_RESET( ide_controller )
 		}
 	} else if (ide->hardware != NULL) {
 		ide->hardware->get_info(ide->device, ide->features, ide->num_cylinders, ide->num_sectors, ide->num_heads);
-	  	ide_generate_features (ide);
+		ide_generate_features (ide);
 	}
 
 	/* reset the drive state */

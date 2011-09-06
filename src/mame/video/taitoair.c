@@ -375,8 +375,8 @@ WRITE16_HANDLER( dsp_flags_w )
 			bitmap_fill(state->m_framebuffer[1], &cliprect, 0);
 			/* copy buffer fb into screen fb (at this stage we are ready to draw) */
 			copybitmap_trans(state->m_framebuffer[1], state->m_framebuffer[0], 0, 0, 0, 0, &cliprect, 0);
-		 	/* now clear buffer fb */
-		 	bitmap_fill(state->m_framebuffer[0], &cliprect, 0);
+			/* now clear buffer fb */
+			bitmap_fill(state->m_framebuffer[0], &cliprect, 0);
 		}
 
 		/* if offset 0x3001 OR 0x3002 we put data in the buffer fb */
@@ -460,8 +460,8 @@ void multVecMtx(const INT16* vec4, const float* m, float* result)
 #undef M
 }
 
-void projectEyeCoordToScreen(float* projectionMatrix, 
-							 const int xRes, const int yRes, 
+void projectEyeCoordToScreen(float* projectionMatrix,
+							 const int xRes, const int yRes,
 							 INT16* eyePoint3d,
 							 int* result)
 {
@@ -473,7 +473,7 @@ void projectEyeCoordToScreen(float* projectionMatrix,
 
 	/* Coordinate system flip */
 	eyePoint3d[0] *= -1;
-    
+
 	/* Nothing fancy about this homogeneous worldspace coordinate */
 	eyePoint3d[3] = 1;
 
@@ -525,8 +525,8 @@ WRITE16_HANDLER( dsp_rasterize_w )
 	airInfernoFrustum(state->m_frustumLeft, state->m_frustumBottom, m);
 
 	int result[2];
-	projectEyeCoordToScreen(m, 
-							32*16, 	/* These are defined in the machine ctor */
+	projectEyeCoordToScreen(m,
+							32*16,	/* These are defined in the machine ctor */
 							28*16,  /* not sure how to get them here or if they're even correct */
 							state->m_eyecoordBuffer,
 							result);

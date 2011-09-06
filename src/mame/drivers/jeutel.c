@@ -12,7 +12,7 @@ public:
 static ADDRESS_MAP_START( jeutel_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( jeutel )
 INPUT_PORTS_END
 
@@ -28,7 +28,7 @@ static MACHINE_CONFIG_START( jeutel, jeutel_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3300000)
 	MCFG_CPU_PROGRAM_MAP(jeutel_map)
-	
+
 	MCFG_MACHINE_RESET( jeutel )
 MACHINE_CONFIG_END
 

@@ -159,7 +159,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	{
 		ES5503Osc *pOsc = &oscillators[osc];
 
-		mixp = &mix[0];  
+		mixp = &mix[0];
 
 		if (!(pOsc->control & 1))
 		{
