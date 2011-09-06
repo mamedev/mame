@@ -22,6 +22,13 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+typedef struct _ide_hardware ide_hardware;
+struct _ide_hardware
+{
+	void	(*get_info)(device_t *device, UINT8 *buffer, UINT16 &cylinders, UINT8 &sectors, UINT8 &heads);
+	int		(*read_sector)(device_t *device, UINT32 lba, void *buffer);
+	int		(*write_sector)(device_t *device, UINT32 lba, const void *buffer);
+};
 
 typedef struct _ide_config ide_config;
 struct _ide_config
@@ -31,6 +38,7 @@ struct _ide_config
 	const char *slave;		/* name of slave region (defaults to NULL) */
 	const char *bmcpu;		/* name of bus master CPU */
 	UINT32 bmspace;			/* address space of bus master transfer */
+	const ide_hardware *hardware;	/* connected to hardware that is not an hard disk */
 };
 
 
@@ -51,6 +59,8 @@ struct _ide_config
 	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, bmcpu, _cpu) \
 	MCFG_DEVICE_CONFIG_DATA32(ide_config, bmspace, AS_##_space)
 
+#define MCFG_IDE_CONNECTED_TO(_hardware) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, hardware, _hardware) \
 
 
 /***************************************************************************

@@ -343,7 +343,7 @@ Dump info:
 Network Board Dump : Ver1305.bin
 Media Board dump   : FPR21042_M29W160ET.bin
 Base Board Dumps   : ic10_g24lc64.bin ic11_24lc024.bin pc20_g24lc64.bin
-Xbox Board Dump    : Not dumped
+Xbox Board Dump    : chihiro_xbox_bios.bin
 
 FPR21042_M29W160ET.bin :
 As in Triforce, it consists of two versions in the same flash, the first MB of the flash has
@@ -362,11 +362,24 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/idectrl.h"
 #include "machine/naomigd.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
+#include "debug/debugcpu.h"
 
-/* jamtable instructions for Chihiro
+#define LOG_PCI
+
+static struct {
+	device_t	*pic8259_1;
+	device_t	*pic8259_2;
+	device_t	*ide;
+} chihiro_devices;
+
+
+/* jamtable instructions for Chihiro (different from console)
 St.     Instr.       Comment
 0x01    POKEPCI      PCICONF[OP2] := OP1
 0x02    OUTB         PORT[OP2] := OP1
@@ -384,22 +397,26 @@ St.     Instr.       Comment
 /* jamtable disassembler */
 static void jamtable_disasm(running_machine &machine, address_space *space,UINT32 address,UINT32 size) // 0xff000080 == fff00080
 {
-	UINT32 base,addr;
+	offs_t base,addr;
 	UINT32 opcode,op1,op2;
 	char sop1[16];
 	char sop2[16];
 	char pcrel[16];
-//  int prefix;
 
-	addr=address;
+	addr=(offs_t)address;
+	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&addr))
+	{
+		debug_console_printf(machine,"Address is unmapped.\n");
+		return;
+	}
 	while (1)
 	{
 		base=addr;
 		opcode=space->read_byte(addr);
 		addr++;
-		op1=space->read_dword(addr);
+		op1=space->read_dword_unaligned(addr);
 		addr+=4;
-		op2=space->read_dword(addr);
+		op2=space->read_dword_unaligned(addr);
 		addr+=4;
 		if (opcode == 0xe1)
 		{
@@ -409,14 +426,12 @@ static void jamtable_disasm(running_machine &machine, address_space *space,UINT3
 			sprintf(sop2,"%08X",op2);
 			sprintf(sop1,"ACC");
 			sprintf(pcrel,"PC+ACC");
-//          prefix=1;
 		}
 		else
 		{
 			sprintf(sop2,"%08X",op2);
 			sprintf(sop1,"%08X",op1);
 			sprintf(pcrel,"%08X",base+9+op1);
-//          prefix=0;
 		}
 		debug_console_printf(machine,"%08X ",base);
 		// dl=instr ebx=par1 eax=par2
@@ -476,7 +491,7 @@ static void jamtable_disasm(running_machine &machine, address_space *space,UINT3
 	}
 }
 
-void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
+static void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
 {
 	address_space *space=machine.firstcpu->space();
 	UINT64	addr,size;
@@ -490,37 +505,191 @@ void jamtable_disasm_command(running_machine &machine, int ref, int params, cons
 	jamtable_disasm(machine, space, (UINT32)addr, (UINT32)size);
 }
 
-/*
-St.     Instr.       Comment
-0x02    PEEK         ACC := MEM[OP1]
-0x03    POKE         MEM[OP1] := OP2
-0x04    POKEPCI      PCICONF[OP1] := OP2
-0x05    PEEKPCI      ACC := PCICONF[OP1]
-0x06    AND/OR       ACC := (ACC & OP1) | OP2
-0x07    (prefix)     execute the instruction code in OP1 with OP1 := OP2, OP2 := ACC
-0x08    BNE          IF ACC = OP1 THEN PC := PC + OP2
-0x09    BRA          PC := PC + OP2
-0x10    AND/OR ACC2  (unused/defunct) ACC2 := (ACC2 & OP1) | OP2
-0x11    OUTB         PORT[OP1] := OP2
-0x12    INB          ACC := PORT(OP1)
-0xEE    END
-*/
-#ifdef UNUSED_FUNCTION
-static READ32_HANDLER( chihiro_jamtable )
+static void dump_string_command(running_machine &machine, int ref, int params, const char **param)
 {
-	return 0xEEEEEEEE;
+	address_space *space=machine.firstcpu->space();
+	UINT64	addr;
+	offs_t address;
+	UINT32 length,maximumlength;
+	offs_t buffer;
+
+	if (params < 1)
+		return;
+	if (!debug_command_parameter_number(machine, param[0], &addr))
+		return;
+	address=(offs_t)addr;
+	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
+	{
+		debug_console_printf(machine,"Address is unmapped.\n");
+		return;
+	}
+	length=space->read_word_unaligned(address);
+	maximumlength=space->read_word_unaligned(address+2);
+	buffer=space->read_dword_unaligned(address+4);
+	debug_console_printf(machine,"Length %d word\n",length);
+	debug_console_printf(machine,"MaximumLength %d word\n",maximumlength);
+	debug_console_printf(machine,"Buffer %08X byte* ",buffer);
+	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&buffer))
+	{
+		debug_console_printf(machine,"\nBuffer is unmapped.\n");
+		return;
+	}
+	if (length > 256)
+		length=256;
+	for (int a=0;a < length;a++)
+	{
+		UINT8 c=space->read_byte(buffer+a);
+		debug_console_printf(machine,"%c",c);
+	}
+	debug_console_printf(machine,"\n");
 }
-#endif
+
+static void dump_process_command(running_machine &machine, int ref, int params, const char **param)
+{
+	address_space *space=machine.firstcpu->space();
+	UINT64 addr;
+	offs_t address;
+
+	if (params < 1)
+		return;
+	if (!debug_command_parameter_number(machine, param[0], &addr))
+		return;
+	address=(offs_t)addr;
+	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
+	{
+		debug_console_printf(machine,"Address is unmapped.\n");
+		return;
+	}
+	debug_console_printf(machine,"ReadyListHead {%08X,%08X} _LIST_ENTRY\n",space->read_dword_unaligned(address),space->read_dword_unaligned(address+4));
+	debug_console_printf(machine,"ThreadListHead {%08X,%08X} _LIST_ENTRY\n",space->read_dword_unaligned(address+8),space->read_dword_unaligned(address+12));
+	debug_console_printf(machine,"StackCount %d dword\n",space->read_dword_unaligned(address+16));
+	debug_console_printf(machine,"ThreadQuantum %d dword\n",space->read_dword_unaligned(address+20));
+	debug_console_printf(machine,"BasePriority %d byte\n",space->read_byte(address+24));
+	debug_console_printf(machine,"DisableBoost %d byte\n",space->read_byte(address+25));
+	debug_console_printf(machine,"DisableQuantum %d byte\n",space->read_byte(address+26));
+	debug_console_printf(machine,"_padding %d byte\n",space->read_byte(address+27));
+}
+
+static void dump_list_command(running_machine &machine, int ref, int params, const char **param)
+{
+	address_space *space=machine.firstcpu->space();
+	UINT64 addr,offs,start,old;
+	offs_t address,offset;
+
+	if (params < 1)
+		return;
+	if (!debug_command_parameter_number(machine, param[0], &addr))
+		return;
+	offs=0;
+	offset=0;
+	if (params >= 2)
+	{
+		if (!debug_command_parameter_number(machine, param[1], &offs))
+			return;
+		offset=(offs_t)offs;
+	}
+	start=addr;
+	address=(offs_t)addr;
+	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
+	{
+		debug_console_printf(machine,"Address is unmapped.\n");
+		return;
+	}
+	if (params >= 2)
+		debug_console_printf(machine,"Entry    Object\n");
+	else
+		debug_console_printf(machine,"Entry\n");
+	for (int num=0;num < 32;num++)
+	{
+		if (params >= 2)
+			debug_console_printf(machine,"%08X %08X\n",(UINT32)addr,(offs_t)addr-offset);
+		else
+			debug_console_printf(machine,"%08X\n",(UINT32)addr);
+		old=addr;
+		addr=space->read_dword_unaligned(address);
+		if (addr == start)
+			break;
+		if (addr == old)
+			break;
+		address=(offs_t)addr;
+		if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
+			break;
+	}
+}
+
+static void help_command(running_machine &machine, int ref, int params, const char **param)
+{
+	debug_console_printf(machine,"Available Chihiro commands:\n");
+	debug_console_printf(machine,"  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
+	debug_console_printf(machine,"  chihiro dump_string,<address> -- Dump _STRING object at <address>\n");
+	debug_console_printf(machine,"  chihiro dump_process,<address> -- Dump _PROCESS object at <address>\n");
+	debug_console_printf(machine,"  chihiro dump_list,<address>[,<offset>] -- Dump _LIST_ENTRY chain starting at <address>\n");
+	debug_console_printf(machine,"  chihiro help -- this list\n");
+}
+
+static void chihiro_debug_commands(running_machine &machine, int ref, int params, const char **param)
+{
+	if (params < 1)
+		return;
+	if (strcmp("jamdis",param[0]) == 0)
+		jamtable_disasm_command(machine,ref,params-1,param+1);
+	else if (strcmp("dump_string",param[0]) == 0)
+		dump_string_command(machine,ref,params-1,param+1);
+	else if (strcmp("dump_process",param[0]) == 0)
+		dump_process_command(machine,ref,params-1,param+1);
+	else if (strcmp("dump_list",param[0]) == 0)
+		dump_list_command(machine,ref,params-1,param+1);
+	else
+		help_command(machine,ref,params-1,param+1);
+}
+
+/*
+ * geforce 3d placeholder
+ */
+
+static READ32_HANDLER( geforce_r )
+{
+static int x;
+
+	if (offset == 0x1804f6) {
+		x = x ^ 0x08080808;
+		return x;
+	}
+	return 0;
+}
+
+static WRITE32_HANDLER( geforce_w )
+{
+}
 
 static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
-	logerror("  bus:%d function:%d register:%d mask:%08X\n",((pci_bus_config *)downcast<const legacy_device_base *>(busdevice)->inline_config())->busnum,function,reg,mem_mask);
+#ifdef LOG_PCI
+	logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+#endif
 	return 0;
 }
 
 static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-	logerror("  bus:%d function:%d register:%d data:%08X mask:%08X\n",((pci_bus_config *)downcast<const legacy_device_base *>(busdevice)->inline_config())->busnum,function,reg,data,mem_mask);
+#ifdef LOG_PCI
+	logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
+#endif
+}
+
+static UINT32 geforce_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+{
+#ifdef LOG_PCI
+	logerror("  bus:1 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+#endif
+	return 0;
+}
+
+static void geforce_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+#ifdef LOG_PCI
+	logerror("  bus:1 function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
+#endif
 }
 
 static READ32_HANDLER( dummy_r )
@@ -532,11 +701,225 @@ static WRITE32_HANDLER( dummy_w )
 {
 }
 
+/*
+ * IDE
+ */
+
+INLINE int convert_to_offset_and_size32(offs_t *offset, UINT32 mem_mask)
+{
+	int size = 4;
+
+	/* determine which real offset */
+	if (!ACCESSING_BITS_0_7)
+	{
+		(*offset)++, size = 3;
+		if (!ACCESSING_BITS_8_15)
+		{
+			(*offset)++, size = 2;
+			if (!ACCESSING_BITS_16_23)
+				(*offset)++, size = 1;
+		}
+	}
+
+	/* determine the real size */
+	if (ACCESSING_BITS_24_31)
+		return size;
+	size--;
+	if (ACCESSING_BITS_16_23)
+		return size;
+	size--;
+	if (ACCESSING_BITS_8_15)
+		return size;
+	size--;
+	return size;
+}
+
+static READ32_HANDLER( ide_r )
+{
+	int size;
+
+	offset *= 4;
+	size = convert_to_offset_and_size32(&offset, mem_mask);
+
+	return ide_controller_r(chihiro_devices.ide, offset+0x01f0, size) << ((offset & 3) * 8);
+}
+
+static WRITE32_HANDLER( ide_w )
+{
+	int size;
+
+	offset *= 4;
+	size = convert_to_offset_and_size32(&offset, mem_mask);
+	data = data >> ((offset & 3) * 8);
+
+	ide_controller_w(chihiro_devices.ide, offset+0x01f0, size, data);
+}
+
+static void ide_interrupt(device_t *device, int state)
+{
+	pic8259_ir6_w(chihiro_devices.pic8259_2, state); // IRQ 14
+}
+
+void get_info(device_t *device, UINT8 *buffer, UINT16 &cylinders, UINT8 &sectors, UINT8 &heads)
+{
+	cylinders=65535;
+	sectors=255;
+	heads=255;
+}
+
+int read_sector(device_t *device, UINT32 lba, void *buffer)
+{
+	int off;
+	UINT8 *data;
+
+	logerror("baseboard: read sector lba %08x\n",lba);
+	off=(lba&0x7ff)*512;
+	data=device->machine().region("others")->base();
+	memcpy(buffer,data+off,512);
+	return 1;
+}
+
+int write_sector(device_t *device, UINT32 lba, const void *buffer)
+{
+	logerror("baseboard: write sector lba %08x\n",lba);
+	return 1;
+}
+
+ide_hardware baseboard={get_info,read_sector,write_sector};
+
+/*
+ * PIC & PIT
+ */
+
+static WRITE_LINE_DEVICE_HANDLER( chihiro_pic8259_1_set_int_line )
+{
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+}
+
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	if (offset==2) { // IRQ = 2
+		return pic8259_acknowledge(chihiro_devices.pic8259_2);
+	}
+	return 0x00;
+}
+
+static const struct pic8259_interface chihiro_pic8259_1_config =
+{
+	DEVCB_LINE(chihiro_pic8259_1_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
+};
+
+static const struct pic8259_interface chihiro_pic8259_2_config =
+{
+	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w),
+	DEVCB_LINE_GND,
+	DEVCB_NULL
+};
+
+static IRQ_CALLBACK(irq_callback)
+{
+	int r = 0;
+	r = pic8259_acknowledge(chihiro_devices.pic8259_2);
+	if (r==0)
+	{
+		r = pic8259_acknowledge( chihiro_devices.pic8259_1);
+	}
+	return r;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( chihiro_pit8254_out0_changed )
+{
+	if ( device->machine().device("pic8259_1") )
+	{
+		pic8259_ir0_w(device->machine().device("pic8259_1"), state);
+	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( chihiro_pit8254_out2_changed )
+{
+	//chihiro_speaker_set_input( state ? 1 : 0 );
+}
+
+static const struct pit8253_config chihiro_pit8254_config =
+{
+	{
+		{
+			1125000,				/* heartbeat IRQ */
+			DEVCB_NULL,
+			DEVCB_LINE(chihiro_pit8254_out0_changed)
+		}, {
+			1125000,				/* (unused) dram refresh */
+			DEVCB_NULL,
+			DEVCB_NULL
+		}, {
+			1125000,				/* (unused) pio port c pin 4, and speaker polling enough */
+			DEVCB_NULL,
+			DEVCB_LINE(chihiro_pit8254_out2_changed)
+		}
+	}
+};
+
+/*
+ * SMbus devices
+ */
+
+static UINT8 pic16lc_buffer[0xff];
+
+int smbus_pic16lc(int command,int rw,int data)
+{
+	if (rw == 1) { // read
+		if (command == 0) {
+			if (pic16lc_buffer[0] == 'D')
+				pic16lc_buffer[0]='X';
+			else if (pic16lc_buffer[0] == 'X')
+				pic16lc_buffer[0]='B';
+			else if (pic16lc_buffer[0] == 'B')
+				pic16lc_buffer[0]='D';
+		}
+		logerror("pic16lc: %d %d %d\n",command,rw,pic16lc_buffer[command]);
+		return pic16lc_buffer[command];
+	} else
+		if (command == 0)
+			pic16lc_buffer[0]='B';
+		else
+			pic16lc_buffer[command]=(UINT8)data;
+	logerror("pic16lc: %d %d %d\n",command,rw,data);
+	return 0;
+}
+
 int smbus_cx25871(int command,int rw,int data)
 {
 	logerror("cx25871: %d %d %d\n",command,rw,data);
 	return 0;
 }
+
+static int eeprom_buffer[256];
+
+int smbus_eeprom(int command,int rw,int data)
+{
+	if (rw == 1) { // 8003b744,3b744=0x90 0x90
+		// hack to avoid hanging if eeprom contents are not correct
+		// this would need dumping the serial eeprom on the xbox board
+		if (command == 0) {
+			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b744,0x90);
+			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b745,0x90);
+			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b766,0xc9);
+			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b767,0xc3);
+		}
+		data = eeprom_buffer[command]+eeprom_buffer[command+1]*256;
+		logerror("eeprom: %d %d %d\n",command,rw,data);
+		return data;
+	}
+	logerror("eeprom: %d %d %d\n",command,rw,data);
+	eeprom_buffer[command]=data;
+	return 0;
+}
+
+/*
+ * SMbus controller
+ */
 
 typedef struct _smbus_state {
 	int status;
@@ -559,9 +942,9 @@ void smbus_register_device(int address,int (*handler)(int command,int rw,int dat
 static READ32_HANDLER( smbus_r )
 {
 	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
-		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | (smbusst.status << 0);
-	if ((offset == 1) && (mem_mask == 0xff0000)) // 6 smbus data
-		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | (smbusst.data << 16);
+		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | ((smbusst.status << 0) & mem_mask);
+	if ((offset == 1) && ((mem_mask == 0x00ff0000) || (mem_mask == 0xffff0000))) // 6 smbus data
+		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | ((smbusst.data << 16) & mem_mask);
 	return smbusst.words[offset];
 }
 
@@ -569,22 +952,32 @@ static WRITE32_HANDLER( smbus_w )
 {
 	COMBINE_DATA(smbusst.words);
 	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
+	{
+		if (!((smbusst.status ^ data) & 0x10)) // clearing interrupt
+			pic8259_ir3_w(chihiro_devices.pic8259_2, 0); // IRQ 11
 		smbusst.status &= ~data;
+	}
 	if ((offset == 0) && (mem_mask == 0xff0000)) // 2 smbus control
 	{
 		data=data>>16;
 		smbusst.control = data;
-		if ((smbusst.control & 6) == 2)
-		{
-			if (smbusst.devices[smbusst.address & 127]) {
-				if (smbusst.rw == 0) {
-					smbusst.devices[smbusst.address & 127](smbusst.command,smbusst.rw,smbusst.data);
-				}
-				else {
-					smbusst.data=smbusst.devices[smbusst.address & 127](smbusst.command,smbusst.rw,smbusst.data);
+		int cycletype = smbusst.control & 7;
+		if (smbusst.control & 8) { // start
+			if ((cycletype & 6) == 2)
+			{
+				if (smbusst.devices[smbusst.address])
+					if (smbusst.rw == 0)
+						smbusst.devices[smbusst.address](smbusst.command,smbusst.rw,smbusst.data);
+					else
+						smbusst.data=smbusst.devices[smbusst.address](smbusst.command,smbusst.rw,smbusst.data);
+				else
+					logerror("SMBUS: access to missing device at address %d\n",smbusst.address);
+				smbusst.status |= 0x10;
+				if (smbusst.control & 0x10)
+				{
+					pic8259_ir3_w(chihiro_devices.pic8259_2, 1); // IRQ 11
 				}
 			}
-			smbusst.status |= 0x10;
 		}
 	}
 	if ((offset == 1) && (mem_mask == 0xff)) // 4 smbus address
@@ -592,7 +985,7 @@ static WRITE32_HANDLER( smbus_w )
 		smbusst.address = data >> 1;
 		smbusst.rw = data & 1;
 	}
-	if ((offset == 1) && (mem_mask == 0xff0000)) // 6 smbus data
+	if ((offset == 1) && ((mem_mask == 0x00ff0000) || (mem_mask == 0xffff0000))) // 6 smbus data
 	{
 		data=data>>16;
 		smbusst.data = data;
@@ -604,28 +997,43 @@ static WRITE32_HANDLER( smbus_w )
 
 static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM
+	AM_RANGE(0xfd000000, 0xfdffffff) AM_READWRITE(geforce_r, geforce_w)
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32)
+	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r, pci_32le_w)
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)
+	AM_RANGE(0xff60, 0xff67) AM_DEVREADWRITE("ide", ide_bus_master32_r, ide_bus_master32_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chihiro )
 INPUT_PORTS_END
 
-static MACHINE_START( chihiro )
-{
-	smbus_register_device(0x45,smbus_cx25871);
-	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
-}
-
 static SCREEN_UPDATE( chihiro )
 {
     return 0;
+}
+
+static MACHINE_START( chihiro )
+{
+	memset(pic16lc_buffer,0,sizeof(pic16lc_buffer));
+	pic16lc_buffer[0]='B';
+	pic16lc_buffer[4]=2; // A/V connector, 2=vga
+	smbus_register_device(0x10,smbus_pic16lc);
+	smbus_register_device(0x45,smbus_cx25871);
+	smbus_register_device(0x54,smbus_eeprom);
+	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	chihiro_devices.pic8259_1 = machine.device( "pic8259_1" );
+	chihiro_devices.pic8259_2 = machine.device( "pic8259_2" );
+	chihiro_devices.ide = machine.device( "ide" );
+	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
+		debug_console_register_command(machine,"chihiro",CMDFLAG_NONE,0,1,4,chihiro_debug_commands);
 }
 
 static MACHINE_CONFIG_START( chihiro_base, driver_device )
@@ -645,7 +1053,13 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 	MCFG_PCI_BUS_DEVICE(30, "AGP Host to PCI Bridge", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_ADD("agpbus", 1)
 	MCFG_PCI_BUS_SIBLING("pcibus")
-	MCFG_PCI_BUS_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", geforce_pci_r, geforce_pci_w)
+	MCFG_PIC8259_ADD( "pic8259_1", chihiro_pic8259_1_config )
+	MCFG_PIC8259_ADD( "pic8259_2", chihiro_pic8259_2_config )
+	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt )
+	MCFG_IDE_BUS_MASTER_SPACE( "maincpu", PROGRAM )
+	MCFG_IDE_CONNECTED_TO( &baseboard )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -674,12 +1088,12 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x1000000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
-	ROM_REGION( 0x200000, "others", 0) \
+	ROM_REGION( 0x404080, "others", 0) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr21042_m29w160et.bin", 0x000000, 0x200000, CRC(a4fcab0b) SHA1(a13cf9c5cdfe8605d82150b7573652f419b30197) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x000000, 0x2000, CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x000000, 0x80, CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x000000, 0x2000, CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ver1305.bin", 0x000000, 0x200000, CRC(a738ea1c) SHA1(45d94d0c39be1cb3db9fab6610a88a550adda4e9) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x200000, 0x2000, CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x202000, 0x80, CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x202080, 0x2000, CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ver1305.bin", 0x204080, 0x200000, CRC(a738ea1c) SHA1(45d94d0c39be1cb3db9fab6610a88a550adda4e9) ) \
 
 ROM_START( chihiro )
 	CHIHIRO_BIOS
