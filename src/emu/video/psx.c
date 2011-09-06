@@ -3641,7 +3641,7 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 		DebugCheckKeys();
 #endif
 
-#if 0
+#if 1
 		/* HACK for sianniv
 		OG: sianniv does the bios startup, then loads the main program, clears the bss zone,
 		then starts it.  More or less.  Meanwhile, it somehow forgets to disable vblank,
@@ -3650,7 +3650,7 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 		What happens on the real hardware?  Screen turned off disabling vbl indirectly perhaps?
 		*/
 		UINT32 pc = cpu_get_pc(screen.machine().device("maincpu"));
-		if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0)
+		if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0 || pc == 0x8002a4f4)
 			return;
 #endif
 
