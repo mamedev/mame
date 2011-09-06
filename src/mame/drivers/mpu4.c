@@ -14792,7 +14792,7 @@ GAME(199?, m4hvhel	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Hea
 GAME(199?, m4holywd	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Hollywood (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4indycr	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Indy Cars (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4jakjok	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4jakjoka,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4, alternate)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4jakjoka	,m4jakjok		,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4, alternate)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4jflash	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jumping Jack Flash (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4kingq	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4kingqc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
