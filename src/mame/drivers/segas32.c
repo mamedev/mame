@@ -3334,6 +3334,10 @@ ROM_END
 /**************************************************************************************************************************
     Rad Rally (Japan)
     not protected
+    Sega Game ID codes:
+     Game: 833-8110-03 RAD RALLY
+Rom board: 833-8111-03
+A/D BD NO. 837-7536
 */
 ROM_START( radrj )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
