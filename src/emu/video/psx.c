@@ -3649,9 +3649,11 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 		initialization, with insta-crash effects.
 		What happens on the real hardware?  Screen turned off disabling vbl indirectly perhaps?
 		*/
-		UINT32 pc = cpu_get_pc(screen.machine().device("maincpu"));
-		if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0 || pc == 0x8002a4f4)
-			return;
+		if(!strcmp(machine().system().name, "sianniv")) {
+			UINT32 pc = cpu_get_pc(machine().device("maincpu"));
+			if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0 || pc == 0x8002a4f4)
+				return;
+		}
 #endif
 
 		n_gpustatus ^= ( 1L << 31 );
