@@ -2584,153 +2584,238 @@ OP(fc, OP_JSRAXI(            ) ) /* JSR axi (G) */
 OP(fd, OP_SBC  ( AX          ) ) /* SBC ax      */
 OP(fe, OP_INCM ( AX          ) ) /* INC ax      */
 OP(ff, OP_SBC  ( ALX         ) ) /* SBC alx (G) */
-OP(101, OP_ORB   ( DXI         ) ) /* ORB dxi     */
-OP(103, OP_ORB   ( S           ) ) /* ORB s   (G) */
-OP(105, OP_ORB   ( D           ) ) /* ORB d       */
-OP(107, OP_ORB   ( DLI         ) ) /* ORB dli (G) */
-OP(109, OP_ORB   ( IMM         ) ) /* ORB imm     */
-OP(10a, OP_BSL   (             ) ) /* BSL acc     */
-OP(10d, OP_ORB   ( A           ) ) /* ORB a       */
-OP(10f, OP_ORB   ( AL          ) ) /* ORB al  (G) */
-OP(111, OP_ORB   ( DIY         ) ) /* ORB diy     */
-OP(112, OP_ORB   ( DI          ) ) /* ORB di  (C) */
-OP(113, OP_ORB   ( SIY         ) ) /* ORB siy (G) */
-OP(115, OP_ORB   ( DX          ) ) /* ORB dx      */
-OP(117, OP_ORB   ( DLIY        ) ) /* ORB dliy(C) */
-OP(119, OP_ORB   ( AY          ) ) /* ORB ay      */
-OP(11a, OP_DECB  (             ) ) /* DEB     (C) */
-OP(11d, OP_ORB   ( AX          ) ) /* ORB ax      */
-OP(11f, OP_ORB   ( ALX         ) ) /* ORB alx (G) */
-OP(129, OP_ANDB  ( IMM         ) ) /* ANDB imm     */
-OP(12a, OP_ROLB  (	       ) ) /* ROL Bacc    */
-OP(13a, OP_INCB  (             ) ) /* INB     (C) */
-OP(148, OP_PHAB  (             ) ) /* PHB          */
-OP(149, OP_EORB  ( IMM         ) ) /* EORB imm     */
-OP(14a, OP_LSRB  (             ) ) /* LSRB acc     */
-OP(161, OP_ADCB  ( DXI         ) ) /* ADCB dxi     */
-OP(163, OP_ADCB  ( S           ) ) /* ADCB s   (G) */
-OP(165, OP_ADCB  ( D           ) ) /* ADCB d       */
-OP(167, OP_ADCB  ( DLI         ) ) /* ADCB dli (G) */
-OP(168, OP_PLAB  (             ) ) /* PLB          */
-OP(169, OP_ADCB  ( IMM         ) ) /* ADCB imm     */
-OP(16a, OP_RORB  (             ) ) /* ROR Bacc     */
-OP(16d, OP_ADCB  ( A           ) ) /* ADCB a       */
-OP(16f, OP_ADCB  ( AL          ) ) /* ADCB al  (G) */
-OP(171, OP_ADCB  ( DIY         ) ) /* ADCB diy     */
-OP(172, OP_ADCB  ( DI          ) ) /* ADCB di  (G) */
-OP(173, OP_ADCB  ( SIY         ) ) /* ADCB siy (G) */
-OP(175, OP_ADCB  ( DX          ) ) /* ADCB dx      */
-OP(177, OP_ADCB  ( DLIY        ) ) /* ADCB dliy(G) */
-OP(179, OP_ADCB  ( AY          ) ) /* ADCB ay      */
-OP(17d, OP_ADCB  ( AX          ) ) /* ADCB ax      */
-OP(17f, OP_ADCB  ( ALX         ) ) /* ADCB alx (G) */
-OP(181, OP_STB   ( DXI         ) ) /* STB dxi     */
-OP(183, OP_STB   ( S           ) ) /* STB s   (G) */
-OP(185, OP_STB   ( D           ) ) /* STB d       */
-OP(187, OP_STB   ( DLI         ) ) /* STB dli (G) */
-OP(18a, OP_TXB   ( REG_X       ) ) /* TXB         */
-OP(18d, OP_STB   ( A           ) ) /* STB a       */
-OP(18f, OP_STB   ( AL          ) ) /* STB al  (G) */
-OP(191, OP_STB   ( DIY         ) ) /* STB diy     */
-OP(192, OP_STB   ( DI          ) ) /* STB di  (C) */
-OP(193, OP_STB   ( SIY         ) ) /* STB siy (G) */
-OP(195, OP_STB   ( DX          ) ) /* STB dx      */
-OP(197, OP_STB   ( DLIY        ) ) /* STB dliy(G) */
-OP(198, OP_TXB   ( REG_Y       ) ) /* TYB         */
-OP(199, OP_STB   ( AY          ) ) /* STB ay      */
-OP(19d, OP_STB   ( AX          ) ) /* STB ax      */
-OP(19f, OP_STB   ( ALX         ) ) /* STB alx (G) */
-OP(1a1, OP_LDB   ( DXI         ) ) /* LDB dxi     */
-OP(1a5, OP_LDB   ( D           ) ) /* LDB d       */
-OP(1a8, OP_TBX   ( REG_Y       ) ) /* TBY         */
-OP(1a9, OP_LDB   ( IMM         ) ) /* LDB imm     */
-OP(1aa, OP_TBX   ( REG_X       ) ) /* TBX         */
-OP(1ad, OP_LDB   ( A           ) ) /* LDB a       */
-OP(1b2, OP_LDB   ( DI          ) ) /* LDB di  (C) */
-OP(1b5, OP_LDB   ( DX          ) ) /* LDB dx      */
-OP(1b9, OP_LDB   ( AY          ) ) /* LDB ay      */
-OP(1bd, OP_LDB   ( AX          ) ) /* LDB ax      */
-OP(1c1, OP_CMPB  ( DXI         ) ) /* CMPB dxi     */
-OP(1c3, OP_CMPB  ( S           ) ) /* CMPB s   (G) */
-OP(1c5, OP_CMPB  ( D           ) ) /* CMPB d       */
-OP(1c7, OP_CMPB  ( DLI         ) ) /* CMPB dli (G) */
-OP(1c9, OP_CMPB  ( IMM         ) ) /* CMPB imm     */
-OP(1cd, OP_CMPB  ( A           ) ) /* CMPB a       */
-OP(1cf, OP_CMPB  ( AL          ) ) /* CMPB al  (G) */
-OP(1d1, OP_CMPB  ( DIY         ) ) /* CMPB diy     */
-OP(1d2, OP_CMPB  ( DI          ) ) /* CMPB di  (C) */
-OP(1d3, OP_CMPB  ( SIY         ) ) /* CMPB siy (G) */
-OP(1d5, OP_CMPB  ( DX          ) ) /* CMPB dx      */
-OP(1d7, OP_CMPB  ( DLIY        ) ) /* CMPB dliy(G) */
-OP(1d9, OP_CMPB  ( AY          ) ) /* CMPB ay      */
-OP(1dd, OP_CMPB  ( AX          ) ) /* CMPB ax      */
-OP(1df, OP_CMPB  ( ALX         ) ) /* CMPB alx (G) */
-OP(1e9, OP_SBCB  ( IMM         ) ) /* SBCB imm     */
-OP(1f5, OP_SBCB  ( DX          ) ) /* SBCB dx      */
-OP(200, OP_UNIMP (             ) ) /* unimplemented */
-OP(203, OP_MPY   ( S           ) ) /* MPY s       */
-OP(205, OP_MPY   ( D           ) ) /* MPY d       */
-OP(209, OP_MPY   ( IMM         ) ) /* MPY imm     */
-OP(215, OP_MPY   ( DX          ) ) /* MPY dx      */
-OP(219, OP_MPY   ( AY	       ) ) /* MPY ay      */
-OP(225, OP_DIV   ( D           ) ) /* DIV d       */
-OP(228, OP_XAB   (             ) ) /* XAB         */
-OP(235, OP_DIV   ( DX          ) ) /* DIV dx      */
-OP(249, OP_RLA   ( IMM         ) ) /* RLA imm     */
-OP(2c2, OP_LDT   ( IMM         ) ) /* LDT imm     */
+
+/* B accumulator */
+OP(101,OP_ORB  ( DXI         ) ) /* ORB dxi     */
+OP(103,OP_ORB  ( S           ) ) /* ORB s       */
+OP(105,OP_ORB  ( D           ) ) /* ORB d       */
+OP(107,OP_ORB  ( DLI         ) ) /* ORB dli     */
+OP(109,OP_ORB  ( IMM         ) ) /* ORB imm     */
+OP(10a,OP_BSL  (             ) ) /* BSL acc     */
+OP(10d,OP_ORB  ( A           ) ) /* ORB a       */
+OP(10f,OP_ORB  ( AL          ) ) /* ORB al      */
+OP(111,OP_ORB  ( DIY         ) ) /* ORB diy     */
+OP(112,OP_ORB  ( DI          ) ) /* ORB di      */
+OP(113,OP_ORB  ( SIY         ) ) /* ORB siy     */
+OP(115,OP_ORB  ( DX          ) ) /* ORB dx      */
+OP(117,OP_ORB  ( DLIY        ) ) /* ORB dliy    */
+OP(119,OP_ORB  ( AY          ) ) /* ORB ay      */
+OP(11a,OP_DECB (             ) ) /* DEB         */
+// 11b,TBS (TODO)
+OP(11d,OP_ORB  ( AX          ) ) /* ORB ax      */
+OP(11f,OP_ORB  ( ALX         ) ) /* ORB alx     */
+OP(121,OP_ANDB ( DXI         ) ) /* ANDB dxi    */
+OP(123,OP_ANDB ( S           ) ) /* ANDB s      */
+OP(125,OP_ANDB ( D           ) ) /* ANDB d      */
+OP(127,OP_ANDB ( DLI         ) ) /* ANDB dli    */
+OP(129,OP_ANDB ( IMM         ) ) /* ANDB imm    */
+OP(12a,OP_ROLB (             ) ) /* ROL Bacc    */
+OP(12d,OP_ANDB ( A           ) ) /* ANDB a      */
+OP(12f,OP_ANDB ( AL          ) ) /* ANDB al     */
+OP(131,OP_ANDB ( DIY         ) ) /* ANDB diy    */
+OP(132,OP_ANDB ( DI          ) ) /* ANDB di     */
+OP(133,OP_ANDB ( SIY         ) ) /* ANDB siy    */
+OP(135,OP_ANDB ( DX          ) ) /* ANDB dx     */
+OP(137,OP_ANDB ( DLIY        ) ) /* ANDB dliy   */
+OP(139,OP_ANDB ( AY          ) ) /* ANDB ay     */
+OP(13a,OP_INCB (             ) ) /* INB         */
+// 13b,TSB (TODO)
+OP(13d,OP_ANDB ( AX          ) ) /* ANDB ax     */
+OP(13f,OP_ANDB ( ALX         ) ) /* ANDB alx    */
+OP(141,OP_EORB ( DXI         ) ) /* EORB dxi    */
+OP(143,OP_EORB ( S           ) ) /* EORB s      */
+OP(145,OP_EORB ( D           ) ) /* EORB d      */
+OP(147,OP_EORB ( DLI         ) ) /* EORB dli    */
+OP(148,OP_PHAB (             ) ) /* PHB         */
+OP(149,OP_EORB ( IMM         ) ) /* EORB imm    */
+OP(14a,OP_LSRB (             ) ) /* LSRB acc    */
+OP(14d,OP_EORB ( A           ) ) /* EORB a      */
+OP(14f,OP_EORB ( AL          ) ) /* EORB al     */
+OP(151,OP_EORB ( DIY         ) ) /* EORB diy    */
+OP(152,OP_EORB ( DI          ) ) /* EORB di     */
+OP(153,OP_EORB ( SIY         ) ) /* EORB siy    */
+OP(155,OP_EORB ( DX          ) ) /* EORB dx     */
+OP(157,OP_EORB ( DLIY        ) ) /* EORB dliy   */
+OP(159,OP_EORB ( AY          ) ) /* EORB ay     */
+// 15b,TBD (TODO)
+OP(15d,OP_EORB ( AX          ) ) /* EORB ax     */
+OP(15f,OP_EORB ( ALX         ) ) /* EORB alx    */
+OP(161,OP_ADCB ( DXI         ) ) /* ADCB dxi    */
+OP(163,OP_ADCB ( S           ) ) /* ADCB s      */
+OP(165,OP_ADCB ( D           ) ) /* ADCB d      */
+OP(167,OP_ADCB ( DLI         ) ) /* ADCB dli    */
+OP(168,OP_PLAB (             ) ) /* PLB         */
+OP(169,OP_ADCB ( IMM         ) ) /* ADCB imm    */
+OP(16a,OP_RORB (             ) ) /* ROR Bacc    */
+OP(16d,OP_ADCB ( A           ) ) /* ADCB a      */
+OP(16f,OP_ADCB ( AL          ) ) /* ADCB al     */
+OP(171,OP_ADCB ( DIY         ) ) /* ADCB diy    */
+OP(172,OP_ADCB ( DI          ) ) /* ADCB di     */
+OP(173,OP_ADCB ( SIY         ) ) /* ADCB siy    */
+OP(175,OP_ADCB ( DX          ) ) /* ADCB dx     */
+OP(177,OP_ADCB ( DLIY        ) ) /* ADCB dliy   */
+OP(179,OP_ADCB ( AY          ) ) /* ADCB ay     */
+// 17b,TDB (TODO)
+OP(17d,OP_ADCB ( AX          ) ) /* ADCB ax     */
+OP(17f,OP_ADCB ( ALX         ) ) /* ADCB alx    */
+OP(181,OP_STB  ( DXI         ) ) /* STB dxi     */
+OP(183,OP_STB  ( S           ) ) /* STB s       */
+OP(185,OP_STB  ( D           ) ) /* STB d       */
+OP(187,OP_STB  ( DLI         ) ) /* STB dli     */
+OP(18a,OP_TXB  ( REG_X       ) ) /* TXB         */
+OP(18d,OP_STB  ( A           ) ) /* STB a       */
+OP(18f,OP_STB  ( AL          ) ) /* STB al      */
+OP(191,OP_STB  ( DIY         ) ) /* STB diy     */
+OP(192,OP_STB  ( DI          ) ) /* STB di      */
+OP(193,OP_STB  ( SIY         ) ) /* STB siy     */
+OP(195,OP_STB  ( DX          ) ) /* STB dx      */
+OP(197,OP_STB  ( DLIY        ) ) /* STB dliy    */
+OP(198,OP_TXB  ( REG_Y       ) ) /* TYB         */
+OP(199,OP_STB  ( AY          ) ) /* STB ay      */
+OP(19d,OP_STB  ( AX          ) ) /* STB ax      */
+OP(19f,OP_STB  ( ALX         ) ) /* STB alx     */
+OP(1a1,OP_LDB  ( DXI         ) ) /* LDB dxi     */
+OP(1a3,OP_LDB  ( S           ) ) /* LDB s       */
+OP(1a5,OP_LDB  ( D           ) ) /* LDB d       */
+OP(1a7,OP_LDB  ( DLI         ) ) /* LDB dli     */
+OP(1a8,OP_TBX  ( REG_Y       ) ) /* TBY         */
+OP(1a9,OP_LDB  ( IMM         ) ) /* LDB imm     */
+OP(1aa,OP_TBX  ( REG_X       ) ) /* TBX         */
+OP(1ad,OP_LDB  ( A           ) ) /* LDB a       */
+OP(1af,OP_LDB  ( AL          ) ) /* LDB al      */
+OP(1b1,OP_LDB  ( DIY         ) ) /* LDB diy     */
+OP(1b2,OP_LDB  ( DI          ) ) /* LDB di      */
+OP(1b3,OP_LDB  ( SIY         ) ) /* LDB siy     */
+OP(1b5,OP_LDB  ( DX          ) ) /* LDB dx      */
+OP(1b7,OP_LDB  ( DLIY        ) ) /* LDB dliy    */
+OP(1b9,OP_LDB  ( AY          ) ) /* LDB ay      */
+OP(1bd,OP_LDB  ( AX          ) ) /* LDB ax      */
+OP(1bf,OP_LDB  ( ALX         ) ) /* LDB alx     */
+OP(1c1,OP_CMPB ( DXI         ) ) /* CMPB dxi    */
+OP(1c3,OP_CMPB ( S           ) ) /* CMPB s      */
+OP(1c5,OP_CMPB ( D           ) ) /* CMPB d      */
+OP(1c7,OP_CMPB ( DLI         ) ) /* CMPB dli    */
+OP(1c9,OP_CMPB ( IMM         ) ) /* CMPB imm    */
+OP(1cd,OP_CMPB ( A           ) ) /* CMPB a      */
+OP(1cf,OP_CMPB ( AL          ) ) /* CMPB al     */
+OP(1d1,OP_CMPB ( DIY         ) ) /* CMPB diy    */
+OP(1d2,OP_CMPB ( DI          ) ) /* CMPB di     */
+OP(1d3,OP_CMPB ( SIY         ) ) /* CMPB siy    */
+OP(1d5,OP_CMPB ( DX          ) ) /* CMPB dx     */
+OP(1d7,OP_CMPB ( DLIY        ) ) /* CMPB dliy   */
+OP(1d9,OP_CMPB ( AY          ) ) /* CMPB ay     */
+OP(1dd,OP_CMPB ( AX          ) ) /* CMPB ax     */
+OP(1df,OP_CMPB ( ALX         ) ) /* CMPB alx    */
+OP(1e1,OP_SBCB ( DXI         ) ) /* SBCB dxi    */
+OP(1e3,OP_SBCB ( S           ) ) /* SBCB s      */
+OP(1e5,OP_SBCB ( D           ) ) /* SBCB d      */
+OP(1e7,OP_SBCB ( DLI         ) ) /* SBCB dli    */
+OP(1e9,OP_SBCB ( IMM         ) ) /* SBCB imm    */
+OP(1ed,OP_SBCB ( A           ) ) /* SBCB a      */
+OP(1ef,OP_SBCB ( AL          ) ) /* SBCB al     */
+OP(1f1,OP_SBCB ( DIY         ) ) /* SBCB diy    */
+OP(1f2,OP_SBCB ( DI          ) ) /* SBCB di     */
+OP(1f3,OP_SBCB ( SIY         ) ) /* SBCB siy    */
+OP(1f5,OP_SBCB ( DX          ) ) /* SBCB dx     */
+OP(1f7,OP_SBCB ( DLIY        ) ) /* SBCB dliy   */
+OP(1f9,OP_SBCB ( AY          ) ) /* SBCB ay     */
+OP(1fd,OP_SBCB ( AX          ) ) /* SBCB ax     */
+OP(1ff,OP_SBCB ( ALX         ) ) /* SBCB alx    */
+
+OP(200,OP_UNIMP(             ) ) /* unimplemented */
+
+/* multiply/divide */
+OP(201,OP_MPY  ( DXI         ) ) /* MPY dxi     */
+OP(203,OP_MPY  ( S           ) ) /* MPY s       */
+OP(205,OP_MPY  ( D           ) ) /* MPY d       */
+OP(207,OP_MPY  ( DLI         ) ) /* MPY dli     */
+OP(209,OP_MPY  ( IMM         ) ) /* MPY imm     */
+OP(20d,OP_MPY  ( A           ) ) /* MPY a       */
+OP(20f,OP_MPY  ( AL          ) ) /* MPY al      */
+OP(211,OP_MPY  ( DIY         ) ) /* MPY diy     */
+OP(212,OP_MPY  ( DI          ) ) /* MPY di      */
+OP(213,OP_MPY  ( SIY         ) ) /* MPY siy     */
+OP(215,OP_MPY  ( DX          ) ) /* MPY dx      */
+OP(217,OP_MPY  ( DLIY        ) ) /* MPY dliy    */
+OP(219,OP_MPY  ( AY          ) ) /* MPY ay      */
+OP(21d,OP_MPY  ( AX          ) ) /* MPY ax      */
+OP(21f,OP_MPY  ( ALX         ) ) /* MPY alx     */
+OP(221,OP_DIV  ( DXI         ) ) /* DIV dxi     */
+OP(223,OP_DIV  ( S           ) ) /* DIV s       */
+OP(225,OP_DIV  ( D           ) ) /* DIV d       */
+OP(227,OP_DIV  ( DLI         ) ) /* DIV dli     */
+OP(228,OP_XAB  (             ) ) /* XAB         */
+OP(229,OP_DIV  ( IMM         ) ) /* DIV imm     */
+OP(22d,OP_DIV  ( A           ) ) /* DIV a       */
+OP(22f,OP_DIV  ( AL          ) ) /* DIV al      */
+OP(231,OP_DIV  ( DIY         ) ) /* DIV diy     */
+OP(232,OP_DIV  ( DI          ) ) /* DIV di      */
+OP(233,OP_DIV  ( SIY         ) ) /* DIV siy     */
+OP(235,OP_DIV  ( DX          ) ) /* DIV dx      */
+OP(237,OP_DIV  ( DLIY        ) ) /* DIV dliy    */
+OP(239,OP_DIV  ( AY          ) ) /* DIV ay      */
+OP(23d,OP_DIV  ( AX          ) ) /* DIV ax      */
+OP(23f,OP_DIV  ( ALX         ) ) /* DIV alx     */
+OP(249,OP_RLA  ( IMM         ) ) /* RLA imm     */
+OP(2c2,OP_LDT  ( IMM         ) ) /* LDT imm     */
+// note: block 28x-2bx is for 7750 opcodes, not implemented yet
 
 extern TABLE_OPCODES;
 TABLE_OPCODES =
+//    00     01     02     03     04     05     06     07
+//    08     09     0a     0b     0c     0d     0e     0f
 {
-	O(00),O(01),O(02),O(03),O(04),O(05),O(06),O(07),
-	O(08),O(09),O(0a),O(0b),O(0c),O(0d),O(0e),O(0f),
-	O(10),O(11),O(12),O(13),O(14),O(15),O(16),O(17),
-	O(18),O(19),O(1a),O(1b),O(1c),O(1d),O(1e),O(1f),
-	O(20),O(21),O(22),O(23),O(24),O(25),O(26),O(27),
-	O(28),O(29),O(2a),O(2b),O(2c),O(2d),O(2e),O(2f),
-	O(30),O(31),O(32),O(33),O(34),O(35),O(36),O(37),
-	O(38),O(39),O(3a),O(3b),O(3c),O(3d),O(3e),O(3f),
-	O(40),O(41),O(42),O(43),O(44),O(45),O(46),O(47),
-	O(48),O(49),O(4a),O(4b),O(4c),O(4d),O(4e),O(4f),
-	O(50),O(51),O(52),O(53),O(54),O(55),O(56),O(57),
-	O(58),O(59),O(5a),O(5b),O(5c),O(5d),O(5e),O(5f),
-	O(60),O(61),O(62),O(63),O(64),O(65),O(66),O(67),
-	O(68),O(69),O(6a),O(6b),O(6c),O(6d),O(6e),O(6f),
-	O(70),O(71),O(72),O(73),O(74),O(75),O(76),O(77),
-	O(78),O(79),O(7a),O(7b),O(7c),O(7d),O(7e),O(7f),
-	O(80),O(81),O(82),O(83),O(84),O(85),O(86),O(87),
-	O(88),O(89),O(8a),O(8b),O(8c),O(8d),O(8e),O(8f),
-	O(90),O(91),O(92),O(93),O(94),O(95),O(96),O(97),
-	O(98),O(99),O(9a),O(9b),O(9c),O(9d),O(9e),O(9f),
-	O(a0),O(a1),O(a2),O(a3),O(a4),O(a5),O(a6),O(a7),
-	O(a8),O(a9),O(aa),O(ab),O(ac),O(ad),O(ae),O(af),
-	O(b0),O(b1),O(b2),O(b3),O(b4),O(b5),O(b6),O(b7),
-	O(b8),O(b9),O(ba),O(bb),O(bc),O(bd),O(be),O(bf),
-	O(c0),O(c1),O(c2),O(c3),O(c4),O(c5),O(c6),O(c7),
-	O(c8),O(c9),O(ca),O(cb),O(cc),O(cd),O(ce),O(cf),
-	O(d0),O(d1),O(d2),O(d3),O(d4),O(d5),O(d6),O(d7),
-	O(d8),O(d9),O(da),O(db),O(dc),O(dd),O(de),O(df),
-	O(e0),O(e1),O(e2),O(e3),O(e4),O(e5),O(e6),O(e7),
-	O(e8),O(e9),O(ea),O(eb),O(ec),O(ed),O(ee),O(ef),
-	O(f0),O(f1),O(f2),O(f3),O(f4),O(f5),O(f6),O(f7),
-	O(f8),O(f9),O(fa),O(fb),O(fc),O(fd),O(fe),O(ff)
+	O(00), O(01), O(02), O(03), O(04), O(05), O(06), O(07), 	// 00
+	O(08), O(09), O(0a), O(0b), O(0c), O(0d), O(0e), O(0f), 
+	O(10), O(11), O(12), O(13), O(14), O(15), O(16), O(17), 	// 10
+	O(18), O(19), O(1a), O(1b), O(1c), O(1d), O(1e), O(1f), 
+	O(20), O(21), O(22), O(23), O(24), O(25), O(26), O(27), 	// 20
+	O(28), O(29), O(2a), O(2b), O(2c), O(2d), O(2e), O(2f), 
+	O(30), O(31), O(32), O(33), O(34), O(35), O(36), O(37), 	// 30
+	O(38), O(39), O(3a), O(3b), O(3c), O(3d), O(3e), O(3f), 
+	O(40), O(41), O(42), O(43), O(44), O(45), O(46), O(47), 	// 40
+	O(48), O(49), O(4a), O(4b), O(4c), O(4d), O(4e), O(4f), 
+	O(50), O(51), O(52), O(53), O(54), O(55), O(56), O(57), 	// 50
+	O(58), O(59), O(5a), O(5b), O(5c), O(5d), O(5e), O(5f), 
+	O(60), O(61), O(62), O(63), O(64), O(65), O(66), O(67), 	// 60
+	O(68), O(69), O(6a), O(6b), O(6c), O(6d), O(6e), O(6f), 
+	O(70), O(71), O(72), O(73), O(74), O(75), O(76), O(77), 	// 70
+	O(78), O(79), O(7a), O(7b), O(7c), O(7d), O(7e), O(7f), 
+	O(80), O(81), O(82), O(83), O(84), O(85), O(86), O(87), 	// 80
+	O(88), O(89), O(8a), O(8b), O(8c), O(8d), O(8e), O(8f), 
+	O(90), O(91), O(92), O(93), O(94), O(95), O(96), O(97), 	// 90
+	O(98), O(99), O(9a), O(9b), O(9c), O(9d), O(9e), O(9f), 
+	O(a0), O(a1), O(a2), O(a3), O(a4), O(a5), O(a6), O(a7), 	// a0
+	O(a8), O(a9), O(aa), O(ab), O(ac), O(ad), O(ae), O(af), 
+	O(b0), O(b1), O(b2), O(b3), O(b4), O(b5), O(b6), O(b7), 	// b0
+	O(b8), O(b9), O(ba), O(bb), O(bc), O(bd), O(be), O(bf), 
+	O(c0), O(c1), O(c2), O(c3), O(c4), O(c5), O(c6), O(c7), 	// c0
+	O(c8), O(c9), O(ca), O(cb), O(cc), O(cd), O(ce), O(cf), 
+	O(d0), O(d1), O(d2), O(d3), O(d4), O(d5), O(d6), O(d7), 	// d0
+	O(d8), O(d9), O(da), O(db), O(dc), O(dd), O(de), O(df), 
+	O(e0), O(e1), O(e2), O(e3), O(e4), O(e5), O(e6), O(e7), 	// e0
+	O(e8), O(e9), O(ea), O(eb), O(ec), O(ed), O(ee), O(ef), 
+	O(f0), O(f1), O(f2), O(f3), O(f4), O(f5), O(f6), O(f7), 	// f0
+	O(f8), O(f9), O(fa), O(fb), O(fc), O(fd), O(fe), O(ff)
 };
 
 extern TABLE_OPCODES2;
 TABLE_OPCODES2 =
+//    00     01     02     03     04     05     06     07
+//    08     09     0a     0b     0c     0d     0e     0f
 {
-	O(200),O(101),O(200),O(103),O(200),O(105),O(200),O(107),
+	O(200),O(101),O(200),O(103),O(200),O(105),O(200),O(107),	// 00
 	O(200),O(109),O(10a),O(200),O(200),O(10d),O(200),O(10f),
 	O(200),O(111),O(112),O(113),O(200),O(115),O(200),O(117),	// 10
 	O(200),O(119),O(11a),O(200),O(200),O(11d),O(200),O(11f),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 20
-	O(200),O(129),O(12a),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 30
-	O(200),O(200),O(13a),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 40
-	O(148),O(149),O(14a),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 50
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),
+	O(200),O(121),O(200),O(123),O(200),O(125),O(200),O(127),	// 20
+	O(200),O(129),O(12a),O(200),O(200),O(12d),O(200),O(12f),
+	O(200),O(131),O(132),O(133),O(200),O(135),O(200),O(137),	// 30
+	O(200),O(139),O(13a),O(200),O(200),O(13d),O(200),O(13f),
+	O(200),O(141),O(200),O(143),O(200),O(145),O(200),O(147),	// 40
+	O(148),O(149),O(14a),O(200),O(200),O(14d),O(200),O(14f),
+	O(200),O(151),O(152),O(153),O(200),O(155),O(200),O(157),	// 50
+	O(200),O(159),O(200),O(200),O(200),O(15d),O(200),O(15f),
 	O(200),O(161),O(200),O(163),O(200),O(165),O(200),O(167),	// 60
 	O(168),O(169),O(16a),O(200),O(200),O(16d),O(200),O(16f),
 	O(200),O(171),O(172),O(173),O(200),O(175),O(200),O(177),	// 70
@@ -2739,31 +2824,33 @@ TABLE_OPCODES2 =
 	O(200),O(200),O(18a),O(200),O(200),O(18d),O(200),O(18f),
 	O(200),O(191),O(192),O(193),O(200),O(195),O(200),O(197),	// 90
 	O(198),O(199),O(200),O(200),O(200),O(19d),O(200),O(19f),
-	O(200),O(1a1),O(200),O(200),O(200),O(1a5),O(200),O(200),	// a0
-	O(1a8),O(1a9),O(1aa),O(200),O(200),O(1ad),O(200),O(200),
-	O(200),O(200),O(1b2),O(200),O(200),O(1b5),O(200),O(200),	// b0
-	O(200),O(1b9),O(200),O(200),O(200),O(1bd),O(200),O(200),
+	O(200),O(1a1),O(200),O(1a3),O(200),O(1a5),O(200),O(1a7),	// a0
+	O(1a8),O(1a9),O(1aa),O(200),O(200),O(1ad),O(200),O(1af),
+	O(200),O(1b1),O(1b2),O(1b3),O(200),O(1b5),O(200),O(1b7),	// b0
+	O(200),O(1b9),O(200),O(200),O(200),O(1bd),O(200),O(1bf),
 	O(200),O(1c1),O(200),O(1c3),O(200),O(1c5),O(200),O(1c7),	// c0
 	O(200),O(1c9),O(200),O(200),O(200),O(1cd),O(200),O(1cf),
 	O(200),O(1d1),O(1d2),O(1d3),O(200),O(1d5),O(200),O(1d7),	// d0
 	O(200),O(1d9),O(200),O(200),O(200),O(1dd),O(200),O(1df),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// e0
-	O(200),O(1e9),O(200),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(1f5),O(200),O(200),	// f0
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200)
+	O(200),O(1e1),O(200),O(1e3),O(200),O(1e5),O(200),O(1e7),	// e0
+	O(200),O(1e9),O(200),O(200),O(200),O(1ed),O(200),O(1ef),
+	O(200),O(1f1),O(1f2),O(1f3),O(200),O(1f5),O(200),O(1f7),	// f0
+	O(200),O(1f9),O(200),O(200),O(200),O(1fd),O(200),O(1ff)
 };
 
 extern TABLE_OPCODES3;
 TABLE_OPCODES3 =
+//    00     01     02     03     04     05     06     07
+//    08     09     0a     0b     0c     0d     0e     0f
 {
-	O(200),O(200),O(200),O(203),O(200),O(205),O(200),O(200),
-	O(200),O(209),O(200),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(215),O(200),O(200),	// 10
-	O(200),O(219),O(200),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(225),O(200),O(200),	// 20
-	O(228),O(200),O(200),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(235),O(200),O(200),	// 30
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),
+	O(200),O(201),O(200),O(203),O(200),O(205),O(200),O(207),	// 00
+	O(200),O(209),O(200),O(200),O(200),O(20d),O(200),O(20f),
+	O(200),O(211),O(212),O(213),O(200),O(215),O(200),O(217),	// 10
+	O(200),O(219),O(200),O(200),O(200),O(21d),O(200),O(21f),
+	O(200),O(221),O(200),O(223),O(200),O(225),O(200),O(227),	// 20
+	O(228),O(229),O(200),O(200),O(200),O(22d),O(200),O(22f),
+	O(200),O(231),O(232),O(233),O(200),O(235),O(200),O(237),	// 30
+	O(200),O(239),O(200),O(200),O(200),O(23d),O(200),O(23f),
 	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 40
 	O(200),O(249),O(200),O(200),O(200),O(200),O(200),O(200),
 	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 50
