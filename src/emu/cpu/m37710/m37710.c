@@ -458,11 +458,9 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 			return cpustate->io->read_byte(M37710_ADC7_L);
 		case 0x2f:
 			return cpustate->io->read_byte(M37710_ADC7_H);
+
 		case 0x35:
 			return 0xff;	// UART control
-
-		case 0x70:	// A/D IRQ control
-			return cpustate->m37710_regs[offset] | 8;
 	}
 
 	return cpustate->m37710_regs[offset];
