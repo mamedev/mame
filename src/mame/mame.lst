@@ -9573,7 +9573,7 @@ j6framft	// Frame & Fortune Club (Jpm)
 j6frtmch	// Fruit Machine, The (Jpm)
 j6frtpot	// Fruitpots (Qps)
 j6gforce	// G Force (Jpm)
-j6gfrceb	// G Force (Jpm) 15GBP
+j6gforceb	// G Force (Jpm) 15GBP
 j6gidogh	// G.I. Dough (Ace)
 j6guab		// Give Us A Break (Jpm)
 j6guabcl	// Give Us A Break Club (Jpm)
@@ -9586,7 +9586,7 @@ j6goldgl	// Golden Goal (Jpm)
 j6hapyhr	// Happy Hour (Jpm)
 j6hifly		// Hi Flyer (Ace)
 j6impact	// Hi Impact (Jpm)
-j6impctb	// Hi Impact (Jpm) 15GBP
+j6impactb	// Hi Impact (Jpm) 15GBP
 j6hilosv	// Hi Lo Silver (Jpm)
 j6hirol		// Hi Roller (Jpm)
 j6hirlcl	// Hi Roller Club (Jpm)
@@ -9617,8 +9617,8 @@ j6montlk	// Money Talks (Jpm)
 j6mono60	// Monopoly 60th Anniversary Edition (Jpm)
 j6monobn	// Monopoly Bingo (Jpm)
 j6outlaw	// Outlaw (Jpm)
-j6outlwc	// Outlaw (Jpm) Club?
-j6outlwd	// Outlaw (Jpm) Protocol
+j6outlawc	// Outlaw (Jpm) Club?
+j6outlawd	// Outlaw (Jpm) Protocol
 j6oxo		// Oxo (Jpm)
 j6oxobin	// Oxo Bingo (Jpm)
 j6pacman	// Pac Man Plus (Qps)
@@ -9639,7 +9639,7 @@ j6rager		// Red Alert (Jpm) [German]
 j6ra		// Red Alert (Jpm)
 j6raclb		// Red Alert Club (Jpm)
 j6redarw	// Red Arrow (Jpm)
-j6rdarww	// Red Arrow (Whitbread / Jpm)
+j6redarww	// Red Arrow (Whitbread / Jpm)
 j6reddmn	// Red Demon (Jpm)
 j6rh6		// Red Hot 6 (Jpm)
 j6rhchil	// Red Hot Chili Stepper (Ace)
@@ -9734,13 +9734,13 @@ cluedod			// (c) 1995
 cluedo2c		// (c) 1995
 cluedo2			// (c) 1995
 trivialp		// (c) 1996
-trivalpd		// (c) 1996
+trivialpd		// (c) 1996
 scrabble		// (c) 1997
-scrabbld		// (c) 1997
+scrabbled		// (c) 1997
 hngmnjpm		// (c) 1998
-hngmjpmd		// (c) 1998
+hngmnjpmd		// (c) 1998
 coronatn		// (c) 1999
-corontnd		// (c) 1999
+coronatnd		// (c) 1999
 tqst			// (c) ACE?
 snlad			// (c) 199?
 
@@ -13111,7 +13111,7 @@ m4hvhel		// Heaven & Hell (Bwb)
 m4holywd	// Hollywood (Bwb)
 m4indycr	// Indy Cars (Bwb)
 m4jakjok	// Jackpot Jokers (Bwb)
-m4jakjka
+m4jakjoka
 m4jflash	// Jumping Jack Flash (Bwb)
 m4kingq		// Kings & Queens (Bwb)
 m4kingqc	// Kings & Queens Classic (Bwb)
@@ -13740,9 +13740,10 @@ m5casfev	// Casino Fever (Red Gaming)
 m5dmnstr	// Demon Streak (Barcrest - Red Gaming)
 m5dmnstra	//
 m5dbubl		// Double Bubble (Barcrest - Red Gaming)
-m5ddrag		// Double Dragon (Barcrest - Red Gaming)
+m5dragnd	// Dragon Drop (Barcrest - Red Gaming)
+m5dragnda
 m5fnfair	// Funfair (Barcrest - Red Gaming)
-m5fnfard	//
+m5fnfaird	//
 m5fusir		// Fruits U Sir (Barcrest - Red Gaming)
 m5fusira	//
 m5hypalx	// Hypalinx (Barcrest - Red Gaming)

@@ -622,6 +622,8 @@ ROM_START( ep_grun )
 	// there appears to be an older game (maygay m1ab? hardware) of the same name, these samples MIGHT come from that.
 	ROM_LOAD( "gridrunnersound0.bin", 0x000000, 0x080000, CRC(dc8f0bbb) SHA1(a375eff2fa5d109491479e050c5267ae73f63ebc) )
 	ROM_LOAD( "gridrunnersound1.bin", 0x080000, 0x080000, CRC(d965860b) SHA1(ceaabf092777c50035baf13545a0280047d530ae) )
+	// this is verified EPOCH, but has no partner
+	ROM_LOAD( "grid run.s0", 0x0000, 0x080000, CRC(9c8938ef) SHA1(f6bc299097c64984cb8356d62bf935582b86d6bc) )
 ROM_END
 
 

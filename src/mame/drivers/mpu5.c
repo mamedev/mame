@@ -1526,7 +1526,7 @@ ROM_START( m5fnfair )
 	ROM_LOAD16_BYTE( "funfair.p4", 0x100001, 0x080000, CRC(60b56e14) SHA1(6a8a356e127178ce5abf105d47c970cb2c100561) )
 ROM_END
 
-ROM_START( m5fnfard )
+ROM_START( m5fnfaird )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "f_fair.p1d", 0x000000, 0x080000, CRC(f0097df8) SHA1(3d17638b4ab812c29d366570732beeb67315be89) )
 	ROM_LOAD16_BYTE( "f_fair.p2d", 0x000001, 0x080000, CRC(20d55e77) SHA1(c1158d7e95e7575debd341f8bdecaae44405e0ed) )
@@ -4739,6 +4739,7 @@ ROM_START( m5devil ) // devil_of_a_deal_(vivid)_[c01_800_25jp].hex
 
 	ROM_REGION( 0x400000, "altrevs", 0 )
 	ROM_LOAD( "devil_de.p1", 0x0000, 0x080000, CRC(0b8408f7) SHA1(7460a4619fe2217e99d360121c45eb680a3a3e3a) )
+	ROM_LOAD( "deal2.2p1", 0x0000, 0x080000, CRC(e1f2dc1d) SHA1(629d82e2bb9e1c6a1bc961e54edea87d070b93cd) )
 
 ROM_END
 
@@ -5556,12 +5557,17 @@ ROM_START( m5dbubl )
 ROM_END
 
 
-ROM_START( m5ddrag )
+ROM_START( m5dragnd )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "dragon_d.p1", 0x000000, 0x080000, CRC(ae4f778b) SHA1(0fab7173f9da64fb5ff15452aa9249ebefd40ae2) )
 	ROM_LOAD( "dragon_d.p2", 0x000001, 0x080000, CRC(d56f498c) SHA1(01ddeba4154826f4608ae7c37256e43d55210120) )
 ROM_END
 
+ROM_START( m5dragnda )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "drop_pound5.p1", 0x000000, 0x080000, CRC(197bc0b3) SHA1(02949cd86a4d4569a540d11f8bda1d49d4e94c2f) )
+	ROM_LOAD( "drop_pound5.p2", 0x000001, 0x080000, CRC(cdb76803) SHA1(69534f33ab2dac80049c566d385cf67a9feff343) )
+ROM_END
 
 ROM_START( m5ttwo )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -5728,9 +5734,10 @@ GAME( 199?, m5casfev	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Casino 
 GAME( 199?, m5dmnstr	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5dmnstra	,m5dmnstr,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5dbubl		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Double Bubble (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m5ddrag		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Double Dragon (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5dragnd	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5dragnda	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fnfair	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m5fnfard	,m5fnfair,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5) (Datapak)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5fnfaird	,m5fnfair,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5) (Datapak)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fusir		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fusira	,m5fusir,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5hypalx	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Hypalinx (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5768,7 +5775,7 @@ GAME( 199?, m5card		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Card Shark (Vivid) (MPU5
 GAME( 199?, m5cshkcb	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5clifhn	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Cliffhanger (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5cnct4		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m5devil		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Devil Of A  Deal (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5devil		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Devil Of A Deal (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5elband	,0,			mpu5, mpu5, 0, ROT0, "Vivid","El Bandido Club (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fair		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Fairground Attraction (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5ggems		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Giant Gems (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
