@@ -3612,15 +3612,11 @@ ROM_START( gigaman2 )
 	ROM_REGION(0x10000, "mcu", 0 )      /* sound MCU code */
 	ROM_LOAD( "89c4051.bin", 0x000000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x1000000, "gfx", 0 )
-	/* you can use the original CPS2 gfx roms, but the 'GIGA part of GIGAMAN2 is missing, on real HW it isn't, roms are different */
-//  ROMX_LOAD( "rm2.14m",  0x800000, 0x200000, CRC(9b1f00b4) SHA1(c1c5c2d9d00121425ae6598444d704f420ef4eef) , ROM_GROUPWORD | ROM_SKIP(6) )
-//  ROMX_LOAD( "rm2.16m",  0x800002, 0x200000, CRC(c2bb0c24) SHA1(38724c49d9db49765a4ed9bc2dc8f57cec45ec7c) , ROM_GROUPWORD | ROM_SKIP(6) )
-//  ROMX_LOAD( "rm2.18m",  0x800004, 0x200000, CRC(12257251) SHA1(20cb58afda0e6200991277817485340a6a41ae2b) , ROM_GROUPWORD | ROM_SKIP(6) )
-//  ROMX_LOAD( "rm2.20m",  0x800006, 0x200000, CRC(f9b6e786) SHA1(aeb4acff7208e66a35198143fd2478039fdaa3a6) , ROM_GROUPWORD | ROM_SKIP(6) )
-	/* TODO: understand the proper ROM loading and gfxdecoding */
-    ROM_LOAD32_WORD( "cg_rom1.bin",  0x0000000, 0x800000, CRC(ed55a641) SHA1(fa798779a3787317937a646047620b1c0dbe102a) )
-    ROM_LOAD32_WORD( "cg_rom2.bin",  0x0000002, 0x800000, CRC(63918c05) SHA1(3a7fdf88e87bdbc622504276287740c08df38f6f) )
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD( "cg_rom1.bin",  0x0000000, 0x400000, CRC(ed55a641) SHA1(fa798779a3787317937a646047620b1c0dbe102a) )
+	ROM_IGNORE( 0x400000 )
+	ROM_LOAD( "cg_rom2.bin",  0x0400000, 0x400000, CRC(63918c05) SHA1(3a7fdf88e87bdbc622504276287740c08df38f6f) )
+	ROM_IGNORE( 0x400000 )
 
 	ROM_REGION( 0x800000, "oki", 0 ) /* QSound samples */
 	/* No Qsound, OKI instead.. */
@@ -8038,12 +8034,31 @@ static WRITE16_HANDLER( gigaman2_dummyqsound_w )
 	state->m_gigaman2_dummyqsound_ram[offset] = data;
 };
 
+/* rearrange the graphics data into the normal order */
+static void gigaman2_gfx_reorder(running_machine &machine)
+{
+	int i;
+	int length = machine.region( "gfx" )->bytes();
+	UINT16 *rom = (UINT16 *)machine.region("gfx")->base();
+	UINT16 *buf = auto_alloc_array(machine, UINT16, length );
+
+	memcpy (buf, rom, length);
+
+	for (i = 0; i < length/2; i++) {
+		rom[i] = buf[((i & ~7) >> 2) | ((i & 4) << 18) | ((i & 2) >> 1) | ((i & 1) << 21)];
+	}
+
+	auto_free( machine, buf );
+}
+
 static DRIVER_INIT( gigaman2 )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 	int length = machine.region("maincpu")->bytes();
+
+	gigaman2_gfx_reorder(machine);
 
 	DRIVER_INIT_CALL(cps2);
 
@@ -8333,13 +8348,6 @@ GAME( 2001, progeara,   progear,  cps2, cps2_2p3b, cps2,     ROT0,   "Cave (Capc
 
  This may not be a complete list of sets, it was taken from MamePlus.  Other sets, and
  further customized bootlegs boards are known to exist.
-
- ------------------------
- Other bootlegs
- ------------------------
-
- There is a bootleg of Megaman 2 called 'Gigaman 2' which has SMT roms, and replaces
- the Qsound hardware with an OKI6295 / AD-65 chip.  No known complete dump exists.
 
 */
 
@@ -9631,7 +9639,7 @@ GAME( 1996, sfz2jd,   sfa2,     dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg"
 GAME( 1996, spf2td,   spf2t,    dead_cps2, cps2_2p2b, cps2,    ROT0,   "bootleg", "Super Puzzle Fighter II Turbo (USA 960620 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, spf2xjd,  spf2t,    dead_cps2, cps2_2p2b, cps2,    ROT0,   "bootleg", "Super Puzzle Fighter II X (Japan 960531 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, ddsomud,  ddsom,    dead_cps2, cps2_4p4b, cps2,    ROT0,   "bootleg", "Dungeons & Dragons: Shadow over Mystara (USA 960619 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1996, gigaman2, megaman2, gigaman2,  cps2_2p3b, gigaman2,ROT0,   "bootleg", "Giga Man 2: The Power Fighters (bootleg of Mega Man 2: The Power Fighters)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // flash roms aren't dumped, layer offsets different, different sound system
+GAME( 1996, gigaman2, megaman2, gigaman2,  cps2_2p3b, gigaman2,ROT0,   "bootleg", "Giga Man 2: The Power Fighters (bootleg of Mega Man 2: The Power Fighters)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // different layer offsets and sound system
 GAME( 1996, megamn2d, megaman2, dead_cps2, cps2_2p3b, cps2,    ROT0,   "bootleg", "Mega Man 2: The Power Fighters (USA 960708 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, sfz2ald,  sfz2al,   dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "Street Fighter Zero 2 Alpha (Asia 960826 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsfu1d, xmvsf,    dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "X-Men Vs. Street Fighter (USA 961004 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )

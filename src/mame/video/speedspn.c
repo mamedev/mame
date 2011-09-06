@@ -74,6 +74,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		int ypos = source[3];
 		int color;
 
+		if (!attr && xpos) break; // end of sprite list marker?
+
 		if (attr&0x10) xpos +=0x100;
 
 		xpos = 0x1f8-xpos;

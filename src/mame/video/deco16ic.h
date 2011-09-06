@@ -90,4 +90,7 @@ void deco16ic_set_pf1_8bpp_mode(device_t *device, int mode);
 /* used by stoneage */
 void deco16ic_set_scrolldx(device_t *device, int tmap, int size, int dx, int dx_if_flipped);
 
+/* used by cninjabl */
+void deco16ic_set_enable( device_t *device, int tmap, int enable );
+
 #endif

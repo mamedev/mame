@@ -551,6 +551,17 @@ void deco16ic_set_scrolldx( device_t *device, int tmap, int size, int dx, int dx
 	}
 }
 
+/* cninjabl does not enable background layers */
+void deco16ic_set_enable( device_t *device, int tmap, int enable )
+{
+	deco16ic_state *deco16ic = get_safe_token(device);
+
+	int shift = (tmap & 1) ? 15 : 7;
+	deco16ic->pf12_control[5] &= ~(1 << shift);
+	deco16ic->pf12_control[5] |= (enable & 1) << shift;
+}
+
+
 /******************************************************************************/
 
 WRITE16_DEVICE_HANDLER( deco16ic_pf1_data_w )
@@ -586,7 +597,6 @@ READ16_DEVICE_HANDLER( deco16ic_pf2_data_r )
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->pf2_data[offset];
 }
-
 
 WRITE16_DEVICE_HANDLER( deco16ic_pf_control_w )
 {

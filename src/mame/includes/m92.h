@@ -52,3 +52,5 @@ WRITE16_HANDLER( m92_master_control_w );
 
 VIDEO_START( m92 );
 SCREEN_UPDATE( m92 );
+VIDEO_START( ppan );
+SCREEN_UPDATE( ppan );

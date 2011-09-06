@@ -150,6 +150,10 @@ SCREEN_UPDATE( cninjabl )
 	cninja_state *state = screen->machine().driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
+	/* force layers to be enabled */
+	deco16ic_set_enable(state->m_deco_tilegen2, 0, 1 );
+	deco16ic_set_enable(state->m_deco_tilegen2, 1, 1 );
+
 	flip_screen_set(screen->machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);

@@ -193,11 +193,6 @@ static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
 ADDRESS_MAP_END
 
-static WRITE16_HANDLER( cninjabl_soundlatch_w )
-{
-	// todo:
-}
-
 static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
@@ -217,7 +212,7 @@ static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x17ff22, 0x17ff23) AM_READ_PORT("DSW")
 	AM_RANGE(0x17ff28, 0x17ff29) AM_READ_PORT("IN1")
-	AM_RANGE(0x17ff2a, 0x17ff2b) AM_WRITE(cninjabl_soundlatch_w)
+	AM_RANGE(0x17ff2a, 0x17ff2b) AM_WRITE(stoneage_sound_w)
 	AM_RANGE(0x17ff2c, 0x17ff2d) AM_READ_PORT("IN0")
 
 	AM_RANGE(0x180000, 0x187fff) AM_RAM // more ram on bootleg?
@@ -2066,7 +2061,7 @@ GAME( 1991, cninja1,  cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Cor
 GAME( 1991, cninjau,  cninja,  cninja,   cninjau, cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)", GAME_SUPPORTS_SAVE )
 GAME( 1991, joemac,   cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, stoneage, cninja,  stoneage, cninja,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", GAME_SUPPORTS_SAVE )
-GAME( 1991, cninjabl, cninja,  cninjabl, cninja,  0,        ROT0, "bootleg", "Caveman Ninja (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1991, cninjabl, cninja,  cninjabl, cninja,  0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1991, robocop2, 0,       robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", GAME_SUPPORTS_SAVE )
 GAME( 1991, robocop2u,robocop2,robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", GAME_SUPPORTS_SAVE )
 GAME( 1991, robocop2j,robocop2,robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", GAME_SUPPORTS_SAVE )

@@ -7,7 +7,6 @@ Notes:
   e.g. BUTTON 1.
 
 TODO:
-- A couple of garbage sprites on the player selection screen
 - Unknown Port Writes:
   cpu #0 (PC=00000D88): unmapped port byte write to 00000001 = 02
   cpu #0 (PC=00006974): unmapped port byte write to 00000010 = 10
@@ -340,4 +339,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1994, speedspn, 0, speedspn, speedspn, 0, ROT180, "TCH", "Speed Spin", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, speedspn, 0, speedspn, speedspn, 0, ROT180, "TCH", "Speed Spin", 0 )
