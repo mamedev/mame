@@ -433,6 +433,7 @@ src/emu/cpu/sc61860/sctable.c svneol=native#text/plain
 src/emu/cpu/scmp/scmp.c svneol=native#text/plain
 src/emu/cpu/scmp/scmp.h svneol=native#text/plain
 src/emu/cpu/scmp/scmpdasm.c svneol=native#text/plain
+src/emu/cpu/scudsp/scudspdasm.c svneol=native#text/plain
 src/emu/cpu/se3208/se3208.c svneol=native#text/plain
 src/emu/cpu/se3208/se3208.h svneol=native#text/plain
 src/emu/cpu/se3208/se3208dis.c svneol=native#text/plain
