@@ -493,8 +493,8 @@ void airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* 
 	/* Hard-coded near and far clipping planes :( */
 	float nearZ = 1.0f;
 	float farZ = 10000.0f;
-	float left = -1.0f;
-	float right = 1.0f;
+	float left = 1.0f;
+	float right = -1.0f;
 	float bottom = (float)(-bottomExtent) / leftExtent;
 	float top = (float)(bottomExtent) / leftExtent;
 
