@@ -2823,7 +2823,8 @@ TABLE_FUNCTION(void, set_line, (m37710i_cpu_struct *cpustate, int line, int stat
 					{
 						cpustate->m37710_regs[m37710_irq_levels[line]] &= ~8;
 					}
-					return;
+					break;
+
 				case ASSERT_LINE:
 				case PULSE_LINE:
 				case HOLD_LINE:
@@ -2833,16 +2834,12 @@ TABLE_FUNCTION(void, set_line, (m37710i_cpu_struct *cpustate, int line, int stat
 						cpustate->m37710_regs[m37710_irq_levels[line]] |= 8;
 					}
 					break;
-			}
 
-			// if I flag is set, trip the WAI mechanism only (may not be totally accurate)
-			if(FLAG_I)
-			{
-				if(CPU_STOPPED & STOP_LEVEL_WAI)
-					CPU_STOPPED &= ~STOP_LEVEL_WAI;
-				return;
+				default: break;
 			}
-			return;
+			break;
+
+		default: break;
 	}
 }
 
