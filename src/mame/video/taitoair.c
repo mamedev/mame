@@ -518,6 +518,31 @@ WRITE16_HANDLER( dsp_rasterize_w )
 {
 	/* Does the pixel projection */
 	/* Presumably called when the eye coordinates are all loaded up in their x,y,z buffer */
+	#if 0
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
+
+	/* Construct a frustum from the system's most recently set left and bottom extents */
+	float m[16];
+	airInfernoFrustum(state->m_frustumLeft, state->m_frustumBottom, m);
+
+	int result[2];
+	projectEyeCoordToScreen(m,
+							32*16,	/* These are defined in the machine ctor */
+							28*16,  /* not sure how to get them here or if they're even correct */
+							state->m_eyecoordBuffer,
+							result);
+	#endif
+
+	/* Do not splat invalid results */
+	//if (result[0] == -1 && result[1] == -1)
+	//	return;
+
+	/* Splat a (any) non-translucent color */
+	//*BITMAP_ADDR16(state->m_buffer3d, result[1], result[0]) = 1;
+}
+
+READ16_HANDLER( dsp_x_return_r )
+{
 	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	/* Construct a frustum from the system's most recently set left and bottom extents */
@@ -531,15 +556,26 @@ WRITE16_HANDLER( dsp_rasterize_w )
 							state->m_eyecoordBuffer,
 							result);
 
-	/* Do not splat invalid results */
-	if (result[0] == -1 && result[1] == -1)
-		return;
-
-	/* Splat a (any) non-translucent color */
-	*BITMAP_ADDR16(state->m_buffer3d, result[1], result[0]) = 1;
+	return result[0];
 }
 
+READ16_HANDLER( dsp_y_return_r )
+{
+	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
+	/* Construct a frustum from the system's most recently set left and bottom extents */
+	float m[16];
+	airInfernoFrustum(state->m_frustumLeft, state->m_frustumBottom, m);
+
+	int result[2];
+	projectEyeCoordToScreen(m,
+							32*16,	/* These are defined in the machine ctor */
+							28*16,  /* not sure how to get them here or if they're even correct */
+							state->m_eyecoordBuffer,
+							result);
+
+	return result[1];
+}
 
 VIDEO_START( taitoair )
 {
@@ -550,7 +586,7 @@ VIDEO_START( taitoair )
 	height = machine.primary_screen->height();
 	state->m_framebuffer[0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	state->m_framebuffer[1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	state->m_buffer3d = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	//state->m_buffer3d = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 SCREEN_UPDATE( taitoair )
@@ -603,8 +639,8 @@ SCREEN_UPDATE( taitoair )
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 
 	/* Hacky 3d bitmap */
-	copybitmap_trans(bitmap, state->m_buffer3d, 0, 0, 0, 0, cliprect, 0);
-	bitmap_fill(state->m_buffer3d, cliprect, 0);
+	//copybitmap_trans(bitmap, state->m_buffer3d, 0, 0, 0, 0, cliprect, 0);
+	//bitmap_fill(state->m_buffer3d, cliprect, 0);
 
 	return 0;
 }
