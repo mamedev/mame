@@ -859,35 +859,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			}																\
 			CLK(CLK_OP + CLK_RELATIVE_8);									\
 
-/* M37710   Set flags according to bits */
-#undef OP_BIT
-#if FLAG_SET_M
-#define OP_BIT(MODE)														\
-			CLK(CLK_OP + CLK_R8 + CLK_##MODE);								\
-			FLAG_N = OPER_8_##MODE(cpustate);										\
-			FLAG_Z = FLAG_N & REG_A;										\
-			FLAG_V = FLAG_N << 1
-#else
-#define OP_BIT(MODE)														\
-			CLK(CLK_OP + CLK_R16 + CLK_##MODE);								\
-			FLAG_N = OPER_16_##MODE(cpustate);										\
-			FLAG_Z = FLAG_N & REG_A;										\
-			FLAG_N = NFLAG_16(FLAG_N);										\
-			FLAG_V = FLAG_N << 1
-#endif
-
-/* M37710  Set flags according to bits (immediate addressing mode) */
-#undef OP_BITI
-#if FLAG_SET_M
-#define OP_BITI()															\
-			CLK(CLK_OP + CLK_R8 + CLK_IMM);									\
-			FLAG_Z = REG_A & OPER_8_IMM(cpustate)
-#else
-#define OP_BITI()															\
-			CLK(CLK_OP + CLK_R16 + CLK_IMM);								\
-			FLAG_Z = REG_A & OPER_16_IMM(cpustate)
-#endif
-
 /* M37710   Cause a Break interrupt */
 #undef OP_BRK
 #define OP_BRK()															\
@@ -912,12 +883,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_CLC()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_C = CFLAG_CLEAR
-
-/* M37710   Clear Decimal flag */
-#undef OP_CLD
-#define OP_CLD()															\
-			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_D = DFLAG_CLEAR
 
 /* M37710   Clear Interrupt Mask flag */
 #undef OP_CLI
@@ -1712,10 +1677,10 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_RLA
 #if FLAG_SET_M
 #define OP_RLA(MODE)														\
-	{ int cnt = OPER_8_##MODE(cpustate); int tmp; while (cnt > 0) { CLK(6); tmp = REG_A; REG_A=(REG_A<<1)&0xff; REG_A |= (tmp>>7); cnt--; } }
+	{ int cnt = OPER_8_##MODE(cpustate); while (cnt > 0) { CLK(6); REG_A=((REG_A<<1)|(REG_A>>7&1))&0xff; cnt--; } }
 #else
 #define OP_RLA(MODE)														\
-	{ int cnt = OPER_16_##MODE(cpustate); int tmp; while (cnt > 0) { CLK(6); tmp = REG_A; REG_A=(REG_A<<1)&0xffff; REG_A |= (tmp>>15); cnt--; } }
+	{ int cnt = OPER_16_##MODE(cpustate); while (cnt > 0) { CLK(6); REG_A=((REG_A<<1)|(REG_A>>15&1))&0xffff; cnt--; } }
 #endif
 
 /* M37710   Rotate Left an operand */
@@ -1941,12 +1906,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_C = CFLAG_SET
 
-/* M37710   Set Decimal flag */
-#undef OP_SED
-#define OP_SED()															\
-			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_D = DFLAG_SET
-
 /* M37710   Set Interrupt Mask flag */
 #undef OP_SEI
 #define OP_SEI()															\
@@ -1999,18 +1958,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_STX(REG, MODE)													\
 			CLK(CLK_OP + CLK_W16 + CLK_W_##MODE);								\
 			write_16_##MODE(EA_##MODE(cpustate), REG)
-#endif
-
-/* M37710   Store zero to memory */
-#undef OP_STZ
-#if FLAG_SET_M
-#define OP_STZ(MODE)														\
-			CLK(CLK_OP + CLK_W8 + CLK_W_##MODE);								\
-			write_8_##MODE(EA_##MODE(cpustate), 0)
-#else
-#define OP_STZ(MODE)														\
-			CLK(CLK_OP + CLK_W16 + CLK_W_##MODE);								\
-			write_16_##MODE(EA_##MODE(cpustate), 0)
 #endif
 
 /* M37710  Stop the clock */
