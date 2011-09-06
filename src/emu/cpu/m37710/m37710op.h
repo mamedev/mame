@@ -296,7 +296,6 @@ INLINE void m37710i_interrupt_software(m37710i_cpu_struct *cpustate, uint vector
 	m37710i_push_16(cpustate, REG_PC);
 	m37710i_push_8(cpustate, cpustate->ipl);
 	m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
-	FLAG_D = DFLAG_CLEAR;
 	m37710i_set_flag_i(cpustate, IFLAG_SET);
 	REG_PB = 0;
 	m37710i_jump_16(cpustate, m37710i_read_16_normal(cpustate, vector));
