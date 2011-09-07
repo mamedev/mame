@@ -1221,7 +1221,7 @@ static void dsp_dasm_move_immediate( UINT32 op, char *buffer )
 	{
 		data[0] = op & 0x7FFFF;
 		data[1] = (op & 0x3C000000) >> 26;
-		data[2] = (op & 0x3F80000 ) >> 18;
+		data[2] = (op & 0x3F80000 ) >> 19;
 		dsp_dasm_prefix( MVI_Command[1], buffer, data ); /* TODO: bad mem*/
 	}
 	else
