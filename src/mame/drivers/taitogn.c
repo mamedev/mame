@@ -915,7 +915,7 @@ static MACHINE_RESET( coh3002t )
 	cputag_set_input_line(machine, "mn10200",INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 }
 
-static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x00400000, 0x007fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE(flash_s1_r, flash_s1_w)
@@ -960,7 +960,7 @@ static void spu_irq(device_t *device, UINT32 data)
 static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
-	MCFG_CPU_PROGRAM_MAP( zn_map)
+	MCFG_CPU_PROGRAM_MAP(taitogn_map)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
