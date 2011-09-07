@@ -2076,6 +2076,18 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			REG_D = REG_A
 #endif
 
+/* M37710  Transfer accumulator B to direct register */
+#undef OP_TBD
+#if FLAG_SET_M
+#define OP_TBD()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_D = REG_BA | REG_BB
+#else
+#define OP_TBD()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_D = REG_BA
+#endif
+
 /* M37710  Transfer direct register to accumulator */
 #undef OP_TDA
 #if FLAG_SET_M
@@ -2092,6 +2104,22 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
 
+/* M37710  Transfer direct register to accumulator B */
+#undef OP_TDB
+#if FLAG_SET_M
+#define OP_TDB()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_D;													\
+			FLAG_N = NFLAG_16(FLAG_Z);										\
+			REG_BA = MAKE_UINT_8(REG_D);									\
+			REG_BB = REG_D & 0xff00
+#else
+#define OP_TDB()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_BA = REG_D;										\
+			FLAG_N = NFLAG_16(FLAG_Z)
+#endif
+
 /* M37710  Transfer accumulator to stack pointer */
 #undef OP_TAS
 #if FLAG_SET_M
@@ -2102,6 +2130,18 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_TAS()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_S = REG_A
+#endif
+
+/* M37710  Transfer accumulator B to stack pointer */
+#undef OP_TBS
+#if FLAG_SET_M
+#define OP_TBS()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_S = REG_BA | REG_BB
+#else
+#define OP_TBS()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_S = REG_BA
 #endif
 
 /* M37710  Transfer stack pointer to accumulator */
@@ -2117,6 +2157,22 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_TSA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG_S;											\
+			FLAG_N = NFLAG_16(FLAG_Z)
+#endif
+
+/* M37710  Transfer stack pointer to accumulator B */
+#undef OP_TSB
+#if FLAG_SET_M
+#define OP_TSB()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_S;													\
+			FLAG_N = NFLAG_16(FLAG_Z);										\
+			REG_BA = MAKE_UINT_8(REG_S);									\
+			REG_BB = REG_S & 0xff00
+#else
+#define OP_TSB()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_BA = REG_S;										\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
 
@@ -2571,7 +2627,7 @@ OP(115,OP_ORB  ( DX          ) ) /* ORB dx      */
 OP(117,OP_ORB  ( DLIY        ) ) /* ORB dliy    */
 OP(119,OP_ORB  ( AY          ) ) /* ORB ay      */
 OP(11a,OP_DECB (             ) ) /* DEB         */
-// 11b,TBS (TODO)
+OP(11b,OP_TBS  (             ) ) /* TBS         */
 OP(11d,OP_ORB  ( AX          ) ) /* ORB ax      */
 OP(11f,OP_ORB  ( ALX         ) ) /* ORB alx     */
 OP(121,OP_ANDB ( DXI         ) ) /* ANDB dxi    */
@@ -2589,7 +2645,7 @@ OP(135,OP_ANDB ( DX          ) ) /* ANDB dx     */
 OP(137,OP_ANDB ( DLIY        ) ) /* ANDB dliy   */
 OP(139,OP_ANDB ( AY          ) ) /* ANDB ay     */
 OP(13a,OP_INCB (             ) ) /* INB         */
-// 13b,TSB (TODO)
+OP(13b,OP_TSB  (             ) ) /* TSB         */
 OP(13d,OP_ANDB ( AX          ) ) /* ANDB ax     */
 OP(13f,OP_ANDB ( ALX         ) ) /* ANDB alx    */
 OP(141,OP_EORB ( DXI         ) ) /* EORB dxi    */
@@ -2607,7 +2663,7 @@ OP(153,OP_EORB ( SIY         ) ) /* EORB siy    */
 OP(155,OP_EORB ( DX          ) ) /* EORB dx     */
 OP(157,OP_EORB ( DLIY        ) ) /* EORB dliy   */
 OP(159,OP_EORB ( AY          ) ) /* EORB ay     */
-// 15b,TBD (TODO)
+OP(15b,OP_TBD  (             ) ) /* TBD         */
 OP(15d,OP_EORB ( AX          ) ) /* EORB ax     */
 OP(15f,OP_EORB ( ALX         ) ) /* EORB alx    */
 OP(161,OP_ADCB ( DXI         ) ) /* ADCB dxi    */
@@ -2625,7 +2681,7 @@ OP(173,OP_ADCB ( SIY         ) ) /* ADCB siy    */
 OP(175,OP_ADCB ( DX          ) ) /* ADCB dx     */
 OP(177,OP_ADCB ( DLIY        ) ) /* ADCB dliy   */
 OP(179,OP_ADCB ( AY          ) ) /* ADCB ay     */
-// 17b,TDB (TODO)
+OP(17b,OP_TDB  (             ) ) /* TDB         */
 OP(17d,OP_ADCB ( AX          ) ) /* ADCB ax     */
 OP(17f,OP_ADCB ( ALX         ) ) /* ADCB alx    */
 OP(181,OP_STB  ( DXI         ) ) /* STB dxi     */
@@ -2777,19 +2833,19 @@ TABLE_OPCODES2 =
 	O(200),O(101),O(200),O(103),O(200),O(105),O(200),O(107),	// 00
 	O(200),O(109),O(10a),O(200),O(200),O(10d),O(200),O(10f),
 	O(200),O(111),O(112),O(113),O(200),O(115),O(200),O(117),	// 10
-	O(200),O(119),O(11a),O(200),O(200),O(11d),O(200),O(11f),
+	O(200),O(119),O(11a),O(11b),O(200),O(11d),O(200),O(11f),
 	O(200),O(121),O(200),O(123),O(200),O(125),O(200),O(127),	// 20
 	O(200),O(129),O(12a),O(200),O(200),O(12d),O(200),O(12f),
 	O(200),O(131),O(132),O(133),O(200),O(135),O(200),O(137),	// 30
-	O(200),O(139),O(13a),O(200),O(200),O(13d),O(200),O(13f),
+	O(200),O(139),O(13a),O(13b),O(200),O(13d),O(200),O(13f),
 	O(200),O(141),O(200),O(143),O(200),O(145),O(200),O(147),	// 40
 	O(148),O(149),O(14a),O(200),O(200),O(14d),O(200),O(14f),
 	O(200),O(151),O(152),O(153),O(200),O(155),O(200),O(157),	// 50
-	O(200),O(159),O(200),O(200),O(200),O(15d),O(200),O(15f),
+	O(200),O(159),O(200),O(15b),O(200),O(15d),O(200),O(15f),
 	O(200),O(161),O(200),O(163),O(200),O(165),O(200),O(167),	// 60
 	O(168),O(169),O(16a),O(200),O(200),O(16d),O(200),O(16f),
 	O(200),O(171),O(172),O(173),O(200),O(175),O(200),O(177),	// 70
-	O(200),O(179),O(200),O(200),O(200),O(17d),O(200),O(17f),
+	O(200),O(179),O(200),O(17b),O(200),O(17d),O(200),O(17f),
 	O(200),O(181),O(200),O(183),O(200),O(185),O(200),O(187),	// 80
 	O(200),O(200),O(18a),O(200),O(200),O(18d),O(200),O(18f),
 	O(200),O(191),O(192),O(193),O(200),O(195),O(200),O(197),	// 90
