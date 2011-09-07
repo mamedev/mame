@@ -593,8 +593,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	CLK(14); \
 	if (SRC&0x80)	\
 		{ m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate)); m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate)); CLK(3); } \
-	if (SRC&0x40)	\
-		{ REG_PB = m37710i_pull_8(cpustate) << 16; CLK(3); }   \
 	if (SRC&0x20)	\
 		{ REG_DB = m37710i_pull_8(cpustate) << 16; CLK(3); }   \
 	if (SRC&0x10)	\
@@ -633,12 +631,12 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_MPY
 #if FLAG_SET_M
 #define OP_MPY(MODE)														\
-	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
+	CLK(CLK_OP + CLK_R8 + CLK_##MODE + 14);	\
 	SRC = OPER_8_##MODE(cpustate);			\
 	{ UINT16 temp = SRC * (REG_A&0xff);  REG_A = temp & 0xff; REG_BA = (temp>>8)&0xff; FLAG_Z = temp; FLAG_N = (temp & 0x8000) ? 1 : 0; FLAG_C = 0; }
 #else
 #define OP_MPY(MODE)														\
-	CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
+	CLK(CLK_OP + CLK_R16 + CLK_##MODE + 14+8);	\
 	SRC = OPER_16_##MODE(cpustate);			\
 	{ UINT32 temp = SRC * REG_A;  REG_A = temp & 0xffff;  REG_BA = (temp>>16)&0xffff; FLAG_Z = temp; FLAG_N = (temp & 0x80000000) ? 1 : 0; FLAG_C = 0; }
 #endif
@@ -2300,7 +2298,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	logerror("error M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x\n", REG_PB, REG_PPC);
 
 /* M37710 load data bank register */
-#undef OP_LDTAAA
+#undef OP_LDT
 #define OP_LDT(MODE)	\
 	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
 	REG_DB = OPER_8_##MODE(cpustate)<<16;
