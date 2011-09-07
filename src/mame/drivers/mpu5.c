@@ -1380,6 +1380,7 @@ ROM_START( m5elim )
 	ROM_LOAD16_BYTE( "elim02s.p1", 0x000000, 0x080000, CRC(3f626dee) SHA1(3c482e90f8fdbed1e3e91db980073e99ada9e6bb) )
 	ROM_LOAD16_BYTE( "elim02y.p1", 0x000000, 0x080000, CRC(f16a9961) SHA1(35e18bb70e8e5b096526242ef9400630d675e704) )
 	ROM_LOAD16_BYTE( "elim03s", 0x000000, 0x080000, CRC(6903d0d0) SHA1(01af2abc7f88e7e9ebfbe668727f5ff52658a5e1) )
+	ROM_LOAD16_BYTE( "elim03.p2", 0x0000, 0x080000, CRC(3262eb5a) SHA1(62bbfebb32e16fb7f5945a6b523c619401117a1f) )
 	ROM_LOAD16_BYTE( "elim04.p2", 0x000000, 0x080000, CRC(4f17729a) SHA1(8854a8fd571a8de6b49fec6c172ec0a5f5f1622f) )
 	ROM_LOAD16_BYTE( "elim04.p3", 0x000000, 0x080000, CRC(1387646a) SHA1(00c6157c07398c6e5b4e6ead6a8cca88e38f298d) )
 	ROM_LOAD16_BYTE( "elim04.p4", 0x000000, 0x080000, CRC(99f609d4) SHA1(53803bc0f4712b7772f525f2b65ad3ca8b1e6122) )
@@ -3277,6 +3278,9 @@ ROM_START( m5redrck )
 	ROM_LOAD16_BYTE( "rttr10r.p1", 0x000000, 0x080000, CRC(b314837b) SHA1(f3c2e607cfc4c8056915771f4d67a6c990f29aa0) )
 	ROM_LOAD16_BYTE( "rttr10s.p1", 0x000000, 0x080000, CRC(60229f1d) SHA1(653d6f11bf1a5665a203137a8129e03632bee22b) )
 	ROM_LOAD16_BYTE( "rttr10y.p1", 0x000000, 0x080000, CRC(ce187484) SHA1(bce0c86418efd7f15ef75c5d73e95ed1b10ac458) )
+
+	ROM_LOAD16_BYTE( "r_trock.p1", 0x0000, 0x080000, CRC(ba0b2f5d) SHA1(e4ac11da00f5c0b2b2a3bc68d429870039583036) )
+	
 ROM_END
 
 
@@ -3565,6 +3569,11 @@ ROM_START( m5rcx )
 	ROM_LOAD16_BYTE( "rexg07z.p1", 0x000000, 0x080000, CRC(810af718) SHA1(b78368d8aea9e07fda61bc87b3f9f8ee4e9b0a89) )
 ROM_END
 
+ROM_START( m5rcxa )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "r.exc", 0x00000, 0x080000, CRC(78ba3908) SHA1(b2728fd099a6540e7d53b5268257f844dbb772db) )
+	ROM_LOAD16_BYTE( "r_exclub.p2", 0x00001, 0x080000, CRC(14456741) SHA1(0a8bfcc806b014f863855f9aae8a17a385a31255) )
+ROM_END
 
 ROM_START( m5ritj )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4224,6 +4233,9 @@ ROM_START( m5topdol )
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "tpd13d.p1", 0x000000, 0x080000, CRC(c878b025) SHA1(3c594a94b53491edc42e91b5f7ff80c5194d38e1) )
 	ROM_LOAD16_BYTE( "tpd13k.p1", 0x000000, 0x080000, CRC(6a5271c5) SHA1(1b576d4de1ce7d2da37e17143eb3719d6bc703c8) )
+	// alt roms? (were paired with tpd13s.p1 / tpd13s.p2 with t doller.p1 / t doller.p2 labels
+	ROM_LOAD( "t doller.p3", 0x0000, 0x080000, CRC(11ce71f0) SHA1(30603a897d5226d3d5c064b77d3c6314d21fe709) )
+	ROM_LOAD( "t doller.p4", 0x0000, 0x080000, CRC(abd514e0) SHA1(a42f35b57ad41a02a9f6969fbeb380152b5b8bf0) )
 ROM_END
 
 ROM_START( m5trail )
@@ -4239,6 +4251,13 @@ ROM_START( m5trail )
 	ROM_LOAD16_BYTE( "trbl06s.p1", 0x000000, 0x080000, CRC(f8035826) SHA1(0c5cdc355721b9be35e819fa6c5d09e6ebc6cc07) )
 	ROM_LOAD16_BYTE( "trbl06z.p1", 0x000000, 0x080000, CRC(c7d1d42f) SHA1(6b70f64fdbc00542f5717bc5e4f27a044d27d2ff) )
 ROM_END
+
+ROM_START( m5sblz )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s_blazer.p1", 0x00000, 0x080000, CRC(e4840160) SHA1(8521f590ee43f2014ab874731971c86f5b7a877f) )
+	ROM_LOAD16_BYTE( "s_blazer.p2", 0x00001, 0x080000, CRC(a6760014) SHA1(f49d14ea91cbe842a0d5fec6ca99248a962885d6) )
+ROM_END
+
 
 ROM_START( m5ttop )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4867,6 +4886,10 @@ ROM_START( m5shark ) // shark_raving_mad_(vivid)_[c01_800_25jp].hex
 	ROM_LOAD16_BYTE( "m5shark_p2", 0x000001, 0x080000, CRC(eb5d1814) SHA1(3dcb3e77cb546d8f77b3ba0e9d2a0f9831c5e83e) )
 	ROM_LOAD16_BYTE( "m5shark_p3", 0x100000, 0x080000, CRC(6552161c) SHA1(31fc00ecb64777cdeb54c7a15df0a5f160724fd8) )
 	ROM_LOAD16_BYTE( "m5shark_p4", 0x100001, 0x080000, CRC(b4e8137e) SHA1(000bbe4a8dedad0f752eecee6208cc0250c0e742) )
+
+	ROM_REGION( 0x400000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "sharkrav.p1", 0x00000, 0x080000, CRC(8a672a5f) SHA1(04349940a3b8e2d282f256fed205c0ff97371541) )
+	ROM_LOAD16_BYTE( "sharkrav.p2", 0x00001, 0x080000, CRC(650ea6c6) SHA1(c6569d6e0163116c4997250a9db8658fed1e1cdd) )
 ROM_END
 
 ROM_START( m5supnov ) // supernova_(barcrest)_[c01_800_25jp].hex
@@ -4875,6 +4898,10 @@ ROM_START( m5supnov ) // supernova_(barcrest)_[c01_800_25jp].hex
 	ROM_LOAD16_BYTE( "m5supnov_p2", 0x000001, 0x080000, CRC(c58d5fa0) SHA1(2e90c811977be290c020184ebd27f4a47e272ea7) )
 	ROM_LOAD16_BYTE( "m5supnov_p3", 0x100000, 0x080000, CRC(1ec42684) SHA1(20c73adbcbbfbe2df6a87e6c9aa112d7fdfd5b6f) )
 	ROM_LOAD16_BYTE( "m5supnov_p4", 0x100001, 0x080000, CRC(4e1ad394) SHA1(ef051be5b13585fd61cc185f4c279a322d1d1f94) )
+
+	ROM_REGION( 0x400000, "altrevs", 0 )
+	ROM_LOAD16_BYTE( "s_nova.p1", 0x00000, 0x080000, CRC(b4ccd869) SHA1(e93edeae1689b684f35fd299d9377ccd87bf2bb5) )
+	ROM_LOAD16_BYTE( "s_nova.p2", 0x00001, 0x080000, CRC(dd433e0a) SHA1(cdf2ab3e5d8921797e5041e5feeb4a235031c3b8) )
 ROM_END
 
 ROM_START( m5tictac ) // tic_tac_tut_(vivid)_[c01_800_25jp].hex
@@ -5550,40 +5577,75 @@ ROM_END
 
 ROM_START( m5dbubl )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "dbubble.p1", 0x000000, 0x080000, CRC(ea046f04) SHA1(ec5b24fbd4df03c61f3ab9ca52661d9aab0bdef8) )
-	ROM_LOAD( "dbubble.p2", 0x000001, 0x080000, CRC(a040b387) SHA1(8bb14da05dc0762c4b3829bacf6f325f1e94e2c6) )
-	ROM_LOAD( "dbubble.p3", 0x100000, 0x080000, CRC(985f7267) SHA1(05a9aa5353b8830663f86971ffc819f01d20824d) )
-	ROM_LOAD( "dbubble.p4", 0x100001, 0x080000, CRC(9b43f59d) SHA1(acb8d1f66c68f23c3989ba8f35af43f7b5352418) )
+	ROM_LOAD16_BYTE( "dbubble.p1", 0x000000, 0x080000, CRC(ea046f04) SHA1(ec5b24fbd4df03c61f3ab9ca52661d9aab0bdef8) )
+	ROM_LOAD16_BYTE( "dbubble.p2", 0x000001, 0x080000, CRC(a040b387) SHA1(8bb14da05dc0762c4b3829bacf6f325f1e94e2c6) )
+	ROM_LOAD16_BYTE( "dbubble.p3", 0x100000, 0x080000, CRC(985f7267) SHA1(05a9aa5353b8830663f86971ffc819f01d20824d) )
+	ROM_LOAD16_BYTE( "dbubble.p4", 0x100001, 0x080000, CRC(9b43f59d) SHA1(acb8d1f66c68f23c3989ba8f35af43f7b5352418) )
 ROM_END
 
 
 ROM_START( m5dragnd )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "dragon_d.p1", 0x000000, 0x080000, CRC(ae4f778b) SHA1(0fab7173f9da64fb5ff15452aa9249ebefd40ae2) )
-	ROM_LOAD( "dragon_d.p2", 0x000001, 0x080000, CRC(d56f498c) SHA1(01ddeba4154826f4608ae7c37256e43d55210120) )
+	ROM_LOAD16_BYTE( "dragon_d.p1", 0x000000, 0x080000, CRC(ae4f778b) SHA1(0fab7173f9da64fb5ff15452aa9249ebefd40ae2) )
+	ROM_LOAD16_BYTE( "dragon_d.p2", 0x000001, 0x080000, CRC(d56f498c) SHA1(01ddeba4154826f4608ae7c37256e43d55210120) )
 ROM_END
 
 ROM_START( m5dragnda )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "drop_pound5.p1", 0x000000, 0x080000, CRC(197bc0b3) SHA1(02949cd86a4d4569a540d11f8bda1d49d4e94c2f) )
-	ROM_LOAD( "drop_pound5.p2", 0x000001, 0x080000, CRC(cdb76803) SHA1(69534f33ab2dac80049c566d385cf67a9feff343) )
+	ROM_LOAD16_BYTE( "drop_pound5.p1", 0x000000, 0x080000, CRC(197bc0b3) SHA1(02949cd86a4d4569a540d11f8bda1d49d4e94c2f) )
+	ROM_LOAD16_BYTE( "drop_pound5.p2", 0x000001, 0x080000, CRC(cdb76803) SHA1(69534f33ab2dac80049c566d385cf67a9feff343) )
 ROM_END
 
 ROM_START( m5ttwo )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "take_two.p1", 0x000000, 0x080000, CRC(16b0dbc3) SHA1(c8893115c2bbdaaf20af2a2a36b414539342f3e5) )
-	ROM_LOAD( "take_two.p2", 0x000001, 0x080000, CRC(406f8212) SHA1(afa5016b5689787ee076a1f243b9f7516aad1fc6) )
-	ROM_LOAD( "take_two.p3", 0x100000, 0x080000, CRC(5517f852) SHA1(dc90c1279c65d6040391abe4499bd39abdd7505b) )
-	ROM_LOAD( "take_two.p4", 0x100001, 0x080000, CRC(23cf044c) SHA1(dc168cd2f06fbab5822a35ea87966b351ba21e3c) )
+	ROM_LOAD16_BYTE( "take_two.p1", 0x000000, 0x080000, CRC(16b0dbc3) SHA1(c8893115c2bbdaaf20af2a2a36b414539342f3e5) )
+	ROM_LOAD16_BYTE( "take_two.p2", 0x000001, 0x080000, CRC(406f8212) SHA1(afa5016b5689787ee076a1f243b9f7516aad1fc6) )
+	ROM_LOAD16_BYTE( "take_two.p3", 0x100000, 0x080000, CRC(5517f852) SHA1(dc90c1279c65d6040391abe4499bd39abdd7505b) )
+	ROM_LOAD16_BYTE( "take_two.p4", 0x100001, 0x080000, CRC(23cf044c) SHA1(dc168cd2f06fbab5822a35ea87966b351ba21e3c) )
 ROM_END
 
 ROM_START( m5zigzag )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "zigzag.p1", 0x0000, 0x080000, CRC(68f4e9ab) SHA1(b22063976cf971dbbff9adb0d14c4eda5f6a9e23) )
-	ROM_LOAD( "zigzag.p2", 0x0000, 0x080000, CRC(8c237c1d) SHA1(e5332000569bfa1ef8363f4e2825e508eb2ab792) )
-	ROM_LOAD( "zigzag.p3", 0x0000, 0x080000, CRC(e34e8da2) SHA1(d1d38881b8f90de73058cad429d913b5676a2712) )
-	ROM_LOAD( "zigzag.p4", 0x0000, 0x080000, CRC(a82600af) SHA1(4d2bf77a15eaf57fa0b020eadcd315f5e32eff5a) )
+	ROM_LOAD16_BYTE( "zigzag.p1", 0x000000, 0x080000, CRC(68f4e9ab) SHA1(b22063976cf971dbbff9adb0d14c4eda5f6a9e23) )
+	ROM_LOAD16_BYTE( "zigzag.p2", 0x000001, 0x080000, CRC(8c237c1d) SHA1(e5332000569bfa1ef8363f4e2825e508eb2ab792) )
+	ROM_LOAD16_BYTE( "zigzag.p3", 0x100000, 0x080000, CRC(e34e8da2) SHA1(d1d38881b8f90de73058cad429d913b5676a2712) )
+	ROM_LOAD16_BYTE( "zigzag.p4", 0x100001, 0x080000, CRC(a82600af) SHA1(4d2bf77a15eaf57fa0b020eadcd315f5e32eff5a) )
 ROM_END
+
+ROM_START( m5rawin )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "r_a_win.p1", 0x00000, 0x080000, CRC(af94dff4) SHA1(4415eaab3cf3810367d4ea7a4ab79f8f5bd2cde1) )
+	ROM_LOAD16_BYTE( "r_a_win.p2", 0x00001, 0x080000, CRC(30be41d4) SHA1(bb3e972b2b885d28eae641dc44823f57eb654538) )
+ROM_END
+
+ROM_START( m5horn )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "horn_0f.p1", 0x00000, 0x080000, CRC(c01732dd) SHA1(6b157ad01535d8c7bbf6c3b2db96e7fed271f5f9) )
+	ROM_LOAD16_BYTE( "horn_of.p2", 0x00001, 0x080000, CRC(8b270edf) SHA1(0d6011bdd4c38f97813dae187bf2c67f09066de5) )
+ROM_END
+
+ROM_START( m5hotrk )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "hot_rock.p1", 0x00000, 0x080000, CRC(cef5b5ae) SHA1(1ed34ea307c40bdfd0ea7296b9a2be4d3ecc796c) )
+	ROM_LOAD16_BYTE( "hot_rock.p2", 0x00001, 0x080000, CRC(c90efc7b) SHA1(6f82a7d31f9b891b13879ed40fc2f47829422e7e) )
+ROM_END
+
+
+ROM_START( m5cmass )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "c_mass",   0x00000, 0x080000, CRC(96427dfc) SHA1(762cccf773bc81b06e6197492207f91385002c7b) )
+	ROM_LOAD16_BYTE( "c_mass.p2", 0x00001, 0x080000, CRC(837930ac) SHA1(5b5ae91b13dd7ae671fb60df3e7545c8239e7dec) )
+ROM_END
+
+ROM_START( m5slide )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "slider.p1", 0x00000, 0x080000, CRC(7b75e001) SHA1(b6cdeddc16d399e77ff9ba53e1603273ecbe23c6) )
+	ROM_LOAD16_BYTE( "slider.p2", 0x00001, 0x080000, CRC(963267bf) SHA1(17541a075733184fee0c4b3acdb6d60407e31a64) )
+ROM_END
+
+
+
+
 
 /* Barcrest */
 GAME( 199?, m5clr		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","MPU 5 Ram & Meter Clear (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5692,7 +5754,8 @@ GAME( 199?, m5rhrgt		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Roll Triple 
 GAME( 199?, m5rwb		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Red White & Blue (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5revo		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5rgclb		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m5rcx		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5rcx		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5rcxa		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5rub		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Rubies & Diamonds (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5ritj		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Rumble In The Jungle (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5rfymc		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5723,6 +5786,8 @@ GAME( 199?, m5vampup	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Vamp It Up (Barcrest
 GAME( 199?, m5wking		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5costa		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Costa Del Cash (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5ttwo		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Take Two (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5horn		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Whitbread","Horn Of Plenty (Barcrest / Whitbread) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5hotrk		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Hot Rocks (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 /* Barcrest / Red Gaming */
 
@@ -5735,7 +5800,7 @@ GAME( 199?, m5dmnstr	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Demon S
 GAME( 199?, m5dmnstra	,m5dmnstr,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5dbubl		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Double Bubble (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5dragnd	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m5dragnda	,m5dragnd,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5dragnda	,m5dragnd,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fnfair	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fnfaird	,m5fnfair,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5) (Datapak)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5fusir		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5759,7 +5824,9 @@ GAME( 199?, m5redx		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Red X (B
 GAME( 199?, m5thtsmg	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","That's Magic (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5topdol	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Top Dollar (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5zigzag	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Zig Zag (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-
+GAME( 199?, m5cmass		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Critical Mass (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5sblz		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Snail Blazer (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5slide		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Slider (Barcrest - Red Gaming) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 /* Vivid */
 
@@ -5803,6 +5870,7 @@ GAME( 199?, m5piefcr	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory Rio (Vivid)
 GAME( 199?, m5qdraw		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5redbal	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Random Red Ball (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5ratpk		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Rat Pack (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5rawin		,0,			mpu5, mpu5, 0, ROT0, "Vivid / Whitbread","Reel A Win (Vivid / Whitbread) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5rollup	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Roll Up Roll Up (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5shark		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Shark Raving Mad (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5speccl	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Spectrum Club (Vivid) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -5816,6 +5884,8 @@ GAME( 199?, m5tictac	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Tic Tac Tut (Vivid) (MP
 GAME( 199?, m5tictaca	,m5tictac,	mpu5, mpu5, 0, ROT0, "Vivid","Tic Tac Tut (Vivid) (MPU5, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5whdres	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Who Dares Spins (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5winway	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Winning Ways (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
+
 
 /* Empire */
 

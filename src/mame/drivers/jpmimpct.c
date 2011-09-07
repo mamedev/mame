@@ -1543,6 +1543,32 @@ ROM_START( trivialpd )
 	ROM_LOAD( "tp-snd.bin", 0x000000, 0x80000, CRC(7e2cb00a) SHA1(670ee5dd5c60313676b9271901b4df9e6ebd5955) )
 ROM_END
 
+ROM_START( trivialpo )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	// set only contained these 2 roms.. others are assumed to be the same for now
+	ROM_LOAD16_BYTE( "tpswpp1", 0x000000, 0x080000, CRC(9d3cb9b7) SHA1(959cc0e2254aa3a3a4e9f5814ca6ee2b0e486fb3) )
+	ROM_LOAD16_BYTE( "tpswpp2", 0x000001, 0x080000, CRC(4a2f1476) SHA1(c08a5c99b44ee3e5457cb26a29405b2f01fd5a27) )
+	ROM_LOAD16_BYTE( "1424.bin", 0x100000, 0x080000, CRC(c37d045b) SHA1(3c127b14e1dc1e453fb08c741847c712d1fea78b) )
+	ROM_LOAD16_BYTE( "1425.bin", 0x100001, 0x080000, CRC(8d209f61) SHA1(3e16ee4c43a31da2e6773a938a20c616a5e6179b) )
+
+	ROM_LOAD16_BYTE( "tp-q1.bin", 0xc00000, 0x080000, CRC(98d42cfd) SHA1(67a6745d55493034128f767b518d86dedc9c22a6) )
+	ROM_LOAD16_BYTE( "tp-q2.bin", 0xc00001, 0x080000, CRC(8a670ee8) SHA1(33628b34f4a0413f2f39e26520169d0eff9942c5) )
+	ROM_LOAD16_BYTE( "tp-q3.bin", 0xd00000, 0x080000, CRC(eb47f94e) SHA1(957812b63de4532b9175214db7947c96264a48f1) )
+	ROM_LOAD16_BYTE( "tp-q4.bin", 0xd00001, 0x080000, CRC(23c01c99) SHA1(187c3448ae1cb44ca6a4a829e64b860ee7548ac5) )
+	ROM_LOAD16_BYTE( "tp-q5.bin", 0xe00000, 0x080000, CRC(1c9f4f8a) SHA1(7541d518d24e59140d62a869b27bcc15b205054d) )
+	ROM_LOAD16_BYTE( "tp-q6.bin", 0xe00001, 0x080000, CRC(df9da57d) SHA1(a3e29cb03bd780de2c5454c86d6dc48e1c6c63bc) )
+	ROM_LOAD16_BYTE( "tp-q7.bin", 0xf00000, 0x080000, CRC(e075e5d7) SHA1(3490730c569678d48fb2d810484de063882f71a5) )
+	ROM_LOAD16_BYTE( "tp-q8.bin", 0xf00001, 0x080000, CRC(12f90e74) SHA1(a39a1cee6107d1e83954e3cabf191fd5c89777f8) )
+
+	ROM_REGION16_LE( 0x200000, "user1", 0 )
+	ROM_LOAD16_BYTE( "tp-gr1.bin", 0x000000, 0x100000, CRC(7fa955f7) SHA1(9ecae4c8c26bfa1701c39148099bf0f8b5974ac8) )
+	ROM_LOAD16_BYTE( "tp-gr2.bin", 0x000001, 0x100000, CRC(2495d785) SHA1(eb89eb299a7000364a0a0f59459d1ec27755fca1) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "tp-snd.bin", 0x000000, 0x80000, CRC(7e2cb00a) SHA1(670ee5dd5c60313676b9271901b4df9e6ebd5955) )
+ROM_END
+
+
 ROM_START( scrabble )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1562.bin", 0x000000, 0x080000, CRC(d7303b98) SHA1(46e8ed04c8fdc092b7d8910d3e3f6cc62f691646) )
@@ -3534,6 +3560,13 @@ ROM_START( j6mono60 )
 	ROM_LOAD( "monop60.snd", 0x000000, 0x080000, CRC(c79af6d0) SHA1(518a7b16978a843bdb83938279b11f446503361e) )
 ROM_END
 
+ROM_START( j6mono60a )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s60_pound8p1", 0x00000, 0x020000, CRC(f5220142) SHA1(2d9460fbd833b477f579f0925dd999fa3d4355cc) )
+	ROM_LOAD16_BYTE( "s60_pound8p2", 0x00001, 0x020000, CRC(3786bbb8) SHA1(d45d1d6713e480fa6e430fd1900778dcc56250c9) )
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "s60snd", 0x0000, 0x080000, CRC(f597a454) SHA1(ab88779657524df2b04b91ed35f25dc9206a5623) )
+ROM_END
 
 ROM_START( j6monobn )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
@@ -5399,6 +5432,18 @@ ROM_START( j6gldpl )
 	/* missing? */
 ROM_END
 
+ROM_START( j6shoot )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "shoot out p1", 0x00000, 0x020000, CRC(d1797023) SHA1(6a75451b0e5954c87f65f333a5fc73d3ac43d1f4) )
+	//ROM_LOAD( "shoot ou", 0x0000, 0x020000, CRC(d1797023) SHA1(6a75451b0e5954c87f65f333a5fc73d3ac43d1f4) )
+	ROM_LOAD16_BYTE( "shootp2", 0x00001, 0x020000, CRC(c345c0a9) SHA1(8e9dfb58b3295b2d44bfa810f5502872cf7111d1) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
+
+
 
 DRIVER_INIT( j6fbcrz )
 {
@@ -5441,8 +5486,9 @@ GAME( 1995, cluedo,   0,       jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod
 GAME( 1995, cluedod,  cluedo,  jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995, cluedo2c, cluedo,  jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2C)",           GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995, cluedo2,  cluedo,  jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2)",      	 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1996, trivialp, 0,       jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursuit (prod. 1D)",  GAME_SUPPORTS_SAVE )
-GAME( 1996, trivialpd,trivialp,jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursuit (prod. 1D) (Protocol)",GAME_SUPPORTS_SAVE )
+GAME( 1996, trivialp, 0,       jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  GAME_SUPPORTS_SAVE )
+GAME( 1996, trivialpd,trivialp,jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",GAME_SUPPORTS_SAVE )
+GAME( 1996, trivialpo,trivialp,jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursuit",  GAME_SUPPORTS_SAVE )
 GAME( 1997, scrabble, 0,       jpmimpct, scrabble, 0, ROT0, "JPM", "Scrabble (rev. F)",           GAME_SUPPORTS_SAVE )
 GAME( 1997, scrabbled,scrabble,jpmimpct, scrabble, 0, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",GAME_SUPPORTS_SAVE )
 GAME( 1998, hngmnjpm, 0,       jpmimpct, hngmnjpm, 0, ROT0, "JPM", "Hangman (JPM)",               GAME_SUPPORTS_SAVE )
@@ -5558,7 +5604,8 @@ GAME( 199?, j6megbck	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Mega Bucks (Jpm)
 GAME( 199?, j6monmad	, 0			, impctawp, tbirds, 0, ROT0, "Ace", "Money Madness (Ace) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6monspd	, 0			, impctawp, tbirds, 0, ROT0, "Ace", "Money Spider (Ace) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6montlk	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Money Talks (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, j6mono60	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j6mono60	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (Jpm) (IMPACT, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j6mono60a	, j6mono60	, impctawp, tbirds, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (Jpm) (IMPACT, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6monobn	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Monopoly Bingo (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6outlaw	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Outlaw (Jpm) (IMPACT, v3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6outlawd	, j6outlaw	, impctawp, tbirds, 0, ROT0, "JPM", "Outlaw (Jpm) (IMPACT, v3) (Protocol)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
@@ -5674,6 +5721,7 @@ GAME( 199?, j6sla		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Snakes & Ladde
 GAME( 199?, j6thril		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Thriller (Crystal) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6tqust		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Treasure Quest (Crystal) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6gldpl		, 0			, impctawp, tbirds, 0, ROT0, "Qps / Mazooma", "Golden Palace (Qps / Mazooma) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND ) // Mazooma rebuild? only has QPS strings tho
+GAME( 199?, j6shoot		, 0			, impctawp, tbirds, 0, ROT0, "JPM / Whitbread", "ShootOut (Jpm / Whitbread) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND ) // Mazooma rebuild? only has QPS strings tho
 
 
 // was marked as SWP, should this be a video game? - Apparently it's just a link box using the same hardware, but for 3 PC based units which aren't dumped, and probably can't really be emulated :-/

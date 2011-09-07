@@ -155,6 +155,12 @@ ROM_START( hb_dac )
 	ROM_LOAD16_BYTE( "80001164.p2", 0x00001, 0x100000, CRC(01129a24) SHA1(8c567f1462b44d82da4dfa8a463e79586c446ed5) )
 ROM_END
 
+ROM_START( hb_daca )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 ) // these seem a little small...
+	ROM_LOAD16_BYTE( "dough_cl.p1", 0x00000, 0x020000, CRC(c8833628) SHA1(ca797fd77c8c9993dc6411bc478d07b828afe34f) )
+	ROM_LOAD16_BYTE( "dough_cl.p2", 0x00001, 0x020000, CRC(94a8141b) SHA1(968dfbe5dc1ec78f896e207beb390af70fccf9af) )
+ROM_END
+
 ROM_START( hb_frtcl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "80000134.p1", 0x00000, 0x100000, CRC(5db61c65) SHA1(fdd354c74c43ab45e975ce14a5c8f4f2c2ecb30f) )
@@ -340,6 +346,7 @@ ROM_START( hb_ydd )
 ROM_END
 
 
+
 extern void astra_addresslines( UINT16* src, size_t srcsize, int small );
 
 
@@ -347,6 +354,21 @@ extern void astra_addresslines( UINT16* src, size_t srcsize, int small );
 static DRIVER_INIT( hb )
 {
 	astra_addresslines( (UINT16*)machine.region( "maincpu" )->base(), machine.region( "maincpu" )->bytes(), 0 );
+
+	#if 1
+	{
+		UINT8* ROM = machine.region( "maincpu" )->base();
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"%s", machine.system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM,  machine.region( "maincpu" )->bytes(), 1, fp);
+			fclose(fp);
+		}
+	}
+	#endif
 }
 
 
@@ -357,7 +379,8 @@ GAME( 200?, hb_ccow		,0,			pluto5, pluto5, hb, ROT0, "Qps","Cash Cow (Qps)", GAM
 GAME( 200?, hb_cashc	,0,			pluto5, pluto5, hb, ROT0, "Qps","Cash Crusade (Qps)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, hb_cashx	,0,			pluto5, pluto5, hb, ROT0, "Fairgames","Cash X (Fairgames)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, hb_cwf		,0,			pluto5, pluto5, hb, ROT0, "Fairgames","Cherry Win Falls (Fairgames)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, hb_dac		,0,			pluto5, pluto5, hb, ROT0, "Qps","Dough & Arrow Club (Qps)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, hb_dac		,0,			pluto5, pluto5, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, hb_daca		,hb_dac,	pluto5, pluto5, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, hb_frtcl	,0,			pluto5, pluto5, hb, ROT0, "Qps","Fruitopia Club (Qps)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, hb_gpal		,0,			pluto5, pluto5, hb, ROT0, "Qps","Golden Palace (Qps)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, hb_gldpl	,0,			pluto5, pluto5, hb, ROT0, "Qps / Mazooma","Golden Palace (Qps / Mazooma)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // rebuild?

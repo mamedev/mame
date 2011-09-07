@@ -9616,6 +9616,7 @@ j6monmad	// Money Madness (Ace)
 j6monspd	// Money Spider (Ace)
 j6montlk	// Money Talks (Jpm)
 j6mono60	// Monopoly 60th Anniversary Edition (Jpm)
+j6mono60a	//
 j6monobn	// Monopoly Bingo (Jpm)
 j6outlaw	// Outlaw (Jpm)
 j6outlawc	// Outlaw (Jpm) Club?
@@ -9728,6 +9729,7 @@ j6sla		// Snakes & Ladders Slides Again (Crystal)
 j6thril		// Thriller (Crystal)
 j6tqust		// Treasure Quest (Crystal)
 j6gldpl		// Golden Palace (QPS / Mazooma)
+j6shoot		// ShootOut
 j6milln		// Millionaire / Who Wants To Be A Millionaire (Jpm)?
 
 // JPM Impact + Video Board
@@ -9737,6 +9739,7 @@ cluedo2c		// (c) 1995
 cluedo2			// (c) 1995
 trivialp		// (c) 1996
 trivialpd		// (c) 1996
+trivialpo		// (c) 1996
 scrabble		// (c) 1997
 scrabbled		// (c) 1997
 hngmnjpm		// (c) 1998
@@ -11518,7 +11521,7 @@ sc1twice	//
 sc1chain	//
 sc1potp		//
 sc1potpa	//
-
+sc1scunk	//
 
 // Scorpion 1 + Adder Video board
 
@@ -12465,6 +12468,7 @@ mg_kf		// Krypton Factor
 ep_simp		// The Simpsons (Maygay)
 ep_dblim	// Double Impact (Maygay - Impulse)
 ep_itjb3	// Italian Job 3 (Maygay)
+ep_itj3a	//
 ep_merln	// Merlin's Magic (Maygay)
 ep_wipeo	// Wipeout (Maygay)
 ep_bingb	// Bingo Belle (Maygay)
@@ -12656,7 +12660,7 @@ ep_cascz	// Casino Crazy (Global)
 ep_wside	// Wildside (Global)
 ep_goldf	// Gold Fever (Impulse)
 ep_imj		// I'm A Jackpot (Global)
-ep_itj3a
+ep_party
 
 // MPU2
 
@@ -13468,6 +13472,7 @@ m4blsbys	// Blues Boys (Version 6)
 m4conn4     // Connect 4
 
 m4surf		// Super Surfin' (Gemini)
+m4wife		// Money Or Yer Wife (Gemini)
 m4blkgd		// Black Gold (Gemini)
 m4excam		// Excalibur (Mdm)
 m4front		// Final Frontier (Mdm)
@@ -13702,6 +13707,7 @@ m5rwb		// Red White & Blue (Barcrest)
 m5revo		// Revolution (Barcrest)
 m5rgclb		// Rio Grande Club (Barcrest)
 m5rcx		// Royal Exchange Club (Barcrest)
+m5rcxa		//
 m5rub		// Rubies & Diamonds (Barcrest)
 m5ritj		// Rumble In The Jungle (Barcrest)
 m5rfymc		// Run For Your Money Club (Barcrest)
@@ -13732,6 +13738,8 @@ m5vampup	// Vamp It Up (Barcrest)
 m5wking		// Wild King (Barcrest)
 m5costa		// Costa Del Cash (Barcrest)
 m5ttwo		// Take Two (Barcrest)
+m5horn		// Horn Of Plenty (Barcrest)
+m5hotrk		// Hot Rocks (Barcrest)
 
 /* Barcrest / Red Gaming */
 
@@ -13768,6 +13776,9 @@ m5redx		// Red X (Barcrest - Red Gaming)
 m5thtsmg	// That's Magic (Barcrest - Red Gaming)
 m5topdol	// Top Dollar (Barcrest - Red Gaming)
 m5zigzag	// Zig Zag
+m5cmass		// Critical Mass (Barcrest - Red Gaming)
+m5sblz		// Snail Blazer (Barcrest - Red Gaming)
+m5slide		// Slider (Barcrest - Red Gaming)
 
 /* Vivid */
 
@@ -13824,6 +13835,7 @@ m5tictac	// Tic Tac Tut (Vivid)
 m5tictaca	//
 m5whdres	// Who Dares Spins (Vivid)
 m5winway	// Winning Ways (Vivid)
+m5rawin		// Reel A Win (Vivid)
 
 /* Empire */
 
@@ -14117,6 +14129,8 @@ as_partya		//
 as_partyb		//
 as_partyc		//
 as_partyd		//
+as_partye		//
+as_partyf		//
 as_letsp		// Let's Party (Astra)
 as_topsl		// Top Slot (Astra)
 as_topsla		//
@@ -14213,6 +14227,7 @@ as_otra			//
 as_ptf			//
 as_ptfa			//
 as_ptfb			//
+as_ptfc			//
 as_pia			//
 as_piaa			//
 as_piab			//
@@ -14363,6 +14378,7 @@ hb_cashc	// Cash Crusade (Qps)
 hb_cashx	// Cash X (Fairgames)
 hb_cwf		// Cherry Win Falls (Fairgames)
 hb_dac		// Dough & Arrow Club (Qps) [c]
+hb_daca		//
 hb_frtcl	// Fruitopia Club (Qps) [c]
 hb_gpal		// G' Palace (Qps)
 hb_gldpl	// Golden Palace (Mazooma)

@@ -2676,7 +2676,18 @@ ROM_START( sc1potpa )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
+// these mostly look like the same thing, and clearly have the BFM address scramble, but might be
+// bad dumps / missing the first half (in all cases it's either 0xff or a mirror of the 2nd half)
+// alternatively there might be an additional scramble
+ROM_START( sc1scunk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "su_cashx", 0x0000, 0x010000, CRC(1ed97ef6) SHA1(1aaf911369dc814ee2edf5d59baa2961bfc73168) )
+	ROM_LOAD( "s_nudge.p1", 0x0000, 0x010000, CRC(ca5fdbca) SHA1(60079aeb4904e42a4a45feb7f31cf6c71b611845) )
+	ROM_LOAD( "s_ghost.p1", 0x0000, 0x010000, CRC(e1e63cfd) SHA1(1e966758eb890eb8515bd943e7f8077e2948e22c) )
+	ROM_LOAD( "s.che", 0x0000, 0x010000, CRC(e285d761) SHA1(1d5aebebd41d388bc69777610dc3ee449e4a504e) )
 
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
 
 
 
@@ -2829,6 +2840,8 @@ GAME( 199?, sc1chain			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM", 
 GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //was mixed with the sc4/5 potp roms..  System status 98
 GAME( 199?, sc1potpa			, sc1potp			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
+
+GAME( 199?, sc1scunk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "unknown",      "Unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
 
 //Adder 2
