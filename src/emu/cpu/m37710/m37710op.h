@@ -2064,57 +2064,57 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #endif
 #endif /* FLAG_SET_M */
 
-/* M37710  Transfer C to direct register */
-#undef OP_TCD
+/* M37710  Transfer accumulator to direct register */
+#undef OP_TAD
 #if FLAG_SET_M
-#define OP_TCD()															\
+#define OP_TAD()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_D = REG_A | REG_B
 #else
-#define OP_TCD()															\
+#define OP_TAD()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_D = REG_A
 #endif
 
-/* M37710  Transfer direct register to C */
-#undef OP_TDC
+/* M37710  Transfer direct register to accumulator */
+#undef OP_TDA
 #if FLAG_SET_M
-#define OP_TDC()															\
+#define OP_TDA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_D;													\
 			FLAG_N = NFLAG_16(FLAG_Z);										\
 			REG_A = MAKE_UINT_8(REG_D);										\
 			REG_B = REG_D & 0xff00
 #else
-#define OP_TDC()															\
+#define OP_TDA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG_D;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
 
-/* M37710  Transfer C to stack pointer */
-#undef OP_TCS
+/* M37710  Transfer accumulator to stack pointer */
+#undef OP_TAS
 #if FLAG_SET_M
-#define OP_TCS()															\
+#define OP_TAS()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_S = REG_A | REG_B
 #else
-#define OP_TCS()															\
+#define OP_TAS()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_S = REG_A
 #endif
 
-/* M37710  Transfer stack pointer to C */
-#undef OP_TSC
+/* M37710  Transfer stack pointer to accumulator */
+#undef OP_TSA
 #if FLAG_SET_M
-#define OP_TSC()															\
+#define OP_TSA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_S;													\
 			FLAG_N = NFLAG_16(FLAG_Z);										\
 			REG_A = MAKE_UINT_8(REG_S);										\
 			REG_B = REG_S & 0xff00
 #else
-#define OP_TSC()															\
+#define OP_TSA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG_S;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
@@ -2325,7 +2325,7 @@ OP(17, OP_ORA  ( DLIY        ) ) /* ORA dliy(C) */
 OP(18, OP_CLC  (             ) ) /* CLC         */
 OP(19, OP_ORA  ( AY          ) ) /* ORA ay      */
 OP(1a, OP_DEC  (             ) ) /* DEA     (C) */
-OP(1b, OP_TCS  (             ) ) /* TCS     (G) */
+OP(1b, OP_TAS  (             ) ) /* TAS     (G) */
 OP(1c, OP_CLB  ( A           ) ) /* CLB a   (C) */
 OP(1d, OP_ORA  ( AX          ) ) /* ORA ax      */
 OP(1e, OP_ASLM ( AX          ) ) /* ASL ax      */
@@ -2357,7 +2357,7 @@ OP(37, OP_AND  ( DLIY        ) ) /* AND dliy(G) */
 OP(38, OP_SEC  (             ) ) /* SEC         */
 OP(39, OP_AND  ( AY          ) ) /* AND ay      */
 OP(3a, OP_INC  (             ) ) /* INA     (C) */
-OP(3b, OP_TSC  (             ) ) /* TSC     (G) */
+OP(3b, OP_TSA  (             ) ) /* TSA     (G) */
 OP(3c, OP_BBC  ( A           ) ) /* BBC a       */
 OP(3d, OP_AND  ( AX          ) ) /* AND ax      */
 OP(3e, OP_ROLM ( AX          ) ) /* ROL ax      */
@@ -2389,7 +2389,7 @@ OP(57, OP_EOR  ( DLIY        ) ) /* EOR dliy(G) */
 OP(58, OP_CLI  (             ) ) /* CLI         */
 OP(59, OP_EOR  ( AY          ) ) /* EOR ay      */
 OP(5a, OP_PHX  ( REG_Y       ) ) /* PHY     (C) */
-OP(5b, OP_TCD  (             ) ) /* TCD     (G) */
+OP(5b, OP_TAD  (             ) ) /* TAD     (G) */
 OP(5c, OP_JMPAL(             ) ) /* JMP al  (G) */
 OP(5d, OP_EOR  ( AX          ) ) /* EOR ax      */
 OP(5e, OP_LSRM ( AX          ) ) /* LSR ax      */
@@ -2421,7 +2421,7 @@ OP(77, OP_ADC  ( DLIY        ) ) /* ADC dliy(G) */
 OP(78, OP_SEI  (             ) ) /* SEI         */
 OP(79, OP_ADC  ( AY          ) ) /* ADC ay      */
 OP(7a, OP_PLX  ( REG_Y       ) ) /* PLY     (C) */
-OP(7b, OP_TDC  (             ) ) /* TDC     (G) */
+OP(7b, OP_TDA  (             ) ) /* TDA     (G) */
 OP(7c, OP_JMPAXI(            ) ) /* JMP axi (C) */
 OP(7d, OP_ADC  ( AX          ) ) /* ADC ax      */
 OP(7e, OP_RORM ( AX          ) ) /* ROR ax      */
