@@ -81,6 +81,8 @@ struct _m37710i_cpu_struct
 	uint bb;		/* holds high byte of secondary accumulator */
 	uint x;			/* Index Register X */
 	uint y;			/* Index Register Y */
+	uint xh;		/* holds high byte of x */
+	uint yh;		/* holds high byte of y */
 	uint s;			/* Stack Pointer */
 	uint pc;		/* Program Counter */
 	uint ppc;		/* Previous Program Counter */
@@ -152,6 +154,8 @@ extern int (*const m37710i_execute[])(m37710i_cpu_struct *cpustate, int cycles);
 #define REG_BB			cpustate->bb		/* Secondary Accumulator hi byte */
 #define REG_X			cpustate->x		/* Index X Register */
 #define REG_Y			cpustate->y		/* Index Y Register */
+#define REG_XH			cpustate->xh		/* X high byte */
+#define REG_YH			cpustate->yh		/* Y high byte */
 #define REG_S			cpustate->s		/* Stack Pointer */
 #define REG_PC			cpustate->pc		/* Program Counter */
 #define REG_PPC			cpustate->ppc		/* Previous Program Counter */

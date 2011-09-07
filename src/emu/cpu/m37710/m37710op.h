@@ -230,11 +230,19 @@ INLINE void m37710i_set_flag_mx(m37710i_cpu_struct *cpustate, uint value)
 #if FLAG_SET_X
 	if(!(value & FLAGPOS_X))
 	{
+		REG_X |= REG_XH;
+		REG_XH = 0;
+		REG_Y |= REG_YH;
+		REG_YH = 0;
 		FLAG_X = XFLAG_CLEAR;
 	}
 #else
 	if(value & FLAGPOS_X)
 	{
+		REG_XH = REG_X & 0xff00;
+		REG_X = MAKE_UINT_8(REG_X);
+		REG_YH = REG_Y & 0xff00;
+		REG_Y = MAKE_UINT_8(REG_Y);
 		FLAG_X = XFLAG_SET;
 	}
 #endif
@@ -587,6 +595,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #endif	// FLAG_SET_M
 
 /* M37710  Pull all */
+/* Unusual behavior: bit 6 has no effect */
 #undef OP_PUL
 #define OP_PUL(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
@@ -2028,18 +2037,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_Z = REG_A = MAKE_UINT_8(REG);								\
 			FLAG_N = NFLAG_8(FLAG_Z)
 #else
-#if FLAG_SET_X
-#define OP_TXA(REG)															\
-			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_Z = REG_A = MAKE_UINT_8(REG);								\
-			FLAG_N = NFLAG_16(FLAG_Z)
-#else
 #define OP_TXA(REG)															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
-#endif /* FLAG_SET_M */
 
 /* M37710   Transfer index to accumulator B */
 #undef OP_TXB
@@ -2049,18 +2051,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_Z = REG_BA = MAKE_UINT_8(REG);								\
 			FLAG_N = NFLAG_8(FLAG_Z)
 #else
-#if FLAG_SET_X
-#define OP_TXB(REG)															\
-			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_Z = REG_BA = MAKE_UINT_8(REG);								\
-			FLAG_N = NFLAG_16(FLAG_Z)
-#else
 #define OP_TXB(REG)															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_BA = REG;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
-#endif /* FLAG_SET_M */
 
 /* M37710  Transfer accumulator to direct register */
 #undef OP_TAD
@@ -2274,6 +2269,13 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			USE_ALL_CLKS();													\
 			CPU_STOPPED |= STOP_LEVEL_WAI
 
+/* M37710 load data bank register */
+#undef OP_LDT
+#define OP_LDT(MODE)	\
+	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
+	REG_DB = OPER_8_##MODE(cpustate)<<16;
+
+
 /* M37710  prefix for B accumulator (0x42) */
 /* There is a 2 cycle penalty for all instructions using this prefix */
 #undef OP_PFB
@@ -2296,12 +2298,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_UNIMP
 #define OP_UNIMP()															\
 	logerror("error M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x\n", REG_PB, REG_PPC);
-
-/* M37710 load data bank register */
-#undef OP_LDT
-#define OP_LDT(MODE)	\
-	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
-	REG_DB = OPER_8_##MODE(cpustate)<<16;
 
 /* ======================================================================== */
 /* ======================== OPCODE & FUNCTION TABLES ====================== */

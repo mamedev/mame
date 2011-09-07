@@ -824,10 +824,10 @@ static CPU_RESET( m37710 )
 	REG_PB = 0;
 	REG_DB = 0;
 	REG_S = (REG_S & 0xff) | 0x100;
-	REG_X &= 0xff;
-	REG_Y &= 0xff;
-	REG_B = REG_A & 0xff00;
-	REG_A &= 0xff;
+	REG_XH = REG_X & 0xff00; REG_X &= 0xff;
+	REG_YH = REG_Y & 0xff00; REG_Y &= 0xff;
+	REG_B = REG_A & 0xff00; REG_A &= 0xff;
+	REG_BB = REG_BA & 0xff00; REG_BA &= 0xff;
 
 	/* Set the function tables to emulation mode */
 	m37710i_set_execution_mode(cpustate, EXECUTION_MODE_M0X0);
@@ -945,6 +945,8 @@ static CPU_INIT( m37710 )
 	device->save_item(NAME(cpustate->bb));
 	device->save_item(NAME(cpustate->x));
 	device->save_item(NAME(cpustate->y));
+	device->save_item(NAME(cpustate->xh));
+	device->save_item(NAME(cpustate->yh));
 	device->save_item(NAME(cpustate->s));
 	device->save_item(NAME(cpustate->pc));
 	device->save_item(NAME(cpustate->ppc));
