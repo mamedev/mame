@@ -605,9 +605,12 @@ const floppy_image_format_t::desc_e *const st_gen_format::desc_fcp_11[] = {
 
 void st_gen_format::generate(int track, int head, int track_count, int head_count, UINT8 *buffer, int sector_count, floppy_image *image)
 {
-	desc_s sectors[11];
-	for(int i=0; i<sector_count; i++) {
-		sectors[i].data = buffer + 512*i;
+	// Note: sector numbers start at 1 for atari/pc
+	desc_s sectors[12];
+	sectors[0].data = 0;
+	sectors[0].size = 0;
+	for(int i=1; i<=sector_count; i++) {
+		sectors[i].data = buffer + 512*(i-1);
 		sectors[i].size = 512;
 	}
 
