@@ -1617,8 +1617,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_PLD
 #define OP_PLD()															\
 			CLK(CLK_OP + CLK_R16 + 2);										\
-			FLAG_Z = REG_D = m37710i_pull_16(cpustate);								\
-			FLAG_N = NFLAG_16(FLAG_Z)
+			REG_D = m37710i_pull_16(cpustate)
 
 /* M37710   Pull the Processor Status Register from the stack */
 #undef OP_PLP
@@ -2031,13 +2030,20 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_Z = REG_A = MAKE_UINT_8(REG);								\
 			FLAG_N = NFLAG_8(FLAG_Z)
 #else
+#if FLAG_SET_X
+#define OP_TXA(REG)															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_A = MAKE_UINT_8(REG);								\
+			FLAG_N = NFLAG_16(FLAG_Z)
+#else
 #define OP_TXA(REG)															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
+#endif /* FLAG_SET_M */
 
-/* M37710   Transfer index to accumulator */
+/* M37710   Transfer index to accumulator B */
 #undef OP_TXB
 #if FLAG_SET_M
 #define OP_TXB(REG)															\
@@ -2045,24 +2051,29 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_Z = REG_BA = MAKE_UINT_8(REG);								\
 			FLAG_N = NFLAG_8(FLAG_Z)
 #else
+#if FLAG_SET_X
+#define OP_TXB(REG)															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_BA = MAKE_UINT_8(REG);								\
+			FLAG_N = NFLAG_16(FLAG_Z)
+#else
 #define OP_TXB(REG)															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_BA = REG;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
+#endif /* FLAG_SET_M */
 
 /* M37710  Transfer C to direct register */
 #undef OP_TCD
 #if FLAG_SET_M
 #define OP_TCD()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_Z = REG_D = REG_A | REG_B;									\
-			FLAG_N = NFLAG_16(FLAG_Z)
+			REG_D = REG_A | REG_B
 #else
 #define OP_TCD()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_Z = REG_D = REG_A;											\
-			FLAG_N = NFLAG_16(FLAG_Z)
+			REG_D = REG_A
 #endif
 
 /* M37710  Transfer direct register to C */
@@ -2083,9 +2094,15 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 
 /* M37710  Transfer C to stack pointer */
 #undef OP_TCS
+#if FLAG_SET_M
 #define OP_TCS()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_S = REG_A | REG_B
+#else
+#define OP_TCS()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_S = REG_A
+#endif
 
 /* M37710  Transfer stack pointer to C */
 #undef OP_TSC
@@ -2119,9 +2136,15 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 
 /* M37710   Transfer X to stack pointer */
 #undef OP_TXS
+#if FLAG_SET_X
+#define OP_TXS()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_S = MAKE_UINT_8(REG_X)
+#else
 #define OP_TXS()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_S = REG_X
+#endif
 
 /* M37710  Transfer X to Y */
 #undef OP_TXY
