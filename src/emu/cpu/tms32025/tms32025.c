@@ -454,9 +454,7 @@ INLINE void CALCULATE_ADD_OVERFLOW(tms32025_state *cpustate, INT32 addval)
 		SET0(cpustate, OV_FLAG);
 		if (OVM)
 		{
-		// Stroff:HACK! support for overflow capping as implemented results in bad DSP floating point math in many
-		// System22 games - for example, the score display in Prop Cycle.
-		//  cpustate->ACC.d = ((INT32)cpustate->oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			cpustate->ACC.d = ((INT32)cpustate->oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
@@ -1493,37 +1491,25 @@ static void subb(tms32025_state *cpustate)
 	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
 	CALCULATE_SUB_CARRY(cpustate);
 }
-
-
 static void subc(tms32025_state *cpustate)
 {
-	/**
-    * conditional subtraction, which may be used for division
-    * execute 16 times for 16-bit division
-    *
-    * input:   32 bit numerator in accumulator
-    *          16 bit denominator in data memory
-    *
-    * output:  remainder in upper 16 bits
-    *          quotient in lower 16 bits
-    */
+	PAIR temp_alu;
+	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 15, SXM);
-	if( cpustate->ACC.d >= cpustate->ALU.d ) {
-		cpustate->ACC.d = (cpustate->ACC.d - cpustate->ALU.d)*2+1;
+	cpustate->ACC.d -= cpustate->ALU.d;		/* Temporary switch to ACC. Actual calculation is done as (ACC)-[mem] -> ALU, will be preserved later on. */
+	temp_alu.d = cpustate->ACC.d;
+	if ((INT32)((cpustate->oldacc.d ^ cpustate->ALU.d) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0) {
+		SET0(cpustate, OV_FLAG);			/* Not affected by OVM */
+	}
+	CALCULATE_SUB_CARRY(cpustate);
+	if( cpustate->oldacc.d >= cpustate->ALU.d ) {
+		cpustate->ACC.d = (cpustate->oldacc.d - cpustate->ALU.d)*2+1;
 	}
 	else {
-		cpustate->ACC.d = cpustate->ACC.d*2;
+		cpustate->ACC.d = cpustate->oldacc.d*2;
 	}
-// Stroff: HACK! support for overflow capping as implemented results in bad DSP floating point math in many
-// System22 games - for example, the score display in Prop Cycle.
-//  cpustate->ACC.d = ((INT32)cpustate->oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
-
-//  if ((INT32)((cpustate->oldacc.d ^ subval ) & (cpustate->oldacc.d ^ cpustate->ALU.d)) < 0) {
-//      SET0(cpustate, OV_FLAG);
-//  }
-//  CALCULATE_SUB_CARRY(cpustate);
+	cpustate->ALU.d = temp_alu.d;
 }
-
 static void subh(tms32025_state *cpustate)
 {
 	cpustate->oldacc.d = cpustate->ACC.d;
