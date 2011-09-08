@@ -2404,7 +2404,7 @@ ROM_START( edfbl )
 	ROM_LOAD16_BYTE( "01.bin",  0x000001, 0x020000, CRC(fc893ad0) SHA1(6d7be560e2343f3943f52ccdae7bd255b7720b6e) )
 	ROM_CONTINUE (                  0x080001, 0x020000 )
 
-	/* no 2nd 68k on this bootleg */
+	/* no 2nd 68k on this bootleg, is there a PIC? */
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
 	ROM_LOAD( "07.bin",  0x000000, 0x040000, CRC(4495c228) SHA1(2193561e193e696c66f27fa186f27ffbbdcb1826) )
@@ -3794,12 +3794,29 @@ static DRIVER_INIT( edf )
 
 static READ16_HANDLER( edfbl_input_r )
 {
-	return 0xffff;
+	const char *const in_names[] = { "SYSTEM", "P1", "P2", "DSW1", "DSW2" };
+	UINT16 res;
+
+	res = 0;
+
+	switch(offset)
+	{
+		case 0x02/2:
+		case 0x04/2:
+		case 0x06/2:
+		case 0x08/2:
+		case 0x0a/2: res = input_port_read(space->machine(), in_names[offset-1]); break;
+	}
+
+	return res;
 }
 
 static DRIVER_INIT( edfbl )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0002, 0xe000b, FUNC(edfbl_input_r));
+	device_t *oki1 = machine.device("oki1");
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0000, 0xe000f, FUNC(edfbl_input_r));
+	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_w));
 }
 
 static DRIVER_INIT( hayaosi1 )
@@ -3998,14 +4015,28 @@ static DRIVER_INIT( stdragona )
 
 static READ16_HANDLER( monkelf_input_r )
 {
-	return 0xffff;
+	const char *const in_names[] = { "P1", "P2", "DSW1", "DSW2", "SYSTEM" };
+	UINT16 res;
+
+	res = 0xffff;
+
+	switch(offset)
+	{
+		case 0x02/2:
+		case 0x04/2:
+		case 0x06/2:
+		case 0x08/2:
+		case 0x0a/2: res = input_port_read(space->machine(), in_names[offset-1]); break;
+	}
+
+	return res;
 }
 
 static DRIVER_INIT( monkelf )
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	UINT16 *ROM = (UINT16*)machine.region("maincpu")->base();
-	ROM[0x00744/2] = 0x4e71;
+	ROM[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0000, 0xe000f, FUNC(monkelf_input_r));
 
@@ -4043,7 +4074,7 @@ GAME( 1990, phantasm, avspirit, system_A,          phantasm, phantasm, ROT0,   "
 GAME( 1990, monkelf,  avspirit, system_B,          avspirit, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", GAME_NOT_WORKING )
 GAME( 1991, edf,      0,        system_B,          edf,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force", 0 )
 GAME( 1991, edfu,     edf,      system_B,          edf,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
-GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      edfbl,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      edfbl,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", GAME_NO_SOUND )
 GAME( 1991, 64street, 0,        system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
 GAME( 1991, 64streetj,64street, system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
 GAME( 1992, soldam,   0,        system_A,          soldam,   soldam,   ROT0,   "Jaleco", "Soldam", 0 )
