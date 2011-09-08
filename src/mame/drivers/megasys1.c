@@ -3874,16 +3874,16 @@ static WRITE16_HANDLER( iganinju_mcu_hs_w )
 
 static DRIVER_INIT( iganinju )
 {
-	UINT16 *RAM;
+	//UINT16 *RAM;
 
 	phantasm_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) machine.region("maincpu")->base();
+	//RAM  = (UINT16 *) machine.region("maincpu")->base();
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000, 0x3ffff, FUNC(iganinju_mcu_hs_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2f000, 0x2f009, FUNC(iganinju_mcu_hs_w));
 
-	RAM[0x00006e/2] = 0x0420;	// the only game that does
+	//RAM[0x00006e/2] = 0x0420;	// the only game that does
 								// not like lev 3 interrupts
 }
 
