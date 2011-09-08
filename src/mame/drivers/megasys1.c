@@ -135,6 +135,7 @@ static MACHINE_RESET( megasys1 )
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->m_ignore_oki_status = 1;	/* ignore oki status due 'protection' */
 	state->m_ip_select = 0;	/* reset protection */
+	state->m_mcu_hs = 0;
 }
 
 static MACHINE_RESET( megasys1_hachoo )
@@ -142,6 +143,7 @@ static MACHINE_RESET( megasys1_hachoo )
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	state->m_ignore_oki_status = 0;	/* strangely hachoo need real oki status */
 	state->m_ip_select = 0;	/* reset protection */
+	state->m_mcu_hs = 0;
 }
 
 
@@ -3656,6 +3658,21 @@ static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
  *
  *************************************/
 
+/*
+	MCU handshake sequence:
+	the M50747 MCU can overlay 0x20 bytes of data inside the ROM space.
+	The offset where this happens is given by m68k to MCU write [0x8/2] << 6.
+	For example stdragon writes 0x33e -> maps at 0xcf80-0xcfbf while stdragona writes 0x33f -> maps at 0xcfc0-0xcfff.
+*/
+
+#define MCU_HS_LOG 0
+
+#define MCU_HS_SEQ(_1_,_2_,_3_,_4_) \
+	(state->m_mcu_hs_ram[0/2] == _1_ && \
+	 state->m_mcu_hs_ram[2/2] == _2_ && \
+	 state->m_mcu_hs_ram[4/2] == _3_ && \
+	 state->m_mcu_hs_ram[6/2] == _4_)
+
 static DRIVER_INIT( 64street )
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
@@ -3670,14 +3687,53 @@ static DRIVER_INIT( 64street )
 	state->m_ip_select_values[4] = 0x56;
 }
 
+static READ16_HANDLER( megasys1A_mcu_hs_r )
+{
+	UINT16 *ROM  = (UINT16 *) space->machine().region("maincpu")->base();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
+
+	if(state->m_mcu_hs && ((state->m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
+	{
+		if(MCU_HS_LOG && !space->debugger_access())
+			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
+
+		return 0x889e;
+	}
+
+	return ROM[offset];
+}
+
+static WRITE16_HANDLER( megasys1A_mcu_hs_w )
+{
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
+
+	// following is hachoo, other games differs slightly
+	// R 0x5f0, if bit 0 == 0 then skips hs seq (debug?)
+	// [0/2]: 0x00ff
+	// [2/2]: 0x0055
+	// [4/2]: 0x00aa
+	// [6/2]: 0x0000
+	// [8/2]: 0x0fff
+	// R 0x5f0, if bit 1 == 0 then goes further (debug again?)
+	// R 0x3ffc0, compares with seed 0x889e
+
+	COMBINE_DATA(&state->m_mcu_hs_ram[offset]);
+
+	if(MCU_HS_SEQ(0x00ff,0x0055,0x00aa,0x0000) && offset == 0x8/2)
+		state->m_mcu_hs = 1;
+	else
+		state->m_mcu_hs = 0;
+
+	if(MCU_HS_LOG && !space->debugger_access())
+		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
+}
+
 static DRIVER_INIT( astyanax )
 {
-	UINT16 *RAM;
-
 	astyanax_rom_decode(machine, "maincpu");
 
-	RAM = (UINT16 *) machine.region("maincpu")->base();
-	RAM[0x0004e6/2] = 0x6040;	// protection
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000, 0x3ffff, FUNC(megasys1A_mcu_hs_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20000, 0x20009, FUNC(megasys1A_mcu_hs_w));
 }
 
 static DRIVER_INIT( avspirit )
@@ -3746,17 +3802,6 @@ static DRIVER_INIT( edfbl )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0002, 0xe000b, FUNC(edfbl_input_r));
 }
 
-
-static DRIVER_INIT( hachoo )
-{
-	UINT16 *RAM;
-
-	astyanax_rom_decode(machine, "maincpu");
-
-	RAM  = (UINT16 *) machine.region("maincpu")->base();
-	RAM[0x0006da/2] = 0x6000;	// protection
-}
-
 static DRIVER_INIT( hayaosi1 )
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
@@ -3767,6 +3812,44 @@ static DRIVER_INIT( hayaosi1 )
 	state->m_ip_select_values[4] = 0x55;
 }
 
+static READ16_HANDLER( iganinju_mcu_hs_r )
+{
+	UINT16 *ROM  = (UINT16 *) space->machine().region("maincpu")->base();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
+
+	if(state->m_mcu_hs && ((state->m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
+	{
+		if(MCU_HS_LOG && !space->debugger_access())
+			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
+
+		return 0x835d;
+	}
+
+	return ROM[offset];
+}
+
+static WRITE16_HANDLER( iganinju_mcu_hs_w )
+{
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
+
+	// [0/2]: 0x0000
+	// [2/2]: 0x0055
+	// [4/2]: 0x00aa
+	// [6/2]: 0x00ff
+	// [8/2]: 0x0bc0
+	// expects 0x835d to be read at 0x2f000, does hs sequence until that happens
+
+	COMBINE_DATA(&state->m_mcu_hs_ram[offset]);
+
+	if(MCU_HS_SEQ(0x0000,0x0055,0x00aa,0x00ff) && offset == 0x8/2)
+		state->m_mcu_hs = 1;
+	else
+		state->m_mcu_hs = 0;
+
+	if(MCU_HS_LOG && !space->debugger_access())
+		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
+}
+
 static DRIVER_INIT( iganinju )
 {
 	UINT16 *RAM;
@@ -3774,7 +3857,9 @@ static DRIVER_INIT( iganinju )
 	phantasm_rom_decode(machine, "maincpu");
 
 	RAM  = (UINT16 *) machine.region("maincpu")->base();
-	RAM[0x02f000/2] = 0x835d;	// protection
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000, 0x3ffff, FUNC(iganinju_mcu_hs_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2f000, 0x2f009, FUNC(iganinju_mcu_hs_w));
 
 	RAM[0x00006e/2] = 0x0420;	// the only game that does
 								// not like lev 3 interrupts
@@ -3791,15 +3876,15 @@ static DRIVER_INIT( jitsupro )
 {
 	device_t *oki1 = machine.device("oki1");
 	device_t *oki2 = machine.device("oki2");
-	UINT16 *RAM  = (UINT16 *) machine.region("maincpu")->base();
+	//UINT16 *RAM  = (UINT16 *) machine.region("maincpu")->base();
 
 	astyanax_rom_decode(machine, "maincpu");		// Code
 
 	jitsupro_gfx_unmangle(machine, "gfx1");	// Gfx
 	jitsupro_gfx_unmangle(machine, "gfx4");
 
-	RAM[0x436/2] = 0x4e71;	// protection
-	RAM[0x438/2] = 0x4e71;	//
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000, 0x3ffff, FUNC(megasys1A_mcu_hs_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20000, 0x20009, FUNC(megasys1A_mcu_hs_w));
 
 	/* the sound code writes oki commands to both the lsb and msb */
 	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xa0000, 0xa0003, FUNC(okim6295_both_w));
@@ -3814,16 +3899,6 @@ static DRIVER_INIT( peekaboo )
 static DRIVER_INIT( phantasm )
 {
 	phantasm_rom_decode(machine, "maincpu");
-}
-
-static DRIVER_INIT( plusalph )
-{
-	UINT16 *RAM;
-
-	astyanax_rom_decode(machine, "maincpu");
-
-	RAM  = (UINT16 *) machine.region("maincpu")->base();
-	RAM[0x0012b6/2] = 0x0000;	// protection
 }
 
 static DRIVER_INIT( rodland )
@@ -3844,6 +3919,7 @@ static READ16_HANDLER( soldamj_spriteram16_r )
 	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	return state->m_spriteram[offset];
 }
+
 static WRITE16_HANDLER( soldamj_spriteram16_w )
 {
 	megasys1_state *state = space->machine().driver_data<megasys1_state>();
@@ -3867,27 +3943,57 @@ static DRIVER_INIT( soldam )
 }
 
 
+static READ16_HANDLER( stdragon_mcu_hs_r )
+{
+	UINT16 *ROM  = (UINT16 *) space->machine().region("maincpu")->base();
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
+
+	if(state->m_mcu_hs && ((state->m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
+	{
+		if(MCU_HS_LOG && !space->debugger_access())
+			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
+
+		return 0x835d;
+	}
+
+	return ROM[offset];
+}
+
+static WRITE16_HANDLER( stdragon_mcu_hs_w )
+{
+	megasys1_state *state = space->machine().driver_data<megasys1_state>();
+
+	COMBINE_DATA(&state->m_mcu_hs_ram[offset]);
+
+	if(MCU_HS_SEQ(0x0000,0x0055,0x00aa,0x00ff) && offset == 0x8/2)
+		state->m_mcu_hs = 1;
+	else
+		state->m_mcu_hs = 0;
+
+	if(MCU_HS_LOG && !space->debugger_access())
+		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
+}
+
+
 static DRIVER_INIT( stdragon )
 {
-	UINT16 *RAM;
-
 	phantasm_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) machine.region("maincpu")->base();
-	RAM[0x00045e/2] = 0x0098;	// protection
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000, 0x3ffff, FUNC(stdragon_mcu_hs_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x23ff0, 0x23ff9, FUNC(stdragon_mcu_hs_w));
 }
 
 static DRIVER_INIT( stdragona )
 {
-	UINT16 *RAM;
+	//UINT16 *RAM;
 
 	phantasm_rom_decode(machine, "maincpu");
 
 	stdragona_gfx_unmangle(machine, "gfx1");
 	stdragona_gfx_unmangle(machine, "gfx4");
 
-	RAM  = (UINT16 *) machine.region("maincpu")->base();
-	RAM[0x000458/2] = 0x0098;	// protection
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000, 0x3ffff, FUNC(stdragon_mcu_hs_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x23ff0, 0x23ff9, FUNC(stdragon_mcu_hs_w));
 }
 
 static READ16_HANDLER( monkelf_input_r )
@@ -3924,9 +4030,9 @@ GAME( 1988, kazan,    0,        system_A,          kazan,    iganinju, ROT0,   "
 GAME( 1988, iganinju, kazan,    system_A,          kazan,    iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
 GAME( 1989, astyanax, 0,        system_A,          astyanax, astyanax, ROT0,   "Jaleco", "The Astyanax", 0 )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", 0 )
-GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   hachoo,   ROT0,   "Jaleco", "Hachoo!", 0 )
+GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   astyanax, ROT0,   "Jaleco", "Hachoo!", 0 )
 GAME( 1989, jitsupro, 0,        system_A,          jitsupro, jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", 0 )
-GAME( 1989, plusalph, 0,        system_A,          plusalph, plusalph, ROT270, "Jaleco", "Plus Alpha", 0 )
+GAME( 1989, plusalph, 0,        system_A,          plusalph, astyanax, ROT270, "Jaleco", "Plus Alpha", 0 )
 GAME( 1989, stdragon, 0,        system_A,          stdragon, stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", 0 )
 GAME( 1989, stdragona,stdragon, system_A,          stdragon, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", GAME_NOT_WORKING ) // gfx scramble
 GAME( 1990, rodland,  0,        system_A,          rodland,  rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )

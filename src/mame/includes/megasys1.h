@@ -48,6 +48,9 @@ public:
 	UINT16 *m_buffer_spriteram16;
 	UINT16 *m_buffer2_spriteram16;
 	int m_layers_order[16];
+
+	int m_mcu_hs;
+	UINT16 m_mcu_hs_ram[0x10];
 };
 
 
