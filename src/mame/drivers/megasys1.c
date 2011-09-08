@@ -3772,6 +3772,11 @@ static DRIVER_INIT( chimerab )
 	state->m_ip_select_values[4] = 0x55;
 }
 
+static READ16_HANDLER( cybattlr_test_r )
+{
+	return 0;
+}
+
 static DRIVER_INIT( cybattlr )
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
@@ -3780,6 +3785,7 @@ static DRIVER_INIT( cybattlr )
 	state->m_ip_select_values[2] = 0x53;
 	state->m_ip_select_values[3] = 0x54;
 	state->m_ip_select_values[4] = 0x55;
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1dd280, 0x1dd28f, FUNC(cybattlr_test_r));
 }
 
 static DRIVER_INIT( edf )
@@ -3813,7 +3819,7 @@ static READ16_HANDLER( edfbl_input_r )
 
 static DRIVER_INIT( edfbl )
 {
-	device_t *oki1 = machine.device("oki1");
+	//device_t *oki1 = machine.device("oki1");
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe0000, 0xe000f, FUNC(edfbl_input_r));
 	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_w));
