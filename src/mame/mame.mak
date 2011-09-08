@@ -1951,7 +1951,8 @@ $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/pmpoker.lh
 
-$(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh
+$(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh \
+			$(LAYOUT)/bingowng.lh
 
 $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 

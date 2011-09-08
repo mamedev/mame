@@ -256,6 +256,21 @@ VIDEO_START( goldstar )
 	state->m_cm_enable_reg = 0x0b;
 }
 
+VIDEO_START( bingowng )
+{
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+
+	state->m_reel1_tilemap = tilemap_create(machine,get_goldstar_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
+
+	tilemap_set_scroll_cols(state->m_reel1_tilemap, 64);
+
+	state->m_fg_tilemap = tilemap_create(machine,get_goldstar_fg_tile_info,tilemap_scan_rows,8,8, 64, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+
+	// is there an enable reg for this game?
+	state->m_cm_enable_reg = 0x0b;
+}
+
 VIDEO_START( magical )
 {
 	goldstar_state *state = machine.driver_data<goldstar_state>();
@@ -395,6 +410,8 @@ static const rectangle magical_visible3 = { 0*8, (14+48)*8-1, 20*8, (20+8)*8-1 }
 static const rectangle magical_visible1alt = { 0*8, (16+48)*8-1,  4*8,  16*8-1 };
 static const rectangle magical_visible2alt = { 0*8, (16+48)*8-1, 16*8,  28*8-1 };
 
+static const rectangle bingowng_visible1 = { 0*8, (14+48)*8-1,  3*8,  (4+7)*8-1 };
+
 
 SCREEN_UPDATE( goldstar )
 {
@@ -419,6 +436,48 @@ SCREEN_UPDATE( goldstar )
 		tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
 		tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
 		tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
+	}
+
+	if (state->m_cm_enable_reg &0x04)
+	{
+		if (screen->machine().region("user1")->base())
+		{
+			const gfx_element *gfx = screen->machine().gfx[2];
+			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));
+			int girlxscroll = (INT8)((state->m_cm_girl_scroll & 0x0f)<<4);
+
+			drawgfxzoom_transpen(bitmap,cliprect,gfx,state->m_cmaster_girl_num,state->m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+		}
+	}
+
+	if (state->m_cm_enable_reg &0x02)
+	{
+		tilemap_draw(bitmap,cliprect, state->m_fg_tilemap, 0, 0);
+	}
+
+	return 0;
+}
+
+
+SCREEN_UPDATE( bingowng )
+{
+	goldstar_state *state = screen->machine().driver_data<goldstar_state>();
+	int i;
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+
+	if (!state->m_cm_enable_reg &0x01)
+		return 0;
+
+	if (state->m_cm_enable_reg &0x08)
+	{
+		for (i= 0;i < 64;i++)
+		{
+			tilemap_set_scrolly(state->m_reel1_tilemap, i, state->m_reel1_scroll[i]);
+		}
+
+
+		tilemap_draw(bitmap, &bingowng_visible1, state->m_reel1_tilemap, 0, 0);
 	}
 
 	if (state->m_cm_enable_reg &0x04)
