@@ -20,7 +20,7 @@
 #include <signal.h>
 #endif
 
-#ifdef SDLMAME_NETBSD
+#if defined(SDLMAME_NETBSD) || defined(SDLMAME_OPENBSD)
 /* for SIGKILL */
 #include <signal.h>
 #endif
