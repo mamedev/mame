@@ -40,6 +40,7 @@
 
 
 
+
 // "Pacman hardware" games
 puckman			// (c) 1980 Namco
 puckmana		// (c) 1980 Namco
@@ -13497,6 +13498,25 @@ m4supsl
 m4abra		// Abracadabra (Bwb)
 m4wcnov		// World Cup (Nova)
 m4excaln	// Excalibur (Nova)
+
+/* Bdd? */
+m4robo
+m4trg
+m4mbel
+m4abeaut
+m4cmont
+m4blkmgc
+m4amalad
+m4bben		
+m4bbox		
+m4frnudg	
+m4frmtx	
+m4jok2k	
+m4mjp		
+m4milrou	
+m4kingg		
+m4bddunk	
+
 
 // MPU4 + Video board
 
