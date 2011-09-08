@@ -707,7 +707,7 @@ ROM_START( starspnr )
 	ROM_LOAD( "16-1-101.b11", 0x0200, 0x0100, NO_DUMP )
 ROM_END
 
-/* no information about this one */
+/* This has been identified as Silhouette with the help of a flyer */
 ROM_START( acefruit  )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vp-h9.bin",    0x00e000, 0x0800, CRC(f595daf7) SHA1(be5abd34fd06f73cd80f5b15902d158e33705c8f) )
@@ -732,7 +732,8 @@ ROM_END
 
 
 GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, sidewndr, ROT270, "ACE", "Sidewinder", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
-GAMEL( 1981?, spellbnd, sidewndr, acefruit, spellbnd, 0,        ROT270, "ACE", "Spellbound", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
+GAMEL( 1981?, spellbnd, 0,		  acefruit, spellbnd, 0,        ROT270, "ACE", "Spellbound", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
 GAME ( 1982?, starspnr, 0,        acefruit, starspnr, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", GAME_NOT_WORKING | GAME_NO_SOUND )
-// inputs need fixing on this one, no idea what it's called either
-GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, 0,        ROT270, "ACE", "unknown ACE fruits game", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, 0,        ROT270, "ACE", "Silhouette", GAME_NOT_WORKING | GAME_NO_SOUND ) // inputs and video in bonus game need fixing on this one
+// not dumped: Magnum?
+
