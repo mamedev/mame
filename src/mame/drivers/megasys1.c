@@ -122,7 +122,6 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -158,17 +157,19 @@ static MACHINE_RESET( megasys1_hachoo )
                         [ Main CPU - System A / Z ]
 ***************************************************************************/
 
-#define INTERRUPT_NUM_A		3
-static INTERRUPT_GEN( interrupt_A )
+static TIMER_DEVICE_CALLBACK( megasys1A_scanline )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 0:		device_set_input_line(device, 3, HOLD_LINE);	break;
-		case 1:		device_set_input_line(device, 2, HOLD_LINE);	break;
-		case 2:		device_set_input_line(device, 1, HOLD_LINE);	break;
-	}
-}
+	int scanline = param;
 
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+
+	if(scanline == 0)
+		cputag_set_input_line(timer.machine(), "maincpu", 1, HOLD_LINE);
+
+	if(scanline == 128)
+		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+}
 
 static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
@@ -192,17 +193,19 @@ ADDRESS_MAP_END
                             [ Main CPU - System B ]
 ***************************************************************************/
 
-#define INTERRUPT_NUM_B		3
-static INTERRUPT_GEN( interrupt_B )
+static TIMER_DEVICE_CALLBACK( megasys1B_scanline )
 {
-	switch (cpu_getiloops(device))
-	{
-		case 0:		device_set_input_line(device, 4, HOLD_LINE); break;
-		case 1:		device_set_input_line(device, 1, HOLD_LINE); break;
-		default:	device_set_input_line(device, 2, HOLD_LINE); break;
-	}
-}
+	int scanline = param;
 
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+
+	if(scanline == 0)
+		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+
+	if(scanline == 128)
+		cputag_set_input_line(timer.machine(), "maincpu", 1, HOLD_LINE);
+}
 
 
 /*           Read the input ports, through a protection device:
@@ -293,7 +296,7 @@ ADDRESS_MAP_END
                             [ Main CPU - System D ]
 ***************************************************************************/
 
-static INTERRUPT_GEN( interrupt_D )
+static INTERRUPT_GEN( megasys1D_irq )
 {
 	device_set_input_line(device, 2, HOLD_LINE);
 }
@@ -1461,7 +1464,7 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
 	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
-	MCFG_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", megasys1A_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	MCFG_CPU_PROGRAM_MAP(megasys1A_sound_map)
@@ -1514,7 +1517,8 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
-	MCFG_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(megasys1B_scanline)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
@@ -1526,7 +1530,7 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
-	MCFG_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", megasys1B_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(megasys1)
 
@@ -1575,7 +1579,8 @@ static MACHINE_CONFIG_DERIVED( system_C, system_A )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(megasys1C_map)
-	MCFG_CPU_VBLANK_INT_HACK(interrupt_C,INTERRUPT_NUM_C)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(megasys1B_scanline)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
@@ -1598,7 +1603,7 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(megasys1D_map)
-	MCFG_CPU_VBLANK_INT("screen", interrupt_D)
+	MCFG_CPU_VBLANK_INT("screen", megasys1D_irq)
 
 	MCFG_MACHINE_RESET(megasys1)
 
@@ -1660,7 +1665,7 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
 	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
-	MCFG_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", megasys1A_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
