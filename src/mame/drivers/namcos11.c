@@ -102,6 +102,9 @@ Notes:
       AT28C16  - 2k x8 EEPROM (DIP28)
       61C256   - 32k x8 SRAM (x2, SOJ28)
       2061ASC-1- IC Designs 2061ASC-1 programmable clock generator (SOIC16)
+                   * Pin 8 MCLKOUT - 20.0132MHz tied to C352
+                   * Pin 9 VCLKOUT - 40.0264MHz (==2x MCLKOUT). Tied to C195
+                   * Pin 7 XTALOUT - 16.93426MHz. This is tied to the clock input of the C76
       S11MOT*  - Standard System 11 PALs (DIP20)
       WAVE.8K  - Sound samples, 42 pin DIP MASKROM, either 16MBit or 32MBit. If 32MBit, it is programmed in Byte Mode.
       SPROG.6D - Sound program, Intel PA28F200BX 2MBit Flash ROM (SOP44)
@@ -983,7 +986,7 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
-	MCFG_CPU_ADD("c76", M37702, 16384000) // note: this+c352 clock source is a ICD2061A IC, no XTAL
+	MCFG_CPU_ADD("c76", M37702, 16934400)
 	MCFG_CPU_PROGRAM_MAP(c76_map)
 	MCFG_CPU_IO_MAP(c76_io_map)
 	MCFG_CPU_VBLANK_INT_HACK(c76_interrupt, 3)
@@ -993,7 +996,9 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_C352_ADD("c352", 16384000)
+	// note: C352 internal divider is currently set to 192, but that sounds wrong with an input clock of 20MHz.
+	// 228.0 here is a guess, estimated from PCB recordings sound/music pitch.
+	MCFG_C352_ADD("c352", 20000000 / (228.0/192.0))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -1007,19 +1012,6 @@ static MACHINE_CONFIG_DERIVED( coh110, coh100 )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( pocketrc, coh110 )
-	MCFG_CPU_REPLACE("c76", M37702, 16934400) // ICD2061A setup differs
-	MCFG_CPU_PROGRAM_MAP(c76_map)
-	MCFG_CPU_IO_MAP(c76_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(c76_interrupt, 3)
-
-	MCFG_DEVICE_REPLACE("c352", C352, 16934400)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos11 )
@@ -1825,25 +1817,25 @@ ROM_START( xevi3dg )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 
-GAME( 1994, tekken,    0,        coh100,   tekken,    tekken,    ROT0, "Namco", "Tekken (World, TE4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1994, tekkenac,  tekken,   coh100,   tekken,    tekken,    ROT0, "Namco", "Tekken (Asia, TE2/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1994, tekkenab,  tekken,   coh100,   tekken,    tekken,    ROT0, "Namco", "Tekken (Asia, TE2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1994, tekkenjb,  tekken,   coh100,   tekken,    tekken,    ROT0, "Namco", "Tekken (Japan, TE1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, tekken2,   0,        coh110,   tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.D)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2ub, tekken2,  coh100,   tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2ab, tekken2,  coh100,   tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (Asia, TES2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2aa, tekken2,  coh100,   tekken,    tekken2,   ROT0, "Namco", "Tekken 2 (Asia, TES2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, souledge,  0,        coh110,   souledge,  souledge,  ROT0, "Namco", "Soul Edge Ver. II (World, SO4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, souledgeuc,souledge, coh110,   souledge,  souledge,  ROT0, "Namco", "Soul Edge Ver. II (US, SO3/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, souledgeua,souledge, coh110,   souledge,  souledge,  ROT0, "Namco", "Soul Edge (US, SO3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, souledgeaa,souledge, coh110,   souledge,  souledge,  ROT0, "Namco", "Soul Edge (Asia, SO2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, souledgeja,souledge, coh110,   souledge,  souledge,  ROT0, "Namco", "Soul Edge (Japan, SO1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, dunkmnia,  0,        coh110,   namcos11,  dunkmnia,  ROT0, "Namco", "Dunk Mania (Asia, DM2/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, dunkmniajc,dunkmnia, coh110,   namcos11,  dunkmnia,  ROT0, "Namco", "Dunk Mania (Japan, DM1/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, xevi3dg,   0,        coh110,   namcos11,  xevi3dg,   ROT0, "Namco", "Xevious 3D/G (Japan, XV31/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, primglex,  0,        coh110,   tekken,    primglex,  ROT0, "Namco", "Prime Goal EX (Japan, PG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, danceyes,  0,        coh110,   namcos11,  danceyes,  ROT0, "Namco", "Dancing Eyes (Japan, DC1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, pocketrc,  0,        pocketrc, pocketrc,  pocketrc,  ROT0, "Namco", "Pocket Racer (Japan, PKR1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, starswep,  0,        coh110,   namcos11,  starswep,  ROT0, "Axela/Namco", "Star Sweep (Japan, STP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, myangel3,  0,        coh110,   myangel3,  myangel3,  ROT0, "Namco", "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ptblank2ua,ptblank2, coh110,   ptblank2ua,ptblank2ua,ROT0, "Namco", "Point Blank 2 (US, GNB3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, tekken,    0,        coh100, tekken,    tekken,    ROT0, "Namco", "Tekken (World, TE4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, tekkenac,  tekken,   coh100, tekken,    tekken,    ROT0, "Namco", "Tekken (Asia, TE2/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, tekkenab,  tekken,   coh100, tekken,    tekken,    ROT0, "Namco", "Tekken (Asia, TE2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, tekkenjb,  tekken,   coh100, tekken,    tekken,    ROT0, "Namco", "Tekken (Japan, TE1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, tekken2,   0,        coh110, tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.D)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2ub, tekken2,  coh100, tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2ab, tekken2,  coh100, tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (Asia, TES2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2aa, tekken2,  coh100, tekken,    tekken2,   ROT0, "Namco", "Tekken 2 (Asia, TES2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, souledge,  0,        coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge Ver. II (World, SO4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, souledgeuc,souledge, coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge Ver. II (US, SO3/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, souledgeua,souledge, coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge (US, SO3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, souledgeaa,souledge, coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge (Asia, SO2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, souledgeja,souledge, coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge (Japan, SO1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, dunkmnia,  0,        coh110, namcos11,  dunkmnia,  ROT0, "Namco", "Dunk Mania (Asia, DM2/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, dunkmniajc,dunkmnia, coh110, namcos11,  dunkmnia,  ROT0, "Namco", "Dunk Mania (Japan, DM1/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, xevi3dg,   0,        coh110, namcos11,  xevi3dg,   ROT0, "Namco", "Xevious 3D/G (Japan, XV31/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, primglex,  0,        coh110, tekken,    primglex,  ROT0, "Namco", "Prime Goal EX (Japan, PG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, danceyes,  0,        coh110, namcos11,  danceyes,  ROT0, "Namco", "Dancing Eyes (Japan, DC1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, pocketrc,  0,        coh110, pocketrc,  pocketrc,  ROT0, "Namco", "Pocket Racer (Japan, PKR1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, starswep,  0,        coh110, namcos11,  starswep,  ROT0, "Axela/Namco", "Star Sweep (Japan, STP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, myangel3,  0,        coh110, myangel3,  myangel3,  ROT0, "Namco", "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ptblank2ua,ptblank2, coh110, ptblank2ua,ptblank2ua,ROT0, "Namco", "Point Blank 2 (US, GNB3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
