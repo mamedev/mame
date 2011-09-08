@@ -2775,7 +2775,7 @@ ROM_START( imgfight )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "imgfight_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_LOAD( "imgfight_i8751h.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )	/* sprites */
@@ -2810,7 +2810,7 @@ ROM_START( imgfighto )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "imgfight_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_LOAD( "imgfight_i8751h.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )	/* sprites */
@@ -3106,7 +3106,7 @@ ROM_START( xmultiplm72 )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "xmultipl_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_LOAD( "xmultipl_i8751h.bin",  0x00000, 0x01000, CRC(c8ceb3cd) SHA1(e5d20a3a9d7f0919604543c97643a03434d80130) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "t44.00",       0x00000, 0x20000, CRC(db45186e) SHA1(8c8edeb4b7e6b0516f2597823dc27eba9c5d9528) )	/* sprites */
