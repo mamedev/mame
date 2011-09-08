@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[2])
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0d8000, 0x0d8001) AM_READWRITE(ip_select_r,ip_select_w)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_ram)
+	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM AM_BASE_MEMBER(megasys1_state, m_ram) //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
 
 
@@ -3772,11 +3772,6 @@ static DRIVER_INIT( chimerab )
 	state->m_ip_select_values[4] = 0x55;
 }
 
-static READ16_HANDLER( cybattlr_test_r )
-{
-	return 0;
-}
-
 static DRIVER_INIT( cybattlr )
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
@@ -3785,7 +3780,6 @@ static DRIVER_INIT( cybattlr )
 	state->m_ip_select_values[2] = 0x53;
 	state->m_ip_select_values[3] = 0x54;
 	state->m_ip_select_values[4] = 0x55;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1dd280, 0x1dd28f, FUNC(cybattlr_test_r));
 }
 
 static DRIVER_INIT( edf )
