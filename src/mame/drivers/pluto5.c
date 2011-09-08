@@ -355,7 +355,7 @@ static DRIVER_INIT( hb )
 {
 	astra_addresslines( (UINT16*)machine.region( "maincpu" )->base(), machine.region( "maincpu" )->bytes(), 0 );
 
-	#if 1
+	#if 0
 	{
 		UINT8* ROM = machine.region( "maincpu" )->base();
 		FILE *fp;
