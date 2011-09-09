@@ -2533,6 +2533,25 @@ ROM_START( sc5pircl )
 ROM_END
 
 
+ROM_START( sc5mrrcl )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	// sc5
+	ROM_LOAD16_BYTE( "95424586.lo", 0x00001, 0x080000, CRC(6f4da0cf) SHA1(4a671f62de1a1af48cd3754b7a1d60c005ce9dfb) )
+	ROM_LOAD16_BYTE( "95424587.hi", 0x00000, 0x080000, CRC(89e2b659) SHA1(c7f1e6cb5b04aff30bb5997cef50fa7a621334f7) )
+
+	ROM_REGION( 0x400000, "altrevs", 0 )
+	// sc5
+	ROM_LOAD16_BYTE( "95425586.lo", 0x00001, 0x080000, CRC(03bfa76e) SHA1(ca73d02dddf5e5091f1b26cb6b3f9c5db8ea071d) )
+	ROM_LOAD16_BYTE( "95425587.hi", 0x00000, 0x080000, CRC(0c204d84) SHA1(31a4f5021b2b12bdf930ed13268c52961aab3cbf) )
+	ROM_LOAD16_BYTE( "99990558.lo", 0x00001, 0x080000, CRC(ae3f79e9) SHA1(0b086425f1091d01a71bcfaa33627f9b8b66632a) )
+	ROM_LOAD16_BYTE( "99990559.hi", 0x00000, 0x080000, CRC(e9c6849d) SHA1(e3b846b5ec06f7048cde44ca1ae45c235476695a) )
+	ROM_LOAD16_BYTE( "99991558.lo", 0x00001, 0x080000, CRC(b78a36ad) SHA1(a6728544e10e7578cc6b2c6a06d031fe1e30980e) )
+	ROM_LOAD16_BYTE( "99991559.hi", 0x00000, 0x080000, CRC(c87db6c9) SHA1(6f100cbfd4a94f8f01fba7996bc59fdfc3b20ce5) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+
 /* Adder 5 */
 
 // sets which only contain larger roms (almost certainly adder 5)
@@ -3066,6 +3085,7 @@ GAME( 200?, sc5u7606	,0,			sc5, sc5, 0, ROT0, "Mazooma","Unknown Scorpion '95417
 GAME( 200?, sc5rhr		,0,			sc5, sc5, 0, ROT0, "Qps","Red Hot Reels (Qps) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5srrcl	,0,			sc5, sc5, 0, ROT0, "BFM","Snake Rattle 'n' Roll Club (Bellfruit) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5pircl	,0,			sc5, sc5, 0, ROT0, "BFM","The Prize Is Right Club (Bellfruit) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc5mrrcl	,0,			sc5, sc5, 0, ROT0, "Mazooma","Monopoly Road To Riches Club (Mazooma) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // Adder 5
 GAME( 200?, ad5bpfpm	,0,			sc5, sc5, 0, ROT0, "Mazooma","Bullseye Pounds For Points (Mazooma) (Scorpion 5, Adder 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
