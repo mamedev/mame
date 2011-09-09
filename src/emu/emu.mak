@@ -64,6 +64,7 @@ EMUOBJS = \
 	$(EMUOBJ)/diexec.o \
 	$(EMUOBJ)/diimage.o \
 	$(EMUOBJ)/dimemory.o \
+	$(EMUOBJ)/dinetwork.o \
 	$(EMUOBJ)/dinvram.o \
 	$(EMUOBJ)/dirtc.o \
 	$(EMUOBJ)/diserial.o \
@@ -122,7 +123,8 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/textbuf.o \
 	$(EMUOBJ)/debugint/debugint.o \
 	$(EMUOBJ)/profiler.o \
-	$(OSDOBJ)/osdepend.o
+	$(OSDOBJ)/osdepend.o \
+	$(OSDOBJ)/osdnet.o
 
 EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/filter.o \
