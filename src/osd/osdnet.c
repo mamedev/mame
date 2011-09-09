@@ -3,6 +3,7 @@
 
 typedef struct netdev_entry
 {
+	int id;
 	char name[256];
 	create_netdev func;
 	struct netdev_entry *m_next;
@@ -13,17 +14,18 @@ static class simple_list<netdev_entry_t> netdev_list;
 void add_netdev(const char *name, create_netdev func)
 {
 	netdev_entry_t *entry = new netdev_entry_t;
+	entry->id = netdev_list.count();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';
 	entry->func = func;
 	netdev_list.append(*entry);
 }
 
-class netdev *open_netdev(const char *name, class device_network_interface *ifdev, int rate)
+class netdev *open_netdev(int id, class device_network_interface *ifdev, int rate)
 {
 	netdev_entry_t *entry = netdev_list.first();
 	while(entry) {
-		if(!strncmp(name, entry->name, 256))
+		if(entry->id==id)
 			return entry->func(entry->name, ifdev, rate);
 		entry = entry->m_next;
 	}

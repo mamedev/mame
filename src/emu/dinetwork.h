@@ -9,7 +9,7 @@ public:
 	device_network_interface(const machine_config &mconfig, device_t &device, float bandwidth);
 	virtual ~device_network_interface();
 
-	void set_interface(const char *name);
+	void set_interface(int id);
 	void set_promisc(bool promisc);
 	void set_mac(const char *mac);
 

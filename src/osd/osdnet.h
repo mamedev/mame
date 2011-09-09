@@ -28,6 +28,6 @@ private:
 #define CREATE_NETDEV(name) class netdev *name(const char *ifname, class device_network_interface *ifdev, int rate)
 typedef class netdev *(*create_netdev)(const char *ifname, class device_network_interface *ifdev, int rate);
 
-class netdev *open_netdev(const char *name, class device_network_interface *ifdev, int rate);
+class netdev *open_netdev(int id, class device_network_interface *ifdev, int rate);
 void add_netdev(const char *name, create_netdev func);
 #endif

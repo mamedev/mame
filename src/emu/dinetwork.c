@@ -43,9 +43,9 @@ void device_network_interface::set_mac(const char *mac)
 	if(m_dev) m_dev->set_mac(m_mac);
 }
 
-void device_network_interface::set_interface(const char *name)
+void device_network_interface::set_interface(int id)
 {
-	m_dev = open_netdev(name, this, (int)(m_bandwidth*1000000/8.0/1500));
+	m_dev = open_netdev(id, this, (int)(m_bandwidth*1000000/8.0/1500));
 	if(!m_dev)
-		logerror("Network interface %.256s not found\n", name);
+		logerror("Network interface %d not found\n", id);
 }
