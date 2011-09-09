@@ -119,6 +119,18 @@ ROM_END
 
 ROM_START( futari15 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("u4", 0x000000, 0x200000, CRC(e8c5f128) SHA1(45fb8066fdbecb83fdc2e14555c460d0c652cd5f) ) /* (2006/12/8 MAST VER. 1.54) */
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) /* (2006/12/8 MAST VER. 1.54) */
+
+	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_LOAD("u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
+	ROM_LOAD("u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
+ROM_END
+
+ROM_START( futari15a )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u4", 0x000000, 0x200000, CRC(a609cf89) SHA1(56752fae9f42fa852af8ee2eae79e25ec7f17953) ) /* (2006/12/8 MAST VER 1.54) */
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
@@ -190,16 +202,17 @@ ROM_START( deathsml )
 ROM_END
 
 
-GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                   GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                    GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                    GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                      GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",    GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara (2005/03/22 MASTER VER..)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",        GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",         GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                      GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                    GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER. 1.54)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara (2005/03/22 MASTER VER..)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",          GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                       GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /*
 
@@ -234,7 +247,7 @@ MUSHIHIMESAMA FUTARI 1.0
 
 MUSHIHIME SAMA FUTARI 1.5
   "2006/12/8 MASTER VER 1.54"
-* "2006/12/8.MASTER VER.1.54."
+  "2006/12/8.MASTER VER.1.54."
 
 MUSHIHIMESAMA FUTARI BLACK LABEL
 * "2007/12/11 BLACK LABEL VER"
@@ -251,7 +264,7 @@ DEATH SMILES MEGA BLACK LABEL
 * "2008/10/06 MEGABLACK LABEL VER"
 
 DODONPACHI FUKKATSU 1.0
-* "2008/02/22 MASTER VER"
+* "2008/05/16 MASTER VER"
 
 DODONPACHI FUKKATSU 1.5
 * "2008/06/23 MASTER VER 1.5"
