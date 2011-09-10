@@ -274,7 +274,7 @@
  *                      the function of this chip matches 139
  *       137          : Namco custom clock divider IC (DIP28)
  *       C405         : Namco custom C405 (QFP176)
- *       C352         : Namco custom C352 PCM sound chip (QFP100)
+ *       C352         : Namco custom C352 PCM sound chip (QFP100), clock is 24.576MHz (49.152/2), from pin 6 of C137
  *       SS22C1       : PALCE 22V10H (PLCC28, labelled 'SS22C1')
  *       SS22C2       : PALCE 22V10H (PLCC28, labelled 'SS22C2')
  *       SS22C4       : PALCE 22V10H (PLCC28, labelled 'SS22C4')
@@ -2916,7 +2916,7 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/3)
+	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/3) // should be SS22_MASTER_CLOCK/2, but relies on c352.c clockdivider implementation
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
