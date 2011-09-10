@@ -5,7 +5,8 @@
 	preliminary driver by Angelo Salese
 
 	TODO:
-	- coins?
+	- remaining lamps;
+	- portd meaning is a mystery
 	- inputs are annoying to map;
 
 ============================================================================
@@ -117,13 +118,18 @@ static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0d80, 0x0dbf) AM_RAM	// EEPROM read-back data goes there
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x4000, 0x401f) AM_WRITE(namco_30test_led_w) // 7-seg leds
+	/* 0x6000: 1st place 7-seg led */
+	/* 0x6001: 2nd place 7-seg led */
+	/* 0x6002: 3rd place 7-seg led */
+	/* 0x6003: current / last play score */
+	/* 0x6004: lamps? */
 	AM_RANGE(0x6000, 0x6004) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8 )
 	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
-//	AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_READ_PORT("SYSTEM")
+//	AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
 	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
@@ -175,16 +181,10 @@ static INPUT_PORTS_START( 30test )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CODE(KEYCODE_6_PAD)
+	PORT_DIPNAME( 0x08, 0x08, "SYSTEM" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
@@ -215,7 +215,7 @@ static MACHINE_RESET( 30test )
 static const hc11_config namco_30test_config =
 {
 	0, 	   //has extended internal I/O
-	0,//768,   //internal RAM size
+	768,   //internal RAM size
 	0x00   //registers are at 0-0x100
 };
 
