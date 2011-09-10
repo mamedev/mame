@@ -2987,6 +2987,20 @@ static void HC11OP(std_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 6);
 }
 
+/* STS DIR          0x9F */
+static void HC11OP(sts_dir)(hc11_state *cpustate)
+{
+	UINT8 d = FETCH(cpustate);
+	UINT16 r = cpustate->sp;
+	CLEAR_NZV(cpustate);
+	WRITE8(cpustate, d, (r & 0xff00) >> 8);
+	WRITE8(cpustate, d + 1, (r & 0xff));
+	SET_N16(r);
+	SET_Z16(r);
+	CYCLES(cpustate, 4);
+}
+
+
 /* STX DIR          0xDF */
 static void HC11OP(stx_dir)(hc11_state *cpustate)
 {

@@ -271,7 +271,7 @@ static const hc11_opcode_list_struct hc11_opcode_list[] =
 	{	0,		0xfd,			HC11OP(std_ext)				},
 	{	0,		0xed,			HC11OP(std_indx)			},
 	{	0x18,	0xed,			HC11OP(std_indy)			},
-//  {   0,      0x9f,           HC11OP(sts_dir)             },
+	{   0,      0x9f,           HC11OP(sts_dir)             },
 //  {   0,      0xbf,           HC11OP(sts_ext)             },
 //  {   0,      0xaf,           HC11OP(sts_indx)            },
 //  {   0x18,   0xaf,           HC11OP(sts_indy)            },

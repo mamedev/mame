@@ -53,11 +53,6 @@ static SCREEN_UPDATE( 30test )
 	return 0;
 }
 
-static READ8_HANDLER( unk_r )
-{
-	return 1;
-}
-
 static READ8_HANDLER(hc11_mux_r)
 {
 	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
@@ -128,8 +123,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8 )
 	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
-	AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_READ_PORT("SYSTEM")
-	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ(unk_r)
+//	AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_READ_PORT("SYSTEM")
+	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
 
@@ -220,7 +215,7 @@ static MACHINE_RESET( 30test )
 static const hc11_config namco_30test_config =
 {
 	0, 	   //has extended internal I/O
-	768,   //internal RAM size
+	0,//768,   //internal RAM size
 	0x00   //registers are at 0-0x100
 };
 
