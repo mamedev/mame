@@ -28,7 +28,8 @@ public:
 	namco_30test_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8 mux_data;
+	UINT8 m_mux_data;
+	UINT8 m_oki_bank;
 };
 
 
@@ -51,21 +52,21 @@ static READ8_HANDLER(hc11_mux_r)
 {
 	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
 
-	return state->mux_data;
+	return state->m_mux_data;
 }
 
 static WRITE8_HANDLER(hc11_mux_w)
 {
 	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
 
-	state->mux_data = data;
+	state->m_mux_data = data;
 }
 
 static READ8_HANDLER(namco_30test_mux_r)
 {
 	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
 
-	switch(state->mux_data)
+	switch(state->m_mux_data)
 	{
 		default:
 			return 0xff;
@@ -83,9 +84,26 @@ static WRITE8_HANDLER( namco_30test_led_w )
 	output_set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
+static READ8_DEVICE_HANDLER( hc11_okibank_r )
+{
+	namco_30test_state *state = device->machine().driver_data<namco_30test_state>();
+	return state->m_oki_bank;
+}
+
+static WRITE8_DEVICE_HANDLER( hc11_okibank_w )
+{
+	namco_30test_state *state = device->machine().driver_data<namco_30test_state>();
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+
+	state->m_oki_bank = data;
+	oki->set_bank_base((data & 1) ? 0x40000 : 0);
+}
+
+
 static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
 	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
+	AM_RANGE(0x007e, 0x007e) AM_DEVREADWRITE("oki",hc11_okibank_r,hc11_okibank_w)
 	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
 	AM_RANGE(0x0d80, 0x0dbf) AM_RAM	// EEPROM read-back data goes there
@@ -97,7 +115,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8 )
 	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
-	AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM//AM_READ_PORT("SYSTEM")
+	AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_READ_PORT("SYSTEM")
 	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ(unk_r)
 ADDRESS_MAP_END
 
@@ -197,4 +215,4 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
-GAMEL( 1997, 30test,  0,   30test,  30test,  0, ROT0, "Namco", "30 Test (Remake)", GAME_NOT_WORKING | GAME_NO_SOUND, layout_30test )
+GAMEL( 1997, 30test,  0,   30test,  30test,  0, ROT0, "Namco", "30 Test (Remake)", GAME_NOT_WORKING, layout_30test )
