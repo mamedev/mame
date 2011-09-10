@@ -54,7 +54,6 @@ static READ8_HANDLER(namco30test_pcbid_r)
 static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal I/O
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
-	AM_RANGE(0x2000, 0x2010) AM_RAM // test, remove me
 	AM_RANGE(0x0d80, 0x0d8f) AM_READ(namco30test_pcbid_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

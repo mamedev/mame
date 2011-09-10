@@ -126,6 +126,10 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 			return cpustate->tcnt >> 8;
 		case 0x0f:
 			return cpustate->tcnt & 0xff;
+		case 0x16:		/* TOC1 */
+			return cpustate->toc1 >> 8;
+		case 0x17:
+			return cpustate->toc1 & 0xff;
 		case 0x23:
 			return cpustate->tflg1;
 		case 0x28:		/* SPCR1 */
