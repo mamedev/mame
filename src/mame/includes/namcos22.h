@@ -1,7 +1,5 @@
 #include "video/poly.h"
 
-#define USE_NAMCOS22_SPEED_HACK
-
 #define MAX_LIT_SURFACES 0x80
 #define MAX_RENDER_CMD_SEQ 0x1c
 
