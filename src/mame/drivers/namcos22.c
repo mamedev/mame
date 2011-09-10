@@ -6050,9 +6050,12 @@ static DRIVER_INIT( aquajet )
 
 static DRIVER_INIT( dirtdash )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22s_init(machine, NAMCOS22_DIRT_DASH);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
+
+	state->m_stick_input = 0x3;
 }
 
 /************************************************************************************/
