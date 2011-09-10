@@ -38,12 +38,28 @@ static SCREEN_UPDATE( 30test )
 	return 0;
 }
 
+static READ8_HANDLER( unk_r )
+{
+	return 1;
+}
+
+static READ8_HANDLER(namco30test_pcbid_r)
+{
+	static const char pcb_id[] =
+	{"NAMCOM1251997212"};
+
+	return pcb_id[offset];
+}
+
 static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8 )
-	//AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
+//	AM_RANGE(0x0000, 0x007f) AM_RAM // internal I/O
+//	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
+	AM_RANGE(0x0d80, 0x0d8f) AM_READ(namco30test_pcbid_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8 )
+	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ(unk_r)
 ADDRESS_MAP_END
 
 
@@ -63,8 +79,8 @@ static MACHINE_RESET( 30test )
 
 static const hc11_config namco_30test_config =
 {
-	1, 	   //has extended internal I/O
-	0x100, //internal RAM size, TODO
+	0, 	   //has extended internal I/O
+	768,   //internal RAM size
 	0x00   //registers are at 0-0x100
 };
 

@@ -29,6 +29,7 @@ DECLARE_LEGACY_CPU_DEVICE(MC68HC11, mc68hc11);
 #define MC68HC11_IO_AD7				0x17
 
 #define MC68HC11_IRQ_LINE			0
+#define MC68HC11_TOC1_LINE			1
 
 typedef struct _hc11_config hc11_config;
 struct _hc11_config

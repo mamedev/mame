@@ -33,6 +33,8 @@ enum
 #define CC_V	0x02
 #define CC_C	0x01
 
+static const int div_tab[4] = { 1, 4, 8, 16 };
+
 typedef struct _hc11_state hc11_state;
 struct _hc11_state
 {
@@ -77,7 +79,13 @@ struct _hc11_state
 
 	UINT8 wait_state,stop_state;
 
-	UINT8 tflg1;
+	UINT8 tflg1, tmsk1;
+	UINT16 toc1;
+	UINT16 tcnt;
+//	UINT8 por;
+	UINT8 pr;
+
+	UINT64 frc_base;
 };
 
 INLINE hc11_state *get_safe_token(device_t *device)
@@ -114,6 +122,10 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 			return 0;
 		case 0x0a:		/* PORTE */
 			return cpustate->io->read_byte(MC68HC11_IO_PORTE);
+		case 0x0e:		/* TCNT */
+			return cpustate->tcnt >> 8;
+		case 0x0f:
+			return cpustate->tcnt & 0xff;
 		case 0x23:
 			return cpustate->tflg1;
 		case 0x28:		/* SPCR1 */
@@ -225,12 +237,25 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 		case 0x0a:		/* PORTE */
 			cpustate->io->write_byte(MC68HC11_IO_PORTE, value);
 			return;
+		case 0x0e:		/* TCNT */
+		case 0x0f:
+			logerror("HC11: TCNT register write %02x %02x!\n",address,value);
+			return;
+		case 0x16:		/* TOC1 */
+			/* TODO: inhibit for one bus cycle */
+			cpustate->toc1 = (value << 8) | (cpustate->toc1 & 0xff);
+			return;
+		case 0x17:
+			cpustate->toc1 = (value & 0xff) | (cpustate->toc1 & 0xff00);
+			return;
 		case 0x22:		/* TMSK1 */
+			cpustate->tmsk1 = value;
 			return;
 		case 0x23:
-			cpustate->tflg1 = value;
+			cpustate->tflg1 &= ~value;
 			return;
 		case 0x24:		/* TMSK2 */
+			cpustate->pr = value & 3;
 			return;
 		case 0x28:		/* SPCR1 */
 			return;
@@ -251,7 +276,7 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 
 			if (reg_page == ram_page) {
 				cpustate->reg_position = reg_page << 12;
-				cpustate->ram_position = (ram_page << 12) + 0x100;
+				cpustate->ram_position = (ram_page << 12) + (cpustate->has_extended_io) ? 0x100 : 0x80;
 			} else {
 				cpustate->reg_position = reg_page << 12;
 				cpustate->ram_position = ram_page << 12;
@@ -430,6 +455,10 @@ static CPU_RESET( hc11 )
 	cpustate->stop_state = 0;
 	cpustate->ccr = CC_X | CC_I | CC_S;
 	hc11_regs_w(cpustate,0x3d,cpustate->init_value);
+	cpustate->toc1 = 0xffff;
+	cpustate->tcnt = 0xffff;
+//	cpustate->por = 1; // for first timer overflow / compare stuff
+	cpustate->pr = 3; // timer prescale
 }
 
 static CPU_EXIT( hc11 )
@@ -484,6 +513,53 @@ static void check_irq_lines(hc11_state *cpustate)
 		if(cpustate->stop_state == 1) { cpustate->stop_state = 2; }
 		(void)(*cpustate->irq_callback)(cpustate->device, MC68HC11_IRQ_LINE);
 	}
+
+	/* check timers here */
+	{
+		int divider = div_tab[cpustate->pr & 3];
+		UINT64 cur_time = cpustate->device->total_cycles();
+		UINT64 add = (cur_time - cpustate->frc_base) / divider;
+
+		if (add > 0)
+		{
+			int i;
+
+			for(i=0;i<add;i++)
+			{
+				cpustate->tcnt++;
+				if(cpustate->tcnt == cpustate->toc1)
+				{
+					cpustate->tflg1 |= 0x80;
+					cpustate->irq_state[MC68HC11_TOC1_LINE] = ASSERT_LINE;
+				}
+			}
+
+			cpustate->frc_base = cur_time;
+		}
+	}
+
+	if( cpustate->irq_state[MC68HC11_TOC1_LINE]!=CLEAR_LINE && (!(cpustate->ccr & CC_I)) && cpustate->tmsk1 & 0x80)
+	{
+		UINT16 pc_vector;
+
+		if(cpustate->wait_state == 0)
+		{
+			PUSH16(cpustate, cpustate->pc);
+			PUSH16(cpustate, cpustate->iy);
+			PUSH16(cpustate, cpustate->ix);
+			PUSH8(cpustate, REG_A);
+			PUSH8(cpustate, REG_B);
+			PUSH8(cpustate, cpustate->ccr);
+		}
+		pc_vector = READ16(cpustate, 0xffe8);
+		SET_PC(cpustate, pc_vector);
+		cpustate->ccr |= CC_I; //irq taken, mask the flag
+		if(cpustate->wait_state == 1) { cpustate->wait_state = 2; }
+		if(cpustate->stop_state == 1) { cpustate->stop_state = 2; }
+		(void)(*cpustate->irq_callback)(cpustate->device, MC68HC11_TOC1_LINE);
+		cpustate->irq_state[MC68HC11_TOC1_LINE] = CLEAR_LINE; // auto-ack irq
+	}
+
 }
 
 static void set_irq_line(hc11_state *cpustate, int irqline, int state)
@@ -520,6 +596,7 @@ static CPU_SET_INFO( mc68hc11 )
 	switch (state)
 	{
 		case CPUINFO_INT_INPUT_STATE + MC68HC11_IRQ_LINE:	set_irq_line(cpustate, MC68HC11_IRQ_LINE, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + MC68HC11_TOC1_LINE:	set_irq_line(cpustate, MC68HC11_TOC1_LINE, info->i);		break;
 
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:							cpustate->pc = info->i;						break;
