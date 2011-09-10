@@ -441,14 +441,9 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 	extra->fogFactor = 0;
 	extra->fadeFactor = 0;
 
-	if (mixer.target&1)
-	{
-		extra->fadeFactor = mixer.fadeFactor;
-		rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
-	}
-
 	if( state->m_mbSuperSystem22 )
 	{
+		// fog
 		if( !(color&0x80) )
 		{
 			int cz = flags>>8;
@@ -470,6 +465,30 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 				}
 				extra->fogFactor = fogDensity >> 5;
 				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
+			}
+		}
+
+		// fade
+		if (mixer.target&1)
+		{
+			extra->fadeFactor = mixer.fadeFactor;
+			rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
+		}
+	}
+	else
+	{
+		// fade (is currently implemented as global brighter or darker: see UpdateVideoMixer)
+		if (mixer.target&1)
+		{
+			if (mixer.fadeFactor < 0)
+			{
+				extra->fadeFactor = Clamp256((-mixer.fadeFactor) >> 4);
+				rgb_comp_to_rgbint(&extra->fadeColor, 0xff, 0xff, 0xff);
+			}
+			else
+			{
+				extra->fadeFactor = Clamp256(mixer.fadeFactor);
+				rgb_comp_to_rgbint(&extra->fadeColor, 0x00, 0x00, 0x00);
 			}
 		}
 	}
