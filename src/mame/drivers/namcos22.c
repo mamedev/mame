@@ -2446,8 +2446,6 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 
 /* Namco Super System 22 */
 static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
-	AM_RANGE(0x200000, 0x200003) AM_READ(alpinesa_prot_r)
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(alpinesa_prot_w)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_READ(namcos22_keycus_r) AM_WRITENOP
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
@@ -4974,13 +4972,13 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* VIEW */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) /* VIEW */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MCUP5B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5895,6 +5893,9 @@ static DRIVER_INIT( alpiner2 )
 static DRIVER_INIT( alpinesa )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_SURFER);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x200000, 0x200003, FUNC(alpinesa_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x300000, 0x300003, FUNC(alpinesa_prot_w));
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 
