@@ -73,6 +73,7 @@ struct _hc11_state
 
 	int has_extended_io; // extended I/O enable flag
 	int internal_ram_size;
+	int init_value;
 
 	UINT8 wait_state,stop_state;
 
@@ -402,18 +403,18 @@ static CPU_INIT( hc11 )
 	{
 		cpustate->has_extended_io = conf->has_extended_io;
 		cpustate->internal_ram_size = conf->internal_ram_size;
+		cpustate->init_value = conf->init_value;
 	}
 	else
 	{
 		/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
 		cpustate->has_extended_io = 1;
 		cpustate->internal_ram_size = 1280;
+		cpustate->init_value = 0x01;
 	}
 
 	cpustate->internal_ram = auto_alloc_array(device->machine(), UINT8, cpustate->internal_ram_size);
 
-	cpustate->reg_position = 0;
-	cpustate->ram_position = 0x100;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
@@ -428,8 +429,7 @@ static CPU_RESET( hc11 )
 	cpustate->wait_state = 0;
 	cpustate->stop_state = 0;
 	cpustate->ccr = CC_X | CC_I | CC_S;
-	cpustate->reg_position = 0x1000;
-	cpustate->ram_position = 0;
+	hc11_regs_w(cpustate,0x3d,cpustate->init_value);
 }
 
 static CPU_EXIT( hc11 )

@@ -473,8 +473,9 @@ static const ay8910_interface ay8910_config =
 
 static const hc11_config hitpoker_config =
 {
-	0, //has extended internal I/O
-	0x100  //internal RAM size
+	0, 		//has extended internal I/O
+	0x100,  //internal RAM size
+	0x01	//INIT defaults to 0x01
 };
 
 static INTERRUPT_GEN( hitpoker_irq )

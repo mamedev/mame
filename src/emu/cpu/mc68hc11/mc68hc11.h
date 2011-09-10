@@ -35,6 +35,7 @@ struct _hc11_config
 {
 	int has_extended_io; // I/O enable flag
 	int internal_ram_size;
+	int init_value; // default value for INIT register
 };
 
 
