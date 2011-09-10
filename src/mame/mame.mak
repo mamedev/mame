@@ -1853,6 +1853,8 @@ $(MAMEOBJ)/misc.a: \
 # layout dependencies
 #-------------------------------------------------
 
+$(DRIVERS)/30test.o:	$(LAYOUT)/30test.lh
+
 $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
 			$(LAYOUT)/shuttlei.lh \
 			$(LAYOUT)/cosmicm.lh
@@ -1936,7 +1938,7 @@ $(DRIVERS)/darius.o:	$(LAYOUT)/darius.lh
 
 $(DRIVERS)/destroyr.o:	$(LAYOUT)/destroyr.lh
 
-$(DRIVERS)/dlair.o:		$(LAYOUT)/dlair.lh
+$(DRIVERS)/dlair.o:	$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 

@@ -17,6 +17,8 @@ http://blogs.yahoo.co.jp/nadegatayosoyuki/59285865.html
 
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
+#include "sound/okim6295.h"
+#include "30test.lh"
 
 #define MAIN_CLOCK XTAL_16MHz
 
@@ -25,6 +27,8 @@ class namco_30test_state : public driver_device
 public:
 	namco_30test_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+
+	UINT8 mux_data;
 };
 
 
@@ -43,27 +47,87 @@ static READ8_HANDLER( unk_r )
 	return 1;
 }
 
-static READ8_HANDLER(namco30test_pcbid_r)
+static READ8_HANDLER(hc11_mux_r)
 {
-	static const char pcb_id[] =
-	{"NAMCOM1251997212"};
+	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
 
-	return pcb_id[offset];
+	return state->mux_data;
+}
+
+static WRITE8_HANDLER(hc11_mux_w)
+{
+	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
+
+	state->mux_data = data;
+}
+
+static READ8_HANDLER(namco_30test_mux_r)
+{
+	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
+
+	switch(state->mux_data)
+	{
+		default:
+			return 0xff;
+	}
+
+	return 0;
+}
+
+static const UINT8 led_map[16] =
+	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
+
+static WRITE8_HANDLER( namco_30test_led_w )
+{
+	output_set_digit_value(0 + offset * 2, led_map[(data & 0xf0) >> 4]);
+	output_set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
 static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_RAM // internal I/O
+	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
+	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
+	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
-	AM_RANGE(0x0d80, 0x0d8f) AM_READ(namco30test_pcbid_r)
+	AM_RANGE(0x0d80, 0x0dbf) AM_RAM	// EEPROM read-back data goes there
+	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x4000, 0x401f) AM_WRITE(namco_30test_led_w) // 7-seg leds
+	AM_RANGE(0x6000, 0x6004) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8 )
+	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
+	AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM//AM_READ_PORT("SYSTEM")
 	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ(unk_r)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( 30test )
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -114,6 +178,9 @@ static MACHINE_CONFIG_START( 30test, namco_30test_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -130,4 +197,4 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
-GAME( 1997, 30test,  0,   30test,  30test,  0, ROT0, "Namco", "30 Test (Remake)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAMEL( 1997, 30test,  0,   30test,  30test,  0, ROT0, "Namco", "30 Test (Remake)", GAME_NOT_WORKING | GAME_NO_SOUND, layout_30test )
