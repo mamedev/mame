@@ -68,6 +68,7 @@ public:
 	UINT32 m_mAlpineSurferProtData;
 	int m_p4;
 	UINT16 m_su_82;
+	UINT16 m_keycus_id;
 	int m_gametype;
 	int m_mbSuperSystem22;
 	UINT32 *m_cgram;

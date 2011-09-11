@@ -2251,41 +2251,12 @@ static READ32_HANDLER( namcos22_keycus_r )
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 //  printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(&space->device()));
 
-	switch( state->m_gametype )
-	{
-	case NAMCOS22_RIDGE_RACER:
-	case NAMCOS22_RIDGE_RACER2:
-		return 0x0172<<16;
+	if (ACCESSING_BITS_0_15)
+		return state->m_keycus_id;
+	if (ACCESSING_BITS_16_31)
+		return state->m_keycus_id << 16;
 
-	case NAMCOS22_ACE_DRIVER:
-		return 0x0173;
-
-	case NAMCOS22_CYBER_COMMANDO:
-		return 0x0185;
-
-	case NAMCOS22_ALPINE_RACER:
-	case NAMCOS22_ALPINE_RACER_2:
-		return 0x0187;
-
-	case NAMCOS22_VICTORY_LAP:
-		return 0x0188<<16;
-
-	case NAMCOS22_CYBER_CYCLES:
-		return 0x0387;
-
-	case NAMCOS22_DIRT_DASH:
-		return 0x01a2<<16;
-
-	case NAMCOS22_TOKYO_WARS:
-		return 0x01a8<<16;
-
-	case NAMCOS22_ALPINE_SURFER:
-		return 0x01a9;
-
-	default:
-		/* unknown/unused */
-		return 0;
-	}
+	return 0;
 }
 
 /**
@@ -5864,6 +5835,7 @@ static void namcos22_init( running_machine &machine, int game_type )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	state->m_gametype = game_type;
+	state->m_keycus_id = 0;
 	state->m_mpPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
 }
 
@@ -5875,24 +5847,31 @@ static void namcos22s_init( running_machine &machine, int game_type )
 
 static DRIVER_INIT( alpiner )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22s_init(machine, NAMCOS22_ALPINE_RACER);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 
 	install_130_speedup(machine);
+
+	state->m_keycus_id = 0x0187;
 }
 
 static DRIVER_INIT( alpiner2 )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22s_init(machine, NAMCOS22_ALPINE_RACER_2);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 
 	install_130_speedup(machine);
+
+	state->m_keycus_id = 0x0187;
 }
 
 static DRIVER_INIT( alpinesa )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22s_init(machine, NAMCOS22_ALPINE_SURFER);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x200000, 0x200003, FUNC(alpinesa_prot_r));
@@ -5901,6 +5880,8 @@ static DRIVER_INIT( alpinesa )
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 
 	install_141_speedup(machine);
+
+	state->m_keycus_id = 0x01a9;
 }
 
 static DRIVER_INIT( airco22 )
@@ -5943,6 +5924,7 @@ static DRIVER_INIT( ridgeraj )
 
 	install_c74_speedup(machine);
 
+	state->m_keycus_id = 0x0172;
 	state->m_old_coin_state = 0;
 	state->m_credits1 = state->m_credits2 = 0;
 	state->m_stick_input = 0xa;
@@ -5955,6 +5937,7 @@ static DRIVER_INIT( ridger2j )
 
 	install_c74_speedup(machine);
 
+	state->m_keycus_id = 0x0172;
 	state->m_old_coin_state = 0;
 	state->m_credits1 = state->m_credits2 = 0;
 	state->m_stick_input = 0xa;
@@ -5967,6 +5950,7 @@ static DRIVER_INIT( acedrvr )
 
 	install_c74_speedup(machine);
 
+	state->m_keycus_id = 0x0173;
 	state->m_old_coin_state = 0;
 	state->m_credits1 = state->m_credits2 = 0;
 	state->m_stick_input = 0x3;
@@ -5979,6 +5963,7 @@ static DRIVER_INIT( victlap )
 
 	install_c74_speedup(machine);
 
+	state->m_keycus_id = 0x0188;
 	state->m_old_coin_state = 0;
 	state->m_credits1 = state->m_credits2 = 0;
 	state->m_stick_input = 0x3;
@@ -6010,12 +5995,15 @@ static DRIVER_INIT( cybrcomm )
 
 	install_c74_speedup(machine);
 
+	state->m_keycus_id = 0x0185;
 	state->m_old_coin_state = 0;
 	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( cybrcyc )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
+
 	/* patch DSP RAM test */
 	UINT32 *pROM = (UINT32 *)machine.region("maincpu")->base();
 	pROM[0x355C/4] &= 0x0000ffff;
@@ -6026,6 +6014,8 @@ static DRIVER_INIT( cybrcyc )
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
 
 	install_130_speedup(machine);
+
+	state->m_keycus_id = 0x0387;
 }
 
 static DRIVER_INIT( timecris )
@@ -6037,9 +6027,12 @@ static DRIVER_INIT( timecris )
 
 static DRIVER_INIT( tokyowar )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22s_init(machine, NAMCOS22_TOKYO_WARS);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(tokyowar_mcu_adc_r));
+
+	state->m_keycus_id = 0x01a8;
 }
 
 static DRIVER_INIT( aquajet )
@@ -6056,6 +6049,7 @@ static DRIVER_INIT( dirtdash )
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
 
+	state->m_keycus_id = 0x01a2;
 	state->m_stick_input = 0x3;
 }
 
