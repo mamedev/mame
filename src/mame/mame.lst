@@ -11603,7 +11603,6 @@ sc2rock		// How Bigs Your Rock (Global)
 sc2call		// It's Your Call (Glonal)
 sc2prom		// Along The Prom
 sc2payr		// Pay Roll (Mazooma)
-sc2smnud	// Super Multi Nudge (Concept)
 sc2cgc		// Carrot Gold Club (Bellfruit)
 sc2cnile	// Cash On The Nile Club (Bellfruit)
 sc2casr		// Casino Royale (Bellfruit)
@@ -11625,6 +11624,16 @@ sc2topwk	// Top Wack (Bellfruit)
 sc2cb7		// Casino Bar 7 (Bellfruit)
 sc2cgcas	// Club Grand Casino
 sc2cvega	// Cash Vegas
+sc2bar7		// Bar 7 (Concept)
+sc2bbar7	// Big Bar 7 (Concept)
+sc2flutr	// Flutter (Concept)
+sc2sghst	// Super Ghost (Concept)
+sc2smnud	// Super Multi Nudge (Concept)
+sc2paw		// Pull-a-Win (Concept)
+sc2scshx	// Super Cash X (Concept)
+sc2scshxgman // Gamesman hardware
+sc2scshxstar // Starpoint hardware
+sc2scshxcas // Super Casino Cash X (Concept)
 
 // Scorpion 2 + Dot Matrix Display
 
@@ -13183,7 +13192,11 @@ m4xch		// X-change (Bwb)
 m4xs		// X-s (Bwb)
 m4xtrm		// X-treme (Bwb)
 
-
+/* Concept */
+m4rhfevc	// Red Hot Fever (Concept)
+m4spnwnc	// Spin-A-Win (Concept)
+m4nudgwc	// Nudge a Win (Concept)
+ 
 /* Empire */
 
 m4apachg	// Apache Gold (Empire)
@@ -14364,6 +14377,17 @@ ec_barxmab  // Bar X (MAB PCB) (Electrocoin)
 ec_spbg7mab	// Super Big 7 (MAB PCB) (Electrocoin)
 ec_supbxmab // Super Bar X (MAB PCB) (Electrocoin)
 
+// Concept PCB
+ec_casbxcon // Casino Bar X (Concept - Electrocoin)
+ec_multb	// Multi Bar (Concept - Electrocoin)
+ec_casmb	// Casino Multi Bar (Concept - Electrocoin)
+ec_supmb	// Super Multi Bar (Concept - Electrocoin)
+ec_stkex	// Stake X (Concept - Electrocoin)
+ec_fltr		// Flutter (Concept)
+ec_gold7	// Golden 7 (Concept)
+ec_mgbel	// Megabell (Concept)
+ec_supbxcon // Super Bar X (MAB PCB) (Concept - Electrocoin)
+
 // OXO PCB
 
 ec_oxocg	// Oxo Classic Gold (Electrocoin)
@@ -14373,6 +14397,8 @@ ec_oxorl	// Oxo Reels (Electrocoin)
 ec_oxorv	// Oxo Revolution (Electrocoin)
 ec_suprl	// Super Reels (Electrocoin)
 ec_rcc		// Royal Casino Club (Electrocoin)
+ec_sumnd	// Super Multi Nudger (Concept/Electrocoin)
+ec_sumnc	// Casino Super Multi Nudger (Concept/Electrocoin)
 
 // Pyramid PCB
 

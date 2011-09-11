@@ -11333,7 +11333,65 @@ ROM_START( m4xtrm )
 	/* missing? */
 ROM_END
 
+ROM_START( m4nudgwc )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "naw02.bin", 0x0000, 0x010000, CRC(eb3ff27d) SHA1(ff0a80a75162380c6cc2d1b31f0bb0579faa1a2c) )
+	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
+	ROM_LOAD( "nawhc6.bin", 0x0000, 0x010000, CRC(f9389823) SHA1(e1db35200c9ed9d59cf817901cf75bdbb48507b2) )
+	ROM_LOAD( "nawhm5.bin", 0x0000, 0x010000, CRC(da365ac1) SHA1(4d8aa3541dcf94a550c815a0ade226a426b0c92d) )
+	ROM_LOAD( "nawsl10n.bin", 0x0000, 0x010000, CRC(6d5527b1) SHA1(52cdd413aaf5031dd3b8172bf49df59c3b33c9e7) )
+	ROM_LOAD( "nawsl10p.bin", 0x0000, 0x010000, CRC(cfdc953d) SHA1(919c5b52e9853b5896c573649257353e0b28536a) )
+	ROM_LOAD( "nawsl13n.bin", 0x0000, 0x010000, CRC(92ee524c) SHA1(88467af5d9e6db69969aaf9d8540828a1c058362) )
+	ROM_LOAD( "nawsl14n.bin", 0x0000, 0x010000, CRC(5217e17e) SHA1(449ff0c43bde5b4fecc7e5d31652648f7094e89d) )
+	ROM_LOAD( "nawsl7.bin", 0x0000, 0x010000, CRC(261192f6) SHA1(d754c0db8ee3986c33ea903c2efe86f14240afcf) )
 
+	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "naws1.bin", 0x0000, 0x02373f, CRC(b2ea8c50) SHA1(a02181f8f4636e69287073f4ffb8604ff2f14b9c) )
+ROM_END
+
+ROM_START( m4rhfevc )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "rhb6a58e.bin", 0x0000, 0x010000, CRC(c5a1ec02) SHA1(3a4dc552fffc34673e590e903a5c15a409f9aeec) )
+	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
+	ROM_LOAD( "rhf1a101.bin", 0x0000, 0x010000, CRC(e3a5caf2) SHA1(228fc1c7a6fa5029fe7c5a5feb6de1de6d703bc1) )
+	ROM_LOAD( "rhf1a102.bin", 0x0000, 0x010000, CRC(cd5b8788) SHA1(40d0b956291d3f858fe968d0bdf11929fe191f0a) )
+	ROM_LOAD( "rhf1a103.bin", 0x0000, 0x010000, CRC(7ad8b857) SHA1(840aa944e3da9ef4c5e724d7d22a8fe04f1b0d35) )
+	ROM_LOAD( "rhf1a104.bin", 0x0000, 0x010000, CRC(0ce94f67) SHA1(2a4869ef38bf00fc21eba5583e8a23eb6db5c574) )
+	ROM_LOAD( "rhf1a106.bin", 0x0000, 0x010000, CRC(fb5f5346) SHA1(1863e93bd0221d7851b9d7ebd9c802c8435ad490) )
+	ROM_LOAD( "rhf1a107.bin", 0x0000, 0x010000, CRC(f37860d1) SHA1(8986e0112bdc30f4ac338a8e42e8f32e16dd2902) )
+	ROM_LOAD( "rhf1a108.bin", 0x0000, 0x010000, CRC(5b4fd8cd) SHA1(5d70c7cb71b57c6d808e84d42219d7aa4b2ab858) )
+	ROM_LOAD( "rhf1a109.bin", 0x0000, 0x010000, CRC(24c0b660) SHA1(d50fd13c225362fd72e51de9a3159d1a78ee7442) )
+	ROM_LOAD( "rhf1a115.bin", 0x0000, 0x010000, CRC(244694b7) SHA1(ad1cc41d6a43bddeb641dfa0099a9bcc2c16a07c) )
+	ROM_LOAD( "rhf1a125.bin", 0x0000, 0x010000, CRC(060cfc77) SHA1(4d65665763fb4987a9c6aa4ba7f3feed4387e3fc) )
+	ROM_LOAD( "rhf1a126.bin", 0x0000, 0x010000, CRC(6901e28d) SHA1(e0cf4beb97a359df22aa89576793bab3f89e2f71) )
+	ROM_LOAD( "rhf1a128.bin", 0x0000, 0x010000, CRC(bd82a28d) SHA1(e6a5bb5595e3561ba7d21e6da108239545baa1ae) )
+	ROM_LOAD( "rhf1a129.bin", 0x0000, 0x010000, CRC(228725d3) SHA1(aaac6d001f1568821549cdfd44a56c407f0391ee) )
+	ROM_LOAD( "rhf1a130.bin", 0x0000, 0x010000, CRC(f576770c) SHA1(d0e44768de4673c38bd17a504dafb7df40ac8bd3) )
+	ROM_LOAD( "rhf1a131.bin", 0x0000, 0x010000, CRC(9fa11675) SHA1(02d5d3f8feebee898f34b68b29ac369df8e49ca4) )
+	ROM_LOAD( "rhf1a132.bin", 0x0000, 0x010000, CRC(3baa2ee4) SHA1(e18533e50533ed59f6bad26c4085bbd91a71c024) )
+	ROM_LOAD( "rhf1g127.bin", 0x0000, 0x010000, CRC(63de982a) SHA1(e1f77b7c5afb9c7d4682312a0864dbaff72ed7a9) )
+	ROM_LOAD( "rhf1g128.bin", 0x0000, 0x010000, CRC(88119fd0) SHA1(96a80af400522890cb912244f1c26ff60d6f1d87) )
+	ROM_LOAD( "rhf1g129.bin", 0x0000, 0x010000, CRC(afd31bc6) SHA1(738643ac9956738708d423e43ae0d14b20560ed2) )
+	ROM_LOAD( "rhf1g130.bin", 0x0000, 0x010000, CRC(8de45d11) SHA1(0839cbd4954c6587761d2b654487bc2236992313) )
+	ROM_LOAD( "rhf1g131.bin", 0x0000, 0x010000, CRC(60ea3303) SHA1(c9946047b7833626fba493fcd1cd6fbe8214bf73) )
+	ROM_LOAD( "rhf1g132.bin", 0x0000, 0x010000, CRC(2645c98b) SHA1(27ed2433ab9111b99c4bd375f3926c8d44e519ed) )
+	ROM_LOAD( "rhf2a101.bin", 0x0000, 0x010000, CRC(206c9ab6) SHA1(01acc4ce9731f273d0eb68a4cdbe323c13384b30) )
+	ROM_LOAD( "rhf2g101.bin", 0x0000, 0x010000, CRC(bae39dae) SHA1(d34f0506415f681d145f3c1b3949667a6dfdde95) )
+	//Was listed as part of this, but Alpha string says Wheel of Fortune
+	ROM_LOAD( "lxled1.bin", 0x0000, 0x010000, CRC(84a652b7) SHA1(0efb11480a0435140b43f77a7c7bca5e51e3aefb) )
+
+	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_LOAD( "rhfs1.bin", 0x0000, 0x03de5e, CRC(0dddd05f) SHA1(908a58752fb1cf76667695a40bcaa7778201c3a2) )
+ROM_END
+
+ROM_START( m4spnwnc )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "saw01.bin", 0x0000, 0x010000, CRC(5350e50e) SHA1(0d7ba3280eddb4400545729c55bcfaff7918d553) )
+	ROM_LOAD( "saw02.bin", 0x0000, 0x010000, CRC(daf85100) SHA1(ff89adb0d6530bcf5ff0807f48c6008198948d50) )
+	ROM_LOAD( "saw03.bin", 0x0000, 0x010000, CRC(a891451d) SHA1(2c0a4b6b5c50e234715e103e72986a2bda1d4588) )
+	ROM_REGION( 0x080000, "msm6376", 0 )	
+	ROM_LOAD( "sawsnd1", 0x0000, 0x080000, CRC(7957381f) SHA1(8fd45e5bf67248607f7d98032e08516ded493d74) )
+ROM_END
 
 ROM_START( m42punlm )
 	ROM_REGION( 0x020000, "maincpu", 0 )
@@ -12850,6 +12908,9 @@ ROM_END
 ROM_START( m4spnwin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "saw.bin", 0x0000, 0x010000, CRC(f8aac65f) SHA1(2cf8402bffe1638bddc0c2dd145d7be3cc7bd02b) )
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	//Found in a pile of ROMs for Concept's version of the game
+	ROM_LOAD( "spawv2.0", 0x0000, 0x008000, CRC(cc6eb567) SHA1(9293e0e72b1143f762cce80bf3b942e3958ddab7) )	
 ROM_END
 
 
@@ -15534,6 +15595,13 @@ GAME(199?, m4xch	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-cha
 GAME(199?, m4xs		,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-s (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4xtrm	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-treme (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
+
+/* Concept
+   most of these are rebuilds of other firm's games, often using the OKI chip to simulate MOD2 sound*/
+GAME(199?, m4rhfevc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Red Hot Fever (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(199?, m4spnwnc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Spin-A-Win (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(199?, m4nudgwc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Nudge-A-Win (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+ 
 
 /* Empire
    most of these boot (after a single reset to initialize)
