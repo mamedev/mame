@@ -127,11 +127,7 @@ UpdateVideoMixer( running_machine &machine )
 		mixer.rFadeColor  = nthbyte( state->m_gamma, 0x0011 )*256 + nthbyte( state->m_gamma, 0x0012 );
 		mixer.gFadeColor  = nthbyte( state->m_gamma, 0x0013 )*256 + nthbyte( state->m_gamma, 0x0014 );
 		mixer.bFadeColor  = nthbyte( state->m_gamma, 0x0015 )*256 + nthbyte( state->m_gamma, 0x0016 );
-
-		mixer.fadeFactor  = 0x100 - mixer.rFadeColor; // hack
-		mixer.rFadeColor  = 0;
-		mixer.gFadeColor  = 0;
-		mixer.bFadeColor  = 0;
+		mixer.fadeFactor  = (mixer.rFadeColor == 0x100 && mixer.gFadeColor == 0x100 && mixer.bFadeColor == 0x100) ? 0 : 1;
 
 		mixer.rFogColor   = nthbyte( state->m_gamma, 0x0100 );
 		mixer.rFogColor2  = nthbyte( state->m_gamma, 0x0101 );
@@ -252,6 +248,9 @@ struct _poly_extra_data
 	int cmode;
 	int fogFactor;
 	int fadeFactor;
+	int fade_r;
+	int fade_g;
+	int fade_b;
 	const UINT8 *source;		/* sprites */
 	int z;
 	int alpha;
@@ -330,7 +329,23 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 				rgbint_blend(&rgb, &fogColor, fogFactor);
 
 			if( fadeFactor != 0xff )
-				rgbint_blend(&rgb, &fadeColor, fadeFactor);
+			{
+				if (state->m_mbSuperSystem22)
+				{
+					rgbint_blend(&rgb, &fadeColor, fadeFactor);
+				}
+				else
+				{
+					// rgbutil does not support per-channel scaling without a shared fade factor, so do it manually
+					rgb_t c = rgbint_to_rgb(&rgb);
+					c = MAKE_RGB(
+						Clamp256((RGB_RED(c)   * extra->fade_r) >> 8),
+						Clamp256((RGB_GREEN(c) * extra->fade_g) >> 8),
+						Clamp256((RGB_BLUE(c)  * extra->fade_b) >> 8)
+					);
+					rgb_to_rgbint(&rgb, c);
+				}
+			}
 
 			if( transFactor != 0xff )
 			{
@@ -364,8 +379,23 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 				if( fogFactor != 0xff )
 					rgbint_blend(&rgb, &fogColor, fogFactor);
 
-				if( fadeFactor != 0xff )
+			if( fadeFactor != 0xff )
+			{
+				if (state->m_mbSuperSystem22)
+				{
 					rgbint_blend(&rgb, &fadeColor, fadeFactor);
+				}
+				else
+				{
+					rgb_t c = rgbint_to_rgb(&rgb);
+					c = MAKE_RGB(
+						Clamp256((RGB_RED(c)   * extra->fade_r) >> 8),
+						Clamp256((RGB_GREEN(c) * extra->fade_g) >> 8),
+						Clamp256((RGB_BLUE(c)  * extra->fade_b) >> 8)
+					);
+					rgb_to_rgbint(&rgb, c);
+				}
+			}
 
 				pDest[x] = rgbint_to_rgb(&rgb);
 			}
@@ -477,19 +507,13 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 	}
 	else
 	{
-		// fade (is currently implemented as global brighter or darker: see UpdateVideoMixer)
+		// fade (not the same as Super System 22)
 		if (mixer.target&1)
 		{
-			if (mixer.fadeFactor < 0)
-			{
-				extra->fadeFactor = Clamp256((-mixer.fadeFactor) >> 4);
-				rgb_comp_to_rgbint(&extra->fadeColor, 0xff, 0xff, 0xff);
-			}
-			else
-			{
-				extra->fadeFactor = Clamp256(mixer.fadeFactor);
-				rgb_comp_to_rgbint(&extra->fadeColor, 0x00, 0x00, 0x00);
-			}
+			extra->fadeFactor = mixer.fadeFactor;
+			extra->fade_r = mixer.rFadeColor;
+			extra->fade_g = mixer.gFadeColor;
+			extra->fade_b = mixer.bFadeColor;
 		}
 	}
 
@@ -556,10 +580,19 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 				}
 				if( fadeEnable )
 				{
-					int fade2 = 0x100-mixer.fadeFactor;
-					r = (r*fade2+mixer.fadeFactor*mixer.rFadeColor)>>8;
-					g = (g*fade2+mixer.fadeFactor*mixer.gFadeColor)>>8;
-					b = (b*fade2+mixer.fadeFactor*mixer.bFadeColor)>>8;
+					if (state->m_mbSuperSystem22)
+					{
+						int fade2 = 0x100-mixer.fadeFactor;
+						r = (r*fade2+mixer.fadeFactor*mixer.rFadeColor)>>8;
+						g = (g*fade2+mixer.fadeFactor*mixer.gFadeColor)>>8;
+						b = (b*fade2+mixer.fadeFactor*mixer.bFadeColor)>>8;
+					}
+					else
+					{
+						r = Clamp256((r*mixer.rFadeColor)>>8);
+						g = Clamp256((g*mixer.gFadeColor)>>8);
+						b = Clamp256((b*mixer.bFadeColor)>>8);
+					}
 				}
 				color = (r<<16)|(g<<8)|b;
 				color = alpha_blend_r32(dest[x], color, alpha);
