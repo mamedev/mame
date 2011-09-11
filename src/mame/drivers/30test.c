@@ -6,20 +6,23 @@
 
 	TODO:
 	- clickable artwork;
-	- remaining lamps;
 	- portd meaning is a mystery
 	- inputs are annoying to map;
+	- EEPROM
 
 ============================================================================
+
+cheats:
+- [0xb0-0xb3] timer
 
 lamps:
 ?OK???!! = really OK! (91+)
 ???????? = pretty good (80+)
-???~??? = not bad (70+)
-??? = normal (55+)
-????? = pretty bad (40+)
-???~ = worst (39 or less)
-??????? = game over
+???~??? = not bad (70+) (0x84)
+??? = normal (55+) (0x88)
+????? = pretty bad (40+) (0x90)
+???~ = worst (39 or less) (0xa0)
+??????? = game over (0xe0)
 
 
 ============================================================================
@@ -114,7 +117,16 @@ static WRITE8_HANDLER( namco_30test_led_rank_w )
 
 static WRITE8_HANDLER( namco_30test_lamps_w )
 {
-	popmessage("%02x",data);
+	if(!(data & 0x80)) // guess: lamps mask
+		data = 0;
+
+	output_set_lamp_value(0, (data & 0x01) >> 0); // really OK! lamp
+	output_set_lamp_value(1, (data & 0x02) >> 1); // pretty good lamp
+	output_set_lamp_value(2, (data & 0x04) >> 2); // not bad lamp
+	output_set_lamp_value(3, (data & 0x08) >> 3); // normal lamp
+	output_set_lamp_value(4, (data & 0x10) >> 4); // pretty bad lamp
+	output_set_lamp_value(5, (data & 0x20) >> 5); // worst lamp
+	output_set_lamp_value(6, (data & 0x40) >> 6); // game over lamp
 }
 
 static READ8_DEVICE_HANDLER( hc11_okibank_r )
@@ -244,7 +256,7 @@ static MACHINE_RESET( 30test )
 static const hc11_config namco_30test_config =
 {
 	0, 	   //has extended internal I/O
-	768,   //internal RAM size
+	0,//768,   //internal RAM size
 	0x00   //registers are at 0-0x100
 };
 

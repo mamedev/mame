@@ -6,6 +6,15 @@
 		</led7seg>
 	</element>
 
+	<element name="rank">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
 	<view name="Simple LEDs">
 		<screen index="0">
 			<bounds left="0" top="0" right="3.2" bottom="4.3" />
@@ -344,5 +353,35 @@
 		<bezel name="digit71" element="digit">
 			<bounds x="0.4" y="0.3" width="0.4" height="0.4" />
 		</bezel>
+	
+		<bezel name="lamp0" element="rank">
+			<bounds x="1.5" y="0.3" width="0.1" height="0.1" />
+		</bezel>
+
+		<bezel name="lamp1" element="rank">
+			<bounds x="1.5" y="0.4" width="0.1" height="0.1" />
+		</bezel>
+
+		<bezel name="lamp2" element="rank">
+			<bounds x="1.5" y="0.5" width="0.1" height="0.1" />
+		</bezel>
+
+		<bezel name="lamp3" element="rank">
+			<bounds x="1.5" y="0.6" width="0.1" height="0.1" />
+		</bezel>
+
+		<bezel name="lamp4" element="rank">
+			<bounds x="1.5" y="0.7" width="0.1" height="0.1" />
+		</bezel>
+
+		<bezel name="lamp5" element="rank">
+			<bounds x="1.5" y="0.8" width="0.1" height="0.1" />
+		</bezel>
+
+		<bezel name="lamp6" element="rank">
+			<bounds x="1.5" y="0.9" width="0.1" height="0.1" />
+		</bezel>
+
+
 	</view>
 </mamelayout>
