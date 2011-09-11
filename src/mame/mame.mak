@@ -1909,11 +1909,11 @@ $(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
 
 $(DRIVERS)/buggychl.o:	$(LAYOUT)/buggychl.lh
 
-$(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
+$(DRIVERS)/bzone.o:	$(LAYOUT)/bzone.lh
 
 $(DRIVERS)/cardline.o:	$(LAYOUT)/cardline.lh
 
-$(DRIVERS)/cdi.o:		$(LAYOUT)/cdi.lh
+$(DRIVERS)/cdi.o:	$(LAYOUT)/cdi.lh
 
 $(DRIVERS)/changela.o:	$(LAYOUT)/changela.lh
 
@@ -1963,6 +1963,8 @@ $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
+$(DRIVERS)/kingdrby.o:	$(LAYOUT)/kingdrby.lh
+
 $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 
 $(DRIVERS)/luckgrln.o:	$(LAYOUT)/luckgrln.lh
@@ -1976,19 +1978,19 @@ $(DRIVERS)/majorpkr.o:	$(LAYOUT)/majorpkr.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
-$(DRIVERS)/mcr3.o:		$(LAYOUT)/turbotag.lh
+$(DRIVERS)/mcr3.o:	$(LAYOUT)/turbotag.lh
 
 $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 
-$(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
-            $(LAYOUT)/connect4.lh \
-            $(LAYOUT)/mpu4ext.lh \
-            $(LAYOUT)/gamball.lh
+$(DRIVERS)/mpu4.o:	$(LAYOUT)/mpu4.lh \
+			$(LAYOUT)/connect4.lh \
+			$(LAYOUT)/mpu4ext.lh \
+			$(LAYOUT)/gamball.lh
 
 $(DRIVERS)/mpu4vid.o:	$(LAYOUT)/crmaze2p.lh \
-            $(LAYOUT)/crmaze4p.lh
+			$(LAYOUT)/crmaze4p.lh
 
-$(DRIVERS)/mw18w.o:		$(LAYOUT)/18w.lh
+$(DRIVERS)/mw18w.o:	$(LAYOUT)/18w.lh
 
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 			$(LAYOUT)/clowns.lh \
@@ -2027,11 +2029,11 @@ $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
 $(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh \
 			$(LAYOUT)/topracer.lh
 
-$(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
+$(DRIVERS)/qix.o:	$(LAYOUT)/elecyoyo.lh
 
-$(DRIVERS)/re900.o:		$(LAYOUT)/re900.lh
+$(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
 
-$(DRIVERS)/roul.o:		$(LAYOUT)/roul.lh
+$(DRIVERS)/roul.o:	$(LAYOUT)/roul.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
@@ -2087,11 +2089,11 @@ $(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/topspeed.o:	$(LAYOUT)/topspeed.lh
 
-$(DRIVERS)/turbo.o:		$(LAYOUT)/turbo.lh \
+$(DRIVERS)/turbo.o:	$(LAYOUT)/turbo.lh \
 			$(LAYOUT)/subroc3d.lh \
 			$(LAYOUT)/buckrog.lh
 
-$(DRIVERS)/tx1.o:		$(LAYOUT)/buggybjr.lh \
+$(DRIVERS)/tx1.o:	$(LAYOUT)/buggybjr.lh \
 			$(LAYOUT)/buggyboy.lh \
 			$(LAYOUT)/tx1.lh
 

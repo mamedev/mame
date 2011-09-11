@@ -71,6 +71,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
 #include "machine/nvram.h"
+#include "kingdrby.lh"
 
 
 class kingdrby_state : public driver_device
@@ -360,6 +361,9 @@ static READ8_DEVICE_HANDLER( sound_cmd_r )
 	return state->m_sound_cmd;
 }
 
+static const UINT8 led_map[16] =
+	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
+
 static WRITE8_HANDLER( led_array_w )
 {
 	/*
@@ -369,6 +373,9 @@ static WRITE8_HANDLER( led_array_w )
     they goes from 0 to 5, to indicate the number.
     If one player bets something, the other led will toggle between p1 and p2 bets.
     */
+	output_set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
+	output_set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
+
 }
 
 /*************************************
@@ -1180,6 +1187,6 @@ ROM_START( cowrace )
 ROM_END
 
 
-GAME( 1981, kingdrby,  0,             kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby (1981)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAMEL( 1981, kingdrby,  0,             kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby (1981)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND, layout_kingdrby )
 GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb,   0,       ROT0,   "bootleg (Casino Electronics)",  "King Derby (Taiwan bootleg)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
 GAME( 2000, cowrace,   kingdrby,      cowrace,    kingdrbb,   0,       ROT0,   "bootleg",  "Cow Race (1986 King Derby hack)", GAME_NOT_WORKING | GAME_WRONG_COLORS )
