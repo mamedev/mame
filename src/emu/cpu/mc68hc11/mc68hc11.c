@@ -5,6 +5,7 @@
 
 TODO:
 - Interrupts handling is really bare-bones, just to make Hit Poker happy;
+- Timers are really sketchy as per now, only TOC1 is emulated so far;
 - Complete opcodes hook-up;
 - Emulate the MC68HC12 (same as HC11 with a bunch of new opcodes);
 
@@ -449,6 +450,34 @@ static CPU_INIT( hc11 )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
+
+	device->save_item(NAME(cpustate->pc));
+	device->save_item(NAME(cpustate->ix));
+	device->save_item(NAME(cpustate->iy));
+	device->save_item(NAME(cpustate->sp));
+	device->save_item(NAME(cpustate->ppc));
+	device->save_item(NAME(cpustate->ccr));
+	device->save_item(NAME(cpustate->d.d8.a));
+	device->save_item(NAME(cpustate->d.d8.b));
+	device->save_item(NAME(cpustate->adctl));
+	device->save_item(NAME(cpustate->ad_channel));
+	device->save_item(NAME(cpustate->ram_position));
+	device->save_item(NAME(cpustate->reg_position));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->icount));
+	device->save_item(NAME(cpustate->has_extended_io));
+	device->save_item(NAME(cpustate->internal_ram_size));
+	device->save_item(NAME(cpustate->init_value));
+	device->save_pointer(NAME(cpustate->internal_ram),cpustate->internal_ram_size);
+	device->save_item(NAME(cpustate->wait_state));
+	device->save_item(NAME(cpustate->stop_state));
+	device->save_item(NAME(cpustate->tflg1));
+	device->save_item(NAME(cpustate->tmsk1));
+	device->save_item(NAME(cpustate->toc1));
+	device->save_item(NAME(cpustate->tcnt));
+//	device->save_item(NAME(cpustate->por));
+	device->save_item(NAME(cpustate->pr));
+	device->save_item(NAME(cpustate->frc_base));
 }
 
 static CPU_RESET( hc11 )
@@ -631,7 +660,7 @@ CPU_GET_INFO( mc68hc11 )
 		case CPUINFO_INT_MIN_CYCLES:						info->i = 1;					break;
 		case CPUINFO_INT_MAX_CYCLES:						info->i = 41;					break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:				info->i = 8;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;					break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 16;					break;
 		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0;					break;
 		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:				info->i = 0;					break;
@@ -642,6 +671,7 @@ CPU_GET_INFO( mc68hc11 )
 		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:					info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + MC68HC11_IRQ_LINE:	info->i = cpustate->irq_state[MC68HC11_IRQ_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + MC68HC11_TOC1_LINE:	info->i = cpustate->irq_state[MC68HC11_TOC1_LINE];	break;
 
 		case CPUINFO_INT_PREVIOUSPC:						/* not implemented */			break;
 

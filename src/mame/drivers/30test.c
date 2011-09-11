@@ -230,7 +230,10 @@ INPUT_PORTS_END
 
 static MACHINE_START( 30test )
 {
+	namco_30test_state *state = machine.driver_data<namco_30test_state>();
 
+	state->save_item(NAME(state->m_mux_data));
+	state->save_item(NAME(state->m_oki_bank));
 }
 
 static MACHINE_RESET( 30test )
@@ -253,7 +256,6 @@ static MACHINE_CONFIG_START( 30test, namco_30test_state )
 	MCFG_CPU_PROGRAM_MAP(namco_30test_map)
 	MCFG_CPU_IO_MAP(namco_30test_io)
 	MCFG_CPU_CONFIG(namco_30test_config)
-//	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60) // unknown timing
 
 	MCFG_MACHINE_START(30test)
 	MCFG_MACHINE_RESET(30test)
@@ -269,7 +271,7 @@ static MACHINE_CONFIG_START( 30test, namco_30test_state )
 	MCFG_SCREEN_UPDATE(30test)
 
 //	MCFG_PALETTE_INIT(30test)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_VIDEO_START(30test)
 
@@ -294,4 +296,4 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
-GAMEL( 1997, 30test,  0,   30test,  30test,  0, ROT0, "Namco", "30 Test (Remake)", 0, layout_30test )
+GAMEL( 1997, 30test,  0,   30test,  30test,  0, ROT0, "Namco", "30 Test (Remake)", GAME_SUPPORTS_SAVE, layout_30test )
