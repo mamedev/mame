@@ -256,7 +256,7 @@ static MACHINE_RESET( 30test )
 static const hc11_config namco_30test_config =
 {
 	0, 	   //has extended internal I/O
-	0,//768,   //internal RAM size
+	768,   //internal RAM size
 	0x00   //registers are at 0-0x100
 };
 
