@@ -2,12 +2,25 @@
 
 	30 Test (Remake) (c) 1997 Namco
 
-	preliminary driver by Angelo Salese
+	driver by Angelo Salese
 
 	TODO:
+	- clickable artwork;
 	- remaining lamps;
 	- portd meaning is a mystery
 	- inputs are annoying to map;
+
+============================================================================
+
+lamps:
+?OK???!! = really OK! (91+)
+???????? = pretty good (80+)
+???~??? = not bad (70+)
+??? = normal (55+)
+????? = pretty bad (40+)
+???~ = worst (39 or less)
+??????? = game over
+
 
 ============================================================================
 
@@ -93,6 +106,17 @@ static WRITE8_HANDLER( namco_30test_led_w )
 	output_set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
+static WRITE8_HANDLER( namco_30test_led_rank_w )
+{
+	output_set_digit_value(64 + offset * 2, led_map[(data & 0xf0) >> 4]);
+	output_set_digit_value(65 + offset * 2, led_map[(data & 0x0f) >> 0]);
+}
+
+static WRITE8_HANDLER( namco_30test_lamps_w )
+{
+	popmessage("%02x",data);
+}
+
 static READ8_DEVICE_HANDLER( hc11_okibank_r )
 {
 	namco_30test_state *state = device->machine().driver_data<namco_30test_state>();
@@ -117,13 +141,15 @@ static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
 	AM_RANGE(0x0d80, 0x0dbf) AM_RAM	// EEPROM read-back data goes there
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	/* 0x401e-0x401f: time */
 	AM_RANGE(0x4000, 0x401f) AM_WRITE(namco_30test_led_w) // 7-seg leds
 	/* 0x6000: 1st place 7-seg led */
 	/* 0x6001: 2nd place 7-seg led */
 	/* 0x6002: 3rd place 7-seg led */
 	/* 0x6003: current / last play score */
-	/* 0x6004: lamps? */
-	AM_RANGE(0x6000, 0x6004) AM_RAM
+	/* 0x6004: lamps */
+	AM_RANGE(0x6000, 0x6003) AM_WRITE(namco_30test_led_rank_w)
+	AM_RANGE(0x6004, 0x6004) AM_WRITE(namco_30test_lamps_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -268,4 +294,4 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
-GAMEL( 1997, 30test,  0,   30test,  30test,  0, ROT0, "Namco", "30 Test (Remake)", GAME_NOT_WORKING, layout_30test )
+GAMEL( 1997, 30test,  0,   30test,  30test,  0, ROT0, "Namco", "30 Test (Remake)", 0, layout_30test )
