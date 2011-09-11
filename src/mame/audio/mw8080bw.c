@@ -2580,52 +2580,167 @@ WRITE8_DEVICE_HANDLER( shuffle_audio_2_w )
  *
  *  Dog Patch
  *
- *  We don't have the schematics, so this is all questionable.
- *  This game is most likely stereo as well.
+ *  Discrete sound emulation:
+ *   Sept 2011, D.R.
  *
  *************************************/
 
+/* nodes - inputs */
+#define DOGPATCH_GAME_ON_EN         NODE_01
+#define DOGPATCH_LEFT_SHOT_EN       NODE_02
+#define DOGPATCH_RIGHT_SHOT_EN      NODE_03
+#define DOGPATCH_HIT_EN             NODE_04
+#define DOGPATCH_PAN_DATA           NODE_05
+
+/* nodes - sounds */
+#define DOGPATCH_NOISE              NODE_06
+#define DOGPATCH_L_SHOT_SND         NODE_07
+#define DOGPATCH_R_SHOT_SND         NODE_08
+#define DOGPATCH_HIT_SND            NODE_09
+#define DOGPATCH_L_HIT_SND          NODE_10
+#define DOGPATCH_R_HIT_SND          NODE_11
+
+
+static const discrete_op_amp_tvca_info dogpatch_shot_tvca_info =
+{
+	RES_M(2.7),
+	RES_K(510),
+	0,
+	RES_K(510),
+	RES_K(10),
+	0,
+	RES_K(510),
+	0,
+	0,
+	0,
+	0,
+	CAP_U(0.22),
+	0,
+	0, 0,
+	12,
+	0,
+	0,
+	12,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+
+static const discrete_mixer_desc dogpatch_l_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(12) + RES_K(68) + RES_K(33),
+	  RES_K(33) },
+	{ 0 },
+	{ 0 },
+	0,
+	RES_K(100),
+	0,
+	CAP_U(0.1),
+	0,
+	1	/* final gain */
+};
+
+
+static const discrete_mixer_desc dogpatch_r_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(12) + RES_K(68) + RES_K(33),
+	  RES_K(33),
+	  RES_K(510) + RES_K(33) },
+	{ 0 },
+	{ 0 },
+	0,
+	RES_K(100),
+	0,
+	CAP_U(0.1),
+	0,
+	1	/* final gain */
+};
+
 
 static DISCRETE_SOUND_START(dogpatch)
+	/************************************************
+     * Input register mapping
+     ************************************************/
+	DISCRETE_INPUT_LOGIC(DOGPATCH_GAME_ON_EN)
+	DISCRETE_INPUT_LOGIC(DOGPATCH_LEFT_SHOT_EN)
+	DISCRETE_INPUT_LOGIC(DOGPATCH_RIGHT_SHOT_EN)
+	DISCRETE_INPUT_LOGIC(DOGPATCH_HIT_EN)
 
 	/************************************************
      * Tone generator
      ************************************************/
 	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
 
-	/************************************************
-     * Filter it to be AC.
-     ************************************************/
-	DISCRETE_CRFILTER(NODE_91, MIDWAY_TONE_SND, RES_K(100), CAP_U(0.1))
+	/* Noise clock was breadboarded and measured at 7700Hz */
+	DISCRETE_LFSR_NOISE(DOGPATCH_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
 
-	DISCRETE_OUTPUT(NODE_91, 5000)
+	/************************************************
+     * Shot sounds
+     ************************************************/
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_20, DOGPATCH_LEFT_SHOT_EN, 0, 0, DOGPATCH_NOISE, 0, &dogpatch_shot_tvca_info)
+	DISCRETE_RCFILTER(NODE_21, NODE_20, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(DOGPATCH_L_SHOT_SND, NODE_21, RES_K(12) + RES_K(68), CAP_U(.0022))
+
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, DOGPATCH_RIGHT_SHOT_EN, 0, 0, DOGPATCH_NOISE, 0, &dogpatch_shot_tvca_info)
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(DOGPATCH_R_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0033))
+
+	/************************************************
+     * Target hit sounds
+     ************************************************/
+	DISCRETE_CONSTANT(DOGPATCH_L_HIT_SND, 0)
+	DISCRETE_CONSTANT(DOGPATCH_R_HIT_SND, 0)
+
+	/************************************************
+     * Combine all sound sources.
+     ************************************************/
+	/* There is a 1uF cap on the input to the amp that I was too lazy to simulate.
+     * It is just a DC blocking cap needed by the Norton amp.  Doing the extra
+     * work to simulate it is not going to make a difference to the waveform
+     * or to how it sounds.  Also I use a regular amp in place of the Norton
+     * for the same reasons.  Ease of coding/simulation. */
+
+	DISCRETE_MIXER2(NODE_91, DOGPATCH_GAME_ON_EN, DOGPATCH_L_SHOT_SND, DOGPATCH_L_HIT_SND, &dogpatch_l_mixer)
+
+	/* Music is only added to the right channel per schematics */
+	/* This should be verified on the real game */
+	DISCRETE_MIXER3(NODE_92, DOGPATCH_GAME_ON_EN, DOGPATCH_R_SHOT_SND, DOGPATCH_R_HIT_SND, MIDWAY_TONE_SND, &dogpatch_r_mixer)
+
+	DISCRETE_OUTPUT(NODE_91, 32760.0 / 5.8)
+	DISCRETE_OUTPUT(NODE_92, 32760.0 / 5.8)
 
 DISCRETE_SOUND_END
 
 
 MACHINE_CONFIG_FRAGMENT( dogpatch_audio )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(dogpatch)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.3)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
-WRITE8_HANDLER( dogpatch_audio_w )
+WRITE8_DEVICE_HANDLER( dogpatch_audio_w )
 {
-	/* D0 and D1 are most likely not used */
+	/* D0, D1 and D7 are not used */
 
-	coin_counter_w(space->machine(), 0, (data >> 2) & 0x01);
+	coin_counter_w(device->machine(), 0, (data >> 2) & 0x01);
 
-	space->machine().sound().system_enable((data >> 3) & 0x01);
+	device->machine().sound().system_enable((data >> 3) & 0x01);
+	discrete_sound_w(device, DOGPATCH_GAME_ON_EN, (data >> 3) & 0x01);
 
-	/* if (data & 0x10)  enable LEFT SHOOT sound */
+	discrete_sound_w(device, DOGPATCH_LEFT_SHOT_EN, (data >> 4) & 0x01);
 
-	/* if (data & 0x20)  enable RIGHT SHOOT sound */
+	discrete_sound_w(device, DOGPATCH_RIGHT_SHOT_EN, (data >> 5) & 0x01);
 
-	/* if (data & 0x40)  enable CAN HIT sound */
-
-	/* D7 is most likely not used */
+	discrete_sound_w(device, DOGPATCH_HIT_EN, (data >> 6) & 0x01);
 }
 
 

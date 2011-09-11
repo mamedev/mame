@@ -9,7 +9,7 @@
 #include "sound/samples.h"
 
 
-#define MW8080BW_MASTER_CLOCK             (19968000)
+#define MW8080BW_MASTER_CLOCK             (19968000.0)
 #define MW8080BW_CPU_CLOCK                (MW8080BW_MASTER_CLOCK / 10)
 #define MW8080BW_PIXEL_CLOCK              (MW8080BW_MASTER_CLOCK / 4)
 #define MW8080BW_HTOTAL                   (0x140)
@@ -24,6 +24,7 @@
 #define MW8080BW_INT_TRIGGER_VBLANK_1     (0)
 #define MW8080BW_INT_TRIGGER_COUNT_2      MW8080BW_VCOUNTER_START_VBLANK
 #define MW8080BW_INT_TRIGGER_VBLANK_2     (1)
+#define MW8080BW_60HZ                     (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)
 
 /* +4 is added to HBSTART because the hardware displays that many pixels after
    setting HBLANK */
@@ -189,7 +190,7 @@ WRITE8_DEVICE_HANDLER( shuffle_audio_1_w );
 WRITE8_DEVICE_HANDLER( shuffle_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( dogpatch_audio );
-WRITE8_HANDLER( dogpatch_audio_w );
+WRITE8_DEVICE_HANDLER( dogpatch_audio_w );
 
 MACHINE_CONFIG_EXTERN( spcenctr_audio );
 WRITE8_DEVICE_HANDLER( spcenctr_audio_1_w );
