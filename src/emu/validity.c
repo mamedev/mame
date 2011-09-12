@@ -584,7 +584,7 @@ static bool validate_roms(driver_enumerator &drivlist, region_array *rgninfo, ga
 					}
 				}
 				if (!found)
-					mame_printf_error("Device %s is not listed in device list\n", source->shortname());
+					mame_printf_error("Device %s is not listed in device list (mame_dev.lst / mess_dev.lst)\n", source->shortname());
 			}
 		}
 	}

@@ -19,15 +19,17 @@ struct _h63484_state
 	h63484_display_pixels_func display_func;
 	screen_device *screen;	/* screen */
 
-	UINT8 vram[0x40000];
+	UINT8 *vram;
 	UINT8 ar;
 	UINT8 vreg[0x100];
 	UINT8 sr;
 
-	UINT8 fifo[16];					/* FIFO data queue */
-	int fifo_flag[16];				/* FIFO flag queue */
-	int fifo_ptr;					/* FIFO pointer */
-	int fifo_dir;					/* FIFO direction */
+	UINT8 fifo[16];					/* FIFO W data queue */
+	int fifo_ptr;					/* FIFO W pointer */
+
+	UINT8 fifo_r[16];				/* FIFO R data queue */
+	int fifo_r_ptr;					/* FIFO R pointer */
+
 
 	UINT16 cr;
 	UINT16 pr[9];					/* parameter byte register */
@@ -35,6 +37,8 @@ struct _h63484_state
 
 	UINT32 rwp;
 	UINT8 rwp_dn;
+
+	address_space		*space;		/* memory space */
 };
 
 enum
@@ -344,15 +348,12 @@ INLINE const h63484_interface *get_interface( device_t *device )
 }
 
 
-INLINE void fifo_clear(h63484_state *h63484)
+INLINE void fifo_w_clear(h63484_state *h63484)
 {
 	int i;
 
 	for (i = 0; i < 16; i++)
-	{
 		h63484->fifo[i] = 0;
-		h63484->fifo_flag[i] = FIFO_EMPTY;
-	}
 
 	h63484->fifo_ptr = -1;
 
@@ -360,41 +361,17 @@ INLINE void fifo_clear(h63484_state *h63484)
 	h63484->sr |= H63484_SR_WFE;
 }
 
-INLINE int fifo_param_count(h63484_state *h63484)
-{
-	int i;
-
-	for (i = 0; i < 16; i++)
-	{
-		if (h63484->fifo_flag[i] != FIFO_PARAMETER) break;
-	}
-
-	return i;
-}
-
-INLINE void fifo_set_direction(h63484_state *h63484, int dir)
-{
-	if (h63484->fifo_dir != dir)
-	{
-		fifo_clear(h63484);
-	}
-
-	h63484->fifo_dir = dir;
-}
-
-INLINE void queue(h63484_state *h63484, UINT8 data, int flag)
+INLINE void queue_w(h63484_state *h63484, UINT8 data)
 {
 	if (h63484->fifo_ptr < 15)
 	{
 		h63484->fifo_ptr++;
 
 		h63484->fifo[h63484->fifo_ptr] = data;
-		h63484->fifo_flag[h63484->fifo_ptr] = flag;
 
 		if (h63484->fifo_ptr == 16)
 			h63484->sr &= ~H63484_SR_WFR;
 
-		//h63484->sr |= H63484_SR_RFR;
 		h63484->sr &= ~H63484_SR_WFE;
 	}
 	else
@@ -404,33 +381,83 @@ INLINE void queue(h63484_state *h63484, UINT8 data, int flag)
 	}
 }
 
-INLINE void dequeue(h63484_state *h63484, UINT8 *data, int *flag)
+INLINE void dequeue_w(h63484_state *h63484, UINT8 *data)
 {
 	int i;
 
 	*data = h63484->fifo[0];
-	*flag = h63484->fifo_flag[0];
 
 	//h63484->sr &= ~H63484_SR_RFF;
 
 	if (h63484->fifo_ptr > -1)
 	{
 		for (i = 0; i < 15; i++)
-		{
 			h63484->fifo[i] = h63484->fifo[i + 1];
-			h63484->fifo_flag[i] = h63484->fifo_flag[i + 1];
-		}
 
 		h63484->fifo[15] = 0;
-		h63484->fifo_flag[15] = 0;
 
 		h63484->fifo_ptr--;
 
-		//h63484->sr &= ~H63484_SR_RFR;
 		h63484->sr |= H63484_SR_WFR;
 
 		if (h63484->fifo_ptr == -1)
 			h63484->sr |= H63484_SR_WFE;
+
+	}
+}
+
+INLINE void fifo_r_clear(h63484_state *h63484)
+{
+	int i;
+
+	for (i = 0; i < 16; i++)
+		h63484->fifo_r[i] = 0;
+
+	h63484->fifo_r_ptr = -1;
+
+	h63484->sr &= ~H63484_SR_RFR;
+	h63484->sr &= ~H63484_SR_RFF;
+}
+
+INLINE void queue_r(h63484_state *h63484, UINT8 data)
+{
+	if (h63484->fifo_ptr < 15)
+	{
+		h63484->fifo_r_ptr++;
+
+		h63484->fifo_r[h63484->fifo_r_ptr] = data;
+
+		if (h63484->fifo_r_ptr == 16)
+			h63484->sr |= H63484_SR_RFF;
+
+		h63484->sr |= H63484_SR_RFR;
+	}
+	else
+	{
+		// TODO what happen? somebody set us up the bomb
+		printf("FIFO?\n");
+	}
+}
+
+INLINE void dequeue_r(h63484_state *h63484, UINT8 *data)
+{
+	int i;
+
+	*data = h63484->fifo_r[0];
+
+	if (h63484->fifo_r_ptr > -1)
+	{
+		for (i = 0; i < 15; i++)
+			h63484->fifo_r[i] = h63484->fifo_r[i + 1];
+
+		h63484->fifo_r[15] = 0;
+
+		h63484->fifo_r_ptr--;
+
+		h63484->sr &= ~H63484_SR_RFF;
+
+		if (h63484->fifo_ptr == -1)
+			h63484->sr &= H63484_SR_RFR;
 
 	}
 }
@@ -574,14 +601,13 @@ static void process_fifo(device_t *device)
 {
 	h63484_state *h63484 = get_safe_token(device);
 	UINT8 data;
-	int flag;
 
-	dequeue(h63484, &data, &flag);
+	dequeue_w(h63484, &data);
 
-	if (flag == FIFO_COMMAND)
+	if (h63484->sr & H63484_SR_CED)
 	{
 		h63484->cr = (data & 0xff) << 8;
-		dequeue(h63484, &data, &flag);
+		dequeue_w(h63484, &data);
 		h63484->cr |= data & 0xff;
 		h63484->param_ptr = 0;
 		h63484->sr &= ~H63484_SR_CED;
@@ -589,7 +615,7 @@ static void process_fifo(device_t *device)
 	else
 	{
 		h63484->pr[h63484->param_ptr] = (data & 0xff) << 8;
-		dequeue(h63484, &data, &flag);
+		dequeue_w(h63484, &data);
 		h63484->pr[h63484->param_ptr] |= (data & 0xff);
 		h63484->param_ptr++;
 	}
@@ -610,6 +636,18 @@ static void process_fifo(device_t *device)
 				command_end_seq(device);
 			}
 			break;
+
+		case COMMAND_RD:
+			if (h63484->param_ptr == 0)
+			{
+				printf("%08x %02x %02x\n", h63484->rwp,h63484->space->direct().read_raw_byte((h63484->rwp+0) & 0xfffff), h63484->space->direct().read_raw_byte((h63484->rwp+1) & 0xfffff));
+
+				queue_r(h63484, h63484->space->read_byte((h63484->rwp+0) & 0xfffff));
+				queue_r(h63484, h63484->space->read_byte((h63484->rwp+1) & 0xfffff));
+				h63484->rwp+=2;
+				command_end_seq(device);
+			}
+			break;
 	}
 }
 
@@ -617,8 +655,9 @@ static void exec_abort_sequence(device_t *device)
 {
 	h63484_state *h63484 = get_safe_token(device);
 
-	fifo_clear(h63484);
-	h63484->sr = H63484_SR_WFR | H63484_SR_WFE | H63484_SR_CED; // set to 0x23
+	fifo_w_clear(h63484);
+	fifo_r_clear(h63484);
+	h63484->sr = H63484_SR_WFR | H63484_SR_WFE | H63484_SR_CED; // hard-set to 0x23
 }
 
 static void check_video_registers(device_t *device, int offset)
@@ -678,9 +717,8 @@ WRITE16_DEVICE_HANDLER( h63484_data_w )
 
 	if(h63484->ar == 0)
 	{
-		fifo_set_direction(h63484, FIFO_WRITE);
-		queue(h63484, (data & 0xff00) >> 8, (h63484->sr & H63484_SR_CED) >> 5);
-		queue(h63484, (data & 0x00ff) >> 0, (h63484->sr & H63484_SR_CED) >> 5);
+		queue_w(h63484, (data & 0xff00) >> 8);
+		queue_w(h63484, (data & 0x00ff) >> 0);
 		process_fifo(device);
 	}
 	else
@@ -702,6 +740,9 @@ static DEVICE_START( h63484 )
 
 	h63484->screen = device->machine().device<screen_device>(intf->screen_tag);
 	assert(h63484->screen != NULL);
+
+	h63484->space = device->memory().space(AS_0);
+	h63484->vram = auto_alloc_array_clear(device->machine(), UINT8, 1 << 20);
 }
 
 static DEVICE_RESET( h63484 )
@@ -718,7 +759,7 @@ DEVICE_GET_INFO( h63484 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(h63484_state);					break;
 		case DEVINFO_INT_DATABUS_WIDTH_0:		info->i = 8;									break;
-		case DEVINFO_INT_ADDRBUS_WIDTH_0:		info->i = 19;									break;
+		case DEVINFO_INT_ADDRBUS_WIDTH_0:		info->i = 20;									break;
 		case DEVINFO_INT_ADDRBUS_SHIFT_0:		info->i = -1;									break;
 
 		/* --- the following bits of info are returned as pointers --- */
