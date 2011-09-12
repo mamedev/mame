@@ -16,7 +16,7 @@
 // default address map
 static ADDRESS_MAP_START( h63484_vram, AS_0, 8 )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
-	AM_RANGE(0x80000, 0xbffff) AM_NOP
+	AM_RANGE(0x80000, 0xfffff) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -35,7 +35,7 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	m_param_ptr(0),
 	m_rwp(0),
 	m_rwp_dn(0),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(h63484_vram))
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(h63484_vram))
 {
 	m_shortname = "h63484";
 }
@@ -359,6 +359,26 @@ const rom_entry *h63484_device::device_rom_region() const
 }
 
 //-------------------------------------------------
+//  readbyte - read a byte at the given address
+//-------------------------------------------------
+
+inline UINT8 h63484_device::readbyte(offs_t address)
+{
+	return space()->read_byte(address);
+}
+
+
+//-------------------------------------------------
+//  writebyte - write a byte at the given address
+//-------------------------------------------------
+
+inline void h63484_device::writebyte(offs_t address, UINT8 data)
+{
+	space()->write_byte(address, data);
+}
+
+
+//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
@@ -449,7 +469,7 @@ inline void h63484_device::fifo_r_clear()
 
 inline void h63484_device::queue_r(UINT8 data)
 {
-	if (m_fifo_ptr < 15)
+	if (m_fifo_r_ptr < 15)
 	{
 		m_fifo_r_ptr++;
 
@@ -484,8 +504,8 @@ inline void h63484_device::dequeue_r(UINT8 *data)
 
 		m_sr &= ~H63484_SR_RFF;
 
-		if (m_fifo_ptr == -1)
-			m_sr &= H63484_SR_RFR;
+		if (m_fifo_r_ptr == -1)
+			m_sr &= ~H63484_SR_RFR;
 	}
 }
 
@@ -650,9 +670,10 @@ void h63484_device::process_fifo()
 		case COMMAND_RD:
 			if (m_param_ptr == 0)
 			{
-				//queue_r(h63484, h63484->space->read_byte((h63484->rwp+0) & 0xfffff));
-				//queue_r(h63484, h63484->space->read_byte((h63484->rwp+1) & 0xfffff));
+				queue_r(readbyte((m_rwp+0) & 0xfffff));
+				queue_r(readbyte((m_rwp+1) & 0xfffff));
 				m_rwp+=2;
+				m_rwp&=0xfffff;
 				command_end_seq();
 			}
 			break;
@@ -693,6 +714,20 @@ READ16_MEMBER( h63484_device::data_r )
 	int res;
 
 	res = 0xffff;
+
+	if(m_ar == 0) // FIFO read
+	{
+		UINT8 data;
+
+		dequeue_r(&data);
+		res = (data & 0xff) << 8;
+		dequeue_r(&data);
+		res |= data & 0xff;
+	}
+	else
+	{
+		if(LOG) printf("%s R\n",acrtc_regnames[m_ar/2]);
+	}
 
 	return res;
 }
