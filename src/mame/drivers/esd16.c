@@ -21,6 +21,7 @@ Year + Game            PCB             Notes
 99  Head Panic         ESD 05-28-99   (All English version, copyright 1999)
 00  Head Panic         ESD 08-26-1999 (All English version, copyright 2000)
 00  Head Panic         ESD 08-26-1999 (with Fuuki, Story in Japanese)
+00  Deluxe 5           ESD            (no date is marked on PCB)
 00  Tang Tang          ESD            (no date is marked on PCB)
 01  SWAT Police        ESD            (no date is marked on PCB)
 ---------------------------------------------------------------------------
@@ -28,7 +29,6 @@ Year + Game            PCB             Notes
 Other ESD games:
 
 3 Cushion Billiards (c) 2000 - Undumped
-Deluxe 5            (c) 2000 - Undumped (PCB looks identical to the ESD 08-26-1999)
 Tang Tang           (c) 2000 - Undumped ESD 05-28-99 version
 Fire Hawk           (c) 2001 - see nmk16.c driver
 Jumping Pop         (c) 2001 - see tumbleb.c driver
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w)												// not used in mchampdx?
 ADDRESS_MAP_END
 
-/* Tang Tang - like the others but again with different addresses */
+/* Tang Tang & Deluxe 5 - like the others but again with different addresses */
 
 static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
@@ -777,8 +777,8 @@ ESD 08-26-1999
 |   93C46                 |A40MX04| 6116  |
 |              MCM6206    |       | 6116  |
 |              MCM6206    |-------| 6116  |
-| 16MHz   PAL  MCM6206                    |
-| 14MHz   PAL  MCM6206  ROM.FU35 ROM.FU34 |
+|SW1 16MHz PAL MCM6206                    |
+|SW2 14MHz PAL MCM6206  ROM.FU35 ROM.FU34 |
 |-----------------------------------------|
 
 Notes:
@@ -938,8 +938,8 @@ ESD 08-26-1999
 |                         |A40MX04| 6116  |
 |   93C46      MCM6206    |       | 6116  |
 |              MCM6206    |-------| 6116  |
-| 16MHz   PAL  MCM6206                    |
-| 14MHz   PAL  MCM6206    ESD8 %  ESD9    |
+|SW1 16MHz PAL MCM6206                    |
+|SW2 14MHz PAL MCM6206    ESD8 %  ESD9    |
 |-----------------------------------------|
 
 Notes:
@@ -1048,6 +1048,79 @@ ROM_END
 
 
 
+/*
+
+Deluxe 5 (c) 2001 ESD
+PCB Layout
+----------
+
+ESD made in Korea
+|-----------------------------------------|
+|     3014 3812 6116  6295   ESD4.SU10    |
+|VOL      ESD3.SU06  Z80              JU03|
+|             PAL                         |
+|                           6116      JU04|
+|       6116           PAL  6116          |
+|       6116     PAL  |-------|       JU05|
+|J               PAL  | ESD   |           |
+|A                    |CRTC99 |       JU06|
+|M     PAL            | 0016  |           |
+|M     PAL            |-------|       JU07|
+|A    68000   ESD1.CU03                   |
+|             ESD2.CU02   |-------|       |
+|                         |ACTEL  |       |
+|                         |A40MX04|   6116|
+|              MCM6206    |  0008 |   6116|
+|              MCM6206    |-------|       |
+|SW1 16MHz PAL MCM6206                6116|
+|SW2 14MHz PAL MCM6206   FU35   FU34  6116|
+|-----------------------------------------|
+
+Notes:
+      68000 (MC68HC000FN16)
+      Z80 (Z84C00006FEC-Z80CPU)
+      OKI6295 label AD65 (sound)
+      YM3014 label U6614 (sound)
+      YM3812 label U6612 (sound)
+      MCM6206 - 32k x8 SRAM (SOJ28)
+      6116    - 2k x8 SRAM (SOP28)
+      A40MX04 - Actel A40MX04-F FPGA (PLCC84)
+      CRTC99  - ESD CRTC99 Graphics Controller (QFP240)
+      JU03-8  - AM27C020
+      FU34,FU35  -  MX29F1610MC
+
+1x connector JAMMA
+1x trimmer (volume)
+2x pushbutton
+
+      * : Board has positions for 6x standard 32 pin EPROMs but only 5 positions are populated with an EPROM.
+
+*/
+
+ROM_START( deluxe5 ) /* Deluxe 5 */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000,  CRC(d077dc13) SHA1(d83feadb29674d56a5f019641f402798c7ba8d61) ) /* M27C2001 EPROM */
+	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(15d6644f) SHA1(cfb8168167389855f906658511d1dc7460e13100) ) /* M27C2001 EPROM */
+
+	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
+	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) /* AM27C020 mask rom */
+	ROM_CONTINUE(          0x10000, 0x34000)
+
+	ROM_REGION( 0x280000, "gfx1", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD( "am27c020.ju03", 0x000000, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) ) /* AM27C020 mask roms with no label */
+	ROM_LOAD( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
+	ROM_LOAD( "am27c020.ju05", 0x100000, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
+	ROM_LOAD( "am27c020.ju06", 0x180000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) )
+	ROM_LOAD( "am27c020.ju07", 0x200000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
+	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, NO_DUMP ) /* No labels on the flash roms */
+	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, NO_DUMP ) /* No labels on the flash roms */
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+ROM_END
+
 /* Tang Tang
 
 Tang Tang (ESD)
@@ -1074,8 +1147,8 @@ ESD made in Korea
 |                         |A40MX04| 6116  |
 |              MCM6206    |  0008 | 6116  |
 |              MCM6206    |-------| 6116  |
-| 16MHz   PAL  MCM6206                    |
-| 14MHz   PAL  MCM6206  ROM.FU35 ROM.FU34 |
+|SW1 16MHz PAL MCM6206                6116|
+|SW2 14MHz PAL MCM6206   FU35   FU34  6116|
 |-----------------------------------------|
 
 Notes:
@@ -1149,8 +1222,8 @@ ESD made in Korea
 |                         |A40MX04|   6116|
 |              MCM6206    |  0008 |   6116|
 |              MCM6206    |-------|       |
-| 16MHz   PAL  MCM6206                6116|
-| 14MHz   PAL  MCM6206   FU35   FU34  6116|
+|SW1 16MHz PAL MCM6206                6116|
+|SW2 14MHz PAL MCM6206   FU35   FU34  6116|
 |-----------------------------------------|
 
 Notes:
@@ -1170,8 +1243,7 @@ Notes:
 1x trimmer (volume)
 2x pushbutton
 
-      * : Board has positions for 6x standard 32 pin EPROMs but only 5 positions are populated
-          with an EPROM.
+      * : Board has positions for 6x standard 32 pin EPROMs but only 5 positions are populated with an EPROM.
 
 */
 
@@ -1222,6 +1294,7 @@ GAME( 1999, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Hea
 GAME( 1999, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", GAME_SUPPORTS_SAVE ) // 15/03/2000 ?
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
+GAME( 2000, deluxe5,  0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Deluxe 5", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* Missing background graphics roms */
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", GAME_SUPPORTS_SAVE ) // 26/05/2000 ?
-GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police ", GAME_SUPPORTS_SAVE )
+GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police", GAME_SUPPORTS_SAVE )
 
