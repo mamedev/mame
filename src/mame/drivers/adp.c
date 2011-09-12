@@ -148,7 +148,7 @@ Video board has additional chips:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
-#include "video/hd63484.h"
+#include "video/h63484.h"
 #include "machine/microtch.h"
 #include "machine/68681.h"
 
@@ -166,9 +166,13 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_duart;
-	device_t *m_hd63484;
+	device_t *m_h63484;
 };
 
+static H63484_DISPLAY_PIXELS( acrtc_display_pixels )
+{
+	// ...
+}
 
 /***************************************************************************
 
@@ -208,11 +212,12 @@ static MACHINE_START( skattv )
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_duart = machine.device("duart68681");
-	state->m_hd63484 = machine.device("hd63484");
+	state->m_h63484 = machine.device("h63484");
 
 	state->save_item(NAME(state->m_mux_data));
 	state->save_item(NAME(state->m_register_active));
 
+	#if 0
 	/*
         ACRTC memory:
 
@@ -237,6 +242,7 @@ static MACHINE_START( skattv )
 			hd63484_ram_w(hd63484, i + 0xc0000/2, rom[i], 0xffff);
 		}
 	}
+	#endif
 }
 
 static MACHINE_RESET( skattv )
@@ -291,6 +297,7 @@ static VIDEO_START(adp)
 
 static SCREEN_UPDATE( adp )
 {
+	#if 0
 	adp_state *state = screen->machine().driver_data<adp_state>();
 	int x, y, b, src;
 
@@ -362,6 +369,7 @@ if (!screen->machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
 			}
 		}
 	}
+	#endif
 
 	return 0;
 }
@@ -435,8 +443,8 @@ static READ8_DEVICE_HANDLER(t2_r)
 
 static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_status_r, h63484_address_w)
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_data_r, h63484_data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(test_r,wh2_w) //related to input
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff )
@@ -448,8 +456,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff )
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w) // bad
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w) // bad
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_status_r, h63484_address_w) // bad
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_data_r, h63484_data_w) // bad
 	AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -501,8 +509,8 @@ static WRITE8_HANDLER( ramdac_io_w )
 
 static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_status_r, h63484_address_w)
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_data_r, h63484_data_w)
 	AM_RANGE(0x800088, 0x80008d) AM_WRITE8(ramdac_io_w, 0x00ff)
 	AM_RANGE(0x800100, 0x800101) AM_RAM //???
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
@@ -513,8 +521,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	//400000-40001f?
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_status_r, h63484_address_w)
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_data_r, h63484_data_w)
 	AM_RANGE(0x800100, 0x800101) AM_RAM //???
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff )
@@ -627,8 +635,28 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static const hd63484_interface adp_hd63484_intf = { 0 };
-static const hd63484_interface skattva_hd63484_intf = { 1 };	// skattva hd63484 hack. to be removed once the video controller emulation is complete!
+static READ8_HANDLER( h63484_rom_r )
+{
+	UINT8 *rom = space->machine().region("gfx1")->base();
+
+	return rom[offset];
+}
+
+static ADDRESS_MAP_START( adp_h63484_map, AS_0, 8 )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+	AM_RANGE(0x40000, 0x7ffff) AM_READ(h63484_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fashiong_h63484_map, AS_0, 8 )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+//	AM_RANGE(0x40000, 0x7ffff) AM_ROM AM_REGION("gfx1", 0)
+ADDRESS_MAP_END
+
+static H63484_INTERFACE( adp_h63484_intf )
+{
+	"screen",
+	acrtc_display_pixels
+};
 
 static MACHINE_CONFIG_START( quickjac, adp_state )
 
@@ -654,7 +682,7 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_PALETTE_INIT(adp)
 	MCFG_VIDEO_START(adp)
 
-	MCFG_HD63484_ADD("hd63484", adp_hd63484_intf)
+	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
@@ -687,19 +715,13 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_PALETTE_INIT(adp)
 	MCFG_VIDEO_START(adp)
 
-	MCFG_HD63484_ADD("hd63484", adp_hd63484_intf)
+	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( skattva, skattv )
-
-	MCFG_DEVICE_REMOVE("hd63484")
-	MCFG_HD63484_ADD("hd63484", skattva_hd63484_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( backgamn, adp_state )
@@ -725,7 +747,7 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 //  MCFG_PALETTE_INIT(adp)
 	MCFG_VIDEO_START(adp)
 
-	MCFG_HD63484_ADD("hd63484", adp_hd63484_intf)
+	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
@@ -734,7 +756,12 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( funland, skattv )
+static MACHINE_CONFIG_DERIVED( fashiong, skattv )
+	MCFG_DEVICE_REMOVE("h63484")
+	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, fashiong_h63484_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( funland, fashiong )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funland_mem)
 
@@ -742,7 +769,7 @@ static MACHINE_CONFIG_DERIVED( funland, skattv )
 	MCFG_PALETTE_INIT(all_black)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fstation, skattv )
+static MACHINE_CONFIG_DERIVED( fstation, fashiong )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fstation_mem)
 MACHINE_CONFIG_END
@@ -754,8 +781,8 @@ ROM_START( quickjac )
 	ROM_LOAD16_BYTE( "quick_jack_index_a.2.u6.bin", 0x00001, 0x10000, CRC(210cb89b) SHA1(8eac60d40b60e845f9c02fee6c447f125ba5d1ab) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.1.u2.bin", 0x00001, 0x20000, CRC(73c27fc6) SHA1(12429bc0009b7754e08d2b6a5e1cd8251ab66e2d) )
-	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.2.u6.bin", 0x00000, 0x20000, CRC(61d55be2) SHA1(bc17dc91fd1ef0f862eb0d7dbbbfa354a8403eb8) )
+	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.1.u2.bin", 0x00000, 0x20000, CRC(73c27fc6) SHA1(12429bc0009b7754e08d2b6a5e1cd8251ab66e2d) )
+	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.2.u6.bin", 0x00001, 0x20000, CRC(61d55be2) SHA1(bc17dc91fd1ef0f862eb0d7dbbbfa354a8403eb8) )
 ROM_END
 
 ROM_START( skattv )
@@ -764,8 +791,8 @@ ROM_START( skattv )
 	ROM_LOAD16_BYTE( "f2_ii.bin", 0x00001, 0x20000, CRC(0db1d2d5) SHA1(a29b0299352e0b2b713caf02aa7978f2a4b34e37) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "f1_i.bin", 0x00001, 0x20000, CRC(4869a889) SHA1(ad9f3fcdfd3630f9ad5b93a9d2738de9fc3514d3) )
-	ROM_LOAD16_BYTE( "f1_ii.bin", 0x00000, 0x20000, CRC(17681537) SHA1(133685854b2080aaa3d0cced0287bc454d1f3bfc) )
+	ROM_LOAD16_BYTE( "f1_i.bin", 0x00000, 0x20000, CRC(4869a889) SHA1(ad9f3fcdfd3630f9ad5b93a9d2738de9fc3514d3) )
+	ROM_LOAD16_BYTE( "f1_ii.bin", 0x00001, 0x20000, CRC(17681537) SHA1(133685854b2080aaa3d0cced0287bc454d1f3bfc) )
 ROM_END
 
 ROM_START( skattva )
@@ -774,8 +801,8 @@ ROM_START( skattva )
 	ROM_LOAD16_BYTE( "skat_tv_version_ts3.2.u6.bin", 0x00001, 0x20000, CRC(4f927832) SHA1(bbe013005fd00dd42d12939eab5c80ec44a54b71) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.1.u2.bin", 0x00001, 0x20000, CRC(de6f275b) SHA1(0c396fa4d1975c8ccc4967d330b368c0697d2124) )
-	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5.bin", 0x00000, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
+	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.1.u2.bin", 0x00000, 0x20000, CRC(de6f275b) SHA1(0c396fa4d1975c8ccc4967d330b368c0697d2124) )
+	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5.bin", 0x00001, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
 ROM_END
 
 ROM_START( backgamn )
@@ -784,8 +811,8 @@ ROM_START( backgamn )
 	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "b_f1_i.bin", 0x00001, 0x20000, NO_DUMP )
-	ROM_LOAD16_BYTE( "b_f1_ii.bin", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "b_f1_i.bin", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "b_f1_ii.bin", 0x00001, 0x20000, NO_DUMP )
 ROM_END
 
 ROM_START( fashiong )
@@ -794,8 +821,8 @@ ROM_START( fashiong )
 	ROM_LOAD16_BYTE( "fashion_gambler_s6_ii.bin", 0x00001, 0x80000, CRC(5a2466d1) SHA1(c113a2295beed2011c70887a1f2fcdec00b055cb) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_i.bin", 0x00001, 0x80000, CRC(d1ee9133) SHA1(e5fdfa303a3317f8f5fbdc03438ee97415afff4b) )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_ii.bin", 0x00000, 0x80000, CRC(07b1e722) SHA1(594cbe9edfea6b04a4e49d1c1594f1c3afeadef5) )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_i.bin", 0x00000, 0x80000, CRC(d1ee9133) SHA1(e5fdfa303a3317f8f5fbdc03438ee97415afff4b) )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_ii.bin", 0x00001, 0x80000, CRC(07b1e722) SHA1(594cbe9edfea6b04a4e49d1c1594f1c3afeadef5) )
 
 	ROM_REGION( 0x4000, "user1", 0 )
 	//nvram - 16 bit
@@ -809,8 +836,8 @@ ROM_START( fashiong2 )
 	ROM_LOAD16_BYTE( "fashion_gambler_f3_ii.u6.bin", 0x00001, 0x80000, CRC(7d48e9ab) SHA1(603e946b95c53ee75c9ca10751316e723242424f) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_f2_i.u2", 0x00001, 0x80000, CRC(54ea6f10) SHA1(a1284ec34e4e78acba08dc00d5ba47c3457531f8) )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_f2_ii.u5", 0x00000, 0x80000, CRC(c292a278) SHA1(9f66531ae9f202d364f47c7ed3551483fc9d27b0) )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_f2_i.u2", 0x00000, 0x80000, CRC(54ea6f10) SHA1(a1284ec34e4e78acba08dc00d5ba47c3457531f8) )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_f2_ii.u5", 0x00001, 0x80000, CRC(c292a278) SHA1(9f66531ae9f202d364f47c7ed3551483fc9d27b0) )
 
 	ROM_REGION( 0x4000, "user1", 0 )
 	//nvram - 16 bit - taken from parent
@@ -824,8 +851,8 @@ ROM_START( funlddlx )
 	ROM_LOAD16_BYTE( "fldl_f6_2.bin", 0x00000, 0x80000, CRC(93bf1a4b) SHA1(5b4353feba1e0d4402cd26f4855e3803e6be43b9) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "flv_f1_i.bin", 0x00001, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
-	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00000, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
+	ROM_LOAD16_BYTE( "flv_f1_i.bin", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
+	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
 ROM_END
 
 ROM_START( fstation )
@@ -834,16 +861,16 @@ ROM_START( fstation )
 	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1.ii", 0x00001, 0x80000, CRC(a972184d) SHA1(1849e71e696039f07b7b67c4172c7999e81664c3) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.i", 0x00001, 0x80000, CRC(b6eb971e) SHA1(14e3272c66a82db0f77123974eea28f308209b1b) )
-	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00000, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
+	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.i", 0x00000, 0x80000, CRC(b6eb971e) SHA1(14e3272c66a82db0f77123974eea28f308209b1b) )
+	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00001, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
 ROM_END
 
 
 GAME( 1990, backgamn,        0, backgamn,    skattv,    0, ROT0,  "ADP",     "Backgammon", GAME_NOT_WORKING )
 GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP",     "Quick Jack", GAME_NOT_WORKING )
 GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP",     "Skat TV", GAME_NOT_WORKING )
-GAME( 1995, skattva,    skattv, skattva,     skattv,    0, ROT0,  "ADP",     "Skat TV (version TS3)", GAME_NOT_WORKING )
-GAME( 1997, fashiong,        0, skattv,      skattv,    0, ROT0,  "ADP",     "Fashion Gambler", GAME_NOT_WORKING )
-GAME( 1997, fashiong2,fashiong, skattv,      skattv,    0, ROT0,  "ADP",     "Fashion Gambler (Set 2)", GAME_NOT_WORKING )
+GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP",     "Skat TV (version TS3)", GAME_NOT_WORKING )
+GAME( 1997, fashiong,        0, fashiong,    skattv,    0, ROT0,  "ADP",     "Fashion Gambler", GAME_NOT_WORKING )
+GAME( 1997, fashiong2,fashiong, fashiong,    skattv,    0, ROT0,  "ADP",     "Fashion Gambler (Set 2)", GAME_NOT_WORKING )
 GAME( 1999, funlddlx,        0, funland,     skattv,    0, ROT0,  "Stella",  "Funny Land de Luxe", GAME_NOT_WORKING )
 GAME( 2000, fstation,        0, fstation,    skattv,    0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", GAME_NOT_WORKING )

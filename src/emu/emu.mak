@@ -263,19 +263,20 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/crt9212.o		\
 	$(EMUVIDEO)/dm9368.o		\
 	$(EMUVIDEO)/generic.o		\
+	$(EMUVIDEO)/h63484.o		\
 	$(EMUVIDEO)/hd44102.o		\
 	$(EMUVIDEO)/hd61830.o		\
 	$(EMUVIDEO)/hd63484.o		\
-	$(EMUVIDEO)/i8275.o			\
+	$(EMUVIDEO)/i8275.o		\
 	$(EMUVIDEO)/k053250.o		\
 	$(EMUVIDEO)/mc6845.o		\
 	$(EMUVIDEO)/msm6255.o		\
 	$(EMUVIDEO)/pc_vga.o		\
-	$(EMUVIDEO)/poly.o			\
-	$(EMUVIDEO)/psx.o			\
+	$(EMUVIDEO)/poly.o		\
+	$(EMUVIDEO)/psx.o		\
 	$(EMUVIDEO)/resnet.o		\
 	$(EMUVIDEO)/rgbutil.o		\
-	$(EMUVIDEO)/s2636.o			\
+	$(EMUVIDEO)/s2636.o		\
 	$(EMUVIDEO)/saa5050.o		\
 	$(EMUVIDEO)/sed1330.o		\
 	$(EMUVIDEO)/tlc34076.o		\
@@ -283,7 +284,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/tms9927.o		\
 	$(EMUVIDEO)/tms9928a.o		\
 	$(EMUVIDEO)/upd3301.o		\
-	$(EMUVIDEO)/v9938.o			\
+	$(EMUVIDEO)/v9938.o		\
 	$(EMUVIDEO)/vector.o		\
 	$(EMUVIDEO)/voodoo.o		\
 
