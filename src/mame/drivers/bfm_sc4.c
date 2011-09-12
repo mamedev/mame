@@ -14755,8 +14755,8 @@ GAME( 200?, sc4winsp	,0,			sc4, sc4, 0, ROT0, "Qps","Winning Spin (Qps) (Scorpio
 GAME( 200?, sc4wondw	,0,			sc4, sc4, 0, ROT0, "BFM","Wonder Wheel (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4xmark	,0,			sc4, sc4, 0, ROT0, "BFM","X Marks The Spot (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4xcash	,0,			sc4, sc4, 0, ROT0, "BFM","Xtra Cash (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4unk		,0,			sc4, sc4, 0, ROT0, "Mazooma","Unknown Scorpion '95410476' (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4s16		,0,			sc4, sc4, 0, ROT0, "Mazooma","Unknown Scorpion 'Section 16' (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4unk		,0,			sc4, sc4, 0, ROT0, "Mazooma","unknown Scorpion '95410476' (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4s16		,0,			sc4, sc4, 0, ROT0, "Mazooma","unknown Scorpion 'Section 16' (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4bgold	,0,			sc4, sc4, 0, ROT0, "Nova","Black Gold (Nova) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4blokq	,0,			sc4, sc4, 0, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4clbtm	,0,			sc4, sc4, 0, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -14994,7 +14994,7 @@ GAME( 200?, sc_dndbe	,0,			sc4, sc4, 0, ROT0, "BFM","Deal Or No Deal Beat The Ba
 GAME( 200?, sc_dndbc	,0,			sc4, sc4, 0, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc_mowow	,0,			sc4, sc4, 0, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc_nunsm	,0,			sc4, sc4, 0, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc_unsrt	,0,			sc4, sc4, 0, ROT0, "unknown","Unknown Scorpion 'Unsorted Sound' (Unknown) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc_unsrt	,0,			sc4, sc4, 0, ROT0, "<unknown>","unknown Scorpion 'Unsorted Sound' (Unknown) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 /* Scorpion 4 + Adder 4 */
 

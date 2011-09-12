@@ -364,7 +364,7 @@ ROM_END
 
 GAME(198?, j_ewnud	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j_ewnda	,j_ewnud	,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j_luckac	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Unknown","Lucky Aces (Unk)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j_luckac	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "<unknown>","Lucky Aces (Unk)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j_super2	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Jpm","Super 2 (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 
 // this one is different again?

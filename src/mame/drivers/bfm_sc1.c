@@ -2807,7 +2807,7 @@ GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELA
 // are they really SC1?
 GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Beat The Bank Club (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // behaves like sc1dyncl, but then locks up
 GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // OFAH - Phoenix 1
+GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // OFAH - Phoenix 1
 GAME( 199?, sc1boncl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Bonanza Club (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 // are these really SC1? they do more here than in SC2 at least!
 GAME( 199?, sc1days			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "All In A Days Work (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
@@ -2841,7 +2841,7 @@ GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",  
 GAME( 199?, sc1potpa			, sc1potp			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
 
-GAME( 199?, sc1scunk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "unknown",      "Unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
+GAME( 199?, sc1scunk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "<unknown>",      "unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
 
 //Adder 2

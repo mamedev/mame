@@ -15519,9 +15519,9 @@ GAME(199?, m4whaton	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Wha
 GAME(199?, m4wildms	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Wild Mystery (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4wildtm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Wild Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4wta	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Winner Takes All (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4ch30	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Unknown MPU4 'CH3 0.1' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4sb5	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Unknown MPU4 'BSB 0.3' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4stc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4ch30	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","unknown MPU4 'CH3 0.1' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4sb5	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","unknown MPU4 'BSB 0.3' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4stc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 
 /* Bwb */
 
@@ -15824,20 +15824,20 @@ GAME(199?, m4stand2,  0,		mod2    ,mpu4, m4default, ROT0,   "DJE","Stand To Deli
 
 /* Unknown stuff that looks like it might be MPU4, but needs further verification, some could be bad */
 
-GAME(199?, m4barcrz	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Bar Crazy (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bonzbn	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Bingo Bonanza (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4cld02	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'CLD 0.2C' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4dnj	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Double Nudge (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4matdr	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Matador (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4ttak	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Tic Tac Take (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4hslo	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'HOT 3.0' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4unkjok	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'Joker' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4remag	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'ZTP 0.7' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4rmg	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'CTP 0.4' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4wnud	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'W Nudge' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4t266	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'TTO 1.1' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4brnze	,  0,		mod4oki, mpu4, m4default, ROT0,   "unknown","Bronze Voyage (unknown) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4riotrp	,  0,		mod4oki, mpu4, m4default, ROT0,   "unknown","Rio Tropico (unknown) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4barcrz	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Bar Crazy (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bonzbn	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4cld02	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Unknown MPU4 'CLD 0.2C' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4dnj	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Double Nudge (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4matdr	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Matador (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ttak	,  0,		mod2	,mpu4, m4default, ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4hslo	,  0,		mod2	,mpu4, m4default, ROT0,   "<unknown>","unknown MPU4 'HOT 3.0' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4unkjok	,  0,		mod2	,mpu4, m4default, ROT0,   "<unknown>","unknown MPU4 'Joker' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4remag	,  0,		mod2	,mpu4, m4default, ROT0,   "<unknown>","unknown MPU4 'ZTP 0.7' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4rmg	,  0,		mod2	,mpu4, m4default, ROT0,   "<unknown>","unknown MPU4 'CTP 0.4' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4wnud	,  0,		mod2	,mpu4, m4default, ROT0,   "<unknown>","unknown MPU4 'W Nudge' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4t266	,  0,		mod2	,mpu4, m4default, ROT0,   "<unknown>","unknown MPU4 'TTO 1.1' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4brnze	,  0,		mod4oki, mpu4, m4default, ROT0,   "<unknown>","Bronze Voyage (unknown) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4riotrp	,  0,		mod4oki, mpu4, m4default, ROT0,   "<unknown>","Rio Tropico (unknown) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
 /* *if* these are MPU4 they have a different sound system at least - The copyright strings in them are 'AET' tho (Ace?) - Could be related to the Crystal stuff? */
 GAME(199?, m4sbx	,  0,		mpu4crys	,mpu4, m_frkstn, ROT0,   "AET/Coinworld","Super Bear X (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -15913,7 +15913,7 @@ GAME(199?, m4booze, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Extreme","Booze C
 GAME(199?, m4cbing, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Redpoint Systems","Cherry Bingo (Redpoint Systems) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // custom sound system
 
 
-GAME( 1986, m4supsl	, 0			, mod2, mpu4,		m4default		,	  ROT0,       "Unknown",   "Supa Silva (Bellfruit?) (MPU4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1986, m4supsl	, 0			, mod2, mpu4,		m4default		,	  ROT0,       "<unknown>",   "Supa Silva (Bellfruit?) (MPU4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 199?, m4nod		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
 
 GAME( 199?, m4dcrls		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Mazooma",   "Double Crazy Reels (Mazooma) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
