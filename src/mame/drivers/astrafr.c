@@ -1814,7 +1814,7 @@ GAME( 200?, as_topsld,  as_topsl	, astrafr_dual,    astrafr,    0, ROT0,  "Astra
 
 // Other HW? (has u1/u2 pairing)
 GAME( 200?, as_bigtm,   0			, astra_single ,    astrafr,    astradec, ROT0,  "Astra", "Big Time (Astra, V003)", GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 200?, as_acp,     0			, astra_single ,    astrafr,    astradec, ROT0,  "Astra", "Unknown Astra 'ACP' (Astra, V403)", GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // no sound data in here?
+GAME( 200?, as_acp,     0			, astra_single ,    astrafr,    astradec, ROT0,  "Astra", "unknown Astra 'ACP' (Astra, V403)", GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // no sound data in here?
 GAME( 200?, as_celeb,   0			, astra_single ,    astrafr,    astradec, ROT0,  "Astra", "Celebration (Astra, V100)", GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_celeba,  as_celeb	, astra_single ,    astrafr,    astradec, ROT0,  "Astra", "Celebration (Astra, V101)", GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 200?, as_celebb,  as_celeb	, astra_single ,    astrafr,    astradec, ROT0,  "Astra", "Celebration (Astra, V201)", GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

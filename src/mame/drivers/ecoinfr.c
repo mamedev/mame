@@ -1457,8 +1457,8 @@ GAME( 19??, ec_casbx,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electr
 GAME( 19??, ec_redbr,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // a mix of REDBAR and 2001 REDBAR
 GAME( 19??, ec_supbx,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_spbxd,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk1,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk1,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
 GAME( 19??, ec_barxmab, ec_barx	 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Bar X (MAB PCB) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // scrambled roms

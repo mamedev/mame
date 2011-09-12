@@ -15826,7 +15826,7 @@ GAME(199?, m4stand2,  0,		mod2    ,mpu4, m4default, ROT0,   "DJE","Stand To Deli
 
 GAME(199?, m4barcrz	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Bar Crazy (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bonzbn	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4cld02	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Unknown MPU4 'CLD 0.2C' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4cld02	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","unknown MPU4 'CLD 0.2C' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4dnj	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Double Nudge (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4matdr	,  0,		mod4oki	,mpu4, m4default, ROT0,   "<unknown>","Matador (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4ttak	,  0,		mod2	,mpu4, m4default, ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )

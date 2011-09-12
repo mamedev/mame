@@ -3081,9 +3081,9 @@ GAME( 200?, sc5wotw		,0,			sc5, sc5, 0, ROT0, "Mazooma","War Of The Wads (Mazoom
 GAME( 200?, sc5wild		,0,			sc5, sc5, 0, ROT0, "Mazooma","Wild Reels (Mazooma) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5wca		,0,			sc5, sc5, 0, ROT0, "Qps","Win Can Alley (Qps) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5wok		,0,			sc5, sc5, 0, ROT0, "BFM","Wok n' Roll (Bellfruit) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5u1396	,0,			sc5, sc5, 0, ROT0, "Mazooma","Unknown Scorpion '95411396' (Mazooma) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5u6606	,0,			sc5, sc5, 0, ROT0, "Mazooma","Unknown Scorpion '95416606' (Mazooma) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5u7606	,0,			sc5, sc5, 0, ROT0, "Mazooma","Unknown Scorpion '95417606' (Mazooma) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc5u1396	,0,			sc5, sc5, 0, ROT0, "Mazooma","unknown Scorpion '95411396' (Mazooma) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc5u6606	,0,			sc5, sc5, 0, ROT0, "Mazooma","unknown Scorpion '95416606' (Mazooma) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc5u7606	,0,			sc5, sc5, 0, ROT0, "Mazooma","unknown Scorpion '95417606' (Mazooma) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5rhr		,0,			sc5, sc5, 0, ROT0, "Qps","Red Hot Reels (Qps) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5srrcl	,0,			sc5, sc5, 0, ROT0, "BFM","Snake Rattle 'n' Roll Club (Bellfruit) (Scorpion 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5pircl	,0,			sc5, sc5, 0, ROT0, "BFM","The Prize Is Right Club (Bellfruit) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -3115,6 +3115,6 @@ GAME( 200?, ad5rsrr		,0,			sc5, sc5, 0, ROT0, "BFM","Ronnie O'Sullivan's Rocket 
 GAME( 200?, ad5tornc	,0,			sc5, sc5, 0, ROT0, "BFM","Tornado Club (Bellfruit) (Scorpion 5, Adder 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, ad5vpa		,0,			sc5, sc5, 0, ROT0, "BFM","Video Poker Ace (Bellfruit) (Scorpion 5, Adder 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, ad5vlv		,0,			sc5, sc5, 0, ROT0, "BFM","Viva Las Vegas (Bellfruit) (Scorpion 5, Adder 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, ad5u1337	,0,			sc5, sc5, 0, ROT0, "Mazooma","Unknown Scorpion '39211337' (Mazooma) (Scorpion 5, Adder 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, ad5u1337	,0,			sc5, sc5, 0, ROT0, "Mazooma","unknown Scorpion '39211337' (Mazooma) (Scorpion 5, Adder 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 
