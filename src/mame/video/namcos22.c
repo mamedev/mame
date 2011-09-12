@@ -379,23 +379,23 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 				if( fogFactor != 0xff )
 					rgbint_blend(&rgb, &fogColor, fogFactor);
 
-			if( fadeFactor != 0xff )
-			{
-				if (state->m_mbSuperSystem22)
+				if( fadeFactor != 0xff )
 				{
-					rgbint_blend(&rgb, &fadeColor, fadeFactor);
+					if (state->m_mbSuperSystem22)
+					{
+						rgbint_blend(&rgb, &fadeColor, fadeFactor);
+					}
+					else
+					{
+						rgb_t c = rgbint_to_rgb(&rgb);
+						c = MAKE_RGB(
+							Clamp256((RGB_RED(c)   * extra->fade_r) >> 8),
+							Clamp256((RGB_GREEN(c) * extra->fade_g) >> 8),
+							Clamp256((RGB_BLUE(c)  * extra->fade_b) >> 8)
+						);
+						rgb_to_rgbint(&rgb, c);
+					}
 				}
-				else
-				{
-					rgb_t c = rgbint_to_rgb(&rgb);
-					c = MAKE_RGB(
-						Clamp256((RGB_RED(c)   * extra->fade_r) >> 8),
-						Clamp256((RGB_GREEN(c) * extra->fade_g) >> 8),
-						Clamp256((RGB_BLUE(c)  * extra->fade_b) >> 8)
-					);
-					rgb_to_rgbint(&rgb, c);
-				}
-			}
 
 				pDest[x] = rgbint_to_rgb(&rgb);
 			}
@@ -541,19 +541,9 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	const UINT8 *pCharPri = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
 	int x;
 
-	int bFogEnable = 0;
-	INT16 fogDelta = 0;
+	int bFogEnable = nthword(state->m_czattr,4)&0x4000; /* ? */
+	INT16 fogDelta = nthword(state->m_czattr, 0 );
 	int fadeEnable = (mixer.target&2) && mixer.fadeFactor;
-
-	if( state->m_mbSuperSystem22 )
-	{
-		fogDelta = nthword(state->m_czattr, 0 );
-		bFogEnable = nthword(state->m_czattr,4)&0x4000; /* ? */
-	}
-	else
-	{
-		bFogEnable = 0;
-	}
 
 	for( x=extent->startx; x<extent->stopx; x++ )
 	{
@@ -580,19 +570,10 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 				}
 				if( fadeEnable )
 				{
-					if (state->m_mbSuperSystem22)
-					{
-						int fade2 = 0x100-mixer.fadeFactor;
-						r = (r*fade2+mixer.fadeFactor*mixer.rFadeColor)>>8;
-						g = (g*fade2+mixer.fadeFactor*mixer.gFadeColor)>>8;
-						b = (b*fade2+mixer.fadeFactor*mixer.bFadeColor)>>8;
-					}
-					else
-					{
-						r = Clamp256((r*mixer.rFadeColor)>>8);
-						g = Clamp256((g*mixer.gFadeColor)>>8);
-						b = Clamp256((b*mixer.bFadeColor)>>8);
-					}
+					int fade2 = 0x100-mixer.fadeFactor;
+					r = (r*fade2+mixer.fadeFactor*mixer.rFadeColor)>>8;
+					g = (g*fade2+mixer.fadeFactor*mixer.gFadeColor)>>8;
+					b = (b*fade2+mixer.fadeFactor*mixer.bFadeColor)>>8;
 				}
 				color = (r<<16)|(g<<8)|b;
 				color = alpha_blend_r32(dest[x], color, alpha);
@@ -1499,29 +1480,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	}
 } /* DrawSprites */
 
-static void UpdatePaletteS(running_machine &machine) /* for Super System22 - apply gamma correction and preliminary fader support */
-{
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	int i;
-	for( i=0; i<NAMCOS22_PALETTE_SIZE/4; i++ )
-	{
-		if( state->m_dirtypal[i] )
-		{
-			int j;
-			for( j=0; j<4; j++ )
-			{
-				int which = i*4+j;
-				int r = nthbyte(machine.generic.paletteram.u32,which+0x00000);
-				int g = nthbyte(machine.generic.paletteram.u32,which+0x08000);
-				int b = nthbyte(machine.generic.paletteram.u32,which+0x10000);
-				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
-			}
-			state->m_dirtypal[i] = 0;
-		}
-	}
-} /* UpdatePaletteS */
-
-static void UpdatePalette(running_machine &machine) /* for System22 - ignore gamma/fader effects for now */
+static void UpdatePalette(running_machine &machine)
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int i,j;
@@ -1677,7 +1636,6 @@ BlitQuadHelper(
 	float zmax = 0.0f;
 	Poly3dVertex v[4];
 	int i;
-	int bBackFace = 0;
 
 	for( i=0; i<4; i++ )
 	{
@@ -1688,7 +1646,9 @@ BlitQuadHelper(
 		TransformPoint( &pVerTex->x, &pVerTex->y, &pVerTex->z, m );
 	} /* for( i=0; i<4; i++ ) */
 
-	if( (v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
+	/* backface cull one-sided polygons */
+	if( flags&0x0020 &&
+		(v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
 		(v[2].y*((v[0].x*v[1].z)-(v[0].z*v[1].x)))+
 		(v[2].z*((v[0].y*v[1].x)-(v[0].x*v[1].y))) >= 0 &&
 
@@ -1696,12 +1656,8 @@ BlitQuadHelper(
 		(v[0].y*((v[2].x*v[3].z)-(v[2].z*v[3].x)))+
 		(v[0].z*((v[2].y*v[3].x)-(v[2].x*v[3].y))) >= 0 )
 	{
-		bBackFace = 1;
-	}
-
-	/* backface cull one-sided polygons */
-	if( bBackFace && (flags&0x0020) )
 		return;
+	}
 
 	for( i=0; i<4; i++ )
 	{
@@ -2319,7 +2275,7 @@ SCREEN_UPDATE( namcos22s )
 	UpdateVideoMixer(screen->machine());
 	bgColor = (mixer.rBackColor<<16)|(mixer.gBackColor<<8)|mixer.bBackColor;
 	bitmap_fill( bitmap, cliprect , bgColor);
-	UpdatePaletteS(screen->machine());
+	UpdatePalette(screen->machine());
 	DrawCharacterLayer(screen->machine(), bitmap, cliprect );
 	DrawPolygons( screen->machine(), bitmap );
 	DrawSprites( screen->machine(), bitmap, cliprect );
