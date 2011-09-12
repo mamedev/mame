@@ -9,37 +9,36 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/h63484.h"
+#include "h63484.h"
 
 #define LOG 1
 
-typedef struct _h63484_state h63484_state;
-struct _h63484_state
+// default address map
+static ADDRESS_MAP_START( h63484_vram, AS_0, 8 )
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM
+	AM_RANGE(0x80000, 0xbffff) AM_NOP
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  h63484_device - constructor
+//-------------------------------------------------
+
+h63484_device::h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, H63484, "H63484", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	m_ar(0),
+	m_sr(0),
+	m_fifo_ptr(-1),
+	m_fifo_r_ptr(-1),
+	m_cr(0),
+	m_param_ptr(0),
+	m_rwp(0),
+	m_rwp_dn(0),
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(h63484_vram))
 {
-	h63484_display_pixels_func display_func;
-	screen_device *screen;	/* screen */
-
-	UINT8 *vram;
-	UINT8 ar;
-	UINT8 vreg[0x100];
-	UINT8 sr;
-
-	UINT8 fifo[16];					/* FIFO W data queue */
-	int fifo_ptr;					/* FIFO W pointer */
-
-	UINT8 fifo_r[16];				/* FIFO R data queue */
-	int fifo_r_ptr;					/* FIFO R pointer */
-
-
-	UINT16 cr;
-	UINT16 pr[9];					/* parameter byte register */
-	int param_ptr;					/* parameter pointer */
-
-	UINT32 rwp;
-	UINT8 rwp_dn;
-
-	address_space		*space;		/* memory space */
-};
+	m_shortname = "h63484";
+}
 
 enum
 {
@@ -326,174 +325,190 @@ enum
 #define H63484_COMMAND_RGCPY	0xf000	// & ~0x0fff	p: 4
 
 
-
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE h63484_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == H63484);
-
-	return (h63484_state *)downcast<legacy_device_base *>(device)->token();
-}
-
-INLINE const h63484_interface *get_interface( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == H63484);
-	return (const h63484_interface *) device->static_config();
-}
-
-
-INLINE void fifo_w_clear(h63484_state *h63484)
-{
-	int i;
-
-	for (i = 0; i < 16; i++)
-		h63484->fifo[i] = 0;
-
-	h63484->fifo_ptr = -1;
-
-	h63484->sr |= H63484_SR_WFR;
-	h63484->sr |= H63484_SR_WFE;
-}
-
-INLINE void queue_w(h63484_state *h63484, UINT8 data)
-{
-	if (h63484->fifo_ptr < 15)
-	{
-		h63484->fifo_ptr++;
-
-		h63484->fifo[h63484->fifo_ptr] = data;
-
-		if (h63484->fifo_ptr == 16)
-			h63484->sr &= ~H63484_SR_WFR;
-
-		h63484->sr &= ~H63484_SR_WFE;
-	}
-	else
-	{
-		// TODO what happen? somebody set us up the bomb
-		printf("FIFO?\n");
-	}
-}
-
-INLINE void dequeue_w(h63484_state *h63484, UINT8 *data)
-{
-	int i;
-
-	*data = h63484->fifo[0];
-
-	//h63484->sr &= ~H63484_SR_RFF;
-
-	if (h63484->fifo_ptr > -1)
-	{
-		for (i = 0; i < 15; i++)
-			h63484->fifo[i] = h63484->fifo[i + 1];
-
-		h63484->fifo[15] = 0;
-
-		h63484->fifo_ptr--;
-
-		h63484->sr |= H63484_SR_WFR;
-
-		if (h63484->fifo_ptr == -1)
-			h63484->sr |= H63484_SR_WFE;
-
-	}
-}
-
-INLINE void fifo_r_clear(h63484_state *h63484)
-{
-	int i;
-
-	for (i = 0; i < 16; i++)
-		h63484->fifo_r[i] = 0;
-
-	h63484->fifo_r_ptr = -1;
-
-	h63484->sr &= ~H63484_SR_RFR;
-	h63484->sr &= ~H63484_SR_RFF;
-}
-
-INLINE void queue_r(h63484_state *h63484, UINT8 data)
-{
-	if (h63484->fifo_ptr < 15)
-	{
-		h63484->fifo_r_ptr++;
-
-		h63484->fifo_r[h63484->fifo_r_ptr] = data;
-
-		if (h63484->fifo_r_ptr == 16)
-			h63484->sr |= H63484_SR_RFF;
-
-		h63484->sr |= H63484_SR_RFR;
-	}
-	else
-	{
-		// TODO what happen? somebody set us up the bomb
-		printf("FIFO?\n");
-	}
-}
-
-INLINE void dequeue_r(h63484_state *h63484, UINT8 *data)
-{
-	int i;
-
-	*data = h63484->fifo_r[0];
-
-	if (h63484->fifo_r_ptr > -1)
-	{
-		for (i = 0; i < 15; i++)
-			h63484->fifo_r[i] = h63484->fifo_r[i + 1];
-
-		h63484->fifo_r[15] = 0;
-
-		h63484->fifo_r_ptr--;
-
-		h63484->sr &= ~H63484_SR_RFF;
-
-		if (h63484->fifo_ptr == -1)
-			h63484->sr &= H63484_SR_RFR;
-
-	}
-}
-
 /*-------------------------------------------------
     ROM( h63484 )
 -------------------------------------------------*/
+
+// devices
+const device_type H63484 = &device_creator<h63484_device>;
+
 
 ROM_START( h63484 )
 	ROM_REGION( 0x100, "h63484", 0 )
 	ROM_LOAD( "h63484.bin", 0x000, 0x100, NO_DUMP ) /* internal control ROM */
 ROM_END
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *h63484_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_0) ? &m_space_config : NULL;
+}
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *h63484_device::device_rom_region() const
+{
+	return ROM_NAME( h63484 );
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void h63484_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const h63484_interface *intf = reinterpret_cast<const h63484_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<h63484_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		// ...
+	}
+}
+
+inline void h63484_device::fifo_w_clear()
+{
+	int i;
+
+	for (i = 0; i < 16; i++)
+		m_fifo[i] = 0;
+
+	m_fifo_ptr = -1;
+
+	m_sr |= H63484_SR_WFR;
+	m_sr |= H63484_SR_WFE;
+}
+
+inline void h63484_device::queue_w(UINT8 data)
+{
+	if (m_fifo_ptr < 15)
+	{
+		m_fifo_ptr++;
+
+		m_fifo[m_fifo_ptr] = data;
+
+		if (m_fifo_ptr == 16)
+			m_sr &= ~H63484_SR_WFR;
+
+		m_sr &= ~H63484_SR_WFE;
+	}
+	else
+	{
+		// TODO what happen? somebody set us up the bomb
+		printf("FIFO?\n");
+	}
+}
+
+inline void h63484_device::dequeue_w(UINT8 *data)
+{
+	int i;
+
+	*data = m_fifo[0];
+
+	if (m_fifo_ptr > -1)
+	{
+		for (i = 0; i < 15; i++)
+			m_fifo[i] = m_fifo[i + 1];
+
+		m_fifo[15] = 0;
+
+		m_fifo_ptr--;
+
+		m_sr |= H63484_SR_WFR;
+
+		if (m_fifo_ptr == -1)
+			m_sr |= H63484_SR_WFE;
+
+	}
+}
+
+inline void h63484_device::fifo_r_clear()
+{
+	int i;
+
+	for (i = 0; i < 16; i++)
+		m_fifo_r[i] = 0;
+
+	m_fifo_r_ptr = -1;
+
+	m_sr &= ~H63484_SR_RFR;
+	m_sr &= ~H63484_SR_RFF;
+}
+
+inline void h63484_device::queue_r(UINT8 data)
+{
+	if (m_fifo_ptr < 15)
+	{
+		m_fifo_r_ptr++;
+
+		m_fifo_r[m_fifo_r_ptr] = data;
+
+		if (m_fifo_r_ptr == 16)
+			m_sr |= H63484_SR_RFF;
+
+		m_sr |= H63484_SR_RFR;
+	}
+	else
+	{
+		// TODO what happen? somebody set us up the bomb
+		printf("FIFO?\n");
+	}
+}
+
+inline void h63484_device::dequeue_r(UINT8 *data)
+{
+	int i;
+
+	*data = m_fifo_r[0];
+
+	if (m_fifo_r_ptr > -1)
+	{
+		for (i = 0; i < 15; i++)
+			m_fifo_r[i] = m_fifo_r[i + 1];
+
+		m_fifo_r[15] = 0;
+
+		m_fifo_r_ptr--;
+
+		m_sr &= ~H63484_SR_RFF;
+
+		if (m_fifo_ptr == -1)
+			m_sr &= H63484_SR_RFR;
+	}
+}
+
 /*-------------------------------------------------
-    ADDRESS_MAP( upd7220 )
+    ADDRESS_MAP( h63484 )
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( h63484_vram_r )
+READ8_MEMBER( h63484_device::vram_r )
 {
-	h63484_state *h63484 = get_safe_token(device);
-
-	return h63484->vram[offset];
+	return m_vram[offset];
 }
 
-WRITE8_DEVICE_HANDLER( h63484_vram_w )
+WRITE8_MEMBER( h63484_device::vram_w )
 {
-	h63484_state *h63484 = get_safe_token(device);
-
-	h63484->vram[offset] = data;
+	m_vram[offset] = data;
 }
+
 
 /*****************************************************************************
     IMPLEMENTATION
 *****************************************************************************/
 
-static int translate_command(UINT16 data)
+int h63484_device::translate_command(UINT16 data)
 {
 	/* annoying switch-case sequence, but it's the only way to get invalid commands ... */
 	switch (data)
@@ -569,103 +584,93 @@ static int translate_command(UINT16 data)
 	return COMMAND_INVALID;
 }
 
-static void command_end_seq(device_t *device)
+void h63484_device::command_end_seq()
 {
-	h63484_state *h63484 = get_safe_token(device);
-
 	//h63484->param_ptr = 0;
-	h63484->sr |= H63484_SR_CED;
+	m_sr |= H63484_SR_CED;
 
 	/* TODO: we might need to be more aggressive and clear the params in there */
 }
 
-static void command_wpr_exec(device_t *device)
+void h63484_device::command_wpr_exec()
 {
-	h63484_state *h63484 = get_safe_token(device);
+	if(LOG) printf("%s -> %02x\n",wpr_regnames[m_cr & 0x1f],m_pr[0]);
 
-	if(LOG) printf("%s -> %02x\n",wpr_regnames[h63484->cr & 0x1f],h63484->pr[0]);
-
-	switch(h63484->cr & 0x1f)
+	switch(m_cr & 0x1f)
 	{
 		case 0x0c: // Read Write Pointer H
-			h63484->rwp_dn = (h63484->pr[0] & 0xc000) >> 14;
-			h63484->rwp = (h63484->rwp & 0x00fff) | ((h63484->pr[0] & 0x00ff) << 12);
+			m_rwp_dn = (m_pr[0] & 0xc000) >> 14;
+			m_rwp = (m_rwp & 0x00fff) | ((m_pr[0] & 0x00ff) << 12);
 			break;
 		case 0x0d: // Read Write Pointer L
-			h63484->rwp = (h63484->rwp & 0xff000) | ((h63484->pr[0] & 0xfff0) >> 4);
+			m_rwp = (m_rwp & 0xff000) | ((m_pr[0] & 0xfff0) >> 4);
 			break;
 	}
 }
 
-static void process_fifo(device_t *device)
+void h63484_device::process_fifo()
 {
-	h63484_state *h63484 = get_safe_token(device);
 	UINT8 data;
 
-	dequeue_w(h63484, &data);
+	dequeue_w(&data);
 
-	if (h63484->sr & H63484_SR_CED)
+	if (m_sr & H63484_SR_CED)
 	{
-		h63484->cr = (data & 0xff) << 8;
-		dequeue_w(h63484, &data);
-		h63484->cr |= data & 0xff;
-		h63484->param_ptr = 0;
-		h63484->sr &= ~H63484_SR_CED;
+		m_cr = (data & 0xff) << 8;
+		dequeue_w(&data);
+		m_cr |= data & 0xff;
+		m_param_ptr = 0;
+		m_sr &= ~H63484_SR_CED;
 	}
 	else
 	{
-		h63484->pr[h63484->param_ptr] = (data & 0xff) << 8;
-		dequeue_w(h63484, &data);
-		h63484->pr[h63484->param_ptr] |= (data & 0xff);
-		h63484->param_ptr++;
+		m_pr[m_param_ptr] = (data & 0xff) << 8;
+		dequeue_w(&data);
+		m_pr[m_param_ptr] |= (data & 0xff);
+		m_param_ptr++;
 	}
 
-	switch (translate_command(h63484->cr))
+	switch (translate_command(m_cr))
 	{
 		case COMMAND_INVALID:
-			printf("H63484 '%s' Invalid Command Byte %02x\n", device->tag(), h63484->cr);
-			h63484->sr |= H63484_SR_CER; // command error
+			printf("H63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
+			m_sr |= H63484_SR_CER; // command error
 			break;
 
 		case COMMAND_WPR: // 0x0800 & ~0x1f
-			if (h63484->param_ptr == 1)
+			if (m_param_ptr == 1)
 			{
-				printf("%04x\n",h63484->pr[0]);
+				printf("%04x\n",m_pr[0]);
 
-				command_wpr_exec(device);
-				command_end_seq(device);
+				command_wpr_exec();
+				command_end_seq();
 			}
 			break;
 
 		case COMMAND_RD:
-			if (h63484->param_ptr == 0)
+			if (m_param_ptr == 0)
 			{
-				printf("%08x %02x %02x\n", h63484->rwp,h63484->space->direct().read_raw_byte((h63484->rwp+0) & 0xfffff), h63484->space->direct().read_raw_byte((h63484->rwp+1) & 0xfffff));
-
-				queue_r(h63484, h63484->space->read_byte((h63484->rwp+0) & 0xfffff));
-				queue_r(h63484, h63484->space->read_byte((h63484->rwp+1) & 0xfffff));
-				h63484->rwp+=2;
-				command_end_seq(device);
+				//queue_r(h63484, h63484->space->read_byte((h63484->rwp+0) & 0xfffff));
+				//queue_r(h63484, h63484->space->read_byte((h63484->rwp+1) & 0xfffff));
+				m_rwp+=2;
+				command_end_seq();
 			}
 			break;
 	}
 }
 
-static void exec_abort_sequence(device_t *device)
+void h63484_device::exec_abort_sequence()
 {
-	h63484_state *h63484 = get_safe_token(device);
-
-	fifo_w_clear(h63484);
-	fifo_r_clear(h63484);
-	h63484->sr = H63484_SR_WFR | H63484_SR_WFE | H63484_SR_CED; // hard-set to 0x23
+	fifo_w_clear();
+	fifo_r_clear();
+	m_sr = H63484_SR_WFR | H63484_SR_WFE | H63484_SR_CED; // hard-set to 0x23
 }
 
-static void check_video_registers(device_t *device, int offset)
+void h63484_device::check_video_registers(int offset)
 {
-	h63484_state *h63484 = get_safe_token(device);
 	UINT16 vreg_data;
 
-	vreg_data = (h63484->vreg[offset]<<8)|(h63484->vreg[offset+1]&0xff);
+	vreg_data = (m_vreg[offset]<<8)|(m_vreg[offset+1]&0xff);
 
 	switch(offset)
 	{
@@ -673,21 +678,18 @@ static void check_video_registers(device_t *device, int offset)
 			break;
 		case CCR: // Command Entry
 			if(vreg_data & ABT) // abort sequence
-				exec_abort_sequence(device);
+				exec_abort_sequence();
 			break;
 	}
 }
 
-READ16_DEVICE_HANDLER( h63484_status_r )
+READ16_MEMBER( h63484_device::status_r )
 {
-	h63484_state *h63484 = get_safe_token(device);
-
-	return h63484->sr;
+	return m_sr;
 }
 
-READ16_DEVICE_HANDLER( h63484_data_r )
+READ16_MEMBER( h63484_device::data_r )
 {
-	//h63484_state *h63484 = get_safe_token(device);
 	int res;
 
 	res = 0xffff;
@@ -695,93 +697,51 @@ READ16_DEVICE_HANDLER( h63484_data_r )
 	return res;
 }
 
-WRITE16_DEVICE_HANDLER( h63484_address_w )
+WRITE16_MEMBER( h63484_device::address_w )
 {
-	h63484_state *h63484 = get_safe_token(device);
-
 	if(ACCESSING_BITS_0_7)
-		h63484->ar = data & 0xff;
+		m_ar = data & 0xff;
 }
 
-WRITE16_DEVICE_HANDLER( h63484_data_w )
+WRITE16_MEMBER( h63484_device::data_w )
 {
-	h63484_state *h63484 = get_safe_token(device);
-
-	if(LOG) printf("%s -> %02x\n",acrtc_regnames[h63484->ar/2],data);
+	if(LOG) printf("%s -> %02x\n",acrtc_regnames[m_ar/2],data);
 
 	if(ACCESSING_BITS_8_15)
-		h63484->vreg[h63484->ar] = (data & 0xff00) >> 8;
+		m_vreg[m_ar] = (data & 0xff00) >> 8;
 
 	if(ACCESSING_BITS_0_7)
-		h63484->vreg[h63484->ar+1] = (data & 0xff);
+		m_vreg[m_ar+1] = (data & 0xff);
 
-	if(h63484->ar == 0)
+	if(m_ar == 0)
 	{
-		queue_w(h63484, (data & 0xff00) >> 8);
-		queue_w(h63484, (data & 0x00ff) >> 0);
-		process_fifo(device);
+		queue_w((data & 0xff00) >> 8);
+		queue_w((data & 0x00ff) >> 0);
+		process_fifo();
 	}
 	else
-		check_video_registers(device,h63484->ar);
+		check_video_registers(m_ar);
 
-	if(h63484->ar & 0x80)
+	if(m_ar & 0x80)
 	{
-		h63484->ar+=2;
-		h63484->ar &= 0xff; // TODO: what happens if it overflows?
+		m_ar+=2;
+		m_ar &= 0xff; // TODO: what happens if it overflows?
 	}
 }
 
-static DEVICE_START( h63484 )
+void h63484_device::device_start()
 {
-	h63484_state *h63484 = get_safe_token(device);
-	const h63484_interface *intf = get_interface(device);
+	m_screen = machine().device<screen_device>(m_screen_tag);
 
-	h63484->display_func = intf->display_func;
-
-	h63484->screen = device->machine().device<screen_device>(intf->screen_tag);
-	assert(h63484->screen != NULL);
-
-	h63484->space = device->memory().space(AS_0);
-	h63484->vram = auto_alloc_array_clear(device->machine(), UINT8, 1 << 20);
+	//h63484->space = device->memory().space(AS_0);
+	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 20);
 }
 
-static DEVICE_RESET( h63484 )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void h63484_device::device_reset()
 {
-	//h63484_state *h63484 = get_safe_token(device);
-
-	//h63484->fifo_counter = 0;
+	// ...
 }
-
-DEVICE_GET_INFO( h63484 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(h63484_state);					break;
-		case DEVINFO_INT_DATABUS_WIDTH_0:		info->i = 8;									break;
-		case DEVINFO_INT_ADDRBUS_WIDTH_0:		info->i = 20;									break;
-		case DEVINFO_INT_ADDRBUS_SHIFT_0:		info->i = -1;									break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = ROM_NAME(h63484);				break;
-
-		/* --- the following bits of info are returned as pointers to data --- */
-		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:	info->default_map8 = NULL; 						break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(h63484);		break;
-		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(h63484);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Hitachi 63484");				break;
-		case DEVINFO_STR_SHORTNAME:				strcpy(info->s, "h63484");						break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Hitachi 63484 ACRTC");			break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
-	}
-}
-
-
-DEFINE_LEGACY_MEMORY_DEVICE(H63484, h63484);
