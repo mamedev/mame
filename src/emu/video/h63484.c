@@ -2,6 +2,10 @@
 
 	HD63484 ACRTC (rewrite in progress)
 
+	TODO:
+	- 8-bit support for FIFO, parameters and command values
+	- convert to C++
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -25,9 +29,12 @@ struct _h63484_state
 	int fifo_ptr;					/* FIFO pointer */
 	int fifo_dir;					/* FIFO direction */
 
-	UINT8 cr;
-	UINT8 pr[17];					/* parameter byte register */
+	UINT16 cr;
+	UINT16 pr[9];					/* parameter byte register */
 	int param_ptr;					/* parameter pointer */
+
+	UINT32 rwp;
+	UINT8 rwp_dn;
 };
 
 enum
@@ -196,10 +203,126 @@ static const char *const acrtc_regnames[0x100/2] =
 	"(Undefined)"  // 0xfe
 };
 
+static const char *const wpr_regnames[0x20] =
+{
+	"Color 0 (CL0)",
+	"Color 1 (CL1)",
+	"Color Comparison (COMP)",
+	"Edge Color (EDG)",
+	"Mask (MASK)",
+	"Pattern RAM Control (PRC) 0x05",
+	"Pattern RAM Control (PRC) 0x06",
+	"Pattern RAM Control (PRC) 0x07",
+	"Area Definition (ADR) 0x08",
+	"Area Definition (ADR) 0x09",
+	"Area Definition (ADR) 0x0a",
+	"Area Definition (ADR) 0x0b",
+	"Read Write Pointer (RWP) H",
+	"Read Write Pointer (RWP) L",
+	"(Undefined)",
+	"(Undefined)",
+	"Drawing Pointer (DP) H",
+	"Drawing Pointer (DP) L",
+	"Current Pointer (CP) H",
+	"Current Pointer (CP) L",
+	"(Undefined)", // 0x14
+	"(Undefined)",
+	"(Undefined)", // 0x16
+	"(Undefined)",
+	"(Undefined)", // 0x18
+	"(Undefined)",
+	"(Undefined)", // 0x1a
+	"(Undefined)",
+	"(Undefined)", // 0x1c
+	"(Undefined)",
+	"(Undefined)", // 0x1e
+	"(Undefined)"
+};
+
 enum
 {
-	COMMAND_INVALID = -1
+	COMMAND_INVALID = -1,
+	COMMAND_ORG,
+	COMMAND_WPR,
+	COMMAND_RPR,
+	COMMAND_WPTN,
+	COMMAND_RPTN,
+	COMMAND_DRD,
+	COMMAND_DWT,
+	COMMAND_DMOD,
+	COMMAND_RD,
+	COMMAND_WT,
+	COMMAND_MOD,
+	COMMAND_CLR,
+	COMMAND_SCLR,
+	COMMAND_CPY,
+	COMMAND_SCPY,
+	COMMAND_AMOVE,
+	COMMAND_RMOVE,
+	COMMAND_ALINE,
+	COMMAND_RLINE,
+	COMMAND_ARCT,
+	COMMAND_RRCT,
+	COMMAND_APLL,
+	COMMAND_RPLL,
+	COMMAND_APLG,
+	COMMAND_RPLG,
+	COMMAND_CRCL,
+	COMMAND_ELPS,
+	COMMAND_AARC,
+	COMMAND_RARC,
+	COMMAND_AEARC,
+	COMMAND_REARC,
+	COMMAND_AFRCT,
+	COMMAND_RFRCT,
+	COMMAND_PAINT,
+	COMMAND_DOT,
+	COMMAND_PTN,
+	COMMAND_AGCPY,
+	COMMAND_RGCPY
 };
+
+#define H63484_COMMAND_ORG		0x0400	// 				p: 2
+#define H63484_COMMAND_WPR		0x0800	// & ~0x1f  	p: 1
+#define H63484_COMMAND_RPR		0x0c00	// & ~0x1f  	p: 0
+#define H63484_COMMAND_WPTN		0x1800	// & ~0xf   	p: 1 + n
+#define H63484_COMMAND_RPTN		0x1c00	// & ~0xf		p: 1
+#define H63484_COMMAND_DRD		0x2400	//				p: 2
+#define H63484_COMMAND_DWT		0x2800	// 				p: 2
+#define H63484_COMMAND_DMOD		0x2c00	// & ~3			p: 2
+#define H63484_COMMAND_RD		0x4400	//				p: 0
+#define H63484_COMMAND_WT		0x4800	//				p: 1
+#define H63484_COMMAND_MOD		0x4c00	// & ~3			p: 1
+#define H63484_COMMAND_CLR		0x5800	//				p: 3
+#define H63484_COMMAND_SCLR		0x5c00	// & ~3			p: 3
+#define H63484_COMMAND_CPY		0x6000	// & ~0x0f03	p: 4
+#define H63484_COMMAND_SCPY		0x7000	// & ~0x0f03	p: 4
+#define H63484_COMMAND_AMOVE	0x8000	//				p: 2
+#define H63484_COMMAND_RMOVE	0x8400	//				p: 2
+#define H63484_COMMAND_ALINE	0x8800	// & ~0x00ff	p: 2
+#define H63484_COMMAND_RLINE	0x8c00	// & ~0x00ff	p: 2
+#define H63484_COMMAND_ARCT		0x9000	// & ~0x00ff	p: 2
+#define H63484_COMMAND_RRCT		0x9400	// & ~0x00ff	p: 2
+#define H63484_COMMAND_APLL		0x9800	// & ~0x00ff	p: 1 + n
+#define H63484_COMMAND_RPLL		0x9c00	// & ~0x00ff	p: 1 + n
+#define H63484_COMMAND_APLG		0xa000	// & ~0x00ff	p: 1 + n
+#define H63484_COMMAND_RPLG		0xa400	// & ~0x00ff	p: 1 + n
+#define H63484_COMMAND_CRCL		0xa800	// & ~0x01ff	p: 1
+#define H63484_COMMAND_ELPS		0xac00	// & ~0x01ff	p: 3
+#define H63484_COMMAND_AARC		0xb000	// & ~0x01ff	p: 4
+#define H63484_COMMAND_RARC		0xb400	// & ~0x01ff	p: 4
+#define H63484_COMMAND_AEARC	0xb800	// & ~0x01ff	p: 6
+#define H63484_COMMAND_REARC	0xbc00	// & ~0x01ff	p: 6
+#define H63484_COMMAND_AFRCT	0xc000	// & ~0x00ff	p: 2
+#define H63484_COMMAND_RFRCT	0xc400	// & ~0x00ff	p: 2
+#define H63484_COMMAND_PAINT	0xc800	// & ~0x01ff	p: 0
+#define H63484_COMMAND_DOT		0xcc00	// & ~0x00ff	p: 0
+#define H63484_COMMAND_PTN		0xd000	// & ~0x0fff	p: 1
+#define H63484_COMMAND_AGCPY	0xe000	// & ~0x0fff	p: 4
+#define H63484_COMMAND_RGCPY	0xf000	// & ~0x0fff	p: 4
+
+
+
 
 /*****************************************************************************
     INLINE FUNCTIONS
@@ -271,6 +394,7 @@ INLINE void queue(h63484_state *h63484, UINT8 data, int flag)
 		if (h63484->fifo_ptr == 16)
 			h63484->sr &= ~H63484_SR_WFR;
 
+		//h63484->sr |= H63484_SR_RFR;
 		h63484->sr &= ~H63484_SR_WFE;
 	}
 	else
@@ -287,6 +411,8 @@ INLINE void dequeue(h63484_state *h63484, UINT8 *data, int *flag)
 	*data = h63484->fifo[0];
 	*flag = h63484->fifo_flag[0];
 
+	//h63484->sr &= ~H63484_SR_RFF;
+
 	if (h63484->fifo_ptr > -1)
 	{
 		for (i = 0; i < 15; i++)
@@ -300,6 +426,7 @@ INLINE void dequeue(h63484_state *h63484, UINT8 *data, int *flag)
 
 		h63484->fifo_ptr--;
 
+		//h63484->sr &= ~H63484_SR_RFR;
 		h63484->sr |= H63484_SR_WFR;
 
 		if (h63484->fifo_ptr == -1)
@@ -339,16 +466,108 @@ WRITE8_DEVICE_HANDLER( h63484_vram_w )
     IMPLEMENTATION
 *****************************************************************************/
 
-static int translate_command(UINT8 data)
+static int translate_command(UINT16 data)
 {
-	int command = COMMAND_INVALID;
-
+	/* annoying switch-case sequence, but it's the only way to get invalid commands ... */
 	switch (data)
 	{
-
+		case H63484_COMMAND_ORG: 	return COMMAND_ORG;
+		case H63484_COMMAND_DRD: 	return COMMAND_DRD;
+		case H63484_COMMAND_DWT: 	return COMMAND_DWT;
+		case H63484_COMMAND_RD:  	return COMMAND_RD;
+		case H63484_COMMAND_WT:  	return COMMAND_WT;
+		case H63484_COMMAND_CLR: 	return COMMAND_CLR;
+		case H63484_COMMAND_AMOVE:	return COMMAND_AMOVE;
+		case H63484_COMMAND_RMOVE:	return COMMAND_RMOVE;
 	}
 
-	return command;
+	switch(data & ~0x3)
+	{
+		case H63484_COMMAND_DMOD:	return COMMAND_DMOD;
+		case H63484_COMMAND_MOD: 	return COMMAND_MOD;
+		case H63484_COMMAND_SCLR:	return COMMAND_SCLR;
+	}
+
+	switch(data & ~0xf)
+	{
+		case H63484_COMMAND_WPTN:	return COMMAND_WPTN;
+		case H63484_COMMAND_RPTN:	return COMMAND_RPTN;
+	}
+
+	switch(data & ~0x1f)
+	{
+		case H63484_COMMAND_WPR:	return COMMAND_WPR;
+		case H63484_COMMAND_RPR:	return COMMAND_RPR;
+	}
+
+	switch(data & ~0x0f03)
+	{
+		case H63484_COMMAND_CPY:	return COMMAND_CPY;
+		case H63484_COMMAND_SCPY:	return COMMAND_SCPY;
+	}
+
+	switch(data & ~0x00ff)
+	{
+		case H63484_COMMAND_ALINE:	return COMMAND_ALINE;
+		case H63484_COMMAND_RLINE:	return COMMAND_RLINE;
+		case H63484_COMMAND_ARCT:	return COMMAND_ARCT;
+		case H63484_COMMAND_RRCT:	return COMMAND_RRCT;
+		case H63484_COMMAND_APLL:	return COMMAND_APLL;
+		case H63484_COMMAND_RPLL:	return COMMAND_RPLL;
+		case H63484_COMMAND_APLG:	return COMMAND_APLG;
+		case H63484_COMMAND_RPLG:	return COMMAND_RPLG;
+		case H63484_COMMAND_AFRCT:	return COMMAND_AFRCT;
+		case H63484_COMMAND_RFRCT:	return COMMAND_RFRCT;
+		case H63484_COMMAND_DOT:	return COMMAND_DOT;
+	}
+
+	switch(data & ~0x01ff)
+	{
+		case H63484_COMMAND_CRCL:	return COMMAND_CRCL;
+		case H63484_COMMAND_ELPS:	return COMMAND_ELPS;
+		case H63484_COMMAND_AARC:	return COMMAND_AARC;
+		case H63484_COMMAND_RARC:	return COMMAND_RARC;
+		case H63484_COMMAND_AEARC:	return COMMAND_AEARC;
+		case H63484_COMMAND_REARC:	return COMMAND_REARC;
+		case H63484_COMMAND_PAINT:	return COMMAND_PAINT;
+	}
+
+	switch(data & ~0x0fff)
+	{
+		case H63484_COMMAND_PTN:	return COMMAND_PTN;
+		case H63484_COMMAND_AGCPY:	return COMMAND_AGCPY;
+		case H63484_COMMAND_RGCPY:	return COMMAND_RGCPY;
+	}
+
+	return COMMAND_INVALID;
+}
+
+static void command_end_seq(device_t *device)
+{
+	h63484_state *h63484 = get_safe_token(device);
+
+	//h63484->param_ptr = 0;
+	h63484->sr |= H63484_SR_CED;
+
+	/* TODO: we might need to be more aggressive and clear the params in there */
+}
+
+static void command_wpr_exec(device_t *device)
+{
+	h63484_state *h63484 = get_safe_token(device);
+
+	if(LOG) printf("%s -> %02x\n",wpr_regnames[h63484->cr & 0x1f],h63484->pr[0]);
+
+	switch(h63484->cr & 0x1f)
+	{
+		case 0x0c: // Read Write Pointer H
+			h63484->rwp_dn = (h63484->pr[0] & 0xc000) >> 14;
+			h63484->rwp = (h63484->rwp & 0x00fff) | ((h63484->pr[0] & 0x00ff) << 12);
+			break;
+		case 0x0d: // Read Write Pointer L
+			h63484->rwp = (h63484->rwp & 0xff000) | ((h63484->pr[0] & 0xfff0) >> 4);
+			break;
+	}
 }
 
 static void process_fifo(device_t *device)
@@ -361,25 +580,36 @@ static void process_fifo(device_t *device)
 
 	if (flag == FIFO_COMMAND)
 	{
-		h63484->cr = (data & 0xff00) >> 8;
-		h63484->param_ptr = 1;
-		h63484->sr &= ~H63484_SR_CED;
+		h63484->cr = (data & 0xff) << 8;
 		dequeue(h63484, &data, &flag);
-		h63484->pr[h63484->param_ptr] = data & 0xff;
-		h63484->param_ptr++;
+		h63484->cr |= data & 0xff;
+		h63484->param_ptr = 0;
+		h63484->sr &= ~H63484_SR_CED;
 	}
 	else
 	{
-		h63484->pr[h63484->param_ptr] = (data & 0xff00) >> 8;
-		h63484->param_ptr++;
+		h63484->pr[h63484->param_ptr] = (data & 0xff) << 8;
 		dequeue(h63484, &data, &flag);
-		h63484->pr[h63484->param_ptr] = data & 0xff;
+		h63484->pr[h63484->param_ptr] |= (data & 0xff);
 		h63484->param_ptr++;
 	}
 
 	switch (translate_command(h63484->cr))
 	{
-		// ...
+		case COMMAND_INVALID:
+			printf("H63484 '%s' Invalid Command Byte %02x\n", device->tag(), h63484->cr);
+			h63484->sr |= H63484_SR_CER; // command error
+			break;
+
+		case COMMAND_WPR: // 0x0800 & ~0x1f
+			if (h63484->param_ptr == 1)
+			{
+				printf("%04x\n",h63484->pr[0]);
+
+				command_wpr_exec(device);
+				command_end_seq(device);
+			}
+			break;
 	}
 }
 
@@ -450,7 +680,7 @@ WRITE16_DEVICE_HANDLER( h63484_data_w )
 	{
 		fifo_set_direction(h63484, FIFO_WRITE);
 		queue(h63484, (data & 0xff00) >> 8, (h63484->sr & H63484_SR_CED) >> 5);
-		queue(h63484, (data & 0x00ff) >> 0, 0);
+		queue(h63484, (data & 0x00ff) >> 0, (h63484->sr & H63484_SR_CED) >> 5);
 		process_fifo(device);
 	}
 	else
