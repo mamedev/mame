@@ -398,6 +398,8 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 
 static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 {
+	UINT8 d;
+
 	#if M37710_DEBUG
 	if (offset > 1)
 	logerror("m37710_internal_r from %02x: %s (PC=%x)\n", (int)offset, m37710_rnames[(int)offset], REG_PB<<16 | REG_PC);
@@ -407,23 +409,50 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 	{
 		// ports
 		case 0x02: // p0
-			return cpustate->io->read_byte(M37710_PORT0);
+			d = cpustate->m37710_regs[0x04];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT0)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 		case 0x03: // p1
-			return cpustate->io->read_byte(M37710_PORT1);
+			d = cpustate->m37710_regs[0x05];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT1)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 		case 0x06: // p2
-			return cpustate->io->read_byte(M37710_PORT2);
+			d = cpustate->m37710_regs[0x08];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT2)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 		case 0x07: // p3
-			return cpustate->io->read_byte(M37710_PORT3);
+			d = cpustate->m37710_regs[0x09];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT3)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 		case 0x0a: // p4
-			return cpustate->io->read_byte(M37710_PORT4);
+			d = cpustate->m37710_regs[0x0c];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT4)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 		case 0x0b: // p5
-			return cpustate->io->read_byte(M37710_PORT5);
+			d = cpustate->m37710_regs[0x0d];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT5)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 		case 0x0e: // p6
-			return cpustate->io->read_byte(M37710_PORT6);
+			d = cpustate->m37710_regs[0x10];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT6)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 		case 0x0f: // p7
-			return cpustate->io->read_byte(M37710_PORT7);
+			d = cpustate->m37710_regs[0x11];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT7)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 		case 0x12: // p8
-			return cpustate->io->read_byte(M37710_PORT8);
+			d = cpustate->m37710_regs[0x14];
+			if (d != 0xff)
+				return (cpustate->io->read_byte(M37710_PORT8)&~d) | (cpustate->m37710_regs[offset]&d);
+			break;
 
 		// A-D regs
 		case 0x20:
@@ -472,12 +501,15 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 		default:
 			return cpustate->m37710_regs[offset];
 	}
+
+	return cpustate->m37710_regs[offset];
 }
 
 static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 data)
 {
 	int i;
 	UINT8 prevdata;
+	UINT8 d;
 
 	#if M37710_DEBUG
 	if (offset != 0x60)	// filter out watchdog
@@ -491,31 +523,49 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 	{
 		// ports
 		case 0x02: // p0
-			cpustate->io->write_byte(M37710_PORT0, data);
+			d = cpustate->m37710_regs[0x04];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT0, data&d);
 			break;
 		case 0x03: // p1
-			cpustate->io->write_byte(M37710_PORT1, data);
+			d = cpustate->m37710_regs[0x05];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT1, data&d);
 			break;
 		case 0x06: // p2
-			cpustate->io->write_byte(M37710_PORT2, data);
+			d = cpustate->m37710_regs[0x08];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT2, data&d);
 			break;
 		case 0x07: // p3
-			cpustate->io->write_byte(M37710_PORT3, data);
+			d = cpustate->m37710_regs[0x09];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT3, data&d);
 			break;
 		case 0x0a: // p4
-			cpustate->io->write_byte(M37710_PORT4, data);
+			d = cpustate->m37710_regs[0x0c];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT4, data&d);
 			break;
 		case 0x0b: // p5
-			cpustate->io->write_byte(M37710_PORT5, data);
+			d = cpustate->m37710_regs[0x0d];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT5, data&d);
 			break;
 		case 0x0e: // p6
-			cpustate->io->write_byte(M37710_PORT6, data);
+			d = cpustate->m37710_regs[0x10];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT6, data&d);
 			break;
 		case 0x0f: // p7
-			cpustate->io->write_byte(M37710_PORT7, data);
+			d = cpustate->m37710_regs[0x11];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT7, data&d);
 			break;
 		case 0x12: // p8
-			cpustate->io->write_byte(M37710_PORT8, data);
+			d = cpustate->m37710_regs[0x14];
+			if (d != 0)
+				cpustate->io->write_byte(M37710_PORT8, data&d);
 			break;
 
 		case 0x40:	// count start
