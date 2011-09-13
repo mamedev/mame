@@ -4982,9 +4982,7 @@ static INPUT_PORTS_START( dirtdash )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Change")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP   ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("Shift Down")
-	PORT_DIPNAME( 0x80, 0x80, "Motion Stop" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
 
 	PORT_START("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5336,7 +5334,7 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Switch")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Change")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -5345,19 +5343,10 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
 
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Ace Driver */
-
-static INPUT_PORTS_START( victlap )
-	PORT_INCLUDE( acedrvr )
-
-	PORT_MODIFY("INPUTS")
-	PORT_DIPNAME( 0x8000, 0x8000, "Motion Stop" )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-INPUT_PORTS_END /* Victory Lap */
 
 static INPUT_PORTS_START( ridgera )
 	PORT_START("DSW0")	/* DIP2 and DIP3 */
@@ -5445,8 +5434,8 @@ static INPUT_PORTS_START( ridgeracf )
 	PORT_DIPNAME( 0x8000, 0x8000, "DIP3-8 (Test Mode)" )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	// Like with Ridge Racer 2, some dipswitches are for debugging.
 	// DIP3-1 to DIP3-3 are for setting up the viewing angle (game used one board per screen?)
+	// Some of the other dipswitches are for debugging, like with Ridge Racer 2.
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Ignition Key")
@@ -5476,7 +5465,7 @@ static INPUT_PORTS_START( raveracw )
 	PORT_INCLUDE( ridgera )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("View Switch")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("View Change")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no coin2
 INPUT_PORTS_END /* Rave Racer */
 
@@ -5779,7 +5768,7 @@ GAME( 1994, ridgera2,  0,        namcos22,  ridgera2, ridger2j, ROT0, "Namco", "
 GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2, ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)"    , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )		// 1994-06-21
 GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2, ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )		// 1994-06-13
 GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,  acedrvr,  ROT0, "Namco", "Ace Driver (Rev. AD2, World)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, victlapw,  0,        namcos22,  victlap,  victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, victlapw,  0,        namcos22,  acedrvr,  victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 
 /* Super System22 games */
 GAME( 1995, airco22b, 0,        namcos22s, airco22,  airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)"     , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) /* boots but missing sprite clear DMA? */
