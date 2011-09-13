@@ -285,7 +285,7 @@ static PALETTE_INIT(carrera)
 	int br_bit0, br_bit1, bit0, bit1, r, g, b;
 	int	i;
 
-	for (i = 0; i < 0x40; ++i)
+	for (i = 0; i < 0x20; ++i)
 	{
 		br_bit0 = (color_prom[0] >> 6) & 0x01;
 		br_bit1 = (color_prom[0] >> 7) & 0x01;
