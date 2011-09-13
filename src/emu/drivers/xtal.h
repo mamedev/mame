@@ -83,6 +83,7 @@ enum
 	XTAL_8_2MHz			= 8200000,		/* Universal Mr. Do - Model 8021 PCB */
 	XTAL_8_4672MHz		= 8467200,		/* Subsino's Ying Hua Lian */
 	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
+	XTAL_8_7MHz			= 8700000,		/* Tandberg TDV 2324 */
 	XTAL_8_867236MHz	= 8867236,		/* RCA CDP1869 PAL color clock */
 	XTAL_8_867238MHz	= 8867238,		/* ETI-660 */
 	XTAL_9_216MHz		= 9216000,		/* Conitec PROF-180X */
@@ -148,6 +149,7 @@ enum
 	XTAL_24_8832MHz 	= 24883200,		/* DEC VT100 */
 	XTAL_25MHz  		= 25000000,		/* Namco System 22, Taito GNET, Dogyuun h/w */
 	XTAL_25_1748MHz 	= 25174800,		/* Sega S16A, S16B */
+	XTAL_25_39836MHz	= 25398360,		/* Tandberg TDV 2324 */
 	XTAL_25_447MHz  	= 25447000,		/* Namco EVA3A (Funcube2) */
 	XTAL_25_590906MHz	= 25590906,		/* Atari Jaguar NTSC */
 	XTAL_25_593900MHz	= 25593900,		/* Atari Jaguar PAL */
