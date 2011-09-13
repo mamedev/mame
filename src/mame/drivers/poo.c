@@ -285,7 +285,7 @@ static PALETTE_INIT( unclepoo )
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
-	for (i = 0; i < 0x200; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		val = (color_prom[i+0x100]) | (color_prom[i+0x000]<<4);
 
