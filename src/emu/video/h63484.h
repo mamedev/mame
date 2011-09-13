@@ -80,6 +80,7 @@ private:
 
 	void command_end_seq();
 	void command_wpr_exec();
+	void command_clr_exec();
 	void process_fifo();
 	void exec_abort_sequence();
 	void check_video_registers(int offset);
@@ -104,8 +105,17 @@ private:
 	UINT16 m_pr[9];					/* parameter byte register */
 	int m_param_ptr;					/* parameter pointer */
 
-	UINT32 m_rwp;
+	UINT32 m_rwp[4];
 	UINT8 m_rwp_dn;
+
+	UINT32 m_org_dpa;
+	UINT8 m_org_dn;
+	UINT8 m_org_dpd;
+	UINT16 m_cl0;
+	UINT16 m_cl1;
+
+	UINT16 m_mwr[4];
+	UINT8  m_mwr_chr[4];
 
 	const address_space_config		m_space_config;
 };
