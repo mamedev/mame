@@ -61,8 +61,6 @@ public:
 	UINT16 m_mRenderBufData[MAX_RENDER_CMD_SEQ];
 	UINT32 m_mSys22PortBits;
 	int m_mFrameCount;
-	UINT8 m_stick_input;
-	UINT8 m_prev_stick_state;
 	int m_mDspUploadState;
 	int m_mUploadDestIdx;
 	UINT32 m_mAlpineSurferProtData;
