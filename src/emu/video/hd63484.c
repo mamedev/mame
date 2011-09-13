@@ -1199,7 +1199,7 @@ static void hd63484_command_w(device_t *device, UINT16 cmd)
             }
 
 		}
-		else if ((hd63484->fifo[0] & 0xf0ff) == 0x6000)	/* hd63484->cpy */
+		else if ((hd63484->fifo[0] & 0xf0ff) == 0x6000)	/* CPY */
 		{
 			docpy16(device, hd63484->fifo[0], ((hd63484->fifo[1] & 0x00ff) << 12) | ((hd63484->fifo[2] & 0xfff0) >> 4), &hd63484->rwp, hd63484->fifo[3], hd63484->fifo[4]);
 
@@ -1211,7 +1211,7 @@ static void hd63484_command_w(device_t *device, UINT16 cmd)
             }
 
 		}
-		else if ((hd63484->fifo[0] & 0xf0fc) == 0x7000)	/* Shd63484->cpy */
+		else if ((hd63484->fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
 			docpy16(device, hd63484->fifo[0], ((hd63484->fifo[1] & 0x00ff) << 12) | ((hd63484->fifo[2] & 0xfff0) >> 4), &hd63484->rwp, hd63484->fifo[3], hd63484->fifo[4]);
 

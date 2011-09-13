@@ -697,6 +697,26 @@ void h63484_device::command_clr_exec()
 	m_rwp[m_rwp_dn] = offset;
 }
 
+void h63484_device::command_cpy_exec()
+{
+	INT16 ax, ay;
+	UINT32 src_offset,dst_offset;
+	//int inc_x,inc_y;
+
+	src_offset = ((m_pr[0] & 0xff) << 12) | ((m_pr[1]&0xfff0) >> 4);
+	ax = m_pr[2];
+	ay = m_pr[3];
+
+	//inc_x = (ax < 0) ? -1 : 1;
+	//inc_y = (ay < 0) ? -1 : 1;
+
+	dst_offset = m_rwp[m_rwp_dn] & 0xfffff;
+
+	printf("%08x %08x %d %d\n",src_offset,dst_offset,ax,ay);
+
+	// ...
+}
+
 void h63484_device::process_fifo()
 {
 	UINT8 data;
@@ -745,6 +765,28 @@ void h63484_device::process_fifo()
 			}
 			break;
 
+		case COMMAND_WPTN:
+			if(m_param_ptr == 1)
+			{
+				m_dn = m_pr[0]; // number of param words
+
+				//if(m_dn > 0x10 || m_dn == 0)
+				//	fatalerror("stop!");
+			}
+
+			if(m_param_ptr == (1 + m_dn))
+			{
+				int pra = m_cr & 0xf;
+				int i;
+
+				for(i=0;i<m_dn;i++)
+					m_pram[(i + pra) & 0xf] = m_pr[1 + i];
+
+				command_end_seq();
+			}
+
+			break;
+
 		case COMMAND_RD:
 			if (m_param_ptr == 0)
 			{
@@ -756,6 +798,16 @@ void h63484_device::process_fifo()
 			}
 			break;
 
+		case COMMAND_WT:
+			if (m_param_ptr == 1)
+			{
+				writebyte(((m_rwp[m_rwp_dn]+0) & 0xfffff),(m_pr[0] & 0xff00) >> 8);
+				writebyte(((m_rwp[m_rwp_dn]+1) & 0xfffff),(m_pr[0] & 0x00ff) >> 0);
+				m_rwp[m_rwp_dn]+=2;
+				m_rwp[m_rwp_dn]&=0xfffff;
+				command_end_seq();
+			}
+
 		case COMMAND_CLR:
 			if (m_param_ptr == 3)
 			{
@@ -764,8 +816,25 @@ void h63484_device::process_fifo()
 			}
 			break;
 
+		case COMMAND_CPY:
+			if (m_param_ptr == 4)
+			{
+				command_cpy_exec();
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_AMOVE:
+			if (m_param_ptr == 2)
+			{
+				m_cpx = m_pr[0];
+				m_cpy = m_pr[1];
+				command_end_seq();
+			}
+			break;
+
 		default:
-			fatalerror("stop!\n");
+			fatalerror("stop!");
 			break;
 	}
 }
@@ -797,6 +866,9 @@ void h63484_device::check_video_registers(int offset)
 		case 0xda:
 			m_mwr[(offset & 0x18) >> 3] = vreg_data & 0xfff; // pitch
 			m_mwr_chr[(offset & 0x18) >> 3] = (vreg_data & 0x8000) >> 15;
+			break;
+		default:
+			if(LOG) printf("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
 			break;
 	}
 }
@@ -841,8 +913,6 @@ WRITE16_MEMBER( h63484_device::address_w )
 
 WRITE16_MEMBER( h63484_device::data_w )
 {
-	if(LOG) printf("%s -> %02x\n",acrtc_regnames[m_ar/2],data);
-
 	if(ACCESSING_BITS_8_15)
 		m_vreg[m_ar] = (data & 0xff00) >> 8;
 
@@ -853,6 +923,7 @@ WRITE16_MEMBER( h63484_device::data_w )
 	{
 		queue_w((data & 0xff00) >> 8);
 		queue_w((data & 0x00ff) >> 0);
+		if(LOG) printf("%s -> %02x\n",acrtc_regnames[m_ar/2],data);
 		process_fifo();
 	}
 	else
@@ -878,6 +949,15 @@ void h63484_device::device_start()
 //-------------------------------------------------
 
 void h63484_device::device_reset()
+{
+	// ...
+}
+
+//-------------------------------------------------
+//  update_screen -
+//-------------------------------------------------
+
+void h63484_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	// ...
 }

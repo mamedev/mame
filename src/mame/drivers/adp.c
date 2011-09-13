@@ -448,18 +448,17 @@ static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(test_r,wh2_w) //related to input
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff )
-//  AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
-//  AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+//	AM_RANGE(0x400000, 0x40001f) ?
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE_MODERN("h63484", h63484_device, status_r, address_w) // bad
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE_MODERN("h63484", h63484_device, data_r, data_w) // bad
-	AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM
+	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_address_data_w, 0x00ff) //18b too
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16 )
