@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/bsmt2000.h"
+#include "video/mc6845.h"
 
 class whitestar_state : public driver_device
 {
@@ -24,18 +25,92 @@ public:
 
 	UINT8 m_bsmt_latch;
 	UINT8 m_bsmt_reset;
+	
+	UINT8 m_dmd_latch;
+	UINT8 m_dmd_ctrl;
+	UINT8 m_dmd_status;
 
     DECLARE_WRITE8_MEMBER(bsmt_reset_w);
     DECLARE_READ8_MEMBER(bsmt_status_r);
     DECLARE_WRITE8_MEMBER(bsmt0_w);
     DECLARE_WRITE8_MEMBER(bsmt1_w);
+    
+	DECLARE_WRITE8_MEMBER(dmd_latch_w);
+    DECLARE_READ8_MEMBER(dmd_latch_r);
+    DECLARE_WRITE8_MEMBER(dmd_ctrl_w);
+    DECLARE_READ8_MEMBER(dmd_ctrl_r);
+	DECLARE_READ8_MEMBER(dmd_status_r);
+	DECLARE_WRITE8_MEMBER(dmd_status_w);
+	
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(dmd_bank_w);
 };
 
 
 static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x3200, 0x3200) AM_WRITE(bank_w)
+	AM_RANGE(0x3600, 0x3600) AM_READWRITE(dmd_latch_r,dmd_latch_w)
+	AM_RANGE(0x3601, 0x3601) AM_READWRITE(dmd_ctrl_r, dmd_ctrl_w)
+	AM_RANGE(0x3700, 0x3700) AM_READ(dmd_status_r)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(whitestar_state::bank_w)
+{
+	memory_set_bankptr(machine(), "bank1", machine().region("user1")->base() + (data & 0x1f) * 0x4000);
+}
+
+WRITE8_MEMBER(whitestar_state::dmd_bank_w)
+{
+	memory_set_bankptr(machine(), "dmd_bank1", machine().region("gfx3")->base() + (data & 0x1f) * 0x4000);
+}
+
+READ8_MEMBER(whitestar_state::dmd_latch_r)
+{
+	cputag_set_input_line(machine(), "dmdcpu", M6809_IRQ_LINE, CLEAR_LINE); 
+	return m_dmd_latch;
+}
+
+WRITE8_MEMBER(whitestar_state::dmd_latch_w)
+{
+	m_dmd_latch = data;
+	cputag_set_input_line(machine(), "dmdcpu", M6809_IRQ_LINE, CLEAR_LINE); 
+	cputag_set_input_line(machine(), "dmdcpu", M6809_IRQ_LINE, ASSERT_LINE); 
+}
+
+READ8_MEMBER(whitestar_state::dmd_ctrl_r)
+{
+	return m_dmd_ctrl;
+}
+
+WRITE8_MEMBER(whitestar_state::dmd_ctrl_w)
+{	
+	m_dmd_ctrl = data;
+	bank_w(space,0,0);
+	machine().device("dmdcpu")->reset();	
+}
+
+/*U202 - HC245
+  D0 = BUSY   -> SOUND BUSY?
+  D1 = SSTO   -> SOUND RELATED
+  D2 = MPIN   -> ??
+  D3 = CN8-22 -> DMD STAT0
+  D4 = CN8-23 -> DMD STAT1
+  D5 = CN8-24 -> DMD STAT2
+  D6 = CN8-25 -> DMD STAT3
+  D7 = CN8-26 -> DMD BUSY
+*/
+READ8_MEMBER(whitestar_state::dmd_status_r)
+{	
+	return (m_dmd_status ? 0x80 : 0x00) | (m_dmd_status << 3);
+}
+
+WRITE8_MEMBER(whitestar_state::dmd_status_w)
+{	
+	m_dmd_status = data & 0x0f;
+}
 /* Whitestar audio (similar to Tattoo Assassins) */
 
 WRITE8_MEMBER(whitestar_state::bsmt_reset_w)
@@ -78,11 +153,25 @@ static ADDRESS_MAP_START( whitestar_sound_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( whitestar_dmd_map, AS_PROGRAM, 8, whitestar_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x2fff) AM_RAM // video out
+	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("mc6845", mc6845_device, register_w)
+	AM_RANGE(0x3002, 0x3002) AM_WRITE(dmd_bank_w)
+	AM_RANGE(0x3003, 0x3003) AM_READ(dmd_latch_r)	
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("dmd_bank1")
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(dmd_status_w)	
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("gfx3", 0x78000)
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( whitestar )
 INPUT_PORTS_END
 
 static MACHINE_RESET( whitestar )
 {
+	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	memory_set_bankptr(machine, "dmd_bank1", machine.region("gfx3")->base());
 }
 
 static DRIVER_INIT( whitestar )
@@ -94,6 +183,25 @@ static INTERRUPT_GEN( whitestar_snd_interrupt )
 	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
+static INTERRUPT_GEN( whitestar_dmd_interrupt )
+{
+	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+}
+
+static const mc6845_interface whitestar_crtc6845_interface =
+{
+	NULL,
+	8 /*?*/,
+	NULL,
+	NULL,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
@@ -102,6 +210,10 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
     MCFG_CPU_ADD("soundcpu", M6809, (3579580/2))
 	MCFG_CPU_PROGRAM_MAP(whitestar_sound_map)
 	MCFG_CPU_PERIODIC_INT(whitestar_snd_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
+
+    MCFG_CPU_ADD("dmdcpu", M6809, (8000000/4))
+	MCFG_CPU_PROGRAM_MAP(whitestar_dmd_map)
+	MCFG_CPU_PERIODIC_INT(whitestar_dmd_interrupt, 80) // value taken from PinMAME 
 
 	MCFG_MACHINE_RESET( whitestar )
 
@@ -112,6 +224,8 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	MCFG_BSMT2000_READY_CALLBACK(bsmt_ready_callback)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	
+	MCFG_MC6845_ADD("mc6845", MC6845, 2000000, whitestar_crtc6845_interface)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
