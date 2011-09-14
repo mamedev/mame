@@ -300,7 +300,7 @@ static WRITE32_HANDLER ( skns_hit2_w )
 	// this code simulates behaviour of protection PLD
 	data>>= 24;
 	hit.disconnect = 1;
-	switch (state->region)
+	switch (state->m_region)
 	{
 		case 'J':
 			if (data == 0) hit.disconnect= 0;
@@ -429,7 +429,7 @@ static MACHINE_RESET(skns)
 	skns_state *state = machine.driver_data<skns_state>();
 	hit_t &hit = state->m_hit;
 
-	if (state->region != 'A')
+	if (state->m_region != 'A')
 		hit.disconnect= 1;
 	else
 		hit.disconnect= 0;
@@ -858,35 +858,35 @@ MACHINE_CONFIG_END
 static MACHINE_RESET(sknsa)
 {
 	skns_state *state = machine.driver_data<skns_state>();
-	state->region = 'A';
+	state->m_region = 'A';
 	MACHINE_RESET_CALL(skns);
 }
 
 static MACHINE_RESET(sknsj)
 {
 	skns_state *state = machine.driver_data<skns_state>();
-	state->region = 'J';
+	state->m_region = 'J';
 	MACHINE_RESET_CALL(skns);
 }
 
 static MACHINE_RESET(sknsu)
 {
 	skns_state *state = machine.driver_data<skns_state>();
-	state->region = 'U';
+	state->m_region = 'U';
 	MACHINE_RESET_CALL(skns);
 }
 
 static MACHINE_RESET(sknse)
 {
 	skns_state *state = machine.driver_data<skns_state>();
-	state->region = 'E';
+	state->m_region = 'E';
 	MACHINE_RESET_CALL(skns);
 }
 
 static MACHINE_RESET(sknsk)
 {
 	skns_state *state = machine.driver_data<skns_state>();
-	state->region = 'K';
+	state->m_region = 'K';
 	MACHINE_RESET_CALL(skns);
 }
 

@@ -62,7 +62,7 @@ public:
 	tilemap_t *m_tilemap_A;
 	tilemap_t *m_tilemap_B;
 
-	UINT8 region;
+	UINT8 m_region;
 };
 
 
