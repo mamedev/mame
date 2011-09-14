@@ -15,11 +15,13 @@ public:
 	whitestar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
         m_maincpu(*this, "maincpu"),
+        m_dmdcpu(*this, "dmdcpu"),
         m_soundcpu(*this, "soundcpu"),
         m_bsmt(*this, "bsmt")
         { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dmdcpu;
 	required_device<cpu_device> m_soundcpu;
     required_device<bsmt2000_device> m_bsmt;
 
@@ -50,9 +52,10 @@ public:
 static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(bank_w)
-	AM_RANGE(0x3600, 0x3600) AM_READWRITE(dmd_latch_r,dmd_latch_w)
+	AM_RANGE(0x3600, 0x3600) AM_WRITE(dmd_latch_w)
 	AM_RANGE(0x3601, 0x3601) AM_READWRITE(dmd_ctrl_r, dmd_ctrl_w)
 	AM_RANGE(0x3700, 0x3700) AM_READ(dmd_status_r)
+    AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0x18000)
 ADDRESS_MAP_END
@@ -69,15 +72,14 @@ WRITE8_MEMBER(whitestar_state::dmd_bank_w)
 
 READ8_MEMBER(whitestar_state::dmd_latch_r)
 {
-	cputag_set_input_line(machine(), "dmdcpu", M6809_IRQ_LINE, CLEAR_LINE); 
+	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, CLEAR_LINE); 
 	return m_dmd_latch;
 }
 
 WRITE8_MEMBER(whitestar_state::dmd_latch_w)
 {
 	m_dmd_latch = data;
-	cputag_set_input_line(machine(), "dmdcpu", M6809_IRQ_LINE, CLEAR_LINE); 
-	cputag_set_input_line(machine(), "dmdcpu", M6809_IRQ_LINE, ASSERT_LINE); 
+	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, ASSERT_LINE); 
 }
 
 READ8_MEMBER(whitestar_state::dmd_ctrl_r)
@@ -89,7 +91,7 @@ WRITE8_MEMBER(whitestar_state::dmd_ctrl_w)
 {	
 	m_dmd_ctrl = data;
 	bank_w(space,0,0);
-	machine().device("dmdcpu")->reset();	
+	m_dmdcpu->reset();
 }
 
 /*U202 - HC245
@@ -178,12 +180,8 @@ static DRIVER_INIT( whitestar )
 {
 }
 
-static INTERRUPT_GEN( whitestar_snd_interrupt )
-{
-	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
-}
-
-static INTERRUPT_GEN( whitestar_dmd_interrupt )
+// the appropriate device is passed in, so we can share this routine
+static INTERRUPT_GEN( whitestar_firq_interrupt )
 {
 	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
@@ -206,14 +204,15 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(whitestar_map)
+	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 976) // value taken from PinMAME 
 
     MCFG_CPU_ADD("soundcpu", M6809, (3579580/2))
 	MCFG_CPU_PROGRAM_MAP(whitestar_sound_map)
-	MCFG_CPU_PERIODIC_INT(whitestar_snd_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
+	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
     MCFG_CPU_ADD("dmdcpu", M6809, (8000000/4))
 	MCFG_CPU_PROGRAM_MAP(whitestar_dmd_map)
-	MCFG_CPU_PERIODIC_INT(whitestar_dmd_interrupt, 80) // value taken from PinMAME 
+	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 80) // value taken from PinMAME 
 
 	MCFG_MACHINE_RESET( whitestar )
 
