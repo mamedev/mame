@@ -3641,28 +3641,8 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 		DebugCheckKeys();
 #endif
 
-		// It seems like disabling the screen disables the vbl irq,
-		// but with a one vbl delay.
-
-		// Fixes sianniv (which breaks without the delay, too).
-		// Perhaps breaks other things, there are 1e6 psx-based games..
-
-		// Needs to be checked throughly and if it's ok implemented
-		// way more cleanly.
-
-		static int delay = 0;
-		if(( n_gpustatus & ( 1 << 0x17 ) ) != 0)
-		{
-			if(delay < 2)
-				delay++;
-		}
-		else
-			delay = 0;
-		if( delay != 2 )
-		{
-			n_gpustatus ^= ( 1L << 31 );
-			psx_irq_set( machine(), 0x0001 );
-		}
+		n_gpustatus ^= ( 1L << 31 );
+		psx_irq_set( machine(), 0x0001 );
 	}
 }
 
