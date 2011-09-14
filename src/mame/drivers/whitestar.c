@@ -8,6 +8,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/bsmt2000.h"
 #include "video/mc6845.h"
+#include "rendlay.h"
 
 class whitestar_state : public driver_device
 {
@@ -17,13 +18,15 @@ public:
         m_maincpu(*this, "maincpu"),
         m_dmdcpu(*this, "dmdcpu"),
         m_soundcpu(*this, "soundcpu"),
-        m_bsmt(*this, "bsmt")
+        m_bsmt(*this, "bsmt"),
+		m_mc6845(*this, "mc6845")
         { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dmdcpu;
 	required_device<cpu_device> m_soundcpu;
     required_device<bsmt2000_device> m_bsmt;
+	required_device<mc6845_device> m_mc6845;
 
 	UINT8 m_bsmt_latch;
 	UINT8 m_bsmt_reset;
@@ -48,6 +51,8 @@ public:
 	
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(dmd_bank_w);
+	
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -92,8 +97,10 @@ READ8_MEMBER(whitestar_state::dmd_ctrl_r)
 WRITE8_MEMBER(whitestar_state::dmd_ctrl_w)
 {	
 	m_dmd_ctrl = data;
-	bank_w(space,0,0);
-	m_dmdcpu->reset();
+	if (data!=0) {
+		bank_w(space,0,0);
+		m_dmdcpu->reset();
+	}
 }
 
 /*U202 - HC245
@@ -188,12 +195,31 @@ static INTERRUPT_GEN( whitestar_firq_interrupt )
 	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
+MC6845_UPDATE_ROW( whitestar_update_row )
+{
+	whitestar_state *state = device->machine().driver_data<whitestar_state>();
+	UINT8 *vram  = state->m_vram + ((ma & 0x100)<<2) + (ra << 4);	
+	for (int x = 0; x < 128/8; x++)
+	{
+		UINT16 val = (vram[x]<<8) + vram[x+0x200];
+		val = BITSWAP16(val,15,7,14,6,13,5,12,4,11,3,10,2,9,1,8,0);
+		*BITMAP_ADDR16(bitmap, ra, x*8 +0)  = (val>>14) & 0x03;
+		*BITMAP_ADDR16(bitmap, ra, x*8 +1)  = (val>>12) & 0x03;
+		*BITMAP_ADDR16(bitmap, ra, x*8 +2)  = (val>>10) & 0x03;
+		*BITMAP_ADDR16(bitmap, ra, x*8 +3)  = (val>>8)  & 0x03;
+		*BITMAP_ADDR16(bitmap, ra, x*8 +4)  = (val>>6)  & 0x03;
+		*BITMAP_ADDR16(bitmap, ra, x*8 +5)  = (val>>4)  & 0x03;
+		*BITMAP_ADDR16(bitmap, ra, x*8 +6)  = (val>>2)  & 0x03;
+		*BITMAP_ADDR16(bitmap, ra, x*8 +7)  = (val>>0)  & 0x03;
+	}
+}
+
 static const mc6845_interface whitestar_crtc6845_interface =
 {
 	NULL,
-	8 /*?*/,
+	1,
 	NULL,
-	NULL,
+	whitestar_update_row,
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -201,6 +227,20 @@ static const mc6845_interface whitestar_crtc6845_interface =
 	DEVCB_NULL,
 	NULL
 };
+
+static PALETTE_INIT( whitestar )
+{
+	palette_set_color(machine, 0, MAKE_RGB(0, 0, 0));
+	palette_set_color(machine, 1, MAKE_RGB(84, 73, 10));
+	palette_set_color(machine, 2, MAKE_RGB(168, 147, 21));
+	palette_set_color(machine, 3, MAKE_RGB(255, 224, 32));
+}
+
+bool whitestar_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	m_mc6845->update(&bitmap, &cliprect);
+	return 0;
+}
 
 static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	/* basic machine hardware */
@@ -227,6 +267,19 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 	
 	MCFG_MC6845_ADD("mc6845", MC6845, 2000000, whitestar_crtc6845_interface)
+	
+    /* video hardware */
+    MCFG_SCREEN_ADD("screen", LCD)
+    MCFG_SCREEN_REFRESH_RATE(60)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 128, 32 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 128-1, 0, 32-1 )
+
+	MCFG_DEFAULT_LAYOUT( layout_lcd )
+
+    MCFG_PALETTE_LENGTH(4)
+    MCFG_PALETTE_INIT(whitestar)	
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
