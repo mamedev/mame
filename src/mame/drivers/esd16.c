@@ -990,8 +990,8 @@ ROM_END
 
 ROM_START( hedpanicf ) /* Story line in Japanese, game instructions in English */
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "esd2", 0x000000, 0x040000, CRC(8cccc691) SHA1(d6a5dd6c21a67638b9023182f77780282b9b04e5) )
-	ROM_LOAD16_BYTE( "esd1", 0x000001, 0x040000, CRC(d8574925) SHA1(bd4990778b90a49aa6b10f8cf6709ce2424f546a) )
+	ROM_LOAD16_BYTE( "esd2", 0x000000, 0x040000, CRC(8cccc691) SHA1(d6a5dd6c21a67638b9023182f77780282b9b04e5) ) /* CU03 */
+	ROM_LOAD16_BYTE( "esd1", 0x000001, 0x040000, CRC(d8574925) SHA1(bd4990778b90a49aa6b10f8cf6709ce2424f546a) ) /* CU02 */
 
 	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
@@ -1022,9 +1022,6 @@ ROM_START( hedpanico ) /* Story line & game instructions in English, copyright y
 	ROM_LOAD16_BYTE( "esd1.rom", 0x000001, 0x040000, CRC(4e0682c5) SHA1(f4117f31b6426d7bf126a6c62c489b9347885b42) ) /* CU02 */
 
 	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
-	// this rom is severely corrupted, however, I think it should be the same, so I'm using the one from the other sets
-	//ROM_LOAD( "esd3.rom", 0x00000, 0x0c000, BAD_DUMP CRC(b72b761b) SHA1(9735e05ddc1db38bf81eac89a5312200fc008248) ) /* Should be twice the size, IE: 27C020 */
-	//ROM_CONTINUE(         0x10000, 0x14000)
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
@@ -1050,7 +1047,7 @@ ROM_END
 
 /*
 
-Deluxe 5 (c) 2001 ESD
+Deluxe 5 (c) 2000 ESD
 PCB Layout
 ----------
 
@@ -1086,6 +1083,7 @@ Notes:
       6116    - 2k x8 SRAM (SOP28)
       A40MX04 - Actel A40MX04-F FPGA (PLCC84)
       CRTC99  - ESD CRTC99 Graphics Controller (QFP240)
+      ESD1-2  - M27C2001
       JU03-8  - AM27C020
       FU34,FU35  -  MX29F1610MC
 
@@ -1236,6 +1234,7 @@ Notes:
       6116    - 2k x8 SRAM (SOP28)
       A40MX04 - Actel A40MX04-F FPGA (PLCC84)
       CRTC99  - ESD CRTC99 Graphics Controller (QFP240)
+      CU02-3  - 27C2001
       JU03-8  - 27C040
       FU34,FU35  -  MX29F1610MC
 
@@ -1284,17 +1283,17 @@ GAME( 1998, multchmp, 0,        multchmp, multchmp, 0, ROT0, "ESD",         "Mul
 GAME( 1998, multchmpk,multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", GAME_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
-GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_SUPPORTS_SAVE ) // 15/06/1999 ?
+GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_SUPPORTS_SAVE )
 
 /* ESD 08-26-1999 */
-GAME( 1999, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", GAME_SUPPORTS_SAVE ) // 06/01/2000 ?
-GAME( 1999, mchampdxa,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", GAME_SUPPORTS_SAVE ) // 26/11/1999 ?
-GAME( 1999, mchampdxb,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", GAME_SUPPORTS_SAVE ) // 14/11/1999 ?
-GAME( 1999, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", GAME_SUPPORTS_SAVE ) // 17/01/2000 ?
-GAME( 1999, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", GAME_SUPPORTS_SAVE ) // 15/03/2000 ?
+GAME( 1999, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", GAME_SUPPORTS_SAVE )
+GAME( 1999, mchampdxa,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, mchampdxb,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", GAME_SUPPORTS_SAVE )
+GAME( 1999, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", GAME_SUPPORTS_SAVE )
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
 GAME( 2000, deluxe5,  0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Deluxe 5", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* Missing background graphics roms */
-GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", GAME_SUPPORTS_SAVE ) // 26/05/2000 ?
+GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", GAME_SUPPORTS_SAVE )
 GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police", GAME_SUPPORTS_SAVE )
 
