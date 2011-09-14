@@ -56,14 +56,39 @@ public:
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
+	DECLARE_READ8_MEMBER(dedicated_switch_r);
 	
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
+static INPUT_PORTS_START( whitestar )
+/*-- Dedicated Switches --*/
+// Note: active low
+// D0 - DED #1 - Left Flipper
+// D1 - DED #2 - Left Flipper EOS
+// D2 - DED #3 - Right Flipper
+// D3 - DED #4 - Right Flipper EOS
+// D4 - DED #5 - Not Used (Upper Flipper on some games!)
+// D5 - DED #6 - Volume (Red Button)
+// D6 - DED #7 - Service Credit (Green Button)
+// D7 - DED #8 - Begin Test (Black Button)
+	PORT_START("DEDICATED")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_START("DSW0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x3100, 0x3100) AM_READ(dips_r)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DEDICATED")
+	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW0") 
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(bank_w)
 	AM_RANGE(0x3300, 0x3300) AM_WRITE(switch_w)
 	AM_RANGE(0x3400, 0x3400) AM_READ(switch_r)
@@ -74,11 +99,6 @@ static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0x18000)
 ADDRESS_MAP_END
-
-READ8_MEMBER(whitestar_state::dips_r)
-{	
-	return 0;
-}
 
 READ8_MEMBER(whitestar_state::switch_r)
 {
@@ -201,9 +221,6 @@ static ADDRESS_MAP_START( whitestar_dmd_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(dmd_status_w)	
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("gfx3", 0x78000)
 ADDRESS_MAP_END
-
-static INPUT_PORTS_START( whitestar )
-INPUT_PORTS_END
 
 static MACHINE_RESET( whitestar )
 {
