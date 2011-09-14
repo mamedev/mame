@@ -301,6 +301,9 @@ void mc6845_device::recompute_parameters(bool postload)
 	if (hsync_off_pos > horiz_pix_total)
 		hsync_off_pos = horiz_pix_total;
 
+	if (vsync_on_pos > vert_pix_total)
+		vsync_on_pos = vert_pix_total;
+
 	if (vsync_off_pos > vert_pix_total)
 		vsync_off_pos = vert_pix_total;
 
