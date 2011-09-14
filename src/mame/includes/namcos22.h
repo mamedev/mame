@@ -64,6 +64,8 @@ public:
 	int m_mDspUploadState;
 	int m_mUploadDestIdx;
 	UINT32 m_mAlpineSurferProtData;
+	int m_motor_status;
+	emu_timer *m_motor_timer;
 	int m_p4;
 	UINT16 m_su_82;
 	UINT16 m_keycus_id;
