@@ -628,7 +628,84 @@ ROM_START( spacewin )
 	ROM_LOAD( "8.u145", 0x080000, 0x20000, CRC(541a73fd) SHA1(fede5e2fcbb18e90cc50995d44e831c3f9b56614) )
 ROM_END
 
-ROM_START( pmroulet )
+
+/*
+Croupier (PlaYMark)
+-------------------
+
+1x MC68000FN12 (U24, QFP)
+1x unknown scratched 40-pin DIP IC (U39)
+
+1x OKI M6295 (U34, near ROM 1)
+1x Resonator 1000J (Y1)
+
+2x KM6264BL-10L SRAM (U2/U6, near ROMs 2 & 3)
+2x KM6264BL-10 SRAM (U36/U37, near ROMs 4, 5, 6, 7 & 8)
+1x DALLAS DS1220Y-100 NONVOLATILE SRAM (U17)
+
+2x ACTEL A1020B PL84C
+4x GAL 22CV10-25LNC (U1, U77, U111, U112. Undumped)
+
+1x 24.000000 MHz. Xtal. (XTL1)
+1x 28.000000 MHz. Xtal. (XTL2)
+
+1x Pot (TR1, near OKI M6295)
+1x Push Button.
+1x JAMMA connector.
+
+ROMs:
+-----
+
+1.bin : AMD Am27C020.
+checksum : 03FC0000h
+CRC-32 : B7094978h
+
+2.bin : ST M27C1001.
+checksum : 00B958B6h
+CRC-32 : E7941975h
+
+3.bin : ST M27C1001.
+checksum : 011DE502h
+CRC-32 : 29D06A38h
+
+4.bin : MACRONIX MX27C4000.
+checksum : 01CADC6Ch
+CRC-32 : EFCDDAC9h
+
+5.bin : MACRONIX MX27C4000.
+checksum : 01F8DEB8h
+CRC-32 : BC75EF8Fh
+
+6.bin : MACRONIX MX27C4000.
+checksum : 0195B5C0h
+CRC-32 : E47D5F55h
+
+7.bin : MACRONIX MX27C4000.
+checksum : 013483F4h
+CRC-32 : 0FA6CE7Dh
+
+8.bin : MACRONIX MX27C4000.
+checksum : 0106A95Ch
+CRC-32 : D4C2B7DAh
+
+*/
+ROM_START( croupier )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(e7941975) SHA1(ea32cd51b8d87205a1d6c6a83ebf8b50e03c55fc))
+	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(29d06a38) SHA1(c6fdca1a31fad9abf854e521e593f3ec8018ae6d))
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* samples are ok */
+	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))
+
+	ROM_REGION( 0x280000, "gfx1", 0 ) /* sprites */
+	ROM_LOAD( "4.bin", 0x000000, 0x80000, CRC(efcddac9) SHA1(72435ec478b70a067d47f3daf7c224169ee5827a))
+	ROM_LOAD( "5.bin", 0x080000, 0x80000, CRC(bc75ef8f) SHA1(1f3dc457e5ae143d53cfef0e1fcb4586dceefb67))
+	ROM_LOAD( "6.bin", 0x100000, 0x80000, CRC(e47d5f55) SHA1(a341e24f98125265cb3986f8c7ce84eedd056b71))
+	ROM_LOAD( "7.bin", 0x180000, 0x80000, CRC(0fa6ce7d) SHA1(5ba96c9c0625a131d890d9c0c0f65cb2a03fa084))
+	ROM_LOAD( "8.bin", 0x200000, 0x80000, CRC(d4c2b7da) SHA1(515be861443acc5b911241dbaafa42e02f79985a))
+ROM_END
+
+ROM_START( croupiera )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(1677a2de) SHA1(4dcbb3c1ce9b65e06ba7e0cffa00c0c8016538f5))
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(11acaac2) SHA1(19e7bbbf4356fc9a866f9f36d0568c42d6a36c07))
@@ -649,7 +726,8 @@ ROM_END
 *        Game Drivers         *
 ******************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY     FULLNAME                       FLAGS                                          LAYOUT  */
-GAMEL( 1996, sderby,   0,      sderby,   sderby,   0,     ROT0, "Playmark", "Super Derby",                  0,                                             layout_sderby   )
-GAMEL( 1996, spacewin, 0,      spacewin, spacewin, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",     0,                                             layout_spacewin )
-GAMEL( 1997, pmroulet, 0,      pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING, layout_pmroulet )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT   ROT    COMPANY     FULLNAME                               FLAGS                                          LAYOUT  */
+GAMEL( 1996, sderby,    0,        sderby,   sderby,   0,     ROT0, "Playmark", "Super Derby",                          0,                                             layout_sderby   )
+GAMEL( 1996, spacewin,  0,        spacewin, spacewin, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                             layout_spacewin )
+GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING, layout_pmroulet )
