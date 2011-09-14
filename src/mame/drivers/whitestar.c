@@ -34,6 +34,7 @@ public:
 	UINT8 m_dmd_latch;
 	UINT8 m_dmd_ctrl;
 	UINT8 m_dmd_status;
+	UINT8 m_dmd_busy;
 
     UINT8 *m_vram;
 
@@ -51,6 +52,10 @@ public:
 	
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(dmd_bank_w);
+		
+	DECLARE_READ8_MEMBER(dips_r);
+	DECLARE_READ8_MEMBER(switch_r);
+	DECLARE_WRITE8_MEMBER(switch_w);
 	
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
@@ -58,7 +63,10 @@ public:
 
 static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x3100, 0x3100) AM_READ(dips_r)
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(bank_w)
+	AM_RANGE(0x3300, 0x3300) AM_WRITE(switch_w)
+	AM_RANGE(0x3400, 0x3400) AM_READ(switch_r)
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(dmd_latch_w)
 	AM_RANGE(0x3601, 0x3601) AM_READWRITE(dmd_ctrl_r, dmd_ctrl_w)
 	AM_RANGE(0x3700, 0x3700) AM_READ(dmd_status_r)
@@ -66,6 +74,20 @@ static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0x18000)
 ADDRESS_MAP_END
+
+READ8_MEMBER(whitestar_state::dips_r)
+{	
+	return 0;
+}
+
+READ8_MEMBER(whitestar_state::switch_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(whitestar_state::switch_w)
+{
+}
 
 WRITE8_MEMBER(whitestar_state::bank_w)
 {
@@ -79,6 +101,7 @@ WRITE8_MEMBER(whitestar_state::dmd_bank_w)
 
 READ8_MEMBER(whitestar_state::dmd_latch_r)
 {
+	m_dmd_busy = 0;
 	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, CLEAR_LINE); 
 	return m_dmd_latch;
 }
@@ -86,6 +109,8 @@ READ8_MEMBER(whitestar_state::dmd_latch_r)
 WRITE8_MEMBER(whitestar_state::dmd_latch_w)
 {
 	m_dmd_latch = data;
+	m_dmd_busy = 1;
+	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, CLEAR_LINE); 
 	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, ASSERT_LINE); 
 }
 
@@ -97,6 +122,7 @@ READ8_MEMBER(whitestar_state::dmd_ctrl_r)
 WRITE8_MEMBER(whitestar_state::dmd_ctrl_w)
 {	
 	m_dmd_ctrl = data;
+	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, CLEAR_LINE); 
 	if (data!=0) {
 		bank_w(space,0,0);
 		m_dmdcpu->reset();
@@ -115,7 +141,7 @@ WRITE8_MEMBER(whitestar_state::dmd_ctrl_w)
 */
 READ8_MEMBER(whitestar_state::dmd_status_r)
 {	
-	return (m_dmd_status ? 0x80 : 0x00) | (m_dmd_status << 3);
+	return (m_dmd_busy ? 0x80 : 0x00) | (m_dmd_status << 3);
 }
 
 WRITE8_MEMBER(whitestar_state::dmd_status_w)
