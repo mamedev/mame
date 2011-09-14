@@ -32,6 +32,8 @@ public:
 	UINT8 m_dmd_ctrl;
 	UINT8 m_dmd_status;
 
+    UINT8 *m_vram;
+
     DECLARE_WRITE8_MEMBER(bsmt_reset_w);
     DECLARE_READ8_MEMBER(bsmt_status_r);
     DECLARE_WRITE8_MEMBER(bsmt0_w);
@@ -157,7 +159,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( whitestar_dmd_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_RAM // video out
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(m_vram) // video out
 	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("mc6845", mc6845_device, register_w)
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(dmd_bank_w)
