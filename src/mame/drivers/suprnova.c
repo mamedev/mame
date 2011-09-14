@@ -295,33 +295,33 @@ static WRITE32_HANDLER ( skns_hit2_w )
 {
 	skns_state *state = space->machine().driver_data<skns_state>();
 	hit_t &hit = state->m_hit;
-	
+
 	// Decide to unlock on country char of string "FOR xxxxx" in Bios ROM at offset 0x420
 	// this code simulates behaviour of protection PLD
 	data>>= 24;
 	hit.disconnect = 1;
 	switch (state->region)
-	{		
+	{
 		case 'J':
 			if (data == 0) hit.disconnect= 0;
 		break;
-		case 'U':		
+		case 'U':
 			if (data == 1) hit.disconnect= 0;
-		break;				
+		break;
 		case 'K':
 			if (data == 2) hit.disconnect= 0;
 		break;
 		case 'E':
 			if (data == 3) hit.disconnect= 0;
-		break;		
-		case 'A':			
+		break;
+		case 'A':
 			if (data < 2) hit.disconnect= 0;
 		break;
 		// unknow country id, unlock per default
 		default:
 			hit.disconnect= 0;
 		break;
-	}	
+	}
 }
 
 
@@ -425,17 +425,15 @@ static TIMER_DEVICE_CALLBACK( interrupt_callback )
 }
 
 static MACHINE_RESET(skns)
-{	
+{
 	skns_state *state = machine.driver_data<skns_state>();
 	hit_t &hit = state->m_hit;
-	
-	if (state->region != 'A') 
-	{
-		hit.disconnect= 1; 
-	} else
-	{
+
+	if (state->region != 'A')
+		hit.disconnect= 1;
+	else
 		hit.disconnect= 0;
-	}
+
 	memory_set_bankptr(machine, "bank1",machine.region("user1")->base());
 }
 
@@ -858,35 +856,35 @@ static MACHINE_CONFIG_START( skns, skns_state )
 MACHINE_CONFIG_END
 
 static MACHINE_RESET(sknsa)
-{	
+{
 	skns_state *state = machine.driver_data<skns_state>();
 	state->region = 'A';
 	MACHINE_RESET_CALL(skns);
 }
 
 static MACHINE_RESET(sknsj)
-{	
+{
 	skns_state *state = machine.driver_data<skns_state>();
 	state->region = 'J';
 	MACHINE_RESET_CALL(skns);
 }
 
 static MACHINE_RESET(sknsu)
-{	
+{
 	skns_state *state = machine.driver_data<skns_state>();
 	state->region = 'U';
 	MACHINE_RESET_CALL(skns);
 }
 
 static MACHINE_RESET(sknse)
-{	
+{
 	skns_state *state = machine.driver_data<skns_state>();
 	state->region = 'E';
 	MACHINE_RESET_CALL(skns);
 }
 
 static MACHINE_RESET(sknsk)
-{	
+{
 	skns_state *state = machine.driver_data<skns_state>();
 	state->region = 'K';
 	MACHINE_RESET_CALL(skns);

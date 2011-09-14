@@ -61,6 +61,8 @@ public:
 	int m_alt_enable_sprites;
 	tilemap_t *m_tilemap_A;
 	tilemap_t *m_tilemap_B;
+
+	UINT8 region;
 };
 
 
