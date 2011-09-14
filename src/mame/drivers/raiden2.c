@@ -1799,28 +1799,83 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 MACHINE_CONFIG_END
 
 /* ROM LOADING */
+/*
+Raiden II
 
-/* Raiden II  Seibu Kaihatsu 1993
+(C) 1993 RAIDEN II SEIBU KAIHATSU INC.,o
+|----------------------------------------------------------|
+|      1    2   3   4   5   6    7      8      9     10    |
+|LA4460    M6295  PCM  Z8400A  6116    BATTERY3.6v        A|
+|   YM2151 M6295   6    5      6116    28.6360 MHz        B|
+|     VOL   YM3014                                         |
+|HB-45A     YM3012 |------|                               C|
+|HB-2      NJM4560 |SIE150| LH5116    |---------|          |
+|RC220             |      | LH5116    | SEI252  |         D|
+|RC220             |------| LH5116    |SB05-106 |          |
+|RC220                      LH5116    |(QFP208) |         E|
+|J                                    |         |         F|
+|A                                    |---------|          |
+|M    DSW2(8)                                             G|
+|M    DSW1(8)                                   LH522258   |
+|A          |---------|OBJ-1    OBJ-2           LH522258  H|
+|           | SEI360  |                         LH522258  J|
+|           |SB06-1937|OBJ-3    OBJ-4           LH522258  K|
+|           |(QFP160) |                     |---------|   L|
+|           |         |      1              |SEI1000  |   M|
+| |------|  |---------|  1x      3x         |SB01-001 |   N|
+| |SEI200|         32MHz     2              |(QFP184) |    |
+| |      |CXK5863        2x      4x         |         |   P|
+| |------|CXK5863                           |---------|    |
+|                                                         Q|
+|                        PAL2 PAL1             |----|     R|
+|                                              |V30 |      |
+|      BG-1       BG-2   7   COPX-D2           |----|     S|
+|----------------------------------------------------------|
+Notes:
+      V30 clock    - 16.000MHz [32/2]. Chip is stamped "NEC D70116HG-16 V30 NEC '84" (QFP52)
+      Z80 clock    - 3.579545MHz [28.63636/8]
+      YM2151 clock - 3.579545MHz [28.63636/8]
+      Yamaha DAC   -
+        early boards: ym3014 mono dac, no NJM4560
+        later boards: ym3012 stereo dac plus NJM4560, each with a capacitor on top
+      M6295 clocks - 1.022MHz [28.63636/28] and pin 7 HIGH (both)
+      LH52258      - Sharp LH52258 32k x8 SRAM (= 62256)
+      CXK5863      - Sony CXK5863 8k x8 SRAM (= 6264)
+      6116         - 2k x8 SRAM
+      LH5116       - 2k x8 SRAM
+      HB-45A       - Seibu custom ceramic module sound DAC (SIP20)
+      HB-2         - Seibu custom ceramic module connected to coin counters (SIP10)
+      RC220        - Custom resistor network module used for inputs (SIP14)
+      VSync        - 55.4859Hz  \
+      HSync        - 15.5586kHz / not measured but assumed same as R2DX
+      PAL1         - MMIPAL16L8B stamped 'JJ4B01' (DIP20)
+      PAL2         - AMI 18CV8 stamped 'JJ4B02' (DIP20)
+      ROMs         - *PCM      - 2M MaskROM stamped 'RAIDEN 2 PCM' at location U1018 (DIP32), pcb labeled VOI2
+                     6         - 23C020 MASK ROM labelled 'SEIBU 6' at location U1017 (DIP32), pcb labeled VOI1
+                     5         - 27C512 EPROM labelled 'SEIBU 5' at location U1110 (DIP28)
+                     *OBJ-1     - 16M MaskROM stamped 'RAIDEN 2 OBJ-1' at location U0811 (DIP42)
+                     *OBJ-2     - 16M MaskROM stamped 'RAIDEN 2 OBJ-2' at location U082 (DIP42)
+                     *OBJ-3     - 16M MaskROM stamped 'RAIDEN 2 OBJ-3' at location U0837 (DIP42)
+                     *OBJ-4     - 16M MaskROM stamped 'RAIDEN 2 OBJ-4' at location U0836 (DIP42)
+                 /   1x        - 27C2001 EPROM labelled 'SEIBU 1' at location U1210 (DIP32)
+     Early boards|   2x        - 27C2001 EPROM labelled 'SEIBU 2' at location U1211 (DIP32)
+                 |   3x        - 27C2001 EPROM labelled 'SEIBU 3' at location U129 (DIP32)
+                 \   4x        - 27C2001 EPROM labelled 'SEIBU 4' at location U1212 (DIP32)
+     Later boards/   1         - 27C402 or 27C4096 EPROM labelled 'SEIBU 1' at location U0211 (DIP40)
+                 \   2         - 27C402 or 27C4096 EPROM labelled 'SEIBU 2' at location U0212 (DIP40)
+                     *BG-1      - 16M MaskROM stamped 'RAIDEN 2 BG-1' at location U075 (DIP42)
+                     *BG-2      - 16M MaskROM stamped 'RAIDEN 2 BG-2' at location U0714 (DIP42)
+                     7         - 27C210 EPROM labelled 'SEIBU 7' at location U0724 (DIP40)
+                     *COPX-D2  - 2M MaskROM stamped 'COPX-D2' at location U0313 (DIP40)
 
-YM2151   OKI M6295 VOI2  Z8400A
-         OKI M6295 VOI1  SND       2018
-                  5816-15          6116
-   YM3012         5816-15
-                  5816-15
-                  5816-15
-          SIE150       SEI252
+                     * = these ROMs are soldered-in
 
-             OBJ1 OBJ2            34256-20
-             OBJ3 OBJ4            34256-20
-                                  34256-20
-    SEI360                        34256-20
-                  PRG0
-                  PRG1
-          32MHz
- SEI0200   7C185-35            SEI1000
-           7C185-35
-                 JJ4B02 JJ4B01
-  BG1   BG2    7   COPX-D2      NEC V30
+      SEIBU Custom ICs -
+                        SIE150 (QFP100) - z80 interface
+                        SEI252 SB05-106 (QFP208) - fg/sprite gfx and its decryption
+                        SEI0200 TC110G21AF 0076 (QFP100) - bg gfx
+                        SEI360 SB06-1937 (QFP160) - logic and i/o array
+                        SEI1000 SB01-001 (QFP184) - main protection
 
 */
 
@@ -2390,6 +2445,14 @@ ROM_END
 
 
 /* Zero Team sets */
+/* Zero team is slightly older hardware (early 93 instead of late 93) but
+almost identical to raiden 2 with a few key differences:
+SEI251 instead of SEI252 for fg sprites+decrypt
++
+*/
+/* ZERO TEAM Seibu Kaihatsu 1993
+	TODO: guru-readme here
+*/
 
 ROM_START( zeroteam )
 	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
