@@ -10,15 +10,17 @@
 
     Games running on this hardware:
 
-    * Draw Poker,    1984, IGT - International Game Technology
+    * Draw Poker,          1984, IGT - International Game Technology
 
-    * Video Poker,   1984, InterFlip.
-    * Black Jack,    1984, InterFlip.
-    * Video Dado,    1987, InterFlip.
-    * Video Cordoba, 1987, InterFlip.
+    * Video Poker,         1984, InterFlip.
+    * Black Jack,          1984, InterFlip.
+    * Video Dado,          1987, InterFlip.
+    * Video Cordoba,       1987, InterFlip.
 
-    * Baby Poker,    1989, Recreativos Franco.
-    * Baby Dado,     1989, Recreativos Franco.
+    * Baby Poker,          1989, Recreativos Franco.
+    * Baby Dado,           1989, Recreativos Franco.
+
+    * Video Poker (v1403), 198?, Recreativos Franco?.
 
 
 ***************************************************************************
@@ -1429,6 +1431,95 @@ ROM_START( babydad )
 	ROM_LOAD( "babydad.col",	0x0000, 0x0100,	CRC(b3358b3f) SHA1(d499a08fefaa3566de2e6fcddd237d6dfa840d8a) )
 ROM_END
 
+/*
+Video Poker PCB
+-----------------
+
+Main + daughterboard...
+
+
+MAINBOARD:
+----------
+
+1x AMD D8751H.
+1x AY-3-8910A.
+1x LM380N.
+1x 6.0 MHz. Xtal.
+
+5x pots:
+- 3 together on the connectors opposit side (maybe RGB). 
+- 1 near the AY-3-8910.
+- 1 opposit to the sound circuitry.
+
+1x 8.0000 MHz. Xtal, near the 3 pots (RGB).
+NOTE: silkscreened 7.8643 MHz. on the PCB.
+
+ROMs:
+
+conf_11_poker_ver_1.00_9055.bin : AMD Am27C256.
+checksum : 00779055h
+CRC-32 : B8ABC965h
+
+conf_12_poker_ver_1.00_3909.bin : AMD Am27C256.
+checksum : 00753909h
+CRC-32 : 3E72D96Ch
+
+conf_14_poker_ver_1.00_813a.bin : AMD Am27C256.
+checksum : 0074813Ah
+CRC-32 : F3D6A741h
+
+conf_15_poker_ver_1.00_ea91.bin : AMD Am27C256.
+checksum : 0074EA91h
+CRC-32 : 4EFEA023h
+
+sonido_dados_poker_y_b.jack_3d2f_(d8751h).bin : AMD D8751H.
+checksum : 000C3D2Fh
+CRC-32 : 7B71CD30h
+
+
+DAUGHTERBOARD:
+--------------
+
+1x AMD P80C31BH (8031 CPU)
+1x AMD P8255A (PPI)
+1x 40-pin empty socket (silkscreened 'zocalo' = socket)
+
+1x NEC D4464C-15 SRAM
+1x DALLAS DS1232
+
+1x 27256 ROM:
+
+b_poker_ver_1403.bin
+
+FUJITSU MBM27256.
+-Buffer checksum : 003D1403h
+-CRC-32 : 61ECA2F6h
+
+1x 8.0000 MHz. Xtal.
+
+1x 3-pin connector (JP2).
+1x 7-pin connector (JP4).
+1x 8-pin connector (JP3).
+1x 14-pin connector (impresora).
+
+*/
+ROM_START( bpoker )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "b_poker_ver_1403.bin", 0x0000, 0x8000, CRC(61eca2f6) SHA1(62a671e86b94005a9ffc4b6545a90c43880e0a11) )
+
+	ROM_REGION( 0x1000, "soundcpu", 0 )
+	ROM_LOAD( "sonido_dados_poker_y_b.jack_3d2f_(d8751h).bin", 0x0000, 0x1000, CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
+
+	ROM_REGION( 0x20000, "tiles", 0 )
+	ROM_LOAD( "conf_15_poker_ver_1.00_ea91.bin", 0x00000, 0x8000, CRC(4efea023) SHA1(c10a30353d793a54eab14bd5e9687668743b66de) )
+	ROM_LOAD( "conf_14_poker_ver_1.00_813a.bin", 0x08000, 0x8000, CRC(f3d6a741) SHA1(5fbfcf4b8fdd1ef9f3d0f9acc735d5c23f45b607) )
+	ROM_LOAD( "conf_12_poker_ver_1.00_3909.bin", 0x10000, 0x8000, CRC(3e72d96c) SHA1(3d921b9a79b8116984f58954141800d1856d8311) )
+	ROM_LOAD( "conf_11_poker_ver_1.00_9055.bin", 0x18000, 0x8000, CRC(b8abc965) SHA1(61a6cdcfd4cd65d4a7ce02c6a2c4216ab6da095c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "babypok.col",	0x0000, 0x0100,	BAD_DUMP CRC(2b98e88a) SHA1(bb22ef090e9e5dddc5c160d41a5f52df0db6feb6) )
+ROM_END
+
 ROM_START( fortune1 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "pk485-s-000-7ff.c5",   0x0000, 0x0800, CRC(d74c4860) SHA1(9d151e2be5c1e9fc2e7ce5e533eb08e4b849f2c1) )
@@ -1449,11 +1540,12 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY                                 FULLNAME                              FLAGS  LAYOUT      */
-GAMEL( 1984, videopkr, 0,        videopkr, videopkr, 0,    ROT0, "InterFlip",                             "Video Poker",                        0,     layout_videopkr )
-GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, 0,    ROT0, "IGT - International Gaming Technology", "Fortune I (PK485-S) Draw Poker",     0,     layout_videopkr )
-GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, 0,    ROT0, "InterFlip",                             "Black Jack",                         0,     layout_blckjack )
-GAMEL( 1987, videodad, videopkr, videodad, videodad, 0,    ROT0, "InterFlip",                             "Video Dado",                         0,     layout_videodad )
-GAMEL( 1987, videocba, videopkr, videodad, videocba, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,     layout_videocba )
-GAMEL( 1987, babypkr , videopkr, babypkr , babypkr , 0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,     layout_babypkr  )
-GAMEL( 1987, babydad , videopkr, babypkr , babydad , 0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,     layout_babydad  )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY                                 FULLNAME                              FLAGS             LAYOUT      */
+GAMEL( 1984, videopkr, 0,        videopkr, videopkr, 0,    ROT0, "InterFlip",                             "Video Poker",                        0,                layout_videopkr )
+GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, 0,    ROT0, "IGT - International Gaming Technology", "Fortune I (PK485-S) Draw Poker",     0,                layout_videopkr )
+GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, 0,    ROT0, "InterFlip",                             "Black Jack",                         0,                layout_blckjack )
+GAMEL( 1987, videodad, videopkr, videodad, videodad, 0,    ROT0, "InterFlip",                             "Video Dado",                         0,                layout_videodad )
+GAMEL( 1987, videocba, videopkr, videodad, videocba, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,                layout_videocba )
+GAMEL( 1987, babypkr , videopkr, babypkr,  babypkr,  0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,                layout_babypkr  )
+GAMEL( 1987, babydad , videopkr, babypkr,  babydad,  0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,                layout_babydad  )
+GAMEL( 198?, bpoker ,  videopkr, babypkr,  babypkr,  0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                GAME_NOT_WORKING, layout_babypkr  )
