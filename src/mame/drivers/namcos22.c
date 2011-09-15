@@ -150,7 +150,7 @@
  *
  * This document covers all the known Namco Super System 22 games, including....
  * Air Combat 22    (C) Namco, 1995
- * Alpine Racer 1   (C) Namco, 1995
+ * Alpine Racer 1   (C) Namco, 1994
  * Alpine Racer 2   (C) Namco, 1996
  * Alpine Surfer    (C) Namco, 1996
  * Aqua Jet         (C) Namco, 1996
@@ -423,7 +423,7 @@
  * |  |-------------------|  |
  * |-------------------------|
  * Notes:
- *       ICx    : Fujutsu 29F016 16MBit FlashROMs (x4, TSOP48)
+ *       ICx    : Fujitsu 29F016 16MBit FlashROMs (x4, TSOP48)
  *       SS22P1B: PALCE16V8H (PLCC20, labelled 'SS22P1B')
  *                There is a small mod on this PAL as follows....
  *                - Pin 8 is lifted and the pad on the PCB at pin 8
@@ -3424,6 +3424,9 @@ ROM_START( alpinerc )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpinerc_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
 ROM_END
 
 ROM_START( alpinerd )
@@ -3480,6 +3483,9 @@ ROM_START( alpinerd )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpinerd_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
 ROM_END
 
 ROM_START( alpinr2b )
@@ -3534,6 +3540,9 @@ ROM_START( alpinr2b )
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "ars1wavea.2l", 0x000000, 0x400000, CRC(f8d107e9) SHA1(5c418691f0b35403553f21f5570eda8bbb66890f) )
 	ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpinr2b_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
 ROM_END
 
 ROM_START( alpinr2a )
@@ -3588,6 +3597,9 @@ ROM_START( alpinr2a )
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "ars1wavea.2l", 0x000000, 0x400000, CRC(f8d107e9) SHA1(5c418691f0b35403553f21f5570eda8bbb66890f) )
 	ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpinr2a_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
 ROM_END
 
 ROM_START( alpinesa )
@@ -3632,6 +3644,9 @@ ROM_START( alpinesa )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "af1wavea.2l",  0x000000, 0x400000, CRC(28cca494) SHA1(4ff87ab85fd17bf8dbee5b03d99cc5c31dd6349a) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpinesa_defaults.nv", 0x0000, 0x4000, CRC(9744207c) SHA1(bbd34ee138c116d281c718f14740e2883a5cdf49) )
 ROM_END
 
 ROM_START( cybrcomm )
@@ -3689,9 +3704,9 @@ ROM_START( cybrcomm )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 
-	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
 //  ROM_LOAD( "cy1eeprm.9e", 0x0000, 0x2000, CRC(4e1d294b) SHA1(954ce04dcdba65214f5d0690ca59264f9090a1d6) ) /* EPROM (dumped?) */
-	ROM_LOAD( "cybrcomm.nv", 0x0000, 0x2000, CRC(8432c066) SHA1(99d4bfda3f8aec288dbeaf291bce85fe9009a1de) ) /* EPROM (useful defaults) */
+	ROM_LOAD( "cy1eeprm.9e", 0x0000, 0x2000, CRC(8432c066) SHA1(99d4bfda3f8aec288dbeaf291bce85fe9009a1de) ) /* EPROM (useful defaults) */
 ROM_END
 
 ROM_START( cybrcycc )
@@ -3745,6 +3760,9 @@ ROM_START( cybrcycc )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "cb1wavea.2l", 0x000000, 0x400000, CRC(b79a624d) SHA1(c0ee358a183ba6d0835731dbdd191b64718fde6e) )
 	ROM_LOAD( "cb1waveb.1l", 0x800000, 0x200000, CRC(33bf08f6) SHA1(bf9d68b26a8158ea1abfe8428b7454cac25242c5) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "cybrcycc_defaults.nv", 0x0000, 0x4000, CRC(1ef95c25) SHA1(26b8bead9d62a420ee0ff770df83c4207a963065) )
 ROM_END
 
 ROM_START( propcycl )
@@ -4680,6 +4698,9 @@ ROM_START( tokyowar )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "tw1wavea.2l",  0x000000, 0x400000, CRC(ebce6366) SHA1(44ebe90ff3c7af5bebbf1baba3b7a2b1863daebb) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "tokyowar_defaults.nv", 0x0000, 0x4000, CRC(a1fe05e4) SHA1(39a20b35394a43e12c66a6c0f5ecb204148c58de) )
 ROM_END
 
 ROM_START( dirtdash )
@@ -4786,6 +4807,9 @@ ROM_START( aquajet )
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "aj1wavea.2l",  0x000000, 0x400000, CRC(8c72ea59) SHA1(3ae8dbd8baae08f1daab2b218932ba9d9451231d) )
 	ROM_LOAD( "aj1waveb.1l",  0x800000, 0x400000, CRC(ab5a457f) SHA1(c34531fd574eb0c3e78fc31a9af8658df3446adc) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "aquajet_defaults.nv", 0x0000, 0x4000, CRC(7d03893c) SHA1(f75ca5d996a94da4136ed0a4f0f4c869f1412e38) )
 ROM_END
 
 /*******************************************************************/
@@ -4834,10 +4858,10 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(alpine_motor_read, (void *)0) // steps are free
 
 	PORT_START("SWING")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Steps Swing")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Swing")
 
 	PORT_START("EDGE")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Steps Edge")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Edge")
 
 	PORT_START("MCUP5B")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(alpine_motor_read, (void *)1) // steps are locked
@@ -5012,9 +5036,9 @@ static INPUT_PORTS_START( tokyowar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* VIEW */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) /* RIGHT */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) /* LEFT */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Change")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Right Trigger")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Trigger")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MCUP5B")
@@ -5761,7 +5785,7 @@ GAME( 1996, victlapw,  0,        namcos22,  acedrvr,  victlap,  ROT0, "Namco", "
 GAME( 1994, alpinerd, 0,         namcos22s, alpiner,  alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, alpinerc, alpinerd,  namcos22s, alpiner,  alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, airco22b, 0,         namcos22s, airco22,  airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)"    , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // boots but missing sprite clear DMA?
-GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/04/04
 GAME( 1995, dirtdash, 0,         namcos22s, dirtdash, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 95/12/20 20:01:56
 GAME( 1995, timecris, 0,         namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
 GAME( 1995, timecrisa,timecris,  namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
