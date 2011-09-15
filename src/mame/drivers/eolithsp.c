@@ -52,6 +52,7 @@ static const struct
 	{ "fort2b",   0x000081e0, 239 },
 	{ "fort2ba",  0x000081e0, 239 },
 	{ "penfan",   0x4001FA66, 239 },
+	{ "candy",	  0x4001990C, 239 }, 
 	/* eolith16.c */
 	{ "klondkp",  0x0001a046, 239 },
 	/* vegaeo.c */
