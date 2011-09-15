@@ -25,22 +25,24 @@
     512Kbyte/1Mega main RAM
 
  Games dumped
- - Hidden Catch (pcb ver 3.03)
- - New Hidden Catch (pcb ver 3.02)
- - Hidden Catch 2 (pcb ver 3.03)
- - Hidden Catch 3 (v. 1.00 / pcb ver 3.05)
- - Land Breaker (pcb ver 3.03) (MCU internal flash dump is missing)
- - Land Breaker (pcb ver 3.02)
- - Raccoon World
- - Fortress 2 Blue Arcade (v. 1.01 / pcb ver 3.05)
- - Fortress 2 Blue Arcade (v. 1.00 / pcb ver 3.05)
- - Puzzle King (Dance & Puzzle)
- - Iron Fortress
+  1998 - Hidden Catch (pcb ver 3.03)
+  1998 - Iron Fortress
+  1998 - Puzzle King (Dance & Puzzle)
+  1998 - Raccoon World
+  1999 - Candy Candy
+  1999 - Hidden Catch 2 (pcb ver 3.03)
+  1999 - Land Breaker (pcb ver 3.03) (MCU internal flash dump is missing)
+  1999 - Land Breaker (pcb ver 3.02)
+  1999 - New Hidden Catch (pcb ver 3.02)
+  1999 - Penfan Girls
+  2000 - Hidden Catch 3 (v. 1.00 / pcb ver 3.05)
+  2001 - Fortress 2 Blue Arcade (v. 1.01 / pcb ver 3.05)
+  2001 - Fortress 2 Blue Arcade (v. 1.00 / pcb ver 3.05)
 
  Known games not dumped
  - Hidden Catch (pcb ver 3.02)
  - Fortress 2 Blue Arcade (v. 1.02)
- - Ribbon (Step1. Mild Mind) (c) 1999
+ - Ribbon (Step1. Mild Mind) (c) 1999 - Alt title Penfan girls is dumped
 
  TODO:
  - sound & sound cpu
@@ -495,7 +497,7 @@ ROM_START( hidnctch )
 	ROM_LOAD( "hc_u107.bin", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x008000, "cpu2", 0 )  /* Sound (80c301) CPU Code */
-	ROM_LOAD( "hc_u111.bin", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "hc_u111.bin", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "hc_u108.bin", 0x00000, 0x80000, CRC(2bae46cb) SHA1(7c43f1002dfc20b9c1bb1647f7261dfa7ed2b4f9) )
@@ -568,7 +570,7 @@ ROM_START( nhidctch )
 	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x008000, "cpu2", 0 )  /* Sound (80c301) CPU Code */
-	ROM_LOAD( "u111",        0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "u111",        0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "u108",        0x00000, 0x80000, CRC(2bae46cb) SHA1(7c43f1002dfc20b9c1bb1647f7261dfa7ed2b4f9) )
@@ -651,7 +653,8 @@ ROM_START( hidctch2 )
 	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) )
 
 	ROM_REGION( 0x000800, "cpu2", 0 ) /* AT89c52 */
-	ROM_LOAD( "hc2.103",     0x0000, 0x0800, NO_DUMP ) /* MCU internal 8K flash */
+	/* This is the first 2K of hc2j.u111 from hidctch2a, verify against the internal dump when decapped */
+	ROM_LOAD( "hc2.103", 0x0000, 0x0800, BAD_DUMP CRC(92797034) SHA1(b600f19972986b2e09c56be0ea0c09f92a9fe422) ) /* MCU internal 2K flash */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "u108",        0x00000, 0x80000, CRC(75fc7a65) SHA1(308715ab62d28787ee894ddcf7304464e2543b2e) )
@@ -689,7 +692,7 @@ ROM_START( hidctch2a )
 	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) )
 
 	ROM_REGION( 0x008000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
-	ROM_LOAD( "hc2j.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "hc2j.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "u108",        0x00000, 0x80000, CRC(75fc7a65) SHA1(308715ab62d28787ee894ddcf7304464e2543b2e) )
@@ -819,16 +822,16 @@ ROM_START( landbrk )
 	ROM_LOAD32_WORD_SWAP( "15.bin", 0x1c00002, 0x200000, CRC(bc1664e3) SHA1(a13a4e1df8d9825a72ecca1552ee52958c0d33d8) )
 
 	ROM_REGION( 0x008000, "cpu1", 0 ) /* QDSP ('51) Code */
-	ROM_LOAD( "rom5.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
+	ROM_LOAD( "lb.107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x008000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
-	ROM_LOAD( "rom1.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "rom1.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "rom2.u108", 0x00000, 0x80000, CRC(f3b327ef) SHA1(4b359171afd6ca10275961f795f3fe64f9df9897) )
 
 	ROM_REGION( 0x080000, "sfx", 0 ) /* QDSP samples (SFX) */
-	ROM_LOAD( "rom4.u97", 0x00000, 0x80000, CRC(5b34dff0) SHA1(1668763e977e272781ddcc74beba97b53477cc9d) )
+	ROM_LOAD( "lb_3.u97", 0x00000, 0x80000, CRC(5b34dff0) SHA1(1668763e977e272781ddcc74beba97b53477cc9d) )
 
 	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
@@ -853,7 +856,8 @@ ROM_START( landbrka )
 	ROM_LOAD( "lb.107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x000800, "cpu2", 0 ) /* AT89c52 */
-	ROM_LOAD( "lb.103", 0x0000, 0x0800, NO_DUMP ) /* MCU internal 8K flash */
+	/* This is the first 2K of rom1.u111 from landbrk, verify against the internal dump when decapped */
+	ROM_LOAD( "lb.103", 0x0000, 0x0800, BAD_DUMP CRC(92797034) SHA1(b600f19972986b2e09c56be0ea0c09f92a9fe422) ) /* MCU internal 2K flash */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "lb_2.108", 0x00000, 0x80000, CRC(a99182d7) SHA1(628c8d09efb3917a4e97d9e02b6b0ca1f339825d) )
@@ -892,13 +896,52 @@ ROM_START( penfan )
 	ROM_LOAD( "pfg.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x008000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
-	ROM_LOAD( "pfg.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "pfg.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "pfg.u108", 0x00000, 0x80000, CRC(ac97c23b) SHA1(85319cbff811c84af2a802c2f609bd58cf9e7bc3) )
 
 	ROM_REGION( 0x080000, "sfx", 0 ) /* QDSP samples (SFX) */
 	ROM_LOAD( "pfg.u97", 0x00000, 0x80000, CRC(0c713eef) SHA1(4c4ea19fec5af4f0cb983c8b9f71152d05c15047) )
+
+	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
+
+ROM_START( candy )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "cc.u43", 0x00000, 0x80000, CRC(837c9967) SHA1(ccb38ec986d7cd598a48ee1c3806566c360fd783) )
+
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "00.u5", 0x0000000, 0x200000, CRC(04bc53e4) SHA1(093651c4d4148dc36260d7a6cd8c322ba9a63195) )
+	ROM_LOAD32_WORD_SWAP( "01.u1", 0x0000002, 0x200000, CRC(288229f1) SHA1(56e3ae101f8acc5d1e9bcc28b74ee48aa456bf28) )
+	ROM_LOAD32_WORD_SWAP( "02.u6", 0x0400000, 0x200000, CRC(5d3b130c) SHA1(e247d0dd3a1909296c2a754733f10170d264825c) )
+	ROM_LOAD32_WORD_SWAP( "03.u2", 0x0400002, 0x200000, CRC(e36cc85c) SHA1(897955effd178aa3889bacabaede4f39efdeee4b) )
+	ROM_LOAD32_WORD_SWAP( "04.u7", 0x0800000, 0x200000, CRC(5090624c) SHA1(60973f3b7a4e62ad39faed1d1d108058f4990ab0) )
+	ROM_LOAD32_WORD_SWAP( "05.u3", 0x0800002, 0x200000, CRC(c9e7c5d3) SHA1(0495fde350125a39150d14caf2b801e21924cbe4) )
+	ROM_LOAD32_WORD_SWAP( "06.u8", 0x0c00000, 0x200000, CRC(e3b65d10) SHA1(fdade9b9a1eb8444ddb96f8712910ab9d5ab17a7) )
+	ROM_LOAD32_WORD_SWAP( "07.u4", 0x0c00002, 0x200000, CRC(5bf4cb29) SHA1(7c2247b85cd55533d13e5fa96ffdb6ee8ec025b6) )
+	ROM_LOAD32_WORD_SWAP( "08.u15", 0x1000000, 0x200000, CRC(296f3ec3) SHA1(3bfdbab85e178f13d8a713249785fc8b04de91d5) )
+	ROM_LOAD32_WORD_SWAP( "09.u10", 0x1000002, 0x200000, CRC(2ab8f847) SHA1(f0573a365a8dede78257b7d6d6699d235d04229c) )
+	ROM_LOAD32_WORD_SWAP( "10.u16", 0x1400000, 0x200000, CRC(f382e9e8) SHA1(2498b84fc559412e83be2b607fda1e1f37edd345) )
+	ROM_LOAD32_WORD_SWAP( "11.u11", 0x1400002, 0x200000, CRC(545ef2bf) SHA1(cf81a7e215de8b18967ef4ac8e76d8e470bc45bd) )
+	ROM_LOAD32_WORD_SWAP( "12.u17", 0x1800000, 0x200000, CRC(8d125f1a) SHA1(6d0a562ec40efde9540996f34351e05cebee4154) )
+	ROM_LOAD32_WORD_SWAP( "13.u12", 0x1800002, 0x200000, CRC(a10ea2e8) SHA1(9780ba4b718b09474af49d15508031200164f3e9) )
+	ROM_LOAD32_WORD_SWAP( "14.u18", 0x1c00000, 0x200000, CRC(7cdd8639) SHA1(bdffcb2eeff10b7b3de5d178c766619205dd6f21) ) // not checked by rom check
+	ROM_LOAD32_WORD_SWAP( "15.u13", 0x1c00002, 0x200000, CRC(8b0cf884) SHA1(5acdd084732a15c4a452766bb53bd0e908c1e6f0) ) // not checked by rom check
+
+	ROM_REGION( 0x008000, "cpu1", 0 ) /* QDSP ('51) Code */
+	ROM_LOAD( "cc.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
+
+	ROM_REGION( 0x008000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
+	ROM_LOAD( "cc.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
+
+	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
+	ROM_LOAD( "cc.u108", 0x00000, 0x80000, CRC(6eedb497) SHA1(d9c7322cba0efa21bef72bc6b1465aa45e8caef6) )
+
+	ROM_REGION( 0x080000, "sfx", 0 ) /* QDSP samples (SFX) */
+	ROM_LOAD( "cc.u97", 0x00000, 0x80000, CRC(1400c878) SHA1(d643a9fa930d3a945786a2bb90919a0f6404c625) )
 
 	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
@@ -933,7 +976,7 @@ ROM_START( fort2b )
 	ROM_LOAD( "5.u107",       0x00000, 0x08000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x08000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
-	ROM_LOAD( "4.u111",       0x00000, 0x08000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "4.u111",       0x00000, 0x08000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "3.u108",       0x00000, 0x80000, CRC(9b996b60) SHA1(c4e34601f754ae2908dd6d59ea9da0c5c6f56f2d) )
@@ -963,7 +1006,7 @@ ROM_START( fort2ba )
 	ROM_LOAD( "ftii010.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x08000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
-	ROM_LOAD( "ftii008.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "ftii008.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "ftii009.u108", 0x00000, 0x80000, CRC(9b996b60) SHA1(c4e34601f754ae2908dd6d59ea9da0c5c6f56f2d) )
@@ -1003,7 +1046,7 @@ ROM_START( puzzlekg )
 	ROM_LOAD( "u107.bin",    0x0000, 0x8000, CRC(f3add818) SHA1(96e77950154ced9f3234200de2aa29060c00d47f) )
 
 	ROM_REGION( 0x08000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
-	ROM_LOAD( "u111.bin",    0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "u111.bin",    0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "u108.bin",    0x00000, 0x80000, CRC(e4555c6b) SHA1(128196a5b47d13ee7163981043b96f7b4b27204b) )
@@ -1091,7 +1134,7 @@ ROM_START( hidctch3 )
 	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x008000, "cpu2", 0 ) /* GMS90C32 */
-	ROM_LOAD( "u111",        0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+	ROM_LOAD( "u111",        0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) ) /* Only 0x3E6 bytes used */
 
 	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
 	ROM_LOAD( "u108",        0x00000, 0x80000, CRC(4a7de2e1) SHA1(89da2423f22f98886d7cac807964b1e52398ee19) )
@@ -1156,12 +1199,13 @@ GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith,   ROT0, "Eolith", 
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
+GAME( 1999, candy,     0,        eolith45, landbrk,   eolith,   ROT0, "Eolith", "Candy Candy",  GAME_NO_SOUND )
 GAME( 1999, hidctch2,  0,        eolith50, hidnctch,  hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", GAME_NO_SOUND )
 GAME( 1999, hidctch2a, hidctch2, eolith50, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", GAME_NO_SOUND )
 GAME( 1999, landbrk,   0,        eolith45, landbrk,   landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
 GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
-GAME( 1999, penfan,    0,        eolith45, landbrk,   eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind",  GAME_NO_SOUND ) // alt title of Ribbon?
 GAME( 1999, nhidctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ) // or New Teurrin Geurim Chajgi '98
+GAME( 1999, penfan,    0,        eolith45, landbrk,   eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind",  GAME_NO_SOUND ) // alt title of Ribbon
 GAME( 2000, hidctch3,  0,        eolith50, hidctch3,  hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_NO_SOUND )
 GAME( 2001, fort2b,    0,        eolith50, common,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND )
 GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_NO_SOUND )
