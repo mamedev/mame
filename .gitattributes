@@ -1864,6 +1864,7 @@ src/mame/drivers/bfcobra.c svneol=native#text/plain
 src/mame/drivers/bfm_sc1.c svneol=native#text/plain
 src/mame/drivers/bfm_sc2.c svneol=native#text/plain
 src/mame/drivers/bfm_sc4.c svneol=native#text/plain
+src/mame/drivers/bfm_sc45.h svneol=native#text/plain
 src/mame/drivers/bfm_sc5.c svneol=native#text/plain
 src/mame/drivers/bfm_swp.c svneol=native#text/plain
 src/mame/drivers/bfmsys83.c svneol=native#text/plain
