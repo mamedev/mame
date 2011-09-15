@@ -11697,6 +11697,7 @@ sc4adren	// Adrenalin (Mazooma)
 sc4alad		// Aladdin's Cave (Mazooma)
 sc4a40cl	// Around The Board In 40 Days Club (Mazooma)
 sc4aztec	// Aztec (Bellfruit)
+sc4azteca	//
 sc4botn		// Back Of The Net (Qps)
 sc4broll	// Bank Roll (Mazooma)
 sc4bankb	// Bankety Bank (Qps)
@@ -12046,6 +12047,23 @@ sc4count	// Countdown (Bellfruit)
 sc4cf		// Crazy Fruits (Bellfruit)
 sc4crnjw	// Crown Jewels (Bellfruit)
 sc4dnd		// Deal Or No Deal (Bellfruit)
+sc4dnda		//
+sc4dndb		//
+sc4dndc		//
+sc4dndd		//
+sc4dnde		//
+sc4dndf		//
+sc4dndg		//
+sc4dndh		//
+sc4dndi		//
+sc4dndj		//
+sc4dndk		//
+sc4dndl		//
+sc4dndm		//
+sc4dndcs	//  Deal Or No Deal Classic (Bellfruit)
+sc4dndcsa	//
+sc4dndcsb	//
+sc4dndcsc	//
 sc4dndbb	// Deal Or No Deal Break The Bank (Bellfruit)
 sc4dndcl	// Deal Or No Deal Club (Bellfruit)
 sc4dnddd	// Deal Or No Deal Double Deal Or No Deal (Bellfruit)

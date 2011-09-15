@@ -1,6 +1,26 @@
 /* Scorpion 4 + 5 driver releated includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
 
+#define sc_dnd_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	/* Regular */ \
+	ROM_LOAD( "95008606.bin", 0x0000, 0x100000, CRC(c63c8663) SHA1(4718baf87340fe93ccfe642a1a0cdb9d9dcac57f) ) /* 0 (1907)  DOND SOUNDS 11 */ \
+	ROM_LOAD( "95008607.bin", 0x0000, 0x100000, CRC(a615514f) SHA1(d4ff7d4fe6f1dd1d7b00cc504f90b2921aa5e8fb) ) /* 1 */ \
+	\
+	/*  Casino */ \
+	ROM_LOAD( "95008631.bin", 0x0000, 0x100000, CRC(7208854a) SHA1(a02de60cfcbafe5da4f67596ab65237f5b5f41b7) ) /* 0 (1954) DOND SOUNDS 11 */ \
+	\
+	ROM_LOAD( "95008632.bin", 0x0000, 0x100000, CRC(fd81a317) SHA1(1e597fd58aab5a7a8321dc4daf138ee07b42c094) ) /* 0 (1945) DOND SOUNDS 11 */ \
+	ROM_LOAD( "95008633.bin", 0x0000, 0x100000, CRC(a7a445d4) SHA1(dbb1938c33ce654c2d4aa3b6af8c210f5aad2ae3) ) /* 1 */ \
+	\
+	/*  Casino */ \
+	ROM_LOAD( "95008661.bin", 0x0000, 0x100000, CRC(2d9ebcd5) SHA1(d824a227420cbe616aca6e2fd279af691ddfd87a) ) /* 0 (1945) DOND SOUNDS 12 */ \
+	\
+	ROM_LOAD( "95008680.bin", 0x0000, 0x100000, CRC(9bd439d1) SHA1(5e71d04e5697e92998bae28f7352ea7742cafe07) ) /* 0 (1964) DOND SOUNDS 11 */ \
+	\
+	ROM_LOAD( "95008698.bin", 0x0000, 0x100000, CRC(8eea7754) SHA1(7612c128d6c062bba3477d55aee3089e1255f61e) ) /* 0 (1964) DOND SOUNDS 12 */ \
+
+
 #define sc_dndbe_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008624.bin", 0x0000, 0x100000, CRC(bf9620ea) SHA1(63f5a209da3d0117fcb579364a53b23d2b02cfe5) ) \
