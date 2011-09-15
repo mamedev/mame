@@ -248,9 +248,6 @@ struct _poly_extra_data
 	int cmode;
 	int fogFactor;
 	int fadeFactor;
-	int fade_r;
-	int fade_g;
-	int fade_b;
 	const UINT8 *source;		/* sprites */
 	int z;
 	int alpha;
@@ -323,7 +320,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 			rgbint rgb;
 
 			rgb_to_rgbint(&rgb, pens[(pen >> penshift) & penmask]);
-			rgbint_scale_and_clamp(&rgb, shade << 2);
+			rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
 
 			if( fogFactor != 0xff )
 				rgbint_blend(&rgb, &fogColor, fogFactor);
@@ -331,20 +328,9 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 			if( fadeFactor != 0xff )
 			{
 				if (state->m_mbSuperSystem22)
-				{
 					rgbint_blend(&rgb, &fadeColor, fadeFactor);
-				}
 				else
-				{
-					// rgbutil does not support per-channel scaling without a shared fade factor, so do it manually
-					rgb_t c = rgbint_to_rgb(&rgb);
-					c = MAKE_RGB(
-						Clamp256((RGB_RED(c)   * extra->fade_r) >> 8),
-						Clamp256((RGB_GREEN(c) * extra->fade_g) >> 8),
-						Clamp256((RGB_BLUE(c)  * extra->fade_b) >> 8)
-					);
-					rgb_to_rgbint(&rgb, c);
-				}
+					rgbint_scale_channel_and_clamp(&rgb, &fadeColor);
 			}
 
 			if( transFactor != 0xff )
@@ -374,7 +360,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 				rgbint rgb;
 
 				rgb_to_rgbint(&rgb, pens[(pen >> penshift) & penmask]);
-				rgbint_scale_and_clamp(&rgb, shade << 2);
+				rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
 
 				if( fogFactor != 0xff )
 					rgbint_blend(&rgb, &fogColor, fogFactor);
@@ -382,19 +368,9 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 				if( fadeFactor != 0xff )
 				{
 					if (state->m_mbSuperSystem22)
-					{
 						rgbint_blend(&rgb, &fadeColor, fadeFactor);
-					}
 					else
-					{
-						rgb_t c = rgbint_to_rgb(&rgb);
-						c = MAKE_RGB(
-							Clamp256((RGB_RED(c)   * extra->fade_r) >> 8),
-							Clamp256((RGB_GREEN(c) * extra->fade_g) >> 8),
-							Clamp256((RGB_BLUE(c)  * extra->fade_b) >> 8)
-						);
-						rgb_to_rgbint(&rgb, c);
-					}
+						rgbint_scale_channel_and_clamp(&rgb, &fadeColor);
 				}
 
 				pDest[x] = rgbint_to_rgb(&rgb);
@@ -471,9 +447,14 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 	extra->fogFactor = 0;
 	extra->fadeFactor = 0;
 
+	if (mixer.target&1)
+	{
+		extra->fadeFactor = mixer.fadeFactor;
+		rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
+	}
+
 	if( state->m_mbSuperSystem22 )
 	{
-		// fog
 		if( !(color&0x80) )
 		{
 			int cz = flags>>8;
@@ -496,24 +477,6 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 				extra->fogFactor = fogDensity >> 5;
 				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
 			}
-		}
-
-		// fade
-		if (mixer.target&1)
-		{
-			extra->fadeFactor = mixer.fadeFactor;
-			rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
-		}
-	}
-	else
-	{
-		// fade (not the same as Super System 22)
-		if (mixer.target&1)
-		{
-			extra->fadeFactor = mixer.fadeFactor;
-			extra->fade_r = mixer.rFadeColor;
-			extra->fade_g = mixer.gFadeColor;
-			extra->fade_b = mixer.bFadeColor;
 		}
 	}
 

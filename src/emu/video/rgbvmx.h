@@ -255,11 +255,11 @@ INLINE void rgbaint_blend(rgbaint *color1, const rgbaint *color2, UINT8 color1sc
 
 /*-------------------------------------------------
     rgbint_scale_and_clamp - scale the given
-    color by an 8.8 scale factor and clamp to
-    byte values
+    color by an 8.8 scale factor, immediate or
+    per channel, and clamp to byte values
 -------------------------------------------------*/
 
-INLINE void rgbint_scale_and_clamp(rgbint *color, INT16 colorscale)
+INLINE void rgbint_scale_immediate_and_clamp(rgbint *color, INT16 colorscale)
 {
 	rgbint splatmap = vec_splat((rgbint)vec_lvsl(0, &colorscale), 0);
 	rgbint vecscale = vec_lde(0, &colorscale);
@@ -271,19 +271,39 @@ INLINE void rgbint_scale_and_clamp(rgbint *color, INT16 colorscale)
 	*color = vec_min(vec_packs(temp, temp), rgbvmx_statics.maxbyte);
 }
 
+INLINE void rgbint_scale_channel_and_clamp(rgbint *color, const rgbint *colorscale)
+{
+	rgbint vecscale = (rgbint)vec_mergeh(*colorscale, (rgbint)vec_splat_s32(0));
+	vector signed int temp;
+	*color = (rgbint)vec_mergeh(*color, (rgbint)vec_splat_s32(0));
+	temp = vec_msum(*color, vecscale, vec_splat_s32(0));
+	temp = (vector signed int)vec_sr(temp, vec_splat_u32(8));
+	*color = vec_min(vec_packs(temp, temp), rgbvmx_statics.maxbyte);
+}
+
 
 /*-------------------------------------------------
     rgbaint_scale_and_clamp - scale the given
-    color by an 8.8 scale factor and clamp to
-    byte values
+    color by an 8.8 scale factor, immediate or
+    per channel, and clamp to byte values
 -------------------------------------------------*/
 
-INLINE void rgbaint_scale_and_clamp(rgbaint *color, INT16 colorscale)
+INLINE void rgbaint_scale_immediate_and_clamp(rgbaint *color, INT16 colorscale)
 {
 	rgbaint splatmap = vec_splat((rgbaint)vec_lvsl(0, &colorscale), 0);
 	rgbaint vecscale = vec_lde(0, &colorscale);
 	vector signed int temp;
 	vecscale = (rgbaint)vec_perm(vecscale, vecscale, (vector unsigned char)splatmap);
+	*color = (rgbaint)vec_mergeh(*color, (rgbaint)vec_splat_s32(0));
+	temp = vec_msum(*color, vecscale, vec_splat_s32(0));
+	temp = (vector signed int)vec_sr(temp, vec_splat_u32(8));
+	*color = vec_min(vec_packs(temp, temp), rgbvmx_statics.maxbyte);
+}
+
+INLINE void rgbaint_scale_channel_and_clamp(rgbaint *color, const rgbint *colorscale)
+{
+	rgbaint vecscale = (rgbaint)vec_mergeh(*color, (rgbaint)vec_splat_s32(0));
+	vector signed int temp;
 	*color = (rgbaint)vec_mergeh(*color, (rgbaint)vec_splat_s32(0));
 	temp = vec_msum(*color, vecscale, vec_splat_s32(0));
 	temp = (vector signed int)vec_sr(temp, vec_splat_u32(8));

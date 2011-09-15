@@ -312,11 +312,11 @@ INLINE void rgbaint_blend(rgbaint *color1, const rgbaint *color2, UINT8 color1sc
 
 /*-------------------------------------------------
     rgbint_scale_and_clamp - scale the given
-    color by an 8.8 scale factor and clamp to
-    byte values
+    color by an 8.8 scale factor, immediate or
+    per channel, and clamp to byte values
 -------------------------------------------------*/
 
-INLINE void rgbint_scale_and_clamp(rgbint *color, INT16 colorscale)
+INLINE void rgbint_scale_immediate_and_clamp(rgbint *color, INT16 colorscale)
 {
 	color->r = (color->r * colorscale) >> 8;
 	if ((UINT16)color->r > 255) { color->r = (color->r < 0) ? 0 : 255; }
@@ -326,14 +326,24 @@ INLINE void rgbint_scale_and_clamp(rgbint *color, INT16 colorscale)
 	if ((UINT16)color->b > 255) { color->b = (color->b < 0) ? 0 : 255; }
 }
 
+INLINE void rgbint_scale_channel_and_clamp(rgbint *color, const rgbint *colorscale)
+{
+	color->r = (color->r * colorscale->r) >> 8;
+	if ((UINT16)color->r > 255) { color->r = (color->r < 0) ? 0 : 255; }
+	color->g = (color->g * colorscale->g) >> 8;
+	if ((UINT16)color->g > 255) { color->g = (color->g < 0) ? 0 : 255; }
+	color->b = (color->b * colorscale->b) >> 8;
+	if ((UINT16)color->b > 255) { color->b = (color->b < 0) ? 0 : 255; }
+}
+
 
 /*-------------------------------------------------
     rgbaint_scale_and_clamp - scale the given
-    color by an 8.8 scale factor and clamp to
-    byte values
+    color by an 8.8 scale factor, immediate or
+    per channel, and clamp to byte values
 -------------------------------------------------*/
 
-INLINE void rgbaint_scale_and_clamp(rgbaint *color, INT16 colorscale)
+INLINE void rgbaint_scale_immediate_and_clamp(rgbaint *color, INT16 colorscale)
 {
 	color->a = (color->a * colorscale) >> 8;
 	if ((UINT16)color->a > 255) { color->a = (color->a < 0) ? 0 : 255; }
@@ -342,6 +352,18 @@ INLINE void rgbaint_scale_and_clamp(rgbaint *color, INT16 colorscale)
 	color->g = (color->g * colorscale) >> 8;
 	if ((UINT16)color->g > 255) { color->g = (color->g < 0) ? 0 : 255; }
 	color->b = (color->b * colorscale) >> 8;
+	if ((UINT16)color->b > 255) { color->b = (color->b < 0) ? 0 : 255; }
+}
+
+INLINE void rgbaint_scale_channel_and_clamp(rgbaint *color, const rgbaint *colorscale)
+{
+	color->a = (color->a * colorscale->a) >> 8;
+	if ((UINT16)color->a > 255) { color->a = (color->a < 0) ? 0 : 255; }
+	color->r = (color->r * colorscale->r) >> 8;
+	if ((UINT16)color->r > 255) { color->r = (color->r < 0) ? 0 : 255; }
+	color->g = (color->g * colorscale->g) >> 8;
+	if ((UINT16)color->g > 255) { color->g = (color->g < 0) ? 0 : 255; }
+	color->b = (color->b * colorscale->b) >> 8;
 	if ((UINT16)color->b > 255) { color->b = (color->b < 0) ? 0 : 255; }
 }
 

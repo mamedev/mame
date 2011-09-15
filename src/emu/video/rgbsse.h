@@ -284,13 +284,23 @@ INLINE void rgbaint_blend(rgbaint *color1, const rgbaint *color2, UINT8 color1sc
 
 /*-------------------------------------------------
     rgbint_scale_and_clamp - scale the given
-    color by an 8.8 scale factor and clamp to
-    byte values
+    color by an 8.8 scale factor, immediate or
+    per channel, and clamp to byte values
 -------------------------------------------------*/
 
-INLINE void rgbint_scale_and_clamp(rgbint *color, INT16 colorscale)
+INLINE void rgbint_scale_immediate_and_clamp(rgbint *color, INT16 colorscale)
 {
 	__m128i mscale = _mm_set1_epi16(colorscale);
+	*color = _mm_unpacklo_epi16(*color, _mm_setzero_si128());
+	*color = _mm_madd_epi16(*color, mscale);
+	*color = _mm_srli_epi32(*color, 8);
+	*color = _mm_packs_epi32(*color, *color);
+	*color = _mm_min_epi16(*color, *(__m128i *)&rgbsse_statics.maxbyte);
+}
+
+INLINE void rgbint_scale_channel_and_clamp(rgbint *color, const rgbint *colorscale)
+{
+	__m128i mscale = _mm_unpacklo_epi16(*colorscale, _mm_setzero_si128());
 	*color = _mm_unpacklo_epi16(*color, _mm_setzero_si128());
 	*color = _mm_madd_epi16(*color, mscale);
 	*color = _mm_srli_epi32(*color, 8);
@@ -301,13 +311,18 @@ INLINE void rgbint_scale_and_clamp(rgbint *color, INT16 colorscale)
 
 /*-------------------------------------------------
     rgbaint_scale_and_clamp - scale the given
-    color by an 8.8 scale factor and clamp to
-    byte values
+    color by an 8.8 scale factor, immediate or
+    per channel, and clamp to byte values
 -------------------------------------------------*/
 
-INLINE void rgbaint_scale_and_clamp(rgbaint *color, INT16 colorscale)
+INLINE void rgbaint_scale_immediate_and_clamp(rgbaint *color, INT16 colorscale)
 {
-	rgbint_scale_and_clamp(color, colorscale);
+	rgbint_scale_immediate_and_clamp(color, colorscale);
+}
+
+INLINE void rgbaint_scale_channel_and_clamp(rgbaint *color, const rgbint *colorscale)
+{
+	rgbint_scale_channel_and_clamp(color, color);
 }
 
 
