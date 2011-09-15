@@ -98,12 +98,12 @@ void serial_image_device::device_start()
 	transmit_register_reset();
 	receive_register_reset();
 
-	set_transmit_state(m_transmit_on_start ? 1 :0);
-
 	device_serial_interface *intf = NULL;
-	device_t *dev = machine().device(m_tag_connected);
-	if (dev!=NULL && dev->interface(intf)) {
-		intf->connect(this);
+	if (m_tag_connected) {
+		device_t *dev = machine().device(m_tag_connected);
+		if (dev!=NULL && dev->interface(intf)) {
+			intf->connect(this);
+		}
 	}
 }
 
@@ -290,6 +290,7 @@ bool serial_image_device::call_load()
 	if (load_internal(&data, &data_length))
 	{
 		data_stream_init(&m_transmit, data, data_length);
+		set_transmit_state(m_transmit_on_start ? 1 :0);		
 		return IMAGE_INIT_PASS;
 	}
 
