@@ -242,18 +242,15 @@ MC6845_UPDATE_ROW( whitestar_update_row )
 {
 	whitestar_state *state = device->machine().driver_data<whitestar_state>();
 	UINT8 *vram  = state->m_vram + ((ma & 0x100)<<2) + (ra << 4);
+	int xi;
+
 	for (int x = 0; x < 128/8; x++)
 	{
 		UINT16 val = (vram[x]<<8) + vram[x+0x200];
 		val = BITSWAP16(val,15,7,14,6,13,5,12,4,11,3,10,2,9,1,8,0);
-		*BITMAP_ADDR16(bitmap, ra, x*8 +0)  = (val>>14) & 0x03;
-		*BITMAP_ADDR16(bitmap, ra, x*8 +1)  = (val>>12) & 0x03;
-		*BITMAP_ADDR16(bitmap, ra, x*8 +2)  = (val>>10) & 0x03;
-		*BITMAP_ADDR16(bitmap, ra, x*8 +3)  = (val>>8)  & 0x03;
-		*BITMAP_ADDR16(bitmap, ra, x*8 +4)  = (val>>6)  & 0x03;
-		*BITMAP_ADDR16(bitmap, ra, x*8 +5)  = (val>>4)  & 0x03;
-		*BITMAP_ADDR16(bitmap, ra, x*8 +6)  = (val>>2)  & 0x03;
-		*BITMAP_ADDR16(bitmap, ra, x*8 +7)  = (val>>0)  & 0x03;
+
+		for(xi=0;xi<8;xi++)
+			*BITMAP_ADDR16(bitmap, ra, x*8 + xi)  = (val>>(14-xi*2)) & 0x03;
 	}
 }
 
