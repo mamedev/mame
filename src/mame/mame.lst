@@ -6602,10 +6602,10 @@ fantasyu		// (c) 1981 Rock-Ola
 fantasyj		// (c) 1981 SNK
 pballoon		// (c) 1982 SNK
 pballoonr		// (c) 1982 SNK (Rock-Ola license)
-nibbler			// (c) 1982 Rock-ola
-nibblera		// (c) 1982 Rock-ola
-nibblerb		// (c) 1982 Rock-ola
-nibblero		// (c) 1982 Olympia
+nibbler			// (c) 1982 Rock-ola (version 9)
+nibbler8		// (c) 1982 Rock-ola (version 8)
+nibbler6		// (c) 1982 Rock-ola (vresion 6)
+nibblero		// (c) 1983 Olympia/Rock-Ola (version 8)
 
 // later SNK games, each game can be identified by PCB code and ROM
 // code, the ROM code is the same between versions, and usually based

@@ -112,6 +112,22 @@ Interrupts: VBlank causes an IRQ. Coin insertion causes a NMI.
 
 ****************************************************************************
 
+Nibbler information:
+
+Version Number -  Hold DOWN on controller after crosshatch appears.  A number
+will show up to the right of the primary game creator's initials "JU".
+
+The music that has been in MAME for this game since it was first added
+is not from Nibbler!  IC51 is a leftover from the game board to which the
+conversion kit for Nibbler was applied, a Pioneer Balloon, and is where MAME's
+original rom dump came from.  Both the dedicated cabinet boards and the
+conversion kit boards for Nibbler never came with nor do the manuals for them
+list an "iC51" in the part list breakdown.  In fact, sound roms between different
+games using the snk6502 custom sound can largely be interchanged with another
+using the same.
+
+****************************************************************************
+
 Stephh's notes (based on the games M6502 code and some tests) :
 
 1a) 'vanguard'
@@ -206,7 +222,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
   - 3 letters when you enter your initials
   - "CREDIT" is displayed
 
-4a) 'nibbler'
+4a) 'nibbler6'
 
   - "Lives settings" : 3, 4, 5 or 6 (table at 0x4edf)
   - Bonus life every 4 levels
@@ -215,7 +231,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
       * bit 2 = 0 : pause for 13 frames
       * bit 2 = 1 : no pause
 
-4b) 'nibblera'
+4b) 'nibbler'
 
   - "Lives settings" : 3, 4, 5 or 6 (table at 0x5bf0)
   - Bonus life every 4 levels
@@ -225,24 +241,24 @@ Stephh's notes (based on the games M6502 code and some tests) :
     However, there is extra code where it is tested to determine difficulty
     (code at 0x31b4 and 0x32f5 - tables at 0x3391 and 0x33b2)
 
-4c) 'nibblerb'
+4c) 'nibbler8'
 
-  - code based on 'nibblera'
+  - code based on 'nibbler'
   - "Lives settings" : 2, 3, 4 or 5 (table at 0x5be7)
   - Bonus life every 4 levels
   - Detailed instructions
   - The snake ALWAYS pauses for 13 frames (code at 0x3b38) when it touches a corner
-    and DSW bit 2 determines difficulty as in 'nibblera'
+    and DSW bit 2 determines difficulty as in 'nibbler'
     (code at 0x31b0 and 0x32f1 - tables at 0x338d and 0x33ae)
 
 4d) 'nibblero'
 
-  - code is the same as 'nibblerb' (same routines, same code and tables addresses)
+  - code is the same as 'nibbler8' (same routines, same code and tables addresses)
   - "Lives settings" : 2, 3, 4 or 5 (table at 0x5be7)
   - Bonus life every 8 levels
   - Detailed instructions
   - The snake ALWAYS pauses for 13 frames (code at 0x3b38) when it touches a corner
-    and DSW bit 2 determines difficulty as in 'nibblera'
+    and DSW bit 2 determines difficulty as in 'nibbler'
     (code at 0x31b0 and 0x32f1 - tables at 0x338d and 0x33ae)
   - The game is harder than 'nibblerb' because the tables at 0x338d and 0x33ae
     have higher values; so the snake goes faster and grows longer.
@@ -619,9 +635,9 @@ static INPUT_PORTS_START( nibbler )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "Pause at Corners" ) PORT_DIPLOCATION("SW1:!3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
@@ -638,17 +654,8 @@ static INPUT_PORTS_START( nibbler )
 	PORT_DIPSETTING(    0x80, "1 Coin/1 Credit 2/3" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( nibblera )
+static INPUT_PORTS_START( nibbler8 )
 	PORT_INCLUDE(nibbler)
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:!3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( nibblerb )
-	PORT_INCLUDE(nibblera)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:!1,!2")
@@ -656,6 +663,15 @@ static INPUT_PORTS_START( nibblerb )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nibbler6 )
+	PORT_INCLUDE(nibbler8)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x04, 0x00, "Pause at Corners" ) PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1309,7 +1325,6 @@ ROM_START( pballoon )
 	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
 ROM_END
 
-
 ROM_START( pballoonr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk7_ic12.bin",        0x3000, 0x1000, CRC(dfe2ae05) SHA1(21c98bef9d4d5fcb65ce5e9b20cde2259840459e) )
@@ -1335,15 +1350,14 @@ ROM_START( pballoonr )
 	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
 ROM_END
 
-
-ROM_START( nibbler )
+ROM_START( nibbler ) /* revision 9 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "g-0960-52.ic12", 0x3000, 0x1000, CRC(ac6a802b) SHA1(ac1072e30994f13097663dc24d9d1dc35a95d874) )
-	ROM_LOAD( "g-0960-48.ic7",  0x4000, 0x1000, CRC(35971364) SHA1(6430c7be9e5f47d3f1f2cc157d949246e4085e8b) )
-	ROM_LOAD( "g-0960-49.ic8",  0x5000, 0x1000, CRC(6b33b806) SHA1(29444e45bf5a6ab1d86e0aa19dc6c1bc64ba633f) )
-	ROM_LOAD( "g-0960-50.ic9",  0x6000, 0x1000, CRC(91a4f98d) SHA1(678c7e8c91a7fdba8dc2faff4192eb0964abdb3f) )
-	ROM_LOAD( "g-0960-51.ic10", 0x7000, 0x1000, CRC(a151d934) SHA1(6681bdcd84cf62b40b2430ff530cb3c9aa36656c) )
-	ROM_LOAD( "g-0960-53.ic14", 0x8000, 0x1000, CRC(063f05cc) SHA1(039ac1b007cb817ae0902484ca611ae7076930d6) )
+	ROM_LOAD( "g-0960-52.ic12", 0x3000, 0x1000, CRC(6dfa1be5) SHA1(bb265702a2f74cb7d5ba27081f9fb2fe01dd95a5) )
+	ROM_LOAD( "g-0960-48.ic7",  0x4000, 0x1000, CRC(808e1a03) SHA1(a747a16ee0c8cb803b72ac84e80f791b2bf1813a) )
+	ROM_LOAD( "g-0960-49.ic8",  0x5000, 0x1000, CRC(1571d4a2) SHA1(42cbaa262c2265d904fd5844c0d3c63d3beb67a8) )
+	ROM_LOAD( "g-0960-50.ic9",  0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) )
+	ROM_LOAD( "g-0960-51.ic10", 0x7000, 0x1000, CRC(a6b5abe5) SHA1(a0f228dac801a54dfa1947d6b2f6b4e3d005e0b2) )
+	ROM_LOAD( "g-0960-53.ic14", 0x8000, 0x1000, CRC(9f537185) SHA1(619df63f4df38014dc229f614043f867e6a5aa51) )
 	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
 	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
 	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
@@ -1358,45 +1372,18 @@ ROM_START( nibbler )
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
 	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
-	ROM_LOAD( "g-0959-43.ic51", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
+	ROM_FILL( 0x0000, 0x0800, 0xff )  // Game does not have a populated IC51
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
 
-ROM_START( nibblera )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic12",           0x3000, 0x1000, CRC(6dfa1be5) SHA1(bb265702a2f74cb7d5ba27081f9fb2fe01dd95a5) )
-	ROM_LOAD( "ic7",            0x4000, 0x1000, CRC(808e1a03) SHA1(a747a16ee0c8cb803b72ac84e80f791b2bf1813a) )
-	ROM_LOAD( "ic8",            0x5000, 0x1000, CRC(1571d4a2) SHA1(42cbaa262c2265d904fd5844c0d3c63d3beb67a8) )
-	ROM_LOAD( "ic9",            0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) )
-	ROM_LOAD( "ic10",           0x7000, 0x1000, CRC(a6b5abe5) SHA1(a0f228dac801a54dfa1947d6b2f6b4e3d005e0b2) )
-	ROM_LOAD( "ic14",           0x8000, 0x1000, CRC(9f537185) SHA1(619df63f4df38014dc229f614043f867e6a5aa51) )
-	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
-	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
-	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
-	ROM_LOAD( "g-0960-56.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "g-0960-57.ic50", 0x0000, 0x1000, CRC(01d4d0c2) SHA1(5a8026210a872351ce4e39e27f6479d3ca0689e2) )
-	ROM_LOAD( "g-0960-58.ic51", 0x1000, 0x1000, CRC(feff7faf) SHA1(50005502578a4ea9b9c8f36998670b787d2d0b20) )
-
-	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
-	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
-
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
-	ROM_LOAD( "g-0959-43.ic51", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
-	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
-	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
-ROM_END
-
-ROM_START( nibblerb )
+ROM_START( nibbler8 ) /* revision 8 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "50-144.012",     0x3000, 0x1000, CRC(68af8f4b) SHA1(be6ddd3a9abb05563c927b1ec54dbaab44b65492) )
 	ROM_LOAD( "50-140.007",     0x4000, 0x1000, CRC(c18b3009) SHA1(c3703d0300f5f1546417ecdc27ab747d9c7eb267) )
 	ROM_LOAD( "50-141.008",     0x5000, 0x1000, CRC(b50fd79c) SHA1(cd9847bf8d570ca9411d1bbcbccb3c94220349f9) )
-	ROM_LOAD( "ic9",            0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) ) // 50-142.009
-	ROM_LOAD( "ic10",           0x7000, 0x1000, CRC(a6b5abe5) SHA1(a0f228dac801a54dfa1947d6b2f6b4e3d005e0b2) ) // 50-143.010
+	ROM_LOAD( "g-0960-50.ic9",  0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) ) // 50-142.009
+	ROM_LOAD( "g-0960-51.ic10", 0x7000, 0x1000, CRC(a6b5abe5) SHA1(a0f228dac801a54dfa1947d6b2f6b4e3d005e0b2) ) // 50-143.010
 	ROM_LOAD( "50-145.014",     0x8000, 0x1000, CRC(29ea246a) SHA1(bf1afbddbea5ab7e93e5ac69c6445749dd65ed3b) )
 	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
 	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) ) // 50-146.015
@@ -1412,12 +1399,39 @@ ROM_START( nibblerb )
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
 	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
-	ROM_LOAD( "g-0959-43.ic51", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) // not in this set / board according to readme but it seems to be needed?!
+	ROM_FILL( 0x0000, 0x0800, 0xff )  // Game does not have a populated IC51
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) ) // 50-152.052
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) ) // 50-151.053
 ROM_END
 
-ROM_START( nibblero )
+ROM_START( nibbler6 ) /* revision 6 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic12",           0x3000, 0x1000, CRC(ac6a802b) SHA1(ac1072e30994f13097663dc24d9d1dc35a95d874) ) // ic12
+	ROM_LOAD( "ic7",            0x4000, 0x1000, CRC(35971364) SHA1(6430c7be9e5f47d3f1f2cc157d949246e4085e8b) ) // ic7
+	ROM_LOAD( "ic8",            0x5000, 0x1000, CRC(6b33b806) SHA1(29444e45bf5a6ab1d86e0aa19dc6c1bc64ba633f) ) // ic8
+	ROM_LOAD( "ic9",            0x6000, 0x1000, CRC(91a4f98d) SHA1(678c7e8c91a7fdba8dc2faff4192eb0964abdb3f) ) // ic9
+	ROM_LOAD( "ic10",           0x7000, 0x1000, CRC(a151d934) SHA1(6681bdcd84cf62b40b2430ff530cb3c9aa36656c) ) // ic10
+	ROM_LOAD( "ic14",           0x8000, 0x1000, CRC(063f05cc) SHA1(039ac1b007cb817ae0902484ca611ae7076930d6) ) // ic14
+	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
+	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
+	ROM_LOAD( "g-0960-56.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "g-0960-57.ic50", 0x0000, 0x1000, CRC(01d4d0c2) SHA1(5a8026210a872351ce4e39e27f6479d3ca0689e2) )
+	ROM_LOAD( "g-0960-58.ic51", 0x1000, 0x1000, CRC(feff7faf) SHA1(50005502578a4ea9b9c8f36998670b787d2d0b20) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
+	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
+
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_FILL( 0x0000, 0x0800, 0xff )  // Game does not have a populated IC51
+	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
+	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
+ROM_END
+
+ROM_START( nibblero ) /* revision 8 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "50-144g.012",    0x3000, 0x1000, CRC(1093f525) SHA1(6a63372300765acdbac1d2e30fd73af7773de80f) )
 	ROM_LOAD( "50-140g.007",    0x4000, 0x1000, CRC(848651dd) SHA1(a5aafbcca42baca8d0d5d28546733aefc778ba99) )
@@ -1439,7 +1453,7 @@ ROM_START( nibblero )
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
 	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
-	ROM_LOAD( "g-0959-43.ic51", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
+	ROM_FILL( 0x0000, 0x0800, 0xff )  // Game does not have a populated IC51
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1463,7 +1477,7 @@ GAME( 1981, fantasyu, fantasy,  fantasy,  fantasyu, 0, ROT90, "SNK (Rock-Ola lic
 GAME( 1981, fantasyj, fantasy,  fantasy,  fantasyu, 0, ROT90, "SNK", "Fantasy (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1982, pballoon, 0,        pballoon, pballoon, 0, ROT90, "SNK", "Pioneer Balloon", 0 )
 GAME( 1982, pballoonr,pballoon, pballoon, pballoon, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", 0 )
-GAME( 1982, nibbler,  0,        nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 1)", 0 )
-GAME( 1982, nibblera, nibbler,  nibbler,  nibblera, 0, ROT90, "Rock-Ola", "Nibbler (set 2)", 0 )
-GAME( 1982, nibblerb, nibbler,  nibbler,  nibblerb, 0, ROT90, "Rock-Ola", "Nibbler (set 3)", 0 )
-GAME( 1983, nibblero, nibbler,  nibbler,  nibblerb, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia)", 0 )
+GAME( 1982, nibbler,  0,        nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (rev 9)", 0 )
+GAME( 1982, nibbler8, nibbler,  nibbler,  nibbler8, 0, ROT90, "Rock-Ola", "Nibbler (rev 8)", 0 )
+GAME( 1982, nibbler6, nibbler,  nibbler,  nibbler6, 0, ROT90, "Rock-Ola", "Nibbler (rev 6)", 0 )
+GAME( 1983, nibblero, nibbler,  nibbler,  nibbler8, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", 0 )
