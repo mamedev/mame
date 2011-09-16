@@ -262,6 +262,40 @@ static INPUT_PORTS_START( hidnctch )
 	PORT_BIT( 0xfffffffc, IP_ACTIVE_LOW, IPT_UNUSED	)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( candy )
+	PORT_INCLUDE(common)
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x00000001, 0x00000001, DEF_STR( Free_Play ) ) // always has 1 credit
+	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000020, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( hidctch3 )
 	PORT_INCLUDE(common)
 	PORT_MODIFY("IN0")
@@ -1199,7 +1233,7 @@ GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith,   ROT0, "Eolith", 
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
-GAME( 1999, candy,     0,        eolith50, hidnctch,  eolith,   ROT0, "Eolith", "Candy Candy",  GAME_NOT_WORKING | GAME_NO_SOUND ) // seems to have logic bugs, and coin bugs (game can be started with no coin, but refuses to start first time.. some stages clear without clearing)
+GAME( 1999, candy,     0,        eolith50, candy,	  eolith,   ROT0, "Eolith", "Candy Candy",  GAME_NOT_WORKING | GAME_NO_SOUND ) // seems to have logic bugs - how to play screen displayed AFTER 'ready' 'go' messages? how to play can only be skipped if a coin is present?  also you don't need to clear all blocks to clear a level?
 GAME( 1999, hidctch2,  0,        eolith50, hidnctch,  hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", GAME_NO_SOUND )
 GAME( 1999, hidctch2a, hidctch2, eolith50, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", GAME_NO_SOUND )
 GAME( 1999, landbrk,   0,        eolith45, landbrk,   landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
