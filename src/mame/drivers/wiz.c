@@ -73,6 +73,10 @@ TODO:
   almost identical, except for three patches affecting noise period, noise
   channel C enable and channel C volume. So it looks just like a bug in the
   original (weird), or some strange form of protection.
+  Another possible assumption is that it has a nonstandard AY hookup, where
+  channel C is not directly mixed with channels A and B but is either
+  disconnected or gated by something else first or filtered. scionc on the
+  other hand is a 'normal' hookup.
 
 Wiz:
 - Possible sprite/char priority issues.
