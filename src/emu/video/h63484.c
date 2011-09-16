@@ -13,6 +13,7 @@
 #include "h63484.h"
 
 #define LOG 1
+#define FIFO_LOG 0
 
 // default address map
 static ADDRESS_MAP_START( h63484_vram, AS_0, 8 )
@@ -40,6 +41,7 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	m_org_dpd(0),
 	m_cl0(0),
 	m_cl1(0),
+	m_dcr(0),
 	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(h63484_vram))
 {
 	m_shortname = "h63484";
@@ -509,6 +511,19 @@ inline void h63484_device::dequeue_r(UINT8 *data)
 	}
 }
 
+//-------------------------------------------------
+//  recompute_parameters -
+//-------------------------------------------------
+
+inline void h63484_device::recompute_parameters()
+{
+	if(m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
+		return;
+
+	printf("HC %d HSW %d HDS %d HDW %d HWS %d HWW %d\n",m_hc,m_hsw,m_hds,m_hdw,m_hws,m_hww);
+	printf("VC %d VDS %d VSW %d VWS %d VWW %d\n",m_vc,m_vds,m_vsw,m_vws,m_vww);
+}
+
 /*-------------------------------------------------
     ADDRESS_MAP( h63484 )
 -------------------------------------------------*/
@@ -846,7 +861,31 @@ void h63484_device::exec_abort_sequence()
 	m_sr = H63484_SR_WFR | H63484_SR_WFE | H63484_SR_CED; // hard-set to 0x23
 }
 
-void h63484_device::check_video_registers(int offset)
+UINT16 h63484_device::video_registers_r(int offset)
+{
+	UINT16 res;
+
+	res = 0;
+
+	switch(offset)
+	{
+		case 0x06:
+			res = m_dcr;
+			break;
+
+		case 0x80:
+			res = m_screen->vpos() & 0xfff; // Raster Count
+			break;
+
+		default:
+			if(LOG) printf("%s R\n",acrtc_regnames[m_ar/2]);
+			break;
+	}
+
+	return res;
+}
+
+void h63484_device::video_registers_w(int offset)
 {
 	UINT16 vreg_data;
 
@@ -856,10 +895,60 @@ void h63484_device::check_video_registers(int offset)
 	{
 		case 0x00: // FIFO entry, not covered there
 			break;
+
 		case 0x02: // Command Entry
-			if(vreg_data & 0x8000) // abort sequence
+
+			if(vreg_data & 0x8000) // abort sequence (ABT)
 				exec_abort_sequence();
+
+			/*
+			x--- ---- ---- ---- ABorT
+			-x-- ---- ---- ---- PauSE
+			...
+			---- -xxx ---- ---- Graphic Bit Mode (bpp)
+			---- ---- xxxx xxxx irq mask, directly correlated to sr
+			*/
+			m_ccr = vreg_data;
 			break;
+
+		case 0x06:
+			m_dcr = vreg_data;
+			break;
+
+		case 0x82: // Horizontal Sync Register
+			m_hc = ((vreg_data & 0xff00) >> 8) + 1;
+			m_hsw = vreg_data & 0x1f;
+			recompute_parameters();
+			break;
+		case 0x84: // Horizontal Display Register
+			m_hds = ((vreg_data & 0xff00) >> 8) + 1;
+			m_hdw = ((vreg_data & 0x00ff) >> 8) + 1;
+			recompute_parameters();
+			break;
+		case 0x92: // Horizontal Window Register
+			m_hws = ((vreg_data & 0xff00) >> 8) + 1;
+			m_hww = ((vreg_data & 0x00ff) >> 8) + 1;
+			recompute_parameters();
+			break;
+
+		case 0x86: // Vertical Sync Register
+			m_vc = (vreg_data & 0xfff);
+			recompute_parameters();
+			break;
+		case 0x88: // Vertical Display Register
+			m_vds = ((vreg_data & 0xff00) >> 8) + 1;
+			m_vsw = (vreg_data & 0x1f);
+			recompute_parameters();
+			break;
+		case 0x94: // Vertical Window Register A
+			m_vws = (vreg_data & 0xfff) + 1;
+			recompute_parameters();
+			break;
+		case 0x96: // Vertical Window Register B
+			m_vww = (vreg_data & 0xfff);
+			recompute_parameters();
+			break;
+
 		case 0xc2: // Memory Width Register
 		case 0xca:
 		case 0xd2:
@@ -894,13 +983,7 @@ READ16_MEMBER( h63484_device::data_r )
 		res |= data & 0xff;
 	}
 	else
-	{
-		if(m_ar == 0x80)
-			res = m_screen->vpos() & 0xfff; // Raster Count
-		else
-			if(LOG) printf("%s R\n",acrtc_regnames[m_ar/2]);
-
-	}
+		res = video_registers_r(m_ar);
 
 	return res;
 }
@@ -923,11 +1006,11 @@ WRITE16_MEMBER( h63484_device::data_w )
 	{
 		queue_w((data & 0xff00) >> 8);
 		queue_w((data & 0x00ff) >> 0);
-		if(LOG) printf("%s -> %02x\n",acrtc_regnames[m_ar/2],data);
+		if(FIFO_LOG) printf("%s -> %02x\n",acrtc_regnames[m_ar/2],data);
 		process_fifo();
 	}
 	else
-		check_video_registers(m_ar);
+		video_registers_w(m_ar);
 
 	if(m_ar & 0x80)
 	{
@@ -959,5 +1042,8 @@ void h63484_device::device_reset()
 
 void h63484_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	// ...
+	if(m_dcr & 0x8000) // correct?
+	{
+		// ...
+	}
 }

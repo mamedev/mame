@@ -156,7 +156,14 @@ class adp_state : public driver_device
 {
 public:
 	adp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_h63484(*this, "h63484")
+		{ }
+
+	required_device<h63484_device> m_h63484;
+
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	/* misc */
 	UINT8 m_mux_data;
@@ -166,13 +173,90 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_duart;
-	device_t *m_h63484;
 };
+
+void adp_state::video_start()
+{
+	VIDEO_START_NAME(generic_bitmapped)(machine());
+}
+
 
 static H63484_DISPLAY_PIXELS( acrtc_display_pixels )
 {
 	// ...
 }
+
+bool adp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	bitmap_fill(&bitmap, &cliprect, 0);
+
+	/* graphics */
+	m_h63484->update_screen(&bitmap, &cliprect);
+
+	return 0;
+}
+
+
+#if 0
+static SCREEN_UPDATE( adp )
+{
+	adp_state *state = screen->machine().driver_data<adp_state>();
+
+	state->m_h63484->update_screen(bitmap, cliprect);
+
+	#if 0
+	adp_state *state = screen->machine().driver_data<adp_state>();
+	int x, y, b, src;
+
+	b = ((hd63484_regs_r(state->m_hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->m_hd63484, 0xce/2, 0xffff);
+
+	for (y = 0;y < 280;y++)
+	{
+		for (x = 0 ; x < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
+		{
+			b &= (HD63484_RAM_SIZE - 1);
+			src = hd63484_ram_r(state->m_hd63484, b, 0xffff);
+			*BITMAP_ADDR16(bitmap, y, x    ) = ((src & 0x000f) >>  0) << 0;
+			*BITMAP_ADDR16(bitmap, y, x + 1) = ((src & 0x00f0) >>  4) << 0;
+			*BITMAP_ADDR16(bitmap, y, x + 2) = ((src & 0x0f00) >>  8) << 0;
+			*BITMAP_ADDR16(bitmap, y, x + 3) = ((src & 0xf000) >> 12) << 0;
+			b++;
+		}
+	}
+if (!screen->machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
+	if ((hd63484_regs_r(state->m_hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
+	{
+		int sy = (hd63484_regs_r(state->m_hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(state->m_hd63484, 0x88/2, 0xffff) >> 8);
+		int h = hd63484_regs_r(state->m_hd63484, 0x96/2, 0xffff) & 0x0fff;
+		int sx = ((hd63484_regs_r(state->m_hd63484, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(state->m_hd63484, 0x84/2, 0xffff) >> 8)) * 2 * 2;
+		int w = (hd63484_regs_r(state->m_hd63484, 0x92/2, 0xffff) & 0xff) * 2;
+		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
+
+		b = (((hd63484_regs_r(state->m_hd63484, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->m_hd63484, 0xde/2, 0xffff));
+
+		for (y = sy ; y <= sy + h && y < 280 ; y++)
+		{
+			for (x = 0 ; x < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
+			{
+				b &= (HD63484_RAM_SIZE - 1);
+				src = hd63484_ram_r(state->m_hd63484, b, 0xffff);
+
+				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4)
+				{
+					*BITMAP_ADDR16(bitmap, y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
+					*BITMAP_ADDR16(bitmap, y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
+					*BITMAP_ADDR16(bitmap, y, x + sx + 2) = ((src & 0x0f00) >>  8) << 0;
+					*BITMAP_ADDR16(bitmap, y, x + sx + 3) = ((src & 0xf000) >> 12) << 0;
+				}
+				b++;
+			}
+		}
+	}
+	#endif
+
+	return 0;
+}
+#endif
 
 /***************************************************************************
 
@@ -212,7 +296,7 @@ static MACHINE_START( skattv )
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_duart = machine.device("duart68681");
-	state->m_h63484 = machine.device("h63484");
+	//state->m_h63484 = machine.device("h63484");
 
 	state->save_item(NAME(state->m_mux_data));
 	state->save_item(NAME(state->m_register_active));
@@ -288,90 +372,6 @@ static PALETTE_INIT( adp )
 
         palette_set_color(machine, i, MAKE_RGB(r,g,b));
     }
-}
-
-static VIDEO_START(adp)
-{
-
-}
-
-static SCREEN_UPDATE( adp )
-{
-	#if 0
-	adp_state *state = screen->machine().driver_data<adp_state>();
-	int x, y, b, src;
-
-	b = ((hd63484_regs_r(state->m_hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->m_hd63484, 0xce/2, 0xffff);
-#if 1
-	if (screen->machine().input().code_pressed(KEYCODE_M)) b = 0;
-	if (screen->machine().input().code_pressed(KEYCODE_Q)) b += 0x2000 * 1;
-	if (screen->machine().input().code_pressed(KEYCODE_W)) b += 0x2000 * 2;
-	if (screen->machine().input().code_pressed(KEYCODE_E)) b += 0x2000 * 3;
-	if (screen->machine().input().code_pressed(KEYCODE_R)) b += 0x2000 * 4;
-	if (screen->machine().input().code_pressed(KEYCODE_T)) b += 0x2000 * 5;
-	if (screen->machine().input().code_pressed(KEYCODE_Y)) b += 0x2000 * 6;
-	if (screen->machine().input().code_pressed(KEYCODE_U)) b += 0x2000 * 7;
-	if (screen->machine().input().code_pressed(KEYCODE_I)) b += 0x2000 * 8;
-	if (screen->machine().input().code_pressed(KEYCODE_A)) b += 0x2000 * 9;
-	if (screen->machine().input().code_pressed(KEYCODE_S)) b += 0x2000 * 10;
-	if (screen->machine().input().code_pressed(KEYCODE_D)) b += 0x2000 * 11;
-	if (screen->machine().input().code_pressed(KEYCODE_F)) b += 0x2000 * 12;
-	if (screen->machine().input().code_pressed(KEYCODE_G)) b += 0x2000 * 13;
-	if (screen->machine().input().code_pressed(KEYCODE_H)) b += 0x2000 * 14;
-	if (screen->machine().input().code_pressed(KEYCODE_J)) b += 0x2000 * 15;
-	if (screen->machine().input().code_pressed(KEYCODE_K)) b += 0x2000 * 16;
-	if (screen->machine().input().code_pressed(KEYCODE_Z)) b += 0x2000 * 17;
-	if (screen->machine().input().code_pressed(KEYCODE_X)) b += 0x2000 * 18;
-	if (screen->machine().input().code_pressed(KEYCODE_C)) b += 0x2000 * 19;
-	if (screen->machine().input().code_pressed(KEYCODE_V)) b += 0x2000 * 20;
-	if (screen->machine().input().code_pressed(KEYCODE_B)) b += 0x2000 * 21;
-	if (screen->machine().input().code_pressed(KEYCODE_N)) b += 0x2000 * 22;
-#endif
-	for (y = 0;y < 280;y++)
-	{
-		for (x = 0 ; x < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
-		{
-			b &= (HD63484_RAM_SIZE - 1);
-			src = hd63484_ram_r(state->m_hd63484, b, 0xffff);
-			*BITMAP_ADDR16(bitmap, y, x    ) = ((src & 0x000f) >>  0) << 0;
-			*BITMAP_ADDR16(bitmap, y, x + 1) = ((src & 0x00f0) >>  4) << 0;
-			*BITMAP_ADDR16(bitmap, y, x + 2) = ((src & 0x0f00) >>  8) << 0;
-			*BITMAP_ADDR16(bitmap, y, x + 3) = ((src & 0xf000) >> 12) << 0;
-			b++;
-		}
-	}
-if (!screen->machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
-	if ((hd63484_regs_r(state->m_hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
-	{
-		int sy = (hd63484_regs_r(state->m_hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(state->m_hd63484, 0x88/2, 0xffff) >> 8);
-		int h = hd63484_regs_r(state->m_hd63484, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((hd63484_regs_r(state->m_hd63484, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(state->m_hd63484, 0x84/2, 0xffff) >> 8)) * 2 * 2;
-		int w = (hd63484_regs_r(state->m_hd63484, 0x92/2, 0xffff) & 0xff) * 2;
-		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
-
-		b = (((hd63484_regs_r(state->m_hd63484, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->m_hd63484, 0xde/2, 0xffff));
-
-		for (y = sy ; y <= sy + h && y < 280 ; y++)
-		{
-			for (x = 0 ; x < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
-			{
-				b &= (HD63484_RAM_SIZE - 1);
-				src = hd63484_ram_r(state->m_hd63484, b, 0xffff);
-
-				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4)
-				{
-					*BITMAP_ADDR16(bitmap, y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
-					*BITMAP_ADDR16(bitmap, y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
-					*BITMAP_ADDR16(bitmap, y, x + sx + 2) = ((src & 0x0f00) >>  8) << 0;
-					*BITMAP_ADDR16(bitmap, y, x + sx + 3) = ((src & 0xf000) >> 12) << 0;
-				}
-				b++;
-			}
-		}
-	}
-	#endif
-
-	return 0;
 }
 
 static READ16_HANDLER( test_r )
@@ -674,12 +674,12 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE(adp)
+//	MCFG_SCREEN_UPDATE(adp)
 
 	MCFG_PALETTE_LENGTH(0x10)
 
 	MCFG_PALETTE_INIT(adp)
-	MCFG_VIDEO_START(adp)
+//	MCFG_VIDEO_START(adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -707,12 +707,12 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE(adp)
+//	MCFG_SCREEN_UPDATE(adp)
 
 	MCFG_PALETTE_LENGTH(0x10)
 
 	MCFG_PALETTE_INIT(adp)
-	MCFG_VIDEO_START(adp)
+//	MCFG_VIDEO_START(adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -739,12 +739,12 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(adp)
+//	MCFG_SCREEN_UPDATE(adp)
 
 	MCFG_PALETTE_LENGTH(0x10)
 
 //  MCFG_PALETTE_INIT(adp)
-	MCFG_VIDEO_START(adp)
+//	MCFG_VIDEO_START(adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 

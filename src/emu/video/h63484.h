@@ -77,6 +77,7 @@ private:
 	inline void fifo_r_clear();
 	inline void queue_r(UINT8 data);
 	inline void dequeue_r(UINT8 *data);
+	inline void recompute_parameters();
 
 	void command_end_seq();
 	void command_wpr_exec();
@@ -84,7 +85,8 @@ private:
 	void command_cpy_exec();
 	void process_fifo();
 	void exec_abort_sequence();
-	void check_video_registers(int offset);
+	UINT16 video_registers_r(int offset);
+	void video_registers_w(int offset);
 	int translate_command(UINT16 data);
 
 
@@ -123,6 +125,15 @@ private:
 
 	UINT16 m_pram[0x10];
 	UINT8 m_dn;
+
+	UINT16 m_ccr;
+	UINT16 m_dcr;
+
+	UINT16 m_hc, m_hds, m_hdw, m_hws, m_hww;
+	UINT8 m_hsw;
+
+	UINT16 m_vc, m_vws, m_vww, m_vds;
+	UINT8 m_vsw;
 
 	const address_space_config		m_space_config;
 };
