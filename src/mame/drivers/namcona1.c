@@ -1168,16 +1168,30 @@ ROM_START( emeraldaja ) /* NA-1 Game PCB, parent is NA-2 version listed below */
         ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
-/* Known to exist, but not dumped is an English Exvania with progrom roms labeled EX2-EP0L & EX2-EPOU, unknown if NA-1 or NA-2 main */
 ROM_START( exvania )
 	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ex1-ep0l.bin", 0x080001, 0x080000, CRC(18c12015) SHA1(e4f3524e798545c434549719b377c8b5863f580f) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "ex1-ep0u.bin", 0x080000, 0x080000, CRC(07d054d1) SHA1(e2d2cb81acd309c519686572804648bef4cbd191) )
+	ROM_LOAD16_BYTE( "ex2-ep0l.4c", 0x080001, 0x080000, CRC(ccf46677) SHA1(f9d057a7b1c388323d49ef692f41242769f1a08c) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "ex2-ep0u.4f", 0x080000, 0x080000, CRC(37b8d890) SHA1(a0417a1b51d1206bd3eb5e7b58303a9a5691fa43) )
 
-	ROM_LOAD16_BYTE( "ex1-ma0l.bin", 0x280001, 0x100000, CRC(17922cd4) SHA1(af92c2335e7110c0c5e712f3148c1534d22d3814) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "ex1-ma0u.bin", 0x280000, 0x100000, CRC(93d66106) SHA1(c5d665db04ae0e8992ef46544e2cb7b0e27c8bfe) )
-	ROM_LOAD16_BYTE( "ex1-ma1l.bin", 0x480001, 0x100000, CRC(e4bba6ed) SHA1(6483ef91e5a5b8ddd13a3d889936c39829fa50d6) )
-	ROM_LOAD16_BYTE( "ex1-ma1u.bin", 0x480000, 0x100000, CRC(04e7c4b0) SHA1(78180d96cd1fae583617d4d227ed4ee24f2f9e29) )
+	ROM_LOAD16_BYTE( "ex1-ma0l.2c", 0x280001, 0x100000, CRC(17922cd4) SHA1(af92c2335e7110c0c5e712f3148c1534d22d3814) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "ex1-ma0u.2f", 0x280000, 0x100000, CRC(93d66106) SHA1(c5d665db04ae0e8992ef46544e2cb7b0e27c8bfe) )
+	ROM_LOAD16_BYTE( "ex1-ma1l.3c", 0x480001, 0x100000, CRC(e4bba6ed) SHA1(6483ef91e5a5b8ddd13a3d889936c39829fa50d6) )
+	ROM_LOAD16_BYTE( "ex1-ma1u.3f", 0x480000, 0x100000, CRC(04e7c4b0) SHA1(78180d96cd1fae583617d4d227ed4ee24f2f9e29) )
+
+	/* M37702 BIOS - labeled as Namco custom C69 */
+	ROM_REGION16_LE( 0x4000, "mcu", 0 )
+        ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+ROM_END
+
+ROM_START( exvaniaj )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ex1-ep0l.4c", 0x080001, 0x080000, CRC(18c12015) SHA1(e4f3524e798545c434549719b377c8b5863f580f) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "ex1-ep0u.4f", 0x080000, 0x080000, CRC(07d054d1) SHA1(e2d2cb81acd309c519686572804648bef4cbd191) )
+
+	ROM_LOAD16_BYTE( "ex1-ma0l.2c", 0x280001, 0x100000, CRC(17922cd4) SHA1(af92c2335e7110c0c5e712f3148c1534d22d3814) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "ex1-ma0u.2f", 0x280000, 0x100000, CRC(93d66106) SHA1(c5d665db04ae0e8992ef46544e2cb7b0e27c8bfe) )
+	ROM_LOAD16_BYTE( "ex1-ma1l.3c", 0x480001, 0x100000, CRC(e4bba6ed) SHA1(6483ef91e5a5b8ddd13a3d889936c39829fa50d6) )
+	ROM_LOAD16_BYTE( "ex1-ma1u.3f", 0x480000, 0x100000, CRC(04e7c4b0) SHA1(78180d96cd1fae583617d4d227ed4ee24f2f9e29) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1410,23 +1424,24 @@ ROM_START( xday2 )
 ROM_END
 
 // NA-1 (C69 MCU)
-GAME( 1992,bkrtmaq,    0,        namcona1w, namcona1_quiz,bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", 0 )
-GAME( 1992,cgangpzl,   0,        namcona1w, namcona1_joy, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", 0 )
-GAME( 1992,cgangpzlj,  cgangpzl, namcona1w, namcona1_joy, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (Japan)", 0 )
-GAME( 1992,exvania,    0,        namcona1,  namcona1_joy, exbania,  ROT0, "Namco", "Exvania (Japan)", 0 )
-GAME( 1992,fghtatck,   0,        namcona1,  namcona1_joy, fa,       ROT90,"Namco", "Fighter & Attacker (US)", 0 )
-GAME( 1992,fa,         fghtatck, namcona1,  namcona1_joy, fa,       ROT90,"Namco", "F/A (Japan)", 0 )
-GAME( 1992,swcourt,    0,        namcona1w, namcona1_joy, swcourt,  ROT0, "Namco", "Super World Court (World)", 0 )
-GAME( 1992,swcourtj,   swcourt,  namcona1w, namcona1_joy, swcourt,  ROT0, "Namco", "Super World Court (Japan)", 0 )
-GAME( 1993,emeraldaj,  emeralda, namcona1w, namcona1_joy, emeraldj, ROT0, "Namco", "Emeraldia (Japan Version B)", 0 ) /* Parent is below on NA-2 Hardware */
-GAME( 1993,emeraldaja, emeralda, namcona1w, namcona1_joy, emeraldj, ROT0, "Namco", "Emeraldia (Japan)", 0 ) /* Parent is below on NA-2 Hardware */
-GAME( 1993,tinklpit,   0,        namcona1w, namcona1_joy, tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", 0 )
+GAME( 1992, bkrtmaq,    0,        namcona1w, namcona1_quiz,bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", 0 )
+GAME( 1992, cgangpzl,   0,        namcona1w, namcona1_joy, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", 0 )
+GAME( 1992, cgangpzlj,  cgangpzl, namcona1w, namcona1_joy, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (Japan)", 0 )
+GAME( 1992, exvania,    0,        namcona1,  namcona1_joy, exbania,  ROT0, "Namco", "Exvania (World)", 0 )
+GAME( 1992, exvaniaj,   exvania,  namcona1,  namcona1_joy, exbania,  ROT0, "Namco", "Exvania (Japan)", 0 )
+GAME( 1992, fghtatck,   0,        namcona1,  namcona1_joy, fa,       ROT90,"Namco", "Fighter & Attacker (US)", 0 )
+GAME( 1992, fa,         fghtatck, namcona1,  namcona1_joy, fa,       ROT90,"Namco", "F/A (Japan)", 0 )
+GAME( 1992, swcourt,    0,        namcona1w, namcona1_joy, swcourt,  ROT0, "Namco", "Super World Court (World)", 0 )
+GAME( 1992, swcourtj,   swcourt,  namcona1w, namcona1_joy, swcourt,  ROT0, "Namco", "Super World Court (Japan)", 0 )
+GAME( 1993, emeraldaj,  emeralda, namcona1w, namcona1_joy, emeraldj, ROT0, "Namco", "Emeraldia (Japan Version B)", 0 ) /* Parent is below on NA-2 Hardware */
+GAME( 1993, emeraldaja, emeralda, namcona1w, namcona1_joy, emeraldj, ROT0, "Namco", "Emeraldia (Japan)", 0 ) /* Parent is below on NA-2 Hardware */
+GAME( 1993, tinklpit,   0,        namcona1w, namcona1_joy, tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", 0 )
 
 // NA-2 (C70 MCU)
-GAME( 1992,knckhead,  0,        namcona2,  namcona1_joy, knckhead, ROT0, "Namco", "Knuckle Heads (World)", 0 )
-GAME( 1992,knckheadj, knckhead, namcona2,  namcona1_joy, knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", 0 )
-GAME( 1993,emeralda,  0,        namcona2,  namcona1_joy, emeralda, ROT0, "Namco", "Emeraldia (World)", 0 )
-GAME( 1993,numanath,  0,        namcona2,  namcona1_joy, numanath, ROT0, "Namco", "Numan Athletics (World)", 0 )
-GAME( 1993,numanathj, numanath, namcona2,  namcona1_joy, numanath, ROT0, "Namco", "Numan Athletics (Japan)", 0 )
-GAME( 1993,quiztou,   0,        namcona2,  namcona1_quiz,quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", 0 )
-GAME( 1995,xday2,     0,        namcona2,  namcona1_joy, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, knckhead,  0,        namcona2,  namcona1_joy, knckhead, ROT0, "Namco", "Knuckle Heads (World)", 0 )
+GAME( 1992, knckheadj, knckhead, namcona2,  namcona1_joy, knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", 0 )
+GAME( 1993, emeralda,  0,        namcona2,  namcona1_joy, emeralda, ROT0, "Namco", "Emeraldia (World)", 0 )
+GAME( 1993, numanath,  0,        namcona2,  namcona1_joy, numanath, ROT0, "Namco", "Numan Athletics (World)", 0 )
+GAME( 1993, numanathj, numanath, namcona2,  namcona1_joy, numanath, ROT0, "Namco", "Numan Athletics (Japan)", 0 )
+GAME( 1993, quiztou,   0,        namcona2,  namcona1_quiz,quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", 0 )
+GAME( 1995, xday2,     0,        namcona2,  namcona1_joy, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
