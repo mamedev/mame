@@ -1438,6 +1438,42 @@ ROM_START( ec_supbxcon )
 	ROM_LOAD( "v120.bin", 0x0000, 0x020000, CRC(57ea3d86) SHA1(dbb12590aa735271b5f994f27726e61b6d52a1c0) )
 ROM_END
 
+ROM_START( ec_jackb )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// SREC file for ROM, needs converting later. Host it for now, convert later
+	ROM_LOAD( "jakx1v2.s28", 0x0000, 0x067738, CRC(e4f911dc) SHA1(fa521ff0c03e12848f51bf10e2bf8a5e43e03c80) )
+ROM_END
+
+ROM_START( ec_ndgxs )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "code.s28", 0x0000, 0x0671e8, CRC(e2eb55f5) SHA1(65cfec813f132de0142f20b0469f3673a8c54b01) )
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "nudex2v0.s28", 0x0000, 0x0663d4, CRC(590b23e1) SHA1(74fd550e69b071670b87e914a6609f68494b2d7b) )
+	ROM_LOAD( "nudex2v2.s28", 0x0000, 0x06bd04, CRC(100ac3bc) SHA1(88e7be77f4df2dfc2883270d582fbe80f739ad49) )
+	ROM_LOAD( "nudge2v4.s28", 0x0000, 0x0663c2, CRC(d9c77f3c) SHA1(1edd407d62d0b0ffad1e11109b02d6a12393f6a8) )
+	ROM_LOAD( "nudge2v5.s28", 0x0000, 0x066426, CRC(df7fbc8b) SHA1(ddcc548ad3b10a06022837e054281ad9e5ce945e) )
+	ROM_LOAD( "nudge2v6.s28", 0x0000, 0x067342, CRC(4a41380a) SHA1(17647f83bf682273c5e5b819cacfa80897a3db2d) )
+	ROM_LOAD( "nudge2v7.s28", 0x0000, 0x06733e, CRC(cd7afde8) SHA1(bdd6168c858223b8a014a7ab16f75da0f79bd837) )
+	ROM_LOAD( "nudge2v8.s28", 0x0000, 0x066ffa, CRC(1d62f8eb) SHA1(45a5bb3c8dbb5cc697fec57620491058278d5c94) )
+	ROM_LOAD( "nudge2v9.s28", 0x0000, 0x0675c8, CRC(e9957d6b) SHA1(dcfb1ea3b6ea325dd9947b1ce37b07ff68eae2ce) )
+	ROM_LOAD( "nudge2v9p", 0x0000, 0x0675e8, CRC(15faa9d8) SHA1(fdd0d64531a11a726014565b451337fcace36967) )
+	ROM_LOAD( "nudge3v0.p", 0x0000, 0x067714, CRC(b8aa212d) SHA1(afee8b13e9fb268d99726f3747f93680acbaf75a) )
+ROM_END
+
+ROM_START( ec_rdht7 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// SREC file for ROM, needs converting later. Host it for now, convert later
+	ROM_LOAD( "rh7m.s28", 0x0000, 0x0b8413, CRC(811525ae) SHA1(29f76548f6088939ce0a505ce7bea20597125be6) )
+ROM_END
+
+ROM_START( ec_unkt )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	//Strange data, possibly bad, but looks like some sort of linked board ROM
+	ROM_LOAD( "t.bin", 0x0000, 0x000789, CRC(ee41f048) SHA1(d9b0539ac822218f71cd85301e3da35b3dea783b) )
+	ROM_LOAD( "t2.bin", 0x0000, 0x000989, CRC(0992ffa6) SHA1(cffb6e0a9a72bb2bf9a6e262074062bd06cfa1fb) )
+ROM_END
+
 DRIVER_INIT( ecoinfr )
 {
 
@@ -1475,3 +1511,7 @@ GAME( 19??, ec_fltr,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Con
 GAME( 19??, ec_gold7,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Golden 7 (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_mgbel,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Megabell (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_supbxcon,ec_supbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Super Bar X (MAB PCB) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_jackb,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Jackpot Bars (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_ndgxs,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Nudge Excess (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_rdht7,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Red Hot 7 (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unkt,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Unknown 'T' (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

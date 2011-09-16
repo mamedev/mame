@@ -11802,6 +11802,8 @@ sc4game		// Game, The (Bellfruit)
 sc4ziggy	// Gettin Ziggy With It (Mazooma)
 sc4gldcl	// Gladiator Club (Mazooma)
 sc4gfev		// Gold Fever (Mazooma)
+sc4gfeva	//
+sc4gfevb	//
 sc4ggcas	// Golden Game Casino (Mazooma)
 sc4gnc		// Golden Game Club (Mazooma)
 sc4ghost	// Golden Ghost (Mazooma)
@@ -12061,27 +12063,135 @@ sc4dndj		//
 sc4dndk		//
 sc4dndl		//
 sc4dndm		//
-sc4dndcs	//  Deal Or No Deal Classic (Bellfruit)
+sc4dndcs	// Deal Or No Deal Classic (Bellfruit)
 sc4dndcsa	//
 sc4dndcsb	//
 sc4dndcsc	//
 sc4dndbb	// Deal Or No Deal Break The Bank (Bellfruit)
+sc4dndbba	//
+sc4dndbbb	//
+sc4dndbbc	//
+sc4dndbbd	//
+sc4dndbbe	//
+sc4dndbbf	//
+sc4dndbbg	//
+sc4dndbbh	//
+sc4dndbbi	//
 sc4dndcl	// Deal Or No Deal Club (Bellfruit)
+sc4dndcla	//
+sc4dndclb	//
+sc4dndclc	//
+sc4dndcld	//
+sc4dndcle	//
+sc4dndclf	//
+sc4dndclg	//
 sc4dnddd	// Deal Or No Deal Double Deal Or No Deal (Bellfruit)
+sc4dnddda	//
+sc4dndddb	//
+sc4dndddc	//
+sc4dndddd	//
+sc4dnddde	//
+sc4dndddf	//
+sc4dndddg	//
 sc4dndhf	// Deal Or No Deal Hall Of Fame (Bellfruit)
+sc4dndhfa	//
+sc4dndhfb	//
+sc4dndhfc	//
+sc4dndhfd	//
+sc4dndhfe	//
+sc4dndhff	//
+sc4dndhfg	//
+sc4dndhfh	//
+sc4dndhfi	//
 sc4dndys	// Deal Or No Deal It's Your Show (Bellfruit)
+sc4dndysa	//
+sc4dndysb	//
 sc4dndlp	// Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit)
+sc4dndlpa	//
+sc4dndlpb	//
+sc4dndlpc	//
+sc4dndlpd	//
+sc4dndlpe	//
 sc4dndra	// Deal Or No Deal Red Alert (Bellfruit)
+sc4dndraa	//
+sc4dndrab	//
+sc4dndrac	//
+sc4dndrad	//
+sc4dndrae	//
 sc4dndbd	// Deal Or No Deal The Big Deal (Bellfruit)
+sc4dndbda	//
+sc4dndbdb	//
+sc4dndbdc	//
+sc4dndbdd	//
+sc4dndbde	//
 sc4dndbr	// Deal Or No Deal The Big Reds (Bellfruit)
+sc4dndbra	//
+sc4dndbrb	//
+sc4dndbrc	//
+sc4dndbrd	//
+sc4dndbre	//
+sc4dndbrf	//
+sc4dndbrg	//
 sc4dndcc	// Deal Or No Deal The Crazy Chair (Bellfruit)
+sc4dndcca	//
+sc4dndccb	//
+sc4dndccc	//
+sc4dndccd	//
+sc4dndcce	//
+sc4dndccf	//
 sc4dnddw	// Deal Or No Deal The Deal Wheel (Bellfruit)
+sc4dnddwa	//
+sc4dnddwb	//
+sc4dnddwc	//
+sc4dnddwd	//
+sc4dnddwe	//
+sc4dnddwf	//
+sc4dnddwg	//
 sc4dnddf	// Deal Or No Deal The Dream Factory (Bellfruit)
+sc4dnddfa	//
+sc4dnddfb	//
+sc4dnddfc	//
+sc4dnddfd	//
+sc4dnddfe	//
 sc4dndpg	// Deal Or No Deal The Perfect Game (Bellfruit)
+sc4dndpga	//
+sc4dndpgb	//
+sc4dndpgc	//
+sc4dndpgd	//
+sc4dndpge	//
 sc4dndtp	// Deal Or No Deal The Power (Bellfruit)
+sc4dndtpa	//
+sc4dndtpb	//
+sc4dndtpc	//
+sc4dndtpd	//
+sc4dndtpe	//
+sc4dndtpf	//
+sc4dndtpg	//
+sc4dndtph	//
+sc4dndtpi	//
+sc4dndtpj	//
+sc4dndtpk	//
+sc4dndtpl	//
+sc4dndtpm	//
 sc4dndww	// Deal Or No Deal The Walk Of Wealth (Bellfruit)
+sc4dndwwa	//
+sc4dndwwb	//
+sc4dndwwc	//
+sc4dndwwd	//
+sc4dndcw	// Deal Or No Deal The Walk Of Wealth Classic (Bellfruit)
+sc4dndcwa	//
+sc4dndcwb	//
+sc4dndcwc	//
 sc4dndtr	// Deal Or No Deal Think Red (Bellfruit)
+sc4dndtra	//
 sc4dndwb	// Deal Or No Deal What's In Your Box (Bellfruit)
+sc4dndwba	//
+sc4dndwbb	//
+sc4dndwbc	//
+sc4dndwbd	//
+sc4dndwbe	//
+sc4dndwbf	//
+sc4dndwbg	//
 sc4dmine	// Diamond Mine (Bellfruit)
 sc4ddosh	// Doctor Dosh (Bellfruit)
 sc4dhh		// Dough Ho Ho (Bellfruit)
@@ -12166,8 +12276,32 @@ sc4chain	// Chain Reaction (Bellfruit)
 sc4clown	// Clown Around (Bellfruit)
 sc4copsr	// Cops 'n' Robbers (Bellfruit)
 sc4dndbe	// Deal Or No Deal Beat The Banker (Bellfruit)
+sc4dndbea	//
+sc4dndbeb	//
+sc4dndbec	//
+sc4dndbed	//
+sc4dndbee	//
+sc4dndbef	//
+sc4dndbeg	//
+sc4dndbeh	//
+sc4dndbei	//
+sc4dndbej	//
+sc4dndbek	//
+sc4dndbel	//
+sc4dndbem	//
+sc4dndben	//
 sc4dndbc	// Deal Or No Deal Box Clever (Bellfruit)
+sc4dndbca	//
 sc4mowow	// Monopoly Wheel Of Wealth (Mazooma)
+sc4mowowa	//
+sc4mowowb	//
+sc4mowowc	//
+sc4mowowe	//
+sc4mowowf	//
+sc4mowowg	//
+sc4mowowh	//
+sc4mowowi	//
+sc4mowowj	//
 sc4nunsm	// Nuns 'n' Roses (Mazooma)
 sc_unsrt	//
 sc_film		//
@@ -12342,6 +12476,13 @@ sc5dndbd	// Deal Or No Deal The Big Deal (Bellfruit)
 sc5dndbr	// Deal Or No Deal The Big Reds (Bellfruit)
 sc5dndcc	// Deal Or No Deal The Crazy Chair (Bellfruit)
 sc5dnddw	// Deal Or No Deal The Deal Wheel (Bellfruit)
+sc5dnddwa	//
+sc5dnddwb	//
+sc5dnddwc	//
+sc5dnddwd	//
+sc5dnddwe	//
+sc5dnddwf	//
+sc5dnddwg	//
 sc5dnddf	// Deal Or No Deal The Dream Factory (Bellfruit)
 sc5dndpg	// Deal Or No Deal The Perfect Game (Bellfruit)
 ad5dndpg	// Deal Or No Deal The Perfect Game (Bellfruit)
@@ -14552,6 +14693,10 @@ ec_fltr		// Flutter (Concept)
 ec_gold7	// Golden 7 (Concept)
 ec_mgbel	// Megabell (Concept)
 ec_supbxcon // Super Bar X (MAB PCB) (Concept - Electrocoin)
+ec_jackb	// Jackpot Bars (MAB PCB) (Concept - Electrocoin)
+ec_ndgxs	// Nudge Excess (MAB PCB) (Concept - Electrocoin)
+ec_rdht7	// Red Hot 7 (MAB PCB) (Concept - Electrocoin)
+ec_unkt		// Unknown 'T' (MAB PCB) (Concept - Electrocoin)
 
 // OXO PCB
 
