@@ -638,7 +638,6 @@ ROM_START( unkfra )
 	ROM_LOAD( "c.fas", 0x0000, 0x080000, CRC(e942c4bc) SHA1(9833f4b8c418d51bdab851602162811d1ebb6956) )
 	ROM_LOAD( "fesnd1", 0x0000, 0x080000, CRC(d2dab810) SHA1(daa26821ad31a81e714a2ddcc0a467a60d650ed3) )
 	ROM_LOAD( "fe_p_std.hi", 0x0000, 0x080000, CRC(c38a1263) SHA1(5431c9b9c000a184f4753b4aa05e037c2d3bfa46) )
-	ROM_LOAD( "fr.nig", 0x0000, 0x020000, CRC(908926eb) SHA1(30e778c18f8e3b72ab88dcce198e4fa39f138bf7) )// Fright Night (Empire) check code is valid (looks bad)
 	ROM_LOAD( "fruitopi.lo", 0x0000, 0x080000, CRC(da9d5edb) SHA1(249445a5193b04490641a0498f577cb2be69c0dd) )
 	//ROM_LOAD( "gia_gems.p1", 0x0000, 0x080000, CRC(c841d2f7) SHA1(480397141c917bce26cfdc8ba7fa8d21ab741770) ) bad
 	//ROM_LOAD( "gia_gems.p2", 0x0000, 0x080000, CRC(7824adf5) SHA1(99b59d28adb80d5cf3d70691cc134eba72288f20) ) bad

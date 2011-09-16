@@ -11805,7 +11805,15 @@ sc4gfev		// Gold Fever (Mazooma)
 sc4gfeva	//
 sc4gfevb	//
 sc4ggcas	// Golden Game Casino (Mazooma)
+sc4ggcasa	//
+sc4ggcasb	//
+sc4ggcasc	//
 sc4gnc		// Golden Game Club (Mazooma)
+sc4gnca		//
+sc4gncb		//
+sc4gncc		//
+sc4gncd		//
+sc4gnce		//
 sc4ghost	// Golden Ghost (Mazooma)
 sc4ggrid	// Golden Grid (Qps)
 sc4ggcl		// Golden Grid Club (Qps)
@@ -11864,6 +11872,33 @@ sc4ltr2c	// Lord Of The Rings - The Two Towers Club (Bellfruit)
 sc4lotrt	// Lord Of The Rings Triology (Bellfruit)
 sc4luck7	// Lucky 7s (Mazooma)
 sc4luckb	// Lucky Balls (Bellfruit)
+sc4luckba	//
+sc4luckbb	//
+sc4luckbc	//
+sc4luckbd	//
+sc4luckbe	//
+sc4luckbf	//
+sc4luckbg	//
+sc4luckbh	//
+sc4luckbi	//
+sc4luckbj	//
+sc4luckbk	//
+sc4luckbl	//
+sc4luckbm	//
+sc4luckbn	//
+sc4luckbo	//
+sc4luckbp	//
+sc4luckbq	//
+sc4luckbr	//
+sc4luckbs	//
+sc4luckbt	//
+sc4luckbu	//
+sc4luckbv	//
+sc4luckbw	//
+sc4luckbx	//
+sc4luckby	//
+sc4luckbz	//
+sc4luckb0	//
 sc4magci	// Magic Circle (Qps)
 sc4magic	// Magic Poundabout (Qps)
 sc4maxim	// Maximus Cash (Mazooma)
@@ -12063,6 +12098,8 @@ sc4dndj		//
 sc4dndk		//
 sc4dndl		//
 sc4dndm		//
+sc4dndn		//
+sc4dndo		//
 sc4dndcs	// Deal Or No Deal Classic (Bellfruit)
 sc4dndcsa	//
 sc4dndcsb	//
@@ -12178,6 +12215,7 @@ sc4dndwwa	//
 sc4dndwwb	//
 sc4dndwwc	//
 sc4dndwwd	//
+sc4dndwwe	//
 sc4dndcw	// Deal Or No Deal The Walk Of Wealth Classic (Bellfruit)
 sc4dndcwa	//
 sc4dndcwb	//
@@ -12206,9 +12244,84 @@ sc4glad		// Gladiator (Mazooma)
 sc4gd		// Gold Digger (Bellfruit)
 sc4gdmz		// Gold Digger (Mazooma)
 sc4gdclb	// Gold Digger Club (Bellfruit)
-sc4gball	// Golden Balls (Bellfruit)
-sc4gg		// Golden Game (Mazooma)
+sc4gbcas	// Golden Balls (Bellfruit)
+sc4gbcasa	//
+sc4gbcasb	//
+sc4gbcasc	//
+sc4gball	//
+sc4gballa	//
+sc4gballb	//
+sc4gballc	//
+sc4ggame	// Golden Game (Mazooma)
+sc4ggamea	//
+sc4ggameb	//
+sc4ggamec	//
+sc4ggamed	//
+sc4ggamee	//
+sc4ggamef	//
+sc4ggameg	//
+sc4ggameh	//
+sc4ggamei	//
+sc4ggamej	//
+sc4ggamek	//
+sc4ggamel	//
+sc4ggamem	//
+sc4ggamen	//
+sc4ggameo	//
+sc4ggamep	//
+sc4ggameq	//
+sc4ggamer	//
+sc4ggames	//
+sc4ggamet	//
+sc4ggameu	//
+sc4ggamev	//
+sc4ggamew	//
+sc4ggamex	//
+sc4ggamey	//
+sc4ggamez	//
+sc4ggame0	//
+sc4ggame1	//
+sc4ggame2	//
+sc4ggame3	//
+sc4ggame4	//
+sc4ggame5	//
+sc4ggame6	//
+sc4ggame7	//
+sc4ggame8	//
+sc4ggame9	//
+sc4ggameaa	//
+sc4ggameab	//
+sc4ggameac	//
+sc4ggamead	//
+sc4ggameae	//
+sc4ggdlx	// Golden Game Deluxe (Mazooma)
+sc4ggdlxa	//
+sc4ggdlxb	//
+sc4ggdlxc	//
+sc4ggdlxd	//
+sc4ggdlxe	//
+sc4ggdlxf	//
+sc4ggdlxg	//
 sc4ggg		// Grand Golden Game (Mazooma)
+sc4ggga		//
+sc4gggb		//
+sc4gggc		//
+sc4gggd		//
+sc4ggge		//
+sc4gggf		//
+sc4gggg		//
+sc4gggh		//
+sc4gggi		//
+sc4gggj		//
+sc4gggk		//
+sc4gggl		//
+sc4gggm		//
+sc4gggn		//
+sc4gggo		//
+sc4gggp		//
+sc4gggq		//
+sc4gggr		//
+sc4gggs		//
 sc4gunp		// Gunpowder Slot (Bellfruit)
 sc4hapnt	// Happy Notes (Bellfruit)
 sc4hellb	// Hells Bells (Bellfruit)
@@ -12225,6 +12338,13 @@ sc4jjok		// Jackpot Jokers (Bellfruit)
 sc4ldvl		// Little Devil (Mazooma)
 sc4lotrr	// Lord Of The Rings - Return Of The King (Bellfruit)
 sc4manic	// Manic Miner (Bellfruit)
+sc4manica	//
+sc4manicb	//
+sc4manicc	//
+sc4manicd	//
+sc4manice	//
+sc4manicf	//
+sc4manicg	//
 sc4mmm		// Mental Money Monsters (Mazooma)
 sc4mmad		// Money Madness (Mazooma)
 sc4monsp	// Money Spinner (Bellfruit)
@@ -12263,6 +12383,13 @@ sc4sus		// Suits U Sir (Qps)
 sc4sslam	// Super Slam (Bellfruit)
 sc4swbak	// Switch Back (Mazooma)
 sc4ttpie	// Take The Piece (Bellfruit)
+sc4ttpiea	//
+sc4ttpieb	//
+sc4ttpiec	//
+sc4ttpied	//
+sc4ttpiee	//
+sc4ttpief	//
+sc4ttpieg	//
 sc4typ		// Take Your Pick (Bellfruit)
 sc4tbox		// Top Box (Mazooma)
 sc4tpsht	// Top Of The Shots (Mazooma)
@@ -12462,8 +12589,74 @@ sc5count	// Countdown (Bellfruit)
 sc5cf		// Crazy Fruits (Bellfruit)
 sc5crnjw	// Crown Jewels (Bellfruit)
 sc5dnd		// Deal Or No Deal (Bellfruit)
-ad5dnd		// Deal Or No Deal (Bellfruit)
+sc5dnda		// 
+sc5dndb		// 
+sc5dndc		// 
+sc5dndd		// 
+sc5dnde		// 
+sc5dndf		// 
+sc5dndg		// 
+sc5dndh		// 
+sc5dndi		// 
+sc5dndj		// 
+sc5dndk		// 
+sc5dndl		// 
+sc5dndm		// 
+sc5dndn		// 
+sc5dndo		// 
+sc5dndp		// 
+sc5dndq		// 
+sc5dndr		// 
+sc5dnds		//
+sc5dndt		//
+sc5dndcs	// 
+sc5dndcsa	// 
+sc5dndcsb	// 
+sc5dndcsc	// 
+sc5dndcsd	// 
+sc5dndcse	// 
+sc5dndcsf	// 
+sc5dndcsg	// 
+sc5dndcsh	// 
+sc5dndcsi	// 
+sc5dndcsj	// 
+sc5dndc2	// 
+sc5dndc2a	// 
+sc5dndc2b	// 
+sc5dndc2c	// 
+sc5dndc2d	// 
+sc5dndc2e	// 
+sc5dndc2f	// 
+sc5dndc2g	// 
+sc5dndc2h	// 
+sc5dndc2i	// 
+sc5dndc2j	// 
+sc5dndc2k	// 
+sc5dndc2l	// 
+sc5dndc2m	// 
+sc5dndc2n	// 
+sc5dndc2o	// 
+sc5dndc2p	// 
+sc5dndc2q	// 
+sc5dndc2r	// 
+sc5dndc2s	// 
+sc5dndc2t	// 
+sc5dndc2u	// 
+sc5dndc2v	// 
+sc5dndc2w	// 
+sc5dndc3	// 
+sc5dndc3a	// 
+sc5dndc3b	// 
+sc5dndc3c	// 
+ad5dnd		// Deal Or No Deal (Bellfruit) (AD5)
 sc5dndbb	// Deal Or No Deal Break The Bank (Bellfruit)
+sc5dndbba	//
+sc5dndbbb	//
+sc5dndbbc	//
+sc5dndbbd	//
+sc5dndbbe	//
+sc5dndbbf	//
+sc5dndbbg	//
 sc5dndcl	// Deal Or No Deal Club (Bellfruit)
 ad5dndcl	// Deal Or No Deal Club (Bellfruit)
 sc5dnddd	// Deal Or No Deal Double Deal Or No Deal (Bellfruit)
@@ -12487,7 +12680,55 @@ sc5dnddf	// Deal Or No Deal The Dream Factory (Bellfruit)
 sc5dndpg	// Deal Or No Deal The Perfect Game (Bellfruit)
 ad5dndpg	// Deal Or No Deal The Perfect Game (Bellfruit)
 sc5dndtp	// Deal Or No Deal The Power (Bellfruit)
+sc5dndtpa	//
+sc5dndtpb	//
+sc5dndtpc	//
+sc5dndtpd	//
+sc5dndtpe	//
+sc5dndtpf	//
+sc5dndtpg	//
+sc5dndtph	//
+sc5dndtpi	//
+sc5dndtpj	//
+sc5dndtpk	//
+sc5dndtpl	//
+sc5dndtpm	//
+sc5dndtpn	//
+sc5dndtpo	//
+sc5dndtpp	//
+sc5dndtpq	//
+sc5dndtpr	//
+sc5dndtps	//
+sc5dndtpt	//
+sc5dndtpu	//
 sc5dndww	// Deal Or No Deal The Walk Of Wealth (Bellfruit)
+sc5dndwwa	//
+sc5dndwwb	//
+sc5dndwwc	//
+sc5dndwwd	//
+sc5dndwwe	//
+sc5dndwwf	//
+sc5dndwwg	//
+sc5dndwwh	//
+sc5dndwwi	//
+sc5dndwwj	//
+sc5dndwwk	//
+sc5dndwwl	//
+sc5dndwwm	//
+sc5dndwwn	//
+sc5dndwwo	//
+sc5dndwwp	//
+sc5dndwwq	//
+sc5dndcb	//
+sc5dndcba	//
+sc5dndwc	//
+sc5dndwca	//
+sc5dndwcb	//
+sc5dndwcc	//
+sc5dndwcd	//
+sc5dndwce	//
+sc5dndwcf	//
+sc5dndwcg	//
 sc5dndtr	// Deal Or No Deal Think Red (Bellfruit)
 sc5dndwb	// Deal Or No Deal What's In Your Box (Bellfruit)
 sc5dmine	// Diamond Mine (Bellfruit)
@@ -12505,8 +12746,18 @@ sc5gd		// Gold Digger (Bellfruit)
 sc5gdmz		// Gold Digger (Mazooma)
 sc5gdclb	// Gold Digger Club (Bellfruit)
 sc5gball	// Golden Balls (Bellfruit)
-sc5gg		// Golden Game (Mazooma)
+sc5gballa	//
+sc5gballb	//
+sc5gballc	//
+sc5ggame	// Golden Game (Mazooma)
+sc5ggamea	//
+sc5ggameb	//
+sc5ggamec	//
+sc5ggamed	//
 sc5ggg		// Grand Golden Game (Mazooma)
+sc5ggga		//
+sc5gggb		//
+sc5gggc		//
 sc5gunp		// Gunpowder Slot (Bellfruit)
 sc5hapnt	// Happy Notes (Bellfruit)
 sc5hellb	// Hells Bells (Bellfruit)
@@ -12523,6 +12774,29 @@ sc5jjok		// Jackpot Jokers (Bellfruit)
 sc5ldvl		// Little Devil (Mazooma)
 sc5lotrr	// Lord Of The Rings - Return Of The King (Bellfruit)
 sc5manic	// Manic Miner (Bellfruit)
+sc5manica	//
+sc5manicb	//
+sc5manicc	//
+sc5manicd	//
+sc5manice	//
+sc5manicf	//
+sc5manicg	//
+sc5manich	//
+sc5manici	//
+sc5manicj	//
+sc5manick	//
+sc5manicl	//
+sc5manicm	//
+sc5manicn	//
+sc5manico	//
+sc5manicp	//
+sc5manicq	//
+sc5manicr	//
+sc5manics	//
+sc5manict	//
+sc5manicu	//
+sc5manicv	//
+sc5manicw	//
 sc5mmm		// Mental Money Monsters (Mazooma)
 sc5mmad		// Money Madness (Mazooma)
 sc5monsp	// Money Spinner (Bellfruit)
@@ -12566,6 +12840,15 @@ sc5sus		// Suits U Sir (Qps)
 ad5sslam	// Super Slam (Bellfruit)
 sc5swbak	// Switch Back (Mazooma)
 sc5ttpie	// Take The Piece (Bellfruit)
+sc5ttpiea	//
+sc5ttpieb	//
+sc5ttpiec	//
+sc5ttpied	//
+sc5ttpiee	//
+sc5ttpief	//
+sc5ttpieg	//
+sc5ttpieh	//
+sc5ttpiei	//
 sc5typ		// Take Your Pick (Bellfruit)
 sc5tbox		// Top Box (Mazooma)
 sc5tpsht	// Top Of The Shots (Mazooma)
@@ -13172,6 +13455,7 @@ m4cashzn	// Cash Zone (Barcrest)
 m4casmul	// Casino Multiplay (Barcrest)
 m4celclb	// Celebration Club (Barcrest)
 m4centpt	// Centrepoint (Barcrest)
+m4centpta	// Centrepoint (Barcrest)
 m4ceptr		// Ceptor (Barcrest)
 m4chasei	// Chase Invaders (Barcrest)
 m4cheryo	// Cherryo (Barcrest)
@@ -13345,6 +13629,7 @@ m4rockmn	// Rocket Money (Barcrest)
 m4royjwl	// Royal Jewels (Barcrest)
 m4rfym		// Run For Your Money (Barcrest)
 m4runawy	// Runaway Trail (Barcrest)
+m4runawyb	//
 m4salsa		// Salsa (Barcrest)
 m4samu		// Samurai (Barcrest)
 m4sayno		// Say No More (Barcrest)
@@ -13375,6 +13660,8 @@ m4suphv		// Super Hyper Viper (Barcrest)
 m4supst		// Super Streak (Barcrest)
 m4suptub	// Super Tubes (Barcrest)
 m4suptwo	// Super Two (Barcrest)
+m4swpnot	// Swap-A-Note (Barcrest)
+m4swpnota	// Swap-A-Note (Barcrest)
 m4taj		// Taj Mahal (Barcrest)
 m4take5		// Take 5 (Barcrest)
 m4take2		// Take Two (Barcrest)
@@ -13571,6 +13858,7 @@ m4hisprte	//
 m4hotcsh	// Hot Cash (Empire)
 m4hotcsha	//
 m4hotcshb	//
+m4hotcshc	//
 m4monspn	// Money Spinner (Empire)
 m4monspna	//
 m4monspnb	//
@@ -13581,7 +13869,7 @@ m4pitfal	// Pitfall (Empire)
 m4pitfala	//
 m4pitfalb	//
 m4pitfalc	//
-m4ttrail	// reasure Trail (Empire)
+m4ttrail	// Treasure Trail (Empire)
 m4ttraila	//
 m4ttrailb	//
 m4jne		// The Jackpot's Not Enough (Empire?)

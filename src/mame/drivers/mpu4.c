@@ -3698,6 +3698,8 @@ ROM_START( m4andyge )
 	ROM_LOAD( "agi05___.3_1", 0x0000, 0x010000, CRC(b061a468) SHA1(a1f1a8bd55eb7a684de270bace9464812172ed92) )
 	ROM_LOAD( "agi10___.2_1", 0x0000, 0x010000, CRC(7c56a6ca) SHA1(adb567b8e1b6cc727bcfa694ade947f8c695f44a) )
 
+	ROM_REGION( 0x1200, "plds", 0 )//PAL16V8 PLD, like others - CHR? Guess it should be here...
+	ROM_LOAD( "age.bin", 0x0000, 0x000117, CRC(901359e5) SHA1(7dbcd6023e7ce68f4aa7f191f572d74f21f978aa) )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "char.chr", 0x0000, 0x000048, CRC(053a5846) SHA1(c92de79e568c9f253bb71dbda2ca32b7b3b6661a) )
@@ -4526,8 +4528,14 @@ ROM_END
 
 ROM_START( m4centpt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "centrepoint v1.6.bin", 0x0000, 0x010000, CRC(adcf0330) SHA1(b68b8c808b2dc1965d37d912adec714547466522) )
+ROM_END
+
+ROM_START( m4centpta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "centrepoint v1.3.bin", 0x0000, 0x010000, CRC(24d117a5) SHA1(bd48a1687d11e32ea8cda19318e8936d1ffd9fd7) )
 ROM_END
+
 
 ROM_START( m4ceptr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5998,6 +6006,8 @@ ROM_START( m4jpjmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vjcs.p1", 0x0000, 0x010000, CRC(90280752) SHA1(bc2fcefc00adbae9ca2e116108b53ab932ab57b2) )
 
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "jackjump-vjc1-3.bin", 0x0000, 0x010000, CRC(fa713c10) SHA1(766912ea891166d7d7f0360e81bdad58b6064eb1) )
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "jj.chr", 0x0000, 0x000048, CRC(abf2340a) SHA1(6cfeb84db61e647da0a46faa87fa003a34b46f5c) )
 ROM_END
@@ -8398,6 +8408,11 @@ ROM_START( m4runawy )
 	ROM_LOAD( "r4t1_1.2", 0x6000, 0x002000, CRC(b25001ce) SHA1(73f11579094d38fc369805d18ebf73dee3c206ac) )
 ROM_END
 
+ROM_START( m4runawyb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "runawaytrail-p1.bin", 0x8000, 0x008000, CRC(35ce4948) SHA1(dcffdf1f3eaeeb1facebf5d5ceb3f4c4d0e32236) )
+	ROM_LOAD( "runawaytrail-p2.bin", 0x6000, 0x002000, CRC(78c803c1) SHA1(6473939f77d56ea29de96cce66bc21c54ec93666) )
+ROM_END
 
 ROM_START( m4salsa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8896,6 +8911,15 @@ ROM_START( m4suptwo )
 	ROM_LOAD( "suts.p1", 0x0000, 0x010000, CRC(0476a1f9) SHA1(5dfd26cf7307c9fb98852e3b2daa65f81f13380d) )
 ROM_END
 
+ROM_START( m4swpnot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "san3.3.bin", 0x0000, 0x010000, CRC(d90479e6) SHA1(f634d4db62946017d70a1cd70b67fcb28587a66c) )
+ROM_END
+
+ROM_START( m4swpnota )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "swap-a-note-v32.bin", 0x0000, 0x010000, CRC(8f0b45f5) SHA1(766239927cfbdaedb98c9eca5401b82114e85207) )
+ROM_END
 
 ROM_START( m4taj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -11585,7 +11609,6 @@ ROM_START( m4screw )
 	ROM_LOAD( "screwinaroundv0-7.bin", 0x0000, 0x020000, CRC(78a1e3ca) SHA1(a3d6e76a474a3a5cd74e4b527aa575f21825a7aa) )
 	//ROM_LOAD( "screwing.bin", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
 
-
 	ROM_REGION( 0x180000, "msm6376", 0 )
 	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
 	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
@@ -12235,6 +12258,8 @@ ROM_END
 ROM_START( m4frightc )
 	ROM_REGION( 0x020000, "maincpu", 0 ) // fixed bits, probably the same as one of the others sets anyway, remove?
 	ROM_LOAD( "frnt8ac", 0x0000, 0x020000, BAD_DUMP CRC(db081875) SHA1(1e994dd411c81eb9d152b9fa2c3e53258d680dfa) )
+	ROM_REGION( 0x020000, "altrevs", 0 )
+	ROM_LOAD( "fr.nig", 0x0000, 0x020000, CRC(908926eb) SHA1(30e778c18f8e3b72ab88dcce198e4fa39f138bf7) )// Fright Night (Empire) check code is valid (looks bad)
 
 	ROM_REGION( 0x180000, "msm6376", 0 )
 	ROM_LOAD( "fnsnd1.bin", 0x000000, 0x080000, CRC(0f7a6d97) SHA1(f812631af8eb46e188d457d567f42aecceb9e5d2) )
@@ -12542,6 +12567,18 @@ ROM_END
 ROM_START( m4hotcshb )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "hc3_0kx.bin", 0x0000, 0x010000, CRC(3abebe72) SHA1(fec09ca41e8e43628140456bb44ce6e7c66f5270) )
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "hotsnd1.bin", 0x000000, 0x080000, CRC(eef55915) SHA1(b673a05a0313271cc16645f277d37a4a03deced1) )
+	ROM_LOAD( "hotsnd2.bin", 0x080000, 0x080000, CRC(92e921ab) SHA1(11e1f3c61a2eddfdcb40f606672d8845000c4ce7) )
+ROM_END
+
+ROM_START( m4hotcshc )
+	ROM_REGION( 0x010000, "maincpu", 0 )
+	ROM_LOAD( "empire-hotcashv2-0.bin", 0x0000, 0x010000, CRC(b7ec5af3) SHA1(9454feecc7d7c533fed7134118acd2117ebe2591) )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
@@ -15268,7 +15305,8 @@ GAME(199?, m4cashmx	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cas
 GAME(199?, m4cashzn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cash Zone (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4casmul	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Casino Multiplay (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // crashes mame
 GAME(199?, m4celclb	,0			,mod2   	,mpu4				,m_ccelbr			,ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4centpt	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4centpt, 0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.3) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4centpta,m4centpt	,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4ceptr	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Ceptor (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4chasei	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4cheryo	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Cherryo (Barcrest) [DCH, Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -15442,6 +15480,7 @@ GAME(199?, m4rockmn	,0			,mod4oki	,mpu4jackpot8tkn	,m4default_bigbank	,ROT0,   "
 GAME(199?, m4royjwl	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4rfym	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Run For Your Money (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4runawy	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Runaway Trail (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4runawyb,m4runawy	,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Runaway Trail (Barcrest) (v1.2?) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4salsa	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Salsa (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4samu	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Samurai (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4sayno	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -15469,6 +15508,8 @@ GAME(199?, m4suphv	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Supe
 GAME(199?, m4supst	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Super Streak (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4suptub	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4suptwo	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Super Two (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4swpnot	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Swap-A-Note (Barcrest) (v3.3) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4swpnota,m4swpnot	,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Swap-A-Note (Barcrest) (v3.2) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4taj	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Taj Mahal (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4take5	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Take 5 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4take2	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -15673,6 +15714,7 @@ GAME(199?, m4hisprte, m4hisprt,	mod4oki, mpu4, m4default, ROT0,   "Empire","High
 GAME(199?, m4hotcsh,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4hotcsha, m4hotcsh, mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4hotcshb, m4hotcsh,	mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4hotcshc, m4hotcsh,	mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4monspn,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Money Spinner (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4monspna, m4monspn,	mod4oki, mpu4, m4default, ROT0,   "Empire","Money Spinner (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4monspnb, m4monspn,	mod4oki, mpu4, m4default, ROT0,   "Empire","Money Spinner (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
