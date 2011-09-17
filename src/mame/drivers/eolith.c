@@ -47,9 +47,36 @@
  TODO:
  - sound & sound cpu
 
- Original Bugs:
- - Hidden Catch 3: the text shown when you start a game is flipped or
-                   clipped wrongly
+-----------------------------------------------------------------------------
+ Original (Not emulation) Bugs:
+ 
+ - hidctch3 (Hidden Catch 3)
+
+	 the text shown when you start a game is flipped or
+	 clipped wrongly
+
+ - candy (Candy Candy)
+
+	 'Ready, Go' is displayed before cutting to the How To Play screen,
+	 this flow seems illogical, but is correct.
+	 The How To Play screen can't be skipped with the start button
+	 unless there is an additional credit inserted.
+	 There are some bad pixels at the top right of th How To Play text
+
+-----------------------------------------------------------------------------
+ Driver (Emulation) Bugs:
+
+  - candy (Candy Candy)
+
+	  VRAM erasing doesn't work properly in this game with the logic we're
+	  using in eolith_vram_w.  There are various screens, such as the how
+	  to play screen and high score screen where you can see graphics which
+	  should have been erased.  It has been verified that these get erased
+	  correctly on the real hardware.
+
+  - racooon (Raccoon World)
+
+	  Game animation seems too fast?
 
  *********************************************************************/
 
@@ -1233,7 +1260,7 @@ GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith,   ROT0, "Eolith", 
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
-GAME( 1999, candy,     0,        eolith50, candy,	  eolith,   ROT0, "Eolith", "Candy Candy",  GAME_NOT_WORKING | GAME_NO_SOUND ) // seems to have logic bugs - how to play screen displayed AFTER 'ready' 'go' messages? how to play can only be skipped if a coin is present?  also you don't need to clear all blocks to clear a level?
+GAME( 1999, candy,     0,        eolith50, candy,	  eolith,   ROT0, "Eolith", "Candy Candy",  GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1999, hidctch2,  0,        eolith50, hidnctch,  hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", GAME_NO_SOUND )
 GAME( 1999, hidctch2a, hidctch2, eolith50, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", GAME_NO_SOUND )
 GAME( 1999, landbrk,   0,        eolith45, landbrk,   landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi

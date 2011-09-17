@@ -9,6 +9,10 @@ WRITE32_HANDLER( eolith_vram_w )
 
 	if (mem_mask == 0xffffffff)
 	{
+		// candy needs this to always write to RAM (verified that certain glitches, for example the high score table, don't occur on real hw)
+		// other games clearly don't.
+		// is there a cpu bug, or is there more to this logic / a flag which disables it?
+
 		if (~data & 0x80000000)
 			*dest = (*dest & 0x0000ffff) | (data & 0xffff0000);
 
@@ -18,6 +22,7 @@ WRITE32_HANDLER( eolith_vram_w )
 	else if (((mem_mask == 0xffff0000) && (~data & 0x80000000)) ||
 	    	 ((mem_mask == 0x0000ffff) && (~data & 0x00008000)))
 		COMBINE_DATA(dest);
+
 }
 
 

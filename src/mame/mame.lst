@@ -12708,15 +12708,36 @@ sc4ttpieg	//
 sc4typ		// Take Your Pick (Bellfruit)
 sc4tbox		// Top Box (Mazooma)
 sc4tpsht	// Top Of The Shots (Mazooma)
+sc4tpshta	//
+sc4tpshtb	//
+sc4tpshtc	//
+sc4tpshtd	//
+sc4tpshte	//
+sc4tpshtf	//
+sc4tpshtg	//
 sc4trail	// Trailblazer (Mazooma)
 sc4vivam	// Viva Mexico (Bellfruit)
 sc4wldjk	// Wild Jackpots (Mazooma)
 sc4adsnt	// Ant & Dec's Saturday Night Takeaway (Bellfruit)
 sc4bpb		// Bully's Prize Board (Bellfruit)
+sc4bpba		//
+sc4bpbb		//
+sc4bpbc		//
+sc4bpbd		//
+sc4bpbe		//
 sc4bsp		// Bully's Star Prize (Bellfruit)
 sc4chain	// Chain Reaction (Bellfruit)
 sc4clown	// Clown Around (Bellfruit)
 sc4copsr	// Cops 'n' Robbers (Bellfruit)
+sc4copsra	//
+sc4copsrb	//
+sc4copsrc	//
+sc4copsrd	//
+sc4copsre	//
+sc4copsrf	//
+sc4copsrg	//
+sc4copsrh	//
+sc4copsri	//
 sc4dndbe	// Deal Or No Deal Beat The Banker (Bellfruit)
 sc4dndbea	//
 sc4dndbeb	//
@@ -12761,8 +12782,10 @@ sc5bjob		// Bank Job (Bellfruit)
 sc5bkngx	// Bar King X (Mazooma)
 sc5bucc		// Buccaneers (Bellfruit)
 sc5bpfpb	// Bullseye Pounds For Points (Bellfruit)
+sc5bpfpba	//
 sc5btiab	// Bullseye Three In A Bed (Bellfruit)
 sc5btrip	// Bullseye Triple (Bellfruit)
+sc5btripa	//
 sc5bunny	// Bunny Money (Mazooma)
 sc5cbrun	// Cannonball Run (Bellfruit)
 sc5cfact	// Cash Factor (Bellfruit)
@@ -12778,9 +12801,17 @@ sc5clus		// Cluedo The Usual Suspects (Mazooma)
 sc5cmony	// Colour Of Money (Bellfruit)
 sc5newcm	// Colour Of Money New, The (Bellfruit)
 sc5crotr	// Cops 'n' Robbers On The Run (Bellfruit)
+sc5crotra	//
 sc5crsgc	// Cops 'n' Robbers Smash 'n' Grab Club (Bellfruit)
+sc5crsgca	//
+sc5crsgcb	//
+sc5crsgcc	//
 sc5crsgr	// Cops 'n' Robbers Smash 'n' Grab (Bellfruit)
+sc5crsgra	//
+sc5crsgrb	//
+sc5crsgrc	//
 sc5corst	// Coronation Street (Bellfruit)
+sc5corsta	//
 sc5cfnc		// Crazy Fruit & Nutcase (Bellfruit)
 sc5cfcp		// Crazy Fruits Community Party (Bellfruit)
 sc5cfpt		// Crazy Fruits Party Time (Bellfruit)
@@ -12848,18 +12879,74 @@ sc5dndfle	//
 sc5dndgo	// Deal Or No Deal Game On (Bellfruit)
 sc5dndgoa	//
 sc5dndgl	// Deal Or No Deal Gold (Bellfruit)
+sc5dndgla	//
+sc5dndglb	//
+sc5dndglc	//
+sc5dndgld	//
+sc5dndgle	//
+sc5dndglf	//
+sc5dndglg	//
+sc5dndglh	//
+sc5dndgli	//
+sc5dndglj	//
+sc5dndglk	//
 sc5dndld	// Deal Or No Deal Live The Dream (Bellfruit)
+sc5dndlda	//
 sc5dndmb	// Deal Or No Deal Make Or Break (Bellfruit)
+sc5dndmba	//
+sc5dndmbb	//
+sc5dndmbc	//
+sc5dndmbd	//
+sc5dndmbe	//
+sc5dndmbf	//
+sc5dndmbg	//
+sc5dndmbh	//
+sc5dndmbi	//
+sc5dndmbj	//
+sc5dndmbk	//
 sc5dndmd	// Deal Or No Deal Mega Deal Or No Deal (Bellfruit)
+sc5dndmda	//
+sc5dndmdb	//
+sc5dndmdc	//
+sc5dndmdd	//
+sc5dndmde	//
+sc5dndmdf	//
+sc5dndmdg	//
+sc5dndmdh	//
+sc5dndmdi	//
 sc5dndpa	// Deal Or No Deal Play It Again (Bellfruit)
+sc5dndpaa	//
+sc5dndpab	//
+sc5dndpac	//
 sc5ddptg	// Deal Or No Deal Play The Game (Bellfruit)
+sc5ddptga	//
+sc5ddptgb	//
+sc5ddptgc	//
 sc5ddply	// Deal Or No Deal Player's Choice (Bellfruit)
+sc5ddplya	//
 sc5dndrr	// Deal Or No Deal Road To Riches (Bellfruit)
+sc5dndrra	//
+sc5dndrrb	//
+sc5dndrrc	//
 sc5dndsi	// Deal Or No Deal Simply Deal Or No Deal (Bellfruit)
+sc5dndsia	//
+sc5dndsib	//
+sc5dndsic	//
+sc5dndsid	//
 sc5dndrt	// Deal Or No Deal The Banker Rings Twice (Bellfruit)
+sc5dndrta	//
+sc5dndrtb	//
+sc5dndrtc	//
+sc5dndrtd	//
+sc5dndrte	//
 sc5dndpd	// Deal Or No Deal The Perfect Deal (Bellfruit)
+sc5dndpda	//
+sc5dndpdb	//
+sc5dndpdc	//
 sc5dndpc	// Deal Or No Deal The Players Choice (Bellfruit)
+sc5dndpca	//
 sc5dndtb	// Deal Or No Deal Think Big (Bellfruit)
+sc5dndtba	//
 sc5devil	// Devil Of A Deal (Mazooma)
 sc5dracp	// Drac Pack (Bellfruit)
 sc5fgbh		// Family Guy Booze Hound (Bellfruit)
@@ -13487,15 +13574,33 @@ sc5ttpiei	//
 sc5typ		// Take Your Pick (Bellfruit)
 sc5tbox		// Top Box (Mazooma)
 sc5tpsht	// Top Of The Shots (Mazooma)
+sc5tpshta	//
+sc5tpshtb	//
+sc5tpshtc	//
+sc5tpshtd	//
 sc5trail	// Trailblazer (Mazooma)
 sc5vivam	// Viva Mexico (Bellfruit)
 sc5wldjk	// Wild Jackpots (Mazooma)
 sc5adsnt	// Ant & Dec's Saturday Night Takeaway (Bellfruit)
 sc5bpb		// Bully's Prize Board (Bellfruit)
+sc5bpba		//
+sc5bpbb		//
+sc5bpbc		//
+sc5bpbd		//
+sc5bpbe		//
 sc5bsp		// Bully's Star Prize (Bellfruit)
 sc5chain	// Chain Reaction (Bellfruit)
 sc5clown	// Clown Around (Bellfruit)
 sc5copsr	// Cops 'n' Robbers (Bellfruit)
+sc5copsra	//
+sc5copsrb	//
+sc5copsrc	//
+sc5copsrd	//
+sc5copsre	//
+sc5copsrf	//
+sc5copsrg	//
+sc5copsrh	//
+sc5copsri	//
 ad5copsr	// Cops 'n' Robbers (Bellfruit)
 sc5dndbe	// Deal Or No Deal Beat The Banker (Bellfruit)
 sc5dndbea	//
