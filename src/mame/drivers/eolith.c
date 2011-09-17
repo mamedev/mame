@@ -61,7 +61,7 @@
 	 this flow seems illogical, but is correct.
 	 The How To Play screen can't be skipped with the start button
 	 unless there is an additional credit inserted.
-	 There are some bad pixels at the top right of th How To Play text
+	 There are some bad pixels at the top right of the How To Play text
 
 -----------------------------------------------------------------------------
  Driver (Emulation) Bugs:
