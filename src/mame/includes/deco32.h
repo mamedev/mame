@@ -1,8 +1,14 @@
+#include "audio/decobsmt.h"
+
 class deco32_state : public driver_device
 {
 public:
 	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_decobsmt(*this, "decobsmt")
+    { }
+
+	required_device<decobsmt_device> m_decobsmt;
 
 	UINT32 *m_ram;
 	int m_raster_enable;
@@ -16,8 +22,6 @@ public:
 	int m_pendingCommand;
 	int m_readBitCount;
 	int m_byteAddr;
-	UINT8 m_bsmt_latch;
-	UINT8 m_bsmt_reset;
 
 	int m_ace_ram_dirty;
 	int m_has_ace_ram;

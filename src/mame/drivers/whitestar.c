@@ -5,9 +5,8 @@
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "sound/bsmt2000.h"
 #include "video/mc6845.h"
+#include "audio/decobsmt.h"
 #include "rendlay.h"
 
 class whitestar_state : public driver_device
@@ -17,19 +16,14 @@ public:
 		: driver_device(mconfig, type, tag),
         m_maincpu(*this, "maincpu"),
         m_dmdcpu(*this, "dmdcpu"),
-        m_soundcpu(*this, "soundcpu"),
-        m_bsmt(*this, "bsmt"),
-		m_mc6845(*this, "mc6845")
+		m_mc6845(*this, "mc6845"),
+		m_decobsmt(*this, "decobsmt")
         { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dmdcpu;
-	required_device<cpu_device> m_soundcpu;
-    required_device<bsmt2000_device> m_bsmt;
 	required_device<mc6845_device> m_mc6845;
-
-	UINT8 m_bsmt_latch;
-	UINT8 m_bsmt_reset;
+	required_device<decobsmt_device> m_decobsmt;
 
 	UINT8 m_dmd_latch;
 	UINT8 m_dmd_ctrl;
@@ -37,11 +31,6 @@ public:
 	UINT8 m_dmd_busy;
 
     UINT8 *m_vram;
-
-    DECLARE_WRITE8_MEMBER(bsmt_reset_w);
-    DECLARE_READ8_MEMBER(bsmt_status_r);
-    DECLARE_WRITE8_MEMBER(bsmt0_w);
-    DECLARE_WRITE8_MEMBER(bsmt1_w);
 
 	DECLARE_WRITE8_MEMBER(dmd_latch_w);
     DECLARE_READ8_MEMBER(dmd_latch_r);
@@ -95,7 +84,7 @@ static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(dmd_latch_w)
 	AM_RANGE(0x3601, 0x3601) AM_READWRITE(dmd_ctrl_r, dmd_ctrl_w)
 	AM_RANGE(0x3700, 0x3700) AM_READ(dmd_status_r)
-    AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(soundlatch_w)
+    AM_RANGE(0x3800, 0x3800) AM_DEVWRITE(DECOBSMT_TAG, decobsmt_device, bsmt_comms_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0x18000)
 ADDRESS_MAP_END
@@ -168,47 +157,6 @@ WRITE8_MEMBER(whitestar_state::dmd_status_w)
 {
 	m_dmd_status = data & 0x0f;
 }
-/* Whitestar audio (similar to Tattoo Assassins) */
-
-WRITE8_MEMBER(whitestar_state::bsmt_reset_w)
-{
-	UINT8 diff = data ^ m_bsmt_reset;
-	m_bsmt_reset = data;
-	if ((diff & 0x80) && !(data & 0x80))
-		m_bsmt->reset();
-}
-
-WRITE8_MEMBER(whitestar_state::bsmt0_w)
-{
-	m_bsmt_latch = data;
-}
-
-static void bsmt_ready_callback(bsmt2000_device &device)
-{
-	cputag_set_input_line(device.machine(), "soundcpu", M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
-}
-
-WRITE8_MEMBER(whitestar_state::bsmt1_w)
-{
-	m_bsmt->write_reg(offset ^ 0xff);
-	m_bsmt->write_data((m_bsmt_latch << 8) | data);
-	device_set_input_line(m_soundcpu, M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
-}
-
-READ8_MEMBER(whitestar_state::bsmt_status_r)
-{
-	return m_bsmt->read_status() << 7;
-}
-
-static ADDRESS_MAP_START( whitestar_sound_map, AS_PROGRAM, 8, whitestar_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_WRITE(bsmt_reset_w)
-	AM_RANGE(0x2002, 0x2003) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x2006, 0x2007) AM_READ(bsmt_status_r)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(bsmt0_w)
-	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(bsmt1_w)
-	AM_RANGE(0x2000, 0xffff) AM_ROM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( whitestar_dmd_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
@@ -288,10 +236,6 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	MCFG_CPU_PROGRAM_MAP(whitestar_map)
 	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 976) // value taken from PinMAME
 
-    MCFG_CPU_ADD("soundcpu", M6809, (3579580/2))
-	MCFG_CPU_PROGRAM_MAP(whitestar_sound_map)
-	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
-
     MCFG_CPU_ADD("dmdcpu", M6809, (8000000/4))
 	MCFG_CPU_PROGRAM_MAP(whitestar_dmd_map)
 	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 80) // value taken from PinMAME
@@ -299,12 +243,7 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	MCFG_MACHINE_RESET( whitestar )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_BSMT2000_ADD("bsmt", 24000000)
-	MCFG_BSMT2000_READY_CALLBACK(bsmt_ready_callback)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 
 	MCFG_MC6845_ADD("mc6845", MC6845, 2000000, whitestar_crtc6845_interface)
 

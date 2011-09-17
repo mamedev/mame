@@ -235,7 +235,6 @@ Notes:
 #include "includes/deco32.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "sound/bsmt2000.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 
@@ -515,12 +514,13 @@ static READ32_HANDLER( tattass_prot_r )
 
 static WRITE32_HANDLER( tattass_prot_w )
 {
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	/* Only sound port of chip is used - no protection */
 	if (offset==0x700/4) {
 		/* 'Swap bits 0 and 3 to correct for design error from BSMT schematic' */
 		int soundcommand = (data>>16)&0xff;
 		soundcommand = BITSWAP8(soundcommand,7,6,5,4,0,2,1,3);
-		soundlatch_w(space,0,soundcommand);
+		state->m_decobsmt->bsmt_comms_w(*space, 0, soundcommand);
 	}
 }
 
@@ -646,9 +646,9 @@ static WRITE32_HANDLER( tattass_control_w )
 
 	/* Sound board reset control */
 	if (data&0x80)
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+		state->m_decobsmt->bsmt_reset_line(CLEAR_LINE);
 	else
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		state->m_decobsmt->bsmt_reset_line(ASSERT_LINE);
 
 	/* bit 0x4 fade cancel? */
 	/* bit 0x8 ?? */
@@ -1031,42 +1031,6 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-
-static WRITE8_HANDLER(deco32_bsmt_reset_w)
-{
-	deco32_state *state = space->machine().driver_data<deco32_state>();
-	UINT8 diff = data ^ state->m_bsmt_reset;
-	state->m_bsmt_reset = data;
-	if ((diff & 0x80) && !(data & 0x80))
-		devtag_reset(space->machine(), "bsmt");
-}
-
-static WRITE8_HANDLER(deco32_bsmt0_w)
-{
-	deco32_state *state = space->machine().driver_data<deco32_state>();
-	state->m_bsmt_latch = data;
-}
-
-static void bsmt_ready_callback(bsmt2000_device &device)
-{
-	cputag_set_input_line(device.machine(), "audiocpu", M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
-}
-
-static WRITE8_HANDLER(deco32_bsmt1_w)
-{
-	deco32_state *state = space->machine().driver_data<deco32_state>();
-	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
-	bsmt->write_reg(offset ^ 0xff);
-	bsmt->write_data((state->m_bsmt_latch << 8) | data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
-}
-
-static READ8_HANDLER(deco32_bsmt_status_r)
-{
-	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
-	return bsmt->read_status() << 7;
-}
-
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1076,16 +1040,6 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tattass_sound_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_WRITE(deco32_bsmt_reset_w)
-	AM_RANGE(0x2002, 0x2003) AM_READ(soundlatch_r)
-	AM_RANGE(0x2006, 0x2007) AM_READ(deco32_bsmt_status_r)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(deco32_bsmt0_w)
-	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(deco32_bsmt1_w)
-	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static READ8_HANDLER(latch_r)
@@ -1744,12 +1698,6 @@ static INTERRUPT_GEN( deco32_vbl_interrupt )
 	device_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( tattass_snd_interrupt )
-{
-	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
-}
-
-
 UINT16 captaven_pri_callback(UINT16 x)
 {
 	if ((x&0x60)==0x00)
@@ -2165,10 +2113,6 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_CPU_PROGRAM_MAP(tattass_map)
 	MCFG_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 2000000)
-	MCFG_CPU_PROGRAM_MAP(tattass_sound_map)
-	MCFG_CPU_PERIODIC_INT(tattass_snd_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
-
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_tattass)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2188,19 +2132,13 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);
 
-
 	MCFG_GFXDECODE(tattass)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(nslasher)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_BSMT2000_ADD("bsmt", 24000000)
-	MCFG_BSMT2000_READY_CALLBACK(bsmt_ready_callback)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( nslasher, deco32_state )
@@ -3002,7 +2940,7 @@ ROM_START( tattass )
 	ROM_LOAD32_WORD( "pp44.cpu", 0x000000, 0x80000, CRC(c3ca5b49) SHA1(c6420b0c20df1ae166b279504880ade65b1d8048) )
 	ROM_LOAD32_WORD( "pp45.cpu", 0x000002, 0x80000, CRC(d3f30de0) SHA1(5a0aa0f96d29299b3b337b4b51bc84e447eb74d0) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION(0x10000, "soundcpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(6947be8a) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -3075,7 +3013,7 @@ ROM_START( tattassa )
 	ROM_LOAD32_WORD( "rev232a.000", 0x000000, 0x80000, CRC(1a357112) SHA1(d7f78f90970fd56ca1452a4c138168568b06d868) )
 	ROM_LOAD32_WORD( "rev232a.001", 0x000002, 0x80000, CRC(550245d4) SHA1(c1b2b31768da9becebd907a8622d05aa68ecaa29) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION(0x10000, "soundcpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(6947be8a) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
