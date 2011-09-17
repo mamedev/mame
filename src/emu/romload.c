@@ -709,14 +709,14 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
     random data for a NULL file
 -------------------------------------------------*/
 
-static int rom_fread(rom_load_data *romdata, UINT8 *buffer, int length)
+static int rom_fread(rom_load_data *romdata, UINT8 *buffer, int length, const rom_entry *parent_region)
 {
 	/* files just pass through */
 	if (romdata->file != NULL)
 		return romdata->file->read(buffer, length);
 
-	/* otherwise, fill with randomness */
-	else
+	/* otherwise, fill with randomness unless it was already specifically erased */
+	else if (!ROMREGION_ISERASE(parent_region))
 		fill_random(romdata->machine(), buffer, length);
 
 	return length;
@@ -728,7 +728,7 @@ static int rom_fread(rom_load_data *romdata, UINT8 *buffer, int length)
     entry
 -------------------------------------------------*/
 
-static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
+static int read_rom_data(rom_load_data *romdata, const rom_entry *parent_region, const rom_entry *romp)
 {
 	int datashift = ROM_GETBITSHIFT(romp);
 	int datamask = ((1 << ROM_GETBITWIDTH(romp)) - 1) << datashift;
@@ -758,7 +758,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 
 	/* special case for simple loads */
 	if (datamask == 0xff && (groupsize == 1 || !reversed) && skip == 0)
-		return rom_fread(romdata, base, numbytes);
+		return rom_fread(romdata, base, numbytes, parent_region);
 
 	/* use a temporary buffer for complex loads */
 	tempbufsize = MIN(TEMPBUFFER_MAX_SIZE, numbytes);
@@ -774,7 +774,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 
 		/* read as much as we can */
 		LOG(("  Reading %X bytes into buffer\n", bytesleft));
-		if (rom_fread(romdata, bufptr, bytesleft) != bytesleft)
+		if (rom_fread(romdata, bufptr, bytesleft, parent_region) != bytesleft)
 		{
 			auto_free(romdata->machine(), tempbuf);
 			return 0;
@@ -904,7 +904,7 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
     for a region
 -------------------------------------------------*/
 
-static void process_rom_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *romp)
+static void process_rom_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp)
 {
 	UINT32 lastflags = 0;
 
@@ -962,7 +962,7 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
 
 					/* attempt to read using the modified entry */
 					if (!ROMENTRY_ISIGNORE(&modified_romp) && !irrelevantbios)
-						/*readresult = */read_rom_data(romdata, &modified_romp);
+						/*readresult = */read_rom_data(romdata, parent_region, &modified_romp);
 				}
 				while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp));
 
@@ -1205,7 +1205,7 @@ done:
     for a region
 -------------------------------------------------*/
 
-static void process_disk_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *romp, const char *locationtag)
+static void process_disk_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag)
 {
 	/* loop until we hit the end of this region */
 	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
@@ -1424,9 +1424,9 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
-			process_rom_entries(romdata, locationtag, region + 1);
+			process_rom_entries(romdata, locationtag, region, region + 1);
 		else if (ROMREGION_ISDISKDATA(region))
-			process_disk_entries(romdata, core_strdup(regiontag.cstr()), region + 1, locationtag);
+			process_disk_entries(romdata, core_strdup(regiontag.cstr()), region, region + 1, locationtag);
 	}
 
 	/* now go back and post-process all the regions */
@@ -1489,10 +1489,10 @@ static void process_region_list(rom_load_data *romdata)
 #endif
 
 				/* now process the entries in the region */
-				process_rom_entries(romdata, (source->shortname()!=NULL) ? source->shortname() : NULL, region + 1);
+				process_rom_entries(romdata, (source->shortname()!=NULL) ? source->shortname() : NULL, region, region + 1);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
-				process_disk_entries(romdata, ROMREGION_GETTAG(region), region + 1, NULL);
+				process_disk_entries(romdata, ROMREGION_GETTAG(region), region, region + 1, NULL);
 		}
 
 	/* now go back and post-process all the regions */
