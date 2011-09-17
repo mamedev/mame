@@ -318,10 +318,19 @@ bool device_memory_interface::interface_validity_check(emu_options &options, con
 							{
 								astring fulltag;
 								astring regiontag;
-								if (strchr(entry->m_region,':')) {
-									regiontag = entry->m_region;
-								} else {
-									device().siblingtag(regiontag, entry->m_region);
+
+								// a leading : on a region name indicates an absolute region, so fix up accordingly
+								if (entry->m_region[0] == ':')
+								{
+									regiontag = &entry->m_region[1];
+								}
+								else
+								{
+									if (strchr(entry->m_region,':')) {
+										regiontag = entry->m_region;
+									} else {
+										device().siblingtag(regiontag, entry->m_region);
+									}
 								}
 								rom_region_name(fulltag, &driver, source, romp);
 								if (fulltag.cmp(regiontag) == 0)

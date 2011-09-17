@@ -617,6 +617,12 @@ inline const input_port_config *running_machine::port(const char *tag)
 
 inline const memory_region *running_machine::region(const char *tag)
 {
+	// if tag begins with a :, it's absolute
+	if (tag[0] == ':')
+	{
+		return m_regionlist.find(&tag[1]);
+	}
+
 	return m_regionlist.find(tag);
 }
 

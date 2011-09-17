@@ -2198,10 +2198,19 @@ void address_space::prepare_map()
 		if (entry->m_region != NULL && entry->m_share == NULL && entry->m_baseptr == NULL)
 		{
 			astring regiontag;
-			if (strchr(entry->m_region,':')) {
-				regiontag = entry->m_region;
-			} else {
-				m_device.siblingtag(regiontag, entry->m_region);
+
+			// a leading : on a region name indicates an absolute region, so fix up accordingly
+			if (entry->m_region[0] == ':')
+			{
+				regiontag = &entry->m_region[1];
+			}
+			else
+			{
+				if (strchr(entry->m_region,':')) {
+					regiontag = entry->m_region;
+				} else {
+					m_device.siblingtag(regiontag, entry->m_region);
+				}
 			}
 			const memory_region *region = machine().region(regiontag.cstr());
 			if (region == NULL)
