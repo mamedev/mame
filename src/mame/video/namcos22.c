@@ -3,14 +3,16 @@
  *
  * todo:
  *
+ * - hook up slave dsp!
  * - fog bugfixes
- *
+ * - high priority polygons (above textlayer, for example minimap and speeddial in raveracer)
+ * - shadow in textlayer (raveracer speeddial) + alpha blending fixes in textlayer
  * - SPOT
  *
  * - sprite
- *          xy offset
- *          clipping to window
- *          eliminate garbage (air combat)
+ *   + xy offset
+ *   + clipping to window
+ *   + eliminate garbage (air combat)
  *
  *
  *******************************
