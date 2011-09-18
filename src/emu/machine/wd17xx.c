@@ -1010,17 +1010,13 @@ static void wd17xx_side_compare(device_t *device, UINT8 command)
 {
 	wd1770_state *w = get_safe_token(device);
 
+	if (wd17xx_has_side_select(device))
+		wd17xx_set_side(device, (command & FDC_SIDE_CMP_T) ? 1 : 0);
+
 	if (command & FDC_SIDE_CMP_T)
-	{
 		w->head = (command & FDC_SIDE_CMP_S) ? 1 : 0;
-		
-		if (wd17xx_has_side_select(device))
-			wd17xx_set_side(device, w->head);
-	}
 	else
-	{
 		w->head = ~0;
-	}
 }
 
 /* read a sector */
