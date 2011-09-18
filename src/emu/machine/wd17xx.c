@@ -139,6 +139,9 @@
 
     2011-Jun-24 Curt Coder
     - Added device types for all known variants, and enforced inverted DAL lines.
+	
+	2011-Sep-18 Curt Coder
+	- Connected Side Select Output for variants that support it.
 
     TODO:
         - What happens if a track is read that doesn't have any id's on it?
@@ -1003,7 +1006,22 @@ static int wd17xx_find_sector(device_t *device)
 	return 0;
 }
 
+static void wd17xx_side_compare(device_t *device, UINT8 command)
+{
+	wd1770_state *w = get_safe_token(device);
 
+	if (command & FDC_SIDE_CMP_T)
+	{
+		w->head = (command & FDC_SIDE_CMP_S) ? 1 : 0;
+		
+		if (wd17xx_has_side_select(device))
+			wd17xx_set_side(device, w->head);
+	}
+	else
+	{
+		w->head = ~0;
+	}
+}
 
 /* read a sector */
 static void wd17xx_read_sector(device_t *device)
@@ -1012,10 +1030,7 @@ static void wd17xx_read_sector(device_t *device)
 	w->data_offset = 0;
 
 	/* side compare? */
-	if (w->read_cmd & 0x02)
-		w->head = (w->read_cmd & 0x08) ? 1 : 0;
-	else
-		w->head = ~0;
+	wd17xx_side_compare(device, w->read_cmd);
 
 	if (wd17xx_find_sector(device))
 	{
@@ -1067,10 +1082,7 @@ static void wd17xx_write_sector(device_t *device)
      */
 
 	/* side compare? */
-	if (w->write_cmd & 0x02)
-		w->head = (w->write_cmd & 0x08) ? 1 : 0;
-	else
-		w->head = ~0;
+	wd17xx_side_compare(device, w->write_cmd);
 
 	/* find sector */
 	if (wd17xx_find_sector(device))
@@ -1173,10 +1185,7 @@ static TIMER_CALLBACK( wd17xx_write_sector_callback )
 		else
 		{
 			/* side compare? */
-			if (w->write_cmd & 0x02)
-				w->head = (w->write_cmd & 0x08) ? 1 : 0;
-			else
-				w->head = ~0;
+			wd17xx_side_compare(device, w->write_cmd);
 
 			/* attempt to find it first before getting data from cpu */
 			if (wd17xx_find_sector(device))
