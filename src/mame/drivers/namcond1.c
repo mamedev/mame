@@ -41,7 +41,7 @@ PCB Layout
 |                  NC1_SUB.1C    62256   |
 |----------------------------------------|
 Notes:
-      68000 clock  : 12.288MHz (49.152 / 2)
+      68000 clock  : 12.288MHz (49.152 / 4)
       H8/3002 clock: 16.384MHz (49.152 / 3)
       VSync        : 60Hz
 
@@ -279,7 +279,6 @@ static INTERRUPT_GEN( mcu_interrupt )
 /******************************************
   ND-1 Master clock = 49.152MHz
   - 680000  = 12288000 (CLK/4)
-  - H8/3002 = 16666667 (CLK/3) ??? huh?
   - H8/3002 = 16384000 (CLK/3)
   - The level 1 interrupt to the 68k has been measured at 60Hz.
 *******************************************/
@@ -287,7 +286,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 static MACHINE_CONFIG_START( namcond1, namcond1_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12288000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_49_152MHz/4)
 	MCFG_CPU_PROGRAM_MAP(namcond1_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
@@ -298,7 +297,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	//MCFG_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
 
 
-	MCFG_CPU_ADD("mcu", H83002, 16384000 )
+	MCFG_CPU_ADD("mcu", H83002, XTAL_49_152MHz/3 )
 	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
 	MCFG_CPU_IO_MAP( nd1h8iomap)
 	MCFG_CPU_VBLANK_INT("screen", mcu_interrupt)
@@ -325,7 +324,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", 16384000)
+	MCFG_C352_ADD("c352", XTAL_49_152MHz/3)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
