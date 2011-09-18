@@ -103,9 +103,6 @@ ROM_START( unkfr )
 	ROM_LOAD( "957179.02.bin", 0x0000, 0x008000, CRC(ee215e94) SHA1(249d16a3ed7b9b6c99b1135f350efcb2ed130865) )
 // More Money (VFS)
 	ROM_LOAD( "mmchancs.bin", 0x0000, 0x002000, CRC(3eaede51) SHA1(6914fcaed6e51736c6dc725ba82b691803571222) )
-// Nudge Accumulator (Summit Coin)
-	ROM_LOAD( "na10.bin", 0x0000, 0x000800, CRC(720c747c) SHA1(f371de01d7066ffc9c10e0088dc7c73aa3f7c0be) )
-	ROM_LOAD( "na11.bin", 0x0000, 0x000800, CRC(993b64b9) SHA1(39c2bdef52a21f91772b06a07a73631ba3f82edc) )
 // Oceans Eleven (Empire) (corrupt? ascii/binary mode?)
 	ROM_LOAD( "oceansb3_n_vr102.bin", 0x0000, 0x03f046, CRC(e425c04a) SHA1(9a64c6065670d4523c8f5d1094bdea0598ca2a87) )
 	ROM_LOAD( "oceansb3_p_vr102.bin", 0x0000, 0x03f046, CRC(71824b03) SHA1(540c5497217de70fa4e297a9e866b3311a12d6d6) )
@@ -733,7 +730,10 @@ ROM_START( unkfra )
 	ROM_LOAD( "carry on", 0x0000, 0x080000, CRC(4282b495) SHA1(7cdec8e8219a892c26311608ebd8953b381ecc70) )
 	ROM_LOAD( "double d.s0", 0x0000, 0x080000, CRC(c57cc5c1) SHA1(03e0062048eeedf55a35f31eccd658347fc68576) )
 	ROM_LOAD( "double d.s1", 0x0000, 0x080000, CRC(d74b49d2) SHA1(d6d39ad08ef1dfdd36163984ed3f9ae89cbad138) )
-
+	ROM_LOAD( "sound2.bin", 0x0000, 0x008000, CRC(84e8cf84) SHA1(e3e05a7dd5264c26378aefa540c3fd9d7b415827) )// Seems bad
+	ROM_LOAD( "sound3.bin", 0x0000, 0x008000, CRC(36b25191) SHA1(8a3237fa7bc5b5e630b04f76e25d22e62a4a2375) )// Similar to Club Explosion sound roms
+	ROM_LOAD( "sn-33-white.bin", 0x0000, 0x010000, CRC(8d5aba16) SHA1(3b63cf53e8bc7790f63fa395711114d1b195a07c) )//just bad I think
+	ROM_LOAD( "taker-over-008.bin", 0x0000, 0x008000, CRC(2dad1088) SHA1(b8bdf5bf4e0ef5bee44d1f7031b08e4e6a8ae5ca) )//looks a bit ACE ish, but no strings to make sure
 ROM_END
 
 

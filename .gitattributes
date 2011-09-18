@@ -2759,6 +2759,7 @@ src/mame/drivers/subs.c svneol=native#text/plain
 src/mame/drivers/subsino.c svneol=native#text/plain
 src/mame/drivers/subsino2.c svneol=native#text/plain
 src/mame/drivers/summit.c svneol=native#text/plain
+src/mame/drivers/sumt8035.c svneol=native#text/plain
 src/mame/drivers/suna16.c svneol=native#text/plain
 src/mame/drivers/suna8.c svneol=native#text/plain
 src/mame/drivers/supbtime.c svneol=native#text/plain

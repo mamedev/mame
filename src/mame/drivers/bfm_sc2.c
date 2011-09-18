@@ -5114,6 +5114,15 @@ ROM_START( sc2scshx )
 	ROM_LOAD( "scxv2hi.pg", 0x0000, 0x010000, CRC(ee5219bd) SHA1(d193289ab9d2348292f122a7dfd4121c37b1635a) )
 	ROM_LOAD( "scxv2lo.pg", 0x0000, 0x010000, CRC(48aea8e3) SHA1(601c22fda44171e292a284c0e6cb202cb8a14e24) )
 	ROM_LOAD( "supercashx1v8.bin", 0x0000, 0x010000, CRC(3123327f) SHA1(b2edc4cbbe2fb1c451dc22dd8a7cf40d7012a3f3) )
+/*
+    QF18144*
+    QP44*
+    QV0*
+    F0*
+    X0*
+    J0 0*
+    N DEVICE XC9536-15-PC44 */
+	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "supercx.jed", 0x0000, 0x0008e0, CRC(d80bc698) SHA1(2cfda3f945250253097b8a87924f14946c294894) )
 ROM_END
 

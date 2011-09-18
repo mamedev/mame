@@ -1817,6 +1817,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/statriv2.o \
 	$(DRIVERS)/stellafr.o \
 	$(DRIVERS)/summit.o \
+	$(DRIVERS)/sumt8035.o \
 	$(DRIVERS)/supertnk.o \
 	$(DRIVERS)/superwng.o \
 	$(DRIVERS)/tapatune.o \

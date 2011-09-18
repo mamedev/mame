@@ -15543,6 +15543,7 @@ ac1piadx		// Play It Again Deluxe (Ace)
 ac1prmcl		// Premier Club (Ace)
 ac1rundx		// Runner Deluxe Club (Ace)
 ac1totb			// Top Of The Bill (Ace)
+ac1sptb			// Simply The Best (Pcp)
 ac1shid			// Super Hi De Hi (Ace)
 
 
@@ -15561,6 +15562,7 @@ sp_openb		// Open The Box (Ace)
 sp_payrs		// Payrise (Ace)
 sp_playa		// Play It Again (Ace)
 sp_playaa		//
+sp_playab		//
 sp_spell		// Spellbound (Ace)
 sp_swop			// Swop Shop (Ace)
 sp_timem		// Time Machine (Ace)
@@ -15971,6 +15973,7 @@ hb_ydd		// Yabba Dabba Dough (Qps)
 /* Summit Coin */
 
 pushover	// (c)1981 Summit Coin
+sm_ngacc	// Nudge Accumulator
 
 /* IGT SPlus */
 

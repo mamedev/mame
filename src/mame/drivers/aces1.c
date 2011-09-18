@@ -222,6 +222,10 @@ ROM_START( ac1totb )
 	ROM_LOAD( "tbp3.4", 0x6000, 0x002000, CRC(f2d31ff4) SHA1(445d21ab0d413c23e0ef7bc00f940cdff5142cdd) )
 ROM_END
 
+ROM_START( ac1sptb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "simplythebest091a20pn.bin", 0x0000, 0x010000, CRC(8402d11f) SHA1(bc10f29c546fda03e18238811956c56546fa8bef) )
+ROM_END
 
 ROM_START( ac1shid )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -255,4 +259,5 @@ GAME( 199?, ac1piadx		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Play It Again Del
 GAME( 199?, ac1prmcl		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Premier Club (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, ac1rundx		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Runner Deluxe Club (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, ac1totb			,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Top Of The Bill (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, ac1sptb			,0			,aces1	,aces1	,aces1	,ROT0	,"Pcp", "Simply the Best (Pcp) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, ac1shid			,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Super Hi De Hi (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

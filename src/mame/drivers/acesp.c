@@ -406,6 +406,11 @@ ROM_START( sp_playaa )	// these seem overdumped (all have identical halves) but 
 	ROM_IGNORE(0x8000)
 ROM_END
 
+ROM_START( sp_playab )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "playitagain-v1-6pound1.bin", 0x000000, 0x008000, CRC(e377e7af) SHA1(4ca7c8ddd15791f4d45bebe861fd3c193c7227e0) )
+	ROM_LOAD( "playitagain-v1-6pound2.bin", 0x008000, 0x008000, CRC(7bab5c33) SHA1(46bc6fe7d5cdd998fc1e4e9a4b1a6a95cd160cf0) )
+ROM_END
 
 ROM_START( sp_spell )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1248,6 +1253,7 @@ GAME( 199?, sp_openb		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Open The Box (
 GAME( 199?, sp_payrs		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Payrise (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sp_playa		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Play It Again (Ace) (sp.ACE, set 1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sp_playaa		,sp_playa	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Play It Again (Ace) (sp.ACE, set 2)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // set was marked as a BWB set
+GAME( 199?, sp_playab		,sp_playa	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Play It Again (Ace) (sp.ACE, set 3)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sp_spell		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbound (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sp_swop			,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Swop Shop (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sp_timem		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Time Machine (Ace) (sp.ACE)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
