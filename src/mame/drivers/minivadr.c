@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Minivader (Space Invaders's mini game)
+Mini Vaders (Space Invaders's mini game)
 (c)1990 Taito Corporation
 
 Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/19 -
@@ -110,4 +110,4 @@ ROM_START( minivadr )
 ROM_END
 
 
-GAME( 1990, minivadr, 0, minivadr, minivadr, 0, ROT0, "Taito Corporation", "Minivader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+GAME( 1990, minivadr, 0, minivadr, minivadr, 0, ROT0, "Taito Corporation", "Mini Vaders", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
