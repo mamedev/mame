@@ -2364,6 +2364,24 @@ ROM_START( funcube2 )
 	ROM_LOAD( "fc21_voi0.u47", 0x000000, 0x400000, CRC(25b5fc3f) SHA1(18b16a14e9ee62f3fea382e9d3fdcd43bdb165f5) )
 ROM_END
 
+ROM_START( funcube3 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // XCF5206 Code
+	ROM_LOAD( "fc31prg-0a.u4", 0x000000, 0x080000, CRC(ed7d70dd) SHA1(4ebfca9e60ab5e8de22821f0475abf515c83ce53) )
+
+	ROM_REGION( 0x20000, "sub", 0 )		// H8/3007 Code
+    ROM_LOAD( "fc21iopr-0.u49", 0x000000, 0x020000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
+
+	ROM_REGION( 0x400, "pic", 0 )		// PIC12C508? Code
+	ROM_LOAD( "fc31a.u57", 0x000, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x800000, "sprites", 0 )
+	ROM_LOAD32_WORD( "fc31obj-0.u43", 0x000000, 0x400000, CRC(08c5eb6f) SHA1(016d8f3067db487ccd47188142743897c9722b1f) )
+	ROM_LOAD32_WORD( "fc31obj-1.u42", 0x000002, 0x400000, CRC(4dadc76e) SHA1(cf82296b38dc22a618fd178816316af05f2459b3) )
+
+	ROM_REGION( 0x1000000, "oki", 0 )
+	ROM_LOAD( "fc31snd-0.u47", 0x000000, 0x400000, CRC(319e8c32) SHA1(65fe58d762efb7c092a226ecbfed04c174af35a5) )
+ROM_END
+
 ROM_START( funcube4 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // XCF5206 Code
 	ROM_LOAD( "fc41_prg-0.u3", 0x00000, 0x80000, CRC(ef870874) SHA1(dcb8dc3f780ca135df55e4b4f3c95620597ad28f) )
@@ -2408,20 +2426,20 @@ static DRIVER_INIT( funcube2 )
     }
 }
 
-// Note: same as funcube2
-static DRIVER_INIT( funcube4 )
+static DRIVER_INIT( funcube3 )
 {
 	UINT32 *main_cpu = (UINT32 *) machine.region("maincpu")->base();
 	UINT16 *sub_cpu  = (UINT16 *) machine.region("sub")->base();
 
-	main_cpu[0x810/4] = 0xe0214e71;
-	main_cpu[0x814/4] = 0x4e71203c;
+	main_cpu[0x450/4] = 0xe0214e71;
+	main_cpu[0x454/4] = 0x4e71203c;
 
-	main_cpu[0x81c/4] = 0x4e714e71;
+	main_cpu[0x45c/4] = 0x4e714e71;
 
-	main_cpu[0xa5c/4] = 0x4e713e3c;
-	main_cpu[0xa74/4] = 0x4e713e3c;
-	main_cpu[0xa8c/4] = 0x4e7141f9;
+	// 0x3c0
+//	main_cpu[0xa5c/4] = 0x4e713e3c;
+//	main_cpu[0xa74/4] = 0x4e713e3c;
+//	main_cpu[0xa8c/4] = 0x4e7141f9;
 
 	// Sub CPU
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
@@ -3185,6 +3203,7 @@ GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0,        ROT0, "Sammy USA C
 GAME( 2001, wschamp,  0,        samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyh,  0,        samshoot, trophyh,  0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube4, 0,        funcube,  funcube4, funcube4, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2,  ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, funcube3, 0,        funcube,  funcube,  funcube3,  ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, funcube4, 0,        funcube,  funcube4, funcube2,  ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( ????, reelquak, 0,        reelquak, reelquak, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Ver. 1.05)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
