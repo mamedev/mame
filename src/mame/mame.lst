@@ -12040,7 +12040,7 @@ sc4polemd	//
 sc4polen	// Pole Position (Nova)
 sc4polic	// Police Squid (Qps)
 sc4potsh	// Pot Shot (Qps)
-sc4pogcl	// Pots Of Gold Club (Bellfruit)
+sc4pogbl	// Pots Of Gold Club (Bellfruit)
 sc4pwcrz	// Power Crazy (Bellfruit)
 sc4pwrsg	// Power Surge (Qps)
 sc4pwrbq	// Powerball (Qps)
@@ -12182,14 +12182,29 @@ sc4vrgclg	//
 sc4vrgclh	//
 sc4vrgcli	//
 sc4vmnv		// Viva Mexico (Nova)
+sc4vmnva	//
 sc4vmclb	// Viva Mexico Club (Bellfruit)
+sc4vmclba	//
+sc4vmclbb	//
 sc4wadzl	// Wadzilla (Mazooma)
 sc4wernr	// Werner (Nova)
 sc4wrnlt	// Werner Light (Nova)
 sc4waw		// Wet & Wild (Mazooma)
 sc4wdw		// Who Dares Wins (Bellfruit)
 sc4leg		// Who Wants To Be A Legionnaire (Bellfruit)
+sc4lega		//
+sc4legb		//
+sc4legc		//
+sc4legd		//
+sc4lege		//
+sc4legf		//
+sc4legg		//
 sc4legcb	// Who Wants To Be A Legionnaire Club (Bellfruit)
+sc4legcba	//
+sc4legcbb	//
+sc4legcbc	//
+sc4legcbd	//
+sc4legcbe	//
 sc4wldbn	// Wild Bunch (Bellfruit)
 sc4wthng	// Wild Thing (Bellfruit)
 sc4wthnm	// Wild Thing (Mazooma)
@@ -12201,7 +12216,6 @@ sc4winsp	// Winning Spin (Qps)
 sc4wondw	// Wonder Wheel (Bellfruit)
 sc4xmark	// X Marks The Spot (Bellfruit)
 sc4xcash	// Xtra Cash (Bellfruit)
-sc4unk		// Unknown Scorpion '95410476' (Mazooma)
 sc4s16		// Unknown Scorpion 'Section 16' (Mazooma)
 sc4bgold	// Black Gold (Nova)
 sc4blokq	// Blockbuster (Qps)
@@ -12226,12 +12240,18 @@ sc4adjbg	//
 sc4adjbh	//
 sc4adjbi	//
 sc4adwta	// Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit)
+sc4adwtaa	//
 sc4a40		// Around The Board In 40 Days (Mazooma)
 sc4bantm	// Bantam Of The Opera (Mazooma)
 sc4bar7		// Bar 7's (Bellfruit)
 sc4batl		// Battleships & Cruisers (Bellfruit)
 sc4bob		// Bobby Dazzler (Mazooma)
 sc4bull		// Bullseye (Bellfruit)
+sc4bulla	//
+sc4bulcs	//
+sc4bullb	//
+sc4bulcsa	//
+sc4bullc	//
 sc4butch	// Butch Cashidy & The Sundance Quid (Bellfruit)
 sc4cabin	// Cabin Fever (Mazooma)
 sc4cabina	//
@@ -12575,10 +12595,44 @@ sc4gggr		//
 sc4gggs		//
 sc4gunp		// Gunpowder Slot (Bellfruit)
 sc4hapnt	// Happy Notes (Bellfruit)
+sc4hapnta	//
+sc4hntcs	//
+sc4hntcsa	//
+sc4hntcsb	//
+sc4hntcsc	//
+sc4hapntb	//
+sc4hapntc	//
+sc4hapntd	//
+sc4hapnte	//
+sc4hntcsd	//
+sc4hntcse	//
+sc4hntcsf	//
+sc4hntcsg	//
+sc4hntcsh	//
+sc4hntcsi	//
+sc4hntcsj	//
+sc4hntcsk	//
+sc4hntcsl	//
+sc4hntcsm	//
+sc4hntcsn	//
+sc4hntcso	//
 sc4hellb	// Hells Bells (Bellfruit)
+sc4hellba	//
+sc4hellbb	//
+sc4hellbc	//
+sc4hellbd	//
+sc4hellbe	//
+sc4hellbf	//
+sc4hellbg	//
+sc4hellbh	//
+sc4hellbi	//
+sc4hellbj	//
 sc4hill		// Hill Billionaire (Bellfruit)
 sc4hiss		// Hissing Quid (Qps)
 sc4hotdg	// Hot Dog (Bellfruit)
+sc4hotdga	//
+sc4hotdgb	//
+sc4hotdgc	//
 sc4hotrd	// Hot Rod (Bellfruit)
 sc4hotsh	// Hot Shots (Bellfruit)
 sc4hotwd	// Hot Wad (Bellfruit)
@@ -12588,6 +12642,11 @@ sc4ijob		// Italian Job (Mazooma)
 sc4jjok		// Jackpot Jokers (Bellfruit)
 sc4ldvl		// Little Devil (Mazooma)
 sc4lotrr	// Lord Of The Rings - Return Of The King (Bellfruit)
+sc4lotrra	//
+sc4lotrrb	//
+sc4lotrrc	//
+sc4lotrrd	//
+sc4lotrre	//
 sc4manic	// Manic Miner (Bellfruit)
 sc4manica	//
 sc4manicb	//
@@ -12681,6 +12740,15 @@ sc4ppsag	// Pink Panther Strikes Again (Mazooma)
 sc4pony		// Pony Express (Bellfruit)
 sc4popey	// Popeye (Mazooma)
 sc4pog		// Pots Of Gold (Bellfruit)
+sc4bulcsb		//
+sc4poga		//
+sc4pogb		//
+sc4bulcsc		//
+sc4pogc		//
+sc4pogd		//
+sc4poge		//
+sc4pogf		//
+sc4pogg		//
 sc4pwrpl	// Power Play (Mazooma)
 sc4pwrbl	// Powerball (Bellfruit)
 sc4quidv	// Quid Vicious (Mazooma)
@@ -12706,6 +12774,9 @@ sc4ttpiee	//
 sc4ttpief	//
 sc4ttpieg	//
 sc4typ		// Take Your Pick (Bellfruit)
+sc4typa		//
+sc4typb		//
+sc4typc		//
 sc4tbox		// Top Box (Mazooma)
 sc4tpsht	// Top Of The Shots (Mazooma)
 sc4tpshta	//
@@ -12716,9 +12787,24 @@ sc4tpshte	//
 sc4tpshtf	//
 sc4tpshtg	//
 sc4trail	// Trailblazer (Mazooma)
+sc4traila	//
+sc4trailb	//
+sc4trailc	//
 sc4vivam	// Viva Mexico (Bellfruit)
+sc4vivama	//
+sc4vivcs	//
+sc4vivamb	//
+sc4vivamc	//
+sc4vivcsa	//
+sc4vivcsb	//
+sc4vivcsc	//
+sc4vivcsd	//
+sc4vivcse	//
+sc4vivcsf	//
+sc4vivcsg	//
 sc4wldjk	// Wild Jackpots (Mazooma)
 sc4adsnt	// Ant & Dec's Saturday Night Takeaway (Bellfruit)
+sc4adsnta	//
 sc4bpb		// Bully's Prize Board (Bellfruit)
 sc4bpba		//
 sc4bpbb		//
@@ -13007,7 +13093,6 @@ sc5wotw		// War Of The Wads (Mazooma)
 sc5wild		// Wild Reels (Mazooma)
 sc5wca		// Win Can Alley (Qps)
 sc5wok		// Wok n' Roll (Bellfruit)
-sc5u1396	// Unknown Scorpion '95411396' (Mazooma)
 sc5u6606	// Unknown Scorpion '95416606' (Mazooma)
 sc5u7606	// Unknown Scorpion '95417606' (Mazooma)
 sc5rhr		// Red Hot Reels (Qps)
@@ -13038,13 +13123,21 @@ sc5adjbp	//
 sc5adjbq	//
 sc5adjbr	//
 sc5adwta	// Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit)
+sc5adwtaa	//
 sc5a40		// Around The Board In 40 Days (Mazooma)
 sc5bantm	// Bantam Of The Opera (Mazooma)
 sc5bar7		// Bar 7's (Bellfruit)
 sc5batl		// Battleships & Cruisers (Bellfruit)
 sc5bob		// Bobby Dazzler (Mazooma)
 sc5bull		// Bullseye (Bellfruit)
-ad5bull		// Bullseye (Bellfruit)
+sc5bulla	//
+sc5sbull	//
+sc5sbulla	//
+sc5bull5	//
+sc5bull5a	//
+sc5bull5b	//
+sc5bull5c	//
+ad5bull		// Bullseye (Bellfruit) (AD5)
 sc5butch	// Butch Cashidy & The Sundance Quid (Bellfruit)
 sc5cabin	// Cabin Fever (Mazooma)
 sc5cabina	//
@@ -13492,6 +13585,15 @@ sc5ijob		// Italian Job (Mazooma)
 sc5jjok		// Jackpot Jokers (Bellfruit)
 sc5ldvl		// Little Devil (Mazooma)
 sc5lotrr	// Lord Of The Rings - Return Of The King (Bellfruit)
+sc5lotrra	//
+sc5lotrrb	//
+sc5lotrrc	//
+sc5lotrrd	//
+sc5lotrre	//
+sc5lotrrf	//
+sc5lotrrg	//
+sc5lotrrh	//
+sc5lotrri	//
 sc5manic	// Manic Miner (Bellfruit)
 sc5manica	//
 sc5manicb	//
@@ -13545,6 +13647,19 @@ sc5ppsag	// Pink Panther Strikes Again (Mazooma)
 sc5pony		// Pony Express (Bellfruit)
 sc5popey	// Popeye (Mazooma)
 sc5pog		// Pots Of Gold (Bellfruit)
+sc5poga		//
+sc5pogb		//
+sc5pogc		//
+sc5potog	//
+sc5potoga	//
+sc5potogb	//
+sc5potogc	//
+sc5potogd	//
+sc5potoge	//
+sc5potogf	//
+sc5potogg	//
+sc5pogd		//
+sc5poge		//
 sc5pwrpl	// Power Play (Mazooma)
 sc5pwrbl	// Powerball (Bellfruit)
 sc5quidv	// Quid Vicious (Mazooma)
@@ -13572,7 +13687,27 @@ sc5ttpieg	//
 sc5ttpieh	//
 sc5ttpiei	//
 sc5typ		// Take Your Pick (Bellfruit)
+sc5typa		//
+sc5typb		//
+sc5typc		//
 sc5tbox		// Top Box (Mazooma)
+sc5tboxa	//
+sc5tboxb	//
+sc5tboxc	//
+sc5tboxd	//
+sc5tboxe	//
+sc5tboxf	//
+sc5tboxg	//
+sc5tboxh	//
+sc5tboxi	//
+sc5tboxj	//
+sc5tboxk	//
+sc5tboxl	//
+sc5tboxm	//
+sc5tboxn	//
+sc5tboxo	//
+sc5tboxp	//
+sc5tboxq	//
 sc5tpsht	// Top Of The Shots (Mazooma)
 sc5tpshta	//
 sc5tpshtb	//
@@ -13582,6 +13717,7 @@ sc5trail	// Trailblazer (Mazooma)
 sc5vivam	// Viva Mexico (Bellfruit)
 sc5wldjk	// Wild Jackpots (Mazooma)
 sc5adsnt	// Ant & Dec's Saturday Night Takeaway (Bellfruit)
+sc5adsnta	//
 sc5bpb		// Bully's Prize Board (Bellfruit)
 sc5bpba		//
 sc5bpbb		//
