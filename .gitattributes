@@ -2872,6 +2872,7 @@ src/mame/drivers/uapce.c svneol=native#text/plain
 src/mame/drivers/ultraman.c svneol=native#text/plain
 src/mame/drivers/ultratnk.c svneol=native#text/plain
 src/mame/drivers/ultrsprt.c svneol=native#text/plain
+src/mame/drivers/umipoker.c svneol=native#text/plain
 src/mame/drivers/undrfire.c svneol=native#text/plain
 src/mame/drivers/unico.c svneol=native#text/plain
 src/mame/drivers/unkfr.c svneol=native#text/plain
