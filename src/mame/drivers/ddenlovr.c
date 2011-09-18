@@ -3745,6 +3745,22 @@ static READ8_HANDLER( daimyojn_protection_r )
 	return 0xff;
 }
 
+static READ8_HANDLER( momotaro_protection_r )
+{
+	dynax_state *state = space->machine().driver_data<dynax_state>();
+
+	switch (state->m_prot_val)
+	{
+		case 0xd4: return 0xd9;
+		case 0xed: return 0xe0;
+		case 0x76: return 0x7b;
+		case 0xc9: return 0xc4;
+		case 0xcb: return 0xc6;
+	}
+
+	return 0xff;
+}
+
 static WRITE8_DEVICE_HANDLER( daimyojn_okibank_w )
 {
 	okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -10341,6 +10357,23 @@ ROM_START( daimyojn )
 	ROM_LOAD( "t0171.2b", 0x00000, 0x80000, CRC(464be04c) SHA1(3532ac8d7eaadb2dc33e2c2d9731654176231184) )
 ROM_END
 
+ROM_START( momotaro )
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
+    ROM_LOAD( "r0272m1.6e",   0x00000, 0x080000, CRC(71c83332) SHA1(c949cb9e23e5cc77dbd64fc28e62a88f1dc811a3) )
+	ROM_RELOAD(           	  0x10000, 0x80000 )
+
+	ROM_REGION( 0x400000, "blitter", 0 )	/* blitter data */
+	ROM_LOAD( "t0273.7b",     0x000000, 0x200000, CRC(5ae90ae2) SHA1(975bae930d848987405dc3dd59de138b1f98b358) )
+	ROM_LOAD( "t0274.8b",     0x200000, 0x200000, CRC(78209778) SHA1(4054972e12115049322bb43381ff50a354c3cadf) )
+
+	ROM_REGION( 0x80000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "t0271.2b",     0x000000, 0x080000, CRC(c850d7b2) SHA1(8bb69bdea7035c5f8274927f07a4cdf6ed9b32fc) )
+ROM_END
+
+static DRIVER_INIT( momotaro )
+{
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xe0, 0xe0, FUNC(momotaro_protection_r) );
+}
 
 GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  0,        ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter",                                         GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // scrolling, priority?
@@ -10377,3 +10410,4 @@ GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, 0,        ROT0, "Dynax",  
 GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, 0,        ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1999, jongtei,   0,        jongtei,   jongtei,  0,        ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, ver. NM532-01)",                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, 0,        ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, momotaro, ROT0, "Techno-Top", 						         "Mahjong Momotarou (Japan)",                           			GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS ) // different blitter commands

@@ -26,7 +26,6 @@ TODO:
 - Add the RS232c interface (serial port),needed by fhboxers.
 - Video emulation bugs: check stvvdp2.c file.
 - Reimplement the idle skip if possible.
-- clean up the I/Os, by using per-game specific mapped ports and rewrite it by using 16-bit trampolines
 - Properly emulate the protection chips, used by several games (check stvprot.c for more info)
 - Move SCU device into its respective file;
 - Split ST-V and Saturn files properly;
