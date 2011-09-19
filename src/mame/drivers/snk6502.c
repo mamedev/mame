@@ -122,9 +122,11 @@ is not from Nibbler!  IC51 is a leftover from the game board to which the
 conversion kit for Nibbler was applied, a Pioneer Balloon, and is where MAME's
 original rom dump came from.  Both the dedicated cabinet boards and the
 conversion kit boards for Nibbler never came with nor do the manuals for them
-list an "iC51" in the part list breakdown.  In fact, sound roms between different
+list a "iC51" in the parts list breakdown.  In fact, sound roms between different
 games using the snk6502 custom sound can largely be interchanged with another
-using the same.
+using the same.  Currently in MAME, this IC51 from Pioneer Balloon is set as
+as OPTIONAL rom, allowing you to still play Nibbler (with/without music if you
+wish) without needing to adjust the source and recompile.
 
 ****************************************************************************
 
@@ -1371,8 +1373,8 @@ ROM_START( nibbler ) /* revision 9 */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
-	ROM_FILL( 0x0000, 0x0800, 0xff )  // Game does not have a populated IC51
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_LOAD_OPTIONAL( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1398,10 +1400,10 @@ ROM_START( nibbler8 ) /* revision 8 */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
-	ROM_FILL( 0x0000, 0x0800, 0xff )  // Game does not have a populated IC51
-	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) ) // 50-152.052
-	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) ) // 50-151.053
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_LOAD_OPTIONAL( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
+	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
+	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
 
 ROM_START( nibbler6 ) /* revision 6 */
@@ -1425,8 +1427,8 @@ ROM_START( nibbler6 ) /* revision 6 */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
-	ROM_FILL( 0x0000, 0x0800, 0xff )  // Game does not have a populated IC51
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_LOAD_OPTIONAL( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1452,8 +1454,8 @@ ROM_START( nibblero ) /* revision 8 */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
-	ROM_FILL( 0x0000, 0x0800, 0xff )  // Game does not have a populated IC51
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_LOAD_OPTIONAL( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
