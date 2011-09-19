@@ -11765,6 +11765,7 @@ sc4crcc		// Cops 'n' Robbers Club Classic (Bellfruit)
 sc4crcp		// Cops 'n' Robbers Club Platinum (Bellfruit)
 sc4crgc		// Cops 'n' Robbers Gold Club (Bellfruit)
 sc4corcl	// Coronation Street Club (Mazooma)
+sc4corcla	//
 sc4cyc		// Count Yer Cash (Mazooma)
 sc4cyccl	// Count Yer Cash Club (Mazooma)
 sc4crzcs	// Crazy Casino (Bellfruit)
@@ -12255,6 +12256,13 @@ sc4bullb	//
 sc4bulcsa	//
 sc4bullc	//
 sc4butch	// Butch Cashidy & The Sundance Quid (Bellfruit)
+sc4butcha	//
+sc4butchb	//
+sc4butchc	//
+sc4butchd	//
+sc4butche	//
+sc4butchf	//
+sc4butchg	//
 sc4cabin	// Cabin Fever (Mazooma)
 sc4cabina	//
 sc4cabinb	//
@@ -12273,14 +12281,43 @@ sc4cari		// Caribbean Cash (Qps)
 sc4cblas	// Cash Blast (Bellfruit)
 sc4casxt	// Casino Xtravaganza  (Mazooma)
 sc4chavi	// Chav It (Bellfruit)
+sc4chavia	//
+sc4chavib	//
+sc4chavic	//
+sc4chavid	//
+sc4chavie	//
+sc4chavif	//
+sc4chavig	//
 sc4chavy	// Chavy Chase (Mazooma)
+sc4chavya	//
+sc4chavyb	//
+sc4chavyc	//
+sc4chavyd	//
+sc4chavye	//
+sc4chavyf	//
+sc4chavyg	//
 sc4clue		// Cluedo (Mazooma)
 sc4cmani	// Colour Mania (Bellfruit)
 sc4cj		// Cool Jewels (Bellfruit)
 sc4ctl		// Cop The Lot (Bellfruit)
 sc4crsc		// Cops 'n' Robbers Safe Cracker (Bellfruit)
 sc4coro		// Coronation Street (Mazooma)
+sc4coroa	//
+sc4corotb	//
+sc4coroc	//
+sc4corod	//
+sc4corotba	//
+sc4corof	//
+sc4corog	//
+sc4coroh	//
+sc4coroi	//
+sc4coroj	//
+sc4corok	//
+sc4corol	//
+sc4corom	//
+sc4coron	//
 sc4count	// Countdown (Bellfruit)
+sc4counta	//
 sc4cf		// Crazy Fruits (Bellfruit)
 sc4crnjw	// Crown Jewels (Bellfruit)
 sc4dnd		// Deal Or No Deal (Bellfruit)
@@ -12854,14 +12891,64 @@ sc4poge		//
 sc4pogf		//
 sc4pogg		//
 sc4pwrpl	// Power Play (Mazooma)
+sc4pwrpla	//
+sc4pwrplb	//
+sc4pwrplc	//
 sc4pwrbl	// Powerball (Bellfruit)
+sc4pwrbla	//
 sc4quidv	// Quid Vicious (Mazooma)
+sc4quidva	//
+sc4quidvb	//
+sc4quidvc	//
 sc4rhx		// Red Hot X (Mazooma)
+sc4rhxa		//
+sc4rhxb		//
+sc4rhxc		//
+sc4rhxd		//
+sc4rhxe		//
+sc4rhxf		//
+sc4rhxg		//
+sc4rhxh		//
+sc4rhxi		//
+sc4rhxj		//
+sc4rhxk		//
+sc4rhxl		//
+sc4rhxm		//
+sc4rhxn		//
+sc4rhxo		//
+sc4rhxp		//
+sc4rhxq		//
+sc4rhxr		//
+sc4rhxs		//
+sc4rhxt		//
+sc4rhxu		//
+sc4rhxv		//
+sc4rhxw		//
 sc4rhxcs	// Red Hot X Casino (Mazooma)
+sc4rhxcsa	//
+sc4rhxcsb	//
+sc4rhxcsc	//
+sc4rhxcsd	//
+sc4rhxcse	//
 sc4redsq	// Red Square (Mazooma)
+sc4redsqa	//
+sc4redsqb	//
+sc4redsqc	//
 sc4rosts	// Ronnie O'Sullivan's Tournament Snooker (Bellfruit)
+sc4rostsa	//
+sc4rostsb	//
+sc4rostsc	//
+sc4rostsd	//
+sc4rostse	//
+sc4rostsf	//
+sc4rostsg	//
 sc4rovrt	// Rovers Return (Mazooma)
-sc4smtm		// Show Me The Money (Mazooma)
+sc4rovrta	//
+sc4rovrtb	//
+sc4rovrtc	//
+sc4rovrtd	//
+sc4rovrte	//
+
 sc4showt	// Showtime (Bellfruit)
 sc4slad		// Snakes & Ladders (Bellfruit)
 sc4spice	// Spice It Up (Bellfruit)
