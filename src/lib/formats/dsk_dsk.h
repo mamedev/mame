@@ -1,24 +1,23 @@
 /*********************************************************************
 
-    formats/hxcmfm_dsk.h
+    formats/dsk_dsk.h
 
-    HxC Floppy Emulator disk images
+    CPC DSK disk images
 
 *********************************************************************/
 
-#ifndef HXCMFM_DSK_H
-#define HXCMFM_DSK_H
+#ifndef CPCDSK_DSK_H
+#define CPCDSK_DSK_H
 
 #include "flopimg.h"
 
-class mfm_format : public floppy_image_format_t
+class dsk_format : public floppy_image_format_t
 {
 public:
-	mfm_format();
+	dsk_format();
 
 	virtual int identify(io_generic *io);
 	virtual bool load(io_generic *io, floppy_image *image);
-	virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const;
 	virtual const char *description() const;
@@ -26,6 +25,6 @@ public:
 	virtual bool supports_save() const;
 };
 
-extern const floppy_format_type FLOPPY_MFM_FORMAT;
+extern const floppy_format_type FLOPPY_DSK_FORMAT;
 
-#endif /* HXCMFM_DSK_H */
+#endif /* CPCDSK_DSK_H */

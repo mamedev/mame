@@ -9,29 +9,24 @@
 
 #include "formats/flopimg.h"
 
+#define MCFG_FLOPPY_DRIVE_ADD(_tag, _type, _tracks, _sides, _formats)	\
+	MCFG_DEVICE_ADD(_tag, FLOPPY, 0) \
+	downcast<floppy_image_device *>(device)->set_info(_type, _tracks, _sides, _formats);
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-// ======================> floppy_interface
 
-struct floppy_interface
-{
-	devcb_write_line				m_out_idx_cb;  /* index */
-
-	const floppy_format_type		*m_formats;
-	const char *					m_interface;
-	device_image_display_info_func	m_device_displayinfo;
-	device_image_load_func			m_load_func;
-	device_image_unload_func		m_unload_func;
-};
-
-// ======================> cdrom_image_device
 
 class floppy_image_device :	public device_t,
-							public floppy_interface,
 							public device_image_interface
 {
 public:
+	enum {
+		TYPE_35_SD, TYPE_35_DD, TYPE_35_HD, TYPE_35_ED,
+		TYPE_525_SD, TYPE_525_DD, TYPE_525_HD
+	};
+
 	typedef delegate<int (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
@@ -40,10 +35,13 @@ public:
 	floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_image_device();
 
+	void set_info(int type, int tracks, int sides, const floppy_format_type *formats);
+	void set_rpm(float rpm);
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
-	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
+	virtual void call_display_info() {}
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
 	virtual iodevice_t image_type() const { return IO_FLOPPY; }
@@ -53,87 +51,79 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return m_interface; }
-	virtual const char *file_extensions() const { return m_extension_list; }
+	virtual const char *file_extensions() const { return extension_list; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	void setup_load_cb(load_cb cb);
 	void setup_unload_cb(unload_cb cb);
 	void setup_index_pulse_cb(index_pulse_cb cb);
 
-	UINT32* get_buffer() { return m_image->get_buffer(m_cyl,m_ss ^ 1); }
-	UINT32 get_len() { return m_image->get_track_size(m_cyl,m_ss ^ 1); }
+	UINT32* get_buffer() { return image->get_buffer(cyl, ss ^ 1); }
+	UINT32 get_len() { return image->get_track_size(cyl, ss ^ 1); }
 
 	void mon_w(int state);
-	void index_func();
 	int  ready_r();
 	double get_pos();
 
-	int wpt_r() { return m_wpt; }
-	int dskchg_r() { return m_dskchg; }
-	int trk00_r() { return (m_cyl==0) ? 0 : 1; }
+	int wpt_r() { return wpt; }
+	int dskchg_r() { return dskchg; }
+	bool trk00_r() { return cyl != 0; }
+	int idx_r() { return idx; }
 
 	void stp_w(int state);
-	void dir_w(int state) { m_dir = state; }
-	void ss_w(int state) { m_ss = state; }
+	void dir_w(int state) { dir = state; }
+	void ss_w(int state) { ss = state; }
+
+	void index_resync();
+	attotime time_next_index();
+	attotime get_next_transition(attotime from_when);
 
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	image_device_format m_format;
-	floppy_image		*m_image;
-	char				m_extension_list[256];
-	floppy_image_format_t *m_fif_list;
+	image_device_format   format;
+	floppy_image		  *image;
+	char				  extension_list[256];
+	floppy_image_format_t *fif_list;
+	emu_timer             *index_timer;
 
-	/* index pulse timer */
-	emu_timer	*m_index_timer;
+	/* Physical characteristics */
+	int type;   /* reader type */
+	int tracks; /* addressable tracks */
+	int sides;  /* number of heads */
 
 	/* state of input lines */
-	int m_dir;  /* direction */
-	int m_stp;  /* step */
-	int m_wtg;  /* write gate */
-	int m_mon;  /* motor on */
-	int m_ss;	/* side select */
+	int dir;  /* direction */
+	int stp;  /* step */
+	int wtg;  /* write gate */
+	int mon;  /* motor on */
+	int ss;	/* side select */
 
 	/* state of output lines */
-	int m_idx;  /* index pulse */
-	int m_tk00; /* track 00 */
-	int m_wpt;  /* write protect */
-	int m_rdy;  /* ready */
-	int m_dskchg;		/* disk changed */
+	int idx;  /* index pulse */
+	int wpt;  /* write protect */
+	int rdy;  /* ready */
+	int dskchg;		/* disk changed */
 
 	/* rotation per minute => gives index pulse frequency */
-	float m_rpm;
+	float rpm;
 
-	int m_cyl;
-	devcb_resolved_write_line m_out_idx_func;
+	attotime revolution_start_time, rev_time;
+	UINT32 revolution_count;
+	int cyl;
 
 	load_cb cur_load_cb;
 	unload_cb cur_unload_cb;
 	index_pulse_cb cur_index_pulse_cb;
+
+	int find_position(int position, const UINT32 *buf, int buf_size);
 };
 
 // device type definition
 extern const device_type FLOPPY;
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-#define FLOPPY_0 "floppy0"
-#define FLOPPY_1 "floppy1"
-#define FLOPPY_2 "floppy2"
-#define FLOPPY_3 "floppy3"
-
-#define MCFG_FLOPPY_DRIVE_ADD(_config) \
-	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY, 0) \
-	MCFG_DEVICE_CONFIG(_config)	\
-
-#define MCFG_FLOPPY_2_DRIVES_ADD(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY, 0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY, 0)		\
-	MCFG_DEVICE_CONFIG(_config)
 
 #endif /* FLOPPY_H */

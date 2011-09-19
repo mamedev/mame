@@ -225,9 +225,9 @@ public:
 	floppy_image_format_t();
 	virtual ~floppy_image_format_t();
 
-	virtual int identify(floppy_image *image) = 0;
-	virtual bool load(floppy_image *image) = 0;
-	virtual bool save(floppy_image *image);
+	virtual int identify(io_generic *io) = 0;
+	virtual bool load(io_generic *io, floppy_image *image) = 0;
+	virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const = 0;
 	virtual const char *description() const = 0;
@@ -238,6 +238,8 @@ public:
 	void append(floppy_image_format_t *_next);
 
 protected:
+	// **** Reader helpers ****
+
 	// Struct designed for easy track data description
 	// Optional, you can always do things by hand, but useful nevertheless
 	// A vector of these structures describes one track.
@@ -288,8 +290,108 @@ protected:
 	// "track_size" is in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm
 
 	void generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
+
+	// Generate a track from cell binary values, MSB-first, size in cells and not bytes
 	void generate_track_from_bitstream(UINT8 track, UINT8 head, const UINT8 *trackbuf, int track_size, floppy_image *image);
+
+
 	void normalize_times(UINT32 *buffer, int bitlen);
+
+
+
+	// Some useful descriptions shared by multiple formats
+
+	// Atari ST formats (100K cells)
+	//   Standard TOS 9 sectors-per-track format
+	static const desc_e atari_st_9[];
+
+	//   Usual 10 sectors-per-track format
+	static const desc_e atari_st_10[];
+
+	//   Fastcopy Pro optimized formats, with fake sector header for
+	//   faster verify and skew/interleave where appropriate
+	static const desc_e atari_st_fcp_9[];
+	static const desc_e *const atari_st_fcp_10[10];
+	static const desc_e *const atari_st_fcp_11[11];
+
+	static const desc_e atari_st_fcp_10_0[], atari_st_fcp_10_1[], atari_st_fcp_10_2[], atari_st_fcp_10_3[];
+	static const desc_e atari_st_fcp_10_4[], atari_st_fcp_10_5[], atari_st_fcp_10_6[], atari_st_fcp_10_7[];
+	static const desc_e atari_st_fcp_10_8[], atari_st_fcp_10_9[];
+
+	static const desc_e atari_st_fcp_11_0[], atari_st_fcp_11_1[], atari_st_fcp_11_2[], atari_st_fcp_11_3[];
+	static const desc_e atari_st_fcp_11_4[], atari_st_fcp_11_5[], atari_st_fcp_11_6[], atari_st_fcp_11_7[];
+	static const desc_e atari_st_fcp_11_8[], atari_st_fcp_11_9[], atari_st_fcp_11_10[];
+
+	static const desc_e *atari_st_fcp_get_desc(UINT8 track, UINT8 head, UINT8 head_count, UINT8 sect_count);
+
+	// Amiga formats (100K cells)
+	//   Standard 11 sectors per track format
+	static const desc_e amiga_11[];
+
+
+	// **** Writer helpers ****
+
+	// Rebuild a cell bitstream for a track.  Takes the cell standard
+	// angular size as a parameter, gives out a msb-first bitstream.
+	// Beware that fuzzy bits will always give out the same value.
+	//
+	// Output buffer size should be 34% more than the nominal number
+	// of cells (the dpll tolerates a cell size down to 75% of the
+	// nominal one, with gives a cell count of 1/0.75=1.333... times
+	// the nominal one).
+	//
+	// Output size is given in bits (cells).
+	//
+	// Computing the standard angular size of a cell is
+	// simple. Noting:
+	//   d = standard cell duration in microseconds
+	//   r = motor rotational speed in rpm
+	// then:
+	//   a = r * d * 10 / 3
+	//
+	// Some values:
+	//   Type           Cell    RPM    Size
+
+	// C1541 tr  1-17   3.25    300    3250
+	// C1541 tr 18-24   3.50    300    3500
+	// C1541 tr 25-30   3.75    300    3750
+	// C1541 tr 31+     4.00    300    4000
+	// 5.25" SD         4       300    4000
+	// 5.25" DD         2       300    2000
+	// 5.25" HD         1       360    1200
+	// 3.5" SD          4       300    4000
+	// 3.5" DD          2       300    2000
+	// 3.5" HD          1       300    1000
+	// 3.5" ED          0.5     300     500
+
+	void generate_bitstream_from_track(UINT8 track, UINT8 head, int cell_size,  UINT8 *trackbuf, int &track_size, floppy_image *image);
+
+	struct desc_xs {
+		UINT8 track, head;
+		int size;
+		const UINT8 *data;
+	};
+
+	// Extract standard sectors from a regenerated bitstream
+	// sectors must point to an array of 256 desc_xs
+	// An existing sector is reconizable by having ->data non-null
+	// Sector data is written in sectdata up to sectdata_size bytes
+
+	// The ones implemented here are the ones used by multiple
+	// systems.
+
+	//   PC-type sectors with MFM encoding, sector size can go from 128 bytes to 16K
+	void extract_sectors_from_bitstream_mfm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
+
+
+	// Get a geometry (including sectors) from an image
+	//   PC-type sectors with MFM encoding
+	void get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
+
+
+	// Regenerate the data for a full track
+	//   PC-type sectors with MFM encoding and fixed-size
+	void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata);
 
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT };
@@ -313,6 +415,10 @@ private:
 	void mfm_w(UINT8 *buffer, int &offset, int n, UINT32 val);
 	void mfm_half_w(UINT8 *buffer, int &offset, int start_bit, UINT32 val);
 	void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
+
+	int sbit_r(const UINT8 *bitstream, int pos);
+	int sbit_rp(const UINT8 *bitstream, int &pos, int track_size);
+	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
 };
 
 // a device_type is simply a pointer to its alloc function
@@ -360,39 +466,29 @@ public:
 	};
 
 	// construction/destruction
-	floppy_image(void *fp, const struct io_procs *procs, const floppy_format_type *formats);
+	floppy_image(int tracks, int heads);
 	virtual ~floppy_image();
 
-	void image_read(void *buffer, UINT64 offset, size_t length);
-	void image_write(const void *buffer, UINT64 offset, size_t length);
-	void image_write_filler(UINT8 filler, UINT64 offset, size_t length);
-	UINT64 image_size();
-	void close();
+	void set_track_size(int track, int head, UINT32 size) { track_size[(track << 1) + head] = size; ensure_alloc(track, head); }
+	UINT32 *get_buffer(int track, int head) { return cell_data[(track << 1) + head]; }
+	UINT32 get_track_size(int track, int head) { return track_size[(track << 1) + head]; }
 
-	void set_meta_data(UINT16 tracks, UINT8 sides);
-	void set_track_size(UINT16 track, UINT8 side, UINT32 size) { track_size[(track << 1) + side] = size; ensure_alloc(track, side); }
-	floppy_image_format_t *identify(int *best);
-	UINT32 *get_buffer(UINT16 track, UINT8 side) { return cell_data[(track << 1) + side]; }
-	UINT32 get_track_size(UINT16 track, UINT8 side) { return track_size[(track << 1) + side]; }
+	void get_maximal_geometry(int &tracks, int &heads);
+	void get_actual_geometry(int &tracks, int &heads);
 
 private:
 	enum {
-		MAX_FLOPPY_SIDES = 2,
+		MAX_FLOPPY_HEADS = 2,
 		MAX_FLOPPY_TRACKS = 84
 	};
 
-	void close_internal(bool close_file);
-	struct io_generic		m_io;
-	floppy_image_format_t *m_formats;
+	int tracks, heads;
 
-	UINT16 tracks;
-	UINT8  sides;
+	UINT32 *cell_data[MAX_FLOPPY_HEADS * MAX_FLOPPY_TRACKS];
+	UINT32 track_size[MAX_FLOPPY_HEADS * MAX_FLOPPY_TRACKS];
+	UINT32 track_alloc_size[MAX_FLOPPY_HEADS * MAX_FLOPPY_TRACKS];
 
-	UINT32 *cell_data[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
-	UINT32 track_size[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
-	UINT32 track_alloc_size[MAX_FLOPPY_SIDES * MAX_FLOPPY_TRACKS];
-
-	void ensure_alloc(UINT16 track, UINT8 side);
+	void ensure_alloc(int track, int head);
 };
 
 #endif /* FLOPIMG_H */

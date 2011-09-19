@@ -1441,6 +1441,7 @@ src/lib/formats/d88_dsk.c svneol=native#text/plain
 src/lib/formats/dim_dsk.c svneol=native#text/plain
 src/lib/formats/dim_dsk.h svneol=native#text/plain
 src/lib/formats/dsk_dsk.c svneol=native#text/plain
+src/lib/formats/dsk_dsk.h svneol=native#text/plain
 src/lib/formats/fdi_dsk.c svneol=native#text/plain
 src/lib/formats/flopimg.c svneol=native#text/plain
 src/lib/formats/flopimg.h svneol=native#text/plain

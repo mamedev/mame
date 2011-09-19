@@ -18,7 +18,7 @@ const device_type FLOPPY = &device_creator<floppy_image_device>;
 floppy_image_device::floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, FLOPPY, "Floppy drive", tag, owner, clock),
 	  device_image_interface(mconfig, *this),
-	  m_image(NULL)
+	  image(NULL)
 {
 }
 
@@ -28,56 +28,6 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, const ch
 
 floppy_image_device::~floppy_image_device()
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void floppy_image_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const floppy_interface *intf = reinterpret_cast<const floppy_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<floppy_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_formats, 0, sizeof(m_formats));
-		memset(&m_interface, 0, sizeof(m_interface));
-		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
-		memset(&m_load_func, 0, sizeof(m_load_func));
-		memset(&m_unload_func, 0, sizeof(m_unload_func));
-	}
-
-	image_device_format **formatptr;
-    image_device_format *format;
-    formatptr = &m_formatlist;
-	m_extension_list[0] = '\0';
-	m_fif_list = 0;
-	for(int cnt=0; m_formats[cnt]; cnt++)
-	{
-		// allocate a new format
-		floppy_image_format_t *fif = m_formats[cnt]();
-
-		format = global_alloc_clear(image_device_format);
-		format->m_index 	  = cnt;
-		format->m_name        = fif->name();
-		format->m_description = fif->description();
-		format->m_extensions  = fif->extensions();
-		format->m_optspec     = "";
-
-		image_specify_extension( m_extension_list, 256, fif->extensions() );
-		// and append it to the list
-		*formatptr = format;
-		formatptr = &format->m_next;
-	}
-
-	// set brief and instance name
-	update_names();
 }
 
 void floppy_image_device::setup_load_cb(load_cb cb)
@@ -95,11 +45,57 @@ void floppy_image_device::setup_index_pulse_cb(index_pulse_cb cb)
 	cur_index_pulse_cb = cb;
 }
 
-static TIMER_CALLBACK(floppy_drive_index_callback)
+void floppy_image_device::set_info(int _type, int _tracks, int _sides, const floppy_format_type *formats)
 {
-	floppy_image_device *image = (floppy_image_device *) ptr;
-	image->index_func();
+	type = _type;
+	tracks = _tracks;
+	sides = _sides;
+
+	image_device_format **formatptr;
+    image_device_format *format;
+    formatptr = &m_formatlist;
+	extension_list[0] = '\0';
+	fif_list = 0;
+	for(int cnt=0; formats[cnt]; cnt++)
+	{
+		// allocate a new format
+		floppy_image_format_t *fif = formats[cnt]();
+		if(!fif_list)
+			fif_list = fif;
+		else
+			fif_list->append(fif);
+
+		format = global_alloc_clear(image_device_format);
+		format->m_index       = cnt;
+		format->m_name        = fif->name();
+		format->m_description = fif->description();
+		format->m_extensions  = fif->extensions();
+		format->m_optspec     = "";
+
+		image_specify_extension( extension_list, 256, fif->extensions() );
+		// and append it to the list
+		*formatptr = format;
+		formatptr = &format->m_next;
+	}
+
+	// set brief and instance name
+	update_names();
 }
+
+void floppy_image_device::device_config_complete()
+{
+	update_names();
+}
+
+void floppy_image_device::set_rpm(float _rpm)
+{
+	if(rpm == _rpm)
+		return;
+
+	rpm = _rpm;
+	rev_time = attotime::from_double(60/rpm);
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -107,52 +103,77 @@ static TIMER_CALLBACK(floppy_drive_index_callback)
 
 void floppy_image_device::device_start()
 {
-	// resolve callbacks
-	m_out_idx_func.resolve(m_out_idx_cb, *this);
-
-	m_idx = 0;
+	idx = 0;
 
 	/* motor off */
-	m_mon = 1;
+	mon = 1;
 	/* set write protect on */
-	m_wpt = 0;
+	wpt = 0;
 
-	m_rpm = 300.0f;
+	rpm = 0;
+	set_rpm(300);
 
-	m_cyl = 0;
-	m_ss  = 1;
-	m_stp = 1;
-	m_dskchg = 0;
-	m_index_timer = machine().scheduler().timer_alloc(FUNC(floppy_drive_index_callback), (void *)this);
+	cyl = 0;
+	ss  = 1;
+	stp = 1;
+	dskchg = 0;
+	index_timer = timer_alloc(0);
+}
+
+void floppy_image_device::device_reset()
+{
+	revolution_start_time = attotime::never;
+	revolution_count = 0;
+	mon = 1;
+}
+
+void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	index_resync();
 }
 
 bool floppy_image_device::call_load()
 {
-	device_image_interface *image = this;
-	int best;
-	m_image = global_alloc(floppy_image((void *) image, &image_ioprocs, m_formats));
-	floppy_image_format_t *format = m_image->identify(&best);
-	m_dskchg = 0;
-	if (format) {
-		format->load(m_image);
-		if (m_load_func)
-			return m_load_func(*this);
-		if (!cur_load_cb.isnull())
-			return cur_load_cb(this);
-		return IMAGE_INIT_PASS;
-	} else {
-		return IMAGE_INIT_FAIL;
+	io_generic io;
+	// Do _not_ remove this cast otherwise the pointer will be incorrect when used by the ioprocs.
+	io.file = (device_image_interface *)this;
+	io.procs = &image_ioprocs;
+	io.filler = 0xff;
+
+	int best = 0;
+	floppy_image_format_t *best_format = 0;
+	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
+		int score = format->identify(&io);
+		if(score > best) {
+			best = score;
+			best_format = format;
+		}
 	}
+
+	if(!best_format)
+		return IMAGE_INIT_FAIL;
+
+	image = global_alloc(floppy_image(tracks, sides));
+	best_format->load(&io, image);
+
+	revolution_start_time = attotime::never;
+	revolution_count = 0;
+
+	index_resync();
+
+	if (!cur_load_cb.isnull())
+		return cur_load_cb(this);
+	return IMAGE_INIT_PASS;
 }
 
 void floppy_image_device::call_unload()
 {
-	m_dskchg = 0;
+	dskchg = 0;
 
-	if (m_image)
-		global_free(m_image);
-	if (m_unload_func)
-		m_unload_func(*this);
+	if (image) {
+		global_free(image);
+		image = 0;
+	}
 	if (!cur_unload_cb.isnull())
 		cur_unload_cb(this);
 }
@@ -160,50 +181,72 @@ void floppy_image_device::call_unload()
 /* motor on, active low */
 void floppy_image_device::mon_w(int state)
 {
-	/* force off if there is no attached image */
-	if (!exists())
-		state = 1;
+	if(mon == state)
+		return;
+
+	mon = state;
 
 	/* off -> on */
-	if (m_mon && state == 0)
+	if (!mon && image)
 	{
-		m_idx = 0;
-		index_func();
+		revolution_start_time = machine().time();
+		index_resync();
 	}
 
 	/* on -> off */
-	else if (m_mon == 0 && state)
-		m_index_timer->adjust(attotime::zero);
-
-	m_mon = state;
+	else {
+		revolution_start_time = attotime::never;
+		index_timer->adjust(attotime::zero);
+	}
 }
 
-/* index pulses at rpm/60 Hz, and stays high 1/20th of time */
-void floppy_image_device::index_func()
+attotime floppy_image_device::time_next_index()
 {
-	double ms = 1000.0 / (m_rpm / 60.0);
+	if(revolution_start_time.is_never())
+		return attotime::never;
+	return revolution_start_time + attotime::from_double(60/rpm);
+}
 
-	if (m_idx)
-	{
-		m_idx = 0;
-		m_index_timer->adjust(attotime::from_double(ms*19/20/1000.0));
-	}
-	else
-	{
-		m_idx = 1;
-		m_index_timer->adjust(attotime::from_double(ms/20/1000.0));
+/* index pulses at rpm/60 Hz, and stays high for ~2ms at 300rpm */
+void floppy_image_device::index_resync()
+{
+	if(revolution_start_time.is_never()) {
+		if(idx) {
+			idx = 0;
+			if (!cur_index_pulse_cb.isnull())
+				cur_index_pulse_cb(this, idx);
+		}
+		return;
 	}
 
-	m_out_idx_func(m_idx);
-	if (!cur_index_pulse_cb.isnull())
-		cur_index_pulse_cb(this, m_idx);
+	attotime delta = machine().time() - revolution_start_time;
+	while(delta >= rev_time) {
+		delta -= rev_time;
+		revolution_start_time += rev_time;
+		revolution_count++;
+	}
+	int position = (delta*(rpm/300)).as_ticks(1000000000);
+
+	int new_idx = position <= 20000;
+
+	if(new_idx) {
+		attotime index_up_time = attotime::from_nsec(2000000*300.0/rpm+0.5);
+		index_timer->adjust(index_up_time - delta);
+	} else
+		index_timer->adjust(rev_time - delta);
+
+	if(new_idx != idx) {
+		idx = new_idx;
+		if (!cur_index_pulse_cb.isnull())
+			cur_index_pulse_cb(this, idx);
+	}
 }
 
 int floppy_image_device::ready_r()
 {
 	if (exists())
 	{
-		if (m_mon == 0)
+		if (mon == 0)
 		{
 			return 0;
 		}
@@ -213,25 +256,90 @@ int floppy_image_device::ready_r()
 
 double floppy_image_device::get_pos()
 {
-	return m_index_timer->elapsed().as_double();
+	return index_timer->elapsed().as_double();
 }
 
 void floppy_image_device::stp_w(int state)
 {
-    if ( m_stp != state ) {
-		m_stp = state;
-    	if ( m_stp == 0 ) {
-			if ( m_dir ) {
-				if ( m_cyl ) m_cyl--;
+    if ( stp != state ) {
+		stp = state;
+    	if ( stp == 0 ) {
+			if ( dir ) {
+				if ( cyl ) cyl--;
 			} else {
-				if ( m_cyl < 83 ) m_cyl++;
+				if ( cyl < tracks-1 ) cyl++;
 			}
 			/* Update disk detection if applicable */
 			if (exists())
 			{
-				if (m_dskchg==0) m_dskchg = 1;
+				if (dskchg==0) dskchg = 1;
 			}
 		}
 	}
+}
 
+int floppy_image_device::find_position(int position, const UINT32 *buf, int buf_size)
+{
+	int spos = (buf_size >> 1)-1;
+	int step;
+	for(step=1; step<buf_size+1; step<<=1);
+	step >>= 1;
+
+	for(;;) {
+#if 0
+		fprintf(stderr, "%09d - %09d / %09d  -- %6d %6d %6d\n",
+			   position,
+			   spos < 0 ? 0 : spos >= buf_size ? 200000000 :buf[spos] & floppy_image::TIME_MASK,
+				spos < 0 ? 0 : spos >= buf_size-1 ? 200000000 : buf[spos+1] & floppy_image::TIME_MASK,
+				spos, step, buf_size);
+#endif
+
+		if(spos >= buf_size || (spos > 0 && (buf[spos] & floppy_image::TIME_MASK) > position)) {
+			spos -= step;
+			step >>= 1;
+		} else if(spos < 0 || (spos < buf_size-1 && (buf[spos+1] & floppy_image::TIME_MASK) <= position)) {
+			spos += step;
+			step >>= 1;
+		} else
+			return spos;
+	}
+}
+
+attotime floppy_image_device::get_next_transition(attotime from_when)
+{
+	if(!image || mon)
+		return attotime::never;
+
+	int cells = image->get_track_size(cyl, ss);
+	if(cells <= 1)
+		return attotime::never;
+
+	attotime base = revolution_start_time;
+	UINT32 revc = revolution_count;
+	attotime delta = from_when - base;
+
+	while(delta >= rev_time) {
+		delta -= rev_time;
+		base += rev_time;
+		revc++;
+	}
+	int position = (delta*(rpm/300)).as_ticks(1000000000);
+
+	const UINT32 *buf = image->get_buffer(cyl, ss);
+	int index = find_position(position, buf, cells);
+
+	//	fprintf(stderr, "position=%9d, index=%d\n", position, index);
+	if(index == -1)
+		return attotime::never;
+
+	int next_position;
+	if(index < cells-1)
+		next_position = buf[index+1] & floppy_image::TIME_MASK;
+	else if((buf[index]^buf[0]) & floppy_image::MG_MASK)
+		next_position = 200000000;
+	else
+		next_position = 200000000 + (buf[1] & floppy_image::TIME_MASK);
+
+	//	printf("next_pos=%d, delta=%d\n", next_position, next_position-position);
+	return base + attotime::from_nsec(next_position*(300/rpm));
 }

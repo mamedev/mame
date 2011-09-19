@@ -9,6 +9,7 @@
 AY-3-8910A: 2 I/O ports
 AY-3-8912A: 1 I/O port
 AY-3-8913A: 0 I/O port
+AY-3-8914:  same as 8910 except for different register mapping and two bit envelope enable / volume field
 AY8930: upper compatible with 8910.
 In extended mode, it has higher resolution and duty ratio setting
 YM2149: higher resolution, selectable clock divider
@@ -96,6 +97,10 @@ WRITE8_DEVICE_HANDLER( ay8910_data_address_w );
 /* use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data' */
 WRITE8_DEVICE_HANDLER( ay8910_address_data_w );
 
+/* AY8914 handlers needed due to different register map */
+READ8_DEVICE_HANDLER( ay8914_r );
+WRITE8_DEVICE_HANDLER( ay8914_w );
+
 
 /*********** An interface for SSG of YM2203 ***********/
 
@@ -110,6 +115,7 @@ int ay8910_read_ym(void *chip);
 DECLARE_LEGACY_SOUND_DEVICE(AY8910, ay8910);
 DECLARE_LEGACY_SOUND_DEVICE(AY8912, ay8912);
 DECLARE_LEGACY_SOUND_DEVICE(AY8913, ay8913);
+DECLARE_LEGACY_SOUND_DEVICE(AY8914, ay8914);
 DECLARE_LEGACY_SOUND_DEVICE(AY8930, ay8930);
 DECLARE_LEGACY_SOUND_DEVICE(YM2149, ym2149);
 DECLARE_LEGACY_SOUND_DEVICE(YM3439, ym3439);

@@ -142,7 +142,7 @@ has twice the steps, happening twice as fast.
 #define TONE_PERIOD(_psg, _chan)	( (_psg)->regs[(_chan) << 1] | (((_psg)->regs[((_chan) << 1) | 1] & 0x0f) << 8) )
 #define NOISE_PERIOD(_psg)			( (_psg)->regs[AY_NOISEPER] & 0x1f)
 #define TONE_VOLUME(_psg, _chan)	( (_psg)->regs[AY_AVOL + (_chan)] & 0x0f)
-#define TONE_ENVELOPE(_psg, _chan)	(((_psg)->regs[AY_AVOL + (_chan)] >> 4) & 1)
+#define TONE_ENVELOPE(_psg, _chan)	(((_psg)->regs[AY_AVOL + (_chan)] >> 4) & 3)
 #define ENVELOPE_PERIOD(_psg)		(((_psg)->regs[AY_EFINE] | ((_psg)->regs[AY_ECOARSE]<<8)))
 
 /*************************************
@@ -202,6 +202,7 @@ INLINE ay8910_context *get_safe_token(device_t *device)
 	assert(device->type() == AY8910 ||
 		   device->type() == AY8912 ||
 		   device->type() == AY8913 ||
+		   device->type() == AY8914 ||
 		   device->type() == AY8930 ||
 		   device->type() == YM2149 ||
 		   device->type() == YM3439 ||
@@ -438,7 +439,14 @@ INLINE UINT16 mix_3D(ay8910_context *psg)
 	for (chan = 0; chan < NUM_CHANNELS; chan++)
 		if (TONE_ENVELOPE(psg, chan))
 		{
-			indx |= (1 << (chan+15)) | ( psg->vol_enabled[chan] ? psg->env_volume << (chan*5) : 0);
+			if (psg->device->type() == AY8914) // AY8914 Has a two bit tone_envelope field
+			{
+				indx |= (1 << (chan+15)) | ( psg->vol_enabled[chan] ? ((psg->env_volume >> (3-TONE_ENVELOPE(psg, chan))) << (chan*5)) : 0);
+			}
+			else
+			{
+				indx |= (1 << (chan+15)) | ( psg->vol_enabled[chan] ? psg->env_volume << (chan*5) : 0);
+			}	
 		}
 		else
 		{
@@ -658,8 +666,14 @@ static STREAM_UPDATE( ay8910_update )
 			for (chan = 0; chan < NUM_CHANNELS; chan++)
 				if (TONE_ENVELOPE(psg,chan))
 				{
-					/* Envolope has no "off" state */
-					*(buf[chan]++) = psg->env_table[chan][psg->vol_enabled[chan] ? psg->env_volume : 0];
+					if (psg->device->type() == AY8914) // AY8914 Has a two bit tone_envelope field
+					{
+						*(buf[chan]++) = psg->env_table[chan][psg->vol_enabled[chan] ? psg->env_volume >> (3-TONE_ENVELOPE(psg,chan)) : 0];
+					}
+					else
+					{
+						*(buf[chan]++) = psg->env_table[chan][psg->vol_enabled[chan] ? psg->env_volume : 0];
+					}
 				}
 				else
 				{
@@ -755,7 +769,7 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 	else
 		info->streams = 3;
 
-	if (chip_type == AY8910 || chip_type == AY8930)
+	if (chip_type == AY8910 || chip_type == AY8914 || chip_type == AY8930)
 	{
 		info->step = 2;
 		info->par = &ay8910_param;
@@ -1001,6 +1015,16 @@ DEVICE_GET_INFO( ay8913 )
 	}
 }
 
+DEVICE_GET_INFO( ay8914 )
+{
+	switch (state)
+	{
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ay8910 );			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "AY-3-8914");					break;
+		default:										DEVICE_GET_INFO_CALL(ay8910);						break;
+	}
+}
+
 DEVICE_GET_INFO( ay8930 )
 {
 	switch (state)
@@ -1091,10 +1115,26 @@ WRITE8_DEVICE_HANDLER( ay8910_data_w )
 #endif
 }
 
+static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };
 
+READ8_DEVICE_HANDLER( ay8914_r )
+{
+	UINT16 rv;
+	ay8910_address_w(device, 0, mapping8914to8910[offset & 0xff]);
+	rv = (UINT16)ay8910_r(device, 0);
+	return rv;
+}
+
+WRITE8_DEVICE_HANDLER( ay8914_w )
+{
+	ay8910_address_w(device, 0, mapping8914to8910[offset & 0xff]);
+	ay8910_data_w(device, 0, data & 0xff);
+}
+ 
 DEFINE_LEGACY_SOUND_DEVICE(AY8910, ay8910);
 DEFINE_LEGACY_SOUND_DEVICE(AY8912, ay8912);
 DEFINE_LEGACY_SOUND_DEVICE(AY8913, ay8913);
+DEFINE_LEGACY_SOUND_DEVICE(AY8914, ay8914);
 DEFINE_LEGACY_SOUND_DEVICE(AY8930, ay8930);
 DEFINE_LEGACY_SOUND_DEVICE(YM2149, ym2149);
 DEFINE_LEGACY_SOUND_DEVICE(YM3439, ym3439);

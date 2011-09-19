@@ -74,14 +74,14 @@ const char *mfi_format::extensions() const
 
 bool mfi_format::supports_save() const
 {
-	return false;
+	return true;
 }
 
-int mfi_format::identify(floppy_image *image)
+int mfi_format::identify(io_generic *io)
 {
 	header h;
 
-	image->image_read(&h, 0, sizeof(header));
+	io_generic_read(io, &h, 0, sizeof(header));
 	if(memcmp( h.sign, sign, 16 ) == 0 &&
 	   h.cyl_count > 0 && h.cyl_count <= 84 &&
 	   h.head_count > 0 && h.head_count <= 2)
@@ -89,13 +89,12 @@ int mfi_format::identify(floppy_image *image)
 	return 0;
 }
 
-bool mfi_format::load(floppy_image *image)
+bool mfi_format::load(io_generic *io, floppy_image *image)
 {
 	header h;
 	entry entries[84*2];
-	image->image_read(&h, 0, sizeof(header));
-	image->image_read(&entries, sizeof(header), h.cyl_count*h.head_count*sizeof(entry));
-	image->set_meta_data(h.cyl_count, h.head_count);
+	io_generic_read(io, &h, 0, sizeof(header));
+	io_generic_read(io, &entries, sizeof(header), h.cyl_count*h.head_count*sizeof(entry));
 
 	UINT8 *compressed = 0;
 	int compressed_size = 0;
@@ -116,7 +115,7 @@ bool mfi_format::load(floppy_image *image)
 				compressed = global_alloc_array(UINT8, compressed_size);
 			}
 
-			image->image_read(compressed, ent->offset, ent->compressed_size);
+			io_generic_read(io, compressed, ent->offset, ent->compressed_size);
 
 			unsigned int cell_count = ent->uncompressed_size/4;
 			image->set_track_size(cyl, head, cell_count);
@@ -124,7 +123,7 @@ bool mfi_format::load(floppy_image *image)
 
 			uLongf size = ent->uncompressed_size;
 			if(uncompress((Bytef *)trackbuf, &size, compressed, ent->compressed_size) != Z_OK)
-				return true;
+				return false;
 
 			UINT32 cur_time = 0;
 			for(unsigned int i=0; i != cell_count; i++) {
@@ -133,7 +132,7 @@ bool mfi_format::load(floppy_image *image)
 				cur_time = next_cur_time;
 			}
 			if(cur_time != 200000000)
-				return true;
+				return false;
 
 			ent++;
 		}
@@ -141,7 +140,67 @@ bool mfi_format::load(floppy_image *image)
 	if(compressed)
 		global_free(compressed);
 
-	return false;
+	return true;
+}
+
+bool mfi_format::save(io_generic *io, floppy_image *image)
+{
+	int tracks, heads;
+	image->get_actual_geometry(tracks, heads);
+	int max_track_size = 0;
+	for(int track=0; track<tracks; track++)
+		for(int head=0; head<heads; head++) {
+			int tsize = image->get_track_size(track, head);
+			if(tsize > max_track_size)
+				 max_track_size = tsize;
+		}
+
+	header h;
+	entry entries[84*2];
+	memcpy(h.sign, sign, 16);
+	h.cyl_count = tracks;
+	h.head_count = heads;
+
+	io_generic_write(io, &h, 0, sizeof(header));
+
+	memset(entries, 0, sizeof(entries));
+
+	int pos = sizeof(header) + tracks*heads*sizeof(entry);
+	int epos = 0;
+	UINT32 *precomp = global_alloc_array(UINT32, max_track_size);
+	UINT8 *postcomp = global_alloc_array(UINT8, max_track_size*4 + 1000);
+
+	for(int track=0; track<tracks; track++)
+		for(int head=0; head<heads; head++) {
+			int tsize = image->get_track_size(track, head);
+			if(!tsize) {
+				epos++;
+				continue;
+			}
+
+			memcpy(precomp, image->get_buffer(track, head), tsize*4);
+			for(int j=0; j<tsize-1; j++)
+				precomp[j] = (precomp[j] & floppy_image::MG_MASK) |
+					((precomp[j+1] & floppy_image::TIME_MASK) -
+					 (precomp[j] & floppy_image::TIME_MASK));
+			precomp[tsize-1] = (precomp[tsize-1] & floppy_image::MG_MASK) |
+				(200000000 - (precomp[tsize-1] & floppy_image::TIME_MASK));
+
+			uLongf csize = max_track_size*4 + 1000;
+			if(compress(postcomp, &csize, (const Bytef *)precomp, tsize*4) != Z_OK)
+				return false;
+
+			entries[epos].offset = pos;
+			entries[epos].uncompressed_size = tsize*4;
+			entries[epos].compressed_size = csize;
+			epos++;
+
+			io_generic_write(io, postcomp, pos, csize);
+			pos += csize;
+		}
+
+	io_generic_write(io, entries, sizeof(header), tracks*heads*sizeof(entry));
+	return true;
 }
 
 const floppy_format_type FLOPPY_MFI_FORMAT = &floppy_image_format_creator<mfi_format>;
