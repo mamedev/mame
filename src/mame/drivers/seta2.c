@@ -12,6 +12,7 @@ Video  :    DX-101
             DX-102 x3
 
 Sound  :    X1-010
+            OKI M9810 for later EVA2 & EVA3 PCBs
 
 OSC    :    50.00000MHz
             32.53047MHz
@@ -36,7 +37,7 @@ B0-006B                 2001    Funcube 2                               Namco
 B0-006B                 2001    Funcube 4                               Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
--                       ????    Reel'N Quake                            <unknown>
+P-FG-02                 ????    Reel'N Quake                            <unknown>
 -------------------------------------------------------------------------------------------
 
 TODO:
@@ -2369,7 +2370,7 @@ ROM_START( funcube3 )
 	ROM_LOAD( "fc31prg-0a.u4", 0x000000, 0x080000, CRC(ed7d70dd) SHA1(4ebfca9e60ab5e8de22821f0475abf515c83ce53) )
 
 	ROM_REGION( 0x20000, "sub", 0 )		// H8/3007 Code
-    ROM_LOAD( "fc21iopr-0.u49", 0x000000, 0x020000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
+	ROM_LOAD( "fc21iopr-0.u49", 0x000000, 0x020000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
 
 	ROM_REGION( 0x400, "pic", 0 )		// PIC12C508? Code
 	ROM_LOAD( "fc31a.u57", 0x000, 0x400, NO_DUMP )
@@ -2870,35 +2871,71 @@ ROM_END
 
 Reel'N Quake!
 
-Board:
-  0594 (Sticker)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz & 28MHz
+ Other: 8 Position Dipswitch x 2
+        Push Button SW1
+        3.6V Battery at BT1
+        GAL 16V8 - labeled "KF-001" at U38
 
-CPU:
-  TMP68301AF-16 CPU
-  50MHz Osc.
+Memory:
+M1 are TC551001BFL-70L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9
+M4 are UT62256SC-70L at U6, U7, U13 & U14
 
-Video:
-  NEC DX-101? 9546KK002 (@ U10)
-  3 x NEC DX-102? (@ U28, U30 & U45)
-  28MHz Osc.
+PCB Number: P-FG-02
++-----------------------------------------------------------+
+|             +------+      U  U                            |
+| VOL         |Seta  |   M  5  5            +--------------+|
+|             |X1-010|   2  8  7    +-+  M  |KF-001-005 U16||
+|             +------+      *  *    | |  1  +--------------+|
++-+                                 |U|                     |
+  |  +-+    +-+           BT1       |3|            U20*     |
++-+  | |    | |         M           |2|  M                  |
+|  C |U| U  |U| U  M M  4           | |  1  +--------------+|
+|J N |3| 5  |2| 4  3 3              +-+     |KF-001-006 U15||
+|A 1 | | *  | | *       M                   +--------------+|
+|M   +-+    +-+         4                                   |
+|M C                                               U19*     |
+|A N                                                        |
+|  2                                        +--------------+|
+|C 1                                        |KF-001-007 U18||
+|o                           +----------+   +--------------+|
+|n C        +-------+        |          |                   |
+|n N        |Toshiba|        |   NEC    |          U22*     |
+|e 2        |  TMP  |        |  DX-101  |                   |
+|c 2        | 68301 |        |          |   +--------------+|
+|t        U +-------+        |          |   |KF-001-008 U17||
+|e C      5                  +----------+   +--------------+|
+|r N      6                                                 |
+|  3      *                                        U21*     |
++-+   +---+    +---+       U  50MHz 32MHz*                  |
+  |   |DX | S  |DX |       3                                |
+  |   |102| W  |102|       8                   +---+   28MHz|
++-+   +---+ 1  +---+                    M  M   |DX |        |
+|              D D                      4  4   |102|        |
+|              S S                             +---+        |
+|              W W                                          |
+|              2 1                                          |
++-----------------------------------------------------------+
 
-Sound:
-  Seta X1-010 (@ U32)
-  Volume Trimmer
+CN1   - 7 Pin connector
+CN2-1 - 3 Pin connector
+CN2-2 - 3 Pin connector
+CN3   - 10 Pin connector
 
-Other:
-  Push Button (@ SW1)
-  2 x DSW8 (@ DSW1 & DSW2)
-  3.6V Battery (@ BT1)
-  MAX232CPE (@ U60)
+* Denotes not populated. U56 is unpopulated 93C45 EEPROM
 
-ROMs:
-  2 x 27C4001 (@ U2-3)
-  5 x 23C32000 (@ U15-18, U32)
-  GAL 16V8? (@ U38)
+    U3-U5 silkscreened 27C4001
+  U57-U58 silkscreened 23C8001E
+  U15-U22 silkscreened 23C32000
+      U32 silkscreened 23C32000
 
 Note:
-
   The PCB is silkscreened with 23C32000 which would be equal to the 27C322.
   The graphics roms dumped that way have the first half as a bad mirror
   of the second half (even <- odd, odd <- FF). They seem OK dumped as 27C160.
@@ -3203,7 +3240,7 @@ GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0,        ROT0, "Sammy USA C
 GAME( 2001, wschamp,  0,        samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyh,  0,        samshoot, trophyh,  0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2,  ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube3, 0,        funcube,  funcube,  funcube3,  ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube4, 0,        funcube,  funcube4, funcube2,  ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, funcube3, 0,        funcube,  funcube,  funcube3, ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, funcube4, 0,        funcube,  funcube4, funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( ????, reelquak, 0,        reelquak, reelquak, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Ver. 1.05)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
