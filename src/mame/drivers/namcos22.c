@@ -2883,7 +2883,7 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/3) // should be SS22_MASTER_CLOCK/2, but relies on c352.c clockdivider implementation
+	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3292,7 +3292,7 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/3)
+	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
