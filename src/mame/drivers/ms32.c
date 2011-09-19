@@ -5,6 +5,9 @@
 Used by Jaleco in the Mid-90's this system, based on the V70 processor consisted
 of a two board set up, the first a standard mainboard and the second a 'cartridge'
 
+The actual Mega System 32 PCB mobo only outputs mono sound.  There is a connector on
+the PCB for a second speaker but it is still only in mono (no stereo effects in the music).
+
 -- Hardware Information (from Guru) --
 
 MS32 Motherboard
@@ -1435,11 +1438,11 @@ static MACHINE_CONFIG_START( ms32, ms32_state )
 	MCFG_VIDEO_START(ms32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymf", YMF271, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( f1superb, ms32 )
