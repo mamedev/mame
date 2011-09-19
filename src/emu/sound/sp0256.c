@@ -1212,7 +1212,10 @@ static DEVICE_START( sp0256 )
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
 	sp->rom = *device->region();
-	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
+	// the rom is not supposed to be reversed first; according to Joe Zbiciak.
+	// see http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
+	// TODO: because of this, check if the bitrev functions are even used anywhere else
+	//sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 }
 
 static void sp0256_reset(sp0256_state *sp)
