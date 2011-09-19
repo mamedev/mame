@@ -1892,12 +1892,29 @@ raiden2   (set 1 fabtek) 1 1'        1(f51a28f9)       1(fb0fca23)        1(c9ec
 raiden2a  (set 2 metro)  1 2'        2(8f130589)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore
 raiden2b  (set 3 japan)  1 3'        2(8f130589)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore
 raiden2c  (set 4 italy)  2 4'        3(5db9f922)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore
+(trap15: one of these four above has aama serial 0587600)
 raiden2d  (set 5 easy)   3 5'        4(6bad0a3e)       2(488d050f)        2(c709bdf6)      red fighter on hiscore
 raiden2e  (set 6 easy)   4 6'        5(f5f835af)       3(fab9f8e4)        3(c7aa4d00)      red fighter on hiscore
 raiden2f  (set 7 easy fabtek) 4 7'   5(f5f835af)       3(fab9f8e4)        3(c7aa4d00)      red fighter on hiscore
 raiden2g  (set 8 easy fabtek) 3 8'   6(6d362472)       3(fab9f8e4)        3(c7aa4d00)      red fighter on hiscore, sn 0003068, aama 0557135
 ^ this set has 4 prg roms: 1 and 3 correspond to seibu1/prg0 and 2 and 4 correspond to seibu2/prg1
 balrog+ln (set x fabtek) 1 1'        2(8f130589)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore, sn 0012739, aama 0600565, not in mame yet due to roms matching mix of sets 1 and 2
+
+differences amongst SND/u1110 roms:
+   First half end, last byte before ff fill ending at 7fff
+   |     Last byte before ff fill ending at 8fff
+   |     |     Last byte before ff fill ending at ffff
+   |     |     |
+1: 62e8  8faf  f56b
+2: 62b8  8faf  f56b
+3: 62a9  8faf  f56b
+4: 623e  8ee7  f4dd
+5: 620a  8ee7  f4d7
+6: 64b8  8e1f  f4db
+<LordNlptp> btw my guess is the code versions go from newest to oldest, 1 to 6, though I need more serial numbers to be sure
+<LordNlptp> 6 has a larger main code chunk because i think they accidentally included some stuff they didn't actually use, which was removed on later versions
+<LordNlptp> and it would not surprise me in the least if the code/player data is ALMOST the same as the zt version but with support for the second msm6295
+
 */
 
 ROM_START( raiden2 )
