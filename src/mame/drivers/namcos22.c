@@ -12,7 +12,6 @@
  * Input
  *      - input ports require manual calibration through built-in diagnostics (or canned EEPROM)
  *      - new input port type needed for bicycle pedal speed
- *      - new input port needed for multi-value stick shift
  *      - text layer row placement may be incorrect (emulated Prop Cycle differs from real game)
  *
  * Output Devices
@@ -2390,7 +2389,6 @@ static READ32_HANDLER( alpinesa_prot_r )
 static WRITE32_HANDLER( alpinesa_prot_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-#if 1
 	switch( data )
 	{
 	case 0:
@@ -2405,16 +2403,6 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 	default:
 		break;
 	}
-#else
-	int i;
-	unsigned sptr = downcast<cpu_device *>(&space->device())->sp();
-	state->m_mAlpineSurferProtData = 0;
-	for(i=0;i<4;i++)
-	{
-		state->m_mAlpineSurferProtData<<=8;
-		state->m_mAlpineSurferProtData |= space->read_byte(sptr+4+i );
-	}
-#endif
 } /* alpinesa_prot_w */
 
 /* Namco Super System 22 */
