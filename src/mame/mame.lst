@@ -12636,13 +12636,40 @@ sc4hotdga	//
 sc4hotdgb	//
 sc4hotdgc	//
 sc4hotrd	// Hot Rod (Bellfruit)
+sc4hotrda	//
 sc4hotsh	// Hot Shots (Bellfruit)
+sc4hotsha	//
 sc4hotwd	// Hot Wad (Bellfruit)
+sc4hotwda	//
+sc4hotwdb	//	
+sc4hotwdc	//
+sc4hotwdd	//
+sc4hotwde	//
 sc4celeb	// I'm A Celebrity (Bellfruit)
+sc4celeba	//
+sc4celebb	//
+sc4celebc	//
+sc4celebd	//
 sc4inspn	// Inner Spin (Mazooma)
+sc4inspna	//
 sc4ijob		// Italian Job (Mazooma)
+sc4ijoba	//
+sc4ijobb	//
+sc4ijobc	//
+sc4ijobd	//
+sc4ijobe	//
+sc4ijobf	//
+sc4ijobg	//
+sc4ijobh	//
+sc4ijobi	//
+sc4ijobj	//
+sc4ijobk	//
 sc4jjok		// Jackpot Jokers (Bellfruit)
+sc4jjoka	//
 sc4ldvl		// Little Devil (Mazooma)
+sc4ldvla	//
+sc4ldvlb	//
+sc4ldvlc	//
 sc4lotrr	// Lord Of The Rings - Return Of The King (Bellfruit)
 sc4lotrra	//
 sc4lotrrb	//
@@ -12727,25 +12754,100 @@ sc4mcas2	//
 sc4mcas3	//
 sc4mcas4	//
 sc4mdm		// Monopoly Double Money (Bellfruit)
+sc4mdma		//
 sc4mhn		// Monopoly Here & Now (Mazooma)
+sc4mhna		//
 sc4mhp		// Monopoly Hot Property (Bellfruit)
+sc4mhpa		//
+sc4mhpb		//
+sc4mhpc		//
+sc4mhpd		//
+sc4mhpe		//
+sc4mhpf		//
+sc4mhpg		//
+sc4mhph		//
+sc4mhpi		//
+sc4mhpj		//
+sc4mhpk		//
 sc4mmb		// Monopoly Money Bags (Bellfruit)
+sc4mmba		//
 sc4mrh		// Monopoly Red Hot (Mazooma)
+sc4mrha		//
+sc4mrhb		//
+sc4mrhc		//
+sc4mrhd		//
+sc4mrhe		//
 sc4mr2r		// Monopoly Road To Riches (Mazooma)
+sc4mr2ra	//
+sc4mr2rb	//
+sc4mr2rc	//
+sc4mr2rd	//
+sc4mr2re	//
 sc4nmare	// A Nightmare On Elm Street (Bellfruit)
+sc4nmarea	//
+sc4nmareb	//
+sc4nmarec	//
 sc4potp		// Pick Of The Pack (Bellfruit)
+sc4potpa	//
 sc4pp		// Pink Panther (Mazooma)
+sc4ppa		//
+sc4ppb		//
+sc4ppc		//
+sc4ppd		//
 sc4ppcr		// Pink Panther Clouseau's Revenge (Mazooma)
+sc4ppcra	//
+sc4ppcrb	//
+sc4ppcrtb	//
+sc4ppcrd	//
+sc4ppcre	//
+sc4ppcrf	//
+sc4ppcrg	//
+sc4ppcrh	//
+sc4ppcri	//
+sc4ppcrj	//
 sc4ppctc	// Pink Panther Crack The Code (Bellfruit)
+sc4ppctca	//
+sc4ppctcb	//
+sc4ppctcc	//
+sc4ppctcd	//
+sc4ppctce	//
+sc4ppctcf	//
+sc4ppctcg	//
 sc4ppdym	// Pink Panther Double Your Money (Mazooma)
+sc4ppdymb	//
+sc4ppdymc	//
+sc4ppdymd	//
+sc4ppdymf	//
+sc4ppdymg	//
+sc4ppdymh	//
+sc4ppdymi	//
+sc4ppdymtb	//
+sc4ppdymtba	//
 sc4ppsag	// Pink Panther Strikes Again (Mazooma)
+sc4ppsaga	//
+sc4ppsagb	//
+sc4ppsagc	//
+sc4ppsagd	//
+sc4ppsage	//
+sc4ppsagf	//
+sc4ppsagg	//
+sc4ppsagh	//
+sc4ppsagi	//
 sc4pony		// Pony Express (Bellfruit)
+sc4ponya	//
+sc4ponyb	//
+sc4ponyc	//
+sc4ponyd	//
+sc4ponye	//
 sc4popey	// Popeye (Mazooma)
+sc4popeya	//
+sc4popeyb	//
+sc4popeyc	//
 sc4pog		// Pots Of Gold (Bellfruit)
-sc4bulcsb		//
+sc4bulcsb	//
 sc4poga		//
 sc4pogb		//
-sc4bulcsc		//
+sc4bulcsc	//
 sc4pogc		//
 sc4pogd		//
 sc4poge		//
