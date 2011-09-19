@@ -71,7 +71,7 @@ http://www.tsc-acnet.com/index.php?sort=8&action=cataloglist&s=1&mode=3&genre_id
 To Do:
 
 - KL5C80 emulation is needed to consolidate the sammymdl games in one memory map and to run the BIOS
-- Remove ROM patches from gegege
+- Remove ROM patches from gegege, pepsiman
 - gegege checks the EEPROM output after reset, and wants a timed 0->1 transition or locks up while
   saving setting in service mode. Using a reset_delay of 7 works, unless when "play style" is set
   to "coin" (it probably changes the number of reads from port $C0).
@@ -80,6 +80,7 @@ To Do:
   This can be achieved using either pen 0 or ff as background color, but messes up the other games.
 - pyenaget intro: when the theater scrolls out to the left, the train should scroll in from the right,
   with no visible gaps. It currently leaves the screen empty instead, for several seconds.
+- pepsiman: sometimes a spurious "0408" error pops up at boot/reset
 
 Notes:
 
@@ -1512,6 +1513,44 @@ static INPUT_PORTS_START( gegege )
 INPUT_PORTS_END
 
 /***************************************************************************
+                                PEPSI Man
+***************************************************************************/
+
+static INPUT_PORTS_START( pepsiman )
+
+	PORT_START("EEPROM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)	// ? (coin error, pulses mask 4 of port c6)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(5) PORT_NAME("Medal")	// coin/medal in (coin error)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_1)	// bet / select in test menu
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Rock (Gu)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Scissors (Choki)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Paper (Par)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )	// pay out / enter in test menu
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
+/***************************************************************************
                              Sammy Medal Games
 ***************************************************************************/
 
@@ -1877,6 +1916,57 @@ static DRIVER_INIT( gegege )
 
 /***************************************************************************
 
+  PEPSI Man
+
+***************************************************************************/
+
+ROM_START( pepsiman )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "b9806-1a.ic7", 0x00000, 0x20000, CRC(3152fe90) SHA1(98a8ae1bd3a4381cec11ba8b3e9cdad71c7bd05a) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD( "b9806-2.ic12", 0x00000, 0x80000, CRC(82f650ea) SHA1(c0b214fdc39329e2136707bc195d470d4b613509) )
+	ROM_LOAD( "b9806-3.ic13", 0x80000, 0x80000, CRC(07dc548e) SHA1(9419c0cac289a9894cce1a10924f40e146e2ff8a) )
+
+	ROM_REGION( 0x80000, "ymz", 0 )
+	ROM_LOAD( "b9806-5.ic16", 0x00000, 0x80000, CRC(6d405dfb) SHA1(e65ffe1279680097894754e379d7ad638657eb49) )
+ROM_END
+
+static DRIVER_INIT( pepsiman )
+{
+	UINT8 *rom = machine.region("maincpu")->base();
+
+	// Protection?
+	rom[0x580] = 0x18;
+	rom[0x581] = 0x14;
+
+	rom[0x59c] = 0x18;
+	rom[0x59d] = 0x14;
+
+	rom[0xa00e] = 0x00;
+	rom[0xa00f] = 0x00;
+
+	// EEPROM timing checks
+	rom[0x8138] = 0x00;
+	rom[0x8139] = 0x00;
+
+	rom[0x8164] = 0x00;
+	rom[0x8165] = 0x00;
+
+	// ROM banks
+	memory_configure_bank(machine, "rombank", 0, 0x18, rom + 0x8000, 0x1000);
+	memory_set_bank(machine, "rombank", 0);
+
+	// RAM banks
+	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x800 * 2);
+
+	memory_configure_bank(machine, "rambank", 0, 2, bankedram, 0x800);
+	memory_set_bank(machine, "rambank", 0);
+}
+
+
+/***************************************************************************
+
   Sammy Medal Games
 
   PCB:
@@ -2131,6 +2221,7 @@ static DRIVER_INIT( haekaka )
 ***************************************************************************/
 
 GAME( 1997, gegege,   0,        gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0 )
+GAME( 1997, pepsiman, 0,        gegege,   pepsiman, pepsiman, ROT0, "Sigma",             "PEPSI Man", 0 )
 // Sammy Medal Games:
 GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, 0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",  GAME_IS_BIOS_ROOT )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  0 )
