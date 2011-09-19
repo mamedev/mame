@@ -114,7 +114,7 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, BSMT2000, "BSMT2000", "bsmt2000", tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_memory_interface(mconfig, *this),
-	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 32, 0, NULL, *ADDRESS_MAP_NAME(bsmt2000)),
+	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 32, 0, NULL),
 	  m_ready_callback(NULL),
 	  m_stream(NULL),
 	  m_direct(NULL),
@@ -128,6 +128,7 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 	  m_write_pending(false)
 {
 	m_shortname = "bsmt2000";
+	m_address_map[0] = *ADDRESS_MAP_NAME(bsmt2000);
 }
 
 

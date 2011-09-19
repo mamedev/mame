@@ -14,12 +14,6 @@
 #define	M6809_TAG	"soundcpu"
 #define BSMT_TAG	"bsmt"
 
-/*
-    Overriding the child device's memory map fails when done from a parent device rather than the base driver.
-    Uncomment this out to observe.
-*/
-//#define USE_OVERRIDE_MAP
-
 static ADDRESS_MAP_START( decobsmt_map, AS_PROGRAM, 8, decobsmt_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_WRITE(bsmt_reset_w)
@@ -30,15 +24,9 @@ static ADDRESS_MAP_START( decobsmt_map, AS_PROGRAM, 8, decobsmt_device )
 	AM_RANGE(0x2000, 0xffff) AM_ROM AM_REGION(":soundcpu", 0x2000)
 ADDRESS_MAP_END
 
-#ifdef USE_OVERRIDE_MAP
 static ADDRESS_MAP_START( bsmt_map, AS_0, 8, decobsmt_device )
 	AM_RANGE(0x000000, 0xffffff) AM_ROM AM_REGION(":bsmt", 0)
 ADDRESS_MAP_END
-#endif
-
-ROM_START( decobsmt )
-	ROM_REGION(0x1000000, BSMT_TAG, ROMREGION_ERASE00)
-ROM_END
 
 static INTERRUPT_GEN( decobsmt_firq_interrupt )
 {
@@ -57,10 +45,8 @@ MACHINE_CONFIG_FRAGMENT( decobsmt )
 	MCFG_CPU_PERIODIC_INT(decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
     MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_BSMT2000_ADD("bsmt", 24000000)
-#ifdef USE_OVERRIDE_MAP
+	MCFG_BSMT2000_ADD(BSMT_TAG, 24000000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, bsmt_map)
-#endif
 	MCFG_BSMT2000_READY_CALLBACK(bsmt_ready_callback)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
@@ -83,11 +69,6 @@ machine_config_constructor decobsmt_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( decobsmt );
 }
 
-const rom_entry *decobsmt_device::device_rom_region() const
-{
-	return ROM_NAME( decobsmt );
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -101,7 +82,6 @@ decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag,
 	m_ourcpu(*this, M6809_TAG),
 	m_bsmt(*this, BSMT_TAG)
 {
-	m_shortname = "decobsmt";
 }
 
 //-------------------------------------------------
@@ -110,13 +90,6 @@ decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag,
 
 void decobsmt_device::device_start()
 {
-#ifndef USE_OVERRIDE_MAP
-    UINT8 *romsrc = machine().region("bsmt")->base();
-	astring tempstring;
-    UINT8 *romdst = machine().region(subtag(tempstring, "bsmt"))->base(); 
-
-    memcpy(romdst, romsrc, 0x1000000);
-#endif
 }
 
 //-------------------------------------------------

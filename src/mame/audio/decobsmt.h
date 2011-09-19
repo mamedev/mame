@@ -24,7 +24,6 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
 
         DECLARE_WRITE8_MEMBER(bsmt_reset_w);
         DECLARE_READ8_MEMBER(bsmt_status_r);
