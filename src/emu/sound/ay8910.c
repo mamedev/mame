@@ -142,7 +142,7 @@ has twice the steps, happening twice as fast.
 #define TONE_PERIOD(_psg, _chan)	( (_psg)->regs[(_chan) << 1] | (((_psg)->regs[((_chan) << 1) | 1] & 0x0f) << 8) )
 #define NOISE_PERIOD(_psg)			( (_psg)->regs[AY_NOISEPER] & 0x1f)
 #define TONE_VOLUME(_psg, _chan)	( (_psg)->regs[AY_AVOL + (_chan)] & 0x0f)
-#define TONE_ENVELOPE(_psg, _chan)	(((_psg)->regs[AY_AVOL + (_chan)] >> 4) & 3)
+#define TONE_ENVELOPE(_psg, _chan)	(((_psg)->regs[AY_AVOL + (_chan)] >> 4) & (_psg)->env_enabled_mask)
 #define ENVELOPE_PERIOD(_psg)		(((_psg)->regs[AY_EFINE] | ((_psg)->regs[AY_ECOARSE]<<8)))
 
 /*************************************
@@ -184,6 +184,7 @@ struct _ay8910_context
 	/* init parameters ... */
 	int step;
 	int zero_is_off;
+	int env_enabled_mask;
 	UINT8 vol_enabled[NUM_CHANNELS];
 	const ay_ym_param *par;
 	const ay_ym_param *par_env;
@@ -768,6 +769,8 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 	}
 	else
 		info->streams = 3;
+
+	info->env_enabled_mask = (chip_type == AY8914) ? 3 : 1; // AY8914 Has a two bit tone_envelope field
 
 	if (chip_type == AY8910 || chip_type == AY8914 || chip_type == AY8930)
 	{
