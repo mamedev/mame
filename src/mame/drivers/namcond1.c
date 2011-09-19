@@ -43,6 +43,7 @@ PCB Layout
 Notes:
       68000 clock  : 12.288MHz (49.152 / 4)
       H8/3002 clock: 16.384MHz (49.152 / 3)
+      C352 clock:    24.576MHz (49.152 / 2)
       VSync        : 60Hz
 
       POT1    : Master volume
@@ -324,7 +325,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", XTAL_49_152MHz/2)
+	MCFG_C352_ADD("c352", XTAL_49_152MHz/3) // NOTE: should be XTAL_49_152MHz/3, but that's currently incompatible with c352.c internal divider
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
