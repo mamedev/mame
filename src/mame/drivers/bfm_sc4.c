@@ -8033,29 +8033,58 @@ ROM_END
 
 ROM_START( sc4tempt )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	// sc4
 	ROM_LOAD16_BYTE( "95402638.lo", 0x00001, 0x080000, CRC(f857ccfd) SHA1(bbef92c4682a9a491dcdb82569ca84e7dc2b95ee) )
 	ROM_LOAD16_BYTE( "95402639.hi", 0x00000, 0x080000, CRC(97fef5fb) SHA1(dde5375e864d6b84abf67c698bfa1443594b7caa) )
+	sc_tempt_others
+ROM_END
 
-	ROM_REGION( 0x400000, "altrevs", 0 )
-	// sc4
+ROM_START( sc4tempta )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95402640.lo", 0x00001, 0x080000, CRC(af1b6f7d) SHA1(3ded3642bb5209267d68188f7718312db3d9d351) )
 	ROM_LOAD16_BYTE( "95402641.hi", 0x00000, 0x080000, CRC(4e30a12b) SHA1(0d2cbe6c3e5cd92758b5c840ae3c61f558276c38) )
+	sc_tempt_others
+ROM_END
+
+ROM_START( sc4temptb )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95403638.lo", 0x00001, 0x080000, CRC(6d10d513) SHA1(5bbce9d10d547bba4a2639bb57d8f4ffe546f01c) )
 	ROM_LOAD16_BYTE( "95403639.hi", 0x00000, 0x080000, CRC(12f616c7) SHA1(04dbe7d7c0649878718214fab945a4dca3a4a3be) )
+	sc_tempt_others
+ROM_END
+
+ROM_START( sc4temptc )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95403640.lo", 0x00001, 0x080000, CRC(8d9c0c0d) SHA1(e9d7ce40e0a8c84d128a59fbddcb792e6d8206a9) )
 	ROM_LOAD16_BYTE( "95403641.hi", 0x00000, 0x080000, CRC(20cd8fcb) SHA1(6388c3a2f267c6d16f74ebef9f86c86971c90abd) )
+	sc_tempt_others
+ROM_END
+
+ROM_START( sc4temptd )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406062.lo", 0x00001, 0x080000, CRC(902622d4) SHA1(414814fb077a452873c9db0c37b66d6f20cb211b) )
 	ROM_LOAD16_BYTE( "95406063.hi", 0x00000, 0x080000, CRC(7a8ec2b0) SHA1(0c7ccfdba6365c4f49ea569a2485f7b42a16dedf) )
+	sc_tempt_others
+ROM_END
+
+ROM_START( sc4tempte )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406932.lo", 0x00001, 0x080000, CRC(a4dca430) SHA1(7de4040493bf595ecc01fd308b3a4efd46d36c75) )
 	ROM_LOAD16_BYTE( "95406933.hi", 0x00000, 0x080000, CRC(93a734e4) SHA1(2312f33b2d84ebe0af1a76423b6394d617cdf703) )
+	sc_tempt_others
+ROM_END
+
+ROM_START( sc4temptf )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407062.lo", 0x00001, 0x080000, CRC(35a32fd4) SHA1(8af600c67b1ec21a127077cf5f50752bc788592d) )
 	ROM_LOAD16_BYTE( "95407063.hi", 0x00000, 0x080000, CRC(426697b5) SHA1(a8dfd5b1a4404b5a123a2b1ca075623978490058) )
+	sc_tempt_others
+ROM_END
+
+ROM_START( sc4temptg )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407932.lo", 0x00001, 0x080000, CRC(42445fdd) SHA1(b9b133d183cb4104b493b9ef4535ad54ded95ba8) )
 	ROM_LOAD16_BYTE( "95407933.hi", 0x00000, 0x080000, CRC(c5dfc2a2) SHA1(37f302fbaf2b658371545caff6f0b2ebe6228d00) )
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
-	ROM_LOAD( "95008654.bin", 0x0000, 0x100000, CRC(9963724c) SHA1(90d22b11934e95fd2bfda026dcde51dcd74f93cc) )
-	ROM_LOAD( "95008655.bin", 0x0000, 0x100000, CRC(12735319) SHA1(166fbcc5828fd26ace63eed127427cbd0c81570d) )
+	sc_tempt_others
 ROM_END
 
 
@@ -9495,29 +9524,33 @@ ROM_END
 
 
 
+
 ROM_START( sc4a40 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x400000, "altrevs", 0 )
-
-	// sc4
-	ROM_LOAD16_BYTE( "95414950.lo", 0x00001, 0x080000, CRC(43b9da3c) SHA1(bcc473bb48e090052aab6646738fff750aeaa9f0) )
-	ROM_LOAD16_BYTE( "95414951.hi", 0x00000, 0x080000, CRC(1360c672) SHA1(837b4172f05119555fc6874aeaacfdbeeacb381c) )
 	ROM_LOAD16_BYTE( "95416088.lo", 0x00001, 0x080000, CRC(7bebb61c) SHA1(b1228eb50a66f19c7496306d2fa2d72c768d8b91) )
 	ROM_LOAD16_BYTE( "95416089.hi", 0x00000, 0x080000, CRC(8a5bf808) SHA1(02336466dbf1ad7155ffc16111037333d11e09b9) )
+	sc_a40_others
+ROM_END
+
+ROM_START( sc4a40a )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95416090.lo", 0x00001, 0x080000, CRC(23ebede2) SHA1(9b3c3f6fcde88f595d60b986d5f7f551ac6b4dc5) )
 	ROM_LOAD16_BYTE( "95416091.hi", 0x00000, 0x080000, CRC(4cc5160d) SHA1(95aa16ec0b36676a17af89b99b47f0d1265e07b5) )
+	sc_a40_others
+ROM_END
+
+ROM_START( sc4a40b )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95417088.lo", 0x00001, 0x080000, CRC(1f4b5227) SHA1(d58751b06a3f69911d3c2275484bdb7f14dfc2ed) )
 	ROM_LOAD16_BYTE( "95417089.hi", 0x00000, 0x080000, CRC(bd6ac464) SHA1(811a99bc9b308d5d80dd001e362112bcd13df899) )
+	sc_a40_others
+ROM_END
+
+ROM_START( sc4a40c )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95417090.lo", 0x00001, 0x080000, CRC(6a9853be) SHA1(dcf973cfab45656ca8dc597e385e1c3c2eb4ca9a) )
 	ROM_LOAD16_BYTE( "95417091.hi", 0x00000, 0x080000, CRC(4c5a4035) SHA1(363072def1061500102acc0806cad70cbab3be37) )
-
-	ROM_REGION( 0x5000, "pics", 0 )
-	ROM_LOAD16_BYTE( "95890123.bin", 0x0000, 0x5000, CRC(e3f5466e) SHA1(ae2f45f79d0113e651b8cf5f655a9ceb32a3ddaa) )
-	ROM_LOAD16_BYTE( "95890124.bin", 0x0000, 0x5000, CRC(9663025a) SHA1(097246412fd4084c1185d8dfd91e884abc5a3f8a) )
-	ROM_LOAD16_BYTE( "95890125.bin", 0x0000, 0x5000, CRC(08d9ce06) SHA1(9087170d6c6edad735ab5a2abbc0a2191aabfd03) )
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
-	ROM_LOAD( "95008511.bin", 0x0000, 0x0ff5c3, CRC(6fac2014) SHA1(5b364406f7b5d8f4c54561e3977571e4a47273a0) )
+	sc_a40_others
 ROM_END
 
 
@@ -13642,6 +13675,13 @@ ROM_END
 
 
 
+ROM_START( sc4mondxg )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95414950.lo", 0x00001, 0x080000, CRC(43b9da3c) SHA1(bcc473bb48e090052aab6646738fff750aeaa9f0) )
+	ROM_LOAD16_BYTE( "95414951.hi", 0x00000, 0x080000, CRC(1360c672) SHA1(837b4172f05119555fc6874aeaacfdbeeacb381c) )
+	sc_monop_others
+ROM_END
+
 ROM_START( sc4mcas )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95412230.lo", 0x00001, 0x080000, CRC(45f66b73) SHA1(049bfdbd73a2b8bd8222d0c1eca15c2d64414d51) )
@@ -15728,12 +15768,14 @@ ROM_START( sc4dndbe )
 	sc_dndbe_others
 ROM_END
 
+/*
 ROM_START( sc4dndbea )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418410.lo", 0x00001, 0x080000, CRC(ddd534d0) SHA1(1c8acd74d79fc7f169ed54e2d603100775610e5a) )
 	ROM_LOAD16_BYTE( "95418411.hi", 0x00000, 0x080000, CRC(5346fd2a) SHA1(ada8ed84a173bf3f68af0a2e1b92dbfe94f2d6c9) )
 	sc_dndbe_others
 ROM_END
+*/
 
 ROM_START( sc4dndbeb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -16747,7 +16789,18 @@ GAME( 200?, sc4taekw	,0,			sc4, sc4, sc4, ROT0, "Qps","Tae Kwon Dough (Qps) (Sco
 GAME( 200?, sc4taknt	,0,			sc4, sc4, sc4, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4takcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4ttp		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Take The Piste (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4tempt	,0,			sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
+// PROJECT NUMBER PR7113  TEMPTATION         PR7113 TEMPTATION SOUNDS11
+GAME( 200?, sc4tempt	,0,			sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4tempta	,sc4tempt,	sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4temptb	,sc4tempt,	sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4temptc	,sc4tempt,	sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4temptd	,sc4tempt,	sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4tempte	,sc4tempt,	sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4temptf	,sc4tempt,	sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4temptg	,sc4tempt,	sc4, sc4, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
+
 
 // PR7077 TETRIS         TETR SOUNDS
 GAME( 200?, sc4tetri	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Tetris (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -16873,7 +16926,15 @@ GAME( 200?, sc4adwta	,0,			sc4, sc4, sc4, ROT0, "BFM","Ant & Dec's Saturday Nigh
 GAME( 200?, sc4adwtaa	,sc4adwta,	sc4, sc4, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 
-GAME( 200?, sc4a40		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
+// PR2200 AROUND THE BOARD         AROU SOUNDS         AROUND THE BOARD
+GAME( 200?, sc4a40		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4a40a		,sc4a40,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4a40b		,sc4a40,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4a40c		,sc4a40,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
+
+
 GAME( 200?, sc4bantm	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4bar7		,0,			sc4, sc4, sc4, ROT0, "BFM","Bar 7's (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4batl		,0,			sc4, sc4, sc4, ROT0, "BFM","Battleships & Cruisers (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -17470,8 +17531,10 @@ GAME( 200?, sc4mondxa	,sc4mondx,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Deluxe
 GAME( 200?, sc4mondxb	,sc4mondx,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )// ^^
 GAME( 200?, sc4mondxc	,sc4mondx,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )// ^^
 GAME( 200?, sc4mondxd	,sc4mondx,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )// PR2202 MONOPOLY DELUXE         MONOPOLY  DELUXE  MAZ       MONOPOLY  TRIPLE
+GAME( 200?, sc4mondxg	,sc4mondx,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )// ^^ (found in an sc4a40 set)
 GAME( 200?, sc4mondxe	,sc4mondx,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )// PR2202 MONOPOLY         MONOPOLY  TRIPLE  MAZ       MONOPOLY  DELUXE
 GAME( 200?, sc4mondxf	,sc4mondx,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )// ^^
+
 
 // I think these belong to one of the 'Golden Game / Golden X' sets
 GAME( 200?, sc4monog	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly? / Golden X Game (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )// PR2056  GOLD X TRIPLE         BARX SOUNDS         GOLD X TRIPLE
@@ -17836,20 +17899,19 @@ GAME( 200?, sc4copsri	,sc4copsr,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers (B
 
 // PR1935 AWP DEAL OR NO DEAL BEAT THE BANKER S4         PR1915 BEAT THE BANKER SOUNDS11   BEAT THE BANKER S.SITE
 GAME( 200?, sc4dndbe	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbea	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbeb	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbec	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbed	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbee	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbef	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbeg	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbeh	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4dndbei	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4dndbej	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4dndbek	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4dndbel	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4dndbem	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4dndben	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 17)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbeb	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbec	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbed	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbee	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbef	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbeg	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbeh	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbei	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbej	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbek	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbel	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbem	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndben	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3337 AWP DEAL OR NO DEAL BOX CLEVER SCORP4         PR3312 DOND BOXCLEVER SOUNDS11    BOX CLEVER  S.SITE
 GAME( 200?, sc4dndbc	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 

@@ -1,6 +1,14 @@
 /* Scorpion 4 + 5 driver releated includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
 
+#define sc_a40_others \
+	ROM_REGION( 0x5000, "pics", 0 ) \
+	ROM_LOAD( "95890123.bin", 0x0000, 0x5000, CRC(e3f5466e) SHA1(ae2f45f79d0113e651b8cf5f655a9ceb32a3ddaa) ) \
+	ROM_LOAD( "95890124.bin", 0x0000, 0x5000, CRC(9663025a) SHA1(097246412fd4084c1185d8dfd91e884abc5a3f8a) ) \
+	ROM_LOAD( "95890125.bin", 0x0000, 0x5000, CRC(08d9ce06) SHA1(9087170d6c6edad735ab5a2abbc0a2191aabfd03) ) \
+	ROM_REGION( 0x1000000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008511.bin", 0x0000, 0x0ff5c3, CRC(6fac2014) SHA1(5b364406f7b5d8f4c54561e3977571e4a47273a0) ) \
+
 #define sc_adjb_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008699.bin", 0x0000, 0x100000, CRC(6d49b54a) SHA1(d64caa1dae40c3bf536f8739d6995b589c7184b7) ) \
@@ -719,6 +727,11 @@
 #define sc_srr_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008213.bin", 0x0000, 0x100000, CRC(e8f82b1d) SHA1(9357f587d638289b2cd5029e5895f69097d69089) ) \
+
+#define sc_tempt_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008654.bin", 0x0000, 0x100000, CRC(9963724c) SHA1(90d22b11934e95fd2bfda026dcde51dcd74f93cc) ) \
+	ROM_LOAD( "95008655.bin", 0x0000, 0x100000, CRC(12735319) SHA1(166fbcc5828fd26ace63eed127427cbd0c81570d) ) \
 
 #define sc_tpsht_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \

@@ -12146,6 +12146,13 @@ sc4taknt	// Take Note (Bellfruit)
 sc4takcl	// Take Note Club (Bellfruit)
 sc4ttp		// Take The Piste (Mazooma)
 sc4tempt	// Temptation (Bellfruit)
+sc4tempta	//
+sc4temptb	//
+sc4temptc	//
+sc4temptd	//
+sc4tempte	//
+sc4temptf	//
+sc4temptg	//
 sc4tetri	// Tetris (Mazooma)
 sc4tetria	//
 sc4tetrib	//
@@ -12246,6 +12253,9 @@ sc4adjbi	//
 sc4adwta	// Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit)
 sc4adwtaa	//
 sc4a40		// Around The Board In 40 Days (Mazooma)
+sc4a40a		//
+sc4a40b		//
+sc4a40c		//
 sc4bantm	// Bantam Of The Opera (Mazooma)
 sc4bar7		// Bar 7's (Bellfruit)
 sc4batl		// Battleships & Cruisers (Bellfruit)
@@ -13017,7 +13027,6 @@ sc4copsrg	//
 sc4copsrh	//
 sc4copsri	//
 sc4dndbe	// Deal Or No Deal Beat The Banker (Bellfruit)
-sc4dndbea	//
 sc4dndbeb	//
 sc4dndbec	//
 sc4dndbed	//
