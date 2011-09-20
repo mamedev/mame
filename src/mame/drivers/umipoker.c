@@ -27,30 +27,14 @@ static VIDEO_START( umipoker )
 
 }
 
-static SCREEN_UPDATE( umipoker )
+static void draw_layer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer_n )
 {
-	umipoker_state *state = screen->machine().driver_data<umipoker_state>();
+	umipoker_state *state = machine.driver_data<umipoker_state>();
 	int x,y;
 	int count;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = machine.gfx[0];
 
-	count = 0/2;
-
-	for(y=0;y<32;y++)
-	{
-		for(x=0;x<64;x++)
-		{
-			int tile = state->m_vram[count*2+0];
-			int attr = state->m_vram[count*2+1];
-			int color = (attr & 0x1f);
-
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8),(y*8));
-
-			count++;
-		}
-	}
-
-	count = 0x3000/2;
+	count = (layer_n*0x1000) / 2;
 
 	for(y=0;y<32;y++)
 	{
@@ -65,6 +49,18 @@ static SCREEN_UPDATE( umipoker )
 			count++;
 		}
 	}
+
+}
+
+static SCREEN_UPDATE( umipoker )
+{
+	//umipoker_state *state = screen->machine().driver_data<umipoker_state>();
+	int i;
+
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+
+	for(i=0;i<4;i++)
+		draw_layer(screen->machine(),bitmap,cliprect,i);
 
 	return 0;
 }
@@ -135,7 +131,7 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(umipoker)
 
 	MCFG_GFXDECODE(umipoker)
@@ -170,7 +166,7 @@ ROM_START( umipoker )
 
 	ROM_REGION( 0x40000, "oki", 0 )
     ROM_LOAD( "sm.u17",       0x000000, 0x040000, CRC(99503aed) SHA1(011404fad01b3ced708a94143908be3e1d0194d3) ) // first half 1-filled
-    ROM_CONTINUE(               0x000000, 0x040000 )
+    ROM_CONTINUE(             0x000000, 0x040000 )
 ROM_END
 
 ROM_START( sayukipk )
@@ -189,9 +185,9 @@ ROM_START( sayukipk )
 
 	ROM_REGION( 0x40000, "oki", 0 )
     ROM_LOAD( "slm.u17",      0x000000, 0x040000, CRC(b50eb70b) SHA1(342fcb307844f4d0a02a85b2c61e73b5e8bacd44) ) // first half 1-filled
-    ROM_CONTINUE(               0x000000, 0x040000 )
+    ROM_CONTINUE(             0x000000, 0x040000 )
 ROM_END
 
 
-GAME( 1997, umipoker,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Umi de Poker", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, umipoker,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Marine Paradise", GAME_NOT_WORKING | GAME_NO_SOUND ) // Umi de Poker?
 GAME( 1997, sayukipk,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki", GAME_NOT_WORKING | GAME_NO_SOUND )
