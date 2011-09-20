@@ -8,7 +8,7 @@ public:
 		m_decobsmt(*this, "decobsmt")
     { }
 
-	required_device<decobsmt_device> m_decobsmt;
+	optional_device<decobsmt_device> m_decobsmt;
 
 	UINT32 *m_ram;
 	int m_raster_enable;
