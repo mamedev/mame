@@ -996,9 +996,8 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	// note: C352 internal divider is currently set to 288, but that sounds wrong with an input clock of 20MHz.
-	// 228.0 here is a guess, estimated from PCB recordings sound/music pitch.
-	MCFG_C352_ADD("c352", 20000000 / (228.0/288.0))
+
+	MCFG_C352_ADD("c352", 16934400*1.5) // measured at 20MHz, but that's too lowpitched
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
