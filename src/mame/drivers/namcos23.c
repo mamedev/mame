@@ -983,10 +983,11 @@ Notes:
 #include "sound/c352.h"
 #include "machine/nvram.h"
 
-#define S23_BUSCLOCK	(66664460/2)	// 33 MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal
-#define S23_VSYNC1	(59.8824)
-#define S23_VSYNC2	(59.915)
-#define S23_HSYNC	(16666150)
+#define S23_BUSCLOCK	(66664460/2)	/* 33MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal */
+#define S23_C352CLOCK	(25992000)		/* 25.992MHz, from 2061 pin 9 */
+#define S23_VSYNC1		(59.8824)
+#define S23_VSYNC2		(59.915)
+#define S23_HSYNC		(16666150)
 #define S23_MODECLOCK	(130205)
 
 enum { MODEL, FLUSH };
@@ -2878,7 +2879,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", 14745600*1.5) // ?
+	MCFG_C352_ADD("c352", S23_C352CLOCK)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -2924,7 +2925,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", 14745600*1.5) // ?
+	MCFG_C352_ADD("c352", S23_C352CLOCK)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -2966,7 +2967,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", 14745600*1.5) // ?
+	MCFG_C352_ADD("c352", S23_C352CLOCK)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
