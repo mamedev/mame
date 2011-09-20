@@ -1812,6 +1812,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/splus.o \
 	$(DRIVERS)/spool99.o \
 	$(DRIVERS)/sprcros2.o $(VIDEO)/sprcros2.o \
+	$(DRIVERS)/sshot.o \
 	$(DRIVERS)/ssingles.o \
 	$(DRIVERS)/sstrangr.o \
 	$(DRIVERS)/statriv2.o \
