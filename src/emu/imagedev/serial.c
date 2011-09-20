@@ -290,7 +290,7 @@ bool serial_image_device::call_load()
 	if (load_internal(&data, &data_length))
 	{
 		data_stream_init(&m_transmit, data, data_length);
-		set_transmit_state(m_transmit_on_start ? 1 :0);		
+		set_transmit_state(m_transmit_on_start ? 1 :0);
 		return IMAGE_INIT_PASS;
 	}
 

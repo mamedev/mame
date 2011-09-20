@@ -1401,7 +1401,7 @@ static INTERRUPT_GEN( taitojc_vblank )
 
 static const hc11_config taitojc_config =
 {
-	1, 		//has extended I/O
+	1,		//has extended I/O
 	1280,	//internal RAM size
 	0x00	//INIT defaults to 0x00
 };

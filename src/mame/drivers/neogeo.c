@@ -27,8 +27,8 @@
     It comes in many different cabinets but basically consists of an add on board that can be linked to a standard Jamma system.
     The system was discontinued in 2004.
     Source (modified): http://en.wikipedia.org/wiki/Neo_Geo
-    
-    
+
+
     MVS motherboards were produced in 1 / 2 / 4 and 6 Slot versions.
 
     Known motherboards:
@@ -45,19 +45,19 @@
     NEO-MVH MV1FT
     NEO-MVH MV1FZ
     NEO-MVH MV1FZS
-    
+
     2 Slot:
     NEO-MVH MV2
     NEO-MVH MV2F
     NEO-MVH MV2F-01
-    
+
     4 Slot:
     NEO-MVH MV4
     NEO-MVH MV4F
     NEO-MVH MV4FS
     NEO-MVH MV4FT
     NEO-MVH MV4FT2
-    
+
     6 Slot:
     NEO-MVH MV6
     NEO-MVH MV6F

@@ -49,34 +49,34 @@
 
 -----------------------------------------------------------------------------
  Original (Not emulation) Bugs:
- 
+
  - hidctch3 (Hidden Catch 3)
 
-	 the text shown when you start a game is flipped or
-	 clipped wrongly
+     the text shown when you start a game is flipped or
+     clipped wrongly
 
  - candy (Candy Candy)
 
-	 'Ready, Go' is displayed before cutting to the How To Play screen,
-	 this flow seems illogical, but is correct.
-	 The How To Play screen can't be skipped with the start button
-	 unless there is an additional credit inserted.
-	 There are some bad pixels at the top right of the How To Play text
+     'Ready, Go' is displayed before cutting to the How To Play screen,
+     this flow seems illogical, but is correct.
+     The How To Play screen can't be skipped with the start button
+     unless there is an additional credit inserted.
+     There are some bad pixels at the top right of the How To Play text
 
 -----------------------------------------------------------------------------
  Driver (Emulation) Bugs:
 
   - candy (Candy Candy)
 
-	  VRAM erasing doesn't work properly in this game with the logic we're
-	  using in eolith_vram_w.  There are various screens, such as the how
-	  to play screen and high score screen where you can see graphics which
-	  should have been erased.  It has been verified that these get erased
-	  correctly on the real hardware.
+      VRAM erasing doesn't work properly in this game with the logic we're
+      using in eolith_vram_w.  There are various screens, such as the how
+      to play screen and high score screen where you can see graphics which
+      should have been erased.  It has been verified that these get erased
+      correctly on the real hardware.
 
   - racooon (Raccoon World)
 
-	  Game animation seems too fast?
+      Game animation seems too fast?
 
  *********************************************************************/
 

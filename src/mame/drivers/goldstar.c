@@ -8318,14 +8318,14 @@ ROM_END
 /*
   Bingo, from Wing (1993).
   ------------------------
-   
+
   Seems hardware derivated from Lucky 8 Lines.
 
   1x Z8400AB1  (11c)      Z80A CPU.
   3x D8255AC-2 (7c,8c,9c) Programmable Peripheral Interface.
   1x WF19054   (5c)       Programmable Sound Generator.
   1x oscillator (x1 6j)   12.000MHz Xtal.
-	
+
   ROMs
   4x 2764 (1,2,3,4).
   4x 27256 (5,6,7,9).
@@ -8345,7 +8345,7 @@ ROM_END
   1x trimmer VAL.
   4x 8x2 DIP switches.
   1x battery 3.6V.
-  
+
 */
 
 ROM_START( bingowng )

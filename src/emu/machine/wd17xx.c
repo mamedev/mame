@@ -139,9 +139,9 @@
 
     2011-Jun-24 Curt Coder
     - Added device types for all known variants, and enforced inverted DAL lines.
-	
-	2011-Sep-18 Curt Coder
-	- Connected Side Select Output for variants that support it.
+
+    2011-Sep-18 Curt Coder
+    - Connected Side Select Output for variants that support it.
 
     TODO:
         - What happens if a track is read that doesn't have any id's on it?

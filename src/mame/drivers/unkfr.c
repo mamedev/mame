@@ -60,10 +60,10 @@ ROM_START( unkfr )
 	ROM_LOAD( "3ofakind.bin", 0x0000, 0x008000, CRC(46883c38) SHA1(ab1ffbc437a919e991443d1f5c1b6378b0c8fd53) )
 	ROM_LOAD( "3ofakindhacked.bin", 0x0000, 0x008000, CRC(94acff35) SHA1(d0e3c7666fb655b1fc20542527e4f55bc25abe0c) )
 // Club 21 (Unk) [c] (bad - only a few bits ever used)
-//	ROM_LOAD( "club21_1.bin", 0x0000, 0x080000, CRC(826e047c) SHA1(1da8a86688148c184c42ce213239ea2e57cb9e29) )
-//	ROM_LOAD( "club21_2.bin", 0x0000, 0x080000, CRC(75297a19) SHA1(1c7e2b3fccfc79b3fbfbc979d06aef3405fa2aad) )
-//	ROM_LOAD( "club21snd-0.bin", 0x0000, 0x080000, CRC(673551c6) SHA1(d7540388ccc8df6be2ec7a3fa90765f7e6ac49f7) )
-//	ROM_LOAD( "club21snd-1.bin", 0x0000, 0x080000, CRC(a9288cf4) SHA1(a30027497e965fc670ca902ca228c3e434815e34) )
+//  ROM_LOAD( "club21_1.bin", 0x0000, 0x080000, CRC(826e047c) SHA1(1da8a86688148c184c42ce213239ea2e57cb9e29) )
+//  ROM_LOAD( "club21_2.bin", 0x0000, 0x080000, CRC(75297a19) SHA1(1c7e2b3fccfc79b3fbfbc979d06aef3405fa2aad) )
+//  ROM_LOAD( "club21snd-0.bin", 0x0000, 0x080000, CRC(673551c6) SHA1(d7540388ccc8df6be2ec7a3fa90765f7e6ac49f7) )
+//  ROM_LOAD( "club21snd-1.bin", 0x0000, 0x080000, CRC(a9288cf4) SHA1(a30027497e965fc670ca902ca228c3e434815e34) )
 // Cops 'n' Robbers Classic (Bellfruit) - possibly a DMD ROM, given the mtx filename
 	ROM_LOAD( "classic-cops-and-robbers_mtx_ass.bin", 0x0000, 0x010000, CRC(3f40a2c9) SHA1(f73731171c56add1329f3a9d2f84303311d87884) )
 // Crystal Maze SWP (Barcrest) [c] (just a bad dump?)
@@ -554,7 +554,7 @@ ROM_START( unkfr )
 // zzz_unk fred (Barcrest)
 	ROM_LOAD( "fred.bin", 0x0000, 0x000c1b, CRC(cf46223b) SHA1(dcf5d0c310b8ccc2783d4d7a80ce496d7ecd0d56) )
 // zzz_unk lahroc5 (Electrocoin) - Last Action Hero (Data East Pinball)
-//	ROM_LOAD( "lahroc5", 0x0000, 0x010000, CRC(94102fdd) SHA1(b741fe7a646225351148f5e675bd232881730221) )
+//  ROM_LOAD( "lahroc5", 0x0000, 0x010000, CRC(94102fdd) SHA1(b741fe7a646225351148f5e675bd232881730221) )
 // zzz_unk pgsnd (Maygay)
 	ROM_LOAD( "pgsnd", 0x0000, 0x080000, CRC(c1d5a1f1) SHA1(8b7ded8aa4a84310d08c1438d0d91a28e1d95a21) )
 // zzz_unk sil (Barcrest)
@@ -638,7 +638,7 @@ ROM_START( unkfra )
 	ROM_LOAD( "fruitopi.lo", 0x0000, 0x080000, CRC(da9d5edb) SHA1(249445a5193b04490641a0498f577cb2be69c0dd) )
 	//ROM_LOAD( "gia_gems.p1", 0x0000, 0x080000, CRC(c841d2f7) SHA1(480397141c917bce26cfdc8ba7fa8d21ab741770) ) bad
 	//ROM_LOAD( "gia_gems.p2", 0x0000, 0x080000, CRC(7824adf5) SHA1(99b59d28adb80d5cf3d70691cc134eba72288f20) ) bad
-	ROM_LOAD( "gimme_st.p1", 0x0000, 0x080000, CRC(d5df19b3) SHA1(3efdff2894f6edcae1121a63c654b7d58bd378c0) ) 
+	ROM_LOAD( "gimme_st.p1", 0x0000, 0x080000, CRC(d5df19b3) SHA1(3efdff2894f6edcae1121a63c654b7d58bd378c0) )
 	ROM_LOAD( "h hop.p1", 0x0000, 0x080000, CRC(71c3549f) SHA1(7b98acd3ce9d72dbbef573330d3206d9af60c15e) ) // bad? (looks like fixed bits in places)
 //  ROM_LOAD( "hbrk_hot.txt", 0x0000, 0x0000ff, CRC(c95eecc8) SHA1(fd3e5658028ab39622e761445d72ed110da3e091) )
 	ROM_LOAD( "jc5p_pound5", 0x0000, 0x020000, CRC(cf1d708e) SHA1(df0188b6d66763a91ae153821f6e12b9df391146) ) // mpu4
@@ -646,14 +646,14 @@ ROM_START( unkfra )
 	//ROM_LOAD( "jewel s", 0x0000, 0x000001, CRC(38d7a8b4) SHA1(999a0a8cad102eb519ca788d6e0cd48ee9e6ca3e) )
 	ROM_LOAD( "jpoter.p1s", 0x0000, 0x080000, CRC(56aec852) SHA1(df6b35176dadc6f2b7736a2557b9af254a1e4dd2) ) // sc5
 	ROM_LOAD( "jpoter.p2_", 0x0000, 0x080000, CRC(032ebbf5) SHA1(ed21f30e02826c629d0c3bfbec332aeb9a6266a9) ) // sc5
-//	ROM_LOAD( "ra_cd100.3_6", 0x0000, 0x020000, CRC(4cc8cf79) SHA1(8eb51e0f6c0f66d155f9b325ee02a313f1f3a525) ) // cd100 jukebox?
+//  ROM_LOAD( "ra_cd100.3_6", 0x0000, 0x020000, CRC(4cc8cf79) SHA1(8eb51e0f6c0f66d155f9b325ee02a313f1f3a525) ) // cd100 jukebox?
 	ROM_LOAD( "wb_v22", 0x0000, 0x002000, CRC(bd02c9c8) SHA1(044024ce40668397e9ca2ea3ec4f68d05fd20bd0) )
 
 	// these look like astra/pluto
 	ROM_LOAD( "ldeven", 0x0000, 0x040000, CRC(179505b4) SHA1(2c80a5289f8945eba222d3daa29a1ecca26aae0c) )
 	ROM_LOAD( "ldodd", 0x0000, 0x040000, CRC(9611a17f) SHA1(06199f2f8660162ce4157e07927406b4046d8457) )
 	//ROM_LOAD( "sldodd", 0x0000, 0x040000, CRC(9611a17f) SHA1(06199f2f8660162ce4157e07927406b4046d8457)
-	ROM_LOAD( "sldeven", 0x0000, 0x040000, CRC(cbd08464) SHA1(d7b6397b597d05efcffc5ed975723f07b794a1f5) ) 
+	ROM_LOAD( "sldeven", 0x0000, 0x040000, CRC(cbd08464) SHA1(d7b6397b597d05efcffc5ed975723f07b794a1f5) )
 
 	ROM_LOAD( "legion.sn1", 0x0000, 0x080000, CRC(782827cd) SHA1(0f5aeba70e639549376c5df9146fe6a9c58396d5) )
 	ROM_LOAD( "mon_60.p1", 0x0000, 0x020000, CRC(ddb30a35) SHA1(c225995fe41f76d32d101cc91dcfa9c3d0e9aa02) )
@@ -672,19 +672,19 @@ ROM_START( unkfra )
 	ROM_LOAD( "noonshin.g1", 0x0000, 0x080000, CRC(b2c5f80b) SHA1(4ec7b0bd758ddad88315021ed746aec35fa688b7) ) // moonshine club?
 	ROM_LOAD( "phoenix.hi", 0x0000, 0x080000, CRC(f23ae723) SHA1(9a4bbe9d305f7a24ee71216270d98e5830630c63) )
 	ROM_LOAD( "phoenix.lo", 0x0000, 0x080000, CRC(793350ce) SHA1(888be3c3e4711750c5102a6a4a19fd0458462444) )
-//	ROM_LOAD( "pick.p2", 0x0000, 0x080000, CRC(cb170a74) SHA1(913914dcfa9c94f6e6d6d0aae6e0ba98cdcb66ce) ) bad
-//	ROM_LOAD( "pick_pac", 0x0000, 0x080000, CRC(c1127969) SHA1(ea72b90591df2398efbdeb55520b0fde5dd4e5a0) ) bad
+//  ROM_LOAD( "pick.p2", 0x0000, 0x080000, CRC(cb170a74) SHA1(913914dcfa9c94f6e6d6d0aae6e0ba98cdcb66ce) ) bad
+//  ROM_LOAD( "pick_pac", 0x0000, 0x080000, CRC(c1127969) SHA1(ea72b90591df2398efbdeb55520b0fde5dd4e5a0) ) bad
 	ROM_LOAD( "rc_club.p1", 0x0000, 0x020000, CRC(5bf41b92) SHA1(48f85ef7352d75a7f9e9c7a9e01408b2a00b0053) ) // impact
 	ROM_LOAD( "rc_club.p2", 0x0000, 0x020000, CRC(e790dda8) SHA1(5564626e3235bad8048e8be00ca7a5a7798b236e) ) // impact
 	ROM_LOAD( "redalert.p1", 0x0000, 0x020000, CRC(ff5952b2) SHA1(c4fd40d9eae05f80497f312b85bc97c88a0c3502) )
 	ROM_LOAD( "side split.lo", 0x0000, 0x080000, CRC(89e97aee) SHA1(1e0a21b9cdd049a1ed7bfd2216c9b9789ff103a2) )
 	//ROM_LOAD( "side spl", 0x0000, 0x080000, CRC(89e97aee) SHA1(1e0a21b9cdd049a1ed7bfd2216c9b9789ff103a2) )
-//	ROM_LOAD( "smg1", 0x0000, 0x080000, CRC(6dc368c5) SHA1(afc65e5ceefadf794b53bd073d483e4616b9cb34) ) // bad? (crystal maze rom, paired with cry.p4)
+//  ROM_LOAD( "smg1", 0x0000, 0x080000, CRC(6dc368c5) SHA1(afc65e5ceefadf794b53bd073d483e4616b9cb34) ) // bad? (crystal maze rom, paired with cry.p4)
 	ROM_LOAD( "s_night.lo", 0x0000, 0x080000, CRC(65f8fa73) SHA1(59bc4ca637615a4e4b3ca7750a9257632ce3a31b) )
 	//ROM_LOAD( "s_tonic.p4", 0x0000, 0x000001, CRC(ff000000) SHA1(85e53271e14006f0265921d02d4d736cdc580b0b) )
 
 	ROM_LOAD( "upov03.p2", 0x0000, 0x080000, CRC(8601a331) SHA1(b5caddd15ccd140e28eba1ae44e7d944e37ccbb3) ) // Up and Over, missing the rest of v3
-	
+
 	// looks like a pluto style decode, but isn't (text is corrupt).. might just be bad
 	ROM_LOAD( "winamil.p1", 0x0000, 0x020000, CRC(c23539e9) SHA1(1fb5ea2a4ffe8eda890c580329471c5ec820c4ca) )
 	ROM_LOAD( "winamil.p2", 0x0000, 0x020000, CRC(a2e12e68) SHA1(6abdf37a48ee8fa4728dcc6553b6e5d8f834620a) )

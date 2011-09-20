@@ -2207,7 +2207,7 @@ void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const UINT8 *b
 		sectors[sector].data = sectdata + sectdata_pos;
 		for(int j=0; j<ssize; j++)
 			sectdata[sectdata_pos++] = sbyte_mfm_r(bitstream, pos, track_size);
-	}		
+	}
 }
 
 void floppy_image_format_t::get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count)

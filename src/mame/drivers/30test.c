@@ -1,14 +1,14 @@
 /***************************************************************************
 
-	30 Test (Remake) (c) 1997 Namco
+    30 Test (Remake) (c) 1997 Namco
 
-	driver by Angelo Salese
+    driver by Angelo Salese
 
-	TODO:
-	- clickable artwork;
-	- portd meaning is a mystery
-	- inputs are annoying to map;
-	- EEPROM
+    TODO:
+    - clickable artwork;
+    - portd meaning is a mystery
+    - inputs are annoying to map;
+    - EEPROM
 
 ============================================================================
 
@@ -167,7 +167,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8 )
 	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
-//	AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
+//  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
 	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
@@ -255,7 +255,7 @@ static MACHINE_RESET( 30test )
 
 static const hc11_config namco_30test_config =
 {
-	0, 	   //has extended internal I/O
+	0,	   //has extended internal I/O
 	768,   //internal RAM size
 	0x00   //registers are at 0-0x100
 };
@@ -282,7 +282,7 @@ static MACHINE_CONFIG_START( 30test, namco_30test_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE(30test)
 
-//	MCFG_PALETTE_INIT(30test)
+//  MCFG_PALETTE_INIT(30test)
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_VIDEO_START(30test)

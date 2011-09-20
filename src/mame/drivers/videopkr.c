@@ -1447,7 +1447,7 @@ MAINBOARD:
 1x 6.0 MHz. Xtal.
 
 5x pots:
-- 3 together on the connectors opposit side (maybe RGB). 
+- 3 together on the connectors opposit side (maybe RGB).
 - 1 near the AY-3-8910.
 - 1 opposit to the sound circuitry.
 

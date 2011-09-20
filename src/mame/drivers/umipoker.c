@@ -1,15 +1,15 @@
 /***************************************************************************
 
-	Umi de Poker (c) 1997 World Station Co.,LTD
-	Slot Poker Saiyuki (c) 1998 World Station Co.,LTD
+    Umi de Poker (c) 1997 World Station Co.,LTD
+    Slot Poker Saiyuki (c) 1998 World Station Co.,LTD
 
-	driver by Angelo Salese
+    driver by Angelo Salese
 
-	TODO:
-	- fix clocks;
-	- inputs are bare-bones;
+    TODO:
+    - fix clocks;
+    - inputs are bare-bones;
 
-	TMP68HC000-16 + z80 + YM3812 + OKI6295
+    TMP68HC000-16 + z80 + YM3812 + OKI6295
 
 ***************************************************************************/
 

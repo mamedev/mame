@@ -447,7 +447,7 @@ INLINE UINT16 mix_3D(ay8910_context *psg)
 			else
 			{
 				indx |= (1 << (chan+15)) | ( psg->vol_enabled[chan] ? psg->env_volume << (chan*5) : 0);
-			}	
+			}
 		}
 		else
 		{
@@ -1133,7 +1133,7 @@ WRITE8_DEVICE_HANDLER( ay8914_w )
 	ay8910_address_w(device, 0, mapping8914to8910[offset & 0xff]);
 	ay8910_data_w(device, 0, data & 0xff);
 }
- 
+
 DEFINE_LEGACY_SOUND_DEVICE(AY8910, ay8910);
 DEFINE_LEGACY_SOUND_DEVICE(AY8912, ay8912);
 DEFINE_LEGACY_SOUND_DEVICE(AY8913, ay8913);

@@ -19,7 +19,7 @@ class netdev_pcap : public netdev
 public:
 	netdev_pcap(const char *name, class device_network_interface *ifdev, int rate);
 	~netdev_pcap();
-	
+
 	int send(UINT8 *buf, int len);
 	void set_mac(const char *mac);
 protected:
@@ -87,7 +87,7 @@ void init_pcap()
 	pcap_if_t *devs;
 	char errbuf[PCAP_ERRBUF_SIZE];
 	HMODULE handle;
-	
+
 	try
 	{
 		if(!(handle = LoadLibrary(L"wpcap.dll"))) throw GetLastError();

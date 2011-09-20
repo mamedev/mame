@@ -1,7 +1,7 @@
 /***************************************************************************
 
   Data East Pinball BSMT2000 sound board
- 
+
   used for System 3 and Whitestar pinball games and Tattoo Assassins video
 
 ***************************************************************************/
@@ -31,7 +31,7 @@ ADDRESS_MAP_END
 static INTERRUPT_GEN( decobsmt_firq_interrupt )
 {
 	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
-}                                              
+}
 
 static void bsmt_ready_callback(bsmt2000_device &device)
 {

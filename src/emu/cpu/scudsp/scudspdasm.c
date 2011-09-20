@@ -1,7 +1,7 @@
 /*
-	Sega Saturn SCU DSP disassembler
+    Sega Saturn SCU DSP disassembler
 
-	Written by Angelo Salese
+    Written by Angelo Salese
 */
 
 #include "emu.h"
@@ -242,9 +242,9 @@ static UINT32 decode_opcode(UINT32 pc, const SCUDSP_OPCODE *op_table,UINT32 cur_
 	UINT32 flags = 0;
 
 	//if (!strcmp(op_table->mnemonic, "jsr") || !strcmp(op_table->mnemonic, "bsr"))
-	//	flags = DASMFLAG_STEP_OVER;
+	//  flags = DASMFLAG_STEP_OVER;
 	//else if (!strcmp(op_table->mnemonic, "rts") || !strcmp(op_table->mnemonic, "rti"))
-	//	flags = DASMFLAG_STEP_OUT;
+	//  flags = DASMFLAG_STEP_OUT;
 
 	print("%s ", op_table->mnemonic);
 
@@ -267,10 +267,10 @@ static UINT32 decode_opcode(UINT32 pc, const SCUDSP_OPCODE *op_table,UINT32 cur_
 
 	switch(op_table->address_mode_2)
 	{
-		case EA_A: 		   print("A"); break;
-		case EA_P: 		   print("P"); break;
-		case EA_X: 		   print("X"); break;
-		case EA_Y: 		   print("Y"); break;
+		case EA_A:		   print("A"); break;
+		case EA_P:		   print("P"); break;
+		case EA_X:		   print("X"); break;
+		case EA_Y:		   print("Y"); break;
 		case EA_DSTMEM:    print("%s ", dst_mem[(cur_opcode & 0x00000f00) >> 8]); break;
 		case EA_DMADSTMEM: print("%s ", dst_mem[(cur_opcode & 0x00000300) >> 8]); break;
 		case EA_MVIDSTMEM: print("%s ", mvi_dst_mem[(cur_opcode & 0x3c000000) >> 26]); break;

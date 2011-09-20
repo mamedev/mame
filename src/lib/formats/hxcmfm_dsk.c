@@ -122,7 +122,7 @@ bool mfm_format::save(io_generic *io, floppy_image *image)
 	int dpos = tpos + track_count*head_count*sizeof(MFMTRACKIMG);
 
 	UINT8 trackbuf[150000/8];
-	
+
 	for(int track=0; track < track_count; track++) {
 		for(int side=0; side < head_count; side++) {
 			int track_size;

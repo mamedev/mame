@@ -5184,10 +5184,10 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Note(s)
-		The ranges here are based on the test mode which displays +-224
-		The nvram is calibrated using these settings.  If the SUBCPU handling changes then these might
-		end up needing to change again too
-		Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
+        The ranges here are based on the test mode which displays +-224
+        The nvram is calibrated using these settings.  If the SUBCPU handling changes then these might
+        end up needing to change again too
+        Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
     */
 	PORT_START("STICKY1")		/* VOLUME 0 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: vertical */
@@ -5323,9 +5323,9 @@ INPUT_PORTS_END /* Ace Driver */
 
 static INPUT_PORTS_START( ridgera )
 	PORT_START("INPUTS")
-	/*	1 3 5	When the cabinet is set to Deluxe, the stick shift is basically
-		|-|-|	an 8-way joystick that locks into place.
-		2 4 6	Standard (default) setup uses a racing shifter like in Ace Driver. */
+	/*  1 3 5   When the cabinet is set to Deluxe, the stick shift is basically
+        |-|-|   an 8-way joystick that locks into place.
+        2 4 6   Standard (default) setup uses a racing shifter like in Ace Driver. */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Down")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Shift Left")	// not used in Standard
@@ -5431,12 +5431,12 @@ static INPUT_PORTS_START( ridgera2 )
 	PORT_DIPSETTING(      0x2100, "Deluxe" )
 
 	/* Some dipswitches seem to be for debug purposes, for example:
-		2-4 : background drawing related
-		2-5 : background drawing related
-		2-6 : debug link-up
-		2-8 : no game over when time runs out (cheat)
-		3-7 : debug polygons
-	*/
+        2-4 : background drawing related
+        2-5 : background drawing related
+        2-6 : debug link-up
+        2-8 : no game over when time runs out (cheat)
+        3-7 : debug polygons
+    */
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x8000, 0x8000, "DIP3-8 (Test Mode)" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )

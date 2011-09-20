@@ -335,18 +335,18 @@ bool dsk_format::load(io_generic *io, floppy_image *image)
 {
 	UINT8 header[100];
 	bool extendformat = FALSE;
-	
+
 	io_generic_read(io, &header, 0, sizeof(header));
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
 		extendformat = TRUE;
 	}
-	
+
 	int heads = header[0x31];
 	int skip = 1;
 	if (heads==1) {
 		skip = 2;
 	}
-	int tracks  = header[0x30];	
+	int tracks  = header[0x30];
 	UINT64 track_offsets[84*2];
 	int cnt =0;
 	if (!extendformat) {
@@ -366,7 +366,7 @@ bool dsk_format::load(io_generic *io, floppy_image *image)
 			cnt += skip;
 		}
 	}
-	
+
 	int counter = 0;
 	for(int track=0; track < tracks; track++) {
 		for(int side=0; side < heads; side++) {
@@ -380,7 +380,7 @@ bool dsk_format::load(io_generic *io, floppy_image *image)
 				sector_header sector;
 				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
 				//printf("sec %02x %08x\n",sector.sector_id,sec_location);
-				
+
 				sec_location += sector.data_lenght;
 			}
 			counter++;

@@ -34,7 +34,7 @@ bool device_network_interface::mcast_chk(const UINT8 *buf, int len)
 void device_network_interface::set_promisc(bool promisc)
 {
 	m_promisc = promisc;
-	if(m_dev) m_dev->set_promisc(promisc); 
+	if(m_dev) m_dev->set_promisc(promisc);
 }
 
 void device_network_interface::set_mac(const char *mac)

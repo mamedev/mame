@@ -3664,10 +3664,10 @@ static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
  *************************************/
 
 /*
-	MCU handshake sequence:
-	the M50747 MCU can overlay 0x20 bytes of data inside the ROM space.
-	The offset where this happens is given by m68k to MCU write [0x8/2] << 6.
-	For example stdragon writes 0x33e -> maps at 0xcf80-0xcfbf while stdragona writes 0x33f -> maps at 0xcfc0-0xcfff.
+    MCU handshake sequence:
+    the M50747 MCU can overlay 0x20 bytes of data inside the ROM space.
+    The offset where this happens is given by m68k to MCU write [0x8/2] << 6.
+    For example stdragon writes 0x33e -> maps at 0xcf80-0xcfbf while stdragona writes 0x33f -> maps at 0xcfc0-0xcfff.
 */
 
 #define MCU_HS_LOG 0
@@ -3883,7 +3883,7 @@ static DRIVER_INIT( iganinju )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000, 0x3ffff, FUNC(iganinju_mcu_hs_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2f000, 0x2f009, FUNC(iganinju_mcu_hs_w));
 
-	//RAM[0x00006e/2] = 0x0420;	// the only game that does
+	//RAM[0x00006e/2] = 0x0420; // the only game that does
 								// not like lev 3 interrupts
 }
 

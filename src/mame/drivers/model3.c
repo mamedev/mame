@@ -2312,7 +2312,7 @@ ROM_START( scud )	/* step 1.5 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 
 	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
-	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) ) 
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 ROM_END
 
 ROM_START( scudj )	/* step 1.5 */
@@ -2387,7 +2387,7 @@ ROM_START( scudj )	/* step 1.5 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 
 	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
-	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) ) 
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 ROM_END
 
 ROM_START( scuda )	/* step 1.5 */
@@ -2462,7 +2462,7 @@ ROM_START( scuda )	/* step 1.5 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 
 	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
-	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) ) 
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 ROM_END
 
 ROM_START( scudp )	/* step 1.5 */
@@ -2543,7 +2543,7 @@ ROM_START( scudp )	/* step 1.5 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 
 	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
-	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) ) 
+	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) )
 ROM_END
 
 ROM_START( vf3 )	/* step 1.0 */
@@ -4145,7 +4145,7 @@ ROM_START( daytona2 )	/* Step 2.1 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 
 	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
-	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) ) 
+	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) )
 ROM_END
 
 ROM_START( dayto2pe )	/* Step 2.1 */
@@ -4225,7 +4225,7 @@ ROM_START( dayto2pe )	/* Step 2.1 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 
 	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
-	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) ) 
+	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) )
 ROM_END
 
 ROM_START( srally2 )	/* Step 2.0 */

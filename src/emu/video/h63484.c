@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	HD63484 ACRTC (rewrite in progress)
+    HD63484 ACRTC (rewrite in progress)
 
-	TODO:
-	- 8-bit support for FIFO, parameters and command values
-	- convert to C++
-	- execution cycles;
+    TODO:
+    - 8-bit support for FIFO, parameters and command values
+    - convert to C++
+    - execution cycles;
 
 ***************************************************************************/
 
@@ -287,44 +287,44 @@ enum
 	COMMAND_RGCPY
 };
 
-#define H63484_COMMAND_ORG		0x0400	// 				p: 2
-#define H63484_COMMAND_WPR		0x0800	// & ~0x1f  	p: 1
-#define H63484_COMMAND_RPR		0x0c00	// & ~0x1f  	p: 0
-#define H63484_COMMAND_WPTN		0x1800	// & ~0xf   	p: 1 + n
-#define H63484_COMMAND_RPTN		0x1c00	// & ~0xf		p: 1
-#define H63484_COMMAND_DRD		0x2400	//				p: 2
-#define H63484_COMMAND_DWT		0x2800	// 				p: 2
-#define H63484_COMMAND_DMOD		0x2c00	// & ~3			p: 2
-#define H63484_COMMAND_RD		0x4400	//				p: 0
-#define H63484_COMMAND_WT		0x4800	//				p: 1
-#define H63484_COMMAND_MOD		0x4c00	// & ~3			p: 1
-#define H63484_COMMAND_CLR		0x5800	//				p: 3
-#define H63484_COMMAND_SCLR		0x5c00	// & ~3			p: 3
-#define H63484_COMMAND_CPY		0x6000	// & ~0x0f03	p: 4
-#define H63484_COMMAND_SCPY		0x7000	// & ~0x0f03	p: 4
-#define H63484_COMMAND_AMOVE	0x8000	//				p: 2
-#define H63484_COMMAND_RMOVE	0x8400	//				p: 2
-#define H63484_COMMAND_ALINE	0x8800	// & ~0x00ff	p: 2
-#define H63484_COMMAND_RLINE	0x8c00	// & ~0x00ff	p: 2
-#define H63484_COMMAND_ARCT		0x9000	// & ~0x00ff	p: 2
-#define H63484_COMMAND_RRCT		0x9400	// & ~0x00ff	p: 2
-#define H63484_COMMAND_APLL		0x9800	// & ~0x00ff	p: 1 + n
-#define H63484_COMMAND_RPLL		0x9c00	// & ~0x00ff	p: 1 + n
-#define H63484_COMMAND_APLG		0xa000	// & ~0x00ff	p: 1 + n
-#define H63484_COMMAND_RPLG		0xa400	// & ~0x00ff	p: 1 + n
-#define H63484_COMMAND_CRCL		0xa800	// & ~0x01ff	p: 1
-#define H63484_COMMAND_ELPS		0xac00	// & ~0x01ff	p: 3
-#define H63484_COMMAND_AARC		0xb000	// & ~0x01ff	p: 4
-#define H63484_COMMAND_RARC		0xb400	// & ~0x01ff	p: 4
-#define H63484_COMMAND_AEARC	0xb800	// & ~0x01ff	p: 6
-#define H63484_COMMAND_REARC	0xbc00	// & ~0x01ff	p: 6
-#define H63484_COMMAND_AFRCT	0xc000	// & ~0x00ff	p: 2
-#define H63484_COMMAND_RFRCT	0xc400	// & ~0x00ff	p: 2
-#define H63484_COMMAND_PAINT	0xc800	// & ~0x01ff	p: 0
-#define H63484_COMMAND_DOT		0xcc00	// & ~0x00ff	p: 0
-#define H63484_COMMAND_PTN		0xd000	// & ~0x0fff	p: 1
-#define H63484_COMMAND_AGCPY	0xe000	// & ~0x0fff	p: 4
-#define H63484_COMMAND_RGCPY	0xf000	// & ~0x0fff	p: 4
+#define H63484_COMMAND_ORG		0x0400	//              p: 2
+#define H63484_COMMAND_WPR		0x0800	// & ~0x1f      p: 1
+#define H63484_COMMAND_RPR		0x0c00	// & ~0x1f      p: 0
+#define H63484_COMMAND_WPTN		0x1800	// & ~0xf       p: 1 + n
+#define H63484_COMMAND_RPTN		0x1c00	// & ~0xf       p: 1
+#define H63484_COMMAND_DRD		0x2400	//              p: 2
+#define H63484_COMMAND_DWT		0x2800	//              p: 2
+#define H63484_COMMAND_DMOD		0x2c00	// & ~3         p: 2
+#define H63484_COMMAND_RD		0x4400	//              p: 0
+#define H63484_COMMAND_WT		0x4800	//              p: 1
+#define H63484_COMMAND_MOD		0x4c00	// & ~3         p: 1
+#define H63484_COMMAND_CLR		0x5800	//              p: 3
+#define H63484_COMMAND_SCLR		0x5c00	// & ~3         p: 3
+#define H63484_COMMAND_CPY		0x6000	// & ~0x0f03    p: 4
+#define H63484_COMMAND_SCPY		0x7000	// & ~0x0f03    p: 4
+#define H63484_COMMAND_AMOVE	0x8000	//              p: 2
+#define H63484_COMMAND_RMOVE	0x8400	//              p: 2
+#define H63484_COMMAND_ALINE	0x8800	// & ~0x00ff    p: 2
+#define H63484_COMMAND_RLINE	0x8c00	// & ~0x00ff    p: 2
+#define H63484_COMMAND_ARCT		0x9000	// & ~0x00ff    p: 2
+#define H63484_COMMAND_RRCT		0x9400	// & ~0x00ff    p: 2
+#define H63484_COMMAND_APLL		0x9800	// & ~0x00ff    p: 1 + n
+#define H63484_COMMAND_RPLL		0x9c00	// & ~0x00ff    p: 1 + n
+#define H63484_COMMAND_APLG		0xa000	// & ~0x00ff    p: 1 + n
+#define H63484_COMMAND_RPLG		0xa400	// & ~0x00ff    p: 1 + n
+#define H63484_COMMAND_CRCL		0xa800	// & ~0x01ff    p: 1
+#define H63484_COMMAND_ELPS		0xac00	// & ~0x01ff    p: 3
+#define H63484_COMMAND_AARC		0xb000	// & ~0x01ff    p: 4
+#define H63484_COMMAND_RARC		0xb400	// & ~0x01ff    p: 4
+#define H63484_COMMAND_AEARC	0xb800	// & ~0x01ff    p: 6
+#define H63484_COMMAND_REARC	0xbc00	// & ~0x01ff    p: 6
+#define H63484_COMMAND_AFRCT	0xc000	// & ~0x00ff    p: 2
+#define H63484_COMMAND_RFRCT	0xc400	// & ~0x00ff    p: 2
+#define H63484_COMMAND_PAINT	0xc800	// & ~0x01ff    p: 0
+#define H63484_COMMAND_DOT		0xcc00	// & ~0x00ff    p: 0
+#define H63484_COMMAND_PTN		0xd000	// & ~0x0fff    p: 1
+#define H63484_COMMAND_AGCPY	0xe000	// & ~0x0fff    p: 4
+#define H63484_COMMAND_RGCPY	0xf000	// & ~0x0fff    p: 4
 
 
 /*-------------------------------------------------
@@ -548,12 +548,12 @@ int h63484_device::translate_command(UINT16 data)
 	/* annoying switch-case sequence, but it's the only way to get invalid commands ... */
 	switch (data)
 	{
-		case H63484_COMMAND_ORG: 	return COMMAND_ORG;
-		case H63484_COMMAND_DRD: 	return COMMAND_DRD;
-		case H63484_COMMAND_DWT: 	return COMMAND_DWT;
-		case H63484_COMMAND_RD:  	return COMMAND_RD;
-		case H63484_COMMAND_WT:  	return COMMAND_WT;
-		case H63484_COMMAND_CLR: 	return COMMAND_CLR;
+		case H63484_COMMAND_ORG:	return COMMAND_ORG;
+		case H63484_COMMAND_DRD:	return COMMAND_DRD;
+		case H63484_COMMAND_DWT:	return COMMAND_DWT;
+		case H63484_COMMAND_RD: 	return COMMAND_RD;
+		case H63484_COMMAND_WT: 	return COMMAND_WT;
+		case H63484_COMMAND_CLR:	return COMMAND_CLR;
 		case H63484_COMMAND_AMOVE:	return COMMAND_AMOVE;
 		case H63484_COMMAND_RMOVE:	return COMMAND_RMOVE;
 	}
@@ -561,7 +561,7 @@ int h63484_device::translate_command(UINT16 data)
 	switch(data & ~0x3)
 	{
 		case H63484_COMMAND_DMOD:	return COMMAND_DMOD;
-		case H63484_COMMAND_MOD: 	return COMMAND_MOD;
+		case H63484_COMMAND_MOD:	return COMMAND_MOD;
 		case H63484_COMMAND_SCLR:	return COMMAND_SCLR;
 	}
 
@@ -786,7 +786,7 @@ void h63484_device::process_fifo()
 				m_dn = m_pr[0]; // number of param words
 
 				//if(m_dn > 0x10 || m_dn == 0)
-				//	fatalerror("stop!");
+				//  fatalerror("stop!");
 			}
 
 			if(m_param_ptr == (1 + m_dn))
@@ -902,12 +902,12 @@ void h63484_device::video_registers_w(int offset)
 				exec_abort_sequence();
 
 			/*
-			x--- ---- ---- ---- ABorT
-			-x-- ---- ---- ---- PauSE
-			...
-			---- -xxx ---- ---- Graphic Bit Mode (bpp)
-			---- ---- xxxx xxxx irq mask, directly correlated to sr
-			*/
+            x--- ---- ---- ---- ABorT
+            -x-- ---- ---- ---- PauSE
+            ...
+            ---- -xxx ---- ---- Graphic Bit Mode (bpp)
+            ---- ---- xxxx xxxx irq mask, directly correlated to sr
+            */
 			m_ccr = vreg_data;
 			break;
 

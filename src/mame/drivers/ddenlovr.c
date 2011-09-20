@@ -10360,7 +10360,7 @@ ROM_END
 ROM_START( momotaro )
 	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
     ROM_LOAD( "r0272m1.6e",   0x00000, 0x080000, CRC(71c83332) SHA1(c949cb9e23e5cc77dbd64fc28e62a88f1dc811a3) )
-	ROM_RELOAD(           	  0x10000, 0x80000 )
+	ROM_RELOAD(         	  0x10000, 0x80000 )
 
 	ROM_REGION( 0x400000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "t0273.7b",     0x000000, 0x200000, CRC(5ae90ae2) SHA1(975bae930d848987405dc3dd59de138b1f98b358) )

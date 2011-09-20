@@ -304,7 +304,7 @@ OSDOBJS += \
 	$(WINOBJ)/netdev.o \
 	$(WINOBJ)/netdev_pcap.o
 endif
-	
+
 ifeq ($(DIRECT3D),9)
 CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
 else

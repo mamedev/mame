@@ -20,7 +20,7 @@ Mainboard:
 |                                                                                                                          |
 |                                                                                                                          |
 |      _        _____                                                                                                     _|
-|     | |      |/853 |                                                                                                   |_ 
+|     | |      |/853 |                                                                                                   |_
 |     |S|      |     |      _      _                                                                                      _|
 |     | |      |INS80|     | |    | |     _      _      _      ____     ____     _      _      _      _      _            -|
 |     |_|      |60N  |     | |    | |    | |    | |    | |    |SS  |   |SS  |   | |    | |    | |    | |    | |           -|
@@ -38,7 +38,7 @@ Mainboard:
 | |    EPOXY BLOCK   |     | |           | |    | |    | |    | |    | |     | |    | |    | |    | |    | |              -|
 | |                  |     |Q|           |J|    |H|    |K|    |I|    |H|     |H|    |F|    |F|    |F|    |F|              -|
 |C|                  |     | |           | |    | |    | |    | |    | |     | |    | |    | |    | |    | |              -|
-| |__________________|     |_|           |_|    |_|    |_|    |_|    |_|     |_|    |_|    |_|    |_|    |_|             |_ 
+| |__________________|     |_|           |_|    |_|    |_|    |_|    |_|     |_|    |_|    |_|    |_|    |_|             |_
 |                                                                                                                          |
 |                                                                                                                          |
 |                                                                                                                          |
@@ -215,14 +215,14 @@ static WRITE8_HANDLER(supershot_output0_w)
 	/*
         bit     signal      description
 
-        0       12			EXPLOSIONE LAMP. DX
-        1       13			RIMBALZO PALLINA (BALL BOUNCE)
-        2       14			CONSENSO GIOCO (CONSENT GAME)
-        3       16			VINCITA EXT. PLAY (WIN EXT. PLAY)
-		4       n.c.
+        0       12          EXPLOSIONE LAMP. DX
+        1       13          RIMBALZO PALLINA (BALL BOUNCE)
+        2       14          CONSENSO GIOCO (CONSENT GAME)
+        3       16          VINCITA EXT. PLAY (WIN EXT. PLAY)
+        4       n.c.
         5       n.c.
         6       n.c.
-        7       H			n.c.
+        7       H           n.c.
     */
 }
 
@@ -231,14 +231,14 @@ static WRITE8_HANDLER(supershot_output1_w)
 	/*
         bit     signal      description
 
-        0       5			ESPL. BICCHIERI E BOTTIGLIE	(EXPLOSION GLASSES AND BOTTLES)
-        1       F			n.c.
-        2       E			APPARIZIONE BOTTIGLIE (APPEARANCE BOTTLES)
-        3       4			MUSICA FINE GIOCO (END OF GAME MUSIC)
-        4       S			EXPANSIONE CERCHIO (EXPANSION CIRCLE)
+        0       5           ESPL. BICCHIERI E BOTTIGLIE (EXPLOSION GLASSES AND BOTTLES)
+        1       F           n.c.
+        2       E           APPARIZIONE BOTTIGLIE (APPEARANCE BOTTLES)
+        3       4           MUSICA FINE GIOCO (END OF GAME MUSIC)
+        4       S           EXPANSIONE CERCHIO (EXPANSION CIRCLE)
         5       n.c.
-        6       N			EXPLOSIONE CERCHIO (CIRCLE EXPLOSION)
-        7       11			SIBILO SPIRALE (PATHY SPIRAL)
+        6       N           EXPLOSIONE CERCHIO (CIRCLE EXPLOSION)
+        7       11          SIBILO SPIRALE (PATHY SPIRAL)
     */
 }
 

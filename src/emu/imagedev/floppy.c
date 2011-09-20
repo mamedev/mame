@@ -328,7 +328,7 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	const UINT32 *buf = image->get_buffer(cyl, ss);
 	int index = find_position(position, buf, cells);
 
-	//	fprintf(stderr, "position=%9d, index=%d\n", position, index);
+	//  fprintf(stderr, "position=%9d, index=%d\n", position, index);
 	if(index == -1)
 		return attotime::never;
 
@@ -340,6 +340,6 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	else
 		next_position = 200000000 + (buf[1] & floppy_image::TIME_MASK);
 
-	//	printf("next_pos=%d, delta=%d\n", next_position, next_position-position);
+	//  printf("next_pos=%d, delta=%d\n", next_position, next_position-position);
 	return base + attotime::from_nsec(next_position*(300/rpm));
 }

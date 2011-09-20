@@ -69,88 +69,88 @@ MACHINE_CONFIG_END
 */
 
 ROM_START( as_party )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ptm105.u1", 0x0000, 0x080000, CRC(383a0132) SHA1(7a8f06afa0b747c328b4137ae6dcbebac2165bb7) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "pts105.u1", 0x0000, 0x080000, CRC(0699143f) SHA1(486dff92c27ede8cd0d9395f6e4418ba0d056e90) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "pts105d.u1", 0x0000, 0x080000, CRC(0f628b8c) SHA1(c970db9274df6b9c0383ae6e0bcf9b24288a40cd) )
 ROM_END
 
 ROM_START( as_partya )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ptm110.u1", 0x0000, 0x080000, CRC(dd649eaf) SHA1(7449818635b6542148335e4ede72c6682d07834b) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "pts110.u1", 0x0000, 0x080000, CRC(b2771618) SHA1(40b0b52969a2ee53d38907c210305ae6f9ed7436) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "pts110d.u1", 0x0000, 0x080000, CRC(bb8c89ab) SHA1(2702574177d56768a4cc03f0b2bb95b3510dfe48) )
 	ROM_LOAD( "pts110g.u1", 0x0000, 0x080000, CRC(c9cc1d09) SHA1(5ae08d5413d8b8f6ba06c412163168b3e86a67e6) )
 ROM_END
 
 ROM_START( as_partyb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ptm112.u1", 0x0000, 0x080000, CRC(ab4a2808) SHA1(4b7c4986d4d3cf65be925085d41b698bbf0b4374) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "pts112.u1", 0x0000, 0x080000, CRC(b89bca1d) SHA1(899bafefa02321f2225276de2eca2a303b64a2b2) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "pts112d.u1", 0x0000, 0x080000, CRC(b16055ae) SHA1(beb411fb06f72557fcdc8c8d42dae0751448855b) )
 ROM_END
 
 ROM_START( as_partyc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ptnm206.u1", 0x0000, 0x080000, CRC(46d841b9) SHA1(6c4ffffd685bfa3474f697a1d9c96a36882ce104) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "ptns206.u1", 0x0000, 0x080000, CRC(933ce1a6) SHA1(c75a43e9bcb95f6d1579f7f5d5ed67b80499b5e7) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "ptns206d.u1", 0x0000, 0x080000, CRC(9ac77e15) SHA1(a0ee7db100a0303a15f5fde2b44a5982f8252e85) )
 ROM_END
 
 ROM_START( as_partyd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ptmv4-01.bin", 0x0000, 0x100000, CRC(3fde519a) SHA1(4d6f19e95e488e05174b2b025310852780e8d916) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "ptsv4-01.bin", 0x0000, 0x100000, CRC(da51bdca) SHA1(675fd673085155ffd4211f2fb4c8e8252fe76072) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "pts4-01d.bin", 0x0000, 0x100000, CRC(f6bc31a6) SHA1(c5c05e40da7c097c3b56a2b48cbf1992128cab6b) )
 	ROM_LOAD( "pts4-01g.bin", 0x0000, 0x100000, CRC(0440d541) SHA1(afcef2d6671d23d6635a54faa2f72217f03ab2de) )
 ROM_END
 
 ROM_START( as_partye )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ptime9.07m", 0x0000, 0x080000, CRC(0af16f11) SHA1(37e8abea7386fbeda634e546e1a560d7c1eaf913) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "ptime9.07s", 0x0000, 0x080000, CRC(4ff4fb24) SHA1(eb98026518e86a4959fa6039eace55a473ef58c3) )
 ROM_END
 
 ROM_START( as_partyf )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "p_time9.06", 0x0000, 0x080000, CRC(5bdf1b05) SHA1(267f66250451cee2afc43d9275a39f23eccd357d) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
-	ROM_LOAD( "p_time9.06s", 0x0000, 0x080000, CRC(4d33ca2c) SHA1(da6623bdf46160bbb178ea7df1f28dfc687e9dcb) )	
+	ROM_REGION( 0x200000, "slavecpu", 0 )
+	ROM_LOAD( "p_time9.06s", 0x0000, 0x080000, CRC(4d33ca2c) SHA1(da6623bdf46160bbb178ea7df1f28dfc687e9dcb) )
 ROM_END
 
 
 
 ROM_START( as_letsp )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "lpmv9-04.bin", 0x0000, 0x080000, CRC(c93e4e63) SHA1(3a1d4f589d8cdbcb25e35769104f21ba0883498d) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "lpsv9-04.bin", 0x0000, 0x080000, CRC(e2c5558b) SHA1(a49f6a23523aac3c5c8198fffc2d319e4bc7cfdd) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "lpsv904d.bin", 0x0000, 0x080000, CRC(eb3eca38) SHA1(9655fe22112110f015a6bbe5c43dbda96d800912) )
 ROM_END
 
@@ -161,35 +161,35 @@ ROM_END
 
 
 ROM_START( as_topsl )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tsm103.u1", 0x0000, 0x080000, CRC(da37998f) SHA1(202dad521dc15187c40e807b117aa70737e126f4) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "tss103.u1", 0x0000, 0x080000, CRC(f4be316a) SHA1(f96e76b81db17ce1b4b42a45b5b209d140048657) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "tss103d.u1", 0x0000, 0x080000, CRC(fd45aed9) SHA1(029b66154ef171449b8712a1ec6a367052ea8aa8) )
 ROM_END
 
 ROM_START( as_topsla )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tsm104.u1", 0x0000, 0x080000, CRC(f5af7008) SHA1(73d436c146b46886004b0cf3b1e64a5a58e0e769) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "tss104.u1", 0x0000, 0x080000, CRC(a3ab1bce) SHA1(9c9b9ca6e62219b7e8e2631e56800a212613df0e) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "tss104d.u1", 0x0000, 0x080000, CRC(aa50847d) SHA1(78375a73c1f318aaab8c3ea9024d9fdaeb42c2fc) )
 ROM_END
 
 ROM_START( as_topslb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tsm201.u1", 0x0000, 0x080000, CRC(acd57fcf) SHA1(69819d6002a2ce0481977369d469fe597fd6618b) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "tss201.u1", 0x0000, 0x080000, CRC(3ead0a9e) SHA1(cf2630c0d555ee7aa6dc9a33265feb26208321b8) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "tss201d.u1", 0x0000, 0x080000, CRC(3756952d) SHA1(23a31b95e96df9b1090bc49b13df49cd4e425025) )
 	ROM_LOAD( "tss201g.u1", 0x0000, 0x080000, CRC(4516018f) SHA1(008be270e2a9276989e069b757705035668dc8c6) )
 	ROM_LOAD( "tss201gt.u1", 0x0000, 0x080000, CRC(5662e78c) SHA1(af9aede67706b3c596a46e5947b768c719883ab2) )
@@ -198,89 +198,89 @@ ROM_START( as_topslb )
 ROM_END
 
 ROM_START( as_topslc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tsm203.u1", 0x0000, 0x080000, CRC(78e61d11) SHA1(888c76cd44fe1f556eddf0227df03bd0d6210bbf) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "tss203.u1", 0x0000, 0x080000, CRC(5c55f57a) SHA1(ca6172788deb06d3faeb7186f7922bd4f4094430) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "tss203d.u1", 0x0000, 0x080000, CRC(55ae6ac9) SHA1(8d297fcadb63e1e9b0ac1e91ff10321b043f1280) )
 ROM_END
 
 
 ROM_START( as_topsld )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tsmv2-05.bin", 0x0000, 0x080000, CRC(d525422d) SHA1(45b39fb0f4c8c8e7159b8832eca6e80b2cb79ced) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "tssv2-05.bin", 0x0000, 0x080000, CRC(d67ffde8) SHA1(f4e3b84c0a6a23f2fe1482b97dc48fb44315101f) )
 ROM_END
 
 
 ROM_START( as_hc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hcm107.u1", 0x00000, 0x080000, CRC(6481cf82) SHA1(975ac90615aee6fbda56707e0cc0776d103e6681) )
 	ROM_LOAD16_BYTE( "hcm107.u2", 0x00001, 0x080000, CRC(e5dbba3e) SHA1(545828ad4649665bd8b1125a0943108fc41ef44b) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD16_BYTE( "hcs107.u1", 0x00000, 0x080000, CRC(07c68bad) SHA1(32987bac887a02e9b073d16fb51251f7d9196e19) )
 	ROM_LOAD16_BYTE( "hcs107.u2", 0x00001, 0x080000, CRC(856c7bbf) SHA1(cf20481f93ebd10c8907f3f909fb0f6f9504b046) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "hcs107d.u1", 0x0000, 0x080000, CRC(0e3d141e) SHA1(66640deb844d3b23d408dcb15c9fcd8076d4ab15) )
 ROM_END
 
 ROM_START( as_hca )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hcm109.u1", 0x00000, 0x080000, CRC(25496265) SHA1(72cb61732949cf81db3fa45fc97087ae6f2e0fe2) )
 	ROM_LOAD16_BYTE( "hcm109.u2", 0x00001, 0x080000, CRC(85959686) SHA1(866dc6567639a10ddc8628ab7651140c558ac2df) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD16_BYTE( "hcs109.u1", 0x00000, 0x080000, CRC(f28ecdfb) SHA1(afc7fc048a8a5950bd0209c3dbe71a5a81b3313a) )
 	ROM_LOAD16_BYTE( "hcs109.u2", 0x00001, 0x080000, CRC(61d426f8) SHA1(818ae31de701dca318eeb75a98ba387ee619fc02) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "hcs109d.u1", 0x00000, 0x080000, CRC(fb755248) SHA1(5432691c46e35592f2975ae2d5c71d69043f43a5) )
 ROM_END
 
 ROM_START( as_hcb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hcmv1-10.u1", 0x00000, 0x080000, CRC(25dc38e9) SHA1(727d6de290b9078f1c8552b04b1d848863874107) )
 	ROM_LOAD16_BYTE( "hcmv1-10.u2", 0x00001, 0x080000, CRC(7f80cb29) SHA1(fdad25bfab6827486b114896fa5dba3d4a0b6ebe) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD16_BYTE( "hcsv1-10.u1", 0x00000, 0x080000, CRC(64e90540) SHA1(d0e31d2c9aa5399c07ade7e85fc79f584f3d83ba) )
 	ROM_LOAD16_BYTE( "hcsv1-10.u2", 0x00001, 0x080000, CRC(18c61602) SHA1(d4cbd894b65e46914ea858a221e01e222310c7ca) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "hcsv110d.u1", 0x00000, 0x080000, CRC(6d129af3) SHA1(49397a77d2c7cab507772793138acb543d16cd53) )
 ROM_END
 
 
 ROM_START( as_hcc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hcmv1-11.u1", 0x00000, 0x080000, CRC(7c29dffc) SHA1(185233d02165066e5b845b2821f40f07850c242e) )
 	ROM_LOAD16_BYTE( "hcmv1-11.u2", 0x00001, 0x080000, CRC(96c39b83) SHA1(c7bfcd8a33338579837e008cb5cd19b64d291133) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD16_BYTE( "hcsv1-11.u1", 0x00000, 0x080000, CRC(cdce1540) SHA1(bf27fbf7670154f6c2048a25754dd79627335314) )
 	ROM_LOAD16_BYTE( "hcsv1-11.u2", 0x00001, 0x080000, CRC(4f2b0bfe) SHA1(928ecc985e7d1d23d4db564f6499dd7fea47407a) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "hcs1-11d.u1", 0x00000, 0x080000, CRC(c4358af3) SHA1(9c08eb2a5daf1d77a4c81cf339a8a0d10f3c30da) )
 ROM_END
 
 ROM_START( as_hcd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hcm909.u1", 0x00000, 0x080000, CRC(c3d10181) SHA1(532e71733578fec11f452968fd82f2e656f27fdc) )
 	ROM_LOAD16_BYTE( "hcm909.u2", 0x00001, 0x080000, CRC(0a899237) SHA1(8be4937429732f1cddeaa6565a80a0b5430adaee) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD16_BYTE( "hcs909.u1", 0x00000, 0x080000, CRC(cc2553ac) SHA1(2f6f45727b5a160ddf2afeb3c481a92046f80a8f) )
 	ROM_LOAD16_BYTE( "hcs909.u2", 0x00001, 0x080000, CRC(97f4a5ea) SHA1(f4e625aabfaaaea71f1feddb3f681cbb7ce1de7e) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) 
+	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "hcs909d.u1", 0x00000, 0x080000, CRC(c5decc1f) SHA1(2824377a479901262614068406c6e7898bc2d9f3) )
 ROM_END
 
@@ -288,7 +288,7 @@ ROM_END
 
 
 ROM_START( as_bigtm )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bti003.u1", 0x00000, 0x080000, CRC(6751c225) SHA1(c4b69293c40927e81bd473f4b6487f0a05472503) )
 	ROM_LOAD16_BYTE( "bti003.u2", 0x00001, 0x080000, CRC(88369abd) SHA1(2d4d06a6598f7b4a2ae1aef0a4c6f571c9de9a0b) )
 
@@ -298,7 +298,7 @@ ROM_END
 
 
 ROM_START( as_acp )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "acpv403.u1", 0x00000, 0x100000, CRC(b1af78be) SHA1(6cacd0e815cea236130d35ac742076d24d825d66) )
 	ROM_LOAD16_BYTE( "acpv403.u2", 0x00001, 0x100000, CRC(ba6d3127) SHA1(f2511455d387ee588b106b9f2823e44b6e9328c9) )
 
@@ -308,7 +308,7 @@ ROM_START( as_acp )
 ROM_END
 
 ROM_START( as_celeb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cel100.u1", 0x00000, 0x080000, CRC(7eb2de99) SHA1(8d24ac812da727b60a043b875f409223c7bd589f) )
 	ROM_LOAD16_BYTE( "cel100.u2", 0x00001, 0x080000, CRC(9f5512a2) SHA1(86ec5df6905fe07bff2176c134a48a196f78a772) )
 
@@ -318,7 +318,7 @@ ROM_END
 
 
 ROM_START( as_celeba )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cel101.u1", 0x00000, 0x080000, CRC(884187de) SHA1(5a96e47e09607ec91af575c6c29972f6ddcea103) )
 	ROM_LOAD16_BYTE( "cel101.u2", 0x00001, 0x080000, CRC(b50b7dfb) SHA1(63b243464eae47a0676b40f2fe65e43e8cea62d7) )
 
@@ -327,7 +327,7 @@ ROM_START( as_celeba )
 ROM_END
 
 ROM_START( as_celebb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cel201.u1", 0x00000, 0x080000, CRC(4b5d11ca) SHA1(b4cd631524a67a18515230ef07bb52dca115472c) )
 	ROM_LOAD16_BYTE( "cel201.u2", 0x00001, 0x080000, CRC(42f81484) SHA1(305b04c8300c868551c852c6305588b2331155cc) )
 //  ROM_LOAD16_BYTE( "cel201u2.bin", 0x00001, 0x080000, CRC(42f81484) SHA1(305b04c8300c868551c852c6305588b2331155cc) )
@@ -338,14 +338,14 @@ ROM_END
 
 
 ROM_START( as_cshah )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cash1-050lwn-e.u1", 0x00000, 0x100000, CRC(7297ff77) SHA1(419ca98b29e2ae0b8c056201af631320fffb768a) )
 	ROM_LOAD16_BYTE( "cash1-050lwn-e.u2", 0x00001, 0x100000, CRC(4d39a9b0) SHA1(44a78c5068791703547cb1618f1b2ccdd5ddb015) )
 ROM_END
 
 
 ROM_START( as_srb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "srb004.u1", 0x0000, 0x080000, CRC(a0ce3300) SHA1(8db1959ad5a51bd395a9105fe74351d043760cbd) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -354,7 +354,7 @@ ROM_START( as_srb )
 ROM_END
 
 ROM_START( as_srba )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "srb100.u1", 0x0000, 0x080000, CRC(9b12d52e) SHA1(bc65b1c6ba8eeaa07ce8320bba655e4726b61b6c) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -362,7 +362,7 @@ ROM_START( as_srba )
 ROM_END
 
 ROM_START( as_srbb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "srb101.u1", 0x0000, 0x080000, CRC(fa4d87af) SHA1(e553c7f70ad5b5cc1b7ed999103b947df1a18203) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -370,7 +370,7 @@ ROM_START( as_srbb )
 ROM_END
 
 ROM_START( as_srbc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "srb201.u1", 0x0000, 0x080000, CRC(d74fcc7c) SHA1(636b2b847baa25cb9472cc0240852a9995b15e54) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -379,7 +379,7 @@ ROM_START( as_srbc )
 ROM_END
 
 ROM_START( as_srbd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "srb202.u1", 0x0000, 0x080000, CRC(5035b095) SHA1(4113ca5d9ff1d80dbc2593c21d2eeba12352d9fb) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -387,7 +387,7 @@ ROM_START( as_srbd )
 ROM_END
 
 ROM_START( as_srbe )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "srb203.bin", 0x0000, 0x080000, CRC(cf72c049) SHA1(7d29412a6787312a336ca007a9c9490c8a955f1f) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -395,19 +395,19 @@ ROM_START( as_srbe )
 ROM_END
 
 ROM_START( as_big10 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "astra big10.bin", 0x0000, 0x080000, CRC(9562f4b4) SHA1(867a411e62f089b85a7223c940b401ac136fd127) )
 ROM_END
 
 
 ROM_START( as_big10a )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "btc5_03.bin", 0x0000, 0x080000, CRC(e07008c6) SHA1(5f9950fe6404da8865d4d47fd29a8d6e0a4e878d) )
 ROM_END
 
 
 ROM_START( as_big10b )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "btc507.u1", 0x0000, 0x080000, CRC(311f7c95) SHA1(02e18a6148aaead138e4e36c42d78a6096c8c1dd) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -418,7 +418,7 @@ ROM_START( as_big10b )
 ROM_END
 
 ROM_START( as_big10c )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "btc601.u1", 0x0000, 0x080000, CRC(0b57da84) SHA1(0cd2e2cab81a6e807a01a79c9f351bab4b3d5c12) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -428,7 +428,7 @@ ROM_END
 
 
 ROM_START( as_big10d )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bt605.bin", 0x0000, 0x080000, CRC(17b28a5a) SHA1(f4f252bced0f6a8614a0cda1613841935fb07016) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -436,7 +436,7 @@ ROM_START( as_big10d )
 ROM_END
 
 ROM_START( as_big15 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "b15101g.u1", 0x0000, 0x080000, CRC(15fd1ec0) SHA1(0eb50529b178cea0b70523c144392d143ad79dfa) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -444,7 +444,7 @@ ROM_START( as_big15 )
 ROM_END
 
 ROM_START( as_bigcs )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bc1_01g.bin", 0x0000, 0x080000, CRC(b5eeeee5) SHA1(e159ba719606b7667ddfa9fd9abf0d7d8db77c2e) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -452,7 +452,7 @@ ROM_START( as_bigcs )
 ROM_END
 
 ROM_START( as_bigcsa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bc103.u1", 0x0000, 0x080000, CRC(ef96e656) SHA1(49bd0ffd4380d7a045bfb1d5a3fccb3d2ad90b05) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -461,7 +461,7 @@ ROM_END
 
 
 ROM_START( as_bbr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bbr101.u1", 0x0000, 0x080000, CRC(6854afcd) SHA1(f8ce1cc7e5835160e01eedf0abf7cd38eb4a1e08) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -469,17 +469,17 @@ ROM_START( as_bbr )
 ROM_END
 
 ROM_START( as_bbra )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bbv1-02.bin", 0x0000, 0x080000, CRC(e9f55c67) SHA1(8c052cd35e39839eafde5dca1daec58a84c04f84) )
 ROM_END
 
 ROM_START( as_bbrb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bbv2-01.bin", 0x0000, 0x080000, CRC(20864069) SHA1(0ac0b55bf866cf2dcbe1b042abca58d1740f0c9a) )
 ROM_END
 
 ROM_START( as_bbrc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bbv0-03.bin", 0x0000, 0x080000, CRC(9c8f092b) SHA1(96a6a10eff5e847c20dea82dda9d59d87cf0224b) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -489,7 +489,7 @@ ROM_END
 
 
 ROM_START( as_bbrd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bb102.u1", 0x0000, 0x080000, CRC(6cec69f8) SHA1(bbc289b2b404898283eb10e6142dec43ebb93428) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -499,7 +499,7 @@ ROM_END
 
 
 ROM_START( as_bbre )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bbs105.u1", 0x0000, 0x080000, CRC(a481131f) SHA1(2bc94a992dd7871d64c354a4dfab7fcb8e6bb807) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -507,7 +507,7 @@ ROM_START( as_bbre )
 ROM_END
 
 ROM_START( as_bbrf )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bbsb004.u1", 0x0000, 0x080000, CRC(cb582b13) SHA1(996fc410e9d4980d95e92a0dfdbceeaa81bfbc43) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -517,7 +517,7 @@ ROM_END
 
 
 ROM_START( as_dblcs )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dc110.u1", 0x0000, 0x080000, CRC(b930219c) SHA1(6c17b4d98b9c51a5e8bac17af1a198c961983e7e) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -526,7 +526,7 @@ ROM_START( as_dblcs )
 ROM_END
 
 ROM_START( as_dblcsa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dcc112.u1", 0x0000, 0x080000, CRC(75c600dd) SHA1(78c0193623c5499b46ec0e316d0c0f8b96cb84cc) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -534,7 +534,7 @@ ROM_START( as_dblcsa )
 ROM_END
 
 ROM_START( as_dblcsb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dcc1_08.bin", 0x0000, 0x080000, CRC(43bfb902) SHA1(23d31dec9125ff5ffa04ca87fe7831bc141092ed) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -543,7 +543,7 @@ ROM_START( as_dblcsb )
 ROM_END
 
 ROM_START( as_dblcsc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dcu109.u1", 0x0000, 0x080000, CRC(ad660c95) SHA1(c5cb67148a67c95f79339e088fbffc730bb07049) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -551,7 +551,7 @@ ROM_START( as_dblcsc )
 ROM_END
 
 ROM_START( as_dblcsd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dcl1_06.bin", 0x0000, 0x080000, CRC(652b07db) SHA1(c2125abb58f66461f1d9bfdef0677bf3baab3c69) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -560,12 +560,12 @@ ROM_START( as_dblcsd )
 ROM_END
 
 ROM_START( as_dblcse )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dcv1-02.bin", 0x0000, 0x080000, CRC(e6b745bc) SHA1(0c7b71cbbe6c0c5a494ff7891c02addc51ba11ce) )
 ROM_END
 
 ROM_START( as_dblcsf )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dcr100.u1", 0x0000, 0x080000, CRC(e56cfd6a) SHA1(bcd2d67daa33d0d65373394f5948384795d7c08a) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -573,7 +573,7 @@ ROM_START( as_dblcsf )
 ROM_END
 
 ROM_START( as_dblcsg )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dcd100.bin", 0x0000, 0x080000, CRC(83bfdde9) SHA1(75c6f6d3f8fd4d28d46731d70cc3082bb3f18f91) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -581,7 +581,7 @@ ROM_START( as_dblcsg )
 ROM_END
 
 ROM_START( as_dblcsh )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dcb004.u1", 0x0000, 0x080000, CRC(b734d6f1) SHA1(0536fa661ebe9504acd411516f61482e0bade77e) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -589,7 +589,7 @@ ROM_START( as_dblcsh )
 ROM_END
 
 ROM_START( as_fortn )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ft009.u1", 0x00000, 0x080000, CRC(fc4413ec) SHA1(b6874584fa328d6029069e11a5b5f0495f6d319e) )
 	ROM_LOAD16_BYTE( "ft009.u2", 0x00001, 0x080000, CRC(940eda83) SHA1(06582b7b45a0aeeb59cbf583ebedffc8a45c4cf6) )
 
@@ -598,13 +598,13 @@ ROM_START( as_fortn )
 ROM_END
 
 ROM_START( as_gof )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gofv2-08.u1", 0x00000, 0x100000, CRC(8cce26aa) SHA1(4deb704ff102b85b5e6711df2a8644d6c2aea72c) )
 	ROM_LOAD16_BYTE( "gofv2-08.u2", 0x00001, 0x100000, CRC(5bd78874) SHA1(41741d0e3ba1ab2371de4eb4783715c8d1c8b697) )
 ROM_END
 
 ROM_START( as_hog )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hog002.u1", 0x00000, 0x080000, CRC(e2975c31) SHA1(b77c07548eee991fb55c60906c9d52cf7abcc927) )
 	ROM_LOAD16_BYTE( "hog002.u2", 0x00001, 0x080000, CRC(757bc739) SHA1(f406152050f9ccb234c5fddf7356333ae02b36ef) )
 
@@ -613,7 +613,7 @@ ROM_START( as_hog )
 ROM_END
 
 ROM_START( as_hxr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1hxr1_08.bin", 0x00000, 0x040000, CRC(eb1671c3) SHA1(554eb3bd215f1d6ca88585bb4a67dfefd2de3c9a) )
 	ROM_LOAD16_BYTE( "2hxr1_08.bin", 0x00001, 0x040000, CRC(4ec8651d) SHA1(5dd1068f1b1523023e0adf5a00752adf0d02ad78) )
 
@@ -624,7 +624,7 @@ ROM_END
 
 
 ROM_START( as_hr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hru004.u1", 0x00000, 0x080000, CRC(0af214ad) SHA1(b58a6cca24c5c144e88ffdb1fcd592801b4e21d3) )
 	ROM_LOAD16_BYTE( "hru004.u2", 0x00001, 0x080000, CRC(d7b60ede) SHA1(04069bcea8cb3c25bf7539a6adb05951fe43849e) )
 
@@ -636,7 +636,7 @@ ROM_END
 
 
 ROM_START( as_djp )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "dj107.u1", 0x00000, 0x080000, CRC(13998f29) SHA1(f7c517a6c34a827c9a20e6ace102e3879f839cac) )
 	ROM_LOAD16_BYTE( "dj107.u2", 0x00001, 0x080000, CRC(e78cbce6) SHA1(100a13a118ccf5ca34f3a1a4bf7dec1d02b3d511) )
 
@@ -645,7 +645,7 @@ ROM_START( as_djp )
 ROM_END
 
 ROM_START( as_djpa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "djb004.u1", 0x00000, 0x040000, CRC(579d1b7a) SHA1(91fef91cbeaaba92bc1d4908ae67ba5f22cced77) )
 	ROM_LOAD16_BYTE( "djb004.u2", 0x00001, 0x040000, CRC(b0854c9b) SHA1(ef1cb1da7a0172d3e0ad18fd2d2a8d6ad840be23) )
 
@@ -654,7 +654,7 @@ ROM_START( as_djpa )
 ROM_END
 
 ROM_START( as_djpb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "djv1-09.u1", 0x00000, 0x080000, CRC(1165ab7b) SHA1(6eb8d6ee7cede06175e0d265ad26fc843ddae43a) )
 	ROM_LOAD16_BYTE( "djv1-09.u2", 0x00001, 0x080000, CRC(5690e543) SHA1(328ee733dab1346fa1db8effb48fd0ba07d3d16c) )
 ROM_END
@@ -663,14 +663,14 @@ ROM_END
 
 
 ROM_START( as_cshcs )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ccv0-06.bin", 0x0000, 0x100000, CRC(c211f807) SHA1(71fc611872f81ad66a476efaa22d3c7862619331) )
 ROM_END
 
 
 
 ROM_START( as_colmn )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1com2_00.bin", 0x00000, 0x040000, CRC(ae1fcf19) SHA1(8f5ec95940e2e7e1ac6d58be69937e460bde9a21) )
 	ROM_LOAD16_BYTE( "2com2_00.bin", 0x00001, 0x040000, CRC(19183568) SHA1(67ccb77077566a14118b2330e55dec09d7382038) )
 
@@ -680,7 +680,7 @@ ROM_START( as_colmn )
 ROM_END
 
 ROM_START( as_colmna )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ccm1_07.bin", 0x0000, 0x080000, CRC(aa1695fe) SHA1(46d0a45036da3afdfd347eeff7a48a417fb02f9d) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -689,7 +689,7 @@ ROM_START( as_colmna )
 ROM_END
 
 ROM_START( as_colmnb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ccm108.u1", 0x0000, 0x080000, CRC(d252ac41) SHA1(ba663d67e80677184f54d5c059cc671b489f0904) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -697,7 +697,7 @@ ROM_START( as_colmnb )
 ROM_END
 
 ROM_START( as_colmnc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ccm109.u1", 0x0000, 0x080000, CRC(2a8c2794) SHA1(1ef9aacd3eb2776fd8097653fab69a78da4ee8cc) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -705,7 +705,7 @@ ROM_START( as_colmnc )
 ROM_END
 
 ROM_START( as_colmnd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "com908.u1", 0x0000, 0x080000, CRC(0938b4f3) SHA1(1e9ca5ba379472fbd982a764757218b2bd79af5b) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -717,7 +717,7 @@ ROM_END
 
 
 ROM_START( as_jackb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "jb104.u1", 0x0000, 0x080000, CRC(a13596c7) SHA1(93a14cce239d0d9e4acb1ab87d0e077526576bf6) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -727,7 +727,7 @@ ROM_END
 
 
 ROM_START( as_jpx )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jpx51-00.u1", 0x00000, 0x080000, CRC(87a1984d) SHA1(e82ebbef81e43c465974eaec81a74723b41f9039) )
 	ROM_LOAD16_BYTE( "jpx51-00.u2", 0x00001, 0x080000, CRC(4cb35408) SHA1(e134edfc841f6ce4562807eb59282d0bce30d5c4) )
 
@@ -738,13 +738,13 @@ ROM_END
 
 
 ROM_START( as_jpxa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jpx101-2.u1", 0x00000, 0x080000, CRC(e7596323) SHA1(97f75ba13f560d8c41cc3f6d4c3c6071eaa0cfa6) )
 	ROM_LOAD16_BYTE( "jpx1-01.u2",  0x00001, 0x080000, CRC(988f7d4f) SHA1(8124e11126510a0a7f12d19e2ae70149618c8a83) )
 ROM_END
 
 ROM_START( as_jpxb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jx002d.u1", 0x00000, 0x080000, CRC(7a62d914) SHA1(66fc9ac8951f3ca3c37202e7c56e1fcdbfa2c368) )
 	ROM_LOAD16_BYTE( "jx002.u2",  0x00001, 0x080000, CRC(18afeeff) SHA1(1f0616138f165481c55810b1160b593e24fc8570) )
 ROM_END
@@ -752,7 +752,7 @@ ROM_END
 
 
 ROM_START( as_jolly )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "jr1_03.bin", 0x0000, 0x080000, CRC(8b69d270) SHA1(c9daa9d2b50d49a771424309aeafc5dc033916a8) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -764,12 +764,12 @@ ROM_END
 
 
 ROM_START( as_jmpj )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "jj1-00p.bin", 0x0000, 0x080000, CRC(36ff9a47) SHA1(46416d0256c905dbbd7b1b40531180cc9b6f59eb) )
 ROM_END
 
 ROM_START( as_jmpja )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "jj102.u1", 0x0000, 0x080000, CRC(0242e991) SHA1(e606c14c64a574a54dfe5e26fab29d5ef15aefd0) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -779,7 +779,7 @@ ROM_END
 
 
 ROM_START( as_jjive )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jpush107.u1", 0x00000, 0x100000, CRC(25342d3f) SHA1(fe72985bf80f4221609caa49cf0cfed718a81a25) )
 	ROM_LOAD16_BYTE( "jpush107.u2", 0x00001, 0x100000, CRC(b86ff64b) SHA1(f246c891919300e3eff6bcf6117e60652e11f3ff) )
 
@@ -788,7 +788,7 @@ ROM_START( as_jjive )
 ROM_END
 
 ROM_START( as_jjivea )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jpush106.u1", 0x00000, 0x100000, CRC(cca6805e) SHA1(a3dd55edb2b82deb5a24216b66a7834962dff653) )
 	ROM_LOAD16_BYTE( "jpush106.u2", 0x00001, 0x100000, CRC(e2de49eb) SHA1(be99f68124f6315a54250003fcc185cb8dc77c4f) )
 
@@ -797,7 +797,7 @@ ROM_START( as_jjivea )
 ROM_END
 
 ROM_START( as_jjiveb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jpush104.u1", 0x00000, 0x100000, CRC(3ef7c678) SHA1(05a39a20e14f1b94a849cec587de1bf7fd436ddb) )
 	ROM_LOAD16_BYTE( "jpush104.u2", 0x00001, 0x100000, CRC(b4b52aa8) SHA1(638b72f92df6e42dad1e43e1f531a8bd239a6bbe) )
 
@@ -806,7 +806,7 @@ ROM_START( as_jjiveb )
 ROM_END
 
 ROM_START( as_jjivec )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jpush102.u1", 0x00000, 0x100000, CRC(3d005f61) SHA1(f75aff32c61136316c9eae9d81d0d2a1dd8c008e) )
 	ROM_LOAD16_BYTE( "jpush102.u2", 0x00001, 0x100000, CRC(e8b4557e) SHA1(b980368bd32e66bfd1b30de730ffc4ea841815eb) )
 
@@ -815,7 +815,7 @@ ROM_START( as_jjivec )
 ROM_END
 
 ROM_START( as_jjived )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jpush101.u1", 0x00000, 0x100000, CRC(6baab9c4) SHA1(884379acd0fa168cf71319ae023aa7bead7653a1) )
 	ROM_LOAD16_BYTE( "jpush101.u2", 0x00001, 0x100000, CRC(0882cd5e) SHA1(f728678ec24febb05d2e05c70ef94e7722d7fa09) )
 
@@ -824,7 +824,7 @@ ROM_START( as_jjived )
 ROM_END
 
 ROM_START( as_jjivee )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jj101.u1",  0x00000, 0x080000, CRC(108524ba) SHA1(8cd3d33a0f3237b183e397ad61555fdd2d501fbe) )
 	ROM_LOAD16_BYTE( "jjr101.u2", 0x00001, 0x080000, CRC(535b367a) SHA1(61d11f9b0f4536b8dd7625f96c24c2f5589031e4) )
 
@@ -834,7 +834,7 @@ ROM_END
 
 
 ROM_START( as_jjivef )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jjb004.u1", 0x00000, 0x080000, CRC(af253f87) SHA1(0d39d442102f27556da70011c1085fbbb88ce015) )
 	ROM_LOAD16_BYTE( "jjb004.u2", 0x00001, 0x080000, CRC(e35fc34d) SHA1(bfa13bcc0e4d14d0320282f4624f10f47e2a717d) )
 
@@ -843,7 +843,7 @@ ROM_START( as_jjivef )
 ROM_END
 
 ROM_START( as_jjiveg )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jp005.u1", 0x00000, 0x100000, CRC(2528325a) SHA1(653dc439fd4a73559772cbc7154380c0e3e36200) )
 	ROM_LOAD16_BYTE( "jp005.u2", 0x00001, 0x100000, CRC(888b53ea) SHA1(166a073c8f54cfd41e75a2eed5d0d41d749192a9) )
 
@@ -855,7 +855,7 @@ ROM_END
 
 
 ROM_START( as_kingc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "kc106.u1", 0x0000, 0x080000, CRC(097b8a9c) SHA1(fa2f546f5fb2bf11ebca314fc86d4ce663fe4058) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -863,7 +863,7 @@ ROM_START( as_kingc )
 ROM_END
 
 ROM_START( as_kingca )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "kc1_03.bin", 0x0000, 0x080000, CRC(787011fe) SHA1(d1078c4671c98640b6a215b5a7b16a0041946b21) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -872,12 +872,12 @@ ROM_END
 
 
 ROM_START( as_koc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "koc2_00.bin", 0x0000, 0x080000, CRC(8512166a) SHA1(b9b081419d58a6b788b35d4535d34efbadf62e2f) )
 ROM_END
 
 ROM_START( as_koca )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "koc101.bin", 0x0000, 0x080000, CRC(8e16f681) SHA1(e8448e7a3b96199f04458c48554a6b2cb27541f2) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -887,7 +887,7 @@ ROM_END
 
 
 ROM_START( as_lbt )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "lbt103.u1", 0x0000, 0x080000, CRC(0b73f9a1) SHA1(f88c475fb9e020962068ab6c0a1533d6ddbda877) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -895,7 +895,7 @@ ROM_START( as_lbt )
 ROM_END
 
 ROM_START( as_lbta )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "lbt1_02.bin", 0x0000, 0x080000, CRC(aa6c8b06) SHA1(47b5ce80fb92563c07362c3e8b40741bbd426b50) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -906,7 +906,7 @@ ROM_END
 
 
 ROM_START( as_ldl )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ld700.u1", 0x00000, 0x040000, CRC(62594e4d) SHA1(486655920dad4cc90c45fcbb13328246876273fd) )
 	ROM_LOAD16_BYTE( "ld700.u2", 0x00001, 0x040000, CRC(03939717) SHA1(d2446ad9bf436ca382c839ff946878fef9d50c6f) )
 
@@ -915,7 +915,7 @@ ROM_START( as_ldl )
 ROM_END
 
 ROM_START( as_ldla )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ld600.u1", 0x00000, 0x040000, CRC(1def9345) SHA1(d06dbb7858cef18fd01f579cfe59e01958c7a275) )
 	ROM_LOAD16_BYTE( "ld600.u2", 0x00001, 0x040000, CRC(7e93bf7f) SHA1(e44b28d564d279db765181810b39ad3d600f6d45) )
 
@@ -924,7 +924,7 @@ ROM_START( as_ldla )
 ROM_END
 
 ROM_START( as_ldlb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1ld3_12.bin", 0x00000, 0x040000, CRC(f5cd8c64) SHA1(423767374d54823d0b2fe3628580914aa01433af) )
 	ROM_LOAD16_BYTE( "2ld3_12.bin", 0x00001, 0x040000, CRC(a1999a2d) SHA1(efeab7695c721826b7df56d334df2136a361995f) )
 
@@ -933,7 +933,7 @@ ROM_START( as_ldlb )
 ROM_END
 
 ROM_START( as_ldlc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ldb003.u1", 0x00000, 0x040000, CRC(e9df9b88) SHA1(0febc7c374b2d3136ce86a4957a4174233d12eab) )
 	ROM_LOAD16_BYTE( "ldb003.u2", 0x00001, 0x040000, CRC(278223e7) SHA1(3e96d7abf0876acc10922c4585143745f1740c00) )
 
@@ -943,7 +943,7 @@ ROM_START( as_ldlc )
 ROM_END
 
 ROM_START( as_ldld )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ld102.u1", 0x0000, 0x080000, CRC(59e12987) SHA1(cde1c23637a57001ac2eae4c842be3b18fab68b2) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -951,7 +951,7 @@ ROM_START( as_ldld )
 ROM_END
 
 ROM_START( as_ldle )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ld1-03.bin", 0x0000, 0x080000, CRC(6edb3d2d) SHA1(caebdba44ced2a45e48f28b2fe1660d747cc34c4) )
 ROM_END
 
@@ -959,7 +959,7 @@ ROM_END
 
 
 ROM_START( as_mp )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mpv118.u1", 0x00000, 0x080000, CRC(4efef116) SHA1(44da5e9ebfdcb5e2d0a5c5312512a2dc08088c37) )
 	ROM_LOAD16_BYTE( "mpv118.u2", 0x00001, 0x080000, CRC(b5b54977) SHA1(ab67195d6fc3414e3d9ba86837d352a90340544e) )
 ROM_END
@@ -967,14 +967,14 @@ ROM_END
 
 
 ROM_START( as_mp2 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "mp2v1-14.bin", 0x0000, 0x080000, CRC(131fff7a) SHA1(69bb7fa011f6e7687e280126275651093d7f33f9) )
 ROM_END
 
 
 
 ROM_START( as_otr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "otr1_041.bin", 0x00000, 0x040000, CRC(2ce53cb2) SHA1(fae967243789d42a410b93fd2b7bc006f1a4a83e) )
 	ROM_LOAD16_BYTE( "otr1_042.bin", 0x00001, 0x040000, CRC(81ea6a43) SHA1(4cbbc892c720c333e9f62b6f6fdd0a959c67af7e) )
 
@@ -984,7 +984,7 @@ ROM_START( as_otr )
 ROM_END
 
 ROM_START( as_otra )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "otr102.u1", 0x00000, 0x040000, NO_DUMP )
 	ROM_LOAD16_BYTE( "otr102.u2", 0x00001, 0x040000, CRC(57310d5e) SHA1(585ff22a52e8c2b0be43051cdd1c534a894a4d6f) )
 ROM_END
@@ -992,7 +992,7 @@ ROM_END
 
 
 ROM_START( as_ptf )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pfm_s102.u1", 0x00000, 0x040000, CRC(5cf6ce44) SHA1(762b3bb4abc0e47c699b4e16aeedcf8603af5189) )
 	ROM_LOAD16_BYTE( "pfm_s102.u2", 0x00001, 0x040000, CRC(ccd3c63c) SHA1(cdc9edf00703cf31bd9d145aeb631d4791d6f308) )
 
@@ -1015,7 +1015,7 @@ ROM_START( as_ptf )
 ROM_END
 
 ROM_START( as_ptfa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pfm803.u1", 0x00000, 0x040000, CRC(f637643c) SHA1(97d2e189000c003fa68372bbd5597159fd507722) )
 	ROM_LOAD16_BYTE( "pfm803.u2", 0x00001, 0x040000, CRC(e0b4d85b) SHA1(eee4c36eea128e59ca64153be4bb608df95289e3) )
 
@@ -1028,7 +1028,7 @@ ROM_START( as_ptfa )
 ROM_END
 
 ROM_START( as_ptfb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pfm905.u1", 0x00000, 0x040000, CRC(b8082360) SHA1(81496a4b81debb838da03b6d7ad6df3a64d70f6c) )
 	ROM_LOAD16_BYTE( "pfm905.u2", 0x00001, 0x040000, CRC(594a7b02) SHA1(1af2e410ad4803393b6e90118c470f3a0c90902f) )
 
@@ -1042,7 +1042,7 @@ ROM_START( as_ptfb )
 ROM_END
 
 ROM_START( as_ptfc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "p_fruits.u1m", 0x00000, 0x040000, CRC(fcb6c345) SHA1(9ebd3dd816e711a88f337fc7d321be53a6ee90e9) )
 	ROM_LOAD16_BYTE( "p_fruits.u2m", 0x00001, 0x040000, CRC(f10daa29) SHA1(5bdefb710e6003e72c6dd786ca7e5fb15e88c492) )
 
@@ -1057,12 +1057,12 @@ ROM_END
 
 
 ROM_START( as_pia )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "pia202.u1", 0x0000, 0x080000, CRC(ffb5eb17) SHA1(a08fd091026d397ce0aed48bd801872b6c7939e5) )
 ROM_END
 
 ROM_START( as_piaa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "pia206.u1", 0x0000, 0x080000, CRC(536b24d4) SHA1(38f4eb2fee6fd35d9a603fccd16f4bad46f2f1f2) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1070,7 +1070,7 @@ ROM_START( as_piaa )
 ROM_END
 
 ROM_START( as_piab )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "pia904d.u1", 0x0000, 0x080000, CRC(6fa4a228) SHA1(02ae4ae32b8cfd044344c3b194be8f76ef471af4) )
 ROM_END
 
@@ -1078,7 +1078,7 @@ ROM_END
 
 
 ROM_START( as_pharg )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pp005.u1", 0x00000, 0x100000, CRC(4cf8cc5f) SHA1(0c5ccb00013fe992e6ab63d210eda6f2ea5f39b2) )
 	ROM_LOAD16_BYTE( "pp005.u2", 0x00001, 0x100000, CRC(852592d6) SHA1(9b3dc99065b720c3607b4fe454f5470cca4a18b5) )
 
@@ -1088,7 +1088,7 @@ ROM_END
 
 
 ROM_START( as_pharga )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ppush101.u1", 0x00000, 0x100000, CRC(c3f297f1) SHA1(a22144e3e7b3a42fd5574978e1e83f27a7a51842) )
 	ROM_LOAD16_BYTE( "ppush101.u2", 0x00001, 0x100000, CRC(764a4e5b) SHA1(199191502d8e868075da970e28b3f9219670afc0) )
 
@@ -1097,7 +1097,7 @@ ROM_START( as_pharga )
 ROM_END
 
 ROM_START( as_phargb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ppush102.u1", 0x00000, 0x100000, CRC(38ddfc65) SHA1(b765c882424cef30a9be03d72122df4b0a81993d) )
 	ROM_LOAD16_BYTE( "ppush102.u2", 0x00001, 0x100000, CRC(761466dd) SHA1(c85b2f253755c1f8200ead16fd5bc46ce2c00477) )
 
@@ -1106,7 +1106,7 @@ ROM_START( as_phargb )
 ROM_END
 
 ROM_START( as_phargc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ppush104.u1", 0x00000, 0x100000, CRC(4afdd7f0) SHA1(c07e413f0308f19be5af836763214fb6f36f8bc2) )
 	ROM_LOAD16_BYTE( "ppush104.u2", 0x00001, 0x100000, CRC(1aece0dd) SHA1(518916a0f5affa830613f4078b3768e1ca69f6fd) )
 
@@ -1115,7 +1115,7 @@ ROM_START( as_phargc )
 ROM_END
 
 ROM_START( as_phargd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ppush106.u1", 0x00000, 0x100000, CRC(64ed1407) SHA1(a646c5a5873d028221f6a1b5f4cee41f8ac4a752) )
 	ROM_LOAD16_BYTE( "ppush106.u2", 0x00001, 0x100000, CRC(9af70eec) SHA1(23e1761bbc989f659f1b3bfc4d9fe0369571fb21) )
 
@@ -1124,7 +1124,7 @@ ROM_START( as_phargd )
 ROM_END
 
 ROM_START( as_pharge )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ppush107.u1", 0x00000, 0x100000, CRC(5044fd1e) SHA1(efe43cc996b18e89da7a4d8c789e1988aff205c4) )
 	ROM_LOAD16_BYTE( "ppush107.u2", 0x00001, 0x100000, CRC(488e57e6) SHA1(1281d47bad90562d478696292a92e57c678a6d7d) )
 
@@ -1136,7 +1136,7 @@ ROM_END
 
 
 ROM_START( as_pb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "pb105.u1", 0x0000, 0x080000, CRC(31b8ebe9) SHA1(510c6f54f411d10ea378834c074650ed05363b28) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1148,7 +1148,7 @@ ROM_END
 
 
 ROM_START( as_rtr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rr1h101.u1", 0x00000, 0x080000, CRC(5563f2cd) SHA1(da8515e17b3d0807ac79896f3eca29b886ce5e08) )
 	ROM_LOAD16_BYTE( "rr1h101.u2", 0x00001, 0x080000, CRC(12b0c111) SHA1(319d75f3f04570bc1012facbe0238484cb93e437) )
 
@@ -1157,7 +1157,7 @@ ROM_START( as_rtr )
 ROM_END
 
 ROM_START( as_rtra )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rr1l101.u1", 0x00000, 0x080000, CRC(162b21fd) SHA1(29072fdaeeeba7dfcf446b77f5f8af0fb08c5f19) )
 	ROM_LOAD16_BYTE( "rr1l101.u2", 0x00001, 0x080000, CRC(f3158104) SHA1(d5d19af94926a71efda732df2a4c53bcbf512ba9) )
 
@@ -1166,7 +1166,7 @@ ROM_START( as_rtra )
 ROM_END
 
 ROM_START( as_rtrb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rtr101.u1", 0x00000, 0x080000, CRC(8d89cf0b) SHA1(42d7594ac55dc4bde2830e4d19af01fd3ccd6b2b) )
 	ROM_LOAD16_BYTE( "rtr101.u2", 0x00001, 0x080000, CRC(8b1ddddf) SHA1(c394f836f1cf07ecf82a00de360bcce93b25e38f) )
 
@@ -1175,7 +1175,7 @@ ROM_START( as_rtrb )
 ROM_END
 
 ROM_START( as_rtrc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rr2h101.u1", 0x00000, 0x080000, CRC(0188165b) SHA1(13d88e6c832bd5d299dd6126659bdf541035fcdd) )
 	ROM_LOAD16_BYTE( "rr2h101.u2", 0x00001, 0x080000, CRC(810c1075) SHA1(61bc3bf2715a72fb41f334b9f93e30a48d73eda6) )
 
@@ -1184,7 +1184,7 @@ ROM_START( as_rtrc )
 ROM_END
 
 ROM_START( as_rtrd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rrdh100.u1", 0x00000, 0x080000, CRC(5c06124e) SHA1(a3d7a3248c97db37a6b140a88cd7468bfd9ea1b6) )
 	ROM_LOAD16_BYTE( "rrdh100.u2", 0x00001, 0x080000, CRC(39a0aa8d) SHA1(02c89be8f3c0f68207776955e3f5e1b5542f9c47) )
 
@@ -1193,7 +1193,7 @@ ROM_START( as_rtrd )
 ROM_END
 
 ROM_START( as_rtre )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rrdl100.u1", 0x00000, 0x080000, CRC(54e4ee29) SHA1(3bdf32515bbaaca44e18f947a00ef5aced5dd5e3) )
 	ROM_LOAD16_BYTE( "rrdl100.u2", 0x00001, 0x080000, CRC(04ce1f27) SHA1(efec934f6ccc23545ffbc89454cb6ce8de47a018) )
 
@@ -1202,7 +1202,7 @@ ROM_START( as_rtre )
 ROM_END
 
 ROM_START( as_rtrf )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rrlo200.u1", 0x00000, 0x080000, CRC(206772f9) SHA1(9b577dc568a84943bd02e18611a0d9451d74a123) )
 	ROM_LOAD16_BYTE( "rrlo200.u2", 0x00001, 0x080000, CRC(314778a6) SHA1(85dbc2b68cdc9bdcce28941dec56a5539fcc5f3a) )
 
@@ -1212,7 +1212,7 @@ ROM_END
 
 
 ROM_START( as_rtrg )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rrhi200.u1", 0x00000, 0x080000, CRC(c65a4844) SHA1(a6513c5fcf45b8a2294f996813b83771f87efdb9) )
 	ROM_LOAD16_BYTE( "rrhi200.u2", 0x00001, 0x080000, NO_DUMP ) // ??
 
@@ -1221,7 +1221,7 @@ ROM_START( as_rtrg )
 ROM_END
 
 ROM_START( as_rtrh )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rrhi202.u1", 0x00000, 0x080000, CRC(9e4751d7) SHA1(209c8d025cbdf1f411cddc6724af22b285220e75) )
 	ROM_LOAD16_BYTE( "rrhi202.u2", 0x00001, 0x080000, CRC(703c2a60) SHA1(0cdb1643c2775556c46db7955b110e36d80de61e) )
 
@@ -1237,7 +1237,7 @@ ROM_END
 
 
 ROM_START( as_rab )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rab105.u1", 0x0000, 0x080000, CRC(08185159) SHA1(3185009055fd8c08a58d50635641187a47044c9a) )
 	//ROM_LOAD( "rab1_05.bin", 0x0000, 0x080000, CRC(08185159) SHA1(3185009055fd8c08a58d50635641187a47044c9a) )
 
@@ -1247,7 +1247,7 @@ ROM_START( as_rab )
 ROM_END
 
 ROM_START( as_raba )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rab106.u1", 0x0000, 0x080000, CRC(2df108ad) SHA1(a5221e9fa6966fec1506002a8c4646013d184887) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1255,12 +1255,12 @@ ROM_START( as_raba )
 ROM_END
 
 ROM_START( as_rabb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rab107.u1", 0x0000, 0x080000, CRC(4bc3af26) SHA1(68b8999301c275168c9199d64f0a6a624bf068db) )
 ROM_END
 
 ROM_START( as_rabc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rab1_04.bin", 0x0000, 0x080000, CRC(df2b4bb7) SHA1(1a664f9a7085606b6f3c2e26d37cd853538a2d0e) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1270,7 +1270,7 @@ ROM_END
 
 
 ROM_START( as_rbg )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rbg304.u1", 0x0000, 0x080000, CRC(360932ed) SHA1(8ccb3d1aa99f4d23f0b20a42d32895e77f810fd1) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1278,7 +1278,7 @@ ROM_START( as_rbg )
 ROM_END
 
 ROM_START( as_rbga )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rbg303.u1", 0x0000, 0x080000, CRC(1aa5b429) SHA1(c32ff4492db206dffb7725b78d247333d5095c3a) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1286,7 +1286,7 @@ ROM_START( as_rbga )
 ROM_END
 
 ROM_START( as_rbgb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rbg104.u1", 0x0000, 0x080000, CRC(d1bae82d) SHA1(7334b73e1cab339a09e526de7737511810a37d97) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1294,7 +1294,7 @@ ROM_START( as_rbgb )
 ROM_END
 
 ROM_START( as_rbgc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rbg1_02.bin", 0x0000, 0x080000, CRC(ff70e9f9) SHA1(dced84105db4d81192383d7dfa31b57a88e440db) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1303,7 +1303,7 @@ ROM_START( as_rbgc )
 ROM_END
 
 ROM_START( as_rbgd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rbg1_01.bin", 0x0000, 0x080000, CRC(2cc1f8f0) SHA1(7710a72fb9abbcc666a09eb1e4a9bb24cc7cfc2f) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1312,23 +1312,23 @@ ROM_START( as_rbgd )
 ROM_END
 
 ROM_START( as_rbge )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rbg0_08.bin", 0x0000, 0x080000, CRC(0906c9d7) SHA1(3a6a5c644398803857672470495a76ef2ff916f0) )
 ROM_END
 
 ROM_START( as_rbglo )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rgmv1-06.u1", 0x00000, 0x040000, CRC(3a935eed) SHA1(236acbb4defb007c8dcd63937cd1b3dd50b9dd49) )
 	ROM_LOAD16_BYTE( "rgmv1-06.u2", 0x00001, 0x040000, CRC(ab89ff35) SHA1(88a45dfeb98beac47b578cb5679507b4a6dc0fff) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD16_BYTE( "rgsv1-06.u1", 0x00000, 0x040000, CRC(13f46cb6) SHA1(10a46bfb0c4efb768882c36dbc5c0c88f45c0d13) )
 	ROM_LOAD16_BYTE( "rgsv1-06.u2", 0x00001, 0x040000, CRC(408d6007) SHA1(875f812a1d6a6177e45199fba0e5ca04a2fff02c) )
 ROM_END
 
 
 ROM_START( as_rox )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "rox006.u1", 0x0000, 0x080000, CRC(8e63812c) SHA1(240810641896a2af22abe362752206061a9d3866) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1337,13 +1337,13 @@ ROM_END
 
 
 ROM_START( as_csv ) // csv code is also used in as_stcl, I suspect this is either not what it's meant to be, or some of those roms are this
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "csv2-02g.bin", 0x0000, 0x080000, CRC(8c903573) SHA1(ba9fe333ca3f4f21114fb052c85efa245059fd05) )
 ROM_END
 
 
 ROM_START( as_sltcl )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "csbv9-03.bin", 0x0000, 0x080000, CRC(5c47f413) SHA1(e376cd98d8881e8dfdf91ec2fb2611719059bef4) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1386,7 +1386,7 @@ ROM_START( as_sltcl )
 ROM_END
 
 ROM_START( as_stp )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1st1_03.bin", 0x0000, 0x080000, CRC(6f34a144) SHA1(69f7e58bf7d868f75ef3f4242a0b6624452a3558) )
 	ROM_LOAD16_BYTE( "2st1_03.bin", 0x0000, 0x080000, CRC(cc04e763) SHA1(532c914d4925d19b2c416d29711e7eb506eb75e5) )
 
@@ -1397,7 +1397,7 @@ ROM_END
 
 
 ROM_START( as_stpa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "stp102.u1", 0x0000, 0x080000, CRC(8df15c17) SHA1(45f6bdd3e213cea5de5feca8e2c4658b17507014) )
 	ROM_LOAD16_BYTE( "stp102.u2", 0x0000, 0x080000, CRC(a06d6e4a) SHA1(d0ca62e98863ae9d07a8f81f8e9c0d655c0eab2b) )
 
@@ -1406,7 +1406,7 @@ ROM_START( as_stpa )
 ROM_END
 
 ROM_START( as_stpb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "stp105.u1", 0x0000, 0x080000, CRC(c3c600b4) SHA1(e570ed887e8aad6b816872c8468e15ab5b904ad5) )
 	ROM_LOAD16_BYTE( "stp105.u2", 0x0000, 0x080000, CRC(7f23fe83) SHA1(e8b0a141ca3c578a1c0d49b237b309326a01300d) )
 
@@ -1416,7 +1416,7 @@ ROM_END
 
 
 ROM_START( as_siu )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "siu202.u1", 0x00000, 0x040000, CRC(35889e31) SHA1(66072aa0f2499479e41120d642a2d4fcba8d5e9e) )
 	ROM_LOAD16_BYTE( "siu202.u2", 0x00001, 0x040000, CRC(0c68566c) SHA1(97fd26c5e514df137c29521ead71386fa6c1cc8e) )
 
@@ -1430,7 +1430,7 @@ ROM_START( as_siu )
 ROM_END
 
 ROM_START( as_siua )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "siu203.u1", 0x00000, 0x040000, CRC(63d8fb2f) SHA1(5d9cb707169281700e76a180a362430c563515be) )
 	ROM_LOAD16_BYTE( "siu203.u2", 0x00001, 0x040000, CRC(de111417) SHA1(d1535ed408105797fa7efbbbad209027456ee1a5) )
 
@@ -1441,7 +1441,7 @@ ROM_END
 
 
 ROM_START( as_sld )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sld700.u1", 0x0000, 0x080000, CRC(6cd630e1) SHA1(edbfb016ddc68a600b4e72c32e5f60c747227e02) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1450,7 +1450,7 @@ ROM_END
 
 
 ROM_START( as_slda )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sld600.u1", 0x0000, 0x080000, CRC(563c3acf) SHA1(317523362206e367fc968562191d3394c026b012) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1458,7 +1458,7 @@ ROM_START( as_slda )
 ROM_END
 
 ROM_START( as_sldb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sld500.u1", 0x0000, 0x080000, CRC(d0039416) SHA1(bd2bb31a6ad885ccbe8a66f90dfdd977229b1aa4) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1466,7 +1466,7 @@ ROM_START( as_sldb )
 ROM_END
 
 ROM_START( as_sldc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sld400.u1", 0x0000, 0x080000, CRC(25b4ccfd) SHA1(c590df0f07b3e79a9409f57f8b0dc8f00b1f5119) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1474,7 +1474,7 @@ ROM_START( as_sldc )
 ROM_END
 
 ROM_START( as_sldd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sld200.u1", 0x0000, 0x080000, CRC(d7cd2b78) SHA1(2de766995bcf25e82511c8fe9ccf45575bee7490) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1482,7 +1482,7 @@ ROM_START( as_sldd )
 ROM_END
 
 ROM_START( as_slde )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sld101.bin", 0x0000, 0x080000, CRC(3350d4a6) SHA1(22f0bb3bbc00c198af4f1546d2adfa8906de9cc1) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1490,7 +1490,7 @@ ROM_START( as_slde )
 ROM_END
 
 ROM_START( as_tem )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "temv1-01.u1", 0x00000, 0x080000, CRC(78cfa14d) SHA1(d234329ba9557c8fdcc61f05af96cc0b3d89c049) )
 	ROM_LOAD16_BYTE( "temv1-01.u2", 0x00001, 0x080000, CRC(c432b954) SHA1(1e0a9dc1c9cfcddece5f3efd8e4c00e2b55881fc) )
 
@@ -1499,7 +1499,7 @@ ROM_START( as_tem )
 ROM_END
 
 ROM_START( as_tema )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "temv0-06.u1", 0x00000, 0x080000, CRC(173def07) SHA1(46e3337bfb3a159d8806611f16d023893795e122) )
 	ROM_LOAD16_BYTE( "temv0-06.u2", 0x00001, 0x080000, CRC(9c28438b) SHA1(a098f036cc1c5261e720dbe5ae110e6c7a073fae) )
 
@@ -1510,7 +1510,7 @@ ROM_END
 
 
 ROM_START( as_tbl )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tb1-04.bin", 0x0000, 0x080000, CRC(726f2643) SHA1(d938b3b7d342bbb04b6400886d93bdae2ed87873) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1519,7 +1519,7 @@ ROM_START( as_tbl )
 ROM_END
 
 ROM_START( as_tbla )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tb105.u1", 0x0000, 0x080000, CRC(b8479f27) SHA1(1b9f048fbaf0e3fcd4ebff140f14f3e55ea9a127) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1527,7 +1527,7 @@ ROM_START( as_tbla )
 ROM_END
 
 ROM_START( as_tblb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tb106.u1", 0x0000, 0x080000, CRC(c286fd39) SHA1(e13c67872b976cb026c77ad245867a3f12906fe6) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1535,7 +1535,7 @@ ROM_START( as_tblb )
 ROM_END
 
 ROM_START( as_tblc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tb1_03.bin", 0x0000, 0x080000, CRC(95cf57c1) SHA1(1292c330d030fa2eb41aba57ec16092a296e7df2) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1544,7 +1544,7 @@ ROM_START( as_tblc )
 ROM_END
 
 ROM_START( as_tbld )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tb304.bin", 0x0000, 0x080000, CRC(f10796ae) SHA1(e6698931b28a813e466d64364e652e99706d2090) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1552,7 +1552,7 @@ ROM_START( as_tbld )
 ROM_END
 
 ROM_START( as_tble )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tb303.u1", 0x0000, 0x080000, CRC(381c1817) SHA1(c88a10a4b68caf55edae7bc8b743e368d1c9bdeb) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1561,7 +1561,7 @@ ROM_END
 
 
 ROM_START( as_tblf )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "tb3_01.bin", 0x0000, 0x080000, CRC(bd3d6ad3) SHA1(1625bc608f64fcc0f8767375ccbbfd6a31e5e55c) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1572,7 +1572,7 @@ ROM_END
 
 
 ROM_START( as_td )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1td1_03.bin", 0x00000, 0x040000, CRC(c5d7e5eb) SHA1(1c68e05bd20d703d34f3c7d9dfca3e7c7eac08e5) )
 	ROM_LOAD16_BYTE( "2td1_03.bin", 0x00001, 0x040000, CRC(49eb2350) SHA1(3c867c2e25eb1c4860f07cbe7c0b10176d75dcc9) )
 
@@ -1585,7 +1585,7 @@ ROM_END
 
 
 ROM_START( as_twp )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "twp1_06.bin", 0x0000, 0x080000, CRC(c90090d1) SHA1(1abd0ed0182171b05d3d679e788d7849075783ee) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1594,7 +1594,7 @@ ROM_START( as_twp )
 ROM_END
 
 ROM_START( as_twpa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "twp104.u1", 0x0000, 0x080000, CRC(c56576c1) SHA1(f72758a1a16fdc2083df3477cec93dacf3b24ba3) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1604,11 +1604,11 @@ ROM_END
 
 
 ROM_START( as_vn )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vnm205.u1", 0x00000, 0x080000, CRC(e083b08d) SHA1(3107619046a6dd593d84d4fa16f3fe573fcc6ff5) )
 	ROM_LOAD16_BYTE( "vnm205.u2", 0x00001, 0x080000, CRC(531d4eda) SHA1(1293076cef8837577f07566af1d96516c7391b46) )
 
-	ROM_REGION( 0x200000, "slavecpu", 0 ) 
+	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD16_BYTE( "vns205.u1", 0x00000, 0x080000, CRC(3d26aaa0) SHA1(7e2138d53d6c40b0713fa84a93f6a2e5aa647f59) )
 	ROM_LOAD16_BYTE( "vns205.u2", 0x00001, 0x080000, CRC(66a7e22b) SHA1(8fc6d88d5e44357c880525b47f3537ed1a5a45af) )
 
@@ -1618,7 +1618,7 @@ ROM_END
 
 
 ROM_START( as_vcv )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vp005.u1", 0x0000, 0x100000, CRC(0777ad2d) SHA1(25eb83ebe54fe68a21f8e78435d171ff0141c718) )
 	ROM_LOAD16_BYTE( "vp005.u2", 0x0000, 0x100000, CRC(2d030eff) SHA1(501fea814b38701b4465fa9cfe2d6d1ba4f0cfde) )
 
@@ -1627,7 +1627,7 @@ ROM_START( as_vcv )
 ROM_END
 
 ROM_START( as_vcva )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vpush107.u1", 0x00000, 0x100000, CRC(79f5268c) SHA1(fd52074e4f050d9ca93f21007a8a18d56dc43d90) )
 	ROM_LOAD16_BYTE( "vpush107.u2", 0x00001, 0x100000, CRC(490442bf) SHA1(e01cdd81688c8ec0d9cadd53869e7c53a1c20f61) )
 
@@ -1636,7 +1636,7 @@ ROM_START( as_vcva )
 ROM_END
 
 ROM_START( as_vcvb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vpush106.u1", 0x00000, 0x100000, CRC(efa20dd9) SHA1(1fcac063e132ff7287d835577a5614dd9dc9448d) )
 	ROM_LOAD16_BYTE( "vpush106.u2", 0x00001, 0x100000, CRC(dfe7c909) SHA1(3e84c24b32ed4f40046ce5334d8cf67f65da8beb) )
 
@@ -1645,7 +1645,7 @@ ROM_START( as_vcvb )
 ROM_END
 
 ROM_START( as_vcvc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vpush104.u1", 0x00000, 0x100000, CRC(218e3749) SHA1(524c8e9eeb80a7d07afb89f6b88fdc90388b2444) )
 	ROM_LOAD16_BYTE( "vpush104.u2", 0x00001, 0x100000, CRC(684cd8ae) SHA1(c80e29de19a010158d141549d38268adda4f3eb8) )
 
@@ -1654,7 +1654,7 @@ ROM_START( as_vcvc )
 ROM_END
 
 ROM_START( as_vcvd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vpush102.u1", 0x00000, 0x100000, CRC(8965317d) SHA1(cf97c3fa5c5b7c93dab781cac9945340e20e8a6a) )
 	ROM_LOAD16_BYTE( "vpush102.u2", 0x00001, 0x100000, CRC(f4f724eb) SHA1(cdebb1f889c16890a3f143a361d623fd4faa409f) )
 
@@ -1663,7 +1663,7 @@ ROM_START( as_vcvd )
 ROM_END
 
 ROM_START( as_vcve )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vpush101.u1", 0x00000, 0x100000, CRC(13b2da9e) SHA1(f0e1997b6c684cdf071ebd3c37924f726e4fa514) )
 	ROM_LOAD16_BYTE( "vpush101.u2", 0x00001, 0x100000, CRC(047c45d9) SHA1(6a7924b4eba4a3adf90ab5495400aa25ebc03380) )
 
@@ -1676,7 +1676,7 @@ ROM_END
 
 
 ROM_START( as_ww )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ww2_03.bin", 0x0000, 0x080000, CRC(8bb26a49) SHA1(9de143cde5578cb4fe0c9295e279d6f155b1337b) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1685,7 +1685,7 @@ ROM_START( as_ww )
 ROM_END
 
 ROM_START( as_wwa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ww204.u1", 0x0000, 0x080000, CRC(0d161888) SHA1(55f1666b8c34da237280cbd266dd3839b428a5e9) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1693,7 +1693,7 @@ ROM_START( as_wwa )
 ROM_END
 
 ROM_START( as_wwb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ww205.u1", 0x0000, 0x080000, CRC(b0b34fe9) SHA1(f1fa8885768145191c72351b49b5da0d2091d502) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1701,7 +1701,7 @@ ROM_START( as_wwb )
 ROM_END
 
 ROM_START( as_wwc )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ww104.bin", 0x0000, 0x080000, CRC(791d09b4) SHA1(6852a6da56ed877add503762fba38af7fbe0dc06) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1709,7 +1709,7 @@ ROM_START( as_wwc )
 ROM_END
 
 ROM_START( as_wwd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ww103.bin", 0x0000, 0x080000, CRC(bc23b12e) SHA1(2ff1348d6b92c58d2c5475c16f52d41d8b14e62a) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1717,7 +1717,7 @@ ROM_START( as_wwd )
 ROM_END
 
 ROM_START( as_wwe )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "ww1_02.bin", 0x0000, 0x080000, CRC(ff3a167c) SHA1(fce5bd1cb593e71776d2724eda00f6f31843f495) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
@@ -1729,7 +1729,7 @@ ROM_END
 
 
 ROM_START( as_ws )
-	ROM_REGION( 0x200000, "maincpu", 0 ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ws100.u1", 0x00000, 0x040000, CRC(a8e5a89f) SHA1(3a3182aee75d92934da04cff523cb91dd0ed3d09) )
 	ROM_LOAD16_BYTE( "ws100.u2", 0x00001, 0x100000, NO_DUMP )
 ROM_END

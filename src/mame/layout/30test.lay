@@ -129,7 +129,7 @@
 		<bezel name="digit23" element="digit">
 			<bounds x="3.2" y="1.9" width="0.2" height="0.3" />
 		</bezel>
-		
+
 
 
 
@@ -297,8 +297,8 @@
 		<bezel name="digit59" element="digit">
 			<bounds x="3.2" y="3.7" width="0.2" height="0.3" />
 		</bezel>
-		
-		
+
+
 
 
 		<bezel name="digit60" element="digit">
@@ -308,7 +308,7 @@
 		<bezel name="digit61" element="digit">
 			<bounds x="0.2" y="0.9" width="0.2" height="0.2" />
 		</bezel>
-		
+
 		<bezel name="digit62" element="digit">
 			<bounds x="0.4" y="0.9" width="0.2" height="0.2" />
 		</bezel>
@@ -340,7 +340,7 @@
 		<bezel name="digit68" element="digit">
 			<bounds x="0.9" y="0.9" width="0.2" height="0.2" />
 		</bezel>
-	
+
 		<bezel name="digit69" element="digit">
 			<bounds x="1.1" y="0.9" width="0.2" height="0.2" />
 		</bezel>
@@ -353,7 +353,7 @@
 		<bezel name="digit71" element="digit">
 			<bounds x="0.4" y="0.3" width="0.4" height="0.4" />
 		</bezel>
-	
+
 		<bezel name="lamp0" element="rank">
 			<bounds x="1.5" y="0.3" width="0.1" height="0.1" />
 		</bezel>

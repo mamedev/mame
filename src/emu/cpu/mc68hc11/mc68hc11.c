@@ -83,7 +83,7 @@ struct _hc11_state
 	UINT8 tflg1, tmsk1;
 	UINT16 toc1;
 	UINT16 tcnt;
-//	UINT8 por;
+//  UINT8 por;
 	UINT8 pr;
 
 	UINT64 frc_base;
@@ -475,7 +475,7 @@ static CPU_INIT( hc11 )
 	device->save_item(NAME(cpustate->tmsk1));
 	device->save_item(NAME(cpustate->toc1));
 	device->save_item(NAME(cpustate->tcnt));
-//	device->save_item(NAME(cpustate->por));
+//  device->save_item(NAME(cpustate->por));
 	device->save_item(NAME(cpustate->pr));
 	device->save_item(NAME(cpustate->frc_base));
 }
@@ -490,7 +490,7 @@ static CPU_RESET( hc11 )
 	hc11_regs_w(cpustate,0x3d,cpustate->init_value);
 	cpustate->toc1 = 0xffff;
 	cpustate->tcnt = 0xffff;
-//	cpustate->por = 1; // for first timer overflow / compare stuff
+//  cpustate->por = 1; // for first timer overflow / compare stuff
 	cpustate->pr = 3; // timer prescale
 }
 

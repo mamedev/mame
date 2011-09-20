@@ -11988,6 +11988,8 @@ sc4monod	// Monopoly (Mazooma) [German]
 sc4mclb		// Monopoly Club (Mazooma)
 sc4mdlx		// Monopoly Deluxe (Mazooma)
 sc4mwwcl	// Monopoly Wonders Of The World Club (Mazooma)
+sc4mondxg       //
+sc4mowowd       //
 sc4mont		// Montego Pay (Qps)
 sc4motor	// Motorway Mania (Bellfruit)
 sc4mou		// Move On Up (Qps)
@@ -12690,7 +12692,7 @@ sc4hotsh	// Hot Shots (Bellfruit)
 sc4hotsha	//
 sc4hotwd	// Hot Wad (Bellfruit)
 sc4hotwda	//
-sc4hotwdb	//	
+sc4hotwdb	//
 sc4hotwdc	//
 sc4hotwdd	//
 sc4hotwde	//
@@ -13361,65 +13363,65 @@ sc5count	// Countdown (Bellfruit)
 sc5cf		// Crazy Fruits (Bellfruit)
 sc5crnjw	// Crown Jewels (Bellfruit)
 sc5dnd		// Deal Or No Deal (Bellfruit)
-sc5dnda		// 
-sc5dndb		// 
-sc5dndc		// 
-sc5dndd		// 
-sc5dnde		// 
-sc5dndf		// 
-sc5dndg		// 
-sc5dndh		// 
-sc5dndi		// 
-sc5dndj		// 
-sc5dndk		// 
-sc5dndl		// 
-sc5dndm		// 
-sc5dndn		// 
-sc5dndo		// 
-sc5dndp		// 
-sc5dndq		// 
-sc5dndr		// 
+sc5dnda		//
+sc5dndb		//
+sc5dndc		//
+sc5dndd		//
+sc5dnde		//
+sc5dndf		//
+sc5dndg		//
+sc5dndh		//
+sc5dndi		//
+sc5dndj		//
+sc5dndk		//
+sc5dndl		//
+sc5dndm		//
+sc5dndn		//
+sc5dndo		//
+sc5dndp		//
+sc5dndq		//
+sc5dndr		//
 sc5dnds		//
 sc5dndt		//
-sc5dndcs	// 
-sc5dndcsa	// 
-sc5dndcsb	// 
-sc5dndcsc	// 
-sc5dndcsd	// 
-sc5dndcse	// 
-sc5dndcsf	// 
-sc5dndcsg	// 
-sc5dndcsh	// 
-sc5dndcsi	// 
-sc5dndcsj	// 
-sc5dndc2	// 
-sc5dndc2a	// 
-sc5dndc2b	// 
-sc5dndc2c	// 
-sc5dndc2d	// 
-sc5dndc2e	// 
-sc5dndc2f	// 
-sc5dndc2g	// 
-sc5dndc2h	// 
-sc5dndc2i	// 
-sc5dndc2j	// 
-sc5dndc2k	// 
-sc5dndc2l	// 
-sc5dndc2m	// 
-sc5dndc2n	// 
-sc5dndc2o	// 
-sc5dndc2p	// 
-sc5dndc2q	// 
-sc5dndc2r	// 
-sc5dndc2s	// 
-sc5dndc2t	// 
-sc5dndc2u	// 
-sc5dndc2v	// 
-sc5dndc2w	// 
-sc5dndc3	// 
-sc5dndc3a	// 
-sc5dndc3b	// 
-sc5dndc3c	// 
+sc5dndcs	//
+sc5dndcsa	//
+sc5dndcsb	//
+sc5dndcsc	//
+sc5dndcsd	//
+sc5dndcse	//
+sc5dndcsf	//
+sc5dndcsg	//
+sc5dndcsh	//
+sc5dndcsi	//
+sc5dndcsj	//
+sc5dndc2	//
+sc5dndc2a	//
+sc5dndc2b	//
+sc5dndc2c	//
+sc5dndc2d	//
+sc5dndc2e	//
+sc5dndc2f	//
+sc5dndc2g	//
+sc5dndc2h	//
+sc5dndc2i	//
+sc5dndc2j	//
+sc5dndc2k	//
+sc5dndc2l	//
+sc5dndc2m	//
+sc5dndc2n	//
+sc5dndc2o	//
+sc5dndc2p	//
+sc5dndc2q	//
+sc5dndc2r	//
+sc5dndc2s	//
+sc5dndc2t	//
+sc5dndc2u	//
+sc5dndc2v	//
+sc5dndc2w	//
+sc5dndc3	//
+sc5dndc3a	//
+sc5dndc3b	//
+sc5dndc3c	//
 ad5dnd		// Deal Or No Deal (Bellfruit) (AD5)
 sc5dndbb	// Deal Or No Deal Break The Bank (Bellfruit)
 sc5dndbba	//
@@ -13826,7 +13828,7 @@ sc5monsp	// Money Spinner (Bellfruit)
 sc5monop	// Monopoly (Mazooma)
 ad5monop	// Monopoly (Mazooma)
 sc5mcas		// Monopoly Casino (Mazooma)
-sc5mcasa	// 
+sc5mcasa	//
 sc5mcasb	//
 sc5mcasc	//
 sc5mdm		// Monopoly Double Money (Bellfruit)
@@ -14902,7 +14904,7 @@ m4xtrm		// X-treme (Bwb)
 m4rhfevc	// Red Hot Fever (Concept)
 m4spnwnc	// Spin-A-Win (Concept)
 m4nudgwc	// Nudge a Win (Concept)
- 
+
 /* Empire */
 
 m4apachg	// Apache Gold (Empire)
@@ -15245,15 +15247,15 @@ m4abeaut
 m4cmont
 m4blkmgc
 m4amalad
-m4bben		
-m4bbox		
-m4frnudg	
-m4frmtx	
-m4jok2k	
-m4mjp		
-m4milrou	
-m4kingg		
-m4bddunk	
+m4bben
+m4bbox
+m4frnudg
+m4frmtx
+m4jok2k
+m4mjp
+m4milrou
+m4kingg
+m4bddunk
 
 
 // MPU4 + Video board

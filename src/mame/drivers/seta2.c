@@ -2438,9 +2438,9 @@ static DRIVER_INIT( funcube3 )
 	main_cpu[0x45c/4] = 0x4e714e71;
 
 	// 0x3c0
-//	main_cpu[0xa5c/4] = 0x4e713e3c;
-//	main_cpu[0xa74/4] = 0x4e713e3c;
-//	main_cpu[0xa8c/4] = 0x4e7141f9;
+//  main_cpu[0xa5c/4] = 0x4e713e3c;
+//  main_cpu[0xa74/4] = 0x4e713e3c;
+//  main_cpu[0xa8c/4] = 0x4e7141f9;
 
 	// Sub CPU
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts

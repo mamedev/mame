@@ -1884,7 +1884,7 @@ Notes:
     z80 sound rom as used in raiden2a instead of the
     ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
     rom from raiden2. Slight version difference, and I don't know which is older/newer. - LN
-	
+
 ROMSET organization:
 Note: type numbers are NOT NECESSARILY in chronological version order YET.
 SETNAME   LONGNAME       PRG TYPES   SND(u1110) TYPE   VOICE(u1017) TYPE  FX0(u0724) TYPE  Notes
@@ -2534,7 +2534,7 @@ YM3812 plus Y3014              YM2151 plus Y3012 plus NJM4550 (some older pcbs h
 4x pals (two are stacked)      2x pals
 */
 /* ZERO TEAM Seibu Kaihatsu 1993
-	TODO: guru-readme here
+    TODO: guru-readme here
 */
 
 ROM_START( zeroteam )
