@@ -1,8 +1,13 @@
 /***************************************************************************
 
 	Umi de Poker (c) 1997 World Station Co.,LTD
+	Slot Poker Saiyuki (c) 1998 World Station Co.,LTD
 
-	preliminary driver by Angelo Salese
+	driver by Angelo Salese
+
+	TODO:
+	- fix clocks;
+	- inputs are bare-bones;
 
 	TMP68HC000-16 + z80 + YM3812 + OKI6295
 
@@ -13,6 +18,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 
 class umipoker_state : public driver_device
@@ -196,7 +202,7 @@ static WRITE16_HANDLER( umipoker_vram_3_w )
 static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x400000, 0x403fff) AM_RAM
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_BASE_MEMBER(umipoker_state, m_vram_0)
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_BASE_MEMBER(umipoker_state, m_vram_1)
@@ -205,15 +211,16 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ8(z80_rom_readback_r,0x00ff)
 	AM_RANGE(0xc1f000, 0xc1ffff) AM_READWRITE8(z80_shared_ram_r,z80_shared_ram_w,0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
-	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("IN1")
+	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("IN1") // unused?
 	AM_RANGE(0xe00008, 0xe00009) AM_READ_PORT("IN2")
-	AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP // outputs
+	AM_RANGE(0xe0000c, 0xe0000d) AM_WRITENOP // lamps
+	AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP // coin counters
 	AM_RANGE(0xe00014, 0xe00015) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe00018, 0xe00019) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe00020, 0xe00021) AM_WRITE(umipoker_scrolly_0_w)
 	AM_RANGE(0xe00022, 0xe00023) AM_WRITE(umipoker_irq_ack_w)
-	AM_RANGE(0xe00026, 0xe00027) AM_WRITE(umipoker_scrolly_1_w)
-	AM_RANGE(0xe0002a, 0xe0002b) AM_WRITE(umipoker_scrolly_2_w)
+	AM_RANGE(0xe00026, 0xe00027) AM_WRITE(umipoker_scrolly_2_w)
+	AM_RANGE(0xe0002a, 0xe0002b) AM_WRITE(umipoker_scrolly_1_w)
 	AM_RANGE(0xe0002c, 0xe0002d) AM_WRITENOP // unknown meaning, bit 0 goes from 0 -> 1 on IRQ service routine
 	AM_RANGE(0xe0002e, 0xe0002f) AM_WRITE(umipoker_scrolly_3_w)
 ADDRESS_MAP_END
@@ -229,7 +236,7 @@ static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8 )
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( umipoker )
+static INPUT_PORTS_START( common )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
@@ -237,24 +244,12 @@ static INPUT_PORTS_START( umipoker )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_DIPNAME( 0x0100, 0x0100, "IN0" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -281,7 +276,99 @@ static INPUT_PORTS_START( umipoker )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN1" )
+	PORT_DIPNAME( 0x0001, 0x0000, "IN1" )
+	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, "IN0" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0000, "IN2" )
+	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN )
+	PORT_DIPNAME( 0x0100, 0x0000, "IN0" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( umipoker )
+	PORT_INCLUDE( common )
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW0" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -330,8 +417,8 @@ static INPUT_PORTS_START( umipoker )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -364,9 +451,9 @@ static INPUT_PORTS_START( umipoker )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, "Title Type" )
+	PORT_DIPSETTING(    0x0000, "Umi de Poker" )
+	PORT_DIPSETTING(    0x0800, "Marine Paradise" )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -379,6 +466,10 @@ static INPUT_PORTS_START( umipoker )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( saiyukip )
+	PORT_INCLUDE( common )
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0001, 0x0001, "DSW0" )
@@ -520,6 +611,8 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_CPU_IO_MAP(umipoker_audio_io_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 120)	// ? controls ym3812 music tempo
 
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
 	MCFG_MACHINE_START(umipoker)
 	MCFG_MACHINE_RESET(umipoker)
 
@@ -573,7 +666,7 @@ ROM_START( umipoker )
     ROM_CONTINUE(             0x000000, 0x040000 )
 ROM_END
 
-ROM_START( sayukipk )
+ROM_START( saiyukip )
 	ROM_REGION( 0x40000, "maincpu", 0 )
     ROM_LOAD16_BYTE( "slp0-spq.u61", 0x000000, 0x020000, CRC(7fc0f201) SHA1(969170d68278e212dd459744373ed9e704976e45) )
     ROM_LOAD16_BYTE( "slp1-spq.u60", 0x000001, 0x020000, CRC(c8e3547c) SHA1(18bb380a64ed36f45a377b86cbbac892efe879bb) )
@@ -593,5 +686,5 @@ ROM_START( sayukipk )
 ROM_END
 
 
-GAME( 1997, umipoker,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise", GAME_NOT_WORKING ) // title screen is toggleable thru an i/o bit
-GAME( 1998, sayukipk,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki", GAME_NOT_WORKING )
+GAME( 1997, umipoker,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 ) // title screen is toggleable thru a dsw
+GAME( 1998, saiyukip,  0,   umipoker,  saiyukip,  0, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)", 0 )
