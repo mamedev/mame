@@ -1292,7 +1292,7 @@ static MACHINE_CONFIG_DERIVED( desertgu, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(desertgu_io_map)
 	MCFG_MACHINE_START(desertgu)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1491,7 +1491,7 @@ static MACHINE_CONFIG_DERIVED( dplay, mw8080bw_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(dplay_io_map)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1587,7 +1587,7 @@ static MACHINE_CONFIG_DERIVED( gmissile, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(gmissile_io_map)
 	MCFG_MACHINE_START(gmissile)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1681,7 +1681,7 @@ static MACHINE_CONFIG_DERIVED( m4, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(m4_io_map)
 	MCFG_MACHINE_START(m4)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1851,7 +1851,7 @@ static MACHINE_CONFIG_DERIVED( clowns, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(clowns_io_map)
 	MCFG_MACHINE_START(clowns)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1945,7 +1945,7 @@ static MACHINE_CONFIG_DERIVED( spacwalk, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(spacwalk_io_map)
 	MCFG_MACHINE_START(clowns)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2025,7 +2025,7 @@ static MACHINE_CONFIG_DERIVED( shuffle, mw8080bw_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(shuffle_io_map)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2110,7 +2110,7 @@ static MACHINE_CONFIG_DERIVED( dogpatch, mw8080bw_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(dogpatch_io_map)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2274,7 +2274,7 @@ static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(spcenctr_io_map)
 	MCFG_MACHINE_START(spcenctr)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* timers */
 	MCFG_TIMER_ADD_PERIODIC("strobeon", spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
@@ -2370,7 +2370,7 @@ static MACHINE_CONFIG_DERIVED( phantom2, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(phantom2_io_map)
 	MCFG_MACHINE_START(phantom2)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2509,7 +2509,7 @@ static MACHINE_CONFIG_DERIVED( bowler, mw8080bw_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(bowler_io_map)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2726,7 +2726,7 @@ MACHINE_CONFIG_DERIVED( invaders, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(invaders_io_map)
 	MCFG_MACHINE_START(invaders)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2808,7 +2808,7 @@ static MACHINE_CONFIG_DERIVED( blueshrk, mw8080bw_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(blueshrk_io_map)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2908,7 +2908,7 @@ static MACHINE_CONFIG_DERIVED( invad2ct, mw8080bw_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(invad2ct_io_map)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MW8080BW_60HZ / 255))
+	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
