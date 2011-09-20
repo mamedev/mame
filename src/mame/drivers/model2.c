@@ -2300,7 +2300,7 @@ They are linked to a QFP208 IC labelled 315-5645
 	ROM_LOAD("mpr-16312.14",   0x100000,  0x80000, CRC(a25fef5b) SHA1(c6a37856b97f5bc4996cb6b66209f47af392cc38) ) \
 
 
-
+/* Known to exist: Zero Gunner Model 2A with program roms EPR-20288 & EPR-20289, should be the Japan region - Currently undumped */
 ROM_START( zeroguna ) /* Zero Gunner (Export), Model 2A */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-20437", 0x000000, 0x080000, CRC(fad30cc0) SHA1(5c6222e07594b4be59b5095f7cc0a164d5895306) )
