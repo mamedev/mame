@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "sound/3812intf.h"
 
 
 class umipoker_state : public driver_device
@@ -20,6 +21,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_vram;
+	UINT8 *m_z80_wram;
 };
 
 static VIDEO_START( umipoker )
@@ -42,7 +44,7 @@ static void draw_layer( running_machine &machine, bitmap_t *bitmap, const rectan
 		{
 			int tile = state->m_vram[count*2+0];
 			int attr = state->m_vram[count*2+1];
-			int color = (attr & 0x1f);
+			int color = (attr & 0x3f);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,(x*8),(y*8),0);
 
@@ -72,18 +74,44 @@ static READ8_HANDLER( z80_rom_readback_r )
 	return ROM[offset];
 }
 
+static READ8_HANDLER( z80_shared_ram_r )
+{
+	umipoker_state *state = space->machine().driver_data<umipoker_state>();
+
+	space->machine().scheduler().synchronize(); // force resync
+
+	return state->m_z80_wram[offset];
+}
+
+static WRITE8_HANDLER( z80_shared_ram_w )
+{
+	umipoker_state *state = space->machine().driver_data<umipoker_state>();
+
+	space->machine().scheduler().synchronize(); // force resync
+
+	state->m_z80_wram[offset] = data;
+}
+
 static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16 )
-	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_BASE_MEMBER(umipoker_state, m_vram)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ8(z80_rom_readback_r,0x00ff)
-	AM_RANGE(0xc1f000, 0xc1ffff) AM_RAM // ODD addresses only? probably z80 shared RAM
+	AM_RANGE(0xc1f000, 0xc1ffff) AM_READWRITE8(z80_shared_ram_r,z80_shared_ram_w,0x00ff)
 	// 0xe000xx I/O
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( umipoker_audio_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(z80_shared_ram_r,z80_shared_ram_w) AM_BASE_MEMBER(umipoker_state, m_z80_wram)
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( umipoker )
 
@@ -115,12 +143,18 @@ static MACHINE_RESET( umipoker )
 	//umipoker_state *state = machine.driver_data<_umipoker_state>();
 }
 
+// TODO: clocks
 static MACHINE_CONFIG_START( umipoker, umipoker_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16
 	MCFG_CPU_PROGRAM_MAP(umipoker_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+
+	MCFG_CPU_ADD("audiocpu",Z80,4000000)
+	MCFG_CPU_PROGRAM_MAP(umipoker_audio_map)
+	MCFG_CPU_IO_MAP(umipoker_audio_io_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 60)	// ?
 
 	MCFG_MACHINE_START(umipoker)
 	MCFG_MACHINE_RESET(umipoker)
@@ -142,6 +176,9 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ym", YM3812, 4000000 / 2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -189,5 +226,5 @@ ROM_START( sayukipk )
 ROM_END
 
 
-GAME( 1997, umipoker,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Marine Paradise", GAME_NOT_WORKING | GAME_NO_SOUND ) // Umi de Poker?
-GAME( 1997, sayukipk,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, umipoker,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise", GAME_NOT_WORKING | GAME_NO_SOUND ) // title screen is toggleable thru an i/o bit
+GAME( 1998, sayukipk,  0,   umipoker,  umipoker,  0, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki", GAME_NOT_WORKING | GAME_NO_SOUND )
