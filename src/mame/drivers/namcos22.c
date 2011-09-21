@@ -2363,7 +2363,7 @@ static WRITE32_HANDLER( spotram_w )
 static READ32_HANDLER( namcos22_gun_r )
 {
 	int xpos = input_port_read_safe(space->machine(), "LIGHTX", 0) * 640 / 0xff;
-	int ypos = input_port_read_safe(space->machine(), "LIGHTY", 0) * 480 / 0xff;
+	int ypos = input_port_read_safe(space->machine(), "LIGHTY", 0) * 240 / 0xff + 0x10;
 	switch( offset )
 	{
 	case 0: /* 430000 */
@@ -2371,7 +2371,7 @@ static READ32_HANDLER( namcos22_gun_r )
 
 	case 1: /* 430004 */
 	case 2: /* 430008 */
-		return ((ypos>>1)+0x10)<<16;
+		return ypos<<16;
 
 	case 3:
 	default:
@@ -2411,7 +2411,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x40001f) AM_READ(namcos22_keycus_r) AM_WRITENOP
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
 	AM_RANGE(0x420000, 0x42000f) AM_READNOP AM_WRITENOP /* C139 SCI registers */
-	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r) AM_WRITENOP /* LEDs? */
+	AM_RANGE(0x430000, 0x430003) AM_WRITENOP /* LEDs? */
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READ(namcos22_portbit_r) AM_WRITE(namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
@@ -5144,9 +5144,9 @@ static INPUT_PORTS_START( timecris )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START( "LIGHTX" )
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(48) PORT_KEYDELTA(4)
 	PORT_START( "LIGHTY" )
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
 
 	PORT_START("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -5711,6 +5711,8 @@ static DRIVER_INIT( cybrcyc )
 static DRIVER_INIT( timecris )
 {
 	namcos22s_init(machine, NAMCOS22_TIME_CRISIS);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x430000, 0x43000f, FUNC(namcos22_gun_r));
 
 	install_130_speedup(machine);
 }
