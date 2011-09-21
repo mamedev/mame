@@ -78,11 +78,12 @@ private:
 	inline void queue_r(UINT8 data);
 	inline void dequeue_r(UINT8 *data);
 	inline void recompute_parameters();
+	inline void command_end_seq();
 
-	void command_end_seq();
 	void command_wpr_exec();
 	void command_clr_exec();
 	void command_cpy_exec();
+	void command_rct_exec();
 	void process_fifo();
 	void exec_abort_sequence();
 	UINT16 video_registers_r(int offset);

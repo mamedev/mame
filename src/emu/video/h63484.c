@@ -619,7 +619,7 @@ int h63484_device::translate_command(UINT16 data)
 	return COMMAND_INVALID;
 }
 
-void h63484_device::command_end_seq()
+inline void h63484_device::command_end_seq()
 {
 	//h63484->param_ptr = 0;
 	m_sr |= H63484_SR_CED;
@@ -730,6 +730,96 @@ void h63484_device::command_cpy_exec()
 	printf("%08x %08x %d %d\n",src_offset,dst_offset,ax,ay);
 
 	// ...
+}
+
+void h63484_device::command_rct_exec()
+{
+	INT16 dX, dY;
+	UINT8 area,col,opm;
+	UINT32 offset;
+	int inc_x,inc_y;
+	int i;
+	UINT8 res,data_r;
+
+	area = (m_cr & 0xe0) >> 5;
+	col = (m_cr & 0x18) >> 3;
+	opm = (m_cr & 0x07);
+	dX = m_pr[0];
+	dY = m_pr[1];
+
+	offset = m_rwp[m_rwp_dn] & 0xfffff;
+
+	inc_x = (dX < 0) ? -1 : 1;
+	inc_y = (dY < 0) ? -1 : 1;
+
+	printf("%d %d\n",dX,dY);
+
+	/*
+	3<-2
+	|  ^
+	v  |
+	0->1
+	*/
+
+	/* 0 -> 1 */
+	for(i=0;i<dX;i+=inc_x)
+	{
+		offset = (((i + m_cpx) >> 1) + (0 + m_cpy) * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
+		data_r = readbyte(offset);
+
+		if((i + m_cpx) & 1)
+			res = (col & 0x0f) | (data_r & 0xf0);
+		else
+			res = (col & 0xf0) | (data_r & 0x0f);
+
+		writebyte(offset,res);
+	}
+
+	/* 1 -> 2 */
+	for(i=0;i<dY;i+=inc_y)
+	{
+		offset = (((dX + m_cpx) >> 1) + (i + m_cpy) * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
+		data_r = readbyte(offset);
+
+		if((dX + m_cpx) & 1)
+			res = (col & 0x0f) | (data_r & 0xf0);
+		else
+			res = (col & 0xf0) | (data_r & 0x0f);
+
+		writebyte(offset,res);
+	}
+
+	/* 2 -> 3 */
+	for(i=0;i<dX;i+=inc_x)
+	{
+		offset = (((i + m_cpx) >> 1) + (dY + m_cpy) * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
+		data_r = readbyte(offset);
+
+		if((i + m_cpx) & 1)
+			res = (col & 0x0f) | (data_r & 0xf0);
+		else
+			res = (col & 0xf0) | (data_r & 0x0f);
+
+		writebyte(offset,res);
+	}
+
+	/* 3 -> 4 */
+	for(i=0;i<dY;i+=inc_y)
+	{
+		offset = (((0 + m_cpx) >> 1) + (i + m_cpy) * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
+		data_r = readbyte(offset);
+
+		if((0 + m_cpx) & 1)
+			res = (col & 0x0f) | (data_r & 0xf0);
+		else
+			res = (col & 0xf0) | (data_r & 0x0f);
+
+		writebyte(offset,res);
+	}
+
+
+	m_cpx += dX;
+	m_cpy += dY;
 }
 
 void h63484_device::process_fifo()
@@ -848,9 +938,26 @@ void h63484_device::process_fifo()
 			}
 			break;
 
+		case COMMAND_RRCT:
+			if (m_param_ptr == 2)
+			{
+				command_rct_exec();
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_RMOVE:
+			if (m_param_ptr == 2)
+			{
+				m_cpx += (INT16)m_pr[0];
+				m_cpy += (INT16)m_pr[1];
+				command_end_seq();
+			}
+			break;
+
 		default:
 			printf("%04x\n",m_cr);
-			//fatalerror("stop!");
+			fatalerror("stop!");
 			break;
 	}
 }
@@ -894,7 +1001,11 @@ void h63484_device::video_registers_w(int offset)
 
 	switch(offset)
 	{
-		case 0x00: // FIFO entry, not covered there
+		case 0x00: // FIFO entry
+			queue_w((vreg_data & 0xff00) >> 8);
+			queue_w((vreg_data & 0x00ff) >> 0);
+			if(FIFO_LOG) printf("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
+			process_fifo();
 			break;
 
 		case 0x02: // Command Entry
@@ -1019,15 +1130,7 @@ WRITE16_MEMBER( h63484_device::data_w )
 	if(ACCESSING_BITS_0_7)
 		m_vreg[m_ar+1] = (data & 0xff);
 
-	if(m_ar == 0)
-	{
-		queue_w((data & 0xff00) >> 8);
-		queue_w((data & 0x00ff) >> 0);
-		if(FIFO_LOG) printf("%s -> %02x\n",acrtc_regnames[m_ar/2],data);
-		process_fifo();
-	}
-	else
-		video_registers_w(m_ar);
+	video_registers_w(m_ar);
 
 	if(m_ar & 0x80)
 	{
