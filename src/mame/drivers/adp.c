@@ -183,7 +183,7 @@ void adp_state::video_start()
 
 static H63484_DISPLAY_PIXELS( acrtc_display_pixels )
 {
-	// ...
+	*BITMAP_ADDR16(bitmap, y, x) = data & 0xf;
 }
 
 bool adp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

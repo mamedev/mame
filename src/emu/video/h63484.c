@@ -849,7 +849,8 @@ void h63484_device::process_fifo()
 			break;
 
 		default:
-			fatalerror("stop!");
+			printf("%04x\n",m_cr);
+			//fatalerror("stop!");
 			break;
 	}
 }
@@ -956,6 +957,22 @@ void h63484_device::video_registers_w(int offset)
 			m_mwr[(offset & 0x18) >> 3] = vreg_data & 0xfff; // pitch
 			m_mwr_chr[(offset & 0x18) >> 3] = (vreg_data & 0x8000) >> 15;
 			break;
+
+		case 0xc4: // Start Address Register
+		case 0xcc:
+		case 0xd4:
+		case 0xdc:
+			m_sar[(offset & 0x18) >> 3] = ((vreg_data & 0xf) << 16) | (m_sar[(offset & 0x18) >> 3] & 0xffff);
+			m_sda[(offset & 0x18) >> 3] = (vreg_data & 0x0f00) >> 8;
+			break;
+
+		case 0xc6: // Start Address Register
+		case 0xce:
+		case 0xd6:
+		case 0xde:
+			m_sar[(offset & 0x18) >> 3] = (vreg_data & 0xffff) | (m_sar[(offset & 0x18) >> 3] & 0xf0000);
+			break;
+
 		default:
 			if(LOG) printf("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
 			break;
@@ -1037,6 +1054,35 @@ void h63484_device::device_reset()
 }
 
 //-------------------------------------------------
+//  draw_graphics_line -
+//-------------------------------------------------
+
+void h63484_device::draw_graphics_line(bitmap_t *bitmap, const rectangle *cliprect, int y, int layer_n)
+{
+	int x;
+	int pitch;
+	int base_offs;
+
+	pitch = m_mwr[layer_n];
+	base_offs = m_sar[layer_n];
+
+	for(x=0;x<pitch * 4;x+=4)
+	{
+		UINT16 data;
+
+		data = readbyte(base_offs + (x >> 1) + y * pitch * 2);
+
+		m_display_cb(this, bitmap, y, x+3, (data >> 4) & 0xf);
+		m_display_cb(this, bitmap, y, x+2, data & 0xf);
+
+		data = readbyte(base_offs + ((x + 2) >> 1) + y * pitch * 2);
+
+		m_display_cb(this, bitmap, y, x+1, (data >> 4) & 0xf);
+		m_display_cb(this, bitmap, y, x+0, data & 0xf);
+	}
+}
+
+//-------------------------------------------------
 //  update_screen -
 //-------------------------------------------------
 
@@ -1044,6 +1090,12 @@ void h63484_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if(m_dcr & 0x8000) // correct?
 	{
-		// ...
+		int y;
+
+		for(y=cliprect->min_y;y<cliprect->max_y;y++)
+		{
+			if (m_display_cb)
+				draw_graphics_line(bitmap,cliprect, y, 1);
+		}
 	}
 }
