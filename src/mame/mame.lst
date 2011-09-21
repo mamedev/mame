@@ -11789,6 +11789,17 @@ sc4cclimn	//
 sc4cclimo	//
 sc4cclimp	//
 sc4cfqps	// Crazy Fruits (Qps)
+sc4cfqpsa	//
+sc4cfqpsb	//
+sc4cfqpsc	//
+sc4cfqpsd	//
+sc4cfqpse	//
+sc4cfqpsf	//
+sc4cfqpsg	//
+sc4cfqpsh	//
+sc4cfqpsi	//
+sc4cfqpsj	//
+sc4cfqpsk	//
 sc4cfcla	// Crazy Fruits Classic (Bellfruit)
 sc4cfclb	// Crazy Fruits Club (Bellfruit)
 sc4cfdu		// Crazy Fruits Down Under (Bellfruit)
@@ -12260,9 +12271,27 @@ sc4a40a		//
 sc4a40b		//
 sc4a40c		//
 sc4bantm	// Bantam Of The Opera (Mazooma)
+sc4bantma	//
+sc4bantmb	//
+sc4bantmc	//
 sc4bar7		// Bar 7's (Bellfruit)
+sc4bar7a	//
+sc4bar7b	//
+sc4bar7c	//
+sc4bar7d	//
+sc4bar7e	//
 sc4batl		// Battleships & Cruisers (Bellfruit)
+sc4batla	//
 sc4bob		// Bobby Dazzler (Mazooma)
+sc4boba		//
+sc4bobb		//
+sc4bobc		//
+sc4bobd		//
+sc4bobe		//
+sc4bobf		//
+sc4bobg		//
+sc4bobh		//
+sc4bobi		//
 sc4bull		// Bullseye (Bellfruit)
 sc4bulla	//
 sc4bulcs	//
@@ -12292,8 +12321,26 @@ sc4cabink	//
 sc4cabinl	//
 sc4cabinm	//
 sc4cari		// Caribbean Cash (Qps)
+sc4caria	//
+sc4carib	//
+sc4caric	//
+sc4carid	//
+sc4carie	//
+sc4cariq	//
+sc4cariqa	//
+sc4cariqb	//
+sc4cariqc	//
+sc4cariqd	//
+sc4cariqe	//
+sc4cariqf	//
+sc4cariqg	//
 sc4cblas	// Cash Blast (Bellfruit)
 sc4casxt	// Casino Xtravaganza  (Mazooma)
+sc4casxta	//
+sc4casxtb	//
+sc4casxtc	//
+sc4casxtd	//
+sc4casxte	//
 sc4chavi	// Chav It (Bellfruit)
 sc4chavia	//
 sc4chavib	//
@@ -12311,10 +12358,34 @@ sc4chavye	//
 sc4chavyf	//
 sc4chavyg	//
 sc4clue		// Cluedo (Mazooma)
+sc4cluea	//
+sc4clueb	//
+sc4cluec	//
+sc4clued	//
+sc4cluee	//
+sc4cluef	//
+sc4clueg	//
 sc4cmani	// Colour Mania (Bellfruit)
+sc4cmania	//
 sc4cj		// Cool Jewels (Bellfruit)
+sc4cja		//
+sc4cjb		//
+sc4cjc		//
+sc4cjd		//
 sc4ctl		// Cop The Lot (Bellfruit)
+sc4ctla		//
+sc4ctlb		//
+sc4ctlc		//
+sc4ctld		//
+sc4ctle		//
 sc4crsc		// Cops 'n' Robbers Safe Cracker (Bellfruit)
+sc4crsca	//
+sc4crscb	//
+sc4crscc	//
+sc4crscd	//
+sc4crsce	//
+sc4crscf	//
+sc4crscg	//
 sc4coro		// Coronation Street (Mazooma)
 sc4coroa	//
 sc4corotb	//
@@ -12332,8 +12403,12 @@ sc4corom	//
 sc4coron	//
 sc4count	// Countdown (Bellfruit)
 sc4counta	//
-sc4cf		// Crazy Fruits (Bellfruit)
+sc4czfr		// Crazy Fruits (Bellfruit)
+sc4czfra	//
+sc4czfrb	//
+sc4czfrc	//
 sc4crnjw	// Crown Jewels (Bellfruit)
+sc4crnjwa	//
 sc4dnd		// Deal Or No Deal (Bellfruit)
 sc4dnda		//
 sc4dndb		//
@@ -12647,6 +12722,13 @@ sc4gggq		//
 sc4gggr		//
 sc4gggs		//
 sc4gunp		// Gunpowder Slot (Bellfruit)
+sc4gunpa	//
+sc4gunpb	//
+sc4gunpc	//
+sc4gunpd	//
+sc4gunpe	//
+sc4gunpf	//
+sc4gunpg	//
 sc4hapnt	// Happy Notes (Bellfruit)
 sc4hapnta	//
 sc4hntcs	//
@@ -12681,7 +12763,15 @@ sc4hellbh	//
 sc4hellbi	//
 sc4hellbj	//
 sc4hill		// Hill Billionaire (Bellfruit)
+sc4hilla	//
 sc4hiss		// Hissing Quid (Qps)
+sc4hissa	//
+sc4hissb	//
+sc4hissc	//
+sc4hissd	//
+sc4hisse	//
+sc4hissf	//
+sc4hissg	//
 sc4hotdg	// Hot Dog (Bellfruit)
 sc4hotdga	//
 sc4hotdgb	//
@@ -12736,7 +12826,21 @@ sc4manice	//
 sc4manicf	//
 sc4manicg	//
 sc4mmm		// Mental Money Monsters (Mazooma)
+sc4mmma		//
+sc4mmmb		//
+sc4mmmc		//
+sc4mmmd		//
+sc4mmme		//
+sc4mmmf		//
+sc4mmmg		//
 sc4mmad		// Money Madness (Mazooma)
+sc4mmada	//
+sc4mmadb	//
+sc4mmadc	//
+sc4mmadd	//
+sc4mmade	//
+sc4mmadf	//
+sc4mmadg	//
 sc4monsp	// Money Spinner (Bellfruit)
 sc4monop	// Monopoly (Mazooma)
 sc4monopa	//
@@ -12962,14 +13066,50 @@ sc4rovrtb	//
 sc4rovrtc	//
 sc4rovrtd	//
 sc4rovrte	//
-
 sc4showt	// Showtime (Bellfruit)
+sc4showta	//
+sc4showtb	//
+sc4showtc	//
+sc4showtd	//
+sc4showte	//
 sc4slad		// Snakes & Ladders (Bellfruit)
+sc4slada	//
+sc4sladb	//
+sc4sladc	//
+sc4sladd	//
+sc4slade	//
+sc4sladf	//
+sc4sladg	//
 sc4spice	// Spice It Up (Bellfruit)
+sc4spicea	//
+sc4spiceb	//
+sc4spicec	//
 sc4swywm	// Spin When Your Winning (Mazooma)
+sc4swywma	//
+sc4swywmb	//
+sc4swywmc	//
+sc4swywmd	//
+sc4swywme	//
+sc4swywmf	//
+sc4swywmg	//
+sc4sumit	// Summit Up (Mazooma)
+sc4sumita	//
+sc4sumitb	//
+sc4sumitc	//
 sc4sus		// Suits U Sir (Qps)
+sc4susc		//
+sc4susf		//
+sc4susg		//
+sc4sush		//
+sc4susi		//
+sc4susj		//
+sc4susk		//
 sc4sslam	// Super Slam (Bellfruit)
+sc4sslama	//
 sc4swbak	// Switch Back (Mazooma)
+sc4swbaka	//
+sc4swbakb	//
+sc4swbakc	//
 sc4ttpie	// Take The Piece (Bellfruit)
 sc4ttpiea	//
 sc4ttpieb	//
@@ -13008,6 +13148,13 @@ sc4vivcse	//
 sc4vivcsf	//
 sc4vivcsg	//
 sc4wldjk	// Wild Jackpots (Mazooma)
+sc4wldjka	//
+sc4wldjkb	//
+sc4wldjkc	//
+sc4wldjkd	//
+sc4wldjke	//
+sc4wldjkf	//
+sc4wldjkg	//
 sc4adsnt	// Ant & Dec's Saturday Night Takeaway (Bellfruit)
 sc4adsnta	//
 sc4bpb		// Bully's Prize Board (Bellfruit)
@@ -13017,8 +13164,23 @@ sc4bpbc		//
 sc4bpbd		//
 sc4bpbe		//
 sc4bsp		// Bully's Star Prize (Bellfruit)
+sc4bspa		//
+sc4bspb		//
+sc4bspc		//
+sc4bspd		//
+sc4bspe		//
 sc4chain	// Chain Reaction (Bellfruit)
+sc4chaina	//
+sc4chainb	//
+sc4chainc	//
 sc4clown	// Clown Around (Bellfruit)
+sc4clowna	//
+sc4clownb	//
+sc4clownc	//
+sc4clownd	//
+sc4clowne	//
+sc4clownf	//
+sc4clowng	//
 sc4copsr	// Cops 'n' Robbers (Bellfruit)
 sc4copsra	//
 sc4copsrb	//
@@ -13056,6 +13218,16 @@ sc4mowowh	//
 sc4mowowi	//
 sc4mowowj	//
 sc4nunsm	// Nuns 'n' Roses (Mazooma)
+sc4nunsma	//
+sc4nunsmb	//
+sc4nunsmc	//
+sc4nunsmd	//
+sc4nunsme	//
+sc4nunsmf	//
+sc4nunsmg	//
+sc4nunsmh	//
+sc4nunsmi	//
+sc4nunsmj	//
 sc_unsrt	//
 sc_film		//
 
@@ -13360,7 +13532,7 @@ sc5crsc		// Cops 'n' Robbers Safe Cracker (Bellfruit)
 ad5crsc		// Cops 'n' Robbers Safe Cracker (Bellfruit)
 sc5coro		// Coronation Street (Mazooma)
 sc5count	// Countdown (Bellfruit)
-sc5cf		// Crazy Fruits (Bellfruit)
+sc5czfr		// Crazy Fruits (Bellfruit)
 sc5crnjw	// Crown Jewels (Bellfruit)
 sc5dnd		// Deal Or No Deal (Bellfruit)
 sc5dnda		//
