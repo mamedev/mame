@@ -2411,7 +2411,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x40001f) AM_READ(namcos22_keycus_r) AM_WRITENOP
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
 	AM_RANGE(0x420000, 0x42000f) AM_READNOP AM_WRITENOP /* C139 SCI registers */
-	AM_RANGE(0x430000, 0x430003) AM_WRITENOP /* LEDs? */
+	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r) AM_WRITENOP /* LEDs? */
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READ(namcos22_portbit_r) AM_WRITE(namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
@@ -5711,8 +5711,6 @@ static DRIVER_INIT( cybrcyc )
 static DRIVER_INIT( timecris )
 {
 	namcos22s_init(machine, NAMCOS22_TIME_CRISIS);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x430000, 0x43000f, FUNC(namcos22_gun_r));
 
 	install_130_speedup(machine);
 }
