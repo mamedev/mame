@@ -21,10 +21,6 @@
     - Text layer is (almost?) identical to System 22 & Super System 22.
 
     TODO:
-    - Hook up gun inputs (?) via the 2 serial latches at d00004 and d00006.
-      Works like this: write to d00004, then read d00004 12 times.  Ditto at
-      d00006.  This gives 24 bits of inputs (?) from the I/O board (?) or guns (?)
-
     - There are currently no differences seen between System 23 (Time Crisis 2) and
       Super System 23 (GP500, Final Furlong 2).  These will presumably appear when
       the 3D hardware is emulated.
@@ -984,7 +980,8 @@ Notes:
 #include "machine/nvram.h"
 
 #define S23_BUSCLOCK	(66664460/2)	/* 33MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal */
-#define S23_C352CLOCK	(25992000)		/* 25.992MHz, from 2061 pin 9 */
+#define S23_H8CLOCK		(14745600)
+#define S23_C352CLOCK	(24576000)		/* measured at 25.992MHz from 2061 pin 9 (but that sounds too highpitched) */
 #define S23_VSYNC1		(59.8824)
 #define S23_VSYNC2		(59.915)
 #define S23_HSYNC		(16666150)
@@ -2528,13 +2525,17 @@ static INPUT_PORTS_START( s23 )
 	PORT_START("H8PORT")
 
 	// No idea if start is actually there, but we need buttons to pass error screens
+	// You can go to the pcb test mode by pressing start, and it doesn't crash anymore somehow
+	// Use start1 to select, start1+start2 to exit, up/down to navigate
 	PORT_START("P1")
-	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_START1 )	// P1 A
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_START2 )	// P1 SEL
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0xd07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )	// 0x100 = freeze?
 
 	PORT_START("TC2P0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2576,6 +2577,15 @@ static INPUT_PORTS_START( s23 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( timecrs2 )
+	PORT_INCLUDE( s23 )
+
+	PORT_START("LIGHTX")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(48) PORT_KEYDELTA(4)
+	PORT_START("LIGHTY")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ss23 )
@@ -2719,6 +2729,26 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 	state->m_jvssense = (data & 0x04) ? 0 : 1;
 }
 
+static READ8_HANDLER( s23_gun_r )
+{
+	UINT16 xpos = input_port_read_safe(space->machine(), "LIGHTX", 0) * 640 / 0xff;
+	UINT16 ypos = input_port_read_safe(space->machine(), "LIGHTY", 0) * 240 / 0xff;
+
+	// note: will need angle adjustments for accurate aiming at screen sides
+	switch(offset)
+	{
+		case 0: return xpos&0xff;
+		case 3: return xpos>>8&0xff;
+		case 1: return ypos&0xff;
+		case 4: return ypos>>8&0xff;
+		case 2: return ypos&0xff;
+		case 5: return ypos>>8&0xff;
+		default: break;
+	}
+
+	return 0;
+}
+
 static READ8_HANDLER(iob_r)
 {
 	return space->machine().rand();
@@ -2730,6 +2760,7 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
 	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r )
+	AM_RANGE(0x6002, 0x6003) AM_NOP
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
 	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
@@ -2737,7 +2768,19 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
-// gorgon map
+static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")
+	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r ) AM_WRITENOP
+	AM_RANGE(0x6002, 0x6003) AM_NOP
+	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
+	AM_RANGE(0x6006, 0x6007) AM_NOP
+	AM_RANGE(0x7000, 0x700f) AM_READ( s23_gun_r )
+
+	AM_RANGE(0xc000, 0xf7ff) AM_RAM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( gorgoniobrdmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("RRP0")	  // 0-5 = start
@@ -2847,12 +2890,12 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_CPU_PROGRAM_MAP(gorgon_map)
 	MCFG_CPU_VBLANK_INT("screen", s23_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", H83002, 14745600 )
+	MCFG_CPU_ADD("audiocpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
-	MCFG_CPU_ADD("ioboard", H83334, 14745600 )
+	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( gorgoniobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
@@ -2893,16 +2936,14 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_CPU_PROGRAM_MAP(ss23_map)
 	MCFG_CPU_VBLANK_INT("screen", s23_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", H83002, 14745600 )
+	MCFG_CPU_ADD("audiocpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
-	MCFG_CPU_ADD("ioboard", H83334, 14745600 )
+	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
@@ -2939,12 +2980,10 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_CPU_PROGRAM_MAP(ss23_map)
 	MCFG_CPU_VBLANK_INT("screen", s23_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", H83002, 14745600 )
+	MCFG_CPU_ADD("audiocpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8noiobmap )
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
@@ -2979,7 +3018,7 @@ static MACHINE_CONFIG_DERIVED( ss23io, ss23 )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IO_MAP( s23h8iomap )
 
-	MCFG_CPU_ADD("ioboard", H83334, 14745600 )
+	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 MACHINE_CONFIG_END
@@ -2992,9 +3031,15 @@ static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IO_MAP( s23h8iomap )
 
-	MCFG_CPU_ADD("ioboard", H83334, 14745600 )
+	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( timecrs2, s23 )
+
+	MCFG_CPU_MODIFY("ioboard")
+	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gmen, s23 )
@@ -3886,22 +3931,24 @@ ROM_START( crszonea )
 ROM_END
 
 /* Games */
-GAME( 1997, rapidrvr, 0,      gorgon, gorgon, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, rapidrvr2,rapidrvr,gorgon,gorgon, ss23, ROT0, "Namco", "Rapid River (RD2 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, finlflng, 0,      gorgon, gorgon, ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, downhill, 0,         s23,    s23, ss23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, motoxgo,  0,         s23,    s23, ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, motoxgoa, motoxgo,   s23,    s23, ss23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, timecrs2, 0,         s23,    s23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, timecrs2b,timecrs2,  s23,    s23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1997, timecrs2c,timecrs2, ss23io, ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS4 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1998, panicprk, 0,         s23,    s23, ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1998, gunwars,  0,        gmen,   ss23, ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1998, raceon,   0,        gmen,   ss23, ss23, ROT0, "Namco", "Race On! (RO2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1998, 500gp,    0,        ss23,   ss23, ss23, ROT0, "Namco", "500 GP (5GP3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1999, finfurl2, 0,        gmen,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1999, finfurl2j,finfurl2, gmen,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 2000, crszone,  0,      ss23e2,   ss23, ss23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 2000, crszonea, crszone,ss23e2,   ss23, ss23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 2000, crszoneb, crszone,ss23e2,   ss23, ss23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+#define GAME_FLAGS (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+//    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT, MNTR,  COMPANY, FULLNAME,                         FLAGS
+GAME( 1997, rapidrvr, 0,        gorgon,   gorgon,   ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",		GAME_FLAGS )
+GAME( 1997, rapidrvr2,rapidrvr, gorgon,   gorgon,   ss23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",		GAME_FLAGS )
+GAME( 1997, finlflng, 0,        gorgon,   gorgon,   ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",		GAME_FLAGS )
+GAME( 1997, downhill, 0,        s23,      s23,      ss23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)",	GAME_FLAGS )
+GAME( 1997, motoxgo,  0,        s23,      s23,      ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",		GAME_FLAGS )
+GAME( 1997, motoxgoa, motoxgo,  s23,      s23,      ss23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",		GAME_FLAGS )
+GAME( 1997, timecrs2, 0,        timecrs2, timecrs2, ss23, ROT0, "Namco", "Time Crisis 2 (TSS3 Ver. B)",		GAME_FLAGS )
+GAME( 1997, timecrs2b,timecrs2, timecrs2, timecrs2, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)",		GAME_FLAGS )
+GAME( 1997, timecrs2c,timecrs2, ss23io,   ss23,     ss23, ROT0, "Namco", "Time Crisis 2 (TSS4 Ver. A)",		GAME_FLAGS )
+GAME( 1998, panicprk, 0,        s23,      s23,      ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)",		GAME_FLAGS )
+GAME( 1998, gunwars,  0,        gmen,     ss23,     ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",		GAME_FLAGS )
+GAME( 1998, raceon,   0,        gmen,     ss23,     ss23, ROT0, "Namco", "Race On! (RO2 Ver. A)",			GAME_FLAGS )
+GAME( 1998, 500gp,    0,        ss23,     ss23,     ss23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",			GAME_FLAGS )
+GAME( 1999, finfurl2, 0,        gmen,     ss23,     ss23, ROT0, "Namco", "Final Furlong 2 (World)",			GAME_FLAGS )
+GAME( 1999, finfurl2j,finfurl2, gmen,     ss23,     ss23, ROT0, "Namco", "Final Furlong 2 (Japan)",			GAME_FLAGS )
+GAME( 2000, crszone,  0,        ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)",		GAME_FLAGS )
+GAME( 2000, crszonea, crszone,  ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)",		GAME_FLAGS )
+GAME( 2000, crszoneb, crszone,  ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",		GAME_FLAGS )
 
