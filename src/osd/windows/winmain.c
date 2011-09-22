@@ -866,7 +866,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	info.bmiHeader.biClrUsed = 0;
 	info.bmiHeader.biClrImportant = 0;
 	info.bmiColors[0].rgbBlue = info.bmiColors[0].rgbGreen = info.bmiColors[0].rgbRed = 0x00;
-	//info.bmiColors[1].rgbBlue = info.bmiColors[1].rgbGreen = info.bmiColors[1].rgbRed = 0xff;
+	info.bmiColors[1].rgbBlue = info.bmiColors[1].rgbGreen = info.bmiColors[1].rgbRed = 0xff;
 
 	// create a DIB to render to
 	BYTE *bits;
