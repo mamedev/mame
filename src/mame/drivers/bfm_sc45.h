@@ -1288,17 +1288,97 @@
 	ROM_LOAD( "95008103.bin", 0x0000, 0x100000, CRC(74ec1e6c) SHA1(1636192a63afcb060ee9453d24d7deb3a6776f51) ) \
 	ROM_LOAD( "95008104.bin", 0x0000, 0x100000, CRC(b11bd959) SHA1(1739035495a14fedcbc67b724e7595693425d15f) ) \
 
+#define sc_miljo_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004305.sn1", 0x0000, 0x080000, CRC(1fffefe8) SHA1(e4dd8ee3ac82c598b50fe49afeddf11bcca96581) ) \
+	ROM_LOAD( "95004306.sn2", 0x0000, 0x080000, CRC(afc501d4) SHA1(9a28381a7c1c047d6e7bb70736d2c8308c8911a3) ) \
+
+#define sc_milja_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004305.sn1", 0x0000, 0x080000, CRC(1fffefe8) SHA1(e4dd8ee3ac82c598b50fe49afeddf11bcca96581) ) \
+	ROM_LOAD( "95004306.sn2", 0x0000, 0x080000, CRC(afc501d4) SHA1(9a28381a7c1c047d6e7bb70736d2c8308c8911a3) ) \
+
+#define sc_mbags_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_mgr_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008212.bin", 0x0000, 0x100000, CRC(1d0fffb3) SHA1(da7e10479b1ba9e67af94feaa20702bae687168f) ) \
+	ROM_LOAD( "snd_mgo.p1", 0x0000, 0x100000, CRC(b2f8dd11) SHA1(2db747a0c422d7dd18972f80ba94570c69564c9b) ) \
+
+#define sc_mspid_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008278.bin", 0x0000, 0x100000, CRC(8fc20733) SHA1(6ede5578fa11cb3322291958d6e1ef8f6cd99da0) ) \
+
 #define sc_msclb_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008191.bin", 0x0000, 0x100000, CRC(4d392e0c) SHA1(798ba07fdb0bebe5367f58b1e13226827153e0e8) ) \
+
+#define sc_mtb_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "mtb_snd1.bin", 0x0000, 0x080000, CRC(4abca575) SHA1(8f0e3fd169cbf0876368dac335bf81ab0601c923) ) \
+	ROM_LOAD( "mtb_snd2.bin", 0x0000, 0x080000, CRC(034a49dc) SHA1(aac70d867856f13f5948e81ed3ca7f2746edf134) ) \
+
+#define sc_mtbcl_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008009.lo", 0x00001, 0x100000, CRC(b9334137) SHA1(e7481688e18b56bddee4a2eff219f83ac5180082) ) \
+	ROM_LOAD( "95008010.hi", 0x00000, 0x100000, CRC(cb197b7e) SHA1(56fb416a98bc2875df11024518babf4a07418a79) ) \
+
+#define sc_m2m_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_magci_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008480.bin", 0x0000, 0x0c4846, CRC(025a1417) SHA1(6f522e71b4707829c98f77551f7cd4f2910f15b5) ) \
+
+#define sc_magic_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008340.bin", 0x0000, 0x0ff5d7, CRC(1371b0d9) SHA1(aa8c23a86cbd5e8274bb035c1132da11d71fd2f8) ) \
+
+#define sc_maxim_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008151.bin", 0x0000, 0x184af2, CRC(775d8471) SHA1(d784e25f52e6df18da9eabf93e6b50de5217c374) ) \
+
+#define sc_maxcc_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 
 #define sc_monob_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008359.bin", 0x0000, 0x0e89fa, CRC(763e4367) SHA1(c44b70f8336c2d6c00cd0dde9b6ca014667c59a6) ) \
 	ROM_LOAD( "monopoly95008359_sound1.bin", 0x0000, 0x100000, CRC(93f005f2) SHA1(d2351982d6352d9793efac617ac9fb9569f229c6) ) \
 
+#define sc_monod_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_mou_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008364.bin", 0x0000, 0x0e98ac, CRC(47aae23d) SHA1(0964a4f68c3688ebd65daf317b17e1341fcd3ceb) ) \
+
+#define sc_nmtj_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008472.bin", 0x0000, 0x0fe798, CRC(a522157a) SHA1(f1fea963579cb8caddd5fcbfa36e33dc35c6e2a0) ) \
+
+#define sc_mclb_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_mdlx_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008514.bin", 0x0000, 0x0ed840, CRC(2608cbde) SHA1(4831570fbc825592781e6473173d6ec911a0054d) ) \
+
+#define sc_mwwcl_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_mont_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004314.bin", 0x0000, 0x0ccf04, CRC(0faba601) SHA1(1f21e39c2a9a18dd74292e68456c725ec2631aac) ) /* lotech sounds? */ \
+
 #define sc_motor_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_nudit_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95404303.bin", 0x000000, 0x080000, CRC(adb71c93) SHA1(e91165b0280da9f79415b1cd7bb2ff8c1ea974fe) ) \
+	ROM_LOAD( "95404304.bin", 0x080000, 0x080000, CRC(96190422) SHA1(0e3192d959f1ea4296474684f04847c50a983400) ) \
 
 #define sc_pen1_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -1308,13 +1388,92 @@
 	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "pbemydot", 0x0000, 0x010000, CRC(b056d3d4) SHA1(6c1dbc6fcb4761c25f9cc8123e9f0fe791488c19) ) /* DMD rom? Possibly SC2 DM01 */ \
 
+#define sc_oyf_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008301.bin", 0x0000, 0x100000, CRC(0e042883) SHA1(2e73e5a49bcc525edfddf56e0d4ef5137116eec2) ) \
+
+#define sc_opses_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008211.bin", 0x0000, 0x100000, CRC(535fbad0) SHA1(25804a47e20dcfe364f49195da0ab057bce31266) ) \
+
+#define sc_outlw_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_party_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008113.bin", 0x0000, 0x100000, CRC(7e54f87c) SHA1(b64e4da7c088ba2f328d6adcfd0a3824d98a5f31) ) \
+	ROM_LOAD( "95008114.bin", 0x0000, 0x100000, CRC(594fef43) SHA1(8549d372ffb0194823afc11992d8a16f6caed2ff) ) \
+
+#define sc_paytm_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004224.sn1", 0x0000, 0x080000, CRC(74382d29) SHA1(bd0323b7208e9b03e2d8468f7d4603fb4a3fe394) ) \
+	ROM_LOAD( "95004225.sn2", 0x0000, 0x080000, CRC(23efa88d) SHA1(af52ec3dcb45a2ea26eaa273c783134402105168) ) \
+
+#define sc_pgold_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004316.snd", 0x0000, 0x080000, CRC(94a9ec9c) SHA1(bab1a431e2857b9db9fa3f3ef28f150e19c4ae50) ) /* casino */ \
+	ROM_LOAD( "95008141.bin", 0x0000, 0x100000, CRC(e1b214dc) SHA1(811f6ec42961496f8cd9fb3434ab6a07457ca61a) ) \
+	ROM_LOAD( "95008142.bin", 0x0000, 0x100000, CRC(faa84d52) SHA1(f5139df5e9ff95fab3c01ac2b1aa44b1d939bf7a) ) \
+
+#define sc_ppclb_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008934.bin", 0x0000, 0x100000, CRC(87290522) SHA1(27deddd66b0ac9a0f4fe526f0eda7f6b2e73a8b6) ) \
+	ROM_LOAD( "95008935.bin", 0x0000, 0x100000, CRC(7517053c) SHA1(d83019c52b8c78539359e9277864717c76fae0ce) ) \
+
+#define sc_pipe_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "pipingsnd.bin", 0x0000, 0x0c50d9, CRC(ff240faa) SHA1(f0961b3207c0c8779479c773d1453ac4ff376bd2) ) \
+
+#define sc_plumb_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008430.bin", 0x0000, 0x0c690f, CRC(29059625) SHA1(4e46f794726b778e03f67ab3ec3cd4cb71be0b64) ) \
+
+#define sc_pwcrz_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
 #define sc_ibiza_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+
+#define sc_quart_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_redad_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004266.snd", 0x0000, 0x080000, CRC(457fffbf) SHA1(ede2adc836ba4904cdf3d1ed825f9128c27b2b58) ) \
+
+#define sc_redal_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004266.snd", 0x0000, 0x080000, CRC(457fffbf) SHA1(ede2adc836ba4904cdf3d1ed825f9128c27b2b58) ) \
+
+#define sc_rio_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004309.snd", 0x0000, 0x080000, CRC(60eb25fc) SHA1(66f3ac8bc1be99eda07c71f63ebc818014ef7800) ) \
+
+#define sc_rvlnx_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004320.snd", 0x0000, 0x080000, CRC(b20c0557) SHA1(f61df4a80751571caf4d44add753b5477c13b7f0) ) \
+
+#define sc_rvl_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004259.sn1", 0x0000, 0x080000, CRC(c26ed994) SHA1(da336ab76c1c148906c734d7239b2b83a05ec083) ) \
+	ROM_LOAD( "95004260.sn2", 0x0000, 0x080000, CRC(1a32d1bd) SHA1(e88ba7b8b353ea168a689e1d2be8c753a56f8f1d) ) \
+
+#define sc_rogds_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008256.bin", 0x0000, 0x0fafa4, CRC(6d70436f) SHA1(adf7d18d9fcbb216ee461183951c1ab2972b8ef7) ) \
+
+#define sc_rmo_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 
 #define sc_royle_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008207.bin", 0x000000, 0x100000, CRC(269f845f) SHA1(eaddeaebdafd3f237b6af5c3539da407a6782210) ) \
 	ROM_LOAD( "95008208.bin", 0x100000, 0x100000, CRC(07d4d9fa) SHA1(841fead29de19da0436f937614de50e1f07ebc8b) ) \
+
+#define sc_rbank_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008233.bin", 0x000000, 0x100000, CRC(ebdb6017) SHA1(ca723483f6a7ae6512fa4abc4437c1f8eb606784) ) \
+	ROM_LOAD( "95008234.bin", 0x100000, 0x100000, CRC(4b7ac02a) SHA1(29c51906e5ca1e0c9c70db86e3a24f08be06b7e0) ) \
 
 #define sc_pstat_others \
 	ROM_REGION( 0x100000, "ymz", 0 ) \
@@ -1325,18 +1484,56 @@
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008416.bin", 0x0000, 0x0fe66d, CRC(9ae69b6a) SHA1(7bb94d7c941c64c1ea53e391b3f66a6e1b483417) ) \
 
+#define sc_sidsp_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008369.bin", 0x0000, 0x100000, CRC(76ea0074) SHA1(6cc4f320d8e331477569dfc7e961afd30a4ce7b2) ) \
+
 #define sc_stl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "sk_t_lim.sn1", 0x0000, 0x080000, CRC(1b88bf7d) SHA1(76a8453fd2f8375030f69a3a569b45daceb3e4f7) ) /*Need testing*/ \
 	ROM_LOAD( "sk_t_lim.sn2", 0x0000, 0x080000, CRC(b3ecf658) SHA1(bf4ce85a3662df6dacfa42e3b4f9dfd6bba43b24) ) \
 
+#define sc_sbust_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008255.bin", 0x0000, 0x0d55db, CRC(feef5ac9) SHA1(83b7de3bd3a1fa3f5ae17f102cc54467d564740f) ) \
+
+#define sc_strbr_others \
+	ROM_REGION( 0x400000, "unk", ROMREGION_ERASE00 ) \
+	/* this looks encrypted, or like samples.. I don't think it belongs here, check */ \
+	ROM_LOAD16_BYTE( "sbar713.bin", 0x0000, 0x010000, CRC(c7e26d6e) SHA1(1e270d4f5de92083f54cc3fe246b2bc1d2f441b3) ) \
+	ROM_LOAD16_BYTE( "sbar714.bin", 0x0000, 0x010000, CRC(57dbca5f) SHA1(22a6fcf1e11dd9ba2b3f73cd7520e2b4a740a893) ) \
+	ROM_LOAD16_BYTE( "sbar715.bin", 0x0000, 0x010000, CRC(e9192085) SHA1(a030e81f54338bcb8667c59bad9a6b35a41bbd9f) ) \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004290.snd", 0x0000, 0x080000, CRC(488972c2) SHA1(4cd9bbb6df0fbaf9b8dd93294046c71c82bf4b5b) ) \
+
+#define sc_strx_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008247.bin", 0x0000, 0x100000, CRC(0817596f) SHA1(250db171d1f7893883ffbcfdd3fd3f6e62524bdc) ) \
+
+#define sc_s6c_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95004095.p1", 0x000000, 0x080000, CRC(d9d7b876) SHA1(fdd9b5f07665b7b7edd198e00d3b005b32d1609c) ) \
+	ROM_LOAD( "95004096.p1", 0x080000, 0x080000, CRC(fb8e103f) SHA1(fd8e2c8ae1e459f7426aa6b5de20f91dfae7bec9) ) \
+
 #define sc_sdr_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
+#define sc_slc_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008412.bin", 0x0000, 0x100000, CRC(197edb63) SHA1(f1851029f6870d41d6aaf2df0a49fc54f5c79e4c) ) \
 
 #define sc_spark_others \
 	ROM_REGION( 0x200000, "ymz", 0 ) \
 	ROM_LOAD( "95008031.bin", 0x000000, 0x100000, CRC(445d3cf7) SHA1(ded74e46b4fb4ef405eb74027a63d301efce1f45) ) \
 	ROM_LOAD( "95008032.bin", 0x100000, 0x0fd082, CRC(88781139) SHA1(e8e972032664c314f5263d7acb5a3f0769c7fb2a) ) \
+
+#define sc_taekw_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008283.bin", 0x0000, 0x0fd772, CRC(59a3924c) SHA1(ceba9236db0b26eb79feabc9564eb6dec10c4ab9) ) \
+
+#define sc_tbana_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008229.bin", 0x0000, 0x100000, CRC(003f9c3d) SHA1(38ea111096e84e77e727fb784992b525767f5b0c) ) \
 
 #define sc_ticlb_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -1346,10 +1543,21 @@
 	ROM_REGION( 0x400000, "others", 0 ) \
 	ROM_LOAD( "club-treasure-island_mtx_ass.bin", 0x0000, 0x010000, CRC(74f97b29) SHA1(9334bf1e4b4e2bcbbfaa5ae32201ceaab0641d83) ) /* DMD */ \
 
+#define sc_tri7_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008308.bin", 0x0000, 0x100000, CRC(87a25bc3) SHA1(bf3d6b86f8f217131c33b681787f4a6fe84b8b8d) ) \
+
+#define sc_tfclb_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008043.bin", 0x0000, 0x100000, CRC(b168cec4) SHA1(42b891ba918c7063420688c99dc72609801a1987) ) \
+	ROM_LOAD( "95008044.bin", 0x0000, 0x100000, CRC(6074fa77) SHA1(1d4fa88a7ba2b020042ef3681e0f8eb732705d55) ) \
 
 #define sc_trist_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008499.bin", 0x0000, 0x0efbd7, CRC(90710d1f) SHA1(923f6396941b713d3f55bb002c36b0e42063ae4d) ) \
+
+#define sc_ufi_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 
 #define sc_winsp_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
