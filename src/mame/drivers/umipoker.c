@@ -7,7 +7,6 @@
 	Additional work by Roberto Fresca.
 
     TODO:
-    - Slot Poker Saiyuki DIP switches.
     - Fix clocks;
 
     TMP68HC000-16 + z80 + YM3812 + OKI6295
