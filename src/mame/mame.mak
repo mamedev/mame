@@ -2101,6 +2101,8 @@ $(DRIVERS)/tx1.o:	$(LAYOUT)/buggybjr.lh \
 			$(LAYOUT)/buggyboy.lh \
 			$(LAYOUT)/tx1.lh
 
+$(DRIVERS)/umipoker.o:	$(LAYOUT)/saiyukip.lh
+
 $(DRIVERS)/undrfire.o:	$(LAYOUT)/cbombers.lh
 
 $(DRIVERS)/vicdual.o:	$(LAYOUT)/depthch.lh
