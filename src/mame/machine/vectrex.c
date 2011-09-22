@@ -360,9 +360,11 @@ DRIVER_INIT(vectrex)
 		state->m_imager_colors[i] = RGB_WHITE;
 
 	/*
-     * Uninitialized RAM needs to return 0xff. Otherwise the mines in
-     * the first level of Minestorm are not evenly distributed.
+     * Minestorm's PRNG doesn't work with a 0 seed (mines in the first
+     * level are not randomly distributed then). Only patch the seed's
+     * location since initializing all RAM randomly causes problems
+     * with Berzerk.
      */
-
-	memset(state->m_gce_vectorram, 0xff, state->m_gce_vectorram_size);
+	state->m_gce_vectorram[0x7e] = machine.rand() | 1;
+	state->m_gce_vectorram[0x7f] = machine.rand() | 1;
 }
