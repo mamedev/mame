@@ -735,15 +735,15 @@ void h63484_device::command_cpy_exec()
 void h63484_device::command_rct_exec()
 {
 	INT16 dX, dY;
-	UINT8 area,col,opm;
+	UINT8 col; //, area, opm;
 	UINT32 offset;
 	int inc_x,inc_y;
 	int i;
 	UINT8 res,data_r;
 
-	area = (m_cr & 0xe0) >> 5;
+//	area = (m_cr & 0xe0) >> 5;
 	col = (m_cr & 0x18) >> 3;
-	opm = (m_cr & 0x07);
+//	opm = (m_cr & 0x07);
 	dX = m_pr[0];
 	dY = m_pr[1];
 
