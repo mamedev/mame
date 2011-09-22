@@ -2600,15 +2600,15 @@ cleanup:
 static void console_recompute_children(debugwin_info *info)
 {
 	RECT parent, regrect, disrect, conrect, editrect;
-	UINT32 regchars, dischars, conchars;
+	UINT32 regchars;//, dischars, conchars;
 
 	// get the parent's dimensions
 	GetClientRect(info->wnd, &parent);
 
 	// get the total width of all three children
-	dischars = info->view[0].view->total_size().x;
+	//dischars = info->view[0].view->total_size().x;
 	regchars = main_console_regwidth;
-	conchars = info->view[2].view->total_size().x;
+	//conchars = info->view[2].view->total_size().x;
 
 	// registers always get their desired width, and span the entire height
 	regrect.top = parent.top + EDGE_WIDTH;

@@ -164,6 +164,7 @@ void winvideo_monitor_refresh(win_monitor_info *monitor)
 	monitor->info.cbSize = sizeof(monitor->info);
 	result = GetMonitorInfo(monitor->handle, (LPMONITORINFO)&monitor->info);
 	assert(result);
+	result++; // to silence gcc 4.6
 }
 
 
@@ -272,6 +273,7 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	info.cbSize = sizeof(info);
 	result = GetMonitorInfo(handle, (LPMONITORINFO)&info);
 	assert(result);
+	result++; // to silence gcc 4.6
 
 	// allocate a new monitor info
 	monitor = global_alloc_clear(win_monitor_info);

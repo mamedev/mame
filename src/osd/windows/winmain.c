@@ -866,7 +866,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	info.bmiHeader.biClrUsed = 0;
 	info.bmiHeader.biClrImportant = 0;
 	info.bmiColors[0].rgbBlue = info.bmiColors[0].rgbGreen = info.bmiColors[0].rgbRed = 0x00;
-	info.bmiColors[1].rgbBlue = info.bmiColors[1].rgbGreen = info.bmiColors[1].rgbRed = 0xff;
+	//info.bmiColors[1].rgbBlue = info.bmiColors[1].rgbGreen = info.bmiColors[1].rgbRed = 0xff;
 
 	// create a DIB to render to
 	BYTE *bits;
@@ -1364,7 +1364,7 @@ const char *symbol_manager::symbol_for_address(FPTR address)
 bool symbol_manager::query_system_for_address(FPTR address)
 {
 	// need at least the sym_from_addr API
-	if (m_sym_from_addr == NULL)
+	if (!m_sym_from_addr)
 		return false;
 
 	BYTE info_buffer[sizeof(SYMBOL_INFO) + 256] = { 0 };
@@ -1379,7 +1379,7 @@ bool symbol_manager::query_system_for_address(FPTR address)
 		// try to get source info as well; again we are returned an ANSI string
 		IMAGEHLP_LINE64 lineinfo = { sizeof(lineinfo) };
 		DWORD linedisp;
-		if (m_sym_get_line_from_addr_64 != NULL && (*m_sym_get_line_from_addr_64)(m_process, address, &linedisp, &lineinfo))
+		if (m_sym_get_line_from_addr_64 && (*m_sym_get_line_from_addr_64)(m_process, address, &linedisp, &lineinfo))
 			format_symbol(info.Name, displacement, lineinfo.FileName, lineinfo.LineNumber);
 		else
 			format_symbol(info.Name, displacement);
@@ -1428,7 +1428,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 	while (fgets(line, sizeof(line) - 1, srcfile))
 	{
 		// parse the line looking for an interesting symbol
-		FPTR addr;
+		FPTR addr = 0;
 		bool valid = is_symfile ? parse_sym_line(line, addr, symbol) : parse_map_line(line, addr, symbol);
 
 		// if we got one, see if this is the best
@@ -1611,7 +1611,7 @@ FPTR symbol_manager::get_text_section_base()
 	assert(base != NULL);
 
 	// make sure we have the functions we need
-	if (image_nt_header != NULL && image_rva_to_section != NULL)
+	if (image_nt_header && image_rva_to_section)
 	{
 		// get the NT header
 		PIMAGE_NT_HEADERS headers = (*image_nt_header)(base);
