@@ -456,14 +456,16 @@ static DRIVER_INIT( gunbalna )
 static DRIVER_INIT( chocovdr )
 {
 	memn_driver_init(machine);
-	decrypt_bios( machine, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
+//	NOTE: none of the possible permutations show the Sony Computer Entertainment string at BIOS[0x84], very likely a bad dump
+//                                             BAD? 0 or 9                             1 or 8         0 or 9
+//	                       ok!  ok!  ok!  ok!            ok!  ok!  ok!  ok!  ok!  ok!       ok!  ok!
+	decrypt_bios( machine, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9 );
 }
 
 static DRIVER_INIT( panikuru )
 {
 	memn_driver_init(machine);
-	/* TODO */
-	//decrypt_bios( machine, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
+	decrypt_bios( machine, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa );
 }
 
 
@@ -619,7 +621,7 @@ ROM_START( chocovdr )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION( 0x5280000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(f265b1b6) SHA1(f327e7bac0bc1bd31aa3362e36233130a6b240ea) )
+	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, BAD_DUMP CRC(f265b1b6) SHA1(f327e7bac0bc1bd31aa3362e36233130a6b240ea) )
 	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(05d01cd2) SHA1(e9947ebea24d618e8b9a69f582ef0b9d97bb4cad) )
 	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(2e308d20) SHA1(4ff072f0d488b12f77ef7d119822f89b5b5a6712) )
 	ROM_LOAD( "3.7d",         0x3180000, 0x1080000, CRC(126c9e6f) SHA1(32de87f01fd1c8c26a68bf42a062f5f44bcc5a3b) )
