@@ -2,7 +2,7 @@
 
     deprecat.h
 
-    Definition of derprecated and obsolte constructs that should not
+    Definition of deprecated and obsolete constructs that should not
     be used by new code, if at all possible.
 
     Copyright Nicola Salmoria and the MAME Team.
