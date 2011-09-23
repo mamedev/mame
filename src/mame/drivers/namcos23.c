@@ -2532,7 +2532,7 @@ static INPUT_PORTS_START( s23 )
 	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_START2 )	// P1 SEL
 	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0xd07, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xd37, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )	// 0x100 = freeze?
@@ -2553,9 +2553,7 @@ static INPUT_PORTS_START( s23 )
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, "Skip POST" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2599,7 +2597,7 @@ static INPUT_PORTS_START( ss23 )
 	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0xd07, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xd37, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2620,9 +2618,7 @@ static INPUT_PORTS_START( ss23 )
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, "Skip POST" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2731,18 +2727,18 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 
 static READ8_HANDLER( s23_gun_r )
 {
-	UINT16 xpos = input_port_read_safe(space->machine(), "LIGHTX", 0) * 640 / 0xff;
-	UINT16 ypos = input_port_read_safe(space->machine(), "LIGHTY", 0) * 240 / 0xff;
+	UINT16 xpos = input_port_read_safe(space->machine(), "LIGHTX", 0) * 640 / 0xff + 0x80;
+	UINT16 ypos = input_port_read_safe(space->machine(), "LIGHTY", 0) * 240 / 0xff + 0x20;
 
 	// note: will need angle adjustments for accurate aiming at screen sides
 	switch(offset)
 	{
 		case 0: return xpos&0xff;
-		case 3: return xpos>>8&0xff;
+		case 3: return xpos>>8;
 		case 1: return ypos&0xff;
-		case 4: return ypos>>8&0xff;
+		case 4: return ypos>>8;
 		case 2: return ypos&0xff;
-		case 5: return ypos>>8&0xff;
+		case 5: return ypos>>8;
 		default: break;
 	}
 
@@ -2942,6 +2938,8 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
@@ -2982,6 +2980,8 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_CPU_IO_MAP( s23h8noiobmap )
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
@@ -3010,16 +3010,6 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ss23io, ss23 )
-
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_IO_MAP( s23h8iomap )
-
-	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -3037,6 +3027,16 @@ static MACHINE_CONFIG_DERIVED( timecrs2, s23 )
 
 	MCFG_CPU_MODIFY("ioboard")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( timecrs2c, ss23 )
+
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_IO_MAP( s23h8iomap )
+
+	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
+	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
+	MCFG_CPU_IO_MAP( s23iobrdiomap )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gmen, s23 )
@@ -3938,7 +3938,7 @@ GAME( 1997, motoxgo,  0,        s23,      s23,      ss23, ROT0, "Namco", "Motocr
 GAME( 1997, motoxgoa, motoxgo,  s23,      s23,      ss23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",		GAME_FLAGS )
 GAME( 1997, timecrs2, 0,        timecrs2, timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS3 Ver. B)",	GAME_FLAGS )
 GAME( 1997, timecrs2b,timecrs2, timecrs2, timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS2 Ver. B)",	GAME_FLAGS )
-GAME( 1997, timecrs2c,timecrs2, ss23io,   ss23,     ss23, ROT0, "Namco", "Time Crisis II (TSS4 Ver. A)",	GAME_FLAGS )
+GAME( 1997, timecrs2c,timecrs2, timecrs2c,timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS4 Ver. A)",	GAME_FLAGS )
 GAME( 1998, panicprk, 0,        s23,      s23,      ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)",		GAME_FLAGS )
 GAME( 1998, gunwars,  0,        gmen,     ss23,     ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",		GAME_FLAGS )
 GAME( 1998, raceon,   0,        gmen,     ss23,     ss23, ROT0, "Namco", "Race On! (RO2 Ver. A)",			GAME_FLAGS )
