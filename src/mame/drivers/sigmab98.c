@@ -80,7 +80,6 @@ To Do:
   This can be achieved using either pen 0 or ff as background color, but messes up the other games.
 - pyenaget intro: when the theater scrolls out to the left, the train should scroll in from the right,
   with no visible gaps. It currently leaves the screen empty instead, for several seconds.
-- pepsiman: sometimes a spurious "0408" error pops up at boot/reset
 
 Notes:
 
@@ -1482,7 +1481,7 @@ static INPUT_PORTS_START( gegege )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_VBLANK  )	// protection? checks. Must be 0
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1520,7 +1519,7 @@ static INPUT_PORTS_START( pepsiman )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_VBLANK  )	// protection? checks. Must be 0
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1541,6 +1540,44 @@ static INPUT_PORTS_START( pepsiman )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )	// pay out / enter in test menu
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
+/***************************************************************************
+                             Uchuu Tokkyuu Medalian
+***************************************************************************/
+
+static INPUT_PORTS_START( ucytokyu )
+
+	PORT_START("EEPROM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_VBLANK  )	// protection? checks. Must be 0
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(10)	// ? (coin error, pulses mask 4 of port c6)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(10) PORT_NAME("Medal")	// coin/medal in (coin error)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_1)	// bet / enter in test menu
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )	// pay out / back in test menu
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1886,14 +1923,12 @@ static DRIVER_INIT( gegege )
 	UINT8 *rom = machine.region("maincpu")->base();
 
 	// Protection?
-	rom[0xbd3] = 0x18;
-	rom[0xbd4] = 0x14;
+	rom[0x0bdd] = 0xc9;
 
-	rom[0xbef] = 0x18;
-	rom[0xbf0] = 0x14;
+	rom[0x0bf9] = 0xc9;
 
-	rom[0xdec] = 0x00;
-	rom[0xded] = 0x00;
+	rom[0x0dec] = 0x00;
+	rom[0x0ded] = 0x00;
 
 	// EEPROM timing checks
 	rom[0x8138] = 0x00;
@@ -1937,14 +1972,63 @@ static DRIVER_INIT( pepsiman )
 	UINT8 *rom = machine.region("maincpu")->base();
 
 	// Protection?
-	rom[0x580] = 0x18;
-	rom[0x581] = 0x14;
+	rom[0x058a] = 0xc9;
 
-	rom[0x59c] = 0x18;
-	rom[0x59d] = 0x14;
+	rom[0x05a6] = 0xc9;
 
 	rom[0xa00e] = 0x00;
 	rom[0xa00f] = 0x00;
+
+	// EEPROM timing checks
+	rom[0x8138] = 0x00;
+	rom[0x8139] = 0x00;
+
+	rom[0x8164] = 0x00;
+	rom[0x8165] = 0x00;
+
+	// ROM banks
+	memory_configure_bank(machine, "rombank", 0, 0x18, rom + 0x8000, 0x1000);
+	memory_set_bank(machine, "rombank", 0);
+
+	// RAM banks
+	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x800 * 2);
+
+	memory_configure_bank(machine, "rambank", 0, 2, bankedram, 0x800);
+	memory_set_bank(machine, "rambank", 0);
+}
+
+
+/***************************************************************************
+
+  Uchuu Tokkyuu Medalian
+
+***************************************************************************/
+
+ROM_START( ucytokyu )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "b9809-1.ic7", 0x00000, 0x20000, CRC(5be6adff) SHA1(7248157111be2ae23df7d51f5d071cc3b9fd79b4) )
+
+	ROM_REGION( 0x180000, "sprites", 0 )
+	ROM_LOAD( "b9809-2.ic12", 0x000000, 0x80000, CRC(18f342b3) SHA1(09d62bb3597259e0fbae2c0f4ed163685a4a9dd9) )
+	ROM_LOAD( "b9809-3.ic13", 0x080000, 0x80000, CRC(88a2a52a) SHA1(0dd10d4fa88d1a54150729026495a70dbe67bae0) )
+	ROM_LOAD( "b9809-4.ic17", 0x100000, 0x80000, CRC(ea74eacd) SHA1(279fa1d2bc7bfafbafecd0e0758a47345ca95140) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "b9809-5.ic16", 0x00000, 0x80000, CRC(470006e6) SHA1(34c82fae7364eb5288de5c8128d72d7e5772c526) )
+	ROM_LOAD( "b9809-6.ic26", 0x80000, 0x80000, CRC(4e2d5fdf) SHA1(af1357b0f6a407890ecad26a18d2b4e223802693) )
+ROM_END
+
+static DRIVER_INIT( ucytokyu )
+{
+	UINT8 *rom = machine.region("maincpu")->base();
+
+	// Protection?
+	rom[0x0bfa] = 0xc9;
+
+	rom[0x0c16] = 0xc9;
+
+	rom[0xa43a] = 0x00;
+	rom[0xa43b] = 0x00;
 
 	// EEPROM timing checks
 	rom[0x8138] = 0x00;
@@ -2221,7 +2305,8 @@ static DRIVER_INIT( haekaka )
 ***************************************************************************/
 
 GAME( 1997, gegege,   0,        gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0 )
-GAME( 1997, pepsiman, 0,        gegege,   pepsiman, pepsiman, ROT0, "Sigma",             "PEPSI Man", 0 )
+GAME( 1997, pepsiman, 0,        gegege,   pepsiman, pepsiman, ROT0, "Sigma",             "PEPSI Man",                     0 )
+GAME( 1997, ucytokyu, 0,        gegege,   ucytokyu, ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",        0 )	// Banpresto + others in the ROM
 // Sammy Medal Games:
 GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, 0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",  GAME_IS_BIOS_ROOT )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  0 )
