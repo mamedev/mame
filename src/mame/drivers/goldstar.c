@@ -5605,6 +5605,34 @@ static GFXDECODE_START( pkrmast )
 GFXDECODE_END
 
 
+static const gfx_layout cm97_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 8,12,0,4,24,28, 16,20 },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32 },
+	8*32
+};
+
+static const gfx_layout cm97_layout32 =
+	{
+	8,32,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 8,12,0,4,24,28, 16,20 },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32,14*32,15*32,16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32,24*32,25*32,26*32,27*32,28*32,29*32,30*32,31*32 },
+	32*32
+};
+
+static GFXDECODE_START( cm97 )
+	GFXDECODE_ENTRY( "gfx", 0, cm97_layout,   0x0, 32 )
+	GFXDECODE_ENTRY( "gfx", 0, cm97_layout32, 0x0, 32 )
+GFXDECODE_END
+
+
 
 /*************************************
 *      PPI 8255 (x3) Interfaces      *
@@ -6708,6 +6736,13 @@ static MACHINE_CONFIG_DERIVED( cherrys, ncb3 )
 	MCFG_GFXDECODE(cherrys)
 
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( cm97, ncb3 )
+	MCFG_GFXDECODE(cm97)
+
+MACHINE_CONFIG_END
+
+
 
 // hw unknown
 static MACHINE_CONFIG_START( pkrmast, goldstar_state )
@@ -9959,6 +9994,21 @@ ROM_START( unkch4 )  // all roms unique
 ROM_END
 
 
+ROM_START( cmast97 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "c97.f10", 0x00000, 0x10000, CRC(1416439f) SHA1(a1e44e5dc67dfb74c5651a5f9da822a9e6c7df6f) )
+
+	ROM_REGION( 0x080000, "gfx", 0 )
+	ROM_LOAD( "c97.d9", 0x000000, 0x80000, CRC(c2c14738) SHA1(dd378cb77a7214ffe5fd9ba1dcbc54f6802b0e41) )
+
+	ROM_REGION( 0x200, "proms", 0 ) // bad decoded
+	ROM_LOAD( "82s135.c8",  0x000, 0x100, CRC(4b715969) SHA1(9429dc8698f4ff9195e5e975e62546b7b7e2f856) )
+	ROM_LOAD( "82s135.c9",  0x100, 0x100, CRC(85883486) SHA1(adcee60f6fc1e8a75c529951df9e5e1ee277e131) )
+ROM_END
+
+
+/*********************************************************************************************************************/
+
 static DRIVER_INIT(goldstar)
 {
 	int A;
@@ -10619,7 +10669,9 @@ GAME(  199?, cb3a,      ncb3,     ncb3,     cb3a,     0,         ROT0, "Dyna",  
 GAME(  199?, cb3,       ncb3,     ncb3,     ncb3,     cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
 GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3,     cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",           0 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)", GAME_NOT_WORKING)
-GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)", GAME_NOT_WORKING) // fix prom decode
+GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",  GAME_NOT_WORKING) // fix prom decode
+
+GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  0,         ROT0, "Dyna",              "Cherry Master '97",         GAME_NOT_WORKING) // fix prom decode
 
 // looks like a hack of Cherry Bonus 3
 GAME(  199?, chryangl,  ncb3,     cm,       cmasterb, cmv4,      ROT0, "<unknown>",              "Cherry Angel",         GAME_NOT_WORKING )
