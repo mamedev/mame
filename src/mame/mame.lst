@@ -11708,7 +11708,23 @@ sc4pstato	//
 sc4pstatp	//
 sc4pstatq	//
 sc4cvani	// Cashvania (Qps)
+sc4cvania	//
+sc4cvanib	//
+sc4cvanic	//
+sc4cvanid	//
+sc4cvanie	//
+sc4cvanif	//
+sc4cvanig	//
+sc4cvanih	//
+sc4cvanii	//
 sc4cvclb	// Cashvania Club (Qps)
+sc4cvclba	//
+sc4cvclbb	//
+sc4cvclbc	//
+sc4cvclbd	//
+sc4cvclbe	//
+sc4cvclbf	//
+sc4cvclbg	//
 sc4spark	// South Park (BFM)
 sc4sparka	//
 sc4sparkb	//
@@ -11716,6 +11732,9 @@ sc4sparkc	//
 sc4sparkd	//
 sc4sparke	//
 sc4brkfs	// The Big Breakfast (BFM)
+sc4brkfsa	//
+sc4brkfsb	//
+sc4brkfsc	//
 sc4gslam	// Grandslam Club (BFM)
 sc4gslama	//
 sc4gslamb	//
@@ -11731,9 +11750,19 @@ sc4abrac	//
 sc4abrad	//
 sc4abrae	//
 sc4acesh	// Aces High (Mazooma)
+sc4acesha	//
+sc4aceshb	//
+sc4aceshc	//
 sc4adren	// Adrenalin (Mazooma)
+sc4adrena	//
+sc4adrenb	//
+sc4adrenc	//
 sc4alad		// Aladdin's Cave (Mazooma)
+sc4alada	//
 sc4a40cl	// Around The Board In 40 Days Club (Mazooma)
+sc4a40cla	//
+sc4a40clb	//
+sc4a40clc	//
 sc4aztec	// Aztec (Bellfruit)
 sc4azteca	//
 sc4botn		// Back Of The Net (Qps)
@@ -11751,9 +11780,21 @@ sc4bedc		//
 sc4bedd		//
 sc4bede		//
 sc4bedcl	// Bedazzled Club (Mazooma)
+sc4bedcla	//
+sc4bedclb	//
+sc4bedclc	//
+sc4bedcld	//
 sc4bblas	// Big Blaster (Mazooma)
+sc4bblasa	//
+sc4bblasb	//
+sc4bblasc	//
+sc4bblasd	//
+sc4bblase	//
+sc4bblasf	//
 sc4bigdl	// Big Deal (Qps)
+sc4bigdla	//
 sc4bingb	// Bingo Belle (Mazooma)
+sc4bingba	//
 sc4bb		// Blankety Bank (Qps)
 sc4bba		//
 sc4bbclb	// Blankety Bank Club (Qps)
@@ -11761,12 +11802,42 @@ sc4bbclba	//
 sc4bbclbb	//
 sc4bbclbc	//
 sc4blast	// Blast Off (Qps)
+sc4blasta	//
+sc4blastb	//
+sc4blastc	//
+sc4blastd	//
+sc4blaste	//
 sc4blue		// Blue Rinse (Mazooma)
+sc4bluea	//
+sc4blueb	//
+sc4bluec	//
+sc4blued	//
+sc4bluee	//
 sc4bobcl	// Bobby Dazzler Club (Mazooma)
+sc4bobcla	//
 sc4bonbx	// Bonus Bar X (Mazooma)
+sc4bonbxa	//
+sc4bonbxb	//
+sc4bonbxc	//
+sc4bonbxd	//
+sc4bonbxe	//
+sc4bonbxf	//
+sc4bonbxg	//
+sc4bonbxh	//
+sc4bonbxi	//
+sc4bonbxj	//
+sc4bonbxk	//
+sc4bonbxl	//
 sc4brksp	// Break The Spell (Mazooma)
+sc4brkspa	//
 sc4brix		// Brix (Nova)
+sc4brixa	//
+sc4brixb	//
 sc4bugs		// Bugs Money (Bellfruit)
+sc4bugsa	//
+sc4bugsb	//
+sc4bugsc	//
+sc4bugsd	//
 sc4bulcl	// Bullseye Club (Bellfruit)
 sc4bulcla	//
 sc4bulclb	//
