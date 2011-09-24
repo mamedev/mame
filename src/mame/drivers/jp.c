@@ -111,6 +111,15 @@ ROM_START(lortium)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Pimbal
+/-------------------------------------------------------------------*/
+ROM_START(pimbal)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("p3000.r1", 0x0000, 0x2000, CRC(57fb5958) SHA1(536d6564c184f214edf821b83a27aa7f75c7ad00))
+	ROM_LOAD("p3000.r2", 0x2000, 0x2000, CRC(b8aae5ad) SHA1(8639b132aa69281f4460f80e84e0d30a5dc298d0))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Olympus
 /-------------------------------------------------------------------*/
 ROM_START(olympus)
@@ -159,6 +168,7 @@ GAME(1986,	america,	0,		jp,	jp,	jp,	ROT0,	"Juegos Populares",				"America 1492",
 GAME(1986,	aqualand,	0,		jp,	jp,	jp,	ROT0,	"Juegos Populares",				"Aqualand",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	faeton,		0,		jp,	jp,	jp,	ROT0,	"Juegos Populares",				"Faeton",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1987,	lortium,	0,		jp,	jp,	jp,	ROT0,	"Juegos Populares",				"Lortium",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(19??,	pimbal,		0,		jp,	jp,	jp,	ROT0,	"Juegos Populares",				"Pimbal (Pinball 3000)",GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1984,	petaco,		0,		jp,	jp,	jp,	ROT0,	"Juegos Populares",				"Petaco",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	petaco2,	0,		jp,	jp,	jp,	ROT0,	"Juegos Populares",				"Petaco 2",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	halley,		0,		jp,	jp,	jp,	ROT0,	"Juegos Populares",				"Halley Comet",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
