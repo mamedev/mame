@@ -11850,6 +11850,9 @@ sc4bulclg	//
 sc4bulclh	//
 sc4bulcli	//
 sc4canca	// Can Can Cash (Mazooma)
+sc4cancaa	//
+sc4cancab	//
+sc4cancac	//
 sc4captn	// Captain Cash (Qps)
 sc4captna	//
 sc4captnb	//
@@ -11858,12 +11861,43 @@ sc4captnd	//
 sc4captne	//
 sc4captnf	//
 sc4carry	// Carry On Winning (Bellfruit)
+sc4carrya	//
 sc4cmous	// Cash & Mouse (Qps)
+sc4cmousa	//
+sc4cmousb	//
+sc4cmousc	//
 sc4cburn	// Cash 'n' Burn (Qps)
 sc4cburna	//
 sc4cnfr		// Cash 'n' Fruit (Bellfruit)
+sc4cnfra	//
+sc4cnfrb	//
+sc4cnfrc	//
+sc4cnfrd	//
+sc4cnfre	//
+sc4cnfrf	//
+sc4cnfrg	//
+sc4cnfrh	//
+sc4cnfri	//
 sc4cad		// Cash Adder (Qps)
+sc4cada		//
+sc4cadb		//
+sc4cadc		//
+sc4cadd		//
+sc4cade		//
+sc4cadf		//
+sc4cadg		//
+sc4cadh		//
+sc4cadi		//
+sc4cadj		//
+sc4cadk		//
+sc4cadl		//
+sc4cadm		//
+sc4cadn		//
+sc4cado		//
+sc4cadp		//
+sc4cadq		//
 sc4cadcl	// Cash Adder Club (Qps)
+sc4cadcla	//
 sc4cbaz		// Cash Bazaar Club (Bellfruit)
 sc4cbaza	//
 sc4cbazb	//
@@ -11877,10 +11911,26 @@ sc4cbazi	//
 sc4cbazj	//
 sc4cbazk	//
 sc4cconx	// Cash Connexion (Mazooma)
+sc4cconxa	//
+sc4cconxb	//
+sc4cconxc	//
+sc4cconxd	//
 sc4ccrus	// Cash Crusaders (Mazooma)
+sc4ccrusa	//
+sc4ccrusb	//
 sc4cerup	// Cash Eruption (Mazooma)
 sc4cexpl	// Cash Explosion (Mazooma)
+sc4cexpla	//
+sc4cexplb	//
+sc4cexplc	//
+sc4cexpld	//
+sc4cexple	//
+sc4cexplf	//
+sc4cexplg	//
 sc4chand	// Cash In Hand (Bellfruit)
+sc4chanda	//
+sc4chandb	//
+sc4chandc	//
 sc4cinv		// Cash Invaders (Bellfruit)
 sc4cinva	//
 sc4cinvb	//
@@ -11892,8 +11942,27 @@ sc4cinvg	//
 sc4cinvh	//
 sc4cinvi	//
 sc4clash	// Cash On The Lash (Mazooma)
+sc4clasha	//
+sc4clashb	//
+sc4clashc	//
+sc4clashd	//
+sc4clashe	//
+sc4clashf	//
+sc4clashg	//
 sc4cr		// Cash Raker (Qps)
+sc4cra		//
+sc4crb		//
+sc4crc		//
+sc4crd		//
+sc4cre		//
+sc4crf		//
 sc4crcl		// Cash Raker Club (Qps)
+sc4crcla	//
+sc4crclb	//
+sc4crclc	//
+sc4crcld	//
+sc4crcle	//
+sc4crclf	//
 sc4cashn	// Cashanova (Bellfruit)
 sc4cashm	// Cashanova (Mazooma)
 sc4cashma	//
@@ -11903,7 +11972,17 @@ sc4cashmd	//
 sc4cashme	//
 sc4cashg	//
 sc4cckey	// Casino Crazy Keys (Bellfruit)
+sc4cckeya	//
+sc4cckeyb	//
+sc4cckeyc	//
 sc4ckx		// Casino King X (Mazooma)
+sc4ckxa		//
+sc4ckxb		//
+sc4ckxc		//
+sc4ckxd		//
+sc4ckxe		//
+sc4ckxf		//
+sc4ckxg		//
 sc4casry	// Casino Royale (Mazooma)
 sc4casrya	//
 sc4casryb	//
@@ -11912,7 +11991,12 @@ sc4casryd	//
 sc4casrye	//
 sc4chick	// Chickendales (Mazooma)
 sc4chub		// Chubby Does Vegas (Mazooma)
+sc4chuba	//
+sc4chubb	//
 sc4cla7		// Classic 7s (Mazooma)
+sc4cla7a	//
+sc4cla7b	//
+sc4cla7c	//
 sc4ccogs	// Clever Cogs (Qps)
 sc4cclas	// Club Class (Bellfruit)
 sc4cclasa	//
@@ -11948,6 +12032,7 @@ sc4cclas3	//
 sc4cclas4	//
 sc4clclo	// Club Clouseau (Mazooma)
 sc4clucl	// Cluedo Club (Mazooma)
+sc4clucla	//
 sc4colos	// Colossus (Bellfruit)
 sc4cjcl		// Cool Jewels Club (Bellfruit)
 sc4cjcla	//
@@ -12001,8 +12086,18 @@ sc4crgcw	//
 sc4corcl	// Coronation Street Club (Mazooma)
 sc4corcla	//
 sc4cyc		// Count Yer Cash (Mazooma)
+sc4cyca		//
+sc4cycb		//
+sc4cycc		//
+sc4cycd		//
 sc4cyccl	// Count Yer Cash Club (Mazooma)
+sc4cyccla	//
+sc4cycclb	//
+sc4cycclc	//
 sc4crzcs	// Crazy Casino (Bellfruit)
+sc4crzcsa	//
+sc4crzcsb	//
+sc4crzcsc	//
 sc4cclim	// Crazy Climber (Bellfruit)
 sc4cclima	//
 sc4cclimb	//
@@ -12119,7 +12214,19 @@ sc4crzkyq	//
 sc4crzkyr	//
 sc4crzkys	//
 sc4crzwl	// Crazy World (Mazooma)
+sc4crzwla	//
+sc4crzwlb	//
+sc4crzwlc	//
+sc4crzwld	//
+sc4crzwle	//
+sc4crzwlf	//
+sc4crzwlg	//
 sc4cccsh	// Criss Cross Cash (Mazooma)
+sc4cccsha	//
+sc4cccshb	//
+sc4cccshc	//
+sc4cccshd	//
+sc4cccshe	//
 sc4ccc		// Criss Cross Crazy (Bellfruit)
 sc4db		// D & B (Mazooma)
 sc4daylt	// Daylight Robbery (Bellfruit)
