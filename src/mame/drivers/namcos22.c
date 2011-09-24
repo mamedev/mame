@@ -2085,22 +2085,8 @@ static READ32_HANDLER( namcos22_system_controller_r )
 	return state->m_system_controller[offset];
 }
 
-static int
-GetDspControlRegister( namcos22_state *state )
-{
-	int mode;
-	if( state->m_mbSuperSystem22 )
-	{
-		mode = nthbyte(state->m_system_controller,0x1c);
-	}
-	else
-	{
-		mode = nthbyte(state->m_system_controller,0x1a);
-	}
-	return mode;
-} /* GetDspControlRegister */
+/* system controller (super system22)
 
-/*
 0x00: vblank irq level
 0x01: hblank irq level
 0x02: sci irq level
@@ -2132,89 +2118,74 @@ GetDspControlRegister( namcos22_state *state )
 0x1b: 0x01
 0x1c: dsp control
 */
-static TIMER_CALLBACK( start_subcpu )
-{
-	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, CLEAR_LINE);
-}
-
-static WRITE32_HANDLER( namcos22_system_controller_w )
+static WRITE32_HANDLER( namcos22s_system_controller_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	int oldReg = GetDspControlRegister(state);
-	int newReg;
+	int oldreg, newreg;
 
-	if( 0 )
-	{ /* trace use of these registers */
-		UINT32 mask = mem_mask;
-		UINT32 dat = data;
-		int i;
-		for( i=0; i<4; i++ )
+	// acknowledge irqs
+	if (offset == 0x04/4 && mem_mask & 0xff000000)
+	{
+		// vblank
+		state->m_irq_state &= ~1;
+		cputag_set_input_line(space->machine(), "maincpu", nthbyte(state->m_system_controller, 0x00) & 7, CLEAR_LINE);
+	}
+
+	// irq level / enable irqs
+	if (offset == 0x00/4 && mem_mask & 0xff000000)
+	{
+		// vblank
+		oldreg = nthbyte(state->m_system_controller, 0x00) & 7;
+		newreg = data >> 24 & 7;
+		if (state->m_irq_state & 1 && oldreg != newreg)
 		{
-			if( (mask&0xff000000)!=0 )
-			{
-				int offs = offset*4+i;
-				if(offs<4 || offs>=8)
-				{
-					mame_printf_debug( "%08x: sys[0x%02x] := 0x%02x\n",
-						cpu_get_previouspc(&space->device()),
-						offs,
-						dat>>24 );
-				}
-			}
-			dat<<=8;
-			mask<<=8;
+			cputag_set_input_line(space->machine(), "maincpu", oldreg, CLEAR_LINE);
+			if (newreg)
+				cputag_set_input_line(space->machine(), "maincpu", newreg, CLEAR_LINE);
+			else
+				state->m_irq_state &= ~1;
 		}
 	}
 
-	if( state->m_mbSuperSystem22 )
+	// enable mcu
+	if (offset == 0x16/4 && mem_mask & 0x0000ff00)
 	{
-		if (offset == 0x14/4 && mem_mask == 0x0000ff00)
-		{ /* SUBCPU enable for Super System 22 */
-			if (data)
-			{
-				cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, CLEAR_LINE);
-			}
-			else
-			{
-				cputag_set_input_line(space->machine(), "mcu",INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
-			}
-		}
+		if (data & 0x0000ff00)
+			cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, CLEAR_LINE);
+		else
+			cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, ASSERT_LINE);
 	}
-	else
+
+	// dsp control
+	if (offset == 0x1c/4 && mem_mask & 0xff000000)
 	{
-		if (offset == 0x18/4 && mem_mask == 0x0000ff00)
-		{ /* SUBCPU enable on System 22 (guessed, but too early crashes Rave Racer so it's a good test) */
-			if (data == 0xff00)
-			{
-				space->machine().scheduler().timer_set(attotime::from_msec(50), FUNC(start_subcpu));
+		oldreg = nthbyte(state->m_system_controller, 0x1c);
+		newreg = data >> 24 & 0xff;
+		if (newreg != oldreg)
+		{
+			if( newreg == 0 )
+			{ /* disable DSPs */
+				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
+				cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
+				state->m_mbEnableDspIrqs = 0;
+			}
+			else if( newreg == 1 )
+			{ /*enable dsp and rendering subsystem */
+				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
+				namcos22_enable_slave_simulation(space->machine());
+				state->m_mbEnableDspIrqs = 1;
+			}
+			else if( newreg == 0xff )
+			{ /* used to upload game-specific code to master/slave dsps */
+				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
+				state->m_mbEnableDspIrqs = 0;
 			}
 		}
 	}
 
 	COMBINE_DATA( &state->m_system_controller[offset] );
 
-	newReg = GetDspControlRegister(state);
-	if( newReg != oldReg )
-	{
-		if( newReg == 0 )
-		{ /* disable DSPs */
-			cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
-			cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
-			state->m_mbEnableDspIrqs = 0;
-		}
-		else if( newReg == 1 )
-		{ /*enable dsp and rendering subsystem */
-			cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
-			namcos22_enable_slave_simulation(space->machine());
-			state->m_mbEnableDspIrqs = 1;
-		}
-		else if( newReg == 0xff )
-		{ /* used to upload game-specific code to master/slave dsps */
-			cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
-			state->m_mbEnableDspIrqs = 0;
-		}
-	}
-} /* namcos22_system_controller_w */
+} /* namcos22s_system_controller_w */
 
 /*
 000064: 0000 8C9A  (1)
@@ -2231,18 +2202,194 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 static INTERRUPT_GEN( namcos22s_interrupt )
 {
 	namcos22_state *state = device->machine().driver_data<namcos22_state>();
-	if( cpu_getiloops(device) == 0 )
+
+	state->m_mFrameCount++;
+
+	if (nthbyte(state->m_system_controller, 0x00) & 7)
 	{
-		int vblank_level   = nthbyte(state->m_system_controller,0x00)&0x7; /* $700004: ack */
-		device_set_input_line(device, vblank_level, HOLD_LINE);
-		state->m_mFrameCount++;
+		// vblank irq
+		state->m_irq_state |= 1;
+		device_set_input_line(device, nthbyte(state->m_system_controller, 0x00) & 7, ASSERT_LINE);
 	}
-	else
+}
+
+/* system controller (system22)
+
+0x00: IRQ (unknown)
+0x01: ?
+0x02: SCI IRQ level
+0x03: IRQ (unknown)
+
+0x04: VSYNC IRQ level
+0x05: IRQ (unknown) acknowledge
+0x06: ?
+0x07: SCI IRQ acknowledge
+
+0x08: IRQ (unknown) acknowledge
+0x09: VSYNC IRQ acknowledge
+0x0a: ?
+0x0b: ?
+
+0x0c: ?
+0x0d: ?
+0x0e: ?
+0x0f: ?
+
+0x10: ?
+0x11: ?
+0x12: ?
+0x13: ?
+
+0x14: ?
+0x15: ? (cyc1)
+0x16: Watchdog timer reset
+0x17: ?
+
+0x18: 0 or 1 -> mcu reset?
+0x19: ?
+0x1a: 0 or 1 or 0xff -> DSP control
+0x1b: ?
+*/
+static WRITE32_HANDLER( namcos22_system_controller_w )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	int oldreg, newreg;
+
+	// acknowledge irqs
+	if (offset == 0x09/4 && mem_mask & 0x00ff0000)
 	{
-		//int scanline_level = nthbyte(state->m_system_controller,0x01)&0x7; /* $700005: ack */
-		//int sci_level      = nthbyte(state->m_system_controller,0x02)&0x7; /* $700006: ack */
-		//int unk_irq        = nthbyte(state->m_system_controller,0x03)&0x7; /* $700007: ack */
-		//device_set_input_line(device, sci_level, HOLD_LINE);
+		// vblank
+		state->m_irq_state &= ~1;
+		cputag_set_input_line(space->machine(), "maincpu", nthbyte(state->m_system_controller, 0x04) & 7, CLEAR_LINE);
+	}
+
+	// irq level / enable irqs
+	if (offset == 0x04/4 && mem_mask & 0xff000000)
+	{
+		// vblank
+		oldreg = nthbyte(state->m_system_controller, 0x04) & 7;
+		newreg = data >> 24 & 7;
+		if (state->m_irq_state & 1 && oldreg != newreg)
+		{
+			cputag_set_input_line(space->machine(), "maincpu", oldreg, CLEAR_LINE);
+			if (newreg)
+				cputag_set_input_line(space->machine(), "maincpu", newreg, CLEAR_LINE);
+			else
+				state->m_irq_state &= ~1;
+		}
+	}
+
+	// enable mcu
+	if (offset == 0x1a/4 && mem_mask & 0xff000000)
+	{
+		if (data & 0xff000000)
+			cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, CLEAR_LINE);
+		else
+			cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+	}
+
+	// dsp control
+	if (offset == 0x1a/4 && mem_mask & 0x0000ff00)
+	{
+		oldreg = nthbyte(state->m_system_controller, 0x1a);
+		newreg = data >> 8 & 0xff;
+		if (newreg != oldreg)
+		{
+			if( newreg == 0 )
+			{ /* disable DSPs */
+				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
+				cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
+				state->m_mbEnableDspIrqs = 0;
+			}
+			else if( newreg == 1 )
+			{ /*enable dsp and rendering subsystem */
+				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
+				namcos22_enable_slave_simulation(space->machine());
+				state->m_mbEnableDspIrqs = 1;
+			}
+			else if( newreg == 0xff )
+			{ /* used to upload game-specific code to master/slave dsps */
+				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
+				state->m_mbEnableDspIrqs = 0;
+			}
+		}
+	}
+
+	COMBINE_DATA( &state->m_system_controller[offset] );
+
+} /* namcos22_system_controller_w */
+
+/* namcos22_interrupt
+Ridge Racer:
+	1:0a0b6
+	2:09fe8 (rte)
+	3:09fe8 (rte)
+	4:09f9a (vblank)
+	5:14dee (SCI)
+	6:09fe8 (rte)
+	7:09fe8 (rte)
+
+Ridge Racer 2:
+	1:0d10c  40000005
+	2:0cfa2 (rte)
+	3:0cfa2 (rte)
+	4:0cfa2 (rte)
+	5:0cef0
+	6:1bbcc
+	7:0cfa2 (rte)
+
+Ace Driver:
+	9f8 (rte)
+	9fa (rte)
+	9fc (rte)
+	9fe (rte)
+	a00
+	a46
+	a4c (rte)
+
+Victory Lap:
+	a54 indir to 21c2 (hblank?)
+	a5a (rte)
+	a5c (rte)
+	a5e (rte)
+	a60 irq
+	abe indirect to 27f1e (SCI)
+	ac4 (rte)
+
+Cyber Commando:
+	move.b  #$36, $40000002.l
+	move.b  # $0, $40000003.l
+	move.b  #$35, $40000004.l
+	
+	move.b  #$34, $40000004.l
+*/
+static INTERRUPT_GEN( namcos22_interrupt )
+{
+	namcos22_state *state = device->machine().driver_data<namcos22_state>();
+
+	switch( state->m_gametype )
+	{
+		case NAMCOS22_RIDGE_RACER:
+		case NAMCOS22_RIDGE_RACER2:
+		case NAMCOS22_RAVE_RACER:
+		case NAMCOS22_ACE_DRIVER:
+		case NAMCOS22_VICTORY_LAP:
+			HandleDrivingIO(device->machine());
+			break;
+
+		case NAMCOS22_CYBER_COMMANDO:
+			HandleCyberCommandoIO(device->machine());
+			break;
+
+		default:
+			break;
+	}
+
+	if (nthbyte(state->m_system_controller, 0x04) & 7)
+	{
+		// vblank irq
+		state->m_irq_state |= 1;
+		device_set_input_line(device, nthbyte(state->m_system_controller, 0x04) & 7, ASSERT_LINE);
 	}
 }
 
@@ -2415,7 +2562,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READ(namcos22_portbit_r) AM_WRITE(namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
-	AM_RANGE(0x700000, 0x70001f) AM_READ(namcos22_system_controller_r) AM_WRITE(namcos22_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
+	AM_RANGE(0x700000, 0x70001f) AM_READ(namcos22_system_controller_r) AM_WRITE(namcos22s_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22_port800000_w) /* (C304 C399)  40380000 during SPOT test */
 	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czattr)
 	AM_RANGE(0x810200, 0x8103ff) AM_READ(namcos22_czram_r) AM_WRITE(namcos22_czram_w)
@@ -2846,7 +2993,7 @@ static MACHINE_RESET(namcos22)
 static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namcos22s_am)
-	MCFG_CPU_VBLANK_INT_HACK(namcos22s_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen", namcos22s_interrupt)
 
 	MCFG_CPU_ADD("master", TMS32025,SS22_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
@@ -2972,45 +3119,6 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
 	/**
      * System Controller: Interrupt Control, Peripheral Control
      *
-     * 40000000 IRQ (unknown)
-     * 40000001
-     * 40000002 SCI IRQ level
-     * 40000003 IRQ (unknown)
-
-     * 40000004 VSYNC IRQ level
-     * 40000005 IRQ (unknown) acknowledge
-     * 40000006
-     * 40000007 SCI IRQ acknowledge
-
-     * 40000008 IRQ (unknown) acknowledge
-     * 40000009 VSYNC IRQ acknowledge
-     * 4000000a
-     * 4000000b ?
-
-     * 4000000c ?
-     * 4000000d
-     * 4000000e ?
-     * 4000000f
-
-     * 40000010 ?
-     * 40000011 ?
-     * 40000012 ?
-     * 40000013 ?
-
-     * 40000014 ?
-     * 40000015 ? (cyc1)
-     * 40000016 Watchdog timer reset
-     * 40000017
-
-     * 40000018 0 or 1 -> DSP control (reset?)
-     * 40000019 sub cpu reset?
-     * 4000001a 0 or 1 or 0xff -> DSP control
-     * 4000001b ?
-
-     * 4000001c
-     * 4000001d
-     * 4000001e
-     * 4000001f
      */
 	AM_RANGE(0x40000000, 0x4000001f) AM_READ(namcos22_system_controller_r) AM_WRITE(namcos22_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
 
@@ -3159,106 +3267,11 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x900a0000, 0x900a000f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_tilemapattr)
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( namcos22_interrupt )
-{
-	namcos22_state *state = device->machine().driver_data<namcos22_state>();
-	int irq_level1 = 5;
-	int irq_level2 = 6;
-
-	switch( state->m_gametype )
-	{
-	case NAMCOS22_RIDGE_RACER:
-		HandleDrivingIO(device->machine());
-		irq_level1 = 4;
-		irq_level2 = 5;
-		// 1:0a0b6
-		// 2:09fe8 (rte)
-		// 3:09fe8 (rte)
-		// 4:09f9a (vblank)
-		// 5:14dee (SCI)
-		// 6:09fe8 (rte)
-		// 7:09fe8 (rte)
-		break;
-
-	case NAMCOS22_RIDGE_RACER2:
-		HandleDrivingIO(device->machine());
-		irq_level1 = 5;
-		irq_level2 = 6;
-		//1:0d10c  40000005
-		//2:0cfa2 (rte)
-		//3:0cfa2 (rte)
-		//4:0cfa2 (rte)
-		//5:0cef0
-		//6:1bbcc
-		//7:0cfa2 (rte)
-		break;
-
-	case NAMCOS22_RAVE_RACER:
-		HandleDrivingIO(device->machine());
-		break;
-
-	case NAMCOS22_VICTORY_LAP:
-		HandleDrivingIO(device->machine());
-		// a54 indir to 21c2 (hblank?)
-		// a5a (rte)
-		// a5c (rte)
-		// a5e (rte)
-		// a60 irq
-		// abe indirect to 27f1e (SCI)
-		// ac4 (rte)
-		irq_level1 = nthbyte(state->m_system_controller,0x04)&0x7;
-		irq_level2 = nthbyte(state->m_system_controller,0x02)&0x7;
-		break;
-
-	case NAMCOS22_ACE_DRIVER:
-		HandleDrivingIO(device->machine());
-		// 9f8 (rte)
-		// 9fa (rte)
-		// 9fc (rte)
-		// 9fe (rte)
-		// a00
-		// a46
-		// a4c (rte)
-		irq_level1 = 5;
-		irq_level2 = 6;
-		break;
-
-	case NAMCOS22_CYBER_COMMANDO:
-		//move.b  #$36, $40000002.l
-		//move.b  # $0, $40000003.l
-		//move.b  #$35, $40000004.l
-		//
-		//move.b  #$34, $40000004.l
-		HandleCyberCommandoIO(device->machine());
-		irq_level1 = nthbyte(state->m_system_controller,0x04)&0x7;
-		irq_level2 = nthbyte(state->m_system_controller,0x02)&0x7;
-		break;
-
-	default:
-		break;
-	}
-
-	switch( cpu_getiloops(device) )
-	{
-	case 0:
-		if( irq_level1 )
-		{
-			device_set_input_line(device, irq_level1, HOLD_LINE); /* vblank */
-		}
-		break;
-	case 1:
-		if( irq_level2 )
-		{
-			device_set_input_line(device, irq_level2, HOLD_LINE); /* SCI */
-		}
-		break;
-	}
-}
 
 static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
 	MCFG_CPU_PROGRAM_MAP(namcos22_am)
-	MCFG_CPU_VBLANK_INT_HACK(namcos22_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen", namcos22_interrupt)
 
 	MCFG_CPU_ADD("master", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
@@ -5530,6 +5543,7 @@ static void namcos22_init( running_machine &machine, int game_type )
 	state->m_gametype = game_type;
 	state->m_keycus_id = 0;
 	state->m_su_82 = 0;
+	state->m_irq_state = 0;
 	state->m_p4 = 0;
 
 	state->m_mpPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
