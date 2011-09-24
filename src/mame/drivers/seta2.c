@@ -591,6 +591,10 @@ static READ32_HANDLER( funcube_debug_r )
 	return ret;
 }
 
+static READ32_DEVICE_HANDLER( oki_read )
+{
+	return downcast<okim9810_device *>(device)->read_status() << 16;
+}
 static WRITE32_DEVICE_HANDLER( oki_write )
 {
 	if (ACCESSING_BITS_0_7)
@@ -613,7 +617,7 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32 )
 	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ( funcube_debug_r )
 	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ( watchdog_reset32_r ) AM_WRITENOP
 
-	AM_RANGE( 0x00600000, 0x00600003 ) AM_DEVWRITE("oki", oki_write)
+	AM_RANGE( 0x00600000, 0x00600003 ) AM_DEVREADWRITE("oki", oki_read, oki_write)
 
 	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE_GENERIC(paletteram)
@@ -1772,43 +1776,31 @@ static INPUT_PORTS_START( funcube )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
 
 	// 500000.w
-	PORT_DIPNAME(    0x00010000, 0x00010000, "Debug 0" )
+	PORT_DIPNAME(    0x00010000, 0x00000000, "Debug 0" )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00010000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x00020000, 0x00020000, "Debug 1" )
+	PORT_DIPNAME(    0x00020000, 0x00000000, "Debug 1" )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00020000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x00040000, 0x00040000, "Debug 2" )	// Touch-Screen
+	PORT_DIPNAME(    0x00040000, 0x00000000, "Debug 2" )	// Touch-Screen
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00040000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x00080000, 0x00080000, "Debug 3" )
+	PORT_DIPNAME(    0x00080000, 0x00000000, "Debug 3" )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00080000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x00100000, 0x00100000, "Debug 4" )
+	PORT_DIPNAME(    0x00100000, 0x00000000, "Debug 4" )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00100000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x00200000, 0x00200000, "Debug 5" )
+	PORT_DIPNAME(    0x00200000, 0x00000000, "Debug 5" )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00200000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x00400000, 0x00400000, "Debug 6" )
-	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00400000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x00800000, 0x00800000, "Debug 7" )
-	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00800000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( funcube4 )
-        PORT_INCLUDE(funcube)
-
-// Inverted this dip by default to allow game to be played
-
-	PORT_MODIFY("DEBUG")
 	PORT_DIPNAME(    0x00400000, 0x00000000, "Debug 6" )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00400000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x00800000, 0x00000000, "Debug 7" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00800000, DEF_STR( On ) )
 INPUT_PORTS_END
-
 
 
 /***************************************************************************
@@ -1914,7 +1906,8 @@ static const gfx_layout funcube_layout_4bpp_lo =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ STEP4(7*8, -8) },
+//	{ STEP4(7*8, -8) },
+	{ STEP4(0*8, 8) },	// needed by funcube3 text
 	{ STEP8(0, 1) },
 	{ STEP8(0, 8*8) },
 	8*8*8
@@ -2247,6 +2240,13 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( funcube3, funcube )
+	// video hardware
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)
+MACHINE_CONFIG_END
+
+
 
 /***************************************************************************
 
@@ -2367,10 +2367,10 @@ ROM_END
 
 ROM_START( funcube3 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // XCF5206 Code
-	ROM_LOAD( "fc31prg-0a.u4", 0x000000, 0x080000, CRC(ed7d70dd) SHA1(4ebfca9e60ab5e8de22821f0475abf515c83ce53) )
+	ROM_LOAD( "fc31prg-0a.u4", 0x00000, 0x80000, CRC(ed7d70dd) SHA1(4ebfca9e60ab5e8de22821f0475abf515c83ce53) )
 
 	ROM_REGION( 0x20000, "sub", 0 )		// H8/3007 Code
-	ROM_LOAD( "fc21iopr-0.u49", 0x000000, 0x020000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
+	ROM_LOAD( "fc21iopr-0.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
 
 	ROM_REGION( 0x400, "pic", 0 )		// PIC12C508? Code
 	ROM_LOAD( "fc31a.u57", 0x000, 0x400, NO_DUMP )
@@ -2437,10 +2437,9 @@ static DRIVER_INIT( funcube3 )
 
 	main_cpu[0x45c/4] = 0x4e714e71;
 
-	// 0x3c0
-//  main_cpu[0xa5c/4] = 0x4e713e3c;
-//  main_cpu[0xa74/4] = 0x4e713e3c;
-//  main_cpu[0xa8c/4] = 0x4e7141f9;
+	main_cpu[0x008bc/4] = 0x4a804e71;
+	main_cpu[0x19f0c/4] = 0x4e714e71;
+	main_cpu[0x19fb8/4] = 0x4e714e71;
 
 	// Sub CPU
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
@@ -3240,7 +3239,7 @@ GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0,        ROT0, "Sammy USA C
 GAME( 2001, wschamp,  0,        samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyh,  0,        samshoot, trophyh,  0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube3, 0,        funcube,  funcube,  funcube3, ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube4, 0,        funcube,  funcube4, funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NO_COCKTAIL )
+GAME( 2001, funcube3, 0,        funcube3, funcube,  funcube3, ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NO_COCKTAIL )
+GAME( 2001, funcube4, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_COCKTAIL )
 GAME( ????, reelquak, 0,        reelquak, reelquak, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Ver. 1.05)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )

@@ -222,7 +222,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
 	UINT16 *end = &buffered_spriteram16[state->m_spriteram_size/2];
 
-	for ( ; s1 < end; s1+=4 )
+//	for ( ; s1 < end; s1+=4 )
+	for ( ; s1 < buffered_spriteram16 + 0x4000/2; s1+=4 )	// more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
 	{
 		const gfx_element *gfx;
 		int num		= s1[0];
