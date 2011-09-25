@@ -12230,7 +12230,23 @@ sc4cccshe	//
 sc4ccc		// Criss Cross Crazy (Bellfruit)
 sc4db		// D & B (Mazooma)
 sc4daylt	// Daylight Robbery (Bellfruit)
+sc4daylta	//
+sc4dayltb	//
+sc4dayltc	//
+sc4dayltd	//
+sc4daylte	//
+sc4dayltf	//
+sc4dayltg	//
+sc4daylth	//
+sc4daylti	//
+sc4dayltj	//
+sc4dayltk	//
+sc4dayltl	//
+sc4dayltm	//
 sc4deepi	// Deep Impact (Mazooma)
+sc4deepia	//
+sc4deepib	//
+sc4deepid	//
 sc4derby	// Demolition Derby (Bellfruit)
 sc4derbya	//
 sc4derbyb	//
@@ -12243,8 +12259,17 @@ sc4drubyb	//
 sc4drubyc	//
 sc4drubyd	//
 sc4disco	// Disco Inferno (Mazooma)
+sc4discoa	//
+sc4discob	//
+sc4discoc	//
+sc4discod	//
 sc4dbldm	// Double Diamond (Qps)
 sc4dblfr	// Double Frenzy (Qps)
+sc4dblfra	//
+sc4dblfrb	//
+sc4dblfrc	//
+sc4dblfrd	//
+sc4dblfre	//
 sc4darw		// Dough & Arrow (Qps)
 sc4darwa	//
 sc4darwb	//
@@ -12315,8 +12340,14 @@ sc4fccb		//
 sc4fccc		//
 sc4fccd		//
 sc4fire		// Firepower (Mazooma)
+sc4firea	//
 sc4fwp		// Five Ways Pays (Mazooma)
+sc4fwpa		//
+sc4fwpb		//
+sc4fwpc		//
 sc4fwpcs	// Five Ways Pays Casino (Mazooma)
+sc4fwpcsa	//
+sc4fwpcsb	//
 sc4fbcrz	// Football Crazy (Bellfruit)
 sc4fbcrza	//
 sc4fbcrzb	//
@@ -12378,7 +12409,15 @@ sc4fullti	//
 sc4gamcs	// Game Casino, The (Bellfruit)
 sc4game		// Game, The (Bellfruit)
 sc4ziggy	// Gettin Ziggy With It (Mazooma)
+sc4ziggya	//
+sc4ziggyb	//
+sc4ziggyc	//
+sc4ziggyd	//
+sc4ziggye	//
+sc4ziggyf	//
+sc4ziggyg	//
 sc4gldcl	// Gladiator Club (Mazooma)
+sc4gldcla	//
 sc4gfev		// Gold Fever (Mazooma)
 sc4gfeva	//
 sc4gfevb	//
@@ -12393,15 +12432,70 @@ sc4gncc		//
 sc4gncd		//
 sc4gnce		//
 sc4ghost	// Golden Ghost (Mazooma)
+sc4ghosta	//
+sc4ghostb	//
+sc4ghostc	//
+sc4ghostd	//
+sc4ghoste	//
+sc4ghostf	//
+sc4ghostg	//
+sc4ghosth	//
 sc4ggrid	// Golden Grid (Qps)
+sc4ggrida	//
+sc4ggridb	//
+sc4ggridc	//
+sc4ggridd	//
+sc4ggride	//
+sc4ggridf	//
+sc4ggridg	//
+sc4ggridh	//
+sc4ggridi	//
+sc4ggridj	//
+sc4ggridk	//
+sc4ggridl	//
+sc4ggridm	//
+sc4ggridn	//
 sc4ggcl		// Golden Grid Club (Qps)
+sc4ggcla	//
+sc4ggclb	//
+sc4ggclc	//
+sc4ggcld	//
 sc4goldo	// Golden Oldie (Mazooma)
+sc4goldoa	//
+sc4goldob	//
+sc4goldoc	//
 sc4gocas	// Golden Oldie Casino (Mazooma)
+sc4gocasa	//
 sc4gshot	// Golden Shot (Qps)
+sc4gshota	//
+sc4gshotb	//
+sc4gshotc	//
 sc4goldw	// Golden Winner (Bellfruit)
+sc4goldwa	//
+sc4goldwb	//
+sc4goldwc	//
+sc4goldwd	//
+sc4goldwe	//
+sc4goldwf	//
+sc4goldwg	//
 sc4gx		// Golden X (Mazooma)
+sc4gxa		//
+sc4gxb		//
 sc4gxcas	// Golden X Casino (Mazooma)
+sc4gxcasa	//
+sc4gxcasb	//
+sc4gxcasc	//
+sc4gxcasd	//
+sc4gxcase	//
+sc4gxcasf	//
 sc4gx3		// Golden X Triple (Mazooma)
+sc4gx3a		//
+sc4gx3b		//
+sc4gx3c		//
+sc4gx3d		//
+sc4gx3e		//
+sc4gx3f		//
+sc4gx3g		//
 sc4goud		// Goudkoorts (Bellfruit)
 sc4gag		// Grab A Granny (Mazooma)
 sc4gcb		// Grand Blaster Cash (Mazooma)
@@ -12420,6 +12514,7 @@ sc4helrd	// Hellraiser (Bellfruit) [Dutch]
 sc4helrs	// Hellraiser (Bellfruit)
 sc4hdd		// Hickory Dickory Dosh (Mazooma)
 sc4himi		// High 'n' Mighty (Mazooma)
+sc4himia	//
 sc4hi5		// High 5 (Bellfruit)
 sc4sprng	// Highly Sprung (Mazooma)
 sc4hilo		// Hilowatha (Bellfruit)
