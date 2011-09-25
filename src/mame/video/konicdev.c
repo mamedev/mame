@@ -3684,14 +3684,14 @@ void k053245_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 		{
 			int sx, sy, zw, zh;
 
-			sy = oy + ((zoomy * y + (1 << 11)) >> 12);
+			sy = oy + ((zoomy * y + (1 << 11)) >> 12) - 1;
 			zh = (oy + ((zoomy * (y + 1) + (1 << 11)) >> 12)) - sy;
 
 			for (x = 0; x < w; x++)
 			{
 				int c, fx, fy;
 
-				sx = ox + ((zoomx * x + (1 << 11)) >> 12);
+				sx = ox + ((zoomx * x + (1 << 11)) >> 12) - 1;
 				zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
 				c = code;
 				if (mirrorx)
