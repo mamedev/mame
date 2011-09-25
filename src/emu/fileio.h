@@ -45,7 +45,10 @@
 #include "corefile.h"
 #include "hash.h"
 
-
+// some systems use macros for getc/putc rather than functions
+#ifdef getc
+#undef getc
+#endif
 
 //**************************************************************************
 //  TYPE DEFINITIONS
