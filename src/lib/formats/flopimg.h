@@ -276,12 +276,14 @@ protected:
 
 		SECTOR_LOOP_START, // Start of the per-sector loop, sector number goes from p1 to p2 inclusive
 		SECTOR_LOOP_END,   // End of the per-sector loop
+		SECTOR_INTERLEAVE_SKEW, // Defines interleave and skew for sector counting
 	};
 
 	// Sector data description
 	struct desc_s {
 		int size;          // Sector size, int bytes
 		const UINT8 *data; // Sector data
+		UINT8 sector_id;   // Sector ID
 	};
 
 
@@ -312,15 +314,11 @@ protected:
 	//   faster verify and skew/interleave where appropriate
 	static const desc_e atari_st_fcp_9[];
 	static const desc_e *const atari_st_fcp_10[10];
-	static const desc_e *const atari_st_fcp_11[11];
+	static const desc_e atari_st_fcp_11[];
 
 	static const desc_e atari_st_fcp_10_0[], atari_st_fcp_10_1[], atari_st_fcp_10_2[], atari_st_fcp_10_3[];
 	static const desc_e atari_st_fcp_10_4[], atari_st_fcp_10_5[], atari_st_fcp_10_6[], atari_st_fcp_10_7[];
 	static const desc_e atari_st_fcp_10_8[], atari_st_fcp_10_9[];
-
-	static const desc_e atari_st_fcp_11_0[], atari_st_fcp_11_1[], atari_st_fcp_11_2[], atari_st_fcp_11_3[];
-	static const desc_e atari_st_fcp_11_4[], atari_st_fcp_11_5[], atari_st_fcp_11_6[], atari_st_fcp_11_7[];
-	static const desc_e atari_st_fcp_11_8[], atari_st_fcp_11_9[], atari_st_fcp_11_10[];
 
 	static const desc_e *atari_st_fcp_get_desc(UINT8 track, UINT8 head, UINT8 head_count, UINT8 sect_count);
 
@@ -419,6 +417,8 @@ private:
 	int sbit_r(const UINT8 *bitstream, int pos);
 	int sbit_rp(const UINT8 *bitstream, int &pos, int track_size);
 	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
+	
+	int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);	
 };
 
 // a device_type is simply a pointer to its alloc function

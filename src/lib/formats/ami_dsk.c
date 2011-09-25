@@ -49,6 +49,7 @@ bool adf_format::load(io_generic *io, floppy_image *image)
 	for(int i=0; i<11; i++) {
 		sectors[i].data = sectdata + 512*i;
 		sectors[i].size = 512;
+		sectors[i].sector_id = i;
 	}
 
 	for(int track=0; track < 80; track++) {

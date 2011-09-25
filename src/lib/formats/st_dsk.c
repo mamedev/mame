@@ -61,9 +61,10 @@ bool st_format::load(io_generic *io, floppy_image *image)
 
 	UINT8 sectdata[11*512];
 	desc_s sectors[11];
-	for(int i=1; i<=sector_count; i++) {
-		sectors[i].data = sectdata + 512*(i-1);
+	for(int i=0; i<sector_count; i++) {
+		sectors[i].data = sectdata + 512*i;
 		sectors[i].size = 512;
+		sectors[i].sector_id = i + 1;
 	}
 
 	int track_size = sector_count*512;
@@ -221,9 +222,10 @@ bool msa_format::load(io_generic *io, floppy_image *image)
 
 	UINT8 sectdata[11*512];
 	desc_s sectors[11];
-	for(int i=1; i<=sect; i++) {
-		sectors[i].data = sectdata + 512*(i-1);
+	for(int i=0; i<sect; i++) {
+		sectors[i].data = sectdata + 512*1;
 		sectors[i].size = 512;
+		sectors[i].sector_id = i + 1;
 	}
 
 	int pos = 10;
