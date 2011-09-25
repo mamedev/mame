@@ -993,7 +993,7 @@ static MACHINE_START( neogeo )
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* configure NVRAM */
-	machine.device<nvram_device>("saveram")->set_base(save_ram, 0x2000);
+	machine.device<nvram_device>("saveram")->set_base(save_ram, 0x10000);
 
 	/* set the BIOS bank */
 	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine.region("mainbios")->base());
