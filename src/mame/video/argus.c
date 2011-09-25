@@ -679,7 +679,10 @@ WRITE8_HANDLER( butasan_pageselect_w )
 READ8_HANDLER( butasan_pagedram_r )
 {
 	argus_state *state = space->machine().driver_data<argus_state>();
-	return state->m_butasan_pagedram[state->m_butasan_page_latch][offset];
+	if (offset <= 0x07ff)
+		return state->m_butasan_pagedram[state->m_butasan_page_latch][offset];
+	else
+		return state->m_butasan_pagedram[0][offset];
 }
 
 WRITE8_HANDLER( butasan_pagedram_w )
