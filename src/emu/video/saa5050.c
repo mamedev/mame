@@ -233,7 +233,9 @@ void saa5050_update( device_t *device, bitmap_t *bitmap, const rectangle *clipre
 				switch (code)
 				{
 				case 0x00:
+#ifndef MESS
 					blank = 1;  // code 0x00 should not display anything, unless HOLDGR is set
+#endif
 					break;
 				case 0x01: case 0x02: case 0x03: case 0x04:
 				case 0x05: case 0x06: case 0x07:
