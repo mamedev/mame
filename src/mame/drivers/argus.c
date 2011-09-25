@@ -108,8 +108,6 @@ Known issues :
  - Half transparent color (50% alpha blending) is not emulated.
  - Sprite priority switch of Butasan is shown in test mode. What will be
    happened when set it ? JFF is not implemented this mistery switch too.
- - In Butasan, text layer will corrupt completely when you take a special
-   item.
  - Data proms of Butasan does exist. But I don't know what is used for.
  - Though clock speed of Argus is actually 4 MHz, major sprite problems
    are broken out in the middle of slowdown. So, it is set 5 MHz now.
