@@ -11331,6 +11331,190 @@ sweetl2_2c		// bootleg
 sweetl2_2d		// bootleg
 fcockt2a		// bootleg - Fruit Cocktail 2
 
+
+// Novotech
+
+g4u2		// Games 4 U
+g4u3		//
+g4u3a		//
+g4u4		//
+g4u5		//
+g4u6		//
+g4u7		//
+gamt1		// Gaminator 1
+gamt1a		// 
+gamt1b		//
+gamt4		// Gaminator 4
+gamt4a		// 
+gamt4b		//
+gamt4c		//
+gamt4d		//
+gamt4e		//
+gamt4f		//
+gamt4g		//
+gamt4h		//
+gamt4i		//
+gamt4j		//
+gamt5		// Gaminator 5
+gamt6		// Gaminator 6
+gamt6a		//
+gamt6b		//
+gamt6c		//
+gamt6d		//
+gamt6e		//
+gamt6f		//
+gamt7		// Gaminator 7
+gamt7a		//
+gamt7b		//
+gamt7c		//
+gamt7d		//
+gamt7e		//
+gamt7f		//
+gamt7g		//
+gamt7h		//
+gamt8		// Gaminator 8
+gamt8a		//
+gamt8b		//
+gamt8c		//
+gamt8d		//
+gamt9		// Gaminator 9
+gamt9a		//
+gamt10		//
+gamt10a		//
+gamt10b		//
+gamt10c		//
+gamt10d		//
+gamt10e		//
+gamt10f		//
+gamt10g		//
+gamt10h		//
+gamt10i		//
+gamt10j		//
+gamt10k		//
+gamt10l		//
+gamt10m		//
+gamt10n		//
+gamt10o		//
+gamt11		//
+gamt11a		//
+gamt11b		//
+gamt11c		//
+gamt12		//
+gamt12a		//
+gamt12b		//
+gamt16		//
+gamt16a		//
+gamt16b		//
+gamt16c		//
+gamt16d		//
+gamt16e		//
+gamt16f		//
+gamt16g		//
+gamt16h		//
+gamt16i		//
+gamt16j		//
+gamt16k		//
+gamt17		//
+gamt17a		//
+gamt17b		//
+gamt18		//
+gamt18a		//
+gamt18b		//
+gamt18c		//
+gamt18d		//
+gamt19		//
+gamt19a		//
+gamt20		//
+gamt20a		//
+gamt20b		//
+gamt21		//
+gamt21a		//
+gamt22		//
+gamt22a		//
+gamt22b		//
+gamt23		//
+gamt23a		//
+gamt23b		//
+gamt29		//
+gamt29a		//
+gamt30		//
+gamt31		//
+megakat		//
+hspot2		//
+hspot3		//
+gamt1lotc	//
+gamt4lotc	//
+gamt4lotca	//
+gamt6lotc	//
+gamt8lotc	//
+gamt9lotc	//
+gamt10lotc	//
+gamt16lotc	//
+gamt18lotc	//
+gamt19lotc	//
+gamt20lotc	//
+gamt4lotm	//
+gamt10lotm	//
+gamt20lotm	//
+gamt4hmult	//
+gamt10gmult	//
+gamt11bmult	//
+gamt16fmult	//
+gamt18bmult	//
+gamt19mult	//
+gamt21amult	//
+gamt22amult	//
+gamt31mult	//
+gamt1ent	//
+gamt4ent	//
+gamt6ent	//
+gamt10ent	//
+gamt18ent	//
+gamt19ent	//
+gamt20ent	//
+gamt4dbag	//
+gamt4fbag	//
+gamt4hbag	//
+gamt4ibag	//
+gamt10bag	//
+ancienta	//
+ancientaa	//
+ancientab	//
+ancientac	//
+ancientad	//
+bananas		//
+bananasa	//
+beebop		//
+beebopa		//
+beebopb		//
+beebopc		//
+beebopd		//
+beebope		//
+beetlem		//
+beetlema	//
+beetlemb	//
+beetlemc	//
+beetlemd	//
+bungeem		//
+bungeema	//
+bookra		//
+bsplash		//
+chillicc	//
+columbus	//
+columbusa	//
+columbusb	//
+columbusc	//
+columbusd	//
+columbuse	//
+columbusf	//
+ditrio		//
+dolphinp	//
+eurogame	//
+eurogamea	//
+firstcl		//
+llcharm		//
+llcharma	//
+
 // TAB Austria
 // Quizard (Philips CD-I based HW)
 cdimono1		// Base unit
@@ -12498,6 +12682,9 @@ sc4gx3f		//
 sc4gx3g		//
 sc4goud		// Goudkoorts (Bellfruit)
 sc4gag		// Grab A Granny (Mazooma)
+sc4gaga		//
+sc4gagb		//
+sc4gagc		//
 sc4gcb		// Grand Blaster Cash (Mazooma)
 sc4greed	// Greedy Gonzalez (Bellfruit)
 sc4hf		// Happy Fruits (Bellfruit)
@@ -12509,6 +12696,7 @@ sc4hfe		//
 sc4hff		//
 sc4hfg		//
 sc4hfcl		// Happy Fruits Club (Bellfruit)
+sc4hfcla	//
 sc4heatw	// Heatwave (Bellfruit)
 sc4helrd	// Hellraiser (Bellfruit) [Dutch]
 sc4helrs	// Hellraiser (Bellfruit)
