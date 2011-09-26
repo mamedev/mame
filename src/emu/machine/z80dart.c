@@ -422,6 +422,16 @@ void z80dart_device::take_interrupt(int priority)
 }
 
 
+//-------------------------------------------------
+//  m1_r - interrupt acknowledge
+//-------------------------------------------------
+
+int z80dart_device::m1_r()
+{
+	return z80daisy_irq_ack();
+}
+
+
 
 //**************************************************************************
 //  DART CHANNEL

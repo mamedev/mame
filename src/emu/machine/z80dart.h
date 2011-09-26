@@ -195,6 +195,9 @@ public:
 	// put data on the input lines
 	void receive_data(int which, UINT8 data) { m_channel[which].receive_data(data); }
 
+	// interrupt acknowledge
+	int m1_r();
+
 	// control line access
 	void cts_w(int which, int state) { m_channel[which].cts_w(state); }
 	void dcd_w(int which, int state) { m_channel[which].dcd_w(state); }
