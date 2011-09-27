@@ -302,6 +302,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 	}
 #else
 #define m68ki_set_address_error_trap(m68k) \
+	SETJMP_GNUC_PROTECT(); \
 	if(setjmp(m68k->aerr_trap) != 0) \
 	{ \
 		m68ki_exception_address_error(m68k); \
