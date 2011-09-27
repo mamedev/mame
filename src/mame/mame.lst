@@ -12686,7 +12686,18 @@ sc4gaga		//
 sc4gagb		//
 sc4gagc		//
 sc4gcb		// Grand Blaster Cash (Mazooma)
+sc4gcba		//
+sc4gcbb		//
+sc4gcbc		//
+sc4gcbd		//
+sc4gcbe		//
+sc4gcbf		//
+sc4gcbg		//
+sc4gcbh		//
+sc4gcbi		//
+sc4gcbj		//
 sc4greed	// Greedy Gonzalez (Bellfruit)
+sc4greeda	//
 sc4hf		// Happy Fruits (Bellfruit)
 sc4hfa		//
 sc4hfb		//
@@ -12701,13 +12712,53 @@ sc4heatw	// Heatwave (Bellfruit)
 sc4helrd	// Hellraiser (Bellfruit) [Dutch]
 sc4helrs	// Hellraiser (Bellfruit)
 sc4hdd		// Hickory Dickory Dosh (Mazooma)
+sc4hdda		//
+sc4hddb		//
+sc4hddc		//
+sc4hddd		//
+sc4hdde		//
+sc4hddf		//
 sc4himi		// High 'n' Mighty (Mazooma)
 sc4himia	//
+sc4himib	//
+sc4himic	//
+sc4himid	//
+sc4himie	//
+sc4himif	//
+sc4himig	//
+sc4himih	//
+sc4himii	//
 sc4hi5		// High 5 (Bellfruit)
+sc4hi5a		//
+sc4hi5b		//
+sc4hi5c		//
+sc4hi5d		//
+sc4hi5e		//
+sc4hi5f		//
+sc4hi5g		//
 sc4sprng	// Highly Sprung (Mazooma)
 sc4hilo		// Hilowatha (Bellfruit)
+sc4hiloa	//
+sc4hilob	//
+sc4hiloc	//
+sc4hilod	//
+sc4hiloe	//
+sc4hilof	//
+sc4hilog	//
+sc4hiloh	//
+sc4hiloi	//
+sc4hiloj	//
+sc4hilok	//
 sc4hitsh	// Hit Shot (Bellfruit)
+sc4hitsha	//
+sc4hitshb	//
+sc4hitshc	//
+sc4hitshd	//
+sc4hitshe	//
 sc4holyw	// Hollywood (Bellfruit)
+sc4holywa	//
+sc4holywb	//
+sc4holywc	//
 sc4hotpr	// Hot Property (Bellfruit)
 sc4hotpra	//
 sc4hotprb	//
@@ -12715,18 +12766,72 @@ sc4hotprc	//
 sc4hotprd	//
 sc4hotpre	//
 sc4h6cl		// Hot Six Club (Bellfruit)
+sc4h6cla	//
+sc4h6clb	//
+sc4h6clc	//
 sc4hyde		// Hyde & Streak (Mazooma)
+sc4hydea	//
+sc4hydeb	//
+sc4hydec	//
 sc4hyper	// Hyperactive (Mazooma)
+sc4hypera	//
 sc4ijclb	// Italian Job Club (Mazooma)
 sc4jack		// Jack The Kipper (Mazooma)
+sc4jacka	//
+sc4jackb	//
+sc4jackc	//
+sc4jackd	//
+sc4jacke	//
+sc4jackf	//
+sc4jackg	//
 sc4jjunc	// Jackpot Junction (Bellfruit)
+sc4jjunca	//
+sc4jjuncb	//
+sc4jjuncc	//
+sc4jjuncd	//
+sc4jjunce	//
+sc4jjuncf	//
+sc4jjuncg	//
+sc4jjunch	//
+sc4jjunci	//
 sc4jjucl	// Jackpot Junction Club (Bellfruit)
+sc4jjucla	//
+sc4jjuclb	//
+sc4jjuclc	//
+sc4jjucld	//
+sc4jjucle	//
 sc4jiggn	// Jiggery Pockery (Nova)
 sc4jiggr	// Jiggery Pokery (Mazooma)
+sc4jiggra	//
+sc4jiggrb	//
+sc4jiggrc	//
 sc4jive		// Jive Money (Mazooma)
+sc4jivea	//
+sc4jiveb	//
+sc4jivec	//
+sc4jived	//
 sc4jolly	// Jolly Jousting (Qps)
+sc4jollya	//
 sc4juicy	// Juicy Jackpots Club (Bellfruit)
+sc4juicya	//
+sc4juicyb	//
+sc4juicyc	//
+sc4juicyd	//
+sc4juicye	//
+sc4juicyf	//
+sc4juicyg	//
+sc4juicyi	//
+sc4juicyj	//
 sc4jjc		// Jumping Jack Cash (Mazooma)
+sc4jjca		//
+sc4jjcb		//
+sc4jjcc		//
+sc4jjcd		//
+sc4jjce		//
+sc4jjcf		//
+sc4jjcg		//
+sc4jjch		//
+sc4jjci		//
 sc4jjf		// Jumping Jack Flash (Bellfruit)
 sc4jjfa		//
 sc4jjfb		//
@@ -12742,10 +12847,33 @@ sc4jjfk		//
 sc4jjfl		//
 sc4jjfm		//
 sc4jbuck	// Jungle Bucks (Bellfruit)
+sc4jbucka	//
+sc4jbuckb	//
+sc4jbuckc	//
+sc4jbuckd	//
 sc4kalei	// Kaleidoscope (Qps)
+sc4kaleia	//
+sc4kaleib	//
+sc4kaleic	//
+sc4kaleid	//
+sc4kaleie	//
 sc4kkong	// King Kong Cash (Mazooma)
+sc4kkonga	//
+sc4kkongb	//
+sc4kkongc	//
+sc4kkongd	//
+sc4kkonge	//
+sc4kkongf	//
+sc4kkongg	//
+sc4kkongh	//
+sc4kkongi	//
+sc4kkongj	//
 sc4knok		// Knockout (Mazooma)
+sc4knoka	//
+sc4knokb	//
+sc4knokc	//
 sc4lasv		// Las Vegas (Bellfruit)
+sc4lasva	//
 sc4lir		// Let It Roll (Bellfruit)
 sc4lira		//
 sc4lirb		//
@@ -12757,10 +12885,40 @@ sc4lirg		//
 sc4lirh		//
 sc4liri		//
 sc4lined	// Line Dancer (Mazooma)
+sc4lineda	//
+sc4linedb	//
+sc4linedc	//
+sc4linedd	//
+sc4linede	//
+sc4linedf	//
+sc4linedg	//
+sc4linedh	//
+sc4linedi	//
 sc4ldcas	// Line Dancer Casino (Mazooma)
+sc4ldcasa	//
+sc4ldcasb	//
+sc4ldcasc	//
+sc4ldcasd	//
+sc4ldcase	//
 sc4ldvcl	// Little Devil Club (Mazooma)
 sc4lockb	// Lock Buster (Bellfruit)
+sc4lockba	//
+sc4lockbb	//
+sc4lockbc	//
+sc4lockbd	//
+sc4lockbe	//
+sc4lockbf	//
+sc4lockbg	//
 sc4lkbcl	// Lock Buster Club (Bellfruit)
+sc4lkbcla	//
+sc4lkbclb	//
+sc4lkbclc	//
+sc4lkbcld	//
+sc4lkbcle	//
+sc4lkbclf	//
+sc4lkbclg	//
+sc4lkbclh	//
+sc4lkbcli	//
 sc4lotrf	// Lord Of The Rings - The Fellowship Of The Ring (Bellfruit)
 sc4lotrfa	//
 sc4lotrfb	//
@@ -13066,8 +13224,15 @@ sc4polemc	//
 sc4polemd	//
 sc4polen	// Pole Position (Nova)
 sc4polic	// Police Squid (Qps)
+sc4polica	//
+sc4policb	//
+sc4policc	//
 sc4potsh	// Pot Shot (Qps)
+sc4potsha	//
 sc4pogbl	// Pots Of Gold Club (Bellfruit)
+sc4pogbla	//
+sc4pogblb	//
+sc4pogblc	//
 sc4pwcrz	// Power Crazy (Bellfruit)
 sc4pwcrza	//
 sc4pwcrzb	//
@@ -13079,8 +13244,19 @@ sc4pwcrzg	//
 sc4pwcrzh	//
 sc4pwcrzi	//
 sc4pwrsg	// Power Surge (Qps)
+sc4pwrsga	//
+sc4pwrsgb	//
+sc4pwrsgc	//
 sc4pwrbq	// Powerball (Qps)
+sc4pwrbqa	//
 sc4pir		// The Prize Is Right (Bellfruit)
+sc4pira		//
+sc4pirb		//
+sc4pirc		//
+sc4pird		//
+sc4pire		//
+sc4pirf		//
+sc4pirg		//
 sc4pen1		// Public Enemy No1 (Bellfruit)
 sc4pen1a	//
 sc4pen1b	//
@@ -13101,9 +13277,16 @@ sc4quartk	//
 sc4quartl	//
 sc4quartm	//
 sc4qmodo	// Quazzi Mo Dough (Qps)
+sc4qmodoa	//
+sc4qmodob	//
+sc4qmodoc	//
+sc4qmodod	//
 sc4quidr	// Quid Rock (Qps)
+sc4quidra	//
+sc4quidrb	//
+sc4quidrc	//
 sc4redad	// Red Alert (Bellfruit) [Dutch]
-sc4redal	// Red Alert (Bellfruit)
+sc4redada	//
 sc4rdrag	// Red Dragon (Qps)
 sc4rdrcl	// Red Dragon Club (Qps)
 sc4ibiza	// Red Hot Ibiza (Bellfruit)
@@ -13213,7 +13396,15 @@ sc4slcl		//
 sc4slcm		//
 sc4slcn		//
 sc4solgl	// Solid Gold (Bellfruit)
+sc4solgla	//
+sc4solglb	//
+sc4solglc	//
 sc4slih		// Some Like It Hot (Mazooma)
+sc4sliha	//
+sc4slihb	//
+sc4slihc	//
+sc4slihd	//
+sc4slihe	//
 sc4sace		// Space Ace (Qps)
 sc4sacea	//
 sc4sbust	// Space Buster (Qps)
@@ -13239,8 +13430,29 @@ sc4strbrb	//
 sc4strbrc	//
 sc4strbrd	//
 sc4stirc	// Stir Crazy (Mazooma)
+sc4stirca	//
+sc4stircb	//
+sc4stircc	//
+sc4stircd	//
+sc4stirce	//
+sc4stircf	//
+sc4stircg	//
+sc4stirch	//
+sc4stirci	//
+sc4stircj	//
 sc4strk		// Streak, The (Mazooma)
-sc4strka	// Streaks Ahead (Qps)
+sc4strka	//
+sc4strkb	//
+sc4strkc	//
+sc4strkd	//
+sc4strke	//
+sc4strkf	//
+sc4strkg	//
+sc4strkh	//
+sc4strki	//
+sc4strkj	//
+sc4strkk	//
+sc4sahed	// Streaks Ahead (Qps)
 sc4sf		// Street Fighter (Mazooma)
 sc4sfa		//
 sc4sfb		//
@@ -13251,6 +13463,9 @@ sc4strxa	//
 sc4strxb	//
 sc4strxc	//
 sc4suscl	// Suits U Sir Club (Qps)
+sc4suscla	//
+sc4susclb	//
+sc4susclc	//
 sc4s6c		// Super 6 Club (Bellfruit)
 sc4s6ca		//
 sc4s6cb		//
