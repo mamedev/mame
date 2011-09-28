@@ -2125,8 +2125,6 @@ $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 			$(LAYOUT)/navarone.lh \
 			$(LAYOUT)/sos.lh
 
-$(DRIVERS)/whitestar.o:	$(LAYOUT)/whitestar.lh
-
 $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh

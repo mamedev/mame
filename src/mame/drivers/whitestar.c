@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "video/mc6845.h"
 #include "audio/decobsmt.h"
-#include "whitestar.lh"
 #include "rendlay.h"
 
 class whitestar_state : public driver_device
@@ -199,7 +198,7 @@ MC6845_UPDATE_ROW( whitestar_update_row )
 		val = BITSWAP16(val,15,7,14,6,13,5,12,4,11,3,10,2,9,1,8,0);
 
 		for(xi=0;xi<8;xi++)
-			output_set_indexed_value("dmd", ra*128 + x*8+xi, (val>>(14-xi*2)) & 0x03);
+			*BITMAP_ADDR16(bitmap, ra, x*8 + xi)  = (val>>(14-xi*2)) & 0x03;
 	}
 }
 
@@ -216,6 +215,14 @@ static const mc6845_interface whitestar_crtc6845_interface =
 	DEVCB_NULL,
 	NULL
 };
+
+static PALETTE_INIT( whitestar )
+{
+	palette_set_color(machine, 0, MAKE_RGB(0, 0, 0));
+	palette_set_color(machine, 1, MAKE_RGB(84, 73, 10));
+	palette_set_color(machine, 2, MAKE_RGB(168, 147, 21));
+	palette_set_color(machine, 3, MAKE_RGB(255, 224, 32));
+}
 
 bool whitestar_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
@@ -240,19 +247,18 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 
 	MCFG_MC6845_ADD("mc6845", MC6845, 2000000, whitestar_crtc6845_interface)
 
-    MCFG_DEFAULT_LAYOUT(layout_whitestar)
-	
-	/* video hardware */
-	// Just a fake screen so mc6845 would update
+    /* video hardware */
     MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE( 128, 32 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 128-1, 0, 32-1 )
 
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_DEFAULT_LAYOUT( layout_lcd )
+
+    MCFG_PALETTE_LENGTH(4)
+    MCFG_PALETTE_INIT(whitestar)
 MACHINE_CONFIG_END
 
 // 8Mbit ROMs are mapped oddly: the first 4Mbit of each of the ROMs goes in order u17, u21, u36, u37
