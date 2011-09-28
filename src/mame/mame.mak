@@ -1850,7 +1850,11 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/gamtor.o \
-
+	$(DRIVERS)/belatra.o \
+	$(DRIVERS)/atronic.o \
+	$(DRIVERS)/astropc.o \
+	$(DRIVERS)/wms.o \
+	$(DRIVERS)/cupidon.o \
 
 
 

@@ -11332,7 +11332,7 @@ sweetl2_2d		// bootleg
 fcockt2a		// bootleg - Fruit Cocktail 2
 
 
-// Novotech
+// Novomatic
 
 g4u2		// Games 4 U
 g4u3		//
@@ -11514,6 +11514,46 @@ eurogamea	//
 firstcl		//
 llcharm		//
 llcharma	//
+
+// Belatra
+
+fairyl2		//
+fairyl2a	//
+fairyl2b	//
+fairyl2bl	//
+ldrink		//
+ldrinka		//
+merryjn		//
+
+// Astro (Russia)
+
+blackbd		//
+blackbda	//
+blackbdb	//
+dslayrr		//
+dslayrra	//
+hawaii		//
+oligam		//
+rasce		//
+
+// Atronic (Russia)
+
+atronic		//
+atronica	//
+atlantca	//
+
+// WMS (Russian)
+
+wms			//
+wmsa		//
+wmsb		//
+btippers	//
+
+// Cupidon (Russian)
+
+tsarevna	//
+tsarevnaa	//
+
 
 // TAB Austria
 // Quizard (Philips CD-I based HW)
@@ -13288,7 +13328,12 @@ sc4quidrc	//
 sc4redad	// Red Alert (Bellfruit) [Dutch]
 sc4redada	//
 sc4rdrag	// Red Dragon (Qps)
+sc4rdraga	//
+sc4rdragc	//
+sc4rdragf	//
 sc4rdrcl	// Red Dragon Club (Qps)
+sc4rdrcla	//
+sc4rdrclb	//
 sc4ibiza	// Red Hot Ibiza (Bellfruit)
 sc4ibizaa	//
 sc4ibizab	//
@@ -13300,12 +13345,30 @@ sc4ibizag	//
 sc4ibizah	//
 sc4ibizai	//
 sc4rhxcl	// Red Hot X Club (Mazooma)
+sc4rhxcla	//
+sc4rhxclb	//
+sc4rhxclc	//
 sc4r2r		// Reel To Reel (Mazooma)
+sc4r2ra		//
+sc4r2rb		//
+sc4r2rc		//
 sc4relcz	// Reely Crazy (Bellfruit)
+sc4relcza	//
+sc4relczb	//
+sc4relczc	//
 sc4rotc		// Return Of The Count (Mazooma)
+sc4rotca	//
+sc4rotcb	//
+sc4rotcc	//
+sc4rotcd	//
 sc4rvlnx	// Revoluion The Next (Bellfruit)
 sc4rvl		// Revolution (Bellfruit)
 sc4revo		// Revolver (Mazooma)
+sc4revoa	//
+sc4revob	//
+sc4revoc	//
+sc4revod	//
+sc4revoe	//
 sc4rich		// Rich Geezer (Bellfruit)
 sc4richa	//
 sc4richb	//
@@ -13321,7 +13384,15 @@ sc4richk	//
 sc4richl	//
 sc4rio		// Rio Grande (Bellfruit)
 sc4rttt		// Rise To The Top (Mazooma)
+sc4rttta	//
+sc4rtttb	//
+sc4rtttc	//
+sc4rtttd	//
+sc4rttte	//
 sc4roksc	// Rocket Science (Qps)
+sc4roksca	//
+sc4rokscb	//
+sc4rokscc	//
 sc4rogds	// Rogan Dosh (Qps)
 sc4rogdsa	//
 sc4rogdsb	//
@@ -13340,6 +13411,12 @@ sc4rtd		//
 sc4rtclb	// Rolling Thunder Club (Mazooma)
 sc4rtclba	//
 sc4rollo	// Rollover Jackpot (Mazooma)
+sc4rolloa	//
+sc4rollob	//
+sc4rolloc	//
+sc4rollod	//
+sc4rolloe	//
+sc4rollof	//
 sc4r66		// Route 66 (Mazooma)
 sc4rbank	// Royle Banker (Bellfruit)
 sc4rbanka	//
@@ -13360,13 +13437,33 @@ sc4roylek	//
 sc4roylel	//
 sc4roylem	//
 sc4srrmz	// Shake Rattle Roll (Mazooma)
+sc4srrmza	//
+sc4srrmzb	//
+sc4srrmzc	//
+sc4srrmzd	//
+sc4srrmze	//
+sc4srrmzf	//
+sc4srrmzg	//
+sc4srrmzh	//
+sc4srrmzi	//
+sc4srrmzj	//
+sc4srrmzk	//
+sc4srrmzl	//
+sc4srrmzm	//
 sc4srrca	// Shake Rattle Roll Casino (Mazooma)
+sc4srrcaa	//
+sc4srrcab	//
+sc4srrcac	//
+sc4srrcad	//
+sc4srrcae	//
 sc4sidsp	// Side Splitter (Mazooma)
 sc4sidspa	//
 sc4sidspb	//
 sc4sidspc	//
 sc4s2k		// Sinbad 2000 (Nova)
 sc4sirpz	// Sir Prize (Mazooma)
+sc4sirpza	//
+sc4sirpzb	//
 sc4stl		// Sky's The Limit, The (Bellfruit)
 sc4stla		//
 sc4stlb		//
@@ -13410,8 +13507,10 @@ sc4sacea	//
 sc4sbust	// Space Buster (Qps)
 sc4sbusta	//
 sc4splgb	// Splash & Grab (Mazooma)
+sc4splgba	//
 sc4spred	// Spread Your Bet (Mazooma)
 sc4stag		// Stag Night (Bellfruit)
+sc4staga	//
 sc4starp	// Starprize (Bellfruit)
 sc4starpa	//
 sc4starpb	//
@@ -13453,6 +13552,8 @@ sc4strki	//
 sc4strkj	//
 sc4strkk	//
 sc4sahed	// Streaks Ahead (Qps)
+sc4saheda	//
+sc4sahedb	//
 sc4sf		// Street Fighter (Mazooma)
 sc4sfa		//
 sc4sfb		//
