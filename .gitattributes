@@ -3827,6 +3827,7 @@ src/mame/layout/videodad.lay svneol=native#text/plain
 src/mame/layout/videopin.lay svneol=native#text/plain
 src/mame/layout/videopkr.lay svneol=native#text/plain
 src/mame/layout/wecleman.lay svneol=native#text/plain
+src/mame/layout/whitestar.lay svneol=native#text/plain
 src/mame/layout/wildone.lay svneol=native#text/plain
 src/mame/machine/3do.c svneol=native#text/plain
 src/mame/machine/acitya.c svneol=native#text/plain

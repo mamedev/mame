@@ -202,7 +202,7 @@ public:
 
 	public:
 		// construction/destruction
-		item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist);
+		item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist, int rep_x = 0, int rep_y = 0);
 		virtual ~item();
 
 		// getters
@@ -231,6 +231,8 @@ public:
 		render_bounds		m_bounds;			// bounds of the item
 		render_bounds		m_rawbounds;		// raw (original) bounds of the item
 		render_color		m_color;			// color of the item
+		int					m_repeatx;			// repeating element on horizontal
+		int					m_repeaty;			// repeating element on vertical
 	};
 
 	// construction/destruction

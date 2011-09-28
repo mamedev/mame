@@ -1690,8 +1690,19 @@ layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simp
 		parse_bounds(machine, xml_get_sibling(boundsnode, "bounds"), m_expbounds);
 
 	// load backdrop items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "backdrop"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "backdrop"))
-		m_backdrop_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
+	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "backdrop"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "backdrop")) {
+		int repeatx = xml_get_attribute_int_with_subst(machine, *itemnode, "repeatx", 0);
+		int repeaty = xml_get_attribute_int_with_subst(machine, *itemnode, "repeaty", 0);
+		if (repeatx!=0 && repeaty!=0) {
+			for(int y=0;y<repeaty;y++) {
+				for(int x=0;x<repeatx;x++) {
+					m_backdrop_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist, x, y)));
+				}
+			}
+		} else {
+			m_backdrop_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
+		}		
+	}
 
 	// load screen items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "screen"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "screen"))
@@ -1855,16 +1866,24 @@ void layout_view::recompute(render_layer_config layerconfig)
 //  item - constructor
 //-------------------------------------------------
 
-layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist)
+layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist,int rep_x, int rep_y)
 	: m_next(NULL),
 	  m_element(NULL),
 	  m_input_mask(0),
 	  m_screen(NULL),
 	  m_orientation(ROT0)
 {
-	// allocate a copy of the output name
-	m_output_name = xml_get_attribute_string_with_subst(machine, itemnode, "name", "");
+	char buff[256];
+	m_repeatx = xml_get_attribute_int_with_subst(machine, itemnode, "repeatx", 0);
+	m_repeaty = xml_get_attribute_int_with_subst(machine, itemnode, "repeaty", 0);
 
+	// allocate a copy of the output name
+	if (m_repeatx!=0 && m_repeaty!=0) {
+		sprintf(buff, "%s%d",xml_get_attribute_string_with_subst(machine, itemnode, "name", ""),rep_y * m_repeatx + rep_x);
+		m_output_name = buff;
+	} else {
+		m_output_name = xml_get_attribute_string_with_subst(machine, itemnode, "name", "");
+	}
 	// allocate a copy of the input tag
 	m_input_tag = xml_get_attribute_string_with_subst(machine, itemnode, "inputtag", "");
 
@@ -1890,6 +1909,17 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	if (m_output_name[0] != 0 && m_element != NULL)
 		output_set_value(m_output_name, m_element->default_state());
 	parse_bounds(machine, xml_get_sibling(itemnode.child, "bounds"), m_rawbounds);
+	// recalc bounds
+	if (m_repeatx!=0 && m_repeaty!=0) {
+		float w = m_rawbounds.x1 - m_rawbounds.x0;
+		float h = m_rawbounds.y1 - m_rawbounds.y0;
+		m_rawbounds.x0 = m_rawbounds.x0 + w * rep_x;
+		m_rawbounds.x1 = m_rawbounds.x1 + w * rep_x;
+		
+		m_rawbounds.y0 = m_rawbounds.y0 + h * rep_y;
+		m_rawbounds.y1 = m_rawbounds.y1 + h * rep_y;
+	}
+	
 	parse_color(machine, xml_get_sibling(itemnode.child, "color"), m_color);
 	parse_orientation(machine, xml_get_sibling(itemnode.child, "orientation"), m_orientation);
 
