@@ -1855,6 +1855,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/astropc.o \
 	$(DRIVERS)/wms.o \
 	$(DRIVERS)/cupidon.o \
+	$(DRIVERS)/extrema.o \
 
 
 

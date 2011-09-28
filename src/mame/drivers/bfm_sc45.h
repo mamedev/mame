@@ -385,6 +385,9 @@
 	ROM_LOAD( "95008846.bin", 0x0000, 0x080000, CRC(44f9eaab) SHA1(394bd36121c33aba97bc957b3d46d2944c1daeed) ) \
 	ROM_LOAD( "95009130.bin", 0x0000, 0x100000, CRC(f6813371) SHA1(bd9e5d009c7870d50149d9de396f363fb19b183c) ) \
 
+#define sc_crcpt_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
 #define sc_corst_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95009037.bin", 0x0000, 0x100000, CRC(c2d3b6ee) SHA1(36e7e9c956ab91fd1b2e52800b4482ce3a3597f5) ) \
@@ -1113,6 +1116,9 @@
 #define sc_rdrcl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008525.bin", 0x0000, 0x0e7e1d, CRC(0c7aa11d) SHA1(3d028d2d5558056e84626ba66f7c22286be34bd9) ) \
+
+#define sc_rhr \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 
 #define sc_rhx_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \

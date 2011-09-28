@@ -4349,3 +4349,59 @@ GAME( 2007, sweetl2_2c,  sweetl2_parent,  multfish, multfish,  0,             RO
 GAME( 2007, sweetl2_2d,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 
 GAME( 2008, fcockt2a,    fcockt2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 080707, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+
+
+/* 0x000000 - 0x03ffff Crazy Monkey V03-1110
+   0x040000 - 0x07ffff Garage V05-0311
+   0x080000 - 0x0bffff Lucky Haunter V04-0825
+   0x0c0000 - 0x0fffff Island 2  IS2-060529
+   0x100000 - 0x13ffff Fruit Cocktail V05-0118
+   0x140000 - 0x17ffff Resident  V04-0513
+   0x180000 - 0x1bffff Rock Climber RC040827
+   0x1c0000 - 0x1fffff xxxx MENU xxxx  ( Lucky Haunter V04-0825 service mode )
+   0x200000 - 0x23ffff Pirate PR060210
+   0x240000 - 0x27ffff Sweet Life SL041220
+   0x280000 - 0x2bffff Keks KS060403
+   0x2c0000 - 0x2fffff xxxx MENU xxxx  ( Lucky Haunter V04-0825 service mode )
+   0x300000 - 0x33ffff NOTHING
+   0x340000 - 0x37ffff NOTHING
+   0x380000 - 0x3bffff NOTHING
+   0x3c0000 - 0x3fffff NOTHING
+*/
+ROM_START( igromult )
+	ROM_REGION( 0x400000, "maincpu", 0 ) 
+	ROM_LOAD( "10games.320.bin", 0x0000, 0x400000, CRC(94e5b2e1) SHA1(62544a5b3de02b5f323478dbae19ef2409af2529) )
+
+	ROM_REGION( 0x4000000, "gfx", 0 ) /* There should be 64MB worth of FLASH ROM for the gfx, the menu GFX are unique at least (not in any Igrosoft set) */
+	ROM_LOAD( "10games.gfx", 0x000000, 0x4000000, NO_DUMP )
+ROM_END
+
+/* 0x000000 - 0x03ffff Crazy Monkey V03-1110
+   0x040000 - 0x07ffff Garage V05-0311
+   0x080000 - 0x0bffff Lucky Haunter V04-0825
+   0x0c0000 - 0x0fffff Island 2  IS2-060529
+   0x100000 - 0x13ffff Fruit Cocktail V05-0118
+   0x140000 - 0x17ffff Resident  V04-0513
+   0x180000 - 0x1bffff Rock Climber RC040827
+   0x1c0000 - 0x1fffff Pirate PR060210
+   0x200000 - 0x23ffff Sweet Life SL041220
+   0x240000 - 0x27ffff Keks KS060403
+   0x280000 - 0x2bffff Gnome M GNM-080303
+   0x2c0000 - 0x2fffff Multifish 4Game V04-0308
+   0x300000 - 0x33ffff Pirate 2 PR2-061005
+   0x340000 - 0x37ffff F Cocktail 2 FC2M-081105
+   0x380000 - 0x3bffff Sweet Life 2 - SL2M-080320
+   0x3c0000 - 0x3fffff  xxxx MENU xxxx  ( Lucky Haunter V04-0825 service mode )
+*/
+
+ROM_START( igromula )
+	ROM_REGION( 0x400000, "maincpu", 0 ) 
+	ROM_LOAD( "15games.320.bin", 0x0000, 0x400000, CRC(1cfd520d) SHA1(7316b883a13ff98fc7c3ff05aa085f1fb8e0bdcd) )
+
+	ROM_REGION( 0x4000000, "gfx", 0 ) /* There should be 64MB worth of FLASH ROM for the gfx, the menu GFX are unique at least (not in any Igrosoft set) */
+	ROM_LOAD( "15games.gfx", 0x000000, 0x4000000, NO_DUMP )
+ROM_END
+
+GAME( 2003, igromult,   0,		  multfish, multfish,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (10 Games)", GAME_NOT_WORKING ) // no GFX roms
+GAME( 2003, igromula,   igromult, multfish, multfish,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (15 Games)", GAME_NOT_WORKING ) // no GFX roms
+

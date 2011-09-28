@@ -11331,6 +11331,8 @@ sweetl2_2c		// bootleg
 sweetl2_2d		// bootleg
 fcockt2a		// bootleg - Fruit Cocktail 2
 
+igromult		// Multigame bootleg
+igromula		// Multigame bootleg
 
 // Novomatic
 
@@ -11540,19 +11542,88 @@ rasce		//
 
 atronic		//
 atronica	//
-atlantca	//
+
+atlantca 	// Atlantica
+atlantcaa 	//
+baboshka 	// Baboshka 
+cfblue 		// Crazy Fruits Blue
+cfbluea 	// 
+cfgreen 	// Crazy Fruits Green 
+chicken 	// Chicken 
+aclown 		// Clown 
+goldglen 	// Golden Glenn 
+iccash 		// I C Cash 
+shpinxii 	// Sphinx II 
+bearnec 	// Bear Necessities 
+beachpt 	// Beach Patrol 
+beetleup 	// Beetles Unplugged 
+abigchs 	// Big Cheese 
+bigblue 	// Big Blue 
+castaway 	// Castaway
+castawaya 	// 
+dncsprt 	// Dancing Spirit 
+drmmake 	// Dream Maker 
+goldcity 	// Gold City 
+jumpjkpt 	// Jumping Jackpots 
+mushmagi 	// Mushroom Magic 
+santam 		// Santa Maria 
+splmastr 	// Spell Master 
+tajmah 		// Tajmahal 
+3wishrd     // Three Wishes Red 
+
 
 // WMS (Russian)
 
-wms			//
+wms			// Set Chips
 wmsa		//
 wmsb		//
-btippers	//
 
-// Cupidon (Russian)
+btippers    // Big Tippers (Russia)
+wmsboom     // Boom (Russia)
+cashcrop    // Cash Crop (Russia)
+filthyr 	// Filthy Rich (Russia)
+hottop 		// Hot Toppings (Russia)
+inwinner 	// In Winner (Russia)
+jptparty 	// Jackpot Party (Russia)
+leprgld 	// Leprecorns Gold (Russia)
+lol 		// Life of Luxury (Russia)
+lovewin 	// Love To Win (Russia)
+mtburn 		// Money To Burn (Russia)
+otchart 	// Off The Charts (Russia)
+perfect 	// Perfect Game (Russia)
+reelemin 	// Reel 'Em In (Russia)
+sonoth 		// Sum Of Nothing (Russia)
+swingin 	// Swingin' Green (Russia)
+wmstopb 	// Top Banana (Russia)
+wdun 		// Who Dunnit (Russia)
+winbid 		// Winning Bid (Russia)
+wldstrek 	// Wild Streak (Russia)
+yukongld 	// Yukon Gold (Russia)
+
+// Extrema (Russian)
+
+
+ maski     // Maski Show (Russia)
+ adults    // Adults Only (Russia)
+ bloto     // Blits Loto (Russia)
+ blpearl   // Black Pearl (Russia)
+ grancan   // Grand Canyon (Russia)
+ luckshel  // Lucky Shell (Russia)
+ exsafar   // Safari (Russia)
+ strlink   // Strong Link (Russia)
+ extrmth   // Treasure Hunt (Russia)
+ extrmti   // Treasure Island (Russia)
+
+
+// Cupidon / Kupidon (Russian)
 
 tsarevna	//
 tsarevnaa	//
+gangrose	//
+funnyfm		//
+funnyfma	//
+funnyfmb	//
+cashtrn		//
 
 
 // TAB Austria
@@ -15163,13 +15234,17 @@ sc5wotw		// War Of The Wads (Mazooma)
 sc5wild		// Wild Reels (Mazooma)
 sc5wca		// Win Can Alley (Qps)
 sc5wok		// Wok n' Roll (Bellfruit)
-sc5u6606	// Unknown Scorpion '95416606' (Mazooma)
-sc5u7606	// Unknown Scorpion '95417606' (Mazooma)
+sc5rhrd	// Unknown Scorpion '95416606' (Mazooma)
+sc5rhre	// Unknown Scorpion '95417606' (Mazooma)
 sc5rhr		// Red Hot Reels (Qps)
+sc5rhra		//
+sc5rhrb		//
+sc5rhrc		//
 sc5srrcl	// Snake Rattle 'n' Roll Club (Bellfruit)
 sc5pircl	// The Prize Is Right Club (Bellfruit)
 sc5mrrcl	// Monopoly Road To Riches Club (Mazooma)
 sc5crcpt	// Cops 'n' Robbers Community Party (Bellfruit)
+sc5crcpta	//
 sc5adjb		// Ant & Dec's Jiggy Bank (Bellfruit)
 sc5adjba	//
 sc5adjbb	//
@@ -15192,10 +15267,23 @@ sc5adjbr	//
 sc5adwta	// Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit)
 sc5adwtaa	//
 sc5a40		// Around The Board In 40 Days (Mazooma)
+sc5a40a		//
 sc5bantm	// Bantam Of The Opera (Mazooma)
+sc5bantma	//
 sc5bar7		// Bar 7's (Bellfruit)
+sc5bar7a	//
+sc5bar7b	//
+sc5bar7c	//
+sc5bar7d	//
+sc5bar7e	//
+sc5bar7f	//
+sc5bar7g	//
 sc5batl		// Battleships & Cruisers (Bellfruit)
+sc5batla	//
 sc5bob		// Bobby Dazzler (Mazooma)
+sc5boba		//
+sc5bobb		//
+sc5bobc		//
 sc5bull		// Bullseye (Bellfruit)
 sc5bulla	//
 sc5sbull	//
@@ -15205,15 +15293,37 @@ sc5bull5a	//
 sc5bull5b	//
 sc5bull5c	//
 sc5butch	// Butch Cashidy & The Sundance Quid (Bellfruit)
+sc5butcha	//
+sc5butchb	//
+sc5butchc	//
+sc5butchd	//
+sc5butche	//
 sc5cabin	// Cabin Fever (Mazooma)
 sc5cabina	//
 sc5cabinb	//
 sc5cabinc	//
 sc5cari		// Caribbean Cash (Qps)
+sc5caria	//
+sc5carib	//
+sc5caric	//
+sc5carid	//
+sc5carie	//
+sc5carif	//
+sc5carig	//
 sc5cblas	// Cash Blast (Bellfruit)
+sc5cblasa	//
 sc5casxt	// Casino Xtravaganza  (Mazooma)
+sc5casxta	//
 sc5chavi	// Chav It (Bellfruit)
+sc5chavia	//
+sc5chavib	//
+sc5chavic	//
+sc5chavid	//
+sc5chavie	//
 sc5chavy	// Chavy Chase (Mazooma)
+sc5chavya	//
+sc5chavyb	//
+sc5chavyc	//
 sc5clue		// Cluedo (Mazooma)
 sc5cmani	// Colour Mania (Bellfruit)
 sc5cj		// Cool Jewels (Bellfruit)

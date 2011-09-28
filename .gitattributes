@@ -2095,6 +2095,7 @@ src/mame/drivers/exidy440.c svneol=native#text/plain
 src/mame/drivers/expro02.c svneol=native#text/plain
 src/mame/drivers/exprraid.c svneol=native#text/plain
 src/mame/drivers/exterm.c svneol=native#text/plain
+src/mame/drivers/extrema.c svneol=native#text/plain
 src/mame/drivers/exzisus.c svneol=native#text/plain
 src/mame/drivers/f-32.c svneol=native#text/plain
 src/mame/drivers/f1gp.c svneol=native#text/plain
