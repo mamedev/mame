@@ -186,6 +186,45 @@ static INTERRUPT_GEN( whitestar_firq_interrupt )
 	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
+#define DMD_CHUNK_SIZE 10
+#define MCFG_DMD_ADD(_tag, _width, _height) \
+	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
+	MCFG_SCREEN_TYPE(LCD) \
+    MCFG_SCREEN_REFRESH_RATE(60) \
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
+	MCFG_SCREEN_SIZE( _width * DMD_CHUNK_SIZE, _height *DMD_CHUNK_SIZE) \
+	MCFG_SCREEN_VISIBLE_AREA( 0, _width * DMD_CHUNK_SIZE-1, 0, _height*DMD_CHUNK_SIZE-1 ) \
+	MCFG_DEFAULT_LAYOUT( layout_lcd )
+
+
+void dmd_put_pixel(bitmap_t *bitmap, int x, int y, int color)
+{
+	int midx = x * DMD_CHUNK_SIZE + DMD_CHUNK_SIZE/2;
+	int midy = y * DMD_CHUNK_SIZE + DMD_CHUNK_SIZE/2;
+	int width = DMD_CHUNK_SIZE-2;
+	// compute parameters
+	width /= 2;
+	float ooradius2 = 1.0f / (float)(width * width);
+
+	// iterate over y
+	for (UINT32 y = 0; y <= width; y++)
+	{
+		UINT16 *d0 = BITMAP_ADDR16(bitmap, midy - y, 0);
+		UINT16 *d1 = BITMAP_ADDR16(bitmap, midy + y, 0);
+		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
+		INT32 left, right;
+
+		// compute left/right coordinates
+		left = midx - (INT32)(xval + 0.5f);
+		right = midx + (INT32)(xval + 0.5f);
+
+		// draw this scanline
+		for (UINT32 x = left; x < right; x++)
+			d0[x] = d1[x] = color + 1;
+	}
+}
+
 MC6845_UPDATE_ROW( whitestar_update_row )
 {
 	whitestar_state *state = device->machine().driver_data<whitestar_state>();
@@ -198,7 +237,7 @@ MC6845_UPDATE_ROW( whitestar_update_row )
 		val = BITSWAP16(val,15,7,14,6,13,5,12,4,11,3,10,2,9,1,8,0);
 
 		for(xi=0;xi<8;xi++)
-			*BITMAP_ADDR16(bitmap, ra, x*8 + xi)  = (val>>(14-xi*2)) & 0x03;
+			dmd_put_pixel(bitmap, (x*8 + xi), ra, (val>>(14-xi*2)) & 0x03);
 	}
 }
 
@@ -219,9 +258,11 @@ static const mc6845_interface whitestar_crtc6845_interface =
 static PALETTE_INIT( whitestar )
 {
 	palette_set_color(machine, 0, MAKE_RGB(0, 0, 0));
-	palette_set_color(machine, 1, MAKE_RGB(84, 73, 10));
-	palette_set_color(machine, 2, MAKE_RGB(168, 147, 21));
-	palette_set_color(machine, 3, MAKE_RGB(255, 224, 32));
+	
+	palette_set_color(machine, 1, MAKE_RGB(20, 20, 20));
+	palette_set_color(machine, 2, MAKE_RGB(84, 73, 10));
+	palette_set_color(machine, 3, MAKE_RGB(168, 147, 21));
+	palette_set_color(machine, 4, MAKE_RGB(255, 224, 32));
 }
 
 bool whitestar_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -248,16 +289,9 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	MCFG_MC6845_ADD("mc6845", MC6845, 2000000, whitestar_crtc6845_interface)
 
     /* video hardware */
-    MCFG_SCREEN_ADD("screen", LCD)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE( 128, 32 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 128-1, 0, 32-1 )
+    MCFG_DMD_ADD("screen", 128, 32)
 
-	MCFG_DEFAULT_LAYOUT( layout_lcd )
-
-    MCFG_PALETTE_LENGTH(4)
+    MCFG_PALETTE_LENGTH(5)
     MCFG_PALETTE_INIT(whitestar)
 MACHINE_CONFIG_END
 
