@@ -99,7 +99,7 @@ public:
 
 *******************************************************/
 
-
+#if 0
 static void set_mirroring(famibox_state *state, int mirroring)
 {
 	switch(mirroring)
@@ -131,6 +131,7 @@ static void set_mirroring(famibox_state *state, int mirroring)
 		break;
 	}
 }
+#endif
 
 static WRITE8_HANDLER (famibox_nt_w)
 {
@@ -242,7 +243,7 @@ static void famicombox_bankswitch(running_machine &machine, UINT8 bank)
 		{ 0x00, "menu",         0, 0x4000, 0x8000 },
 	};
 
-	famibox_state *state = machine.driver_data<famibox_state>();
+//	famibox_state *state = machine.driver_data<famibox_state>();
 
 	for (int i = 0; i < sizeof(famicombox_banks)/sizeof(famicombox_banks[0]); i++ )
 	{
