@@ -158,10 +158,10 @@ ROM_END
 
 ROM_START( ac1piaca )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "pia casino 5p 5-1.bin", 0x0000, 0x002000, CRC(216b0719) SHA1(11a1a04edd981922e2a6756709168c33e1d437c7) )
-	ROM_LOAD( "pia casino 5p 5-2.bin", 0x2000, 0x002000, CRC(5baad962) SHA1(3afd8e0f76e82cd7fd028d9a627a9ca5a7704bd7) )
-	ROM_LOAD( "pia casino 5p 5-3.bin", 0x4000, 0x002000, CRC(d6670a6a) SHA1(30de7ba1534351ec96c803530fcdacc234ee7454) )
-	ROM_LOAD( "pia casino 5p 5-4.bin", 0x6000, 0x002000, CRC(7987db2d) SHA1(ee6ed7617f64faaa12182a8f12a96adb8b0ce32d) )
+	ROM_LOAD( "pia casino 5p 5-1.bin", 0x0000, 0x002000, CRC(216b0719) SHA1(11a1a04edd981922e2a6756709168c33e1d437c7) ) // aka pd566p5a
+	ROM_LOAD( "pia casino 5p 5-2.bin", 0x2000, 0x002000, CRC(5baad962) SHA1(3afd8e0f76e82cd7fd028d9a627a9ca5a7704bd7) ) // aka pd566p5b
+	ROM_LOAD( "pia casino 5p 5-3.bin", 0x4000, 0x002000, CRC(d6670a6a) SHA1(30de7ba1534351ec96c803530fcdacc234ee7454) ) // aka pd566p5c
+	ROM_LOAD( "pia casino 5p 5-4.bin", 0x6000, 0x002000, CRC(7987db2d) SHA1(ee6ed7617f64faaa12182a8f12a96adb8b0ce32d) ) // aka pd566p5d
 ROM_END
 
 
@@ -179,13 +179,7 @@ ROM_START( ac1piacl )
 	ROM_LOAD( "cpia7.bin", 0x0000, 0x008000, CRC(718b10f0) SHA1(0fe8ee1d14e5f22d27057f53ef2a2690cf02cab2) )
 ROM_END
 
-ROM_START( ac1piadx )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "pd566p5a", 0x0000, 0x002000, CRC(216b0719) SHA1(11a1a04edd981922e2a6756709168c33e1d437c7) )
-	ROM_LOAD( "pd566p5b", 0x2000, 0x002000, CRC(5baad962) SHA1(3afd8e0f76e82cd7fd028d9a627a9ca5a7704bd7) )
-	ROM_LOAD( "pd566p5c", 0x4000, 0x002000, CRC(d6670a6a) SHA1(30de7ba1534351ec96c803530fcdacc234ee7454) )
-	ROM_LOAD( "pd566p5d", 0x6000, 0x002000, CRC(7987db2d) SHA1(ee6ed7617f64faaa12182a8f12a96adb8b0ce32d) )
-ROM_END
+
 
 
 
@@ -253,9 +247,8 @@ GAME( 199?, ac1taklv		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Take It Or Leave 
 GAME( 199?, ac1bbclb		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Big Break Club (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, ac1clbsv		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Club Sovereign (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, ac1clbxt		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Club Xtra (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, ac1piaca		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Play It Again Casino (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, ac1piaca		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Play It Again Casino (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // Same ROMs were in 'Play It Again Deluxe'
 GAME( 199?, ac1piacl		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Play It Again Club (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, ac1piadx		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Play It Again Deluxe (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, ac1prmcl		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Premier Club (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, ac1rundx		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Runner Deluxe Club (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, ac1totb			,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Top Of The Bill (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

@@ -15347,14 +15347,86 @@ sc5chavya	//
 sc5chavyb	//
 sc5chavyc	//
 sc5clue		// Cluedo (Mazooma)
+sc5cluea	//
+sc5clueb	//
+sc5cluec	//
 sc5cmani	// Colour Mania (Bellfruit)
+sc5cmania	//
+sc5cmanib	//
+sc5cmanic	//
 sc5cj		// Cool Jewels (Bellfruit)
+sc5cja		//
+sc5cjb		//
+sc5cjc		//
+sc5cjd		//
+sc5cje		//
 sc5ctl		// Cop The Lot (Bellfruit)
+sc5ctla		//
+sc5ctlb		//
+sc5ctlc		//
 sc5crsc		// Cops 'n' Robbers Safe Cracker (Bellfruit)
+sc5crsca	//
+sc5crscb	//
+sc5crscc	//
+sc5crscd	//
+sc5crsce	//
+sc5crscf	//
+sc5crscg	//
+sc5crsch	//
+sc5crsci	//
+sc5crscj	//
+sc5crsck	//
+sc5crscl	//
+sc5crscm	//
+sc5crscn	//
+sc5crsco	//
+sc5crscp	//
+sc5crscq	//
+sc5crscr	//
+sc5crscs	//
+sc5crsct	//
+sc5crscu	//
 sc5coro		// Coronation Street (Mazooma)
+sc5coroa	//
+sc5corob	//
+sc5coroc	//
+sc5corod	//
+sc5coroe	//
+sc5corof	//
+sc5corog	//
+sc5coroh	//
+sc5coroi	//
+sc5coroj	//
+sc5corok	//
+sc5corol	//
+sc5corom	//
+sc5coron	//
+sc5coroo	//
+sc5corop	//
+sc5coroq	//
+sc5coror	//
+sc5coros	//
+sc5corot	//
+sc5corou	//
+sc5corov	//
+sc5corow	//
+sc5corox	//
+sc5coroy	//
+sc5coroz	//
+sc5coro0	//
+sc5coro1	//
 sc5count	// Countdown (Bellfruit)
+sc5counta	//
 sc5czfr		// Crazy Fruits (Bellfruit)
+sc5frcrza	//
+sc5frcrz	//
 sc5crnjw	// Crown Jewels (Bellfruit)
+sc5crnjwa	//
+sc5crnjwb	//
+sc5cjqps	//
+sc5cjqpsa	//
+sc5cjqpsb	//
+sc5cjqpsc	//
 sc5dnd		// Deal Or No Deal (Bellfruit)
 sc5dnda		//
 sc5dndb		//
@@ -15763,19 +15835,94 @@ sc5ggga		//
 sc5gggb		//
 sc5gggc		//
 sc5gunp		// Gunpowder Slot (Bellfruit)
+sc5gunpa	//
+sc5gunpb	//
+sc5gunpc	//
+sc5gunpd	//
+sc5gunpe	//
+sc5gunpf	//
+sc5gunpg	//
+sc5gunph	//
+sc5gunpi	//
+sc5gunpj	//
+sc5gunpk	//
+sc5gunpl	//
 sc5hapnt	// Happy Notes (Bellfruit)
+sc5hapnta	//
+sc5hapntb	//
+sc5hapntc	//
+sc5hapntd	//
+sc5hapnte	//
+sc5hapntf	//
+sc5hapntg	//
 sc5hellb	// Hells Bells (Bellfruit)
+sc5hellba	//
 sc5hill		// Hill Billionaire (Bellfruit)
+sc5hilla	//
+sc5hillb	//
 sc5hiss		// Hissing Quid (Qps)
+sc5hissa	//
+sc5hissb	//
+sc5hissc	//
 sc5hotdg	// Hot Dog (Bellfruit)
+sc5hotdga	//
+sc5hotdgb	//
+sc5hotdgc	//
+sc5hotdgd	//
+sc5hotdge	//
 sc5hotrd	// Hot Rod (Bellfruit)
+sc5hotrda	//
 sc5hotsh	// Hot Shots (Bellfruit)
+sc5hotsha	//
+sc5hotshb	//
+sc5hotshc	//
+sc5hotshd	//
+sc5hotshe	//
+sc5hotshf	//
+sc5hotshg	//
+sc5hotshh	//
+sc5hotshi	//
+sc5hotshj	//
+sc5hotshk	//
+sc5hotshl	//
+sc5hotshm	//
+sc5hotshn	//
+sc5hotsho	//
+sc5hotshp	//
+sc5hotshq	//
 sc5hotwd	// Hot Wad (Bellfruit)
+sc5hotwda	//
+sc5hotwdb	//
+sc5hotwdc	//
+sc5hotwdd	//
+sc5hotwde	//
+sc5hotwdf	//
+sc5hotwdg	//
 sc5celeb	// I'm A Celebrity (Bellfruit)
+sc5celeba	//
+sc5celebb	//
+sc5celebc	//
+sc5celebd	//
 sc5inspn	// Inner Spin (Mazooma)
+sc5inspna	//
 sc5ijob		// Italian Job (Mazooma)
+sc5ijoba	//
+sc5ijobb	//
+sc5ijobc	//
+sc5ijobd	//
+sc5ijobe	//
+sc5ijobf	//
+sc5ijobg	//
+sc5ijobh	//
+sc5ijobi	//
 sc5jjok		// Jackpot Jokers (Bellfruit)
+sc5jjoka	//
 sc5ldvl		// Little Devil (Mazooma)
+sc5ldvla	//
+sc5ldvlb	//
+sc5ldvlc	//
+sc5ldvld	//
+sc5ldvle	//
 sc5lotrr	// Lord Of The Rings - Return Of The King (Bellfruit)
 sc5lotrra	//
 sc5lotrrb	//
@@ -15811,29 +15958,100 @@ sc5manicu	//
 sc5manicv	//
 sc5manicw	//
 sc5mmm		// Mental Money Monsters (Mazooma)
+sc5mmma		//
+sc5mmmb		//
+sc5mmmc		//
 sc5mmad		// Money Madness (Mazooma)
+sc5mmada	//
+sc5mmadb	//
+sc5mmadc	//
 sc5monsp	// Money Spinner (Bellfruit)
+sc5monspa	//
 sc5monop	// Monopoly (Mazooma)
 sc5mcas		// Monopoly Casino (Mazooma)
 sc5mcasa	//
 sc5mcasb	//
 sc5mcasc	//
 sc5mdm		// Monopoly Double Money (Bellfruit)
+sc5mdma		//
+sc5mdmb		//
+sc5mdmc		//
 sc5mhn		// Monopoly Here & Now (Mazooma)
+sc5mhna		//
+sc5mhnb		//
+sc5mhnc		//
+sc5mhnd		//
+sc5mhne		//
 sc5mhp		// Monopoly Hot Property (Bellfruit)
+sc5mhpa		//
+sc5mhpb		//
+sc5mhpc		//
+sc5mhpd		//
+sc5mhpe		//
+sc5mhpf		//
+sc5mhpg		//
+sc5mhph		//
+sc5mhpi		//
 sc5mmb		// Monopoly Money Bags (Bellfruit)
+sc5mmba		//
+sc5mmbb		//
+sc5mmbc		//
+sc5mmbd		//
+sc5mmbe		//
 sc5mrh		// Monopoly Red Hot (Mazooma)
+sc5mrha		//
 sc5mr2r		// Monopoly Road To Riches (Mazooma)
+sc5mr2ra	//
+sc5mr2rb	//
 sc5mww		// Monopoly Wonders Of The World (Mazooma)
+sc5mwwa		//
+sc5mwwb		//
+sc5mwwc		//
 sc5nmare	// A Nightmare On Elm Street (Bellfruit)
+sc5nmarea	//
+sc5nmareb	//
+sc5nmarec	//
 sc5potp		// Pick Of The Pack (Bellfruit)
+sc5potpa	//
 sc5pp		// Pink Panther (Mazooma)
+sc5ppa		//
+sc5ppb		//
+sc5ppc		//
+sc5ppd		//
+sc5ppe		//
+sc5ppf		//
+sc5ppg		//
 sc5ppcr		// Pink Panther Clouseau's Revenge (Mazooma)
+sc5ppcra	//
+sc5ppcrb	//
+sc5ppcrc	//
+sc5ppcrd	//
 sc5ppctc	// Pink Panther Crack The Code (Bellfruit)
+sc5ppctca	//
+sc5ppctcb	//
+sc5ppctcc	//
+sc5ppctcd	//
+sc5ppctce	//
+sc5ppctcf	//
+sc5ppctcg	//
+sc5ppctch	//
 sc5ppdym	// Pink Panther Double Your Money (Mazooma)
+sc5ppdyma	//
 sc5ppsag	// Pink Panther Strikes Again (Mazooma)
+sc5ppsaga	//
+sc5ppsagb	//
+sc5ppsagc	//
+sc5ppsagd	//
+sc5ppsage	//
 sc5pony		// Pony Express (Bellfruit)
+sc5ponya	//
+sc5ponyb	//
+sc5ponyc	//
+sc5ponyd	//
 sc5popey	// Popeye (Mazooma)
+sc5popeya	//
+sc5popeyb	//
+sc5popeyc	//
 sc5pog		// Pots Of Gold (Bellfruit)
 sc5poga		//
 sc5pogb		//
@@ -15849,11 +16067,28 @@ sc5potogg	//
 sc5pogd		//
 sc5poge		//
 sc5pwrpl	// Power Play (Mazooma)
+sc5pwrpla	//
 sc5pwrbl	// Powerball (Bellfruit)
+sc5pwrbla	//
 sc5quidv	// Quid Vicious (Mazooma)
+sc5quidva	//
+sc5quidvb	//
+sc5quidvc	//
+sc5quidvd	//
+sc5quidve	//
+sc5quidvf	//
+sc5quidvg	//
 sc5rhx		// Red Hot X (Mazooma)
+sc5rhxa		//
+sc5rhxb		//
+sc5rhxc		//
+sc5rhxd		//
+sc5rhxe		//
+sc5rhxf		//
 sc5rhxcs	// Red Hot X Casino (Mazooma)
+sc5rhxcsa	//
 sc5redsq	// Red Square (Mazooma)
+sc5redsqa	//
 sc5rosts	// Ronnie O'Sullivan's Tournament Snooker (Bellfruit)
 sc5rostsa	//
 sc5rostsb	//
@@ -16577,7 +16812,6 @@ m3nnice		// Naughty But Nice (Barcrest)
 m3nudge		// Nudges Unlimited (Barcrest)
 m3oddson	// Odds On (Barcrest)
 m3optunl	// Options Unlimited (Barcrest)
-m3optunla	//
 m3razdaz	// Razzle Dazzle (Barcrest)
 m3razdaza	//
 m3razdazd	//
@@ -17885,7 +18119,6 @@ ac1clbsv		// Club Sovereign (Ace)
 ac1clbxt		// Club Xtra (Ace)
 ac1piaca		// Play It Again Casino (Ace)
 ac1piacl		// Play It Again Club (Ace)
-ac1piadx		// Play It Again Deluxe (Ace)
 ac1prmcl		// Premier Club (Ace)
 ac1rundx		// Runner Deluxe Club (Ace)
 ac1totb			// Top Of The Bill (Ace)
