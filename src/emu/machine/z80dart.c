@@ -444,7 +444,7 @@ int z80dart_device::m1_r()
 z80dart_device::dart_channel::dart_channel()
 	: m_rx_shift(0),
 	  m_rx_error(0),
-	  m_rx_fifo(0),
+	  m_rx_fifo(-1),
 	  m_rx_clock(0),
 	  m_rx_state(0),
 	  m_rx_bits(0),
