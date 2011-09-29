@@ -741,6 +741,7 @@ static CPU_EXECUTE( m68k )
 
 			if (!m68k->pmmu_enabled)
 			{
+				m68k->run_mode = RUN_MODE_NORMAL;
 				/* Read an instruction and call its handler */
 				m68k->ir = m68ki_read_imm_16(m68k);
 				m68k->jump_table[m68k->ir](m68k);
@@ -748,6 +749,7 @@ static CPU_EXECUTE( m68k )
 			}
 			else
 			{
+				m68k->run_mode = RUN_MODE_NORMAL;
 				// save CPU address registers values at start of instruction
 				int i;
 				UINT32 tmp_dar[16];
