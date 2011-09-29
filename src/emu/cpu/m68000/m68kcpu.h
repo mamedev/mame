@@ -255,26 +255,14 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define CPU_TYPE_IS_000(A)         ((A) == CPU_TYPE_000 || (A) == CPU_TYPE_008)
 
 
-/* Configuration switches (see m68kconf.h for explanation) */
-#define M68K_EMULATE_TRACE          0
-
-/* Enable or disable trace emulation */
-#if M68K_EMULATE_TRACE
-	/* Initiates trace checking before each instruction (t1) */
-	#define m68ki_trace_t1() m68ki_tracing = m68k->t1_flag
-	/* adds t0 to trace checking if we encounter change of flow */
-	#define m68ki_trace_t0() m68ki_tracing |= m68k->t0_flag
-	/* Clear all tracing */
-	#define m68ki_clear_trace() m68ki_tracing = 0
-	/* Cause a trace exception if we are tracing */
-	#define m68ki_exception_if_trace() if(m68ki_tracing) m68ki_exception_trace(m68k)
-#else
-	#define m68ki_trace_t1()
-	#define m68ki_trace_t0()
-	#define m68ki_clear_trace()
-	#define m68ki_exception_if_trace()
-#endif /* M68K_EMULATE_TRACE */
-
+/* Initiates trace checking before each instruction (t1) */
+#define m68ki_trace_t1(m68k) m68k->tracing = m68k->t1_flag
+/* adds t0 to trace checking if we encounter change of flow */
+#define m68ki_trace_t0(m68k) m68k->tracing |= m68k->t0_flag
+/* Clear all tracing */
+#define m68ki_clear_trace(m68k) m68k->tracing = 0
+/* Cause a trace exception if we are tracing */
+#define m68ki_exception_if_trace(m68k) if(m68k->tracing) m68ki_exception_trace(m68k)
 
 
 /* Address error */
@@ -1448,7 +1436,7 @@ INLINE UINT32 m68ki_init_exception(m68ki_cpu_core *m68k)
 
 	/* Turn off trace flag, clear pending traces */
 	m68k->t1_flag = m68k->t0_flag = 0;
-	m68ki_clear_trace();
+	m68ki_clear_trace(m68k);
 	/* Enter supervisor mode */
 	m68ki_set_s_flag(m68k, SFLAG_SET);
 

@@ -1683,7 +1683,7 @@ static void fbcc16(m68ki_cpu_core *m68k)
 	// TODO: condition and jump!!!
 	if (TEST_CONDITION(m68k, condition))
 	{
-		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(m68k);			   /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_16(m68k, offset-2);
 	}
 
@@ -1700,7 +1700,7 @@ static void fbcc32(m68ki_cpu_core *m68k)
 	// TODO: condition and jump!!!
 	if (TEST_CONDITION(m68k, condition))
 	{
-		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(m68k);			   /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_32(m68k, offset-4);
 	}
 

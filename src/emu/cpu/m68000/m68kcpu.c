@@ -725,7 +725,7 @@ static CPU_EXECUTE( m68k )
 		do
 		{
 			/* Set tracing accodring to T1. (T0 is done inside instruction) */
-			m68ki_trace_t1(); /* auto-disable (see m68kcpu.h) */
+			m68ki_trace_t1(m68k); /* auto-disable (see m68kcpu.h) */
 
 			/* Call external hook to peek at CPU */
 			debugger_instruction_hook(device, REG_PC(m68k));
@@ -810,7 +810,7 @@ static CPU_EXECUTE( m68k )
 			}
 
 			/* Trace m68k_exception, if necessary */
-			m68ki_exception_if_trace(); /* auto-disable (see m68kcpu.h) */
+			m68ki_exception_if_trace(m68k); /* auto-disable (see m68kcpu.h) */
 		} while (m68k->remaining_cycles > 0);
 
 		/* set previous PC to current PC for the next entry into the loop */
@@ -886,7 +886,7 @@ static CPU_RESET( m68k )
 
 	/* Turn off tracing */
 	m68k->t1_flag = m68k->t0_flag = 0;
-	m68ki_clear_trace();
+	m68ki_clear_trace(m68k);
 	/* Interrupt mask to level 7 */
 	m68k->int_mask = 0x0700;
 	m68k->int_level = 0;
