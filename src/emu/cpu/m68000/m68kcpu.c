@@ -714,6 +714,8 @@ static CPU_EXECUTE( m68k )
 
 	/* See if interrupts came in */
 	m68ki_check_interrupts(m68k);
+	if (m68k->remaining_cycles <= 0)
+		return;
 
 	/* Make sure we're not stopped */
 	if(!m68k->stopped)
