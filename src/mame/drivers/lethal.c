@@ -156,7 +156,7 @@ japanese version scroll / mirror / guns not set up correctly
 
 guns might be slightly off center
 
-'external' rowscroll not hooked up correctly (1st attract level, highscores)
+'external' rowscroll hooked up forcing xylinescroll for tilemap #3
 
 maybe some priority issues / sprite placement issues..
 
