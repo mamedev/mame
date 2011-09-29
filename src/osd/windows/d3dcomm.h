@@ -70,6 +70,7 @@ struct _d3d_texture_info
 	int						xprescale;					// what is our X prescale factor?
 	int						yprescale;					// what is our Y prescale factor?
 	int						cur_frame;					// what is our current frame?
+	int						prev_frame;					// what was our last frame? (used to determine pause state)
 	d3d_texture *			d3dtex;						// Direct3D texture pointer
 	d3d_surface *			d3dsurface;					// Direct3D offscreen plain surface pointer
 	d3d_texture *			d3dfinaltex;				// Direct3D final (post-scaled) texture

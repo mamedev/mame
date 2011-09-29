@@ -66,6 +66,7 @@
 #include "emuopts.h"
 #include "aviio.h"
 #include "png.h"
+#include "screen.h"
 
 // MAMEOS headers
 #include "d3dintf.h"
@@ -198,7 +199,10 @@ hlsl_info::hlsl_info()
 	shadow_bitmap = NULL;
 	shadow_texture = NULL;
 	registered_targets = 0;
+	cyclic_target_idx = 0;
 	options = NULL;
+	paused = true;
+	lastidx = -1;
 }
 
 
@@ -598,6 +602,23 @@ void hlsl_info::set_texture(d3d_texture_info *texture)
 		return;
 
 	d3d_info *d3d = (d3d_info *)window->drawdata;
+
+	if(texture != NULL)
+	{
+		if(texture->prev_frame == texture->cur_frame)
+		{
+			//printf("Paused\n");
+			paused = true;
+		}
+		else
+		{
+			//printf("Not paused\n");
+			paused = false;
+		}
+
+		texture->prev_frame = texture->cur_frame;
+		//printf("%08x cur_frame is %d\n", (UINT32)(UINT64)texture, texture->cur_frame);
+	}
 
 	(*d3dintf->effect.set_texture)(effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 	if (options->yiq_enable)
@@ -1229,7 +1250,12 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 	if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags) && poly->texture != NULL)
 	{
-		int targetidx = poly->texture->target_index;
+		int rawidx = poly->texture->target_index;
+		int targetidx = rawidx % 9;
+		int minidx = cyclic_target_idx - (num_screens * 2);
+		int wrappedidx = (minidx + ((rawidx - minidx) % num_screens) + num_screens) % 9;
+		//printf("rendering %d %d %d %d %d %d %d %d %d %f %f\n", poly->texture->target_index, rawidx, targetidx, minidx, wrappedidx, poly->texture->rawwidth, poly->texture->rawheight, d3d->width, d3d->height, (float)(poly->texture->ustop - poly->texture->ustart), (float)(poly->texture->vstop - poly->texture->vstart));
+
 		screen_encountered[targetidx] = true;
 		target_in_use[targetidx] = poly->texture;
 
@@ -1504,8 +1530,8 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		// Simulate phosphorescence. This should happen after the shadow/scanline pass, but since
 		// the phosphors are a direct result of the incoming texture, might as well just change the
 		// input texture.
-		int num_screens = registered_targets / 2;
 		curr_effect = phosphor_effect;
+		//printf("num_screens %d\n", num_screens);
 
 		if(options->params_dirty)
 		{
@@ -1522,7 +1548,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		(*d3dintf->effect.set_float)(curr_effect, "Passthrough", 0.0f);
 
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? texture1[targetidx] : texture2[targetidx]);
-		(*d3dintf->effect.set_texture)(curr_effect, "LastPass", last_texture[num_screens > 0 ? (targetidx % num_screens) : targetidx]); // Avoid changing targets due to page flipping
+		(*d3dintf->effect.set_texture)(curr_effect, "LastPass", last_texture[wrappedidx]); // Avoid changing targets due to page flipping
 
 		result = (*d3dintf->device.set_render_target)(d3d->device, 0, target0[targetidx]);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 4\n", (int)result);
@@ -1549,7 +1575,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		(*d3dintf->effect.set_texture)(curr_effect, "LastPass", texture0[targetidx]);
 		(*d3dintf->effect.set_float)(curr_effect, "Passthrough", 1.0f);
 
-		result = (*d3dintf->device.set_render_target)(d3d->device, 0, last_target[num_screens > 0 ? (targetidx % num_screens) : targetidx]); // Avoid changing targets due to page flipping
+		result = (*d3dintf->device.set_render_target)(d3d->device, 0, last_target[wrappedidx]); // Avoid changing targets due to page flipping
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
 		result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1683,9 +1709,17 @@ void hlsl_info::end()
 
 	(*d3dintf->surface.release)(backbuffer);
 
+	//printf("registered_targets %d\n", registered_targets);
+
+	// Don't check de-registration if we're paused.
+	if(paused)
+	{
+		return;
+	}
+
 	// Unregister any registered targets we didn't traverse in the past frame. A resolution change must
 	// have occurred.
-	for(int index = 0; index < 9 && master_enable && d3dintf->post_fx_available; index++)
+	for(int index = 0; index < 9; index++)
 	{
 		if(!screen_encountered[index] && smalltarget0[index] != NULL)
 		{
@@ -1695,6 +1729,7 @@ void hlsl_info::end()
 			}
 			else
 			{
+				//printf("deregging %d\n", index);
 				// free all textures
 				if(target_in_use[index] != NULL)
 				{
@@ -1810,6 +1845,7 @@ void hlsl_info::end()
 					last_target[index] = NULL;
 				}
 				target_use_count[index] = 0;
+				registered_targets--;
 			}
 		}
 	}
@@ -1827,7 +1863,9 @@ int hlsl_info::register_prescaled_texture(d3d_texture_info *texture, int scwidth
 
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
-	int idx = registered_targets;
+	//printf("registering prescaled texture, seqid %d\n", texture->texinfo.seqid);
+
+	int idx = cyclic_target_idx % 9;
 
 	// Find the nearest prescale factor that is over our screen size
 	int hlsl_prescale_x = prescale_force_x ? prescale_force_x : 1;
@@ -1884,15 +1922,35 @@ int hlsl_info::register_prescaled_texture(d3d_texture_info *texture, int scwidth
 		return 1;
 	(*d3dintf->texture.get_surface_level)(last_texture[idx], 0, &last_target[idx]);
 
-	texture->target_index = registered_targets;
+	texture->target_index = cyclic_target_idx;
 	target_width[idx] = scwidth * hlsl_prescale_x;
 	target_height[idx] = scheight * hlsl_prescale_y;
-	target_use_count[texture->target_index] = 60;
-	target_in_use[texture->target_index] = texture;
+	target_use_count[idx] = 60;
+	target_in_use[idx] = texture;
+	raw_target_idx[idx] = cyclic_target_idx;
 	registered_targets++;
-	registered_targets %= 9;
+	cyclic_target_idx++;
+
+	options->params_dirty = true;
+
+	enumerate_screens();
 
 	return 0;
+}
+
+//============================================================
+//  hlsl_info::enumerate_screens
+//============================================================
+void hlsl_info::enumerate_screens()
+{
+	screen_device *screen = window->machine().first_screen();
+	num_screens = 0;
+	while(screen != NULL)
+	{
+		num_screens++;
+		screen = screen->next_screen();
+		//printf("Encountered %d screens\n", num_screens);
+	}
 }
 
 //============================================================
@@ -1906,7 +1964,9 @@ int hlsl_info::register_texture(d3d_texture_info *texture)
 
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
-	int idx = registered_targets;
+	//printf("registering unscaled texture, seqid %d\n", texture->texinfo.seqid);
+
+	int idx = cyclic_target_idx % 9;
 
 	// Find the nearest prescale factor that is over our screen size
 	int hlsl_prescale_x = prescale_force_x ? prescale_force_x : 1;
@@ -1963,13 +2023,18 @@ int hlsl_info::register_texture(d3d_texture_info *texture)
 		return 1;
 	(*d3dintf->texture.get_surface_level)(last_texture[idx], 0, &last_target[idx]);
 
-	texture->target_index = registered_targets;
+	texture->target_index = cyclic_target_idx;
 	target_width[idx] = texture->rawwidth * hlsl_prescale_x;
 	target_height[idx] = texture->rawheight * hlsl_prescale_y;
-	target_use_count[texture->target_index] = 60;
-	target_in_use[texture->target_index] = texture;
+	target_use_count[idx] = 60;
+	target_in_use[idx] = texture;
+	raw_target_idx[idx] = cyclic_target_idx;
 	registered_targets++;
-	registered_targets %= 9;
+	cyclic_target_idx++;
+
+	options->params_dirty = true;
+
+	enumerate_screens();
 
 	return 0;
 }
