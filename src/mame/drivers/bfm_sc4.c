@@ -17169,12 +17169,7 @@ ROM_START( sc4dndccf )
 	sc_dndcc_others
 ROM_END
 
-ROM_START( sc4dndccg )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95422392.lo", 0x00001, 0x080000, CRC(e83c2bea) SHA1(ea4ed543476f637236e03249c493c10693ce27b1) )
-	ROM_LOAD16_BYTE( "95422393.hi", 0x00000, 0x080000, CRC(ba88c94a) SHA1(0de684f3ac06899df45ecac9a79f13948f02af70) )
-	sc_dndcc_others
-ROM_END
+
 
 
 ROM_START( sc4dnddw )
@@ -22442,12 +22437,6 @@ ROM_START( sc4nunsm )
 	sc_nunsm_others
 ROM_END
 
-ROM_START( sc4nunsma )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95416246.lo", 0x00001, 0x080000, CRC(a7e086c5) SHA1(3597c442c3416a17e96b548b32ec503e17c74db4) )
-	ROM_LOAD16_BYTE( "95416247.hi", 0x00000, 0x080000, CRC(325706fa) SHA1(f888358e6632a339d7a5a159b78e6da556d649f7) )
-	sc_nunsm_others
-ROM_END
 
 ROM_START( sc4nunsmb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -26040,7 +26029,6 @@ GAME( 200?, sc4dndccc	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The
 GAME( 200?, sc4dndccd	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndcce	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndccf	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4dndccg	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3043 AWP THE DEAL WHEEL S4         PR3202 THE DEAL WHEEL SOUNDS11    THE DEAL WHEEL  S.SITE
 GAME( 200?, sc4dnddw	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
@@ -26937,16 +26925,15 @@ GAME( 200?, sc4mowowj	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel 
 
 // PR2166 NUN N ROSES          NANR SOUNDS         NUNS N ROSES
 GAME( 200?, sc4nunsm	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsma	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsmb	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsmc	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsmd	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsme	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsmf	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsmg	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsmh	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsmi	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4nunsmj	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsmb	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsmc	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsmd	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsme	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsmf	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsmg	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsmh	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsmi	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4nunsmj	,sc4nunsm,	sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 
 GAME( 200?, sc_unsrt	,0,			sc4, sc4, sc4, ROT0, "<unknown>","unknown Scorpion 'Unsorted Sound' (Unknown) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

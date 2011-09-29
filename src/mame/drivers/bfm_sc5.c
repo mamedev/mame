@@ -9965,13 +9965,6 @@ ROM_START( sc5mowow )
 	sc_mowow_others
 ROM_END
 	
-ROM_START( sc5mowowa )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95418076.lo", 0x00001, 0x080000, CRC(3a1340cd) SHA1(5567323e42a0e87abeae9a2f4433d9b64af145e9) )
-	ROM_LOAD16_BYTE( "95418077.hi", 0x00000, 0x080000, CRC(73abe57d) SHA1(82deeb7a88346ad8e16e52feeb9ac81e7650b569) )
-	sc_mowow_others
-ROM_END
-
 ROM_START( sc5mowowb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95419076.lo", 0x00001, 0x080000, CRC(117f4e3e) SHA1(dd712361d05ad34d58b892a3fe98e057adf14a23) )
@@ -11389,8 +11382,7 @@ GAME( 200?, sc5dndbck	,sc5dndbc,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Box
 
 // PR1706 AWP WHEEL OF WEALTH         PR1706 WHEEL OF WEALTH SOUNDS11   WHEEL OF WEALTH S.SITE
 GAME( 200?, sc5mowow	,0,			sc5, sc5, sc5, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 5) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5mowowa	,sc5mowow,	sc5, sc5, sc5, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 5) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5mowowb	,sc5mowow,	sc5, sc5, sc5, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 5) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc5mowowb	,sc5mowow,	sc5, sc5, sc5, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 5) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR2166 NUN N ROSES          NANR SOUNDS         NUNS N ROSES
 GAME( 200?, sc5nunsm	,0,			sc5, sc5, sc5, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 5) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

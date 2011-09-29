@@ -74,8 +74,7 @@ static WRITE32_HANDLER( eeprom_w )
 }
 
 static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM	// main program
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0)	// mirror
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM	// work RAM
 
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)
@@ -165,9 +164,11 @@ MACHINE_CONFIG_END
 
 
 ROM_START( kingtut )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68EC020 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68EC020 Code */
 	ROM_LOAD32_WORD_SWAP( "kitp1b37_l.02", 0x000002, 0x40000, CRC(95c6da28) SHA1(3ef33f5d0748c80be82d33c21f0f8bb71909884e) )
+	ROM_RELOAD(0x080002, 0x40000)
 	ROM_LOAD32_WORD_SWAP( "kitp1b37_h.01", 0x000000, 0x40000, CRC(16709625) SHA1(6b818a85724f87fed23a26978dd26b079f814134) )
+	ROM_RELOAD(0x080000, 0x40000)
 
 	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "n12prog_ifu.41", 0x00000, 0x08000, CRC(dbb8a7e8) SHA1(9662b34e9332385d20e17ee1c92fd91935d4c3b2) )
@@ -188,9 +189,11 @@ ROM_START( kingtut )
 ROM_END
 
 ROM_START( moneybnk )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68EC020 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68EC020 Code */
 	ROM_LOAD32_WORD_SWAP( "mobn6l29_l.02", 0x000002, 0x40000, CRC(9cd2754a) SHA1(2eb695cb4abab4a448711b8acf3f5b1bb169eb6f) )
+	ROM_RELOAD(0x080002, 0x40000)
 	ROM_LOAD32_WORD_SWAP( "mobn6l29_h.01", 0x000000, 0x40000, CRC(952c376b) SHA1(0fc0499f5570b920c600ddd6a15751d72345c83e) )
+	ROM_RELOAD(0x080000, 0x40000)
 
 	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "n12prog_ifu.41", 0x00000, 0x08000, CRC(dbb8a7e8) SHA1(9662b34e9332385d20e17ee1c92fd91935d4c3b2) ) // some kind of bios? same on both games
@@ -211,5 +214,84 @@ ROM_START( moneybnk )
 ROM_END
 
 
+
+ROM_START( dragsphr )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68EC020 Code */
+	ROM_LOAD32_WORD_SWAP( "u2.bin", 0x00002, 0x080000, CRC(1fec9ead) SHA1(55c1420b22781ee985ce5369186a236e235c55d1) )
+	ROM_LOAD32_WORD_SWAP( "u1.bin", 0x00000, 0x080000, CRC(581acba9) SHA1(157157130c009ab5c4329e4f0dad7419176ff51a) )
+
+	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
+	ROM_LOAD16_WORD_SWAP( "u41_c06chex", 0x0000, 0x020000, CRC(adac17b1) SHA1(8e92dfd112f15ee0dbca215e265f479fb19d4be4) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x8x8 tiles
+	ROM_LOAD16_BYTE( "u21.bin", 0x00000, 0x080000, CRC(83fc3afe) SHA1(09cc89567b985685ed206b273915157fc46212f9) )
+	ROM_LOAD16_BYTE( "u23.bin", 0x00001, 0x080000, CRC(a29a777f) SHA1(1ca37e468f31246cbcbd2e1799e5a0137d19d0b9) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) // 16x16x8 sprites
+	ROM_LOAD16_BYTE( "u11.bin", 0x000000, 0x080000, CRC(97efac6c) SHA1(e317834e3e9b32fb8a8343e58c047a427b3111f0) )
+	ROM_LOAD16_BYTE( "u13.bin", 0x000001, 0x080000, CRC(a4a60822) SHA1(6f49ae6b40185a0b0dc796b32cdbd048bfcbd3de) )
+	ROM_LOAD16_BYTE( "u17.bin", 0x100000, 0x080000, CRC(9352f279) SHA1(1795df2331fde6de06b7d910d74a3fde69379943) )
+	ROM_LOAD16_BYTE( "u15.bin", 0x100001, 0x080000, CRC(4a7bc71a) SHA1(7b6bfc2b83ea6189a629b64cae295071b52c5fab) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd11sd1_snd.31", 0x000000, 0x80000, CRC(cce53e79) SHA1(970507fcef309c6c81f7e1a8e90afa64f3f6e2ae) ) // same as moneybnk
+	/* no rom 32? missing or unused? */
+ROM_END
+
+
+
+ROM_START( ivorytsk )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68EC020 Code */
+	ROM_LOAD32_WORD_SWAP( "u2_5ff4hex", 0x00002, 0x080000, CRC(0af976ba) SHA1(23dbaa6d8eaa501436aecc4f4d2875b3cf1ce4d9) )
+	ROM_LOAD32_WORD_SWAP( "u1_a3d6hex", 0x00000, 0x080000, CRC(4e37c7dc) SHA1(52afb1989cb720b4757c8adb12240b493165c145) )
+
+	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
+	ROM_LOAD16_WORD_SWAP( "u41_c06chex", 0x0000, 0x020000, CRC(adac17b1) SHA1(8e92dfd112f15ee0dbca215e265f479fb19d4be4) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x8x8 tiles
+	ROM_LOAD16_BYTE( "u21_ba6dhex", 0x00000, 0x080000, CRC(d14efb82) SHA1(420bf5d807d59e6d17ee113125046b979e1d12f4) )
+	ROM_LOAD16_BYTE( "u23_9297hex", 0x00001, 0x080000, CRC(5e36ff5f) SHA1(9be65015217affc1e28d9ce855cd22f9cb147258) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) // 16x16x8 sprites
+	ROM_LOAD16_BYTE( "u11_17fbhex", 0x000000, 0x080000, CRC(82e8e69b) SHA1(9aab64be470b07340d4f39de04b3b790821b3ce7) )
+	ROM_LOAD16_BYTE( "u13_29fbhex", 0x000001, 0x080000, CRC(8f21cbb9) SHA1(a0e82e9f29f9eedabcd79a72db7187180e64a076) )
+	ROM_LOAD16_BYTE( "u17_cof8hex", 0x100000, 0x080000, CRC(1ace8891) SHA1(91115680b50d6e31cdbac81ae439eeacb7a5f812) )
+	ROM_LOAD16_BYTE( "u15_8e23hex", 0x100001, 0x080000, CRC(174114cb) SHA1(3f9151e5785482aebfcb6787ddd63d32e0225ad2) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd11sd1_snd.31", 0x000000, 0x80000, CRC(cce53e79) SHA1(970507fcef309c6c81f7e1a8e90afa64f3f6e2ae) ) // same as moneybnk
+	ROM_LOAD( "u32_c20fbin.hex", 0x080000, 0x080000, CRC(38a50800) SHA1(a7a70638d021a039070c9173a42095f7603b57c2) )
+ROM_END
+
+
+
+
+ROM_START( vikingt )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68EC020 Code */
+	ROM_LOAD32_WORD_SWAP( "u2.bin", 0x00002, 0x080000, CRC(09a14cb1) SHA1(f09338b43e89cb265c136965b01625a3458f3e41) )
+	ROM_LOAD32_WORD_SWAP( "u1.bin", 0x00000, 0x080000, CRC(90b07cb4) SHA1(e9eb1601956fa6f5bfa3c4c9b7fccf6eab08dc09) )
+
+	ROM_REGION( 0x80000, "sndcpu", 0 ) /* 68000 sound program */
+	ROM_LOAD16_WORD_SWAP( "u41.bin", 0x0000, 0x020000, CRC(adac17b1) SHA1(8e92dfd112f15ee0dbca215e265f479fb19d4be4) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x8x8 tiles
+	ROM_LOAD16_BYTE( "u21.bin", 0x00000, 0x080000, CRC(789d7c41) SHA1(a04b7e8c894e08e9210c630fabd878b8389ee82c) )
+	ROM_LOAD16_BYTE( "u23.bin", 0x00001, 0x080000, CRC(56ba968e) SHA1(100edc40748067683172480fc2b7d48f4dc89da7) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) // 16x16x8 sprites
+	ROM_LOAD16_BYTE( "u11.bin", 0x000000, 0x080000, CRC(c0bf7510) SHA1(aa0a6d8109452ddf6915a9bd33b7cbb5fbda2386) )
+	ROM_LOAD16_BYTE( "u13.bin", 0x000001, 0x080000, CRC(2cbda923) SHA1(888b3ef9fe91843b59b03b9dabc3fd32fb7fac20) )
+	ROM_LOAD16_BYTE( "u17.bin", 0x100000, 0x080000, CRC(83e7f568) SHA1(0f82eadb3badb7074338099ff9f4d73216a1d5c7) )
+	ROM_LOAD16_BYTE( "u15.bin", 0x100001, 0x080000, CRC(f349b72b) SHA1(d8abc42bbc607e36004a76e45dd88b581db60d09) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd12sd1_snd.31", 0x000000, 0x80000, CRC(f4121baa) SHA1(723c6d96ecef5ef510d085f443d44bad07aa19e5) ) // same as King Tut
+	ROM_LOAD( "u32.bin",         0x080000, 0x080000, CRC(b162ecc7) SHA1(2d1bcbe692a579ed4b582472228021839fd5dab0) )
+ROM_END
+
+
 GAME( 199?, kingtut,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Dragon Sphere", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Ivory Tusk", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Viking Treasure", GAME_NOT_WORKING | GAME_NO_SOUND )

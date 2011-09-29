@@ -5976,9 +5976,33 @@ rushhero		// 1997.10 GX605 (US)
 qdrmfgp			// 1994.12 GQ460 (Japan)
 qdrmfgp2		// 1995.09 GE557 (Japan)
 
-// 68000-based gambling games
+// Konami 'Tasman' gambling hardware
 kingtut
 moneybnk
+dragsphr
+ivorytsk
+vikingt
+
+// Konami 'Endeavour' gambling hardware
+
+enchlamp    // Enchanted Lamp
+whiterus    // White Russia
+aadvent     // African Adventure
+dragnfly    // Dragonfly
+gypmagic	// Gypsy Magic
+incanp		// Incan P
+jestmagi	// Jester Magic
+luckfoun	// Lucky Fountain
+mohicans	// Mohican Sun
+monshow		// Mon Show
+romanl		// Roman L
+safemon		// Safe Money
+showqn		// Show Queen
+spiceup		// Spice It Up
+sultanw		// Sultan W
+konzero		// Zero
+
+
 
 // DJ Main
 bm1stmix		// GQ753 (c) 1997 (Japan)
@@ -14262,7 +14286,6 @@ sc4dndccc	//
 sc4dndccd	//
 sc4dndcce	//
 sc4dndccf	//
-sc4dndccg	//
 sc4dnddw	// Deal Or No Deal The Deal Wheel (Bellfruit)
 sc4dnddwa	//
 sc4dnddwb	//
@@ -14983,7 +15006,6 @@ sc4mowowh	//
 sc4mowowi	//
 sc4mowowj	//
 sc4nunsm	// Nuns 'n' Roses (Mazooma)
-sc4nunsma	//
 sc4nunsmb	//
 sc4nunsmc	//
 sc4nunsmd	//
@@ -16012,7 +16034,6 @@ sc5dndbci	//
 sc5dndbcj	//
 sc5dndbck	//
 sc5mowow	// Monopoly Wheel Of Wealth (Mazooma)
-sc5mowowa	//
 sc5mowowb	//
 sc5nunsm	// Nuns 'n' Roses (Mazooma)
 sc5nunsma	//
