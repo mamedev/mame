@@ -553,8 +553,6 @@ READ8_DEVICE_HANDLER( k051733_r );
 /**  Konami 056832 **/
 void k056832_SetExtLinescroll(device_t *device);	/* Lethal Enforcers */
 
-#define K056832_DRAW_FLAG_FORCE_XYSCROLL		0x00800000
-
 READ16_DEVICE_HANDLER( k056832_ram_word_r );
 WRITE16_DEVICE_HANDLER( k056832_ram_word_w );
 READ16_DEVICE_HANDLER( k056832_ram_half_word_r );

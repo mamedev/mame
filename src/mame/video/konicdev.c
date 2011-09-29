@@ -7154,12 +7154,6 @@ void k056832_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 
 	corr -= k056832->layer_offs[layer][0];
 
-	if (/* (scrollmode == 0) && */ (flags & K056832_DRAW_FLAG_FORCE_XYSCROLL))
-	{
-		scrollmode = 3;
-		flags &= ~K056832_DRAW_FLAG_FORCE_XYSCROLL;
-	}
-
 	switch( scrollmode )
 	{
 		case 0: // linescroll
@@ -7455,12 +7449,6 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_t *bitmap, const rectangl
 		corr = 0;
 
 	corr -= k056832->layer_offs[layer][0];
-
-	if (/* (scrollmode == 0) && */ (flags & K056832_DRAW_FLAG_FORCE_XYSCROLL))
-	{
-		scrollmode = 3;
-		flags &= ~K056832_DRAW_FLAG_FORCE_XYSCROLL;
-	}
 
 	switch( scrollmode )
 	{

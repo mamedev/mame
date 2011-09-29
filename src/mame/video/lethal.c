@@ -109,7 +109,7 @@ SCREEN_UPDATE(lethalen)
 	bitmap_fill(bitmap, cliprect, 7168);
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 3, K056832_DRAW_FLAG_FORCE_XYSCROLL, 1);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 3, 0, 1);
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, 0, 2);
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 1, 0, 4);
 
