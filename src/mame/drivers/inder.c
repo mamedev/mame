@@ -137,11 +137,30 @@ ROM_START(lapbylap)
 	ROM_LOAD("lblsr0.bin", 0x00000, 0x2000, CRC(cbaddf02) SHA1(8207eebc414d90328bfd521190d508b88bb870a2))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Metal Man (1992)
+/-------------------------------------------------------------------*/
+ROM_START(metalman)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("cpu_0.bin", 0x00000, 0x02000, CRC(7fe4335b) SHA1(52ef2efa29337eebd8c2c9a8aec864356a6829b6))
+	ROM_LOAD("cpu_1.bin", 0x02000, 0x02000, CRC(2cca735e) SHA1(6a76017dfbcac0d57fcec8f07f92d5e04dd3e00b))
+	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_LOAD("sound_e1.bin", 0x00000, 0x02000, CRC(55e889e8) SHA1(0a240868c1b17762588c0ed9a14f568a6e50f409))
+	ROM_REGION(0x80000, "user1", 0)
+	ROM_LOAD("sound_e2.bin", 0x00000, 0x20000, CRC(5ac61535) SHA1(75b9a805f8639554251192e3777073c29952c78f))
+	ROM_REGION(0x10000, "soundcpu2", 0)
+	ROM_LOAD("sound_m1.bin", 0x00000, 0x02000, CRC(21a9ee1d) SHA1(d906ac7d6e741f05e81076a5be33fc763f0de9c1))
+	ROM_REGION(0x80000, "user2", 0)
+	ROM_LOAD("sound_m2.bin", 0x00000, 0x20000, CRC(349df1fe) SHA1(47e7ddbdc398396e40bb5340e5edcb8baf06c255))
+	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(4d9f5ed2) SHA1(bc6b7c70369c25eddddac5304497f30cee7675d4))
+ROM_END
+
 GAME(1992,	ind250cc,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"250 CC",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1991,	atleta,		0,		inder,	inder,	inder,	ROT0,	"Inder",		"Atleta",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	brvteam,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"Brave Team",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	canasta,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"Canasta '86'",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1988,	pinclown,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"Clown (Inder)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1989,	corsario,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"Corsario",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1990,	mundial,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"Mundial 90",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1990,	mundial,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"Mundial 90",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,	metalman,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"Metal Man",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	lapbylap,	0,		inder,	inder,	inder,	ROT0,	"Inder",		"Lap By Lap",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
