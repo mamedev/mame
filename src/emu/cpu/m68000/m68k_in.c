@@ -4397,7 +4397,7 @@ M68KMAKE_OP(cpdbcc, 32, ., .)
 
 M68KMAKE_OP(cpgen, 32, ., .)
 {
-	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
+	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type) && (mc68kcpu->has_fpu || mc68kcpu->has_pmmu))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
 					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
