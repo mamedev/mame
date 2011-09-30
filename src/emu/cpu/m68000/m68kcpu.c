@@ -654,7 +654,7 @@ INLINE m68ki_cpu_core *get_safe_token(device_t *device)
 		   device->type() == M68EC040 ||
 		   device->type() == M68040 ||
 		   device->type() == SCC68070 ||
-		   device->type() == COLDFIRE ||
+		   device->type() == MCF5206E ||
 		   device->type() == M68340);
 	return (m68ki_cpu_core *)downcast<legacy_cpu_device *>(device)->token();
 }
