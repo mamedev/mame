@@ -5,6 +5,9 @@
 
   interrupt vectors get put in ram at 0x08000000
 
+
+  preliminary video based on g4u5 set ONLY
+
 */
 
 
@@ -16,6 +19,11 @@ class gaminator_state : public driver_device
 public:
 	gaminator_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+
+	UINT32* m_vram;
+	UINT32* m_tmapram1;
+	UINT32* m_tmapram2;
+
 
 };
 
@@ -66,12 +74,73 @@ static READ32_HANDLER( gamtor_unk7_r )
 	return space->machine().rand();
 }
 
+#define GAMTOR_NUM_TILES 0x4000000 / 16
+
+static const gfx_layout gamtor_layout =
+{
+	8,16,
+	GAMTOR_NUM_TILES,
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{  3*8, 2*8, 1*8, 0*8,  7*8, 6*8, 5*8, 4*8,  11*8, 10*8, 9*8, 8*8,  15*8, 14*8, 13*8, 12*8 },
+	16*8
+};
+
+static WRITE32_HANDLER( gaminator_vram_w )
+{
+	gaminator_state *state = space->machine().driver_data<gaminator_state>();
+
+	COMBINE_DATA(state->m_vram + offset);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
+
+}
+
+VIDEO_START( gamtor )
+{
+	gaminator_state *state = machine.driver_data<gaminator_state>();
+
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	machine.gfx[0] = gfx_element_alloc(machine, &gamtor_layout, (UINT8 *)state->m_vram, 1, 0);
+
+}
+
+SCREEN_UPDATE(gamtor)
+{	
+	gaminator_state *state = screen->machine().driver_data<gaminator_state>();
+	const gfx_element *gfx = screen->machine().gfx[0];
+	int count = 0;
+	for (int y=0;y<32;y++)
+	{
+		for (int x=0;x<80;x++)
+		{
+			UINT32 chr = state->m_tmapram1[count];
+		
+
+			int tile = (chr>>24)&0xff;
+			tile +=0x18DF1; // g4u5
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*16);
+
+			count++;
+		}
+
+	}
+
+	return 0;
+}
+
+
+
+
 
 static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_ROM
-	AM_RANGE(0x08000000, 0x0fffffff) AM_RAM // 0x083ea460 = some data  
+	AM_RANGE(0x08000000, 0x0bffffff) AM_RAM_WRITE(gaminator_vram_w) AM_BASE_MEMBER(gaminator_state, m_vram) // 0x083ea460 = some data  
 	AM_RANGE(0x1e040008, 0x1e04000b) AM_WRITE( gamtor_unk_w )
 	
+	AM_RANGE(0x20000000, 0x2003ffff) AM_RAM
+	                          
 	/* some kind of video control / blitter? */
 	AM_RANGE(0x400003c0, 0x400003c3) AM_WRITE( gamtor_unk3_w )
 	AM_RANGE(0x400003c4, 0x400003c7) AM_READWRITE( gamtor_unk4_r, gamtor_unk4_w )
@@ -80,8 +149,8 @@ static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x400003d4, 0x400003d7) AM_READWRITE( gamtor_unk2_r, gamtor_unk2_w )
 	AM_RANGE(0x400003d8, 0x400003fb) AM_READ( gamtor_unk7_r )
 
-	AM_RANGE(0x44000000, 0x44007fff) AM_RAM // puts strings here, looks almost like a tilemap, but where are the tiles?
-	AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM // beetlem (like above, mirror?)
+	AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_BASE_MEMBER(gaminator_state, m_tmapram1) // puts strings here, looks almost like a tilemap, but where are the tiles?
+	AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_BASE_MEMBER(gaminator_state, m_tmapram2) // beetlem (like above, mirror?)
 
 	AM_RANGE(0xe0000000, 0xe00001ff) AM_RAM // nvram?
 
@@ -94,6 +163,20 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( gaminator, gaminator_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
 	MCFG_CPU_PROGRAM_MAP(gaminator_map)
+
+	
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(gamtor)
+
+	MCFG_PALETTE_LENGTH(0x200)
+
+
+	MCFG_VIDEO_START(gamtor)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
