@@ -12362,8 +12362,8 @@ sc4ctlcl	// Cop The Lot Club (Bellfruit)
 sc4ctlcla	//
 sc4ctlclb	//
 sc4ctlclc	//
-sc4ctlcld	//
-sc4ctlcle	//
+ad4ctl	//
+ad4ctla	//
 sc4crcc		// Cops 'n' Robbers Club Classic (Bellfruit)
 sc4crcca	//
 sc4crccb	//
@@ -15014,7 +15014,8 @@ sc4nunsmh	//
 sc4nunsmi	//
 sc4nunsmj	//
 sc_unsrt	//
-sc_film		//
+ad4film		//
+ad4filma	//
 
 /* Scorpion 4 + Adder 4 */
 

@@ -2080,11 +2080,11 @@
 	ROM_LOAD( "95004249.hi", 0x080000, 0x080000, CRC(2c8cdeb1) SHA1(771bcc907be91be2d178b87a76b72bd3cc07fe30) ) \
 
 #define sc_cvani_others \
-	ROM_REGION( 0x100000, "ymz", 0 ) \
+	ROM_REGION( 0x400000, "ymz", 0 ) \
 	ROM_LOAD( "95008237.bin", 0x0000, 0x0fdb37, CRC(ce0a3555) SHA1(7ba0c53709236d41f9e73b3a5151174ca2bf3fae) ) \
 
 #define sc_cvclb_others \
-	ROM_REGION( 0x100000, "ymz", 0 ) \
+	ROM_REGION( 0x400000, "ymz", 0 ) \
 	ROM_LOAD( "95008345.bin", 0x0000, 0x0fdb37, CRC(1e01057c) SHA1(f54cd2b59b1b4901b972b8b33c85defc975b0fac) ) \
 
 #define sc_druby_others \

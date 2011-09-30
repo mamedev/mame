@@ -2799,14 +2799,20 @@ ROM_START( sc4ctlclc )
 	sc_ctlcl_others
 ROM_END
 
-ROM_START( sc4ctlcld )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+ROM_START( ad4ctl )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	/* not sure which of the regular Cop the Lot roms these go with */
+	
+	ROM_REGION( 0x400000, "adder4", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95780008.lo", 0x00001, 0x100000, CRC(0c81e70d) SHA1(0520fbc3afb9c3306e89d32ba8f01b1a83a47de5) )
 	ROM_LOAD16_BYTE( "95780009.hi", 0x00000, 0x100000, CRC(458ea63b) SHA1(4ac8290d3255d992be851a13fc45ef2080edc5ce) )
 	sc_ctlcl_others
 ROM_END
 
-ROM_START( sc4ctlcle )
+ROM_START( ad4ctla )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	/* not sure which of the regular Cop the Lot roms these go with */
+	
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95780024.lo", 0x00001, 0x100000, CRC(654e4428) SHA1(92f6074461bb58120401b0e1981e48d13cd467dd) )
 	ROM_LOAD16_BYTE( "95780025.hi", 0x00000, 0x100000, CRC(7397e2e4) SHA1(d22cc364aeb096ca03cd4642a22bd37fe548e2a1) )
@@ -14807,8 +14813,8 @@ ROM_END
 
 ROM_START( sc4bgolda )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95404604.lo", 0x00000, 0x080000, CRC(3697c961) SHA1(6053e5e05092294c41b78377b8d739309c2e45ac) )
-	ROM_LOAD16_BYTE( "95404605.hi", 0x00001, 0x080000, NO_DUMP )
+	ROM_LOAD16_BYTE( "95404604.lo", 0x00001, 0x080000, CRC(3697c961) SHA1(6053e5e05092294c41b78377b8d739309c2e45ac) )
+	ROM_LOAD16_BYTE( "95404605.hi", 0x00000, 0x080000, NO_DUMP )
 	sc_bgold_others
 ROM_END
 
@@ -22503,18 +22509,31 @@ ROM_END
 
 /********* UNSORTED *************/
 
-/* not sure this is scorpion at all, , it has valid 68k code, but the start vector isn't right at least.. */
-ROM_START( sc_film )
+
+ROM_START( ad4film )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "ad4film_sc4rom.lo", 0x00001, 0x080000, NO_DUMP )
+	ROM_LOAD16_BYTE( "ad4film_sc4rom.hi", 0x00000, 0x080000, NO_DUMP )
+
+	ROM_REGION( 0x400000, "adder4", 0 )
 	ROM_LOAD16_BYTE( "pr6973s21.hi", 0x00000, 0x080000, CRC(e9ff42c0) SHA1(9227868e031b26ecc20416e51cd02b417f449819) )
 	ROM_LOAD16_BYTE( "pr6973s21.lo", 0x00001, 0x080000, CRC(2a2e974f) SHA1(ec6cf9e79c651f84f6371a27e7814da0e6b6650d) )
+	
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )	
+ROM_END
 
-	ROM_REGION( 0x400000, "altrevs", 0 )
+ROM_START( ad4filma )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "ad4film_sc4rom.lo", 0x00001, 0x080000, NO_DUMP )
+	ROM_LOAD16_BYTE( "ad4film_sc4rom.hi", 0x00000, 0x080000, NO_DUMP )
+
+	ROM_REGION( 0x400000, "adder4", 0 )
 	ROM_LOAD16_BYTE( "pr6973p21.hi", 0x00000, 0x080000, CRC(70722d50) SHA1(79cb6544ff7f7813cb1c2d64cf4fadcf9b091708) )
 	ROM_LOAD16_BYTE( "pr6973p21.lo", 0x00001, 0x080000, CRC(9ecc1838) SHA1(1aea40281a174a39866aef668e78b031e4337be1) )
-
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+	
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )	
 ROM_END
+
 
 
 // unsorted roms, mostly sound, probably for undumped sets, but kept here on the chance that they belong
@@ -23307,9 +23326,6 @@ GAME( 200?, sc4ctlcla	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (B
 // PR1036 CLUB COP THE LOT         COP THE LOT CLUB  PR1036 CLOT SOUNDS11           COP THE LOT
 GAME( 200?, sc4ctlclb	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4ctlclc	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// no ident string, these are some kind of video roms, 68k vectors aren't right for a standard 68k
-GAME( 200?, sc4ctlcld	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video?) (Bellfruit) (Scorpion ?) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4ctlcle	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video?) (Bellfruit) (Scorpion ?) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR6837 CLASSIC CLUB COPS AND ROBBERS         PR6837 COPS SOUNDS11         COPS AND ROBBERS
 GAME( 200?, sc4crcc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -27032,11 +27048,9 @@ GAME( 200?, sc4gggs		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game 
 /* Scorpion 4 + Adder 4 */
 
 GAME( 200?, ad4skill	,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Skill Dice (BFM) (Scorpion 4 + Adder 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-
-/* Unknown */
-
-// // no ident string, these are some kind of video roms, 68k vectors aren't right for a standard 68k
-GAME( 200?, sc_film		,0,			sc4, sc4, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Scorpion ?)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // like some of the 'cop the lot club' roms
-
+GAME( 200?, ad4film		,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // the 68k vectors differ from usual, but it contains the expected strings for an Adder 4 title.   No main program roms tho? :/
+GAME( 200?, ad4filma	,ad4film,	sc4_adder4, sc4, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // ^^
+GAME( 200?, ad4ctl		,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, ad4ctla		,ad4ctl,	sc4_adder4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 
