@@ -2204,7 +2204,7 @@ static MACHINE_RESET( funcube )
 
 static MACHINE_CONFIG_START( funcube, seta2_state )
 
-	MCFG_CPU_ADD("maincpu", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
+	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL_25_447MHz)
 	MCFG_CPU_PROGRAM_MAP(funcube_map)
 	MCFG_CPU_VBLANK_INT_HACK(funcube_interrupt,2)
 
@@ -2406,12 +2406,7 @@ static DRIVER_INIT( funcube2 )
 	UINT32 *main_cpu = (UINT32 *) machine.region("maincpu")->base();
 	UINT16 *sub_cpu  = (UINT16 *) machine.region("sub")->base();
 
-	main_cpu[0x810/4] = 0xe0214e71;
-	main_cpu[0x814/4] = 0x4e71203c;
-
-	main_cpu[0x81c/4] = 0x4e714e71;
-
-	main_cpu[0xa5c/4] = 0x4e713e3c;
+	main_cpu[0xa5c/4] = 0x4e713e3c;       // PIC protection?
 	main_cpu[0xa74/4] = 0x4e713e3c;
 	main_cpu[0xa8c/4] = 0x4e7141f9;
 
@@ -2431,11 +2426,6 @@ static DRIVER_INIT( funcube3 )
 {
 	UINT32 *main_cpu = (UINT32 *) machine.region("maincpu")->base();
 	UINT16 *sub_cpu  = (UINT16 *) machine.region("sub")->base();
-
-	main_cpu[0x450/4] = 0xe0214e71;
-	main_cpu[0x454/4] = 0x4e71203c;
-
-	main_cpu[0x45c/4] = 0x4e714e71;
 
 	main_cpu[0x008bc/4] = 0x4a804e71;
 	main_cpu[0x19f0c/4] = 0x4e714e71;

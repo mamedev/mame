@@ -82,17 +82,18 @@
 #define TYPE_68020 8
 #define TYPE_68030 16
 #define TYPE_68040 32
-#define TYPE_68340 64
+#define TYPE_68340 64	// (CPU32)
+#define TYPE_COLDFIRE 128
 
 #define M68000_ONLY		(TYPE_68000 | TYPE_68008)
 
 #define M68010_ONLY		TYPE_68010
 #define M68010_LESS		(TYPE_68000 | TYPE_68008 | TYPE_68010)
-#define M68010_PLUS		(TYPE_68010 | TYPE_68020 | TYPE_68030 | TYPE_68040 | TYPE_68340)
+#define M68010_PLUS		(TYPE_68010 | TYPE_68020 | TYPE_68030 | TYPE_68040 | TYPE_68340 | TYPE_COLDFIRE)
 
 #define M68020_ONLY 	(TYPE_68020 | TYPE_68340)
 #define M68020_LESS 	(TYPE_68010 | TYPE_68020 | TYPE_68340)
-#define M68020_PLUS		(TYPE_68020 | TYPE_68030 | TYPE_68040 | TYPE_68340)
+#define M68020_PLUS		(TYPE_68020 | TYPE_68030 | TYPE_68040 | TYPE_68340 | TYPE_COLDFIRE)
 
 #define M68030_ONLY 	TYPE_68030
 #define M68030_LESS 	(TYPE_68010 | TYPE_68020 | TYPE_68030 | TYPE_68340 )
@@ -100,6 +101,7 @@
 
 #define M68040_PLUS		TYPE_68040
 
+#define COLDFIRE		TYPE_COLDFIRE
 
 /* Extension word formats */
 #define EXT_8BIT_DISPLACEMENT(A)          ((A)&0xff)
@@ -2133,20 +2135,52 @@ static void d68010_movec(void)
 			processor = "4+";
 			break;
 		case 0x004:
-			reg_name = "ITT0";
-			processor = "4+";
+			if(g_cpu_type & COLDFIRE)
+			{
+				reg_name = "ACR0";
+				processor = "CF";
+			}
+			else
+			{
+				reg_name = "ITT0";
+				processor = "4+";
+			}
 			break;
 		case 0x005:
-			reg_name = "ITT1";
-			processor = "4+";
+			if(g_cpu_type & COLDFIRE)
+			{
+				reg_name = "ACR1";
+				processor = "CF";
+			}
+			else
+			{
+				reg_name = "ITT1";
+				processor = "4+";
+			}
 			break;
 		case 0x006:
-			reg_name = "DTT0";
-			processor = "4+";
+			if(g_cpu_type & COLDFIRE)
+			{
+				reg_name = "ACR2";
+				processor = "CF";
+			}
+			else
+			{
+				reg_name = "DTT0";
+				processor = "4+";
+			}
 			break;
 		case 0x007:
-			reg_name = "DTT1";
-			processor = "4+";
+			if(g_cpu_type & COLDFIRE)
+			{
+				reg_name = "ACR3";
+				processor = "CF";
+			}
+			else
+			{
+				reg_name = "DTT1";
+				processor = "4+";
+			}
 			break;
 		case 0x805:
 			reg_name = "MMUSR";
@@ -2159,6 +2193,38 @@ static void d68010_movec(void)
 		case 0x807:
 			reg_name = "SRP";
 			processor = "4+";
+			break;
+		case 0xc00:
+			reg_name = "ROMBAR0";
+			processor = "CF";
+			break;
+		case 0xc01:
+			reg_name = "ROMBAR1";
+			processor = "CF";
+			break;
+		case 0xc04:
+			reg_name = "RAMBAR0";
+			processor = "CF";
+			break;
+		case 0xc05:
+			reg_name = "RAMBAR1";
+			processor = "CF";
+			break;
+		case 0xc0c:
+			reg_name = "MPCR";
+			processor = "CF";
+			break;
+		case 0xc0d:
+			reg_name = "EDRAMBAR";
+			processor = "CF";
+			break;
+		case 0xc0e:
+			reg_name = "SECMBAR";
+			processor = "CF";
+			break;
+		case 0xc0f:
+			reg_name = "MBAR";
+			processor = "CF";
 			break;
 		default:
 			reg_name = make_signed_hex_str_16(extension & 0xfff);
@@ -3759,6 +3825,9 @@ static unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned i
 		case M68K_CPU_TYPE_68340:
 			g_cpu_type = TYPE_68340;
 			break;
+		case M68K_CPU_TYPE_COLDFIRE:
+			g_cpu_type = TYPE_COLDFIRE;
+			break;
 		default:
 			return 0;
 	}
@@ -3951,6 +4020,7 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 		case M68K_CPU_TYPE_68030:
 		case M68K_CPU_TYPE_68EC030:
 		case M68K_CPU_TYPE_68340:
+		case M68K_CPU_TYPE_COLDFIRE:
 			if(g_instruction_table[instruction] == d68040_cinv)
 				return 0;
 			if(g_instruction_table[instruction] == d68040_cpush)
@@ -4035,7 +4105,10 @@ CPU_DISASSEMBLE( m68340 )
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68340);
 }
 
-// f028 2215 0008
+CPU_DISASSEMBLE( coldfire )
+{
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
+}
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

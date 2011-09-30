@@ -3,11 +3,10 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 4.80
+ *                                Version 4.90
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
- * FPU and MMU by R. Belmont.
  *
  * This code may be freely used for non-commercial purposes as long as this
  * copyright notice remains unaltered in the source code and any binary files
@@ -21,11 +20,10 @@
  */
 
 /*
- * Modified For OpenVMS By:  Robert Alan Byer
- *                           byer@mail.ourservers.net
- *
  * 68030 and PMMU by R. Belmont and Hans Ostermeyer
- * 68040 and FPU by Ville Linde, R. Belmont, and Hans Ostermeyer
+ * 68040 and FPU by Ville Linde, R. Belmont, and Hans Ostermeyer 
+ * CPU32 by David Haywood.  ColdFire by R. Belmont. 
+ *  
  */
 
 
@@ -56,7 +54,7 @@
  */
 
 
-static const char g_version[] = "4.80";
+static const char g_version[] = "4.90";
 
 /* ======================================================================== */
 /* =============================== INCLUDES =============================== */
@@ -139,6 +137,7 @@ enum
 	CPU_TYPE_030,       // 3
 	CPU_TYPE_040,       // 4
 	CPU_TYPE_68340,     // 5
+	CPU_TYPE_COLDFIRE,	// 6
 	NUM_CPUS
 };
 
@@ -1079,9 +1078,11 @@ static void populate_table(void)
 	buff[0] = 0;
 
 	/* Find the start of the table */
-	while(strcmp(buff, ID_TABLE_START) != 0)
+	while (strncmp(buff, ID_TABLE_START, strlen(ID_TABLE_START)) != 0)
+	{
 		if(fgetline(buff, MAX_LINE_LENGTH, g_input_file) < 0)
 			error_exit("(table_start) Premature EOF while reading table");
+	}
 
 	/* Process the entire table */
 	for(op = g_opcode_input_table;;op++)
@@ -1246,8 +1247,8 @@ int main(int argc, char *argv[])
 	int table_body_read = 0;
 	int ophandler_body_read = 0;
 
-	printf("\n\tMusashi v%s 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, 68040 emulator\n", g_version);
-	printf("\tCopyright Karl Stenerud\n\n");
+	printf("\n\tMusashi v%s 680x0, CPU32, and ColdFire emulator\n", g_version);
+	printf("\tCopyright Karl Stenerud and the MAME team.\n\n");
 
 	/* Check if output path and source for the input file are given */
 	if(argc > 1)
@@ -1257,45 +1258,22 @@ int main(int argc, char *argv[])
 
 		for(ptr = strchr(output_path, '\\'); ptr; ptr = strchr(ptr, '\\'))
 			*ptr = '/';
-
-#if !(defined(__DECC) && defined(VMS))
-		if(output_path[strlen(output_path)-1] != '/')
-			strcat(output_path, "/");
-#endif
 	}
 
 	strcpy(g_input_filename, (argc > 2) ? argv[2] : FILENAME_INPUT);
 
-#if defined(__DECC) && defined(VMS)
-
 	/* Open the files we need */
-	sprintf(filename, "%s%s", output_path, FILENAME_PROTOTYPE);
-	if((g_prototype_file = fopen(filename, "w")) == NULL)
-		perror_exit("Unable to create prototype file (%s)\n", filename);
-
-	sprintf(filename, "%s%s", output_path, FILENAME_TABLE);
-	if((g_table_file = fopen(filename, "w")) == NULL)
-		perror_exit("Unable to create table file (%s)\n", filename);
-
-	if((g_input_file=fopen(g_input_filename, "r")) == NULL)
-		perror_exit("can't open %s for input", g_input_filename);
-
-#else
-
-
-	/* Open the files we need */
-	sprintf(filename, "%s%s", output_path, FILENAME_PROTOTYPE);
+	sprintf(filename, "%s/%s", output_path, FILENAME_PROTOTYPE);
 	if((g_prototype_file = fopen(filename, "wt")) == NULL)
 		perror_exit("Unable to create prototype file (%s)\n", filename);
 
-	sprintf(filename, "%s%s", output_path, FILENAME_TABLE);
+	sprintf(filename, "%s/%s", output_path, FILENAME_TABLE);
 	if((g_table_file = fopen(filename, "wt")) == NULL)
 		perror_exit("Unable to create table file (%s)\n", filename);
 
 	if((g_input_file=fopen(g_input_filename, "rt")) == NULL)
 		perror_exit("can't open %s for input", g_input_filename);
 
-#endif
 
 	/* Get to the first section of the input file */
 	section_id[0] = 0;

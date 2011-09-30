@@ -87,6 +87,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define CPU_TYPE_040    (0x00000200)
 #define CPU_TYPE_SCC070 (0x00000400)
 #define CPU_TYPE_68340  (0x00000800)
+#define CPU_TYPE_COLDFIRE (0x00001000)
 
 /* Different ways to stop the CPU */
 #define STOP_LEVEL_STOP 1
@@ -234,22 +235,24 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 /* These defines are dependant on the configuration defines in m68kconf.h */
 
 /* Disable certain comparisons if we're not using all CPU types */
+#define CPU_TYPE_IS_COLDFIRE(A)    ((A) & (CPU_TYPE_COLDFIRE))
+
 #define CPU_TYPE_IS_040_PLUS(A)    ((A) & (CPU_TYPE_040 | CPU_TYPE_EC040))
 #define CPU_TYPE_IS_040_LESS(A)    1
 
 #define CPU_TYPE_IS_030_PLUS(A)    ((A) & (CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040))
 #define CPU_TYPE_IS_030_LESS(A)    1
 
-#define CPU_TYPE_IS_020_PLUS(A)    ((A) & (CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340))
+#define CPU_TYPE_IS_020_PLUS(A)    ((A) & (CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340 | CPU_TYPE_COLDFIRE))
 #define CPU_TYPE_IS_020_LESS(A)    1
 
 #define CPU_TYPE_IS_020_VARIANT(A) ((A) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_68340))
 
-#define CPU_TYPE_IS_EC020_PLUS(A)  ((A) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340))
+#define CPU_TYPE_IS_EC020_PLUS(A)  ((A) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340 | CPU_TYPE_COLDFIRE))
 #define CPU_TYPE_IS_EC020_LESS(A)  ((A) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020))
 
 #define CPU_TYPE_IS_010(A)         ((A) == CPU_TYPE_010)
-#define CPU_TYPE_IS_010_PLUS(A)    ((A) & (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340))
+#define CPU_TYPE_IS_010_PLUS(A)    ((A) & (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340 | CPU_TYPE_COLDFIRE))
 #define CPU_TYPE_IS_010_LESS(A)    ((A) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010))
 
 #define CPU_TYPE_IS_000(A)         ((A) == CPU_TYPE_000 || (A) == CPU_TYPE_008)
@@ -694,6 +697,8 @@ public:
 	UINT32 mmu_atc_tag[MMU_ATC_ENTRIES], mmu_atc_data[MMU_ATC_ENTRIES];
 	UINT32 mmu_atc_rr;
 	UINT32 mmu_tt0, mmu_tt1;
+	UINT32 mmu_itt0, mmu_itt1, mmu_dtt0, mmu_dtt1;
+	UINT32 mmu_acr0, mmu_acr1, mmu_acr2, mmu_acr3;
 
 	UINT16 mmu_tmp_sr;      /* temporary hack: status code for ptest and to handle write protection */
 	UINT16 mmu_tmp_fc;      /* temporary hack: function code for the mmu (moves) */

@@ -5,8 +5,8 @@
 #if 0
 static const char copyright_notice[] =
 "MUSASHI\n"
-"Version 4.80 (2010-08-27)\n"
-"A portable Motorola M68xxx processor emulation engine.\n"
+"Version 4.90 (2011-09-22)\n"
+"A portable Motorola M68xxx/CPU32/ColdFire processor emulation engine.\n"
 "Copyright Karl Stenerud.  All rights reserved.\n"
 "\n"
 "This code may be freely used for non-commercial purpooses as long as this\n"
@@ -89,7 +89,7 @@ const UINT32 m68ki_shift_32_table[65] =
 /* Number of clock cycles to use for exception processing.
  * I used 4 for any vectors that are undocumented for processing times.
  */
-const UINT8 m68ki_exception_cycle_table[6][256] =
+const UINT8 m68ki_exception_cycle_table[7][256] =
 {
 	{ /* 000 */
 		 40, /*  0: Reset - Initial Stack Pointer                      */
@@ -529,6 +529,79 @@ const UINT8 m68ki_exception_cycle_table[6][256] =
 		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
 		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
+	{ /* ColdFire - not correct */
+		  4, /*  0: Reset - Initial Stack Pointer                      */
+		  4, /*  1: Reset - Initial Program Counter                    */
+		 50, /*  2: Bus Error                             (unemulated) */
+		 50, /*  3: Address Error                         (unemulated) */
+		 20, /*  4: Illegal Instruction                                */
+		 38, /*  5: Divide by Zero                                     */
+		 40, /*  6: CHK                                                */
+		 20, /*  7: TRAPV                                              */
+		 34, /*  8: Privilege Violation                                */
+		 25, /*  9: Trace                                              */
+		 20, /* 10: 1010                                               */
+		 20, /* 11: 1111                                               */
+		  4, /* 12: RESERVED                                           */
+		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+		  4, /* 14: Format Error                                       */
+		 30, /* 15: Uninitialized Interrupt                            */
+		  4, /* 16: RESERVED                                           */
+		  4, /* 17: RESERVED                                           */
+		  4, /* 18: RESERVED                                           */
+		  4, /* 19: RESERVED                                           */
+		  4, /* 20: RESERVED                                           */
+		  4, /* 21: RESERVED                                           */
+		  4, /* 22: RESERVED                                           */
+		  4, /* 23: RESERVED                                           */
+		 30, /* 24: Spurious Interrupt                                 */
+		 30, /* 25: Level 1 Interrupt Autovector                       */
+		 30, /* 26: Level 2 Interrupt Autovector                       */
+		 30, /* 27: Level 3 Interrupt Autovector                       */
+		 30, /* 28: Level 4 Interrupt Autovector                       */
+		 30, /* 29: Level 5 Interrupt Autovector                       */
+		 30, /* 30: Level 6 Interrupt Autovector                       */
+		 30, /* 31: Level 7 Interrupt Autovector                       */
+		 20, /* 32: TRAP #0                                            */
+		 20, /* 33: TRAP #1                                            */
+		 20, /* 34: TRAP #2                                            */
+		 20, /* 35: TRAP #3                                            */
+		 20, /* 36: TRAP #4                                            */
+		 20, /* 37: TRAP #5                                            */
+		 20, /* 38: TRAP #6                                            */
+		 20, /* 39: TRAP #7                                            */
+		 20, /* 40: TRAP #8                                            */
+		 20, /* 41: TRAP #9                                            */
+		 20, /* 42: TRAP #10                                           */
+		 20, /* 43: TRAP #11                                           */
+		 20, /* 44: TRAP #12                                           */
+		 20, /* 45: TRAP #13                                           */
+		 20, /* 46: TRAP #14                                           */
+		 20, /* 47: TRAP #15                                           */
+		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+		  4, /* 49: FP Inexact Result                     (unemulated) */
+		  4, /* 50: FP Divide by Zero                     (unemulated) */
+		  4, /* 51: FP Underflow                          (unemulated) */
+		  4, /* 52: FP Operand Error                      (unemulated) */
+		  4, /* 53: FP Overflow                           (unemulated) */
+		  4, /* 54: FP Signaling NAN                      (unemulated) */
+		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
+		  4, /* 56: MMU Configuration Error               (unemulated) */
+		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
+		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
+		  4, /* 59: RESERVED                                           */
+		  4, /* 60: RESERVED                                           */
+		  4, /* 61: RESERVED                                           */
+		  4, /* 62: RESERVED                                           */
+		  4, /* 63: RESERVED                                           */
+		     /* 64-255: User Defined                                   */
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+	},
 };
 
 const UINT8 m68ki_ea_idx_cycle_table[64] =
@@ -581,6 +654,7 @@ INLINE m68ki_cpu_core *get_safe_token(device_t *device)
 		   device->type() == M68EC040 ||
 		   device->type() == M68040 ||
 		   device->type() == SCC68070 ||
+		   device->type() == COLDFIRE ||
 		   device->type() == M68340);
 	return (m68ki_cpu_core *)downcast<legacy_cpu_device *>(device)->token();
 }
@@ -1154,7 +1228,7 @@ static CPU_GET_INFO( m68k )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per-core */						break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.60");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.90");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO)"); break;
 	}
@@ -2367,7 +2441,62 @@ CPU_GET_INFO( m68340 )
 	}
 }
 
+/*
+  ColdFire 
+ 
+*/
 
+static CPU_INIT( coldfire )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68k);
+
+	m68k->cpu_type         = CPU_TYPE_COLDFIRE;
+	m68k->dasm_type        = M68K_CPU_TYPE_COLDFIRE;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32(*m68k->program);
+	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->jump_table       = m68ki_instruction_jump_table[6];
+	m68k->cyc_instruction  = m68ki_cycles[6];
+	m68k->cyc_exception    = m68ki_exception_cycle_table[6];
+	m68k->cyc_bcc_notake_b = -2;
+	m68k->cyc_bcc_notake_w = 0;
+	m68k->cyc_dbcc_f_noexp = 0;
+	m68k->cyc_dbcc_f_exp   = 4;
+	m68k->cyc_scc_r_true   = 0;
+	m68k->cyc_movem_w      = 2;
+	m68k->cyc_movem_l      = 2;
+	m68k->cyc_shift        = 0;
+	m68k->cyc_reset        = 518;
+
+	define_state(device);
+}
+
+CPU_GET_INFO( mcf5206e )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
+
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(coldfire);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MCF5206E");			break;
+
+		default:										CPU_GET_INFO_CALL(m68k);				break;
+	}
+}
 
 DEFINE_LEGACY_CPU_DEVICE(M68000, m68000);
 DEFINE_LEGACY_CPU_DEVICE(M68008, m68008);
@@ -2383,4 +2512,5 @@ DEFINE_LEGACY_CPU_DEVICE(M68LC040, m68lc040);
 DEFINE_LEGACY_CPU_DEVICE(M68040, m68040);
 DEFINE_LEGACY_CPU_DEVICE(SCC68070, scc68070);
 DEFINE_LEGACY_CPU_DEVICE(M68340, m68340);
+DEFINE_LEGACY_CPU_DEVICE(MCF5206E, mcf5206e);
 
