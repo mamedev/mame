@@ -1,8 +1,8 @@
 #include "video/poly.h"
 
+#define NAMCOS22_PALETTE_SIZE 0x8000
 #define MAX_LIT_SURFACES 0x80
 #define MAX_RENDER_CMD_SEQ 0x1c
-
 
 #define GFX_CHAR               0
 #define GFX_TEXTURE_TILE       1
@@ -27,12 +27,6 @@ enum
 	NAMCOS22_AQUA_JET,
 	NAMCOS22_DIRT_DASH
 };
-
-#define NAMCOS22_NUM_ROWS 30
-#define NAMCOS22_NUM_COLS 40
-
-#define NAMCOS22_PALETTE_SIZE 0x8000
-
 
 class namcos22_state : public driver_device
 {
@@ -103,6 +97,7 @@ public:
 	const UINT8 *m_mpPolyM;
 	const UINT8 *m_mpPolyL;
 	UINT8 *m_dirtypal;
+	bitmap_t *m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
 };
 
@@ -116,8 +111,8 @@ WRITE16_HANDLER( namcos22_dspram16_w );
 READ32_HANDLER( namcos22_cgram_r );
 WRITE32_HANDLER( namcos22_cgram_w );
 
-READ32_HANDLER( namcos22_czram_r );
-WRITE32_HANDLER( namcos22_czram_w );
+READ32_HANDLER( namcos22s_czram_r );
+WRITE32_HANDLER( namcos22s_czram_w );
 
 WRITE32_HANDLER(namcos22_port800000_w);
 
@@ -129,6 +124,9 @@ WRITE32_HANDLER( namcos22_textram_w );
 
 READ32_HANDLER( namcos22_gamma_r );
 WRITE32_HANDLER( namcos22_gamma_w );
+
+READ32_HANDLER( namcos22_tilemapattr_r );
+WRITE32_HANDLER( namcos22_tilemapattr_w );
 
 READ32_HANDLER( namcos22_dspram_r );
 WRITE32_HANDLER( namcos22_dspram_w );
@@ -142,4 +140,4 @@ SCREEN_UPDATE( namcos22s );
 
 void namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource );
 UINT32 namcos22_point_rom_r( running_machine &machine, offs_t offs );
-void namcos22_enable_slave_simulation( running_machine &machine );
+void namcos22_enable_slave_simulation( running_machine &machine, int enable );

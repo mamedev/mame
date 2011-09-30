@@ -3,16 +3,18 @@
  *
  * todo:
  *
- * - hook up slave dsp!
- * - fog bugfixes
- * - high priority polygons (above textlayer, for example minimap and speeddial in raveracer)
- * - shadow in textlayer (raveracer speeddial) + alpha blending fixes in textlayer
- * - SPOT
+ * - emulate slave dsp!
+ * - fog (not even hooked yet up on not-super)
+ * - polygon seaming (fix those small gaps between polygons)
+ * - missing/wrong sided textures (eg. ridgerac race start, propcycl scoreboard)
+ * - spot
  *
- * - sprite
+ * - spritelayer:
  *   + xy offset
  *   + clipping to window
- *   + eliminate garbage (air combat)
+ *   + eliminate garbage (airco22b, tokyowar)
+ *
+ * - lots of smaller issues
  *
  *
  *******************************
@@ -40,10 +42,6 @@ SPOT TABLE test
 #include "includes/namcos22.h"
 #include "video/poly.h"
 
-// uncomment this line to render everything as quads
-//#define RENDER_AS_QUADS
-
-
 
 static UINT8
 nthbyte( const UINT32 *pSource, int offs )
@@ -57,99 +55,6 @@ nthword( const UINT32 *pSource, int offs )
 {
 	pSource += offs/2;
 	return (pSource[0]<<((offs&1)*16))>>16;
-}
-
-static struct
-{
-	int target;
-	int rFogColor;
-	int gFogColor;
-	int bFogColor;
-	int rFogColor2;
-	int gFogColor2;
-	int bFogColor2;
-	int rBackColor;
-	int gBackColor;
-	int bBackColor;
-	int rFadeColor;
-	int gFadeColor;
-	int bFadeColor;
-	int fadeFactor;
-	int spot_translucency;
-	int poly_translucency;
-	int text_translucency;
-	int palBase;
-} mixer;
-
-static void
-UpdateVideoMixer( running_machine &machine )
-{
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	poly_wait(state->m_poly, "UpdateVideoMixer");
-	memset( &mixer, 0, sizeof(mixer) );
-	if( state->m_mbSuperSystem22 )
-	{
-/*
-           0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
-00824000: ffffff00 00000000 0000007f 00ff0000 1000ff00 0f000000 00ff007f 00010007 // time crisis
-00824000: ffffff00 00000000 1830407f 00800000 0000007f 0f000000 0000037f 00010007 // trans sprite
-00824000: ffffff00 00000000 3040307f 00000000 0080007f 0f000000 0000037f 00010007 // trans poly
-00824000: ffffff00 00000000 1800187f 00800000 0080007f 0f000000 0000037f 00010007 // trans poly(2)
-00824000: ffffff00 00000000 1800187f 00000000 0000007f 0f800000 0000037f 00010007 // trans text
-*/
-		mixer.rFogColor         = nthbyte( state->m_gamma, 0x05 );
-		mixer.gFogColor         = nthbyte( state->m_gamma, 0x06 );
-		mixer.bFogColor         = nthbyte( state->m_gamma, 0x07 );
-		mixer.rBackColor        = nthbyte( state->m_gamma, 0x08 );
-		mixer.gBackColor        = nthbyte( state->m_gamma, 0x09 );
-		mixer.bBackColor        = nthbyte( state->m_gamma, 0x0a );
-		mixer.spot_translucency = nthbyte( state->m_gamma, 0x0d );
-		mixer.poly_translucency = nthbyte( state->m_gamma, 0x11 );
-		mixer.text_translucency = nthbyte( state->m_gamma, 0x15 );
-		mixer.rFadeColor        = nthbyte( state->m_gamma, 0x16 );
-		mixer.gFadeColor        = nthbyte( state->m_gamma, 0x17 );
-		mixer.bFadeColor        = nthbyte( state->m_gamma, 0x18 );
-		mixer.fadeFactor        = nthbyte( state->m_gamma, 0x19 );
-		mixer.target            = nthbyte( state->m_gamma, 0x1a );
-		mixer.palBase           = nthbyte( state->m_gamma, 0x1b );
-	}
-	else
-	{
-/*
-90020000: 4f030000 7f00007f 4d4d4d42 0c00c0c0
-90020010: c0010001 00010000 00000000 00000000
-90020080: 00010101 01010102 00000000 00000000
-900200c0: 00000000 00000000 00000000 03000000
-90020100: fff35000 00000000 00000000 00000000
-90020180: ff713700 00000000 00000000 00000000
-90020200: ff100000 00000000 00000000 00000000
-*/
-		mixer.palBase     = 0x7f;
-		mixer.target      = 0x7;//nthbyte( state->m_gamma, 0x0002 )*256 + nthbyte( state->m_gamma, 0x0003 );
-		mixer.rFadeColor  = nthbyte( state->m_gamma, 0x0011 )*256 + nthbyte( state->m_gamma, 0x0012 );
-		mixer.gFadeColor  = nthbyte( state->m_gamma, 0x0013 )*256 + nthbyte( state->m_gamma, 0x0014 );
-		mixer.bFadeColor  = nthbyte( state->m_gamma, 0x0015 )*256 + nthbyte( state->m_gamma, 0x0016 );
-		mixer.fadeFactor  = (mixer.rFadeColor == 0x100 && mixer.gFadeColor == 0x100 && mixer.bFadeColor == 0x100) ? 0 : 1;
-
-		mixer.rFogColor   = nthbyte( state->m_gamma, 0x0100 );
-		mixer.rFogColor2  = nthbyte( state->m_gamma, 0x0101 );
-		mixer.gFogColor   = nthbyte( state->m_gamma, 0x0180 );
-		mixer.gFogColor2  = nthbyte( state->m_gamma, 0x0181 );
-		mixer.bFogColor   = nthbyte( state->m_gamma, 0x0200 );
-		mixer.bFogColor2  = nthbyte( state->m_gamma, 0x0201 );
-
-/*  +0x0002.w   Fader Enable(?) (0: disabled)
- *  +0x0011.w   Display Fader (R) (0x0100 = 1.0)
- *  +0x0013.w   Display Fader (G) (0x0100 = 1.0)
- *  +0x0015.w   Display Fader (B) (0x0100 = 1.0)
- *  +0x0100.b   Fog1 Color (R) (world fogging)
- *  +0x0101.b   Fog2 Color (R) (used for heating of brake-disc on RV1)
- *  +0x0180.b   Fog1 Color (G)
- *  +0x0181.b   Fog2 Color (G)
- *  +0x0200.b   Fog1 Color (B)
- *  +0x0201.b   Fog2 Color (B)
- */
-	}
 }
 
 INLINE UINT8
@@ -169,6 +74,151 @@ Clamp256( int v )
 #ifdef MAME_DEBUG
 static void Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name );
 #endif
+
+
+static struct
+{
+	int flags;
+	int rFogColor;
+	int gFogColor;
+	int bFogColor;
+	int rFogColor2;
+	int gFogColor2;
+	int bFogColor2;
+	int rPolyFadeColor;
+	int gPolyFadeColor;
+	int bPolyFadeColor;
+	int PolyFade_enabled;
+	int rFadeColor;
+	int gFadeColor;
+	int bFadeColor;
+	int fadeFactor;
+	int spot_translucency;
+	int poly_translucency;
+	int palBase;
+} mixer;
+
+static void
+UpdateVideoMixer( running_machine &machine )
+{
+	namcos22_state *state = machine.driver_data<namcos22_state>();
+	poly_wait(state->m_poly, "UpdateVideoMixer");
+	memset( &mixer, 0, sizeof(mixer) );
+#if 0 // show reg contents
+	char msg1[0x1000]={0}, msg2[0x1000]={0};
+	int i,st=0x000/16;
+	for (i=st;i<(st+3);i++) {
+		sprintf(msg2,"%04X %08X %08X %08X %08X\n",i*16,state->m_gamma[i*4+0],state->m_gamma[i*4+1],state->m_gamma[i*4+2],state->m_gamma[i*4+3]);
+		strcat(msg1,msg2);
+	}
+	popmessage("%s",msg1);
+#endif
+
+	if( state->m_mbSuperSystem22 )
+	{
+/*
+           0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
+00824000: ffffff00 00000000 0000007f 00ff0000 1000ff00 0f000000 00ff007f 00010007 // time crisis
+00824000: ffffff00 00000000 1830407f 00800000 0000007f 0f000000 0000037f 00010007 // trans sprite
+00824000: ffffff00 00000000 3040307f 00000000 0080007f 0f000000 0000037f 00010007 // trans poly
+00824000: ffffff00 00000000 1800187f 00800000 0080007f 0f000000 0000037f 00010007 // trans poly(2)
+00824000: ffffff00 00000000 1800187f 00000000 0000007f 0f800000 0000037f 00010007 // trans text
+
+	00,01,02		polygon fade rgb
+	03
+	04
+	05,06,07		world fog rgb
+	08,09,0a		background color
+	0b
+	0c
+	0d				spot related?
+	0e
+	0f
+	10
+	11				global polygon alpha factor
+	12,13			textlayer alpha pen comparison
+	14				textlayer alpha pen mask?
+	15				textlayer alpha factor
+	16,17,18		global fade rgb
+	19				global fade factor
+	1a				fade target flags
+	1b				textlayer palette base?
+	1c
+	1d
+	1e
+	1f				layer enable
+*/
+		mixer.rPolyFadeColor    = nthbyte( state->m_gamma, 0x00 );
+		mixer.gPolyFadeColor    = nthbyte( state->m_gamma, 0x01 );
+		mixer.bPolyFadeColor    = nthbyte( state->m_gamma, 0x02 ); mixer.PolyFade_enabled = (mixer.rPolyFadeColor == 0xff && mixer.gPolyFadeColor == 0xff && mixer.bPolyFadeColor == 0xff) ? 0 : 1;
+		mixer.rFogColor         = nthbyte( state->m_gamma, 0x05 );
+		mixer.gFogColor         = nthbyte( state->m_gamma, 0x06 );
+		mixer.bFogColor         = nthbyte( state->m_gamma, 0x07 );
+		mixer.poly_translucency = nthbyte( state->m_gamma, 0x11 );
+		mixer.rFadeColor        = nthbyte( state->m_gamma, 0x16 );
+		mixer.gFadeColor        = nthbyte( state->m_gamma, 0x17 );
+		mixer.bFadeColor        = nthbyte( state->m_gamma, 0x18 );
+		mixer.fadeFactor        = nthbyte( state->m_gamma, 0x19 );
+		mixer.flags             = nthbyte( state->m_gamma, 0x1a );
+		mixer.palBase           = nthbyte( state->m_gamma, 0x1b ) & 0x7f;
+	}
+	else
+	{
+/*
+90020000: 4f030000 7f00007f 4d4d4d42 0c00c0c0
+90020010: c0010001 00010000 00000000 00000000
+90020080: 00010101 01010102 00000000 00000000
+900200c0: 00000000 00000000 00000000 03000000
+90020100: fff35000 00000000 00000000 00000000
+90020180: ff713700 00000000 00000000 00000000
+90020200: ff100000 00000000 00000000 00000000
+
+	00,01			display flags
+	02
+	03
+	04
+	05
+	06
+	07				textlayer palette base?
+	08,09,0a		textlayer pen c shadow rgb
+	0b,0c,0d		textlayer pen d shadow rgb
+	0e,0f,10		textlayer pen e shadow rgb
+	11,12			global fade factor red
+	13,14			global fade factor green
+	15,16			global fade factor blue
+
+	100,180,200		world fog rgb (not implemented)
+	101,181,201		specific fog rgb? (not implemented)
+*/
+		mixer.flags             = nthbyte( state->m_gamma, 0x00 )*256 + nthbyte( state->m_gamma, 0x01 );
+		mixer.rPolyFadeColor    = nthbyte( state->m_gamma, 0x11 )*256 + nthbyte( state->m_gamma, 0x12 ); // 0x0100 = 1.0
+		mixer.gPolyFadeColor    = nthbyte( state->m_gamma, 0x13 )*256 + nthbyte( state->m_gamma, 0x14 );
+		mixer.bPolyFadeColor    = nthbyte( state->m_gamma, 0x15 )*256 + nthbyte( state->m_gamma, 0x16 );
+		mixer.PolyFade_enabled  = (mixer.rPolyFadeColor == 0x100 && mixer.gPolyFadeColor == 0x100 && mixer.bPolyFadeColor == 0x100) ? 0 : 1;
+
+		mixer.rFogColor  = nthbyte( state->m_gamma, 0x0100 );
+		mixer.rFogColor2 = nthbyte( state->m_gamma, 0x0101 ); // eg. used for heating of brake-disc on raveracw
+		mixer.gFogColor  = nthbyte( state->m_gamma, 0x0180 );
+		mixer.gFogColor2 = nthbyte( state->m_gamma, 0x0181 );
+		mixer.bFogColor  = nthbyte( state->m_gamma, 0x0200 );
+		mixer.bFogColor2 = nthbyte( state->m_gamma, 0x0201 );
+
+		mixer.palBase = 0x7f;
+		mixer.poly_translucency = 0;
+	}
+}
+
+READ32_HANDLER( namcos22_gamma_r )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	return state->m_gamma[offset];
+}
+
+WRITE32_HANDLER( namcos22_gamma_w )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	COMBINE_DATA( &state->m_gamma[offset] );
+}
 
 static struct
 {
@@ -240,9 +290,11 @@ INLINE unsigned texel( namcos22_state *state, unsigned x, unsigned y )
 typedef struct _poly_extra_data poly_extra_data;
 struct _poly_extra_data
 {
+	/* poly / sprites */
 	running_machine *machine;
 	rgbint fogColor;
 	rgbint fadeColor;
+	rgbint polyColor;
 	const pen_t *pens;
 	bitmap_t *priority_bitmap;
 	int bn;
@@ -250,15 +302,17 @@ struct _poly_extra_data
 	int cmode;
 	int fogFactor;
 	int fadeFactor;
-	const UINT8 *source;		/* sprites */
-	int z;
+	int pfade_enabled;
+
+	/* sprites */
+	const UINT8 *source;
 	int alpha;
 	int prioverchar;
 	int line_modulo;
 };
 
 
-static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
@@ -268,131 +322,91 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	float du = extent->param[1].dpdx;
 	float dv = extent->param[2].dpdx;
 	float di = extent->param[3].dpdx;
-	bitmap_t *bitmap = (bitmap_t *)dest;
+	bitmap_t *destmap = (bitmap_t *)destbase;
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	namcos22_state *state = extra->machine->driver_data<namcos22_state>();
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = extra->pens;
 	int fogFactor = 0xff - extra->fogFactor;
 	int fadeFactor = 0xff - extra->fadeFactor;
-	int transFactor = 0xff;
+	int alphaFactor = 0xff - mixer.poly_translucency;
 	rgbint fogColor = extra->fogColor;
 	rgbint fadeColor = extra->fadeColor;
-	int penmask, penshift;
-	int prioverchar;
-	const UINT8 *pCharPri = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
-	UINT32 *pDest = BITMAP_ADDR32(bitmap, scanline, 0);
+	rgbint polyColor = extra->polyColor;
+	int polyfade_enabled = extra->pfade_enabled;
+	int penmask = 0xff;
+	int penshift = 0;
+	int prioverchar = (extra->cmode & 7) == 1;
+	UINT32 *dest = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT8 *primap = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
 	int x;
 
 	if (extra->cmode & 4)
 	{
-		prioverchar = 0;
 		pens += 0xec + ((extra->cmode & 8) << 1);
 		penmask = 0x03;
-		penshift = 2 * ~(extra->cmode & 3);
+		penshift = 2 * (~extra->cmode & 3);
 	}
 	else if (extra->cmode & 2)
 	{
-		prioverchar = 0;
 		pens += 0xe0 + ((extra->cmode & 8) << 1);
 		penmask = 0x0f;
-		penshift = 4 * ~(extra->cmode & 1);
-	}
-	else if (extra->cmode & 1)
-	{
-		transFactor = 0xff - mixer.poly_translucency;
-		prioverchar = 1;
-		penmask = 0xff;
-		penshift = 0;
-	}
-	else
-	{
-		prioverchar = 0;
-		penmask = 0xff;
-		penshift = 0;
+		penshift = 4 * (~extra->cmode & 1);
 	}
 
-	if (prioverchar)
+	for( x=extent->startx; x<extent->stopx; x++ )
 	{
-		for( x=extent->startx; x<extent->stopx; x++ )
+		float ooz = 1.0f / z;
+		int pen = texel(state, (int)(u*ooz), bn+(int)(v*ooz));
+		int shade = i*ooz;
+		rgbint rgb;
+
+		rgb_to_rgbint(&rgb, pens[pen>>penshift&penmask]);
+		rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
+
+		if( fogFactor != 0xff )
+			rgbint_blend(&rgb, &fogColor, fogFactor);
+
+		if( polyfade_enabled )
+			rgbint_scale_channel_and_clamp(&rgb, &polyColor);
+
+		if( fadeFactor != 0xff )
+			rgbint_blend(&rgb, &fadeColor, fadeFactor);
+
+		if( alphaFactor != 0xff )
 		{
-			float ooz = 1.0f / z;
-			int pen = texel(state, (int)(u * ooz),bn+(int)(v*ooz));
-			int shade = i*ooz;
-			rgbint rgb;
-
-			rgb_to_rgbint(&rgb, pens[(pen >> penshift) & penmask]);
-			rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
-
-			if( fogFactor != 0xff )
-				rgbint_blend(&rgb, &fogColor, fogFactor);
-
-			if( fadeFactor != 0xff )
-			{
-				if (state->m_mbSuperSystem22)
-					rgbint_blend(&rgb, &fadeColor, fadeFactor);
-				else
-					rgbint_scale_channel_and_clamp(&rgb, &fadeColor);
-			}
-
-			if( transFactor != 0xff )
-			{
-				rgbint dest;
-				rgb_to_rgbint(&dest, pDest[x]);
-				rgbint_blend(&rgb, &dest, transFactor);
-			}
-
-			pDest[x] = rgbint_to_rgb(&rgb);
-
-			u += du;
-			v += dv;
-			i += di;
-			z += dz;
+			rgbint mix;
+			rgb_to_rgbint(&mix, dest[x]);
+			rgbint_blend(&rgb, &mix, alphaFactor);
 		}
-	}
-	else
-	{
-		for( x=extent->startx; x<extent->stopx; x++ )
-		{
-			if( pCharPri[x]==0 )
-			{
-				float ooz = 1.0f / z;
-				int pen = texel(state, (int)(u * ooz),bn+(int)(v*ooz));
-				int shade = i*ooz;
-				rgbint rgb;
 
-				rgb_to_rgbint(&rgb, pens[(pen >> penshift) & penmask]);
-				rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
+		dest[x] = rgbint_to_rgb(&rgb);
+		primap[x] |= prioverchar;
 
-				if( fogFactor != 0xff )
-					rgbint_blend(&rgb, &fogColor, fogFactor);
-
-				if( fadeFactor != 0xff )
-				{
-					if (state->m_mbSuperSystem22)
-						rgbint_blend(&rgb, &fadeColor, fadeFactor);
-					else
-						rgbint_scale_channel_and_clamp(&rgb, &fadeColor);
-				}
-
-				pDest[x] = rgbint_to_rgb(&rgb);
-			}
-
-			u += du;
-			v += dv;
-			i += di;
-			z += dz;
-		}
+		u += du;
+		v += dv;
+		i += di;
+		z += dz;
 	}
 } /* renderscanline_uvi_full */
 
 static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int textureBank, int color, Poly3dVertex pv[4], UINT16 flags, int direct, int cmode )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	poly_extra_data *extra;
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
 	poly_vertex v[4], clipv[6];
 	int clipverts;
 	int vertnum;
+
+	extra->machine = &machine;
+	extra->fogFactor = 0;
+	extra->fadeFactor = 0;
+
+	extra->pens = &machine.pens[(color&0x7f)<<8];
+	extra->priority_bitmap = machine.priority_bitmap;
+	extra->bn = textureBank;
+	extra->flags = flags;
+	extra->cmode = cmode;
 
 	/* non-direct case: project and z-clip */
 	if (!direct)
@@ -438,25 +452,20 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 		}
 	}
 
-	extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
-
-	extra->machine = &machine;
-	extra->pens = &machine.pens[(color&0x7f)<<8];
-	extra->priority_bitmap = machine.priority_bitmap;
-	extra->bn = textureBank;
-	extra->flags = flags;
-	extra->cmode = cmode;
-	extra->fogFactor = 0;
-	extra->fadeFactor = 0;
-
-	if (mixer.target&1)
-	{
-		extra->fadeFactor = mixer.fadeFactor;
-		rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
-	}
-
 	if( state->m_mbSuperSystem22 )
 	{
+		// global fade
+		if (mixer.flags&1)
+		{
+			extra->fadeFactor = mixer.fadeFactor;
+			rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
+		}
+
+		// poly fade
+		extra->pfade_enabled = mixer.PolyFade_enabled;
+		rgb_comp_to_rgbint(&extra->polyColor, mixer.rPolyFadeColor, mixer.gPolyFadeColor, mixer.bPolyFadeColor);
+
+		// fog (prelim!)
 		if( !(color&0x80) )
 		{
 			int cz = flags>>8;
@@ -477,74 +486,72 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 					fogDensity = 0x1fff;
 				}
 				extra->fogFactor = fogDensity >> 5;
+
+				// disallow 100% fogFactor for now (completely breaks alpinr2 otherwise)
+				if (extra->fogFactor == 0xff)
+					extra->fogFactor = 0;
+
 				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
 			}
 		}
 	}
+	else
+	{
+		// global fade
+		if (mixer.flags&1)
+		{
+			extra->pfade_enabled = mixer.PolyFade_enabled;
+			rgb_comp_to_rgbint(&extra->polyColor, mixer.rPolyFadeColor, mixer.gPolyFadeColor, mixer.bPolyFadeColor);
+		}
 
-#ifdef RENDER_AS_QUADS
-	poly_render_quad_fan(state->m_poly, bitmap, &mClip.scissor, renderscanline_uvi_full, 4, clipverts, clipv);
-#else
+		// fog not hooked up yet
+	}
+
 	poly_render_triangle_fan(state->m_poly, bitmap, &mClip.scissor, renderscanline_uvi_full, 4, clipverts, clipv);
-#endif
 }
 
 static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	int x_index = extent->param[0].start * 65536.0f;
-	int y_index = extent->param[1].start * 65536.0f;
-	int dx = extent->param[0].dpdx * 65536.0f;
+	int y_index = extent->param[1].start;
+	float x_index = extent->param[0].start;
+	float dx = extent->param[0].dpdx;
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	namcos22_state *state = extra->machine->driver_data<namcos22_state>();
 	bitmap_t *destmap = (bitmap_t *)destbase;
 	const pen_t *pal = extra->pens;
 	int prioverchar = extra->prioverchar;
-	int z = extra->z;
-	int alpha = extra->alpha;
-	UINT8 *source = (UINT8 *)extra->source + (y_index>>16) * extra->line_modulo;
+	int alphaFactor = extra->alpha;
+	int fogFactor = 0xff - extra->fogFactor;
+	int fadeFactor = 0xff - extra->fadeFactor;
+	rgbint fogColor = extra->fogColor;
+	rgbint fadeColor = extra->fadeColor;
+	UINT8 *source = (UINT8 *)extra->source + y_index * extra->line_modulo;
 	UINT32 *dest = BITMAP_ADDR32(destmap, scanline, 0);
-	const UINT8 *pCharPri = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
+	UINT8 *primap = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
 	int x;
-
-	int bFogEnable = nthword(state->m_czattr,4)&0x4000; /* ? */
-	INT16 fogDelta = nthword(state->m_czattr, 0 );
-	int fadeEnable = (mixer.target&2) && mixer.fadeFactor;
 
 	for( x=extent->startx; x<extent->stopx; x++ )
 	{
-		int pen = source[x_index>>16];
+		int pen = source[(int)x_index];
 		if( pen != 0xff )
 		{
-			if( pCharPri[x]==0 || prioverchar )
+			rgbint rgb;
+			rgb_to_rgbint(&rgb, pal[pen]);
+
+			if( fogFactor != 0xff )
+				rgbint_blend(&rgb, &fogColor, fogFactor);
+
+			if( fadeFactor != 0xff )
+				rgbint_blend(&rgb, &fadeColor, fadeFactor);
+
+			if( alphaFactor != 0xff )
 			{
-				UINT32 color = pal[pen];
-				int r = color>>16;
-				int g = (color>>8)&0xff;
-				int b = color&0xff;
-				if( bFogEnable && z!=0xffff )
-				{
-					int zc = Clamp256(fogDelta + z);
-					UINT16 fogDensity = state->m_czram[3][zc];
-					if( fogDensity>0 )
-					{
-						int fogDensity2 = 0x2000 - fogDensity;
-						r = (r*fogDensity2 + fogDensity*mixer.rFogColor)>>13;
-						g = (g*fogDensity2 + fogDensity*mixer.gFogColor)>>13;
-						b = (b*fogDensity2 + fogDensity*mixer.bFogColor)>>13;
-					}
-				}
-				if( fadeEnable )
-				{
-					int fade2 = 0x100-mixer.fadeFactor;
-					r = (r*fade2+mixer.fadeFactor*mixer.rFadeColor)>>8;
-					g = (g*fade2+mixer.fadeFactor*mixer.gFadeColor)>>8;
-					b = (b*fade2+mixer.fadeFactor*mixer.bFadeColor)>>8;
-				}
-				color = (r<<16)|(g<<8)|b;
-				color = alpha_blend_r32(dest[x], color, alpha);
-				color&=0xffffff;
-				dest[x] = color;
+				rgbint mix;
+				rgb_to_rgbint(&mix, dest[x]);
+				rgbint_blend(&rgb, &mix, alphaFactor);
 			}
+
+			dest[x] = rgbint_to_rgb(&rgb);
+			primap[x] |= prioverchar;
 		}
 		x_index += dx;
 	}
@@ -568,8 +575,20 @@ mydrawgfxzoom(
 		float fheight = gfx->height;
 		float fsw = sprite_screen_width;
 		float fsh = sprite_screen_height;
-		poly_extra_data *extra;
+		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
 		poly_vertex vert[4];
+
+		extra->fadeFactor = 0;
+		extra->fogFactor = 0;
+		extra->flags = 0;
+
+		extra->machine = &gfx->machine();
+		extra->alpha = alpha;
+		extra->prioverchar = (prioverchar != 0);
+		extra->line_modulo = gfx->line_modulo;
+		extra->pens = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color&0x7f)];
+		extra->priority_bitmap = gfx->machine().priority_bitmap;
+		extra->source = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		vert[0].x = fsx;
 		vert[0].y = fsy;
@@ -588,20 +607,27 @@ mydrawgfxzoom(
 		vert[3].p[0] = flipx ? fwidth : 0;
 		vert[3].p[1] = flipy ? 0 : fheight;
 
-		extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
-		extra->machine = &gfx->machine();
-		extra->z = z;
-		extra->alpha = alpha;
-		extra->prioverchar = prioverchar;
-		extra->line_modulo = gfx->line_modulo;
-		extra->pens = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-		extra->priority_bitmap = gfx->machine().priority_bitmap;
-		extra->source = gfx_element_get_data(gfx, code % gfx->total_elements);
-#ifdef RENDER_AS_QUADS
-		poly_render_quad_fan(state->m_poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);
-#else
+		// global fade
+		if (mixer.flags&1)
+		{
+			extra->fadeFactor = mixer.fadeFactor;
+			rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
+		}
+
+		// fog (prelim!)
+		if (z != 0xffff && nthword(state->m_czattr,4)&0x4000) // ?
+		{
+			INT16 fogDelta = nthword(state->m_czattr, 0);
+			int zc = Clamp256(fogDelta + z);
+			UINT16 fogDensity = state->m_czram[3][zc];
+			if (fogDensity < 0x2000)
+			{
+				extra->fogFactor = fogDensity >> 5;
+				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
+			}
+		}
+
 		poly_render_triangle_fan(state->m_poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);
-#endif
 	}
 } /* mydrawgfxzoom */
 
@@ -677,13 +703,8 @@ poly3d_Draw3dSprite( bitmap_t *bitmap, const gfx_element *gfx, int tileNumber, i
 #define CGRAM_SIZE 0x1e000
 #define NUM_CG_CHARS ((CGRAM_SIZE*8)/(64*16)) /* 0x3c0 */
 
-/* 16 bit access to DSP RAM */
-
 
 /* modal rendering properties */
-
-
-
 static void
 matrix3d_Multiply( float A[4][4], float B[4][4] )
 {
@@ -989,16 +1010,29 @@ DspFloatToNativeFloat( UINT32 iVal )
 static INT32
 GetPolyData( namcos22_state *state, INT32 addr )
 {
-	INT32 result;
+	UINT32 result;
 	if( addr<0 || addr>=state->m_mPtRomSize )
 	{
-		return -1; /* HACK */
+		// point ram, only used in ram test?
+		if( state->m_mbSuperSystem22 )
+		{
+			if( addr>=0xf80000 && addr<=0xf9ffff )
+				result = state->m_mpPointRAM[addr-0xf80000];
+			else return -1;
+		}
+		else
+		{
+			if( addr>=0xf00000 && addr<=0xf1ffff )
+				result = state->m_mpPointRAM[addr-0xf00000];
+			else return -1;
+		}
 	}
-	result = (state->m_mpPolyH[addr]<<16)|(state->m_mpPolyM[addr]<<8)|state->m_mpPolyL[addr];
-	if( result&0x00800000 )
+	else
 	{
-		result |= 0xff000000; /* sign extend */
+		result = (state->m_mpPolyH[addr]<<16)|(state->m_mpPolyM[addr]<<8)|state->m_mpPolyL[addr];
 	}
+	if( result&0x00800000 )
+		result |= 0xff000000; /* sign extend */
 	return result;
 } /* GetPolyData */
 
@@ -1006,7 +1040,7 @@ UINT32
 namcos22_point_rom_r( running_machine &machine, offs_t offs )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	return GetPolyData(state, offs);
+	return GetPolyData(state, offs & 0x00ffffff);
 }
 
 
@@ -1025,10 +1059,7 @@ namcos22_point_rom_r( running_machine &machine, offs_t offs )
          //00810000:  ff80 ff80 ff80 ff80 0000 0000 0000 0000 // hs entry
          //00810000:  ff01 ff01 0000 0000 0000 0000 00e4 0000 // alpine racer
 */
-
-
-
-READ32_HANDLER( namcos22_czram_r )
+READ32_HANDLER( namcos22s_czram_r )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	int bank = nthword(state->m_czattr,0xa/2);
@@ -1036,7 +1067,7 @@ READ32_HANDLER( namcos22_czram_r )
 	return (czram[offset*2]<<16)|czram[offset*2+1];
 }
 
-WRITE32_HANDLER( namcos22_czram_w )
+WRITE32_HANDLER( namcos22s_czram_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	int bank = nthword(state->m_czattr,0xa/2);
@@ -1223,7 +1254,11 @@ DrawSpritesHelper(
 	int deltay )
 {
 	int i;
-	for( i=0; i<num_sprites; i++ )
+	num_sprites--;
+	pSource += num_sprites*4;
+	pPal += num_sprites*2;
+
+	for( i=num_sprites; i>=0; i-- )
 	{
 		/*
         ----.-x--.----.----.----.----.----.---- hidden?
@@ -1285,7 +1320,7 @@ DrawSpritesHelper(
 			}
 
 			{
-				struct SceneNode *node = NewSceneNode(machine, zcoord,eSCENENODE_SPRITE);
+				struct SceneNode *node = NewSceneNode(machine, zcoord, eSCENENODE_SPRITE);
 
 				//printf("[%02d]: tile %x pri %x color %x flipX %d flipY %d cols %d rows %d link %d X %d Y %d sX %d sY %d trans %d cz %d\n",
 				//i, tile, cz&0x80, color&0x7f, flipx, flipy, numcols, numrows, linkType, xpos, ypos, sizex, sizey, translucency, cz);
@@ -1293,9 +1328,7 @@ DrawSpritesHelper(
 				if (color == 0) color = 0x67;	// extreme hack for Tokyo Wars
 
 				node->data.sprite.tile = tile;
-				node->data.sprite.pri = cz&0x80;
-				//node->data.sprite.pri = (color&0x80);
-				node->data.sprite.color = color&0x7f;
+				node->data.sprite.color = color;
 				node->data.sprite.flipx = flipx;
 				node->data.sprite.flipy = flipy;
 				node->data.sprite.numcols = numcols;
@@ -1306,11 +1339,12 @@ DrawSpritesHelper(
 				node->data.sprite.sizex = sizex;
 				node->data.sprite.sizey = sizey;
 				node->data.sprite.translucency = translucency;
+				node->data.sprite.pri = 0; // ? (not cz&0x80, not color&0x80)
 				node->data.sprite.cz = cz;
 			}
 		} /* visible sprite */
-		pSource += 4;
-		pPal += 2;
+		pSource -= 4;
+		pPal -= 2;
 	}
 } /* DrawSpritesHelper */
 
@@ -1394,6 +1428,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	int deltay = spriteram32[0x18/4]>>16;
 	int enable = spriteram32[0]>>16;
 
+#if 1
 	/* HACK for Tokyo Wars */
 	if (deltax == 0 && deltay == 0)
 	{
@@ -1407,8 +1442,9 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 		deltax = 48;
 		deltay = 43;
 	}
+#endif
 
-	if( enable==6 /*&& state->m_gametype!=NAMCOS22_AIR_COMBAT22*/ )
+	if( enable==6 )
 	{
 		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
 	}
@@ -1427,7 +1463,6 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 
     0x940060..0x94007c      set#2
     */
-
 	num_sprites = (state->m_vics_control[0x40/4]&0xffff)/0x10;
 	if( num_sprites>=1 )
 	{
@@ -1472,17 +1507,12 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	UINT16 data = nthword( state->m_textram,tile_index );
    /**
-    * x---.----.----.---- blend
     * xxxx.----.----.---- palette select
     * ----.xx--.----.---- flip
     * ----.--xx.xxxx.xxxx code
     */
 	SET_TILE_INFO( GFX_CHAR,data&0x03ff,data>>12,TILE_FLIPYX((data&0x0c00)>>10) );
-	if( data&0x8000 )
-	{
-		tileinfo->category = 1;
-	}
-} /* TextTilemapGetInfo */
+}
 
 READ32_HANDLER( namcos22_textram_r )
 {
@@ -1498,30 +1528,180 @@ WRITE32_HANDLER( namcos22_textram_w )
 	tilemap_mark_tile_dirty( state->m_bgtilemap, offset*2+1 );
 }
 
-static void
-DrawTranslucentCharacters( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+READ32_HANDLER( namcos22_tilemapattr_r )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+
+	switch (offset)
+	{
+		case 2:
+		{
+			UINT16 lo,hi = state->m_tilemapattr[offset] & 0xffff0000;
+			// assume current scanline, 0x1ff if in vblank (used in alpinesa)
+			// or maybe relative to posirq?
+			if (space->machine().primary_screen->vblank()) lo = 0x1ff;
+			else lo = space->machine().primary_screen->vpos() >> 1;
+			return hi|lo;
+		}
+
+		case 3:
+			// don't know, maybe also scanline related
+			// timecris reads it everytime the gun triggers and will decline if it's 0xffff
+			return 0;
+
+		default:
+			break;
+	}
+
+	return state->m_tilemapattr[offset];
+}
+
+WRITE32_HANDLER( namcos22_tilemapattr_w )
+{
+	/*
+	0.hiword	R/W		x offset
+	0.loword	R/W		y offset, bit 9 for interlacing?(cybrcomm, tokyowar)
+	1.hiword	R/W		??? always 0x006e?
+	1.loword	?		unused?
+	2.hiword	R/W		posirq scanline, not hooked up yet
+	2.loword	R		assume current scanline
+	3.hiword	?		unused?
+	3.loword	R		???
+	*/
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	COMBINE_DATA( &state->m_tilemapattr[offset] );
+//	popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
+}
+
+static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	UINT8 alpha = 0xff-mixer.text_translucency; /* ? */
-	tilemap_draw( bitmap, cliprect, state->m_bgtilemap, TILEMAP_DRAW_ALPHA(alpha)|1, 0 );
+	const pen_t *pens = machine.pens;
+	UINT16 *src;
+	UINT32 *dest;
+	UINT8 *pri;
+	int x,y;
+
+	// prepare fader and alpha
+	UINT8 alpha_check12 = nthbyte(state->m_gamma, 0x12);
+	UINT8 alpha_check13 = nthbyte(state->m_gamma, 0x13);
+	UINT8 alpha_mask = nthbyte(state->m_gamma, 0x14);
+	UINT8 alpha_factor = nthbyte(state->m_gamma, 0x15);
+	bool fade_enabled = mixer.flags&2 && mixer.fadeFactor;
+	int fade_factor = 0xff - mixer.fadeFactor;
+	rgbint fade_color;
+
+	rgb_comp_to_rgbint(&fade_color, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
+
+	// mix textlayer with poly/sprites
+	for (y=0;y<480;y++)
+	{
+		src = BITMAP_ADDR16(state->m_mix_bitmap, y, 0);
+		dest = BITMAP_ADDR32(bitmap, y, 0);
+		pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+		for (x=0;x<640;x++)
+		{
+			// skip if transparent or under poly/sprite
+			if (!pri[x] || pri[x]&1)
+				continue;
+
+			rgbint rgb;
+			rgb_to_rgbint(&rgb, pens[src[x]]);
+
+			// apply alpha
+			if (alpha_factor)
+			{
+				UINT8 pen = src[x]&0xff;
+				if ((pen&0xf) == alpha_mask || pen == alpha_check12 || pen == alpha_check13)
+				{
+					rgbint mix;
+					rgb_to_rgbint(&mix, dest[x]);
+					rgbint_blend(&rgb, &mix, 0xff - alpha_factor);
+				}
+			}
+
+			if (fade_enabled)
+				rgbint_blend(&rgb, &fade_color, fade_factor);
+
+			dest[x] = rgbint_to_rgb(&rgb);
+		}
+	}
+}
+
+static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+{
+	namcos22_state *state = machine.driver_data<namcos22_state>();
+	const pen_t *pens = machine.pens;
+	UINT16 *src;
+	UINT32 *dest;
+	UINT8 *pri;
+	int x,y;
+
+	// prepare fader and shadow factor
+	bool fade_enabled = mixer.flags&2 && mixer.PolyFade_enabled;
+	bool shadow_enabled = mixer.flags&0x100; // ? (ridgerac is the only game not using shadow)
+	rgbint fade_color, rgb_mix[3];
+
+	rgb_comp_to_rgbint(&fade_color, mixer.rPolyFadeColor, mixer.gPolyFadeColor, mixer.bPolyFadeColor);
+	rgb_comp_to_rgbint(&rgb_mix[0], nthbyte(state->m_gamma, 0x08), nthbyte(state->m_gamma, 0x09), nthbyte(state->m_gamma, 0x0a)); // pen c
+	rgb_comp_to_rgbint(&rgb_mix[1], nthbyte(state->m_gamma, 0x0b), nthbyte(state->m_gamma, 0x0c), nthbyte(state->m_gamma, 0x0d)); // pen d
+	rgb_comp_to_rgbint(&rgb_mix[2], nthbyte(state->m_gamma, 0x0e), nthbyte(state->m_gamma, 0x0f), nthbyte(state->m_gamma, 0x10)); // pen e
+
+	// mix textlayer with poly/sprites
+	for (y=0;y<480;y++)
+	{
+		src = BITMAP_ADDR16(state->m_mix_bitmap, y, 0);
+		dest = BITMAP_ADDR32(bitmap, y, 0);
+		pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+		for (x=0;x<640;x++)
+		{
+			// skip if transparent or under poly/sprite
+			if (!pri[x] || pri[x]&1)
+				continue;
+
+			// apply shadow
+			rgbint rgb;
+			switch (src[x] & 0xff)
+			{
+				case 0xfc:
+				case 0xfd:
+				case 0xfe:
+					if (shadow_enabled)
+					{
+						rgb_to_rgbint(&rgb, dest[x]);
+						rgbint_scale_channel_and_clamp(&rgb, &rgb_mix[(src[x]&0xf)-0xc]);
+						break;
+					}
+					// (fall through)
+				default:
+					rgb_to_rgbint(&rgb, pens[src[x]]);
+					break;
+			}
+
+			if (fade_enabled)
+				rgbint_scale_channel_and_clamp(&rgb, &fade_color);
+
+			dest[x] = rgbint_to_rgb(&rgb);
+		}
+	}
 }
 
 static void DrawCharacterLayer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	INT32 dx = state->m_tilemapattr[0]>>16;
-	INT32 dy = state->m_tilemapattr[0]&0xffff;
-   /**
-    * state->m_tilemapattr[0x4/4] == 0x006e0000
-    * state->m_tilemapattr[0x8/4] == 0x01ff0000
-    * state->m_tilemapattr[0xe/4] == ?
-    */
-	bitmap_fill(machine.priority_bitmap,cliprect,0);
-	tilemap_set_scrollx( state->m_bgtilemap,0, (dx-0x35c)&0x3ff );
-	tilemap_set_scrolly( state->m_bgtilemap,0, dy&0x3ff );
+	int scroll_x = state->m_tilemapattr[0]>>16;
+	int scroll_y = state->m_tilemapattr[0]&0xffff;
+
+	tilemap_set_scrollx( state->m_bgtilemap,0, (scroll_x-0x35c) & 0x3ff );
+	tilemap_set_scrolly( state->m_bgtilemap,0, scroll_y & 0x3ff );
 	tilemap_set_palette_offset( state->m_bgtilemap, mixer.palBase*256 );
-	tilemap_draw( bitmap, cliprect, state->m_bgtilemap, 0/*flags*/, 0x1/*priority*/ ); /* opaque */
-} /* DrawCharacterLayer */
+	tilemap_draw_primask(state->m_mix_bitmap, cliprect, state->m_bgtilemap, 0, 0x02, 0x02|1);
+
+	if (state->m_mbSuperSystem22)
+		namcos22s_mix_textlayer(machine, bitmap, cliprect);
+	else
+		namcos22_mix_textlayer(machine, bitmap, cliprect);
+}
 
 /*********************************************************************************************/
 
@@ -1557,7 +1737,7 @@ Signed18( UINT32 value )
  * @brief render a single quad
  *
  * @param flags
- *     x1.----.----.---- priority over tilemap
+ *     x1.----.----.---- ?
  *     --.-xxx.----.---- representative z algorithm?
  *     --.----.-1x-.---- backface cull enable
  *     --.----.----.--1x fog enable?
@@ -1578,7 +1758,7 @@ Signed18( UINT32 value )
  *
  * @param polygonShiftValue22
  *    0x1fbd0 - sky+sea
- *    0x0c350 - mountins
+ *    0x0c350 - mountains
  *    0x09c40 - boats, surf, road, buildings
  *    0x07350 - guardrail
  *    0x061a8 - red car
@@ -1876,12 +2056,22 @@ BlitPolyObject( running_machine &machine, bitmap_t *bitmap, int code, float M[4]
 READ32_HANDLER( namcos22_dspram_r )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_polygonram[offset];
+	return state->m_polygonram[offset] | 0xff000000; // only d0-23 are connected
 }
 
 WRITE32_HANDLER( namcos22_dspram_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	if (mem_mask & 0x00ff0000)
+	{
+		// sign extend or crop
+		mem_mask |= 0xff000000;
+		if (data & 0x00800000)
+			data |= 0xff000000;
+		else
+			data &= 0xffffff;
+	}
+
 	COMBINE_DATA( &state->m_polygonram[offset] );
 }
 
@@ -2008,6 +2198,7 @@ Handle200002( running_machine &machine, bitmap_t *bitmap, const INT32 *pSource )
 	else if( state->m_mPrimitiveID !=0 && state->m_mPrimitiveID !=2 )
 	{
 		logerror( "Handle200002:unk code=0x%x\n", state->m_mPrimitiveID );
+		// ridgerac title screen waving flag: 0x5
 	}
 } /* Handle200002 */
 
@@ -2122,10 +2313,10 @@ DrawPolygons( running_machine &machine, bitmap_t *bitmap )
 } /* DrawPolygons */
 
 void
-namcos22_enable_slave_simulation( running_machine &machine )
+namcos22_enable_slave_simulation( running_machine &machine, int enable )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	state->m_mbDSPisActive = 1;
+	state->m_mbDSPisActive = enable;
 }
 
 /*********************************************************************************************/
@@ -2141,18 +2332,6 @@ WRITE32_HANDLER( namcos22_cgram_w )
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	COMBINE_DATA( &state->m_cgram[offset] );
 	gfx_element_mark_dirty(space->machine().gfx[GFX_CHAR],offset/32);
-}
-
-READ32_HANDLER( namcos22_gamma_r )
-{
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_gamma[offset];
-}
-
-WRITE32_HANDLER( namcos22_gamma_w )
-{
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &state->m_gamma[offset] );
 }
 
 READ32_HANDLER( namcos22_paletteram_r )
@@ -2184,14 +2363,16 @@ static VIDEO_START( common )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int code;
 
+	state->m_mix_bitmap = auto_bitmap_alloc(machine,640,480,BITMAP_FORMAT_INDEXED16);
 	state->m_bgtilemap = tilemap_create( machine, TextTilemapGetInfo,tilemap_scan_rows,16,16,64,64 );
-		tilemap_set_transparent_pen( state->m_bgtilemap, 0xf );
+	tilemap_set_transparent_pen(state->m_bgtilemap, 0xf);
 
 	state->m_mbDSPisActive = 0;
 	memset( state->m_polygonram, 0xcc, 0x20000 );
 
 	for (code = 0; code < machine.gfx[GFX_TEXTURE_TILE]->total_elements; code++)
 		gfx_element_decode(machine.gfx[GFX_TEXTURE_TILE], code);
+
 	Prepare3dTexture(machine, machine.region("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
 	state->m_dirtypal = auto_alloc_array(machine, UINT8, NAMCOS22_PALETTE_SIZE/4);
 	state->m_mPtRomSize = machine.region("pointrom")->bytes()/3;
@@ -2199,11 +2380,7 @@ static VIDEO_START( common )
 	state->m_mpPolyM = state->m_mpPolyL + state->m_mPtRomSize;
 	state->m_mpPolyH = state->m_mpPolyM + state->m_mPtRomSize;
 
-#ifdef RENDER_AS_QUADS
-	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-#else
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-#endif
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine));
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_exit), &machine));
 
@@ -2236,17 +2413,29 @@ VIDEO_START( namcos22s )
 
 SCREEN_UPDATE( namcos22s )
 {
-	UINT32 bgColor;
+	namcos22_state *state = screen->machine().driver_data<namcos22_state>();
 	UpdateVideoMixer(screen->machine());
-	bgColor = (mixer.rBackColor<<16)|(mixer.gBackColor<<8)|mixer.bBackColor;
-	bitmap_fill( bitmap, cliprect , bgColor);
 	UpdatePalette(screen->machine());
-	DrawCharacterLayer(screen->machine(), bitmap, cliprect );
-	DrawPolygons( screen->machine(), bitmap );
-	DrawSprites( screen->machine(), bitmap, cliprect );
-	RenderScene(screen->machine(), bitmap );
-	DrawTranslucentCharacters( screen->machine(), bitmap, cliprect );
-	ApplyGamma( screen->machine(), bitmap );
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+
+	// background color
+	rgbint bg_color;
+	rgb_comp_to_rgbint(&bg_color, nthbyte(state->m_gamma,0x08), nthbyte(state->m_gamma,0x09), nthbyte(state->m_gamma,0x0a));
+	if (mixer.flags&1 && mixer.fadeFactor)
+	{
+		rgbint fade_color;
+		rgb_comp_to_rgbint(&fade_color, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
+		rgbint_blend(&bg_color, &fade_color, 0xff - mixer.fadeFactor);
+	}
+	bitmap_fill( bitmap, cliprect, rgbint_to_rgb(&bg_color));
+
+	// layers
+	UINT8 layer = nthbyte(state->m_gamma,0x1f);
+	if (layer&1) DrawPolygons(screen->machine(), bitmap);
+	if (layer&2) DrawSprites(screen->machine(), bitmap, cliprect);
+	if (layer&3) RenderScene(screen->machine(), bitmap );
+	if (layer&4) DrawCharacterLayer(screen->machine(), bitmap, cliprect);
+	ApplyGamma(screen->machine(), bitmap);
 
 #ifdef MAME_DEBUG
 	if( screen->machine().input().code_pressed(KEYCODE_D) )
@@ -2291,13 +2480,13 @@ SCREEN_UPDATE( namcos22s )
 SCREEN_UPDATE( namcos22 )
 {
 	UpdateVideoMixer(screen->machine());
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 	UpdatePalette(screen->machine());
-	DrawCharacterLayer(screen->machine(), bitmap, cliprect );
-	DrawPolygons( screen->machine(), bitmap );
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	DrawPolygons(screen->machine(), bitmap);
 	RenderScene(screen->machine(), bitmap);
-	DrawTranslucentCharacters( screen->machine(), bitmap, cliprect );
-	ApplyGamma( screen->machine(), bitmap );
+	DrawCharacterLayer(screen->machine(), bitmap, cliprect);
+	ApplyGamma(screen->machine(), bitmap);
 
 #ifdef MAME_DEBUG
 	if( screen->machine().input().code_pressed(KEYCODE_D) )
