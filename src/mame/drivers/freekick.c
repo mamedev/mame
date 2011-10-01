@@ -779,9 +779,11 @@ ROM_END
 
 /*
 
-original sets don't work, they're missing the main cpu code which is probably inside
-the custom cpu, battery backed too so hopefully somebody can work out how to get it
-from an original counter run board before they all die :-(
+The original Freekick boards have the main CPU code inside a custom CPU "block". This code is stored in battery
+backed RAM. There is 64K of RAM, but only 52K is program code while the remaining RAM is actually used as RAM.
+
+There is known to exist a Nihon System version without the Merit license, but has the Sega license enabled
+through a dipswitch. Hopefully this version can be found and dumped before they all die.
 
 */
 
@@ -814,7 +816,7 @@ ROM_END
 
 ROM_START( freekickb )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "freekbl8.q7", 0x00000, 0x10000, CRC(4208cfe5) SHA1(21628cbe8a217fbae30a6c24c9cc4c790fe45d65) ) // this was on the bootleg, would normally be battery backed inside cpu?
+	ROM_LOAD( "freekbl8.q7", 0x00000, 0x10000, CRC(4208cfe5) SHA1(21628cbe8a217fbae30a6c24c9cc4c790fe45d65) )
 
 	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
 	ROM_LOAD( "11.1e", 0x00000, 0x08000, CRC(a6030ba9) SHA1(f363100f54a7a80701a6395c7539b8daa60db054) ) // freekbl1.e2
@@ -840,7 +842,7 @@ ROM_END
 
 ROM_START( freekickb2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "15.bin", 0x00000, 0x10000, CRC(6569f2b0) SHA1(9306e316e6ae659bae3759a12a4e445b555a8893) ) // this was on the bootleg, would normally be battery backed inside cpu?
+	ROM_LOAD( "15.bin", 0x00000, 0x10000, CRC(6569f2b0) SHA1(9306e316e6ae659bae3759a12a4e445b555a8893) )
 
 	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
 	ROM_LOAD( "1.bin", 0x00000, 0x08000, CRC(a6030ba9) SHA1(f363100f54a7a80701a6395c7539b8daa60db054) )
@@ -873,6 +875,13 @@ ROM_START( freekickb2 )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(a507f941) SHA1(97619959ee4c366cb010525636ab5eefe5a3127a) )
 ROM_END
 
+/*
+
+The original Counter Run set doesn't work, it's missing the main CPU code which is inside a custom CPU "block"
+just like the original Freekick boards. Hopefully an original Counter Run board can be found and dumped (using
+the same method as used for Freekick) before they all die, batteries don't last for ever :-(
+
+*/
 
 ROM_START( countrun )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
