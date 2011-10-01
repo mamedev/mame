@@ -143,7 +143,7 @@ public:
 	static attotime from_msec(INT64 msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
 	static attotime from_usec(INT64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
 	static attotime from_nsec(INT64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
-	static attotime from_hz(double frequency) { assert(frequency >= 1); return attotime(0, double(ATTOSECONDS_PER_SECOND) / frequency); }
+	static attotime from_hz(double frequency) { assert(frequency > 0); double d = 1 / frequency; return attotime(floor(d), modf(d, &d) * ATTOSECONDS_PER_SECOND); }
 
 	// math
 	attotime &operator+=(const attotime &right);
