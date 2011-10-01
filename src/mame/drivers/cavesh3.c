@@ -153,6 +153,18 @@ ROM_START( futari10 )
 	ROM_LOAD( "u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
 ROM_END
 
+ROM_START( futariblk )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD( "u4", 0x000000, 0x200000, CRC(6db13c62) SHA1(6a53ce7f70b754936ccbb3a4674d4b2f03979644) ) /* (2007/12/11 BLACK LABEL VER) */
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(08c6fd62) SHA1(e1fc386b2b0e41906c724287cbf82304297e0150) ) /* (2007/12/11 BLACK LABEL VER) */
+
+	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_LOAD( "u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
+	ROM_LOAD( "u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
+ROM_END
+
 ROM_START( ibara )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD( "u4", 0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) ) /* (2005/03/22 MASTER VER..) */
@@ -214,27 +226,34 @@ ROM_START( mmpork )
 ROM_END
 
 
-GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                      GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                        GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                      GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",   GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",      GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara (2005/03/22 MASTER VER..)",                             GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",          GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",           GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                        GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futariblk, futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /*
 
 Known versions of games on this hardware (* denotes undumped):
 
-MUSHIHIMESAMA
+MUSHIHIME SAMA
   "2004/10/12 MASTER VER"  - broken
   "2004/10/12 MASTER VER." - fixed 1
 * "2004/10/12.MASTER VER." - fixed 2
+
+MUSHIHIME TAMA
+  "2005/09/09 MASTER VER"
+
+ESPGALUDA II
+  "2005/11/14 MASTER VER"
 
 IBARA
   "2005/03/22 MASTER VER.."
@@ -243,9 +262,6 @@ IBARA BLACK LABEL
   "2006/02/06 MASTER VER."
   "2006/02/06. MASTER VER."
 
-ESPGALUDA II
-  "2005/11/14 MASTER VER"
-
 PINK SWEETS
 * "2006/04/06 MASTER VER."
 * "2006/04/06 MASTER VER..."
@@ -253,7 +269,7 @@ PINK SWEETS
 * "2006/05/18 MASTER VER."
 * "2006/xx/xx MASTER VER"
 
-MUSHIHIMESAMA FUTARI 1.0
+MUSHIHIME SAMA FUTARI 1.0
 * "2006/10/23 MASTER VER"  - Ultra unlockable
   "2006/10/23 MASTER VER." - Ultra unlockable
 * "2006/10/23.MASTER VER." - Cannot unlock ultra
@@ -262,8 +278,8 @@ MUSHIHIME SAMA FUTARI 1.5
   "2006/12/8 MASTER VER 1.54"
   "2006/12/8.MASTER VER.1.54."
 
-MUSHIHIMESAMA FUTARI BLACK LABEL
-* "2007/12/11 BLACK LABEL VER"
+MUSHIHIME SAMA FUTARI BLACK LABEL
+  "2007/12/11 BLACK LABEL VER"
 * "2009/11/17 INTERNATIONAL BL"  ("Another Ver" on title screen)
 
 MUCHI MUCHI PORK
