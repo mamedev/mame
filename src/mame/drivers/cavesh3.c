@@ -27,8 +27,9 @@ SCREEN_UPDATE(cavesh3)
 
 static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0)
-    AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("game", 0)    // or mirror of the maincpu ROM?
+	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 // I/O at 040xxxxx - 04000130 appears to be the FPGA programming port
+// NAND at 0b00xxxx (the "u2" ROM is read this way)
     AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM // work RAM
 ADDRESS_MAP_END
 
