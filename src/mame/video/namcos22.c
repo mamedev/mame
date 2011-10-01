@@ -12,7 +12,8 @@
  * - spritelayer:
  *   + xy offset
  *   + clipping to window
- *   + eliminate garbage (airco22b, tokyowar)
+ *   + priority above textlayer (used in at least timecris)
+ *   + eliminate garbage (airco22b)
  *
  * - lots of smaller issues
  *
@@ -1260,10 +1261,11 @@ DrawSpritesHelper(
 
 	for( i=num_sprites; i>=0; i-- )
 	{
-		/*
+		/* attrs:
         ----.-x--.----.----.----.----.----.---- hidden?
         ----.--xx.----.----.----.----.----.---- ?
-        ----.----.xxxx.xxxx.xxxx.----.----.---- always 0xff0?
+        ----.----.xxxx.xxxx.----.----.----.---- linktype?
+        ----.----.----.----.xxxx.xx--.----.---- always 0?
         ----.----.----.----.----.--x-.----.---- right justify
         ----.----.----.----.----.---x.----.---- bottom justify
         ----.----.----.----.----.----.x---.---- flipx
@@ -1287,7 +1289,7 @@ DrawSpritesHelper(
 			int zoomx = (1<<16)*sizex/0x20;
 			int zoomy = (1<<16)*sizey/0x20;
 			int flipy = attrs&0x8;
-			int numrows = attrs&0x7; /* 0000 0001 1111 1111 0000 0000 fccc frrr */
+			int numrows = attrs&0x7;
 			int linkType = (attrs&0x00ff0000)>>16;
 			int flipx = (attrs>>4)&0x8;
 			int numcols = (attrs>>4)&0x7;
@@ -1325,10 +1327,7 @@ DrawSpritesHelper(
 				//printf("[%02d]: tile %x pri %x color %x flipX %d flipY %d cols %d rows %d link %d X %d Y %d sX %d sY %d trans %d cz %d\n",
 				//i, tile, cz&0x80, color&0x7f, flipx, flipy, numcols, numrows, linkType, xpos, ypos, sizex, sizey, translucency, cz);
 
-				if (color == 0) color = 0x67;	// extreme hack for Tokyo Wars
-
 				node->data.sprite.tile = tile;
-				node->data.sprite.color = color;
 				node->data.sprite.flipx = flipx;
 				node->data.sprite.flipy = flipy;
 				node->data.sprite.numcols = numcols;
@@ -1339,8 +1338,9 @@ DrawSpritesHelper(
 				node->data.sprite.sizex = sizex;
 				node->data.sprite.sizey = sizey;
 				node->data.sprite.translucency = translucency;
-				node->data.sprite.pri = 0; // ? (not cz&0x80, not color&0x80)
+				node->data.sprite.color = color;
 				node->data.sprite.cz = cz;
+				node->data.sprite.pri = 0; // ? priority over textlayer (not cz&0x80 or color&0x80 or in attrs)
 			}
 		} /* visible sprite */
 		pSource -= 4;
@@ -1421,12 +1421,12 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         ...
     */
 	UINT32 *spriteram32 = state->m_spriteram;
-	int num_sprites = ((spriteram32[0x04/4]>>16)&0x3ff)+1;
-	const UINT32 *pSource = &spriteram32[0x4000/4];
-	const UINT32 *pPal = &spriteram32[0x20000/4];
+	int num_sprites;
+	const UINT32 *pSource;
+	const UINT32 *pPal;
+
 	int deltax = spriteram32[0x14/4]>>16;
 	int deltay = spriteram32[0x18/4]>>16;
-	int enable = spriteram32[0]>>16;
 
 #if 1
 	/* HACK for Tokyo Wars */
@@ -1444,13 +1444,18 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	}
 #endif
 
-	if( enable==6 )
+	int enable = spriteram32[0]>>16;
+	num_sprites = spriteram32[0x04/4]>>16 & 0x3ff;
+	num_sprites++; // alpinerd, propcycl, .. but garbage in airco22b
+	if( num_sprites > 0 && enable == 6 )
 	{
+		pSource = &spriteram32[0x04000/4];
+		pPal    = &spriteram32[0x20000/4];
 		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
 	}
 
 	/* VICS RAM provides two additional banks */
-	/*
+	/* (still many unknowns here)
     0x940000 -x------       sprite chip busy
     0x940018 xxxx----       clr.w   $940018.l
 
@@ -1463,19 +1468,19 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 
     0x940060..0x94007c      set#2
     */
-	num_sprites = (state->m_vics_control[0x40/4]&0xffff)/0x10;
-	if( num_sprites>=1 )
-	{
-		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
-		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
-	}
-
-	num_sprites = (state->m_vics_control[0x60/4]&0xffff)/0x10;
-	if( num_sprites>=1 )
+	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff;
+	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
+	}
+
+	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff;
+	if( num_sprites > 0 )
+	{
+		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
+		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
 		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
 	}
 } /* DrawSprites */
@@ -1602,28 +1607,28 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 		for (x=0;x<640;x++)
 		{
 			// skip if transparent or under poly/sprite
-			if (!pri[x] || pri[x]&1)
-				continue;
-
-			rgbint rgb;
-			rgb_to_rgbint(&rgb, pens[src[x]]);
-
-			// apply alpha
-			if (alpha_factor)
+			if (pri[x] == 2)
 			{
-				UINT8 pen = src[x]&0xff;
-				if ((pen&0xf) == alpha_mask || pen == alpha_check12 || pen == alpha_check13)
+				rgbint rgb;
+				rgb_to_rgbint(&rgb, pens[src[x]]);
+
+				// apply alpha
+				if (alpha_factor)
 				{
-					rgbint mix;
-					rgb_to_rgbint(&mix, dest[x]);
-					rgbint_blend(&rgb, &mix, 0xff - alpha_factor);
+					UINT8 pen = src[x]&0xff;
+					if ((pen&0xf) == alpha_mask || pen == alpha_check12 || pen == alpha_check13)
+					{
+						rgbint mix;
+						rgb_to_rgbint(&mix, dest[x]);
+						rgbint_blend(&rgb, &mix, 0xff - alpha_factor);
+					}
 				}
+
+				if (fade_enabled)
+					rgbint_blend(&rgb, &fade_color, fade_factor);
+
+				dest[x] = rgbint_to_rgb(&rgb);
 			}
-
-			if (fade_enabled)
-				rgbint_blend(&rgb, &fade_color, fade_factor);
-
-			dest[x] = rgbint_to_rgb(&rgb);
 		}
 	}
 }
@@ -1656,32 +1661,32 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, 
 		for (x=0;x<640;x++)
 		{
 			// skip if transparent or under poly/sprite
-			if (!pri[x] || pri[x]&1)
-				continue;
-
-			// apply shadow
-			rgbint rgb;
-			switch (src[x] & 0xff)
+			if (pri[x] == 2)
 			{
-				case 0xfc:
-				case 0xfd:
-				case 0xfe:
-					if (shadow_enabled)
-					{
-						rgb_to_rgbint(&rgb, dest[x]);
-						rgbint_scale_channel_and_clamp(&rgb, &rgb_mix[(src[x]&0xf)-0xc]);
+				// apply shadow
+				rgbint rgb;
+				switch (src[x] & 0xff)
+				{
+					case 0xfc:
+					case 0xfd:
+					case 0xfe:
+						if (shadow_enabled)
+						{
+							rgb_to_rgbint(&rgb, dest[x]);
+							rgbint_scale_channel_and_clamp(&rgb, &rgb_mix[(src[x]&0xf)-0xc]);
+							break;
+						}
+						// (fall through)
+					default:
+						rgb_to_rgbint(&rgb, pens[src[x]]);
 						break;
-					}
-					// (fall through)
-				default:
-					rgb_to_rgbint(&rgb, pens[src[x]]);
-					break;
+				}
+
+				if (fade_enabled)
+					rgbint_scale_channel_and_clamp(&rgb, &fade_color);
+
+				dest[x] = rgbint_to_rgb(&rgb);
 			}
-
-			if (fade_enabled)
-				rgbint_scale_channel_and_clamp(&rgb, &fade_color);
-
-			dest[x] = rgbint_to_rgb(&rgb);
 		}
 	}
 }

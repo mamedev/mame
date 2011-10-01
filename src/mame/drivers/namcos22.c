@@ -4981,7 +4981,7 @@ static INPUT_PORTS_START( tokyowar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Change")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // also view-change function
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Right Trigger")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Trigger")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5746,7 +5746,7 @@ GAME( 1995, timecris, 0,         namcos22s, timecris, timecris, ROT0, "Namco", "
 GAME( 1995, timecrisa,timecris,  namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl, 0,         namcos22s, propcycl, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
 GAME( 1996, alpinesa, 0,         namcos22s, alpiner,  alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/07/01 15:19:23. major gfx problems, slave dsp?
-GAME( 1996, tokyowar, 0,         namcos22s, tokyowar, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/09/03 14:08:47. boots but missing sprite clear DMA?
+GAME( 1996, tokyowar, 0,         namcos22s, tokyowar, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
 GAME( 1996, aquajet,  0,         namcos22s, aquajet,  aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"                 , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
 GAME( 1996, alpinr2b, 0,         namcos22s, alpiner,  alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 97/01/10 17:10:59
 GAME( 1996, alpinr2a, alpinr2b,  namcos22s, alpiner,  alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/12/06 13:45:05
