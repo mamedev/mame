@@ -31,6 +31,7 @@
 #ifndef USE_SH4DRC
 
 CPU_DISASSEMBLE( sh4 );
+CPU_DISASSEMBLE( sh4be );
 
 /* Called for unimplemented opcodes */
 static void TODO(sh4_state *sh4)
@@ -3301,7 +3302,67 @@ static CPU_EXECUTE( sh4 )
 			sh4->pc -= 2;
 		}
 		else
+		{
 			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->pc & AM), WORD2_XOR_LE(0));
+		}
+
+		debugger_instruction_hook(device, sh4->pc & AM);
+
+		sh4->delay = 0;
+		sh4->pc += 2;
+		sh4->ppc = sh4->pc;
+
+		switch (opcode & ( 15 << 12))
+		{
+		case  0<<12: op0000(sh4, opcode); break;
+		case  1<<12: op0001(sh4, opcode); break;
+		case  2<<12: op0010(sh4, opcode); break;
+		case  3<<12: op0011(sh4, opcode); break;
+		case  4<<12: op0100(sh4, opcode); break;
+		case  5<<12: op0101(sh4, opcode); break;
+		case  6<<12: op0110(sh4, opcode); break;
+		case  7<<12: op0111(sh4, opcode); break;
+		case  8<<12: op1000(sh4, opcode); break;
+		case  9<<12: op1001(sh4, opcode); break;
+		case 10<<12: op1010(sh4, opcode); break;
+		case 11<<12: op1011(sh4, opcode); break;
+		case 12<<12: op1100(sh4, opcode); break;
+		case 13<<12: op1101(sh4, opcode); break;
+		case 14<<12: op1110(sh4, opcode); break;
+		default: op1111(sh4, opcode); break;
+		}
+
+		if (sh4->test_irq && !sh4->delay)
+		{
+			sh4_check_pending_irq(sh4, "mame_sh4_execute");
+		}
+		sh4->sh4_icount--;
+	} while( sh4->sh4_icount > 0 );
+}
+
+static CPU_EXECUTE( sh4be )
+{
+	sh4_state *sh4 = get_safe_token(device);
+
+	if (sh4->cpu_off)
+	{
+		sh4->sh4_icount = 0;
+		return;
+	}
+
+	do
+	{
+		UINT32 opcode;
+
+		if (sh4->delay)
+		{
+			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->delay & AM), WORD_XOR_LE(6));
+			sh4->pc -= 2;
+		}
+		else
+		{
+			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->pc & AM), WORD_XOR_LE(6));
+		}
 
 		debugger_instruction_hook(device, sh4->pc & AM);
 
@@ -3587,6 +3648,9 @@ static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64 )
 	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, U64(0xffffffffffffffff))
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64 )
+ADDRESS_MAP_END
+
 
 /**************************************************************************
  * Generic get_info
@@ -3814,6 +3878,8 @@ CPU_GET_INFO( sh3 )
 	case DEVINFO_STR_NAME:						strcpy(info->s, "SH-3");				break;
 	case DEVINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7700");		break;
 
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh3_internal_map); break;
+
 	default:									CPU_GET_INFO_CALL(sh4);					break;
 	}
 }
@@ -3824,10 +3890,14 @@ CPU_GET_INFO( sh3be )
 	{
 	/* --- the following bits of info are returned as pointers to data or functions --- */
 	case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh3);				break;
+	case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(sh4be);			break;
+	case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(sh4be);			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	case DEVINFO_STR_NAME:						strcpy(info->s, "SH-3");				break;
 	case DEVINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7700");		break;
+
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh3_internal_map); break;
 
 	case DEVINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;				break;
 
@@ -3839,6 +3909,8 @@ CPU_GET_INFO( sh4be )
 {
 	switch (state)
 	{
+	case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(sh4be);			break;
+	case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(sh4be);			break;
 	case DEVINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;				break;
 	default:									CPU_GET_INFO_CALL(sh4);					break;
 	}

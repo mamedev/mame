@@ -816,3 +816,8 @@ CPU_DISASSEMBLE( sh4 )
 	return DasmSH4( buffer, pc, (oprom[1] << 8) | oprom[0] );
 }
 
+CPU_DISASSEMBLE( sh4be )
+{
+	return DasmSH4( buffer, pc, (oprom[0] << 8) | oprom[1] );
+}
+
