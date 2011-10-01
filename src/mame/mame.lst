@@ -4480,7 +4480,7 @@ vf2b			// 1995.??
 srallyc			// 1995.02 Sega Rally Championship - Rev C
 srallycb		// 1995.02 Sega Rally Championship - Rev B
 vcop2			// 1995.09 Virtua Cop 2
-vf2				// 1995.09 Virtua Fighter 2.1
+vf2			// 1995.09 Virtua Fighter 2.1
 				// 1995.10 Sky Target
 manxtt			// 1995.11 Manx T.T.
 				// 1996.08 Dynamite Baseball
@@ -4488,6 +4488,7 @@ doaa			// 1996.11 Dead or Alive
 				// 1997.04 Dynamite Baseball '97
 motoraid		// 1997.10 Motor Raid
 zeroguna		// 1997.12 Zero Gunner
+zerogunaj		// 1997.12 Zero Gunner (Japan)
 dyndeka2		// 1998.05 Dynamite Deka 2
 dynamcop		// 1998.09 Dynamic Cop
 pltkidsa		// 1999.03 Pilot Kids
@@ -4501,16 +4502,17 @@ indy500d		// 1995.07 Indy 500
 indy500to		// 1995.07 Indy 500
 skytargt		// 1995.10 Sky Target
 fvipers			// 1995.11 Fighting Vipers
-von				// 1996.01 Dennou Senki Virtual-On (USA)
+von			// 1996.01 Dennou Senki Virtual-On (USA)
 vonj			// 1996.01 Dennou Senki Virtual-On (Japan)
 gunblade		// 1996.04 Gunblade N.Y.
 schamp			// 1996.05 Sonic Championship
 sfight			// 1996.05 Sonic the Fighters
 lastbrnx		// 1996.06 Last Bronx
+lastbrnxu		// 1996.06 Last Bronx (USA)
 lastbrnxj		// 1996.06 Last Bronx (Japan)
 sgt24h			// 1996.07 Super GT 24h
 dynabb			// 1996.08 Dynamite Baseball
-doa				// 1996.11 Dead or Alive
+doa			// 1996.11 Dead or Alive
 				// 1997.04 Dynamite Baseball '97
 zerogun			// 1997.12 Zero Gunner
 zerogunj		// 1997.12 Zero Gunner (Japan)
@@ -4531,7 +4533,7 @@ topskatrj		// 1997.05 Top Skater (Japan)
 overrev			// 1997.09 Overrev
 segawski		// 1997.09 Sega Water Ski
 dynamcopc		// 1998.09 Dynamite Cop
-bel				// 1998.12 Behind Enemy Lines
+bel			// 1998.12 Behind Enemy Lines
 
 // Sega Model 3 Games
 
