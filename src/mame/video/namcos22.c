@@ -12,7 +12,6 @@
  * - spritelayer:
  *   + xy offset
  *   + clipping to window
- *   + priority above textlayer (used in at least timecris)
  *   + eliminate garbage (airco22b)
  *
  * - lots of smaller issues
@@ -1268,6 +1267,7 @@ DrawSpritesHelper(
 	for( i=num_sprites; i>=0; i-- )
 	{
 		/* attrs:
+        xxxx.x---.----.----.----.----.----.---- always 0?
         ----.-x--.----.----.----.----.----.---- hidden?
         ----.--xx.----.----.----.----.----.---- ?
         ----.----.xxxx.xxxx.----.----.----.---- linktype?
@@ -1343,7 +1343,7 @@ DrawSpritesHelper(
 				node->data.sprite.translucency = translucency;
 				node->data.sprite.color = color;
 				node->data.sprite.cz = cz;
-				node->data.sprite.pri = 0; // ? priority over textlayer (not cz&0x80 or color&0x80 or in attrs)
+				node->data.sprite.pri = ((cz & 0xffff) == 0x00fe); // ? priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
 			}
 		} /* visible sprite */
 		pSource -= 4;
