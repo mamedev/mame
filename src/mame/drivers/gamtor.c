@@ -6,7 +6,20 @@
   interrupt vectors get put in ram at 0x08000000
 
 
-  preliminary video based on g4u5 set ONLY
+  preliminary video based on llcharm / g4u5 set ONLY
+  there is clearly a way to set the base adddress for the tiles, or they should get
+  DMAd elsewhere before use.
+
+  ends up making some accesses to the rom area because the pointer it gets from RAM is 0
+  and dies during what it calls 'EEPROM test' (investigate - is it hooked up in the coldfire
+  peripheral area?)
+
+  llcharm ->
+	'maincpu' (014902D2): unmapped program memory write to 000000D8 = 00000000 & FFFFFFFF
+	'maincpu' (01490312): unmapped program memory write to 000000B8 = 0BB19C00 & FFFFFFFF
+	'maincpu' (0149031C): unmapped program memory write to 000000D8 = 00000001 & FFFFFFFF
+	'maincpu' (01490312): unmapped program memory write to 000000B8 = 038B9C00 & FFFFFFFF
+	'maincpu' (0149031C): unmapped program memory write to 000000D8 = 00000001 & FFFFFFFF
 
 */
 
@@ -74,17 +87,17 @@ static READ32_HANDLER( gamtor_unk7_r )
 	return space->machine().rand();
 }
 
-#define GAMTOR_NUM_TILES 0x4000000 / 16
+#define GAMTOR_NUM_TILES 0x4000000 / 8
 
 static const gfx_layout gamtor_layout =
 {
-	8,16,
+	8,8,
 	GAMTOR_NUM_TILES,
 	1,
 	{ 0 },
 	{ 0,1,2,3,4,5,6,7 },
-	{  3*8, 2*8, 1*8, 0*8,  7*8, 6*8, 5*8, 4*8,  11*8, 10*8, 9*8, 8*8,  15*8, 14*8, 13*8, 12*8 },
-	16*8
+	{  3*8, 2*8, 1*8, 0*8,  7*8, 6*8, 5*8, 4*8 },
+	8*8
 };
 
 static WRITE32_HANDLER( gaminator_vram_w )
@@ -92,7 +105,7 @@ static WRITE32_HANDLER( gaminator_vram_w )
 	gaminator_state *state = space->machine().driver_data<gaminator_state>();
 
 	COMBINE_DATA(state->m_vram + offset);
-	gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
 
 }
 
@@ -108,6 +121,15 @@ VIDEO_START( gamtor )
 SCREEN_UPDATE(gamtor)
 {	
 	gaminator_state *state = screen->machine().driver_data<gaminator_state>();
+
+	int tile_base = 0x00000;
+
+	// where does the base address come from?
+	if (!strcmp(screen->machine().system().name,"g4u5"))	tile_base = 0x31BE4 - 2;
+	if (!strcmp(screen->machine().system().name,"llcharm"))	tile_base = 0x2f58d - 2;
+
+
+
 	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0;
 	for (int y=0;y<32;y++)
@@ -117,10 +139,11 @@ SCREEN_UPDATE(gamtor)
 			UINT32 chr = state->m_tmapram1[count];
 		
 
-			int tile = (chr>>24)&0xff;
-			tile +=0x18DF1; // g4u5
+			int tile = ((chr>>24)&0xff)*2;
+			tile += tile_base;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile+1,0,0,0,x*8,(y*16)+8);
 
 			count++;
 		}
@@ -160,9 +183,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(  gaminator )
 INPUT_PORTS_END
 
+
+
 static MACHINE_CONFIG_START( gaminator, gaminator_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
 	MCFG_CPU_PROGRAM_MAP(gaminator_map)
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold) // irq6 seems to be needed to get past the ROM checking
 
 	
 	MCFG_SCREEN_ADD("screen", RASTER)
