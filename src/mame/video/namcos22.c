@@ -303,11 +303,11 @@ struct _poly_extra_data
 	int fogFactor;
 	int fadeFactor;
 	int pfade_enabled;
+	int prioverchar;
 
 	/* sprites */
 	const UINT8 *source;
 	int alpha;
-	int prioverchar;
 	int line_modulo;
 };
 
@@ -336,7 +336,7 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	int polyfade_enabled = extra->pfade_enabled;
 	int penmask = 0xff;
 	int penshift = 0;
-	int prioverchar = (extra->cmode & 7) == 1;
+	int prioverchar = extra->prioverchar;
 	UINT32 *dest = BITMAP_ADDR32(destmap, scanline, 0);
 	UINT8 *primap = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
 	int x;
@@ -407,6 +407,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 	extra->bn = textureBank;
 	extra->flags = flags;
 	extra->cmode = cmode;
+	extra->prioverchar = (state->m_mbSuperSystem22 << 1) | ((cmode & 7) == 1);
 
 	/* non-direct case: project and z-clip */
 	if (!direct)
@@ -584,7 +585,7 @@ mydrawgfxzoom(
 
 		extra->machine = &gfx->machine();
 		extra->alpha = alpha;
-		extra->prioverchar = (prioverchar != 0);
+		extra->prioverchar = 2 | (prioverchar != 0);
 		extra->line_modulo = gfx->line_modulo;
 		extra->pens = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color&0x7f)];
 		extra->priority_bitmap = gfx->machine().priority_bitmap;
@@ -1581,7 +1582,7 @@ WRITE32_HANDLER( namcos22_tilemapattr_w )
 //	popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
 }
 
-static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int prival )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	const pen_t *pens = machine.pens;
@@ -1610,7 +1611,7 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 		for (x=0;x<640;x++)
 		{
 			// skip if transparent or under poly/sprite
-			if (pri[x] == 2)
+			if (pri[x] == prival)
 			{
 				rgbint rgb;
 				rgb_to_rgbint(&rgb, pens[src[x]]);
@@ -1703,12 +1704,17 @@ static void DrawCharacterLayer(running_machine &machine, bitmap_t *bitmap, const
 	tilemap_set_scrollx( state->m_bgtilemap,0, (scroll_x-0x35c) & 0x3ff );
 	tilemap_set_scrolly( state->m_bgtilemap,0, scroll_y & 0x3ff );
 	tilemap_set_palette_offset( state->m_bgtilemap, mixer.palBase*256 );
-	tilemap_draw_primask(state->m_mix_bitmap, cliprect, state->m_bgtilemap, 0, 0x02, 0x02|1);
 
 	if (state->m_mbSuperSystem22)
-		namcos22s_mix_textlayer(machine, bitmap, cliprect);
+	{
+		tilemap_draw_primask(state->m_mix_bitmap, cliprect, state->m_bgtilemap, 0, 4, 4);
+		namcos22s_mix_textlayer(machine, bitmap, cliprect, 4);
+	}
 	else
+	{
+		tilemap_draw_primask(state->m_mix_bitmap, cliprect, state->m_bgtilemap, 0, 2, 3);
 		namcos22_mix_textlayer(machine, bitmap, cliprect);
+	}
 }
 
 /*********************************************************************************************/
@@ -2439,10 +2445,11 @@ SCREEN_UPDATE( namcos22s )
 
 	// layers
 	UINT8 layer = nthbyte(state->m_gamma,0x1f);
+	if (layer&4) DrawCharacterLayer(screen->machine(), bitmap, cliprect);
 	if (layer&1) DrawPolygons(screen->machine(), bitmap);
 	if (layer&2) DrawSprites(screen->machine(), bitmap, cliprect);
 	if (layer&3) RenderScene(screen->machine(), bitmap );
-	if (layer&4) DrawCharacterLayer(screen->machine(), bitmap, cliprect);
+	if (layer&4) namcos22s_mix_textlayer(screen->machine(), bitmap, cliprect, 6);
 	ApplyGamma(screen->machine(), bitmap);
 
 #ifdef MAME_DEBUG
