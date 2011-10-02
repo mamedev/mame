@@ -2559,7 +2559,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x820000, 0x8202ff) AM_RAM /* unknown (air combat) */
 	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_BASE_MEMBER(namcos22_state, m_gamma)
 	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x860000, 0x860007) AM_READ(spotram_r) AM_WRITE(spotram_w)
+	AM_RANGE(0x860000, 0x860007) AM_READWRITE(spotram_r, spotram_w)
 	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_BASE_MEMBER(namcos22_state, m_cgram)
 	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_BASE_MEMBER(namcos22_state, m_textram)
 	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE_MEMBER(namcos22_state, m_tilemapattr)
@@ -3001,6 +3001,7 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+//	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 //	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_NVRAM_HANDLER(namcos22)

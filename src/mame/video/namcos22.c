@@ -1159,51 +1159,57 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 	struct SceneNode *node = NewSceneNode(machine, zsortvalue24,eSCENENODE_QUAD3D);
 	int i;
 	node->data.quad3d.flags = ((pSource[3]&0x7f00)*2)|(pSource[3]&3);
-	node->data.quad3d.cmode = (pSource[2]&0x00f0)>>4;
-	node->data.quad3d.textureBank = pSource[2]&0xf;
 	node->data.quad3d.color = (pSource[2]&0xff00)>>8;
+	if( state->m_mbSuperSystem22 )
+	{
+		node->data.quad3d.cmode       = (pSource[2]&0x00f0)>>4;
+		node->data.quad3d.textureBank = (pSource[2]&0x000f);
+	}
+	else
+	{
+		node->data.quad3d.cmode       = (pSource[0+4]&0xf000)>>12;
+		node->data.quad3d.textureBank = (pSource[1+4]&0xf000)>>12;
+	}
 	pSource += 4;
 	for( i=0; i<4; i++ )
 	{
 		Poly3dVertex *p = &node->data.quad3d.v[i];
-
-		p->u = pSource[0];
-		p->v = pSource[1];
 		if( state->m_mbSuperSystem22 )
 		{
-			p->u >>= 4;
-			p->v >>= 4;
+			p->u = pSource[0] >> 4;
+			p->v = pSource[1] >> 4;
 		}
-		p->u &= 0xfff;
-		p->v &= 0xfff;
-
+		else
 		{
-			int mantissa = (INT16)pSource[5];
-			float zf = (float)mantissa;
-			int exponent = (pSource[4])&0xff;
-			if( mantissa )
+			p->u = pSource[0] & 0x0fff;
+			p->v = pSource[1] & 0x0fff;
+		}
+
+		int mantissa = (INT16)pSource[5];
+		float zf = (float)mantissa;
+		int exponent = (pSource[4])&0xff;
+		if( mantissa )
+		{
+			while( exponent<0x2e )
 			{
-				while( exponent<0x2e )
-				{
-					zf /= 2.0;
-					exponent++;
-				}
-				if( state->m_mbSuperSystem22 )
-					p->z = zf;
-				else
-					p->z = 1.0f/zf;
+				zf /= 2.0;
+				exponent++;
 			}
+			if( state->m_mbSuperSystem22 )
+				p->z = zf;
 			else
-			{
-				zf = (float)0x10000;
-				exponent = 0x40-exponent;
-				while( exponent<0x2e )
-				{
-					zf /= 2.0;
-					exponent++;
-				}
 				p->z = 1.0f/zf;
+		}
+		else
+		{
+			zf = (float)0x10000;
+			exponent = 0x40-exponent;
+			while( exponent<0x2e )
+			{
+				zf /= 2.0;
+				exponent++;
 			}
+			p->z = 1.0f/zf;
 		}
 
 		p->x = ((INT16)pSource[2]);
@@ -1323,9 +1329,6 @@ DrawSpritesHelper(
 
 			{
 				struct SceneNode *node = NewSceneNode(machine, zcoord, eSCENENODE_SPRITE);
-
-				//printf("[%02d]: tile %x pri %x color %x flipX %d flipY %d cols %d rows %d link %d X %d Y %d sX %d sY %d trans %d cz %d\n",
-				//i, tile, cz&0x80, color&0x7f, flipx, flipy, numcols, numrows, linkType, xpos, ypos, sizex, sizey, translucency, cz);
 
 				node->data.sprite.tile = tile;
 				node->data.sprite.flipx = flipx;
@@ -1660,7 +1663,7 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, 
 		pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
 		for (x=0;x<640;x++)
 		{
-			// skip if transparent or under poly/sprite
+			// skip if transparent or under poly
 			if (pri[x] == 2)
 			{
 				// apply shadow
