@@ -2632,7 +2632,6 @@ src/mame/drivers/s7.c svneol=native#text/plain
 src/mame/drivers/s8.c svneol=native#text/plain
 src/mame/drivers/s9.c svneol=native#text/plain
 src/mame/drivers/safarir.c svneol=native#text/plain
-src/mame/drivers/sam.c svneol=native#text/plain
 src/mame/drivers/sandscrp.c svneol=native#text/plain
 src/mame/drivers/sangho.c svneol=native#text/plain
 src/mame/drivers/saturn.c svneol=native#text/plain
