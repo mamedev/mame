@@ -12,7 +12,7 @@
  * - spritelayer:
  *   + xy offset
  *   + clipping to window (eg. timecris)
- *   + 1-pixel gaps on left side of aquajet/alpinr2b
+ *   + 1-pixel x-offset error on left side of aquajet/alpinr2b
  *   + eliminate garbage in airco22b
  *   + some wrong snow sprites in alpinr2b
  *   + some missing sprites in cycbrcycc (most easy to spot is the missing city picture at titlescreen)
@@ -1510,7 +1510,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	int base = spriteram32[0] & 0xffff;
 	int num_sprites = (spriteram32[1]>>16) - base;
 	num_sprites += (~enable & 1); // alpinr2b! (+1 in all other games, though airco22b expects +0?)
-	if( num_sprites > 0 && enable != 7 )
+	if( num_sprites > 0 && num_sprites < 0x400 && enable != 7 )
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
