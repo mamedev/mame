@@ -11,6 +11,7 @@
 #include "sh4.h"
 #include "sh4regs.h"
 #include "sh4comn.h"
+#include "sh3comn.h"
 
 static const int tcnt_div[8] = { 4, 16, 64, 256, 1024, 1, 1, 1 };
 static const int rtcnt_div[8] = { 0, 4, 16, 64, 256, 1024, 2048, 4096 };
@@ -25,6 +26,8 @@ static const int exception_codes[] = { 0x000, 0x020, 0x000, 0x140, 0x140, 0x1E0,
 	0x320, 0x340, 0x360, 0x380, 0x3A0, 0x3C0, 0x240, 0x2A0, 0x300, 0x360, 0x600, 0x620, 0x640, 0x660, 0x680, 0x6A0, 0x780, 0x7A0, 0x7C0,
 	0x7E0, 0x6C0, 0xB00, 0xB80, 0x400, 0x420, 0x440, 0x460, 0x480, 0x4A0, 0x4C0, 0x4E0, 0x500, 0x520, 0x540, 0x700, 0x720, 0x740, 0x760,
 	0x560, 0x580, 0x5A0 };
+
+/* SH3 INTEVT2 uses a different table */
 
 static const UINT16 tcnt[] = { TCNT0, TCNT1, TCNT2 };
 static const UINT16 tcor[] = { TCOR0, TCOR1, TCOR2 };
@@ -161,30 +164,76 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 {
 	UINT32 vector;
 
-	if (exception < SH4_INTC_NMI)
-		return; // Not yet supported
-	if (exception == SH4_INTC_NMI) {
-		if ((sh4->sr & BL) && (!(sh4->m[ICR] & 0x200)))
+
+	if (sh4->cpu_type == CPU_TYPE_SH4)
+	{	
+		if (exception < SH4_INTC_NMI)
+			return; // Not yet supported
+		if (exception == SH4_INTC_NMI) {
+			if ((sh4->sr & BL) && (!(sh4->m[ICR] & 0x200)))
+				return;
+
+			sh4->m[ICR] &= ~0x200;
+			sh4->m[INTEVT] = 0x1c0;
+
+
+			vector = 0x600;
+			sh4->irq_callback(sh4->device, INPUT_LINE_NMI);
+			LOG(("SH-4 '%s' nmi exception after [%s]\n", sh4->device->tag(), message));
+		} else {
+	//      if ((sh4->m[ICR] & 0x4000) && (sh4->nmi_line_state == ASSERT_LINE))
+	//          return;
+			if (sh4->sr & BL)
+				return;
+			if (((sh4->exception_priority[exception] >> 8) & 255) <= ((sh4->sr >> 4) & 15))
+				return;
+			sh4->m[INTEVT] = exception_codes[exception];
+			vector = 0x600;
+			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
+				sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+			else
+				sh4->irq_callback(sh4->device, SH4_IRL3+1);
+			LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", sh4->device->tag(), exception, message));
+		}
+	}
+	else /* SH3 exceptions */
+	{
+		/***** ASSUME THIS TO BE WRONG FOR NOW *****/
+
+		if (exception < SH4_INTC_NMI)
+			return; // Not yet supported
+		if (exception == SH4_INTC_NMI)
+		{
 			return;
-		sh4->m[ICR] &= ~0x200;
-		sh4->m[INTEVT] = 0x1c0;
-		vector = 0x600;
-		sh4->irq_callback(sh4->device, INPUT_LINE_NMI);
-		LOG(("SH-4 '%s' nmi exception after [%s]\n", sh4->device->tag(), message));
-	} else {
-//      if ((sh4->m[ICR] & 0x4000) && (sh4->nmi_line_state == ASSERT_LINE))
-//          return;
-		if (sh4->sr & BL)
-			return;
-		if (((sh4->exception_priority[exception] >> 8) & 255) <= ((sh4->sr >> 4) & 15))
-			return;
-		sh4->m[INTEVT] = exception_codes[exception];
-		vector = 0x600;
-		if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-			sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+		}
 		else
-			sh4->irq_callback(sh4->device, SH4_IRL3+1);
-		LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", sh4->device->tag(), exception, message));
+		{
+			
+			if (sh4->sr & BL)
+				return;
+			if (((sh4->exception_priority[exception] >> 8) & 255) <= ((sh4->sr >> 4) & 15))
+				return;
+			
+				
+			vector = 0x600;
+			int callbackval = 0;
+
+			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
+				callbackval = sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+			else
+				callbackval = sh4->irq_callback(sh4->device, SH4_IRL3+1);
+
+			// we should put the value here based on a table, like the regular exception codes! (values are different tho)
+			//printf("exception %04x\n", exception);
+			//sh4->m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
+			sh4->m_sh3internal_lower[INTEVT2] = callbackval;
+			sh4->m_sh3internal_upper[SH3_EXPEVT] = exception_codes[exception];
+
+
+			LOG(("SH-3 '%s' interrupt exception #%d after [%s]\n", sh4->device->tag(), exception, message));
+		}
+
+		/***** END ASSUME THIS TO BE WRONG FOR NOW *****/
 	}
 	sh4_exception_checkunrequest(sh4, exception);
 
@@ -219,6 +268,10 @@ static void sh4_refresh_timer_recompute(sh4_state *sh4)
 {
 UINT32 ticks;
 
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_refresh_timer_recompute uses sh4->m[] with SH3\n");
+
+
 	//if rtcnt < rtcor then rtcor-rtcnt
 	//if rtcnt >= rtcor then 256-rtcnt+rtcor=256+rtcor-rtcnt
 	ticks = sh4->m[RTCOR]-sh4->m[RTCNT];
@@ -250,6 +303,10 @@ static void sh4_timer_recompute(sh4_state *sh4, int which)
 {
 	double ticks;
 
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_timer_recompute uses sh4->m[] with SH3\n");
+
+
 	ticks = sh4->m[tcnt[which]];
 	sh4->timer[which]->adjust(sh4_scale_up_mame_time(attotime::from_hz(sh4->pm_clock) * tcnt_div[sh4->m[tcr[which]] & 7], ticks), which);
 }
@@ -257,6 +314,9 @@ static void sh4_timer_recompute(sh4_state *sh4, int which)
 static TIMER_CALLBACK( sh4_refresh_timer_callback )
 {
 	sh4_state *sh4 = (sh4_state *)ptr;
+
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_refresh_timer_callback uses sh4->m[] with SH3\n");
 
 	sh4->m[RTCNT] = 0;
 	sh4_refresh_timer_recompute(sh4);
@@ -275,6 +335,9 @@ static TIMER_CALLBACK( sh4_refresh_timer_callback )
 static void increment_rtc_time(sh4_state *sh4, int mode)
 {
 	int carry, year, leap, days;
+
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("increment_rtc_time uses sh4->m[] with SH3\n");
 
 	if (mode == 0)
 	{
@@ -369,6 +432,12 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 {
 	sh4_state *sh4 = (sh4_state *)ptr;
 
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+	{
+		logerror("sh4_rtc_timer_callback uses sh4->m[] with SH3\n");
+		return;
+	}
+
 	sh4->rtc_timer->adjust(attotime::from_hz(128));
 	sh4->m[R64CNT] = (sh4->m[R64CNT]+1) & 0x7f;
 	if (sh4->m[R64CNT] == 64)
@@ -386,6 +455,9 @@ static TIMER_CALLBACK( sh4_timer_callback )
 	int which = param;
 	int idx = tcr[which];
 
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_timer_callback uses sh4->m[] with SH3\n");
+
 	sh4->m[tcnt[which]] = sh4->m[tcor[which]];
 	sh4_timer_recompute(sh4, which);
 	sh4->m[idx] = sh4->m[idx] | 0x100;
@@ -397,6 +469,9 @@ static TIMER_CALLBACK( sh4_dmac_callback )
 {
 	sh4_state *sh4 = (sh4_state *)ptr;
 	int channel = param;
+
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_dmac_callback uses sh4->m[] with SH3\n");
 
 	LOG(("SH4 '%s': DMA %d complete\n", sh4->device->tag(), channel));
 	sh4->dma_timer_active[channel] = 0;
@@ -601,6 +676,9 @@ static void sh4_dmac_check(sh4_state *sh4, int channel)
 {
 UINT32 dmatcr, chcr, sar, dar;
 
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_dmac_check uses sh4->m[] with SH3\n");
+
 	switch (channel)
 	{
 	case 0:
@@ -657,6 +735,9 @@ static void sh4_dmac_nmi(sh4_state *sh4) // manage dma when nmi gets asserted
 {
 int s;
 
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_dmac_nmi uses sh4->m[] with SH3\n");
+
 	sh4->m[DMAOR] |= DMAOR_NMIF;
 	for (s = 0;s < 4;s++)
 	{
@@ -675,6 +756,9 @@ WRITE32_HANDLER( sh4_internal_w )
 	int a;
 	UINT32 addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
+
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_internal_w uses sh4->m[] with SH3\n");
 
 	UINT32 old = sh4->m[offset];
 	COMBINE_DATA(sh4->m+offset);
@@ -991,6 +1075,9 @@ READ32_HANDLER( sh4_internal_r )
 {
 	sh4_state *sh4 = get_safe_token(&space->device());
 
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_internal_r uses sh4->m[] with SH3\n");
+
 	UINT32 addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
 
@@ -1058,6 +1145,9 @@ void sh4_set_frt_input(device_t *device, int state)
 {
 	sh4_state *sh4 = get_safe_token(device);
 
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_set_frt_input uses sh4->m[] with SH3\n");
+
 	if(state == PULSE_LINE)
 	{
 		sh4_set_frt_input(device, ASSERT_LINE);
@@ -1071,14 +1161,22 @@ void sh4_set_frt_input(device_t *device, int state)
 
 	sh4->frt_input = state;
 
-	if(sh4->m[5] & 0x8000) {
-		if(state == CLEAR_LINE) {
-			return;
+	if (sh4->cpu_type == CPU_TYPE_SH4)
+	{
+
+		if(sh4->m[5] & 0x8000) {
+			if(state == CLEAR_LINE) {
+				return;
+			}
+		} else {
+			if(state == ASSERT_LINE) {
+				return;
+			}
 		}
-	} else {
-		if(state == ASSERT_LINE) {
-			return;
-		}
+	}
+	else
+	{
+		fatalerror("sh4_set_frt_input uses sh4->m[] with SH3\n");
 	}
 
 #if 0
@@ -1103,42 +1201,18 @@ void sh4_set_irln_input(device_t *device, int value)
 
 void sh4_set_irq_line(sh4_state *sh4, int irqline, int state) // set state of external interrupt line
 {
-	int s;
-
-	if (irqline == INPUT_LINE_NMI)
-    {
-		if (sh4->nmi_line_state == state)
-			return;
-		if (sh4->m[ICR] & 0x100)
-		{
-			if ((state == CLEAR_LINE) && (sh4->nmi_line_state == ASSERT_LINE))  // rising
-			{
-				LOG(("SH-4 '%s' assert nmi\n", sh4->device->tag()));
-				sh4_exception_request(sh4, SH4_INTC_NMI);
-				sh4_dmac_nmi(sh4);
-			}
-		}
-		else
-		{
-			if ((state == ASSERT_LINE) && (sh4->nmi_line_state == CLEAR_LINE)) // falling
-			{
-				LOG(("SH-4 '%s' assert nmi\n", sh4->device->tag()));
-				sh4_exception_request(sh4, SH4_INTC_NMI);
-				sh4_dmac_nmi(sh4);
-			}
-		}
-		if (state == CLEAR_LINE)
-			sh4->m[ICR] ^= 0x8000;
-		else
-			sh4->m[ICR] |= 0x8000;
-		sh4->nmi_line_state = state;
-	}
-	else
+	if (sh4->cpu_type == CPU_TYPE_SH3)
 	{
-		if (sh4->m[ICR] & 0x80) // four independent external interrupt sources
+		/***** ASSUME THIS TO BE WRONG FOR NOW *****/
+
+		if (irqline == INPUT_LINE_NMI)
 		{
-			if (irqline > SH4_IRL3)
-				return;
+			fatalerror("SH3 NMI Unimplemented\n");
+		}
+		else
+		{
+			//if (irqline > SH4_IRL3)
+			//	return;
 			if (sh4->irq_line_state[irqline] == state)
 				return;
 			sh4->irq_line_state[irqline] = state;
@@ -1153,22 +1227,80 @@ void sh4_set_irq_line(sh4_state *sh4, int irqline, int state) // set state of ex
 				LOG(("SH-4 '%s' assert external irq IRL%d\n", sh4->device->tag(), irqline));
 				sh4_exception_request(sh4, SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
+
 		}
-		else // level-encoded interrupt
-		{
-			if (irqline != SH4_IRLn)
-				return;
-			if ((sh4->irln > 15) || (sh4->irln < 0))
-				return;
-			for (s = 0; s < 15; s++)
-				sh4_exception_unrequest(sh4, SH4_INTC_IRLn0+s);
-			if (sh4->irln < 15)
-				sh4_exception_request(sh4, SH4_INTC_IRLn0+sh4->irln);
-			LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", sh4->device->tag(), sh4->irln));
-		}
+
+		/***** END ASSUME THIS TO BE WRONG FOR NOW *****/
 	}
-	if (sh4->test_irq && (!sh4->delay))
-		sh4_check_pending_irq(sh4, "sh4_set_irq_line");
+	else
+	{
+		int s;
+
+		if (irqline == INPUT_LINE_NMI)
+		{
+			if (sh4->nmi_line_state == state)
+				return;
+			if (sh4->m[ICR] & 0x100)
+			{
+				if ((state == CLEAR_LINE) && (sh4->nmi_line_state == ASSERT_LINE))  // rising
+				{
+					LOG(("SH-4 '%s' assert nmi\n", sh4->device->tag()));
+					sh4_exception_request(sh4, SH4_INTC_NMI);
+					sh4_dmac_nmi(sh4);
+				}
+			}
+			else
+			{
+				if ((state == ASSERT_LINE) && (sh4->nmi_line_state == CLEAR_LINE)) // falling
+				{
+					LOG(("SH-4 '%s' assert nmi\n", sh4->device->tag()));
+					sh4_exception_request(sh4, SH4_INTC_NMI);
+					sh4_dmac_nmi(sh4);
+				}
+			}
+			if (state == CLEAR_LINE)
+				sh4->m[ICR] ^= 0x8000;
+			else
+				sh4->m[ICR] |= 0x8000;
+			sh4->nmi_line_state = state;
+		}
+		else
+		{
+			if (sh4->m[ICR] & 0x80) // four independent external interrupt sources
+			{
+				if (irqline > SH4_IRL3)
+					return;
+				if (sh4->irq_line_state[irqline] == state)
+					return;
+				sh4->irq_line_state[irqline] = state;
+
+				if( state == CLEAR_LINE )
+				{
+					LOG(("SH-4 '%s' cleared external irq IRL%d\n", sh4->device->tag(), irqline));
+					sh4_exception_unrequest(sh4, SH4_INTC_IRL0+irqline-SH4_IRL0);
+				}
+				else
+				{
+					LOG(("SH-4 '%s' assert external irq IRL%d\n", sh4->device->tag(), irqline));
+					sh4_exception_request(sh4, SH4_INTC_IRL0+irqline-SH4_IRL0);
+				}
+			}
+			else // level-encoded interrupt
+			{
+				if (irqline != SH4_IRLn)
+					return;
+				if ((sh4->irln > 15) || (sh4->irln < 0))
+					return;
+				for (s = 0; s < 15; s++)
+					sh4_exception_unrequest(sh4, SH4_INTC_IRLn0+s);
+				if (sh4->irln < 15)
+					sh4_exception_request(sh4, SH4_INTC_IRLn0+sh4->irln);
+				LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", sh4->device->tag(), sh4->irln));
+			}
+		}
+		if (sh4->test_irq && (!sh4->delay))
+			sh4_check_pending_irq(sh4, "sh4_set_irq_line");
+	}
 }
 
 void sh4_parse_configuration(sh4_state *sh4, const struct sh4_config *conf)
@@ -1387,6 +1519,9 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 	UINT32 *p32bits;
 	UINT64 *p32bytes;
 	UINT32 pos,len,siz;
+
+	if (sh4->cpu_type != CPU_TYPE_SH4)
+		fatalerror("sh4_dma_ddt uses sh4->m[] with SH3\n");
 
 	if (sh4->dma_timer_active[s->channel])
 		return;

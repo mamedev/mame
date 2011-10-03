@@ -24,6 +24,19 @@ SCREEN_UPDATE(cavesh3)
 	return 0;
 }
 
+static READ64_HANDLER( cave_unk_status_r )
+{
+	static int i = 0;
+
+	i^=1;
+	logerror("'maincpu' (%08x): unmapped cavesh3 read from %08x mask %08x%08x (unknown)\n",cpu_get_pc(&space->device()),(offset *8)+0x18000010,(UINT32)((mem_mask>>32)&0xffffffff),(UINT32)(mem_mask&0xffffffff));
+	
+	if (i==0)
+		return U64(0xffffffffffffffff);
+	else
+		return U64(0x0000000000000000);
+}
+
 
 static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0)
@@ -31,6 +44,8 @@ static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 // I/O at 040xxxxx - 04000130 appears to be the FPGA programming port
 // NAND at 0b00xxxx (the "u2" ROM is read this way)
     AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM // work RAM
+	AM_RANGE(0x18000010, 0x18000017) AM_READ(cave_unk_status_r)
+	AM_RANGE(0xF0000000, 0xF0003fff) AM_RAM // mem mapped cache (sh3 internal?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cavesh3_port, AS_IO, 64 )
@@ -45,12 +60,39 @@ INPUT_PORTS_END
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CAVE_CPU_CLOCK };
 
+/*static TIMER_CALLBACK( cavesh3_interrupt_off )
+{
+	cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
+}
+*/
+
+static IRQ_CALLBACK(cavesh3_int_callback)
+{
+	printf("irqline %02x\n",irqline);
+	cputag_set_input_line(device->machine(), "maincpu", 2, CLEAR_LINE);
+	return 0x640; // hack vector until SH3 core works better
+}
+
+
+static INTERRUPT_GEN(cavesh3_interrupt)
+{
+	device_set_input_line(device, 2, ASSERT_LINE);
+//	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(cavesh3_interrupt_off));
+}
+
+static MACHINE_RESET( cavesh3 )
+{
+	device_set_irq_callback(machine.device("maincpu"), cavesh3_int_callback);
+}
+
 static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH3BE, CAVE_CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(cavesh3_map)
 	MCFG_CPU_IO_MAP(cavesh3_port)
+	MCFG_CPU_VBLANK_INT("screen", cavesh3_interrupt)
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -60,6 +102,7 @@ static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(cavesh3)
+	MCFG_MACHINE_RESET(cavesh3)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -102,7 +145,7 @@ ROM_START( espgal2 )
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(09c908bb) SHA1(7d6031fd3542b3e1d296ff218feb40502fd78694) ) /* (2005/11/14 MASTER VER) */
 
 	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u2", 0x000000, 0x8400000, CRC(222f58c7) SHA1(d47a5085a1debd9cb8c61d88cd39e4f5036d1797) ) /* (2005/11/14 MASTER VER) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(222f58c7) SHA1(d47a5085a1debd9cb8c61d88cd39e4f5036d1797) ) /* (2005/11/14 MASTER VER) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(b9a10c22) SHA1(4561f95c6018c9716077224bfe9660e61fb84681) )
@@ -150,7 +193,7 @@ ROM_START( futari10 )
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(b127dca7) SHA1(e1f518bc72fc1cdf69aefa89eafa4edaf4e84778) ) /* (2006/10/23 MASTER VER.) */
 
 	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u2", 0x000000, 0x8400000, CRC(78ffcd0c) SHA1(0e2937edec15ce3f5741b72ebd3bbaaefffb556e) ) /* (2006/10/23 MASTER VER.) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(78ffcd0c) SHA1(0e2937edec15ce3f5741b72ebd3bbaaefffb556e) ) /* (2006/10/23 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
@@ -162,7 +205,7 @@ ROM_START( futariblk )
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(6db13c62) SHA1(6a53ce7f70b754936ccbb3a4674d4b2f03979644) ) /* (2007/12/11 BLACK LABEL VER) */
 
 	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u2", 0x000000, 0x8400000, CRC(08c6fd62) SHA1(e1fc386b2b0e41906c724287cbf82304297e0150) ) /* (2007/12/11 BLACK LABEL VER) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(08c6fd62) SHA1(e1fc386b2b0e41906c724287cbf82304297e0150) ) /* (2007/12/11 BLACK LABEL VER) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
@@ -174,7 +217,7 @@ ROM_START( ibara )
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) ) /* (2005/03/22 MASTER VER..) */
 
 	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) /* (2005/03/22 MASTER VER..) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) /* (2005/03/22 MASTER VER..) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(ee5e585d) SHA1(7eeba4ee693060e927f8c46b16e39227c6a62392) )
@@ -186,7 +229,7 @@ ROM_START( ibarablk )
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
 
 	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) /* (2006/02/06. MASTER VER.) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) /* (2006/02/06. MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) /* (2006/02/06 MASTER VER.) */
@@ -198,7 +241,7 @@ ROM_START( ibarablka )
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
 
 	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u2", 0x000000, 0x8400000, CRC(33400d96) SHA1(09c22b5431ac3726bf88c56efd970f56793f825a) ) /* (2006/02/06 MASTER VER.) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(33400d96) SHA1(09c22b5431ac3726bf88c56efd970f56793f825a) ) /* (2006/02/06 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) /* (2006/02/06 MASTER VER.) */
@@ -210,7 +253,7 @@ ROM_START( deathsml )
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(1a7b98bf) SHA1(07798a4a846e5802756396b34df47d106895c1f1) ) /* (2007/10/09 MASTER VER) */
 
 	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u2", 0x000000, 0x8400000, CRC(d45b0698) SHA1(7077b9445f5ed4749c7f683191ccd312180fac38) ) /* (2007/10/09 MASTER VER) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(d45b0698) SHA1(7077b9445f5ed4749c7f683191ccd312180fac38) ) /* (2007/10/09 MASTER VER) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(aab718c8) SHA1(0e636c46d06151abd6f73232bc479dafcafe5327) )
@@ -222,12 +265,25 @@ ROM_START( mmpork )
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(d06cfa42) SHA1(5707feb4b3e5265daf5926f38c38612b24106f1f) ) /* (2007/ 4/17 MASTER VER.) */
 
 	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u2", 0x000000, 0x8400000, CRC(1ee961b8) SHA1(81a2eba704ac1cf7fc44fa7c6a3f50e3570c104f) ) /* (2007/ 4/17 MASTER VER.) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(1ee961b8) SHA1(81a2eba704ac1cf7fc44fa7c6a3f50e3570c104f) ) /* (2007/ 4/17 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4a4b36df) SHA1(5db5ce6fa47e5ca3263d4bd19315890c6d29df66) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(ce83d07b) SHA1(a5947467c8f5b7c4b0ad8e32df2ee29b787e355f) )
 ROM_END
+
+ROM_START( mmmbnk )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u4", 0x0000, 0x200000, CRC(5589d8c6) SHA1(43fbdb0effe2bc0e7135698757b6ee50200aecde) ) /* (2007/06/05 MASTER VER.) */
+
+	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "u2", 0x0000, 0x8400000, CRC(f3b50c30) SHA1(962327798081b292b2d3fd3b7845c0197f9f2d8a) ) /* (2007/06/05 MASTER VER.) */
+
+	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4caaa1bf) SHA1(9b92c13eac05601da4d9bb3eb727c156974e9f0c) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(8e3a51ba) SHA1(e34cf9acb13c3d8ca6cd1306b060b1d429872abd) )
+ROM_END
+
 
 
 GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -243,6 +299,7 @@ GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara
 GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, mmmbnk,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Medal Majhong moukari Banchou no Kiban (2007/06/05 MASTER VER.)",   GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /*
 

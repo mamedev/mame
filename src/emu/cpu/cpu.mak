@@ -532,19 +532,24 @@ $(CPUOBJ)/sh2/sh2fe.o:	$(CPUSRC)/sh2/sh2fe.c \
 
 ifneq ($(filter SH4,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh4
-CPUOBJS += $(CPUOBJ)/sh4/sh4.o $(CPUOBJ)/sh4/sh4comn.o
+CPUOBJS += $(CPUOBJ)/sh4/sh4.o $(CPUOBJ)/sh4/sh4comn.o $(CPUOBJ)/sh4/sh3comn.o
 DASMOBJS += $(CPUOBJ)/sh4/sh4dasm.o
 endif
 
 $(CPUOBJ)/sh4/sh4.o:	$(CPUSRC)/sh4/sh4.c \
 			$(CPUSRC)/sh4/sh4.h \
 			$(CPUSRC)/sh4/sh4regs.h \
-			$(CPUSRC)/sh4/sh4comn.h
+			$(CPUSRC)/sh4/sh4comn.h \
+			$(CPUSRC)/sh4/sh3comn.h
 
 $(CPUOBJ)/sh4/sh4comn.o:  $(CPUSRC)/sh4/sh4comn.c \
 			$(CPUSRC)/sh4/sh4comn.h \
 			$(CPUSRC)/sh4/sh4regs.h \
 			$(CPUSRC)/sh4/sh4.h
+
+$(CPUOBJ)/sh4/sh3comn.o:  $(CPUSRC)/sh4/sh3comn.c \
+			$(CPUSRC)/sh4/sh3comn.h \
+
 
 #-------------------------------------------------
 # Hudsonsoft 6280

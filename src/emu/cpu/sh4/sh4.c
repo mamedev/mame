@@ -27,6 +27,7 @@
 #include "sh4.h"
 #include "sh4regs.h"
 #include "sh4comn.h"
+#include "sh3comn.h"
 
 #ifndef USE_SH4DRC
 
@@ -1707,7 +1708,16 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 {
 	UINT32 imm = i & 0xff;
 
-	sh4->m[TRA] = imm;
+	if (sh4->cpu_type == CPU_TYPE_SH4)
+	{
+		sh4->m[SH3_TRA] = imm;
+	}
+	else /* SH3 */
+	{
+		sh4->m_sh3internal_upper[SH3_TRA] = imm;
+	}
+
+
 	sh4->ssr = sh4->sr;
 	sh4->spc = sh4->pc;
 	sh4->sgr = sh4->r[15];
@@ -1721,7 +1731,15 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 	sh4->sr |= BL;
 	sh4_exception_recompute(sh4);
 
-	sh4->m[EXPEVT] = 0x00000160;
+	if (sh4->cpu_type == CPU_TYPE_SH4)
+	{
+		sh4->m[SH3_EXPEVT] = 0x00000160;
+	}
+	else /* SH3 */
+	{
+		sh4->m_sh3internal_upper[SH3_EXPEVT] = 0x00000160;
+	}
+
 	sh4->pc = sh4->vbr + 0x00000100;
 
 	sh4->sh4_icount -= 7;
@@ -2064,9 +2082,28 @@ INLINE void PREFM(sh4_state *sh4, UINT32 n)
 			sq = (addr & 0x20) >> 5;
 			dest = addr & 0x03FFFFE0;
 			if (sq == 0)
-				dest |= (sh4->m[QACR0] & 0x1C) << 24;
+			{
+				if (sh4->cpu_type == CPU_TYPE_SH4)
+				{
+					dest |= (sh4->m[QACR0] & 0x1C) << 24;
+				}
+				else
+				{
+					fatalerror("sh4->cpu_type != CPU_TYPE_SH4 but access internal regs\n");
+				}
+			}
 			else
-				dest |= (sh4->m[QACR1] & 0x1C) << 24;
+			{
+				if (sh4->cpu_type == CPU_TYPE_SH4)
+				{	
+					dest |= (sh4->m[QACR1] & 0x1C) << 24;
+				}
+				else
+				{
+					fatalerror("sh4->cpu_type != CPU_TYPE_SH4 but access internal regs\n");
+				}
+
+			}
 			addr = addr & 0xFFFFFFE0;
 		}
 
@@ -3187,7 +3224,7 @@ INLINE void op1111(sh4_state *sh4, UINT16 opcode)
  *  MAME CPU INTERFACE
  *****************************************************************************/
 
-static CPU_RESET( sh4 )
+static CPU_RESET( common_sh4_reset )
 {
 	sh4_state *sh4 = get_safe_token(device);
 	emu_timer *tsaved[4];
@@ -3244,13 +3281,17 @@ static CPU_RESET( sh4 )
 	memset(sh4->exception_requesting, 0, sizeof(sh4->exception_requesting));
 
 	sh4->rtc_timer->adjust(attotime::from_hz(128));
-	sh4->m[RCR2] = 0x09;
-	sh4->m[TCOR0] = 0xffffffff;
-	sh4->m[TCNT0] = 0xffffffff;
-	sh4->m[TCOR1] = 0xffffffff;
-	sh4->m[TCNT1] = 0xffffffff;
-	sh4->m[TCOR2] = 0xffffffff;
-	sh4->m[TCNT2] = 0xffffffff;
+
+	if (sh4->cpu_type == CPU_TYPE_SH4)
+	{
+		sh4->m[RCR2] = 0x09;
+		sh4->m[TCOR0] = 0xffffffff;
+		sh4->m[TCNT0] = 0xffffffff;
+		sh4->m[TCOR1] = 0xffffffff;
+		sh4->m[TCNT1] = 0xffffffff;
+		sh4->m[TCOR2] = 0xffffffff;
+		sh4->m[TCNT2] = 0xffffffff;
+	}
 
 	sh4->pc = 0xa0000000;
 	sh4->r[15] = RL(sh4,4);
@@ -3266,8 +3307,6 @@ static CPU_RESET( sh4 )
 	sh4->sleep_mode = 0;
 
 	sh4->sh4_mmu_enabled = 0;
-
-	sh4->cpu_type = CPU_TYPE_SH4;
 }
 
 /*-------------------------------------------------
@@ -3277,8 +3316,21 @@ static CPU_RESET( sh4 )
 static CPU_RESET( sh3 )
 {
 	sh4_state *sh4 = get_safe_token(device);
-	CPU_RESET_CALL(sh4);
+	
+	CPU_RESET_CALL(common_sh4_reset);
+
 	sh4->cpu_type = CPU_TYPE_SH3;
+	
+}
+
+static CPU_RESET( sh4 )
+{
+	sh4_state *sh4 = get_safe_token(device);
+	
+	CPU_RESET_CALL(common_sh4_reset);
+
+	sh4->cpu_type = CPU_TYPE_SH4;
+	
 }
 
 /* Execute cycles - returns number of cycles actually run */
@@ -3649,6 +3701,8 @@ static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64 )
+	AM_RANGE(SH3_LOWER_REGBASE, SH3_LOWER_REGEND) AM_READWRITE32(sh3_internal_r, sh3_internal_w, U64(0xffffffffffffffff))
+	AM_RANGE(SH3_UPPER_REGBASE, SH3_UPPER_REGEND) AM_READWRITE32(sh3_internal_high_r, sh3_internal_high_w, U64(0xffffffffffffffff))
 ADDRESS_MAP_END
 
 

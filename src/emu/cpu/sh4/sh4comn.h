@@ -78,7 +78,14 @@ typedef struct
 	address_space *program;
 	direct_read_data *direct;
 	address_space *io;
+	
+	// sh4 internal
 	UINT32	*m;
+
+	// sh3 internal
+	UINT32  m_sh3internal_upper[0x3000/4];
+	UINT32  m_sh3internal_lower[0x1000];
+
 	INT8	nmi_line_state;
 
 	UINT8 sleep_mode;
@@ -271,6 +278,7 @@ UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address);
 
 READ64_HANDLER( sh4_tlb_r );
 WRITE64_HANDLER( sh4_tlb_w );
+
 
 INLINE void sh4_check_pending_irq(sh4_state *sh4, const char *message) // look for highest priority active exception and handle it
 {

@@ -107,6 +107,13 @@ DECLARE_LEGACY_CPU_DEVICE(SH4BE, sh4be);
 WRITE32_HANDLER( sh4_internal_w );
 READ32_HANDLER( sh4_internal_r );
 
+WRITE32_HANDLER( sh3_internal_w );
+READ32_HANDLER( sh3_internal_r );
+
+WRITE32_HANDLER( sh3_internal_high_w );
+READ32_HANDLER( sh3_internal_high_r );
+
+
 void sh4_set_frt_input(device_t *device, int state);
 void sh4_set_irln_input(device_t *device, int value);
 void sh4_set_ftcsr_callback(device_t *device, sh4_ftcsr_callback callback);
