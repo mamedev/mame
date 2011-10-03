@@ -11,8 +11,11 @@
  *
  * - spritelayer:
  *   + xy offset
- *   + clipping to window
- *   + eliminate garbage (airco22b)
+ *   + clipping to window (eg. timecris)
+ *   + 1-pixel gaps on left side of aquajet/alpinr2b
+ *   + eliminate garbage in airco22b
+ *   + some wrong snow sprites in alpinr2b
+ *   + some missing sprites in cycbrcycc (most easy to spot is the missing city picture at titlescreen)
  *
  * - lots of smaller issues
  *
@@ -1269,8 +1272,7 @@ DrawSpritesHelper(
 	{
 		/* attrs:
         xxxx.x---.----.----.----.----.----.---- always 0?
-        ----.-x--.----.----.----.----.----.---- hidden?
-        ----.--xx.----.----.----.----.----.---- ?
+        ----.-xxx.----.----.----.----.----.---- enable mask?
         ----.----.xxxx.xxxx.----.----.----.---- linktype?
         ----.----.----.----.xxxx.xx--.----.---- always 0?
         ----.----.----.----.----.--x-.----.---- right justify
@@ -1282,10 +1284,12 @@ DrawSpritesHelper(
         */
 		UINT32 attrs = pSource[2];
 		if( (attrs&0x04000000)==0 )
-		{ /* sprite is not hidden */
+		{
+			/* sprite is not hidden */
 			INT32 zcoord = pPal[0];
 			int color = pPal[1]>>16;
 			int cz = pPal[1]&0xffff;
+			int pri = ((pPal[1] & 0xffff) == 0x00fe); // ? priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
 			UINT32 xypos = pSource[0];
 			UINT32 size = pSource[1];
 			UINT32 code = pSource[3];
@@ -1293,8 +1297,8 @@ DrawSpritesHelper(
 			int ypos = (xypos&0xffff)-deltay;
 			int sizex = size>>16;
 			int sizey = size&0xffff;
-			int zoomx = (1<<16)*sizex/0x20;
-			int zoomy = (1<<16)*sizey/0x20;
+			int zoomx = (1<<(16-5))*sizex;
+			int zoomy = (1<<(16-5))*sizey;
 			int flipy = attrs&0x8;
 			int numrows = attrs&0x7;
 			int linkType = (attrs&0x00ff0000)>>16;
@@ -1303,31 +1307,30 @@ DrawSpritesHelper(
 			int tile = code>>16;
 			int translucency = (code&0xff00)>>8;
 
-			if( numrows==0 )
-				numrows = 8;
-			if( flipy )
+			if (numrows == 0) numrows = 8;
+			if (numcols == 0) numcols = 8;
+
+			if (flipy)
 			{
 				ypos += sizey*(numrows-1);
 				sizey = -sizey;
 			}
 
-			if( numcols==0 )
-				numcols = 8;
-			if( flipx )
+			if (flipx)
 			{
 				xpos += sizex*(numcols-1);
 				sizex = -sizex;
 			}
 
-			if( attrs & 0x0200 )
-			{ /* right justify */
-				xpos -= ((zoomx*numcols*0x20)>>16)-1;
-			}
-			if( attrs & 0x0100 )
-			{ /* bottom justify */
-				ypos -= ((zoomy*numrows*0x20)>>16)-1;
-			}
+			/* right justify */
+			if (attrs & 0x0200)
+				xpos -= ((zoomx*numcols)>>(16-5))-1;
 
+			/* bottom justify */
+			if (attrs & 0x0100)
+				ypos -= ((zoomy*numrows)>>(16-5))-1;
+
+			if (sizex && sizey)
 			{
 				struct SceneNode *node = NewSceneNode(machine, zcoord, eSCENENODE_SPRITE);
 
@@ -1344,7 +1347,7 @@ DrawSpritesHelper(
 				node->data.sprite.translucency = translucency;
 				node->data.sprite.color = color;
 				node->data.sprite.cz = cz;
-				node->data.sprite.pri = ((cz & 0xffff) == 0x00fe); // ? priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
+				node->data.sprite.pri = pri;
 			}
 		} /* visible sprite */
 		pSource -= 4;
@@ -1356,6 +1359,32 @@ static void
 DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
+	UINT32 *spriteram32 = state->m_spriteram;
+	const UINT32 *pSource;
+	const UINT32 *pPal;
+
+#if 0 // show reg contents
+	int i;
+	char msg1[0x1000]={0}, msg2[0x1000]={0};
+	// 980000-98023f (spriteram header)
+	for (i=0x00;i<0x02;i++) {
+		sprintf(msg2,"98%04X %08X %08X %08X %08X\n",i*16,spriteram32[i*4+0],spriteram32[i*4+1],spriteram32[i*4+2],spriteram32[i*4+3]);
+		strcat(msg1,msg2);
+	}
+	for (i=0x20;i<0x24;i++) {
+		sprintf(msg2,"98%04X %08X %08X %08X %08X\n",i*16,spriteram32[i*4+0],spriteram32[i*4+1],spriteram32[i*4+2],spriteram32[i*4+3]);
+		strcat(msg1,msg2);
+	}
+	strcat(msg1,"\n");
+	// 940000-94007c (vics control)
+	for (i=0x00;i<0x08;i++) {
+		sprintf(msg2,"94%04X %08X %08X %08X %08X\n",i*16,state->m_vics_control[i*4+0],state->m_vics_control[i*4+1],state->m_vics_control[i*4+2],state->m_vics_control[i*4+3]);
+		strcat(msg1,msg2);
+	}
+	if (machine.input().code_pressed(KEYCODE_S))
+		popmessage("%s",msg1);
+	else popmessage("[S] shows spite/vics regs");
+#endif
 /*
 // time crisis:
 00980000: 00060000 000b0053 03000200 03000000
@@ -1385,6 +1414,8 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         0x980000:   00060000 00010000 02ff0000 000007ff
                     ^^^^                                7 = disable
                              ^^^^                       num sprites
+                                      ^^^^              probably deltax related
+                                               ^^^^     definitely deltay related!
 
         0x980010:   00200020 000002ff 000007ff 00000000
                     ^^^^^^^^                            character size?
@@ -1424,15 +1455,42 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         0x9a0004:   palette, C381 ZC (depth cueing)
         ...
     */
-	UINT32 *spriteram32 = state->m_spriteram;
-	int num_sprites;
-	const UINT32 *pSource;
-	const UINT32 *pPal;
 
-	int deltax = spriteram32[0x14/4]>>16;
-	int deltay = spriteram32[0x18/4]>>16;
+	// xy offs, prelim!
+	int deltax=spriteram32[5]>>16; // usually 0x280
+	int deltay=spriteram32[6]>>16; // usually 0x32a
 
-#if 1
+	if (deltax == 0 || deltay == 0)
+	switch (state->m_gametype)
+	{
+		case NAMCOS22_AQUA_JET:
+			deltax = 0x07f;
+			deltay = 0x0fe; // spriteram32[3]>>16(0x0d6) + default(0x02a) is 0x100, close to 0x0fe
+			break;
+
+		case NAMCOS22_CYBER_CYCLES:
+			// approx (not enough testdata)
+			deltax = 0x280;
+			deltay = 0x400; // is spriteram32[3]>>16
+			break;
+
+		case NAMCOS22_TOKYO_WARS:
+			// approx (not enough testdata)
+			deltax = 190;
+			deltay = 0x10e; // spriteram32[3]>>16(0x0e6) is 0x10 more than aquajet
+			break;
+
+		default:
+			// accurate in testmode
+			deltax = 0x02e;
+			deltay = 0x02a;
+			break;
+	}
+
+	// previous xy implementation
+#if 0
+	deltax=spriteram32[5]>>16;
+	deltay=spriteram32[6]>>16;
 	/* HACK for Tokyo Wars */
 	if (deltax == 0 && deltay == 0)
 	{
@@ -1448,18 +1506,19 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	}
 #endif
 
-	int enable = spriteram32[0]>>16;
-	num_sprites = spriteram32[0x04/4]>>16 & 0x3ff;
-	num_sprites++; // alpinerd, propcycl, .. but garbage in airco22b
-	if( num_sprites > 0 && enable == 6 )
+	int enable = spriteram32[0]>>16&7;
+	int base = spriteram32[0] & 0xffff;
+	int num_sprites = (spriteram32[1]>>16) - base;
+	num_sprites += (~enable & 1); // alpinr2b! (+1 in all other games, though airco22b expects +0?)
+	if( num_sprites > 0 && enable != 7 )
 	{
-		pSource = &spriteram32[0x04000/4];
-		pPal    = &spriteram32[0x20000/4];
+		pSource = &spriteram32[0x04000/4 + base*4];
+		pPal    = &spriteram32[0x20000/4 + base*2];
 		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
 	}
 
-	/* VICS RAM provides two additional banks */
-	/* (still many unknowns here)
+	/* VICS RAM provides two additional banks (also many unknown regs here) */
+	/*
     0x940000 -x------       sprite chip busy
     0x940018 xxxx----       clr.w   $940018.l
 
