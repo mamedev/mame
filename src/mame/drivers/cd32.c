@@ -35,6 +35,7 @@
 #include "includes/cd32.h"
 #include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
+#include "machine/microtch.h"
 
 #define CD32PAL_XTAL_X1   XTAL_28_37516MHz
 #define CD32PAL_XTAL_X2   XTAL_4_433619MHz
@@ -1369,6 +1370,110 @@ static DRIVER_INIT(mgprem11)
 	state->m_input_hack = mgprem11_input_hack;
 }
 
+static INPUT_PORTS_START( odeontw2 )
+//	PORT_INCLUDE( cd32 )
+	PORT_INCLUDE( microtouch )
+
+	PORT_START("CIA0PORTA")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("CIA0PORTB")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
+	PORT_START("DIPSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1 1" )
+	PORT_DIPSETTING(    0x01, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x02, 0x02, "DSW1 2" )
+	PORT_DIPSETTING(    0x02, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x04, 0x04, "DSW1 3" )
+	PORT_DIPSETTING(    0x04, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x08, 0x08, "DSW1 4" )
+	PORT_DIPSETTING(    0x08, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x10, 0x10, "DSW1 5" )
+	PORT_DIPSETTING(    0x10, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x20, 0x20, "DSW1 6" )
+	PORT_DIPSETTING(    0x20, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW1 7" )
+	PORT_DIPSETTING(    0x40, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x80, 0x80, "DSW1 8" )
+	PORT_DIPSETTING(    0x80, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+
+	PORT_START("DIPSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2 1" )
+	PORT_DIPSETTING(    0x01, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x02, 0x02, "DSW2 2" )
+	PORT_DIPSETTING(    0x02, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x04, 0x04, "DSW2 3" )
+	PORT_DIPSETTING(    0x04, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x08, 0x08, "DSW2 4" )
+	PORT_DIPSETTING(    0x08, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x10, 0x10, "DSW2 5" )
+	PORT_DIPSETTING(    0x10, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x20, 0x20, "DSW2 6" )
+	PORT_DIPSETTING(    0x20, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW2 7" )
+	PORT_DIPSETTING(    0x40, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x80, 0x80, "DSW2 8" )
+	PORT_DIPSETTING(    0x80, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+
+INPUT_PORTS_END
+
+static void serial_w(running_machine &machine, UINT16 data)
+{
+	UINT8 data8 = data & 0xff;
+	if ( data8 != 0x00 )
+		microtouch_rx(1, &data8);
+}
+
+static void microtouch_tx(running_machine &machine, UINT8 data)
+{
+	amiga_serial_in_w(machine, data);
+}
+
+static DRIVER_INIT( odeontw2 )
+{
+	cd32_state *state = machine.driver_data<cd32_state>();
+	static const amiga_machine_interface cd32_intf =
+	{
+		AGA_CHIP_RAM_MASK,
+		NULL, NULL, cd32_potgo_w,
+		NULL, NULL, serial_w,
+		NULL, NULL,
+		NULL,
+		FLAGS_AGA_CHIPSET
+	};
+
+	/* configure our Amiga setup */
+	amiga_machine_config(machine, &cd32_intf);
+
+	/* set up memory */
+	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+
+	/* input hack */
+	state->m_input_hack = NULL;
+
+	/* touch screen */
+	microtouch_init(machine, microtouch_tx, NULL);
+}
+
 /***************************************************************************************************/
 
 // these are clones of the cd32 SYSTEM because they run on a stock retail unit, with additional HW
@@ -1379,4 +1484,4 @@ GAME( 1995, lsrquiz2, cd32, cd32base, lsrquiz2, lsrquiz2, ROT0, "CD Express", "L
 GAME( 1995, lasstixx, cd32, cd32base, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, mgnumber, cd32, cd32base, mgnumber, mgnumber, ROT0, "CD Express", "Magic Number",              GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, mgprem11, cd32, cd32base, mgprem11, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1999, odeontw2, cd32, cd32base, cd32,     cd32,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", GAME_NOT_WORKING )
+GAME( 1999, odeontw2, cd32, cd32base, odeontw2, odeontw2, ROT0, "CD Express", "Odeon Twister 2 (v202.19)", GAME_NOT_WORKING )
