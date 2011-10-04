@@ -318,21 +318,21 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes, char *string, int maxchars, bool encrypted)
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-
+	int char_num = source.is_octal() ? 3 : 2;
 	// output the first value
 	int offset = 0;
-	if (maxchars >= 2 * minbytes)
-		offset = sprintf(string, "%s", core_i64_hex_format(debug_read_opcode(source.m_space, pcbyte, minbytes, FALSE), minbytes * 2));
+	if (maxchars >= char_num * minbytes)
+		offset = sprintf(string, "%s", core_i64_format(debug_read_opcode(source.m_space, pcbyte, minbytes, FALSE), minbytes * char_num, source.is_octal()));
 
 	// output subsequent values
 	int byte;
-	for (byte = minbytes; byte < numbytes && offset + 1 + 2 * minbytes < maxchars; byte += minbytes)
-		offset += sprintf(&string[offset], " %s", core_i64_hex_format(debug_read_opcode(source.m_space, pcbyte + byte, minbytes, encrypted), minbytes * 2));
+	for (byte = minbytes; byte < numbytes && offset + 1 + char_num * minbytes < maxchars; byte += minbytes)
+		offset += sprintf(&string[offset], " %s", core_i64_format(debug_read_opcode(source.m_space, pcbyte + byte, minbytes, encrypted), minbytes * char_num, source.is_octal()));
 
 	// if we ran out of room, indicate more
 	string[maxchars - 1] = 0;
-	if (byte < numbytes && maxchars > 3)
-		string[maxchars - 2] = string[maxchars - 3] = string[maxchars - 4] = '.';
+	if (byte < numbytes && maxchars > (char_num*2 -1))
+		string[maxchars - char_num] = string[maxchars - char_num - 1] = string[maxchars - char_num -2] = '.';
 }
 
 
@@ -345,9 +345,10 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 {
 	bool changed = false;
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
+	int char_num =  source.is_octal() ? 3 : 2;
 
 	// determine how many characters we need for an address and set the divider
-	m_divider1 = 1 + source.m_space->logaddrchars() + 1;
+	m_divider1 = 1 + (source.m_space->logaddrchars()/2*char_num) + 1;
 
 	// assume a fixed number of characters for the disassembly
 	m_divider2 = m_divider1 + 1 + m_dasm_width + 1;
@@ -363,7 +364,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	if (m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED)
 	{
 		int maxbytes_clamped = MIN(maxbytes, DASM_MAX_BYTES);
-		m_total.x = m_divider2 + 1 + 2 * maxbytes_clamped + (maxbytes_clamped / minbytes - 1) + 1;
+		m_total.x = m_divider2 + 1 + char_num * maxbytes_clamped + (maxbytes_clamped / minbytes - 1) + 1;
 	}
 	else if (m_right_column == DASM_RIGHTCOL_COMMENTS)
 		m_total.x = m_divider2 + 1 + 50;		// DEBUG_COMMENT_MAX_LINE_LENGTH
@@ -400,7 +401,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 		// convert back and set the address of this instruction
 		m_byteaddress[instr] = pcbyte;
-		sprintf(&destbuf[0], " %s  ", core_i64_hex_format(source.m_space->byte_to_address(pcbyte), source.m_space->logaddrchars()));
+		sprintf(&destbuf[0], " %s  ", core_i64_format(source.m_space->byte_to_address(pcbyte), source.m_space->logaddrchars()/2*char_num, source.is_octal()));
 
 		// make sure we can translate the address, and then disassemble the result
 		char buffer[100];

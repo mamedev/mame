@@ -62,8 +62,13 @@
 debug_view_source::debug_view_source(const char *name, device_t *device)
 	: m_next(NULL),
 	  m_name(name),
-	  m_device(device)
+	  m_device(device),
+	  m_is_octal(false)
 {
+	device_execute_interface *intf;
+	if (device->interface(intf)) 
+		m_is_octal = intf->is_octal();
+
 }
 
 
