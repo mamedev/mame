@@ -14,8 +14,6 @@
  *   + clipping to window (eg. timecris)
  *   + eliminate garbage in airco22b
  *   + some missing sprites in cycbrcycc (most easy to spot is the missing city picture at titlescreen)
- *   + red arrows in timecris attract mode are placed wrong
- *   + 1-pixel x-offset error on left side of aquajet/alpinr2b
  *
  * - lots of smaller issues
  *
@@ -312,11 +310,15 @@ struct _poly_extra_data
 	const UINT8 *source;
 	int alpha;
 	int line_modulo;
+	int flipx;
+	int flipy;
 };
 
 
 static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	namcos22_state *state = extra->machine->driver_data<namcos22_state>();
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
 	float v = extent->param[2].start;
@@ -326,8 +328,6 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	float dv = extent->param[2].dpdx;
 	float di = extent->param[3].dpdx;
 	bitmap_t *destmap = (bitmap_t *)destbase;
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	namcos22_state *state = extra->machine->driver_data<namcos22_state>();
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = extra->pens;
 	int fogFactor = 0xff - extra->fogFactor;
@@ -516,10 +516,10 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 
 static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	int y_index = extent->param[1].start;
-	float x_index = extent->param[0].start;
-	float dx = extent->param[0].dpdx;
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	int y_index = extent->param[1].start - extra->flipy;
+	float x_index = extent->param[0].start - extra->flipx;
+	float dx = extent->param[0].dpdx;
 	bitmap_t *destmap = (bitmap_t *)destbase;
 	const pen_t *pal = extra->pens;
 	int prioverchar = extra->prioverchar;
@@ -571,7 +571,7 @@ mydrawgfxzoom(
 	namcos22_state *state = gfx->machine().driver_data<namcos22_state>();
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
 	int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
-	if (sprite_screen_width && sprite_screen_height && gfx)
+	if (sprite_screen_width && sprite_screen_height)
 	{
 		float fsx = sx;
 		float fsy = sy;
@@ -588,28 +588,30 @@ mydrawgfxzoom(
 
 		extra->machine = &gfx->machine();
 		extra->alpha = alpha;
-		extra->prioverchar = 2 | (prioverchar != 0);
+		extra->prioverchar = 2 | prioverchar;
 		extra->line_modulo = gfx->line_modulo;
+		extra->flipx = flipx;
+		extra->flipy = flipy;
 		extra->pens = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color&0x7f)];
 		extra->priority_bitmap = gfx->machine().priority_bitmap;
 		extra->source = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		vert[0].x = fsx;
 		vert[0].y = fsy;
-		vert[0].p[0] = flipx ? fwidth : 0;
-		vert[0].p[1] = flipy ? fheight : 0;
+		vert[0].p[0] = 0;
+		vert[0].p[1] = 0;
 		vert[1].x = fsx + fsw;
 		vert[1].y = fsy;
-		vert[1].p[0] = flipx ? 0 : fwidth;
-		vert[1].p[1] = flipy ? fheight : 0;
+		vert[1].p[0] = fwidth;
+		vert[1].p[1] = 0;
 		vert[2].x = fsx + fsw;
 		vert[2].y = fsy + fsh;
-		vert[2].p[0] = flipx ? 0 : fwidth;
-		vert[2].p[1] = flipy ? 0 : fheight;
+		vert[2].p[0] = fwidth;
+		vert[2].p[1] = fheight;
 		vert[3].x = fsx;
 		vert[3].y = fsy + fsh;
-		vert[3].p[0] = flipx ? fwidth : 0;
-		vert[3].p[1] = flipy ? 0 : fheight;
+		vert[3].p[0] = 0;
+		vert[3].p[1] = fheight;
 
 		// global fade
 		if (mixer.flags&1)
@@ -631,7 +633,7 @@ mydrawgfxzoom(
 			}
 		}
 
-		poly_render_triangle_fan(state->m_poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);
+		poly_render_triangle_fan(state->m_poly, dest_bmp, clip, renderscanline_sprite, 2, 4, vert);
 	}
 } /* mydrawgfxzoom */
 
@@ -680,10 +682,8 @@ ApplyGamma( running_machine &machine, bitmap_t *bitmap )
 } /* ApplyGamma */
 
 static void
-poly3d_Draw3dSprite( bitmap_t *bitmap, const gfx_element *gfx, int tileNumber, int color, int sx, int sy, int width, int height, int translucency, int zc, UINT32 pri )
+poly3d_Draw3dSprite( bitmap_t *bitmap, const gfx_element *gfx, int tileNumber, int color, int flipx, int flipy, int sx, int sy, int width, int height, int translucency, int zc, UINT32 pri )
 {
-	int flipx = 0;
-	int flipy = 0;
 	rectangle clip;
 	clip.min_x = 0;
 	clip.min_y = 0;
@@ -918,6 +918,8 @@ static void RenderSprite(running_machine &machine, bitmap_t *bitmap, struct Scen
 					machine.gfx[GFX_SPRITE],
 					code,
 					node->data.sprite.color,
+					node->data.sprite.flipx,
+					node->data.sprite.flipy,
 					node->data.sprite.xpos+col*node->data.sprite.sizex,
 					node->data.sprite.ypos+row*node->data.sprite.sizey,
 					node->data.sprite.sizex,
@@ -1297,12 +1299,10 @@ DrawSpritesHelper(
 			int ypos = (xypos&0xffff)-deltay;
 			int sizex = size>>16;
 			int sizey = size&0xffff;
-			int zoomx = (1<<(16-5))*sizex;
-			int zoomy = (1<<(16-5))*sizey;
-			int flipy = attrs&0x8;
+			int flipy = attrs>>3&0x1;
 			int numrows = attrs&0x7;
 			int linkType = (attrs&0x00ff0000)>>16;
-			int flipx = (attrs>>4)&0x8;
+			int flipx = (attrs>>7)&0x1;
 			int numcols = (attrs>>4)&0x7;
 			int tile = code>>16;
 			int translucency = (code&0xff00)>>8;
@@ -1310,25 +1310,25 @@ DrawSpritesHelper(
 			if (numrows == 0) numrows = 8;
 			if (numcols == 0) numcols = 8;
 
+			/* right justify */
+			if (attrs & 0x0200)
+				xpos -= sizex*numcols-1;
+
+			/* bottom justify */
+			if (attrs & 0x0100)
+				ypos -= sizey*numrows-1;
+
 			if (flipy)
 			{
-				ypos += sizey*(numrows-1);
+				ypos += sizey*numrows-1;
 				sizey = -sizey;
 			}
 
 			if (flipx)
 			{
-				xpos += sizex*(numcols-1);
+				xpos += sizex*numcols-1;
 				sizex = -sizex;
 			}
-
-			/* right justify */
-			if (attrs & 0x0200)
-				xpos -= ((zoomx*numcols)>>(16-5))-1;
-
-			/* bottom justify */
-			if (attrs & 0x0100)
-				ypos -= ((zoomy*numrows)>>(16-5))-1;
 
 			if (sizex && sizey)
 			{
@@ -1506,10 +1506,13 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	}
 #endif
 
-	int enable = spriteram32[0]>>16&7;
-	int base = spriteram32[0] & 0xffff;
+	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = (spriteram32[1]>>16) - base;
-	num_sprites += (~enable & 1); // alpinr2b! (+1 in all other games, though airco22b expects +0?)
+
+	// 'enable' bits: assume that bit 0 affects spritecount by 1 (alpinr2b), and all bits set means off (aquajet)
+	int enable = spriteram32[0]>>16&7;
+	num_sprites += (~enable & 1);
+
 	if( num_sprites > 0 && num_sprites < 0x400 && enable != 7 )
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
