@@ -882,21 +882,6 @@ void running_machine::logfile_callback(running_machine &machine, const char *buf
 		machine.m_logfile->puts(buffer);
 }
 
-//-------------------------------------------------
-//  is_octal - returs if output should be hex or octal
-//-------------------------------------------------
-
-bool running_machine::is_octal()
-{
-	device_execute_interface *executing = m_scheduler.currently_executing();
-	if (executing != NULL)
-	{
-		cpu_device *cpu = downcast<cpu_device *>(&executing->device());
-		if (cpu != NULL)
-			return cpu->is_octal();
-	}
-	return false;
-}
 /***************************************************************************
     MEMORY REGIONS
 ***************************************************************************/
