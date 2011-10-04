@@ -122,6 +122,8 @@ legacy_cpu_device::legacy_cpu_device(const machine_config &mconfig, device_type 
 
 	// allocate memory for the token
 	m_token = global_alloc_array_clear(UINT8, tokenbytes);
+	// set hex or octal output
+	m_is_octal = get_legacy_int(CPUINFO_IS_OCTAL);
 }
 
 

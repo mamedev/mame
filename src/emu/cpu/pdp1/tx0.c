@@ -546,6 +546,7 @@ CPU_GET_INFO( tx0_64kw )
 	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s, "CYCLE:%X", cpustate->cycle); break;
 	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s, "IOH:%X", cpustate->ioh); break;
 	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s, "IOS:%X", cpustate->ios); break;
+	case CPUINFO_IS_OCTAL:							info->i = true;							break;
 	}
 }
 
@@ -672,6 +673,7 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s, "CYCLE:%X", cpustate->cycle); break;
 	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s, "IOH:%X", cpustate->ioh); break;
 	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s, "IOS:%X", cpustate->ios); break;
+	case CPUINFO_IS_OCTAL:							info->i = true;							break;
 	}
 }
 

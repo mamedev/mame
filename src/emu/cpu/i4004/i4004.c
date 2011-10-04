@@ -616,6 +616,8 @@ CPU_GET_INFO( i4004 )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
+
+		case CPUINFO_IS_OCTAL:						info->i = true;							break;
 	}
 }
 

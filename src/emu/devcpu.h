@@ -88,6 +88,9 @@ enum
 		CPUINFO_INT_SP = CPUINFO_INT_REGISTER + STATE_GENSP,		// R/W: the current stack pointer value
 		CPUINFO_INT_PC = CPUINFO_INT_REGISTER + STATE_GENPC,		// R/W: the current PC value
 		CPUINFO_INT_PREVIOUSPC = CPUINFO_INT_REGISTER + STATE_GENPCBASE,	// R/W: the previous PC value
+
+		CPUINFO_IS_OCTAL = CPUINFO_INT_REGISTER + MAX_REGS - 2,				// R/O: determine if default is octal or hexadecimal
+
 		CPUINFO_INT_REGISTER_LAST = CPUINFO_INT_REGISTER + MAX_REGS - 1,
 
 	CPUINFO_INT_CPU_SPECIFIC = 0x08000,						// R/W: CPU-specific values start here

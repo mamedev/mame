@@ -160,6 +160,7 @@ public:
 	UINT64 attotime_to_cycles(attotime duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 	UINT32 input_lines() const { return execute_input_lines(); }
 	UINT32 default_irq_vector() const { return execute_default_irq_vector(); }
+	bool is_octal() const { return m_is_octal; }
 
 	// static inline configuration helpers
 	static void static_set_disable(device_t &device);
@@ -280,6 +281,7 @@ protected:
 	const char *			m_vblank_interrupt_screen;	// the screen that causes the VBLANK interrupt
 	device_interrupt_func	m_timed_interrupt;			// for interrupts not tied to VBLANK
 	attotime				m_timed_interrupt_period;	// period for periodic interrupts
+	bool					m_is_octal;					// to determine if messages/debugger will show octal or hex
 
 	// execution lists
 	device_execute_interface *m_nextexec;				// pointer to the next device to execute, in order

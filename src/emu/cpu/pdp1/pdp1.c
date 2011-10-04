@@ -1090,6 +1090,7 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_STR_REGISTER + PDP1_IOC:			sprintf(info->s, "IOC:%X", cpustate->ioc); break;
 	case CPUINFO_STR_REGISTER + PDP1_IOH:			sprintf(info->s, "IOH:%X", cpustate->ioh); break;
 	case CPUINFO_STR_REGISTER + PDP1_IOS:			sprintf(info->s, "IOS:%X", cpustate->ios); break;
+	case CPUINFO_IS_OCTAL:							info->i = true;							break;
 	}
 }
 
