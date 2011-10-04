@@ -105,6 +105,7 @@ bool mfi_format::load(io_generic *io, floppy_image *image)
 			if(ent->uncompressed_size == 0) {
 				// Unformatted track
 				image->set_track_size(cyl, head, 0);
+				ent++;
 				continue;
 			}
 

@@ -983,6 +983,7 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 			for(int i=0; i<=maxt; i++)
 				if(get_track_size(i, maxh))
 					goto head_done;
+			maxh--;
 		}
  head_done:
 	_tracks = maxt+1;
@@ -1325,6 +1326,9 @@ void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT
 		}
 		index++;
 	}
+
+	if(offset != track_size)
+		throw emu_fatalerror("Wrong track size in generate_track, expected %d, got %d\n", track_size, offset);
 
 	fixup_crcs(buffer, crcs);
 
