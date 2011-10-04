@@ -3282,16 +3282,6 @@ static CPU_RESET( common_sh4_reset )
 
 	sh4->rtc_timer->adjust(attotime::from_hz(128));
 
-	if (sh4->cpu_type == CPU_TYPE_SH4)
-	{
-		sh4->m[RCR2] = 0x09;
-		sh4->m[TCOR0] = 0xffffffff;
-		sh4->m[TCNT0] = 0xffffffff;
-		sh4->m[TCOR1] = 0xffffffff;
-		sh4->m[TCNT1] = 0xffffffff;
-		sh4->m[TCOR2] = 0xffffffff;
-		sh4->m[TCNT2] = 0xffffffff;
-	}
 
 	sh4->pc = 0xa0000000;
 	sh4->r[15] = RL(sh4,4);
@@ -3331,6 +3321,13 @@ static CPU_RESET( sh4 )
 
 	sh4->cpu_type = CPU_TYPE_SH4;
 	
+	sh4->m[RCR2] = 0x09;
+	sh4->m[TCOR0] = 0xffffffff;
+	sh4->m[TCNT0] = 0xffffffff;
+	sh4->m[TCOR1] = 0xffffffff;
+	sh4->m[TCNT1] = 0xffffffff;
+	sh4->m[TCOR2] = 0xffffffff;
+	sh4->m[TCNT2] = 0xffffffff;
 }
 
 /* Execute cycles - returns number of cycles actually run */

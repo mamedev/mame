@@ -299,7 +299,7 @@ GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara
 GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, mmmbnk,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Medal Majhong moukari Banchou no Kiban (2007/06/05 MASTER VER.)",   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, mmmbnk,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Medal Mahjong Moukari Bancho no Kiban (2007/06/05 MASTER VER.)",   GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /*
 
@@ -346,6 +346,9 @@ MUSHIHIME SAMA FUTARI BLACK LABEL
 MUCHI MUCHI PORK
   "2007/ 4/17 MASTER VER."
 * 2 "period" ver, location of the periods unknown
+
+MEDAL MAHJONG MOKUARI BANCHO NO KIBAN
+  "2007/06/05 MASTER VER."
 
 DEATH SMILES
   "2007/10/09 MASTER VER"

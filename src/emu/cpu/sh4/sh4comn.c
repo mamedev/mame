@@ -17,15 +17,126 @@ static const int tcnt_div[8] = { 4, 16, 64, 256, 1024, 1, 1, 1 };
 static const int rtcnt_div[8] = { 0, 4, 16, 64, 256, 1024, 2048, 4096 };
 static const int daysmonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 static const int dmasize[8] = { 8, 1, 2, 4, 32, 0, 0, 0 };
-static const UINT32 exception_priority_default[] = { EXPPRI(1,1,0,0), EXPPRI(1,2,0,1), EXPPRI(1,1,0,2), EXPPRI(1,3,0,3), EXPPRI(1,4,0,4),
-	EXPPRI(2,0,0,5), EXPPRI(2,1,0,6), EXPPRI(2,2,0,7), EXPPRI(2,3,0,8), EXPPRI(2,4,0,9), EXPPRI(2,4,0,10), EXPPRI(2,4,0,11), EXPPRI(2,4,0,12),
-	EXPPRI(2,5,0,13), EXPPRI(2,5,0,14), EXPPRI(2,6,0,15), EXPPRI(2,6,0,16), EXPPRI(2,7,0,17), EXPPRI(2,7,0,18), EXPPRI(2,8,0,19),
-	EXPPRI(2,9,0,20), EXPPRI(2,4,0,21), EXPPRI(2,10,0,22), EXPPRI(3,0,16,SH4_INTC_NMI) };
-static const int exception_codes[] = { 0x000, 0x020, 0x000, 0x140, 0x140, 0x1E0, 0x0E0, 0x040, 0x0A0, 0x180, 0x1A0, 0x800, 0x820, 0x0E0,
-	0x100, 0x040, 0x060, 0x0A0, 0x0C0, 0x120, 0x080, 0x160, 0x1E0, 0x1C0, 0x200, 0x220, 0x240, 0x260, 0x280, 0x2A0, 0x2C0, 0x2E0, 0x300,
-	0x320, 0x340, 0x360, 0x380, 0x3A0, 0x3C0, 0x240, 0x2A0, 0x300, 0x360, 0x600, 0x620, 0x640, 0x660, 0x680, 0x6A0, 0x780, 0x7A0, 0x7C0,
-	0x7E0, 0x6C0, 0xB00, 0xB80, 0x400, 0x420, 0x440, 0x460, 0x480, 0x4A0, 0x4C0, 0x4E0, 0x500, 0x520, 0x540, 0x700, 0x720, 0x740, 0x760,
-	0x560, 0x580, 0x5A0 };
+
+
+static const UINT32 exception_priority_default[] = {
+	EXPPRI(1,1,0,0),			 /* Power-on Reset */
+	EXPPRI(1,2,0,1),			 /* Manual Reset */
+	EXPPRI(1,1,0,2),			 /* H-UDI Reset */
+	EXPPRI(1,3,0,3),			 /* Inst TLB Multiple Hit */
+	EXPPRI(1,4,0,4),			 /* Data TLB Multiple Hit */
+	
+	EXPPRI(2,0,0,5),			/* User break Before Instruction */
+	EXPPRI(2,1,0,6),			/* Inst Address Error */
+	EXPPRI(2,2,0,7),			/* Inst TLB Miss */
+	EXPPRI(2,3,0,8),			/* Inst TLB Protection Violation */
+	EXPPRI(2,4,0,9),			/* Illegal Instruction */
+	EXPPRI(2,4,0,10),			/* Slot Illegal Instruction */
+	EXPPRI(2,4,0,11),			/* FPU Disable */
+	EXPPRI(2,4,0,12),			/* Slot FPU Disable */
+	EXPPRI(2,5,0,13),			/* Data Address Error (Read) */
+	EXPPRI(2,5,0,14),			/* Data Address Error (Write) */  
+	EXPPRI(2,6,0,15),			/* Data TBL Miss Read */
+	EXPPRI(2,6,0,16),			/* Data TBL Miss Write */
+	EXPPRI(2,7,0,17),			/* Data TBL Protection Violation Read */
+	EXPPRI(2,7,0,18),			/* Data TBL Protection Violation Write */  
+	EXPPRI(2,8,0,19),			/* FPU Exception */
+	EXPPRI(2,9,0,20),			/* Initial Page Write exception */
+
+	EXPPRI(2,4,0,21),			/* Unconditional TRAP */
+	EXPPRI(2,10,0,22),			/* User break After Instruction */
+
+	EXPPRI(3,0,16,SH4_INTC_NMI)	/* NMI */
+	/* This is copied to a table, and the IRQ priorities filled in later */
+};
+
+static const int exception_codes[] =
+
+{ 0x000, /* Power-on Reset */
+  0x020, /* Manual Reset */
+  0x000, /* H-UDI Reset */
+  0x140, /* Inst TLB Multiple Hit */
+  0x140, /* Data TLB Multiple Hit */
+ 
+  0x1E0, /* User break Before Instruction */
+  0x0E0, /* Inst Address Error */
+  0x040, /* Inst TLB Miss */
+  0x0A0, /* Inst TLB Protection Violation */
+  0x180, /* Illegal Instruction */
+  0x1A0, /* Slot Illegal Instruction */
+  0x800, /* FPU Disable */
+  0x820, /* Slot FPU Disable */
+  0x0E0, /* Data Address Error (Read) */
+  0x100, /* Data Address Error (Write) */  
+  0x040, /* Data TBL Miss Read */
+  0x060, /* Data TBL Miss Write */
+  0x0A0, /* Data TBL Protection Violation Read */
+  0x0C0, /* Data TBL Protection Violation Write */  
+  0x120, /* FPU Exception */
+  0x080, /* Initial Page Write exception */
+
+  0x160, /* Unconditional TRAP */
+  0x1E0, /* User break After Instruction */
+
+  0x1C0, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
+
+  0x200, /* EX Irq 0 */
+  0x220, /*        1 */
+  0x240, /*        2 */
+  0x260, /*        3 */
+  0x280, /*        4 */
+  0x2A0, /*        5 */
+  0x2C0, /*        6 */
+  0x2E0, /*        7 */
+  0x300, /*        8 */
+  0x320, /*        9 */
+  0x340, /*        A */
+  0x360, /*        B */
+  0x380, /*        C */
+  0x3A0, /*        D */
+  0x3C0, /*        E */
+
+  0x240, /* SH4_INTC_IRL0 */
+  0x2A0, /* SH4_INTC_IRL1 */
+  0x300, /* SH4_INTC_IRL2 */
+  0x360, /* SH4_INTC_IRL3 */
+
+  0x600, /* HUDI */
+  0x620, /* SH4_INTC_GPOI */
+  0x640, /* SH4_INTC_DMTE0 */
+  0x660, /* SH4_INTC_DMTE1 */
+  0x680, /* SH4_INTC_DMTE2 */
+  0x6A0, /* SH4_INTC_DMTE3 */
+ 
+  0x780, /* SH4_INTC_DMTE4 */
+  0x7A0, /* SH4_INTC_DMTE5 */
+  0x7C0, /* SH4_INTC_DMTE6 */
+  0x7E0, /* SH4_INTC_DMTE7 */
+  
+  0x6C0, /* SH4_INTC_DMAE */
+  
+  0xB00, /* SH4_INTC_TUNI3 */
+  0xB80, /* SH4_INTC_TUNI4 */
+  0x400, /* SH4_INTC_TUNI0 */
+  0x420, /* SH4_INTC_TUNI1 */
+  0x440, /* SH4_INTC_TUNI2 */
+  0x460, /* SH4_INTC_TICPI2 */
+  0x480, /* SH4_INTC_ATI */
+  0x4A0, /* SH4_INTC_PRI */
+  0x4C0, /* SH4_INTC_CUI */
+  0x4E0, /* SH4_INTC_SCI1ERI */
+  0x500, /* SH4_INTC_SCI1RXI */
+  0x520, /* SH4_INTC_SCI1TXI */
+  0x540, /* SH4_INTC_SCI1TEI */
+
+  0x700, /* SH4_INTC_SCIFERI */
+  0x720, /* SH4_INTC_SCIFRXI */
+  0x740, /* SH4_INTC_SCIFBRI */
+  0x760, /* SH4_INTC_SCIFTXI */
+  0x560, /* SH4_INTC_ITI */
+  0x580, /* SH4_INTC_RCMI */
+  0x5A0 /* SH4_INTC_ROVI */
+};
 
 /* SH3 INTEVT2 uses a different table */
 
