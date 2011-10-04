@@ -12,10 +12,10 @@
  * - spritelayer:
  *   + xy offset
  *   + clipping to window (eg. timecris)
- *   + 1-pixel x-offset error on left side of aquajet/alpinr2b
  *   + eliminate garbage in airco22b
- *   + some wrong snow sprites in alpinr2b
  *   + some missing sprites in cycbrcycc (most easy to spot is the missing city picture at titlescreen)
+ *   + red arrows in timecris attract mode are placed wrong
+ *   + 1-pixel x-offset error on left side of aquajet/alpinr2b
  *
  * - lots of smaller issues
  *
