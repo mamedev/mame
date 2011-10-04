@@ -24,29 +24,89 @@ SCREEN_UPDATE(cavesh3)
 	return 0;
 }
 
-static READ64_HANDLER( cave_unk_status_r )
-{
-	static int i = 0;
 
-	i^=1;
-	logerror("'maincpu' (%08x): unmapped cavesh3 read from %08x mask %08x%08x (unknown)\n",cpu_get_pc(&space->device()),(offset *8)+0x18000010,(UINT32)((mem_mask>>32)&0xffffffff),(UINT32)(mem_mask&0xffffffff));
-	
-	if (i==0)
-		return U64(0xffffffffffffffff);
-	else
-		return U64(0x0000000000000000);
+
+static READ64_HANDLER( serial_rtc_eeprom_r )
+{
+	if (mem_mask & U64(0xff00ffffffffffff))
+	{
+		logerror("unknown serial_rtc_eeprom_r access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+	}
+
+	return (UINT64)(space->machine().rand()&0xff)<<(32+16);
+}
+
+static WRITE64_HANDLER( serial_rtc_eeprom_w )
+{
+	if (mem_mask & U64(0xff000000ffffffff))
+	{
+		logerror("unknown serial_rtc_eeprom_w access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+	}
+}
+
+static READ64_HANDLER( cavesh3_blitter_r )
+{
+	UINT64 ret = space->machine().rand();
+
+	return ret ^ (ret<<32);
+}
+
+static WRITE64_HANDLER( cavesh3_blitter_w )
+{
+
+}
+
+
+static READ64_HANDLER( ymz2770c_z_r )
+{
+	UINT64 ret = space->machine().rand();
+
+	return ret ^ (ret<<32);
+}
+
+static WRITE64_HANDLER( ymz2770c_z_w )
+{
+
+}
+
+static READ64_HANDLER( cavesh3_nand_r )
+{
+	if (mem_mask & U64(0x00ffffffffffffff))
+	{
+		logerror("unknown cavesh3_nand_r access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+	}
+
+	return (UINT64)(space->machine().rand()&0xff)<<(32+16+8);
+}
+
+static WRITE64_HANDLER( cavesh3_nand_w )
+{
+	if (mem_mask & U64(0xff0000ffffffffff))
+	{
+		logerror("unknown cavesh3_nand_w access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+	}
 }
 
 
 static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
-// I/O at 040xxxxx - 04000130 appears to be the FPGA programming port
-// NAND at 0b00xxxx (the "u2" ROM is read this way)
-    AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM // work RAM
-	AM_RANGE(0x18000010, 0x18000017) AM_READ(cave_unk_status_r)
-	AM_RANGE(0xF0000000, 0xF0003fff) AM_RAM // mem mapped cache (sh3 internal?)
+
+	/*       0x04000000, 0x07ffffff  SH3 Internal Regs (including ports) */
+  
+	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM // work RAM
+	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM // mirror of above on type B boards, extra ram on type D
+
+	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE(cavesh3_nand_r, cavesh3_nand_w)
+	AM_RANGE(0x10400000, 0x10400007) AM_READWRITE(ymz2770c_z_r, ymz2770c_z_w)
+	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE(serial_rtc_eeprom_r, serial_rtc_eeprom_w)
+	AM_RANGE(0x18000000, 0x18000057) AM_READWRITE(cavesh3_blitter_r, cavesh3_blitter_w)
+
+	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
+	/*       0xffffe000, 0xffffffff  SH3 Internal Regs 2 */
 ADDRESS_MAP_END
+
+
 
 static ADDRESS_MAP_START( cavesh3_port, AS_IO, 64 )
 ADDRESS_MAP_END
