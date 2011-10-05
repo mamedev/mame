@@ -1565,7 +1565,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<24, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay );
 	}
 } /* DrawSprites */
 
