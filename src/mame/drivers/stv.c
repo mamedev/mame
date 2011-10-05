@@ -1968,6 +1968,23 @@ ROM_START( critcrsh ) /* Must use Europe or Asia BIOS */
 	ROM_LOAD( "critcrsh.nv", 0x0000, 0x0080, CRC(3da9860e) SHA1(05b315aa71fcfc4e617266e1c5e4954eccbf7854) )
 ROM_END
 
+/*
+Sports Fishing
+
+There's the regular STV main board with dumped BIOS EPR-18343 and on top is a plug in board (837-11781) containing 2 smaller plug in modules.
+One is the CD ROM controller (838-10834) with....
+Hitachi HD6437097 (SH1 variant) (QFP144)
+20MHz Xtal
+Hitachi YGR019B (QFP168)
+HM514260 4M DRAM
+
+The other is an MPEG decoder board (837-10835 171-6814D PC BD MPEG) containing....
+HM514260 4M DRAM
+Hitachi HD814102F (QFP100)
+Sega 315-5745 HD814101FE (QFP144)
+a curious PLCC44 marked SEGA MPR-17610A-H. The MPR-xxxxx suggests it's a PLCC mask ROM, but type unknown????)
+*/
+
 ROM_START( sfish2 )
 //  STV_BIOS // - sports fishing 2 uses its own bios
 
@@ -1977,10 +1994,12 @@ ROM_START( sfish2 )
 	ROM_COPY( "maincpu",0,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 ) /* SH2 code */
-	ROM_LOAD(             "epr18427.bin",      0x0000000, 0x0100000, CRC(3f25bec8) SHA1(43a5342b882d5aec0f35a8777cb475659f43b1c4) )
-	ROM_LOAD16_WORD_SWAP( "mpr18273.ic2",	   0x0400000, 0x0200000, NO_DUMP )
-	ROM_LOAD16_WORD_SWAP( "mpr18274.ic3",      0x0800000, 0x0200000, NO_DUMP )
-	ROM_LOAD16_WORD_SWAP( "mpr18275.ic4",      0x0c00000, 0x0200000, NO_DUMP )
+	ROM_LOAD16_BYTE( "epr-18427.ic13",  0x0000001, 0x0100000, CRC(3f25bec8) SHA1(43a5342b882d5aec0f35a8777cb475659f43b1c4) )
+	ROM_RELOAD_PLAIN ( 0x0200000, 0x0100000 )
+	ROM_RELOAD_PLAIN ( 0x0300000, 0x0100000 )
+	ROM_LOAD16_WORD_SWAP( "mpr-18273.ic2",    0x0400000, 0x0400000, CRC(6fec0193) SHA1(5bbda289a5ca58c5bf57307360b07f0bb98f7356) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-18274.ic3",    0x0800000, 0x0400000, CRC(a6d76d23) SHA1(eee8c824eff4485d1b3af93a4fd5b21262eec803) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-18275.ic4",    0x0c00000, 0x0200000, CRC(7691deca) SHA1(aabb6b098963caf51f66aefa0a97aed7eb86c308) ) // good
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "sfish2", 0, SHA1(a10073d83bbbe16e16f69ad48565821576557d61) )
@@ -1997,15 +2016,16 @@ ROM_START( sfish2j )
 	ROM_COPY( "maincpu",0,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 ) /* SH2 code */
-	ROM_LOAD16_BYTE(             "epr18344.a",      0x0000001, 0x0100000,  CRC(5a7de018) SHA1(88e0c2a9a9d4ebf699878c0aa9737af85f95ccf8) )
-
-	ROM_LOAD16_WORD_SWAP( "mpr18273.ic2",	   0x0400000, 0x0200000, NO_DUMP )
-	ROM_LOAD16_WORD_SWAP( "mpr18274.ic3",      0x0800000, 0x0200000, NO_DUMP )
+	ROM_LOAD16_BYTE( "epr18344.a",      0x0000001, 0x0100000, CRC(5a7de018) SHA1(88e0c2a9a9d4ebf699878c0aa9737af85f95ccf8) )
+	ROM_RELOAD_PLAIN ( 0x0200000, 0x0100000 )
+	ROM_RELOAD_PLAIN ( 0x0300000, 0x0100000 )
+	ROM_LOAD16_WORD_SWAP( "mpr-18273.ic2",    0x0400000, 0x0400000, CRC(6fec0193) SHA1(5bbda289a5ca58c5bf57307360b07f0bb98f7356) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-18274.ic3",    0x0800000, 0x0400000, CRC(a6d76d23) SHA1(eee8c824eff4485d1b3af93a4fd5b21262eec803) ) // good
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "sfish2", 0, SHA1(a10073d83bbbe16e16f69ad48565821576557d61) )
 
-	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */ \
+	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
 
 
