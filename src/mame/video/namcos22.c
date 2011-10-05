@@ -16,7 +16,7 @@
  *   + xy offset
  *   + clipping to window (eg. timecris)
  *   + eliminate garbage in airco22b
- *   + y doublesize/scaling feature? (cybrcycc)
+ *   + find out which reg/bit controls y_lowres (only used in cybrcycc?)
  *
  * - lots of smaller issues
  *
@@ -1267,7 +1267,8 @@ DrawSpritesHelper(
 	int num_sprites,
 	int enable,
 	int deltax,
-	int deltay )
+	int deltay,
+	int y_lowres )
 {
 	int i;
 	num_sprites--;
@@ -1332,6 +1333,12 @@ DrawSpritesHelper(
 			{
 				xpos += sizex*numcols-1;
 				sizex = -sizex;
+			}
+
+			if (y_lowres)
+			{
+				sizey *= 2;
+				ypos *= 2;
 			}
 
 			if (sizex && sizey)
@@ -1460,6 +1467,14 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         ...
     */
 
+	// y-resolution, where is this bit?
+	// the only game that uses y_lowres is cybrcycc, and unfortunately doesn't have a video test in service mode
+	int y_lowres = 0;
+	if (state->m_gametype == NAMCOS22_CYBER_CYCLES)
+	{
+		y_lowres = 1;
+	}
+
 	// xy offs, prelim!
 	int deltax=spriteram32[5]>>16; // usually 0x280
 	int deltay=spriteram32[6]>>16; // usually 0x32a
@@ -1482,7 +1497,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 		case NAMCOS22_CYBER_CYCLES:
 			// approx (not enough testdata)
 			deltax = 0x280;
-			deltay = 0x390; // minimap sprites y-pos is still very wrong, probably related to y-scaling - spriteram32[3]>>16 is 0x400
+			deltay = 0x415; // spriteram32[3]>>16 is 0x400, 0x02a / 2 = 0x015
 			break;
 
 		case NAMCOS22_TOKYO_WARS:
@@ -1497,25 +1512,6 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 			deltay = 0x02a;
 			break;
 	}
-
-	// previous xy implementation
-#if 0
-	deltax=spriteram32[5]>>16;
-	deltay=spriteram32[6]>>16;
-	/* HACK for Tokyo Wars */
-	if (deltax == 0 && deltay == 0)
-	{
-		deltax = 190;
-		deltay = 250;
-	}
-
-	if( spriteram32[0x14/4] == 0x000002ff &&
-	spriteram32[0x18/4] == 0x000007ff )
-	{ /* HACK (fixes alpine racer and self test) */
-		deltax = 48;
-		deltay = 43;
-	}
-#endif
 
 	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = (spriteram32[1]>>16) - base;
@@ -1532,7 +1528,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
 	}
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
@@ -1557,7 +1553,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
 	}
 
 	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
@@ -1565,7 +1561,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
 	}
 } /* DrawSprites */
 
