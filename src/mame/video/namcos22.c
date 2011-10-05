@@ -4,6 +4,9 @@
  * todo:
  *
  * - emulate slave dsp!
+ * - tokyowar tanks are not shootable, same for timecris helicopter,
+ *   there's still a very small hitbox but almost impossible to hit
+ *   (is this related to video board? or cpu?)
  * - fog (not even hooked yet up on not-super)
  * - polygon seaming (fix those small gaps between polygons)
  * - missing/wrong sided textures (eg. ridgerac race start, propcycl scoreboard)
@@ -13,7 +16,7 @@
  *   + xy offset
  *   + clipping to window (eg. timecris)
  *   + eliminate garbage in airco22b
- *   + some missing sprites in cycbrcycc (most easy to spot is the missing city picture at titlescreen)
+ *   + y doublesize/scaling feature? (cybrcycc)
  *
  * - lots of smaller issues
  *
@@ -1262,6 +1265,7 @@ DrawSpritesHelper(
 	const UINT32 *pSource,
 	const UINT32 *pPal,
 	int num_sprites,
+	int enable,
 	int deltax,
 	int deltay )
 {
@@ -1285,7 +1289,7 @@ DrawSpritesHelper(
         ----.----.----.----.----.----.----.-xxx numrows
         */
 		UINT32 attrs = pSource[2];
-		if( (attrs&0x04000000)==0 )
+		if( (attrs&enable)==0 )
 		{
 			/* sprite is not hidden */
 			INT32 zcoord = pPal[0];
@@ -1478,13 +1482,13 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 		case NAMCOS22_CYBER_CYCLES:
 			// approx (not enough testdata)
 			deltax = 0x280;
-			deltay = 0x400; // spriteram32[3]>>16 is 0x400, 0x42a doesn't look correct
+			deltay = 0x390; // minimap sprites y-pos is still very wrong, probably related to y-scaling - spriteram32[3]>>16 is 0x400
 			break;
 
 		case NAMCOS22_TOKYO_WARS:
 			// approx (not enough testdata)
 			deltax = 190;
-			deltay = 0x10e; // spriteram32[3]>>16(0x0e6) is 0x10 more than aquajet
+			deltay = 0x110; // spriteram32[3]>>16(0x0e6) is 0x10 more than aquajet
 			break;
 
 		default:
@@ -1516,7 +1520,11 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = (spriteram32[1]>>16) - base;
 
-	// 'enable' bits: assume that bit 0 affects spritecount by 1 (alpinr2b), and all bits set means off (aquajet)
+	/* 'enable' bits function:
+		bit 0:		affects spritecount by 1? (alpinr2b)
+		bit 1:		???
+		bit 2:		per-sprite enable mask? (cybrcycc)
+		all bits set means off (aquajet) */
 	int enable = spriteram32[0]>>16&7;
 	num_sprites += (~enable & 1);
 
@@ -1524,7 +1532,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay );
 	}
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
@@ -1532,6 +1540,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
     0x940000 -x------       sprite chip busy
     0x940018 xxxx----       clr.w   $940018.l
 
+    0x940030 xxxxxxxx       0x0600000 - enable bits?
     0x940034 xxxxxxxx       0x3070b0f
 
     0x940040 xxxxxxxx       sprite attribute size
@@ -1541,20 +1550,22 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 
     0x940060..0x94007c      set#2
     */
-	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff;
+    enable = 4; // placeholder
+
+	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
 	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay );
 	}
 
-	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff;
+	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
 	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<24, deltax, deltay );
 	}
 } /* DrawSprites */
 
