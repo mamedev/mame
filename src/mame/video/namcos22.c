@@ -1464,14 +1464,21 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	switch (state->m_gametype)
 	{
 		case NAMCOS22_AQUA_JET:
+			// approx (not enough testdata) - aligns with titlescreen
 			deltax = 0x07f;
 			deltay = 0x0fe; // spriteram32[3]>>16(0x0d6) + default(0x02a) is 0x100, close to 0x0fe
+			break;
+
+		case NAMCOS22_ALPINE_SURFER:
+			// approx (not enough testdata)
+			deltax = 0x02e;
+			deltay = 0x42a; // spriteram32[3]>>16 is 0x400
 			break;
 
 		case NAMCOS22_CYBER_CYCLES:
 			// approx (not enough testdata)
 			deltax = 0x280;
-			deltay = 0x400; // is spriteram32[3]>>16
+			deltay = 0x400; // spriteram32[3]>>16 is 0x400, 0x42a doesn't look correct
 			break;
 
 		case NAMCOS22_TOKYO_WARS:
