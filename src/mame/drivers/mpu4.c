@@ -2436,6 +2436,7 @@ static READ8_HANDLER( characteriser_r )
 	{
 		logerror("No Characteriser Table @ %04x", cpu_get_previouspc(&space->device()));
 
+#if 0
 		/* a cheat ... many early games use a standard check */
 		int addr = cpu_get_reg(&space->device(), M6809_X);
 		UINT8 ret = space->read_byte(addr);
@@ -2444,6 +2445,8 @@ static READ8_HANDLER( characteriser_r )
 		logerror("\n");
 
 		return ret;
+#endif
+		return 0x00;
 	}
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
