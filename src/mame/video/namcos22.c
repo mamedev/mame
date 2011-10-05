@@ -614,7 +614,7 @@ mydrawgfxzoom(
 		vert[3].p[1] = fheight;
 
 		// global fade
-		if (mixer.flags&1)
+		if (mixer.flags&2)
 		{
 			extra->fadeFactor = mixer.fadeFactor;
 			rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
