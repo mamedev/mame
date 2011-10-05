@@ -742,32 +742,32 @@ ROM_END
 
 ROM_START( butasan ) /* English "subtitle" of Butasan for Japanese region.  Original Jaleco PCB */
 	ROM_REGION( 0x30000, "maincpu", 0 ) 					/* Main CPU */
-	ROM_LOAD( "t2-4.bin",     0x00000, 0x10000, CRC(937dabed) SHA1(23058b07cc2973b3b7a4b0bcdab43c3db605a54e) ) /* overdump?  1+2 half identical */
-	ROM_LOAD( "s2-3.bin",     0x10000, 0x10000, CRC(a6b3ccc2) SHA1(fcc9db1cd68fd9477d86e63e6906d194d5ee477a) )
-	ROM_LOAD( "p2-2.bin",     0x20000, 0x10000, CRC(96517fa9) SHA1(03ee1f118f109c85b046098c457a90b40e163f3c) )
+	ROM_LOAD( "4.t2",    0x00000, 0x10000, CRC(937dabed) SHA1(23058b07cc2973b3b7a4b0bcdab43c3db605a54e) ) /* overdump?  1+2 half identical */
+	ROM_LOAD( "3.s2",    0x10000, 0x10000, CRC(a6b3ccc2) SHA1(fcc9db1cd68fd9477d86e63e6906d194d5ee477a) )
+	ROM_LOAD( "2.p2",    0x20000, 0x10000, CRC(96517fa9) SHA1(03ee1f118f109c85b046098c457a90b40e163f3c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
-	ROM_LOAD( "buta-01.bin",  0x00000, 0x10000, CRC(c9d23e2d) SHA1(cee289d5bf7626fc35808a09f9f1f4628fa16974) )
+	ROM_LOAD( "1.b2",    0x00000, 0x10000, CRC(c9d23e2d) SHA1(cee289d5bf7626fc35808a09f9f1f4628fa16974) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )	/* Sprite */
-	ROM_LOAD( "buta-16.bin",  0x00000, 0x10000, CRC(e0ce51b6) SHA1(458c7c422a7b6ce42f397a8868610f6386fd815c) )
-	ROM_LOAD( "k15-15.bin",   0x10000, 0x10000, CRC(2105f6e1) SHA1(54c13073f0dc8b5d3fb5578aa5958a5dd01396a6) )
-	ROM_LOAD( "buta-14.bin",  0x20000, 0x10000, CRC(8ec891c1) SHA1(e16f18a0eed300752af8f07fd3cef5cd825a2a05) )
-	ROM_LOAD( "buta-13.bin",  0x30000, 0x10000, CRC(5023e74d) SHA1(edf43e6c89f0e537cebf1c21a671dba4cd7d91ea) )
-	ROM_LOAD( "buta-12.bin",  0x40000, 0x10000, CRC(44f59905) SHA1(bf364f7f907fee551e9228db7c27c106bcfecf6c) )
-	ROM_LOAD( "buta-11.bin",  0x50000, 0x10000, CRC(b8929f1d) SHA1(18a72f30284bed0c6723105f87eb10d64d3f461d) )
-	ROM_LOAD( "buta-10.bin",  0x60000, 0x10000, CRC(fd4d3baf) SHA1(fa8e3970a8aac83efcb669fe5d4683adade9aa4f) )
-	ROM_LOAD( "buta-09.bin",  0x70000, 0x10000, CRC(7da4c0fd) SHA1(fb2b148ccfee530313da886eddf7711ee83b4aeb) )
+	ROM_LOAD( "16.k16",  0x00000, 0x10000, CRC(e0ce51b6) SHA1(458c7c422a7b6ce42f397a8868610f6386fd815c) )
+	ROM_LOAD( "15.k15",  0x10000, 0x10000, CRC(2105f6e1) SHA1(54c13073f0dc8b5d3fb5578aa5958a5dd01396a6) )
+	ROM_LOAD( "14.k14",  0x20000, 0x10000, CRC(8ec891c1) SHA1(e16f18a0eed300752af8f07fd3cef5cd825a2a05) )
+	ROM_LOAD( "13.k13",  0x30000, 0x10000, CRC(5023e74d) SHA1(edf43e6c89f0e537cebf1c21a671dba4cd7d91ea) )
+	ROM_LOAD( "12.k12",  0x40000, 0x10000, CRC(44f59905) SHA1(bf364f7f907fee551e9228db7c27c106bcfecf6c) )
+	ROM_LOAD( "11.k11",  0x50000, 0x10000, CRC(b8929f1d) SHA1(18a72f30284bed0c6723105f87eb10d64d3f461d) )
+	ROM_LOAD( "10.k10",  0x60000, 0x10000, CRC(fd4d3baf) SHA1(fa8e3970a8aac83efcb669fe5d4683adade9aa4f) )
+	ROM_LOAD( "9.k9",    0x70000, 0x10000, CRC(7da4c0fd) SHA1(fb2b148ccfee530313da886eddf7711ee83b4aeb) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )	/* BG0 */
-	ROM_LOAD( "buta-05.bin",  0x00000, 0x10000, CRC(b8e026b0) SHA1(eb6ff9042b21b7190000c571ccba7d81f11ce9f1) )
-	ROM_LOAD( "buta-06.bin",  0x10000, 0x10000, CRC(8bbacb81) SHA1(015be76e44ed2389eff912d8f61a757667d7670b) )
+	ROM_LOAD( "5.l7",    0x00000, 0x10000, CRC(b8e026b0) SHA1(eb6ff9042b21b7190000c571ccba7d81f11ce9f1) )
+	ROM_LOAD( "6.n7",    0x10000, 0x10000, CRC(8bbacb81) SHA1(015be76e44ed2389eff912d8f61a757667d7670b) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )	/* BG1 */
-	ROM_LOAD( "buta-07.bin",  0x00000, 0x10000, CRC(3a48d531) SHA1(0ff6256bb7ea909d95b2bfb994ebc5432ea6d055) )
+	ROM_LOAD( "7.a8",    0x00000, 0x10000, CRC(3a48d531) SHA1(0ff6256bb7ea909d95b2bfb994ebc5432ea6d055) )
 
 	ROM_REGION( 0x08000, "gfx4", 0 )	/* Text */
-	ROM_LOAD( "a7-8.bin",     0x00000, 0x08000, CRC(85153252) SHA1(20af223f9dc2e29e506e257c36e96d10dc150467) )
+	ROM_LOAD( "8.a7",    0x00000, 0x08000, CRC(85153252) SHA1(20af223f9dc2e29e506e257c36e96d10dc150467) )
 
 	ROM_REGION( 0x00200, "proms", 0 )					/* Data proms ??? */
 	ROM_LOAD( "buta-01.prm",  0x00000, 0x00100, CRC(45baedd0) SHA1(afdafb67d55007e6fb99518657e27ce61d2cb7e6) )
@@ -781,27 +781,27 @@ ROM_START( butasanj )
 	ROM_LOAD( "buta-02.bin",  0x20000, 0x10000, CRC(519dc412) SHA1(48bbb01b217bd19c48ef7ab12c60805aaa02527c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
-	ROM_LOAD( "buta-01.bin",  0x00000, 0x10000, CRC(c9d23e2d) SHA1(cee289d5bf7626fc35808a09f9f1f4628fa16974) )
+	ROM_LOAD( "1.b2",    0x00000, 0x10000, CRC(c9d23e2d) SHA1(cee289d5bf7626fc35808a09f9f1f4628fa16974) ) // buta-01.bin
 
 	ROM_REGION( 0x80000, "gfx1", 0 )	/* Sprite */
-	ROM_LOAD( "buta-16.bin",  0x00000, 0x10000, CRC(e0ce51b6) SHA1(458c7c422a7b6ce42f397a8868610f6386fd815c) )
+	ROM_LOAD( "16.k16",  0x00000, 0x10000, CRC(e0ce51b6) SHA1(458c7c422a7b6ce42f397a8868610f6386fd815c) ) // buta-16.bin
 	ROM_LOAD( "buta-15.bin",  0x10000, 0x10000, CRC(3ed19daa) SHA1(b8090c3baa2b31681bed15c682a97c024e229df7) )
-	ROM_LOAD( "buta-14.bin",  0x20000, 0x10000, CRC(8ec891c1) SHA1(e16f18a0eed300752af8f07fd3cef5cd825a2a05) )
-	ROM_LOAD( "buta-13.bin",  0x30000, 0x10000, CRC(5023e74d) SHA1(edf43e6c89f0e537cebf1c21a671dba4cd7d91ea) )
-	ROM_LOAD( "buta-12.bin",  0x40000, 0x10000, CRC(44f59905) SHA1(bf364f7f907fee551e9228db7c27c106bcfecf6c) )
-	ROM_LOAD( "buta-11.bin",  0x50000, 0x10000, CRC(b8929f1d) SHA1(18a72f30284bed0c6723105f87eb10d64d3f461d) )
-	ROM_LOAD( "buta-10.bin",  0x60000, 0x10000, CRC(fd4d3baf) SHA1(fa8e3970a8aac83efcb669fe5d4683adade9aa4f) )
-	ROM_LOAD( "buta-09.bin",  0x70000, 0x10000, CRC(7da4c0fd) SHA1(fb2b148ccfee530313da886eddf7711ee83b4aeb) )
+	ROM_LOAD( "14.k14",  0x20000, 0x10000, CRC(8ec891c1) SHA1(e16f18a0eed300752af8f07fd3cef5cd825a2a05) ) // buta-14.bin
+	ROM_LOAD( "13.k13",  0x30000, 0x10000, CRC(5023e74d) SHA1(edf43e6c89f0e537cebf1c21a671dba4cd7d91ea) ) // buta-13.bin
+	ROM_LOAD( "12.k12",  0x40000, 0x10000, CRC(44f59905) SHA1(bf364f7f907fee551e9228db7c27c106bcfecf6c) ) // buta-12.bin
+	ROM_LOAD( "11.k11",  0x50000, 0x10000, CRC(b8929f1d) SHA1(18a72f30284bed0c6723105f87eb10d64d3f461d) ) // buta-11.bin
+	ROM_LOAD( "10.k10",  0x60000, 0x10000, CRC(fd4d3baf) SHA1(fa8e3970a8aac83efcb669fe5d4683adade9aa4f) ) // buta-10.bin
+	ROM_LOAD( "9.k9",    0x70000, 0x10000, CRC(7da4c0fd) SHA1(fb2b148ccfee530313da886eddf7711ee83b4aeb) ) // buta-09.bin
 
 	ROM_REGION( 0x20000, "gfx2", 0 )	/* BG0 */
-	ROM_LOAD( "buta-05.bin",  0x00000, 0x10000, CRC(b8e026b0) SHA1(eb6ff9042b21b7190000c571ccba7d81f11ce9f1) )
-	ROM_LOAD( "buta-06.bin",  0x10000, 0x10000, CRC(8bbacb81) SHA1(015be76e44ed2389eff912d8f61a757667d7670b) )
+	ROM_LOAD( "5.l7",    0x00000, 0x10000, CRC(b8e026b0) SHA1(eb6ff9042b21b7190000c571ccba7d81f11ce9f1) ) // buta-05.bin
+	ROM_LOAD( "6.n7",    0x10000, 0x10000, CRC(8bbacb81) SHA1(015be76e44ed2389eff912d8f61a757667d7670b) ) // buta-06.bin
 
 	ROM_REGION( 0x10000, "gfx3", 0 )	/* BG1 */
-	ROM_LOAD( "buta-07.bin",  0x00000, 0x10000, CRC(3a48d531) SHA1(0ff6256bb7ea909d95b2bfb994ebc5432ea6d055) )
+	ROM_LOAD( "7.a8",    0x00000, 0x10000, CRC(3a48d531) SHA1(0ff6256bb7ea909d95b2bfb994ebc5432ea6d055) ) // buta-07.bin
 
 	ROM_REGION( 0x08000, "gfx4", 0 )	/* Text */
-	ROM_LOAD( "buta-08.bin",  0x00000, 0x08000, CRC(5d45ce9c) SHA1(113c3e7ce20634ee4bb740705485572583298694) )
+	ROM_LOAD( "buta-08.bin",    0x00000, 0x08000, CRC(5d45ce9c) SHA1(113c3e7ce20634ee4bb740705485572583298694) )
 
 	ROM_REGION( 0x00200, "proms", 0 )					/* Data proms ??? */
 	ROM_LOAD( "buta-01.prm",  0x00000, 0x00100, CRC(45baedd0) SHA1(afdafb67d55007e6fb99518657e27ce61d2cb7e6) )
