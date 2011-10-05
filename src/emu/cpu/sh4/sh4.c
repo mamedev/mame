@@ -1708,13 +1708,15 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 {
 	UINT32 imm = i & 0xff;
 
+	/* << 2 according to docs, but this doesn't seem to work any better? */
+
 	if (sh4->cpu_type == CPU_TYPE_SH4)
 	{
-		sh4->m[SH3_TRA] = imm;
+		sh4->m[TRA] = imm << 2;
 	}
 	else /* SH3 */
 	{
-		sh4->m_sh3internal_upper[SH3_TRA] = imm;
+		sh4->m_sh3internal_upper[SH3_TRA] = imm << 2;
 	}
 
 
@@ -1733,7 +1735,7 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 
 	if (sh4->cpu_type == CPU_TYPE_SH4)
 	{
-		sh4->m[SH3_EXPEVT] = 0x00000160;
+		sh4->m[EXPEVT] = 0x00000160;
 	}
 	else /* SH3 */
 	{
