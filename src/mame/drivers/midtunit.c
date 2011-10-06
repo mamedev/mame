@@ -1381,6 +1381,42 @@ ROM_START( nbajamt3 )
 ROM_END
 
 
+ROM_START( nbajamtn )
+	ROM_REGION( 0x50000, "adpcm", 0 ) /* sound CPU */
+	ROM_LOAD(  "te-u3.bin", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
+	ROM_RELOAD(             0x030000, 0x20000 )
+
+	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_LOAD( "te-u12.bin", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
+	ROM_LOAD( "te-u13.bin", 0x080000, 0x80000, CRC(6f27b202) SHA1(c1f0db15624d1e7102ce9fd1db49ccf86e8611d6) )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "nani-uj12.bin", 0x00000, 0x80000, CRC(a2662e74) SHA1(7a6c18464446baf3d279013eb95bf862b5b3be70) )
+	ROM_LOAD16_BYTE( "nani-ug12.bin", 0x00001, 0x80000, CRC(40cda5b1) SHA1(2ff51f830aa86f6456c626666e221be1f7bfbfa2) )
+
+	ROM_REGION( 0xc00000, "gfx1", 0 )
+	ROM_LOAD( "nbaug14.bin", 0x000000, 0x80000, CRC(04bb9f64) SHA1(9e1a8c37e14cb6fe67f4aa3caa9022f356f1ca64) )
+	ROM_LOAD( "te-ug16.bin", 0x080000, 0x80000, CRC(c7ce74d0) SHA1(93861cd909e0f28ed112096d6f9fc57d0d31c57c) )
+	ROM_LOAD( "te-ug17.bin", 0x100000, 0x80000, CRC(9401be62) SHA1(597413a8a1eb66a7ad89af2f548fa3062e5e8efb) )
+	ROM_LOAD( "te-ug18.bin", 0x180000, 0x80000, CRC(6fd08f57) SHA1(5b7031dffc88374c5bfdf3021aa01ec4e28d0631) )
+
+	ROM_LOAD( "nbauj14.bin", 0x300000, 0x80000, CRC(b34b7af3) SHA1(0abb74d2f414bc9da0380a81beb134f3a87c1a0a) )
+	ROM_LOAD( "te-uj16.bin", 0x380000, 0x80000, CRC(905ad88b) SHA1(24c336ccc0e2ac0ee96a34ad6fe4aa7464de0009) )
+	ROM_LOAD( "te-uj17.bin", 0x400000, 0x80000, CRC(8a852b9e) SHA1(604c7f4305887e9505320630027765ea76607c58) )
+	ROM_LOAD( "te-uj18.bin", 0x480000, 0x80000, CRC(4eb73c26) SHA1(693bf45f777da8e55b7bcd8699ea5bd711964941) )
+
+	ROM_LOAD( "nbaug19.bin", 0x600000, 0x80000, CRC(a8f22fbb) SHA1(514208a9d6d0c8c2d7847cc02d4387eac90be659) )
+	ROM_LOAD( "te-ug20.bin", 0x680000, 0x80000, CRC(8a48728c) SHA1(3684099b4934b027336c319c77d9e0710b8c22dc) )
+	ROM_LOAD( "te-ug22.bin", 0x700000, 0x80000, CRC(3b05133b) SHA1(f6067abb92b8751afe7352a4f1b1a22c9528002b) )
+	ROM_LOAD( "te-ug23.bin", 0x780000, 0x80000, CRC(854f73bc) SHA1(242cc8ce28711f6f0787524a1070eb4b0956e6ae) )
+
+	ROM_LOAD( "nbauj19.bin", 0x900000, 0x80000, CRC(8130a8a2) SHA1(f23f124024285d07d8cf822817b62e42c38b82db) )
+	ROM_LOAD( "te-uj20.bin", 0x980000, 0x80000, CRC(bf263d61) SHA1(b5b59e8df55f8030eff068c1d8b07dad8521bf5d) )
+	ROM_LOAD( "te-uj22.bin", 0xa00000, 0x80000, CRC(39791051) SHA1(7aa02500ddacd31fca04044a22a38f36452ca300) )
+	ROM_LOAD( "te-uj23.bin", 0xa80000, 0x80000, CRC(f8c30998) SHA1(33e2f982d74e9f3686b1f4a8172c49fb8b604cf5) )
+ROM_END
+
+
 ROM_START( jdreddp )
 	ROM_REGION( 0x50000, "adpcm", 0 ) /* sound CPU */
 	ROM_LOAD(  "jd_u3.rom", 0x010000, 0x20000, CRC(6154d108) SHA1(54328455ec22ba815de85aa3bfe6405353c64f5c) )
@@ -1448,3 +1484,4 @@ GAME( 1994, nbajamte, 0,         tunit_adpcm, nbajamte, nbajamte, ROT0, "Midway"
 GAME( 1994, nbajamt1, nbajamte,  tunit_adpcm, nbajamte, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 1.0 01/17/94)", GAME_SUPPORTS_SAVE )
 GAME( 1994, nbajamt2, nbajamte,  tunit_adpcm, nbajamte, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 2.0 01/28/94)", GAME_SUPPORTS_SAVE )
 GAME( 1994, nbajamt3, nbajamte,  tunit_adpcm, nbajamte, nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 3.0 03/04/94)", GAME_SUPPORTS_SAVE )
+GAME( 1995, nbajamtn, nbajamte,  tunit_adpcm, nbajamte, nbajamte, ROT0, "hack",     "NBA Jam T.E. Nani Edition (rev 5.2 8/11/95, hack)", GAME_SUPPORTS_SAVE )
