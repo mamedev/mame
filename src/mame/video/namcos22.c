@@ -249,6 +249,18 @@ poly3d_Clip( float vx, float vy, float vw, float vh )
 }
 
 static void
+sprite_Clip( int miny, int maxy )
+{
+	// cx/cy not used, and only set y-clipping
+	mClip.scissor.min_y = miny;
+	mClip.scissor.max_y = maxy;
+	if( mClip.scissor.min_y<0 )   mClip.scissor.min_y = 0;
+	if( mClip.scissor.max_y>479 ) mClip.scissor.max_y = 479;
+	mClip.scissor.min_x = 0;
+	mClip.scissor.max_x = 639;
+}
+
+static void
 poly3d_NoClip( void )
 {
 	mClip.cx = 640/2;
@@ -256,7 +268,7 @@ poly3d_NoClip( void )
 	mClip.scissor.min_x = 0;
 	mClip.scissor.max_x = 639;
 	mClip.scissor.min_y = 0;
-	mClip.scissor.max_x = 479;
+	mClip.scissor.max_y = 479;
 }
 
 typedef struct
@@ -556,8 +568,8 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 
 static void
 mydrawgfxzoom(
-	bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
-	UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
+	bitmap_t *dest_bmp, const gfx_element *gfx, UINT32 code,
+	UINT32 color, int flipx, int flipy, int sx, int sy,
 	int scalex, int scaley, int z, int prioverchar, int alpha )
 {
 	namcos22_state *state = gfx->machine().driver_data<namcos22_state>();
@@ -625,7 +637,7 @@ mydrawgfxzoom(
 			}
 		}
 
-		poly_render_triangle_fan(state->m_poly, dest_bmp, clip, renderscanline_sprite, 2, 4, vert);
+		poly_render_triangle_fan(state->m_poly, dest_bmp, &mClip.scissor, renderscanline_sprite, 2, 4, vert);
 	}
 } /* mydrawgfxzoom */
 
@@ -673,32 +685,11 @@ ApplyGamma( running_machine &machine, bitmap_t *bitmap )
 	}
 } /* ApplyGamma */
 
-static void
-poly3d_Draw3dSprite( bitmap_t *bitmap, const gfx_element *gfx, int tileNumber, int color, int flipx, int flipy, int sx, int sy, int width, int height, int translucency, int zc, UINT32 pri )
-{
-	rectangle clip;
-	clip.min_x = 0;
-	clip.min_y = 0;
-	clip.max_x = 640-1;
-	clip.max_y = 480-1;
-	mydrawgfxzoom(
-		bitmap,
-		&clip,
-		gfx,
-		tileNumber,
-		color,
-		flipx, flipy,
-		sx, sy,
-		(width<<16)/32,
-		(height<<16)/32,
-		zc, pri, 0xff - translucency );
-}
 
 #define DSP_FIXED_TO_FLOAT( X ) (((INT16)(X))/(float)0x7fff)
 #define SPRITERAM_SIZE (0x9b0000-0x980000)
 #define CGRAM_SIZE 0x1e000
 #define NUM_CG_CHARS ((CGRAM_SIZE*8)/(64*16)) /* 0x3c0 */
-
 
 /* modal rendering properties */
 static void
@@ -809,6 +800,7 @@ struct SceneNode
 			int linkType;
 			int numcols, numrows;
 			int xpos, ypos;
+			int cy_min, cy_max;
 			int sizex, sizey;
 			int translucency;
 			int cz;
@@ -897,7 +889,7 @@ static void RenderSprite(running_machine &machine, bitmap_t *bitmap, struct Scen
 			{
 				code += nthword( &state->m_spriteram[0x800/4], i+node->data.sprite.linkType*4 );
 			}
-			poly3d_Draw3dSprite(
+			mydrawgfxzoom(
 					bitmap,
 					machine.gfx[GFX_SPRITE],
 					code,
@@ -906,11 +898,11 @@ static void RenderSprite(running_machine &machine, bitmap_t *bitmap, struct Scen
 					node->data.sprite.flipy,
 					node->data.sprite.xpos+col*node->data.sprite.sizex,
 					node->data.sprite.ypos+row*node->data.sprite.sizey,
-					node->data.sprite.sizex,
-					node->data.sprite.sizey,
-					node->data.sprite.translucency,
+					(node->data.sprite.sizex<<16)/32,
+					(node->data.sprite.sizey<<16)/32,
 					node->data.sprite.cz,
-					node->data.sprite.pri );
+					node->data.sprite.pri,
+					0xff - node->data.sprite.translucency );
 		i++;
 		} /* next col */
 	} /* next row */
@@ -954,8 +946,10 @@ static void RenderSceneHelper(running_machine &machine, bitmap_t *bitmap, struct
 					break;
 
 				case eSCENENODE_SPRITE:
-					poly3d_NoClip();
-					RenderSprite(machine, bitmap,node );
+					sprite_Clip(
+						node->data.sprite.cy_min,
+						node->data.sprite.cy_max );
+					RenderSprite(machine, bitmap, node );
 					break;
 
 				default:
@@ -1251,9 +1245,15 @@ DrawSpritesHelper(
 	int enable,
 	int deltax,
 	int deltay,
+	UINT32 clip,
 	int y_lowres )
 {
+	// set y-clipping
+	INT16 cy_min = -deltay + (INT16)(clip>>16);
+	INT16 cy_max = -deltay + (INT16)(clip&0xffff);
+
 	int i;
+
 	for( i=0; i<num_sprites; i++ )
 	{
 		/* attrs:
@@ -1332,6 +1332,8 @@ DrawSpritesHelper(
 				node->data.sprite.linkType = linkType;
 				node->data.sprite.xpos = xpos;
 				node->data.sprite.ypos = ypos;
+				node->data.sprite.cy_min = cy_min;
+				node->data.sprite.cy_max = cy_max;
 				node->data.sprite.sizex = sizex;
 				node->data.sprite.sizey = sizey;
 				node->data.sprite.translucency = translucency;
@@ -1383,12 +1385,12 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
                                  ^^^^     ^^^^           deltax
                                                ^^^^      deltay
 
-        0x980010:   00200020 000002ff 000007ff 00000000
+        0x980010:   00200020 028004ff 032a0509 00000000
                     ^^^^^^^^                             character size?
+                             ^^^^^^^^                    window-x related?
+                                      ^^^^^^^^           window-y related?
 
-        0x980200:   000007ff 000007ff 000007ff 032a0509
-                                               ^^^^^^^^  y-clipping (see timecris, not implemented yet)
-
+        0x980200:   000007ff 000007ff 000007ff 032a0509  y-clipping related
         0x980210:   000007ff 000007ff 000007ff 000007ff
         0x980220:   000007ff 000007ff 000007ff 000007ff
         0x980230:   000007ff 000007ff 000007ff 000007ff
@@ -1411,6 +1413,10 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         0x9a0004:   palette, C381 ZC (depth cueing)
         ...
     */
+
+	// y-clipping, disabled for now
+	UINT32 clipy_minmax = spriteram32[0x20c/4]; // works in timecris, but problems in aquajet and tokyowar
+	clipy_minmax = 0x000007ff;
 
 	// y-resolution, where is this bit?
 	// the only game that uses y_lowres is cybrcycc, and unfortunately doesn't have a video test in service mode
@@ -1438,7 +1444,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
 	}
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
@@ -1463,7 +1469,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
 	}
 
 	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
@@ -1471,7 +1477,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
 	}
 } /* DrawSprites */
 
