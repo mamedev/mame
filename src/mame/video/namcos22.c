@@ -12,16 +12,17 @@
  * - sort for polys/sprites with same z value, things to look out for:
  *   + ridgerac race start countdown					currently bad
  *   + ridgerac selection screen						currently almost ok
- *   + propcycl score board								currently ok
+ *   + propcycl scoreboard poly <-> poly				currently ok
+ *   + propcycl scoreboard poly <-> sprite				currently ok
  *   + timecris sprites (eg. photos in attract mode)	currently ok
  * - spot
  *
  * - spritelayer:
- *   + xy offset
  *   + clipping to window (eg. timecris)
  *   + eliminate garbage in airco22b
  *   + find out which reg/bit controls y_lowres (only used in cybrcycc?)
  *   + timecris shattered glass is supposed to fade out (happens just before the titlescreen shows)
+ *   + timecris last part of photos attract mode, sprites should be hidden
  *
  * - lots of smaller issues
  *
@@ -873,8 +874,16 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 	{
 		struct SceneNode *leaf = MallocSceneNode(machine);
 		leaf->type = type;
+
+		// give sprites priority over polys (eg. propcycl scoreboard)
+		if (type == eSCENENODE_SPRITE)
+		{
+			while (node->nextInBucket && node->type != eSCENENODE_SPRITE)
+				node = node->nextInBucket;
+		}
 		leaf->nextInBucket = node->nextInBucket;
 		node->nextInBucket = leaf;
+
 		return leaf;
 	}
 } /* NewSceneNode */
@@ -1121,6 +1130,8 @@ void
 namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
+	int polys_enabled = state->m_mbSuperSystem22 ? nthbyte(state->m_gamma,0x1f)&1 : 1;
+	if (!polys_enabled) return;
    /**
     * word#0:
     *    x--------------- end-of-display-list marker
@@ -1259,7 +1270,7 @@ DrawSpritesHelper(
 		/* attrs:
         xxxx.x---.----.----.----.----.----.---- always 0?
         ----.-xxx.----.----.----.----.----.---- enable mask?
-        ----.----.xxxx.xxxx.----.----.----.---- linktype?
+        ----.----.xxxx.xxxx.----.----.----.---- linktype
         ----.----.----.----.xxxx.xx--.----.---- always 0?
         ----.----.----.----.----.--x-.----.---- right justify
         ----.----.----.----.----.---x.----.---- bottom justify
@@ -1275,7 +1286,7 @@ DrawSpritesHelper(
 			INT32 zcoord = pPal[0];
 			int color = pPal[1]>>16;
 			int cz = pPal[1]&0xffff;
-			int pri = ((pPal[1] & 0xffff) == 0x00fe); // ? priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
+			int pri = ((pPal[1] & 0xffff) == 0x00fe); // priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
 			UINT32 xypos = pSource[0];
 			UINT32 size = pSource[1];
 			UINT32 code = pSource[3];
@@ -1376,56 +1387,22 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	else popmessage("[S] shows spite/vics regs");
 #endif
 /*
-// time crisis:
-00980000: 00060000 000b0053 03000200 03000000
-00980010: 00200020 028004ff 032a0509 00000000
-00980200: 000007ff 000007ff 000007ff 032a0509
-00980210: 000007ff 000007ff 000007ff 000007ff
-00980220: 000007ff 000007ff 000007ff 000007ff
-00980230: 000007ff 000007ff 05000500 050a050a
-
-// prop normal
-00980000: 00060000 00040053 03000200 03000000
-00980010: 00200020 028004ff 032a0509 00000000
-00980200: 028004ff 032a0509 028004ff 032a0509
-00980210: 028004ff 032a0509 028004ff 032a0509
-00980220: 028004ff 032a0509 028004ff 032a0509
-00980230: 028004ff 032a0509 028004ff 032a0509
-
-//alpine normal / prop test (-48,-43)
-00980000: 00060000 00000000 02ff0000 000007ff
-00980010: 00200020 000002ff 000007ff 00000000
-00980200: 000007ff 000007ff 000007ff 000007ff
-00980210: 000007ff 000007ff 000007ff 000007ff
-00980220: 000007ff 000007ff 000007ff 000007ff
-00980230: 000007ff 000007ff 000007ff 000007ff
-
-
         0x980000:   00060000 00010000 02ff0000 000007ff
-                    ^^^^                                7 = disable
-                             ^^^^                       num sprites
-                                      ^^^^              probably deltax related
-                                               ^^^^     definitely deltay related!
+                    ^^^^                                 enable bits, 7 = disable
+                        ^^^^                             base
+                             ^^^^                        base + num sprites
+                                 ^^^^     ^^^^           deltax
+                                               ^^^^      deltay
 
         0x980010:   00200020 000002ff 000007ff 00000000
-                    ^^^^^^^^                            character size?
-                             ^^^^                       delta xpos?
-                                      ^^^^              delta ypos?
+                    ^^^^^^^^                             character size?
 
-        0x980200:   000007ff 000007ff       delta xpos, delta ypos?
-        0x980208:   000007ff 000007ff
-        0x980210:   000007ff 000007ff
-        0x980218:   000007ff 000007ff
-        0x980220:   000007ff 000007ff
-        0x980228:   000007ff 000007ff
-        0x980230:   000007ff 000007ff
-        0x980238:   000007ff 000007ff
+        0x980200:   000007ff 000007ff 000007ff 032a0509
+                                               ^^^^^^^^  y-clipping (see timecris, not implemented yet)
 
-        //time crisis
-        00980200:  000007ff 000007ff 000007ff 032a0509
-        00980210:  000007ff 000007ff 000007ff 000007ff
-        00980220:  000007ff 000007ff 000007ff 000007ff
-        00980230:  000007ff 000007ff 05000500 050a050a
+        0x980210:   000007ff 000007ff 000007ff 000007ff
+        0x980220:   000007ff 000007ff 000007ff 000007ff
+        0x980230:   000007ff 000007ff 000007ff 000007ff
 
         0x980400:   hzoom table
         0x980600:   vzoom table
@@ -1454,38 +1431,8 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 		y_lowres = 1;
 	}
 
-	// x offs, prelim!
-	int deltax=spriteram32[5]>>16; // usually 0x280
-	if (deltax == 0)
-	switch (state->m_gametype)
-	{
-		case NAMCOS22_AQUA_JET:
-			// approx (not enough testdata)
-			deltax = 0x07f;
-			break;
-
-		case NAMCOS22_ALPINE_SURFER:
-			// approx (not enough testdata)
-			deltax = 0x02e;
-			break;
-
-		case NAMCOS22_CYBER_CYCLES:
-			// approx (not enough testdata)
-			deltax = 0x280;
-			break;
-
-		case NAMCOS22_TOKYO_WARS:
-			// approx (not enough testdata)
-			deltax = 190;
-			break;
-
-		default:
-			// accurate in testmode
-			deltax = 0x02e;
-			break;
-	}
-
-	int deltay = (spriteram32[3]>>16) + (0x02a >> y_lowres); // ok!
+	int deltax = (spriteram32[1]&0xffff) + (spriteram32[2]&0xffff) + 0x2d;
+	int deltay = (spriteram32[3]>>16) + (0x2a >> y_lowres);
 
 	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = (spriteram32[1]>>16) - base;
@@ -1748,10 +1695,10 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, 
 static void DrawCharacterLayer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	int scroll_x = state->m_tilemapattr[0]>>16;
+	int scroll_x = (state->m_tilemapattr[0]>>16) - 0x35c;
 	int scroll_y = state->m_tilemapattr[0]&0xffff;
 
-	tilemap_set_scrollx( state->m_bgtilemap,0, (scroll_x-0x35c) & 0x3ff );
+	tilemap_set_scrollx( state->m_bgtilemap,0, scroll_x & 0x3ff );
 	tilemap_set_scrolly( state->m_bgtilemap,0, scroll_y & 0x3ff );
 	tilemap_set_palette_offset( state->m_bgtilemap, mixer.palBase*256 );
 
@@ -2498,7 +2445,7 @@ SCREEN_UPDATE( namcos22s )
 	if (layer&4) DrawCharacterLayer(screen->machine(), bitmap, cliprect);
 	if (layer&1) DrawPolygons(screen->machine(), bitmap);
 	if (layer&2) DrawSprites(screen->machine(), bitmap, cliprect);
-	if (layer&3) RenderScene(screen->machine(), bitmap );
+	RenderScene(screen->machine(), bitmap );
 	if (layer&4) namcos22s_mix_textlayer(screen->machine(), bitmap, cliprect, 6);
 	ApplyGamma(screen->machine(), bitmap);
 
