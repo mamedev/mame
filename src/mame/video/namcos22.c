@@ -1454,43 +1454,38 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 		y_lowres = 1;
 	}
 
-	// xy offs, prelim!
+	// x offs, prelim!
 	int deltax=spriteram32[5]>>16; // usually 0x280
-	int deltay=spriteram32[6]>>16; // usually 0x32a
-
-	if (deltax == 0 || deltay == 0)
+	if (deltax == 0)
 	switch (state->m_gametype)
 	{
 		case NAMCOS22_AQUA_JET:
-			// approx (not enough testdata) - aligns with titlescreen
+			// approx (not enough testdata)
 			deltax = 0x07f;
-			deltay = 0x0fe; // spriteram32[3]>>16(0x0d6) + default(0x02a) is 0x100, close to 0x0fe
 			break;
 
 		case NAMCOS22_ALPINE_SURFER:
 			// approx (not enough testdata)
 			deltax = 0x02e;
-			deltay = 0x42a; // spriteram32[3]>>16 is 0x400
 			break;
 
 		case NAMCOS22_CYBER_CYCLES:
 			// approx (not enough testdata)
 			deltax = 0x280;
-			deltay = 0x415; // spriteram32[3]>>16 is 0x400, 0x02a / 2 = 0x015
 			break;
 
 		case NAMCOS22_TOKYO_WARS:
 			// approx (not enough testdata)
 			deltax = 190;
-			deltay = 0x110; // spriteram32[3]>>16(0x0e6) is 0x10 more than aquajet
 			break;
 
 		default:
 			// accurate in testmode
 			deltax = 0x02e;
-			deltay = 0x02a;
 			break;
 	}
+
+	int deltay = (spriteram32[3]>>16) + (0x02a >> y_lowres); // ok!
 
 	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = (spriteram32[1]>>16) - base;
