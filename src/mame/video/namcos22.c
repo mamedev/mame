@@ -9,12 +9,7 @@
  * - tokyowar tanks are not shootable, same for timecris helicopter,
  *   there's still a very small hitbox but almost impossible to hit
  *   (is this related to video board? or cpu?)
- * - sort for polys/sprites with same z value, things to look out for:
- *   + ridgerac race start countdown					currently bad
- *   + ridgerac selection screen						currently almost ok
- *   + propcycl scoreboard poly <-> poly				currently ok
- *   + propcycl scoreboard poly <-> sprite				currently ok
- *   + timecris sprites (eg. photos in attract mode)	currently ok
+ * - window clipping (acedrvrw, victlapw)
  * - spot
  *
  * - spritelayer:
@@ -850,10 +845,11 @@ static struct SceneNode *
 NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type )
 {
 	struct SceneNode *node = &mSceneRoot;
-	int i;
+	struct SceneNode *prev = NULL;
+	int i, hash = 0;
 	for( i=0; i<24; i+=RADIX_BITS )
 	{
-		int hash = (zsortvalue24>>20)&RADIX_MASK;
+		hash = (zsortvalue24>>20)&RADIX_MASK;
 		struct SceneNode *next = node->data.nonleaf.next[hash];
 		if( !next )
 		{ /* lazily allocate tree node for this radix */
@@ -861,6 +857,7 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 			next->type = eSCENENODE_NONLEAF;
 			node->data.nonleaf.next[hash] = next;
 		}
+		prev = node;
 		node = next;
 		zsortvalue24 <<= RADIX_BITS;
 	}
@@ -874,16 +871,8 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 	{
 		struct SceneNode *leaf = MallocSceneNode(machine);
 		leaf->type = type;
-
-		// give sprites priority over polys (eg. propcycl scoreboard)
-		if (type == eSCENENODE_SPRITE)
-		{
-			while (node->nextInBucket && node->type != eSCENENODE_SPRITE)
-				node = node->nextInBucket;
-		}
-		leaf->nextInBucket = node->nextInBucket;
-		node->nextInBucket = leaf;
-
+		leaf->nextInBucket = node;
+		prev->data.nonleaf.next[hash] = leaf;
 		return leaf;
 	}
 } /* NewSceneNode */
@@ -2443,8 +2432,8 @@ SCREEN_UPDATE( namcos22s )
 	// layers
 	UINT8 layer = nthbyte(state->m_gamma,0x1f);
 	if (layer&4) DrawCharacterLayer(screen->machine(), bitmap, cliprect);
-	if (layer&1) DrawPolygons(screen->machine(), bitmap);
 	if (layer&2) DrawSprites(screen->machine(), bitmap, cliprect);
+	if (layer&1) DrawPolygons(screen->machine(), bitmap);
 	RenderScene(screen->machine(), bitmap );
 	if (layer&4) namcos22s_mix_textlayer(screen->machine(), bitmap, cliprect, 6);
 	ApplyGamma(screen->machine(), bitmap);
