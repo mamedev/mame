@@ -82,6 +82,20 @@ typedef struct
 	// sh4 internal
 	UINT32	*m;
 
+	// timer regs handled manually for reuse
+	UINT32 SH4_TSTR;
+	UINT32 SH4_TCNT0;
+	UINT32 SH4_TCNT1;
+	UINT32 SH4_TCNT2;
+	UINT32 SH4_TCR0;
+	UINT32 SH4_TCR1;
+	UINT32 SH4_TCR2;
+	UINT32 SH4_TCOR0;
+	UINT32 SH4_TCOR1;
+	UINT32 SH4_TCOR2;
+	UINT32 SH4_TOCR;
+	UINT32 SH4_TCPR2;
+
 	// sh3 internal
 	UINT32  m_sh3internal_upper[0x3000/4];
 	UINT32  m_sh3internal_lower[0x1000];

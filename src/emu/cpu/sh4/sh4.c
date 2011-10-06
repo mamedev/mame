@@ -3324,12 +3324,12 @@ static CPU_RESET( sh4 )
 	sh4->cpu_type = CPU_TYPE_SH4;
 	
 	sh4->m[RCR2] = 0x09;
-	sh4->m[TCOR0] = 0xffffffff;
-	sh4->m[TCNT0] = 0xffffffff;
-	sh4->m[TCOR1] = 0xffffffff;
-	sh4->m[TCNT1] = 0xffffffff;
-	sh4->m[TCOR2] = 0xffffffff;
-	sh4->m[TCNT2] = 0xffffffff;
+	sh4->SH4_TCOR0 = 0xffffffff;
+	sh4->SH4_TCNT0 = 0xffffffff;
+	sh4->SH4_TCOR1 = 0xffffffff;
+	sh4->SH4_TCNT1 = 0xffffffff;
+	sh4->SH4_TCOR2 = 0xffffffff;
+	sh4->SH4_TCNT2 = 0xffffffff;
 }
 
 /* Execute cycles - returns number of cycles actually run */
@@ -3531,6 +3531,20 @@ static CPU_INIT( sh4 )
 	device->save_item(NAME(sh4->dbr));
 	device->save_item(NAME(sh4->exception_priority));
 	device->save_item(NAME(sh4->exception_requesting));
+
+	device->save_item(NAME(sh4->SH4_TSTR));
+	device->save_item(NAME(sh4->SH4_TCNT0));
+	device->save_item(NAME(sh4->SH4_TCNT1));
+	device->save_item(NAME(sh4->SH4_TCNT2));
+	device->save_item(NAME(sh4->SH4_TCR0));
+	device->save_item(NAME(sh4->SH4_TCR1));
+	device->save_item(NAME(sh4->SH4_TCR2));
+	device->save_item(NAME(sh4->SH4_TCOR0));
+	device->save_item(NAME(sh4->SH4_TCOR1));
+	device->save_item(NAME(sh4->SH4_TCOR2));
+	device->save_item(NAME(sh4->SH4_TOCR));
+	device->save_item(NAME(sh4->SH4_TCPR2));
+
 
 }
 

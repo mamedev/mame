@@ -140,9 +140,8 @@ static const int exception_codes[] =
 
 /* SH3 INTEVT2 uses a different table */
 
-static const UINT16 tcnt[] = { TCNT0, TCNT1, TCNT2 };
-static const UINT16 tcor[] = { TCOR0, TCOR1, TCOR2 };
-static const UINT16 tcr[] = { TCR0, TCR1, TCR2 };
+
+
 
 void sh4_change_register_bank(sh4_state *sh4, int to)
 {
@@ -414,12 +413,28 @@ static void sh4_timer_recompute(sh4_state *sh4, int which)
 {
 	double ticks;
 
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_timer_recompute uses sh4->m[] with SH3\n");
+	UINT32 tcnt = 0;
+	UINT32 tcr = 0;
+	switch (which)
+	{
+		case 0:
+			tcr = sh4->SH4_TCR0;
+			tcnt = sh4->SH4_TCNT0;
+			break;
 
+		case 1:
+			tcr = sh4->SH4_TCR1;
+			tcnt = sh4->SH4_TCNT1;
+			break;
 
-	ticks = sh4->m[tcnt[which]];
-	sh4->timer[which]->adjust(sh4_scale_up_mame_time(attotime::from_hz(sh4->pm_clock) * tcnt_div[sh4->m[tcr[which]] & 7], ticks), which);
+		case 2:
+			tcr = sh4->SH4_TCR2;
+			tcnt = sh4->SH4_TCNT2;
+			break;
+	}
+
+	ticks = tcnt;
+	sh4->timer[which]->adjust(sh4_scale_up_mame_time(attotime::from_hz(sh4->pm_clock) * tcnt_div[tcr & 7], ticks), which);
 }
 
 static TIMER_CALLBACK( sh4_refresh_timer_callback )
@@ -561,19 +576,63 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 
 static TIMER_CALLBACK( sh4_timer_callback )
 {
-	static const UINT16 tuni[] = { SH4_INTC_TUNI0, SH4_INTC_TUNI1, SH4_INTC_TUNI2 };
 	sh4_state *sh4 = (sh4_state *)ptr;
 	int which = param;
-	int idx = tcr[which];
 
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_timer_callback uses sh4->m[] with SH3\n");
+	switch (which)
+	{
+		case 0:
+			sh4->SH4_TCNT0 = sh4->SH4_TCOR0;
+			break;
 
-	sh4->m[tcnt[which]] = sh4->m[tcor[which]];
+		case 1:
+			sh4->SH4_TCNT1 = sh4->SH4_TCOR1;
+			break;
+
+		case 2:
+			sh4->SH4_TCNT2 = sh4->SH4_TCOR2;
+			break;
+
+	}
+
 	sh4_timer_recompute(sh4, which);
-	sh4->m[idx] = sh4->m[idx] | 0x100;
-	if (sh4->m[idx] & 0x20)
-		sh4_exception_request(sh4, tuni[which]);
+
+	switch (which)
+	{
+		case 0:
+			sh4->SH4_TCR0 |= 0x100;
+			break;
+
+		case 1:
+			sh4->SH4_TCR1 |= 0x100;
+			break;
+
+		case 2:
+			sh4->SH4_TCR2 |= 0x100;
+			break;
+
+	}
+
+	switch (which)
+	{
+		case 0:
+			if (sh4->SH4_TCR0 & 0x20)
+				sh4_exception_request(sh4, SH4_INTC_TUNI0);
+			break;
+
+		case 1:
+			if (sh4->SH4_TCR1 & 0x20)
+				sh4_exception_request(sh4, SH4_INTC_TUNI1);
+			break;
+
+		case 2:
+			if (sh4->SH4_TCR2 & 0x20)
+				sh4_exception_request(sh4, SH4_INTC_TUNI2);
+			break;
+
+	}
+
+
 }
 
 static TIMER_CALLBACK( sh4_dmac_callback )
@@ -873,6 +932,7 @@ WRITE32_HANDLER( sh4_internal_w )
 
 	UINT32 old = sh4->m[offset];
 	COMBINE_DATA(sh4->m+offset);
+	UINT32 old2 = 0;
 
 //  printf("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
 
@@ -969,93 +1029,119 @@ WRITE32_HANDLER( sh4_internal_w )
 		}
 		break;
 
-		// TMU
+/*********************************************************************************************************************
+		TMU (Timer Unit)
+*********************************************************************************************************************/
 	case TSTR:
-		if (old & 1)
-			sh4->m[TCNT0] = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->m[TCR0] & 7]);
-		if ((sh4->m[TSTR] & 1) == 0) {
+		old2 = sh4->SH4_TSTR;
+		COMBINE_DATA(&sh4->SH4_TSTR);
+
+		if (old2 & 1)
+			sh4->SH4_TCNT0 = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->SH4_TCR0 & 7]);
+		if ((sh4->SH4_TSTR & 1) == 0) {
 			sh4->timer[0]->adjust(attotime::never);
 		} else
 			sh4_timer_recompute(sh4, 0);
 
-		if (old & 2)
-			sh4->m[TCNT1] = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->m[TCR1] & 7]);
-		if ((sh4->m[TSTR] & 2) == 0) {
+		if (old2 & 2)
+			sh4->SH4_TCNT1 = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->SH4_TCR1 & 7]);
+		if ((sh4->SH4_TSTR & 2) == 0) {
 			sh4->timer[1]->adjust(attotime::never);
 		} else
 			sh4_timer_recompute(sh4, 1);
 
-		if (old & 4)
-			sh4->m[TCNT2] = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->m[TCR2] & 7]);
-		if ((sh4->m[TSTR] & 4) == 0) {
+		if (old2 & 4)
+			sh4->SH4_TCNT2 = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->SH4_TCR2 & 7]);
+		if ((sh4->SH4_TSTR & 4) == 0) {
 			sh4->timer[2]->adjust(attotime::never);
 		} else
 			sh4_timer_recompute(sh4, 2);
 		break;
 
 	case TCR0:
-		if (sh4->m[TSTR] & 1)
+		old2 = sh4->SH4_TCR0;
+		COMBINE_DATA(&sh4->SH4_TCR0);
+		if (sh4->SH4_TSTR & 1)
 		{
-			sh4->m[TCNT0] = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[old & 7]);
+			sh4->SH4_TCNT0 = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[old2 & 7]);
 			sh4_timer_recompute(sh4, 0);
 		}
-		if (!(sh4->m[TCR0] & 0x20) || !(sh4->m[TCR0] & 0x100))
+		if (!(sh4->SH4_TCR0 & 0x20) || !(sh4->SH4_TCR0 & 0x100))
 			sh4_exception_unrequest(sh4, SH4_INTC_TUNI0);
 		break;
 	case TCR1:
-		if (sh4->m[TSTR] & 2)
+		old2 = sh4->SH4_TCR1;
+		COMBINE_DATA(&sh4->SH4_TCR1);
+		if (sh4->SH4_TSTR & 2)
 		{
-			sh4->m[TCNT1] = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[old & 7]);
+			sh4->SH4_TCNT1 = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[old2 & 7]);
 			sh4_timer_recompute(sh4, 1);
 		}
-		if (!(sh4->m[TCR1] & 0x20) || !(sh4->m[TCR1] & 0x100))
+		if (!(sh4->SH4_TCR1 & 0x20) || !(sh4->SH4_TCR1 & 0x100))
 			sh4_exception_unrequest(sh4, SH4_INTC_TUNI1);
 		break;
 	case TCR2:
-		if (sh4->m[TSTR] & 4)
+		old2 = sh4->SH4_TCR2;
+		COMBINE_DATA(&sh4->SH4_TCR2);
+		if (sh4->SH4_TSTR & 4)
 		{
-			sh4->m[TCNT2] = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[old & 7]);
+			sh4->SH4_TCNT2 = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[old2 & 7]);
 			sh4_timer_recompute(sh4, 2);
 		}
-		if (!(sh4->m[TCR2] & 0x20) || !(sh4->m[TCR2] & 0x100))
+		if (!(sh4->SH4_TCR2 & 0x20) || !(sh4->SH4_TCR2 & 0x100))
 			sh4_exception_unrequest(sh4, SH4_INTC_TUNI2);
 		break;
 
 	case TCOR0:
-		if (sh4->m[TSTR] & 1)
+		COMBINE_DATA(&sh4->SH4_TCOR0);
+		if (sh4->SH4_TSTR & 1)
 		{
-			sh4->m[TCNT0] = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->m[TCR0] & 7]);
+			sh4->SH4_TCNT0 = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->SH4_TCR0 & 7]);
 			sh4_timer_recompute(sh4, 0);
 		}
 		break;
 	case TCNT0:
-		if (sh4->m[TSTR] & 1)
+		COMBINE_DATA(&sh4->SH4_TCNT0);
+		if (sh4->SH4_TSTR & 1)
 			sh4_timer_recompute(sh4, 0);
 		break;
 	case TCOR1:
-		if (sh4->m[TSTR] & 2)
+		COMBINE_DATA(&sh4->SH4_TCOR1);
+		if (sh4->SH4_TSTR & 2)
 		{
-			sh4->m[TCNT1] = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->m[TCR1] & 7]);
+			sh4->SH4_TCNT1 = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->SH4_TCR1 & 7]);
 			sh4_timer_recompute(sh4, 1);
 		}
 		break;
 	case TCNT1:
-		if (sh4->m[TSTR] & 2)
+		COMBINE_DATA(&sh4->SH4_TCNT1);
+		if (sh4->SH4_TSTR & 2)
 			sh4_timer_recompute(sh4, 1);
 		break;
 	case TCOR2:
-		if (sh4->m[TSTR] & 4)
+		COMBINE_DATA(&sh4->SH4_TCOR2);
+		if (sh4->SH4_TSTR & 4)
 		{
-			sh4->m[TCNT2] = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->m[TCR2] & 7]);
+			sh4->SH4_TCNT2 = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->SH4_TCR2 & 7]);
 			sh4_timer_recompute(sh4, 2);
 		}
 		break;
 	case TCNT2:
-		if (sh4->m[TSTR] & 4)
+		COMBINE_DATA(&sh4->SH4_TCNT2);
+		if (sh4->SH4_TSTR & 4)
 			sh4_timer_recompute(sh4, 2);
 		break;
 
-		// INTC
+	case TOCR:  // not supported
+		COMBINE_DATA(&sh4->SH4_TOCR);
+		break;
+
+	case TCPR2: // not supported
+		COMBINE_DATA(&sh4->SH4_TCPR2);
+		break;
+/*********************************************************************************************************************
+		INTC (Interrupt Controller)
+*********************************************************************************************************************/
 	case ICR:
 		sh4->m[ICR] = (sh4->m[ICR] & 0x7fff) | (old & 0x8000);
 		break;
@@ -1216,26 +1302,61 @@ READ32_HANDLER( sh4_internal_r )
 			return sh4->m[RTCNT];
 		break;
 
+
+/*********************************************************************************************************************
+		TMU (Timer Unit)
+*********************************************************************************************************************/
+
+	case TSTR:
+		return sh4->SH4_TSTR;
+
+	case TCR0:
+		return sh4->SH4_TCR0;
+
+	case TCR1:
+		return sh4->SH4_TCR1;
+
+	case TCR2:
+		return sh4->SH4_TCR2;
+
 	case TCNT0:
-		if (sh4->m[TSTR] & 1)
-			return compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->m[TCR0] & 7]);
+		if (sh4->SH4_TSTR & 1)
+			return compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->SH4_TCR0 & 7]);
 		else
-			return sh4->m[TCNT0];
+			return sh4->SH4_TCNT0;
 		break;
 	case TCNT1:
-		if (sh4->m[TSTR] & 2)
-			return compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->m[TCR1] & 7]);
+		if (sh4->SH4_TSTR & 2)
+			return compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->SH4_TCR1 & 7]);
 		else
-			return sh4->m[TCNT1];
+			return sh4->SH4_TCNT1;
 		break;
 	case TCNT2:
-		if (sh4->m[TSTR] & 4)
-			return compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->m[TCR2] & 7]);
+		if (sh4->SH4_TSTR & 4)
+			return compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->SH4_TCR2 & 7]);
 		else
-			return sh4->m[TCNT2];
+			return sh4->SH4_TCNT2;
 		break;
 
-		// I/O ports
+	case TCOR0:
+		return sh4->SH4_TCOR0;
+
+	case TCOR1:
+		return sh4->SH4_TCOR1;
+
+	case TCOR2:
+		return sh4->SH4_TCOR2;
+
+	case TOCR: // not supported
+		return sh4->SH4_TOCR;
+
+	case TCPR2: // not supported
+		return sh4->SH4_TCPR2;
+
+/*********************************************************************************************************************
+		I/O Ports
+*********************************************************************************************************************/
+
 	case PDTRA:
 		if (sh4->m[BCR2] & 1)
 			return (sh4->io->read_dword(SH4_IOPORT_16) & ~sh4->ioport16_direction) | (sh4->m[PDTRA] & sh4->ioport16_direction);
