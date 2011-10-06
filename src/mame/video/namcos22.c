@@ -4,12 +4,16 @@
  * todo:
  *
  * - emulate slave dsp!
+ * - fog (not even hooked yet up on not-super)
+ * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter,
  *   there's still a very small hitbox but almost impossible to hit
  *   (is this related to video board? or cpu?)
- * - fog (not even hooked yet up on not-super)
- * - polygon seaming (fix those small gaps between polygons)
- * - missing/wrong sided textures (eg. ridgerac race start, propcycl scoreboard)
+ * - sort for polys/sprites with same z value, things to look out for:
+ *   + ridgerac race start countdown					currently bad
+ *   + ridgerac selection screen						currently almost ok
+ *   + propcycl score board								currently ok
+ *   + timecris sprites (eg. photos in attract mode)	currently ok
  * - spot
  *
  * - spritelayer:
@@ -17,6 +21,7 @@
  *   + clipping to window (eg. timecris)
  *   + eliminate garbage in airco22b
  *   + find out which reg/bit controls y_lowres (only used in cybrcycc?)
+ *   + timecris shattered glass is supposed to fade out (happens just before the titlescreen shows)
  *
  * - lots of smaller issues
  *
@@ -267,20 +272,6 @@ typedef struct
 
 #define MIN_Z (10.0f)
 
-typedef struct
-{
-	float x,y;
-	float u,v,i,z;
-} vertex;
-
-typedef struct
-{
-	float x;
-	float u,v,i,z;
-} edge;
-
-#define SWAP(A,B) { const void *temp = A; A = B; B = temp; }
-
 
 INLINE unsigned texel( namcos22_state *state, unsigned x, unsigned y )
 {
@@ -366,6 +357,8 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 		int pen = texel(state, (int)(u*ooz), bn+(int)(v*ooz));
 		int shade = i*ooz;
 		rgbint rgb;
+
+		// pen = 0x55; // debug: disable textures
 
 		rgb_to_rgbint(&rgb, pens[pen>>penshift&penmask]);
 		rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
@@ -880,18 +873,8 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 	{
 		struct SceneNode *leaf = MallocSceneNode(machine);
 		leaf->type = type;
-#if 0
 		leaf->nextInBucket = node->nextInBucket;
 		node->nextInBucket = leaf;
-#else
-		/* stable insertion sort */
-		leaf->nextInBucket = NULL;
-		while( node->nextInBucket )
-		{
-			node = node->nextInBucket;
-		}
-		node->nextInBucket = leaf;
-#endif
 		return leaf;
 	}
 } /* NewSceneNode */
@@ -1271,11 +1254,7 @@ DrawSpritesHelper(
 	int y_lowres )
 {
 	int i;
-	num_sprites--;
-	pSource += num_sprites*4;
-	pPal += num_sprites*2;
-
-	for( i=num_sprites; i>=0; i-- )
+	for( i=0; i<num_sprites; i++ )
 	{
 		/* attrs:
         xxxx.x---.----.----.----.----.----.---- always 0?
@@ -1361,8 +1340,8 @@ DrawSpritesHelper(
 				node->data.sprite.pri = pri;
 			}
 		} /* visible sprite */
-		pSource -= 4;
-		pPal -= 2;
+		pSource += 4;
+		pPal += 2;
 	}
 } /* DrawSpritesHelper */
 
@@ -1548,19 +1527,19 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
     */
     enable = 4; // placeholder
 
-	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
-	if( num_sprites > 0 )
-	{
-		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
-		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
-	}
-
 	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
 	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
+	}
+
+	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
+	if( num_sprites > 0 )
+	{
+		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
+		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
 		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
 	}
 } /* DrawSprites */
