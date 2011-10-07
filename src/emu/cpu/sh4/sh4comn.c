@@ -422,12 +422,11 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 			
 				
 			vector = 0x600;
-			int callbackval = 0;
 
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				callbackval = sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+				sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
 			else
-				callbackval = sh4->irq_callback(sh4->device, SH4_IRL3+1);
+				sh4->irq_callback(sh4->device, SH4_IRL3+1);
 
 			if (sh3_intevt2_exception_codes[exception]==-1)
 				fatalerror("sh3_intevt2_exception_codes unpopulated for exception %02x\n", exception);
