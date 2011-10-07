@@ -36,9 +36,9 @@ WRITE32_HANDLER( sh3_internal_high_w )
 		case SH3_TCNT0_ADDR:  sh4_handle_tcnt0_addr_w(sh4, data, mem_mask);break;
 		case SH3_TCNT1_ADDR:  sh4_handle_tcnt1_addr_w(sh4, data, mem_mask);break;
 		case SH3_TCNT2_ADDR:  sh4_handle_tcnt2_addr_w(sh4, data, mem_mask);break;
-		case SH3_TCR0_ADDR:   sh4_handle_tcr0_addr_w(sh4, data, mem_mask);break;
-		case SH3_TCR1_ADDR:   sh4_handle_tcr1_addr_w(sh4, data, mem_mask);break;
-		case SH3_TCR2_ADDR:   sh4_handle_tcr2_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCR0_ADDR:   sh4_handle_tcr0_addr_w(sh4, data>>16, mem_mask>>16);break;
+		case SH3_TCR1_ADDR:   sh4_handle_tcr1_addr_w(sh4, data>>16, mem_mask>>16);break;
+		case SH3_TCR2_ADDR:   sh4_handle_tcr2_addr_w(sh4, data>>16, mem_mask>>16);break;
 		case SH3_TCPR2_ADDR:  sh4_handle_tcpr2_addr_w(sh4,data,  mem_mask);break;
 
 		default:
@@ -81,9 +81,9 @@ READ32_HANDLER( sh3_internal_high_r )
 		case SH3_TCNT0_ADDR:  return sh4_handle_tcnt0_addr_r(sh4, mem_mask);
 		case SH3_TCNT1_ADDR:  return sh4_handle_tcnt1_addr_r(sh4, mem_mask);
 		case SH3_TCNT2_ADDR:  return sh4_handle_tcnt2_addr_r(sh4, mem_mask);
-		case SH3_TCR0_ADDR:   return sh4_handle_tcr0_addr_r(sh4, mem_mask);
-		case SH3_TCR1_ADDR:   return sh4_handle_tcr1_addr_r(sh4, mem_mask);
-		case SH3_TCR2_ADDR:   return sh4_handle_tcr2_addr_r(sh4, mem_mask);
+		case SH3_TCR0_ADDR:   return sh4_handle_tcr0_addr_r(sh4, mem_mask)<<16;
+		case SH3_TCR1_ADDR:   return sh4_handle_tcr1_addr_r(sh4, mem_mask)<<16;
+		case SH3_TCR2_ADDR:   return sh4_handle_tcr2_addr_r(sh4, mem_mask)<<16;
 		case SH3_TCPR2_ADDR:  return sh4_handle_tcpr2_addr_r(sh4, mem_mask);
 
 

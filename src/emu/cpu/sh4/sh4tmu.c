@@ -99,17 +99,26 @@ TIMER_CALLBACK( sh4_timer_callback )
 	{
 		case 0:
 			if (sh4->SH4_TCR0 & 0x20)
+			{
 				sh4_exception_request(sh4, SH4_INTC_TUNI0);
+			//	logerror("SH4_INTC_TUNI0 requested\n");
+			}
 			break;
 
 		case 1:
 			if (sh4->SH4_TCR1 & 0x20)
+			{
 				sh4_exception_request(sh4, SH4_INTC_TUNI1);
+			//	logerror("SH4_INTC_TUNI1 requested\n");
+			}
 			break;
 
 		case 2:
 			if (sh4->SH4_TCR2 & 0x20)
+			{
 				sh4_exception_request(sh4, SH4_INTC_TUNI2);
+			//	logerror("SH4_INTC_TUNI2 requested\n");
+			}
 			break;
 
 	}
