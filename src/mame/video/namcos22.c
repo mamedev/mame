@@ -4,16 +4,18 @@
  * todo:
  *
  * - emulate slave dsp!
- * - fog (not even hooked yet up on not-super)
+ * - fog (should be per-z, not per-poly, and not even hooked yet up on non-super)
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter,
  *   there's still a very small hitbox but almost impossible to hit
  *   (is this related to video board? or cpu?)
  * - window clipping (acedrvrw, victlapw)
+ * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
+ *   (probably a bug in rgbint, not here?)
  * - spot
  *
  * - spritelayer:
- *   + clipping to window (eg. timecris)
+ *   + y-clipping (eg. timecris)
  *   + eliminate garbage in airco22b
  *   + find out which reg/bit controls y_lowres (only used in cybrcycc?)
  *   + timecris shattered glass is supposed to fade out (happens just before the titlescreen shows)
