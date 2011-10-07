@@ -139,8 +139,96 @@ static const int exception_codes[] =
   0x5A0 /* SH4_INTC_ROVI */
 };
 
-/* SH3 INTEVT2 uses a different table */
+/* SH3 INTEVT2 uses a different table - values of -1 aren't filled in yet, some may not exist on the sh3. */
+/* The above table should differ too, some things depend on the interrupt level rather than beign fixed values */
 
+static const int sh3_intevt2_exception_codes[] =
+
+{ 0x000, /* Power-on Reset */
+  -1, /* Manual Reset */
+  -1, /* H-UDI Reset */
+  -1, /* Inst TLB Multiple Hit */
+  -1, /* Data TLB Multiple Hit */
+ 
+  -1, /* User break Before Instruction */
+  -1, /* Inst Address Error */
+  -1, /* Inst TLB Miss */
+  -1, /* Inst TLB Protection Violation */
+  -1, /* Illegal Instruction */
+  -1, /* Slot Illegal Instruction */
+  -1, /* FPU Disable */
+  -1, /* Slot FPU Disable */
+  -1, /* Data Address Error (Read) */
+  -1, /* Data Address Error (Write) */  
+  -1, /* Data TBL Miss Read */
+  -1, /* Data TBL Miss Write */
+  -1, /* Data TBL Protection Violation Read */
+  -1, /* Data TBL Protection Violation Write */  
+  -1, /* FPU Exception */
+  -1, /* Initial Page Write exception */
+
+  -1, /* Unconditional TRAP */
+  -1, /* User break After Instruction */
+
+  -1, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
+
+  -1, /* EX Irq 0 */
+  -1, /*        1 */
+  -1, /*        2 */
+  -1, /*        3 */
+  -1, /*        4 */
+  -1, /*        5 */
+  -1, /*        6 */
+  -1, /*        7 */
+  -1, /*        8 */
+  -1, /*        9 */
+  -1, /*        A */
+  -1, /*        B */
+  -1, /*        C */
+  -1, /*        D */
+  -1, /*        E */
+
+  -1, /* SH4_INTC_IRL0 */
+  -1, /* SH4_INTC_IRL1 */
+  -1, /* SH4_INTC_IRL2 */
+  -1, /* SH4_INTC_IRL3 */
+
+  -1, /* HUDI */
+  -1, /* SH4_INTC_GPOI */
+  -1, /* SH4_INTC_DMTE0 */
+  -1, /* SH4_INTC_DMTE1 */
+  -1, /* SH4_INTC_DMTE2 */
+  -1, /* SH4_INTC_DMTE3 */
+ 
+  -1, /* SH4_INTC_DMTE4 */
+  -1, /* SH4_INTC_DMTE5 */
+  -1, /* SH4_INTC_DMTE6 */
+  -1, /* SH4_INTC_DMTE7 */
+  
+  -1, /* SH4_INTC_DMAE */
+  
+  -1, /* SH4_INTC_TUNI3 */
+  -1, /* SH4_INTC_TUNI4 */
+  0x400, /* SH4_INTC_TUNI0 */
+  0x420, /* SH4_INTC_TUNI1 */
+  0x440, /* SH4_INTC_TUNI2 */
+  0x460, /* SH4_INTC_TICPI2 */
+  -1, /* SH4_INTC_ATI */
+  -1, /* SH4_INTC_PRI */
+  -1, /* SH4_INTC_CUI */
+  -1, /* SH4_INTC_SCI1ERI */
+  -1, /* SH4_INTC_SCI1RXI */
+  -1, /* SH4_INTC_SCI1TXI */
+  -1, /* SH4_INTC_SCI1TEI */
+
+  -1, /* SH4_INTC_SCIFERI */
+  -1, /* SH4_INTC_SCIFRXI */
+  -1, /* SH4_INTC_SCIFBRI */
+  -1, /* SH4_INTC_SCIFTXI */
+  -1, /* SH4_INTC_ITI */
+  -1, /* SH4_INTC_RCMI */
+  -1 /* SH4_INTC_ROVI */
+};
 
 
 
@@ -341,10 +429,10 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 			else
 				callbackval = sh4->irq_callback(sh4->device, SH4_IRL3+1);
 
-			// we should put the value here based on a table, like the regular exception codes! (values are different tho)
-			//printf("exception %04x\n", exception);
-			//sh4->m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
-			sh4->m_sh3internal_lower[INTEVT2] = callbackval;
+			if (sh3_intevt2_exception_codes[exception]==-1)
+				fatalerror("sh3_intevt2_exception_codes unpopulated for exception %02x\n", exception);
+
+			sh4->m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
 			sh4->m_sh3internal_upper[SH3_EXPEVT_ADDR] = exception_codes[exception];
 
 

@@ -130,15 +130,13 @@ static IRQ_CALLBACK(cavesh3_int_callback)
 {
 	if (irqline == 4)
 	{
-		logerror("irqline %02x\n",irqline);
-		cputag_set_input_line(device->machine(), "maincpu", 4, CLEAR_LINE);
-		return 0x420;
+		return 0;
 	}
 	else
 	{
 		logerror("irqline %02x\n",irqline);
 		cputag_set_input_line(device->machine(), "maincpu", 2, CLEAR_LINE);
-		return 0x640; // hack vector until SH3 core works better
+		return 0;// 0x640; // hack vector until SH3 core works better
 	}
 }
 
