@@ -15,6 +15,25 @@ WRITE32_HANDLER( sh3_internal_high_w )
 
 	switch (offset)
 	{
+
+		case SH3_ICR0_IPRA_ADDR:
+			if (mem_mask & 0xffff0000)
+			{
+				logerror("'%s' (%08x): INTC internal write to %08x = %08x & %08x (SH3_ICR0_IPRA_ADDR - ICR0)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,data,mem_mask);
+			}
+
+			if (mem_mask & 0x0000ffff)
+			{
+				logerror("'%s' (%08x): INTC internal write to %08x = %08x & %08x (SH3_ICR0_IPRA_ADDR - IPRA)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,data,mem_mask);
+				sh4_handler_ipra_w(sh4,data&0xffff,mem_mask&0xffff);
+			}
+				
+			break;
+
+		case SH3_IPRB_ADDR:
+			logerror("'%s' (%08x): INTC internal write to %08x = %08x & %08x (SH3_IPRB_ADDR)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,data,mem_mask);
+		break;
+	
 		case SH3_TOCR_TSTR_ADDR:
 			logerror("'%s' (%08x): TMU internal write to %08x = %08x & %08x (SH3_TOCR_TSTR_ADDR)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,data,mem_mask);
 			if (mem_mask&0xff000000)
@@ -60,6 +79,15 @@ READ32_HANDLER( sh3_internal_high_r )
 
 	switch (offset)
 	{
+
+		case SH3_ICR0_IPRA_ADDR:
+			logerror("'%s' (%08x): INTC internal read from %08x mask %08x (SH3_ICR0_IPRA_ADDR - %08x)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, sh4->m_sh3internal_upper[offset]);
+			return (sh4->m_sh3internal_upper[offset] & 0xffff0000) | (sh4->SH4_IPRA & 0xffff);
+
+		case SH3_IPRB_ADDR:
+			logerror("'%s' (%08x): INTC internal read from %08x mask %08x (SH3_IPRB_ADDR - %08x)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, sh4->m_sh3internal_upper[offset]);
+			return sh4->m_sh3internal_upper[offset];
+
 		case SH3_TOCR_TSTR_ADDR:
 
 			if (mem_mask&0xff00000)
@@ -119,7 +147,7 @@ READ32_HANDLER( sh3_internal_r )
 		{
 			case INTEVT2:
 				{
-					logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (INTEVT2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
+				//	logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (INTEVT2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
 					return sh4->m_sh3internal_lower[offset];
 				}
 				break;

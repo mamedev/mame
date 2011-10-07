@@ -128,15 +128,24 @@ static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,
 
 static IRQ_CALLBACK(cavesh3_int_callback)
 {
-	printf("irqline %02x\n",irqline);
-	cputag_set_input_line(device->machine(), "maincpu", 2, CLEAR_LINE);
-	return 0x640; // hack vector until SH3 core works better
+	if (irqline == 4)
+	{
+		logerror("irqline %02x\n",irqline);
+		cputag_set_input_line(device->machine(), "maincpu", 4, CLEAR_LINE);
+		return 0x420;
+	}
+	else
+	{
+		logerror("irqline %02x\n",irqline);
+		cputag_set_input_line(device->machine(), "maincpu", 2, CLEAR_LINE);
+		return 0x640; // hack vector until SH3 core works better
+	}
 }
 
 
 static INTERRUPT_GEN(cavesh3_interrupt)
 {
-	device_set_input_line(device, 2, ASSERT_LINE);
+//	device_set_input_line(device, 2, ASSERT_LINE);
 //	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(cavesh3_interrupt_off));
 }
 

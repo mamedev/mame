@@ -3546,6 +3546,10 @@ static CPU_INIT( sh4 )
 	device->save_item(NAME(sh4->SH4_TOCR));
 	device->save_item(NAME(sh4->SH4_TCPR2));
 
+	device->save_item(NAME(sh4->SH4_IPRA));
+
+	
+
 
 }
 

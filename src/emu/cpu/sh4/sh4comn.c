@@ -234,18 +234,25 @@ void sh4_exception_recompute(sh4_state *sh4) // checks if there is any interrupt
 	for (a=0;a <= SH4_INTC_ROVI;a++)
 	{
 		if (sh4->exception_requesting[a])
-			if ((((int)sh4->exception_priority[a] >> 8) & 255) > z)
+		{
+			int pri = (((int)sh4->exception_priority[a] >> 8) & 255);
+			//logerror("pri is %02x z is %02x\n",pri,z);
+			if (pri > z)
 			{
+				//logerror("will test\n");
 				sh4->test_irq = 1; // will check for exception at end of instructions
 				break;
 			}
+		}
 	}
 }
 
 void sh4_exception_request(sh4_state *sh4, int exception) // start requesting an exception
 {
+	//logerror("sh4_exception_request a\n");
 	if (!sh4->exception_requesting[exception])
 	{
+		//logerror("sh4_exception_request b\n");
 		sh4->exception_requesting[exception] = 1;
 		sh4->pending_irq++;
 		sh4_exception_recompute(sh4);
@@ -817,7 +824,28 @@ int s;
 	}
 }
 
+void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+{
+	COMBINE_DATA(&sh4->SH4_IPRA);
+	/* 15 - 12 TMU0 */
+	/* 11 -  8 TMU1 */
+	/*  7 -  4 TMU2 */
+	/*  3 -  0 RTC  */
+	sh4->exception_priority[SH4_INTC_ATI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_ATI);
+	sh4->exception_priority[SH4_INTC_PRI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_PRI);
+	sh4->exception_priority[SH4_INTC_CUI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_CUI);
 
+	sh4->exception_priority[SH4_INTC_TUNI2]  = INTPRI((sh4->SH4_IPRA & 0x00f0) >> 4, SH4_INTC_TUNI2);
+	sh4->exception_priority[SH4_INTC_TICPI2] = INTPRI((sh4->SH4_IPRA & 0x00f0) >> 4, SH4_INTC_TICPI2);
+
+	sh4->exception_priority[SH4_INTC_TUNI1]  = INTPRI((sh4->SH4_IPRA & 0x0f00) >> 8, SH4_INTC_TUNI1);
+
+	sh4->exception_priority[SH4_INTC_TUNI0]  = INTPRI((sh4->SH4_IPRA & 0xf000) >> 12, SH4_INTC_TUNI0);
+
+	logerror("setting priorities TMU0 %01x TMU1 %01x TMU2 %01x RTC %01x\n", (sh4->SH4_IPRA & 0xf000)>>12, (sh4->SH4_IPRA & 0x0f00)>>8, (sh4->SH4_IPRA & 0x00f0)>>4, (sh4->SH4_IPRA & 0x000f)>>0);
+
+	sh4_exception_recompute(sh4);
+}
 
 WRITE32_HANDLER( sh4_internal_w )
 {
@@ -948,16 +976,7 @@ WRITE32_HANDLER( sh4_internal_w )
 	case ICR:
 		sh4->m[ICR] = (sh4->m[ICR] & 0x7fff) | (old & 0x8000);
 		break;
-	case IPRA:
-		sh4->exception_priority[SH4_INTC_ATI] = INTPRI(sh4->m[IPRA] & 0x000f, SH4_INTC_ATI);
-		sh4->exception_priority[SH4_INTC_PRI] = INTPRI(sh4->m[IPRA] & 0x000f, SH4_INTC_PRI);
-		sh4->exception_priority[SH4_INTC_CUI] = INTPRI(sh4->m[IPRA] & 0x000f, SH4_INTC_CUI);
-		sh4->exception_priority[SH4_INTC_TUNI2] = INTPRI((sh4->m[IPRA] & 0x00f0) >> 4, SH4_INTC_TUNI2);
-		sh4->exception_priority[SH4_INTC_TICPI2] = INTPRI((sh4->m[IPRA] & 0x00f0) >> 4, SH4_INTC_TICPI2);
-		sh4->exception_priority[SH4_INTC_TUNI1] = INTPRI((sh4->m[IPRA] & 0x0f00) >> 8, SH4_INTC_TUNI1);
-		sh4->exception_priority[SH4_INTC_TUNI0] = INTPRI((sh4->m[IPRA] & 0xf000) >> 12, SH4_INTC_TUNI0);
-		sh4_exception_recompute(sh4);
-		break;
+	case IPRA: sh4_handler_ipra_w(sh4, data, mem_mask); break;
 	case IPRB:
 		sh4->exception_priority[SH4_INTC_SCI1ERI] = INTPRI((sh4->m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1ERI);
 		sh4->exception_priority[SH4_INTC_SCI1RXI] = INTPRI((sh4->m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1RXI);
@@ -1105,6 +1124,12 @@ READ32_HANDLER( sh4_internal_r )
 			return sh4->m[RTCNT];
 		break;
 
+/*********************************************************************************************************************
+		INTC (Interrupt Controller)
+*********************************************************************************************************************/
+
+	case IPRA:
+		return sh4->SH4_IPRA;
 
 /*********************************************************************************************************************
 		TMU (Timer Unit)

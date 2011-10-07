@@ -96,6 +96,10 @@ typedef struct
 	UINT32 SH4_TOCR;
 	UINT32 SH4_TCPR2;
 
+	// INTC regs
+	UINT32 SH4_IPRA;
+
+
 	// sh3 internal
 	UINT32  m_sh3internal_upper[0x3000/4];
 	UINT32  m_sh3internal_lower[0x1000];
@@ -289,6 +293,7 @@ void sh4_swap_fp_couples(sh4_state *sh4);
 #endif
 void sh4_common_init(device_t *device);
 UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address);
+void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask);
 
 READ64_HANDLER( sh4_tlb_r );
 WRITE64_HANDLER( sh4_tlb_w );
