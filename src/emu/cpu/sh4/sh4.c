@@ -28,6 +28,7 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 #include "sh3comn.h"
+#include "sh4tmu.h"
 
 #ifndef USE_SH4DRC
 
@@ -1716,7 +1717,7 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 	}
 	else /* SH3 */
 	{
-		sh4->m_sh3internal_upper[SH3_TRA] = imm << 2;
+		sh4->m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
 	}
 
 
@@ -1739,7 +1740,7 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 	}
 	else /* SH3 */
 	{
-		sh4->m_sh3internal_upper[SH3_EXPEVT] = 0x00000160;
+		sh4->m_sh3internal_upper[SH3_EXPEVT_ADDR] = 0x00000160;
 	}
 
 	sh4->pc = sh4->vbr + 0x00000100;

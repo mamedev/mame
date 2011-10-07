@@ -5,32 +5,99 @@
 #include "sh4.h"
 #include "sh4comn.h"
 #include "sh3comn.h"
-
+#include "sh4tmu.h"
 /* High internal area (ffffxxxx) */
 
 WRITE32_HANDLER( sh3_internal_high_w )
 {
 	sh4_state *sh4 = get_safe_token(&space->device());
+	COMBINE_DATA(&sh4->m_sh3internal_upper[offset]);	
 
-	COMBINE_DATA(&sh4->m_sh3internal_upper[offset]);
+	switch (offset)
+	{
+		case SH3_TOCR_TSTR_ADDR:
+			logerror("'%s' (%08x): TMU internal write to %08x = %08x & %08x (SH3_TOCR_TSTR_ADDR)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,data,mem_mask);
+			if (mem_mask&0xff000000)
+			{
+				sh4_handle_tocr_addr_w(sh4, (data>>24)&0xffff, (mem_mask>>24)&0xff);
+			}
+			if (mem_mask&0x0000ff00)
+			{
+				sh4_handle_tstr_addr_w(sh4, (data>>8)&0xff, (mem_mask>>8)&0xff);
+			}
+			if (mem_mask&0x00ff00ff)
+			{
+				fatalerror("SH3_TOCR_TSTR_ADDR unused bits accessed (write)\n");
+			}
+			break;
+		case SH3_TCOR0_ADDR:  sh4_handle_tcor0_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCOR1_ADDR:  sh4_handle_tcor1_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCOR2_ADDR:  sh4_handle_tcor2_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCNT0_ADDR:  sh4_handle_tcnt0_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCNT1_ADDR:  sh4_handle_tcnt1_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCNT2_ADDR:  sh4_handle_tcnt2_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCR0_ADDR:   sh4_handle_tcr0_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCR1_ADDR:   sh4_handle_tcr1_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCR2_ADDR:   sh4_handle_tcr2_addr_w(sh4, data, mem_mask);break;
+		case SH3_TCPR2_ADDR:  sh4_handle_tcpr2_addr_w(sh4,data,  mem_mask);break;
+
+		default:
+			logerror("'%s' (%08x): unmapped internal write to %08x = %08x & %08x (unk)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,data,mem_mask);
+			break;
+
+	}
+
+	
+
+	
 }
 
 READ32_HANDLER( sh3_internal_high_r )
 {
 	sh4_state *sh4 = get_safe_token(&space->device());
 
+	UINT32 ret = 0;
+
 	switch (offset)
 	{
-		case SH3_TRA:
+		case SH3_TOCR_TSTR_ADDR:
+
+			if (mem_mask&0xff00000)
+			{
+				ret |= (sh4_handle_tocr_addr_r(sh4, mem_mask)&0xff)<<24;
+			}
+			if (mem_mask&0x0000ff00)
+			{
+				ret |= (sh4_handle_tstr_addr_r(sh4, mem_mask)&0xff)<<8;
+			}
+			if (mem_mask&0x00ff00ff)
+			{
+				fatalerror("SH3_TOCR_TSTR_ADDR unused bits accessed (read)\n");
+			}
+			return ret;
+		case SH3_TCOR0_ADDR:  return sh4_handle_tcor0_addr_r(sh4, mem_mask);
+		case SH3_TCOR1_ADDR:  return sh4_handle_tcor1_addr_r(sh4, mem_mask);
+		case SH3_TCOR2_ADDR:  return sh4_handle_tcor2_addr_r(sh4, mem_mask);
+		case SH3_TCNT0_ADDR:  return sh4_handle_tcnt0_addr_r(sh4, mem_mask);
+		case SH3_TCNT1_ADDR:  return sh4_handle_tcnt1_addr_r(sh4, mem_mask);
+		case SH3_TCNT2_ADDR:  return sh4_handle_tcnt2_addr_r(sh4, mem_mask);
+		case SH3_TCR0_ADDR:   return sh4_handle_tcr0_addr_r(sh4, mem_mask);
+		case SH3_TCR1_ADDR:   return sh4_handle_tcr1_addr_r(sh4, mem_mask);
+		case SH3_TCR2_ADDR:   return sh4_handle_tcr2_addr_r(sh4, mem_mask);
+		case SH3_TCPR2_ADDR:  return sh4_handle_tcpr2_addr_r(sh4, mem_mask);
+
+
+		case SH3_TRA_ADDR:
 			logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (SH3 TRA - %08x)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, sh4->m_sh3internal_upper[offset]);
 			return sh4->m_sh3internal_upper[offset];
 
-		case SH3_EXPEVT:
+		case SH3_EXPEVT_ADDR:
 			logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (SH3 EXPEVT - %08x)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, sh4->m_sh3internal_upper[offset]);
 			return sh4->m_sh3internal_upper[offset];
 
-		case SH3_INTEVT:
+		case SH3_INTEVT_ADDR:
 			logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (SH3 INTEVT - %08x)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, sh4->m_sh3internal_upper[offset]);
+			fatalerror("INTEVT unsupported on SH3\n");
 			return sh4->m_sh3internal_upper[offset];
 
 
