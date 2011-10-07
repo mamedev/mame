@@ -522,21 +522,24 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 							for ( int z = 0; z <= sprite_mag; colission_index++, z++ )
 							{
-								/* Check for colission */
-								if ( spr_drawn[ colission_index ] )
-									m_StatusReg |= 0x20;
-								spr_drawn[ colission_index ] |= 0x01;
-
 								/* Check if pixel should be drawn */
-								if ( ( pattern & 0x80 ) && sprcol && num_sprites < 5 )
+								if ( pattern & 0x80 )
 								{
 									if ( colission_index >= 32 && colission_index < 32 + 256 )
 									{
-										/* Has another sprite already drawn here? */
-										if ( ! ( spr_drawn[ colission_index ] & 0x02 ) )
+										/* Check for colission */
+										if ( spr_drawn[ colission_index ] )
+											m_StatusReg |= 0x20;
+										spr_drawn[ colission_index ] |= 0x01;
+
+										if ( sprcol )
 										{
-											spr_drawn[ colission_index ] |= 0x02;
-											p[ TMS9928A_HORZ_DISPLAY_START + colission_index - 32 ] = sprcol;
+											/* Has another sprite already drawn here? */
+											if ( ! ( spr_drawn[ colission_index ] & 0x02 ) )
+											{
+												spr_drawn[ colission_index ] |= 0x02;
+												p[ TMS9928A_HORZ_DISPLAY_START + colission_index - 32 ] = sprcol;
+											}
 										}
 									}
 								}
