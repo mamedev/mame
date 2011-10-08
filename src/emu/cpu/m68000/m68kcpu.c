@@ -735,20 +735,28 @@ static CPU_TRANSLATE( m68k )
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if (m68k)
 	{
-		if ((space == AS_PROGRAM) && (m68k->pmmu_enabled))
+		/* 68040 needs to call the MMU even when disabled so transparent translation works */
+		if ((space == AS_PROGRAM) && ((m68k->pmmu_enabled) || (CPU_TYPE_IS_040_PLUS(m68k->cpu_type))))
 		{
 			// FIXME: mmu_tmp_sr will be overwritten in pmmu_translate_addr_with_fc
 			UINT16 mmu_tmp_sr = m68k->mmu_tmp_sr;
 //          UINT32 va=*address;
 
-			*address = pmmu_translate_addr_with_fc(m68k, *address, 4, 1);
+			if (CPU_TYPE_IS_040_PLUS(m68k->cpu_type))
+			{
+				*address = pmmu_translate_addr_with_fc_040(m68k, *address, FUNCTION_CODE_SUPERVISOR_PROGRAM, 1);
+			}
+			else
+			{
+				*address = pmmu_translate_addr_with_fc(m68k, *address, FUNCTION_CODE_SUPERVISOR_PROGRAM, 1);
+			}
 
 			if ((m68k->mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
 //              logerror("cpu_translate_m68k failed with mmu_sr=%04x va=%08x pa=%08x\n",m68k->mmu_tmp_sr,va ,*address);
 				*address = 0;
 			}
 
-			m68k->mmu_tmp_sr= mmu_tmp_sr;
+			m68k->mmu_tmp_sr = mmu_tmp_sr;
 		}
 	}
 	return TRUE;

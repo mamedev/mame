@@ -692,8 +692,10 @@ public:
 	/* PMMU registers */
 	UINT32 mmu_crp_aptr, mmu_crp_limit;
 	UINT32 mmu_srp_aptr, mmu_srp_limit;
+	UINT32 mmu_urp_aptr;	/* 040 only */
 	UINT32 mmu_tc;
 	UINT16 mmu_sr;
+	UINT32 mmu_sr_040;
 	UINT32 mmu_atc_tag[MMU_ATC_ENTRIES], mmu_atc_data[MMU_ATC_ENTRIES];
 	UINT32 mmu_atc_rr;
 	UINT32 mmu_tt0, mmu_tt1;

@@ -6586,7 +6586,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 			case 0x003:				/* TC */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
-					/* TODO */
+					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_tc;
 					return;
 				}
 				m68ki_exception_illegal(mc68kcpu);
@@ -6646,7 +6646,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 			case 0x805:				/* MMUSR */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
-					/* TODO */
+					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_sr_040;
 					return;
 				}
 				m68ki_exception_illegal(mc68kcpu);
@@ -6654,7 +6654,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 			case 0x806:				/* URP */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
-					/* TODO */
+					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_urp_aptr;
 					return;
 				}
 				m68ki_exception_illegal(mc68kcpu);
@@ -6662,7 +6662,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 			case 0x807:				/* SRP */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
-					/* TODO */
+					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_srp_aptr;
 					return;
 				}
 				m68ki_exception_illegal(mc68kcpu);
@@ -6831,7 +6831,16 @@ M68KMAKE_OP(movec, 32, rc, .)
 			case 0x003:			/* TC */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
-					/* TODO */
+					mc68kcpu->mmu_tc = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
+
+					if (mc68kcpu->mmu_tc & 0x8000)
+					{
+						mc68kcpu->pmmu_enabled = 1;
+					}
+					else
+					{
+						mc68kcpu->pmmu_enabled = 0;
+					}
 					return;
 				}
 				m68ki_exception_illegal(mc68kcpu);
@@ -6891,7 +6900,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 			case 0x805:			/* MMUSR */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
-					/* TODO */
+					mc68kcpu->mmu_sr_040 = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
 					return;
 				}
 				m68ki_exception_illegal(mc68kcpu);
@@ -6899,7 +6908,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 			case 0x806:			/* URP */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
-					/* TODO */
+					mc68kcpu->mmu_urp_aptr = REG_DA(mc68kcpu)[(word2 >> 12) & 15]; 
 					return;
 				}
 				m68ki_exception_illegal(mc68kcpu);
@@ -6907,7 +6916,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 			case 0x807:			/* SRP */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
-					/* TODO */
+					mc68kcpu->mmu_srp_aptr = REG_DA(mc68kcpu)[(word2 >> 12) & 15]; 
 					return;
 				}
 				m68ki_exception_illegal(mc68kcpu);
