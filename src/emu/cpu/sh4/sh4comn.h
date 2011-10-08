@@ -99,6 +99,8 @@ typedef struct
 	// INTC regs
 	UINT32 SH4_IPRA;
 
+	UINT32 SH4_IPRC;
+
 
 	// sh3 internal
 	UINT32  m_sh3internal_upper[0x3000/4];

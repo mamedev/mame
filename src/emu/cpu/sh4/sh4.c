@@ -1718,7 +1718,7 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 	else /* SH3 */
 	{
 		sh4->m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
-	}
+	} 
 
 
 	sh4->ssr = sh4->sr;
@@ -3548,6 +3548,7 @@ static CPU_INIT( sh4 )
 
 	device->save_item(NAME(sh4->SH4_IPRA));
 
+	device->save_item(NAME(sh4->SH4_IPRC));
 	
 
 

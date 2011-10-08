@@ -188,10 +188,11 @@ static const int sh3_intevt2_exception_codes[] =
   -1, /*        D */
   -1, /*        E */
 
-  -1, /* SH4_INTC_IRL0 */
-  -1, /* SH4_INTC_IRL1 */
-  -1, /* SH4_INTC_IRL2 */
-  -1, /* SH4_INTC_IRL3 */
+  0x600, /* SH4_INTC_IRL0 */
+  0x620, /* SH4_INTC_IRL1 */
+  0x640, /* SH4_INTC_IRL2 */
+  0x660, /* SH4_INTC_IRL3 */
+    /* todo: SH3 should have lines 4+5 too? */
 
   -1, /* HUDI */
   -1, /* SH4_INTC_GPOI */

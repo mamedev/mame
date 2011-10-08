@@ -48,14 +48,33 @@ static READ64_HANDLER( cavesh3_blitter_r )
 {
 	UINT64 ret = space->machine().rand();
 
-	return ret ^ (ret<<32);
+	logerror("cavesh3_blitter_r access at %08x (%08x) - mem_mask %08x%08x\n",offset, offset*8, (UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+
+	switch (offset)
+	{
+
+		case 0x2:
+			return ret ^ (ret<<32);
+
+		case 0x4:
+			return 0;
+
+		default:
+			logerror("no case for blit read\n");
+			return 0;
+	}
+
+
+	return 0;
+
+
+	
 }
 
 static WRITE64_HANDLER( cavesh3_blitter_w )
 {
-
+	logerror("cavesh3_blitter_w access at %08x (%08x) -  %08x%08x %08x%08x\n",offset, offset*8, (UINT32)(data>>32),(UINT32)(data&0xffffffff),(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
 }
-
 
 static READ64_HANDLER( ymz2770c_z_r )
 {
@@ -75,15 +94,23 @@ static READ64_HANDLER( cavesh3_nand_r )
 	{
 		logerror("unknown cavesh3_nand_r access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
 	}
+	else
+	{
+		logerror("cavesh3_nand_r access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+	}
 
-	return (UINT64)(space->machine().rand()&0xff)<<(32+16+8);
+	return 0;// (UINT64)(space->machine().rand()&0xff)<<(32+16+8);
 }
 
 static WRITE64_HANDLER( cavesh3_nand_w )
 {
 	if (mem_mask & U64(0xff0000ffffffffff))
 	{
-		logerror("unknown cavesh3_nand_w access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+		logerror("unknown cavesh3_nand_w access %08x%08x %08x%08x\n",(UINT32)(data>>32),(UINT32)(data&0xffffffff),(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+	}
+	else
+	{
+		logerror("cavesh3_nand_w access %08x%08x %08x%08x\n",(UINT32)(data>>32),(UINT32)(data&0xffffffff),(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
 	}
 }
 
@@ -116,15 +143,11 @@ static INPUT_PORTS_START( cavesh3 )
 INPUT_PORTS_END
 
 
-#define CAVE_CPU_CLOCK 133333333/4
+#define CAVE_CPU_CLOCK 133333333
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CAVE_CPU_CLOCK };
 
-/*static TIMER_CALLBACK( cavesh3_interrupt_off )
-{
-	cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
-}
-*/
+
 
 static IRQ_CALLBACK(cavesh3_int_callback)
 {
@@ -135,16 +158,15 @@ static IRQ_CALLBACK(cavesh3_int_callback)
 	else
 	{
 		logerror("irqline %02x\n",irqline);
-		cputag_set_input_line(device->machine(), "maincpu", 2, CLEAR_LINE);
-		return 0;// 0x640; // hack vector until SH3 core works better
+
+		return 0;
 	}
 }
 
 
 static INTERRUPT_GEN(cavesh3_interrupt)
 {
-//	device_set_input_line(device, 2, ASSERT_LINE);
-//	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(cavesh3_interrupt_off));
+	device_set_input_line(device, 2, HOLD_LINE);
 }
 
 static MACHINE_RESET( cavesh3 )

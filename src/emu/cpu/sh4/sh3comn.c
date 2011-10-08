@@ -153,6 +153,30 @@ READ32_HANDLER( sh3_internal_r )
 				break;
 			
 
+			case IRR0_IRR1:
+				{
+					{
+						if (mem_mask & 0xff000000)
+						{
+							logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (IRR0)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
+							return sh4->m_sh3internal_lower[offset];
+						}
+
+						if (mem_mask & 0x0000ff00)
+						{
+							logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (IRR1)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);						
+							return sh4->m_sh3internal_lower[offset];
+						}
+
+						if (mem_mask & 0x00ff00ff);
+						{
+							fatalerror("'%s' (%08x): unmapped internal read from %08x mask %08x (IRR0/1 unused bits)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);						
+						}
+
+					}
+				}
+				break;
+
 			case PEDR_PFDR:
 				{
 					if (mem_mask & 0xffff0000)
@@ -224,8 +248,34 @@ WRITE32_HANDLER( sh3_internal_w )
 		switch (offset)
 		{
 
+			case IRR0_IRR1:
+				{
+					{
+						if (mem_mask & 0xff000000)
+						{
+							logerror("'%s' (%08x): unmapped internal write to %08x = %08x & %08x (IRR0)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+							// not sure if this is how we should clear lines in this core...
+							if (!(data & 0x01000000)) sh4_set_irq_line(sh4, 0, CLEAR_LINE);
+							if (!(data & 0x02000000)) sh4_set_irq_line(sh4, 1, CLEAR_LINE);
+							if (!(data & 0x04000000)) sh4_set_irq_line(sh4, 2, CLEAR_LINE);
+							if (!(data & 0x08000000)) sh4_set_irq_line(sh4, 3, CLEAR_LINE);
+
+						}
+						if (mem_mask & 0x0000ff00)
+						{
+							logerror("'%s' (%08x): unmapped internal write to %08x = %08x & %08x (IRR1)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+						}
+						if (mem_mask & 0x00ff00ff)
+						{
+							fatalerror("'%s' (%08x): unmapped internal write to %08x = %08x & %08x (IRR0/1 unused bits)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+						}
+					}
+				}
+				break;
+
 			case PINTER_IPRC:
 				{
+					
 					if (mem_mask & 0xffff0000)
 					{
 						logerror("'%s' (%08x): unmapped internal write to %08x = %08x & %08x (PINTER)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
@@ -233,7 +283,14 @@ WRITE32_HANDLER( sh3_internal_w )
 
 					if (mem_mask & 0x0000ffff)
 					{
-						logerror("'%s' (%08x): unmapped internal write to %08x = %08x & %08x (IPRC)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+						data &= 0xffff; mem_mask &= 0xffff;
+						COMBINE_DATA(&sh4->SH4_IPRC);
+						logerror("'%s' (%08x): INTC internal write to %08x = %08x & %08x (IPRC)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+						sh4->exception_priority[SH4_INTC_IRL0]     = INTPRI((sh4->SH4_IPRC & 0x000f)>>0, SH4_INTC_IRL0);
+						sh4->exception_priority[SH4_INTC_IRL1]     = INTPRI((sh4->SH4_IPRC & 0x00f0)>>4, SH4_INTC_IRL1);
+						sh4->exception_priority[SH4_INTC_IRL2]     = INTPRI((sh4->SH4_IPRC & 0x0f00)>>8, SH4_INTC_IRL2);
+						sh4->exception_priority[SH4_INTC_IRL3]     = INTPRI((sh4->SH4_IPRC & 0xf000)>>12,SH4_INTC_IRL3);
+						sh4_exception_recompute(sh4);
 					}
 				}
 				break;
