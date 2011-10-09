@@ -6,12 +6,12 @@
 #include "cpu/sh4/sh4.h"
 
 
+
 class cavesh3_state : public driver_device
 {
 public:
 	cavesh3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-
 };
 
 
@@ -26,37 +26,22 @@ SCREEN_UPDATE(cavesh3)
 
 
 
-static READ64_HANDLER( serial_rtc_eeprom_r )
+
+static READ32_HANDLER( cavesh3_blitter_r )
 {
-	if (mem_mask & U64(0xff00ffffffffffff))
-	{
-		logerror("unknown serial_rtc_eeprom_r access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
-	}
+//	UINT64 ret = space->machine().rand();
+	static UINT32 i = 0;
+	i^=0xffffffff;
 
-	return (UINT64)(space->machine().rand()&0xff)<<(32+16);
-}
-
-static WRITE64_HANDLER( serial_rtc_eeprom_w )
-{
-	if (mem_mask & U64(0xff000000ffffffff))
-	{
-		logerror("unknown serial_rtc_eeprom_w access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
-	}
-}
-
-static READ64_HANDLER( cavesh3_blitter_r )
-{
-	UINT64 ret = space->machine().rand();
-
-	logerror("cavesh3_blitter_r access at %08x (%08x) - mem_mask %08x%08x\n",offset, offset*8, (UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+	logerror("%08x cavesh3_blitter_r access at %08x (%08x) - mem_mask %08x\n",cpu_get_pc(&space->device()), offset, offset*4, mem_mask);
 
 	switch (offset)
 	{
 
-		case 0x2:
-			return ret ^ (ret<<32);
-
 		case 0x4:
+			return i;
+
+		case 0x9:
 			return 0;
 
 		default:
@@ -71,9 +56,9 @@ static READ64_HANDLER( cavesh3_blitter_r )
 	
 }
 
-static WRITE64_HANDLER( cavesh3_blitter_w )
+static WRITE32_HANDLER( cavesh3_blitter_w )
 {
-	logerror("cavesh3_blitter_w access at %08x (%08x) -  %08x%08x %08x%08x\n",offset, offset*8, (UINT32)(data>>32),(UINT32)(data&0xffffffff),(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+	logerror("%08x cavesh3_blitter_w access at %08x (%08x) -  %08x %08x\n",cpu_get_pc(&space->device()),offset, offset*8, data,mem_mask);
 }
 
 static READ64_HANDLER( ymz2770c_z_r )
@@ -88,31 +73,306 @@ static WRITE64_HANDLER( ymz2770c_z_w )
 
 }
 
-static READ64_HANDLER( cavesh3_nand_r )
+
+
+// FLASH
+
+#define FLASH_PAGE_SIZE	(2048+64)
+
+UINT8 flash_page_data[FLASH_PAGE_SIZE];
+
+typedef enum							{ STATE_IDLE = 0,	STATE_READ,		STATE_READ_ID,	STATE_READ_STATUS	} flash_state_t;
+static const char *flash_state_name[] =	{ "IDLE",			"READ",			"READ_ID",		"READ_STATUS"		};
+
+static flash_state_t flash_state;
+
+static UINT8 flash_enab;
+
+static UINT8 flash_cmd_seq;
+static UINT32 flash_cmd_prev;
+
+static UINT8 flash_addr_seq;
+static UINT8 flash_read_seq;
+
+static UINT16 flash_row, flash_col;
+static UINT16 flash_page_addr;
+static UINT16 flash_page_index;
+
+static void flash_hard_reset(running_machine &machine)
 {
-	if (mem_mask & U64(0x00ffffffffffffff))
+//	logerror("%08x FLASH: RESET\n", cpuexec_describe_context(machine));
+
+	flash_state = STATE_READ;
+
+	flash_cmd_prev = -1;
+	flash_cmd_seq = 0;
+
+	flash_addr_seq = 0;
+	flash_read_seq = 0;
+
+	flash_row = 0;
+	flash_col = 0;
+
+	memset(flash_page_data, 0, FLASH_PAGE_SIZE);
+	flash_page_addr = 0;
+	flash_page_index = 0;
+}
+
+static WRITE8_HANDLER( flash_enab_w )
+{
+	logerror("%08x FLASH: enab = %02X\n", cpu_get_pc(&space->device()), data);
+	//flash_enab = data;
+	flash_enab = 1; // todo, why does it get turned off again instantly?
+}
+
+static void flash_change_state(running_machine &machine, flash_state_t state)
+{
+	flash_state = state;
+
+	flash_cmd_prev = -1;
+	flash_cmd_seq = 0;
+
+	flash_read_seq = 0;
+	flash_addr_seq = 0;
+
+	logerror("flash_change_state - FLASH: state = %s\n", flash_state_name[state]);
+}
+
+static WRITE8_HANDLER( flash_cmd_w )
+{
+	if (!flash_enab)
+		return;
+
+	logerror("%08x FLASH: cmd = %02X (prev = %02X)\n", cpu_get_pc(&space->device()), data, flash_cmd_prev);
+
+	if (flash_cmd_prev == -1)
 	{
-		logerror("unknown cavesh3_nand_r access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+		flash_cmd_prev = data;
+
+		switch (data)
+		{
+			case 0x00:	// READ
+				flash_addr_seq = 0;
+				break;
+
+			case 0x70:	// READ STATUS
+				flash_change_state( space->machine(), STATE_READ_STATUS );
+				break;
+
+			case 0x90:	// READ ID
+				flash_change_state( space->machine(), STATE_READ_ID );
+				break;
+
+			case 0xff:	// RESET
+				flash_change_state( space->machine(), STATE_IDLE );
+				break;
+
+			default:
+			{
+				logerror("%08x FLASH: unknown cmd1 = %02X\n", cpu_get_pc(&space->device()), data);
+			}
+		}
 	}
 	else
 	{
-		logerror("cavesh3_nand_r access %08x%08x\n",(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
-	}
+		switch (flash_cmd_prev)
+		{
+			case 0x00:	// READ
+				if (data == 0x30)
+				{
+					UINT8 *region = space->machine().region( "game" )->base();
 
-	return 0;// (UINT64)(space->machine().rand()&0xff)<<(32+16+8);
+					memcpy(flash_page_data, region + flash_row * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
+					flash_page_addr = flash_col;
+					flash_page_index = flash_row;
+
+					flash_change_state( space->machine(), STATE_READ );
+
+					logerror("%08x FLASH: caching page = %04X\n", cpu_get_pc(&space->device()), flash_row);
+				}
+				break;
+
+			default:
+			{
+				logerror("%08x FLASH: unknown cmd2 = %02X (cmd1 = %02X)\n", cpu_get_pc(&space->device()), data, flash_cmd_prev);
+			}
+		}
+	}
 }
 
-static WRITE64_HANDLER( cavesh3_nand_w )
+static WRITE8_HANDLER( flash_addr_w )
 {
-	if (mem_mask & U64(0xff0000ffffffffff))
+	if (!flash_enab)
+		return;
+
+	logerror("%08x FLASH: addr = %02X (seq = %02X)\n", cpu_get_pc(&space->device()), data, flash_addr_seq);
+
+	switch( flash_addr_seq++ )
 	{
-		logerror("unknown cavesh3_nand_w access %08x%08x %08x%08x\n",(UINT32)(data>>32),(UINT32)(data&0xffffffff),(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
-	}
-	else
-	{
-		logerror("cavesh3_nand_w access %08x%08x %08x%08x\n",(UINT32)(data>>32),(UINT32)(data&0xffffffff),(UINT32)(mem_mask>>32),(UINT32)(mem_mask&0xffffffff));
+		case 0:
+			flash_col = (flash_col & 0xff00) | data;
+			break;
+		case 1:
+			flash_col = (flash_col & 0x00ff) | (data << 8);
+			break;
+		case 2:
+			flash_row = (flash_row & 0xff00) | data;
+			break;
+		case 3:
+			flash_row = (flash_row & 0x00ff) | (data << 8);
+			flash_addr_seq = 0;
+			break;
 	}
 }
+
+static READ8_HANDLER( flash_io_r )
+{
+	UINT8 data = 0x00;
+	UINT32 old;
+
+	if (!flash_enab)
+		return 0xff;
+
+	switch (flash_state)
+	{
+		case STATE_READ_ID:
+			old = flash_read_seq;
+
+			switch( flash_read_seq++ )
+			{
+				case 0:
+					data = 0xEC;	// Manufacturer
+					break;
+				case 1:
+					data = 0xF1;	// Device
+					break;
+				case 2:
+					data = 0x00;	// XX
+					break;
+				case 3:
+					data = 0x15;	// Flags
+					flash_read_seq = 0;
+					break;
+			}
+
+			logerror("%08x FLASH: read %02X from id(%02X)\n", cpu_get_pc(&space->device()), data, old);
+			break;
+
+		case STATE_READ:
+			if (flash_page_addr > FLASH_PAGE_SIZE-1)
+				flash_page_addr = FLASH_PAGE_SIZE-1;
+
+			old = flash_page_addr;
+
+			data = flash_page_data[flash_page_addr++];
+
+//			logerror("%08x FLASH: read data %02X from addr %03X (page %04X)\n", cpu_get_pc(&space->device()), data, old, flash_page_index);
+			break;
+
+		case STATE_READ_STATUS:
+			// bit 7 = writeable, bit 6 = ready, bit 5 = ready/true ready, bit 1 = fail(N-1), bit 0 = fail
+			data = 0xe0;
+			logerror("%08x FLASH: read status %02X\n", cpu_get_pc(&space->device()), data);
+			break;
+
+		default:
+		{
+			logerror("%08x FLASH: unknown read in state %s\n", cpu_get_pc(&space->device()), flash_state_name[flash_state]);
+		}
+	}
+
+	return data;
+}
+/*
+static READ8_HANDLER( flash_ready_r )
+{
+	return 1;
+}
+
+// FLASH interface
+
+static READ32_HANDLER( ibara_flash_ready_r )
+{
+	// 400012a contains test bit (shown in service mode)
+	return	((flash_ready_r(space, offset) ? 0x20 : 0x00) << 24) |
+			input_port_read(space->machine(), "PORT_EF");
+}
+*/
+static READ8_HANDLER( ibara_flash_io_r )
+{
+	switch (offset)
+	{
+		default:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07:
+
+		//	logerror("ibara_flash_io_r offset %04x\n", offset);
+			return 0xff;
+
+		case 0x00:
+			return flash_io_r(space,offset);
+	}
+}
+
+static WRITE8_HANDLER( ibara_flash_io_w )
+{
+	switch (offset)
+	{
+		default:
+		case 0x00:
+		case 0x03:
+			logerror("unknown ibara_flash_io_w offset %04x data %02x\n", offset, data); // 03 enable/disable fgpa access?
+			break;
+
+		case 0x01:
+			flash_cmd_w(space, offset, data);
+			break;
+
+		case 0x2:
+			flash_addr_w(space, offset, data);
+			break;
+	}
+}
+
+
+
+
+static READ8_HANDLER( serial_rtc_eeprom_r )
+{
+	switch (offset)
+	{
+		default:
+		logerror("unknown serial_rtc_eeprom_r access offset %02x\n", offset);
+		return 0xff;
+	}
+}
+
+static WRITE8_HANDLER( serial_rtc_eeprom_w )
+{
+	switch (offset)
+	{
+		case 0x01:
+		// data & 0x00010000 = DATA
+		// data & 0x00020000 = CLK
+		// data & 0x00040000 = CE
+		break;
+
+		case 0x03:
+			flash_enab_w(space,offset,data);
+			return;
+
+		default:
+		logerror("unknown serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
+		break;
+	}
+
+}
+
 
 
 static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
@@ -124,10 +384,10 @@ static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM // work RAM
 	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM // mirror of above on type B boards, extra ram on type D
 
-	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE(cavesh3_nand_r, cavesh3_nand_w)
+	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(ibara_flash_io_r, ibara_flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_READWRITE(ymz2770c_z_r, ymz2770c_z_w)
-	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE(serial_rtc_eeprom_r, serial_rtc_eeprom_w)
-	AM_RANGE(0x18000000, 0x18000057) AM_READWRITE(cavesh3_blitter_r, cavesh3_blitter_w)
+	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x18000000, 0x18000057) AM_READWRITE32(cavesh3_blitter_r, cavesh3_blitter_w, U64(0xffffffffffffffff))
 
 	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
 	/*       0xffffe000, 0xffffffff  SH3 Internal Regs 2 */
@@ -143,25 +403,11 @@ static INPUT_PORTS_START( cavesh3 )
 INPUT_PORTS_END
 
 
-#define CAVE_CPU_CLOCK 133333333
+#define CAVE_CPU_CLOCK 12800000 * 8
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CAVE_CPU_CLOCK };
 
 
-
-static IRQ_CALLBACK(cavesh3_int_callback)
-{
-	if (irqline == 4)
-	{
-		return 0;
-	}
-	else
-	{
-		logerror("irqline %02x\n",irqline);
-
-		return 0;
-	}
-}
 
 
 static INTERRUPT_GEN(cavesh3_interrupt)
@@ -171,8 +417,10 @@ static INTERRUPT_GEN(cavesh3_interrupt)
 
 static MACHINE_RESET( cavesh3 )
 {
-	device_set_irq_callback(machine.device("maincpu"), cavesh3_int_callback);
+	flash_enab = 0;
+	flash_hard_reset(machine);
 }
+
 
 static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	/* basic machine hardware */
@@ -372,6 +620,7 @@ ROM_START( mmmbnk )
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4caaa1bf) SHA1(9b92c13eac05601da4d9bb3eb727c156974e9f0c) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(8e3a51ba) SHA1(e34cf9acb13c3d8ca6cd1306b060b1d429872abd) )
 ROM_END
+
 
 
 

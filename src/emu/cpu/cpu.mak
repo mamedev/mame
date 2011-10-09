@@ -532,7 +532,7 @@ $(CPUOBJ)/sh2/sh2fe.o:	$(CPUSRC)/sh2/sh2fe.c \
 
 ifneq ($(filter SH4,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh4
-CPUOBJS += $(CPUOBJ)/sh4/sh4.o $(CPUOBJ)/sh4/sh4comn.o $(CPUOBJ)/sh4/sh3comn.o $(CPUOBJ)/sh4/sh4tmu.o
+CPUOBJS += $(CPUOBJ)/sh4/sh4.o $(CPUOBJ)/sh4/sh4comn.o $(CPUOBJ)/sh4/sh3comn.o $(CPUOBJ)/sh4/sh4tmu.o $(CPUOBJ)/sh4/sh4dmac.o
 DASMOBJS += $(CPUOBJ)/sh4/sh4dasm.o
 endif
 
@@ -552,6 +552,16 @@ $(CPUOBJ)/sh4/sh3comn.o:  $(CPUSRC)/sh4/sh3comn.c \
 
 $(CPUOBJ)/sh4/sh4tmu.o: $(CPUSRC)/sh4/sh4tmu.c \
 			$(CPUSRC)/sh4/sh4tmu.h \
+			$(CPUSRC)/sh4/sh3comn.c \
+			$(CPUSRC)/sh4/sh3comn.h \
+			$(CPUSRC)/sh4/sh4.c \
+			$(CPUSRC)/sh4/sh4.h \
+			$(CPUSRC)/sh4/sh4regs.h \
+			$(CPUSRC)/sh4/sh4comn.h \
+			$(CPUSRC)/sh4/sh3comn.h
+
+$(CPUOBJ)/sh4/sh4dmac.o: $(CPUSRC)/sh4/sh4dmac.c \
+			$(CPUSRC)/sh4/sh4dmac.h \
 			$(CPUSRC)/sh4/sh3comn.c \
 			$(CPUSRC)/sh4/sh3comn.h \
 			$(CPUSRC)/sh4/sh4.c \

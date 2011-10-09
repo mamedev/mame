@@ -3313,7 +3313,14 @@ static CPU_RESET( sh3 )
 	CPU_RESET_CALL(common_sh4_reset);
 
 	sh4->cpu_type = CPU_TYPE_SH3;
-	
+
+	sh4->SH4_TCOR0 = 0xffffffff;
+	sh4->SH4_TCNT0 = 0xffffffff;
+	sh4->SH4_TCOR1 = 0xffffffff;
+	sh4->SH4_TCNT1 = 0xffffffff;
+	sh4->SH4_TCOR2 = 0xffffffff;
+	sh4->SH4_TCNT2 = 0xffffffff;
+
 }
 
 static CPU_RESET( sh4 )
