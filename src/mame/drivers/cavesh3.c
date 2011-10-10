@@ -1,10 +1,21 @@
 /* Cave SH3 ( CAVE CV1000-B ) */
 /* skeleton placeholder driver */
 
+/*
+ToDo:
+
+Eeprom
+NAND/Flash Writing and Saving! (DeathSmiles uses it for Unlock data)
+Improve Blending precision?
+Sound
+Make mmmbnk boot
+General SH3 cleanups
+
+*/
 
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
-
+#include "cpu/sh4/sh3comn.h"
 
 
 class cavesh3_state : public driver_device
@@ -478,6 +489,15 @@ static READ32_HANDLER( cavesh3_blitter_r )
 		case 0x10:
 			return cavesh_gfx_ready_r(space,offset,mem_mask);
 
+		case 0x24:
+			return 0xffffffff;
+
+		case 0x28:
+			return 0xffffffff;
+
+		default:
+			logerror("unknowncavesh3_blitter_r %08x %08x\n", offset*4, mem_mask);
+			break;
 
 	}
 	return 0;
@@ -737,7 +757,7 @@ static READ8_HANDLER( flash_io_r )
 
 	return data;
 }
-/*
+
 static READ8_HANDLER( flash_ready_r )
 {
 	return 1;
@@ -745,13 +765,13 @@ static READ8_HANDLER( flash_ready_r )
 
 // FLASH interface
 
-static READ32_HANDLER( ibara_flash_ready_r )
+static READ64_HANDLER( ibara_flash_port_e_r )
 {
-	// 400012a contains test bit (shown in service mode)
-	return	((flash_ready_r(space, offset) ? 0x20 : 0x00) << 24) |
-			input_port_read(space->machine(), "PORT_EF");
+	return	((flash_ready_r(space, offset) ? 0x20 : 0x00)) |
+			input_port_read(space->machine(), "PORT_E");
 }
-*/
+
+
 static READ8_HANDLER( ibara_flash_io_r )
 {
 	switch (offset)
@@ -827,7 +847,7 @@ static WRITE8_HANDLER( serial_rtc_eeprom_w )
 
 }
 
-
+static UINT64*cavesh3_ram;
 
 static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0)
@@ -835,7 +855,7 @@ static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 
 	/*       0x04000000, 0x07ffffff  SH3 Internal Regs (including ports) */
   
-	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM // work RAM
+	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_BASE(&cavesh3_ram)// work RAM
 	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM // mirror of above on type B boards, extra ram on type D
 
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(ibara_flash_io_r, ibara_flash_io_w, U64(0xffffffffffffffff))
@@ -847,19 +867,96 @@ static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 	/*       0xffffe000, 0xffffffff  SH3 Internal Regs 2 */
 ADDRESS_MAP_END
 
+static READ64_HANDLER( ibara_fpga_r )
+{
+	return 0xff;
+}
+
+static WRITE64_HANDLER( ibara_fpga_w )
+{
+	if (ACCESSING_BITS_24_31)
+	{
+		// data & 0x08 = CE
+		// data & 0x10 = CLK
+		// data & 0x20 = DATA
+	}
+}
 
 
 static ADDRESS_MAP_START( cavesh3_port, AS_IO, 64 )
+	AM_RANGE(SH3_PORT_C, SH3_PORT_C+7) AM_READ_PORT("PORT_C")
+	AM_RANGE(SH3_PORT_D, SH3_PORT_D+7) AM_READ_PORT("PORT_D")
+	AM_RANGE(SH3_PORT_E, SH3_PORT_E+7) AM_READ( ibara_flash_port_e_r )
+	AM_RANGE(SH3_PORT_F, SH3_PORT_F+7) AM_READ_PORT("PORT_F")
+	AM_RANGE(SH3_PORT_L, SH3_PORT_L+7) AM_READ_PORT("PORT_L")
+	AM_RANGE(SH3_PORT_J, SH3_PORT_J+7) AM_READWRITE( ibara_fpga_r, ibara_fpga_w )
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( cavesh3 )
+	PORT_START("DSW")		// 18000050.l (18000050.b + 3 i.e. MSB + 3, is shown as DIPSW)
+//	PORT_BIT(        0xfcfffffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME(    0x00000002, 0x00000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00000002, DEF_STR( On ) )
+	PORT_SERVICE(    0x00000001, IP_ACTIVE_HIGH )
+
+	PORT_START("PORT_C")	
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Service coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	// Test button copied here
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  )	// IMPLEMENT COIN ERROR!
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PORT_D")	
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1)
+
+	PORT_START("PORT_E")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	// FLASH ready
+	PORT_BIT( 0xdf, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("PORT_F")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )	// Test Push Button
+	PORT_BIT( 0xfd, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+
+	PORT_START("PORT_L")	// 4000134.b, 4000136.b
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
+// apparently correct (but where is the OSC?)
 #define CAVE_CPU_CLOCK 12800000 * 8
 
-static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CAVE_CPU_CLOCK };
+// none of this is verified for cave sh3
+static const struct sh4_config sh4cpu_config = {
+	0, // md2 (clock divders)
+	0, // md1 (clock divders)
+	0, // md0 (clock divders)
+	0,
+	0,
+	0,
+	1,
+	1, // md7 (master?)
+	0,
+	CAVE_CPU_CLOCK
+};
 
 
 
@@ -1088,10 +1185,50 @@ ROM_END
 
 
 
-GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
+static READ64_HANDLER( mushisam_speedup_r )
+{
+	int pc = cpu_get_pc(&space->device());
+	if ( pc == 0xc04a0aa ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // mushisam
+	else if (pc == 0xc04a0da)  device_spin_until_time(&space->device(), attotime::from_usec(10)); // mushitam
+//	else printf("read %08x\n", cpu_get_pc(&space->device()));
+	return cavesh3_ram[0x0022f0/8];
+}
+
+DRIVER_INIT( mushisam )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0022f0, 0xc0022f7, FUNC(mushisam_speedup_r) );
+}
+
+static READ64_HANDLER( mushisama_speedup_r )
+{
+	if ( cpu_get_pc(&space->device())== 0xc04a2aa ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // mushisam
+//	else printf("read %08x\n", cpu_get_pc(&space->device()));
+	return cavesh3_ram[0x00024d8/8];
+}
+
+DRIVER_INIT( mushisama )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0024d8, 0xc0024df, FUNC(mushisama_speedup_r) );
+}
+
+
+/*
+espgal2 c002310
+futari15 c002310
+futari15a c002310
+futari10 c002310
+futariblk c002310
+ibarablk c002310
+ibarablka c002310
+deathsml c002310
+mmpork c002310
+*/
+
+
+GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  mushisam,  ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  mushisama, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  mushisam, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NOT_WORKING | GAME_NO_SOUND )

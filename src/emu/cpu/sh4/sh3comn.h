@@ -3,6 +3,23 @@
 #ifndef __SH3COMN_H__
 #define __SH3COMN_H__
 
+
+// actual port handling is more complex than this
+// which should be considered a temporary solution
+// just used some arbitrary  port nubmers
+#define SH3_PORT_A (0x10*8)
+#define SH3_PORT_B (0x11*8)
+#define SH3_PORT_C (0x12*8)
+#define SH3_PORT_D (0x13*8)
+#define SH3_PORT_E (0x14*8)
+#define SH3_PORT_F (0x15*8)
+#define SH3_PORT_G (0x16*8)
+#define SH3_PORT_H (0x17*8)
+/* no I */
+#define SH3_PORT_J (0x18*8)
+#define SH3_PORT_K (0x19*8)
+#define SH3_PORT_L (0x1a*8)
+
 /* SH3 lower area regs */
 
 #define SH3_LOWER_REGBASE (0x04000000)
@@ -36,7 +53,11 @@
 #define PGCR_PHCR	((0x400010c - SH3_LOWER_REGBASE)/4)
 #define PJCR_PKCR	((0x4000110 - SH3_LOWER_REGBASE)/4)
 #define PLCR_SCPCR	((0x4000114 - SH3_LOWER_REGBASE)/4)
+
+#define PADR_PBDR	((0x4000120 - SH3_LOWER_REGBASE)/4)
+#define PCDR_PDDR	((0x4000124 - SH3_LOWER_REGBASE)/4)
 #define PEDR_PFDR	((0x4000128 - SH3_LOWER_REGBASE)/4)
+#define PGDR_PHDR	((0x400012c - SH3_LOWER_REGBASE)/4)
 #define PJDR_PKDR	((0x4000130 - SH3_LOWER_REGBASE)/4)
 
 /* SH3 upper area */
