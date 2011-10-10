@@ -79,8 +79,8 @@ INLINE INT8 clamp(INT8 comp)
 // clr_t to r5g5b5
 INLINE UINT16 clr_to_pen(const clr_t *clr)
 {
-//	return (clr->r << 10) | (clr->g << 5) | clr->b;
-return 0x8000 | (clr->r << 10) | (clr->g << 5) | clr->b;
+	return (clr->r << 10) | (clr->g << 5) | clr->b;
+//return 0x8000 | (clr->r << 10) | (clr->g << 5) | clr->b;
 }
 
 // add clrs
@@ -275,7 +275,7 @@ INLINE void draw_sprite(
 				}
 
 				// write result
-				bmp[dst_x + x] = clr_to_pen(&s_clr);
+				bmp[dst_x + x] = clr_to_pen(&s_clr)|(pen&0x8000);
 			}
 
 		}
