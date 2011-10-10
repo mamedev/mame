@@ -37,7 +37,7 @@ public:
 	UINT32* m_tmapram1;
 	UINT32* m_tmapram2;
 
-
+	struct { int r,g,b,offs,offs_internal; } m_pal;
 };
 
 static WRITE32_HANDLER( gamtor_unk_w )
@@ -72,9 +72,37 @@ static WRITE32_HANDLER( gamtor_unk4_w )
 
 }
 
-static WRITE32_HANDLER( gamtor_unk5_w )
+static WRITE8_HANDLER( gamtor_ramdac_w )
 {
+	gaminator_state *state = space->machine().driver_data<gaminator_state>();
+	switch(offset)
+	{
+		case 3:
+			state->m_pal.offs = data;
+			state->m_pal.offs_internal = 0;
+			break;
+		case 2:
+			switch(state->m_pal.offs_internal)
+			{
+				case 0:
+					state->m_pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->m_pal.offs_internal++;
+					break;
+				case 1:
+					state->m_pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->m_pal.offs_internal++;
+					break;
+				case 2:
+					state->m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine(), state->m_pal.offs, MAKE_RGB(state->m_pal.r, state->m_pal.g, state->m_pal.b));
+					state->m_pal.offs_internal = 0;
+					state->m_pal.offs++;
+					state->m_pal.offs&=0xff;
+					break;
+			}
 
+			break;
+	}
 }
 
 static WRITE32_HANDLER( gamtor_unk6_w )
@@ -167,7 +195,7 @@ static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32 )
 	/* some kind of video control / blitter? */
 	AM_RANGE(0x400003c0, 0x400003c3) AM_WRITE( gamtor_unk3_w )
 	AM_RANGE(0x400003c4, 0x400003c7) AM_READWRITE( gamtor_unk4_r, gamtor_unk4_w )
-	AM_RANGE(0x400003c8, 0x400003cb) AM_WRITE( gamtor_unk5_w )
+	AM_RANGE(0x400003c8, 0x400003cb) AM_WRITE8( gamtor_ramdac_w, 0xffffffff )
 	AM_RANGE(0x400003cc, 0x400003cf) AM_WRITE( gamtor_unk6_w )
 	AM_RANGE(0x400003d4, 0x400003d7) AM_READWRITE( gamtor_unk2_r, gamtor_unk2_w )
 	AM_RANGE(0x400003d8, 0x400003fb) AM_READ( gamtor_unk7_r )
@@ -199,7 +227,7 @@ static MACHINE_CONFIG_START( gaminator, gaminator_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(gamtor)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x100)
 
 
 	MCFG_VIDEO_START(gamtor)
