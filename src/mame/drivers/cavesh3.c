@@ -12,14 +12,14 @@ Why does mmmbnk write to 0 on startup, is it related to the broken GFX you see?
 What is mmpork checking when it reports 'ERROR'
 General SH3 cleanups, verify dividers and such
 Speedups? (without breaking overall timing)
-Missing GFX in Death Smiles?
+Solid White BG on DS title screen? Lack of BG / GFX clear in MMP boot/test mode?
 
 */
 
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/sh4/sh3comn.h"
-
+#include "profiler.h"
 
 class cavesh3_state : public driver_device
 {
@@ -384,6 +384,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr, int layer)
 	);
 }
 
+// Death Smiles has bad text with wrong clip sizes, must clip to screen size.
 static void cavesh_gfx_exec(address_space &space)
 {
 	UINT16 layer = 0;
@@ -394,8 +395,8 @@ static void cavesh_gfx_exec(address_space &space)
 
 	cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
 	cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
-	cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 0x180-1;
-	cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 0x100-1;
+	cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 320-1;
+	cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 240-1;
 
 	while (1)
 	{
@@ -417,8 +418,8 @@ static void cavesh_gfx_exec(address_space &space)
 				{
 					cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
 					cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
-					cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 0x180-1;
-					cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 0x100-1;
+					cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 320-1;
+					cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 240-1;
 				}
 				else
 				{
@@ -458,7 +459,9 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 	{
 		if (data & 1)
 		{
+			g_profiler.start(PROFILER_USER1);
 			cavesh_gfx_exec(*space);
+			g_profiler.stop();
 		}
 	}
 }
@@ -468,14 +471,14 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 static SCREEN_UPDATE( cavesh3 )
 {
 	int scroll_0_x, scroll_0_y;
-//	int scroll_1_x, scroll_1_y;
+	//int scroll_1_x, scroll_1_y;
 	
 	bitmap_fill(bitmap, cliprect, 0);
 
 	scroll_0_x = -cavesh_gfx_scroll_0_x;
 	scroll_0_y = -cavesh_gfx_scroll_0_y;
-//	scroll_1_x = -cavesh_gfx_scroll_1_x;
-//	scroll_1_y = -cavesh_gfx_scroll_1_y;
+	//scroll_1_x = -cavesh_gfx_scroll_1_x;
+	//scroll_1_y = -cavesh_gfx_scroll_1_y;
 
 	//logerror("SCREEN UPDATE\n");
 
@@ -876,14 +879,17 @@ static WRITE8_HANDLER( ibara_flash_io_w )
 
 
 
-
+// ibarablk uses the rtc to render the clock in the first attract demo
+// if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
 static READ8_HANDLER( serial_rtc_eeprom_r )
 {
 	switch (offset)
 	{
 		default:
+			return 0;
 		//logerror("unknown serial_rtc_eeprom_r access offset %02x\n", offset);
-		return 0xff;
+		case 1:
+			return 0xfe;
 	}
 }
 
@@ -1194,7 +1200,7 @@ ROM_START( ibarablk )
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) /* (2006/02/06. MASTER VER.) */
-
+	
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) /* (2006/02/06 MASTER VER.) */
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
@@ -1316,8 +1322,8 @@ GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave"
 GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, futariblk, futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  mushisam, ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  espgal2, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NOT_WORKING | GAME_NO_SOUND )
