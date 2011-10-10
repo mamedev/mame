@@ -2517,6 +2517,27 @@ static READ32_HANDLER( namcos22_gun_r )
 	}
 } /* namcos22_gun_r */
 
+static WRITE32_HANDLER( namcos22_cpuleds_w )
+{
+	if (ACCESSING_BITS_0_15) data &= 0xff;
+	else data = (data>>16) & 0xff;
+
+	// GYRGYRGY green/yellow/red, 0=on 1=off
+	// 76543210
+#if 0
+	char msg[0x10];
+	sprintf(msg,"________");
+	if (~data&0x80) msg[0]='G';
+	if (~data&0x40) msg[1]='Y';
+	if (~data&0x20) msg[2]='R';
+	if (~data&0x10) msg[3]='G';
+	if (~data&0x08) msg[4]='Y';
+	if (~data&0x04) msg[5]='R';
+	if (~data&0x02) msg[6]='G';
+	if (~data&0x01) msg[7]='Y';
+	popmessage("%s",msg);
+#endif
+}
 
 static READ32_HANDLER( alpinesa_prot_r )
 {
@@ -2556,7 +2577,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namcos22_keycus_r, namcos22_keycus_w)
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
 	AM_RANGE(0x420000, 0x42000f) AM_READ(namcos22_C139_SCI_r) AM_WRITEONLY /* C139 SCI registers */
-	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r) AM_WRITENOP /* LEDs? */
+	AM_RANGE(0x430000, 0x43000f) AM_READWRITE(namcos22_gun_r, namcos22_cpuleds_w)
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE(namcos22_portbit_r, namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
@@ -2564,7 +2585,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22_port800000_w) /* (C304 C399)  40380000 during SPOT test */
 	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czattr)
 	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE(namcos22s_czram_r, namcos22s_czram_w)
-	AM_RANGE(0x820000, 0x8202ff) AM_RAM /* unknown (air combat) */
+	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */
 	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_BASE_MEMBER(namcos22_state, m_gamma)
 	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x860000, 0x860007) AM_READWRITE(spotram_r, spotram_w)
