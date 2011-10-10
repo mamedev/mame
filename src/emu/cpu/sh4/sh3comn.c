@@ -279,6 +279,23 @@ READ32_HANDLER( sh3_internal_r )
 				}
 				break;
 
+			case PLDR_SCPDR:
+				{
+					if (mem_mask & 0xffff0000)
+					{
+						//logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (PLDR)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
+						return sh4->io->read_qword(SH3_PORT_L)<<24;
+					}
+
+					if (mem_mask & 0x0000ffff)
+					{
+						logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (SCPDR)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
+						//return sh4->io->read_qword(SH3_PORT_K)<<8;
+					}
+				}
+				break;
+
+
 			default:
 				{
 					logerror("'%s' (%08x): unmapped internal read from %08x mask %08x\n",

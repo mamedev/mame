@@ -8,8 +8,11 @@ Eeprom
 NAND/Flash Writing and Saving! (DeathSmiles uses it for Unlock data)
 Improve Blending precision?
 Sound
-Make mmmbnk boot
-General SH3 cleanups
+Why does mmmbnk write to 0 on startup, is it related to the broken GFX you see?
+What is mmpork checking when it reports 'ERROR'
+General SH3 cleanups, verify dividers and such
+Speedups? (without breaking overall timing)
+Missing GFX in Death Smiles?
 
 */
 
@@ -217,7 +220,7 @@ INLINE void draw_sprite(
 )
 {
 
-	logerror("draw sprite %04x %04x - %04x %04x\n", dst_x, dst_y, dimx, dimy);
+	//logerror("draw sprite %04x %04x - %04x %04x\n", dst_x, dst_y, dimx, dimy);
 
 	int x,y, xf,yf;
 	clr_t s_clr, d_clr, clr0, clr1;
@@ -474,7 +477,7 @@ static SCREEN_UPDATE( cavesh3 )
 	scroll_1_x = -cavesh_gfx_scroll_1_x;
 	scroll_1_y = -cavesh_gfx_scroll_1_y;
 
-	logerror("SCREEN UPDATE\n");
+	//logerror("SCREEN UPDATE\n");
 
 	copyscrollbitmap_trans(bitmap, cavesh_bitmaps[0], 1,&scroll_0_x, 1,&scroll_0_y, cliprect, 0x8000);
 
@@ -494,6 +497,9 @@ static READ32_HANDLER( cavesh3_blitter_r )
 
 		case 0x28:
 			return 0xffffffff;
+
+		case 0x50:
+			return input_port_read(space->machine(), "DSW");
 
 		default:
 			logerror("unknowncavesh3_blitter_r %08x %08x\n", offset*4, mem_mask);
@@ -555,8 +561,8 @@ static WRITE64_HANDLER( ymz2770c_z_w )
 
 UINT8 flash_page_data[FLASH_PAGE_SIZE];
 
-typedef enum							{ STATE_IDLE = 0,	STATE_READ,		STATE_READ_ID,	STATE_READ_STATUS	} flash_state_t;
-static const char *flash_state_name[] =	{ "IDLE",			"READ",			"READ_ID",		"READ_STATUS"		};
+typedef enum							{ STATE_IDLE = 0,	STATE_READ,		STATE_READ_ID,	STATE_READ_STATUS, STATE_BLOCK_ERASE, STATE_PAGE_PROGRAM	} flash_state_t;
+static const char *flash_state_name[] =	{ "IDLE",			"READ",			"READ_ID",		"READ_STATUS",     "BLOCK ERASE",     "PAGE PROGRAM"		};
 
 static flash_state_t flash_state;
 
@@ -629,8 +635,20 @@ static WRITE8_HANDLER( flash_cmd_w )
 				flash_addr_seq = 0;
 				break;
 
+			case 0x60:  // BLOCK ERASE
+				flash_addr_seq = 0;
+				break;
+
 			case 0x70:	// READ STATUS
 				flash_change_state( space->machine(), STATE_READ_STATUS );
+				break;
+
+			case 0x80:	// PAGE / CACHE PROGRAM
+				flash_addr_seq = 0;
+				flash_page_addr = 0;// flash_col;
+				//flash_page_index = flash_row;
+
+
 				break;
 
 			case 0x90:	// READ ID
@@ -666,12 +684,52 @@ static WRITE8_HANDLER( flash_cmd_w )
 				}
 				break;
 
+			case 0x60: // BLOCK ERASE
+				if (data==0xd0)
+				{
+
+					 flash_change_state( space->machine(), STATE_BLOCK_ERASE );
+					 //logerror("%08x FLASH: caching page = %04X\n", cpu_get_pc(&space->device()), flash_row);
+				}
+				else
+				{
+					logerror("unexpected 2nd command after BLOCK ERASE\n");
+				}
+				break;
+			case 0x80:
+				if (data==0x10)
+				{
+				//	UINT8 *region = space->machine().region( "game" )->base();
+					flash_change_state( space->machine(), STATE_PAGE_PROGRAM );
+					flash_page_addr = flash_col;
+					flash_page_index = flash_row;
+					// don't do this until it's verified as OK
+					//memcpy(region + flash_row * FLASH_PAGE_SIZE, flash_page_data, FLASH_PAGE_SIZE);
+
+				}
+				else
+				{
+					logerror("unexpected 2nd command after SPAGE PROGRAM\n");
+				}
+				break;
+				
+
 			default:
 			{
 				logerror("%08x FLASH: unknown cmd2 = %02X (cmd1 = %02X)\n", cpu_get_pc(&space->device()), data, flash_cmd_prev);
 			}
 		}
 	}
+}
+
+static WRITE8_HANDLER( flash_data_w ) // death smiles
+{
+	if (!flash_enab)
+		return;
+
+	logerror("flash data write %04x\n", flash_page_addr);
+	flash_page_data[flash_page_addr] = data;
+	flash_page_addr++;
 }
 
 static WRITE8_HANDLER( flash_addr_w )
@@ -798,9 +856,12 @@ static WRITE8_HANDLER( ibara_flash_io_w )
 	switch (offset)
 	{
 		default:
-		case 0x00:
 		case 0x03:
 			logerror("unknown ibara_flash_io_w offset %04x data %02x\n", offset, data); // 03 enable/disable fgpa access?
+			break;
+
+		case 0x00:
+			flash_data_w(space, offset, data);
 			break;
 
 		case 0x01:
@@ -821,7 +882,7 @@ static READ8_HANDLER( serial_rtc_eeprom_r )
 	switch (offset)
 	{
 		default:
-		logerror("unknown serial_rtc_eeprom_r access offset %02x\n", offset);
+		//logerror("unknown serial_rtc_eeprom_r access offset %02x\n", offset);
 		return 0xff;
 	}
 }
@@ -849,14 +910,19 @@ static WRITE8_HANDLER( serial_rtc_eeprom_w )
 
 static UINT64*cavesh3_ram;
 
+static WRITE64_HANDLER( cavesh3_nop_write )
+{
+
+}
+
 static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(cavesh3_nop_write) // mmmbnk writes here on startup for some reason..
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 
 	/*       0x04000000, 0x07ffffff  SH3 Internal Regs (including ports) */
   
-	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_BASE(&cavesh3_ram)// work RAM
-	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM // mirror of above on type B boards, extra ram on type D
+	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_BASE(&cavesh3_ram)//  AM_SHARE("mainram")// work RAM
+	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM// AM_SHARE("mainram") // mirror of above on type B boards, extra ram on type D
 
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(ibara_flash_io_r, ibara_flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_READWRITE(ymz2770c_z_r, ymz2770c_z_w)
@@ -1211,6 +1277,23 @@ DRIVER_INIT( mushisama )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0024d8, 0xc0024df, FUNC(mushisama_speedup_r) );
 }
 
+static READ64_HANDLER( espgal2_speedup_r )
+{
+	int pc = cpu_get_pc(&space->device());
+
+	if ( pc == 0xc05177a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // espgal2
+	if ( pc == 0xc05176a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork
+	if ( pc == 0xc0519a2 ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // deathsml
+	//else printf("read %08x\n", cpu_get_pc(&space->device()));
+	return cavesh3_ram[0x002310/8];
+}
+
+DRIVER_INIT( espgal2 )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc002310, 0xc002317, FUNC(espgal2_speedup_r) );
+}
+
+
 
 /*
 espgal2 c002310
@@ -1227,17 +1310,17 @@ mmpork c002310
 
 GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  mushisam,  ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  mushisama, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  mushisam, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, futariblk, futari15,   cavesh3,    cavesh3,  0, ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, futariblk, futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  0, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  espgal2, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, mmmbnk,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Medal Mahjong Moukari Bancho no Kiban (2007/06/05 MASTER VER.)",   GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /*
