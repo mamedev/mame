@@ -101,7 +101,7 @@ ROM_START( atlantca )
 	ROM_LOAD( "u21.8 atla01-aa-a-std", 0x300000, 0x100000, CRC(a1bcd0a3) SHA1(0fd66c3bda92cead9457c35ce4b39f97293bb119) )
 
 	ROM_REGION( 0x400000, "pals", 0 ) // pal (converted from JED)
-	ROM_LOAD( "atlantica.bin", 0x0000, 0x0002dd, CRC(c3fdcd7d) SHA1(b56c859689e44689474142e537951c1cef40e46b) )	
+	ROM_LOAD( "atlantica.bin", 0x0000, 0x0002dd, CRC(c3fdcd7d) SHA1(b56c859689e44689474142e537951c1cef40e46b) )
 ROM_END
 
 
@@ -129,7 +129,7 @@ ROM_START( atlantcaa )
 	ROM_LOAD( "u21.8 atla01-aa-a-std", 0x300000, 0x100000, CRC(a1bcd0a3) SHA1(0fd66c3bda92cead9457c35ce4b39f97293bb119) )
 
 	ROM_REGION( 0x400000, "pals", 0 ) // pal (converted from JED)
-	ROM_LOAD( "atlantica.bin", 0x0000, 0x0002dd, CRC(c3fdcd7d) SHA1(b56c859689e44689474142e537951c1cef40e46b) )	
+	ROM_LOAD( "atlantica.bin", 0x0000, 0x0002dd, CRC(c3fdcd7d) SHA1(b56c859689e44689474142e537951c1cef40e46b) )
 ROM_END
 
 
@@ -200,7 +200,7 @@ ROM_START( cfbluea )
 	ROM_LOAD( "u13-80.bin", 0x0000, 0x100000, CRC(478bb4a5) SHA1(94304fe1477bfc66e8dcf2c2c91226754cb8c32a) )
 	ROM_LOAD( "u14-80.bin", 0x0000, 0x100000, CRC(89aaf76b) SHA1(6e731ba815c20b184e44495dd2231d9ae315a146) )
 	ROM_LOAD( "u15-80.bin", 0x0000, 0x100000, CRC(cfe9e4d4) SHA1(8cd4aadd885fc5500b0a2c1e41b1f096bd4cd2b5) )
-	
+
 	ROM_REGION( 0x400000, "u18u21", 0 ) // sound
 	ROM_LOAD( "u18-80.bin", 0x0000, 0x100000, CRC(77d6c103) SHA1(667c4c77eeba3af9c8c772a9ffe2941f8f3df38f) )
 	ROM_LOAD( "u19-80.bin", 0x0000, 0x100000, CRC(36371ef6) SHA1(83a454a71e01962937b23817419fe2e071f077ee) )
@@ -420,7 +420,7 @@ ROM_START( beetleup )
 	ROM_LOAD( "u06_n5b0-a-04-b.65aa.bin", 0x0000, 0x020000, CRC(d68d08e4) SHA1(548577d43f4136cf16266fe6855898a30fa49965) )
 	ROM_LOAD( "u06_n5b0-a-05-b.648f.bin", 0x0000, 0x020000, CRC(2d2ff35f) SHA1(97759fbad4b6b30ca8f8ea74da74cfaa433a7fa2) )
 	ROM_LOAD( "u06_n5b0-a-06-b.64 56.bin", 0x0000, 0x020000, CRC(7b4a6a97) SHA1(e3d54476730ca34a9f7214219cf991a220e15d5c) )
-	
+
 	ROM_REGION( 0x800000, "u8u15", 0 ) // gfx
 	ROM_LOAD( "u08_5804.bin", 0x0000, 0x100000, CRC(65a020e3) SHA1(2bb781905338e2d444222095d8430137632fae3d) )
 	ROM_LOAD( "u09_7b88.bin", 0x0000, 0x100000, CRC(8443972b) SHA1(5f2eea84ba18a83502f36eeaa52cff49a1631668) )
@@ -465,11 +465,11 @@ ROM_END
 ROM_START( bigblue )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "o_-bbbu01-adbaa-cb-std_.8mu02.bin", 0x0000, 0x100000, CRC(62d08d90) SHA1(fa563dd59eacd3021744863245aa7f82dea2c266) )
-	
+
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "big blue bags.bin", 0x0000, 0x020000, CRC(4ec3fc1c) SHA1(7a081d370c54a6ea333957958b1341560458e845) )
 	ROM_LOAD( "bbbu01-c-za-std_-5-xx-xx-axx.1mu06.bin", 0x0000, 0x020000, CRC(09e6df0b) SHA1(85961160f95cb8d223f73483d6edad79fa37d729) )
-	
+
 	ROM_REGION( 0x800000, "u8u15", 0 ) // gfx
 	ROM_LOAD( "bbbu01-a_-a-std_-5_.8gu08.bin", 0x0000, 0x100000, CRC(32f01864) SHA1(f515cfa2ecdc239b441f6f5f7033516e88030ad6) )
 	ROM_LOAD( "bbbu01-a_-a-std_-5_.8gu09.bin", 0x0000, 0x100000, CRC(6f11b908) SHA1(663382bc295615afbc3a9a39c7089470b8b55926) )
@@ -490,7 +490,7 @@ ROM_END
 ROM_START( castaway )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "u2.8 o-cast-b-a-cc", 0x0000, 0x100000, CRC(8f103bb3) SHA1(65596aff9cfb2345a36a0e2a2b03a2b4310d421c) )
-	
+
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6.1 c5bo-a-03-a", 0x0000, 0x020000, CRC(3917302a) SHA1(39b0672c36554712825a0e310522933be4b46d84) )
 
@@ -514,7 +514,7 @@ ROM_END
 ROM_START( castawaya ) // bad dump? (roms all look incorrect size to me)
 	ROM_REGION( 0x100000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "u-2 m27c801.bin", 0x0000, 0x080000, CRC(55b61206) SHA1(abdbe887a6739dbc9f51838b31d23d3c8d8f03dd) )
-	
+
 	ROM_REGION( 0x080000, "u6", 0 ) // config?
 	ROM_LOAD( "u-6 m27c801.bin", 0x0000, 0x080000, CRC(86538b30) SHA1(6b8d732b59af2cc1a6524989f8cf12a4d4dac484) )
 
@@ -567,7 +567,7 @@ ROM_END
 ROM_START( drmmake )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "u2-801", 0x0000, 0x100000, CRC(c809ecf0) SHA1(4ab641f9b805cd13d1fb860a3e9776505474a95d) )
-	
+
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6-1001", 0x0000, 0x020000, CRC(7a00ad2a) SHA1(67d90b10b4f62922c4ed94bb8a0f77e474ee385d) )
 	ROM_LOAD( "dream maker.bin", 0x0000, 0x020000, CRC(49c19eb3) SHA1(a55d4f9a0dd2b1db41fb28f475efa7e9f7c85be6) )
@@ -589,7 +589,7 @@ ROM_START( drmmake )
 	ROM_LOAD( "u21-801", 0x0000, 0x100000, CRC(d5e81837) SHA1(ebbd5a3a73c3f440e518103da7e8db8c0818f351) )
 ROM_END
 
-	
+
 ROM_START( goldcity )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "o_-goci01-afaaa-cd-rus_.8mu02", 0x0000, 0x100000, CRC(59c19539) SHA1(7c40eee8e534795a44b33140535284b2bc2a9ac5) )
@@ -757,7 +757,7 @@ ROM_END
 ROM_START( 3wishrd )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "3w-baca.8u2", 0x0000, 0x100000, CRC(14ca9f18) SHA1(8bf5eaa11ca70d14c7ed69a17c4610ecca6f76f8) )
-	
+
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "3590a25a.1u6", 0x0000, 0x020000, CRC(8a10399e) SHA1(9658705821cdd39e1022a2b63dd61355d44c23f6) )
 	ROM_LOAD( "3590a26a.1u6", 0x0000, 0x020000, CRC(86ec866d) SHA1(1fbcbfec49900e45ed7866857b0314de07020405) )

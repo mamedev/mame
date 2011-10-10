@@ -3498,7 +3498,7 @@ static DRIVER_INIT( m1 )
 
 				if ((rom>=0x20) && (rom<0x7f))
 				{
-					printf("%c", rom); 
+					printf("%c", rom);
 				}
 				else
 				{

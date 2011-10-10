@@ -135,7 +135,7 @@ private:
 	static const device_timer_id TIMER_1 = 0;
 	static const device_timer_id TIMER_2 = 1;
 	static const device_timer_id TIMER_3 = 2;
-	
+
 	static const int PORT_A = 0;
 	static const int PORT_B = 1;
 	static const int PORT_C = 2;

@@ -493,7 +493,7 @@ CPU_GET_INFO( t11 )
 		case CPUINFO_STR_REGISTER + T11_R3:				sprintf(info->s, "R3:%04X", cpustate->reg[3].w.l); break;
 		case CPUINFO_STR_REGISTER + T11_R4:				sprintf(info->s, "R4:%04X", cpustate->reg[4].w.l); break;
 		case CPUINFO_STR_REGISTER + T11_R5:				sprintf(info->s, "R5:%04X", cpustate->reg[5].w.l); break;
-		
+
 		case CPUINFO_IS_OCTAL:							info->i = true;							break;
 	}
 }

@@ -1,4 +1,4 @@
-/* 
+/*
 
 WMS Russian Fruit Machines (Mechanical?)
 
@@ -84,7 +84,7 @@ ROM_START( wmsboom )
 	ROM_LOAD( "xu-30.bin", 0x0000, 0x080000, CRC(ba1b2ab6) SHA1(087a360c1260484ad3bc0b2601003da9581a92b5) )
 	ROM_LOAD( "xu-31.bin", 0x0000, 0x080000, CRC(3ba6c20d) SHA1(2324a7bc83f695541bbf1a66c0559fea30f3d007) )
 	ROM_LOAD( "xu-17.bin", 0x0000, 0x080000, CRC(948e8104) SHA1(04bffd1bb2dc9b96550424e8be64a75907b4cbe4) )
-	ROM_LOAD( "xu-18.bin", 0x0000, 0x080000, CRC(68187707) SHA1(9a85fe5737ae372999f2bfaf50263c00fc9b22f4) )	
+	ROM_LOAD( "xu-18.bin", 0x0000, 0x080000, CRC(68187707) SHA1(9a85fe5737ae372999f2bfaf50263c00fc9b22f4) )
 ROM_END
 
 ROM_START( cashcrop )
@@ -118,7 +118,7 @@ ROM_END
 ROM_START( hottop )
 	ROM_REGION32_LE(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, NO_DUMP ) // missing?
-	
+
 	ROM_REGION(0x100000, "rom", 0)
 	ROM_LOAD( "xu-2.bin", 0x0000, 0x100000, CRC(15ebe9a4) SHA1(3852bf9bd0976abe46102b2c237a513f6447bea6) )
 	ROM_LOAD( "xu-4.bin", 0x0000, 0x100000, CRC(8cab6576) SHA1(be1dc406cbf4fd4035f4e123c4095a0a07350035) )
@@ -132,7 +132,7 @@ ROM_END
 ROM_START( inwinner )
 	ROM_REGION32_LE(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(f5c26579) SHA1(4ef22c0115417320ef17f0c3fc7550db24bdcb8c) )
-	
+
 	ROM_REGION(0x100000, "rom", 0)
 	ROM_LOAD( "xu-2.bin", 0x0000, 0x100000, CRC(93082de5) SHA1(5469cd5dfc2a54707cf08feae1e09d808efabf6c) )
 	// sound
@@ -150,7 +150,7 @@ ROM_START( jptparty )
 
 	ROM_REGION(0x100000, "rom", 0)
 	ROM_LOAD( "xu-2.bin", 0x0000, 0x100000, CRC(78c8bfcd) SHA1(a6ce68a88bcd3c74bffcc852d6f91b6f0f077a91) )
-	// sound 
+	// sound
 	ROM_LOAD( "xu-30.bin", 0x0000, 0x100000, CRC(969ac077) SHA1(30207da5f9c3e1fc2a1f4d1bc66fcd2bfc760a8e) )
 	ROM_LOAD( "xu-31.bin", 0x0000, 0x100000, CRC(c76a100e) SHA1(e29b65a92fd8254f577852acfefbec40840e4962) )
 	ROM_LOAD( "xu-17.bin", 0x0000, 0x100000, CRC(53001015) SHA1(ce08db51f812a71db93026bb9d9c33e705020860) )
@@ -263,7 +263,7 @@ ROM_START( reelemin )
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(1e4b64f1) SHA1(f082b2a7b6e029ffded1eec6fbc5f755bdd8d9eb) )
 ROM_END
 
-	
+
 ROM_START( sonoth )
 	ROM_REGION32_LE(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a5afc1dd) SHA1(5743c630d382d1cc2f7720a2038b105f0dd49790) )
@@ -315,7 +315,7 @@ ROM_START( wdun )
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(59aaceb0) SHA1(2f7506b634291cc1f7654115fe6be7d34ba16c8c) )
 ROM_END
 
-	
+
 ROM_START( winbid )
 	ROM_REGION32_LE(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(873eecfb) SHA1(35960c9a2a4efeac8b8cea94f1eac6ffb175b9a9) )

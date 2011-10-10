@@ -78,7 +78,7 @@ typedef struct
 	address_space *program;
 	direct_read_data *direct;
 	address_space *io;
-	
+
 	// sh4 internal
 	UINT32	*m;
 

@@ -280,7 +280,7 @@ static const char *CTMS_DCS[] = { "Pulse", "One-shot", "Square Wave", "Do not us
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_interrupt_vector - 
+//  get_interrupt_vector -
 //-------------------------------------------------
 
 inline void z8536_device::get_interrupt_vector()
@@ -305,10 +305,10 @@ inline void z8536_device::get_interrupt_vector()
 			if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_PA_VIS)
 			{
 				vector &= 0xf1;
-				
+
 				if (((m_register[PORT_A_MODE_SPECIFICATION] & PMS_PMS_MASK) >> 1) == PMS_OR_PEV)
 				{
-					if 		(m_match[PORT_A] & 0x80) vector |= 7 << 1;
+					if		(m_match[PORT_A] & 0x80) vector |= 7 << 1;
 					else if (m_match[PORT_A] & 0x40) vector |= 6 << 1;
 					else if (m_match[PORT_A] & 0x20) vector |= 5 << 1;
 					else if (m_match[PORT_A] & 0x10) vector |= 4 << 1;
@@ -339,10 +339,10 @@ inline void z8536_device::get_interrupt_vector()
 			if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_PB_VIS)
 			{
 				vector &= 0xf1;
-				
+
 				if (((m_register[PORT_B_MODE_SPECIFICATION] & PMS_PMS_MASK) >> 1) == PMS_OR_PEV)
 				{
-					if 		(m_match[PORT_B] & 0x80) vector |= 7 << 1;
+					if		(m_match[PORT_B] & 0x80) vector |= 7 << 1;
 					else if (m_match[PORT_B] & 0x40) vector |= 6 << 1;
 					else if (m_match[PORT_B] & 0x20) vector |= 5 << 1;
 					else if (m_match[PORT_B] & 0x10) vector |= 4 << 1;
@@ -471,7 +471,7 @@ inline UINT8 z8536_device::read_register(offs_t offset)
 		m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + timer] &= ~CTCS_RCC;
 		}
 		break;
-		
+
 	case CURRENT_VECTOR:
 		get_interrupt_vector();
 		data = m_register[offset];
@@ -602,7 +602,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		}
 
 		m_register[offset] = (m_register[offset] & ~PCS_IOE) | (data & PCS_IOE);
-		
+
 		match_pattern(offset - PORT_A_COMMAND_AND_STATUS);
 		check_interrupt();
 		}
@@ -900,7 +900,7 @@ inline void z8536_device::count(device_timer_id id)
 		else
 		{
 			if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Interrupt Pending\n", machine().describe_context(), tag(), id + 1);
-		
+
 			// set interrupt pending bit
 			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] |= CTCS_IP;
 		}
@@ -966,7 +966,7 @@ inline void z8536_device::match_pattern(int port)
 	{
 	case PMS_OR_PEV:
 		m_match[port] = m_input[port] & ddr & pm;
-		
+
 		if (m_match[port])
 		{
 			if (LOG) logerror("%s Z8536 '%s' Port %c Interrupt Pending\n", machine().describe_context(), tag(), 'A' + port);
@@ -990,17 +990,17 @@ inline void z8536_device::external_port_w(int port, int bit, int state)
 	case PORT_B:
 		{
 		UINT8 ddr = m_register[PORT_A_DATA_DIRECTION + (port << 3)];
-		
+
 		if (!BIT(ddr, bit)) return;
 
 		if (LOG) logerror("%s Z8536 '%s' Port %c Bit %u: %u\n", machine().describe_context(), tag(), 'A' + port, bit, state);
-	
+
 		m_input[port] = (m_input[port] & ~(1 << bit)) | (state << bit);
-		
+
 		match_pattern(port);
 		}
 		break;
-		
+
 	case PORT_C:
 		break;
 	}
@@ -1064,7 +1064,7 @@ void z8536_device::device_start()
 		m_buffer[i] = 0;
 		m_match[i] = 0;
 	}
-	
+
 	// allocate timer
 	m_timer = timer_alloc();
 	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
@@ -1295,7 +1295,7 @@ int z8536_device::intack_r()
 	}
 
 	check_interrupt();
-	
+
 	if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_NV)
 	{
 		// no vector

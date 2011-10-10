@@ -15,11 +15,11 @@
   peripheral area?)
 
   llcharm ->
-	'maincpu' (014902D2): unmapped program memory write to 000000D8 = 00000000 & FFFFFFFF
-	'maincpu' (01490312): unmapped program memory write to 000000B8 = 0BB19C00 & FFFFFFFF
-	'maincpu' (0149031C): unmapped program memory write to 000000D8 = 00000001 & FFFFFFFF
-	'maincpu' (01490312): unmapped program memory write to 000000B8 = 038B9C00 & FFFFFFFF
-	'maincpu' (0149031C): unmapped program memory write to 000000D8 = 00000001 & FFFFFFFF
+    'maincpu' (014902D2): unmapped program memory write to 000000D8 = 00000000 & FFFFFFFF
+    'maincpu' (01490312): unmapped program memory write to 000000B8 = 0BB19C00 & FFFFFFFF
+    'maincpu' (0149031C): unmapped program memory write to 000000D8 = 00000001 & FFFFFFFF
+    'maincpu' (01490312): unmapped program memory write to 000000B8 = 038B9C00 & FFFFFFFF
+    'maincpu' (0149031C): unmapped program memory write to 000000D8 = 00000001 & FFFFFFFF
 
 */
 

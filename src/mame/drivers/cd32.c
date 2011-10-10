@@ -1371,7 +1371,7 @@ static DRIVER_INIT(mgprem11)
 }
 
 static INPUT_PORTS_START( odeontw2 )
-//	PORT_INCLUDE( cd32 )
+//  PORT_INCLUDE( cd32 )
 	PORT_INCLUDE( microtouch )
 
 	PORT_START("CIA0PORTA")

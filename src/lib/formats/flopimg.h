@@ -417,8 +417,8 @@ private:
 	int sbit_r(const UINT8 *bitstream, int pos);
 	int sbit_rp(const UINT8 *bitstream, int &pos, int track_size);
 	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
-	
-	int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);	
+
+	int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);
 };
 
 // a device_type is simply a pointer to its alloc function

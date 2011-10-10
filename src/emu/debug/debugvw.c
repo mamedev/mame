@@ -66,7 +66,7 @@ debug_view_source::debug_view_source(const char *name, device_t *device)
 	  m_is_octal(false)
 {
 	device_execute_interface *intf;
-	if (device && device->interface(intf)) 
+	if (device && device->interface(intf))
 		m_is_octal = intf->is_octal();
 
 }

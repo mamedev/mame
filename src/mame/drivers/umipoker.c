@@ -4,7 +4,7 @@
     Slot Poker Saiyuki (c) 1998 World Station Co.,LTD
 
     Driver by Angelo Salese.
-	Additional work by Roberto Fresca.
+    Additional work by Roberto Fresca.
 
     TODO:
     - Fix clocks;
@@ -219,7 +219,7 @@ static WRITE16_HANDLER( lamps_w )
    (yellow)    (green)      (red)       (red)      (green)     (yellow)
 
   Seems that only saiyukip has programmed lamps.
-  
+
   0x0000 - Normal State (lamps off).
   0x0020 - RIGHT lamp.
   0x0200 - TAKE lamp.
@@ -238,7 +238,7 @@ static WRITE16_HANDLER( lamps_w )
   ---- x--- ---- ----  BET lamp.
   ---x ---- ---- ----  LEFT/STOP lamp.
   --x- ---- ---- ----  START lamp.
-  
+
 */
 	output_set_lamp_value(0, (data >> 5) & 1);		/* Lamp 0 - RIGHT */
 	output_set_lamp_value(1, (data >> 9) & 1);		/* Lamp 1 - TAKE */
@@ -262,7 +262,7 @@ static WRITE16_HANDLER( umi_counters_w )
   ---- ---- --x- ----  Coin 1.
   ---- ---- -x-- ----  Coin 2, 3 and Remote.
   xxxx xxxx x--x xxx-  Unknown / Not used.
-  
+
 */
 	coin_counter_w(space->machine(), 0, data & 0x20);	/* COIN 1 */
 	coin_counter_w(space->machine(), 1, data & 0x40);	/* COIN 2 */
@@ -285,7 +285,7 @@ static WRITE16_HANDLER( saiyu_counters_w )
   -x-- ---- ---- ----  Coin 2, 3 and Remote.
   x--x xxx- xxxx xxxx  Unknown / Not used.
 
-*/  
+*/
 	coin_counter_w(space->machine(), 0, data & 0x2000);	/* COIN 1 */
 	coin_counter_w(space->machine(), 1, data & 0x4000);	/* COIN 2 */
 	coin_counter_w(space->machine(), 2, data & 0x0100);	/* PAYOUT */
@@ -306,8 +306,8 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("IN1") // unused?
 	AM_RANGE(0xe00008, 0xe00009) AM_READ_PORT("IN2")
-//	AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE(lamps_w) -----> lamps only for saiyukip.
-//	AM_RANGE(0xe00010, 0xe00011) AM_WRITE(counters_w) --> coin counters for both games.
+//  AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE(lamps_w) -----> lamps only for saiyukip.
+//  AM_RANGE(0xe00010, 0xe00011) AM_WRITE(counters_w) --> coin counters for both games.
 	AM_RANGE(0xe00014, 0xe00015) AM_READ_PORT("DSW1-2")
 	AM_RANGE(0xe00018, 0xe00019) AM_READ_PORT("DSW3-4")
 	AM_RANGE(0xe00020, 0xe00021) AM_WRITE(umipoker_scrolly_0_w)
@@ -750,5 +750,5 @@ static DRIVER_INIT( saiyukip )
 ******************************************/
 
 /*     YEAR  NAME       PARENT    MACHINE    INPUT      INIT      ROT    COMPANY                  FULLNAME                                 FLAGS   LAYOUT      */
-GAME(  1997, umipoker,  0,        umipoker,  umipoker,  umipoker, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 ) 						// title screen is toggleable thru a dsw
+GAME(  1997, umipoker,  0,        umipoker,  umipoker,  umipoker, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )						// title screen is toggleable thru a dsw
 GAMEL( 1998, saiyukip,  0,        umipoker,  saiyukip,  saiyukip, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )

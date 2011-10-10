@@ -3692,7 +3692,7 @@ ROM_END
 
 ROM_START( pbobblen ) /* MVS ONLY RELEASE */
 	/* This set uses CHA and PROG board from Power Spikes II. Six Power Spikes II prom's are replaced with
-	Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? */
+    Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "d96-07.ep1", 0x000000, 0x080000, CRC(6102ca14) SHA1(328429d11de5b327a0654ae0548da4d0025a2ae6) ) /* 27C240 */
 

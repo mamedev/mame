@@ -741,9 +741,9 @@ void h63484_device::command_rct_exec()
 	int i;
 	UINT8 res,data_r;
 
-//	area = (m_cr & 0xe0) >> 5;
+//  area = (m_cr & 0xe0) >> 5;
 	col = (m_cr & 0x18) >> 3;
-//	opm = (m_cr & 0x07);
+//  opm = (m_cr & 0x07);
 	dX = m_pr[0];
 	dY = m_pr[1];
 
@@ -755,11 +755,11 @@ void h63484_device::command_rct_exec()
 	printf("%d %d\n",dX,dY);
 
 	/*
-	3<-2
-	|  ^
-	v  |
-	0->1
-	*/
+    3<-2
+    |  ^
+    v  |
+    0->1
+    */
 
 	/* 0 -> 1 */
 	for(i=0;i<dX;i+=inc_x)

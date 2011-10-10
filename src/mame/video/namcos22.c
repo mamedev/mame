@@ -131,29 +131,29 @@ UpdateVideoMixer( running_machine &machine )
 00824000: ffffff00 00000000 1800187f 00800000 0080007f 0f000000 0000037f 00010007 // trans poly(2)
 00824000: ffffff00 00000000 1800187f 00000000 0000007f 0f800000 0000037f 00010007 // trans text
 
-	00,01,02		polygon fade rgb
-	03
-	04
-	05,06,07		world fog rgb
-	08,09,0a		background color
-	0b
-	0c
-	0d				spot related?
-	0e
-	0f
-	10
-	11				global polygon alpha factor
-	12,13			textlayer alpha pen comparison
-	14				textlayer alpha pen mask?
-	15				textlayer alpha factor
-	16,17,18		global fade rgb
-	19				global fade factor
-	1a				fade target flags
-	1b				textlayer palette base?
-	1c
-	1d
-	1e
-	1f				layer enable
+    00,01,02        polygon fade rgb
+    03
+    04
+    05,06,07        world fog rgb
+    08,09,0a        background color
+    0b
+    0c
+    0d              spot related?
+    0e
+    0f
+    10
+    11              global polygon alpha factor
+    12,13           textlayer alpha pen comparison
+    14              textlayer alpha pen mask?
+    15              textlayer alpha factor
+    16,17,18        global fade rgb
+    19              global fade factor
+    1a              fade target flags
+    1b              textlayer palette base?
+    1c
+    1d
+    1e
+    1f              layer enable
 */
 		mixer.rPolyFadeColor    = nthbyte( state->m_gamma, 0x00 );
 		mixer.gPolyFadeColor    = nthbyte( state->m_gamma, 0x01 );
@@ -180,22 +180,22 @@ UpdateVideoMixer( running_machine &machine )
 90020180: ff713700 00000000 00000000 00000000
 90020200: ff100000 00000000 00000000 00000000
 
-	00,01			display flags
-	02
-	03
-	04
-	05
-	06
-	07				textlayer palette base?
-	08,09,0a		textlayer pen c shadow rgb
-	0b,0c,0d		textlayer pen d shadow rgb
-	0e,0f,10		textlayer pen e shadow rgb
-	11,12			global fade factor red
-	13,14			global fade factor green
-	15,16			global fade factor blue
+    00,01           display flags
+    02
+    03
+    04
+    05
+    06
+    07              textlayer palette base?
+    08,09,0a        textlayer pen c shadow rgb
+    0b,0c,0d        textlayer pen d shadow rgb
+    0e,0f,10        textlayer pen e shadow rgb
+    11,12           global fade factor red
+    13,14           global fade factor green
+    15,16           global fade factor blue
 
-	100,180,200		world fog rgb (not implemented)
-	101,181,201		specific fog rgb? (not implemented)
+    100,180,200     world fog rgb (not implemented)
+    101,181,201     specific fog rgb? (not implemented)
 */
 		mixer.flags             = nthbyte( state->m_gamma, 0x00 )*256 + nthbyte( state->m_gamma, 0x01 );
 		mixer.rPolyFadeColor    = nthbyte( state->m_gamma, 0x11 )*256 + nthbyte( state->m_gamma, 0x12 ); // 0x0100 = 1.0
@@ -1435,10 +1435,10 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	int num_sprites = (spriteram32[1]>>16) - base;
 
 	/* 'enable' bits function:
-		bit 0:		affects spritecount by 1? (alpinr2b)
-		bit 1:		???
-		bit 2:		per-sprite enable mask? (cybrcycc)
-		all bits set means off (aquajet) */
+        bit 0:      affects spritecount by 1? (alpinr2b)
+        bit 1:      ???
+        bit 2:      per-sprite enable mask? (cybrcycc)
+        all bits set means off (aquajet) */
 	int enable = spriteram32[0]>>16&7;
 	num_sprites += (~enable & 1);
 
@@ -1562,18 +1562,18 @@ READ32_HANDLER( namcos22_tilemapattr_r )
 WRITE32_HANDLER( namcos22_tilemapattr_w )
 {
 	/*
-	0.hiword	R/W		x offset
-	0.loword	R/W		y offset, bit 9 for interlacing?(cybrcomm, tokyowar)
-	1.hiword	R/W		??? always 0x006e?
-	1.loword	?		unused?
-	2.hiword	R/W		posirq scanline, not hooked up yet
-	2.loword	R		assume current scanline
-	3.hiword	?		unused?
-	3.loword	R		???
-	*/
+    0.hiword    R/W     x offset
+    0.loword    R/W     y offset, bit 9 for interlacing?(cybrcomm, tokyowar)
+    1.hiword    R/W     ??? always 0x006e?
+    1.loword    ?       unused?
+    2.hiword    R/W     posirq scanline, not hooked up yet
+    2.loword    R       assume current scanline
+    3.hiword    ?       unused?
+    3.loword    R       ???
+    */
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	COMBINE_DATA( &state->m_tilemapattr[offset] );
-//	popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
+//  popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
 }
 
 static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int prival )

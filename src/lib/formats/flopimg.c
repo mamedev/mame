@@ -1176,7 +1176,7 @@ int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, 
 	}
 	// use skew param
 	sec -= track_head * skew;
-	sec %= total_sectors;	
+	sec %= total_sectors;
 	if (sec < 0) sec += total_sectors;
 	return sec;
 }
@@ -1196,7 +1196,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT
 	int sector_limit = 0;
 	int sector_interleave = 0;
 	int sector_skew = 0;
-	
+
 	while(desc[index].type != END) {
 		//      printf("%d.%d.%d (%d) - %d %d\n", desc[index].type, desc[index].p1, desc[index].p2, index, offset, offset/8);
 		switch(desc[index].type) {
@@ -1284,7 +1284,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT
 			sector_interleave = desc[index].p1;
 			sector_skew = desc[index].p2;
 			break;
-			
+
 		case CRC_AMIGA_START:
 		case CRC_CCITT_START:
 			crcs[desc[index].p1].start = offset;

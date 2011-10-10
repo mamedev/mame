@@ -2450,8 +2450,8 @@ CPU_GET_INFO( m68340 )
 }
 
 /*
-  ColdFire 
- 
+  ColdFire
+
 */
 
 static CPU_INIT( coldfire )

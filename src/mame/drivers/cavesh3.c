@@ -254,7 +254,7 @@ INLINE void draw_sprite(
 				pen_to_clr(pen, &s_clr);
 
 				// apply clr bias to source
-//				if (tint)
+//              if (tint)
 					clr_add(&s_clr, tint_clr, &s_clr);
 
 				if (blend)
@@ -286,11 +286,11 @@ INLINE void draw_sprite(
 
 INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
 {
-//	UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
+//  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
 	UINT16 data =  cavesh3_ram16[((*addr&(0x7fffff))>>1)^3]; // this probably needs to be made endian safe tho
 	*addr += 2;
 
-//	printf("data %04x\n", data);
+//  printf("data %04x\n", data);
 	return data;
 }
 
@@ -403,7 +403,7 @@ static void cavesh_gfx_exec(address_space &space)
 
 	offs_t addr = cavesh_gfx_addr & 0x1fffffff;
 
-//	logerror("GFX EXEC: %08X\n", addr);
+//  logerror("GFX EXEC: %08X\n", addr);
 
 	cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
 	cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
@@ -594,7 +594,7 @@ static UINT16 flash_page_index;
 
 static void flash_hard_reset(running_machine &machine)
 {
-//	logerror("%08x FLASH: RESET\n", cpuexec_describe_context(machine));
+//  logerror("%08x FLASH: RESET\n", cpuexec_describe_context(machine));
 
 	flash_state = STATE_READ;
 
@@ -713,7 +713,7 @@ static WRITE8_HANDLER( flash_cmd_w )
 			case 0x80:
 				if (data==0x10)
 				{
-				//	UINT8 *region = space->machine().region( "game" )->base();
+				//  UINT8 *region = space->machine().region( "game" )->base();
 					flash_change_state( space->machine(), STATE_PAGE_PROGRAM );
 					flash_page_addr = flash_col;
 					flash_page_index = flash_row;
@@ -857,7 +857,7 @@ static READ8_HANDLER( ibara_flash_io_r )
 		case 0x06:
 		case 0x07:
 
-		//	logerror("ibara_flash_io_r offset %04x\n", offset);
+		//  logerror("ibara_flash_io_r offset %04x\n", offset);
 			return 0xff;
 
 		case 0x00:
@@ -978,7 +978,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cavesh3 )
 	PORT_START("DSW")		// 18000050.l (18000050.b + 3 i.e. MSB + 3, is shown as DIPSW)
-//	PORT_BIT(        0xfcfffffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//  PORT_BIT(        0xfcfffffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME(    0x00000002, 0x00000000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00000002, DEF_STR( On ) )
@@ -1274,7 +1274,7 @@ static READ64_HANDLER( mushisam_speedup_r )
 	int pc = cpu_get_pc(&space->device());
 	if ( pc == 0xc04a0aa ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // mushisam
 	else if (pc == 0xc04a0da)  device_spin_until_time(&space->device(), attotime::from_usec(10)); // mushitam
-//	else printf("read %08x\n", cpu_get_pc(&space->device()));
+//  else printf("read %08x\n", cpu_get_pc(&space->device()));
 	return cavesh3_ram[0x0022f0/8];
 }
 
@@ -1286,7 +1286,7 @@ DRIVER_INIT( mushisam )
 static READ64_HANDLER( mushisama_speedup_r )
 {
 	if ( cpu_get_pc(&space->device())== 0xc04a2aa ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // mushisam
-//	else printf("read %08x\n", cpu_get_pc(&space->device()));
+//  else printf("read %08x\n", cpu_get_pc(&space->device()));
 	return cavesh3_ram[0x00024d8/8];
 }
 

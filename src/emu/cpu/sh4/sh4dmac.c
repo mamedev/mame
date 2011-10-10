@@ -56,7 +56,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 	incs = (chcr & CHCR_SM) >> 12;
 
 	if (sh4->cpu_type == CPU_TYPE_SH4)
-	{	
+	{
 		size = dmasize[(chcr & CHCR_TS) >> 4];
 	}
 	else
@@ -193,14 +193,14 @@ static int sh4_dma_transfer_device(sh4_state *sh4, int channel, UINT32 chcr, UIN
 
 
 	if (sh4->cpu_type == CPU_TYPE_SH4)
-	{	
+	{
 		size = dmasize[(chcr & CHCR_TS) >> 4];
 	}
 	else
 	{
 		size = sh3_dmasize[(chcr >> 3) & 3];
 	}
-	
+
 	mod = ((chcr & CHCR_RS) >> 8);
 	if (incd == 3 || incs == 3)
 	{
@@ -508,10 +508,10 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 		} else {
 			chcr = (chcr & 0xffffcfff) | ((s->mode & 0x30) << 8);
 		}
-		
+
 
 		if (sh4->cpu_type == CPU_TYPE_SH4)
-		{	
+		{
 			//siz = dmasize[(chcr & CHCR_TS) >> 4];
 			siz = dmasize[(chcr >> 4) & 7];
 		}
@@ -519,7 +519,7 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 		{
 			siz = sh3_dmasize[(chcr >> 3) & 3];
 		}
-	
+
 
 		if (siz && (s->size))
 			if ((len * siz) != (s->length * s->size))
@@ -655,7 +655,7 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
  void sh4_handle_dmaor_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	UINT32 old = sh4->SH4_DMAOR;
-	COMBINE_DATA(&sh4->SH4_DMAOR);	
+	COMBINE_DATA(&sh4->SH4_DMAOR);
 
 	if ((sh4->SH4_DMAOR & DMAOR_AE) && (~old & DMAOR_AE))
 		sh4->SH4_DMAOR &= ~DMAOR_AE;

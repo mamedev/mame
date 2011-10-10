@@ -2017,7 +2017,7 @@
 
 #define sc_ccogs_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	
+
 #define sc_cclas_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95004250.bin", 0x0000, 0x080000, CRC(5250f18b) SHA1(bbdc556df845753f9ce15dd7dfb2347539dfa00f) ) \

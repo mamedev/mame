@@ -23,17 +23,17 @@ Gold Fever
 Happy Mine
 Siberian Gamble
 Tinder Box
-Air Mail   
-Barry Picker 
+Air Mail
+Barry Picker
 Casino
-The Elusive Gonzales 
-Fairy Land 3  
-Greengrocery 
-Merry Joiner    
-Piggy Bank   
-The Scrooge     
-Spirit of Prairies  
-Viking’s Fun Mill
+The Elusive Gonzales
+Fairy Land 3
+Greengrocery
+Merry Joiner
+Piggy Bank
+The Scrooge
+Spirit of Prairies
+Viking?s Fun Mill
 
 */
 

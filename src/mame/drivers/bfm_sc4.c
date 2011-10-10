@@ -1673,7 +1673,7 @@ ROM_START( sc4cadcl )
 ROM_END
 
 ROM_START( sc4cadcla )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "91415812.odd", 0x00001, 0x080000, CRC(5ea10616) SHA1(171eaec9aeef53767085d3ed3d26b411fe37ea87) )
 	ROM_LOAD16_BYTE( "91415813.evn", 0x00000, 0x080000, CRC(fa822d67) SHA1(4499ccfaaacae5afefb2d052168e92166480fe54) )
 	sc_cadcl_others
@@ -2356,7 +2356,7 @@ ROM_END
 
 ROM_START( sc4casrye )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95416042.lo", 0x00001, 0x080000, CRC(1fcd054d) SHA1(7e061ecbd2b53af9dea3dd9b7bdccd555cd31286) ) 
+	ROM_LOAD16_BYTE( "95416042.lo", 0x00001, 0x080000, CRC(1fcd054d) SHA1(7e061ecbd2b53af9dea3dd9b7bdccd555cd31286) )
 	ROM_LOAD16_BYTE( "95416043.hi", 0x00000, 0x080000, CRC(61d1a38b) SHA1(631b14ed69cdf39473677ae42ebe3ed0046b221c) )
 	sc_casry_others
 ROM_END
@@ -2802,7 +2802,7 @@ ROM_END
 ROM_START( ad4ctl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	/* not sure which of the regular Cop the Lot roms these go with */
-	
+
 	ROM_REGION( 0x400000, "adder4", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95780008.lo", 0x00001, 0x100000, CRC(0c81e70d) SHA1(0520fbc3afb9c3306e89d32ba8f01b1a83a47de5) )
 	ROM_LOAD16_BYTE( "95780009.hi", 0x00000, 0x100000, CRC(458ea63b) SHA1(4ac8290d3255d992be851a13fc45ef2080edc5ce) )
@@ -2812,7 +2812,7 @@ ROM_END
 ROM_START( ad4ctla )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	/* not sure which of the regular Cop the Lot roms these go with */
-	
+
 	ROM_REGION( 0x400000, "adder4", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95780024.lo", 0x00001, 0x100000, CRC(654e4428) SHA1(92f6074461bb58120401b0e1981e48d13cd467dd) )
 	ROM_LOAD16_BYTE( "95780025.hi", 0x00000, 0x100000, CRC(7397e2e4) SHA1(d22cc364aeb096ca03cd4642a22bd37fe548e2a1) )
@@ -3177,7 +3177,7 @@ ROM_START( sc4crzcs )
 	ROM_LOAD16_BYTE( "95402099.lo", 0x00001, 0x080000, CRC(a4f80337) SHA1(9960f2aeeb820bf8ea9884239ac68a9939007d81) )
 	ROM_LOAD16_BYTE( "95402100.hi", 0x00000, 0x080000, CRC(c463bb66) SHA1(b1a5e53207e9e282ab5e1937843da155ddf29f62) )
 	sc_crzcs_others
-ROM_END	
+ROM_END
 
 ROM_START( sc4crzcsa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -3332,7 +3332,7 @@ ROM_START( sc4cfqps )
 	ROM_LOAD16_BYTE( "95402951.evn", 0x00000, 0x080000, CRC(41ec3adf) SHA1(03f3dc231715e708c567a44ab3128e77229a8f35) )
 	sc_cfqps_others
 ROM_END
-	
+
 ROM_START( sc4cfqpsa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95403950.lo", 0x00001, 0x080000, CRC(c40ca42e) SHA1(79333b174d3a7a2466f686e06583a3856460a916) )
@@ -4370,7 +4370,7 @@ ROM_START( sc4drubya )
 	ROM_LOAD16_BYTE( "p1439p51.lo", 0x00001, 0x080000, CRC(dd701d6c) SHA1(8d0ae2f3426cee81fa3941240312fc3bcf66c2b4) )
 	sc_druby_others
 ROM_END
-	
+
 
 ROM_START( sc4drubyb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -4442,7 +4442,7 @@ ROM_END
 ROM_START( sc4dbldm )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95416168.odd", 0x00001, 0x080000, CRC(7724358b) SHA1(ffd57d13d08d05287382e07a433037d6cd002d1e) )
-	ROM_LOAD16_BYTE( "95416169.evn", 0x00000, 0x080000, CRC(87b9ce5c) SHA1(b5f9bc9b7428c5537e9d7b2e1adc07a0c78422b2) )	
+	ROM_LOAD16_BYTE( "95416169.evn", 0x00000, 0x080000, CRC(87b9ce5c) SHA1(b5f9bc9b7428c5537e9d7b2e1adc07a0c78422b2) )
 	sc_dbldm_others
 ROM_END
 
@@ -5383,8 +5383,8 @@ ROM_START( sc4ftopig )
 	ROM_LOAD16_BYTE( "95409028.odd", 0x00001, 0x080000, CRC(b3c7510a) SHA1(ce220b9f8352c48f6e69519e9506605ff49b5a0e) )
 	ROM_LOAD16_BYTE( "95409029.evn", 0x00000, 0x080000, CRC(d895b833) SHA1(9e479407261c0278c47ac5eeb05a2c3320220c4a) )
 	sc_ftopi_others
-ROM_END	
-	
+ROM_END
+
 ROM_START( sc4ftopih )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95409306.odd", 0x00001, 0x080000, CRC(244c8915) SHA1(d8093c9fa98cc0b5438c3344ecb74adfb1998fe5) )
@@ -5551,7 +5551,7 @@ ROM_START( sc4game )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406470.lo", 0x00001, 0x080000, CRC(8471230a) SHA1(d72eef5b8addbaa60d1bda9b3e62b48728ddc818) )
 	ROM_LOAD16_BYTE( "95406471.hi", 0x00000, 0x080000, CRC(7dc7e054) SHA1(9ad9c218fb55ba2841fd75dbcdb56d1f1dbc41e9) )
-	sc_game_others	
+	sc_game_others
 ROM_END
 
 
@@ -10885,7 +10885,7 @@ ROM_START( sc4rdragf )
 	ROM_LOAD16_BYTE( "95417245.evn", 0x00000, 0x080000, CRC(bcee571c) SHA1(6b8d95c74124565584c353fe15b037ffa8b78807) )
 	sc_rdrag_others
 ROM_END
-	 
+
 
 ROM_START( sc4rdrcl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -12656,7 +12656,7 @@ ROM_START( sc4s6ce )
 ROM_END
 
 
- 
+
 ROM_START( sc4sdr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95400453.lo", 0x00001, 0x080000, CRC(3d8eb03c) SHA1(802b05db351004a999c1881e1d33cbc1af250041) )
@@ -13334,7 +13334,7 @@ ROM_END
 ROM_START( sc4tload )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408424.lo", 0x00001, 0x080000, CRC(1f8f93d4) SHA1(62349a83010f90931aa8a179db216e138824379e) )
-	ROM_LOAD16_BYTE( "95408425.hi", 0x00000, 0x080000, CRC(a4a6930e) SHA1(c75d9ce127ba90e070412888551991cf7d46d7c6) )	
+	ROM_LOAD16_BYTE( "95408425.hi", 0x00000, 0x080000, CRC(a4a6930e) SHA1(c75d9ce127ba90e070412888551991cf7d46d7c6) )
 	sc_tload_others
 ROM_END
 
@@ -13876,8 +13876,8 @@ ROM_START( sc4ufie )
 	ROM_LOAD16_BYTE( "95400911.lo", 0x00000, 0x080000, NO_DUMP )
 	ROM_LOAD16_BYTE( "95400912.hi", 0x00000, 0x080000, CRC(d1a24394) SHA1(03d6561f8e66bbaaabd18fb9d5244f12b2202c0d) )
 	sc_ufi_others
-ROM_END	
-	
+ROM_END
+
 
 
 ROM_START( sc4valnv )
@@ -13901,70 +13901,70 @@ ROM_START( sc4vrgcl )
 	ROM_LOAD16_BYTE( "95404018.lo", 0x00001, 0x080000, CRC(21ee4f08) SHA1(d2a89dcab0810eb1cccd6176dacbb2bfc96d7450) )
 	ROM_LOAD16_BYTE( "95404019.hi", 0x00000, 0x080000, CRC(434fef1c) SHA1(3653a81213599272db63282573b1c639e630c6c2) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgcla )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95404076.lo", 0x00001, 0x080000, CRC(65551002) SHA1(fe41d92b0ca3137d1731d6d2cbcc94d4a9da6088) )
 	ROM_LOAD16_BYTE( "95404077.hi", 0x00000, 0x080000, CRC(04550388) SHA1(7613591cabdf72628ad5a6915137cba43c427984) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgclb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95404548.lo", 0x00001, 0x080000, CRC(e8dacffe) SHA1(cc9034542d684bc300ffdf7a38e047f1ce0ca739) )
 	ROM_LOAD16_BYTE( "95404549.hi", 0x00000, 0x080000, CRC(fa5075f9) SHA1(9f87a52c8f9ed64724be87e88fff833253d3e22a) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgclc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95404550.lo", 0x00001, 0x080000, CRC(b2ce484f) SHA1(88db91f7bce08ee6e84352286bc33df5d4c9a6d0) )
 	ROM_LOAD16_BYTE( "95404551.hi", 0x00000, 0x080000, CRC(66ab7174) SHA1(ec4ae81c1f4e4a9a48c17f8aef798dff216aefc4) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgcld )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95404634.lo", 0x00001, 0x080000, CRC(9e2ed4a0) SHA1(44c1707f9489e755f9035c039b7b976b1734630d) )
 	ROM_LOAD16_BYTE( "95404635.hi", 0x00000, 0x080000, CRC(8249f713) SHA1(1f361f849985ae70c841b2b40658d40b1aa6b399) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgcle )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95405548.lo", 0x00001, 0x080000, CRC(bba0c2bc) SHA1(c3a99423fc62920c5c1ca6fa4f0a3283ca6490f0) )
 	ROM_LOAD16_BYTE( "95405549.hi", 0x00000, 0x080000, CRC(b113fe1d) SHA1(7883c34c403c532209137105a15f97f18311bf8a) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgclf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95405550.lo", 0x00001, 0x080000, CRC(2c882c37) SHA1(c35645c58d11971cc9d8717a7b27c1082259f07b) )
 	ROM_LOAD16_BYTE( "95405551.hi", 0x00000, 0x080000, CRC(ac52e4c3) SHA1(2f93b3f262861e5ba54f70824fcc6961e66f935d) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgclg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95405634.lo", 0x00001, 0x080000, CRC(056413e9) SHA1(555dec6eea70135b6a12c0c3c0421618c321fb94) )
 	ROM_LOAD16_BYTE( "95405635.hi", 0x00000, 0x080000, CRC(0046f382) SHA1(8d3cb10b44edba2cd677eab2618a610b0f9fa35c) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgclh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95412208.lo", 0x00001, 0x080000, CRC(3edfe2d8) SHA1(c4f12de7ed7db8fc317418a8adeea1a2f15ca7ef) )
 	ROM_LOAD16_BYTE( "95412209.hi", 0x00000, 0x080000, CRC(509088c4) SHA1(c6b70ecd33599adb379586bbb2cbe3b58fce857b) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 ROM_START( sc4vrgcli )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95413208.lo", 0x00001, 0x080000, CRC(4d34246d) SHA1(4bcfae186064f3d1619de336c74e8d4d5d4ef05f) )
 	ROM_LOAD16_BYTE( "95413209.hi", 0x00000, 0x080000, CRC(e04b594c) SHA1(d1c5d00e3fc2a4fc6d612ca0d51b83851129398d) )
 	sc_vrgcl_others
-ROM_END 
+ROM_END
 
 
 
@@ -16934,7 +16934,7 @@ ROM_START( sc4dndlp )
 	ROM_LOAD16_BYTE( "95426343.hi", 0x00000, 0x080000, CRC(f8382df6) SHA1(0cbbc0afefd2a61baad30cbdb916572b4d97ea7d) )
 	sc_dndlp_others
 ROM_END
-	
+
 
 ROM_START( sc4dndlpa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -17855,7 +17855,7 @@ ROM_END
 ROM_START( sc4emmerc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95421074.lo", 0x00001, 0x080000, CRC(ea40002d) SHA1(da3949e45bbf7eeba432b72492f156f4dece8582) )
-	ROM_LOAD16_BYTE( "95421075.hi", 0x00000, 0x080000, CRC(028ae706) SHA1(5a74859ac7ee5985fcf96d493017b4c8a012a0ac) )	
+	ROM_LOAD16_BYTE( "95421075.hi", 0x00000, 0x080000, CRC(028ae706) SHA1(5a74859ac7ee5985fcf96d493017b4c8a012a0ac) )
 	sc_emmer_others
 ROM_END
 
@@ -18645,7 +18645,7 @@ ROM_START( sc4ggg )
 ROM_END
 
 ROM_START( sc4ggga )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420672.lo", 0x00001, 0x080000, CRC(88dd2622) SHA1(dc30308638d602b76e828cf6c98605a9fb7589b6) )
 	ROM_LOAD16_BYTE( "95420673.hi", 0x00000, 0x080000, CRC(309a5f9c) SHA1(8592127022c84bc6c36b744d8fa0d44a1bc38ea0) )
 	sc_ggg_others
@@ -18659,34 +18659,34 @@ ROM_START( sc4gggb )
 ROM_END
 
 ROM_START( sc4gggc )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420676.lo", 0x00001, 0x080000, CRC(6c841f87) SHA1(873d60cb447529f42d9f4cb0fe05d7c464a10473) )
 	ROM_LOAD16_BYTE( "95420677.hi", 0x00000, 0x080000, CRC(afe9543e) SHA1(2c88a0120762372f349c098c8e346626198a7635) )
 	sc_ggg_others
 ROM_END
 
 ROM_START( sc4gggd )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420678.lo", 0x00001, 0x080000, CRC(5d1d9b26) SHA1(ed9594f794bd582bb54e7c824272b7321b6ae2ef) )
 	ROM_LOAD16_BYTE( "95420679.hi", 0x00000, 0x080000, CRC(910215de) SHA1(5e3d9ab721ea008e33754ac8237f82c106114364) )
 	sc_ggg_others
 ROM_END
 
 ROM_START( sc4ggge )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420680.lo", 0x00001, 0x080000, CRC(22a8623d) SHA1(22b75306e0ee2944e45739c380fc68338f2534f7) )
 	ROM_LOAD16_BYTE( "95420681.hi", 0x00000, 0x080000, CRC(47dfc03a) SHA1(6fcacce499a8aa17a5b821511ffb1434d7f43850) )
 	sc_ggg_others
 ROM_END
 
 ROM_START( sc4gggf )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420682.lo", 0x00001, 0x080000, CRC(e41bce75) SHA1(db07f0c55c40d527df795f860ff2317af1f030b3) )
 	ROM_LOAD16_BYTE( "95420683.hi", 0x00000, 0x080000, CRC(00b92dfe) SHA1(e77cc410b591eace2b40c5fdbf0fc99f0379c771) )
 	sc_ggg_others
 ROM_END
 
-	
+
 ROM_START( sc4gggg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420688.lo", 0x00001, 0x080000, CRC(6d7c6ed2) SHA1(1004c5027a60ba2cbdd488a4d49fee3c369d7c74) )
@@ -18695,7 +18695,7 @@ ROM_START( sc4gggg )
 ROM_END
 
 ROM_START( sc4gggh )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420690.lo", 0x00001, 0x080000, CRC(f06826b2) SHA1(ed3f6d54252fe6edd4490c86291212365c2f9177) )
 	ROM_LOAD16_BYTE( "95420691.hi", 0x00000, 0x080000, CRC(74cf31ec) SHA1(d0e68a25266e7f9308afb4840329a638d97e3ad1) )
 	sc_ggg_others
@@ -19436,36 +19436,36 @@ ROM_START( sc4lotrr )
 	ROM_LOAD16_BYTE( "95410614.lo", 0x00001, 0x080000, CRC(39b70b6b) SHA1(feda79017224771822335ecd2a9c29c69c7a5aa5) )
 	ROM_LOAD16_BYTE( "95410615.hi", 0x00000, 0x080000, CRC(d5ed8948) SHA1(63f4fd2fd5de601cee0668d74b7a8907643024ff) )
 	sc_lotrr_others
-ROM_END	
+ROM_END
 
 ROM_START( sc4lotrra )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95410950.lo", 0x00001, 0x080000, CRC(33875be7) SHA1(4e2e092e2fa2f1ea9b7f4d748b182f5a9c3ffb3b) )
 	ROM_LOAD16_BYTE( "95410951.hi", 0x00000, 0x080000, CRC(72553949) SHA1(91927ef336d367364f61dfe31c016c8e9a2bf99e) )
 	sc_lotrr_others
-ROM_END	
-	
+ROM_END
+
 ROM_START( sc4lotrrb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95411614.lo", 0x00001, 0x080000, CRC(a2a230d7) SHA1(55f0a16bed44bceb94c578ed84df857ce95cf55d) )
 	ROM_LOAD16_BYTE( "95411615.hi", 0x00000, 0x080000, CRC(bb8ff190) SHA1(9fec418e8d7540a54c79885236a30016acac70cf) )
 	sc_lotrr_others
-ROM_END	
-	
+ROM_END
+
 ROM_START( sc4lotrrc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95411950.lo", 0x00001, 0x080000, CRC(ec42d7f8) SHA1(fed3e0d17f671db1d3060ab9d8ae5d9bf45c9dbc) )
 	ROM_LOAD16_BYTE( "95411951.hi", 0x00000, 0x080000, CRC(a7c31009) SHA1(d2db9721b6967810e02f28ce20e1ded6598eb08d) )
 	sc_lotrr_others
-ROM_END	
-	
+ROM_END
+
 ROM_START( sc4lotrrd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95412574.lo", 0x00001, 0x080000, CRC(653cd804) SHA1(35e3346581a72ad29af7afe88266910d46ef043a) )
 	ROM_LOAD16_BYTE( "95412575.hi", 0x00000, 0x080000, CRC(4227e0b5) SHA1(a8ae560d537cfb1bea25ac271deed501e7b655f4) )
 	sc_lotrr_others
-ROM_END	
-	
+ROM_END
+
 ROM_START( sc4lotrre )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95413574.lo", 0x00001, 0x080000, CRC(796749c9) SHA1(e2940a8184537570b71eabd675ea44f23055798c) )
@@ -21957,28 +21957,28 @@ ROM_START( sc4bpb )
 	ROM_LOAD16_BYTE( "95418050.lo", 0x00001, 0x080000, CRC(548d09d0) SHA1(037fe5fc16222994f5c1d9688379bf1ca75aa2b0) )
 	ROM_LOAD16_BYTE( "95418051.hi", 0x00000, 0x080000, CRC(0e811890) SHA1(ee77c31b2b59695c5a067eb70cbffe69d6a60bde) )
 	sc_bpb_others
-ROM_END	
-	
+ROM_END
+
 ROM_START( sc4bpba )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418804.lo", 0x00001, 0x080000, CRC(0a8363e9) SHA1(0f45aa3e40250a43ba96271e7596aa6c0d6da6bd) )
 	ROM_LOAD16_BYTE( "95418805.hi", 0x00000, 0x080000, CRC(9b106d25) SHA1(455ea82638630e16b7a117f287cc5df4282282fa) )
 	sc_bpb_others
-ROM_END	
-	
+ROM_END
+
 ROM_START( sc4bpbb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418946.lo", 0x00001, 0x080000, CRC(bdc928e7) SHA1(d7a21dde2dd40a57d2c7243bdb04b37a55ccc8d3) )
 	ROM_LOAD16_BYTE( "95418947.hi", 0x00000, 0x080000, CRC(29ae9d0a) SHA1(80860f70cf71070b3d923f7685ad185e396f5d97) )
 	sc_bpb_others
-ROM_END	
+ROM_END
 
 ROM_START( sc4bpbc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95419050.lo", 0x00001, 0x080000, CRC(ed898de9) SHA1(8a2a0ff43a8c7dbd30e532f421527bc96b6b6f31) )
 	ROM_LOAD16_BYTE( "95419051.hi", 0x00000, 0x080000, CRC(f2397d9f) SHA1(22c698551304e0571530315753d9c26fb6023655) )
 	sc_bpb_others
-ROM_END	
+ROM_END
 
 ROM_START( sc4bpbd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -22230,10 +22230,10 @@ ROM_END
 
 /*
 ROM_START( sc4dndbea )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95418410.lo", 0x00001, 0x080000, CRC(ddd534d0) SHA1(1c8acd74d79fc7f169ed54e2d603100775610e5a) )
-	ROM_LOAD16_BYTE( "95418411.hi", 0x00000, 0x080000, CRC(5346fd2a) SHA1(ada8ed84a173bf3f68af0a2e1b92dbfe94f2d6c9) )
-	sc_dndbe_others
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE( "95418410.lo", 0x00001, 0x080000, CRC(ddd534d0) SHA1(1c8acd74d79fc7f169ed54e2d603100775610e5a) )
+    ROM_LOAD16_BYTE( "95418411.hi", 0x00000, 0x080000, CRC(5346fd2a) SHA1(ada8ed84a173bf3f68af0a2e1b92dbfe94f2d6c9) )
+    sc_dndbe_others
 ROM_END
 */
 
@@ -22518,8 +22518,8 @@ ROM_START( ad4film )
 	ROM_REGION( 0x400000, "adder4", 0 )
 	ROM_LOAD16_BYTE( "pr6973s21.hi", 0x00000, 0x080000, CRC(e9ff42c0) SHA1(9227868e031b26ecc20416e51cd02b417f449819) )
 	ROM_LOAD16_BYTE( "pr6973s21.lo", 0x00001, 0x080000, CRC(2a2e974f) SHA1(ec6cf9e79c651f84f6371a27e7814da0e6b6650d) )
-	
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )	
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( ad4filma )
@@ -22530,8 +22530,8 @@ ROM_START( ad4filma )
 	ROM_REGION( 0x400000, "adder4", 0 )
 	ROM_LOAD16_BYTE( "pr6973p21.hi", 0x00000, 0x080000, CRC(70722d50) SHA1(79cb6544ff7f7813cb1c2d64cf4fadcf9b091708) )
 	ROM_LOAD16_BYTE( "pr6973p21.lo", 0x00001, 0x080000, CRC(9ecc1838) SHA1(1aea40281a174a39866aef668e78b031e4337be1) )
-	
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )	
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 ROM_END
 
 
@@ -22557,7 +22557,7 @@ ROM_START( sc_unsrt )
 	ROM_LOAD( "95008403.bin", 0x0000, 0x0facbf, CRC(cf3969bb) SHA1(4cb6fb4e536882a11bb6c1548ffb94daea70ca5f) )
 	// Casino Viva Mexico
 	ROM_LOAD( "95004209.lo", 0x00001, 0x080000, CRC(40247425) SHA1(54c8540f9ce45b8b02f6616233b81e33af804f63) )
-	ROM_LOAD( "95004210.hi", 0x00000, 0x080000, CRC(6f6ce2c8) SHA1(7e9ce336a1307b8290196d58c7419996d0758ab9) )	
+	ROM_LOAD( "95004210.hi", 0x00000, 0x080000, CRC(6f6ce2c8) SHA1(7e9ce336a1307b8290196d58c7419996d0758ab9) )
 	// Casino Triple Classic (Bellfruit)
 	// 95008423.bin =
 	// 95008423.bin          sc4bar7    Bar 7's (Bellfruit) (Scorpion 4)
@@ -22665,7 +22665,7 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 
 	for (int i=0;i<size-strlength;i++)
 	{
-	//	printf("%02x", src[i]);
+	//  printf("%02x", src[i]);
 
 		int j;
 		int found = 1;
@@ -22706,7 +22706,7 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 				else if (mode == 1)
 				{
 					addr = (i+count)^addrxor;
-					
+
 					if (addr&1)
 						rom = src[addr];
 					else
@@ -22724,12 +22724,12 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 
 
 				//if (rom==0xff)
-				//	end = 1;
+				//  end = 1;
 				//else
 				{
 					if ((rom>=0x20) && (rom<0x7f))
 					{
-						printf("%c", rom); 
+						printf("%c", rom);
 						blankcount = 0;
 					}
 					else
@@ -22857,7 +22857,7 @@ GAME( 200?, sc4brkfsa	,sc4brkfs,	sc4, sc4, sc4, ROT0, "BFM","The Big Breakfast (
 GAME( 200?, sc4brkfsb	,sc4brkfs,	sc4, sc4, sc4, ROT0, "BFM","The Big Breakfast (BFM) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4brkfsc	,sc4brkfs,	sc4, sc4, sc4, ROT0, "BFM","The Big Breakfast (BFM) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
-// PR6934 GRAND SLAM         PR6934 SLM2 SOUNDS11            GRAND SLAM   
+// PR6934 GRAND SLAM         PR6934 SLM2 SOUNDS11            GRAND SLAM
 GAME( 200?, sc4gslam	,0,			sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gslama	,sc4gslam,	sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gslamb	,sc4gslam,	sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -23147,7 +23147,7 @@ GAME( 200?, sc4cexplb	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion 
 GAME( 200?, sc4cexplc	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4cexplf	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4cexplg	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-//  PR2120 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION 
+//  PR2120 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
 GAME( 200?, sc4cexpld	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4cexple	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
@@ -24380,27 +24380,27 @@ GAME( 200?, sc4magcik	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (011) 
 // PR2535 MAGIC CIRCLE STANDARD 021         MAGICSND
 GAME( 200?, sc4magcia	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (021) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcil	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (021) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR2535 MAGIC CIRCLE STANDARD 031         MAGICSND 
+// PR2535 MAGIC CIRCLE STANDARD 031         MAGICSND
 GAME( 200?, sc4magcib	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (031) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcim	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (031) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR2535 MAGIC CIRCLE STANDARD 012         MAGICSND 
+// PR2535 MAGIC CIRCLE STANDARD 012         MAGICSND
 GAME( 200?, sc4magcic	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcin	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcid	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcio	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (012) (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-//P R2535 MAGIC CIRCLE STANDARD 022         MAGICSND 
+//P R2535 MAGIC CIRCLE STANDARD 022         MAGICSND
 GAME( 200?, sc4magcie	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (022) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcip	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (022) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR2535 MAGIC CIRCLE STANDARD 032         MAGICSND 
+// PR2535 MAGIC CIRCLE STANDARD 032         MAGICSND
 GAME( 200?, sc4magcif	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (032) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magciq	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (032) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR2535 MAGIC CIRCLE STANDARD  013         MAGICSND  
+// PR2535 MAGIC CIRCLE STANDARD  013         MAGICSND
 GAME( 200?, sc4magcig	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (013) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcir	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (013) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR2535 MAGIC CIRCLE STANDARD  014         MAGICSND 
+// PR2535 MAGIC CIRCLE STANDARD  014         MAGICSND
 GAME( 200?, sc4magcih	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (014) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcis	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (014) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR2535 MAGIC CIRCLE STANDARD  024         MAGICSND 
+// PR2535 MAGIC CIRCLE STANDARD  024         MAGICSND
 GAME( 200?, sc4magcii	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (024) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4magcit	,sc4magci,	sc4, sc4, sc4, ROT0, "Qps","Magic Circle (024) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 // PR2535 MAGIC CIRCLE STANDARD  034         MAGICSND
@@ -24775,7 +24775,7 @@ GAME( 200?, sc4quarta	,sc4quart,	sc4, sc4, sc4, ROT0, "Mazooma","Quaterback (Maz
 // QUARTERBACK  .PR2072.ITALIAN QUARTERBACK..  (non-standard header)
 GAME( 200?, sc4quartb	,sc4quart,	sc4, sc4, sc4, ROT0, "Mazooma","Quaterback (PR2072) (Italian) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4quarte	,sc4quart,	sc4, sc4, sc4, ROT0, "Mazooma","Quaterback (PR2072) (Italian) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4quarti	,sc4quart,	sc4, sc4, sc4, ROT0, "Mazooma","Quaterback (PR2072) (Italian) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4quarti	,sc4quart,	sc4, sc4, sc4, ROT0, "Mazooma","Quaterback (PR2072) (Italian) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4quartk	,sc4quart,	sc4, sc4, sc4, ROT0, "Mazooma","Quaterback (PR2072) (Italian) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // QUARTERBACK  .PR2064.GERMAN QUARTERBACK.. (non-standard header)
@@ -25081,7 +25081,7 @@ GAME( 200?, sc4splgba	,sc4splgb,	sc4, sc4, sc4, ROT0, "Mazooma","Splash & Grab (
 // PR2044 CASINO SPREAD YOUR BET         SBET SOUNDS         SPREAD YOUR BET
 GAME( 200?, sc4spred	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Spread Your Bet (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
-//  PR6915 stag night         PR6915 STAG NIGHT SOUNDS11   
+//  PR6915 stag night         PR6915 STAG NIGHT SOUNDS11
 GAME( 200?, sc4stag		,0,			sc4, sc4, sc4, ROT0, "BFM","Stag Night (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4staga	,sc4stag,	sc4, sc4, sc4, ROT0, "BFM","Stag Night (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
@@ -25164,7 +25164,7 @@ GAME( 200?, sc4susclc	,sc4suscl,	sc4, sc4, sc4, ROT0, "Qps","Suits U Sir Club (Q
 // PR6834 SUPER 6 FIXED 65%         PR6834 SSIX SOUNDS11
 GAME( 200?, sc4s6c		,0,			sc4, sc4, sc4, ROT0, "BFM","Super 6 Club (65% Fixed) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4s6cb		,sc4s6c,	sc4, sc4, sc4, ROT0, "BFM","Super 6 Club (65% Fixed) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR6834 SUPER 6         PR6834 SSIX SOUNDS11        
+// PR6834 SUPER 6         PR6834 SSIX SOUNDS11
 GAME( 200?, sc4s6ca		,sc4s6c,	sc4, sc4, sc4, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4s6cc		,sc4s6c,	sc4, sc4, sc4, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4s6cd		,sc4s6c,	sc4, sc4, sc4, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -25424,7 +25424,7 @@ GAME( 200?, sc4vrgcli	,sc4vrgcl,	sc4, sc4, sc4, ROT0, "BFM","Very Rich Geezer Cl
 
 // PR6984 VIVA MEXICO 1.30         95008095 VIVA MEXICO PR6984
 GAME( 200?, sc4vmnv		,0,			sc4, sc4, sc4, ROT0, "Nova","Viva Mexico (Nova) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR6984 VIVA MEXICO 1.00         95008095 VIVA MEXICO PR6984  
+// PR6984 VIVA MEXICO 1.00         95008095 VIVA MEXICO PR6984
 GAME( 200?, sc4vmnva	,sc4vmnv,	sc4, sc4, sc4, ROT0, "Nova","Viva Mexico (Nova) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // / PR7132 CLUB VIVA MEXICO         PR7132 VIVA SOUNDS11           VIVA MEXICO
@@ -25637,7 +25637,7 @@ GAME( 200?, sc4dcrlsj	,sc4dcrls,	sc4, sc4, sc4, ROT0, "Mazooma","Double Crazy Re
 GAME( 200?, sc4dcrlse	,sc4dcrls,	sc4, sc4, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dcrlsk	,sc4dcrls,	sc4, sc4, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
-// PR7194 GRAND CASINO         PR6934 SLM2 SOUNDS11           GRAND CASINO 
+// PR7194 GRAND CASINO         PR6934 SLM2 SOUNDS11           GRAND CASINO
 GAME( 200?, sc4gcclb	,0,			sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gcclba	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gcclbb	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -25650,7 +25650,7 @@ GAME( 200?, sc4gcclbh	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (
 GAME( 200?, sc4gcclbi	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gcclbj	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gcclbk	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-// PR7194 GRAND CASINO         PR6934 SLM2 SOUNDS11           GRAND CASINO    GRAND CASINO  CLUB  
+// PR7194 GRAND CASINO         PR6934 SLM2 SOUNDS11           GRAND CASINO    GRAND CASINO  CLUB
 GAME( 200?, sc4gcclbl	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gcclbm	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gcclbn	,sc4gcclb,	sc4, sc4, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -25929,15 +25929,15 @@ GAME( 200?, sc4crnjw	,0,			sc4, sc4, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) 
 GAME( 200?, sc4crnjwa	,sc4crnjw,	sc4, sc4, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR1927 AWP DEAL OR NO DEAL S4         PR1907 DEAL OR NO DEAL SOUNDS11
-GAME( 200?, sc4dnd		,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dnd		,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dnda		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // incomplete pairing
-GAME( 200?, sc4dndb		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndc		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndd		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnde		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndf		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndg		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndh		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndb		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndc		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndd		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnde		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndf		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndg		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndh		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndi		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndj		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndk		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -25948,21 +25948,21 @@ GAME( 200?, sc4dndo		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellf
 
 
 // PR1967 AWP CLASSIC DEAL OR NO DEAL S4         PR1907 DEAL OR NO DEAL SOUNDS11
-GAME( 200?, sc4dndcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndcsa	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndcsb	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndcsc	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndcsa	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndcsb	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndcsc	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3229 AWP DEAL OR NO DEAL BREAK THE BANK SCORP4         PR3209 BREAK THE BANK SOUNDS11
-GAME( 200?, sc4dndbb	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbba	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbbb	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbbc	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbbd	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbbe	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbbf	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbbg	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbbh	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbb	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbba	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbbb	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbbc	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbbd	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbbe	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbbf	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbbg	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbbh	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndbbi	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR1949 CLUB DEAL OR NO DEAL         DEAL OR NO DEAL CLUB  PR1949 DEAL O N D SOUNDS11
@@ -25977,30 +25977,30 @@ GAME( 200?, sc4dndclg	,sc4dndcl,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Clu
 
 // PR3235 AWP DEAL OR NO DEAL DOUBLE S4         PR3215 DOND DOUBLE SOUNDS11       DOUBLE DOND S.SITE
 GAME( 200?, sc4dnddd	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4dnddda	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndddb	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndddc	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndddd	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddde	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndddf	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndddg	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dnddda	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndddb	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndddc	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndddd	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddde	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndddf	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndddg	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3038 DEAL OR NO DEAL HALL OF FAME SCORP4         PR3008 HALL OF FAME SOUNDS11      HALL OF FAME  S.SITE
-GAME( 200?, sc4dndhf	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndhfa	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndhfb	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndhfc	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndhfd	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndhfe	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndhff	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndhfg	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndhfh	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndhf	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndhfa	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndhfb	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndhfc	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndhfd	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndhfe	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndhff	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndhfg	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndhfh	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndhfi	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3227 AWP DEAL OR NO DEAL ITS YOUR SHOW SCORP4         PR3207 ITS YOUR SHOW SOUNDS11     ITS YOUR SHOW S.SITE
-GAME( 200?, sc4dndys	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndysa	,sc4dndys,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndysb	,sc4dndys,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndys	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndysa	,sc4dndys,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndysb	,sc4dndys,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3212 AWP DEAL OR NO DEAL LETS PLAY DEAL OR NO DEAL SCORP4         PR3212 LETS PLAY DOND SOUNDS11    LETS PLAY DOND  S.SITE
 GAME( 200?, sc4dndlp	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -26011,31 +26011,31 @@ GAME( 200?, sc4dndlpd	,sc4dndlp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let
 GAME( 200?, sc4dndlpe	,sc4dndlp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3221 AWP DEAL OR NO DEAL RED ALERT SCORP4         PR3201 DOND RED ALERT SOUNDS11    RED ALERT S.SITE
-GAME( 200?, sc4dndra	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndraa	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndrab	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndrac	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndrad	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndrae	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndra	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndraa	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndrab	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndrac	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndrad	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndrae	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 
 // PR3230 AWP DEAL OR NO DEAL THE BIG DEAL SCORP4         PR3210 THE BIG DEAL SOUNDS11      THE BIG DEAL  S.SITE
-GAME( 200?, sc4dndbd	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbda	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbdb	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbdc	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbdd	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbde	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbd	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbda	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbdb	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbdc	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbdd	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbde	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3041 AWP DEAL OR NO DEAL THE BIG REDS S4         PR3011 THE BIG REDS SOUNDS11      THE BIG REDS  S.SITE
-GAME( 200?, sc4dndbr	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbra	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbrb	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbrc	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbrd	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbre	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbrf	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbrg	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbr	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbra	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbrb	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbrc	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbrd	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbre	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbrf	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbrg	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3047 AWP DEAL OR NO DEAL THE CRAZY CHAIR SCORP4         PR3017 CRAZY CHAIR SOUNDS11       CRAZY CHAIR S.SITE
 GAME( 200?, sc4dndcc	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -26047,42 +26047,42 @@ GAME( 200?, sc4dndcce	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The
 GAME( 200?, sc4dndccf	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3043 AWP THE DEAL WHEEL S4         PR3202 THE DEAL WHEEL SOUNDS11    THE DEAL WHEEL  S.SITE
-GAME( 200?, sc4dnddw	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddwa	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddwb	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddwc	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddwd	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddwe	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddwf	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddwg	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dnddw	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddwa	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddwb	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddwc	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddwd	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddwe	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddwf	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddwg	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3044 AWP DEAL OR NO DEAL THE DREAM FACTORY SCORP4         PR3014 DREAM FACTORY SOUNDS11     DREAM FACTORY S.SITE
-GAME( 200?, sc4dnddf	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dnddf	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dnddfa	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // incomplete pairing
-GAME( 200?, sc4dnddfb	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddfc	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddfd	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dnddfe	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dnddfb	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddfc	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddfd	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dnddfe	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3240 AWP DEAL OR NO DEAL THE PERFECT GAME SCORP4         PR3220 DOND PERFECT SOUNDS11      THE PERFECT GAME  S.SITE
-GAME( 200?, sc4dndpg	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndpga	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndpgb	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndpgc	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndpgd	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndpge	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndpg	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndpga	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndpgb	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndpgc	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndpgd	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndpge	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 
 // PR3033 AWP DOND THE POWER 5 SCORP4         PR3033 POWER FIVE SOUNDS11        DOND THE POWER 5  S.SITE
-GAME( 200?, sc4dndtp	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndtpa	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndtpb	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndtpc	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndtpd	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndtpe	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndtpf	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndtpg	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndtph	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndtp	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndtpa	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndtpb	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndtpc	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndtpd	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndtpe	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndtpf	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndtpg	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndtph	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndtpi	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndtpj	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndtpk	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -26091,12 +26091,12 @@ GAME( 200?, sc4dndtpm	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The
 
 
 // PR3006 AWP DEAL OR NO DEAL THE WALK OF WEALTH SCORP4         PR3006 WALK OF WEALTH SOUNDS11    WALK OF WEALTH  S.SITE
-GAME( 200?, sc4dndww	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwwa	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwwb	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwwc	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwwd	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwwe	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndww	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwwa	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwwb	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwwc	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwwd	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwwe	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3027 AWP CLASSIC DEAL OR NO DEAL THE WALK OF WEALTH SCORP4         PR3006 WALK OF WEALTH SOUNDS11    WALK OF WEALTH  S.SITE
 GAME( 200?, sc4dndcw	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -26109,14 +26109,14 @@ GAME( 200?, sc4dndtr	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Think Red
 GAME( 200?, sc4dndtra	,sc4dndtr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR1982 AWP DEAL OR NO DEAL WHATS IN YOUR BOX SCORP4         PR1962 WHATS IN Y BOX SOUNDS11    WHATS IN YOUR BX  S.SITE
-GAME( 200?, sc4dndwb	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwba	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwbb	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwbc	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwbd	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwbe	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwbf	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndwbg	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndwb	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwba	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwbb	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwbc	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwbd	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwbe	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwbf	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndwbg	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR1307 AWP DIAMOND MINE         PR1307 DIAM MINE SOUNDS11
 GAME( 200?, sc4dmine	,0,			sc4, sc4, sc4, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -26908,13 +26908,13 @@ GAME( 200?, sc4copsrh	,sc4copsr,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers (B
 GAME( 200?, sc4copsri	,sc4copsr,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR1935 AWP DEAL OR NO DEAL BEAT THE BANKER S4         PR1915 BEAT THE BANKER SOUNDS11   BEAT THE BANKER S.SITE
-GAME( 200?, sc4dndbe	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbeb	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbec	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbed	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbee	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbef	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
-GAME( 200?, sc4dndbeg	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbe	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbeb	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbec	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbed	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbee	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbef	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 200?, sc4dndbeg	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndbeh	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndbei	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndbej	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -26924,7 +26924,7 @@ GAME( 200?, sc4dndbem	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Bea
 GAME( 200?, sc4dndben	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3337 AWP DEAL OR NO DEAL BOX CLEVER SCORP4         PR3312 DOND BOXCLEVER SOUNDS11    BOX CLEVER  S.SITE
-GAME( 200?, sc4dndbc	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4dndbc	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4dndbca	,sc4dndbc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 GAME( 200?, sc4mowow	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // PR2118 MONOPOLY WOTW         WOTW SOUNDS         MONOPOLY WOTW   8P
@@ -26957,7 +26957,7 @@ GAME( 200?, sc_unsrt	,0,			sc4, sc4, sc4, ROT0, "<unknown>","unknown Scorpion 'U
 // These all basically seem to have the same strings as header info... probably all builds of the same basic game
 
 // PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4ggcas	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4ggcas	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4ggcasa	,sc4ggcas,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4ggcasb	,sc4ggcas,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4ggcasc	,sc4ggcas,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -26965,7 +26965,7 @@ GAME( 200?, sc4ggcasc	,sc4ggcas,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Cas
 // PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
 GAME( 200?, sc4gnc		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gnca		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4gncb		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) 
+GAME( 200?, sc4gncb		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gncc		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gncd		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4gnce		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

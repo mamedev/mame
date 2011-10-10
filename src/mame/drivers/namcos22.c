@@ -2304,47 +2304,47 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 
 /* namcos22_interrupt
 Ridge Racer:
-	1:0a0b6
-	2:09fe8 (rte)
-	3:09fe8 (rte)
-	4:09f9a (vblank)
-	5:14dee (SCI)
-	6:09fe8 (rte)
-	7:09fe8 (rte)
+    1:0a0b6
+    2:09fe8 (rte)
+    3:09fe8 (rte)
+    4:09f9a (vblank)
+    5:14dee (SCI)
+    6:09fe8 (rte)
+    7:09fe8 (rte)
 
 Ridge Racer 2:
-	1:0d10c  40000005
-	2:0cfa2 (rte)
-	3:0cfa2 (rte)
-	4:0cfa2 (rte)
-	5:0cef0
-	6:1bbcc
-	7:0cfa2 (rte)
+    1:0d10c  40000005
+    2:0cfa2 (rte)
+    3:0cfa2 (rte)
+    4:0cfa2 (rte)
+    5:0cef0
+    6:1bbcc
+    7:0cfa2 (rte)
 
 Ace Driver:
-	9f8 (rte)
-	9fa (rte)
-	9fc (rte)
-	9fe (rte)
-	a00
-	a46
-	a4c (rte)
+    9f8 (rte)
+    9fa (rte)
+    9fc (rte)
+    9fe (rte)
+    a00
+    a46
+    a4c (rte)
 
 Victory Lap:
-	a54 indir to 21c2 (hblank?)
-	a5a (rte)
-	a5c (rte)
-	a5e (rte)
-	a60 irq
-	abe indirect to 27f1e (SCI)
-	ac4 (rte)
+    a54 indir to 21c2 (hblank?)
+    a5a (rte)
+    a5c (rte)
+    a5e (rte)
+    a60 irq
+    abe indirect to 27f1e (SCI)
+    ac4 (rte)
 
 Cyber Commando:
-	move.b  #$36, $40000002.l
-	move.b  # $0, $40000003.l
-	move.b  #$35, $40000004.l
-	
-	move.b  #$34, $40000004.l
+    move.b  #$36, $40000002.l
+    move.b  # $0, $40000003.l
+    move.b  #$35, $40000004.l
+
+    move.b  #$34, $40000004.l
 */
 static INTERRUPT_GEN( namcos22_interrupt )
 {
@@ -2382,7 +2382,7 @@ static READ32_HANDLER( namcos22_keycus_r )
 	// for example in timecris to determine where certain enemies will emerge
 	// but it is not yet understood how this works
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-//	printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(&space->device()));
+//  printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(&space->device()));
 
 	if (ACCESSING_BITS_0_15)
 		return state->m_keycus_id;
@@ -3033,8 +3033,8 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-//	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-//	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
+//  MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_NVRAM_HANDLER(namcos22)
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3286,7 +3286,7 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_CPU_PROGRAM_MAP( mcu_s22_program)
 	MCFG_CPU_IO_MAP( mcu_s22_io)
 
-//	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+//  MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_NVRAM_HANDLER(namcos22)
 	MCFG_SCREEN_ADD("screen", RASTER)

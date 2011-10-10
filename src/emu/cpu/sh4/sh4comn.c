@@ -26,7 +26,7 @@ static const UINT32 exception_priority_default[] = {
 	EXPPRI(1,1,0,2),			 /* H-UDI Reset */
 	EXPPRI(1,3,0,3),			 /* Inst TLB Multiple Hit */
 	EXPPRI(1,4,0,4),			 /* Data TLB Multiple Hit */
-	
+
 	EXPPRI(2,0,0,5),			/* User break Before Instruction */
 	EXPPRI(2,1,0,6),			/* Inst Address Error */
 	EXPPRI(2,2,0,7),			/* Inst TLB Miss */
@@ -36,11 +36,11 @@ static const UINT32 exception_priority_default[] = {
 	EXPPRI(2,4,0,11),			/* FPU Disable */
 	EXPPRI(2,4,0,12),			/* Slot FPU Disable */
 	EXPPRI(2,5,0,13),			/* Data Address Error (Read) */
-	EXPPRI(2,5,0,14),			/* Data Address Error (Write) */  
+	EXPPRI(2,5,0,14),			/* Data Address Error (Write) */
 	EXPPRI(2,6,0,15),			/* Data TBL Miss Read */
 	EXPPRI(2,6,0,16),			/* Data TBL Miss Write */
 	EXPPRI(2,7,0,17),			/* Data TBL Protection Violation Read */
-	EXPPRI(2,7,0,18),			/* Data TBL Protection Violation Write */  
+	EXPPRI(2,7,0,18),			/* Data TBL Protection Violation Write */
 	EXPPRI(2,8,0,19),			/* FPU Exception */
 	EXPPRI(2,9,0,20),			/* Initial Page Write exception */
 
@@ -58,7 +58,7 @@ static const int exception_codes[] =
   0x000, /* H-UDI Reset */
   0x140, /* Inst TLB Multiple Hit */
   0x140, /* Data TLB Multiple Hit */
- 
+
   0x1E0, /* User break Before Instruction */
   0x0E0, /* Inst Address Error */
   0x040, /* Inst TLB Miss */
@@ -68,11 +68,11 @@ static const int exception_codes[] =
   0x800, /* FPU Disable */
   0x820, /* Slot FPU Disable */
   0x0E0, /* Data Address Error (Read) */
-  0x100, /* Data Address Error (Write) */  
+  0x100, /* Data Address Error (Write) */
   0x040, /* Data TBL Miss Read */
   0x060, /* Data TBL Miss Write */
   0x0A0, /* Data TBL Protection Violation Read */
-  0x0C0, /* Data TBL Protection Violation Write */  
+  0x0C0, /* Data TBL Protection Violation Write */
   0x120, /* FPU Exception */
   0x080, /* Initial Page Write exception */
 
@@ -108,14 +108,14 @@ static const int exception_codes[] =
   0x660, /* SH4_INTC_DMTE1 */
   0x680, /* SH4_INTC_DMTE2 */
   0x6A0, /* SH4_INTC_DMTE3 */
- 
+
   0x780, /* SH4_INTC_DMTE4 */
   0x7A0, /* SH4_INTC_DMTE5 */
   0x7C0, /* SH4_INTC_DMTE6 */
   0x7E0, /* SH4_INTC_DMTE7 */
-  
+
   0x6C0, /* SH4_INTC_DMAE */
-  
+
   0xB00, /* SH4_INTC_TUNI3 */
   0xB80, /* SH4_INTC_TUNI4 */
   0x400, /* SH4_INTC_TUNI0 */
@@ -149,7 +149,7 @@ static const int sh3_intevt2_exception_codes[] =
   -1, /* H-UDI Reset */
   -1, /* Inst TLB Multiple Hit */
   -1, /* Data TLB Multiple Hit */
- 
+
   -1, /* User break Before Instruction */
   -1, /* Inst Address Error */
   -1, /* Inst TLB Miss */
@@ -159,11 +159,11 @@ static const int sh3_intevt2_exception_codes[] =
   -1, /* FPU Disable */
   -1, /* Slot FPU Disable */
   -1, /* Data Address Error (Read) */
-  -1, /* Data Address Error (Write) */  
+  -1, /* Data Address Error (Write) */
   -1, /* Data TBL Miss Read */
   -1, /* Data TBL Miss Write */
   -1, /* Data TBL Protection Violation Read */
-  -1, /* Data TBL Protection Violation Write */  
+  -1, /* Data TBL Protection Violation Write */
   -1, /* FPU Exception */
   -1, /* Initial Page Write exception */
 
@@ -200,14 +200,14 @@ static const int sh3_intevt2_exception_codes[] =
   -1, /* SH4_INTC_DMTE1 */
   -1, /* SH4_INTC_DMTE2 */
   -1, /* SH4_INTC_DMTE3 */
- 
+
   -1, /* SH4_INTC_DMTE4 */
   -1, /* SH4_INTC_DMTE5 */
   -1, /* SH4_INTC_DMTE6 */
   -1, /* SH4_INTC_DMTE7 */
-  
+
   -1, /* SH4_INTC_DMAE */
-  
+
   -1, /* SH4_INTC_TUNI3 */
   -1, /* SH4_INTC_TUNI4 */
   0x400, /* SH4_INTC_TUNI0 */
@@ -373,7 +373,7 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 
 
 	if (sh4->cpu_type == CPU_TYPE_SH4)
-	{	
+	{
 		if (exception < SH4_INTC_NMI)
 			return; // Not yet supported
 		if (exception == SH4_INTC_NMI) {
@@ -415,13 +415,13 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 		}
 		else
 		{
-			
+
 			if (sh4->sr & BL)
 				return;
 			if (((sh4->exception_priority[exception] >> 8) & 255) <= ((sh4->sr >> 4) & 15))
 				return;
-			
-				
+
+
 			vector = 0x600;
 
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
@@ -776,7 +776,7 @@ WRITE32_HANDLER( sh4_internal_w )
 		break;
 
 /*********************************************************************************************************************
-		TMU (Timer Unit)
+        TMU (Timer Unit)
 *********************************************************************************************************************/
 	case SH4_TSTR_ADDR:	sh4_handle_tstr_addr_w(sh4,data,mem_mask);   break;
 	case SH4_TCR0_ADDR:	sh4_handle_tcr0_addr_w(sh4,data,mem_mask);   break;
@@ -791,7 +791,7 @@ WRITE32_HANDLER( sh4_internal_w )
 	case SH4_TOCR_ADDR: sh4_handle_tocr_addr_w(sh4,data,mem_mask);   break; // not supported
 	case SH4_TCPR2_ADDR: sh4_handle_tcpr2_addr_w(sh4,data,mem_mask); break; // not supported
 /*********************************************************************************************************************
-		INTC (Interrupt Controller)
+        INTC (Interrupt Controller)
 *********************************************************************************************************************/
 	case ICR:
 		sh4->m[ICR] = (sh4->m[ICR] & 0x7fff) | (old & 0x8000);
@@ -822,33 +822,33 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4_exception_recompute(sh4);
 		break;
 /*********************************************************************************************************************
-		DMAC (DMA Controller)
+        DMAC (DMA Controller)
 *********************************************************************************************************************/
-	case SH4_SAR0_ADDR: sh4_handle_sar0_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_SAR1_ADDR: sh4_handle_sar1_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_SAR2_ADDR: sh4_handle_sar2_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_SAR3_ADDR: sh4_handle_sar3_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_DAR0_ADDR: sh4_handle_dar0_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_DAR1_ADDR: sh4_handle_dar1_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_DAR2_ADDR: sh4_handle_dar2_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_DAR3_ADDR: sh4_handle_dar3_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(sh4,data,mem_mask);   break; 
-	case SH4_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(sh4,data,mem_mask);   break; 
+	case SH4_SAR0_ADDR: sh4_handle_sar0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_SAR1_ADDR: sh4_handle_sar1_addr_w(sh4,data,mem_mask);   break;
+	case SH4_SAR2_ADDR: sh4_handle_sar2_addr_w(sh4,data,mem_mask);   break;
+	case SH4_SAR3_ADDR: sh4_handle_sar3_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DAR0_ADDR: sh4_handle_dar0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DAR1_ADDR: sh4_handle_dar1_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DAR2_ADDR: sh4_handle_dar2_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DAR3_ADDR: sh4_handle_dar3_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(sh4,data,mem_mask);   break;
 	case SH4_CHCR0_ADDR: sh4_handle_chcr0_addr_w(sh4,data,mem_mask);   break;
 	case SH4_CHCR1_ADDR: sh4_handle_chcr1_addr_w(sh4,data,mem_mask);   break;
 	case SH4_CHCR2_ADDR: sh4_handle_chcr2_addr_w(sh4,data,mem_mask);   break;
 	case SH4_CHCR3_ADDR: sh4_handle_chcr3_addr_w(sh4,data,mem_mask);   break;
 	case SH4_DMAOR_ADDR: sh4_handle_dmaor_addr_w(sh4,data,mem_mask);   break;
 /*********************************************************************************************************************
-		Store Queues
+        Store Queues
 *********************************************************************************************************************/
 	case QACR0:
 	case QACR1:
 		break;
 /*********************************************************************************************************************
-		I/O
+        I/O
 *********************************************************************************************************************/
 	case PCTRA:
 		sh4->ioport16_pullup = 0;
@@ -930,14 +930,14 @@ READ32_HANDLER( sh4_internal_r )
 		break;
 
 /*********************************************************************************************************************
-		INTC (Interrupt Controller)
+        INTC (Interrupt Controller)
 *********************************************************************************************************************/
 
 	case IPRA:
 		return sh4->SH4_IPRA;
 
 /*********************************************************************************************************************
-		TMU (Timer Unit)
+        TMU (Timer Unit)
 *********************************************************************************************************************/
 	case SH4_TSTR_ADDR:  return sh4_handle_tstr_addr_r(sh4, mem_mask);
 	case SH4_TCR0_ADDR:  return sh4_handle_tcr0_addr_r(sh4, mem_mask);
@@ -952,7 +952,7 @@ READ32_HANDLER( sh4_internal_r )
 	case SH4_TOCR_ADDR:  return sh4_handle_tocr_addr_r(sh4, mem_mask); // not supported
 	case SH4_TCPR2_ADDR: return sh4_handle_tcpr2_addr_r(sh4, mem_mask); // not supported
 /*********************************************************************************************************************
-		DMAC (DMA Controller)
+        DMAC (DMA Controller)
 *********************************************************************************************************************/
 	case SH4_SAR0_ADDR: return sh4_handle_sar0_addr_r(sh4,mem_mask);
 	case SH4_SAR1_ADDR: return sh4_handle_sar1_addr_r(sh4,mem_mask);
@@ -972,7 +972,7 @@ READ32_HANDLER( sh4_internal_r )
 	case SH4_CHCR3_ADDR: return sh4_handle_chcr3_addr_r(sh4,mem_mask);
 	case SH4_DMAOR_ADDR: return sh4_handle_dmaor_addr_r(sh4,mem_mask);
 /*********************************************************************************************************************
-		I/O Ports
+        I/O Ports
 *********************************************************************************************************************/
 
 	case PDTRA:
@@ -1062,7 +1062,7 @@ void sh4_set_irq_line(sh4_state *sh4, int irqline, int state) // set state of ex
 		else
 		{
 			//if (irqline > SH4_IRL3)
-			//	return;
+			//  return;
 			if (sh4->irq_line_state[irqline] == state)
 				return;
 			sh4->irq_line_state[irqline] = state;

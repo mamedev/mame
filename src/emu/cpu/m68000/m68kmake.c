@@ -21,9 +21,9 @@
 
 /*
  * 68030 and PMMU by R. Belmont and Hans Ostermeyer
- * 68040 and FPU by Ville Linde, R. Belmont, and Hans Ostermeyer 
- * CPU32 by David Haywood.  ColdFire by R. Belmont. 
- *  
+ * 68040 and FPU by Ville Linde, R. Belmont, and Hans Ostermeyer
+ * CPU32 by David Haywood.  ColdFire by R. Belmont.
+ *
  */
 
 

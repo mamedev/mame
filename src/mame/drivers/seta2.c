@@ -1906,7 +1906,7 @@ static const gfx_layout funcube_layout_4bpp_lo =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-//	{ STEP4(7*8, -8) },
+//  { STEP4(7*8, -8) },
 	{ STEP4(0*8, 8) },	// needed by funcube3 text
 	{ STEP8(0, 1) },
 	{ STEP8(0, 8*8) },

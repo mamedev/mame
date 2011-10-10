@@ -258,7 +258,7 @@ static const mc6845_interface whitestar_crtc6845_interface =
 static PALETTE_INIT( whitestar )
 {
 	palette_set_color(machine, 0, MAKE_RGB(0, 0, 0));
-	
+
 	palette_set_color(machine, 1, MAKE_RGB(20, 20, 20));
 	palette_set_color(machine, 2, MAKE_RGB(84, 73, 10));
 	palette_set_color(machine, 3, MAKE_RGB(168, 147, 21));

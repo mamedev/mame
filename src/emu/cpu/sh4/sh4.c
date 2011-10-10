@@ -1718,7 +1718,7 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 	else /* SH3 */
 	{
 		sh4->m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
-	} 
+	}
 
 
 	sh4->ssr = sh4->sr;
@@ -2098,7 +2098,7 @@ INLINE void PREFM(sh4_state *sh4, UINT32 n)
 			else
 			{
 				if (sh4->cpu_type == CPU_TYPE_SH4)
-				{	
+				{
 					dest |= (sh4->m[QACR1] & 0x1C) << 24;
 				}
 				else
@@ -3309,7 +3309,7 @@ static CPU_RESET( common_sh4_reset )
 static CPU_RESET( sh3 )
 {
 	sh4_state *sh4 = get_safe_token(device);
-	
+
 	CPU_RESET_CALL(common_sh4_reset);
 
 	sh4->cpu_type = CPU_TYPE_SH3;
@@ -3326,11 +3326,11 @@ static CPU_RESET( sh3 )
 static CPU_RESET( sh4 )
 {
 	sh4_state *sh4 = get_safe_token(device);
-	
+
 	CPU_RESET_CALL(common_sh4_reset);
 
 	sh4->cpu_type = CPU_TYPE_SH4;
-	
+
 	sh4->m[RCR2] = 0x09;
 	sh4->SH4_TCOR0 = 0xffffffff;
 	sh4->SH4_TCNT0 = 0xffffffff;
@@ -3556,7 +3556,7 @@ static CPU_INIT( sh4 )
 	device->save_item(NAME(sh4->SH4_IPRA));
 
 	device->save_item(NAME(sh4->SH4_IPRC));
-	
+
 
 
 }
