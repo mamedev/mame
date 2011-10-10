@@ -382,26 +382,28 @@
     .PROG PCB contains sample data ('V' - rom) and program code ('P' - rom).
 
     On most PCBs various custom/protection chips can also be found:
+    (Custom chip detail information (modified) from: http://wiki.neogeodev.org)
 
     CHA:
-    . NEO-273
-    . NEO-CMC
-    . NEO-ZMC
-    . NEO-ZMC2
-    . PRO-CT0
-    . SNK-9201
+    . NEO-273  (C and S-ROM address latch)
+    . NEO-CMC 90G06CF7042 (NEO-273 logic / NEO-ZMC logic / C-ROM decryption / C and S-ROM multiplexer / S-ROM bankswitching)
+    . NEO-CMC 90G06CF7050 (NEO-273 logic / NEO-ZMC logic / C-ROM decryption / M-ROM decryption / C and S-ROM multiplexer / S-ROM bankswitching)
+    . NEO-ZMC  (Z80 memory controller)
+    . NEO-ZMC2 (Z80 memory controller / Tile serializer)
+    . PRO-CT0  (C-ROM serializer and multiplexer?; used on early AES-CHA boards)
+    . SNK-9201 (C-ROM serializer and multiplexer?; used on early AES-CHA boards)
 
     PROG:
-    . 0103 (QFP144)
-    . ALTERA (EPM7128SQC100-15)
-    . NEO-COMA
-    . NEO-PCM2 (SNK 1999)
-    . NEO-PCM2 (PLAYMORE 2002)
-    . NEO-PVC
-    . NEO-SMA
-    . PCM
-    . PRO-CT0
-    . SNK-9201
+    . 0103 (QFP144) (Only found on Metal Slug X NEO-MVS PROGEOP board; function unknown)
+    . ALTERA   (EPM7128SQC100-15) (P-ROM protection chip used for KOF98 NEO-MVS PROGSF1 board and Metal Slug X NEO-MVS PROGEOP board)
+    . NEO-COMA (Microcontroller; used for MULTI PLAY MODE, boards and sets see below)
+    . NEO-PCM2 (SNK 1999) (PCM functionality / V-ROM decryption / P-ROM decoding and bankswitching)
+    . NEO-PCM2 (PLAYMORE 2002) (PCM functionality / V-ROM decryption / P-ROM decoding and bankswitching)
+    . NEO-PVC  (P-ROM decryption and bankswitching)
+    . NEO-SMA  (P-ROM decryption and bankswitching / RNG / Storage of 256kb game data)
+    . PCM      (ADPCM bus latches / V-ROM multiplexer)
+    . PRO-CT0  (On PROG board used for P-ROM protection -> Fatal Fury 2)
+    . SNK-9201 (On PROG board used for P-ROM protection -> Fatal Fury 2)
 
 
     Known PCBs:
@@ -533,7 +535,7 @@
     MVS cart pinout
     ===============
 
-    kindly submitted by Apollo69 (apollo69@columbus.rr.com)
+    Kindly submitted by Apollo69 (apollo69@columbus.rr.com)
     =================================================================
                 CTRG1                            CTRG2
     =================================================================
@@ -1823,6 +1825,7 @@ ROM_END
  ID-0029
  . ??M-029
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . ??H-029
 ****************************************/
 
 ROM_START( legendos )
@@ -2001,23 +2004,24 @@ ROM_END
 #if 0
 ROM_START( roboarma )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "032-p1h.bin", 0x000000, 0x080000, CRC(27c773cb) SHA1(597ca73f142b1129cc7780540bb9cfacd47bc6ce) ) /* TC534200 */
+	ROM_LOAD16_WORD_SWAP( "032-p1h.p1", 0x000000, 0x080000, CRC(27c773cb) SHA1(597ca73f142b1129cc7780540bb9cfacd47bc6ce) ) /* TC534200 */
+	/* Chip label p1h does not exist; if this is real what is the correct chip label? */
 
-	NEO_SFIX_128K( "032-s1.bin", CRC(ac0daa1b) SHA1(93bae4697dc403fce19422752a514326ccf66a91) ) /* TC531000 */
+	NEO_SFIX_128K( "032-s1.s1", CRC(ac0daa1b) SHA1(93bae4697dc403fce19422752a514326ccf66a91) ) /* TC531000 */
 
-	NEO_BIOS_AUDIO_128K( "032-m1.bin", CRC(35ec952d) SHA1(8aed30e26d7e2c70dbce5de752df416091066f7b) ) /* TC531001 */
+	NEO_BIOS_AUDIO_128K( "032-m1.m1", CRC(35ec952d) SHA1(8aed30e26d7e2c70dbce5de752df416091066f7b) ) /* TC531001 */
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
-	ROM_LOAD( "032-v1.bin", 0x000000, 0x100000, CRC(63791533) SHA1(4479e9308cdc906b9e03b985303f4ebedd00512f) ) /* TC538200 */
-	ROM_LOAD( "032-v2.bin", 0x100000, 0x100000, CRC(eb95de70) SHA1(b34885201116d2b3bbdee15ec7b5961cf5c069e1) ) /* TC538200 */
+	ROM_LOAD( "032-v1.v1", 0x000000, 0x100000, CRC(63791533) SHA1(4479e9308cdc906b9e03b985303f4ebedd00512f) ) /* TC538200 */
+	ROM_LOAD( "032-v2.v2", 0x100000, 0x100000, CRC(eb95de70) SHA1(b34885201116d2b3bbdee15ec7b5961cf5c069e1) ) /* TC538200 */
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x300000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "032-c1.bin", 0x000000, 0x100000, CRC(97984c6c) SHA1(deea59c0892f05dc7db98cb57b3eb83688dc57f0) ) /* Plane 0,1 */ /* TC538200 */
-	ROM_LOAD16_BYTE( "032-c2.bin", 0x000001, 0x100000, CRC(65773122) SHA1(2c0162a8e971e5e57933e4ae16040bf824ffdefe) ) /* Plane 2,3 */ /* TC538200 */
-	ROM_LOAD16_BYTE( "032-c3.bin", 0x200000, 0x080000, CRC(40adfccd) SHA1(b11f866dd70ba0ed9123424508355cb948b19bdc) ) /* Plane 0,1 */ /* TC534200 */
-	ROM_LOAD16_BYTE( "032-c4.bin", 0x200001, 0x080000, CRC(462571de) SHA1(5c3d610d492f91564423873b3b434dcda700373f) ) /* Plane 2,3 */ /* TC534200 */
+	ROM_LOAD16_BYTE( "032-c1.c1", 0x000000, 0x100000, CRC(97984c6c) SHA1(deea59c0892f05dc7db98cb57b3eb83688dc57f0) ) /* Plane 0,1 */ /* TC538200 */
+	ROM_LOAD16_BYTE( "032-c2.c2", 0x000001, 0x100000, CRC(65773122) SHA1(2c0162a8e971e5e57933e4ae16040bf824ffdefe) ) /* Plane 2,3 */ /* TC538200 */
+	ROM_LOAD16_BYTE( "032-c3.c3", 0x200000, 0x080000, CRC(40adfccd) SHA1(b11f866dd70ba0ed9123424508355cb948b19bdc) ) /* Plane 0,1 */ /* TC534200 */
+	ROM_LOAD16_BYTE( "032-c4.c4", 0x200001, 0x080000, CRC(462571de) SHA1(5c3d610d492f91564423873b3b434dcda700373f) ) /* Plane 2,3 */ /* TC534200 */
 ROM_END
 #endif
 
@@ -3358,6 +3362,13 @@ ROM_END
  ID-0071
  Bang Bang Busters (prototype) 1994 Visco
  Released in 2010 for MVS and AES (Releaser claims that it is officially licensed by VISCO)
+
+ Reported UNIVERSE BIOS CRC32:
+  ROM     EC861CAF
+  BANK 0  NOT USED
+  BANK 1  NOT USED
+  BANK 2  NOT USED
+  BANK 3  NOT USED
  ****************************************/
 
 /****************************************
@@ -3681,7 +3692,7 @@ ROM_END
 
 ROM_START( pbobblen ) /* MVS ONLY RELEASE */
 	/* This set uses CHA and PROG board from Power Spikes II. Six Power Spikes II prom's are replaced with
-    Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? */
+	Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "d96-07.ep1", 0x000000, 0x080000, CRC(6102ca14) SHA1(328429d11de5b327a0654ae0548da4d0025a2ae6) ) /* 27C240 */
 
@@ -4424,25 +4435,24 @@ ROM_END
  ID-0207
  . ??M-207
  NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
- NEO-MVS PROG 4096 / NEO-MVS CHA42G-3B
 ****************************************/
 
 ROM_START( neomrdo ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "207-p1.p1", 0x000000, 0x80000, CRC(39efdb82) SHA1(75fe68921f871872e5fc92594e43b4cd712e819b) )
+	ROM_LOAD16_WORD_SWAP( "207-p1.p1", 0x000000, 0x100000, CRC(334ea51e) SHA1(0a642f8565ec6e9587ed767bcf177f4677547162) ) /* TC538200 */
 
-	NEO_SFIX_128K( "207-s1.s1", CRC(6aebafce) SHA1(5db03715fbed62f2ff3cef7f93606f30261c0362) )
+	NEO_SFIX_128K( "207-s1.s1", CRC(6aebafce) SHA1(5db03715fbed62f2ff3cef7f93606f30261c0362) ) /* TC531000 */
 
-	NEO_BIOS_AUDIO_128K( "207-m1.m1", CRC(81eade02) SHA1(d6d135bc525f3ed14a8c255f0b83d83a52b0659c) )
+	NEO_BIOS_AUDIO_128K( "207-m1.m1", CRC(b5b74a95) SHA1(7b01f3b87c247cc7472591f8cdcf0ae8065e31c6) ) /* TC531001 */
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
-	ROM_LOAD( "207-v1.v1", 0x000000, 0x200000, CRC(4143c052) SHA1(561b19bc8811b80f2f42ffc0b5df27132696470a) )
+	ROM_LOAD( "207-v1.v1", 0x000000, 0x200000, CRC(4143c052) SHA1(561b19bc8811b80f2f42ffc0b5df27132696470a) ) /* TC5316200 */
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "207-c1.c1", 0x000000, 0x200000, CRC(c7541b9d) SHA1(25ca1a2b14cc2648d8dbe432cbd1396017af822c) )
-	ROM_LOAD16_BYTE( "207-c2.c2", 0x000001, 0x200000, CRC(f57166d2) SHA1(bf3aa47d17156485c2177fb63cba093f050abb98) )
+	ROM_LOAD16_BYTE( "207-c1.c1", 0x000000, 0x200000, CRC(c7541b9d) SHA1(25ca1a2b14cc2648d8dbe432cbd1396017af822c) ) /* Plane 0,1 */ /* TC5316200 */
+	ROM_LOAD16_BYTE( "207-c2.c2", 0x000001, 0x200000, CRC(f57166d2) SHA1(bf3aa47d17156485c2177fb63cba093f050abb98) ) /* Plane 2,3 */ /* TC5316200 */
 ROM_END
 
 /****************************************
@@ -6722,6 +6732,7 @@ ROM_END
  MVS PROGBK2 REV1.0 (NEO-PCM2 SNK)/ MVS CHAFIO REV1.0 (NEO-CMC 7050)
  . NGH-2621
  NEO-AEG PROGBK1F / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+  - Distribution by BrezzaSoft
 ****************************************/
 
 ROM_START( kof2001 ) /* MVS VERSION */
@@ -6876,10 +6887,11 @@ ROM_END
 
 /****************************************
  ID-0264
- . NGM-2640
+ . NGM-264?
  NEO-MVS PROGBK2 (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
- . NGH-2640
+ . NGH-2641
  NEO-AEG PROGBK2 (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+  - Distribution by BrezzaSoft
 ****************************************/
 
 ROM_START( rotd ) /* Encrypted Set */ /* MVS VERSION */
@@ -9932,7 +9944,7 @@ GAME( 2002, mslug4h,   mslug4,   neogeo,   neogeo,   mslug4,   ROT0, "Mega / Pla
 GAME( 2002, ms4plus,   mslug4,   neogeo,   neogeo,   ms4plus,  ROT0, "bootleg", "Metal Slug 4 Plus (bootleg)", GAME_SUPPORTS_SAVE )
 
 /* Evoga */
-GAME( 2002, rotd,      neogeo,   neogeo,   neogeo,   rotd,     ROT0, "Evoga / Playmore", "Rage of the Dragons (NGM-2640)", GAME_SUPPORTS_SAVE )
+GAME( 2002, rotd,      neogeo,   neogeo,   neogeo,   rotd,     ROT0, "Evoga / Playmore", "Rage of the Dragons (NGM-264?)", GAME_SUPPORTS_SAVE )
 
 /* Atlus */
 GAME( 2002, matrim,    neogeo,   neogeo,   neogeo,   matrim,   ROT0, "Noise Factory / Atlus", "Matrimelee / Shin Gouketsuji Ichizoku Toukon (NGM-2660) (NGH-2660)", GAME_SUPPORTS_SAVE )
