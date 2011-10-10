@@ -94,6 +94,9 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 
 - Added Muroge Monaco (set 3). This game has only 1 coin slot.
 
+- Figured out the sound. It's a Delta-Sigma DAC (driven by bit3 of the output port
+  at $7000.
+
 - The real game title is unknown. Could be "Muroge Monaco", "Las Vegas, Nevada", but
   I strongly think that the original name is different.
 
@@ -102,6 +105,7 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
+#include "sound/dac.h"
 
 
 class murogem_state : public driver_device
@@ -114,13 +118,26 @@ public:
 };
 
 
+static WRITE8_HANDLER( outport_w )
+{
+/*
+   It's a Delta-Sigma DAC (1-bit/Bitstream)
+
+    - bits -
+    7654 3210
+    ---- x---   Sound DAC.
+*/
+	dac_data_w(space->machine().device("dac"), data & 0x08);
+}
+
+
 static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("IN1")
-	AM_RANGE(0x7000, 0x7000) AM_WRITENOP // sound? payout?
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(outport_w)	/* output port */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(murogem_state, m_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -223,7 +240,7 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_CONFIG_START( murogem, murogem_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802,8000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", M6802, 8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(murogem_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -232,8 +249,8 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)           // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)    // Taken from MC6845 init, registers 01 & 06.
+	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(murogem)
 
 	MCFG_GFXDECODE(murogem)
@@ -242,6 +259,11 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_PALETTE_INIT(murogem)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 750000, mc6845_intf) /* ? MHz */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 12.00)
 MACHINE_CONFIG_END
 
 
@@ -271,12 +293,12 @@ ROM_START( murogema )
 
 ROM_END
 
-/*  Set 802 from EMMA Italian Dumping team.
-    Slaightly different. Only one coin in slot.
+/*  Set 802 from EMMA Italian Dumping Team.
+    Slightly different. Only one coin in slot.
 */
 ROM_START( murogemb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a1.8e", 0xf000, 0x0400, CRC(5b59417a) SHA1(2a2a92b3f8e703ee723ff47d133214e61af8e87d)  )	/* is this rom ok? */
+	ROM_LOAD( "a1.8e", 0xf000, 0x0400, CRC(5b59417a) SHA1(2a2a92b3f8e703ee723ff47d133214e61af8e87d)  )
 	ROM_FILL(		   0xf400, 0x0400, 0xff ) /* filling the hole */
 	ROM_LOAD( "a0.9e", 0xf800, 0x0800, CRC(14ef74fb) SHA1(09ae8156fc76c132cb456aefc1c07a4136d935b8)  )
 
@@ -300,7 +322,7 @@ ROM_START( lasvegas )
 	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )	/* 74s288 at 1B */
 ROM_END
 
-GAME( 198?, murogem,  0,       murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", GAME_NO_SOUND|GAME_WRONG_COLORS )
-GAME( 198?, murogema, murogem, murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 2)", GAME_NO_SOUND|GAME_WRONG_COLORS )
-GAME( 198?, murogemb, murogem, murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 3)", GAME_NO_SOUND|GAME_WRONG_COLORS )
-GAME( 198?, lasvegas, murogem, murogem, murogem, 0, ROT0, "hack",      "Las Vegas, Nevada", GAME_NO_SOUND|GAME_WRONG_COLORS )
+GAME( 198?, murogem,  0,       murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", GAME_WRONG_COLORS )
+GAME( 198?, murogema, murogem, murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 2)", GAME_WRONG_COLORS )
+GAME( 198?, murogemb, murogem, murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 3)", GAME_WRONG_COLORS )
+GAME( 198?, lasvegas, murogem, murogem, murogem, 0, ROT0, "hack",      "Las Vegas, Nevada",     GAME_WRONG_COLORS )
