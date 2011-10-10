@@ -152,7 +152,7 @@
  * Alpine Racer 2   (C) Namco, 1996
  * Alpine Surfer    (C) Namco, 1996
  * Aqua Jet         (C) Namco, 1996
- * *Armidillo Racing(C) Namco, 1997
+ * *Armadillo Racing(C) Namco, 1997
  * Cyber Cycles     (C) Namco, 1995
  * Dirt Dash        (C) Namco, 1995
  * Prop Cycle       (C) Namco, 1996
@@ -180,7 +180,7 @@
  * MROM PCB  - These PCB's have many SOP44 ROMs on them and are identical for each game, but the contents of the ROMs
  *             and the number of ROMs vary per game. (a few of the dumped games have had their surface mounted ROMs
  *             swapped to other PCBs and worked fine)
- * FLASH PCB - Flash ROM board used only for Armidillo Racing and contains many TSOP56 16M FlashROMs
+ * FLASH PCB - Flash ROM board used only for Armadillo Racing and contains many TSOP56 16M FlashROMs
  * VIDEO PCB - There are three known revisions of this PCB. They're mostly identical apart from some component shuffling
  *             and in the earlier versions (A & B), an Altera FPGA chip is used instead of a Namco custom chip.
  *             All revisions of the Video PCBs are swappable and fully compatible with any SS22 game. The Altera FPGA runs
@@ -284,7 +284,7 @@
  *                                          Alpine Racer 2   = C434
  *                                          Alpine Surfer    = C425
  *                                          Aqua Jet         = C429
- *                                          Armidillo Racing = C433
+ *                                          Armadillo Racing = C433
  *                                          Cyber Cycles     = C389
  *                                          Dirt Dash        = C418
  *                                          Prop Cycle       = C428
@@ -302,7 +302,7 @@
  *                      Alpine Racer 2     'ARS2 DATA'
  *                      Alpine Surfer      'AF1 DATA'
  *                      Aqua Jet           'AJ1 DATA'
- *                      Armidillo Racing   'AR DATA'
+ *                      Armadillo Racing   'AR DATA'
  *                      Cyber Cycles       'CB1 DATA B'
  *                      Dirt Dash          'DT1 DATA A'
  *                      Prop Cycle         'PR1 DATA'
@@ -318,7 +318,7 @@
  *                      Alpine Racer 2     'ARS1 WAVEA', 'ARS2 WAVE B', both DIP42 32M MASKROMs
  *                      Alpine Surfer      'AF1 WAVEA' ,              , DIP42 32M MASKROM
  *                      Aqua Jet           'AJ1 WAVEA' , 'AJ1 WAVEB'  , both DIP42 32M MASKROMs
- *                      Armidillo Racing   'AR WAVEA'  , 'AR WAVEB'   , both TSOP56, mounted on a DIP48 adapter board
+ *                      Armadillo Racing   'AR WAVEA'  , 'AR WAVEB'   , both TSOP56, mounted on a DIP48 adapter board
  *                      Cyber Cycles       'CB1 WAVEA' , 'CB1 WAVEB'  , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
  *                      Dirt Dash          'DT1 WAVEA' , 'DT1 WAVEB'  , both DIP42 32M MASKROMs
  *                      Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M MASKROM
@@ -355,7 +355,7 @@
  *                           Alpine Racer     'AR2 Ver.C'
  *                           Alpine Racer     'AR2 Ver.D'
  *                           Aqua Jet         'AJ2 Ver.B'
- *                           Armidillo Racing 'AR' Ver.?
+ *                           Armadillo Racing 'AR' Ver.?
  *                           Cyber Cycles     'CB2 Ver.C'
  *                           Prop Cycle       'PR2 Ver.A'
  *                           Time Crisis      'TS2 Ver.B'
@@ -864,7 +864,7 @@
  *
  * Game               ROMs populated (All Intel E28F016SA TSOP56 16M FlashROMs)
  * -----------------------------------------------------------------
- * Armidillo Racing   F1E, F1J, F2E, F2J            - CCRL/CCRH ROMs
+ * Armadillo Racing   F1E, F1J, F2E, F2J            - CCRL/CCRH ROMs
  *
  *                    F4E, F4J, F5E, F5J, F6E, F6J, \
  *                    F7E, F7J, F8E, F8J, F9E, F9J, \ CGx ROMs
@@ -2543,6 +2543,13 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 	}
 } /* alpinesa_prot_w */
 
+static WRITE32_HANDLER( namcos22s_nvmem_w )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	mem_mask &= 0xff00ff00; // 8KB RAM over 16KB address space
+	COMBINE_DATA(&state->m_nvmem[offset]);
+}
+
 /* Namco Super System 22 */
 static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
@@ -2552,7 +2559,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r) AM_WRITENOP /* LEDs? */
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE(namcos22_portbit_r, namcos22_portbit_w)
-	AM_RANGE(0x460000, 0x463fff) AM_RAM AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
+	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
 	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(namcos22_system_controller_r, namcos22s_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22_port800000_w) /* (C304 C399)  40380000 during SPOT test */
 	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czattr)
@@ -3129,7 +3136,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
      * Mounted position: CPU 9E
      * Known chip type: HN58C65P-25 (8k x 8bit EEPROM)
      */
-	AM_RANGE(0x58000000, 0x58001fff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_nvmem) AM_SIZE_MEMBER(namcos22_state, m_nvmem_size)
+	AM_RANGE(0x58000000, 0x58001fff) AM_RAM AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
 
 	/**
      * C74 (Mitsubishi M37702 MCU) Shared RAM (0x60004000 - 0x6000bfff)
