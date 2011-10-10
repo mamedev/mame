@@ -14,52 +14,505 @@ public:
 		: driver_device(mconfig, type, tag) { }
 };
 
+/***************************************************************************
+                                Video Hardware
+***************************************************************************/
 
-VIDEO_START(cavesh3)
+struct _clr_t
 {
+	INT8 r,g,b;
+};
+typedef struct _clr_t clr_t;
+
+// r5g5b5 ro clr_t
+INLINE void pen_to_clr(UINT16 pen, clr_t *clr)
+{
+	clr->r = (pen >> 10) & 0x1f;
+	clr->g = (pen >>  5) & 0x1f;
+	clr->b = (pen      ) & 0x1f;
 }
 
-SCREEN_UPDATE(cavesh3)
+// convert separate r,g,b biases (0..80..ff) to clr_t (-1f..0..1f)
+INLINE void tint_to_clr(UINT8 r, UINT8 g, UINT8 b, clr_t *clr)
 {
+	clr->r	=	(r - 0x80) / 4;
+	clr->g	=	(g - 0x80) / 4;
+	clr->b	=	(b - 0x80) / 4;
+
+	if (clr->r < -0x1f)	clr->r = -0x1f;
+	if (clr->g < -0x1f)	clr->g = -0x1f;
+	if (clr->b < -0x1f)	clr->b = -0x1f;
+}
+
+// convert alpha factor (0..ff) to clr_t (0..1f)
+INLINE void alpha_to_clr(UINT8 alpha, clr_t *clr)
+{
+	clr->r	=	alpha / 8;
+	clr->g	=	alpha / 8;
+	clr->b	=	alpha / 8;
+}
+
+// clamp to 0..1f
+INLINE INT8 clamp(INT8 comp)
+{
+	if (comp > 0x1f)	return 0x1f;
+	else if (comp < 0)	return 0;
+	else				return comp;
+}
+
+// clr_t to r5g5b5
+INLINE UINT16 clr_to_pen(const clr_t *clr)
+{
+//	return (clr->r << 10) | (clr->g << 5) | clr->b;
+return 0x8000 | (clr->r << 10) | (clr->g << 5) | clr->b;
+}
+
+// add clrs
+INLINE void clr_add(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
+{
+	clr->r = clamp(clr0->r + clr1->r);
+	clr->g = clamp(clr0->g + clr1->g);
+	clr->b = clamp(clr0->b + clr1->b);
+}
+
+// multiply clrs
+INLINE void clr_mul(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
+{
+	clr->r = clamp(clr0->r * clr1->r / 0x1f);
+	clr->g = clamp(clr0->g * clr1->g / 0x1f);
+	clr->b = clamp(clr0->b * clr1->b / 0x1f);
+}
+
+INLINE char mode_name(UINT8 mode)
+{
+	switch( mode )
+	{
+		case 0:	return 'A';	// +alpha
+		case 1:	return 'S';	// +source
+		case 2:	return 'D';	// +dest
+		case 3:	return '*';	// *
+		case 4:	return 'a';	// -alpha
+		case 5:	return 's';	// -source
+		case 6:	return 'd';	// -dest
+		case 7:	return '-';	// *
+	}
+	return '?';
+}
+
+// (1|s|d) * s_factor * s + (1|s|d) * d_factor * d
+// 0: +alpha
+// 1: +source
+// 2: +dest
+// 3: *
+// 4: -alpha
+// 5: -source
+// 6: -dest
+// 7: *
+INLINE void cavesh_clr_select(const clr_t *s_clr, const clr_t *d_clr, const clr_t *a_clr, UINT8 mode, clr_t *clr)
+{
+	switch( mode )
+	{
+		case 0:	// +alpha
+			clr->r = a_clr->r;
+			clr->g = a_clr->g;
+			clr->b = a_clr->b;
+			return;
+
+		case 1:	// +source
+			clr->r = s_clr->r;
+			clr->g = s_clr->g;
+			clr->b = s_clr->b;
+			return;
+
+		case 2:	// +dest
+			clr->r = d_clr->r;
+			clr->g = d_clr->g;
+			clr->b = d_clr->b;
+			return;
+
+		case 3:	// *
+			clr->r = 0x1f;
+			clr->g = 0x1f;
+			clr->b = 0x1f;
+			return;
+
+		case 4:	// -alpha
+			clr->r = a_clr->r^0x1f;
+			clr->g = a_clr->g^0x1f;
+			clr->b = a_clr->b^0x1f;
+			return;
+
+		case 5:	// -source
+			clr->r = s_clr->r^0x1f;
+			clr->g = s_clr->g^0x1f;
+			clr->b = s_clr->b^0x1f;
+			return;
+
+		case 6:	// -dest
+			clr->r = d_clr->r^0x1f;
+			clr->g = d_clr->g^0x1f;
+			clr->b = d_clr->b^0x1f;
+			return;
+
+		default:
+		case 7:	// *
+			clr->r = 0x1f;
+			clr->g = 0x1f;
+			clr->b = 0x1f;
+			return;
+	}
+}
+
+
+static UINT32 cavesh_gfx_addr;
+static UINT32 cavesh_gfx_scroll_0_x, cavesh_gfx_scroll_0_y;
+static UINT32 cavesh_gfx_scroll_1_x, cavesh_gfx_scroll_1_y;
+
+static int cavesh_gfx_size;
+static bitmap_t *cavesh_bitmaps[1];
+
+static VIDEO_START( cavesh3 )
+{
+	cavesh_gfx_size	= 0x2000 * 0x1000;
+	cavesh_bitmaps[0]	=	auto_bitmap_alloc(machine, 0x2000, 0x1000, BITMAP_FORMAT_INDEXED16);
+}
+
+INLINE UINT32 GFX_OFFSET( UINT32 p, UINT32 x0, UINT32 y0, UINT32 x, UINT32 y )
+{
+//	return	 p * 0x100 * 0x1000 +
+//			((x0 + x) & 0x00ff) + 
+//			((y0 + y) & 0x0fff) * 0x100;
+
+/*
+	// to see flash
+	return	(((x0 + x) & 0x1f00)>>8) * 0x100 * 0x1000 +
+			((x0 + x) & 0x00ff) + 
+			((y0 + y) & 0x0fff) * 0x100;
+*/
+
+	// correct
+	return	((x0 + x) & 0x1fff) + 
+			((y0 + y) & 0x0fff) * 0x2000;
+}
+
+INLINE void draw_sprite(
+	bitmap_t *bitmap, const rectangle *clip, UINT16 *gfx, int gfx_size,
+
+	int src_p,int src_x,int src_y, int dst_x,int dst_y, int dimx,int dimy, int flipx,int flipy,
+
+	int blend, clr_t *s_alpha_clr, int s_mode, clr_t *d_alpha_clr, int d_mode,
+
+	int tint, clr_t *tint_clr
+)
+{
+
+	logerror("draw sprite %04x %04x\n", dimx, dimy);
+
+	int x,y, xf,yf;
+	clr_t s_clr, d_clr, clr0, clr1;
+	UINT16 pen;
+	UINT16 *bmp;
+
+	if (flipx)	{	xf = -1;	src_x += (dimx-1);	}
+	else		{	xf = +1;						}
+
+	if (flipy)	{	yf = -1;	src_y += (dimy-1);	}
+	else		{	yf = +1;						}
+
+	for (y = 0; y < dimy; y++)
+	{
+		for (x = 0; x < dimx; x++)
+		{
+			pen = gfx[GFX_OFFSET(src_p,src_x,src_y, xf * x, yf * y) % gfx_size];
+			if ((pen & 0x8000) && ((dst_x + x) >= clip->min_x) && ((dst_x + x) <= clip->max_x) && ((dst_y + y) >= clip->min_y) && ((dst_y + y) <= clip->max_y))
+			{
+				bmp = BITMAP_ADDR16(bitmap, dst_y + y, dst_x + x);
+
+				// convert source to clr
+				pen_to_clr(pen, &s_clr);
+
+				// apply clr bias to source
+//				if (tint)
+					clr_add(&s_clr, tint_clr, &s_clr);
+
+				if (blend)
+				{
+					// convert destination to clr
+					pen_to_clr(*bmp, &d_clr);
+
+					// transform source
+					cavesh_clr_select(&s_clr, &d_clr, s_alpha_clr, s_mode, &clr0);
+					clr_mul(&clr0, &s_clr, &clr0);
+
+					// transform destination
+					cavesh_clr_select(&s_clr, &d_clr, d_alpha_clr, d_mode, &clr1);
+					clr_mul(&clr1, &d_clr, &clr1);
+
+					// blend (add) into source
+					clr_add(&clr0, &clr1, &s_clr);
+				}
+
+				// write result
+				*bmp = clr_to_pen(&s_clr);
+			}
+		}
+	}
+}
+
+
+
+INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
+{
+	UINT16 data = space.read_word(*addr);
+	*addr += 2;
+
+//	printf("data %04x\n", data);
+	return data;
+}
+
+INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr, int layer)
+{
+	UINT32 x,y, dst_p,dst_x,dst_y, dimx,dimy;
+//	UINT16 *dst;
+
+	// 0x20000000
+	READ_NEXT_WORD(space, addr);
+	READ_NEXT_WORD(space, addr);
+
+	// 0x99999999
+	READ_NEXT_WORD(space, addr);
+	READ_NEXT_WORD(space, addr);
+	
+	dst_x = READ_NEXT_WORD(space, addr);
+	dst_y = READ_NEXT_WORD(space, addr);
+
+	dst_p = 0;
+	dst_x &= 0x1fff;
+	dst_y &= 0x0fff;
+
+	dimx = (READ_NEXT_WORD(space, addr) & 0x1fff) + 1;
+	dimy = (READ_NEXT_WORD(space, addr) & 0x0fff) + 1;
+
+	logerror("GFX COPY: DST %02X,%02X,%03X DIM %02X,%03X\n", dst_p,dst_x,dst_y, dimx,dimy);
+
+	for (y = 0; y < dimy; y++)
+	{
+		for (x = 0; x < dimx; x++)
+		{
+			*BITMAP_ADDR16(cavesh_bitmaps[0], dst_y + y, dst_x + x) = READ_NEXT_WORD(space, addr);
+		}
+	}
+}
+
+INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr, int layer)
+{
+	int	x,y, dimx,dimy, flipx,flipy, src_p;
+	int tint,blend, s_alpha,s_mode, d_alpha,d_mode;
+	clr_t tint_clr, s_alpha_clr, d_alpha_clr;
+
+	UINT16 attr		=	READ_NEXT_WORD(space, addr);
+	UINT16 alpha	=	READ_NEXT_WORD(space, addr);
+	UINT16 src_x	=	READ_NEXT_WORD(space, addr);
+	UINT16 src_y	=	READ_NEXT_WORD(space, addr);
+	UINT16 dst_x	=	READ_NEXT_WORD(space, addr);
+	UINT16 dst_y	=	READ_NEXT_WORD(space, addr);
+	UINT16 w		=	READ_NEXT_WORD(space, addr);
+	UINT16 h		=	READ_NEXT_WORD(space, addr);
+	UINT16 tint_r	=	READ_NEXT_WORD(space, addr);
+	UINT16 tint_gb	=	READ_NEXT_WORD(space, addr);
+
+	// 0: +alpha
+	// 1: +source
+	// 2: +dest
+	// 3: *
+	// 4: -alpha
+	// 5: -source
+	// 6: -dest
+	// 7: *
+
+	d_mode	=	 attr & 0x0007;
+	s_mode	=	(attr & 0x0070) >> 4;
+
+	tint	=	 !(attr & 0x0100);
+	blend	=	   attr & 0x0200;
+
+	flipy	=	 attr & 0x0400;
+	flipx	=	 attr & 0x0800;
+
+	d_alpha	=	 alpha & 0x00ff;
+	s_alpha	=	(alpha & 0xff00) >> 8;
+
+	src_p	=	0;
+	src_x	=	src_x & 0x1fff;
+	src_y	=	src_y & 0x0fff;
+
+
+	x		=	(dst_x & 0x7fff) - (dst_x & 0x8000);
+	y		=	(dst_y & 0x7fff) - (dst_y & 0x8000);
+
+	dimx	=	(w & 0x1fff) + 1;
+	dimy	=	(h & 0x0fff) + 1;
+
+	// convert parameters to clr
+
+	tint_to_clr(tint_r & 0x00ff, (tint_gb >>  8) & 0xff, tint_gb & 0xff, &tint_clr);
+
+	alpha_to_clr(s_alpha, &s_alpha_clr);
+	alpha_to_clr(d_alpha, &d_alpha_clr);
+
+	// draw
+	draw_sprite(
+		cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR16(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,
+		src_p,src_x,src_y, x,y, dimx,dimy, flipx,flipy,
+		blend, &s_alpha_clr, s_mode, &d_alpha_clr, d_mode,
+		tint, &tint_clr
+	);
+}
+
+static void cavesh_gfx_exec(address_space &space)
+{
+	UINT16 layer = 0;
+
+	offs_t addr = cavesh_gfx_addr & 0x1fffffff;
+
+	logerror("GFX EXEC: %08X\n", addr);
+
+	cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
+	cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
+	cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 0x180-1;
+	cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 0x100-1;
+
+	while (1)
+	{
+		UINT16 data = READ_NEXT_WORD(space, &addr);
+
+		switch( data & 0xf000 )
+		{
+			case 0x0000:
+			case 0xf000:
+				return;
+
+			case 0xc000:
+				data = READ_NEXT_WORD(space, &addr);
+				//logerror("GFX LAYER: %X\n", (UINT32)data);
+				//printf("GFX LAYER: %X\n", (UINT32)data);
+				layer = data ? 1 : 0;
+
+				if (layer)
+				{
+					cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
+					cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
+					cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 0x180-1;
+					cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 0x100-1;
+				}
+				else
+				{
+					cavesh_bitmaps[0]->cliprect.min_x = 0;
+					cavesh_bitmaps[0]->cliprect.min_y = 0;
+					cavesh_bitmaps[0]->cliprect.max_x = 0x2000-1;
+					cavesh_bitmaps[0]->cliprect.max_y = 0x1000-1;
+				}
+				break;
+
+			case 0x2000:
+				addr -= 2;
+				cavesh_gfx_copy(space, &addr, layer);
+				break;
+
+			case 0x1000:
+				addr -= 2;
+				cavesh_gfx_draw(space, &addr, layer);
+				break;
+
+			default:
+				popmessage("GFX op = %04X", data);
+				return;
+		}
+	}
+}
+
+
+static READ32_HANDLER( cavesh_gfx_ready_r )
+{
+	return 0x00000010;
+}
+
+static WRITE32_HANDLER( cavesh_gfx_exec_w )
+{
+	if ( ACCESSING_BITS_0_7 )
+	{
+		if (data & 1)
+		{
+			cavesh_gfx_exec(*space);
+		}
+	}
+}
+
+
+
+static SCREEN_UPDATE( cavesh3 )
+{
+	int scroll_0_x, scroll_0_y;
+	int scroll_1_x, scroll_1_y;
+	
+	bitmap_fill(bitmap, cliprect, 0);
+
+	scroll_0_x = -cavesh_gfx_scroll_0_x;
+	scroll_0_y = -cavesh_gfx_scroll_0_y;
+	scroll_1_x = -cavesh_gfx_scroll_1_x;
+	scroll_1_y = -cavesh_gfx_scroll_1_y;
+
+	logerror("SCREEN UPDATE\n");
+
+	copyscrollbitmap_trans(bitmap, cavesh_bitmaps[0], 1,&scroll_0_x, 1,&scroll_0_y, cliprect, 0x8000);
+
 	return 0;
 }
-
-
 
 
 static READ32_HANDLER( cavesh3_blitter_r )
 {
-//	UINT64 ret = space->machine().rand();
-	static UINT32 i = 0;
-	i^=0xffffffff;
-
-	logerror("%08x cavesh3_blitter_r access at %08x (%08x) - mem_mask %08x\n",cpu_get_pc(&space->device()), offset, offset*4, mem_mask);
-
-	switch (offset)
+	switch (offset*4)
 	{
+		case 0x10:
+			return cavesh_gfx_ready_r(space,offset,mem_mask);
 
-		case 0x4:
-			return i;
 
-		case 0x9:
-			return 0;
-
-		default:
-			logerror("no case for blit read\n");
-			return 0;
 	}
-
-
 	return 0;
-
-
-	
 }
 
 static WRITE32_HANDLER( cavesh3_blitter_w )
 {
-	logerror("%08x cavesh3_blitter_w access at %08x (%08x) -  %08x %08x\n",cpu_get_pc(&space->device()),offset, offset*8, data,mem_mask);
+	switch (offset*4)
+	{
+		case 0x04:
+			cavesh_gfx_exec_w(space,offset,data,mem_mask);
+
+		case 0x08:
+			COMBINE_DATA(&cavesh_gfx_addr);
+			break;
+
+		case 0x14:
+			COMBINE_DATA(&cavesh_gfx_scroll_0_x);
+			break;
+
+		case 0x18:
+			COMBINE_DATA(&cavesh_gfx_scroll_0_y);
+			break;
+
+		case 0x40:
+			COMBINE_DATA(&cavesh_gfx_scroll_1_x);
+			break;
+
+		case 0x44:
+			COMBINE_DATA(&cavesh_gfx_scroll_1_y);
+			break;
+
+	}
 }
+
+
 
 static READ64_HANDLER( ymz2770c_z_r )
 {
@@ -266,7 +719,7 @@ static READ8_HANDLER( flash_io_r )
 
 			data = flash_page_data[flash_page_addr++];
 
-//			logerror("%08x FLASH: read data %02X from addr %03X (page %04X)\n", cpu_get_pc(&space->device()), data, old, flash_page_index);
+			//logerror("%08x FLASH: read data %02X from addr %03X (page %04X)\n", cpu_get_pc(&space->device()), data, old, flash_page_index);
 			break;
 
 		case STATE_READ_STATUS:
@@ -421,6 +874,13 @@ static MACHINE_RESET( cavesh3 )
 	flash_hard_reset(machine);
 }
 
+static PALETTE_INIT( cavesh_RRRRR_GGGGG_BBBBB )
+{
+	int i;
+	for (i = 0; i < 0x10000; i++)
+		palette_set_color(machine, i, MAKE_RGB(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
+}
+
 
 static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	/* basic machine hardware */
@@ -434,10 +894,15 @@ static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 0x200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
+
+	MCFG_PALETTE_INIT(cavesh_RRRRR_GGGGG_BBBBB)
+	MCFG_PALETTE_LENGTH(0x10000)
+
+
 	MCFG_SCREEN_UPDATE(cavesh3)
 	MCFG_MACHINE_RESET(cavesh3)
 
@@ -457,8 +922,8 @@ ROM_START( mushisam )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(0b5b30b2) SHA1(35fd1bb1561c30b311b4325bc8f4628f2fccd20b) ) /* (2004/10/12 MASTER VER.) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u2", 0x000000, 0x8400000, CRC(b1f826dc) SHA1(c287bd9f571d0df03d7fcbcf3c57c74ce564ab05) ) /* (2004/10/12 MASTER VER.) */
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(b1f826dc) SHA1(c287bd9f571d0df03d7fcbcf3c57c74ce564ab05) ) /* (2004/10/12 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(138e2050) SHA1(9e86489a4e65af5efb5495adf6d4b3e01d5b2816) )
@@ -469,8 +934,8 @@ ROM_START( mushisama )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(9f1c7f51) SHA1(f82ae72ec03687904ca7516887080be92365a5f3) ) /* (2004/10/12 MASTER VER) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u2", 0x000000, 0x8400000, CRC(2cd13810) SHA1(40e45e201b60e63a060b68d4cc767eb64cfb99c2) ) /* (2004/10/12 MASTER VER) */
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(2cd13810) SHA1(40e45e201b60e63a060b68d4cc767eb64cfb99c2) ) /* (2004/10/12 MASTER VER) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(138e2050) SHA1(9e86489a4e65af5efb5495adf6d4b3e01d5b2816) )
@@ -481,7 +946,7 @@ ROM_START( espgal2 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(09c908bb) SHA1(7d6031fd3542b3e1d296ff218feb40502fd78694) ) /* (2005/11/14 MASTER VER) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(222f58c7) SHA1(d47a5085a1debd9cb8c61d88cd39e4f5036d1797) ) /* (2005/11/14 MASTER VER) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
@@ -493,8 +958,8 @@ ROM_START( mushitam )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(4a23e6c8) SHA1(d44c287bb88e6d413a8d35d75bc1b4928ad52cdf) ) /* (2005/09/09 MASTER VER) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u2", 0x000000, 0x8400000, CRC(3f93ff82) SHA1(6f6c250aa7134016ffb288d056bc937ea311f538) ) /* (2005/09/09 MASTER VER) */
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(3f93ff82) SHA1(6f6c250aa7134016ffb288d056bc937ea311f538) ) /* (2005/09/09 MASTER VER) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(701a912a) SHA1(85c198946fb693d99928ea2595c84ba4d9dc8157) )
@@ -505,8 +970,8 @@ ROM_START( futari15 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(e8c5f128) SHA1(45fb8066fdbecb83fdc2e14555c460d0c652cd5f) ) /* (2006/12/8.MAST VER. 1.54.) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) /* (2006/12/8.MAST VER. 1.54.) */
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) /* (2006/12/8.MAST VER. 1.54.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
@@ -517,8 +982,8 @@ ROM_START( futari15a )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(a609cf89) SHA1(56752fae9f42fa852af8ee2eae79e25ec7f17953) ) /* (2006/12/8 MAST VER 1.54) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u2", 0x000000, 0x8400000, CRC(b9d815f9) SHA1(6b6f668b0bbb087ffac65e4f0d8bd9d5b28eeb28) ) /* (2006/12/8 MAST VER 1.54) */
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(b9d815f9) SHA1(6b6f668b0bbb087ffac65e4f0d8bd9d5b28eeb28) ) /* (2006/12/8 MAST VER 1.54) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
@@ -529,7 +994,7 @@ ROM_START( futari10 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(b127dca7) SHA1(e1f518bc72fc1cdf69aefa89eafa4edaf4e84778) ) /* (2006/10/23 MASTER VER.) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(78ffcd0c) SHA1(0e2937edec15ce3f5741b72ebd3bbaaefffb556e) ) /* (2006/10/23 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
@@ -541,7 +1006,7 @@ ROM_START( futariblk )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(6db13c62) SHA1(6a53ce7f70b754936ccbb3a4674d4b2f03979644) ) /* (2007/12/11 BLACK LABEL VER) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(08c6fd62) SHA1(e1fc386b2b0e41906c724287cbf82304297e0150) ) /* (2007/12/11 BLACK LABEL VER) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
@@ -553,7 +1018,7 @@ ROM_START( ibara )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) ) /* (2005/03/22 MASTER VER..) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) /* (2005/03/22 MASTER VER..) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
@@ -565,7 +1030,7 @@ ROM_START( ibarablk )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) /* (2006/02/06. MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
@@ -577,7 +1042,7 @@ ROM_START( ibarablka )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(33400d96) SHA1(09c22b5431ac3726bf88c56efd970f56793f825a) ) /* (2006/02/06 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
@@ -589,7 +1054,7 @@ ROM_START( deathsml )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(1a7b98bf) SHA1(07798a4a846e5802756396b34df47d106895c1f1) ) /* (2007/10/09 MASTER VER) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(d45b0698) SHA1(7077b9445f5ed4749c7f683191ccd312180fac38) ) /* (2007/10/09 MASTER VER) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
@@ -601,7 +1066,7 @@ ROM_START( mmpork )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(d06cfa42) SHA1(5707feb4b3e5265daf5926f38c38612b24106f1f) ) /* (2007/ 4/17 MASTER VER.) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(1ee961b8) SHA1(81a2eba704ac1cf7fc44fa7c6a3f50e3570c104f) ) /* (2007/ 4/17 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
@@ -613,7 +1078,7 @@ ROM_START( mmmbnk )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x0000, 0x200000, CRC(5589d8c6) SHA1(43fbdb0effe2bc0e7135698757b6ee50200aecde) ) /* (2007/06/05 MASTER VER.) */
 
-	ROM_REGION64_BE( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x0000, 0x8400000, CRC(f3b50c30) SHA1(962327798081b292b2d3fd3b7845c0197f9f2d8a) ) /* (2007/06/05 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
