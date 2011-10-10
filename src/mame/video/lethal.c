@@ -109,14 +109,14 @@ SCREEN_UPDATE(lethalen)
 	bitmap_fill(bitmap, cliprect, 7168);
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 3, 0, 1);
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, 0, 2);
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 1, 0, 4);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
 
 	k053245_sprites_draw_lethal(state->m_k053244, bitmap, cliprect);
 
 	// force "A" layer over top of everything
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 0, 0, 0);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
 
 	return 0;
 }

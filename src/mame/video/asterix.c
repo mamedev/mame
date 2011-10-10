@@ -99,14 +99,14 @@ SCREEN_UPDATE( asterix )
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[0], 0, 1);
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[1], 0, 2);
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[2], 0, 4);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
 	k053245_sprites_draw(state->m_k053244, bitmap, cliprect);
 
-	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, 0, 0);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
 	return 0;
 }
