@@ -16,6 +16,9 @@
 #define MCFG_SHARP_LH28F016S_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SHARP_LH28F016S, 0)
 
+#define MCFG_AMD_29F080_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F080, 0)
+
 #define MCFG_FUJITSU_29F016A_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, FUJITSU_29F016A, 0)
 
@@ -68,6 +71,7 @@ public:
 		FLASH_INTEL_28F016S5 = 0x0800,
 		FLASH_FUJITSU_29F016A,
 		FLASH_FUJITSU_29DL16X,
+		FLASH_AMD_29F080,
 		FLASH_SHARP_LH28F016S,
 		FLASH_INTEL_E28F008SA,
 		FLASH_MACRONIX_29L001MC,
@@ -178,6 +182,12 @@ public:
 	fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class amd_29f080_device : public intelfsh8_device
+{
+public:
+	amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class sharp_lh28f016s_device : public intelfsh8_device
 {
 public:
@@ -239,6 +249,7 @@ public:
 // device type definition
 extern const device_type INTEL_28F016S5;
 extern const device_type SHARP_LH28F016S;
+extern const device_type AMD_29F080;
 extern const device_type FUJITSU_29F016A;
 extern const device_type FUJITSU_29DL16X;
 extern const device_type INTEL_E28F400;

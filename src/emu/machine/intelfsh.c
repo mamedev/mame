@@ -47,6 +47,7 @@ enum
 // device type definition
 const device_type INTEL_28F016S5 = &device_creator<intel_28f016s5_device>;
 const device_type SHARP_LH28F016S = &device_creator<sharp_lh28f016s_device>;
+const device_type AMD_29F080 = &device_creator<amd_29f080_device>;
 const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
 const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
 const device_type INTEL_E28F400 = &device_creator<intel_e28f400_device>;
@@ -126,6 +127,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = 0x89;
 		m_device_id = 0xaa;
 		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
+		break;
+	case FLASH_AMD_29F080:
+		m_bits = 8;
+		m_size = 0x100000;
+		m_maker_id = 0x01;
+		m_device_id = 0xd5;
+		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
 		break;
 	case FLASH_SHARP_LH28F400:
 	case FLASH_INTEL_E28F400:
@@ -221,6 +229,9 @@ fujitsu_29dl16x_device::fujitsu_29dl16x_device(const machine_config &mconfig, co
 
 sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SHARP_LH28F016S, "Sharp LH28F016S Flash", tag, owner, clock, FLASH_SHARP_LH28F016S) { }
+
+amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F080 Flash", tag, owner, clock, FLASH_AMD_29F080) { }
 
 intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, INTEL_E28F008SA, "Intel E28F008SA Flash", tag, owner, clock, FLASH_INTEL_E28F008SA) { }
@@ -532,6 +543,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			m_flash_mode = FM_READAMDID2;
 		}
+		else if( ( address & 0x7ff ) == 0x2aa && ( data & 0xff ) == 0x55 && m_type == FLASH_AMD_29F080 )
+		{
+			m_flash_mode = FM_READAMDID2;
+		}
 		else
 		{
 			logerror( "unexpected %08x=%02x in FM_READAMDID1\n", address, data & 0xff );
@@ -590,6 +605,24 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xb0 && m_maker_id == 0x62 && m_device_id == 0x13 )
 		{
 			m_flash_mode = FM_BANKSELECT;
+		}
+
+		// for AMD 29F080 address bits A11-A19 don't care
+		else if(( address & 0x7ff ) == 0x555 && ( data & 0xff ) == 0x80 && m_type == FLASH_AMD_29F080 )
+		{
+			m_flash_mode = FM_ERASEAMD1;
+		}
+		else if(( address & 0x7ff ) == 0x555 && ( data & 0xff ) == 0x90 && m_type == FLASH_AMD_29F080 )
+		{
+			m_flash_mode = FM_READAMDID3;
+		}
+		else if(( address & 0x7ff ) == 0x555 && ( data & 0xff ) == 0xa0 && m_type == FLASH_AMD_29F080 )
+		{
+			m_flash_mode = FM_BYTEPROGRAM;
+		}
+		else if(( address & 0x7ff ) == 0x555 && ( data & 0xff ) == 0xf0 && m_type == FLASH_AMD_29F080 )
+		{
+			m_flash_mode = FM_NORMAL;
 		}
 		else
 		{
