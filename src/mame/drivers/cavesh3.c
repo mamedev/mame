@@ -36,7 +36,7 @@ UINT16* cavesh3_ram16;
 
 struct _clr_t
 {
-	INT8 r,g,b; 
+	INT8 r,g,b;
 };
 typedef struct _clr_t clr_t;
 
@@ -196,7 +196,7 @@ static VIDEO_START( cavesh3 )
 INLINE UINT32 GFX_OFFSET( UINT32 x0, UINT32 y0, UINT32 x, UINT32 y )
 {
 	// correct
-	return	((x0 + x) & 0x1fff) + 
+	return	((x0 + x) & 0x1fff) +
 			((y0 + y) & 0x0fff) * 0x2000;
 }
 
@@ -237,7 +237,7 @@ INLINE void draw_sprite(
 		bmp = BITMAP_ADDR16(bitmap, dst_y + y, 0);
 
 		int startx = 0;
-	
+
 		if (dst_x < clip->min_x)
 			startx = clip->min_x - dst_x;
 
@@ -245,7 +245,7 @@ INLINE void draw_sprite(
 		{
 			if ((dst_x + x) > clip->max_x)
 				break;
-	
+
 			pen = gfx[GFX_OFFSET(src_x,src_y, xf * x, yf * y) & (gfx_size-1)];
 
 			if ((tint) ||(pen & 0x8000)) // (tint) not quite right but improves deathsml
@@ -277,7 +277,7 @@ INLINE void draw_sprite(
 				// write result
 				bmp[dst_x + x] = clr_to_pen(&s_clr);
 			}
-			
+
 		}
 	}
 }
@@ -306,7 +306,7 @@ INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr)
 	// 0x99999999
 	READ_NEXT_WORD(space, addr);
 	READ_NEXT_WORD(space, addr);
-	
+
 	dst_x = READ_NEXT_WORD(space, addr);
 	dst_y = READ_NEXT_WORD(space, addr);
 
@@ -391,7 +391,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 		cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR16(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,
 		src_p,src_x,src_y, x,y, dimx,dimy, flipx,flipy,
 		blend, &s_alpha_clr, s_mode, &d_alpha_clr, d_mode,
-		tint, &tint_clr		
+		tint, &tint_clr
 	);
 
 }
@@ -482,7 +482,7 @@ static SCREEN_UPDATE( cavesh3 )
 {
 	int scroll_0_x, scroll_0_y;
 	//int scroll_1_x, scroll_1_y;
-	
+
 	bitmap_fill(bitmap, cliprect, 0);
 
 	scroll_0_x = -cavesh_gfx_scroll_0_x;
@@ -528,6 +528,7 @@ static WRITE32_HANDLER( cavesh3_blitter_w )
 	{
 		case 0x04:
 			cavesh_gfx_exec_w(space,offset,data,mem_mask);
+			break;
 
 		case 0x08:
 			COMBINE_DATA(&cavesh_gfx_addr);
@@ -725,7 +726,7 @@ static WRITE8_HANDLER( flash_cmd_w )
 					logerror("unexpected 2nd command after SPAGE PROGRAM\n");
 				}
 				break;
-				
+
 
 			default:
 			{
@@ -936,7 +937,7 @@ static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 
 	/*       0x04000000, 0x07ffffff  SH3 Internal Regs (including ports) */
-  
+
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_BASE(&cavesh3_ram)//  AM_SHARE("mainram")// work RAM
 	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM// AM_SHARE("mainram") // mirror of above on type B boards, extra ram on type D
 
@@ -983,7 +984,7 @@ static INPUT_PORTS_START( cavesh3 )
 	PORT_DIPSETTING( 0x00000002, DEF_STR( On ) )
 	PORT_SERVICE(    0x00000001, IP_ACTIVE_HIGH )
 
-	PORT_START("PORT_C")	
+	PORT_START("PORT_C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Service coin
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	// Test button copied here
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  )	// IMPLEMENT COIN ERROR!
@@ -992,7 +993,7 @@ static INPUT_PORTS_START( cavesh3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("PORT_D")	
+	PORT_START("PORT_D")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
@@ -1211,7 +1212,7 @@ ROM_START( ibarablk )
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) /* (2006/02/06. MASTER VER.) */
-	
+
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) /* (2006/02/06 MASTER VER.) */
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
