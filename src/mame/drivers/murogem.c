@@ -92,6 +92,11 @@ MC6845 registers:
 reg (hex):  00  01  02  03  04  05  06  07  08  09  0A  0B  0C  0D  0E  0F  10  11
 val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  ns
 
+- Added Muroge Monaco (set 3). This game has only 1 coin slot.
+
+- The real game title is unknown. Could be "Muroge Monaco", "Las Vegas, Nevada", but
+  I strongly think that the original name is different.
+
 */
 
 #include "emu.h"
@@ -266,6 +271,23 @@ ROM_START( murogema )
 
 ROM_END
 
+/*  Set 802 from EMMA Italian Dumping team.
+    Slaightly different. Only one coin in slot.
+*/
+ROM_START( murogemb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a1.8e", 0xf000, 0x0400, CRC(5b59417a) SHA1(2a2a92b3f8e703ee723ff47d133214e61af8e87d)  )	/* is this rom ok? */
+	ROM_FILL(		   0xf400, 0x0400, 0xff ) /* filling the hole */
+	ROM_LOAD( "a0.9e", 0xf800, 0x0800, CRC(14ef74fb) SHA1(09ae8156fc76c132cb456aefc1c07a4136d935b8)  )
+
+	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_LOAD( "a2.6e", 0x0000, 0x0400, CRC(86e053da) SHA1(b7cdddca273204513c818384860883bf54cf9434)  )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "dm74s288.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )
+
+ROM_END
+
 ROM_START( lasvegas )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pk8.8e", 0xf000, 0x0800, CRC(995bd527) SHA1(af96bd0118511b13a755925e3bf5138be61c09d8)  )
@@ -276,9 +298,9 @@ ROM_START( lasvegas )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )	/* 74s288 at 1B */
-
 ROM_END
 
 GAME( 198?, murogem,  0,       murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", GAME_NO_SOUND|GAME_WRONG_COLORS )
 GAME( 198?, murogema, murogem, murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 2)", GAME_NO_SOUND|GAME_WRONG_COLORS )
+GAME( 198?, murogemb, murogem, murogem, murogem, 0, ROT0, "<unknown>", "Muroge Monaco (set 3)", GAME_NO_SOUND|GAME_WRONG_COLORS )
 GAME( 198?, lasvegas, murogem, murogem, murogem, 0, ROT0, "hack",      "Las Vegas, Nevada", GAME_NO_SOUND|GAME_WRONG_COLORS )
