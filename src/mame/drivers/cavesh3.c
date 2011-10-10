@@ -32,9 +32,11 @@ public:
                                 Video Hardware
 ***************************************************************************/
 
+UINT16* cavesh3_ram16;
+
 struct _clr_t
 {
-	INT8 r,g,b;
+	INT8 r,g,b; 
 };
 typedef struct _clr_t clr_t;
 
@@ -191,19 +193,8 @@ static VIDEO_START( cavesh3 )
 	cavesh_bitmaps[0]	=	auto_bitmap_alloc(machine, 0x2000, 0x1000, BITMAP_FORMAT_INDEXED16);
 }
 
-INLINE UINT32 GFX_OFFSET( UINT32 p, UINT32 x0, UINT32 y0, UINT32 x, UINT32 y )
+INLINE UINT32 GFX_OFFSET( UINT32 x0, UINT32 y0, UINT32 x, UINT32 y )
 {
-//	return	 p * 0x100 * 0x1000 +
-//			((x0 + x) & 0x00ff) + 
-//			((y0 + y) & 0x0fff) * 0x100;
-
-/*
-	// to see flash
-	return	(((x0 + x) & 0x1f00)>>8) * 0x100 * 0x1000 +
-			((x0 + x) & 0x00ff) + 
-			((y0 + y) & 0x0fff) * 0x100;
-*/
-
 	// correct
 	return	((x0 + x) & 0x1fff) + 
 			((y0 + y) & 0x0fff) * 0x2000;
@@ -233,15 +224,32 @@ INLINE void draw_sprite(
 	if (flipy)	{	yf = -1;	src_y += (dimy-1);	}
 	else		{	yf = +1;						}
 
-	for (y = 0; y < dimy; y++)
-	{
-		for (x = 0; x < dimx; x++)
-		{
-			pen = gfx[GFX_OFFSET(src_p,src_x,src_y, xf * x, yf * y) % gfx_size];
-			if ((pen & 0x8000) && ((dst_x + x) >= clip->min_x) && ((dst_x + x) <= clip->max_x) && ((dst_y + y) >= clip->min_y) && ((dst_y + y) <= clip->max_y))
-			{
-				bmp = BITMAP_ADDR16(bitmap, dst_y + y, dst_x + x);
+	int starty = 0;
 
+	if (dst_y < clip->min_y)
+		starty = clip->min_y - dst_y;
+
+	for (y = starty; y < dimy; y++)
+	{
+		if ((dst_y + y) > clip->max_y)
+			return;
+
+		bmp = BITMAP_ADDR16(bitmap, dst_y + y, 0);
+
+		int startx = 0;
+	
+		if (dst_x < clip->min_x)
+			startx = clip->min_x - dst_x;
+
+		for (x = startx; x < dimx; x++)
+		{
+			if ((dst_x + x) > clip->max_x)
+				break;
+	
+			pen = gfx[GFX_OFFSET(src_x,src_y, xf * x, yf * y) & (gfx_size-1)];
+
+			if ((tint) ||(pen & 0x8000)) // (tint) not quite right but improves deathsml
+			{
 				// convert source to clr
 				pen_to_clr(pen, &s_clr);
 
@@ -252,7 +260,7 @@ INLINE void draw_sprite(
 				if (blend)
 				{
 					// convert destination to clr
-					pen_to_clr(*bmp, &d_clr);
+					pen_to_clr(bmp[dst_x + x], &d_clr);
 
 					// transform source
 					cavesh_clr_select(&s_clr, &d_clr, s_alpha_clr, s_mode, &clr0);
@@ -267,9 +275,9 @@ INLINE void draw_sprite(
 				}
 
 				// write result
-				*bmp = clr_to_pen(&s_clr);
-
+				bmp[dst_x + x] = clr_to_pen(&s_clr);
 			}
+			
 		}
 	}
 }
@@ -278,17 +286,18 @@ INLINE void draw_sprite(
 
 INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
 {
-	UINT16 data = space.read_word(*addr);
+//	UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
+	UINT16 data =  cavesh3_ram16[((*addr&(0x7fffff))>>1)^3]; // this probably needs to be made endian safe tho
 	*addr += 2;
 
 //	printf("data %04x\n", data);
 	return data;
 }
 
-INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr, int layer)
+INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr)
 {
 	UINT32 x,y, dst_p,dst_x,dst_y, dimx,dimy;
-//	UINT16 *dst;
+	UINT16 *dst;
 
 	// 0x20000000
 	READ_NEXT_WORD(space, addr);
@@ -312,14 +321,16 @@ INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr, int layer)
 
 	for (y = 0; y < dimy; y++)
 	{
+		dst = BITMAP_ADDR16(cavesh_bitmaps[0], dst_y + y, 0);
+
 		for (x = 0; x < dimx; x++)
 		{
-			*BITMAP_ADDR16(cavesh_bitmaps[0], dst_y + y, dst_x + x) = READ_NEXT_WORD(space, addr);
+			 dst[dst_x + x] = READ_NEXT_WORD(space, addr);
 		}
 	}
 }
 
-INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr, int layer)
+INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 {
 	int	x,y, dimx,dimy, flipx,flipy, src_p;
 	int tint,blend, s_alpha,s_mode, d_alpha,d_mode;
@@ -380,8 +391,9 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr, int layer)
 		cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR16(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,
 		src_p,src_x,src_y, x,y, dimx,dimy, flipx,flipy,
 		blend, &s_alpha_clr, s_mode, &d_alpha_clr, d_mode,
-		tint, &tint_clr
+		tint, &tint_clr		
 	);
+
 }
 
 // Death Smiles has bad text with wrong clip sizes, must clip to screen size.
@@ -391,7 +403,7 @@ static void cavesh_gfx_exec(address_space &space)
 
 	offs_t addr = cavesh_gfx_addr & 0x1fffffff;
 
-	logerror("GFX EXEC: %08X\n", addr);
+//	logerror("GFX EXEC: %08X\n", addr);
 
 	cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
 	cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
@@ -410,8 +422,6 @@ static void cavesh_gfx_exec(address_space &space)
 
 			case 0xc000:
 				data = READ_NEXT_WORD(space, &addr);
-				//logerror("GFX LAYER: %X\n", (UINT32)data);
-				//printf("GFX LAYER: %X\n", (UINT32)data);
 				layer = data ? 1 : 0;
 
 				if (layer)
@@ -432,12 +442,12 @@ static void cavesh_gfx_exec(address_space &space)
 
 			case 0x2000:
 				addr -= 2;
-				cavesh_gfx_copy(space, &addr, layer);
+				cavesh_gfx_copy(space, &addr);
 				break;
 
 			case 0x1000:
 				addr -= 2;
-				cavesh_gfx_draw(space, &addr, layer);
+				cavesh_gfx_draw(space, &addr);
 				break;
 
 			default:
@@ -1042,6 +1052,7 @@ static MACHINE_RESET( cavesh3 )
 {
 	flash_enab = 0;
 	flash_hard_reset(machine);
+	cavesh3_ram16 = (UINT16*)cavesh3_ram;
 }
 
 static PALETTE_INIT( cavesh_RRRRR_GGGGG_BBBBB )
