@@ -2519,24 +2519,27 @@ static READ32_HANDLER( namcos22_gun_r )
 
 static WRITE32_HANDLER( namcos22_cpuleds_w )
 {
-	if (ACCESSING_BITS_0_15) data &= 0xff;
-	else data = (data>>16) & 0xff;
-
-	// GYRGYRGY green/yellow/red, 0=on 1=off
-	// 76543210
+	if (offset == 0)
+	{
+		if (ACCESSING_BITS_0_15) data &= 0xff;
+		else data = (data>>16) & 0xff;
+		// 8 leds on cpu board, left to right:
+		// GYRGYRGY green/yellow/red, 0=on 1=off
+		// 76543210
 #if 0
-	char msg[0x10];
-	sprintf(msg,"________");
-	if (~data&0x80) msg[0]='G';
-	if (~data&0x40) msg[1]='Y';
-	if (~data&0x20) msg[2]='R';
-	if (~data&0x10) msg[3]='G';
-	if (~data&0x08) msg[4]='Y';
-	if (~data&0x04) msg[5]='R';
-	if (~data&0x02) msg[6]='G';
-	if (~data&0x01) msg[7]='Y';
-	popmessage("%s",msg);
+		char msg[0x10];
+		sprintf(msg,"________");
+		if (~data&0x80) msg[0]='G';
+		if (~data&0x40) msg[1]='Y';
+		if (~data&0x20) msg[2]='R';
+		if (~data&0x10) msg[3]='G';
+		if (~data&0x08) msg[4]='Y';
+		if (~data&0x04) msg[5]='R';
+		if (~data&0x02) msg[6]='G';
+		if (~data&0x01) msg[7]='Y';
+		popmessage("%s",msg);
 #endif
+	}
 }
 
 static READ32_HANDLER( alpinesa_prot_r )
@@ -4564,6 +4567,9 @@ ROM_START( timecris )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ts1wavea.2l", 0x000000, 0x400000, CRC(d1123301) SHA1(4bf1fd746fef4e6befa63c61a761971d729e1573) )
 	ROM_LOAD( "ts1waveb.1l", 0x800000, 0x200000, CRC(bf4d7272) SHA1(c7c7b3620e7b3176644b6784ee36e679c9e31cc1) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "timecris_defaults.nv", 0x0000, 0x4000, CRC(02eeea95) SHA1(0c3c20c9dc7c1e1d5affb99e305e671b32f8e29b) )
 ROM_END
 
 ROM_START( timecrisa )
@@ -4617,6 +4623,9 @@ ROM_START( timecrisa )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ts1wavea.2l", 0x000000, 0x400000, CRC(d1123301) SHA1(4bf1fd746fef4e6befa63c61a761971d729e1573) )
 	ROM_LOAD( "ts1waveb.1l", 0x800000, 0x200000, CRC(bf4d7272) SHA1(c7c7b3620e7b3176644b6784ee36e679c9e31cc1) )
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "timecris_defaults.nv", 0x0000, 0x4000, CRC(02eeea95) SHA1(0c3c20c9dc7c1e1d5affb99e305e671b32f8e29b) )
 ROM_END
 
 ROM_START( tokyowar )
