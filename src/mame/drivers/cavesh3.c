@@ -468,14 +468,14 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 static SCREEN_UPDATE( cavesh3 )
 {
 	int scroll_0_x, scroll_0_y;
-	int scroll_1_x, scroll_1_y;
+//	int scroll_1_x, scroll_1_y;
 	
 	bitmap_fill(bitmap, cliprect, 0);
 
 	scroll_0_x = -cavesh_gfx_scroll_0_x;
 	scroll_0_y = -cavesh_gfx_scroll_0_y;
-	scroll_1_x = -cavesh_gfx_scroll_1_x;
-	scroll_1_y = -cavesh_gfx_scroll_1_y;
+//	scroll_1_x = -cavesh_gfx_scroll_1_x;
+//	scroll_1_y = -cavesh_gfx_scroll_1_y;
 
 	//logerror("SCREEN UPDATE\n");
 
