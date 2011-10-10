@@ -97,6 +97,8 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 - Figured out the sound. It's a Delta-Sigma DAC (driven by bit3 of the output port
   at $7000.
 
+- Fixed the GFX decode of Las Vegas.
+
 - The real game title is unknown. Could be "Muroge Monaco", "Las Vegas, Nevada", but
   I strongly think that the original name is different.
 
@@ -315,8 +317,9 @@ ROM_START( lasvegas )
 	ROM_LOAD( "pk8.8e", 0xf000, 0x0800, CRC(995bd527) SHA1(af96bd0118511b13a755925e3bf5138be61c09d8)  )
 	ROM_LOAD( "pk9.9e", 0xf800, 0x0800, CRC(2ab1556e) SHA1(cd7bd377b6a3f6c0f8df61b0da83e55468d599d6)  )
 
-	ROM_REGION( 0x0800, "gfx1", 0 )	// the second half is filled of 0xff.
-	ROM_LOAD( "pk6.6e", 0x0000, 0x0800, CRC(78a3593a) SHA1(96ba470f5b0dd6d490eadd09b4b6894e044c66b4)  )
+	ROM_REGION( 0x0400, "gfx1", 0 )	// the second half is filled of 0xff.
+	ROM_LOAD( "pk6.6e", 0x0000, 0x0400, CRC(78a3593a) SHA1(96ba470f5b0dd6d490eadd09b4b6894e044c66b4)  )
+	ROM_IGNORE(                 0x0400)
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )	/* 74s288 at 1B */
