@@ -695,6 +695,7 @@ void general_init(running_machine &machine, int patchaddress)
 
 static DRIVER_INIT( jyunai )   { general_init(machine, 0x679c/2); }
 static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2); }
+static DRIVER_INIT( jyunai2 )  { general_init(machine, 0x6588/2); }
 static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2); }
 static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2); }
 static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2); }
@@ -718,7 +719,7 @@ ROM_START( jyunai )
 	// 0x100000 - 0x3fffff empty sockets
 
 	DISK_REGION( "dvd" )
-	DISK_IMAGE( "jyunai", 0, NO_DUMP )
+	DISK_IMAGE( "jyunai", 0, SHA1(0491533e0ce3e4d2af608ea0b9d9646316b512bd) )
 ROM_END
 
 ROM_START( csplayh5 )
@@ -740,6 +741,30 @@ ROM_START( csplayh5 )
 	DISK_REGION( "dvd" )
 	DISK_IMAGE( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
 ROM_END
+
+ROM_START( jyunai2 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(b0ce71d6) SHA1(35cff8f8b18312808e2f6b96f02d952b0d1f04a1) )
+	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(5a428e91) SHA1(dffce6f0a48cc4110970f124684dcaa267fe1b7f) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(a4b07757) SHA1(5010f28d7a80af0cc3f4fd135f777950fb2cf679) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+	ROM_LOAD16_BYTE( "3.ic40",   0x00000, 0x80000, CRC(95ecb29d) SHA1(e07bb0ff15aaee9fb26d8ef7f4644b47045c81a8) )
+	ROM_LOAD16_BYTE( "4.ic41",   0x00001, 0x80000, CRC(5b37c8dd) SHA1(8de5e2f92721c6679c6506850a442cafff89653f) )
+	// 0x100000 - 0x3fffff empty sockets
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "jyunai2", 0, SHA1(dc9633a101f20f03fd9b4414c10274d2539fb7c2) )
+
+	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(01c2895a) SHA1(782166a60fa14d5faa5a92629f7ca65a878ad7fe) )
+ROM_END
+
 
 ROM_START( mjmania )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
@@ -854,7 +879,7 @@ ROM_END
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
 /* 03 */ GAME( 1998, jyunai,    0,   csplayh5,  csplayh5,  jyunai,   ROT0, "Nichibutsu/eic",   "Jyunai - Manatsu no First Kiss (Japan)", GAME_NOT_WORKING )
 /* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5,  csplayh5, ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", GAME_NOT_WORKING )
-// 05 : Jyunai2 - White Love Story : Nichibutsu/eic
+/* 05 */ GAME( 1998, jyunai2,   0,   csplayh5,  csplayh5,  jyunai2,  ROT0, "Nichibutsu/eic",   "Jyunai 2 - White Love Story (Japan)", GAME_NOT_WORKING )
 // 06 : Mahjong Mogitate : Nichibutsu/Just&Just/NVS/Astro System/AV Japan
 
 
