@@ -152,13 +152,9 @@ lethal enforcers has 2 sprite rendering chips working in parallel mixing
 data together to give 6bpp.. we cheat by using a custom function in
 konamiic.c and a fixed 6bpp decode.
 
-japanese version scroll / mirror / guns not set up correctly
+mirror not set up correctly
 
-guns might be slightly off center
-
-'external' rowscroll hooked up forcing xylinescroll for tilemap #3
-
-maybe some priority issues / sprite placement issues..
+maybe some sprite placement issues
 
 ***************************************************************************/
 
@@ -180,15 +176,6 @@ static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIG
 /* a = 1, 2 = player # */
 #define GUNX( a ) (( ( input_port_read(space->machine(), gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
 #define GUNY( a ) (( ( input_port_read(space->machine(), gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
-
-
-/* Default Eeprom for the parent.. otherwise it will always complain first boot */
-/* its easy to init but this saves me a bit of time.. */
-static const UINT8 lethalen_default_eeprom[48] = {
-	0x02, 0x1E, 0x00, 0x00, 0x39, 0x31, 0x39, 0x31, 0x55, 0x45, 0x77, 0x00, 0x00, 0x00, 0x00, 0x01,
-	0x02, 0x01, 0x00, 0x03, 0x05, 0x01, 0x01, 0x02, 0x28, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-};
 
 static const eeprom_interface eeprom_intf =
 {
@@ -444,18 +431,18 @@ static READ8_HANDLER( guns_r )
 		case 0:
 			return GUNX(1) >> 1;
 		case 1:
-			if ((240 - GUNY(1)) == 7)
+			if ((GUNY(1)<=0x0b) || (GUNY(1)>=0xe8))
 				return 0;
 			else
-				return (240 - GUNY(1));
+				return (232 - GUNY(1));
 			break;
 		case 2:
 			return GUNX(2) >> 1;
 		case 3:
-			if ((240 - GUNY(2)) == 7)
+			if ((GUNY(2)<=0x0b) || (GUNY(2)>=0xe8))
 				return 0;
 			else
-				return (240 - GUNY(2));
+				return (232 - GUNY(2));
 			break;
 	}
 
@@ -675,7 +662,6 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_MACHINE_RESET(lethalen)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
-	MCFG_EEPROM_DATA(lethalen_default_eeprom, 48)
 
 	MCFG_GFXDECODE(lethal)
 

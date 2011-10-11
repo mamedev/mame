@@ -57,13 +57,13 @@ VIDEO_START(lethalen)
 	// the US and Japanese cabinets apparently use different mirror setups
 	if (!strcmp(machine.system().name, "lethalenj"))
 	{
-		k056832_set_layer_offs(state->m_k056832, 0, -196, 0);
-		k056832_set_layer_offs(state->m_k056832, 1, -194, 0);
-		k056832_set_layer_offs(state->m_k056832, 2, -192, 0);
-		k056832_set_layer_offs(state->m_k056832, 3, -190, 0);
+		k056832_set_layer_offs(state->m_k056832, 0, -195, 0);
+		k056832_set_layer_offs(state->m_k056832, 1, -193, 0);
+		k056832_set_layer_offs(state->m_k056832, 2, -191, 0);
+		k056832_set_layer_offs(state->m_k056832, 3, -189, 0);
 	}
 	else
-	{ /* fixme */
+	{
 		k056832_set_layer_offs(state->m_k056832, 0, 188, 0);
 		k056832_set_layer_offs(state->m_k056832, 1, 190, 0);
 		k056832_set_layer_offs(state->m_k056832, 2, 192, 0);
