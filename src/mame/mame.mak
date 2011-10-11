@@ -1332,6 +1332,7 @@ $(MAMEOBJ)/sun.a: \
 	$(DRIVERS)/shanghai.o \
 	$(DRIVERS)/shangha3.o $(VIDEO)/shangha3.o \
 	$(DRIVERS)/strnskil.o $(VIDEO)/strnskil.o \
+	$(DRIVERS)/tonton.o \
 
 $(MAMEOBJ)/suna.a: \
 	$(DRIVERS)/go2000.o \
