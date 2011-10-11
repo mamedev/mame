@@ -12,7 +12,7 @@ Why does mmmbnk write to 0 on startup, is it related to the broken GFX you see?
 What is mmpork checking when it reports 'ERROR'
 General SH3 cleanups, verify dividers and such
 Speedups? (without breaking overall timing)
-Solid White BG on DS title screen? Lack of BG / GFX clear in MMP boot/test mode?
+Lack of BG / GFX clear in MMP boot/test mode?
 
 */
 
@@ -51,31 +51,25 @@ INLINE void pen_to_clr(UINT16 pen, clr_t *clr)
 // convert separate r,g,b biases (0..80..ff) to clr_t (-1f..0..1f)
 INLINE void tint_to_clr(UINT8 r, UINT8 g, UINT8 b, clr_t *clr)
 {
-	clr->r	=	(r - 0x80) / 4;
-	clr->g	=	(g - 0x80) / 4;
-	clr->b	=	(b - 0x80) / 4;
-
-	if (clr->r < -0x1f)	clr->r = -0x1f;
-	if (clr->g < -0x1f)	clr->g = -0x1f;
-	if (clr->b < -0x1f)	clr->b = -0x1f;
+	clr->r	=	r>>2;
+	clr->g	=	g>>2;
+	clr->b	=	b>>2;
 }
 
 // convert alpha factor (0..ff) to clr_t (0..1f)
 INLINE void alpha_to_clr(UINT8 alpha, clr_t *clr)
 {
-	clr->r	=	alpha / 8;
-	clr->g	=	alpha / 8;
-	clr->b	=	alpha / 8;
+	clr->r	=	alpha>>3;
+	clr->g	=	alpha>>3;
+	clr->b	=	alpha>>3;
 }
 
-// clamp to 0..1f
-INLINE INT8 clamp(INT8 comp)
+INLINE void clamp_clr(clr_t *clr)
 {
-	if (comp > 0x1f)	return 0x1f;
-	else if (comp < 0)	return 0;
-	else				return comp;
+	if (clr->r > 0x1f) clr->r = 0x1f;
+	if (clr->g > 0x1f) clr->g = 0x1f;
+	if (clr->b > 0x1f) clr->b = 0x1f;
 }
-
 // clr_t to r5g5b5
 INLINE UINT16 clr_to_pen(const clr_t *clr)
 {
@@ -86,17 +80,17 @@ INLINE UINT16 clr_to_pen(const clr_t *clr)
 // add clrs
 INLINE void clr_add(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
 {
-	clr->r = clamp(clr0->r + clr1->r);
-	clr->g = clamp(clr0->g + clr1->g);
-	clr->b = clamp(clr0->b + clr1->b);
+	clr->r = clr0->r + clr1->r;
+	clr->g = clr0->g + clr1->g;
+	clr->b = clr0->b + clr1->b;
 }
 
 // multiply clrs
 INLINE void clr_mul(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
 {
-	clr->r = clamp(clr0->r * clr1->r / 0x1f);
-	clr->g = clamp(clr0->g * clr1->g / 0x1f);
-	clr->b = clamp(clr0->b * clr1->b / 0x1f);
+	clr->r = (clr0->r * clr1->r) >>5;
+	clr->g = (clr0->g * clr1->g) >>5;
+	clr->b = (clr0->b * clr1->b) >>5;
 }
 
 INLINE char mode_name(UINT8 mode)
@@ -147,9 +141,9 @@ INLINE void cavesh_clr_select(const clr_t *s_clr, const clr_t *d_clr, const clr_
 			return;
 
 		case 3:	// *
-			clr->r = 0x1f;
-			clr->g = 0x1f;
-			clr->b = 0x1f;
+			clr->r = 0x20;
+			clr->g = 0x20;
+			clr->b = 0x20;
 			return;
 
 		case 4:	// -alpha
@@ -172,9 +166,9 @@ INLINE void cavesh_clr_select(const clr_t *s_clr, const clr_t *d_clr, const clr_
 
 		default:
 		case 7:	// *
-			clr->r = 0x1f;
-			clr->g = 0x1f;
-			clr->b = 0x1f;
+			clr->r = 0x20;
+			clr->g = 0x20;
+			clr->b = 0x20;
 			return;
 	}
 }
@@ -207,7 +201,7 @@ INLINE void draw_sprite(
 
 	int blend, clr_t *s_alpha_clr, int s_mode, clr_t *d_alpha_clr, int d_mode,
 
-	int tint, clr_t *tint_clr
+	int transparent, clr_t *tint_clr
 )
 {
 
@@ -247,37 +241,31 @@ INLINE void draw_sprite(
 				break;
 
 			pen = gfx[GFX_OFFSET(src_x,src_y, xf * x, yf * y) & (gfx_size-1)];
+			if (transparent && (pen & 0x8000) == 0)
+				continue;
 
-			if ((tint) ||(pen & 0x8000)) // (tint) not quite right but improves deathsml
+			// convert source to clr
+			pen_to_clr(pen, &s_clr);
+			// source * intesity and clamp
+			clr_mul(&s_clr, tint_clr, &s_clr);
+			clamp_clr(&s_clr);
+
+			if (blend)
 			{
-				// convert source to clr
-				pen_to_clr(pen, &s_clr);
-
-				// apply clr bias to source
-//              if (tint)
-					clr_add(&s_clr, tint_clr, &s_clr);
-
-				if (blend)
-				{
-					// convert destination to clr
-					pen_to_clr(bmp[dst_x + x], &d_clr);
-
-					// transform source
-					cavesh_clr_select(&s_clr, &d_clr, s_alpha_clr, s_mode, &clr0);
-					clr_mul(&clr0, &s_clr, &clr0);
-
-					// transform destination
-					cavesh_clr_select(&s_clr, &d_clr, d_alpha_clr, d_mode, &clr1);
-					clr_mul(&clr1, &d_clr, &clr1);
-
-					// blend (add) into source
-					clr_add(&clr0, &clr1, &s_clr);
-				}
-
-				// write result
-				bmp[dst_x + x] = clr_to_pen(&s_clr)|(pen&0x8000);
+				// convert destination to clr
+				pen_to_clr(bmp[dst_x + x], &d_clr);
+                        	// transform source
+				cavesh_clr_select(&s_clr, &d_clr, s_alpha_clr, s_mode, &clr0);
+				clr_mul(&clr0, &s_clr, &clr0);                        	// transform destination
+				cavesh_clr_select(&s_clr, &d_clr, d_alpha_clr, d_mode, &clr1);
+				clr_mul(&clr1, &d_clr, &clr1);
+				// blend (add) into source
+				clr_add(&clr0, &clr1, &s_clr);
+				clamp_clr(&s_clr);
 			}
 
+			// write result
+			bmp[dst_x + x] = clr_to_pen(&s_clr)|(pen&0x8000);
 		}
 	}
 }
@@ -333,7 +321,7 @@ INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr)
 INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 {
 	int	x,y, dimx,dimy, flipx,flipy, src_p;
-	int tint,blend, s_alpha,s_mode, d_alpha,d_mode;
+	int trans,blend, s_alpha,s_mode, d_alpha,d_mode;
 	clr_t tint_clr, s_alpha_clr, d_alpha_clr;
 
 	UINT16 attr		=	READ_NEXT_WORD(space, addr);
@@ -359,7 +347,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	d_mode	=	 attr & 0x0007;
 	s_mode	=	(attr & 0x0070) >> 4;
 
-	tint	=	 !(attr & 0x0100);
+	trans	=	 attr & 0x0100;
 	blend	=	   attr & 0x0200;
 
 	flipy	=	 attr & 0x0400;
@@ -391,7 +379,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 		cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR16(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,
 		src_p,src_x,src_y, x,y, dimx,dimy, flipx,flipy,
 		blend, &s_alpha_clr, s_mode, &d_alpha_clr, d_mode,
-		tint, &tint_clr
+		trans, &tint_clr
 	);
 
 }
@@ -1335,7 +1323,7 @@ GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave"
 GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, futariblk, futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  mushisam, ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  espgal2, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NOT_WORKING | GAME_NO_SOUND )
