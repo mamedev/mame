@@ -26,6 +26,8 @@ class cavesh3_state : public driver_device
 public:
 	cavesh3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+
+	
 };
 
 /***************************************************************************
@@ -33,6 +35,7 @@ public:
 ***************************************************************************/
 
 UINT16* cavesh3_ram16;
+UINT16 cavesh3_colrtable[0x100][0x100];
 
 struct _clr_t
 {
@@ -47,6 +50,7 @@ INLINE void pen_to_clr(UINT16 pen, clr_t *clr)
 	clr->g = (pen >>  5) & 0x1f;
 	clr->b = (pen      ) & 0x1f;
 }
+
 
 // convert separate r,g,b biases (0..80..ff) to clr_t (-1f..0..1f)
 INLINE void tint_to_clr(UINT8 r, UINT8 g, UINT8 b, clr_t *clr)
@@ -88,26 +92,12 @@ INLINE void clr_add(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
 // multiply clrs
 INLINE void clr_mul(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
 {
-	clr->r = (clr0->r * clr1->r) >>5;
-	clr->g = (clr0->g * clr1->g) >>5;
-	clr->b = (clr0->b * clr1->b) >>5;
+	clr->r = cavesh3_colrtable[(clr0->r)][(clr1->r)];
+	clr->g = cavesh3_colrtable[(clr0->g)][(clr1->g)];
+	clr->b = cavesh3_colrtable[(clr0->b)][(clr1->b)];
 }
 
-INLINE char mode_name(UINT8 mode)
-{
-	switch( mode )
-	{
-		case 0:	return 'A';	// +alpha
-		case 1:	return 'S';	// +source
-		case 2:	return 'D';	// +dest
-		case 3:	return '*';	// *
-		case 4:	return 'a';	// -alpha
-		case 5:	return 's';	// -source
-		case 6:	return 'd';	// -dest
-		case 7:	return '-';	// *
-	}
-	return '?';
-}
+
 
 // (1|s|d) * s_factor * s + (1|s|d) * d_factor * d
 // 0: +alpha
@@ -118,60 +108,7 @@ INLINE char mode_name(UINT8 mode)
 // 5: -source
 // 6: -dest
 // 7: *
-INLINE void cavesh_clr_select(const clr_t *s_clr, const clr_t *d_clr, const clr_t *a_clr, UINT8 mode, clr_t *clr)
-{
-	switch( mode )
-	{
-		case 0:	// +alpha
-			clr->r = a_clr->r;
-			clr->g = a_clr->g;
-			clr->b = a_clr->b;
-			return;
 
-		case 1:	// +source
-			clr->r = s_clr->r;
-			clr->g = s_clr->g;
-			clr->b = s_clr->b;
-			return;
-
-		case 2:	// +dest
-			clr->r = d_clr->r;
-			clr->g = d_clr->g;
-			clr->b = d_clr->b;
-			return;
-
-		case 3:	// *
-			clr->r = 0x20;
-			clr->g = 0x20;
-			clr->b = 0x20;
-			return;
-
-		case 4:	// -alpha
-			clr->r = a_clr->r^0x1f;
-			clr->g = a_clr->g^0x1f;
-			clr->b = a_clr->b^0x1f;
-			return;
-
-		case 5:	// -source
-			clr->r = s_clr->r^0x1f;
-			clr->g = s_clr->g^0x1f;
-			clr->b = s_clr->b^0x1f;
-			return;
-
-		case 6:	// -dest
-			clr->r = d_clr->r^0x1f;
-			clr->g = d_clr->g^0x1f;
-			clr->b = d_clr->b^0x1f;
-			return;
-
-		default:
-		case 7:	// *
-			clr->r = 0x20;
-			clr->g = 0x20;
-			clr->b = 0x20;
-			return;
-	}
-}
 
 
 static UINT32 cavesh_gfx_addr;
@@ -194,81 +131,537 @@ INLINE UINT32 GFX_OFFSET( UINT32 x0, UINT32 y0, UINT32 x, UINT32 y )
 			((y0 + y) & 0x0fff) * 0x2000;
 }
 
-INLINE void draw_sprite(
-	bitmap_t *bitmap, const rectangle *clip, UINT16 *gfx, int gfx_size,
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-	int src_p,int src_x,int src_y, int dst_x,int dst_y, int dimx,int dimy, int flipx,int flipy,
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-	int blend, clr_t *s_alpha_clr, int s_mode, clr_t *d_alpha_clr, int d_mode,
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-	int transparent, clr_t *tint_clr
-)
-{
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-	//logerror("draw sprite %04x %04x - %04x %04x\n", dst_x, dst_y, dimx, dimy);
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-	int x,y, xf,yf;
-	clr_t s_clr, d_clr, clr0, clr1;
-	UINT16 pen;
-	UINT16 *bmp;
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-	if (flipx)	{	xf = -1;	src_x += (dimx-1);	}
-	else		{	xf = +1;						}
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-	if (flipy)	{	yf = -1;	src_y += (dimy-1);	}
-	else		{	yf = +1;						}
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-	int starty = 0;
+///////
 
-	if (dst_y < clip->min_y)
-		starty = clip->min_y - dst_y;
 
-	for (y = starty; y < dimy; y++)
-	{
-		if ((dst_y + y) > clip->max_y)
-			return;
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-		bmp = BITMAP_ADDR16(bitmap, dst_y + y, 0);
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-		int startx = 0;
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-		if (dst_x < clip->min_x)
-			startx = clip->min_x - dst_x;
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-		for (x = startx; x < dimx; x++)
-		{
-			if ((dst_x + x) > clip->max_x)
-				break;
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-			pen = gfx[GFX_OFFSET(src_x,src_y, xf * x, yf * y) & (gfx_size-1)];
-			if (transparent && (pen & 0x8000) == 0)
-				continue;
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-			// convert source to clr
-			pen_to_clr(pen, &s_clr);
-			// source * intesity and clamp
-			clr_mul(&s_clr, tint_clr, &s_clr);
-			clamp_clr(&s_clr);
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-			if (blend)
-			{
-				// convert destination to clr
-				pen_to_clr(bmp[dst_x + x], &d_clr);
-                        	// transform source
-				cavesh_clr_select(&s_clr, &d_clr, s_alpha_clr, s_mode, &clr0);
-				clr_mul(&clr0, &s_clr, &clr0);                        	// transform destination
-				cavesh_clr_select(&s_clr, &d_clr, d_alpha_clr, d_mode, &clr1);
-				clr_mul(&clr1, &d_clr, &clr1);
-				// blend (add) into source
-				clr_add(&clr0, &clr1, &s_clr);
-				clamp_clr(&s_clr);
-			}
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
 
-			// write result
-			bmp[dst_x + x] = clr_to_pen(&s_clr)|(pen&0x8000);
-		}
-	}
-}
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
 
 
 
@@ -284,7 +677,7 @@ INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
 
 INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr)
 {
-	UINT32 x,y, dst_p,dst_x,dst_y, dimx,dimy;
+	UINT32 x,y, dst_p,dst_x_start,dst_y_start, dimx,dimy;
 	UINT16 *dst;
 
 	// 0x20000000
@@ -295,25 +688,25 @@ INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr)
 	READ_NEXT_WORD(space, addr);
 	READ_NEXT_WORD(space, addr);
 
-	dst_x = READ_NEXT_WORD(space, addr);
-	dst_y = READ_NEXT_WORD(space, addr);
+	dst_x_start = READ_NEXT_WORD(space, addr);
+	dst_y_start = READ_NEXT_WORD(space, addr);
 
 	dst_p = 0;
-	dst_x &= 0x1fff;
-	dst_y &= 0x0fff;
+	dst_x_start &= 0x1fff;
+	dst_y_start &= 0x0fff;
 
 	dimx = (READ_NEXT_WORD(space, addr) & 0x1fff) + 1;
 	dimy = (READ_NEXT_WORD(space, addr) & 0x0fff) + 1;
 
-	logerror("GFX COPY: DST %02X,%02X,%03X DIM %02X,%03X\n", dst_p,dst_x,dst_y, dimx,dimy);
+	logerror("GFX COPY: DST %02X,%02X,%03X DIM %02X,%03X\n", dst_p,dst_x_start,dst_y_start, dimx,dimy);
 
 	for (y = 0; y < dimy; y++)
 	{
-		dst = BITMAP_ADDR16(cavesh_bitmaps[0], dst_y + y, 0);
+		dst = BITMAP_ADDR16(cavesh_bitmaps[0], dst_y_start + y, 0);
 
 		for (x = 0; x < dimx; x++)
 		{
-			 dst[dst_x + x] = READ_NEXT_WORD(space, addr);
+			 dst[dst_x_start + x] = READ_NEXT_WORD(space, addr);
 		}
 	}
 }
@@ -328,8 +721,8 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	UINT16 alpha	=	READ_NEXT_WORD(space, addr);
 	UINT16 src_x	=	READ_NEXT_WORD(space, addr);
 	UINT16 src_y	=	READ_NEXT_WORD(space, addr);
-	UINT16 dst_x	=	READ_NEXT_WORD(space, addr);
-	UINT16 dst_y	=	READ_NEXT_WORD(space, addr);
+	UINT16 dst_x_start	=	READ_NEXT_WORD(space, addr);
+	UINT16 dst_y_start	=	READ_NEXT_WORD(space, addr);
 	UINT16 w		=	READ_NEXT_WORD(space, addr);
 	UINT16 h		=	READ_NEXT_WORD(space, addr);
 	UINT16 tint_r	=	READ_NEXT_WORD(space, addr);
@@ -361,8 +754,8 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	src_y	=	src_y & 0x0fff;
 
 
-	x		=	(dst_x & 0x7fff) - (dst_x & 0x8000);
-	y		=	(dst_y & 0x7fff) - (dst_y & 0x8000);
+	x		=	(dst_x_start & 0x7fff) - (dst_x_start & 0x8000);
+	y		=	(dst_y_start & 0x7fff) - (dst_y_start & 0x8000);
 
 	dimx	=	(w & 0x1fff) + 1;
 	dimy	=	(h & 0x0fff) + 1;
@@ -374,14 +767,101 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	alpha_to_clr(s_alpha, &s_alpha_clr);
 	alpha_to_clr(d_alpha, &d_alpha_clr);
 
-	// draw
-	draw_sprite(
-		cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR16(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,
-		src_p,src_x,src_y, x,y, dimx,dimy, flipx,flipy,
-		blend, &s_alpha_clr, s_mode, &d_alpha_clr, d_mode,
-		trans, &tint_clr
-	);
+#define draw_params cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR16(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,src_p,src_x,src_y, x,y, dimx,dimy, flipx,flipy,blend, &s_alpha_clr, &d_alpha_clr, trans, &tint_clr
 
+
+	switch (d_mode)
+	{
+	case 0:
+	// draw
+	if (s_mode==0)     draw_sprite_s0_d0(draw_params);
+	else if (s_mode==1)draw_sprite_s1_d0(draw_params);
+	else if (s_mode==2)draw_sprite_s2_d0(draw_params);
+	else if (s_mode==3)draw_sprite_s3_d0(draw_params);
+	else if (s_mode==4)draw_sprite_s4_d0(draw_params);
+	else if (s_mode==5)draw_sprite_s5_d0(draw_params);
+	else if (s_mode==6)draw_sprite_s6_d0(draw_params);
+	else if (s_mode==7)draw_sprite_s7_d0(draw_params);
+	break;
+
+	case 1:
+	if (s_mode==0)     draw_sprite_s0_d1(draw_params);
+	else if (s_mode==1)draw_sprite_s1_d1(draw_params);
+	else if (s_mode==2)draw_sprite_s2_d1(draw_params);
+	else if (s_mode==3)draw_sprite_s3_d1(draw_params);
+	else if (s_mode==4)draw_sprite_s4_d1(draw_params);
+	else if (s_mode==5)draw_sprite_s5_d1(draw_params);
+	else if (s_mode==6)draw_sprite_s6_d1(draw_params);
+	else if (s_mode==7)draw_sprite_s7_d1(draw_params);
+	break;
+
+	case 2:
+	if (s_mode==0)     draw_sprite_s0_d2(draw_params);
+	else if (s_mode==1)draw_sprite_s1_d2(draw_params);
+	else if (s_mode==2)draw_sprite_s2_d2(draw_params);
+	else if (s_mode==3)draw_sprite_s3_d2(draw_params);
+	else if (s_mode==4)draw_sprite_s4_d2(draw_params);
+	else if (s_mode==5)draw_sprite_s5_d2(draw_params);
+	else if (s_mode==6)draw_sprite_s6_d2(draw_params);
+	else if (s_mode==7)draw_sprite_s7_d2(draw_params);
+	break;
+
+	case 3:
+	if (s_mode==0)     draw_sprite_s0_d3(draw_params);
+	else if (s_mode==1)draw_sprite_s1_d3(draw_params);
+	else if (s_mode==2)draw_sprite_s2_d3(draw_params);
+	else if (s_mode==3)draw_sprite_s3_d3(draw_params);
+	else if (s_mode==4)draw_sprite_s4_d3(draw_params);
+	else if (s_mode==5)draw_sprite_s5_d3(draw_params);
+	else if (s_mode==6)draw_sprite_s6_d3(draw_params);
+	else if (s_mode==7)draw_sprite_s7_d3(draw_params);
+	break;
+
+	case 4:
+	if (s_mode==0)     draw_sprite_s0_d4(draw_params);
+	else if (s_mode==1)draw_sprite_s1_d4(draw_params);
+	else if (s_mode==2)draw_sprite_s2_d4(draw_params);
+	else if (s_mode==3)draw_sprite_s3_d4(draw_params);
+	else if (s_mode==4)draw_sprite_s4_d4(draw_params);
+	else if (s_mode==5)draw_sprite_s5_d4(draw_params);
+	else if (s_mode==6)draw_sprite_s6_d4(draw_params);
+	else if (s_mode==7)draw_sprite_s7_d4(draw_params);
+	break;
+
+	case 5:
+	if (s_mode==0)     draw_sprite_s0_d5(draw_params);
+	else if (s_mode==1)draw_sprite_s1_d5(draw_params);
+	else if (s_mode==2)draw_sprite_s2_d5(draw_params);
+	else if (s_mode==3)draw_sprite_s3_d5(draw_params);
+	else if (s_mode==4)draw_sprite_s4_d5(draw_params);
+	else if (s_mode==5)draw_sprite_s5_d5(draw_params);
+	else if (s_mode==6)draw_sprite_s6_d5(draw_params);
+	else if (s_mode==7)draw_sprite_s7_d5(draw_params);
+	break;
+
+	case 6:
+	if (s_mode==0)     draw_sprite_s0_d6(draw_params);
+	else if (s_mode==1)draw_sprite_s1_d6(draw_params);
+	else if (s_mode==2)draw_sprite_s2_d6(draw_params);
+	else if (s_mode==3)draw_sprite_s3_d6(draw_params);
+	else if (s_mode==4)draw_sprite_s4_d6(draw_params);
+	else if (s_mode==5)draw_sprite_s5_d6(draw_params);
+	else if (s_mode==6)draw_sprite_s6_d6(draw_params);
+	else if (s_mode==7)draw_sprite_s7_d6(draw_params);
+	break;
+
+	case 7:
+	if (s_mode==0     )draw_sprite_s0_d7(draw_params);
+	else if (s_mode==1)draw_sprite_s1_d7(draw_params);
+	else if (s_mode==2)draw_sprite_s2_d7(draw_params);
+	else if (s_mode==3)draw_sprite_s3_d7(draw_params);
+	else if (s_mode==4)draw_sprite_s4_d7(draw_params);
+	else if (s_mode==5)draw_sprite_s5_d7(draw_params);
+	else if (s_mode==6)draw_sprite_s6_d7(draw_params);
+	else if (s_mode==7)draw_sprite_s7_d7(draw_params);
+	break;
+
+	}
 }
 
 // Death Smiles has bad text with wrong clip sizes, must clip to screen size.
@@ -469,16 +949,16 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 static SCREEN_UPDATE( cavesh3 )
 {
 	int scroll_0_x, scroll_0_y;
-	//int scroll_1_x, scroll_1_y;
+//	int scroll_1_x, scroll_1_y;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	scroll_0_x = -cavesh_gfx_scroll_0_x;
 	scroll_0_y = -cavesh_gfx_scroll_0_y;
-	//scroll_1_x = -cavesh_gfx_scroll_1_x;
-	//scroll_1_y = -cavesh_gfx_scroll_1_y;
+//	scroll_1_x = -cavesh_gfx_scroll_1_x;
+//	scroll_1_y = -cavesh_gfx_scroll_1_y;
 
-	//logerror("SCREEN UPDATE\n");
+	//printf("SCREEN UPDATE\n %d %d %d %d\n", scroll_0_x, scroll_0_y, scroll_1_x, scroll_1_y);
 
 	copyscrollbitmap_trans(bitmap, cavesh_bitmaps[0], 1,&scroll_0_x, 1,&scroll_0_y, cliprect, 0x8000);
 
@@ -1042,6 +1522,16 @@ static MACHINE_RESET( cavesh3 )
 	flash_enab = 0;
 	flash_hard_reset(machine);
 	cavesh3_ram16 = (UINT16*)cavesh3_ram;
+
+	// cache table to avoid divides in blit code
+	int x,y;
+	for (y=0;y<0x100;y++)
+	{
+		for (x=0;x<0x100;x++)
+		{
+			cavesh3_colrtable[x][y] = (x*y) / 0x1f;
+		}
+	}
 }
 
 static PALETTE_INIT( cavesh_RRRRR_GGGGG_BBBBB )
@@ -1298,20 +1788,6 @@ DRIVER_INIT( espgal2 )
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc002310, 0xc002317, FUNC(espgal2_speedup_r) );
 }
-
-
-
-/*
-espgal2 c002310
-futari15 c002310
-futari15a c002310
-futari10 c002310
-futariblk c002310
-ibarablk c002310
-ibarablka c002310
-deathsml c002310
-mmpork c002310
-*/
 
 
 GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  mushisam,  ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
