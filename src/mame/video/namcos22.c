@@ -1299,8 +1299,8 @@ DrawSpritesHelper(
 			int pri = ((pPal[1] & 0xffff) == 0x00fe);
 
 			// set window clipping
-			INT16 cx_min, cx_max;
-			INT16 cy_min, cy_max;
+			int cx_min, cx_max;
+			int cy_min, cy_max;
 			if (attrs & 0x01000000)
 			{
 				cx_min = -deltax + (INT16)(pBase[0x208/4]>>16);
