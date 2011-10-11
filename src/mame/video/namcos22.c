@@ -15,8 +15,7 @@
  * - spot
  *
  * - spritelayer:
- *   + y-clipping (eg. timecris)
- *   + eliminate garbage in airco22b
+ *   + eliminate garbage in airco22b: find out how/where vics num_sprites is determined exactly
  *   + find out which reg/bit controls y_lowres (only used in cybrcycc?)
  *   + timecris shattered glass is supposed to fade out (happens just before the titlescreen shows)
  *   + timecris last part of photos attract mode, sprites should be hidden
@@ -241,32 +240,34 @@ poly3d_Clip( float vx, float vy, float vw, float vh )
 	mClip.cx = cx;
 	mClip.cy = cy;
 	mClip.scissor.min_x = cx + vw;
-	mClip.scissor.min_y = cy + vh;
 	mClip.scissor.max_x = cx - vw;
+	mClip.scissor.min_y = cy + vh;
 	mClip.scissor.max_y = cy - vh;
 	if( mClip.scissor.min_x<0 )   mClip.scissor.min_x = 0;
-	if( mClip.scissor.min_y<0 )   mClip.scissor.min_y = 0;
 	if( mClip.scissor.max_x>639 ) mClip.scissor.max_x = 639;
+	if( mClip.scissor.min_y<0 )   mClip.scissor.min_y = 0;
 	if( mClip.scissor.max_y>479 ) mClip.scissor.max_y = 479;
 }
 
 static void
-sprite_Clip( int miny, int maxy )
+sprite_Clip( int min_x, int max_x, int min_y, int max_y )
 {
-	// cx/cy not used, and only set y-clipping
-	mClip.scissor.min_y = miny;
-	mClip.scissor.max_y = maxy;
+	// cx/cy not used
+	mClip.scissor.min_x = min_x;
+	mClip.scissor.max_x = max_x;
+	mClip.scissor.min_y = min_y;
+	mClip.scissor.max_y = max_y;
+	if( mClip.scissor.min_x<0 )   mClip.scissor.min_x = 0;
+	if( mClip.scissor.max_x>639 ) mClip.scissor.max_x = 639;
 	if( mClip.scissor.min_y<0 )   mClip.scissor.min_y = 0;
 	if( mClip.scissor.max_y>479 ) mClip.scissor.max_y = 479;
-	mClip.scissor.min_x = 0;
-	mClip.scissor.max_x = 639;
 }
 
 static void
 poly3d_NoClip( void )
 {
-	mClip.cx = 640/2;
-	mClip.cy = 480/2;
+	mClip.cx = 320;
+	mClip.cy = 240;
 	mClip.scissor.min_x = 0;
 	mClip.scissor.max_x = 639;
 	mClip.scissor.min_y = 0;
@@ -569,7 +570,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 
 
 static void
-mydrawgfxzoom(
+poly3d_DrawSprite(
 	bitmap_t *dest_bmp, const gfx_element *gfx, UINT32 code,
 	UINT32 color, int flipx, int flipy, int sx, int sy,
 	int scalex, int scaley, int z, int prioverchar, int alpha )
@@ -641,7 +642,7 @@ mydrawgfxzoom(
 
 		poly_render_triangle_fan(state->m_poly, dest_bmp, &mClip.scissor, renderscanline_sprite, 2, 4, vert);
 	}
-} /* mydrawgfxzoom */
+} /* poly3d_DrawSprite */
 
 static void
 ApplyGamma( running_machine &machine, bitmap_t *bitmap )
@@ -802,6 +803,7 @@ struct SceneNode
 			int linkType;
 			int numcols, numrows;
 			int xpos, ypos;
+			int cx_min, cx_max;
 			int cy_min, cy_max;
 			int sizex, sizey;
 			int translucency;
@@ -884,28 +886,26 @@ static void RenderSprite(running_machine &machine, bitmap_t *bitmap, struct Scen
 		{
 			int code = tile;
 			if( node->data.sprite.linkType == 0xff )
-			{
 				code += i;
-			}
 			else
-			{
 				code += nthword( &state->m_spriteram[0x800/4], i+node->data.sprite.linkType*4 );
-			}
-			mydrawgfxzoom(
-					bitmap,
-					machine.gfx[GFX_SPRITE],
-					code,
-					node->data.sprite.color,
-					node->data.sprite.flipx,
-					node->data.sprite.flipy,
-					node->data.sprite.xpos+col*node->data.sprite.sizex,
-					node->data.sprite.ypos+row*node->data.sprite.sizey,
-					(node->data.sprite.sizex<<16)/32,
-					(node->data.sprite.sizey<<16)/32,
-					node->data.sprite.cz,
-					node->data.sprite.pri,
-					0xff - node->data.sprite.translucency );
-		i++;
+
+			poly3d_DrawSprite(
+				bitmap,
+				machine.gfx[GFX_SPRITE],
+				code,
+				node->data.sprite.color,
+				node->data.sprite.flipx,
+				node->data.sprite.flipy,
+				node->data.sprite.xpos+col*node->data.sprite.sizex,
+				node->data.sprite.ypos+row*node->data.sprite.sizey,
+				(node->data.sprite.sizex<<16)/32,
+				(node->data.sprite.sizey<<16)/32,
+				node->data.sprite.cz,
+				node->data.sprite.pri,
+				0xff - node->data.sprite.translucency
+			);
+			i++;
 		} /* next col */
 	} /* next row */
 } /* RenderSprite */
@@ -936,7 +936,8 @@ static void RenderSceneHelper(running_machine &machine, bitmap_t *bitmap, struct
 						node->data.quad3d.vx,
 						node->data.quad3d.vy,
 						node->data.quad3d.vw,
-						node->data.quad3d.vh );
+						node->data.quad3d.vh
+					);
 					poly3d_DrawQuad(machine,
 						bitmap,
 						node->data.quad3d.textureBank,
@@ -944,13 +945,17 @@ static void RenderSceneHelper(running_machine &machine, bitmap_t *bitmap, struct
 						node->data.quad3d.v,
 						node->data.quad3d.flags,
 						node->data.quad3d.direct,
-						node->data.quad3d.cmode );
+						node->data.quad3d.cmode
+					);
 					break;
 
 				case eSCENENODE_SPRITE:
 					sprite_Clip(
+						node->data.sprite.cx_min,
+						node->data.sprite.cx_max,
 						node->data.sprite.cy_min,
-						node->data.sprite.cy_max );
+						node->data.sprite.cy_max
+					);
 					RenderSprite(machine, bitmap, node );
 					break;
 
@@ -1241,26 +1246,24 @@ DrawSpritesHelper(
 	running_machine &machine,
 	bitmap_t *bitmap,
 	const rectangle *cliprect,
+	UINT32 *pBase,
 	const UINT32 *pSource,
 	const UINT32 *pPal,
 	int num_sprites,
 	int enable,
 	int deltax,
 	int deltay,
-	UINT32 clip,
 	int y_lowres )
 {
-	// set y-clipping
-	INT16 cy_min = -deltay + (INT16)(clip>>16);
-	INT16 cy_max = -deltay + (INT16)(clip&0xffff);
-
 	int i;
 
 	for( i=0; i<num_sprites; i++ )
 	{
 		/* attrs:
         xxxx.x---.----.----.----.----.----.---- always 0?
-        ----.-xxx.----.----.----.----.----.---- enable mask?
+        ----.-x--.----.----.----.----.----.---- enable mask?
+        ----.--x-.----.----.----.----.----.---- ?
+        ----.---x.----.----.----.----.----.---- clip target
         ----.----.xxxx.xxxx.----.----.----.---- linktype
         ----.----.----.----.xxxx.xx--.----.---- always 0?
         ----.----.----.----.----.--x-.----.---- right justify
@@ -1277,7 +1280,6 @@ DrawSpritesHelper(
 			INT32 zcoord = pPal[0];
 			int color = pPal[1]>>16;
 			int cz = pPal[1]&0xffff;
-			int pri = ((pPal[1] & 0xffff) == 0x00fe); // priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
 			UINT32 xypos = pSource[0];
 			UINT32 size = pSource[1];
 			UINT32 code = pSource[3];
@@ -1292,6 +1294,27 @@ DrawSpritesHelper(
 			int numcols = (attrs>>4)&0x7;
 			int tile = code>>16;
 			int translucency = (code&0xff00)>>8;
+
+			// priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
+			int pri = ((pPal[1] & 0xffff) == 0x00fe);
+
+			// set window clipping
+			INT16 cx_min, cx_max;
+			INT16 cy_min, cy_max;
+			if (attrs & 0x01000000)
+			{
+				cx_min = -deltax + (INT16)(pBase[0x208/4]>>16);
+				cx_max = -deltax + (INT16)(pBase[0x208/4]&0xffff);
+				cy_min = -deltay + (INT16)(pBase[0x20c/4]>>16);
+				cy_max = -deltay + (INT16)(pBase[0x20c/4]&0xffff);
+			}
+			else
+			{
+				cx_min = -deltax + (INT16)(pBase[0x200/4]>>16);
+				cx_max = -deltax + (INT16)(pBase[0x200/4]&0xffff);
+				cy_min = -deltay + (INT16)(pBase[0x204/4]>>16);
+				cy_max = -deltay + (INT16)(pBase[0x204/4]&0xffff);
+			}
 
 			if (numrows == 0) numrows = 8;
 			if (numcols == 0) numcols = 8;
@@ -1334,6 +1357,8 @@ DrawSpritesHelper(
 				node->data.sprite.linkType = linkType;
 				node->data.sprite.xpos = xpos;
 				node->data.sprite.ypos = ypos;
+				node->data.sprite.cx_min = cx_min;
+				node->data.sprite.cx_max = cx_max;
 				node->data.sprite.cy_min = cy_min;
 				node->data.sprite.cy_max = cy_max;
 				node->data.sprite.sizex = sizex;
@@ -1392,7 +1417,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
                              ^^^^^^^^                    window-x related?
                                       ^^^^^^^^           window-y related?
 
-        0x980200:   000007ff 000007ff 000007ff 032a0509  y-clipping related
+        0x980200:   000007ff 000007ff 000007ff 032a0509  window clipping
         0x980210:   000007ff 000007ff 000007ff 000007ff
         0x980220:   000007ff 000007ff 000007ff 000007ff
         0x980230:   000007ff 000007ff 000007ff 000007ff
@@ -1415,10 +1440,6 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         0x9a0004:   palette, C381 ZC (depth cueing)
         ...
     */
-
-	// y-clipping, disabled for now
-	UINT32 clipy_minmax = spriteram32[0x20c/4]; // works in timecris, but problems in aquajet and tokyowar
-	clipy_minmax = 0x000007ff;
 
 	// y-resolution, where is this bit?
 	// the only game that uses y_lowres is cybrcycc, and unfortunately doesn't have a video test in service mode
@@ -1446,7 +1467,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
 	}
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
@@ -1471,7 +1492,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
 	}
 
 	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
@@ -1479,7 +1500,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
 	}
 } /* DrawSprites */
 
@@ -2299,9 +2320,8 @@ SimulateSlaveDSP( running_machine &machine, bitmap_t *bitmap )
 
 		/* hackery! commands should be streamed, not parsed here */
 		pSource += len;
-//      marker = (INT16)*pSource++; /* always 0xffff */
-		pSource++;
-		next   = (INT16)*pSource++; /* link to next command */
+		pSource++; /* always 0xffff */
+		next = (INT16)*pSource++; /* link to next command */
 		if( (next&0x7fff) != (pSource - (INT32 *)state->m_polygonram) )
 		{ /* end of list */
 			break;
