@@ -376,6 +376,74 @@ ROM_START( gunbustr )
 	ROM_LOAD32_BYTE( "d27-23.bin", 0x00000, 0x40000, CRC(cd1037cc) SHA1(8005a6a84081ce609e7a605ec8e00e740bfc6846) )
 	ROM_LOAD32_BYTE( "d27-22.bin", 0x00001, 0x40000, CRC(475949fc) SHA1(3d5aa3411d2618004902f9d05dff61d9af01ff35) )
 	ROM_LOAD32_BYTE( "d27-21.bin", 0x00002, 0x40000, CRC(60950a8a) SHA1(a0336bf6970baa6eaa998a112db840a7fd0452d7) )
+	ROM_LOAD32_BYTE( "d27-27.bin", 0x00003, 0x40000, CRC(fd7d3d4c) SHA1(df42e135b1e9b7e371971ba7c8a2e161f3623aa3) )
+
+	ROM_REGION( 0x140000, "audiocpu", 0 )	/* Sound cpu */
+	ROM_LOAD16_BYTE( "d27-25.bin", 0x100000, 0x20000, CRC(c88203cf) SHA1(a918d395b471acdce56dacabd7a1e1e023948365) )
+	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "d27-01.bin", 0x00000, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) )	/* SCR 16x16 tiles */
+	ROM_LOAD16_BYTE( "d27-02.bin", 0x00001, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "d27-04.bin", 0x000003, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )	/* OBJ 16x16 tiles: each rom has 1 bitplane */
+	ROM_LOAD32_BYTE( "d27-05.bin", 0x000002, 0x100000, CRC(96d7c1a5) SHA1(93b6a7aea397280a5a778e736d433a85cb7da52c) )
+	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
+	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) )	/* STY, used to create big sprites on the fly */
+
+	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "d27-08.bin", 0x000000, 0x100000, CRC(7c147e30) SHA1(b605045154967050ec06391798da4afe3686a6e1) ) // C8, C9
+	ROM_RELOAD(0x400000,0x100000)
+	ROM_LOAD16_BYTE( "d27-09.bin", 0x200000, 0x100000, CRC(3e060304) SHA1(c4da4a94c168c3a454409d758c3ed45babbab170) ) // CA, CB
+	ROM_LOAD16_BYTE( "d27-10.bin", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) ) // -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-gunbustr.bin", 0x0000, 0x0080, CRC(af7dc017) SHA1(5ff106cccd2679025cdd81fbc133d32148e2818c) )
+ROM_END
+
+ROM_START( gunbustru )
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024K for 68020 code (CPU A) */
+	ROM_LOAD32_BYTE( "d27-23.bin", 0x00000, 0x40000, CRC(cd1037cc) SHA1(8005a6a84081ce609e7a605ec8e00e740bfc6846) )
+	ROM_LOAD32_BYTE( "d27-22.bin", 0x00001, 0x40000, CRC(475949fc) SHA1(3d5aa3411d2618004902f9d05dff61d9af01ff35) )
+	ROM_LOAD32_BYTE( "d27-21.bin", 0x00002, 0x40000, CRC(60950a8a) SHA1(a0336bf6970baa6eaa998a112db840a7fd0452d7) )
+	ROM_LOAD32_BYTE( "d27-26.bin", 0x00003, 0x40000, CRC(8a7a0dda) SHA1(59ee7c391c170ab05a3d3d940d833c65e265d9b3) )
+
+	ROM_REGION( 0x140000, "audiocpu", 0 )	/* Sound cpu */
+	ROM_LOAD16_BYTE( "d27-25.bin", 0x100000, 0x20000, CRC(c88203cf) SHA1(a918d395b471acdce56dacabd7a1e1e023948365) )
+	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "d27-01.bin", 0x00000, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) )	/* SCR 16x16 tiles */
+	ROM_LOAD16_BYTE( "d27-02.bin", 0x00001, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "d27-04.bin", 0x000003, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )	/* OBJ 16x16 tiles: each rom has 1 bitplane */
+	ROM_LOAD32_BYTE( "d27-05.bin", 0x000002, 0x100000, CRC(96d7c1a5) SHA1(93b6a7aea397280a5a778e736d433a85cb7da52c) )
+	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
+	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) )	/* STY, used to create big sprites on the fly */
+
+	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "d27-08.bin", 0x000000, 0x100000, CRC(7c147e30) SHA1(b605045154967050ec06391798da4afe3686a6e1) ) // C8, C9
+	ROM_RELOAD(0x400000,0x100000)
+	ROM_LOAD16_BYTE( "d27-09.bin", 0x200000, 0x100000, CRC(3e060304) SHA1(c4da4a94c168c3a454409d758c3ed45babbab170) ) // CA, CB
+	ROM_LOAD16_BYTE( "d27-10.bin", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) ) // -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-gunbustr.bin", 0x0000, 0x0080, CRC(af7dc017) SHA1(5ff106cccd2679025cdd81fbc133d32148e2818c) )
+ROM_END
+
+ROM_START( gunbustrj )
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024K for 68020 code (CPU A) */
+	ROM_LOAD32_BYTE( "d27-23.bin", 0x00000, 0x40000, CRC(cd1037cc) SHA1(8005a6a84081ce609e7a605ec8e00e740bfc6846) )
+	ROM_LOAD32_BYTE( "d27-22.bin", 0x00001, 0x40000, CRC(475949fc) SHA1(3d5aa3411d2618004902f9d05dff61d9af01ff35) )
+	ROM_LOAD32_BYTE( "d27-21.bin", 0x00002, 0x40000, CRC(60950a8a) SHA1(a0336bf6970baa6eaa998a112db840a7fd0452d7) )
 	ROM_LOAD32_BYTE( "d27-20.bin", 0x00003, 0x40000, CRC(13735c60) SHA1(65b762b28d51b295f6fe190420af566b1b3d4a82) )
 
 	ROM_REGION( 0x140000, "audiocpu", 0 )	/* Sound cpu */
@@ -420,4 +488,6 @@ static DRIVER_INIT( gunbustr )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x203acc, 0x203acf, FUNC(main_cycle_r));
 }
 
-GAME( 1992, gunbustr, 0,      gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )
+GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Gunbuster (World)", 0 )
+GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)", 0 )
+GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )
