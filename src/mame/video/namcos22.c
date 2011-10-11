@@ -1,24 +1,20 @@
 /**
  * video hardware for Namco System22
  *
- * todo:
+ * todo (ordered by importance):
  *
  * - emulate slave dsp!
  * - fog (should be per-z, not per-poly, and not even hooked yet up on non-super)
+ * - emulate spot
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter,
  *   there's still a very small hitbox but almost impossible to hit
  *   (is this related to video board? or cpu?)
+ * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
  *   (probably a bug in rgbint, not here?)
- * - spot
- *
- * - spritelayer:
- *   + eliminate garbage in airco22b: find out how/where vics num_sprites is determined exactly
- *   + find out which reg/bit controls y_lowres (only used in cybrcycc?)
- *   + timecris shattered glass is supposed to fade out (happens just before the titlescreen shows)
- *   + timecris last part of photos attract mode, sprites should be hidden
+ * - timecris shattered glass sprite is supposed to fade out (happens just before the titlescreen shows)
  *
  * - lots of smaller issues
  *
@@ -1250,20 +1246,15 @@ DrawSpritesHelper(
 	const UINT32 *pSource,
 	const UINT32 *pPal,
 	int num_sprites,
-	int enable,
 	int deltax,
 	int deltay,
 	int y_lowres )
 {
-	int i;
-
-	for( i=0; i<num_sprites; i++ )
+	for( int i=0; i<num_sprites; i++ )
 	{
 		/* attrs:
         xxxx.x---.----.----.----.----.----.---- always 0?
-        ----.-x--.----.----.----.----.----.---- enable mask?
-        ----.--x-.----.----.----.----.----.---- ?
-        ----.---x.----.----.----.----.----.---- clip target
+        ----.-xxx.----.----.----.----.----.---- clip target
         ----.----.xxxx.xxxx.----.----.----.---- linktype
         ----.----.----.----.xxxx.xx--.----.---- always 0?
         ----.----.----.----.----.--x-.----.---- right justify
@@ -1274,101 +1265,86 @@ DrawSpritesHelper(
         ----.----.----.----.----.----.----.-xxx numrows
         */
 		UINT32 attrs = pSource[2];
-		if( (attrs&enable)==0 )
+		INT32 zcoord = pPal[0];
+		int color = pPal[1]>>16;
+		int cz = pPal[1]&0xffff;
+		UINT32 xypos = pSource[0];
+		UINT32 size = pSource[1];
+		UINT32 code = pSource[3];
+		int xpos = (xypos>>16)-deltax;
+		int ypos = (xypos&0xffff)-deltay;
+		int sizex = size>>16;
+		int sizey = size&0xffff;
+		int flipy = attrs>>3&0x1;
+		int numrows = attrs&0x7;
+		int linkType = (attrs&0x00ff0000)>>16;
+		int flipx = (attrs>>7)&0x1;
+		int numcols = (attrs>>4)&0x7;
+		int tile = code>>16;
+		int translucency = (code&0xff00)>>8;
+
+		// priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
+		int pri = ((pPal[1] & 0xffff) == 0x00fe);
+
+		// set window clipping
+		int clip = attrs>>23&0xe;
+		int cx_min = -deltax + (INT16)(pBase[0x80|clip]>>16);
+		int cx_max = -deltax + (INT16)(pBase[0x80|clip]&0xffff);
+		int cy_min = -deltay + (INT16)(pBase[0x81|clip]>>16);
+		int cy_max = -deltay + (INT16)(pBase[0x81|clip]&0xffff);
+
+		if (numrows == 0) numrows = 8;
+		if (numcols == 0) numcols = 8;
+
+		/* right justify */
+		if (attrs & 0x0200)
+			xpos -= sizex*numcols-1;
+
+		/* bottom justify */
+		if (attrs & 0x0100)
+			ypos -= sizey*numrows-1;
+
+		if (flipy)
 		{
-			/* sprite is not hidden */
-			INT32 zcoord = pPal[0];
-			int color = pPal[1]>>16;
-			int cz = pPal[1]&0xffff;
-			UINT32 xypos = pSource[0];
-			UINT32 size = pSource[1];
-			UINT32 code = pSource[3];
-			int xpos = (xypos>>16)-deltax;
-			int ypos = (xypos&0xffff)-deltay;
-			int sizex = size>>16;
-			int sizey = size&0xffff;
-			int flipy = attrs>>3&0x1;
-			int numrows = attrs&0x7;
-			int linkType = (attrs&0x00ff0000)>>16;
-			int flipx = (attrs>>7)&0x1;
-			int numcols = (attrs>>4)&0x7;
-			int tile = code>>16;
-			int translucency = (code&0xff00)>>8;
+			ypos += sizey*numrows-1;
+			sizey = -sizey;
+		}
 
-			// priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
-			int pri = ((pPal[1] & 0xffff) == 0x00fe);
+		if (flipx)
+		{
+			xpos += sizex*numcols-1;
+			sizex = -sizex;
+		}
 
-			// set window clipping
-			int cx_min, cx_max;
-			int cy_min, cy_max;
-			if (attrs & 0x01000000)
-			{
-				cx_min = -deltax + (INT16)(pBase[0x208/4]>>16);
-				cx_max = -deltax + (INT16)(pBase[0x208/4]&0xffff);
-				cy_min = -deltay + (INT16)(pBase[0x20c/4]>>16);
-				cy_max = -deltay + (INT16)(pBase[0x20c/4]&0xffff);
-			}
-			else
-			{
-				cx_min = -deltax + (INT16)(pBase[0x200/4]>>16);
-				cx_max = -deltax + (INT16)(pBase[0x200/4]&0xffff);
-				cy_min = -deltay + (INT16)(pBase[0x204/4]>>16);
-				cy_max = -deltay + (INT16)(pBase[0x204/4]&0xffff);
-			}
+		if (y_lowres)
+		{
+			sizey *= 2;
+			ypos *= 2;
+		}
 
-			if (numrows == 0) numrows = 8;
-			if (numcols == 0) numcols = 8;
+		if (sizex && sizey)
+		{
+			struct SceneNode *node = NewSceneNode(machine, zcoord, eSCENENODE_SPRITE);
 
-			/* right justify */
-			if (attrs & 0x0200)
-				xpos -= sizex*numcols-1;
-
-			/* bottom justify */
-			if (attrs & 0x0100)
-				ypos -= sizey*numrows-1;
-
-			if (flipy)
-			{
-				ypos += sizey*numrows-1;
-				sizey = -sizey;
-			}
-
-			if (flipx)
-			{
-				xpos += sizex*numcols-1;
-				sizex = -sizex;
-			}
-
-			if (y_lowres)
-			{
-				sizey *= 2;
-				ypos *= 2;
-			}
-
-			if (sizex && sizey)
-			{
-				struct SceneNode *node = NewSceneNode(machine, zcoord, eSCENENODE_SPRITE);
-
-				node->data.sprite.tile = tile;
-				node->data.sprite.flipx = flipx;
-				node->data.sprite.flipy = flipy;
-				node->data.sprite.numcols = numcols;
-				node->data.sprite.numrows = numrows;
-				node->data.sprite.linkType = linkType;
-				node->data.sprite.xpos = xpos;
-				node->data.sprite.ypos = ypos;
-				node->data.sprite.cx_min = cx_min;
-				node->data.sprite.cx_max = cx_max;
-				node->data.sprite.cy_min = cy_min;
-				node->data.sprite.cy_max = cy_max;
-				node->data.sprite.sizex = sizex;
-				node->data.sprite.sizey = sizey;
-				node->data.sprite.translucency = translucency;
-				node->data.sprite.color = color;
-				node->data.sprite.cz = cz;
-				node->data.sprite.pri = pri;
-			}
-		} /* visible sprite */
+			node->data.sprite.tile = tile;
+			node->data.sprite.flipx = flipx;
+			node->data.sprite.flipy = flipy;
+			node->data.sprite.numcols = numcols;
+			node->data.sprite.numrows = numrows;
+			node->data.sprite.linkType = linkType;
+			node->data.sprite.xpos = xpos;
+			node->data.sprite.ypos = ypos;
+			node->data.sprite.cx_min = cx_min;
+			node->data.sprite.cx_max = cx_max;
+			node->data.sprite.cy_min = cy_min;
+			node->data.sprite.cy_max = cy_max;
+			node->data.sprite.sizex = sizex;
+			node->data.sprite.sizey = sizey;
+			node->data.sprite.translucency = translucency;
+			node->data.sprite.color = color;
+			node->data.sprite.cz = cz;
+			node->data.sprite.pri = pri;
+		}
 		pSource += 4;
 		pPal += 2;
 	}
@@ -1406,7 +1382,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 #endif
 /*
         0x980000:   00060000 00010000 02ff0000 000007ff
-                    ^^^^                                 enable bits, 7 = disable
+                       ^                                 enable bits, 7 = disable
                         ^^^^                             base
                              ^^^^                        base + num sprites
                                  ^^^^     ^^^^           deltax
@@ -1417,10 +1393,10 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
                              ^^^^^^^^                    window-x related?
                                       ^^^^^^^^           window-y related?
 
-        0x980200:   000007ff 000007ff 000007ff 032a0509  window clipping
-        0x980210:   000007ff 000007ff 000007ff 000007ff
-        0x980220:   000007ff 000007ff 000007ff 000007ff
-        0x980230:   000007ff 000007ff 000007ff 000007ff
+        0x980200:   000007ff 000007ff 000007ff 000007ff  window clipping
+        0x980210:   000007ff 000007ff 000007ff 000007ff  "
+        0x980220:   000007ff 000007ff 000007ff 000007ff  "
+        0x980230:   000007ff 000007ff 000007ff 000007ff  "
 
         0x980400:   hzoom table
         0x980600:   vzoom table
@@ -1441,33 +1417,27 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         ...
     */
 
-	// y-resolution, where is this bit?
-	// the only game that uses y_lowres is cybrcycc, and unfortunately doesn't have a video test in service mode
-	int y_lowres = 0;
-	if (state->m_gametype == NAMCOS22_CYBER_CYCLES)
-	{
-		y_lowres = 1;
-	}
+	/* 'enable' bits function:
+        bit 0:      affects spritecount by 1? (alpinr2b)
+        bit 1:      ??? (always set, except in alpinr2b. it's not x-resolution)
+        bit 2:      y-resolution? (always set, except in cybrcycc)
+        all bits set means off (aquajet) */
+	int enable = spriteram32[0]>>16&7;
+
+	int y_lowres = (enable & 4) ? 0 : 1;
 
 	int deltax = (spriteram32[1]&0xffff) + (spriteram32[2]&0xffff) + 0x2d;
 	int deltay = (spriteram32[3]>>16) + (0x2a >> y_lowres);
 
 	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = (spriteram32[1]>>16) - base;
-
-	/* 'enable' bits function:
-        bit 0:      affects spritecount by 1? (alpinr2b)
-        bit 1:      ???
-        bit 2:      per-sprite enable mask? (cybrcycc)
-        all bits set means off (aquajet) */
-	int enable = spriteram32[0]>>16&7;
 	num_sprites += (~enable & 1);
 
 	if( num_sprites > 0 && num_sprites < 0x400 && enable != 7 )
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
-		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, deltax, deltay, y_lowres );
 	}
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
@@ -1485,14 +1455,13 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 
     0x940060..0x94007c      set#2
     */
-    enable = 4; // placeholder
 
 	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
 	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, deltax, deltay, y_lowres );
 	}
 
 	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
@@ -1500,7 +1469,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, y_lowres );
+		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, deltax, deltay, y_lowres );
 	}
 } /* DrawSprites */
 
