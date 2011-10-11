@@ -1,6 +1,5 @@
 /******************************************************************************
 
-
     MAGIC FLY
     ---------
 
@@ -14,9 +13,18 @@
 
 
     **** NOTE ****
+
     This hardware was clearly designed for poker games.
     You can find a complete hardware & software analysis here:
-    http://mamedev.emulab.it/robbie
+    http://www.robertofresca.com.ar/
+
+
+    Special Thanks to...
+
+	- EMMA Italian Dumping Team for providing the board.
+	- Rob Ragon for the exhaustive hardware testing.
+    - Iris Falbala, that kindly offered herself as beta tester,
+      poppin' baloons since she was only 2 years old. :)
 
 
 *******************************************************************************
@@ -382,11 +390,18 @@
     - Updated the memory map description and technical notes.
     - Added game notes and documented the test/settings/bookkeeping modes.
 
+    [2011-10-11]
+    - Confirmed and fixed CPU clock for magicfly and 7mezzo.
+	- Rearranged the graphic ROMs addressing. Splitted both gfx banks.
+    - Created and minimized the color palette for both gfx banks.
+    - Fixed colors for magicfly and 7mezzo. 
+
 
     TODO:
 
-    - Correct colors. (where is the palette?)
-    - Confirm the CPU clock (there is some lag in MF controls).
+    - Simplify the gfx banks to avoid a custom palette.
+    - Document the correct pinout.
+    - Analyze the PLD. Try to reconstruct.
     - Split the driver.
 
 
@@ -509,21 +524,26 @@ static PALETTE_INIT( magicfly )
 {
 	int i;
 
-	for (i = 0; i < 0x100; i += 0x20)
+	for (i = 0x00; i < 0x10; i += 0x10)
 	{
 		/* 1st gfx bank */
 		palette_set_color(machine, i + 0, MAKE_RGB(0x00, 0x00, 0x00));
 		palette_set_color(machine, i + 2, MAKE_RGB(0x00, 0x00, 0x00));
 		palette_set_color(machine, i + 4, MAKE_RGB(0x00, 0x00, 0x00));
 		palette_set_color(machine, i + 6, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine, i + 8, MAKE_RGB(0x00, 0x00, 0x00));
 		palette_set_color(machine, i + 10, MAKE_RGB(0x00, 0x00, 0x00));
-		palette_set_color(machine, i + 11, MAKE_RGB(0x00, 0xff, 0x00));
 		palette_set_color(machine, i + 12, MAKE_RGB(0x00, 0x00, 0x00));
 		palette_set_color(machine, i + 14, MAKE_RGB(0x00, 0x00, 0x00));
 
-		/* 2nd gfx bank */
-		palette_set_color(machine, i + 22, MAKE_RGB(0xe0, 0xe0, 0xe0));
-		palette_set_color(machine, i + 23, MAKE_RGB(0xff, 0xff, 0xff));
+		palette_set_color(machine, i + 1, MAKE_RGB(0x00, 0x00, 0x00));
+		palette_set_color(machine, i + 3, MAKE_RGB(0xff, 0x00, 0x00));
+		palette_set_color(machine, i + 5, MAKE_RGB(0x00, 0xff, 0x00));
+		palette_set_color(machine, i + 7, MAKE_RGB(0xff, 0xff, 0x00));
+		palette_set_color(machine, i + 9, MAKE_RGB(0x00, 0x00, 0xff));
+		palette_set_color(machine, i + 11, MAKE_RGB(0xff, 0x00, 0xff));
+		palette_set_color(machine, i + 13, MAKE_RGB(0x00, 0xff, 0xff));
+		palette_set_color(machine, i + 15, MAKE_RGB(0xff, 0xff, 0xff));
 	}
 }
 
@@ -591,7 +611,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( magicfly )
 /*  Multiplexed 4 x 5 bits.
-    Code accept only bits 0, 1, 2, 3 and 5 as valid. */
+    Code accept only bits 0, 1, 2, 3 and 5 as valid.
+*/
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -653,7 +674,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( 7mezzo )
 /*  Multiplexed 4 x 5 bits.
-    Code accept only bits 0, 1, 2, 3 and 5 as valid. */
+    Code accept only bits 0, 1, 2, 3 and 5 as valid.
+*/
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -721,9 +743,9 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	8, 8,
-	256,
+	RGN_FRAC(1,3),
 	3,
-	{ 0, 0x2800*8, 0x4800*8 },	/* bitplanes are separated. */
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -732,7 +754,7 @@ static const gfx_layout tilelayout =
 static const gfx_layout charlayout =
 {
 	8, 8,
-	256,
+	RGN_FRAC(1,1),
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -746,8 +768,8 @@ static const gfx_layout charlayout =
 ******************************/
 
 static GFXDECODE_START( magicfly )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 16, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfxbnk1", 0, tilelayout, 16, 1 )
+	GFXDECODE_ENTRY( "gfxbnk0", 0, charlayout, 0, 8 )
 GFXDECODE_END
 
 
@@ -777,7 +799,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( magicfly, magicfly_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/12)	/* guess */
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(magicfly_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
@@ -793,7 +815,7 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_SCREEN_UPDATE(magicfly)
 
 	MCFG_GFXDECODE(magicfly)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT(magicfly)
 
 	MCFG_VIDEO_START(magicfly)
@@ -824,10 +846,19 @@ ROM_START( magicfly )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "magicfly3_3.bin",	0xc000, 0x4000, CRC(c29798d5) SHA1(bf92ac93d650398569b3ab79d01344e74a6d35be) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "gfx", 0 )
 	ROM_LOAD( "magicfly2.bin",	0x0000, 0x2000, CRC(3596a45b) SHA1(7ec32ec767d0883d05606beb588d8f27ba8f10a4) )
 	ROM_LOAD( "magicfly1.bin",	0x2000, 0x2000, CRC(724d330c) SHA1(cce3923ce48634b27f0e7d29979cd36e7394ab37) )
 	ROM_LOAD( "magicfly0.bin",	0x4000, 0x2000, CRC(44e3c9d6) SHA1(677d25360d261bf2400f399b8015eeb529ad405e) )
+
+	ROM_REGION( 0x0800, "gfxbnk0", 0 )
+//	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling the R-G bitplanes */
+	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
+
+	ROM_REGION( 0x1800, "gfxbnk1", 0 )
+	ROM_COPY( "gfx",	0x1000, 0x0000, 0x0800 )	/* sprites, bitplane 1 */
+	ROM_COPY( "gfx",	0x3800, 0x0800, 0x0800 )	/* sprites, bitplane 2 */
+	ROM_COPY( "gfx",	0x5800, 0x1000, 0x0800 )	/* sprites, bitplane 3 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r4a-magicfly.bin",	0x0000, 0x0104, NO_DUMP )	/* PAL is read protected */
@@ -838,13 +869,22 @@ ROM_START( 7mezzo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ns3_1.bin",	0xc000, 0x4000, CRC(b1867b76) SHA1(eb76cffb81c865352f4767015edade54801f6155) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "gfx", 0 )
 	ROM_LOAD( "ns2.bin",	0x0000, 0x2000, CRC(7983a41c) SHA1(68805ea960c2738d3cd2c7490ffed84f90da029b) )    /* Renamed as ns2.bin regarding pcb location and content */
 	ROM_LOAD( "ns1.bin",	0x2000, 0x2000, CRC(a6ada872) SHA1(7f531a76e73d479161e485bdcf816eb8eb9fdc62) )
 	ROM_LOAD( "ns0.bin",	0x4000, 0x2000, CRC(e04fb210) SHA1(81e764e296fe387daf8ca67064d5eba2a4fc3c26) )    /* Renamed as ns0.bin regarding pcb location and content */
 
+	ROM_REGION( 0x0800, "gfxbnk0", 0 )
+//	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling the R-G bitplanes */
+	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
+
+	ROM_REGION( 0x1800, "gfxbnk1", 0 )
+	ROM_COPY( "gfx",	0x1000, 0x0000, 0x0800 )	/* sprites, bitplane 1 */
+	ROM_COPY( "gfx",	0x3800, 0x0800, 0x0800 )	/* sprites, bitplane 2 */
+	ROM_COPY( "gfx",	0x5800, 0x1000, 0x0800 )	/* sprites, bitplane 3 */
+
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "pal16r4a-7mezzo.bin",	0x0000, 0x0104, CRC(61ac7372) SHA1(7560506468a7409075094787182ded24e2d0c0a3) )
+	ROM_LOAD( "pal16r4a-7mezzo.bin",	0x0000, 0x0104, BAD_DUMP CRC(61ac7372) SHA1(7560506468a7409075094787182ded24e2d0c0a3) )
 ROM_END
 
 
@@ -853,5 +893,5 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY      FULLNAME    FLAGS... */
-GAME( 198?, magicfly, 0,      magicfly, magicfly, 0,     ROT0, "P&A Games", "Magic Fly", GAME_IMPERFECT_COLORS )
-GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   0,     ROT0, "<unknown>", "7 e Mezzo", GAME_IMPERFECT_COLORS )
+GAME( 198?, magicfly, 0,      magicfly, magicfly, 0,     ROT0, "P&A Games", "Magic Fly", 0 )
+GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   0,     ROT0, "<unknown>", "7 e Mezzo", 0 )
