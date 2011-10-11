@@ -2847,6 +2847,7 @@ src/mame/drivers/timetrv.c svneol=native#text/plain
 src/mame/drivers/tmaster.c svneol=native#text/plain
 src/mame/drivers/tmmjprd.c svneol=native#text/plain
 src/mame/drivers/tmnt.c svneol=native#text/plain
+src/mame/drivers/tmspoker.c svneol=native#text/plain
 src/mame/drivers/tnzs.c svneol=native#text/plain
 src/mame/drivers/toaplan1.c svneol=native#text/plain
 src/mame/drivers/toaplan2.c svneol=native#text/plain

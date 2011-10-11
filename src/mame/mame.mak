@@ -1857,7 +1857,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wms.o \
 	$(DRIVERS)/cupidon.o \
 	$(DRIVERS)/extrema.o \
-
+	$(DRIVERS)/tmspoker.o \
 
 
 #-------------------------------------------------
