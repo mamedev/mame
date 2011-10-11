@@ -106,6 +106,7 @@ void dump_unfreed_mem();
 // zeromem_t is a dummy class used to tell new to zero memory after allocation
 class zeromem_t { };
 
+#ifndef NO_MEM_TRACKING
 
 // standard new/delete operators (try to avoid using)
 ATTR_FORCE_INLINE inline void *operator new(std::size_t size) throw (std::bad_alloc)
@@ -136,6 +137,7 @@ ATTR_FORCE_INLINE inline void operator delete[](void *ptr) throw()
 		free_file_line(ptr, NULL, 0);
 }
 
+#endif
 
 // file/line new/delete operators
 ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc)
@@ -318,6 +320,7 @@ extern const zeromem_t zeromem;
 //  ADDDITIONAL MACROS
 //**************************************************************************
 
+#ifndef NO_MEM_TRACKING
 // re-route classic malloc-style allocations
 #undef malloc
 #undef calloc
@@ -331,6 +334,6 @@ extern const zeromem_t zeromem;
 
 // disable direct deletion
 #define delete			__error_use_pool_free_mechanisms__
-
+#endif
 
 #endif	/* __EMUALLOC_H__ */
