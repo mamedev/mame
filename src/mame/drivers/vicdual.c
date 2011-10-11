@@ -2815,6 +2815,24 @@ ROM_START( supcrash )
 	ROM_LOAD( "316-0042.u88",   0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
 
+/*
+This PCB is a bootleg of Sidam's Head On bootleg manufactured in Torino (Italy) by Fraber.
+*/
+
+ROM_START( hocrash )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1-0s.0s",         0x0000, 0x0400, CRC(4bb51259) SHA1(43411ffda3fe03b1d694f70791b0bab5786759c0) )
+	ROM_LOAD( "2-0r.0r",         0x0400, 0x0400, CRC(aeac8c5f) SHA1(ef9ad63d13076a559ba12c6421ad61de21dd4c90) )
+	ROM_LOAD( "3-0p.0p",         0x0800, 0x0400, CRC(f1a0cb72) SHA1(540b30225ef176c416ea5b142fe7dbb67b7a78fb) )
+	ROM_LOAD( "4-0m.0m",         0x0c00, 0x0400, CRC(fd67208d) SHA1(539b0db174aef66ac7d8137e4eca4e3237bc7a82) )
+	ROM_LOAD( "5-0l.0l",         0x1000, 0x0400, CRC(069e839e) SHA1(e1ed68573c13c0c88a2bb7b2096860523de952c0) )
+	ROM_LOAD( "6-0k.0k",         0x1400, 0x0400, CRC(11960190) SHA1(f3908fece95b7e5468ae4bba5a9f2d2482ed6656) )
+	ROM_LOAD( "7-0j.0j",         0x1800, 0x0400, CRC(d3782c1d) SHA1(340782374b7015a0aaf98aeb6503b759e199a58a) )
+
+	ROM_REGION( 0x0040, "user1", 0 )	/* timing PROMs */
+	ROM_LOAD( "316-0043.u87", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
+	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
+ROM_END
 
 ROM_START( headon2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3445,6 +3463,7 @@ GAME( 1979, headonb,  headon,   headon,   headon,   0, ROT0,   "Gremlin", "Head 
 GAME( 1979, headons,  headon,   headons,  headon,   0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)",  GAME_IMPERFECT_SOUND )
 GAME( 1979, headonsa, headon,   headons,  headon,   0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)",  GAME_NOT_WORKING ) // won't coin up?
 GAME( 1979, supcrash, headon,   headons,  supcrash, 0, ROT0,   "bootleg", "Super Crash (bootleg of Head On)", GAME_NO_SOUND )
+GAME( 1979, hocrash,  headon,   headons,  headon,   0, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", GAME_IMPERFECT_SOUND )
 GAME( 1979, headon2,  0,        headon2,  headon2,  0, ROT0,   "Sega", "Head On 2",  GAME_IMPERFECT_SOUND )
 GAME( 1979, headon2s, headon2,  headon2bw,car2,     0, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  GAME_NOT_WORKING ) // won't coin up?
 GAME( 1979, car2,     headon2,  headon2bw,car2,     0, ROT0,   "bootleg (RZ Bologna)", "Car 2 (bootleg of Head On 2)",  GAME_IMPERFECT_SOUND ) // title still says 'HeadOn 2'
