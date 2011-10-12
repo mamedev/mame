@@ -4,18 +4,17 @@
  * todo (ordered by importance):
  *
  * - emulate slave dsp!
- * - fog (should be per-z, not per-poly, and not even hooked yet up on non-super)
+ * - poly fog (should be per-z, not per-poly, and not even hooked yet up on non-super)
  * - emulate spot
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter,
  *   there's still a very small hitbox but almost impossible to hit
- *   (is this related to video board? or cpu?)
+ *   (is this related to dsp? or cpu?)
  * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly, or is it linktable related?
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
  *   (probably a bug in rgbint, not here?)
- * - propcycl scoreboard sprite part should fade out in attract mode and just before game over
- * - timecris shattered glass sprite is supposed to fade out (happens just before the titlescreen shows)
+ * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
  *
  * - lots of smaller issues
  *
@@ -570,7 +569,7 @@ static void
 poly3d_DrawSprite(
 	bitmap_t *dest_bmp, const gfx_element *gfx, UINT32 code,
 	UINT32 color, int flipx, int flipy, int sx, int sy,
-	int scalex, int scaley, int z, int prioverchar, int alpha )
+	int scalex, int scaley, int cz, int prioverchar, int alpha )
 {
 	namcos22_state *state = gfx->machine().driver_data<namcos22_state>();
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -624,17 +623,12 @@ poly3d_DrawSprite(
 			rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
 		}
 
-		// fog (prelim!)
-		if (z != 0xffff && nthword(state->m_czattr,4)&0x4000) // ?
+		// fog, 0xfe is a special case for sprite priority over textlayer
+		if (~color & 0x80 && cz > 0 && cz != 0xfe)
 		{
-			INT16 fogDelta = nthword(state->m_czattr, 0);
-			int zc = Clamp256(fogDelta + z);
-			UINT16 fogDensity = state->m_czram[3][zc];
-			if (fogDensity < 0x2000)
-			{
-				extra->fogFactor = fogDensity >> 5;
-				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
-			}
+			// or does it fetch from poly-cz ram? that will break timecris though
+			extra->fogFactor = cz;
+			rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
 		}
 
 		poly_render_triangle_fan(state->m_poly, dest_bmp, &mClip.scissor, renderscanline_sprite, 2, 4, vert);
@@ -1253,38 +1247,62 @@ DrawSpritesHelper(
 {
 	for( int i=0; i<num_sprites; i++ )
 	{
-		/* attrs:
-        xxxx.x---.----.----.----.----.----.---- always 0?
-        ----.-xxx.----.----.----.----.----.---- clip target
-        ----.----.xxxx.xxxx.----.----.----.---- linktype
-        ----.----.----.----.xxxx.xx--.----.---- always 0?
-        ----.----.----.----.----.--x-.----.---- right justify
-        ----.----.----.----.----.---x.----.---- bottom justify
-        ----.----.----.----.----.----.x---.---- flipx
-        ----.----.----.----.----.----.-xxx.---- numcols
-        ----.----.----.----.----.----.----.x--- flipy
-        ----.----.----.----.----.----.----.-xxx numrows
+		/*
+		pSource[0]
+	        xxxx.xxxx.xxxx.xxxx | ----.----.----.----  x pos
+    	    ----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y pos
+
+		pSource[1]
+	        xxxx.xxxx.xxxx.xxxx | ----.----.----.----  x size
+        	----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y size
+
+		pSource[2]
+	        xxxx.x---.----.---- | ----.----.----.----  no function
+        	----.-xxx.----.---- | ----.----.----.----  clip target
+        	----.----.xxxx.xxxx | ----.----.----.----  linktype
+        	----.----.----.---- | xxxx.xx--.----.----  no function(?) - set in airco22b
+        	----.----.----.---- | ----.--x-.----.----  right justify
+        	----.----.----.---- | ----.---x.----.----  bottom justify
+        	----.----.----.---- | ----.----.x---.----  flipx
+        	----.----.----.---- | ----.----.-xxx.----  numcols
+        	----.----.----.---- | ----.----.----.x---  flipy
+        	----.----.----.---- | ----.----.----.-xxx  numrows
+
+		pSource[3]
+        	xxxx.xxxx.xxxx.xxxx | ----.----.----.----  tile number
+        	----.----.----.---- | xxxx.xxxx.----.----  translucency
+        	----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris
+
+		pPal[0]
+        	xxxx.xxxx.----.---- | ----.----.----.----  no function
+        	----.----.xxxx.xxxx | xxxx.xxxx.xxxx.xxxx  z pos
+
+		pPal[1]
+        	xxxx.xxxx.----.---- | ----.----.----.----  no function
+        	----.----.x---.---- | ----.----.----.----  cz enable
+        	----.----.-xxx.xxxx | ----.----.----.----  color
+        	----.----.----.---- | xxxx.xxxx.----.----  no function(?) - set in airco22b, propcycl
+        	----.----.----.---- | ----.----.xxxx.xxxx  cz factor (fog aka depth cueing)
         */
+		int xpos = (pSource[0]>>16) - deltax;
+		int ypos = (pSource[0]&0xffff) - deltay;
+		int sizex = pSource[1]>>16;
+		int sizey = pSource[1]&0xffff;
 		UINT32 attrs = pSource[2];
-		INT32 zcoord = pPal[0];
-		int color = pPal[1]>>16;
-		int cz = pPal[1]&0xffff;
-		UINT32 xypos = pSource[0];
-		UINT32 size = pSource[1];
-		UINT32 code = pSource[3];
-		int xpos = (xypos>>16)-deltax;
-		int ypos = (xypos&0xffff)-deltay;
-		int sizex = size>>16;
-		int sizey = size&0xffff;
 		int flipy = attrs>>3&0x1;
 		int numrows = attrs&0x7;
 		int linkType = (attrs&0x00ff0000)>>16;
 		int flipx = (attrs>>7)&0x1;
 		int numcols = (attrs>>4)&0x7;
+		UINT32 code = pSource[3];
 		int tile = code>>16;
 		int translucency = (code&0xff00)>>8;
 
-		// priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
+		UINT32 zcoord = pPal[0]&0x00ffffff;
+		int color = pPal[1]>>16;
+		int cz = pPal[1]&0xff;
+
+		// priority over textlayer, trusted by testmode and timecris
 		int pri = ((pPal[1] & 0xffff) == 0x00fe);
 
 		// set window clipping
@@ -1381,7 +1399,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 		popmessage("%s",msg1);
 	else popmessage("[S] shows spite/vics regs");
 #endif
-/*
+	/*
         0x980000:   00060000 00010000 02ff0000 000007ff
                        ^                                 enable bits, 7 = disable
                         ^^^^                             base
@@ -1394,28 +1412,13 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
                              ^^^^^^^^                    window-x related?
                                       ^^^^^^^^           window-y related?
 
-        0x980200:   000007ff 000007ff 000007ff 000007ff  window clipping
-        0x980210:   000007ff 000007ff 000007ff 000007ff  "
-        0x980220:   000007ff 000007ff 000007ff 000007ff  "
-        0x980230:   000007ff 000007ff 000007ff 000007ff  "
+        0x980200-0x98023f:   window clipping registers
+        0x980400-0x9805ff:   hzoom table
+        0x980600-0x9807ff:   vzoom table
+        0x980800-0x980fff:   link table
 
-        0x980400:   hzoom table
-        0x980600:   vzoom table
-
-        link table:
-        0x980800:   0000 0001 0002 0003 ... 03ff
-
-        eight words per sprite:
-        0x984000:   010f 007b   xpos, ypos
-        0x984004:   0020 0020   size x, size y
-        0x984008:   00ff 0311   attributes
-        0x98400c:   0001 0000   sprite code, translucency
-        ...
-
-        additional sorting/color data for sprite:
-        0x9a0000:   C381 Z (sort)
-        0x9a0004:   palette, C381 ZC (depth cueing)
-        ...
+        eight words per sprite, start address at 0x984000
+        additional sorting/color data for sprite at 0x9a0000
     */
 
 	/* 'enable' bits function:
