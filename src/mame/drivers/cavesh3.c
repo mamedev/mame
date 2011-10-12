@@ -20,6 +20,7 @@ Lack of BG / GFX clear in MMP boot/test mode?
 #include "cpu/sh4/sh4.h"
 #include "cpu/sh4/sh3comn.h"
 #include "profiler.h"
+#include "machine/rtc9701.h"
 
 /*
 
@@ -3200,27 +3201,45 @@ static WRITE8_HANDLER( ibara_flash_io_w )
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
 static READ8_HANDLER( serial_rtc_eeprom_r )
 {
+	rtc9701_device* dev = space->machine().device<rtc9701_device>("eeprom");
+
 	switch (offset)
 	{
-		default:
-			return 0;
-		//logerror("unknown serial_rtc_eeprom_r access offset %02x\n", offset);
+
+		
 		case 1:
-			return 0xfe;
+	
+
+		//	return 0xfe | (input_port_read(space->machine(), "EEPROMIN") & 0x1); 
+			return 0xfe | dev->read_bit();
+			
+
+		default:
+		//logerror("%08x unknown serial_rtc_eeprom_r access offset %02x\n", cpu_get_pc(&space->device()), offset);
+			return 0;
+
 	}
 }
+
+
+
 
 static WRITE8_HANDLER( serial_rtc_eeprom_w )
 {
 	switch (offset)
 	{
 		case 0x01:
+//		logerror("serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
+
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+
 		// data & 0x00010000 = DATA
 		// data & 0x00020000 = CLK
 		// data & 0x00040000 = CE
 		break;
 
 		case 0x03:
+			logerror("flashenable serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
 			flash_enab_w(space,offset,data);
 			return;
 
@@ -3327,6 +3346,15 @@ static INPUT_PORTS_START( cavesh3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_cs_line)
+
+	PORT_START( "EEPROMIN" )
+//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, read_bit)
+
 INPUT_PORTS_END
 
 
@@ -3402,6 +3430,7 @@ static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	MCFG_CPU_IO_MAP(cavesh3_port)
 	MCFG_CPU_VBLANK_INT("screen", cavesh3_interrupt)
 
+	MCFG_RTC9701_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
