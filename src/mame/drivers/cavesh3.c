@@ -227,9 +227,9 @@ INLINE void clr_mul_fixed(clr_t *clr, const UINT8 val, const clr_t *clr0)
 
 INLINE void clr_mul_fixed_rev(clr_t *clr, const UINT8 val, const clr_t *clr0)
 {
-	clr->r = cavesh3_colrtable_rev[(clr0->r)][val];
-	clr->g = cavesh3_colrtable_rev[(clr0->g)][val];
-	clr->b = cavesh3_colrtable_rev[(clr0->b)][val];
+	clr->r = cavesh3_colrtable_rev[val][(clr0->r)];
+	clr->g = cavesh3_colrtable_rev[val][(clr0->g)];
+	clr->b = cavesh3_colrtable_rev[val][(clr0->b)];
 }
 
 INLINE void clr_copy(clr_t *clr, const clr_t *clr0)
@@ -2640,6 +2640,13 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 		tinted = 1;
 	*/
 
+	// surprisingly frequent, need to verify if it produces a worthwhile speedup tho.
+	if ((s_mode==0 && s_alpha==0x1f) && (d_mode==4 && d_alpha==0x1f))
+		blend = 0;
+
+
+	//printf("smode %d dmode %d\n", s_mode, d_mode);
+
 	if (!flipx)
 	{
 		if (trans)
@@ -3363,8 +3370,8 @@ static MACHINE_RESET( cavesh3 )
 			cavesh3_colrtable[x][y] = (x*y) / 0x1f;
 			if (cavesh3_colrtable[x][y]>0x1f) cavesh3_colrtable[x][y] = 0x1f;
 
-			cavesh3_colrtable_rev[x][y^0x1f] = (x*y) / 0x1f;
-			if (cavesh3_colrtable_rev[x][y^0x1f]>0x1f) cavesh3_colrtable_rev[x][y^0x1f] = 0x1f;
+			cavesh3_colrtable_rev[x^0x1f][y] = (x*y) / 0x1f;
+			if (cavesh3_colrtable_rev[x^0x1f][y]>0x1f) cavesh3_colrtable_rev[x^0x1f][y] = 0x1f;
 		}
 	}
 
