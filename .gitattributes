@@ -936,6 +936,7 @@ src/emu/machine/rp5h01.c svneol=native#text/plain
 src/emu/machine/rp5h01.h svneol=native#text/plain
 src/emu/machine/rtc65271.c svneol=native#text/plain
 src/emu/machine/rtc65271.h svneol=native#text/plain
+src/emu/machine/rtc9701.c svneol=native#text/plain
 src/emu/machine/rtc9701.h svneol=native#text/plain
 src/emu/machine/s3c2400.c svneol=native#text/plain
 src/emu/machine/s3c2400.h svneol=native#text/plain
