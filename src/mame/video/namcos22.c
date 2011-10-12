@@ -10,10 +10,11 @@
  * - tokyowar tanks are not shootable, same for timecris helicopter,
  *   there's still a very small hitbox but almost impossible to hit
  *   (is this related to video board? or cpu?)
- * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly
+ * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly, or is it linktable related?
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
  *   (probably a bug in rgbint, not here?)
+ * - propcycl scoreboard sprite part should fade out in attract mode and just before game over
  * - timecris shattered glass sprite is supposed to fade out (happens just before the titlescreen shows)
  *
  * - lots of smaller issues
@@ -1407,7 +1408,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         eight words per sprite:
         0x984000:   010f 007b   xpos, ypos
         0x984004:   0020 0020   size x, size y
-        0x984008:   00ff 0311   00ff, chr x;chr y;flip x;flip y
+        0x984008:   00ff 0311   attributes
         0x98400c:   0001 0000   sprite code, translucency
         ...
 

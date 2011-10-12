@@ -12,7 +12,6 @@
  * Input
  *      - input ports require manual calibration through built-in diagnostics (or canned EEPROM)
  *      - new input port type needed for bicycle pedal speed
- *      - text layer row placement may be incorrect (emulated Prop Cycle differs from real game)
  *
  * Output Devices
  *      - Prop Cycle fan (outputs noted at the right MCU port)
