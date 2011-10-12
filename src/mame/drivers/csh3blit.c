@@ -104,7 +104,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 				clr0.b = d_clr.b;
 				clr_mul(&clr0, &s_clr); 
 				#elif _SMODE == 3
-				clr_mul_fixed(&clr0, 0x1f, &s_clr); 
+				clr_copy(&clr0, &s_clr);
 				
 				#elif _SMODE == 4
 				clr_mul_fixed_rev(&clr0, s_alpha, &s_clr); 
@@ -119,7 +119,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 				clr0.b = d_clr.b;
 				clr_mul_rev(&clr0, &s_clr); 
 				#elif _SMODE == 7
-				clr_mul_fixed_rev(&clr0, 0x1f, &s_clr); 
+				clr_copy(&clr0, &s_clr);
 				#endif
 
 				
@@ -137,7 +137,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 				clr1.b = d_clr.b;
 				clr_mul(&clr1, &d_clr);
 				#elif _DMODE == 3
-				clr_mul_fixed(&clr1, 0x1f, &d_clr);
+				clr_copy(&clr1, &d_clr);
 				
 				#elif _DMODE == 4
 				clr_mul_fixed_rev(&clr1, d_alpha, &d_clr);
@@ -152,7 +152,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 				clr1.b = d_clr.b;
 				clr_mul_rev(&clr1, &d_clr);
 				#elif _DMODE == 7
-				clr_mul_fixed_rev(&clr1, 0x1f, &d_clr);
+				clr_copy(&clr1, &d_clr);
 				#endif
 
 				

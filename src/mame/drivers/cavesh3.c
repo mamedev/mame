@@ -232,6 +232,14 @@ INLINE void clr_mul_fixed_rev(clr_t *clr, const UINT8 val, const clr_t *clr0)
 	clr->b = cavesh3_colrtable_rev[(clr0->b)][val];
 }
 
+INLINE void clr_copy(clr_t *clr, const clr_t *clr0)
+{
+	clr->r = clr0->r;
+	clr->g = clr0->g;
+	clr->b = clr0->b;
+}
+
+
 
 // (1|s|d) * s_factor * s + (1|s|d) * d_factor * d
 // 0: +alpha
@@ -3355,8 +3363,8 @@ static MACHINE_RESET( cavesh3 )
 			cavesh3_colrtable[x][y] = (x*y) / 0x1f;
 			if (cavesh3_colrtable[x][y]>0x1f) cavesh3_colrtable[x][y] = 0x1f;
 
-			cavesh3_colrtable_rev[x^0x1f][y] = (x*y) / 0x1f;
-			if (cavesh3_colrtable_rev[x^0x1f][y]>0x1f) cavesh3_colrtable_rev[x^0x1f][y] = 0x1f;
+			cavesh3_colrtable_rev[x][y^0x1f] = (x*y) / 0x1f;
+			if (cavesh3_colrtable_rev[x][y^0x1f]>0x1f) cavesh3_colrtable_rev[x][y^0x1f] = 0x1f;
 		}
 	}
 
