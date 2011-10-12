@@ -201,6 +201,7 @@ bits(7:4) and bit(24)), X, and Y:
 #define LOG_RASTERIZERS		(0)
 #define LOG_CMDFIFO			(0)
 #define LOG_CMDFIFO_VERBOSE	(0)
+#define LOG_BANSHEE_2D		(1)
 
 #define MODIFY_PIXEL(VV)
 
@@ -241,6 +242,7 @@ static TIMER_CALLBACK( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront);
 static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data);
+static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data);
 
 /* command handlers */
 static INT32 fastfill(voodoo_state *v);
@@ -996,8 +998,24 @@ static TIMER_CALLBACK( vblank_off_callback )
 
 	/* set internal state and call the client */
 	v->fbi.vblank = FALSE;
-	if (v->fbi.vblank_client != NULL)
-		(*v->fbi.vblank_client)(v->device, FALSE);
+
+	// TODO: Vblank IRQ enable is VOODOO3 only?
+	if (v->type >= VOODOO_3)
+	{
+		if (v->reg[intrCtrl].u & 0x8)		// call IRQ handler if VSYNC interrupt (falling) is enabled
+		{
+			v->reg[intrCtrl].u |= 0x200;		// VSYNC int (falling) active
+
+			if (v->fbi.vblank_client != NULL)
+				(*v->fbi.vblank_client)(v->device, FALSE);
+		
+		}
+	}
+	else
+	{
+		if (v->fbi.vblank_client != NULL)
+			(*v->fbi.vblank_client)(v->device, FALSE);
+	}
 
 	/* go to the end of the next frame */
 	adjust_vblank_timer(v);
@@ -1036,8 +1054,23 @@ static TIMER_CALLBACK( vblank_callback )
 
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
-	if (v->fbi.vblank_client != NULL)
-		(*v->fbi.vblank_client)(v->device, TRUE);
+
+	// TODO: Vblank IRQ enable is VOODOO3 only?
+	if (v->type >= VOODOO_3)
+	{
+		if (v->reg[intrCtrl].u & 0x4)		// call IRQ handler if VSYNC interrupt (rising) is enabled
+		{
+			v->reg[intrCtrl].u |= 0x100;		// VSYNC int (rising) active
+
+			if (v->fbi.vblank_client != NULL)
+				(*v->fbi.vblank_client)(v->device, TRUE);
+		}
+	}
+	else
+	{
+		if (v->fbi.vblank_client != NULL)
+			(*v->fbi.vblank_client)(v->device, TRUE);
+	}
 }
 
 
@@ -1364,7 +1397,8 @@ static void recompute_texture_params(tmu_state *t)
 	/* LODs 1-3 are different depending on whether we are in multitex mode */
 	/* Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think */
 	/* they want multitex mode when they really don't -- disable for now */
-	if (0)//TEXLOD_TMULTIBASEADDR(t->reg[tLOD].u))
+	// Enable for Voodoo 3 or Viper breaks - VL.
+	if (TEXLOD_TMULTIBASEADDR(t->reg[tLOD].u))
 	{
 		base = (t->reg[texBaseAddr_1].u & t->texaddr_mask) << t->texaddr_shift;
 		t->lodoffset[1] = base & t->mask;
@@ -1688,9 +1722,24 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 			if (LOG_CMDFIFO) logerror("  PACKET TYPE 1: count=%d inc=%d reg=%04X\n", count, inc, target);
 
-			/* loop over all registers and write them one at a time */
-			for (i = 0; i < count; i++, target += inc)
-				cycles += register_w(v, target, *src++);
+			if (v->type >= VOODOO_BANSHEE && (target & 0x800))
+			{
+				//  Banshee/Voodoo3 2D register writes
+
+				/* loop over all registers and write them one at a time */
+				for (i = 0; i < count; i++, target += inc)
+				{
+					cycles += banshee_2d_w(v, target & 0xff, *src);
+					//logerror("    2d reg: %03x = %08X\n", target & 0x7ff, *src);
+					src++;
+				}
+			}
+			else
+			{
+				/* loop over all registers and write them one at a time */
+				for (i = 0; i < count; i++, target += inc)
+					cycles += register_w(v, target, *src++);
+			}
 			break;
 
 		/*
@@ -1851,10 +1900,28 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 			if (LOG_CMDFIFO) logerror("  PACKET TYPE 4: mask=%X reg=%04X pad=%d\n", (command >> 15) & 0x3fff, target, command >> 29);
 
-			/* loop over all registers and write them one at a time */
-			for (i = 15; i <= 28; i++)
-				if (command & (1 << i))
-					cycles += register_w(v, target + (i - 15), *src++);
+			if (v->type >= VOODOO_BANSHEE && (target & 0x800))
+			{
+				//  Banshee/Voodoo3 2D register writes
+
+				/* loop over all registers and write them one at a time */
+				for (i = 15; i <= 28; i++)
+				{
+					if (command & (1 << i))
+					{
+						cycles += banshee_2d_w(v, target & 0xff, *src);
+						//logerror("    2d reg: %03x = %08X\n", target & 0x7ff, *src);
+						src++;
+					}
+				}
+			}
+			else
+			{
+				/* loop over all registers and write them one at a time */
+				for (i = 15; i <= 28; i++)
+					if (command & (1 << i))
+						cycles += register_w(v, target + (i - 15), *src++);
+			}
 
 			/* account for the extra dummy words */
 			src += command >> 29;
@@ -2440,7 +2507,14 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		case userIntrCMD:
 			poly_wait(v->poly, v->regnames[regnum]);
-			fatalerror("userIntrCMD");
+			//fatalerror("userIntrCMD");
+
+			v->reg[intrCtrl].u |= 0x1800;
+			v->reg[intrCtrl].u &= ~0x80000000;
+
+			// TODO: rename vblank_client for less confusion?
+			if (v->fbi.vblank_client != NULL)
+				(*v->fbi.vblank_client)(v->device, TRUE);
 			break;
 
 		/* gamma table access -- Voodoo/Voodoo2 only */
@@ -4015,7 +4089,9 @@ READ32_DEVICE_HANDLER( banshee_fb_r )
 
 	if (offset < v->fbi.lfb_base)
 	{
+#if LOG_LFB	
 		logerror("%s:banshee_fb_r(%X)\n", device->machine().describe_context(), offset*4);
+#endif
 		if (offset*4 <= v->fbi.mask)
 			result = ((UINT32 *)v->fbi.ram)[offset];
 	}
@@ -4173,6 +4249,267 @@ READ32_DEVICE_HANDLER( banshee_rom_r )
 }
 
 
+int blt_base;
+int blt_x, blt_y;
+int blt_width, blt_height;
+int blt_format;
+int blt_stride;
+int blt_bpp;
+
+int blt_cur_x, blt_cur_y, blt_cur_bpp, blt_cur_base;
+int blt_cur_stride, blt_cur_width, blt_cur_height;
+int blt_cmd;
+
+static void blit_2d(voodoo_state *v, UINT32 data)
+{
+	switch (blt_cmd)
+	{
+		case 0:			// NOP - wait for idle
+		{
+			break;
+		}
+
+		case 1:			// Screen-to-screen blit
+		{
+			// TODO
+#if LOG_BANSHEE_2D
+			logerror("   blit_2d:screen_to_screen: src X %d, src Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			break;
+		}
+
+		case 2:			// Screen-to-screen stretch blit
+		{
+			fatalerror("   blit_2d:screen_to_screen_stretch: src X %d, src Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+		}
+
+		case 3:			// Host-to-screen blit
+		{
+			UINT32 addr = blt_cur_base;
+
+			addr += (blt_cur_y * blt_cur_stride) + (blt_cur_x * blt_cur_bpp);
+
+#if LOG_BANSHEE_2D
+			logerror("   blit_2d:host_to_screen: %08x -> %08x, %d, %d\n", data, addr, blt_cur_x, blt_cur_y);
+#endif
+
+			switch (blt_cur_bpp)
+			{
+				case 1:
+					v->fbi.ram[addr+0] = data & 0xff;
+					v->fbi.ram[addr+1] = (data >> 8) & 0xff;
+					v->fbi.ram[addr+2] = (data >> 16) & 0xff;
+					v->fbi.ram[addr+3] = (data >> 24) & 0xff;
+					blt_cur_x += 4;
+					break;
+				case 2:
+					v->fbi.ram[addr+1] = data & 0xff;
+					v->fbi.ram[addr+0] = (data >> 8) & 0xff;
+					v->fbi.ram[addr+3] = (data >> 16) & 0xff;
+					v->fbi.ram[addr+2] = (data >> 24) & 0xff;
+					blt_cur_x += 2;
+					break;
+				case 3:
+					blt_cur_x += 1;
+					break;
+				case 4:
+					v->fbi.ram[addr+3] = data & 0xff;
+					v->fbi.ram[addr+2] = (data >> 8) & 0xff;
+					v->fbi.ram[addr+1] = (data >> 16) & 0xff;
+					v->fbi.ram[addr+0] = (data >> 24) & 0xff;
+					blt_cur_x += 1;
+					break;
+			}
+
+			if (blt_cur_x >= blt_cur_width)
+			{
+				blt_cur_x = 0;
+				blt_cur_y++;
+			}
+			break;
+		}
+
+		case 5:			// Rectangle fill
+		{
+			fatalerror("blit_2d:rectangle_fill: src X %d, src Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+		}
+
+		case 6:			// Line
+		{
+			fatalerror("blit_2d:line: end X %d, end Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+		}
+
+		case 7:			// Polyline
+		{
+			fatalerror("blit_2d:polyline: end X %d, end Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+		}
+
+		case 8:			// Polygon fill
+		{
+			fatalerror("blit_2d:polygon_fill\n");
+		}
+
+		default:
+		{
+			fatalerror("blit_2d: unknown command %d\n", blt_cmd);
+		}
+	}
+}
+
+static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data)
+{
+	switch (offset)
+	{
+		case banshee2D_command:
+#if LOG_BANSHEE_2D
+			logerror("   2D:command: cmd %d, ROP0 %02X\n", data & 0x3, data >> 24);
+#endif
+			blt_cur_x = blt_x;
+			blt_cur_y = blt_y;
+			blt_cur_bpp = blt_bpp;
+			blt_cur_base = blt_base;
+			blt_cur_stride = blt_stride;
+			blt_cur_width = blt_width;
+			blt_cur_height = blt_height;
+
+			blt_cmd = data & 0x3;
+			break;
+
+		case banshee2D_colorBack:
+#if LOG_BANSHEE_2D
+			logerror("   2D:colorBack: %08X\n", data);
+#endif
+			break;
+
+		case banshee2D_colorFore:
+#if LOG_BANSHEE_2D
+			logerror("   2D:colorFore: %08X\n", data);
+#endif
+			break;
+
+		case banshee2D_srcBaseAddr:
+#if LOG_BANSHEE_2D
+			logerror("   2D:srcBaseAddr: %08X, %s\n", data & 0xffffff, data & 0x80000000 ? "tiled" : "non-tiled");
+#endif
+			break;
+
+		case banshee2D_dstBaseAddr:
+#if LOG_BANSHEE_2D
+			logerror("   2D:dstBaseAddr: %08X, %s\n", data & 0xffffff, data & 0x80000000 ? "tiled" : "non-tiled");
+#endif
+			blt_base = data & 0xffffff;
+			break;
+
+		case banshee2D_srcSize:
+#if LOG_BANSHEE_2D
+			logerror("   2D:srcSize: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			break;
+
+		case banshee2D_dstSize:
+#if LOG_BANSHEE_2D
+			logerror("   2D:dstSize: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			blt_width = data & 0xfff;
+			blt_height = (data >> 16) & 0xfff;
+			break;
+
+		case banshee2D_srcXY:
+#if LOG_BANSHEE_2D
+			logerror("   2D:srcXY: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			blt_x = data & 0xfff;
+			blt_y = (data >> 16) & 0xfff;
+			break;
+
+		case banshee2D_dstXY:
+#if LOG_BANSHEE_2D
+			logerror("   2D:dstXY: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			break;
+
+		case banshee2D_srcFormat:
+#if LOG_BANSHEE_2D
+			logerror("   2D:srcFormat: str %d, fmt %d, packing %d\n", data & 0x3fff, (data >> 16) & 0xf, (data >> 22) & 0x3);
+#endif
+			break;
+
+		case banshee2D_dstFormat:
+#if LOG_BANSHEE_2D
+			logerror("   2D:dstFormat: str %d, fmt %d\n", data & 0x3fff, (data >> 16) & 0xf);
+#endif
+			blt_format = (data >> 16) & 0x7;
+			blt_stride = data & 0x3fff;
+
+			blt_bpp = 1;
+			switch (blt_format)
+			{
+				case 1:	blt_bpp = 1; break;
+				case 3: blt_bpp = 2; break;
+				case 4: blt_bpp = 3; break;
+				case 5: blt_bpp = 4; break;
+			}
+			break;
+
+		case banshee2D_clip0Min:
+#if LOG_BANSHEE_2D
+			logerror("   2D:clip0Min: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			break;
+
+		case banshee2D_clip0Max:
+#if LOG_BANSHEE_2D
+			logerror("   2D:clip0Max: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			break;
+
+		case banshee2D_clip1Min:
+#if LOG_BANSHEE_2D
+			logerror("   2D:clip1Min: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			break;
+
+		case banshee2D_clip1Max:
+#if LOG_BANSHEE_2D
+			logerror("   2D:clip1Max: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
+#endif
+			break;
+
+		case banshee2D_rop:
+#if LOG_BANSHEE_2D
+			logerror("   2D:rop: %d, %d, %d\n",  data & 0xff, (data >> 8) & 0xff, (data >> 16) & 0xff);
+#endif
+			break;
+
+		default:
+			if (offset >= 0x20 && offset < 0x40)
+			{
+				/*
+				logerror("   2D:launch: %08x -> %08x, %d remaining\n", data, blt_base, blt_count);
+				v->fbi.ram[blt_base+3] = (data >> 24) & 0xff;
+				v->fbi.ram[blt_base+2] = (data >> 16) & 0xff;
+				v->fbi.ram[blt_base+1] = (data >> 8) & 0xff;
+				v->fbi.ram[blt_base+0] = data & 0xff;
+
+				blt_count -= 4;
+				blt_base += 4;
+				*/
+
+				blit_2d(v, data);
+			}
+			else if (offset >= 0x40 && offset < 0x80)
+			{
+				// TODO: colorPattern
+			}
+			break;
+	}
+
+
+	return 1;
+}
+
+
+
 
 static WRITE32_DEVICE_HANDLER( banshee_agp_w )
 {
@@ -4317,7 +4654,9 @@ WRITE32_DEVICE_HANDLER( banshee_fb_w )
 		{
 			if (offset*4 <= v->fbi.mask)
 				COMBINE_DATA(&((UINT32 *)v->fbi.ram)[offset]);
+#if LOG_LFB	
 			logerror("%s:banshee_fb_w(%X) = %08X & %08X\n", device->machine().describe_context(), offset*4, data, mem_mask);
+#endif
 		}
 	}
 	else
@@ -4618,7 +4957,7 @@ static DEVICE_START( voodoo )
 	/* set up the TMUs */
 	init_tmu(v, &v->tmu[0], &v->reg[0x100], tmumem[0], tmumem0 << 20);
 	v->chipmask |= 0x02;
-	if (config->tmumem1 != 0)
+	if (config->tmumem1 != 0 || v->type == VOODOO_3)
 	{
 		init_tmu(v, &v->tmu[1], &v->reg[0x200], tmumem[1], config->tmumem1 << 20);
 		v->chipmask |= 0x04;
@@ -4639,6 +4978,7 @@ static DEVICE_START( voodoo )
 	v->banshee.io[io_sipMonitor] = 0x40000000;
 	v->banshee.io[io_lfbMemoryConfig] = 0x000a2200;
 	v->banshee.io[io_dramInit0] = 0x00579d29;
+	v->banshee.io[io_dramInit0] |= 0x08000000;		// Konami Viper expects 16MBit SGRAMs
 	v->banshee.io[io_dramInit1] = 0x00f02200;
 	v->banshee.io[io_tmuGbeInit] = 0x00000bfb;
 

@@ -319,6 +319,36 @@ enum
 
 
 
+// 2D registers
+#define banshee2D_clip0Min			(0x008/4)
+#define banshee2D_clip0Max			(0x00c/4)
+#define banshee2D_dstBaseAddr		(0x010/4)
+#define banshee2D_dstFormat			(0x014/4)
+#define banshee2D_srcColorkeyMin	(0x018/4)
+#define banshee2D_srcColorkeyMax	(0x01c/4)
+#define banshee2D_dstColorkeyMin	(0x020/4)
+#define banshee2D_dstColorkeyMax	(0x024/4)
+#define banshee2D_bresError0		(0x028/4)
+#define banshee2D_bresError1		(0x02c/4)
+#define banshee2D_rop				(0x030/4)
+#define banshee2D_srcBaseAddr		(0x034/4)
+#define banshee2D_commandExtra		(0x038/4)
+#define banshee2D_lineStipple		(0x03c/4)
+#define banshee2D_lineStyle			(0x040/4)
+#define banshee2D_pattern0Alias		(0x044/4)
+#define banshee2D_pattern1Alias		(0x048/4)
+#define banshee2D_clip1Min			(0x04c/4)
+#define banshee2D_clip1Max			(0x050/4)
+#define banshee2D_srcFormat			(0x054/4)
+#define banshee2D_srcSize			(0x058/4)
+#define banshee2D_srcXY				(0x05c/4)
+#define banshee2D_colorBack			(0x060/4)
+#define banshee2D_colorFore			(0x064/4)
+#define banshee2D_dstSize			(0x068/4)
+#define banshee2D_dstXY				(0x06c/4)
+#define banshee2D_command			(0x070/4)
+
+
 /*************************************
  *
  *  Alias map of the first 64
