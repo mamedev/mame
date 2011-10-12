@@ -12,16 +12,15 @@ INLINE void FUNCNAME(bitmap_t *bitmap,
 					 int dst_y_start,
 					 int dimx,
 					 int dimy,
-					 int flipx,
 					 int flipy,
 					 clr_t *s_alpha_clr,
 					 clr_t *d_alpha_clr,
 					 clr_t *tint_clr )
 {
 
-	//logerror("draw sprite %04x %04x - %04x %04x\n", dst_x_start, dst_y_start, dimx, dimy);
 
-	int x,y, xf,yf;
+	UINT32* gfx2;
+	int x,y, yf;
 	clr_t s_clr;
 #ifdef BLENDED	
 	clr_t d_clr, clr0, clr1;
@@ -29,8 +28,9 @@ INLINE void FUNCNAME(bitmap_t *bitmap,
 	UINT32 pen;
 	UINT32 *bmp;
 
-	if (flipx)	{	xf = -1;	src_x += (dimx-1);	}
-	else		{	xf = +1;						}
+#ifdef FLIPX
+	src_x += (dimx-1);
+#endif
 
 	if (flipy)	{	yf = -1;	src_y += (dimy-1);	}
 	else		{	yf = +1;						}
@@ -58,11 +58,17 @@ INLINE void FUNCNAME(bitmap_t *bitmap,
 			dimx -= (dst_x_end-1) - clip->max_x;
 
 		bmp = BITMAP_ADDR32(bitmap, dst_y_start + y, dst_x_start+startx);
-
+		int ysrc_index =  ((src_y + yf * y) & 0x0fff) * 0x2000;
+		gfx2 = gfx + ysrc_index;
 
 		for (x = startx; x < dimx; x++, bmp++)
 		{
-			pen = gfx[GFX_OFFSET(src_x,src_y, xf * x, yf * y)/* & (gfx_size-1)*/]; // no need to mask, already masked in function!
+
+#ifdef FLIPX
+			pen = gfx2[((src_x - x) & 0x1fff)];
+#else
+			pen = gfx2[((src_x + x) & 0x1fff)];
+#endif
 
 #if TRANSPARENT == 1
 			if ((pen & 0x20000000) == 0)

@@ -21,6 +21,99 @@ Lack of BG / GFX clear in MMP boot/test mode?
 #include "cpu/sh4/sh3comn.h"
 #include "profiler.h"
 
+/*
+
+
+PCB CV1000-B
++--------------------------------------------+
+|                                            |
+|                                            |
+|                                            |
+|                 VOL                        |
+|                                            |
++-+        +-----+ +-----+       X3          |
+  |        | U24 | | U23 |                   |
++-+        +-----+ +-----+    +-------+      |
+|                             |  YMZ  |      |
+|            U25*    U26*     | 770C-F|      |
+|                             |       |      |
+|J  D5                        +-------+      |
+|A  D2                                       |
+|M  D3                    +-----+ +-----+    |
+|M  D4         P2*        | U7  | | U6  |    |
+|A  D1                    +-----+ +-----+    |
+|          +-------+                         |
+|C         |P4 JTAG|                         |
+|o         +-------+       +-------+         |
+|n                         |Altera |  +--+   |
+|n          D6             |Cyclone|  |  |   |
+|e     X1      S1          |       |  |U1|   |
+|c    S3 +---------+       +-------+  |  |   |
+|t       |         |                  +--+   |
+|e       | 6417709 |                         |
+|r       |         |   DSW2                  |
+|        |   SH3   |   +-----------------+   |
+|        |         |   |       P3        |   |
+|        +---------+   +-----------------+   |
++-+    X2                                    |
+  |       +--+  +--+    +---+  U27           |
++-+       |  |  |  |    |U13|                |
+|+-+      |U2|  |U4|    +---+                |
+||P|      |  |  |  |                 __      |
+||8| U12* +--+  +--+     U10        /  \     |
+|+-+                               |C126|    |
+|     P5* P7*                       \__/     |
++--------------------------------------------+
+
+* Denotes not populated
+
+  CPU: Hitachi SH-3 clocked at 102.4MHz (12.800MHz * 8)
+Sound: Yamaha YMZ770C-F @ 16.384MHz
+Other: Altera Cyclone EP1C12 FPGA, Altera EPM7032 (MAX 7000 Series) @ U13
+
+OSC:
+ X1 12.800MHz
+ X2 ??
+ X3 16.384MHz
+
+Memory:
+ U6 (SDRAM)  MT46V16M16 – 4 MBit x 16 x 4 banks, RAM (256 MBit)
+ U7 (SDRAM)  MT46V16M16 – 4 MBit x 16 x 4 banks, RAM (256 MBit)
+ U1 (SDRAM)  MT48LC2M32 – 512K x 32 x 4 banks, (64 MBit)
+
+Roms:
+      U4 (FLASH)  29LV160BB 16M-BIT CMOS 3.0, Boot device, FPGA bit file, main program code.
+      U2 (FLASH)  K9F1G08U0M 128M x 8 Bit / 64M x 16 Bit NAND. Graphics data.
+ U23-U24 (FLASH)  MBM 29DL321, 32 MBit CMOS 3.0V. Sound data.
+ U25-U26 (FLASH)  MBM 29DL321, not populated
+
+Battery:
+ C126 CR2450, Powers the RTC (Real Time Clock) U10. Look at the garden clock in Ibara.
+
+Dipswitches & Push Buttons:
+ S1 (DIL SWITCH)  Half Pitch DIL Switch x 1, function unknown
+ S2 (DIL SWITCH) Half Pitch DIL Switch x 4, SW1=Setup, other switches unknown
+ S3 (MICRO PUSH BUTTON)  Test switch, same as on the JAMMA connector
+
+Connectors:
+ P2 (IDC CONNECTOR 20 PIN)  function unknown, P2 is not always mounted
+ P4 (IDC CONNECTOR 14 PIN)  JTAG connector
+ P8 (IDC CONNECTOR 10 PIN)  Advanced User Debugger
+ P3 (CONNECTOR)  Most likely an expansion port, P3 is not always mounted
+ P5 (CONNECTOR)  Most likely a serial connector. Only mounted on early Mushihimesama PCB's
+ P7 (CONNECTOR)  Network port pinout. Never seen mounted on any PCB.
+
+Misc:
+
+   U27 (SUPERVISOR) MAX 690S 3.0V Microprocessor Supervisory Circuit.
+   U10 (RTC & EEPROM) RTC 9701, Serial RTC Module with EEPROM 4 kbit (256x16 bit), controlled by Altera EPM7032 U13.
+   U12 (RS-232 TRANCEIVER) MAX 3244E RS-232 Tranceiver, only mounted when P5 is mounted.
+ D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.  
+
+Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
+
+*/
+
 class cavesh3_state : public driver_device
 {
 public:
@@ -141,12 +234,7 @@ static VIDEO_START( cavesh3 )
 	cavesh_bitmaps[0]	=	auto_bitmap_alloc(machine, 0x2000, 0x1000, BITMAP_FORMAT_RGB32);
 }
 
-INLINE UINT32 GFX_OFFSET( UINT32 x0, UINT32 y0, UINT32 x, UINT32 y )
-{
-	// correct
-	return	((x0 + x) & 0x1fff) +
-			((y0 + y) & 0x0fff) * 0x2000;
-}
+
 
 #define TRANSPARENT 1
 
@@ -1237,7 +1325,1098 @@ INLINE UINT32 GFX_OFFSET( UINT32 x0, UINT32 y0, UINT32 x, UINT32 y )
 
 #undef TRANSPARENT
 
+// flipped X cases
 
+#define FLIPX 1
+#define TRANSPARENT 1
+
+#define FUNCNAME draw_sprite_flipx_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+
+
+#define TRANSPARENT 0
+
+#define FUNCNAME draw_sprite_flipx_opaque_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+#undef FLIPX
 
 INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
 {
@@ -1347,211 +2526,422 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	alpha_to_clr(s_alpha, &s_alpha_clr);
 	alpha_to_clr(d_alpha, &d_alpha_clr);
 
-#define draw_params cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR32(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,src_p,src_x,src_y, x,y, dimx,dimy, flipx,flipy, &s_alpha_clr, &d_alpha_clr, &tint_clr
-	if (trans)
+#define draw_params cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR32(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,src_p,src_x,src_y, x,y, dimx,dimy, flipy, &s_alpha_clr, &d_alpha_clr, &tint_clr
+	if (!flipx)
 	{
+		if (trans)
+		{
+			if (!blend) 
+			{
+				draw_sprite_plain(draw_params);
+			}
+			else
+			{
+				switch (d_mode)
+				{
+				case 0:
+				// draw
+				if (s_mode==0)     draw_sprite_s0_d0(draw_params);
+				else if (s_mode==1)draw_sprite_s1_d0(draw_params);
+				else if (s_mode==2)draw_sprite_s2_d0(draw_params);
+				else if (s_mode==3)draw_sprite_s3_d0(draw_params);
+				else if (s_mode==4)draw_sprite_s4_d0(draw_params);
+				else if (s_mode==5)draw_sprite_s5_d0(draw_params);
+				else if (s_mode==6)draw_sprite_s6_d0(draw_params);
+				else if (s_mode==7)draw_sprite_s7_d0(draw_params);
+				break;
+
+				case 1:
+				if (s_mode==0)     draw_sprite_s0_d1(draw_params);
+				else if (s_mode==1)draw_sprite_s1_d1(draw_params);
+				else if (s_mode==2)draw_sprite_s2_d1(draw_params);
+				else if (s_mode==3)draw_sprite_s3_d1(draw_params);
+				else if (s_mode==4)draw_sprite_s4_d1(draw_params);
+				else if (s_mode==5)draw_sprite_s5_d1(draw_params);
+				else if (s_mode==6)draw_sprite_s6_d1(draw_params);
+				else if (s_mode==7)draw_sprite_s7_d1(draw_params);
+				break;
+
+				case 2:
+				if (s_mode==0)     draw_sprite_s0_d2(draw_params);
+				else if (s_mode==1)draw_sprite_s1_d2(draw_params);
+				else if (s_mode==2)draw_sprite_s2_d2(draw_params);
+				else if (s_mode==3)draw_sprite_s3_d2(draw_params);
+				else if (s_mode==4)draw_sprite_s4_d2(draw_params);
+				else if (s_mode==5)draw_sprite_s5_d2(draw_params);
+				else if (s_mode==6)draw_sprite_s6_d2(draw_params);
+				else if (s_mode==7)draw_sprite_s7_d2(draw_params);
+				break;
+
+				case 3:
+				if (s_mode==0)     draw_sprite_s0_d3(draw_params);
+				else if (s_mode==1)draw_sprite_s1_d3(draw_params);
+				else if (s_mode==2)draw_sprite_s2_d3(draw_params);
+				else if (s_mode==3)draw_sprite_s3_d3(draw_params);
+				else if (s_mode==4)draw_sprite_s4_d3(draw_params);
+				else if (s_mode==5)draw_sprite_s5_d3(draw_params);
+				else if (s_mode==6)draw_sprite_s6_d3(draw_params);
+				else if (s_mode==7)draw_sprite_s7_d3(draw_params);
+				break;
+
+				case 4:
+				if (s_mode==0)     draw_sprite_s0_d4(draw_params);
+				else if (s_mode==1)draw_sprite_s1_d4(draw_params);
+				else if (s_mode==2)draw_sprite_s2_d4(draw_params);
+				else if (s_mode==3)draw_sprite_s3_d4(draw_params);
+				else if (s_mode==4)draw_sprite_s4_d4(draw_params);
+				else if (s_mode==5)draw_sprite_s5_d4(draw_params);
+				else if (s_mode==6)draw_sprite_s6_d4(draw_params);
+				else if (s_mode==7)draw_sprite_s7_d4(draw_params);
+				break;
+
+				case 5:
+				if (s_mode==0)     draw_sprite_s0_d5(draw_params);
+				else if (s_mode==1)draw_sprite_s1_d5(draw_params);
+				else if (s_mode==2)draw_sprite_s2_d5(draw_params);
+				else if (s_mode==3)draw_sprite_s3_d5(draw_params);
+				else if (s_mode==4)draw_sprite_s4_d5(draw_params);
+				else if (s_mode==5)draw_sprite_s5_d5(draw_params);
+				else if (s_mode==6)draw_sprite_s6_d5(draw_params);
+				else if (s_mode==7)draw_sprite_s7_d5(draw_params);
+				break;
+
+				case 6:
+				if (s_mode==0)     draw_sprite_s0_d6(draw_params);
+				else if (s_mode==1)draw_sprite_s1_d6(draw_params);
+				else if (s_mode==2)draw_sprite_s2_d6(draw_params);
+				else if (s_mode==3)draw_sprite_s3_d6(draw_params);
+				else if (s_mode==4)draw_sprite_s4_d6(draw_params);
+				else if (s_mode==5)draw_sprite_s5_d6(draw_params);
+				else if (s_mode==6)draw_sprite_s6_d6(draw_params);
+				else if (s_mode==7)draw_sprite_s7_d6(draw_params);
+				break;
+
+				case 7:
+				if (s_mode==0     )draw_sprite_s0_d7(draw_params);
+				else if (s_mode==1)draw_sprite_s1_d7(draw_params);
+				else if (s_mode==2)draw_sprite_s2_d7(draw_params);
+				else if (s_mode==3)draw_sprite_s3_d7(draw_params);
+				else if (s_mode==4)draw_sprite_s4_d7(draw_params);
+				else if (s_mode==5)draw_sprite_s5_d7(draw_params);
+				else if (s_mode==6)draw_sprite_s6_d7(draw_params);
+				else if (s_mode==7)draw_sprite_s7_d7(draw_params);
+				break;
+
+				}
+			}
+		}
+		else
+		{
 		if (!blend) 
-		{
-			draw_sprite_plain(draw_params);
-		}
-		else
-		{
-			switch (d_mode)
 			{
-			case 0:
-			// draw
-			if (s_mode==0)     draw_sprite_s0_d0(draw_params);
-			else if (s_mode==1)draw_sprite_s1_d0(draw_params);
-			else if (s_mode==2)draw_sprite_s2_d0(draw_params);
-			else if (s_mode==3)draw_sprite_s3_d0(draw_params);
-			else if (s_mode==4)draw_sprite_s4_d0(draw_params);
-			else if (s_mode==5)draw_sprite_s5_d0(draw_params);
-			else if (s_mode==6)draw_sprite_s6_d0(draw_params);
-			else if (s_mode==7)draw_sprite_s7_d0(draw_params);
-			break;
+				draw_sprite_opaque_plain(draw_params);
+			}
+			else
+			{
+				switch (d_mode)
+				{
+				case 0:
+				// draw
+				if (s_mode==0)     draw_sprite_opaque_s0_d0(draw_params);
+				else if (s_mode==1)draw_sprite_opaque_s1_d0(draw_params);
+				else if (s_mode==2)draw_sprite_opaque_s2_d0(draw_params);
+				else if (s_mode==3)draw_sprite_opaque_s3_d0(draw_params);
+				else if (s_mode==4)draw_sprite_opaque_s4_d0(draw_params);
+				else if (s_mode==5)draw_sprite_opaque_s5_d0(draw_params);
+				else if (s_mode==6)draw_sprite_opaque_s6_d0(draw_params);
+				else if (s_mode==7)draw_sprite_opaque_s7_d0(draw_params);
+				break;
 
-			case 1:
-			if (s_mode==0)     draw_sprite_s0_d1(draw_params);
-			else if (s_mode==1)draw_sprite_s1_d1(draw_params);
-			else if (s_mode==2)draw_sprite_s2_d1(draw_params);
-			else if (s_mode==3)draw_sprite_s3_d1(draw_params);
-			else if (s_mode==4)draw_sprite_s4_d1(draw_params);
-			else if (s_mode==5)draw_sprite_s5_d1(draw_params);
-			else if (s_mode==6)draw_sprite_s6_d1(draw_params);
-			else if (s_mode==7)draw_sprite_s7_d1(draw_params);
-			break;
+				case 1:
+				if (s_mode==0)     draw_sprite_opaque_s0_d1(draw_params);
+				else if (s_mode==1)draw_sprite_opaque_s1_d1(draw_params);
+				else if (s_mode==2)draw_sprite_opaque_s2_d1(draw_params);
+				else if (s_mode==3)draw_sprite_opaque_s3_d1(draw_params);
+				else if (s_mode==4)draw_sprite_opaque_s4_d1(draw_params);
+				else if (s_mode==5)draw_sprite_opaque_s5_d1(draw_params);
+				else if (s_mode==6)draw_sprite_opaque_s6_d1(draw_params);
+				else if (s_mode==7)draw_sprite_opaque_s7_d1(draw_params);
+				break;
 
-			case 2:
-			if (s_mode==0)     draw_sprite_s0_d2(draw_params);
-			else if (s_mode==1)draw_sprite_s1_d2(draw_params);
-			else if (s_mode==2)draw_sprite_s2_d2(draw_params);
-			else if (s_mode==3)draw_sprite_s3_d2(draw_params);
-			else if (s_mode==4)draw_sprite_s4_d2(draw_params);
-			else if (s_mode==5)draw_sprite_s5_d2(draw_params);
-			else if (s_mode==6)draw_sprite_s6_d2(draw_params);
-			else if (s_mode==7)draw_sprite_s7_d2(draw_params);
-			break;
+				case 2:
+				if (s_mode==0)     draw_sprite_opaque_s0_d2(draw_params);
+				else if (s_mode==1)draw_sprite_opaque_s1_d2(draw_params);
+				else if (s_mode==2)draw_sprite_opaque_s2_d2(draw_params);
+				else if (s_mode==3)draw_sprite_opaque_s3_d2(draw_params);
+				else if (s_mode==4)draw_sprite_opaque_s4_d2(draw_params);
+				else if (s_mode==5)draw_sprite_opaque_s5_d2(draw_params);
+				else if (s_mode==6)draw_sprite_opaque_s6_d2(draw_params);
+				else if (s_mode==7)draw_sprite_opaque_s7_d2(draw_params);
+				break;
 
-			case 3:
-			if (s_mode==0)     draw_sprite_s0_d3(draw_params);
-			else if (s_mode==1)draw_sprite_s1_d3(draw_params);
-			else if (s_mode==2)draw_sprite_s2_d3(draw_params);
-			else if (s_mode==3)draw_sprite_s3_d3(draw_params);
-			else if (s_mode==4)draw_sprite_s4_d3(draw_params);
-			else if (s_mode==5)draw_sprite_s5_d3(draw_params);
-			else if (s_mode==6)draw_sprite_s6_d3(draw_params);
-			else if (s_mode==7)draw_sprite_s7_d3(draw_params);
-			break;
+				case 3:
+				if (s_mode==0)     draw_sprite_opaque_s0_d3(draw_params);
+				else if (s_mode==1)draw_sprite_opaque_s1_d3(draw_params);
+				else if (s_mode==2)draw_sprite_opaque_s2_d3(draw_params);
+				else if (s_mode==3)draw_sprite_opaque_s3_d3(draw_params);
+				else if (s_mode==4)draw_sprite_opaque_s4_d3(draw_params);
+				else if (s_mode==5)draw_sprite_opaque_s5_d3(draw_params);
+				else if (s_mode==6)draw_sprite_opaque_s6_d3(draw_params);
+				else if (s_mode==7)draw_sprite_opaque_s7_d3(draw_params);
+				break;
 
-			case 4:
-			if (s_mode==0)     draw_sprite_s0_d4(draw_params);
-			else if (s_mode==1)draw_sprite_s1_d4(draw_params);
-			else if (s_mode==2)draw_sprite_s2_d4(draw_params);
-			else if (s_mode==3)draw_sprite_s3_d4(draw_params);
-			else if (s_mode==4)draw_sprite_s4_d4(draw_params);
-			else if (s_mode==5)draw_sprite_s5_d4(draw_params);
-			else if (s_mode==6)draw_sprite_s6_d4(draw_params);
-			else if (s_mode==7)draw_sprite_s7_d4(draw_params);
-			break;
+				case 4:
+				if (s_mode==0)     draw_sprite_opaque_s0_d4(draw_params);
+				else if (s_mode==1)draw_sprite_opaque_s1_d4(draw_params);
+				else if (s_mode==2)draw_sprite_opaque_s2_d4(draw_params);
+				else if (s_mode==3)draw_sprite_opaque_s3_d4(draw_params);
+				else if (s_mode==4)draw_sprite_opaque_s4_d4(draw_params);
+				else if (s_mode==5)draw_sprite_opaque_s5_d4(draw_params);
+				else if (s_mode==6)draw_sprite_opaque_s6_d4(draw_params);
+				else if (s_mode==7)draw_sprite_opaque_s7_d4(draw_params);
+				break;
 
-			case 5:
-			if (s_mode==0)     draw_sprite_s0_d5(draw_params);
-			else if (s_mode==1)draw_sprite_s1_d5(draw_params);
-			else if (s_mode==2)draw_sprite_s2_d5(draw_params);
-			else if (s_mode==3)draw_sprite_s3_d5(draw_params);
-			else if (s_mode==4)draw_sprite_s4_d5(draw_params);
-			else if (s_mode==5)draw_sprite_s5_d5(draw_params);
-			else if (s_mode==6)draw_sprite_s6_d5(draw_params);
-			else if (s_mode==7)draw_sprite_s7_d5(draw_params);
-			break;
+				case 5:
+				if (s_mode==0)     draw_sprite_opaque_s0_d5(draw_params);
+				else if (s_mode==1)draw_sprite_opaque_s1_d5(draw_params);
+				else if (s_mode==2)draw_sprite_opaque_s2_d5(draw_params);
+				else if (s_mode==3)draw_sprite_opaque_s3_d5(draw_params);
+				else if (s_mode==4)draw_sprite_opaque_s4_d5(draw_params);
+				else if (s_mode==5)draw_sprite_opaque_s5_d5(draw_params);
+				else if (s_mode==6)draw_sprite_opaque_s6_d5(draw_params);
+				else if (s_mode==7)draw_sprite_opaque_s7_d5(draw_params);
+				break;
 
-			case 6:
-			if (s_mode==0)     draw_sprite_s0_d6(draw_params);
-			else if (s_mode==1)draw_sprite_s1_d6(draw_params);
-			else if (s_mode==2)draw_sprite_s2_d6(draw_params);
-			else if (s_mode==3)draw_sprite_s3_d6(draw_params);
-			else if (s_mode==4)draw_sprite_s4_d6(draw_params);
-			else if (s_mode==5)draw_sprite_s5_d6(draw_params);
-			else if (s_mode==6)draw_sprite_s6_d6(draw_params);
-			else if (s_mode==7)draw_sprite_s7_d6(draw_params);
-			break;
+				case 6:
+				if (s_mode==0)     draw_sprite_opaque_s0_d6(draw_params);
+				else if (s_mode==1)draw_sprite_opaque_s1_d6(draw_params);
+				else if (s_mode==2)draw_sprite_opaque_s2_d6(draw_params);
+				else if (s_mode==3)draw_sprite_opaque_s3_d6(draw_params);
+				else if (s_mode==4)draw_sprite_opaque_s4_d6(draw_params);
+				else if (s_mode==5)draw_sprite_opaque_s5_d6(draw_params);
+				else if (s_mode==6)draw_sprite_opaque_s6_d6(draw_params);
+				else if (s_mode==7)draw_sprite_opaque_s7_d6(draw_params);
+				break;
 
-			case 7:
-			if (s_mode==0     )draw_sprite_s0_d7(draw_params);
-			else if (s_mode==1)draw_sprite_s1_d7(draw_params);
-			else if (s_mode==2)draw_sprite_s2_d7(draw_params);
-			else if (s_mode==3)draw_sprite_s3_d7(draw_params);
-			else if (s_mode==4)draw_sprite_s4_d7(draw_params);
-			else if (s_mode==5)draw_sprite_s5_d7(draw_params);
-			else if (s_mode==6)draw_sprite_s6_d7(draw_params);
-			else if (s_mode==7)draw_sprite_s7_d7(draw_params);
-			break;
+				case 7:
+				if (s_mode==0     )draw_sprite_opaque_s0_d7(draw_params);
+				else if (s_mode==1)draw_sprite_opaque_s1_d7(draw_params);
+				else if (s_mode==2)draw_sprite_opaque_s2_d7(draw_params);
+				else if (s_mode==3)draw_sprite_opaque_s3_d7(draw_params);
+				else if (s_mode==4)draw_sprite_opaque_s4_d7(draw_params);
+				else if (s_mode==5)draw_sprite_opaque_s5_d7(draw_params);
+				else if (s_mode==6)draw_sprite_opaque_s6_d7(draw_params);
+				else if (s_mode==7)draw_sprite_opaque_s7_d7(draw_params);
+				break;
 
+				}
 			}
 		}
-	}
-	else
+	} 
+	else // flipx
 	{
-	if (!blend) 
+	if (trans)
 		{
-			draw_sprite_opaque_plain(draw_params);
+			if (!blend) 
+			{
+				draw_sprite_flipx_plain(draw_params);
+			}
+			else
+			{
+				switch (d_mode)
+				{
+				case 0:
+				// draw
+				if (s_mode==0)     draw_sprite_flipx_s0_d0(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_s1_d0(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_s2_d0(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_s3_d0(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_s4_d0(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_s5_d0(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_s6_d0(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_s7_d0(draw_params);
+				break;
+
+				case 1:
+				if (s_mode==0)     draw_sprite_flipx_s0_d1(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_s1_d1(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_s2_d1(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_s3_d1(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_s4_d1(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_s5_d1(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_s6_d1(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_s7_d1(draw_params);
+				break;
+
+				case 2:
+				if (s_mode==0)     draw_sprite_flipx_s0_d2(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_s1_d2(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_s2_d2(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_s3_d2(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_s4_d2(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_s5_d2(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_s6_d2(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_s7_d2(draw_params);
+				break;
+
+				case 3:
+				if (s_mode==0)     draw_sprite_flipx_s0_d3(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_s1_d3(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_s2_d3(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_s3_d3(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_s4_d3(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_s5_d3(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_s6_d3(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_s7_d3(draw_params);
+				break;
+
+				case 4:
+				if (s_mode==0)     draw_sprite_flipx_s0_d4(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_s1_d4(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_s2_d4(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_s3_d4(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_s4_d4(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_s5_d4(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_s6_d4(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_s7_d4(draw_params);
+				break;
+
+				case 5:
+				if (s_mode==0)     draw_sprite_flipx_s0_d5(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_s1_d5(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_s2_d5(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_s3_d5(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_s4_d5(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_s5_d5(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_s6_d5(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_s7_d5(draw_params);
+				break;
+
+				case 6:
+				if (s_mode==0)     draw_sprite_flipx_s0_d6(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_s1_d6(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_s2_d6(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_s3_d6(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_s4_d6(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_s5_d6(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_s6_d6(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_s7_d6(draw_params);
+				break;
+
+				case 7:
+				if (s_mode==0     )draw_sprite_flipx_s0_d7(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_s1_d7(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_s2_d7(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_s3_d7(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_s4_d7(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_s5_d7(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_s6_d7(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_s7_d7(draw_params);
+				break;
+
+				}
+			}
 		}
 		else
 		{
-			switch (d_mode)
+		if (!blend) 
 			{
-			case 0:
-			// draw
-			if (s_mode==0)     draw_sprite_opaque_s0_d0(draw_params);
-			else if (s_mode==1)draw_sprite_opaque_s1_d0(draw_params);
-			else if (s_mode==2)draw_sprite_opaque_s2_d0(draw_params);
-			else if (s_mode==3)draw_sprite_opaque_s3_d0(draw_params);
-			else if (s_mode==4)draw_sprite_opaque_s4_d0(draw_params);
-			else if (s_mode==5)draw_sprite_opaque_s5_d0(draw_params);
-			else if (s_mode==6)draw_sprite_opaque_s6_d0(draw_params);
-			else if (s_mode==7)draw_sprite_opaque_s7_d0(draw_params);
-			break;
+				draw_sprite_flipx_opaque_plain(draw_params);
+			}
+			else
+			{
+				switch (d_mode)
+				{
+				case 0:
+				// draw
+				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d0(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d0(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d0(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d0(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d0(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d0(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d0(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d0(draw_params);
+				break;
 
-			case 1:
-			if (s_mode==0)     draw_sprite_opaque_s0_d1(draw_params);
-			else if (s_mode==1)draw_sprite_opaque_s1_d1(draw_params);
-			else if (s_mode==2)draw_sprite_opaque_s2_d1(draw_params);
-			else if (s_mode==3)draw_sprite_opaque_s3_d1(draw_params);
-			else if (s_mode==4)draw_sprite_opaque_s4_d1(draw_params);
-			else if (s_mode==5)draw_sprite_opaque_s5_d1(draw_params);
-			else if (s_mode==6)draw_sprite_opaque_s6_d1(draw_params);
-			else if (s_mode==7)draw_sprite_opaque_s7_d1(draw_params);
-			break;
+				case 1:
+				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d1(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d1(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d1(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d1(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d1(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d1(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d1(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d1(draw_params);
+				break;
 
-			case 2:
-			if (s_mode==0)     draw_sprite_opaque_s0_d2(draw_params);
-			else if (s_mode==1)draw_sprite_opaque_s1_d2(draw_params);
-			else if (s_mode==2)draw_sprite_opaque_s2_d2(draw_params);
-			else if (s_mode==3)draw_sprite_opaque_s3_d2(draw_params);
-			else if (s_mode==4)draw_sprite_opaque_s4_d2(draw_params);
-			else if (s_mode==5)draw_sprite_opaque_s5_d2(draw_params);
-			else if (s_mode==6)draw_sprite_opaque_s6_d2(draw_params);
-			else if (s_mode==7)draw_sprite_opaque_s7_d2(draw_params);
-			break;
+				case 2:
+				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d2(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d2(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d2(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d2(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d2(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d2(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d2(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d2(draw_params);
+				break;
 
-			case 3:
-			if (s_mode==0)     draw_sprite_opaque_s0_d3(draw_params);
-			else if (s_mode==1)draw_sprite_opaque_s1_d3(draw_params);
-			else if (s_mode==2)draw_sprite_opaque_s2_d3(draw_params);
-			else if (s_mode==3)draw_sprite_opaque_s3_d3(draw_params);
-			else if (s_mode==4)draw_sprite_opaque_s4_d3(draw_params);
-			else if (s_mode==5)draw_sprite_opaque_s5_d3(draw_params);
-			else if (s_mode==6)draw_sprite_opaque_s6_d3(draw_params);
-			else if (s_mode==7)draw_sprite_opaque_s7_d3(draw_params);
-			break;
+				case 3:
+				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d3(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d3(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d3(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d3(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d3(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d3(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d3(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d3(draw_params);
+				break;
 
-			case 4:
-			if (s_mode==0)     draw_sprite_opaque_s0_d4(draw_params);
-			else if (s_mode==1)draw_sprite_opaque_s1_d4(draw_params);
-			else if (s_mode==2)draw_sprite_opaque_s2_d4(draw_params);
-			else if (s_mode==3)draw_sprite_opaque_s3_d4(draw_params);
-			else if (s_mode==4)draw_sprite_opaque_s4_d4(draw_params);
-			else if (s_mode==5)draw_sprite_opaque_s5_d4(draw_params);
-			else if (s_mode==6)draw_sprite_opaque_s6_d4(draw_params);
-			else if (s_mode==7)draw_sprite_opaque_s7_d4(draw_params);
-			break;
+				case 4:
+				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d4(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d4(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d4(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d4(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d4(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d4(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d4(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d4(draw_params);
+				break;
 
-			case 5:
-			if (s_mode==0)     draw_sprite_opaque_s0_d5(draw_params);
-			else if (s_mode==1)draw_sprite_opaque_s1_d5(draw_params);
-			else if (s_mode==2)draw_sprite_opaque_s2_d5(draw_params);
-			else if (s_mode==3)draw_sprite_opaque_s3_d5(draw_params);
-			else if (s_mode==4)draw_sprite_opaque_s4_d5(draw_params);
-			else if (s_mode==5)draw_sprite_opaque_s5_d5(draw_params);
-			else if (s_mode==6)draw_sprite_opaque_s6_d5(draw_params);
-			else if (s_mode==7)draw_sprite_opaque_s7_d5(draw_params);
-			break;
+				case 5:
+				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d5(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d5(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d5(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d5(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d5(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d5(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d5(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d5(draw_params);
+				break;
 
-			case 6:
-			if (s_mode==0)     draw_sprite_opaque_s0_d6(draw_params);
-			else if (s_mode==1)draw_sprite_opaque_s1_d6(draw_params);
-			else if (s_mode==2)draw_sprite_opaque_s2_d6(draw_params);
-			else if (s_mode==3)draw_sprite_opaque_s3_d6(draw_params);
-			else if (s_mode==4)draw_sprite_opaque_s4_d6(draw_params);
-			else if (s_mode==5)draw_sprite_opaque_s5_d6(draw_params);
-			else if (s_mode==6)draw_sprite_opaque_s6_d6(draw_params);
-			else if (s_mode==7)draw_sprite_opaque_s7_d6(draw_params);
-			break;
+				case 6:
+				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d6(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d6(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d6(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d6(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d6(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d6(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d6(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d6(draw_params);
+				break;
 
-			case 7:
-			if (s_mode==0     )draw_sprite_opaque_s0_d7(draw_params);
-			else if (s_mode==1)draw_sprite_opaque_s1_d7(draw_params);
-			else if (s_mode==2)draw_sprite_opaque_s2_d7(draw_params);
-			else if (s_mode==3)draw_sprite_opaque_s3_d7(draw_params);
-			else if (s_mode==4)draw_sprite_opaque_s4_d7(draw_params);
-			else if (s_mode==5)draw_sprite_opaque_s5_d7(draw_params);
-			else if (s_mode==6)draw_sprite_opaque_s6_d7(draw_params);
-			else if (s_mode==7)draw_sprite_opaque_s7_d7(draw_params);
-			break;
+				case 7:
+				if (s_mode==0     )draw_sprite_flipx_opaque_s0_d7(draw_params);
+				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d7(draw_params);
+				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d7(draw_params);
+				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d7(draw_params);
+				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d7(draw_params);
+				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d7(draw_params);
+				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d7(draw_params);
+				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d7(draw_params);
+				break;
 
+				}
 			}
 		}
 	}
+	
 }
 
 // Death Smiles has bad text with wrong clip sizes, must clip to screen size.
@@ -2182,7 +3572,7 @@ static INPUT_PORTS_START( cavesh3 )
 INPUT_PORTS_END
 
 
-// apparently correct (but where is the OSC?)
+
 #define CAVE_CPU_CLOCK 12800000 * 8
 
 // none of this is verified for cave sh3
