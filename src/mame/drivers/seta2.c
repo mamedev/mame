@@ -29,11 +29,13 @@ PO-113A                 1994    Mobile Suit Gundam EX Revue             Banprest
 P0-123A                 1996    Wakakusamonogatari Mahjong Yonshimai    Maboroshi Ware
 P0-125A ; KE (Namco)    1996    Kosodate Quiz My Angel                  Namco
 P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
+P0-140B                 2000    Namco Stars                             Namco
 P0-142A                 1999    Puzzle De Bowling                       Nihon System / Moss
 P0-142A + extra parts   2000    Penguin Brothers                        Subsino
 B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
 B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-006B                 2001    Funcube 2                               Namco
+B0-006B?                2001    Funcube 3                               Namco
 B0-006B                 2001    Funcube 4                               Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
@@ -445,6 +447,20 @@ static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)				// Video Registers
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE( reelquak_leds_w )		// parallel data register (leds)
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+                                Namco Stars
+***************************************************************************/
+
+// To be done:
+static ADDRESS_MAP_START( namcostr_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)	// Video Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -2246,6 +2262,36 @@ static MACHINE_CONFIG_DERIVED( funcube3, funcube )
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( namcostr, seta2_state )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_50MHz/3)	// !! TMP68301 !!
+	MCFG_CPU_PROGRAM_MAP(namcostr_map)
+	MCFG_CPU_VBLANK_INT("screen", seta2_interrupt)
+
+	MCFG_MACHINE_START( tmp68301 )
+	MCFG_MACHINE_RESET( tmp68301 )
+
+	// video hardware
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 0x200)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_UPDATE(seta2)
+	MCFG_SCREEN_EOF(seta2)
+
+	MCFG_GFXDECODE(funcube)
+	MCFG_PALETTE_LENGTH(0x8000+0xf0)	// extra 0xf0 because we might draw 256-color object with 16-color granularity
+
+	MCFG_VIDEO_START(seta2)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -2684,6 +2730,38 @@ ROM_START( myangel2 )
 	ROM_REGION( 0x500000, "x1snd", 0 )	// Samples
 	// Leave 1MB empty (addressable by the chip)
 	ROM_LOAD( "kqs1-snd.u32", 0x100000, 0x400000, CRC(792a6b49) SHA1(341b4e8f248b5032217733bada32e353c67e3888) )
+ROM_END
+
+/***************************************************************************
+
+  Namco Stars
+
+  EVA2B PCB (8829970101 P0-140B Serial Z033):
+
+  TMP68301AF-16 CPU
+  DX101
+  DX102 x 2
+  OKI M9810
+  GAL 16V8d x 2
+  MAX232
+  DSW8
+  Coin Battery
+  Reset Button
+  OSC: 25.447 MHz @ XM1, 50.000 MHz @ XM2, 32.53005 MHz @ X2
+  Volume Trimmer
+
+***************************************************************************/
+
+ROM_START( namcostr )
+	ROM_REGION( 0x80000, "maincpu", 0 )	// TMP68301 Code
+	ROM_LOAD( "ns1mpr0.u08", 0x00000, 0x80000, BAD_DUMP CRC(008d23fe) SHA1(8c77a34dd0285c06809e99d20b9d8b31b81bfc68) )	// FIXED BITS (xxxxx1xxxxxxxxxx)
+
+	ROM_REGION( 0x800000, "sprites", 0 )
+	ROM_LOAD32_WORD( "ns1cha0.u39", 0x000000, 0x400000, BAD_DUMP CRC(372d1651) SHA1(355553992e5a474ae1e45bcdeb88804d5b75f802) )	// FIXED BITS (xxxxx1xxxxxxxxxx)
+	ROM_LOAD32_WORD( "ns1cha1.u38", 0x000002, 0x400000, BAD_DUMP CRC(82e67809) SHA1(6b25726cd3683e1691e4d4e1628c13998f20933d) )	// FIXED BITS (xxxxx1xxxxxxxxxx)
+
+	ROM_REGION( 0x1000000, "oki", 0 )
+	ROM_LOAD( "ns1voi0.u40", 0x000000, 0x400000, BAD_DUMP CRC(fe5c2b16) SHA1(21e4423cc91e8833297d4588343237b8b3155196) )	// FIXED BITS (xxxxx1xxxxxxxxxx)
 ROM_END
 
 /***************************************************************************
@@ -3221,6 +3299,7 @@ GAME( 1996, myangel,  0,        myangel,  myangel,  0,        ROT0, "Namco",    
 GAME( 1997, myangel2, 0,        myangel2, myangel2, 0,        ROT0, "Namco",                 "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl,  0,        ROT0, "Nihon System / Moss",   "Puzzle De Bowling (Japan)",                    GAME_NO_COCKTAIL )
 GAME( 2000, penbros,  0,        penbros,  penbros,  0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     GAME_NO_COCKTAIL )
+GAME( 2000, namcostr, 0,        namcostr, funcube,  0,        ROT0, "Namco",                 "Namco Stars",                                  GAME_NO_COCKTAIL | GAME_NOT_WORKING )
 GAME( 2000, deerhunt, 0,        samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.3",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta,deerhunt, samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.2",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhuntb,deerhunt, samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.0",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )

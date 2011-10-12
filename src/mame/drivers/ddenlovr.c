@@ -38,6 +38,7 @@ Year + Game              Board              CPU   Sound              Custom     
 98 Reach Ippatsu                            Z80          YM2413 M6295 70C160F011
 99 Jong-Tei              NM532-9902         Z80          YM2413 M6295 4L10FXXXX?
 02 Mj Daimyojin          TSM015-0111        Z80          YM2413 M6295 70C160F011
+04 Mj Momotarou          TSM015-0111?       Z80          YM2413 M6295 70C160F011?
 ------------------------------------------------------------------------------------------------------------------
 
 TODO:
@@ -3744,6 +3745,9 @@ static READ8_HANDLER( daimyojn_protection_r )
 	}
 	return 0xff;
 }
+
+// 1ADD: D4 ED 76 C9 CB
+// 1AE2: D9 E0 7B C4 C6
 
 static READ8_HANDLER( momotaro_protection_r )
 {
@@ -10359,15 +10363,15 @@ ROM_END
 
 ROM_START( momotaro )
 	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
-    ROM_LOAD( "r0272m1.6e",   0x00000, 0x080000, CRC(71c83332) SHA1(c949cb9e23e5cc77dbd64fc28e62a88f1dc811a3) )
-	ROM_RELOAD(         	  0x10000, 0x80000 )
+	ROM_LOAD( "r0272m1.6e", 0x00000, 0x80000, CRC(71c83332) SHA1(c949cb9e23e5cc77dbd64fc28e62a88f1dc811a3) )
+	ROM_RELOAD(           	0x10000, 0x80000 )
 
 	ROM_REGION( 0x400000, "blitter", 0 )	/* blitter data */
-	ROM_LOAD( "t0273.7b",     0x000000, 0x200000, CRC(5ae90ae2) SHA1(975bae930d848987405dc3dd59de138b1f98b358) )
-	ROM_LOAD( "t0274.8b",     0x200000, 0x200000, CRC(78209778) SHA1(4054972e12115049322bb43381ff50a354c3cadf) )
+	ROM_LOAD( "t0273.7b", 0x000000, 0x200000, BAD_DUMP CRC(5ae90ae2) SHA1(975bae930d848987405dc3dd59de138b1f98b358) )	// FIXED BITS (xxxxx1xxxxxxxxx1)
+	ROM_LOAD( "t0274.8b", 0x200000, 0x200000, BAD_DUMP CRC(78209778) SHA1(4054972e12115049322bb43381ff50a354c3cadf) )	// FIXED BITS (xxxxx1xxxxxxxxx1)
 
 	ROM_REGION( 0x80000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "t0271.2b",     0x000000, 0x080000, CRC(c850d7b2) SHA1(8bb69bdea7035c5f8274927f07a4cdf6ed9b32fc) )
+	ROM_LOAD( "t0271.2b", 0x00000, 0x80000, CRC(c850d7b2) SHA1(8bb69bdea7035c5f8274927f07a4cdf6ed9b32fc) )
 ROM_END
 
 static DRIVER_INIT( momotaro )
@@ -10410,4 +10414,4 @@ GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, 0,        ROT0, "Dynax",  
 GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, 0,        ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1999, jongtei,   0,        jongtei,   jongtei,  0,        ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, ver. NM532-01)",                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, 0,        ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, momotaro, ROT0, "Techno-Top", 						         "Mahjong Momotarou (Japan)",                           			GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS ) // different blitter commands
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, momotaro, ROT0, "Techno-Top", 						         "Mahjong Momotarou (Japan)",                                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
