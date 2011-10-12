@@ -128,11 +128,12 @@ public:
 ***************************************************************************/
 
 UINT16* cavesh3_ram16;
-UINT16 cavesh3_colrtable[0x100][0x100];
-
+UINT8 cavesh3_colrtable[0x20][0x40];
+UINT8 cavesh3_colrtable_rev[0x20][0x40];
+UINT8 cavesh3_colrtable_add[0x20][0x20];
 struct _clr_t
 {
-	INT8 t,r,g,b;
+	INT8 r,g,b;
 };
 
 
@@ -166,20 +167,15 @@ INLINE void tint_to_clr(UINT8 r, UINT8 g, UINT8 b, clr_t *clr)
 	clr->b	=	b>>2;
 }
 
-// convert alpha factor (0..ff) to clr_t (0..1f)
-INLINE void alpha_to_clr(UINT8 alpha, clr_t *clr)
-{
-	clr->r	=	alpha>>3;
-	clr->g	=	alpha>>3;
-	clr->b	=	alpha>>3;
-}
-
+#if 0
 INLINE void clamp_clr(clr_t *clr)
 {
 	if (clr->r > 0x1f) clr->r = 0x1f;
 	if (clr->g > 0x1f) clr->g = 0x1f;
 	if (clr->b > 0x1f) clr->b = 0x1f;
 }
+#endif
+
 // clr_t to r5g5b5
 INLINE UINT32 clr_to_pen(const clr_t *clr)
 {
@@ -192,21 +188,49 @@ INLINE UINT32 clr_to_pen(const clr_t *clr)
 }
 
 // add clrs
-INLINE void clr_add(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
+INLINE void clr_add(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
 {
+/*
 	clr->r = clr0->r + clr1->r;
 	clr->g = clr0->g + clr1->g;
 	clr->b = clr0->b + clr1->b;
+*/
+	// use pre-clamped lookup table
+	clr->r = cavesh3_colrtable_add[clr0->r][clr1->r];
+	clr->g = cavesh3_colrtable_add[clr0->g][clr1->g];
+	clr->b = cavesh3_colrtable_add[clr0->b][clr1->b];
+	
 }
 
 // multiply clrs
-INLINE void clr_mul(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
+INLINE void clr_mul(clr_t *clr0, const clr_t *clr1)
 {
-	clr->r = cavesh3_colrtable[(clr0->r)][(clr1->r)];
-	clr->g = cavesh3_colrtable[(clr0->g)][(clr1->g)];
-	clr->b = cavesh3_colrtable[(clr0->b)][(clr1->b)];
+	clr0->r = cavesh3_colrtable[(clr0->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable[(clr0->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable[(clr0->b)][(clr1->b)];
 }
 
+INLINE void clr_mul_rev(clr_t *clr0, const clr_t *clr1)
+{
+	clr0->r = cavesh3_colrtable_rev[(clr0->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable_rev[(clr0->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable_rev[(clr0->b)][(clr1->b)];
+}
+
+
+INLINE void clr_mul_fixed(clr_t *clr, const UINT8 val, const clr_t *clr0)
+{
+	clr->r = cavesh3_colrtable[(clr0->r)][val];
+	clr->g = cavesh3_colrtable[(clr0->g)][val];
+	clr->b = cavesh3_colrtable[(clr0->b)][val];
+}
+
+INLINE void clr_mul_fixed_rev(clr_t *clr, const UINT8 val, const clr_t *clr0)
+{
+	clr->r = cavesh3_colrtable_rev[(clr0->r)][val];
+	clr->g = cavesh3_colrtable_rev[(clr0->g)][val];
+	clr->b = cavesh3_colrtable_rev[(clr0->b)][val];
+}
 
 
 // (1|s|d) * s_factor * s + (1|s|d) * d_factor * d
@@ -2418,6 +2442,7 @@ static VIDEO_START( cavesh3 )
 #undef TRANSPARENT
 #undef FLIPX
 
+
 INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
 {
 //  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
@@ -2470,11 +2495,82 @@ INLINE void cavesh_gfx_upload(address_space &space, offs_t *addr)
 	}
 }
 
+#define draw_params cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR32(cavesh_bitmaps[0], 0,0),src_x,src_y, x,y, dimx,dimy, flipy, s_alpha, d_alpha, &tint_clr
+
+typedef const void (*caveblitfunction)(bitmap_t *,
+					 const rectangle *,
+					 UINT32 *, /* gfx */
+					 int , /* src_x */
+					 int , /* src_y */
+					 int , /* dst_x_start */
+					 int , /* dst_y_start */
+					 int , /* dimx */
+					 int , /* dimy */
+					 int , /* flipy */
+					 const UINT8 , /* s_alpha */
+					 const UINT8 , /* d_alpha */
+					 //int , /* tint */ 
+					 clr_t * );
+
+caveblitfunction cave_blit_funcs[] =
+{
+
+	draw_sprite_s0_d0, draw_sprite_s1_d0, draw_sprite_s2_d0, draw_sprite_s3_d0, draw_sprite_s4_d0, draw_sprite_s5_d0, draw_sprite_s6_d0, draw_sprite_s7_d0,
+	draw_sprite_s0_d1, draw_sprite_s1_d1, draw_sprite_s2_d1, draw_sprite_s3_d1, draw_sprite_s4_d1, draw_sprite_s5_d1, draw_sprite_s6_d1, draw_sprite_s7_d1,
+	draw_sprite_s0_d2, draw_sprite_s1_d2, draw_sprite_s2_d2, draw_sprite_s3_d2, draw_sprite_s4_d2, draw_sprite_s5_d2, draw_sprite_s6_d2, draw_sprite_s7_d2,
+	draw_sprite_s0_d3, draw_sprite_s1_d3, draw_sprite_s2_d3, draw_sprite_s3_d3, draw_sprite_s4_d3, draw_sprite_s5_d3, draw_sprite_s6_d3, draw_sprite_s7_d3,
+	draw_sprite_s0_d4, draw_sprite_s1_d4, draw_sprite_s2_d4, draw_sprite_s3_d4, draw_sprite_s4_d4, draw_sprite_s5_d4, draw_sprite_s6_d4, draw_sprite_s7_d4,
+	draw_sprite_s0_d5, draw_sprite_s1_d5, draw_sprite_s2_d5, draw_sprite_s3_d5, draw_sprite_s4_d5, draw_sprite_s5_d5, draw_sprite_s6_d5, draw_sprite_s7_d5,
+	draw_sprite_s0_d6, draw_sprite_s1_d6, draw_sprite_s2_d6, draw_sprite_s3_d6, draw_sprite_s4_d6, draw_sprite_s5_d6, draw_sprite_s6_d6, draw_sprite_s7_d6,
+	draw_sprite_s0_d7, draw_sprite_s1_d7, draw_sprite_s2_d7, draw_sprite_s3_d7, draw_sprite_s4_d7, draw_sprite_s5_d7, draw_sprite_s6_d7, draw_sprite_s7_d7,
+};
+
+caveblitfunction cave_opaque_blit_funcs[] =
+{
+
+	draw_sprite_opaque_s0_d0, draw_sprite_opaque_s1_d0, draw_sprite_opaque_s2_d0, draw_sprite_opaque_s3_d0, draw_sprite_opaque_s4_d0, draw_sprite_opaque_s5_d0, draw_sprite_opaque_s6_d0, draw_sprite_opaque_s7_d0,
+	draw_sprite_opaque_s0_d1, draw_sprite_opaque_s1_d1, draw_sprite_opaque_s2_d1, draw_sprite_opaque_s3_d1, draw_sprite_opaque_s4_d1, draw_sprite_opaque_s5_d1, draw_sprite_opaque_s6_d1, draw_sprite_opaque_s7_d1,
+	draw_sprite_opaque_s0_d2, draw_sprite_opaque_s1_d2, draw_sprite_opaque_s2_d2, draw_sprite_opaque_s3_d2, draw_sprite_opaque_s4_d2, draw_sprite_opaque_s5_d2, draw_sprite_opaque_s6_d2, draw_sprite_opaque_s7_d2,
+	draw_sprite_opaque_s0_d3, draw_sprite_opaque_s1_d3, draw_sprite_opaque_s2_d3, draw_sprite_opaque_s3_d3, draw_sprite_opaque_s4_d3, draw_sprite_opaque_s5_d3, draw_sprite_opaque_s6_d3, draw_sprite_opaque_s7_d3,
+	draw_sprite_opaque_s0_d4, draw_sprite_opaque_s1_d4, draw_sprite_opaque_s2_d4, draw_sprite_opaque_s3_d4, draw_sprite_opaque_s4_d4, draw_sprite_opaque_s5_d4, draw_sprite_opaque_s6_d4, draw_sprite_opaque_s7_d4,
+	draw_sprite_opaque_s0_d5, draw_sprite_opaque_s1_d5, draw_sprite_opaque_s2_d5, draw_sprite_opaque_s3_d5, draw_sprite_opaque_s4_d5, draw_sprite_opaque_s5_d5, draw_sprite_opaque_s6_d5, draw_sprite_opaque_s7_d5,
+	draw_sprite_opaque_s0_d6, draw_sprite_opaque_s1_d6, draw_sprite_opaque_s2_d6, draw_sprite_opaque_s3_d6, draw_sprite_opaque_s4_d6, draw_sprite_opaque_s5_d6, draw_sprite_opaque_s6_d6, draw_sprite_opaque_s7_d6,
+	draw_sprite_opaque_s0_d7, draw_sprite_opaque_s1_d7, draw_sprite_opaque_s2_d7, draw_sprite_opaque_s3_d7, draw_sprite_opaque_s4_d7, draw_sprite_opaque_s5_d7, draw_sprite_opaque_s6_d7, draw_sprite_opaque_s7_d7,
+};
+
+caveblitfunction cave_flipx_blit_funcs[] =
+{
+
+	draw_sprite_flipx_s0_d0, draw_sprite_flipx_s1_d0, draw_sprite_flipx_s2_d0, draw_sprite_flipx_s3_d0, draw_sprite_flipx_s4_d0, draw_sprite_flipx_s5_d0, draw_sprite_flipx_s6_d0, draw_sprite_flipx_s7_d0,
+	draw_sprite_flipx_s0_d1, draw_sprite_flipx_s1_d1, draw_sprite_flipx_s2_d1, draw_sprite_flipx_s3_d1, draw_sprite_flipx_s4_d1, draw_sprite_flipx_s5_d1, draw_sprite_flipx_s6_d1, draw_sprite_flipx_s7_d1,
+	draw_sprite_flipx_s0_d2, draw_sprite_flipx_s1_d2, draw_sprite_flipx_s2_d2, draw_sprite_flipx_s3_d2, draw_sprite_flipx_s4_d2, draw_sprite_flipx_s5_d2, draw_sprite_flipx_s6_d2, draw_sprite_flipx_s7_d2,
+	draw_sprite_flipx_s0_d3, draw_sprite_flipx_s1_d3, draw_sprite_flipx_s2_d3, draw_sprite_flipx_s3_d3, draw_sprite_flipx_s4_d3, draw_sprite_flipx_s5_d3, draw_sprite_flipx_s6_d3, draw_sprite_flipx_s7_d3,
+	draw_sprite_flipx_s0_d4, draw_sprite_flipx_s1_d4, draw_sprite_flipx_s2_d4, draw_sprite_flipx_s3_d4, draw_sprite_flipx_s4_d4, draw_sprite_flipx_s5_d4, draw_sprite_flipx_s6_d4, draw_sprite_flipx_s7_d4,
+	draw_sprite_flipx_s0_d5, draw_sprite_flipx_s1_d5, draw_sprite_flipx_s2_d5, draw_sprite_flipx_s3_d5, draw_sprite_flipx_s4_d5, draw_sprite_flipx_s5_d5, draw_sprite_flipx_s6_d5, draw_sprite_flipx_s7_d5,
+	draw_sprite_flipx_s0_d6, draw_sprite_flipx_s1_d6, draw_sprite_flipx_s2_d6, draw_sprite_flipx_s3_d6, draw_sprite_flipx_s4_d6, draw_sprite_flipx_s5_d6, draw_sprite_flipx_s6_d6, draw_sprite_flipx_s7_d6,
+	draw_sprite_flipx_s0_d7, draw_sprite_flipx_s1_d7, draw_sprite_flipx_s2_d7, draw_sprite_flipx_s3_d7, draw_sprite_flipx_s4_d7, draw_sprite_flipx_s5_d7, draw_sprite_flipx_s6_d7, draw_sprite_flipx_s7_d7,
+};
+
+caveblitfunction cave_flipx_opaque_blit_funcs[] =
+{
+
+	draw_sprite_flipx_opaque_s0_d0, draw_sprite_flipx_opaque_s1_d0, draw_sprite_flipx_opaque_s2_d0, draw_sprite_flipx_opaque_s3_d0, draw_sprite_flipx_opaque_s4_d0, draw_sprite_flipx_opaque_s5_d0, draw_sprite_flipx_opaque_s6_d0, draw_sprite_flipx_opaque_s7_d0,
+	draw_sprite_flipx_opaque_s0_d1, draw_sprite_flipx_opaque_s1_d1, draw_sprite_flipx_opaque_s2_d1, draw_sprite_flipx_opaque_s3_d1, draw_sprite_flipx_opaque_s4_d1, draw_sprite_flipx_opaque_s5_d1, draw_sprite_flipx_opaque_s6_d1, draw_sprite_flipx_opaque_s7_d1,
+	draw_sprite_flipx_opaque_s0_d2, draw_sprite_flipx_opaque_s1_d2, draw_sprite_flipx_opaque_s2_d2, draw_sprite_flipx_opaque_s3_d2, draw_sprite_flipx_opaque_s4_d2, draw_sprite_flipx_opaque_s5_d2, draw_sprite_flipx_opaque_s6_d2, draw_sprite_flipx_opaque_s7_d2,
+	draw_sprite_flipx_opaque_s0_d3, draw_sprite_flipx_opaque_s1_d3, draw_sprite_flipx_opaque_s2_d3, draw_sprite_flipx_opaque_s3_d3, draw_sprite_flipx_opaque_s4_d3, draw_sprite_flipx_opaque_s5_d3, draw_sprite_flipx_opaque_s6_d3, draw_sprite_flipx_opaque_s7_d3,
+	draw_sprite_flipx_opaque_s0_d4, draw_sprite_flipx_opaque_s1_d4, draw_sprite_flipx_opaque_s2_d4, draw_sprite_flipx_opaque_s3_d4, draw_sprite_flipx_opaque_s4_d4, draw_sprite_flipx_opaque_s5_d4, draw_sprite_flipx_opaque_s6_d4, draw_sprite_flipx_opaque_s7_d4,
+	draw_sprite_flipx_opaque_s0_d5, draw_sprite_flipx_opaque_s1_d5, draw_sprite_flipx_opaque_s2_d5, draw_sprite_flipx_opaque_s3_d5, draw_sprite_flipx_opaque_s4_d5, draw_sprite_flipx_opaque_s5_d5, draw_sprite_flipx_opaque_s6_d5, draw_sprite_flipx_opaque_s7_d5,
+	draw_sprite_flipx_opaque_s0_d6, draw_sprite_flipx_opaque_s1_d6, draw_sprite_flipx_opaque_s2_d6, draw_sprite_flipx_opaque_s3_d6, draw_sprite_flipx_opaque_s4_d6, draw_sprite_flipx_opaque_s5_d6, draw_sprite_flipx_opaque_s6_d6, draw_sprite_flipx_opaque_s7_d6,
+	draw_sprite_flipx_opaque_s0_d7, draw_sprite_flipx_opaque_s1_d7, draw_sprite_flipx_opaque_s2_d7, draw_sprite_flipx_opaque_s3_d7, draw_sprite_flipx_opaque_s4_d7, draw_sprite_flipx_opaque_s5_d7, draw_sprite_flipx_opaque_s6_d7, draw_sprite_flipx_opaque_s7_d7,
+};
+
+
 INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 {
 	int	x,y, dimx,dimy, flipx,flipy, src_p;
-	int trans,blend, s_alpha,s_mode, d_alpha,d_mode;
-	clr_t tint_clr, s_alpha_clr, d_alpha_clr;
+	int trans,blend, s_mode, d_mode;
+	clr_t tint_clr;
+	//int tinted = 0;
 
 	UINT16 attr		=	READ_NEXT_WORD(space, addr);
 	UINT16 alpha	=	READ_NEXT_WORD(space, addr);
@@ -2505,8 +2601,8 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	flipy	=	 attr & 0x0400;
 	flipx	=	 attr & 0x0800;
 
-	d_alpha	=	 alpha & 0x00ff;
-	s_alpha	=	(alpha & 0xff00) >> 8;
+	const UINT8 d_alpha	=	((alpha & 0x00ff)       )>>3;
+	const UINT8 s_alpha	=	((alpha & 0xff00) >> 8  )>>3;
 
 	src_p	=	0;
 	src_x	=	src_x & 0x1fff;
@@ -2521,12 +2617,21 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 
 	// convert parameters to clr
 
+
 	tint_to_clr(tint_r & 0x00ff, (tint_gb >>  8) & 0xff, tint_gb & 0xff, &tint_clr);
 
-	alpha_to_clr(s_alpha, &s_alpha_clr);
-	alpha_to_clr(d_alpha, &d_alpha_clr);
+	/* interestingly this gets set to 0x20 for 'normal' not 0x1f */
+	/*
+	if (tint_clr.r!=0x20)
+		tinted = 1;
 
-#define draw_params cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR32(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,src_p,src_x,src_y, x,y, dimx,dimy, flipy, &s_alpha_clr, &d_alpha_clr, &tint_clr
+	if (tint_clr.g!=0x20)
+		tinted = 1;
+
+	if (tint_clr.b!=0x20)
+		tinted = 1;
+	*/
+
 	if (!flipx)
 	{
 		if (trans)
@@ -2537,98 +2642,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 			}
 			else
 			{
-				switch (d_mode)
-				{
-				case 0:
-				// draw
-				if (s_mode==0)     draw_sprite_s0_d0(draw_params);
-				else if (s_mode==1)draw_sprite_s1_d0(draw_params);
-				else if (s_mode==2)draw_sprite_s2_d0(draw_params);
-				else if (s_mode==3)draw_sprite_s3_d0(draw_params);
-				else if (s_mode==4)draw_sprite_s4_d0(draw_params);
-				else if (s_mode==5)draw_sprite_s5_d0(draw_params);
-				else if (s_mode==6)draw_sprite_s6_d0(draw_params);
-				else if (s_mode==7)draw_sprite_s7_d0(draw_params);
-				break;
-
-				case 1:
-				if (s_mode==0)     draw_sprite_s0_d1(draw_params);
-				else if (s_mode==1)draw_sprite_s1_d1(draw_params);
-				else if (s_mode==2)draw_sprite_s2_d1(draw_params);
-				else if (s_mode==3)draw_sprite_s3_d1(draw_params);
-				else if (s_mode==4)draw_sprite_s4_d1(draw_params);
-				else if (s_mode==5)draw_sprite_s5_d1(draw_params);
-				else if (s_mode==6)draw_sprite_s6_d1(draw_params);
-				else if (s_mode==7)draw_sprite_s7_d1(draw_params);
-				break;
-
-				case 2:
-				if (s_mode==0)     draw_sprite_s0_d2(draw_params);
-				else if (s_mode==1)draw_sprite_s1_d2(draw_params);
-				else if (s_mode==2)draw_sprite_s2_d2(draw_params);
-				else if (s_mode==3)draw_sprite_s3_d2(draw_params);
-				else if (s_mode==4)draw_sprite_s4_d2(draw_params);
-				else if (s_mode==5)draw_sprite_s5_d2(draw_params);
-				else if (s_mode==6)draw_sprite_s6_d2(draw_params);
-				else if (s_mode==7)draw_sprite_s7_d2(draw_params);
-				break;
-
-				case 3:
-				if (s_mode==0)     draw_sprite_s0_d3(draw_params);
-				else if (s_mode==1)draw_sprite_s1_d3(draw_params);
-				else if (s_mode==2)draw_sprite_s2_d3(draw_params);
-				else if (s_mode==3)draw_sprite_s3_d3(draw_params);
-				else if (s_mode==4)draw_sprite_s4_d3(draw_params);
-				else if (s_mode==5)draw_sprite_s5_d3(draw_params);
-				else if (s_mode==6)draw_sprite_s6_d3(draw_params);
-				else if (s_mode==7)draw_sprite_s7_d3(draw_params);
-				break;
-
-				case 4:
-				if (s_mode==0)     draw_sprite_s0_d4(draw_params);
-				else if (s_mode==1)draw_sprite_s1_d4(draw_params);
-				else if (s_mode==2)draw_sprite_s2_d4(draw_params);
-				else if (s_mode==3)draw_sprite_s3_d4(draw_params);
-				else if (s_mode==4)draw_sprite_s4_d4(draw_params);
-				else if (s_mode==5)draw_sprite_s5_d4(draw_params);
-				else if (s_mode==6)draw_sprite_s6_d4(draw_params);
-				else if (s_mode==7)draw_sprite_s7_d4(draw_params);
-				break;
-
-				case 5:
-				if (s_mode==0)     draw_sprite_s0_d5(draw_params);
-				else if (s_mode==1)draw_sprite_s1_d5(draw_params);
-				else if (s_mode==2)draw_sprite_s2_d5(draw_params);
-				else if (s_mode==3)draw_sprite_s3_d5(draw_params);
-				else if (s_mode==4)draw_sprite_s4_d5(draw_params);
-				else if (s_mode==5)draw_sprite_s5_d5(draw_params);
-				else if (s_mode==6)draw_sprite_s6_d5(draw_params);
-				else if (s_mode==7)draw_sprite_s7_d5(draw_params);
-				break;
-
-				case 6:
-				if (s_mode==0)     draw_sprite_s0_d6(draw_params);
-				else if (s_mode==1)draw_sprite_s1_d6(draw_params);
-				else if (s_mode==2)draw_sprite_s2_d6(draw_params);
-				else if (s_mode==3)draw_sprite_s3_d6(draw_params);
-				else if (s_mode==4)draw_sprite_s4_d6(draw_params);
-				else if (s_mode==5)draw_sprite_s5_d6(draw_params);
-				else if (s_mode==6)draw_sprite_s6_d6(draw_params);
-				else if (s_mode==7)draw_sprite_s7_d6(draw_params);
-				break;
-
-				case 7:
-				if (s_mode==0     )draw_sprite_s0_d7(draw_params);
-				else if (s_mode==1)draw_sprite_s1_d7(draw_params);
-				else if (s_mode==2)draw_sprite_s2_d7(draw_params);
-				else if (s_mode==3)draw_sprite_s3_d7(draw_params);
-				else if (s_mode==4)draw_sprite_s4_d7(draw_params);
-				else if (s_mode==5)draw_sprite_s5_d7(draw_params);
-				else if (s_mode==6)draw_sprite_s6_d7(draw_params);
-				else if (s_mode==7)draw_sprite_s7_d7(draw_params);
-				break;
-
-				}
+				cave_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 			}
 		}
 		else
@@ -2639,104 +2653,13 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 			}
 			else
 			{
-				switch (d_mode)
-				{
-				case 0:
-				// draw
-				if (s_mode==0)     draw_sprite_opaque_s0_d0(draw_params);
-				else if (s_mode==1)draw_sprite_opaque_s1_d0(draw_params);
-				else if (s_mode==2)draw_sprite_opaque_s2_d0(draw_params);
-				else if (s_mode==3)draw_sprite_opaque_s3_d0(draw_params);
-				else if (s_mode==4)draw_sprite_opaque_s4_d0(draw_params);
-				else if (s_mode==5)draw_sprite_opaque_s5_d0(draw_params);
-				else if (s_mode==6)draw_sprite_opaque_s6_d0(draw_params);
-				else if (s_mode==7)draw_sprite_opaque_s7_d0(draw_params);
-				break;
-
-				case 1:
-				if (s_mode==0)     draw_sprite_opaque_s0_d1(draw_params);
-				else if (s_mode==1)draw_sprite_opaque_s1_d1(draw_params);
-				else if (s_mode==2)draw_sprite_opaque_s2_d1(draw_params);
-				else if (s_mode==3)draw_sprite_opaque_s3_d1(draw_params);
-				else if (s_mode==4)draw_sprite_opaque_s4_d1(draw_params);
-				else if (s_mode==5)draw_sprite_opaque_s5_d1(draw_params);
-				else if (s_mode==6)draw_sprite_opaque_s6_d1(draw_params);
-				else if (s_mode==7)draw_sprite_opaque_s7_d1(draw_params);
-				break;
-
-				case 2:
-				if (s_mode==0)     draw_sprite_opaque_s0_d2(draw_params);
-				else if (s_mode==1)draw_sprite_opaque_s1_d2(draw_params);
-				else if (s_mode==2)draw_sprite_opaque_s2_d2(draw_params);
-				else if (s_mode==3)draw_sprite_opaque_s3_d2(draw_params);
-				else if (s_mode==4)draw_sprite_opaque_s4_d2(draw_params);
-				else if (s_mode==5)draw_sprite_opaque_s5_d2(draw_params);
-				else if (s_mode==6)draw_sprite_opaque_s6_d2(draw_params);
-				else if (s_mode==7)draw_sprite_opaque_s7_d2(draw_params);
-				break;
-
-				case 3:
-				if (s_mode==0)     draw_sprite_opaque_s0_d3(draw_params);
-				else if (s_mode==1)draw_sprite_opaque_s1_d3(draw_params);
-				else if (s_mode==2)draw_sprite_opaque_s2_d3(draw_params);
-				else if (s_mode==3)draw_sprite_opaque_s3_d3(draw_params);
-				else if (s_mode==4)draw_sprite_opaque_s4_d3(draw_params);
-				else if (s_mode==5)draw_sprite_opaque_s5_d3(draw_params);
-				else if (s_mode==6)draw_sprite_opaque_s6_d3(draw_params);
-				else if (s_mode==7)draw_sprite_opaque_s7_d3(draw_params);
-				break;
-
-				case 4:
-				if (s_mode==0)     draw_sprite_opaque_s0_d4(draw_params);
-				else if (s_mode==1)draw_sprite_opaque_s1_d4(draw_params);
-				else if (s_mode==2)draw_sprite_opaque_s2_d4(draw_params);
-				else if (s_mode==3)draw_sprite_opaque_s3_d4(draw_params);
-				else if (s_mode==4)draw_sprite_opaque_s4_d4(draw_params);
-				else if (s_mode==5)draw_sprite_opaque_s5_d4(draw_params);
-				else if (s_mode==6)draw_sprite_opaque_s6_d4(draw_params);
-				else if (s_mode==7)draw_sprite_opaque_s7_d4(draw_params);
-				break;
-
-				case 5:
-				if (s_mode==0)     draw_sprite_opaque_s0_d5(draw_params);
-				else if (s_mode==1)draw_sprite_opaque_s1_d5(draw_params);
-				else if (s_mode==2)draw_sprite_opaque_s2_d5(draw_params);
-				else if (s_mode==3)draw_sprite_opaque_s3_d5(draw_params);
-				else if (s_mode==4)draw_sprite_opaque_s4_d5(draw_params);
-				else if (s_mode==5)draw_sprite_opaque_s5_d5(draw_params);
-				else if (s_mode==6)draw_sprite_opaque_s6_d5(draw_params);
-				else if (s_mode==7)draw_sprite_opaque_s7_d5(draw_params);
-				break;
-
-				case 6:
-				if (s_mode==0)     draw_sprite_opaque_s0_d6(draw_params);
-				else if (s_mode==1)draw_sprite_opaque_s1_d6(draw_params);
-				else if (s_mode==2)draw_sprite_opaque_s2_d6(draw_params);
-				else if (s_mode==3)draw_sprite_opaque_s3_d6(draw_params);
-				else if (s_mode==4)draw_sprite_opaque_s4_d6(draw_params);
-				else if (s_mode==5)draw_sprite_opaque_s5_d6(draw_params);
-				else if (s_mode==6)draw_sprite_opaque_s6_d6(draw_params);
-				else if (s_mode==7)draw_sprite_opaque_s7_d6(draw_params);
-				break;
-
-				case 7:
-				if (s_mode==0     )draw_sprite_opaque_s0_d7(draw_params);
-				else if (s_mode==1)draw_sprite_opaque_s1_d7(draw_params);
-				else if (s_mode==2)draw_sprite_opaque_s2_d7(draw_params);
-				else if (s_mode==3)draw_sprite_opaque_s3_d7(draw_params);
-				else if (s_mode==4)draw_sprite_opaque_s4_d7(draw_params);
-				else if (s_mode==5)draw_sprite_opaque_s5_d7(draw_params);
-				else if (s_mode==6)draw_sprite_opaque_s6_d7(draw_params);
-				else if (s_mode==7)draw_sprite_opaque_s7_d7(draw_params);
-				break;
-
-				}
+				cave_opaque_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 			}
 		}
 	} 
 	else // flipx
 	{
-	if (trans)
+		if (trans)
 		{
 			if (!blend) 
 			{
@@ -2744,98 +2667,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 			}
 			else
 			{
-				switch (d_mode)
-				{
-				case 0:
-				// draw
-				if (s_mode==0)     draw_sprite_flipx_s0_d0(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_s1_d0(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_s2_d0(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_s3_d0(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_s4_d0(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_s5_d0(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_s6_d0(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_s7_d0(draw_params);
-				break;
-
-				case 1:
-				if (s_mode==0)     draw_sprite_flipx_s0_d1(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_s1_d1(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_s2_d1(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_s3_d1(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_s4_d1(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_s5_d1(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_s6_d1(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_s7_d1(draw_params);
-				break;
-
-				case 2:
-				if (s_mode==0)     draw_sprite_flipx_s0_d2(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_s1_d2(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_s2_d2(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_s3_d2(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_s4_d2(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_s5_d2(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_s6_d2(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_s7_d2(draw_params);
-				break;
-
-				case 3:
-				if (s_mode==0)     draw_sprite_flipx_s0_d3(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_s1_d3(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_s2_d3(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_s3_d3(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_s4_d3(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_s5_d3(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_s6_d3(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_s7_d3(draw_params);
-				break;
-
-				case 4:
-				if (s_mode==0)     draw_sprite_flipx_s0_d4(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_s1_d4(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_s2_d4(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_s3_d4(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_s4_d4(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_s5_d4(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_s6_d4(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_s7_d4(draw_params);
-				break;
-
-				case 5:
-				if (s_mode==0)     draw_sprite_flipx_s0_d5(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_s1_d5(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_s2_d5(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_s3_d5(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_s4_d5(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_s5_d5(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_s6_d5(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_s7_d5(draw_params);
-				break;
-
-				case 6:
-				if (s_mode==0)     draw_sprite_flipx_s0_d6(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_s1_d6(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_s2_d6(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_s3_d6(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_s4_d6(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_s5_d6(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_s6_d6(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_s7_d6(draw_params);
-				break;
-
-				case 7:
-				if (s_mode==0     )draw_sprite_flipx_s0_d7(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_s1_d7(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_s2_d7(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_s3_d7(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_s4_d7(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_s5_d7(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_s6_d7(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_s7_d7(draw_params);
-				break;
-
-				}
+				cave_flipx_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 			}
 		}
 		else
@@ -2846,102 +2678,13 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 			}
 			else
 			{
-				switch (d_mode)
-				{
-				case 0:
-				// draw
-				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d0(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d0(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d0(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d0(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d0(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d0(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d0(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d0(draw_params);
-				break;
-
-				case 1:
-				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d1(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d1(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d1(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d1(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d1(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d1(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d1(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d1(draw_params);
-				break;
-
-				case 2:
-				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d2(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d2(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d2(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d2(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d2(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d2(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d2(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d2(draw_params);
-				break;
-
-				case 3:
-				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d3(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d3(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d3(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d3(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d3(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d3(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d3(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d3(draw_params);
-				break;
-
-				case 4:
-				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d4(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d4(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d4(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d4(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d4(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d4(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d4(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d4(draw_params);
-				break;
-
-				case 5:
-				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d5(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d5(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d5(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d5(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d5(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d5(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d5(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d5(draw_params);
-				break;
-
-				case 6:
-				if (s_mode==0)     draw_sprite_flipx_opaque_s0_d6(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d6(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d6(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d6(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d6(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d6(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d6(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d6(draw_params);
-				break;
-
-				case 7:
-				if (s_mode==0     )draw_sprite_flipx_opaque_s0_d7(draw_params);
-				else if (s_mode==1)draw_sprite_flipx_opaque_s1_d7(draw_params);
-				else if (s_mode==2)draw_sprite_flipx_opaque_s2_d7(draw_params);
-				else if (s_mode==3)draw_sprite_flipx_opaque_s3_d7(draw_params);
-				else if (s_mode==4)draw_sprite_flipx_opaque_s4_d7(draw_params);
-				else if (s_mode==5)draw_sprite_flipx_opaque_s5_d7(draw_params);
-				else if (s_mode==6)draw_sprite_flipx_opaque_s6_d7(draw_params);
-				else if (s_mode==7)draw_sprite_flipx_opaque_s7_d7(draw_params);
-				break;
-
-				}
+				cave_flipx_opaque_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 			}
 		}
 	}
 	
+
+
 }
 
 // Death Smiles has bad text with wrong clip sizes, must clip to screen size.
@@ -3603,13 +3346,27 @@ static MACHINE_RESET( cavesh3 )
 	flash_hard_reset(machine);
 	cavesh3_ram16 = (UINT16*)cavesh3_ram;
 
-	// cache table to avoid divides in blit code
+	// cache table to avoid divides in blit code, also pre-clamped
 	int x,y;
-	for (y=0;y<0x100;y++)
+	for (y=0;y<0x40;y++)
 	{
-		for (x=0;x<0x100;x++)
+		for (x=0;x<0x20;x++)
 		{
 			cavesh3_colrtable[x][y] = (x*y) / 0x1f;
+			if (cavesh3_colrtable[x][y]>0x1f) cavesh3_colrtable[x][y] = 0x1f;
+
+			cavesh3_colrtable_rev[x^0x1f][y] = (x*y) / 0x1f;
+			if (cavesh3_colrtable_rev[x^0x1f][y]>0x1f) cavesh3_colrtable_rev[x^0x1f][y] = 0x1f;
+		}
+	}
+
+	// preclamped add table
+	for (y=0;y<0x20;y++)
+	{
+		for (x=0;x<0x20;x++)
+		{
+			cavesh3_colrtable_add[x][y] = (x+y);
+			if (cavesh3_colrtable_add[x][y]>0x1f) cavesh3_colrtable_add[x][y] = 0x1f;
 		}
 	}
 }

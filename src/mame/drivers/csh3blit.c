@@ -2,10 +2,9 @@
 
 
 
-INLINE void FUNCNAME(bitmap_t *bitmap,
+const void FUNCNAME(bitmap_t *bitmap,
 					 const rectangle *clip,
-					 UINT32 *gfx, int gfx_size,
-					 int src_p,
+					 UINT32 *gfx,
 					 int src_x,
 					 int src_y,
 					 int dst_x_start,
@@ -13,8 +12,9 @@ INLINE void FUNCNAME(bitmap_t *bitmap,
 					 int dimx,
 					 int dimy,
 					 int flipy,
-					 clr_t *s_alpha_clr,
-					 clr_t *d_alpha_clr,
+					 const UINT8 s_alpha,
+					 const UINT8 d_alpha,
+					// int tint,
 					 clr_t *tint_clr )
 {
 
@@ -79,9 +79,12 @@ INLINE void FUNCNAME(bitmap_t *bitmap,
 			// convert source to clr
 			pen_to_clr(pen, &s_clr);
 			// source * intesity and clamp
-			clr_mul(&s_clr, tint_clr, &s_clr);
-			clamp_clr(&s_clr);
-
+			
+			//if (tint)
+			//{
+				clr_mul(&s_clr, tint_clr);
+				//clamp_clr(&s_clr); // table used by clr_mul is pre-clamped
+			//}
 
 			#ifdef BLENDED
 
@@ -89,80 +92,74 @@ INLINE void FUNCNAME(bitmap_t *bitmap,
 				pen_to_clr(*bmp, &d_clr);
                 
 				#if _SMODE == 0
-				clr0.r = s_alpha_clr->r;
-				clr0.g = s_alpha_clr->g;
-				clr0.b = s_alpha_clr->b;
+				clr_mul_fixed(&clr0, s_alpha, &s_clr); 
 				#elif _SMODE == 1
 				clr0.r = s_clr.r;
 				clr0.g = s_clr.g;
 				clr0.b = s_clr.b;
+				clr_mul(&clr0, &s_clr); 
 				#elif _SMODE == 2
 				clr0.r = d_clr.r;
 				clr0.g = d_clr.g;
 				clr0.b = d_clr.b;
+				clr_mul(&clr0, &s_clr); 
 				#elif _SMODE == 3
-				clr0.r = 0x1f;
-				clr0.g = 0x1f;
-				clr0.b = 0x1f;
+				clr_mul_fixed(&clr0, 0x1f, &s_clr); 
+				
 				#elif _SMODE == 4
-				clr0.r = s_alpha_clr->r^0x1f;
-				clr0.g = s_alpha_clr->g^0x1f;
-				clr0.b = s_alpha_clr->b^0x1f;
+				clr_mul_fixed_rev(&clr0, s_alpha, &s_clr); 
 				#elif _SMODE == 5
-				clr0.r = s_clr.r^0x1f;
-				clr0.g = s_clr.g^0x1f;
-				clr0.b = s_clr.b^0x1f;
+				clr0.r = s_clr.r;
+				clr0.g = s_clr.g;
+				clr0.b = s_clr.b;
+				clr_mul_rev(&clr0, &s_clr); 
 				#elif _SMODE == 6
-				clr0.r = d_clr.r^0x1f;
-				clr0.g = d_clr.g^0x1f;
-				clr0.b = d_clr.b^0x1f;
+				clr0.r = d_clr.r;
+				clr0.g = d_clr.g;
+				clr0.b = d_clr.b;
+				clr_mul_rev(&clr0, &s_clr); 
 				#elif _SMODE == 7
-				clr0.r = 0x1f;
-				clr0.g = 0x1f;
-				clr0.b = 0x1f;
+				clr_mul_fixed_rev(&clr0, 0x1f, &s_clr); 
 				#endif
 
-				clr_mul(&clr0, &s_clr, &clr0); 
+				
 				
 				#if _DMODE == 0
-				clr1.r = d_alpha_clr->r;
-				clr1.g = d_alpha_clr->g;
-				clr1.b = d_alpha_clr->b;
+				clr_mul_fixed(&clr1, d_alpha, &d_clr);
 				#elif _DMODE == 1
 				clr1.r = s_clr.r;
 				clr1.g = s_clr.g;
 				clr1.b = s_clr.b;
+				clr_mul(&clr1, &d_clr);
 				#elif _DMODE == 2
 				clr1.r = d_clr.r;
 				clr1.g = d_clr.g;
 				clr1.b = d_clr.b;
+				clr_mul(&clr1, &d_clr);
 				#elif _DMODE == 3
-				clr1.r = 0x1f;
-				clr1.g = 0x1f;
-				clr1.b = 0x1f;
+				clr_mul_fixed(&clr1, 0x1f, &d_clr);
+				
 				#elif _DMODE == 4
-				clr1.r = d_alpha_clr->r^0x1f;
-				clr1.g = d_alpha_clr->g^0x1f;
-				clr1.b = d_alpha_clr->b^0x1f;
+				clr_mul_fixed_rev(&clr1, d_alpha, &d_clr);
 				#elif _DMODE == 5
-				clr1.r = s_clr.r^0x1f;
-				clr1.g = s_clr.g^0x1f;
-				clr1.b = s_clr.b^0x1f;
+				clr1.r = s_clr.r;
+				clr1.g = s_clr.g;
+				clr1.b = s_clr.b;
+				clr_mul_rev(&clr1, &d_clr);
 				#elif _DMODE == 6
-				clr1.r = d_clr.r^0x1f;
-				clr1.g = d_clr.g^0x1f;
-				clr1.b = d_clr.b^0x1f;
+				clr1.r = d_clr.r;
+				clr1.g = d_clr.g;
+				clr1.b = d_clr.b;
+				clr_mul_rev(&clr1, &d_clr);
 				#elif _DMODE == 7
-				clr1.r = 0x1f;
-				clr1.g = 0x1f;
-				clr1.b = 0x1f;
+				clr_mul_fixed_rev(&clr1, 0x1f, &d_clr);
 				#endif
 
-				clr_mul(&clr1, &d_clr, &clr1);
+				
 				
 				// blend (add) into source
-				clr_add(&clr0, &clr1, &s_clr);
-				clamp_clr(&s_clr);
+				clr_add(&s_clr, &clr0, &clr1);
+				//clamp_clr(&s_clr); // our add is pre-clamped
 			#endif
 
 			// write result
