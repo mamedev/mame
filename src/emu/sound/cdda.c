@@ -311,10 +311,7 @@ void cdda_set_channel_volume(device_t *device, int channel, int volume)
 {
 	cdda_info *cdda = get_safe_token(device);
 
-	if(channel == 0)
-		cdda->stream->set_output_gain(0,volume / 100.0);
-	if(channel == 1)
-		cdda->stream->set_output_gain(1,volume / 100.0);
+	cdda->stream->set_output_gain(channel,volume / 100.0);
 }
 
 /**************************************************************************
