@@ -2518,27 +2518,19 @@ static READ32_HANDLER( namcos22_gun_r )
 
 static WRITE32_HANDLER( namcos22_cpuleds_w )
 {
-	if (offset == 0)
-	{
-		if (ACCESSING_BITS_0_15) data &= 0xff;
-		else data = (data>>16) & 0xff;
-		// 8 leds on cpu board, left to right:
-		// GYRGYRGY green/yellow/red, 0=on 1=off
-		// 76543210
-#if 0
-		char msg[0x10];
-		sprintf(msg,"________");
-		if (~data&0x80) msg[0]='G';
-		if (~data&0x40) msg[1]='Y';
-		if (~data&0x20) msg[2]='R';
-		if (~data&0x10) msg[3]='G';
-		if (~data&0x08) msg[4]='Y';
-		if (~data&0x04) msg[5]='R';
-		if (~data&0x02) msg[6]='G';
-		if (~data&0x01) msg[7]='Y';
-		popmessage("%s",msg);
-#endif
-	}
+	// 8 leds on cpu board, left to right:
+	// GYRGYRGY green/yellow/red, 0=on 1=off
+	if (ACCESSING_BITS_0_15) data &= 0xff;
+	else data = (data>>16) & 0xff;
+
+	output_set_lamp_value(0, data>>7 & 1);
+	output_set_lamp_value(1, data>>6 & 1);
+	output_set_lamp_value(2, data>>5 & 1);
+	output_set_lamp_value(3, data>>4 & 1);
+	output_set_lamp_value(4, data>>3 & 1);
+	output_set_lamp_value(5, data>>2 & 1);
+	output_set_lamp_value(6, data>>1 & 1);
+	output_set_lamp_value(7, data>>0 & 1);
 }
 
 static READ32_HANDLER( alpinesa_prot_r )
@@ -2579,7 +2571,8 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namcos22_keycus_r, namcos22_keycus_w)
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
 	AM_RANGE(0x420000, 0x42000f) AM_READ(namcos22_C139_SCI_r) AM_WRITEONLY /* C139 SCI registers */
-	AM_RANGE(0x430000, 0x43000f) AM_READWRITE(namcos22_gun_r, namcos22_cpuleds_w)
+	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r)
+	AM_RANGE(0x430000, 0x430003) AM_WRITE(namcos22_cpuleds_w)
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE(namcos22_portbit_r, namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
