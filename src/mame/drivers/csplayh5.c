@@ -693,16 +693,16 @@ void general_init(running_machine &machine, int patchaddress)
 
 }
 
-static DRIVER_INIT( jyunai )   { general_init(machine, 0x679c/2); }
+static DRIVER_INIT( junai )    { general_init(machine, 0x679c/2); }
 static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2); }
-static DRIVER_INIT( jyunai2 )  { general_init(machine, 0x6588/2); }
+static DRIVER_INIT( junai2 )   { general_init(machine, 0x6588/2); }
 static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2); }
 static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2); }
 static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2); }
-static DRIVER_INIT( cspureh7 ) { general_init(machine, 0x7a20/2); }
-static DRIVER_INIT( fudol )    { general_init(machine, 0x9166/2); }
+static DRIVER_INIT( csplayh7 ) { general_init(machine, 0x7a20/2); }
+static DRIVER_INIT( fuudol )   { general_init(machine, 0x9166/2); }
 
-ROM_START( jyunai )
+ROM_START( junai )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(5923bf2e) SHA1(8fc7b95a44eb792ce03c1bffb9ad56f82d34b470) )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(4ac649ee) SHA1(f5b5bccecb6eba5addcf6a57e54deff7f29f6381) )
@@ -742,7 +742,7 @@ ROM_START( csplayh5 )
 	DISK_IMAGE( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
 ROM_END
 
-ROM_START( jyunai2 )
+ROM_START( junai2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(b0ce71d6) SHA1(35cff8f8b18312808e2f6b96f02d952b0d1f04a1) )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(5a428e91) SHA1(dffce6f0a48cc4110970f124684dcaa267fe1b7f) )
@@ -830,7 +830,7 @@ ROM_START( thenanpa )
     ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(daffd0ac)SHA1(cbeff914163d425a9cb30fe8d62f91fca281b11f) )
 ROM_END
 
-ROM_START( cspureh7 )
+ROM_START( csplayh7 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(c5ce76a6) SHA1(f8878285d2318c1ec50ba98607eb3f15a7f69913) )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(162f8cff) SHA1(8aa185fd1daa943d0b21fdf6e692f7782bc6dac4) )
@@ -852,7 +852,7 @@ ROM_START( cspureh7 )
     ROM_LOAD( "mjdvd12.gal16v8b.ic8.bin", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563)SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
 ROM_END
 
-ROM_START( fudol )
+ROM_START( fuudol )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
     ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(0cab2a72) SHA1(32d098bdd693a11f3cea6bbed3515c4217f40e23) )
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(b1fa335e) SHA1(8a881c9c511fb63b00a3a7e433bae12aa9c2c262) )
@@ -875,31 +875,30 @@ ROM_START( fudol )
 ROM_END
 
 // 1998
-// 01 : Mahjong Gal-pri (World Gal-con Grandprix) : Nichibutsu/Just&Just
+// 01 : Mahjong Gal-pri - World Gal-con Grandprix : Nichibutsu/Just&Just
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
-/* 03 */ GAME( 1998, jyunai,    0,   csplayh5,  csplayh5,  jyunai,   ROT0, "Nichibutsu/eic",   "Jyunai - Manatsu no First Kiss (Japan)", GAME_NOT_WORKING )
-/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5,  csplayh5, ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", GAME_NOT_WORKING )
-/* 05 */ GAME( 1998, jyunai2,   0,   csplayh5,  csplayh5,  jyunai2,  ROT0, "Nichibutsu/eic",   "Jyunai 2 - White Love Story (Japan)", GAME_NOT_WORKING )
+/* 03 */ GAME( 1998, junai,     0,   csplayh5,  csplayh5,  junai,    		ROT0, "Nichibutsu/eic",   "Junai - Manatsu no First Kiss (Japan)", GAME_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5,  csplayh5, 		ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", GAME_NOT_WORKING )
+/* 05 */ GAME( 1998, junai2,    0,   csplayh5,  csplayh5,  junai2,   		ROT0, "Nichibutsu/eic",   "Junai 2 - White Love Story (Japan)", GAME_NOT_WORKING )
 // 06 : Mahjong Mogitate : Nichibutsu/Just&Just/NVS/Astro System/AV Japan
 
 
 // 1999
-/* 07 */ GAME( 1999, mjmania,   0,   csplayh5,  csplayh5,  mjmania,        ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan he Youkoso (Japan)", GAME_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmania,   0,   csplayh5,  csplayh5,  mjmania,        	ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", GAME_NOT_WORKING )
 // 08 : Renai Mahjong Idol Gakuen : Nichibutsu/eic
-/* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko, ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shityaimashita (Japan)", GAME_NOT_WORKING )
-// 10 : Mahjong Hanafuda Cospure Tengoko 6 - Jyunai hen : Nichibutsu/eic
-/* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa", GAME_NOT_WORKING )
-// 12 GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Simai ni Kiwotukete (Japan)", GAME_NOT_WORKING )
-/* 13 */ GAME( 1999, cspureh7,  0,   csplayh5,  csplayh5,  cspureh7,        ROT0, "Nichibutsu/eic", "Cospure Tengoku 7 - Super Co-gal Grandprix", GAME_NOT_WORKING )
+/* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko, 		ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", GAME_NOT_WORKING )
+// 10 : Mahjong Hanafuda Cosplay Tengoku 6 - Junai hen : Nichibutsu/eic
+/* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", GAME_NOT_WORKING )
+// 12 GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", GAME_NOT_WORKING )
+/* 13 */ GAME( 1999, csplayh7,  0,   csplayh5,  csplayh5,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Grandprix (Japan)", GAME_NOT_WORKING )
 // 14 : Ai-mode - Pet Shiiku : Nichibutsu/eic
 
 // 2000
-/* 15 */ GAME( 2000, fudol,     0,   csplayh5,  csplayh5,  fudol,        ROT0, "Nichibutsu/eic", "Fudol (Japan)", GAME_NOT_WORKING )
+/* 15 */ GAME( 2000, fuudol,    0,   csplayh5,  csplayh5,  fuudol,       	ROT0, "Nichibutsu/eic", "Fuudol (Japan)", GAME_NOT_WORKING )
 // 16 : Nurete Mitaino... - Net Idol Hen : Nichibutsu/Love Factory
-// 17 : Tuugakuro no Yuuwaku : Nichibutsu/Love Factory/Just&Just
-// 18 : Toraretyattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
+// 17 : Tsuugakuro no Yuuwaku : Nichibutsu/Love Factory/Just&Just
+// 18 : Torarechattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
 
 // 2001
 // 19 : Konnano Hajimete! : Nichibutsu/Love Factory
-// 20 : Uwasa no Deai-kei Sight : Nichibutsu/Love Factory/eic
-
+// 20 : Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic
