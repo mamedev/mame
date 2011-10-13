@@ -470,6 +470,12 @@ void emu_options::set_system_name(const char *name)
 		remove_device_options();
 		// then add the options
 		add_device_options(true);
+
+		bool isfirst = true;
+		while (add_slot_options(isfirst)) {
+			add_device_options(false);
+			isfirst = false;
+		}
 	}
 }
 
