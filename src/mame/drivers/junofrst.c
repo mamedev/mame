@@ -95,7 +95,7 @@ public:
 	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tutankhm_state(mconfig, type, tag) { }
 
-	UINT8     m_blitterdata[4];
+	UINT8    m_blitterdata[4];
 	int      m_i8039_status;
 	int      m_last_irq;
 
@@ -267,7 +267,14 @@ static WRITE8_HANDLER( junofrst_coin_counter_w )
 	coin_counter_w(space->machine(), offset, data);
 }
 
+static WRITE8_HANDLER( junofrst_irq_enable_w )
+{
+	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 
+	state->m_irq_enable = data & 1;
+	if (!state->m_irq_enable)
+		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+}
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(junofrst_state, m_videoram)
@@ -278,7 +285,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8024, 0x8024) AM_READ_PORT("P1")
 	AM_RANGE(0x8028, 0x8028) AM_READ_PORT("P2")
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8030, 0x8030) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x8030, 0x8030) AM_WRITE(junofrst_irq_enable_w)
 	AM_RANGE(0x8031, 0x8032) AM_WRITE(junofrst_coin_counter_w)
 	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE_MEMBER(junofrst_state, m_scroll)  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
@@ -382,6 +389,8 @@ static MACHINE_START( junofrst )
 
 	state->save_item(NAME(state->m_i8039_status));
 	state->save_item(NAME(state->m_last_irq));
+	state->save_item(NAME(state->m_irq_toggle));
+	state->save_item(NAME(state->m_irq_enable));
 	state->save_item(NAME(state->m_flip_x));
 	state->save_item(NAME(state->m_flip_y));
 	state->save_item(NAME(state->m_blitterdata));
@@ -401,12 +410,22 @@ static MACHINE_RESET( junofrst )
 	state->m_blitterdata[3] = 0;
 }
 
+static INTERRUPT_GEN( junofrst_30hz_irq )
+{
+	junofrst_state *state = device->machine().driver_data<junofrst_state>();
+
+	/* flip flops cause the interrupt to be signalled every other frame */
+	state->m_irq_toggle ^= 1;
+	if (state->m_irq_toggle && state->m_irq_enable)
+		device_set_input_line(device, 0, ASSERT_LINE);
+}
+
 static MACHINE_CONFIG_START( junofrst, junofrst_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", junofrst_30hz_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)	/* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -420,7 +439,7 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
