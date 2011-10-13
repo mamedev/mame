@@ -2661,6 +2661,7 @@ src/mame/drivers/segae.c svneol=native#text/plain
 src/mame/drivers/segag80r.c svneol=native#text/plain
 src/mame/drivers/segag80v.c svneol=native#text/plain
 src/mame/drivers/segahang.c svneol=native#text/plain
+src/mame/drivers/segajw.c svneol=native#text/plain
 src/mame/drivers/segald.c svneol=native#text/plain
 src/mame/drivers/segaorun.c svneol=native#text/plain
 src/mame/drivers/segas16a.c svneol=native#text/plain
