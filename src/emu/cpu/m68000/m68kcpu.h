@@ -25,7 +25,7 @@
 #ifndef __M68KCPU_H__
 #define __M68KCPU_H__
 
-typedef struct _m68ki_cpu_core m68ki_cpu_core;
+typedef class _m68ki_cpu_core m68ki_cpu_core;
 
 
 #include "m68000.h"
