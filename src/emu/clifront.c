@@ -469,7 +469,7 @@ void cli_frontend::listcrc(const char *gamename)
 					// if we have a CRC, display it
 					UINT32 crc;
 					if (hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						mame_printf_info("%08x %-16s %s\n", crc, ROM_GETNAME(rom), isdriver ? drivlist.driver().description : source->name());
+						mame_printf_info("%08x %-16s %-16s %s\n", crc, ROM_GETNAME(rom), source->shortname(), isdriver ? drivlist.driver().description : source->name());
 				}
 		}
 }
