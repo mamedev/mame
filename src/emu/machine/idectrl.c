@@ -155,6 +155,7 @@ struct _ide_state
 
 	chd_file       *handle;
 	hard_disk_file *disk;
+	bool			is_image_device;
 	emu_timer *		last_status_timer;
 	emu_timer *		reset_timer;
 
@@ -1859,6 +1860,7 @@ static DEVICE_START( ide_controller )
 	config = (const ide_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	ide->handle = get_disk_handle(device->machine(), (config->master != NULL) ? config->master : device->tag());
 	ide->disk = hard_disk_open(ide->handle);
+	ide->is_image_device = false;
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
 
 	/* find the bus master space */
@@ -1955,10 +1957,11 @@ static DEVICE_START( ide_controller )
 static DEVICE_STOP( ide_controller )
 {
 	ide_state *ide = get_safe_token(device);
-
-	/* close the hard disk */
-	if (ide->disk != NULL)
-		hard_disk_close(ide->disk);
+	if (!ide->is_image_device) {
+		/* close the hard disk */
+		if (ide->disk != NULL)
+			hard_disk_close(ide->disk);
+	}
 }
 
 
@@ -1982,6 +1985,7 @@ static DEVICE_RESET( ide_controller )
 			if (ide->handle)
 			{
 				ide->disk = device->machine().device<harddisk_image_device>(hardtag.cstr())->get_hard_disk_file();	// should be config->master
+				ide->is_image_device = true;
 
 				if (ide->disk != NULL)
 				{
