@@ -796,8 +796,6 @@ static CPU_EXECUTE( m68k )
 
 	/* See if interrupts came in */
 	m68ki_check_interrupts(m68k);
-	if (m68k->remaining_cycles <= 0)
-		return;
 
 	/* Make sure we're not stopped */
 	if(!m68k->stopped)
@@ -806,7 +804,7 @@ static CPU_EXECUTE( m68k )
 		m68ki_set_address_error_trap(m68k); /* auto-disable (see m68kcpu.h) */
 
 		/* Main loop.  Keep going until we run out of clock cycles */
-		do
+		while (m68k->remaining_cycles > 0)
 		{
 			/* Set tracing accodring to T1. (T0 is done inside instruction) */
 			m68ki_trace_t1(m68k); /* auto-disable (see m68kcpu.h) */
@@ -823,14 +821,15 @@ static CPU_EXECUTE( m68k )
 
 			if (!m68k->pmmu_enabled)
 			{
+				m68k->run_mode = RUN_MODE_NORMAL;
 				/* Read an instruction and call its handler */
 				m68k->ir = m68ki_read_imm_16(m68k);
-				m68k->run_mode = RUN_MODE_NORMAL;
 				m68k->jump_table[m68k->ir](m68k);
 				m68k->remaining_cycles -= m68k->cyc_instruction[m68k->ir];
 			}
 			else
 			{
+				m68k->run_mode = RUN_MODE_NORMAL;
 				// save CPU address registers values at start of instruction
 				int i;
 				UINT32 tmp_dar[16];
@@ -844,7 +843,6 @@ static CPU_EXECUTE( m68k )
 
 				/* Read an instruction and call its handler */
 				m68k->ir = m68ki_read_imm_16(m68k);
-				m68k->run_mode = RUN_MODE_NORMAL;
 
 				if (!m68k->mmu_tmp_buserror_occurred)
 				{
@@ -895,10 +893,9 @@ static CPU_EXECUTE( m68k )
 				}
 			}
 
-
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(m68k); /* auto-disable (see m68kcpu.h) */
-		} while (m68k->remaining_cycles > 0);
+		}
 
 		/* set previous PC to current PC for the next entry into the loop */
 		REG_PPC(m68k) = REG_PC(m68k);
