@@ -823,15 +823,14 @@ static CPU_EXECUTE( m68k )
 
 			if (!m68k->pmmu_enabled)
 			{
-				m68k->run_mode = RUN_MODE_NORMAL;
 				/* Read an instruction and call its handler */
 				m68k->ir = m68ki_read_imm_16(m68k);
+				m68k->run_mode = RUN_MODE_NORMAL;
 				m68k->jump_table[m68k->ir](m68k);
 				m68k->remaining_cycles -= m68k->cyc_instruction[m68k->ir];
 			}
 			else
 			{
-				m68k->run_mode = RUN_MODE_NORMAL;
 				// save CPU address registers values at start of instruction
 				int i;
 				UINT32 tmp_dar[16];
@@ -845,6 +844,7 @@ static CPU_EXECUTE( m68k )
 
 				/* Read an instruction and call its handler */
 				m68k->ir = m68ki_read_imm_16(m68k);
+				m68k->run_mode = RUN_MODE_NORMAL;
 
 				if (!m68k->mmu_tmp_buserror_occurred)
 				{
@@ -894,6 +894,7 @@ static CPU_EXECUTE( m68k )
 					// m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_BUS_ERROR] - m68k->cyc_instruction[m68k->ir];
 				}
 			}
+
 
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(m68k); /* auto-disable (see m68kcpu.h) */
