@@ -1763,7 +1763,7 @@ READ64_MEMBER(cobra_state::gfx_unk1_r)
 	{
 		// mbuslib_init fails if this is not 0x7f
 
-		r |= U64(0x7f) << 40;
+		r |= (UINT64) 0x7f << 40;
 	}
 	if (ACCESSING_BITS_24_31)
 	{
