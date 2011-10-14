@@ -444,11 +444,11 @@ ROM_START( flyball )
 	ROM_REGION( 0x3000, "maincpu", 0 )	/* program */
 	ROM_LOAD( "6129-02.d5", 0x2000, 0x0200, CRC(105ffe40) SHA1(20225571ccf76df5d96a42168d9223cccdff90a8) )
 	ROM_LOAD( "6130-02.f5", 0x2200, 0x0200, CRC(188210e1) SHA1(6d837dd9ea44d16f0d54ea9e14260de5f7c05b6b) )
-	ROM_LOAD( "6131-01.h5", 0x2400, 0x0200, CRC(a9c7e858) SHA1(aee4a359d6a5729dc1be5b8ce8fbe54d032d12b0) )
-	ROM_LOAD( "6132-01.j5", 0x2600, 0x0200, CRC(31fefd8a) SHA1(97e3ef278ce2175cd33c0f3147bdf7974752c836) )
-	ROM_LOAD( "6133-01.k5", 0x2800, 0x0200, CRC(6fdb09b1) SHA1(04ad412b437bb24739b3e31fa5a413e63d5897f8) )
-	ROM_LOAD( "6134-01.m5", 0x2A00, 0x0200, CRC(7b526c73) SHA1(e47c8f33b7edc143ab1713556c59b93571933daa) )
-	ROM_LOAD( "6135-01.n5", 0x2C00, 0x0200, CRC(b352cb51) SHA1(39b9062fb51d0a78a47dcd470ceae47fcdbd7891) )
+	ROM_LOAD( "6131-01.h5", 0x2400, 0x0200, CRC(a9c7e858) SHA1(aee4a359d6a5729dc1be5b8ce8fbe54d032d12b0) ) /* Roms found with and without the "-01" extension */
+	ROM_LOAD( "6132-01.j5", 0x2600, 0x0200, CRC(31fefd8a) SHA1(97e3ef278ce2175cd33c0f3147bdf7974752c836) ) /* Roms found with and without the "-01" extension */
+	ROM_LOAD( "6133-01.k5", 0x2800, 0x0200, CRC(6fdb09b1) SHA1(04ad412b437bb24739b3e31fa5a413e63d5897f8) ) /* Roms found with and without the "-01" extension */
+	ROM_LOAD( "6134-01.m5", 0x2A00, 0x0200, CRC(7b526c73) SHA1(e47c8f33b7edc143ab1713556c59b93571933daa) ) /* Roms found with and without the "-01" extension */
+	ROM_LOAD( "6135-01.n5", 0x2C00, 0x0200, CRC(b352cb51) SHA1(39b9062fb51d0a78a47dcd470ceae47fcdbd7891) ) /* Roms found with and without the "-01" extension */
 	ROM_LOAD( "6136-02.r5", 0x2E00, 0x0200, CRC(ae06a0f5) SHA1(6034176b255eeaa2980e8fef1b17ef6f0a743941) )
 
 	ROM_REGION( 0x0C00, "gfx1", 0 )	/* tiles */
