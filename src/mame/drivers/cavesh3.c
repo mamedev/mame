@@ -2,13 +2,12 @@
 
 /*
 
+
  To enter service mode in mode cases hold down 0 (Service 2) for a few seconds
   (I believe it's the test button on the PCB)
  Some games also use the test dipswitch as an alternative method.
 
 ToDo:
-
-NAND/Flash Writing and Saving! (DeathSmiles uses it for Unlock data)
 
 Improve Blending precision?
  - I'm not sure what precision the original HW mixes with, source data is 555 RGB with 1 bit transparency (16-bits)
@@ -22,7 +21,7 @@ Touchscreen
  - Used for mmmbnk, needs SH3 serial support.
 
 Remaining Video issues
- - mmpork startup screen flicker
+ - mmpork startup screen flicker (maybe it's just like this while they load the bg gfx?)
  - is the use of the 'scroll' registers 100% correct?
 
 Speedups
@@ -40,7 +39,7 @@ Speedups
 /*
 
 
-PCB CV1000-B
+PCB CV1000-B / CV1000-D
 +--------------------------------------------+
 |                                            |
 |                                            |
@@ -49,11 +48,11 @@ PCB CV1000-B
 |                                            |
 +-+        +-----+ +-----+       X3          |
   |        | U24 | | U23 |                   |
-+-+        +-----+ +-----+    +-------+      |
-|                             |  YMZ  |      |
-|            U25*    U26*     | 770C-F|      |
-|                             |       |      |
-|J  D5                        +-------+      |
++-+        +-----+ +-----+    +------+       |
+|                             |Yamaha|       |
+|            U25*    U26*     |YMZ770|       |
+|                             |      |       |
+|J  D5                        +------+       |
 |A  D2                                       |
 |M  D3                    +-----+ +-----+    |
 |M  D4         P2*        | U7  | | U6  |    |
@@ -66,8 +65,8 @@ PCB CV1000-B
 |e     X1      S1          |       |  |U1|   |
 |c    S3 +---------+       +-------+  |  |   |
 |t       |         |                  +--+   |
-|e       | 6417709 |                         |
-|r       |         |   DSW2                  |
+|e       | Hitachi |                         |
+|r       |         |     S2                  |
 |        |   SH3   |   +-----------------+   |
 |        |         |   |       P3        |   |
 |        +---------+   +-----------------+   |
@@ -83,50 +82,58 @@ PCB CV1000-B
 
 * Denotes not populated
 
-  CPU: Hitachi SH-3 clocked at 102.4MHz (12.800MHz * 8)
-Sound: Yamaha YMZ770C-F @ 16.384MHz
-Other: Altera Cyclone EP1C12 FPGA, Altera EPM7032 (MAX 7000 Series) @ U13
+  CPU: Hitachi 6417709S SH3 clocked at 102.4MHz (12.800MHz * 8)
+Sound: Yamaha YMZ770C-F clocked at 16.384MHz
+Other: Altera Cyclone EP1C12 FPGA
+       Altera EPM7032 (MAX 7000 Series, Stamped "CA011") at U13
 
 OSC:
- X1 12.800MHz
- X2 ??
- X3 16.384MHz
+ X1 12.800MHz (SH3 clock derived from this)
+ X2 32.768kHz (Used by the RTC)
+ X3 16.384MHz (Yamaha YMZ770C-F clock)
 
 Memory:
  U6 (SDRAM)  MT46V16M16 – 4 MBit x 16 x 4 banks, RAM (256 MBit)
  U7 (SDRAM)  MT46V16M16 – 4 MBit x 16 x 4 banks, RAM (256 MBit)
- U1 (SDRAM)  MT48LC2M32 – 512K x 32 x 4 banks, (64 MBit)
+ U1 (SDRAM)  MT48LC2M32 – 512K x 32 x 4 banks, (64 MBit) for CV1000-B
+ U1 (SDRAM)  IS42S32400 - 1024K x 32 x 4 banks, (128 MBit) for CV1000-D
 
 Roms:
-      U4 (FLASH)  29LV160BB 16M-BIT CMOS 3.0, Boot device, FPGA bit file, main program code.
+      U4 (FLASH)  29LV160BB 16M-Bit CMOS 3.0V, Boot device, FPGA bit file, main program code for CV1000-B
+      U4 (FLASH)  S29JL032H 32M-Bit CMOS 3.0V, Boot device, FPGA bit file, main program code for CV1000-D
       U2 (FLASH)  K9F1G08U0M 128M x 8 Bit / 64M x 16 Bit NAND. Graphics data.
- U23-U24 (FLASH)  MBM 29DL321, 32 MBit CMOS 3.0V. Sound data.
+ U23-U24 (FLASH)  MBM 29DL321, 32M-Bit CMOS 3.0V. Sound data.
  U25-U26 (FLASH)  MBM 29DL321, not populated
 
 Battery:
- C126 CR2450, Powers the RTC (Real Time Clock) U10. Look at the garden clock in Ibara.
+ C126 CR2450, Powers the RTC (Real Time Clock) U10. Look at the garden clock in Ibara. NOT present on CV1000-D
 
 Dipswitches & Push Buttons:
- S1 (DIL SWITCH)  Half Pitch DIL Switch x 1, function unknown
+ S1 (DIL SWITCH) Half Pitch DIL Switch x 1, function unknown
  S2 (DIL SWITCH) Half Pitch DIL Switch x 4, SW1=Setup, other switches unknown
- S3 (MICRO PUSH BUTTON)  Test switch, same as on the JAMMA connector
+ S3 (MICRO PUSH BUTTON) Test switch, same as on the JAMMA connector
 
 Connectors:
- P2 (IDC CONNECTOR 20 PIN)  function unknown, P2 is not always mounted
- P4 (IDC CONNECTOR 14 PIN)  JTAG connector
- P8 (IDC CONNECTOR 10 PIN)  Advanced User Debugger
- P3 (CONNECTOR)  Most likely an expansion port, P3 is not always mounted
- P5 (CONNECTOR)  Most likely a serial connector. Only mounted on early Mushihimesama PCB's
- P7 (CONNECTOR)  Network port pinout. Never seen mounted on any PCB.
+ P2 (IDC CONNECTOR 20 PIN) function unknown, P2 is not always mounted
+ P4 (IDC CONNECTOR 14 PIN) JTAG connector
+ P8 (IDC CONNECTOR 10 PIN) Advanced User Debugger
+ P3 (CONNECTOR) Most likely an expansion port, P3 is not always mounted
+ P5 (CONNECTOR) Most likely a serial connector. Only mounted on early Mushihimesama PCB's
+ P7 (CONNECTOR) Network port pinout. Never seen mounted on any PCB.
 
 Misc:
-
    U27 (SUPERVISOR) MAX 690S 3.0V Microprocessor Supervisory Circuit.
    U10 (RTC & EEPROM) RTC 9701, Serial RTC Module with EEPROM 4 kbit (256x16 bit), controlled by Altera EPM7032 U13.
    U12 (RS-232 TRANCEIVER) MAX 3244E RS-232 Tranceiver, only mounted when P5 is mounted.
  D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.  
 
+Note: * The Altera EPM7032 has been seen stamped "CA017" for at least one DeathSmiles, there are other revisions.
+      * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
+      * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
+        The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
+
 Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
+
 
 */
 
@@ -136,6 +143,7 @@ public:
 	cavesh3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	UINT8* flashregion;
 	
 };
 
@@ -204,6 +212,51 @@ INLINE UINT32 clr_to_pen(const clr_t *clr)
 }
 
 // add clrs
+
+
+INLINE void clr_add_with_clr_mul_fixed(clr_t *clr, const clr_t *clr0, const UINT8 mulfixed_val, const clr_t *mulfixed_clr0)
+{
+	clr->r = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(mulfixed_clr0->r)][mulfixed_val]];
+	clr->g = cavesh3_colrtable_add[clr0->g][cavesh3_colrtable[(mulfixed_clr0->g)][mulfixed_val]];
+	clr->b = cavesh3_colrtable_add[clr0->b][cavesh3_colrtable[(mulfixed_clr0->b)][mulfixed_val]];
+}
+
+INLINE void clr_add_with_clr_mul_3param(clr_t *clr, const clr_t *clr0, const clr_t *clr1, const clr_t *clr2)
+{
+	clr->r = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr2->r)][(clr1->r)]];
+	clr->g = cavesh3_colrtable_add[clr0->g][cavesh3_colrtable[(clr2->g)][(clr1->g)]];
+	clr->b = cavesh3_colrtable_add[clr0->b][cavesh3_colrtable[(clr2->b)][(clr1->b)]];
+}
+
+INLINE void clr_add_with_clr_square(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
+{
+	clr->r = clr->r =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->r)][(clr1->r)]];
+	clr->g = clr->g =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->g)][(clr1->g)]];
+	clr->b = clr->b =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->b)][(clr1->b)]];
+}
+
+INLINE void clr_add_with_clr_mul_fixed_rev(clr_t *clr, const clr_t *clr0, const UINT8 val, const clr_t *clr1)
+{
+	clr->r =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable_rev[val][(clr1->r)]];
+	clr->g =  cavesh3_colrtable_add[clr0->g][cavesh3_colrtable_rev[val][(clr1->g)]];
+	clr->b =  cavesh3_colrtable_add[clr0->b][cavesh3_colrtable_rev[val][(clr1->b)]];
+}
+
+INLINE void clr_add_with_clr_mul_rev_3param(clr_t *clr, const clr_t *clr0, const clr_t *clr1, const clr_t *clr2)
+{
+	clr->r =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable_rev[(clr2->r)][(clr1->r)]];
+	clr->g =  cavesh3_colrtable_add[clr0->g][cavesh3_colrtable_rev[(clr2->g)][(clr1->g)]];
+	clr->b =  cavesh3_colrtable_add[clr0->b][cavesh3_colrtable_rev[(clr2->b)][(clr1->b)]];
+}
+
+INLINE void clr_add_with_clr_mul_rev_square(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
+{
+	clr->r =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable_rev[(clr1->r)][(clr1->r)]];
+	clr->g =  cavesh3_colrtable_add[clr0->g][cavesh3_colrtable_rev[(clr1->g)][(clr1->g)]];
+	clr->b =  cavesh3_colrtable_add[clr0->b][cavesh3_colrtable_rev[(clr1->b)][(clr1->b)]];
+}
+
+
 INLINE void clr_add(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
 {
 /*
@@ -212,9 +265,9 @@ INLINE void clr_add(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
 	clr->b = clr0->b + clr1->b;
 */
 	// use pre-clamped lookup table
-	clr->r = cavesh3_colrtable_add[clr0->r][clr1->r];
-	clr->g = cavesh3_colrtable_add[clr0->g][clr1->g];
-	clr->b = cavesh3_colrtable_add[clr0->b][clr1->b];
+	clr->r =  cavesh3_colrtable_add[clr0->r][clr1->r];
+	clr->g =  cavesh3_colrtable_add[clr0->g][clr1->g];
+	clr->b =  cavesh3_colrtable_add[clr0->b][clr1->b];
 	
 }
 
@@ -226,6 +279,20 @@ INLINE void clr_mul(clr_t *clr0, const clr_t *clr1)
 	clr0->b = cavesh3_colrtable[(clr0->b)][(clr1->b)];
 }
 
+INLINE void clr_square(clr_t *clr0, const clr_t *clr1)
+{
+	clr0->r = cavesh3_colrtable[(clr1->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable[(clr1->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable[(clr1->b)][(clr1->b)];
+}
+
+INLINE void clr_mul_3param(clr_t *clr0, const clr_t *clr1, const clr_t *clr2)
+{
+	clr0->r = cavesh3_colrtable[(clr2->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable[(clr2->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable[(clr2->b)][(clr1->b)];
+}
+
 INLINE void clr_mul_rev(clr_t *clr0, const clr_t *clr1)
 {
 	clr0->r = cavesh3_colrtable_rev[(clr0->r)][(clr1->r)];
@@ -233,6 +300,20 @@ INLINE void clr_mul_rev(clr_t *clr0, const clr_t *clr1)
 	clr0->b = cavesh3_colrtable_rev[(clr0->b)][(clr1->b)];
 }
 
+INLINE void clr_mul_rev_square(clr_t *clr0, const clr_t *clr1)
+{
+	clr0->r = cavesh3_colrtable_rev[(clr1->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable_rev[(clr1->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable_rev[(clr1->b)][(clr1->b)];
+}
+
+
+INLINE void clr_mul_rev_3param(clr_t *clr0, const clr_t *clr1, const clr_t *clr2)
+{
+	clr0->r = cavesh3_colrtable_rev[(clr2->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable_rev[(clr2->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable_rev[(clr2->b)][(clr1->b)];
+}
 
 INLINE void clr_mul_fixed(clr_t *clr, const UINT8 val, const clr_t *clr0)
 {
@@ -274,12 +355,12 @@ static UINT32 cavesh_gfx_scroll_0_x, cavesh_gfx_scroll_0_y;
 static UINT32 cavesh_gfx_scroll_1_x, cavesh_gfx_scroll_1_y;
 
 static int cavesh_gfx_size;
-static bitmap_t *cavesh_bitmaps[1];
+static bitmap_t *cavesh_bitmaps;
 
 static VIDEO_START( cavesh3 )
 {
 	cavesh_gfx_size	= 0x2000 * 0x1000;
-	cavesh_bitmaps[0]	=	auto_bitmap_alloc(machine, 0x2000, 0x1000, BITMAP_FORMAT_RGB32);
+	cavesh_bitmaps	=	auto_bitmap_alloc(machine, 0x2000, 0x1000, BITMAP_FORMAT_RGB32);
 }
 
 
@@ -2466,6 +2547,34 @@ static VIDEO_START( cavesh3 )
 #undef TRANSPARENT
 #undef FLIPX
 
+// really simple cases
+
+#define REALLY_SIMPLE
+
+#define TRANSPARENT 1
+#define FUNCNAME draw_sprite_simple
+#include "csh3blit.c"
+#undef FUNCNAME
+
+#define FLIPX
+#define FUNCNAME draw_sprite_flipx_simple
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef FLIPX
+#undef TRANSPARENT
+
+#define TRANSPARENT 0
+#define FUNCNAME draw_sprite_opaque_simple
+#include "csh3blit.c"
+#undef FUNCNAME
+
+#define FLIPX
+#define FUNCNAME draw_sprite_flipx_opaque_simple
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef FLIPX
+#undef TRANSPARENT
+#undef REALLY_SIMPLE
 
 INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
 {
@@ -2504,14 +2613,15 @@ INLINE void cavesh_gfx_upload(address_space &space, offs_t *addr)
 
 	for (y = 0; y < dimy; y++)
 	{
-		dst = BITMAP_ADDR32(cavesh_bitmaps[0], dst_y_start + y, 0);
+		dst = BITMAP_ADDR32(cavesh_bitmaps, dst_y_start + y, 0);
+		dst += dst_x_start;
 
 		for (x = 0; x < dimx; x++)
 		{
 			UINT16 pendat = READ_NEXT_WORD(space, addr);
 			// real hw would upload the gfxword directly, but our VRAM is 32-bit, so convert it.
 			//dst[dst_x_start + x] = pendat;
-			dst[dst_x_start + x] = ((pendat&0x8000)<<14) | ((pendat&0x7c00)<<9) | ((pendat&0x03e0)<<6) | ((pendat&0x001f)<<3);  // --t- ---- rrrr r--- gggg g--- bbbb b---  format
+			*dst++ = ((pendat&0x8000)<<14) | ((pendat&0x7c00)<<9) | ((pendat&0x03e0)<<6) | ((pendat&0x001f)<<3);  // --t- ---- rrrr r--- gggg g--- bbbb b---  format
 			//dst[dst_x_start + x] = ((pendat&0x8000)<<14) | ((pendat&0x7c00)<<6) | ((pendat&0x03e0)<<3) | ((pendat&0x001f)<<0);  // --t- ---- ---r rrrr ---g gggg ---b bbbb  format
 
 
@@ -2519,7 +2629,7 @@ INLINE void cavesh_gfx_upload(address_space &space, offs_t *addr)
 	}
 }
 
-#define draw_params cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR32(cavesh_bitmaps[0], 0,0),src_x,src_y, x,y, dimx,dimy, flipy, s_alpha, d_alpha, &tint_clr
+#define draw_params cavesh_bitmaps, &cavesh_bitmaps->cliprect, BITMAP_ADDR32(cavesh_bitmaps, 0,0),src_x,src_y, x,y, dimx,dimy, flipy, s_alpha, d_alpha, &tint_clr
 
 typedef const void (*caveblitfunction)(bitmap_t *,
 					 const rectangle *,
@@ -2594,7 +2704,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	int	x,y, dimx,dimy, flipx,flipy, src_p;
 	int trans,blend, s_mode, d_mode;
 	clr_t tint_clr;
-	//int tinted = 0;
+	int tinted = 0;
 
 	UINT16 attr		=	READ_NEXT_WORD(space, addr);
 	UINT16 alpha	=	READ_NEXT_WORD(space, addr);
@@ -2645,7 +2755,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	tint_to_clr(tint_r & 0x00ff, (tint_gb >>  8) & 0xff, tint_gb & 0xff, &tint_clr);
 
 	/* interestingly this gets set to 0x20 for 'normal' not 0x1f */
-	/*
+	
 	if (tint_clr.r!=0x20)
 		tinted = 1;
 
@@ -2654,11 +2764,41 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 
 	if (tint_clr.b!=0x20)
 		tinted = 1;
-	*/
+	
 
 	// surprisingly frequent, need to verify if it produces a worthwhile speedup tho.
 	if ((s_mode==0 && s_alpha==0x1f) && (d_mode==4 && d_alpha==0x1f))
 		blend = 0;
+
+	if (blend==0 && tinted==0)
+	{
+		if (!flipx)
+		{
+			if (trans)
+			{
+				draw_sprite_simple(draw_params);
+			}
+			else
+			{
+				draw_sprite_opaque_simple(draw_params);
+			}
+		}
+		else
+		{
+			if (trans)
+			{
+				draw_sprite_flipx_simple(draw_params);
+			}
+			else
+			{
+				draw_sprite_flipx_opaque_simple(draw_params);
+			}
+
+		}
+
+		return;
+	}
+	
 
 
 	//printf("smode %d dmode %d\n", s_mode, d_mode);
@@ -2727,10 +2867,10 @@ static void cavesh_gfx_exec(address_space &space)
 
 //  logerror("GFX EXEC: %08X\n", addr);
 
-	cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
-	cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
-	cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 320-1;
-	cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 240-1;
+	cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x;
+	cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y;
+	cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+	cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
 
 	while (1)
 	{
@@ -2748,17 +2888,17 @@ static void cavesh_gfx_exec(address_space &space)
 
 				if (layer)
 				{
-					cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
-					cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
-					cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 320-1;
-					cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 240-1;
+					cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x;
+					cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y;
+					cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+					cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
 				}
 				else
 				{
-					cavesh_bitmaps[0]->cliprect.min_x = 0;
-					cavesh_bitmaps[0]->cliprect.min_y = 0;
-					cavesh_bitmaps[0]->cliprect.max_x = 0x2000-1;
-					cavesh_bitmaps[0]->cliprect.max_y = 0x1000-1;
+					cavesh_bitmaps->cliprect.min_x = 0;
+					cavesh_bitmaps->cliprect.min_y = 0;
+					cavesh_bitmaps->cliprect.max_x = 0x2000-1;
+					cavesh_bitmaps->cliprect.max_y = 0x1000-1;
 				}
 				break;
 
@@ -2814,7 +2954,7 @@ static SCREEN_UPDATE( cavesh3 )
 
 	//printf("SCREEN UPDATE\n %d %d %d %d\n", scroll_0_x, scroll_0_y, scroll_1_x, scroll_1_y);
 
-	copyscrollbitmap_trans(bitmap, cavesh_bitmaps[0], 1,&scroll_0_x, 1,&scroll_0_y, cliprect, 0x8000);
+	copyscrollbitmap(bitmap, cavesh_bitmaps, 1,&scroll_0_x, 1,&scroll_0_y, cliprect);
 
 	return 0;
 }
@@ -2936,9 +3076,9 @@ static void flash_hard_reset(running_machine &machine)
 
 static WRITE8_HANDLER( flash_enab_w )
 {
-	logerror("%08x FLASH: enab = %02X\n", cpu_get_pc(&space->device()), data);
-	//flash_enab = data;
-	flash_enab = 1; // todo, why does it get turned off again instantly?
+	//logerror("%08x FLASH: enab = %02X\n", cpu_get_pc(&space->device()), data);
+	flash_enab = data;
+	//flash_enab = 1; // todo, why does it get turned off again instantly?
 }
 
 static void flash_change_state(running_machine &machine, flash_state_t state)
@@ -2951,11 +3091,13 @@ static void flash_change_state(running_machine &machine, flash_state_t state)
 	flash_read_seq = 0;
 	flash_addr_seq = 0;
 
-	logerror("flash_change_state - FLASH: state = %s\n", flash_state_name[state]);
+	//logerror("flash_change_state - FLASH: state = %s\n", flash_state_name[state]);
 }
 
 static WRITE8_HANDLER( flash_cmd_w )
 {
+	cavesh3_state *state = space->machine().driver_data<cavesh3_state>();
+
 	if (!flash_enab)
 		return;
 
@@ -3006,9 +3148,9 @@ static WRITE8_HANDLER( flash_cmd_w )
 			case 0x00:	// READ
 				if (data == 0x30)
 				{
-					UINT8 *region = space->machine().region( "game" )->base();
+					
 
-					memcpy(flash_page_data, region + flash_row * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
+					memcpy(flash_page_data, state->flashregion + flash_row * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
 					flash_page_addr = flash_col;
 					flash_page_index = flash_row;
 
@@ -3021,10 +3163,8 @@ static WRITE8_HANDLER( flash_cmd_w )
 			case 0x60: // BLOCK ERASE
 				if (data==0xd0)
 				{
-					UINT8 *region = space->machine().region( "game" )->base();
-
 					flash_change_state( space->machine(), STATE_BLOCK_ERASE );
-					memset(region + flash_col * FLASH_PAGE_SIZE, 0xff, FLASH_PAGE_SIZE);
+					memset(state->flashregion + flash_col * FLASH_PAGE_SIZE, 0xff, FLASH_PAGE_SIZE);
 					//logerror("erased block %04x (%08x - %08x)\n", flash_col, flash_col * FLASH_PAGE_SIZE,  ((flash_col+1) * FLASH_PAGE_SIZE)-1);
 				}
 				else
@@ -3035,9 +3175,8 @@ static WRITE8_HANDLER( flash_cmd_w )
 			case 0x80:
 				if (data==0x10)
 				{
-					UINT8 *region = space->machine().region( "game" )->base();
 					flash_change_state( space->machine(), STATE_PAGE_PROGRAM );
-					memcpy(region + flash_row * FLASH_PAGE_SIZE, flash_page_data, FLASH_PAGE_SIZE);
+					memcpy(state->flashregion + flash_row * FLASH_PAGE_SIZE, flash_page_data, FLASH_PAGE_SIZE);
 					//logerror("re-written block %04x (%08x - %08x)\n", flash_row, flash_row * FLASH_PAGE_SIZE,  ((flash_row+1) * FLASH_PAGE_SIZE)-1);
 
 				}
@@ -3159,8 +3298,7 @@ static READ8_HANDLER( flash_ready_r )
 
 static READ64_HANDLER( ibara_flash_port_e_r )
 {
-	return	((flash_ready_r(space, offset) ? 0x20 : 0x00)) |
-			input_port_read(space->machine(), "PORT_E");
+	return	((flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
 }
 
 
@@ -3252,7 +3390,7 @@ static WRITE8_HANDLER( serial_rtc_eeprom_w )
 		break;
 
 		case 0x03:
-			logerror("flashenable serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
+			//logerror("flashenable serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
 			flash_enab_w(space,offset,data);
 			return;
 
@@ -3341,10 +3479,6 @@ static INPUT_PORTS_START( cavesh3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1)
 
-	PORT_START("PORT_E")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	// FLASH ready
-	PORT_BIT( 0xdf, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
 	PORT_START("PORT_F")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )	// Test Push Button
 	PORT_BIT( 0xfd, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -3375,6 +3509,7 @@ INPUT_PORTS_END
 #define CAVE_CPU_CLOCK 12800000 * 8
 
 // none of this is verified for cave sh3
+// (the sh3 is different to the sh4 anyway, should be changed)
 static const struct sh4_config sh4cpu_config = {
 	0, // md2 (clock divders)
 	0, // md1 (clock divders)
@@ -3398,9 +3533,13 @@ static INTERRUPT_GEN(cavesh3_interrupt)
 
 static MACHINE_RESET( cavesh3 )
 {
+	cavesh3_state *state = machine.driver_data<cavesh3_state>();
+
 	flash_enab = 0;
 	flash_hard_reset(machine);
 	cavesh3_ram16 = (UINT16*)cavesh3_ram;
+
+	state->flashregion = machine.region( "game" )->base();
 
 	// cache table to avoid divides in blit code, also pre-clamped
 	int x,y;
@@ -3425,13 +3564,6 @@ static MACHINE_RESET( cavesh3 )
 			if (cavesh3_colrtable_add[x][y]>0x1f) cavesh3_colrtable_add[x][y] = 0x1f;
 		}
 	}
-}
-
-static PALETTE_INIT( cavesh_RRRRR_GGGGG_BBBBB )
-{
-	int i;
-	for (i = 0; i < 0x10000; i++)
-		palette_set_color(machine, i, MAKE_RGB(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
 }
 
 
@@ -3472,7 +3604,6 @@ static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 
-	MCFG_PALETTE_INIT(cavesh_RRRRR_GGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(0x10000)
 
 
@@ -3691,9 +3822,9 @@ static READ64_HANDLER( espgal2_speedup_r )
 	int pc = cpu_get_pc(&space->device());
 
 	if ( pc == 0xc05177a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // espgal2
-	if ( pc == 0xc05176a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork
+	if ( pc == 0xc05176a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork / mmmbnk
 	if ( pc == 0xc0519a2 ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // deathsml
-	//else printf("read %08x\n", cpu_get_pc(&space->device()));
+//	else printf("read %08x\n", cpu_get_pc(&space->device()));
 	return cavesh3_ram[0x002310/8];
 }
 
@@ -3716,7 +3847,7 @@ GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave"
 GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NO_SOUND )
 GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  espgal2, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NO_SOUND )
 GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NO_SOUND )
-GAME( 2007, mmmbnk,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Medal Mahjong Moukari Bancho no Kiban (2007/06/05 MASTER VER.)",   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, mmmbnk,    0,          cavesh3,    cavesh3,  espgal2, ROT0, "Cave", "Medal Mahjong Moukari Bancho no Kiban (2007/06/05 MASTER VER.)",   GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /*
 
