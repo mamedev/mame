@@ -190,11 +190,7 @@ READ32_HANDLER( sh3_internal_r )
 							return sh4->m_sh3internal_lower[offset];
 						}
 
-						if (mem_mask & 0x00ff00ff);
-						{
-							fatalerror("'%s' (%08x): unmapped internal read from %08x mask %08x (IRR0/1 unused bits)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
-						}
-
+						fatalerror("'%s' (%08x): unmapped internal read from %08x mask %08x (IRR0/1 unused bits)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
 					}
 				}
 				break;
