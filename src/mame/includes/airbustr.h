@@ -31,8 +31,6 @@ public:
 	/* misc */
 	int        m_soundlatch_status;
 	int        m_soundlatch2_status;
-	int        m_master_addr;
-	int        m_slave_addr;
 
 	/* devices */
 	device_t *m_master;

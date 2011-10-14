@@ -177,8 +177,8 @@ c760    rom bank
                                 -----
 
 - Is the sub cpu / sound cpu communication status port (0e) correct ?
-- Main cpu: port  01 ?
-- Sub  cpu: port 0x38 ? Plus it can probably cause a nmi to main cpu
+- Main cpu: port  01 ? boot sub/sound cpu?
+- Sub  cpu: port 0x38 ? irq ack?
 - incomplete DSW's
 - Spriteram low 0x300 bytes (priority?)
 
@@ -562,11 +562,11 @@ static TIMER_DEVICE_CALLBACK( airbustr_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine(), "master", 0, HOLD_LINE, 0xfd);
-
-	/* Pandora "sprite end dma" irq? TODO: timing is clearly off, attract mode relies on this */
-	if(scanline == 64)
 		cputag_set_input_line_and_vector(timer.machine(), "master", 0, HOLD_LINE, 0xff);
+
+	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
+	if(scanline == 64)
+		cputag_set_input_line_and_vector(timer.machine(), "master", 0, HOLD_LINE, 0xfd);
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
@@ -598,8 +598,6 @@ static MACHINE_START( airbustr )
 
 	state->save_item(NAME(state->m_soundlatch_status));
 	state->save_item(NAME(state->m_soundlatch2_status));
-	state->save_item(NAME(state->m_master_addr));
-	state->save_item(NAME(state->m_slave_addr));
 	state->save_item(NAME(state->m_bg_scrollx));
 	state->save_item(NAME(state->m_bg_scrolly));
 	state->save_item(NAME(state->m_fg_scrollx));
@@ -612,8 +610,6 @@ static MACHINE_RESET( airbustr )
 	airbustr_state *state = machine.driver_data<airbustr_state>();
 
 	state->m_soundlatch_status = state->m_soundlatch2_status = 0;
-	state->m_master_addr = 0xff;
-	state->m_slave_addr = 0xfd;
 	state->m_bg_scrollx = 0;
 	state->m_bg_scrolly = 0;
 	state->m_fg_scrollx = 0;
@@ -640,7 +636,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_CPU_ADD("master", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", airbustr_scanline, "screen", 0, 1) /* nmi signal from slave cpu */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", airbustr_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(slave_map)
