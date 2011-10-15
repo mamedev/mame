@@ -231,9 +231,9 @@ INLINE void clr_add_with_clr_mul_3param(clr_t *clr, const clr_t *clr0, const clr
 
 INLINE void clr_add_with_clr_square(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
 {
-	clr->r = clr->r =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->r)][(clr1->r)]];
-	clr->g = clr->g =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->g)][(clr1->g)]];
-	clr->b = clr->b =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->b)][(clr1->b)]];
+	clr->r = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->r)][(clr1->r)]];
+	clr->g = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->g)][(clr1->g)]];
+	clr->b = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->b)][(clr1->b)]];
 }
 
 INLINE void clr_add_with_clr_mul_fixed_rev(clr_t *clr, const clr_t *clr0, const UINT8 val, const clr_t *clr1)
@@ -2702,7 +2702,7 @@ caveblitfunction cave_flipx_opaque_blit_funcs[] =
 
 INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 {
-	int	x,y, dimx,dimy, flipx,flipy, src_p;
+	int	x,y, dimx,dimy, flipx,flipy;//, src_p;
 	int trans,blend, s_mode, d_mode;
 	clr_t tint_clr;
 	int tinted = 0;
@@ -2739,7 +2739,7 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	const UINT8 d_alpha	=	((alpha & 0x00ff)       )>>3;
 	const UINT8 s_alpha	=	((alpha & 0xff00) >> 8  )>>3;
 
-	src_p	=	0;
+//	src_p	=	0;
 	src_x	=	src_x & 0x1fff;
 	src_y	=	src_y & 0x0fff;
 
@@ -3234,7 +3234,7 @@ static WRITE8_HANDLER( flash_addr_w )
 static READ8_HANDLER( flash_io_r )
 {
 	UINT8 data = 0x00;
-	UINT32 old;
+//	UINT32 old;
 
 	if (!flash_enab)
 		return 0xff;
@@ -3242,7 +3242,7 @@ static READ8_HANDLER( flash_io_r )
 	switch (flash_state)
 	{
 		case STATE_READ_ID:
-			old = flash_read_seq;
+			//old = flash_read_seq;
 
 			switch( flash_read_seq++ )
 			{
@@ -3268,7 +3268,7 @@ static READ8_HANDLER( flash_io_r )
 			if (flash_page_addr > FLASH_PAGE_SIZE-1)
 				flash_page_addr = FLASH_PAGE_SIZE-1;
 
-			old = flash_page_addr;
+			//old = flash_page_addr;
 
 			data = flash_page_data[flash_page_addr++];
 
