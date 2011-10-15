@@ -38,7 +38,21 @@ const void FUNCNAME(bitmap_t *bitmap,
 #endif
 
 #ifdef BLENDED	
-	clr_t d_clr, clr0;
+	clr_t d_clr;
+
+#if _SMODE == 2
+#if _DMODE != 0
+	clr_t clr0;
+#endif
+#elif _SMODE == 0
+#if _DMODE != 0
+	clr_t clr0;
+#endif
+#else
+	clr_t clr0;
+#endif
+
+
 #endif
 
 #ifdef REALLY_SIMPLE
@@ -91,7 +105,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 		dimx -= (dst_x_end-1) - clip->max_x;
 	
 
-//	g_profiler.start(PROFILER_USER2);
+
 
 	for (y = starty; y < dimy; y++)
 	{
@@ -153,26 +167,106 @@ const void FUNCNAME(bitmap_t *bitmap,
 				pen_to_clr(*bmp, &d_clr);
                 
 				#if _SMODE == 0
-				clr_mul_fixed(&clr0, s_alpha, &s_clr); 
+				//g_profiler.start(PROFILER_USER7);
+				
+
+					#if _DMODE == 0
+					//g_profiler.start(PROFILER_USER1);	
+					// this is used extensively in the games (ingame, futari title screens etc.)
+					s_clr.r = cavesh3_colrtable_add[cavesh3_colrtable[(s_clr.r)][s_alpha]][cavesh3_colrtable[(d_clr.r)][d_alpha]];
+					s_clr.g = cavesh3_colrtable_add[cavesh3_colrtable[(s_clr.g)][s_alpha]][cavesh3_colrtable[(d_clr.g)][d_alpha]];
+					s_clr.b = cavesh3_colrtable_add[cavesh3_colrtable[(s_clr.b)][s_alpha]][cavesh3_colrtable[(d_clr.b)][d_alpha]];
+					#elif _DMODE == 1
+					//g_profiler.start(PROFILER_USER2);	
+					clr_mul_fixed(&clr0, s_alpha, &s_clr); 	
+					clr_add_with_clr_mul_3param(&s_clr, &clr0, &d_clr, &s_clr);
+					#elif _DMODE == 2
+					//g_profiler.start(PROFILER_USER3);	
+					clr_mul_fixed(&clr0, s_alpha, &s_clr); 
+					clr_add_with_clr_square(&s_clr, &clr0, &d_clr); 
+					#elif _DMODE == 3
+					//g_profiler.start(PROFILER_USER4);
+					clr_mul_fixed(&clr0, s_alpha, &s_clr); 
+					clr_add(&s_clr, &s_clr, &d_clr);
+				
+					#elif _DMODE == 4
+					//g_profiler.start(PROFILER_USER5);	
+					clr_mul_fixed(&clr0, s_alpha, &s_clr); 
+					clr_add_with_clr_mul_fixed_rev(&s_clr, &clr0, d_alpha, &d_clr);
+					#elif _DMODE == 5
+					//g_profiler.start(PROFILER_USER6);
+					clr_mul_fixed(&clr0, s_alpha, &s_clr); 
+					clr_add_with_clr_mul_rev_3param(&s_clr, &clr0, &d_clr, &s_clr);
+					#elif _DMODE == 6
+					//g_profiler.start(PROFILER_USER7);	
+					clr_mul_fixed(&clr0, s_alpha, &s_clr); 	
+					clr_add_with_clr_mul_rev_square(&s_clr, &clr0, &d_clr);
+					#elif _DMODE == 7
+					//g_profiler.start(PROFILER_USER8);
+					clr_mul_fixed(&clr0, s_alpha, &s_clr); 	
+					clr_add(&s_clr, &s_clr, &d_clr);
+					#endif
+
+				//g_profiler.stop();
 				#elif _SMODE == 1
+				//g_profiler.start(PROFILER_USER6);
 				clr_square(&clr0, &s_clr); 
+				
 				#elif _SMODE == 2
-				clr_mul_3param(&clr0, &s_clr, &d_clr); 
+			//	g_profiler.start(PROFILER_USER4);
+					#if _DMODE == 0
+					// this is used heavily on espgal2 highscore screen (~28%) optimized to avoid use of temp clr0 variable
+					s_clr.r = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.r)][(s_clr.r)]][cavesh3_colrtable[(d_clr.r)][d_alpha]];
+					s_clr.g = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.g)][(s_clr.g)]][cavesh3_colrtable[(d_clr.g)][d_alpha]];
+					s_clr.b = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.b)][(s_clr.b)]][cavesh3_colrtable[(d_clr.b)][d_alpha]];
+					#elif _DMODE == 1
+					clr_mul_3param(&clr0, &s_clr, &d_clr); 	
+					clr_add_with_clr_mul_3param(&s_clr, &clr0, &d_clr, &s_clr);
+					#elif _DMODE == 2
+					clr_mul_3param(&clr0, &s_clr, &d_clr); 
+					clr_add_with_clr_square(&s_clr, &clr0, &d_clr); 
+					#elif _DMODE == 3
+					clr_mul_3param(&clr0, &s_clr, &d_clr); 
+					clr_add(&s_clr, &s_clr, &d_clr);
+				
+					#elif _DMODE == 4
+					clr_mul_3param(&clr0, &s_clr, &d_clr); 
+					clr_add_with_clr_mul_fixed_rev(&s_clr, &clr0, d_alpha, &d_clr);
+					#elif _DMODE == 5
+					clr_mul_3param(&clr0, &s_clr, &d_clr); 	
+					clr_add_with_clr_mul_rev_3param(&s_clr, &clr0, &d_clr, &s_clr);
+					#elif _DMODE == 6
+					clr_mul_3param(&clr0, &s_clr, &d_clr); 
+					clr_add_with_clr_mul_rev_square(&s_clr, &clr0, &d_clr);
+					#elif _DMODE == 7
+					clr_mul_3param(&clr0, &s_clr, &d_clr); 
+					clr_add(&s_clr, &s_clr, &d_clr);
+					#endif
+				//g_profiler.stop();
+
 				#elif _SMODE == 3
+				//g_profiler.start(PROFILER_USER1);
 				clr_copy(&clr0, &s_clr);
 				
 				#elif _SMODE == 4
+				//g_profiler.start(PROFILER_USER2);
 				clr_mul_fixed_rev(&clr0, s_alpha, &s_clr); 
 				#elif _SMODE == 5
+				//g_profiler.start(PROFILER_USER3);
 				clr_mul_rev_square(&clr0, &s_clr); 
 				#elif _SMODE == 6
+				//g_profiler.start(PROFILER_USER4);
 				clr_mul_rev_3param(&clr0, &s_clr, &d_clr); 
 				#elif _SMODE == 7
+				//g_profiler.start(PROFILER_USER5);
 				clr_copy(&clr0, &s_clr);
 				#endif
 
 				
-				
+// smode 0/2 cases are already split up and handled above.				
+#if _SMODE != 2
+#if _SMODE != 0
+
 				#if _DMODE == 0
 				clr_add_with_clr_mul_fixed(&s_clr, &clr0, d_alpha, &d_clr);
 				#elif _DMODE == 1
@@ -191,6 +285,11 @@ const void FUNCNAME(bitmap_t *bitmap,
 				#elif _DMODE == 7
 				clr_add(&s_clr, &s_clr, &d_clr);
 				#endif
+
+				//g_profiler.stop();
+#endif
+#endif
+				
 
 			#endif
 

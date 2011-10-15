@@ -23,6 +23,7 @@ Touchscreen
 Remaining Video issues
  - mmpork startup screen flicker (maybe it's just like this while they load the bg gfx?)
  - is the use of the 'scroll' registers 100% correct?
+ - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
 
 Speedups
  - Blitter is already tightly optimized
@@ -2931,9 +2932,9 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 	{
 		if (data & 1)
 		{
-			g_profiler.start(PROFILER_USER1);
+			//g_profiler.start(PROFILER_USER1);
 			cavesh_gfx_exec(*space);
-			g_profiler.stop();
+			//g_profiler.stop();
 		}
 	}
 }
