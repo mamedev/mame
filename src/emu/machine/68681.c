@@ -574,6 +574,13 @@ READ8_DEVICE_HANDLER(duart68681_r)
 						//attotime rate = attotime::from_hz(duart68681->clock) * (16*duart68681->CTR.w.l);
 						attotime rate = attotime::from_hz(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
 						//hz = ATTOSECONDS_TO_HZ(rate.attoseconds);
+
+						// workaround for maygay1b locking up MAME
+						if ((2*device->clock()/(2*16*16*duart68681->CTR.w.l)) == 0)
+						{
+							rate = attotime::from_hz(1);
+						}
+
 						duart68681->duart_timer->adjust(rate, 0, rate);
 					}
 					break;
