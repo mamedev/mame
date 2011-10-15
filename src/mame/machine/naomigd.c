@@ -343,11 +343,12 @@ void naomi_gdrom_board::find_file(const char *name, const UINT8 *dir_sector, UIN
 {
 	file_start = 0;
 	file_size = 0;
-	logerror("Looking for file %s\n", name);
+	logerror("Looking for file [%s]\n", name);
 	for(UINT32 pos = 0; pos < 2048; pos += dir_sector[pos]) {
 		int fnlen = 0;
 		if(!(dir_sector[pos+25] & 2)) {
 			int len = dir_sector[pos+32];
+//			printf("file: [%s]\n", &dir_sector[pos+33+fnlen]);
 			for(fnlen=0; fnlen < FILENAME_LENGTH; fnlen++) {
 				if((dir_sector[pos+33+fnlen] == ';') && (name[fnlen] == 0)) {
 					fnlen = FILENAME_LENGTH+1;
@@ -396,95 +397,97 @@ void naomi_gdrom_board::device_start()
 
 	const UINT8 *picdata = machine().region(pic_tag)->base();
 
-	if(machine().region(pic_tag)->bytes() == 0x4000) {
-		//printf("Real PIC binary found\n");
-		for(int i=0;i<7;i++)
-			name[i] = picdata[0x7c0+i*2];
-		for(int i=0;i<7;i++)
-			name[i+7] = picdata[0x7e0+i*2];
+	if(picdata) {
+		if(machine().region(pic_tag)->bytes() == 0x4000) {
+			printf("Real PIC binary found\n");
+			for(int i=0;i<7;i++)
+				name[i] = picdata[0x7c0+i*2];
+			for(int i=0;i<7;i++)
+				name[i+7] = picdata[0x7e0+i*2];
 
-		key = 0;
-		for(int i=0;i<7;i++)
-			key |= UINT64(picdata[0x780+i*2]) << (56 - i*8);
+			key = 0;
+			for(int i=0;i<7;i++)
+				key |= UINT64(picdata[0x780+i*2]) << (56 - i*8);
+														
+			key |= picdata[0x7a0];
 
-		key |= picdata[0x7a0];
+		} else {
+			// use extracted pic data
+	//		printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
+			memcpy(name, picdata+33, 7);
+			memcpy(name+7, picdata+25, 7);
 
-	} else {
-		// use extracted pic data
-		logerror("This PIC key hasn't been converted to a proper PIC binary yet!\n");
-		memcpy(name, picdata+33, 7);
-		memcpy(name+7, picdata+25, 7);
+			key =((UINT64(picdata[0x31]) << 56) |
+				  (UINT64(picdata[0x32]) << 48) |
+				  (UINT64(picdata[0x33]) << 40) |
+				  (UINT64(picdata[0x34]) << 32) |
+				  (UINT64(picdata[0x35]) << 24) |
+				  (UINT64(picdata[0x36]) << 16) |
+				  (UINT64(picdata[0x37]) << 8)  |
+				  (UINT64(picdata[0x29]) << 0));
+		}
 
-		key =((UINT64(picdata[0x31]) << 56) |
-			  (UINT64(picdata[0x32]) << 48) |
-			  (UINT64(picdata[0x33]) << 40) |
-			  (UINT64(picdata[0x34]) << 32) |
-			  (UINT64(picdata[0x35]) << 24) |
-			  (UINT64(picdata[0x36]) << 16) |
-			  (UINT64(picdata[0x37]) << 8)  |
-			  (UINT64(picdata[0x29]) << 0));
-	}
+		logerror("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
 
-	logerror("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
+		UINT8 buffer[2048];
+		cdrom_file *gdromfile = cdrom_open(get_disk_handle(machine(), image_tag));
+		// primary volume descriptor
+		// read frame 0xb06e (frame=sector+150)
+		// dimm board firmware starts straight from this frame
+		cdrom_read_data(gdromfile, 0xb06e - 150, buffer, CD_TRACK_MODE1);
+		UINT32 path_table = ((buffer[0x8c+0] << 0) |
+							 (buffer[0x8c+1] << 8) |
+							 (buffer[0x8c+2] << 16) |
+							 (buffer[0x8c+3] << 24));
+		// path table
+		cdrom_read_data(gdromfile, path_table, buffer, CD_TRACK_MODE1);
+		UINT32 dir = ((buffer[0x2+0] << 0) |
+					  (buffer[0x2+1] << 8) |
+					  (buffer[0x2+2] << 16) |
+					  (buffer[0x2+3] << 24));
 
-	UINT8 buffer[2048];
-	cdrom_file *gdromfile = cdrom_open(get_disk_handle(machine(), image_tag));
-	// primary volume descriptor
-	// read frame 0xb06e (frame=sector+150)
-	// dimm board firmware starts straight from this frame
-	cdrom_read_data(gdromfile, 0xb06e - 150, buffer, CD_TRACK_MODE1);
-	UINT32 path_table = ((buffer[0x8c+0] << 0) |
-						 (buffer[0x8c+1] << 8) |
-						 (buffer[0x8c+2] << 16) |
-						 (buffer[0x8c+3] << 24));
-	// path table
-	cdrom_read_data(gdromfile, path_table, buffer, CD_TRACK_MODE1);
-	UINT32 dir = ((buffer[0x2+0] << 0) |
-				  (buffer[0x2+1] << 8) |
-				  (buffer[0x2+2] << 16) |
-				  (buffer[0x2+3] << 24));
-
-	// directory
-	UINT8 dir_sector[2048];
-	cdrom_read_data(gdromfile, dir, dir_sector, CD_TRACK_MODE1);
-	// find data of file
-	UINT32 file_start, file_size;
-	find_file(name, dir_sector, file_start, file_size);
-
-	if(file_start && (file_size == 0x100)) {
-		// read file
-		cdrom_read_data(gdromfile, file_start, buffer, CD_TRACK_MODE1);
-		// get "rom" file name
-		memset(name,'\0', 128);
-		memcpy(name, buffer+0xc0, FILENAME_LENGTH-1);
-
+		// directory
+		UINT8 dir_sector[2048];
+		cdrom_read_data(gdromfile, dir, dir_sector, CD_TRACK_MODE1);
+		// find data of file
+		UINT32 file_start, file_size;
 		find_file(name, dir_sector, file_start, file_size);
 
-		if(file_start) {
-			UINT32 file_rounded_size = (file_size+2047) & -2048;
-			for(dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
-			dimm_data = auto_alloc_array(machine(), UINT8, dimm_data_size);
-			if(dimm_data_size != file_rounded_size)
-				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
+		if(file_start && (file_size == 0x100)) {
+			// read file
+			cdrom_read_data(gdromfile, file_start, buffer, CD_TRACK_MODE1);
+			// get "rom" file name
+			memset(name,'\0', 128);
+			memcpy(name, buffer+0xc0, FILENAME_LENGTH-1);
 
-			// read encrypted data into dimm_data
-			UINT32 sectors = file_rounded_size / 2048;
-			for(UINT32 sec = 0; sec != sectors; sec++)
-				cdrom_read_data(gdromfile, file_start+sec, dimm_data + 2048*sec, CD_TRACK_MODE1);
+			find_file(name, dir_sector, file_start, file_size);
 
-			UINT32 des_subkeys[32];
-			des_generate_subkeys(rev64(key), des_subkeys);
+			if(file_start) {
+				UINT32 file_rounded_size = (file_size+2047) & -2048;
+				for(dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
+				dimm_data = auto_alloc_array(machine(), UINT8, dimm_data_size);
+				if(dimm_data_size != file_rounded_size)
+					memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
 
-			for(int i=0; i<file_rounded_size;i+=8)
-				write_from_qword(dimm_data+i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_data+i)), des_subkeys)));
+				// read encrypted data into dimm_data
+				UINT32 sectors = file_rounded_size / 2048;
+				for(UINT32 sec = 0; sec != sectors; sec++)
+					cdrom_read_data(gdromfile, file_start+sec, dimm_data + 2048*sec, CD_TRACK_MODE1);
+
+				UINT32 des_subkeys[32];
+				des_generate_subkeys(rev64(key), des_subkeys);
+
+				for(int i=0; i<file_rounded_size;i+=8)
+					write_from_qword(dimm_data+i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_data+i)), des_subkeys)));
+			}
 		}
+
+		// decrypt loaded data
+		cdrom_close(gdromfile);
+
+		if(!dimm_data)
+			throw emu_fatalerror("GDROM: Could not find the file to decrypt.");
 	}
-
-	// decrypt loaded data
-	cdrom_close(gdromfile);
-
-	if(!dimm_data)
-		throw emu_fatalerror("GDROM: Could not find the file to decrypt.");
 
 	save_item(NAME(dimm_cur_address));
 }

@@ -1,6 +1,6 @@
 /* Triforce Skeleton
  -- split from Naomi.c
-
+ 
  Triforce uses
 
 a stock Gamecube motherboard with custom Bios
@@ -396,7 +396,11 @@ Notes:
       J8 - 3-pin Fan Connector
       J9 - 4-pin Namco Audio Connector (unused)
 
-
+------------------------------------------------------------------------------------------------------------------ 
+ 
+ Note: "Type 3" Triforce uploads GD-ROM firmware to a MIPS processor which is DES encrypted (same as the GD images).
+ The key is 0x00 0x22 0x44 0x66 0x88 0xaa 0xcc 0xee (http://debugmo.de/2010/12/the-last-piece/).
+ 
 */
 
 #include "emu.h"
@@ -404,7 +408,7 @@ Notes:
 #include "machine/naomigd.h"
 
 static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")	/* Program ROM */
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")	/* Program ROM */
 ADDRESS_MAP_END
 
 
@@ -424,7 +428,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( triforce_base, driver_device )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000) /* Wrong! */
+	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000) /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
 	MCFG_CPU_PROGRAM_MAP(gc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
