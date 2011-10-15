@@ -2871,14 +2871,14 @@ Region byte encoding is as follows:
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
-	ROM_LOAD16_WORD("eeprom-naomi-main-default.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) ) \
+	ROM_LOAD16_WORD("main_eeprom.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) ) \
 	ROM_REGION( 0x84, "naomibd_eeprom", 0 ) \
-	ROM_LOAD("eeprom-naomi-x76f100-default.bin", 0x0000, 0x0084, CRC(3ea24b6a) SHA1(3a730ebcf56e0060fef6b1b02eb2eb7cfb7e61dc) )
+	ROM_LOAD("x76f100_eeprom.bin", 0x0000, 0x0084, CRC(3ea24b6a) SHA1(3a730ebcf56e0060fef6b1b02eb2eb7cfb7e61dc) )
 
 /* Version without the default x76f100 eeprom */
 #define NAOMI_DEFAULT_EEPROM_NO_BD	\
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
-	ROM_LOAD16_WORD("eeprom-naomi-main-default.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) )
+	ROM_LOAD16_WORD("main_eeprom.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) )
 
 ROM_START( naomi )
 	NAOMI_BIOS
