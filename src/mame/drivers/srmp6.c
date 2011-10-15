@@ -68,7 +68,6 @@ Dumped 06/15/2000
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/nile.h"
 
 class srmp6_state : public driver_device
@@ -79,6 +78,7 @@ public:
 
 	UINT16* m_tileram;
 	UINT16* m_dmaram;
+	UINT16* m_chrram;
 
 	UINT16 *m_sprram;
 	UINT16 *m_sprram_old;
@@ -478,14 +478,17 @@ static WRITE16_HANDLER(srmp6_dma_w)
 /* if tileram is actually bigger than the mapped area, how do we access the rest? */
 static READ16_HANDLER(tileram_r)
 {
-	//return state->m_tileram[offset];
-	return 0x0000;
+	srmp6_state *state = space->machine().driver_data<srmp6_state>();
+
+	return state->m_chrram[offset];
 }
 
 static WRITE16_HANDLER(tileram_w)
 {
+	srmp6_state *state = space->machine().driver_data<srmp6_state>();
+
 	//UINT16 tmp;
-	//COMBINE_DATA(&state->m_tileram[offset]);
+	COMBINE_DATA(&state->m_chrram[offset]);
 
 	/* are the DMA registers enabled some other way, or always mapped here, over RAM? */
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )
@@ -530,7 +533,13 @@ static WRITE16_HANDLER(paletteram_w)
 	}
 }
 
-static ADDRESS_MAP_START( srmp6, AS_PROGRAM, 16 )
+static READ16_HANDLER( srmp6_irq_ack_r )
+{
+	cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
+	return 0; // value read doesn't matter
+}
+
+static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM					// work RAM
 	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")		// banked ROM (used by ROM check)
@@ -538,13 +547,13 @@ static ADDRESS_MAP_START( srmp6, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs
 	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x4d0000, 0x4d0001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
+	AM_RANGE(0x4d0000, 0x4d0001) AM_READ(srmp6_irq_ack_r)
 
 	// OBJ RAM: checked [$400000-$47dfff]
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_BASE_MEMBER(srmp6_state,m_sprram)
 
 	// CHR RAM: checked [$500000-$5fffff]
-	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w)//AM_RAM AM_BASE_MEMBER(srmp6_state,m_tileram)
+	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w) AM_BASE_MEMBER(srmp6_state,m_chrram)
 	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_BASE_MEMBER(srmp6_state,m_dmaram)
 
 	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_BASE_MEMBER(srmp6_state,m_video_regs)	// ? gfx regs ST-0026 NiLe
@@ -655,20 +664,11 @@ INPUT_PORTS_END
     Machine driver
 ***************************************************************************/
 
-static INTERRUPT_GEN(srmp6_interrupt)
-{
-	if(!cpu_getiloops(device))
-		device_set_input_line(device,3,HOLD_LINE);
-	else
-		device_set_input_line(device,4,HOLD_LINE);
-}
-
 static MACHINE_CONFIG_START( srmp6, srmp6_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(srmp6)
-	MCFG_CPU_VBLANK_INT_HACK(srmp6_interrupt,2)
-
+	MCFG_CPU_PROGRAM_MAP(srmp6_map)
+	MCFG_CPU_VBLANK_INT("screen",irq4_line_assert) // irq3 is a timer irq, but it's never enabled
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
