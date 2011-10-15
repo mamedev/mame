@@ -21,8 +21,8 @@ Touchscreen
  - Used for mmmbnk, needs SH3 serial support.
 
 Remaining Video issues
- - mmpork startup screen flicker (maybe it's just like this while they load the bg gfx?)
- - is the use of the 'scroll' registers 100% correct?
+ - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
+ - is the use of the 'scroll' registers 100% correct? (related to above?)
  - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
 
 Speedups
@@ -119,7 +119,7 @@ Connectors:
  P4 (IDC CONNECTOR 14 PIN) JTAG connector
  P8 (IDC CONNECTOR 10 PIN) Advanced User Debugger
  P3 (CONNECTOR) Most likely an expansion port, P3 is not always mounted
- P5 (CONNECTOR) Most likely a serial connector. Only mounted on early Mushihimesama PCB's
+ P5 (CONNECTOR) Most likely a serial connector. Used for the mahjong Touchscreen titles.  Also mounted on early Mushihimesama PCB's
  P7 (CONNECTOR) Network port pinout. Never seen mounted on any PCB.
 
 Misc:
@@ -158,12 +158,18 @@ UINT8 cavesh3_colrtable_rev[0x20][0x40];
 UINT8 cavesh3_colrtable_add[0x20][0x20];
 struct _clr_t
 {
-	INT8 r,g,b;
+	UINT8 b,g,r,t;
 };
+
 
 
 typedef struct _clr_t clr_t;
 
+union colour_t
+{
+	clr_t trgb;
+	UINT32 u32;
+};
 
 // r5g5b5 ro clr_t
 
@@ -172,9 +178,9 @@ typedef struct _clr_t clr_t;
 INLINE void pen_to_clr(UINT32 pen, clr_t *clr)
 {
 // --t- ---- rrrr r--- gggg g--- bbbb b---  format
-	clr->r = (pen >> (16+3)) & 0x1f;
-	clr->g = (pen >>  (8+3)) & 0x1f;
-	clr->b = (pen >>   3) & 0x1f;
+	clr->r = (pen >> (16+3));// & 0x1f;
+	clr->g = (pen >>  (8+3));// & 0x1f;
+	clr->b = (pen >>   3);// & 0x1f;
 
 // --t- ---- ---r rrrr ---g gggg ---b bbbb  format
 //	clr->r = (pen >> 16) & 0x1f;
@@ -318,9 +324,9 @@ INLINE void clr_mul_rev_3param(clr_t *clr0, const clr_t *clr1, const clr_t *clr2
 
 INLINE void clr_mul_fixed(clr_t *clr, const UINT8 val, const clr_t *clr0)
 {
-	clr->r = cavesh3_colrtable[(clr0->r)][val];
-	clr->g = cavesh3_colrtable[(clr0->g)][val];
-	clr->b = cavesh3_colrtable[(clr0->b)][val];
+	clr->r = cavesh3_colrtable[val][(clr0->r)];
+	clr->g = cavesh3_colrtable[val][(clr0->g)];
+	clr->b = cavesh3_colrtable[val][(clr0->b)];
 }
 
 INLINE void clr_mul_fixed_rev(clr_t *clr, const UINT8 val, const clr_t *clr0)

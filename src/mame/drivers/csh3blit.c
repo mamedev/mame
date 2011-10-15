@@ -34,22 +34,26 @@ const void FUNCNAME(bitmap_t *bitmap,
 	int y, yf;
 
 #ifndef REALLY_SIMPLE
-	clr_t s_clr;
+	colour_t s_clr;
 #endif
 
 #ifdef BLENDED	
-	clr_t d_clr;
+	colour_t d_clr;
 
 #if _SMODE == 2
 #if _DMODE != 0
-	clr_t clr0;
+	colour_t clr0;
 #endif
 #elif _SMODE == 0
 #if _DMODE != 0
-	clr_t clr0;
+#if _DMODE != 5
+#if _DMODE != 1
+	colour_t clr0;
+#endif
+#endif
 #endif
 #else
-	clr_t clr0;
+	colour_t clr0;
 #endif
 
 
@@ -105,6 +109,30 @@ const void FUNCNAME(bitmap_t *bitmap,
 		dimx -= (dst_x_end-1) - clip->max_x;
 	
 
+#ifdef BLENDED	
+#if _SMODE == 0
+#if _DMODE == 0
+	UINT8* salpha_table = cavesh3_colrtable[s_alpha];
+	UINT8* dalpha_table = cavesh3_colrtable[d_alpha];
+#endif
+
+#if _DMODE == 5
+	UINT8* salpha_table = cavesh3_colrtable[s_alpha];
+#endif
+#if _DMODE == 1
+	UINT8* salpha_table = cavesh3_colrtable[s_alpha];
+#endif
+
+#endif
+
+#if _SMODE == 2
+#if _DMODE == 0
+		
+	UINT8* dalpha_table = cavesh3_colrtable[d_alpha];
+#endif
+#endif
+#endif
+
 
 
 	for (y = starty; y < dimy; y++)
@@ -121,6 +149,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 
 		const UINT32* end = bmp+(dimx-startx);
 
+
 		while (bmp<end)
 		{
 
@@ -132,11 +161,8 @@ const void FUNCNAME(bitmap_t *bitmap,
 
 #if TRANSPARENT == 1
 			pen = *gfx2;
-			if (!(pen & 0x20000000))
+			if (pen & 0x20000000)
 			{
-				LOOP_INCREMENTS
-				continue;
-			}
 			*bmp = pen;
 #else
 			*bmp = *gfx2;
@@ -148,24 +174,22 @@ const void FUNCNAME(bitmap_t *bitmap,
 			pen = *gfx2;
 
 #if TRANSPARENT == 1
-			if (!(pen & 0x20000000))
+			if (pen & 0x20000000)
 			{
-				LOOP_INCREMENTS
-				continue;
-			}
 #endif
 
 			// convert source to clr
-			pen_to_clr(pen, &s_clr);
+			pen_to_clr(pen, &s_clr.trgb);
+			//s_clr.u32 = (pen >> 3); // using the union is actually significantly slower than our pen_to_clr to function!
 			// source * intesity and clamp
 			
-			clr_mul(&s_clr, tint_clr);
+			clr_mul(&s_clr.trgb, tint_clr);
 
 			#ifdef BLENDED
 
 				// convert destination to clr
-				pen_to_clr(*bmp, &d_clr);
-                
+				pen_to_clr(*bmp, &d_clr.trgb);
+                //d_clr.u32 = *bmp >> 3; // using the union is actually significantly slower than our pen_to_clr to function!
 				#if _SMODE == 0
 				//g_profiler.start(PROFILER_USER7);
 				
@@ -173,93 +197,99 @@ const void FUNCNAME(bitmap_t *bitmap,
 					#if _DMODE == 0
 					//g_profiler.start(PROFILER_USER1);	
 					// this is used extensively in the games (ingame, futari title screens etc.)
-					s_clr.r = cavesh3_colrtable_add[cavesh3_colrtable[(s_clr.r)][s_alpha]][cavesh3_colrtable[(d_clr.r)][d_alpha]];
-					s_clr.g = cavesh3_colrtable_add[cavesh3_colrtable[(s_clr.g)][s_alpha]][cavesh3_colrtable[(d_clr.g)][d_alpha]];
-					s_clr.b = cavesh3_colrtable_add[cavesh3_colrtable[(s_clr.b)][s_alpha]][cavesh3_colrtable[(d_clr.b)][d_alpha]];
+					
+					s_clr.trgb.r = cavesh3_colrtable_add[salpha_table[(s_clr.trgb.r)]][dalpha_table[(d_clr.trgb.r)]];
+					s_clr.trgb.g = cavesh3_colrtable_add[salpha_table[(s_clr.trgb.g)]][dalpha_table[(d_clr.trgb.g)]];
+					s_clr.trgb.b = cavesh3_colrtable_add[salpha_table[(s_clr.trgb.b)]][dalpha_table[(d_clr.trgb.b)]];
 					#elif _DMODE == 1
-					//g_profiler.start(PROFILER_USER2);	
-					clr_mul_fixed(&clr0, s_alpha, &s_clr); 	
-					clr_add_with_clr_mul_3param(&s_clr, &clr0, &d_clr, &s_clr);
+					//g_profiler.start(PROFILER_USER2);
+					// futari ~7%
+					s_clr.trgb.r = cavesh3_colrtable_add[salpha_table[(s_clr.trgb.r)]][cavesh3_colrtable[(s_clr.trgb.r)][(d_clr.trgb.r)]];
+					s_clr.trgb.g = cavesh3_colrtable_add[salpha_table[(s_clr.trgb.g)]][cavesh3_colrtable[(s_clr.trgb.g)][(d_clr.trgb.g)]];
+					s_clr.trgb.b = cavesh3_colrtable_add[salpha_table[(s_clr.trgb.b)]][cavesh3_colrtable[(s_clr.trgb.b)][(d_clr.trgb.b)]];
 					#elif _DMODE == 2
 					//g_profiler.start(PROFILER_USER3);	
-					clr_mul_fixed(&clr0, s_alpha, &s_clr); 
-					clr_add_with_clr_square(&s_clr, &clr0, &d_clr); 
+					clr_mul_fixed(&clr0.trgb, s_alpha, &s_clr.trgb); 
+					clr_add_with_clr_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb); 
 					#elif _DMODE == 3
 					//g_profiler.start(PROFILER_USER4);
-					clr_mul_fixed(&clr0, s_alpha, &s_clr); 
-					clr_add(&s_clr, &s_clr, &d_clr);
+					clr_mul_fixed(&clr0.trgb, s_alpha, &s_clr.trgb); 
+					clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
 				
 					#elif _DMODE == 4
 					//g_profiler.start(PROFILER_USER5);	
-					clr_mul_fixed(&clr0, s_alpha, &s_clr); 
-					clr_add_with_clr_mul_fixed_rev(&s_clr, &clr0, d_alpha, &d_clr);
+					clr_mul_fixed(&clr0.trgb, s_alpha, &s_clr.trgb); 
+					clr_add_with_clr_mul_fixed_rev(&s_clr.trgb, &clr0.trgb, d_alpha, &d_clr.trgb);
 					#elif _DMODE == 5
+					// futari black character select ~13%
 					//g_profiler.start(PROFILER_USER6);
-					clr_mul_fixed(&clr0, s_alpha, &s_clr); 
-					clr_add_with_clr_mul_rev_3param(&s_clr, &clr0, &d_clr, &s_clr);
+					s_clr.trgb.r =  cavesh3_colrtable_add[salpha_table[(s_clr.trgb.r)]][cavesh3_colrtable_rev[(s_clr.trgb.r)][(d_clr.trgb.r)]];
+					s_clr.trgb.g =  cavesh3_colrtable_add[salpha_table[(s_clr.trgb.g)]][cavesh3_colrtable_rev[(s_clr.trgb.g)][(d_clr.trgb.g)]];
+					s_clr.trgb.b =  cavesh3_colrtable_add[salpha_table[(s_clr.trgb.b)]][cavesh3_colrtable_rev[(s_clr.trgb.b)][(d_clr.trgb.b)]];
+					
 					#elif _DMODE == 6
 					//g_profiler.start(PROFILER_USER7);	
-					clr_mul_fixed(&clr0, s_alpha, &s_clr); 	
-					clr_add_with_clr_mul_rev_square(&s_clr, &clr0, &d_clr);
+					clr_mul_fixed(&clr0.trgb, s_alpha, &s_clr.trgb); 	
+					clr_add_with_clr_mul_rev_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 					#elif _DMODE == 7
 					//g_profiler.start(PROFILER_USER8);
-					clr_mul_fixed(&clr0, s_alpha, &s_clr); 	
-					clr_add(&s_clr, &s_clr, &d_clr);
+					clr_mul_fixed(&clr0.trgb, s_alpha, &s_clr.trgb); 	
+					clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
 					#endif
 
 				//g_profiler.stop();
 				#elif _SMODE == 1
 				//g_profiler.start(PROFILER_USER6);
-				clr_square(&clr0, &s_clr); 
+				clr_square(&clr0.trgb, &s_clr.trgb); 
 				
 				#elif _SMODE == 2
 			//	g_profiler.start(PROFILER_USER4);
 					#if _DMODE == 0
 					// this is used heavily on espgal2 highscore screen (~28%) optimized to avoid use of temp clr0 variable
-					s_clr.r = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.r)][(s_clr.r)]][cavesh3_colrtable[(d_clr.r)][d_alpha]];
-					s_clr.g = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.g)][(s_clr.g)]][cavesh3_colrtable[(d_clr.g)][d_alpha]];
-					s_clr.b = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.b)][(s_clr.b)]][cavesh3_colrtable[(d_clr.b)][d_alpha]];
+					s_clr.trgb.r = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.trgb.r)][(s_clr.trgb.r)]][dalpha_table[(d_clr.trgb.r)]];
+					s_clr.trgb.g = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.trgb.g)][(s_clr.trgb.g)]][dalpha_table[(d_clr.trgb.g)]];
+					s_clr.trgb.b = cavesh3_colrtable_add[cavesh3_colrtable[(d_clr.trgb.b)][(s_clr.trgb.b)]][dalpha_table[(d_clr.trgb.b)]];
 					#elif _DMODE == 1
-					clr_mul_3param(&clr0, &s_clr, &d_clr); 	
-					clr_add_with_clr_mul_3param(&s_clr, &clr0, &d_clr, &s_clr);
+					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb); 	
+					clr_add_with_clr_mul_3param(&s_clr.trgb, &clr0.trgb, &d_clr.trgb, &s_clr.trgb);
 					#elif _DMODE == 2
-					clr_mul_3param(&clr0, &s_clr, &d_clr); 
-					clr_add_with_clr_square(&s_clr, &clr0, &d_clr); 
+					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb); 
+					clr_add_with_clr_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb); 
 					#elif _DMODE == 3
-					clr_mul_3param(&clr0, &s_clr, &d_clr); 
-					clr_add(&s_clr, &s_clr, &d_clr);
+					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb); 
+					clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
 				
 					#elif _DMODE == 4
-					clr_mul_3param(&clr0, &s_clr, &d_clr); 
-					clr_add_with_clr_mul_fixed_rev(&s_clr, &clr0, d_alpha, &d_clr);
+					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb); 
+					clr_add_with_clr_mul_fixed_rev(&s_clr.trgb, &clr0.trgb, d_alpha, &d_clr.trgb);
 					#elif _DMODE == 5
-					clr_mul_3param(&clr0, &s_clr, &d_clr); 	
-					clr_add_with_clr_mul_rev_3param(&s_clr, &clr0, &d_clr, &s_clr);
+					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb); 	
+					clr_add_with_clr_mul_rev_3param(&s_clr.trgb, &clr0.trgb, &d_clr.trgb, &s_clr.trgb);
 					#elif _DMODE == 6
-					clr_mul_3param(&clr0, &s_clr, &d_clr); 
-					clr_add_with_clr_mul_rev_square(&s_clr, &clr0, &d_clr);
+					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb); 
+					clr_add_with_clr_mul_rev_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 					#elif _DMODE == 7
-					clr_mul_3param(&clr0, &s_clr, &d_clr); 
-					clr_add(&s_clr, &s_clr, &d_clr);
+					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb); 
+					clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
 					#endif
 				//g_profiler.stop();
 
 				#elif _SMODE == 3
 				//g_profiler.start(PROFILER_USER1);
-				clr_copy(&clr0, &s_clr);
+				clr_copy(&clr0.trgb, &s_clr.trgb);
 				
 				#elif _SMODE == 4
 				//g_profiler.start(PROFILER_USER2);
-				clr_mul_fixed_rev(&clr0, s_alpha, &s_clr); 
+				clr_mul_fixed_rev(&clr0.trgb, s_alpha, &s_clr.trgb); 
 				#elif _SMODE == 5
 				//g_profiler.start(PROFILER_USER3);
-				clr_mul_rev_square(&clr0, &s_clr); 
+				clr_mul_rev_square(&clr0.trgb, &s_clr.trgb); 
 				#elif _SMODE == 6
 				//g_profiler.start(PROFILER_USER4);
-				clr_mul_rev_3param(&clr0, &s_clr, &d_clr); 
+				clr_mul_rev_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb); 
 				#elif _SMODE == 7
 				//g_profiler.start(PROFILER_USER5);
-				clr_copy(&clr0, &s_clr);
+				clr_copy(&clr0.trgb, &s_clr.trgb);
 				#endif
 
 				
@@ -268,22 +298,22 @@ const void FUNCNAME(bitmap_t *bitmap,
 #if _SMODE != 0
 
 				#if _DMODE == 0
-				clr_add_with_clr_mul_fixed(&s_clr, &clr0, d_alpha, &d_clr);
+				clr_add_with_clr_mul_fixed(&s_clr.trgb, &clr0.trgb, d_alpha, &d_clr.trgb);
 				#elif _DMODE == 1
-				clr_add_with_clr_mul_3param(&s_clr, &clr0, &d_clr, &s_clr);
+				clr_add_with_clr_mul_3param(&s_clr.trgb, &clr0.trgb, &d_clr.trgb, &s_clr.trgb);
 				#elif _DMODE == 2
-				clr_add_with_clr_square(&s_clr, &clr0, &d_clr); 
+				clr_add_with_clr_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb); 
 				#elif _DMODE == 3
-				clr_add(&s_clr, &s_clr, &d_clr);
+				clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
 				
 				#elif _DMODE == 4
-				clr_add_with_clr_mul_fixed_rev(&s_clr, &clr0, d_alpha, &d_clr);
+				clr_add_with_clr_mul_fixed_rev(&s_clr.trgb, &clr0.trgb, d_alpha, &d_clr.trgb);
 				#elif _DMODE == 5
-				clr_add_with_clr_mul_rev_3param(&s_clr, &clr0, &d_clr, &s_clr);
+				clr_add_with_clr_mul_rev_3param(&s_clr.trgb, &clr0.trgb, &d_clr.trgb, &s_clr.trgb);
 				#elif _DMODE == 6
-				clr_add_with_clr_mul_rev_square(&s_clr, &clr0, &d_clr);
+				clr_add_with_clr_mul_rev_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 				#elif _DMODE == 7
-				clr_add(&s_clr, &s_clr, &d_clr);
+				clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
 				#endif
 
 				//g_profiler.stop();
@@ -294,10 +324,14 @@ const void FUNCNAME(bitmap_t *bitmap,
 			#endif
 
 			// write result
-			*bmp = clr_to_pen(&s_clr)|(pen&0x20000000);
-			
+			*bmp = clr_to_pen(&s_clr.trgb)|(pen&0x20000000);
+			//*bmp = (s_clr.u32<<3)|(pen&0x20000000); // using the union is actually significantly slower than our clr_to_pen function!
 
 #endif // END NOT REALLY SIMPLE
+
+#if TRANSPARENT == 1
+			}
+#endif	
 			LOOP_INCREMENTS
 		}
 		
