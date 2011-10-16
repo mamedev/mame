@@ -182,8 +182,10 @@ const void FUNCNAME(bitmap_t *bitmap,
 			pen_to_clr(pen, &s_clr.trgb);
 			//s_clr.u32 = (pen >> 3); // using the union is actually significantly slower than our pen_to_clr to function!
 			// source * intesity and clamp
-			
+
+#ifdef TINT
 			clr_mul(&s_clr.trgb, tint_clr);
+#endif
 
 			#ifdef BLENDED
 
