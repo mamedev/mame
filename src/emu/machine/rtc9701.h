@@ -71,6 +71,7 @@ protected:
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);
 	inline UINT8 rtc_read(UINT8 offset);
+	inline void rtc_write(UINT8 offset,UINT8 data);
 
 	static TIMER_CALLBACK( rtc_inc_callback );
 

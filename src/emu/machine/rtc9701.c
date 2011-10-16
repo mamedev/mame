@@ -4,7 +4,7 @@
 
     Epson RTC-9701-JE
 
-	Serial Real Time Clock + Eeprom
+	Serial Real Time Clock + EEPROM
 
 
 ***************************************************************************/
@@ -43,6 +43,7 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 void rtc9701_device::timer_callback()
 {
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	int dpm_count;
 
 	m_rtc.sec++;
 
@@ -51,16 +52,19 @@ void rtc9701_device::timer_callback()
 	if((m_rtc.min & 0x0f) >= 0x0a)				{ m_rtc.min+=0x10; m_rtc.min&=0xf0; }
 	if((m_rtc.min & 0xf0) >= 0x60)				{ m_rtc.hour++; m_rtc.min = 0; }
 	if((m_rtc.hour & 0x0f) >= 0x0a)				{ m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
-	if((m_rtc.hour & 0xff) >= 0x24)				{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
-	if((m_rtc.wday & 0x0f) >= 0x07)				{ m_rtc.wday = 0; }
+	if((m_rtc.hour & 0xff) >= 0x24)				{ m_rtc.day++; m_rtc.wday<<=1; m_rtc.hour = 0; }
+	if(m_rtc.wday & 0x80)						{ m_rtc.wday = 1; }
 	if((m_rtc.day & 0x0f) >= 0x0a)				{ m_rtc.day+=0x10; m_rtc.day&=0xf0; }
+
 	/* TODO: crude leap year support */
+	dpm_count = (m_rtc.month & 0xf) + (((m_rtc.month & 0x10) >> 4)*10)-1;
+
 	if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
 	{
-		if((m_rtc.day & 0xff) >= dpm[m_rtc.month-1]+1+1)
+		if((m_rtc.day & 0xff) >= dpm[dpm_count]+1+1)
 			{ m_rtc.month++; m_rtc.day = 0x01; }
 	}
-	else if((m_rtc.day & 0xff) >= dpm[m_rtc.month-1]+1){ m_rtc.month++; m_rtc.day = 0x01; }
+	else if((m_rtc.day & 0xff) >= dpm[dpm_count]+1){ m_rtc.month++; m_rtc.day = 0x01; }
 	if((m_rtc.month & 0x0f) >= 0x0a)			{ m_rtc.month = 0x10; }
 	if(m_rtc.month >= 0x13)						{ m_rtc.year++; m_rtc.month = 1; }
 	if((m_rtc.year & 0x0f) >= 0x0a)				{ m_rtc.year+=0x10; m_rtc.year&=0xf0; }
@@ -98,7 +102,7 @@ void rtc9701_device::device_start()
 
 	m_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
 	m_rtc.month = (((systime.local_time.month+1) / 10) << 4) | (((systime.local_time.month+1) % 10) & 0xf);
-	m_rtc.wday = ((systime.local_time.weekday % 10) & 0xf);
+	m_rtc.wday = 1 << systime.local_time.weekday;
 	m_rtc.year = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
 	m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
 	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
@@ -166,7 +170,7 @@ inline UINT8 rtc9701_device::rtc_read(UINT8 offset)
 		case 0: res = m_rtc.sec; break;
 		case 1: res = m_rtc.min; break;
 		case 2: res = m_rtc.hour; break;
-		case 3: res = 1 << m_rtc.wday; break; /* untested */
+		case 3: res = m_rtc.wday; break; /* untested */
 		case 4: res = m_rtc.day; break;
 		case 5: res = m_rtc.month; break;
 		case 6: res = m_rtc.year & 0xff; break;
@@ -174,6 +178,21 @@ inline UINT8 rtc9701_device::rtc_read(UINT8 offset)
 	}
 
 	return res;
+}
+
+inline void rtc9701_device::rtc_write(UINT8 offset,UINT8 data)
+{
+	switch(offset)
+	{
+		case 0: m_rtc.sec = data; break;
+		case 1: m_rtc.min = data; break;
+		case 2: m_rtc.hour = data; break;
+		case 3: m_rtc.wday = data; break; /* untested */
+		case 4: m_rtc.day = data; break;
+		case 5: m_rtc.month = data; break;
+		case 6: m_rtc.year = data; break;
+		case 7: break; // NOP
+	}
 }
 
 //**************************************************************************
@@ -328,9 +347,9 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					break;
 
 				case RTC9701_RTC_WRITE:
+					cmd_stream_pos++;
 					if (cmd_stream_pos<=4)
 					{
-						cmd_stream_pos++;
 						rtc9701_address_pos++;
 						rtc9701_current_address = (rtc9701_current_address << 1) | (m_latch&1);
 						if (cmd_stream_pos==4)
@@ -339,9 +358,16 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 						}
 					}
 
+					if (cmd_stream_pos>4)
+					{
+						rtc9701_data_pos++;
+						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);;
+					}
+
 					if (cmd_stream_pos==12)
 					{
 						cmd_stream_pos = 0;
+						rtc_write(rtc9701_current_address,rtc9701_current_data);
 						//logerror("Written 12 bits, going back to WAIT mode\n");
 						rtc_state = RTC9701_CMD_WAIT;
 					}
