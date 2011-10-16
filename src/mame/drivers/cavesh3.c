@@ -132,7 +132,7 @@ Misc:
    U27 (SUPERVISOR) MAX 690S 3.0V Microprocessor Supervisory Circuit.
    U10 (RTC & EEPROM) RTC 9701, Serial RTC Module with EEPROM 4 kbit (256x16 bit), controlled by Altera EPM7032 U13.
    U12 (RS-232 TRANCEIVER) MAX 3244E RS-232 Tranceiver, only mounted when P5 is mounted.
- D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.  
+ D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.
 
 Note: * The Altera EPM7032 has been seen stamped "CA017" for at least one DeathSmiles, there are other revisions.
       * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
@@ -283,7 +283,7 @@ INLINE void clr_add(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
 	clr->r =  cavesh3_colrtable_add[clr0->r][clr1->r];
 	clr->g =  cavesh3_colrtable_add[clr0->g][clr1->g];
 	clr->b =  cavesh3_colrtable_add[clr0->b][clr1->b];
-	
+
 }
 
 // multiply clrs
@@ -4890,7 +4890,7 @@ typedef const void (*caveblitfunction)(bitmap_t *,
 					 int , /* flipy */
 					 const UINT8 , /* s_alpha */
 					 const UINT8 , /* d_alpha */
-					 //int , /* tint */ 
+					 //int , /* tint */
 					 clr_t * );
 
 caveblitfunction cave_blit_funcs[] =
@@ -5073,7 +5073,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 	tint_to_clr(tint_r & 0x00ff, (tint_gb >>  8) & 0xff, tint_gb & 0xff, &tint_clr);
 
 	/* interestingly this gets set to 0x20 for 'normal' not 0x1f */
-	
+
 	if (tint_clr.r!=0x20)
 		tinted = 1;
 
@@ -5082,7 +5082,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 
 	if (tint_clr.b!=0x20)
 		tinted = 1;
-	
+
 
 	// surprisingly frequent, need to verify if it produces a worthwhile speedup tho.
 	if ((s_mode==0 && s_alpha==0x1f) && (d_mode==4 && d_alpha==0x1f))
@@ -5094,7 +5094,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 		{
 			if (trans)
 			{
-				if (!blend) 
+				if (!blend)
 				{
 					draw_sprite_plain(draw_params);
 				}
@@ -5105,7 +5105,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 			}
 			else
 			{
-			if (!blend) 
+			if (!blend)
 				{
 					draw_sprite_opaque_plain(draw_params);
 				}
@@ -5114,12 +5114,12 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 					cave_opaque_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
-		} 
+		}
 		else // flipx
 		{
 			if (trans)
 			{
-				if (!blend) 
+				if (!blend)
 				{
 					draw_sprite_flipx_plain(draw_params);
 				}
@@ -5130,7 +5130,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 			}
 			else
 			{
-			if (!blend) 
+			if (!blend)
 				{
 					draw_sprite_flipx_opaque_plain(draw_params);
 				}
@@ -5172,7 +5172,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 
 			return;
 		}
-	
+
 
 
 		//printf("smode %d dmode %d\n", s_mode, d_mode);
@@ -5181,7 +5181,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 		{
 			if (trans)
 			{
-				if (!blend) 
+				if (!blend)
 				{
 					draw_sprite_notint_plain(draw_params);
 				}
@@ -5192,7 +5192,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 			}
 			else
 			{
-			if (!blend) 
+			if (!blend)
 				{
 					draw_sprite_notint_opaque_plain(draw_params);
 				}
@@ -5201,12 +5201,12 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 					cave_notint_opaque_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
-		} 
+		}
 		else // flipx
 		{
 			if (trans)
 			{
-				if (!blend) 
+				if (!blend)
 				{
 					draw_sprite_notint_flipx_plain(draw_params);
 				}
@@ -5217,7 +5217,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 			}
 			else
 			{
-			if (!blend) 
+			if (!blend)
 				{
 					draw_sprite_notint_flipx_opaque_plain(draw_params);
 				}
@@ -5366,7 +5366,7 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 			}
 
 
-			cavesh_gfx_create_shadow_copy(*space); // create a copy of the blit list so we can safely thread it.			
+			cavesh_gfx_create_shadow_copy(*space); // create a copy of the blit list so we can safely thread it.
 			cavesh_gfx_addr_shadowcopy = cavesh_gfx_addr;
 			cavesh_gfx_scroll_0_x_shadowcopy =  cavesh_gfx_scroll_0_x;
 			cavesh_gfx_scroll_0_y_shadowcopy = cavesh_gfx_scroll_0_y;
@@ -5602,7 +5602,7 @@ static WRITE8_HANDLER( flash_cmd_w )
 			case 0x00:	// READ
 				if (data == 0x30)
 				{
-					
+
 
 					memcpy(flash_page_data, state->flashregion + flash_row * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
 					flash_page_addr = flash_col;
@@ -5811,13 +5811,13 @@ static READ8_HANDLER( serial_rtc_eeprom_r )
 	switch (offset)
 	{
 
-		
-		case 1:
-	
 
-		//	return 0xfe | (input_port_read(space->machine(), "EEPROMIN") & 0x1); 
+		case 1:
+
+
+		//	return 0xfe | (input_port_read(space->machine(), "EEPROMIN") & 0x1);
 			return 0xfe | dev->read_bit();
-			
+
 
 		default:
 		//logerror("%08x unknown serial_rtc_eeprom_r access offset %02x\n", cpu_get_pc(&space->device()), offset);
@@ -6058,7 +6058,7 @@ static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	MCFG_CPU_IO_MAP(cavesh3_port)
 	MCFG_CPU_VBLANK_INT("screen", cavesh3_interrupt)
 
-	MCFG_RTC9701_ADD("eeprom")
+	MCFG_RTC9701_ADD("eeprom", XTAL_32_768kHz)
 	MCFG_NVRAM_HANDLER(cavesh3)
 
 	/* video hardware */

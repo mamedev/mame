@@ -40,6 +40,10 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 
 }
 
+TIMER_CALLBACK( rtc9701_device::rtc_inc_callback )
+{
+
+}
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -52,14 +56,15 @@ bool rtc9701_device::device_validity_check(emu_options &options, const game_driv
 	return error;
 }
 
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void rtc9701_device::device_start()
 {
-
+	/* let's call the timer callback every second */
+	if(clock() >= XTAL_32_768kHz)
+		machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
 }
 
 
@@ -94,7 +99,6 @@ void rtc9701_device::nvram_default()
 
 void rtc9701_device::nvram_read(emu_file &file)
 {
-
 	file.read(rtc9701_data, 0x200);
 }
 
@@ -109,7 +113,26 @@ void rtc9701_device::nvram_write(emu_file &file)
 	file.write(rtc9701_data, 0x200);
 }
 
+//-------------------------------------------------
+//  rtc_read - used to route RTC reading registers
+//-------------------------------------------------
 
+inline UINT8 rtc9701_device::rtc_read(UINT8 offset)
+{
+	UINT8 res;
+
+	res = 0;
+
+	switch(offset)
+	{
+		case 0: // seconds
+			res = 0x11;
+			break;
+	}
+
+
+	return res;
+}
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
@@ -317,9 +340,9 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 
 				case RTC9701_EEPROM_WRITE:
 					cmd_stream_pos++;
-					
+
 					if (cmd_stream_pos<=12)
-					{			
+					{
 						rtc9701_address_pos++;
 						rtc9701_current_address = (rtc9701_current_address << 1) | (m_latch&1);
 						if (cmd_stream_pos==12)
@@ -331,7 +354,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					if (cmd_stream_pos>12)
 					{
 						rtc9701_data_pos++;
-						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);;					
+						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);;
 					}
 
 					if (cmd_stream_pos==28)
@@ -352,12 +375,12 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 						if (cmd_stream_pos==4)
 						{
 							//printf("Set RTC Read Address To %04x\n", rtc9701_current_address );
-							rtc9701_current_data = 0; // not supported
+							rtc9701_current_data = rtc_read(rtc9701_current_address);
 							//printf("Setting data latch for reading to %04x\n", rtc9701_current_data);
 							rtc9701_data_pos = 8;
 						}
 					}
-					
+
 					if (cmd_stream_pos>4)
 					{
 						rtc9701_data_pos--;

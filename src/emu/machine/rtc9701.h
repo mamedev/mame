@@ -17,8 +17,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RTC9701_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, rtc9701, 0) \
+#define MCFG_RTC9701_ADD(_tag, _clock ) \
+	MCFG_DEVICE_ADD(_tag, rtc9701, _clock) \
 
 
 //**************************************************************************
@@ -34,7 +34,7 @@ typedef enum
 	RTC9701_EEPROM_READ,
 	RTC9701_EEPROM_WRITE,
 	RTC9701_AFTER_WRITE_ENABLE,
-	
+
 } rtc9701_state_t;
 
 
@@ -64,7 +64,9 @@ protected:
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);
+	inline UINT8 rtc_read(UINT8 offset);
 
+	static TIMER_CALLBACK( rtc_inc_callback );
 
 	int 					m_latch;
 	int						m_reset_line;
