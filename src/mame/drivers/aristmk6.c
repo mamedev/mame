@@ -108,9 +108,16 @@ SCREEN_UPDATE(aristmk6)
 	return 0;
 }
 
+static READ64_HANDLER( test_r )
+{
+	// bit 1 read in various places, status for something ...
+	return -1;
+}
+
 static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM // work ram
+	AM_RANGE(0x13800000, 0x13800007) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aristmk6_port, AS_IO, 64 )
@@ -131,7 +138,7 @@ static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(aristmk6_map)
 	MCFG_CPU_IO_MAP(aristmk6_port)
-	MCFG_DEVICE_DISABLE()
+//	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
