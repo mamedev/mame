@@ -37,6 +37,12 @@ Speedups
 #include "profiler.h"
 #include "machine/rtc9701.h"
 
+static UINT64* cavesh3_ram;
+//static UINT64* cavesh3_ram_copy;
+static UINT16* cavesh3_ram16;
+static UINT16* cavesh3_ram16_copy = 0;
+
+
 /*
 
 
@@ -145,14 +151,16 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8* flashregion;
-	
+
+
+	osd_work_queue *	queue;					/* work queue */
+	osd_work_item * blitter_request;
 };
 
 /***************************************************************************
                                 Video Hardware
 ***************************************************************************/
 
-UINT16* cavesh3_ram16;
 UINT8 cavesh3_colrtable[0x20][0x40];
 UINT8 cavesh3_colrtable_rev[0x20][0x40];
 UINT8 cavesh3_colrtable_add[0x20][0x20];
@@ -360,6 +368,12 @@ INLINE void clr_copy(clr_t *clr, const clr_t *clr0)
 static UINT32 cavesh_gfx_addr;
 static UINT32 cavesh_gfx_scroll_0_x, cavesh_gfx_scroll_0_y;
 static UINT32 cavesh_gfx_scroll_1_x, cavesh_gfx_scroll_1_y;
+
+static UINT32 cavesh_gfx_addr_shadowcopy;
+static UINT32 cavesh_gfx_scroll_0_x_shadowcopy, cavesh_gfx_scroll_0_y_shadowcopy;
+static UINT32 cavesh_gfx_scroll_1_x_shadowcopy, cavesh_gfx_scroll_1_y_shadowcopy;
+
+
 
 static int cavesh_gfx_size;
 static bitmap_t *cavesh_bitmaps;
@@ -4774,38 +4788,73 @@ static VIDEO_START( cavesh3 )
 #undef TINT
 
 
-INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
+INLINE UINT16 READ_NEXT_WORD(offs_t *addr)
 {
 //  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
-	UINT16 data =  cavesh3_ram16[((*addr&(0x7fffff))>>1)^3]; // this probably needs to be made endian safe tho
+	UINT16 data =  cavesh3_ram16_copy[((*addr&(0x7fffff))>>1)^3]; // this probably needs to be made endian safe tho
 	*addr += 2;
 
 //  printf("data %04x\n", data);
 	return data;
 }
 
-INLINE void cavesh_gfx_upload(address_space &space, offs_t *addr)
+INLINE UINT16 COPY_NEXT_WORD(address_space &space, offs_t *addr)
+{
+//  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
+	UINT16 data =  cavesh3_ram16[((*addr&(0x7fffff))>>1)^3]; // this probably needs to be made endian safe tho
+	cavesh3_ram16_copy[((*addr&(0x7fffff))>>1)^3] = data;
+
+	*addr += 2;
+
+//  printf("data %04x\n", data);
+	return data;
+}
+
+
+INLINE void cavesh_gfx_upload_shadow_copy(address_space &space, offs_t *addr)
+{
+	UINT32 x,y, dimx,dimy;
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+
+	dimx = (COPY_NEXT_WORD(space, addr) & 0x1fff) + 1;
+	dimy = (COPY_NEXT_WORD(space, addr) & 0x0fff) + 1;
+
+	for (y = 0; y < dimy; y++)
+	{
+		for (x = 0; x < dimx; x++)
+		{
+			COPY_NEXT_WORD(space, addr);
+		}
+	}
+}
+
+INLINE void cavesh_gfx_upload(offs_t *addr)
 {
 	UINT32 x,y, dst_p,dst_x_start,dst_y_start, dimx,dimy;
 	UINT32 *dst;
 
 	// 0x20000000
-	READ_NEXT_WORD(space, addr);
-	READ_NEXT_WORD(space, addr);
+	READ_NEXT_WORD(addr);
+	READ_NEXT_WORD(addr);
 
 	// 0x99999999
-	READ_NEXT_WORD(space, addr);
-	READ_NEXT_WORD(space, addr);
+	READ_NEXT_WORD(addr);
+	READ_NEXT_WORD(addr);
 
-	dst_x_start = READ_NEXT_WORD(space, addr);
-	dst_y_start = READ_NEXT_WORD(space, addr);
+	dst_x_start = READ_NEXT_WORD(addr);
+	dst_y_start = READ_NEXT_WORD(addr);
 
 	dst_p = 0;
 	dst_x_start &= 0x1fff;
 	dst_y_start &= 0x0fff;
 
-	dimx = (READ_NEXT_WORD(space, addr) & 0x1fff) + 1;
-	dimy = (READ_NEXT_WORD(space, addr) & 0x0fff) + 1;
+	dimx = (READ_NEXT_WORD(addr) & 0x1fff) + 1;
+	dimy = (READ_NEXT_WORD(addr) & 0x0fff) + 1;
 
 	logerror("GFX COPY: DST %02X,%02X,%03X DIM %02X,%03X\n", dst_p,dst_x_start,dst_y_start, dimx,dimy);
 
@@ -4816,7 +4865,7 @@ INLINE void cavesh_gfx_upload(address_space &space, offs_t *addr)
 
 		for (x = 0; x < dimx; x++)
 		{
-			UINT16 pendat = READ_NEXT_WORD(space, addr);
+			UINT16 pendat = READ_NEXT_WORD(addr);
 			// real hw would upload the gfxword directly, but our VRAM is 32-bit, so convert it.
 			//dst[dst_x_start + x] = pendat;
 			*dst++ = ((pendat&0x8000)<<14) | ((pendat&0x7c00)<<9) | ((pendat&0x03e0)<<6) | ((pendat&0x001f)<<3);  // --t- ---- rrrr r--- gggg g--- bbbb b---  format
@@ -4952,23 +5001,39 @@ caveblitfunction cave_notint_flipx_opaque_blit_funcs[] =
 
 
 
-INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
+INLINE void cavesh_gfx_draw_shadow_copy(address_space &space, offs_t *addr)
+{
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+}
+
+
+
+INLINE void cavesh_gfx_draw(offs_t *addr)
 {
 	int	x,y, dimx,dimy, flipx,flipy;//, src_p;
 	int trans,blend, s_mode, d_mode;
 	clr_t tint_clr;
 	int tinted = 0;
 
-	UINT16 attr		=	READ_NEXT_WORD(space, addr);
-	UINT16 alpha	=	READ_NEXT_WORD(space, addr);
-	UINT16 src_x	=	READ_NEXT_WORD(space, addr);
-	UINT16 src_y	=	READ_NEXT_WORD(space, addr);
-	UINT16 dst_x_start	=	READ_NEXT_WORD(space, addr);
-	UINT16 dst_y_start	=	READ_NEXT_WORD(space, addr);
-	UINT16 w		=	READ_NEXT_WORD(space, addr);
-	UINT16 h		=	READ_NEXT_WORD(space, addr);
-	UINT16 tint_r	=	READ_NEXT_WORD(space, addr);
-	UINT16 tint_gb	=	READ_NEXT_WORD(space, addr);
+	UINT16 attr		=	READ_NEXT_WORD(addr);
+	UINT16 alpha	=	READ_NEXT_WORD(addr);
+	UINT16 src_x	=	READ_NEXT_WORD(addr);
+	UINT16 src_y	=	READ_NEXT_WORD(addr);
+	UINT16 dst_x_start	=	READ_NEXT_WORD(addr);
+	UINT16 dst_y_start	=	READ_NEXT_WORD(addr);
+	UINT16 w		=	READ_NEXT_WORD(addr);
+	UINT16 h		=	READ_NEXT_WORD(addr);
+	UINT16 tint_r	=	READ_NEXT_WORD(addr);
+	UINT16 tint_gb	=	READ_NEXT_WORD(addr);
 
 	// 0: +alpha
 	// 1: +source
@@ -5168,23 +5233,14 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 
 }
 
-// Death Smiles has bad text with wrong clip sizes, must clip to screen size.
-static void cavesh_gfx_exec(address_space &space)
+
+static void cavesh_gfx_create_shadow_copy(address_space &space)
 {
-	UINT16 cliptype = 0;
-
 	offs_t addr = cavesh_gfx_addr & 0x1fffffff;
-
-//  logerror("GFX EXEC: %08X\n", addr);
-
-	cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x;
-	cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y;
-	cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
-	cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
 
 	while (1)
 	{
-		UINT16 data = READ_NEXT_WORD(space, &addr);
+		UINT16 data = COPY_NEXT_WORD(space, &addr);
 
 		switch( data & 0xf000 )
 		{
@@ -5193,13 +5249,58 @@ static void cavesh_gfx_exec(address_space &space)
 				return;
 
 			case 0xc000:
-				data = READ_NEXT_WORD(space, &addr);
+				data = COPY_NEXT_WORD(space, &addr);
+				break;
+
+			case 0x2000:
+				addr -= 2;
+				cavesh_gfx_upload_shadow_copy(space, &addr);
+				break;
+
+			case 0x1000:
+				addr -= 2;
+				cavesh_gfx_draw_shadow_copy(space, &addr);
+				break;
+
+			default:
+				popmessage("GFX op = %04X", data);
+				return;
+		}
+	}
+}
+
+// Death Smiles has bad text with wrong clip sizes, must clip to screen size.
+static void cavesh_gfx_exec(void)
+{
+	UINT16 cliptype = 0;
+
+	offs_t addr = cavesh_gfx_addr_shadowcopy & 0x1fffffff;
+
+//  logerror("GFX EXEC: %08X\n", addr);
+
+	cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x_shadowcopy;
+	cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y_shadowcopy;
+	cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+	cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
+
+	while (1)
+	{
+		UINT16 data = READ_NEXT_WORD(&addr);
+
+		switch( data & 0xf000 )
+		{
+			case 0x0000:
+			case 0xf000:
+				return;
+
+			case 0xc000:
+				data = READ_NEXT_WORD(&addr);
 				cliptype = data ? 1 : 0;
 
 				if (cliptype)
 				{
-					cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x;
-					cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y;
+					cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x_shadowcopy;
+					cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y_shadowcopy;
 					cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
 					cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
 				}
@@ -5214,12 +5315,12 @@ static void cavesh_gfx_exec(address_space &space)
 
 			case 0x2000:
 				addr -= 2;
-				cavesh_gfx_upload(space, &addr);
+				cavesh_gfx_upload(&addr);
 				break;
 
 			case 0x1000:
 				addr -= 2;
-				cavesh_gfx_draw(space, &addr);
+				cavesh_gfx_draw(&addr);
 				break;
 
 			default:
@@ -5230,6 +5331,15 @@ static void cavesh_gfx_exec(address_space &space)
 }
 
 
+static void *blit_request_callback(void *param, int threadid)
+{
+	cavesh_gfx_exec();
+//	printf("blah\n");
+	return NULL;
+}
+
+
+
 static READ32_HANDLER( cavesh_gfx_ready_r )
 {
 	return 0x00000010;
@@ -5237,12 +5347,32 @@ static READ32_HANDLER( cavesh_gfx_ready_r )
 
 static WRITE32_HANDLER( cavesh_gfx_exec_w )
 {
+	cavesh3_state *state = space->machine().driver_data<cavesh3_state>();
+
 	if ( ACCESSING_BITS_0_7 )
 	{
 		if (data & 1)
 		{
 			//g_profiler.start(PROFILER_USER1);
-			cavesh_gfx_exec(*space);
+			// make sure we've not already got a request running
+			if (state->blitter_request)
+			{
+				int result;
+				do
+				{
+					result = osd_work_item_wait(state->blitter_request, 1000);
+				} while (result==0);
+				osd_work_item_release(state->blitter_request);
+			}
+
+
+			cavesh_gfx_create_shadow_copy(*space); // create a copy of the blit list so we can safely thread it.			
+			cavesh_gfx_addr_shadowcopy = cavesh_gfx_addr;
+			cavesh_gfx_scroll_0_x_shadowcopy =  cavesh_gfx_scroll_0_x;
+			cavesh_gfx_scroll_0_y_shadowcopy = cavesh_gfx_scroll_0_y;
+			cavesh_gfx_scroll_1_x_shadowcopy = cavesh_gfx_scroll_1_x;
+			cavesh_gfx_scroll_1_y_shadowcopy = cavesh_gfx_scroll_1_y;
+			state->blitter_request = osd_work_item_queue(state->queue, blit_request_callback, 0, 0);
 			//g_profiler.stop();
 		}
 	}
@@ -5252,6 +5382,20 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 
 static SCREEN_UPDATE( cavesh3 )
 {
+
+	cavesh3_state *state = screen->machine().driver_data<cavesh3_state>();
+
+	if (state->blitter_request)
+	{
+		int result;
+		do
+		{
+			result = osd_work_item_wait(state->blitter_request, 1000);
+		} while (result==0);
+		osd_work_item_release(state->blitter_request);
+	}
+
+
 	int scroll_0_x, scroll_0_y;
 //	int scroll_1_x, scroll_1_y;
 
@@ -5711,7 +5855,6 @@ static WRITE8_HANDLER( serial_rtc_eeprom_w )
 
 }
 
-static UINT64*cavesh3_ram;
 
 
 static WRITE64_HANDLER( cavesh3_nop_write )
@@ -5843,6 +5986,15 @@ static INTERRUPT_GEN(cavesh3_interrupt)
 	device_set_input_line(device, 2, HOLD_LINE);
 }
 
+static MACHINE_START( cavesh3 )
+{
+	cavesh3_state *state = machine.driver_data<cavesh3_state>();
+
+	cavesh3_ram16_copy = auto_alloc_array(machine, UINT16, 0x8000000);
+
+	state->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+}
+
 static MACHINE_RESET( cavesh3 )
 {
 	cavesh3_state *state = machine.driver_data<cavesh3_state>();
@@ -5852,6 +6004,7 @@ static MACHINE_RESET( cavesh3 )
 	cavesh3_ram16 = (UINT16*)cavesh3_ram;
 
 	state->flashregion = machine.region( "game" )->base();
+
 
 	// cache table to avoid divides in blit code, also pre-clamped
 	int x,y;
@@ -5920,6 +6073,7 @@ static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 
 
 	MCFG_SCREEN_UPDATE(cavesh3)
+	MCFG_MACHINE_START(cavesh3)
 	MCFG_MACHINE_RESET(cavesh3)
 
 	MCFG_VIDEO_START(cavesh3)
