@@ -37,6 +37,11 @@ typedef enum
 
 } rtc9701_state_t;
 
+typedef struct
+{
+	UINT8 sec, min, hour, day, wday, month, year;
+} rtc_regs_t;
+
 
 // ======================> rtc9701_device
 
@@ -53,6 +58,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( read_bit );
 	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
 	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
+	void timer_callback();
 
 protected:
 	// device-level overrides
@@ -85,7 +91,7 @@ protected:
 
 	UINT16 rtc9701_data[0x100];
 
-
+	rtc_regs_t m_rtc;
 };
 
 

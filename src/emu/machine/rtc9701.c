@@ -40,9 +40,36 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 
 }
 
+void rtc9701_device::timer_callback()
+{
+	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+
+	m_rtc.sec++;
+
+	if((m_rtc.sec & 0x0f) >= 0x0a)				{ m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
+	if((m_rtc.sec & 0xf0) >= 0x60)				{ m_rtc.min++; m_rtc.sec = 0; }
+	if((m_rtc.min & 0x0f) >= 0x0a)				{ m_rtc.min+=0x10; m_rtc.min&=0xf0; }
+	if((m_rtc.min & 0xf0) >= 0x60)				{ m_rtc.hour++; m_rtc.min = 0; }
+	if((m_rtc.hour & 0x0f) >= 0x0a)				{ m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
+	if((m_rtc.hour & 0xff) >= 0x24)				{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
+	if((m_rtc.wday & 0x0f) >= 0x07)				{ m_rtc.wday = 0; }
+	if((m_rtc.day & 0x0f) >= 0x0a)				{ m_rtc.day+=0x10; m_rtc.day&=0xf0; }
+	/* TODO: crude leap year support */
+	if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
+	{
+		if((m_rtc.day & 0xff) >= dpm[m_rtc.month-1]+1+1)
+			{ m_rtc.month++; m_rtc.day = 0x01; }
+	}
+	else if((m_rtc.day & 0xff) >= dpm[m_rtc.month-1]+1){ m_rtc.month++; m_rtc.day = 0x01; }
+	if((m_rtc.month & 0x0f) >= 0x0a)			{ m_rtc.month = 0x10; }
+	if(m_rtc.month >= 0x13)						{ m_rtc.year++; m_rtc.month = 1; }
+	if((m_rtc.year & 0x0f) >= 0x0a)				{ m_rtc.year+=0x10; m_rtc.year&=0xf0; }
+	if((m_rtc.year & 0xf0) >= 0xa0)				{ m_rtc.year = 0; } //2000-2099 possible timeframe
+}
+
 TIMER_CALLBACK( rtc9701_device::rtc_inc_callback )
 {
-
+	reinterpret_cast<rtc9701_device *>(ptr)->timer_callback();
 }
 
 //-------------------------------------------------
@@ -65,6 +92,17 @@ void rtc9701_device::device_start()
 	/* let's call the timer callback every second */
 	if(clock() >= XTAL_32_768kHz)
 		machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
+
+	system_time systime;
+	machine().base_datetime(systime);
+
+	m_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
+	m_rtc.month = (((systime.local_time.month+1) / 10) << 4) | (((systime.local_time.month+1) % 10) & 0xf);
+	m_rtc.wday = ((systime.local_time.weekday % 10) & 0xf);
+	m_rtc.year = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
+	m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
+	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
+	m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
 }
 
 
@@ -125,11 +163,15 @@ inline UINT8 rtc9701_device::rtc_read(UINT8 offset)
 
 	switch(offset)
 	{
-		case 0: // seconds
-			res = 0x11;
-			break;
+		case 0: res = m_rtc.sec; break;
+		case 1: res = m_rtc.min; break;
+		case 2: res = m_rtc.hour; break;
+		case 3: res = 1 << m_rtc.wday; break; /* untested */
+		case 4: res = m_rtc.day; break;
+		case 5: res = m_rtc.month; break;
+		case 6: res = m_rtc.year & 0xff; break;
+		case 7: res = 0x20; break;
 	}
-
 
 	return res;
 }
