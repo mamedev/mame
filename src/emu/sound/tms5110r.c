@@ -43,6 +43,7 @@
 #define SUBTYPE_TMS5220			16
 #define SUBTYPE_TMS5220C		32
 #define SUBTYPE_PAT4335277		64
+#define SUBTYPE_VLM5030			128
 
 /* coefficient defines */
 #define MAX_K					10
@@ -533,3 +534,85 @@ static const struct tms5100_coeffs tms5220c_coeff =
 	/* interpolation coefficients */
 	{ 0, 3, 3, 3, 2, 2, 1, 1 }
 };
+
+/* The following Sanyo VLM5030 coefficients are derived from decaps of the chip
+done by ogoun, plus image stitching done by John McMaster. The organization of
+coefficients beyond k2 is derived from work by Tatsuyuki Satoh.
+The actual coefficient rom on the chip die has 5 groups of bits only:
+Address |   K1A   |   K1B   |   K2+   | Energy | Pitch |
+Decoder |   K1A   |   K1B   |   K2+   | Energy | Pitch |
+K1A, K1B and K2+ are 10 bits wide, 32 bits long each.
+Energy and pitch are both 7 bits wide, 32 bits long each.
+K1A holds odd values of K1, K1B holds even values.
+K2+ holds values for K2 directly, and K3 and K4 use every other value,
+and K5-K10 use every 4th value. Values with the MSB of their index set add an additional
+1 or 3 to the index looked up.
+(Not sure how this actually works, the logic driving it is a bit of a mess).
+TODO: Current implementation is a bit of a guess, be warned!
+ */
+static const struct tms5100_coeffs vlm5030_coeff =
+{
+	/* subtype */
+	SUBTYPE_VLM5030,
+	10,
+	5,
+	5,
+	{ 6, 5, 4, 4, 3, 3, 3, 3, 3, 3 },
+	/* E   */
+	{ 0,  1,  2,  3,  5,  6,  7,  9,
+	 11, 13, 15, 17, 19, 22, 24, 27,
+	 31, 34, 38, 42, 47, 51, 57, 62,
+	 68, 75, 82, 89, 98,107,116,127},
+	/* P   */
+	{   0,  21,  22,  23,  24,  25,  26,  27,
+	   28,  29,  31,  33,  35,  37,  39,  41,
+	   43,  45,  49,  53,  57,  61,  65,  69,
+	   73,  77,  85,  93, 101, 109, 117, 125 },
+	{
+		/* K1  */
+		/* (NOTE: the order of each table is correct, despite that the index MSb 
+		looks backwards) */
+		{  390, 403, 414, 425, 434, 443, 450, 457,
+		   463, 469, 474, 478, 482, 485, 488, 491,
+		   494, 496, 498, 499, 501, 502, 503, 504,
+		   505, 506, 507, 507, 508, 508, 509, 509,
+		  -390,-376,-360,-344,-325,-305,-284,-261,
+		  -237,-211,-183,-155,-125, -95, -64, -32,
+		     0,  32,  64,  95, 125, 155, 183, 211,
+		   237, 261, 284, 305, 325, 344, 360, 376 },
+		/* K2  */
+		{    0,  50, 100, 149, 196, 241, 284, 325,
+		   362, 396, 426, 452, 473, 490, 502, 510,
+		     0,-510,-502,-490,-473,-452,-426,-396, /* entry 16(0x10) has some special function, purpose unknown */
+		  -362,-325,-284,-241,-196,-149,-100, -50 },
+		/* K3  */
+		{    0, 100, 196, 284, 362, 426, 473, 502,
+		  -510,-490,-452,-396,-325,-241,-149, -50 },
+		/* K4  */
+		{    0, 100, 196, 284, 362, 426, 473, 502,
+		  -510,-490,-452,-396,-325,-241,-149, -50 },
+		/* K5  */
+		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		/* K6  */
+		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		/* K7  */
+		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		/* K8  */
+		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		/* K9  */
+		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		/* K10 */
+		{    0, 196, 362, 473,-510,-452,-325,-149 },
+	},
+	/* Chirp table */
+	{   0,  42, -44, 50, -78, 18, 37, 20,
+	    2, -31, -59,  2,  95, 90,  5, 15,
+	   38, -4,  -91,-91, -42,-35,-36, -4,
+       37, 43,   34, 33,  15, -1, -8,-18,
+	  -19,-17,   -9,-10,  -6,  0,  3,  2,
+	    1,  0,    0,  0,   0,  0,  0,  0,
+	    0,  0,    0,  0 },
+	/* interpolation coefficients */
+	{ 3, 3, 3, 2, 2, 1, 1, 0 }
+};
+

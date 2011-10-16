@@ -127,6 +127,9 @@ struct _vlm5030_state
 
 	sound_stream * channel;
 
+	/* coefficient tables */
+	const struct tms5100_coeffs *coeff;
+
 	/* need to save state */
 
 	UINT8 *rom;
@@ -181,6 +184,9 @@ enum {
 	PH_END
 };
 
+/* Pull in the ROM tables */
+#include "tms5110r.c"
+
 /*
   speed parameter
 SPC SPB SPA
@@ -203,54 +209,6 @@ static const int vlm5030_speed_table[8] =
 };
 
 static const char VLM_NAME[] = "VLM5030";
-
-/* ROM Tables */
-
-/* This is the energy lookup table */
-
-/* sampled from real chip */
-static const unsigned short energytable[0x20] =
-{
-	  0,  2,  4,  6, 10, 12, 14, 18, /*  0-7  */
-	 22, 26, 30, 34, 38, 44, 48, 54, /*  8-15 */
-	 62, 68, 76, 84, 94,102,114,124, /* 16-23 */
-	136,150,164,178,196,214,232,254  /* 24-31 */
-};
-
-/* This is the pitch lookup table */
-static const unsigned char pitchtable [0x20]=
-{
-   1,                               /* 0     : random mode */
-   22,                              /* 1     : start=22    */
-   23, 24, 25, 26, 27, 28, 29, 30,  /*  2- 9 : 1step       */
-   32, 34, 36, 38, 40, 42, 44, 46,  /* 10-17 : 2step       */
-   50, 54, 58, 62, 66, 70, 74, 78,  /* 18-25 : 4step       */
-   86, 94, 102,110,118,126          /* 26-31 : 8step       */
-};
-
-static const INT16 K1_table[] = {
-  -24898,  -25672,  -26446,  -27091,  -27736,  -28252,  -28768,  -29155,
-  -29542,  -29929,  -30316,  -30574,  -30832,  -30961,  -31219,  -31348,
-  -31606,  -31735,  -31864,  -31864,  -31993,  -32122,  -32122,  -32251,
-  -32251,  -32380,  -32380,  -32380,  -32509,  -32509,  -32509,  -32509,
-   24898,   23995,   22963,   21931,   20770,   19480,   18061,   16642,
-   15093,   13416,   11610,    9804,    7998,    6063,    3999,    1935,
-       0,   -1935,   -3999,   -6063,   -7998,   -9804,  -11610,  -13416,
-  -15093,  -16642,  -18061,  -19480,  -20770,  -21931,  -22963,  -23995
-};
-static const INT16 K2_table[] = {
-       0,   -3096,   -6321,   -9417,  -12513,  -15351,  -18061,  -20770,
-  -23092,  -25285,  -27220,  -28897,  -30187,  -31348,  -32122,  -32638,
-       0,   32638,   32122,   31348,   30187,   28897,   27220,   25285,
-   23092,   20770,   18061,   15351,   12513,    9417,    6321,    3096
-};
-static const INT16 K3_table[] = {
-       0,   -3999,   -8127,  -12255,  -16384,  -20383,  -24511,  -28639,
-   32638,   28639,   24511,   20383,   16254,   12255,    8127,    3999
-};
-static const INT16 K5_table[] = {
-       0,   -8127,  -16384,  -24511,   32638,   24511,   16254,    8127
-};
 
 INLINE vlm5030_state *get_safe_token(device_t *device)
 {
@@ -306,24 +264,25 @@ static int parse_frame (vlm5030_state *chip)
 		}
 	}
 	/* pitch */
-	chip->new_pitch  = ( pitchtable[get_bits(chip, 1,5)] + chip->pitch_offset )&0xff;
+	chip->new_pitch  = ( chip->coeff->pitchtable[get_bits(chip, 1,chip->coeff->pitch_bits)] + chip->pitch_offset )&0xff;
 	/* energy */
-	chip->new_energy = energytable[get_bits(chip, 6,5)];
+	chip->new_energy = chip->coeff->energytable[get_bits(chip, 6,chip->coeff->energy_bits)];
 
 	/* 10 K's */
-	chip->new_k[9] = K5_table[get_bits(chip,11,3)];
-	chip->new_k[8] = K5_table[get_bits(chip,14,3)];
-	chip->new_k[7] = K5_table[get_bits(chip,17,3)];
-	chip->new_k[6] = K5_table[get_bits(chip,20,3)];
-	chip->new_k[5] = K5_table[get_bits(chip,23,3)];
-	chip->new_k[4] = K5_table[get_bits(chip,26,3)];
-	chip->new_k[3] = K3_table[get_bits(chip,29,4)];
-	chip->new_k[2] = K3_table[get_bits(chip,33,4)];
-	chip->new_k[1] = K2_table[get_bits(chip,37,5)];
-	chip->new_k[0] = K1_table[get_bits(chip,42,6)];
+	chip->new_k[9] = chip->coeff->ktable[9][get_bits(chip,11,chip->coeff->kbits[9])];
+	chip->new_k[8] = chip->coeff->ktable[8][get_bits(chip,14,chip->coeff->kbits[8])];
+	chip->new_k[7] = chip->coeff->ktable[7][get_bits(chip,17,chip->coeff->kbits[7])];
+	chip->new_k[6] = chip->coeff->ktable[6][get_bits(chip,20,chip->coeff->kbits[6])];
+	chip->new_k[5] = chip->coeff->ktable[5][get_bits(chip,23,chip->coeff->kbits[5])];
+	chip->new_k[4] = chip->coeff->ktable[4][get_bits(chip,26,chip->coeff->kbits[4])];
+	chip->new_k[3] = chip->coeff->ktable[3][get_bits(chip,29,chip->coeff->kbits[3])];
+	chip->new_k[2] = chip->coeff->ktable[2][get_bits(chip,33,chip->coeff->kbits[2])];
+	chip->new_k[1] = chip->coeff->ktable[1][get_bits(chip,37,chip->coeff->kbits[1])];
+	chip->new_k[0] = chip->coeff->ktable[0][get_bits(chip,42,chip->coeff->kbits[0])];
 
 	chip->address+=6;
 	logerror("VLM5030 %04X voice \n",chip->address );
+	//fprintf(stderr,"*** target Energy, Pitch, and Ks = %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",chip->new_energy, chip->new_pitch, chip->new_k[0], chip->new_k[1], chip->new_k[2], chip->new_k[3], chip->new_k[4], chip->new_k[5], chip->new_k[6], chip->new_k[7], chip->new_k[8], chip->new_k[9]);
 	return FR_SIZE;
 }
 
@@ -421,9 +380,9 @@ static STREAM_UPDATE( vlm5030_update_callback )
 			/* Lattice filter here */
 			u[10] = current_val;
 			for (i = 9; i >= 0; i--)
-				u[i] = u[i+1] - ((chip->current_k[i] * chip->x[i]) / 32768);
+				u[i] = u[i+1] - ((-chip->current_k[i] * chip->x[i]) / 512);
 			for (i = 9; i >= 1; i--)
-				chip->x[i] = chip->x[i-1] + ((chip->current_k[i-1] * u[i-1]) / 32768);
+				chip->x[i] = chip->x[i-1] + ((-chip->current_k[i-1] * u[i-1]) / 512);
 			chip->x[0] = u[0];
 
 			/* clipping, buffering */
@@ -684,6 +643,7 @@ static DEVICE_START( vlm5030 )
 	vlm5030_state *chip = get_safe_token(device);
 
 	chip->device = device;
+	chip->coeff = &vlm5030_coeff;
 	chip->intf = (device->static_config() != NULL) ? (const vlm5030_interface *)device->static_config() : &defintrf;
 
 	emulation_rate = device->clock() / 440;
