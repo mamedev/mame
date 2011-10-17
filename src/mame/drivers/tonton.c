@@ -9,7 +9,7 @@
 
   TODO:
 
-  - Hopper mechanism;
+  - Hopper mechanism.
 
 ===========================================================================
 
@@ -162,9 +162,9 @@ static INPUT_PORTS_START( tonton )
 	PORT_DIPSETTING(    0x10, "2 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x18, "1 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x08, "1 Coin / 2 Medal" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Service Coinage" )		PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, "1 Pulse / 1 Medal" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 2 Medal" )
 	PORT_DIPNAME( 0x40, 0x40, "Coinage A Lock" )		PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, "Unlocked" )
 	PORT_DIPSETTING(    0x00, "Locked" )
