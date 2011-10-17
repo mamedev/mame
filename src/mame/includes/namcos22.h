@@ -75,7 +75,9 @@ public:
 	UINT32 *m_czattr;
 	UINT32 *m_tilemapattr;
 	int m_mbSpotlightEnable;
-	UINT16 *m_czram[4];
+	UINT32 *m_czram;
+	UINT16 *m_banked_czram[4];
+	int m_cz_adjust;
 	poly_manager *m_poly;
 	UINT16 *m_mpTextureTileMap16;
 	UINT8 *m_mpTextureTileMapAttr;

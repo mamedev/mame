@@ -3216,7 +3216,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
      * Mounted position: VIDEO 8P
      * Known chip type: TC55328P-25
      */
-	AM_RANGE(0x90010000, 0x90017fff) AM_RAM /* AM_BASE_MEMBER(namcos22_state, m_czram) */
+	AM_RANGE(0x90010000, 0x90017fff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czram)
 
 	/**
      * C305 (Display Controller)

@@ -4,45 +4,72 @@
  * todo (ordered by importance):
  *
  * - emulate slave dsp!
- * - poly fog (should be per-z, not per-poly, and not even hooked yet up on non-super)
+ * - improve super22 poly fog
  * - emulate spot
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
- * - tokyowar tanks are not shootable, same for timecris helicopter,
- *   there's still a very small hitbox but almost impossible to hit
- *   (is this related to dsp? or cpu?)
+ * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
+ *       (is this related to dsp? or cpu?)
  * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly, or is it linktable related?
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
- *   (probably a bug in rgbint, not here?)
+ *       (probably a bug in rgbint, not here?)
  * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
+ * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
+ *       czram contents is rather odd here and partly cleared (probably the cause?):
+ *        $0000-$0d7f   - gradual increase from $00-$7c
+ *        $0d80-$0fff   - $73, huh, why lower?
+ *        $1000-$19ff   - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
+ *        $1a00-$0dff   - $77
+ *        $1e00-$1fff   - $78
  *
  * - lots of smaller issues
  *
  *
- *******************************
-czram[0] = 1fff 1fdf 1fbf 1f9f 1f7f 1f5f 1f3f 1f1f 1eff 1edf 1ebf 1e9f 1e7f 1e5f 1e3f 1e1f 1dff 1ddf 1dbf 1d9f 1d7f 1d5f 1d3f 1d1f 1cff 1cdf 1cbf 1c9f 1c7f 1c5f 1c3f 1c1f 1bff 1bdf 1bbf 1b9f 1b7f 1b5f 1b3f 1b1f 1aff 1adf 1abf 1a9f 1a7f 1a5f 1a3f 1a1f 19ff 19df 19bf 199f 197f 195f 193f 191f 18ff 18df 18bf 189f 187f 185f 183f 181f 17ff 17df 17bf 179f 177f 175f 173f 171f 16ff 16df 16bf 169f 167f 165f 163f 161f 15ff 15df 15bf 159f 157f 155f 153f 151f 14ff 14df 14bf 149f 147f 145f 143f 141f 13ff 13df 13bf 139f 137f 135f 133f 131f 12ff 12df 12bf 129f 127f 125f 123f 121f 11ff 11df 11bf 119f 117f 115f 113f 111f 10ff 10df 10bf 109f 107f 105f 103f 101f 0fff 0fdf 0fbf 0f9f 0f7f 0f5f 0f3f 0f1f 0eff 0edf 0ebf 0e9f 0e7f 0e5f 0e3f 0e1f 0dff 0ddf 0dbf 0d9f 0d7f 0d5f 0d3f 0d1f 0cff 0cdf 0cbf 0c9f 0c7f 0c5f 0c3f 0c1f 0bff 0bdf 0bbf 0b9f 0b7f 0b5f 0b3f 0b1f 0aff 0adf 0abf 0a9f 0a7f 0a5f 0a3f 0a1f 09ff 09df 09bf 099f 097f 095f 093f 091f 08ff 08df 08bf 089f 087f 085f 083f 081f 07ff 07df 07bf 079f 077f 075f 073f 071f 06ff 06df 06bf 069f 067f 065f 063f 061f 05ff 05df 05bf 059f 057f 055f 053f 051f 04ff 04df 04bf 049f 047f 045f 043f 041f 03ff 03df 03bf 039f 037f 035f 033f 031f 02ff 02df 02bf 029f 027f 025f 023f 021f 01ff 01df 01bf 019f 017f 015f 013f 011f 00ff 00df 00bf 009f 007f 005f 003f 001f
-czram[1] = 0000 0000 0000 0001 0002 0003 0005 0007 0009 000b 000e 0011 0014 0017 001b 001f 0023 0027 002c 0031 0036 003b 0041 0047 004d 0053 005a 0061 0068 006f 0077 007f 0087 008f 0098 00a1 00aa 00b3 00bd 00c7 00d1 00db 00e6 00f1 00fc 0107 0113 011f 012b 0137 0144 0151 015e 016b 0179 0187 0195 01a3 01b2 01c1 01d0 01df 01ef 01ff 020f 021f 0230 0241 0252 0263 0275 0287 0299 02ab 02be 02d1 02e4 02f7 030b 031f 0333 0347 035c 0371 0386 039b 03b1 03c7 03dd 03f3 040a 0421 0438 044f 0467 047f 0497 04af 04c8 04e1 04fa 0513 052d 0547 0561 057b 0596 05b1 05cc 05e7 0603 061f 063b 0657 0674 0691 06ae 06cb 06e9 0707 0725 0743 0762 0781 07a0 07bf 07df 07ff 081f 083f 0860 0881 08a2 08c3 08e5 0907 0929 094b 096e 0991 09b4 09d7 09fb 0a1f 0a43 0a67 0a8c 0ab1 0ad6 0afb 0b21 0b47 0b6d 0b93 0bba 0be1 0c08 0c2f 0c57 0c7f 0ca7 0ccf 0cf8 0d21 0d4a 0d73 0d9d 0dc7 0df1 0e1b 0e46 0e71 0e9c 0ec7 0ef3 0f1f 0f4b 0f77 0fa4 0fd1 0ffe 102b 1059 1087 10b5 10e3 1112 1141 1170 119f 11cf 11ff 122f 125f 1290 12c1 12f2 1323 1355 1387 13b9 13eb 141e 1451 1484 14b7 14eb 151f 1553 1587 15bc 15f1 1626 165b 1691 16c7 16fd 1733 176a 17a1 17d8 180f 1847 187f 18b7 18ef 1928 1961 199a 19d3 1a0d 1a47 1a81 1abb 1af6 1b31 1b6c 1ba7 1be3 1c1f 1c5b 1c97 1cd4 1d11 1d4e 1d8b 1dc9 1e07 1e45 1e83 1ec2 1f01 1f40 1f7f 1fbf 1fff
-czram[2] = 003f 007f 00be 00fd 013c 017b 01b9 01f7 0235 0273 02b0 02ed 032a 0367 03a3 03df 041b 0457 0492 04cd 0508 0543 057d 05b7 05f1 062b 0664 069d 06d6 070f 0747 077f 07b7 07ef 0826 085d 0894 08cb 0901 0937 096d 09a3 09d8 0a0d 0a42 0a77 0aab 0adf 0b13 0b47 0b7a 0bad 0be0 0c13 0c45 0c77 0ca9 0cdb 0d0c 0d3d 0d6e 0d9f 0dcf 0dff 0e2f 0e5f 0e8e 0ebd 0eec 0f1b 0f49 0f77 0fa5 0fd3 1000 102d 105a 1087 10b3 10df 110b 1137 1162 118d 11b8 11e3 120d 1237 1261 128b 12b4 12dd 1306 132f 1357 137f 13a7 13cf 13f6 141d 1444 146b 1491 14b7 14dd 1503 1528 154d 1572 1597 15bb 15df 1603 1627 164a 166d 1690 16b3 16d5 16f7 1719 173b 175c 177d 179e 17bf 17df 17ff 181f 183f 185e 187d 189c 18bb 18d9 18f7 1915 1933 1950 196d 198a 19a7 19c3 19df 19fb 1a17 1a32 1a4d 1a68 1a83 1a9d 1ab7 1ad1 1aeb 1b04 1b1d 1b36 1b4f 1b67 1b7f 1b97 1baf 1bc6 1bdd 1bf4 1c0b 1c21 1c37 1c4d 1c63 1c78 1c8d 1ca2 1cb7 1ccb 1cdf 1cf3 1d07 1d1a 1d2d 1d40 1d53 1d65 1d77 1d89 1d9b 1dac 1dbd 1dce 1ddf 1def 1dff 1e0f 1e1f 1e2e 1e3d 1e4c 1e5b 1e69 1e77 1e85 1e93 1ea0 1ead 1eba 1ec7 1ed3 1edf 1eeb 1ef7 1f02 1f0d 1f18 1f23 1f2d 1f37 1f41 1f4b 1f54 1f5d 1f66 1f6f 1f77 1f7f 1f87 1f8f 1f96 1f9d 1fa4 1fab 1fb1 1fb7 1fbd 1fc3 1fc8 1fcd 1fd2 1fd7 1fdb 1fdf 1fe3 1fe7 1fea 1fed 1ff0 1ff3 1ff5 1ff7 1ff9 1ffb 1ffc 1ffd 1ffe 1fff 1fff 1fff
-czram[3] = 0000 001f 003f 005f 007f 009f 00bf 00df 00ff 011f 013f 015f 017f 019f 01bf 01df 01ff 021f 023f 025f 027f 029f 02bf 02df 02ff 031f 033f 035f 037f 039f 03bf 03df 03ff 041f 043f 045f 047f 049f 04bf 04df 04ff 051f 053f 055f 057f 059f 05bf 05df 05ff 061f 063f 065f 067f 069f 06bf 06df 06ff 071f 073f 075f 077f 079f 07bf 07df 07ff 081f 083f 085f 087f 089f 08bf 08df 08ff 091f 093f 095f 097f 099f 09bf 09df 09ff 0a1f 0a3f 0a5f 0a7f 0a9f 0abf 0adf 0aff 0b1f 0b3f 0b5f 0b7f 0b9f 0bbf 0bdf 0bff 0c1f 0c3f 0c5f 0c7f 0c9f 0cbf 0cdf 0cff 0d1f 0d3f 0d5f 0d7f 0d9f 0dbf 0ddf 0dff 0e1f 0e3f 0e5f 0e7f 0e9f 0ebf 0edf 0eff 0f1f 0f3f 0f5f 0f7f 0f9f 0fbf 0fdf 0fff 101f 103f 105f 107f 109f 10bf 10df 10ff 111f 113f 115f 117f 119f 11bf 11df 11ff 121f 123f 125f 127f 129f 12bf 12df 12ff 131f 133f 135f 137f 139f 13bf 13df 13ff 141f 143f 145f 147f 149f 14bf 14df 14ff 151f 153f 155f 157f 159f 15bf 15df 15ff 161f 163f 165f 167f 169f 16bf 16df 16ff 171f 173f 175f 177f 179f 17bf 17df 17ff 181f 183f 185f 187f 189f 18bf 18df 18ff 191f 193f 195f 197f 199f 19bf 19df 19ff 1a1f 1a3f 1a5f 1a7f 1a9f 1abf 1adf 1aff 1b1f 1b3f 1b5f 1b7f 1b9f 1bbf 1bdf 1bff 1c1f 1c3f 1c5f 1c7f 1c9f 1cbf 1cdf 1cff 1d1f 1d3f 1d5f 1d7f 1d9f 1dbf 1ddf 1dff 1e1f 1e3f 1e5f 1e7f 1e9f 1ebf 1edf 1eff 1f1f 1f3f 1f5f 1f7f 1f9f 1fbf 1fdf
-
-CZ (NORMAL) 00810000: 00000000 00000000 75550000 00e40000
-CZ (OFFSET) 00810000: 7fff8000 7fff8000 75550000 00e40000
-CZ (OFF)    00810000: 00000000 00000000 31110000 00e40000
-
-SPOT TABLE test
-03F282: 13FC 0000 0082 4011        move.b  #$0, $824011.l
-03F28A: 13FC 0000 0082 4015        move.b  #$0, $824015.l
-03F292: 13FC 0080 0082 400D        move.b  #$80, $82400d.l
-03F29A: 13FC 0001 0082 400E        move.b  #$1, $82400e.l
-03F2A2: 13FC 0001 0082 4021        move.b  #$1, $824021.l
-03F2AA: 33FC 4038 0080 0000        move.w  #$4038, $800000.l
-03F2B2: 06B9 0000 0001 00E0 AB08   addi.l  #$1, $e0ab08.l
-*/
+ *******************************/
 
 #include "emu.h"
 #include "video/rgbutil.h"
 #include "includes/namcos22.h"
 #include "video/poly.h"
+
+/* for debug: allow memdump to file with D key */
+#define ALLOW_MEMDUMP	0
+
+#if ALLOW_MEMDUMP
+static void Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name )
+{
+	unsigned addr;
+	fprintf( f, "%s:\n", name );
+	for( addr=addr1; addr<=addr2; addr+=16 )
+	{
+		UINT8 data[16];
+		int bHasNonZero = 0;
+		int i;
+		for( i=0; i<16; i++ )
+		{
+			data[i] = space->read_byte(addr+i );
+			if( data[i] )
+			{
+				bHasNonZero = 1;
+			}
+		}
+		if( bHasNonZero )
+		{
+			fprintf( f,"%08x:", addr );
+			for( i=0; i<16; i++ )
+			{
+				if( (i&0x03)==0 )
+				{
+					fprintf( f, " " );
+				}
+				fprintf( f, "%02x", data[i] );
+			}
+			fprintf( f, "\n" );
+		}
+	}
+	fprintf( f, "\n" );
+}
+#endif
 
 
 static UINT8
@@ -73,10 +100,6 @@ Clamp256( int v )
 	return v;
 } /* Clamp256 */
 
-#ifdef MAME_DEBUG
-static void Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name );
-#endif
-
 
 static struct
 {
@@ -84,9 +107,10 @@ static struct
 	int rFogColor;
 	int gFogColor;
 	int bFogColor;
-	int rFogColor2;
-	int gFogColor2;
-	int bFogColor2;
+	UINT32 fog_colormask;
+	int rFogColor_per_cztype[4];
+	int gFogColor_per_cztype[4];
+	int bFogColor_per_cztype[4];
 	int rPolyFadeColor;
 	int gPolyFadeColor;
 	int bPolyFadeColor;
@@ -103,15 +127,27 @@ static struct
 static void
 UpdateVideoMixer( running_machine &machine )
 {
+	int i;
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	poly_wait(state->m_poly, "UpdateVideoMixer");
 	memset( &mixer, 0, sizeof(mixer) );
 #if 0 // show reg contents
 	char msg1[0x1000]={0}, msg2[0x1000]={0};
-	int i,st=0x000/16;
-	for (i=st;i<(st+3);i++) {
+	int st=0x000/16;
+	for (i=st;i<(st+3);i++)
+	{
 		sprintf(msg2,"%04X %08X %08X %08X %08X\n",i*16,state->m_gamma[i*4+0],state->m_gamma[i*4+1],state->m_gamma[i*4+2],state->m_gamma[i*4+3]);
 		strcat(msg1,msg2);
+	}
+	if (1) // + other non-super regs
+	if (!state->m_mbSuperSystem22)
+	{
+		strcat(msg1,"\n");
+		for (i=8;i<=0x20;i+=8)
+		{
+			sprintf(msg2,"%04X %08X %08X %08X %08X\n",i*16,state->m_gamma[i*4+0],state->m_gamma[i*4+1],state->m_gamma[i*4+2],state->m_gamma[i*4+3]);
+			strcat(msg1,msg2);
+		}
 	}
 	popmessage("%s",msg1);
 #endif
@@ -188,9 +224,11 @@ UpdateVideoMixer( running_machine &machine )
     11,12           global fade factor red
     13,14           global fade factor green
     15,16           global fade factor blue
-
-    100,180,200     world fog rgb (not implemented)
-    101,181,201     specific fog rgb? (not implemented)
+    80-87           fog color mask?
+    100,180,200     fog rgb 0
+    101,181,201     fog rgb 1
+    102,182,202     fog rgb 2
+    103,183,203     fog rgb 3
 */
 		mixer.flags             = nthbyte( state->m_gamma, 0x00 )*256 + nthbyte( state->m_gamma, 0x01 );
 		mixer.rPolyFadeColor    = nthbyte( state->m_gamma, 0x11 )*256 + nthbyte( state->m_gamma, 0x12 ); // 0x0100 = 1.0
@@ -198,15 +236,18 @@ UpdateVideoMixer( running_machine &machine )
 		mixer.bPolyFadeColor    = nthbyte( state->m_gamma, 0x15 )*256 + nthbyte( state->m_gamma, 0x16 );
 		mixer.PolyFade_enabled  = (mixer.rPolyFadeColor == 0x100 && mixer.gPolyFadeColor == 0x100 && mixer.bPolyFadeColor == 0x100) ? 0 : 1;
 
-		mixer.rFogColor  = nthbyte( state->m_gamma, 0x0100 );
-		mixer.rFogColor2 = nthbyte( state->m_gamma, 0x0101 ); // eg. used for heating of brake-disc on raveracw
-		mixer.gFogColor  = nthbyte( state->m_gamma, 0x0180 );
-		mixer.gFogColor2 = nthbyte( state->m_gamma, 0x0181 );
-		mixer.bFogColor  = nthbyte( state->m_gamma, 0x0200 );
-		mixer.bFogColor2 = nthbyte( state->m_gamma, 0x0201 );
+		// raveracw is the only game using multiple fog colors (city smog, cars under tunnels, brake disc in attract mode)
+		mixer.fog_colormask     = state->m_gamma[0x84/4];
+
+		// fog color per cz type
+		for (i=0; i<4; i++)
+		{
+			mixer.rFogColor_per_cztype[i] = nthbyte( state->m_gamma, 0x0100+i );
+			mixer.gFogColor_per_cztype[i] = nthbyte( state->m_gamma, 0x0180+i );
+			mixer.bFogColor_per_cztype[i] = nthbyte( state->m_gamma, 0x0200+i );
+		}
 
 		mixer.palBase = 0x7f;
-		mixer.poly_translucency = 0;
 	}
 }
 
@@ -300,12 +341,15 @@ struct _poly_extra_data
 	const pen_t *pens;
 	bitmap_t *priority_bitmap;
 	int bn;
-	UINT16 flags;
+	int flags;
+	int prioverchar;
 	int cmode;
-	int fogFactor;
 	int fadeFactor;
 	int pfade_enabled;
-	int prioverchar;
+	int fogFactor;
+	int zfog_enabled;
+	int cz_adjust;
+	const UINT8 *czram_8;
 
 	/* sprites */
 	const UINT8 *source;
@@ -331,6 +375,9 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	bitmap_t *destmap = (bitmap_t *)destbase;
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = extra->pens;
+	const UINT8 *czram_8 = extra->czram_8;
+	int cz_adjust = extra->cz_adjust;
+	int zfog_enabled = extra->zfog_enabled;
 	int fogFactor = 0xff - extra->fogFactor;
 	int fadeFactor = 0xff - extra->fadeFactor;
 	int alphaFactor = 0xff - mixer.poly_translucency;
@@ -362,16 +409,35 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	{
 		float ooz = 1.0f / z;
 		int pen = texel(state, (int)(u*ooz), bn+(int)(v*ooz));
-		int shade = i*ooz;
-		rgbint rgb;
-
 		// pen = 0x55; // debug: disable textures
 
+		rgbint rgb;
 		rgb_to_rgbint(&rgb, pens[pen>>penshift&penmask]);
-		rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
 
-		if( fogFactor != 0xff )
+		if (zfog_enabled)
+		{
+			// per-z distance fogging
+			if (state->m_mbSuperSystem22)
+			{
+				// todo
+				// not understood yet
+			}
+			else
+			{
+				int cz = ooz + cz_adjust;
+				// discard low byte and clamp to 0-1fff
+				if ((UINT32)cz < 0x200000) cz >>= 8;
+				else cz = (cz < 0) ? 0 : 0x1fff;
+				if ((fogFactor = czram_8[NATIVE_ENDIAN_VALUE_LE_BE(3,0)^cz]) != 0)
+					rgbint_blend(&rgb, &fogColor, 0xff-fogFactor);
+			}
+		}
+		else if (fogFactor != 0xff) // direct
 			rgbint_blend(&rgb, &fogColor, fogFactor);
+
+		// gourad shading after fog
+		int shade = i*ooz;
+		rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
 
 		if( polyfade_enabled )
 			rgbint_scale_channel_and_clamp(&rgb, &polyColor);
@@ -396,7 +462,7 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	}
 } /* renderscanline_uvi_full */
 
-static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int textureBank, int color, Poly3dVertex pv[4], UINT16 flags, int direct, int cmode )
+static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int textureBank, int color, Poly3dVertex pv[4], int flags, int cz_adjust, int direct, int cmode )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
@@ -405,13 +471,16 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 	int vertnum;
 
 	extra->machine = &machine;
-	extra->fogFactor = 0;
+	extra->pfade_enabled = 0;
+	extra->zfog_enabled = 0;
 	extra->fadeFactor = 0;
+	extra->fogFactor = 0;
 
 	extra->pens = &machine.pens[(color&0x7f)<<8];
 	extra->priority_bitmap = machine.priority_bitmap;
 	extra->bn = textureBank;
 	extra->flags = flags;
+	extra->cz_adjust = cz_adjust;
 	extra->cmode = cmode;
 	extra->prioverchar = (state->m_mbSuperSystem22 << 1) | ((cmode & 7) == 1);
 
@@ -472,7 +541,86 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 		extra->pfade_enabled = mixer.PolyFade_enabled;
 		rgb_comp_to_rgbint(&extra->polyColor, mixer.rPolyFadeColor, mixer.gPolyFadeColor, mixer.bPolyFadeColor);
 
-		// fog (prelim!)
+		/* fog (prelim!)
+
+		czram contents.. big amount, sorry :P  this stuff will be removed when ss22 fog is understood
+
+		testmode:
+			czram[0] = 1fff 1fdf 1fbf 1f9f 1f7f 1f5f 1f3f 1f1f 1eff 1edf 1ebf 1e9f 1e7f 1e5f 1e3f 1e1f 1dff 1ddf 1dbf 1d9f 1d7f 1d5f 1d3f 1d1f 1cff 1cdf 1cbf 1c9f 1c7f 1c5f 1c3f 1c1f 1bff 1bdf 1bbf 1b9f 1b7f 1b5f 1b3f 1b1f 1aff 1adf 1abf 1a9f 1a7f 1a5f 1a3f 1a1f 19ff 19df 19bf 199f 197f 195f 193f 191f 18ff 18df 18bf 189f 187f 185f 183f 181f 17ff 17df 17bf 179f 177f 175f 173f 171f 16ff 16df 16bf 169f 167f 165f 163f 161f 15ff 15df 15bf 159f 157f 155f 153f 151f 14ff 14df 14bf 149f 147f 145f 143f 141f 13ff 13df 13bf 139f 137f 135f 133f 131f 12ff 12df 12bf 129f 127f 125f 123f 121f 11ff 11df 11bf 119f 117f 115f 113f 111f 10ff 10df 10bf 109f 107f 105f 103f 101f 0fff 0fdf 0fbf 0f9f 0f7f 0f5f 0f3f 0f1f 0eff 0edf 0ebf 0e9f 0e7f 0e5f 0e3f 0e1f 0dff 0ddf 0dbf 0d9f 0d7f 0d5f 0d3f 0d1f 0cff 0cdf 0cbf 0c9f 0c7f 0c5f 0c3f 0c1f 0bff 0bdf 0bbf 0b9f 0b7f 0b5f 0b3f 0b1f 0aff 0adf 0abf 0a9f 0a7f 0a5f 0a3f 0a1f 09ff 09df 09bf 099f 097f 095f 093f 091f 08ff 08df 08bf 089f 087f 085f 083f 081f 07ff 07df 07bf 079f 077f 075f 073f 071f 06ff 06df 06bf 069f 067f 065f 063f 061f 05ff 05df 05bf 059f 057f 055f 053f 051f 04ff 04df 04bf 049f 047f 045f 043f 041f 03ff 03df 03bf 039f 037f 035f 033f 031f 02ff 02df 02bf 029f 027f 025f 023f 021f 01ff 01df 01bf 019f 017f 015f 013f 011f 00ff 00df 00bf 009f 007f 005f 003f 001f
+			czram[1] = 0000 0000 0000 0001 0002 0003 0005 0007 0009 000b 000e 0011 0014 0017 001b 001f 0023 0027 002c 0031 0036 003b 0041 0047 004d 0053 005a 0061 0068 006f 0077 007f 0087 008f 0098 00a1 00aa 00b3 00bd 00c7 00d1 00db 00e6 00f1 00fc 0107 0113 011f 012b 0137 0144 0151 015e 016b 0179 0187 0195 01a3 01b2 01c1 01d0 01df 01ef 01ff 020f 021f 0230 0241 0252 0263 0275 0287 0299 02ab 02be 02d1 02e4 02f7 030b 031f 0333 0347 035c 0371 0386 039b 03b1 03c7 03dd 03f3 040a 0421 0438 044f 0467 047f 0497 04af 04c8 04e1 04fa 0513 052d 0547 0561 057b 0596 05b1 05cc 05e7 0603 061f 063b 0657 0674 0691 06ae 06cb 06e9 0707 0725 0743 0762 0781 07a0 07bf 07df 07ff 081f 083f 0860 0881 08a2 08c3 08e5 0907 0929 094b 096e 0991 09b4 09d7 09fb 0a1f 0a43 0a67 0a8c 0ab1 0ad6 0afb 0b21 0b47 0b6d 0b93 0bba 0be1 0c08 0c2f 0c57 0c7f 0ca7 0ccf 0cf8 0d21 0d4a 0d73 0d9d 0dc7 0df1 0e1b 0e46 0e71 0e9c 0ec7 0ef3 0f1f 0f4b 0f77 0fa4 0fd1 0ffe 102b 1059 1087 10b5 10e3 1112 1141 1170 119f 11cf 11ff 122f 125f 1290 12c1 12f2 1323 1355 1387 13b9 13eb 141e 1451 1484 14b7 14eb 151f 1553 1587 15bc 15f1 1626 165b 1691 16c7 16fd 1733 176a 17a1 17d8 180f 1847 187f 18b7 18ef 1928 1961 199a 19d3 1a0d 1a47 1a81 1abb 1af6 1b31 1b6c 1ba7 1be3 1c1f 1c5b 1c97 1cd4 1d11 1d4e 1d8b 1dc9 1e07 1e45 1e83 1ec2 1f01 1f40 1f7f 1fbf 1fff
+			czram[2] = 003f 007f 00be 00fd 013c 017b 01b9 01f7 0235 0273 02b0 02ed 032a 0367 03a3 03df 041b 0457 0492 04cd 0508 0543 057d 05b7 05f1 062b 0664 069d 06d6 070f 0747 077f 07b7 07ef 0826 085d 0894 08cb 0901 0937 096d 09a3 09d8 0a0d 0a42 0a77 0aab 0adf 0b13 0b47 0b7a 0bad 0be0 0c13 0c45 0c77 0ca9 0cdb 0d0c 0d3d 0d6e 0d9f 0dcf 0dff 0e2f 0e5f 0e8e 0ebd 0eec 0f1b 0f49 0f77 0fa5 0fd3 1000 102d 105a 1087 10b3 10df 110b 1137 1162 118d 11b8 11e3 120d 1237 1261 128b 12b4 12dd 1306 132f 1357 137f 13a7 13cf 13f6 141d 1444 146b 1491 14b7 14dd 1503 1528 154d 1572 1597 15bb 15df 1603 1627 164a 166d 1690 16b3 16d5 16f7 1719 173b 175c 177d 179e 17bf 17df 17ff 181f 183f 185e 187d 189c 18bb 18d9 18f7 1915 1933 1950 196d 198a 19a7 19c3 19df 19fb 1a17 1a32 1a4d 1a68 1a83 1a9d 1ab7 1ad1 1aeb 1b04 1b1d 1b36 1b4f 1b67 1b7f 1b97 1baf 1bc6 1bdd 1bf4 1c0b 1c21 1c37 1c4d 1c63 1c78 1c8d 1ca2 1cb7 1ccb 1cdf 1cf3 1d07 1d1a 1d2d 1d40 1d53 1d65 1d77 1d89 1d9b 1dac 1dbd 1dce 1ddf 1def 1dff 1e0f 1e1f 1e2e 1e3d 1e4c 1e5b 1e69 1e77 1e85 1e93 1ea0 1ead 1eba 1ec7 1ed3 1edf 1eeb 1ef7 1f02 1f0d 1f18 1f23 1f2d 1f37 1f41 1f4b 1f54 1f5d 1f66 1f6f 1f77 1f7f 1f87 1f8f 1f96 1f9d 1fa4 1fab 1fb1 1fb7 1fbd 1fc3 1fc8 1fcd 1fd2 1fd7 1fdb 1fdf 1fe3 1fe7 1fea 1fed 1ff0 1ff3 1ff5 1ff7 1ff9 1ffb 1ffc 1ffd 1ffe 1fff 1fff 1fff
+			czram[3] = 0000 001f 003f 005f 007f 009f 00bf 00df 00ff 011f 013f 015f 017f 019f 01bf 01df 01ff 021f 023f 025f 027f 029f 02bf 02df 02ff 031f 033f 035f 037f 039f 03bf 03df 03ff 041f 043f 045f 047f 049f 04bf 04df 04ff 051f 053f 055f 057f 059f 05bf 05df 05ff 061f 063f 065f 067f 069f 06bf 06df 06ff 071f 073f 075f 077f 079f 07bf 07df 07ff 081f 083f 085f 087f 089f 08bf 08df 08ff 091f 093f 095f 097f 099f 09bf 09df 09ff 0a1f 0a3f 0a5f 0a7f 0a9f 0abf 0adf 0aff 0b1f 0b3f 0b5f 0b7f 0b9f 0bbf 0bdf 0bff 0c1f 0c3f 0c5f 0c7f 0c9f 0cbf 0cdf 0cff 0d1f 0d3f 0d5f 0d7f 0d9f 0dbf 0ddf 0dff 0e1f 0e3f 0e5f 0e7f 0e9f 0ebf 0edf 0eff 0f1f 0f3f 0f5f 0f7f 0f9f 0fbf 0fdf 0fff 101f 103f 105f 107f 109f 10bf 10df 10ff 111f 113f 115f 117f 119f 11bf 11df 11ff 121f 123f 125f 127f 129f 12bf 12df 12ff 131f 133f 135f 137f 139f 13bf 13df 13ff 141f 143f 145f 147f 149f 14bf 14df 14ff 151f 153f 155f 157f 159f 15bf 15df 15ff 161f 163f 165f 167f 169f 16bf 16df 16ff 171f 173f 175f 177f 179f 17bf 17df 17ff 181f 183f 185f 187f 189f 18bf 18df 18ff 191f 193f 195f 197f 199f 19bf 19df 19ff 1a1f 1a3f 1a5f 1a7f 1a9f 1abf 1adf 1aff 1b1f 1b3f 1b5f 1b7f 1b9f 1bbf 1bdf 1bff 1c1f 1c3f 1c5f 1c7f 1c9f 1cbf 1cdf 1cff 1d1f 1d3f 1d5f 1d7f 1d9f 1dbf 1ddf 1dff 1e1f 1e3f 1e5f 1e7f 1e9f 1ebf 1edf 1eff 1f1f 1f3f 1f5f 1f7f 1f9f 1fbf 1fdf
+
+		cybrcycc (1st course) fog color: 80 80 c0
+			czram[0] = 0000 0011 0021 0031 0041 0051 0060 0061 006a 0071 0076 0081 0087 0091 0093 009c 00a1 00a4 00ad 00b1 00b9 00c1 00c7 00cf 00d1 00d9 00e0 00e1 00e7 00ed 00f1 00f8 00fe 0101 0107 010e 0111 0116 011c 0121 0124 012a 0130 0131 0137 013d 0141 0144 014a 014f 0151 0156 015b 0161 016c 0171 017c 0181 018c 0191 019c 01a1 01ac 01b1 01bc 01c1 01cc 01d1 01dc 01e1 01ec 01f1 01fc 0201 020c 0211 021c 0221 022c 0231 023c 0241 024c 0251 025c 0261 026c 0271 027c 0281 028c 0291 029c 02a1 02ac 02b1 02bc 02c1 02cc 02d1 02d7 02dc 02e1 02e7 02ec 02f1 033a 033f 0343 0348 034c 0351 0355 035a 035e 0363 0367 036c 0370 0375 0379 037d 0382 0386 038a 038f 0393 0397 039c 03a0 03a4 03a8 03ad 03b1 03b5 03b9 03be 03c2 03c6 03ca 03ce 03d2 03d7 03db 03df 03e3 03e7 03eb 03ef 03f3 03f7 03fb 03ff 0403 0407 040b 040f 0413 0417 041b 041f 0423 0427 042b 042f 0433 0436 043a 043e 0442 0446 044a 044e 0451 0455 0459 045d 0461 0464 0468 046c 0470 0473 0477 047b 047f 0482 0486 048a 048d 0491 0495 0498 049c 04a0 04a3 04a7 04ab 04ae 04b2 04b5 04b9 04bd 04c0 04c4 04c7 04cb 04ce 04d2 04d5 04d9 04dd 04e0 04e4 04e7 04eb 04ee 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+
+		alpinerd (1st course) fog color: c8 c8 c8
+			czram[0] = 00c8 00ca 00cc 00ce 00d0 00d2 00d4 00d6 00d8 00da 00dc 00de 00e0 00e2 00e4 00e6 00e8 00ea 00ec 00ee 00f0 00f2 00f4 00f6 00f8 00fa 00fc 00fe 0100 0102 0104 0106 0108 010a 010c 010e 0110 0112 0114 0116 0118 011a 011c 011e 0120 0122 0124 0126 0128 012a 012c 012e 0130 0132 0134 0136 0138 013a 013c 013e 0140 0142 0144 0146 0148 014a 014c 014e 0150 0152 0154 0156 0158 015a 015c 015e 0160 0162 0164 0166 0168 016a 016c 016e 0170 0172 0174 0176 0178 017a 017c 017e 0180 0182 0184 0186 0188 018a 018c 018e 0190 0192 0194 0196 0198 019a 019c 019e 01a0 01a2 01a4 01a6 01a8 01aa 01ac 01ae 01b0 01b2 01b4 01b6 01b8 01ba 01bc 01be 01c0 01c2 01c4 01c6 01c8 01ca 01cc 01ce 01d0 01d2 01d4 01d6 01d8 01da 01dc 01de 01e0 01e2 01e4 01e6 01e8 01ea 01ec 01ee 01f0 01f2 01f4 01f6 01f8 01fa 01fc 01fe 0200 0202 0204 0206 0208 020a 020c 020e 0210 0212 0214 0216 0218 021a 021c 021e 0220 0222 0224 0226 0228 022a 022c 022e 0230 0232 0234 0236 0238 023a 023c 023e 0240 0242 0244 0246 0248 024a 024c 024e 0250 0252 0254 0256 0258 025a 025c 025e 0260 0262 0264 0266 0268 026a 026c 026e 0270 0272 0274 0276 0278 027a 027c 027e 0280 0282 0284 0286 0288 028a 028c 028e 0290 0292 0294 0296 0298 029a 029c 029e 02a0 02a2 02a4 02a6 02a8 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+
+		alpinr2b (1st course) fog color: ff ff ff
+		alpinr2b start of race: - gets gradually filled from left to right, initial contents filled with 1fff?
+			czram[0] = 01cd 01d7 01e1 01eb 01f5 01ff 0209 0213 021d 0227 0231 023b 0245 024f 0259 0263 026d 0277 0281 028b 0295 029f 02a9 02b3 02bd 02c7 02d1 02db 02e5 02ef 02f9 0303 030d 0317 0321 032b 0335 033f 0349 0353 035d 0367 0371 037b 0385 038f 0399 03a3 03ad 03b7 03c1 03cb 03d5 03df 03e9 03f3 03fd 0407 0411 041b 0425 042f 0439 0443 044d 0457 0461 046b 0475 047f 0489 0493 049d 04a7 04b1 04bb 04c5 04cf 04d9 04e3 04ed 04f7 0501 050b 0515 051f 0529 0533 053d 0547 0551 055b 0565 056f 0579 0583 058d 0597 05a1 05ab 05b5 05bf 05c9 05d3 05dd 05e7 05f1 05fb 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+			other banks unused, zerofilled
+		alpinr2b mid race: - gets gradually filled from right to left, initial contents
+			czram[0] = 1ffe 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+
+		*/
+
+		/*  czattr:
+               0    2    4    6    8    a    c    e
+            ^^^^ ^^^^ ^^^^ ^^^^                        cz offset, signed16 per cztype 0,1,2,3
+                                ^^^^                   flags, nybble per cztype 3,2,1,0 - 4 means enable?
+                                     ^^^^              maincpu ram access bank
+                                          ^^^^         flags, nybble per cztype 3,2,1,0 - ?
+                                               ^^^^    ? (only set sometimes in timecris)
+            0000 0000 0000 0000 7555 0000 00e4 0000 // testmode normal
+            7fff 8000 7fff 8000 7555 0000 00e4 0000 // testmode offset
+            0000 0000 0000 0000 3111 0000 00e4 0000 // testmode off
+            0000 0000 0000 0000 4444 0000 0000 0000 // propcycl solitar
+            0004 0004 0004 0004 4444 0000 0000 0000 // propcycl out pool
+            00a4 00a4 00a4 00a4 4444 0000 0000 0000 // propcycl in pool
+            ff80 ff80 ff80 ff80 4444 0000 0000 0000 // propcycl ending
+            ff80 ff80 ff80 ff80 0000 0000 0000 0000 // propcycl hs entry
+            0000 0000 0000 0000 0b6c 0000 00e4 0000 // cybrcycc
+            ff01 ff01 0000 0000 4444 0000 0000 0000 // alpinerd
+            0000 0000 0000 0000 4455 0000 000a 0000 // alpinr2b
+            8001 8001 0000 0000 1111 0000 5555 0000 // aquajet (reg 8 is either 1111 or 5555, reg c is usually interlaced)
+		*/
+
+#if 1
+		if (~color & 0x80)
+		{
+			int cztype = flags&3;
+			rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
+			
+			if (direct)
+			{
+				int fogDelta = (INT16)nthword(state->m_czattr, cztype);
+				
+				static const int cztype_remap[4] = { 3,1,2,0 }; //hmm?
+				int fogDensity = fogDelta + (state->m_banked_czram[cztype_remap[cztype]][flags>>13&0xff]&0x1fff);
+				//int fogDensity = fogDelta + (state->m_banked_czram[cztype][flags>>13&0xff]&0x1fff);
+				
+				
+				if( fogDensity<0x0000 )
+				{
+					fogDensity = 0x0000;
+				}
+				else if( fogDensity>0x1fff )
+				{
+					fogDensity = 0x1fff;
+				}
+				if( nthword(state->m_czattr,4)&(4<<(cztype*4)) )
+				extra->fogFactor = fogDensity >> 5;
+				//flags>>13&0xff;
+			}
+			else
+			{
+				//extra->zfog_enabled = 1;
+			}
+		}
+#else
+		// old implementation
 		if( !(color&0x80) )
 		{
 			int cz = flags>>8;
@@ -481,7 +629,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 			if( nthword(state->m_czattr,4)&(0x4000>>(cztype*4)) )
 			{
 				int fogDelta = (INT16)nthword(state->m_czattr, cztype);
-				int fogDensity = fogDelta + state->m_czram[cztype_remap[cztype]][cz];
+				int fogDensity = fogDelta + state->m_banked_czram[cztype_remap[cztype]][cz];
 				//if( fogDelta == 0x8000 ) fogDelta = -0x7fff;
 				//cz = Clamp256(cz+fogDelta);
 				if( fogDensity<0x0000 )
@@ -501,7 +649,9 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
 			}
 		}
+#endif
 	}
+
 	else
 	{
 		// global fade
@@ -511,7 +661,27 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 			rgb_comp_to_rgbint(&extra->polyColor, mixer.rPolyFadeColor, mixer.gPolyFadeColor, mixer.bPolyFadeColor);
 		}
 
-		// fog not hooked up yet
+		// poly fog
+		if (~color & 0x80)
+		{
+			int cztype = flags&3;
+			int czcolor = cztype & nthbyte(&mixer.fog_colormask, cztype);
+			rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor_per_cztype[czcolor], mixer.gFogColor_per_cztype[czcolor], mixer.bFogColor_per_cztype[czcolor]);
+
+			if (direct)
+			{
+				// direct case, cz value is preset
+				int cz = ((flags&0x1fff00) + cz_adjust) >> 8;
+				if (cz < 0) cz = 0;
+				else if (cz > 0x1fff) cz = 0x1fff;
+				extra->fogFactor = nthbyte(state->m_czram, cztype<<13|cz);
+			}
+			else
+			{
+				extra->zfog_enabled = 1;
+				extra->czram_8 = (UINT8*)&state->m_czram[cztype<<(13-2)];
+			}
+		}
 	}
 
 	poly_render_triangle_fan(state->m_poly, bitmap, &mClip.scissor, renderscanline_uvi_full, 4, clipverts, clipv);
@@ -569,7 +739,7 @@ static void
 poly3d_DrawSprite(
 	bitmap_t *dest_bmp, const gfx_element *gfx, UINT32 code,
 	UINT32 color, int flipx, int flipy, int sx, int sy,
-	int scalex, int scaley, int cz, int prioverchar, int alpha )
+	int scalex, int scaley, int cz_factor, int prioverchar, int alpha )
 {
 	namcos22_state *state = gfx->machine().driver_data<namcos22_state>();
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -624,10 +794,10 @@ poly3d_DrawSprite(
 		}
 
 		// fog, 0xfe is a special case for sprite priority over textlayer
-		if (~color & 0x80 && cz > 0 && cz != 0xfe)
+		if (~color & 0x80 && cz_factor > 0 && cz_factor != 0xfe)
 		{
 			// or does it fetch from poly-cz ram? that will break timecris though
-			extra->fogFactor = cz;
+			extra->fogFactor = cz_factor;
 			rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
 		}
 
@@ -642,7 +812,6 @@ ApplyGamma( running_machine &machine, bitmap_t *bitmap )
 	int x,y;
 	if( state->m_mbSuperSystem22 )
 	{ /* super system 22 */
-#define XORPAT NATIVE_ENDIAN_VALUE_LE_BE(3,0)
 		const UINT8 *rlut = (const UINT8 *)&state->m_gamma[0x100/4];
 		const UINT8 *glut = (const UINT8 *)&state->m_gamma[0x200/4];
 		const UINT8 *blut = (const UINT8 *)&state->m_gamma[0x300/4];
@@ -652,9 +821,9 @@ ApplyGamma( running_machine &machine, bitmap_t *bitmap )
 			for( x=0; x<bitmap->width; x++ )
 			{
 				int rgb = dest[x];
-				int r = rlut[XORPAT^((rgb>>16)&0xff)];
-				int g = glut[XORPAT^((rgb>>8)&0xff)];
-				int b = blut[XORPAT^(rgb&0xff)];
+				int r = rlut[NATIVE_ENDIAN_VALUE_LE_BE(3,0)^((rgb>>16)&0xff)];
+				int g = glut[NATIVE_ENDIAN_VALUE_LE_BE(3,0)^((rgb>>8)&0xff)];
+				int b = blut[NATIVE_ENDIAN_VALUE_LE_BE(3,0)^(rgb&0xff)];
 				dest[x] = (r<<16)|(g<<8)|b;
 			}
 		}
@@ -783,6 +952,7 @@ struct SceneNode
 			int color;
 			int cmode;
 			int flags;
+			int cz_adjust;
 			int direct;
 			Poly3dVertex v[4];
 		} quad3d;
@@ -935,6 +1105,7 @@ static void RenderSceneHelper(running_machine &machine, bitmap_t *bitmap, struct
 						node->data.quad3d.color,
 						node->data.quad3d.v,
 						node->data.quad3d.flags,
+						node->data.quad3d.cz_adjust,
 						node->data.quad3d.direct,
 						node->data.quad3d.cmode
 					);
@@ -1026,39 +1197,25 @@ namcos22_point_rom_r( running_machine &machine, offs_t offs )
 }
 
 
-/*
-                         0    2    4    6    8    a    b
-                      ^^^^ ^^^^ ^^^^ ^^^^                        cz offset
-                                          ^^^^                   target (4==poly)
-                                                    ^^^^         ????
-         //00810000:  0000 0000 0000 0000 4444 0000 0000 0000 // solitar
-         //00810000:  0000 0000 0000 0000 7555 0000 00e4 0000 // normal
-         //00810000:  7fff 8000 7fff 8000 7555 0000 00e4 0000 // offset
-         //00810000:  0000 0000 0000 0000 3111 0000 00e4 0000 // off
-         //00810000:  0004 0004 0004 0004 4444 0000 0000 0000 // out pool
-         //00810000:  00a4 00a4 00a4 00a4 4444 0000 0000 0000 // in pool
-         //00810000:  ff80 ff80 ff80 ff80 4444 0000 0000 0000 // ending
-         //00810000:  ff80 ff80 ff80 ff80 0000 0000 0000 0000 // hs entry
-         //00810000:  ff01 ff01 0000 0000 0000 0000 00e4 0000 // alpine racer
-*/
-READ32_HANDLER( namcos22s_czram_r )
-{
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	int bank = nthword(state->m_czattr,0xa/2);
-	const UINT16 *czram = state->m_czram[bank&3];
-	return (czram[offset*2]<<16)|czram[offset*2+1];
-}
-
 WRITE32_HANDLER( namcos22s_czram_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	int bank = nthword(state->m_czattr,0xa/2);
-	UINT16 *czram = state->m_czram[bank&3];
+	UINT16 *czram = state->m_banked_czram[bank&3];
 	UINT32 dat = (czram[offset*2]<<16)|czram[offset*2+1];
 	COMBINE_DATA( &dat );
 	czram[offset*2] = dat>>16;
 	czram[offset*2+1] = dat&0xffff;
 }
+
+READ32_HANDLER( namcos22s_czram_r )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	int bank = nthword(state->m_czattr,0xa/2);
+	const UINT16 *czram = state->m_banked_czram[bank&3];
+	return (czram[offset*2]<<16)|czram[offset*2+1];
+}
+
 
 static void
 InitXYAttrToPixel( namcos22_state *state )
@@ -1110,6 +1267,7 @@ PatchTexture( namcos22_state *state )
 void
 namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 {
+	if (machine.video().skip_this_frame()) return;
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int polys_enabled = state->m_mbSuperSystem22 ? nthbyte(state->m_gamma,0x1f)&1 : 1;
 	if (!polys_enabled) return;
@@ -1127,7 +1285,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
     *    ------------xxxx BN (texture bank)
     *
     * word#3:
-    *    xxxxxxxx-------- ZC
+    *    -xxxxxxxxxxxxx-- ZC (less bits for super?)
     *    --------------xx depth cueing table select
     *
     * for each vertex:
@@ -1138,10 +1296,11 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
     *    xx-- ---- // BRI
     *    --xx xxxx // zpos
     */
-	INT32 zsortvalue24 = ((pSource[1]&0xfff)<<12)|(pSource[0]&0xfff);
-	struct SceneNode *node = NewSceneNode(machine, zsortvalue24,eSCENENODE_QUAD3D);
+	UINT32 zsortvalue24 = ((pSource[1]&0xfff)<<12)|(pSource[0]&0xfff);
+	struct SceneNode *node = NewSceneNode(machine, zsortvalue24, eSCENENODE_QUAD3D);
 	int i;
-	node->data.quad3d.flags = ((pSource[3]&0x7f00)*2)|(pSource[3]&3);
+	node->data.quad3d.cz_adjust = state->m_cz_adjust;
+	node->data.quad3d.flags = (pSource[3]<<6&0x1fff00) | (pSource[3]&3);
 	node->data.quad3d.color = (pSource[2]&0xff00)>>8;
 	if( state->m_mbSuperSystem22 )
 	{
@@ -1707,30 +1866,14 @@ static void DrawCharacterLayer(running_machine &machine, bitmap_t *bitmap, const
 
 /*********************************************************************************************/
 
-static int
-Cap( int val, int minval, int maxval )
-{
-	if( val<minval )
-	{
-		val = minval;
-	}
-	else if( val>maxval )
-	{
-		val = maxval;
-	}
-	return val;
-}
-
-#define LSB21 (0x1fffff)
-#define LSB18 (0x03ffff)
 
 static INT32
 Signed18( UINT32 value )
 {
-	INT32 offset = value&LSB18;
+	INT32 offset = value&0x03ffff;
 	if( offset&0x20000 )
 	{ /* sign extend */
-		offset |= ~LSB18;
+		offset |= ~0x03ffff;
 	}
 	return offset;
 }
@@ -1739,10 +1882,12 @@ Signed18( UINT32 value )
  * @brief render a single quad
  *
  * @param flags
- *     x1.----.----.---- ?
- *     --.-xxx.----.---- representative z algorithm?
- *     --.----.-1x-.---- backface cull enable
- *     --.----.----.--1x fog enable?
+ *     00-1.----.01-0.001- ? (always set/clear)
+ *     --x-.----.----.---- ?
+ *     ----.xx--.----.---- cz table
+ *     ----.--xx.----.---- representative z algorithm?
+ *     ----.----.--x-.---- backface cull enable
+ *     ----.----.----.---x ?
  *
  *      1163 // sky
  *      1262 // score (front)
@@ -1754,9 +1899,10 @@ Signed18( UINT32 value )
  *      1663 // ?
  *
  * @param color
- *      -------- xxxxxxxx unused?
- *      -xxxxxxx -------- palette select
- *      x------- -------- ?
+ *      xxxxxxxx -------- -------- type?
+ *      -------- x------- -------- fog enable
+ *      -------- -xxxxxxx -------- palette select
+ *      -------- -------- xxxxxxxx unused?
  *
  * @param polygonShiftValue22
  *    0x1fbd0 - sky+sea
@@ -1778,7 +1924,7 @@ BlitQuadHelper(
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int absolutePriority = state->m_mAbsolutePriority;
-	UINT32 zsortvalue24;
+	INT32 zsortvalue24;
 	float zmin = 0.0f;
 	float zmax = 0.0f;
 	Poly3dVertex v[4];
@@ -1840,17 +1986,16 @@ BlitQuadHelper(
 	if( zmin<0.0f ) zmin = 0.0f;
 	if( zmax<0.0f ) zmax = 0.0f;
 
-	switch( (flags&0x0f00)>>8 )
+	switch (flags & 0x300)
 	{
-		case 0:
+		case 0x000:
 			zsortvalue24 = (INT32)zmin;
 			break;
 
-		case 1:
+		case 0x100:
 			zsortvalue24 = (INT32)zmax;
 			break;
 
-		case 2:
 		default:
 			zsortvalue24 = (INT32)((zmin+zmax)/2.0f);
 			break;
@@ -1862,7 +2007,7 @@ BlitQuadHelper(
     * 0-.--xx.xxxxxxxx.xxxxxxxx z-representative value shift
     */
 	if( polygonShiftValue22 & 0x200000 )
-		zsortvalue24 = polygonShiftValue22 & LSB21;
+		zsortvalue24 = polygonShiftValue22 & 0x1fffff;
 	else
 	{
 		zsortvalue24 += Signed18( polygonShiftValue22 );
@@ -1870,45 +2015,42 @@ BlitQuadHelper(
 	}
 
 	if( state->m_mObjectShiftValue22 & 0x200000 )
-		zsortvalue24 = state->m_mObjectShiftValue22 & LSB21;
+		zsortvalue24 = state->m_mObjectShiftValue22 & 0x1fffff;
 	else
 	{
 		zsortvalue24 += Signed18( state->m_mObjectShiftValue22 );
 		absolutePriority += (state->m_mObjectShiftValue22&0x1c0000)>>18;
 	}
 
+	if (zsortvalue24 < 0) zsortvalue24 = 0;
+	else if (zsortvalue24 > 0x1fffff) zsortvalue24 = 0x1fffff;
 	absolutePriority &= 7;
-	zsortvalue24 = Cap(zsortvalue24,0,0x1fffff);
 	zsortvalue24 |= (absolutePriority<<21);
 
+	// allocate quad
+	struct SceneNode *node = NewSceneNode(machine, zsortvalue24, eSCENENODE_QUAD3D);
+	node->data.quad3d.cmode = (v[0].u>>12)&0xf;
+	node->data.quad3d.textureBank = (v[0].v>>12)&0xf;
+	node->data.quad3d.color = (color>>8)&0xff;
+	node->data.quad3d.flags = flags>>10&3;
+	node->data.quad3d.cz_adjust = state->m_cz_adjust;
+
+	for( i=0; i<4; i++ )
 	{
-		struct SceneNode *node = NewSceneNode(machine, zsortvalue24,eSCENENODE_QUAD3D);
-		node->data.quad3d.cmode = (v[0].u>>12)&0xf;
-		node->data.quad3d.textureBank = (v[0].v>>12)&0xf;
-		node->data.quad3d.color = (color>>8)&0xff;
-
-		{
-			INT32 cz = (INT32)((zmin+zmax)/2.0f);
-			cz = Clamp256(cz/0x2000);
-			node->data.quad3d.flags = (cz<<8)|(flags&3);
-		}
-
-		for( i=0; i<4; i++ )
-		{
-			Poly3dVertex *p = &node->data.quad3d.v[i];
-			p->x     = v[i].x*mCamera.zoom;
-			p->y     = v[i].y*mCamera.zoom;
-			p->z     = v[i].z;
-			p->u     = v[i].u&0xfff;
-			p->v     = v[i].v&0xfff;
-			p->bri   = v[i].bri;
-		}
-		node->data.quad3d.direct = 0;
-		node->data.quad3d.vx = mCamera.vx;
-		node->data.quad3d.vy = mCamera.vy;
-		node->data.quad3d.vw = mCamera.vw;
-		node->data.quad3d.vh = mCamera.vh;
+		Poly3dVertex *p = &node->data.quad3d.v[i];
+		p->x     = v[i].x*mCamera.zoom;
+		p->y     = v[i].y*mCamera.zoom;
+		p->z     = v[i].z;
+		p->u     = v[i].u&0xfff;
+		p->v     = v[i].v&0xfff;
+		p->bri   = v[i].bri;
 	}
+
+	node->data.quad3d.direct = 0;
+	node->data.quad3d.vx = mCamera.vx;
+	node->data.quad3d.vy = mCamera.vy;
+	node->data.quad3d.vw = mCamera.vw;
+	node->data.quad3d.vh = mCamera.vh;
 } /* BlitQuadHelper */
 
 static void
@@ -1960,21 +2102,6 @@ BlitQuads( running_machine &machine, bitmap_t *bitmap, INT32 addr, float m[4][4]
         *      000080 tex# or UV or CMODE?
         *      000040 use I
         *      000001 ?
-        *
-        * flags:
-        *      1042 (always set)
-        *      0c00 depth-cueing mode (brake-disc(2108)=001e43, model font)
-        *      0200 usually 1
-        *      0100 ?
-        *      0040 1 ... polygon palette?
-        *      0020 cull backface
-        *      0002 ?
-        *      0001 ?
-        *
-        * color:
-        *      ff0000 type?
-        *      008000 depth-cueing off
-        *      007f00 palette#
         */
 		switch( packetLength )
 		{
@@ -2225,7 +2352,7 @@ Handle233002( namcos22_state *state, const INT32 *pSource )
 {
    /*
     00233002
-       00000000 // zc adjust?
+       00000000 // cz adjust (signed24)
        0003dd00 // z bias adjust
        001fffff // far plane?
        00007fff 00000000 00000000
@@ -2233,6 +2360,7 @@ Handle233002( namcos22_state *state, const INT32 *pSource )
        00000000 00000000 00007fff
        00000000 00000000 00000000
    */
+	state->m_cz_adjust = (pSource[1] & 0x00800000) ? pSource[1] | 0xff000000 : pSource[1] & 0x00ffffff;
 	state->m_mObjectShiftValue22 = pSource[2];
 } /* Handle233002 */
 
@@ -2399,15 +2527,15 @@ VIDEO_START( namcos22s )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	state->m_mbSuperSystem22 = 1;
-	state->m_czram[0] = auto_alloc_array(machine, UINT16, 0x200/2 );
-	state->m_czram[1] = auto_alloc_array(machine, UINT16, 0x200/2 );
-	state->m_czram[2] = auto_alloc_array(machine, UINT16, 0x200/2 );
-	state->m_czram[3] = auto_alloc_array(machine, UINT16, 0x200/2 );
+	state->m_banked_czram[0] = auto_alloc_array(machine, UINT16, 0x200/2 );
+	state->m_banked_czram[1] = auto_alloc_array(machine, UINT16, 0x200/2 );
+	state->m_banked_czram[2] = auto_alloc_array(machine, UINT16, 0x200/2 );
+	state->m_banked_czram[3] = auto_alloc_array(machine, UINT16, 0x200/2 );
 
-	memset(state->m_czram[0], 0, 0x200);
-	memset(state->m_czram[1], 0, 0x200);
-	memset(state->m_czram[2], 0, 0x200);
-	memset(state->m_czram[3], 0, 0x200);
+	memset(state->m_banked_czram[0], 0, 0x200);
+	memset(state->m_banked_czram[1], 0, 0x200);
+	memset(state->m_banked_czram[2], 0, 0x200);
+	memset(state->m_banked_czram[3], 0, 0x200);
 
 	VIDEO_START_CALL(common);
 }
@@ -2439,10 +2567,10 @@ SCREEN_UPDATE( namcos22s )
 	if (layer&4) namcos22s_mix_textlayer(screen->machine(), bitmap, cliprect, 6);
 	ApplyGamma(screen->machine(), bitmap);
 
-#ifdef MAME_DEBUG
+	// debug stuff
+#if ALLOW_MEMDUMP
 	if( screen->machine().input().code_pressed(KEYCODE_D) )
 	{
-		namcos22_state *state = screen->machine().driver_data<namcos22_state>();
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
@@ -2455,27 +2583,29 @@ SCREEN_UPDATE( namcos22s )
 					fprintf( f, "czram[%d] =", bank );
 					for( i=0; i<256; i++ )
 					{
-						fprintf( f, " %04x", state->m_czram[bank][i] );
+						fprintf( f, " %04x", state->m_banked_czram[bank][i] );
 					}
 					fprintf( f, "\n" );
 				}
 			}
 
 			Dump(space, f,0x810000, 0x81000f, "cz attr" );
-			Dump(space, f,0x820000, 0x8202ff, "unk_ac" );
 			Dump(space, f,0x824000, 0x8243ff, "gamma");
-			Dump(space, f,0x828000, 0x83ffff, "palette" );
-			Dump(space, f,0x8a0000, 0x8a000f, "tilemap_attr");
-			Dump(space, f,0x880000, 0x89ffff, "cgram/textram");
-			Dump(space, f,0x900000, 0x90ffff, "vics_data");
-			Dump(space, f,0x940000, 0x94007f, "vics_control");
-			Dump(space, f,0x980000, 0x9affff, "sprite374" );
-			Dump(space, f,0xc00000, 0xc1ffff, "polygonram");
+			//Dump(space, f,0x828000, 0x83ffff, "palette" );
+			//Dump(space, f,0x8a0000, 0x8a000f, "tilemap_attr");
+			//Dump(space, f,0x880000, 0x89ffff, "cgram/textram");
+			//Dump(space, f,0x900000, 0x90ffff, "vics_data");
+			//Dump(space, f,0x940000, 0x94007f, "vics_control");
+			//Dump(space, f,0x980000, 0x9affff, "sprite374" );
+			//Dump(space, f,0xc00000, 0xc1ffff, "polygonram");
 			fclose( f );
 		}
 		while( screen->machine().input().code_pressed(KEYCODE_D) ){}
 	}
 #endif
+
+//	popmessage("%08X %08X %08X %08X",state->m_czattr[0],state->m_czattr[1],state->m_czattr[2],state->m_czattr[3]);
+
 	return 0;
 }
 
@@ -2490,7 +2620,7 @@ SCREEN_UPDATE( namcos22 )
 	DrawCharacterLayer(screen->machine(), bitmap, cliprect);
 	ApplyGamma(screen->machine(), bitmap);
 
-#ifdef MAME_DEBUG
+#if ALLOW_MEMDUMP
 	if( screen->machine().input().code_pressed(KEYCODE_D) )
 	{
 		FILE *f = fopen( "dump.txt", "wb" );
@@ -2499,7 +2629,7 @@ SCREEN_UPDATE( namcos22 )
 			address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 			//Dump(space, f,0x90000000, 0x90000003, "led?" );
-			//Dump(space, f,0x90010000, 0x90017fff, "cz_ram");
+			Dump(space, f,0x90010000, 0x90017fff, "cz_ram");
 			//Dump(space, f,0x900a0000, 0x900a000f, "tilemap_attr");
 			Dump(space, f,0x90020000, 0x90027fff, "gamma");
 			//Dump(space, f,0x70000000, 0x7001ffff, "polygonram");
@@ -2508,6 +2638,7 @@ SCREEN_UPDATE( namcos22 )
 		while( screen->machine().input().code_pressed(KEYCODE_D) ){}
 	}
 #endif
+
 	return 0;
 }
 
@@ -2569,43 +2700,6 @@ WRITE16_HANDLER( namcos22_dspram16_w )
 	state->m_polygonram[offset] = (hi<<16)|lo;
 } /* namcos22_dspram16_w */
 
-#ifdef MAME_DEBUG
-static void
-Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name )
-{
-	unsigned addr;
-	fprintf( f, "%s:\n", name );
-	for( addr=addr1; addr<=addr2; addr+=16 )
-	{
-		UINT8 data[16];
-		int bHasNonZero = 0;
-		int i;
-		for( i=0; i<16; i++ )
-		{
-			data[i] = space->read_byte(addr+i );
-			if( data[i] )
-			{
-				bHasNonZero = 1;
-			}
-		}
-		if( bHasNonZero )
-		{
-			fprintf( f,"%08x:", addr );
-			for( i=0; i<16; i++ )
-			{
-				if( (i&0x03)==0 )
-				{
-					fprintf( f, " " );
-				}
-				fprintf( f, "%02x", data[i] );
-			}
-			fprintf( f, "\n" );
-		}
-	}
-	fprintf( f, "\n" );
-}
-#endif
-
 /**
  * 4038 spot enable?
  * 0828 pre-initialization
@@ -2638,7 +2732,15 @@ Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char 
  *    0001 0001 // 0x001
  *    0001 0001 // 0x001
  **********************************************
- */
+ * SPOT TABLE test:
+ 03F282: 13FC 0000 0082 4011        move.b  #$0, $824011.l
+ 03F28A: 13FC 0000 0082 4015        move.b  #$0, $824015.l
+ 03F292: 13FC 0080 0082 400D        move.b  #$80, $82400d.l
+ 03F29A: 13FC 0001 0082 400E        move.b  #$1, $82400e.l
+ 03F2A2: 13FC 0001 0082 4021        move.b  #$1, $824021.l
+ 03F2AA: 33FC 4038 0080 0000        move.w  #$4038, $800000.l
+ 03F2B2: 06B9 0000 0001 00E0 AB08   addi.l  #$1, $e0ab08.l
+*/
 WRITE32_HANDLER(namcos22_port800000_w)
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
