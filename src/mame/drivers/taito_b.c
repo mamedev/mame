@@ -23,6 +23,7 @@ TODO:
   screen wiggles after the puck hits the wall shortly into the first round of attract mode)
 - sprites are not in perfect sync with the background. Check ashura, they are almost
   tight during gameplay but completely off in attract mode.
+- realpunc: missing camera emulation.
 
 The Taito B system is a fairly flexible hardware platform. It supports 4
 separate layers of graphics - one 64x64 tiled scrolling background plane
@@ -164,6 +165,14 @@ Notes:
             Vsync: 60Hz
 
 
+Real Puncher
+Taito, 1994
+
+PCB Layout
+----------
+
+TODO!
+
 
 ***************************************************************************/
 
@@ -178,6 +187,7 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
+#include "video/hd63484.h"
 #include "video/taitoic.h"
 #include "includes/taito_b.h"
 
@@ -186,7 +196,7 @@ static WRITE8_HANDLER( bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", (data - 1) & 3);
 }
 
-static TIMER_CALLBACK( rsaga2_interrupt2  )
+static TIMER_CALLBACK( rsaga2_interrupt2 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
 	device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
@@ -310,6 +320,18 @@ static INTERRUPT_GEN( sbm_interrupt )//5
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
+static TIMER_CALLBACK( realpunc_interrupt3 )//3
+{
+	taitob_state *state = machine.driver_data<taitob_state>();
+	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+}
+
+static INTERRUPT_GEN( realpunc_interrupt )//2
+{
+	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(realpunc_interrupt3));
+	device_set_input_line(device, 2, HOLD_LINE);
+}
+
 
 
 static READ16_HANDLER( tracky1_hi_r )
@@ -369,6 +391,12 @@ static WRITE16_HANDLER( gain_control_w )
 	           //logerror("MB87078 dsel=1 data=%4x\n", data);
 		}
 	}
+}
+
+static INPUT_CHANGED( realpunc_sensor )
+{
+	taitob_state *state = field.machine().driver_data<taitob_state>();
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
 /***************************************************************************
@@ -471,6 +499,15 @@ static WRITE16_HANDLER( spacedxo_tc0220ioc_w )
 		/* spacedxo also writes here - bug? */
 		tc0220ioc_w(state->m_tc0220ioc, offset, (data >> 8) & 0xff);
 	}
+}
+
+static WRITE16_HANDLER( realpunc_output_w )
+{
+/*
+   15 = Camera Enable?
+   14 = Lamp 2?
+   13 = Lamp 1?
+*/
 }
 
 
@@ -687,7 +724,23 @@ static ADDRESS_MAP_START( sbm_map, AS_PROGRAM, 16 )
 	TC0180VCU_MEMRW( 0x900000 )
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x110000, 0x12ffff) AM_RAM
+	AM_RANGE(0x130000, 0x13ffff) AM_RAM // Check me
+	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
+	AM_RANGE(0x184000, 0x184001) AM_WRITE(realpunc_video_ctrl_w)
+	AM_RANGE(0x188000, 0x188001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
+	AM_RANGE(0x188002, 0x188003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_comm_w, 0xff00)
+	AM_RANGE(0x18c000, 0x18c001) AM_WRITE(realpunc_output_w)
+	TC0180VCU_MEMRW( 0x200000 )
+	AM_RANGE(0x280000, 0x281fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
+//	AM_RANGE(0x320000, 0x320001) AM_READ(SMH_NOP) // ?
+	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_comm_r, 0xff00)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -1716,6 +1769,88 @@ static INPUT_PORTS_START( sbm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Pad Photosensor 4")//PHOTO 4  ??? ACTIVE_LOW  ??? (punching pad photosensor 4)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( realpunc )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, "Difficulty 1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x02, "Difficulty 2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Difficulty 3" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,IPT_BUTTON1 ) PORT_NAME("Safety switch")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_BUTTON2 ) PORT_NAME("Pad Photosensor 1 (N)") PORT_CHANGED(realpunc_sensor, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,IPT_BUTTON3 ) PORT_NAME("Pad Photosensor 2 (U)") PORT_CHANGED(realpunc_sensor, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,IPT_BUTTON4 ) PORT_NAME("Pad Photosensor 3 (D)") PORT_CHANGED(realpunc_sensor, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 
 static const gfx_layout charlayout =
@@ -1848,6 +1983,13 @@ static const tc0510nio_interface sbm_io_intf =
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_INPUT_PORT("JOY"), DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("PHOTOSENSOR")	/* port read handlers */
 };
+
+static const tc0510nio_interface realpunc_io_intf =
+{
+	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+};
+
 
 /* this is the basic layout used in: Nastar, Ashura Blaster, Hit the Ice, Rambo3, Tetris */
 static const tc0180vcu_interface color0_tc0180vcu_intf =
@@ -2783,6 +2925,61 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
 MACHINE_CONFIG_END
 
+/* TODO: Properly hook up the HD63484 */
+static const hd63484_interface realpunc_hd63484_intf =
+{
+	0
+};
+
+static MACHINE_CONFIG_START( realpunc, taitob_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(realpunc_map)
+	MCFG_CPU_VBLANK_INT("screen", realpunc_interrupt)
+
+	MCFG_CPU_ADD("audiocpu", Z80, 6000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_MACHINE_START(taitob)
+	MCFG_MACHINE_RESET(taitob)
+
+	MCFG_TC0510NIO_ADD("tc0510nio", realpunc_io_intf)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(taitob)
+	MCFG_SCREEN_EOF(taitob)
+
+	MCFG_GFXDECODE(taito_b)
+	MCFG_PALETTE_LENGTH(4096)
+
+	MCFG_VIDEO_START(realpunc)
+	MCFG_SCREEN_UPDATE(realpunc)
+
+	MCFG_HD63484_ADD("hd63484", realpunc_hd63484_intf)
+
+	MCFG_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM2610B, 8000000)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+
+	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
+MACHINE_CONFIG_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -2987,7 +3184,7 @@ ROM_START( tetrist )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
 	/* empty (uses only pixel layer) */
 
-	ROM_REGION( 0x80000, "ymsnd", ROMREGION_ERASE00 )	/* adpcm samples */
+	ROM_REGION( 0x80000, "ymsnd", ROMREGION_ERASE00 )	/* ADPCM samples */
 	/* empty */
 
 	ROM_REGION( 0x80000, "ymsnd.deltat", ROMREGION_ERASE00 )	/* DELTA-T samples */
@@ -3182,7 +3379,7 @@ ROM_START( spacedx )
 	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
 	ROM_LOAD( "d89-01.9",  0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* adpcm samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3207,7 +3404,7 @@ ROM_START( spacedxj )
 	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
 	ROM_LOAD( "d89-01.9" , 0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* adpcm samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3232,7 +3429,7 @@ ROM_START( spacedxo )
 	ROM_LOAD( "d89-12.bin",0x00000, 0x80000, CRC(53df86f1) SHA1(f03d77dd54eb455462133a29dd8fec007abedcfd) )
 	ROM_LOAD( "d89-13.bin",0x80000, 0x80000, CRC(c44c1352) SHA1(78a04fe0ade6e8f9e6bbda7652a54a79b6208fdd) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* adpcm samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 ROM_END
 
@@ -3469,7 +3666,7 @@ ROM_START( selfeena ) /* Silkscreened PCB number ET910000A */
 	ROM_LOAD( "se-04.2",  0x000000, 0x80000, CRC(920ad100) SHA1(69cd2af6218db90632f09a131d2956ab69034643) )
 	ROM_LOAD( "se-05.1",  0x080000, 0x80000, CRC(d297c995) SHA1(e5ad5a8ce222621c9156c2949916bee6b3099c4e) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* adpcm samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "se-06.11", 0x00000, 0x80000, CRC(80d5e772) SHA1(bee4982a3d65210ff86495e36a0b656934b00c7d) )
 ROM_END
 
@@ -3488,7 +3685,7 @@ ROM_START( ryujin )
 	ROM_LOAD( "ryujin07.2", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
 	ROM_LOAD( "ryujin06.1", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* adpcm samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ryujin08.11", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
 ROM_END
 
@@ -3513,9 +3710,27 @@ ROM_START( sbm )
 	ROM_LOAD16_BYTE( "c69-14.ic3", 0x300001, 0x020000, CRC(0ed0272a) SHA1(03b15654213ff71ffc96d3a87657bdeb724e9269) )
 	/* 340000-3fffff empty */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* adpcm samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c69-03.36", 0x00000, 0x80000, CRC(63e6b6e7) SHA1(72574ca7505eee15fabc4996f253505d9dd65898) )
 ROM_END
+
+ROM_START( realpunc )
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024k for 68000 code */
+	ROM_LOAD16_BYTE( "d76_05.47", 0x00000, 0x80000, CRC(879b7e6a) SHA1(2b06fb4b92d4c23edba97974161da1cb88e0daf5) )
+	ROM_LOAD16_BYTE( "d76_18.48", 0x00001, 0x80000, CRC(46ed7a9f) SHA1(5af7f23e79b9a947f15d36fe54111aa76bc1037b) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* 64k for Z80 code */
+	ROM_LOAD( "d76_06.106",0x00000, 0x4000, CRC(72c799fd) SHA1(ab086be38b890152b33f0c4e33d0f02d0a5321bc) )
+	ROM_CONTINUE(         0x10000, 0xc000 ) /* banked stuff */
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "d76_02.76", 0x000000, 0x100000, CRC(57691b93) SHA1(570dbefda40f8be5f1da58c5433b8a8084f49cac) )
+	ROM_LOAD( "d76_03.45", 0x200000, 0x100000, CRC(9f0aefd8) SHA1(d516c64baabd268f99dc5e67b7adf135b4eb45fd) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )		/* ADPCM samples */
+	ROM_LOAD( "d76_01.93", 0x000000, 0x200000, CRC(2bc265f2) SHA1(409b822989e2aad50872f80f5160d4909c42206c) )
+ROM_END
+
 
 static DRIVER_INIT( taito_b )
 {
@@ -3561,4 +3776,5 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo, taito_b, ROT0,   "Taito Corpo
     in that it has a punching pad that player needs to punch to hit
     the enemy.
 */
-GAME(  1990, sbm,      0,       sbm,      sbm,      taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL )
+GAME( 1990, sbm,      0,       sbm,      sbm,      taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL )
+GAME( 1994, realpunc, 0,       realpunc, realpunc, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher",       GAME_SUPPORTS_SAVE | GAME_MECHANICAL )

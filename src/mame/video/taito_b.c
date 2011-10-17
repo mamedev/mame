@@ -1,5 +1,6 @@
 #include "emu.h"
 #include "profiler.h"
+#include "video/hd63484.h"
 #include "video/taitoic.h"
 #include "includes/taito_b.h"
 
@@ -34,13 +35,18 @@ static void hitice_clear_pixel_bitmap( running_machine &machine )
 		hitice_pixelram_w(space, i, 0, 0xffff);
 }
 
+WRITE16_HANDLER( realpunc_video_ctrl_w )
+{
+	taitob_state *state = space->machine().driver_data<taitob_state>();
+	COMBINE_DATA(&state->m_realpunc_video_ctrl);
+}
 
 static VIDEO_START( taitob_core )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
 
-	state->m_framebuffer[0] = auto_bitmap_alloc(machine, 512, 256, machine.primary_screen->format());
-	state->m_framebuffer[1] = auto_bitmap_alloc(machine, 512, 256, machine.primary_screen->format());
+	state->m_framebuffer[0] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
+	state->m_framebuffer[1] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
 	state->m_pixel_bitmap = NULL;  /* only hitice needs this */
 
 	state->save_item(NAME(state->m_pixel_scroll));
@@ -100,6 +106,16 @@ VIDEO_RESET( hitice )
 {
 	/* kludge: clear the bitmap on startup */
 	hitice_clear_pixel_bitmap(machine);
+}
+
+
+VIDEO_START( realpunc )
+{
+	taitob_state *state = machine.driver_data<taitob_state>();
+
+	state->m_realpunc_bitmap = auto_bitmap_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height(), BITMAP_FORMAT_INDEXED16);
+
+	VIDEO_START_CALL(taitob_color_order0);
 }
 
 
@@ -389,6 +405,98 @@ SCREEN_UPDATE( taitob )
 	draw_framebuffer(screen->machine(), bitmap, cliprect, 0);
 
 	tc0180vcu_tilemap_draw(state->m_tc0180vcu, bitmap, cliprect, 2, 0);
+
+	return 0;
+}
+
+
+
+SCREEN_UPDATE( realpunc )
+{
+	taitob_state *state = screen->machine().driver_data<taitob_state>();
+	const rgb_t *palette = palette_entry_list_adjusted(screen->machine().palette);
+	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
+	int x, y;
+
+	/* Video blanked? */
+	if (!(video_control & 0x20))
+	{
+		bitmap_fill(bitmap, cliprect, 0);
+		return 0;
+	}
+
+	/* Draw the palettized playfields to an indexed bitmap */
+	tc0180vcu_tilemap_draw(state->m_tc0180vcu, state->m_realpunc_bitmap, cliprect, 0, 1);
+
+	draw_framebuffer(screen->machine(), state->m_realpunc_bitmap, cliprect, 1);
+
+	tc0180vcu_tilemap_draw(state->m_tc0180vcu, state->m_realpunc_bitmap, cliprect, 1, 0);
+
+	if (state->m_realpunc_video_ctrl & 0x0001)
+		draw_framebuffer(screen->machine(), state->m_realpunc_bitmap, cliprect, 0);
+
+	/* Copy the intermediate bitmap to the output bitmap, applying the palette */
+	for (y = 0; y <= cliprect->max_y; y++)
+		for (x = 0; x <= cliprect->max_x; x++)
+			*BITMAP_ADDR32(bitmap, y, x) = palette[*BITMAP_ADDR16(state->m_realpunc_bitmap, y, x)];
+
+	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
+	if (state->m_realpunc_video_ctrl & 0x0002)
+	{
+		device_t *hd63484 = screen->machine().device("hd63484");
+
+		int base = (hd63484_regs_r(hd63484, 0xcc/2, 0xffff) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);
+		int stride = hd63484_regs_r(hd63484, 0xca/2, 0xffff);
+
+//		scrollx = taitob_scroll[0];
+//		scrolly = taitob_scroll[1];
+
+		for (y = 0; y <= cliprect->max_y; y++)
+		{
+			int addr = base + (y*stride);
+			for (x = 0; x <= cliprect->max_x; x++)
+			{
+				int r, g, b;
+				UINT16 srcpix = hd63484_ram_r(hd63484, addr++, 0xffff);
+
+				r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
+				g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);
+				b = (BIT(srcpix, 3)) | ((srcpix >> 3) & 0x1e);
+
+				if (srcpix)
+					*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+			}
+
+			addr += stride;
+		}
+	}
+	/* Draw the 15bpp raw output of the camera ADCs (TODO) */
+	else if (state->m_realpunc_video_ctrl & 0x0004)
+	{
+		for (y = 0; y <= cliprect->max_y; y++)
+		{
+			for (x = 0; x <= cliprect->max_x; x++)
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0x00, 0x00, 0x00);
+		}
+	}
+
+	/* Clear the indexed bitmap and draw the final indexed layers */
+	bitmap_fill(state->m_realpunc_bitmap, cliprect, 0);
+
+	if (!(state->m_realpunc_video_ctrl & 0x0001))
+		draw_framebuffer(screen->machine(), state->m_realpunc_bitmap, cliprect, 0);
+
+	tc0180vcu_tilemap_draw(state->m_tc0180vcu, state->m_realpunc_bitmap, cliprect, 2, 0);
+
+	/* Merge the indexed layers with the output bitmap */
+	for (y = 0; y <= cliprect->max_y; y++)
+	{
+		for (x = 0; x <= cliprect->max_x; x++)
+		{
+			if (*BITMAP_ADDR16(state->m_realpunc_bitmap, y, x))
+				*BITMAP_ADDR32(bitmap, y, x) = palette[*BITMAP_ADDR16(state->m_realpunc_bitmap, y, x)];
+		}
+	}
 
 	return 0;
 }
