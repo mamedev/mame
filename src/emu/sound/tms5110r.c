@@ -539,15 +539,14 @@ static const struct tms5100_coeffs tms5220c_coeff =
 done by ogoun, plus image stitching done by John McMaster. The organization of
 coefficients beyond k2 is derived from work by Tatsuyuki Satoh.
 The actual coefficient rom on the chip die has 5 groups of bits only:
-Address |   K1A   |   K1B   |   K2+   | Energy | Pitch |
-Decoder |   K1A   |   K1B   |   K2+   | Energy | Pitch |
-K1A, K1B and K2+ are 10 bits wide, 32 bits long each.
+Address |   K1A   |   K1B   |   K2   | Energy | Pitch |
+Decoder |   K1A   |   K1B   |   K2   | Energy | Pitch |
+K1A, K1B and K2 are 10 bits wide, 32 bits long each.
 Energy and pitch are both 7 bits wide, 32 bits long each.
 K1A holds odd values of K1, K1B holds even values.
-K2+ holds values for K2 directly, and K3 and K4 use every other value,
-and K5-K10 use every 4th value. Values with the MSB of their index set add an additional
-1 or 3 to the index looked up.
-(Not sure how this actually works, the logic driving it is a bit of a mess).
+K2 holds values for K2 only
+K3 and K4 are actually the table index values <<6
+K5 thru K10 are actually the table index values <<7
 TODO: Current implementation is a bit of a guess, be warned!
  */
 static const struct tms5100_coeffs vlm5030_coeff =
@@ -586,23 +585,28 @@ static const struct tms5100_coeffs vlm5030_coeff =
 		     0,-510,-502,-490,-473,-452,-426,-396, /* entry 16(0x10) has some special function, purpose unknown */
 		  -362,-325,-284,-241,-196,-149,-100, -50 },
 		/* K3  */
-		{    0, 100, 196, 284, 362, 426, 473, 502,
-		  -510,-490,-452,-396,-325,-241,-149, -50 },
+		/*{    0, 100, 196, 284, 362, 426, 473, 502,
+		  -510,-490,-452,-396,-325,-241,-149, -50 },*/
+		{    0, 64, 128, 192, 256, 320, 384, 448,
+		  -512,-448,-384,-320,-256,-192,-128, -64 },
 		/* K4  */
-		{    0, 100, 196, 284, 362, 426, 473, 502,
-		  -510,-490,-452,-396,-325,-241,-149, -50 },
+		/*{    0, 100, 196, 284, 362, 426, 473, 502,
+		  -510,-490,-452,-396,-325,-241,-149, -50 },*/
+		{    0, 64, 128, 192, 256, 320, 384, 448,
+		  -512,-448,-384,-320,-256,-192,-128, -64 },
 		/* K5  */
-		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		{    0, 128, 256, 384,-512,-384,-256,-128 },
 		/* K6  */
-		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		{    0, 128, 256, 384,-512,-384,-256,-128 },
 		/* K7  */
-		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		{    0, 128, 256, 384,-512,-384,-256,-128 },
 		/* K8  */
-		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		{    0, 128, 256, 384,-512,-384,-256,-128 },
 		/* K9  */
-		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		{    0, 128, 256, 384,-512,-384,-256,-128 },
 		/* K10 */
-		{    0, 196, 362, 473,-510,-452,-325,-149 },
+		/*{    0, 196, 362, 473,-510,-452,-325,-149 },*/
+		{    0, 128, 256, 384,-512,-384,-256,-128 },
 	},
 	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
