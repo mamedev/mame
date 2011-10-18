@@ -435,7 +435,7 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 		else if (fogFactor != 0xff) // direct
 			rgbint_blend(&rgb, &fogColor, fogFactor);
 
-		// gourad shading after fog
+		// apply shading after fog
 		int shade = i*ooz;
 		rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
 
@@ -1899,7 +1899,7 @@ Signed18( UINT32 value )
  *      1663 // ?
  *
  * @param color
- *      xxxxxxxx -------- -------- type?
+ *      xxxxxxxx -------- -------- flat shading factor
  *      -------- x------- -------- fog enable
  *      -------- -xxxxxxx -------- palette select
  *      -------- -------- xxxxxxxx unused?
@@ -1937,7 +1937,7 @@ BlitQuadHelper(
 		pVerTex->y = GetPolyData( state, 9+i*3+addr );
 		pVerTex->z = GetPolyData( state, 10+i*3+addr );
 		TransformPoint( &pVerTex->x, &pVerTex->y, &pVerTex->z, m );
-	} /* for( i=0; i<4; i++ ) */
+	}
 
 	/* backface cull one-sided polygons */
 	if( flags&0x0020 &&
@@ -1965,6 +1965,7 @@ BlitQuadHelper(
 
 		if( state->m_mLitSurfaceCount )
 		{
+			// lighting
 			bri = state->m_mLitSurfaceInfo[state->m_mLitSurfaceIndex%state->m_mLitSurfaceCount];
 			if( state->m_mSurfaceNormalFormat == 0x6666 )
 			{
@@ -1975,13 +1976,14 @@ BlitQuadHelper(
 				state->m_mLitSurfaceIndex++;
 			else
 				logerror( "unknown normal format: 0x%x\n", state->m_mSurfaceNormalFormat );
-		} /* pLitSurfaceInfo */
-		else if( packetFormat & 0x40 )
+		}
+		else if( packetFormat & 0x40 ) // gourad shading
 			bri = (GetPolyData(state, i+addr)>>16)&0xff;
-		else
-			bri = 0x40;
+		else // flat shading
+			bri = color>>16&0xff;
+
 		pVerTex->bri = bri;
-	} /* for( i=0; i<4; i++ ) */
+	}
 
 	if( zmin<0.0f ) zmin = 0.0f;
 	if( zmax<0.0f ) zmax = 0.0f;
