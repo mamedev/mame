@@ -766,10 +766,10 @@ ROM_START( badlandsb )
 
 	/* the 2nd half of 122,123,124 and 125 is identical to the first half and not used */
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "blb36.ic123",  0x000000, 0x10000, BAD_DUMP CRC(d7978eeb) SHA1(1adc95bebe9eea8c112d40cd04ab7a8d75c4f961) ) /* bad dump -- empty */
+	ROM_LOAD( "13.ic123",     0x000000, 0x10000, CRC(55fac198) SHA1(055938f38cb7fc02ecaf35446b2598f7808baa1c) ) // alt set replaced bad rom
 	ROM_LOAD( "blb37.ic92",   0x008000, 0x10000, CRC(9188db9f) SHA1(8f7dc2c4c0dec9a80b6214a2efaa0de0858de84c) )
 	ROM_LOAD( "blb38.ic125",  0x020000, 0x10000, CRC(4839dd54) SHA1(031efbc144e5e088be0f3576aa514c7c2b775f6d) )
-	ROM_LOAD( "blb31.ic91",   0x028000, 0x10000, BAD_DUMP CRC(77e3dabc) SHA1(fa3c93f37ab11cfe82cf17c25ec2f9b8bee8a64e) ) /* bad dump -- BADADDR        xxxx-xxxxxxxxxxx */
+	ROM_LOAD( "8.ic91",       0x028000, 0x10000, CRC(4d85a509) SHA1(f8f13fe16706d01f0ee87cd1188c3115d6cdbf46) ) // alt set replaced bad rom
 	ROM_LOAD( "blb30.ic122",  0x040000, 0x10000, CRC(61a1bcec) SHA1(fd38bbf8f6c8d1e0e936740db757f9fa85753503) )
 	ROM_LOAD( "blb35.ic90",   0x048000, 0x10000, CRC(649c17f0) SHA1(bed3b7fc2c0516fe309bb81b65d8925ecf3065e4) )
 	ROM_LOAD( "blb32.ic124",  0x060000, 0x10000, CRC(a67c61ba) SHA1(d701eb7f4520b57be54a7113d39f81d52800ee7e) )
@@ -784,4 +784,38 @@ ROM_START( badlandsb )
 ROM_END
 
 
+ROM_START( badlandsb2 )
+	/* bootleg 68k Program */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "5.ic21",  0x00000, 0x10000, CRC(dffb025d) SHA1(f2c17607acbbeee7d5d3f3dd2e8dc768b755e991) )
+	ROM_LOAD16_BYTE( "2.ic22",  0x00001, 0x10000, CRC(ca3015c4) SHA1(72e1451498143d920239487704f4b4a8a71410e0) )
+	ROM_LOAD16_BYTE( "4.ic19",  0x20000, 0x10000, CRC(0e2e807f) SHA1(5b61de066dca12c44335aa68a13c821845657866) )
+	ROM_LOAD16_BYTE( "1.ic20",  0x20001, 0x10000, CRC(99a20c2c) SHA1(9b0a5a5dafb8816e72330d302c60339b600b49a8) )
+
+	/* Z80 on the bootleg! */
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "3.ic27", 0x00000, 0x10000, CRC(08850eb5) SHA1(be169e8ccee275b72bcfca66cd126cc27af7a1d6) )  // only rom that differs from badlandsb
+
+	/* the 2nd half of 122,123,124 and 125 is identical to the first half and not used */
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "13.ic123",  0x000000, 0x10000, CRC(55fac198) SHA1(055938f38cb7fc02ecaf35446b2598f7808baa1c) )
+	ROM_LOAD( "14.ic92",   0x008000, 0x10000, CRC(9188db9f) SHA1(8f7dc2c4c0dec9a80b6214a2efaa0de0858de84c) )
+	ROM_LOAD( "15.ic125",  0x020000, 0x10000, CRC(4839dd54) SHA1(031efbc144e5e088be0f3576aa514c7c2b775f6d) )
+	ROM_LOAD( "8.ic91",    0x028000, 0x10000, CRC(4d85a509) SHA1(f8f13fe16706d01f0ee87cd1188c3115d6cdbf46) )
+	ROM_LOAD( "7.ic122",   0x040000, 0x10000, CRC(61a1bcec) SHA1(fd38bbf8f6c8d1e0e936740db757f9fa85753503) )
+	ROM_LOAD( "12.ic90",   0x048000, 0x10000, CRC(649c17f0) SHA1(bed3b7fc2c0516fe309bb81b65d8925ecf3065e4) )
+	ROM_LOAD( "9.ic124",   0x060000, 0x10000, CRC(a67c61ba) SHA1(d701eb7f4520b57be54a7113d39f81d52800ee7e) )
+	ROM_LOAD( "6.ic88",    0x068000, 0x10000, CRC(a9f280e5) SHA1(daff021d14f17da8c4469270a1e50e5a01d05d49) )
+
+	/* the 1st half of 67 & 68 are empty and not used */
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "10.ic67", 0x10001, 0x10000, CRC(aebf9938) SHA1(3778aacbde07e5a5d010e41ab62d5b0db8632ad8) )
+	ROM_LOAD16_BYTE( "11.ic34", 0x00001, 0x10000, CRC(3eac30a5) SHA1(deefc668185bf30ad3eeba73853f97ce12b85293) )
+	ROM_LOAD16_BYTE( "16.ic68", 0x10000, 0x10000, CRC(f398f2d7) SHA1(1eef64680101888425490eb4d5b86072e59753cf) )
+	ROM_LOAD16_BYTE( "17.ic35", 0x00000, 0x10000, CRC(b47679ee) SHA1(0bd7d40dad214c54021c2014efbd374a7e4c7a3f) )
+ROM_END
+
+
+
 GAME( 1989, badlandsb, badlands, badlandsb, badlands, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb2,badlands, badlandsb, badlands, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", GAME_NOT_WORKING )
