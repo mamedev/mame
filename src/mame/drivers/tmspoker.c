@@ -622,6 +622,21 @@ static DRIVER_INIT( bus )
 	}
 
 	/* still need to decode the addressing lines */
+	/* text found in the ROM (A at 6, B at 8, etc: consistent with gfx rom byte offsets) suggests
+	   that the lower address lines are good already:
+
+	ROM offset    TEXT
+	-----------------------
+	$0914-$0919   POINTS
+	$091e-$0920   BET
+	$0924-$0927   GAME
+	$092c-$092f   OVER
+	$0934-$0938   RESET
+	$093c-$0941   WINNER
+	$0946-$0949   TEST
+
+	the same 53 bytes blob of data ("POINTS" to "TEST", text control codes included) is also located at	offset $190c-$1941
+	*/
 }
 
 
@@ -629,5 +644,5 @@ static DRIVER_INIT( bus )
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME                     FLAGS */
-GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, bus,  ROT0, "Unknown", "Unknown TMS9980 Poker Game", GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY      FULLNAME                     FLAGS */
+GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, bus,  ROT0, "<unknown>", "unknown TMS9980 Poker Game", GAME_NO_SOUND | GAME_NOT_WORKING )
