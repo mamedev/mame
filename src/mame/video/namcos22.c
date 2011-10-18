@@ -541,7 +541,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 		extra->pfade_enabled = mixer.PolyFade_enabled;
 		rgb_comp_to_rgbint(&extra->polyColor, mixer.rPolyFadeColor, mixer.gPolyFadeColor, mixer.bPolyFadeColor);
 
-		/* fog (prelim!)
+		/* poly fog (prelim!)
 
 		czram contents.. big amount, sorry :P  this stuff will be removed when ss22 fog is understood
 
@@ -558,10 +558,10 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 			czram[0] = 00c8 00ca 00cc 00ce 00d0 00d2 00d4 00d6 00d8 00da 00dc 00de 00e0 00e2 00e4 00e6 00e8 00ea 00ec 00ee 00f0 00f2 00f4 00f6 00f8 00fa 00fc 00fe 0100 0102 0104 0106 0108 010a 010c 010e 0110 0112 0114 0116 0118 011a 011c 011e 0120 0122 0124 0126 0128 012a 012c 012e 0130 0132 0134 0136 0138 013a 013c 013e 0140 0142 0144 0146 0148 014a 014c 014e 0150 0152 0154 0156 0158 015a 015c 015e 0160 0162 0164 0166 0168 016a 016c 016e 0170 0172 0174 0176 0178 017a 017c 017e 0180 0182 0184 0186 0188 018a 018c 018e 0190 0192 0194 0196 0198 019a 019c 019e 01a0 01a2 01a4 01a6 01a8 01aa 01ac 01ae 01b0 01b2 01b4 01b6 01b8 01ba 01bc 01be 01c0 01c2 01c4 01c6 01c8 01ca 01cc 01ce 01d0 01d2 01d4 01d6 01d8 01da 01dc 01de 01e0 01e2 01e4 01e6 01e8 01ea 01ec 01ee 01f0 01f2 01f4 01f6 01f8 01fa 01fc 01fe 0200 0202 0204 0206 0208 020a 020c 020e 0210 0212 0214 0216 0218 021a 021c 021e 0220 0222 0224 0226 0228 022a 022c 022e 0230 0232 0234 0236 0238 023a 023c 023e 0240 0242 0244 0246 0248 024a 024c 024e 0250 0252 0254 0256 0258 025a 025c 025e 0260 0262 0264 0266 0268 026a 026c 026e 0270 0272 0274 0276 0278 027a 027c 027e 0280 0282 0284 0286 0288 028a 028c 028e 0290 0292 0294 0296 0298 029a 029c 029e 02a0 02a2 02a4 02a6 02a8 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
 
 		alpinr2b (1st course) fog color: ff ff ff
-		alpinr2b start of race: - gets gradually filled from left to right, initial contents filled with 1fff?
+		alpinr2b start of race: - gets gradually filled from left to right, initial contents filled with 1fff? - game should be foggy here
 			czram[0] = 01cd 01d7 01e1 01eb 01f5 01ff 0209 0213 021d 0227 0231 023b 0245 024f 0259 0263 026d 0277 0281 028b 0295 029f 02a9 02b3 02bd 02c7 02d1 02db 02e5 02ef 02f9 0303 030d 0317 0321 032b 0335 033f 0349 0353 035d 0367 0371 037b 0385 038f 0399 03a3 03ad 03b7 03c1 03cb 03d5 03df 03e9 03f3 03fd 0407 0411 041b 0425 042f 0439 0443 044d 0457 0461 046b 0475 047f 0489 0493 049d 04a7 04b1 04bb 04c5 04cf 04d9 04e3 04ed 04f7 0501 050b 0515 051f 0529 0533 053d 0547 0551 055b 0565 056f 0579 0583 058d 0597 05a1 05ab 05b5 05bf 05c9 05d3 05dd 05e7 05f1 05fb 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
 			other banks unused, zerofilled
-		alpinr2b mid race: - gets gradually filled from right to left, initial contents
+		alpinr2b mid race: - gets gradually filled from right to left, initial contents above - game should not be foggy here
 			czram[0] = 1ffe 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
 
 		*/
@@ -569,7 +569,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 		/*  czattr:
                0    2    4    6    8    a    c    e
             ^^^^ ^^^^ ^^^^ ^^^^                        cz offset, signed16 per cztype 0,1,2,3
-                                ^^^^                   flags, nybble per cztype 3,2,1,0 - 4 means enable?
+                                ^^^^                   flags, nybble per cztype 3,2,1,0 - 4 probably means enable
                                      ^^^^              maincpu ram access bank
                                           ^^^^         flags, nybble per cztype 3,2,1,0 - ?
                                                ^^^^    ? (only set sometimes in timecris)
@@ -586,70 +586,26 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
             0000 0000 0000 0000 4455 0000 000a 0000 // alpinr2b
             8001 8001 0000 0000 1111 0000 5555 0000 // aquajet (reg 8 is either 1111 or 5555, reg c is usually interlaced)
 		*/
-
-#if 1
 		if (~color & 0x80)
 		{
 			int cztype = flags&3;
-			rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
-			
-			if (direct)
+			if (nthword(state->m_czattr, 4) & (4<<(cztype*4)))
 			{
-				int fogDelta = (INT16)nthword(state->m_czattr, cztype);
-				
-				static const int cztype_remap[4] = { 3,1,2,0 }; //hmm?
-				int fogDensity = fogDelta + (state->m_banked_czram[cztype_remap[cztype]][flags>>13&0xff]&0x1fff);
-				//int fogDensity = fogDelta + (state->m_banked_czram[cztype][flags>>13&0xff]&0x1fff);
-				
-				
-				if( fogDensity<0x0000 )
-				{
-					fogDensity = 0x0000;
-				}
-				else if( fogDensity>0x1fff )
-				{
-					fogDensity = 0x1fff;
-				}
-				if( nthword(state->m_czattr,4)&(4<<(cztype*4)) )
-				extra->fogFactor = fogDensity >> 5;
-				//flags>>13&0xff;
-			}
-			else
-			{
-				//extra->zfog_enabled = 1;
-			}
-		}
-#else
-		// old implementation
-		if( !(color&0x80) )
-		{
-			int cz = flags>>8;
-			static const int cztype_remap[4] = { 3,1,2,0 };
-			int cztype = flags&3;
-			if( nthword(state->m_czattr,4)&(0x4000>>(cztype*4)) )
-			{
-				int fogDelta = (INT16)nthword(state->m_czattr, cztype);
-				int fogDensity = fogDelta + state->m_banked_czram[cztype_remap[cztype]][cz];
-				//if( fogDelta == 0x8000 ) fogDelta = -0x7fff;
-				//cz = Clamp256(cz+fogDelta);
-				if( fogDensity<0x0000 )
-				{
-					fogDensity = 0x0000;
-				}
-				else if( fogDensity>0x1fff )
-				{
-					fogDensity = 0x1fff;
-				}
-				extra->fogFactor = fogDensity >> 5;
-
-				// disallow 100% fogFactor for now (completely breaks alpinr2 otherwise)
-				if (extra->fogFactor == 0xff)
-					extra->fogFactor = 0;
-
+				int delta = (INT16)nthword(state->m_czattr, cztype);
 				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
+				if (direct)
+				{
+					// not accurate (see testmode)
+					int cz = Clamp256((flags>>13&0xff) + delta);
+					cz = state->m_banked_czram[cztype][cz]&0x1fff;
+					extra->fogFactor = cz >> 5;
+				}
+				else
+				{
+					// not implemented yet
+				}
 			}
 		}
-#endif
 	}
 
 	else
@@ -1285,7 +1241,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
     *    ------------xxxx BN (texture bank)
     *
     * word#3:
-    *    -xxxxxxxxxxxxx-- ZC (less bits for super?)
+    *    -xxxxxxxxxxxxx-- ZC (less bits for super)
     *    --------------xx depth cueing table select
     *
     * for each vertex:
@@ -1719,7 +1675,7 @@ WRITE32_HANDLER( namcos22_tilemapattr_w )
     0.loword    R/W     y offset, bit 9 for interlacing?(cybrcomm, tokyowar)
     1.hiword    R/W     ??? always 0x006e?
     1.loword    ?       unused?
-    2.hiword    R/W     posirq scanline, not hooked up yet
+    2.hiword    R/W     posirq scanline? - not hooked up yet
     2.loword    R       assume current scanline
     3.hiword    ?       unused?
     3.loword    R       ???
@@ -1965,7 +1921,7 @@ BlitQuadHelper(
 
 		if( state->m_mLitSurfaceCount )
 		{
-			// lighting
+			// lighting (prelim)
 			bri = state->m_mLitSurfaceInfo[state->m_mLitSurfaceIndex%state->m_mLitSurfaceCount];
 			if( state->m_mSurfaceNormalFormat == 0x6666 )
 			{
@@ -1977,10 +1933,16 @@ BlitQuadHelper(
 			else
 				logerror( "unknown normal format: 0x%x\n", state->m_mSurfaceNormalFormat );
 		}
-		else if( packetFormat & 0x40 ) // gourad shading
+		else if( packetFormat & 0x40 )
+		{
+			// gourad shading
 			bri = (GetPolyData(state, i+addr)>>16)&0xff;
-		else // flat shading
+		}
+		else
+		{
+			// flat shading
 			bri = color>>16&0xff;
+		}
 
 		pVerTex->bri = bri;
 	}
