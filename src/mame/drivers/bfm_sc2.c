@@ -4991,6 +4991,7 @@ ROM_START( sc2bbar7 )
 ROM_END
 
 ROM_START( sc2flutr )
+	//This is weird, it looks like the sc2 board is some sort of master controller for linked machines (serial connection)?.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "code.bin", 0x0000, 0x010000, CRC(3e5d54d6) SHA1(a0ad4a4c723e0d03683c7f53fd0932b46f49cb41) )
 
@@ -5050,46 +5051,6 @@ ROM_START( sc2sghst )
 	ROM_REGION( 0x800000, "altupd", 0 )
 	ROM_LOAD( "sgstsnd", 0x0000, 0x03af13, CRC(2c6b2237) SHA1(7da432ccea45ce30bba72a0b565d53b33257f877) )
 	ROM_LOAD( "ghostsnd.dat", 0x0000, 0x0d9ce8, CRC(56f4377f) SHA1(ddf296d2d705def19870b24019ecfdb42bc45342) )
-ROM_END
-
-ROM_START( sc2paw )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pawhc02.bin", 0x0000, 0x010000, CRC(599bfe96) SHA1(5960e60b52b1b965c76e5df40ef255e6d79c9ac2) )
-	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
-	ROM_LOAD( "pawhc03.bin", 0x0000, 0x010000, CRC(78262206) SHA1(8d8d9ca982d2d69bdb750be6654a7253f539ee31) )
-	ROM_LOAD( "pawhc05.bin", 0x0000, 0x010000, CRC(7683b547) SHA1(71ffdc8e6952c0dad652b67691ed88f3674ce80d) )
-	ROM_LOAD( "pawhm01.bin", 0x0000, 0x010000, CRC(076b8162) SHA1(1a13f07a57a6cc1486b710012c29e5a45ab6e258) )
-	ROM_LOAD( "pawhs09.bin", 0x0000, 0x010000, CRC(a51c9f45) SHA1(74675dcf4299f10fffd998dfbfa59f541deff3cc) )
-	ROM_LOAD( "pawhs10.bin", 0x0000, 0x010000, CRC(7e4c27bf) SHA1(aea811790bf505d3a60dc4145225eb441c4733f5) )
-	ROM_LOAD( "pawuc06.bin", 0x0000, 0x010000, CRC(e4a97fe0) SHA1(ae59f6637866d7f8d9ebd08e1bf72f1e99c67bbe) )
-	ROM_LOAD( "pawuc08.bin", 0x0000, 0x010000, CRC(f5500f6a) SHA1(0ec680589edcbee86e85f1d2454ce11efaab416c) )
-	ROM_LOAD( "pawus09.bin", 0x0000, 0x010000, CRC(650ed3df) SHA1(995ac45346b925c823b393361dcd7d77d413278d) )
-	ROM_LOAD( "pawus10.bin", 0x0000, 0x010000, CRC(dcaeb369) SHA1(65604c0c77f6887c9967a9b1ef0fbcce5535127b) )
-	ROM_LOAD( "pw2ds14.bin", 0x0000, 0x010000, CRC(12327bfd) SHA1(b0f4ee8eef61fdb203384883de06715455c12907) )
-	ROM_LOAD( "pw2ds15.bin", 0x0000, 0x010000, CRC(8f094db8) SHA1(a2a323bd917770b3be364fcaca08aef155c2f934) )
-	ROM_LOAD( "pw2ds16.bin", 0x0000, 0x010000, CRC(19b3de66) SHA1(80ffba6eff992fbfea4f7c31f434192250970a78) )
-	ROM_LOAD( "pw2ds17.bin", 0x0000, 0x010000, CRC(a105e0b4) SHA1(10c0abd4c82c99da2126961fb39981c036725e02) )
-	ROM_LOAD( "pw2hc05.bin", 0x0000, 0x010000, CRC(46381370) SHA1(39a3cc2d8ad0b1799f89db380a3362139f96a2b7) )
-	ROM_LOAD( "pw2hc06.bin", 0x0000, 0x010000, CRC(12139fdd) SHA1(77cc4ca1ce5659129b0f4b3caaed76a905840d03) )
-	ROM_LOAD( "pw2hc07.bin", 0x0000, 0x010000, CRC(f4883446) SHA1(9eba19b74d1182be6ec9ec2778d93ac83aa9fed1) )
-	ROM_LOAD( "pw2hc08.bin", 0x0000, 0x010000, CRC(62075be2) SHA1(ea5d3c82a1e0d6f914d86dce156453f47bf1d635) )
-	ROM_LOAD( "pw2hc10.bin", 0x0000, 0x010000, CRC(9918d018) SHA1(3a51a5b04a749f5ec49dd7a25fc1c50509f3ab7c) )
-	ROM_LOAD( "pw2hm01.bin", 0x0000, 0x010000, CRC(330a0961) SHA1(99d831c90d9b7f336ad2d27e024ccf896f87f0c7) )
-	ROM_LOAD( "pw2hm02.bin", 0x0000, 0x010000, CRC(43ebb988) SHA1(3eec2db9731c2bdf6e768ca0ff2c21aa02758c36) )
-	ROM_LOAD( "pw2hm04.bin", 0x0000, 0x010000, CRC(83d7cfa8) SHA1(7a1ee63ab1860cdf6edd6a7945d41a7229ac114a) )
-	ROM_LOAD( "pw2hs11.bin", 0x0000, 0x010000, CRC(c3fb0cea) SHA1(53b6c8b0a9ccf037b988616f789ab0175ca1482d) )
-	ROM_LOAD( "pw2hs15.bin", 0x0000, 0x010000, CRC(227cd67e) SHA1(37eb5605ef37cb9ce2dd3be0d61b1f74a90cb686) )
-	ROM_LOAD( "pw2hs16.bin", 0x0000, 0x010000, CRC(70d368fe) SHA1(560f967107c20ca6910ebd20be0d48db5739e53d) )
-	ROM_LOAD( "pw2hs17.bin", 0x0000, 0x010000, CRC(ef7a5ded) SHA1(f34852db80e49016ff53bad4d975606cfdb06493) )
-	ROM_LOAD( "pw2mh03.bin", 0x0000, 0x010000, CRC(9d4859c7) SHA1(90bed8937c581726852e911c56827108ae983f1e) )
-	ROM_LOAD( "pw3cs01.bin", 0x0000, 0x010000, CRC(7e4e07f9) SHA1(52b9a086da53621c92571c0209171595cb78c479) )
-	ROM_LOAD( "pw3cs02.bin", 0x0000, 0x010000, CRC(c85736a9) SHA1(147535fc56b4d40cca076200a17a696251c4ec90) )
-	ROM_LOAD( "show03.bin", 0x0000, 0x010000, CRC(d89ae7fc) SHA1(1887b2066447c6e90d3fb9a4259e87e857793c7d) )
-	ROM_LOAD( "show04.bin", 0x0000, 0x010000, CRC(5a96d640) SHA1(bf36c2327c527583a0c758afdbb329e773151d9c) )
-	ROM_LOAD( "tchm02.bin", 0x0000, 0x010000, CRC(09aa9ad6) SHA1(91ae2d677aefde936daf211051719aa49966398f) )
-
-	ROM_REGION( 0x80000, "upd", 0 )
-	ROM_LOAD( "paws1.bin", 0x0000, 0x03e72f, CRC(124b14ba) SHA1(b6b84c306c83b3159d88992ad88a10aff161fce8) )
 ROM_END
 
 ROM_START( sc2scshx )
@@ -5524,7 +5485,6 @@ GAME( 199?, sc2flutr	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Concept",   "
 GAME( 199?, sc2smnud	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Concept",   "Super Multi Nudger (Concept)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 //Seems to be plain Scorpion 2 - keeps tripping watchdog?
-GAME( 199?, sc2paw		, 0			,  scorpion2		, drwho		, drwhon		, 0,		 "Concept",   "Pull-a-Win (Concept)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2scshx	, 0			,  scorpion2		, drwho		, drwho			, 0,		 "Concept",   "Super Cash X (Concept)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2sghst	, 0			,  scorpion2		, drwho		, drwho			, 0,		 "Concept",   "Super Ghost (Concept)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc2scshxgman, sc2scshx	,  scorpion2		, drwho		, drwho			, 0,		 "Concept",   "Super Cash X (Concept) (Gamesman Hardware)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

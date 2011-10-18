@@ -1501,17 +1501,19 @@ GAME( 19??, ec_barxmab, ec_barx	 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0, 
 GAME( 19??, ec_spbg7mab,ec_big7  , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Big 7 (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_supbxmab,ec_supbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Bar X (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
-//Games using the MAB scrambling, but identified as being from Concept Gaming
-GAME( 19??, ec_casbxcon,ec_casbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Casino Bar X (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_multb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Multi Bar (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_casmb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Casino Multi Bar (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supmb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Super Multi Bar (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_stkex,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Stake X (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_fltr,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Flutter (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_gold7,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Golden 7 (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_mgbel,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Megabell (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_supbxcon,ec_supbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Super Bar X (MAB PCB) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_jackb,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Jackpot Bars (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_ndgxs,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Nudge Excess (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_rdht7,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Red Hot 7 (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unkt,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Unknown 'T' (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+//Games using the MAB scrambling, but identified as being from Concept Games
+GAME( 19??, ec_casbxcon,ec_casbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Casino Bar X (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_multb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Multi Bar (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supbxcon,ec_supbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Super Bar X (MAB PCB) (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_casmb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Casino Multi Bar (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supmb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Super Multi Bar (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_stkex,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Stake X (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_fltr,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Flutter (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_rdht7,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Red Hot 7 (MAB PCB?) (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unkt,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Unknown 'T' (MAB PCB?) (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
+//These look more like some variant of Astra Gaming hardware than the MAB PCB, but I can't be sure. Certainly they dont seem to be on the base hardware
+GAME( 19??, ec_gold7,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Golden 7 (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_mgbel,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Megabell (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_jackb,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Jackpot Bars (MAB PCB?) (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_ndgxs,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Nudge Xcess (MAB PCB?) (Concept Games Ltd) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

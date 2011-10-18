@@ -11986,7 +11986,6 @@ sc2bbar7	// Big Bar 7 (Concept)
 sc2flutr	// Flutter (Concept)
 sc2sghst	// Super Ghost (Concept)
 sc2smnud	// Super Multi Nudge (Concept)
-sc2paw		// Pull-a-Win (Concept)
 sc2scshx	// Super Cash X (Concept)
 sc2scshxgman // Gamesman hardware
 sc2scshxstar // Starpoint hardware
@@ -16701,7 +16700,29 @@ m1casroyp
 m1casroy1
 m1chain		// Chain Reaction (Maygay)
 m1clbfvr	// Club Fever (Maygay)
+m1clbfvrp
 m1cluedo	// Cluedo (Maygay)
+m1cluedop
+m1cluedo5
+m1cluedo5p
+m1cluedoi
+m1cluedoip
+m1cluedon
+m1cluedonp
+m1cluedob2	//These are BwB builds
+m1cluedob2p //
+m1cluedob2h //
+m1cluedob1  //
+m1cluedob1p //
+m1cluedob1h //
+m1cluedo4
+m1cluedo4p
+m1cluedo3
+m1cluedo3p
+m1cluedo3h
+m1cluedo1
+m1cluedo1p
+m1cluedo1h
 m1cluecb	// Cluedo Club (Maygay)
 m1cluesh	// Cluedo Showcase (Maygay)
 m1cluess	// Cluedo Super Sleuth (Maygay)
@@ -16819,6 +16840,7 @@ m1topstr	// Top Strike (Maygay - Bwb)
 m1sirich	// Strike It Rich
 m1gskill	// Greek Skill
 m1luxor		// Luxor Casino
+m1atunk
 
 // Maygay MV1 hardware
 
@@ -17559,8 +17581,9 @@ m4xtrm		// X-treme (Bwb)
 
 /* Concept */
 m4rhfevc	// Red Hot Fever (Concept)
-m4spnwnc	// Spin-A-Win (Concept)
 m4nudgwc	// Nudge a Win (Concept)
+m4pulwnc	// Pull-a-Win (Concept)
+m4spnwnc	// Spin-A-Win (Concept)
 
 /* Empire */
 
@@ -17912,7 +17935,6 @@ m4jok2k
 m4mjp
 m4milrou
 m4kingg
-m4bddunk
 
 
 // MPU4 + Video board

@@ -11410,6 +11410,46 @@ ROM_START( m4rhfevc )
 	ROM_LOAD( "rhfs1.bin", 0x0000, 0x03de5e, CRC(0dddd05f) SHA1(908a58752fb1cf76667695a40bcaa7778201c3a2) )
 ROM_END
 
+ROM_START( m4pulwnc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pawhc02.bin", 0x0000, 0x010000, CRC(599bfe96) SHA1(5960e60b52b1b965c76e5df40ef255e6d79c9ac2) )
+	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
+	ROM_LOAD( "pawhc03.bin", 0x0000, 0x010000, CRC(78262206) SHA1(8d8d9ca982d2d69bdb750be6654a7253f539ee31) )
+	ROM_LOAD( "pawhc05.bin", 0x0000, 0x010000, CRC(7683b547) SHA1(71ffdc8e6952c0dad652b67691ed88f3674ce80d) )
+	ROM_LOAD( "pawhm01.bin", 0x0000, 0x010000, CRC(076b8162) SHA1(1a13f07a57a6cc1486b710012c29e5a45ab6e258) )
+	ROM_LOAD( "pawhs09.bin", 0x0000, 0x010000, CRC(a51c9f45) SHA1(74675dcf4299f10fffd998dfbfa59f541deff3cc) )
+	ROM_LOAD( "pawhs10.bin", 0x0000, 0x010000, CRC(7e4c27bf) SHA1(aea811790bf505d3a60dc4145225eb441c4733f5) )
+	ROM_LOAD( "pawuc06.bin", 0x0000, 0x010000, CRC(e4a97fe0) SHA1(ae59f6637866d7f8d9ebd08e1bf72f1e99c67bbe) )
+	ROM_LOAD( "pawuc08.bin", 0x0000, 0x010000, CRC(f5500f6a) SHA1(0ec680589edcbee86e85f1d2454ce11efaab416c) )
+	ROM_LOAD( "pawus09.bin", 0x0000, 0x010000, CRC(650ed3df) SHA1(995ac45346b925c823b393361dcd7d77d413278d) )
+	ROM_LOAD( "pawus10.bin", 0x0000, 0x010000, CRC(dcaeb369) SHA1(65604c0c77f6887c9967a9b1ef0fbcce5535127b) )
+	ROM_LOAD( "pw2ds14.bin", 0x0000, 0x010000, CRC(12327bfd) SHA1(b0f4ee8eef61fdb203384883de06715455c12907) )
+	ROM_LOAD( "pw2ds15.bin", 0x0000, 0x010000, CRC(8f094db8) SHA1(a2a323bd917770b3be364fcaca08aef155c2f934) )
+	ROM_LOAD( "pw2ds16.bin", 0x0000, 0x010000, CRC(19b3de66) SHA1(80ffba6eff992fbfea4f7c31f434192250970a78) )
+	ROM_LOAD( "pw2ds17.bin", 0x0000, 0x010000, CRC(a105e0b4) SHA1(10c0abd4c82c99da2126961fb39981c036725e02) )
+	ROM_LOAD( "pw2hc05.bin", 0x0000, 0x010000, CRC(46381370) SHA1(39a3cc2d8ad0b1799f89db380a3362139f96a2b7) )
+	ROM_LOAD( "pw2hc06.bin", 0x0000, 0x010000, CRC(12139fdd) SHA1(77cc4ca1ce5659129b0f4b3caaed76a905840d03) )
+	ROM_LOAD( "pw2hc07.bin", 0x0000, 0x010000, CRC(f4883446) SHA1(9eba19b74d1182be6ec9ec2778d93ac83aa9fed1) )
+	ROM_LOAD( "pw2hc08.bin", 0x0000, 0x010000, CRC(62075be2) SHA1(ea5d3c82a1e0d6f914d86dce156453f47bf1d635) )
+	ROM_LOAD( "pw2hc10.bin", 0x0000, 0x010000, CRC(9918d018) SHA1(3a51a5b04a749f5ec49dd7a25fc1c50509f3ab7c) )
+	ROM_LOAD( "pw2hm01.bin", 0x0000, 0x010000, CRC(330a0961) SHA1(99d831c90d9b7f336ad2d27e024ccf896f87f0c7) )
+	ROM_LOAD( "pw2hm02.bin", 0x0000, 0x010000, CRC(43ebb988) SHA1(3eec2db9731c2bdf6e768ca0ff2c21aa02758c36) )
+	ROM_LOAD( "pw2hm04.bin", 0x0000, 0x010000, CRC(83d7cfa8) SHA1(7a1ee63ab1860cdf6edd6a7945d41a7229ac114a) )
+	ROM_LOAD( "pw2hs11.bin", 0x0000, 0x010000, CRC(c3fb0cea) SHA1(53b6c8b0a9ccf037b988616f789ab0175ca1482d) )
+	ROM_LOAD( "pw2hs15.bin", 0x0000, 0x010000, CRC(227cd67e) SHA1(37eb5605ef37cb9ce2dd3be0d61b1f74a90cb686) )
+	ROM_LOAD( "pw2hs16.bin", 0x0000, 0x010000, CRC(70d368fe) SHA1(560f967107c20ca6910ebd20be0d48db5739e53d) )
+	ROM_LOAD( "pw2hs17.bin", 0x0000, 0x010000, CRC(ef7a5ded) SHA1(f34852db80e49016ff53bad4d975606cfdb06493) )
+	ROM_LOAD( "pw2mh03.bin", 0x0000, 0x010000, CRC(9d4859c7) SHA1(90bed8937c581726852e911c56827108ae983f1e) )
+	ROM_LOAD( "pw3cs01.bin", 0x0000, 0x010000, CRC(7e4e07f9) SHA1(52b9a086da53621c92571c0209171595cb78c479) )
+	ROM_LOAD( "pw3cs02.bin", 0x0000, 0x010000, CRC(c85736a9) SHA1(147535fc56b4d40cca076200a17a696251c4ec90) )
+	ROM_LOAD( "show03.bin", 0x0000, 0x010000, CRC(d89ae7fc) SHA1(1887b2066447c6e90d3fb9a4259e87e857793c7d) )
+	ROM_LOAD( "show04.bin", 0x0000, 0x010000, CRC(5a96d640) SHA1(bf36c2327c527583a0c758afdbb329e773151d9c) )
+	ROM_LOAD( "tchm02.bin", 0x0000, 0x010000, CRC(09aa9ad6) SHA1(91ae2d677aefde936daf211051719aa49966398f) )
+
+	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_LOAD( "paws1.bin", 0x0000, 0x03e72f, CRC(124b14ba) SHA1(b6b84c306c83b3159d88992ad88a10aff161fce8) )
+ROM_END
+
 ROM_START( m4spnwnc )
 	ROM_REGION( 0x020000, "maincpu", 0 )
 	ROM_LOAD( "saw01.bin", 0x0000, 0x010000, CRC(5350e50e) SHA1(0d7ba3280eddb4400545729c55bcfaff7918d553) )
@@ -15167,33 +15207,6 @@ ROM_START( m4kingg )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
 
-// I'm not 100% convinced this is a real game, or a collection of random roms
-ROM_START( m4bddunk )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "rndm7802.u1", 0x0000, 0x010000, CRC(d88ec13b) SHA1(3f32a2c77c1bdab016f582fa40099a6ffb6427f5) )
-	ROM_LOAD( "rndm7802.u2", 0x0000, 0x010000, CRC(0439b0f9) SHA1(fb3941d80ad64b3f442d11697c30f9c63131b5c4) )
-	ROM_LOAD( "rrun4.1t", 0x0000, 0x010000, CRC(4c95f6c1) SHA1(112c4b39fa9654824e47c1da360c1ce3e1ee750a) )
-	ROM_LOAD( "rrun4.2t", 0x0000, 0x010000, CRC(c423978e) SHA1(6a8b88c931ed95946226244d8bd88323412d0e1c) )
-
-	ROM_REGION( 0x200000, "other1", 0 )
-	// these look like something else? check!
-	ROM_LOAD( "dnj1.6", 0x0000, 0x010000, CRC(29d1ce09) SHA1(ed90ce869c71d06a2f6d1cc7becbeff53d00b3c2) ) // has a cotswald copyright??
-	ROM_LOAD( "jjok", 0x0000, 0x010000, CRC(9821978b) SHA1(e327c59c2f47774986a5e22cbd119a7f75aeddb1) ) // Jolly Joker? (German?)
-	ROM_LOAD( "stest01.bin", 0x0000, 0x010000, CRC(0e2a4906) SHA1(6d3c5ed2fd8f78b63289dc96d7153740937a9584) ) // Test ROM?
-
-	ROM_REGION( 0x200000, "other2", 0 )
-	// these look like 68k pairs instead? check!
-	ROM_LOAD( "grm17011.bin", 0x0000, 0x010000, CRC(b1aa6eca) SHA1(31c5995eb19be4772413e3dc3f690f609c123673) )
-	ROM_LOAD( "grm17012.bin", 0x0000, 0x010000, CRC(a26a6345) SHA1(70ededa58b92d32e0968bb326d6579146c3bd6cb) )
-	ROM_LOAD( "grmc2001.u1", 0x0000, 0x010000, CRC(6301ebdb) SHA1(b6290fccbfa31ddf7f972dfb493a94b8b844fc17) )
-	ROM_LOAD( "grmc2001.u2", 0x0000, 0x010000, CRC(6332520f) SHA1(f6b2cc29ee947f5421593922cb4b7619d832e156) )
-	ROM_LOAD( "grm_p1.bin", 0x0000, 0x010000, CRC(43375584) SHA1(4d9342ea5ef3fe882f51f37771bbf033363fca6c) )
-	ROM_LOAD( "grm_p2.bin", 0x0000, 0x010000, CRC(e8809b05) SHA1(9002642cbecaed61746cd25de02fe6efbc5c2ca2) )
-	ROM_LOAD( "grm_pl_1.bin", 0x0000, 0x010000, CRC(b1aa6eca) SHA1(31c5995eb19be4772413e3dc3f690f609c123673) )
-	ROM_LOAD( "grm_pl_2.bin", 0x0000, 0x010000, CRC(a26a6345) SHA1(70ededa58b92d32e0968bb326d6579146c3bd6cb) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
 
 
 
@@ -15636,14 +15649,15 @@ GAME(199?, m4xtrm	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-tr
 
 /* Concept
    most of these are rebuilds of other firm's games, often using the OKI chip to simulate MOD2 sound*/
-GAME(199?, m4rhfevc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Red Hot Fever (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME(199?, m4spnwnc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Spin-A-Win (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME(199?, m4nudgwc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Nudge-A-Win (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(199?, m4rhfevc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept Games Ltd","Red Hot Fever (Concept Games Ltd) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(199?, m4nudgwc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept Games Ltd","Nudge-A-Win (Concept Games Ltd) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(199?, m4pulwnc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept Games Ltd","Pull-A-Win (Concept Games Ltd)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(199?, m4spnwnc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept Games Ltd","Spin-A-Win (Concept Games Ltd) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 
 /* Empire
    most of these boot (after a single reset to initialize)
-   but have broken text, I guess due to the characterizer (protection) */
+   but have broken text, need to check VFD emulation */
 
 GAME(199?, m4apachg,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4apachga, m4apachg,	mod4oki, mpu4, m4default, ROT0,   "Empire","Apache Gold (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -15726,6 +15740,7 @@ GAME(199?, m4ttrail, 0,			mod4oki, mpu4, m4default, ROT0,   "Empire","Treasure T
 GAME(199?, m4ttraila,m4ttrail,	mod4oki, mpu4, m4default, ROT0,   "Empire","Treasure Trail (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4ttrailb,m4ttrail,	mod4oki, mpu4, m4default, ROT0,   "Empire","Treasure Trail (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 // doesn't seem like the other Empire games (starts with RESETTING JNE, licensed, mislabeled?)
+//Looks like the only one to have a proper protection routine, too so I'm guessing it's just a game they distributed, rather than made themselves
 GAME(199?, m4jne,	  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","The Jackpot's Not Enough (Empire) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
 /* MDM
@@ -15993,22 +16008,21 @@ GAME(199?, m4abra	,0			,bwboki		,mpu4				,m_blsbys			,ROT0,	 "Bwb","Abracadabra 
 GAME(199?, m4wcnov	,0			,bwboki		,mpu4				,m_blsbys			,ROT0,	 "Nova","World Cup (Nova) (MPU4?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME(199?, m4excaln	,0			,bwboki		,mpu4				,m_blsbys			,ROT0,	 "Nova","Excalibur (Nova) (MPU4?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
-// I'm not sure Bdd is the company, but they were all in a floder marked Bdd, they appear to be games which were taken / modified for export around eastern europe / russia
-GAME( 19??, m4robo		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Robotica / Dream Machine (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4trg		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Turbo Reel Gambler (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4mbel		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Millennium Bells (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4abeaut	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "American Beauty (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4cmont		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Casino Monte Carlo (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4blkmgc	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Black Magic (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4amalad	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "American Aladdin (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4bben		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Big Ben (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4bbox		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Brain Box (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4frnudg	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Fruit & Nudge (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4frmtx		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Fruit Matrix (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4jok2k		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Joker 2000 (Bdd?) (Latvia) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4mjp		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Mega Jackpot (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4milrou	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Millennium Roulette (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4kingg		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "King George (Bdd?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, m4bddunk	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Random Runner? (Bdd?) (MPU4?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // not sure about this one, might not be this hw
+// I'm not sure Bdd is the company (more likely to be Avantime), but they were all in a folder marked Bdd, they appear to be games which were taken / modified for export around eastern europe / russia
+GAME( 19??, m4robo		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Robotica / Dream Machine (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4trg		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Turbo Reel Gambler (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4mbel		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Millennium Bells (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4abeaut	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "American Beauty (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4cmont		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Casino Monte Carlo (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4blkmgc	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Black Magic (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4amalad	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "American Aladdin (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4bben		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Big Ben (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4bbox		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Brain Box (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4frnudg	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Fruit & Nudge (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4frmtx		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Fruit Matrix (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4jok2k		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Joker 2000 (Avantime?) (Latvia) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4mjp		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Mega Jackpot (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4milrou	,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "Millennium Roulette (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, m4kingg		,  0		 ,  mod4oki		, mpu4		, m4default		,	ROT0,  "Bdd", "King George (Avantime?) (MPU4)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 
