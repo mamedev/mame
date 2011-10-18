@@ -155,6 +155,10 @@ public:
 
 	osd_work_queue *	queue;					/* work queue */
 	osd_work_item * blitter_request;
+
+	// blit timing
+	emu_timer *cavesh3_blitter_delay_timer;
+	int blitter_busy;
 };
 
 /***************************************************************************
@@ -373,6 +377,7 @@ static UINT32 cavesh_gfx_addr_shadowcopy;
 static UINT32 cavesh_gfx_scroll_0_x_shadowcopy, cavesh_gfx_scroll_0_y_shadowcopy;
 static UINT32 cavesh_gfx_scroll_1_x_shadowcopy, cavesh_gfx_scroll_1_y_shadowcopy;
 
+static UINT64 cave_blit_delay;
 
 
 static int cavesh_gfx_size;
@@ -5001,18 +5006,24 @@ caveblitfunction cave_notint_flipx_opaque_blit_funcs[] =
 
 
 
-INLINE void cavesh_gfx_draw_shadow_copy(address_space &space, offs_t *addr)
+INLINE void cavesh_gfx_draw_shadow_copy(address_space &space, offs_t *addr, int cliptype)
 {
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr); // UINT16 dst_x_start	=	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr); // UINT16 dst_y_start	=	COPY_NEXT_WORD(space, addr);
+	UINT16 w		=	COPY_NEXT_WORD(space, addr);
+	UINT16 h		=	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr);
+
+
+
+	// todo, calcualte clipping.
+	cave_blit_delay += w*h;
+
 }
 
 
@@ -5237,6 +5248,12 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 static void cavesh_gfx_create_shadow_copy(address_space &space)
 {
 	offs_t addr = cavesh_gfx_addr & 0x1fffffff;
+	UINT16 cliptype = 0;
+
+	cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x_shadowcopy;
+	cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y_shadowcopy;
+	cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+	cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
 
 	while (1)
 	{
@@ -5250,6 +5267,24 @@ static void cavesh_gfx_create_shadow_copy(address_space &space)
 
 			case 0xc000:
 				data = COPY_NEXT_WORD(space, &addr);
+
+				cliptype = data ? 1 : 0;
+
+				if (cliptype)
+				{
+					cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x_shadowcopy;
+					cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y_shadowcopy;
+					cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+					cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
+				}
+				else
+				{
+					cavesh_bitmaps->cliprect.min_x = 0;
+					cavesh_bitmaps->cliprect.min_y = 0;
+					cavesh_bitmaps->cliprect.max_x = 0x2000-1;
+					cavesh_bitmaps->cliprect.max_y = 0x1000-1;
+				}
+
 				break;
 
 			case 0x2000:
@@ -5259,7 +5294,7 @@ static void cavesh_gfx_create_shadow_copy(address_space &space)
 
 			case 0x1000:
 				addr -= 2;
-				cavesh_gfx_draw_shadow_copy(space, &addr);
+				cavesh_gfx_draw_shadow_copy(space, &addr, cliptype);
 				break;
 
 			default:
@@ -5342,7 +5377,17 @@ static void *blit_request_callback(void *param, int threadid)
 
 static READ32_HANDLER( cavesh_gfx_ready_r )
 {
-	return 0x00000010;
+	// ideally we want a recompiler for the CPU before we attempt to do this
+	// otherwise the games get stuck in more loops waiting for the blitter and we'd
+	// have to add even more idle skips all over the place ;-)
+
+//	cavesh3_state *state = space->machine().driver_data<cavesh3_state>();
+//	int pc = cpu_get_pc(&space->device());
+// if we're waiting for the blitter.. spin otherwise it becomes CPU intensive again
+///	if ( pc == 0xc0512d0 ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // espgal2
+//	if (state->blitter_busy) return 0x00000000;
+//	else
+		return 0x00000010;
 }
 
 static WRITE32_HANDLER( cavesh_gfx_exec_w )
@@ -5365,8 +5410,15 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 				osd_work_item_release(state->blitter_request);
 			}
 
-
+			cave_blit_delay = 0;
 			cavesh_gfx_create_shadow_copy(*space); // create a copy of the blit list so we can safely thread it.
+
+			if (cave_blit_delay)
+			{
+				state->blitter_busy = 1;
+				state->cavesh3_blitter_delay_timer->adjust(attotime::from_nsec(cave_blit_delay*8)); // NOT accurate timing (currently ignored anyway)
+			}
+
 			cavesh_gfx_addr_shadowcopy = cavesh_gfx_addr;
 			cavesh_gfx_scroll_0_x_shadowcopy =  cavesh_gfx_scroll_0_x;
 			cavesh_gfx_scroll_0_y_shadowcopy = cavesh_gfx_scroll_0_y;
@@ -5869,8 +5921,8 @@ static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 
 	/*       0x04000000, 0x07ffffff  SH3 Internal Regs (including ports) */
 
-	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_BASE(&cavesh3_ram)//  AM_SHARE("mainram")// work RAM
-	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM// AM_SHARE("mainram") // mirror of above on type B boards, extra ram on type D
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&cavesh3_ram)//  AM_SHARE("mainram")// work RAM
+//	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM// AM_SHARE("mainram") // mirror of above on type B boards, extra ram on type D
 
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(ibara_flash_io_r, ibara_flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_READWRITE(ymz2770c_z_r, ymz2770c_z_w)
@@ -5978,6 +6030,10 @@ static const struct sh4_config sh4cpu_config = {
 	CAVE_CPU_CLOCK
 };
 
+// 1166666 pixels per frame
+// 1 frame is 0.01666666666666666666666666666667 seconds
+// 1 frame is 16.666666666666666666666666666667 milliseconds
+// 1 frame is 16666666.666666666666666666666667 nanoseconds
 
 
 
@@ -5986,11 +6042,23 @@ static INTERRUPT_GEN(cavesh3_interrupt)
 	device_set_input_line(device, 2, HOLD_LINE);
 }
 
+
+static TIMER_CALLBACK( cavesh3_blitter_delay_callback )
+{
+	cavesh3_state *state = machine.driver_data<cavesh3_state>();
+
+	state->blitter_busy = 0;
+}
+
 static MACHINE_START( cavesh3 )
 {
 	cavesh3_state *state = machine.driver_data<cavesh3_state>();
 
-	cavesh3_ram16_copy = auto_alloc_array(machine, UINT16, 0x8000000);
+	cavesh3_ram16_copy = auto_alloc_array(machine, UINT16, 0x10000000);
+
+	state->cavesh3_blitter_delay_timer = machine.scheduler().timer_alloc(FUNC(cavesh3_blitter_delay_callback));
+	state->cavesh3_blitter_delay_timer->adjust(attotime::never);
+	
 
 	state->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 }
@@ -6029,6 +6097,8 @@ static MACHINE_RESET( cavesh3 )
 			if (cavesh3_colrtable_add[x][y]>0x1f) cavesh3_colrtable_add[x][y] = 0x1f;
 		}
 	}
+
+	state->blitter_busy = 0;
 }
 
 
@@ -6081,7 +6151,7 @@ MACHINE_CONFIG_END
 
 /**************************************************
 
-All roms are flash roms with no lables, so keep the
+All roms are flash roms with no labels, so keep the
  version numbers attached to the roms that differ
  - roms which differ have also been prefixed with
    the MAME set names to aid readability and prevent
