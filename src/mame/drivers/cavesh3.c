@@ -14,6 +14,9 @@ Improve Blending precision?
    and the real VRAM is also clearly in this format.  The Alpha values supplied however are 8bpp, and the 'Tint'
    values use 0x20 for 'normal' (not 0x1f)
 
+Overall screen brightness / contrast (see test mode)
+ - Could convert ram back to 16-bit and use a palette lookup at the final blit.. probably easiest / quickest.
+
 Sound
  - Chip is completely unemulated
 
@@ -27,7 +30,7 @@ Remaining Video issues
 
 Speedups
  - Blitter is already tightly optimized
- - Need SH3 recompiler? threading?
+ - Need SH3 recompiler?
 
 */
 
@@ -6231,7 +6234,7 @@ ROM_START( futari15a )
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("futari15_u2", 0x000000, 0x8400000, CRC(b9d815f9) SHA1(6b6f668b0bbb087ffac65e4f0d8bd9d5b28eeb28) ) /* (2006/12/8 MAST VER 1.54) */
+	ROM_LOAD("futari15a_u2", 0x000000, 0x8400000, CRC(b9d815f9) SHA1(6b6f668b0bbb087ffac65e4f0d8bd9d5b28eeb28) ) /* (2006/12/8 MAST VER 1.54) */
 
 	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
@@ -6465,9 +6468,9 @@ IBARA BLACK LABEL
   "2006/02/06. MASTER VER."
 
 PINK SWEETS
-* "2006/04/06 MASTER VER."
-* "2006/04/06 MASTER VER..."
-* "2006/04/06 MASTER VER...."
+  "2006/04/06 MASTER VER."
+  "2006/04/06 MASTER VER..."
+  "2006/04/06 MASTER VER...."
 * "2006/05/18 MASTER VER."
 * "2006/xx/xx MASTER VER"
 
