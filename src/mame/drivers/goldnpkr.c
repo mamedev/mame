@@ -21,7 +21,8 @@
     * Jack Potten's Poker (NGold, set 1).       198?, Unknown.
     * Jack Potten's Poker (NGold, set 2).       198?, Unknown.
     * Jack Potten's Poker (NGold, set 3).       198?, Unknown.
-    * Witch Card (Video Klein CPU box).         1991, Video Klein.
+    * Witch Card (Video Klein CPU box, set 1).  1991, Video Klein.
+    * Witch Card (Video Klein CPU box, set 2).  1991, Video Klein.
     * Witch Card (Spanish, witch game, set 1).  1991, Unknown.
     * Witch Card (Spanish, witch game, set 2).  1991, Unknown.
     * Witch Card (English, no witch game).      1991, Unknown.
@@ -30,7 +31,8 @@
     * Witch Card (Falcon, enhanced sound).      199?, Falcon.
     * Witch Card (German, WC3050, set 2 ).      1994, Proma.
     * Witch Card (German, WC3050, 27-4-94),     1994, Proma.
-    * Witch Game (Video Klein).                 1991, Video Klein.
+    * Witch Game (Video Klein, set 1).          1991, Video Klein.
+    * Witch Game (Video Klein, set 2).          1991, Video Klein.
     * Jolli Witch (Export, 6T/12T ver 1.57D).   1994, Video Klein?.
     * Wild Witch (Export, 6T/12T ver 1.74A).    1994, Video Klein.
     * Buena Suerte (Spanish, set 1).            1990, Unknown.
@@ -677,12 +679,20 @@
     - Added technical and game notes.
 
 
+    [2011-10-19]
+
+    - Mapped the Dallas DS1210 for Video Klein sets that have one.
+    - Mapped the 2800-2fff range as RAM for the non-Dallas Video Klein sets.
+    - Added Witch Card (Video Klein CPU box, set 2)
+    - Added Witch Game (Video Klein, set 2)
+    - Some minor fixes.
+
+
     TODO:
 
     - Missing PIA connections.
     - Code analysis, Inputs & lamps for Royale.
     - Final cleanup and split the driver.
-    - Check if calomega.c can be merged with this driver because hardware is compatible
 
 
 *******************************************************************************/
@@ -715,7 +725,7 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
-	int m_mux_data;
+	UINT8 m_mux_data;
 	UINT8 m_pia0_PA_data;
 };
 
@@ -968,7 +978,6 @@ static READ8_DEVICE_HANDLER( pottnpkr_mux_port_r )
 	}
 
 	pa_7 = (state->m_pia0_PA_data >> 7) & 1;	/* To do: bit PA5 to pin CB1 */
-//  popmessage ("mux_port_r: %x ",((pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7))) ; /* Equates PA6 to PA7 */
 
 	return ( (pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7) ) ;
 }
@@ -988,19 +997,17 @@ static WRITE8_DEVICE_HANDLER( mux_port_w )
 
 /* Demuxing ay8910 data/address from Falcon board, PIA portA out */
 
-int wcfalcon_flag = 0;
+UINT8 wcfalcon_flag = 0;
 
 static WRITE8_DEVICE_HANDLER( wcfalcon_snd_w )
 {
 	if (wcfalcon_flag == 0)
 	{
 		ay8910_data_address_w(device->machine().device("ay8910"), 0, data);
-//      logerror("sound address: %02x %02x\n", data, wcfalcon_flag);
 	}
 	else
 	{
 		ay8910_data_address_w(device->machine().device("ay8910"), 1, data);
-//      logerror("sound data: %02x %02x\n", data, wcfalcon_flag);
 	}
 
 	wcfalcon_flag = wcfalcon_flag ^ 1;
@@ -1049,7 +1056,6 @@ static WRITE8_DEVICE_HANDLER( lamps_a_w )
 	output_set_lamp_value(3, 1 - ((data >> 3) & 1));	/* Lamp 3 */
 	output_set_lamp_value(4, 1 - ((data >> 4) & 1));	/* Lamp 4 */
 
-//  popmessage("written : %02X", data);
 	coin_counter_w(device->machine(), 0, data & 0x40);	/* counter1 */
 	coin_counter_w(device->machine(), 1, data & 0x80);	/* counter2 */
 	coin_counter_w(device->machine(), 2, data & 0x20);	/* counter3 */
@@ -1117,6 +1123,7 @@ static ADDRESS_MAP_START( witchcrd_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE_MEMBER(goldnpkr_state, m_colorram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
 //  AM_RANGE(0x2108, 0x210b) AM_NOP /* unknown 40-pin device */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -3516,6 +3523,28 @@ ROM_END
 	ROM_LOAD( "tbp24s10n.7d",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/*  Witch Card (Video Klein)
+    Video Klein original with epoxy block module.
+	Alt set....
+*/
+	ROM_START( witchcde )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27128_epoxy.bin",	0x4000, 0x4000, CRC(48186272) SHA1(d211bfa89404a292e6d0f0169ed11e1e74a361d9) )	/* epoxy block program ROM */
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(					0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "wc4.a7",	0x2000, 0x1000, CRC(d3694522) SHA1(0f66ff2dd5c7ac9bf91fa9f48eb9f356572e814c) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "wc1.a2",	0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "wc2.a4",	0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "wc3.a5",	0x2000, 0x1000, CRC(a03f2d68) SHA1(6d81b1e92f40f7150498b65941d5a9ab64a89790) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "24s10.bin",			0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
+	ROM_LOAD( "24s10_epoxy.bin",	0x0100, 0x0100, CRC(ddfd7034) SHA1(78dee69ab4ba759485ee7f00446c2d86f08cc50f) ) /* original epoxy block PROM */
+ROM_END
+
 /*  Witch Card (english, witch game, lights)
     PCB by PM. Hybrid hardware.
 
@@ -3682,6 +3711,29 @@ ROM_START( witchgme )
 
 	ROM_REGION( 0x0100, "proms2", 0 )
 	ROM_LOAD( "tbp24s10n.2c",	0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*  Witch Game (Video Klein)
+    Video Klein original with epoxy block module.
+	Alt set....
+*/
+	ROM_START( witchcdk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wc_epoxy.bin",	0x0000, 0x8000, CRC(33f1acd9) SHA1(2facb3d807b5b2a2978e567d0c1106c0a027621a) )	/* epoxy block program ROM */
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(			 0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "wc4.7a",	 0x2000, 0x1000, BAD_DUMP CRC(3bf07c44) SHA1(f6e859b142b7d4585b89ca609d8bc85c84fe2b09) )    /* text chars, corrupt */
+	ROM_COPY( "gfx1",    0x2800, 0x2000, 0x0800 )	/* srctag, srcoffs, offset, length */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "wc1.2a",	0x0000, 0x1000, CRC(f59c6fd2) SHA1(bea4b6043728311ca9fff36e2d7e24254af5b97a) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "wc2.4a",	0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "wc3.5a",	0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "24s10.bin",			0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
+	ROM_LOAD( "82s137_epoxy.bin",	0x0100, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) ) /* original epoxy block PROM */
 ROM_END
 
 
@@ -4854,16 +4906,18 @@ GAMEL( 198?, ngold,    pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown
 GAMEL( 198?, ngolda,   pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,   pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",      GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )
 
-GAMEL( 1991, witchcrd, 0,        witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box)",        0,                layout_goldnpkr )
+GAMEL( 1991, witchcrd, 0,        witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)", 0,                layout_goldnpkr )
 GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)", 0 )
 GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)", 0 )
 GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, 0,        ROT0,   "<unknown>",                "Witch Card (English, no witch game)",     0 )
 GAMEL( 1994, witchcdd, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",     0,                layout_goldnpkr )
+GAMEL( 1991, witchcde, witchcrd, witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)", GAME_IMPERFECT_COLORS, layout_goldnpkr )
 GAMEL( 1985, witchcdf, witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PlayMan",                  "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
 GAMEL( 199?, witchcdg, witchcrd, wcfalcon, witchcrd, 0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",     0,                layout_goldnpkr )
 GAMEL( 1994, witchcdh, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",     0,                layout_goldnpkr )
 GAMEL( 1994, witchcdi, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",    0,                layout_goldnpkr )
-GAMEL( 1991, witchgme, witchcrd, witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein)",                0,                layout_goldnpkr )
+GAMEL( 1991, witchgme, witchcrd, witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",         0,                layout_goldnpkr )
+GAMEL( 1997, witchcdk, witchcrd, witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",         GAME_NOT_WORKING, layout_goldnpkr )
 GAMEL( 1994, witchjol, witchcrd, wcrdxtnd, witchjol, vkdlsa,   ROT0,   "Video Klein?",             "Jolli Witch (Export, 6T/12T ver 1.57D)",  GAME_IMPERFECT_COLORS, layout_goldnpkr )
 GAMEL( 1994, wldwitch, witchcrd, wcrdxtnd, wldwitch, vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",   GAME_IMPERFECT_COLORS, layout_goldnpkr )
 
