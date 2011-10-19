@@ -1740,6 +1740,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/jokrwild.o \
 	$(DRIVERS)/jongkyo.o \
 	$(DRIVERS)/jubilee.o \
+	$(DRIVERS)/kas89.o \
 	$(DRIVERS)/kingpin.o \
 	$(DRIVERS)/koikoi.o \
 	$(DRIVERS)/kyugo.o $(VIDEO)/kyugo.o \
@@ -1975,6 +1976,8 @@ $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
+
+$(DRIVERS)/kas89.o:	$(LAYOUT)/kas89.lh
 
 $(DRIVERS)/kingdrby.o:	$(LAYOUT)/kingdrby.lh
 
