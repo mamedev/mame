@@ -37,6 +37,10 @@ CPU_DISASSEMBLE( sh4be );
 
 typedef const void (*sh4ophandler)(sh4_state*, UINT16);
 
+sh4ophandler master_ophandler_table[0x10000];
+void sh4_build_optable(sh4_state* sh4);
+
+
 /* Called for unimplemented opcodes */
 const void TODO(sh4_state *sh4, UINT16 opcode)
 {
@@ -2430,152 +2434,6 @@ const void PREFM(sh4_state *sh4, UINT16 opcode)
  *  OPCODE DISPATCHERS
  *****************************************************************************/
 
-// lines of 0 are handled earlier
-sh4ophandler op0000_handlers[] =
-{
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		STCSR,		STCGBR,		STCVBR,		STCSSR,		STCSPC,		NOP,		NOP,		NOP,		STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,
-		BSRF,		NOP,		BRAF,		NOP,		NOP,		NOP,		NOP,		NOP,		PREFM,		TODO,		TODO,		TODO,		MOVCAL,		NOP,		NOP,		NOP,
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		CLRT,		SETT,		CLRMAC,		TODO,		CLRS,		SETS,		NOP,		NOP,		CLRT,		SETT,		CLRMAC,		TODO,		CLRS,		SETS,		NOP,		NOP,
-		NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,		
-		STSMACH,	STSMACL,	STSPR,		STCSGR,		NOP,		STSFPUL,	STSFPSCR,	STCDBR,		STSMACH,	STSMACL,	STSPR,		STCSGR,		NOP,		STSFPUL,	STSFPSCR,	STCDBR,	
-		RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,		
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-		0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-};
-
-
-
-const void op0000_0x02(sh4_state *sh4, UINT16 opcode)
-{
-	op0000_handlers[((opcode&0xf0)>>4)|0x20](sh4, opcode);
-}
-
-const void op0000_0x03(sh4_state *sh4, UINT16 opcode)
-{
-	op0000_handlers[((opcode&0xf0)>>4)|0x30](sh4, opcode);
-}
-
-const void op0000_0x08(sh4_state *sh4, UINT16 opcode)
-{
-	op0000_handlers[((opcode&0xf0)>>4)|0x80](sh4, opcode);
-}
-
-const void op0000_0x09(sh4_state *sh4, UINT16 opcode)
-{
-	op0000_handlers[((opcode&0xf0)>>4)|0x90](sh4, opcode);
-}
-
-const void op0000_0x0a(sh4_state *sh4, UINT16 opcode)
-{
-	op0000_handlers[((opcode&0xf0)>>4)|0xa0](sh4, opcode);
-}
-
-const void op0000_0x0b(sh4_state *sh4, UINT16 opcode)
-{
-	op0000_handlers[((opcode&0xf0)>>4)|0xb0](sh4, opcode);
-}
-
-
-// lines of 0 are handled earlier
-sh4ophandler op0100_handlers[] =
-{
-	SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP, 
-	SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,
-	STSMMACH,	STSMMACL,	STSMPR,		STCMSGR,	NOP,		STSMFPUL,	STSMFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		STCMDBR,
-	STCMSR,		STCMGBR,	STCMVBR,	STCMSSR,	STCMSPC,	NOP,		NOP,		NOP,		STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,
-	ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,		
-	ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,	
-	LDSMMACH,	LDSMMACL,	LDSMPR,		NOP,		NOP,		LDSMFPUL,	LDSMFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		LDCMDBR,
-	LDCMSR,		LDCMGBR,	LDCMVBR,	LDCMSSR,	LDCMSPC,	NOP,		NOP,		NOP,		LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,
-	SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,		
-	SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,		
-	LDSMACH,	LDSMACL,	LDSPR,		NOP,		NOP,		LDSFPUL,	LDSFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		LDCDBR,
-	JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,	
-	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-	LDCSR,		LDCGBR,		LDCVBR,		LDCSSR,		LDCSPC,		NOP,		NOP,		NOP,		LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,
-	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,	
-};
-
-
-
-
-
-const void op0100_0x00(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x00](sh4, opcode);
-}
-
-const void op0100_0x01(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x10](sh4, opcode);
-}
-
-const void op0100_0x02(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x20](sh4, opcode);
-}
-
-const void op0100_0x03(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x30](sh4, opcode);
-}
-
-const void op0100_0x04(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x40](sh4, opcode);
-}
-
-const void op0100_0x05(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x50](sh4, opcode);
-}
-
-const void op0100_0x06(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x60](sh4, opcode);
-}
-
-const void op0100_0x07(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x70](sh4, opcode);
-}
-
-const void op0100_0x08(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x80](sh4, opcode);
-}
-
-const void op0100_0x09(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0x90](sh4, opcode);
-}
-
-const void op0100_0x0a(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0xa0](sh4, opcode);
-}
-
-const void op0100_0x0b(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0xb0](sh4, opcode);
-}
-
-const void op0100_0x0e(sh4_state *sh4, UINT16 opcode)
-{
-	op0100_handlers[((opcode&0xf0)>>4)|0xe0](sh4, opcode);
-}
-
-
-
 
 
 
@@ -3197,7 +3055,6 @@ const void op1111_0x13(sh4_state *sh4, UINT16 opcode)
 }
 
 
-
 /*****************************************************************************
  *  MAME CPU INTERFACE
  *****************************************************************************/
@@ -3275,6 +3132,8 @@ static CPU_RESET( common_sh4_reset )
 	sh4->sleep_mode = 0;
 
 	sh4->sh4_mmu_enabled = 0;
+
+	sh4_build_optable(sh4);
 }
 
 /*-------------------------------------------------
@@ -3315,52 +3174,161 @@ static CPU_RESET( sh4 )
 	sh4->SH4_TCNT2 = 0xffffffff;
 }
 
-	
+/* These tables are combined into our main opcode jump table, master_ophandler_table in the RESET function */
+
 sh4ophandler op1000_handler[] =
 {
 	MOVBS4,		MOVWS4,		NOP,		NOP,		MOVBL4,		MOVWL4,		NOP,		NOP,		CMPIM,		BT,			NOP,		BF,			NOP,		BTS,		NOP,		BFS	
 };
-
-const void op1000(sh4_state *sh4, UINT16 opcode)
-{
-	op1000_handler[(opcode & 0xf00)>>8](sh4, opcode);
-}
-
-
 	
 sh4ophandler op1100_handler[] =
 {
-		MOVBSG,		MOVWSG,		MOVLSG,		TRAPA,		MOVBLG,		MOVWLG,		MOVLLG,		MOVA,		TSTI,		ANDI,		XORI,		ORI,		TSTM,		ANDM,		XORM,		ORM			
+	MOVBSG,		MOVWSG,		MOVLSG,		TRAPA,		MOVBLG,		MOVWLG,		MOVLLG,		MOVA,		TSTI,		ANDI,		XORI,		ORI,		TSTM,		ANDM,		XORM,		ORM			
 };
 
-const void op1100(sh4_state *sh4, UINT16 opcode)
+sh4ophandler op0000_handlers[] =
 {
-	op1100_handler[(opcode & 0xf00)>>8](sh4, opcode);
-}
+	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		
+	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		
+	STCSR,		STCGBR,		STCVBR,		STCSSR,		STCSPC,		NOP,		NOP,		NOP,		STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,
+	BSRF,		NOP,		BRAF,		NOP,		NOP,		NOP,		NOP,		NOP,		PREFM,		TODO,		TODO,		TODO,		MOVCAL,		NOP,		NOP,		NOP,
+	MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		
+	MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		
+	MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		
+	MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		
+	CLRT,		SETT,		CLRMAC,		TODO,		CLRS,		SETS,		NOP,		NOP,		CLRT,		SETT,		CLRMAC,		TODO,		CLRS,		SETS,		NOP,		NOP,
+	NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,		
+	STSMACH,	STSMACL,	STSPR,		STCSGR,		NOP,		STSFPUL,	STSFPSCR,	STCDBR,		STSMACH,	STSMACL,	STSPR,		STCSGR,		NOP,		STSFPUL,	STSFPSCR,	STCDBR,	
+	RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,		
+	MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		
+	MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		
+	MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		
+	MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		
+};
 
-
+sh4ophandler op0100_handlers[] =
+{
+	SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP, 
+	SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,
+	STSMMACH,	STSMMACL,	STSMPR,		STCMSGR,	NOP,		STSMFPUL,	STSMFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		STCMDBR,
+	STCMSR,		STCMGBR,	STCMVBR,	STCMSSR,	STCMSPC,	NOP,		NOP,		NOP,		STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,
+	ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,		
+	ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,	
+	LDSMMACH,	LDSMMACL,	LDSMPR,		NOP,		NOP,		LDSMFPUL,	LDSMFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		LDCMDBR,
+	LDCMSR,		LDCMGBR,	LDCMVBR,	LDCMSSR,	LDCMSPC,	NOP,		NOP,		NOP,		LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,
+	SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,		
+	SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,		
+	LDSMACH,	LDSMACL,	LDSPR,		NOP,		NOP,		LDSFPUL,	LDSFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		LDCDBR,
+	JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,	
+	SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		
+	SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		
+	LDCSR,		LDCGBR,		LDCVBR,		LDCSSR,		LDCSPC,		NOP,		NOP,		NOP,		LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,
+	MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		
+};
 
 
 sh4ophandler upper4bits[] =
 {
-		NOP,		NOP,		op0000_0x02,op0000_0x03,MOVBS0,		MOVWS0,		MOVLS0,		MULL,		op0000_0x08,op0000_0x09,op0000_0x0a,op0000_0x0b,MOVBL0,		MOVWL0,		MOVLL0,		MAC_L,
-		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,
-		MOVBS,		MOVWS,		MOVLS,		NOP,		MOVBM,		MOVWM,		MOVLM,		DIV0S,		TST,		AND,		XOR,		OR,			CMPSTR,		XTRCT,		MULU,		MULS,			
-		CMPEQ,		NOP,		CMPHS,		CMPGE,		DIV1,		DMULU,		CMPHI,		CMPGT,		SUB,		NOP,		SUBC,		SUBV,		ADD,		DMULS,		ADDC,		ADDV,			
-		op0100_0x00,op0100_0x01,op0100_0x02,op0100_0x03,op0100_0x04,op0100_0x05,op0100_0x06,op0100_0x07,op0100_0x08,op0100_0x09,op0100_0x0a,op0100_0x0b,SHAD,		SHLD,		op0100_0x0e,MAC_W,
-		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,
-		MOVBL,		MOVWL,		MOVLL,		MOV,		MOVBP,		MOVWP,		MOVLP,		NOT,		SWAPB,		SWAPW,		NEGC,		NEG,		EXTUB,		EXTUW,		EXTSB,		EXTSW,				
-		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,
-		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,		op1000,
-		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,
-		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,
-		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,
-		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,		op1100,	
-		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,
-		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,
-		FADD,		FSUB,		FMUL,		FDIV,		FCMP_EQ,	FCMP_GT,	FMOVS0FR,	FMOVFRS0,	FMOVMRFR,	FMOVMRIFR,	FMOVFRMR,	FMOVFRMDR,	FMOVFR,		op1111_0x13,FMAC,		dbreak
+	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,		/* j = 0x0000 - uses op0000_handlers*/
+	MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4, /* j = 0x1000 */
+	MOVBS,		MOVWS,		MOVLS,		NOP,		MOVBM,		MOVWM,		MOVLM,		DIV0S,		TST,		AND,		XOR,		OR,			CMPSTR,		XTRCT,		MULU,		MULS,	/* j = 0x2000 */		
+	CMPEQ,		NOP,		CMPHS,		CMPGE,		DIV1,		DMULU,		CMPHI,		CMPGT,		SUB,		NOP,		SUBC,		SUBV,		ADD,		DMULS,		ADDC,		ADDV,	/* j = 0x3000 */
+	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,		/* j = 0x4000 - uses op0100_handlers*/
+	MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4, /* j = 0x5000 */
+	MOVBL,		MOVWL,		MOVLL,		MOV,		MOVBP,		MOVWP,		MOVLP,		NOT,		SWAPB,		SWAPW,		NEGC,		NEG,		EXTUB,		EXTUW,		EXTSB,		EXTSW,	/* j = 0x6000 */
+	ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,	/* j = 0x7000 */
+	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,		/* j = 0x8000 - uses op1000_handlers */
+	MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,	/* j = 0x9000 */
+	BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,	/* j = 0xa000 */
+	BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,	/* j = 0xb000 */
+	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,		/* j = 0xc000 - uses op1100_handlers */
+	MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,	/* j = 0xd000 */
+	MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,	/* j = 0xe000 */
+	FADD,		FSUB,		FMUL,		FDIV,		FCMP_EQ,	FCMP_GT,	FMOVS0FR,	FMOVFRS0,	FMOVMRFR,	FMOVMRIFR,	FMOVFRMR,	FMOVFRMDR,	FMOVFR,		op1111_0x13,FMAC,		dbreak	/* j = 0xf000 */
 };
 
+void sh4_build_optable(sh4_state *sh4)
+{
+	int j,y,x,z;
+
+	// combine our opcode handler tables into one larger table thus reducing level of indirection on all opcode handlers
+	for (j = 0; j<0x10000;j+=0x1000)
+	{
+		for (y = 0; y<0x1000;y+=0x100)
+		{
+			for (x=0; x<0x100;x+=0x10)
+			{
+				for (z=0;z<0x10;z++)
+				{
+					master_ophandler_table[j+y+x+z] = upper4bits[(((j+z)&0xf000)>>8) + (z & 0xf)];
+				}
+			}
+		}
+	}
+
+	j = 0x0000;
+	//for (j = 0; j<0x10000;j+=0x1000)
+	{
+		for (y = 0; y<0x1000;y+=0x100)
+		{	
+			for (x=0; x<0x100;x+=0x10)
+			{
+				for (z=0;z<0x10;z++)
+				{
+					master_ophandler_table[j+y+x+z] = op0000_handlers[((((j+y+x+z)&0xf0)>>4)) | ((((j+y+x+z)&0xf)<<4))];
+				}
+			}
+		}
+	}
+	
+	j = 0x4000;
+	//for (j = 0; j<0x10000;j+=0x1000)
+	{
+		for (y = 0; y<0x1000;y+=0x100)
+		{	
+			for (x=0; x<0x100;x+=0x10)
+			{
+				for (z=0;z<0x10;z++)
+				{
+					master_ophandler_table[j+y+x+z] = op0100_handlers[((((j+y+x+z)&0xf0)>>4)) | ((((j+y+x+z)&0xf)<<4))];
+				}
+			}
+		}
+	}
+	
+
+	j = 0x8000;
+	//for (j = 0; j<0x10000;j+=0x1000)
+	{
+		for (y = 0; y<0x1000;y+=0x100)
+		{	
+			for (x=0; x<0x100;x+=0x10)
+			{
+				for (z=0;z<0x10;z++)
+				{
+					master_ophandler_table[j+y+x+z] = op1000_handler[((((j+y+x+z)&0xf00)>>8))];
+				}
+			}
+		}
+	}
+
+	j = 0xc000;
+	//for (j = 0; j<0x10000;j+=0x1000)
+	{
+		for (y = 0; y<0x1000;y+=0x100)
+		{	
+			for (x=0; x<0x100;x+=0x10)
+			{
+				for (z=0;z<0x10;z++)
+				{
+					master_ophandler_table[j+y+x+z] = op1100_handler[((((j+y+x+z)&0xf00)>>8))];
+				}
+			}
+		}
+	}
+
+
+}
 
 
 /* Execute cycles - returns number of cycles actually run */
@@ -3394,7 +3362,7 @@ static CPU_EXECUTE( sh4 )
 		sh4->pc += 2;
 		sh4->ppc = sh4->pc;
 
-		upper4bits[((opcode & 0xf000) >> 8)|(opcode&0xf)](sh4, opcode);
+		master_ophandler_table[opcode](sh4, opcode);
 
 		if (sh4->test_irq && !sh4->delay)
 		{
@@ -3434,7 +3402,7 @@ static CPU_EXECUTE( sh4be )
 		sh4->pc += 2;
 		sh4->ppc = sh4->pc;
 
-		upper4bits[((opcode & 0xf000) >> 8)|(opcode&0xf)](sh4, opcode);
+		master_ophandler_table[opcode](sh4, opcode);
 
 		if (sh4->test_irq && !sh4->delay)
 		{
