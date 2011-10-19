@@ -4,12 +4,13 @@
  * todo (ordered by importance):
  *
  * - emulate slave dsp!
- * - improve super22 poly fog
  * - emulate spot
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
  *       (is this related to dsp? or cpu?)
  * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly, or is it linktable related?
+ * - super22 poly fog currently doesn't work on reversed tables (see testmode), or on 'short' tables (see airco22b)
+ * - optimize super22 poly fog: precompute 2KB tables at czram write
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
  *       (probably a bug in rgbint, not here?)
@@ -349,7 +350,9 @@ struct _poly_extra_data
 	int fogFactor;
 	int zfog_enabled;
 	int cz_adjust;
+	int cz_sdelta;
 	const UINT8 *czram_8;
+	const UINT16 *czram_16;
 
 	/* sprites */
 	const UINT8 *source;
@@ -376,7 +379,9 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = extra->pens;
 	const UINT8 *czram_8 = extra->czram_8;
+	const UINT16 *czram_16 = extra->czram_16;
 	int cz_adjust = extra->cz_adjust;
+	int cz_sdelta = extra->cz_sdelta;
 	int zfog_enabled = extra->zfog_enabled;
 	int fogFactor = 0xff - extra->fogFactor;
 	int fadeFactor = 0xff - extra->fadeFactor;
@@ -414,20 +419,28 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 		rgbint rgb;
 		rgb_to_rgbint(&rgb, pens[pen>>penshift&penmask]);
 
+		// per-z distance fogging
 		if (zfog_enabled)
 		{
-			// per-z distance fogging
+			int cz = ooz + cz_adjust;
+			// discard low byte and clamp to 0-1fff
+			if ((UINT32)cz < 0x200000) cz >>= 8;
+			else cz = (cz < 0) ? 0 : 0x1fff;
 			if (state->m_mbSuperSystem22)
 			{
-				// todo
-				// not understood yet
+				// compare against cz table, slow :(
+				for (fogFactor=0; fogFactor<0x100; fogFactor++)
+					if (czram_16[fogFactor] >= cz) break;
+
+				fogFactor = (fogFactor&0xff) + cz_sdelta;
+				if (fogFactor>0)
+				{
+					if (fogFactor>0xff) fogFactor=0xff;
+					rgbint_blend(&rgb, &fogColor, 0xff-fogFactor);
+				}
 			}
 			else
 			{
-				int cz = ooz + cz_adjust;
-				// discard low byte and clamp to 0-1fff
-				if ((UINT32)cz < 0x200000) cz >>= 8;
-				else cz = (cz < 0) ? 0 : 0x1fff;
 				if ((fogFactor = czram_8[NATIVE_ENDIAN_VALUE_LE_BE(3,0)^cz]) != 0)
 					rgbint_blend(&rgb, &fogColor, 0xff-fogFactor);
 			}
@@ -541,28 +554,44 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 		extra->pfade_enabled = mixer.PolyFade_enabled;
 		rgb_comp_to_rgbint(&extra->polyColor, mixer.rPolyFadeColor, mixer.gPolyFadeColor, mixer.bPolyFadeColor);
 
-		/* poly fog (prelim!)
+		/* poly fog (not completely accurate yet)
 
-		czram contents.. big amount, sorry :P  this stuff will be removed when ss22 fog is understood
+		czram contents, it's basically a big cz compare table
 
 		testmode:
-			czram[0] = 1fff 1fdf 1fbf 1f9f 1f7f 1f5f 1f3f 1f1f 1eff 1edf 1ebf 1e9f 1e7f 1e5f 1e3f 1e1f 1dff 1ddf 1dbf 1d9f 1d7f 1d5f 1d3f 1d1f 1cff 1cdf 1cbf 1c9f 1c7f 1c5f 1c3f 1c1f 1bff 1bdf 1bbf 1b9f 1b7f 1b5f 1b3f 1b1f 1aff 1adf 1abf 1a9f 1a7f 1a5f 1a3f 1a1f 19ff 19df 19bf 199f 197f 195f 193f 191f 18ff 18df 18bf 189f 187f 185f 183f 181f 17ff 17df 17bf 179f 177f 175f 173f 171f 16ff 16df 16bf 169f 167f 165f 163f 161f 15ff 15df 15bf 159f 157f 155f 153f 151f 14ff 14df 14bf 149f 147f 145f 143f 141f 13ff 13df 13bf 139f 137f 135f 133f 131f 12ff 12df 12bf 129f 127f 125f 123f 121f 11ff 11df 11bf 119f 117f 115f 113f 111f 10ff 10df 10bf 109f 107f 105f 103f 101f 0fff 0fdf 0fbf 0f9f 0f7f 0f5f 0f3f 0f1f 0eff 0edf 0ebf 0e9f 0e7f 0e5f 0e3f 0e1f 0dff 0ddf 0dbf 0d9f 0d7f 0d5f 0d3f 0d1f 0cff 0cdf 0cbf 0c9f 0c7f 0c5f 0c3f 0c1f 0bff 0bdf 0bbf 0b9f 0b7f 0b5f 0b3f 0b1f 0aff 0adf 0abf 0a9f 0a7f 0a5f 0a3f 0a1f 09ff 09df 09bf 099f 097f 095f 093f 091f 08ff 08df 08bf 089f 087f 085f 083f 081f 07ff 07df 07bf 079f 077f 075f 073f 071f 06ff 06df 06bf 069f 067f 065f 063f 061f 05ff 05df 05bf 059f 057f 055f 053f 051f 04ff 04df 04bf 049f 047f 045f 043f 041f 03ff 03df 03bf 039f 037f 035f 033f 031f 02ff 02df 02bf 029f 027f 025f 023f 021f 01ff 01df 01bf 019f 017f 015f 013f 011f 00ff 00df 00bf 009f 007f 005f 003f 001f
-			czram[1] = 0000 0000 0000 0001 0002 0003 0005 0007 0009 000b 000e 0011 0014 0017 001b 001f 0023 0027 002c 0031 0036 003b 0041 0047 004d 0053 005a 0061 0068 006f 0077 007f 0087 008f 0098 00a1 00aa 00b3 00bd 00c7 00d1 00db 00e6 00f1 00fc 0107 0113 011f 012b 0137 0144 0151 015e 016b 0179 0187 0195 01a3 01b2 01c1 01d0 01df 01ef 01ff 020f 021f 0230 0241 0252 0263 0275 0287 0299 02ab 02be 02d1 02e4 02f7 030b 031f 0333 0347 035c 0371 0386 039b 03b1 03c7 03dd 03f3 040a 0421 0438 044f 0467 047f 0497 04af 04c8 04e1 04fa 0513 052d 0547 0561 057b 0596 05b1 05cc 05e7 0603 061f 063b 0657 0674 0691 06ae 06cb 06e9 0707 0725 0743 0762 0781 07a0 07bf 07df 07ff 081f 083f 0860 0881 08a2 08c3 08e5 0907 0929 094b 096e 0991 09b4 09d7 09fb 0a1f 0a43 0a67 0a8c 0ab1 0ad6 0afb 0b21 0b47 0b6d 0b93 0bba 0be1 0c08 0c2f 0c57 0c7f 0ca7 0ccf 0cf8 0d21 0d4a 0d73 0d9d 0dc7 0df1 0e1b 0e46 0e71 0e9c 0ec7 0ef3 0f1f 0f4b 0f77 0fa4 0fd1 0ffe 102b 1059 1087 10b5 10e3 1112 1141 1170 119f 11cf 11ff 122f 125f 1290 12c1 12f2 1323 1355 1387 13b9 13eb 141e 1451 1484 14b7 14eb 151f 1553 1587 15bc 15f1 1626 165b 1691 16c7 16fd 1733 176a 17a1 17d8 180f 1847 187f 18b7 18ef 1928 1961 199a 19d3 1a0d 1a47 1a81 1abb 1af6 1b31 1b6c 1ba7 1be3 1c1f 1c5b 1c97 1cd4 1d11 1d4e 1d8b 1dc9 1e07 1e45 1e83 1ec2 1f01 1f40 1f7f 1fbf 1fff
-			czram[2] = 003f 007f 00be 00fd 013c 017b 01b9 01f7 0235 0273 02b0 02ed 032a 0367 03a3 03df 041b 0457 0492 04cd 0508 0543 057d 05b7 05f1 062b 0664 069d 06d6 070f 0747 077f 07b7 07ef 0826 085d 0894 08cb 0901 0937 096d 09a3 09d8 0a0d 0a42 0a77 0aab 0adf 0b13 0b47 0b7a 0bad 0be0 0c13 0c45 0c77 0ca9 0cdb 0d0c 0d3d 0d6e 0d9f 0dcf 0dff 0e2f 0e5f 0e8e 0ebd 0eec 0f1b 0f49 0f77 0fa5 0fd3 1000 102d 105a 1087 10b3 10df 110b 1137 1162 118d 11b8 11e3 120d 1237 1261 128b 12b4 12dd 1306 132f 1357 137f 13a7 13cf 13f6 141d 1444 146b 1491 14b7 14dd 1503 1528 154d 1572 1597 15bb 15df 1603 1627 164a 166d 1690 16b3 16d5 16f7 1719 173b 175c 177d 179e 17bf 17df 17ff 181f 183f 185e 187d 189c 18bb 18d9 18f7 1915 1933 1950 196d 198a 19a7 19c3 19df 19fb 1a17 1a32 1a4d 1a68 1a83 1a9d 1ab7 1ad1 1aeb 1b04 1b1d 1b36 1b4f 1b67 1b7f 1b97 1baf 1bc6 1bdd 1bf4 1c0b 1c21 1c37 1c4d 1c63 1c78 1c8d 1ca2 1cb7 1ccb 1cdf 1cf3 1d07 1d1a 1d2d 1d40 1d53 1d65 1d77 1d89 1d9b 1dac 1dbd 1dce 1ddf 1def 1dff 1e0f 1e1f 1e2e 1e3d 1e4c 1e5b 1e69 1e77 1e85 1e93 1ea0 1ead 1eba 1ec7 1ed3 1edf 1eeb 1ef7 1f02 1f0d 1f18 1f23 1f2d 1f37 1f41 1f4b 1f54 1f5d 1f66 1f6f 1f77 1f7f 1f87 1f8f 1f96 1f9d 1fa4 1fab 1fb1 1fb7 1fbd 1fc3 1fc8 1fcd 1fd2 1fd7 1fdb 1fdf 1fe3 1fe7 1fea 1fed 1ff0 1ff3 1ff5 1ff7 1ff9 1ffb 1ffc 1ffd 1ffe 1fff 1fff 1fff
-			czram[3] = 0000 001f 003f 005f 007f 009f 00bf 00df 00ff 011f 013f 015f 017f 019f 01bf 01df 01ff 021f 023f 025f 027f 029f 02bf 02df 02ff 031f 033f 035f 037f 039f 03bf 03df 03ff 041f 043f 045f 047f 049f 04bf 04df 04ff 051f 053f 055f 057f 059f 05bf 05df 05ff 061f 063f 065f 067f 069f 06bf 06df 06ff 071f 073f 075f 077f 079f 07bf 07df 07ff 081f 083f 085f 087f 089f 08bf 08df 08ff 091f 093f 095f 097f 099f 09bf 09df 09ff 0a1f 0a3f 0a5f 0a7f 0a9f 0abf 0adf 0aff 0b1f 0b3f 0b5f 0b7f 0b9f 0bbf 0bdf 0bff 0c1f 0c3f 0c5f 0c7f 0c9f 0cbf 0cdf 0cff 0d1f 0d3f 0d5f 0d7f 0d9f 0dbf 0ddf 0dff 0e1f 0e3f 0e5f 0e7f 0e9f 0ebf 0edf 0eff 0f1f 0f3f 0f5f 0f7f 0f9f 0fbf 0fdf 0fff 101f 103f 105f 107f 109f 10bf 10df 10ff 111f 113f 115f 117f 119f 11bf 11df 11ff 121f 123f 125f 127f 129f 12bf 12df 12ff 131f 133f 135f 137f 139f 13bf 13df 13ff 141f 143f 145f 147f 149f 14bf 14df 14ff 151f 153f 155f 157f 159f 15bf 15df 15ff 161f 163f 165f 167f 169f 16bf 16df 16ff 171f 173f 175f 177f 179f 17bf 17df 17ff 181f 183f 185f 187f 189f 18bf 18df 18ff 191f 193f 195f 197f 199f 19bf 19df 19ff 1a1f 1a3f 1a5f 1a7f 1a9f 1abf 1adf 1aff 1b1f 1b3f 1b5f 1b7f 1b9f 1bbf 1bdf 1bff 1c1f 1c3f 1c5f 1c7f 1c9f 1cbf 1cdf 1cff 1d1f 1d3f 1d5f 1d7f 1d9f 1dbf 1ddf 1dff 1e1f 1e3f 1e5f 1e7f 1e9f 1ebf 1edf 1eff 1f1f 1f3f 1f5f 1f7f 1f9f 1fbf 1fdf
+			o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
+			czram[0] = 1fff 1fdf 1fbf 1f9f 1f7f 1f5f 1f3f 1f1f .... 00ff 00df 00bf 009f 007f 005f 003f 001f
+			czram[1] = 0000 0000 0000 0001 0002 0003 0005 0007 .... 1e45 1e83 1ec2 1f01 1f40 1f7f 1fbf 1fff
+			czram[2] = 003f 007f 00be 00fd 013c 017b 01b9 01f7 .... 1ff9 1ffb 1ffc 1ffd 1ffe 1fff 1fff 1fff
+			czram[3] = 0000 001f 003f 005f 007f 009f 00bf 00df .... 1eff 1f1f 1f3f 1f5f 1f7f 1f9f 1fbf 1fdf
 
-		cybrcycc (1st course) fog color: 80 80 c0
-			czram[0] = 0000 0011 0021 0031 0041 0051 0060 0061 006a 0071 0076 0081 0087 0091 0093 009c 00a1 00a4 00ad 00b1 00b9 00c1 00c7 00cf 00d1 00d9 00e0 00e1 00e7 00ed 00f1 00f8 00fe 0101 0107 010e 0111 0116 011c 0121 0124 012a 0130 0131 0137 013d 0141 0144 014a 014f 0151 0156 015b 0161 016c 0171 017c 0181 018c 0191 019c 01a1 01ac 01b1 01bc 01c1 01cc 01d1 01dc 01e1 01ec 01f1 01fc 0201 020c 0211 021c 0221 022c 0231 023c 0241 024c 0251 025c 0261 026c 0271 027c 0281 028c 0291 029c 02a1 02ac 02b1 02bc 02c1 02cc 02d1 02d7 02dc 02e1 02e7 02ec 02f1 033a 033f 0343 0348 034c 0351 0355 035a 035e 0363 0367 036c 0370 0375 0379 037d 0382 0386 038a 038f 0393 0397 039c 03a0 03a4 03a8 03ad 03b1 03b5 03b9 03be 03c2 03c6 03ca 03ce 03d2 03d7 03db 03df 03e3 03e7 03eb 03ef 03f3 03f7 03fb 03ff 0403 0407 040b 040f 0413 0417 041b 041f 0423 0427 042b 042f 0433 0436 043a 043e 0442 0446 044a 044e 0451 0455 0459 045d 0461 0464 0468 046c 0470 0473 0477 047b 047f 0482 0486 048a 048d 0491 0495 0498 049c 04a0 04a3 04a7 04ab 04ae 04b2 04b5 04b9 04bd 04c0 04c4 04c7 04cb 04ce 04d2 04d5 04d9 04dd 04e0 04e4 04e7 04eb 04ee 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+		airco22b demo mode, fog color: 76 9a c3
+			o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
+			czram[0] = 0000 00e4 0141 0189 01c6 01fb 022c 0258 .... 13bb 13c4 13cd 13d6 13df 13e7 13f0 13f9
 
-		alpinerd (1st course) fog color: c8 c8 c8
-			czram[0] = 00c8 00ca 00cc 00ce 00d0 00d2 00d4 00d6 00d8 00da 00dc 00de 00e0 00e2 00e4 00e6 00e8 00ea 00ec 00ee 00f0 00f2 00f4 00f6 00f8 00fa 00fc 00fe 0100 0102 0104 0106 0108 010a 010c 010e 0110 0112 0114 0116 0118 011a 011c 011e 0120 0122 0124 0126 0128 012a 012c 012e 0130 0132 0134 0136 0138 013a 013c 013e 0140 0142 0144 0146 0148 014a 014c 014e 0150 0152 0154 0156 0158 015a 015c 015e 0160 0162 0164 0166 0168 016a 016c 016e 0170 0172 0174 0176 0178 017a 017c 017e 0180 0182 0184 0186 0188 018a 018c 018e 0190 0192 0194 0196 0198 019a 019c 019e 01a0 01a2 01a4 01a6 01a8 01aa 01ac 01ae 01b0 01b2 01b4 01b6 01b8 01ba 01bc 01be 01c0 01c2 01c4 01c6 01c8 01ca 01cc 01ce 01d0 01d2 01d4 01d6 01d8 01da 01dc 01de 01e0 01e2 01e4 01e6 01e8 01ea 01ec 01ee 01f0 01f2 01f4 01f6 01f8 01fa 01fc 01fe 0200 0202 0204 0206 0208 020a 020c 020e 0210 0212 0214 0216 0218 021a 021c 021e 0220 0222 0224 0226 0228 022a 022c 022e 0230 0232 0234 0236 0238 023a 023c 023e 0240 0242 0244 0246 0248 024a 024c 024e 0250 0252 0254 0256 0258 025a 025c 025e 0260 0262 0264 0266 0268 026a 026c 026e 0270 0272 0274 0276 0278 027a 027c 027e 0280 0282 0284 0286 0288 028a 028c 028e 0290 0292 0294 0296 0298 029a 029c 029e 02a0 02a2 02a4 02a6 02a8 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+		alpinerd (1st course), fog color: c8 c8 c8
+			o_16          0    1    2    3    4    5    6    7 <  >   ec   ed   ee   ef   f0   f1   f2 - ff
+			czram[0] = 00c8 00ca 00cc 00ce 00d0 00d2 00d4 00d6 .... 02a0 02a2 02a4 02a6 02a8 1fff 1fff ....
 
-		alpinr2b (1st course) fog color: ff ff ff
+		alpinr2b (1st course), fog color: ff ff ff
 		alpinr2b start of race: - gets gradually filled from left to right, initial contents filled with 1fff? - game should be foggy here
-			czram[0] = 01cd 01d7 01e1 01eb 01f5 01ff 0209 0213 021d 0227 0231 023b 0245 024f 0259 0263 026d 0277 0281 028b 0295 029f 02a9 02b3 02bd 02c7 02d1 02db 02e5 02ef 02f9 0303 030d 0317 0321 032b 0335 033f 0349 0353 035d 0367 0371 037b 0385 038f 0399 03a3 03ad 03b7 03c1 03cb 03d5 03df 03e9 03f3 03fd 0407 0411 041b 0425 042f 0439 0443 044d 0457 0461 046b 0475 047f 0489 0493 049d 04a7 04b1 04bb 04c5 04cf 04d9 04e3 04ed 04f7 0501 050b 0515 051f 0529 0533 053d 0547 0551 055b 0565 056f 0579 0583 058d 0597 05a1 05ab 05b5 05bf 05c9 05d3 05dd 05e7 05f1 05fb 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+			o_16          0    1    2    3    4    5    6    7 <  >   67   68   69   6a   6b   6c   6d - ff
+			czram[0] = 01cd 01d7 01e1 01eb 01f5 01ff 0209 0213 .... 05d3 05dd 05e7 05f1 05fb 1fff 1fff ....
 			other banks unused, zerofilled
 		alpinr2b mid race: - gets gradually filled from right to left, initial contents above - game should not be foggy here
-			czram[0] = 1ffe 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+			o_16          0    1    2    3    4    5    6    7 <  >   ec   ed   ee   ef   f0   f1   f2 - ff
+			czram[0] = 1ffe 1fff 1fff 1fff 1fff 1fff 1fff 1fff .... 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+
+		cybrcycc (1st course), fog color: 80 80 c0 - 2nd course has same cz table, but fog color 00 00 00
+			o_16          0    1    2    3    4    5    6    7 <  >   d4   d5   d6   d7   d8   d9   da - ff
+			czram[0] = 0000 0011 0021 0031 0041 0051 0060 0061 .... 04e0 04e4 04e7 04eb 04ee 1fff 1fff ....
+
+		tokyowar, fog color: 80 c0 ff - it uses cztype 1 too by accident? (becomes fogfactor 0)
+			o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
+			czram[0] = 0000 01c5 0244 029f 02e7 0325 035b 038b .... 0eaf 0ec7 0ee0 0efc 0f1b 0f3f 0f6a 0faa
+			czram[1] = 0000 0000 0000 0000 0000 0000 0000 0000 .... 0000 0000 0000 0000 0000 0000 0000 0000
+			czram[2] = 0000 0000 0000 0000 0000 0000 0000 0000 .... 0000 0000 0000 0000 0000 0000 0000 0000
+			czram[3] = 0000 00e8 0191 0206 0265 02b7 0301 0345 .... 1c7e 1cbc 1d00 1d4a 1d9c 1dfb 1e70 1f19
 
 		*/
 
@@ -582,9 +611,11 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
             ff80 ff80 ff80 ff80 4444 0000 0000 0000 // propcycl ending
             ff80 ff80 ff80 ff80 0000 0000 0000 0000 // propcycl hs entry
             0000 0000 0000 0000 0b6c 0000 00e4 0000 // cybrcycc
+            0000 0000 0000 0000 5554 0000 00e4 0000 // airco22b
             ff01 ff01 0000 0000 4444 0000 0000 0000 // alpinerd
             0000 0000 0000 0000 4455 0000 000a 0000 // alpinr2b
             8001 8001 0000 0000 1111 0000 5555 0000 // aquajet (reg 8 is either 1111 or 5555, reg c is usually interlaced)
+            0000 0000 0000 0000 5554 0000 0000 0000 // tokyowar
 		*/
 		if (~color & 0x80)
 		{
@@ -595,14 +626,27 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 				rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
 				if (direct)
 				{
-					// not accurate (see testmode)
-					int cz = Clamp256((flags>>13&0xff) + delta);
-					cz = state->m_banked_czram[cztype][cz]&0x1fff;
-					extra->fogFactor = cz >> 5;
+					int cz = ((flags&0x1fff00) + cz_adjust) >> 8;
+					if (cz < 0) cz = 0;
+					else if (cz > 0x1fff) cz = 0x1fff;
+
+					// bad (see testmode)
+					int fogFactor;
+					for (fogFactor=0; fogFactor<0x100; fogFactor++)
+						if (state->m_banked_czram[cztype][fogFactor] >= cz) break;
+					
+					fogFactor = (fogFactor&0xff) + delta;
+					if (fogFactor>0)
+					{
+						if (fogFactor>0xff) fogFactor = 0xff;
+						extra->fogFactor = fogFactor;
+					}
 				}
 				else
 				{
-					// not implemented yet
+					extra->zfog_enabled = 1;
+					extra->cz_sdelta = delta;
+					extra->czram_16 = state->m_banked_czram[cztype];
 				}
 			}
 		}
@@ -1241,7 +1285,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
     *    ------------xxxx BN (texture bank)
     *
     * word#3:
-    *    -xxxxxxxxxxxxx-- ZC (less bits for super)
+    *    -xxxxxxxxxxxxx-- ZC
     *    --------------xx depth cueing table select
     *
     * for each vertex:
