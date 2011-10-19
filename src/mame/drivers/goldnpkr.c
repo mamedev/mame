@@ -3531,14 +3531,20 @@ ROM_END
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27128_epoxy.bin",	0x4000, 0x4000, CRC(48186272) SHA1(d211bfa89404a292e6d0f0169ed11e1e74a361d9) )	/* epoxy block program ROM */
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(					0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "wc4.a7",	0x2000, 0x1000, CRC(d3694522) SHA1(0f66ff2dd5c7ac9bf91fa9f48eb9f356572e814c) )    /* text layer */
+	ROM_REGION( 0x4000, "temp", 0 )
+	ROM_LOAD( "wc1.a2",	0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )
+	ROM_LOAD( "wc2.a4",	0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )
+	ROM_LOAD( "wc3.a5",	0x2000, 0x1000, CRC(a03f2d68) SHA1(6d81b1e92f40f7150498b65941d5a9ab64a89790) )
+	ROM_LOAD( "wc4.a7",	0x3000, 0x1000, CRC(d3694522) SHA1(0f66ff2dd5c7ac9bf91fa9f48eb9f356572e814c) )
 
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "wc1.a2",	0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "wc2.a4",	0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "wc3.a5",	0x2000, 0x1000, CRC(a03f2d68) SHA1(6d81b1e92f40f7150498b65941d5a9ab64a89790) )    /* cards deck gfx, bitplane3 */
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(					0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_COPY( "temp",	0x3800, 0x1000, 0x0800 )	/* 0800-0fff of wc4.a7 - charset */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )	/* 2nd half of each ROM */
+	ROM_COPY( "temp",	0x0800, 0x0000, 0x0800 )	/* 0800-0fff of wc1.a2 - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x1800, 0x0800, 0x0800 )	/* 0000-07ff of wc2.a4 - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x2800, 0x1000, 0x0800 )	/* 0800-0fff of wc3.a5 - regular cards gfx, bitplane 3 */
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "24s10.bin",			0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
@@ -4911,7 +4917,7 @@ GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown
 GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)", 0 )
 GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, 0,        ROT0,   "<unknown>",                "Witch Card (English, no witch game)",     0 )
 GAMEL( 1994, witchcdd, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",     0,                layout_goldnpkr )
-GAMEL( 1991, witchcde, witchcrd, witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)", GAME_IMPERFECT_COLORS, layout_goldnpkr )
+GAMEL( 1991, witchcde, witchcrd, witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)", 0,                layout_goldnpkr )
 GAMEL( 1985, witchcdf, witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PlayMan",                  "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
 GAMEL( 199?, witchcdg, witchcrd, wcfalcon, witchcrd, 0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",     0,                layout_goldnpkr )
 GAMEL( 1994, witchcdh, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",     0,                layout_goldnpkr )
