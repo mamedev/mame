@@ -2170,5 +2170,5 @@ GAME( 1993, leaguemn, nbbatman, nbbatman,      nbbatman, m92_bank, ROT0,   "Irem
 GAME( 1993, ssoldier, 0,        psoldier,      psoldier, m92_alt,  ROT0,   "Irem America", "Superior Soldiers (US)", GAME_SUPPORTS_SAVE )
 GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, m92_alt,  ROT0,   "Irem",         "Perfect Soldiers (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1994, dsoccr94j,dsoccr94, dsoccr94j,     dsoccr94j,m92_bank, ROT0,   "Irem",         "Dream Soccer '94 (Japan, M92 hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1994, gunforc2, 0,        gunforc2,      gunforc2, m92_bank, ROT0,   "Irem",         "Gunforce 2 (US)", GAME_SUPPORTS_SAVE )
-GAME( 1994, geostorm, gunforc2, gunforc2,      gunforc2, m92_bank, ROT0,   "Irem",         "Geostorm (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, gunforc2, 0,        gunforc2,      gunforc2, m92_bank, ROT0,   "Irem",         "Gun Force II (US)", GAME_SUPPORTS_SAVE )
+GAME( 1994, geostorm, gunforc2, gunforc2,      gunforc2, m92_bank, ROT0,   "Irem",         "Geo Storm (Japan)", GAME_SUPPORTS_SAVE )
