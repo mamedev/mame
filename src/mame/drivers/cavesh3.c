@@ -1,52 +1,6 @@
-/* Cave SH3 ( CAVE CV1000-B ) */
-
 /*
 
-
- To enter service mode in most cases hold down 0 (Service 2) for a few seconds
-  (I believe it's the test button on the PCB)
- Some games also use the test dipswitch as an alternative method.
-
-ToDo:
-
-Improve Blending precision?
- - I'm not sure what precision the original HW mixes with, source data is 555 RGB with 1 bit transparency (16-bits)
-   and the real VRAM is also clearly in this format.  The Alpha values supplied however are 8bpp, and the 'Tint'
-   values use 0x20 for 'normal' (not 0x1f)
-
-Overall screen brightness / contrast (see test mode)
- - Could convert ram back to 16-bit and use a palette lookup at the final blit.. probably easiest / quickest.
-
-Sound
- - Chip is completely unemulated
-
-Touchscreen
- - Used for mmmbanc, needs SH3 serial support.
-
-Remaining Video issues
- - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
- - is the use of the 'scroll' registers 100% correct? (related to above?)
- - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
-
-Speedups
- - Blitter is already tightly optimized
- - Need SH3 recompiler?
-
-*/
-
-#include "emu.h"
-#include "cpu/sh4/sh4.h"
-#include "cpu/sh4/sh3comn.h"
-#include "profiler.h"
-#include "machine/rtc9701.h"
-
-static UINT64* cavesh3_ram;
-//static UINT64* cavesh3_ram_copy;
-static UINT16* cavesh3_ram16;
-static UINT16* cavesh3_ram16_copy = 0;
-
-
-/*
+Cave SH3 hardware
 
 
 PCB CV1000-B / CV1000-D
@@ -144,8 +98,52 @@ Note: * The Altera EPM7032 has been seen stamped "CA017" for at least one DeathS
 
 Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
 
+------------------------------------------------------
+
+ To enter service mode in most cases hold down 0 (Service 2) for a few seconds
+  (I believe it's the test button on the PCB)
+ Some games also use the test dipswitch as an alternative method.
+
+ToDo:
+
+Improve Blending precision?
+ - I'm not sure what precision the original HW mixes with, source data is 555 RGB with 1 bit transparency (16-bits)
+   and the real VRAM is also clearly in this format.  The Alpha values supplied however are 8bpp, and the 'Tint'
+   values use 0x20 for 'normal' (not 0x1f)
+
+Overall screen brightness / contrast (see test mode)
+ - Could convert ram back to 16-bit and use a palette lookup at the final blit.. probably easiest / quickest.
+
+Sound
+ - Chip is completely unemulated
+
+Touchscreen
+ - Used for mmmbanc, needs SH3 serial support.
+
+Remaining Video issues
+ - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
+ - is the use of the 'scroll' registers 100% correct? (related to above?)
+ - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
+
+Speedups
+ - Blitter is already tightly optimized
+ - Need SH3 recompiler?
 
 */
+
+#include "emu.h"
+#include "cpu/sh4/sh4.h"
+#include "cpu/sh4/sh3comn.h"
+#include "profiler.h"
+#include "machine/rtc9701.h"
+
+static UINT64* cavesh3_ram;
+//static UINT64* cavesh3_ram_copy;
+static UINT16* cavesh3_ram16;
+static UINT16* cavesh3_ram16_copy = 0;
+
+
+
 
 class cavesh3_state : public driver_device
 {
@@ -6280,7 +6278,7 @@ ROM_START( ibara )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(f0aa3cb6) SHA1(f9d137cd879e718811b2d21a0af2a9c6b7dca2f9) )
 ROM_END
 
-ROM_START( ibarablk )
+ROM_START( ibarablk ) /* Title screen shows (c) 2005 despite the 2006/02/06 "master" date */
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ibarablk_u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
@@ -6293,7 +6291,7 @@ ROM_START( ibarablk )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
 ROM_END
 
-ROM_START( ibarablka )
+ROM_START( ibarablka ) /* Title screen shows (c) 2005 despite the 2006/02/06 "master" date */
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ibarablka_u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
@@ -6427,23 +6425,23 @@ DRIVER_INIT( espgal2 )
 }
 
 
-GAME( 2004, mushisam,   0,          cavesh3,    cavesh3,  mushisam,		ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NO_SOUND )
-GAME( 2004, mushisama,  mushisam,   cavesh3,    cavesh3,  mushisama,	ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            GAME_NO_SOUND )
-GAME( 2005, espgal2,    0,          cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              GAME_NO_SOUND )
-GAME( 2005, mushitam,   0,          cavesh3,    cavesh3,  mushisam,		ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            GAME_NO_SOUND )
-GAME( 2006, futari15,   0,          cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       GAME_NO_SOUND )
-GAME( 2006, futari15a,  futari15,   cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         GAME_NO_SOUND )
-GAME( 2006, futari10,   futari15,   cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NO_SOUND )
-GAME( 2007, futariblk,  futari15,   cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    GAME_NO_SOUND )
-GAME( 2006, ibara,      0,          cavesh3,    cavesh3,  mushisam,		ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   GAME_NO_SOUND )
-GAME( 2006, ibarablk,   0,          cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NO_SOUND )
-GAME( 2006, ibarablka,  ibarablk,   cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NO_SOUND )
-GAME( 2007, deathsml,   0,          cavesh3,    cavesh3,  espgal2,		ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NO_SOUND )
-GAME( 2007, mmpork,     0,          cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NO_SOUND )
-GAME( 2007, mmmbanc,    0,          cavesh3,    cavesh3,  espgal2,		ROT0, "Cave", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",   GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, pinkswts,   0,          cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER....)",   GAME_NO_SOUND )
-GAME( 2006, pinkswtsa,  pinkswts,   cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER...)",   GAME_NO_SOUND )
-GAME( 2006, pinkswtsb,  pinkswts,   cavesh3,    cavesh3,  espgal2,		ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER.)",   GAME_NO_SOUND )
+GAME( 2004, mushisam,   0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NO_SOUND )
+GAME( 2004, mushisama,  mushisam, cavesh3, cavesh3, mushisama, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            GAME_NO_SOUND )
+GAME( 2005, espgal2,    0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              GAME_NO_SOUND )
+GAME( 2005, ibara,      0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   GAME_NO_SOUND )
+GAME( 2005, ibarablk,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NO_SOUND )
+GAME( 2005, ibarablka,  ibarablk, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NO_SOUND )
+GAME( 2005, mushitam,   0,        cavesh3, cavesh3, mushisam,  ROT0,   "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            GAME_NO_SOUND )
+GAME( 2006, futari15,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       GAME_NO_SOUND )
+GAME( 2006, futari15a,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         GAME_NO_SOUND )
+GAME( 2006, futari10,   futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NO_SOUND )
+GAME( 2007, futariblk,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    GAME_NO_SOUND )
+GAME( 2006, pinkswts,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER....)",          GAME_NO_SOUND )
+GAME( 2006, pinkswtsa,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER...)",           GAME_NO_SOUND )
+GAME( 2006, pinkswtsb,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER.)",             GAME_NO_SOUND )
+GAME( 2007, deathsml,   0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NO_SOUND )
+GAME( 2007, mmpork,     0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NO_SOUND )
+GAME( 2007, mmmbanc,    0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",             GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /*
 
@@ -6505,6 +6503,8 @@ DODONPACHI FUKKATSU 1.0
 
 DODONPACHI FUKKATSU 1.5
 * "2008/06/23 MASTER VER 1.5"
+
+--- Titles below are too new to emulate, but included for documentation ---
 
 DODONPACHI DAIFUKKATSU BLACK LABEL
 * "2010/1/18 BLACK LABEL"
