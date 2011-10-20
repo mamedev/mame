@@ -1,7 +1,5 @@
 /**********************************************************************************
 
-    needs modernizing, see "#if 0 //" fixme comments
-
     S-PLUS (S+)
 
     Driver by Jim Stolis.
@@ -22,76 +20,55 @@
 ***********************************************************************************/
 #include "emu.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
-#include "machine/nvram.h"
-#include "splus.lh"
-#include "video/awpvid.h"		//Fruit Machines Only
 
+#include "splus.lh"
 
 class splus_state : public driver_device
 {
 public:
 	splus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		m_cmosl_ram(*this, "cmosl"), m_cmosh_ram(*this, "cmosh")
 	{
-
 		m_sda_dir = 0;
 		m_coin_state = 0;
+		m_last_cycles = 0;
 	}
 
-/* Pointers to External RAM */
-UINT8 *m_cmosl_ram;
-UINT8 *m_cmosh_ram;
-UINT8 *m_reel_ram;
-UINT8 *m_program_ram;
+	// Pointers to External RAM
+	required_shared_ptr<UINT8> m_cmosl_ram;
+	required_shared_ptr<UINT8> m_cmosh_ram;
 
-/* IO Ports */
-UINT8 *m_io_port;
+	// Program and Reel Data
+	UINT8 *m_program_ram;
+	UINT8 *m_reel_ram;
 
-/* EEPROM States */
-int m_sda_dir;
-UINT8 m_coin_state ;
-UINT32 m_last_cycles;
+	// IO Ports
+	UINT8 *m_io_port;
+
+	// EEPROM States
+	int m_sda_dir;
+
+	// Coin-In States
+	UINT8 m_coin_state;
+	UINT64 m_last_cycles;
 };
 
+#define MASTER_CLOCK		XTAL_20MHz
+#define CPU_CLOCK			((MASTER_CLOCK)/2)		/* divided by 2 - 7474 */
+#define SOUND_CLOCK			((MASTER_CLOCK)/12)
 
 /* Static Variables */
-#define CMOS_NVRAM_SIZE     0x1000
 #define EEPROM_NVRAM_SIZE   0x200 // 4k Bit
 
-
-/*****************
-* NVRAM Handlers *
-******************/
-
-static NVRAM_HANDLER( splus )
+/* EEPROM is a X2404P 4K-bit Serial I2C Bus */
+static const i2cmem_interface i2cmem_interface =
 {
-	splus_state *state = machine.driver_data<splus_state>();
-
-	if (read_or_write)
-	{	// writing
-		file->write(state->m_cmosl_ram,CMOS_NVRAM_SIZE);
-		file->write(state->m_cmosh_ram,CMOS_NVRAM_SIZE);
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(state->m_cmosl_ram, CMOS_NVRAM_SIZE);
-			file->read(state->m_cmosh_ram, CMOS_NVRAM_SIZE);
-		}
-		else
-		{
-			memset(state->m_cmosl_ram, 0, CMOS_NVRAM_SIZE);
-			memset(state->m_cmosh_ram, 0, CMOS_NVRAM_SIZE);
-		}
-	}
-
-#if 0 //fixme
-    NVRAM_HANDLER_CALL(i2cmem_0);
-#endif
-}
+	I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE
+};
 
 /*****************
 * Write Handlers *
@@ -188,41 +165,24 @@ static WRITE8_HANDLER( splus_duart_w )
 	// Used for Slot Accounting System Communication
 }
 
-static WRITE8_HANDLER(i2c_nvram_w)
+static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 {
-#if 0// fixme
-	splus_state *state = space->machine().driver_data<splus_state>();
-
-	i2cmem_write(0, I2CMEM_SCL, BIT(data, 2));
+	splus_state *state = device->machine().driver_data<splus_state>();
+	i2cmem_scl_write(device,BIT(data, 2));
 	state->m_sda_dir = BIT(data, 1);
-	i2cmem_write(0, I2CMEM_SDA, BIT(data, 0));
-#endif
+	i2cmem_sda_write(device,BIT(data, 0));
 }
 
 /****************
 * Read Handlers *
 ****************/
 
-/* External RAM Callback for I8052 */
-#if 0 // fixme
-static READ32_HANDLER( splus_external_ram_iaddr )
-{
-	splus_state *state = space->machine().driver_data<splus_state>();
-	if (mem_mask == 0xff) {
-		return (state->m_io_port[2] << 8) | offset;
-	} else {
-		return offset;
-	}
-}
-#endif
-
 static READ8_HANDLER( splus_serial_r )
 {
-#if 0 // fixme
 	splus_state *state = space->machine().driver_data<splus_state>();
 
     UINT8 coin_optics = 0x00;
-    UINT32 curr_cycles = cpu_get_total_cycles(&space->device());
+	UINT64 curr_cycles = space->machine().firstcpu->total_cycles();
 
     UINT8 in = 0x00;
     UINT8 val = 0x00;
@@ -233,16 +193,16 @@ static READ8_HANDLER( splus_serial_r )
         case 0x02: // Unknown
             break;
 		case 0x03: // Bank 10
-	        if ((input_port_read_safe(machine,"SENSOR",0x00) & 0x01) == 0x01 && state->m_coin_state == 0) {
+	        if ((input_port_read_safe(space->machine(),"SENSOR",0x00) & 0x01) == 0x01 && state->m_coin_state == 0) {
 		        state->m_coin_state = 1; // Start Coin Cycle
-		        state->m_last_cycles = cpu_get_total_cycles(&space->device());
+		        state->m_last_cycles = space->machine().firstcpu->total_cycles();
 	        } else {
-		        /* Process Next Coin Optic State */
-		        if (curr_cycles - m_last_cycles > 600000 && state->m_coin_state != 0) {
+		        // Process Next Coin Optic State
+		        if (curr_cycles - state->m_last_cycles > 600000 && state->m_coin_state != 0) {
 			        state->m_coin_state++;
 			        if (state->m_coin_state > 5)
 				        state->m_coin_state = 0;
-			        m_last_cycles = cpu_get_total_cycles(&space->device());
+			        state->m_last_cycles = space->machine().firstcpu->total_cycles();
 		        }
 	        }
 
@@ -272,25 +232,25 @@ static READ8_HANDLER( splus_serial_r )
             // Coin In B
             // Coin In C
             val = val | coin_optics;
-            val = val | (input_port_read_safe(machine,"I10",0x08) & 0x08); // Door Optics Receiver
+            val = val | (input_port_read_safe(space->machine(),"I10",0x08) & 0x08); // Door Optics Receiver
             val = val | 0x00; // Hopper Coin Out
             val = val | 0x00; // Hopper Full
-            val = val | (input_port_read_safe(machine,"I10",0x40) & 0x40); // Handle/Spin Button
-            val = val | (input_port_read_safe(machine,"I10",0x80) & 0x80); // Jackpot Reset Key
+            val = val | (input_port_read_safe(space->machine(),"I10",0x40) & 0x40); // Handle/Spin Button
+            val = val | (input_port_read_safe(space->machine(),"I10",0x80) & 0x80); // Jackpot Reset Key
 			break;
 		case 0x05: // Bank 20
-            val = val | (input_port_read_safe(machine,"I20",0x01) & 0x01); // Bet One Credit
-            val = val | (input_port_read_safe(machine,"I20",0x02) & 0x02); // Play Max Credits
-            val = val | (input_port_read_safe(machine,"I20",0x04) & 0x04); // Cash Out
-            val = val | (input_port_read_safe(machine,"I20",0x08) & 0x08); // Change Request
+            val = val | (input_port_read_safe(space->machine(),"I20",0x01) & 0x01); // Bet One Credit
+            val = val | (input_port_read_safe(space->machine(),"I20",0x02) & 0x02); // Play Max Credits
+            val = val | (input_port_read_safe(space->machine(),"I20",0x04) & 0x04); // Cash Out
+            val = val | (input_port_read_safe(space->machine(),"I20",0x08) & 0x08); // Change Request
             val = val | 0x00; // Reel Mechanism
-            val = val | (input_port_read_safe(machine,"I20",0x20) & 0x20); // Self Test Button
+            val = val | (input_port_read_safe(space->machine(),"I20",0x20) & 0x20); // Self Test Button
             val = val | 0x40; // Card Cage
             val = val | 0x80; // Bill Acceptor
 			break;
 		case 0x09: // Bank 30
             // Reserved
-            val = val | (input_port_read_safe(machine,"I30",0x02) & 0x02); // Drop Door
+            val = val | (input_port_read_safe(space->machine(),"I30",0x02) & 0x02); // Drop Door
             // Jackpot to Credit Key
             // Reserved
             // Reserved
@@ -311,14 +271,11 @@ static READ8_HANDLER( splus_serial_r )
 			break;
 	}
 	return val;
-#endif
-	return 0;
 }
 
 static READ8_HANDLER( splus_m_reel_ram_r )
 {
 	splus_state *state = space->machine().driver_data<splus_state>();
-
 	return state->m_reel_ram[offset];
 }
 
@@ -348,9 +305,9 @@ static READ8_HANDLER( splus_registers_r )
 	return 0xff; // Reset Registers in Real Time Clock
 }
 
-static READ8_HANDLER( splus_reel_optics_r )
+static READ8_DEVICE_HANDLER( splus_reel_optics_r )
 {
-	splus_state *state = space->machine().driver_data<splus_state>();
+	splus_state *state = device->machine().driver_data<splus_state>();
 
 /*
         Bit 0 = REEL #1
@@ -367,9 +324,7 @@ static READ8_HANDLER( splus_reel_optics_r )
 
 	if(!state->m_sda_dir)
 	{
-#if 0 // fixme
-		sda = i2cmem_read(0, I2CMEM_SDA);
-#endif
+		sda = i2cmem_sda_read(device);
 	}
 
 	reel_optics = reel_optics | (sda<<7);
@@ -385,18 +340,10 @@ static DRIVER_INIT( splus )
 {
 	splus_state *state = machine.driver_data<splus_state>();
 
-	UINT8 *reel_data = machine.region( "user1" )->base();
+	UINT8 *reel_data = machine.region( "reeldata" )->base();
 
-    /* Load Reel Data */
-    memcpy(state->m_reel_ram, &reel_data[0], 0x2000);
-
-#if 0 // fixme
-    /* External RAM callback */
-	i8051_set_eram_iaddr_callback(splus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-#endif
+    // Load Reel Data
+    memcpy(state->m_reel_ram, &reel_data[0x0000], 0x2000);
 }
 
 
@@ -408,41 +355,37 @@ static ADDRESS_MAP_START( splus_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE_MEMBER(splus_state, m_program_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( splus_datamap, AS_IO, 8 )
+static ADDRESS_MAP_START( splus_iomap, AS_IO, 8 )
 	// Serial I/O
-    AM_RANGE(0x0000, 0x0000) AM_RAM AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
+    AM_RANGE(0x0000, 0x0000) AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
 
     // Battery-backed RAM (Lower 4K) 0x1500-0x16ff eeprom staging area
-    AM_RANGE(0x1000, 0x1fff) AM_RAM AM_RAMBANK("b1") AM_BASE_MEMBER(splus_state, m_cmosl_ram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("cmosl")
 
     // Watchdog, 7-segment Display
-    AM_RANGE(0x2000, 0x2000) AM_RAM AM_READWRITE(splus_watchdog_r, splus_7seg_w)
+    AM_RANGE(0x2000, 0x2000) AM_READWRITE(splus_watchdog_r, splus_7seg_w)
 
     // DUART
-    AM_RANGE(0x3000, 0x300f) AM_RAM AM_READWRITE(splus_duart_r, splus_duart_w)
+    AM_RANGE(0x3000, 0x300f) AM_READWRITE(splus_duart_r, splus_duart_w)
 
 	// Dip Switches, Sound
-	AM_RANGE(0x4000, 0x4000) AM_RAM AM_READ_PORT("SW1") AM_DEVWRITE("aysnd", ay8910_address_w)
-    AM_RANGE(0x4001, 0x4001) AM_RAM AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE("aysnd", ay8910_address_w)
+    AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("aysnd", ay8910_data_w)
 
     // Reel Optics, EEPROM
-    AM_RANGE(0x5000, 0x5000) AM_RAM AM_READ(splus_reel_optics_r) AM_WRITE(i2c_nvram_w)
+    AM_RANGE(0x5000, 0x5000) AM_DEVREAD("i2cmem", splus_reel_optics_r) AM_DEVWRITE("i2cmem", i2c_nvram_w)
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
-	AM_RANGE(0x6000, 0x6000) AM_RAM AM_READWRITE(splus_registers_r, splus_load_pulse_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(splus_registers_r, splus_load_pulse_w)
 
     // Battery-backed RAM (Upper 4K)
-    AM_RANGE(0x7000, 0x7fff) AM_RAM AM_RAMBANK("b2") AM_BASE_MEMBER(splus_state, m_cmosh_ram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
 
     // SSxxxx Reel Chip
-    AM_RANGE(0x8000, 0x9fff) AM_RAM AM_READ(splus_m_reel_ram_r) AM_BASE_MEMBER(splus_state, m_reel_ram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( splus_iomap, AS_IO, 8 )
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	// I/O Ports
-	AM_RANGE(0x00, 0x03) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_BASE_MEMBER(splus_state, m_io_port)
+    AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_BASE_MEMBER(splus_state, m_reel_ram)
+	
+	// Ports start here
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_BASE_MEMBER(splus_state, m_io_port)
 ADDRESS_MAP_END
 
 /*************************
@@ -495,18 +438,19 @@ static INPUT_PORTS_START( splus )
 	PORT_DIPSETTING(    0x00, "Link" )
 INPUT_PORTS_END
 
+
 /*************************
 *     Machine Driver     *
 *************************/
 
 static MACHINE_CONFIG_START( splus, splus_state )	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8052, 10000000*2)
+	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(splus_map)
-	MCFG_CPU_DATA_MAP(splus_datamap)
 	MCFG_CPU_IO_MAP(splus_iomap)
-    MCFG_CPU_VBLANK_INT("scrn", irq0_line_hold)
 
-	MCFG_NVRAM_HANDLER(splus)
+	// Fill NVRAM
+	MCFG_NVRAM_ADD_0FILL("cmosl")
+	MCFG_NVRAM_ADD_0FILL("cmosh")
 
 	// video hardware (ALL FAKE, NO VIDEO)
     MCFG_PALETTE_LENGTH(16*16)
@@ -517,9 +461,12 @@ static MACHINE_CONFIG_START( splus, splus_state )	// basic machine hardware
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 
+	MCFG_I2CMEM_ADD("i2cmem", i2cmem_interface)
+
 	// sound hardware
-	MCFG_SOUND_ADD("aysnd", AY8912, 10000000/8)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -531,7 +478,7 @@ ROM_START( spss4240 ) /* Coral Reef (SS4240) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sp1271.u52",   0x00000, 0x10000, CRC(dc164599) SHA1(7114652a733b26cd711dbe4d65dde065ba73619f) )
 
-    ROM_REGION( 0x02000, "user1", 0 )
+    ROM_REGION( 0x02000, "reeldata", 0 )
     ROM_LOAD( "ss4240.u53",   0x00000, 0x02000, CRC(c5715b9b) SHA1(8b0ca15b520a5c8e1ebec13e3a1dc304fb40aea0) )
 ROM_END
 
