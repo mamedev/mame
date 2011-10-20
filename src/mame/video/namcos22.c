@@ -1252,6 +1252,8 @@ static void namcos22s_recalc_czram( running_machine &machine )
 		// this is very slow when emulating, so let's recalculate it to a simpler lookup table
 		if (state->m_cz_was_written[table])
 		{
+			const UINT16 *src = state->m_banked_czram[table];
+			UINT8 *dest = state->m_recalc_czram[table];
 			int small_val = 0x2000;
 			int small_offset = 0;
 			int large_val = 0;
@@ -1260,7 +1262,7 @@ static void namcos22s_recalc_czram( running_machine &machine )
 
 			for (i=0; i<0x100; i++)
 			{
-				int val = state->m_banked_czram[table][i];
+				int val = src[i];
 
 				// discard if larger than 1fff
 				if (val>0x1fff) val = prev;
@@ -1281,7 +1283,7 @@ static void namcos22s_recalc_czram( running_machine &machine )
 
 				// fill range
 				for (j=start; j<end; j++)
-					state->m_recalc_czram[table][j] = i;
+					dest[j] = i;
 
 				// remember largest/smallest for later
 				if (val<small_val)
@@ -1298,9 +1300,9 @@ static void namcos22s_recalc_czram( running_machine &machine )
 
 			// fill possible leftover ranges
 			for (j=0; j<small_val; j++)
-				state->m_recalc_czram[table][j] = small_offset;
+				dest[j] = small_offset;
 			for (j=large_val; j<0x2000; j++)
-				state->m_recalc_czram[table][j] = large_offset;
+				dest[j] = large_offset;
 
 			state->m_cz_was_written[table] = 0;
 		}
