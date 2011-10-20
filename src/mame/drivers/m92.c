@@ -190,7 +190,7 @@ Notes:
 Dip locations verified for:
     - dsoccr94j, gunforce, inthunt, majtitl2, uccops [manual]
     - bmaster, hook, lethalt, mysticri, rtypeleo [dip listing]
-psoldier dip locations still need veritication.
+psoldier dip locations still need verification.
 
 *****************************************************************************/
 
@@ -899,11 +899,11 @@ void m92_sprite_interrupt(running_machine &machine)
 static MACHINE_CONFIG_START( m92, m92_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",V33,18000000/2)	/* NEC V33, 18 MHz clock */
+	MCFG_CPU_ADD("maincpu",V33,XTAL_18MHz/2)
 	MCFG_CPU_PROGRAM_MAP(m92_map)
 	MCFG_CPU_IO_MAP(m92_portmap)
 
-	MCFG_CPU_ADD("soundcpu" ,V35, 14318180)	/* 14.31818 MHz */
+	MCFG_CPU_ADD("soundcpu" ,V35, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START(m92)
@@ -930,12 +930,12 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_14_31818MHz/4)
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("irem", IREMGA20, 14318180/4)
+	MCFG_SOUND_ADD("irem", IREMGA20, XTAL_14_31818MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -987,7 +987,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ppan, m92_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",V33,18000000/2)
+	MCFG_CPU_ADD("maincpu",V33,XTAL_18MHz/2)
 	MCFG_CPU_PROGRAM_MAP(m92_map)
 	MCFG_CPU_IO_MAP(ppan_portmap)
 
