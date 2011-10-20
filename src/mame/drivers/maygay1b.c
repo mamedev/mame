@@ -544,13 +544,13 @@ static void cpu0_firq(int state)
 	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 firq%d \n",state));
 }
+#endif
 
-static void cpu0_nmi(int state)
+static void cpu0_nmi(running_machine &machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, state?ASSERT_LINE:CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 nmi%d \n",state));
 }
-#endif
 
 /***************************************************************************
     6821 PIA
@@ -798,7 +798,10 @@ static WRITE8_HANDLER( m1_latch_w )
 		state->m_ALARMEN = (data & 1);
 		break;
 		case 2: // Enable
-//      if ( m1_enable == 0 && ( data & 1 ) && Vmm )
+	      cpu0_nmi(space->machine(),1);
+	      cpu0_nmi(space->machine(),0);
+
+		  //		if ( m1_enable == 0 && ( data & 1 ) && Vmm )
 //      {
 	//      cpu0_nmi(1)
 		//  m1_enable = (data & 1);
@@ -826,6 +829,22 @@ static WRITE8_HANDLER( latch_ch2_w )
 	okim6376_w(msm6376, 0, data&0x7f);
 	okim6376_ch2_w(msm6376,data&0x80);
 }
+
+//A strange setup this, the address lines are used to move st to the right level
+static READ8_HANDLER( latch_st_hi )
+{
+	device_t *msm6376 = space->machine().device("msm6376");
+	okim6376_st_w(msm6376,1);
+	return 0;
+}
+
+static READ8_HANDLER( latch_st_lo )
+{
+	device_t *msm6376 = space->machine().device("msm6376");
+	okim6376_st_w(msm6376,0);
+	return 0;
+}
+
 static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
@@ -848,6 +867,9 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
 
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE( "ymsnd", ym2413_w )
+	AM_RANGE(0x2404, 0x2405) AM_READ(latch_st_lo)
+	AM_RANGE(0x2406, 0x2407) AM_READ(latch_st_hi)
+
 	AM_RANGE(0x2420, 0x2421) AM_WRITE( latch_ch2_w ) // oki
 
 	AM_RANGE(0x2800, 0xffff) AM_ROM
@@ -936,6 +958,16 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )\
 	ROM_LOAD( "cluedosnd1.hex", 0x000000, 0x080000, CRC(5a18a395) SHA1(d309acb315a2f62306e850308424c98744dfc6eb) )\
 	ROM_LOAD( "cluedosnd2.hex", 0x080000, 0x080000, CRC(0aa15ee0) SHA1(eb156743a44e66b86c0c0443db0356e2f25d1cd2) )\
+
+#define m1_cluecb_sound \
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )\
+	ROM_LOAD( "cluclub1", 0x000000, 0x080000, CRC(05e928ed) SHA1(41ae1f5342dc7afbdbdf3871e29d2a85c65a5965) )\
+	ROM_LOAD( "cluclub2", 0x080000, 0x080000, CRC(91811c0e) SHA1(88b3259b241136cd549ed9b4930d165896eebcc4) )\
+
+#define m1_cluess_sound \
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )\
+	ROM_LOAD( "supersleuth.p1", 0x000000, 0x080000, CRC(2417208f) SHA1(5c51bdcfa566aa8b2379d529441d37b2145864bb) )\
+	ROM_LOAD( "supersleuth.p2", 0x080000, 0x080000, CRC(892d3a4d) SHA1(bb585a9fda56f2f0859707973f771d60c5dfa080) )\
 
 ROM_START( m1albsq )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
@@ -1569,72 +1601,263 @@ ROM_END_M1A_MCU
 
 ROM_START( m1cluecb )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "sc5-433", 0x0000, 0x010000, CRC(27254937) SHA1(b75f4a7e66f625c0db7d658f0427c8c1893a3d10) )
+	ROM_LOAD( "sc5-437", 0x0000, 0x010000, CRC(0282878c) SHA1(90624916699e5866678b02260e0b0502041f32bf) )//nhq 3.1
+	m1_cluecb_sound
+	ROM_END_M1A_MCU
 
-	ROM_REGION( 0x20000, "altrevs", ROMREGION_ERASE00  )
-	ROM_LOAD( "sc5-434", 0x0000, 0x010000, CRC(6185ea69) SHA1(a20bccb86cfcd929908974500186e9ecf2cdc55b) )
-	ROM_LOAD( "sc5-435", 0x0000, 0x010000, CRC(84095d36) SHA1(f86f7f25fa25eb2731d81a23aafaf5e4c8aa976b) )
-	ROM_LOAD( "sc5-436", 0x0000, 0x010000, CRC(3b277a98) SHA1(cab3b277bec84056f6a97a87d97bbd86f80a1c8c) )
-	ROM_LOAD( "sc5-437", 0x0000, 0x010000, CRC(0282878c) SHA1(90624916699e5866678b02260e0b0502041f32bf) )
-	ROM_LOAD( "sc5-438", 0x0000, 0x010000, CRC(26f6d094) SHA1(31fa78db1a581c00b39d4f6f64d8f08786dec97a) )
+ROM_START( m1cluecbp )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sc5-438", 0x0000, 0x010000, CRC(26f6d094) SHA1(31fa78db1a581c00b39d4f6f64d8f08786dec97a) )//phq 3.1 (typo?)
+	m1_cluecb_sound
+	ROM_END_M1A_MCU
 
-	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
-	ROM_LOAD( "cluclub1", 0x000000, 0x080000, CRC(05e928ed) SHA1(41ae1f5342dc7afbdbdf3871e29d2a85c65a5965) )
-	ROM_LOAD( "cluclub2", 0x080000, 0x080000, CRC(91811c0e) SHA1(88b3259b241136cd549ed9b4930d165896eebcc4) )
+ROM_START( m1cluecb2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sc5-435", 0x0000, 0x010000, CRC(84095d36) SHA1(f86f7f25fa25eb2731d81a23aafaf5e4c8aa976b) )//nhq 2.1
+	m1_cluecb_sound
+	ROM_END_M1A_MCU
+
+ROM_START( m1cluecb2p )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sc5-436", 0x0000, 0x010000, CRC(3b277a98) SHA1(cab3b277bec84056f6a97a87d97bbd86f80a1c8c) )//phq 2.1
+	m1_cluecb_sound
 ROM_END_M1A_MCU
 
+ROM_START( m1cluecb1 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sc5-433", 0x0000, 0x010000, CRC(27254937) SHA1(b75f4a7e66f625c0db7d658f0427c8c1893a3d10) )//nhq 1.1
+	m1_cluecb_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluecb1p )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sc5-434", 0x0000, 0x010000, CRC(6185ea69) SHA1(a20bccb86cfcd929908974500186e9ecf2cdc55b) )//phq 1.1
+	m1_cluecb_sound
+ROM_END_M1A_MCU
+
+//These have no sound ROMs, could they use the standard cluedo ones?
 ROM_START( m1cluesh )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "sa4-492", 0x0000, 0x010000, CRC(824eafd8) SHA1(19beeb7238eddfed4917dc809a620b695d2d8098) )
-
-	ROM_REGION( 0x20000, "altrevs", ROMREGION_ERASE00  )
-	ROM_LOAD( "sa4-493", 0x0000, 0x010000, CRC(6aa6323e) SHA1(fb45b027259cb703ac31230465a65f39e834c0f2) )
-	ROM_LOAD( "sa5-098", 0x0000, 0x010000, CRC(36c70b9d) SHA1(24659224f26a3bc0efea3b71666fc5c52479cb06) )
-	ROM_LOAD( "sa5-099", 0x0000, 0x010000, CRC(de2f967b) SHA1(e30c1e93cf47200d683cd00de232d017c00b9976) )
+	ROM_LOAD( "sa5-098", 0x0000, 0x010000, CRC(36c70b9d) SHA1(24659224f26a3bc0efea3b71666fc5c52479cb06) )//nhj 1.2
 ROM_END_M1A_MCU
 
+ROM_START( m1clueshp )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-099", 0x0000, 0x010000, CRC(de2f967b) SHA1(e30c1e93cf47200d683cd00de232d017c00b9976) )//phj 1.2
+ROM_END_M1A_MCU
+
+ROM_START( m1cluesho )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa4-492", 0x0000, 0x010000, CRC(824eafd8) SHA1(19beeb7238eddfed4917dc809a620b695d2d8098) )//nhj 1.2
+ROM_END_M1A_MCU
+
+ROM_START( m1clueshop )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa4-493", 0x0000, 0x010000, CRC(6aa6323e) SHA1(fb45b027259cb703ac31230465a65f39e834c0f2) )//phj 1.2
+ROM_END_M1A_MCU
 
 ROM_START( m1cluess )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "clssgame", 0x0000, 0x020000, CRC(d620e3c7) SHA1(24a185906762acef44ee3662b4645d4ab21ae32e) )
-
-	ROM_REGION( 0x20000, "altrevs", ROMREGION_ERASE00  )
-	ROM_LOAD( "sa6-444", 0x0000, 0x020000, CRC(bb257c07) SHA1(eb402538fc11e759e54df814e59d2dd79ac895bc) )
-	ROM_LOAD( "sa6-445", 0x0000, 0x020000, CRC(eb6482bb) SHA1(f6012913d79a22a69ed41beaf7bc506bae59fbcf) )
-	ROM_LOAD( "sa7-356", 0x0000, 0x020000, CRC(079c1bb0) SHA1(1d0a5518ea9b480745e09e370244411ac932d499) )
-	ROM_LOAD( "sa7-357", 0x0000, 0x020000, CRC(57dde50c) SHA1(be31f42219213fbe27563f43c30571fb5887a92b) )
-	ROM_LOAD( "sa7-358", 0x0000, 0x020000, CRC(8550c577) SHA1(20d3a2fd0b4c172f7b521f795ec6e6644e16919e) )
-	ROM_LOAD( "sa7-359", 0x0000, 0x020000, CRC(d5113bcb) SHA1(703459ab22f480637f20ce0837a2cfbd6481dc68) )
-	ROM_LOAD( "sa7-745", 0x0000, 0x020000, CRC(d8e1a02b) SHA1(8e1244e60924d739ad67ebd04ab4de8ad5fb5929) )
-	ROM_LOAD( "sa7-746", 0x0000, 0x020000, CRC(cb269b7d) SHA1(e8352e19215131b445a60721eb67c7245eff6ca7) )
-	ROM_LOAD( "sa8-007", 0x0000, 0x020000, CRC(758ef0be) SHA1(1ae1502d7d1d2fb532149d19d55023e4b7d64d3d) )
-	ROM_LOAD( "sa8-008", 0x0000, 0x020000, CRC(342e51d5) SHA1(e9c4fcfc9a1c391b2c27b0fb049d424b86444060) )
-	ROM_LOAD( "sa8-009", 0x0000, 0x020000, CRC(fa1ea087) SHA1(6dfa634daf78f51aa5c99080eb646ac029d73468) )
-	ROM_LOAD( "sa8-010", 0x0000, 0x020000, CRC(839bb97c) SHA1(4682e3e344a742bf72de828b1c9e1ce7e60de1e7) )
-	ROM_LOAD( "sa8-249", 0x0000, 0x020000, CRC(86611d7b) SHA1(d8fd94c69911da21b9db9e805b7b61f9b507e032) )
-	ROM_LOAD( "sa8-250", 0x0000, 0x020000, CRC(f99f319b) SHA1(550ee8235c784de9d10c5e6810780e9bc135a788) )
-	ROM_LOAD( "sa8-251", 0x0000, 0x020000, CRC(a9decf27) SHA1(507bbcfaf68a1f7e5e79e0ff5b43686974cf1d6c) )
-	ROM_LOAD( "sa8-252", 0x0000, 0x020000, CRC(19610dd3) SHA1(7c4130e25285ce4804838dc0b776eff97a073d3e) )
-	ROM_LOAD( "sa8-253", 0x0000, 0x020000, CRC(4920f36f) SHA1(bdece8e68faa5b5dc07d2d5ad87b8f41b4899831) )
-	ROM_LOAD( "sa8-258", 0x0000, 0x020000, CRC(88d5d9d0) SHA1(f500925d916ad20673d02f4de9eadacb08f1d8e1) )
-	ROM_LOAD( "sa8-259", 0x0000, 0x020000, CRC(d894276c) SHA1(bf9e19b1d1606d4d75916d5d405bbf2ad89d9211) )
-	ROM_LOAD( "sa8-260", 0x0000, 0x020000, CRC(4302c3de) SHA1(12ba5359ecfa502cd2f548f83fb4cea1d84cdec6) )
-	ROM_LOAD( "sa8-261", 0x0000, 0x020000, CRC(13433d62) SHA1(24bbb6425cd8156996fb17bd23672c59b8aa10d6) )
-	ROM_LOAD( "sk001025", 0x0000, 0x020000, CRC(9b30d25a) SHA1(185c2f56d69dc6635c75c18bc1c4f342d94a3c96) )
-	ROM_LOAD( "sk001026", 0x0000, 0x020000, CRC(72088e4f) SHA1(1e41b656c0a7b45cc4f7c12a5c14b899b8ce24da) )
-	ROM_LOAD( "sk001027", 0x0000, 0x020000, CRC(4b4c9c92) SHA1(5c981b19175491c275668a5686a15b77571cc8e7) )
-	ROM_LOAD( "sk001028", 0x0000, 0x020000, CRC(ad0ccb34) SHA1(1cfe0cc945ba3fe91645301abca40285984084e3) )
-	ROM_LOAD( "sleu5p8c.bin", 0x0000, 0x020000, CRC(e4fc65d7) SHA1(ba573a33247682a1a1a213381e49fe390c661b8c) )
-	ROM_LOAD( "ss10fo", 0x0000, 0x020000, CRC(5f6ccfea) SHA1(18f4fcaee6a0e2eb5f4ccfde983a4e7b4e5cec6b) )
-	ROM_LOAD( "sslth10v", 0x0000, 0x020000, CRC(7b4b409b) SHA1(de8e05c6728b1af9cf080e43a4b22a22a5b06b62) )
-	ROM_LOAD( "sslth15f", 0x0000, 0x020000, CRC(9eabb468) SHA1(890e309a628150b629b7fdc89b868c56e9649ffe) )
-	ROM_LOAD( "sslu510", 0x0000, 0x020000, CRC(ce9540dc) SHA1(e951afd45f95e9ea92bbb4f4f5c1854bde5edd8d) )
-	ROM_LOAD( "sslu55", 0x0000, 0x020000, CRC(67f299a5) SHA1(fd4b15cfbf84a0966b6317c260e3c099ebaa1f2d) )
-
-	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
-	ROM_LOAD( "supersleuth.p1", 0x000000, 0x080000, CRC(2417208f) SHA1(5c51bdcfa566aa8b2379d529441d37b2145864bb) )
-	ROM_LOAD( "supersleuth.p2", 0x080000, 0x080000, CRC(892d3a4d) SHA1(bb585a9fda56f2f0859707973f771d60c5dfa080) )
+	ROM_LOAD( "sk001027", 0x0000, 0x020000, CRC(4b4c9c92) SHA1(5c981b19175491c275668a5686a15b77571cc8e7) )//ncf 2.3
+	m1_cluess_sound
 ROM_END_M1A_MCU
+
+ROM_START( m1cluessh )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sleu5p8c.bin", 0x0000, 0x020000, CRC(e4fc65d7) SHA1(ba573a33247682a1a1a213381e49fe390c661b8c) )//hack ncf 2.3
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sk001028", 0x0000, 0x020000, CRC(ad0ccb34) SHA1(1cfe0cc945ba3fe91645301abca40285984084e3) )//pcf 2.3
+	m1_cluess_sound
+ROM_END_M1A_MCU
+		
+ROM_START( m1cluessa )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sk001025", 0x0000, 0x020000, CRC(9b30d25a) SHA1(185c2f56d69dc6635c75c18bc1c4f342d94a3c96) )//ncf 1.2
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessap )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sk001026", 0x0000, 0x020000, CRC(72088e4f) SHA1(1e41b656c0a7b45cc4f7c12a5c14b899b8ce24da) )//pcf 1.2
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessb )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-260", 0x0000, 0x020000, CRC(4302c3de) SHA1(12ba5359ecfa502cd2f548f83fb4cea1d84cdec6) )//ncl71
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessbp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-261", 0x0000, 0x020000, CRC(13433d62) SHA1(24bbb6425cd8156996fb17bd23672c59b8aa10d6) )//pcl71
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessc )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-258", 0x0000, 0x020000, CRC(88d5d9d0) SHA1(f500925d916ad20673d02f4de9eadacb08f1d8e1) )//ncl61
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluesscp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-259", 0x0000, 0x020000, CRC(d894276c) SHA1(bf9e19b1d1606d4d75916d5d405bbf2ad89d9211) )//pcl61
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessd )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-252", 0x0000, 0x020000, CRC(19610dd3) SHA1(7c4130e25285ce4804838dc0b776eff97a073d3e) )//ncl51
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessdp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-253", 0x0000, 0x020000, CRC(4920f36f) SHA1(bdece8e68faa5b5dc07d2d5ad87b8f41b4899831) )//pcl51
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluesse )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-250", 0x0000, 0x020000, CRC(f99f319b) SHA1(550ee8235c784de9d10c5e6810780e9bc135a788) )//ncl21
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessep )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-251", 0x0000, 0x020000, CRC(a9decf27) SHA1(507bbcfaf68a1f7e5e79e0ff5b43686974cf1d6c) )//pcl21
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessf )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-248", 0x0000, 0x020000, CRC(d620e3c7) SHA1(24a185906762acef44ee3662b4645d4ab21ae32e) )//ncl11
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessfp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-249", 0x0000, 0x020000, CRC(86611d7b) SHA1(d8fd94c69911da21b9db9e805b7b61f9b507e032) )//pcl11
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessg )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-246", 0x0000, 0x020000, CRC(9eabb468) SHA1(890e309a628150b629b7fdc89b868c56e9649ffe) )//ncl71 15
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessi )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-118", 0x0000, 0x020000, CRC(5f6ccfea) SHA1(18f4fcaee6a0e2eb5f4ccfde983a4e7b4e5cec6b) )//ncl21 ss10fo 10gbp
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessj )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-090", 0x0000, 0x020000, CRC(67f299a5) SHA1(fd4b15cfbf84a0966b6317c260e3c099ebaa1f2d) )//ncf 2.3 5gbp
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessk )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-082", 0x0000, 0x020000, CRC(ce9540dc) SHA1(e951afd45f95e9ea92bbb4f4f5c1854bde5edd8d) )//ncf 1.2
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessl )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-009", 0x0000, 0x020000, CRC(fa1ea087) SHA1(6dfa634daf78f51aa5c99080eb646ac029d73468) )//ncl41
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluesslp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-010", 0x0000, 0x020000, CRC(839bb97c) SHA1(4682e3e344a742bf72de828b1c9e1ce7e60de1e7) )//pcl41
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessm )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-007", 0x0000, 0x020000, CRC(758ef0be) SHA1(1ae1502d7d1d2fb532149d19d55023e4b7d64d3d) )//ncl31
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessmp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-008", 0x0000, 0x020000, CRC(342e51d5) SHA1(e9c4fcfc9a1c391b2c27b0fb049d424b86444060) )//pcl31
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessn )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa8-003", 0x0000, 0x020000, CRC(7b4b409b) SHA1(de8e05c6728b1af9cf080e43a4b22a22a5b06b62) )//ncl11 sslth10v
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluesso )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa7-745", 0x0000, 0x020000, CRC(d8e1a02b) SHA1(8e1244e60924d739ad67ebd04ab4de8ad5fb5929) )//ncl21
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessop )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa7-746", 0x0000, 0x020000, CRC(cb269b7d) SHA1(e8352e19215131b445a60721eb67c7245eff6ca7) )//pcl21
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessq )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa7-358", 0x0000, 0x020000, CRC(8550c577) SHA1(20d3a2fd0b4c172f7b521f795ec6e6644e16919e) )//ncl51
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessqp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa7-359", 0x0000, 0x020000, CRC(d5113bcb) SHA1(703459ab22f480637f20ce0837a2cfbd6481dc68) )//pcl51
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessr )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa7-356", 0x0000, 0x020000, CRC(079c1bb0) SHA1(1d0a5518ea9b480745e09e370244411ac932d499) )//ncl31
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluessrp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa7-357", 0x0000, 0x020000, CRC(57dde50c) SHA1(be31f42219213fbe27563f43c30571fb5887a92b) )//pcl31
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluesss )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa6-444", 0x0000, 0x020000, CRC(bb257c07) SHA1(eb402538fc11e759e54df814e59d2dd79ac895bc) )//ncl41
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1cluesssp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa6-445", 0x0000, 0x020000, CRC(eb6482bb) SHA1(f6012913d79a22a69ed41beaf7bc506bae59fbcf) )//pcl41
+	m1_cluess_sound
+ROM_END_M1A_MCU
+
+
+
+
+
+
+
+
+
+
+
 
 
 ROM_START( m1coderd )
@@ -3764,9 +3987,49 @@ GAME( 1993, m1cluedo1	,m1cluedo	,m1,m1,m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1
 GAME( 1993, m1cluedo1p	,m1cluedo	,m1,m1,m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1 (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 1993, m1cluedo1h	,m1cluedo	,m1,m1,m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1 (Hack?) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
-GAME( 199?, m1cluecb	,0			,m1,m1,m1, ROT0, "Maygay", "Cluedo Club (Maygay) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m1cluesh	,0			,m1,m1,m1, ROT0, "Maygay", "Cluedo Showcase (Maygay) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m1cluess	,0			,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1cluecb	,0			,m1,m1,m1, ROT0, "Maygay", "Cluedo Club (Maygay) v3.1 (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1cluecbp	,m1cluecb	,m1,m1,m1, ROT0, "Maygay", "Cluedo Club (Maygay) v3.1 (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1cluecb2	,m1cluecb	,m1,m1,m1, ROT0, "Maygay", "Cluedo Club (Maygay) v2.1 (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1cluecb2p	,m1cluecb	,m1,m1,m1, ROT0, "Maygay", "Cluedo Club (Maygay) v2.1 (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1cluecb1	,m1cluecb	,m1,m1,m1, ROT0, "Maygay", "Cluedo Club (Maygay) v1.1 (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1cluecb1p	,m1cluecb	,m1,m1,m1, ROT0, "Maygay", "Cluedo Club (Maygay) v1.1 (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1cluesh	,0			,m1,m1,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1clueshp	,m1cluesh	,m1,m1,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1cluesho	,m1cluesh	,m1,m1,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1993, m1clueshop	,m1cluesh	,m1,m1,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Older) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluess	,0			,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessh	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (Newer) (Hack) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (Newer) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessa	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Newer) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessap	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Newer) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessb	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessbp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (Older) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessc	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v6.1 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluesscp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v6.1 (Older) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessd	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessdp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluesse	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessep	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessf	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessfp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (Older) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessg	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (15GBP Jackpot) (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessi	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (10GBP Jackpot) (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessj	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (5GBP Jackpot) (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessk	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessl	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluesslp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1 (Older) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessm	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessmp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessn	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (10GBP Jackpot) (Older) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluesso	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older, alternate) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessop	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older, alternate) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessq	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older, alternate) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessqp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older, alternate) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessr	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older, alternate) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluessrp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older, alternate) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluesss	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1? (Older, alternate) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1996, m1cluesssp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1? (Older, alternate) (Protocol) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
 GAME( 199?, m1coderd	,0			,m1,m1,m1, ROT0, "Maygay", "Code Red Club (Maygay) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m1coro		,0			,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m1cororr	,0			,m1,m1,m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (M1A/B)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

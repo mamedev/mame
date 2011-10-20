@@ -873,7 +873,7 @@ static READ8_DEVICE_HANDLER( hopper_b_r )
 	jpmimpct_state *state = device->machine().driver_data<jpmimpct_state>();
 
 	int retval;
-	// B0 = ?1 Hopper Out Verif
+	// B0 = 100p Hopper Out Verif
 	// B1 = Hopper High
 	// B2 = Hopper Low
 	// B3 = 20p Hopper Opto
@@ -905,7 +905,7 @@ static READ8_DEVICE_HANDLER( hopper_c_r )
    // C3
    // C4 = 20p Hopper Detect
    // C5 = Hopper Top-Up
-   // C6 = ?1 Hopper Detect
+   // C6 = 100p Hopper Detect
    // C7 = Payout Verif (Slides)
 
    retval=0xf0; //1111 0000
@@ -1108,6 +1108,11 @@ static READ16_HANDLER( prot_1_r )
 	return 0x01;
 }
 
+static READ16_HANDLER( prot_0_r )
+{
+	return 0x00;
+}
+
 static WRITE16_HANDLER( jpmioawp_w )
 {
 	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
@@ -1210,7 +1215,7 @@ static WRITE16_HANDLER( jpmioawp_w )
 
 static READ16_HANDLER( ump_r )
 {
-	return 0xffff;
+	return 0xff;//0xffff;
 }
 
 /*************************************
@@ -1236,16 +1241,18 @@ static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
 //  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
 	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(prot_1_r)
+	AM_RANGE(0x004801de, 0x006575ff) AM_READ(prot_1_r)
+	AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
+	AM_RANGE(0x00657602, 0x00ffffff) AM_READ(prot_1_r)
 
 //  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
 //  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
-//  AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
 	//AM_RANGE(0x00657602, 0x00bfffff) AM_READ(prot_1_r)
 //  AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
-	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
-	AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
-	AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
-	AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
+//	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
+//	AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
+//	AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
+//	AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tbirds )
