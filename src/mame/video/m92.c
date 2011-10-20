@@ -73,13 +73,12 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 	/* Sprite buffer - the data written doesn't matter (confirmed by several games) */
 	if (offset==4)
 	{
-			buffer_spriteram16_w(space,0,0,0xffff);
+		buffer_spriteram16_w(space,0,0,0xffff);
 		state->m_sprite_buffer_busy = 0;
 
-		/* Pixel clock is 26.6666 MHz, we have 0x800 bytes, or 0x400 words
-           to copy from spriteram to the buffer.  It seems safe to assume 1
-           word can be copied per clock.*/
-		space->machine().scheduler().timer_set(attotime::from_hz(26666000) * 0x400, FUNC(spritebuffer_callback));
+		/* Pixel clock is 26.6666MHz (some boards 27MHz??), we have 0x800 bytes, or 0x400 words to copy from
+		spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
+		space->machine().scheduler().timer_set(attotime::from_hz(XTAL_26_66666MHz) * 0x400, FUNC(spritebuffer_callback));
 	}
 //  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(&space->device()),offset,data);
 }
@@ -87,6 +86,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 WRITE16_HANDLER( m92_videocontrol_w )
 {
 	m92_state *state = space->machine().driver_data<m92_state>();
+	COMBINE_DATA(&state->m_videocontrol);
 	/*
         Many games write:
             0x2000
@@ -100,11 +100,24 @@ WRITE16_HANDLER( m92_videocontrol_w )
         be a different motherboard revision (most games use M92-A-B top
         pcb, a M92-A-A revision could exist...).
     */
-	if (ACCESSING_BITS_0_7)
-	{
-		/* Access to upper palette bank */
-		state->m_palette_bank = (data >> 1) & 1;
-	}
+
+    /*
+        fedc ba98 7654 3210
+        .x.. x... .xx. ....   always 0?
+        x... .... .... ....   disable tiles
+        ..xx .... .... ....   ? only written at POST - otherwise always 2
+        .... .xxx .... ....   ? only written at POST - otherwise always 0
+        .... .... x... ....   disable sprites
+        .... .... ...x ....   ?
+        .... .... .... x...   ?
+        .... .... .... .x..   ? maybe more palette banks?
+        .... .... .... ..x.   palette bank
+        .... .... .... ...x   ?
+    */
+
+	/* Access to upper palette bank */
+    state->m_palette_bank = (state->m_videocontrol >> 1) & 1;
+
 //  logerror("%04x: m92_videocontrol_w %d = %02x\n",cpu_get_pc(&space->device()),offset,data);
 }
 
@@ -276,6 +289,7 @@ VIDEO_START( m92 )
 
 	state->save_item(NAME(state->m_pf_master_control));
 
+	state->save_item(NAME(state->m_videocontrol));
 	state->save_item(NAME(state->m_sprite_list));
 	state->save_item(NAME(state->m_raster_irq_position));
 	state->save_item(NAME(state->m_sprite_buffer_busy));
@@ -310,6 +324,7 @@ VIDEO_START( ppan )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
+	if (state->m_videocontrol & 0x0080) return;
 	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 	int offs,k;
 
@@ -395,6 +410,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 static void ppan_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
+	if (state->m_videocontrol & 0x0080) return;
 	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 	int offs,k;
 
@@ -529,10 +545,10 @@ static void m92_update_scroll_positions(running_machine &machine)
 
 /*****************************************************************************/
 
-static void m92_screenrefresh(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void m92_draw_tiles(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	bitmap_fill(machine.priority_bitmap, cliprect, 0);
+	if (state->m_videocontrol & 0x8000) return;
 
 	if ((~state->m_pf_master_control[2] >> 4) & 1)
 	{
@@ -541,8 +557,6 @@ static void m92_screenrefresh(running_machine &machine, bitmap_t *bitmap,const r
 		tilemap_draw(bitmap, cliprect, state->m_pf_layer[2].wide_tmap, TILEMAP_DRAW_LAYER0, 1);
 		tilemap_draw(bitmap, cliprect, state->m_pf_layer[2].tmap,      TILEMAP_DRAW_LAYER0, 1);
 	}
-	else
-		bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_pf_layer[1].wide_tmap, TILEMAP_DRAW_LAYER1, 0);
 	tilemap_draw(bitmap, cliprect, state->m_pf_layer[1].tmap,      TILEMAP_DRAW_LAYER1, 0);
@@ -558,8 +572,10 @@ static void m92_screenrefresh(running_machine &machine, bitmap_t *bitmap,const r
 
 SCREEN_UPDATE( m92 )
 {
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);
 	m92_update_scroll_positions(screen->machine());
-	m92_screenrefresh(screen->machine(), bitmap, cliprect);
+	m92_draw_tiles(screen->machine(), bitmap, cliprect);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
@@ -573,8 +589,10 @@ SCREEN_UPDATE( m92 )
 
 SCREEN_UPDATE( ppan )
 {
+	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0);
 	m92_update_scroll_positions(screen->machine());
-	m92_screenrefresh(screen->machine(), bitmap, cliprect);
+	m92_draw_tiles(screen->machine(), bitmap, cliprect);
 
 	ppan_draw_sprites(screen->machine(), bitmap, cliprect);
 
