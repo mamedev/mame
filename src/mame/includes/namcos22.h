@@ -77,6 +77,8 @@ public:
 	int m_mbSpotlightEnable;
 	UINT32 *m_czram;
 	UINT16 *m_banked_czram[4];
+	UINT8 *m_recalc_czram[4];
+	UINT32 m_cz_was_written[4];
 	int m_cz_adjust;
 	poly_manager *m_poly;
 	UINT16 *m_mpTextureTileMap16;

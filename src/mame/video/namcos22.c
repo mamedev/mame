@@ -9,8 +9,6 @@
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
  *       (is this related to dsp? or cpu?)
  * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly, or is it linktable related?
- * - super22 poly fog currently doesn't work on reversed tables (see testmode), or on 'short' tables (see airco22b)
- * - optimize super22 poly fog: precompute 2KB tables at czram write
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
  *       (probably a bug in rgbint, not here?)
@@ -351,8 +349,7 @@ struct _poly_extra_data
 	int zfog_enabled;
 	int cz_adjust;
 	int cz_sdelta;
-	const UINT8 *czram_8;
-	const UINT16 *czram_16;
+	const UINT8 *czram;
 
 	/* sprites */
 	const UINT8 *source;
@@ -378,8 +375,7 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	bitmap_t *destmap = (bitmap_t *)destbase;
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = extra->pens;
-	const UINT8 *czram_8 = extra->czram_8;
-	const UINT16 *czram_16 = extra->czram_16;
+	const UINT8 *czram = extra->czram;
 	int cz_adjust = extra->cz_adjust;
 	int cz_sdelta = extra->cz_sdelta;
 	int zfog_enabled = extra->zfog_enabled;
@@ -410,68 +406,101 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 		penshift = 4 * (~extra->cmode & 1);
 	}
 
-	for( x=extent->startx; x<extent->stopx; x++ )
+	// slight differences between super and non-super, do the branch here for optimization
+	// normal: 1 fader, no alpha, shading after fog
+	// super:  2 faders, alpha, shading before fog
+	if (state->m_mbSuperSystem22)
 	{
-		float ooz = 1.0f / z;
-		int pen = texel(state, (int)(u*ooz), bn+(int)(v*ooz));
-		// pen = 0x55; // debug: disable textures
-
-		rgbint rgb;
-		rgb_to_rgbint(&rgb, pens[pen>>penshift&penmask]);
-
-		// per-z distance fogging
-		if (zfog_enabled)
+		for( x=extent->startx; x<extent->stopx; x++ )
 		{
-			int cz = ooz + cz_adjust;
-			// discard low byte and clamp to 0-1fff
-			if ((UINT32)cz < 0x200000) cz >>= 8;
-			else cz = (cz < 0) ? 0 : 0x1fff;
-			if (state->m_mbSuperSystem22)
-			{
-				// compare against cz table, slow :(
-				for (fogFactor=0; fogFactor<0x100; fogFactor++)
-					if (czram_16[fogFactor] >= cz) break;
+			float ooz = 1.0f / z;
+			int pen = texel(state, (int)(u*ooz), bn+(int)(v*ooz));
+			// pen = 0x55; // debug: disable textures
 
-				fogFactor = (fogFactor&0xff) + cz_sdelta;
-				if (fogFactor>0)
+			rgbint rgb;
+			rgb_to_rgbint(&rgb, pens[pen>>penshift&penmask]);
+
+			// apply shading before fog
+			int shade = i*ooz;
+			rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
+
+			// per-z distance fogging
+			if (zfog_enabled)
+			{
+				int cz = ooz + cz_adjust;
+				// discard low byte and clamp to 0-1fff
+				if ((UINT32)cz < 0x200000) cz >>= 8;
+				else cz = (cz < 0) ? 0 : 0x1fff;
+				if ((fogFactor = czram[cz] + cz_sdelta) > 0)
 				{
 					if (fogFactor>0xff) fogFactor=0xff;
 					rgbint_blend(&rgb, &fogColor, 0xff-fogFactor);
 				}
 			}
-			else
+			else if (fogFactor != 0xff) // direct
+				rgbint_blend(&rgb, &fogColor, fogFactor);
+
+			if( polyfade_enabled )
+				rgbint_scale_channel_and_clamp(&rgb, &polyColor);
+
+			if( fadeFactor != 0xff )
+				rgbint_blend(&rgb, &fadeColor, fadeFactor);
+
+			if( alphaFactor != 0xff )
 			{
-				if ((fogFactor = czram_8[NATIVE_ENDIAN_VALUE_LE_BE(3,0)^cz]) != 0)
+				rgbint mix;
+				rgb_to_rgbint(&mix, dest[x]);
+				rgbint_blend(&rgb, &mix, alphaFactor);
+			}
+
+			dest[x] = rgbint_to_rgb(&rgb);
+			primap[x] |= prioverchar;
+
+			u += du;
+			v += dv;
+			i += di;
+			z += dz;
+		}
+	}
+	else
+	{
+		for( x=extent->startx; x<extent->stopx; x++ )
+		{
+			float ooz = 1.0f / z;
+			int pen = texel(state, (int)(u*ooz), bn+(int)(v*ooz));
+			// pen = 0x55; // debug: disable textures
+
+			rgbint rgb;
+			rgb_to_rgbint(&rgb, pens[pen>>penshift&penmask]);
+
+			// per-z distance fogging
+			if (zfog_enabled)
+			{
+				int cz = ooz + cz_adjust;
+				// discard low byte and clamp to 0-1fff
+				if ((UINT32)cz < 0x200000) cz >>= 8;
+				else cz = (cz < 0) ? 0 : 0x1fff;
+				if ((fogFactor = czram[NATIVE_ENDIAN_VALUE_LE_BE(3,0)^cz]) != 0)
 					rgbint_blend(&rgb, &fogColor, 0xff-fogFactor);
 			}
+			else if (fogFactor != 0xff) // direct
+				rgbint_blend(&rgb, &fogColor, fogFactor);
+
+			// apply shading after fog
+			int shade = i*ooz;
+			rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
+
+			if( polyfade_enabled )
+				rgbint_scale_channel_and_clamp(&rgb, &polyColor);
+
+			dest[x] = rgbint_to_rgb(&rgb);
+			primap[x] |= prioverchar;
+
+			u += du;
+			v += dv;
+			i += di;
+			z += dz;
 		}
-		else if (fogFactor != 0xff) // direct
-			rgbint_blend(&rgb, &fogColor, fogFactor);
-
-		// apply shading after fog
-		int shade = i*ooz;
-		rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
-
-		if( polyfade_enabled )
-			rgbint_scale_channel_and_clamp(&rgb, &polyColor);
-
-		if( fadeFactor != 0xff )
-			rgbint_blend(&rgb, &fadeColor, fadeFactor);
-
-		if( alphaFactor != 0xff )
-		{
-			rgbint mix;
-			rgb_to_rgbint(&mix, dest[x]);
-			rgbint_blend(&rgb, &mix, alphaFactor);
-		}
-
-		dest[x] = rgbint_to_rgb(&rgb);
-		primap[x] |= prioverchar;
-
-		u += du;
-		v += dv;
-		i += di;
-		z += dz;
 	}
 } /* renderscanline_uvi_full */
 
@@ -602,9 +631,9 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
                                      ^^^^              maincpu ram access bank
                                           ^^^^         flags, nybble per cztype 3,2,1,0 - ?
                                                ^^^^    ? (only set sometimes in timecris)
-            0000 0000 0000 0000 7555 0000 00e4 0000 // testmode normal
-            7fff 8000 7fff 8000 7555 0000 00e4 0000 // testmode offset
-            0000 0000 0000 0000 3111 0000 00e4 0000 // testmode off
+            0000 0000 0000 0000 7555 0000 00e4 0000 // testmode normal - 0=white to black(mid), 1=white to black(weak), 2=white to black(strong), 3=black to white(mid, reverse of 0)
+            7fff 8000 7fff 8000 7555 0000 00e4 0000 // testmode offset - 0=black, 1=white, 2=black, 3=white
+            0000 0000 0000 0000 3111 0000 00e4 0000 // testmode off    - 0=white, 1=white, 2=white, 3=white
             0000 0000 0000 0000 4444 0000 0000 0000 // propcycl solitar
             0004 0004 0004 0004 4444 0000 0000 0000 // propcycl out pool
             00a4 00a4 00a4 00a4 4444 0000 0000 0000 // propcycl in pool
@@ -630,12 +659,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 					if (cz < 0) cz = 0;
 					else if (cz > 0x1fff) cz = 0x1fff;
 
-					// bad (see testmode)
-					int fogFactor;
-					for (fogFactor=0; fogFactor<0x100; fogFactor++)
-						if (state->m_banked_czram[cztype][fogFactor] >= cz) break;
-					
-					fogFactor = (fogFactor&0xff) + delta;
+					int fogFactor = state->m_recalc_czram[cztype][cz] + delta;
 					if (fogFactor>0)
 					{
 						if (fogFactor>0xff) fogFactor = 0xff;
@@ -646,7 +670,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 				{
 					extra->zfog_enabled = 1;
 					extra->cz_sdelta = delta;
-					extra->czram_16 = state->m_banked_czram[cztype];
+					extra->czram = state->m_recalc_czram[cztype];
 				}
 			}
 		}
@@ -679,7 +703,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 			else
 			{
 				extra->zfog_enabled = 1;
-				extra->czram_8 = (UINT8*)&state->m_czram[cztype<<(13-2)];
+				extra->czram = (UINT8*)&state->m_czram[cztype<<(13-2)];
 			}
 		}
 	}
@@ -1200,20 +1224,87 @@ namcos22_point_rom_r( running_machine &machine, offs_t offs )
 WRITE32_HANDLER( namcos22s_czram_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	int bank = nthword(state->m_czattr,0xa/2);
-	UINT16 *czram = state->m_banked_czram[bank&3];
+	int bank = nthword(state->m_czattr,0xa/2)&3;
+	UINT16 *czram = state->m_banked_czram[bank];
 	UINT32 dat = (czram[offset*2]<<16)|czram[offset*2+1];
+	UINT32 prev = dat;
 	COMBINE_DATA( &dat );
 	czram[offset*2] = dat>>16;
 	czram[offset*2+1] = dat&0xffff;
+	state->m_cz_was_written[bank] |= (prev^dat);
 }
 
 READ32_HANDLER( namcos22s_czram_r )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	int bank = nthword(state->m_czattr,0xa/2);
-	const UINT16 *czram = state->m_banked_czram[bank&3];
+	int bank = nthword(state->m_czattr,0xa/2)&3;
+	const UINT16 *czram = state->m_banked_czram[bank];
 	return (czram[offset*2]<<16)|czram[offset*2+1];
+}
+
+static void namcos22s_recalc_czram( running_machine &machine )
+{
+	namcos22_state *state = machine.driver_data<namcos22_state>();
+	int i, j, table;
+	for (table=0; table<4; table++)
+	{
+		// as documented above, ss22 czram is 'just' a big compare table
+		// this is very slow when emulating, so let's recalculate it to a simpler lookup table
+		if (state->m_cz_was_written[table])
+		{
+			int small_val = 0x2000;
+			int small_offset = 0;
+			int large_val = 0;
+			int large_offset = 0;
+			int prev = 0x2000;
+
+			for (i=0; i<0x100; i++)
+			{
+				int val = state->m_banked_czram[table][i];
+
+				// discard if larger than 1fff
+				if (val>0x1fff) val = prev;
+				if (prev>0x1fff)
+				{
+					prev = val;
+					continue;
+				}
+
+				int start = prev;
+				int end = val;
+				if (start>end)
+				{
+					start = val;
+					end = prev;
+				}
+				prev = val;
+
+				// fill range
+				for (j=start; j<end; j++)
+					state->m_recalc_czram[table][j] = i;
+
+				// remember largest/smallest for later
+				if (val<small_val)
+				{
+					small_val = val;
+					small_offset = i;
+				}
+				if (val>large_val)
+				{
+					large_val = val;
+					large_offset = i;
+				}
+			}
+
+			// fill possible leftover ranges
+			for (j=0; j<small_val; j++)
+				state->m_recalc_czram[table][j] = small_offset;
+			for (j=large_val; j<0x2000; j++)
+				state->m_recalc_czram[table][j] = large_offset;
+
+			state->m_cz_was_written[table] = 0;
+		}
+	}
 }
 
 
@@ -1300,7 +1391,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 	struct SceneNode *node = NewSceneNode(machine, zsortvalue24, eSCENENODE_QUAD3D);
 	int i;
 	node->data.quad3d.cz_adjust = state->m_cz_adjust;
-	node->data.quad3d.flags = (pSource[3]<<6&0x1fff00) | (pSource[3]&3);
+	node->data.quad3d.flags = (pSource[3]<<6&0x1fff00) | (~pSource[3]&3);
 	node->data.quad3d.color = (pSource[2]&0xff00)>>8;
 	if( state->m_mbSuperSystem22 )
 	{
@@ -2535,15 +2626,17 @@ VIDEO_START( namcos22s )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	state->m_mbSuperSystem22 = 1;
-	state->m_banked_czram[0] = auto_alloc_array(machine, UINT16, 0x200/2 );
-	state->m_banked_czram[1] = auto_alloc_array(machine, UINT16, 0x200/2 );
-	state->m_banked_czram[2] = auto_alloc_array(machine, UINT16, 0x200/2 );
-	state->m_banked_czram[3] = auto_alloc_array(machine, UINT16, 0x200/2 );
 
-	memset(state->m_banked_czram[0], 0, 0x200);
-	memset(state->m_banked_czram[1], 0, 0x200);
-	memset(state->m_banked_czram[2], 0, 0x200);
-	memset(state->m_banked_czram[3], 0, 0x200);
+	// init czram tables
+	int table;
+	for (table=0; table<4; table++)
+	{
+		state->m_banked_czram[table] = auto_alloc_array(machine, UINT16, 0x100);
+		memset(state->m_banked_czram[table], 0, 0x100*2);
+		state->m_recalc_czram[table] = auto_alloc_array(machine, UINT8, 0x2000);
+		memset(state->m_recalc_czram[table], 0, 0x2000);
+		state->m_cz_was_written[table] = 0;
+	}
 
 	VIDEO_START_CALL(common);
 }
@@ -2553,6 +2646,7 @@ SCREEN_UPDATE( namcos22s )
 	namcos22_state *state = screen->machine().driver_data<namcos22_state>();
 	UpdateVideoMixer(screen->machine());
 	UpdatePalette(screen->machine());
+	namcos22s_recalc_czram(screen->machine());
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 	// background color
