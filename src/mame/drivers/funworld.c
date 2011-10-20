@@ -61,6 +61,7 @@
   * Saloon (French, encrypted),                       unknown,            199?.
   * Fun World Quiz (Austrian),                        Funworld,           198?.
   * Witch Royal (Export version 2.1),                 Video Klein,        199?.
+  * Novo Play Multi Card / Club Card,                 Admiral/Novomatic,  1986.
 
 ***********************************************************************************
 
@@ -346,6 +347,32 @@
 
   If the game has credits loaded, the bookkeeping mode will start
   as soon as the current game ends.
+
+
+  * Novo Play Multi Card / Club Card
+
+  This game needs a default NVRAM to work. There is a special ROM that need to be
+  placed into the program socket, then turn ON the board till the OK message appear.
+  After this operation, just switch the special ROM with the regular program.
+  The board now is ready to operate.
+
+  To program the game, enter the service mode (Key 9), and then keep pressed both
+  HOLD2 & HOLD4 at least for 5 seconds....
+
+  You can see:
+
+     C1        C2          REMOTE         IN-MAX/IN-MIN         CONT
+
+  (Coin A)  (Coin B)  (Remote credits)  (Bet Max & Minimum)  (Difficult)
+
+
+  C2:     Coin B, from 1-20... Selectable through HOLD1.
+  REMOTE: Remote Credits, from 10-100... Selectable through HOLD3.
+  IN-MAX: Maximum Bet allowed. From 1-40. selectable through HOLD4.
+  IN_MIN: Minimum Bet allowed. From 1-5. selectable through HOLD4, keeping COLLECT pressed.
+  CONT:   Earnings control... From 1-4, selectable through HOLD5. 4 is the highest payment.
+
+  Press DEAL/DRAW to exit the mode.
 
 
 ***********************************************************************************
@@ -722,6 +749,13 @@
   - Reworked the button-lamps layout to get the hold buttons
      more centered.
 
+  [2011/10/20]
+  - Added 'Novo Play Multi Card / Club Card' from Admiral/Novomatic.
+     Seems a derivated game from Royal Vegas...
+  - Added proper button-lamps support and layout.
+  - Added default NVRAM, necessary to boot.
+  - Added technical notes.
+
 
   *** TO DO ***
 
@@ -749,6 +783,7 @@
 #include "machine/nvram.h"
 #include "jollycrd.lh"
 #include "bigdeal.lh"
+#include "novoplay.lh"
 #include "royalcrd.lh"
 #include "includes/funworld.h"
 
@@ -2059,7 +2094,7 @@ static INPUT_PORTS_START( novoplay )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Collect (D-UP) / Autohold")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Deal Draw / Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Deal/Draw / Double")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Bet / Half")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Service 1 / Test")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Service 2 / Select")
@@ -4589,4 +4624,4 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  soccernw, ROT0, "bootleg"
 GAME(  198?, saloon,    0,        saloon,   saloon,    saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      GAME_NOT_WORKING )
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   0,        ROT0, "Funworld / " O_UMLAUT "hlinger", "Fun World Quiz (Austrian)",        0 )
 GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
-GAME(  1986, novoplay,  0,        fw2ndpal, novoplay,  0,        ROT0, "Admiral/Novomatic", "Novo Play Multi Card / Club Card",              0 )
+GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  0,        ROT0, "Admiral/Novomatic", "Novo Play Multi Card / Club Card",              0,                       layout_novoplay )

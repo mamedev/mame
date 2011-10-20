@@ -61,6 +61,7 @@
   * Saloon (French, encrypted),                       unknown,            199?.
   * Fun World Quiz (Austrian),                        Funworld,           198?.
   * Witch Royal (Export version 2.1),                 Video Klein,        199?.
+  * Novo Play Multi Card / Club Card,                 Admiral/Novomatic,  1986.
 
 ***********************************************************************************
 

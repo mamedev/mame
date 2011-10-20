@@ -3770,6 +3770,7 @@ src/mame/layout/nbmj8688.lay svneol=native#text/plain
 src/mame/layout/neogeo.lay svneol=native#text/plain
 src/mame/layout/noraut11.lay svneol=native#text/plain
 src/mame/layout/noraut12.lay svneol=native#text/plain
+src/mame/layout/novoplay.lay svneol=native#text/plain
 src/mame/layout/outrun.lay svneol=native#text/plain
 src/mame/layout/overdriv.lay svneol=native#text/plain
 src/mame/layout/paradice.lay svneol=native#text/plain

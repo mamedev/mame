@@ -1958,6 +1958,7 @@ $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
 $(DRIVERS)/funworld.o:	$(LAYOUT)/jollycrd.lh \
 			$(LAYOUT)/bigdeal.lh \
+			$(LAYOUT)/novoplay.lh \
 			$(LAYOUT)/royalcrd.lh
 
 $(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
