@@ -4802,11 +4802,7 @@ ROM_END
  Choutetsu Brikin'ger - Iron clad (prototype) 1996 Saurus
 ****************************************/
 
-/* Disabled. For now documentation only (08/2011). */
-
-#if 0
-ROM_START( ironclad ) /* Prototype */
-	/* Second (bugfix) release. */
+ROM_START( ironclad ) /* Prototype - Second (bugfix) release. */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "220-p1p.p1", 0x100000, 0x100000, CRC(ce37e3a0) SHA1(488f95fa15f56eea6666dda13d96ec29dba18e19) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
@@ -4827,8 +4823,7 @@ ROM_START( ironclad ) /* Prototype */
 	ROM_LOAD16_BYTE( "220-c4p.c4", 0x800001, 0x400000, CRC(e73ea38b) SHA1(27138d588e61e86c292f12d16e36c3681075c607) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( ironclado ) /* Prototype, older */
-	/* First release. Original prototype from '96? */
+ROM_START( ironclado ) /* Prototype, older - First release. Original prototype from '96? */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "220-p1po.p1", 0x100000, 0x100000, CRC(62a942c6) SHA1(12aaa7d9bd84328d1bf4610e056b5c57d0252537) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
@@ -4848,7 +4843,6 @@ ROM_START( ironclado ) /* Prototype, older */
 	ROM_LOAD16_BYTE( "220-c3p.c3", 0x800000, 0x400000, CRC(d67fb15a) SHA1(842971aeaf3c92e70f7c653bbf29058bc60f5b71) ) /* Plane 0,1 */
 	ROM_LOAD16_BYTE( "220-c4p.c4", 0x800001, 0x400000, CRC(e73ea38b) SHA1(27138d588e61e86c292f12d16e36c3681075c607) ) /* Plane 2,3 */
 ROM_END
-#endif
 
 /****************************************
  ID-0221
@@ -9884,8 +9878,8 @@ GAME( 1995, quizkofk,  quizkof,  neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "
 GAME( 1995, stakwin,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Stakes Winner / Stakes Winner - GI kinzen seihae no michi", GAME_SUPPORTS_SAVE )
 GAME( 1996, ragnagrd,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Ragnagard / Shin-Oh-Ken", GAME_SUPPORTS_SAVE )
 GAME( 1996, pgoal,     neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Pleasure Goal / Futsal - 5 on 5 Mini Soccer (NGM-219)", GAME_SUPPORTS_SAVE )
-//GAME( 1996, ironclad,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Choutetsu Brikin'ger - Iron clad (Prototype)", GAME_SUPPORTS_SAVE )
-//GAME( 1996, ironclado, ironclad, neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Choutetsu Brikin'ger - Iron clad (Prototype, older)", GAME_SUPPORTS_SAVE )
+GAME( 1996, ironclad,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Choutetsu Brikin'ger - Iron clad (Prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1996, ironclado, ironclad, neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Choutetsu Brikin'ger - Iron clad (Prototype, older)", GAME_SUPPORTS_SAVE )
 GAME( 1996, stakwin2,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Stakes Winner 2", GAME_SUPPORTS_SAVE )
 GAME( 1997, shocktro,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Shock Troopers (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1997, shocktroa, shocktro, neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Shock Troopers (set 2)", GAME_SUPPORTS_SAVE )
