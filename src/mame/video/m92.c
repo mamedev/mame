@@ -56,8 +56,12 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 {
 	m92_state *state = space->machine().driver_data<m92_state>();
 	COMBINE_DATA(&state->m_spritecontrol[offset]);
-
-	/* Sprite list size register - used in spriteroutine */
+	// offset0: sprite list size (negative)
+	// offset1: ? (always 0)
+	// offset2: sprite control
+	// offset3: ? (always 0)
+	// offset4: sprite dma
+	// offset5: ?
 
 	/* Sprite control - display all sprites, or partial list */
 	if (offset==2 && ACCESSING_BITS_0_7)
@@ -73,6 +77,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 	/* Sprite buffer - the data written doesn't matter (confirmed by several games) */
 	if (offset==4)
 	{
+		/* this implementation is not accurate: still some delayed sprites in gunforc2 (might be another issue?) */
 		buffer_spriteram16_w(space,0,0,0xffff);
 		state->m_sprite_buffer_busy = 0;
 
@@ -104,10 +109,10 @@ WRITE16_HANDLER( m92_videocontrol_w )
     /*
         fedc ba98 7654 3210
         .x.. x... .xx. ....   always 0?
-        x... .... .... ....   disable tiles
+        x... .... .... ....   disable tiles?? (but that breaks mysticri)
         ..xx .... .... ....   ? only written at POST - otherwise always 2
         .... .xxx .... ....   ? only written at POST - otherwise always 0
-        .... .... x... ....   disable sprites
+        .... .... x... ....   disable sprites??
         .... .... ...x ....   ?
         .... .... .... x...   ?
         .... .... .... .x..   ? maybe more palette banks?
@@ -288,7 +293,6 @@ VIDEO_START( m92 )
 	memset(machine.generic.buffered_spriteram.u16,0,0x800);
 
 	state->save_item(NAME(state->m_pf_master_control));
-
 	state->save_item(NAME(state->m_videocontrol));
 	state->save_item(NAME(state->m_sprite_list));
 	state->save_item(NAME(state->m_raster_irq_position));
@@ -324,7 +328,6 @@ VIDEO_START( ppan )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	if (state->m_videocontrol & 0x0080) return;
 	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 	int offs,k;
 
@@ -410,7 +413,6 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 static void ppan_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	if (state->m_videocontrol & 0x0080) return;
 	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 	int offs,k;
 
@@ -548,7 +550,6 @@ static void m92_update_scroll_positions(running_machine &machine)
 static void m92_draw_tiles(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	if (state->m_videocontrol & 0x8000) return;
 
 	if ((~state->m_pf_master_control[2] >> 4) & 1)
 	{
