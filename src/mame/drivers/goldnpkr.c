@@ -3543,7 +3543,7 @@ ROM_END
 
 	ROM_REGION( 0x1800, "gfx2", 0 )	/* 2nd half of each ROM */
 	ROM_COPY( "temp",	0x0800, 0x0000, 0x0800 )	/* 0800-0fff of wc1.a2 - regular cards gfx, bitplane 1 */
-	ROM_COPY( "temp",	0x1800, 0x0800, 0x0800 )	/* 0000-07ff of wc2.a4 - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x1800, 0x0800, 0x0800 )	/* 0800-0fff of wc2.a4 - regular cards gfx, bitplane 2 */
 	ROM_COPY( "temp",	0x2800, 0x1000, 0x0800 )	/* 0800-0fff of wc3.a5 - regular cards gfx, bitplane 3 */
 
 	ROM_REGION( 0x0200, "proms", 0 )
