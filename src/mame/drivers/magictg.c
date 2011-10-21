@@ -548,7 +548,6 @@ WRITE32_MEMBER( magictg_state::f0_w )
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
 
 	ch = ((offset >> 2) & 3) - 1;
-	assert(dma_ch != 0);
 
 	switch (offset)
 	{
@@ -635,7 +634,6 @@ READ32_MEMBER( magictg_state::f0_r )
 	offset *= 4;
 
 	ch = ((offset >> 2) & 3) - 1;
-	assert(dma_ch != 0);
 
 	switch (offset)
 	{
