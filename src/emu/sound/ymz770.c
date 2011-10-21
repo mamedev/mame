@@ -412,7 +412,7 @@ const double amm::synthesis_filter[513] = {
   +0.000442505, +0.000396729, +0.000366211, +0.000320435, +0.000289917, +0.000259399, +0.000244141, +0.000213623,
   +0.000198364, +0.000167847, +0.000152588, +0.000137329, +0.000122070, +0.000106812, +0.000106812, +0.000091553,
   +0.000076294, +0.000076294, +0.000061035, +0.000061035, +0.000045776, +0.000045776, +0.000030518, +0.000030518,
-  +0.000030518, +0.000030518, +0.000015259, +0.000015259, +0.000015259, +0.000015259, +0.000015259, +0.000015259, +0.000015259,
+  +0.000030518, +0.000030518, +0.000015259, +0.000015259, +0.000015259, +0.000015259, +0.000015259, +0.000015259, 0.0
 };
 
 int amm::get_band_param(int &pos, int band)
@@ -665,7 +665,7 @@ void amm::handle_block(int &pos)
 
 	int base_offset = rsize;
 	for(int chan=0; chan<channel_count; chan++) {
-	  double resynthesis_buffer[32];
+	  double resynthesis_buffer[33];    // MinGW (falsely?) claims out-of-range if not 32; 4.6.x on Linux and 4.2.x on OS X don't
 	  idct32(subbuffer[chan], audio_buffer[chan] + audio_buffer_pos[chan]);
 	  resynthesis(audio_buffer[chan] + audio_buffer_pos[chan] + 16, resynthesis_buffer);
 	  scale_and_clamp(resynthesis_buffer, base_offset+2*chan, 2*channel_count);
@@ -772,11 +772,36 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		for (ch = 0; ch < 8; ch++)
 		{
+			if (channels[ch].is_seq_playing)
+			{
+				if (channels[ch].seqdelay != 0)
+				{
+					channels[ch].seqdelay--;
+				}
+				else
+				{
+					int reg = *channels[ch].seqdata++;
+					UINT8 data = *channels[ch].seqdata++;
+					switch (reg)
+					{
+						case 0x0f:
+							channels[ch].is_seq_playing = false;
+							break;
+						case 0x0e:
+							channels[ch].seqdelay = 32 - 1;
+							break;
+						default:
+							address_space *dummy = 0;
+							write(*dummy, 0, reg);
+							write(*dummy, 1, data);
+					}
+				}
+			}
 			if (channels[ch].is_playing)
 			{
 				if (channels[ch].output_remaining > 0)
 				{
-					mix += (channels[ch].output_data[channels[ch].output_ptr++]*256);
+					mix += (channels[ch].output_data[channels[ch].output_ptr++]*2*channels[ch].volume);
 					channels[ch].output_remaining--;
 				}
 				else
@@ -791,7 +816,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						channels[ch].output_remaining = (channels[ch].decoder->get_rsize()/2)-1;
 						channels[ch].output_ptr = 1;
 
-						mix += (channels[ch].output_data[0]*256);
+						mix += (channels[ch].output_data[0]*2*channels[ch].volume);
 					}
 				}
 			}
@@ -844,7 +869,7 @@ WRITE8_MEMBER( ymz770_device::write )
 				break;
 
 			case 3:
-				if ((data & 6) && !(channels[voice].is_playing))
+				if (data & 6)
 				{
 					UINT8 phrase = channels[voice].phrase;
 					UINT32 pptr = rom_base[(4*phrase)+1]<<16 | rom_base[(4*phrase)+2]<<8 | rom_base[(4*phrase)+3];
@@ -863,6 +888,32 @@ WRITE8_MEMBER( ymz770_device::write )
 				}
 
 				channels[voice].control = data;
+				break;
+		}
+	}
+	else if (cur_reg >= 0x80 && cur_reg <= 0xff)
+	{
+		int voice = (cur_reg & 0x70)>>4;
+		int reg = cur_reg & 0x0f;
+		switch (reg)
+		{
+			case 0:
+				channels[voice].sequence = data;
+				break;
+			case 1:
+				if (data & 6)
+				{
+					UINT8 sqn = channels[voice].sequence;
+					UINT32 pptr = rom_base[(4*sqn)+1+0x400]<<16 | rom_base[(4*sqn)+2+0x400]<<8 | rom_base[(4*sqn)+3+0x400];
+					channels[voice].seqdata = &rom_base[pptr];
+					channels[voice].is_seq_playing = true;
+					channels[voice].seqdelay = 0;
+				}
+				else
+				{
+						channels[voice].is_seq_playing = false;
+				}
+				channels[voice].sqncontrol = data;
 				break;
 		}
 	}
