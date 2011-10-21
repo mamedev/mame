@@ -610,9 +610,11 @@ void amm::resynthesis(const double *input, double *output)
   for(int j=0; j<64*8; j+=64) {
     for(int i=0; i<16; i++) {
       output[   i] += input[   i+j]*synthesis_filter[   i+j] - input[32-i+j]*synthesis_filter[32+i+j];
-      output[17+i] -= input[15-i+j]*synthesis_filter[17+i+j] + input[17+i+j]*synthesis_filter[49+i+j];
     }
     output[16] -= input[16+j]*synthesis_filter[32+16+j];
+	for(int i=17; i<32; i++) {
+      output[i] -= input[32-i+j]*synthesis_filter[i+j] + input[i+j]*synthesis_filter[32+i+j];
+	}
   }
 }
 
@@ -665,7 +667,7 @@ void amm::handle_block(int &pos)
 
 	int base_offset = rsize;
 	for(int chan=0; chan<channel_count; chan++) {
-	  double resynthesis_buffer[33];    // loop in resynthesis() can access [32]
+	  double resynthesis_buffer[32];
 	  idct32(subbuffer[chan], audio_buffer[chan] + audio_buffer_pos[chan]);
 	  resynthesis(audio_buffer[chan] + audio_buffer_pos[chan] + 16, resynthesis_buffer);
 	  scale_and_clamp(resynthesis_buffer, base_offset+2*chan, 2*channel_count);
