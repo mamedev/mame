@@ -735,6 +735,7 @@ $(MAMEOBJ)/ibmpc.a: \
 	$(DRIVERS)/pcxt.o \
 	$(DRIVERS)/quakeat.o \
 	$(DRIVERS)/queen.o \
+	$(DRIVERS)/igspc.o \
 
 $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/cabaret.o \
