@@ -231,7 +231,7 @@ SOUNDS += ASC
 SOUNDS += MAS3507D
 SOUNDS += LMC1992
 SOUNDS += AWACS
-
+SOUNDS += YMZ770
 
 #-------------------------------------------------
 # this is the list of driver libraries that
