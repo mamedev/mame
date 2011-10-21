@@ -787,32 +787,52 @@
 #include "royalcrd.lh"
 #include "includes/funworld.h"
 
+
 /**********************
 * Read/Write Handlers *
 **********************/
 
 static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
 {
+/*  - bits -
+    7654 3210
+    ---- ---x   Credit In counter.
+    ---- --x-   HOLD1 & HOLD3 lamps (inverted).
+    ---- -x--   Credit Out counter.
+    ---- x---   HOLD2 lamp (inverted).
+    ---x ----   Unknown (inverted).
+    --x- ----   CANCEL / COLLECT (inverted).
+    -x-- ----   Hopper Motor (inverted).
+    x--- ----   HOLD4 lamp.
+*/
+	output_set_lamp_value(0, 1-((data >> 1) & 1));	/* Hold1 (inverted) */
+	output_set_lamp_value(2, 1-((data >> 1) & 1));	/* Hold3 (inverted, see pinouts) */
 
-	output_set_lamp_value(0, 1-((data >> 1) & 1));	/* button hold1 and */
-	output_set_lamp_value(2, 1-((data >> 1) & 1));	/* hold3 (see pinouts) */
+	output_set_lamp_value(1, 1-((data >> 3) & 1));	/* Hold2 / Low (inverted) */
+	output_set_lamp_value(3, (data >> 7) & 1);		/* Hold4 / High */
+	output_set_lamp_value(5, 1-((data >> 5) & 1));	/* Cancel / Collect (inverted) */
 
-	output_set_lamp_value(1, 1-((data >> 3) & 1));	/* button hold2/low */
-	output_set_lamp_value(3, (data >> 7) & 1);		/* button hold4/high */
-	output_set_lamp_value(5, 1-((data >> 5) & 1));	/* button 6 (collect/cancel) */
+	coin_counter_w(device->machine(), 0, data & 0x01);	/* Credit In counter */
+	coin_counter_w(device->machine(), 7, data & 0x04);	/* Credit Out counter, mapped as coin 8 */
 
-	coin_counter_w(device->machine(), 0, data & 0x01);	/* credit in counter */
-	coin_counter_w(device->machine(), 7, data & 0x04);	/* credit out counter, mapped as coin 8 */
+	output_set_lamp_value(7, 1-((data >> 6) & 1));		/* Hopper Motor (inverted) */
 
-//  popmessage("Lamps A: %02X", data);
+//	popmessage("Lamps A: %02X", (data ^ 0xff));
 }
 
 static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
 {
-	output_set_lamp_value(4, (data >> 0) & 1);		/* button hold5/bet */
-	output_set_lamp_value(6, (data >> 1) & 1);		/* button 7 (start/play) */
+/*  - bits -
+    7654 3210
+    ---- ---x   HOLD5 lamp.
+    ---- --x-   DEAL/DRAW lamp.
+    ---- -x--   Unknown (inverted).
+    xxxx x---   Unknown.
+*/
+	output_set_lamp_value(4, (data >> 0) & 1);		/* Hold5 / Bet */
+	output_set_lamp_value(6, (data >> 1) & 1);		/* Start / Deal / Draw */
 
-//  popmessage("Lamps B: %02X", data);
+//	popmessage("Lamps B: %02X", data);
 }
 
 static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
@@ -2139,13 +2159,10 @@ static INPUT_PORTS_START( novoplay )
 	PORT_DIPNAME( 0x20, 0x20, "Game Type" )			PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, "Multi Card (without Jokers)" )
 	PORT_DIPSETTING(    0x00, "Club Card (with Jokers)" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x40, 0x40, "Allow Autohold" )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
@@ -2198,6 +2215,34 @@ static const pia6821_interface pia0_intf =
          |05 PA3    /RS0 36|- 10 ROM(PRG)            |05 PA3    /RS0 36|- 10 ROM(PRG)
          |06 PA4    /RS1 35|- 09 ROM(PRG)            |06 PA4    /RS1 35|- 23 AY(SOUND)
          |07 PA5  /RESET 34|- 09 GAL/PAL             |07 PA5  /RESET 34|- 37 AY(SOUND)
+         |08 PA6      D0 33|                         |08 PA6      D0 33|
+         |09 PA7      D1 32|                         |09 PA7      D1 32|
+         |10 PB0      D2 31|                         |10 PB0      D2 31|
+         |11 PB1      D3 30|                         |11 PB1      D3 30|
+         |12 PB2      D4 29|                         |12 PB2      D4 29|
+         |13 PB3      D5 28|                         |13 PB3      D5 28|
+         |14 PB4      D6 27|                         |14 PB4      D6 27|
+         |15 PB5      D7 26|                         |15 PB5      D7 26|
+         |16 PB6       E 25|                         |16 PB6       E 25|
+         |17 PB7     CS1 24|                         |17 PB7     CS1 24|
+    GND -|18 CB1    /CS2 23|                    N/C -|18 CB1    /CS2 23|
+    GND -|19 CB2     CS0 22|                    N/C -|19 CB2     CS0 22|
+         |20 VCC     R/W 21|                         |20 VCC     R/W 21|
+         '-----------------'                         '-----------------'
+
+
+    Novo Play Multi Card
+    --------------------
+
+                PIA 0                                       PIA 1
+         .--------u--------.                         .--------u--------.
+         |01 VSS     CA1 40|- GND                    |01 VSS     CA1 40|- GND
+         |02 PA0     CA2 39|- GND                    |02 PA0     CA2 39|- N/C
+         |03 PA1   /IRQA 38|- 65C02 (-IRQ)           |03 PA1   /IRQA 38|- 65C02 (-IRQ)
+         |04 PA2   /IRQB 37|- N/C                    |04 PA2   /IRQB 37|- N/C
+         |05 PA3    /RS0 36|- A0                     |05 PA3    /RS0 36|- A0
+         |06 PA4    /RS1 35|- A1                     |06 PA4    /RS1 35|- A1
+         |07 PA5  /RESET 34|- 65C02 (-RST)           |07 PA5  /RESET 34|- 65C02 (-RST)
          |08 PA6      D0 33|                         |08 PA6      D0 33|
          |09 PA7      D1 32|                         |09 PA7      D1 32|
          |10 PB0      D2 31|                         |10 PB0      D2 31|
