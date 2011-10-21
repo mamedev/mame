@@ -665,7 +665,7 @@ void amm::handle_block(int &pos)
 
 	int base_offset = rsize;
 	for(int chan=0; chan<channel_count; chan++) {
-	  double resynthesis_buffer[33];    // MinGW (falsely?) claims out-of-range if not 32; 4.6.x on Linux and 4.2.x on OS X don't
+	  double resynthesis_buffer[33];    // loop in resynthesis() can access [32]
 	  idct32(subbuffer[chan], audio_buffer[chan] + audio_buffer_pos[chan]);
 	  resynthesis(audio_buffer[chan] + audio_buffer_pos[chan] + 16, resynthesis_buffer);
 	  scale_and_clamp(resynthesis_buffer, base_offset+2*chan, 2*channel_count);
@@ -785,7 +785,16 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					switch (reg)
 					{
 						case 0x0f:
-							channels[ch].is_seq_playing = false;
+							if (channels[ch].sqncontrol & 1)
+							{
+								UINT8 sqn = channels[ch].sequence;
+								UINT32 pptr = rom_base[(4*sqn)+1+0x400]<<16 | rom_base[(4*sqn)+2+0x400]<<8 | rom_base[(4*sqn)+3+0x400];
+								channels[ch].seqdata = &rom_base[pptr];
+							} 
+							else
+							{
+								channels[ch].is_seq_playing = false;
+							}
 							break;
 						case 0x0e:
 							channels[ch].seqdelay = 32 - 1;
@@ -808,9 +817,21 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				{
 					if (channels[ch].last_block)
 					{
-						channels[ch].is_playing = false;
+						if (channels[ch].control & 1)
+						{
+								UINT8 phrase = channels[ch].phrase;
+								UINT32 pptr = rom_base[(4*phrase)+1]<<16 | rom_base[(4*phrase)+2]<<8 | rom_base[(4*phrase)+3];
+
+								channels[ch].decoder->set_pointers(&rom_base[pptr], (UINT8 *)&channels[ch].output_data[0]);
+								channels[ch].decoder->init();
+						} 
+						else
+						{
+								channels[ch].is_playing = false;
+						}
 					}
-					else
+
+					if (channels[ch].is_playing)
 					{
 						channels[ch].last_block = channels[ch].decoder->run();
 						channels[ch].output_remaining = (channels[ch].decoder->get_rsize()/2)-1;
@@ -882,7 +903,7 @@ WRITE8_MEMBER( ymz770_device::write )
 
 					channels[voice].is_playing = true;
 				}
-				else if (!(data & 6) && (channels[voice].is_playing))
+				else
 				{
 					channels[voice].is_playing = false;
 				}
@@ -906,8 +927,8 @@ WRITE8_MEMBER( ymz770_device::write )
 					UINT8 sqn = channels[voice].sequence;
 					UINT32 pptr = rom_base[(4*sqn)+1+0x400]<<16 | rom_base[(4*sqn)+2+0x400]<<8 | rom_base[(4*sqn)+3+0x400];
 					channels[voice].seqdata = &rom_base[pptr];
-					channels[voice].is_seq_playing = true;
 					channels[voice].seqdelay = 0;
+					channels[voice].is_seq_playing = true;
 				}
 				else
 				{
