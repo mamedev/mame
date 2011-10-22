@@ -49,11 +49,11 @@ class ymz770_device : public device_t, public device_sound_interface
         int output_remaining;
         int output_ptr;
 
-	UINT8 sequence;
-	UINT8 sqncontrol;
-	UINT8 seqdelay;
-	UINT8 *seqdata;
-	bool is_seq_playing;
+    	UINT8 sequence;
+    	UINT8 sqncontrol;
+    	UINT8 seqdelay;
+    	UINT8 *seqdata;
+    	bool is_seq_playing;
 
     } ymz_channel;
 
@@ -74,6 +74,8 @@ protected:
 	virtual void device_reset();
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+    void internal_reg_write(int offset, UINT8 data);
 
     // data
     UINT8 cur_reg;

@@ -733,6 +733,24 @@ void ymz770_device::device_start()
 	}
 
 	rom_base = device().machine().region(":ymz770")->base();
+
+	save_item(NAME(cur_reg));
+	for (int i = 0; i < 8; i++)
+	{
+		save_item(NAME(channels[i].phrase), i);
+		save_item(NAME(channels[i].pan), i);
+		save_item(NAME(channels[i].volume), i);
+		save_item(NAME(channels[i].control), i);
+		save_item(NAME(channels[i].is_playing), i);
+		save_item(NAME(channels[i].last_block), i);
+		save_item(NAME(channels[i].output_remaining), i);
+		save_item(NAME(channels[i].output_ptr), i);
+		save_item(NAME(channels[i].sequence), i);
+		save_item(NAME(channels[i].sqncontrol), i);
+		save_item(NAME(channels[i].seqdelay), i);
+		save_item(NAME(channels[i].is_seq_playing), i);
+		save_item(NAME(channels[i].output_data), i);
+	}
 }
 
 
@@ -802,9 +820,9 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 							channels[ch].seqdelay = 32 - 1;
 							break;
 						default:
-							address_space *dummy = 0;
-							write(*dummy, 0, reg);
-							write(*dummy, 1, data);
+							cur_reg = reg;
+							internal_reg_write(1, data);
+							break;
 					}
 				}
 			}
@@ -858,11 +876,7 @@ READ8_MEMBER( ymz770_device::read )
 	return 0;
 }
 
-//-------------------------------------------------
-//  write - write to the chip's registers and internal RAM
-//-------------------------------------------------
-
-WRITE8_MEMBER( ymz770_device::write )
+void ymz770_device::internal_reg_write(int offset, UINT8 data)
 {
 	if (!offset)
 	{
@@ -940,4 +954,14 @@ WRITE8_MEMBER( ymz770_device::write )
 				break;
 		}
 	}
+}
+
+//-------------------------------------------------
+//  write - write to the chip's registers and internal RAM
+//-------------------------------------------------
+
+WRITE8_MEMBER( ymz770_device::write )
+{
+	m_stream->update();
+	internal_reg_write(offset, data);
 }
