@@ -866,8 +866,10 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	info.bmiHeader.biYPelsPerMeter = GetDeviceCaps(dummyDC, VERTRES) / GetDeviceCaps(dummyDC, VERTSIZE);
 	info.bmiHeader.biClrUsed = 0;
 	info.bmiHeader.biClrImportant = 0;
-	info.bmiColors[0].rgbBlue = info.bmiColors[0].rgbGreen = info.bmiColors[0].rgbRed = 0x00;
-	info.bmiColors[1].rgbBlue = info.bmiColors[1].rgbGreen = info.bmiColors[1].rgbRed = 0xff;
+	RGBQUAD col1 = info.bmiColors[0];
+	RGBQUAD col2 = info.bmiColors[1];	
+	col1.rgbBlue = col1.rgbGreen = col1.rgbRed = 0x00;
+	col2.rgbBlue = col2.rgbGreen = col2.rgbRed = 0xff;
 
 	// create a DIB to render to
 	BYTE *bits;
