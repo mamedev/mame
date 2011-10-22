@@ -2064,6 +2064,11 @@ static DRIVER_INIT(cobra)
 
 	comram[0] = auto_alloc_array(machine, UINT32, 0x40000/4);
 	comram[1] = auto_alloc_array(machine, UINT32, 0x40000/4);
+}
+
+static DRIVER_INIT(bujutsu)
+{
+	DRIVER_INIT_CALL(cobra);
 
 	// rom hacks for main board...
 	{
@@ -2121,6 +2126,11 @@ static DRIVER_INIT(cobra)
 	}
 }
 
+static DRIVER_INIT(racjamdx)
+{
+	DRIVER_INIT_CALL(cobra);
+}
+
 /*****************************************************************************/
 
 ROM_START(bujutsu)
@@ -2137,6 +2147,22 @@ ROM_START(bujutsu)
 	DISK_IMAGE_READONLY( "645c04", 0, SHA1(c0aabe69f6eb4e4cf748d606ae50674297af6a04) )
 ROM_END
 
+ROM_START(racjamdx)
+	ROM_REGION64_BE(0x80000, "user1", 0)		/* Main CPU program (PPC603) */
+	ROM_LOAD( "676a01.33d", 0x000000, 0x080000, CRC(1e6238f1) SHA1(d55949d98e9e290ceb8c018ed60ca090ec16c9dd) ) 
+
+	ROM_REGION32_BE(0x80000, "user2", 0)		/* Sub CPU program (PPC403) */
+	ROM_LOAD( "676a02.24r", 0x000000, 0x080000, CRC(371978ed) SHA1(c83f0cf04204212db00588df91b32122f37900f8) ) 
+	
+	ROM_REGION64_BE(0x80000, "user3", 0)		/* Gfx CPU program (PPC604) */
+	ROM_LOAD( "676a03.u17", 0x000000, 0x080000, CRC(66f77cbd) SHA1(f1c7e50dbbfcc27ac011cbbb8ad2fd376c2e9056) ) 
+
+	DISK_REGION( "ide" )
+	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )
+ROM_END
+
 /*************************************************************************/
 
-GAME( 1997, bujutsu, 0, cobra, cobra, cobra, ROT0, "Konami", "Fighting Bujutsu", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, bujutsu, 0, cobra, cobra, bujutsu, ROT0, "Konami", "Fighting Bujutsu", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, racjamdx, 0, cobra, cobra, racjamdx, ROT0, "Konami", "Racing Jam DX", GAME_NOT_WORKING | GAME_NO_SOUND )
+
