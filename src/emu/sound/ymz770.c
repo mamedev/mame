@@ -49,7 +49,7 @@ private:
 	static const band_parameter_size band_parameter_sizes[5];
 	static const int init_band_counts[4];
 	static const band_info band_infos[18];
-	static const double synthesis_filter[513];
+	static const double synthesis_filter[512];
 
 	int sampling_rate, last_frame_number;
 	int param_index, forced_param_index;
@@ -348,7 +348,7 @@ const amm::band_info amm::band_infos[18] = {
   { 0xffff, 98.01, 16, 48, 0,  0, 1-1.0/65536, -1.0/65536,   1/(1-1.0/65536), 1.0/32768 },
 };
 
-const double amm::synthesis_filter[513] = {
+const double amm::synthesis_filter[512] = {
   +0.000000000, -0.000015259, -0.000015259, -0.000015259, -0.000015259, -0.000015259, -0.000015259, -0.000030518,
   -0.000030518, -0.000030518, -0.000030518, -0.000045776, -0.000045776, -0.000061035, -0.000061035, -0.000076294,
   -0.000076294, -0.000091553, -0.000106812, -0.000106812, -0.000122070, -0.000137329, -0.000152588, -0.000167847,
