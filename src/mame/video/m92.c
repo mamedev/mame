@@ -299,7 +299,7 @@ VIDEO_START( m92 )
 	state->save_item(NAME(state->m_sprite_buffer_busy));
 	state->save_item(NAME(state->m_palette_bank));
 
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u16, 0x1000);
+	state_save_register_global_pointer(machine, machine.generic.paletteram.u16, 0x1000/2);
 }
 
 VIDEO_START( ppan )
