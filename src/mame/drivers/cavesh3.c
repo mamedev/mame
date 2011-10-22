@@ -6126,6 +6126,7 @@ static NVRAM_HANDLER( cavesh3 )
 			file->read(&page, 4);
 			while (page < size)
 			{
+				state->flashwritemap[page] = 1;
 				file->read(region + page * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
 				file->read(&page, 4);
 			}
