@@ -6268,7 +6268,7 @@ ROM_START( ibara )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(f0aa3cb6) SHA1(f9d137cd879e718811b2d21a0af2a9c6b7dca2f9) )
 ROM_END
 
-ROM_START( ibarablk ) /* Title screen shows (c) 2005 despite the 2006/02/06 "master" date */
+ROM_START( ibarablk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ibarablk_u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
@@ -6281,7 +6281,7 @@ ROM_START( ibarablk ) /* Title screen shows (c) 2005 despite the 2006/02/06 "mas
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
 ROM_END
 
-ROM_START( ibarablka ) /* Title screen shows (c) 2005 despite the 2006/02/06 "master" date */
+ROM_START( ibarablka )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ibarablka_u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
@@ -6419,8 +6419,8 @@ GAME( 2004, mushisam,   0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "
 GAME( 2004, mushisama,  mushisam, cavesh3, cavesh3, mushisama, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            0 )
 GAME( 2005, espgal2,    0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              0 )
 GAME( 2005, ibara,      0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   0 )
-GAME( 2005, ibarablk,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                0 )
-GAME( 2005, ibarablka,  ibarablk, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 0 )
+GAME( 2006, ibarablk,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                0 )
+GAME( 2006, ibarablka,  ibarablk, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 0 )
 GAME( 2005, mushitam,   0,        cavesh3, cavesh3, mushisam,  ROT0,   "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            0 )
 GAME( 2006, futari15,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       0 )
 GAME( 2006, futari15a,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         0 )
