@@ -928,7 +928,7 @@ void ymz770_device::internal_reg_write(int offset, UINT8 data)
 				break;
 		}
 	}
-	else if (cur_reg >= 0x80 && cur_reg <= 0xff)
+	else if (cur_reg >= 0x80)
 	{
 		int voice = (cur_reg & 0x70)>>4;
 		int reg = cur_reg & 0x0f;
