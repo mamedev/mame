@@ -1,6 +1,6 @@
 /*
 
-Cave SH3 hardware
+Cave CV1000 hardware
 
 
 PCB CV1000-B / CV1000-D
@@ -6297,7 +6297,7 @@ ROM_START( ibara )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(f0aa3cb6) SHA1(f9d137cd879e718811b2d21a0af2a9c6b7dca2f9) )
 ROM_END
 
-ROM_START( ibarablk )
+ROM_START( ibarablk ) /* Title screen shows (c) 2005 despite the 2006 "master" date */
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ibarablk_u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
@@ -6310,7 +6310,7 @@ ROM_START( ibarablk )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
 ROM_END
 
-ROM_START( ibarablka )
+ROM_START( ibarablka ) /* Title screen shows (c) 2005 despite the 2006 "master" date */
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ibarablka_u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
