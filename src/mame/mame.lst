@@ -6750,6 +6750,7 @@ maglordh		// 0005 (c) 1990 Alpha Denshi Co.
 ridhero			// 0006 (c) 1990 SNK
 ridheroh		// 0006 (c) 1990 SNK
 alpham2			// 0007 (c) 1991 SNK
+alpham2p		// 0007 (c) 1991 SNK (prototype)
 				// 0008 Sunshine (prototype) 1990 SNK
 ncombat			// 0009 (c) 1990 Alpha Denshi Co.
 ncombath		// 0009 (c) 1990 Alpha Denshi Co.
@@ -6765,6 +6766,7 @@ sengoku			// 0017 (c) 1991 SNK
 sengokuh		// 0017 (c) 1991 SNK
 burningf		// 0018 (c) 1991 SNK
 burningfh		// 0018 (c) 1991 SNK
+burningfp		// 0018 (c) 1991 SNK (prototype)
 lbowling		// 0019 (c) 1990 SNK
 gpilots			// 0020 (c) 1991 SNK
 gpilotsh		// 0020 (c) 1991 SNK

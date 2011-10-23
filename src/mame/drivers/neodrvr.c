@@ -1212,6 +1212,36 @@ ROM_START( alpham2 ) /* MVS AND AES VERSION */
 	ROM_LOAD16_BYTE( "007-c4.c4", 0x200001, 0x080000, CRC(7d588349) SHA1(a5ed789d7bbc25be5c5b2d99883b64d379c103a2) ) /* Plane 2,3 */ /* TC534200 */
 ROM_END
 
+ROM_START( alpham2p ) /* early prototype - all roms were hand labeled with CRCs, dumps verified against them */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "proto_007-p1.bin", 0x000001, 0x080000, CRC(c763e52a) SHA1(b24acbac255c5ee1a2e92e77cdde6620a24081cf) )
+	ROM_LOAD16_BYTE( "proto_007-p2.bin", 0x000000, 0x080000, CRC(7a0b435c) SHA1(40e6f42a92001d9f4e51898dd7489da143b6b74b) )
+
+	NEO_SFIX_128K( "proto_007-s1.bin", CRC(efc9ae2e) SHA1(a594826b0082fe5a13191673e8d9aa42517230f5) )
+
+	NEO_BIOS_AUDIO_128K( "proto_007-m1.bin", CRC(5976b464) SHA1(ec824567ecc3579f6d86c9d9385710cbaeef16a3) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_LOAD( "proto_007-v11.bin", 0x000000, 0x080000, CRC(18eaa9e1) SHA1(85c94d8660f8a32e4ca8e015f0bd704208482d68) )
+	ROM_LOAD( "proto_007-v12.bin", 0x080000, 0x080000, CRC(2487d495) SHA1(49af3c4dc6a38c5158d3641fd8f9a40041b42aa6) )
+	ROM_LOAD( "proto_007-v13.bin", 0x100000, 0x080000, CRC(25e60f25) SHA1(d06b0df872372de38fcf90187195070ac5f8c651) )
+	ROM_LOAD( "proto_007-v21.bin", 0x180000, 0x080000, CRC(ac44b75a) SHA1(7399a05cd4e2c7ecde4a7323d3e189255afe5fc2) )
+
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )
+	ROM_COPY( "ymsnd", 0x180000, 0x00000, 0x80000 )
+
+	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_LOAD32_BYTE( "proto_007-c1.bin", 0x000000, 0x80000, CRC(24841639) SHA1(fcc2a349121dad86ffefc44b9f0e8ba616ce0d30) )
+	ROM_LOAD32_BYTE( "proto_007-c2.bin", 0x000002, 0x80000, CRC(912763ab) SHA1(cedf26d7d85ad140399ee62813c71f35e65498d6) )
+	ROM_LOAD32_BYTE( "proto_007-c3.bin", 0x000001, 0x80000, CRC(0743bde2) SHA1(0d13ad6333909ad3cf10f9ac360f9abf191318de) )
+	ROM_LOAD32_BYTE( "proto_007-c4.bin", 0x000003, 0x80000, CRC(61240212) SHA1(dee36f6604adaeb96e0d761a7256241c066b1cd2) )
+	ROM_LOAD32_BYTE( "proto_007-c5.bin", 0x200000, 0x80000, CRC(cf9f4c53) SHA1(f979c85f83d9f76e554c2617f85f6d4efca6799c) )
+	ROM_LOAD32_BYTE( "proto_007-c6.bin", 0x200002, 0x80000, CRC(3d903b19) SHA1(001a8c762336b855fe1df69fe2e605d30a3f00a1) )
+	ROM_LOAD32_BYTE( "proto_007-c7.bin", 0x200001, 0x80000, CRC(e41e3875) SHA1(730aceb8a66cb33d0194b096568f053ad7dc000a) )
+	ROM_LOAD32_BYTE( "proto_007-c8.bin", 0x200003, 0x80000, CRC(4483e2cf) SHA1(47c3364f5c36ae9dc3a49fe37ca60bcee0e73314) )
+ROM_END
+
+
 /****************************************
  ID-0008
  Sunshine (prototype) 1990 SNK
@@ -1539,6 +1569,36 @@ ROM_START( burningfh ) /* AES VERSION (US) */
 	ROM_LOAD16_BYTE( "018-c3.c3", 0x200000, 0x100000, CRC(862b60da) SHA1(e2303eb1609f1050f0b4f46693a15e37deb176fb) ) /* Plane 0,1 */ /* HN62408 */
 	ROM_LOAD16_BYTE( "018-c4.c4", 0x200001, 0x100000, CRC(e2e0aff7) SHA1(1c691c092a6e2787de4f433b0eb9252bfdaa7e16) ) /* Plane 2,3 */ /* HN62408 */
 ROM_END
+
+
+ROM_START( burningfp ) /* early prototype - all roms were hand labeled with CRCs, dumps verified against them */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "proto_018.p1", 0x000001, 0x080000, CRC(5b4032e7) SHA1(55df91dad6f484d3d49c28ab5972700bf71a8662) )
+	ROM_LOAD16_BYTE( "proto_018.p2", 0x000000, 0x080000, CRC(78762f68) SHA1(12170fc6efe75cb5d32624033d3d341032c97548) )
+
+	NEO_SFIX_128K( "proto_018.s1", CRC(f3d130e8) SHA1(2fdeb93f4bb2a60d391cac2822be41661b1e1795) )
+
+	NEO_BIOS_AUDIO_128K( "proto_018.m1", CRC(470dd5d4) SHA1(4291811b4aefe45261a1ae3631b6999fcd74fb3f) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_LOAD( "proto_018.v11", 0x000000, 0x080000, CRC(dc07ea3c) SHA1(c3e71aaec44ead7ddc581565d16b90030e6db5fd) )
+	ROM_LOAD( "proto_018.v12", 0x080000, 0x080000, CRC(f1ae637c) SHA1(02a4c7d4a544350a314ab7b26d8c9d3baa8f5778) )
+	ROM_LOAD( "proto_018.v21", 0x100000, 0x080000, CRC(9f3b4eda) SHA1(7f516923d04daa483b4b99c9babba66505931a34) )
+
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )
+	ROM_COPY( "ymsnd", 0x100000, 0x00000, 0x80000 )
+
+	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_LOAD32_BYTE( "proto_018.c1", 0x000000, 0x80000, CRC(6569018b) SHA1(25040e0a9c2b72900100a22a2a41de5f6c339d8a) )
+	ROM_LOAD32_BYTE( "proto_018.c2", 0x000002, 0x80000, CRC(6949b501) SHA1(d8ee48837faff6cc849046ee8757b2b94d440303) )
+	ROM_LOAD32_BYTE( "proto_018.c3", 0x000001, 0x80000, CRC(410f653b) SHA1(ce94667721baa7b2c318fc268e3bb9209671c9f5) )
+	ROM_LOAD32_BYTE( "proto_018.c4", 0x000003, 0x80000, CRC(d43bf2a5) SHA1(c27985d8973611d02570f469a0d8cb4f5b63b614) )
+	ROM_LOAD32_BYTE( "proto_018.c5", 0x200000, 0x80000, CRC(837d09d3) SHA1(d3b06931fca6123604549599544b04529ef34c53) )
+	ROM_LOAD32_BYTE( "proto_018.c6", 0x200002, 0x80000, CRC(5fee51e7) SHA1(835c632fa12a1d5b4104cd80b8f686ac80b314a1) )
+	ROM_LOAD32_BYTE( "proto_018.c7", 0x200001, 0x80000, CRC(0f3f0823) SHA1(ec1d681c1795de43d20f30f85956e2473ec39c95) )
+	ROM_LOAD32_BYTE( "proto_018.c8", 0x200003, 0x80000, CRC(67cc9e34) SHA1(dc72a464c1456a4d2f7b992b416a984fb7885e99) )
+ROM_END
+
 
 /****************************************
  ID-0019
@@ -9662,6 +9722,7 @@ GAME( 1990, mahretsu,  neogeo,   neogeo,   mjneogeo, neogeo,   ROT0, "SNK", "Mah
 GAME( 1990, ridhero,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Riding Hero (NGM-006)(NGH-006)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ridheroh,  ridhero,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Riding Hero (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1991, alpham2,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian (NGM-007)(NGH-007)", GAME_SUPPORTS_SAVE )
+GAME( 1991, alpham2p,  alpham2,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1990, cyberlip,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Cyber-Lip (NGM-010)", GAME_SUPPORTS_SAVE )
 GAME( 1990, superspy,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The Super Spy (NGM-011)(NGH-011)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mutnat,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Mutation Nation (NGM-014)(NGH-014)", GAME_SUPPORTS_SAVE )
@@ -9671,6 +9732,7 @@ GAME( 1991, sengoku,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Sen
 GAME( 1991, sengokuh,  sengoku,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Sengoku / Sengoku Denshou (NGH-017)(US)", GAME_SUPPORTS_SAVE )
 GAME( 1991, burningf,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Burning Fight (NGM-018)(NGH-018)", GAME_SUPPORTS_SAVE )
 GAME( 1991, burningfh, burningf, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Burning Fight (NGH-018)(US)", GAME_SUPPORTS_SAVE )
+GAME( 1991, burningfp, burningf, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Burning Fight (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1990, lbowling,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "League Bowling (NGM-019)(NGH-019)", GAME_SUPPORTS_SAVE )
 GAME( 1991, gpilots,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Ghost Pilots (NGM-020)(NGH-020)", GAME_SUPPORTS_SAVE )
 GAME( 1991, gpilotsh,  gpilots,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Ghost Pilots (NGH-020)(US)", GAME_SUPPORTS_SAVE )
