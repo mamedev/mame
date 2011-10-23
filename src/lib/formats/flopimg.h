@@ -238,6 +238,15 @@ public:
 	void append(floppy_image_format_t *_next);
 
 protected:
+	// Input for convert_to_edge
+	enum {
+		MG_SHIFT  = 28,
+
+		MG_0      = (4 << MG_SHIFT),
+		MG_1      = (5 << MG_SHIFT),
+		MG_W      = (6 << MG_SHIFT)
+	};
+
 	// **** Reader helpers ****
 
 	// Struct designed for easy track data description
@@ -291,14 +300,25 @@ protected:
 	// "sect" is a vector indexed by sector id
 	// "track_size" is in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm
 
-	void generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
+	void generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
 
 	// Generate a track from cell binary values, MSB-first, size in cells and not bytes
-	void generate_track_from_bitstream(UINT8 track, UINT8 head, const UINT8 *trackbuf, int track_size, floppy_image *image);
+	void generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image);
 
+	// Generate a track from cell level values (0/1/W/D/N)
+	//
+	// Splice pos is the position of the track splice.  For normal
+	// formats, use -1.  For protected formats, you're supposed to
+	// know. trackbuf may be modified at that position or after.
+	//
+	// Note that this function needs to be able to split cells in two,
+	// so no time value should be less than 2, and even values are a
+	// good idea.
 
+	void generate_track_from_levels(int track, int head, UINT32 *trackbuf, int track_size, int splice_pos, floppy_image *image);
+
+	// Normalize the times in a cell buffer to sum up to 200000000
 	void normalize_times(UINT32 *buffer, int bitlen);
-
 
 
 	// Some useful descriptions shared by multiple formats
@@ -320,7 +340,7 @@ protected:
 	static const desc_e atari_st_fcp_10_4[], atari_st_fcp_10_5[], atari_st_fcp_10_6[], atari_st_fcp_10_7[];
 	static const desc_e atari_st_fcp_10_8[], atari_st_fcp_10_9[];
 
-	static const desc_e *atari_st_fcp_get_desc(UINT8 track, UINT8 head, UINT8 head_count, UINT8 sect_count);
+	static const desc_e *atari_st_fcp_get_desc(int track, int head, int head_count, int sect_count);
 
 	// Amiga formats (100K cells)
 	//   Standard 11 sectors per track format
@@ -362,11 +382,10 @@ protected:
 	// 3.5" HD          1       300    1000
 	// 3.5" ED          0.5     300     500
 
-	void generate_bitstream_from_track(UINT8 track, UINT8 head, int cell_size,  UINT8 *trackbuf, int &track_size, floppy_image *image);
+	void generate_bitstream_from_track(int track, int head, int cell_size,  UINT8 *trackbuf, int &track_size, floppy_image *image);
 
 	struct desc_xs {
-		UINT8 track, head;
-		int size;
+		int track, head, size;
 		const UINT8 *data;
 	};
 

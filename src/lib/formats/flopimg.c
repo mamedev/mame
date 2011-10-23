@@ -1181,7 +1181,7 @@ int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, 
 	return sec;
 }
 
-void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, floppy_image *image)
+void floppy_image_format_t::generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image)
 {
 	UINT8 *buffer = global_alloc_array_clear(UINT8, (track_size+7)/8);
 
@@ -1350,7 +1350,7 @@ void floppy_image_format_t::normalize_times(UINT32 *buffer, int bitlen)
 	}
 }
 
-void floppy_image_format_t::generate_track_from_bitstream(UINT8 track, UINT8 head, const UINT8 *trackbuf, int track_size, floppy_image *image)
+void floppy_image_format_t::generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image)
 {
 	// Maximal number of cells which happens when the buffer is all 1
 	image->set_track_size(track, head, track_size+1);
@@ -1366,6 +1366,88 @@ void floppy_image_format_t::generate_track_from_bitstream(UINT8 track, UINT8 hea
 			count = 1;
 		} else
 			count += 2;
+
+	if(count)
+		*dest++ = cbit | count;
+
+	int size = dest - base;
+	normalize_times(base, size);
+	image->set_track_size(track, head, size);
+}
+
+void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT32 *trackbuf, int track_size, int splice_pos, floppy_image *image)
+{
+	// Check if we need to invert a cell to get an even number of
+	// transitions on the whole track
+	//
+	// Also check if all MG values are valid
+
+	int transition_count = 0;
+	for(int i=0; i<track_size; i++) {
+		switch(trackbuf[i] & floppy_image::MG_MASK) {
+		case MG_1:
+			transition_count++;
+			break;
+
+		case MG_W:
+			throw emu_fatalerror("Weak bits not yet handled, track %d head %d\n", track, head);
+		case MG_0:
+		case floppy_image::MG_N:
+		case floppy_image::MG_D:
+			break;
+
+		case floppy_image::MG_A:
+		case floppy_image::MG_B:
+		default:
+			throw emu_fatalerror("Incorrect MG information in generate_track_from_levels, track %d head %d\n", track, head);
+		}
+	}
+
+	if(transition_count & 1) {
+		splice_pos = splice_pos % track_size;
+		int pos = splice_pos;
+		while((trackbuf[pos] & floppy_image::MG_MASK) != MG_0 && (trackbuf[pos] & floppy_image::MG_MASK) != MG_1) {
+			pos++;
+			if(pos == track_size)
+				pos = 0;
+			if(pos == splice_pos)
+				goto meh;
+		}
+		if((trackbuf[pos] & floppy_image::MG_MASK) == MG_0)
+			trackbuf[pos] = (trackbuf[pos] & floppy_image::TIME_MASK) | MG_1;
+		else
+			trackbuf[pos] = (trackbuf[pos] & floppy_image::TIME_MASK) | MG_0;
+
+	meh:
+		;
+			
+	}
+
+	// Maximal number of cells which happens when the buffer is all MG_1/MG_N alternated, which would be 3/2
+	image->set_track_size(track, head, track_size*2);
+	UINT32 *dest = image->get_buffer(track, head);
+	UINT32 *base = dest;
+
+	UINT32 cbit = floppy_image::MG_A;
+	UINT32 count = 0;
+	for(int i=0; i<track_size; i++) {
+		UINT32 bit = trackbuf[i] & floppy_image::MG_MASK;
+		UINT32 time = trackbuf[i] & floppy_image::TIME_MASK;
+		if(bit == MG_0) {
+			count += time;
+			continue;
+		}
+		if(bit == MG_1) {
+			count += time >> 1;
+			*dest++ = cbit | count;
+			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
+			count = time - (time >> 1);
+			continue;
+		}
+		*dest++ = cbit | count;
+		*dest++ = trackbuf[i];
+		count = 0;
+	}
 
 	if(count)
 		*dest++ = cbit | count;
@@ -1667,7 +1749,7 @@ const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11[] = {
 #undef SECTOR_42_HEADER
 #undef NORMAL_SECTOR
 
-const floppy_image_format_t::desc_e *floppy_image_format_t::atari_st_fcp_get_desc(UINT8 track, UINT8 head, UINT8 head_count, UINT8 sect_count)
+const floppy_image_format_t::desc_e *floppy_image_format_t::atari_st_fcp_get_desc(int track, int head, int head_count, int sect_count)
 {
 	switch(sect_count) {
 	case 9:
@@ -1708,7 +1790,7 @@ const floppy_image_format_t::desc_e floppy_image_format_t::amiga_11[] = {
 	{ END }
 };
 
-void floppy_image_format_t::generate_bitstream_from_track(UINT8 track, UINT8 head, int cell_size, UINT8 *trackbuf, int &track_size, floppy_image *image)
+void floppy_image_format_t::generate_bitstream_from_track(int track, int head, int cell_size, UINT8 *trackbuf, int &track_size, floppy_image *image)
 {
 	int tsize = image->get_track_size(track, head);
 	if(!tsize || tsize == 1) {
