@@ -3475,6 +3475,7 @@ src/mame/includes/scramble.h svneol=native#text/plain
 src/mame/includes/sderby.h svneol=native#text/plain
 src/mame/includes/segag80r.h svneol=native#text/plain
 src/mame/includes/segag80v.h svneol=native#text/plain
+src/mame/includes/segaipt.h svneol=native#text/plain
 src/mame/includes/segamsys.h svneol=native#text/plain
 src/mame/includes/segas16.h svneol=native#text/plain
 src/mame/includes/segas24.h svneol=native#text/plain
