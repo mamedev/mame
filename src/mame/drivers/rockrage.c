@@ -54,6 +54,7 @@ Notes:
 #include "sound/vlm5030.h"
 #include "video/konicdev.h"
 #include "includes/rockrage.h"
+#include "includes/konamipt.h"
 
 
 static INTERRUPT_GEN( rockrage_interrupt )
@@ -132,40 +133,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rockrage )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, "Invalid" )
+	KONAMI_COINAGE(DEF_STR( Free_Play ), "Invalid" )
 	/* Invalid = both coin slots disabled */
 
 	PORT_START("DSW2")
@@ -348,7 +316,7 @@ ROM_START( rockrage )
 	ROM_LOAD( "620q01.16c", 0x08000, 0x08000, CRC(0ddb5ef5) SHA1(71b38c9f957858371f0ac95720d3c6d07339e5c5) )	/* fixed ROM */
 	ROM_LOAD( "620q02.15c", 0x10000, 0x10000, CRC(b4f6e346) SHA1(43fded4484836ff315dd6e40991f909dad73f1ed) )	/* banked ROM */
 
-	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION(  0x10000,  "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
@@ -373,7 +341,7 @@ ROM_START( rockragea )
 	ROM_LOAD( "620n01.16c", 0x08000, 0x10000, CRC(f89f56ea) SHA1(64ba2575e09af257b242d913eab69130f7341894) )	/* fixed ROM */
 	ROM_LOAD( "620n02.15c", 0x10000, 0x10000, CRC(5bc1f1cf) SHA1(d5bb9971d778449e0c01495f9888c0da7ac617a7) )	/* banked ROM */
 
-	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION(  0x10000,  "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) ) /* Same rom but labeled as ver "G" */
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
@@ -402,7 +370,7 @@ ROM_START( rockragej )
 	ROM_LOAD( "620k01.16c", 0x08000, 0x08000, CRC(4f5171f7) SHA1(5bce9e3f9d01c113c697853763cd891b91297eb2) )	/* fixed ROM */
 	ROM_LOAD( "620k02.15c", 0x10000, 0x10000, CRC(04c4d8f7) SHA1(2a1a024fc38bb934c454092b0aed74d0f1d1c4af) )	/* banked ROM */
 
-	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION(  0x10000,  "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
@@ -428,6 +396,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (World)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rockragea,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (prototype?)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rockragej,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", GAME_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1986, rockrage,  0,        rockrage, rockrage, 0,   ROT0,   "Konami", "Rock'n Rage (World)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rockragea, rockrage, rockrage, rockrage, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rockragej, rockrage, rockrage, rockrage, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", GAME_SUPPORTS_SAVE )

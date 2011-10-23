@@ -161,6 +161,8 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_JOYSTICK_DEADZONE ";joy_deadzone;jdz",      "0.3",       OPTION_FLOAT,      "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ OPTION_JOYSTICK_SATURATION ";joy_saturation;jsat", "0.85",      OPTION_FLOAT,      "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ OPTION_NATURAL_KEYBOARD ";nat",                    "0",         OPTION_BOOLEAN,    "specifies whether to use a natural keyboard or not" },
+	{ OPTION_JOYSTICK_CONTRADICTORY,                     "0",         OPTION_BOOLEAN,    "enable contradictory direction digital joystick input at the same time" },
+	{ OPTION_COIN_IMPULSE,                               "0",         OPTION_INTEGER,    "set coin impulse time (n<0 disable impulse, n==0 obey driver, 0<n set time n)" },
 
 	// input autoenable options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE INPUT AUTOMATIC ENABLE OPTIONS" },

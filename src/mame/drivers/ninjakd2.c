@@ -8,7 +8,8 @@ The peculiar feature of this hardware is the ability to disable clearing of the
 sprite framebuffer, therefore overdrawing new sprites on top of the ones drawn
 in the previous frames.
 When sprite overdrawing is enabled, not all sprites leave trails: only the ones
-using color codes C, D, and E.
+using specific color codes. and the other ones clear the sprite framebuffer like
+an eraser. (See notes)
 
 
 Game              Board
@@ -94,6 +95,16 @@ Notes:
   Atomic Robo-Kid definitely doesn't have the DAC and counters. The other boards
   have not been verified.
 
+- The "credit service" in Ninja Kid II gives "extra credit(s)".
+  5C_1C -> 5C_1C 10C_2C 15C_4C# 20C_5C 25C_6C 30C_8C# 35C_9C 40C_10C 45C_12C#
+  4C_1C -> 4C_1C  8C_2C 12C_4C# 16C_5C 20C_6C 24C_8C# 28C_9C 32C_10C 36C_12C#
+  3C_1C -> 3C_1C  6C_2C  9C_4C# 12C_5C 15C_6C 18C_8C# 21C_9C 24C_10C 27C_12C#
+  2C_1C -> 2C_1C  4C_2C  6C_4C#  8C_5C 10C_6C 12C_8C# 14C_9C 16C_10C 18C_12C#
+  1C_1C -> 1C_1C  2C_2C  3C_4C#  4C_5C  5C_6C  6C_8C#  7C_9C  8C_10C  9C_12C#
+  1C_2C -> 1C_2C  2C_6C# 3C_10C# 4C_12C
+  1C_3C -> 1C_3C  2C_6C  3C_12C#
+  1C_4C -> 1C_4C  2C_8C  3C_12C                   '#' = added extra credit(s)
+
 - Ark Area has no explicit copyright year on the title screen, however it was
   reportedly released in December 1987.
   Text in the ROM says:
@@ -111,7 +122,7 @@ Notes:
   Codes are given on the continue screen after Act 5.
 
 - Omega Fighter has some unknown protection device interfacing with the player
-  and dip switche inputs. There isn't enough evidence to determine what the
+  and dip switch inputs. There isn't enough evidence to determine what the
   device does, so it is roughly simulated just enough to get the game running.
   Most of the time the device just passes over the inputs. It is interrogated
   for protection check only on startup.
@@ -121,9 +132,18 @@ Notes:
   three bits of the returned value ar ORed with register B, and some code is
   executed if the result is not 0. Nothing obvious happens either way.
 
+- Overdrawing color codes
+            OVERDRAW     STENCIL     UNKNOWN
+  NINJAKD2  023459ABCDE  F           1678
+    MNIGHT  0134568ABCDE F           279
+   ARKAREA  012345679BDE             8ACF
+   ROBOKID  EF           01236       45789ABCD
+    OMEGAF  -            -           -         (unused)
+
+
 TODO:
 -----
-- What does the "credit service" dip switch do in Ninja Kid II?
+- Find out how to sort color codes enabled overdrawing.
 
 
 ******************************************************************************/
@@ -594,23 +614,35 @@ static INPUT_PORTS_START( ninjakd2 )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x00, "Credit Service" ) PORT_DIPLOCATION("SW2:6")  // manual says "Credit_Mode Off=Service On=Normal", What does it mean?
+	PORT_DIPNAME( 0x04, 0x04, "Credit Service" ) PORT_DIPLOCATION("SW2:6")  // extra credit(s)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:5,4")
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, "2 Coins/1 Credit, 6/4" )       PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x18, "1 Coin/1 Credit, 3/4" )        PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "1 Coin/2 Credits, 2/6, 3/10" ) PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "1 Coin/3 Credits, 3/12" )      PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:3,2,1")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, "5 Coins/1 Credit, 15/4" )      PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, "4 Coins/1 Credit, 12/4" )      PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, "3 Coins/1 Credit, 9/4" )       PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x60, "2 Coins/1 Credit, 6/4" )       PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0xe0, "1 Coin/1 Credit, 3/4" )        PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, "1 Coin/2 Credits, 2/6, 3/10" ) PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0xa0, "1 Coin/3 Credits, 3/12" )      PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rdaction )
@@ -1463,14 +1495,15 @@ static DRIVER_INIT(mnight)
  *
  *************************************/
 
-GAME( 1987, ninjakd2, 0,        ninjakd2, ninjakd2, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", 0 )
-GAME( 1987, ninjakd2a,ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", 0 )
-GAME( 1987, ninjakd2b,ninjakd2, ninjakd2, rdaction, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", 0 )
-GAME( 1987, rdaction, ninjakd2, ninjakd2, rdaction, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
-GAME( 1987, mnight,   0,        mnight,   mnight,   mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", 0 )
-GAME( 1988, arkarea,  0,        arkarea,  arkarea,  mnight,   ROT0,   "UPL", "Ark Area", 0 )
-GAME( 1988, robokid,  0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
-GAME( 1988, robokidj, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
-GAME( 1988, robokidj2,robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
-GAME( 1989, omegaf,   0,        omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter", 0 )
-GAME( 1989, omegafs,  omegaf,   omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter Special", 0 )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1987, ninjakd2,  0,        ninjakd2, ninjakd2, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", 0 )
+GAME( 1987, ninjakd2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", 0 )
+GAME( 1987, ninjakd2b, ninjakd2, ninjakd2, rdaction, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", 0 )
+GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
+GAME( 1987, mnight,    0,        mnight,   mnight,   mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", 0 )
+GAME( 1988, arkarea,   0,        arkarea,  arkarea,  mnight,   ROT0,   "UPL", "Ark Area", 0 )
+GAME( 1988, robokid,   0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
+GAME( 1988, robokidj,  robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
+GAME( 1988, robokidj2, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
+GAME( 1989, omegaf,    0,        omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter", 0 )
+GAME( 1989, omegafs,   omegaf,   omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter Special", 0 )

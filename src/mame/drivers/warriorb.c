@@ -286,9 +286,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( darius2d )
 	/* 0x800000 -> 0x109e16 ($1e16,A5) and 0x109e1a ($1e1a,A5) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")    /* code at 0x0170f2 ('darius2d') or 0x01705c ('drius2do') */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Difficulty Enhancement" ) PORT_DIPLOCATION("SW1:1")    /* code at 0x0170f2 ('darius2d') or 0x01705c ('drius2do') */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) ) // Easy  Medium  Hard  Hardest  // Japan factory default = "Off"
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Easy- Medium+ Hard+ Hardest+ // "Easy-" is easier than "Easy". "Medium+","Hard+" and "hardest+" are harder than "Medium","Hard" and "hardest".
 	PORT_DIPNAME( 0x02, 0x02, "Auto Fire" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
@@ -341,6 +341,11 @@ static INPUT_PORTS_START( sagaia )
 	PORT_INCLUDE(darius2d)
 
 	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, "Difficulty Enhancement" ) PORT_DIPLOCATION("SW1:1")    /* code at 0x0170f2 ('darius2d') or 0x01705c ('drius2do') */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) ) // Easy  Medium  Hard  Hardest
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Easy- Medium+ Hard+ Hardest+
+	// MAME 0.143u7 SW1:1="Unknown / Off / On" default="On"
+	// I don't have World manual. Is it written "Unused : Must be kept On" ?
 	TAITO_COINAGE_WORLD_LOC(SW1)
 INPUT_PORTS_END
 
@@ -892,7 +897,8 @@ ROM_END
 
 /* Working Games */
 
-GAME( 1989, sagaia,    darius2,  darius2d, sagaia,   0, ROT0, "Taito Corporation Japan", "Sagaia (dual screen) (World)", 0 )
-GAME( 1989, darius2d,  darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan, Rev 2)", 0 )
-GAME( 1989, darius2do, darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan, Rev 1)", 0 )
-GAME( 1991, warriorb,  0,        warriorb, warriorb, 0, ROT0, "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", 0 )
+//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1989, sagaia,    darius2, darius2d, sagaia,   0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", 0 )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 2)", 0 )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 1)", 0 )
+GAME( 1991, warriorb,  0,       warriorb, warriorb, 0,   ROT0,   "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", 0 )

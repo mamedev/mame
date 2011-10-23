@@ -214,7 +214,7 @@ Sticker: 834-7112
 |             315-5337                  |
 |                                       |
 |            16MHz      6264            |
-|                     epr-12587.14       |
+|                    epr-12587.14       |
 | MB89372P-SH     Z80E        MB8421    |
 |---------------------------------------|
 Notes:
@@ -223,7 +223,7 @@ Notes:
       6264     : 8k x8 SRAM
       MB8421   : Fujitsu 2k x8 Dual-Port SRAM (SDIP52)
       MB89372  : ?, Manufactured by Fujitsu, SDIP64
-      epr-12587 : 27C256 EPROM
+      epr-12587: 27C256 EPROM
 
 
 ***************************************************************************/
@@ -237,6 +237,7 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 #include "video/segaic16.h"
+#include "includes/segaipt.h"
 
 
 #define MASTER_CLOCK			50000000
@@ -844,64 +845,17 @@ static INPUT_PORTS_START( xboard_generic )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IO1PORTC")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2,3,4")
-	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x05, "6 Coins/4 Credits" )
-	PORT_DIPSETTING(    0x04, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x03, "5 Coins/6 Credits" )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:5,6,7,8")
-	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x50, "6 Coins/4 Credits" )
-	PORT_DIPSETTING(    0x40, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, "5 Coins/6 Credits" )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_5C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
+	SEGA_COINAGE_LOC(SWA)
 
 	PORT_START("IO1PORTD")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWB:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWB:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SWB:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SWB:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
 INPUT_PORTS_END
 
 
@@ -924,13 +878,14 @@ static INPUT_PORTS_START( aburner )
 	PORT_DIPSETTING(    0x03, "Moving Deluxe" )
 	PORT_DIPSETTING(    0x02, "Moving Standard" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// According to the manual, SWB:4 sets 3 or 4 lives, but it doesn't actually do that.
 	// However, it does on Afterburner II.  Maybe there's another version of Afterburner
 	// that behaves as the manual suggests.
+	// In the Japanese manual "DIP SW B:4 / NOT USED"
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "3x Credits" )
@@ -1188,7 +1143,7 @@ static INPUT_PORTS_START( smgp )
 	PORT_DIPSETTING(    0xc0, "Deluxe" )
 	PORT_DIPSETTING(    0x80, "Cockpit" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
-//  PORT_DIPSETTING(    0x00, "Deluxe" )
+//	PORT_DIPSETTING(    0x00, "Deluxe" )
 
 	PORT_START("ADC0")	/* steering */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
@@ -1247,11 +1202,11 @@ static INPUT_PORTS_START( gprider )
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x03, "Ride On" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
-//  PORT_DIPSETTING(    0x01, DEF_STR( Unused ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(    0x01, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
 	PORT_DIPNAME( 0x08, 0x08, "ID No." ) PORT_DIPLOCATION("SWB:4")
-	PORT_DIPSETTING(    0x08, "Main" )
-	PORT_DIPSETTING(    0x00, "Slave" )
+	PORT_DIPSETTING(    0x08, "Main" ) // Player 1 (Blue)
+	PORT_DIPSETTING(    0x00, "Slave" ) // Player 2 (Red)
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -2844,22 +2799,23 @@ static DRIVER_INIT( gprider )
  *
  *************************************/
 
-GAME( 1987, aburner2, 0,        xboard,  aburner2, aburner2,       ROT0, "Sega", "After Burner II", 0 )
-GAME( 1987, aburner,  aburner2, xboard,  aburner,  aburner,        ROT0, "Sega", "After Burner (Japan)", 0 )
-GAME( 1987, thndrbld, 0,        xboard,  thndrbld, generic_xboard, ROT0, "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
-GAME( 1987, thndrbld1,thndrbld, xboard,  thndrbd1, generic_xboard, ROT0, "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
-GAME( 1989, loffire,  0,        xboard,  loffire,  loffire,        ROT0, "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )
-GAME( 1989, loffireu, loffire,  xboard,  loffire,  loffire,        ROT0, "Sega", "Line of Fire / Bakudan Yarou (US, FD1094 317-0135)", 0 )
-GAME( 1989, loffirej, loffire,  xboard,  loffire,  loffire,        ROT0, "Sega", "Line of Fire / Bakudan Yarou (Japan, FD1094 317-0134)", 0 )
-GAME( 1989, rachero,  0,        xboard,  rachero,  generic_xboard, ROT0, "Sega", "Racing Hero (FD1094 317-0144)", 0 )
-GAME( 1989, smgp,     0,        smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (World, Rev B, 'Twin', FD1094 317-0126a)", 0 )
-GAME( 1989, smgp6,    smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (World, Rev A, FD1094 317-0126a)", 0 )
-GAME( 1989, smgp5,    smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (World, 'Air Drive Cabinet', FD1094 317-0126)", 0 )
-GAME( 1989, smgpu,    smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (US, Rev C, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpu1,   smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (US, Rev B, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpu2,   smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (US, Rev A, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpj,    smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (Japan, Rev B, FD1094 317-0124a)", 0 )
-GAME( 1989, smgpja,   smgp,     smgp,    smgp,     smgp,           ROT0, "Sega", "Super Monaco GP (Japan, Rev A, FD1094 317-0124a)", 0 )
-GAME( 1990, abcop,    0,        xboard,  abcop,    generic_xboard, ROT0, "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
-GAME( 1990, gprider,  0,        xboard,  gprider,  gprider,        ROT0, "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
-GAME( 1990, gprider1, gprider,  xboard,  gprider,  gprider,        ROT0, "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
+//    YEAR, NAME,     PARENT,   MACHINE, INPUT,    INIT,           MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1987, aburner2, 0,        xboard,  aburner2, aburner2,       ROT0,   "Sega", "After Burner II", 0 )
+GAME( 1987, aburner,  aburner2, xboard,  aburner,  aburner,        ROT0,   "Sega", "After Burner (Japan)", 0 )
+GAME( 1987, thndrbld, 0,        xboard,  thndrbld, generic_xboard, ROT0,   "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
+GAME( 1987, thndrbld1,thndrbld, xboard,  thndrbd1, generic_xboard, ROT0,   "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
+GAME( 1989, loffire,  0,        xboard,  loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )
+GAME( 1989, loffireu, loffire,  xboard,  loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US, FD1094 317-0135)", 0 )
+GAME( 1989, loffirej, loffire,  xboard,  loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (Japan, FD1094 317-0134)", 0 )
+GAME( 1989, rachero,  0,        xboard,  rachero,  generic_xboard, ROT0,   "Sega", "Racing Hero (FD1094 317-0144)", 0 )
+GAME( 1989, smgp,     0,        smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev B, 'Twin', FD1094 317-0126a)", 0 )
+GAME( 1989, smgp6,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev A, FD1094 317-0126a)", 0 )
+GAME( 1989, smgp5,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, 'Air Drive Cabinet', FD1094 317-0126)", 0 )
+GAME( 1989, smgpu,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev C, FD1094 317-0125a)", 0 )
+GAME( 1989, smgpu1,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev B, FD1094 317-0125a)", 0 )
+GAME( 1989, smgpu2,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev A, FD1094 317-0125a)", 0 )
+GAME( 1989, smgpj,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (Japan, Rev B, FD1094 317-0124a)", 0 )
+GAME( 1989, smgpja,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (Japan, Rev A, FD1094 317-0124a)", 0 )
+GAME( 1990, abcop,    0,        xboard,  abcop,    generic_xboard, ROT0,   "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
+GAME( 1990, gprider,  0,        xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
+GAME( 1990, gprider1, gprider,  xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )

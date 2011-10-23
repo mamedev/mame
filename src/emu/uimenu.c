@@ -2242,7 +2242,8 @@ static void menu_settings_populate(running_machine &machine, ui_menu *menu, sett
 							dip->mask = dip->state = 0;
 							*diplist_tailptr = dip;
 							diplist_tailptr = &dip->next;
-							dipcount++;
+							if (mame_stricmp(dip->name, "INVISIBLE") != 0)
+								dipcount++;
 						}
 
 						/* apply the bits */
@@ -2284,18 +2285,21 @@ static void menu_settings_custom_render(running_machine &machine, ui_menu *menu,
 	/* iterate over DIP switches */
 	for (dip = menustate->diplist; dip != NULL; dip = dip->next)
 	{
-		const input_field_diplocation *diploc;
-		UINT32 selectedmask = 0;
+		if (mame_stricmp(dip->name, "INVISIBLE") != 0)
+		{
+			const input_field_diplocation *diploc;
+			UINT32 selectedmask = 0;
 
-		/* determine the mask of selected bits */
-		if (field != NULL)
-			for (diploc = field->diploclist().first(); diploc != NULL; diploc = diploc->next())
-				if (strcmp(dip->name, diploc->swname) == 0)
-					selectedmask |= 1 << (diploc->swnum - 1);
+			/* determine the mask of selected bits */
+			if (field != NULL)
+				for (diploc = field->diploclist().first(); diploc != NULL; diploc = diploc->next())
+					if (strcmp(dip->name, diploc->swname) == 0)
+						selectedmask |= 1 << (diploc->swnum - 1);
 
-		/* draw one switch */
-		menu_settings_custom_render_one(menu->container, x1, y1, x2, y1 + DIP_SWITCH_HEIGHT, dip, selectedmask);
-		y1 += (float)(DIP_SWITCH_SPACING + DIP_SWITCH_HEIGHT);
+			/* draw one switch */
+			menu_settings_custom_render_one(menu->container, x1, y1, x2, y1 + DIP_SWITCH_HEIGHT, dip, selectedmask);
+			y1 += (float)(DIP_SWITCH_SPACING + DIP_SWITCH_HEIGHT);
+		}
 	}
 }
 
@@ -2467,14 +2471,14 @@ static void menu_analog_populate(running_machine &machine, ui_menu *menu)
 						if (field->flags & ANALOG_FLAG_WRAPS)
 							break;
 
-					case IPT_PEDAL:
-					case IPT_PEDAL2:
-					case IPT_PEDAL3:
-					case IPT_PADDLE:
-					case IPT_PADDLE_V:
 					case IPT_AD_STICK_X:
 					case IPT_AD_STICK_Y:
 					case IPT_AD_STICK_Z:
+					case IPT_PADDLE:
+					case IPT_PADDLE_V:
+					case IPT_PEDAL:
+					case IPT_PEDAL2:
+					case IPT_PEDAL3:
 						use_autocenter = TRUE;
 						break;
 				}

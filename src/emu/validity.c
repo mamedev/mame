@@ -873,7 +873,7 @@ static void validate_dip_settings(input_field_config *field, const game_driver &
 {
 	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
 	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
-	UINT8 coin_list[INPUT_STRING_1C_9C + 1 - INPUT_STRING_9C_1C] = { 0 };
+	UINT8 coin_list[__input_string_coinage_end + 1 - __input_string_coinage_start] = { 0 };
 	const input_setting_config *setting;
 	int coin_error = FALSE;
 
@@ -883,8 +883,8 @@ static void validate_dip_settings(input_field_config *field, const game_driver &
 		int strindex = get_defstr_index(defstr_map, setting->name, driver, error);
 
 		/* note any coinage strings */
-		if (strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C)
-			coin_list[strindex - INPUT_STRING_9C_1C] = 1;
+		if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end)
+			coin_list[strindex - __input_string_coinage_start] = 1;
 
 		/* make sure demo sounds default to on */
 		if (field->name == demo_sounds && strindex == INPUT_STRING_On && field->defvalue != setting->value)
@@ -934,7 +934,7 @@ static void validate_dip_settings(input_field_config *field, const game_driver &
 			}
 
 			/* check for proper coin ordering */
-			else if (strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C && next_strindex >= INPUT_STRING_9C_1C && next_strindex <= INPUT_STRING_1C_9C &&
+			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
 					 strindex >= next_strindex && memcmp(&setting->condition, &setting->next()->condition, sizeof(setting->condition)) == 0)
 			{
 				mame_printf_error("%s: %s has unsorted coinage %s > %s\n", driver.source_file, driver.name, setting->name, setting->next()->name);
@@ -951,7 +951,7 @@ static void validate_dip_settings(input_field_config *field, const game_driver &
 		mame_printf_error("%s: %s proper coin sort order should be:\n", driver.source_file, driver.name);
 		for (entry = 0; entry < ARRAY_LENGTH(coin_list); entry++)
 			if (coin_list[entry])
-				mame_printf_error("%s\n", input_port_string_from_index(INPUT_STRING_9C_1C + entry));
+				mame_printf_error("%s\n", input_port_string_from_index(__input_string_coinage_start + entry));
 	}
 }
 

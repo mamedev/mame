@@ -54,23 +54,25 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 
   - There is no real "test mode" : only a grid with colors ("Cross Hatch Pattern")
     is displayed. There is a specific "Show Dip Switches Settings".
+  - Test switch on JAMMA connector works to enter "Cross Hatch Pattern".
+  - "Service 1" uses COIN A coinage
 
 1a) 'twincobr'
 
   - No notice screen.
-  - Game uses TOAPLAN_COINAGE_WORLD (code at 0x0bfd in CPU1).
+  - Game uses TOAPLAN_COINAGE_EUROPE (code at 0x0bfd in CPU1).
   - Press any players buttons on startup to skip some tests (code at 0x025ed8).
 
 1b) 'twincobru'
 
   - "FOR USE IN U.S.A. ONLY" notice screen.
-  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1).
+  - Game uses TOAPLAN_COINAGE_JAPAN (code at 0x0bfd in CPU1).
   - Press any players buttons on startup to skip some tests (code at 0x025ed6).
 
 1c) 'ktiger'
 
   - "FOR USE IN JAPAN ONLY" notice screen.
-  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1 - same as in 'twincobru').
+  - Game uses TOAPLAN_COINAGE_JAPAN (code at 0x0bfd in CPU1 - same as in 'twincobru').
   - Press any players buttons on startup to skip some tests (code at 0x0259d0).
   - "Bonus Lives" settings are different than the ones in the other sets.
   - See other differences with 'twincobr' and 'twincobru' above.
@@ -78,8 +80,8 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 1d) 'gulfwar2'
 
   - No notice screen.
-  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1 - same as in 'twincobru').
-    Surprisingly, when Dip Switches are displayed, it shows TOAPLAN_COINAGE_WORLD.
+  - Game uses TOAPLAN_COINAGE_JAPAN (code at 0x0bfd in CPU1 - same as in 'twincobru').
+    Surprisingly, when Dip Switches are displayed, it shows TOAPLAN_COINAGE_EUROPE.
   - Press any players buttons on startup to skip some tests (code at 0x025ed8).
   - VBLANK bit is inverted (ACTIVE_LOW instead of ACTIVE_HIGH).
 
@@ -88,11 +90,13 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 
   - There is no real "test mode" : only a grid with colors ("Cross Hatch Pattern")
     is displayed. There is a specific "Show Dip Switches Settings".
+  - Test switch on JAMMA connector doesn't work to enter "test mode", but works to reset CPU.
+  - "Service 1" uses COIN A coinage
 
 2a) 'fshark'
 
   - No notice screen.
-  - Game uses TOAPLAN_COINAGE_WORLD.
+  - Game uses TOAPLAN_COINAGE_EUROPE.
   - When cabinet set to "Upright", you can use joystick and buttons from both players
     (code at 0x002434).
 
@@ -106,7 +110,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 2c) 'hishouza'
 
   - "FOR USE IN JAPAN ONLY" notice screen.
-  - Game uses TOAPLAN_COINAGE_JAPAN_OLD.
+  - Game uses TOAPLAN_COINAGE_JAPAN.
   - When cabinet set to "Upright", you can use joystick and buttons from both players
     (code at 0x002456).
 
@@ -133,13 +137,11 @@ read:
 78005       Player 1 Joystick and Buttons input port
 78007       Player 2 Joystick and Buttons input port
 78009       bit 7 vblank, coin and control/service inputs (Flying shark)
-                Flying Shark implements Tilt as 'freeze system' and also has
-                a reset button, but its not implelemted here (not needed)
 
 7e000-7e005 read data from video RAM (see below)
 
 write:
-60000-60003 CRTC HD6845 or UM6845B. 0 = register offset , 2 = register data
+60000-60003 CRTC HD6845 or UM6845B. 0 = register offset, 2 = register data
 70000-70001 scroll   y   for character page (centre normally 0x01c9)
 70002-70003 scroll < x > for character page (centre normally 0x00e2)
 70004-70005 offset in character page to write character (7e000)
@@ -267,6 +269,16 @@ Shark   Zame
 #include "sound/3812intf.h"
 
 
+/***************************** debugging flags ******************************/
+
+#define DEBUG_FREE_ALL_DIPSW FALSE
+#define DEBUG_DONT_HIDE_DUP_DIPSETTING TRUE
+	/* Set TRUE and you may find unknown easter eggs */
+
+
+/**************************** customizing flags *****************************/
+
+	/* nothing */
 
 
 /***************************** 68000 Memory Map *****************************/
@@ -346,74 +358,140 @@ ADDRESS_MAP_END
     Input Port definitions
 *****************************************************************************/
 
-/* verified from M68000 and Z80 code */
-static INPUT_PORTS_START( twincobr )
-	PORT_START("DSWA")
-	TOAPLAN_MACHINE_NO_COCKTAIL
-	TOAPLAN_COINAGE_WORLD                                   /* tables at 0x0c30 (COIN1) and 0x0c38 (COIN2) in CPU1 */
+static INPUT_PORTS_START( fshark_generic )
+	PORT_START("DSWA") /* in 0x078001(M68000) */ /* DIP SW 1 */
+	TOAPLAN_DIP_1_SPARE(SW1)
+	TOAPLAN_DIP_2_SPARE(SW1)
+	TOAPLAN_DIP_3_SPARE(SW1)
+	TOAPLAN_DIP_4_SPARE(SW1)
+	TOAPLAN_DIP_5_SPARE(SW1)
+	TOAPLAN_DIP_6_SPARE(SW1)
+	TOAPLAN_DIP_7_SPARE(SW1)
+	TOAPLAN_DIP_8_SPARE(SW1)
 
-	PORT_START("DSWB")
-	TOAPLAN_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x020988 ('twincobr' and 'twincobru') */
-	PORT_DIPSETTING(	0x00, "50k 200k 150k+" )
-	PORT_DIPSETTING(	0x04, "70k 270k 200k+" )
-	PORT_DIPSETTING(	0x08, "50k Only" )
-	PORT_DIPSETTING(	0x0c, "100k Only" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x30, "2" )
-	PORT_DIPSETTING(	0x00, "3" )
-	PORT_DIPSETTING(	0x20, "4" )
-	PORT_DIPSETTING(	0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
+	PORT_START("DSWB") /* in 0x078003(M68000) */ /* DIP SW 2 */
+	TOAPLAN_DIP_1_SPARE(SW2)
+	TOAPLAN_DIP_2_SPARE(SW2)
+	TOAPLAN_DIP_3_SPARE(SW2)
+	TOAPLAN_DIP_4_SPARE(SW2)
+	TOAPLAN_DIP_5_SPARE(SW2)
+	TOAPLAN_DIP_6_SPARE(SW2)
+	TOAPLAN_DIP_7_SPARE(SW2)
+	TOAPLAN_DIP_8_SPARE(SW2)
 
-	PORT_START("P1")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
+	PORT_START("P1") /* in 0x078005(M68000) */ /* Player 1 controls */
+	TOAPLAN_JOY_UDLR_2_BUTTONS(1)
 
-	PORT_START("P2")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
+	PORT_START("P2") /* in 0x078007(M68000) */ /* Player 2 controls */
+	TOAPLAN_JOY_UDLR_2_BUTTONS(2)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )          /* uses COIN1 coinage */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* same effect as the DSWA bit 2 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	/* Port name kept to fit other games in the driver - it doesn't even exist */
+	PORT_BIT(0xff, TOAPLAN_IP_ACTIVE_LEVEL, IPT_UNUSED)
 
-	PORT_START("VBLANK")
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_START("VBLANK") /* in 0x078009(M68000) */ /* VBlank and coin-in/start inputs */
+	/* Port name kept to fit other games in the driver - it shall be "SYSTEM" */
+	TOAPLAN_SYSTEM_INPUT_WITH_VBLANK
+	PORT_MODIFY("VBLANK")
+	TOAPLAN_TEST_SWITCH_RENAME("Test (Reset CPU)")
+	/* When some users see "reset", they may think that is a bug of MAME.
+	   To avoid the doubt, describe the function "Reset CPU" */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( twincobr_generic )
+	PORT_START("DSWA") /* in 0x40(Z80) */ /* DIP SW 1 */
+	TOAPLAN_DIP_1_SPARE(SW1)
+	TOAPLAN_DIP_2_SPARE(SW1)
+	TOAPLAN_DIP_3_SPARE(SW1)
+	TOAPLAN_DIP_4_SPARE(SW1)
+	TOAPLAN_DIP_5_SPARE(SW1)
+	TOAPLAN_DIP_6_SPARE(SW1)
+	TOAPLAN_DIP_7_SPARE(SW1)
+	TOAPLAN_DIP_8_SPARE(SW1)
+
+	PORT_START("DSWB") /* in 0x50(Z80) */ /* DIP SW 2 */
+	TOAPLAN_DIP_1_SPARE(SW2)
+	TOAPLAN_DIP_2_SPARE(SW2)
+	TOAPLAN_DIP_3_SPARE(SW2)
+	TOAPLAN_DIP_4_SPARE(SW2)
+	TOAPLAN_DIP_5_SPARE(SW2)
+	TOAPLAN_DIP_6_SPARE(SW2)
+	TOAPLAN_DIP_7_SPARE(SW2)
+	TOAPLAN_DIP_8_SPARE(SW2)
+
+	PORT_START("P1") /* in 0x078005(M68000) */ /* Player 1 controls */
+	TOAPLAN_JOY_UDLR_2_BUTTONS(1)
+
+	PORT_START("P2") /* in 0x078007(M68000) */ /* Player 2 controls */
+	TOAPLAN_JOY_UDLR_2_BUTTONS(2)
+
+	PORT_START("SYSTEM") /* in 0x10(Z80) */ /* coin-in/start inputs */
+	TOAPLAN_SYSTEM_INPUT_WITHOUT_VBLANK
+
+	PORT_START("VBLANK") /* in 0x078009(M68000) */ /* VBlank */
+	TOAPLAN_VBLANK_INPUT_8BITS
+INPUT_PORTS_END
+
+
+
+
+/* verified from M68000 and Z80 code */
+static INPUT_PORTS_START( twincobr )
+	PORT_INCLUDE( twincobr_generic )
+
+	#if ! DEBUG_FREE_ALL_DIPSW
+	  PORT_MODIFY("DSWA")
+	  //DIP_A1_SPARE (divert from 'twincobr_generic')
+	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
+	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
+	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
+	  TOAPLAN_DIP_A5678_COINAGE_EUROPE(SW1) /* tables at 0x0c30 (COIN1) and 0x0c38 (COIN2) in CPU1 */
+
+	  PORT_MODIFY("DSWB")
+	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
+	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4") /* table at 0x020988 ('twincobr' and 'twincobru') */
+	  PORT_DIPSETTING(    0x00, "50k 200k 150k+" )
+	  PORT_DIPSETTING(    0x04, "70k 270k 200k+" )
+	  PORT_DIPSETTING(    0x08, "50k Only" )
+	  PORT_DIPSETTING(    0x0c, "100k Only" )
+	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
+	  PORT_DIPSETTING(    0x30, "2" )
+	  PORT_DIPSETTING(    0x00, "3" )
+	  PORT_DIPSETTING(    0x20, "4" )
+	  PORT_DIPSETTING(    0x10, "5" )
+	  TOAPLAN_DIP_B7_SHOW_DIPSW_SETTINGS(SW2)
+	  //DIP_B8_SPARE (divert from 'twincobr_generic')
+	#endif
 INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( twincobru )
 	PORT_INCLUDE( twincobr )
 
-	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD                               /* table at 0x0c20 (COIN1 AND COIN2) in CPU1 */
+	#if ! DEBUG_FREE_ALL_DIPSW
+	  PORT_MODIFY("DSWA")
+	  TOAPLAN_DIP_A5678_COINAGE_JAPAN(SW1) /* table at 0x0c20 (COIN1 AND COIN2) in CPU1 */
+	#endif
 INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( ktiger )
 	PORT_INCLUDE( twincobru )
 
-	PORT_MODIFY("DSWA")
-	TOAPLAN_MACHINE_COCKTAIL
+	#if ! DEBUG_FREE_ALL_DIPSW
+	  PORT_MODIFY("DSWA")
+	  TOAPLAN_DIP_A1_CABINET(SW1)
 
-	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x0208d0 */
-	PORT_DIPSETTING(	0x04, "50k 200k 150k+" )
-	PORT_DIPSETTING(	0x00, "70k 270k 200k+" )
-	PORT_DIPSETTING(	0x08, "100k Only" )
-	PORT_DIPSETTING(	0x0c, DEF_STR( None ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )   /* additional code at 0x020b3c */
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	  PORT_MODIFY("DSWB")
+	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4") /* table at 0x0208d0 */
+	  PORT_DIPSETTING(    0x04, "50k 200k 150k+" )
+	  PORT_DIPSETTING(    0x00, "70k 270k 200k+" )
+	  PORT_DIPSETTING(    0x08, "100k Only" )
+	  PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+	  TWINCOBR_DIP_B8_ALLOW_CONTINUE_OFF_NO(SW2) /* additional code at 0x020b3c */
+	  /* Many TOAPLAN "Allow Continue" = OFF YES
+	     but  TWINCOBR                 = ON YES */
+	#endif
 INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
@@ -421,79 +499,87 @@ static INPUT_PORTS_START( gulfwar2 )
 	PORT_INCLUDE( twincobru )
 
 	PORT_MODIFY("VBLANK")
-	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x7f, TOAPLAN_IP_INVERTED_ACTIVE_LEVEL, IPT_UNKNOWN )
+	PORT_BIT( 0x80, TOAPLAN_IP_INVERTED_ACTIVE_LEVEL, IPT_VBLANK )
 INPUT_PORTS_END
 
 
 /* verified from M68000 code */
 static INPUT_PORTS_START( fshark )
-	PORT_START("DSWA")
-	TOAPLAN_MACHINE_COCKTAIL
-	TOAPLAN_COINAGE_WORLD                                   /* tables at 0x00031c (COIN1) and 0x00032c (COIN2) */
+	PORT_INCLUDE( fshark_generic )
 
-	PORT_START("DSWB")
-	TOAPLAN_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000b96 (fshark), 0x000b80 (skyshark) or 0x000b7e (hishouza) */
-	PORT_DIPSETTING(	0x00, "50k 200k 150k+" )
-	PORT_DIPSETTING(	0x04, "70k 270k 200k+" )
-	PORT_DIPSETTING(	0x08, "50k Only" )
-	PORT_DIPSETTING(	0x0c, "100k Only" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x20, "1" )
-	PORT_DIPSETTING(	0x30, "2" )
-	PORT_DIPSETTING(	0x00, "3" )
-	PORT_DIPSETTING(	0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	#if ! DEBUG_FREE_ALL_DIPSW
+	  PORT_MODIFY("DSWA")
+	  TOAPLAN_DIP_A1_CABINET(SW1)
+	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
+	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
+	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
+	  TOAPLAN_DIP_A5678_COINAGE_EUROPE(SW1) /* tables at 0x00031c (COIN1) and 0x00032c (COIN2) */
 
-	PORT_START("P1")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
-
-	PORT_START("SYSTEM")      /* Port name kept to fit other games in the driver - it doesn't even exist */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("VBLANK")      /* Port name kept to fit other games in the driver - it shall be "SYSTEM" */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )          /* uses COIN1 coinage */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* reset button */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	  PORT_MODIFY("DSWB")
+	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
+	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4") /* table at 0x000b96 (fshark), 0x000b80 (skyshark) or 0x000b7e (hishouza) */
+	  PORT_DIPSETTING(    0x00, "50k 200k 150k+" )
+	  PORT_DIPSETTING(    0x04, "70k 270k 200k+" )
+	  PORT_DIPSETTING(    0x08, "50k Only" )
+	  PORT_DIPSETTING(    0x0c, "100k Only" )
+	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
+	  PORT_DIPSETTING(    0x20, "1" )
+	  PORT_DIPSETTING(    0x30, "2" )
+	  PORT_DIPSETTING(    0x00, "3" )
+	  PORT_DIPSETTING(    0x10, "5" )
+	  TOAPLAN_DIP_B7_SHOW_DIPSW_SETTINGS(SW2)
+	  TWINCOBR_DIP_B8_ALLOW_CONTINUE_OFF_NO(SW2)
+	  /* Many TOAPLAN "Allow Continue" = OFF YES
+	     but  FSHARK                   = ON YES */
+	#endif
 INPUT_PORTS_END
 
 /* verified from M68000 code */
 static INPUT_PORTS_START( skyshark )
 	PORT_INCLUDE( fshark )
 
-	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )           /* table at 0x000316 */
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
-//  PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )            /* duplicated setting */
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )           /* table at 0x000316 */
-	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
-//  PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )            /* duplicated setting */
+	#if ! DEBUG_FREE_ALL_DIPSW
+	  PORT_MODIFY("DSWA")
+	  #if ! DEBUG_DONT_HIDE_DUP_DIPSETTING
+	    PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!5,!6") /* table at 0x000316 */
+	    PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	    PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	    //PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) ) /* duplicated setting */
+	    PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!7,!8") /* table at 0x000316 */
+	    PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	    PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	    //PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) /* duplicated setting */
+	  #else
+	    /* Current(0.143) MAME doesn't allow duplicated settins about coinage
+	       (see function "validate_dip_settings()" in file "src\emu\validity.c")
+	       We can not write "PORT_DIPSETTING( 0x00, DEF_STR( 1C_1C ) )"
+	       But we can write "PORT_DIPSETTING( 0x00, " 1 Coin/1 Credit" )" */
+	    PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!5,!6") /* table at 0x000316 */
+	    PORT_DIPSETTING(    0x10, " 2 Coins/1 Credit" )
+	    PORT_DIPSETTING(    0x00, " 1 Coin/1 Credit"  )
+	    PORT_DIPSETTING(    0x20, " 1 Coin/2 Credits" )
+	    PORT_DIPSETTING(    0x30, " 1 Coin/2 Credits" ) /* duplicated setting */
+	    PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!7,!8") /* table at 0x000316 */
+	    PORT_DIPSETTING(    0x40, " 2 Coins/1 Credit" )
+	    PORT_DIPSETTING(    0x00, " 1 Coin/1 Credit"  )
+	    PORT_DIPSETTING(    0x80, " 1 Coin/2 Credits" )
+	    PORT_DIPSETTING(    0xc0, " 1 Coin/2 Credits" ) /* duplicated setting */
+	    /*                         ^ Don't delete these spaces (to pass function "get_defstr_index()") */
+	  #endif
+	#endif
 INPUT_PORTS_END
 
 /* verified from M68000 code */
 static INPUT_PORTS_START( hishouza )
 	PORT_INCLUDE( fshark )
 
-	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD                               /* table at 0x000316 (COIN1 AND COIN2) */
+	#if ! DEBUG_FREE_ALL_DIPSW
+	  PORT_MODIFY("DSWA")
+	  TOAPLAN_DIP_A5678_COINAGE_JAPAN(SW1) /* table at 0x000316 (COIN1 AND COIN2) */
+	#endif
 INPUT_PORTS_END
 
 
@@ -1015,6 +1101,7 @@ static DRIVER_INIT( twincobr )
 }
 
 
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1987, fshark,    0,        twincobr, fshark,    twincobr, ROT270, "Toaplan / Taito Corporation", "Flying Shark (World)", 0 )
 GAME( 1987, skyshark,  fshark,   twincobr, skyshark,  twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US)", 0 )
 GAME( 1987, hishouza,  fshark,   twincobr, hishouza,  twincobr, ROT270, "Toaplan / Taito Corporation", "Hishou Zame (Japan)", 0 )

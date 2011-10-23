@@ -637,40 +637,129 @@ static const struct
 	{ INPUT_STRING_Coinage, "Coinage" },
 	{ INPUT_STRING_Coin_A, "Coin A" },
 	{ INPUT_STRING_Coin_B, "Coin B" },
+//	{ INPUT_STRING_20C_1C, "20 Coins/1 Credit" },
+//	{ INPUT_STRING_15C_1C, "15 Coins/1 Credit" },
+//	{ INPUT_STRING_10C_1C, "10 Coins/1 Credit" },
+//	__input_string_coinage_start
 	{ INPUT_STRING_9C_1C, "9 Coins/1 Credit" },
 	{ INPUT_STRING_8C_1C, "8 Coins/1 Credit" },
 	{ INPUT_STRING_7C_1C, "7 Coins/1 Credit" },
 	{ INPUT_STRING_6C_1C, "6 Coins/1 Credit" },
+//	{ INPUT_STRING_10C_2C, "10 Coins/2 Credits" },
 	{ INPUT_STRING_5C_1C, "5 Coins/1 Credit" },
+//	{ INPUT_STRING_9C_2C, "9 Coins/2 Credits" },
+//	{ INPUT_STRING_8C_2C, "8 Coins/2 Credits" },
 	{ INPUT_STRING_4C_1C, "4 Coins/1 Credit" },
+//	{ INPUT_STRING_7C_2C, "7 Coins/2 Credits" },
+//	{ INPUT_STRING_10C_3C, "10 Coins/3 Credits" },
+//	{ INPUT_STRING_9C_3C, "9 Coins/3 Credits" },
+//	{ INPUT_STRING_6C_2C, "6 Coins/2 Credits" },
 	{ INPUT_STRING_3C_1C, "3 Coins/1 Credit" },
 	{ INPUT_STRING_8C_3C, "8 Coins/3 Credits" },
+//	{ INPUT_STRING_10C_4C, "10 Coins/4 Credits" },
+//	{ INPUT_STRING_5C_2C, "5 Coins/2 Credits" },
+//	{ INPUT_STRING_7C_3C, "7 Coins/3 Credits" },
+//	{ INPUT_STRING_9C_4C, "9 Coins/4 Credits" },
+//	{ INPUT_STRING_10C_5C, "10 Coins/5 Credits" },
+//	{ INPUT_STRING_8C_4C, "8 Coins/4 Credits" },
+//	{ INPUT_STRING_6C_3C, "6 Coins/3 Credits" },
 	{ INPUT_STRING_4C_2C, "4 Coins/2 Credits" },
 	{ INPUT_STRING_2C_1C, "2 Coins/1 Credit" },
+//	{ INPUT_STRING_9C_5C, "9 Coins/5 Credits" },
+//	{ INPUT_STRING_7C_4C, "7 Coins/4 Credits" },
+//	{ INPUT_STRING_10C_6C, "10 Coins/6 Credits" },
 	{ INPUT_STRING_5C_3C, "5 Coins/3 Credits" },
+//	{ INPUT_STRING_8C_5C, "8 Coins/5 Credits" },
+//	{ INPUT_STRING_9C_6C, "9 Coins/6 Credits" },
+//	{ INPUT_STRING_6C_4C, "6 Coins/4 Credits" },
 	{ INPUT_STRING_3C_2C, "3 Coins/2 Credits" },
+//	{ INPUT_STRING_10C_7C, "10 Coins/7 Credits" },
+//	{ INPUT_STRING_7C_5C, "7 Coins/5 Credits" },
+//	{ INPUT_STRING_8C_6C, "8 Coins/6 Credits" },
 	{ INPUT_STRING_4C_3C, "4 Coins/3 Credits" },
+//	{ INPUT_STRING_9C_7C, "9 Coins/7 Credits" },
+//	{ INPUT_STRING_10C_8C, "10 Coins/8 Credits" },
+//	{ INPUT_STRING_5C_4C, "5 Coins/4 Credits" },
+//	{ INPUT_STRING_6C_5C, "6 Coins/5 Credits" },
+//	{ INPUT_STRING_7C_6C, "7 Coins/6 Credits" },
+//	{ INPUT_STRING_8C_7C, "8 Coins/7 Credits" },
+//	{ INPUT_STRING_9C_8C, "9 Coins/8 Credits" },
+//	{ INPUT_STRING_10C_9C, "10 Coins/9 Credits" },
+//	{ INPUT_STRING_10C_10C, "10 Coins/10 Credits" },
+//	{ INPUT_STRING_9C_9C, "9 Coins/9 Credits" },
+//	{ INPUT_STRING_8C_8C, "8 Coins/8 Credits" },
+//	{ INPUT_STRING_7C_7C, "7 Coins/7 Credits" },
+//	{ INPUT_STRING_6C_6C, "6 Coins/6 Credits" },
+//	{ INPUT_STRING_5C_5C, "5 Coins/5 Credits" },
 	{ INPUT_STRING_4C_4C, "4 Coins/4 Credits" },
 	{ INPUT_STRING_3C_3C, "3 Coins/3 Credits" },
 	{ INPUT_STRING_2C_2C, "2 Coins/2 Credits" },
 	{ INPUT_STRING_1C_1C, "1 Coin/1 Credit" },
+//	{ INPUT_STRING_9C_10C, "9 Coins/10 Credits" },
+//	{ INPUT_STRING_8C_9C, "8 Coins/9 Credits" },
+//	{ INPUT_STRING_7C_8C, "7 Coins/8 Credits" },
+//	{ INPUT_STRING_6C_7C, "6 Coins/7 Credits" },
+//	{ INPUT_STRING_5C_6C, "5 Coins/6 Credits" },
+//	{ INPUT_STRING_8C_10C, "8 Coins/10 Credits" },
 	{ INPUT_STRING_4C_5C, "4 Coins/5 Credits" },
+//	{ INPUT_STRING_7C_9C, "7 Coins/9 Credits" },
+//	{ INPUT_STRING_6C_8C, "6 Coins/8 Credits" },
 	{ INPUT_STRING_3C_4C, "3 Coins/4 Credits" },
+//	{ INPUT_STRING_5C_7C, "5 Coins/7 Credits" },
+//	{ INPUT_STRING_7C_10C, "7 Coins/10 Credits" },
+//	{ INPUT_STRING_6C_9C, "6 Coins/9 Credits" },
+//	{ INPUT_STRING_4C_6C, "4 Coins/6 Credits" },
 	{ INPUT_STRING_2C_3C, "2 Coins/3 Credits" },
+//	{ INPUT_STRING_5C_8C, "5 Coins/8 Credits" },
+//	{ INPUT_STRING_6C_10C, "6 Coins/10 Credits" },
+//	{ INPUT_STRING_3C_5C, "3 Coins/5 Credits" },
 	{ INPUT_STRING_4C_7C, "4 Coins/7 Credits" },
+//	{ INPUT_STRING_5C_9C, "5 Coins/9 Credits" },
+//	{ INPUT_STRING_5C_10C, "5 Coins/10 Credits" },
+//	{ INPUT_STRING_4C_8C, "4 Coins/8 Credits" },
+//	{ INPUT_STRING_3C_6C, "3 Coins/6 Credits" },
 	{ INPUT_STRING_2C_4C, "2 Coins/4 Credits" },
 	{ INPUT_STRING_1C_2C, "1 Coin/2 Credits" },
+//	{ INPUT_STRING_4C_9C, "4 Coins/9 Credits" },
+//	{ INPUT_STRING_3C_7C, "3 Coins/7 Credits" },
+//	{ INPUT_STRING_4C_10C, "4 Coins/10 Credits" },
 	{ INPUT_STRING_2C_5C, "2 Coins/5 Credits" },
+//	{ INPUT_STRING_3C_8C, "3 Coins/8 Credits" },
+//	{ INPUT_STRING_3C_9C, "3 Coins/9 Credits" },
 	{ INPUT_STRING_2C_6C, "2 Coins/6 Credits" },
 	{ INPUT_STRING_1C_3C, "1 Coin/3 Credits" },
+//	{ INPUT_STRING_3C_10C, "3 Coins/10 Credits" },
 	{ INPUT_STRING_2C_7C, "2 Coins/7 Credits" },
 	{ INPUT_STRING_2C_8C, "2 Coins/8 Credits" },
 	{ INPUT_STRING_1C_4C, "1 Coin/4 Credits" },
+//	{ INPUT_STRING_2C_9C, "2 Coins/9 Credits" },
+//	{ INPUT_STRING_2C_10C, "2 Coins/10 Credits" },
 	{ INPUT_STRING_1C_5C, "1 Coin/5 Credits" },
 	{ INPUT_STRING_1C_6C, "1 Coin/6 Credits" },
 	{ INPUT_STRING_1C_7C, "1 Coin/7 Credits" },
 	{ INPUT_STRING_1C_8C, "1 Coin/8 Credits" },
 	{ INPUT_STRING_1C_9C, "1 Coin/9 Credits" },
+//	__input_string_coinage_end
+//	{ INPUT_STRING_1C_10C, "1 Coin/10 Credits" },
+//	{ INPUT_STRING_1C_11C, "1 Coin/11 Credits" },
+//	{ INPUT_STRING_1C_12C, "1 Coin/12 Credits" },
+//	{ INPUT_STRING_1C_13C, "1 Coin/13 Credits" },
+//	{ INPUT_STRING_1C_14C, "1 Coin/14 Credits" },
+//	{ INPUT_STRING_1C_15C, "1 Coin/15 Credits" },
+//	{ INPUT_STRING_1C_20C, "1 Coin/20 Credits" },
+//	{ INPUT_STRING_1C_25C, "1 Coin/25 Credits" },
+//	{ INPUT_STRING_1C_30C, "1 Coin/30 Credits" },
+//	{ INPUT_STRING_1C_40C, "1 Coin/40 Credits" },
+//	{ INPUT_STRING_1C_50C, "1 Coin/50 Credits" },
+//	{ INPUT_STRING_1C_99C, "1 Coin/99 Credits" },
+//	{ INPUT_STRING_1C_100C, "1 Coin/100 Credits" },
+//	{ INPUT_STRING_1C_120C, "1 Coin/120 Credits" },
+//	{ INPUT_STRING_1C_125C, "1 Coin/125 Credits" },
+//	{ INPUT_STRING_1C_150C, "1 Coin/150 Credits" },
+//	{ INPUT_STRING_1C_200C, "1 Coin/200 Credits" },
+//	{ INPUT_STRING_1C_250C, "1 Coin/250 Credits" },
+//	{ INPUT_STRING_1C_500C, "1 Coin/500 Credits" },
+//	{ INPUT_STRING_1C_1000C, "1 Coin/1000 Credits" },
 	{ INPUT_STRING_Free_Play, "Free Play" },
 	{ INPUT_STRING_Cabinet, "Cabinet" },
 	{ INPUT_STRING_Upright, "Upright" },
@@ -732,15 +821,25 @@ static const struct
 	{ INPUT_STRING_Continues, "Continues" },
 	{ INPUT_STRING_Allow_Continue, "Allow Continue" },
 	{ INPUT_STRING_Level_Select, "Level Select" },
+//	{ INPUT_STRING_Allow, "Allow" },
+//	{ INPUT_STRING_Forbid, "Forbid" },
+//	{ INPUT_STRING_Enable, "Enable" },
+//	{ INPUT_STRING_Disable, "Disable" },
 	{ INPUT_STRING_Infinite, "Infinite" },
+//	{ INPUT_STRING_Invincibility, "Invincibility" },
+//	{ INPUT_STRING_Invulnerability, "Invulnerability" },
 	{ INPUT_STRING_Stereo, "Stereo" },
 	{ INPUT_STRING_Mono, "Mono" },
 	{ INPUT_STRING_Unused, "Unused" },
 	{ INPUT_STRING_Unknown, "Unknown" },
+//	{ INPUT_STRING_Undefined, "Undefined" },
 	{ INPUT_STRING_Standard, "Standard" },
 	{ INPUT_STRING_Reverse, "Reverse" },
 	{ INPUT_STRING_Alternate, "Alternate" },
-	{ INPUT_STRING_None, "None" }
+//	{ INPUT_STRING_Reserve, "Reserve" },
+//	{ INPUT_STRING_Spare, "Spare" },
+//	{ INPUT_STRING_Invalid, "Invalid" },
+	{ INPUT_STRING_None, "None" },
 };
 
 
@@ -838,20 +937,12 @@ INLINE INT32 apply_analog_min_max(const analog_field_state *analog, INT32 value)
 	/* for relative devices, wrap around when we go past the edge */
 	else
 	{
-		INT32 adj1 = APPLY_INVERSE_SENSITIVITY(INPUT_RELATIVE_PER_PIXEL, analog->sensitivity);
-		INT32 range = adjmax - adjmin + adj1;
+		INT32 range = adjmax - adjmin;
 		/* rolls to other end when 1 position past end. */
-		adjmax += adj1;
-		adjmin -= adj1;
-
-		while (value >= adjmax)
-		{
-			value -= range;
-		}
-		while (value <= adjmin)
-		{
+		value = (value - adjmin) % range;
+		if (value < 0)
 			value += range;
-		}
+		value += adjmin;
 	}
 
 	return value;
@@ -1637,7 +1728,11 @@ static INT32 apply_analog_settings(INT32 value, analog_field_state *analog)
 
 	/* apply reversal if needed */
 	if (analog->reverse)
+	{
 		value = analog->reverse_val - value;
+		if (analog->wraps)
+			value--; 
+	}
 	else if (analog->single_scale)
 		/* it's a pedal or the default value is equal to min/max */
 		/* so we need to adjust the center to the minimum */
@@ -1652,7 +1747,6 @@ static INT32 apply_analog_settings(INT32 value, analog_field_state *analog)
 
 	return value;
 }
-
 
 
 /***************************************************************************
@@ -1769,8 +1863,6 @@ int input_condition_true(running_machine &machine, const input_condition *condit
 
 const char *input_port_string_from_token(const char *string)
 {
-	int index;
-
 	/* 0 is an invalid index */
 	if (string == NULL)
 		return NULL;
@@ -1779,11 +1871,22 @@ const char *input_port_string_from_token(const char *string)
 	if (FPTR(string) >= INPUT_STRING_COUNT)
 		return string;
 
+#if FALSE // Set TRUE, If you want to take care missing-token or wrong-sorting
+
 	/* otherwise, scan the list for a matching string and return it */
+	{
+	int index;
 	for (index = 0; index < ARRAY_LENGTH(input_port_default_strings); index++)
 		if (input_port_default_strings[index].id == FPTR(string))
 			return input_port_default_strings[index].string;
+	}
 	return "(Unknown Default)";
+
+#else
+
+	return input_port_default_strings[FPTR(string)-1].string;
+
+#endif
 }
 
 
@@ -2041,13 +2144,13 @@ static void init_port_state(running_machine &machine)
 	}
 
 	/* handle autoselection of devices */
-	init_autoselect_devices(machine, IPT_PADDLE,      IPT_PADDLE_V,     0,              OPTION_PADDLE_DEVICE,     "paddle");
 	init_autoselect_devices(machine, IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z, OPTION_ADSTICK_DEVICE,    "analog joystick");
-	init_autoselect_devices(machine, IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y,   0,              OPTION_LIGHTGUN_DEVICE,   "lightgun");
+	init_autoselect_devices(machine, IPT_PADDLE,      IPT_PADDLE_V,     0,              OPTION_PADDLE_DEVICE,     "paddle");
 	init_autoselect_devices(machine, IPT_PEDAL,       IPT_PEDAL2,       IPT_PEDAL3,     OPTION_PEDAL_DEVICE,      "pedal");
+	init_autoselect_devices(machine, IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y,   0,              OPTION_LIGHTGUN_DEVICE,   "lightgun");
+	init_autoselect_devices(machine, IPT_POSITIONAL,  IPT_POSITIONAL_V, 0,              OPTION_POSITIONAL_DEVICE, "positional");
 	init_autoselect_devices(machine, IPT_DIAL,        IPT_DIAL_V,       0,              OPTION_DIAL_DEVICE,       "dial");
 	init_autoselect_devices(machine, IPT_TRACKBALL_X, IPT_TRACKBALL_Y,  0,              OPTION_TRACKBALL_DEVICE,  "trackball");
-	init_autoselect_devices(machine, IPT_POSITIONAL,  IPT_POSITIONAL_V, 0,              OPTION_POSITIONAL_DEVICE, "positional");
 	init_autoselect_devices(machine, IPT_MOUSE_X,     IPT_MOUSE_Y,      0,              OPTION_MOUSE_DEVICE,      "mouse");
 
 	/* look for 4-way joysticks and change the default map if we find any */
@@ -2179,23 +2282,23 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 	/* set basic parameters based on the configured type */
 	switch (field->type)
 	{
-		/* pedals start at and autocenter to the min range */
-		case IPT_PEDAL:
-		case IPT_PEDAL2:
-		case IPT_PEDAL3:
-			state->center = INPUT_ABSOLUTE_MIN;
-			state->accum = APPLY_INVERSE_SENSITIVITY(state->center, state->sensitivity);
-			state->absolute = TRUE;
-			state->autocenter = TRUE;
-			state->interpolate = TRUE;
-			break;
-
 		/* paddles and analog joysticks are absolute and autocenter */
 		case IPT_AD_STICK_X:
 		case IPT_AD_STICK_Y:
 		case IPT_AD_STICK_Z:
 		case IPT_PADDLE:
 		case IPT_PADDLE_V:
+			state->absolute = TRUE;
+			state->autocenter = TRUE;
+			state->interpolate = TRUE;
+			break;
+
+		/* pedals start at and autocenter to the min range */
+		case IPT_PEDAL:
+		case IPT_PEDAL2:
+		case IPT_PEDAL3:
+			state->center = INPUT_ABSOLUTE_MIN;
+			state->accum = APPLY_INVERSE_SENSITIVITY(state->center, state->sensitivity);
 			state->absolute = TRUE;
 			state->autocenter = TRUE;
 			state->interpolate = TRUE;
@@ -2209,22 +2312,7 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 			state->interpolate = FALSE;
 			break;
 
-		/* dials, mice and trackballs are relative devices */
-		/* these have fixed "min" and "max" values based on how many bits are in the port */
-		/* in addition, we set the wrap around min/max values to 512 * the min/max values */
-		/* this takes into account the mapping that one mouse unit ~= 512 analog units */
-		case IPT_DIAL:
-		case IPT_DIAL_V:
-		case IPT_MOUSE_X:
-		case IPT_MOUSE_Y:
-		case IPT_TRACKBALL_X:
-		case IPT_TRACKBALL_Y:
-			state->absolute = FALSE;
-			state->wraps = TRUE;
-			state->interpolate = TRUE;
-			break;
-
-		/* positional devices are abolute, but can also wrap like relative devices */
+		/* positional devices are absolute, but can also wrap like relative devices */
 		/* set each position to be 512 units */
 		case IPT_POSITIONAL:
 		case IPT_POSITIONAL_V:
@@ -2233,6 +2321,21 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 			state->adjmax = field->max - 1;
 			state->wraps = ((field->flags & ANALOG_FLAG_WRAPS) != 0);
 			state->autocenter = !state->wraps;
+			break;
+
+		/* dials, mice and trackballs are relative devices */
+		/* these have fixed "min" and "max" values based on how many bits are in the port */
+		/* in addition, we set the wrap around min/max values to 512 * the min/max values */
+		/* this takes into account the mapping that one mouse unit ~= 512 analog units */
+		case IPT_DIAL:
+		case IPT_DIAL_V:
+		case IPT_TRACKBALL_X:
+		case IPT_TRACKBALL_Y:
+		case IPT_MOUSE_X:
+		case IPT_MOUSE_Y:
+			state->absolute = FALSE;
+			state->wraps = TRUE;
+			state->interpolate = TRUE;
 			break;
 
 		default:
@@ -2287,6 +2390,9 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 			/* adjust for signed */
 			state->adjmin = -state->adjmin;
 
+		if (state->wraps)
+			state->adjmax++;
+
 		state->minimum = (state->adjmin - state->adjdefvalue) * INPUT_RELATIVE_PER_PIXEL;
 		state->maximum = (state->adjmax - state->adjdefvalue) * INPUT_RELATIVE_PER_PIXEL;
 
@@ -2301,9 +2407,9 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 			/* positional controls reverse from their max range */
 			state->reverse_val = state->maximum + state->minimum;
 
-			/* relative controls reverse from 1 past their max range */
-			if (state->positionalscale == 0)
-				state->reverse_val += INPUT_RELATIVE_PER_PIXEL;
+//			/* relative controls reverse from 1 past their max range */
+//			if (state->positionalscale == 0)
+//				state->reverse_val += INPUT_RELATIVE_PER_PIXEL;
 		}
 	}
 
@@ -2606,9 +2712,9 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 	/* if we got an absolute input, it overrides everything else */
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
 	{
-		if (analog->previousanalog != rawvalue)
+		if ((analog->previousanalog != rawvalue) || (analog->absolute && analog->autocenter && analog->centerdelta != 0 && rawvalue != 0))
 		{
-			/* only update if analog value changed */
+			/* update if analog value changed or out the deadzone of autocenter device */
 			analog->previousanalog = rawvalue;
 
 			/* apply the inverse of the sensitivity to the raw value so that */
@@ -2635,7 +2741,7 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 				/* sensitivity adjustment is allowed for this mode */
 				analog->accum += rawvalue;
 
-			analog->lastdigital = 0;
+			analog->lastdigital = FALSE;
 			/* do not bother with other control types if the analog data is changing */
 			return;
 		}
@@ -2652,7 +2758,7 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 	if (itemclass == ITEM_CLASS_RELATIVE && rawvalue != 0)
 	{
 		delta = rawvalue;
-		analog->lastdigital = 0;
+		analog->lastdigital = FALSE;
 	}
 
 	keyscale = (analog->accum >= 0) ? analog->keyscalepos : analog->keyscaleneg;
@@ -2737,6 +2843,7 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 {
 	int curstate = mouse_down || field->machine().input().seq_pressed(input_field_seq(field, SEQ_TYPE_STANDARD));
 	int changed = FALSE;
+	int temp_field_impulse;
 
 	/* if the state changed, look for switch down/switch up */
 	if (curstate != field->state->last)
@@ -2748,12 +2855,25 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 	if (field->type == IPT_KEYBOARD && ui_get_use_natural_keyboard(field->machine()))
 		return FALSE;
 
+	/* coin impulse option */
+	{
+		int temp_option_impulse = field->machine().options().coin_impulse();
+		temp_field_impulse = field->impulse;
+		if ( temp_option_impulse != 0)
+		{
+			if (temp_option_impulse < 0)
+				temp_field_impulse = 0;
+			else if ((field->type >= IPT_COIN1 && field->type <= IPT_COIN12) || field->impulse != 0)
+				temp_field_impulse = temp_option_impulse;
+		}
+	}
+
 	/* if this is a switch-down event, handle impulse and toggle */
 	if (changed && curstate)
 	{
 		/* impluse controls: reset the impulse counter */
-		if (field->impulse != 0 && field->state->impulse == 0)
-			field->state->impulse = field->impulse;
+		if (temp_field_impulse != 0 && field->state->impulse == 0)
+			field->state->impulse = temp_field_impulse;
 
 		/* toggle controls: flip the toggle state or advance to the next setting */
 		if (field->flags & FIELD_FLAG_TOGGLE)
@@ -2766,7 +2886,7 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 	}
 
 	/* update the current state with the impulse state */
-	if (field->impulse != 0)
+	if (temp_field_impulse != 0)
 	{
 		if (field->state->impulse != 0)
 		{
@@ -2783,7 +2903,7 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 		curstate = FALSE;
 
 	/* additional logic to restrict digital joysticks */
-	if (curstate && !mouse_down && field->state->joystick != NULL && field->way != 16)
+	if (curstate && !mouse_down && field->state->joystick != NULL && field->way != 16 && !field->machine().options().joystick_contradictory())
 	{
 		UINT8 mask = (field->way == 4) ? field->state->joystick->current4way : field->state->joystick->current;
 		if (!(mask & (1 << field->state->joydir)))
@@ -2791,16 +2911,23 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 	}
 
 	/* skip locked-out coin inputs */
-	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN12 && coin_lockout_get_state(field->machine(), field->type - IPT_COIN1) && field->machine().options().coin_lockout())
+	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN12 && coin_lockout_get_state(field->machine(), field->type - IPT_COIN1))
 	{
 		int verbose = field->machine().options().verbose();
 #ifdef MAME_DEBUG
 		verbose = 1;
 #endif
-		if (verbose)
-			ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
-		return FALSE;
+		if (field->machine().options().coin_lockout())
+		{
+			if (verbose)
+				ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
+			return FALSE; /* curstate = FALSE; */
+		}
+		else
+			if (verbose)
+				ui_popup_time(3, "Coinlock disabled, but broken through %s.", input_field_name(field));
 	}
+
 	return curstate;
 }
 

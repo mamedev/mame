@@ -19,6 +19,7 @@
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 #include "includes/chqflag.h"
+#include "includes/konamipt.h"
 
 #include "chqflag.lh"
 
@@ -200,48 +201,15 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chqflag )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, "Invalid" )
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
 	/* Invalid = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )	/* Manual says it's not used */
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )	/* Manual says it's not used */
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )	/* Manual says it's not used */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )	/* Manual says it's not used */
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )	/* Manual says it's not used */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(	0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Normal ) )
@@ -253,7 +221,7 @@ static INPUT_PORTS_START( chqflag )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:4" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:4" )	/* Manual says it's not used */
 
 	PORT_START("IN1")
 	/* COINSW + STARTSW */
@@ -263,7 +231,7 @@ static INPUT_PORTS_START( chqflag )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* DIPSW #3 */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:1" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW3:1" )	/* Manual says it's not used */
 	PORT_DIPNAME( 0x40, 0x40, "Title" ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(	0x40, "Chequered Flag" )
 	PORT_DIPSETTING(	0x00, "Checkered Flag" )
@@ -280,6 +248,17 @@ static INPUT_PORTS_START( chqflag )
 
 	PORT_START("IN4")	/* Driving wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(80) PORT_KEYDELTA(8)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( chqflagj )
+	PORT_INCLUDE( chqflag )
+
+	PORT_MODIFY("DSW1")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), " 1 Coin/1 Credit", SW1)
+	// Manual says 1-5, 1-6, 1-7 and 1-8 are not used, but they work
+
+	PORT_MODIFY("IN1")
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW3:2" )	/* Manual says it's not used */
 INPUT_PORTS_END
 
 
@@ -497,5 +476,6 @@ ROM_START( chqflagj )
 ROM_END
 
 
-GAMEL( 1988, chqflag,  0,       chqflag, chqflag, 0, ROT90, "Konami", "Chequered Flag", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflag, 0, ROT90, "Konami", "Chequered Flag (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
+//     YEAR, NAME,     PARENT,  MACHINE, INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  0,   ROT90,  "Konami", "Chequered Flag", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, 0,   ROT90,  "Konami", "Chequered Flag (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )

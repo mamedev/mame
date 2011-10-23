@@ -279,6 +279,7 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 #include "video/segaic16.h"
+#include "includes/segaipt.h"
 
 #include "outrun.lh"
 
@@ -855,54 +856,15 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINAGE")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2,3,4")
-	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:5,6,7,8")
-	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
+	SEGA_COINAGE_LOC(SWA)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWB:2" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SWB:4" )
 	PORT_DIPNAME( 0x30, 0x30, "Time Adj." )  PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
@@ -2215,17 +2177,18 @@ static DRIVER_INIT( shangon3 )
  *
  *************************************/
 
-GAMEL(1986, outrun,   0,        outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev B)", 0, layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
-GAMEL(1986, outrunra, outrun,   outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev A)", 0, layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
-GAMEL(1986, outruno,  outrun,   outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright)", 0, layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
-GAMEL(1986, outrundx, outrun,   outrundx, outrundx, outrun,   ROT0, "Sega",    "Out Run (deluxe sitdown)", 0, layout_outrun )
-GAMEL(1986, outrunb,  outrun,   outrun,   outrun,   outrunb,  ROT0, "bootleg", "Out Run (bootleg)", 0, layout_outrun )
-GAME( 1987, shangon,  0,        shangon,  shangon,  shangon,  ROT0, "Sega",    "Super Hang-On (sitdown/upright, unprotected)", 0 )
-GAME( 1987, shangon3, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
-GAME( 1987, shangon2, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
-GAME( 1987, shangon1, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) /* bad program rom */
-GAME( 1991, shangonle,shangon,  shangon,  shangon,  shangon,  ROT0, "Sega",    "Limited Edition Hang-On", 0 )
-GAMEL(1989, toutrun,  0,        outrun,   toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (Out Run upgrade, FD1094 317-0118)" , 0, layout_outrun ) /* Cabinet determined by dipswitch settings */
-GAMEL(1989, toutrun3, toutrun,  outrun,   toutrunc, outrun,   ROT0, "Sega",    "Turbo Out Run (upright, FD1094 317-unknown)", 0, layout_outrun )
-GAMEL(1989, toutrun2, toutrun,  outrun,   toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) /* FD1094 CPU not decrypted */
-GAMEL(1989, toutrun1, toutrun,  outrun,   toutrunm, outrun,   ROT0, "Sega",    "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0, layout_outrun )
+//    YEAR, NAME,     PARENT,  MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS,                                                  LAYOUT
+GAMEL(1986, outrun,   0,       outrun,   outrun,   outrun,   ROT0,   "Sega", "Out Run (sitdown/upright, Rev B)", 0,                           layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
+GAMEL(1986, outrunra, outrun,  outrun,   outrun,   outrun,   ROT0,   "Sega", "Out Run (sitdown/upright, Rev A)", 0,                           layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
+GAMEL(1986, outruno,  outrun,  outrun,   outrun,   outrun,   ROT0,   "Sega", "Out Run (sitdown/upright)", 0,                                  layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
+GAMEL(1986, outrundx, outrun,  outrundx, outrundx, outrun,   ROT0,   "Sega", "Out Run (deluxe sitdown)", 0,                                   layout_outrun )
+GAMEL(1986, outrunb,  outrun,  outrun,   outrun,   outrunb,  ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
+GAME( 1987, shangon,  0,       shangon,  shangon,  shangon,  ROT0,   "Sega", "Super Hang-On (sitdown/upright, unprotected)", 0 )
+GAME( 1987, shangon3, shangon, shangon,  shangon,  shangon3, ROT0,   "Sega", "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
+GAME( 1987, shangon2, shangon, shangon,  shangon,  shangon3, ROT0,   "Sega", "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
+GAME( 1987, shangon1, shangon, shangon,  shangon,  shangon3, ROT0,   "Sega", "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) /* bad program rom */
+GAME( 1991, shangonle,shangon, shangon,  shangon,  shangon,  ROT0,   "Sega", "Limited Edition Hang-On", 0 )
+GAMEL(1989, toutrun,  0,       outrun,   toutrun,  outrun,   ROT0,   "Sega", "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,           layout_outrun ) /* Cabinet determined by dipswitch settings */
+GAMEL(1989, toutrun3, toutrun, outrun,   toutrunc, outrun,   ROT0,   "Sega", "Turbo Out Run (upright, FD1094 317-unknown)", 0,                layout_outrun )
+GAMEL(1989, toutrun2, toutrun, outrun,   toutrun,  outrun,   ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) /* FD1094 CPU not decrypted */
+GAMEL(1989, toutrun1, toutrun, outrun,   toutrunm, outrun,   ROT0,   "Sega", "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,            layout_outrun )

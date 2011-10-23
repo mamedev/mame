@@ -525,17 +525,20 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(      0x3000, "3" )
 	PORT_DIPSETTING(      0x1000, "4" )
 	PORT_DIPSETTING(      0x2000, "5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SWB:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SWB:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SWB:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SWB:8" )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:6,5")
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0400, "TBL 1" )
+	PORT_DIPSETTING(      0x0800, "TBL 2" )
+	PORT_DIPSETTING(      0x0000, "TBL 3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SWB:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drgnbowl )
 	PORT_INCLUDE(  common )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SWA:7" ) /* No Flip Screen */
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SWA:7" ) /* No Flip Screen */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wildfang )
@@ -568,9 +571,9 @@ static INPUT_PORTS_START( tknight )
 	PORT_INCLUDE(  wildfang )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SWB:3" ) /* No separate difficulty option like parent set */
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SWB:4" ) /* No separate difficulty option like parent set */
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SWB:8" ) /* No title change option */
+	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SWB:3" ) /* No separate difficulty option like parent set */
+	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SWB:4" ) /* No separate difficulty option like parent set */
+	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SWB:8" ) /* No title change option */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raiga )
@@ -619,7 +622,7 @@ static INPUT_PORTS_START( raiga )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SWB:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SWB:2" )
 	PORT_DIPNAME( 0x3000, 0x1000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:4,3")
 	PORT_DIPSETTING(      0x3000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Normal ) )
@@ -1619,15 +1622,16 @@ static DRIVER_INIT(mastninj)
 	DRIVER_INIT_CALL(shadoww);
 }
 
-GAME( 1988, shadoww,  0,        shadoww, common,   shadoww,  ROT0, "Tecmo", "Shadow Warriors (World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, shadowwa, shadoww,  shadoww, common,   shadoww,  ROT0, "Tecmo", "Shadow Warriors (World, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, gaiden,   shadoww,  shadoww, common,   shadoww,  ROT0, "Tecmo", "Ninja Gaiden (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ryukendn, shadoww,  shadoww, common,   shadoww,  ROT0, "Tecmo", "Ninja Ryukenden (Japan, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ryukendna,shadoww,  shadoww, common,   shadoww,  ROT0, "Tecmo", "Ninja Ryukenden (Japan, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mastninj, shadoww,  mastninj,common,   mastninj, ROT0, "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too.
-GAME( 1989, wildfang, 0,        shadoww, wildfang, wildfang, ROT0, "Tecmo", "Wild Fang / Tecmo Knight", GAME_SUPPORTS_SAVE )
-GAME( 1989, wildfangs,wildfang, shadoww, tknight,  wildfang, ROT0, "Tecmo", "Wild Fang", GAME_SUPPORTS_SAVE )
-GAME( 1989, tknight,  wildfang, shadoww, tknight,  wildfang, ROT0, "Tecmo", "Tecmo Knight", GAME_SUPPORTS_SAVE )
-GAME( 1991, stratof,  0,        raiga,   raiga,    raiga,    ROT0, "Tecmo", "Raiga - Strato Fighter (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, raiga,    stratof,  raiga,   raiga,    raiga,    ROT0, "Tecmo", "Raiga - Strato Fighter (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1992, drgnbowl, 0,        drgnbowl,drgnbowl, drgnbowl, ROT0, "Nics",  "Dragon Bowl", GAME_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1988, shadoww,   0,        shadoww,  common,   shadoww,  ROT0,   "Tecmo", "Shadow Warriors (World, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, shadowwa,  shadoww,  shadoww,  common,   shadoww,  ROT0,   "Tecmo", "Shadow Warriors (World, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, gaiden,    shadoww,  shadoww,  common,   shadoww,  ROT0,   "Tecmo", "Ninja Gaiden (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ryukendn,  shadoww,  shadoww,  common,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ryukendna, shadoww,  shadoww,  common,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mastninj,  shadoww,  mastninj, common,   mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too.
+GAME( 1989, wildfang,  0,        shadoww,  wildfang, wildfang, ROT0,   "Tecmo", "Wild Fang / Tecmo Knight", GAME_SUPPORTS_SAVE )
+GAME( 1989, wildfangs, wildfang, shadoww,  tknight,  wildfang, ROT0,   "Tecmo", "Wild Fang", GAME_SUPPORTS_SAVE )
+GAME( 1989, tknight,   wildfang, shadoww,  tknight,  wildfang, ROT0,   "Tecmo", "Tecmo Knight", GAME_SUPPORTS_SAVE )
+GAME( 1991, stratof,   0,        raiga,    raiga,    raiga,    ROT0,   "Tecmo", "Raiga - Strato Fighter (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, raiga,     stratof,  raiga,    raiga,    raiga,    ROT0,   "Tecmo", "Raiga - Strato Fighter (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, drgnbowl, ROT0,   "Nics",  "Dragon Bowl", GAME_SUPPORTS_SAVE )

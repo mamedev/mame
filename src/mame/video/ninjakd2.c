@@ -407,25 +407,21 @@ static void draw_sprites(running_machine& machine, bitmap_t* bitmap)
 				code ^= flipy << big_yshift;
 			}
 
+			for (int y = 0; y <= big; ++y)
 			{
-				int y;
-				for (y = 0; y <= big; ++y)
+				for (int x = 0; x <= big; ++x)
 				{
-					int x;
-					for (x = 0; x <= big; ++x)
-					{
-						int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
+					int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
 
-						drawgfx_transpen(bitmap, 0, gfx,
-								tile,
-								color,
-								flipx,flipy,
-								sx + 16*x, sy + 16*y, 15);
+					drawgfx_transpen(bitmap, 0, gfx,
+							tile,
+							color,
+							flipx,flipy,
+							sx + 16*x, sy + 16*y, TRANSPARENTCODE);
 
-						++sprites_drawn;
-						if (sprites_drawn >= 96)
-							return;
-					}
+					++sprites_drawn;
+					if (sprites_drawn >= 96)
+						return;
 				}
 			}
 		}
@@ -463,19 +459,15 @@ static void erase_sprites(running_machine& machine, bitmap_t* bitmap, const rect
 	if (!state->m_next_sprite_overdraw_enabled)
 		bitmap_fill(state->m_sp_bitmap, cliprect, TRANSPARENTCODE);
 	else
-	{
-		int y;
-		for (y = 0; y < state->m_sp_bitmap->height; ++y)
+		for (int y = 0; y < state->m_sp_bitmap->height; ++y)
 		{
-			int x;
-			for (x = 0; x < state->m_sp_bitmap->width; ++x)
+			for (int x = 0; x < state->m_sp_bitmap->width; ++x)
 			{
 				UINT16* const ptr = BITMAP_ADDR16(state->m_sp_bitmap, y, x);
 
 				if ( (*state->m_stencil_compare_function)(*ptr) ) *ptr = TRANSPARENTCODE ;
 			}
 		}
-	}
 }
 
 

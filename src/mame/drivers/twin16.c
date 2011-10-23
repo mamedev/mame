@@ -304,7 +304,7 @@ static INPUT_PORTS_START( devilw )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 )	// map, advance through tests
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Map")	// map, advance through tests
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -320,32 +320,34 @@ static INPUT_PORTS_START( devilw )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	KONAMI_COINAGE(DEF_STR( Free_Play ), "Invalid")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x02, "3" ) // Japan factory default = "3"
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")	/* 0xa0019 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW3:2" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW3:4" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -354,7 +356,7 @@ static INPUT_PORTS_START( darkadv )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 )	// map, advance through tests
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Map")	// map, advance through tests
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -371,7 +373,7 @@ static INPUT_PORTS_START( darkadv )
 	KONAMI8_B123_UNK(3)
 
 	PORT_START("DSW1")	/* Coinage */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -388,31 +390,36 @@ static INPUT_PORTS_START( darkadv )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, "Invalid" )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")	/* 0xa0019 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW3:2" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW3:4" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -437,41 +444,41 @@ static INPUT_PORTS_START( vulcan )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	KONAMI_COINAGE(DEF_STR( Free_Play ), DEF_STR( None ))
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), DEF_STR( None ), SW1)
 	/* "None" = coin slot B disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x02, "3" ) // Japan factory default = "3"
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x18, "20K 70K" )
-	PORT_DIPSETTING(    0x10, "30K 80K" )
-	PORT_DIPSETTING(    0x08, "20K" )
-	PORT_DIPSETTING(    0x00, "70K" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "20K, Every 70K" ) // Japan factory default = "20K, Every 70K"
+	PORT_DIPSETTING(    0x10, "30K, Every 80K" )
+	PORT_DIPSETTING(    0x08, "20K Only" )
+	PORT_DIPSETTING(    0x00, "70K Only" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")	/* 0xa0018 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Upright Controls" )
+	PORT_DIPNAME( 0x02, 0x00, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW3:4" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -480,11 +487,11 @@ static INPUT_PORTS_START( gradius2 )	// same as vulcan, different bonus
 	PORT_INCLUDE( vulcan )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR (Bonus_Life ) )
-	PORT_DIPSETTING(    0x18, "20K 150K" )
-	PORT_DIPSETTING(    0x10, "30K 200K" )
-	PORT_DIPSETTING(    0x08, "20K" )
-	PORT_DIPSETTING(    0x00, "70K" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR (Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "20K, Every 150K" ) // Japan factory default = "20K, Every 150K"
+	PORT_DIPSETTING(    0x10, "30K, Every 200K" )
+	PORT_DIPSETTING(    0x08, "20K Only" )
+	PORT_DIPSETTING(    0x00, "70K Only" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fround )
@@ -508,32 +515,34 @@ static INPUT_PORTS_START( fround )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	KONAMI_COINAGE(DEF_STR( Free_Play ), "No Coin B")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, "Energy" )
+	PORT_DIPNAME( 0x03, 0x02, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "18" )
-	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x02, "20" ) // US and Japan factory default = "20"
 	PORT_DIPSETTING(    0x01, "22" )
 	PORT_DIPSETTING(    0x00, "24" )
-	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" ) // manual says "not used"
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" ) // ditto
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" ) // ditto
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // US and Japan factory default = "Normal"
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")	/* 0xa0018 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW3:2" ) // manual says "not used"
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW3:4" ) // ditto
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -558,39 +567,37 @@ static INPUT_PORTS_START( miaj )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	KONAMI_COINAGE(DEF_STR( Free_Play ), "Invalid")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x02, "3" ) // US and Japan factory default = "3"
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x18, "30K 80K" )
-	PORT_DIPSETTING(    0x10, "50K 100K" )
-	PORT_DIPSETTING(    0x08, "50K" )
-	PORT_DIPSETTING(    0x00, "100K" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "30K, Every 80K" ) // Japan factory default = "30K, Every 80K"
+	PORT_DIPSETTING(    0x10, "50K, Every 100K" )
+	PORT_DIPSETTING(    0x08, "50K Only" ) // US factory default = "50K Only" (struck off "50K, Every 100K")
+	PORT_DIPSETTING(    0x00, "100K Only" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) ) // US factory default = "Difficult" (struck off "Normal")
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")	/* 0xa0018 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "VRAM Character Check" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW3:2" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW3:4" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -615,43 +622,40 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	KONAMI_COINAGE(DEF_STR( Free_Play ), "Invalid")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" ) // manual says "not used"
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" ) // manual says "not used"
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, "Machine Name" )
+	PORT_DIPNAME( 0x18, 0x08, "Machine Name" ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "Lewis" )
-	PORT_DIPSETTING(    0x08, "Johnson" )
+	PORT_DIPSETTING(    0x08, "Johnson" ) // Japan factory default = "Johnson"
 	PORT_DIPSETTING(    0x00, "George" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")	/* 0xa0018 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Upright Controls" )
+	PORT_DIPNAME( 0x02, 0x00, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, "Mode" )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPNAME( 0x08, 0x08, "Stop Time" ) PORT_DIPLOCATION("SW3:4") // old coding [ Title="Mode" Off="3" On="4" Default="3" ] What did it mean?
+	PORT_DIPSETTING(    0x08, "200" ) // Japan factory default = "200"
+	PORT_DIPSETTING(    0x00, "150" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -961,7 +965,7 @@ ROM_START( vulcan )
 
 	ROM_REGION( 0x40000, "sub", 0 )	// 68000 code (CPU B)
 	ROM_LOAD16_BYTE( "785_p07.10n",	0x00000, 0x10000, CRC(686d549d) SHA1(9687be801c4fb963bf6b0199e2ae9f5051213f7a) )
-	ROM_LOAD16_BYTE( "785_p06.8n" ,	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
+	ROM_LOAD16_BYTE( "785_p06.8n",	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
 	ROM_LOAD16_BYTE( "785_p13.10s",	0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",	0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
@@ -995,7 +999,7 @@ ROM_START( vulcana )
 
 	ROM_REGION( 0x40000, "sub", 0 )	// 68000 code (CPU B)
 	ROM_LOAD16_BYTE( "785_p07.10n",	0x00000, 0x10000, CRC(686d549d) SHA1(9687be801c4fb963bf6b0199e2ae9f5051213f7a) )
-	ROM_LOAD16_BYTE( "785_p06.8n" ,	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
+	ROM_LOAD16_BYTE( "785_p06.8n",	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
 	ROM_LOAD16_BYTE( "785_p13.10s",	0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",	0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
@@ -1029,7 +1033,7 @@ ROM_START( vulcanb )
 
 	ROM_REGION( 0x40000, "sub", 0 )	// 68000 code (CPU B)
 	ROM_LOAD16_BYTE( "785_g07.10n",	0x00000, 0x10000, CRC(ee09dd5d) SHA1(9b6fb12c2cb7930df12d9876810811540fd560ee) ) /* requires older CPU B code compared to other sets */
-	ROM_LOAD16_BYTE( "785_g06.8n" ,	0x00001, 0x10000, CRC(85ab7af7) SHA1(5cb36918a5cdfd16611da76f07450ae1d115f2c7) )
+	ROM_LOAD16_BYTE( "785_g06.8n",	0x00001, 0x10000, CRC(85ab7af7) SHA1(5cb36918a5cdfd16611da76f07450ae1d115f2c7) )
 	ROM_LOAD16_BYTE( "785_g13.10s",	0x20000, 0x10000, CRC(274f325d) SHA1(1076efa204eff0fc8a8788706b17b9a128023d35) )
 	ROM_LOAD16_BYTE( "785_g12.8s",	0x20001, 0x10000, CRC(1625f933) SHA1(3f25d7396af46e75e3ae8456414e31935de43d34) )
 
@@ -1063,7 +1067,7 @@ ROM_START( gradius2 )
 
 	ROM_REGION( 0x40000, "sub", 0 )	// 68000 code (CPU B)
 	ROM_LOAD16_BYTE( "785_p07.10n",	0x00000, 0x10000, CRC(686d549d) SHA1(9687be801c4fb963bf6b0199e2ae9f5051213f7a) )
-	ROM_LOAD16_BYTE( "785_p06.8n" ,	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
+	ROM_LOAD16_BYTE( "785_p06.8n",	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
 	ROM_LOAD16_BYTE( "785_p13.10s",	0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",	0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
@@ -1102,7 +1106,7 @@ ROM_START( gradius2a )
 
 	ROM_REGION( 0x40000, "sub", 0 )	// 68000 code (CPU B)
 	ROM_LOAD16_BYTE( "785_p07.10n",	0x00000, 0x10000, CRC(686d549d) SHA1(9687be801c4fb963bf6b0199e2ae9f5051213f7a) )
-	ROM_LOAD16_BYTE( "785_p06.8n" ,	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
+	ROM_LOAD16_BYTE( "785_p06.8n",	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
 	ROM_LOAD16_BYTE( "785_p13.10s",	0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",	0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
@@ -1136,7 +1140,7 @@ ROM_START( gradius2b )
 
 	ROM_REGION( 0x40000, "sub", 0 ) 	// 68000 code (CPU B)
 	ROM_LOAD16_BYTE( "785_p07.10n",	0x00000, 0x10000, CRC(686d549d) SHA1(9687be801c4fb963bf6b0199e2ae9f5051213f7a) )
-	ROM_LOAD16_BYTE( "785_p06.8n" ,	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
+	ROM_LOAD16_BYTE( "785_p06.8n",	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
 	ROM_LOAD16_BYTE( "785_p13.10s",	0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
 	ROM_LOAD16_BYTE( "785_p12.8s",	0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
 
@@ -1347,18 +1351,19 @@ static DRIVER_INIT( cuebrickj )
 
 /* Game Drivers */
 
-GAME( 1987, devilw,   0,        devilw,		devilw,   twin16,   ROT0, "Konami", "Devil World", GAME_SUPPORTS_SAVE )
-GAME( 1987, majuu,    devilw,   devilw,		devilw,   twin16,   ROT0, "Konami", "Majuu no Ohkoku", GAME_SUPPORTS_SAVE )
-GAME( 1987, darkadv,  devilw,   devilw,		darkadv,  twin16,   ROT0, "Konami", "Dark Adventure", GAME_SUPPORTS_SAVE )
-GAME( 1988, vulcan,   0,        twin16,		vulcan,   twin16,   ROT0, "Konami", "Vulcan Venture (New)", GAME_SUPPORTS_SAVE )
-GAME( 1988, vulcana,  vulcan,   twin16,		gradius2, twin16,   ROT0, "Konami", "Vulcan Venture (Old)", GAME_SUPPORTS_SAVE )
-GAME( 1988, vulcanb,  vulcan,   twin16,		gradius2, twin16,   ROT0, "Konami", "Vulcan Venture (Oldest)", GAME_SUPPORTS_SAVE )
-GAME( 1988, gradius2, vulcan,   twin16,		gradius2, twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1988, gradius2a,vulcan,   twin16,		vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1988, gradius2b,vulcan,   twin16,		vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", GAME_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,   INPUT,     INIT,      MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1987, devilw,    0,        devilw,    devilw,    twin16,    ROT0,   "Konami", "Devil World", GAME_SUPPORTS_SAVE )
+GAME( 1987, majuu,     devilw,   devilw,    devilw,    twin16,    ROT0,   "Konami", "Majuu no Ohkoku", GAME_SUPPORTS_SAVE )
+GAME( 1987, darkadv,   devilw,   devilw,    darkadv,   twin16,    ROT0,   "Konami", "Dark Adventure", GAME_SUPPORTS_SAVE )
+GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16,    ROT0,   "Konami", "Vulcan Venture (New)", GAME_SUPPORTS_SAVE )
+GAME( 1988, vulcana,   vulcan,   twin16,    gradius2,  twin16,    ROT0,   "Konami", "Vulcan Venture (Old)", GAME_SUPPORTS_SAVE )
+GAME( 1988, vulcanb,   vulcan,   twin16,    gradius2,  twin16,    ROT0,   "Konami", "Vulcan Venture (Oldest)", GAME_SUPPORTS_SAVE )
+GAME( 1988, gradius2,  vulcan,   twin16,    gradius2,  twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1988, gradius2a, vulcan,   twin16,    vulcan,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", GAME_SUPPORTS_SAVE )
 
-GAME( 1988, fround,   0,        fround,		fround,   fround,   ROT0, "Konami", "The Final Round (version M)", GAME_SUPPORTS_SAVE )
-GAME( 1988, froundl,  fround,   fround,		fround,   fround,   ROT0, "Konami", "The Final Round (version L)", GAME_SUPPORTS_SAVE )
-GAME( 1988, hpuncher, fround,   twin16,		fround,   twin16,   ROT0, "Konami", "Hard Puncher (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, miaj,     mia,      miaj,		miaj,     twin16,   ROT0, "Konami", "M.I.A. - Missing in Action (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, cuebrickj,cuebrick, cuebrickj,	cuebrickj,cuebrickj,ROT0, "Konami", "Cue Brick (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, fround,    0,        fround,    fround,    fround,    ROT0,   "Konami", "The Final Round (version M)", GAME_SUPPORTS_SAVE )
+GAME( 1988, froundl,   fround,   fround,    fround,    fround,    ROT0,   "Konami", "The Final Round (version L)", GAME_SUPPORTS_SAVE )
+GAME( 1988, hpuncher,  fround,   twin16,    fround,    twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, miaj,      mia,      miaj,      miaj,      twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj, ROT0,   "Konami", "Cue Brick (Japan)", GAME_SUPPORTS_SAVE )

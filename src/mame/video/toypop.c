@@ -20,12 +20,10 @@
 
 PALETTE_INIT( toypop )
 {
-	int i;
-
 	/* allocate the colortable */
 	machine.colortable = colortable_alloc(machine, 256);
 
-	for (i = 0;i < 256;i++)
+	for (int i = 0;i < 256;i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -51,7 +49,7 @@ PALETTE_INIT( toypop )
 		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r,g,b));
 	}
 
-	for (i = 0;i < 256;i++)
+	for (int i = 0;i < 256;i++)
 	{
 		UINT8 entry;
 
@@ -62,7 +60,7 @@ PALETTE_INIT( toypop )
 		entry = color_prom[i + 0x500];
 		colortable_entry_set_value(machine.colortable, i + 2*256, entry);
 	}
-	for (i = 0;i < 16;i++)
+	for (int i = 0;i < 16;i++)
 	{
 		// background
 		colortable_entry_set_value(machine.colortable, i + 3*256 + 0*16, 0x60 + i);
@@ -177,17 +175,16 @@ WRITE16_HANDLER( toypop_merged_background_w )
 static void draw_background(running_machine &machine, bitmap_t *bitmap)
 {
 	toypop_state *state = machine.driver_data<toypop_state>();
-	int offs, x, y;
 	pen_t pen_base = 0x300 + 0x10*state->m_palettebank;
 
 	// copy the background image from RAM (0x190200-0x19FDFF) to bitmap
 	if (state->m_bitmapflip)
 	{
-		offs = 0xFDFE/2;
-		for (y = 0; y < 224; y++)
+		int offs = 0xFDFE/2;
+		for (int y = 0; y < 224; y++)
 		{
 			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
-			for (x = 0; x < 288; x+=2)
+			for (int x = 0; x < 288; x+=2)
 			{
 				UINT16 data = state->m_bg_image[offs];
 				scanline[x]   = pen_base | (data & 0x0f);
@@ -198,11 +195,11 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap)
 	}
 	else
 	{
-		offs = 0x200/2;
-		for (y = 0; y < 224; y++)
+		int offs = 0x200/2;
+		for (int y = 0; y < 224; y++)
 		{
 			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
-			for (x = 0; x < 288; x+=2)
+			for (int x = 0; x < 288; x+=2)
 			{
 				UINT16 data = state->m_bg_image[offs];
 				scanline[x]   = pen_base | (data >> 8);
@@ -227,10 +224,9 @@ void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *c
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
-	int offs;
 	enum { xoffs = -31, yoffs = -8 };
 
-	for (offs = 0;offs < 0x80;offs += 2)
+	for (int offs = 0;offs < 0x80;offs += 2)
 	{
 		/* is it on? */
 		if ((spriteram_3[offs+1] & 2) == 0)
@@ -248,7 +244,6 @@ void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *c
 			int flipy = (spriteram_3[offs] & 0x02) >> 1;
 			int sizex = (spriteram_3[offs] & 0x04) >> 2;
 			int sizey = (spriteram_3[offs] & 0x08) >> 3;
-			int x,y;
 
 			sprite &= ~sizex;
 			sprite &= ~(sizey << 1);
@@ -263,12 +258,12 @@ void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *c
 				sy += 40;
 			}
 
-			for (y = 0;y <= sizey;y++)
+			for (int y = 0;y <= sizey;y++)
 			{
-				for (x = 0;x <= sizex;x++)
+				for (int x = 0;x <= sizex;x++)
 				{
 					drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
-						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
+						sprite + gfx_offs[y ^ (sizey & flipy)][x ^ (sizex & flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,

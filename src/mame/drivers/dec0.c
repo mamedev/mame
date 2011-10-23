@@ -755,19 +755,19 @@ static INPUT_PORTS_START( hbarrel )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_3C ) )
-	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )	// Always OFF
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0200, "5" )
-	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
@@ -782,7 +782,7 @@ static INPUT_PORTS_START( hbarrel )
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )	// Always OFF
 
 	PORT_START("AN0")	/* player 1 12-way rotary control - converted in controls_r() */
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -796,23 +796,23 @@ static INPUT_PORTS_START( birdtry )
 
 	PORT_START("DSW")
 	DEC0_COIN_SETTING
-	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:5")
+	PORT_SERVICE_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )	// Always OFF
 
 	PORT_DIPNAME( 0x0300, 0x0300, "Difficulty (Extend)" ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c00, 0x0c00, "Difficulty (Course)" ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5")
@@ -827,6 +827,21 @@ static INPUT_PORTS_START( birdtry )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Unused ) )
 	PORT_DIPSETTING(      0x0000, "Type C - Upright" )
 
+	/* "Difficulty (Extend)"
+	                Easy    Normal  Hard    Hardest
+	(Start)         (5)     (3)     (3)     (3)
+	Hole in one     +5      +5      +2      +1
+	Albatross       +3      +3      +1       0
+	Eagle           +2      +2      +1       0
+	Birdie          +1      +1      +1       0
+	Par              0       0       0       0
+	Bogey           -1      -1      -1      -1
+	Double bogey    -2      -2      -2      -1
+	Triple bogey    -3      -3      -3      -1
+	Quadruple bogey -4      -4      -4      -1
+	Give up         -5      -5      -4      -2
+	*/
+
 	PORT_START("AN0")	/* player 1 12-way rotary control - converted in controls_r() */
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
@@ -839,19 +854,23 @@ static INPUT_PORTS_START( baddudes )
 
 	PORT_START("DSW")
 	DEC0_COIN_SETTING
-	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:5")
+	PORT_SERVICE_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )		// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )	// Always OFF
+	/* "SW1:8"
+	English "Bad Dudes" manual says "Dont Change"
+	Japanese "Dragonninja" manual says "Control Panel / Off=Table / On=Upright", but maybe not work
+	*/
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0200, "5" )
-	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0100, "1" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0200, "5" )
 	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
@@ -861,9 +880,9 @@ static INPUT_PORTS_START( baddudes )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" )	// Always OFF
-	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )	// Always OFF
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW2:6" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x4000, IP_ACTIVE_LOW, "SW2:7" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 
 	PORT_START("AN0")	/* player 1 12-way rotary control - converted in controls_r() */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused */
@@ -872,12 +891,24 @@ static INPUT_PORTS_START( baddudes )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( drgninja )
+	PORT_INCLUDE( baddudes )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0100, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0200, "4" )
+	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( robocop )
 	PORT_INCLUDE( dec0 )
 
 	PORT_START("DSW")
 	DEC0_COIN_SETTING
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )	// Always OFF
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
@@ -904,10 +935,14 @@ static INPUT_PORTS_START( robocop )
 	PORT_DIPNAME( 0x2000, 0x2000, "Bonus Stage Energy" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Low ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( High ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Brink Time" )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) ) PORT_DIPLOCATION("SW2:7")	/* not mentioned in manual */
+	PORT_DIPNAME( 0x4000, 0x4000, "Brink Time" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Less" )
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )	// Always OFF
+	/* "SW2:7"
+	English manual says "Always Off"
+	Japanese manual says "Invulnerable Brink Time On Continue / Off=Long / On=Short"
+	*/
+	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hippodrm )
@@ -915,14 +950,14 @@ static INPUT_PORTS_START( hippodrm )
 
 	PORT_START("DSW")
 	DEC0_COIN_SETTING
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )	// Always OFF
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )	// Always OFF
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0100, "1" )
@@ -935,17 +970,27 @@ static INPUT_PORTS_START( hippodrm )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x3000, 0x3000, "Player & Enemy Energy" ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(      0x3000, DEF_STR( Medium ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Low ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Very_Low ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Low ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
 	PORT_DIPNAME( 0x4000, 0x4000, "Enemy Power Decrease on Continue" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "2 Dots" )	// 2 Dots less
 	PORT_DIPSETTING(      0x0000, "3 Dots" )	// 3 Dots less
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ffantasy )
+	PORT_INCLUDE( hippodrm )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x4000, 0x4000, "Enemy Power Decrease on Continue" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x4000, "2 Dots" )	// 2 Dots less
+	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )	// 0 Dot less
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( slyspy )
@@ -954,7 +999,7 @@ static INPUT_PORTS_START( slyspy )
 
 	PORT_START("DSW")
 	DEC0_COIN_SETTING
-	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:5")
+	PORT_SERVICE_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
@@ -978,9 +1023,9 @@ static INPUT_PORTS_START( slyspy )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" )	// Always OFF
-	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )	// Always OFF
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW2:6" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x4000, IP_ACTIVE_LOW, "SW2:7" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midres )
@@ -988,14 +1033,14 @@ static INPUT_PORTS_START( midres )
 
 	PORT_START("DSW")
 	DEC0_COIN_SETTING
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )	// Always OFF
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )	// Always OFF
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, "3" )
@@ -1007,16 +1052,16 @@ static INPUT_PORTS_START( midres )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")	/* manual mentions Extra Lives - Default OFF */
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")	/* manual mentions Extra Lives - Default OFF */
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW2:5" )	/* manual mentions Extra Lives - Default OFF */
+	PORT_DIPUNUSED_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW2:6" )	/* manual mentions Extra Lives - Default OFF */
+	/* "SW2:5,6"
+	English manual says "Extra Lives / OFF OFF" ( missing "ON OFF", "OFF ON" and "ON ON" ) , but maybe not work
+	Japanese manual says "Never Touch"
+	*/
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 
 	PORT_START("AN0")	/* player 1 12-way rotary control - converted in controls_r() */
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -1025,40 +1070,48 @@ static INPUT_PORTS_START( midres )
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( midresu )
+	PORT_INCLUDE( midres )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0100, "1" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0200, "5" )
+	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( midresb )
 	PORT_INCLUDE( dec0 )
 
 	PORT_START("DSW")
 	DEC0_COIN_SETTING
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )	// Always OFF
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )	// Always OFF
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0300, "3" )
-	PORT_DIPSETTING(      0x0200, "4" )
-	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0200, "5" )
 	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")	/* manual mentions Extra Lives - Default OFF */
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")	/* manual mentions Extra Lives - Default OFF */
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW2:5" )	/* manual mentions Extra Lives - Default OFF */
+	PORT_DIPUNUSED_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW2:6" )	/* manual mentions Extra Lives - Default OFF */
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 
 	PORT_START("AN0")	/* player 1 12-way rotary control - converted in controls_r() */
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -1110,7 +1163,7 @@ static INPUT_PORTS_START( bouldash )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW2:5" )	// Always OFF
+	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW2:5" )	// Always OFF
 	PORT_DIPNAME( 0x2000, 0x2000, "Game Change Mode" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, "Part 1" )
 	PORT_DIPSETTING(      0x0000, "Part 2" )
@@ -2978,30 +3031,31 @@ static DRIVER_INIT( midresb )
 
 /******************************************************************************/
 
-GAME( 1987, hbarrel,  0,        hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East USA",         "Heavy Barrel (US)", 0 )
-GAME( 1987, hbarrelw, hbarrel,  hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East Corporation", "Heavy Barrel (World)", 0 )
-GAME( 1988, baddudes, 0,        baddudes, baddudes, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", 0 )
-GAME( 1988, drgninja, baddudes, baddudes, baddudes, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", 0 )
+//    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1987, hbarrel,    0,        hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East USA",         "Heavy Barrel (US)", 0 )
+GAME( 1987, hbarrelw,   hbarrel,  hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East Corporation", "Heavy Barrel (World)", 0 )
+GAME( 1988, baddudes,   0,        baddudes, baddudes, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", 0 )
+GAME( 1988, drgninja,   baddudes, baddudes, drgninja, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", 0 )
 /* A Bad Dudes bootleg with 68705 like the midres and ffantasy ones exists, but is not dumped */
-GAME( 1988, birdtry,  0,        birdtry,  birdtry,  birdtry,  ROT270, "Data East Corporation", "Birdie Try (Japan)", GAME_UNEMULATED_PROTECTION )
-GAME( 1988, robocop,  0,        robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 4)", 0 )
-GAME( 1988, robocopw, robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 3)", 0 )
-GAME( 1988, robocopj, robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (Japan)", 0 )
-GAME( 1988, robocopu, robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 1)", 0 )
-GAME( 1988, robocopu0,robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 0)", 0 )
-GAME( 1988, robocopb, robocop,  robocopb, robocop,  robocop,  ROT0,   "bootleg",               "Robocop (World bootleg)", 0)
-GAME( 1988, automat,  robocop,  automat,  robocop,  robocop,  ROT0,   "bootleg",               "Automat (bootleg of Robocop)", GAME_NOT_WORKING )
-GAME( 1989, hippodrm, 0,        hippodrm, hippodrm, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", 0 )
-GAME( 1989, ffantasy, hippodrm, hippodrm, hippodrm, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", 0 )
-GAME( 1989, ffantasya,hippodrm, hippodrm, hippodrm, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", 0 )
-GAME( 1989, ffantasybl,hippodrm,midres,   midres,   0,        ROT0,   "bootleg",               "Fighting Fantasy (bootleg with 68705)", GAME_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
-GAME( 1989, slyspy,   0,        slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 3)", 0 )
-GAME( 1989, slyspy2,  slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 2)", 0 )
-GAME( 1989, secretag, slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East Corporation", "Secret Agent (World)", 0 )
-GAME( 1989, secretab, slyspy,   secretab, slyspy,   slyspy,   ROT0,   "bootleg",               "Secret Agent (bootleg)", GAME_NOT_WORKING )
-GAME( 1989, midres,   0,        midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
-GAME( 1989, midresu,  midres,   midres,   midres,   0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
-GAME( 1989, midresj,  midres,   midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
-GAME( 1989, midresb,  midres,   midresb,  midresb,  midresb,  ROT0,   "bootleg",               "Midnight Resistance (bootleg with 68705)", 0 ) // need to hook up 68705?
-GAME( 1990, bouldash, 0,        slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", 0 )
-GAME( 1990, bouldashj,bouldash, slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", 0 )
+GAME( 1988, birdtry,    0,        birdtry,  birdtry,  birdtry,  ROT270, "Data East Corporation", "Birdie Try (Japan)", GAME_UNEMULATED_PROTECTION )
+GAME( 1988, robocop,    0,        robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 4)", 0 )
+GAME( 1988, robocopw,   robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 3)", 0 )
+GAME( 1988, robocopj,   robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (Japan)", 0 )
+GAME( 1988, robocopu,   robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 1)", 0 )
+GAME( 1988, robocopu0,  robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 0)", 0 )
+GAME( 1988, robocopb,   robocop,  robocopb, robocop,  robocop,  ROT0,   "bootleg",               "Robocop (World bootleg)", 0)
+GAME( 1988, automat,    robocop,  automat,  robocop,  robocop,  ROT0,   "bootleg",               "Automat (bootleg of Robocop)", GAME_NOT_WORKING )
+GAME( 1989, hippodrm,   0,        hippodrm, hippodrm, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", 0 )
+GAME( 1989, ffantasy,   hippodrm, hippodrm, ffantasy, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", 0 )
+GAME( 1989, ffantasya,  hippodrm, hippodrm, ffantasy, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", 0 )
+GAME( 1989, ffantasybl, hippodrm, midres,   midres,   0,        ROT0,   "bootleg",               "Fighting Fantasy (bootleg with 68705)", GAME_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
+GAME( 1989, slyspy,     0,        slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 3)", 0 )
+GAME( 1989, slyspy2,    slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 2)", 0 )
+GAME( 1989, secretag,   slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East Corporation", "Secret Agent (World)", 0 )
+GAME( 1989, secretab,   slyspy,   secretab, slyspy,   slyspy,   ROT0,   "bootleg",               "Secret Agent (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, midres,     0,        midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
+GAME( 1989, midresu,    midres,   midres,   midresu,  0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
+GAME( 1989, midresj,    midres,   midres,   midresu,  0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
+GAME( 1989, midresb,    midres,   midresb,  midresb,  midresb,  ROT0,   "bootleg",               "Midnight Resistance (bootleg with 68705)", 0 ) // need to hook up 68705?
+GAME( 1990, bouldash,   0,        slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", 0 )
+GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", 0 )

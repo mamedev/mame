@@ -723,20 +723,23 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	// enumerated list of control types
 	enum
 	{
+		ANALOG_TYPE_PADDLE,
+		ANALOG_TYPE_PEDAL,
 		ANALOG_TYPE_JOYSTICK,
+		ANALOG_TYPE_POSITIONAL,
+		ANALOG_TYPE_LIGHTGUN,
 		ANALOG_TYPE_DIAL,
 		ANALOG_TYPE_TRACKBALL,
-		ANALOG_TYPE_PADDLE,
-		ANALOG_TYPE_LIGHTGUN,
-		ANALOG_TYPE_PEDAL,
+		ANALOG_TYPE_MOUSE,
 		ANALOG_TYPE_COUNT
 	};
 
 	// directions
-	const UINT8 DIR_LEFTRIGHT = 0x01;
-	const UINT8 DIR_UPDOWN = 0x02;
-	const UINT8 DIR_4WAY = 0x04;
-	const UINT8 DIR_DUAL = 0x08;
+	const UINT8 DIR_UP = 0x01;
+	const UINT8 DIR_DOWN = 0x02;
+	const UINT8 DIR_LEFT = 0x04;
+	const UINT8 DIR_RIGHT = 0x08;
+	const UINT8 DIR_4WAY = 0x10;
 
 	// initialize the list of control types
 	struct
@@ -757,11 +760,14 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	int nplayer = 0;
 	int nbutton = 0;
 	int ncoin = 0;
-	UINT8 joytype = 0;
+	UINT8 joytype[3] = { 0,0,0 };
 	bool service = false;
 	bool tilt = false;
 	bool keypad = false;
 	bool keyboard = false;
+	bool mahjong = false;
+	bool hanafuda = false;
+	bool gambling = false;
 
 	// iterate over the ports
 	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
@@ -777,49 +783,37 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 			switch (field->type)
 			{
 				// map which joystick directions are present
-				case IPT_JOYSTICKRIGHT_LEFT:
-				case IPT_JOYSTICKRIGHT_RIGHT:
-				case IPT_JOYSTICKLEFT_LEFT:
-				case IPT_JOYSTICKLEFT_RIGHT:
-					joytype |= DIR_DUAL;
-					// fall through...
+				case IPT_JOYSTICK_UP:			joytype[0] |= DIR_UP | ((field->way == 4) ? DIR_4WAY : 0);		break;
+				case IPT_JOYSTICK_DOWN:			joytype[0] |= DIR_DOWN | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICK_LEFT:			joytype[0] |= DIR_LEFT | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICK_RIGHT:		joytype[0] |= DIR_RIGHT | ((field->way == 4) ? DIR_4WAY : 0);	break;
 
-				case IPT_JOYSTICK_LEFT:
-				case IPT_JOYSTICK_RIGHT:
-					joytype |= DIR_LEFTRIGHT | ((field->way == 4) ? DIR_4WAY : 0);
-					break;
+				case IPT_JOYSTICKLEFT_UP:		joytype[1] |= DIR_UP | ((field->way == 4) ? DIR_4WAY : 0);		break;
+				case IPT_JOYSTICKLEFT_DOWN:		joytype[1] |= DIR_DOWN | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKLEFT_LEFT:		joytype[1] |= DIR_LEFT | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKLEFT_RIGHT:	joytype[1] |= DIR_RIGHT | ((field->way == 4) ? DIR_4WAY : 0);	break;
 
-				case IPT_JOYSTICKRIGHT_UP:
-				case IPT_JOYSTICKRIGHT_DOWN:
-				case IPT_JOYSTICKLEFT_UP:
-				case IPT_JOYSTICKLEFT_DOWN:
-					joytype |= DIR_DUAL;
-					// fall through...
-
-				case IPT_JOYSTICK_UP:
-				case IPT_JOYSTICK_DOWN:
-					joytype |= DIR_UPDOWN | ((field->way == 4) ? DIR_4WAY : 0);
-					break;
+				case IPT_JOYSTICKRIGHT_UP:		joytype[2] |= DIR_UP | ((field->way == 4) ? DIR_4WAY : 0);		break;
+				case IPT_JOYSTICKRIGHT_DOWN:	joytype[2] |= DIR_DOWN | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKRIGHT_LEFT:	joytype[2] |= DIR_LEFT | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKRIGHT_RIGHT:	joytype[2] |= DIR_RIGHT | ((field->way == 4) ? DIR_4WAY : 0);	break;
 
 				// mark as an analog input, and get analog stats after switch
+				case IPT_AD_STICK_X:
+				case IPT_AD_STICK_Y:
+				case IPT_AD_STICK_Z:
+					control_info[analogtype = ANALOG_TYPE_JOYSTICK].type = "stick";
+					break;
+
 				case IPT_PADDLE:
+				case IPT_PADDLE_V:
 					control_info[analogtype = ANALOG_TYPE_PADDLE].type = "paddle";
 					break;
 
-				case IPT_DIAL:
-					control_info[analogtype = ANALOG_TYPE_DIAL].type = "dial";
-					analogtype = ANALOG_TYPE_DIAL;
-					break;
-
-				case IPT_TRACKBALL_X:
-				case IPT_TRACKBALL_Y:
-					control_info[analogtype = ANALOG_TYPE_TRACKBALL].type = "trackball";
-					analogtype = ANALOG_TYPE_TRACKBALL;
-					break;
-
-				case IPT_AD_STICK_X:
-				case IPT_AD_STICK_Y:
-					control_info[analogtype = ANALOG_TYPE_JOYSTICK].type = "stick";
+				case IPT_PEDAL:
+				case IPT_PEDAL2:
+				case IPT_PEDAL3:
+					control_info[analogtype = ANALOG_TYPE_PEDAL].type = "pedal";
 					break;
 
 				case IPT_LIGHTGUN_X:
@@ -827,10 +821,24 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 					control_info[analogtype = ANALOG_TYPE_LIGHTGUN].type = "lightgun";
 					break;
 
-				case IPT_PEDAL:
-				case IPT_PEDAL2:
-				case IPT_PEDAL3:
-					control_info[analogtype = ANALOG_TYPE_PEDAL].type = "pedal";
+				case IPT_POSITIONAL:
+				case IPT_POSITIONAL_V:
+					control_info[analogtype = ANALOG_TYPE_POSITIONAL].type = "positional";
+					break;
+
+				case IPT_DIAL:
+				case IPT_DIAL_V:
+					control_info[analogtype = ANALOG_TYPE_DIAL].type = "dial";
+					break;
+
+				case IPT_TRACKBALL_X:
+				case IPT_TRACKBALL_Y:
+					control_info[analogtype = ANALOG_TYPE_TRACKBALL].type = "trackball";
+					break;
+
+				case IPT_MOUSE_X:
+				case IPT_MOUSE_Y:
+					control_info[analogtype = ANALOG_TYPE_MOUSE].type = "mouse";
 					break;
 
 				// track maximum button index
@@ -882,6 +890,15 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				case IPT_TILT:
 					tilt = true;
 					break;
+
+				default:
+					if (field->type >= __ipt_mahjong_start && field->type <= __ipt_mahjong_end)
+						mahjong = true;
+					else if (field->type >= __ipt_hanafuda_start && field->type <= __ipt_hanafuda_end)
+						hanafuda = true;
+					else if (field->type >= __ipt_gambling_start && field->type <= __ipt_gambling_end)
+						gambling = true;
+					break;
 			}
 
 			// get the analog stats
@@ -914,12 +931,47 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	fprintf(m_output, ">\n");
 
 	// output the joystick types
-	if (joytype != 0)
+	if (joytype[1]==0 && joytype[2]!=0) { joytype[1] = joytype[2]; joytype[2] = 0; }
+	if (joytype[0]==0 && joytype[1]!=0) { joytype[0] = joytype[1]; joytype[1] = 0; }
+	if (joytype[1]==0 && joytype[2]!=0) { joytype[1] = joytype[2]; joytype[2] = 0; }
+	if (joytype[0] != 0)
 	{
-		const char *vertical = ((joytype & DIR_LEFTRIGHT) == 0) ? "v" : "";
-		const char *doubletype = ((joytype & DIR_DUAL) != 0) ? "doublejoy" : "joy";
-		const char *way = ((joytype & DIR_LEFTRIGHT) == 0 || (joytype & DIR_UPDOWN) == 0) ? "2way" : ((joytype & DIR_4WAY) != 0) ? "4way" : "8way";
-		fprintf(m_output, "\t\t\t<control type=\"%s%s%s\"/>\n", vertical, doubletype, way);
+		const char *joys = (joytype[2]!=0) ? "triple" : (joytype[1]!=0) ? "double" : "";
+		fprintf(m_output, "\t\t\t<control type=\"%sjoy\"", joys);
+		for (int lp=0; lp<3 && joytype[lp]!=0; lp++)
+		{
+			const char *plural = (lp==2) ? "3" : (lp==1) ? "2" : "";
+			const char *ways;
+			switch (joytype[lp] & (DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT))
+			{
+				case DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT:
+					ways = ((joytype[lp] & DIR_4WAY) != 0) ? "4" : "8";
+					break;
+				case DIR_LEFT | DIR_RIGHT:
+					ways = "2";
+					break;
+				case DIR_UP | DIR_DOWN:
+					ways = "vertical2";
+					break;
+				case DIR_UP:
+				case DIR_DOWN:
+				case DIR_LEFT:
+				case DIR_RIGHT:
+					ways = "1";
+					break;
+				case DIR_UP | DIR_DOWN | DIR_LEFT:
+				case DIR_UP | DIR_DOWN | DIR_RIGHT:
+				case DIR_UP | DIR_LEFT | DIR_RIGHT:
+				case DIR_DOWN | DIR_LEFT | DIR_RIGHT:
+					ways = ((joytype[lp] & DIR_4WAY) != 0) ? "3 (half4)" : "5 (half8)";
+					break;
+				default:
+					ways = "strange2";
+					break;
+			}
+			fprintf(m_output, " ways%s=\"%s\"", plural,ways);
+		}
+		fprintf(m_output, "/>\n");
 	}
 
 	// output analog types
@@ -947,6 +999,14 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 		fprintf(m_output, "\t\t\t<control type=\"keypad\"/>\n");
 	if (keyboard)
 		fprintf(m_output, "\t\t\t<control type=\"keyboard\"/>\n");
+
+	// misc
+	if (mahjong)
+		fprintf(m_output, "\t\t\t<control type=\"mahjong\"/>\n");
+	if (hanafuda)
+		fprintf(m_output, "\t\t\t<control type=\"hanafuda\"/>\n");
+	if (gambling)
+		fprintf(m_output, "\t\t\t<control type=\"gambling\"/>\n");
 
 	fprintf(m_output, "\t\t</input>\n");
 }

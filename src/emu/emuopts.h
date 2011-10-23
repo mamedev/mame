@@ -167,6 +167,8 @@ enum
 #define OPTION_JOYSTICK_DEADZONE	"joystick_deadzone"
 #define OPTION_JOYSTICK_SATURATION	"joystick_saturation"
 #define OPTION_NATURAL_KEYBOARD		"natural"
+#define OPTION_JOYSTICK_CONTRADICTORY	"joystick_contradictory"
+#define OPTION_COIN_IMPULSE			"coin_impulse"
 
 // input autoenable options
 #define OPTION_PADDLE_DEVICE		"paddle_device"
@@ -327,6 +329,8 @@ public:
 	bool steadykey() const { return bool_value(OPTION_STEADYKEY); }
 	bool offscreen_reload() const { return bool_value(OPTION_OFFSCREEN_RELOAD); }
 	bool natural_keyboard() const { return bool_value(OPTION_NATURAL_KEYBOARD); }
+	bool joystick_contradictory() const { return bool_value(OPTION_JOYSTICK_CONTRADICTORY); }
+	int coin_impulse() const { return int_value(OPTION_COIN_IMPULSE); }
 
 	// core debugging options
 	bool verbose() const { return bool_value(OPTION_VERBOSE); }

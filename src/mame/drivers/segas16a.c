@@ -157,6 +157,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "video/segaic16.h"
+#include "includes/segaipt.h"
 
 
 /*************************************
@@ -633,25 +634,27 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 				{
 					switch (state->m_video_control & 0xf)
 					{
-						case 0x00: return input_port_read(space->machine(), "P1");
-						case 0x04: return input_port_read(space->machine(), "ANALOGX1");
-						case 0x08: return input_port_read(space->machine(), "ANALOGY1");
-						case 0x0c: return input_port_read(space->machine(), "UNUSED");
+						case 0x00: return input_port_read(space->machine(), "P1"); // "HANDX1"
+						case 0x04: return input_port_read(space->machine(), "TRACKX1");
+						case 0x08: return input_port_read(space->machine(), "TRACKY1");
+						case 0x0c: return input_port_read(space->machine(), "HANDY1");
 					}
 					break;
 				}
 
 				case 0x02:
 					return input_port_read(space->machine(), "DIAL1") | (input_port_read(space->machine(), "DIAL2") << 4);
+					// low nibble: Sega 56pin Edge "16"-"19" // rotary switch 10positions 4bit-binary-pinout
+					// high nibble: Sega 56pin Edge "T"-"W"  // ditto
 
 				case 0x03:
 				{
 					switch (state->m_video_control & 0xf)
 					{
-						case 0x00: return input_port_read(space->machine(), "P2");
-						case 0x04: return input_port_read(space->machine(), "ANALOGX2");
-						case 0x08: return input_port_read(space->machine(), "ANALOGY2");
-						case 0x0c: return input_port_read(space->machine(), "POW2");
+						case 0x00: return input_port_read(space->machine(), "P2"); // "HANDX2"
+						case 0x04: return input_port_read(space->machine(), "TRACKX2");
+						case 0x08: return input_port_read(space->machine(), "TRACKY2");
+						case 0x0c: return input_port_read(space->machine(), "HANDY2");
 					}
 					break;
 				}
@@ -1111,50 +1114,17 @@ static INPUT_PORTS_START( system16a_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
+	SEGA_COINAGE_LOC(SW1)
 
 	PORT_START("DSW2")
-	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW2:1" )
-	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW2:2" )
-	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW2:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW2:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )
-	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 
@@ -1165,47 +1135,22 @@ INPUT_PORTS_END
  *************************************/
 
 static INPUT_PORTS_START( aceattaa )
+	#define TMP_PL1HAND 2
+	#define TMP_PL1BALL 1
+	#define TMP_PL2HAND 4
+	#define TMP_PL2BALL 3
+
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )			/* Block Switch */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	/* Block Switch */
 
-	/* This is the direction control of the "hand" device for player 1 */
-	/* I'm sure there is a better way to do this but I don't fully understand how the device works yet */
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 )
+	PORT_MODIFY("P1") // "P1" multiplexer(1of4) // direction of "hand" device
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1HAND)
 
-	/* This is the power control of the "hand" device for player 1 */
-	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 )
-
-	/* This is the direction control of the "hand" device for player 2 */
-	/* I'm sure there is a better way to do this but I don't fully understand how the device works yet */
-	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(2)
-
-	/* This is the power control of the "hand" device for player 2 */
-	PORT_START("POW2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(2)
+	PORT_MODIFY("P2") // "P2" multiplexer(1of4) // direction of "hand" device
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2HAND)
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
@@ -1231,23 +1176,41 @@ static INPUT_PORTS_START( aceattaa )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ANALOGX1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_START("TRACKX1") // "P1" multiplexer(2of4)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1BALL) PORT_REVERSE
 
-	PORT_START("ANALOGY1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
+	PORT_START("TRACKY1") // "P1" multiplexer(3of4)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1BALL)
 
-	PORT_START("DIAL1")
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_START("HANDY1") // "P1" multiplexer(4of4) // power of "hand" device
+	PORT_BIT( 0x7f, 0x40, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(30) PORT_PLAYER(TMP_PL1HAND)
+	// maybe, read 8 bits, and masked 0x70
 
-	PORT_START("ANALOGX2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_START("DIAL1") // toss formation
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(10) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1) PORT_INVERT PORT_FULL_TURN_COUNT(10)
+	// AUTOMATIC 1 /  2  3  \ AUTOMATIC 2
+	// LEFT SIDE  / 1      4 \ RIGHT SIDE   // (out of range)
+	// B QUICK   | 0        5 |   D QUICK   // 10 A QUICK       13 A QUICK
+	// A QUICK    \ 9      6 /    C QUICK   // 11 (buggy blank) 14 B QUICK
+	// CENTER      \  8  7  / BACK ATTACK   // 12 A QUICK       15 A QUICK
 
-	PORT_START("ANALOGY2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
+	PORT_START("TRACKX2") // "P2" multiplexer(2of4)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2BALL) PORT_REVERSE
 
-	PORT_START("DIAL2")
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_START("TRACKY2") // "P2" multiplexer(3of4)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2BALL)
+
+	PORT_START("HANDY2") // "P2" multiplexer(4of4) // power of "hand" device
+	PORT_BIT( 0x7f, 0x40, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(30) PORT_PLAYER(TMP_PL2HAND)
+	// maybe, read 8 bits, and masked 0x70
+
+	PORT_START("DIAL2") // toss formation
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(10) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_INVERT PORT_FULL_TURN_COUNT(10)
+
+	#undef TMP_PL1HAND
+	#undef TMP_PL1BALL
+	#undef TMP_PL2HAND
+	#undef TMP_PL2BALL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( afighter )
@@ -1311,6 +1274,7 @@ static INPUT_PORTS_START( aliensyn )
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
+	//"SW2:1" unused
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1336,6 +1300,7 @@ static INPUT_PORTS_START( aliensynj )
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
+	//"SW2:1" unused
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1361,6 +1326,7 @@ static INPUT_PORTS_START( bodyslam )
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
+	//"SW2:1" unused
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1369,6 +1335,8 @@ static INPUT_PORTS_START( bodyslam )
 	PORT_DIPSETTING(    0x08, "Slow" )
 	PORT_DIPSETTING(    0x04, "Fast" )
 	PORT_DIPSETTING(    0x00, "Fastest" )
+	//"SW2:5" unused
+	//"SW2:6" unused
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
@@ -1433,15 +1401,9 @@ static INPUT_PORTS_START( mjleague )
 	PORT_DIPNAME( 0x10, 0x10, "Team Select" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") //??? something to do with cocktail mode?
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	//"SW2:6" unused //??? something to do with cocktail mode?
+	//"SW2:7" unused
+	//"SW2:8" unused
 
 	PORT_START("ANALOGX1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
@@ -1634,6 +1596,9 @@ static INPUT_PORTS_START( quart2 )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	//"SW2:6" unused
+	//"SW2:7" unused
+	//"SW2:8" unused
 INPUT_PORTS_END
 
 
@@ -1738,6 +1703,57 @@ static INPUT_PORTS_START( sjryuko )
 	PORT_MODIFY("P2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, " 1 Coin/1 Credit" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( None ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, " 1 Coin/1 Credit" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( None ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "CPU Level" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "Weak" )
+	PORT_DIPSETTING(    0x02, "Medium Weak" )
+	PORT_DIPSETTING(    0x01, "Medium Strong" )
+	PORT_DIPSETTING(    0x00, "Strong" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	//"SW2:4" unused
+	//"SW2:5" unused
+	//"SW2:6" unused
+	//"SW2:7" unused
+	//"SW2:8" unused
+
 	PORT_START("MJ0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -1794,14 +1810,19 @@ static INPUT_PORTS_START( tetris )
 	/* SW2:1,3,4,7,8 Unused according to manual.
     From the code SW2:3,4 looks like some kind of difficulty level,
     but all 4 levels points to the same place so it doesn't actually change anything!! */
+	//"SW2:1" unused
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	//"SW2:3" unused
+	//"SW2:4" unused
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	//"SW2:7" unused
+	//"SW2:8" unused
 INPUT_PORTS_END
 
 
@@ -1815,20 +1836,28 @@ static INPUT_PORTS_START( timescan )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWE:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Out Lane Pin" ) PORT_DIPLOCATION("SWE:2")
+	PORT_DIPNAME( 0x02, 0x02, "Out Lane Pin" ) PORT_DIPLOCATION("SWE:2") // Distance between out-lane-pins
 	PORT_DIPSETTING(    0x02, "Near" )
 	PORT_DIPSETTING(    0x00, "Far" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Special" ) PORT_DIPLOCATION("SWE:3,4")
-	PORT_DIPSETTING(    0x08, "7 Credits" )
-	PORT_DIPSETTING(    0x0c, "3 Credits" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Special" ) PORT_DIPLOCATION("SWE:3,4") // SPECIAL-stage clear bonus
+	PORT_DIPSETTING(    0x08, "3 Credits" )
+	PORT_DIPSETTING(    0x0c, "2 Credits" )
 	PORT_DIPSETTING(    0x04, "1 Credit" )
 	PORT_DIPSETTING(    0x00, "2000000 Points" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SWE:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWE:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SWE:6" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SWE:7" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SWE:8" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWE:6" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWE:7" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWE:8" ) /* Listed as "Unused" */
+	//"SWE:1" = "EXT.SW1" = Sega 56pin Edge "16"
+	//"SWE:2" = "EXT.SW2" =                 "17"
+	//"SWE:3" = "EXT.SW3" =                 "18"
+	//"SWE:4" = "EXT.SW4" =                 "19"
+	//"SWE:5" = "EXT.SW5" =                 "T"
+	//"SWE:6" = "EXT.SW6" =                 "U"
+	//"SWE:7" = "EXT.SW7" =                 "V"
+	//"SWE:8" = "EXT.SW8" =                 "W"
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1857,7 +1886,7 @@ static INPUT_PORTS_START( timescan )
 	PORT_DIPNAME( 0x20, 0x20, "Number Match" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Pin Rebound" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Pin Rebound" ) PORT_DIPLOCATION("SW2:7") // Rebounding strength of out-lane-pins
 	PORT_DIPSETTING(    0x40, "Well" )
 	PORT_DIPSETTING(    0x00, "A Little" )
 	/*
@@ -1875,6 +1904,7 @@ static INPUT_PORTS_START( wb3 )
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
+	//"SW2:1" unused
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1892,7 +1922,8 @@ static INPUT_PORTS_START( wb3 )
 	PORT_DIPNAME( 0x40, 0x40, "Test Mode" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )	/* Normal game */
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )	/* Levels are selectable / Player is Invincible */
-	/* Swtches 1 & 8 are listed as "Always off" */
+	//"SW2:8" unused
+	/* Switches 1 & 8 are listed as "Always off" */
 INPUT_PORTS_END
 
 
@@ -3508,36 +3539,37 @@ static DRIVER_INIT( sjryukoa )
  *
  *************************************/
 
+//    YEAR, NAME,       PARENT,   MACHINE,          INPUT,      INIT,        MONITOR,COMPANY,FULLNAME,FLAGS
 /* "Pre-System 16" */
-GAME( 1986, bodyslam,   0,        system16a_8751,   bodyslam,   generic_16a, ROT0,   "Sega",          "Body Slam (8751 317-0015)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dumpmtmt,   bodyslam, system16a_8751,   bodyslam,   dumpmtmt,    ROT0,   "Sega",          "Dump Matsumoto (Japan, 8751 317-0011a)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1985, mjleague,   0,        system16a,        mjleague,   mjleague,    ROT270, "Sega",          "Major League", GAME_SUPPORTS_SAVE )
-GAME( 1986, quartet,    0,        system16a_8751,   quartet,    quartet,     ROT0,   "Sega",          "Quartet (Rev A, 8751 315-5194)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1986, quarteta,   quartet,  system16a_8751,   quartet,    quartet,     ROT0,   "Sega",          "Quartet (8751 315-5194)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1986, quartet2,   quartet,  system16a_8751,   quart2,     generic_16a, ROT0,   "Sega",          "Quartet 2 (8751 317-0010)", GAME_SUPPORTS_SAVE )
-GAME( 1986, quartet2a,  quartet,  system16a,        quart2,     generic_16a, ROT0,   "Sega",          "Quartet 2 (unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bodyslam,   0,        system16a_8751,   bodyslam,   generic_16a, ROT0,   "Sega", "Body Slam (8751 317-0015)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dumpmtmt,   bodyslam, system16a_8751,   bodyslam,   dumpmtmt,    ROT0,   "Sega", "Dump Matsumoto (Japan, 8751 317-0011a)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, mjleague,   0,        system16a,        mjleague,   mjleague,    ROT270, "Sega", "Major League", GAME_SUPPORTS_SAVE )
+GAME( 1986, quartet,    0,        system16a_8751,   quartet,    quartet,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, quarteta,   quartet,  system16a_8751,   quartet,    quartet,     ROT0,   "Sega", "Quartet (8751 315-5194)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, quartet2,   quartet,  system16a_8751,   quart2,     generic_16a, ROT0,   "Sega", "Quartet 2 (8751 317-0010)", GAME_SUPPORTS_SAVE )
+GAME( 1986, quartet2a,  quartet,  system16a,        quart2,     generic_16a, ROT0,   "Sega", "Quartet 2 (unprotected)", GAME_SUPPORTS_SAVE )
 
 /* System 16A */
-GAME( 1987, aliensyn5,  aliensyn, system16a,        aliensyn,   fd1089b_16a, ROT0,   "Sega",           "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", GAME_SUPPORTS_SAVE )
-GAME( 1987, aliensyn2,  aliensyn, system16a,        aliensyn,   fd1089a_16a, ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
-GAME( 1987, aliensynjo, aliensyn, system16a,        aliensynj,  fd1089a_16a, ROT0,   "Sega",           "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
-GAME( 1988, aceattaca,  aceattac, system16a       , aceattaa,   aceattaa,    ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", GAME_SUPPORTS_SAVE )
-GAME( 1986, afighter,   0,        system16a_no7751, afighter,   fd1089a_16a, ROT270, "Sega",           "Action Fighter (FD1089A 317-0018)", GAME_SUPPORTS_SAVE )
-GAME( 1986, alexkidd,   0,        system16a,        alexkidd,   generic_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 2, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1986, alexkidd1,  alexkidd, system16a,        alexkidd,   fd1089a_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", GAME_SUPPORTS_SAVE )
-GAME( 1986, fantzone,   0,        system16a_no7751, fantzone,   generic_16a, ROT0,   "Sega",           "Fantasy Zone (Rev A, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1986, fantzone1,  fantzone, system16a_no7751, fantzone,   generic_16a, ROT0,   "Sega",           "Fantasy Zone (unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1986, fantzonep,  fantzone, system16a_no7751, fantzone,   fantzonep,   ROT0,   "Sega",           "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE )
-GAME( 1988, passsht16a, passsht,  system16a,        passsht16a, passsht16a,  ROT270, "Sega",           "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sdi,        0,        system16a_no7751, sdi,        sdi,         ROT0,   "Sega",           "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
-GAME( 1987, shinobi,    0,        system16a,        shinobi,    generic_16a, ROT0,   "Sega",           "Shinobi (set 6, System 16A, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1987, shinobi1,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "Sega",           "Shinobi (set 1, System 16A, FD1094 317-0050)", GAME_SUPPORTS_SAVE )
+GAME( 1987, aliensyn5,  aliensyn, system16a,        aliensyn,   fd1089b_16a, ROT0,   "Sega", "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", GAME_SUPPORTS_SAVE )
+GAME( 1987, aliensyn2,  aliensyn, system16a,        aliensyn,   fd1089a_16a, ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
+GAME( 1987, aliensynjo, aliensyn, system16a,        aliensynj,  fd1089a_16a, ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
+GAME( 1988, aceattaca,  aceattac, system16a,        aceattaa,   aceattaa,    ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", GAME_SUPPORTS_SAVE )
+GAME( 1986, afighter,   0,        system16a_no7751, afighter,   fd1089a_16a, ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", GAME_SUPPORTS_SAVE )
+GAME( 1986, alexkidd,   0,        system16a,        alexkidd,   generic_16a, ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1986, alexkidd1,  alexkidd, system16a,        alexkidd,   fd1089a_16a, ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", GAME_SUPPORTS_SAVE )
+GAME( 1986, fantzone,   0,        system16a_no7751, fantzone,   generic_16a, ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1986, fantzone1,  fantzone, system16a_no7751, fantzone,   generic_16a, ROT0,   "Sega", "Fantasy Zone (unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1986, fantzonep,  fantzone, system16a_no7751, fantzone,   fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE )
+GAME( 1988, passsht16a, passsht,  system16a,        passsht16a, passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sdi,        0,        system16a_no7751, sdi,        sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
+GAME( 1987, shinobi,    0,        system16a,        shinobi,    generic_16a, ROT0,   "Sega", "Shinobi (set 6, System 16A, unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1987, shinobi1,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "Sega", "Shinobi (set 1, System 16A, FD1094 317-0050)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinobls,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "bootleg (Star)", "Shinobi (Star bootleg, System 16A)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinoblb,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "bootleg (Beta)", "Shinobi (Beta bootleg)", GAME_SUPPORTS_SAVE ) // should have different sound hw? using original ATM
-GAME( 1987, sjryuko1,   sjryuko,  system16a,        sjryuko,    sjryukoa,    ROT0,   "White Board",    "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", GAME_SUPPORTS_SAVE )
-GAME( 1988, tetris,     0,        system16a_no7751, tetris,     generic_16a, ROT0,   "Sega",           "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", GAME_SUPPORTS_SAVE )
-GAME( 1988, tetris3,    tetris,   system16a_no7751, tetris,     generic_16a, ROT0,   "Sega",           "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", GAME_SUPPORTS_SAVE )
-GAME( 1987, timescan1,  timescan, system16a,        timescan,   fd1089b_16a, ROT270, "Sega",           "Time Scanner (set 1, System 16A, FD1089B 317-0024)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sjryuko1,   sjryuko,  system16a,        sjryuko,    sjryukoa,    ROT0,   "White Board", "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", GAME_SUPPORTS_SAVE )
+GAME( 1988, tetris,     0,        system16a_no7751, tetris,     generic_16a, ROT0,   "Sega", "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", GAME_SUPPORTS_SAVE )
+GAME( 1988, tetris3,    tetris,   system16a_no7751, tetris,     generic_16a, ROT0,   "Sega", "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", GAME_SUPPORTS_SAVE )
+GAME( 1987, timescan1,  timescan, system16a,        timescan,   fd1089b_16a, ROT270, "Sega", "Time Scanner (set 1, System 16A, FD1089B 317-0024)", GAME_SUPPORTS_SAVE )
 GAME( 1988, wb31,       wb3,      system16a_no7751, wb3,        generic_16a, ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, System 16A, FD1094 317-0084)", GAME_SUPPORTS_SAVE )
 GAME( 1988, wb35,       wb3,      system16a_no7751, wb3,        fd1089a_16a, ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, System 16A, FD1089A 317-xxxx, bad dump?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1988, wb35a,      wb3,      system16a_no7751, wb3,        fd1089a_16a, ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, System 16A, FD1089A 317-xxxx)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

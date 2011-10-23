@@ -667,7 +667,6 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-
-
-GAME( 1983, liblrabl, 0, liblrabl, liblrabl, 0,  ROT0, "Namco", "Libble Rabble", 0 )
-GAME( 1986, toypop,   0, toypop,   toypop,   0,  ROT0, "Namco", "Toypop", 0 )
+//    YEAR, NAME,     PARENT,MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, 0,   ROT0,   "Namco", "Libble Rabble", 0 )
+GAME( 1986, toypop,   0,     toypop,   toypop,   0,   ROT0,   "Namco", "Toypop", 0 )

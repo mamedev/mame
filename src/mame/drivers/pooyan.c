@@ -12,6 +12,7 @@
 #include "cpu/z80/z80.h"
 #include "audio/timeplt.h"
 #include "includes/pooyan.h"
+#include "includes/konamipt.h"
 
 
 #define MASTER_CLOCK		XTAL_18_432MHz
@@ -100,40 +101,7 @@ static INPUT_PORTS_START( pooyan )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, "Invalid" )
+	KONAMI_COINAGE(DEF_STR( Free_Play ), "Invalid" )
 	/* Invalid = both coin slots disabled */
 
 	PORT_START("DSW1")
@@ -341,6 +309,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, pooyan,  0,      pooyan, pooyan, 0, ROT90, "Konami", "Pooyan", GAME_SUPPORTS_SAVE )
-GAME( 1982, pooyans, pooyan, pooyan, pooyan, 0, ROT90, "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1982, pootan,  pooyan, pooyan, pooyan, 0, ROT90, "bootleg", "Pootan", GAME_SUPPORTS_SAVE )
+//    YEAR, NAME,    PARENT, MACHINE,INPUT,  INIT,MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1982, pooyan,  0,      pooyan, pooyan, 0,   ROT90,  "Konami", "Pooyan", GAME_SUPPORTS_SAVE )
+GAME( 1982, pooyans, pooyan, pooyan, pooyan, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1982, pootan,  pooyan, pooyan, pooyan, 0,   ROT90,  "bootleg", "Pootan", GAME_SUPPORTS_SAVE )

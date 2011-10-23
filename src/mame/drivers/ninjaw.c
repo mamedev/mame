@@ -252,6 +252,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 0x0003 (World) and 0x0004 (licensed to xxx) use TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0000
   - According to the manual, DSWB bit 6 determines continue pricing :
+                                                   ("Not Used" on Japanese manual)
 
     PORT_DIPNAME( 0x40, 0x00, DEF_STR( Continue_Price ) ) PORT_DIPLOCATION("SW2:7")
     PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
@@ -572,9 +573,9 @@ static INPUT_PORTS_START( darius2 )
 
 	/* 0x200000 (port 0) -> 0x0c2002 (-$5ffe,A5) and 0x0c2006 (-$5ffa,A5) */
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")    /* code at 0x00c20e */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Difficulty Enhancement" ) PORT_DIPLOCATION("SW1:1")    /* code at 0x00c20e */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) ) // Easy  Medium  Hard  Hardest  // Japan factory default = "Off"
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Easy- Medium+ Hard+ Hardest+ // "Easy-" is easier than "Easy". "Medium+","Hard+" and "hardest+" are harder than "Medium","Hard" and "hardest".
 	PORT_DIPNAME( 0x02, 0x02, "Auto Fire" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
@@ -1131,6 +1132,7 @@ ROM_END
 
 /* Working Games */
 
-GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,   0,  ROT0, "Taito Corporation Japan", "The Ninja Warriors (World)", 0 )
-GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj,  0,  ROT0, "Taito Corporation", "The Ninja Warriors (Japan)", 0 )
-GAME( 1989, darius2,  0,      darius2, darius2,  0,  ROT0, "Taito Corporation", "Darius II (Japan)", 0 )
+//    YEAR, NAME,    PARENT, MACHINE, INPUT,   INIT,MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw,  0,   ROT0,   "Taito Corporation Japan", "The Ninja Warriors (World)", 0 )
+GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, 0,   ROT0,   "Taito Corporation", "The Ninja Warriors (Japan)", 0 )
+GAME( 1989, darius2, 0,      darius2, darius2, 0,   ROT0,   "Taito Corporation", "Darius II (triple screen) (Japan)", 0 )
