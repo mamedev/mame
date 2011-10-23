@@ -425,7 +425,7 @@ int amm::get_band_param(int &pos, int band)
 void amm::read_band_params(int &pos)
 {
   int band = 0;
-  
+
   while(band < init_bands) {
     for(int chan=0; chan < channel_count; chan++)
       band_param[chan][band] = get_band_param(pos, band);
@@ -483,7 +483,7 @@ void amm::read_band_amplitude_params(int &pos)
 	    scalefactors[chan][2][band] = val;
 	    break;
 	  }
-	    
+
 	  case 3: {
 	    scalefactors[chan][0][band] = gb(pos, 6);
 	    int val = gb(pos, 6);
@@ -810,7 +810,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 								UINT8 sqn = channels[ch].sequence;
 								UINT32 pptr = rom_base[(4*sqn)+1+0x400]<<16 | rom_base[(4*sqn)+2+0x400]<<8 | rom_base[(4*sqn)+3+0x400];
 								channels[ch].seqdata = &rom_base[pptr];
-							} 
+							}
 							else
 							{
 								channels[ch].is_seq_playing = false;
@@ -844,7 +844,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 								channels[ch].decoder->set_pointers(&rom_base[pptr], (UINT8 *)&channels[ch].output_data[0]);
 								channels[ch].decoder->init();
-						} 
+						}
 						else
 						{
 								channels[ch].is_playing = false;
@@ -892,7 +892,7 @@ void ymz770_device::internal_reg_write(int offset, UINT8 data)
 		int reg = cur_reg % 4;
 
 		switch (reg)
-		{   	
+		{
 			case 0:
 				channels[voice].phrase = data;
 				break;

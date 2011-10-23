@@ -99,7 +99,7 @@
 
   TMS9980A memory map:
 
-  
+
   0000-0003 ---> Reset
   0004-0007 ---> Level 1
   0008-000B ---> Level 2
@@ -164,23 +164,23 @@
   - Data lines are clearly inverted (Q1-Q8 --> D7-D0).
 
   - Address lines are scrambled:
-  
-	CPU    pin  device  pin   2532
-	------------------------------
-	A13 - (02)SN74LS367(03) - A00 \
-	A12 - (04)SN74LS367(05) - A01  |
-	A11 - (10)SN74LS367(09) - A02  > Passing through buffers.
-	A10 - (12)SN74LS367(11) - A03  |
-	A09 - (14)SN74LS367(13) - A04 /
+
+    CPU    pin  device  pin   2532
+    ------------------------------
+    A13 - (02)SN74LS367(03) - A00 \
+    A12 - (04)SN74LS367(05) - A01  |
+    A11 - (10)SN74LS367(09) - A02  > Passing through buffers.
+    A10 - (12)SN74LS367(11) - A03  |
+    A09 - (14)SN74LS367(13) - A04 /
     A08 --------------------- A05
     A07 --------------------- A06
     A06 --------------------- A07
     A05 --------------------- A08
     A04 --------------------- A09
     A03 --------------------- A10
-	A02 - (01)SN74LS138 \
-	A01 - (02)SN74LS138  > 8 demuxed lines...
-	A00 - (03)SN74LS138 /
+    A02 - (01)SN74LS138 \
+    A01 - (02)SN74LS138  > 8 demuxed lines...
+    A00 - (03)SN74LS138 /
 
 
 *******************************************************************************
@@ -275,7 +275,7 @@ static PALETTE_INIT( tmspoker )
 
 //static WRITE8_HANDLER( debug_w )
 //{
-//	popmessage("written : %02X", data);
+//  popmessage("written : %02X", data);
 //}
 
 static INTERRUPT_GEN( tmspoker_interrupt )
@@ -563,7 +563,7 @@ static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 	MCFG_CPU_IO_MAP(tmspoker_cru_map)
 	MCFG_CPU_VBLANK_INT("screen", tmspoker_interrupt)
 
-//	MCFG_NVRAM_HANDLER(generic_0fill)
+//  MCFG_NVRAM_HANDLER(generic_0fill)
 	MCFG_MACHINE_START(tmspoker)
 	MCFG_MACHINE_RESET(tmspoker)
 
@@ -623,20 +623,20 @@ static DRIVER_INIT( bus )
 
 	/* still need to decode the addressing lines */
 	/* text found in the ROM (A at 6, B at 8, etc: consistent with gfx rom byte offsets) suggests
-	   that the lower address lines are good already:
+       that the lower address lines are good already:
 
-	ROM offset    TEXT
-	-----------------------
-	$0914-$0919   POINTS
-	$091e-$0920   BET
-	$0924-$0927   GAME
-	$092c-$092f   OVER
-	$0934-$0938   RESET
-	$093c-$0941   WINNER
-	$0946-$0949   TEST
+    ROM offset    TEXT
+    -----------------------
+    $0914-$0919   POINTS
+    $091e-$0920   BET
+    $0924-$0927   GAME
+    $092c-$092f   OVER
+    $0934-$0938   RESET
+    $093c-$0941   WINNER
+    $0946-$0949   TEST
 
-	the same 53 bytes blob of data ("POINTS" to "TEST", text control codes included) is also located at	offset $190c-$1941
-	*/
+    the same 53 bytes blob of data ("POINTS" to "TEST", text control codes included) is also located at offset $190c-$1941
+    */
 }
 
 

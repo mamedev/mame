@@ -448,8 +448,8 @@ SCREEN_UPDATE( realpunc )
 		int base = (hd63484_regs_r(hd63484, 0xcc/2, 0xffff) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);
 		int stride = hd63484_regs_r(hd63484, 0xca/2, 0xffff);
 
-//		scrollx = taitob_scroll[0];
-//		scrolly = taitob_scroll[1];
+//      scrollx = taitob_scroll[0];
+//      scrolly = taitob_scroll[1];
 
 		for (y = 0; y <= cliprect->max_y; y++)
 		{

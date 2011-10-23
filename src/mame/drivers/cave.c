@@ -3409,8 +3409,8 @@ ROM_START( guwange )
 	ROM_RELOAD(                  0x1800000, 0x400000 )
 	ROM_LOAD16_BYTE( "u085.bin", 0x1000001, 0x400000, CRC(a7d5659e) SHA1(10abac022ebe106a3ca7186ff18ca2757f903033) )
 	ROM_RELOAD(                  0x1800001, 0x400000 )
-//	sprite bug fix?
-//	ROM_FILL(                    0x1800000, 0x800000, 0xff )
+//  sprite bug fix?
+//  ROM_FILL(                    0x1800000, 0x800000, 0xff )
 
 	ROM_REGION( 0x800000, "layer0", 0 )	/* Layer 0 */
 	ROM_LOAD( "u101.bin", 0x000000, 0x800000, CRC(0369491f) SHA1(ca6b1345506f13a17c9bace01637d1f61a278644) )
@@ -3446,8 +3446,8 @@ ROM_START( guwanges )
 	ROM_RELOAD(                  0x1800000, 0x400000 )
 	ROM_LOAD16_BYTE( "u085.bin", 0x1000001, 0x400000, CRC(a7d5659e) SHA1(10abac022ebe106a3ca7186ff18ca2757f903033) )
 	ROM_RELOAD(                  0x1800001, 0x400000 )
-//	sprite bug fix?
-//	ROM_FILL(                    0x1800000, 0x800000, 0xff )
+//  sprite bug fix?
+//  ROM_FILL(                    0x1800000, 0x800000, 0xff )
 
 	ROM_REGION( 0x800000, "layer0", 0 )	/* Layer 0 */
 	ROM_LOAD( "u101.bin", 0x000000, 0x800000, CRC(0369491f) SHA1(ca6b1345506f13a17c9bace01637d1f61a278644) )

@@ -138,7 +138,7 @@ static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(aristmk6_map)
 	MCFG_CPU_IO_MAP(aristmk6_port)
-//	MCFG_DEVICE_DISABLE()
+//  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

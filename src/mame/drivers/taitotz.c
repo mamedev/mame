@@ -75,13 +75,13 @@ IC7 Panasonic MN1020819DA E68-01
 // Interesting mem areas
 
 // 0x40080400...0x400807fc: PPC Interrupt handler table for TLCS900 interrupts (called from 0x4002ea80)
-//      0x40080440 (0x10): 0x4003b274		(0xfc06f7 on TLCS sets 0x1000)
-//		0x400804c0 (0x30): 0x4003f1e4		(INT1 handler on TLCS sets 0x3010)	(comms?)
-//		0x40080500 (0x40): 0x4002ed94		(debug/trace?)
-//		0x40080504 (0x41): 0x4002ede4		(debug/trace?)
-//		0x40080540 (0x50): 0x4003c21c
-//		0x40080740 (0xd0): 0x4002ecc0		(INT3 handler on TLCS sets 0xd000)
-//		0x400807c0 (0xf0): 0x4002eae4		(0xfc0a44 on TLCS sets 0xf001)
+//      0x40080440 (0x10): 0x4003b274       (0xfc06f7 on TLCS sets 0x1000)
+//      0x400804c0 (0x30): 0x4003f1e4       (INT1 handler on TLCS sets 0x3010)  (comms?)
+//      0x40080500 (0x40): 0x4002ed94       (debug/trace?)
+//      0x40080504 (0x41): 0x4002ede4       (debug/trace?)
+//      0x40080540 (0x50): 0x4003c21c
+//      0x40080740 (0xd0): 0x4002ecc0       (INT3 handler on TLCS sets 0xd000)
+//      0x400807c0 (0xf0): 0x4002eae4       (0xfc0a44 on TLCS sets 0xf001)
 
 
 class taitotz_state : public driver_device
@@ -113,48 +113,48 @@ static VIDEO_START( taitotz )
 static SCREEN_UPDATE( taitotz )
 {
 	/*
-	{
-		UINT16 *s = (UINT16*)video_char_ram;
-		int x,y,t,u;
-		for (u=0; u < 16; u++)
-		{
-			for (t=0; t < 16; t++)
-			{
-				UINT32 tile = (u*16)+t;
-			
-				tile &= 0xff;
-			
-				for (y=0; y < FONT_HEIGHT; y++)
-				{
-					UINT32 *fb = BITMAP_ADDR32(bitmap, y+(u*FONT_WIDTH), 0);
-					for (x=0; x < FONT_WIDTH; x++)
-					{
-						UINT32 p = s[((tile*(FONT_WIDTH*FONT_HEIGHT*2)) + ((y*FONT_WIDTH)+x)) ^ 1];
-						if (p) p = 0xffffffff;
-						fb[x+(t*FONT_HEIGHT)] = p;
-					}
-				}	
-			}
-		}
-	}
-	*/
+    {
+        UINT16 *s = (UINT16*)video_char_ram;
+        int x,y,t,u;
+        for (u=0; u < 16; u++)
+        {
+            for (t=0; t < 16; t++)
+            {
+                UINT32 tile = (u*16)+t;
+
+                tile &= 0xff;
+
+                for (y=0; y < FONT_HEIGHT; y++)
+                {
+                    UINT32 *fb = BITMAP_ADDR32(bitmap, y+(u*FONT_WIDTH), 0);
+                    for (x=0; x < FONT_WIDTH; x++)
+                    {
+                        UINT32 p = s[((tile*(FONT_WIDTH*FONT_HEIGHT*2)) + ((y*FONT_WIDTH)+x)) ^ 1];
+                        if (p) p = 0xffffffff;
+                        fb[x+(t*FONT_HEIGHT)] = p;
+                    }
+                }
+            }
+        }
+    }
+    */
 
 	/*
-	{
-		UINT16 *s = (UINT16*)video_char_ram;
-		int t,u;
-		for (u=0; u < 256; u++)
-		{
-			UINT32 *fb = BITMAP_ADDR32(bitmap, u, 0);
-			for (t=0; t < 512; t++)
-			{
-				UINT32 p = s[((u*512)+t) ^ 1];
-				if (p) p = 0xffffffff;
-				fb[t] = p;	
-			}
-		}
-	}
-	*/
+    {
+        UINT16 *s = (UINT16*)video_char_ram;
+        int t,u;
+        for (u=0; u < 256; u++)
+        {
+            UINT32 *fb = BITMAP_ADDR32(bitmap, u, 0);
+            for (t=0; t < 512; t++)
+            {
+                UINT32 p = s[((u*512)+t) ^ 1];
+                if (p) p = 0xffffffff;
+                fb[t] = p;
+            }
+        }
+    }
+    */
 
 	taitotz_state *state = screen->machine().driver_data<taitotz_state>();
 
@@ -337,22 +337,22 @@ static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64)
 ADDRESS_MAP_END
 
 // TLCS900 interrupt vectors
-// 0xfc0150:	reset
-// 0xfc0120:	SWI1-7, NMI, INTWD, INTT0, INTT2-7, INTTR8-A, INTAD, INTTC0-3
-// 0xfc0122:	INT0
-// 0xfc0137:	INT1
-// 0xfc013c:	INT2
-// 0xfc0141:	INT3
-// 0xfc0146:	INT4
-// 0xfc0147:	INT5
-// 0xfc0148:	INT6
-// 0xfc0149:	INT7
-// 0xfc014a:	INT8
-// 0xfc0467:	INTT1
-// 0xfc0d1d:	INTRX0
-// 0xfc0ca5:	INTTX0
-// 0xfc0d55:	INTRX1
-// 0xfc0ce1:	INTTX1
+// 0xfc0150:    reset
+// 0xfc0120:    SWI1-7, NMI, INTWD, INTT0, INTT2-7, INTTR8-A, INTAD, INTTC0-3
+// 0xfc0122:    INT0
+// 0xfc0137:    INT1
+// 0xfc013c:    INT2
+// 0xfc0141:    INT3
+// 0xfc0146:    INT4
+// 0xfc0147:    INT5
+// 0xfc0148:    INT6
+// 0xfc0149:    INT7
+// 0xfc014a:    INT8
+// 0xfc0467:    INTT1
+// 0xfc0d1d:    INTRX0
+// 0xfc0ca5:    INTTX0
+// 0xfc0d55:    INTRX1
+// 0xfc0ce1:    INTTX1
 
 static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM		// Work RAM
@@ -383,12 +383,12 @@ static MACHINE_RESET( taitotz )
 static MACHINE_START( taitotz )
 {
 	/*
-	UINT32 *rom = (UINT32*)machine->region("user1")->base();
-	
-	rom[(0x228b0^4)/4] = 0x60000000;
-	rom[(0x22900^4)/4] = 0x60000000;
-	rom[(0x2293c^4)/4] = 0x60000000;
-	*/
+    UINT32 *rom = (UINT32*)machine->region("user1")->base();
+
+    rom[(0x228b0^4)/4] = 0x60000000;
+    rom[(0x22900^4)/4] = 0x60000000;
+    rom[(0x2293c^4)/4] = 0x60000000;
+    */
 }
 
 static INTERRUPT_GEN( taitotz_vbi )

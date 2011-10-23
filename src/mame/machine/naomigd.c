@@ -348,7 +348,7 @@ void naomi_gdrom_board::find_file(const char *name, const UINT8 *dir_sector, UIN
 		int fnlen = 0;
 		if(!(dir_sector[pos+25] & 2)) {
 			int len = dir_sector[pos+32];
-//			printf("file: [%s]\n", &dir_sector[pos+33+fnlen]);
+//          printf("file: [%s]\n", &dir_sector[pos+33+fnlen]);
 			for(fnlen=0; fnlen < FILENAME_LENGTH; fnlen++) {
 				if((dir_sector[pos+33+fnlen] == ';') && (name[fnlen] == 0)) {
 					fnlen = FILENAME_LENGTH+1;
@@ -408,12 +408,12 @@ void naomi_gdrom_board::device_start()
 			key = 0;
 			for(int i=0;i<7;i++)
 				key |= UINT64(picdata[0x780+i*2]) << (56 - i*8);
-														
+
 			key |= picdata[0x7a0];
 
 		} else {
 			// use extracted pic data
-	//		printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
+	//      printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
 			memcpy(name, picdata+33, 7);
 			memcpy(name+7, picdata+25, 7);
 

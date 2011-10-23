@@ -828,19 +828,19 @@ static INPUT_PORTS_START( birdtry )
 	PORT_DIPSETTING(      0x0000, "Type C - Upright" )
 
 	/* "Difficulty (Extend)"
-	                Easy    Normal  Hard    Hardest
-	(Start)         (5)     (3)     (3)     (3)
-	Hole in one     +5      +5      +2      +1
-	Albatross       +3      +3      +1       0
-	Eagle           +2      +2      +1       0
-	Birdie          +1      +1      +1       0
-	Par              0       0       0       0
-	Bogey           -1      -1      -1      -1
-	Double bogey    -2      -2      -2      -1
-	Triple bogey    -3      -3      -3      -1
-	Quadruple bogey -4      -4      -4      -1
-	Give up         -5      -5      -4      -2
-	*/
+                    Easy    Normal  Hard    Hardest
+    (Start)         (5)     (3)     (3)     (3)
+    Hole in one     +5      +5      +2      +1
+    Albatross       +3      +3      +1       0
+    Eagle           +2      +2      +1       0
+    Birdie          +1      +1      +1       0
+    Par              0       0       0       0
+    Bogey           -1      -1      -1      -1
+    Double bogey    -2      -2      -2      -1
+    Triple bogey    -3      -3      -3      -1
+    Quadruple bogey -4      -4      -4      -1
+    Give up         -5      -5      -4      -2
+    */
 
 	PORT_START("AN0")	/* player 1 12-way rotary control - converted in controls_r() */
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -863,9 +863,9 @@ static INPUT_PORTS_START( baddudes )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )	// Always OFF
 	/* "SW1:8"
-	English "Bad Dudes" manual says "Dont Change"
-	Japanese "Dragonninja" manual says "Control Panel / Off=Table / On=Upright", but maybe not work
-	*/
+    English "Bad Dudes" manual says "Dont Change"
+    Japanese "Dragonninja" manual says "Control Panel / Off=Table / On=Upright", but maybe not work
+    */
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0100, "1" )
@@ -939,9 +939,9 @@ static INPUT_PORTS_START( robocop )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Less" )
 	/* "SW2:7"
-	English manual says "Always Off"
-	Japanese manual says "Invulnerable Brink Time On Continue / Off=Long / On=Short"
-	*/
+    English manual says "Always Off"
+    Japanese manual says "Invulnerable Brink Time On Continue / Off=Long / On=Short"
+    */
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 INPUT_PORTS_END
 
@@ -1055,9 +1055,9 @@ static INPUT_PORTS_START( midres )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW2:5" )	/* manual mentions Extra Lives - Default OFF */
 	PORT_DIPUNUSED_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW2:6" )	/* manual mentions Extra Lives - Default OFF */
 	/* "SW2:5,6"
-	English manual says "Extra Lives / OFF OFF" ( missing "ON OFF", "OFF ON" and "ON ON" ) , but maybe not work
-	Japanese manual says "Never Touch"
-	*/
+    English manual says "Extra Lives / OFF OFF" ( missing "ON OFF", "OFF ON" and "ON ON" ) , but maybe not work
+    Japanese manual says "Never Touch"
+    */
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )

@@ -3525,7 +3525,7 @@ ROM_END
 
 /*  Witch Card (Video Klein)
     Video Klein original with epoxy block module.
-	Alt set....
+    Alt set....
 */
 	ROM_START( witchcde )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3721,7 +3721,7 @@ ROM_END
 
 /*  Witch Game (Video Klein)
     Video Klein original with epoxy block module.
-	Alt set....
+    Alt set....
 */
 	ROM_START( witchcdk )
 	ROM_REGION( 0x10000, "maincpu", 0 )

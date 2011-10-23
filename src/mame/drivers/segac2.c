@@ -707,7 +707,7 @@ static INPUT_PORTS_START( columns )
 	//"SW2:3" unused
 	//"SW2:4" unused
 	/* The first level increase (from 0 to 1) is always after destroying
-	   35 jewels. Then, the level gets 1 level more every : */
+       35 jewels. Then, the level gets 1 level more every : */
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )  // 50 jewels
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )     // 40 jewels
@@ -740,7 +740,7 @@ static INPUT_PORTS_START( columnsu )
 	PORT_DIPSETTING(    0x04, "BGM #1" )
 	PORT_DIPSETTING(    0x00, "BGM #2" )
 	/* The first level increase (from 0 to 1) is always after destroying
-	   35 jewels. Then, the level gets 1 level more every : */
+       35 jewels. Then, the level gets 1 level more every : */
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )  // 50 jewels
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )     // 40 jewels

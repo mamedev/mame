@@ -81,18 +81,18 @@ static SCREEN_UPDATE( taitopjc )
 			for (t=0; t < 32; t++)
 			{
 				UINT32 tile = jc_tile_ram[((u*16)+(t/2)) ^ 0];
-				
+
 				if (t & 1)
 					tile &= 0xffff;
 				else
 					tile >>= 16;
-					
+
 				tile &= 0xff;
 				tile -= 0x40;
-			
+
 				if (tile < 0) tile = 0;
 				if (tile > 127) tile = 127;
-			
+
 				for (y=0; y < 16; y++)
 				{
 					UINT32 *fb = BITMAP_ADDR32(bitmap, y+(u*16), 0);
@@ -101,7 +101,7 @@ static SCREEN_UPDATE( taitopjc )
 						UINT8 p = s[((tile*256) + ((y*16)+x)) ^3];
 						fb[x+(t*16)] = p ? 0xffffffff : 0;
 					}
-				}	
+				}
 			}
 		}
 	}
@@ -114,13 +114,13 @@ static UINT32 video_address;
 static UINT32 videochip_r(address_space *space, offs_t address)
 {
 	UINT32 r = 0;
-	
+
 	if (address >= 0x10000000 && address < 0x10010000)
 	{
-		r = jc_screen_ram[address - 0x10000000];	
+		r = jc_screen_ram[address - 0x10000000];
 	}
-	
-	return r;	
+
+	return r;
 }
 
 static void videochip_w(address_space *space, offs_t address, UINT32 data)
@@ -138,11 +138,11 @@ static void videochip_w(address_space *space, offs_t address, UINT32 data)
 	}
 	else if (address >= 0x1003f000 && address < 0x10040000)
 	{
-		jc_tile_ram[address - 0x1003f000] = data;	
+		jc_tile_ram[address - 0x1003f000] = data;
 	}
 	else if (address >= 0x10000000 && address < 0x10010000)
 	{
-		jc_screen_ram[address - 0x10000000] = data;	
+		jc_screen_ram[address - 0x10000000] = data;
 	}
 	else
 	{
@@ -153,15 +153,15 @@ static void videochip_w(address_space *space, offs_t address, UINT32 data)
 static READ64_HANDLER(video_r)
 {
 	UINT64 r = 0;
-	
+
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
 			r |= (UINT64)(videochip_r(space, video_address)) << 32;
-		}	
+		}
 	}
-	
+
 	return r;
 }
 
@@ -187,14 +187,14 @@ static WRITE64_HANDLER(video_w)
 /*
 static UINT16 com_ram[256] =
 {
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-	0x434F, 0x4D4E, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,		// COMNOK
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-	0x574F, 0x524B, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,		// WORKOK
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-	0x5355, 0x4E44, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,		// SUNDOK
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x434F, 0x4D4E, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,     // COMNOK
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x574F, 0x524B, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,     // WORKOK
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x5355, 0x4E44, 0x4F4B, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,     // SUNDOK
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 };
 */
 
@@ -202,7 +202,7 @@ static READ64_HANDLER(ppc_common_r)
 {
 	UINT64 r = 0;
 	UINT32 address;
-	
+
 	logerror("com_r: %08X, %08X%08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 
 	address = offset * 4;
@@ -219,20 +219,20 @@ static READ64_HANDLER(ppc_common_r)
 	}
 
 	/*
-	if (offset < 0x7f)
-	{
-		int reg = (offset & 0x7f) * 2;
-		
-		if (!(mem_mask & U64(0xffff000000000000)))
-		{
-			r |= (UINT64)(com_ram[reg + 0]) << 48;
-		}
-		if (!(mem_mask & U64(0x00000000ffff0000)))
-		{
-			r |= (UINT64)(com_ram[reg + 1]) << 16;
-		}
-	}
-	*/
+    if (offset < 0x7f)
+    {
+        int reg = (offset & 0x7f) * 2;
+
+        if (!(mem_mask & U64(0xffff000000000000)))
+        {
+            r |= (UINT64)(com_ram[reg + 0]) << 48;
+        }
+        if (!(mem_mask & U64(0x00000000ffff0000)))
+        {
+            r |= (UINT64)(com_ram[reg + 1]) << 16;
+        }
+    }
+    */
 	return r;
 }
 
@@ -243,7 +243,7 @@ static UINT16 dsp_ram[0x1000];
 static READ64_HANDLER(dsp_r)
 {
 	UINT64 r = 0;
-	
+
 	if (offset == 0x7fe)
 	{
 		if (!(mem_mask & U64(0xffffffff00000000)))
@@ -251,21 +251,21 @@ static READ64_HANDLER(dsp_r)
 			r |= (UINT64)(dsp_value) << 32;
 		}
 	}
-	
-	return r;	
+
+	return r;
 }
 
 static WRITE64_HANDLER(dsp_w)
 {
 	logerror("dsp_w: %08X, %08X%08X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
-	
+
 	if (offset == 0x7fe)
 	{
 		if (!(mem_mask & U64(0xffffffff00000000)))
 		{
 			dsp_value = data >> 32;
 		}
-		
+
 		#if 0
 		{
 			int i;
@@ -279,7 +279,7 @@ static WRITE64_HANDLER(dsp_w)
 		}
 		#endif
 	}
-	
+
 	if (!(mem_mask & U64(0xffff000000000000)))
 	{
 		int addr = offset * 2;
@@ -293,14 +293,14 @@ static WRITE64_HANDLER(dsp_w)
 }
 
 // BAT Config:
-// IBAT0 U: 0x40000002   L: 0x40000022		(0x40000000...0x4001ffff)
-// IBAT1 U: 0x0000007f   L: 0x00000002		(0x00000000...0x003fffff)
-// IBAT2 U: 0xc0000003   L: 0xc0000022		(0xc0000000...0xc001ffff)
-// IBAT3 U: 0xfe0003ff   L: 0xfe000022		(0xfe000000...0xffffffff)
-// DBAT0 U: 0x40000002   L: 0x40000022		(0x40000000...0x4001ffff)
-// DBAT1 U: 0x0000007f   L: 0x00000002		(0x00000000...0x003fffff)
-// DBAT2 U: 0xc0000003   L: 0xc0000022		(0xc0000000...0xc001ffff)
-// DBAT3 U: 0xfe0003ff   L: 0xfe000022		(0xfe000000...0xffffffff)
+// IBAT0 U: 0x40000002   L: 0x40000022      (0x40000000...0x4001ffff)
+// IBAT1 U: 0x0000007f   L: 0x00000002      (0x00000000...0x003fffff)
+// IBAT2 U: 0xc0000003   L: 0xc0000022      (0xc0000000...0xc001ffff)
+// IBAT3 U: 0xfe0003ff   L: 0xfe000022      (0xfe000000...0xffffffff)
+// DBAT0 U: 0x40000002   L: 0x40000022      (0x40000000...0x4001ffff)
+// DBAT1 U: 0x0000007f   L: 0x00000002      (0x00000000...0x003fffff)
+// DBAT2 U: 0xc0000003   L: 0xc0000022      (0xc0000000...0xc001ffff)
+// DBAT3 U: 0xfe0003ff   L: 0xfe000022      (0xfe000000...0xffffffff)
 
 static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM // Work RAM
@@ -321,7 +321,7 @@ static READ8_HANDLER(tlcs_common_r)
 
 static WRITE8_HANDLER(tlcs_common_w)
 {
-//	printf("tlcs_common_w: %08X, %02X\n", offset, data);
+//  printf("tlcs_common_w: %08X, %02X\n", offset, data);
 
 	common_ram[offset] = data;
 }
@@ -338,7 +338,7 @@ static READ8_HANDLER(tlcs_sound_r)
 
 static WRITE8_HANDLER(tlcs_sound_w)
 {
-//	printf("tlcs_sound_w: %08X, %02X\n", offset, data);
+//  printf("tlcs_sound_w: %08X, %02X\n", offset, data);
 }
 
 // TLCS900 interrupt vectors

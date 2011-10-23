@@ -4,9 +4,9 @@
 
  4 boards
     1x NV440 gfx card
-	1x sound card
-	1x CF2IDE card
-	1x proteection card with a IGS027A (ARM7 with internal ROM)
+    1x sound card
+    1x CF2IDE card
+    1x proteection card with a IGS027A (ARM7 with internal ROM)
 
  The CF dump contains no MBR, it is thought that it is stored in either the main bios
  or provided by the IGS027A.  If you disconnect the protection card the bios will hang

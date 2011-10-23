@@ -21,8 +21,8 @@
 
     Special Thanks to...
 
-	- EMMA Italian Dumping Team for providing the board.
-	- Rob Ragon for the exhaustive hardware testing.
+    - EMMA Italian Dumping Team for providing the board.
+    - Rob Ragon for the exhaustive hardware testing.
     - Iris Falbala, that kindly offered herself as beta tester,
       poppin' baloons since she was only 2 years old. :)
 
@@ -392,9 +392,9 @@
 
     [2011-10-11]
     - Confirmed and fixed CPU clock for magicfly and 7mezzo.
-	- Rearranged the graphic ROMs addressing. Splitted both gfx banks.
+    - Rearranged the graphic ROMs addressing. Splitted both gfx banks.
     - Created and minimized the color palette for both gfx banks.
-    - Fixed colors for magicfly and 7mezzo. 
+    - Fixed colors for magicfly and 7mezzo.
 
 
     TODO:
@@ -852,7 +852,7 @@ ROM_START( magicfly )
 	ROM_LOAD( "magicfly0.bin",	0x4000, 0x2000, CRC(44e3c9d6) SHA1(677d25360d261bf2400f399b8015eeb529ad405e) )
 
 	ROM_REGION( 0x0800, "gfxbnk0", 0 )
-//	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling the R-G bitplanes */
+//  ROM_FILL(           0x0000, 0x1000, 0 )         /* filling the R-G bitplanes */
 	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
 
 	ROM_REGION( 0x1800, "gfxbnk1", 0 )
@@ -875,7 +875,7 @@ ROM_START( 7mezzo )
 	ROM_LOAD( "ns0.bin",	0x4000, 0x2000, CRC(e04fb210) SHA1(81e764e296fe387daf8ca67064d5eba2a4fc3c26) )    /* Renamed as ns0.bin regarding pcb location and content */
 
 	ROM_REGION( 0x0800, "gfxbnk0", 0 )
-//	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling the R-G bitplanes */
+//  ROM_FILL(           0x0000, 0x1000, 0 )         /* filling the R-G bitplanes */
 	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
 
 	ROM_REGION( 0x1800, "gfxbnk1", 0 )

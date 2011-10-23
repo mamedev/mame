@@ -82,7 +82,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 		state->m_sprite_buffer_busy = 0;
 
 		/* Pixel clock is 26.6666MHz (some boards 27MHz??), we have 0x800 bytes, or 0x400 words to copy from
-		spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
+        spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
 		space->machine().scheduler().timer_set(attotime::from_hz(XTAL_26_66666MHz) * 0x400, FUNC(spritebuffer_callback));
 	}
 //  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(&space->device()),offset,data);

@@ -83,7 +83,7 @@ public:
 
 /* Static Variables */
 #define MAX_STEPPER			200		// 1.8 Degree Stepper Motor = 200 full-steps per revolution, but 400 when in half-step mode
-#define STEPPER_DIVISOR		9.09 //18.18	// To allow for 22 stop positions
+#define STEPPER_DIVISOR		9.09 //18.18    // To allow for 22 stop positions
 
 static const UINT8 optics[200] = {
   0x07, 0x07, 0x00, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( splus_io_w )
                             state->m_stepper_pos[x] = MAX_STEPPER - 1;
                     }
 					state->m_stop_pos[x] = (int)(state->m_stepper_pos[x] / STEPPER_DIVISOR);
-				}                
+				}
             }
         }
 #if DEBUG_OUTPUT
@@ -489,7 +489,7 @@ static READ8_HANDLER( splus_serial_r )
             // Reserved
             // Reserved
             // Reserved
-            // Reserved            
+            // Reserved
             break;
 	}
 	return val;
@@ -608,7 +608,7 @@ static ADDRESS_MAP_START( splus_iomap, AS_IO, 8 )
 
     // SSxxxx Reel Chip
     AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_BASE_MEMBER(splus_state, m_reel_ram)
-	
+
 	// Ports start here
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_BASE_MEMBER(splus_state, m_io_port)
 ADDRESS_MAP_END

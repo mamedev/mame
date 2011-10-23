@@ -516,7 +516,7 @@ static INPUT_PORTS_START( elim2 )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(	0x01, DEF_STR( Upright ))		// This switch is not documented in the manual
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ))
-	//"SW1:7" unused									// Unused according to manual
+	//"SW1:7" unused                                    // Unused according to manual
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))			PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(	0x04, "3" )
 	PORT_DIPSETTING(	0x08, "4" )
@@ -579,7 +579,7 @@ static INPUT_PORTS_START( elim4 )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(	0x01, DEF_STR( Upright ))		// This switch is not documented in the manual
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ))
-	//"SW1:7" unused									// This switch is not documented in the manual
+	//"SW1:7" unused                                    // This switch is not documented in the manual
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))			PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(	0x04, "3" )
 	PORT_DIPSETTING(	0x08, "4" )

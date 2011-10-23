@@ -208,144 +208,144 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
 
     IRQs:
 
-    IRQ0: ???				(Task 4)
+    IRQ0: ???               (Task 4)
     IRQ1: unused
-    IRQ2: ???				Possibly UART? Accesses registers at 0xffe00008...f
-    IRQ3: ???				(Task 5, sound?)
-    IRQ4: Voodoo3			Currently only for User Interrupt Command, maybe a more extensive handler gets installed later?
-    
-    I2C:  ???				(no task switch) what drives this? network? U13 (ADC838) test fails if I2C doesn't work
+    IRQ2: ???               Possibly UART? Accesses registers at 0xffe00008...f
+    IRQ3: ???               (Task 5, sound?)
+    IRQ4: Voodoo3           Currently only for User Interrupt Command, maybe a more extensive handler gets installed later?
+
+    I2C:  ???               (no task switch) what drives this? network? U13 (ADC838) test fails if I2C doesn't work
     DMA0: unused
     DMA1: unused
     IIVPR3: unused
-    
+
     Memory:
-    
+
     0x000001E0:             Current task
     0x000001E1:             Current FPU task
     0x000001E4:             Scheduled tasks bitvector (bit 31 = task0, etc.)
     0x00000A00...BFF:       Task structures
-    						0x00-03:    unknown
-    						0x04:       unknown
-    						0x05:       if non-zero, this task uses FPU
-    						0x06-07:    unknown
-    						0x08:       unknown mem pointer, task stack pointer?
-    						0x0c:       pointer to task PC (also top of stack?)
-    						
-    
-    0x00000310:				Global timer 0 IRQ handler
-    0x00000320:				Global timer 1 IRQ handler
-    0x00000330:				Global timer 2 IRQ handler
-    0x00000340:				Global timer 3 IRQ handler
-    0x00000350:				IRQ0 handler
-    0x00000360:				IRQ1 handler
-    0x00000370:				IRQ2 handler
-    0x00000380:				IRQ3 handler
-    0x00000390:				IRQ4 handler
-    0x000003a0:				I2C IRQ handler
-    0x000003b0:				DMA0 IRQ handler
-    0x000003c0:				DMA1 IRQ handler
-    0x000003d0:				Message Unit IRQ handler
-    
-    0x000004e4:				Global timer 0 IRQ handler function ptr
-    0x000004e8:				Global timer 1 IRQ handler function ptr
-    0x000004ec:				Global timer 2 IRQ handler function ptr
-    0x000004f0:				Global timer 3 IRQ handler function ptr
+                            0x00-03:    unknown
+                            0x04:       unknown
+                            0x05:       if non-zero, this task uses FPU
+                            0x06-07:    unknown
+                            0x08:       unknown mem pointer, task stack pointer?
+                            0x0c:       pointer to task PC (also top of stack?)
 
 
-	IRQ0:		Vector 0x0004e020		Stack 0x000d4fa4
-	IRQ1:		Vector 0x0000a5b8		Stack 0x0001323c	(dummy)
-	IRQ2:		Vector 0x000229bc		Stack 0x000d4fa4
-	IRQ3:		Vector 0x006a02f4		Stack 0x006afeb0
-	IRQ4:		Vector 0x0068c354		Stack 0x0068cc54
-	I2C:		Vector 0x00023138		Stack 0x000d4fa4
+    0x00000310:             Global timer 0 IRQ handler
+    0x00000320:             Global timer 1 IRQ handler
+    0x00000330:             Global timer 2 IRQ handler
+    0x00000340:             Global timer 3 IRQ handler
+    0x00000350:             IRQ0 handler
+    0x00000360:             IRQ1 handler
+    0x00000370:             IRQ2 handler
+    0x00000380:             IRQ3 handler
+    0x00000390:             IRQ4 handler
+    0x000003a0:             I2C IRQ handler
+    0x000003b0:             DMA0 IRQ handler
+    0x000003c0:             DMA1 IRQ handler
+    0x000003d0:             Message Unit IRQ handler
 
-    
+    0x000004e4:             Global timer 0 IRQ handler function ptr
+    0x000004e8:             Global timer 1 IRQ handler function ptr
+    0x000004ec:             Global timer 2 IRQ handler function ptr
+    0x000004f0:             Global timer 3 IRQ handler function ptr
+
+
+    IRQ0:       Vector 0x0004e020       Stack 0x000d4fa4
+    IRQ1:       Vector 0x0000a5b8       Stack 0x0001323c    (dummy)
+    IRQ2:       Vector 0x000229bc       Stack 0x000d4fa4
+    IRQ3:       Vector 0x006a02f4       Stack 0x006afeb0
+    IRQ4:       Vector 0x0068c354       Stack 0x0068cc54
+    I2C:        Vector 0x00023138       Stack 0x000d4fa4
+
+
     Functions of interest:
-    
+
     0x0000f7b4:     SwitchTask()
-	0x0000c130:		ScheduleTask()
-    0x00009d00:		LoadProgram(): R3 = ptr to filename
+    0x0000c130:     ScheduleTask()
+    0x00009d00:     LoadProgram(): R3 = ptr to filename
 
 
-	Inf loop at 0x00071014 -> 0x00093e14 -> 0x00093f6c
+    Inf loop at 0x00071014 -> 0x00093e14 -> 0x00093f6c
 
-	0x24dcc(): (R3=0x21, R4=0xffffff, R5=0xff, R6=0x10, R7=0x10, R8=0xab50c, R9=0xab520)
-	           0xab50c = "G*%s BOOT SYSTEM"
-			   0xab520 = "A00"
+    0x24dcc(): (R3=0x21, R4=0xffffff, R5=0xff, R6=0x10, R7=0x10, R8=0xab50c, R9=0xab520)
+               0xab50c = "G*%s BOOT SYSTEM"
+               0xab520 = "A00"
 
-			   (R3=0x21, R4=0xffffff, R5=0xff, R6=0x10, R7=0x20, R8=0xab524, R9=0x7d0)
-			   0xab524 = "(C) %d KONAMI ALL RIGHTS RESERVED."
+               (R3=0x21, R4=0xffffff, R5=0xff, R6=0x10, R7=0x20, R8=0xab524, R9=0x7d0)
+               0xab524 = "(C) %d KONAMI ALL RIGHTS RESERVED."
 
-			   (R3=0x30021, R4=0xffffff, R5=0xff, R6=0xc0, R7=0x60, R8=0xab610, R9=0xa8)
-			   0xab610 = "DEVICE CHECK"
+               (R3=0x30021, R4=0xffffff, R5=0xff, R6=0xc0, R7=0x60, R8=0xab610, R9=0xa8)
+               0xab610 = "DEVICE CHECK"
 
-			   (R3=0x30021, R4=0xffffff, R5=0xff, R6=0xc0, R7=0x100, R8=0xab620, R9=0x10)
-			   0xab620 = "U13    ";
+               (R3=0x30021, R4=0xffffff, R5=0xff, R6=0xc0, R7=0x100, R8=0xab620, R9=0x10)
+               0xab620 = "U13    ";
 
-			   (R3=0x30021, R4=0xff0000, R5=0xff, R6=0xc0, R7=0x100, R8=0xab628, R9=0xab4dc)
-			   0xab628 = "    %s";
-			   0xab4dc = "BAD";
+               (R3=0x30021, R4=0xff0000, R5=0xff, R6=0xc0, R7=0x100, R8=0xab628, R9=0xab4dc)
+               0xab628 = "    %s";
+               0xab4dc = "BAD";
 
-	VOODOO.0.REG:fbzColorPath(3) write = 1C482405
-		RGB = TREX color output
-		Alpha = TREX alpha output
+    VOODOO.0.REG:fbzColorPath(3) write = 1C482405
+        RGB = TREX color output
+        Alpha = TREX alpha output
 
-	VOODOO.0.REG:textureMode(3) write = 102414C0
-		No perspective correction, point-sampling, clamp S/T.
-		Texture format AI44
-		tc_add_local
-		tca_add_alocal
-	
-	VOODOO.0.REG:tLOD(3) write = 01B821C6
-	
-	VOODOO.0.REG:texBaseAddr(3) write = 00000000
-	VOODOO.0.REG:texBaseAddr_1(3) write = 000C3100
-	VOODOO.0.REG:texBaseAddr_2(3) write = FFFF8000
-	VOODOO.0.REG:texBaseAddr_3_8(3) write = FFFFE000
-	
-	VOODOO.0.REG:textureMode(2) write = 000004C0
-		No perspective correction, point-sampling, clamp S/T.
-		Texture format AI44
-	
-	VOODOO.0.REG:tLOD(0) write = 01BC21C6
-	
-	VOODOO.0.REG:texBaseAddr_3_8(2) write = FFFF7800
-	
-	VOODOO.0.REG:fbzMode(3) write = 0002166B
+    VOODOO.0.REG:textureMode(3) write = 102414C0
+        No perspective correction, point-sampling, clamp S/T.
+        Texture format AI44
+        tc_add_local
+        tca_add_alocal
 
+    VOODOO.0.REG:tLOD(3) write = 01B821C6
 
+    VOODOO.0.REG:texBaseAddr(3) write = 00000000
+    VOODOO.0.REG:texBaseAddr_1(3) write = 000C3100
+    VOODOO.0.REG:texBaseAddr_2(3) write = FFFF8000
+    VOODOO.0.REG:texBaseAddr_3_8(3) write = FFFFE000
 
-	PPP2nd requires the following in idectrl.c:
-	//ide->features[51*2+0] = 0;
-	//ide->features[51*2+1] = 2;
-	//ide->features[67*2+0] = 0xf0;
-	//ide->features[67*2+1] = 0x00;
+    VOODOO.0.REG:textureMode(2) write = 000004C0
+        No perspective correction, point-sampling, clamp S/T.
+        Texture format AI44
 
-	MPC8240 requires: 603MMU
+    VOODOO.0.REG:tLOD(0) write = 01BC21C6
+
+    VOODOO.0.REG:texBaseAddr_3_8(2) write = FFFF7800
+
+    VOODOO.0.REG:fbzMode(3) write = 0002166B
 
 
 
-	Game status:
-		ppp2nd				POST: "DIP SWITCH ERROR", "NO SECURITY ERROR"
-		boxingm				Goes to attract mode when ran with memory card check. Coins up.
-		code1d,b			Inf loop on blue screen (writes to I2C before)
-		gticlub2			Inf loop on blue screen (writes to I2C before)
-		gticlub2ea			Doesn't boot: bad CHD?
-		jpark3				POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC...)
-		mocapglf			Inf loop on blue screen (writes to I2C before)
-		mocapb,j			POST: U13 bad
-		p911,e,j,uc,kc		POST: U13 bad
-		p9112				POST: U13 bad
-		popn9				Doesn't boot: bad CHD?
-		sscopex/sogeki		Inf loop on blue screen
-		thrild2,a			Attract mode with partial graphics. Coins up. Hangs in car selection screen.
-		thrild2c			Inf loop on blue screen
-		tsurugi				Goes to attract mode when ran with memory card check. Coins up.
-		tsurugij			No NVRAM
-		wcombat				Hangs on blue screen
-		xtrial				Attract mode. Hangs.
-		mfightc,c			Passes POST. Waits for network connection from main unit? Spams writes to 0xffe08000 (8-bit)
+    PPP2nd requires the following in idectrl.c:
+    //ide->features[51*2+0] = 0;
+    //ide->features[51*2+1] = 2;
+    //ide->features[67*2+0] = 0xf0;
+    //ide->features[67*2+1] = 0x00;
+
+    MPC8240 requires: 603MMU
+
+
+
+    Game status:
+        ppp2nd              POST: "DIP SWITCH ERROR", "NO SECURITY ERROR"
+        boxingm             Goes to attract mode when ran with memory card check. Coins up.
+        code1d,b            Inf loop on blue screen (writes to I2C before)
+        gticlub2            Inf loop on blue screen (writes to I2C before)
+        gticlub2ea          Doesn't boot: bad CHD?
+        jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC...)
+        mocapglf            Inf loop on blue screen (writes to I2C before)
+        mocapb,j            POST: U13 bad
+        p911,e,j,uc,kc      POST: U13 bad
+        p9112               POST: U13 bad
+        popn9               Doesn't boot: bad CHD?
+        sscopex/sogeki      Inf loop on blue screen
+        thrild2,a           Attract mode with partial graphics. Coins up. Hangs in car selection screen.
+        thrild2c            Inf loop on blue screen
+        tsurugi             Goes to attract mode when ran with memory card check. Coins up.
+        tsurugij            No NVRAM
+        wcombat             Hangs on blue screen
+        xtrial              Attract mode. Hangs.
+        mfightc,c           Passes POST. Waits for network connection from main unit? Spams writes to 0xffe08000 (8-bit)
 */
 
 #include "emu.h"
@@ -496,7 +496,7 @@ typedef struct
 	int enable;
 	emu_timer *timer;
 } MPC8240_GLOBAL_TIMER;
- 
+
 
 
 typedef struct
@@ -516,7 +516,7 @@ typedef struct
 	int i2c_state;
 
 	MPC8240_GLOBAL_TIMER global_timer[4];
-	
+
 } MPC8240_EPIC;
 
 // TODO: move to viper_state
@@ -619,7 +619,7 @@ static const char* epic_get_register_name(UINT32 reg)
 			}
 			break;
 		}
-		
+
 		// 0x60000 - 0x6FFFF
 		case 0x6:
 		{
@@ -629,7 +629,7 @@ static const char* epic_get_register_name(UINT32 reg)
 				case 0x00a0:	return "IACK";
 				case 0x00b0:	return "EOI";
 			}
-			break;	
+			break;
 		}
 	}
 
@@ -653,7 +653,7 @@ static TIMER_CALLBACK(epic_global_timer_callback)
 	{
 		epic.global_timer[timer_num].timer->reset();
 	}
- 
+
 	mpc8240_interrupt(machine, MPC8240_GTIMER0_IRQ + timer_num);
 }
 
@@ -712,7 +712,7 @@ static READ32_HANDLER( epic_r )
 {
 	int reg;
 	reg = offset * 4;
-	
+
 	if (reg != 0x600a0)		// IACK is spammy
 	{
 		const char *regname = epic_get_register_name(reg);
@@ -783,13 +783,13 @@ static READ32_HANDLER( epic_r )
 
 							// generate interrupt if interrupt are enabled
 							/*if (epic.i2c_cr & 0x40)
-							{
-								printf("I2C interrupt\n");
-								mpc8240_interrupt(space->machine, MPC8240_I2C_IRQ);
+                            {
+                                printf("I2C interrupt\n");
+                                mpc8240_interrupt(space->machine, MPC8240_I2C_IRQ);
 
-								// set interrupt flag in status register
-								epic.i2c_sr |= 0x2;
-							}*/
+                                // set interrupt flag in status register
+                                epic.i2c_sr |= 0x2;
+                            }*/
 						}
 					}
 					break;
@@ -859,8 +859,8 @@ static READ32_HANDLER( epic_r )
 					value |= epic.irq[MPC8240_I2C_IRQ].priority << 16;
 					value |= epic.irq[MPC8240_I2C_IRQ].vector;
 					value |= epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
- 					return value;
- 				}
+					return value;
+				}
 			}
 			break;
 		}
@@ -897,7 +897,7 @@ static WRITE32_HANDLER( epic_w )
 {
 	int reg;
 	reg = offset * 4;
-	
+
 	if (reg != 0x600b0)		// interrupt clearing is spammy
 	{
 		const char *regname = epic_get_register_name(reg);
@@ -975,7 +975,7 @@ static WRITE32_HANDLER( epic_w )
 						{
 							printf("I2C data transfer, data = %02X\n", data);
 							epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-	
+
 							// set transfer complete in status register
 							epic.i2c_sr |= 0x80;
 
@@ -1019,7 +1019,7 @@ static WRITE32_HANDLER( epic_w )
 				case 0x11e0:			// Offset 0x411E0 - Global timer 3 vector/priority register
 				{
 					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
-					
+
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask = (data & 0x80000000) ? 1 : 0;
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
@@ -1033,7 +1033,7 @@ static WRITE32_HANDLER( epic_w )
 				case 0x11f0:			// Offset 0x411F0 - Global timer 3 destination register
 				{
 					int timer_num = ((reg & 0xffff) - 0x1130) >> 6;
-					
+
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
 
 					epic_update_interrupts(space->machine());
@@ -1043,7 +1043,7 @@ static WRITE32_HANDLER( epic_w )
 				case 0x1150:			// Offset 0x41150 - Global timer 1 base count register
 				case 0x1190:			// Offset 0x41190 - Global timer 2 base count register
 				case 0x11d0:			// Offset 0x411d0 - Global timer 3 base count register
- 				{
+				{
 					int timer_num = ((reg & 0xffff) - 0x1110) >> 6;
 
 					epic.global_timer[timer_num].enable = (data & 0x80000000) ? 0 : 1;
@@ -1053,7 +1053,7 @@ static WRITE32_HANDLER( epic_w )
 					{
 						attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / epic.global_timer[timer_num].base_count);
 						epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
- 
+
 #if VIPER_DEBUG_EPIC_TIMERS
 						printf("EPIC GTIMER%d: next in %s\n", timer_num, attotime_string(timer_duration, 8));
 #endif
@@ -1062,7 +1062,7 @@ static WRITE32_HANDLER( epic_w )
 					{
 						epic.global_timer[timer_num].timer->reset();
 					}
- 					break;
+					break;
 				}
 			}
 			break;
@@ -1106,8 +1106,8 @@ static WRITE32_HANDLER( epic_w )
 					epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
 
 					epic_update_interrupts(space->machine());
- 					break;
- 				}
+					break;
+				}
 				case 0x0210:			// Offset 0x50210 - IRQ0 destination register
 				case 0x0230:			// Offset 0x50230 - IRQ1 destination register
 				case 0x0250:			// Offset 0x50250 - IRQ2 destination register
@@ -1136,8 +1136,8 @@ static WRITE32_HANDLER( epic_w )
 				{
 					epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
 					epic_update_interrupts(space->machine());
- 					break;
- 				}
+					break;
+				}
 			}
 			break;
 		}
@@ -1197,7 +1197,7 @@ static void mpc8240_epic_reset(void)
 	}
 
 	epic.active_irq = -1;
-	
+
 	// Init I2C
 	epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 }
@@ -1644,16 +1644,16 @@ static READ64_HANDLER(unk1_r)
 		UINT64 reg = 0;
 		reg |= (unk1_bit << 5);
 		reg |= 0x40;		// if this bit is 0, loads a disk copier instead
-		//r |= 0x04;	// screen flip
-		//reg |= 0x08;		// memory card check (1 = enable)
+		//r |= 0x04;    // screen flip
+		//reg |= 0x08;      // memory card check (1 = enable)
 
 		r |= reg << 40;
 
 		//r |= (UINT64)(unk1_bit << 5) << 40;
 		//r |= U64(0x0000400000000000);
 
-		//r |= U64(0x0000040000000000);	// screen flip
-		//r |= U64(0x0000080000000000);	// memory card check (1 = enable)
+		//r |= U64(0x0000040000000000); // screen flip
+		//r |= U64(0x0000080000000000); // memory card check (1 = enable)
 	}
 	if (ACCESSING_BITS_32_39)
 	{
@@ -1668,9 +1668,9 @@ static READ64_HANDLER(unk1_r)
 	if (ACCESSING_BITS_16_23)
 	{
 		UINT64 reg = 0;
-		//reg |= 0x80;					// memory card check for boxingm
-		//reg |= 0x40;					// memory card check for tsurugi
-		reg |= 0x3f;	
+		//reg |= 0x80;                  // memory card check for boxingm
+		//reg |= 0x40;                  // memory card check for tsurugi
+		reg |= 0x3f;
 
 		r |= reg << 16;
 	}
@@ -1777,7 +1777,7 @@ static void DS2430_w(int bit)
 		}
 	}
 
-	
+
 }
 
 static READ64_HANDLER(e70000_r)
@@ -1787,7 +1787,7 @@ static READ64_HANDLER(e70000_r)
 		ds2430_bit_timer->reset();
 		ds2430_bit_timer->start_time();
 
-//		printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
+//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
 	}
 
 	return 0;
@@ -1802,7 +1802,7 @@ static WRITE64_HANDLER(e70000_w)
 			ds2430_timer->adjust(attotime::from_usec(40), 1);	// presence pulse for 240 microsecs
 
 			unk1_bit = 1;
-//			printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(&space->device()));
+//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(&space->device()));
 		}
 		else
 		{
@@ -1817,8 +1817,8 @@ static WRITE64_HANDLER(e70000_w)
 			else
 				DS2430_w(1);
 
-//			const char *dtt = diff_time.as_string(8);
-//			printf("   time %s\n", dtt);
+//          const char *dtt = diff_time.as_string(8);
+//          printf("   time %s\n", dtt);
 		}
 	}
 }
@@ -1827,7 +1827,7 @@ static WRITE64_HANDLER(unk1a_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-	//	printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
+	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
 	}
 }
 
@@ -1836,7 +1836,7 @@ static WRITE64_HANDLER(unk1b_w)
 	if (ACCESSING_BITS_56_63)
 	{
 		unk1_bit = 0;
-	//	printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
+	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
 	}
 }
 
@@ -1899,16 +1899,16 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( viper )
 	PORT_START("IN0")
-	
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// Shift down
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW) /* Test Button */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
-	
+
 
 	PORT_START("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

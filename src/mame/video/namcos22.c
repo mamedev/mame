@@ -585,44 +585,44 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 
 		/* poly fog (not completely accurate yet)
 
-		czram contents, it's basically a big cz compare table
+        czram contents, it's basically a big cz compare table
 
-		testmode:
-			o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
-			czram[0] = 1fff 1fdf 1fbf 1f9f 1f7f 1f5f 1f3f 1f1f .... 00ff 00df 00bf 009f 007f 005f 003f 001f
-			czram[1] = 0000 0000 0000 0001 0002 0003 0005 0007 .... 1e45 1e83 1ec2 1f01 1f40 1f7f 1fbf 1fff
-			czram[2] = 003f 007f 00be 00fd 013c 017b 01b9 01f7 .... 1ff9 1ffb 1ffc 1ffd 1ffe 1fff 1fff 1fff
-			czram[3] = 0000 001f 003f 005f 007f 009f 00bf 00df .... 1eff 1f1f 1f3f 1f5f 1f7f 1f9f 1fbf 1fdf
+        testmode:
+            o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
+            czram[0] = 1fff 1fdf 1fbf 1f9f 1f7f 1f5f 1f3f 1f1f .... 00ff 00df 00bf 009f 007f 005f 003f 001f
+            czram[1] = 0000 0000 0000 0001 0002 0003 0005 0007 .... 1e45 1e83 1ec2 1f01 1f40 1f7f 1fbf 1fff
+            czram[2] = 003f 007f 00be 00fd 013c 017b 01b9 01f7 .... 1ff9 1ffb 1ffc 1ffd 1ffe 1fff 1fff 1fff
+            czram[3] = 0000 001f 003f 005f 007f 009f 00bf 00df .... 1eff 1f1f 1f3f 1f5f 1f7f 1f9f 1fbf 1fdf
 
-		airco22b demo mode, fog color: 76 9a c3
-			o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
-			czram[0] = 0000 00e4 0141 0189 01c6 01fb 022c 0258 .... 13bb 13c4 13cd 13d6 13df 13e7 13f0 13f9
+        airco22b demo mode, fog color: 76 9a c3
+            o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
+            czram[0] = 0000 00e4 0141 0189 01c6 01fb 022c 0258 .... 13bb 13c4 13cd 13d6 13df 13e7 13f0 13f9
 
-		alpinerd (1st course), fog color: c8 c8 c8
-			o_16          0    1    2    3    4    5    6    7 <  >   ec   ed   ee   ef   f0   f1   f2 - ff
-			czram[0] = 00c8 00ca 00cc 00ce 00d0 00d2 00d4 00d6 .... 02a0 02a2 02a4 02a6 02a8 1fff 1fff ....
+        alpinerd (1st course), fog color: c8 c8 c8
+            o_16          0    1    2    3    4    5    6    7 <  >   ec   ed   ee   ef   f0   f1   f2 - ff
+            czram[0] = 00c8 00ca 00cc 00ce 00d0 00d2 00d4 00d6 .... 02a0 02a2 02a4 02a6 02a8 1fff 1fff ....
 
-		alpinr2b (1st course), fog color: ff ff ff
-		alpinr2b start of race: - gets gradually filled from left to right, initial contents filled with 1fff? - game should be foggy here
-			o_16          0    1    2    3    4    5    6    7 <  >   67   68   69   6a   6b   6c   6d - ff
-			czram[0] = 01cd 01d7 01e1 01eb 01f5 01ff 0209 0213 .... 05d3 05dd 05e7 05f1 05fb 1fff 1fff ....
-			other banks unused, zerofilled
-		alpinr2b mid race: - gets gradually filled from right to left, initial contents above - game should not be foggy here
-			o_16          0    1    2    3    4    5    6    7 <  >   ec   ed   ee   ef   f0   f1   f2 - ff
-			czram[0] = 1ffe 1fff 1fff 1fff 1fff 1fff 1fff 1fff .... 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
+        alpinr2b (1st course), fog color: ff ff ff
+        alpinr2b start of race: - gets gradually filled from left to right, initial contents filled with 1fff? - game should be foggy here
+            o_16          0    1    2    3    4    5    6    7 <  >   67   68   69   6a   6b   6c   6d - ff
+            czram[0] = 01cd 01d7 01e1 01eb 01f5 01ff 0209 0213 .... 05d3 05dd 05e7 05f1 05fb 1fff 1fff ....
+            other banks unused, zerofilled
+        alpinr2b mid race: - gets gradually filled from right to left, initial contents above - game should not be foggy here
+            o_16          0    1    2    3    4    5    6    7 <  >   ec   ed   ee   ef   f0   f1   f2 - ff
+            czram[0] = 1ffe 1fff 1fff 1fff 1fff 1fff 1fff 1fff .... 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
 
-		cybrcycc (1st course), fog color: 80 80 c0 - 2nd course has same cz table, but fog color 00 00 00
-			o_16          0    1    2    3    4    5    6    7 <  >   d4   d5   d6   d7   d8   d9   da - ff
-			czram[0] = 0000 0011 0021 0031 0041 0051 0060 0061 .... 04e0 04e4 04e7 04eb 04ee 1fff 1fff ....
+        cybrcycc (1st course), fog color: 80 80 c0 - 2nd course has same cz table, but fog color 00 00 00
+            o_16          0    1    2    3    4    5    6    7 <  >   d4   d5   d6   d7   d8   d9   da - ff
+            czram[0] = 0000 0011 0021 0031 0041 0051 0060 0061 .... 04e0 04e4 04e7 04eb 04ee 1fff 1fff ....
 
-		tokyowar, fog color: 80 c0 ff - it uses cztype 1 too by accident? (becomes fogfactor 0)
-			o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
-			czram[0] = 0000 01c5 0244 029f 02e7 0325 035b 038b .... 0eaf 0ec7 0ee0 0efc 0f1b 0f3f 0f6a 0faa
-			czram[1] = 0000 0000 0000 0000 0000 0000 0000 0000 .... 0000 0000 0000 0000 0000 0000 0000 0000
-			czram[2] = 0000 0000 0000 0000 0000 0000 0000 0000 .... 0000 0000 0000 0000 0000 0000 0000 0000
-			czram[3] = 0000 00e8 0191 0206 0265 02b7 0301 0345 .... 1c7e 1cbc 1d00 1d4a 1d9c 1dfb 1e70 1f19
+        tokyowar, fog color: 80 c0 ff - it uses cztype 1 too by accident? (becomes fogfactor 0)
+            o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
+            czram[0] = 0000 01c5 0244 029f 02e7 0325 035b 038b .... 0eaf 0ec7 0ee0 0efc 0f1b 0f3f 0f6a 0faa
+            czram[1] = 0000 0000 0000 0000 0000 0000 0000 0000 .... 0000 0000 0000 0000 0000 0000 0000 0000
+            czram[2] = 0000 0000 0000 0000 0000 0000 0000 0000 .... 0000 0000 0000 0000 0000 0000 0000 0000
+            czram[3] = 0000 00e8 0191 0206 0265 02b7 0301 0345 .... 1c7e 1cbc 1d00 1d4a 1d9c 1dfb 1e70 1f19
 
-		*/
+        */
 
 		/*  czattr:
                0    2    4    6    8    a    c    e
@@ -645,7 +645,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
             0000 0000 0000 0000 4455 0000 000a 0000 // alpinr2b
             8001 8001 0000 0000 1111 0000 5555 0000 // aquajet (reg 8 is either 1111 or 5555, reg c is usually interlaced)
             0000 0000 0000 0000 5554 0000 0000 0000 // tokyowar
-		*/
+        */
 		if (~color & 0x80)
 		{
 			int cztype = flags&3;
@@ -1500,41 +1500,41 @@ DrawSpritesHelper(
 	for( int i=0; i<num_sprites; i++ )
 	{
 		/*
-		pSource[0]
-	        xxxx.xxxx.xxxx.xxxx | ----.----.----.----  x pos
-    	    ----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y pos
+        pSource[0]
+            xxxx.xxxx.xxxx.xxxx | ----.----.----.----  x pos
+            ----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y pos
 
-		pSource[1]
-	        xxxx.xxxx.xxxx.xxxx | ----.----.----.----  x size
-        	----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y size
+        pSource[1]
+            xxxx.xxxx.xxxx.xxxx | ----.----.----.----  x size
+            ----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y size
 
-		pSource[2]
-	        xxxx.x---.----.---- | ----.----.----.----  no function
-        	----.-xxx.----.---- | ----.----.----.----  clip target
-        	----.----.xxxx.xxxx | ----.----.----.----  linktype
-        	----.----.----.---- | xxxx.xx--.----.----  no function(?) - set in airco22b
-        	----.----.----.---- | ----.--x-.----.----  right justify
-        	----.----.----.---- | ----.---x.----.----  bottom justify
-        	----.----.----.---- | ----.----.x---.----  flipx
-        	----.----.----.---- | ----.----.-xxx.----  numcols
-        	----.----.----.---- | ----.----.----.x---  flipy
-        	----.----.----.---- | ----.----.----.-xxx  numrows
+        pSource[2]
+            xxxx.x---.----.---- | ----.----.----.----  no function
+            ----.-xxx.----.---- | ----.----.----.----  clip target
+            ----.----.xxxx.xxxx | ----.----.----.----  linktype
+            ----.----.----.---- | xxxx.xx--.----.----  no function(?) - set in airco22b
+            ----.----.----.---- | ----.--x-.----.----  right justify
+            ----.----.----.---- | ----.---x.----.----  bottom justify
+            ----.----.----.---- | ----.----.x---.----  flipx
+            ----.----.----.---- | ----.----.-xxx.----  numcols
+            ----.----.----.---- | ----.----.----.x---  flipy
+            ----.----.----.---- | ----.----.----.-xxx  numrows
 
-		pSource[3]
-        	xxxx.xxxx.xxxx.xxxx | ----.----.----.----  tile number
-        	----.----.----.---- | xxxx.xxxx.----.----  translucency
-        	----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris
+        pSource[3]
+            xxxx.xxxx.xxxx.xxxx | ----.----.----.----  tile number
+            ----.----.----.---- | xxxx.xxxx.----.----  translucency
+            ----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris
 
-		pPal[0]
-        	xxxx.xxxx.----.---- | ----.----.----.----  no function
-        	----.----.xxxx.xxxx | xxxx.xxxx.xxxx.xxxx  z pos
+        pPal[0]
+            xxxx.xxxx.----.---- | ----.----.----.----  no function
+            ----.----.xxxx.xxxx | xxxx.xxxx.xxxx.xxxx  z pos
 
-		pPal[1]
-        	xxxx.xxxx.----.---- | ----.----.----.----  no function
-        	----.----.x---.---- | ----.----.----.----  cz enable
-        	----.----.-xxx.xxxx | ----.----.----.----  color
-        	----.----.----.---- | xxxx.xxxx.----.----  no function(?) - set in airco22b, propcycl
-        	----.----.----.---- | ----.----.xxxx.xxxx  cz factor (fog aka depth cueing)
+        pPal[1]
+            xxxx.xxxx.----.---- | ----.----.----.----  no function
+            ----.----.x---.---- | ----.----.----.----  cz enable
+            ----.----.-xxx.xxxx | ----.----.----.----  color
+            ----.----.----.---- | xxxx.xxxx.----.----  no function(?) - set in airco22b, propcycl
+            ----.----.----.---- | ----.----.xxxx.xxxx  cz factor (fog aka depth cueing)
         */
 		int xpos = (pSource[0]>>16) - deltax;
 		int ypos = (pSource[0]&0xffff) - deltay;
@@ -2708,7 +2708,7 @@ SCREEN_UPDATE( namcos22s )
 	}
 #endif
 
-//	popmessage("%08X %08X %08X %08X",state->m_czattr[0],state->m_czattr[1],state->m_czattr[2],state->m_czattr[3]);
+//  popmessage("%08X %08X %08X %08X",state->m_czattr[0],state->m_czattr[1],state->m_czattr[2],state->m_czattr[3]);
 
 	return 0;
 }

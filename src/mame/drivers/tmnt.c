@@ -1573,52 +1573,52 @@ INPUT_PORTS_END
 
 /*
 static INPUT_PORTS_START( punkshot2o ) // US 2 Players set1
-	PORT_INCLUDE( punkshtj )
-	PORT_INCLUDE( punksht_us_coinage )
+    PORT_INCLUDE( punkshtj )
+    PORT_INCLUDE( punksht_us_coinage )
 
-	PORT_MODIFY("DSW1/DSW2")
-	PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0300, "30" ) // US set1 factory default = "30"
-	PORT_DIPSETTING(      0x0200, "40" )
-	PORT_DIPSETTING(      0x0100, "50" )
-	PORT_DIPSETTING(      0x0000, "60" )
-	PORT_DIPNAME( 0x0c00, 0x0800, "Period Length" ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0c00, "2 Minutes" )
-	PORT_DIPSETTING(      0x0800, "3 Minutes" ) // US set1 factory default = "3 Minutes"
-	PORT_DIPSETTING(      0x0400, "4 Minutes" )
-	PORT_DIPSETTING(      0x0000, "5 Minutes" )
-	PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
-	PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) ) // US set1 factory default = "Easy"
-	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
+    PORT_MODIFY("DSW1/DSW2")
+    PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
+    PORT_DIPSETTING(      0x0300, "30" ) // US set1 factory default = "30"
+    PORT_DIPSETTING(      0x0200, "40" )
+    PORT_DIPSETTING(      0x0100, "50" )
+    PORT_DIPSETTING(      0x0000, "60" )
+    PORT_DIPNAME( 0x0c00, 0x0800, "Period Length" ) PORT_DIPLOCATION("SW2:3,4")
+    PORT_DIPSETTING(      0x0c00, "2 Minutes" )
+    PORT_DIPSETTING(      0x0800, "3 Minutes" ) // US set1 factory default = "3 Minutes"
+    PORT_DIPSETTING(      0x0400, "4 Minutes" )
+    PORT_DIPSETTING(      0x0000, "5 Minutes" )
+    PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
+    PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) ) // US set1 factory default = "Easy"
+    PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
 INPUT_PORTS_END
 */
 
 /*
 static INPUT_PORTS_START( punksht4n ) // US 4 Players set2
-	PORT_INCLUDE( punkshtj4 )
-	PORT_INCLUDE( punksht_us_coinage )
+    PORT_INCLUDE( punkshtj4 )
+    PORT_INCLUDE( punksht_us_coinage )
 
-	PORT_MODIFY("DSW1/DSW2")
-	PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0300, "40" )
-	PORT_DIPSETTING(      0x0200, "50" )
-	PORT_DIPSETTING(      0x0100, "60" )
-	PORT_DIPSETTING(      0x0000, "70" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Period Length" ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0c00, "3 Minutes" )
-	PORT_DIPSETTING(      0x0800, "4 Minutes" )
-	PORT_DIPSETTING(      0x0400, "5 Minutes" )
-	PORT_DIPSETTING(      0x0000, "6 Minutes" )
-	PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
-	PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_MODIFY("DSW1/DSW2")
+    PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
+    PORT_DIPSETTING(      0x0300, "40" )
+    PORT_DIPSETTING(      0x0200, "50" )
+    PORT_DIPSETTING(      0x0100, "60" )
+    PORT_DIPSETTING(      0x0000, "70" )
+    PORT_DIPNAME( 0x0c00, 0x0c00, "Period Length" ) PORT_DIPLOCATION("SW2:3,4")
+    PORT_DIPSETTING(      0x0c00, "3 Minutes" )
+    PORT_DIPSETTING(      0x0800, "4 Minutes" )
+    PORT_DIPSETTING(      0x0400, "5 Minutes" )
+    PORT_DIPSETTING(      0x0000, "6 Minutes" )
+    PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
+    PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
+    PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 */
 

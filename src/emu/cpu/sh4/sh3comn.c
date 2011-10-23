@@ -299,7 +299,7 @@ READ32_HANDLER( sh3_internal_r )
 						logerror("'%s' (%08x): SCIF internal read from %08x mask %08x (SCSMR2 - Serial Mode Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
 						return sh4->m_sh3internal_lower[offset];
 					}
-					
+
 					if (mem_mask & 0x0000ff00)
 					{
 						logerror("'%s' (%08x): SCIF internal read from %08x mask %08x (SCBRR2 - Bit Rate Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
@@ -315,7 +315,7 @@ READ32_HANDLER( sh3_internal_r )
 						logerror("'%s' (%08x): SCIF internal read from %08x mask %08x (SCSCR2 - Serial Control Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
 						return sh4->m_sh3internal_lower[offset];
 					}
-					
+
 					if (mem_mask & 0x0000ff00)
 					{
 						logerror("'%s' (%08x): SCIF internal read from %08x mask %08x (SCFTDR2 - Transmit FIFO Data Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
@@ -331,7 +331,7 @@ READ32_HANDLER( sh3_internal_r )
 						logerror("'%s' (%08x): SCIF internal read from %08x mask %08x (SCSSR2 - Serial Status Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
 						return sh4->m_sh3internal_lower[offset];
 					}
-					
+
 					if (mem_mask & 0x0000ff00)
 					{
 						logerror("'%s' (%08x): SCIF internal read from %08x mask %08x (SCFRDR2 - Receive FIFO Data Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
@@ -347,7 +347,7 @@ READ32_HANDLER( sh3_internal_r )
 						logerror("'%s' (%08x): SCIF internal read from %08x mask %08x (SCFCR2 - Fifo Control Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
 						return sh4->m_sh3internal_lower[offset];
 					}
-					
+
 					if (mem_mask & 0x0000ffff)
 					{
 						logerror("'%s' (%08x): SCIF internal read from %08x mask %08x (SCFDR2 - Fifo Data Count Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,mem_mask);
@@ -622,7 +622,7 @@ WRITE32_HANDLER( sh3_internal_w )
 					{
 					  logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSMR2 - Serial Mode Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
 					}
-					
+
 					if (mem_mask & 0x0000ff00)
 					{
 						logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCBRR2 - Bit Rate Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
@@ -636,7 +636,7 @@ WRITE32_HANDLER( sh3_internal_w )
 					{
 					  logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSCR2 - Serial Control Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
 					}
-					
+
 					if (mem_mask & 0x0000ff00)
 					{
 						logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCFTDR2 - Transmit FIFO Data Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
@@ -650,7 +650,7 @@ WRITE32_HANDLER( sh3_internal_w )
 					{
 					  logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSSR2 - Serial Status Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
 					}
-					
+
 					if (mem_mask & 0x0000ff00)
 					{
 						logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCFRDR2 - Receive FIFO Data Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
@@ -664,7 +664,7 @@ WRITE32_HANDLER( sh3_internal_w )
 					{
 					  logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCFCR2 - Fifo Control Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
 					}
-					
+
 					if (mem_mask & 0x0000ffff)
 					{
 						logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCFDR2 - Fifo Data Count Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);

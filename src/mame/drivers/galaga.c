@@ -1445,57 +1445,57 @@ INPUT_PORTS_END
 
 /*
 static INPUT_PORTS_START( digdugja ) // Namco older?
-	PORT_INCLUDE( digdug )
+    PORT_INCLUDE( digdug )
 
-	PORT_MODIFY("DSWB") // same order as SWA
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SWB:2,1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWB:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( No ) ) // Namco factory default = "No"
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SWB:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze" )                    PORT_DIPLOCATION("SWB:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWB:7,6")
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
+    PORT_MODIFY("DSWB") // same order as SWA
+    PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SWB:2,1")
+    PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
+    PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+    PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWB:3")
+    PORT_DIPSETTING(    0x04, DEF_STR( No ) ) // Namco factory default = "No"
+    PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SWB:4")
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x10, "Freeze" )                    PORT_DIPLOCATION("SWB:5")
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x60, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWB:7,6")
+    PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+    PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( digdugus ) // Atari older?
-	PORT_INCLUDE( digdug )
+    PORT_INCLUDE( digdug )
 
-	PORT_MODIFY("DSWB") // reverse order against SWA
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWB:1,2")
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )                    PORT_DIPLOCATION("SWB:3")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SWB:4")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWB:5")
-	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) ) // Atari factory default = "Yes"
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SWB:6,7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x01, 0x01, "Number Of Coin Counter(s)" ) PORT_DIPLOCATION("SWB:8")
-	PORT_DIPSETTING(    0x01, "Two Coin Counters" )
-	PORT_DIPSETTING(    0x00, "One Coin Counter" )
+    PORT_MODIFY("DSWB") // reverse order against SWA
+    PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWB:1,2")
+    PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+    PORT_DIPNAME( 0x20, 0x20, "Freeze" )                    PORT_DIPLOCATION("SWB:3")
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SWB:4")
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWB:5")
+    PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Yes ) ) // Atari factory default = "Yes"
+    PORT_DIPNAME( 0x06, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SWB:6,7")
+    PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+    PORT_DIPSETTING(    0x06, DEF_STR( Hardest ) )
+    PORT_DIPNAME( 0x01, 0x01, "Number Of Coin Counter(s)" ) PORT_DIPLOCATION("SWB:8")
+    PORT_DIPSETTING(    0x01, "Two Coin Counters" )
+    PORT_DIPSETTING(    0x00, "One Coin Counter" )
 INPUT_PORTS_END
 */
 

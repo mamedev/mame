@@ -1,6 +1,6 @@
 /* Triforce Skeleton
  -- split from Naomi.c
- 
+
  Triforce uses
 
 a stock Gamecube motherboard with custom Bios
@@ -396,11 +396,11 @@ Notes:
       J8 - 3-pin Fan Connector
       J9 - 4-pin Namco Audio Connector (unused)
 
------------------------------------------------------------------------------------------------------------------- 
- 
+------------------------------------------------------------------------------------------------------------------
+
  Note: "Type 3" Triforce uploads GD-ROM firmware to a MIPS processor which is DES encrypted (same as the GD images).
  The key is 0x00 0x22 0x44 0x66 0x88 0xaa 0xcc 0xee (http://debugmo.de/2010/12/the-last-piece/).
- 
+
 */
 
 #include "emu.h"

@@ -817,7 +817,7 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
 
 	output_set_lamp_value(7, 1-((data >> 6) & 1));		/* Hopper Motor (inverted) */
 
-//	popmessage("Lamps A: %02X", (data ^ 0xff));
+//  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
 
 static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
@@ -832,7 +832,7 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
 	output_set_lamp_value(4, (data >> 0) & 1);		/* Hold5 / Bet */
 	output_set_lamp_value(6, (data >> 1) & 1);		/* Start / Deal / Draw */
 
-//	popmessage("Lamps B: %02X", data);
+//  popmessage("Lamps B: %02X", data);
 }
 
 static WRITE8_DEVICE_HANDLER(pia1_ca2_w)

@@ -4,7 +4,7 @@
 
     Epson RTC-9701-JE
 
-	Serial Real Time Clock + EEPROM
+    Serial Real Time Clock + EEPROM
 
 
 ***************************************************************************/
@@ -399,8 +399,8 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					if (cmd_stream_pos==28)
 					{
 						cmd_stream_pos = 0;
-					//	//logerror("accesed 28 bits, going back to WAIT mode\n");
-					//	rtc_state = RTC9701_CMD_WAIT;
+					//  //logerror("accesed 28 bits, going back to WAIT mode\n");
+					//  rtc_state = RTC9701_CMD_WAIT;
 					}
 					break;
 
@@ -457,8 +457,8 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					if (cmd_stream_pos==12)
 					{
 						cmd_stream_pos = 0;
-					//	//logerror("accessed 12 bits, going back to WAIT mode\n");
-					//	rtc_state = RTC9701_CMD_WAIT;
+					//  //logerror("accessed 12 bits, going back to WAIT mode\n");
+					//  rtc_state = RTC9701_CMD_WAIT;
 					}
 					break;
 

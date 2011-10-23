@@ -57,9 +57,9 @@ OSC:
  X3 16.384MHz (Yamaha YMZ770C-F clock)
 
 Memory:
- U6 (SDRAM)  MT46V16M16 – 4 MBit x 16 x 4 banks, RAM (256 MBit)
- U7 (SDRAM)  MT46V16M16 – 4 MBit x 16 x 4 banks, RAM (256 MBit)
- U1 (SDRAM)  MT48LC2M32 – 512K x 32 x 4 banks, (64 MBit) for CV1000-B
+ U6 (SDRAM)  MT46V16M16 ? 4 MBit x 16 x 4 banks, RAM (256 MBit)
+ U7 (SDRAM)  MT46V16M16 ? 4 MBit x 16 x 4 banks, RAM (256 MBit)
+ U1 (SDRAM)  MT48LC2M32 ? 512K x 32 x 4 banks, (64 MBit) for CV1000-B
  U1 (SDRAM)  IS42S32400 - 1024K x 32 x 4 banks, (128 MBit) for CV1000-D
 
 Roms:
@@ -197,9 +197,9 @@ INLINE void pen_to_clr(UINT32 pen, clr_t *clr)
 	clr->b = (pen >>   3);// & 0x1f;
 
 // --t- ---- ---r rrrr ---g gggg ---b bbbb  format
-//	clr->r = (pen >> 16) & 0x1f;
-//	clr->g = (pen >> 8) & 0x1f;
-//	clr->b = (pen >> 0) & 0x1f;
+//  clr->r = (pen >> 16) & 0x1f;
+//  clr->g = (pen >> 8) & 0x1f;
+//  clr->b = (pen >> 0) & 0x1f;
 
 }
 
@@ -229,7 +229,7 @@ INLINE UINT32 clr_to_pen(const clr_t *clr)
 	return (clr->r << (16+3)) | (clr->g << (8+3)) | (clr->b << 3);
 
 // --t- ---- ---r rrrr ---g gggg ---b bbbb  format
-//	return (clr->r << (16)) | (clr->g << (8)) | (clr->b);
+//  return (clr->r << (16)) | (clr->g << (8)) | (clr->b);
 }
 
 // add clrs
@@ -281,9 +281,9 @@ INLINE void clr_add_with_clr_mul_rev_square(clr_t *clr, const clr_t *clr0, const
 INLINE void clr_add(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
 {
 /*
-	clr->r = clr0->r + clr1->r;
-	clr->g = clr0->g + clr1->g;
-	clr->b = clr0->b + clr1->b;
+    clr->r = clr0->r + clr1->r;
+    clr->g = clr0->g + clr1->g;
+    clr->b = clr0->b + clr1->b;
 */
 	// use pre-clamped lookup table
 	clr->r =  cavesh3_colrtable_add[clr0->r][clr1->r];
@@ -5014,8 +5014,8 @@ INLINE void cavesh_gfx_draw_shadow_copy(address_space &space, offs_t *addr, int 
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr); // UINT16 dst_x_start	=	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr); // UINT16 dst_y_start	=	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr); // UINT16 dst_x_start  =   COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr); // UINT16 dst_y_start  =   COPY_NEXT_WORD(space, addr);
 	UINT16 w		=	COPY_NEXT_WORD(space, addr);
 	UINT16 h		=	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
@@ -5069,7 +5069,7 @@ INLINE void cavesh_gfx_draw(offs_t *addr)
 	const UINT8 d_alpha	=	((alpha & 0x00ff)       )>>3;
 	const UINT8 s_alpha	=	((alpha & 0xff00) >> 8  )>>3;
 
-//	src_p	=	0;
+//  src_p   =   0;
 	src_x	=	src_x & 0x1fff;
 	src_y	=	src_y & 0x0fff;
 
@@ -5371,7 +5371,7 @@ static void cavesh_gfx_exec(void)
 static void *blit_request_callback(void *param, int threadid)
 {
 	cavesh_gfx_exec();
-//	printf("blah\n");
+//  printf("blah\n");
 	return NULL;
 }
 
@@ -5383,12 +5383,12 @@ static READ32_HANDLER( cavesh_gfx_ready_r )
 	// otherwise the games get stuck in more loops waiting for the blitter and we'd
 	// have to add even more idle skips all over the place ;-)
 
-//	cavesh3_state *state = space->machine().driver_data<cavesh3_state>();
-//	int pc = cpu_get_pc(&space->device());
+//  cavesh3_state *state = space->machine().driver_data<cavesh3_state>();
+//  int pc = cpu_get_pc(&space->device());
 // if we're waiting for the blitter.. spin otherwise it becomes CPU intensive again
-///	if ( pc == 0xc0512d0 ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // espgal2
-//	if (state->blitter_busy) return 0x00000000;
-//	else
+/// if ( pc == 0xc0512d0 ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // espgal2
+//  if (state->blitter_busy) return 0x00000000;
+//  else
 		return 0x00000010;
 }
 
@@ -5451,14 +5451,14 @@ static SCREEN_UPDATE( cavesh3 )
 
 
 	int scroll_0_x, scroll_0_y;
-//	int scroll_1_x, scroll_1_y;
+//  int scroll_1_x, scroll_1_y;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	scroll_0_x = -cavesh_gfx_scroll_0_x;
 	scroll_0_y = -cavesh_gfx_scroll_0_y;
-//	scroll_1_x = -cavesh_gfx_scroll_1_x;
-//	scroll_1_y = -cavesh_gfx_scroll_1_y;
+//  scroll_1_x = -cavesh_gfx_scroll_1_x;
+//  scroll_1_y = -cavesh_gfx_scroll_1_y;
 
 	//printf("SCREEN UPDATE\n %d %d %d %d\n", scroll_0_x, scroll_0_y, scroll_1_x, scroll_1_y);
 
@@ -5727,7 +5727,7 @@ static WRITE8_HANDLER( flash_addr_w )
 static READ8_HANDLER( flash_io_r )
 {
 	UINT8 data = 0x00;
-//	UINT32 old;
+//  UINT32 old;
 
 	if (!flash_enab)
 		return 0xff;
@@ -5855,7 +5855,7 @@ static READ8_HANDLER( serial_rtc_eeprom_r )
 		case 1:
 
 
-		//	return 0xfe | (input_port_read(space->machine(), "EEPROMIN") & 0x1);
+		//  return 0xfe | (input_port_read(space->machine(), "EEPROMIN") & 0x1);
 			return 0xfe | dev->read_bit();
 
 
@@ -5874,7 +5874,7 @@ static WRITE8_HANDLER( serial_rtc_eeprom_w )
 	switch (offset)
 	{
 		case 0x01:
-//		logerror("serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
+//      logerror("serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
 
 		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 
@@ -5910,7 +5910,7 @@ static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
 	/*       0x04000000, 0x07ffffff  SH3 Internal Regs (including ports) */
 
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&cavesh3_ram)//  AM_SHARE("mainram")// work RAM
-//	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM// AM_SHARE("mainram") // mirror of above on type B boards, extra ram on type D
+//  AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM// AM_SHARE("mainram") // mirror of above on type B boards, extra ram on type D
 
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(ibara_flash_io_r, ibara_flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_DEVREADWRITE8_MODERN("ymz770", ymz770_device, read, write, U64(0xffffffffffffffff))
@@ -5995,7 +5995,7 @@ static INPUT_PORTS_START( cavesh3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_cs_line)
 
 	PORT_START( "EEPROMIN" )
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, read_bit)
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, read_bit)
 
 INPUT_PORTS_END
 
@@ -6050,7 +6050,7 @@ static MACHINE_START( cavesh3 )
 
 	state->cavesh3_blitter_delay_timer = machine.scheduler().timer_alloc(FUNC(cavesh3_blitter_delay_callback));
 	state->cavesh3_blitter_delay_timer->adjust(attotime::never);
-	
+
 
 	state->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 }
@@ -6097,7 +6097,7 @@ static MACHINE_RESET( cavesh3 )
 static NVRAM_HANDLER( cavesh3 )
 {
 	/* Yes we have to crawl through the entire ~128MB flash because some games
-	   (eg. Deathsmiles) save data there on top of to the actual EEPROM */
+       (eg. Deathsmiles) save data there on top of to the actual EEPROM */
 	UINT8 *region = machine.region( "game" )->base();
 	size_t size = machine.region( "game" )->bytes();
 	cavesh3_state *state = machine.driver_data<cavesh3_state>();
@@ -6434,7 +6434,7 @@ static READ64_HANDLER( espgal2_speedup_r )
 	if ( pc == 0xc05177a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // espgal2
 	if ( pc == 0xc05176a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork / mmmbanc
 	if ( pc == 0xc0519a2 ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // deathsml
-//	else printf("read %08x\n", cpu_get_pc(&space->device()));
+//  else printf("read %08x\n", cpu_get_pc(&space->device()));
 	return cavesh3_ram[0x002310/8];
 }
 

@@ -3,11 +3,11 @@
 Atari Flyball Driver
 
 Etched in copper on top of board:
-	FLYBALL
-	ATARI (c)1976
-	A005629
-	MADE IN USA
-	PAT NO 3793483
+    FLYBALL
+    ATARI (c)1976
+    A005629
+    MADE IN USA
+    PAT NO 3793483
 
 ***************************************************************************/
 

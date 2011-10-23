@@ -801,7 +801,7 @@ static WRITE8_HANDLER( m1_latch_w )
 	      cpu0_nmi(space->machine(),1);
 	      cpu0_nmi(space->machine(),0);
 
-		  //		if ( m1_enable == 0 && ( data & 1 ) && Vmm )
+		  //        if ( m1_enable == 0 && ( data & 1 ) && Vmm )
 //      {
 	//      cpu0_nmi(1)
 		//  m1_enable = (data & 1);
@@ -1673,7 +1673,7 @@ ROM_START( m1cluessp )
 	ROM_LOAD( "sk001028", 0x0000, 0x020000, CRC(ad0ccb34) SHA1(1cfe0cc945ba3fe91645301abca40285984084e3) )//pcf 2.3
 	m1_cluess_sound
 ROM_END_M1A_MCU
-		
+
 ROM_START( m1cluessa )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "sk001025", 0x0000, 0x020000, CRC(9b30d25a) SHA1(185c2f56d69dc6635c75c18bc1c4f342d94a3c96) )//ncf 1.2

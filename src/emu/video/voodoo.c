@@ -1008,7 +1008,7 @@ static TIMER_CALLBACK( vblank_off_callback )
 
 			if (v->fbi.vblank_client != NULL)
 				(*v->fbi.vblank_client)(v->device, FALSE);
-		
+
 		}
 	}
 	else
@@ -4089,7 +4089,7 @@ READ32_DEVICE_HANDLER( banshee_fb_r )
 
 	if (offset < v->fbi.lfb_base)
 	{
-#if LOG_LFB	
+#if LOG_LFB
 		logerror("%s:banshee_fb_r(%X)\n", device->machine().describe_context(), offset*4);
 #endif
 		if (offset*4 <= v->fbi.mask)
@@ -4485,15 +4485,15 @@ static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data)
 			if (offset >= 0x20 && offset < 0x40)
 			{
 				/*
-				logerror("   2D:launch: %08x -> %08x, %d remaining\n", data, blt_base, blt_count);
-				v->fbi.ram[blt_base+3] = (data >> 24) & 0xff;
-				v->fbi.ram[blt_base+2] = (data >> 16) & 0xff;
-				v->fbi.ram[blt_base+1] = (data >> 8) & 0xff;
-				v->fbi.ram[blt_base+0] = data & 0xff;
+                logerror("   2D:launch: %08x -> %08x, %d remaining\n", data, blt_base, blt_count);
+                v->fbi.ram[blt_base+3] = (data >> 24) & 0xff;
+                v->fbi.ram[blt_base+2] = (data >> 16) & 0xff;
+                v->fbi.ram[blt_base+1] = (data >> 8) & 0xff;
+                v->fbi.ram[blt_base+0] = data & 0xff;
 
-				blt_count -= 4;
-				blt_base += 4;
-				*/
+                blt_count -= 4;
+                blt_base += 4;
+                */
 
 				blit_2d(v, data);
 			}
@@ -4654,7 +4654,7 @@ WRITE32_DEVICE_HANDLER( banshee_fb_w )
 		{
 			if (offset*4 <= v->fbi.mask)
 				COMBINE_DATA(&((UINT32 *)v->fbi.ram)[offset]);
-#if LOG_LFB	
+#if LOG_LFB
 			logerror("%s:banshee_fb_w(%X) = %08X & %08X\n", device->machine().describe_context(), offset*4, data, mem_mask);
 #endif
 		}
