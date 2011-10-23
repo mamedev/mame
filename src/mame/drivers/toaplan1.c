@@ -16,9 +16,8 @@ Supported games:
     rallybik    TP-O12      Rally Bike/Dash Yarou
     truxton     TP-O13B     Truxton/Tatsujin
     hellfire    B90         HellFire (2 Player version) Uses Taito rom ID number
-    hellfir1    B90         HellFire (1 Player, ealier version) Uses Taito rom ID number
+    hellfir1    B90         HellFire (1 Player version) Uses Taito rom ID number
     hellfir2    B90         HellFire (2 Player, ealier version) Uses Taito rom ID number
-    hellfir3    B90         HellFire (1 Player version) Uses Taito rom ID number
     zerowing    TP-O15      Zero Wing
     zerowing2   TP-O15      Zero Wing (2 player simultaneous version, Williams Electronics Games, Inc)
     demonwld    TP-O16      Demon's World/Horror Story [1990]
@@ -61,8 +60,8 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from DSWB (port 0x50 in CPU1) then stored at 0x8004 (CPU1 shared RAM) =
     0x180008.w (CPU0 shared RAM) then stored at 0x0804f4.w .
   - Coinage relies on bits 4 and 5 of the region (code at 0x0ccc in CPU1) :
-      * ..10.... : TOAPLAN_COINAGE_EUROPE (tables at 0x0c35 (COIN1) and 0x0c3d (COIN2) in CPU1)
-      *  else    : TOAPLAN_COINAGE_JAPAN  (table at 0x0c25 (COIN1 AND COIN2) in CPU1)
+      * ..10.... : TOAPLAN_COINAGE_WORLD     (tables at 0x0c35 (COIN1) and 0x0c3d (COIN2) in CPU1)
+      *  else    : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0c25 (COIN1 AND COIN2) in CPU1)
   - Title screen relies on bits 4 and 5 of the region (code at 0x00220e) :
       * ..00.... : "Dash Yarou"
       *  else    : "Rally Bike"
@@ -94,10 +93,10 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
     0x18000a.w (CPU0 shared RAM) then stored at 0x081b7c.w .
   - Coinage relies on bits 0 and 1 of the region (code at 0x0ccc in CPU1) :
-      * ......00 : TOAPLAN_COINAGE_JAPAN  (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
-      * ......01 : TOAPLAN_COINAGE_JAPAN  (table at 0x0d29 (COIN1 AND COIN2) in CPU1)
-      * ......10 : TOAPLAN_COINAGE_EUROPE (tables at 0x0d31 (COIN1) and 0x0d39 (COIN2) in CPU1)
-      * ......11 : TOAPLAN_COINAGE_JAPAN  (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
+      * ......00 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
+      * ......01 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d29 (COIN1 AND COIN2) in CPU1)
+      * ......10 : TOAPLAN_COINAGE_WORLD     (tables at 0x0d31 (COIN1) and 0x0d39 (COIN2) in CPU1)
+      * ......11 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
   - Title screen relies on bits 0 to 2 of the region (code at 0x002c58) :
       * .....000 : "Tatsujin"
       *     else : "Truxton"
@@ -139,9 +138,9 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
     0x44000a.w (CPU0 shared RAM) then stored at 0x081810.w .
   - Coinage relies on bits 0 and 1 of the region (code at 0x0c59 in CPU1) :
-      * ......00 : TOAPLAN_COINAGE_JAPAN  (table at 0x0cae (COIN1 AND COIN2) in CPU1)
-      * ......01 : TOAPLAN_COINAGE_JAPAN  (table at 0x0cb6 (COIN1 AND COIN2) in CPU1)
-      * ......1. : TOAPLAN_COINAGE_EUROPE (tables at 0x0cbe (COIN1) and 0x0cb6 (COIN2) in CPU1)
+      * ......00 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0cae (COIN1 AND COIN2) in CPU1)
+      * ......01 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0cb6 (COIN1 AND COIN2) in CPU1)
+      * ......1. : TOAPLAN_COINAGE_WORLD     (tables at 0x0cbe (COIN1) and 0x0cb6 (COIN2) in CPU1)
   - Notice screen relies on bit 0 of the region (code at 0x000564) :
       * .......0 : "FOR USE IN JAPAN ONLY"
       * .......1 : "FOR USE IN U.S.A. ONLY"
@@ -230,8 +229,8 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 
   - Region read from Territory Jumper (0x440011.b).
   - Coinage relies on bits 0 to 3 of the region :
-      * ....0010 : TOAPLAN_COINAGE_EUROPE
-      *     else : TOAPLAN_COINAGE_JAPAN
+      * ....0010 : TOAPLAN_COINAGE_WORLD
+      *     else : TOAPLAN_COINAGE_JAPAN_OLD
     This a guess based on the "test mode" (code at 0x01a804) because of the missing Z180 CPU.
   - Notice screen relies on bits 0 to 3 of the region (code at 0x018bf2 - table at 0x019736) :
       * ....0000 : "JAPAN ONLY"
@@ -303,10 +302,10 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
       * press START2 to pause game
       * press START1 to unpause game
       * when START1 and START2 are pressed, the game enters in "slow motion" mode
-  - When "Invulnerability" Dip Switch is ON, you can press the unused 3rd button of player 1
-    to advance quickly to your desired area.
+  - When "Invulnerability" Dip Switch is ON, you can press F1 ("Fast Scrolling", in fact
+    the unused 3rd button of player 1) to advance quickly to your desired area.
   - When "Invulnerability" Dip Switch is ON, you can press the unused 3rd button of player 2,
-    but as its effect is completely unknown (code at 0x0010aa),
+    but as its effect is completely unknown (code at 0x0010aa), I've decided not to map it for now.
   - It's hard to tell which regions can be used for this set and which one is the default one.
     However, as the text at the "end" (after the "CONGRATULATIONS" message) is in English,
     I've decided to disable the ones related to Japan (0x00 and 0x0f).
@@ -324,7 +323,6 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 
   - The only difference I've noticed with 'vimana' is the text at the "end" is in Japanese.
     This is why I've disabled all regions which aren't related to Japan.
-            -> Changed enabled all regions !!
   - Sound routines at 0x01792c and 0x0179ba.
 
 
@@ -335,36 +333,6 @@ To Do:
         Vimana
     In the meantime, it can be interesting to simulate the basic communications (coinage and credits)
     between the M68000 and the Z180.  [stephh]
-
-
-Easter Eggs (using switches in cabinet):
-
-    rallybik - While "TEST" Switch is held ON, you can play invulnerable mode game.
-             - While playing invulnerable mode, press both "P1 button 1" and "P1 button 2" at the same time.
-               No matter which player is playing.
-               Then you can go to next stage soon. Score reverts. And when 2 players play, they alternate.
-
-    truxton  - To enter the "sound check", press START2 when the grid is displayed.
-             - While playing, when "Service Mode" Dip Switch is ON, you can not enter the grid screen,
-               but can play invulnerable mode game.
-               You can not play invulnerable mode game by pressing JAMMA "Test" Switch.
-               It is a difference between "Service Mode" Dip Switch and JAMMA "Test" Switch.
-
-    hellfire - (not yet found)
-
-    zerowing - (not yet found)
-
-    demonwld - (not yet found)
-
-    fireshrk - While playing invulnerable mode, press "Service coin" to scroll fast.
-
-    outzone  - (not yet found)
-
-    vimana   - While playing invulnerable mode, press "P1 button 3" to scroll fast.
-               No matter which player is playing.
-             - While playing invulnerable mode, press "P2 button 3" to go to next stage.
-               No matter which player is playing.
-
 
 ***************************************************************************/
 
@@ -378,82 +346,6 @@ Easter Eggs (using switches in cabinet):
 #include "sound/3812intf.h"
 
 
-/***************************** debugging flags ******************************/
-
-#define DEBUG_FREE_ALL_DIPSW FALSE
-#define DEBUG_DONT_HIDE_DUP_DIPSETTING TRUE
-	/* Set TRUE and you may find unknown easter eggs */
-
-#if DEBUG_DONT_HIDE_DUP_DIPSETTING
-  #define HIDE_DUP(_para) _para
-#else
-  #define HIDE_DIP(_para) /* null */
-#endif
-
-
-/**************************** customizing flags *****************************/
-
-#define RALLYBIK_TEST_DESCRIBE_LEVEL 1
-	/* Rallybik's "Test" has an easter egg. */
-	/* If you want to rename it, set 1 or 2.
-	   0 = "Test"                   or "Test (Toggle Switch)"
-	   1 = "Test (Invulnerability)" or "Test (Toggle Switch) (Invulnerability)"
-	   2 = "(Invulnerability)"      or "(Toggle Switch) (Invulnerability)" */
-#define RALLYBIK_TEST_TOGGLE TRUE
-	/* If you want to connect toggle switch, set TRUE. */
-#define RALLYBIK_TEST_MOVE_TO_F1 FALSE
-	/* If you want to move it to "F1", set TRUE. */
-
-
-#define FIRESHRK_SERVICE_1_DESCRIBE_LEVEL 1
-	/* Fireshrk's "Service 1" has an easter egg. */
-	/* If you want to rename it, set 1 or 2.
-	   0 = "Service 1"
-	   1 = "Service 1 (Fast Scrolling If Invulnerable)"
-	   2 = "(Fast Scrolling If Invulnerable)" */
-#define FIRESHRK_SERVICE_1_MOVE_TO_F1 FALSE
-	/* If you want to move it to "F1", set TRUE. */
-
-
-#define VIMANA_P1_BUTTON_3_DESCRIBE_LEVEL 2
-	/* Vimana's "P1 Button 3" has an easter egg. */
-	/* If you want to rename it, set 1 or 2.
-	   0 = "Spare (P1 Button 3)"
-	   1 = "Spare (P1 Button 3) (Fast Scrolling If Invulnerable)"
-	   2 = "(Fast Scrolling If Invulnerable)" */
-#define VIMANA_P1_BUTTON_3_MOVE_TO_F1 FALSE
-	/* If you want to move it to "F1", set TRUE. */
-
-#define VIMANA_P2_BUTTON_3_DESCRIBE_LEVEL 2
-	/* Vimana's "P2 Button 3" has an easter egg. */
-	/* If you want to rename it, set 1 or 2.
-	   0 = "Spare (P2 Button 3)"
-	   1 = "Spare (P2 Button 3) (Go To Next Stage If Invulnerable)"
-	   2 = "(Go To Next Stage If Invulnerable)" */
-#define VIMANA_P2_BUTTON_3_MOVE_TO_F1 FALSE
-	/* If you want to move it to "F1", set TRUE. */
-
-	#if VIMANA_P1_BUTTON_3_MOVE_TO_F1 && VIMANA_P2_BUTTON_3_MOVE_TO_F1
-	  ERROR !! : You can set zero or one TRUE, but you set two.
-	#endif
-
-
-/***************************** frequent strings *****************************/
-
-static const char frqstr_europe_nova[] = "Europe (" /*"Licensed to "*/ "Nova Apparate GMBH & Co)";
-static const char frqstr_europe_taitojapan[] = "Europe (" /*"Licensed to "*/ "Taito Japan)";
-static const char frqstr_usa_romstar[] = "USA (" /*"Licensed to "*/ "Romstar)";
-static const char frqstr_usa_romstarinc[] = "USA (" /*"Licensed to "*/ "Romstar Inc)";
-static const char frqstr_usa_taitoamerica[] = "USA (" /*"Licensed to "*/ "Taito America)";
-static const char frqstr_japan_taitocorp[] = "Japan (" /*"Licensed to "*/ "Taito Corp)";
-static const char frqstr_japan_tecmo[] = "Japan (" /*"Distributed by "*/ "Tecmo)";
-static const char frqstr_hongkong[] = "Hong Kong";
-static const char frqstr_hongkong_honest[] = "Hong Kong (" /*"Licensed to "*/ "Honest Trading Co)";
-static const char frqstr_hongkongchina_honest[] = "Hong Kong & China (" /*"Licensed to "*/ "Honest Trading Co)";
-static const char frqstr_korea[] = "Korea";
-static const char frqstr_taiwan[] = "Taiwan";
-static const char frqstr_taiwan_spacy[] = "Taiwan (" /*"Licensed to "*/ "Spacy Co Ltd)";
-static const char frqstr_no_country[] = "No Country";
 
 /***************************** 68000 Memory Map *****************************/
 
@@ -760,99 +652,66 @@ ADDRESS_MAP_END
 /*****************************************************************************
     Generic Input Port definitions
 *****************************************************************************/
-
-/* type1 */
-
-static INPUT_PORTS_START( toaplan1_type1 )
-	/* rallybik truxton zerowing vimana */
-
+static INPUT_PORTS_START( toaplan1_2b )
 	PORT_START("P1")
-	TOAPLAN_JOY_UDLR_2_BUTTONS(1)
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
 
 	PORT_START("P2")
-	TOAPLAN_JOY_UDLR_2_BUTTONS(2)
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
 
 	PORT_START("SYSTEM")
-	TOAPLAN_SYSTEM_INPUT_WITHOUT_VBLANK
-	//                   ^^^^^^^ only one differnce between toaplan1_type1 and toaplan1_type2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )           /* "TEST" switch - see notes */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("VBLANK")
-	TOAPLAN_VBLANK_INPUT_16BITS
-
-	PORT_START("DSWA") /* DIP SW 1 */
-	TOAPLAN_DIP_1_SPARE(SW1)
-	TOAPLAN_DIP_2_SPARE(SW1)
-	TOAPLAN_DIP_3_SPARE(SW1)
-	TOAPLAN_DIP_4_SPARE(SW1)
-	TOAPLAN_DIP_5_SPARE(SW1)
-	TOAPLAN_DIP_6_SPARE(SW1)
-	TOAPLAN_DIP_7_SPARE(SW1)
-	TOAPLAN_DIP_8_SPARE(SW1)
-
-	PORT_START("DSWB") /* DIP SW 2 */
-	TOAPLAN_DIP_1_SPARE(SW2)
-	TOAPLAN_DIP_2_SPARE(SW2)
-	TOAPLAN_DIP_3_SPARE(SW2)
-	TOAPLAN_DIP_4_SPARE(SW2)
-	TOAPLAN_DIP_5_SPARE(SW2)
-	TOAPLAN_DIP_6_SPARE(SW2)
-	TOAPLAN_DIP_7_SPARE(SW2)
-	TOAPLAN_DIP_8_SPARE(SW2)
-
-	PORT_START("TJUMP") /* Territory Jumper Block */
-	TOAPLAN_JMPR_4_SPARE(JP) /* reverse order to DIP SW */
-	TOAPLAN_JMPR_3_SPARE(JP)
-	TOAPLAN_JMPR_2_SPARE(JP)
-	TOAPLAN_JMPR_1_SPARE(JP)
-	TOAPLAN_INPUT_GENERIC_FILL_UNKNOWN(0xf0) /* Unknown/Unused */
-
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-/* type2 */
+#ifdef UNREFERENCED_CODE
+static INPUT_PORTS_START( toaplan1_3b )
+	PORT_INCLUDE( toaplan1_2b )
 
-static INPUT_PORTS_START( toaplan1_type2 )
-	/* hellfire demonwld fireshrk outzone */
+	PORT_MODIFY("P1")
+	TOAPLAN_JOY_UDLR_3_BUTTONS( 1 )
 
-	PORT_START("VBLANK")
-	TOAPLAN_VBLANK_INPUT_16BITS
-
-	PORT_START("P1")
-	TOAPLAN_JOY_UDLR_2_BUTTONS(1)
-
-	PORT_START("P2")
-	TOAPLAN_JOY_UDLR_2_BUTTONS(2)
-
-	PORT_START("DSWA") /* DIP SW 1 */
-	TOAPLAN_DIP_1_SPARE(SW1)
-	TOAPLAN_DIP_2_SPARE(SW1)
-	TOAPLAN_DIP_3_SPARE(SW1)
-	TOAPLAN_DIP_4_SPARE(SW1)
-	TOAPLAN_DIP_5_SPARE(SW1)
-	TOAPLAN_DIP_6_SPARE(SW1)
-	TOAPLAN_DIP_7_SPARE(SW1)
-	TOAPLAN_DIP_8_SPARE(SW1)
-
-	PORT_START("DSWB") /* DIP SW 2 */
-	TOAPLAN_DIP_1_SPARE(SW2)
-	TOAPLAN_DIP_2_SPARE(SW2)
-	TOAPLAN_DIP_3_SPARE(SW2)
-	TOAPLAN_DIP_4_SPARE(SW2)
-	TOAPLAN_DIP_5_SPARE(SW2)
-	TOAPLAN_DIP_6_SPARE(SW2)
-	TOAPLAN_DIP_7_SPARE(SW2)
-	TOAPLAN_DIP_8_SPARE(SW2)
-
-	PORT_START("SYSTEM")
-	TOAPLAN_SYSTEM_INPUT_WITH_VBLANK
-	//                   ^^^^ only one differnce between toaplan1_type1 and toaplan1_type2
-
-	PORT_START("TJUMP") /* Territory Jumper Block */
-	TOAPLAN_JMPR_4_SPARE(JP) /* reverse order to DIP SW */
-	TOAPLAN_JMPR_3_SPARE(JP)
-	TOAPLAN_JMPR_2_SPARE(JP)
-	TOAPLAN_JMPR_1_SPARE(JP)
-	TOAPLAN_INPUT_GENERIC_FILL_UNKNOWN(0xf0) /* Unknown/Unused */
+	PORT_MODIFY("P2")
+	TOAPLAN_JOY_UDLR_3_BUTTONS( 2 )
 INPUT_PORTS_END
+#endif
+
+#define  TOAPLAN1_PLAYER_INPUT( player, button3, options )										\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) options PORT_8WAY		\
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) options PORT_8WAY	\
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) options PORT_8WAY	\
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) options PORT_8WAY	\
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) options					\
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) options					\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, button3 ) PORT_PLAYER(player) options						\
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+#define  TOAPLAN1_SYSTEM_INPUTS						\
+	PORT_START("SYSTEM")						\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )	\
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )		\
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	\
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )		\
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )		\
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )	\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )	\
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+
+#define  TOAPLAN1_VBLANK_INPUT						\
+	PORT_START("VBLANK")						\
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )	\
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
 
 /*****************************************************************************
     Game-specific Input Port definitions
@@ -860,61 +719,39 @@ INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( rallybik )
-	PORT_INCLUDE( toaplan1_type1 )
+	PORT_INCLUDE( toaplan1_2b )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  /* in 0x40 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x180006.w (CPU0 shared RAM) -> 0x0804f2.w */
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A1_CABINET(SW1)
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(DSWB, 0x30, 0x20, SW1)  // mask{0x03} & value{0x02} -> Europe
+	/* in 0x40 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x180006.w (CPU0 shared RAM) -> 0x0804f2.w */
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_DUAL(DSWB, 0x30, 0x20)                  /* see notes */
 
-	  /* in 0x50 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x180008.w (CPU0 shared RAM) -> 0x0804f4.w */
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
-	  //DIP_B34_SPARE (divert from 'toaplan1_type1')
-	  // region verified 'rallybik' (MAME 0.143u7)
-	    // listed as unused in the Dip Switches screen //           |Game   |Service|      |                   |       |
-	  PORT_DIPNAME( 0x30, 0x20, DEF_STR( Region ) )    //           |Mode   |Mode   |      |                   |       |
-	                  PORT_DIPLOCATION("SW2:!5,!6")    // Title     |Coinage|Coinage|Notice|Copyright          |License|Initials
-	  PORT_DIPSETTING(    0x20, DEF_STR( Europe ) )    // Rally Bike|Europe |Europe |Off   |TAITO CORP. JAPAN  |-      |3 letters
-	  PORT_DIPSETTING(    0x10, DEF_STR( USA ) )       // Rally Bike|Japan  |Japan  |Off   |TAITO AMERICA CORP.|-      |3 letters
-	  PORT_DIPSETTING(    0x30, frqstr_usa_romstar )   // Rally Bike|Japan  |Japan  |Off   |TAITO AMERICA CORP.|ROMSTAR|3 letters
-	  PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )     // Dash Yarou|Japan  |Japan  |On    |TAITO CORPORATION  |-      |6 letters
-	  TOAPLAN_DIP_B7_SHOW_DIPSW_SETTINGS(SW2)
-	  TOAPLAN_DIP_B8_ALLOW_CONTINUE_OFF_YES(SW2) // not on race 1
-	#endif
+	/* in 0x50 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x180008.w (CPU0 shared RAM) -> 0x0804f4.w */
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x30, 0x20, "Territory" )                 /* bits 4 and 5 listed as unused in the Dip Switches screen */
+	PORT_DIPSETTING(    0x20, DEF_STR( Europe ) )           /* Taito Corp. Japan */
+	PORT_DIPSETTING(    0x10, DEF_STR( USA ) )              /* Taito America Corp. */
+	PORT_DIPSETTING(    0x30, "USA (Romstar license)" )     /* Taito America Corp. */
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   /* not on race 1 */
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	PORT_MODIFY("TJUMP") // (not present ? this port isn't even read)
-	TOAPLAN_INPUT_GENERIC_FILL_UNKNOWN(0x0f)
+	PORT_START("TJUMP")       /* Territory Jumper Block (not present ? this port isn't even read) */
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* P1 : in 0x00 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x18000c.w (CPU0 shared RAM) */
 	/* P2 : in 0x10 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x18000e.w (CPU0 shared RAM) */
 
 	/* in 0x20 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x18000a.w (CPU0 shared RAM) -> 0x0804f4.w */
 	PORT_MODIFY("SYSTEM")
-	#if ! RALLYBIK_TEST_TOGGLE
-	  #if RALLYBIK_TEST_DESCRIBE_LEVEL == 1
-	    TOAPLAN_TEST_SWITCH_RENAME("Test (Invulnerability)")
-	  #elif RALLYBIK_TEST_DESCRIBE_LEVEL == 2
-	    TOAPLAN_TEST_SWITCH_RENAME("(Invulnerability)")
-	  #else
-	    // TOAPLAN_TEST_SWITCH_RENAME("Test") // not renamed
-	  #endif
-	#else
-	  #if RALLYBIK_TEST_DESCRIBE_LEVEL == 1
-	    TOAPLAN_TEST_SWITCH_TOGGLE_RENAME("Test (Toggle Switch) (Invulnerability)")
-	  #elif RALLYBIK_TEST_DESCRIBE_LEVEL == 2
-	    TOAPLAN_TEST_SWITCH_TOGGLE_RENAME("(Toggle Switch) (Invulnerability)")
-	  #else
-	    TOAPLAN_TEST_SWITCH_TOGGLE
-	  #endif
-	#endif
-	#if RALLYBIK_TEST_MOVE_TO_F1
-	    PORT_CODE(KEYCODE_F1)
-	#endif
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )             /* see notes */
 
 	/* VBLANK : 0x140000.w */
 INPUT_PORTS_END
@@ -922,48 +759,46 @@ INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( truxton )
-	PORT_INCLUDE( toaplan1_type1 )
+	PORT_INCLUDE( toaplan1_2b )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  /* in 0x40 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x180006.w (CPU0 shared RAM) -> 0x081b78.w */
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A1_CABINET(SW1)
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x03, 0x02, SW1) // mask{0x07} & value{0x02,0x06} -> Europe
+	/* in 0x40 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x180006.w (CPU0 shared RAM) -> 0x081b78.w */
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_DUAL(TJUMP, 0x03, 0x02)                 /* see notes */
 
-	  /* in 0x50 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x180008.w (CPU0 shared RAM) -> 0x081b7a.w */
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4") /* table at 0x000930 */
-	  PORT_DIPSETTING(    0x04, "50k 200k 150k+" )
-	  PORT_DIPSETTING(    0x00, "70k 270k 200k+" )
-	  PORT_DIPSETTING(    0x08, "100k Only" )
-	  PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	  PORT_DIPSETTING(    0x30, "2" )
-	  PORT_DIPSETTING(    0x00, "3" )
-	  PORT_DIPSETTING(    0x20, "4" )
-	  PORT_DIPSETTING(    0x10, "5" )
-	  TOAPLAN_DIP_B7_SHOW_DIPSW_SETTINGS(SW2)
-	  TOAPLAN_DIP_B8_ALLOW_CONTINUE_OFF_YES(SW2)
+	/* in 0x50 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x180008.w (CPU0 shared RAM) -> 0x081b7a.w */
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000930 */
+	PORT_DIPSETTING(    0x04, "50k 200k 150k+" )
+	PORT_DIPSETTING(    0x00, "70k 270k 200k+" )
+	PORT_DIPSETTING(    0x08, "100k Only" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	  /* in 0x70 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x18000a.w (CPU0 shared RAM) -> 0x081b7c.w */
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'truxton' (MAME 0.143u7)            //         |Game   |Service|      |Territory|Service |                   |       |
-	  PORT_DIPNAME(        0x07, 0x02, DEF_STR( Region ) )   //         |Mode   |Mode   |      |Notice   |Mode    |                   |       |
-	                         PORT_DIPLOCATION("JP:!4,!3,!2") // Title   |Coinage|Coinage|Notice|Location |Location|Copyright          |License|Initials
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )   // Truxton |Europe |Europe |Off   |-        |Europe  |TAITO CORPORATION  |-      |3 letters
-	  HIDE_DUP( PORT_DIPSETTING( 0x03, DEF_STR( Europe ) ) ) // Truxton |Japan  |Europe |Off   |-        |Europe  |TAITO CORPORATION  |-      |3 letters
-	  HIDE_DUP( PORT_DIPSETTING( 0x06, DEF_STR( Europe ) ) ) // Truxton |Europe |Europe |Off   |-        |Europe  |TAITO AMERICA CORP.|-      |3 letters
-	  HIDE_DUP( PORT_DIPSETTING( 0x07, DEF_STR( Europe ) ) ) // Truxton |Japan  |Europe |Off   |-        |Europe  |TAITO AMERICA CORP.|-      |3 letters
-	  HIDE_DUP( PORT_DIPSETTING( 0x04, DEF_STR( USA ) ) )    // Truxton |Japan  |Japan  |On    |USA      |Japan   |TAITO AMERICA CORP.|-      |3 letters
-	            PORT_DIPSETTING( 0x05, DEF_STR( USA ) )      // Truxton |Japan  |Japan  |On    |USA      |USA     |TAITO AMERICA CORP.|-      |3 letters
-	            PORT_DIPSETTING( 0x01, frqstr_usa_romstar )  // Truxton |Japan  |Japan  |On    |USA      |USA     |TAITO AMERICA CORP.|ROMSTAR|3 letters
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )    // Tatsujin|Japan  |Japan  |On    |Japan    |Japan   |TAITO CORPORATION  |-      |6 letters
-	  //JP_1 (divert from 'toaplan1_type1')
-	#endif
+	/* in 0x70 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x18000a.w (CPU0 shared RAM) -> 0x081b7c.w */
+	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
+	PORT_DIPNAME( 0x07, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )           /* Taito Corporation */       /* TOAPLAN_COINAGE_WORLD */
+//  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )           /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x06, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_WORLD */
+//  PORT_DIPSETTING(    0x07, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x05, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x01, "USA (Romstar license)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* P1 : in 0x00 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x18000e.w (CPU0 shared RAM) -> 0x081b82.w */
 	/* P2 : in 0x10 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x180010.w (CPU0 shared RAM) -> 0x081b84.w */
@@ -974,740 +809,638 @@ static INPUT_PORTS_START( truxton )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( input_common_hellfire )
-	PORT_INCLUDE( toaplan1_type2 )
-
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
-	  //DIP_A5678_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")
-	  PORT_DIPSETTING(    0x00, "70K, every 200K" )
-	  PORT_DIPSETTING(    0x04, "100K, every 250K" )
-	  PORT_DIPSETTING(    0x08, "100K" )
-	  PORT_DIPSETTING(    0x0c, "200K" )
-	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	  PORT_DIPSETTING(    0x30, "2" )
-	  PORT_DIPSETTING(    0x00, "3" )
-	  PORT_DIPSETTING(    0x20, "4" )
-	  PORT_DIPSETTING(    0x10, "5" )
-	  //DIP_B78_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-
-	  //PORT_MODIFY("TJUMP")
-	  //JP_43_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-	  //JP_21_SPARE (divert from 'toaplan1_type2')
-	#endif
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( hellfire )
-	PORT_INCLUDE( input_common_hellfire )
+	TOAPLAN1_VBLANK_INPUT
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2' via 'input_common_hellfire')
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x02, 0x02, SW1) // mask{0x03} & value{0x02,0x03} -> Europe
+	PORT_START("P1")
+	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
 
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B7_INVULNERABILITY(SW2)
-	  //DIP_B8_SPARE (divert from 'toaplan1_type2' via 'input_common_hellfire')
+	PORT_START("P2")
+	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, )
 
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'hellfire' (MAME 0.143u7)           // Game   |Service|      |                         |
-	  PORT_DIPNAME(        0x03, 0x02, DEF_STR( Region ) )   // Mode   |Mode   |      |                         |
-	                            PORT_DIPLOCATION("JP:!4,!3") // Coinage|Coinage|Notice|Licensed to              |initials
-	  HIDE_DUP( PORT_DIPSETTING( 0x03, DEF_STR( Europe ) ) ) // Europe |Europe |Off   |TAITO CORPORATION        |3 letters
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )   // Europe |Europe |Off   |TAITO CORPORATION        |3 letters
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )      // Japan  |Japan  |off   |TAITO AMERICA CORPORATION|3 letters
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )    // Japan  |Japan  |On    |TAITO CORPORATION        |3 letters
-	#endif
+	PORT_START("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSWB")		/* DSWB */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "70K, every 200K" )
+	PORT_DIPSETTING(    0x04, "100K, every 250K" )
+	PORT_DIPSETTING(    0x08, "100K" )
+	PORT_DIPSETTING(    0x0c, "200K" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	TOAPLAN1_SYSTEM_INPUTS
+
+	PORT_START("TJUMP")		/* Territory Jumper block */
+	PORT_DIPNAME( 0x03, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hellfire1 )
-	PORT_INCLUDE( input_common_hellfire )
+	PORT_INCLUDE( hellfire )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A1_CABINET(SW1)
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x03, 0x02, SW1) // mask{0x03} & value{0x02} -> Europe
-
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B7_SHOW_DIPSW_SETTINGS(SW2)
-	  TOAPLAN_DIP_B8_ALLOW_CONTINUE_OFF_YES(SW2)
-
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'hellfire1' (MAME 0.143u7)          // Game   |Service|      |           |
-	  PORT_DIPNAME(        0x03, 0x02, DEF_STR( Region ) )   // Mode   |Mode   |      |           |
-	                            PORT_DIPLOCATION("JP:!4,!3") // Coinage|Coinage|Notice|Licensed to|initials
-	  HIDE_DUP( PORT_DIPSETTING( 0x03, DEF_STR( Europe ) ) ) // Japan  |Europe |Off   |TAITO CORP.|3 letters
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )   // Europe |Europe |Off   |TAITO CORP.|6 letters (default "...000")
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )      // Japan  |Japan  |On    |TAITO CORP.|3 letters
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )    // Japan  |Japan  |On    |TAITO CORP.|6 letters (default "......")
-	#endif
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( hellfire2 )
-	PORT_INCLUDE( input_common_hellfire )
-
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2' via 'input_common_hellfire')
-	  // A1 is listed as cabinet in the Dip Switches screen, but probably unused
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x03, 0x02, SW1) // mask{0x03} & value{0x02} -> Europe
-
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B7_SHOW_DIPSW_SETTINGS(SW2)
-	  TOAPLAN_DIP_B8_ALLOW_CONTINUE_OFF_YES(SW2)
-
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'hellfire2' (MAME 0.143u7)          // Game   |Service|      |           |
-	  PORT_DIPNAME(        0x03, 0x02, DEF_STR( Region ) )   // Mode   |Mode   |      |           |
-	                            PORT_DIPLOCATION("JP:!4,!3") // Coinage|Coinage|Notice|Licensed to|initials
-	  HIDE_DUP( PORT_DIPSETTING( 0x03, DEF_STR( Europe ) ) ) // Japan  |Europe |Off   |TAITO CORP.|3 letters
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )   // Europe |Europe |Off   |TAITO CORP.|3 letters
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )      // Japan  |Japan  |Off   |TAITO CORP.|3 letters
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )    // Japan  |Japan  |Off   |TAITO CORP.|3 letters
-	#endif
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( hellfire3 )
-	PORT_INCLUDE( input_common_hellfire )
-
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A1_CABINET(SW1)
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x02, 0x02, SW1) // mask{0x03} & value{0x02,0x03} -> Europe
-
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B7_INVULNERABILITY(SW2)
-	  TOAPLAN_DIP_B8_ALLOW_CONTINUE_OFF_YES(SW2)
-
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'hellfire3' (MAME 0.143u7)          // Game   |Service|      |                 |
-	  PORT_DIPNAME(        0x03, 0x02, DEF_STR( Region ) )   // Mode   |Mode   |      |                 |
-	                            PORT_DIPLOCATION("JP:!4,!3") // Coinage|Coinage|Notice|Licensed to      |initials
-	  HIDE_DUP( PORT_DIPSETTING( 0x03, DEF_STR( Europe ) ) ) // Europe |Europe |Off   |TAITO CORPORATION|3 letters
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )   // Europe |Europe |Off   |TAITO CORPORATION|6 letters (default "......")
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )      // Japan  |Japan  |On    |TAITO CORPORATION|3 letters
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )    // Japan  |Japan  |On    |TAITO CORPORATION|6 letters (default "......")
-	#endif
-INPUT_PORTS_END
-
-
-/* verified from M68000 and Z80 code */
-static INPUT_PORTS_START( input_common_zerowing )
-	PORT_INCLUDE( toaplan1_type1 )
-
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  // in 0x20 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x440006.w (CPU0 shared RAM) -> 0x08180c.w ('zerowing') or 0x081ade.w ('zerowing2')
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type1') (Specified by each set)
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
-	  //DIP_A5678_SPARE (divert from 'toaplan1_type1') (Specified by each set)
-
-	  // in 0x28 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x440008.w (CPU0 shared RAM) -> 0x08180e.w ('zerowing') or 0x081ae0.w ('zerowing2')
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4") // table at 0x00216c ('zerowing') or 0x002606 ('zerowing2')
-	  PORT_DIPSETTING(    0x00, "200k 700k 500k+" )
-	  PORT_DIPSETTING(    0x04, "500k 1500k 1000k+" )
-	  PORT_DIPSETTING(    0x08, "500k Only" )
-	  PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	  PORT_DIPSETTING(    0x30, "2" )
-	  PORT_DIPSETTING(    0x00, "3" )
-	  PORT_DIPSETTING(    0x20, "4" )
-	  PORT_DIPSETTING(    0x10, "5" )
-	  TOAPLAN_DIP_B7_INVULNERABILITY(SW2)
-	  //DIP_B8_SPARE (divert from 'toaplan1_type1') (Specified by each set)
-
-	  // in 0x88 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x44000a.w (CPU0 shared RAM) -> 0x081810.w ('zerowing') or 0x081ae2.w ('zerowing2')
-	  //PORT_MODIFY("TJUMP")
-	  //JP_43_SPARE (divert from 'toaplan1_type1') (Specified by each set)
-	  //JP_21_SPARE (divert from 'toaplan1_type1')
-	#endif
-
-	// P1 : in 0x00 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x44000e.w (CPU0 shared RAM) -> 0x081818.w ('zerowing') or 0x081aea.w ('zerowing2')
-	// P2 : in 0x08 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x440010.w (CPU0 shared RAM) -> 0x08181a.w ('zerowing') or 0x081aec.w ('zerowing2')
-
-	// SYSTEM : in 0x80 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x44000c.w (CPU0 shared RAM) -> 0x081812.w ('zerowing') or 0x081ae4.w ('zerowing2')
-
-	// VBLANK : 0x400000.w ('zerowing' and 'zerowing2')
-INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( zerowing )
-	PORT_INCLUDE( input_common_zerowing )
+	PORT_INCLUDE( toaplan1_2b )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A1_CABINET(SW1)
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x02, 0x02, SW1) // mask{0x03} & value{0x02,0x03} -> Europe
+	/* in 0x20 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x440006.w (CPU0 shared RAM) -> 0x08180c.w */
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_DUAL(TJUMP, 0x02, 0x02)                 /* see notes */
 
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B8_ALLOW_CONTINUE_OFF_YES(SW2)
+	/* in 0x28 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x440008.w (CPU0 shared RAM) -> 0x08180e.w */
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x00216c ('zerowing') or 0x002606 ('zerowing2') */
+	PORT_DIPSETTING(    0x00, "200k 700k 500k+" )
+	PORT_DIPSETTING(    0x04, "500k 1500k 1000k+" )
+	PORT_DIPSETTING(    0x08, "500k Only" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability" )           /* see notes */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'zerowing' (MAME 0.143u7)          // Game   |Service|      |
-	  PORT_DIPNAME(        0x03, 0x03, DEF_STR( Region ) )   // Mode   |Mode   |      |
-	                            PORT_DIPLOCATION("JP:!4,!3") // Coinage|Coinage|Notice|initials
-	            PORT_DIPSETTING( 0x03, DEF_STR( Europe ) )   // Europe |Europe |Off   |3 letters
-	  HIDE_DUP( PORT_DIPSETTING( 0x02, DEF_STR( Europe ) ) ) // Europe |Europe |Off   |6 letters (default "...000")
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )      // Japan  |Japan  |off   |3 letters
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )    // Japan  |Japan  |On    |6 letters (default "......")
-	#endif
+	/* in 0x88 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x44000a.w (CPU0 shared RAM) -> 0x081810.w */
+	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
+	PORT_DIPNAME( 0x03, 0x03, "Territory" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )           /* 3 letters initials - right */
+//  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )           /* 6 letters initials - wrong */
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* P1 : in 0x00 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x44000e.w (CPU0 shared RAM) -> 0x081818.w */
+	/* P2 : in 0x08 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x440010.w (CPU0 shared RAM) -> 0x08181a.w */
+
+	/* SYSTEM : in 0x80 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x44000c.w (CPU0 shared RAM) -> 0x081812.w */
+
+	/* VBLANK : 0x400000.w */
 INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( zerowing2 )
-	PORT_INCLUDE( input_common_zerowing )
+	PORT_INCLUDE( zerowing )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type1' via 'input_common_zerowing')
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x02, 0x02, SW1) // mask{0x02} & value{0x02} -> Europe
+	/* in 0x20 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x440006.w (CPU0 shared RAM) -> 0x081ade.w */
+	PORT_MODIFY("DSWA")
+	TOAPLAN_MACHINE_NO_COCKTAIL
 
-	  //PORT_MODIFY("DSWB")
-	  //DIP_B8_SPARE (divert from 'toaplan1_type1' via 'input_common_zerowing')
+	/* in 0x28 (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x440008.w (CPU0 shared RAM) -> 0x081ae0.w */
+	PORT_MODIFY("DSWB")
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
-	  PORT_MODIFY("TJUMP")
-	  //JP_4_SPARE (divert from 'toaplan1_type1' via 'input_common_zerowing')
-	  // region verified 'zerowing2' (MAME 0.143u7) // Game   |Service|      |                               |
-	  PORT_DIPNAME( 0x02, 0x00, DEF_STR( Region ) ) // Mode   |Mode   |      |                               |
-	                      PORT_DIPLOCATION("JP:!3") // Coinage|Coinage|Notice|Copyright                      |initials
-	  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) ) // Europe |Europe |Off   |WILLIAMS ELECTRONICS GAMES, INC|3 letters
-	  PORT_DIPSETTING(    0x00, DEF_STR( USA ) )    // Japan  |Japan  |off   |WILLIAMS ELECTRONICS GAMES, INC|3 letters
-	#endif
+	/* in 0x88 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x44000a.w (CPU0 shared RAM) -> 0x081ae2.w */
+	PORT_MODIFY("TJUMP")      /* Territory Jumper block - see notes */
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Region ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* P1 : in 0x00 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x44000e.w (CPU0 shared RAM) -> 0x081aea.w */
+	/* P2 : in 0x08 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x440010.w (CPU0 shared RAM) -> 0x081aec.w */
+
+	/* SYSTEM : in 0x80 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x44000c.w (CPU0 shared RAM) -> 0x081ae4.w */
+
+	/* VBLANK : 0x400000.w */
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( input_common_demonwld )
-	PORT_INCLUDE( toaplan1_type2 )
+static INPUT_PORTS_START( demonwld )
+	TOAPLAN1_VBLANK_INPUT
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2')
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
-	  //DIP_A5678_SPARE (divert from 'toaplan1_type2') (Specified by each set)
+	PORT_START("P1")
+	TOAPLAN1_PLAYER_INPUT( 1, IPT_BUTTON3, )
 
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")
-	  PORT_DIPSETTING(    0x00, "30K, every 100K" )
-	  PORT_DIPSETTING(    0x04, "50K and 100K" )
-	  PORT_DIPSETTING(    0x08, "100K only" )
-	  PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	  PORT_DIPSETTING(    0x30, "1" )
-	  PORT_DIPSETTING(    0x20, "2" )
-	  PORT_DIPSETTING(    0x00, "3" )
-	  PORT_DIPSETTING(    0x10, "5" )
-	  TOAPLAN_DIP_B7_INVULNERABILITY(SW2)
-	  //DIP_B8_SPARE (divert from 'toaplan1_type2')
+	PORT_START("P2")
+	TOAPLAN1_PLAYER_INPUT( 2, IPT_BUTTON3, )
 
-	  //PORT_MODIFY("TJUMP")
-	  //JP_43_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-	  //JP_21_SPARE (divert from 'toaplan1_type2')
-	#endif
-INPUT_PORTS_END
+	PORT_START("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
-static INPUT_PORTS_START( demonwld ) // demonwld, demonwld2, demonwld3 and demonwld4
-	PORT_INCLUDE( input_common_demonwld )
+	PORT_START("DSWB")		/* DSW B */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "30K, every 100K" )
+	PORT_DIPSETTING(    0x04, "50K and 100K" )
+	PORT_DIPSETTING(    0x08, "100K only" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x03, 0x02, SW1) // mask{0x03} & value{0x02} -> Europe
+	TOAPLAN1_SYSTEM_INPUTS
 
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'demonwld','demonwld2','demonwld3','demonwld4' (MAME 0.143u7)
-	                                                            //              |Game   |Service|      |
-	  PORT_DIPNAME(        0x03, 0x01, DEF_STR( Region ) )      //              |Mode   |Mode   |      |
-	                               PORT_DIPLOCATION("JP:!4,!3") // Title        |Coinage|Coinage|Notice|Licensed to
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )      // Demon's World|Europe |?      |off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x03, DEF_STR( USA ) ) )       // Demon's World|Japan  |?      |off   |-
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )         // Demon's World|Japan  |?      |Off   |-
-	            PORT_DIPSETTING( 0x00, frqstr_japan_taitocorp ) // Horror Story |Japan  |?      |On    |TAITO CORP.
-	                                                            //                       service mode (dip switchs screen) is not yet found
-	#endif
+	PORT_START("TJUMP")		/* Territory Jumper Block */
+	PORT_DIPNAME( 0x01, 0x01, "Territory/Copyright" )
+	PORT_DIPSETTING(    0x01, "Toaplan" )
+	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( demonwld1 )
-	PORT_INCLUDE( input_common_demonwld )
+	PORT_INCLUDE( demonwld )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x03, 0x02, SW1) // mask{0x03} & value{0x02} -> Europe
-
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'demonwld1' (MAME 0.143u7)        //              |Game   |Service|      |
-	  PORT_DIPNAME( 0x03, 0x01, DEF_STR( Region ) )        //              |Mode   |Mode   |      |
-	                          PORT_DIPLOCATION("JP:!4,!3") // Title        |Coinage|Coinage|Notice|Licensed to
-	  PORT_DIPSETTING(    0x02, frqstr_europe_taitojapan ) // Demon's World|Europe |?      |off   |TAITO JAPAN
-	  PORT_DIPSETTING(    0x03, DEF_STR( USA ) )           // Demon's World|Japan  |?      |off   |-
-	  PORT_DIPSETTING(    0x01, frqstr_usa_taitoamerica )  // Demon's World|Japan  |?      |Off   |TAITO AMERICA
-	  PORT_DIPSETTING(    0x00, frqstr_japan_taitocorp )   // Horror Story |Japan  |?      |On    |TAITO CORP.
-	                                                       //                       service mode (dip switchs screen) is not yet found
-	#endif
+	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_DIPNAME( 0x03, 0x02, "Territory/Copyright" )
+	PORT_DIPSETTING(    0x02, "World/Taito Japan" )
+	PORT_DIPSETTING(    0x03, "US/Toaplan" )
+	PORT_DIPSETTING(    0x01, "US/Taito America" )
+	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( input_common_fireshrk )
-	PORT_INCLUDE( toaplan1_type2 )
-
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
-	  //DIP_A5678_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")
-	  PORT_DIPSETTING(    0x04, "50K, every 150K" )
-	  PORT_DIPSETTING(    0x00, "70K, every 200K" )
-	  PORT_DIPSETTING(    0x08, "100K" )
-	  PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	  PORT_DIPSETTING(    0x30, "2" )
-	  PORT_DIPSETTING(    0x00, "3" )
-	  PORT_DIPSETTING(    0x20, "4" )
-	  PORT_DIPSETTING(    0x10, "5" )
-	  TOAPLAN_DIP_B7_INVULNERABILITY(SW2)
-	  //DIP_B8_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-
-	  //PORT_MODIFY("TJUMP")
-	  //JP_4321_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-	#endif
-
-	PORT_MODIFY("SYSTEM")
-	#if FIRESHRK_SERVICE_1_DESCRIBE_LEVEL == 1
-	  PORT_BIT(0x01, TOAPLAN_IP_ACTIVE_LEVEL, IPT_SERVICE1) PORT_NAME("Service 1 (Fast Scrolling If Invulnerable)") /* JAMMA "Service" */
-	#elif FIRESHRK_SERVICE_1_DESCRIBE_LEVEL == 2
-	  PORT_BIT(0x01, TOAPLAN_IP_ACTIVE_LEVEL, IPT_SERVICE1) PORT_NAME("(Fast Scrolling If Invulnerable)")
-	#endif
-	#if FIRESHRK_SERVICE_1_MOVE_TO_F1
-	  PORT_CODE(KEYCODE_F1)
-	#endif
-
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( fireshrk )
-	PORT_INCLUDE( input_common_fireshrk )
+	TOAPLAN1_VBLANK_INPUT
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL_GREATERTHAN(TJUMP, 0x03, 0x00, SW1) // mask{0x03} & value{0x01,0x02,0x03} -> Europe
+	PORT_START("P1")
+	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
 
-	  //PORT_MODIFY("DSWB")
-	  //DIP_B8_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
+	PORT_START("P2")
+	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
 
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'fireshrk' (MAME 0.143u7)             //           |Game   |Service|      |
-	  PORT_DIPNAME(        0x0f, 0x02, DEF_STR( Region ) )     //           |Mode   |Mode   |      |
-	                        PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Title     |Coinage|Coinage|Notice|Licensed to
-	            PORT_DIPSETTING( 0x01, DEF_STR( Europe ) )     // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x02, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x03, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x05, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x06, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x07, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x09, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x0a, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x0b, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x0d, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x0e, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x0f, DEF_STR( Europe ) ) )   // Fire Shark|Europe |Europe |Off   |-
-	            PORT_DIPSETTING( 0x04, DEF_STR( USA ) )        // Fire Shark|Japan  |Japan  |On    |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x08, DEF_STR( USA ) ) )      // Fire Shark|Japan  |Japan  |On    |-
-	  HIDE_DUP( PORT_DIPSETTING( 0x0c, DEF_STR( USA ) ) )      // Fire Shark|Japan  |Japan  |On    |-
-	            PORT_DIPSETTING( 0x00, frqstr_usa_romstarinc ) // Fire Shark|Japan  |Japan  |On    |ROMSTAR,INC.
-	  // JP_43 are listed as unused in the Dip Switches screen, but affect to license
-	#endif
+	PORT_START("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSWB")		/* DSW B */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x04, "50K, every 150K" )
+	PORT_DIPSETTING(    0x00, "70K, every 200K" )
+	PORT_DIPSETTING(    0x08, "100K" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	TOAPLAN1_SYSTEM_INPUTS
+
+	PORT_START("TJUMP")		/* Territory Jumper Block */
+	PORT_DIPNAME( 0x06, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x00, "USA (Romstar)" )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( samesame )
-	PORT_INCLUDE( input_common_fireshrk )
+	PORT_INCLUDE( fireshrk )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A1_CABINET(SW1)
-	  //DIP_A5678_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
+	PORT_MODIFY("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+/* settings listed in service mode, but not actually used ???
+    PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x30, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+    PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+*/
 
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B8_ALLOW_CONTINUE_OFF_YES(SW2)
-
-	  //PORT_MODIFY("TJUMP")
-	  //JP_4321_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
-
-	  // region verified 'samesame' (MAME 0.143u7)           //               |Game   |Service|      |
-	  //PORT_DIPNAME(        0x0f, 0x00, DEF_STR( Region ) ) //               |Mode   |Mode   |      |
-	  //                  PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Title         |Coinage|Coinage|Notice|Licensed to
-	  //          PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |-
-	  //          PORT_DIPSETTING( 0x01, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |-
-	  //          PORT_DIPSETTING( 0x02, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |On    |-
-	  //          PORT_DIPSETTING( 0x03, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |On    |-
-	  //          PORT_DIPSETTING( 0x04, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |-
-	  //          PORT_DIPSETTING( 0x05, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |-
-	  //          PORT_DIPSETTING( 0x06, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |On    |-
-	  //          PORT_DIPSETTING( 0x07, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |On    |-
-	  //          PORT_DIPSETTING( 0x08, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |-
-	  //          PORT_DIPSETTING( 0x09, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |-
-	  //          PORT_DIPSETTING( 0x0a, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |On    |-
-	  //          PORT_DIPSETTING( 0x0b, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |On    |-
-	  //          PORT_DIPSETTING( 0x0c, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |-
-	  //          PORT_DIPSETTING( 0x0d, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |-
-	  //          PORT_DIPSETTING( 0x0e, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |On    |-
-	  //          PORT_DIPSETTING( 0x0f, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |On    |-
-	#endif
+	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( samesame2 ) // samesame2 and fireshrkd
-	PORT_INCLUDE( input_common_fireshrk )
+static INPUT_PORTS_START( samesame2 )
+	PORT_INCLUDE( samesame )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  //PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
-	  //DIP_A5678_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
+	PORT_MODIFY("P2")
+	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, )
 
-	  //PORT_MODIFY("DSWB")
-	  //DIP_B8_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
+	PORT_MODIFY("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )	/* No cocktail */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
-	  PORT_MODIFY("TJUMP")
-	  PORT_DIPNAME(           0x03, 0x00, "Show Territory Notice" ) PORT_DIPLOCATION("JP:!4,!3")
-	  HIDE_DUP( PORT_DIPSETTING(    0x03, DEF_STR( No ) ) )
-	  HIDE_DUP( PORT_DIPSETTING(    0x02, DEF_STR( No ) ) )
-	            PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	            PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	  //JP_21_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
-
-	  // region verified 'samesame2' (MAME 0.143u7)          //               |Game   |Service|      |Territory|Service
-	  //PORT_DIPNAME(        0x03, 0x00, DEF_STR( Region ) ) //               |Mode   |Mode   |      |Notice   |Mode
-	  //                  PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Title         |Coinage|Coinage|Notice|Location |Location
-	  //          PORT_DIPSETTING( 0x03, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |Off   |-        |Europe
-	  //          PORT_DIPSETTING( 0x02, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |Off   |-        |Europe
-	  //          PORT_DIPSETTING( 0x01, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Europe |Off   |-        |Europe
-	  //          PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )  // Same Same Same|1C_1C  |Japan  |On    |Japan    |USA
-
-	  // region verified 'fireshrkd' (MAME 0.143u7)          //           |Game   |Service|      |Territory|Service |
-	  //PORT_DIPNAME(        0x03, 0x00, DEF_STR( Region ) ) //           |Mode   |Mode   |      |Notice   |Mode    |
-	  //                  PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Title     |Coinage|Coinage|Notice|Location |Location|Licensed to
-	  //          PORT_DIPSETTING( 0x03, DEF_STR( Japan ) )  // Fire Shark|1C_1C  |Europe |Off   |-        |Europe  |DOOYONG CO.,LTD.
-	  //          PORT_DIPSETTING( 0x02, DEF_STR( Japan ) )  // Fire Shark|1C_1C  |Europe |Off   |-        |Europe  |DOOYONG CO.,LTD.
-	  //          PORT_DIPSETTING( 0x01, DEF_STR( Japan ) )  // Fire Shark|1C_1C  |Europe |Off   |-        |Europe  |DOOYONG CO.,LTD.
-	  //          PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )  // Fire Shark|1C_1C  |Japan  |On    |Korean   |Korean  |DOOYONG CO.,LTD.
-	#endif
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( fireshrkdh )
-	PORT_INCLUDE( input_common_fireshrk )
-
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL_GREATERTHAN(TJUMP, 0x03, 0x00, SW1) // mask{0x03} & value{0x01,0x02,0x03} -> Europe
-
-	  //PORT_MODIFY("DSWB")
-	  //DIP_B8_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
-
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'fireshrkdh' (MAME 0.143u7)         //           |Game   |Service|      |Territory|Service |
-	  PORT_DIPNAME(        0x03, 0x00, DEF_STR( Region ) )   //           |Mode   |Mode   |      |Notice   |Mode    |
-	                            PORT_DIPLOCATION("JP:!4,!3") // Title     |Coinage|Coinage|Notice|Location |Location|Licensed to
-	  HIDE_DUP( PORT_DIPSETTING( 0x03, DEF_STR( Europe ) ) ) // Fire Shark|Europe |Europe |Off   |-        |Europe  |DOOYONG IND.CO.,LTD.
-	  HIDE_DUP( PORT_DIPSETTING( 0x02, DEF_STR( Europe ) ) ) // Fire Shark|Europe |Europe |Off   |-        |Europe  |DOOYONG IND.CO.,LTD.
-	            PORT_DIPSETTING( 0x01, DEF_STR( Europe ) )   // Fire Shark|Europe |Europe |Off   |-        |Europe  |DOOYONG IND.CO.,LTD.
-	            PORT_DIPSETTING( 0x00, frqstr_korea )        // Fire Shark|Japan  |Japan  |On    |Korean   |Korean  |DOOYONG IND.CO.,LTD.
-	  //JP_21_SPARE (divert from 'toaplan1_type2' via 'input_common_fireshrk')
-	#endif
+	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+/* settings listed in service mode, but not actually used
+    PORT_DIPNAME( 0x03, 0x00, "Territory" )
+//  PORT_DIPSETTING(    0x01, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+    PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
+*/
+	PORT_DIPNAME( 0x01, 0x00, "Show Territory Notice" )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+//  PORT_DIPNAME( 0x02, 0x00, "Show Territory Notice" ) /* Same as Bit 1 */
+//  PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_BIT( 0xf2, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Mask bit 2 aswell */
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( input_common_outzone )
-	PORT_INCLUDE( toaplan1_type2 )
+static INPUT_PORTS_START( outzone )
+	TOAPLAN1_VBLANK_INPUT
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type2')
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
-	  //DIP_A5678_SPARE (divert from 'toaplan1_type2') (Specified by each set)
+	PORT_START("P1")
+	TOAPLAN1_PLAYER_INPUT( 1, IPT_BUTTON3, )
 
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")
-	  PORT_DIPSETTING(    0x00, "Every 300K" )
-	  PORT_DIPSETTING(    0x04, "200K and 500K" )
-	  PORT_DIPSETTING(    0x08, "300K only" )
-	  PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	  PORT_DIPSETTING(    0x30, "1" )
-	  PORT_DIPSETTING(    0x20, "2" )
-	  PORT_DIPSETTING(    0x00, "3" )
-	  PORT_DIPSETTING(    0x10, "5" )
-	  TOAPLAN_DIP_B7_INVULNERABILITY(SW2)
-	  //DIP_B8_SPARE (divert from 'toaplan1_type2')
+	PORT_START("P2")
+	TOAPLAN1_PLAYER_INPUT( 2, IPT_BUTTON3, )
 
-	  //PORT_MODIFY("TJUMP")
-	  //JP_4321_SPARE (divert from 'toaplan1_type2') (Specified by each set)
-	#endif
-INPUT_PORTS_END
+	PORT_START("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
-static INPUT_PORTS_START( outzone ) // outzone and outzonec
-	PORT_INCLUDE( input_common_outzone )
+	PORT_START("DSWB")		/* DSW B */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "Every 300K" )
+	PORT_DIPSETTING(    0x04, "200K and 500K" )
+	PORT_DIPSETTING(    0x08, "300K only" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x0f, 0x02, SW1) // mask{0x0f} & value{0x02} -> Europe
+	TOAPLAN1_SYSTEM_INPUTS
 
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'outzone','outzonec' (MAME 0.143u7)         // Game   |Service|      |                  |    |     |Stage
-	  PORT_DIPNAME(        0x0f, 0x02, DEF_STR( Region ) )           // Mode   |Mode   |      |                  |FBI |Demo |Repeat
-	                              PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Coinage|Coinage|Notice|Licensed to       |Logo|Story|Message
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )           // Europe |Europe |On    |-                 |Off |Off  |Off
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )              // Japan  |Japan  |On    |-                 |On  |Off  |Off
-	            PORT_DIPSETTING( 0x07, frqstr_usa_romstarinc )       // Japan  |Europe |On    |ROMSTAR, INC.     |On  |Off  |Off
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )            // Japan  |Japan  |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x09, DEF_STR( Japan ) ) )          // Japan  |Japan  |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0a, DEF_STR( Japan ) ) )          // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0b, DEF_STR( Japan ) ) )          // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0c, DEF_STR( Japan ) ) )          // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0d, DEF_STR( Japan ) ) )          // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0e, DEF_STR( Japan ) ) )          // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0f, DEF_STR( Japan ) ) )          // Japan  |Europe |On    |-                 |Off |On   |On
-	            PORT_DIPSETTING( 0x03, frqstr_hongkong )             // Japan  |Europe |On    |-                 |Off |Off  |Off
-	            PORT_DIPSETTING( 0x08, frqstr_hongkongchina_honest ) // Japan  |Japan  |On    |HONEST TRADING CO.|Off |Off  |Off
-	            PORT_DIPSETTING( 0x04, frqstr_korea )                // Japan  |Europe |On    |-                 |Off |Off  |Off
-	            PORT_DIPSETTING( 0x05, frqstr_taiwan )               // Japan  |Europe |On    |-                 |Off |Off  |Off
-	            PORT_DIPSETTING( 0x06, frqstr_taiwan_spacy )         // Japan  |Europe |On    |SPACY CO.,LTD.    |Off |Off  |Off
-	#endif
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( outzonea ) // outzonea and outzoned
-	PORT_INCLUDE( input_common_outzone )
-
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x0f, 0x02, SW1) // mask{0x0f} & value{0x02} -> Europe
-
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'outzonea','outzoned' (MAME 0.143u7)   // Game   |Service|      |                  |    |     |Stage
-	  PORT_DIPNAME(        0x0f, 0x02, DEF_STR( Region ) )      // Mode   |Mode   |      |                  |FBI |Demo |Repeat
-	                         PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Coinage|Coinage|Notice|Licensed to       |Logo|Story|Message
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )      // Europe |Europe |On    |-                 |Off |Off  |Off
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )         // Japan  |Japan  |On    |-                 |On  |Off  |Off
-	            PORT_DIPSETTING( 0x07, frqstr_usa_romstarinc )  // Japan  |Europe |On    |ROMSTAR, INC.     |On  |Off  |Off
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )       // Japan  |Japan  |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x09, DEF_STR( Japan ) ) )     // Japan  |Japan  |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0a, DEF_STR( Japan ) ) )     // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0b, DEF_STR( Japan ) ) )     // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0c, DEF_STR( Japan ) ) )     // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0d, DEF_STR( Japan ) ) )     // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0e, DEF_STR( Japan ) ) )     // Japan  |Europe |On    |-                 |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x0f, DEF_STR( Japan ) ) )     // Japan  |Europe |On    |-                 |Off |On   |On
-	            PORT_DIPSETTING( 0x03, frqstr_hongkong )        // Japan  |Europe |On    |-                 |Off |Off  |Off
-	            PORT_DIPSETTING( 0x08, frqstr_hongkong_honest ) // Japan  |Japan  |On    |HONEST TRADING CO.|Off |Off  |Off
-	            PORT_DIPSETTING( 0x04, frqstr_korea )           // Japan  |Europe |On    |-                 |Off |Off  |Off
-	            PORT_DIPSETTING( 0x05, frqstr_taiwan )          // Japan  |Europe |On    |-                 |Off |Off  |Off
-	            PORT_DIPSETTING( 0x06, frqstr_taiwan_spacy )    // Japan  |Europe |On    |SPACY CO.,LTD.    |Off |Off  |Off
-	#endif
+	PORT_START("TJUMP")		/* Territory Jumper Block */
+	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x04, "Korea" )
+	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co License)" )
+	PORT_DIPSETTING(    0x07, "US (Romstar License)" )
+	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading License)" )
+//  PORT_DIPSETTING(    0x09, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0a, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0b, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0c, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0d, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0e, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0f, DEF_STR( Japan ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( outzoneb )
-	PORT_INCLUDE( input_common_outzone )
+	PORT_INCLUDE( outzone )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x0f, 0x02, SW1) // mask{0x0f} & value{0x02} -> Europe
+	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_DIPNAME( 0x07, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x04, "Korea" )
+	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x06, "No Warning Screen" )
+	PORT_DIPSETTING(    0x07, "No Warning Screen" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) // doesn't seem to matter on this set
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
 
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'outzoneb' (MAME 0.143u7)                   // Game   |Service|      |           |    |     |Stage
-	  PORT_DIPNAME(        0x0f, 0x02, DEF_STR( Region ) )           // Mode   |Mode   |      |           |FBI |Demo |Repeat
-	                              PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Coinage|Coinage|Notice|Licensed to|Logo|Story|Message
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )           // Europe |Europe |On    |-          |Off |Off  |Off
-	            PORT_DIPSETTING( 0x0a, "Europe (Japanese coinage)" ) // Japan  |Europe |On    |-          |Off |Off  |Off
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )              // Japan  |Japan  |On    |-          |On  |Off  |Off
-	  HIDE_DUP( PORT_DIPSETTING( 0x09, DEF_STR( USA ) ) )            // Japan  |Japan  |On    |-          |On  |Off  |Off
-	            PORT_DIPSETTING( 0x00, DEF_STR( Japan ) )            // Japan  |Japan  |On    |-          |Off |On   |On
-	  HIDE_DUP( PORT_DIPSETTING( 0x08, DEF_STR( Japan ) ) )          // Japan  |Japan  |On    |-          |Off |On   |On
-	            PORT_DIPSETTING( 0x03, frqstr_hongkong )             // Japan  |Europe |On    |-          |Off |Off  |Off
-	  HIDE_DUP( PORT_DIPSETTING( 0x0b, frqstr_hongkong ) )           // Japan  |Europe |On    |-          |Off |Off  |Off
-	            PORT_DIPSETTING( 0x04, frqstr_korea )                // Japan  |Europe |On    |-          |Off |Off  |Off
-	  HIDE_DUP( PORT_DIPSETTING( 0x0c, frqstr_korea ) )              // Japan  |Europe |On    |-          |Off |Off  |Off
-	            PORT_DIPSETTING( 0x05, frqstr_taiwan )               // Japan  |Europe |On    |-          |Off |Off  |Off
-	  HIDE_DUP( PORT_DIPSETTING( 0x0d, frqstr_taiwan ) )             // Japan  |Europe |On    |-          |Off |Off  |Off
-	            PORT_DIPSETTING( 0x06, frqstr_no_country )           // Japan  |Europe |Off   |-          |Off |Off  |Off
-	  HIDE_DUP( PORT_DIPSETTING( 0x07, frqstr_no_country ) )         // Japan  |Europe |Off   |-          |Off |Off  |Off
-	  HIDE_DUP( PORT_DIPSETTING( 0x0e, frqstr_no_country ) )         // Japan  |Europe |Off   |-          |Off |Off  |Off
-	  HIDE_DUP( PORT_DIPSETTING( 0x0f, frqstr_no_country ) )         // Japan  |Europe |Off   |-          |Off |Off  |Off
-	#endif
+static INPUT_PORTS_START( outzonec )
+	PORT_INCLUDE( outzone )
+
+	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x04, "Korea" )
+	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co License)" )
+	PORT_DIPSETTING(    0x07, "US (Romstar License)" )
+	PORT_DIPSETTING(    0x08, "Hong Kong & China (Honest Trading License)" )
+//  PORT_DIPSETTING(    0x09, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0a, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0b, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0c, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0d, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0e, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(    0x0f, DEF_STR( Japan ) )
 INPUT_PORTS_END
 
 
 /* verified from M68000 - coinage based on "test mode" and handled by the MCU simulation */
-static INPUT_PORTS_START( input_common_vimana )
-	PORT_INCLUDE( toaplan1_type1 )
+static INPUT_PORTS_START( vimana )
+	PORT_INCLUDE( toaplan1_2b )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  /* 0x440007.b */
-	  PORT_MODIFY("DSWA")
-	  //DIP_A1_SPARE (divert from 'toaplan1_type1')
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SW1)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SW1)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SW1)
-	  //DIP_A5678_SPARE (divert from 'toaplan1_type1') (Specified by each set)
+	/* 0x440007.b */
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_NO_COCKTAIL
+	TOAPLAN_COINAGE_DUAL(TJUMP, 0x0f, 0x02)                 /* see notes */
 
-	  /* 0x44000f.b */
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SW2)
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4") /* table at 0x000998 */
-	  PORT_DIPSETTING(    0x00, "70k 270k 200k+" )
-	  PORT_DIPSETTING(    0x04, "100k 350k 250k+" )
-	  PORT_DIPSETTING(    0x08, "100k Only" )
-	  PORT_DIPSETTING(    0x0c, "200k Only" )
-	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	  PORT_DIPSETTING(    0x30, "2" )
-	  PORT_DIPSETTING(    0x00, "3" )
-	  PORT_DIPSETTING(    0x20, "4" )
-	  PORT_DIPSETTING(    0x10, "5" )
-	  TOAPLAN_DIP_B7_INVULNERABILITY(SW2)
-	  TOAPLAN_DIP_B8_ALLOW_CONTINUE_OFF_YES(SW2)
+	/* 0x44000f.b */
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000998 */
+	PORT_DIPSETTING(    0x00, "70k 270k 200k+" )
+	PORT_DIPSETTING(    0x04, "100k 350k 250k+" )
+	PORT_DIPSETTING(    0x08, "100k Only" )
+	PORT_DIPSETTING(    0x0c, "200k Only" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability" )           /* see notes */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	  /* 0x440011.b */
-	  //PORT_MODIFY("TJUMP")
-	  //JP_4321_SPARE (divert from 'toaplan1_type1') (Specified by each set)
-	#endif
+	/* 0x440011.b */
+	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
+	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
+//  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
+	PORT_DIPSETTING(    0x04, "Korea" )
+	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
+	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* P1 : 0x44000b.b */
 	PORT_MODIFY("P1")
-	#if VIMANA_P1_BUTTON_3_DESCRIBE_LEVEL == 1
-	  PORT_BIT(0x40, TOAPLAN_IP_ACTIVE_LEVEL, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("Spare (P1 Button 3) (Fast Scrolling If Invulnerable)") /* JAMMA "P1 button 3" */
-	#elif VIMANA_P1_BUTTON_3_DESCRIBE_LEVEL == 2
-	  PORT_BIT(0x40, TOAPLAN_IP_ACTIVE_LEVEL, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("(Fast Scrolling If Invulnerable)")
-	#endif
-	#if VIMANA_P1_BUTTON_3_MOVE_TO_F1
-	  PORT_CODE(KEYCODE_F1)
-	#endif
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fast Scrolling") PORT_CODE(KEYCODE_F1)   /* see notes */
 
 	/* P2 : 0x44000d.b */
-	PORT_MODIFY("P2")
-	#if VIMANA_P2_BUTTON_3_DESCRIBE_LEVEL == 1
-	  PORT_BIT(0x40, TOAPLAN_IP_ACTIVE_LEVEL, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("Spare (P2 Button 3) (Go To Next Stage If Invulnerable)") /* JAMMA "P1 button 3" */
-	#elif VIMANA_P2_BUTTON_3_DESCRIBE_LEVEL == 2
-	  PORT_BIT(0x40, TOAPLAN_IP_ACTIVE_LEVEL, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("(Go To Next Stage If Invulnerable)")
-	#endif
-	#if VIMANA_P2_BUTTON_3_MOVE_TO_F1
-	  PORT_CODE(KEYCODE_F1)
-	#endif
 
 	/* SYSTEM : 0x440009.b */
 
 	/* VBLANK : 0x400001.b */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( vimana )
-	PORT_INCLUDE( input_common_vimana )
-
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x0f, 0x02, SW1)
-
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'vimana' (MAME 0.143u7)                     // Game   |Service|      |Distributed by    |    |
-	  PORT_DIPNAME(        0x0f, 0x02, DEF_STR( Region ) )           // Mode   |Mode   |      |or                |FBI |End
-	                              PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Coinage|Coinage|Notice|Licensed to       |Logo|Story
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )           // Europe |Europe |On    |-                 |Off |English
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )              // Japan  |Japan  |On    |-                 |On  |English
-	            PORT_DIPSETTING( 0x07, frqstr_usa_romstarinc )       // Japan  |Japan  |On    |ROMSTAR, INC.     |On  |English
-	            PORT_DIPSETTING( 0x00, frqstr_japan_tecmo )          // Japan  |Japan  |On    |TECMO             |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0f, frqstr_japan_tecmo ) )        // Japan  |Japan  |On    |TECMO             |Off |English
-	            PORT_DIPSETTING( 0x04, frqstr_korea )                // Japan  |Japan  |On    |-                 |Off |English
-	            PORT_DIPSETTING( 0x03, frqstr_hongkong )             // Japan  |Japan  |On    |-                 |Off |English
-	            PORT_DIPSETTING( 0x08, frqstr_hongkongchina_honest ) // Japan  |Japan  |On    |HONEST TRADING CO.|Off |English
-	            PORT_DIPSETTING( 0x05, frqstr_taiwan )               // Japan  |Japan  |On    |-                 |Off |English
-	            PORT_DIPSETTING( 0x06, frqstr_taiwan_spacy )         // Japan  |Japan  |On    |SPACY CO.,LTD     |Off |English
-	            PORT_DIPSETTING( 0x09, frqstr_no_country )           // Japan  |Japan  |On    |-                 |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0a, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0b, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0c, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0d, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0e, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |English
-	#endif
-INPUT_PORTS_END
-
+/* verified from M68000 - coinage based on "test mode" and handled by the MCU simulation */
 static INPUT_PORTS_START( vimanan )
-	PORT_INCLUDE( input_common_vimana )
+	PORT_INCLUDE( vimana )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x0f, 0x02, SW1)
+	/* DSWA : 0x440007.b */
+	/* DSWB : 0x44000f.b */
 
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'vimanan' (MAME 0.143u7)                    // Game   |Service|      |Distributed by         |    |
-	  PORT_DIPNAME(        0x0f, 0x02, DEF_STR( Region ) )           // Mode   |Mode   |      |or                     |FBI |End
-	                              PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Coinage|Coinage|Notice|Licensed to            |Logo|Story
-	            PORT_DIPSETTING( 0x02, frqstr_europe_nova )          // Europe |Europe |On    |NOVA APPARATE GMBH & CO|Off |English
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )              // Japan  |Japan  |On    |-                      |On  |English
-	            PORT_DIPSETTING( 0x07, frqstr_usa_romstarinc )       // Japan  |Japan  |On    |ROMSTAR, INC.          |On  |English
-	            PORT_DIPSETTING( 0x00, frqstr_japan_tecmo )          // Japan  |Japan  |On    |TECMO                  |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0f, frqstr_japan_tecmo ) )        // Japan  |Japan  |On    |TECMO                  |Off |English
-	            PORT_DIPSETTING( 0x04, frqstr_korea )                // Japan  |Japan  |On    |-                      |Off |English
-	            PORT_DIPSETTING( 0x03, frqstr_hongkong )             // Japan  |Japan  |On    |-                      |Off |English
-	            PORT_DIPSETTING( 0x08, frqstr_hongkongchina_honest ) // Japan  |Japan  |On    |HONEST TRADING CO.     |Off |English
-	            PORT_DIPSETTING( 0x05, frqstr_taiwan )               // Japan  |Japan  |On    |-                      |Off |English
-	            PORT_DIPSETTING( 0x06, frqstr_taiwan_spacy )         // Japan  |Japan  |On    |SPACY CO.,LTD          |Off |English
-	            PORT_DIPSETTING( 0x09, frqstr_no_country )           // Japan  |Japan  |On    |-                      |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0a, frqstr_no_country ) )         // Japan  |Japan  |On    |-                      |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0b, frqstr_no_country ) )         // Japan  |Japan  |On    |-                      |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0c, frqstr_no_country ) )         // Japan  |Japan  |On    |-                      |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0d, frqstr_no_country ) )         // Japan  |Japan  |On    |-                      |Off |English
-	  HIDE_DUP( PORT_DIPSETTING( 0x0e, frqstr_no_country ) )         // Japan  |Japan  |On    |-                      |Off |English
-	#endif
+	/* 0x440011.b */
+	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
+	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPSETTING(    0x02, "Europe (Nova Apparate license)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
+//  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
+	PORT_DIPSETTING(    0x04, "Korea" )
+	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
+	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
+
+	/* P1 : 0x44000b.b */
+	/* P2 : 0x44000d.b */
+
+	/* SYSTEM : 0x440009.b */
+
+	/* VBLANK : 0x400001.b */
 INPUT_PORTS_END
 
+/* verified from M68000 - coinage based on "test mode" and handled by the MCU simulation */
 static INPUT_PORTS_START( vimana1 )
-	PORT_INCLUDE( input_common_vimana )
+	PORT_INCLUDE( vimana )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_DUAL(TJUMP, 0x0f, 0x02, SW1)
+	/* DSWA : 0x440007.b */
+	/* DSWB : 0x44000f.b */
 
-	  PORT_MODIFY("TJUMP")
-	  // region verified 'vimana1' (MAME 0.143u7)                    // Game   |Service|      |Distributed by    |    |
-	  PORT_DIPNAME(        0x0f, 0x00, DEF_STR( Region ) )           // Mode   |Mode   |      |or                |FBI |End
-	                              PORT_DIPLOCATION("JP:!4,!3,!2,!1") // Coinage|Coinage|Notice|Licensed to       |Logo|Story
-	            PORT_DIPSETTING( 0x02, DEF_STR( Europe ) )           // Europe |Europe |On    |-                 |Off |Japanese
-	            PORT_DIPSETTING( 0x01, DEF_STR( USA ) )              // Japan  |Japan  |On    |-                 |On  |Japanese
-	            PORT_DIPSETTING( 0x07, frqstr_usa_romstarinc )       // Japan  |Japan  |On    |ROMSTAR, INC.     |On  |Japanese
-	            PORT_DIPSETTING( 0x00, frqstr_japan_tecmo )          // Japan  |Japan  |On    |TECMO             |Off |Japanese
-	  HIDE_DUP( PORT_DIPSETTING( 0x0f, frqstr_japan_tecmo ) )        // Japan  |Japan  |On    |TECMO             |Off |Japanese
-	            PORT_DIPSETTING( 0x04, frqstr_korea )                // Japan  |Japan  |On    |-                 |Off |Japanese
-	            PORT_DIPSETTING( 0x03, frqstr_hongkong )             // Japan  |Japan  |On    |-                 |Off |Japanese
-	            PORT_DIPSETTING( 0x08, frqstr_hongkongchina_honest ) // Japan  |Japan  |On    |HONEST TRADING CO.|Off |Japanese
-	            PORT_DIPSETTING( 0x05, frqstr_taiwan )               // Japan  |Japan  |On    |-                 |Off |Japanese
-	            PORT_DIPSETTING( 0x06, frqstr_taiwan_spacy )         // Japan  |Japan  |On    |SPACY CO.,LTD     |Off |Japanese
-	            PORT_DIPSETTING( 0x09, frqstr_no_country )           // Japan  |Japan  |On    |-                 |Off |Japanese
-	  HIDE_DUP( PORT_DIPSETTING( 0x0a, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |Japanese
-	  HIDE_DUP( PORT_DIPSETTING( 0x0b, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |Japanese
-	  HIDE_DUP( PORT_DIPSETTING( 0x0c, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |Japanese
-	  HIDE_DUP( PORT_DIPSETTING( 0x0d, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |Japanese
-	  HIDE_DUP( PORT_DIPSETTING( 0x0e, frqstr_no_country ) )         // Japan  |Japan  |On    |-                 |Off |Japanese
-	#endif
+	/* 0x440011.b */
+	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
+	PORT_DIPNAME( 0x0f, 0x00, "Territory" )
+//  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+//  PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
+	PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x04, "Korea" )
+//  PORT_DIPSETTING(    0x03, "Hong Kong" )
+//  PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
+//  PORT_DIPSETTING(    0x05, "Taiwan" )
+//  PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	/* P1 : 0x44000b.b */
+	/* P2 : 0x44000d.b */
+
+	/* SYSTEM : 0x440009.b */
+
+	/* VBLANK : 0x400001.b */
 INPUT_PORTS_END
-
-
 
 
 static const gfx_layout tilelayout =
@@ -2806,29 +2539,29 @@ static DRIVER_INIT( vimana )
 }
 
 
-//    YEAR, NAME,       PARENT,   MACHINE,  INPUT,      INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, rallybik,   0,        rallybik, rallybik,   toaplan1, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
-GAME( 1988, truxton,    0,        truxton,  truxton,    toaplan1, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
-GAME( 1989, hellfire,   0,        hellfire, hellfire,   toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P set)", 0 ) // 2P = simultaneous players
-GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P set, ealier)", 0 ) // 1P = alternating players
-GAME( 1989, hellfire2,  hellfire, hellfire, hellfire2,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P set, ealier)", 0 )
-GAME( 1989, hellfire3,  hellfire, hellfire, hellfire3,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P set)", 0 )
-GAME( 1989, zerowing,   0,        zerowing, zerowing,   toaplan1, ROT0,   "Toaplan", "Zero Wing (1P set)", 0 )
-GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2,  toaplan1, ROT0,   "Toaplan", "Zero Wing (2P set)", 0 )
-GAME( 1990, demonwld,   0,        demonwld, demonwld,   demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
-GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1,  demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 2)", 0 )
-GAME( 1989, demonwld2,  demonwld, demonwld, demonwld,   demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
-GAME( 1989, demonwld3,  demonwld, demonwld, demonwld,   demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 4)", 0 )
-GAME( 1990, fireshrk,   0,        samesame, fireshrk,   toaplan1, ROT270, "Toaplan", "Fire Shark", GAME_NO_SOUND )
-GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2,  toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 1, easier)", GAME_NO_SOUND )
-GAME( 1990, fireshrkdh, fireshrk, samesame, fireshrkdh, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 2, harder)", GAME_NO_SOUND )
-GAME( 1989, samesame,   fireshrk, samesame, samesame,   toaplan1, ROT270, "Toaplan", "Same! Same! Same! (1P set)", GAME_NO_SOUND )
-GAME( 1989, samesame2,  fireshrk, samesame, samesame2,  toaplan1, ROT270, "Toaplan", "Same! Same! Same! (2P set)", GAME_NO_SOUND )
-GAME( 1990, outzone,    0,        outzone,  outzone,    toaplan1, ROT270, "Toaplan", "Out Zone (set 1)", 0 ) // later fixed version
-GAME( 1990, outzonea,   outzone,  outzone,  outzonea,   toaplan1, ROT270, "Toaplan", "Out Zone (set 2)", 0 )
-GAME( 1990, outzoneb,   outzone,  outzone,  outzoneb,   toaplan1, ROT270, "Toaplan", "Out Zone (set 3, prototype?)", 0 ) // early revision at least
-GAME( 1990, outzonec,   outzone,  outzone,  outzone,    toaplan1, ROT270, "Toaplan", "Out Zone (set 4)", 0 )
-GAME( 1990, outzoned,   outzone,  outzone,  outzonea,   toaplan1, ROT270, "Toaplan", "Out Zone (set 5)", 0 )
-GAME( 1991, vimana,     0,        vimana,   vimana,     vimana,   ROT270, "Toaplan", "Vimana (World, set 1)", GAME_NO_SOUND )
-GAME( 1991, vimanan,    vimana,   vimana,   vimanan,    vimana,   ROT270, "Toaplan", "Vimana (World, set 2)", GAME_NO_SOUND )
-GAME( 1991, vimana1,    vimana,   vimana,   vimana1,    vimana,   ROT270, "Toaplan", "Vimana (Japan)", GAME_NO_SOUND )
+
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
+GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
+GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P set)", 0 ) // 2P = simultaneous players
+GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P set)", 0 ) // 1P = alternating players
+GAME( 1989, hellfire2,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P set, first edition)", 0 )
+GAME( 1989, hellfire3,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P set, alt)", 0 )
+GAME( 1989, zerowing,   0,        zerowing, zerowing,  toaplan1, ROT0,   "Toaplan", "Zero Wing (1P set)", 0 )
+GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1, ROT0,   "Toaplan", "Zero Wing (2P set)", 0 )
+GAME( 1990, demonwld,   0,        demonwld, demonwld,  demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
+GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 2)", 0 )
+GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
+GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 4)", 0 )
+GAME( 1990, fireshrk,   0,        samesame, fireshrk,  toaplan1, ROT270, "Toaplan", "Fire Shark", GAME_NO_SOUND )
+GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 1, easier)", GAME_NO_SOUND )
+GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 2, harder)", GAME_NO_SOUND )
+GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1, ROT270, "Toaplan", "Same! Same! Same! (1P set)", GAME_NO_SOUND )
+GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1, ROT270, "Toaplan", "Same! Same! Same! (2P set)", GAME_NO_SOUND )
+GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1, ROT270, "Toaplan", "Out Zone (set 1)", 0 ) // later fixed version
+GAME( 1990, outzonea,   outzone,  outzone,  outzone,   toaplan1, ROT270, "Toaplan", "Out Zone (set 2)", 0 )
+GAME( 1990, outzoneb,   outzone,  outzone,  outzoneb,  toaplan1, ROT270, "Toaplan", "Out Zone (set 3, prototype?)", 0 ) // early revision at least
+GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1, ROT270, "Toaplan", "Out Zone (set 4)", 0 )
+GAME( 1990, outzoned,   outzone,  outzone,  outzonec,  toaplan1, ROT270, "Toaplan", "Out Zone (set 5)", 0 )
+GAME( 1991, vimana,     0,        vimana,   vimana,    vimana,   ROT270, "Toaplan", "Vimana (World, set 1)", GAME_NO_SOUND )
+GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   vimana,   ROT270, "Toaplan", "Vimana (World, set 2)", GAME_NO_SOUND )
+GAME( 1991, vimana1,    vimana,   vimana,   vimana1,   vimana,   ROT270, "Toaplan", "Vimana (Japan)", GAME_NO_SOUND )

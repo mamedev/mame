@@ -11,7 +11,7 @@ Supported games:
     Taito Game Number:      B25
         Wardners Forest (World)
         Pyros           (USA)
-        Wardner no Mori (Japan)
+        Wardna no Mori  (Japan)
 
 Notes:
         Basically the same video and machine hardware as Flying shark,
@@ -19,7 +19,7 @@ Notes:
         See twincobr.c machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
-        Press unused P1 button 3 on startup to skip some video RAM tests
+        Press F1 (initially P1 button 3) on startup to skip some video RAM tests
         (code at 0x6d25 in 'wardner', 0x6d2f in 'wardnerj' or 0x6d2c in 'pyros').
 
 **************************** Memory & I/O Maps *****************************
@@ -131,26 +131,6 @@ out:
 #include "includes/toaplipt.h"
 #include "includes/twincobr.h"
 
-
-/***************************** debugging flags ******************************/
-
-#define DEBUG_FREE_ALL_DIPSW FALSE
-	/* Set TRUE and you may find unknown easter eggs */
-
-
-/**************************** customizing flags *****************************/
-
-#define WARDNER_P1_BUTTON_3_DESCRIBE_LEVEL FALSE
-	/* Wardner's "P1 Button 3" has an easter egg. */
-	/* If you want to rename it, set 1 or 2.
-	   0 = "Spare (P1 Button 3)"
-	   1 = "Spare (P1 Button 3) (Skip Video RAM Tests)"
-	   2 = "(Skip Video RAM Tests)" */
-#define WARDNER_P1_BUTTON_3_MOVE_TO_F1 FALSE
-	/* If you want to move it to "F1", set TRUE. */
-
-
-/****************************************************************************/
 
 class wardner_state : public twincobr_state
 {
@@ -293,107 +273,75 @@ ADDRESS_MAP_END
 
 *****************************************************************************/
 
+/* verified from Z80 code */
 static INPUT_PORTS_START( wardner_generic )
-	PORT_START("DSWA") /* in 0x50 */ /* DIP SW A */
-	TOAPLAN_DIP_1_SPARE(SWA)
-	TOAPLAN_DIP_2_SPARE(SWA)
-	TOAPLAN_DIP_3_SPARE(SWA)
-	TOAPLAN_DIP_4_SPARE(SWA)
-	TOAPLAN_DIP_5_SPARE(SWA)
-	TOAPLAN_DIP_6_SPARE(SWA)
-	TOAPLAN_DIP_7_SPARE(SWA)
-	TOAPLAN_DIP_8_SPARE(SWA)
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_COINAGE_WORLD
 
-	PORT_START("DSWB") /* in 0x52 */ /* DIP SW B */
-	TOAPLAN_DIP_1_SPARE(SWB)
-	TOAPLAN_DIP_2_SPARE(SWB)
-	TOAPLAN_DIP_3_SPARE(SWB)
-	TOAPLAN_DIP_4_SPARE(SWB)
-	TOAPLAN_DIP_5_SPARE(SWB)
-	TOAPLAN_DIP_6_SPARE(SWB)
-	TOAPLAN_DIP_7_SPARE(SWB)
-	TOAPLAN_DIP_8_SPARE(SWB)
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x13ce ('wardner') or 0x13de ('wardnerj') */
+	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
+	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
+	PORT_DIPSETTING(	0x08, "30k Only" )
+	PORT_DIPSETTING(	0x0c, "50k Only" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(	0x30, "1" )
+	PORT_DIPSETTING(	0x00, "3" )
+	PORT_DIPSETTING(	0x10, "4" )
+	PORT_DIPSETTING(	0x20, "5" )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START("P1") /* in 0x54 */ /* Player 1 controls */
-	TOAPLAN_JOY_UDLR_2_BUTTONS(1)
+	PORT_START("P1")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
 
-	PORT_START("P2") /* in 0x56 */ /* Player 2 controls */
-	TOAPLAN_JOY_UDLR_2_BUTTONS(2)
+	PORT_START("P2")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
 
-	PORT_START("SYSTEM") /* in 0x58 */ /* VBlank and coin-in/start inputs */
-	TOAPLAN_SYSTEM_INPUT_WITH_VBLANK
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* "TEST" in "test mode" - no effect outside */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )            /* "V-BLANKING" in "test mode" */
 INPUT_PORTS_END
-
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( wardner )
 	PORT_INCLUDE( wardner_generic )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A1_CABINET(SWA)
-	  TOAPLAN_DIP_A2_FLIP_SCREEN(SWA)
-	  TOAPLAN_DIP_A3_SERVICE_MODE(SWA)
-	  TOAPLAN_DIP_A4_DEMO_SOUNDS(SWA)
-	  TOAPLAN_DIP_A5678_COINAGE_EUROPE(SWA)
-
-	  PORT_MODIFY("DSWB")
-	  TOAPLAN_DIP_B12_DIFFICULTY(SWB)
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:!3,!4") /* table at 0x13ce ('wardner') or 0x13de ('wardnerj') */
-	  PORT_DIPSETTING(    0x00, "30k 80k 50k+" )
-	  PORT_DIPSETTING(    0x04, "50k 100k 50k+" )
-	  PORT_DIPSETTING(    0x08, "30k Only" )
-	  PORT_DIPSETTING(    0x0c, "50k Only" )
-	  PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:!5,!6")
-	  PORT_DIPSETTING(    0x30, "1" )
-	  PORT_DIPSETTING(    0x00, "3" )
-	  PORT_DIPSETTING(    0x10, "4" )
-	  PORT_DIPSETTING(    0x20, "5" )
-	  //DIP_B78_SPARE
-	#endif
-
 	PORT_MODIFY("P1")
-	#if WARDNER_P1_BUTTON_3_DESCRIBE_LEVEL == 1
-	  PORT_BIT(0x40, TOAPLAN_IP_ACTIVE_LEVEL, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("Spare (P1 Button 3) (Skip Video RAM Tests)") /* JAMMA "P1 button 3" */
-	#elif WARDNER_P1_BUTTON_3_DESCRIBE_LEVEL == 2
-	  PORT_BIT(0x40, TOAPLAN_IP_ACTIVE_LEVEL, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("(Skip Video RAM Tests)")
-	#endif
-	#if WARDNER_P1_BUTTON_3_MOVE_TO_F1
-	  PORT_CODE(KEYCODE_F1)
-	#endif
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Skip Video RAM Tests") PORT_CODE(KEYCODE_F1)
 	/* code at 0x6d25 ('wardner'), 0x6d2f ('wardnerj') or 0x6d2c ('pyros') */
-
-	PORT_MODIFY("SYSTEM")
-	TOAPLAN_TEST_SWITCH_SPARE
 INPUT_PORTS_END
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( wardnerj )
 	PORT_INCLUDE( wardner )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWA")
-	  TOAPLAN_DIP_A5678_COINAGE_JAPAN(SWA)
-	#endif
+	PORT_MODIFY("DSWA")
+	TOAPLAN_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( pyros )
 	PORT_INCLUDE( wardnerj )
 
-	#if ! DEBUG_FREE_ALL_DIPSW
-	  PORT_MODIFY("DSWB")
-	  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:!3,!4") /* table at 0x13ce */
-	  PORT_DIPSETTING(    0x00, "30k 80k 50k+" )
-	  PORT_DIPSETTING(    0x04, "50k 100k 50k+" )
-	  PORT_DIPSETTING(    0x08, "50k Only" )
-	  PORT_DIPSETTING(    0x0c, "100k Only" )
-	  WARDNER_DIP_B7_ALLOW_CONTINUE_OFF_YES(SWB) /* additional code at 0x6037 */
-	  /* Many TOAPLAN "Allow Continue" = B:8
-	     but  WARDNER                  = B:7 */
-	#endif
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x13ce */
+	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
+	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
+	PORT_DIPSETTING(	0x08, "50k Only" )
+	PORT_DIPSETTING(	0x0c, "100k Only" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   /* additional code at 0x6037 */
+	PORT_DIPSETTING(	0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
-
 
 
 
@@ -670,7 +618,6 @@ static DRIVER_INIT( wardner )
 
 
 
-//    YEAR, NAME,     PARENT,  MACHINE, INPUT,    INIT,    MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, wardner,  0,       wardner, wardner,  wardner, ROT0,   "Toaplan / Taito Corporation Japan", "Wardner (World)", GAME_SUPPORTS_SAVE )
-GAME( 1987, pyros,    wardner, wardner, pyros,    wardner, ROT0,   "Toaplan / Taito America Corporation", "Pyros (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner, ROT0,   "Toaplan / Taito Corporation", "Wardner no Mori (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wardner,  0,       wardner, wardner,  wardner, ROT0, "Toaplan / Taito Corporation Japan", "Wardner (World)", GAME_SUPPORTS_SAVE )
+GAME( 1987, pyros,    wardner, wardner, pyros,    wardner, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner, ROT0, "Toaplan / Taito Corporation", "Wardner no Mori (Japan)", GAME_SUPPORTS_SAVE )
