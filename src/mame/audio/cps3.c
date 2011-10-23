@@ -162,7 +162,8 @@ WRITE32_DEVICE_HANDLER( cps3_sound_w )
 	}
 	else
 	{
-		printf("Sound [%x] %x\n", offset, data);
+		// during boot: Sound [84] 230000
+		logerror("Sound [%x] %x\n", offset, data);
 	}
 }
 
@@ -181,7 +182,7 @@ READ32_DEVICE_HANDLER( cps3_sound_r )
 	}
 	else
 	{
-		printf("Unk sound read : %x\n", offset);
+		logerror("Unk sound read : %x\n", offset);
 		return 0;
 	}
 }

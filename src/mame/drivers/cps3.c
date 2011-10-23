@@ -1661,7 +1661,8 @@ static WRITE32_HANDLER( cram_gfxflash_bank_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-	/*  if(DEBUG_PRINTF)*/ printf("cram_gfxflash_bank_LSB_w LSB32 %08x\n",data);
+		// writes 0 during boot
+		//printf("cram_gfxflash_bank_LSB_w LSB32 %08x\n",data);
 	}
 }
 
@@ -2080,7 +2081,8 @@ static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 		}
 		else
 		{
-			printf("Unknown DMA List Command Type\n"); // warzard uses command 0, uncompressed? but for what?
+			// warzard uses command 0, uncompressed? but for what?
+			//printf("Unknown DMA List Command Type\n");
 		}
 
 	}
