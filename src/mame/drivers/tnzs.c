@@ -949,7 +949,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( plumppop )
 	/* 0xb001 (CPU1) port 0 -> 0xef0e (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:1" )        /* code at 0x6e99 - is it ever called ? */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWA:1") /* code at 0x6e99 - is it ever called ? */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_DSWA_BITS_1_TO_3_LOC(SWA)
 	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
 
@@ -1454,7 +1456,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( jpopnics )
 	/* 0xc600 (CPU1) -> 0xef0e (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:1" )        /* code at 0x6e99 - is it ever called ? */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWA:1") /* code at 0x6e99 - is it ever called ? */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_DSWA_BITS_1_TO_3
 	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SWA:5" )        /* see notes */
 	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWA:6" )        /* see notes */
