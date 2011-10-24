@@ -35,14 +35,14 @@
 CPU_DISASSEMBLE( sh4 );
 CPU_DISASSEMBLE( sh4be );
 
-typedef const void (*sh4ophandler)(sh4_state*, UINT16);
+typedef const void (*sh4ophandler)(sh4_state*, const UINT16);
 
 sh4ophandler master_ophandler_table[0x10000];
 void sh4_build_optable(sh4_state* sh4);
 
 
 /* Called for unimplemented opcodes */
-const void TODO(sh4_state *sh4, UINT16 opcode)
+const void TODO(sh4_state *sh4, const UINT16 opcode)
 {
 }
 
@@ -185,7 +185,7 @@ const void WL(sh4_state *sh4, offs_t A, UINT32 V)
  *  0011 nnnn mmmm 1100  1       -
  *  ADD     Rm,Rn
  */
-const void ADD(sh4_state *sh4, UINT16 opcode)
+const void ADD(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] += sh4->r[Rm];
 }
@@ -194,19 +194,16 @@ const void ADD(sh4_state *sh4, UINT16 opcode)
  *  0111 nnnn iiii iiii  1       -
  *  ADD     #imm,Rn
  */
-const void ADDI(sh4_state *sh4, UINT16 opcode)
+const void ADDI(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 n = Rn;
-	opcode &= 0xff;
-
-	sh4->r[n] += (INT32)(INT16)(INT8)opcode;
+	sh4->r[Rn] += (INT32)(INT16)(INT8)(opcode&0xff);
 }
 
 /*  code                 cycles  t-bit
  *  0011 nnnn mmmm 1110  1       carry
  *  ADDC    Rm,Rn
  */
-const void ADDC(sh4_state *sh4, UINT16 opcode)
+const void ADDC(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 	UINT32 tmp0, tmp1;
@@ -226,7 +223,7 @@ const void ADDC(sh4_state *sh4, UINT16 opcode)
  *  0011 nnnn mmmm 1111  1       overflow
  *  ADDV    Rm,Rn
  */
-const void ADDV(sh4_state *sh4, UINT16 opcode)
+const void ADDV(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 	INT32 dest, src, ans;
@@ -261,7 +258,7 @@ const void ADDV(sh4_state *sh4, UINT16 opcode)
  *  0010 nnnn mmmm 1001  1       -
  *  AND     Rm,Rn
  */
-const void AND(sh4_state *sh4, UINT16 opcode)
+const void AND(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] &= sh4->r[Rm];
 }
@@ -271,23 +268,21 @@ const void AND(sh4_state *sh4, UINT16 opcode)
  *  1100 1001 iiii iiii  1       -
  *  AND     #imm,R0
  */
-const void ANDI(sh4_state *sh4, UINT16 i)
+const void ANDI(sh4_state *sh4, const UINT16 opcode)
 {
-	i &= 0xff;
-	sh4->r[0] &= i;
+	sh4->r[0] &= (opcode&0xff);
 }
 
 /*  code                 cycles  t-bit
  *  1100 1101 iiii iiii  1       -
  *  AND.B   #imm,@(R0,GBR)
  */
-const void ANDM(sh4_state *sh4, UINT16 i)
+const void ANDM(sh4_state *sh4, const UINT16 opcode)
 {
-	i &= 0xff;
 	UINT32 temp;
 
 	sh4->ea = sh4->gbr + sh4->r[0];
-	temp = i & RB(sh4,  sh4->ea );
+	temp = (opcode&0xff) & RB(sh4,  sh4->ea );
 	WB(sh4, sh4->ea, temp );
 	sh4->sh4_icount -= 2;
 }
@@ -296,13 +291,11 @@ const void ANDM(sh4_state *sh4, UINT16 i)
  *  1000 1011 dddd dddd  3/1     -
  *  BF      disp8
  */
-const void BF(sh4_state *sh4, UINT16 d)
+const void BF(sh4_state *sh4, const UINT16 opcode)
 {
-	d &= 0xff;
-
 	if ((sh4->sr & T) == 0)
 	{
-		INT32 disp = ((INT32)d << 24) >> 24;
+		INT32 disp = ((INT32)(opcode&0xff) << 24) >> 24;
 		sh4->pc = sh4->ea = sh4->pc + disp * 2 + 2;
 		sh4->sh4_icount -= 2;
 	}
@@ -312,12 +305,11 @@ const void BF(sh4_state *sh4, UINT16 d)
  *  1000 1111 dddd dddd  3/1     -
  *  BFS     disp8
  */
-const void BFS(sh4_state *sh4, UINT16 d)
+const void BFS(sh4_state *sh4, const UINT16 opcode)
 {
-	d &= 0xff;
 	if ((sh4->sr & T) == 0)
 	{
-		INT32 disp = ((INT32)d << 24) >> 24;
+		INT32 disp = ((INT32)(opcode&0xff) << 24) >> 24;
 		sh4->delay = sh4->pc;
 		sh4->pc = sh4->ea = sh4->pc + disp * 2 + 2;
 		sh4->sh4_icount--;
@@ -328,10 +320,9 @@ const void BFS(sh4_state *sh4, UINT16 d)
  *  1010 dddd dddd dddd  2       -
  *  BRA     disp12
  */
-const void BRA(sh4_state *sh4, UINT16 d)
+const void BRA(sh4_state *sh4, const UINT16 opcode)
 {
-	d &= 0xfff;
-	INT32 disp = ((INT32)d << 20) >> 20;
+	INT32 disp = ((INT32)(opcode&0xfff) << 20) >> 20;
 
 #if BUSY_LOOP_HACKS
 	if (disp == -2)
@@ -353,7 +344,7 @@ const void BRA(sh4_state *sh4, UINT16 d)
  *  0000 mmmm 0010 0011  2       -
  *  BRAF    Rm
  */
-const void BRAF(sh4_state *sh4, UINT16 opcode)
+const void BRAF(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->delay = sh4->pc;
 	sh4->pc += sh4->r[Rn] + 2;
@@ -364,10 +355,9 @@ const void BRAF(sh4_state *sh4, UINT16 opcode)
  *  1011 dddd dddd dddd  2       -
  *  BSR     disp12
  */
-const void BSR(sh4_state *sh4, UINT16 d)
+const void BSR(sh4_state *sh4, const UINT16 opcode)
 {
-	d &= 0xfff;
-	INT32 disp = ((INT32)d << 20) >> 20;
+	INT32 disp = ((INT32)(opcode&0xfff) << 20) >> 20;
 
 	sh4->pr = sh4->pc + 2;
 	sh4->delay = sh4->pc;
@@ -379,7 +369,7 @@ const void BSR(sh4_state *sh4, UINT16 d)
  *  0000 mmmm 0000 0011  2       -
  *  BSRF    Rm
  */
-const void BSRF(sh4_state *sh4, UINT16 opcode)
+const void BSRF(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->pr = sh4->pc + 2;
 	sh4->delay = sh4->pc;
@@ -391,13 +381,11 @@ const void BSRF(sh4_state *sh4, UINT16 opcode)
  *  1000 1001 dddd dddd  3/1     -
  *  BT      disp8
  */
-const void BT(sh4_state *sh4, UINT16 d)
+const void BT(sh4_state *sh4, const UINT16 opcode)
 {
-	d &= 0xff;
-
 	if ((sh4->sr & T) != 0)
 	{
-		INT32 disp = ((INT32)d << 24) >> 24;
+		INT32 disp = ((INT32)(opcode&0xff) << 24) >> 24;
 		sh4->pc = sh4->ea = sh4->pc + disp * 2 + 2;
 		sh4->sh4_icount -= 2;
 	}
@@ -407,13 +395,11 @@ const void BT(sh4_state *sh4, UINT16 d)
  *  1000 1101 dddd dddd  2/1     -
  *  BTS     disp8
  */
-const void BTS(sh4_state *sh4, UINT16 d)
+const void BTS(sh4_state *sh4, const UINT16 opcode)
 {
-	d &= 0xff;
-
 	if ((sh4->sr & T) != 0)
 	{
-		INT32 disp = ((INT32)d << 24) >> 24;
+		INT32 disp = ((INT32)(opcode&0xff) << 24) >> 24;
 		sh4->delay = sh4->pc;
 		sh4->pc = sh4->ea = sh4->pc + disp * 2 + 2;
 		sh4->sh4_icount--;
@@ -424,7 +410,7 @@ const void BTS(sh4_state *sh4, UINT16 d)
  *  0000 0000 0010 1000  1       -
  *  CLRMAC
  */
-const void CLRMAC(sh4_state *sh4, UINT16 opcode)
+const void CLRMAC(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->mach = 0;
 	sh4->macl = 0;
@@ -434,7 +420,7 @@ const void CLRMAC(sh4_state *sh4, UINT16 opcode)
  *  0000 0000 0000 1000  1       -
  *  CLRT
  */
-const void CLRT(sh4_state *sh4, UINT16 opcode)
+const void CLRT(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->sr &= ~T;
 }
@@ -443,7 +429,7 @@ const void CLRT(sh4_state *sh4, UINT16 opcode)
  *  0011 nnnn mmmm 0000  1       comparison result
  *  CMP_EQ  Rm,Rn
  */
-const void CMPEQ(sh4_state *sh4, UINT16 opcode)
+const void CMPEQ(sh4_state *sh4, const UINT16 opcode)
 {
 	if (sh4->r[Rn] == sh4->r[Rm])
 		sh4->sr |= T;
@@ -455,7 +441,7 @@ const void CMPEQ(sh4_state *sh4, UINT16 opcode)
  *  0011 nnnn mmmm 0011  1       comparison result
  *  CMP_GE  Rm,Rn
  */
-const void CMPGE(sh4_state *sh4, UINT16 opcode)
+const void CMPGE(sh4_state *sh4, const UINT16 opcode)
 {
 	if ((INT32) sh4->r[Rn] >= (INT32) sh4->r[Rm])
 		sh4->sr |= T;
@@ -467,7 +453,7 @@ const void CMPGE(sh4_state *sh4, UINT16 opcode)
  *  0011 nnnn mmmm 0111  1       comparison result
  *  CMP_GT  Rm,Rn
  */
-const void CMPGT(sh4_state *sh4, UINT16 opcode)
+const void CMPGT(sh4_state *sh4, const UINT16 opcode)
 {
 	if ((INT32) sh4->r[Rn] > (INT32) sh4->r[Rm])
 		sh4->sr |= T;
@@ -479,7 +465,7 @@ const void CMPGT(sh4_state *sh4, UINT16 opcode)
  *  0011 nnnn mmmm 0110  1       comparison result
  *  CMP_HI  Rm,Rn
  */
-const void CMPHI(sh4_state *sh4, UINT16 opcode)
+const void CMPHI(sh4_state *sh4, const UINT16 opcode)
 {
 	if ((UINT32) sh4->r[Rn] > (UINT32) sh4->r[Rm])
 		sh4->sr |= T;
@@ -491,7 +477,7 @@ const void CMPHI(sh4_state *sh4, UINT16 opcode)
  *  0011 nnnn mmmm 0010  1       comparison result
  *  CMP_HS  Rm,Rn
  */
-const void CMPHS(sh4_state *sh4, UINT16 opcode)
+const void CMPHS(sh4_state *sh4, const UINT16 opcode)
 {
 	if ((UINT32) sh4->r[Rn] >= (UINT32) sh4->r[Rm])
 		sh4->sr |= T;
@@ -504,7 +490,7 @@ const void CMPHS(sh4_state *sh4, UINT16 opcode)
  *  0100 nnnn 0001 0101  1       comparison result
  *  CMP_PL  Rn
  */
-const void CMPPL(sh4_state *sh4, UINT16 opcode)
+const void CMPPL(sh4_state *sh4, const UINT16 opcode)
 {
 	if ((INT32) sh4->r[Rn] > 0)
 		sh4->sr |= T;
@@ -516,7 +502,7 @@ const void CMPPL(sh4_state *sh4, UINT16 opcode)
  *  0100 nnnn 0001 0001  1       comparison result
  *  CMP_PZ  Rn
  */
-const void CMPPZ(sh4_state *sh4, UINT16 opcode)
+const void CMPPZ(sh4_state *sh4, const UINT16 opcode)
 {
 	if ((INT32) sh4->r[Rn] >= 0)
 		sh4->sr |= T;
@@ -528,7 +514,7 @@ const void CMPPZ(sh4_state *sh4, UINT16 opcode)
  *  0010 nnnn mmmm 1100  1       comparison result
  * CMP_STR  Rm,Rn
  */
-const void CMPSTR(sh4_state *sh4, UINT16 opcode)
+const void CMPSTR(sh4_state *sh4, const UINT16 opcode)
 {
   UINT32 temp;
   INT32 HH, HL, LH, LL;
@@ -548,11 +534,9 @@ const void CMPSTR(sh4_state *sh4, UINT16 opcode)
  *  1000 1000 iiii iiii  1       comparison result
  *  CMP/EQ #imm,R0
  */
-const void CMPIM(sh4_state *sh4, UINT16 i)
+const void CMPIM(sh4_state *sh4, const UINT16 opcode)
 {
-	i &= 0xff;
-
-	UINT32 imm = (UINT32)(INT32)(INT16)(INT8)i;
+	UINT32 imm = (UINT32)(INT32)(INT16)(INT8)(opcode&0xff);
 
 	if (sh4->r[0] == imm)
 		sh4->sr |= T;
@@ -564,7 +548,7 @@ const void CMPIM(sh4_state *sh4, UINT16 i)
  *  0010 nnnn mmmm 0111  1       calculation result
  *  DIV0S   Rm,Rn
  */
-const void DIV0S(sh4_state *sh4, UINT16 opcode)
+const void DIV0S(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -586,7 +570,7 @@ const void DIV0S(sh4_state *sh4, UINT16 opcode)
  *  0000 0000 0001 1001  1       0
  *  DIV0U
  */
-const void DIV0U(sh4_state *sh4, UINT16 opcode)
+const void DIV0U(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->sr &= ~(M | Q | T);
 }
@@ -595,7 +579,7 @@ const void DIV0U(sh4_state *sh4, UINT16 opcode)
  *  0011 nnnn mmmm 0100  1       calculation result
  *  DIV1 Rm,Rn
  */
-const void DIV1(sh4_state *sh4, UINT16 opcode)
+const void DIV1(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -689,7 +673,7 @@ const void DIV1(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  DMULS.L Rm,Rn */
-const void DMULS(sh4_state *sh4, UINT16 opcode)
+const void DMULS(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -740,7 +724,7 @@ const void DMULS(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  DMULU.L Rm,Rn */
-const void DMULU(sh4_state *sh4, UINT16 opcode)
+const void DMULU(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -770,7 +754,7 @@ const void DMULU(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  DT      Rn */
-const void DT(sh4_state *sh4, UINT16 opcode)
+const void DT(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -798,38 +782,38 @@ const void DT(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  EXTS.B  Rm,Rn */
-const void EXTSB(sh4_state *sh4, UINT16 opcode)
+const void EXTSB(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = ((INT32)sh4->r[Rm] << 24) >> 24;
 }
 
 /*  EXTS.W  Rm,Rn */
-const void EXTSW(sh4_state *sh4, UINT16 opcode)
+const void EXTSW(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = ((INT32)sh4->r[Rm] << 16) >> 16;
 }
 
 /*  EXTU.B  Rm,Rn */
-const void EXTUB(sh4_state *sh4, UINT16 opcode)
+const void EXTUB(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->r[Rm] & 0x000000ff;
 }
 
 /*  EXTU.W  Rm,Rn */
-const void EXTUW(sh4_state *sh4, UINT16 opcode)
+const void EXTUW(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->r[Rm] & 0x0000ffff;
 }
 
 /*  JMP     @Rm */
-const void JMP(sh4_state *sh4, UINT16 opcode)
+const void JMP(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->delay = sh4->pc;
 	sh4->pc = sh4->ea = sh4->r[Rn];
 }
 
 /*  JSR     @Rm */
-const void JSR(sh4_state *sh4, UINT16 opcode)
+const void JSR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->delay = sh4->pc;
 	sh4->pr = sh4->pc + 2;
@@ -839,7 +823,7 @@ const void JSR(sh4_state *sh4, UINT16 opcode)
 
 
 /*  LDC     Rm,SR */
-const void LDCSR(sh4_state *sh4, UINT16 opcode)
+const void LDCSR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 reg;
 
@@ -853,19 +837,19 @@ const void LDCSR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC     Rm,GBR */
-const void LDCGBR(sh4_state *sh4, UINT16 opcode)
+const void LDCGBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->gbr = sh4->r[Rn];
 }
 
 /*  LDC     Rm,VBR */
-const void LDCVBR(sh4_state *sh4, UINT16 opcode)
+const void LDCVBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->vbr = sh4->r[Rn];
 }
 
 /*  LDC.L   @Rm+,SR */
-const void LDCMSR(sh4_state *sh4, UINT16 opcode)
+const void LDCMSR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 old;
 
@@ -882,7 +866,7 @@ const void LDCMSR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,GBR */
-const void LDCMGBR(sh4_state *sh4, UINT16 opcode)
+const void LDCMGBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->gbr = RL(sh4, sh4->ea );
@@ -891,7 +875,7 @@ const void LDCMGBR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,VBR */
-const void LDCMVBR(sh4_state *sh4, UINT16 opcode)
+const void LDCMVBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->vbr = RL(sh4, sh4->ea );
@@ -900,25 +884,25 @@ const void LDCMVBR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDS     Rm,MACH */
-const void LDSMACH(sh4_state *sh4, UINT16 opcode)
+const void LDSMACH(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->mach = sh4->r[Rn];
 }
 
 /*  LDS     Rm,MACL */
-const void LDSMACL(sh4_state *sh4, UINT16 opcode)
+const void LDSMACL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->macl = sh4->r[Rn];
 }
 
 /*  LDS     Rm,PR */
-const void LDSPR(sh4_state *sh4, UINT16 opcode)
+const void LDSPR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->pr = sh4->r[Rn];
 }
 
 /*  LDS.L   @Rm+,MACH */
-const void LDSMMACH(sh4_state *sh4, UINT16 opcode)
+const void LDSMMACH(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->mach = RL(sh4, sh4->ea );
@@ -926,7 +910,7 @@ const void LDSMMACH(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDS.L   @Rm+,MACL */
-const void LDSMMACL(sh4_state *sh4, UINT16 opcode)
+const void LDSMMACL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->macl = RL(sh4, sh4->ea );
@@ -934,7 +918,7 @@ const void LDSMMACL(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDS.L   @Rm+,PR */
-const void LDSMPR(sh4_state *sh4, UINT16 opcode)
+const void LDSMPR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->pr = RL(sh4, sh4->ea );
@@ -942,7 +926,7 @@ const void LDSMPR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MAC.L   @Rm+,@Rn+ */
-const void MAC_L(sh4_state *sh4, UINT16 opcode)
+const void MAC_L(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1021,7 +1005,7 @@ const void MAC_L(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MAC.W   @Rm+,@Rn+ */
-const void MAC_W(sh4_state *sh4, UINT16 opcode)
+const void MAC_W(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1075,55 +1059,55 @@ const void MAC_W(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV     Rm,Rn */
-const void MOV(sh4_state *sh4, UINT16 opcode)
+const void MOV(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->r[Rm];
 }
 
 /*  MOV.B   Rm,@Rn */
-const void MOVBS(sh4_state *sh4, UINT16 opcode)
+const void MOVBS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	WB(sh4, sh4->ea, sh4->r[Rm] & 0x000000ff);
 }
 
 /*  MOV.W   Rm,@Rn */
-const void MOVWS(sh4_state *sh4, UINT16 opcode)
+const void MOVWS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	WW(sh4, sh4->ea, sh4->r[Rm] & 0x0000ffff);
 }
 
 /*  MOV.L   Rm,@Rn */
-const void MOVLS(sh4_state *sh4, UINT16 opcode)
+const void MOVLS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	WL(sh4, sh4->ea, sh4->r[Rm] );
 }
 
 /*  MOV.B   @Rm,Rn */
-const void MOVBL(sh4_state *sh4, UINT16 opcode)
+const void MOVBL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rm];
 	sh4->r[Rn] = (UINT32)(INT32)(INT16)(INT8) RB(sh4,  sh4->ea );
 }
 
 /*  MOV.W   @Rm,Rn */
-const void MOVWL(sh4_state *sh4, UINT16 opcode)
+const void MOVWL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rm];
 	sh4->r[Rn] = (UINT32)(INT32)(INT16) RW(sh4, sh4->ea );
 }
 
 /*  MOV.L   @Rm,Rn */
-const void MOVLL(sh4_state *sh4, UINT16 opcode)
+const void MOVLL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rm];
 	sh4->r[Rn] = RL(sh4, sh4->ea );
 }
 
 /*  MOV.B   Rm,@-Rn */
-const void MOVBM(sh4_state *sh4, UINT16 opcode)
+const void MOVBM(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 data = sh4->r[Rm] & 0x000000ff;
 
@@ -1132,7 +1116,7 @@ const void MOVBM(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.W   Rm,@-Rn */
-const void MOVWM(sh4_state *sh4, UINT16 opcode)
+const void MOVWM(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 data = sh4->r[Rm] & 0x0000ffff;
 
@@ -1141,7 +1125,7 @@ const void MOVWM(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.L   Rm,@-Rn */
-const void MOVLM(sh4_state *sh4, UINT16 opcode)
+const void MOVLM(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 data = sh4->r[Rm];
 
@@ -1150,7 +1134,7 @@ const void MOVLM(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.B   @Rm+,Rn */
-const void MOVBP(sh4_state *sh4, UINT16 opcode)
+const void MOVBP(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1160,7 +1144,7 @@ const void MOVBP(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.W   @Rm+,Rn */
-const void MOVWP(sh4_state *sh4, UINT16 opcode)
+const void MOVWP(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1170,7 +1154,7 @@ const void MOVWP(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.L   @Rm+,Rn */
-const void MOVLP(sh4_state *sh4, UINT16 opcode)
+const void MOVLP(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1180,57 +1164,55 @@ const void MOVLP(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.B   Rm,@(R0,Rn) */
-const void MOVBS0(sh4_state *sh4, UINT16 opcode)
+const void MOVBS0(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn] + sh4->r[0];
 	WB(sh4, sh4->ea, sh4->r[Rm] & 0x000000ff );
 }
 
 /*  MOV.W   Rm,@(R0,Rn) */
-const void MOVWS0(sh4_state *sh4, UINT16 opcode)
+const void MOVWS0(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn] + sh4->r[0];
 	WW(sh4, sh4->ea, sh4->r[Rm] & 0x0000ffff );
 }
 
 /*  MOV.L   Rm,@(R0,Rn) */
-const void MOVLS0(sh4_state *sh4, UINT16 opcode)
+const void MOVLS0(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn] + sh4->r[0];
 	WL(sh4, sh4->ea, sh4->r[Rm] );
 }
 
 /*  MOV.B   @(R0,Rm),Rn */
-const void MOVBL0(sh4_state *sh4, UINT16 opcode)
+const void MOVBL0(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rm] + sh4->r[0];
 	sh4->r[Rn] = (UINT32)(INT32)(INT16)(INT8) RB(sh4,  sh4->ea );
 }
 
 /*  MOV.W   @(R0,Rm),Rn */
-const void MOVWL0(sh4_state *sh4, UINT16 opcode)
+const void MOVWL0(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rm] + sh4->r[0];
 	sh4->r[Rn] = (UINT32)(INT32)(INT16) RW(sh4, sh4->ea );
 }
 
 /*  MOV.L   @(R0,Rm),Rn */
-const void MOVLL0(sh4_state *sh4, UINT16 opcode)
+const void MOVLL0(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rm] + sh4->r[0];
 	sh4->r[Rn] = RL(sh4, sh4->ea );
 }
 
 /*  MOV     #imm,Rn */
-const void MOVI(sh4_state *sh4, UINT16 opcode)
+const void MOVI(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 n = Rn;
-	opcode &=0xff;
-	sh4->r[n] = (UINT32)(INT32)(INT16)(INT8)opcode;
+	sh4->r[Rn] = (UINT32)(INT32)(INT16)(INT8)(opcode&0xff);
 }
 
 /*  MOV.W   @(disp8,PC),Rn */
-const void MOVWI(sh4_state *sh4, UINT16 opcode)
+const void MOVWI(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	sh4->ea = sh4->pc + disp * 2 + 2;
@@ -1238,7 +1220,7 @@ const void MOVWI(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.L   @(disp8,PC),Rn */
-const void MOVLI(sh4_state *sh4, UINT16 opcode)
+const void MOVLI(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0xff;
 	sh4->ea = ((sh4->pc + 2) & ~3) + disp * 4;
@@ -1246,55 +1228,55 @@ const void MOVLI(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.B   @(disp8,GBR),R0 */
-const void MOVBLG(sh4_state *sh4, UINT16 d)
+const void MOVBLG(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 disp = d & 0xff;
+	UINT32 disp = opcode & 0xff;
 	sh4->ea = sh4->gbr + disp;
 	sh4->r[0] = (UINT32)(INT32)(INT16)(INT8) RB(sh4,  sh4->ea );
 }
 
 /*  MOV.W   @(disp8,GBR),R0 */
-const void MOVWLG(sh4_state *sh4, UINT16 d)
+const void MOVWLG(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 disp = d & 0xff;
+	UINT32 disp = opcode & 0xff;
 	sh4->ea = sh4->gbr + disp * 2;
 	sh4->r[0] = (INT32)(INT16) RW(sh4, sh4->ea );
 }
 
 /*  MOV.L   @(disp8,GBR),R0 */
-const void MOVLLG(sh4_state *sh4, UINT16 d)
+const void MOVLLG(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 disp = d & 0xff;
+	UINT32 disp = opcode & 0xff;
 	sh4->ea = sh4->gbr + disp * 4;
 	sh4->r[0] = RL(sh4, sh4->ea );
 }
 
 /*  MOV.B   R0,@(disp8,GBR) */
-const void MOVBSG(sh4_state *sh4, UINT16 d)
+const void MOVBSG(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 disp = d & 0xff;
+	UINT32 disp = opcode & 0xff;
 	sh4->ea = sh4->gbr + disp;
 	WB(sh4, sh4->ea, sh4->r[0] & 0x000000ff );
 }
 
 /*  MOV.W   R0,@(disp8,GBR) */
-const void MOVWSG(sh4_state *sh4, UINT16 d)
+const void MOVWSG(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 disp = d & 0xff;
+	UINT32 disp = opcode & 0xff;
 	sh4->ea = sh4->gbr + disp * 2;
 	WW(sh4, sh4->ea, sh4->r[0] & 0x0000ffff );
 }
 
 /*  MOV.L   R0,@(disp8,GBR) */
-const void MOVLSG(sh4_state *sh4, UINT16 d)
+const void MOVLSG(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 disp = d & 0xff;
+	UINT32 disp = opcode & 0xff;
 	sh4->ea = sh4->gbr + disp * 4;
 	WL(sh4, sh4->ea, sh4->r[0] );
 }
 
 /*  MOV.B   R0,@(disp4,Rm) */
-const void MOVBS4(sh4_state *sh4, UINT16 opcode)
+const void MOVBS4(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	sh4->ea = sh4->r[Rm] + disp;
@@ -1302,7 +1284,7 @@ const void MOVBS4(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.W   R0,@(disp4,Rm) */
-const void MOVWS4(sh4_state *sh4, UINT16 opcode)
+const void MOVWS4(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	sh4->ea = sh4->r[Rm] + disp * 2;
@@ -1310,7 +1292,7 @@ const void MOVWS4(sh4_state *sh4, UINT16 opcode)
 }
 
 /* MOV.L Rm,@(disp4,Rn) */
-const void MOVLS4(sh4_state *sh4, UINT16 opcode)
+const void MOVLS4(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	sh4->ea = sh4->r[Rn] + disp * 4;
@@ -1318,7 +1300,7 @@ const void MOVLS4(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.B   @(disp4,Rm),R0 */
-const void MOVBL4(sh4_state *sh4, UINT16 opcode)
+const void MOVBL4(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	sh4->ea = sh4->r[Rm] + disp;
@@ -1326,7 +1308,7 @@ const void MOVBL4(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.W   @(disp4,Rm),R0 */
-const void MOVWL4(sh4_state *sh4, UINT16 opcode)
+const void MOVWL4(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	sh4->ea = sh4->r[Rm] + disp * 2;
@@ -1334,7 +1316,7 @@ const void MOVWL4(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOV.L   @(disp4,Rm),Rn */
-const void MOVLL4(sh4_state *sh4, UINT16 opcode)
+const void MOVLL4(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 disp = opcode & 0x0f;
 	sh4->ea = sh4->r[Rm] + disp * 4;
@@ -1342,46 +1324,46 @@ const void MOVLL4(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOVA    @(disp8,PC),R0 */
-const void MOVA(sh4_state *sh4, UINT16 d)
+const void MOVA(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 disp = d & 0xff;
+	UINT32 disp = opcode & 0xff;
 	sh4->ea = ((sh4->pc + 2) & ~3) + disp * 4;
 	sh4->r[0] = sh4->ea;
 }
 
 /*  MOVT    Rn */
-const void MOVT(sh4_state *sh4, UINT16 opcode)
+const void MOVT(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->sr & T;
 }
 
 /*  MUL.L   Rm,Rn */
-const void MULL(sh4_state *sh4, UINT16 opcode)
+const void MULL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->macl = sh4->r[Rn] * sh4->r[Rm];
 	sh4->sh4_icount--;
 }
 
 /*  MULS    Rm,Rn */
-const void MULS(sh4_state *sh4, UINT16 opcode)
+const void MULS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->macl = (INT16) sh4->r[Rn] * (INT16) sh4->r[Rm];
 }
 
 /*  MULU    Rm,Rn */
-const void MULU(sh4_state *sh4, UINT16 opcode)
+const void MULU(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->macl = (UINT16) sh4->r[Rn] * (UINT16) sh4->r[Rm];
 }
 
 /*  NEG     Rm,Rn */
-const void NEG(sh4_state *sh4, UINT16 opcode)
+const void NEG(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = 0 - sh4->r[Rm];
 }
 
 /*  NEGC    Rm,Rn */
-const void NEGC(sh4_state *sh4, UINT16 opcode)
+const void NEGC(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 temp;
 
@@ -1394,44 +1376,42 @@ const void NEGC(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  NOP */
-const void NOP(sh4_state *sh4, UINT16 opcode)
+const void NOP(sh4_state *sh4, const UINT16 opcode)
 {
 }
 
 /*  NOT     Rm,Rn */
-const void NOT(sh4_state *sh4, UINT16 opcode)
+const void NOT(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = ~sh4->r[Rm];
 }
 
 /*  OR      Rm,Rn */
-const void OR(sh4_state *sh4, UINT16 opcode)
+const void OR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] |= sh4->r[Rm];
 }
 
 /*  OR      #imm,R0 */
-const void ORI(sh4_state *sh4, UINT16 i)
+const void ORI(sh4_state *sh4, const UINT16 opcode)
 {
-	i &= 0xff;
-	sh4->r[0] |= i;
+	sh4->r[0] |= (opcode&0xff);
 	sh4->sh4_icount -= 2;
 }
 
 /*  OR.B    #imm,@(R0,GBR) */
-const void ORM(sh4_state *sh4, UINT16 i)
+const void ORM(sh4_state *sh4, const UINT16 opcode)
 {
-	i &= 0xff;
 	UINT32 temp;
 
 	sh4->ea = sh4->gbr + sh4->r[0];
 	temp = RB(sh4,  sh4->ea );
-	temp |= i;
+	temp |= (opcode&0xff);
 	WB(sh4, sh4->ea, temp );
 }
 
 /*  ROTCL   Rn */
-const void ROTCL(sh4_state *sh4, UINT16 opcode)
+const void ROTCL(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1443,7 +1423,7 @@ const void ROTCL(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  ROTCR   Rn */
-const void ROTCR(sh4_state *sh4, UINT16 opcode)
+const void ROTCR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1457,7 +1437,7 @@ const void ROTCR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  ROTL    Rn */
-const void ROTL(sh4_state *sh4, UINT16 opcode)
+const void ROTL(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1466,7 +1446,7 @@ const void ROTL(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  ROTR    Rn */
-const void ROTR(sh4_state *sh4, UINT16 opcode)
+const void ROTR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1475,7 +1455,7 @@ const void ROTR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  RTE */
-const void RTE(sh4_state *sh4, UINT16 opcode)
+const void RTE(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->delay = sh4->pc;
 	sh4->pc = sh4->ea = sh4->spc;
@@ -1489,7 +1469,7 @@ const void RTE(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  RTS */
-const void RTS(sh4_state *sh4, UINT16 opcode)
+const void RTS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->delay = sh4->pc;
 	sh4->pc = sh4->ea = sh4->pr;
@@ -1497,13 +1477,13 @@ const void RTS(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SETT */
-const void SETT(sh4_state *sh4, UINT16 opcode)
+const void SETT(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->sr |= T;
 }
 
 /*  SHAL    Rn      (same as SHLL) */
-const void SHAL(sh4_state *sh4, UINT16 opcode)
+const void SHAL(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1512,7 +1492,7 @@ const void SHAL(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SHAR    Rn */
-const void SHAR(sh4_state *sh4, UINT16 opcode)
+const void SHAR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1521,7 +1501,7 @@ const void SHAR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SHLL    Rn      (same as SHAL) */
-const void SHLL(sh4_state *sh4, UINT16 opcode)
+const void SHLL(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1530,25 +1510,25 @@ const void SHLL(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SHLL2   Rn */
-const void SHLL2(sh4_state *sh4, UINT16 opcode)
+const void SHLL2(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] <<= 2;
 }
 
 /*  SHLL8   Rn */
-const void SHLL8(sh4_state *sh4, UINT16 opcode)
+const void SHLL8(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] <<= 8;
 }
 
 /*  SHLL16  Rn */
-const void SHLL16(sh4_state *sh4, UINT16 opcode)
+const void SHLL16(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] <<= 16;
 }
 
 /*  SHLR    Rn */
-const void SHLR(sh4_state *sh4, UINT16 opcode)
+const void SHLR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1557,25 +1537,25 @@ const void SHLR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SHLR2   Rn */
-const void SHLR2(sh4_state *sh4, UINT16 opcode)
+const void SHLR2(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] >>= 2;
 }
 
 /*  SHLR8   Rn */
-const void SHLR8(sh4_state *sh4, UINT16 opcode)
+const void SHLR8(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] >>= 8;
 }
 
 /*  SHLR16  Rn */
-const void SHLR16(sh4_state *sh4, UINT16 opcode)
+const void SHLR16(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] >>= 16;
 }
 
 /*  SLEEP */
-const void SLEEP(sh4_state *sh4, UINT16 opcode)
+const void SLEEP(sh4_state *sh4, const UINT16 opcode)
 {
 	/* 0 = normal mode */
 	/* 1 = enters into power-down mode */
@@ -1591,25 +1571,25 @@ const void SLEEP(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STC     SR,Rn */
-const void STCSR(sh4_state *sh4, UINT16 opcode)
+const void STCSR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->sr;
 }
 
 /*  STC     GBR,Rn */
-const void STCGBR(sh4_state *sh4, UINT16 opcode)
+const void STCGBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->gbr;
 }
 
 /*  STC     VBR,Rn */
-const void STCVBR(sh4_state *sh4, UINT16 opcode)
+const void STCVBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->vbr;
 }
 
 /*  STC.L   SR,@-Rn */
-const void STCMSR(sh4_state *sh4, UINT16 opcode)
+const void STCMSR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1620,7 +1600,7 @@ const void STCMSR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STC.L   GBR,@-Rn */
-const void STCMGBR(sh4_state *sh4, UINT16 opcode)
+const void STCMGBR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1631,7 +1611,7 @@ const void STCMGBR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STC.L   VBR,@-Rn */
-const void STCMVBR(sh4_state *sh4, UINT16 opcode)
+const void STCMVBR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1642,25 +1622,25 @@ const void STCMVBR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STS     MACH,Rn */
-const void STSMACH(sh4_state *sh4, UINT16 opcode)
+const void STSMACH(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->mach;
 }
 
 /*  STS     MACL,Rn */
-const void STSMACL(sh4_state *sh4, UINT16 opcode)
+const void STSMACL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->macl;
 }
 
 /*  STS     PR,Rn */
-const void STSPR(sh4_state *sh4, UINT16 opcode)
+const void STSPR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->pr;
 }
 
 /*  STS.L   MACH,@-Rn */
-const void STSMMACH(sh4_state *sh4, UINT16 opcode)
+const void STSMMACH(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1670,7 +1650,7 @@ const void STSMMACH(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STS.L   MACL,@-Rn */
-const void STSMMACL(sh4_state *sh4, UINT16 opcode)
+const void STSMMACL(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1680,7 +1660,7 @@ const void STSMMACL(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STS.L   PR,@-Rn */
-const void STSMPR(sh4_state *sh4, UINT16 opcode)
+const void STSMPR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1690,13 +1670,13 @@ const void STSMPR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SUB     Rm,Rn */
-const void SUB(sh4_state *sh4, UINT16 opcode)
+const void SUB(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] -= sh4->r[Rm];
 }
 
 /*  SUBC    Rm,Rn */
-const void SUBC(sh4_state *sh4, UINT16 opcode)
+const void SUBC(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1714,7 +1694,7 @@ const void SUBC(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SUBV    Rm,Rn */
-const void SUBV(sh4_state *sh4, UINT16 opcode)
+const void SUBV(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1747,7 +1727,7 @@ const void SUBV(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SWAP.B  Rm,Rn */
-const void SWAPB(sh4_state *sh4, UINT16 opcode)
+const void SWAPB(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1760,7 +1740,7 @@ const void SWAPB(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SWAP.W  Rm,Rn */
-const void SWAPW(sh4_state *sh4, UINT16 opcode)
+const void SWAPW(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1771,7 +1751,7 @@ const void SWAPW(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  TAS.B   @Rn */
-const void TAS(sh4_state *sh4, UINT16 opcode)
+const void TAS(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1790,10 +1770,9 @@ const void TAS(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  TRAPA   #imm */
-const void TRAPA(sh4_state *sh4, UINT16 i)
+const void TRAPA(sh4_state *sh4, const UINT16 opcode)
 {
-	i &= 0xff;
-	UINT32 imm = i & 0xff;
+	UINT32 imm = opcode & 0xff;
 
 	if (sh4->cpu_type == CPU_TYPE_SH4)
 	{
@@ -1833,7 +1812,7 @@ const void TRAPA(sh4_state *sh4, UINT16 i)
 }
 
 /*  TST     Rm,Rn */
-const void TST(sh4_state *sh4, UINT16 opcode)
+const void TST(sh4_state *sh4, const UINT16 opcode)
 {
 	if ((sh4->r[Rn] & sh4->r[Rm]) == 0)
 		sh4->sr |= T;
@@ -1842,9 +1821,9 @@ const void TST(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  TST     #imm,R0 */
-const void TSTI(sh4_state *sh4, UINT16 i)
+const void TSTI(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 imm = i & 0xff;
+	UINT32 imm = opcode & 0xff;
 
 	if ((imm & sh4->r[0]) == 0)
 		sh4->sr |= T;
@@ -1853,9 +1832,9 @@ const void TSTI(sh4_state *sh4, UINT16 i)
 }
 
 /*  TST.B   #imm,@(R0,GBR) */
-const void TSTM(sh4_state *sh4, UINT16 i)
+const void TSTM(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 imm = i & 0xff;
+	UINT32 imm = opcode & 0xff;
 
 	sh4->ea = sh4->gbr + sh4->r[0];
 	if ((imm & RB(sh4,  sh4->ea )) == 0)
@@ -1866,22 +1845,22 @@ const void TSTM(sh4_state *sh4, UINT16 i)
 }
 
 /*  XOR     Rm,Rn */
-const void XOR(sh4_state *sh4, UINT16 opcode)
+const void XOR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] ^= sh4->r[Rm];
 }
 
 /*  XOR     #imm,R0 */
-const void XORI(sh4_state *sh4, UINT16 i)
+const void XORI(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 imm = i & 0xff;
+	UINT32 imm = opcode & 0xff;
 	sh4->r[0] ^= imm;
 }
 
 /*  XOR.B   #imm,@(R0,GBR) */
-const void XORM(sh4_state *sh4, UINT16 i)
+const void XORM(sh4_state *sh4, const UINT16 opcode)
 {
-	UINT32 imm = i & 0xff;
+	UINT32 imm = opcode & 0xff;
 	UINT32 temp;
 
 	sh4->ea = sh4->gbr + sh4->r[0];
@@ -1892,7 +1871,7 @@ const void XORM(sh4_state *sh4, UINT16 i)
 }
 
 /*  XTRCT   Rm,Rn */
-const void XTRCT(sh4_state *sh4, UINT16 opcode)
+const void XTRCT(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1904,43 +1883,43 @@ const void XTRCT(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STC     SSR,Rn */
-const void STCSSR(sh4_state *sh4, UINT16 opcode)
+const void STCSSR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->ssr;
 }
 
 /*  STC     SPC,Rn */
-const void STCSPC(sh4_state *sh4, UINT16 opcode)
+const void STCSPC(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->spc;
 }
 
 /*  STC     SGR,Rn */
-const void STCSGR(sh4_state *sh4, UINT16 opcode)
+const void STCSGR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->sgr;
 }
 
 /*  STS     FPUL,Rn */
-const void STSFPUL(sh4_state *sh4, UINT16 opcode)
+const void STSFPUL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->fpul;
 }
 
 /*  STS     FPSCR,Rn */
-const void STSFPSCR(sh4_state *sh4, UINT16 opcode)
+const void STSFPSCR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->fpscr & 0x003FFFFF;
 }
 
 /*  STC     DBR,Rn */
-const void STCDBR(sh4_state *sh4, UINT16 opcode)
+const void STCDBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->r[Rn] = sh4->dbr;
 }
 
 /*  STCRBANK   Rm_BANK,Rn */
-const void STCRBANK(sh4_state *sh4, UINT16 opcode)
+const void STCRBANK(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm;
 
@@ -1948,7 +1927,7 @@ const void STCRBANK(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STCMRBANK   Rm_BANK,@-Rn */
-const void STCMRBANK(sh4_state *sh4, UINT16 opcode)
+const void STCMRBANK(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -1959,24 +1938,24 @@ const void STCMRBANK(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  MOVCA.L     R0,@Rn */
-const void MOVCAL(sh4_state *sh4, UINT16 opcode)
+const void MOVCAL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	WL(sh4, sh4->ea, sh4->r[0] );
 }
 
-const void CLRS(sh4_state *sh4, UINT16 opcode)
+const void CLRS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->sr &= ~S;
 }
 
-const void SETS(sh4_state *sh4, UINT16 opcode)
+const void SETS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->sr |= S;
 }
 
 /*  STS.L   SGR,@-Rn */
-const void STCMSGR(sh4_state *sh4, UINT16 opcode)
+const void STCMSGR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1986,7 +1965,7 @@ const void STCMSGR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STS.L   FPUL,@-Rn */
-const void STSMFPUL(sh4_state *sh4, UINT16 opcode)
+const void STSMFPUL(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -1996,7 +1975,7 @@ const void STSMFPUL(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STS.L   FPSCR,@-Rn */
-const void STSMFPSCR(sh4_state *sh4, UINT16 opcode)
+const void STSMFPSCR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2006,7 +1985,7 @@ const void STSMFPSCR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STC.L   DBR,@-Rn */
-const void STCMDBR(sh4_state *sh4, UINT16 opcode)
+const void STCMDBR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2016,7 +1995,7 @@ const void STCMDBR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STC.L   SSR,@-Rn */
-const void STCMSSR(sh4_state *sh4, UINT16 opcode)
+const void STCMSSR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2026,7 +2005,7 @@ const void STCMSSR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  STC.L   SPC,@-Rn */
-const void STCMSPC(sh4_state *sh4, UINT16 opcode)
+const void STCMSPC(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2036,7 +2015,7 @@ const void STCMSPC(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDS.L   @Rm+,FPUL */
-const void LDSMFPUL(sh4_state *sh4, UINT16 opcode)
+const void LDSMFPUL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->fpul = RL(sh4, sh4->ea );
@@ -2044,7 +2023,7 @@ const void LDSMFPUL(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDS.L   @Rm+,FPSCR */
-const void LDSMFPSCR(sh4_state *sh4, UINT16 opcode)
+const void LDSMFPSCR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 s;
 
@@ -2064,7 +2043,7 @@ const void LDSMFPSCR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,DBR */
-const void LDCMDBR(sh4_state *sh4, UINT16 opcode)
+const void LDCMDBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->dbr = RL(sh4, sh4->ea );
@@ -2072,7 +2051,7 @@ const void LDCMDBR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC.L   @Rn+,Rm_BANK */
-const void LDCMRBANK(sh4_state *sh4, UINT16 opcode)
+const void LDCMRBANK(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2082,7 +2061,7 @@ const void LDCMRBANK(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,SSR */
-const void LDCMSSR(sh4_state *sh4, UINT16 opcode)
+const void LDCMSSR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->ssr = RL(sh4, sh4->ea );
@@ -2090,7 +2069,7 @@ const void LDCMSSR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC.L   @Rm+,SPC */
-const void LDCMSPC(sh4_state *sh4, UINT16 opcode)
+const void LDCMSPC(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ea = sh4->r[Rn];
 	sh4->spc = RL(sh4, sh4->ea );
@@ -2098,13 +2077,13 @@ const void LDCMSPC(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDS     Rm,FPUL */
-const void LDSFPUL(sh4_state *sh4, UINT16 opcode)
+const void LDSFPUL(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->fpul = sh4->r[Rn];
 }
 
 /*  LDS     Rm,FPSCR */
-const void LDSFPSCR(sh4_state *sh4, UINT16 opcode)
+const void LDSFPSCR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 s;
 
@@ -2121,13 +2100,13 @@ const void LDSFPSCR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC     Rm,DBR */
-const void LDCDBR(sh4_state *sh4, UINT16 opcode)
+const void LDCDBR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->dbr = sh4->r[Rn];
 }
 
 /*  SHAD    Rm,Rn */
-const void SHAD(sh4_state *sh4, UINT16 opcode)
+const void SHAD(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2143,7 +2122,7 @@ const void SHAD(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  SHLD    Rm,Rn */
-const void SHLD(sh4_state *sh4, UINT16 opcode)
+const void SHLD(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2156,7 +2135,7 @@ const void SHLD(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDCRBANK   Rn,Rm_BANK */
-const void LDCRBANK(sh4_state *sh4, UINT16 opcode)
+const void LDCRBANK(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm;
 
@@ -2164,19 +2143,19 @@ const void LDCRBANK(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  LDC     Rm,SSR */
-const void LDCSSR(sh4_state *sh4, UINT16 opcode)
+const void LDCSSR(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->ssr = sh4->r[Rn];
 }
 
 /*  LDC     Rm,SPC */
-const void LDCSPC(sh4_state *sh4, UINT16 opcode)
+const void LDCSPC(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->spc = sh4->r[Rn];
 }
 
 /*  PREF     @Rn */
-const void PREFM(sh4_state *sh4, UINT16 opcode)
+const void PREFM(sh4_state *sh4, const UINT16 opcode)
 {
 	int a;
 	UINT32 addr,dest,sq;
@@ -2254,7 +2233,7 @@ const void PREFM(sh4_state *sh4, UINT16 opcode)
 /*  FMOV    @Rm+,DRn PR=0 SZ=1 1111nnn0mmmm1001 */
 /*  FMOV    @Rm+,XDn PR=0 SZ=1 1111nnn1mmmm1001 */
 /*  FMOV    @Rm+,XDn PR=1      1111nnn1mmmm1001 */
-const void FMOVMRIFR(sh4_state *sh4, UINT16 opcode)
+const void FMOVMRIFR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2292,7 +2271,7 @@ const void FMOVMRIFR(sh4_state *sh4, UINT16 opcode)
 /*  FMOV    DRm,@Rn PR=0 SZ=1 1111nnnnmmm01010 */
 /*  FMOV    XDm,@Rn PR=0 SZ=1 1111nnnnmmm11010 */
 /*  FMOV    XDm,@Rn PR=1      1111nnnnmmm11010 */
-const void FMOVFRMR(sh4_state *sh4, UINT16 opcode)
+const void FMOVFRMR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2324,7 +2303,7 @@ const void FMOVFRMR(sh4_state *sh4, UINT16 opcode)
 /*  FMOV    DRm,@-Rn PR=0 SZ=1 1111nnnnmmm01011 */
 /*  FMOV    XDm,@-Rn PR=0 SZ=1 1111nnnnmmm11011 */
 /*  FMOV    XDm,@-Rn PR=1      1111nnnnmmm11011 */
-const void FMOVFRMDR(sh4_state *sh4, UINT16 opcode)
+const void FMOVFRMDR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2360,7 +2339,7 @@ const void FMOVFRMDR(sh4_state *sh4, UINT16 opcode)
 /*  FMOV    DRm,@(R0,Rn) PR=0 SZ=1 1111nnnnmmm00111 */
 /*  FMOV    XDm,@(R0,Rn) PR=0 SZ=1 1111nnnnmmm10111 */
 /*  FMOV    XDm,@(R0,Rn) PR=1      1111nnnnmmm10111 */
-const void FMOVFRS0(sh4_state *sh4, UINT16 opcode)
+const void FMOVFRS0(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2392,7 +2371,7 @@ const void FMOVFRS0(sh4_state *sh4, UINT16 opcode)
 /*  FMOV    @(R0,Rm),DRn PR=0 SZ=1 1111nnn0mmmm0110 */
 /*  FMOV    @(R0,Rm),XDn PR=0 SZ=1 1111nnn1mmmm0110 */
 /*  FMOV    @(R0,Rm),XDn PR=1      1111nnn1mmmm0110 */
-const void FMOVS0FR(sh4_state *sh4, UINT16 opcode)
+const void FMOVS0FR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2425,7 +2404,7 @@ const void FMOVS0FR(sh4_state *sh4, UINT16 opcode)
 /*  FMOV    @Rm,XDn PR=0 SZ=1 1111nnn1mmmm1000 */
 /*  FMOV    @Rm,XDn PR=1      1111nnn1mmmm1000 */
 /*  FMOV    @Rm,DRn PR=1      1111nnn0mmmm1000 */
-const void FMOVMRFR(sh4_state *sh4, UINT16 opcode)
+const void FMOVMRFR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2466,7 +2445,7 @@ const void FMOVMRFR(sh4_state *sh4, UINT16 opcode)
 /*  FMOV    XDm,DRn PR=1      XDm -> DRn 1111nnn0mmm11100 */
 /*  FMOV    DRm,XDn PR=1      DRm -> XDn 1111nnn1mmm01100 */
 /*  FMOV    XDm,XDn PR=1      XDm -> XDn 1111nnn1mmm11100 */
-const void FMOVFR(sh4_state *sh4, UINT16 opcode)
+const void FMOVFR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2494,25 +2473,25 @@ const void FMOVFR(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  FLDI1  FRn 1111nnnn10011101 */
-const void FLDI1(sh4_state *sh4, UINT16 opcode)
+const void FLDI1(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->fr[Rn] = 0x3F800000;
 }
 
 /*  FLDI0  FRn 1111nnnn10001101 */
-const void FLDI0(sh4_state *sh4, UINT16 opcode)
+const void FLDI0(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->fr[Rn] = 0;
 }
 
 /*  FLDS FRm,FPUL 1111mmmm00011101 */
-const void	FLDS(sh4_state *sh4, UINT16 opcode)
+const void	FLDS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->fpul = sh4->fr[Rn];
 }
 
 /*  FSTS FPUL,FRn 1111nnnn00001101 */
-const void	FSTS(sh4_state *sh4, UINT16 opcode)
+const void	FSTS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->fr[Rn] = sh4->fpul;
 }
@@ -2533,7 +2512,7 @@ const void FSCHG(sh4_state *sh4)
 
 /* FTRC FRm,FPUL PR=0 1111mmmm00111101 */
 /* FTRC DRm,FPUL PR=1 1111mmm000111101 */
-const void FTRC(sh4_state *sh4, UINT16 opcode)
+const void FTRC(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2548,7 +2527,7 @@ const void FTRC(sh4_state *sh4, UINT16 opcode)
 
 /* FLOAT FPUL,FRn PR=0 1111nnnn00101101 */
 /* FLOAT FPUL,DRn PR=1 1111nnn000101101 */
-const void FLOAT(sh4_state *sh4, UINT16 opcode)
+const void FLOAT(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2562,7 +2541,7 @@ const void FLOAT(sh4_state *sh4, UINT16 opcode)
 
 /* FNEG FRn PR=0 1111nnnn01001101 */
 /* FNEG DRn PR=1 1111nnn001001101 */
-const void FNEG(sh4_state *sh4, UINT16 opcode)
+const void FNEG(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2575,7 +2554,7 @@ const void FNEG(sh4_state *sh4, UINT16 opcode)
 
 /* FABS FRn PR=0 1111nnnn01011101 */
 /* FABS DRn PR=1 1111nnn001011101 */
-const void FABS(sh4_state *sh4, UINT16 opcode)
+const void FABS(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2594,7 +2573,7 @@ const void FABS(sh4_state *sh4, UINT16 opcode)
 
 /* FCMP/EQ FRm,FRn PR=0 1111nnnnmmmm0100 */
 /* FCMP/EQ DRm,DRn PR=1 1111nnn0mmm00100 */
-const void FCMP_EQ(sh4_state *sh4, UINT16 opcode)
+const void FCMP_EQ(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2615,7 +2594,7 @@ const void FCMP_EQ(sh4_state *sh4, UINT16 opcode)
 
 /* FCMP/GT FRm,FRn PR=0 1111nnnnmmmm0101 */
 /* FCMP/GT DRm,DRn PR=1 1111nnn0mmm00101 */
-const void FCMP_GT(sh4_state *sh4, UINT16 opcode)
+const void FCMP_GT(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2635,7 +2614,7 @@ const void FCMP_GT(sh4_state *sh4, UINT16 opcode)
 }
 
 /* FCNVDS DRm,FPUL PR=1 1111mmm010111101 */
-const void FCNVDS(sh4_state *sh4, UINT16 opcode)
+const void FCNVDS(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2648,7 +2627,7 @@ const void FCNVDS(sh4_state *sh4, UINT16 opcode)
 }
 
 /* FCNVSD FPUL, DRn PR=1 1111nnn010101101 */
-const void FCNVSD(sh4_state *sh4, UINT16 opcode)
+const void FCNVSD(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2660,7 +2639,7 @@ const void FCNVSD(sh4_state *sh4, UINT16 opcode)
 
 /* FADD FRm,FRn PR=0 1111nnnnmmmm0000 */
 /* FADD DRm,DRn PR=1 1111nnn0mmm00000 */
-const void FADD(sh4_state *sh4, UINT16 opcode)
+const void FADD(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2675,7 +2654,7 @@ const void FADD(sh4_state *sh4, UINT16 opcode)
 
 /* FSUB FRm,FRn PR=0 1111nnnnmmmm0001 */
 /* FSUB DRm,DRn PR=1 1111nnn0mmm00001 */
-const void FSUB(sh4_state *sh4, UINT16 opcode)
+const void FSUB(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2691,7 +2670,7 @@ const void FSUB(sh4_state *sh4, UINT16 opcode)
 
 /* FMUL FRm,FRn PR=0 1111nnnnmmmm0010 */
 /* FMUL DRm,DRn PR=1 1111nnn0mmm00010 */
-const void FMUL(sh4_state *sh4, UINT16 opcode)
+const void FMUL(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2706,7 +2685,7 @@ const void FMUL(sh4_state *sh4, UINT16 opcode)
 
 /* FDIV FRm,FRn PR=0 1111nnnnmmmm0011 */
 /* FDIV DRm,DRn PR=1 1111nnn0mmm00011 */
-const void FDIV(sh4_state *sh4, UINT16 opcode)
+const void FDIV(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2724,7 +2703,7 @@ const void FDIV(sh4_state *sh4, UINT16 opcode)
 }
 
 /* FMAC FR0,FRm,FRn PR=0 1111nnnnmmmm1110 */
-const void FMAC(sh4_state *sh4, UINT16 opcode)
+const void FMAC(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 m = Rm; UINT32 n = Rn;
 
@@ -2735,7 +2714,7 @@ const void FMAC(sh4_state *sh4, UINT16 opcode)
 
 /* FSQRT FRn PR=0 1111nnnn01101101 */
 /* FSQRT DRn PR=1 1111nnnn01101101 */
-const void FSQRT(sh4_state *sh4, UINT16 opcode)
+const void FSQRT(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2752,7 +2731,7 @@ const void FSQRT(sh4_state *sh4, UINT16 opcode)
 }
 
 /* FSRRA FRn PR=0 1111nnnn01111101 */
-const void FSRRA(sh4_state *sh4, UINT16 opcode)
+const void FSRRA(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2762,7 +2741,7 @@ const void FSRRA(sh4_state *sh4, UINT16 opcode)
 }
 
 /*  FSSCA FPUL,FRn PR=0 1111nnn011111101 */
-const void FSSCA(sh4_state *sh4, UINT16 opcode)
+const void FSSCA(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2774,7 +2753,7 @@ float angle;
 }
 
 /* FIPR FVm,FVn PR=0 1111nnmm11101101 */
-const void FIPR(sh4_state *sh4, UINT16 opcode)
+const void FIPR(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2790,7 +2769,7 @@ int a;
 }
 
 /* FTRV XMTRX,FVn PR=0 1111nn0111111101 */
-const void FTRV(sh4_state *sh4, UINT16 opcode)
+const void FTRV(sh4_state *sh4, const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
@@ -2807,7 +2786,7 @@ float sum[4];
 		FP_RFS(n + i) = sum[i];
 }
 
-const void op1111_0xf13(sh4_state *sh4, UINT16 opcode)
+const void op1111_0xf13(sh4_state *sh4, const UINT16 opcode)
 {
 	if (opcode & 0x100) {
 			if (opcode & 0x200) {
@@ -2831,7 +2810,7 @@ const void op1111_0xf13(sh4_state *sh4, UINT16 opcode)
 		}
 }
 
-const void dbreak(sh4_state *sh4, UINT16 opcode)
+const void dbreak(sh4_state *sh4, const UINT16 opcode)
 {
 	debugger_break(sh4->device->machine());
 }
@@ -3137,30 +3116,39 @@ static CPU_EXECUTE( sh4 )
 
 	do
 	{
-		UINT32 opcode;
-
 		if (sh4->delay)
 		{
-			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->delay & AM), WORD2_XOR_LE(0));
-			sh4->pc -= 2;
+			const UINT16 opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->delay & AM), WORD2_XOR_LE(0));
+
+			debugger_instruction_hook(device, (sh4->pc-2) & AM);
+
+			sh4->delay = 0;
+			sh4->ppc = sh4->pc;
+
+			master_ophandler_table[opcode](sh4, opcode);
+
+			if (sh4->test_irq && !sh4->delay)
+			{
+				sh4_check_pending_irq(sh4, "mame_sh4_execute");
+			}
 		}
 		else
 		{
-			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->pc & AM), WORD2_XOR_LE(0));
+			const UINT16  opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->pc & AM), WORD2_XOR_LE(0));
+
+			debugger_instruction_hook(device, sh4->pc & AM);
+
+			sh4->pc += 2;
+			sh4->ppc = sh4->pc;
+
+			master_ophandler_table[opcode](sh4, opcode);
+
+			if (sh4->test_irq && !sh4->delay)
+			{
+				sh4_check_pending_irq(sh4, "mame_sh4_execute");
+			}
 		}
 
-		debugger_instruction_hook(device, sh4->pc & AM);
-
-		sh4->delay = 0;
-		sh4->pc += 2;
-		sh4->ppc = sh4->pc;
-
-		master_ophandler_table[opcode](sh4, opcode);
-
-		if (sh4->test_irq && !sh4->delay)
-		{
-			sh4_check_pending_irq(sh4, "mame_sh4_execute");
-		}
 		sh4->sh4_icount--;
 	} while( sh4->sh4_icount > 0 );
 }
@@ -3177,30 +3165,42 @@ static CPU_EXECUTE( sh4be )
 
 	do
 	{
-		UINT32 opcode;
-
 		if (sh4->delay)
 		{
-			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->delay & AM), WORD_XOR_LE(6));
-			sh4->pc -= 2;
+			const UINT16 opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->delay & AM), WORD_XOR_LE(6));
+
+			debugger_instruction_hook(device, sh4->delay & AM);
+
+			sh4->delay = 0;
+			sh4->ppc = sh4->pc;
+
+			master_ophandler_table[opcode](sh4, opcode);
+
+			
+			if (sh4->test_irq && !sh4->delay)
+			{
+				sh4_check_pending_irq(sh4, "mame_sh4_execute");
+			}
+			
+
 		}
 		else
 		{
-			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->pc & AM), WORD_XOR_LE(6));
+			const UINT16 opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->pc & AM), WORD_XOR_LE(6));
+
+			debugger_instruction_hook(device, sh4->pc & AM);
+
+			sh4->pc += 2;
+			sh4->ppc = sh4->pc;
+
+			master_ophandler_table[opcode](sh4, opcode);
+
+			if (sh4->test_irq && !sh4->delay)
+			{
+				sh4_check_pending_irq(sh4, "mame_sh4_execute");
+			}
 		}
 
-		debugger_instruction_hook(device, sh4->pc & AM);
-
-		sh4->delay = 0;
-		sh4->pc += 2;
-		sh4->ppc = sh4->pc;
-
-		master_ophandler_table[opcode](sh4, opcode);
-
-		if (sh4->test_irq && !sh4->delay)
-		{
-			sh4_check_pending_irq(sh4, "mame_sh4_execute");
-		}
 		sh4->sh4_icount--;
 	} while( sh4->sh4_icount > 0 );
 }
