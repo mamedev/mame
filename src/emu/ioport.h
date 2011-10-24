@@ -245,7 +245,7 @@ enum
 	IPT_HANAFUDA_NO,
 #define __ipt_hanafuda_end IPT_HANAFUDA_NO
 
-#define __ipt_gambling_start IPT_GAMBLE_HIGH
+#define __ipt_gambling_start IPT_GAMBLE_KEYIN
 
 	/* gambling inputs */
 	IPT_GAMBLE_KEYIN,	// attendant
