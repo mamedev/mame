@@ -2,6 +2,26 @@
 
 Cave CV1000 hardware
 
+Games by Cave ID number:
+
+CA011  Mushihime Sama
+CA012  Ibara
+CA012B Ibara Kuro - Black Label
+CA013  Espgaluda II
+CA014  Pink Sweets - Ibara Sorekara
+CA015  Mushihime Same Futari
+CA015B Mushihime Same Futari - Black Label
+CA016  Muchi Muchi Pork
+CA017  Death Smiles
+CA017B Death Smiles - Black Label
+CA019  DoDonPanchi DaiFukkatsu
+CA019B DoDonPanchi DaiFukkatsu - Black Label
+CA021  Akai Katana
+
+CMDL01 Medal Mahjong Moukari Bancho
+
+Note: CA018 - Death Smiles II: Makai no Merry Christmas on unknown custom platform
+      CA020 - DoDonPachi Daioujou Tamashii on PGM2 platform
 
 PCB CV1000-B / CV1000-D
 +--------------------------------------------+
@@ -49,7 +69,7 @@ PCB CV1000-B / CV1000-D
   CPU: Hitachi 6417709S SH3 clocked at 102.4MHz (12.800MHz * 8)
 Sound: Yamaha YMZ770C-F clocked at 16.384MHz
 Other: Altera Cyclone EP1C12 FPGA
-       Altera EPM7032 (MAX 7000 Series, Stamped "CA011") at U13
+       Altera EPM7032 (MAX 7000 Series) at U13
 
 OSC:
  X1 12.800MHz (SH3 clock derived from this)
@@ -91,7 +111,7 @@ Misc:
    U12 (RS-232 TRANCEIVER) MAX 3244E RS-232 Tranceiver, only mounted when P5 is mounted.
  D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.
 
-Note: * The Altera EPM7032 has been seen stamped "CA017" for at least one DeathSmiles, there are other revisions.
+Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
       * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
       * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
         The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
@@ -6488,8 +6508,9 @@ PINK SWEETS
   "2006/04/06 MASTER VER."
   "2006/04/06 MASTER VER..."
   "2006/04/06 MASTER VER...."
-* "2006/05/18 MASTER VER."
+* "2006/05/18 MASTER VER."    - Removes infinite lives trick, fixes some bugs
 * "2006/xx/xx MASTER VER"
+* "2006/xx/xx MASTER VER."
 
 MUSHIHIME SAMA FUTARI 1.0
 * "2006/10/23 MASTER VER"  - Ultra unlockable
@@ -6506,7 +6527,7 @@ MUSHIHIME SAMA FUTARI BLACK LABEL
 
 MUCHI MUCHI PORK
   "2007/ 4/17 MASTER VER."
-* 2 "period" ver, location of the periods unknown
+* "2007/ 4/17 MASTER VER.."
 
 MEDAL MAHJONG MOKUARI BANCHO
   "2007/06/05 MASTER VER."
@@ -6523,6 +6544,7 @@ DODONPACHI FUKKATSU 1.0
 DODONPACHI FUKKATSU 1.5
 * "2008/06/23 MASTER VER 1.5"
 
+
 --- Titles below are too new to emulate, but included for documentation ---
 
 DODONPACHI DAIFUKKATSU BLACK LABEL
@@ -6534,5 +6556,18 @@ AKAI KATANA
 
 MUSHIHIMESAMA 1.5 MATSURI VERSION
 * 2011/5/23 CAVEMATSURI VER 1.5
+
+
+--- Titles below are known versions from Cave's fan festivals and are likely in house only versions ---
+
+Shown     Title                                                   Notes
+-----------------------------------------------------------------------------------------------------------------------
+12/28/06  MUSHIHIMESAMA VER 1.5 ~BLUE LABEL~                      No Maniac mode.
+12/28/06  MUSHIHIMESAMA FUTARI VER 1.5 ~RED LABEL~                3 PCBs were given away to top scorers.
+12/28/06  MUSHIHIMESAMA FUTARI VER 1.01
+12/30/07  MUCHI MUCHI PORK! DAI CAVE FESTIVAL ~SPECIAL VERSION~   Includes Pink Sweets bosses at the end of each stage.
+12/30/07  DEATHSMILES: DAI CAVE FESTIVAL ~SPECIAL VERSION~        Inclueds a rank 99 difficulty. Prototype for DSMBL.
+08/15/08  DODONPACHI DAIFUKKATSU VER 1.5 ~SPECIAL~                Power-style only.
+10/20/10  DODONPACHI DAIFUKKATSU VER 1.51
 
 */
