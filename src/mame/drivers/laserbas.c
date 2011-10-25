@@ -3,7 +3,7 @@
 
  IC marked as Z1 is probably protection device
  mapped in memory region f800-fbff
- (simil. to the one used in Parallel Turn)
+ (similar to the one used in Parallel Turn)
 
  Reads form this device depends on previous
  writes (adr, data), address and previous
@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
+#include "video/mc6845.h"
 
 class laserbas_state : public driver_device
 {
@@ -102,8 +103,7 @@ static WRITE8_HANDLER(vrambank_w)
 {
 	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	if ((offset & 0xf1) == 0x10)
-		state->m_vrambank = data & 0x40;
+	state->m_vrambank = data & 0x40;
 }
 
 static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8 )
@@ -116,7 +116,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laserbas_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_WRITE(vrambank_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(vrambank_w)
 	AM_RANGE(0x20, 0x20) AM_READ(read_unk) AM_WRITENOP//write = ram/rom bank ? at fc00-f800 ?
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
 	AM_RANGE(0x80, 0x9f) AM_WRITE(palette_w)
@@ -168,6 +170,21 @@ static MACHINE_RESET( laserbas )
 	state->m_count = 0;
 }
 
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
+
 static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -185,6 +202,8 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(laserbas)
+
+	MCFG_MC6845_ADD("crtc", H46505, 3000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_VIDEO_START(laserbas)
