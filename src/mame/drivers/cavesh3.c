@@ -134,9 +134,6 @@ Improve Blending precision?
 Overall screen brightness / contrast (see test mode)
  - Could convert ram back to 16-bit and use a palette lookup at the final blit.. probably easiest / quickest.
 
-Sound
- - Chip is completely unemulated
-
 Touchscreen
  - Used for mmmbanc, needs SH3 serial support.
 
