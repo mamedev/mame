@@ -9,8 +9,8 @@ CA012  Ibara
 CA012B Ibara Kuro Black Label
 CA013  Espgaluda II
 CA014  Pink Sweets: Ibara Sorekara
-CA015  Mushihime-Same Futari
-CA015B Mushihime-Same Futari Black Label
+CA015  Mushihime-Sama Futari
+CA015B Mushihime-Sama Futari Black Label
 CA016  Muchi Muchi Pork!
 CA017  Deathsmiles
 CA017B Deathsmiles Black Label
@@ -6540,9 +6540,6 @@ Do-Don-Pachi Dai-Fukkatsu 1.0
 
 Do-Don-Pachi Dai-Fukkatsu 1.5
 * "2008/06/23 MASTER VER 1.5"
-
-
---- Titles below are too new to emulate, but included for documentation ---
 
 Do-Don-Pachi Dai-Fukkatsu Black label
 * "2010/1/18 BLACK LABEL"
