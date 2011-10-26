@@ -4,24 +4,24 @@ Cave CV1000 hardware
 
 Games by Cave ID number:
 
-CA011  Mushihimesama
+CA011  Mushihime-Sama
 CA012  Ibara
-CA012B Ibara Black Label
+CA012B Ibara Kuro Black Label
 CA013  Espgaluda II
 CA014  Pink Sweets: Ibara Sorekara
-CA015  Mushihimesame Futari
-CA015B Mushihimesame Futari Black Label
+CA015  Mushihime-Same Futari
+CA015B Mushihime-Same Futari Black Label
 CA016  Muchi Muchi Pork!
 CA017  Deathsmiles
 CA017B Deathsmiles Black Label
-CA019  Dodonpanchi Daifukkatsu
-CA019B Dodonpanchi Daifukkatsu Black Label
+CA019  Do-Don-Pachi Dai-Fukkatsu
+CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
 CA021  Akai Katana
 
 CMDL01 Medal Mahjong Moukari Bancho
 
 Note: CA018 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
-      CA020 - Dodonpachi Dai-ou-jou Tamashii on PGM2 platform
+      CA020 - Do-Don-Pachi Dai-ou-jou Tamashii on PGM2 platform
 
 PCB CV1000-B / CV1000-D
 +--------------------------------------------+
@@ -102,7 +102,7 @@ Connectors:
  P4 (IDC CONNECTOR 14 PIN) JTAG connector
  P8 (IDC CONNECTOR 10 PIN) Advanced User Debugger
  P3 (CONNECTOR) Most likely an expansion port, P3 is not always mounted
- P5 (CONNECTOR) D9 serial connector. Used for the mahjong Touchscreen titles.  Also mounted on early Mushihimesama PCB's
+ P5 (CONNECTOR) D9 serial connector. Used for the mahjong Touchscreen titles.  Also mounted on early Mushihime-Sama PCB's
  P7 (CONNECTOR) Network port pinout. Never seen mounted on any PCB.
 
 Misc:
@@ -6460,19 +6460,18 @@ DRIVER_INIT( espgal2 )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc002310, 0xc002317, FUNC(espgal2_speedup_r) );
 }
 
-/* Names used below are based on Cave's (English) website under Company History */
 
-GAME( 2004, mushisam,   0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Mushihimesama (2004/10/12 MASTER VER.)",                           0 )
-GAME( 2004, mushisama,  mushisam, cavesh3, cavesh3, mushisama, ROT270, "Cave", "Mushihimesama (2004/10/12 MASTER VER)",                            0 )
+GAME( 2004, mushisam,   0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Mushihime-Sama (2004/10/12 MASTER VER.)",                          0 )
+GAME( 2004, mushisama,  mushisam, cavesh3, cavesh3, mushisama, ROT270, "Cave", "Mushihime-Sama (2004/10/12 MASTER VER)",                           0 )
 GAME( 2005, espgal2,    0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Espgaluda II (2005/11/14 MASTER VER)",                             0 )
 GAME( 2005, ibara,      0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                  0 )
-GAME( 2006, ibarablk,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Black Label (2006/02/06. MASTER VER.)",                      0 )
-GAME( 2006, ibarablka,  ibarablk, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Black Label (2006/02/06 MASTER VER.)",                       0 )
-GAME( 2005, mushitam,   0,        cavesh3, cavesh3, mushisam,  ROT0,   "Cave", "Puzzle! Mushihimetama (2005/09/09 MASTER VER)",                    0 )
-GAME( 2006, futari15,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihimesama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       0 )
-GAME( 2006, futari15a,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihimesama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         0 )
-GAME( 2006, futari10,   futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihimesama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            0 )
-GAME( 2007, futariblk,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihimesama Futari Black Label (2007/12/11 BLACK LABEL VER)",    0 )
+GAME( 2006, ibarablk,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                 0 )
+GAME( 2006, ibarablka,  ibarablk, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                  0 )
+GAME( 2005, mushitam,   0,        cavesh3, cavesh3, mushisam,  ROT0,   "Cave", "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                   0 )
+GAME( 2006, futari15,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",      0 )
+GAME( 2006, futari15a,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",        0 )
+GAME( 2006, futari10,   futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",           0 )
+GAME( 2007, futariblk,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",   0 )
 GAME( 2006, pinkswts,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",          0 )
 GAME( 2006, pinkswtsa,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",           0 )
 GAME( 2006, pinkswtsb,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",             0 )
@@ -6482,25 +6481,14 @@ GAME( 2007, mmmbanc,    0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "
 
 /*
 
-Common version of game names (alternates even used on Cave's own web pages):
-
-Mushihimesama - Mushihime-Sama - Mushihime Same
-Puzzle! Mushihimetama - Mushihime-Tama - Mushihime Tama
-Dodonpachi Daifukkatsu - DoDonPachi DaiFukkatsu - Do-Don-Pachi Dai-Fukkatsu
-Muchi Muchi Pork - Muchi Muchi Pork!
-Ibara Black Label - Ibara Kuro - Ibara Kuro Black Label
-
-----------------------------------------------------------------------------
-
-
 Known versions of games on this hardware (* denotes undumped):
 
-Mushihimesama
+Mushihime-Sama
   "2004/10/12 MASTER VER"  - broken
   "2004/10/12 MASTER VER." - fixed 1
 * "2004/10/12.MASTER VER." - fixed 2
 
-Puzzle! Mushihimetama
+Puzzle! Mushihime-Tama
   "2005/09/09 MASTER VER"
 
 Espgaluda II
@@ -6509,7 +6497,7 @@ Espgaluda II
 Ibara
   "2005/03/22 MASTER VER.."
 
-Ibara Black Label
+Ibara Kuro Black Label
   "2006/02/06 MASTER VER."
   "2006/02/06. MASTER VER."
 
@@ -6519,18 +6507,18 @@ Pink Sweets: Ibara Sorkara
   "2006/04/06 MASTER VER...."
 * "2006/05/18 MASTER VER."    - Removes infinite lives trick, fixes some bugs
 * "2006/xx/xx MASTER VER"
-* "2006/xx/xx MASTER VER."
+  "2006/xx/xx MASTER VER."
 
-Mushihimesama Futari 1.0
+Mushihime-Sama Futari 1.0
 * "2006/10/23 MASTER VER"  - Ultra unlockable
   "2006/10/23 MASTER VER." - Ultra unlockable
 * "2006/10/23.MASTER VER." - Cannot unlock ultra
 
-Mushihimesama Futari 1.5
+Mushihime-Sama Futari 1.5
   "2006/12/8 MASTER VER 1.54"
   "2006/12/8.MASTER VER. 1.54."
 
-Mushihimesama Futari Black Label
+Mushihime-Sama Futari Black Label
   "2007/12/11 BLACK LABEL VER"
 * "2009/11/17 INTERNATIONAL BL"  ("Another Ver" on title screen)
 
@@ -6547,23 +6535,23 @@ Deathsmiles
 Deathsmiles Mega Black Label
 * "2008/10/06 MEGABLACK LABEL VER"
 
-Dodonpachi Daifukkatsu 1.0
+Do-Don-Pachi Dai-Fukkatsu 1.0
 * "2008/05/16 MASTER VER"
 
-Dodonpachi Daifukkatsu 1.5
+Do-Don-Pachi Dai-Fukkatsu 1.5
 * "2008/06/23 MASTER VER 1.5"
 
 
 --- Titles below are too new to emulate, but included for documentation ---
 
-Dondonpachi Daifukkatsu Black label
+Do-Don-Pachi Dai-Fukkatsu Black label
 * "2010/1/18 BLACK LABEL"
 
 Akai Katana
 * "2010/ 8/13 MASTER VER."
 *  Home/Limited version, unknown date line, different gameplay from regular version, doesn't accept coins - permanent freeplay
 
-Mushihimesama 1.5 Matsuri Version
+Mushihime-Sama 1.5 Matsuri Version
 * 2011/5/23 CAVEMATSURI VER 1.5
 
 
@@ -6571,12 +6559,12 @@ Mushihimesama 1.5 Matsuri Version
 
 Shown     Title                                                   Notes
 -----------------------------------------------------------------------------------------------------------------------
-12/28/06  Mushihimesama VER 1.5 ~Blus Label~                      No Maniac mode.
-12/28/06  Mushihimesama Futari VER 1.5 ~Red Label~                3 PCBs were given away to top scorers.
-12/28/06  Mushihimesama Futari VER 1.01
+12/28/06  Mushihime-Sama VER 1.5 ~Blus Label~                     No Maniac mode.
+12/28/06  Mushihime-Sama Futari VER 1.5 ~Red Label~               3 PCBs were given away to top scorers.
+12/28/06  Mushihime-Sama Futari VER 1.01
 12/30/07  Muchi Muchi Pork! Dai Cave Festival ~Special Version~   Includes Pink Sweets bosses at the end of each stage.
 12/30/07  Deathsmiles: Dai Cave Festival ~Special Version~        Inclueds a rank 99 difficulty. Prototype for DSMBL.
-08/15/08  Dodonpachi Daifukkatsu VER 1.5 ~Special~                Power-style only.
-10/20/10  Dodonpachi Daifukkatsu VER 1.51
+08/15/08  Do-Don-Pachi Dai-Fukkatsu VER 1.5 ~Special~             Power-style only.
+10/20/10  Do-Don-Pachi Dai-Fukkatsu VER 1.51
 
 */
