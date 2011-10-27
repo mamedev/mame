@@ -1420,7 +1420,7 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT
 
 	meh:
 		;
-			
+
 	}
 
 	// Maximal number of cells which happens when the buffer is all MG_1/MG_N alternated, which would be 3/2

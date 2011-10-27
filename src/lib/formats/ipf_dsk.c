@@ -200,7 +200,7 @@ bool ipf_format::scan_all_tags(UINT8 *data, UINT32 size)
 	while(pos != size) {
 		UINT8 *tag;
 		UINT32 tsize;
-			
+
 		if(!scan_one_tag(data, size, pos, tag, tsize))
 			return false;
 
@@ -427,7 +427,7 @@ void ipf_format::track_write_raw(UINT32 *&track, const UINT8 *data, UINT32 cells
 	for(UINT32 i=0; i != cells; i++)
 		*track++ = data[i>>3] & (0x80 >> (i & 7)) ? MG_1 : MG_0;
 	if(cells)
-		context = track[-1] == MG_1; 
+		context = track[-1] == MG_1;
 }
 
 void ipf_format::track_write_mfm(UINT32 *&track, const UINT8 *data, UINT32 start_offset, UINT32 patlen, UINT32 cells, bool &context)
@@ -472,7 +472,7 @@ bool ipf_format::generate_block_data(const UINT8 *data, const UINT8 *dlimit, UIN
 			break;
 
 		case 2: // MFM-decoded data bytes
-		case 3: // MFM-decoded gap bytes			
+		case 3: // MFM-decoded gap bytes
 			if(16*param > tleft)
 				return false;
 			track_write_mfm(track, data, 0, 8*param, 16*param, context);
@@ -579,7 +579,7 @@ bool ipf_format::generate_gap_from_description(const UINT8 *&data, const UINT8 *
 					block_size = size - pos;
 				if(pos + block_size > size)
 					return false;
-				//				printf("pat=%02x size=%d pre\n", pattern[0], block_size);
+				//              printf("pat=%02x size=%d pre\n", pattern[0], block_size);
 				track_write_mfm(track, pattern, 0, pattern_size, block_size, context);
 				pos += block_size;
 			} else {
@@ -589,7 +589,7 @@ bool ipf_format::generate_gap_from_description(const UINT8 *&data, const UINT8 *
 					block_size = size - res_size;
 				if(pos + block_size > size)
 					return false;
-				//				printf("pat=%02x block_size=%d size=%d res_size=%d post\n", pattern[0], block_size, size, res_size);
+				//              printf("pat=%02x block_size=%d size=%d res_size=%d post\n", pattern[0], block_size, size, res_size);
 				track_write_mfm(track, pattern, -block_size, pattern_size, block_size, context);
 				pos += block_size;
 			}

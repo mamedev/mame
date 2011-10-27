@@ -3176,12 +3176,12 @@ static CPU_EXECUTE( sh4be )
 
 			master_ophandler_table[opcode](sh4, opcode);
 
-			
+
 			if (sh4->test_irq && !sh4->delay)
 			{
 				sh4_check_pending_irq(sh4, "mame_sh4_execute");
 			}
-			
+
 
 		}
 		else

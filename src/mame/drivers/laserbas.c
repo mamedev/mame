@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( laserbas_io, AS_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN1") // DSW + something else?
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("IN2")
-//	AM_RANGE(0x23, 0x23) AM_WRITE(test_w) bit 2 presumably is a mux for 0x20?
+//  AM_RANGE(0x23, 0x23) AM_WRITE(test_w) bit 2 presumably is a mux for 0x20?
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pit0", pit8253_r, pit8253_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("pit1", pit8253_r, pit8253_w)
 	AM_RANGE(0x80, 0x9f) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)

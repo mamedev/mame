@@ -380,7 +380,7 @@ Quiz Ah Megamisama                             840-0030C  23227   16 (64Mb)  pre
 Shootout Pool                                  840-0098C  23844    4 (64mb)  present  317-0336-COM
 Shootout Pool - Shootout Pool Prize            840-0128C  24065    4 (64mb)  present  317-0367-COM
 Shootout Pool Medal                            ?          24148    4 (64Mb)  ?        ?
-Touch de UNO! 2                                840-0022C  23071    6 (64Mb)  present  317-0276-JPN 
+Touch de UNO! 2                                840-0022C  23071    6 (64Mb)  present  317-0276-JPN
 Virtua Fighter 4 Evolution                     840-0106B  23934   20 (64Mb)  present  317-0339-COM
 Virtua Tennis 2 / Power Smash 2 (Rev A)        840-0084C  22327A  18 (64Mb)  present  317-0320-COM
 
