@@ -185,6 +185,22 @@ Notes:
       VSync - 60.0952Hz
       HSync - 15.4442kHz
 
+Flicky sets version notes:
+
+flicky, flickyo
+---------------
+The both seem to be very similar programs.  Difficulty is easier than the S1,S2 sets.
+DIPs are also shared 100% with each other.
+
+flickys1, flickys2
+------------------
+Very noticibly more difficult than the other two sets.  DIPs have changes (less lives
+and bonus options).  There is no screen which shows the bonus lives values like the
+other two sets, either.  flickys1 allows for DEMO SOUND which none of the others sets
+seem to have access to as well as does not looping back during demonstration mode and
+staying at one screen continuously (level 5).  Protection error or proto?
+
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -1089,6 +1105,32 @@ static INPUT_PORTS_START( flicky )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(	0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( flickys1 )
+	PORT_INCLUDE( flicky )
+
+	PORT_MODIFY("SWB")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPSETTING(	0x0c, "2" )
+	PORT_DIPSETTING(	0x08, "3" )
+	PORT_DIPSETTING(	0x04, "4" )
+	PORT_DIPSETTING(	0x00, "5 (Infinite)" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPSETTING(	0x30, "80000" )
+	PORT_DIPSETTING(	0x20, "160000" )
+	PORT_DIPSETTING(	0x10, "240000" )
+	PORT_DIPSETTING(	0x00, "320000" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( flickys2 )
+	PORT_INCLUDE( flickys1 )
+
+	PORT_MODIFY("SWB")
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SWB:2" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wmatch )
@@ -4712,7 +4754,7 @@ GAME( 1984, mrviking,   0,        sys1ppis, mrviking,  mrviking, ROT270, "Sega",
 GAME( 1984, mrvikingj,  mrviking, sys1ppis, mrvikingj, mrviking, ROT270, "Sega",            "Mister Viking (315-5041, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, swat,       0,        sys1ppi,  swat,      swat,     ROT270, "Coreland / Sega", "SWAT (315-5048)", GAME_SUPPORTS_SAVE )
 GAME( 1984, flickyo,    flicky,   sys1ppi,  flicky,    flicky,   ROT0,   "Sega",            "Flicky (64k Version, System 1, 315-5051, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flickys1,   flicky,   sys1ppi,  flicky,    flicky,   ROT0,   "Sega",            "Flicky (64k Version, System 1, 315-5051, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flickys1,   flicky,   sys1ppi,  flickys1,  flicky,   ROT0,   "Sega",            "Flicky (64k Version, System 1, 315-5051, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, wmatch,     0,        sys1ppis, wmatch,    wmatch,   ROT270, "Sega",            "Water Match (315-5064)", GAME_SUPPORTS_SAVE )
 GAME( 1984, bullfgt,    0,        sys1ppi,  bullfgt,   bullfgtj, ROT0,   "Coreland / Sega", "Bullfight (315-5065)", GAME_SUPPORTS_SAVE )
 GAME( 1985, nprinces,   seganinj, sys1ppi,  seganinj,  flicky,   ROT0,   "bootleg?",        "Ninja Princess (315-5051, 64k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
@@ -4725,7 +4767,7 @@ GAME( 1986, nobb,       nob,      nob,      nob,       nobb,     ROT270, "bootle
 
 /* PIO-based System 1 */
 GAME( 1984, flicky,     0,        sys1pio,  flicky,    flicky,   ROT0,   "Sega",            "Flicky (128k Version, System 2, 315-5051)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flickys2,   flicky,   sys1pio,  flicky,    bank00,   ROT0,   "Sega",            "Flicky (128k Version, System 2, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flickys2,   flicky,   sys1pio,  flickys2,  bank00,   ROT0,   "Sega",            "Flicky (128k Version, System 2, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1984, thetogyu,   bullfgt,  sys1pio,  bullfgt,   bullfgtj, ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, spatter,    0,        sys1pios, spatter,   spatter,  ROT0,   "Sega",            "Spatter", GAME_SUPPORTS_SAVE )
 GAME( 1984, ssanchan,   spatter,  sys1pios, spatter,   spatter,  ROT0,   "Sega",            "Sanrin San Chan (Japan)", GAME_SUPPORTS_SAVE )
