@@ -20,7 +20,7 @@ CA021  Akai Katana
 
 CMDL01 Medal Mahjong Moukari Bancho
 
-Note: CA018 - DoDonPachi Dai-ou-jou Tamashii on PGM2 platform
+Note: CA018 - DoDonPachi Dai-Ou-Jou Tamashii on PGM2 platform
       CA020 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
 
 PCB CV1000-B / CV1000-D
@@ -5323,7 +5323,7 @@ static void cavesh_gfx_create_shadow_copy(address_space &space)
 	}
 }
 
-// Death Smiles has bad text with wrong clip sizes, must clip to screen size.
+// Deathsmiles has bad text with wrong clip sizes, must clip to screen size.
 static void cavesh_gfx_exec(void)
 {
 	UINT16 cliptype = 0;
@@ -5706,7 +5706,7 @@ static WRITE8_HANDLER( flash_cmd_w )
 	}
 }
 
-static WRITE8_HANDLER( flash_data_w ) // death smiles
+static WRITE8_HANDLER( flash_data_w ) // Deathsmiles
 {
 	if (!flash_enab)
 		return;
@@ -6541,7 +6541,7 @@ Do-Don-Pachi Dai-Fukkatsu Ver 1.0
 Do-Don-Pachi Dai-Fukkatsu Ver 1.5
 * "2008/06/23 MASTER VER 1.5"
 
-Do-Don-Pachi Dai-Fukkatsu Black label
+Do-Don-Pachi Dai-Fukkatsu Black Label
 * "2010/1/18 BLACK LABEL"
 
 Akai Katana
@@ -6556,7 +6556,7 @@ Mushihime-Sama Ver 1.5 Matsuri Version
 
 Shown     Title                                                   Notes
 -----------------------------------------------------------------------------------------------------------------------
-12/28/06  Mushihime-Sama Ver 1.5 ~Blus Label~                     No Maniac mode.
+12/28/06  Mushihime-Sama Ver 1.5 ~Blue Label~                     No Maniac mode.
 12/28/06  Mushihime-Sama Futari Ver 1.5 ~Red Label~               3 PCBs were given away to top scorers.
 12/28/06  Mushihime-Sama Futari Ver 1.01
 12/30/07  Muchi Muchi Pork! Dai Cave Festival ~Special Version~   Includes Pink Sweets bosses at the end of each stage.
