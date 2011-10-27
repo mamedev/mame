@@ -197,9 +197,7 @@ flickys1, flickys2
 Very noticibly more difficult than the other two sets.  DIPs have changes (less lives
 and bonus options).  There is no screen which shows the bonus lives values like the
 other two sets, either.  flickys1 allows for DEMO SOUND which none of the others sets
-seem to have access to as well as does not looping back during demonstration mode and
-staying at one screen continuously (level 5).  Protection error or proto?
-
+seem to have access to.
 
 ******************************************************************************/
 
