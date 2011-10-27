@@ -1391,12 +1391,10 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
     */
 	UINT32 zsortvalue24 = ((pSource[1]&0xfff)<<12)|(pSource[0]&0xfff);
 	struct SceneNode *node = NewSceneNode(machine, zsortvalue24, eSCENENODE_QUAD3D);
-	int i;
-	node->data.quad3d.cz_adjust = state->m_cz_adjust;
-	node->data.quad3d.flags = (pSource[3]<<6&0x1fff00) | (~pSource[3]&3);
-	node->data.quad3d.color = (pSource[2]&0xff00)>>8;
+	int i, cztype = pSource[3]&3;
 	if( state->m_mbSuperSystem22 )
 	{
+		cztype ^= 3;
 		node->data.quad3d.cmode       = (pSource[2]&0x00f0)>>4;
 		node->data.quad3d.textureBank = (pSource[2]&0x000f);
 	}
@@ -1405,6 +1403,9 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 		node->data.quad3d.cmode       = (pSource[0+4]&0xf000)>>12;
 		node->data.quad3d.textureBank = (pSource[1+4]&0xf000)>>12;
 	}
+	node->data.quad3d.cz_adjust = state->m_cz_adjust;
+	node->data.quad3d.flags = (pSource[3]<<6&0x1fff00) | cztype;
+	node->data.quad3d.color = (pSource[2]&0xff00)>>8;
 	pSource += 4;
 	for( i=0; i<4; i++ )
 	{
