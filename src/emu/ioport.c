@@ -2712,9 +2712,9 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 	/* if we got an absolute input, it overrides everything else */
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
 	{
-		if ((analog->previousanalog != rawvalue) || (analog->absolute && analog->autocenter && analog->centerdelta != 0 && rawvalue != 0))
+		if (analog->previousanalog != rawvalue)
 		{
-			/* update if analog value changed or out the deadzone of autocenter device */
+			/* only update if analog value changed */
 			analog->previousanalog = rawvalue;
 
 			/* apply the inverse of the sensitivity to the raw value so that */
