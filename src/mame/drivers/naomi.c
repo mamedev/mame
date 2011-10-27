@@ -369,18 +369,20 @@ IC17S-IC38S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are popula
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
-                                               Sticker    EPROM   MASKROMs   25LC040   A54SX32
-Game                                           on cart    IC11#   # of SOP44 IC13S#    IC1#          Notes
------------------------------------------------------------------------------------------------------------------------------
-Giant Gram 2000                                840-0039C  23377   20 (64Mb)  present   317-0296-COM
-Kick '4' Cash                                  840-0140C  24212   16 (64Mb)  present   317-0397-COM
-Marvel Vs. Capcom 2 New Age of Heroes (Rev A)  841-0007C  23085A  14 (64Mb)  present   317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
-Quiz Ah Megamisama                             840-0030C  23227   16 (64Mb)  present   317-0280-JPN
-Shootout Pool                                  840-0098C  23844    4 (64mb)  present   317-0336-COM
-Shootout Pool - Shootout Pool Prize            840-0128C  24065    4 (64mb)  present   317-0367-COM
-Shootout Pool Medal                            ?          24148    4 (64Mb)  ?         ?
-Virtua Fighter 4 Evolution                     840-0106B  23934   20 (64Mb)  present   317-0339-COM
-Virtua Tennis 2 / Power Smash 2 (Rev A)        840-0084C  22327A  18 (64Mb)  present   317-0320-COM
+                                               Sticker    EPROM   MASKROMs   25LC040  A54SX32
+Game                                           on cart    IC11#   # of SOP44 IC13S#   IC1#          Notes
+----------------------------------------------------------------------------------------------------------------------------
+Giant Gram 2000                                840-0039C  23377   20 (64Mb)  present  317-0296-COM
+Kick '4' Cash                                  840-0140C  24212   16 (64Mb)  present  317-0397-COM
+Marvel Vs. Capcom 2 New Age of Heroes (Rev A)  841-0007C  23085A  14 (64Mb)  present  317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
+MushiKing The King of Beetles 2K3 2ND          840-0150C  24217    6 (64Mb)  present  317-0394-COM
+Quiz Ah Megamisama                             840-0030C  23227   16 (64Mb)  present  317-0280-JPN
+Shootout Pool                                  840-0098C  23844    4 (64mb)  present  317-0336-COM
+Shootout Pool - Shootout Pool Prize            840-0128C  24065    4 (64mb)  present  317-0367-COM
+Shootout Pool Medal                            ?          24148    4 (64Mb)  ?        ?
+Touch de UNO! 2                                840-0022C  23071    6 (64Mb)  present  317-0276-JPN 
+Virtua Fighter 4 Evolution                     840-0106B  23934   20 (64Mb)  present  317-0339-COM
+Virtua Tennis 2 / Power Smash 2 (Rev A)        840-0084C  22327A  18 (64Mb)  present  317-0320-COM
 
 
 
@@ -471,19 +473,20 @@ Notes:
       CN4   - 6 legs connector for ISP programming
 
    Games known to use this PCB include....
-                                     Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S
-Game                                 on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
+                                       Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S
+Game                                   on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
 ------------------------------------------------------------------------------------------------------------------------------
 /Akatsuki Denkou Senki Blitz Kampf
-\Ausf. Achse                         841-0058C  not present  4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A" - IC#10 & IC#11 are empty
-Dynamite Deka EX / Asian Dynamite    840-0175C  not present  4 (512Mb)   present  317-0495-COM  present  IC2# is labeled "VER.2"
-Illmatic Envelope                    841-0059C  not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2" - IC#11 is empty
-Mamonoro                             841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
-Melty Blood Actress Again            841-0061C  not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
-Melty Blood Actress Again (Rev A)    841-0061C  24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
-Poka Suka Ghost / Manic Panic Ghost  840-0170C  not present  5 (512Mb)   present  317-0461-COM  present
-Shooting Love 2007                   841-0057C  not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
-Touch De Zunou (Rev A)               840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
+\Ausf. Achse                           841-0058C  not present  4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A" - IC#10 & IC#11 are empty
+Dynamite Deka EX / Asian Dynamite      840-0175C  not present  4 (512Mb)   present  317-0495-COM  present  IC2# is labeled "VER.2"
+Illmatic Envelope                      841-0059C  not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2" - IC#11 is empty
+Mamoru-kun wa Norowarete Shimatta      841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
+Melty Blood Actress Again              841-0061C  not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
+Melty Blood Actress Again (Rev A)      841-0061C  24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
+Mushiking - The King Of Beetles II ENG 840-0164C  24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
+Poka Suka Ghost / Manic Panic Ghost    840-0170C  not present  5 (512Mb)   present  317-0461-COM  present
+Shooting Love 2007                     841-0057C  not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
+Touch De Zunou (Rev A)                 840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
 
 
 
@@ -7529,6 +7532,8 @@ ROM_END
 /* 13636 */ GAME( 1998, hotd2o,   hotd2,    naomi,   hotd2,    hotd2,   ROT0, "Sega", "House of the Dead 2 (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
 /* 13842 */ GAME( 1999, f355,     f355bios, naomi,   naomi,    0,       ROT0, "Sega", "Ferrari F355 Challenge", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
 /* 13950 */ GAME( 1999, f355twin, f355bios, naomim2, naomi,    0,       ROT0, "Sega", "Ferrari F355 Challenge (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
+/* ????? */ GAME( 2001, f355twn2, f355bios, naomim2, naomi,    0,       ROT0, "Sega", "Ferrari F355 Challenge 2 (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
+/* ????? */ GAME( 1999, alpiltdx, airlbios, naomim2, naomi,    0,       ROT0, "Sega", "Airline Pilots Deluxe (Rev B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
 
 /* 840-xxxxx (Sega Naomi cart games)*/
 /* 0001 */ GAME( 1998, dybbnao,  naomi,    naomi,   dybbnao,  naomi,    ROT0, "Sega", "Dynamite Baseball NAOMI (JPN)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7560,7 +7565,6 @@ ROM_END
 /* 0039 */ GAME( 2000, gram2000, naomi,    naomim1, naomi,    gram2000, ROT0, "Sega", "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0040 */ GAME( 2000, wwfroyal, naomi,    naomim2, naomi,    naomi,    ROT0, "Sega", "WWF Royal Rumble (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0041 */ GAME( 2000, slasho,   naomi,    naomim2, naomi,    naomi,    ROT0, "Sega", "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0042 */ GAME( 2001, f355twn2, f355bios, naomim2, naomi,    0,        ROT0, "Sega", "Ferrari F355 Challenge 2 (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
 /* 0043 */ GAME( 2000, crackndj, naomi,    naomim2, crackndj, naomi,    ROT0, "Sega", "Crackin' DJ", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0044 */ GAME( 2000, csmasho,  csmash,   naomim2, naomi,    naomi,    ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0044 */ GAME( 2000, csmash,   naomi,    naomim2, naomi,    naomi,    ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7577,14 +7581,13 @@ ROM_END
 /* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128 */ GAME( 2002, shootpl,  naomi,    naomim1, naomi,    naomi,    ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi,    kick4csh, ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-// 0150 MushiKing - The King Of Beetle 2K3 2ND
-// 0164 MushiKing - The King Of Beetle II ENG
+// 0150 MushiKing The King Of Beetle 2K3 2ND
+// 0164 MushiKing The King Of Beetle II ENG
 // 0166 Touch De Zunou (Japan)
 // 0166 Touch De Zunou (Japan) (Rev A)
 /* 0170 */ GAME( 2007, pokasuka, naomi,    naomim4, naomi,    naomi,    ROT0, "Sega", "Pokasuka Ghost", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0175 */ GAME( 2007, asndynmt, naomi,    naomim4, naomi,    naomi,    ROT0, "Sega", "Asian Dynamite", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 00?? */ GAME( 1999, ringout,  naomi,    naomim2, naomi,    naomi,    ROT0, "Sega", "Ring Out 4x4", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 00?? */ GAME( 1999, alpiltdx, airlbios, naomim2, naomi,    0,        ROT0, "Sega", "Airline Pilots Deluxe (Rev B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
 /* 0??? */ GAME( 2001, shootplm, naomi,    naomim1, naomi,    naomi,    ROT0, "Sega", "Shootout Pool Medal", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 00?? Crackin' DJ Part 2
 // 00?? Touch de Uno!
@@ -7622,7 +7625,7 @@ ROM_END
 /* 0057 */ GAME( 2007, sl2007,   naomi,    naomim4, naomi,    naomi,    ROT270, "Triangle Service", "Shooting Love 2007", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0058 */ GAME( 2008, ausfache, naomi,    naomim4, naomi,    naomi,    ROT0, "Subtle Style",    "Akatsuki Blitzkampf Ausf Achse", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0059 */ GAME( 2008, illvelo,  naomi,    naomim4, naomi,    naomi,    ROT270, "Milestone",     "Illvelo (Illmatic Envelope)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-// 0060 Mamonoro - Mamoru-kun wa Norowarete Shimatta!
+// 0060 Mamoru-kun wa Norowarete Shimatta!
 // 0061 Melty Blood Actress Again
 // 0061 Melty Blood Actress Again (Rev A)
 // 0062 Radilgy Noar

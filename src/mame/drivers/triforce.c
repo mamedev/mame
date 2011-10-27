@@ -41,7 +41,8 @@ Games on this system include....
 | |F-Zero AX - Monster Ride Cycraft Edition                 | Sega / Nintendo, 2004   | GDROM ?         | ?            |
 | |The Key Of Avalon 1.10                                   | Sega, 2003              | GDROM ?         | ?            |
 | |The Key Of Avalon 1.20: Summon The New Monster           | Sega, 2003              | GDROM ?         | ?            |
-| |Donkey Kong:Banana Kingdom                               | Namco / Nintendo, 2006  | ?               | ?            |
+| |The Key Of Avalon 2.5: War of the Key                    | Sega, 2005              | GDROM ?         | ?            |
+| |Donkey Kong:Banana Kingdom                               | Namco / Nintendo, 2006  | ROM Cart ?      | ?            |
 | |Starfox Armada (planned, but not released)               | Namco / Nintendo, 2002? | ?               | ?            |
 +-+---------------------------------------------------------+-------------------------+-----------------+--------------+
 * denotes these games are archived.
@@ -680,4 +681,4 @@ GAME( 2004, tfupdate, triforce, triforcegd,    triforce,    0, ROT0, "Sega",    
 GAME( 2004, vs4j,     triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 (Japan) (GDT-0013E)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vs4,      triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 (Export) (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, avalon20, triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2006, vs42006,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 ver. 2006 (Rev D) (Japan) (GDT-0020D)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, vs42006,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", GAME_NO_SOUND|GAME_NOT_WORKING )

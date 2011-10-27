@@ -4884,7 +4884,7 @@ moeru			// 2002.12 Moeru Casinyo
 quizqgd			// 2002.?? Quiz Keitai Q mode
 shootopl		// 2002.?? Shootout Pool
 shootpl			// 2002.?? Shootout Pool / Shootout Pool Prize (Rev A)
-				// 2003.02 MushiKing - The King Of Beetle
+				// 2003.02 MushiKing The King Of Beetle
 				// 2003.03 Sega Network Taisen Mahjong MJ
 ggxxrl			// 2003.03 Guilty Gear XX # Reload (Rev A)
 shikgam2		// 2003.04 Shikigami No Shiro II / The Castle of Shikigami II
@@ -4901,7 +4901,6 @@ tetkiwam		// 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 f
 trizeal			// 2004.09 Trizeal
 				// 2004.?? Dragon Treasure 2
 kick4csh		// 2004.?? Kick '4' Cash
-				// 2004.?? MushiKing II - The King Of Beetle II
 				// 2004.?? The Quiz Show
 				// 2005.03 Melty Blood Act Cadenza
 ss2005			// 2005.03 Super Shanghai 2005
@@ -4915,8 +4914,8 @@ undefeat		// 2005.10 Under Defeat
 				// 2005.12 Radirgy (Rev. A)
 				// 2005.?? Dragon Treasure 3 (Rev A)
 				// 2005.?? ExZeus
-				// 2005.?? MushiKing III - The King Of Beetle III
-
+				// 2005.?? Mushiking The King Of Beetles II ENG
+				// 2005.?? MushiKing The King Of Beetle III
 kurucham		// 2006.03 Kurukuru Chameleon
 trgheart		// 2006.05 Trigger Heart Exelica (Rev A)
 				// 2006.07 Touch de Zunou
@@ -4928,24 +4927,20 @@ meltyb			// 2006.12 Melty Blood Act Cadenza ver.B
 meltyba			// 2006.12 Melty Blood Act Cadenza ver.B (Rev A)
 takoron			// 2006.12.16 Noukone Puzzle Takoron										// Last GD-ROM game?
 				// 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2)
-
-				// Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced
-
+// Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced.
 pokasuka		// 2007.07 Pokasuka Ghost!
 sl2007			// 2007.07 Shooting Love
 asndynmt		// 2007.07 Dynamite Deka EX - Asian dynamite
 				// 2007.09 Rhythm Tengoku
 ausfache		// 2008.02 Akatsuki Denkou Senki Ausf.Achse
 illvelo			// 2008.06 Illvelo (Illmatic Envelope)
-				// 2008.07 Mamoru Kun wa Norowarete Shimatta!
+				// 2008.07 Mamoru-kun wa Norowarete Shimatta!
 				// 2008.09 Melty Blood Actress Again
 				// 2008.12 Melty Blood Actress Again ver.A
 				// 2009.06 Radirgy Noah
 				// 2009.?? Project Cerberus (planned to be released in 2009)
-
-
-ngdup23a		// DIMM Firmware Updater
-ngdup23c
+ngdup23a		// DIMM Firmware Updater (Rev A)
+ngdup23c        // DIMM Firmware Updater (Rev C)
 
 // NAOMI based (System SP)
 				// 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
@@ -4959,7 +4954,7 @@ ngdup23c
 				// 2008.07 Issyo ni Turbo Drive
 
 // NAOMI 2
-naomi2
+naomi2			// 2001.?? Naomi 2 BIOS
 vstrik3			// 2001.04 Virtua Striker 3 (GD-ROM)
 vstrik3cb		// 2001.04 Virtua Striker 3 (Rev B) (cartridge)
 vstrik3c		// 2001.04 Virtua Striker 3 (Rev C) (cartridge)
@@ -4972,14 +4967,14 @@ vf4b			// 2001.08.20 Virtua Fighter 4 (Rev B) (cartridge)
 vf4c			// 2002.01.31 Virtua Fighter 4 (Rev C) (cartridge)
 kingrt66		// 2002.02 The King of Route 66 (Rev A)
 initd			// 2002.03 Initial D Arcade Stage (Japan) (Rev B)
-				// 2002.06 WCCF SERIE A 2001-2002
+				// 2002.06 World Club Champion Football Serie A 2001-2002
 				// 2002.07 Soul Surfer
 vf4evoct		// 2002.08 Virtua Fighter 4 Evolution (cartridge)
 vf4evoa			// 2002.08 Virtua Fighter 4 Evolution
-				// 2002.11 WCCF SERIE A 2001-2002 ver.1.2
-initdv2j		// 2002.12 Initial D Arcade Stage ver.2 rev. B
-initdv2jo		// 2002.12 Initial D Arcade Stage ver.2
-initdv2e		// 2002.12 Initial D Arcade Stage ver.2
+				// 2002.11 World Club Champion Football Serie A 2001-2002 Ver.1.2
+initdv2j		// 2002.12 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
+initdv2jo		// 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
+initdv2e		// 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo			// 2002.12 Virtua Fighter 4 Evolution ver.B
 clubkrte		// 2002.?? Club Kart: European Session
 initdexp		// 2002.?? Initial D Arcade Stage (Export)
@@ -4997,18 +4992,16 @@ vf4tuneda		// 2004.09 Virtua Fighter 4 Final Tuned (Rev A)
 vf4tunedd		// 2004.10 Virtua Fighter 4 Final Tuned (Rev D)
 vf4tuned		// 2004.12 Virtua Fighter 4 Final Tuned (Rev F)
 				// 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.1
-				// 2004.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B)
 				// 2005.04 Menkyo no Tetsujin
 				// 2005.06 World Club Champion Football European Clubs 2004-2005
-
-				// 2006.01 WCCF European Clubs 2004-2005 ver.1.1
-				// 2006.03 WCCF European Clubs 2004-2005 ver.1.2
-				// 2006.08 WCCF European Clubs 2005-2006
-				// 2006.10 WCCF European Clubs 2005-2006 bugfix ver.
-
+				// 2006.01 World Club Champion Football European Clubs 2004-2005 Ver 1.1
+				// 2006.03 World Club Champion Football European Clubs 2004-2005 Ver 1.2
+				// 2006.08 World Club Champion Football European Clubs 2005-2006
+				// 2006.10 World Club Champion Football European Clubs 2005-2006 bugfix
+				// 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B)
 
 // Atomiswave (Dreamcast-based) games
-awbios
+awbios          // 2002.?? Atomiswave BIOS
 maxspeed		// 2002.12 Maximum Speed
 sprtshot		// 2002.12 Sports Shooting USA
 ggx15			// 2003.03 Guilty Gear X ver.1.5
@@ -5037,7 +5030,7 @@ xtrmhnt2		// 2006.09 Extreme Hunting 2 Tournament Edition
 				// 2008.?? Sega Clay Challenge
 
 // Hikaru
-hikaru			// BIOS (c)2000
+hikaru			// 2000.?? Hikaru BIOS
 braveff			// 1999.06 Syouboushi Brave Fire Fighters
 podrace			// 2000.06 Star Wars: Racer Arcade
 sgnascar		// 2000.09 Nascar Arcade
@@ -5047,7 +5040,7 @@ airtrix			// 2001.02 Air Trix
 				// 2002.04 Dennou Senki Virtual-On Force ver.7.7
 
 // Triforce (GameCube based)
-triforce
+triforce        // 2002.?? Triforce BIOS
 vs2002j			// 2002.10 Virtua Striker 2002 (Japan)
 vs2002ex		// 2002.10 Virtua Striker 2002 (Export)
 				// 2003.06 F-Zero AX
@@ -5065,13 +5058,11 @@ tfupdate		// 2004.?? Triforce GDROM Boot Update (GDT-0011)
 				// 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen
 				// 2005.12 Mario Kart Arcade Grand Prix
 				// 2005.?? Donkey Kong Jungle Fever
-
 vs42006			// 2006.05 Virtua Striker 4 ver.2006
 				// 2007.03 Mario Kart Arcade Grand Prix 2
 
-
 // Chihiro (X-Box based)
-chihiro
+chihiro         // 2002.?? Chihiro BIOS
 hotd3			// 2002.12 The House of the Dead III
 crtaxihr		// 2003.03 Crazy Taxi High Roller (Rev B)
 vcop3			// 2003.04 Virtua Cop 3 (Rev A)
@@ -5109,7 +5100,6 @@ wangmd2b		// 2005.10 Wangan Midnight Maximum Tune 2 (Japan) (Rev A)
 mj3				// 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev D)
 				// 2005.12 Quest of D Gofu no Keisyousya ver.2.01
 scg06nt			// 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
-
 				// 2006.02 Sangokushi Taisen Ranse no Gunrou ver.1.12
 				// 2006.03 Mobile Suit Gundam 0079 Card Builder ver.1.007
 				// 2006.03 Quest of D Gofu no Keisyousya ver.2.02b
@@ -5122,7 +5112,6 @@ scg06nt			// 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 				// 2006.10 Quest of D ver.3.00 Oukoku no Syugosya
 				// 2006.11 Quest of D ver.3.01 Oukoku no Syugosya
 				// 2006.11 Mobile Suit Gundam 0079 Card Builder ver.2.02
-
 				// 2007.03 Mobile Suit Gundam 0083 Card Builder
 				// 2007.10 Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu
 				// 2007.11 Quest of D The Battle Kingdom ver.4.00
