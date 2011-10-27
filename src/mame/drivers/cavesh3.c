@@ -13,15 +13,15 @@ CA015  Mushihime-Sama Futari
 CA015B Mushihime-Sama Futari Black Label
 CA016  Muchi Muchi Pork!
 CA017  Deathsmiles
-CA017B Deathsmiles Black Label
+CA017B Deathsmiles Mega Black Label
 CA019  Do-Don-Pachi Dai-Fukkatsu
 CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
 CA021  Akai Katana
 
 CMDL01 Medal Mahjong Moukari Bancho
 
-Note: CA018 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
-      CA020 - Do-Don-Pachi Dai-ou-jou Tamashii on PGM2 platform
+Note: CA018 - DoDonPachi Dai-ou-jou Tamashii on PGM2 platform
+      CA020 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
 
 PCB CV1000-B / CV1000-D
 +--------------------------------------------+
@@ -6501,7 +6501,7 @@ Ibara Kuro Black Label
   "2006/02/06 MASTER VER."
   "2006/02/06. MASTER VER."
 
-Pink Sweets: Ibara Sorkara
+Pink Sweets: Ibara Sorekara
   "2006/04/06 MASTER VER."
   "2006/04/06 MASTER VER..."
   "2006/04/06 MASTER VER...."
@@ -6509,12 +6509,12 @@ Pink Sweets: Ibara Sorkara
 * "2006/xx/xx MASTER VER"
   "2006/xx/xx MASTER VER."
 
-Mushihime-Sama Futari 1.0
+Mushihime-Sama Futari Ver 1.0
 * "2006/10/23 MASTER VER"  - Ultra unlockable
   "2006/10/23 MASTER VER." - Ultra unlockable
 * "2006/10/23.MASTER VER." - Cannot unlock ultra
 
-Mushihime-Sama Futari 1.5
+Mushihime-Sama Futari Ver 1.5
   "2006/12/8 MASTER VER 1.54"
   "2006/12/8.MASTER VER. 1.54."
 
@@ -6535,10 +6535,10 @@ Deathsmiles
 Deathsmiles Mega Black Label
 * "2008/10/06 MEGABLACK LABEL VER"
 
-Do-Don-Pachi Dai-Fukkatsu 1.0
+Do-Don-Pachi Dai-Fukkatsu Ver 1.0
 * "2008/05/16 MASTER VER"
 
-Do-Don-Pachi Dai-Fukkatsu 1.5
+Do-Don-Pachi Dai-Fukkatsu Ver 1.5
 * "2008/06/23 MASTER VER 1.5"
 
 Do-Don-Pachi Dai-Fukkatsu Black label
@@ -6548,7 +6548,7 @@ Akai Katana
 * "2010/ 8/13 MASTER VER."
 *  Home/Limited version, unknown date line, different gameplay from regular version, doesn't accept coins - permanent freeplay
 
-Mushihime-Sama 1.5 Matsuri Version
+Mushihime-Sama Ver 1.5 Matsuri Version
 * 2011/5/23 CAVEMATSURI VER 1.5
 
 
@@ -6556,12 +6556,12 @@ Mushihime-Sama 1.5 Matsuri Version
 
 Shown     Title                                                   Notes
 -----------------------------------------------------------------------------------------------------------------------
-12/28/06  Mushihime-Sama VER 1.5 ~Blus Label~                     No Maniac mode.
-12/28/06  Mushihime-Sama Futari VER 1.5 ~Red Label~               3 PCBs were given away to top scorers.
-12/28/06  Mushihime-Sama Futari VER 1.01
+12/28/06  Mushihime-Sama Ver 1.5 ~Blus Label~                     No Maniac mode.
+12/28/06  Mushihime-Sama Futari Ver 1.5 ~Red Label~               3 PCBs were given away to top scorers.
+12/28/06  Mushihime-Sama Futari Ver 1.01
 12/30/07  Muchi Muchi Pork! Dai Cave Festival ~Special Version~   Includes Pink Sweets bosses at the end of each stage.
 12/30/07  Deathsmiles: Dai Cave Festival ~Special Version~        Inclueds a rank 99 difficulty. Prototype for DSMBL.
-08/15/08  Do-Don-Pachi Dai-Fukkatsu VER 1.5 ~Special~             Power-style only.
-10/20/10  Do-Don-Pachi Dai-Fukkatsu VER 1.51
+08/15/08  Do-Don-Pachi Dai-Fukkatsu Ver 1.5 ~Special~             Power-style only.
+10/20/10  Do-Don-Pachi Dai-Fukkatsu Ver 1.51
 
 */
