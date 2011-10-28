@@ -2271,6 +2271,41 @@ ROM_START( kotm2 ) /* MVS AND AES VERSION */
 	ROM_LOAD16_BYTE( "039-c4.c4", 0x200001, 0x080000, CRC(81c9c250) SHA1(e3a34ff69081a8681b5ca895915892dcdccfa7aa) ) /* Plane 2,3 */ /* TC534200 */
 ROM_END
 
+// fairly late prototype release, only the code differs from the main set
+ROM_START( kotm2p )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "p1.bin", 0x000001, 0x080000, CRC(3c1d17e7) SHA1(aeaff465fafa46ded903ed4e8cb8cd05de8dc096) )
+	ROM_LOAD16_BYTE( "p2.bin", 0x000000, 0x080000, CRC(bc9691f0) SHA1(3854659b952d4f8c2edd5d59858a61ce6d518604) )
+
+	NEO_SFIX_128K( "s1.bin", CRC(63ee053a) SHA1(7d4b92bd022708975b1470e8f24d1f5a712e1b94) )
+
+	NEO_BIOS_AUDIO_128K( "m1.bin", CRC(0c5b2ad5) SHA1(15eb5ea10fecdbdbcfd06225ae6d88bb239592e7) )
+
+	// same data as main set, but prototype board layout
+	ROM_REGION( 0x300000, "ymsnd", 0 )
+	ROM_LOAD( "v1.bin", 0x000000, 0x080000, CRC(dd3566f1) SHA1(f7c2a3747aaab2bc57cdfa33d8bb9fab057b5214) )
+	ROM_LOAD( "v2.bin", 0x080000, 0x080000, CRC(57f60274) SHA1(7e17740aa05cf7ad4f9084e147600a8eb82c7284) )
+	ROM_LOAD( "v3.bin", 0x100000, 0x080000, CRC(0f008a07) SHA1(ed243a0449232bbea409308c3fec7e057fcd8501) )
+	ROM_LOAD( "v4.bin", 0x180000, 0x080000, CRC(1943d0fe) SHA1(47fb716c76ea6b5fe64204ff6d72b7feea10bda9) )
+	ROM_LOAD( "v5.bin", 0x200000, 0x080000, CRC(13be045b) SHA1(0e3713ae6b164ebae434c0f18c466365b26b9a77) )
+	ROM_LOAD( "v6.bin", 0x280000, 0x080000, CRC(d1dd3fd6) SHA1(052b92168a76cf3a97c8cacebcc3ebab228726df) )
+
+	NO_DELTAT_REGION
+
+	// same data as main set, but prototype board layout
+	ROM_REGION( 0x600000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_LOAD32_BYTE( "c1.bin", 0x000000, 0x100000, CRC(7192a787) SHA1(7bef6ce79c618103485480aee3c6f856968eb51f) )
+	ROM_LOAD32_BYTE( "c2.bin", 0x000002, 0x100000, CRC(7157eca1) SHA1(65f36c6a3834775b04076d2c38a6047bffe9a8cf) )
+	ROM_LOAD32_BYTE( "c3.bin", 0x000001, 0x100000, CRC(11d75727) SHA1(5a4c7b5ca3f1195e7853b45c5e71c13fe74d16e9) )
+	ROM_LOAD32_BYTE( "c4.bin", 0x000003, 0x100000, CRC(7ad48b28) SHA1(27e65d948f08c231107cb1a810e2b06731091fc3) )
+	ROM_LOAD32_BYTE( "c5.bin", 0x400000, 0x080000, CRC(5bdaf9ca) SHA1(60620d42ac6cd0e5da019fede2814a2f4171ff3f) )
+	ROM_LOAD32_BYTE( "c6.bin", 0x400002, 0x080000, CRC(21d4be8c) SHA1(f1b19d37d52d21584f304b7d37d5c096b58219d6) )
+	ROM_LOAD32_BYTE( "c7.bin", 0x400001, 0x080000, CRC(da55fd00) SHA1(52804f955597591fdd1d7478dc340b36d3c08c4a) )
+	ROM_LOAD32_BYTE( "c8.bin", 0x400003, 0x080000, CRC(592e9267) SHA1(0d27de59970ccbcaa1d47909ea3d741ffb0d9e07) )
+ROM_END
+
+
+
 /****************************************
  ID-0040
  . NGM-040
@@ -9752,6 +9787,7 @@ GAME( 1991, roboarmy,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Rob
 //GAME( 1991, roboarma,  roboarmy, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Robo Army (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1992, fbfrenzy,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Football Frenzy (NGM-034)(NGH-034)", GAME_SUPPORTS_SAVE )
 GAME( 1992, kotm2,     neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "King of the Monsters 2 - The Next Thing (NGM-039)(NGH-039)", GAME_SUPPORTS_SAVE )
+GAME( 1992, kotm2p,    kotm2,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "King of the Monsters 2 - The Next Thing (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1993, sengoku2,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Sengoku 2 / Sengoku Denshou 2", GAME_SUPPORTS_SAVE )
 GAME( 1992, bstars2,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Baseball Stars 2", GAME_SUPPORTS_SAVE )
 GAME( 1992, quizdai2,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Quiz Meitantei Neo & Geo - Quiz Daisousa Sen part 2 (NGM-042)(NGH-042)", GAME_SUPPORTS_SAVE )
