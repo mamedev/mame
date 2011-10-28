@@ -8,8 +8,8 @@
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
  *       (is this related to dsp? or cpu?)
- * - no sprites shown in dirtdash: looks like the same issue as airco22b: find out how/where vics num_sprites is determined exactly
- * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly, or is it linktable related?
+ * - find out how/where vics num_sprites is determined exactly, it causes major sprite problems in airco22b
+ *       dirtdash would have this issue too, if not for the current workaround
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
  *       (probably a bug in rgbint, not here?)
@@ -1714,7 +1714,13 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
     0x940060..0x94007c      set#2
     */
 
+	// where do the games store the number of sprites to be processed by vics???
+	// the current default implementation (using spritelist size) is clearly wrong and causes problems in dirtdash and airco22b
 	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
+
+	// dirtdash sprite list starts at xxx4, number of sprites is stored in xxx0, it doesn't use set#2
+	if (state->m_gametype == NAMCOS22_DIRT_DASH) num_sprites = (state->m_vics_data[(state->m_vics_control[0x48/4]&0x4000)/4] & 0xff) + 1;
+
 	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
