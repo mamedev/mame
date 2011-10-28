@@ -126,6 +126,9 @@ WRITE32_HANDLER( namcos22_paletteram_w );
 READ32_HANDLER( namcos22_textram_r );
 WRITE32_HANDLER( namcos22_textram_w );
 
+READ32_HANDLER( namcos22s_vics_control_r );
+WRITE32_HANDLER( namcos22s_vics_control_w );
+
 READ32_HANDLER( namcos22_gamma_r );
 WRITE32_HANDLER( namcos22_gamma_w );
 

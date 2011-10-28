@@ -4,10 +4,11 @@
  * todo (ordered by importance):
  *
  * - emulate slave dsp!
- * - emulate spot
+ * - emulate spot (see testmode and dirtdash)
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
  *       (is this related to dsp? or cpu?)
+ * - no sprites shown in dirtdash
  * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly, or is it linktable related?
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
@@ -1699,16 +1700,16 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
 	/*
-    0x940000 -x------       sprite chip busy
+    0x940000 -x------       sprite chip busy?
     0x940018 xxxx----       clr.w   $940018.l
 
     0x940030 xxxxxxxx       0x0600000 - enable bits?
     0x940034 xxxxxxxx       0x3070b0f
 
-    0x940040 xxxxxxxx       sprite attribute size
-    0x940048 xxxxxxxx       sprite attribute list baseaddr
-    0x940050 xxxxxxxx       sprite color size
-    0x940058 xxxxxxxx       sprite color list baseaddr
+    0x940040 xxxxxxxx       sprite attribute size             high bit means busy?
+    0x940048 xxxxxxxx       sprite attribute list baseaddr    high bit means busy?
+    0x940050 xxxxxxxx       sprite color size                 high bit means busy?
+    0x940058 xxxxxxxx       sprite color list baseaddr        high bit means busy?
 
     0x940060..0x94007c      set#2
     */
@@ -1729,6 +1730,38 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, deltax, deltay, y_lowres );
 	}
 } /* DrawSprites */
+
+READ32_HANDLER( namcos22s_vics_control_r )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	UINT32 ret = state->m_vics_control[offset];
+
+	switch (offset*4)
+	{
+		// reg 0, status register?
+		// high byte is read in timecris and lower half is expected to be 0
+		case 0x00:
+			ret = 0;
+			break;
+
+		// sprite attr/color size regs: high bit is busy/ready?
+		// dirtdash reads these and waits for it to become 0
+		case 0x40: case 0x50: case 0x60: case 0x70:
+			ret &= 0x7fffffff;
+			break;
+
+		default:
+			break;
+	}
+	return ret;
+}
+
+WRITE32_HANDLER( namcos22s_vics_control_w )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	COMBINE_DATA(&state->m_vics_control[offset]);
+}
+
 
 static void UpdatePalette(running_machine &machine)
 {

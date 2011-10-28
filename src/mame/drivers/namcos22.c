@@ -2588,7 +2588,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_BASE_MEMBER(namcos22_state, m_textram)
 	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE_MEMBER(namcos22_state, m_tilemapattr)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_vics_data)
-	AM_RANGE(0x940000, 0x94007f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_vics_control)
+	AM_RANGE(0x940000, 0x94007f) AM_READWRITE(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_BASE_MEMBER(namcos22_state, m_vics_control)
 	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_spriteram) /* C374 */
 	AM_RANGE(0xa04000, 0xa0bfff) AM_READWRITE(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE_MEMBER(namcos22_state, m_shareram) /* COM RAM */
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_BASE_MEMBER(namcos22_state, m_polygonram)
@@ -5772,7 +5772,7 @@ GAME( 1994, alpinerd, 0,         namcos22s, alpiner,  alpiner,  ROT0, "Namco", "
 GAME( 1994, alpinerc, alpinerd,  namcos22s, alpiner,  alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, airco22b, 0,         namcos22s, airco22,  airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)"    , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // boots but missing sprite clear DMA?
 GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/04/04
-GAME( 1995, dirtdash, 0,         namcos22s, dirtdash, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 95/12/20 20:01:56. locks up, dsp comms/slave dsp? - romdump looks fine
+GAME( 1995, dirtdash, 0,         namcos22s, dirtdash, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 95/12/20 20:01:56. many issues: slowdown, missing sprites, text layer transparency, spot ram
 GAME( 1995, timecris, 0,         namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
 GAME( 1995, timecrisa,timecris,  namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl, 0,         namcos22s, propcycl, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
