@@ -2444,11 +2444,11 @@ static WRITE32_HANDLER( namcos22_mcuram_w )
 }
 
 /**
- * I don't know how "SPOT RAM" affects the display, yet.
- * I believe it's to support a "spotlight" effect, orthogonal to the polygon layer.
+ * Spot RAM affects how the text layer is blended with the scene, it is not yet known exactly how.
  * It isn't directly memory mapped, but rather ports are used to populate and poll it.
  *
  * See Time Crisis "SPOT RAM" self test for sample use.
+ * It is also used in Dirt Dash night section.
  */
 #define SPOTRAM_SIZE (320*4)
 

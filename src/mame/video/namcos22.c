@@ -179,7 +179,7 @@ UpdateVideoMixer( running_machine &machine )
     16,17,18        global fade rgb
     19              global fade factor
     1a              fade target flags
-    1b              textlayer palette base?
+    1b              textlayer palette base
     1c
     1d
     1e
@@ -624,7 +624,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 
         */
 
-		/*  czattr:
+		/*  czattr: - assumed that it's write-only
                0    2    4    6    8    a    c    e
             ^^^^ ^^^^ ^^^^ ^^^^                        cz offset, signed16 per cztype 0,1,2,3
                                 ^^^^                   flags, nybble per cztype 3,2,1,0 - 4 probably means enable
