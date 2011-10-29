@@ -5545,6 +5545,7 @@ static DRIVER_INIT( airco22 )
 {
 	namcos22_init(machine, NAMCOS22_AIR_COMBAT22);
 
+	// S22-BIOS ver1.20 namco all rights reserved 94/12/21
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(airco22_mcu_adc_r));
 }
 
@@ -5669,6 +5670,7 @@ static DRIVER_INIT( tokyowar )
 	namcos22_init(machine, NAMCOS22_TOKYO_WARS);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(tokyowar_mcu_adc_r));
+	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a8;
 }
@@ -5678,6 +5680,7 @@ static DRIVER_INIT( aquajet )
 	namcos22_init(machine, NAMCOS22_AQUA_JET);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(aquajet_mcu_adc_r));
+	install_141_speedup(machine);
 }
 
 static DRIVER_INIT( dirtdash )
@@ -5686,6 +5689,7 @@ static DRIVER_INIT( dirtdash )
 	namcos22_init(machine, NAMCOS22_DIRT_DASH);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
+	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a2;
 }
