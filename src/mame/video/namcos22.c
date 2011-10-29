@@ -4,7 +4,7 @@
  * todo (ordered by importance):
  *
  * - emulate slave dsp!
- * - emulate spot (see testmode and dirtdash)
+ * - emulate spot (see testmode and dirtdash - other textlayer transparency issues in dirtdash is also spot related?)
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
  *       (is this related to dsp? or cpu?)
@@ -1830,7 +1830,8 @@ READ32_HANDLER( namcos22_tilemapattr_r )
 			// or maybe relative to posirq?
 			if (space->machine().primary_screen->vblank()) lo = 0x1ff;
 			else lo = space->machine().primary_screen->vpos() >> 1;
-			return hi|lo;
+			// dirtdash has slowdowns if high bit is clear, why??
+			return hi | lo | 0x8000;
 		}
 
 		case 3:
