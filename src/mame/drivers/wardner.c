@@ -9,17 +9,17 @@ Supported games:
 
     Toaplan Board Number:   TP-009
     Taito Game Number:      B25
-        Wardners Forest (World)
+        Wardner         (World)
         Pyros           (USA)
-        Wardna no Mori  (Japan)
+        Wardner no Mori (Japan)
 
 Notes:
-        Basically the same video and machine hardware as Flying shark,
+        Basically the same video and machine hardware as Flying Shark,
           except for the Main CPU which is a Z80 here.
         See twincobr.c machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
-        Press F1 (initially P1 button 3) on startup to skip some video RAM tests
+        Press F1 (actually P1 button 3) on startup to skip some video RAM tests
         (code at 0x6d25 in 'wardner', 0x6d2f in 'wardnerj' or 0x6d2c in 'pyros').
 
 **************************** Memory & I/O Maps *****************************
@@ -28,8 +28,8 @@ Z80:(0)  Main CPU
 7000-7fff Main RAM
 8000-ffff Level and scenery ROMS. This is banked with the following
 8000-8fff Sprite RAM
-a000-adff Pallette RAM
-ae00-afff Spare unused, but tested Pallette RAM
+a000-adff Palette RAM
+ae00-afff Spare unused, but tested Palette RAM
 c000-c7ff Sound RAM - shared with C000-C7FF in Z80(1) RAM
 
 in:
@@ -303,7 +303,7 @@ static INPUT_PORTS_START( wardner_generic )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* "TEST" in "test mode" - no effect outside */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME(DEF_STR(Test))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
@@ -317,6 +317,7 @@ static INPUT_PORTS_START( wardner )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Skip Video RAM Tests") PORT_CODE(KEYCODE_F1)
+	/* technically player 1 button 3 - not used in gameplay */
 	/* code at 0x6d25 ('wardner'), 0x6d2f ('wardnerj') or 0x6d2c ('pyros') */
 INPUT_PORTS_END
 

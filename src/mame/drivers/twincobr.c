@@ -27,7 +27,7 @@ Supported games:
         GulfWar II (Game play very similar to Twin cobra)
 
 
-Difference between Twin Cobra and Kyukyoko Tiger:
+Difference between Twin Cobra and Kyukyoku Tiger:
     T.C. supports two simultaneous players.
     K.T. supports two players, but only one at a time.
          for this reason, it also supports Table Top cabinets.
@@ -44,7 +44,7 @@ Difference between Twin Cobra and Kyukyoko Tiger:
          After dying, and your new hero appears, if you do not travel more
          than your helicopter length forward, you are penalised and moved
          back further when your next hero appears.
-    K.T. Due to this difference in continue sequence, Kyukyoko Tiger is MUCH
+    K.T. Due to this difference in continue sequence, Kyukyoku Tiger is MUCH
          harder, challenging, and nearly impossible to complete !
 
 
