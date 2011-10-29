@@ -1825,13 +1825,13 @@ READ32_HANDLER( namcos22_tilemapattr_r )
 	{
 		case 2:
 		{
-			UINT16 lo,hi = state->m_tilemapattr[offset] & 0xffff0000;
+			UINT16 lo,hi = (state->m_tilemapattr[offset] & 0xffff0000) >> 16;
 			// assume current scanline, 0x1ff if in vblank (used in alpinesa)
 			// or maybe relative to posirq?
 			if (space->machine().primary_screen->vblank()) lo = 0x1ff;
 			else lo = space->machine().primary_screen->vpos() >> 1;
 			// dirtdash has slowdowns if high bit is clear, why??
-			return hi | lo | 0x8000;
+			return hi<<16 | lo | 0x8000;
 		}
 
 		case 3:
