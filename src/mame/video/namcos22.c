@@ -1862,6 +1862,115 @@ WRITE32_HANDLER( namcos22_tilemapattr_w )
 //  popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
 }
 
+
+/**
+ * Spot RAM affects how the text layer is blended with the scene, it is not yet known exactly how.
+ * It isn't directly memory mapped, but rather ports are used to populate and poll it.
+ *
+ * See Time Crisis "SPOT RAM" self test for sample use.
+ * It is also used in Dirt Dash night section.
+ */
+#define SPOTRAM_SIZE (320*4)
+
+READ32_HANDLER( namcos22s_spotram_r )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	/* 0x860004: read */
+	if (offset == 1)
+	{
+		if (state->m_spot_read_address >= SPOTRAM_SIZE)
+		{
+			state->m_spot_read_address = 0;
+		}
+		return state->m_spotram[state->m_spot_read_address++] << 16;
+	}
+	return 0;
+}
+
+WRITE32_HANDLER( namcos22s_spotram_w )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	/**
+	* 0x860000: set read and write address (TRUSTED by Tokyo Wars POST)
+	* 0x860002: append data
+	*
+	* 0x860006: enable
+	*/
+	if (offset == 0)
+	{
+		if (!ACCESSING_BITS_16_31)
+		{
+			if (state->m_spot_write_address >= SPOTRAM_SIZE)
+			{
+				state->m_spot_write_address = 0;
+			}
+			state->m_spotram[state->m_spot_write_address++] = data;
+		}
+		else
+		{
+			state->m_spot_read_address = (data>>19)*3;
+			state->m_spot_write_address = (data>>19)*3;
+		}
+	}
+}
+
+/**
+ * 4038 spot enable?
+ * 0828 pre-initialization
+ * 0838 post-initialization
+ **********************************************
+ * upload:
+ *   #bits data
+ *    0010 FEC0
+ *    0010 FF10
+ *    0004 0004
+ *    0004 000E
+ *    0003 0007
+ *    0002 0002
+ *    0002 0003
+ *    0001 0001
+ *    0001 0001
+ *    0001 0000
+ *    0001 0001
+ *    0001 0001
+ *    0001 0000
+ *    0001 0000
+ *    0001 0000
+ *    0001 0001
+ **********************************************
+ *    0008 00EA // 0x0ff
+ *    000A 0364 // 0x3ff
+ *    000A 027F // 0x3ff
+ *    0003 0005 // 0x007
+ *    0001 0001 // 0x001
+ *    0001 0001 // 0x001
+ *    0001 0001 // 0x001
+ **********************************************
+ * SPOT TABLE test:
+ 03F282: 13FC 0000 0082 4011        move.b  #$0, $824011.l
+ 03F28A: 13FC 0000 0082 4015        move.b  #$0, $824015.l
+ 03F292: 13FC 0080 0082 400D        move.b  #$80, $82400d.l
+ 03F29A: 13FC 0001 0082 400E        move.b  #$1, $82400e.l
+ 03F2A2: 13FC 0001 0082 4021        move.b  #$1, $824021.l
+ 03F2AA: 33FC 4038 0080 0000        move.w  #$4038, $800000.l
+ 03F2B2: 06B9 0000 0001 00E0 AB08   addi.l  #$1, $e0ab08.l
+*/
+WRITE32_HANDLER( namcos22s_spot_enable_w )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	/* 00000011011111110000100011111111001001111110111110110001 */
+	UINT16 word = data>>16;
+	logerror( "%x: C304/C399: 0x%04x\n", cpu_get_previouspc(&space->device()), word );
+	if( word == 0x4038 )
+	{
+		state->m_spot_enable = 1;
+	}
+	else
+	{
+		state->m_spot_enable = 0;
+	}
+}
+
 static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int prival )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
@@ -2669,6 +2778,10 @@ VIDEO_START( namcos22s )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	state->m_mbSuperSystem22 = 1;
 
+	// init spotram
+	state->m_spotram = auto_alloc_array(machine, UINT16, SPOTRAM_SIZE);
+	memset(state->m_spotram, 0, SPOTRAM_SIZE*2);
+
 	// init czram tables
 	int table;
 	for (table=0; table<4; table++)
@@ -2843,60 +2956,3 @@ WRITE16_HANDLER( namcos22_dspram16_w )
 	}
 	state->m_polygonram[offset] = (hi<<16)|lo;
 } /* namcos22_dspram16_w */
-
-/**
- * 4038 spot enable?
- * 0828 pre-initialization
- * 0838 post-initialization
- **********************************************
- * upload:
- *   #bits data
- *    0010 FEC0
- *    0010 FF10
- *    0004 0004
- *    0004 000E
- *    0003 0007
- *    0002 0002
- *    0002 0003
- *    0001 0001
- *    0001 0001
- *    0001 0000
- *    0001 0001
- *    0001 0001
- *    0001 0000
- *    0001 0000
- *    0001 0000
- *    0001 0001
- **********************************************
- *    0008 00EA // 0x0ff
- *    000A 0364 // 0x3ff
- *    000A 027F // 0x3ff
- *    0003 0005 // 0x007
- *    0001 0001 // 0x001
- *    0001 0001 // 0x001
- *    0001 0001 // 0x001
- **********************************************
- * SPOT TABLE test:
- 03F282: 13FC 0000 0082 4011        move.b  #$0, $824011.l
- 03F28A: 13FC 0000 0082 4015        move.b  #$0, $824015.l
- 03F292: 13FC 0080 0082 400D        move.b  #$80, $82400d.l
- 03F29A: 13FC 0001 0082 400E        move.b  #$1, $82400e.l
- 03F2A2: 13FC 0001 0082 4021        move.b  #$1, $824021.l
- 03F2AA: 33FC 4038 0080 0000        move.w  #$4038, $800000.l
- 03F2B2: 06B9 0000 0001 00E0 AB08   addi.l  #$1, $e0ab08.l
-*/
-WRITE32_HANDLER(namcos22_port800000_w)
-{
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	/* 00000011011111110000100011111111001001111110111110110001 */
-	UINT16 word = data>>16;
-	logerror( "%x: C304/C399: 0x%04x\n", cpu_get_previouspc(&space->device()), word );
-	if( word == 0x4038 )
-	{
-		state->m_mbSpotlightEnable = 1;
-	}
-	else
-	{
-		state->m_mbSpotlightEnable = 0;
-	}
-} /* namcos22_port800000_w */

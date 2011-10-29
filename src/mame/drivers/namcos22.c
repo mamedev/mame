@@ -2443,60 +2443,6 @@ static WRITE32_HANDLER( namcos22_mcuram_w )
 	COMBINE_DATA(&state->m_shareram[offset]);
 }
 
-/**
- * Spot RAM affects how the text layer is blended with the scene, it is not yet known exactly how.
- * It isn't directly memory mapped, but rather ports are used to populate and poll it.
- *
- * See Time Crisis "SPOT RAM" self test for sample use.
- * It is also used in Dirt Dash night section.
- */
-#define SPOTRAM_SIZE (320*4)
-
-static struct
-{
-	int portR; /* next address for read */
-	int portW; /* next address for write */
-	UINT16 *RAM;//[SPOTRAM_SIZE];
-} mSpotRAM;
-
-static READ32_HANDLER( spotram_r )
-{ /* 0x860004: read */
-	if( offset==1 )
-	{
-		if( mSpotRAM.portR>=SPOTRAM_SIZE )
-		{
-			mSpotRAM.portR = 0;
-		}
-		return mSpotRAM.RAM[mSpotRAM.portR++]<<16;
-	}
-	return 0;
-} /* spotram_r */
-
-static WRITE32_HANDLER( spotram_w )
-{ /**
-   * 0x860000: set read and write address (TRUSTED by Tokyo Wars POST)
-   * 0x860002: append data
-   *
-   * 0x860006: enable
-   */
-	if( offset==0 )
-	{
-		if( !ACCESSING_BITS_16_31 )
-		{
-			if( mSpotRAM.portW>=SPOTRAM_SIZE )
-			{
-				mSpotRAM.portW = 0;
-			}
-			mSpotRAM.RAM[mSpotRAM.portW++] = data;
-		}
-		else
-		{
-			mSpotRAM.portR = (data>>19)*3;
-			mSpotRAM.portW = (data>>19)*3;
-		}
-	}
-} /* spotram_w */
-
 static READ32_HANDLER( namcos22_gun_r )
 {
 	int xpos = input_port_read_safe(space->machine(), "LIGHTX", 0) * 640 / 0xff;
@@ -2577,13 +2523,13 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE(namcos22_portbit_r, namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
 	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(namcos22_system_controller_r, namcos22s_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
-	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22_port800000_w) /* (C304 C399)  40380000 during SPOT test */
+	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22s_spot_enable_w) /* (C304 C399)  40380000 during SPOT test */
 	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czattr)
 	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE(namcos22s_czram_r, namcos22s_czram_w)
 	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */
 	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_BASE_MEMBER(namcos22_state, m_gamma)
 	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x860000, 0x860007) AM_READWRITE(spotram_r, spotram_w)
+	AM_RANGE(0x860000, 0x860007) AM_READWRITE(namcos22s_spotram_r, namcos22s_spotram_w)
 	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_BASE_MEMBER(namcos22_state, m_cgram)
 	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_BASE_MEMBER(namcos22_state, m_textram)
 	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE_MEMBER(namcos22_state, m_tilemapattr)
@@ -5547,17 +5493,10 @@ static void namcos22_init( running_machine &machine, int game_type )
 	state->m_mpPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
 }
 
-static void namcos22s_init( running_machine &machine, int game_type )
-{
-	namcos22_init(machine, game_type);
-
-	mSpotRAM.RAM = auto_alloc_array(machine, UINT16, SPOTRAM_SIZE);
-}
-
 static void alpine_init_common( running_machine &machine, int game_type )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22s_init(machine, game_type);
+	namcos22_init(machine, game_type);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_write_handler(M37710_PORT5, M37710_PORT5, FUNC(alpine_mcu_port5_w));
@@ -5601,7 +5540,7 @@ static DRIVER_INIT( alpinesa )
 
 static DRIVER_INIT( airco22 )
 {
-	namcos22s_init(machine, NAMCOS22_AIR_COMBAT22);
+	namcos22_init(machine, NAMCOS22_AIR_COMBAT22);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(airco22_mcu_adc_r));
 }
@@ -5625,7 +5564,7 @@ static DRIVER_INIT( propcycl )
 //   pROM[0x22296/4] &= 0xffff0000;
 //   pROM[0x22296/4] |= 0x00004e75;
 
-	namcos22s_init(machine, NAMCOS22_PROP_CYCLE);
+	namcos22_init(machine, NAMCOS22_PROP_CYCLE);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(propcycle_mcu_adc_r));
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_write_handler(M37710_PORT5, M37710_PORT5, FUNC(propcycle_mcu_port5_w));
@@ -5706,7 +5645,7 @@ static DRIVER_INIT( cybrcomm )
 static DRIVER_INIT( cybrcyc )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22s_init(machine, NAMCOS22_CYBER_CYCLES);
+	namcos22_init(machine, NAMCOS22_CYBER_CYCLES);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
 	install_130_speedup(machine);
@@ -5716,7 +5655,7 @@ static DRIVER_INIT( cybrcyc )
 
 static DRIVER_INIT( timecris )
 {
-	namcos22s_init(machine, NAMCOS22_TIME_CRISIS);
+	namcos22_init(machine, NAMCOS22_TIME_CRISIS);
 
 	install_130_speedup(machine);
 }
@@ -5724,7 +5663,7 @@ static DRIVER_INIT( timecris )
 static DRIVER_INIT( tokyowar )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22s_init(machine, NAMCOS22_TOKYO_WARS);
+	namcos22_init(machine, NAMCOS22_TOKYO_WARS);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(tokyowar_mcu_adc_r));
 
@@ -5733,7 +5672,7 @@ static DRIVER_INIT( tokyowar )
 
 static DRIVER_INIT( aquajet )
 {
-	namcos22s_init(machine, NAMCOS22_AQUA_JET);
+	namcos22_init(machine, NAMCOS22_AQUA_JET);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(aquajet_mcu_adc_r));
 }
@@ -5741,7 +5680,7 @@ static DRIVER_INIT( aquajet )
 static DRIVER_INIT( dirtdash )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22s_init(machine, NAMCOS22_DIRT_DASH);
+	namcos22_init(machine, NAMCOS22_DIRT_DASH);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
 
