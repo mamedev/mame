@@ -349,25 +349,25 @@ ADDRESS_MAP_END
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( twincobr )
 	PORT_START("DSWA")
-	TOAPLAN_MACHINE_NO_COCKTAIL
-	TOAPLAN_COINAGE_WORLD                                   /* tables at 0x0c30 (COIN1) and 0x0c38 (COIN2) in CPU1 */
+	TOAPLAN_MACHINE_NO_COCKTAIL_LOC(SW1)
+	TOAPLAN_COINAGE_WORLD_LOC(SW1)	/* tables at 0x0c30 (COIN1) and 0x0c38 (COIN2) in CPU1 */
 
 	PORT_START("DSWB")
-	TOAPLAN_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x020988 ('twincobr' and 'twincobru') */
+	TOAPLAN_DIFFICULTY_LOC(SW2)
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")	/* table at 0x020988 ('twincobr' and 'twincobru') */
 	PORT_DIPSETTING(	0x00, "50k 200k 150k+" )
 	PORT_DIPSETTING(	0x04, "70k 270k 200k+" )
 	PORT_DIPSETTING(	0x08, "50k Only" )
 	PORT_DIPSETTING(	0x0c, "100k Only" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(	0x30, "2" )
 	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x20, "4" )
 	PORT_DIPSETTING(	0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switch Settings" ) PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" )
 
 	PORT_START("P1")
 	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( twincobru )
 	PORT_INCLUDE( twincobr )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD                               /* table at 0x0c20 (COIN1 AND COIN2) in CPU1 */
+	TOAPLAN_COINAGE_JAPAN_OLD_LOC(SW1)	/* table at 0x0c20 (COIN1 AND COIN2) in CPU1 */
 INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
@@ -403,15 +403,15 @@ static INPUT_PORTS_START( ktiger )
 	PORT_INCLUDE( twincobru )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN_MACHINE_COCKTAIL
+	TOAPLAN_MACHINE_COCKTAIL_LOC(SW1)
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x0208d0 */
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")	/* table at 0x0208d0 */
 	PORT_DIPSETTING(	0x04, "50k 200k 150k+" )
 	PORT_DIPSETTING(	0x00, "70k 270k 200k+" )
 	PORT_DIPSETTING(	0x08, "100k Only" )
 	PORT_DIPSETTING(	0x0c, DEF_STR( None ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )   /* additional code at 0x020b3c */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:!8")/* additional code at 0x020b3c */
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -429,25 +429,25 @@ INPUT_PORTS_END
 /* verified from M68000 code */
 static INPUT_PORTS_START( fshark )
 	PORT_START("DSWA")
-	TOAPLAN_MACHINE_COCKTAIL
-	TOAPLAN_COINAGE_WORLD                                   /* tables at 0x00031c (COIN1) and 0x00032c (COIN2) */
+	TOAPLAN_MACHINE_COCKTAIL_LOC(SW1)
+	TOAPLAN_COINAGE_WORLD_LOC(SW1)	/* tables at 0x00031c (COIN1) and 0x00032c (COIN2) */
 
 	PORT_START("DSWB")
-	TOAPLAN_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000b96 (fshark), 0x000b80 (skyshark) or 0x000b7e (hishouza) */
+	TOAPLAN_DIFFICULTY_LOC(SW2)
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")	/* table at 0x000b96 (fshark), 0x000b80 (skyshark) or 0x000b7e (hishouza) */
 	PORT_DIPSETTING(	0x00, "50k 200k 150k+" )
 	PORT_DIPSETTING(	0x04, "70k 270k 200k+" )
 	PORT_DIPSETTING(	0x08, "50k Only" )
 	PORT_DIPSETTING(	0x0c, "100k Only" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(	0x20, "1" )
 	PORT_DIPSETTING(	0x30, "2" )
 	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switch Settings" ) PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 
@@ -476,12 +476,12 @@ static INPUT_PORTS_START( skyshark )
 	PORT_INCLUDE( fshark )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )           /* table at 0x000316 */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!5,!6")	/* table at 0x000316 */
 	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
 //  PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )            /* duplicated setting */
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )           /* table at 0x000316 */
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!7,!8")	/* table at 0x000316 */
 	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
@@ -493,7 +493,7 @@ static INPUT_PORTS_START( hishouza )
 	PORT_INCLUDE( fshark )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD                               /* table at 0x000316 (COIN1 AND COIN2) */
+	TOAPLAN_COINAGE_JAPAN_OLD_LOC(SW1)	/* table at 0x000316 (COIN1 AND COIN2) */
 INPUT_PORTS_END
 
 

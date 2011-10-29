@@ -179,17 +179,17 @@
 #define TOAPLAN_DIFFICULTY_LOC(DIPBANK) \
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION(#DIPBANK":!1,!2") \
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) ) \
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Very_Hard ) )
 
 /* without location */
 #define TOAPLAN_DIFFICULTY \
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) \
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) ) \
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Very_Hard ) )
 
 
 /************************** Joysticks and buttons *****************************/
