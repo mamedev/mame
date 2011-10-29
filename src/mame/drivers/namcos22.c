@@ -2511,6 +2511,17 @@ static WRITE32_HANDLER( namcos22s_nvmem_w )
 	COMBINE_DATA(&state->m_nvmem[offset]);
 }
 
+static WRITE32_HANDLER( namcos22s_chipselect_w )
+{
+	// assume that this register is for chip enable/disable
+	// the only sure thing is that bit $4000 means spot enable (testmode, dirtdash)
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	if (ACCESSING_BITS_16_23)
+		state->m_chipselect = data >> 16;
+	else if (ACCESSING_BITS_24_31)
+		state->m_chipselect = data >> 24;
+}
+
 /* Namco Super System 22 */
 static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
@@ -2523,7 +2534,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE(namcos22_portbit_r, namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
 	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(namcos22_system_controller_r, namcos22s_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
-	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22s_spot_enable_w) /* (C304 C399)  40380000 during SPOT test */
+	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22s_chipselect_w)
 	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czattr)
 	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE(namcos22s_czram_r, namcos22s_czram_w)
 	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */

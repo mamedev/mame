@@ -1868,17 +1868,34 @@ WRITE32_HANDLER( namcos22_tilemapattr_w )
  * Spot RAM affects how the text layer is blended with the scene, it is not yet known exactly how.
  * It isn't directly memory mapped, but rather ports are used to populate and poll it.
  *
- * See Time Crisis "SPOT RAM" self test for sample use.
- * It is also used in Dirt Dash night section.
- */
-#define SPOTRAM_SIZE (320*4)
+ * See Time Crisis "SPOT RAM" self test for sample use, maybe also used in-game, but where?
+ * It is also used in Dirt Dash night section. Other games don't seem to use it.
+ *
+ * 0x860000: set read and write address (TRUSTED by Tokyo Wars POST)
+ * 0x860002: write data
+ * 0x860004: read data
+ * 0x860006: enable
+*/
+
+// tokyowar and timecris test ram 000-4ff, but the only practically usable part seems to be 000-3ff
+#define SPOTRAM_SIZE (0x800)
+
+/*
+RAM looks like it is a 256 * 4 bytes table
+testmode:
+ offs: 0000 0001 0002 0003 - 03f4 03f5 03f6 03f7 03f8 03f9 03fa 03fb 03fc 03fd 03fe 03ff
+ data: 00fe 00fe 00fe 00fe - 0001 0001 0001 0001 0000 0000 0000 0000 ffff ffff ffff ffff
+
+is the high byte used? it's usually 00, and in dirtdash always 02
+
+*/
 
 READ32_HANDLER( namcos22s_spotram_r )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	/* 0x860004: read */
 	if (offset == 1)
 	{
+		// read
 		if (state->m_spot_read_address >= SPOTRAM_SIZE)
 		{
 			state->m_spot_read_address = 0;
@@ -1891,84 +1908,31 @@ READ32_HANDLER( namcos22s_spotram_r )
 WRITE32_HANDLER( namcos22s_spotram_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	/**
-	* 0x860000: set read and write address (TRUSTED by Tokyo Wars POST)
-	* 0x860002: append data
-	*
-	* 0x860006: enable
-	*/
 	if (offset == 0)
 	{
-		if (!ACCESSING_BITS_16_31)
+		if (ACCESSING_BITS_16_31)
 		{
+			// set address
+			state->m_spot_read_address  = data>>(16+1);
+			state->m_spot_write_address = data>>(16+1);
+		}
+		else
+		{
+			// write
 			if (state->m_spot_write_address >= SPOTRAM_SIZE)
 			{
 				state->m_spot_write_address = 0;
 			}
 			state->m_spotram[state->m_spot_write_address++] = data;
 		}
-		else
-		{
-			state->m_spot_read_address = (data>>19)*3;
-			state->m_spot_write_address = (data>>19)*3;
-		}
-	}
-}
-
-/**
- * 4038 spot enable?
- * 0828 pre-initialization
- * 0838 post-initialization
- **********************************************
- * upload:
- *   #bits data
- *    0010 FEC0
- *    0010 FF10
- *    0004 0004
- *    0004 000E
- *    0003 0007
- *    0002 0002
- *    0002 0003
- *    0001 0001
- *    0001 0001
- *    0001 0000
- *    0001 0001
- *    0001 0001
- *    0001 0000
- *    0001 0000
- *    0001 0000
- *    0001 0001
- **********************************************
- *    0008 00EA // 0x0ff
- *    000A 0364 // 0x3ff
- *    000A 027F // 0x3ff
- *    0003 0005 // 0x007
- *    0001 0001 // 0x001
- *    0001 0001 // 0x001
- *    0001 0001 // 0x001
- **********************************************
- * SPOT TABLE test:
- 03F282: 13FC 0000 0082 4011        move.b  #$0, $824011.l
- 03F28A: 13FC 0000 0082 4015        move.b  #$0, $824015.l
- 03F292: 13FC 0080 0082 400D        move.b  #$80, $82400d.l
- 03F29A: 13FC 0001 0082 400E        move.b  #$1, $82400e.l
- 03F2A2: 13FC 0001 0082 4021        move.b  #$1, $824021.l
- 03F2AA: 33FC 4038 0080 0000        move.w  #$4038, $800000.l
- 03F2B2: 06B9 0000 0001 00E0 AB08   addi.l  #$1, $e0ab08.l
-*/
-WRITE32_HANDLER( namcos22s_spot_enable_w )
-{
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	/* 00000011011111110000100011111111001001111110111110110001 */
-	UINT16 word = data>>16;
-	logerror( "%x: C304/C399: 0x%04x\n", cpu_get_previouspc(&space->device()), word );
-	if( word == 0x4038 )
-	{
-		state->m_spot_enable = 1;
 	}
 	else
 	{
-		state->m_spot_enable = 0;
+		if (ACCESSING_BITS_0_15)
+		{
+			// enable
+			state->m_spot_enable = data & 1;
+		}
 	}
 }
 
@@ -2834,6 +2798,7 @@ SCREEN_UPDATE( namcos22s )
 		{
 			address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
+			if (1) // czram
 			{
 				int i,bank;
 				for( bank=0; bank<4; bank++ )
@@ -2845,6 +2810,18 @@ SCREEN_UPDATE( namcos22s )
 					}
 					fprintf( f, "\n" );
 				}
+				fprintf( f, "\n" );
+			}
+
+			if (0) // spotram
+			{
+				int i;
+				fprintf(f, "spotram:\n");
+				for (i=0; i<256; i++)
+				{
+					fprintf(f, "%02X: %04X %04X %04X %04X\n", i, state->m_spotram[i*4+0], state->m_spotram[i*4+1], state->m_spotram[i*4+2], state->m_spotram[i*4+3]);
+				}
+				fprintf(f, "\n");
 			}
 
 			Dump(space, f,0x810000, 0x81000f, "cz attr" );

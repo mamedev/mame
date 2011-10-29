@@ -74,6 +74,7 @@ public:
 	UINT32 *m_vics_control;
 	UINT32 *m_czattr;
 	UINT32 *m_tilemapattr;
+	int m_chipselect;
 	int m_spot_enable;
 	int m_spot_read_address;
 	int m_spot_write_address;
@@ -123,7 +124,6 @@ WRITE32_HANDLER( namcos22s_czram_w );
 
 READ32_HANDLER( namcos22s_spotram_r );
 WRITE32_HANDLER( namcos22s_spotram_w );
-WRITE32_HANDLER( namcos22s_spot_enable_w );
 
 READ32_HANDLER( namcos22_paletteram_r );
 WRITE32_HANDLER( namcos22_paletteram_w );
