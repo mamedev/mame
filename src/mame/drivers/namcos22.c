@@ -3365,7 +3365,7 @@ ROM_START( alpinerc )
 	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
 
 	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinerc_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
+	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
 ROM_END
 
 ROM_START( alpinerd )
@@ -3424,7 +3424,7 @@ ROM_START( alpinerd )
 	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
 
 	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinerd_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
+	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
 ROM_END
 
 ROM_START( alpinr2b )
@@ -3481,7 +3481,7 @@ ROM_START( alpinr2b )
 	ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
 
 	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinr2b_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
+	ROM_LOAD( "alpiner2_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
 ROM_END
 
 ROM_START( alpinr2a )
@@ -3538,7 +3538,7 @@ ROM_START( alpinr2a )
 	ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
 
 	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinr2a_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
+	ROM_LOAD( "alpiner2_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
 ROM_END
 
 ROM_START( alpinesa )
@@ -4926,7 +4926,6 @@ static INPUT_PORTS_START( dirtdash )
 	DRIVING_ANALOG_PORTS
 	PORT_MODIFY("STEER") // default is too sensitive
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_NAME("Steering Wheel")
-
 INPUT_PORTS_END /* Dirt Dash */
 
 static INPUT_PORTS_START( tokyowar )
@@ -5492,6 +5491,8 @@ static void namcos22_init( running_machine &machine, int game_type )
 	state->m_su_82 = 0;
 	state->m_irq_state = 0;
 	state->m_p4 = 0;
+	state->m_old_coin_state = 0;
+	state->m_credits1 = state->m_credits2 = 0;
 
 	state->m_mpPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
 }
@@ -5583,8 +5584,6 @@ static DRIVER_INIT( ridgeraj )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0172;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( ridger2j )
@@ -5595,8 +5594,6 @@ static DRIVER_INIT( ridger2j )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0172;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( acedrvr )
@@ -5607,8 +5604,6 @@ static DRIVER_INIT( acedrvr )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0173;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( victlap )
@@ -5619,19 +5614,13 @@ static DRIVER_INIT( victlap )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0188;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( raveracw )
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_RAVE_RACER);
 
 	install_c74_speedup(machine);
-
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( cybrcomm )
@@ -5642,8 +5631,6 @@ static DRIVER_INIT( cybrcomm )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0185;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( cybrcyc )
