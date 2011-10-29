@@ -616,7 +616,7 @@ ROM_START( ptblank3 )
 	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(82d2cfb5) SHA1(4b5e713a55e74a7b32b1b9b5811892df2df86256) )
 ROM_END
 
-ROM_START( gunbalna )
+ROM_START( gunbalina )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
@@ -651,7 +651,7 @@ ROM_END
 GAME( 2000, mrdrilr2,  0,        namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR22 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, ptblank3,  0,        namcos10, namcos10, gunbalna, ROT0, "Namco", "Point Blank 3 (GNN2 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2000, gunbalna,  ptblank3, namcos10, namcos10, gunbalna, ROT0, "Namco", "Gunbalina (GNN1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, gunbalina, ptblank3, namcos10, namcos10, gunbalna, ROT0, "Namco", "Gunbalina (GNN1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, gjspace,   0,        namcos10, namcos10, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, mrdrilrg,  0,        namcos10, namcos10, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2001, knpuzzle,  0,        namcos10, namcos10, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
