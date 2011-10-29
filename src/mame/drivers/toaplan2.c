@@ -442,79 +442,14 @@ static DRIVER_INIT( vfive )
 
 static DRIVER_INIT( pipibibsbl )
 {
-	int A;
-	int oldword, newword;
-	UINT16 *pipibibi_68k_rom = (UINT16 *)(machine.region("maincpu")->base());
+	UINT16 *ROM = (UINT16 *)(machine.region("maincpu")->base());
 
-	// unscramble the 68K ROM data
-
-	for (A = 0; A < (0x040000/2); A+=4)
+	for (int i = 0; i < (0x040000/2); i += 4)
 	{
-		newword = 0;
-		oldword = pipibibi_68k_rom[A];
-		newword |= ((oldword & 0x0001) << 9);
-		newword |= ((oldword & 0x0002) << 14);
-		newword |= ((oldword & 0x0004) << 8);
-		newword |= ((oldword & 0x0018) << 1);
-		newword |= ((oldword & 0x0020) << 9);
-		newword |= ((oldword & 0x0040) << 7);
-		newword |= ((oldword & 0x0080) << 5);
-		newword |= ((oldword & 0x0100) << 3);
-		newword |= ((oldword & 0x0200) >> 1);
-		newword |= ((oldword & 0x0400) >> 8);
-		newword |= ((oldword & 0x0800) >> 10);
-		newword |= ((oldword & 0x1000) >> 12);
-		newword |= ((oldword & 0x6000) >> 7);
-		newword |= ((oldword & 0x8000) >> 12);
-		pipibibi_68k_rom[A] = newword;
-
-		newword = 0;
-		oldword = pipibibi_68k_rom[A+1];
-		newword |= ((oldword & 0x0001) << 8);
-		newword |= ((oldword & 0x0002) << 12);
-		newword |= ((oldword & 0x0004) << 5);
-		newword |= ((oldword & 0x0008) << 11);
-		newword |= ((oldword & 0x0010) << 2);
-		newword |= ((oldword & 0x0020) << 10);
-		newword |= ((oldword & 0x0040) >> 1);
-		newword |= ((oldword & 0x0080) >> 7);
-		newword |= ((oldword & 0x0100) >> 4);
-		newword |= ((oldword & 0x0200) << 0);
-		newword |= ((oldword & 0x0400) >> 7);
-		newword |= ((oldword & 0x0800) >> 1);
-		newword |= ((oldword & 0x1000) >> 10);
-		newword |= ((oldword & 0x2000) >> 2);
-		newword |= ((oldword & 0x4000) >> 13);
-		newword |= ((oldword & 0x8000) >> 3);
-		pipibibi_68k_rom[A+1] = newword;
-
-		newword = 0;
-		oldword = pipibibi_68k_rom[A+2];
-		newword |= ((oldword & 0x000f) << 4);
-		newword |= ((oldword & 0x00f0) >> 4);
-		newword |= ((oldword & 0x0100) << 3);
-		newword |= ((oldword & 0x0200) << 1);
-		newword |= ((oldword & 0x0400) >> 1);
-		newword |= ((oldword & 0x0800) >> 3);
-		newword |= ((oldword & 0x1000) << 3);
-		newword |= ((oldword & 0x2000) << 1);
-		newword |= ((oldword & 0x4000) >> 1);
-		newword |= ((oldword & 0x8000) >> 3);
-		pipibibi_68k_rom[A+2] = newword;
-
-		newword = 0;
-		oldword = pipibibi_68k_rom[A+3];
-		newword |= ((oldword & 0x000f) << 4);
-		newword |= ((oldword & 0x00f0) >> 4);
-		newword |= ((oldword & 0x0100) << 7);
-		newword |= ((oldword & 0x0200) << 5);
-		newword |= ((oldword & 0x0400) << 3);
-		newword |= ((oldword & 0x0800) << 1);
-		newword |= ((oldword & 0x1000) >> 1);
-		newword |= ((oldword & 0x2000) >> 3);
-		newword |= ((oldword & 0x4000) >> 5);
-		newword |= ((oldword & 0x8000) >> 7);
-		pipibibi_68k_rom[A+3] = newword;
+		ROM[i+0] = BITSWAP16(ROM[i+0],0x1,0x5,0x6,0x7,0x8,0x2,0x0,0x9,0xe,0xd,0x4,0x3,0xf,0xa,0xb,0xc);
+		ROM[i+1] = BITSWAP16(ROM[i+1],0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x0,0x2,0x4,0x6,0x8,0xa,0xc,0xe,0x7);
+		ROM[i+2] = BITSWAP16(ROM[i+2],0xc,0xd,0xe,0xf,0x8,0x9,0xa,0xb,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
+		ROM[i+3] = BITSWAP16(ROM[i+3],0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
 	}
 }
 
