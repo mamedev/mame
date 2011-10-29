@@ -35,7 +35,7 @@ const device_type Z8536 = &device_creator<z8536_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 
 // states
