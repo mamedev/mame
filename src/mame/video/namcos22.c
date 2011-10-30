@@ -9,10 +9,16 @@
  *       (is this related to dsp? or cpu?)
  * - find out how/where vics num_sprites is determined exactly, it causes major sprite problems in airco22b
  *       dirtdash would have this issue too, if not for the current workaround
- * - improve ss22 fogging, lighting, and spot
+ * - improve ss22 fogging:
+ *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
+ *       + 100% fog if you start dirtdash at the hill level
+ * - improve ss22 lighting, eg. mountains in alpinr2b selection screen
+ * - improve ss22 spot:
+ *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
+ *       + dirtdash speedometer has wrong colors when in the jungle level
+ *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level (possibly just a game bug)
+ * - dirtdash polys are broken at the start section of the mountain level
  * - window clipping (acedrvrw, victlapw)
- * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
- *       (probably a bug in rgbint, not here?)
  * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
  * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
  *       czram contents is rather odd here and partly cleared (probably the cause?):
@@ -21,6 +27,8 @@
  *        $1000-$19ff   - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
  *        $1a00-$0dff   - $77
  *        $1e00-$1fff   - $78
+ * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
+ *       (probably a bug in rgbint, not here?)
  *
  * - lots of smaller issues
  *
