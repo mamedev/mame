@@ -119,7 +119,7 @@ static struct
 	int gFadeColor;
 	int bFadeColor;
 	int fadeFactor;
-	int spot_length;
+	int spot_limit;
 	int poly_translucency;
 	int palBase;
 } mixer;
@@ -169,8 +169,8 @@ UpdateVideoMixer( running_machine &machine )
     08,09,0a        background color
     0b
     0c
-    0d              amount of pens for spot
-    0e
+    0d              spot factor limit value
+    0e              enable spot factor limit
     0f
     10
     11              global polygon alpha factor
@@ -192,7 +192,7 @@ UpdateVideoMixer( running_machine &machine )
 		mixer.rFogColor         = nthbyte( state->m_gamma, 0x05 );
 		mixer.gFogColor         = nthbyte( state->m_gamma, 0x06 );
 		mixer.bFogColor         = nthbyte( state->m_gamma, 0x07 );
-		mixer.spot_length       = nthbyte( state->m_gamma, 0x0d );
+		mixer.spot_limit        = nthbyte( state->m_gamma, 0x0d );
 		mixer.poly_translucency = nthbyte( state->m_gamma, 0x11 );
 		mixer.rFadeColor        = nthbyte( state->m_gamma, 0x16 );
 		mixer.gFadeColor        = nthbyte( state->m_gamma, 0x17 );
@@ -200,6 +200,11 @@ UpdateVideoMixer( running_machine &machine )
 		mixer.fadeFactor        = nthbyte( state->m_gamma, 0x19 );
 		mixer.flags             = nthbyte( state->m_gamma, 0x1a );
 		mixer.palBase           = nthbyte( state->m_gamma, 0x1b ) & 0x7f;
+
+		// put spot-specific flags into high word
+		mixer.flags |= state->m_spot_enable << 16;
+		mixer.flags |= (nthbyte(state->m_gamma, 0x0e) & 1) << 17;
+		mixer.flags |= (state->m_chipselect & 0xc000) << 4;
 	}
 	else
 	{
@@ -1891,7 +1896,7 @@ is the high byte of each word used? it's usually 00, and in dirtdash always 02
 
 low byte of each word:
  byte 0 looks like a blend factor
- bytes 1,2,3 may be other blend factor tables? (4 in total, like czram, selected where?), or an rgb triplet? (used how?)
+ bytes 1,2,3 a secondary brightness factor per rgb channel
 
 */
 
@@ -1950,17 +1955,21 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 	UINT8 *pri;
 	int x,y;
 
-	// prepare fader and alpha and spot
+	// prepare alpha
 	UINT8 alpha_check12 = nthbyte(state->m_gamma, 0x12);
 	UINT8 alpha_check13 = nthbyte(state->m_gamma, 0x13);
-	UINT8 alpha_mask = nthbyte(state->m_gamma, 0x14);
-	UINT8 alpha_factor = nthbyte(state->m_gamma, 0x15);
-	int spot_length = mixer.spot_length;
-	bool spot_enabled = spot_length && state->m_spot_enable && state->m_chipselect&0xc000;
-	bool fade_enabled = mixer.flags&2 && mixer.fadeFactor;
-	int spot_factor, fade_factor = 0xff - mixer.fadeFactor;
-	rgbint fade_color;
+	UINT8 alpha_mask    = nthbyte(state->m_gamma, 0x14);
+	UINT8 alpha_factor  = nthbyte(state->m_gamma, 0x15);
 
+	// prepare spot
+	int spot_flags = mixer.flags >> 16;
+	bool spot_enabled = spot_flags&1 && spot_flags&0xc;
+	int spot_limit = (spot_flags&2) ? mixer.spot_limit : 0xff;
+
+	// prepare fader
+	bool fade_enabled = mixer.flags&2 && mixer.fadeFactor;
+	int fade_factor = 0xff - mixer.fadeFactor;
+	rgbint fade_color;
 	rgb_comp_to_rgbint(&fade_color, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
 
 	// mix textlayer with poly/sprites
@@ -1993,14 +2002,25 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 				if (spot_enabled)
 				{
 					UINT8 pen = src[x]&0xff;
-					if (pen < spot_length && (spot_factor = state->m_spotram[pen*4]) != 0)
+					rgbint mix;
+					rgb_to_rgbint(&mix, dest[x]);
+					if (spot_flags & 8)
 					{
-						rgbint mix;
-						rgb_to_rgbint(&mix, dest[x]);
-						rgbint_blend(&rgb, &mix, 0xff - spot_factor);
+						// mix with per-channel brightness
+						rgbint shade;
+						rgb_comp_to_rgbint(&shade,
+							(0xff - (state->m_spotram[pen<<2|1] & 0xff)) << 2,
+							(0xff - (state->m_spotram[pen<<2|2] & 0xff)) << 2,
+							(0xff - (state->m_spotram[pen<<2|3] & 0xff)) << 2
+						);
+						rgbint_scale_channel_and_clamp(&mix, &shade);
 					}
+
+					int spot_factor = 0xff - (state->m_spotram[pen<<2] & 0xff);
+					if (spot_factor < spot_limit)
+						rgbint_blend(&rgb, &mix, spot_factor);
 				}
-				
+
 				if (fade_enabled)
 					rgbint_blend(&rgb, &fade_color, fade_factor);
 
