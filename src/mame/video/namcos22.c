@@ -4,12 +4,12 @@
  * todo (ordered by importance):
  *
  * - emulate slave dsp!
- * - emulate spot (see testmode and dirtdash - other textlayer transparency issues in dirtdash is also spot related?)
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
  *       (is this related to dsp? or cpu?)
  * - find out how/where vics num_sprites is determined exactly, it causes major sprite problems in airco22b
  *       dirtdash would have this issue too, if not for the current workaround
+ * - improve ss22 fogging, lighting, and spot
  * - window clipping (acedrvrw, victlapw)
  * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
  *       (probably a bug in rgbint, not here?)
@@ -119,7 +119,7 @@ static struct
 	int gFadeColor;
 	int bFadeColor;
 	int fadeFactor;
-	int spot_translucency;
+	int spot_length;
 	int poly_translucency;
 	int palBase;
 } mixer;
@@ -169,7 +169,7 @@ UpdateVideoMixer( running_machine &machine )
     08,09,0a        background color
     0b
     0c
-    0d              spot related?
+    0d              amount of pens for spot
     0e
     0f
     10
@@ -192,6 +192,7 @@ UpdateVideoMixer( running_machine &machine )
 		mixer.rFogColor         = nthbyte( state->m_gamma, 0x05 );
 		mixer.gFogColor         = nthbyte( state->m_gamma, 0x06 );
 		mixer.bFogColor         = nthbyte( state->m_gamma, 0x07 );
+		mixer.spot_length       = nthbyte( state->m_gamma, 0x0d );
 		mixer.poly_translucency = nthbyte( state->m_gamma, 0x11 );
 		mixer.rFadeColor        = nthbyte( state->m_gamma, 0x16 );
 		mixer.gFadeColor        = nthbyte( state->m_gamma, 0x17 );
@@ -1881,12 +1882,16 @@ WRITE32_HANDLER( namcos22_tilemapattr_w )
 #define SPOTRAM_SIZE (0x800)
 
 /*
-RAM looks like it is a 256 * 4 bytes table
+RAM looks like it is a 256 * 4 words table
 testmode:
  offs: 0000 0001 0002 0003 - 03f4 03f5 03f6 03f7 03f8 03f9 03fa 03fb 03fc 03fd 03fe 03ff
  data: 00fe 00fe 00fe 00fe - 0001 0001 0001 0001 0000 0000 0000 0000 ffff ffff ffff ffff
 
-is the high byte used? it's usually 00, and in dirtdash always 02
+is the high byte of each word used? it's usually 00, and in dirtdash always 02
+
+low byte of each word:
+ byte 0 looks like a blend factor
+ bytes 1,2,3 may be other blend factor tables? (4 in total, like czram, selected where?), or an rgb triplet? (used how?)
 
 */
 
@@ -1945,13 +1950,15 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 	UINT8 *pri;
 	int x,y;
 
-	// prepare fader and alpha
+	// prepare fader and alpha and spot
 	UINT8 alpha_check12 = nthbyte(state->m_gamma, 0x12);
 	UINT8 alpha_check13 = nthbyte(state->m_gamma, 0x13);
 	UINT8 alpha_mask = nthbyte(state->m_gamma, 0x14);
 	UINT8 alpha_factor = nthbyte(state->m_gamma, 0x15);
+	int spot_length = mixer.spot_length;
+	bool spot_enabled = spot_length && state->m_spot_enable && state->m_chipselect&0xc000;
 	bool fade_enabled = mixer.flags&2 && mixer.fadeFactor;
-	int fade_factor = 0xff - mixer.fadeFactor;
+	int spot_factor, fade_factor = 0xff - mixer.fadeFactor;
 	rgbint fade_color;
 
 	rgb_comp_to_rgbint(&fade_color, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
@@ -1982,6 +1989,18 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 					}
 				}
 
+				// apply spot
+				if (spot_enabled)
+				{
+					UINT8 pen = src[x]&0xff;
+					if (pen < spot_length && (spot_factor = state->m_spotram[pen*4]) != 0)
+					{
+						rgbint mix;
+						rgb_to_rgbint(&mix, dest[x]);
+						rgbint_blend(&rgb, &mix, 0xff - spot_factor);
+					}
+				}
+				
 				if (fade_enabled)
 					rgbint_blend(&rgb, &fade_color, fade_factor);
 

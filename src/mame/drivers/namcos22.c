@@ -2514,7 +2514,11 @@ static WRITE32_HANDLER( namcos22s_nvmem_w )
 static WRITE32_HANDLER( namcos22s_chipselect_w )
 {
 	// assume that this register is for chip enable/disable
-	// the only sure thing is that bit $4000 means spot enable (testmode, dirtdash)
+	// it's written many times during boot-up, and most games don't touch it afterwards (last value usually 0038 or 0838)
+	// 8000: spot related (set in dirtdash night driving)
+	// 4000: spot related (set in dirtdash and testmode)
+	// 0800: fade related?
+	// other bits: no clue
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	if (ACCESSING_BITS_16_23)
 		state->m_chipselect = data >> 16;
