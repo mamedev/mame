@@ -2493,6 +2493,7 @@ src/mame/drivers/neogeo.c svneol=native#text/plain
 src/mame/drivers/neoprint.c svneol=native#text/plain
 src/mame/drivers/neptunp2.c svneol=native#text/plain
 src/mame/drivers/news.c svneol=native#text/plain
+src/mame/drivers/nexus3d.c svneol=native#text/plain
 src/mame/drivers/nightgal.c svneol=native#text/plain
 src/mame/drivers/ninjakd2.c svneol=native#text/plain
 src/mame/drivers/ninjaw.c svneol=native#text/plain
