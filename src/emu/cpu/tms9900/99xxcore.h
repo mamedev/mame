@@ -4252,23 +4252,26 @@ static void ldcr_stcr(tms99xx_state *cpustate, UINT16 opcode)
 		if (cnt <= 8)
 		{
 #if (TMS99XX_MODEL != TMS9995_ID)
-				(void)readbyteX(cpustate, addr, src_map);	/*dummy read*/
 
-				(void)READREG(cnt+cnt); /*dummy read (reasonnable guess for TMS9995 & TMS9900, ti990/10)*/
+				(void)READREG(cnt+cnt); /*dummy read (reasonable guess for TMS9995 & TMS9900, ti990/10)*/
+				// MZ: Read before write
+				int value2 = readwordX(cpustate, addr & ~1, src_map);
 
 				#if HAS_PRIVILEGE
 					value = readCRU(cpustate, (READREG(R12) >> 1), cnt);
+
 					if (value == CRU_PRIVILEGE_VIOLATION)
 						HANDLE_PRIVILEGE_VIOLATION
 					else
 					{
 						setst_byte_laep(cpustate, value);
-						writebyteX(cpustate, addr, value, src_map);
+						writewordX(cpustate, addr, ((value << 8) & 0xff00) | (value2 & 0x00ff), src_map);
 					}
 				#else
 			value = readCRU(cpustate, (READREG(R12) >> 1), cnt);
 			setst_byte_laep(cpustate, value);
-					writebyteX(cpustate, addr, value, src_map);
+
+				writewordX(cpustate, addr, ((value << 8) & 0xff00) | (value2 & 0x00ff), src_map);
 				#endif
 				CYCLES(18+cnt, (cnt != 8) ? 42 : 44, 19 + cnt);
 #else
@@ -4276,7 +4279,7 @@ static void ldcr_stcr(tms99xx_state *cpustate, UINT16 opcode)
 			/* this must be because instruction decoding is too complex */
 				int value2 = readwordX(cpustate, addr & ~1, src_map);
 
-				(void)READREG(cnt+cnt); /*dummy read (reasonnable guess for TMS9995 & TMS9900, ti990/10)*/
+				(void)READREG(cnt+cnt); /*dummy read (reasonable guess for TMS9995 & TMS9900, ti990/10)*/
 
 			value = readCRU(cpustate, (READREG(R12) >> 1), cnt);
 			setst_byte_laep(cpustate, value);
