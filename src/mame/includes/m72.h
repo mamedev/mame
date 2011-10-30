@@ -48,6 +48,7 @@ VIDEO_START( rtype2 );
 VIDEO_START( majtitle );
 VIDEO_START( hharry );
 VIDEO_START( poundfor );
+VIDEO_START( xmultipl );
 
 READ16_HANDLER( m72_palette1_r );
 READ16_HANDLER( m72_palette2_r );

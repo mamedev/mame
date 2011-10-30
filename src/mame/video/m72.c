@@ -2,11 +2,6 @@
 #include "audio/m72.h"
 #include "includes/m72.h"
 
-
-
-
-
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -145,6 +140,15 @@ VIDEO_START( m72 )
 	tilemap_set_scrolldy(state->m_bg_tilemap,-128,16);
 
 	register_savestate(machine);
+}
+
+VIDEO_START( xmultipl )
+{
+	m72_state *state = machine.driver_data<m72_state>();
+	VIDEO_START_CALL(m72);
+
+	tilemap_set_scrolldx(state->m_fg_tilemap,4,0);
+	tilemap_set_scrolldx(state->m_bg_tilemap,6,0);
 }
 
 VIDEO_START( rtype2 )
