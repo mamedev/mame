@@ -2265,7 +2265,7 @@ static MACHINE_CONFIG_START( hharryu, m72_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_UPDATE(m72)
 
-	MCFG_VIDEO_START(rtype2)
+	MCFG_VIDEO_START(hharryu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

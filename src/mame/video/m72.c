@@ -187,6 +187,14 @@ VIDEO_START( poundfor )
 	tilemap_set_scrolldx(state->m_bg_tilemap,6,0);
 }
 
+VIDEO_START( hharryu )
+{
+	m72_state *state = machine.driver_data<m72_state>();
+	VIDEO_START_CALL(rtype2);
+
+	tilemap_set_scrolldx(state->m_fg_tilemap,4,0);
+	tilemap_set_scrolldx(state->m_bg_tilemap,6,0);
+}
 
 /* Major Title has a larger background RAM, and rowscroll */
 VIDEO_START( majtitle )
