@@ -771,6 +771,7 @@ static const struct
 	{ INPUT_STRING_Tilt, "Tilt" },
 	{ INPUT_STRING_Version, "Version" },
 	{ INPUT_STRING_Region, "Region" },
+	{ INPUT_STRING_International, "International" },
 	{ INPUT_STRING_Japan, "Japan" },
 	{ INPUT_STRING_USA, "USA" },
 	{ INPUT_STRING_Europe, "Europe" },

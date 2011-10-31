@@ -549,6 +549,7 @@ enum
 	INPUT_STRING_Tilt,
 	INPUT_STRING_Version,
 	INPUT_STRING_Region,
+	INPUT_STRING_International,
 	INPUT_STRING_Japan,
 	INPUT_STRING_USA,
 	INPUT_STRING_Europe,
