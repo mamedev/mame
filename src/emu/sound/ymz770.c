@@ -772,7 +772,6 @@ void ymz770_device::device_reset()
 		channels[i].seqdelay = 0;
 		channels[i].is_playing = false;
 		channels[i].is_seq_playing = false;
-		channels[i].decoder = new amm;
 	}
 }
 
