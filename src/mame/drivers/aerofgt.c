@@ -566,11 +566,11 @@ static INPUT_PORTS_START( pspikesc )
 	PORT_INCLUDE( pspikes )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0030, 0x0030, "Country" )					PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(      0x0030, "China" )
-	PORT_DIPSETTING(      0x0020, "Taiwan" )
-	PORT_DIPSETTING(      0x0010, "Hong-Kong" )
-	PORT_DIPSETTING(      0x0000, "China" )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Region ) )					PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(      0x0030, DEF_STR( China ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( China ) )
 INPUT_PORTS_END
 
 
@@ -958,9 +958,9 @@ static INPUT_PORTS_START( aerofgtb )
 
 	/* Dips bank 3 (not documented) */
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0000, "Country" )				PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Region ) )				PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(      0x0001, "Taiwan" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Taiwan ) )
 	/* TODO: there are others in the table at 11910 */
 	/* this port is checked at 1b080 */
 INPUT_PORTS_END
@@ -1047,12 +1047,12 @@ static INPUT_PORTS_START( aerofgt )
 
 	/* This DSW3 is not documented in the Aero Fighters manual */
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x000f, 0x0000, "Country" )
+	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Any" )
 	PORT_DIPSETTING(      0x000f, "USA/Canada" )
-	PORT_DIPSETTING(      0x000e, "Korea" )
-	PORT_DIPSETTING(      0x000d, "Hong Kong" )
-	PORT_DIPSETTING(      0x000b, "Taiwan" )
+	PORT_DIPSETTING(      0x000e, DEF_STR( Korea ) )
+	PORT_DIPSETTING(      0x000d, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(      0x000b, DEF_STR( Taiwan ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wbbc97 )

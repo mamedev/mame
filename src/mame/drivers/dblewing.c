@@ -447,9 +447,9 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Territory" ) PORT_DIPLOCATION("SW1:8") /*Manual says "don't change this" */
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Region ) ) PORT_DIPLOCATION("SW1:8") /*Manual says "don't change this" */
 	PORT_DIPSETTING(      0x0080, DEF_STR( Japan ) )
-	PORT_DIPSETTING(      0x0000, "Korea" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Korea ) )
 	/* 16bit - These values are for Dip Switch #2 */
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0100, "1" )

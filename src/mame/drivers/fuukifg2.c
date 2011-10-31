@@ -203,9 +203,9 @@ static INPUT_PORTS_START( gogomile )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x0030, 0x0020, DEF_STR( Language ) )	PORT_DIPLOCATION("SW1:5,6") /* Default Language: English */
-	PORT_DIPSETTING(      0x0010, "Chinese" )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Chinese ) )
 	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) )	/* Only setting to give a "For use only in...." Copyright Notice */
-	PORT_DIPSETTING(      0x0000, "Korean" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( English ) )
 	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(      0x0000, "2" )
@@ -248,9 +248,9 @@ static INPUT_PORTS_START( gogomilej )
 
 	PORT_MODIFY("DSW")		// $880000.w
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Language ) ) 	PORT_DIPLOCATION("SW1:5,6") /* Default Language: Japanese */
-	PORT_DIPSETTING(      0x0010, "Chinese" )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Chinese ) )
 	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) )	/* Only setting to give a "For use only in...." Copyright Notice */
-	PORT_DIPSETTING(      0x0000, "Korean" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( English ) )
 
 	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW2:3,4,5")

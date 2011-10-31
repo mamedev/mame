@@ -1248,13 +1248,13 @@ static INPUT_PORTS_START( outzone )
 	TOAPLAN1_SYSTEM_INPUTS
 
 	PORT_START("TJUMP")		/* Territory Jumper Block */
-	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co License)" )
 	PORT_DIPSETTING(    0x07, "US (Romstar License)" )
 	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading License)" )
@@ -1272,31 +1272,31 @@ static INPUT_PORTS_START( outzoneb )
 	PORT_INCLUDE( outzone )
 
 	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
-	PORT_DIPNAME( 0x07, 0x02, "Territory" )
+	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "No Warning Screen" )
 	PORT_DIPSETTING(    0x07, "No Warning Screen" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) // doesn't seem to matter on this set
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) // doesn't seem to matter on this set
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( outzonec )
 	PORT_INCLUDE( outzone )
 
 	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
-	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co License)" )
 	PORT_DIPSETTING(    0x07, "US (Romstar License)" )
 	PORT_DIPSETTING(    0x08, "Hong Kong & China (Honest Trading License)" )
@@ -1341,16 +1341,16 @@ static INPUT_PORTS_START( vimana )
 
 	/* 0x440011.b */
 	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
 //  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
 //  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
 //  PORT_DIPSETTING(    0x09, "???" )
 //  PORT_DIPSETTING(    0x0a, "???" )
@@ -1380,16 +1380,16 @@ static INPUT_PORTS_START( vimanan )
 
 	/* 0x440011.b */
 	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x02, "Europe (Nova Apparate license)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
 //  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
 //  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
 //  PORT_DIPSETTING(    0x09, "???" )
 //  PORT_DIPSETTING(    0x0a, "???" )
@@ -1415,7 +1415,7 @@ static INPUT_PORTS_START( vimana1 )
 
 	/* 0x440011.b */
 	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x00, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Region ) )
 //  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
 //  PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 //  PORT_DIPSETTING(    0x07, "USA (Romstar license)" )

@@ -302,13 +302,13 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW3:8" )		/* Listed as "Unused" */
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x001f, 0x0010, "Country" )			/* Jumpers?? */
+	PORT_DIPNAME( 0x001f, 0x0010, DEF_STR( Region ) )			/* Jumpers?? */
 	PORT_DIPSETTING(      0x0010, DEF_STR( World ) )
 	PORT_DIPSETTING(      0x0001, "USA & Canada" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(      0x0002, "Korea" )
-	PORT_DIPSETTING(      0x0004, "Hong Kong" )
-	PORT_DIPSETTING(      0x0008, "Taiwan" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Korea ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Taiwan ) )
 	/* all other values are invalid */
 INPUT_PORTS_END
 
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( f1gp2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x0001, 0x0001, "Country" )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( World ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japan ) )
 	PORT_DIPUNUSED( 0x001e, 0x001e )

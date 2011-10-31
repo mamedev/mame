@@ -268,12 +268,12 @@ static INPUT_PORTS_START( taotaido )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("JP")	/* Jumpers (0xffff8f.b) */
-	PORT_DIPNAME( 0x0f, 0x08, "Country" )
-	PORT_DIPSETTING(    0x00, "US" )				// also (c) Mc O'River Inc
+	PORT_DIPNAME( 0x0f, 0x08, DEF_STR( Region ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )				// also (c) Mc O'River Inc
 	PORT_DIPSETTING(    0x01, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x02, "Hong-Kong/Taiwan" )
+	PORT_DIPSETTING(    0x02, "Hong Kong/Taiwan" )
 //  PORT_DIPSETTING(    0x03, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x04, "Korea" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
 //  PORT_DIPSETTING(    0x05, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x06, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x07, DEF_STR( Japan ) )

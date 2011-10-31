@@ -1082,8 +1082,8 @@ static INPUT_PORTS_START( orlegend )
 	PORT_DIPNAME( 0x0003, 0x0000, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( World ) )
     PORT_CONFSETTING(      0x0001, "World (duplicate)" ) // again?
-	PORT_CONFSETTING(      0x0002, "Korea" )
-	PORT_CONFSETTING(      0x0003, "China" )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0003, DEF_STR( China ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( orld105k )
@@ -1100,11 +1100,11 @@ static INPUT_PORTS_START( sango )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, "China" )
-	PORT_CONFSETTING(      0x0001, "Taiwan" )
-	PORT_CONFSETTING(      0x0002, "Japan (Alta License)" )
-	PORT_CONFSETTING(      0x0003, "Korea" )
-	PORT_CONFSETTING(      0x0004, "Hong Kong" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
 INPUT_PORTS_END
 
@@ -1133,11 +1133,11 @@ static INPUT_PORTS_START( olds )
 	/* includes the following regions:
     1 = taiwan, 2 = china, 3 = japan (title = orlegend special),
     4 = korea, 5 = hong kong, 6 = world */
-	PORT_CONFSETTING(      0x0001, "Taiwan" )
-	PORT_CONFSETTING(      0x0002, "China" )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Japan ) )
-	PORT_CONFSETTING(      0x0004, "Korea" )
-	PORT_CONFSETTING(      0x0005, "Hong Kong" )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0005, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
 INPUT_PORTS_END
 
@@ -1146,9 +1146,9 @@ static INPUT_PORTS_START( killbld )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x00ff, 0x0021, "Region (not currently working)" ) // different regions supply different protection code sequences, we only have the China one ATM
-	PORT_DIPSETTING(      0x0016, "Taiwan" )
-	PORT_DIPSETTING(      0x0017, "China" )
-	PORT_DIPSETTING(      0x0018, "Hong Kong" )
+	PORT_DIPSETTING(      0x0016, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(      0x0017, DEF_STR( China ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(      0x0019, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(      0x001a, "1a" ) // invalid
 //  PORT_DIPSETTING(      0x001b, "1b" ) // invalid
@@ -1156,7 +1156,7 @@ static INPUT_PORTS_START( killbld )
 //  PORT_DIPSETTING(      0x001d, "1d" ) // invalid
 //  PORT_DIPSETTING(      0x001e, "1e" ) // invalid
 //  PORT_DIPSETTING(      0x001f, "1f" ) // invalid
-	PORT_DIPSETTING(      0x0020, "Korea" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Korea ) )
 	PORT_DIPSETTING(      0x0021, DEF_STR( World ) )
 INPUT_PORTS_END
 
@@ -1165,12 +1165,12 @@ static INPUT_PORTS_START( photoy2k )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0003, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, "Taiwan" )
-	PORT_CONFSETTING(      0x0001, "China" )
-	PORT_CONFSETTING(      0x0002, "Japan (Alta License)" )
-	PORT_CONFSETTING(      0x0003, DEF_STR( World ))
-	PORT_CONFSETTING(      0x0004, "Korea" )
-	PORT_CONFSETTING(      0x0005, "Hong Kong" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0005, DEF_STR( Hong_Kong ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddp2 )
@@ -1279,11 +1279,11 @@ static INPUT_PORTS_START( ddp2 )
 */
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, "China" )
-	PORT_CONFSETTING(      0x0001, "Taiwan" )
-	PORT_CONFSETTING(      0x0002, "Japan (Cave License)" )
-	PORT_CONFSETTING(      0x0003, "Korea" )
-	PORT_CONFSETTING(      0x0004, "Hong Kong" )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, "Japan (Cave license)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
 INPUT_PORTS_END
 
@@ -1292,12 +1292,12 @@ static INPUT_PORTS_START( oldsplus )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0001, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0001, "China" )
+	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
-	PORT_CONFSETTING(      0x0003, "Korea" )
-	PORT_CONFSETTING(      0x0004, "Hong Kong" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
-	PORT_CONFSETTING(      0x0006, "Taiwan" )
+	PORT_CONFSETTING(      0x0006, DEF_STR( Taiwan ) )
 INPUT_PORTS_END
 
 

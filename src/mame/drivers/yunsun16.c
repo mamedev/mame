@@ -471,7 +471,7 @@ static INPUT_PORTS_START( paprazzi )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) )
 	PORT_DIPUNKNOWN( 0x0004, 0x0004 )  // $25bc
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Language ) )
-	PORT_DIPSETTING(      0x0000, "Korean" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( English ) )
 	PORT_DIPNAME( 0x0010, 0x0010, "Enemies" ) // soemthing else.. but related to enemy types
 	PORT_DIPSETTING(      0x0000, "Type 1" )

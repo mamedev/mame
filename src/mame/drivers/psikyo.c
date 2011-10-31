@@ -598,12 +598,12 @@ static INPUT_PORTS_START( samuraia )
         1 1 1 0 Taiwan With FBI logo??
 
     ************************************************/
-	PORT_DIPNAME( 0x000000ff, 0x000000ff, "Country" )
+	PORT_DIPNAME( 0x000000ff, 0x000000ff, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x000000ff, DEF_STR( World ) )
 	PORT_DIPSETTING(          0x000000ef, "USA & Canada" )
-	PORT_DIPSETTING(          0x000000df, "Korea" )
-	PORT_DIPSETTING(          0x000000bf, "Hong Kong" )
-	PORT_DIPSETTING(          0x0000007f, "Taiwan" )
+	PORT_DIPSETTING(          0x000000df, DEF_STR( Korea ) )
+	PORT_DIPSETTING(          0x000000bf, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(          0x0000007f, DEF_STR( Taiwan ) )
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
 INPUT_PORTS_END
 
@@ -625,12 +625,12 @@ static INPUT_PORTS_START( sngkace )
 
     ************************************************/
 #if 0 // See Patch in MACHINE_RESET, only text not logo
-	PORT_DIPNAME( 0x000000ff, 0x000000ff, "Country" )
+	PORT_DIPNAME( 0x000000ff, 0x000000ff, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x000000ff, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x000000ef, "USA & Canada" )
-	PORT_DIPSETTING(          0x000000df, "Korea" )
-	PORT_DIPSETTING(          0x000000bf, "Hong Kong" )
-	PORT_DIPSETTING(          0x0000007f, "Taiwan" )
+	PORT_DIPSETTING(          0x000000df, DEF_STR( Korea ) )
+	PORT_DIPSETTING(          0x000000bf, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(          0x0000007f, DEF_STR( Taiwan ) )
 #endif
 	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -674,13 +674,13 @@ static INPUT_PORTS_START( btlkroad )
         Other   World
 
     ************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x00000000, "Copyright (Country)" )
-	PORT_DIPSETTING(          0x0000000f, "Psikyo (Japan)" )
-	PORT_DIPSETTING(          0x0000000e, "Jaleco+Psikyo (USA & Canada)" )
-	PORT_DIPSETTING(          0x0000000c, "Psikyo (Korea)" )
-	PORT_DIPSETTING(          0x0000000a, "Psikyo (Hong Kong)" )
-	PORT_DIPSETTING(          0x00000006, "Psikyo (Taiwan)" )
-	PORT_DIPSETTING(          0x00000000, "Psikyo (World)" )
+	PORT_DIPNAME( 0x0000000f, 0x00000000, DEF_STR( Region ) )
+	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
+	PORT_DIPSETTING(          0x0000000e, "USA & Canada (Jaleco license)" )
+	PORT_DIPSETTING(          0x0000000c, DEF_STR( Korea ) )
+	PORT_DIPSETTING(          0x0000000a, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(          0x00000006, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( World ) )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -761,12 +761,12 @@ static INPUT_PORTS_START( gunbird )
     Has no effects on Japan or Korea versions.
 
     ************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, "Country" )
+	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x0000000f, DEF_STR( World ) )
 	PORT_DIPSETTING(          0x0000000e, DEF_STR( USA ) )
-	PORT_DIPSETTING(          0x0000000d, "Korea" )
-	PORT_DIPSETTING(          0x0000000b, "Hong Kong" )
-	PORT_DIPSETTING(          0x00000007, "Taiwan" )
+	PORT_DIPSETTING(          0x0000000d, DEF_STR( Korea ) )
+	PORT_DIPSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(          0x00000007, DEF_STR( Taiwan ) )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -831,12 +831,12 @@ static INPUT_PORTS_START( s1945 )
     No effect on set s1945j or s1945k
 
     ************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, "Country" )
+	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x0000000f, DEF_STR( World ) )
-	PORT_DIPSETTING(          0x0000000e, "U.S.A & Canada" )
-	PORT_DIPSETTING(          0x0000000d, "Korea" )
-	PORT_DIPSETTING(          0x0000000b, "Hong Kong" )
-	PORT_DIPSETTING(          0x00000007, "Taiwan" )
+	PORT_DIPSETTING(          0x0000000e, "USA & Canada" )
+	PORT_DIPSETTING(          0x0000000d, DEF_STR( Korea ) )
+	PORT_DIPSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(          0x00000007, DEF_STR( Taiwan ) )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -887,7 +887,7 @@ static INPUT_PORTS_START( s1945a )
     Bit 0 1 2 3
         1 1 1 1 Japan, anything but 0x0f = "World"
     ************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, "Country" )
+	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x0000000e, DEF_STR( World ) )
 INPUT_PORTS_END
@@ -947,12 +947,12 @@ static INPUT_PORTS_START( tengai )
         1 1 1 0 Taiwan
 
     ************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, "Country" )
+	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x0000000f, DEF_STR( World ) )
-	PORT_DIPSETTING(          0x0000000e, "U.S.A & Canada" )
-	PORT_DIPSETTING(          0x0000000d, "Korea" )
-	PORT_DIPSETTING(          0x0000000b, "Hong Kong" )
-	PORT_DIPSETTING(          0x00000007, "Taiwan" )
+	PORT_DIPSETTING(          0x0000000e, "USA & Canada" )
+	PORT_DIPSETTING(          0x0000000d, DEF_STR( Korea ) )
+	PORT_DIPSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(          0x00000007, DEF_STR( Taiwan ) )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -985,7 +985,7 @@ static INPUT_PORTS_START( tengaij )
     Text for other regions is present though.
 
     ************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, "Country" )
+	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x0000000e, DEF_STR( World ) )
 INPUT_PORTS_END

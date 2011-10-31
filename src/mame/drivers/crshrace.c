@@ -346,11 +346,11 @@ static INPUT_PORTS_START( crshrace )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f00, 0x0100, "Country" )
+	PORT_DIPNAME( 0x0f00, 0x0100, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( World ) )
 	PORT_DIPSETTING(      0x0800, "USA & Canada" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(      0x0200, "Korea" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Korea ) )
 	PORT_DIPSETTING(      0x0400, "Hong Kong & Taiwan" )
 /*
     the following are all the same and seem to act like the World setting, possibly

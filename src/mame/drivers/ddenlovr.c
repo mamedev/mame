@@ -5948,7 +5948,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x00, "Hong Kong" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hong_Kong ) )
 
 	PORT_START("DSW5")
 	PORT_DIPNAME( 0x03, 0x03, "Computer Strength?" )
