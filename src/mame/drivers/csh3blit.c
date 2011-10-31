@@ -216,7 +216,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 					#elif _DMODE == 3
 					//g_profiler.start(PROFILER_USER4);
 					clr_mul_fixed(&clr0.trgb, s_alpha, &s_clr.trgb);
-					clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
+					clr_add(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 
 					#elif _DMODE == 4
 					//g_profiler.start(PROFILER_USER5);
@@ -236,7 +236,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 					#elif _DMODE == 7
 					//g_profiler.start(PROFILER_USER8);
 					clr_mul_fixed(&clr0.trgb, s_alpha, &s_clr.trgb);
-					clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
+					clr_add(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 					#endif
 
 				//g_profiler.stop();
@@ -259,7 +259,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 					clr_add_with_clr_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 					#elif _DMODE == 3
 					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb);
-					clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
+					clr_add(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 
 					#elif _DMODE == 4
 					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb);
@@ -272,7 +272,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 					clr_add_with_clr_mul_rev_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 					#elif _DMODE == 7
 					clr_mul_3param(&clr0.trgb, &s_clr.trgb, &d_clr.trgb);
-					clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
+					clr_add(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 					#endif
 				//g_profiler.stop();
 
@@ -306,7 +306,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 				#elif _DMODE == 2
 				clr_add_with_clr_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 				#elif _DMODE == 3
-				clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
+				clr_add(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 
 				#elif _DMODE == 4
 				clr_add_with_clr_mul_fixed_rev(&s_clr.trgb, &clr0.trgb, d_alpha, &d_clr.trgb);
@@ -315,7 +315,7 @@ const void FUNCNAME(bitmap_t *bitmap,
 				#elif _DMODE == 6
 				clr_add_with_clr_mul_rev_square(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 				#elif _DMODE == 7
-				clr_add(&s_clr.trgb, &s_clr.trgb, &d_clr.trgb);
+				clr_add(&s_clr.trgb, &clr0.trgb, &d_clr.trgb);
 				#endif
 
 				//g_profiler.stop();
