@@ -50,7 +50,7 @@ class ymz770_device : public device_t, public device_sound_interface
         int output_ptr;
 
     	UINT8 sequence;
-    	UINT8 sqncontrol;
+    	UINT8 seqcontrol;
     	UINT8 seqdelay;
     	UINT8 *seqdata;
     	bool is_seq_playing;

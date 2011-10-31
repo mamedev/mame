@@ -747,7 +747,7 @@ void ymz770_device::device_start()
 		save_item(NAME(channels[i].output_remaining), i);
 		save_item(NAME(channels[i].output_ptr), i);
 		save_item(NAME(channels[i].sequence), i);
-		save_item(NAME(channels[i].sqncontrol), i);
+		save_item(NAME(channels[i].seqcontrol), i);
 		save_item(NAME(channels[i].seqdelay), i);
 		save_item(NAME(channels[i].is_seq_playing), i);
 		save_item(NAME(channels[i].output_data), i);
@@ -810,7 +810,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					switch (reg)
 					{
 						case 0x0f:
-							if (channels[ch].sqncontrol & 1)
+							if (channels[ch].seqcontrol & 1)
 							{
 								UINT8 sqn = channels[ch].sequence;
 								UINT32 pptr = rom_base[(4*sqn)+1+0x400]<<16 | rom_base[(4*sqn)+2+0x400]<<8 | rom_base[(4*sqn)+3+0x400];
@@ -955,7 +955,7 @@ void ymz770_device::internal_reg_write(int offset, UINT8 data)
 				{
 						channels[voice].is_seq_playing = false;
 				}
-				channels[voice].sqncontrol = data;
+				channels[voice].seqcontrol = data;
 				break;
 		}
 	}
