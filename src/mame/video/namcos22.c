@@ -17,8 +17,11 @@
  *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
  *       + dirtdash speedometer has wrong colors when in the jungle level
  *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level (possibly just a game bug)
+ * - window clipping is wrong in acedrvrw, victlapw
+ * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
+ * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
  * - dirtdash polys are broken at the start section of the mountain level
- * - window clipping (acedrvrw, victlapw)
+ * - alpinr2b skiier selection screen should have mirrored models (easiest to see with cursor on the red pants guy)
  * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
  * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
  *       czram contents is rather odd here and partly cleared (probably the cause?):
@@ -1409,7 +1412,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 	int i, cztype = pSource[3]&3;
 	if( state->m_mbSuperSystem22 )
 	{
-		cztype ^= 3;
+		cztype ^= 3; // ? not sure, but this makes testmode look like on a pcb (only 1 pcb checked)
 		node->data.quad3d.cmode       = (pSource[2]&0x00f0)>>4;
 		node->data.quad3d.textureBank = (pSource[2]&0x000f);
 	}
@@ -1904,7 +1907,7 @@ is the high byte of each word used? it's usually 00, and in dirtdash always 02
 
 low byte of each word:
  byte 0 looks like a blend factor
- bytes 1,2,3 a secondary brightness factor per rgb channel
+ bytes 1,2,3 a secondary brightness factor per rgb channel(?)
 
 */
 
