@@ -134,6 +134,7 @@ endif
 ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
+SDL_NETWORK = on
 endif
 
 ifeq ($(TARGETOS),freebsd)
@@ -495,6 +496,20 @@ LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
 # make sure we can find X headers
 INCPATH += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 endif # NO_X11
+
+#-------------------------------------------------
+# Network (TAP/TUN)
+#-------------------------------------------------
+
+ifdef USE_NETWORK
+ifeq ($(SDL_NETWORK),on)
+OSDOBJS += \
+	$(SDLOBJ)/netdev.o \
+	$(SDLOBJ)/netdev_tap.o
+
+DEFS += -DSDLMAME_NETWORK
+endif
+endif
 
 #-------------------------------------------------
 # Dependencies

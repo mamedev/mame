@@ -75,7 +75,7 @@ else
 UNAME = $(shell uname -a)
 
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
-TARGETOS = unix
+TARGETOS = linux
 endif
 ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
 TARGETOS = solaris
@@ -405,6 +405,10 @@ ifdef PROFILER
 DEFS += -DMAME_PROFILER
 endif
 
+# define USE_NETWORK if we are a making network enabled build
+ifdef USE_NETWORK
+DEFS += -DUSE_NETWORK
+endif
 
 
 #-------------------------------------------------

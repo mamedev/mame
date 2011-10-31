@@ -44,6 +44,7 @@
 #include "output.h"
 #include "osdsdl.h"
 #include "sdlos.h"
+#include "netdev.h"
 
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
@@ -646,10 +647,12 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 	sdlinput_init(machine);
-
 	sdlaudio_init(machine);
-
 	sdloutput_init(machine);
+
+#ifdef SDLMAME_NETWORK
+	sdlnetdev_init(machine);
+#endif
 
 	if (options.oslog())
 		machine.add_logerror_callback(output_oslog);
