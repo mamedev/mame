@@ -729,6 +729,7 @@ void ymz770_device::device_start()
 	for (int i = 0; i < 8; i++)
 	{
 		channels[i].is_playing = false;
+		channels[i].is_seq_playing = false;
 		channels[i].decoder = new amm;
 	}
 
@@ -766,7 +767,11 @@ void ymz770_device::device_reset()
 		channels[i].pan = 8;
 		channels[i].volume = 0;
 		channels[i].control = 0;
+		channels[i].sequence = 0;
+		channels[i].seqcontrol = 0;
+		channels[i].seqdelay = 0;
 		channels[i].is_playing = false;
+		channels[i].is_seq_playing = false;
 		channels[i].decoder = new amm;
 	}
 }
