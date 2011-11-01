@@ -253,7 +253,7 @@ static INPUT_PORTS_START( galaxygame )
 	PORT_DIPNAME( 0x0080, 0x0000, "Speed" )
 	PORT_DIPSETTING(      0x0000, "Slow Speed" )
 	PORT_DIPSETTING(      0x0080, "Fast Speed" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Players ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Players ) )
 	PORT_DIPSETTING(      0x0000, "Two Players" )
 	PORT_DIPSETTING(      0x0040, "One Player" )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -348,7 +348,7 @@ MACHINE_CONFIG_END
 
 ROM_START(galgame)
 	ROM_REGION( 0x20000, "code", ROMREGION_ERASE00 )
-	ROM_LOAD( "original galaxy game listing.lst",  0x00000, 0x1efce, CRC(cd65a869) SHA1(8469313e5feaa3303ddb59c845fcdf00908973af) )	
+	ROM_LOAD( "original galaxy game listing.lst",  0x00000, 0x1efce, CRC(72e206d6) SHA1(dae3f3bbdcf60756eea3985a44528101cab8617f) )	
 ROM_END
 
 /*************************************
@@ -456,7 +456,10 @@ static DRIVER_INIT(galaxygame)
 		}
 	}
 
-	// patch wrong code
+// there is a wrong code on listing (compiled code doesn't match ROL instructions):
+// 1006  006432  006601                10060         ROL        R1
+// 1007  006434  006602                10070         ROL        R2
+// here wrong code is patched
 	main->write_word(006432, 006101); /* ROL	   R1 */
 	main->write_word(006434, 006102); /* ROL	   R2 */
 
@@ -468,4 +471,4 @@ static DRIVER_INIT(galaxygame)
 	main->write_word(8, 000500 - 10);
 }
 
-GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", GAME_NO_SOUND_HW )
