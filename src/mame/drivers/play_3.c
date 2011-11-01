@@ -53,7 +53,7 @@ static MACHINE_CONFIG_START( play_3, play_3_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
-/ Meg-Aaton (1983)
+/ Meg Aaton (1983)
 /-------------------------------------------------------------------*/
 ROM_START(megaaton)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -72,4 +72,4 @@ ROM_START(megaaton)
 	ROM_RELOAD(0xe000, 0x1000)
 ROM_END
 
-GAME(1983,	megaaton,	0,	play_3,	play_3,	play_3,	ROT0,	"Playmatic",		"Meg-Aaton",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	megaaton,	0,	play_3,	play_3,	play_3,	ROT0,	"Playmatic",		"Meg Aaton",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
