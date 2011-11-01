@@ -560,7 +560,6 @@ static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0x70, 0x70) AM_READ_PORT("TJUMP")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( truxton_sound_io_map, AS_IO, 8 )
@@ -736,15 +735,12 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPSETTING(    0x10, DEF_STR( USA ) )              /* Taito America Corp. */
 	PORT_DIPSETTING(    0x30, "USA (Romstar license)" )     /* Taito America Corp. */
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */
-	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switch Settings" )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   /* not on race 1 */
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-
-	PORT_START("TJUMP")       /* Territory Jumper Block (not present ? this port isn't even read) */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* P1 : in 0x00 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x18000c.w (CPU0 shared RAM) */
 	/* P2 : in 0x10 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x18000e.w (CPU0 shared RAM) */
@@ -779,7 +775,7 @@ static INPUT_PORTS_START( truxton )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switch Settings" )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )

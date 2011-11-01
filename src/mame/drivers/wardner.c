@@ -276,23 +276,23 @@ ADDRESS_MAP_END
 /* verified from Z80 code */
 static INPUT_PORTS_START( wardner_generic )
 	PORT_START("DSWA")
-	TOAPLAN_MACHINE_COCKTAIL
-	TOAPLAN_COINAGE_WORLD
+	TOAPLAN_MACHINE_COCKTAIL_LOC(SW1)
+	TOAPLAN_COINAGE_WORLD_LOC(SW1)
 
 	PORT_START("DSWB")
-	TOAPLAN_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x13ce ('wardner') or 0x13de ('wardnerj') */
+	TOAPLAN_DIFFICULTY_LOC(SW2)
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")	/* table at 0x13ce ('wardner') or 0x13de ('wardnerj') */
 	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
 	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
 	PORT_DIPSETTING(	0x08, "30k Only" )
 	PORT_DIPSETTING(	0x0c, "50k Only" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(	0x30, "1" )
 	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x10, "4" )
 	PORT_DIPSETTING(	0x20, "5" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "SW2:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" )
 
 	PORT_START("P1")
 	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
@@ -326,7 +326,7 @@ static INPUT_PORTS_START( wardnerj )
 	PORT_INCLUDE( wardner )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD
+	TOAPLAN_COINAGE_JAPAN_OLD_LOC(SW1)
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -334,12 +334,12 @@ static INPUT_PORTS_START( pyros )
 	PORT_INCLUDE( wardnerj )
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x13ce */
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")	/* table at 0x13ce */
 	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
 	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
 	PORT_DIPSETTING(	0x08, "50k Only" )
 	PORT_DIPSETTING(	0x0c, "100k Only" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   /* additional code at 0x6037 */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:!7")   /* additional code at 0x6037 */
 	PORT_DIPSETTING(	0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
