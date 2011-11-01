@@ -348,7 +348,7 @@ MACHINE_CONFIG_END
 
 ROM_START(galgame)
 	ROM_REGION( 0x20000, "code", ROMREGION_ERASE00 )
-	ROM_LOAD( "original galaxy game listing.lst",  0x00000, 0x1efce, CRC(72e206d6) SHA1(dae3f3bbdcf60756eea3985a44528101cab8617f) )	
+	ROM_LOAD( "original galaxy game listing.lst",  0x00000, 0x1efce, CRC(1dcd2c96) SHA1(4426828e85ecad3a370787b4286b83986cd902e3) )	
 ROM_END
 
 /*************************************
