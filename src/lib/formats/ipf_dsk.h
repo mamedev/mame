@@ -19,13 +19,13 @@ public:
 private:
 	struct track_info {
 		UINT32 cylinder, head, type;
-		UINT32 t12, t44, t56, t60, t64;
+		UINT32 sigtype, process, reserved[3];
 		UINT32 size_bytes, size_cells;
 		UINT32 index_bytes, index_cells;
 		UINT32 datasize_cells, gapsize_cells;
 		UINT32 block_count, weak_bits;
 
-		UINT32 d4;
+		UINT32 data_size_bits;
 
 		bool info_set;
 
@@ -37,7 +37,7 @@ private:
 	UINT32 tcount;
 
 	UINT32 type, release, revision;
-	UINT32 f4, f8, f14;
+	UINT32 encoder_type, encoder_revision, origin;
 	UINT32 min_cylinder, max_cylinder, min_head, max_head;
 	UINT32 credit_day, credit_time;
 	UINT32 platform[4], extra[5];

@@ -94,11 +94,11 @@ bool ipf_format::parse_info(const UINT8 *info)
 	type = r32(info+12);
 	if(type != 1)
 		return false;
-	f4 = r32(info+16); // Usually 2
-	f8 = r32(info+20); // Usually 1
+	encoder_type = r32(info+16); // 1 for CAPS, 2 for SPS
+	encoder_revision = r32(info+20); // 1 always
 	release = r32(info+24);
 	revision = r32(info+28);
-	f14 = r32(info+32); // Perhaps some kind of (unchecked) checksum
+	origin = r32(info+32); // Original source reference
 	min_cylinder = r32(info+36);
 	max_cylinder = r32(info+40);
 	min_head = r32(info+44);
@@ -144,7 +144,7 @@ bool ipf_format::parse_imge(const UINT8 *imge)
 		return false;
 
 	t->type = r32(imge+20);
-	t->t12 = r32(imge+24); // Usually 1
+	t->sigtype = r32(imge+24); // 1 for 2us cells, no other value valid
 	t->size_bytes = r32(imge+28);
 	t->index_bytes = r32(imge+32);
 	t->index_cells = r32(imge+36);
@@ -152,11 +152,11 @@ bool ipf_format::parse_imge(const UINT8 *imge)
 	t->gapsize_cells = r32(imge+44);
 	t->size_cells = r32(imge+48);
 	t->block_count = r32(imge+52);
-	t->t44 = r32(imge+56); // Usually 0
+	t->process = r32(imge+56); // encoder process, always 0
 	t->weak_bits = r32(imge+60);
-	t->t56 = r32(imge+68);
-	t->t60 = r32(imge+72);
-	t->t64 = r32(imge+76);
+	t->reserved[0] = r32(imge+68);
+	t->reserved[1] = r32(imge+72);
+	t->reserved[2] = r32(imge+76);
 
 	return true;
 }
@@ -167,7 +167,7 @@ bool ipf_format::parse_data(const UINT8 *data, UINT32 &pos, UINT32 max_extra_siz
 	if(!t)
 		return false;
 
-	t->d4 = r32(data+16); // Somehow related to the number of data cells
+	t->data_size_bits = r32(data+16);
 	t->data = data+28;
 	t->data_size = r32(data+12);
 	if(t->data_size > max_extra_size)
