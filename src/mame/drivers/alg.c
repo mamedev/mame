@@ -685,7 +685,7 @@ static void alg_init(running_machine &machine)
 	{
 		ANGUS_CHIP_RAM_MASK,
 		NULL, NULL, alg_potgo_w,
-		NULL, NULL, serial_w,
+		serial_w,
 
 		vsync_callback,
 		NULL,

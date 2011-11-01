@@ -164,6 +164,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/adc1213x.o	\
 	$(EMUMACHINE)/am53cf96.o	\
 	$(EMUMACHINE)/am8530h.o		\
+	$(EMUMACHINE)/amigafdc.o	\
 	$(EMUMACHINE)/at28c16.o		\
 	$(EMUMACHINE)/cdp1852.o		\
 	$(EMUMACHINE)/cdp1871.o		\

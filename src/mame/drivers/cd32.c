@@ -834,7 +834,7 @@ static DRIVER_INIT( cd32 )
 	{
 		AGA_CHIP_RAM_MASK,
 		NULL, NULL, cd32_potgo_w,
-		NULL, NULL, NULL,
+		NULL,
 		NULL, NULL,
 		NULL,
 		FLAGS_AGA_CHIPSET
@@ -1454,7 +1454,7 @@ static DRIVER_INIT( odeontw2 )
 	{
 		AGA_CHIP_RAM_MASK,
 		NULL, NULL, cd32_potgo_w,
-		NULL, NULL, serial_w,
+		serial_w,
 		NULL, NULL,
 		NULL,
 		FLAGS_AGA_CHIPSET

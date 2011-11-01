@@ -793,7 +793,7 @@ static void arcadia_init(running_machine &machine)
 	{
 		ANGUS_CHIP_RAM_MASK,
 		NULL, NULL, NULL,
-		NULL, NULL, NULL,
+		NULL,
 		NULL,  arcadia_reset_coins,
 		NULL,
 		0

@@ -269,6 +269,7 @@ void floppy_image_device::stp_w(int state)
 			} else {
 				if ( cyl < tracks-1 ) cyl++;
 			}
+
 			/* Update disk detection if applicable */
 			if (exists())
 			{
@@ -286,14 +287,6 @@ int floppy_image_device::find_position(int position, const UINT32 *buf, int buf_
 	step >>= 1;
 
 	for(;;) {
-#if 0
-		fprintf(stderr, "%09d - %09d / %09d  -- %6d %6d %6d\n",
-			   position,
-			   spos < 0 ? 0 : spos >= buf_size ? 200000000 :buf[spos] & floppy_image::TIME_MASK,
-				spos < 0 ? 0 : spos >= buf_size-1 ? 200000000 : buf[spos+1] & floppy_image::TIME_MASK,
-				spos, step, buf_size);
-#endif
-
 		if(spos >= buf_size || (spos > 0 && (buf[spos] & floppy_image::TIME_MASK) > position)) {
 			spos -= step;
 			step >>= 1;
@@ -328,7 +321,6 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	const UINT32 *buf = image->get_buffer(cyl, ss);
 	int index = find_position(position, buf, cells);
 
-	//  fprintf(stderr, "position=%9d, index=%d\n", position, index);
 	if(index == -1)
 		return attotime::never;
 
@@ -340,6 +332,5 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	else
 		next_position = 200000000 + (buf[1] & floppy_image::TIME_MASK);
 
-	//  printf("next_pos=%d, delta=%d\n", next_position, next_position-position);
 	return base + attotime::from_nsec(next_position*(300/rpm));
 }

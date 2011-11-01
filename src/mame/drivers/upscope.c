@@ -390,7 +390,7 @@ static DRIVER_INIT( upscope )
 	{
 		ANGUS_CHIP_RAM_MASK,
 		NULL, NULL, NULL,
-		NULL, NULL, NULL,
+		NULL,
 		NULL, upscope_reset,
 		NULL,
 		0

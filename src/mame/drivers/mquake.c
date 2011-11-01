@@ -433,7 +433,7 @@ static DRIVER_INIT(mquake)
 	{
 		ANGUS_CHIP_RAM_MASK,
 		NULL, NULL, NULL,
-		NULL, NULL, NULL,
+		NULL,
 		NULL, NULL,
 		NULL,
 		0

@@ -12,7 +12,7 @@
 #include "includes/amiga.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6526cia.h"
-
+#include "machine/amigafdc.h"
 
 /*************************************
  *
@@ -1181,9 +1181,6 @@ READ16_HANDLER( amiga_custom_r )
 				return (*state->m_intf->joy1dat_r)(space->machine());
 			return input_port_read_safe(space->machine(), "JOY1DAT", 0xffff);
 
-		case REG_ADKCONR:
-			return CUSTOM_REG(REG_ADKCON);
-
 		case REG_POTGOR:
 			return input_port_read_safe(space->machine(), "POTGO", 0x5500);
 
@@ -1194,9 +1191,7 @@ READ16_HANDLER( amiga_custom_r )
 			return input_port_read_safe(space->machine(), "POT1DAT", 0x0000);
 
 		case REG_DSKBYTR:
-			if (state->m_intf->dskbytr_r != NULL)
-				return (*state->m_intf->dskbytr_r)(space->machine());
-			return 0x0000;
+			return space->machine().device<amiga_fdc>("fdc")->dskbytr_r();
 
 		case REG_INTENAR:
 			return CUSTOM_REG(REG_INTENA);
@@ -1219,6 +1214,12 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_DENISEID:
 			return CUSTOM_REG(REG_DENISEID);
+
+		case REG_DSKPTH:
+			return space->machine().device<amiga_fdc>("fdc")->dskpth_r();
+
+		case REG_DSKPTL:
+			return space->machine().device<amiga_fdc>("fdc")->dskptl_r();
 	}
 
 	if (LOG_CUSTOM)
@@ -1267,9 +1268,20 @@ WRITE16_HANDLER( amiga_custom_w )
 			/* read-only registers */
 			break;
 
+		case REG_DSKSYNC:
+			space->machine().device<amiga_fdc>("fdc")->dsksync_w(data);
+			break;
+
+		case REG_DSKPTH:
+			space->machine().device<amiga_fdc>("fdc")->dskpth_w(data);
+			break;
+
+		case REG_DSKPTL:
+			space->machine().device<amiga_fdc>("fdc")->dskptl_w(data);
+			break;
+
 		case REG_DSKLEN:
-			if (state->m_intf->dsklen_w != NULL)
-				(*state->m_intf->dsklen_w)(space->machine(), data);
+			space->machine().device<amiga_fdc>("fdc")->dsklen_w(data);
 			break;
 
 		case REG_POTGO:
@@ -1372,7 +1384,8 @@ WRITE16_HANDLER( amiga_custom_w )
 			/* bits BBUSY (14) and BZERO (13) are read-only */
 			data &= 0x9fff;
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
-
+			space->machine().device<amiga_fdc>("fdc")->dmacon_set(data);
+			
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
 				state->m_blitter_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( BLITTER_NASTY_DELAY ));
@@ -1413,6 +1426,7 @@ WRITE16_HANDLER( amiga_custom_w )
 		case REG_ADKCON:
 			amiga_audio_update(state->m_sound_device);
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
+			space->machine().device<amiga_fdc>("fdc")->adkcon_set(data);
 			break;
 
 		case REG_AUD0LCL:	case REG_AUD0LCH:	case REG_AUD0LEN:	case REG_AUD0PER:	case REG_AUD0VOL:
