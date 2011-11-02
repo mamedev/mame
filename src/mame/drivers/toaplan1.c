@@ -60,8 +60,8 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from DSWB (port 0x50 in CPU1) then stored at 0x8004 (CPU1 shared RAM) =
     0x180008.w (CPU0 shared RAM) then stored at 0x0804f4.w .
   - Coinage relies on bits 4 and 5 of the region (code at 0x0ccc in CPU1) :
-      * ..10.... : TOAPLAN_COINAGE_WORLD     (tables at 0x0c35 (COIN1) and 0x0c3d (COIN2) in CPU1)
-      *  else    : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0c25 (COIN1 AND COIN2) in CPU1)
+      * ..10.... : TOAPLAN_COINAGE_WORLD (tables at 0x0c35 (COIN1) and 0x0c3d (COIN2) in CPU1)
+      *  else    : TOAPLAN_COINAGE_JAPAN (table at 0x0c25 (COIN1 AND COIN2) in CPU1)
   - Title screen relies on bits 4 and 5 of the region (code at 0x00220e) :
       * ..00.... : "Dash Yarou"
       *  else    : "Rally Bike"
@@ -93,10 +93,10 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
     0x18000a.w (CPU0 shared RAM) then stored at 0x081b7c.w .
   - Coinage relies on bits 0 and 1 of the region (code at 0x0ccc in CPU1) :
-      * ......00 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
-      * ......01 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d29 (COIN1 AND COIN2) in CPU1)
-      * ......10 : TOAPLAN_COINAGE_WORLD     (tables at 0x0d31 (COIN1) and 0x0d39 (COIN2) in CPU1)
-      * ......11 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
+      * ......00 : TOAPLAN_COINAGE_JAPAN (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
+      * ......01 : TOAPLAN_COINAGE_JAPAN (table at 0x0d29 (COIN1 AND COIN2) in CPU1)
+      * ......10 : TOAPLAN_COINAGE_WORLD (tables at 0x0d31 (COIN1) and 0x0d39 (COIN2) in CPU1)
+      * ......11 : TOAPLAN_COINAGE_JAPAN (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
   - Title screen relies on bits 0 to 2 of the region (code at 0x002c58) :
       * .....000 : "Tatsujin"
       *     else : "Truxton"
@@ -138,9 +138,9 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
     0x44000a.w (CPU0 shared RAM) then stored at 0x081810.w .
   - Coinage relies on bits 0 and 1 of the region (code at 0x0c59 in CPU1) :
-      * ......00 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0cae (COIN1 AND COIN2) in CPU1)
-      * ......01 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0cb6 (COIN1 AND COIN2) in CPU1)
-      * ......1. : TOAPLAN_COINAGE_WORLD     (tables at 0x0cbe (COIN1) and 0x0cb6 (COIN2) in CPU1)
+      * ......00 : TOAPLAN_COINAGE_JAPAN (table at 0x0cae (COIN1 AND COIN2) in CPU1)
+      * ......01 : TOAPLAN_COINAGE_JAPAN (table at 0x0cb6 (COIN1 AND COIN2) in CPU1)
+      * ......1. : TOAPLAN_COINAGE_WORLD (tables at 0x0cbe (COIN1) and 0x0cb6 (COIN2) in CPU1)
   - Notice screen relies on bit 0 of the region (code at 0x000564) :
       * .......0 : "FOR USE IN JAPAN ONLY"
       * .......1 : "FOR USE IN U.S.A. ONLY"
@@ -230,7 +230,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from Territory Jumper (0x440011.b).
   - Coinage relies on bits 0 to 3 of the region :
       * ....0010 : TOAPLAN_COINAGE_WORLD
-      *     else : TOAPLAN_COINAGE_JAPAN_OLD
+      *     else : TOAPLAN_COINAGE_JAPAN
     This a guess based on the "test mode" (code at 0x01a804) because of the missing Z180 CPU.
   - Notice screen relies on bits 0 to 3 of the region (code at 0x018bf2 - table at 0x019736) :
       * ....0000 : "JAPAN ONLY"
@@ -786,13 +786,13 @@ static INPUT_PORTS_START( truxton )
 	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x07, 0x02, "Territory" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )           /* Taito Corporation */       /* TOAPLAN_COINAGE_WORLD */
-//  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )           /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )           /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN */
 //  PORT_DIPSETTING(    0x06, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_WORLD */
-//  PORT_DIPSETTING(    0x07, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-//  PORT_DIPSETTING(    0x05, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x01, "USA (Romstar license)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x07, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN */
+	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN */
+//  PORT_DIPSETTING(    0x05, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN */
+	PORT_DIPSETTING(    0x01, "USA (Romstar license)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN */
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN */
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 

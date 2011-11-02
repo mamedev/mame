@@ -358,6 +358,7 @@ To Do / Unknowns:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "includes/toaplan2.h"
+#include "includes/toaplipt.h"
 
 
 /***************************************************************************
@@ -1551,116 +1552,111 @@ ADDRESS_MAP_END
 
 /*****************************************************************************
     Input Port definitions
-    In most of the games, the Test switch is used as a Pause type input.
-    If you press then release the following buttons, the following occurs:
-    Test & P2 start            : The game will pause.
-    P1 start                   : The game will continue.
-    Test & P1 start & P2 start : The game will play in slow motion.
+    The following commands are available when the Invulnerability dipswitch
+    is set (or, in some games, also when the JAMMA Test switch is pressed):
 
-    When the Invulnerability dipswitch is set, the pause and slow motion
-    functions are available without pressing the Test switch.
+    P2 start                 : pause
+    P1 start                 : resume
+    Hold P1 start & P2 start : slow motion
+
+    In bgaregga, batrider and bbakraid, the commands are different:
+
+    Tap P1 start             : pause/resume
+    Hold P1 start            : slow motion
+
+    Additional per-game test features are as follows:
+
+    truxton2 - While playing in invulnerable mode, press button 3 to suicide.
+
+    fixeight - While playing in invulnerable mode, press button 3 to suicide
+               (player 1 and player 2 only)
+
+    batsugun - While playing in invulnerable mode, press the following buttons
+               to stage skip:
+
+               P2 button 3 & P2 button 1 : Skip to end of stage 1
+               P2 button 3 & P2 button 2 : Skip to end of stage 2
+               P2 button 3               : Skip to end of stage 3
+
+   sstriker - While playing in invulnerable mode as player 2, press
+   /kingdmgp  P2 button 3 to skip to the end of the current stage.
+
+   bgaregga - Press and hold P1 button 1, P1 button 2 and P1 button 3 while
+              powering on in service mode to enter the special service mode.
+              "OPTIONS" and "PLAY DATAS" are added to the menu, and the
+              dipswitch display will show the region jumpers (normally hidden).
+              Choose "GAME MODE" from the special service mode to enter the
+              special game mode. In the special game mode, you can use pause
+              and slow motion even when not playing in invulnerable mode.
+
+   batrider - While playing in invulnerable mode, press P1 Start and P2 Start
+              to skip directly to the ending scene.
+
+   batrider - Press and hold P1 button 1, P1 button 2 and P1 button 3 while
+   /bbakraid  powering on in service mode to enter the special service mode.
+              You can change the game's region by pressing left/right.
+              Choose "GAME MODE" from the special service mode to enter the
+              special game mode. In the special game mode, you can use pause
+              and slow motion even when not playing in invulnerable mode.
+              While the game is paused in special mode, press button 3 to
+              display debugging information.
+
 *****************************************************************************/
 
 
-#define TOAPLAN2_COINAGE( mask, value)																				\
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!5,!6")								\
-	PORT_DIPSETTING(		0x0030, DEF_STR( 4C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0020, DEF_STR( 3C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0010, DEF_STR( 2C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0020, DEF_STR( 2C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0000, DEF_STR( 1C_1C ) )																\
-	PORT_DIPSETTING(		0x0030, DEF_STR( 2C_3C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0010, DEF_STR( 1C_2C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPNAME( 0x00c0,	0x0000, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!7,!8")								\
-	PORT_DIPSETTING(		0x0080, DEF_STR( 2C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x00c0, DEF_STR( 2C_3C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_2C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0000, DEF_STR( 1C_2C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_3C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0080, DEF_STR( 1C_4C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x00c0, DEF_STR( 1C_6C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)
 
-
-
-static INPUT_PORTS_START( toaplan2 )
+static INPUT_PORTS_START( toaplan2_2b )
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
 
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME(DEF_STR(Test))
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW1:!1")
-	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:!2")
-	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(		0x0002, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x0004, IP_ACTIVE_HIGH, "SW1:!3")
-	PORT_DIPNAME( 0x0008,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!4")
-	PORT_DIPSETTING(		0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN_MACHINE_NO_COCKTAIL_LOC(SW1)
+	// Coinage on bit mask 0x00f0
 	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x0003,	0x0000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:!1,!2")
-	PORT_DIPSETTING(		0x0001, DEF_STR( Easy ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(		0x0002, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0003, DEF_STR( Very_Hard ) )
+	TOAPLAN_DIFFICULTY_LOC(SW2)
 	// Per-game features on bit mask 0x00fc
 	PORT_BIT( 0x00fc, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+INPUT_PORTS_END
 
-	PORT_START("JMPR")	// Region jumper block
-	// Region settings on bit mask 0x000f or 0x00f0
-	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
-	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+
+static INPUT_PORTS_START( toaplan2_3b )
+	PORT_INCLUDE( toaplan2_2b )
+
+	PORT_MODIFY("IN1")
+	TOAPLAN_JOY_UDLR_3_BUTTONS( 1 )
+
+	PORT_MODIFY("IN2")
+	TOAPLAN_JOY_UDLR_3_BUTTONS( 2 )
 INPUT_PORTS_END
 
 
 
 static INPUT_PORTS_START( tekipaki )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("DSWA")
 	// Various features on bit mask 0x000f - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x000f, 0x0002 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x0f, 0x02, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
+	// "Stop Mode" corresponds to "Invulnerability" in the other games
+	// (i.e. it enables pause and slow motion)
 	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0004, DEF_STR( On ) )
@@ -1673,14 +1669,14 @@ static INPUT_PORTS_START( tekipaki )
 	PORT_DIPNAME( 0x0020,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040,	0x0000, "Game Mode" )		PORT_DIPLOCATION("SW2:!7")
-	PORT_DIPSETTING(		0x0040, "Stop" )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x0040,	0x0000, "Stop Mode (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	PORT_DIPNAME( 0x000f,	0x0002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0002, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
@@ -1703,12 +1699,11 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ghox )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("DSWA")
 	// Various features on bit mask 0x000f - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x80000, 0x80000 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x80000, 0x80000, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -1731,7 +1726,7 @@ static INPUT_PORTS_START( ghox )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
 	PORT_DIPNAME( 0x8000f,	0x80002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1,FAKE:!1")
 	PORT_DIPSETTING(		0x80002, DEF_STR( Europe ) )
@@ -1762,21 +1757,14 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( dogyuun )
-	PORT_INCLUDE( toaplan2 )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play) )		PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x8000, 0x8000 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x8000, 0x8000, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -1797,7 +1785,7 @@ static INPUT_PORTS_START( dogyuun )
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	// Bit Mask 0x8000 is used here to signify European Coinage for MAME purposes - not read on the real board!
 	// "No speedups": all speedup items in game are replaced with bombs
 	PORT_DIPNAME( 0x80f0,	0x8030, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1,FAKE:!1")
@@ -1824,8 +1812,7 @@ static INPUT_PORTS_START( dogyuuna )
 	PORT_INCLUDE( dogyuun )
 
 	PORT_MODIFY("DSWA")
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00f0, 0x0030 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0xf0, 0x30, SW1 )
 
 	PORT_MODIFY("JMPR")
 	// "No speedups": all speedup items in game are replaced with bombs
@@ -1853,8 +1840,7 @@ static INPUT_PORTS_START( dogyuunt )
 	PORT_INCLUDE( dogyuun )
 
 	PORT_MODIFY("DSWA")
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00f0, 0x0020 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0xf0, 0x20, SW1 )
 
 	PORT_MODIFY("JMPR")
 	PORT_DIPNAME( 0x00f0,	0x0020, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
@@ -1878,21 +1864,14 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kbash )
-	PORT_INCLUDE( toaplan2 )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x0070, 0x0020 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x70, 0x20, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -1913,7 +1892,7 @@ static INPUT_PORTS_START( kbash )
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	PORT_DIPNAME( 0x00f0,	0x0020, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0020, "Europe, USA (Atari Games)" )	// European coinage
 	PORT_DIPSETTING(		0x0010, "USA, Europe (Atari Games)" )
@@ -1938,8 +1917,7 @@ static INPUT_PORTS_START( kbash2 )
 	PORT_INCLUDE( kbash )
 
 	PORT_MODIFY("DSWA")
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x0007, 0x0002 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x07, 0x02, SW1 )
 
 	PORT_MODIFY("JMPR")
 	PORT_DIPNAME( 0x000f,	0x0006, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
@@ -1964,25 +1942,17 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( truxton2 )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_3b )
 
-	// Button 3 is shown in service mode but not used in normal gameplay.
-	// It functions as a suicide button only when the Invulnerability dipswitch is set.
-	// Fast Scrolling always functions, and is not shown as a button in service mode.
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Suicide (Cheat)")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fast Scrolling (Cheat)")
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Suicide (Cheat)")
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, "Rapid Fire" )				PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x000f, 0x0002 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x0f, 0x02, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -1996,14 +1966,14 @@ static INPUT_PORTS_START( truxton2 )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0020, "4" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )			PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	PORT_DIPNAME( 0x000f,	0x0002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0002, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
@@ -2025,12 +1995,11 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( pipibibs )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("DSWA")
 	// Various features on bit mask 0x000f - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x0006, 0x0006 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x06, 0x06, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -2051,7 +2020,7 @@ static INPUT_PORTS_START( pipibibs )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	PORT_DIPNAME( 0x0008,	0x0000, "Nudity" )			PORT_DIPLOCATION("JP:!1")
 	PORT_DIPSETTING(		0x0008, DEF_STR( Low ) )
 	PORT_DIPSETTING(		0x0000, "High, but censored" )
@@ -2083,8 +2052,7 @@ static INPUT_PORTS_START( pipibibsbl )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( On ) )
 	// Various features on bit mask 0x000d - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x80000, 0x80000 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x80000, 0x80000, SW1 )
 
 	PORT_MODIFY("JMPR")
 	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
@@ -2101,10 +2069,6 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fixeight )
-
-	// The suicide buttons only work when the Invulnerability dipswitch is set.
-	// Unlike truxton2, they are not shown in service mode, and there seems
-	// to be no corresponding button for Player 3.
 	// The Suicide buttons are technically P1 and P2 Button 3, but we hook
 	// them up as IPT_OTHER so each player has the same number of buttons.
 	PORT_START("IN1")
@@ -2160,7 +2124,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fixeightbl )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -2188,8 +2152,7 @@ static INPUT_PORTS_START( fixeightbl )
 	PORT_DIPSETTING(		0x0004, "Semi-Auto" )
 	PORT_DIPSETTING(		0x0000, "Full-Auto" )
 	// Various features on bit mask 0x0008 - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00ff, 0x00ff )
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -2203,7 +2166,7 @@ static INPUT_PORTS_START( fixeightbl )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )			PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
@@ -2213,15 +2176,14 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( grindstm )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( Cocktail ) )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00e0, 0x0080 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0xe0, 0x80, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -2242,7 +2204,7 @@ static INPUT_PORTS_START( grindstm )
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	// Code in many places in game tests if region is >= 0xC. Effects on gameplay?
 	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
@@ -2293,7 +2255,7 @@ static INPUT_PORTS_START( vfive )
 	PORT_INCLUDE( grindstm )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN2_COINAGE( 0x00ff, 0x00ff )
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)
 
 	PORT_MODIFY("JMPR")
 	// Region is forced to Japan in this set.
@@ -2317,24 +2279,14 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( batsugun )
-	PORT_INCLUDE( toaplan2 )
-
-	// Button 3 is not shown in service mode.
-	// When the Invulnerability dipswitch is set, P2 button 3 functions as a stage skip button.
-	// In the Special Version, button 3 is a full auto fire button.
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00ff, 0x00ff )	// European coinage shown in Service Mode but not actually used
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)	// European coinage shown in Service Mode but not actually used
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -2355,7 +2307,7 @@ static INPUT_PORTS_START( batsugun )
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0080, "Europe (Taito Corp.)" )
@@ -2377,7 +2329,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( snowbro2 )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
@@ -2388,7 +2340,6 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4) PORT_8WAY
@@ -2399,15 +2350,13 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START4 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x1c00, 0x0800 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x1c00, 0x0800, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -2428,7 +2377,7 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_DIPSETTING(		0x0080, "2" )
 	PORT_DIPSETTING(		0x0000, "4" )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	PORT_DIPNAME( 0x2000,	0x0000, "Show All Rights Reserved" )	PORT_DIPLOCATION("JP:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x2000, DEF_STR( Yes ) )
@@ -2446,24 +2395,14 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( sstriker )
-	PORT_INCLUDE( toaplan2 )
-
-	// Button 3 is shown in service mode (as "Unused") but not used in normal gameplay.
-	// When the Invulnerability dipswitch is set and P2 is playing,
-	// P2 button 3 functions as a stage skip button.
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x000e, 0x0004 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x0e, 0x04, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
@@ -2484,7 +2423,7 @@ static INPUT_PORTS_START( sstriker )
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	PORT_DIPNAME( 0x0001,	0x0001, "FBI Logo" )		PORT_DIPLOCATION("JP:!4")
 	PORT_DIPSETTING(		0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
@@ -2582,7 +2521,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME(DEF_STR(Test))
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
@@ -2783,7 +2722,7 @@ static INPUT_PORTS_START( batrider )
 	PORT_START("SYS-DSW")	// Coin/System and DSWC
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME(DEF_STR(Test))
+	TOAPLAN_TEST_SWITCH( 0x0004, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
@@ -2912,7 +2851,7 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_START("SYS-DSW")	// Coin/System and DSW-3
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME(DEF_STR(Test))
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )

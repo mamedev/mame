@@ -19,7 +19,7 @@ Notes:
         See twincobr.c machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
-        Press F1 (actually P1 button 3) on startup to skip some video RAM tests
+        Press 0 (actually P1 button 3) on startup to skip some video RAM tests
         (code at 0x6d25 in 'wardner', 0x6d2f in 'wardnerj' or 0x6d2c in 'pyros').
 
 **************************** Memory & I/O Maps *****************************
@@ -275,6 +275,22 @@ ADDRESS_MAP_END
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( wardner_generic )
+	PORT_START("P1")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
+
+	PORT_START("P2")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )             /* "TEST" in "test mode" */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )            /* "V-BLANKING" in "test mode" */
+
 	PORT_START("DSWA")
 	TOAPLAN_MACHINE_COCKTAIL_LOC(SW1)
 	TOAPLAN_COINAGE_WORLD_LOC(SW1)
@@ -293,22 +309,6 @@ static INPUT_PORTS_START( wardner_generic )
 	PORT_DIPSETTING(	0x20, "5" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "SW2:!7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" )
-
-	PORT_START("P1")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
-
-	PORT_START("P2")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME(DEF_STR(Test))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )            /* "V-BLANKING" in "test mode" */
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -316,8 +316,8 @@ static INPUT_PORTS_START( wardner )
 	PORT_INCLUDE( wardner_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Skip Video RAM Tests") PORT_CODE(KEYCODE_F1)
-	/* technically player 1 button 3 - not used in gameplay */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Skip Video RAM Tests") PORT_CODE(KEYCODE_0)
+	/* actually player 1 button 3 - not used in gameplay */
 	/* code at 0x6d25 ('wardner'), 0x6d2f ('wardnerj') or 0x6d2c ('pyros') */
 INPUT_PORTS_END
 
@@ -326,7 +326,7 @@ static INPUT_PORTS_START( wardnerj )
 	PORT_INCLUDE( wardner )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD_LOC(SW1)
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)
 INPUT_PORTS_END
 
 /* verified from Z80 code */

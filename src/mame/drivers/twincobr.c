@@ -53,7 +53,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 1) 'twincobr' and "clones"
 
   - There is no real "test mode" : only a grid with colors ("Cross Hatch Pattern")
-    is displayed. There is a specific "Show Dip Switches Settings".
+    is displayed. There is a specific "Show Dip Switch Settings".
 
 1a) 'twincobr'
 
@@ -64,13 +64,13 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 1b) 'twincobru'
 
   - "FOR USE IN U.S.A. ONLY" notice screen.
-  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1).
+  - Game uses TOAPLAN_COINAGE_JAPAN (code at 0x0bfd in CPU1).
   - Press any players buttons on startup to skip some tests (code at 0x025ed6).
 
 1c) 'ktiger'
 
   - "FOR USE IN JAPAN ONLY" notice screen.
-  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1 - same as in 'twincobru').
+  - Game uses TOAPLAN_COINAGE_JAPAN (code at 0x0bfd in CPU1 - same as in 'twincobru').
   - Press any players buttons on startup to skip some tests (code at 0x0259d0).
   - "Bonus Lives" settings are different than the ones in the other sets.
   - See other differences with 'twincobr' and 'twincobru' above.
@@ -78,7 +78,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 1d) 'gulfwar2'
 
   - No notice screen.
-  - Game uses TOAPLAN_COINAGE_JAPAN_OLD (code at 0x0bfd in CPU1 - same as in 'twincobru').
+  - Game uses TOAPLAN_COINAGE_JAPAN (code at 0x0bfd in CPU1 - same as in 'twincobru').
     Surprisingly, when Dip Switches are displayed, it shows TOAPLAN_COINAGE_WORLD.
   - Press any players buttons on startup to skip some tests (code at 0x025ed8).
   - VBLANK bit is inverted (ACTIVE_LOW instead of ACTIVE_HIGH).
@@ -106,7 +106,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
 2c) 'hishouza'
 
   - "FOR USE IN JAPAN ONLY" notice screen.
-  - Game uses TOAPLAN_COINAGE_JAPAN_OLD.
+  - Game uses TOAPLAN_COINAGE_JAPAN.
   - When cabinet set to "Upright", you can use joystick and buttons from both players
     (code at 0x002456).
 
@@ -133,8 +133,8 @@ read:
 78005       Player 1 Joystick and Buttons input port
 78007       Player 2 Joystick and Buttons input port
 78009       bit 7 vblank, coin and control/service inputs (Flying shark)
-                Flying Shark implements Tilt as 'freeze system' and also has
-                a reset button, but its not implelemted here (not needed)
+                Flying Shark implements Tilt as 'freeze system' and
+                uses the Test switch as a reset button
 
 7e000-7e005 read data from video RAM (see below)
 
@@ -348,6 +348,22 @@ ADDRESS_MAP_END
 
 /* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( twincobr )
+	PORT_START("P1")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
+
+	PORT_START("P2")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )          /* uses COIN1 coinage */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )             /* same effect as DSWA bit 2 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("DSWA")
 	TOAPLAN_MACHINE_NO_COCKTAIL_LOC(SW1)
 	TOAPLAN_COINAGE_WORLD_LOC(SW1)	/* tables at 0x0c30 (COIN1) and 0x0c38 (COIN2) in CPU1 */
@@ -369,22 +385,6 @@ static INPUT_PORTS_START( twincobr )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" )
 
-	PORT_START("P1")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )          /* uses COIN1 coinage */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* same effect as the DSWA bit 2 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 	PORT_START("VBLANK")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( twincobru )
 	PORT_INCLUDE( twincobr )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD_LOC(SW1)	/* table at 0x0c20 (COIN1 AND COIN2) in CPU1 */
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)	/* table at 0x0c20 (COIN1 AND COIN2) in CPU1 */
 INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
@@ -428,6 +428,12 @@ INPUT_PORTS_END
 
 /* verified from M68000 code */
 static INPUT_PORTS_START( fshark )
+	PORT_START("P1")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
+
+	PORT_START("P2")
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
+
 	PORT_START("DSWA")
 	TOAPLAN_MACHINE_COCKTAIL_LOC(SW1)
 	TOAPLAN_COINAGE_WORLD_LOC(SW1)	/* tables at 0x00031c (COIN1) and 0x00032c (COIN2) */
@@ -451,19 +457,13 @@ static INPUT_PORTS_START( fshark )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 
-	PORT_START("P1")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
-
-	PORT_START("P2")
-	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
-
 	PORT_START("SYSTEM")      /* Port name kept to fit other games in the driver - it doesn't even exist */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("VBLANK")      /* Port name kept to fit other games in the driver - it shall be "SYSTEM" */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )          /* uses COIN1 coinage */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* reset button */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Test Switch (Reset)") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
@@ -493,7 +493,7 @@ static INPUT_PORTS_START( hishouza )
 	PORT_INCLUDE( fshark )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD_LOC(SW1)	/* table at 0x000316 (COIN1 AND COIN2) */
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)	/* table at 0x000316 (COIN1 AND COIN2) */
 INPUT_PORTS_END
 
 
