@@ -215,6 +215,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/msm5832.o	\
 	$(EMUMACHINE)/msm58321.o	\
 	$(EMUMACHINE)/msm6242.o		\
+    $(EMUMACHINE)/ncr539x.o     \
 	$(EMUMACHINE)/nmc9306.o		\
 	$(EMUMACHINE)/nvram.o		\
 	$(EMUMACHINE)/pc16552d.o	\
