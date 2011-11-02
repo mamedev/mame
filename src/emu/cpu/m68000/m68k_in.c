@@ -215,6 +215,17 @@ void m68ki_build_opcode_table(void)
 		}
 		ostruct++;
 	}
+	while(ostruct->mask == 0xffd8)
+	{
+		for(i = 0;i < 2;i++)
+		{
+			for(j = 0;j < 8;j++)
+			{
+				m68ki_set_one(ostruct->match | (i << 5) | j, ostruct);
+			}
+		}
+		ostruct++;
+	}
 	while(ostruct->mask == 0xfff0)
 	{
 		for(i = 0;i <= 0x0f;i++)
@@ -237,6 +248,12 @@ void m68ki_build_opcode_table(void)
 	{
 		m68ki_set_one(ostruct->match, ostruct);
 		ostruct++;
+	}
+
+	// if we fell all the way through with a non-zero mask, the opcode table wasn't built properly
+	if (ostruct->mask != 0)
+	{
+		fatalerror("m68ki_build_opcode_table: unhandled opcode mask %x (match %x), m68k core will not function!\n", ostruct->mask, ostruct->match);
 	}
 }
 
@@ -744,6 +761,7 @@ pack      16  mm    .     1000...101001...  ..........  . . U U U U U   .   .  1
 pea       32  .     .     0100100001......  A..DXWLdx.  U U U U U U U   6   6   5   5   5   5   5
 pflush    32  .     .     1111010100011000  ..........  . . . . S S .   .   .   .   .   4   4   4 TODO: correct timing
 pmmu      32  .     .     1111000.........  ..........  . . S S S S S   .   .   8   8   8   8   8
+ptest     32  .     .     1111010101.01...  ..........  . . . . S . .   .   .   .   .   8   .   .
 reset      0  .     .     0100111001110000  ..........  S S S S S S S   0   0   0   0   0   0   0
 ror        8  s     .     1110...000011...  ..........  U U U U U U U   6   6   8   8   8   8   8
 ror       16  s     .     1110...001011...  ..........  U U U U U U U   6   6   8   8   8   8   8
@@ -8201,6 +8219,19 @@ M68KMAKE_OP(pmmu, 32, ., .)
 	if ((CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type)) && ((mc68kcpu)->has_pmmu))
 	{
 		m68881_mmu_ops(mc68kcpu);
+	}
+	else
+	{
+		m68ki_exception_1111(mc68kcpu);
+	}
+}
+
+M68KMAKE_OP(ptest, 32, ., .)
+{
+	if ((CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type)) && ((mc68kcpu)->has_pmmu))
+	{
+		logerror("68040: unhandled PTEST\n");
+		return;
 	}
 	else
 	{
