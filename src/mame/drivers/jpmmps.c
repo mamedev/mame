@@ -2085,7 +2085,7 @@ GAME(198?, j2westrn	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Western (Jpm) (MPS
 GAME(198?, j2blustr	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Blue Streak (Pcp) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2cshalm	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Cash Alarm (Pcp) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2cshcrd	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Cash Cards (Pcp) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j2cshfil	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Cash Filla (Pcp) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j2cshfil	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Cash-Filla (Pcp) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2cshsmh	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Cash Smash (Pcp) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2criscr	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Criss Cross Jackpot (Pcp) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2frucnx	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Fruit Connexion (Pcp) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
