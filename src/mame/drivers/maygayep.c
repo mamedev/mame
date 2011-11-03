@@ -4564,7 +4564,7 @@ GAME( 199?, ep_cor2		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",     
 GAME( 199?, ep_cormn	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Coronation Street Monopoly Club (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_cycl		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Cyclone Club (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_duff		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Duff Beer Guide (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
-GAME( 199?, ep_simbg	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "The Simpsons Beer Guide (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL ) // pretty sure this is the same game as Duff Beer Guide
+GAME( 199?, ep_simbg	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Simpsons - Duff Beer Guide (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL ) // pretty sure this is the same game as Duff Beer Guide
 GAME( 199?, ep_flash	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Flashback (Maygay - Impulse) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_fortg	,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Fortune & Glory (Maygay - Impulse) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_fran		,  0,        maygayep,  maygayep,  0,  ROT0, "Maygay",        "Frantic (Maygay) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
