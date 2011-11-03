@@ -27,6 +27,9 @@ TO DO :
   - sound too fast in Maddonna?
   - layer order register?
 
+NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter for
+      One Shot One Kill.  This information was used for the year & manufacturer.
+
 */
 
 #include "emu.h"
@@ -496,6 +499,6 @@ ROM_END
 
 
 
-GAME( 199?, oneshot,  0,        oneshot,  oneshot , 0, ROT0, "<unknown>", "One Shot One Kill", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995, maddonna, 0,        maddonna, maddonna, 0, ROT0, "Tuning",  "Mad Donna (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1995, maddonnb, maddonna, maddonna, maddonna, 0, ROT0, "Tuning",  "Mad Donna (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1996, oneshot,  0,        oneshot,  oneshot , 0, ROT0, "Promat",  "One Shot One Kill", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
