@@ -468,7 +468,7 @@ static MACHINE_RESET( mpu4 )
 
 		memory_configure_bank(machine, "bank1", 0, 8, &rom[0x01000], 0x10000);
 
-		memory_set_bank(machine, "bank1",0);
+		memory_set_bank(machine, "bank1", 0);
 		machine.device("maincpu")->reset();
 	}
 }
@@ -522,8 +522,8 @@ static WRITE8_HANDLER( bankswitch_w )
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 //  printf("bank %02x\n", data);
 
-	state->m_pageval=(data&0x03);
-	memory_set_bank(space->machine(), "bank1",state->m_pageval + (state->m_pageset?4:0));
+	state->m_pageval = (data & 0x03);
+	memory_set_bank(space->machine(), "bank1", (state->m_pageval + (state->m_pageset ? 4 : 0)) & 0x07);
 }
 
 
@@ -536,8 +536,8 @@ static READ8_HANDLER( bankswitch_r )
 static WRITE8_HANDLER( bankset_w )
 {
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	state->m_pageval=(data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
-	memory_set_bank(space->machine(), "bank1",state->m_pageval + (state->m_pageset?4:0));
+	state->m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
+	memory_set_bank(space->machine(), "bank1", (state->m_pageval + (state->m_pageset ? 4 : 0)) & 0x07);
 }
 
 
@@ -1561,9 +1561,8 @@ static WRITE_LINE_DEVICE_HANDLER( pia_gb_cb2_w )
 	//Some BWB games use this to drive the bankswitching
 	if (mstate->m_bwb_bank)
 	{
-		mstate->m_pageval=state;
-
-		memory_set_bank(device->machine(), "bank1",mstate->m_pageval + (mstate->m_pageset?4:0));
+		mstate->m_pageval = state;
+		memory_set_bank(device->machine(), "bank1", (state->m_pageval + (state->m_pageset ? 4 : 0)) & 0x07);
 	}
 }
 
