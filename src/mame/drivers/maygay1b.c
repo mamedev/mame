@@ -3843,9 +3843,8 @@ static DRIVER_INIT( m1 )
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 
 	UINT8 *okirom = machine.region( "oki" )->base();
-	UINT8 *msm6376rom = machine.region( "msm6376" )->base();
 
-	if (!okirom && !msm6376rom)
+	if (!okirom)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2420, 0x2421, FUNC(m1ab_no_oki_w));
 
 	// print out the rom id / header info to give us some hints
