@@ -2483,13 +2483,6 @@ ROM_START( sc1czbrk )
 ROM_END
 
 
-ROM_START( sc1dyncl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dyn1-6nss.p1", 0x8000, 0x008000, CRC(9cb42e58) SHA1(bb92e7618efb9a95e96d55d6ee46ba4f08cb825b) )
-	ROM_LOAD( "dyn1-6nss.p2", 0x0000, 0x008000, CRC(425b8cf6) SHA1(8b3dd294ff965103b5621da462b39629445456b9) )
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( sc1energ )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "energy_v109_u2.bin", 0x8000, 0x008000, CRC(ce5da71b) SHA1(c0cb687523bf7a8f42740dd3f54999eaa1db3cd0) )
@@ -2802,7 +2795,6 @@ GAME( 199?, sc1clinsd		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "B
 GAME( 199?, sc1clinse		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1clb3			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Club 3000 (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1czbrk		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Crazy Break (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // Battery Defect
-GAME( 199?, sc1dyncl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Dynamite Club (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1energ		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Energy (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // Battery Defect
 GAME( 199?, sc1hipt			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1hipta		, sc1hipt	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
@@ -2810,7 +2802,7 @@ GAME( 199?, sc1satse		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELA
 GAME( 199?, sc1strk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Strike (Bellfruit) (Dutch) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Super Flush (Bellfruit) (Dutch) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 // are they really SC1?
-GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Beat The Bank Club (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // behaves like sc1dyncl, but then locks up
+GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Beat The Bank Club (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // behaves like sc1clbdya, but then locks up
 GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // OFAH - Phoenix 1
 GAME( 199?, sc1boncl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Bonanza Club (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
