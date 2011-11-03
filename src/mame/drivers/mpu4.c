@@ -1562,7 +1562,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_gb_cb2_w )
 	if (mstate->m_bwb_bank)
 	{
 		mstate->m_pageval = state;
-		memory_set_bank(device->machine(), "bank1", (state->m_pageval + (state->m_pageset ? 4 : 0)) & 0x07);
+		memory_set_bank(device->machine(), "bank1", (mstate->m_pageval + (mstate->m_pageset ? 4 : 0)) & 0x07);
 	}
 }
 
