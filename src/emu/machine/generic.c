@@ -334,10 +334,11 @@ static astring nvram_filename(running_machine &machine, astring &result)
 static astring nvram_filename(device_t &device, astring &result)
 {
 	running_machine &machine = device.machine();
+	astring name = astring(device.tag()).replacechr(':','_');
 	if (rom_system_bios(machine) == 0 || rom_default_bios(machine) == rom_system_bios(machine)) {
-		result.printf("%s\\%s",machine.basename(),device.tag());
+		result.printf("%s\\%s",machine.basename(),name.cstr());
 	} else {
-		result.printf("%s_%d\\%s",machine.basename(),rom_system_bios(machine) - 1,device.tag());
+		result.printf("%s_%d\\%s",machine.basename(),rom_system_bios(machine) - 1,name.cstr());
 	}
 	return result;
 }
