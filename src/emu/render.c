@@ -2541,7 +2541,7 @@ bool render_manager::is_live(screen_device &screen) const
 {
 	// iterate over all live targets and or together their screen masks
 	for (render_target *target = m_targetlist.first(); target != NULL; target = target->next())
-		if (target->view_screens(target->view()).contains(screen))
+		if (!target->hidden() && target->view_screens(target->view()).contains(screen))
 			return true;
 	return false;
 }
