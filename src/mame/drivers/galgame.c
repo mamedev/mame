@@ -232,10 +232,10 @@ static WRITE16_HANDLER(y_w)
 
 static INPUT_PORTS_START( galaxygame )
 	PORT_START("COINAC")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_COIN4 )
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_COIN3 ) // 25 cents, left
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 cents, left
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_COIN4 ) // 25 cents, right
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 cents, right
 
 	PORT_START("SR")
 	PORT_DIPNAME( 0x8000, 0x0000, "Gravity" )
@@ -347,8 +347,10 @@ static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 MACHINE_CONFIG_END
 
 ROM_START(galgame)
+	// Original Galaxy Game listing, the one used in the 2nd hardware revision (blue dual cabinet)
+	// PALX11 V413R 19-NOV-71 8:46
 	ROM_REGION( 0x20000, "code", ROMREGION_ERASE00 )
-	ROM_LOAD( "original galaxy game listing.lst",  0x00000, 0x1efce, CRC(1dcd2c96) SHA1(4426828e85ecad3a370787b4286b83986cd902e3) )	
+	ROM_LOAD( "sw97.lst", 0x00000, 0x1f062, CRC(838018a5) SHA1(e3c47c5cf78299650b031ec49fde7d9e4024a759) )
 ROM_END
 
 /*************************************
@@ -455,13 +457,6 @@ static DRIVER_INIT(galaxygame)
 
 		}
 	}
-
-// there is a wrong code on listing (compiled code doesn't match ROL instructions):
-// 1006  006432  006601                10060         ROL        R1
-// 1007  006434  006602                10070         ROL        R2
-// here wrong code is patched
-	main->write_word(006432, 006101); /* ROL	   R1 */
-	main->write_word(006434, 006102); /* ROL	   R2 */
 
 	// set startup code
 	main->write_word(0, 012700); /* MOV #0, R0 */
