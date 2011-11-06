@@ -1286,7 +1286,7 @@ static DEVICE_IMAGE_LOAD( neo_cartridge )
 		// create memory regions
 		size = image.get_software_region_length("maincpu");
 		image.device().machine().region_free("maincpu");
-		image.device().machine().region_alloc("maincpu",size,1, ENDIANNESS_LITTLE);
+		image.device().machine().region_alloc("maincpu",size, 2, ENDIANNESS_BIG);
 		memcpy(image.device().machine().region("maincpu")->base(),image.get_software_region("maincpu"),size);
 		
 		// for whatever reason (intentional, or design flaw) software loaded via software lists is swapped in endianess vs. the standard ROM loading, regardless of the above.  Swap it to keep consistency
