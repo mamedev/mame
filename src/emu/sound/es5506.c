@@ -2150,7 +2150,12 @@ void es5505_voice_bank_w(device_t *device, int voice, int bank)
 	chip->voice[voice].exbank=bank;
 }
 
+void es5505_set_channel_volume(device_t *device, int channel, int volume)
+{
+	es5506_state *chip = get_safe_token(device);
 
+	chip->stream->set_output_gain(channel,volume / 100.0);
+}
 
 
 /**************************************************************************

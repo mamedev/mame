@@ -59,22 +59,33 @@ static WRITE16_HANDLER( f3_es5505_bank_w )
 	es5505_voice_bank_w(space->machine().device("ensoniq"),offset,data<<20);
 }
 
-static WRITE16_HANDLER( f3_volume_w )
+static WRITE8_HANDLER( f3_volume_w )
 {
-//  static UINT16 channel[8],last_l,last_r;
-//  static int latch;
+	static UINT8 latch,ch[8];
 
-//  if (offset==0) latch=(data>>8)&0x7;
-//  if (offset==1) channel[latch]=data>>8;
+	if(offset == 0)
+		latch = data & 0x7;
+	else
+	{
+		ch[latch] = data;
+		if((latch & 6) == 6)
+		{
+			double ch_vol;
 
-//      if (channel[7]!=last_l) mixer_set_volume(0, (int)((float)channel[7]*1.58)); /* Left master volume */
-//      if (channel[6]!=last_r) mixer_set_volume(1, (int)((float)channel[6]*1.58)); /* Right master volume */
-//  last_l=channel[7];
-//  last_r=channel[6];
+			ch_vol = (double)(ch[latch] & 0x3f);
+			ch_vol/= 63.0;
+			ch_vol*= 100.0;
+			/* Left/Right panning trusted with Arabian Magic Sound Test menu. */
+			es5505_set_channel_volume(space->machine().device("ensoniq"),(latch & 1) ^ 1,ch_vol);
+		}
+	}
+
+	//popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",ch[0],ch[1],ch[2],ch[3],ch[4],ch[5],ch[6],ch[7]);
 
 	/* Channel 5 - Left Aux?  Always set to volume, but never used for panning */
 	/* Channel 4 - Right Aux?  Always set to volume, but never used for panning */
 	/* Channels 0, 1, 2, 3 - Unused */
+
 }
 
 static TIMER_DEVICE_CALLBACK( taito_en_timer_callback )
@@ -245,7 +256,7 @@ static ADDRESS_MAP_START( f3_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
 	AM_RANGE(0x280000, 0x28001f) AM_READWRITE(f3_68681_r, f3_68681_w)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(f3_es5505_bank_w)
-	AM_RANGE(0x340000, 0x340003) AM_WRITE(f3_volume_w) /* 8 channel volume control */
+	AM_RANGE(0x340000, 0x340003) AM_WRITE8(f3_volume_w,0xff00) /* 8 channel volume control */
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc20000, 0xc3ffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc40000, 0xc7ffff) AM_ROMBANK("bank3")
