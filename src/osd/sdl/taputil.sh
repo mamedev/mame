@@ -1,10 +1,10 @@
 #!/bin/sh
 
 NAME=$2
-UID=`id -u $NAME`
+OURUID=`id -u $NAME`
 HOSTIP=$4
 EMUIP=$3
-TAP="tap-mess-$UID-0"
+TAP="tap-mess-$OURUID-0"
 
 if [ `id -u` != "0" ]
 then
@@ -23,12 +23,12 @@ fi
 
 if [ "$#" != "5" ]
 then
-echo "usage: mess-tap [-c] [-d] USER EMUADDR HOSTADDR MASK\n"
-echo "-c\t\tcreate interface"
-echo "-d\t\tdelete interface"
-echo "USER\t\tuser to own interface, required to delete"
-echo "EMUADDR\temulated machine ip address"
-echo "HOSTADDR\thost ip address"
+echo "usage: mess-tap [-c] [-d] USER EMUADDR HOSTADDR MASK"
+echo "-c        create interface"
+echo "-d        delete interface"
+echo "USER      user to own interface, required to delete"
+echo "EMUADDR   emulated machine ip address"
+echo "HOSTADDR  host ip address"
 exit
 fi
 
