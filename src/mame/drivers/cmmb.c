@@ -13,6 +13,7 @@ TODO:
 - finish video emulation;
 - inputs;
 - sound;
+- NVRAM (EEPROM) at U8 or U11 on PCB
 - driver probably needs rewriting, at least the i/o part;
 - Is the W65C02S the same as the 65SC02 core or are there any
   extra Op-codes & addressing modes?
