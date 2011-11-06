@@ -80,10 +80,10 @@ enum
 	XTAL_7_3728MHz  	= 7372800,
 	XTAL_7_8643MHz		= 7864300,		/* Used on InterFlip games as video clock */
 	XTAL_8MHz   		= 8000000,		/* Extremely common, used on 100's of PCBs */
-	XTAL_8_2MHz			= 8200000,		/* Universal Mr. Do - Model 8021 PCB */
+	XTAL_8_2MHz		= 8200000,		/* Universal Mr. Do - Model 8021 PCB */
 	XTAL_8_4672MHz		= 8467200,		/* Subsino's Ying Hua Lian */
 	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
-	XTAL_8_7MHz			= 8700000,		/* Tandberg TDV 2324 */
+	XTAL_8_7MHz		= 8700000,		/* Tandberg TDV 2324 */
 	XTAL_8_867236MHz	= 8867236,		/* RCA CDP1869 PAL color clock */
 	XTAL_8_867238MHz	= 8867238,		/* ETI-660 */
 	XTAL_9_216MHz		= 9216000,		/* Conitec PROF-180X */
@@ -100,7 +100,7 @@ enum
 	XTAL_10_733MHz  	= 10733000,		/* The Fairyland Story */
 	XTAL_10_738635MHz	= 10738635,		/* TMS9918 family */
 	XTAL_10_816MHz  	= 10816000,		/* Universal 1979-1980 (Cosmic Alien, etc) */
-	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
+	XTAL_11MHz		= 11000000,		/* Mario I8039 sound */
 	XTAL_11_0592MHz 	= 11059200,		/* Lethal Justice, Ruleta RE-900 */
 	XTAL_11_2MHz		= 11200000,		/* New York, New York */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
@@ -121,7 +121,7 @@ enum
 	XTAL_14_31818MHz	= 14318181,		/* Extremely common, used on 100's of PCBs */
 	XTAL_14_705882MHz	= 14705882,		/* Aleck64 */
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
-	XTAL_15MHz			= 15000000,		/* Sinclair QL */
+	XTAL_15MHz		= 15000000,		/* Sinclair QL */
 	XTAL_15_36MHz		= 15360000,		/* Visual 1050 */
 	XTAL_15_468MHz  	= 15468000,		/* Bank Panic h/w, Sega G80 */
 	XTAL_16MHz  		= 16000000,		/* Extremely common, used on 100's of PCBs */
@@ -192,17 +192,18 @@ enum
 	XTAL_64MHz  		= 64000000,		/* BattleToads */
 	XTAL_66_6667MHz 	= 66666700,		/* Later Midway games */
 	XTAL_67_7376MHz 	= 67737600,		/* PSX-based h/w, Sony ZN1-2-based */
+	XTAL_72_576MHz  	= 72576000,		/* Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	XTAL_73_728MHz  	= 73728000,		/* Ms. Pac-Man/Galaga 20th Anniversary */
-	XTAL_100MHz 		= 100000000,	/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
-	XTAL_101_4912MHz	= 101491200,	/* PSX-based Namco System 10 */
-	XTAL_200MHz			= 200000000,	/* Base SH4 CPU (Naomi, Hikaru etc.) */
+	XTAL_100MHz 		= 100000000,		/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
+	XTAL_101_4912MHz	= 101491200,		/* PSX-based Namco System 10 */
+	XTAL_200MHz		= 200000000,		/* Base SH4 CPU (Naomi, Hikaru etc.) */
 
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
-	XTAL_384kHz			= 384000,
-	XTAL_400kHz			= 400000,		/* Used on Great Swordman h/w */
-	XTAL_455kHz			= 455000,		/* Used on Gladiator h/w */
-	XTAL_640kHz			= 640000,
+	XTAL_384kHz		= 384000,
+	XTAL_400kHz		= 400000,		/* Used on Great Swordman h/w */
+	XTAL_455kHz		= 455000,		/* Used on Gladiator h/w */
+	XTAL_640kHz		= 640000,
 	XTAL_1_056MHz		= 1056000		/* used on Trio The Punch */
 };
 

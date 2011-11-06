@@ -6,14 +6,16 @@ Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede"
 preliminary driver by Angelo Salese
 
 Earlier revisions of this cabinet did not include the bowling game.
+ Known to exist "CMM Rev 1.03" (without Let's Go Bowling)
 
 TODO:
 - program banking;
 - finish video emulation;
 - inputs;
 - sound;
-- change the CPU when a G658C02 core will be available;
 - driver probably needs rewriting, at least the i/o part;
+- Is the W65C02S the same as the 65SC02 core or are there any
+  extra Op-codes & addressing modes?
 
 Probably on the CPLD (CY39100V208B) - Quoted from Cosmodog's website:
  "Instead, we used a programmable chip that we could reconfigure very
@@ -31,7 +33,7 @@ Multipede 1.00 PCB by CosmoDog
 Flash ROM AT29C020
 
 Cypress CY39100V208B
-CPU WDC 658C02-8P-14
+CPU WDC 65C02S8P-14
 CY37128-P100
 CYC1399
 
@@ -39,7 +41,7 @@ CYC1399
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/m6502.h"
 
 
 class cmmb_state : public driver_device
@@ -299,7 +301,7 @@ static MACHINE_RESET( cmmb )
 static MACHINE_CONFIG_START( cmmb, cmmb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",G65816,8000000/2) // G658C02 (a G65816 with 64k of address line space), unknown clock
+	MCFG_CPU_ADD("maincpu",M65SC02,XTAL_72_576MHz/5) // Unknown clock, but chip rated for 14MHz
 	MCFG_CPU_PROGRAM_MAP(cmmb_map)
 	MCFG_CPU_VBLANK_INT("screen",cmmb_irq)
 
@@ -333,8 +335,8 @@ MACHINE_CONFIG_END
 
 ROM_START( cmmb162 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "cmmb162.bin",   0x10000, 0x40000, CRC(71a5a75d) SHA1(0ad7b97580082cda98cb1e8aab8efcf491d0ed25) )
-	ROM_COPY( "maincpu",	   0x18000, 0x08000, 0x08000 )
+	ROM_LOAD( "cmmb162.u2",   0x10000, 0x40000, CRC(71a5a75d) SHA1(0ad7b97580082cda98cb1e8aab8efcf491d0ed25) )
+	ROM_COPY( "maincpu",	  0x18000, 0x08000, 0x08000 )
 
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
