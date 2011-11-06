@@ -273,9 +273,9 @@ public:
 
 	// state saving interfaces
 	template<typename _ItemType>
-	void save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != NULL); m_save->save_item(name(), tag(), index, value, valname); }
+	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != NULL); m_save->save_item(name(), tag(), index, value, valname); }
 	template<typename _ItemType>
-	void save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != NULL); m_save->save_pointer(name(), tag(), index, value, valname, count); }
+	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != NULL); m_save->save_pointer(name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug; }
@@ -297,12 +297,12 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();
-	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
-	virtual void device_start() = 0;
-	virtual void device_stop();
-	virtual void device_reset();
-	virtual void device_pre_save();
-	virtual void device_post_load();
+	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const ATTR_COLD;
+	virtual void device_start() ATTR_COLD = 0;
+	virtual void device_stop() ATTR_COLD;
+	virtual void device_reset() ATTR_COLD;
+	virtual void device_pre_save() ATTR_COLD;
+	virtual void device_post_load() ATTR_COLD;
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

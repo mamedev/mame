@@ -954,7 +954,7 @@ typedef void (*ioport_constructor)(device_t &owner, ioport_list &portlist, astri
 
 /* start of table */
 #define INPUT_PORTS_START(_name) \
-void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf) \
+ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf) \
 { \
 	astring fulltag; \
 	input_setting_config *cursetting = NULL; \

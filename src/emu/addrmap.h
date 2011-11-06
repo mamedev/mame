@@ -470,7 +470,7 @@ public:
 #define ADDRESS_MAP_NAME(_name) construct_address_map_##_name
 
 #define ADDRESS_MAP_START(_name, _space, _bits) \
-void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
+ATTR_COLD void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
 { \
 	typedef read##_bits##_delegate read_delegate; \
 	typedef write##_bits##_delegate write_delegate; \
