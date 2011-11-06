@@ -10,6 +10,7 @@
 /* Missing:
    - linescroll in special modes (qgh title, mahmajn2/qrouka attract mode)
    - screen flipping (mix register 13 & 2)
+   - most SFXs in Bonanza Bros. during gameplay
 */
 
 /*
@@ -2477,8 +2478,8 @@ static DRIVER_INIT( roughrac )
 /* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy, sgmast,   sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
 /* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy, sgmastj,  sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
 /* 06 */GAME( 1990, roughrac,  0,        system24_floppy, roughrac, roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
-/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
-/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
+/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", GAME_IMPERFECT_SOUND )
+/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", GAME_IMPERFECT_SOUND )
 /* 08 */GAME( 1991, qsww,      0,        system24_floppy, qsww,     qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", GAME_IMPERFECT_GRAPHICS ) // wrong bg colour on title
 /* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy, dcclub,   dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
 
