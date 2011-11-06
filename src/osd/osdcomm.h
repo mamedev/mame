@@ -68,8 +68,14 @@
 #define ATTR_CONST				__attribute__((const))
 #define ATTR_FORCE_INLINE		__attribute__((always_inline))
 #define ATTR_NONNULL(...)		__attribute__((nonnull(__VA_ARGS__)))
+/* not supported in GCC prior to 4.4.x */
+#if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 4)
 #define ATTR_HOT				__attribute__((hot))
 #define ATTR_COLD				__attribute__((cold))
+#else
+#define ATTR_HOT
+#define ATTR_COLD
+#endif
 #define UNEXPECTED(exp)			__builtin_expect(!!(exp), 0)
 #define EXPECTED(exp)			__builtin_expect(!!(exp), 1)
 #define RESTRICT				__restrict__
