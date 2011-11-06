@@ -48,6 +48,7 @@ public:
 	int      m_vrambank;
 	UINT8    m_vram1[0x8000];
 	UINT8    m_vram2[0x8000];
+	UINT8    *m_protram;
 };
 
 
@@ -119,11 +120,26 @@ static WRITE8_HANDLER(vrambank_w)
 	state->m_vrambank = data & 0x40;
 }
 
+static READ8_HANDLER( protram_r )
+{
+	laserbas_state *state = space->machine().driver_data<laserbas_state>();
+
+	return state->m_protram[offset];
+}
+
+static WRITE8_HANDLER( protram_w )
+{
+	laserbas_state *state = space->machine().driver_data<laserbas_state>();
+
+	state->m_protram[offset] = data;
+}
+
 static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8 )
+	//ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xc000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM /* protection device */
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(protram_r, protram_w) AM_BASE_MEMBER(laserbas_state,m_protram) /* protection device */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -296,7 +312,6 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_PIT8253_ADD("pit0", laserbas_pit8253_intf_0)
 	MCFG_PIT8253_ADD("pit1", laserbas_pit8253_intf_1)
 
-
 	MCFG_MACHINE_START(laserbas)
 	MCFG_MACHINE_RESET(laserbas)
 
@@ -404,4 +419,4 @@ ROM_END
 
 GAME( 1981, laserbas, 0,        laserbas, laserbas, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1981, laserbasa,laserbas, laserbas, laserbas, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1981, futflash, laserbas, laserbas, laserbas, 0, ROT270, "Hoei", "Future Flash", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, futflash, laserbas, laserbas, laserbas, 0, ROT270, "Hoei",                  "Future Flash",       GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
