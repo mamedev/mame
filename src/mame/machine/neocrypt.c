@@ -994,7 +994,7 @@ void kof98_decrypt_68k(running_machine &machine)
 		memcpy( &src[i+0x000100], &dst[i+0x000100], 2 );
 		memcpy( &src[i+0x000102], &dst[i+0x100100], 2 );
 	}
-	memcpy( &src[0x100000], &src[0x200000], 0x400000 );
+	memmove( &src[0x100000], &src[0x200000], 0x400000 );
 
 	auto_free(machine, dst);
 }
