@@ -205,7 +205,6 @@ void samsho5b_px_decrypt(running_machine &machine);
 void samsho5b_vx_decrypt(running_machine &machine);
 void matrimbl_decrypt(running_machine &machine);
 
-void mvs_install_protection(device_image_interface& image);
 
 /*----------- defined in video/neogeo.c -----------*/
 
