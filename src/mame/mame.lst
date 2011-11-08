@@ -4660,70 +4660,9 @@ puckpkmna		// (c) 2000 IBS
 topshoot		// (c) 1995 Sun Mixing
 
 // Sega MegaTech, the number shown is on the label of the instruction rom
+// The cartridges are handled using the softlists, see hash/megatech.xml */
 megatech
-mt_beast		// 01
-mt_shar2		// 02
-mt_stbld		// 03
-mt_ggolf		// 04
-mt_gsocr		// 05
-mt_orun			// 06
-mt_asyn			// 07
-mt_shnbi		// 08
-mt_fz			// 09
-mt_aftrb		// 10
-mt_tfor2		// 11
-				// 12
-mt_astro		// 13
-				// 14
-				// 15
-				// 16
-				// 17
-				// 18
-mt_gfoot		// 19
-mt_lastb		// 20
-mt_wcsoc		// 21
-mt_tetri		// 22
-mt_gng			// 23
-mt_shang		// 24
-mt_gaxe			// 25
-mt_fwrld		// 26
-mt_mystd		// 27
-mt_revsh		// 28
-mt_parlg		// 29
-				// 30
-mt_tgolf		// 31
-mt_srbb			// 32
-				// 33
-				// 34
-mt_tlbba		// 35
-mt_cols			// 36
-				// 37
-mt_eswat		// 38
-mt_smgp			// 39
-mt_mwalk		// 40
-mt_crack		// 41
-				// 42
-mt_shado		// 43
-mt_arrow		// 44
-				// 45
-				// 46
-mt_astrm		// 47
-mt_wwar			// 48
-mt_bbros		// 49
-				// 50
-mt_srage		// 51
-mt_sonic		// 52
-mt_sonia		// ^^
-mt_fshrk		// 53
-mt_spman		// 54
-mt_calga		// 55
-				// 56
-mt_gaxe2		// 57
-mt_stf			// 58
-mt_mlh			// 59
-mt_kcham		// 60
-mt_tout			// 61
-mt_soni2		// 62
+
 
 // Sega MegaPlay
 megaplay
@@ -6052,6 +5991,7 @@ sscope2			// GX931 (c)2000
 racingj			// GX676 (c)1998
 racingj2		// GX888 (c)1999 (EAE)
 racingj2j		// GX888 (c)1999 (JAE)
+racjamdx        // G?676 (c)1997 Japan JAA
 thrilld			// GX713 (c)1998 Japan JAE
 thrilldb		// GX713 (c)1998 Japan JAB
 thrilldae		// GX713 (c)1998 Europe EAA
