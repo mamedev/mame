@@ -1219,13 +1219,6 @@ ROM_START( sc4bugsc )
 	sc_bugs_others
 ROM_END
 
-ROM_START( sc4bugsd )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "bugsmoney.hi", 0x00000, 0x080000, CRC(14e3e3d8) SHA1(701b3c74e18549435deb884f44589c3c23c6a69b) )
-	ROM_LOAD16_BYTE( "bugsmoney.lo", 0x00001, 0x080000, CRC(5fb17f27) SHA1(410070592ac6341aa92df657f92860dba68be579) )
-	sc_bugs_others
-ROM_END
-
 
 
 
@@ -4963,8 +4956,8 @@ ROM_END
 
 ROM_START( sc4fcc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95400775.lo", 0x00001, 0x080000, CRC(b543a3ad) SHA1(42f1c69adcbf7acc48dad98085f3f9e3a69f3342) )
-	ROM_LOAD16_BYTE( "95400776.hi", 0x00000, 0x080000, CRC(0bbab14f) SHA1(97e5d7d0f57c81232a06f89b486b2833f0ec8640) )
+	ROM_LOAD16_BYTE( "club-firecracker_std_ac_varss.hi", 0x00000, 0x080000, CRC(0bbab14f) SHA1(97e5d7d0f57c81232a06f89b486b2833f0ec8640) )
+	ROM_LOAD16_BYTE( "club-firecracker_std_ac_varss.lo", 0x00001, 0x080000, CRC(b543a3ad) SHA1(42f1c69adcbf7acc48dad98085f3f9e3a69f3342) )
 	sc_fcc_others
 ROM_END
 
@@ -4986,13 +4979,6 @@ ROM_START( sc4fccc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "club-firecracker_std_ac_67pss.hi", 0x00000, 0x080000, CRC(6b2e08d5) SHA1(11a870bae9881df116727c942e724320557fac83) )
 	ROM_LOAD16_BYTE( "club-firecracker_std_ac_67pss.lo", 0x00001, 0x080000, CRC(09315677) SHA1(bd9421275331707e1ad24d7d248b8dddb1bf75ee) )
-	sc_fcc_others
-ROM_END
-
-ROM_START( sc4fccd )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-firecracker_std_ac_varss.hi", 0x00000, 0x080000, CRC(0bbab14f) SHA1(97e5d7d0f57c81232a06f89b486b2833f0ec8640) )
-	ROM_LOAD16_BYTE( "club-firecracker_std_ac_varss.lo", 0x00001, 0x080000, CRC(b543a3ad) SHA1(42f1c69adcbf7acc48dad98085f3f9e3a69f3342) )
 	sc_fcc_others
 ROM_END
 
@@ -8826,14 +8812,6 @@ ROM_START( sc4miljo )
 	sc_miljo_others
 ROM_END
 
-ROM_START( sc4miljoa )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "96406346.lo", 0x00001, 0x080000, CRC(5b884ddb) SHA1(b289b0c7d3206ca60af62b6e60cfca778d61d8e0) )
-	ROM_LOAD16_BYTE( "96406347.hi", 0x00000, 0x080000, CRC(e89954d8) SHA1(d9642d3ca8b56f85f0825f4154041171cf523efd) )
-	sc_miljo_others
-ROM_END
-
-
 
 
 ROM_START( sc4milja )
@@ -9352,8 +9330,8 @@ ROM_END
 
 ROM_START( sc4monobc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95408986.lo", 0x00001, 0x080000, CRC(6be0db3e) SHA1(2771294694e61219e23fc0d5bed3a5d9de500245) )
-	ROM_LOAD16_BYTE( "95408987.hi", 0x00000, 0x080000, CRC(66e68347) SHA1(e1fb1b92ac80023dc03467a7a6a0b76edccdbb8c) )
+	ROM_LOAD16_BYTE( "monopoly_95408986_std_low.bin",  0x00001, 0x080000, CRC(6be0db3e) SHA1(2771294694e61219e23fc0d5bed3a5d9de500245) )
+	ROM_LOAD16_BYTE( "monopoly_95408987_std_high.bin", 0x00000, 0x080000, CRC(66e68347) SHA1(e1fb1b92ac80023dc03467a7a6a0b76edccdbb8c) )
 	sc_monob_others
 ROM_END
 
@@ -9427,13 +9405,6 @@ ROM_START( sc4monobm )
 	sc_monob_others
 ROM_END
 
-ROM_START( sc4monobn )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "monopoly_95408986_std_low.bin",  0x00001, 0x080000, CRC(6be0db3e) SHA1(2771294694e61219e23fc0d5bed3a5d9de500245) )
-	ROM_LOAD16_BYTE( "monopoly_95408987_std_high.bin", 0x00000, 0x080000, CRC(66e68347) SHA1(e1fb1b92ac80023dc03467a7a6a0b76edccdbb8c) )
-	sc_monob_others
-ROM_END
-
 
 
 
@@ -9481,6 +9452,7 @@ ROM_START( sc4mclba )
 ROM_END
 
 ROM_START( sc4mclbb )
+/* Deleted set 100% same roms was called:  sc4mwwcl (Monopoly Wonders Of The World Club (Mazooma) (Scorpion 4)) */
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95416422.lo", 0x00001, 0x080000, CRC(42d8151e) SHA1(c008ce3d50026bfc904d2c79e61e76c4d9c4bd63) )
 	ROM_LOAD16_BYTE( "95416423.hi", 0x00000, 0x080000, CRC(6f45ab49) SHA1(2b0686008f5e666a679c2af4e0c167d8a9af5444) )
@@ -9519,13 +9491,6 @@ ROM_START( sc4mdlx )
 ROM_END
 
 
-
-ROM_START( sc4mwwcl )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95416422.lo", 0x00001, 0x080000, CRC(42d8151e) SHA1(c008ce3d50026bfc904d2c79e61e76c4d9c4bd63) )
-	ROM_LOAD16_BYTE( "95416423.hi", 0x00000, 0x080000, CRC(6f45ab49) SHA1(2b0686008f5e666a679c2af4e0c167d8a9af5444) )
-	sc_mwwcl_others
-ROM_END
 
 
 
@@ -22983,7 +22948,6 @@ GAME( 200?, sc4bugs		,0,			sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (S
 GAME( 200?, sc4bugsa	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4bugsb	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4bugsc	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4bugsd	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR1753 CLUB BULLSEYE         BULLSEYE  CLUB  PR1751 BULLSEYE SOUNDS11         BULLSYE
 GAME( 200?, sc4bulcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -23671,7 +23635,6 @@ GAME( 200?, sc4fcc		,0,			sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfrui
 GAME( 200?, sc4fcca		,sc4fcc,	sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4fccb		,sc4fcc,	sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4fccc		,sc4fcc,	sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4fccd		,sc4fcc,	sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR2082 FIRE POWER         FPOW SOUNDS         FIRE POWER
 GAME( 200?, sc4fire		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Firepower (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -24389,7 +24352,7 @@ GAME( 200?, sc4maxccc	,sc4maxcc,	sc4, sc4, sc4, ROT0, "Mazooma","Maximus Cash Cl
 
 // PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
 GAME( 200?, sc4miljo	,0,			sc4, sc4, sc4, ROT0, "BFM","Miljonairs (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4miljoa	,sc4miljo,	sc4, sc4, sc4, ROT0, "BFM","Miljonairs (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+
 // PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
 GAME( 200?, sc4milja	,0,			sc4, sc4, sc4, ROT0, "BFM","Miljonairs Arcade (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
@@ -24494,7 +24457,6 @@ GAME( 200?, sc4monobj	,sc4monob,	sc4, sc4, sc4, ROT0, "BFM","Monopoly (Bellfruit
 GAME( 200?, sc4monobk	,sc4monob,	sc4, sc4, sc4, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4monobl	,sc4monob,	sc4, sc4, sc4, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc4monobm	,sc4monob,	sc4, sc4, sc4, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc4monobn	,sc4monob,	sc4, sc4, sc4, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR2055.GERMAN MONOPOLY...  (non-standard header)
 GAME( 200?, sc4monod	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly (Mazooma) [German] (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -24511,9 +24473,6 @@ GAME( 200?, sc4mclbe	,sc4mclb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Club (Ma
 
 // PR2202 MONOPOLY         MONOPOLY  TRIPLE  MAZ       MONOPOLY  DELUXE  (same as sc4mondx?)
 GAME( 200?, sc4mdlx		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Deluxe (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-
-// PR2164 CLUB MONOPOLY         CLB MONOPOLY WOW  CLUB  CWOW SOUNDS         CLUB MONOPOLOY   (same as sc4mclb?)
-GAME( 200?, sc4mwwcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wonders Of The World Club (Mazooma) (Scorpion 4)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR2510 MONTEGO PAY         LOWTECHSND            MONTEGO PAY
 GAME( 200?, sc4mont		,0,			sc4, sc4, sc4, ROT0, "Qps","Montego Pay (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
