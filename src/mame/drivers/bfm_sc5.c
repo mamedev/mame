@@ -7459,26 +7459,12 @@ ROM_END
 
 ROM_START( sc5dndtpt )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "p3003p42.hi", 0x00000, 0x080000, CRC(6884132e) SHA1(0a864012b36887de2dc1290bb93d533e45f7e85a) )
-	ROM_LOAD16_BYTE( "p3003p42.lo", 0x00001, 0x080000, CRC(46fd164a) SHA1(c7c70773a1327200fa58818f3d23cabb48ab4ba5) )
-	sc_dndtp_others
-ROM_END
-
-ROM_START( sc5dndtpu )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "p3003s42.hi", 0x00000, 0x080000, CRC(f04b7cd3) SHA1(b3b2c77d6458d901da4aa7057f2c4a9bf67df759) )
-	ROM_LOAD16_BYTE( "p3003s42.lo", 0x00001, 0x080000, CRC(71d96983) SHA1(e896334a9ea517bbc20eb06eb8682b7a884b37e6) )
-	sc_dndtp_others
-ROM_END
-
-ROM_START( sc5dndtpv )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95422010.lo", 0x00001, 0x080000, CRC(aa27467d) SHA1(28e834b798ce2778cec8001fa553a9d82094ef73) )
 	ROM_LOAD16_BYTE( "95422011.hi", 0x00000, 0x080000, CRC(3fd5debb) SHA1(d511226c039f2b41c3122863a9764adc4a9330bf) )
 	sc_dndtp_others
 ROM_END
 
-ROM_START( sc5dndtpw )
+ROM_START( sc5dndtpu )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95423010.lo", 0x00001, 0x080000, CRC(62f9f024) SHA1(46bfb758ed6508b4e01779038a5a94da22e7b3b7) )
 	ROM_LOAD16_BYTE( "95423011.hi", 0x00000, 0x080000, CRC(a27f40db) SHA1(78c8eff3c6066005b5b044c95aef0bb0fb53ac18) )
@@ -11587,20 +11573,6 @@ ROM_START( sc5dndben )
 	sc_dndbe_others
 ROM_END
 
-ROM_START( sc5dndbeo )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95422864.lo", 0x00001, 0x080000, CRC(f969e95d) SHA1(c4dc12d745ad4e4e1a37cbf696875c65d0e33349) )
-	ROM_LOAD16_BYTE( "95422865.hi", 0x00000, 0x080000, CRC(76abce7e) SHA1(737bdf6c3fa3820b8e114d61acc072a493fe7b26) )
-	sc_dndbe_others
-ROM_END
-
-ROM_START( sc5dndbep )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95423864.lo", 0x00001, 0x080000, CRC(06e43774) SHA1(d01802ed4a2da78dd5c1b99890b32fb582ba745e) )
-	ROM_LOAD16_BYTE( "95423865.hi", 0x00000, 0x080000, CRC(18f40e09) SHA1(8e3be8b84ed0833c9306e17d14bc3784babc1153) )
-	sc_dndbe_others
-ROM_END
-
 
 ROM_START( sc5ddbbcd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -13150,8 +13122,6 @@ GAME( 200?, sc5dndtpr	,sc5dndtp,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal The
 GAME( 200?, sc5dndtps	,sc5dndtp,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 5) (set 20)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5dndtpt	,sc5dndtp,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 5) (set 21)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5dndtpu	,sc5dndtp,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 5) (set 22)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5dndtpv	,sc5dndtp,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 5) (set 23)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5dndtpw	,sc5dndtp,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 5) (set 24)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3036 AWP DEAL OR NO DEAL THE WALK OF WEALTH SCORP5         PR3006 WALK OF WEALTH SOUNDS11    WALK OF WEALTH  S.SITE
 GAME( 200?, sc5dndww	,0,			sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 5) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -13903,8 +13873,6 @@ GAME( 200?, sc5dndbek	,sc5dndbe,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Bea
 GAME( 200?, sc5dndbel	,sc5dndbe,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 5) (set 13)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5dndbem	,sc5dndbe,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 5) (set 14)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, sc5dndben	,sc5dndbe,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 5) (set 15)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5dndbeo	,sc5dndbe,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 5) (set 16)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 200?, sc5dndbep	,sc5dndbe,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 5) (set 17)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 // PR3063 CASINO DOND CAN YOU BEAT THE BANKER         CASINO DOND ARCADE  PR3063 BEAT THE BANKER SOUNDS11
 GAME( 200?, sc5ddbbc	,0,			sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Beat The Banker Casino (Bellfruit) (Scorpion 5) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
