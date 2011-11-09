@@ -2067,7 +2067,7 @@ GAME(198?, j2spcrsv	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Special Reserve (J
 GAME(198?, j2stahed	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Streets Ahead (Jpm) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2supfrt	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supa Fruit (Jpm) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2supfrc	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supa Fruit Club (Jpm) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j2supsft	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supa Shifta (Jpm) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(1987, j2supsft	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supashifta (Jpm) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2supstp	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supa Steppa (Jpm) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2suptrk	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Supa Track (Jpm) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME(198?, j2suprft	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Super Fruit (Jpm) (MPS)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

@@ -5532,7 +5532,7 @@ GAME( 199?, j6cshcnt	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Cash Countdown (
 GAME( 199?, j6cshrd		, 0			, impctawp, tbirds, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6cshtwr	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Cash Towers (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6cshvgs	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Cash Vegas Strip (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, j6cas5		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Casino 5 Liner (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j6cas5		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Casino 5ive Liner (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6cascz		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Casino Crazy (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6cccla		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Casino Crazy Classic (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6cascla	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Casino Crazy Classic Club (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

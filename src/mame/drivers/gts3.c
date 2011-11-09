@@ -333,7 +333,7 @@ ROM_START(andretti4)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Nudge It (N102)
+/ Nudge-It (N102)
 /-------------------------------------------------------------------*/
 ROM_START(nudgeit)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -920,7 +920,7 @@ GAME(1989,	lca,		0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Lights...Camera...
 GAME(1989,	lca2,		lca,		gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Lights...Camera...Action! (rev.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	andretti,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Mario Andretti",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	andretti4,	andretti,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Mario Andretti (rev.T4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1990,	nudgeit,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Nudge It",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1990,	nudgeit,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Nudge-It",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1992,	opthund,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Operation Thunder",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1994,	rescu911,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Rescue 911 (rev.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	shaqattq,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Shaq Attaq (rev.5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
