@@ -212,7 +212,7 @@ BUILD_EXPAT = 1
 BUILD_ZLIB = 1
 
 # uncomment next line to include the symbols
-# SYMBOLS = 1
+SYMBOLS = 1
 
 # specify symbols level or leave commented to use the default
 # (default is SYMLEVEL = 2 normally; use 1 if you only need backtrace)

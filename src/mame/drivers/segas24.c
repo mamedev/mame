@@ -10,7 +10,6 @@
 /* Missing:
    - linescroll in special modes (qgh title, mahmajn2/qrouka attract mode)
    - screen flipping (mix register 13 & 2)
-   - most SFXs in Bonanza Bros. during gameplay
 */
 
 /*
@@ -739,21 +738,23 @@ READ8_MEMBER( segas24_state::frc_mode_r )
 
 WRITE8_MEMBER( segas24_state::frc_mode_w )
 {
-	/* reset frc if a write here happens */
-	frc_cnt = 0;
+	/* reset frc if a write happens here */
+	frc_cnt_timer->reset();
 	frc_mode = data & 1;
-	irq_frc->adjust(attotime::from_hz(frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0));
 }
 
 READ8_MEMBER( segas24_state::frc_r )
 {
-	return frc_cnt;
+	INT32 result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0)).as_double();
+
+	result %= ((frc_mode) ? 0x100 : 0x67);
+
+	return result;
 }
 
 WRITE8_MEMBER( segas24_state::frc_w )
 {
-	/* Undocumented behaviour ... */
-	frc_cnt = data;
+	/* Undocumented behaviour, Bonanza Bros. seems to use this for irq ack'ing ... */
 	cputag_set_input_line(machine(), "maincpu", IRQ_FRC+1, CLEAR_LINE);
 	cputag_set_input_line(machine(), "sub", IRQ_FRC+1, CLEAR_LINE);
 }
@@ -893,26 +894,12 @@ static TIMER_DEVICE_CALLBACK( irq_timer_clear_cb )
 static TIMER_DEVICE_CALLBACK( irq_frc_cb )
 {
 	segas24_state *state = timer.machine().driver_data<segas24_state>();
-	state->frc_cnt++;
 
-	if((state->frc_mode == 0 && state->frc_cnt == 0x100) || (state->frc_mode == 1 && state->frc_cnt == 0x67))
-	{
-		state->frc_cnt = 0;
-	}
+	if(state->irq_allow0 & (1 << IRQ_FRC) && state->frc_mode == 1)
+		cputag_set_input_line(timer.machine(), "maincpu", IRQ_FRC+1, ASSERT_LINE);
 
-	if(state->frc_mode == 1)
-	{
-		if(state->irq_allow0 & (1 << IRQ_FRC))
-		{
-			cputag_set_input_line(timer.machine(), "maincpu", IRQ_FRC+1, ASSERT_LINE);
-		}
-		if(state->irq_allow1 & (1 << IRQ_FRC))
-		{
-			cputag_set_input_line(timer.machine(), "sub", IRQ_FRC+1, ASSERT_LINE);
-		}
-	}
-
-	state->irq_frc->adjust(attotime::from_hz(state->frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0));
+	if(state->irq_allow1 & (1 << IRQ_FRC) && state->frc_mode == 1)
+		cputag_set_input_line(timer.machine(), "sub", IRQ_FRC+1, ASSERT_LINE);
 }
 
 void segas24_state::irq_init()
@@ -927,7 +914,6 @@ void segas24_state::irq_init()
 	irq_sprite = 0;
 	irq_timer = machine().device<timer_device>("irq_timer");
 	irq_timer_clear = machine().device<timer_device>("irq_timer_clear");
-	irq_frc = machine().device<timer_device>("irq_frc");
 	irq_tval = 0;
 	irq_synctime = attotime::zero;
 	irq_vsynctime = attotime::zero;
@@ -1301,8 +1287,10 @@ static MACHINE_RESET( system24 )
 	state->irq_init();
 	state->mlatch = 0x00;
 	state->frc_mode = 0;
-	state->frc_cnt = 0;
-	state->irq_frc->adjust(attotime::from_hz(state->frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0));
+	state->frc_cnt_timer = machine.device<timer_device>("frc_timer");
+	//state->frc_cnt_timer->reset();
+	//state->frc_cnt = 0;
+	//state->irq_frc->adjust(attotime::from_hz(state->frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0));
 }
 
 /*************************************
@@ -1974,7 +1962,8 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 
 	MCFG_TIMER_ADD("irq_timer", irq_timer_cb)
 	MCFG_TIMER_ADD("irq_timer_clear", irq_timer_clear_cb)
-	MCFG_TIMER_ADD("irq_frc", irq_frc_cb)
+	MCFG_TIMER_ADD("frc_timer", NULL) //stopwatch timer
+	MCFG_TIMER_ADD_PERIODIC("irq_frc", irq_frc_cb, attotime::from_hz(FRC_CLOCK_MODE1))
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -2546,8 +2535,8 @@ static DRIVER_INIT( roughrac )
 /* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy, sgmast,   sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
 /* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy, sgmastj,  sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
 /* 06 */GAME( 1990, roughrac,  0,        system24_floppy, roughrac, roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
-/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", GAME_IMPERFECT_SOUND )
-/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", GAME_IMPERFECT_SOUND )
+/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
+/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
 /* 08 */GAME( 1991, qsww,      0,        system24_floppy, qsww,     qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", GAME_IMPERFECT_GRAPHICS ) // wrong bg colour on title
 /* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy, dcclub,   dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
 

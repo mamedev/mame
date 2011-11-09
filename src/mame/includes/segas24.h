@@ -41,11 +41,11 @@ public:
 	int irq_yms;
 	int irq_vblank;
 	int irq_sprite;
-	int frc_cnt;
 	attotime irq_synctime, irq_vsynctime;
 	timer_device *irq_timer;
 	timer_device *irq_timer_clear;
-	timer_device *irq_frc;
+	//timer_device *irq_frc;
+	timer_device *frc_cnt_timer;
 	UINT8 frc_mode;
 
 	UINT16 *shared_ram;
