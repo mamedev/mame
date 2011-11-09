@@ -4,7 +4,7 @@
 
     We do not support diff files as it will involve some changes in
     the image code.  Additionally, the need for diff files comes
-    from MAME's need for "cannonical" hard drive images.
+    from MAME's need for "canonical" hard drive images.
 
     Raphael Nabet 2003
 

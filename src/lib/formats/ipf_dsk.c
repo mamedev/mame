@@ -447,7 +447,7 @@ void ipf_format::track_write_mfm(UINT32 *&track, const UINT8 *data, UINT32 start
 void ipf_format::track_write_weak(UINT32 *&track, UINT32 cells)
 {
 	for(UINT32 i=0; i != cells; i++)
-		*track++ = MG_W;
+		*track++ = floppy_image::MG_N;
 }
 
 bool ipf_format::generate_block_data(const UINT8 *data, const UINT8 *dlimit, UINT32 *track, UINT32 *tlimit, bool &context)
