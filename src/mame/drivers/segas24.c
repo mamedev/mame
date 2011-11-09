@@ -347,8 +347,9 @@ Notes:
 #define VIDEO_CLOCK			XTAL_32MHz
 #define TIMER_CLOCK         (VIDEO_CLOCK/4)
 #define HSYNC_CLOCK         (VIDEO_CLOCK/2/656.0)
-#define FRC_CLOCK_MODE0		(MASTER_CLOCK/2)/16 // 625 kHz
-#define FRC_CLOCK_MODE1		(MASTER_CLOCK/2)/1024 // 9 kHz
+/* TODO: understand why divisors doesn't match at all with the reference */
+#define FRC_CLOCK_MODE0		(MASTER_CLOCK/2)/24 // /16 according to Charles
+#define FRC_CLOCK_MODE1		(MASTER_CLOCK/2)/1536 // /1024 according to Charles, but /1536 sounds better
 
 enum {
 	IRQ_YM2151 = 1,
@@ -747,7 +748,7 @@ READ8_MEMBER( segas24_state::frc_r )
 {
 	INT32 result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0)).as_double();
 
-	result %= ((frc_mode) ? 0x100 : 0x67);
+	result %= ((frc_mode) ? 0x67 : 0x100);
 
 	return result;
 }
@@ -1288,9 +1289,7 @@ static MACHINE_RESET( system24 )
 	state->mlatch = 0x00;
 	state->frc_mode = 0;
 	state->frc_cnt_timer = machine.device<timer_device>("frc_timer");
-	//state->frc_cnt_timer->reset();
-	//state->frc_cnt = 0;
-	//state->irq_frc->adjust(attotime::from_hz(state->frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0));
+	state->frc_cnt_timer->reset();
 }
 
 /*************************************
