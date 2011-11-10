@@ -337,19 +337,16 @@ void emu_options::remove_device_options()
 bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_string, const char *name, const char *value)
 {
 	remove_device_options();
-	if (name && exists(name)) {
-		set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
-	}
 	bool isfirst = true;
 	bool result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	while (add_slot_options(isfirst)) {
 		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-		if (name && exists(name)) {
-			set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
-		}
 		isfirst = false;
 	}
 	add_device_options(true);
+	if (name && exists(name)) {
+		set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
+	}
 	result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	return result;
 }
