@@ -9743,11 +9743,97 @@ static DRIVER_INIT( lans2004 )
 }
 
 
+driver_init_func neo_gameinit;
+
+static DRIVER_INIT( mvs )
+{
+	DRIVER_INIT_CALL(neogeo);
+}
+
+
+// handle protected carts
+void mvs_install_protection(device_image_interface& image)
+{
+//	neogeo_state *state = image.device().machine().driver_data<neogeo_state>();
+	const char *crypt_feature = image.get_feature( "crypt" );
+
+	if(crypt_feature == NULL)
+	{
+		neo_gameinit = driver_init_neogeo; 
+	}
+	else
+	{
+		/* work out which Driver Init decryption function to call based on flag in softlist
+		 - note this is called AFTER the regular DRIVER_INIT */
+
+		if(strcmp(crypt_feature,"mslugx_prot") == 0)		{ neo_gameinit = driver_init_mslugx; }
+		else if(strcmp(crypt_feature,"fatfury2_prot") == 0) { neo_gameinit = driver_init_fatfury2; }
+		else if(strcmp(crypt_feature,"kog_prot") == 0)		{ neo_gameinit = driver_init_kog; }
+		else if(strcmp(crypt_feature,"kof98_prot") == 0)	{ neo_gameinit = driver_init_kof98; }
+		else if(strcmp(crypt_feature,"kof99_prot") == 0)	{ neo_gameinit = driver_init_kof99; }
+		else if(strcmp(crypt_feature,"kof99k_prot") == 0)	{ neo_gameinit = driver_init_kof99k; }
+		else if(strcmp(crypt_feature,"garou_prot") == 0)	{ neo_gameinit = driver_init_garou; }
+		else if(strcmp(crypt_feature,"garouo_prot") == 0)	{ neo_gameinit = driver_init_garouo; }
+		else if(strcmp(crypt_feature,"garoubl_prot") == 0)	{ neo_gameinit = driver_init_garoubl; }
+		else if(strcmp(crypt_feature,"mslug3_prot") == 0)	{ neo_gameinit = driver_init_mslug3; }
+		else if(strcmp(crypt_feature,"mslug3h_prot") == 0)	{ neo_gameinit = driver_init_mslug3h; }
+		else if(strcmp(crypt_feature,"mslug3b6_prot") == 0)	{ neo_gameinit = driver_init_mslug3b6; }
+		else if(strcmp(crypt_feature,"kof2000_prot") == 0)	{ neo_gameinit = driver_init_kof2000; }
+		else if(strcmp(crypt_feature,"kof2000n_prot") == 0)	{ neo_gameinit = driver_init_kof2000n; }
+		else if(strcmp(crypt_feature,"sengoku3_prot") == 0)	{ neo_gameinit = driver_init_sengoku3; }
+		else if(strcmp(crypt_feature,"zupapa_prot") == 0)	{ neo_gameinit = driver_init_zupapa; }
+		else if(strcmp(crypt_feature,"kof2001_prot") == 0)	{ neo_gameinit = driver_init_kof2001; }
+		else if(strcmp(crypt_feature,"cthd2003_prot") == 0)	{ neo_gameinit = driver_init_cthd2003; }
+		else if(strcmp(crypt_feature,"ct2k3sp_prot") == 0)	{ neo_gameinit = driver_init_ct2k3sp; }
+		else if(strcmp(crypt_feature,"ct2k3sa_prot") == 0)	{ neo_gameinit = driver_init_ct2k3sa; }
+		else if(strcmp(crypt_feature,"kof2002_prot") == 0)	{ neo_gameinit = driver_init_kof2002; }
+		else if(strcmp(crypt_feature,"kof2002b_prot") == 0)	{ neo_gameinit = driver_init_kof2002b; }
+		else if(strcmp(crypt_feature,"kf2k2pls_prot") == 0)	{ neo_gameinit = driver_init_kf2k2pls; }
+		else if(strcmp(crypt_feature,"kf2k2mp_prot") == 0)	{ neo_gameinit = driver_init_kf2k2mp; }
+		else if(strcmp(crypt_feature,"kf2k2mp2_prot") == 0)	{ neo_gameinit = driver_init_kf2k2mp2; }
+		else if(strcmp(crypt_feature,"kof10th_prot") == 0)	{ neo_gameinit = driver_init_kof10th; }
+		else if(strcmp(crypt_feature,"kf10thep_prot") == 0)	{ neo_gameinit = driver_init_kf10thep; }
+		else if(strcmp(crypt_feature,"kf2k5uni_prot") == 0)	{ neo_gameinit = driver_init_kf2k5uni; }
+		else if(strcmp(crypt_feature,"kof2k4se_prot") == 0)	{ neo_gameinit = driver_init_kof2k4se; }
+		else if(strcmp(crypt_feature,"mslug5_prot") == 0)	{ neo_gameinit = driver_init_mslug5; }
+		else if(strcmp(crypt_feature,"ms5plus_prot") == 0)	{ neo_gameinit = driver_init_ms5plus; }
+		else if(strcmp(crypt_feature,"svc_prot") == 0)		{ neo_gameinit = driver_init_svc; }
+		else if(strcmp(crypt_feature,"svcboot_prot") == 0)	{ neo_gameinit = driver_init_svcboot; }
+		else if(strcmp(crypt_feature,"svcplus_prot") == 0)	{ neo_gameinit = driver_init_svcplus; }
+		else if(strcmp(crypt_feature,"svcplusa_prot") == 0)	{ neo_gameinit = driver_init_svcplusa; }
+		else if(strcmp(crypt_feature,"svcsplus_prot") == 0)	{ neo_gameinit = driver_init_svcsplus; }
+		else if(strcmp(crypt_feature,"samsho5_prot") == 0)	{ neo_gameinit = driver_init_samsho5; }
+		else if(strcmp(crypt_feature,"samsho5b_prot") == 0)	{ neo_gameinit = driver_init_samsho5b; }
+		else if(strcmp(crypt_feature,"kof2003_prot") == 0)	{ neo_gameinit = driver_init_kof2003; }
+		else if(strcmp(crypt_feature,"kof2003h_prot") == 0)	{ neo_gameinit = driver_init_kof2003h; }
+		else if(strcmp(crypt_feature,"kf2k3bl_prot") == 0)	{ neo_gameinit = driver_init_kf2k3bl; }
+		else if(strcmp(crypt_feature,"kf2k3pl_prot") == 0)	{ neo_gameinit = driver_init_kf2k3pl; }
+		else if(strcmp(crypt_feature,"kf2k3upl_prot") == 0)	{ neo_gameinit = driver_init_kf2k3upl; }
+		else if(strcmp(crypt_feature,"samsh5sp_prot") == 0)	{ neo_gameinit = driver_init_samsh5sp; }
+		else if(strcmp(crypt_feature,"preisle2_prot") == 0)	{ neo_gameinit = driver_init_preisle2; }
+		else if(strcmp(crypt_feature,"nitd_prot") == 0)		{ neo_gameinit = driver_init_nitd; }
+		else if(strcmp(crypt_feature,"s1945p_prot") == 0)	{ neo_gameinit = driver_init_s1945p; }
+		else if(strcmp(crypt_feature,"lans2004_prot") == 0)	{ neo_gameinit = driver_init_lans2004; }
+		else if(strcmp(crypt_feature,"pnyaa_prot") == 0)	{ neo_gameinit = driver_init_pnyaa; }
+		else if(strcmp(crypt_feature,"ganryu_prot") == 0)	{ neo_gameinit = driver_init_ganryu; }
+		else if(strcmp(crypt_feature,"bangbead_prot") == 0)	{ neo_gameinit = driver_init_bangbead; }
+		else if(strcmp(crypt_feature,"mslug4_prot") == 0)	{ neo_gameinit = driver_init_mslug4; }
+		else if(strcmp(crypt_feature,"ms4plus_prot") == 0)	{ neo_gameinit = driver_init_ms4plus; }
+		else if(strcmp(crypt_feature,"rotd_prot") == 0)		{ neo_gameinit = driver_init_rotd; }
+		else if(strcmp(crypt_feature,"matrim_prot") == 0)	{ neo_gameinit = driver_init_matrim; }
+		else if(strcmp(crypt_feature,"matrimbl_prot") == 0)	{ neo_gameinit = driver_init_matrimbl; }
+		else { fatalerror("unknown crypt type\n"); }
+	}
+
+	if (neo_gameinit) neo_gameinit(image.device().machine());
+}
+
 /****************************************************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      MONITOR  */
-GAME( 1990, neogeo,    0,        neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Neo-Geo", GAME_IS_BIOS_ROOT | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT    COMPAT    MACHINE   INPUT     INIT     */
+CONS( 1990, neogeo,    0,        0,        mvs,	     neogeo,   mvs,  "SNK", "Neo-Geo", GAME_IS_BIOS_ROOT | GAME_SUPPORTS_SAVE )
 
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      MONITOR  */
 /* SNK */
 GAME( 1990, nam1975,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "NAM-1975 (NGM-001)(NGH-001)", GAME_SUPPORTS_SAVE )
 GAME( 1990, bstars,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Baseball Stars Professional (NGM-002)", GAME_SUPPORTS_SAVE )

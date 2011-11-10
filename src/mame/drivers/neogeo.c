@@ -147,7 +147,7 @@
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
-
+#include "imagedev/cartslot.h"
 #include "neogeo.lh"
 
 
@@ -388,7 +388,7 @@ static CUSTOM_INPUT( multiplexed_controller_r )
 	return input_port_read_safe(field.machine(), cntrl[port][state->m_controller_select & 0x01], 0x00);
 }
 
-
+#if 1 // this needs to be added dynamically somehow
 static CUSTOM_INPUT( mahjong_controller_r )
 {
 	neogeo_state *state = field.machine().driver_data<neogeo_state>();
@@ -413,7 +413,7 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 
 	return ret;
 }
-
+#endif
 
 static WRITE16_HANDLER( io_control_w )
 {
@@ -1275,6 +1275,82 @@ INPUT_PORTS_END
 
 
 
+static DEVICE_IMAGE_LOAD( neo_cartridge )
+{
+	UINT32 size;
+	device_t* ym = image.device().machine().device("ymsnd");
+
+	// first check software list
+	if(image.software_entry() != NULL)
+	{
+		// create memory regions
+		size = image.get_software_region_length("maincpu");
+		image.device().machine().region_free("maincpu");
+		image.device().machine().region_alloc("maincpu",size, 2, ENDIANNESS_BIG);
+		memcpy(image.device().machine().region("maincpu")->base(),image.get_software_region("maincpu"),size);
+		
+		// for whatever reason (intentional, or design flaw) software loaded via software lists is swapped in endianess vs. the standard ROM loading, regardless of the above.  Swap it to keep consistency
+		for (int i=0; i<size/2;i++)
+		{
+			UINT16* ROM = (UINT16*)image.device().machine().region("maincpu")->base();
+			ROM[i] = ((ROM[i]&0xff00)>>8) | ((ROM[i]&0x00ff)<<8); 
+		}
+		
+		size = image.get_software_region_length("fixed");
+		image.device().machine().region_free("fixed");
+		image.device().machine().region_alloc("fixed",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("fixed")->base(),image.get_software_region("fixed"),size);
+		
+		if(image.get_software_region("audiocpu") != NULL) 
+		{
+			size = image.get_software_region_length("audiocpu");
+			image.device().machine().region_free("audiocpu");
+			image.device().machine().region_alloc("audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
+			memcpy(image.device().machine().region("audiocpu")->base(),image.get_software_region("audiocpu"),size);
+			memcpy(image.device().machine().region("audiocpu")->base()+0x10000,image.get_software_region("audiocpu"),size); // avoid reloading in XML, should just improve banking instead tho?
+		}
+
+
+		size = image.get_software_region_length("ymsnd");
+		image.device().machine().region_free("ymsnd");
+		image.device().machine().region_alloc("ymsnd",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("ymsnd")->base(),image.get_software_region("ymsnd"),size);
+		if(image.get_software_region("ymsnd.deltat") != NULL)
+		{
+			size = image.get_software_region_length("ymsnd.deltat");
+			image.device().machine().region_free("ymsnd.deltat");
+			image.device().machine().region_alloc("ymsnd.deltat",size,1, ENDIANNESS_LITTLE);
+			memcpy(image.device().machine().region("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
+		}
+		else
+			image.device().machine().region_free("ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
+		ym->reset();
+		size = image.get_software_region_length("sprites");
+		image.device().machine().region_free("sprites");
+		image.device().machine().region_alloc("sprites",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("sprites")->base(),image.get_software_region("sprites"),size);
+		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
+		{
+			size = image.get_software_region_length("audiocrypt");
+			image.device().machine().region_alloc("audiocrypt",size,1, ENDIANNESS_LITTLE);
+			memcpy(image.device().machine().region("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
+			// allocate the audiocpu region to decrypt data into
+			image.device().machine().region_free("audiocpu");
+			image.device().machine().region_alloc("audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
+		}
+
+		// setup cartridge ROM area
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x000080,0x0fffff,"cart_rom");
+		memory_set_bankptr(image.device().machine(),"cart_rom",&image.device().machine().region("maincpu")->base()[0x80]);
+
+		// handle possible protection
+		mvs_install_protection(image);
+
+		return IMAGE_INIT_PASS;
+	}
+	return IMAGE_INIT_FAIL;
+}
+
 
 /*************************************
  *
@@ -1322,6 +1398,19 @@ static MACHINE_CONFIG_START( neogeo, neogeo_state )
 	/* NEC uPD4990A RTC */
 	MCFG_UPD4990A_ADD("upd4990a")
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mvs, neogeo )
+
+	MCFG_MEMCARD_HANDLER(neogeo)
+
+    MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_LOAD(neo_cartridge)
+	MCFG_CARTSLOT_INTERFACE("neo_cart")
+	MCFG_CARTSLOT_MANDATORY
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
+MACHINE_CONFIG_END
+
 
 /*************************************
  *
