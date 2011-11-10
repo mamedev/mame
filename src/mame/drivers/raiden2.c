@@ -2623,7 +2623,8 @@ of the fg sei251 'key data' to the pcb on bootup (like raiden 2 does) rather tha
 keys as programmed from factory (or via the suicide revival kit below); hence this romset is immune to the common
 problem of the 3.6v lithium battery dying and the missing keys to cause the sprites to show up as gibberish */
 // note: it is possible *but not proven* that this specific set in mame is a frankenstein-hybrid of the japan and us
-// sets, using the sound and char roms from us set and code from later japan set.
+// sets, using the sound and char roms from us set and code from later japan set. This would make sense if it was dumped
+// from a 'fixed, suicide free' modified us board where someone swapped in the later suicideless japan code roms.
 ROM_START( zeroteamb ) // No licensee, later japan?
 	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1b.u024.5k",   0x000000, 0x40000, CRC(157743d0) SHA1(f9c84c9025319f76807ef0e79f1ee1599f915b45) )
