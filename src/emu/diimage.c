@@ -999,7 +999,8 @@ void device_image_interface::clear()
 
 void device_image_interface::unload()
 {
-	if (is_loaded()) {
+	if (is_loaded() || m_software_info_ptr) 
+	{
 		call_unload();
 	}
     clear();
