@@ -5636,7 +5636,7 @@ GAME( 199?, j6raclb		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Red Alert Club (
 GAME( 199?, j6redarw	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Red Arrow (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6redarww	, j6redarw	, impctawp, tbirds, 0, ROT0, "Whitbread / JPM", "Red Arrow (Whitbread / Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6reddmn	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Red Demon (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, j6rh6		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Red Hot 6 (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 2002, j6rh6		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Red Hot 6 (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6rhchil	, 0			, impctawp, tbirds, 0, ROT0, "Ace", "Red Hot Chili Stepper (Ace) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6rh6cl		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Red Hot Six Club (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j6reelmn	, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Reel Money (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

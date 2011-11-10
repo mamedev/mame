@@ -5673,7 +5673,7 @@ GAME( 199?, m5bbrocl	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Big Brother Club (Ba
 GAME( 199?, m5bigchs	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","The Big Cheese (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5biggam	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","The Big Game (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5blkwht	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Black & White (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, m5bwaves	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Brainwaves (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, m5bwaves	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Brain Waves (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5blind		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Bling King Crazy (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5cbw		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ca$h Bang Wallop (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, m5cpcash	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Captain Cash (Barcrest) (MPU5)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
