@@ -13,6 +13,7 @@
 #include "sound/es5503.h"
 #include "machine/6526cia.h"
 #include "machine/nvram.h"
+#include "machine/amigafdc.h"
 
 
 
@@ -382,6 +383,9 @@ static MACHINE_CONFIG_START( mquake, amiga_state )
 	/* cia */
 	MCFG_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
 	MCFG_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
+
+	/* fdc */
+	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
 MACHINE_CONFIG_END
 
 

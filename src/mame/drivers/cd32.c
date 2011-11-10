@@ -36,6 +36,7 @@
 #include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
 #include "machine/microtch.h"
+#include "machine/amigafdc.h"
 
 #define CD32PAL_XTAL_X1   XTAL_28_37516MHz
 #define CD32PAL_XTAL_X2   XTAL_4_433619MHz
@@ -799,6 +800,9 @@ static MACHINE_CONFIG_START( cd32base, cd32_state )
 	/* cia */
 	MCFG_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cia_0_intf)
 	MCFG_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cia_1_intf)
+
+	/* fdc */
+	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
 MACHINE_CONFIG_END
 
 struct cdrom_interface cd32_cdrom =
