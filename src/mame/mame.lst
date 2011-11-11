@@ -17052,7 +17052,7 @@ ep_heybc	// Hey Big Spender Club (Global)
 ep_hispr	// Hi Spirits (Global)
 ep_hiscl	// Hi Spirits Club (Global)
 ep_spirt	// High Spirits (Global)
-ep_smoke	// Holy Smoke (Impulse)
+ep_smoke	// Holy Smoke! (Impulse)
 ep_hur		// Hurricane (Global)
 ep_ifern	// Inferno (Impulse)
 ep_kopcl	// Knockout Punch Club (Global)
@@ -17508,7 +17508,7 @@ m4twilgt	// Twilight (Barcrest)
 m4twintm	// Twin Timer (Barcrest)
 m4twist		// Twist Again (Barcrest)
 m4univ		// Universe (Barcrest)
-m4uuaw		// Up Up & Away (Barcrest)
+m4uuaw		// Up Up and Away (Barcrest)
 m4vegast	// Vegas Strip (Barcrest)
 m4vegastg	//
 m4vivaes	// Viva Espana (Barcrest)
@@ -17689,7 +17689,7 @@ m4jne		// The Jackpot's Not Enough (Empire?)
 /* MDM */
 
 m42punlm	// 2p Unlimited (Mdm)
-m4bigapl	// Big Apple (Mdm)
+m4bigapl	// The Big Apple (Mdm)
 m4bigapla	//
 m4bigaplb	//
 m4bigaplc	//

@@ -4677,7 +4677,7 @@ GAME( 199?, ep_heybc	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",     
 GAME( 199?, ep_hispr	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",        "Hi Spirits (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_hiscl	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",        "Hi Spirits Club (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_spirt	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",        "High Spirits (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
-GAME( 199?, ep_smoke	,  0,        maygayep,  maygayep,  0,  ROT0, "Impulse",        "Holy Smoke (Impulse) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
+GAME( 199?, ep_smoke	,  0,        maygayep,  maygayep,  0,  ROT0, "Impulse",        "Holy Smoke! (Impulse) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_hur		,  0,        maygayep,  maygayep,  0,  ROT0, "Global",        "Hurricane (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_ifern	,  0,        maygayep,  maygayep,  0,  ROT0, "Impulse",        "Inferno (Impulse) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )
 GAME( 199?, ep_kopcl	,  0,        maygayep,  maygayep,  0,  ROT0, "Global",        "Knockout Punch Club (Global) (EPOCH)",        GAME_NO_SOUND | GAME_NOT_WORKING | GAME_MECHANICAL )

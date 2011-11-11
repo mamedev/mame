@@ -15554,7 +15554,7 @@ GAME(199?, m4twilgt	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Twi
 GAME(199?, m4twintm	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4twist	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Twist Again (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4univ	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Universe (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4uuaw	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Up Up & Away (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4uuaw	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Up Up and Away (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4vegast	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Vegas Strip (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4vegastg,m4vegast	,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Vegas Strip (Barcrest) [German] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4vivaes	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Viva Espana (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -15748,12 +15748,12 @@ GAME(199?, m42punlm,     0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","2p Unlimit
 GAME(199?, m4silnud,     0,		mod4oki, mpu4, m4default, ROT0,   "Mdm?","Silver Nudger (Mdm?) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // code is close to 2p Unlimited, same sound rom
 GAME(199?, m4nud2p,     0,		mod4oki, mpu4, m4default, ROT0,   "Mdm?","2p Nudger (Mdm?) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // code is close to 2p Unlimited, same sound rom
 GAME(199?, m4ctn,     0,		mod4oki, mpu4, m4default, ROT0,   "Mdm?","Tuppenny Nudger Classic (Mdm?) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK ) // code is close to 2p Unlimited, same sound rom
-GAME(199?, m4bigapl,  0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bigapla, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bigaplb, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bigaplc, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bigapld, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 5)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bigaple, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Big Apple (Mdm) (MPU4, set 6)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bigapl,  0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","The Big Apple (Mdm) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bigapla, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","The Big Apple (Mdm) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bigaplb, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","The Big Apple (Mdm) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bigaplc, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","The Big Apple (Mdm) (MPU4, set 4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bigapld, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","The Big Apple (Mdm) (MPU4, set 5)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bigaple, m4bigapl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","The Big Apple (Mdm) (MPU4, set 6)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4blztrl,  0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","Blazing Trails (Mdm) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4blztrla, m4blztrl,	mod4oki, mpu4, m4default, ROT0,   "Mdm","Blazing Trails (Mdm) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bodymt,  0,		mod4oki, mpu4, m4default, ROT0,   "Mdm","Body Match (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // doesn't boot, various alarms
