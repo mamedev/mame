@@ -888,10 +888,10 @@ ROM_START( warriorb )
 	/* No Delta-T samples */
 
 	ROM_REGION( 0x01000, "user1", 0 )	/* unknown roms */
-	ROM_LOAD( "d24-13.37", 0x00000, 0x400, CRC(3ca18eb3) SHA1(54560f02c2be67993940831222130e90cd171991) )
-	ROM_LOAD( "d24-14.38", 0x00000, 0x400, CRC(baf2a193) SHA1(b7f103b5f5aab0702dd21fd7e3a82261ae1760e9) )
-//  ROM_LOAD( "d24-15.78", 0x00000, 0xa??, NO_DUMP )    /* Pals */
-//  ROM_LOAD( "d24-16.79", 0x00000, 0xa??, NO_DUMP )
+	ROM_LOAD( "d24-13.37", 0x00000, 0x400, CRC(3ca18eb3) SHA1(54560f02c2be67993940831222130e90cd171991) ) /* AM27S33A or compatible like N82HS137A */
+	ROM_LOAD( "d24-14.38", 0x00000, 0x400, CRC(baf2a193) SHA1(b7f103b5f5aab0702dd21fd7e3a82261ae1760e9) ) /* AM27S33A or compatible like N82HS137A */
+//  ROM_LOAD( "d24-15.78", 0x00000, 0xa??, NO_DUMP )    /* 20L8B Pal */
+//  ROM_LOAD( "d24-16.79", 0x00000, 0xa??, NO_DUMP )    /* 20L8B Pal */
 ROM_END
 
 
