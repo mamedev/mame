@@ -1,6 +1,24 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!-- The list contains both MVS and AES cartridges.
+     
+     For the majority of official titles the actual ROM data contained in the cartridges is compatible across systems, the actual codepath taken
+     depends upon the bios used.
+     
+     The only real difference with the cartridges is the physical form of the cartridges which allowed a delayed release of the game for AES
+     systems at a higher cost.  Due to this many adapters are available which plug into an AES unit allowing you to plug any standard MVS cart
+     into the system.  Reverse adapters exist, although were less common because there was no reason to use them.  All MVS carts can be used
+     with AES systems so there is no reason to have separate lists especially when in the majority of cases the data is identical.
+     
+     The primary MVS / AES releases are marked in the list for documentation purposes, typically the first AES release is just a later revision
+     of the game code with additional bugfixes etc. when compared to the primary MVS release.
+     
+     Todo: games which are actually incompatible between systems (the first release of kof2001, and many of the bootlegs / hacks) should be
+           tagged with compatibility tags.
+
+-->
+
 <softwarelist name="neogeo" description="SNK Neo-Geo cartridges">
 
   <!--***************************************

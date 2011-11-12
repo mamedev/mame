@@ -1275,7 +1275,7 @@ INPUT_PORTS_END
 
 
 
-static DEVICE_IMAGE_LOAD( neo_cartridge )
+DEVICE_IMAGE_LOAD( neo_cartridge )
 {
 	UINT32 size;
 	device_t* ym = image.device().machine().device("ymsnd");
