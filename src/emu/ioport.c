@@ -1513,6 +1513,8 @@ input_port_value input_port_active_safe(running_machine &machine, const char *ta
 
 input_port_value input_port_read_direct(const input_port_config *port)
 {
+	assert(port != NULL);
+
 	input_port_private *portdata = port->machine().input_port_data;
 	analog_field_state *analog;
 	device_field_info *device_field;
