@@ -6900,7 +6900,7 @@
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
         <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
-      <dataarea name="audiocpu" size="0x090000">
+      <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="256-m1.m1" crc="eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a" />        <!-- mask rom TC534000 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x1000000">
@@ -6940,7 +6940,7 @@
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
         <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
-      <dataarea name="audiocpu" size="0x090000">
+      <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="256-m1.m1" crc="eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a" />        <!-- mask rom TC534000 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x1000000">
@@ -7116,7 +7116,7 @@
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
         <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
-      <dataarea name="audiocpu" size="0x090000">
+      <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="260-m1.m1" crc="6407c5e5" sha1="d273e154cc905b63205a17a1a6d419cac3485a92" />
       </dataarea>
       <dataarea name="ymsnd" size="0x400000">
@@ -7152,7 +7152,7 @@
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
         <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
-      <dataarea name="audiocpu" size="0x090000">
+      <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="261-m1.m1" crc="7d501c39" sha1="8e6bcc428f5ac7532d9c9be7e07ad0821461a080" />        <!-- mask rom TC534000 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x0e00000">
@@ -8173,7 +8173,7 @@
       <dataarea name="fixed" size="0x040000">
         <rom offset="0x000000" size="0x020000" name="garou-s1.bin" crc="df720e33" sha1="58d05002d4851682bd626241fa7b70f78f6f3bc8" />
       </dataarea>
-      <dataarea name="audiocpu" size="0x090000">
+      <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="garou-m1.bin" crc="7c51d002" sha1="01ffba6cbc8da07804f7b21d8c71c39d64a1a4e2" />
       </dataarea>
       <dataarea name="ymsnd" size="0x1000000">
