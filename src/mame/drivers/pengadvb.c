@@ -1,11 +1,13 @@
 /*
 
-Penguin Adventure bootleg
+Penguin Adventure bootleg (tagged 'Screen', 1988)
+Original release was on MSX, by Konami in 1986. There is no official arcade release of this game.
 
 Driver by Mariusz Wojcieszek
 
-This seems to be the MSX version possibly hacked
-to run on cheap Korean bootleg hardware.
+This seems to be the MSX version hacked to run on cheap Korean(?) bootleg hardware.
+Bosses are at wrong stages when compared to the original, probably to make the game more
+difficult early on. This is also the cause of some gfx glitches when reaching a boss.
 
 Basic components include.....
 Z80 @ 3.579533MHz [10.7386/3]
@@ -15,7 +17,7 @@ AY-3-8910 @ 1.789766MHz [10.7386/6]
 4416 RAM x2
 4164 RAM x8
 10.7386 XTAL
-10 position DIPSW
+10 position DIPSW (where are they read??)
 NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 */
 
@@ -42,96 +44,82 @@ public:
 static void mem_map_banks(running_machine &machine)
 {
 	pengadvb_state *state = machine.driver_data<pengadvb_state>();
-	int slot_select;
+	/*	memorymap: (rest is assumed unmapped)
+		slot 0
+			0000-7fff	BIOS ROM
+		slot 1
+			4000-bfff	game ROM
+		slot 3
+			c000-ffff	RAM
+	*/
 
-	// page 0
-	slot_select = (state->m_mem_map >> 0) & 0x03;
-	switch(slot_select)
+	// page 0 (0000-3fff)
+	switch(state->m_mem_map & 3)
 	{
 		case 0:
-		{
+			// BIOS
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
 			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
 			break;
-		};
-		case 1:
-		case 2:
-		case 3:
-		{
+
+		default:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x0000, 0x3fff);
 			break;
-		}
 	}
 
-	// page 1
-	slot_select = (state->m_mem_map >> 2) & 0x03;
-	switch(slot_select)
+	// page 1 (4000-7fff)
+	switch(state->m_mem_map >> 2 & 3)
 	{
 		case 0:
-		{
+			// BIOS
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
 			memory_set_bankptr(machine, "bank21", machine.region("maincpu")->base() + 0x4000);
 			memory_set_bankptr(machine, "bank22", machine.region("maincpu")->base() + 0x4000 + 0x2000);
 			break;
-		}
+
 		case 1:
-		{
+			// game
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
 			memory_set_bankptr(machine, "bank21", machine.region("game")->base() + state->m_mem_banks[0]*0x2000);
 			memory_set_bankptr(machine, "bank22", machine.region("game")->base() + state->m_mem_banks[1]*0x2000);
 			break;
-		}
-		case 2:
-		case 3:
-		{
+
+		default:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x4000, 0x7fff);
 			break;
-		}
 	}
 
-	// page 2
-	slot_select = (state->m_mem_map >> 4) & 0x03;
-	switch(slot_select)
+	// page 2 (8000-bfff)
+	switch(state->m_mem_map >> 4 & 3)
 	{
 		case 1:
-		{
+			// game
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x9fff, "bank31" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xbfff, "bank32" );
 			memory_set_bankptr(machine, "bank31", machine.region("game")->base() + state->m_mem_banks[2]*0x2000);
 			memory_set_bankptr(machine, "bank32", machine.region("game")->base() + state->m_mem_banks[3]*0x2000);
 			break;
-		}
-		case 0:
-		case 2:
-		case 3:
-		{
+
+		default:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x8000, 0xbfff);
 			break;
-		}
 	}
 
-	// page 3
-	slot_select = (state->m_mem_map >> 6) & 0x03;
-
-	switch(slot_select)
+	// page 3 (c000-ffff)
+	switch(state->m_mem_map >> 6 & 3)
 	{
-		case 0:
-		case 1:
-		case 2:
-		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0xc000, 0xffff);
-			break;
-		}
 		case 3:
-		{
+			// RAM
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xffff, "bank4" );
 			memory_set_bankptr(machine, "bank4", state->m_main_mem);
 			break;
-		}
-	}
 
+		default:
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0xc000, 0xffff);
+			break;
+	}
 }
 
 static WRITE8_HANDLER(mem_w)
@@ -139,22 +127,15 @@ static WRITE8_HANDLER(mem_w)
 	pengadvb_state *state = space->machine().driver_data<pengadvb_state>();
 	if (offset >= 0xc000)
 	{
-		int slot_select = (state->m_mem_map >> 6) & 0x03;
-
-		if ( slot_select == 3 )
-		{
+		// write to RAM
+		if ((state->m_mem_map >> 6 & 3) == 3)
 			state->m_main_mem[offset - 0xc000] = data;
-		}
 	}
-	else
+	else if (offset >= 0x4000 && (state->m_mem_map >> (offset >> 13 & 6) & 3) == 1 && (state->m_mem_banks[(offset - 0x4000) >> 13] != (data & 0xf)))
 	{
-		switch(offset)
-		{
-			case 0x4000: state->m_mem_banks[0] = data; mem_map_banks(space->machine()); break;
-			case 0x6000: state->m_mem_banks[1] = data; mem_map_banks(space->machine()); break;
-			case 0x8000: state->m_mem_banks[2] = data; mem_map_banks(space->machine()); break;
-			case 0xa000: state->m_mem_banks[3] = data; mem_map_banks(space->machine()); break;
-		}
+		// ROM bankswitch
+		state->m_mem_banks[(offset - 0x4000) >> 13] = data & 0xf;
+		mem_map_banks(space->machine());
 	}
 }
 
@@ -210,11 +191,20 @@ static const ay8910_interface pengadvb_ay8910_interface =
 	DEVCB_NULL
 };
 
+static READ8_DEVICE_HANDLER( pengadvb_ppi_port_a_r )
+{
+	pengadvb_state *state = device->machine().driver_data<pengadvb_state>();
+	return state->m_mem_map;
+}
+
 static WRITE8_DEVICE_HANDLER ( pengadvb_ppi_port_a_w )
 {
 	pengadvb_state *state = device->machine().driver_data<pengadvb_state>();
-	state->m_mem_map = data;
-	mem_map_banks(device->machine());
+	if (data != state->m_mem_map)
+	{
+		state->m_mem_map = data;
+		mem_map_banks(device->machine());
+	}
 }
 
 static READ8_DEVICE_HANDLER( pengadvb_ppi_port_b_r )
@@ -229,7 +219,7 @@ static READ8_DEVICE_HANDLER( pengadvb_ppi_port_b_r )
 
 static I8255A_INTERFACE(pengadvb_ppi8255_interface)
 {
-	DEVCB_NULL,
+	DEVCB_HANDLER(pengadvb_ppi_port_a_r),
 	DEVCB_HANDLER(pengadvb_ppi_port_a_w),
 	DEVCB_HANDLER(pengadvb_ppi_port_b_r),
 	DEVCB_NULL,
@@ -239,7 +229,7 @@ static I8255A_INTERFACE(pengadvb_ppi8255_interface)
 
 static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static TMS9928A_INTERFACE(pengadvb_tms9928a_interface)
@@ -326,7 +316,6 @@ static void pengadvb_decrypt(running_machine &machine, const char* region)
 		mem[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,5,11,10,9,8,7,6,12,4,3,2,1,0)];
 	}
 	auto_free(machine, buf);
-
 }
 
 static DRIVER_INIT(pengadvb)
@@ -350,4 +339,4 @@ ROM_START( pengadvb )
 
 ROM_END
 
-GAME( 1988, pengadvb, 0, pengadvb, pengadvb, pengadvb, ROT0, "bootleg / Konami", "Penguin Adventure (bootleg of MSX version)", GAME_SUPPORTS_SAVE )
+GAME( 1988, pengadvb, 0, pengadvb, pengadvb, pengadvb, ROT0, "bootleg (Screen) / Konami", "Penguin Adventure (bootleg of MSX version)", GAME_SUPPORTS_SAVE )
