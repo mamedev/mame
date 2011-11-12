@@ -3253,7 +3253,7 @@ void drcbe_x64::op_getflgs(x86code *&dst, const instruction &inst)
 			emit_setcc_r8(dst, x64emit::COND_C, REG_AL);											// setc   al
 			emit_setcc_r8(dst, x64emit::COND_O, REG_CL);											// seto   cl
 			emit_movzx_r32_r8(dst, REG_EAX, REG_AL);									// movzx  eax,al
-			emit_movzx_r32_r8(dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_movzx_r32_r8(dst, REG_ECX, REG_CL);									// movzx  ecx,cl
 			emit_lea_r32_m32(dst, dstreg, MBISD(REG_EAX, REG_ECX, 2, 0));				// lea    dstreg,[eax+ecx*2]
 			break;
 
@@ -3261,7 +3261,7 @@ void drcbe_x64::op_getflgs(x86code *&dst, const instruction &inst)
 			emit_setcc_r8(dst, x64emit::COND_C, REG_AL);											// setc   al
 			emit_setcc_r8(dst, x64emit::COND_Z, REG_CL);											// setz   cl
 			emit_movzx_r32_r8(dst, REG_EAX, REG_AL);									// movzx  eax,al
-			emit_movzx_r32_r8(dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_movzx_r32_r8(dst, REG_ECX, REG_CL);									// movzx  ecx,cl
 			emit_lea_r32_m32(dst, dstreg, MBISD(REG_EAX, REG_ECX, 4, 0));				// lea    dstreg,[eax+ecx*4]
 			break;
 
@@ -3269,7 +3269,7 @@ void drcbe_x64::op_getflgs(x86code *&dst, const instruction &inst)
 			emit_setcc_r8(dst, x64emit::COND_C, REG_AL);											// setc   al
 			emit_setcc_r8(dst, x64emit::COND_S, REG_CL);											// sets   cl
 			emit_movzx_r32_r8(dst, REG_EAX, REG_AL);									// movzx  eax,al
-			emit_movzx_r32_r8(dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_movzx_r32_r8(dst, REG_ECX, REG_CL);									// movzx  ecx,cl
 			emit_lea_r32_m32(dst, dstreg, MBISD(REG_EAX, REG_ECX, 8, 0));				// lea    dstreg,[eax+ecx*8]
 			break;
 
@@ -3278,7 +3278,7 @@ void drcbe_x64::op_getflgs(x86code *&dst, const instruction &inst)
 			emit_setcc_r8(dst, x64emit::COND_O, REG_AL);											// seto   al
 			emit_setcc_r8(dst, x64emit::COND_Z, REG_CL);											// setz   cl
 			emit_movzx_r32_r8(dst, REG_EAX, REG_AL);									// movzx  eax,al
-			emit_movzx_r32_r8(dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_movzx_r32_r8(dst, REG_ECX, REG_CL);									// movzx  ecx,cl
 			emit_lea_r32_m32(dst, dstreg, MBISD(REG_EAX, REG_ECX, 2, 0));				// lea    dstreg,[eax+ecx*2]
 			emit_shl_r32_imm(dst, dstreg, 1);											// shl    dstreg,1
 			break;
