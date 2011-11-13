@@ -1,13 +1,13 @@
 /************************************************************************
 
-	NEXUS 3D Version 1.0 Board from Interpark
+    NEXUS 3D Version 1.0 Board from Interpark
 
-	Games on this platform:
-	
-	Arcana Heart FULL, Examu Inc, 2006
+    Games on this platform:
 
-	MagicEyes VRENDER 3D Soc (200 MHz ARM920T CPU / GFX / Sound)
-	Also Has 2x QDSP QS1000 for sound
+    Arcana Heart FULL, Examu Inc, 2006
+
+    MagicEyes VRENDER 3D Soc (200 MHz ARM920T CPU / GFX / Sound)
+    Also Has 2x QDSP QS1000 for sound
 
 */
 
@@ -61,7 +61,7 @@ void nexus3d_flash_reset(running_machine& machine)
 READ8_HANDLER( n3d_flash_r )
 {
 	nexus3d_state *state = space->machine().driver_data<nexus3d_state>();
-	
+
 	if (state->m_last_flash_cmd==0x70) return 0xe0;
 
 	if (state->m_last_flash_cmd==0x00)
@@ -69,11 +69,11 @@ READ8_HANDLER( n3d_flash_r )
 		UINT8 retdat = state->flash_page_data[state->m_flash_page_addr];
 
 		//logerror("n3d_flash_r %02x %04x\n", offset, state->m_flash_page_addr);
-		
-		state->m_flash_page_addr++;		
+
+		state->m_flash_page_addr++;
 		return retdat;
 	}
-	
+
 
 	logerror("n3d_flash_r %02x\n", offset);
 	return 0x00;
@@ -98,7 +98,7 @@ WRITE8_HANDLER( n3d_flash_cmd_w )
 WRITE8_HANDLER( n3d_flash_addr_w )
 {
 	nexus3d_state *state = space->machine().driver_data<nexus3d_state>();
-//	logerror("n3d_flash_addr_w %02x %02x\n", offset, data);
+//  logerror("n3d_flash_addr_w %02x %02x\n", offset, data);
 
 	state->m_flash_addr_seq++;
 
@@ -122,17 +122,17 @@ WRITE8_HANDLER( n3d_flash_addr_w )
 
 static READ32_HANDLER( nexus3d_unk_r )
 {
-	return space->machine().rand() ^ (space->machine().rand() << 16); 
+	return space->machine().rand() ^ (space->machine().rand() << 16);
 }
 
 static READ32_HANDLER( nexus3d_unk2_r )
 {
-	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16); 
+	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
 }
 
 static READ32_HANDLER( nexus3d_unk3_r )
 {
-	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16); 
+	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
 }
 
 static WRITE32_HANDLER( nexus3d_unk2_w )
@@ -213,7 +213,7 @@ MACHINE_CONFIG_END
 // I highly suspect this upgrade (to Full) was done at the PCB shop to boost the value of the PCB, and
 // that the original game used a smaller flash.  It seems highly unlikely that Examu would ship ROMs
 // containing the entire backcatalog of SNK and Capcom material ;-)
-// 
+//
 // It's possible this set should be marked as a bootleg due to this although I imagine the actual valid
 // part of the data will match a clean dump.
 ROM_START( acheartf )
@@ -228,7 +228,7 @@ ROM_START( acheartf )
 	ROM_LOAD( "u46.bin",     0x000000, 0x200000, CRC(1e8a7e73) SHA1(3270bc359b266e57debf8fd4283a46e08d679ae2) )
 
 	ROM_REGION( 0x080000, "wavetable", ROMREGION_ERASEFF ) /* QDSP wavetable rom */
-//	ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // missing from this set, but should be the same
+//  ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // missing from this set, but should be the same
 ROM_END
 
 static DRIVER_INIT( nexus3d )

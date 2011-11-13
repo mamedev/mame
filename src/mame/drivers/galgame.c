@@ -1,10 +1,10 @@
 /*
 
-	Galaxy Game
+    Galaxy Game
 
-	Driver by Mariusz Wojcieszek
+    Driver by Mariusz Wojcieszek
 
-	First commercial video game.
+    First commercial video game.
 
 */
 

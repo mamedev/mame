@@ -1385,7 +1385,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			data &= 0x9fff;
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			space->machine().device<amiga_fdc>("fdc")->dmacon_set(data);
-			
+
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
 				state->m_blitter_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( BLITTER_NASTY_DELAY ));

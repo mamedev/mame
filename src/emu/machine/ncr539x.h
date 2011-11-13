@@ -69,10 +69,10 @@ private:
     UINT8 m_clock_factor;
     UINT8 m_forced_test;
     UINT8 m_data_alignment;
-                   
+
     bool m_selected;
     bool m_chipid_available, m_chipid_lock;
-                       
+
     static const int m_fifo_size = 16;
     UINT8 m_fifo_ptr, m_fifo[m_fifo_size];
 

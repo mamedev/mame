@@ -9754,17 +9754,17 @@ static DRIVER_INIT( mvs )
 // handle protected carts
 void mvs_install_protection(device_image_interface& image)
 {
-//	neogeo_state *state = image.device().machine().driver_data<neogeo_state>();
+//  neogeo_state *state = image.device().machine().driver_data<neogeo_state>();
 	const char *crypt_feature = image.get_feature( "crypt" );
 
 	if(crypt_feature == NULL)
 	{
-		neo_gameinit = driver_init_neogeo; 
+		neo_gameinit = driver_init_neogeo;
 	}
 	else
 	{
 		/* work out which Driver Init decryption function to call based on flag in softlist
-		 - note this is called AFTER the regular DRIVER_INIT */
+         - note this is called AFTER the regular DRIVER_INIT */
 
 		if(strcmp(crypt_feature,"mslugx_prot") == 0)		{ neo_gameinit = driver_init_mslugx; }
 		else if(strcmp(crypt_feature,"fatfury2_prot") == 0) { neo_gameinit = driver_init_fatfury2; }

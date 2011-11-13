@@ -175,7 +175,7 @@ void amiga_fdc::live_run(attotime limit)
 				amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKSYN, 0xffff);
 			} else
 				dskbyt &= ~0x0400;
-			
+
 			if(cur_live.bit_counter == 8) {
 				dskbyt = (dskbyt & 0xff00) | 0x8000 | (cur_live.shift_reg & 0xff);
 				cur_live.bit_counter = 0;

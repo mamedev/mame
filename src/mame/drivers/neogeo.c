@@ -1288,20 +1288,20 @@ DEVICE_IMAGE_LOAD( neo_cartridge )
 		image.device().machine().region_free("maincpu");
 		image.device().machine().region_alloc("maincpu",size, 2, ENDIANNESS_BIG);
 		memcpy(image.device().machine().region("maincpu")->base(),image.get_software_region("maincpu"),size);
-		
+
 		// for whatever reason (intentional, or design flaw) software loaded via software lists is swapped in endianess vs. the standard ROM loading, regardless of the above.  Swap it to keep consistency
 		for (int i=0; i<size/2;i++)
 		{
 			UINT16* ROM = (UINT16*)image.device().machine().region("maincpu")->base();
-			ROM[i] = ((ROM[i]&0xff00)>>8) | ((ROM[i]&0x00ff)<<8); 
+			ROM[i] = ((ROM[i]&0xff00)>>8) | ((ROM[i]&0x00ff)<<8);
 		}
-		
+
 		size = image.get_software_region_length("fixed");
 		image.device().machine().region_free("fixed");
 		image.device().machine().region_alloc("fixed",size,1, ENDIANNESS_LITTLE);
 		memcpy(image.device().machine().region("fixed")->base(),image.get_software_region("fixed"),size);
-		
-		if(image.get_software_region("audiocpu") != NULL) 
+
+		if(image.get_software_region("audiocpu") != NULL)
 		{
 			size = image.get_software_region_length("audiocpu");
 			image.device().machine().region_free("audiocpu");

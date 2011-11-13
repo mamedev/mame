@@ -10,7 +10,7 @@
 #ifdef __linux__
 #define IFF_TAP		0x0002
 #define IFF_NO_PI	0x1000
-#define TUNSETIFF     _IOW('T', 202, int) 
+#define TUNSETIFF     _IOW('T', 202, int)
 #endif
 
 class netdev_tap : public netdev
@@ -18,7 +18,7 @@ class netdev_tap : public netdev
 public:
 	netdev_tap(const char *name, class device_network_interface *ifdev, int rate);
 	~netdev_tap();
-	
+
 	int send(UINT8 *buf, int len);
 	void set_mac(const char *mac);
 protected:
@@ -53,7 +53,7 @@ netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, 
 	}
 	strncpy(m_ifname, ifr.ifr_name, 10);
 	fcntl(m_fd, F_SETFL, O_NONBLOCK);
-	
+
 #else
 	m_fd = -1;
 #endif

@@ -471,7 +471,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				set_int(INT_T2);
 		    }
 		    break;
-			
+
 		case TIMER_CA2:
 			m_out_ca2_func(1);
 			m_out_ca2 = 1;
@@ -550,7 +550,7 @@ READ8_MEMBER( via6522_device::read )
 			/* call the CA2 output function */
 			m_out_ca2_func(0);
 			m_out_ca2 = 0;
-			
+
 			m_ca2_timer->adjust(cycles_to_time(1));
 		}
 		/* If CA2 is configured as output and in pulse or handshake mode,
@@ -740,7 +740,7 @@ WRITE8_MEMBER( via6522_device::write )
 			/* call the CA2 output function */
 			m_out_ca2_func(0);
 			m_out_ca2 = 0;
-			
+
 			m_ca2_timer->adjust(cycles_to_time(1));
 		}
 		else if (CA2_AUTO_HS(m_pcr))

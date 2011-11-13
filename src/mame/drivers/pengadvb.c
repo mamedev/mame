@@ -44,14 +44,14 @@ public:
 static void mem_map_banks(running_machine &machine)
 {
 	pengadvb_state *state = machine.driver_data<pengadvb_state>();
-	/*	memorymap: (rest is assumed unmapped)
-		slot 0
-			0000-7fff	BIOS ROM
-		slot 1
-			4000-bfff	game ROM
-		slot 3
-			c000-ffff	RAM
-	*/
+	/*  memorymap: (rest is assumed unmapped)
+        slot 0
+            0000-7fff   BIOS ROM
+        slot 1
+            4000-bfff   game ROM
+        slot 3
+            c000-ffff   RAM
+    */
 
 	// page 0 (0000-3fff)
 	switch(state->m_mem_map & 3)

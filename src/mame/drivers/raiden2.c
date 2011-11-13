@@ -1,6 +1,6 @@
 /* Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
-	TODO: figure out the rest of the protection
-	TODO: Zero team needs COIN3 and COIN4 found and hooked up, they may be on the sound cpu
+    TODO: figure out the rest of the protection
+    TODO: Zero team needs COIN3 and COIN4 found and hooked up, they may be on the sound cpu
 */
 
 /* raiden 2 board test note 17/04/08 (based on test by dox)
@@ -1434,7 +1434,7 @@ static INPUT_PORTS_START( raidendx )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!6") /* Manual shows "Not Used" */
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zeroteam )
@@ -2780,7 +2780,7 @@ ROM_END
 
 As the name implies, this is used to give life again to a "suicided" ZT PCB, where the 3.6v
 lithium battery which backs up the FG/sprite encryption keys has died, and the sprites display
-as garbage blocks. 
+as garbage blocks.
 To use: replace the 3.6v battery with a working one, and then remove the normal four code roms
 and install these instead.
 Boot the pcb, it should rewrite the sei251 decryption keys and display a message on screen.

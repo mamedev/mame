@@ -124,7 +124,7 @@ bool adf_format::save(io_generic *io, floppy_image *image)
 					io_generic_write(io, sectdata, (track*2 + side)*512*11, 512*11);
 				}
 		}
-	} 			
+	}
 	return true;
 }
 

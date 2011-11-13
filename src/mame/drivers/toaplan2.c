@@ -65,8 +65,8 @@ Supported games:
     SET NOTES:
 
     ghox     - The ghoxj set displays an English title screen when the jumpers are set for Japan/Taito,
-	           and fails to display the "Winners Don't Use Drugs" logo when set for USA/Taito (either
-	           Taito America or Taito Japan).
+               and fails to display the "Winners Don't Use Drugs" logo when set for USA/Taito (either
+               Taito America or Taito Japan).
 
     dogyuun  - In the location test version, if you are hit while you have a bomb, the bomb explodes
                automatically and saves you from dying. In the final released version, the bomb explodes
@@ -1687,12 +1687,12 @@ static INPUT_PORTS_START( tekipaki )
 	PORT_DIPSETTING(		0x0006, "Taiwan (Spacy Co., Ltd." )
 	PORT_DIPSETTING(		0x0007, "USA (Romstar, Inc.)" )
 	PORT_DIPSETTING(		0x0008, "Hong Kong (Honest Trading Co.)" )
-//	PORT_DIPSETTING(		0x0009, DEF_STR( Japan ) )	// English title screen
-//	PORT_DIPSETTING(		0x000a, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(		0x000b, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(		0x000c, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(		0x000d, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(		0x000e, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(        0x0009, DEF_STR( Japan ) )  // English title screen
+//  PORT_DIPSETTING(        0x000a, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(        0x000b, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(        0x000c, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(        0x000d, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(        0x000e, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x000f, "Japan (Distributed by Tecmo)" )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(c2map_r, NULL)
 INPUT_PORTS_END
@@ -1743,7 +1743,7 @@ static INPUT_PORTS_START( ghox )
 	PORT_DIPSETTING(		0x0000b, "USA (Taito America Corporation)" )
 	PORT_DIPSETTING(		0x0000c, "USA (Taito Corporation Japan)" )
 	PORT_DIPSETTING(		0x8000d, "Europe (Taito Corporation Japan)" )
-//	PORT_DIPSETTING(		0x0000e, "Japan (Licensed to [blank])" )	// English title screen
+//  PORT_DIPSETTING(        0x0000e, "Japan (Licensed to [blank])" )    // English title screen
 	PORT_DIPSETTING(        0x0000f, "Japan (Taito Corporation)" )
 
 	PORT_START("PAD1")		/* Paddle 1 (left-right)  read at $100000 */
@@ -1824,12 +1824,12 @@ static INPUT_PORTS_START( dogyuuna )
 	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield); no speedups" )
 	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading); no speedups" )
 	PORT_DIPSETTING(		0x0060, "Taiwan; no speedups" )
-//	PORT_DIPSETTING(		0x0070, "Taiwan (Licensed to ???????); no speedups" )
+//  PORT_DIPSETTING(        0x0070, "Taiwan (Licensed to ???????); no speedups" )
 	PORT_DIPSETTING(		0x0080, "Southeast Asia (Charterfield); no speedups" )
 	PORT_DIPSETTING(		0x0090, "Hong Kong (Charterfield)" )
 	PORT_DIPSETTING(		0x00a0, "Korea (Unite Trading)" )
 	PORT_DIPSETTING(		0x00b0, DEF_STR( Taiwan ) )
-//	PORT_DIPSETTING(		0x00c0, "Taiwan (Licensed to ???????)" )
+//  PORT_DIPSETTING(        0x00c0, "Taiwan (Licensed to ???????)" )
 	PORT_DIPSETTING(		0x00d0, "Southeast Asia (Charterfield)" )
 //  PORT_DIPSETTING(        0x00e0, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp.)" )

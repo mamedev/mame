@@ -431,7 +431,7 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 	while(spos < epos) {
 		while(index != cells-1 && (buf[index+1] & floppy_image::TIME_MASK) <= spos)
 			index++;
-	
+
 		UINT32 ref_start = buf[index] & floppy_image::TIME_MASK;
 		UINT32 ref_end   = index == cells-1 ? 200000000 : buf[index+1] & floppy_image::TIME_MASK;
 		UINT32 ref_mg    = buf[index] & floppy_image::MG_MASK;
@@ -479,7 +479,7 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 						index++;
 					}
 				}
-				spos = ref_end;				
+				spos = ref_end;
 
 			} else {
 				// Overlap at the start only
@@ -521,7 +521,7 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 				spos = epos;
 			}
 		}
-	
+
 	}
 }
 

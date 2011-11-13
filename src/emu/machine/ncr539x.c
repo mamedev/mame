@@ -14,7 +14,7 @@
 #define VERBOSE			(0)
 #define VERBOSE_READS	(0)
 
-enum 
+enum
 {
 	TIMER_539X_COMMAND,
 

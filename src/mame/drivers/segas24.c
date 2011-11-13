@@ -10,6 +10,8 @@
 /* Missing:
    - linescroll in special modes (qgh title, mahmajn2/qrouka attract mode)
    - screen flipping (mix register 13 & 2)
+   - FRC timer IRQ is currently in a slight off-beat (timer should be resetted every time
+     that the mode changes, but current MAME framework doesn't seem to like it)
 */
 
 /*
