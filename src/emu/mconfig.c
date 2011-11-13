@@ -79,13 +79,19 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 			if (!options.exists(owner.tag()))
 				selval = slot->get_default_card(devicelist(), options);
 
-			if (selval != NULL)
-				for (int i = 0; intf[i].name != NULL; i++)
+			if (selval != NULL && strlen(selval)!=0) {
+				bool found = false;
+				for (int i = 0; intf[i].name != NULL; i++) {
 					if (strcmp(selval, intf[i].name) == 0) {
 						device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, 0);
+						found = true;
 						if (!options.exists(owner.tag()))
 							device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());
 					}
+				}
+				if (!found) 
+					throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag());
+			}
 		}
 	}
 
