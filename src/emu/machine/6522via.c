@@ -109,6 +109,15 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
+inline void via6522_device::set_irq_line(int state)
+{
+	if (m_irq != state)
+	{
+		m_irq_func(state);
+		m_irq = state;
+	}
+}
+
 attotime via6522_device::cycles_to_time(int c)
 {
 	return attotime::from_hz(clock()) * c;
@@ -150,7 +159,8 @@ const device_type VIA6522 = &device_creator<via6522_device>;
 //-------------------------------------------------
 
 via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock)
+    : device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock),
+	  m_irq(CLEAR_LINE)
 {
 
 }
@@ -214,6 +224,7 @@ void via6522_device::device_start()
     m_time2 = m_time1 = machine().time();
     m_t1 = timer_alloc(TIMER_T1);
     m_t2 = timer_alloc(TIMER_T2);
+    m_ca2_timer = timer_alloc(TIMER_CA2);
     m_shift_timer = timer_alloc(TIMER_SHIFT);
 
 	/* Default clock is from CPU1 */
@@ -248,6 +259,7 @@ void via6522_device::device_start()
     save_item(NAME(m_acr));
     save_item(NAME(m_ier));
     save_item(NAME(m_ifr));
+	save_item(NAME(m_irq));
     save_item(NAME(m_t1_active));
     save_item(NAME(m_t2_active));
     save_item(NAME(m_shift_counter));
@@ -304,7 +316,7 @@ void via6522_device::set_int(int data)
 	if (m_ier & m_ifr)
     {
 		m_ifr |= INT_ANY;
-		m_irq_func(ASSERT_LINE);
+		set_irq_line(ASSERT_LINE);
     }
 }
 
@@ -328,7 +340,7 @@ void via6522_device::clear_int(int data)
     }
 	else
 	{
-		m_irq_func(CLEAR_LINE);
+		set_irq_line(CLEAR_LINE);
 	}
 }
 
@@ -459,6 +471,11 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				set_int(INT_T2);
 		    }
 		    break;
+			
+		case TIMER_CA2:
+			m_out_ca2_func(1);
+			m_out_ca2 = 1;
+			break;
 	}
 }
 
@@ -528,7 +545,17 @@ READ8_MEMBER( via6522_device::read )
 
 		/* If CA2 is configured as output and in pulse or handshake mode,
            CA2 is set now */
-		if (CA2_AUTO_HS(m_pcr))
+		if (CA2_PULSE_OUTPUT(m_pcr))
+		{
+			/* call the CA2 output function */
+			m_out_ca2_func(0);
+			m_out_ca2 = 0;
+			
+			m_ca2_timer->adjust(cycles_to_time(1));
+		}
+		/* If CA2 is configured as output and in pulse or handshake mode,
+           CA2 is set now */
+		else if (CA2_AUTO_HS(m_pcr))
 		{
 			if (m_out_ca2)
 			{
@@ -712,10 +739,9 @@ WRITE8_MEMBER( via6522_device::write )
 		{
 			/* call the CA2 output function */
 			m_out_ca2_func(0);
-			m_out_ca2_func(1);
-
-			/* set CA2 (shouldn't be needed) */
-			m_out_ca2 = 1;
+			m_out_ca2 = 0;
+			
+			m_ca2_timer->adjust(cycles_to_time(1));
 		}
 		else if (CA2_AUTO_HS(m_pcr))
 		{
@@ -902,7 +928,7 @@ WRITE8_MEMBER( via6522_device::write )
 			if (((m_ifr & m_ier) & 0x7f) == 0)
 			{
 				m_ifr &= ~INT_ANY;
-				m_irq_func(CLEAR_LINE);
+				set_irq_line(CLEAR_LINE);
 			}
 		}
 		else
@@ -910,7 +936,7 @@ WRITE8_MEMBER( via6522_device::write )
 			if ((m_ier & m_ifr) & 0x7f)
 			{
 				m_ifr |= INT_ANY;
-				m_irq_func(ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 			}
 		}
 		break;

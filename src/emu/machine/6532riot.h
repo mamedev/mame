@@ -98,6 +98,7 @@ private:
 
     UINT8           m_irqstate;
     UINT8           m_irqenable;
+	int				m_irq;
 
     UINT8           m_pa7dir;     /* 0x80 = high-to-low, 0x00 = low-to-high */
     UINT8           m_pa7prev;

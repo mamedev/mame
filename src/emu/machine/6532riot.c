@@ -46,15 +46,12 @@ enum
 
 void riot6532_device::update_irqstate()
 {
-	int state = (m_irqstate & m_irqenable);
+	int irq = (m_irqstate & m_irqenable) ? ASSERT_LINE : CLEAR_LINE;
 
-	if (!m_irq_func.isnull())
+	if (m_irq != irq)
 	{
-		m_irq_func((state != 0) ? ASSERT_LINE : CLEAR_LINE);
-	}
-	else
-	{
-		logerror("%s:6532RIOT chip #%d: no irq callback function\n", machine().describe_context(), m_index);
+		m_irq_func(irq);
+		m_irq = irq;
 	}
 }
 
@@ -229,14 +226,7 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 		else
 		{
 			port->m_out = data;
-			if (!port->m_out_func.isnull())
-			{
-				port->m_out_func(0, data);
-			}
-			else
-			{
-				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", machine().describe_context(), tag(), 'A' + (offset & 1), data);
-			}
+			port->m_out_func(0, data);
 		}
 
 		/* writes to port A need to update the PA7 state */
@@ -311,19 +301,12 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 		else
 		{
 			/* call the input callback if it exists */
-			if (!port->m_in_func.isnull())
-			{
-				port->m_in = port->m_in_func(0);
+			port->m_in = port->m_in_func(0);
 
-				/* changes to port A need to update the PA7 state */
-				if (port == &m_port[0])
-				{
-					update_pa7_state();
-				}
-			}
-			else
+			/* changes to port A need to update the PA7 state */
+			if (port == &m_port[0])
 			{
-				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", machine().describe_context(), tag(), 'A' + (offset & 1));
+				update_pa7_state();
 			}
 
 			/* apply the DDR to the result */
@@ -440,7 +423,8 @@ UINT8 riot6532_device::portb_out_get()
 //-------------------------------------------------
 
 riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RIOT6532, "6532 (RIOT)", tag, owner, clock)
+	: device_t(mconfig, RIOT6532, "6532 (RIOT)", tag, owner, clock),
+	  m_irq(CLEAR_LINE)
 {
 }
 
@@ -506,6 +490,7 @@ void riot6532_device::device_start()
 
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_irqenable));
+	save_item(NAME(m_irq));
 
 	save_item(NAME(m_pa7dir));
 	save_item(NAME(m_pa7prev));
