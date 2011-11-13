@@ -143,8 +143,6 @@ static DEVICE_START( rf5c68 )
 
 	/* allocate memory for the chip */
 	rf5c68_state *chip = get_safe_token(device);
-
-        /* f1en engine looping fix */
 	memset(chip->data, 0xff, sizeof(chip->data));
 
 	/* allocate the stream */
