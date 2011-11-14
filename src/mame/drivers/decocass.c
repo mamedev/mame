@@ -10,6 +10,8 @@
     Fabio Priuli
     Lord Nightmare
     The Dumping Union
+    Team Japump!!!
+    Hau
 
     The DECO cassette system consists of three PCBS in a card cage:
     Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset)
@@ -393,7 +395,7 @@ static INPUT_PORTS_START( cscrtry )
 	/* Switches 5, 6, 7 & 8 are listed as "Special Purpose" and "Don't Change" */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cprosocc )
+static INPUT_PORTS_START( cpsoccer )
 	PORT_INCLUDE( decocass )
 
 	PORT_MODIFY("DSW2")
@@ -830,10 +832,10 @@ static MACHINE_CONFIG_DERIVED( cnightst, decocass )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cprosocc, decocass )
+static MACHINE_CONFIG_DERIVED( cpsoccer, decocass )
 
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET(cprosocc)
+	MCFG_MACHINE_RESET(cpsoccer)
 MACHINE_CONFIG_END
 
 
@@ -874,23 +876,7 @@ static MACHINE_CONFIG_DERIVED( czeroize, decocass )
 MACHINE_CONFIG_END
 
 
-#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
-
-
-#define DECOCASS_BIOS \
-	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "bios1", "rms8.7e, New boardset bios, revision B" ) \
-	ROM_LOAD_BIOS( 0, "rms8.7e",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/unknown label (probably 'V0B', needs checking; has HDRB01HDR string in it), bios code */ \
-	ROM_SYSTEM_BIOS( 1, "bios0", "v0a.7e, New boardset bios, revision A" ) \
-	ROM_LOAD_BIOS( 1, "v0a.7e",     0xf000, 0x1000, CRC(3D33AC34) SHA1(909D59E7A993AFFD10224402B4370E82A5F5545C) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A' label (has HDRA01HDR string inside it), bios code; doesn't seem to work properly yet (gives cassette 01 error, might use a different mcu revision?) */ \
-	ROM_SYSTEM_BIOS( 2, "bios2", "dsp3.p0b/p1b, Old boardset bios, revision B?" ) /* from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
-	ROM_LOAD_BIOS( 2, "dsp3.p0b",     0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
-	ROM_LOAD_BIOS( 2, "dsp3.p1b",     0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
-
 #define DECOCASS_COMMON_ROMS	\
-	DECOCASS_BIOS \
-\
 	ROM_REGION( 0x10000, "audiocpu", 0 )	  \
 	ROM_LOAD( "v1.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1 label,  contains audio cpu code */ \
 \
@@ -903,8 +889,36 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */ \
 
 
+#define DECOCASS_BIOS_A_ROMS	\
+	/* v0a.7e, New boardset bios, revision A */ \
+\
+	ROM_REGION( 0x10000, "maincpu", 0 ) \
+	ROM_LOAD( "v0a.7e", 0xf000, 0x1000, CRC(3D33AC34) SHA1(909D59E7A993AFFD10224402B4370E82A5F5545C) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A' label (has HDRA01HDR string inside it), bios code */ \
+\
+	DECOCASS_COMMON_ROMS \
+
+
+#define DECOCASS_BIOS_B_ROMS	\
+	/* rms8.7e, New boardset bios, revision B */ \
+\
+	ROM_REGION( 0x10000, "maincpu", 0 ) \
+	ROM_LOAD( "rms8.7e", 0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/unknown label (probably 'V0B', needs checking; has HDRB01HDR string in it), bios code */ \
+\
+	DECOCASS_COMMON_ROMS \
+
+
+#define DECOCASS_BIOS_B2_ROMS	\
+	/* dsp3.p0b/p1b, Old boardset bios, revision B?; from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
+\
+	ROM_REGION( 0x10000, "maincpu", 0 ) \
+	ROM_LOAD( "dsp3.p0b",  0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
+	ROM_LOAD( "dsp3.p1b",  0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
+\
+	DECOCASS_COMMON_ROMS \
+
+
 ROM_START( decocass )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 ROM_END
 
@@ -912,7 +926,7 @@ ROM_END
     (dongle data same for each game)         */
 
 ROM_START( ctsttape )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -922,7 +936,7 @@ ROM_START( ctsttape )
 ROM_END
 
 ROM_START( chwy )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	/* The dongle data is reverse engineered from manual decryption */
@@ -933,7 +947,7 @@ ROM_START( chwy )
 ROM_END
 
 ROM_START( clocknch )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -943,7 +957,7 @@ ROM_START( clocknch )
 ROM_END
 
 ROM_START( ctisland )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -959,7 +973,7 @@ ROM_START( ctisland )
 ROM_END
 
 ROM_START( ctisland2 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -975,7 +989,7 @@ ROM_START( ctisland2 )
 ROM_END
 
 ROM_START( ctisland3 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -991,7 +1005,7 @@ ROM_START( ctisland3 )
 ROM_END
 
 ROM_START( csuperas )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -1001,7 +1015,7 @@ ROM_START( csuperas )
 ROM_END
 
 ROM_START( castfant )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -1011,7 +1025,7 @@ ROM_START( castfant )
 ROM_END
 
 ROM_START( cluckypo )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -1021,7 +1035,7 @@ ROM_START( cluckypo )
 ROM_END
 
 ROM_START( cterrani )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -1031,7 +1045,7 @@ ROM_START( cterrani )
 ROM_END
 
 ROM_START( cexplore )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	/* The dongle data is reverse engineered by table analysis */
@@ -1045,7 +1059,7 @@ ROM_START( cexplore )
 ROM_END
 
 ROM_START( cprogolf )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
@@ -1058,7 +1072,7 @@ ROM_END
     (dongle data differs for each game)      */
 
 ROM_START( cmissnx )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cmissnx.pro",  0x0000, 0x0800, CRC(8a41c071) SHA1(7b16d933707bf21d25dcd11db6a6c28834b11c5b) )
@@ -1068,7 +1082,7 @@ ROM_START( cmissnx )
 ROM_END
 
 ROM_START( cdiscon1 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cdiscon1.pro", 0x0000, 0x0800, CRC(0f793fab) SHA1(331f1b1b482fcd10f42c388a503f9af62d705401) )
@@ -1078,7 +1092,7 @@ ROM_START( cdiscon1 )
 ROM_END
 
 ROM_START( csweetht )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00800, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "cdiscon1.pro", 0x0000, 0x0800, CRC(0f793fab) SHA1(331f1b1b482fcd10f42c388a503f9af62d705401) )
@@ -1088,7 +1102,7 @@ ROM_START( csweetht )
 ROM_END
 
 ROM_START( cptennis )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cptennis.pro", 0x0000, 0x0800, CRC(59b8cede) SHA1(514861a652b5256a11477fc357bc01dfd87f712b) )
@@ -1098,7 +1112,7 @@ ROM_START( cptennis )
 ROM_END
 
 ROM_START( ctornado )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "ctornado.pro", 0x0000, 0x0800, CRC(c9a91697) SHA1(3f7163291edbdf1a596e3cd2b7a16bbb140ffb36) )
@@ -1111,7 +1125,7 @@ ROM_END
     (dongle data differs for each game)      */
 
 ROM_START( cburnrub )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
@@ -1121,7 +1135,7 @@ ROM_START( cburnrub )
 ROM_END
 
 ROM_START( cburnrub2 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
@@ -1131,7 +1145,7 @@ ROM_START( cburnrub2 )
 ROM_END
 
 ROM_START( cbnj )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
@@ -1141,7 +1155,7 @@ ROM_START( cbnj )
 ROM_END
 
 ROM_START( cbtime )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cbtime.pro",   0x0000, 0x1000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) )
@@ -1151,7 +1165,7 @@ ROM_START( cbtime )
 ROM_END
 
 ROM_START( cgraplop )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cgraplop.pro", 0x0000, 0x1000, CRC(ee93787d) SHA1(0c753d62fdce2fdbd5b329a5aa259a967d07a651) )
@@ -1161,7 +1175,7 @@ ROM_START( cgraplop )
 ROM_END
 
 ROM_START( cgraplop2 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cgraplop.pro", 0x0000, 0x1000, CRC(ee93787d) SHA1(0c753d62fdce2fdbd5b329a5aa259a967d07a651) ) /* is this right for this set? */
@@ -1171,7 +1185,7 @@ ROM_START( cgraplop2 )
 ROM_END
 
 ROM_START( clapapa )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "clapapa.pro",  0x0000, 0x1000, CRC(e172819a) SHA1(3492775f4f0a0b31ce5a1a998076829b3f264e98) )
@@ -1181,7 +1195,7 @@ ROM_START( clapapa )
 ROM_END
 
 ROM_START( clapapa2 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "clapapa.pro",  0x0000, 0x1000, CRC(e172819a) SHA1(3492775f4f0a0b31ce5a1a998076829b3f264e98) )
@@ -1191,7 +1205,7 @@ ROM_START( clapapa2 )
 ROM_END
 
 ROM_START( cfghtice )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cfghtice.pro", 0x0000, 0x1000, CRC(5abd27b5) SHA1(2ab1c171adffd491759036d6ce2433706654aad2) )
@@ -1201,7 +1215,7 @@ ROM_START( cfghtice )
 ROM_END
 
 ROM_START( cprobowl )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cprobowl.pro", 0x0000, 0x1000, CRC(e3a88e60) SHA1(e6e9a2e5ab26e0463c63201a15f7d5a429ec836e) )
@@ -1211,7 +1225,7 @@ ROM_START( cprobowl )
 ROM_END
 
 ROM_START( cnightst )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cnightst.pro", 0x0000, 0x1000, CRC(553b0fbc) SHA1(2cdf4560992b62e59b6de760d7996be4ed25f505) )
@@ -1221,7 +1235,7 @@ ROM_START( cnightst )
 ROM_END
 
 ROM_START( cnightst2 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "cnightst.pro", 0x0000, 0x1000, CRC(553b0fbc) SHA1(2cdf4560992b62e59b6de760d7996be4ed25f505) )
@@ -1230,8 +1244,8 @@ ROM_START( cnightst2 )
 	ROM_LOAD( "cnights2.cas", 0x0000, 0x8000, CRC(1a28128c) SHA1(4b620a1919d02814f734aba995115c09dc2db930) )
 ROM_END
 
-ROM_START( cprosocc )
-	DECOCASS_COMMON_ROMS
+ROM_START( cpsoccer )
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cprosocc.pro", 0x0000, 0x1000,  CRC(919fabb2) SHA1(3d6a0676cea7b0be0fe69d06e04ca08c36b2851a) )
@@ -1240,8 +1254,18 @@ ROM_START( cprosocc )
 	ROM_LOAD( "cprosocc.cas", 0x0000, 0x10000, CRC(76b1ad2c) SHA1(6188667e5bc001dfdf83deaf7251eae794de4702) )
 ROM_END
 
+ROM_START( cpsoccerj )
+	DECOCASS_BIOS_A_ROMS
+
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
+	ROM_LOAD( "dp-133a.dgl", 0x0000, 0x1000,  CRC(919fabb2) SHA1(3d6a0676cea7b0be0fe69d06e04ca08c36b2851a) )
+
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-133a.cas", 0x0000, 0x10000, CRC(de682a29) SHA1(2ee0dd8cb7fb595020d730a9da5d9cccda3f1264) )
+ROM_END
+
 ROM_START( cppicf )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cppicf.pro",   0x0000, 0x1000, CRC(0b1a1ecb) SHA1(2106da6837c78812c102b0eaaa1127fcc21ea780) )
@@ -1251,7 +1275,7 @@ ROM_START( cppicf )
 ROM_END
 
 ROM_START( cppicf2 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "cppicf.pro",   0x0000, 0x1000, CRC(0b1a1ecb) SHA1(2106da6837c78812c102b0eaaa1127fcc21ea780) )
@@ -1264,7 +1288,7 @@ ROM_END
     (dongle data probably differs for each game, but only one is known using it atm) */
 
 ROM_START( cscrtry )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x08000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cscrtry.pro",  0x0000, 0x8000, CRC(7bc3460b) SHA1(7c5668ff9a5073e27f4a83b02d79892eb4df6b92) )
@@ -1274,7 +1298,7 @@ ROM_START( cscrtry )
 ROM_END
 
 ROM_START( cscrtry2 )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x08000, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "cscrtry.pro",  0x0000, 0x8000, CRC(7bc3460b) SHA1(7c5668ff9a5073e27f4a83b02d79892eb4df6b92) )
@@ -1287,7 +1311,7 @@ ROM_END
     (dongle data not read)       */
 
 ROM_START( cbdash )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 /*  ROM_REGION( 0x01000, "dongle", 0 ) */ /* (max) 4k for dongle data */
 	/* no proms */
@@ -1299,7 +1323,7 @@ ROM_END
 /* The Following have no Dongles at all */
 
 ROM_START( cflyball )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	/* no dongle data */
 
@@ -1311,7 +1335,7 @@ ROM_END
     (dongle data not read)       */
 
 ROM_START( czeroize )
-	DECOCASS_COMMON_ROMS
+	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "czeroize.pro",  0x0000, 0x1000, NO_DUMP )
@@ -1407,7 +1431,8 @@ static DRIVER_INIT( decocrom )
 /* 31 */ GAME( 1983, cprobowl, decocass, cprobowl, decocass, decocass, ROT270, "Data East Corporation", "Pro Bowling (Cassette)", 0 )
 /* 32 */ GAME( 1983, cnightst, decocass, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 1)", 0 )
 /* 32 */ GAME( 1983, cnightst2,cnightst, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 2)", 0 )
-/* 33 */ GAME( 1983, cprosocc, decocass, cprosocc, cprosocc, decocass, ROT270, "Data East Corporation", "Pro Soccer (Cassette)", 0 )
+/* 33 */ GAME( 1983, cpsoccer, decocass, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (Cassette)", 0 )
+/* 33 */ GAME( 1983, cpsoccerj,cpsoccer, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (Cassette Japan)", 0 )
 /* 37 */ GAME( 1983, czeroize, decocass, czeroize, decocass, decocass, ROT270, "Data East Corporation", "Zeroize (Cassette)", 0 )
 /* 38 */ GAME( 1984, cscrtry,  decocass, cscrtry,  cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 1)", 0 )
 /* 38 */ GAME( 1984, cscrtry2, cscrtry,  cscrtry,  cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 2)", 0 )

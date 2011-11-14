@@ -1620,7 +1620,7 @@ MACHINE_RESET( cnightst )
 	state->m_type3_swap = TYPE3_SWAP_13;
 }
 
-MACHINE_RESET( cprosocc )
+MACHINE_RESET( cpsoccer )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	decocass_reset_common(machine);

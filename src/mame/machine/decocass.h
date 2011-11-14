@@ -162,7 +162,7 @@ MACHINE_RESET( clapapa );
 MACHINE_RESET( cfghtice );
 MACHINE_RESET( cprobowl );
 MACHINE_RESET( cnightst );
-MACHINE_RESET( cprosocc );
+MACHINE_RESET( cpsoccer );
 MACHINE_RESET( cppicf );
 MACHINE_RESET( cscrtry );
 MACHINE_RESET( cflyball );
