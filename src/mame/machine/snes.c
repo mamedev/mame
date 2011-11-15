@@ -1050,8 +1050,9 @@ READ8_HANDLER( snes_r_bank2 )
 		}
 		else if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
 		{
-			/* Donkey Kong Country checks this */
-			int mask = state->m_cart[0].sram - 1; /* Limit SRAM size to what's actually present */
+			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
+			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
+			int mask = (state->m_cart[0].sram - 1) | 0xffe000; /* Limit SRAM size to what's actually present */
 			value = snes_ram[0x300000 + (offset & mask)];
 		}
 		else
@@ -1411,8 +1412,9 @@ WRITE8_HANDLER( snes_w_bank2 )
 		}
 		else if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
 		{
-			/* Donkey Kong Country checks this */
-			int mask = state->m_cart[0].sram - 1; /* Limit SRAM size to what's actually present */
+			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
+			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
+			int mask = (state->m_cart[0].sram - 1) | 0xffe000; /* Limit SRAM size to what's actually present */
 			snes_ram[0x300000 + (offset & mask)] = data;
 		}
 		else
