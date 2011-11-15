@@ -581,11 +581,6 @@ UINT8 pia6821_device::control_b_r()
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER( pia6821_device::read )
-{
-    return reg_r(offset);
-}
-
 UINT8 pia6821_device::reg_r(UINT8 offset)
 {
 	UINT8 ret;
@@ -625,16 +620,6 @@ UINT8 pia6821_device::reg_r(UINT8 offset)
 	}
 
 	return ret;
-}
-
-
-//-------------------------------------------------
-//  pia6821_alt_r
-//-------------------------------------------------
-
-READ8_MEMBER( pia6821_device::read_alt )
-{
-    return reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 
@@ -866,11 +851,6 @@ void pia6821_device::control_b_w(UINT8 data)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER( pia6821_device::write )
-{
-    reg_w(offset, data);
-}
-
 void pia6821_device::reg_w(UINT8 offset, UINT8 data)
 {
 	switch (offset & 0x03)
@@ -906,16 +886,6 @@ void pia6821_device::reg_w(UINT8 offset, UINT8 data)
 			control_b_w(data);
 			break;
 	}
-}
-
-
-//-------------------------------------------------
-//  write_alt
-//-------------------------------------------------
-
-WRITE8_MEMBER( pia6821_device::write_alt )
-{
-    reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 

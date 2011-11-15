@@ -85,10 +85,10 @@ public:
 	// static configuration helpers
 	static void static_set_interface(device_t &device, const pia6821_interface &interface);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
-    DECLARE_READ8_MEMBER( read_alt );
-    DECLARE_WRITE8_MEMBER( write_alt );
+    DECLARE_READ8_MEMBER( read ) { return reg_r(offset); }
+    DECLARE_WRITE8_MEMBER( write ) { reg_w(offset, data); }
+    DECLARE_READ8_MEMBER( read_alt ) { return reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
+    DECLARE_WRITE8_MEMBER( write_alt ) { reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
 
     UINT8 port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
     void set_port_a_z_mask(UINT8 data) { m_port_a_z_mask = data; }// see second note in .c
