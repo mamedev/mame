@@ -2146,7 +2146,8 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 
 	#if USE_CYCLE_STEAL
 	/* every byte transfer takes 8 master cycles */
-	device_adjust_icount(&space->device(),-8);
+//	FIXME: this cycle steal makes Final Fantasy VI (III in US) very glitchy!
+//	device_adjust_icount(&space->device(),-8);
 	#endif
 
 	if (state->m_dma_channel[dma].dmap & 0x80)	/* PPU->CPU */
