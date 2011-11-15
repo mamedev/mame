@@ -95,7 +95,7 @@ Not all regional versions are available for each Megatouch series
   - clean up V9938 interrupt implementation
   - finish inputs, dsw, outputs (lamps)
   - problem with registering touches on the bottom of the screen (currently hacked to work)
-  - megat5: has jmp $0000 in the initialization code causing infinite loop, rom U38 is dumped at half size / bad dump
+  - megat5a: has jmp $0000 in the initialization code causing infinite loop, rom U38 is dumped at half size / bad dump
   - for pbst30 only roms were found, it appears that two roms with graphics data were missing, using pitbossm roms for now
  */
 
