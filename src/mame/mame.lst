@@ -5132,39 +5132,39 @@ ctsttape		// ?
 chwy			// 01 1980.12 Highway Chase
 				// 02 1980.12 Sengoku Ninjatai
 				// 03 1981.01 Manhattan
-cterrani		// 04 1981.02 Terranian
+cterrani		// 04 1981.02 Terranean
 				// 05 1981.?? Missile Sprinter
-				// 06 1980.12 Nebbler
+				// 06 1980.12 Nebula
 castfant		// 07 1981.02 Astro Fantasia
 				// 08 1981.03 The Tower
 csuperas		// 09 1981.05 Super Astro Fighter
 				// 10 1981.?? Ocean to Ocean (medal)
-clocknch		// 11 1981.04 Rock'n Chase
+clocknch		// 11 1981.04 Lock'n'Chase
 				// 12 1981.08 Flash Boy/DECO Kid
-cprogolf		// 13 1981.08 Pro Golf
+cprogolf		// 13 1981.08 Tournament Pro Golf
 				// 14 1981.06 DS Telejan
 cluckypo		// 15 1981.?? Lucky Poker
 ctisland		// 16 1982.02 Treasure Island
 ctisland2		// 16
 ctisland3		// 16
-				// 17 1981.10 Bobbit
+				// 17 1981.10 Bobbitto
 cexplore		// 18 1982.02 Explorer
 cdiscon1		// 19 1982.04 Disco No.1
-csweetht		// 19
+csweetht		// 19         Sweet Heart 
 ctornado		// 20 1982.05 Tornado
-cmissnx			// 21 1982.04 Mission X/Zoar
+cmissnx			// 21 1982.04 Mission-X/Zoar
 cptennis		// 22 1982.06 Pro Tennis
 				// 23 1982.?? 18 Hole Pro Golf
 				// 24 1982.07 Tsumego Kaisyou
-				// 25 1982.10 Fishing
+				// 25 1982.10 Angler Dangler? (fishing)
 cbtime			// 26 1982.08 Hamburger/Burger Time
-cburnrub		// 27 1982.11 Burnin' Rubber/Bump'n Jump
+cburnrub		// 27 1982.11 Burnin' Rubber
 cburnrub2		// 27
-cbnj			// 27
-cgraplop		// 28 1982.11 Grapelop
+cbnj			// 27         Bump 'n' Jump
+cgraplop		// 28 1982.11 Cluster Buster / Graplop
 cgraplop2		// 28
-clapapa			// 29 1982.11 Lapapa/Rootin' Tootin'
-clapapa2		// 29 // this one doesn't display lapapa anywhere
+clapapa			// 29 1982.11 La-Pa-Pa
+clapapa2		// 29         Rootin' Tootin'  // this one doesn't display lapapa anywhere
 				// 30 1983.03 Skater
 cprobowl		// 31 1983.03 Pro Bowling
 cnightst		// 32 1983.04 Night Star
@@ -5172,9 +5172,9 @@ cnightst2		// 32
 cpsoccer		// 33 1982.08 Pro Soccer
 cpsoccerj		// 33 1982.08 Pro Soccer (Japan)
 				// 34 1983.09 Super Doubles Tennis
-cflyball		// 35 1983.?? Bampoline/Flying Ball
+cflyball		// 35 1983.?? Flying Ball/Bampoline
 				// 36 1984.04 Genesis/Boomer Rang'r
-czeroize		// 37 1983.10 Zeroize // doesn't work at all
+czeroize		// 37 1983.10 Zeroize
 cscrtry			// 38 1984.03 Scrum Try
 cscrtry2		// 38
 cppicf			// 39 1984.02 Peter Pepper's Ice Cream Factory
@@ -5184,8 +5184,8 @@ cfghtice		// 40 1984.04 Fighting Ice Hockey
 				// 42 1984.08 Hellow Gateball // not a typo, this is official spelling
 				// 43 1984.08 Yellow Cab
 cbdash			// 44 1985.08 Boulder Dash
-				// UX7 1984.12 Tokyo Mie Shinryoujo
-				// UX8 1985.01 Tokyo Mie Shinryoujo Part 2
+				// UX7 1984.12 Tokyo MIE Clinic/Tokyo MIE Shinryoujo
+				// UX8 1985.01 Tokyo MIE Clinic/Tokyo MIE Shinryoujo Part 2
 				// UX9 1985.05 Geinoujin Shikaku Shiken
 
 // Data East LD games
