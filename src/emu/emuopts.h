@@ -352,11 +352,11 @@ public:
 	// device-specific options
 	const char *device_option(device_image_interface &image);
 
+	void remove_device_options();
 private:
 	// device-specific option handling
 	void add_device_options(bool isfirst);
 	bool add_slot_options(bool isfirst);
-	void remove_device_options();
 
 	// INI parsing helper
 	bool parse_one_ini(const char *basename, int priority, astring *error_string = NULL);

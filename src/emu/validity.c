@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "hash.h"
 #include "validity.h"
-
+#include "emuopts.h"
 #include <ctype.h>
 
 
@@ -1252,6 +1252,7 @@ void validate_drivers(emu_options &options, const game_driver *curdriver)
 	prep += get_profile_ticks();
 
 	/* iterate over all drivers */
+	options.remove_device_options();
 	driver_enumerator drivlist(options);
 	while (drivlist.next())
 	{
