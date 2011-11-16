@@ -1242,17 +1242,18 @@ void info_xml_creator::output_ramoptions()
 {
 	for (const device_t *device = m_drivlist.config().devicelist().first(RAM); device != NULL; device = device->typenext())
 	{
-		ram_config *ram = (ram_config *)downcast<const legacy_device_base *>(device)->inline_config();
-		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram_parse_string(ram->default_size));
+		const ram_device *ram = downcast<const ram_device *>(device);
 
-		if (ram->extra_options != NULL)
+		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram->default_size());
+
+		if (ram->extra_options() != NULL)
 		{
-			astring options(ram->extra_options);
+			astring options(ram->extra_options());
 			for (int start = 0, end = options.chr(0, ','); ; start = end + 1, end = options.chr(start, ','))
 			{
 				astring option;
 				option.cpysubstr(options, start, (end == -1) ? -1 : end - start);
-				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", ram_parse_string(option));
+				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", ram_device::parse_string(option));
 				if (end == -1)
 					break;
 			}

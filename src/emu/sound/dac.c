@@ -91,6 +91,13 @@ void dac_signed_data_16_w(device_t *device, UINT16 data)
 }
 
 
+INT16 dac_output(device_t *device)
+{
+	dac_state *info = get_safe_token(device);
+	return info->output;
+}
+
+
 static void DAC_build_voltable(dac_state *info)
 {
 	int i;

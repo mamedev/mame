@@ -35,6 +35,8 @@ struct slot_interface
 		{ NULL, NULL }							\
 	};
 
+#define SLOT_INTERFACE_EXTERN(name) extern const slot_interface slot_interface_##name[]
+
 class device_slot_card_interface;
 
 class device_slot_interface : public device_interface

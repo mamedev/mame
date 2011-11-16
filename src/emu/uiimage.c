@@ -1314,6 +1314,7 @@ static void menu_tape_control_populate(running_machine &machine, ui_menu *menu, 
 
 static void menu_bitbanger_control_populate(running_machine &machine, ui_menu *menu, bitbanger_control_menu_state *menustate)
 {
+	bitbanger_device *bitbanger = downcast<bitbanger_device *>(&menustate->device->device());
 	int count = bitbanger_count(machine);
 	UINT32 flags = 0, mode_flags = 0, baud_flags = 0, tune_flags = 0;
 
@@ -1325,22 +1326,22 @@ static void menu_bitbanger_control_populate(running_machine &machine, ui_menu *m
 			flags |= MENU_FLAG_RIGHT_ARROW;
 	}
 
-   if (bitbanger_inc_mode(&menustate->device->device(), TRUE))
+   if (bitbanger->inc_mode(TRUE))
       mode_flags |= MENU_FLAG_RIGHT_ARROW;
 
-   if (bitbanger_dec_mode(&menustate->device->device(), TRUE))
+   if (bitbanger->dec_mode(TRUE))
       mode_flags |= MENU_FLAG_LEFT_ARROW;
 
-   if (bitbanger_inc_baud(&menustate->device->device(), TRUE))
+   if (bitbanger->inc_baud(TRUE))
       baud_flags |= MENU_FLAG_RIGHT_ARROW;
 
-   if (bitbanger_dec_baud(&menustate->device->device(), TRUE))
+   if (bitbanger->dec_baud(TRUE))
       baud_flags |= MENU_FLAG_LEFT_ARROW;
 
-   if (bitbanger_inc_tune(&menustate->device->device(), TRUE))
+   if (bitbanger->inc_tune(TRUE))
       tune_flags |= MENU_FLAG_RIGHT_ARROW;
 
-   if (bitbanger_dec_tune(&menustate->device->device(), TRUE))
+   if (bitbanger->dec_tune(TRUE))
       tune_flags |= MENU_FLAG_LEFT_ARROW;
 
 
@@ -1348,9 +1349,9 @@ static void menu_bitbanger_control_populate(running_machine &machine, ui_menu *m
 	{
 		/* name of bitbanger file */
 		ui_menu_item_append(menu, menustate->device->device().name(), menustate->device->filename(), flags, BITBANGERCMD_SELECT);
-		ui_menu_item_append(menu, "Device Mode:", bitbanger_mode_string(&menustate->device->device()), mode_flags, BITBANGERCMD_MODE);
-		ui_menu_item_append(menu, "Baud:", bitbanger_baud_string(&menustate->device->device()), baud_flags, BITBANGERCMD_BAUD);
-		ui_menu_item_append(menu, "Baud Tune:", bitbanger_tune_string(&menustate->device->device()), tune_flags, BITBANGERCMD_TUNE);
+		ui_menu_item_append(menu, "Device Mode:", bitbanger->mode_string(), mode_flags, BITBANGERCMD_MODE);
+		ui_menu_item_append(menu, "Baud:", bitbanger->baud_string(), baud_flags, BITBANGERCMD_BAUD);
+		ui_menu_item_append(menu, "Baud Tune:", bitbanger->tune_string(), tune_flags, BITBANGERCMD_TUNE);
 		ui_menu_item_append(menu, "Protocol:", "8-1-N", 0, NULL);
 	}
 	else
@@ -1490,6 +1491,9 @@ void ui_mess_menu_bitbanger_control(running_machine &machine, ui_menu *menu, voi
 		ui_menu_reset(menu, (ui_menu_reset_options)0);
 	}
 
+	/* get the bitbanger */
+	bitbanger_device *bitbanger = downcast<bitbanger_device *>(menustate->device);
+
 	/* rebuild the menu */
 	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
 	menu_bitbanger_control_populate(machine, menu, (bitbanger_control_menu_state*)state);
@@ -1512,15 +1516,15 @@ void ui_mess_menu_bitbanger_control(running_machine &machine, ui_menu *menu, voi
 				}
 				else if (event->itemref==BITBANGERCMD_MODE)
 				{
-				   bitbanger_dec_mode(&menustate->device->device(), FALSE);
+				   bitbanger->dec_mode(FALSE);
 				}
 				else if (event->itemref==BITBANGERCMD_BAUD)
 				{
-				   bitbanger_dec_baud(&menustate->device->device(), FALSE);
+				   bitbanger->dec_baud(FALSE);
 				}
 				else if (event->itemref==BITBANGERCMD_TUNE)
 				{
-				   bitbanger_dec_tune(&menustate->device->device(), FALSE);
+				   bitbanger->dec_tune(FALSE);
 				}
 				break;
 
@@ -1536,15 +1540,15 @@ void ui_mess_menu_bitbanger_control(running_machine &machine, ui_menu *menu, voi
 				}
 				else if (event->itemref==BITBANGERCMD_MODE)
 				{
-				   bitbanger_inc_mode(&menustate->device->device(), FALSE);
+				   bitbanger->inc_mode(FALSE);
 				}
 				else if (event->itemref==BITBANGERCMD_BAUD)
 				{
-				   bitbanger_inc_baud(&menustate->device->device(), FALSE);
+				   bitbanger->inc_baud(FALSE);
 				}
 				else if (event->itemref==BITBANGERCMD_TUNE)
 				{
-				   bitbanger_inc_tune(&menustate->device->device(), FALSE);
+				   bitbanger->inc_tune(FALSE);
 				}
 				break;
 		}

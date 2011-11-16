@@ -14,55 +14,80 @@
     CONSTANTS
 ***************************************************************************/
 
-#define RAM_DEFAULT_VALUE	0xcd
 #define RAM_TAG				"ram"
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _ram_config ram_config;
-struct _ram_config
-{
-	const char *default_size;
-	const char *extra_options;
-	UINT8 default_value;
-};
 
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(RAM, ram);
-
 #define MCFG_RAM_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, RAM, 0) \
-	MCFG_DEVICE_CONFIG_DATA32(ram_config, default_value, RAM_DEFAULT_VALUE)
+	MCFG_DEVICE_ADD(_tag, RAM, 0)
 
 #define MCFG_RAM_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_RAM_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)	\
-	MCFG_DEVICE_CONFIG_DATAPTR(ram_config, extra_options, NULL)
+	ram_device::static_set_extra_options(*device, NULL);
 
 #define MCFG_RAM_DEFAULT_SIZE(_default_size) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ram_config, default_size, _default_size)
+	ram_device::static_set_default_size(*device, _default_size);
 
 #define MCFG_RAM_EXTRA_OPTIONS(_extra_options) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ram_config, extra_options, _extra_options)
+	ram_device::static_set_extra_options(*device, _extra_options);
 
 #define MCFG_RAM_DEFAULT_VALUE(_default_value) \
-	MCFG_DEVICE_CONFIG_DATA32(ram_config, default_value, _default_value)
+	ram_device::static_set_default_value(*device, _default_value);
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
+    TYPE DEFINITIONS
 ***************************************************************************/
 
-UINT32 ram_get_size(device_t *device);
-UINT8 *ram_get_ptr(device_t *device);
-UINT32 ram_parse_string(const char *s);
+class ram_device :  public device_t
+{
+public:
+    // construction/destruction
+    ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// accessors
+	UINT32 size(void) const { return m_size; }
+	UINT8 *pointer(void) const { return m_pointer; }
+	static UINT32 parse_string(const char *s);
+	UINT32 default_size(void) const;
+	const char *extra_options(void) const { return m_extra_options; }
+
+	// inline configuration helpers
+	static void static_set_default_size(device_t &device, const char *default_size)		{ downcast<ram_device &>(device).m_default_size = default_size; }
+	static void static_set_extra_options(device_t &device, const char *extra_options)	{ downcast<ram_device &>(device).m_extra_options = extra_options; }
+	static void static_set_default_value(device_t &device, UINT8 default_value)			{ downcast<ram_device &>(device).m_default_value = default_value; }
+
+protected:
+	virtual void device_start(void);
+	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
+
+private:
+	// device state
+	UINT32 m_size;
+	UINT8 *m_pointer;
+
+	// device config
+	const char *m_default_size;
+	const char *m_extra_options;
+	UINT8 m_default_value;
+};
+
+
+// device type definition
+extern const device_type RAM;
+
+
+/***************************************************************************
+    LEGACY FUNCTION PROTOTYPES
+***************************************************************************/
+
+inline UINT32 ram_get_size(device_t *device)	{ return downcast<ram_device *>(device)->size(); }
+inline UINT8 *ram_get_ptr(device_t *device)	{ return downcast<ram_device *>(device)->pointer(); }
 
 #endif /* __RAM_H__ */

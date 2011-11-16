@@ -55,7 +55,6 @@ enum
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-DECLARE_LEGACY_IMAGE_DEVICE(BITBANGER, bitbanger);
 
 #define MCFG_BITBANGER_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, BITBANGER, 0) \
@@ -70,30 +69,98 @@ typedef struct _bitbanger_config bitbanger_config;
 struct _bitbanger_config
 {
 	/* callback to driver */
-	void (*input_callback)(running_machine &machine, UINT8 bit);
-	int default_mode;					   /* emulating a printer or modem */
-	int default_baud;					   /* output bits per second */
-	int default_tune;                /* fine tune adjustment to the baud */
+	devcb_write_line		m_input_callback;
+
+	/* emulating a printer or modem */
+	int						m_default_mode;
+
+	/* output bits per second */
+	int						m_default_baud;					   
+
+	/* fine tune adjustment to the baud */
+	int						m_default_tune;                
 };
 
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+class bitbanger_device :	public device_t,
+							public device_image_interface
+{
+public:
+	// construction/destruction
+	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-/* outputs data to a bitbanger port */
-void bitbanger_output(device_t *device, int value);
+	// image-level overrides
+	virtual bool call_load();
+	virtual void call_unload();
 
-/* ui functions */
-const char *bitbanger_mode_string(device_t *device);
-const char *bitbanger_baud_string(device_t *device);
-const char *bitbanger_tune_string(device_t *device);
-bool bitbanger_inc_mode(device_t *device, bool test);
-bool bitbanger_dec_mode(device_t *device, bool test);
-bool bitbanger_inc_tune(device_t *device, bool test);
-bool bitbanger_dec_tune(device_t *device, bool test);
-bool bitbanger_inc_baud(device_t *device, bool test);
-bool bitbanger_dec_baud(device_t *device, bool test);
+	// image device
+	virtual iodevice_t image_type() const { return IO_PRINTER; }
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *file_extensions() const { return "prn"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+
+	// outputs data to a bitbanger port
+	void output(int value);
+
+	// reads the current input value
+	int input(void) const { return m_current_input; }
+
+	// ui functions
+	const char *mode_string(void);
+	const char *baud_string(void);
+	const char *tune_string(void);
+	bool inc_mode(bool test);
+	bool dec_mode(bool test);
+	bool inc_tune(bool test);
+	bool dec_tune(bool test);
+	bool inc_baud(bool test);
+	bool dec_baud(bool test);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete();
+
+private:
+	// constants
+	static const device_timer_id TIMER_OUTPUT = 0;
+	static const device_timer_id TIMER_INPUT = 1;
+
+	// methods
+	void native_output(UINT8 data);
+	UINT32 native_input(void *buffer, UINT32 length);
+	void bytes_to_bits_81N(void);
+	void timer_input(void);
+	void timer_output(void);
+	float tune_value(void);
+	UINT32 baud_value(void);
+	void set_input_line(UINT8 line);
+
+	// variables
+	emu_timer *					m_output_timer;
+	emu_timer *					m_input_timer;
+	devcb_resolved_write_line	m_input_callback;
+	int							m_output_value;
+	int							m_build_count;
+	int							m_build_byte;
+	attotime					m_idle_delay;
+	attotime					m_current_baud;
+	UINT32						m_input_buffer_size;
+	UINT32						m_input_buffer_cursor;
+	int							m_mode;
+	int							m_baud;
+	int							m_tune;
+	UINT8						m_current_input;
+	UINT8						m_input_buffer[1000];
+};
+
+// device type definition
+extern const device_type BITBANGER;
 
 #endif /* __BITBNGR_H__ */
