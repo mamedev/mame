@@ -13,7 +13,9 @@
   - RTC
   - Inputs
 
-  bp 529 do pc=53e
+
+  Enmglish set: bp 529 do pc=53e
+  Spanish set:  bp 529 do pc=562
 
 -------------------------------------------------------------------------------------------------
 
@@ -48,8 +50,6 @@
 
   Xtal: 12 MHz.
 
-  (bp 529 do pc=562)
-
 
   NOTE:
 
@@ -70,13 +70,19 @@
 
 -------------------------------------------------------------------------------------------------
 
-  Initialization (from a card):
+  From the manual (sic)...
+  
+  Initialization of the Forte Card circuit board
+  (Init machine)
 
   1) Open the door of the machine, switch on the game and wait until the message
-     "Permanent RAM test faliled" appears.
-  2) Turn the Main Control and hold in this position
-  3) Enter the serial number of the circuit board with the eight keys
-  4) Press STAR key (sic) and wait until the message "Machine initialization completed" appears.
+     'Permanent RAM test failed' appears.
+  2) Turn the Main Control and hold it in this position.
+  3) Enter the serial number of the circuit board with the eight keys.
+  4) Press STAR key and wait until the message 'Machine initialization completed' appears.
+  5) Release the Main Control, switch off the game and close the door.
+  6) Switch on the game and wait until the demonstration displays appear.
+  7) Turn the Main Control, adjust the time. This is the last step of the initialization procedure.
 
 
 **************************************************************************************************/
@@ -263,7 +269,7 @@ Seems to work properly, but must be checked closely...
 		watchdog_reset(device->machine());
 	}
 
-	logerror("AY port B write %02x\n",data);
+//	logerror("AY port B write %02x\n",data);
 }
 
 
@@ -296,15 +302,15 @@ static const mc6845_interface mc6845_intf =
 static const eeprom_interface forte_eeprom_intf =
 {/*
     Preliminary interface for NM93CS56N Serial EEPROM.
-	Correct address & data. Using 93C46 protocol.
+	Correct address & data. Using 93C46 similar protocol.
 */
-	7,                /* address bits */
+	8,                /* address bits */
 	16,                /* data bits */
 	"*110",           /* read command */
 	"*101",           /* write command */
 	"*111",           /* erase command */
-	"*10000xxxxx",    /* lock command */
-	"*10011xxxxx",    /* unlock command */
+	"*10000xxxxxx",   /* lock command */
+	"*10011xxxxxx",   /* unlock command */
 };
 
 
@@ -333,8 +339,8 @@ CRTC DATA    : 5f 4b 50 08 21 05 1e 1f 00 07 20 00 06 00 00 00
 
 Error messages:
 
-"FALLO EN NVR"                  (NVRAM ok, no serial EEPROM connected)
 "FALSA PRUEBA NVR"              (NVRAM new, no serial EEPROM connected)
+"FALLO EN NVR"                  (NVRAM ok, no serial EEPROM connected)
 "FALSA PRUEBA NVRAM PERMANENTE" (NVRAM new, serial EEPROM connected)
 
 */
