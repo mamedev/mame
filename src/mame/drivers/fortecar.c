@@ -304,7 +304,7 @@ static const eeprom_interface forte_eeprom_intf =
     Preliminary interface for NM93CS56N Serial EEPROM.
 	Correct address & data. Using 93C46 similar protocol.
 */
-	8,                /* address bits */
+	7,                /* address bits */
 	16,                /* data bits */
 	"*110",           /* read command */
 	"*101",           /* write command */
