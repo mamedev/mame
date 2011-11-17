@@ -120,7 +120,7 @@ WRITE16_HANDLER(bloodwar_calc_w)
 {
 	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
 	calc1_hit_t &hit = state->m_hit;
-	int isbrap = ( !strcmp(space->machine().system().name,"brapboysj") || !strcmp(space->machine().system().name,"brapboys"));
+	int isbrap = ( !strcmp(space->machine().system().name,"brapboysj") || !strcmp(space->machine().system().name,"brapboysu") || !strcmp(space->machine().system().name,"brapboys"));
 
 	/* our implementation is incomplete, b.rap boys requires some modifications */
 	if (isbrap)
@@ -197,7 +197,7 @@ READ16_HANDLER(bloodwar_calc_r)
 	INT16 x_coll, y_coll;
 
 	/* our implementation is incomplete, b.rap boys requires some modifications */
-	int isbrap = ( !strcmp(space->machine().system().name,"brapboysj") || !strcmp(space->machine().system().name,"brapboys"));
+	int isbrap = ( !strcmp(space->machine().system().name,"brapboysj") || !strcmp(space->machine().system().name,"brapboysu") || !strcmp(space->machine().system().name,"brapboys"));
 
 	if (isbrap)
 	{
