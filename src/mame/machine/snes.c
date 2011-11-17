@@ -575,9 +575,14 @@ READ8_HANDLER( snes_r_io )
 		case JOY4H:			/* Joypad 4 status register (high) */
 			return state->m_joy4h;
 
-#ifndef MESS
 		case 0x4100:		/* NSS Dip-Switches */
-			return input_port_read(space->machine(), "DSW");
+			{
+				const input_port_config *port = space->machine().port("DSW");
+				if (port != NULL)
+					return input_port_read(space->machine(), "DSW");
+				else
+					return snes_open_bus_r(space, 0);			
+			}
 //      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
 
@@ -585,9 +590,6 @@ READ8_HANDLER( snes_r_io )
 //          mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(&space->device()));
 // Added break; after commenting above line.  If uncommenting, drop the break;
                         break;
-
-#endif	/* MESS */
-
 	}
 
 	//printf("unsupported read: offset == %08x\n", offset);
