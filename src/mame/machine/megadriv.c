@@ -9507,7 +9507,6 @@ int megadrive_z80irq_hpos = 320;
 UINT16* megadriv_backupram;
 int megadriv_backupram_length;
 
-#ifndef MESS
 static NVRAM_HANDLER( megadriv )
 {
 	if (megadriv_backupram!=NULL)
@@ -9529,7 +9528,6 @@ static NVRAM_HANDLER( megadriv )
 		}
 	}
 }
-#endif
 
 
 MACHINE_CONFIG_FRAGMENT( megadriv_timers )
@@ -9565,9 +9563,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_UPDATE(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_EOF(megadriv) /* Used to Sync the timing */
 
-#ifndef MESS
 	MCFG_NVRAM_HANDLER(megadriv)
-#endif
 
 	MCFG_PALETTE_LENGTH(0x200)
 
@@ -9616,9 +9612,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_UPDATE(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_EOF(megadriv) /* Used to Sync the timing */
 
-#ifndef MESS
 	MCFG_NVRAM_HANDLER(megadriv)
-#endif
 
 	MCFG_PALETTE_LENGTH(0x200)
 
@@ -9759,7 +9753,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
-
+	MCFG_NVRAM_HANDLER_CLEAR()
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
