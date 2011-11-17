@@ -1466,11 +1466,17 @@ void stvcd_reset(running_machine &machine)
 		cdrom = (cdrom_file *)NULL;
 	}
 
-	#ifdef MESS
-	cdrom = machine.device<cdrom_image_device>("cdrom")->get_cdrom_file();
-	#else
-	cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
-	#endif
+	cdrom_image_device *cddevice = machine.device<cdrom_image_device>("cdrom");
+	if (cddevice!=NULL)
+	{
+		// MESS case
+		cdrom = cddevice->get_cdrom_file();
+	}
+	else
+	{
+		// MAME case
+		cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
+	}
 
 	cdda_set_cdrom( machine.device("cdda"), cdrom );
 
@@ -2136,9 +2142,11 @@ void stvcd_exit(running_machine& machine)
 
 	if (cdrom)
 	{
-		#ifndef MESS
-		cdrom_close(cdrom);
-		#endif
+		cdrom_image_device *cddevice = machine.device<cdrom_image_device>("cdrom");
+		if (cddevice==NULL)
+		{
+			cdrom_close(cdrom);
+		}
 		cdrom = (cdrom_file *)NULL;
 	}
 }
@@ -2526,11 +2534,17 @@ void stvcd_set_tray_close(running_machine &machine)
 
 	hirqreg |= DCHG;
 
-	#ifdef MESS
-	cdrom = machine.device<cdrom_image_device>("cdrom")->get_cdrom_file();
-	#else
-	cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
-	#endif
+	cdrom_image_device *cddevice = machine.device<cdrom_image_device>("cdrom");
+	if (cddevice!=NULL)
+	{
+		// MESS case
+		cdrom = cddevice->get_cdrom_file();
+	}
+	else
+	{
+		// MAME case
+		cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
+	}
 
 	cdda_set_cdrom( machine.device("cdda"), cdrom );
 
