@@ -32,10 +32,7 @@
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
 #include "debugger.h"
-
-#ifdef MESS
 #include "machine/wd17xx.h"
-#endif
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 
@@ -667,9 +664,7 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 READ32_HANDLER(archimedes_ioc_r)
 {
 	UINT32 ioc_addr;
-	#ifdef MESS
 	device_t *fdc = (device_t *)space->machine().device("wd1772");
-	#endif
 
 	ioc_addr = offset*4;
 
@@ -686,13 +681,13 @@ READ32_HANDLER(archimedes_ioc_r)
 			{
 				case 0: return ioc_ctrl_r(space,offset,mem_mask);
 				case 1:
-					#ifdef MESS
+					if (fdc) {
 						logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
 						return wd17xx_data_r(fdc, offset&0xf);
-					#else
+					} else {
 						logerror("Read from FDC device?\n");
 						return 0;
-					#endif
+					}
 				case 2:
 					logerror("IOC: Econet Read %08x\n",ioc_addr);
 					return 0xffff;
@@ -703,11 +698,11 @@ READ32_HANDLER(archimedes_ioc_r)
 					logerror("IOC: Internal Podule Read\n");
 					return 0xffff;
 				case 5:
-					switch(ioc_addr & 0xfffc)
-					{
-						#ifdef MESS
-						case 0x50: return 0; //fdc type, new model returns 5 here
-						#endif
+					if (fdc) {
+						switch(ioc_addr & 0xfffc)
+						{						
+							case 0x50: return 0; //fdc type, new model returns 5 here
+						}
 					}
 
 					logerror("IOC: Internal Latches Read %08x\n",ioc_addr);
@@ -725,9 +720,7 @@ READ32_HANDLER(archimedes_ioc_r)
 WRITE32_HANDLER(archimedes_ioc_w)
 {
 	UINT32 ioc_addr;
-	#ifdef MESS
 	device_t *fdc = (device_t *)space->machine().device("wd1772");
-	#endif
 
 	ioc_addr = offset*4;
 
@@ -744,12 +737,12 @@ WRITE32_HANDLER(archimedes_ioc_w)
 			{
 				case 0: ioc_ctrl_w(space,offset,data,mem_mask); return;
 				case 1:
-					#ifdef MESS
-						logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-						wd17xx_data_w(fdc, offset&0xf, data&0xff);
-					#else
-						logerror("Write to FDC device?\n");
-					#endif
+						if (fdc) {
+							logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
+							wd17xx_data_w(fdc, offset&0xf, data&0xff);
+						} else {
+							logerror("Write to FDC device?\n");
+						}
 						return;
 				case 2:
 					logerror("IOC: Econet Write %02x at %08x\n",data,ioc_addr);
@@ -761,23 +754,23 @@ WRITE32_HANDLER(archimedes_ioc_w)
 					logerror("IOC: Internal Podule Write\n");
 					return;
 				case 5:
-					switch(ioc_addr & 0xfffc)
-					{
-						#ifdef MESS
-						case 0x18: // latch B
-							wd17xx_dden_w(fdc, BIT(data, 1));
-							return;
+					if (fdc) {
+						switch(ioc_addr & 0xfffc)
+						{
+							case 0x18: // latch B
+								wd17xx_dden_w(fdc, BIT(data, 1));
+								return;
 
-						case 0x40: // latch A
-							if (data & 1) { wd17xx_set_drive(fdc,0); }
-							if (data & 2) {	wd17xx_set_drive(fdc,1); }
-							if (data & 4) { wd17xx_set_drive(fdc,2); }
-							if (data & 8) {	wd17xx_set_drive(fdc,3); }
+							case 0x40: // latch A
+								if (data & 1) { wd17xx_set_drive(fdc,0); }
+								if (data & 2) {	wd17xx_set_drive(fdc,1); }
+								if (data & 4) { wd17xx_set_drive(fdc,2); }
+								if (data & 8) {	wd17xx_set_drive(fdc,3); }
 
-							wd17xx_set_side(fdc,(data & 0x10)>>4);
-							//bit 5 is motor on
-							return;
-						#endif
+								wd17xx_set_side(fdc,(data & 0x10)>>4);
+								//bit 5 is motor on
+								return;
+						}
 					}
 					break;
 			}
