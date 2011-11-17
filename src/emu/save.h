@@ -238,8 +238,6 @@ private:
 	simple_list<state_entry> m_entry_list;			// list of reigstered entries
 	simple_list<state_callback> m_presave_list;		// list of pre-save functions
 	simple_list<state_callback> m_postload_list;	// list of post-load functions
-
-	static const char s_magic_num[8];				// magic number for header
 };
 
 

@@ -42,60 +42,6 @@ enum
 };
 
 
-// MESS vs. MAME abstractions
-#ifndef MESS
-#define APPNAME					"MAME"
-#define APPNAME_LOWER			"mame"
-#define CONFIGNAME				"mame"
-#define APPLONGNAME				"M.A.M.E."
-#define FULLLONGNAME			"Multiple Arcade Machine Emulator"
-#define CAPGAMENOUN				"GAME"
-#define CAPSTARTGAMENOUN		"Game"
-#define GAMENOUN				"game"
-#define GAMESNOUN				"games"
-#define COPYRIGHT				"Copyright Nicola Salmoria\nand the MAME team\nhttp://mamedev.org"
-#define COPYRIGHT_INFO			"Copyright Nicola Salmoria and the MAME team"
-#define DISCLAIMER				"MAME is an emulator: it reproduces, more or less faithfully, the behaviour of\n" \
-								"several arcade machines. But hardware is useless without software, so an image\n" \
-								"of the ROMs which run on that hardware is required. Such ROMs, like any other\n" \
-								"commercial software, are copyrighted material and it is therefore illegal to\n" \
-								"use them if you don't own the original arcade machine. Needless to say, ROMs\n" \
-								"are not distributed together with MAME. Distribution of MAME together with ROM\n" \
-								"images is a violation of copyright law and should be promptly reported to the\n" \
-								"authors so that appropriate legal action can be taken.\n"
-#define USAGE					"Usage:  %s [%s] [options]"
-#define XML_ROOT			    "mame"
-#define XML_TOP 				"game"
-#define STATE_MAGIC_NUM			'M', 'A', 'M', 'E', 'S', 'A', 'V', 'E'
-#else
-#define APPNAME					"MESS"
-#define APPNAME_LOWER			"mess"
-#define CONFIGNAME				"mess"
-#define APPLONGNAME				"M.E.S.S."
-#define FULLLONGNAME			"Multi Emulator Super System"
-#define CAPGAMENOUN				"SYSTEM"
-#define CAPSTARTGAMENOUN		"System"
-#define GAMENOUN				"system"
-#define GAMESNOUN				"systems"
-#define COPYRIGHT				"Copyright the MESS team\nhttp://mess.org"
-#define COPYRIGHT_INFO			"Copyright the MESS team\n\n" \
-								"MESS is based on MAME Source code\n" \
-								"Copyright Nicola Salmoria and the MAME team"
-#define DISCLAIMER				"MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"\
-								"several computer and console systems. But hardware is useless without software\n" \
-								"so a file dump of the ROM, cartridges, discs, and cassettes which run on that\n" \
-								"hardware is required. Such files, like any other commercial software, are\n" \
-								"copyrighted material and it is therefore illegal to use them if you don't own\n" \
-								"the original media from which the files are derived. Needless to say, these\n" \
-								"files are not distributed together with MESS. Distribution of MESS together\n" \
-								"with these files is a violation of copyright law and should be promptly\n" \
-								"reported to the authors so that appropriate legal action can be taken.\n"
-#define USAGE					"Usage:  %s [%s] [media] [software] [options]"
-#define XML_ROOT			    "mess"
-#define XML_TOP 				"machine"
-#define STATE_MAGIC_NUM			'M', 'E', 'S', 'S', 'S', 'A', 'V', 'E'
-#endif
-
 
 
 //**************************************************************************
@@ -105,7 +51,30 @@ enum
 // output channel callback
 typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
 
+class emulator_info
+{
+public:
+	// construction/destruction
+	emulator_info() {};
 
+	static const char * get_appname();
+	static const char * get_appname_lower();
+	static const char * get_configname();
+	static const char * get_applongname();
+	static const char * get_fulllongname();
+	static const char * get_capgamenoun();
+	static const char * get_capstartgamenoun();
+	static const char * get_gamenoun();
+	static const char * get_gamesnoun();
+	static const char * get_copyright();
+	static const char * get_copyright_info();
+	static const char * get_disclaimer();
+	static const char * get_usage();
+	static const char * get_xml_root();
+	static const char * get_xml_top();
+	static const char * get_state_magic_num();
+	static void printf_usage(const char *par1, const char *par2);
+};
 
 //**************************************************************************
 //  GLOBAL VARIABLES

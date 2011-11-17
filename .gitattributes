@@ -4109,6 +4109,7 @@ src/mame/machine/znsec.c svneol=native#text/plain
 src/mame/machine/znsec.h svneol=native#text/plain
 src/mame/machine/zs01.c svneol=native#text/plain
 src/mame/machine/zs01.h svneol=native#text/plain
+src/mame/mame.c svneol=native#text/plain
 src/mame/mame.lst svneol=native#text/plain
 src/mame/mame.mak svneol=native#text/plain
 src/mame/mame_dev.lst svneol=native#text/plain

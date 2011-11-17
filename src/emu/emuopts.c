@@ -386,8 +386,8 @@ void emu_options::parse_standard_inis(astring &error_string)
 
 	// parse the INI file defined by the platform (e.g., "mame.ini")
 	// we do this twice so that the first file can change the INI path
-	parse_one_ini(CONFIGNAME, OPTION_PRIORITY_MAME_INI);
-	parse_one_ini(CONFIGNAME, OPTION_PRIORITY_MAME_INI, &error_string);
+	parse_one_ini(emulator_info::get_configname(), OPTION_PRIORITY_MAME_INI);
+	parse_one_ini(emulator_info::get_configname(), OPTION_PRIORITY_MAME_INI, &error_string);
 
 	// debug mode: parse "debug.ini" as well
 	if (debug())

@@ -917,7 +917,9 @@ static astring &warnings_string(running_machine &machine, astring &string)
 	/* add a warning if any ROMs were loaded with warnings */
 	if (rom_load_warnings(machine) > 0)
 	{
-		string.cat("One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
+		string.cat("One or more ROMs/CHDs for this game are incorrect. The ");
+		string.cat(emulator_info::get_gamenoun());
+		string.cat(" may not run correctly.\n");
 		if (machine.system().flags & WARNING_FLAGS)
 			string.cat("\n");
 	}
@@ -925,12 +927,16 @@ static astring &warnings_string(running_machine &machine, astring &string)
 	/* if we have at least one warning flag, print the general header */
 	if ((machine.system().flags & WARNING_FLAGS) || rom_load_knownbad(machine) > 0)
 	{
-		string.cat("There are known problems with this " GAMENOUN "\n\n");
+		string.cat("There are known problems with this ");
+		string.cat(emulator_info::get_gamenoun());
+		string.cat("\n\n");
 
 		/* add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP */
-		if (rom_load_knownbad(machine) > 0)
-			string.cat("One or more ROMs/CHDs for this "  GAMENOUN " have not been correctly dumped.\n");
-
+		if (rom_load_knownbad(machine) > 0) {
+			string.cat("One or more ROMs/CHDs for this ");
+			string.cat(emulator_info::get_gamenoun());
+			string.cat(" have not been correctly dumped.\n");
+		}
 		/* add one line per warning flag */
 		if (input_machine_has_keyboard(machine))
 			string.cat("The keyboard emulation may not be 100% accurate.\n");
@@ -957,12 +963,20 @@ static astring &warnings_string(running_machine &machine, astring &string)
 			/* add the strings for these warnings */
 			if (machine.system().flags & GAME_UNEMULATED_PROTECTION)
 				string.cat("The game has protection which isn't fully emulated.\n");
-			if (machine.system().flags & GAME_NOT_WORKING)
-				string.cat("\nTHIS " CAPGAMENOUN " DOESN'T WORK. The emulation for this game is not yet complete. "
+			if (machine.system().flags & GAME_NOT_WORKING) {				
+				string.cat("\nTHIS ");
+				string.cat(emulator_info::get_capgamenoun());
+				string.cat(" DOESN'T WORK. The emulation for this game is not yet complete. "
 					 "There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
-			if (machine.system().flags & GAME_MECHANICAL)
-				string.cat("\nCertain elements of this " GAMENOUN " cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
-					 "It is not possible to fully play this " GAMENOUN ".\n");
+			}
+			if (machine.system().flags & GAME_MECHANICAL) {
+				string.cat("\nCertain elements of this ");
+				string.cat(emulator_info::get_gamenoun());
+				string.cat(" cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
+					 "It is not possible to fully play this ");
+				string.cat(emulator_info::get_gamenoun());					 
+				string.cat(".\n");
+			}
 
 			/* find the parent of this driver */
 			driver_enumerator drivlist(machine.options());

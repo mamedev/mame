@@ -53,21 +53,21 @@
 
 // DTD string describing the data
 const char info_xml_creator::s_dtd_string[] =
-"<!DOCTYPE " XML_ROOT " [\n"
-"<!ELEMENT " XML_ROOT " (" XML_TOP "+)>\n"
-"\t<!ATTLIST " XML_ROOT " build CDATA #IMPLIED>\n"
-"\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
-"\t<!ATTLIST " XML_ROOT " mameconfig CDATA #REQUIRED>\n"
-"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, adjuster*, driver?, device*, slot*, softwarelist*, ramoption*)>\n"
-"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
-"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
-"\t\t<!ATTLIST " XML_TOP " isbios (yes|no) \"no\">\n"
-"\t\t<!ATTLIST " XML_TOP " isdevice (yes|no) \"no\">\n"
-"\t\t<!ATTLIST " XML_TOP " ismechanical (yes|no) \"no\">\n"
-"\t\t<!ATTLIST " XML_TOP " runnable (yes|no) \"yes\">\n"
-"\t\t<!ATTLIST " XML_TOP " cloneof CDATA #IMPLIED>\n"
-"\t\t<!ATTLIST " XML_TOP " romof CDATA #IMPLIED>\n"
-"\t\t<!ATTLIST " XML_TOP " sampleof CDATA #IMPLIED>\n"
+"<!DOCTYPE __XML_ROOT__ [\n"
+"<!ELEMENT __XML_ROOT__ (__XML_TOP__+)>\n"
+"\t<!ATTLIST __XML_ROOT__ build CDATA #IMPLIED>\n"
+"\t<!ATTLIST __XML_ROOT__ debug (yes|no) \"no\">\n"
+"\t<!ATTLIST __XML_ROOT__ mameconfig CDATA #REQUIRED>\n"
+"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, adjuster*, driver?, device*, slot*, softwarelist*, ramoption*)>\n"
+"\t\t<!ATTLIST __XML_TOP__ name CDATA #REQUIRED>\n"
+"\t\t<!ATTLIST __XML_TOP__ sourcefile CDATA #IMPLIED>\n"
+"\t\t<!ATTLIST __XML_TOP__ isbios (yes|no) \"no\">\n"
+"\t\t<!ATTLIST __XML_TOP__ isdevice (yes|no) \"no\">\n"
+"\t\t<!ATTLIST __XML_TOP__ ismechanical (yes|no) \"no\">\n"
+"\t\t<!ATTLIST __XML_TOP__ runnable (yes|no) \"yes\">\n"
+"\t\t<!ATTLIST __XML_TOP__ cloneof CDATA #IMPLIED>\n"
+"\t\t<!ATTLIST __XML_TOP__ romof CDATA #IMPLIED>\n"
+"\t\t<!ATTLIST __XML_TOP__ sampleof CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT description (#PCDATA)>\n"
 "\t\t<!ELEMENT year (#PCDATA)>\n"
 "\t\t<!ELEMENT manufacturer (#PCDATA)>\n"
@@ -214,16 +214,21 @@ void info_xml_creator::output(FILE *out)
 
 	// output the DTD
 	fprintf(m_output, "<?xml version=\"1.0\"?>\n");
-	fprintf(m_output, "%s\n\n", s_dtd_string);
+	astring dtd(s_dtd_string);
+	dtd.replace(0,"__XML_ROOT__", emulator_info::get_xml_root());
+	dtd.replace(0,"__XML_TOP__", emulator_info::get_xml_top());
+	
+	fprintf(m_output, "%s\n\n", dtd.cstr());
 
 	// top-level tag
-	fprintf(m_output, "<" XML_ROOT " build=\"%s\" debug=\""
+	fprintf(m_output, "<%s build=\"%s\" debug=\""
 #ifdef MAME_DEBUG
 		"yes"
 #else
 		"no"
 #endif
 		"\" mameconfig=\"%d\">\n",
+		emulator_info::get_xml_root(),
 		xml_normalize_string(build_version),
 		CONFIG_VERSION
 	);
@@ -240,7 +245,7 @@ void info_xml_creator::output(FILE *out)
 	global_free(m_device_used);
 
 	// close the top level tag
-	fprintf(m_output, "</" XML_ROOT ">\n");
+	fprintf(m_output, "</%s>\n",emulator_info::get_xml_root());
 }
 
 
@@ -264,7 +269,7 @@ void info_xml_creator::output_devices()
 			dev->config_complete();
 
 			// print the header and the game name
-			fprintf(m_output, "\t<" XML_TOP);
+			fprintf(m_output, "\t<%s",emulator_info::get_xml_top());
 			fprintf(m_output, " name=\"%s\"", xml_normalize_string(dev->shortname()));
 			fprintf(m_output, " isdevice=\"yes\"");
 			fprintf(m_output, " runnable=\"no\"");
@@ -277,7 +282,7 @@ void info_xml_creator::output_devices()
 			output_rom(dev);
 
 			// close the topmost tag
-			fprintf(m_output, "\t</" XML_TOP ">\n");
+			fprintf(m_output, "\t</%s>\n",emulator_info::get_xml_top());
 			global_free(dev);
 		}
 	}
@@ -303,7 +308,7 @@ void info_xml_creator::output_one()
 		input_port_list_init(*device, portlist, errors);
 
 	// print the header and the game name
-	fprintf(m_output, "\t<" XML_TOP);
+	fprintf(m_output, "\t<%s",emulator_info::get_xml_top());
 	fprintf(m_output, " name=\"%s\"", xml_normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
@@ -364,7 +369,7 @@ void info_xml_creator::output_one()
 	output_ramoptions();
 
 	// close the topmost tag
-	fprintf(m_output, "\t</" XML_TOP ">\n");
+	fprintf(m_output, "\t</%s>\n",emulator_info::get_xml_top());
 }
 
 //------------------------------------------------

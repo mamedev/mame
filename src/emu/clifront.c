@@ -268,7 +268,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 			// print them out
 			fprintf(stderr, "\n\"%s\" approximately matches the following\n"
-					"supported " GAMESNOUN " (best match first):\n\n", m_options.system_name());
+					"supported %s (best match first):\n\n", m_options.system_name(),emulator_info::get_gamesnoun());
 			for (int matchnum = 0; matchnum < ARRAY_LENGTH(matches); matchnum++)
 				if (matches[matchnum] != -1)
 					fprintf(stderr, "%-18s%s\n", drivlist.driver(matches[matchnum]).name, drivlist.driver(matches[matchnum]).description);
@@ -1300,7 +1300,8 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_SHOWUSAGE) == 0)
 	{
 		astring helpstring;
-		mame_printf_info(USAGE "\n\nOptions:\n%s", exename, GAMENOUN, m_options.output_help(helpstring));
+		emulator_info::printf_usage(exename, emulator_info::get_gamenoun());
+		mame_printf_info("\n\nOptions:\n%s", m_options.output_help(helpstring));
 		return;
 	}
 
@@ -1322,8 +1323,8 @@ void cli_frontend::execute_commands(const char *exename)
 	{
 		// attempt to open the output file
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(CONFIGNAME ".ini") != FILERR_NONE)
-			throw emu_fatalerror("Unable to create file " CONFIGNAME ".ini\n");
+		if (file.open(emulator_info::get_configname(), ".ini") != FILERR_NONE)
+			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
 		astring initext;
@@ -1386,15 +1387,16 @@ void cli_frontend::execute_commands(const char *exename)
 
 void cli_frontend::display_help()
 {
-	mame_printf_info(APPLONGNAME " v%s - " FULLLONGNAME "\n"
-		   COPYRIGHT_INFO "\n\n", build_version);
-	mame_printf_info("%s\n", DISCLAIMER);
-	mame_printf_info(USAGE "\n\n"
-		   "        " APPNAME " -showusage    for a brief list of options\n"
-		   "        " APPNAME " -showconfig   for a list of configuration options\n"
-		   "        " APPNAME " -listmedia    for a full list of supported media\n"
-		   "        " APPNAME " -createconfig to create a " CONFIGNAME ".ini\n\n"
-		   "For usage instructions, please consult the files config.txt and windows.txt.\n",APPNAME,GAMENOUN);
+	mame_printf_info("%s v%s - %s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info());
+	mame_printf_info("%s\n", emulator_info::get_disclaimer());
+	emulator_info::printf_usage(emulator_info::get_appname(),emulator_info::get_gamenoun());
+	mame_printf_info("\n\n"
+		   "        %s -showusage    for a brief list of options\n"
+		   "        %s -showconfig   for a list of configuration options\n"
+		   "        %s -listmedia    for a full list of supported media\n"
+		   "        %s -createconfig to create a %s.ini\n\n"
+		   "For usage instructions, please consult the files config.txt and windows.txt.\n",emulator_info::get_appname(),
+		   emulator_info::get_appname(),emulator_info::get_appname(),emulator_info::get_appname(),emulator_info::get_configname());
 }
 
 

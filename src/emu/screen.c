@@ -1030,7 +1030,7 @@ void screen_device::finalize_burnin()
 		char text[256];
 
 		// add two text entries describing the image
-		sprintf(text, APPNAME " %s", build_version);
+		sprintf(text,"%s %s", emulator_info::get_appname(), build_version);
 		png_add_text(&pnginfo, "Software", text);
 		sprintf(text, "%s %s", machine().system().manufacturer, machine().system().description);
 		png_add_text(&pnginfo, "System", text);

@@ -400,7 +400,7 @@ void hlsl_info::render_snapshot(d3d_surface *surface)
 				return;
 
 			// add two text entries describing the image
-			astring text1(APPNAME, " ", build_version);
+			astring text1(emulator_info::get_appname(), " ", build_version);
 			astring text2(window->machine().system().manufacturer, " ", window->machine().system().description);
 			png_info pnginfo = { 0 };
 			png_add_text(&pnginfo, "Software", text1);
