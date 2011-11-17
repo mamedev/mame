@@ -262,7 +262,9 @@ void cojag_sound_init(running_machine &machine)
 	}
 
 #if ENABLE_SPEEDUP_HACKS
-	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf1a100, 0xf1a103, FUNC(dsp_flags_w));
+	if (jaguar_hacks_enabled)
+		machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf1a100, 0xf1a103, FUNC(dsp_flags_w));
+
 #endif
 }
 
@@ -369,18 +371,24 @@ static WRITE32_HANDLER( dsp_flags_w )
 
 TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 {
-	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cputag_set_input_line(timer.machine(), "audiocpu", 1, ASSERT_LINE);
-	jaguar_dsp_resume(timer.machine());
+	if (jaguar_hacks_enabled) {
+		/* assert the A2S IRQ on CPU #2 (DSP) */
+		cputag_set_input_line(timer.machine(), "audiocpu", 1, ASSERT_LINE);
+		jaguar_dsp_resume(timer.machine());
 
-	/* fix flaky code in interrupt handler which thwarts our speedup */
-	if ((jaguar_dsp_ram[0x3e/4] & 0xffff) == 0xbfbc &&
-		(jaguar_dsp_ram[0x42/4] & 0xffff) == 0xe400)
-	{
-		/* move the store r28,(r29) into the branch delay slot, swapping it with */
-		/* the nop that's currently there */
-		jaguar_dsp_ram[0x3e/4] = (jaguar_dsp_ram[0x3e/4] & 0xffff0000) | 0xe400;
-		jaguar_dsp_ram[0x42/4] = (jaguar_dsp_ram[0x42/4] & 0xffff0000) | 0xbfbc;
+		/* fix flaky code in interrupt handler which thwarts our speedup */
+		if ((jaguar_dsp_ram[0x3e/4] & 0xffff) == 0xbfbc &&
+			(jaguar_dsp_ram[0x42/4] & 0xffff) == 0xe400)
+		{
+			/* move the store r28,(r29) into the branch delay slot, swapping it with */
+			/* the nop that's currently there */
+			jaguar_dsp_ram[0x3e/4] = (jaguar_dsp_ram[0x3e/4] & 0xffff0000) | 0xe400;
+			jaguar_dsp_ram[0x42/4] = (jaguar_dsp_ram[0x42/4] & 0xffff0000) | 0xbfbc;
+		}
+	} else {
+		/* assert the A2S IRQ on CPU #2 (DSP) */
+		cputag_set_input_line(timer.machine(), "audiocpu", 1, ASSERT_LINE);
+		jaguar_dsp_resume(timer.machine());
 	}
 }
 

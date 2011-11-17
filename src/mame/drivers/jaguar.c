@@ -390,6 +390,7 @@ UINT32 *jaguar_dsp_ram;
 UINT32 *jaguar_wave_rom;
 UINT32* high_rom_base;
 UINT8 cojag_is_r3000;
+bool jaguar_hacks_enabled;
 static int is_jaguar;
 
 
@@ -950,7 +951,7 @@ static READ32_HANDLER( gpu_jump_r )
 	{
 #if ENABLE_SPEEDUP_HACKS
 		/* spin if we're allowed */
-		jaguar_gpu_suspend(space->machine());
+		if (jaguar_hacks_enabled) jaguar_gpu_suspend(space->machine());
 #endif
 
 		/* no command is pending */
@@ -1800,6 +1801,7 @@ static void jaguar_fix_endian( running_machine &machine, UINT32 addr, UINT32 siz
 
 static DRIVER_INIT( jaguar )
 {
+	jaguar_hacks_enabled = false;
 	state_save_register_global(machine, joystick_data);
 	using_cart = 0;
 
@@ -2317,6 +2319,7 @@ static void cojag_common_init(running_machine &machine, UINT16 gpu_jump_offs, UI
 
 static DRIVER_INIT( area51a )
 {
+	jaguar_hacks_enabled = true;
 	cojag_common_init(machine, 0x5c4, 0x5a0);
 
 #if ENABLE_SPEEDUP_HACKS
@@ -2332,6 +2335,7 @@ static DRIVER_INIT( area51a )
 
 static DRIVER_INIT( area51 )
 {
+	jaguar_hacks_enabled = true;
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
 #if ENABLE_SPEEDUP_HACKS
@@ -2347,6 +2351,7 @@ static DRIVER_INIT( area51 )
 
 static DRIVER_INIT( maxforce )
 {
+	jaguar_hacks_enabled = true;
 	cojag_state *state = machine.driver_data<cojag_state>();
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
@@ -2363,6 +2368,7 @@ static DRIVER_INIT( maxforce )
 
 static DRIVER_INIT( area51mx )
 {
+	jaguar_hacks_enabled = true;
 	cojag_state *state = machine.driver_data<cojag_state>();
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
@@ -2378,6 +2384,7 @@ static DRIVER_INIT( area51mx )
 
 static DRIVER_INIT( a51mxr3k )
 {
+	jaguar_hacks_enabled = true;
 	cojag_state *state = machine.driver_data<cojag_state>();
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
@@ -2394,6 +2401,7 @@ static DRIVER_INIT( a51mxr3k )
 
 static DRIVER_INIT( fishfren )
 {
+	jaguar_hacks_enabled = true;
 	cojag_common_init(machine, 0x578, 0x554);
 
 #if ENABLE_SPEEDUP_HACKS
@@ -2425,16 +2433,17 @@ static void init_freeze_common(running_machine &machine, offs_t main_speedup_add
 #endif
 }
 
-static DRIVER_INIT( freezeat ) { init_freeze_common(machine, 0x1001a9f4); }
-static DRIVER_INIT( freezeat2 ) { init_freeze_common(machine, 0x1001a8c4); }
-static DRIVER_INIT( freezeat3 ) { init_freeze_common(machine, 0x1001a134); }
-static DRIVER_INIT( freezeat4 ) { init_freeze_common(machine, 0x1001a134); }
-static DRIVER_INIT( freezeat5 ) { init_freeze_common(machine, 0x10019b34); }
-static DRIVER_INIT( freezeat6 ) { init_freeze_common(machine, 0x10019684); }
+static DRIVER_INIT( freezeat ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x1001a9f4); }
+static DRIVER_INIT( freezeat2 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x1001a8c4); }
+static DRIVER_INIT( freezeat3 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x1001a134); }
+static DRIVER_INIT( freezeat4 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x1001a134); }
+static DRIVER_INIT( freezeat5 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x10019b34); }
+static DRIVER_INIT( freezeat6 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x10019684); }
 
 
 static DRIVER_INIT( vcircle )
 {
+	jaguar_hacks_enabled = true;
 	cojag_common_init(machine, 0x5c0, 0x5a0);
 
 #if ENABLE_SPEEDUP_HACKS
