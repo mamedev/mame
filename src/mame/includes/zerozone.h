@@ -19,7 +19,6 @@ public:
 	{ }
 	
 	// in drivers/zerozone.c
-	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	
 	// temp workaround for missing generic 'modern' functions
@@ -42,7 +41,7 @@ public:
 	
 	// state
 	// video-related
-	UINT16      m_tilebank;
+	UINT16         m_tilebank;
 	tilemap_t     *m_zz_tilemap;
 	
 protected:
