@@ -1,6 +1,6 @@
 //============================================================
 //
-//  drawd3d.c - Win32 Direct3D HLSL implementation
+//  d3dhlsl.c - Win32 Direct3D HLSL implementation
 //
 //============================================================
 //
@@ -213,6 +213,13 @@ hlsl_info::hlsl_info()
 
 hlsl_info::~hlsl_info()
 {
+	global_free(options);
+
+	if(shadow_bitmap != NULL)
+	{
+		global_free(shadow_bitmap);
+		shadow_bitmap = NULL;
+	}
 }
 
 
@@ -1734,34 +1741,37 @@ void hlsl_info::end()
 				if(target_in_use[index] != NULL)
 				{
 					d3d_texture_info *tex = target_in_use[index];
-
-					if(d3d->texlist == tex)
+					bool found_in_active_list = false;
+					d3d_texture_info *test_tex = d3d->texlist;
+					while (test_tex != NULL)
 					{
-						d3d->texlist = tex->next;
-						if(d3d->texlist != NULL)
+						if(test_tex == tex)
 						{
-							d3d->texlist->prev = NULL;
+							found_in_active_list = true;
+							break;
 						}
-					}
-					else
-					{
-						if(tex->next != NULL)
-						{
-							tex->next->prev = tex->prev;
-						}
-						if(tex->prev != NULL)
-						{
-							tex->prev->next = tex->next;
-						}
+						test_tex = test_tex->next;
 					}
 
-					if (tex->d3dfinaltex != NULL)
-						(*d3dintf->texture.release)(tex->d3dfinaltex);
-					if (tex->d3dtex != NULL && tex->d3dtex != tex->d3dfinaltex)
-						(*d3dintf->texture.release)(tex->d3dtex);
-					if (tex->d3dsurface != NULL)
-						(*d3dintf->surface.release)(tex->d3dsurface);
-					global_free(tex);
+					// only clean up a texture if it won't be cleaned up by drawd3d
+					if(!found_in_active_list)
+					{
+						if (tex->d3dfinaltex != NULL)
+						{
+							(*d3dintf->texture.release)(tex->d3dfinaltex);
+							tex->d3dfinaltex = NULL;
+						}
+						if (tex->d3dtex != NULL && tex->d3dtex != tex->d3dfinaltex)
+						{
+							(*d3dintf->texture.release)(tex->d3dtex);
+							tex->d3dtex = NULL;
+						}
+						if (tex->d3dsurface != NULL)
+						{
+							(*d3dintf->surface.release)(tex->d3dsurface);
+						}
+						global_free(tex);
+					}
 				}
 
 				if (prescaletexture0[index] != NULL)

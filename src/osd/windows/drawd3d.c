@@ -892,14 +892,14 @@ static int device_create_resources(d3d_info *d3d)
 
 static void device_delete(d3d_info *d3d)
 {
-	// free our effects
-	d3d->hlsl->delete_resources();
-
 	// delete the HLSL interface
 	global_free(d3d->hlsl);
 
-	// free resources
+	// free our base resources
 	device_delete_resources(d3d);
+
+	// free our effects
+	d3d->hlsl->delete_resources();
 
 	// free the device itself
 	if (d3d->device != NULL)
@@ -921,11 +921,20 @@ static void device_delete_resources(d3d_info *d3d)
 		d3d_texture_info *tex = d3d->texlist;
 		d3d->texlist = tex->next;
 		if (tex->d3dfinaltex != NULL)
+		{
 			(*d3dintf->texture.release)(tex->d3dfinaltex);
+			tex->d3dfinaltex = NULL;
+		}
 		if (tex->d3dtex != NULL && tex->d3dtex != tex->d3dfinaltex)
+		{
 			(*d3dintf->texture.release)(tex->d3dtex);
+			tex->d3dtex = NULL;
+		}
 		if (tex->d3dsurface != NULL)
+		{
 			(*d3dintf->surface.release)(tex->d3dsurface);
+			tex->d3dsurface = NULL;
+		}
 		global_free(tex);
 	}
 
