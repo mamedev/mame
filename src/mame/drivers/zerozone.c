@@ -35,24 +35,6 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-READ16_MEMBER( zerozone_state::input_r )
-{
-	switch (offset)
-	{
-		case 0x00:
-			return input_port_read(machine(), "SYSTEM");
-		case 0x01:
-			return input_port_read(machine(), "INPUTS");
-		case 0x04:
-			return input_port_read(machine(), "DSWB");
-		case 0x05:
-			return input_port_read(machine(), "DSWA");
-	}
-
-//	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(&space->device()), 0x800000 + offset);
-	return 0x00;
-}
-
 
 WRITE16_MEMBER( zerozone_state::sound_w )
 {
@@ -66,7 +48,10 @@ WRITE16_MEMBER( zerozone_state::sound_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, zerozone_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08000f) AM_READ(input_r)
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("INPUTS")
+	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSWB")
+	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSWA")
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(sound_w)
 	AM_RANGE(0x088000, 0x0881ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x098000, 0x098001) AM_RAM		/* Watchdog? */
