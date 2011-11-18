@@ -85,23 +85,22 @@ Notes:
 
 ***************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/zodiack.h"
 
 
-static WRITE8_HANDLER( zodiack_nmi_mask_w )
+WRITE8_MEMBER( zodiack_state::nmi_mask_w )
 {
-	zodiack_state *state = space->machine().driver_data<zodiack_state>();
-
-	state->m_nmi_enable = (data & 1) ^ 1;
+	m_nmi_enable = (data & 1) ^ 1;
 }
 
-static WRITE8_HANDLER( zodiack_sound_nmi_enable_w )
+WRITE8_MEMBER( zodiack_state::sound_nmi_enable_w )
 {
-	zodiack_state *state = space->machine().driver_data<zodiack_state>();
-	state->m_sound_nmi_enabled = data & 1;
+	m_sound_nmi_enabled = data & 1;
 }
 
 
@@ -126,81 +125,51 @@ static INTERRUPT_GEN( zodiack_sound_nmi_gen )
 }
 
 
-static WRITE8_HANDLER( zodiack_master_soundlatch_w )
+WRITE8_MEMBER( zodiack_state::master_soundlatch_w )
 {
-	zodiack_state *state = space->machine().driver_data<zodiack_state>();
-	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	soundlatch_w(&space, offset, data);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static MACHINE_START( zodiack )
-{
-	zodiack_state *state = machine.driver_data<zodiack_state>();
-
-	state->m_percuss_hardware = 0;
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-
-	state->save_item(NAME(state->m_sound_nmi_enabled));
-}
-
-static MACHINE_RESET( zodiack )
-{
-	zodiack_state *state = machine.driver_data<zodiack_state>();
-
-	state->m_sound_nmi_enabled = FALSE;
-}
-
-static MACHINE_START( percuss )
-{
-	zodiack_state *state = machine.driver_data<zodiack_state>();
-
-	MACHINE_START_CALL( zodiack );
-
-	state->m_percuss_hardware = 1;
-}
-
-
-static WRITE8_HANDLER( zodiack_control_w )
+WRITE8_MEMBER( zodiack_state::control_w )
 {
 	/* Bit 0-1 - coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x01);
-
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x01);
 	/* Bit 2 - ???? */
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5800, 0x5fff) AM_RAM
-	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("DSW0") AM_WRITE(zodiack_control_w)
+	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("DSW0") AM_WRITE(control_w)
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN0")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN1")
-	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, zodiack_master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_WRITE(watchdog_reset_w)  /* NOP??? */
-	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiack_nmi_mask_w)
-	AM_RANGE(0x7200, 0x7200) AM_WRITE(zodiack_flipscreen_w)
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE_MEMBER(zodiack_state, m_attributeram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, m_bulletsram, m_bulletsram_size)
+	AM_RANGE(0x6090, 0x6090) AM_READWRITE(slatch_r, master_soundlatch_w)
+	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_WRITE(watchdog_w)  /* NOP??? */
+	AM_RANGE(0x7100, 0x7100) AM_WRITE(nmi_mask_w)
+	AM_RANGE(0x7200, 0x7200) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(attributes_w) AM_SHARE("attributeram")
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x9080, 0x93ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE_SIZE_MEMBER(zodiack_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE_MEMBER(zodiack_state, m_videoram_2)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram_2")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(zodiack_sound_nmi_enable_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(sound_nmi_enable_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(slatch_r, slatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, zodiack_state  )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -574,6 +543,19 @@ static GFXDECODE_START( zodiack )
 GFXDECODE_END
 
 
+void zodiack_state::machine_start()
+{
+	save_item(NAME(m_sound_nmi_enabled));
+	save_item(NAME(m_nmi_enable));
+}
+
+void zodiack_state::machine_reset()
+{
+	m_sound_nmi_enabled = FALSE;
+	m_nmi_enable = 0;
+}
+
+
 static MACHINE_CONFIG_START( zodiack, zodiack_state )
 
 	/* basic machine hardware */
@@ -586,9 +568,6 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_PERIODIC_INT(zodiack_sound_nmi_gen,8*60)	/* IRQs are triggered by the main CPU */
 
-	MCFG_MACHINE_RESET(zodiack)
-	MCFG_MACHINE_START(zodiack)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -596,13 +575,11 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(zodiack)
 
 	MCFG_GFXDECODE(zodiack)
 	MCFG_PALETTE_LENGTH(4*8+2*8+2*1)
 
 	MCFG_PALETTE_INIT(zodiack)
-	MCFG_VIDEO_START(zodiack)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -611,8 +588,7 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( percuss, zodiack )
-	MCFG_MACHINE_START(percuss)
+static MACHINE_CONFIG_DERIVED_CLASS( percuss, zodiack, percuss_state )
 MACHINE_CONFIG_END
 
 
