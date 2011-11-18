@@ -64,17 +64,17 @@ void atari_interrupt_cb(device_t *device, int mask)
 
 READ8_DEVICE_HANDLER(atari_pia_pa_r)
 {
-	return atari_input_disabled(device->machine()) ? 0xFF : input_port_read_safe(device->machine(), "djoy_0_1", 0);
+	return input_port_read_safe(device->machine(), "djoy_0_1", 0);
 }
 
 READ8_DEVICE_HANDLER(atari_pia_pb_r)
 {
-	return atari_input_disabled(device->machine()) ? 0xFF : input_port_read_safe(device->machine(), "djoy_2_3", 0);
+	return input_port_read_safe(device->machine(), "djoy_2_3", 0);
 }
 
 WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine(), data); }
 
-static WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w) { }	// This is used by Floppy drive on Atari 8bits Home Computers
+WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w) { }	// This is used by Floppy drive on Atari 8bits Home Computers
 
 const pia6821_interface atarixl_pia_interface =
 {

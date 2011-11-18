@@ -368,6 +368,35 @@ static const pokey_interface pokey_config = {
 	atari_interrupt_cb
 };
 
+READ8_DEVICE_HANDLER(maxaflex_atari_pia_pa_r)
+{
+	return atari_input_disabled(device->machine()) ? 0xFF : input_port_read_safe(device->machine(), "djoy_0_1", 0);
+}
+
+READ8_DEVICE_HANDLER(maxaflex_atari_pia_pb_r)
+{
+	return atari_input_disabled(device->machine()) ? 0xFF : input_port_read_safe(device->machine(), "djoy_2_3", 0);
+}
+
+
+const pia6821_interface maxaflex_atarixl_pia_interface =
+{
+	DEVCB_HANDLER(maxaflex_atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(maxaflex_atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(a600xl_pia_pb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(atari_pia_cb2_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
+};
+
+
+
 static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
@@ -377,7 +406,7 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	MCFG_CPU_ADD("mcu", M68705, 3579545)
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
 
-	MCFG_PIA6821_ADD("pia", atarixl_pia_interface)
+	MCFG_PIA6821_ADD("pia", maxaflex_atarixl_pia_interface)
 	MCFG_TIMER_ADD("mcu_timer", mcu_timer_proc)
 
 	/* video hardware */
