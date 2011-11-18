@@ -7,6 +7,8 @@
  should all games have OKI roms? are most missing?
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -14,18 +16,25 @@ class ace_sp_state : public driver_device
 {
 public:
 	ace_sp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
 
-static ADDRESS_MAP_START( ace_sp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ace_sp_map, AS_PROGRAM, 8, ace_sp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ace_sp_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( ace_sp_portmap, AS_IO, 8, ace_sp_state )
 ADDRESS_MAP_END
 
 
@@ -34,11 +43,9 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( ace_sp, ace_sp_state )
-
 	MCFG_CPU_ADD("maincpu", HD6301, 1000000) // 6303?
 	MCFG_CPU_PROGRAM_MAP(ace_sp_map)
 	MCFG_CPU_IO_MAP(ace_sp_portmap)
-
 MACHINE_CONFIG_END
 
 

@@ -4,6 +4,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
@@ -11,27 +13,41 @@ class cesclassic_state : public driver_device
 {
 public:
 	cesclassic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) {}
+	: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
+	
+	DECLARE_READ16_MEMBER(_60000_r);
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
-static VIDEO_START( cesclassic )
+
+void cesclassic_state::video_start()
 {
 }
 
-static SCREEN_UPDATE( cesclassic )
+bool cesclassic_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static READ16_HANDLER(cesclassic_60000_r)
+READ16_MEMBER( cesclassic_state::_60000_r )
 {
 	return 0x100 | 0x200;
 }
 
-static ADDRESS_MAP_START( cesclassic_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cesclassic_map, AS_PROGRAM, 16, cesclassic_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ(cesclassic_60000_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(_60000_r)
 	AM_RANGE(0x640040, 0x640041) AM_WRITENOP
 	AM_RANGE(0x904000, 0x904001) AM_WRITENOP
 ADDRESS_MAP_END
@@ -51,12 +67,10 @@ static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(cesclassic)
 
 	MCFG_PALETTE_LENGTH(16)
-
-	MCFG_VIDEO_START(cesclassic)
 MACHINE_CONFIG_END
+
 
 ROM_START(hrclass)
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -83,6 +97,7 @@ ROM_START(tsclass)
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "tsclassic-v100-u28.bin", 0x00000, 0x80000, CRC(5bf53ca3) SHA1(5767391175fa9488ba0fb17a16de6d5013712a01) )
 ROM_END
+
 
 GAME(1996, hrclass, 0, cesclassic, cesclassic, 0, ROT0, "Creative Electronics And Software", "Home Run Classic", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME(1996, ccclass, 0, cesclassic, cesclassic, 0, ROT0, "Creative Electronics And Software", "Country Club Classic", GAME_NOT_WORKING | GAME_NO_SOUND )

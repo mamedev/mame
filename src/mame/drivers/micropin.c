@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -5,18 +7,28 @@ class micropin_state : public driver_device
 {
 public:
 	micropin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( micropin_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( micropin_map, AS_PROGRAM, 8, micropin_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( micropin )
 INPUT_PORTS_END
 
-static MACHINE_RESET( micropin )
+void micropin_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( micropin, micropin_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(micropin_map)
-
-	MCFG_MACHINE_RESET( micropin )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -55,6 +65,6 @@ ROM_START(pentacup2)
 	ROM_LOAD("micro_4.bin", 0x1800, 0x0800, CRC(a804e7d6) SHA1(f414d6a5308266744645849940c00cd422e920d2))
 ROM_END
 
-GAME(1978,	pentacup,0,		micropin,	micropin,	micropin,	ROT0,	"Micropin",			"Pentacup (rev. 1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	pentacup2,pentacup,micropin,	micropin,	micropin,	ROT0,	"Micropin",			"Pentacup (rev. 2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 
+GAME(1978,  pentacup,  0,         micropin,  micropin,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 1)",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980,  pentacup2, pentacup,  micropin,  micropin,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 2)",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

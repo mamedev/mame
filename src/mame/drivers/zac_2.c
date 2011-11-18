@@ -1,25 +1,39 @@
 /*
     Zaccaria Generation 2
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 
 class zac_2_state : public driver_device
 {
 public:
-	zac_2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+  zac_2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
+	
 };
 
 
-static ADDRESS_MAP_START( zac_2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zac_2_map, AS_PROGRAM, 8, zac_2_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zac_2 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( zac_2 )
+void zac_2_state::machine_reset()
 {
 }
 
@@ -31,8 +45,6 @@ static MACHINE_CONFIG_START( zac_2, zac_2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_2_map)
-
-	MCFG_MACHINE_RESET( zac_2 )
 MACHINE_CONFIG_END
 
 /*--------------------------------
@@ -52,6 +64,7 @@ ROM_START(bbeltzac)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("bbz-e.snd", 0xa000, 0x2000, CRC(1fe045d2) SHA1(d17d7dbcafe9f8644cbe393a56ff6b45d9d40155))
 	ROM_LOAD("bbz-f.snd", 0xc000, 0x4000, CRC(9f58f369) SHA1(32472d93284c0f1fc2875714b40428406dcf6325))
@@ -74,6 +87,7 @@ ROM_START(clown)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("clown_e.snd", 0xc000, 0x2000, CRC(04a34cc1) SHA1(56fcc07ccab3cac27928f5c5411868bde1769603))
 	ROM_LOAD("clown_f.snd", 0xe000, 0x2000, CRC(e35a4f72) SHA1(0037c1072f58798ba61af85a1b4b374b85c883ae))
@@ -96,6 +110,7 @@ ROM_START(dvlrider)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("gb01snd1.1d", 0xe000, 0x2000, CRC(5d48462c) SHA1(755bc259e992a9b375bd1e338775da14c15932bd))
 	ROM_LOAD("gb01snd2.1e", 0xc000, 0x2000, CRC(1127be59) SHA1(be074fe3efecd0c1e10599c8981bf7c5debb4d37))
@@ -116,6 +131,7 @@ ROM_START(dvlrideri)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("dride_it.1d", 0xe000, 0x2000, CRC(cc33b947) SHA1(1b240ed6b38a78e21c5009342c4abab8bfd9ff7e))
 	ROM_LOAD("dride_it.1e", 0xc000, 0x2000, CRC(b3764fd7) SHA1(27b5332af1aaedfc36d942f78146baa85617dbbe))
@@ -136,6 +152,7 @@ ROM_START(dvlriderg)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("g_snd_1.bin", 0xe000, 0x2000, CRC(77d042dc) SHA1(78e056468887a315e29c913803e3c36f9c7f694e))
 	ROM_LOAD("g_snd_2.bin", 0xc000, 0x2000, CRC(31e35fd4) SHA1(2eeefbd831159d975fe9cac99db99dfdca04b0dc))
@@ -159,6 +176,7 @@ ROM_START(farfalla)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("rom1.snd", 0xe000, 0x2000, CRC(aca09674) SHA1(8e1edc25c7fe2189215f73da8f1bec4b670bd8e6))
 	ROM_LOAD("rom2.snd", 0xc000, 0x1000, CRC(76da384d) SHA1(0e4616bf2fb2c21270aecfc04ad9e68ce9390bfb))
@@ -180,6 +198,7 @@ ROM_START(farfallai)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("farsnd1.bin", 0xe000, 0x2000, CRC(fd80040d) SHA1(122c99627d944b253e091b56d32336367df615c1))
 	ROM_LOAD("rom2.snd", 0xc000, 0x1000, CRC(76da384d) SHA1(0e4616bf2fb2c21270aecfc04ad9e68ce9390bfb))
@@ -201,6 +220,7 @@ ROM_START(farfallag)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("farf_de.1d", 0xe000, 0x2000, CRC(5f64df81) SHA1(d8bd6d1fb3eec704fe31ccc1feeb5a9529c70d07))
 	ROM_LOAD("rom2.snd", 0xc000, 0x1000, CRC(76da384d) SHA1(0e4616bf2fb2c21270aecfc04ad9e68ce9390bfb))
@@ -225,7 +245,8 @@ ROM_START(mcastle)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("gb01snd1.1d", 0xe000, 0x2000, CRC(cd6a4a07) SHA1(47359747f79feca9d85d8f7657325874eda0f915))
 	ROM_LOAD("gb01snd2.1e", 0xc000, 0x2000, CRC(d289952d) SHA1(94052cbee4cd499fb55d59b047828c21d71ab288))
 	ROM_LOAD("gb01snd3.1g", 0xa000, 0x2000, CRC(8b4342eb) SHA1(a8534cb2ebaff4d5d4101eb710c068f3b91e9e0c))
@@ -245,6 +266,7 @@ ROM_START(mcastlei)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("mgic_it.1d", 0xe000, 0x2000, CRC(16911674) SHA1(8fc5b0ec48c76eac21bcab44cf2fe9635e55ef49))
 	ROM_LOAD("mgic_it.1e", 0xc000, 0x2000, CRC(646f9673) SHA1(cf78029f63c8264db2d0012143981d36b5410499))
@@ -265,6 +287,7 @@ ROM_START(mcastleg)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("magic1d.snd", 0xe000, 0x2000, CRC(1f1a1140) SHA1(fed351c78e4c46c05e910f1844351492faa9edcf))
 	ROM_LOAD("magic1e.snd", 0xc000, 0x2000, CRC(a8787011) SHA1(16da0b40e24346f4e90d553c7c3e68daa4d4a656))
@@ -285,6 +308,7 @@ ROM_START(mcastlef)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("mgic_fr.1d", 0xe000, 0x2000, CRC(7d3faa3b) SHA1(4f9ab1a868f7b9900bbbde02c2e654e7f778ed9d))
 	ROM_LOAD("mgic_fr.1e", 0xc000, 0x2000, CRC(0077241c) SHA1(113d9039ad14f3887533f5e655a7912ddd441e77))
@@ -308,6 +332,7 @@ ROM_START(mexico)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("mex86_e.snd", 0xa000, 0x2000, CRC(a985e8db) SHA1(11f91179fa1d46c1c83cdd4fbcf8ebdfd2a41f3f))
 	ROM_LOAD("mex86_f.snd", 0xc000, 0x4000, CRC(301c2b63) SHA1(df4a4cb48d28d53c3728066d3e3fa9eac17c78c5))
@@ -330,12 +355,15 @@ ROM_START(nstrphnx)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("snd_ic24.bin", 0x0000, 0x8000, CRC(158d6f83) SHA1(281e1b13be43025be1b33dcd366cec0b36f29e5c))
 	ROM_LOAD("snd_ic25.bin", 0x8000, 0x8000, CRC(b1c9238e) SHA1(88c9df1fca94d32a0fa5d75312dabff257e867dd))
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("snd_ic05.bin", 0x0000, 0x8000, CRC(74cc4902) SHA1(e2f46bcf5446f98d098c49f8c2416292401265b9))
 	ROM_LOAD("snd_ic06.bin", 0x8000, 0x8000, CRC(a0400411) SHA1(da9de6105639c4f6174f5bc92f44e02c339a2bc3))
+
 	ROM_REGION(0x10000, "cpu4", 0)
 	ROM_LOAD("snd_ic40.bin", 0x0000, 0x8000, CRC(974ceb9c) SHA1(3665af9170a2afbe26f68e8f3cedb0d177f476c4))
 ROM_END
@@ -357,6 +385,7 @@ ROM_START(pinchamp)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("pchmp_gb.1c", 0xf000, 0x1000, CRC(f739fcba) SHA1(7460f1da99c474601e8cec64683cbd61837a82e8))
 	ROM_LOAD("pchmp_gb.1e", 0xe000, 0x1000, CRC(24d83e74) SHA1(f78e151c9885b965cd5209777580414522362ebf))
@@ -378,6 +407,7 @@ ROM_START(pinchampg)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("pchmp_de.1c", 0xf000, 0x1000, CRC(6e2defe5) SHA1(fcb62da1aed23d9fb9a222862b4b772aad9792a1))
 	ROM_LOAD("pchmp_de.1e", 0xe000, 0x1000, CRC(703b3cae) SHA1(c7bd021e936fb0fd4bc16d48c3ef1df69d1fe01a))
@@ -399,6 +429,7 @@ ROM_START(pinchampi)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("pchmp_it.1c", 0xf000, 0x1000, CRC(a0033b90) SHA1(bca8fe29fdfcbc22fd0e8bafbd7946db5c2c4041))
 	ROM_LOAD("pchmp_gb.1e", 0xe000, 0x1000, CRC(24d83e74) SHA1(f78e151c9885b965cd5209777580414522362ebf))
@@ -420,6 +451,7 @@ ROM_START(pinchamp7)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("pchmp_gb.1c", 0xf000, 0x1000, CRC(f739fcba) SHA1(7460f1da99c474601e8cec64683cbd61837a82e8))
 	ROM_LOAD("pchmp_gb.1e", 0xe000, 0x1000, CRC(24d83e74) SHA1(f78e151c9885b965cd5209777580414522362ebf))
@@ -441,6 +473,7 @@ ROM_START(pinchamp7g)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("pchmp_de.1c", 0xf000, 0x1000, CRC(6e2defe5) SHA1(fcb62da1aed23d9fb9a222862b4b772aad9792a1))
 	ROM_LOAD("pchmp_de.1e", 0xe000, 0x1000, CRC(703b3cae) SHA1(c7bd021e936fb0fd4bc16d48c3ef1df69d1fe01a))
@@ -462,6 +495,7 @@ ROM_START(pinchamp7i)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("pchmp_it.1c", 0xf000, 0x1000, CRC(a0033b90) SHA1(bca8fe29fdfcbc22fd0e8bafbd7946db5c2c4041))
 	ROM_LOAD("pchmp_gb.1e", 0xe000, 0x1000, CRC(24d83e74) SHA1(f78e151c9885b965cd5209777580414522362ebf))
@@ -488,6 +522,7 @@ ROM_START(poolcham)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("poolcham.1f", 0xc000, 0x4000, CRC(efe33926) SHA1(30444a2ee7f453f46c74fff8365d80fc4f0a277f))
 ROM_END
@@ -506,6 +541,7 @@ ROM_START(poolchami)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("poolc_it.1f", 0xc000, 0x2000, CRC(1dc8308c) SHA1(a69f1e5fe9db5ff9fbcd08504e79ab39009efb85))
 	ROM_LOAD("poolc_it.1e", 0xe000, 0x2000, CRC(28a3e5ee) SHA1(c090c81c78d3296e91ce12e1170ee2c71ba07177))
@@ -525,6 +561,7 @@ ROM_START(poolchama)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sound1.f", 0xc000, 0x4000, CRC(b4b4e31e) SHA1(bcd1c4c7f6f079655a9c37d0b978d997f95b93ad))
 ROM_END
@@ -546,6 +583,7 @@ ROM_START(robot)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("robot_d.snd", 0xe000, 0x2000, CRC(ab5e5524) SHA1(9aae2560bccf64daeab0514c8934c55f77fe240d))
 	ROM_LOAD("robot_e.snd", 0xc000, 0x2000, CRC(2f314e33) SHA1(1f92aff3d99c2e86820720a3290285b9f36cb15b))
@@ -566,6 +604,7 @@ ROM_START(roboti)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("robot_it.1d", 0xe000, 0x2000, CRC(a4a20ed7) SHA1(459519e10bad59ba27cd5d5d31c5f276726c9bd0))
 	ROM_LOAD("robot_it.1e", 0xc000, 0x2000, CRC(2f314e33) SHA1(1f92aff3d99c2e86820720a3290285b9f36cb15b))
@@ -586,6 +625,7 @@ ROM_START(robotg)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("robot_dg.snd", 0xe000, 0x2000, CRC(88685b1e) SHA1(7d49a1d42f3e07948390a00a562aeba9dd4ddeeb))
 	ROM_LOAD("robot_eg.snd", 0xc000, 0x2000, CRC(e326a851) SHA1(c2bb5e329803922fa1c1ca30be6e3ae3d292135a))
@@ -606,6 +646,7 @@ ROM_START(robotf)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("robot_fr.1d", 0xe000, 0x2000, CRC(94957954) SHA1(22f729a1ca48399aa222f5037071d0482b9d59aa))
 	ROM_LOAD("robot_fr.1e", 0xc000, 0x2000, CRC(fdcfff02) SHA1(1ef02ad646dfea1b9727a0a99e93db724cd38cce))
@@ -629,8 +670,10 @@ ROM_START(scram_tp)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("scram_1.snd", 0xe000, 0x2000, CRC(ee5f868b) SHA1(23ef4112b94109ad4d4a6b9bb5215acec20e5e55))
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("scram_2.snd", 0xe000, 0x2000, CRC(a04bf7d0) SHA1(5be5d445b199e7dc9d42e7ee5e9b31c18dec3881))
 	ROM_REGION(0x20000, "cpu4", 0)
@@ -656,6 +699,7 @@ ROM_START(socrking)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sound1.c", 0xf000, 0x1000, CRC(3aa95018) SHA1(5347c3aefb642fc5cabd9d5e61fe6515a2dcb2aa))
 	ROM_LOAD("sound2.e", 0xe000, 0x1000, CRC(f9b57fd6) SHA1(50e42ed349680211eedf55ae639dbae899f3c6da))
@@ -677,6 +721,7 @@ ROM_START(socrkingi)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sking_it.1c", 0xf000, 0x1000, CRC(2965643f) SHA1(06de48e7afe1004ad27b805ab4b5111ef5db4380))
 	ROM_LOAD("sking_it.1e", 0xe000, 0x1000, CRC(f70ae48f) SHA1(c7aec7b54ae298d833f79f041dd9b08ec3e0ccb4))
@@ -698,6 +743,7 @@ ROM_START(socrkingg)
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_RELOAD (0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sk-de1.c", 0xf000, 0x1000, CRC(702e3e67) SHA1(ad4c02ef480d3923eebaedb12851018146740558))
 	ROM_LOAD("sk-de2.e", 0xe000, 0x1000, CRC(b60eddb5) SHA1(7e335315d0b91fc67888cda644dabafdef1afa19))
@@ -723,9 +769,11 @@ ROM_START(spookyp)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("spook_e.snd", 0xa000, 0x2000, CRC(3d632c93) SHA1(3cc127956a6df1a4fd551826068810724b32ad0e))
 	ROM_LOAD("spook_f.snd", 0xc000, 0x4000, CRC(cc04a448) SHA1(e837a7d7640aa1d2c2880616bd377b64dc8fac9d))
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("spook_4.snd", 0x0000, 0x8000, CRC(3ab517a4) SHA1(4a9dd9d571f958c270b437a1665e6d3dd3eef598))
 	ROM_LOAD("spook_6.snd", 0x8000, 0x8000, CRC(d4320bc7) SHA1(30b959f5df44d097baffc2de70b12fc767f5663b))
@@ -745,9 +793,11 @@ ROM_START(spookyi)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("spook_it.1e", 0xa000, 0x2000, CRC(cdbe248e) SHA1(2337836e01622b3fc3f31272faaebf30a608a138))
 	ROM_LOAD("spook_f.snd", 0xc000, 0x4000, CRC(cc04a448) SHA1(e837a7d7640aa1d2c2880616bd377b64dc8fac9d))
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("spook_4.snd", 0x0000, 0x8000, CRC(3ab517a4) SHA1(4a9dd9d571f958c270b437a1665e6d3dd3eef598))
 	ROM_LOAD("spook_6.snd", 0x8000, 0x8000, CRC(d4320bc7) SHA1(30b959f5df44d097baffc2de70b12fc767f5663b))
@@ -770,12 +820,15 @@ ROM_START(strsphnx)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("snd_ic24.bin", 0x0000, 0x8000, CRC(158d6f83) SHA1(281e1b13be43025be1b33dcd366cec0b36f29e5c))
 	ROM_LOAD("snd_ic25.bin", 0x8000, 0x8000, CRC(b1c9238e) SHA1(88c9df1fca94d32a0fa5d75312dabff257e867dd))
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("snd_ic05.bin", 0x0000, 0x8000, CRC(74cc4902) SHA1(e2f46bcf5446f98d098c49f8c2416292401265b9))
 	ROM_LOAD("snd_ic06.bin", 0x8000, 0x8000, CRC(a0400411) SHA1(da9de6105639c4f6174f5bc92f44e02c339a2bc3))
+
 	ROM_REGION(0x10000, "cpu4", 0)
 	ROM_LOAD("snd_ic40.bin", 0x0000, 0x8000, CRC(974ceb9c) SHA1(3665af9170a2afbe26f68e8f3cedb0d177f476c4))
 ROM_END
@@ -797,6 +850,7 @@ ROM_START(tmachzac)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sound1.d", 0xe000, 0x2000, CRC(efc1d724) SHA1(f553767c053e4854fe7839f8c8f4a7f5aefe2692))
 	ROM_LOAD("sound2.e", 0xc000, 0x1000, CRC(41881a1d) SHA1(42f8dd13c38e11c0dd3cf59c64751baaacb00ac1))
@@ -818,6 +872,7 @@ ROM_START(tmachzacg)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("tmach_de.1d", 0xe000, 0x2000, CRC(8e8c27a4) SHA1(2e418e509bc241c193564e926583b09582944233))
 	ROM_LOAD("sound2.e", 0xc000, 0x1000, CRC(41881a1d) SHA1(42f8dd13c38e11c0dd3cf59c64751baaacb00ac1))
@@ -839,6 +894,7 @@ ROM_START(tmachzacf)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("tmach_fr.1d", 0xe000, 0x2000, CRC(831203a4) SHA1(fc60086c2b9b83a47f30b028e7512090658c5700))
 	ROM_LOAD("sound2.e", 0xc000, 0x1000, CRC(41881a1d) SHA1(42f8dd13c38e11c0dd3cf59c64751baaacb00ac1))
@@ -864,51 +920,52 @@ ROM_START(zankor)
 	ROM_CONTINUE(0x6800, 0x0800)
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x7000, 0x0800)
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("1en.64", 0xa000, 0x2000, CRC(abc930cc) SHA1(6c658aae3f26db21df7b74a616cf37307dba63e3))
 	ROM_LOAD("zan_1f.128", 0xc000, 0x4000, CRC(74fcadc9) SHA1(efd6fc99d7a3ed8e59fbbafbee161af6fb527028))
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("zan_ic4.128", 0x0000, 0x4000, CRC(f34a2aaa) SHA1(5e415874f68586aa30dba9fff0dc8990c636cecd))
 	ROM_LOAD("zan_ic5.128", 0x4000, 0x4000, CRC(bf61aab0) SHA1(939266696d0562f255f0fa5068280fe6a4cf8267))
 	ROM_LOAD("zan_ic6.128", 0x8000, 0x4000, CRC(13a5b8d4) SHA1(d8c976b3f5e9c7cded0922feefa1531c59432515))
 ROM_END
 
-GAME(1986,	bbeltzac,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Black Belt (Zaccaria)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	clown,		0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Clown",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,	dvlrider,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Devil Riders",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,	dvlrideri,	dvlrider,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Devil Riders (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,	dvlriderg,	dvlrider,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Devil Riders (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	farfalla,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Farfalla",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	farfallai,	farfalla,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Farfalla (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	farfallag,	farfalla,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Farfalla (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,	mcastle,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Magic Castle",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,	mcastlei,	mcastle,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Magic Castle (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,	mcastleg,	mcastle,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Magic Castle (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,	mcastlef,	mcastle,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Magic Castle (French speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1986,	mexico,		0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Mexico 86 (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1987,	nstrphnx,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"New Star's Phoenix (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	pinchamp,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pinball Champ",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	pinchampg,	pinchamp,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pinball Champ (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	pinchampi,	pinchamp,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pinball Champ (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	pinchamp7,	pinchamp,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pinball Champ (7 digits)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	pinchamp7g,	pinchamp,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pinball Champ (7 digits German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	pinchamp7i,	pinchamp,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pinball Champ (7 digits Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	poolcham,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pool Champion",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	poolchami,	poolcham,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pool Champion (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	poolchama,	poolcham,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Pool Champion (alternate sound)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	robot,		0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Robot",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	roboti,		robot,		zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Robot (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	robotg,		robot,		zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Robot (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	robotf,		robot,		zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Robot (French speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1987,	scram_tp,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Tecnoplay",			"Scramble (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1982,	socrking,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Soccer Kings",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1982,	socrkingi,	socrking,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Soccer Kings (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1982,	socrkingg,	socrking,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Soccer Kings (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1987,	spookyp,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Spooky",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1987,	spookyi,	spookyp,		zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Spooky (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1987,	strsphnx,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Star's Phoenix (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	tmachzac,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Time Machine (Zaccaria)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	tmachzacg,	tmachzac,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Time Machine (Zaccaria German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,	tmachzacf,	tmachzac,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Time Machine (Zaccaria French speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1986,	zankor,		0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Zankor (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-
+GAME(1986,	bbeltzac,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Black Belt (Zaccaria)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	clown,		0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Clown",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,	dvlrider,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Devil Riders",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,	dvlrideri,	dvlrider, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Devil Riders (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,	dvlriderg,	dvlrider, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Devil Riders (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	farfalla,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Farfalla",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	farfallai,	farfalla, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Farfalla (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	farfallag,	farfalla, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Farfalla (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,	mcastle,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Magic Castle",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,	mcastlei,	mcastle,  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Magic Castle (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,	mcastleg,	mcastle,  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Magic Castle (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,	mcastlef,	mcastle,  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Magic Castle (French speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,	mexico,		0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Mexico 86 (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,	nstrphnx,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "New Star's Phoenix (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	pinchamp,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pinball Champ",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	pinchampg,	pinchamp, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pinball Champ (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	pinchampi,	pinchamp, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pinball Champ (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	pinchamp7,	pinchamp, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pinball Champ (7 digits)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	pinchamp7g,	pinchamp, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pinball Champ (7 digits German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	pinchamp7i,	pinchamp, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pinball Champ (7 digits Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	poolcham,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pool Champion",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	poolchami,	poolcham, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pool Champion (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	poolchama,	poolcham, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Pool Champion (alternate sound)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	robot,		0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Robot",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	roboti,		robot,	  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Robot (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	robotg,		robot,	  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Robot (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	robotf,		robot,	  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Robot (French speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,	scram_tp,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Tecnoplay",   "Scramble (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1982,	socrking,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Soccer Kings",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1982,	socrkingi,	socrking, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Soccer Kings (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1982,	socrkingg,	socrking, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Soccer Kings (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,	spookyp,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Spooky",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,	spookyi,	spookyp,  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Spooky (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,	strsphnx,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Star's Phoenix (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	tmachzac,	0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Time Machine (Zaccaria)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	tmachzacg,	tmachzac, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Time Machine (Zaccaria German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,	tmachzacf,	tmachzac, zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Time Machine (Zaccaria French speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,	zankor,		0,		  zac_2,  zac_2,  zac_2,  ROT0,    "Zaccaria",    "Zankor (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

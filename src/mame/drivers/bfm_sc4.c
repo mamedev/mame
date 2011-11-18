@@ -44,6 +44,8 @@
     -------------------------------
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "bfm_sc45.h"
@@ -53,19 +55,37 @@ class sc4_state : public driver_device
 {
 public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+};
 
+class sc4_adder4_state : public sc4_state
+{
+public:
+	sc4_adder4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sc4_state(mconfig, type, tag),
+		  m_adder4cpu(*this, "adder4")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_adder4cpu;
 };
 
 
-static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_state )
 	AM_RANGE(0x0000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x0000000, 0x80ffff) AM_RAM
-
-
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sc4_addre4_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32, sc4_adder4_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -83,10 +103,11 @@ static MACHINE_CONFIG_START( sc4, sc4_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sc4_adder4, sc4 )
+static MACHINE_CONFIG_DERIVED_CLASS( sc4_adder4, sc4, sc4_adder4_state )
 	MCFG_CPU_ADD("adder4", M68340, 25175000)	 // 68340 (CPU32 core)
-	MCFG_CPU_PROGRAM_MAP(sc4_addre4_map)
+	MCFG_CPU_PROGRAM_MAP(sc4_adder4_map)
 MACHINE_CONFIG_END
+
 
 ROM_START( sc4tst )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -26969,5 +26990,3 @@ GAME( 200?, ad4film		,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Film Premiere (Vid
 GAME( 200?, ad4filma	,ad4film,	sc4_adder4, sc4, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // ^^
 GAME( 200?, ad4ctl		,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 200?, ad4ctla		,ad4ctl,	sc4_adder4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-
-

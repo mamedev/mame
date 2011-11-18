@@ -21,6 +21,8 @@
    what appear to be i8255 issues?
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/sn76496.h"
@@ -30,23 +32,29 @@ class jpmmps_state : public driver_device
 {
 public:
 	jpmmps_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( jpmmps_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jpmmps_map, AS_PROGRAM, 8, jpmmps_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE_MODERN("ppi8255_ic26", i8255_device, read, write)
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE_MODERN("ppi8255_ic21", i8255_device, read, write)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE_MODERN("ppi8255_ic22", i8255_device, read, write)
-	AM_RANGE(0xc00c, 0xc00f) AM_DEVREADWRITE_MODERN("ppi8255_ic25", i8255_device, read, write)
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_ic26", i8255_device, read, write)
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_ic21", i8255_device, read, write)
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_ic22", i8255_device, read, write)
+	AM_RANGE(0xc00c, 0xc00f) AM_DEVREADWRITE("ppi8255_ic25", i8255_device, read, write)
 
 	AM_RANGE(0xe800, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jpmmps_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( jpmmps_io_map, AS_IO, 8, jpmmps_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
 ADDRESS_MAP_END
 
 
@@ -119,7 +127,6 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT( jpmmps )
 {
-
 }
 
 

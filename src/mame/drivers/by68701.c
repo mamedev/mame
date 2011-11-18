@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -5,11 +7,21 @@ class by68701_state : public driver_device
 {
 public:
 	by68701_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( by68701_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( by68701_map, AS_PROGRAM, 8, by68701_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x04ff) AM_RAM
@@ -20,7 +32,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( by68701 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( by68701 )
+void by68701_state::machine_reset()
 {
 }
 
@@ -32,8 +44,6 @@ static MACHINE_CONFIG_START( by68701, by68701_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(by68701_map)
-
-	MCFG_MACHINE_RESET( by68701 )
 MACHINE_CONFIG_END
 
 /*------------------
@@ -115,6 +125,7 @@ ROM_START(eballdlxp4)
 	ROM_RELOAD(0xe800, 0x0800)
 	ROM_LOAD("838-16_5.532", 0xf000, 0x1000, CRC(63d92025) SHA1(2f8e8435326a39064b99b9971b0d8944586571fb))
 ROM_END
+
 
 GAME(1981,	flashgdnp1,	flashgdn,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Flash Gordon (prototype rev. 1)",		 GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	flashgdnp2,	flashgdn,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Flash Gordon (prototype rev. 2)",		 GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

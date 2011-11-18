@@ -12,6 +12,8 @@
 
 ****************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "machine/idectrl.h"
@@ -21,33 +23,46 @@ class vp10x_state : public driver_device
 {
 public:
 	vp10x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+	DECLARE_READ32_MEMBER(tty_ready_r);
+	DECLARE_WRITE32_MEMBER(tty_w);
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static SCREEN_UPDATE( vp101 )
+void vp10x_state::video_start()
+{
+}
+
+bool vp10x_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static VIDEO_START( vp101 )
-{
-}
-
-static READ32_HANDLER(tty_ready_r)
+READ32_MEMBER(vp10x_state::tty_ready_r)
 {
 	return 0x60;	// must return &0x20 for output at tty_w to continue
 }
 
-static WRITE32_HANDLER(tty_w)	// set breakpoint at bfc01430 to catch when it's printing things
+WRITE32_MEMBER(vp10x_state::tty_w)	// set breakpoint at bfc01430 to catch when it's printing things
 {
 // uncomment to see startup messages - it says "RAM OK" and "EPI RSS Ver 4.5.1" followed by "<RSS active>" and then lots of dots
 // Special Forces also says "<inited tv_cap> = 00000032"
 //  printf("%c", data);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, vp10x_state )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM				// this is a sufficient amount to get "RAM OK"
 	AM_RANGE(0x1c000000, 0x1c000003) AM_WRITE(tty_w)		// RSS OS code uses this one
 	AM_RANGE(0x1c000014, 0x1c000017) AM_READ(tty_ready_r)
@@ -77,11 +92,9 @@ static MACHINE_CONFIG_START( vp101, vp10x_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(vp101)
 	MCFG_PALETTE_LENGTH(32768)
-
-	MCFG_VIDEO_START(vp101)
 MACHINE_CONFIG_END
+
 
 ROM_START(jnero)
 	ROM_REGION(0x100000, "maincpu", 0)	/* Boot ROM */
@@ -102,6 +115,6 @@ ROM_START(specfrce)
 	DISK_IMAGE_READONLY("sf010101", 0, SHA1(59b5e3d8e1d5537204233598830be2066aad0556) )
 ROM_END
 
-GAME( 2002, specfrce, 0, vp101, vp101, 0, ROT0, "ICE/Play Mechanix", "Special Forces Elite Training", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, jnero, 0, vp101, vp101, 0, ROT0, "ICE/Play Mechanix", "Johnny Nero Action Hero", GAME_NOT_WORKING|GAME_NO_SOUND )
 
+GAME( 2002,  specfrce,  0,  vp101,  vp101,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training",   GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004,  jnero,     0,  vp101,  vp101,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero",         GAME_NOT_WORKING|GAME_NO_SOUND )

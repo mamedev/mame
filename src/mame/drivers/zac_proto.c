@@ -1,6 +1,8 @@
 /*
     Zaccaria Prototype
 */
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
 
@@ -8,18 +10,28 @@ class zac_proto_state : public driver_device
 {
 public:
 	zac_proto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+
+protected:
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( zac_proto_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zac_proto_map, AS_PROGRAM, 8, zac_proto_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zac_proto )
 INPUT_PORTS_END
 
-static MACHINE_RESET( zac_proto )
+void zac_proto_state::machine_reset()
 {
 }
 
@@ -31,8 +43,6 @@ static MACHINE_CONFIG_START( zac_proto, zac_proto_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SCMP, 1000000)
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
-
-	MCFG_MACHINE_RESET( zac_proto )
 MACHINE_CONFIG_END
 
 /*--------------------------------
@@ -68,7 +78,6 @@ ROM_START(spacecty)
 	ROM_LOAD("zsc4.dat", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
 ROM_END
 
-GAME(1978,	skijump,	0,		zac_proto,	zac_proto,	zac_proto,	ROT0,	"Zaccaria",				"Ski Jump",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1979,	spacecty,	0,		zac_proto,	zac_proto,	zac_proto,	ROT0,	"Zaccaria",				"Space City",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1978,	strike,		0,		zac_proto,	zac_proto,	zac_proto,	ROT0,	"Zaccaria",				"Strike",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Ski Jump",        GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Space City",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1978,  strike,    0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Strike",          GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

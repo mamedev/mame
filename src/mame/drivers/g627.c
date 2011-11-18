@@ -5,6 +5,9 @@
 
     Only one of it's kind
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -12,18 +15,28 @@ class g627_state : public driver_device
 {
 public:
 	g627_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( g627_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( g627_map, AS_PROGRAM, 8, g627_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( g627 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( g627 )
+void g627_state::machine_reset()
 {
 }
 
@@ -35,8 +48,6 @@ static MACHINE_CONFIG_START( g627, g627_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
 	MCFG_CPU_PROGRAM_MAP(g627_map)
-
-	MCFG_MACHINE_RESET( g627 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -49,4 +60,5 @@ ROM_START(rotation)
 	ROM_LOAD("rot-c117.dat", 0x1000, 0x0800, CRC(3321ff08) SHA1(d6d94fea27ef58ca648b2829b32d62fcec108c9b))
 ROM_END
 
-GAME(1978,	rotation,	0,	g627,	g627,	g627,	ROT0,	"Midway",	"Rotation VIII",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+
+GAME(1978,  rotation,  0,  g627,  g627,  g627,  ROT0,  "Midway",    "Rotation VIII",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

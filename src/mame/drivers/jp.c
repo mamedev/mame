@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -5,18 +7,28 @@ class jp_state : public driver_device
 {
 public:
 	jp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( jp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jp_map, AS_PROGRAM, 8, jp_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jp )
 INPUT_PORTS_END
 
-static MACHINE_RESET( jp )
+void jp_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( jp, jp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(jp_map)
-
-	MCFG_MACHINE_RESET( jp )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
@@ -14,27 +16,39 @@ class neptunp2_state : public driver_device
 {
 public:
 	neptunp2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+	DECLARE_READ8_MEMBER(test_r);
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static VIDEO_START( neptunp2 )
+void neptunp2_state::video_start()
 {
 
 }
 
-static SCREEN_UPDATE( neptunp2 )
+bool neptunp2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static READ8_HANDLER( test_r )
+READ8_MEMBER( neptunp2_state::test_r )
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static ADDRESS_MAP_START( neptunp2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( neptunp2_map, AS_PROGRAM, 8, neptunp2_state )
 	AM_RANGE(0x00000, 0xbffff) AM_ROM
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM
 
@@ -51,12 +65,11 @@ static ADDRESS_MAP_START( neptunp2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( neptunp2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( neptunp2_io, AS_IO, 8, neptunp2_state )
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( neptunp2 )
-
 INPUT_PORTS_END
 
 #if 0
@@ -91,11 +104,8 @@ static MACHINE_CONFIG_START( neptunp2, neptunp2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(neptunp2)
 	MCFG_GFXDECODE(neptunp2)
 	MCFG_PALETTE_LENGTH(512)
-
-	MCFG_VIDEO_START(neptunp2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -122,5 +132,6 @@ ROM_START( neptunp2 )
 	ROM_REGION( 0x10000, "gfx", 0 )
 	ROM_LOAD( "flash_roms", 0x00000, 0x10000, NO_DUMP )
 ROM_END
+
 
 GAME( 199?, neptunp2,  0,   neptunp2, neptunp2,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", GAME_NOT_WORKING | GAME_NO_SOUND )

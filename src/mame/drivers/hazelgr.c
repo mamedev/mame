@@ -3,6 +3,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -10,14 +12,20 @@ class haze_state : public driver_device
 {
 public:
 	haze_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
 
-static ADDRESS_MAP_START( haze_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( haze_map, AS_PROGRAM, 8, haze_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
-
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -27,7 +35,6 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( haze, haze_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(haze_map)
@@ -40,4 +47,5 @@ ROM_START( hg_frd )
 	ROM_LOAD( "fd v 3-2 c.bin", 0x1000, 0x0800, CRC(77bb8d8c) SHA1(65b7dd8024747175c3bd5bc341e2e1a92699f1c6) )
 ROM_END
 
-GAME( 198?, hg_frd	, 0			,  haze		, haze	, 0	, 0,		 "Hazel Grove",      "Fruit Deuce (Hazel Grove)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
+
+GAME( 198?,  hg_frd,  0,  haze,  haze,  0,  ROT0,  "Hazel Grove",    "Fruit Deuce (Hazel Grove)",     GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)

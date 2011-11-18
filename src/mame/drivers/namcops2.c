@@ -20,6 +20,8 @@
 
 ***************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
@@ -29,21 +31,31 @@ class namcops2_state : public driver_device
 {
 public:
 	namcops2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static VIDEO_START(system246)
+void namcops2_state::video_start()
 {
 }
 
-static SCREEN_UPDATE(system246)
+bool namcops2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START(ps2_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(ps2_map, AS_PROGRAM, 32, namcops2_state)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM	// 32 MB RAM in consumer PS2s, do these have more?
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
@@ -68,11 +80,8 @@ static MACHINE_CONFIG_START( system246, namcops2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE(system246)
 
 	MCFG_PALETTE_LENGTH(65536)
-
-	MCFG_VIDEO_START(system246)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system256, system246 )
@@ -373,4 +382,3 @@ GAME(2005, tekken51,   sys256, system256, system246, 0, ROT0, "Namco", "Tekken 5
 GAME(2006, kinniku,    sys256, system256, system246, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2006, taiko9,     sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2007, taiko10,    sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
-

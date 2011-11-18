@@ -37,6 +37,8 @@ Viking?s Fun Mill
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -45,11 +47,17 @@ class belatra_state : public driver_device
 {
 public:
 	belatra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( belatra_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( belatra_map, AS_PROGRAM, 32, belatra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -63,6 +71,7 @@ static MACHINE_CONFIG_START( belatra, belatra_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
 MACHINE_CONFIG_END
+
 
 ROM_START( merryjn )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -118,5 +127,3 @@ GAME( 2004, ldrink		,0,			belatra, belatra, 0, ROT0, "Belatra","Lucky Drink (set
 GAME( 2004, ldrinka		,ldrink,	belatra, belatra, 0, ROT0, "Belatra","Lucky Drink (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2004, merryjn		,0,			belatra, belatra, 0, ROT0, "Belatra","Merry Joiner", GAME_NOT_WORKING|GAME_NO_SOUND )
-
-

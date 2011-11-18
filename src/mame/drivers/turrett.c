@@ -57,6 +57,8 @@ Windows showed a 5.94 gig partion empty and a 12.74 unallocated partition
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/mips/r3000.h"
 
@@ -65,26 +67,35 @@ class turrett_state : public driver_device
 {
 public:
 	turrett_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
 #define R3041_CLOCK		25000000
 
 
-static VIDEO_START(turrett)
+void turrett_state::video_start()
 {
-
 }
 
-static SCREEN_UPDATE(turrett)
+bool turrett_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, turrett_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x02000010, 0x02000013) AM_RAM
@@ -125,11 +136,8 @@ static MACHINE_CONFIG_START( turrett, turrett_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(turrett)
 
 	MCFG_PALETTE_LENGTH(0x2000)
-
-	MCFG_VIDEO_START(turrett)
 MACHINE_CONFIG_END
 
 

@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -5,10 +7,20 @@ class inder_state : public driver_device
 {
 public:
 	inder_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
-static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -16,7 +28,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( inder )
 INPUT_PORTS_END
 
-static MACHINE_RESET( inder )
+void inder_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( inder, inder_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(inder_map)
-
-	MCFG_MACHINE_RESET( inder )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

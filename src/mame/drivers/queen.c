@@ -19,6 +19,8 @@ processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
@@ -27,22 +29,32 @@ class queen_state : public driver_device
 {
 public:
 	queen_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static VIDEO_START(queen)
+void queen_state::video_start()
 {
 
 }
 
-static SCREEN_UPDATE(queen)
+bool queen_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START( queen_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( queen_map, AS_PROGRAM, 32, queen_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000fffff) AM_ROM AM_REGION("bios", 0) AM_WRITENOP
@@ -55,7 +67,7 @@ static ADDRESS_MAP_START( queen_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(queen_io, AS_IO, 32)
+static ADDRESS_MAP_START( queen_io, AS_IO, 32, queen_state )
 	AM_RANGE(0x0000, 0x001f) AM_RAM//AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_RAM//AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_RAM//AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
@@ -92,11 +104,8 @@ static MACHINE_CONFIG_START( queen, queen_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(queen)
 
 	MCFG_PALETTE_LENGTH(0x200)
-
-	MCFG_VIDEO_START(queen)
 MACHINE_CONFIG_END
 
 

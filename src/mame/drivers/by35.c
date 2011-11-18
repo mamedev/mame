@@ -1,6 +1,9 @@
 /*
     Bally MPU AS-2518-35
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -8,11 +11,21 @@ class by35_state : public driver_device
 {
 public:
 	by35_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8, by35_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
@@ -23,7 +36,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( by35 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( by35 )
+void by35_state::machine_reset()
 {
 }
 
@@ -35,8 +48,6 @@ static MACHINE_CONFIG_START( by35, by35_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(by35_map)
-
-	MCFG_MACHINE_RESET( by35 )
 MACHINE_CONFIG_END
 
 /*--------------------------------

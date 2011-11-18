@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
@@ -5,10 +7,21 @@ class allied_state : public driver_device
 {
 public:
 	allied_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
-static ADDRESS_MAP_START( allied_map, AS_PROGRAM, 8 )
+
+static ADDRESS_MAP_START( allied_map, AS_PROGRAM, 8, allied_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1400, 0x1fff) AM_ROM
@@ -17,7 +30,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( allied )
 INPUT_PORTS_END
 
-static MACHINE_RESET( allied )
+void allied_state::machine_reset()
 {
 }
 
@@ -29,9 +42,8 @@ static MACHINE_CONFIG_START( allied, allied_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6504, 3572549/4)
 	MCFG_CPU_PROGRAM_MAP(allied_map)
-
-	MCFG_MACHINE_RESET( allied )
 MACHINE_CONFIG_END
+
 
 ROM_START( allied )
     ROM_REGION( 0x10000, "maincpu", 0 )
@@ -52,6 +64,7 @@ ROM_END
 #define rom_circa33     rom_allied
 #define rom_starshot    rom_allied
 
+
 GAME(1977,	allied, 	0,			allied, allied, allied, ROT0,	"Allied Leisure",				"Allied System",				GAME_IS_BIOS_ROOT)
 GAME(1977,	suprpick,	allied,		allied,	allied,	allied,	ROT0,	"Allied Leisure",				"Super Picker",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1977,	royclark,	allied,		allied,	allied,	allied,	ROT0,	"Fascination Int.",				"Roy Clark - The Entertainer",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
@@ -64,4 +77,3 @@ GAME(1979,	disco79,	allied,		allied,	allied,	allied,	ROT0,	"Allied Leisure",				
 GAME(1979,	erosone,	allied,		allied,	allied,	allied,	ROT0,	"Fascination Int.",				"Eros One",						GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	circa33,	allied,		allied,	allied,	allied,	ROT0,	"Fascination Int.",				"Circa 1933",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	starshot,	allied,		allied,	allied,	allied,	ROT0,	"Allied Leisure",				"Star Shooter",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-

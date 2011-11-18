@@ -2,6 +2,8 @@
     Capcom A0015405
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
@@ -9,18 +11,28 @@ class capcom_state : public driver_device
 {
 public:
 	capcom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( capcom_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( capcom_map, AS_PROGRAM, 16, capcom_state )
 	AM_RANGE(0x0000, 0xffffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( capcom )
 INPUT_PORTS_END
 
-static MACHINE_RESET( capcom )
+void capcom_state::machine_reset()
 {
 }
 
@@ -32,8 +44,6 @@ static MACHINE_CONFIG_START( capcom, capcom_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16670000) // M68306
 	MCFG_CPU_PROGRAM_MAP(capcom_map)
-
-	MCFG_MACHINE_RESET( capcom )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -276,6 +286,7 @@ ROM_START(ghv101)
 	ROM_LOAD16_BYTE("u17_v10.bin", 0x400000, 0x80000, CRC(b6a39327))
 	ROM_REGION(0x00500000, "maincpu", ROMREGION_ERASEFF)
 ROM_END
+
 
 GAME(1996,	abv106,		0,		capcom,	capcom,	capcom,	ROT0,	"Capcom",		"Airborne",						GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1996,	abv106r,	abv106,	capcom,	capcom,	capcom,	ROT0,	"Capcom",		"Airborne (Redemption)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

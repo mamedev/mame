@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/i8085/i8085.h"
@@ -7,11 +9,21 @@ class bingo_state : public driver_device
 {
 public:
 	bingo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
+	
 
-
-static ADDRESS_MAP_START( bingo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bingo_map, AS_PROGRAM, 8, bingo_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x0000, 0x1eff) AM_ROM
 	AM_RANGE(0x1f00, 0x1fff) AM_RAM
@@ -20,7 +32,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( bingo )
 INPUT_PORTS_END
 
-static MACHINE_RESET( bingo )
+void bingo_state::machine_reset()
 {
 }
 
@@ -32,25 +44,33 @@ static MACHINE_CONFIG_START( bingo, bingo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 1000000)
 	MCFG_CPU_PROGRAM_MAP(bingo_map)
-
-	MCFG_MACHINE_RESET( bingo )
 MACHINE_CONFIG_END
 
 class seeben_state : public driver_device
 {
 public:
 	seeben_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
+	
 
-
-static ADDRESS_MAP_START( seeben_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( seeben_map, AS_PROGRAM, 8, seeben_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( seeben )
 INPUT_PORTS_END
 
-static MACHINE_RESET( seeben )
+void seeben_state::machine_reset()
 {
 }
 
@@ -62,19 +82,26 @@ static MACHINE_CONFIG_START( seeben, seeben_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 1000000)
 	MCFG_CPU_PROGRAM_MAP(seeben_map)
-
-	MCFG_MACHINE_RESET( seeben )
 MACHINE_CONFIG_END
 
 class splin_state : public driver_device
 {
 public:
 	splin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-};
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
+};	
 
-
-static ADDRESS_MAP_START( splin_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( splin_map, AS_PROGRAM, 16, splin_state )
 	AM_RANGE(0x00000, 0x0bfff) AM_RAM
 	AM_RANGE(0x0d900, 0x0d9ff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
@@ -83,7 +110,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( splin )
 INPUT_PORTS_END
 
-static MACHINE_RESET( splin )
+void splin_state::machine_reset()
 {
 }
 
@@ -95,8 +122,6 @@ static MACHINE_CONFIG_START( splin, splin_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80186, 8000000)
 	MCFG_CPU_PROGRAM_MAP(splin_map)
-
-	MCFG_MACHINE_RESET( splin )
 MACHINE_CONFIG_END
 
 ROM_START(cntinntl)
@@ -266,6 +291,7 @@ ROM_START(tripjok)
 	ROM_LOAD( "13006-2", 0x0000, 0x4000, CRC(c7104e8f) SHA1(a3737f70cb9c97df24b5da915ef53b6d30f2470d))
 ROM_END
 
+	
 GAME(1980,	cntinntl,		0,			bingo,	bingo,	bingo,	ROT0,	"Bally",		"Continental (Bingo)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(19??,	goldgame,		0,			splin,	splin,	splin,	ROT0,	"Splin",		"Golden Game (Bingo)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(19??,	goldgkitb,		goldgame,	splin,	splin,	splin,	ROT0,	"Splin",		"Golden Game Kit Bingo Stake 6/10 (Bingo)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

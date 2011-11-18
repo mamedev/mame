@@ -34,6 +34,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -42,10 +44,17 @@ class mpu2_state : public driver_device
 {
 public:
 	mpu2_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mpu2_basemap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpu2_basemap, AS_PROGRAM, 8, mpu2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff) // A14/A15 Not Connected
 	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_REGION("maskrom", 0)
 	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("romp1", 0)
@@ -89,5 +98,5 @@ ROM_START( m2svlite )
 	ROM_LOAD( "sl1.bin", 0x0000, 0x0800, CRC(afe04b5a) SHA1(3b3385a9b039992279fda5b87926b5089a448581) )
 ROM_END
 
-GAME( 198?, m2hilite,   0		 , mpu2,    mpu2,    0, 	ROT0,  "Barcrest", "Hi-Lights (Barcrest) (MPU2)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 198?, m2svlite,   0		 , mpu2,    mpu2,    0, 	ROT0,  "Barcrest", "Silver Lights (Barcrest) (MPU2)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(198?,  m2hilite,  0, mpu2,  mpu2,  0,  ROT0,  "Barcrest",    "Hi-Lights (Barcrest) (MPU2)",         GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(198?,  m2svlite,  0, mpu2,  mpu2,  0,  ROT0,  "Barcrest",    "Silver Lights (Barcrest) (MPU2)",     GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

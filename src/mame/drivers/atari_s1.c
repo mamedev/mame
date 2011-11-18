@@ -1,6 +1,9 @@
 /*
     Atari Generation/System 1
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -9,10 +12,20 @@ class atari_s1_state : public driver_device
 {
 public:
 	atari_s1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
-static ADDRESS_MAP_START( atari_s1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atari_s1_map, AS_PROGRAM, 8, atari_s1_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
@@ -23,7 +36,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( atari_s1 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( atari_s1 )
+void atari_s1_state::machine_reset()
 {
 }
 
@@ -35,8 +48,6 @@ static MACHINE_CONFIG_START( atari_s1, atari_s1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(atari_s1_map)
-
-	MCFG_MACHINE_RESET( atari_s1 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -93,6 +104,7 @@ ROM_START(spcrider)
 	ROM_LOAD("spacer.bin", 0x7000, 0x0800, CRC(3cf1cd73) SHA1(c46044fb815b439f12fb3e21c470c8b93ebdfd55))
 	ROM_LOAD("spacel.bin", 0x7800, 0x0800, CRC(66ffb04e) SHA1(42d8b7fb7206b30478f631d0e947c0908dcf5419))
 ROM_END
+
 
 GAME( 1976, atarians, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","The Atarians", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 //GAME( 2002, atarianb, atarians,   atari_s1, atari_s1, atari_s1, ROT0, "Atari / Gaston","The Atarians (working bootleg)",  GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

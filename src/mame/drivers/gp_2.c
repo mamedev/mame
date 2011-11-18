@@ -1,6 +1,9 @@
 /*
     Game Plan MPU-2
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -8,18 +11,28 @@ class gp_2_state : public driver_device
 {
 public:
 	gp_2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( gp_2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gp_2_map, AS_PROGRAM, 8, gp_2_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gp_2 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( gp_2 )
+void gp_2_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( gp_2, gp_2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2457600)
 	MCFG_CPU_PROGRAM_MAP(gp_2_map)
-
-	MCFG_MACHINE_RESET( gp_2 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -237,6 +248,7 @@ ROM_START(vegasgp)
 	ROM_LOAD( "140b.13", 0x0800, 0x0800, CRC(cf26d67b) SHA1(05481e880e23a7bc1d1716b52ac1effc0db437f2))
 ROM_END
 
+
 GAME(1984,	agent777,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Agents 777",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	andromep,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	andromepa,	andromep,	gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda (alternate set)",GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
@@ -253,4 +265,3 @@ GAME(1983,	sshootr2,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Sharp Shooter II
 GAME(1979,	sshootep,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Sharpshooter",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	suprnova,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Super Nova",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	vegasgp,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Vegas (Game Plan)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-

@@ -1,6 +1,9 @@
 /*
     DataEast/Sega Version 2
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -8,18 +11,28 @@ class de_2_state : public driver_device
 {
 public:
 	de_2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( de_2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( de_2_map, AS_PROGRAM, 8, de_2_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( de_2 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( de_2 )
+void de_2_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( de_2, de_2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(de_2_map)
-
-	MCFG_MACHINE_RESET( de_2 )
 MACHINE_CONFIG_END
 
 /*-----------------------------------------------------------------------------------

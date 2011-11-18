@@ -4,6 +4,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/i86/i86.h"
@@ -12,17 +14,41 @@ class gts80a_state : public driver_device
 {
 public:
 	gts80a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
-static ADDRESS_MAP_START( gts80a_map, AS_PROGRAM, 8 )
+class caveman_state : public gts80a_state
+{
+public:
+	caveman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gts80a_state(mconfig, type, tag),
+		  m_videocpu(*this, "videocpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_videocpu;
+};
+
+static ADDRESS_MAP_START( gts80a_map, AS_PROGRAM, 8, gts80a_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0xc000) AM_ROM	/* PROM */
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_ROM	/* u2 ROM */
 	AM_RANGE(0x3000, 0x3fff) AM_MIRROR(0xc000) AM_ROM	/* u3 ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( caveman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( caveman_map, AS_PROGRAM, 8, gts80a_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0xc000) AM_ROM	/* PROM */
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_ROM	/* u2 ROM */
@@ -35,7 +61,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( caveman )
 INPUT_PORTS_END
 
-static MACHINE_RESET( gts80a )
+void gts80a_state::machine_reset()
 {
 }
 
@@ -48,8 +74,6 @@ static MACHINE_CONFIG_START( gts80a_s, gts80a_state )
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80a_map)
 
-	MCFG_MACHINE_RESET( gts80a )
-
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_s)
 MACHINE_CONFIG_END
@@ -59,28 +83,24 @@ static MACHINE_CONFIG_START( gts80a_ss, gts80a_state )
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80a_map)
 
-	MCFG_MACHINE_RESET( gts80a )
-
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_ss)
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( video_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( video_map, AS_PROGRAM, 16, caveman_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x08000, 0x0ffff) AM_ROM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( video_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( video_io_map, AS_IO, 16, caveman_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( caveman, gts80a_state )
+static MACHINE_CONFIG_START( caveman, caveman_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(caveman_map)
-
-	MCFG_MACHINE_RESET( gts80a )
 
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_ss)
@@ -628,6 +648,7 @@ ROM_START(touchdn)
 	ROM_LOAD("688-s.snd", 0x0800, 0x0800, CRC(5e9988a6) SHA1(5f531491722d3c30cf4a7c17982813a7c548387a))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
+
 
 /* disp3 */GAME(1984,	alienstr,	0,		gts80a_s,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Alien Star",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 /* disp3 */GAME(1983,	amazonh,	0,		gts80a_ss,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Amazon Hunt",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

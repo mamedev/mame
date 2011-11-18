@@ -8,6 +8,8 @@ Possibly related to ADP hardware?
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
@@ -15,32 +17,32 @@ class stellafr_state : public driver_device
 {
 public:
 	stellafr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
 
-static ADDRESS_MAP_START( stellafr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( stellafr_map, AS_PROGRAM, 16, stellafr_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-
-
-
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( stellafr )
-
 INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( stellafr, stellafr_state )
-
 	MCFG_CPU_ADD("maincpu", M68000, 10000000 ) //?
 	MCFG_CPU_PROGRAM_MAP(stellafr_map)
-
 MACHINE_CONFIG_END
-
 
 
 
@@ -57,5 +59,5 @@ ROM_START( st_vulkn )
 ROM_END
 
 
-GAME( 199?, st_ohla,    0,        stellafr,    stellafr,    0, ROT0,  "Stella", "Oh La La (Stella)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, st_vulkn,   0,        stellafr,    stellafr,    0, ROT0,  "Stella", "Vulkan (Stella)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  st_ohla,   0,  stellafr,  stellafr,  0,  ROT0,  "Stella",    "Oh La La (Stella)",    GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  st_vulkn,  0,  stellafr,  stellafr,  0,  ROT0,  "Stella",    "Vulkan (Stella)",      GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

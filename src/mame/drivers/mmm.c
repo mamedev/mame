@@ -4,6 +4,8 @@
  Z80 based Fruit Machine
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -11,12 +13,19 @@ class mmm_state : public driver_device
 {
 public:
 	mmm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
 
-static ADDRESS_MAP_START( mmm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mmm_map, AS_PROGRAM, 8, mmm_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -26,11 +35,11 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( mmm, mmm_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mmm_map)
 MACHINE_CONFIG_END
+
 
 ROM_START( mmm_ldip )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -40,4 +49,5 @@ ROM_START( mmm_ldip )
 	ROM_LOAD( "ld4.bin", 0x3000, 0x001000, CRC(970b749f) SHA1(fe6da7abc699db69c0761304f588b5bed899c674) )
 ROM_END
 
-GAME( 198?, mmm_ldip	, 0			,  mmm		, mmm	, 0	, 0,		 "Maygay",      "Lucky Dip (Maygay)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
+
+GAME( 198?,  mmm_ldip,  0,  mmm,  mmm,  0,  ROT0,  "Maygay",    "Lucky Dip (Maygay)",    GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)

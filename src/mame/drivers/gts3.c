@@ -1,6 +1,9 @@
 /*
     Gottlieb System 3
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6502/m65ce02.h"
 
@@ -8,18 +11,28 @@ class gts3_state : public driver_device
 {
 public:
 	gts3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( gts3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gts3_map, AS_PROGRAM, 8, gts3_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts3 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( gts3 )
+void gts3_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( gts3, gts3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(gts3_map)
-
-	MCFG_MACHINE_RESET( gts3 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

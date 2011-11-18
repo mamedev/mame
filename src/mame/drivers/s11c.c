@@ -1,6 +1,9 @@
 /*
     Williams System 11c
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -8,18 +11,28 @@ class williams_s11c_state : public driver_device
 {
 public:
 	williams_s11c_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( williams_s11c_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_s11c_map, AS_PROGRAM, 8, williams_s11c_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( williams_s11c )
 INPUT_PORTS_END
 
-static MACHINE_RESET( williams_s11c )
+void williams_s11c_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( williams_s11c, williams_s11c_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(williams_s11c_map)
-
-	MCFG_MACHINE_RESET( williams_s11c )
 MACHINE_CONFIG_END
 
 /*--------------------
@@ -332,6 +343,7 @@ ROM_START(strax_p7)
 	ROM_LOAD("pfrc_u19.l1", 0x10000, 0x8000, CRC(abc4caeb) SHA1(6faef2de9a49a1015b4038ab18849de2f25dbded))
 	ROM_RELOAD(0x10000+0x8000, 0x8000)
 ROM_END
+
 
 GAME(1990,	bbnny_l2,	0,			williams_s11c,	williams_s11c,	williams_s11c,	ROT0,	"Bally",				"Bugs Bunny Birthday Ball (L-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1990,	bbnny_lu,	bbnny_l2,	williams_s11c,	williams_s11c,	williams_s11c,	ROT0,	"Bally",				"Bugs Bunny Birthday Ball (LU-2) European",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

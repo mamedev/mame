@@ -8,6 +8,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/arm7/arm7.h"
@@ -18,13 +20,18 @@ class konendev_state : public driver_device
 {
 public:
 	konendev_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
-
-static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
 ADDRESS_MAP_END
 
@@ -157,11 +164,11 @@ DRIVER_INIT( konendev )
 {
 	UINT8 *src = machine.region( "maincpu" )->base();
 	size_t  srcsize = machine.region( "maincpu" )->bytes();
-	for (int i=0;i<srcsize;i+=2)
+	for (int i = 0; i < srcsize; i += 2)
 	{
 		int temp = src[i];
-		src[i] = src[i+1];
-		src[i+1] = temp;
+		src[i] = src[i + 1];
+		src[i + 1] = temp;
 	}
 }
 
@@ -185,5 +192,3 @@ GAME( 200?, showqn,		0,        konendev,    konendev,    konendev, ROT0,  "Konam
 GAME( 200?, spiceup,	0,        konendev,    konendev,    konendev, ROT0,  "Konami", "Spice It Up (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sultanw,	0,        konendev,    konendev,    konendev, ROT0,  "Konami", "Sultan's Wish (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, konzero,	0,        konendev,    konendev,    konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND ) // doesn't seem to have a title string in it?
-
-

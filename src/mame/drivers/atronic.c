@@ -11,6 +11,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -19,19 +21,23 @@ class atronic_state : public driver_device
 {
 public:
 	atronic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
-
-
-static ADDRESS_MAP_START( atronic_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atronic_map, AS_PROGRAM, 8, atronic_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atronic_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( atronic_portmap, AS_IO, 8, atronic_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

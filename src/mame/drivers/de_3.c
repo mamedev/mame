@@ -1,6 +1,9 @@
 /*
     DataEast/Sega Version 3
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "audio/decobsmt.h"
@@ -15,19 +18,25 @@ public:
 		m_decobsmt(*this, "decobsmt")
     { }
 
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<decobsmt_device> m_decobsmt;
+	
+protected:
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( de_3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( de_3_map, AS_PROGRAM, 8, de_3_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( de_3 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( de_3 )
+void de_3_state::machine_reset()
 {
 }
 
@@ -39,8 +48,6 @@ static MACHINE_CONFIG_START( de_3, de_3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(de_3_map)
-
-	MCFG_MACHINE_RESET( de_3 )
 
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
@@ -784,6 +791,7 @@ ROM_START(wwfr_103)
 	ROM_LOAD("wfsndu21.400", 0x080000, 0x80000, CRC(242dcdcb) SHA1(af7220e14b0956ef40f75b2749eb1b9d715a1af0))
 	ROM_LOAD("wfsndu36.400", 0x100000, 0x80000, CRC(39db8d85) SHA1(a55dd88fd4d9154b523dca9160bf96119af1f94d))
 ROM_END
+
 
 GAME(1983,	rab_320,		0,			de_3,	de_3,	de_3,	ROT0,	"Data East",	"Adventures of Rocky and Bullwinkle and Friends (3.20)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1993,	rab_130,		rab_320,	de_3,	de_3,	de_3,	ROT0,	"Data East",	"Adventures of Rocky and Bullwinkle and Friends (1.30)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

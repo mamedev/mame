@@ -5,6 +5,7 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
@@ -15,19 +16,25 @@ class bgt_state : public driver_device
 {
 public:
 	bgt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START( bgt_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bgt_map, AS_PROGRAM, 16, bgt_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( bgt_io, AS_IO, 16 )
+static ADDRESS_MAP_START( bgt_io, AS_IO, 16, bgt_state )
 ADDRESS_MAP_END
 
 
@@ -82,9 +89,7 @@ ROM_START( bg_maxa )
 ROM_END
 
 
-
-
-GAME( 199?, bg_ddb		,0			,bgt	,bgt	,0	,ROT0	,"BGT", "Ding Dong Bells (BGT)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, bg_barmy	,0			,bgt	,bgt	,0	,ROT0	,"BGT", "Barmy Army (BGT)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, bg_max		,0			,bgt	,bgt	,0	,ROT0	,"BGT", "Max A Million (BGT) (set 1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, bg_maxa		,bg_max		,bgt	,bgt	,0	,ROT0	,"BGT", "Max A Million (BGT) (set 2)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, bg_ddb,    0,       bgt,  bgt,  0,  ROT0,  "BGT",    "Ding Dong Bells (BGT)",          GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, bg_barmy,  0,       bgt,  bgt,  0,  ROT0,  "BGT",    "Barmy Army (BGT)",               GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, bg_max,    0,       bgt,  bgt,  0,  ROT0,  "BGT",    "Max A Million (BGT) (set 1)",    GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, bg_maxa,   bg_max,  bgt,  bgt,  0,  ROT0,  "BGT",    "Max A Million (BGT) (set 2)",    GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

@@ -1,6 +1,9 @@
 /*
     Atari Generation/System 3
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -8,11 +11,21 @@ class atari_s3_state : public driver_device
 {
 public:
 	atari_s3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( atari_s3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atari_s3_map, AS_PROGRAM, 8, atari_s3_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
@@ -23,7 +36,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( atari_s3 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( atari_s3 )
+void atari_s3_state::machine_reset()
 {
 }
 
@@ -35,8 +48,6 @@ static MACHINE_CONFIG_START( atari_s3, atari_s3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(atari_s3_map)
-
-	MCFG_MACHINE_RESET( atari_s3 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -55,4 +66,5 @@ ROM_START(roadrunr)
     ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
-GAME( 1979, roadrunr, 0, atari_s3, atari_s3, atari_s3, ROT0, "Atari","Road Runner", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+
+GAME( 1979,  roadrunr,  0,  atari_s3,  atari_s3,  atari_s3,  ROT0,  "Atari",    "Road Runner",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

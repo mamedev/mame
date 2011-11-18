@@ -16,6 +16,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
@@ -24,15 +26,22 @@ class jpms80_state : public driver_device
 {
 public:
 	jpms80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( jpms80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jpms80_map, AS_PROGRAM, 8, jpms80_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jpms80_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( jpms80_io_map, AS_IO, 8, jpms80_state )
 
 ADDRESS_MAP_END
 
@@ -57,7 +66,6 @@ static const ay8910_interface ay8910_interface_jpm =
 #define SOUND_CLOCK 2000000
 
 static MACHINE_CONFIG_START( jpms80, jpms80_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS9995, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(jpms80_map)
@@ -68,16 +76,15 @@ static MACHINE_CONFIG_START( jpms80, jpms80_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_CONFIG(ay8910_interface_jpm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START( jpms_older_e00_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jpms_older_e00_map, AS_PROGRAM, 8, jpms80_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jpms_older_e00_io, AS_IO, 8 )
+static ADDRESS_MAP_START( jpms_older_e00_io, AS_IO, 8, jpms80_state )
 ADDRESS_MAP_END
 
 
@@ -87,12 +94,12 @@ static MACHINE_CONFIG_START( jpms_older_e00, jpms80_state )
 	MCFG_CPU_IO_MAP(jpms_older_e00_io)
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( jpms_older_c00_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jpms_older_c00_map, AS_PROGRAM, 8, jpms80_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0eff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jpms_older_c00_io, AS_IO, 8 )
+static ADDRESS_MAP_START( jpms_older_c00_io, AS_IO, 8, jpms80_state )
 ADDRESS_MAP_END
 
 
@@ -105,10 +112,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT( jpms80 )
 {
-
 }
-
-
 
 
 

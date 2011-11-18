@@ -4,6 +4,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
@@ -11,10 +13,20 @@ class gts80_state : public driver_device
 {
 public:
 	gts80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
-static ADDRESS_MAP_START( gts80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gts80_map, AS_PROGRAM, 8, gts80_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0xc000) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_ROM
@@ -25,7 +37,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gts80 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( gts80 )
+void gts80_state::machine_reset()
 {
 }
 
@@ -39,8 +51,6 @@ static MACHINE_CONFIG_START( gts80_s, gts80_state )
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80_map)
 
-	MCFG_MACHINE_RESET( gts80 )
-
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_s)
 MACHINE_CONFIG_END
@@ -51,8 +61,6 @@ static MACHINE_CONFIG_START( gts80_ss, gts80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80_map)
-
-	MCFG_MACHINE_RESET( gts80 )
 
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_ss)

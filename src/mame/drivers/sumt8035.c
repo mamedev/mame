@@ -9,6 +9,8 @@ This hardware could be enhanced with a 6845 to run video AWPs, and is the origin
 hardware. We don't have the ROMs for that though.
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
@@ -17,21 +19,25 @@ class sumt8035_state : public driver_device
 {
 public:
 	sumt8035_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
-
-static ADDRESS_MAP_START( sumt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sumt_map, AS_PROGRAM, 8, sumt8035_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM//poss wrong
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sumt_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sumt_portmap, AS_IO, 8, sumt8035_state )
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( summit )
@@ -247,6 +253,7 @@ ROM_START( sm_ultng )
 	ROM_LOAD( "ultnudge.p1", 0x0000, 0x000803, CRC(9dbad684) SHA1(b112f5d56afef0b726bdba9bd69cde7a0484b70b) )
 	ROM_LOAD( "ultnudge.p2", 0x0800, 0x000803, CRC(2e9fbd57) SHA1(3a6a695b6d8e9de5635186301dd857e5f1080078) )
 ROM_END
+
 
 GAME( 1981, sm_ngacc,  0,    summit, summit,  0, ROT270, "Summit Coin", "Nudge Accumulator (Summit Coin)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1981, sm_ultng,  0,    summit, summit,  0, ROT270, "Summit Coin", "Ultimate Nudge (Summit Coin)", GAME_NOT_WORKING|GAME_NO_SOUND )

@@ -1,6 +1,9 @@
 /*
     Williams System 11
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -8,18 +11,28 @@ class williams_s11_state : public driver_device
 {
 public:
 	williams_s11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( williams_s11_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_s11_map, AS_PROGRAM, 8, williams_s11_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( williams_s11 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( williams_s11 )
+void williams_s11_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( williams_s11, williams_s11_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(williams_s11_map)
-
-	MCFG_MACHINE_RESET( williams_s11 )
 MACHINE_CONFIG_END
 
 /*--------------------
@@ -220,4 +231,3 @@ GAME(1987,	tdawg_l1,	0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Willi
 GAME(1987,	shfin_l1,	0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Shuffle Inn (Shuffle) (L-1)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	tts_l2,		0,			williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Tic-Tac-Strike (Shuffle) (L-2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	tts_l1,		tts_l2,		williams_s11,	williams_s11,	williams_s11,	ROT0,	"Williams",				"Tic-Tac-Strike (Shuffle) (L-1)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-

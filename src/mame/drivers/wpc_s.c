@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 
@@ -5,18 +7,28 @@ class wpc_s_state : public driver_device
 {
 public:
 	wpc_s_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();	
 };
 
 
-static ADDRESS_MAP_START( wpc_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wpc_s_map, AS_PROGRAM, 8, wpc_s_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wpc_s )
 INPUT_PORTS_END
 
-static MACHINE_RESET( wpc_s )
+void wpc_s_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( wpc_s, wpc_s_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_s_map)
-
-	MCFG_MACHINE_RESET( wpc_s )
 MACHINE_CONFIG_END
 
 /*-----------------
@@ -56,6 +66,7 @@ ROM_START(corv_21)
 	ROM_LOAD("corvsnd7", 0x500000, 0x080000, CRC(1417b547) SHA1(851acf77159a1ef99fc2934353eb887065568004))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(corv_lx1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -77,6 +88,7 @@ ROM_START(corv_lx1)
 	ROM_LOAD("corvsnd7", 0x500000, 0x080000, CRC(1417b547) SHA1(851acf77159a1ef99fc2934353eb887065568004))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(corv_px4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -146,6 +158,7 @@ ROM_START(i500_11r)
 	ROM_LOAD("su7", 0x500000, 0x080000, CRC(94eea5a4) SHA1(afb00e799dbc01c67ed2c4aa399e8a7365ca3dd3))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(i500_11b)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -190,6 +203,7 @@ ROM_START(jb_10r)
 	ROM_LOAD("jbsnd_u6.rom", 0x400000, 0x080000, CRC(7a1e2c3d) SHA1(0c6ccb937328509cb0a87e4c557a64c13bbed2db))
 	ROM_RELOAD(0x400000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(jb_10b)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -399,6 +413,7 @@ ROM_START(rs_l6)
 	ROM_LOAD("rs_u8_s.l1", 0x600000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
 	ROM_RELOAD(0x600000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(rs_la5)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -422,6 +437,7 @@ ROM_START(rs_la5)
 	ROM_LOAD("rs_u8_s.l1", 0x600000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
 	ROM_RELOAD(0x600000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(rs_lx5)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -445,6 +461,7 @@ ROM_START(rs_lx5)
 	ROM_LOAD("rs_u8_s.l1", 0x600000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
 	ROM_RELOAD(0x600000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(rs_la4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -468,6 +485,7 @@ ROM_START(rs_la4)
 	ROM_LOAD("rs_u8_s.l1", 0x600000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
 	ROM_RELOAD(0x600000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(rs_lx4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -491,6 +509,7 @@ ROM_START(rs_lx4)
 	ROM_LOAD("rs_u8_s.l1", 0x600000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
 	ROM_RELOAD(0x600000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(rs_lx3)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -514,6 +533,7 @@ ROM_START(rs_lx3)
 	ROM_LOAD("rs_u8_s.l1", 0x600000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
 	ROM_RELOAD(0x600000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(rs_lx2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -566,6 +586,7 @@ ROM_START(fs_lx5)
 	ROM_LOAD("fs_u9_s.l1", 0x700000, 0x080000, CRC(0a6664fb) SHA1(751a726e3ea6a808bb137f3563d54acd1580836d))
 	ROM_RELOAD(0x700000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(fs_lx2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -591,6 +612,7 @@ ROM_START(fs_lx2)
 	ROM_LOAD("fs_u9_s.l1", 0x700000, 0x080000, CRC(0a6664fb) SHA1(751a726e3ea6a808bb137f3563d54acd1580836d))
 	ROM_RELOAD(0x700000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(fs_sp2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -616,6 +638,7 @@ ROM_START(fs_sp2)
 	ROM_LOAD("fs_u9_s.l1", 0x700000, 0x080000, CRC(0a6664fb) SHA1(751a726e3ea6a808bb137f3563d54acd1580836d))
 	ROM_RELOAD(0x700000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(fs_lx4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -670,6 +693,7 @@ ROM_START(ts_lh6)
 	ROM_LOAD("ts_u7_s.l1", 0x500000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(ts_la2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -691,6 +715,7 @@ ROM_START(ts_la2)
 	ROM_LOAD("ts_u7_s.l1", 0x500000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(ts_la4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -712,6 +737,7 @@ ROM_START(ts_la4)
 	ROM_LOAD("ts_u7_s.l1", 0x500000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(ts_lx4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -733,6 +759,7 @@ ROM_START(ts_lx4)
 	ROM_LOAD("ts_u7_s.l1", 0x500000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(ts_lx5)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -754,6 +781,7 @@ ROM_START(ts_lx5)
 	ROM_LOAD("ts_u7_s.l1", 0x500000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(ts_pa1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -775,6 +803,7 @@ ROM_START(ts_pa1)
 	ROM_LOAD("ts_u7_s.l1", 0x500000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(ts_lf6)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -796,6 +825,7 @@ ROM_START(ts_lf6)
 	ROM_LOAD("ts_u7_s.l1", 0x500000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
 	ROM_RELOAD(0x500000 +0x080000, 0x080000)
 ROM_END
+
 ROM_START(ts_lm6)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -842,6 +872,7 @@ ROM_START(tom_14h)
 	ROM_LOAD("tm_u7_s.l2", 0x500000, 0x080000, CRC(f98e9e38) SHA1(bf8c204cfbbf5f9d59b7ad03d1784d37c638712c))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(tom_13)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -863,6 +894,7 @@ ROM_START(tom_13)
 	ROM_LOAD("tm_u7_s.l2", 0x500000, 0x080000, CRC(f98e9e38) SHA1(bf8c204cfbbf5f9d59b7ad03d1784d37c638712c))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(tom_12)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -884,6 +916,7 @@ ROM_START(tom_12)
 	ROM_LOAD("tm_u7_s.l2", 0x500000, 0x080000, CRC(f98e9e38) SHA1(bf8c204cfbbf5f9d59b7ad03d1784d37c638712c))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(tom_10f)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -905,6 +938,7 @@ ROM_START(tom_10f)
 	ROM_LOAD("tm_u7_s.l2", 0x500000, 0x080000, CRC(f98e9e38) SHA1(bf8c204cfbbf5f9d59b7ad03d1784d37c638712c))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(tom_06)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -951,6 +985,7 @@ ROM_START(wd_12)
 	ROM_LOAD("wdu7_10.rom", 0x500000, 0x080000, CRC(36285ca2) SHA1(d42f04aa62b9859ce2452fa05da2049fe39e9411))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wd_12g)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -972,6 +1007,7 @@ ROM_START(wd_12g)
 	ROM_LOAD("wdu7_10.rom", 0x500000, 0x080000, CRC(36285ca2) SHA1(d42f04aa62b9859ce2452fa05da2049fe39e9411))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wd_10r)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -993,6 +1029,7 @@ ROM_START(wd_10r)
 	ROM_LOAD("wdu7_10.rom", 0x500000, 0x080000, CRC(36285ca2) SHA1(d42f04aa62b9859ce2452fa05da2049fe39e9411))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wd_11)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -1014,6 +1051,7 @@ ROM_START(wd_11)
 	ROM_LOAD("wdu7_10.rom", 0x500000, 0x080000, CRC(36285ca2) SHA1(d42f04aa62b9859ce2452fa05da2049fe39e9411))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wd_10f)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -1035,6 +1073,7 @@ ROM_START(wd_10f)
 	ROM_LOAD("wdu7_10.rom", 0x500000, 0x080000, CRC(36285ca2) SHA1(d42f04aa62b9859ce2452fa05da2049fe39e9411))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wd_10g)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -1056,6 +1095,7 @@ ROM_START(wd_10g)
 	ROM_LOAD("wdu7_10.rom", 0x500000, 0x080000, CRC(36285ca2) SHA1(d42f04aa62b9859ce2452fa05da2049fe39e9411))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wd_03r)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -1077,6 +1117,7 @@ ROM_START(wd_03r)
 	ROM_LOAD("u7-s031.rom", 0x500000, 0x080000, CRC(d252f599) SHA1(bdce67187c027b713b6ef88f6cd4f025de469929))
 	ROM_RELOAD(0x500000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wd_048r)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -1125,6 +1166,7 @@ ROM_START(wcs_l2)
 	ROM_LOAD("wcup_u8.rom", 0x600000, 0x080000, CRC(670cd382) SHA1(89548420c3b6b8a3d7621b10c538ee1dc6a7be62))
 	ROM_RELOAD(0x600000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wcs_p3)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -1148,6 +1190,7 @@ ROM_START(wcs_p3)
 	ROM_LOAD("wcup_u8.rom", 0x600000, 0x080000, CRC(670cd382) SHA1(89548420c3b6b8a3d7621b10c538ee1dc6a7be62))
 	ROM_RELOAD(0x600000+0x080000, 0x080000)
 ROM_END
+
 ROM_START(wcs_p2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -1187,54 +1230,55 @@ ROM_START(tfs_12)
 	ROM_RELOAD(0x000000+0x080000, 0x080000)
 ROM_END
 
-GAME(1994,	corv_21,	0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Corvette (2.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	corv_px4,	corv_21,	wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Corvette (PX4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	corv_lx1,	corv_21,	wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Corvette (LX1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	dh_lx2,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Dirty Harry (LX-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	i500_11r,	0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Indianapolis 500 (1.1R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	i500_11b,	i500_11r,	wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Indianapolis 500 (1.1 Belgium)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	jb_10r,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Jack*Bot (1.0R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	jb_10b,		jb_10r,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Jack*Bot (1.0B) (Belgium/Canada)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	jm_12r,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Johnny Mnemonic (1.2R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	jm_12b,		jm_12r,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Johnny Mnemonic (1.2B) Belgium",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	nf_23x,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"No Fear: Dangerous Sports (2.3X)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	nf_23,		nf_23x,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"No Fear: Dangerous Sports (2.3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	nf_23f,		nf_23x,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"No Fear: Dangerous Sports (2.3F)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	nf_22,		nf_23x,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"No Fear: Dangerous Sports (2.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	nf_20,		nf_23x,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"No Fear: Dangerous Sports (2.0)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	rs_l6,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Red and Ted's Road Show (L-6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	rs_la5,		rs_l6,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Red and Ted's Road Show (La-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	rs_lx5,		rs_l6,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Red and Ted's Road Show (Lx-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	rs_la4,		rs_l6,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Red and Ted's Road Show (La-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	rs_lx4,		rs_l6,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Red and Ted's Road Show (Lx-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	rs_lx3,		rs_l6,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Red and Ted's Road Show (Lx-3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	rs_lx2,		rs_l6,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"Red and Ted's Road Show (Lx-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	fs_lx5,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"The Flintstones (LX-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	fs_lx2,		fs_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"The Flintstones (LX-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	fs_sp2,		fs_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"The Flintstones (SP-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	fs_lx4,		fs_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Williams",				"The Flintstones (LX-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	ts_lx5,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"The Shadow (LX-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	ts_lh6,		ts_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"The Shadow (LH-6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	ts_lx4,		ts_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"The Shadow (LX-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	ts_la4,		ts_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"The Shadow (LA-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	ts_la2,		ts_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"The Shadow (LA-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	ts_pa1,		ts_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"The Shadow (PA-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	ts_lf6,		ts_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"The Shadow (LF-6) French",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	ts_lm6,		ts_lx5,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"The Shadow (LM-6) Mild",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	tom_13,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Theatre Of Magic (1.3X)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2005,	tom_14h,	tom_13,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Theatre Of Magic (1.4H)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	tom_12,		tom_13,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Theatre Of Magic (1.2X)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	tom_10f,	tom_13,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Theatre Of Magic (1.0 French)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	tom_06,		tom_13,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Theatre Of Magic (0.6a)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	wd_12,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Who Dunnit (1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	wd_12g,		wd_12,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Who Dunnit (1.2 Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	wd_11,		wd_12,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Who Dunnit (1.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	wd_10r,		wd_12,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Who Dunnit (1.0 R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	wd_10g,		wd_12,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Who Dunnit (1.0 Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	wd_10f,		wd_12,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Who Dunnit (1.0 French)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	wd_03r,		wd_12,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Who Dunnit (0.3 R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	wd_048r,	wd_12,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"Who Dunnit (0.48 R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	wcs_l2,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"World Cup Soccer (Lx-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	wcs_p2,		wcs_l2,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"World Cup Soccer (Pa-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	wcs_p3,		wcs_l2,		wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"World Cup Soccer (Px-3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1994,	tfs_12,		0,			wpc_s,	wpc_s,	wpc_s,	ROT0,	"Bally",				"WPC Test Fixture: Security (1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+
+GAME(1994,  corv_21,	0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Corvette (2.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  corv_px4,	corv_21,	wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Corvette (PX4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  corv_lx1,	corv_21,	wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Corvette (LX1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  dh_lx2,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Dirty Harry (LX-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  i500_11r,	0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Indianapolis 500 (1.1R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  i500_11b,	i500_11r,	wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  jb_10r,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Jack*Bot (1.0R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  jb_10b,		jb_10r,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Jack*Bot (1.0B) (Belgium/Canada)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  jm_12r,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Johnny Mnemonic (1.2R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  jm_12b,		jm_12r,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Johnny Mnemonic (1.2B) Belgium",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  nf_23x,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "No Fear: Dangerous Sports (2.3X)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  nf_23,		nf_23x,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "No Fear: Dangerous Sports (2.3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  nf_23f,		nf_23x,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "No Fear: Dangerous Sports (2.3F)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  nf_22,		nf_23x,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "No Fear: Dangerous Sports (2.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  nf_20,		nf_23x,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "No Fear: Dangerous Sports (2.0)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  rs_l6,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Red and Ted's Road Show (L-6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  rs_la5,		rs_l6,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Red and Ted's Road Show (La-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  rs_lx5,		rs_l6,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Red and Ted's Road Show (Lx-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  rs_la4,		rs_l6,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Red and Ted's Road Show (La-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  rs_lx4,		rs_l6,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Red and Ted's Road Show (Lx-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  rs_lx3,		rs_l6,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Red and Ted's Road Show (Lx-3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  rs_lx2,		rs_l6,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "Red and Ted's Road Show (Lx-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  fs_lx5,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "The Flintstones (LX-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  fs_lx2,		fs_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "The Flintstones (LX-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  fs_sp2,		fs_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "The Flintstones (SP-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  fs_lx4,		fs_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Williams",	   "The Flintstones (LX-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  ts_lx5,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "The Shadow (LX-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  ts_lh6,		ts_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "The Shadow (LH-6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  ts_lx4,		ts_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "The Shadow (LX-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  ts_la4,		ts_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "The Shadow (LA-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  ts_la2,		ts_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "The Shadow (LA-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  ts_pa1,		ts_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "The Shadow (PA-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  ts_lf6,		ts_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "The Shadow (LF-6) French",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  ts_lm6,		ts_lx5,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "The Shadow (LM-6) Mild",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  tom_13,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Theatre Of Magic (1.3X)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2005,	tom_14h,	tom_13,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Theatre Of Magic (1.4H)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  tom_12,		tom_13,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Theatre Of Magic (1.2X)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  tom_10f,	tom_13,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Theatre Of Magic (1.0 French)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  tom_06,		tom_13,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Theatre Of Magic (0.6a)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  wd_12,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Who Dunnit (1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  wd_12g,		wd_12,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Who Dunnit (1.2 Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  wd_11,		wd_12,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Who Dunnit (1.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  wd_10r,		wd_12,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Who Dunnit (1.0 R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  wd_10g,		wd_12,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Who Dunnit (1.0 Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  wd_10f,		wd_12,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Who Dunnit (1.0 French)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  wd_03r,		wd_12,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Who Dunnit (0.3 R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  wd_048r,	wd_12,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "Who Dunnit (0.48 R)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  wcs_l2,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "World Cup Soccer (Lx-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  wcs_p2,		wcs_l2,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "World Cup Soccer (Pa-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  wcs_p3,		wcs_l2,		wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "World Cup Soccer (Px-3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,  tfs_12,		0,			wpc_s,  wpc_s,  wpc_s,  ROT0,  "Bally",        "WPC Test Fixture: Security (1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

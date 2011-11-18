@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 
@@ -5,18 +7,28 @@ class spinb_state : public driver_device
 {
 public:
 	spinb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( spinb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spinb_map, AS_PROGRAM, 8, spinb_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spinb )
 INPUT_PORTS_END
 
-static MACHINE_RESET( spinb )
+void spinb_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, 16000000)
 	MCFG_CPU_PROGRAM_MAP(spinb_map)
-
-	MCFG_MACHINE_RESET( spinb )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -118,8 +128,7 @@ ROM_END
 / Verne's World (1996)
 /-------------------------------------------------------------------*/
 
-GAME(1993,	bushido,	0,		spinb,	spinb,	spinb,	ROT0,	"Inder/Spinball",	"Bushido",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1993,	bushidoa,	bushido,spinb,	spinb,	spinb,	ROT0,	"Inder/Spinball",	"Bushido (alternate set)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1996,	jolypark,	0,		spinb,	spinb,	spinb,	ROT0,	"Spinball",			"Jolly Park",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,	mach2,		0,		spinb,	spinb,	spinb,	ROT0,	"Spinball",			"Mach 2",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-
+GAME(1993,  bushido,   0,       spinb,  spinb,  spinb,  ROT0,  "Inder/Spinball",    "Bushido",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1993,  bushidoa,  bushido, spinb,  spinb,  spinb,  ROT0,  "Inder/Spinball",    "Bushido (alternate set)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1996,  jolypark,  0,       spinb,  spinb,  spinb,  ROT0,  "Spinball",          "Jolly Park",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1995,  mach2,     0,       spinb,  spinb,  spinb,  ROT0,  "Spinball",          "Mach 2",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -5,18 +7,28 @@ class hankin_state : public driver_device
 {
 public:
 	hankin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( hankin_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hankin_map, AS_PROGRAM, 8, hankin_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hankin )
 INPUT_PORTS_END
 
-static MACHINE_RESET( hankin )
+void hankin_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( hankin, hankin_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 900000)
 	MCFG_CPU_PROGRAM_MAP(hankin_map)
-
-	MCFG_MACHINE_RESET( hankin )
 MACHINE_CONFIG_END
 
 /*--------------------------------
@@ -102,10 +112,9 @@ ROM_START(empsback)
 	ROM_LOAD("sw_ic3.snd", 0xf000, 0x0200, CRC(db214f65) SHA1(1a499cf2059a5c0d860d5a4251a89a5735937ef8))
 ROM_END
 
-GAME(1978,	fjholden,	0,		hankin,	hankin,	hankin,	ROT0,	"Hankin",				"FJ Holden",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	howzat,		0,		hankin,	hankin,	hankin,	ROT0,	"Hankin",				"Howzat!",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1978,	orbit1,		0,		hankin,	hankin,	hankin,	ROT0,	"Hankin",				"Orbit 1",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	shark,		0,		hankin,	hankin,	hankin,	ROT0,	"Hankin",				"Shark",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	empsback,	0,		hankin,	hankin,	hankin,	ROT0,	"Hankin",				"The Empire Strike Back",GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 
-
+GAME(1978,  fjholden,  0,  hankin,  hankin,  hankin,  ROT0,  "Hankin",    "FJ Holden",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980,  howzat,    0,  hankin,  hankin,  hankin,  ROT0,  "Hankin",    "Howzat!",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1978,  orbit1,    0,  hankin,  hankin,  hankin,  ROT0,  "Hankin",    "Orbit 1",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980,  shark,     0,  hankin,  hankin,  hankin,  ROT0,  "Hankin",    "Shark",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,  empsback,  0,  hankin,  hankin,  hankin,  ROT0,  "Hankin",    "The Empire Strike Back",GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

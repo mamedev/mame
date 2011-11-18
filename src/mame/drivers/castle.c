@@ -41,6 +41,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -48,14 +50,22 @@ class castle_state : public driver_device
 {
 public:
 	castle_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( V1rvE_mastermap, AS_PROGRAM, 8 )
+
+static ADDRESS_MAP_START( V1rvE_mastermap, AS_PROGRAM, 8, castle_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( V1rvE_slavemap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( V1rvE_slavemap, AS_PROGRAM, 8, castle_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -75,7 +85,7 @@ MACHINE_CONFIG_END
 
 
 
-static ADDRESS_MAP_START( V2rvA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( V2rvA_map, AS_PROGRAM, 8, castle_state )
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

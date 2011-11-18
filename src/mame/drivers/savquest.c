@@ -20,6 +20,8 @@
 
 ***************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "memconv.h"
@@ -39,26 +41,36 @@ class savquest_state : public driver_device
 {
 public:
 	savquest_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static VIDEO_START(savquest)
+void savquest_state::video_start()
 {
 }
 
-static SCREEN_UPDATE(savquest)
+bool savquest_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(savquest_io, AS_IO, 32)
+static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( savquest )
@@ -76,10 +88,7 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MCFG_SCREEN_UPDATE(savquest)
 	MCFG_PALETTE_LENGTH(16)
-
-	MCFG_VIDEO_START(savquest)
 MACHINE_CONFIG_END
 
 ROM_START( savquest )
@@ -90,5 +99,5 @@ ROM_START( savquest )
 	DISK_IMAGE( "savquest", 0, SHA1(b20cacf45e093b533c538bf4fc08f05f9475d640) )
 ROM_END
 
-GAME(1999, savquest, 0, savquest, savquest, 0, ROT0, "Interactive Light", "Savage Quest", GAME_NO_SOUND|GAME_NOT_WORKING)
 
+GAME(1999, savquest, 0, savquest, savquest, 0, ROT0, "Interactive Light", "Savage Quest", GAME_NO_SOUND|GAME_NOT_WORKING)

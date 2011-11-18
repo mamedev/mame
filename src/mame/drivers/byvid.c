@@ -2,6 +2,8 @@
     Bally MPU AS-2518-133
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
@@ -10,16 +12,28 @@ class by133_state : public driver_device
 {
 public:
 	by133_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_videocpu(*this, "videocpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_videocpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
-static ADDRESS_MAP_START( by133_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( by133_map, AS_PROGRAM, 8, by133_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x1000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( by133_video_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( by133_video_map, AS_PROGRAM, 8, by133_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -27,7 +41,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( by133 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( by133 )
+void by133_state::machine_reset()
 {
 }
 
@@ -42,8 +56,6 @@ static MACHINE_CONFIG_START( by133, by133_state )
 
 	MCFG_CPU_ADD("videocpu", M6809, 3580000/4)
 	MCFG_CPU_PROGRAM_MAP(by133_video_map)
-
-	MCFG_MACHINE_RESET( by133 )
 MACHINE_CONFIG_END
 
 /*-----------------------------------------------------
@@ -86,5 +98,6 @@ ROM_START(granny)
 	ROM_LOAD( "cs_u3.764", 0xe000, 0x2000, CRC(0a39a51d) SHA1(98342ba38e48578ce9870f2ee85b553d46c0e35f))
 ROM_END
 
-GAME( 1982, babypac, 0, 		by133, by133, by133, ROT0, "Bally","Baby Pacman (Video/Pinball Combo)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1984, granny,  0, 		by133, by133, by133, ROT0, "Bally","Granny and the Gators (Video/Pinball Combo)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+
+GAME(1982,  babypac,  0,  by133,  by133,  by133,  ROT0,  "Bally",    "Baby Pacman (Video/Pinball Combo)",              GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,  granny,   0,  by133,  by133,  by133,  ROT0,  "Bally",    "Granny and the Gators (Video/Pinball Combo)",    GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

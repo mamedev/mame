@@ -3,6 +3,8 @@
     Z80 based
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -10,18 +12,25 @@ class unkpcp_state : public driver_device
 {
 public:
 	unkpcp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
 
-static ADDRESS_MAP_START( unkpcp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( unkpcp_map, AS_PROGRAM, 8, unkpcp_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( unkpcp_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( unkpcp_portmap, AS_IO, 8, unkpcp_state )
 ADDRESS_MAP_END
 
 
@@ -30,14 +39,10 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( unkpcp, unkpcp_state )
-
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(unkpcp_map)
 	MCFG_CPU_IO_MAP(unkpcp_portmap)
-
 MACHINE_CONFIG_END
-
-
 
 
 ROM_START( up_bluec )
@@ -62,9 +67,6 @@ ROM_START( up_bluec )
 	ROM_LOAD( "bluechipp3.bin", 0x0000, 0x002000, CRC(cee5f9cc) SHA1(b38bfe0222554b743a7ae20ee74d029293c17424) )
 	ROM_LOAD( "bluechipp4.bin", 0x0000, 0x002000, CRC(89278a76) SHA1(6effb53a0ff9ff04125b47bf12ceebe6347e080a) )
 ROM_END
-
-
-
 
 
 ROM_START( up_dbldx )
@@ -103,7 +105,6 @@ ROM_START( up_nudbk )
 ROM_END
 
 
-
 ROM_START( up_sstrk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "starstruck 4.80 cash p1.bin", 0x0000, 0x002000, CRC(4b504e9b) SHA1(0d4de867b5373c944b9819479cb0aeb9786ceac9) )
@@ -121,8 +122,6 @@ ROM_START( up_sstrk )
 	ROM_LOAD( "starstruck p3 v2 23.4.90 std.bin", 0x0000, 0x002000, CRC(d07764b3) SHA1(18707df2330d3ba9793511fc06c3d79a9a40cce9) )
 	ROM_LOAD( "starstruck p4 v2 23.4.90 std.bin", 0x0000, 0x002000, CRC(ba2533f0) SHA1(db9364c328d11955df4adde280c312e5eb9415ce) )
 ROM_END
-
-
 
 
 ROM_START( up_xpres )
@@ -154,18 +153,13 @@ ROM_START( up_roll )
 ROM_END
 
 
-
-
-
-
 DRIVER_INIT( unkpcp )
 {
-
 }
 
-GAME( 199?, up_dbldx	,0			,unkpcp,unkpcp,unkpcp,ROT0,   "Pcp","Double Deluxe (Pcp)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, up_nudbk	,0			,unkpcp,unkpcp,unkpcp,ROT0,   "Pcp","Nudge Break (Pcp)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, up_sstrk	,0			,unkpcp,unkpcp,unkpcp,ROT0,   "Pcp","Starstruck (Pcp)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, up_xpres	,0			,unkpcp,unkpcp,unkpcp,ROT0,   "Pcp","Xpress (Pcp)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, up_roll		,0			,unkpcp,unkpcp,unkpcp,ROT0,   "Pcp","Roll Up (Pcp)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, up_bluec	,0			,unkpcp,unkpcp,unkpcp,ROT0,   "Pcp","Blue Chip (Pcp)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  up_dbldx,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Double Deluxe (Pcp)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  up_nudbk,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Nudge Break (Pcp)",     GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  up_sstrk,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Starstruck (Pcp)",      GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  up_xpres,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Xpress (Pcp)",          GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  up_roll,   0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Roll Up (Pcp)",         GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  up_bluec,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Blue Chip (Pcp)",       GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )

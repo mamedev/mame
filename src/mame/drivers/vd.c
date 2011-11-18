@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -5,18 +7,28 @@ class vd_state : public driver_device
 {
 public:
 	vd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( vd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( vd_map, AS_PROGRAM, 8, vd_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vd )
 INPUT_PORTS_END
 
-static MACHINE_RESET( vd )
+void vd_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( vd, vd_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(vd_map)
-
-	MCFG_MACHINE_RESET( vd )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -47,5 +57,4 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 
-GAME(1986,	break86,	0,	vd,	vd,	vd,	ROT0,	"Videodens",	"Break '86",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-
+GAME(1986,  break86,  0,    vd,  vd,  vd,  ROT0,  "Videodens",    "Break '86",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

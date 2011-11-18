@@ -1,6 +1,9 @@
 /*
     Gottlieb System 1
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/pps4/pps4.h"
 
@@ -8,18 +11,28 @@ class gts1_state : public driver_device
 {
 public:
 	gts1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( gts1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gts1_map, AS_PROGRAM, 8, gts1_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts1 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( gts1 )
+void gts1_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPS4, 198864)
 	MCFG_CPU_PROGRAM_MAP(gts1_map)
-
-	MCFG_MACHINE_RESET( gts1 )
 MACHINE_CONFIG_END
 
 
@@ -284,6 +295,7 @@ ROM_START(sys1test)
 	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
 	ROM_LOAD("test.cpu", 0x2000, 0x0400, CRC(8b0704bb) SHA1(5f0eb8d5af867b815b6012c9d078927398efe6d8))
 ROM_END
+
 
 GAME(1977,	gts1,		0,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"System 1",								GAME_IS_BIOS_ROOT)
 

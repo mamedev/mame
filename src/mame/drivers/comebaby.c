@@ -56,6 +56,8 @@
   Easy enough to fix a broken game if you have the controls to plug into it.
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
@@ -64,21 +66,31 @@ class comebaby_state : public driver_device
 {
 public:
 	comebaby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static VIDEO_START(comebaby)
+void comebaby_state::video_start()
 {
 }
 
-static SCREEN_UPDATE(comebaby)
+bool comebaby_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START( comebaby_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( comebaby_map, AS_PROGRAM, 32, comebaby_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -98,11 +110,8 @@ static MACHINE_CONFIG_START( comebaby, comebaby_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(comebaby)
 
 	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_START(comebaby)
 MACHINE_CONFIG_END
 
 
@@ -115,4 +124,4 @@ ROM_START(comebaby)
 ROM_END
 
 
-GAME( 2000, comebaby,  0,   comebaby, comebaby, 0, ROT0, "ExPotato", "Come On Baby", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, comebaby,  0,   comebaby,  comebaby,  0,  ROT0,  "ExPotato",    "Come On Baby",   GAME_NOT_WORKING|GAME_NO_SOUND )

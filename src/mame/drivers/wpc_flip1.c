@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 
@@ -5,18 +7,28 @@ class wpc_flip1_state : public driver_device
 {
 public:
 	wpc_flip1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( wpc_flip1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wpc_flip1_map, AS_PROGRAM, 8, wpc_flip1_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wpc_flip1 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( wpc_flip1 )
+void wpc_flip1_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( wpc_flip1, wpc_flip1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_flip1_map)
-
-	MCFG_MACHINE_RESET( wpc_flip1 )
 MACHINE_CONFIG_END
 
 /*-----------------
@@ -44,6 +54,7 @@ ROM_START(taf_p2)
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("afsnd_p2.rom", 0x000000, 0x80000, CRC(73d19698) SHA1(d14a6ea36a93db185a599a7810dfbef2deb0adc0))
 ROM_END
+
 ROM_START(taf_l1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -53,6 +64,7 @@ ROM_START(taf_l1)
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("tafu18l1.rom", 0x000000, 0x80000, CRC(131ae471) SHA1(5ed03b521dfef56cbb99814539d4c74da4216f67))
 ROM_END
+
 ROM_START(taf_l2)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -62,6 +74,7 @@ ROM_START(taf_l2)
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("tafu18l1.rom", 0x000000, 0x80000, CRC(131ae471) SHA1(5ed03b521dfef56cbb99814539d4c74da4216f67))
 ROM_END
+
 ROM_START(taf_l3)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -71,6 +84,7 @@ ROM_START(taf_l3)
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("tafu18l1.rom", 0x000000, 0x80000, CRC(131ae471) SHA1(5ed03b521dfef56cbb99814539d4c74da4216f67))
 ROM_END
+
 ROM_START(taf_l4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -80,6 +94,7 @@ ROM_START(taf_l4)
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("tafu18l1.rom", 0x000000, 0x80000, CRC(131ae471) SHA1(5ed03b521dfef56cbb99814539d4c74da4216f67))
 ROM_END
+
 ROM_START(taf_l7)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -89,6 +104,7 @@ ROM_START(taf_l7)
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("tafu18l1.rom", 0x000000, 0x80000, CRC(131ae471) SHA1(5ed03b521dfef56cbb99814539d4c74da4216f67))
 ROM_END
+
 ROM_START(taf_l5)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -98,6 +114,7 @@ ROM_START(taf_l5)
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("tafu18l1.rom", 0x000000, 0x80000, CRC(131ae471) SHA1(5ed03b521dfef56cbb99814539d4c74da4216f67))
 ROM_END
+
 ROM_START(taf_l6)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -107,6 +124,7 @@ ROM_START(taf_l6)
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("tafu18l1.rom", 0x000000, 0x80000, CRC(131ae471) SHA1(5ed03b521dfef56cbb99814539d4c74da4216f67))
 ROM_END
+
 ROM_START(taf_h4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x2000, "user1", ROMREGION_ERASEFF)
@@ -120,13 +138,12 @@ ROM_END
 /*--------------
 /  Game drivers
 /---------------*/
-GAME(1992,	taf_l5,		0,			wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (L-5)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	taf_p2,		taf_l5,		wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (Prototype) (P-2)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	taf_l1,		taf_l5,		wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (L-1)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	taf_l2,		taf_l5,		wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (L-2)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	taf_l3,		taf_l5,		wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (L-3)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	taf_l4,		taf_l5,		wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (L-4)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	taf_l7,		taf_l5,		wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (Prototype L-5) (L-7)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	taf_l6,		taf_l5,		wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (L-6)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	taf_h4,		taf_l5,		wpc_flip1,	wpc_flip1,	wpc_flip1,	ROT0,	"Bally",				"The Addams Family (H-4)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-
+GAME(1992,  taf_l5,  0,       wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-5)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,  taf_p2,  taf_l5,  wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (Prototype) (P-2)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,  taf_l1,  taf_l5,  wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-1)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,  taf_l2,  taf_l5,  wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-2)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,  taf_l3,  taf_l5,  wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-3)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,  taf_l4,  taf_l5,  wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-4)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,  taf_l7,  taf_l5,  wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (Prototype L-5) (L-7)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,  taf_l6,  taf_l5,  wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-6)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,  taf_h4,  taf_l5,  wpc_flip1,  wpc_flip1,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (H-4)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

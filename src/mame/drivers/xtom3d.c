@@ -32,6 +32,8 @@ MX29F1610MC 16M FlashROM (x7)
 
 ***************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "memconv.h"
@@ -51,26 +53,36 @@ class xtom3d_state : public driver_device
 {
 public:
 	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static VIDEO_START(xtom3d)
+void xtom3d_state::video_start()
 {
 }
 
-static SCREEN_UPDATE(xtom3d)
+bool xtom3d_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START(xtom3d_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(xtom3d_map, AS_PROGRAM, 32, xtom3d_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(xtom3d_io, AS_IO, 32)
+static ADDRESS_MAP_START(xtom3d_io, AS_IO, 32, xtom3d_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xtom3d )
@@ -88,11 +100,9 @@ static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MCFG_SCREEN_UPDATE(xtom3d)
 	MCFG_PALETTE_LENGTH(16)
-
-	MCFG_VIDEO_START(xtom3d)
 MACHINE_CONFIG_END
+
 
 ROM_START( xtom3d )
 	ROM_REGION32_LE(0x40000, "user1", 0)
@@ -107,5 +117,6 @@ ROM_START( xtom3d )
 	ROM_LOAD( "u19", 0xa00000, 0x200000, CRC(a1ae73d0) SHA1(232c73bfee426b5f651a015c505c26b8ed7176b7) )
 	ROM_LOAD( "u20", 0xc00000, 0x200000, CRC(452131d9) SHA1(f62a0f1a7da9025ac1f7d5de4df90166871ac1e5) )
 ROM_END
+
 
 GAME(1999, xtom3d, 0, xtom3d, xtom3d, 0, ROT0, "Jamie System Development", "X Tom 3D", GAME_NO_SOUND|GAME_NOT_WORKING)

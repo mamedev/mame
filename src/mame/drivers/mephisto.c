@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
@@ -5,11 +7,21 @@ class mephisto_state : public driver_device
 {
 public:
 	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8, mephisto_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
@@ -19,7 +31,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mephisto )
 INPUT_PORTS_END
 
-static MACHINE_RESET( mephisto )
+void mephisto_state::machine_reset()
 {
 }
 
@@ -31,8 +43,6 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
-
-	MCFG_MACHINE_RESET( mephisto )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -74,5 +84,6 @@ ROM_START(mephistp1)
 	ROM_LOAD("ic19_f", 0x38000, 0x8000, CRC(cc4bb629) SHA1(db46be2a8034bbd106b7dd80f50988c339684b5e))
 ROM_END
 
-GAME(1986,	mephistp,	0,		 mephisto,	mephisto,	mephisto,	ROT0,	"Stargame",			"Mephisto (rev. 1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1986,	mephistp1,	mephistp,mephisto,	mephisto,	mephisto,	ROT0,	"Stargame",			"Mephisto (rev. 1.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+
+GAME(1986,  mephistp,   0,         mephisto,  mephisto,  mephisto,  ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,  mephistp1,  mephistp,  mephisto,  mephisto,  mephisto,  ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

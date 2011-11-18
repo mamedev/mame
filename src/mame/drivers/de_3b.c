@@ -1,6 +1,9 @@
 /*
     DataEast/Sega Version 3b
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "audio/decobsmt.h"
@@ -10,24 +13,30 @@ class de_3b_state : public driver_device
 {
 public:
 	de_3b_state(const machine_config &mconfig, device_type type, const char *tag)
-    : driver_device(mconfig, type, tag),
-    m_maincpu(*this, "maincpu"),
-    m_decobsmt(*this, "decobsmt")
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_decobsmt(*this, "decobsmt")
     { }
 
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<decobsmt_device> m_decobsmt;
+	
+protected:
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( de_3b_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( de_3b_map, AS_PROGRAM, 8, de_3b_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( de_3b )
 INPUT_PORTS_END
 
-static MACHINE_RESET( de_3b )
+void de_3b_state::machine_reset()
 {
 }
 
@@ -39,8 +48,6 @@ static MACHINE_CONFIG_START( de_3b, de_3b_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(de_3b_map)
-
-	MCFG_MACHINE_RESET( de_3b )
 
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
@@ -390,6 +397,7 @@ ROM_START(detest)
 	ROM_REGION(0x010000, "soundcpu", ROMREGION_ERASE00)
 	ROM_REGION(0x1000000, "bsmt", ROMREGION_ERASE00)
 ROM_END
+
 
 GAME(1995,	batmanf,	0,				de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Batman Forever (4.0)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	batmanf3,	batmanf,		de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Batman Forever (3.0)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

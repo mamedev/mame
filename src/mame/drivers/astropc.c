@@ -9,6 +9,8 @@ We need to figure this out and convert them to CHDs (I think.. unless they're fl
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
@@ -16,15 +18,21 @@ class astropc_state : public driver_device
 {
 public:
 	astropc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( astropc_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( astropc_map, AS_PROGRAM, 32, astropc_state )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( astropc_io, AS_IO, 32 )
+static ADDRESS_MAP_START( astropc_io, AS_IO, 32, astropc_state )
 ADDRESS_MAP_END
 
 
@@ -163,4 +171,3 @@ GAME( 2002, hawaii,	   0,	     astropc, astropc, astropc, ROT0, "Astro", "Hawaii
 GAME( 2002, oligam,	   0,	     astropc, astropc, astropc, ROT0, "Astro", "Olympian Games (Russia)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2002, rasce,	   0,	     astropc, astropc, astropc, ROT0, "Astro", "Ra Sceptor (Russia)", GAME_NOT_WORKING|GAME_NO_SOUND )
-

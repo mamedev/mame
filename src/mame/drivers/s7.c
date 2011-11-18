@@ -1,6 +1,9 @@
 /*
     Williams System 7
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -8,18 +11,28 @@ class williams_s7_state : public driver_device
 {
 public:
 	williams_s7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( williams_s7_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_s7_map, AS_PROGRAM, 8, williams_s7_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( williams_s7 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( williams_s7 )
+void williams_s7_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( williams_s7, williams_s7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(williams_s7_map)
-
-	MCFG_MACHINE_RESET( williams_s7 )
 MACHINE_CONFIG_END
 
 /*----------------------------

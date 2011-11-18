@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -5,18 +7,28 @@ class ltd_state : public driver_device
 {
 public:
 	ltd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( ltd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ltd_map, AS_PROGRAM, 8, ltd_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ltd )
 INPUT_PORTS_END
 
-static MACHINE_RESET( ltd )
+void ltd_state::machine_reset()
 {
 }
 
@@ -28,8 +40,6 @@ static MACHINE_CONFIG_START( ltd, ltd_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, 1000000)
 	MCFG_CPU_PROGRAM_MAP(ltd_map)
-
-	MCFG_MACHINE_RESET( ltd )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -117,6 +127,7 @@ ROM_START(zephy)
 	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
+
 GAME(198?,	alcapone,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Al Capone",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(19??,	atla_ltd,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Atlantis (LTD)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(19??,	bhol_ltd,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Black Hole (LTD)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
@@ -124,4 +135,3 @@ GAME(198?,	columbia,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Columbia",				GAME_NOT_WOR
 GAME(198?,	cowboy,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Cowboy Eight Ball",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(198?,	pecmen,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Mr. & Mrs. Pec-Men",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(198?,	zephy,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Zephy",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-

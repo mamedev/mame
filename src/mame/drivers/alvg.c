@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6502/m65ce02.h"
 
@@ -5,11 +7,21 @@ class alvg_state : public driver_device
 {
 public:
 	alvg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( alvg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( alvg_map, AS_PROGRAM, 8, alvg_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -18,7 +30,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( alvg )
 INPUT_PORTS_END
 
-static MACHINE_RESET( alvg )
+void alvg_state::machine_reset()
 {
 }
 
@@ -30,8 +42,6 @@ static MACHINE_CONFIG_START( alvg, alvg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(alvg_map)
-
-	MCFG_MACHINE_RESET( alvg )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -228,6 +238,7 @@ ROM_START(usafootb)
 	ROM_RELOAD(0x000000 + 0x80000, 0x40000)
 	ROM_RELOAD(0x000000 + 0xc0000, 0x40000)
 ROM_END
+
 
 GAME(1991,	agsoccer,	0,			alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"A.G. Soccer Ball",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1992,	wrldtour,	0,			alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"Al's Garage Band Goes On A World Tour",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

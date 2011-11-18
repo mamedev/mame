@@ -4,6 +4,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
@@ -11,10 +13,20 @@ class gts80b_state : public driver_device
 {
 public:
 	gts80b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
-static ADDRESS_MAP_START( gts80b_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gts80b_map, AS_PROGRAM, 8, gts80b_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0xc000) AM_ROM	/* PROM */
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_ROM	/* u2 ROM */
@@ -25,7 +37,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gts80b )
 INPUT_PORTS_END
 
-static MACHINE_RESET( gts80b )
+void gts80b_state::machine_reset()
 {
 }
 
@@ -39,8 +51,6 @@ static MACHINE_CONFIG_START( gts80b_s, gts80b_state )
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
-	MCFG_MACHINE_RESET( gts80b )
-
 	/* related to src/mame/audio/gottlieb.c */
 //  MCFG_IMPORT_FROM(gts80s_s)
 MACHINE_CONFIG_END
@@ -49,8 +59,6 @@ static MACHINE_CONFIG_START( gts80b_s1, gts80b_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
-
-	MCFG_MACHINE_RESET( gts80b )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b1)
@@ -61,8 +69,6 @@ static MACHINE_CONFIG_START( gts80b_s2, gts80b_state )
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
-	MCFG_MACHINE_RESET( gts80b )
-
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b2)
 MACHINE_CONFIG_END
@@ -72,8 +78,6 @@ static MACHINE_CONFIG_START( gts80b_s3, gts80b_state )
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
-	MCFG_MACHINE_RESET( gts80b )
-
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3)
 MACHINE_CONFIG_END
@@ -82,8 +86,6 @@ static MACHINE_CONFIG_START( bonebstr, gts80b_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
-
-	MCFG_MACHINE_RESET( gts80b )
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3a)
@@ -574,6 +576,7 @@ ROM_START(victoryp)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(921a100e) SHA1(0c3c7eae4ceeb5a1a8150bac52203d3f1e8f917e))
 ROM_END
+
 
 GAME(1987,	arena,	0,		gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Arena",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1988,	badgirls,	0,		gts80b_s3,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Bad Girls",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

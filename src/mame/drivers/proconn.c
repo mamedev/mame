@@ -5,6 +5,8 @@
   some sets might be misidentified.
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -12,18 +14,25 @@ class proconn_state : public driver_device
 {
 public:
 	proconn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
 
-static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8, proconn_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( proconn_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( proconn_portmap, AS_IO, 8, proconn_state )
 ADDRESS_MAP_END
 
 
@@ -32,13 +41,10 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( proconn, proconn_state )
-
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
 	MCFG_CPU_IO_MAP(proconn_portmap)
-
 MACHINE_CONFIG_END
-
 
 
 
@@ -649,11 +655,8 @@ ROM_END
 
 
 
-
-
 DRIVER_INIT( proconn )
 {
-
 }
 
 GAME( 199?, pr_lday			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "'L' Of A Day (Project) (PROCONN)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

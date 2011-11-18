@@ -11,6 +11,8 @@ lots of reads from 0xe000 at the start
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -18,18 +20,25 @@ class aces1_state : public driver_device
 {
 public:
 	aces1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
 
-static ADDRESS_MAP_START( aces1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( aces1_map, AS_PROGRAM, 8, aces1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aces1_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( aces1_portmap, AS_IO, 8, aces1_state )
 ADDRESS_MAP_END
 
 
@@ -232,7 +241,6 @@ ROM_END
 
 DRIVER_INIT( aces1 )
 {
-
 }
 
 GAME( 199?, ac1cshtw		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Cash Towers (Ace) (ACESYS1)",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

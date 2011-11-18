@@ -1,6 +1,9 @@
 /*
     Williams System 6
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
@@ -8,18 +11,28 @@ class williams_s6_state : public driver_device
 {
 public:
 	williams_s6_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( williams_s6_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_s6_map, AS_PROGRAM, 8, williams_s6_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( williams_s6 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( williams_s6 )
+void williams_s6_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( williams_s6, williams_s6_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(williams_s6_map)
-
-	MCFG_MACHINE_RESET( williams_s6 )
 MACHINE_CONFIG_END
 
 /*----------------------------
@@ -332,6 +343,7 @@ ROM_START(trizn_t1)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
+
 GAME(1979,	blkou_l1,		0,			williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Blackout (L-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	blkou_t1,		blkou_l1,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Blackout (T-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	blkou_f1,		blkou_l1,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Blackout (L-1, French Speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
@@ -348,4 +360,3 @@ GAME(1980,	scrpn_l1,		0,			williams_s6,	williams_s6,	williams_s6,	ROT0,	"William
 GAME(1980,	scrpn_t1,		scrpn_l1,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Scorpion (T-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	trizn_l1,		0,			williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Tri Zone (L-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	trizn_t1,		trizn_l1,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Tri Zone (T-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-

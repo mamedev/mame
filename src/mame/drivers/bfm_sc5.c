@@ -14,6 +14,8 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "bfm_sc45.h"
@@ -22,12 +24,18 @@ class sc5_state : public driver_device
 {
 public:
 	sc5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START( sc5_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( sc5_map, AS_PROGRAM, 32, sc5_state )
 	AM_RANGE(0x00000000, 0x002fffff) AM_ROM
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
 	AM_RANGE(0x40000000, 0x40000fff) AM_RAM
@@ -43,8 +51,6 @@ static MACHINE_CONFIG_START( sc5, sc5_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
 MACHINE_CONFIG_END
-
-
 
 
 

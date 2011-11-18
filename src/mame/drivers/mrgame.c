@@ -1,6 +1,9 @@
 /*
     Mr. Game 1B11188/0
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
@@ -8,18 +11,28 @@ class mrgame_state : public driver_device
 {
 public:
 	mrgame_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( mrgame_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mrgame_map, AS_PROGRAM, 16, mrgame_state )
 	AM_RANGE(0x0000, 0xffffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mrgame )
 INPUT_PORTS_END
 
-static MACHINE_RESET( mrgame )
+void mrgame_state::machine_reset()
 {
 }
 
@@ -31,8 +44,6 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mrgame_map)
-
-	MCFG_MACHINE_RESET( mrgame )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -156,8 +167,9 @@ ROM_START(wcup90)
 	ROM_LOAD("snd_ic44.rom", 0x00000, 0x8000, CRC(00946570) SHA1(83e7dd89844679571ab2a803295c8ca8941a4ac7))
 ROM_END
 
-GAME(1988,	dakar,		0,			mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Dakar",						GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1988,	motrshow,	0,			mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Motor Show",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1988,	motrshowa,	motrshow,		mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Motor Show (alternate set)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1990,	macattck,	0,			mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Mac Attack",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1990,	wcup90,		0,			mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"World Cup 90",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+
+GAME(1988,  dakar,     0,         mrgame,  mrgame,  mrgame,  ROT0,  "Mr Game",    "Dakar",                      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1988,  motrshow,  0,         mrgame,  mrgame,  mrgame,  ROT0,  "Mr Game",    "Motor Show",                 GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1988,  motrshowa, motrshow,  mrgame,  mrgame,  mrgame,  ROT0,  "Mr Game",    "Motor Show (alternate set)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1990,  macattck,  0,         mrgame,  mrgame,  mrgame,  ROT0,  "Mr Game",    "Mac Attack",                 GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1990,  wcup90,    0,         mrgame,  mrgame,  mrgame,  ROT0,  "Mr Game",    "World Cup 90",               GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

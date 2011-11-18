@@ -24,6 +24,8 @@
 
 ************************************************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/h83002/h8.h"
 #include "sound/ymz280b.h"
@@ -33,18 +35,21 @@ class maygayep_state : public driver_device
 {
 public:
 	maygayep_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START( maygayep_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( maygayep_map, AS_PROGRAM, 16, maygayep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0xfe8000, 0xfeffff ) AM_RAM // merln at least?
-
-
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( maygayep )

@@ -13,13 +13,15 @@
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 
 class unkfr_state : public driver_device
 {
 public:
 	unkfr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)	{ }
 };
 
 static INPUT_PORTS_START( unkfr )
@@ -737,9 +739,5 @@ ROM_START( unkfra )
 ROM_END
 
 
-
-
-GAME( 19??, unkfr		,  0		 , unkfr,   unkfr,   0,	ROT0,  "unknown", "Unknown Fruit Machine ROMs (set 1)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, unkfra		,  0		 , unkfr,   unkfr,   0,	ROT0,  "unknown", "Unknown Fruit Machine ROMs (set 2)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-
-
+GAME(19??,  unkfr,   0,  unkfr,  unkfr,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 1)",     GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(19??,  unkfra,  0,  unkfr,  unkfr,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 2)",     GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

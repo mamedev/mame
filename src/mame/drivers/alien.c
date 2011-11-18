@@ -13,6 +13,8 @@
 
 ***********************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
 
@@ -22,26 +24,39 @@ class alien_state : public driver_device
 {
 public:
 	alien_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
 
+	DECLARE_READ64_MEMBER(test_r);
+
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
-static VIDEO_START( alien )
+void alien_state::video_start()
 {
 
 }
 
-static SCREEN_UPDATE( alien )
+bool alien_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static READ64_HANDLER( test_r )
+READ64_MEMBER( alien_state::test_r )
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static ADDRESS_MAP_START( alien_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( alien_map, AS_PROGRAM, 64, alien_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x08000000, 0x08000007) AM_READ(test_r) //hangs if zero
 	AM_RANGE(0x0cfe0000, 0x0cffffff) AM_RAM
@@ -56,9 +71,10 @@ static INPUT_PORTS_START( alien )
 
 INPUT_PORTS_END
 
-static MACHINE_RESET( alien )
+
+void alien_state::machine_reset()
 {
-	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+	//cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( alien, alien_state )
@@ -74,11 +90,6 @@ static MACHINE_CONFIG_START( alien, alien_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-
-	MCFG_MACHINE_RESET(alien)
-
-	MCFG_VIDEO_START(alien)
-	MCFG_SCREEN_UPDATE(alien)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

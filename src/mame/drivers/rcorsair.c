@@ -46,6 +46,8 @@ so even the Main CPU is unknown, assuming the 8085 is the sound CPU
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
@@ -54,12 +56,22 @@ class rcorsair_state : public driver_device
 {
 public:
 	rcorsair_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+	: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static ADDRESS_MAP_START( rcorsair_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rcorsair_map, AS_PROGRAM, 8, rcorsair_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -106,11 +118,11 @@ static GFXDECODE_START( rcorsair )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static VIDEO_START( rcorsair )
+void rcorsair_state::video_start()
 {
 }
 
-static SCREEN_UPDATE( rcorsair )
+bool rcorsair_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 
 	return 0;
@@ -131,12 +143,9 @@ static MACHINE_CONFIG_START( rcorsair, rcorsair_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(rcorsair)
 
 	MCFG_GFXDECODE(rcorsair)
 	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_START(rcorsair)
 MACHINE_CONFIG_END
 
 ROM_START( rcorsair )
@@ -158,5 +167,6 @@ ROM_START( rcorsair )
 	ROM_LOAD( "prom_3d.bin", 0x00000, 0x100, CRC(fd8bc85b) SHA1(79324a6cecea652bc920ec762e7a30044003ed3f) ) // ?
 	ROM_LOAD( "prom_3c.bin", 0x00000, 0x100, CRC(edca1d4a) SHA1(a5ff659cffcd09cc161960da8f5cdd234e0db92c) ) // ?
 ROM_END
+
 
 GAME( 1984, rcorsair,  0,    rcorsair, inports, 0, ROT90, "Nakasawa", "Red Corsair", GAME_NOT_WORKING | GAME_NO_SOUND )

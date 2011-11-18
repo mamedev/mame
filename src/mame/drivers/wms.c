@@ -6,6 +6,8 @@ x86 based
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
@@ -13,17 +15,24 @@ class wms_state : public driver_device
 {
 public:
 	wms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+	: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( wms_map, AS_PROGRAM, 32 )
+
+static ADDRESS_MAP_START( wms_map, AS_PROGRAM, 32, wms_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0 )
 
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wms_io, AS_IO, 32 )
+static ADDRESS_MAP_START( wms_io, AS_IO, 32, wms_state )
 ADDRESS_MAP_END
 
 

@@ -16,6 +16,8 @@ I/O Board with Altera Flex EPF15K50EQC240-3
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
@@ -24,21 +26,31 @@ class tokyocop_state : public driver_device
 {
 public:
 	tokyocop_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
-static VIDEO_START(tokyocop)
+void tokyocop_state::video_start()
 {
 }
 
-static SCREEN_UPDATE(tokyocop)
+bool tokyocop_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START( tokyocop_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( tokyocop_map, AS_PROGRAM, 32, tokyocop_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -58,11 +70,8 @@ static MACHINE_CONFIG_START( tokyocop, tokyocop_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(tokyocop)
 
 	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_START(tokyocop)
 MACHINE_CONFIG_END
 
 

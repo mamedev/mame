@@ -1,6 +1,9 @@
 /*
     Zaccaria Generation 1
 */
+
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 
@@ -8,18 +11,28 @@ class zac_1_state : public driver_device
 {
 public:
 	zac_1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( zac_1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zac_1_map, AS_PROGRAM, 8, zac_1_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zac_1 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( zac_1 )
+void zac_1_state::machine_reset()
 {
 }
 
@@ -31,9 +44,8 @@ static MACHINE_CONFIG_START( zac_1, zac_1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_1_map)
-
-	MCFG_MACHINE_RESET( zac_1 )
 MACHINE_CONFIG_END
+
 
 /*--------------------------------
 / Earth Wind Fire (04/81)
@@ -45,6 +57,7 @@ ROM_START(ewf)
 	ROM_LOAD ( "ewf_3.lgc", 0x0800, 0x0400, CRC(b21bf015) SHA1(ecddfe1d6797c39e094a7f86efabf0abea0fa4af))
 	ROM_LOAD ( "ewf_4.lgc", 0x0c00, 0x0400, CRC(d110da3f) SHA1(88e27347d209fab5be924f95b0a001476ea92c1f))
 	ROM_LOAD ( "ewf_5.lgc", 0x1000, 0x0400, CRC(f695dab6) SHA1(48ca60718cea40baa5052f690c8d69eb7ab32b0e))
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("ewf.snd", 0x0000, 0x0800, CRC(5079e493) SHA1(51d366cdd09ad00b8b016b0ea1c85ac95ef94d71))
 ROM_END
@@ -113,6 +126,7 @@ ROM_START(locomotp)
 	ROM_CONTINUE(0x1400, 0x0400)
 	ROM_LOAD ( "loc-4.fil", 0x0c00, 0x0400, CRC(177c89b6) SHA1(23de8208dbbf141952a974514fc752ed2eb6b202))
 	ROM_LOAD ( "loc-5.fil", 0x1000, 0x0400, CRC(cad4122a) SHA1(df29914adeb9675abbd9f43dbef23adf2fe96c81))
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("loc-snd.fil", 0x0000, 0x0800, CRC(51ea9d2a) SHA1(9a68687af2c1cad2a261f61a67a625d906c502e1))
 ROM_END
@@ -139,6 +153,7 @@ ROM_START(sshtlzac)
 	ROM_LOAD ( "spcshtl3.lgc", 0x0800, 0x0400, CRC(a302e5a9) SHA1(1585f4000d105a7a2be5638ade9ab8668e6c8a5e))
 	ROM_LOAD ( "spcshtl4.lgc", 0x0c00, 0x0400, CRC(a02ee0b5) SHA1(50532bdc347ecfdbd4cc43403ff2cb1dcb1fe1ac))
 	ROM_LOAD ( "spcshtl5.lgc", 0x1000, 0x0400, CRC(d1dabd9b) SHA1(0d28336764f43fa4d1b23d849b6ec0f60b2b4ecf))
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("spcshtl.snd", 0x0000, 0x0800, CRC(9a61781c) SHA1(0293640653d8cc9532debd31bbb70f025b4e6d03))
 ROM_END
@@ -162,6 +177,7 @@ ROM_START(stargoda)
 	ROM_LOAD ( "stargod3.lgc", 0x0800, 0x0400, CRC(95492ac0) SHA1(992ad53efc5b53020e3939dfca5431fd50b6571c))
 	ROM_LOAD ( "stargod4.lgc", 0x0c00, 0x0400, CRC(09e5682a) SHA1(c9fcad4f55ee005e204a49fa65e7d77ecfde9680))
 	ROM_LOAD ( "stargod5.lgc", 0x1000, 0x0400, CRC(43ba2462) SHA1(6749bdceca4a1dc2bc90d7ee3b671f52219e1af4))
+
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("stargod.snd", 0x7800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
 	ROM_RELOAD( 0xf800, 0x0800)
@@ -179,14 +195,14 @@ ROM_START(wsports)
 	ROM_LOAD ( "ws5.bin", 0x1000, 0x0400, CRC(5ef51ced) SHA1(390579d0482ceabf87924f7718ef33e336726d92))
 ROM_END
 
-GAME(1981,	ewf,		0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Earth Wind Fire",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	firemntn,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Fire Mountain",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1978,	futurwld,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Future World",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1979,	hotwheel,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Hot Wheels",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1978,	hod,		0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"House of Diamonds",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	locomotp,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Locomotion",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1979,	strapids,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Shooting the Rapids",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	sshtlzac,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Space Shuttle (Zaccaria)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	stargod,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Star God",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	stargoda,	stargod,	zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Star God (alternate sound)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1978,	wsports,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Winter Sports",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981, ewf,       0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Earth Wind Fire",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980, firemntn,  0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Fire Mountain",       GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1978, futurwld,  0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Future World",        GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1979, hotwheel,  0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Hot Wheels",          GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1978, hod,       0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "House of Diamonds",   GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981, locomotp,  0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Locomotion",          GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1979, strapids,  0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Shooting the Rapids", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980, sshtlzac,  0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Space Shuttle (Zaccaria)",   GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980, stargod,   0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Star God",            GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980, stargoda,  stargod, zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Star God (alternate sound)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1978, wsports,   0,       zac_1,  zac_1,  zac_1,  ROT0,  "Zaccaria",    "Winter Sports",       GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

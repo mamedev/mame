@@ -2,6 +2,8 @@
     Game Plan MPU-1
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -9,18 +11,28 @@ class gp_1_state : public driver_device
 {
 public:
 	gp_1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
 };
 
 
-static ADDRESS_MAP_START( gp_1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gp_1_map, AS_PROGRAM, 8, gp_1_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gp_1 )
 INPUT_PORTS_END
 
-static MACHINE_RESET( gp_1 )
+void gp_1_state::machine_reset()
 {
 }
 
@@ -32,8 +44,6 @@ static MACHINE_CONFIG_START( gp_1, gp_1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2457600)
 	MCFG_CPU_PROGRAM_MAP(gp_1_map)
-
-	MCFG_MACHINE_RESET( gp_1 )
 MACHINE_CONFIG_END
 
 

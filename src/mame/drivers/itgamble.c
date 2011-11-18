@@ -53,6 +53,8 @@
 
 #define EJOLLYX5_MAIN_CLOCK	XTAL_16MHz
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/h83002/h8.h"
 #include "sound/okim6295.h"
@@ -62,8 +64,19 @@ class itgamble_state : public driver_device
 {
 public:
 	itgamble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	
+protected:
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	
+	// driver_device overrides
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -71,11 +84,11 @@ public:
 *     Video Hardware     *
 *************************/
 
-static VIDEO_START( itgamble )
+void itgamble_state::video_start()
 {
 }
 
-static SCREEN_UPDATE( itgamble )
+bool itgamble_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -85,7 +98,7 @@ static SCREEN_UPDATE( itgamble )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( itgamble_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( itgamble_map, AS_PROGRAM, 16, itgamble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
@@ -177,10 +190,10 @@ GFXDECODE_END
 *      Machine Reset      *
 **************************/
 
-static MACHINE_RESET( itgamble )
+void itgamble_state::machine_reset()
 {
 	/* stop the CPU, we have no code for it anyway */
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -201,13 +214,9 @@ static MACHINE_CONFIG_START( itgamble, itgamble_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE( itgamble )
-
-	MCFG_MACHINE_RESET( itgamble )
 
 	MCFG_GFXDECODE(itgamble)
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_VIDEO_START( itgamble )
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
