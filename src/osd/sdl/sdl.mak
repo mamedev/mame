@@ -134,7 +134,7 @@ endif
 ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
-SDL_NETWORK = on
+SDL_NETWORK = taptun
 endif
 
 ifeq ($(TARGETOS),freebsd)
@@ -175,6 +175,7 @@ DEBUGOBJS = $(SDLOBJ)/debugosx.o
 SYNC_IMPLEMENTATION = ntc
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
+SDL_NETWORK = pcap
 MAINLDFLAGS = -Xlinker -all_load
 NO_X11 = 1
 ifdef BIGENDIAN
@@ -209,6 +210,7 @@ LIBGL = -lopengl32
 SDLMAIN = $(SDLOBJ)/main.o
 # needed for unidasm
 LDFLAGS += -Wl,--allow-multiple-definition
+SDL_NETWORK = pcap
 
 # do we have GTK ?
 ifndef GTK_INSTALL_ROOT
@@ -502,12 +504,21 @@ endif # NO_X11
 #-------------------------------------------------
 
 ifdef USE_NETWORK
-ifeq ($(SDL_NETWORK),on)
+ifeq ($(SDL_NETWORK),taptun)
 OSDOBJS += \
 	$(SDLOBJ)/netdev.o \
 	$(SDLOBJ)/netdev_tap.o
 
-DEFS += -DSDLMAME_NETWORK
+DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_TAPTUN
+endif
+
+ifeq ($(SDL_NETWORK),pcap)
+OSDOBJS += \
+	$(SDLOBJ)/netdev.o \
+	$(SDLOBJ)/netdev_pcap.o
+
+DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_PCAP
+LIBS += -lpcap
 endif
 endif
 

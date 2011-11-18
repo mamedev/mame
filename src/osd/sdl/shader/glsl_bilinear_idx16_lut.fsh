@@ -25,7 +25,7 @@ vec4 lutTex2D(in vec2 texcoord)
 	color_map_coord.y = floor(color_map_coord.x/colortable_sz.x);
 	color_map_coord.x =   mod(color_map_coord.x,colortable_sz.x);
 
-	return texture2D(colortable_texture, color_map_coord/(colortable_pow2_sz-1.0));
+	return texture2D(colortable_texture, (color_map_coord+vec2(0.5)) / colortable_pow2_sz);
 }
 
 void main()

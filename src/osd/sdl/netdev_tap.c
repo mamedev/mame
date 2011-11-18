@@ -38,7 +38,7 @@ netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, 
 
 	m_fd = -1;
 	if((m_fd = open("/dev/net/tun", O_RDWR)) == -1) {
-		logerror("tap: open failed %d\n", errno);
+		mame_printf_verbose("tap: open failed %d\n", errno);
 		return;
 	}
 
@@ -46,11 +46,12 @@ netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, 
 	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
 	sprintf(ifr.ifr_name, "tap-mess-%d-0", getuid());
 	if(ioctl(m_fd, TUNSETIFF, (void *)&ifr) == -1) {
-		logerror("tap: ioctl failed %d\n", errno);
+		mame_printf_verbose("tap: ioctl failed %d\n", errno);
 		close(m_fd);
 		m_fd = -1;
 		return;
 	}
+    mame_printf_verbose("netdev_tap: network up!\n");
 	strncpy(m_ifname, ifr.ifr_name, 10);
 	fcntl(m_fd, F_SETFL, O_NONBLOCK);
 

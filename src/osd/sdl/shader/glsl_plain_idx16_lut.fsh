@@ -24,7 +24,7 @@ void main()
 	color_map_coord.y = floor(color_map_coord.x/colortable_sz.x);
 	color_map_coord.x =   mod(color_map_coord.x,colortable_sz.x);
 
-	gl_FragColor = texture2D(colortable_texture, color_map_coord / (colortable_pow2_sz-1.0));
+	gl_FragColor = texture2D(colortable_texture, (color_map_coord+vec2(0.5)) / colortable_pow2_sz);
 }
 
 

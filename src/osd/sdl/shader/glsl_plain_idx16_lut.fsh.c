@@ -25,7 +25,7 @@ const char glsl_plain_idx16_lut_fsh_src[] =
 "	color_map_coord.y = floor(color_map_coord.x/colortable_sz.x);\n"
 "	color_map_coord.x =   mod(color_map_coord.x,colortable_sz.x);\n"
 "\n"
-"	gl_FragColor = texture2D(colortable_texture, color_map_coord / (colortable_pow2_sz-1.0));\n"
+"	gl_FragColor = texture2D(colortable_texture, (color_map_coord+vec2(0.5)) / colortable_pow2_sz);\n"
 "}\n"
 "\n"
 "\n"
