@@ -1196,7 +1196,7 @@ VIDEO_START(sms)
 }
 
 
-MACHINE_RESET(sms)
+static MACHINE_RESET(sms)
 {
 	md_sms_vdp->sms_scanline_timer->adjust(attotime::zero);
 }

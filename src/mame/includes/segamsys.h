@@ -36,7 +36,6 @@ extern WRITE8_HANDLER( md_sms_vdp_ctrl_w );
 
 extern VIDEO_START(sms);
 extern SCREEN_EOF(sms);
-extern MACHINE_RESET(sms);
 extern READ8_HANDLER( sms_vdp_2_data_r );
 extern WRITE8_HANDLER( sms_vdp_2_data_w );
 extern READ8_HANDLER( sms_vdp_2_ctrl_r );
