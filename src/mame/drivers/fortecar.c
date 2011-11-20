@@ -71,7 +71,7 @@
 -------------------------------------------------------------------------------------------------
 
   From the manual (sic)...
-  
+
   Initialization of the Forte Card circuit board
   (Init machine)
 
@@ -109,7 +109,7 @@ public:
 	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8 *m_ram;
+	UINT8 *m_vram;
 	int m_bank;
 };
 
@@ -128,12 +128,16 @@ static SCREEN_UPDATE(fortecar)
 	{
 		for(x=0;x<0x4b;x++)
 		{
-			int tile,color;
+			int tile,color,bpp;
 
-			tile = (state->m_ram[(count*4)+1] | (state->m_ram[(count*4)+2]<<8)) & 0xfff;
-			color = state->m_ram[(count*4)+3] & 7;
+			tile = (state->m_vram[(count*4)+1] | (state->m_vram[(count*4)+2]<<8)) & 0xfff;
+			color = state->m_vram[(count*4)+3] & 0x1f;
+			bpp = (state->m_vram[(count*4)+3] & 0x20) >> 5;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,color,0,0,x*8,y*8);
+			if(bpp)
+				color&=0x3;
+
+			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[bpp],tile,color,0,0,x*8,y*8);
 			count++;
 
 		}
@@ -184,9 +188,8 @@ R = 82 Ohms Pull Down.
 		g = combine_3_weights(weights_g, bit0, bit1, bit2);
 
 		/* blue component */
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
@@ -318,7 +321,7 @@ static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_MEMBER(fortecar_state, m_ram)
+	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_MEMBER(fortecar_state, m_vram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
@@ -438,20 +441,33 @@ static INPUT_PORTS_START( fortecar )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
-static const gfx_layout tiles8x8_layout =
+static const gfx_layout tiles8x8_layout_3bpp =
 {
 	8,8,
 	RGN_FRAC(1,3),
-	6,
-	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+4, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+4, 0, 4 },
+	3,
+	{ RGN_FRAC(2,3)+4, RGN_FRAC(1,3)+4, RGN_FRAC(0,3)+4 },
 	{ 8,9,10,11,0, 1, 2, 3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
 };
 
+static const gfx_layout tiles8x8_layout_6bpp =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	6,
+	{ RGN_FRAC(2,3)+0, RGN_FRAC(1,3)+0, RGN_FRAC(0,3)+0, RGN_FRAC(2,3)+4, RGN_FRAC(1,3)+4, RGN_FRAC(0,3)+4 },
+	{ 8,9,10,11,0, 1, 2, 3 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	16*8
+};
+
+
+
 static GFXDECODE_START( fortecar )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout_3bpp, 0x000, 0x20 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout_6bpp, 0x100, 0x04 )
 GFXDECODE_END
 
 
@@ -509,7 +525,7 @@ ROM_START( fortecar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fortecar.u7", 0x00000, 0x010000, CRC(2a4b3429) SHA1(8fa630dac949e758678a1a36b05b3412abe8ae16)  )
 
-	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "fortecar.u38", 0x00000, 0x10000, CRC(c2090690) SHA1(f0aa8935b90a2ab6043555ece69f926372246648) )
 	ROM_LOAD( "fortecar.u39", 0x10000, 0x10000, CRC(fc3ddf4f) SHA1(4a95b24c4edb67f6d59f795f86dfbd12899e01b0) )
 	ROM_LOAD( "fortecar.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
@@ -522,7 +538,7 @@ ROM_START( fortecrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "forte_card.u7", 0x00000, 0x010000, CRC(79fc6dd3) SHA1(5454f2ee12b62d573b61c54e48398f43332b000e) )
 
-	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "forte_card.u38", 0x00000, 0x10000, CRC(258fb7bf) SHA1(cd75001fe40836b2dc229caddfc38f6076df7a79) )
 	ROM_LOAD( "forte_card.u39", 0x10000, 0x10000, CRC(3d9c478e) SHA1(eb86115d1c36038f2c80cd116f5aeddd94036424) )
 	ROM_LOAD( "forte_card.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
@@ -543,5 +559,5 @@ static DRIVER_INIT( fortecar )
 {
 }
 
-GAME( 19??, fortecar, 0,        fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (English)", GAME_NOT_WORKING | GAME_WRONG_COLORS)
-GAME( 19??, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Spanish)", GAME_NOT_WORKING | GAME_WRONG_COLORS)
+GAME( 19??, fortecar, 0,        fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (English)", GAME_NOT_WORKING)
+GAME( 19??, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Spanish)", GAME_NOT_WORKING)
