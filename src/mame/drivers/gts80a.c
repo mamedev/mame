@@ -32,7 +32,7 @@ class caveman_state : public gts80a_state
 public:
 	caveman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gts80a_state(mconfig, type, tag),
-		  m_videocpu(*this, "videocpu")
+		  m_videocpu(*this, "video_cpu")
 	{ }
 	
 protected:
