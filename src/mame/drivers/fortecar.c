@@ -530,8 +530,17 @@ ROM_START( fortecar )
 	ROM_LOAD( "fortecar.u39", 0x10000, 0x10000, CRC(fc3ddf4f) SHA1(4a95b24c4edb67f6d59f795f86dfbd12899e01b0) )
 	ROM_LOAD( "fortecar.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
 
+	/* took from the Spanish version, these are likely to be identical anyway */
+//	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+//	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
+//	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
+
+	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
+	ROM_LOAD( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
+
+
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "prom.x", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "forte_card_82s147.u47", 0x0000, 0x0200, BAD_DUMP CRC(7e631818) SHA1(ac08b0de30260278af3a1c5dee5810d4304cb9ca) )
 ROM_END
 
 ROM_START( fortecrd )
