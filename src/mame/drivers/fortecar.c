@@ -110,7 +110,14 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_vram;
-	int m_bank;
+
+	/* calendar */
+	UINT8        m_cal_val;
+	UINT8        m_cal_mask;
+	UINT8        m_cal_com;
+	UINT8        m_cal_cnt;
+	system_time  m_systime;
+
 };
 
 
@@ -208,9 +215,9 @@ DIN  PPI_PC2
 DOUT PPI_PC4
 */
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data & 0x04);
+	eeprom->write_bit((data & 0x04) >> 2);
 	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom->set_clock_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
@@ -226,8 +233,8 @@ static const ppi8255_interface ppi0intf =
 	Serial Eprom connected to Port C
 */
 
-	DEVCB_INPUT_PORT("DSW1"),	/* Port A read */
-	DEVCB_INPUT_PORT("IN2"),	/* Port B read */
+	DEVCB_INPUT_PORT("SYSTEM"),	/* Port A read */
+	DEVCB_INPUT_PORT("INPUT"),	/* Port B read */
 	DEVCB_DEVICE_HANDLER("eeprom", ppi0_portc_r),	/* Port C read */
 	DEVCB_NULL,					/* Port A write */
 	DEVCB_NULL,					/* Port B write */
@@ -308,7 +315,7 @@ static const eeprom_interface forte_eeprom_intf =
 	Correct address & data. Using 93C46 similar protocol.
 */
 	7,                /* address bits */
-	16,                /* data bits */
+	16,               /* data bits */
 	"*110",           /* read command */
 	"*101",           /* write command */
 	"*111",           /* erase command */
@@ -316,6 +323,81 @@ static const eeprom_interface forte_eeprom_intf =
 	"*10011xxxxxx",   /* unlock command */
 };
 
+/* V3021 RTC emulation, stolen from PGM driver, TODO */
+static UINT8 bcd( UINT8 data )
+{
+	return ((data / 10) << 4) | (data % 10);
+}
+
+static READ8_HANDLER( pgm_calendar_r )
+{
+	fortecar_state *state = space->machine().driver_data<fortecar_state>();
+	UINT8 calr = (state->m_cal_val & state->m_cal_mask) ? 1 : 0;
+
+	state->m_cal_mask <<= 1;
+	return calr;
+}
+
+static WRITE8_HANDLER( pgm_calendar_w )
+{
+	fortecar_state *state = space->machine().driver_data<fortecar_state>();
+
+	space->machine().base_datetime(state->m_systime);
+
+	state->m_cal_com <<= 1;
+	state->m_cal_com |= data & 1;
+	++state->m_cal_cnt;
+
+	if (state->m_cal_cnt == 4)
+	{
+		state->m_cal_mask = 1;
+		state->m_cal_val = 1;
+		state->m_cal_cnt = 0;
+
+		switch (state->m_cal_com & 0xf)
+		{
+			case 1: case 3: case 5: case 7: case 9: case 0xb: case 0xd:
+				state->m_cal_val++;
+				break;
+
+			case 0:
+				state->m_cal_val = bcd(state->m_systime.local_time.weekday); //??
+				break;
+
+			case 2:  //Hours
+				state->m_cal_val = bcd(state->m_systime.local_time.hour);
+				break;
+
+			case 4:  //Seconds
+				state->m_cal_val = bcd(state->m_systime.local_time.second);
+				break;
+
+			case 6:  //Month
+				state->m_cal_val = bcd(state->m_systime.local_time.month + 1); //?? not bcd in MVS
+				break;
+
+			case 8:
+				state->m_cal_val = 0; //Controls blinking speed, maybe milliseconds
+				break;
+
+			case 0xa: //Day
+				state->m_cal_val = bcd(state->m_systime.local_time.mday);
+				break;
+
+			case 0xc: //Minute
+				state->m_cal_val = bcd(state->m_systime.local_time.minute);
+				break;
+
+			case 0xe:  //Year
+				state->m_cal_val = bcd(state->m_systime.local_time.year % 100);
+				break;
+
+			case 0xf:  //Load Date
+				space->machine().base_datetime(state->m_systime);
+				break;
+		}
+	}
+}
 
 static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -332,8 +414,8 @@ static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
 //  AM_RANGE(0x80, 0x81) //8251A UART
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0") //written too,multiplexer?
-	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("IN1")
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE(pgm_calendar_r,pgm_calendar_w) // v3021 RTC, TODO
+	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 /*
 
@@ -348,8 +430,8 @@ Error messages:
 
 */
 static INPUT_PORTS_START( fortecar )
-	PORT_START("IN0")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_START("DSW")	/* 8bit */
+	PORT_DIPNAME( 0x01, 0x01, "DSW" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -374,39 +456,9 @@ static INPUT_PORTS_START( fortecar )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN2")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x01, "IN2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("INPUT")	/* 8bit */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Red")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -414,11 +466,11 @@ static INPUT_PORTS_START( fortecar )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 
-	PORT_START("DSW1")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
+	PORT_START("SYSTEM")	/* 8bit */
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" ) // key in
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // key out
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
@@ -430,13 +482,13 @@ static INPUT_PORTS_START( fortecar )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) // credit
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // service
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // service coin?
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -474,8 +526,8 @@ GFXDECODE_END
 
 static MACHINE_RESET(fortecar)
 {
-	fortecar_state *state = machine.driver_data<fortecar_state>();
-	state->m_bank = -1;
+//	fortecar_state *state = machine.driver_data<fortecar_state>();
+
 }
 
 
