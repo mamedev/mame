@@ -7,6 +7,23 @@
 
 - Note: press F2 to enter service mode -
 
+---------------------------------------------------------------------------
+                                TODO list
+---------------------------------------------------------------------------
+WEC Le Mans 24:
+- The parallactic scrolling is sometimes wrong
+Hot Chase:
+- gameplay speed is VERY erratic
+- Samples pitch is too low
+- No zoom and rotation of the layers
+Common Issues:
+- One ROM unused (32K in hotchase, 16K in wecleman)
+- Incomplete DSWs
+- Sprite ram is not cleared by the game and no sprite list end-marker
+  is written. We cope with that with an hack in the Blitter but there
+  must be a register to do the trick
+
+
 
 ----------------------------------------------------------------------
 Hardware                Main    Sub             Sound   Sound Chips
@@ -199,35 +216,6 @@ Self Test:
 580c                    writes at 60000
 61fc                    print test strings
 18cbe                   print "game over"
-
-
----------------------------------------------------------------------------
-                                   Issues
-                              [WEC Le Mans 24]
----------------------------------------------------------------------------
-
-- The parallactic scrolling is sometimes wrong
-
-
----------------------------------------------------------------------------
-                                   Issues
-                                [Hot Chase]
----------------------------------------------------------------------------
-
-- gameplay speed
-- Samples pitch is too low
-- No zoom and rotation of the layers
-
----------------------------------------------------------------------------
-                               Common Issues
----------------------------------------------------------------------------
-
-- One ROM unused (32K in hotchase, 16K in wecleman)
-- Incomplete DSWs
-- Sprite ram is not cleared by the game and no sprite list end-marker
-  is written. We cope with that with an hack in the Blitter but there
-  must be a register to do the trick
-
 
 Revisions:
 
@@ -556,7 +544,6 @@ static ADDRESS_MAP_START( hotchase_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")					// Shared with sub CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_MEMBER(wecleman_state, m_spriteram)	// Sprites
-	// Input Ports:
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(hotchase_soundlatch_w)	// To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel /
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
@@ -1117,6 +1104,20 @@ static const k051316_interface hotchase_k051316_intf_1 =
 	hotchase_zoom_callback_1
 };
 
+static MACHINE_RESET( hotchase )
+{
+	int i;
+
+	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
+	         For now let's fill everything with white colors until we have better info about it */
+	for(i=0;i<0x2000/2;i++)
+	{
+		machine.generic.paletteram.u16[i] = 0xffff;
+		palette_set_color_rgb(machine,i,0xff,0xff,0xff);
+	}
+}
+
+
 static MACHINE_CONFIG_START( hotchase, wecleman_state )
 
 	/* basic machine hardware */
@@ -1132,6 +1133,8 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_CPU_PERIODIC_INT( hotchase_sound_timer, 496 )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_MACHINE_RESET(hotchase)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
