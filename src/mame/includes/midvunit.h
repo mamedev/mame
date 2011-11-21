@@ -4,9 +4,35 @@
 
 **************************************************************************/
 
-#include "video/poly.h"
+#include "video/polynew.h"
 
 #define MIDVUNIT_VIDEO_CLOCK	33000000
+
+struct midvunit_object_data
+{
+	UINT16 *	destbase;
+	UINT8 *		texbase;
+	UINT16		pixdata;
+	UINT8		dither;
+};
+
+class midvunit_state;
+
+class midvunit_renderer : public poly_manager<float, midvunit_object_data, 2, 4000>
+{
+public:
+	midvunit_renderer(midvunit_state &state);
+	void process_dma_queue();
+	void make_vertices_inclusive(vertex_t *vert);
+
+private:
+	midvunit_state &m_state;
+
+	void render_flat(INT32 scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+	void render_tex(INT32 scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+	void render_textrans(INT32 scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+	void render_textransmask(INT32 scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+};
 
 class midvunit_state : public driver_device
 {
@@ -39,7 +65,7 @@ public:
 	UINT16 m_page_control;
 	UINT8 m_video_changed;
 	emu_timer *m_scanline_timer;
-	poly_manager *m_poly;
+	midvunit_renderer *m_poly;
 };
 
 

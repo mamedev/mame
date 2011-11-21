@@ -8,7 +8,6 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/williams.h"
-#include "video/poly.h"
 #include "includes/midvunit.h"
 
 
@@ -24,14 +23,9 @@
 #define TIME_PER_PIXEL		41e-9
 
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
-{
-	UINT8 *		texbase;
-	UINT16		pixdata;
-	UINT8		dither;
-};
-
+midvunit_renderer::midvunit_renderer(midvunit_state &state)
+	: poly_manager(state.machine()),
+	  m_state(state) { }
 
 
 /*************************************
@@ -56,19 +50,12 @@ static TIMER_CALLBACK( scanline_timer_cb )
 }
 
 
-static void midvunit_exit(running_machine &machine)
-{
-	midvunit_state *state = machine.driver_data<midvunit_state>();
-	poly_free(state->m_poly);
-}
-
-
 VIDEO_START( midvunit )
 {
 	midvunit_state *state = machine.driver_data<midvunit_state>();
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_timer_cb));
-	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midvunit_exit), &machine));
+	
+	state->m_poly = auto_alloc(machine, midvunit_renderer(*state));
 
 	state_save_register_global_array(machine, state->m_video_regs);
 	state_save_register_global_array(machine, state->m_dma_data);
@@ -85,26 +72,25 @@ VIDEO_START( midvunit )
  *
  *************************************/
 
-static void render_flat(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void midvunit_renderer::render_flat(INT32 scanline, const extent_t &extent, const midvunit_object_data &objectdata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	UINT16 pixdata = extra->pixdata;
-	int xstep = extra->dither + 1;
-	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
-	int startx = extent->startx;
+	UINT16 pixdata = objectdata.pixdata;
+	int xstep = objectdata.dither + 1;
+	UINT16 *dest = objectdata.destbase + scanline * 512;
+	int startx = extent.startx;
 	int x;
 
 	/* if dithering, ensure that we start on an appropriate pixel */
-	startx += (scanline ^ startx) & extra->dither;
+	startx += (scanline ^ startx) & objectdata.dither;
 
 	/* non-dithered 0 pixels can use a memset */
 	if (pixdata == 0 && xstep == 1)
-		memset(&dest[startx], 0, 2 * (extent->stopx - startx + 1));
+		memset(&dest[startx], 0, 2 * (extent.stopx - startx + 1));
 
 	/* otherwise, we fill manually */
 	else
 	{
-		for (x = startx; x < extent->stopx; x += xstep)
+		for (x = startx; x < extent.stopx; x += xstep)
 			dest[x] = pixdata;
 	}
 }
@@ -117,19 +103,18 @@ static void render_flat(void *destbase, INT32 scanline, const poly_extent *exten
  *
  *************************************/
 
-static void render_tex(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void midvunit_renderer::render_tex(INT32 scanline, const extent_t &extent, const midvunit_object_data &objectdata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	UINT16 pixdata = extra->pixdata & 0xff00;
-	const UINT8 *texbase = extra->texbase;
-	int xstep = extra->dither + 1;
-	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
-	int startx = extent->startx;
-	int stopx = extent->stopx;
-	INT32 u = extent->param[0].start;
-	INT32 v = extent->param[1].start;
-	INT32 dudx = extent->param[0].dpdx;
-	INT32 dvdx = extent->param[1].dpdx;
+	UINT16 pixdata = objectdata.pixdata & 0xff00;
+	const UINT8 *texbase = objectdata.texbase;
+	int xstep = objectdata.dither + 1;
+	UINT16 *dest = objectdata.destbase + scanline * 512;
+	int startx = extent.startx;
+	int stopx = extent.stopx;
+	INT32 u = extent.param[0].start;
+	INT32 v = extent.param[1].start;
+	INT32 dudx = extent.param[0].dpdx;
+	INT32 dvdx = extent.param[1].dpdx;
 	int x;
 
 	/* if dithering, we advance by 2x; also ensure that we start on an appropriate pixel */
@@ -155,19 +140,18 @@ static void render_tex(void *destbase, INT32 scanline, const poly_extent *extent
 }
 
 
-static void render_textrans(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void midvunit_renderer::render_textrans(INT32 scanline, const extent_t &extent, const midvunit_object_data &objectdata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	UINT16 pixdata = extra->pixdata & 0xff00;
-	const UINT8 *texbase = extra->texbase;
-	int xstep = extra->dither + 1;
-	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
-	int startx = extent->startx;
-	int stopx = extent->stopx;
-	INT32 u = extent->param[0].start;
-	INT32 v = extent->param[1].start;
-	INT32 dudx = extent->param[0].dpdx;
-	INT32 dvdx = extent->param[1].dpdx;
+	UINT16 pixdata = objectdata.pixdata & 0xff00;
+	const UINT8 *texbase = objectdata.texbase;
+	int xstep = objectdata.dither + 1;
+	UINT16 *dest = objectdata.destbase + scanline * 512;
+	int startx = extent.startx;
+	int stopx = extent.stopx;
+	INT32 u = extent.param[0].start;
+	INT32 v = extent.param[1].start;
+	INT32 dudx = extent.param[0].dpdx;
+	INT32 dvdx = extent.param[1].dpdx;
 	int x;
 
 	/* if dithering, we advance by 2x; also ensure that we start on an appropriate pixel */
@@ -195,19 +179,18 @@ static void render_textrans(void *destbase, INT32 scanline, const poly_extent *e
 }
 
 
-static void render_textransmask(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void midvunit_renderer::render_textransmask(INT32 scanline, const extent_t &extent, const midvunit_object_data &objectdata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	UINT16 pixdata = extra->pixdata;
-	const UINT8 *texbase = extra->texbase;
-	int xstep = extra->dither + 1;
-	UINT16 *dest = (UINT16 *)destbase + scanline * 512;
-	int startx = extent->startx;
-	int stopx = extent->stopx;
-	INT32 u = extent->param[0].start;
-	INT32 v = extent->param[1].start;
-	INT32 dudx = extent->param[0].dpdx;
-	INT32 dvdx = extent->param[1].dpdx;
+	UINT16 pixdata = objectdata.pixdata;
+	const UINT8 *texbase = objectdata.texbase;
+	int xstep = objectdata.dither + 1;
+	UINT16 *dest = objectdata.destbase + scanline * 512;
+	int startx = extent.startx;
+	int stopx = extent.stopx;
+	INT32 u = extent.param[0].start;
+	INT32 v = extent.param[1].start;
+	INT32 dudx = extent.param[0].dpdx;
+	INT32 dvdx = extent.param[1].dpdx;
 	int x;
 
 	/* if dithering, we advance by 2x; also ensure that we start on an appropriate pixel */
@@ -242,17 +225,15 @@ static void render_textransmask(void *destbase, INT32 scanline, const poly_exten
  *
  *************************************/
 
-static void make_vertices_inclusive(poly_vertex *vert)
+void midvunit_renderer::make_vertices_inclusive(vertex_t *vert)
 {
-	UINT8 rmask = 0, bmask = 0, eqmask = 0;
-	int vnum;
-
 	/* build up a mask of right and bottom points */
 	/* note we assume clockwise orientation here */
-	for (vnum = 0; vnum < 4; vnum++)
+	UINT8 rmask = 0, bmask = 0, eqmask = 0;
+	for (int vnum = 0; vnum < 4; vnum++)
 	{
-		poly_vertex *currv = &vert[vnum];
-		poly_vertex *nextv = &vert[(vnum + 1) & 3];
+		vertex_t *currv = &vert[vnum];
+		vertex_t *nextv = &vert[(vnum + 1) & 3];
 
 		/* if this vertex equals the next one, tag it */
 		if (nextv->y == currv->y && nextv->x == currv->x)
@@ -272,9 +253,9 @@ static void make_vertices_inclusive(poly_vertex *vert)
 		return;
 
 	/* adjust the right/bottom points so that they get included */
-	for (vnum = 0; vnum < 4; vnum++)
+	for (int vnum = 0; vnum < 4; vnum++)
 	{
-		poly_vertex *currv = &vert[vnum];
+		vertex_t *currv = &vert[vnum];
 		int effvnum = vnum;
 
 		/* if we're equal to the next vertex, use that instead */
@@ -290,73 +271,71 @@ static void make_vertices_inclusive(poly_vertex *vert)
 }
 
 
-static void process_dma_queue(running_machine &machine)
+void midvunit_renderer::process_dma_queue()
 {
-	midvunit_state *state = machine.driver_data<midvunit_state>();
-	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
-	UINT16 *dest = &state->m_videoram[(state->m_page_control & 4) ? 0x40000 : 0x00000];
-	int textured = ((state->m_dma_data[0] & 0x300) == 0x100);
-	poly_draw_scanline_func callback;
-	poly_vertex vert[4];
-
 	/* if we're rendering to the same page we're viewing, it has changed */
-	if ((((state->m_page_control >> 2) ^ state->m_page_control) & 1) == 0 || WATCH_RENDER)
-		state->m_video_changed = TRUE;
+	if ((((m_state.m_page_control >> 2) ^ m_state.m_page_control) & 1) == 0 || WATCH_RENDER)
+		m_state.m_video_changed = TRUE;
 
 	/* fill in the vertex data */
-	vert[0].x = (float)(INT16)state->m_dma_data[2] + 0.5f;
-	vert[0].y = (float)(INT16)state->m_dma_data[3] + 0.5f;
-	vert[1].x = (float)(INT16)state->m_dma_data[4] + 0.5f;
-	vert[1].y = (float)(INT16)state->m_dma_data[5] + 0.5f;
-	vert[2].x = (float)(INT16)state->m_dma_data[6] + 0.5f;
-	vert[2].y = (float)(INT16)state->m_dma_data[7] + 0.5f;
-	vert[3].x = (float)(INT16)state->m_dma_data[8] + 0.5f;
-	vert[3].y = (float)(INT16)state->m_dma_data[9] + 0.5f;
+	vertex_t vert[4];
+	vert[0].x = (float)(INT16)m_state.m_dma_data[2] + 0.5f;
+	vert[0].y = (float)(INT16)m_state.m_dma_data[3] + 0.5f;
+	vert[1].x = (float)(INT16)m_state.m_dma_data[4] + 0.5f;
+	vert[1].y = (float)(INT16)m_state.m_dma_data[5] + 0.5f;
+	vert[2].x = (float)(INT16)m_state.m_dma_data[6] + 0.5f;
+	vert[2].y = (float)(INT16)m_state.m_dma_data[7] + 0.5f;
+	vert[3].x = (float)(INT16)m_state.m_dma_data[8] + 0.5f;
+	vert[3].y = (float)(INT16)m_state.m_dma_data[9] + 0.5f;
 
 	/* make the vertices inclusive of right/bottom points */
 	make_vertices_inclusive(vert);
 
 	/* handle flat-shaded quads here */
+	render_delegate callback;
+	bool textured = ((m_state.m_dma_data[0] & 0x300) == 0x100);
 	if (!textured)
-		callback = render_flat;
+		callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
 
 	/* handle textured quads here */
 	else
 	{
 		/* if textured, add the texture info */
-		vert[0].p[0] = (float)(state->m_dma_data[10] & 0xff) * 65536.0f + 32768.0f;
-		vert[0].p[1] = (float)(state->m_dma_data[10] >> 8) * 65536.0f + 32768.0f;
-		vert[1].p[0] = (float)(state->m_dma_data[11] & 0xff) * 65536.0f + 32768.0f;
-		vert[1].p[1] = (float)(state->m_dma_data[11] >> 8) * 65536.0f + 32768.0f;
-		vert[2].p[0] = (float)(state->m_dma_data[12] & 0xff) * 65536.0f + 32768.0f;
-		vert[2].p[1] = (float)(state->m_dma_data[12] >> 8) * 65536.0f + 32768.0f;
-		vert[3].p[0] = (float)(state->m_dma_data[13] & 0xff) * 65536.0f + 32768.0f;
-		vert[3].p[1] = (float)(state->m_dma_data[13] >> 8) * 65536.0f + 32768.0f;
+		vert[0].p[0] = (float)(m_state.m_dma_data[10] & 0xff) * 65536.0f + 32768.0f;
+		vert[0].p[1] = (float)(m_state.m_dma_data[10] >> 8) * 65536.0f + 32768.0f;
+		vert[1].p[0] = (float)(m_state.m_dma_data[11] & 0xff) * 65536.0f + 32768.0f;
+		vert[1].p[1] = (float)(m_state.m_dma_data[11] >> 8) * 65536.0f + 32768.0f;
+		vert[2].p[0] = (float)(m_state.m_dma_data[12] & 0xff) * 65536.0f + 32768.0f;
+		vert[2].p[1] = (float)(m_state.m_dma_data[12] >> 8) * 65536.0f + 32768.0f;
+		vert[3].p[0] = (float)(m_state.m_dma_data[13] & 0xff) * 65536.0f + 32768.0f;
+		vert[3].p[1] = (float)(m_state.m_dma_data[13] >> 8) * 65536.0f + 32768.0f;
 
 		/* handle non-masked, non-transparent quads */
-		if ((state->m_dma_data[0] & 0xc00) == 0x000)
-			callback = render_tex;
+		if ((m_state.m_dma_data[0] & 0xc00) == 0x000)
+			callback = render_delegate(FUNC(midvunit_renderer::render_tex), this);
 
 		/* handle non-masked, transparent quads */
-		else if ((state->m_dma_data[0] & 0xc00) == 0x800)
-			callback = render_textrans;
+		else if ((m_state.m_dma_data[0] & 0xc00) == 0x800)
+			callback = render_delegate(FUNC(midvunit_renderer::render_textrans), this);
 
 		/* handle masked, transparent quads */
-		else if ((state->m_dma_data[0] & 0xc00) == 0xc00)
-			callback = render_textransmask;
+		else if ((m_state.m_dma_data[0] & 0xc00) == 0xc00)
+			callback = render_delegate(FUNC(midvunit_renderer::render_textransmask), this);
 
 		/* handle masked, non-transparent quads */
 		else
-			callback = render_flat;
+			callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
 	}
 
-	/* set up the extra data for this triangle */
-	extra->texbase = (UINT8 *)state->m_textureram + (state->m_dma_data[14] * 256);
-	extra->pixdata = state->m_dma_data[1] | (state->m_dma_data[0] & 0x00ff);
-	extra->dither = ((state->m_dma_data[0] & 0x2000) != 0);
+	/* set up the object data for this triangle */
+	midvunit_object_data &objectdata = object_data_alloc();
+	objectdata.destbase = &m_state.m_videoram[(m_state.m_page_control & 4) ? 0x40000 : 0x00000];
+	objectdata.texbase = (UINT8 *)m_state.m_textureram + (m_state.m_dma_data[14] * 256);
+	objectdata.pixdata = m_state.m_dma_data[1] | (m_state.m_dma_data[0] & 0x00ff);
+	objectdata.dither = ((m_state.m_dma_data[0] & 0x2000) != 0);
 
 	/* render as a quad */
-	poly_render_quad(state->m_poly, dest, &machine.primary_screen->visible_area(), callback, textured ? 2 : 0, &vert[0], &vert[1], &vert[2], &vert[3]);
+	render_polygon<4>(machine().primary_screen->visible_area(), callback, textured ? 2 : 0, vert);
 }
 
 
@@ -391,7 +370,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 	{
 		if (LOG_DMA && space->machine().input().code_pressed(KEYCODE_L))
 			logerror("%06X:trigger\n", cpu_get_pc(&space->device()));
-		process_dma_queue(space->machine());
+		state->m_poly->process_dma_queue();
 		state->m_dma_data_index = 0;
 	}
 	return 0;
@@ -477,7 +456,7 @@ READ32_HANDLER( midvunit_scanline_r )
 WRITE32_HANDLER( midvunit_videoram_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	poly_wait(state->m_poly, "Video RAM write");
+	state->m_poly->wait("Video RAM write");
 	if (!state->m_video_changed)
 	{
 		int visbase = (state->m_page_control & 1) ? 0x40000 : 0x00000;
@@ -491,7 +470,7 @@ WRITE32_HANDLER( midvunit_videoram_w )
 READ32_HANDLER( midvunit_videoram_r )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	poly_wait(state->m_poly, "Video RAM read");
+	state->m_poly->wait("Video RAM read");
 	return state->m_videoram[offset];
 }
 
@@ -524,7 +503,7 @@ WRITE32_HANDLER( midvunit_textureram_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
 	UINT8 *base = (UINT8 *)state->m_textureram;
-	poly_wait(state->m_poly, "Texture RAM write");
+	state->m_poly->wait("Texture RAM write");
 	base[offset * 2] = data;
 	base[offset * 2 + 1] = data >> 8;
 }
@@ -552,7 +531,7 @@ SCREEN_UPDATE( midvunit )
 	int x, y, width, xoffs;
 	UINT32 offset;
 
-	poly_wait(state->m_poly, "Refresh Time");
+	state->m_poly->wait("Refresh Time");
 
 	/* if the video didn't change, indicate as much */
 	if (!state->m_video_changed)

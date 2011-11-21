@@ -1217,34 +1217,6 @@ ROM_END
 
 static DRIVER_INIT( gaelco3d )
 {
-	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
-	UINT8 *src, *dst;
-	int x, y;
-
-	/* allocate memory */
-	state->m_texture_size = machine.region("gfx1")->bytes();
-	state->m_texmask_size = machine.region("gfx2")->bytes() * 8;
-	state->m_texture = auto_alloc_array(machine, UINT8, state->m_texture_size);
-	state->m_texmask = auto_alloc_array(machine, UINT8, state->m_texmask_size);
-
-	/* first expand the pixel data */
-	src = machine.region("gfx1")->base();
-	dst = state->m_texture;
-	for (y = 0; y < state->m_texture_size/4096; y += 2)
-		for (x = 0; x < 4096; x += 2)
-		{
-			dst[(y + 0) * 4096 + (x + 1)] = src[0*state->m_texture_size/4 + (y/2) * 2048 + (x/2)];
-			dst[(y + 1) * 4096 + (x + 1)] = src[1*state->m_texture_size/4 + (y/2) * 2048 + (x/2)];
-			dst[(y + 0) * 4096 + (x + 0)] = src[2*state->m_texture_size/4 + (y/2) * 2048 + (x/2)];
-			dst[(y + 1) * 4096 + (x + 0)] = src[3*state->m_texture_size/4 + (y/2) * 2048 + (x/2)];
-		}
-
-	/* then expand the mask data */
-	src = machine.region("gfx2")->base();
-	dst = state->m_texmask;
-	for (y = 0; y < state->m_texmask_size/4096; y++)
-		for (x = 0; x < 4096; x++)
-			dst[y * 4096 + x] = (src[(x / 1024) * (state->m_texmask_size/8/4) + (y * 1024 + x % 1024) / 8] >> (x % 8)) & 1;
 }
 
 

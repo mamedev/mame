@@ -1332,6 +1332,7 @@ src/emu/video/pc_vga.c svneol=native#text/plain
 src/emu/video/pc_vga.h svneol=native#text/plain
 src/emu/video/poly.c svneol=native#text/plain
 src/emu/video/poly.h svneol=native#text/plain
+src/emu/video/polynew.h svneol=native#text/plain
 src/emu/video/psx.c svneol=native#text/plain
 src/emu/video/psx.h svneol=native#text/plain
 src/emu/video/resnet.c svneol=native#text/plain

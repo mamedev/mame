@@ -7,9 +7,45 @@
 **************************************************************************/
 
 #include "sound/dmadac.h"
-#include "video/poly.h"
+#include "video/polynew.h"
 
 #define SOUND_CHANNELS	4
+
+struct gaelco3d_object_data
+{
+	UINT32 tex, color;
+	float ooz_dx, ooz_dy, ooz_base;
+	float uoz_dx, uoz_dy, uoz_base;
+	float voz_dx, voz_dy, voz_base;
+	float z0;
+};
+
+class gaelco3d_state;
+
+class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 0, 2000>
+{
+public:
+	gaelco3d_renderer(gaelco3d_state &state);
+
+	bitmap_t *screenbits() const { return m_screenbits; }
+	UINT32 polygons() { UINT32 result = m_polygons; m_polygons = 0; return result; }
+
+	void render_poly(screen_device &screen, UINT32 *polydata);
+
+private:
+	gaelco3d_state &m_state;
+	bitmap_t *m_screenbits;
+	bitmap_t *m_zbuffer;
+	UINT32 m_polygons;
+	offs_t m_texture_size;
+	offs_t m_texmask_size;
+	UINT8 *m_texture;
+	UINT8 *m_texmask;
+
+	void render_noz_noperspective(INT32 scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
+	void render_normal(INT32 scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
+	void render_alphablend(INT32 scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
+};
 
 class gaelco3d_state : public driver_device
 {
@@ -33,19 +69,12 @@ public:
 	offs_t m_adsp_incs;
 	offs_t m_adsp_size;
 	dmadac_sound_device *m_dmadac[SOUND_CHANNELS];
-	UINT8 *m_texture;
-	UINT8 *m_texmask;
-	offs_t m_texture_size;
-	offs_t m_texmask_size;
-	bitmap_t *m_screenbits;
-	bitmap_t *m_zbuffer;
 	rgb_t *m_palette;
 	UINT32 *m_polydata_buffer;
 	UINT32 m_polydata_count;
-	int m_polygons;
 	int m_lastscan;
 	int m_video_changed;
-	poly_manager *m_poly;
+	gaelco3d_renderer *m_poly;
 };
 
 
