@@ -86,7 +86,7 @@ void init_pcap()
 {
 	pcap_if_t *devs;
 	char errbuf[PCAP_ERRBUF_SIZE];
-	HMODULE handle;
+	HMODULE handle = NULL;
 
 	try
 	{
