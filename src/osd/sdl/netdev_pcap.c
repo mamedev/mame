@@ -27,12 +27,12 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 	m_p = pcap_open_live(name, 65535, 1, 1, errbuf);
 	if(!m_p)
 	{
-		mame_print_verbose("Unable to open %s: %s\n", name, errbuf);
+		mame_printf_verbose("Unable to open %s: %s\n", name, errbuf);
 		return;
 	}
 	if(pcap_set_datalink(m_p, DLT_EN10MB) == -1)
 	{
-		mame_print_verbose("Unable to set %s to ethernet", name);
+		mame_printf_verbose("Unable to set %s to ethernet", name);
 		pcap_close(m_p);
 		m_p = NULL;
 		return;
@@ -45,7 +45,7 @@ void netdev_pcap::set_mac(const char *mac)
 	char filter[256];
 	struct bpf_program fp;
 	if(!m_p) return;
-	smame_print_verbose(filter, "ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
+	sprintf(filter, "ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
 	pcap_compile(m_p, &fp, filter, 1, 0);
 	pcap_setfilter(m_p, &fp);
 }
@@ -80,14 +80,18 @@ void init_pcap()
 	char errbuf[PCAP_ERRBUF_SIZE];
 	if(pcap_findalldevs(&devs, errbuf) == -1)
 	{
-		mame_print_verbose("Unable to get network devices: %s\n", errbuf);
+		mame_printf_verbose("Unable to get network devices: %s\n", errbuf);
 		return;
 	}
-	while(devs->next)
+
+    if (devs)
 	{
-		add_netdev(devs->name, create_pcap);
-		devs = devs->next;
-	}
+    	while(devs->next)
+    	{
+    		add_netdev(devs->name, create_pcap);
+    		devs = devs->next;
+    	}
+    }
 }
 
 #endif  // SDLMAME_WIN32
