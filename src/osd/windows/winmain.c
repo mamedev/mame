@@ -709,6 +709,10 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 	// cleanup sockets
 	win_cleanup_sockets();
 
+	#ifdef USE_NETWORK
+	winnetdev_deinit(machine);
+	#endif
+
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
 	{

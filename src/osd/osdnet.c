@@ -13,12 +13,17 @@ static class simple_list<netdev_entry_t> netdev_list;
 
 void add_netdev(const char *name, create_netdev func)
 {
-	netdev_entry_t *entry = new netdev_entry_t;
+	netdev_entry_t *entry = global_alloc_clear(netdev_entry_t);
 	entry->id = netdev_list.count();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';
 	entry->func = func;
 	netdev_list.append(*entry);
+}
+
+void clear_netdev()
+{
+	netdev_list.reset();
 }
 
 class netdev *open_netdev(int id, class device_network_interface *ifdev, int rate)

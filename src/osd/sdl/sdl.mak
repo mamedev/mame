@@ -518,7 +518,9 @@ OSDOBJS += \
 	$(SDLOBJ)/netdev_pcap.o
 
 DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_PCAP
+ifneq ($(TARGETOS),win32)
 LIBS += -lpcap
+endif
 endif
 endif
 

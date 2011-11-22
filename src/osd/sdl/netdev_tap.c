@@ -88,11 +88,16 @@ int netdev_tap::recv_dev(UINT8 **buf)
 
 static CREATE_NETDEV(create_tap)
 {
-	class netdev_tap *dev = new netdev_tap(ifname, ifdev, rate);
+	class netdev_tap *dev = global_alloc(netdev_tap(ifname, ifdev, rate));
 	return dynamic_cast<netdev *>(dev);
 }
 
 void init_tap()
 {
 	add_netdev("tap", create_tap);
+}
+
+void deinit_tap()
+{
+	clear_netdev();
 }

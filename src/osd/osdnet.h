@@ -30,4 +30,5 @@ typedef class netdev *(*create_netdev)(const char *ifname, class device_network_
 
 class netdev *open_netdev(int id, class device_network_interface *ifdev, int rate);
 void add_netdev(const char *name, create_netdev func);
+void clear_netdev();
 #endif

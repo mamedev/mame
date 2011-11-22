@@ -70,7 +70,7 @@ netdev_pcap::~netdev_pcap()
 
 static CREATE_NETDEV(create_pcap)
 {
-	class netdev_pcap *dev = new netdev_pcap(ifname, ifdev, rate);
+	class netdev_pcap *dev = global_alloc(netdev_pcap(ifname, ifdev, rate));
 	return dynamic_cast<netdev *>(dev);
 }
 
@@ -92,6 +92,11 @@ void init_pcap()
     		devs = devs->next;
     	}
     }
+}
+
+void deinit_pcap()
+{
+	clear_netdev();
 }
 
 #endif  // SDLMAME_WIN32
