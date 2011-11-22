@@ -97,6 +97,7 @@
 #include "machine/eeprom.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
+#include "machine/v3021.h"
 #include "video/mc6845.h"
 #include "machine/nvram.h"
 #include "video/resnet.h"
@@ -322,82 +323,6 @@ static const eeprom_interface forte_eeprom_intf =
 	"*10011xxxxxx",   /* unlock command */
 };
 
-/* V3021 RTC emulation, stolen from PGM driver, TODO */
-static UINT8 bcd( UINT8 data )
-{
-	return ((data / 10) << 4) | (data % 10);
-}
-
-static READ8_HANDLER( pgm_calendar_r )
-{
-	fortecar_state *state = space->machine().driver_data<fortecar_state>();
-	UINT8 calr = (state->m_cal_val & state->m_cal_mask) ? 1 : 0;
-
-	state->m_cal_mask <<= 1;
-	return calr;
-}
-
-static WRITE8_HANDLER( pgm_calendar_w )
-{
-	fortecar_state *state = space->machine().driver_data<fortecar_state>();
-
-	space->machine().base_datetime(state->m_systime);
-
-	state->m_cal_com <<= 1;
-	state->m_cal_com |= data & 1;
-	++state->m_cal_cnt;
-
-	if (state->m_cal_cnt == 4)
-	{
-		state->m_cal_mask = 1;
-		state->m_cal_val = 1;
-		state->m_cal_cnt = 0;
-
-		switch (state->m_cal_com & 0xf)
-		{
-			case 1: case 3: case 5: case 7: case 9: case 0xb: case 0xd:
-				state->m_cal_val++;
-				break;
-
-			case 0:
-				state->m_cal_val = bcd(state->m_systime.local_time.weekday); //??
-				break;
-
-			case 2:  //Hours
-				state->m_cal_val = bcd(state->m_systime.local_time.hour);
-				break;
-
-			case 4:  //Seconds
-				state->m_cal_val = bcd(state->m_systime.local_time.second);
-				break;
-
-			case 6:  //Month
-				state->m_cal_val = bcd(state->m_systime.local_time.month + 1); //?? not bcd in MVS
-				break;
-
-			case 8:
-				state->m_cal_val = 0; //Controls blinking speed, maybe milliseconds
-				break;
-
-			case 0xa: //Day
-				state->m_cal_val = bcd(state->m_systime.local_time.mday);
-				break;
-
-			case 0xc: //Minute
-				state->m_cal_val = bcd(state->m_systime.local_time.minute);
-				break;
-
-			case 0xe:  //Year
-				state->m_cal_val = bcd(state->m_systime.local_time.year % 100);
-				break;
-
-			case 0xf:  //Load Date
-				space->machine().base_datetime(state->m_systime);
-				break;
-		}
-	}
-}
-
 static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -413,7 +338,7 @@ static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
 //  AM_RANGE(0x80, 0x81) //8251A UART
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(pgm_calendar_r,pgm_calendar_w) // v3021 RTC, TODO
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE_MODERN("rtc", v3021_device, read, write)
 	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 /*
@@ -555,6 +480,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_PPI8255_ADD("fcppi0", ppi0intf)
+	MCFG_V3021_ADD("rtc", XTAL_32_768kHz)
 
 	MCFG_GFXDECODE(fortecar)
 	MCFG_PALETTE_LENGTH(0x200)

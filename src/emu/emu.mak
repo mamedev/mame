@@ -212,18 +212,18 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/mm74c922.o	\
 	$(EMUMACHINE)/microtch.o	\
 	$(EMUMACHINE)/mos6529.o		\
-	$(EMUMACHINE)/msm5832.o	\
+	$(EMUMACHINE)/msm5832.o		\
 	$(EMUMACHINE)/msm58321.o	\
 	$(EMUMACHINE)/msm6242.o		\
-    $(EMUMACHINE)/ncr539x.o     \
+  	$(EMUMACHINE)/ncr539x.o    	\
 	$(EMUMACHINE)/nmc9306.o		\
 	$(EMUMACHINE)/nvram.o		\
 	$(EMUMACHINE)/pc16552d.o	\
-	$(EMUMACHINE)/pci.o			\
+	$(EMUMACHINE)/pci.o		\
 	$(EMUMACHINE)/pd4990a.o		\
 	$(EMUMACHINE)/pic8259.o		\
 	$(EMUMACHINE)/pit8253.o		\
-	$(EMUMACHINE)/ram.o			\
+	$(EMUMACHINE)/ram.o		\
 	$(EMUMACHINE)/roc10937.o	\
 	$(EMUMACHINE)/rp5c01.o		\
 	$(EMUMACHINE)/rp5c15.o		\
@@ -245,6 +245,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/upd1990a.o	\
 	$(EMUMACHINE)/upd4701.o		\
 	$(EMUMACHINE)/upd7201.o		\
+	$(EMUMACHINE)/v3021.o		\
 	$(EMUMACHINE)/wd17xx.o		\
 	$(EMUMACHINE)/wd33c93.o		\
 	$(EMUMACHINE)/x2212.o		\

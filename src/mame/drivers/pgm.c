@@ -300,6 +300,7 @@ Notes:
 #include "cpu/arm7/arm7core.h"
 #include "machine/nvram.h"
 #include "includes/pgm.h"
+#include "machine/v3021.h"
 
 UINT16 *pgm_mainram;
 static void IGS022_reset(running_machine& machine);
@@ -495,83 +496,6 @@ static void sound_irq( device_t *device, int level )
 };*/
 
 
-/* Calendar Emulation */
-
-static UINT8 bcd( UINT8 data )
-{
-	return ((data / 10) << 4) | (data % 10);
-}
-
-static READ16_HANDLER( pgm_calendar_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	UINT8 calr = (state->m_cal_val & state->m_cal_mask) ? 1 : 0;
-
-	state->m_cal_mask <<= 1;
-	return calr;
-}
-
-static WRITE16_HANDLER( pgm_calendar_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	space->machine().base_datetime(state->m_systime);
-
-	state->m_cal_com <<= 1;
-	state->m_cal_com |= data & 1;
-	++state->m_cal_cnt;
-
-	if (state->m_cal_cnt == 4)
-	{
-		state->m_cal_mask = 1;
-		state->m_cal_val = 1;
-		state->m_cal_cnt = 0;
-
-		switch (state->m_cal_com & 0xf)
-		{
-			case 1: case 3: case 5: case 7: case 9: case 0xb: case 0xd:
-				state->m_cal_val++;
-				break;
-
-			case 0:
-				state->m_cal_val = bcd(state->m_systime.local_time.weekday); //??
-				break;
-
-			case 2:  //Hours
-				state->m_cal_val = bcd(state->m_systime.local_time.hour);
-				break;
-
-			case 4:  //Seconds
-				state->m_cal_val = bcd(state->m_systime.local_time.second);
-				break;
-
-			case 6:  //Month
-				state->m_cal_val = bcd(state->m_systime.local_time.month + 1); //?? not bcd in MVS
-				break;
-
-			case 8:
-				state->m_cal_val = 0; //Controls blinking speed, maybe milliseconds
-				break;
-
-			case 0xa: //Day
-				state->m_cal_val = bcd(state->m_systime.local_time.mday);
-				break;
-
-			case 0xc: //Minute
-				state->m_cal_val = bcd(state->m_systime.local_time.minute);
-				break;
-
-			case 0xe:  //Year
-				state->m_cal_val = bcd(state->m_systime.local_time.year % 100);
-				break;
-
-			case 0xf:  //Load Date
-				space->machine().base_datetime(state->m_systime);
-				break;
-		}
-	}
-}
-
 /*** Memory Maps *************************************************************/
 
 static ADDRESS_MAP_START( pgm_mem, AS_PROGRAM, 16)
@@ -591,7 +515,7 @@ static ADDRESS_MAP_START( pgm_mem, AS_PROGRAM, 16)
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_READWRITE(pgm_calendar_r, pgm_calendar_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8_MODERN("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
@@ -622,7 +546,7 @@ static ADDRESS_MAP_START( killbld_mem, AS_PROGRAM, 16)
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_READWRITE(pgm_calendar_r, pgm_calendar_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8_MODERN("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
@@ -653,7 +577,7 @@ static ADDRESS_MAP_START( olds_mem, AS_PROGRAM, 16)
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_READWRITE(pgm_calendar_r, pgm_calendar_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8_MODERN("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
@@ -683,7 +607,7 @@ static ADDRESS_MAP_START( kov2_mem, AS_PROGRAM, 16)
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_READWRITE(pgm_calendar_r, pgm_calendar_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8_MODERN("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
@@ -712,7 +636,7 @@ static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16)
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_READWRITE(pgm_calendar_r, pgm_calendar_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8_MODERN("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
@@ -844,7 +768,7 @@ static ADDRESS_MAP_START( kovsh_mem, AS_PROGRAM, 16)
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_READWRITE(pgm_calendar_r, pgm_calendar_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8_MODERN("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
@@ -959,7 +883,7 @@ static ADDRESS_MAP_START( svg_68k_mem, AS_PROGRAM, 16)
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_READWRITE(pgm_calendar_r, pgm_calendar_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8_MODERN("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
@@ -1398,6 +1322,8 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_MACHINE_RESET( pgm )
 	MCFG_NVRAM_ADD_0FILL("sram")
 
+	MCFG_V3021_ADD("rtc", XTAL_32_768kHz)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60) // killing blade won't boot (just displays 'error') if this is lower than 59.9 or higher than 60.1 .. are actual PGM boards different to the Cave one?
@@ -1568,6 +1494,8 @@ static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 	MCFG_MACHINE_START( cavepgm )
 	MCFG_MACHINE_RESET( pgm )
 	MCFG_NVRAM_ADD_0FILL("sram")
+
+	MCFG_V3021_ADD("rtc", XTAL_32_768kHz)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
