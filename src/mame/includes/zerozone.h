@@ -21,11 +21,6 @@ public:
 	// in drivers/zerozone.c
 	DECLARE_WRITE16_MEMBER(sound_w);
 	
-	// temp workaround for missing generic 'modern' functions
-	DECLARE_READ8_MEMBER(slatch_r)	{	return soundlatch_r(&space, offset);	};
-	DECLARE_WRITE8_MEMBER(slatch_w)	{	soundlatch_w(&space, offset, data);	};
-	DECLARE_WRITE16_MEMBER(paletteram_w)	{	paletteram16_RRRRGGGGBBBBRGBx_word_w(&space, offset, data, mem_mask);	};
-	
 	// in video/zerozone.c
 	DECLARE_WRITE16_MEMBER(tilemap_w);
 	DECLARE_WRITE16_MEMBER(tilebank_w);

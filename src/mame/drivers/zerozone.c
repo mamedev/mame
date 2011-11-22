@@ -40,7 +40,7 @@ WRITE16_MEMBER( zerozone_state::sound_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		slatch_w(space, offset, data >> 8);
+		soundlatch_w(space, offset, data >> 8);
 		device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 	}
 }
@@ -53,7 +53,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, zerozone_state )
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSWB")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSWA")
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(sound_w)
-	AM_RANGE(0x088000, 0x0881ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x088000, 0x0881ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x098000, 0x098001) AM_RAM		/* Watchdog? */
 	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(tilemap_w) AM_SHARE("videoram")
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(tilebank_w)
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zerozone_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(slatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 

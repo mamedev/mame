@@ -952,7 +952,10 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, "Driver Device", tag, NULL, 0),
 	  m_system(NULL),
-	  m_palette_init(NULL)
+	  m_palette_init(NULL),
+	  m_generic_paletteram(*this, "paletteram"),
+	  m_generic_paletteram16(*this, "paletteram"),
+	  m_generic_paletteram2(*this, "paletteram2")
 {
 	memset(m_callbacks, 0, sizeof(m_callbacks));
 }

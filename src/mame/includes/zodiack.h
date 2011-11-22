@@ -24,10 +24,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(master_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(control_w);
-	// temp workaround for missing generic 'modern' functions
-	DECLARE_READ8_MEMBER(slatch_r)	{	return soundlatch_r(&space, offset);	};
-	DECLARE_WRITE8_MEMBER(slatch_w)	{	soundlatch_w(&space, offset, data);	};
-	DECLARE_WRITE8_MEMBER(watchdog_w)	{	watchdog_reset_w(&space, offset, data);	};
 
 	// in video/zodiack.c
 	DECLARE_WRITE8_MEMBER(videoram_w);

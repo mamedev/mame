@@ -760,6 +760,9 @@ INTERRUPT_GEN( irq7_line_assert )	{ if (interrupt_enabled(device)) device_set_in
 WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(space->machine()); }
 READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine()); return space->unmap(); }
 
+WRITE8_MEMBER( driver_device::watchdog_reset_w ) { watchdog_reset(machine()); }
+READ8_MEMBER( driver_device::watchdog_reset_r ) { watchdog_reset(machine()); return space.unmap(); }
+
 
 /*-------------------------------------------------
     16-bit reset read/write handlers
@@ -768,6 +771,9 @@ READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine()); return spa
 WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(space->machine()); }
 READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine()); return space->unmap(); }
 
+WRITE16_MEMBER( driver_device::watchdog_reset16_w ) { watchdog_reset(machine()); }
+READ16_MEMBER( driver_device::watchdog_reset16_r ) { watchdog_reset(machine()); return space.unmap(); }
+
 
 /*-------------------------------------------------
     32-bit reset read/write handlers
@@ -775,6 +781,9 @@ READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine()); return 
 
 WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(space->machine()); }
 READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine()); return space->unmap(); }
+
+WRITE32_MEMBER( driver_device::watchdog_reset32_w ) { watchdog_reset(machine()); }
+READ32_MEMBER( driver_device::watchdog_reset32_r ) { watchdog_reset(machine()); return space.unmap(); }
 
 
 

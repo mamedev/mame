@@ -118,7 +118,7 @@ const gfx_layout gfx_16x16x4_planar =
     palette RAM referenced by offset
 -------------------------------------------------*/
 
-INLINE UINT16 paletteram16_le(running_machine &machine, offs_t offset)
+inline UINT16 paletteram16_le(running_machine &machine, offs_t offset)
 {
 	return machine.generic.paletteram.u8[offset & ~1] | (machine.generic.paletteram.u8[offset | 1] << 8);
 }
@@ -130,7 +130,7 @@ INLINE UINT16 paletteram16_le(running_machine &machine, offs_t offset)
     palette RAM referenced by offset
 -------------------------------------------------*/
 
-INLINE UINT16 paletteram16_be(running_machine &machine, offs_t offset)
+inline UINT16 paletteram16_be(running_machine &machine, offs_t offset)
 {
 	return machine.generic.paletteram.u8[offset | 1] | (machine.generic.paletteram.u8[offset & ~1] << 8);
 }
@@ -142,7 +142,7 @@ INLINE UINT16 paletteram16_be(running_machine &machine, offs_t offset)
     RAM referenced by offset
 -------------------------------------------------*/
 
-INLINE UINT16 paletteram16_split(running_machine &machine, offs_t offset)
+inline UINT16 paletteram16_split(running_machine &machine, offs_t offset)
 {
 	return machine.generic.paletteram.u8[offset] | (machine.generic.paletteram2.u8[offset] << 8);
 }
@@ -154,7 +154,7 @@ INLINE UINT16 paletteram16_split(running_machine &machine, offs_t offset)
     palette RAM referenced by offset
 -------------------------------------------------*/
 
-INLINE UINT32 paletteram32_be(running_machine &machine, offs_t offset)
+inline UINT32 paletteram32_be(running_machine &machine, offs_t offset)
 {
 	return machine.generic.paletteram.u16[offset | 1] | (machine.generic.paletteram.u16[offset & ~1] << 16);
 }
@@ -166,7 +166,7 @@ INLINE UINT32 paletteram32_be(running_machine &machine, offs_t offset)
     shift values
 -------------------------------------------------*/
 
-INLINE void set_color_444(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+inline void set_color_444(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	palette_set_color_rgb(machine, color, pal4bit(data >> rshift), pal4bit(data >> gshift), pal4bit(data >> bshift));
 }
@@ -178,7 +178,7 @@ INLINE void set_color_444(running_machine &machine, pen_t color, int rshift, int
     shift values
 -------------------------------------------------*/
 
-INLINE void set_color_4444(running_machine &machine, pen_t color, int ishift, int rshift, int gshift, int bshift, UINT16 data)
+inline void set_color_4444(running_machine &machine, pen_t color, int ishift, int rshift, int gshift, int bshift, UINT16 data)
 {
 	static const UINT8 ztable[16] =
 		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
@@ -199,7 +199,7 @@ INLINE void set_color_4444(running_machine &machine, pen_t color, int ishift, in
     shift values
 -------------------------------------------------*/
 
-INLINE void set_color_555(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+inline void set_color_555(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
@@ -211,7 +211,7 @@ INLINE void set_color_555(running_machine &machine, pen_t color, int rshift, int
     shift values
 -------------------------------------------------*/
 
-INLINE void set_color_888(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
+inline void set_color_888(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
 	palette_set_color_rgb(machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
 }
@@ -692,6 +692,12 @@ WRITE8_HANDLER( paletteram_RRRGGGBB_w )
 	palette_set_color_rgb(space->machine(), offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data >> 0));
 }
 
+WRITE8_MEMBER( driver_device::paletteram_RRRGGGBB_w )
+{
+	m_generic_paletteram[offset] = data;
+	palette_set_color_rgb(machine(), offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data >> 0));
+}
+
 
 /*-------------------------------------------------
     BB-GGG-RR writes
@@ -701,6 +707,12 @@ WRITE8_HANDLER( paletteram_BBGGGRRR_w )
 {
 	space->machine().generic.paletteram.u8[offset] = data;
 	palette_set_color_rgb(space->machine(), offset, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_BBGGGRRR_w )
+{
+	m_generic_paletteram[offset] = data;
+	palette_set_color_rgb(machine(), offset, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 }
 
 
@@ -718,6 +730,16 @@ WRITE8_HANDLER( paletteram_BBGGRRII_w )
 	                                   pal4bit(((data >> 4) & 0x0c) | i));
 }
 
+WRITE8_MEMBER( driver_device::paletteram_BBGGRRII_w )
+{
+	int i = (data >> 0) & 3;
+
+	m_generic_paletteram[offset] = data;
+	palette_set_color_rgb(machine(), offset, pal4bit(((data >> 0) & 0x0c) | i),
+	                                   pal4bit(((data >> 2) & 0x0c) | i),
+	                                   pal4bit(((data >> 4) & 0x0c) | i));
+}
+
 /*-------------------------------------------------
     II-BB-GG-RR writes
 -------------------------------------------------*/
@@ -728,6 +750,16 @@ WRITE8_HANDLER( paletteram_IIBBGGRR_w )
 
 	space->machine().generic.paletteram.u8[offset] = data;
 	palette_set_color_rgb(space->machine(), offset, pal4bit(((data << 2) & 0x0c) | i),
+	                                   pal4bit(((data >> 0) & 0x0c) | i),
+	                                   pal4bit(((data >> 2) & 0x0c) | i));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_IIBBGGRR_w )
+{
+	int i = (data >> 6) & 3;
+
+	m_generic_paletteram[offset] = data;
+	palette_set_color_rgb(machine(), offset, pal4bit(((data << 2) & 0x0c) | i),
 	                                   pal4bit(((data >> 0) & 0x0c) | i),
 	                                   pal4bit(((data >> 2) & 0x0c) | i));
 }
@@ -772,6 +804,36 @@ WRITE16_HANDLER( paletteram16_xxxxBBBBGGGGRRRR_word_w )
 	set_color_444(space->machine(), offset, 0, 4, 8, space->machine().generic.paletteram.u16[offset]);
 }
 
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_le_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset / 2, 0, 4, 8, paletteram16_le(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_be_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset / 2, 0, 4, 8, paletteram16_be(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_split1_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset, 0, 4, 8, paletteram16_split(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_split2_w )
+{
+	m_generic_paletteram2[offset] = data;
+	set_color_444(machine(), offset, 0, 4, 8, paletteram16_split(offset));
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_xxxxBBBBGGGGRRRR_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_444(machine(), offset, 0, 4, 8, m_generic_paletteram16[offset]);
+}
+
 
 /*-------------------------------------------------
     xxxx-BBBB-RRRR-GGGG writes
@@ -807,6 +869,36 @@ WRITE16_HANDLER( paletteram16_xxxxBBBBRRRRGGGG_word_w )
 	set_color_444(space->machine(), offset, 4, 0, 8, space->machine().generic.paletteram.u16[offset]);
 }
 
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_le_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset / 2, 4, 0, 8, paletteram16_le(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_be_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset / 2, 4, 0, 8, paletteram16_be(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_split1_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset, 4, 0, 8, paletteram16_split(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_split2_w )
+{
+	m_generic_paletteram2[offset] = data;
+	set_color_444(machine(), offset, 4, 0, 8, paletteram16_split(offset));
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_xxxxBBBBRRRRGGGG_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_444(machine(), offset, 4, 0, 8, m_generic_paletteram16[offset]);
+}
+
 
 /*-------------------------------------------------
     xxxx-RRRR-BBBB-GGGG writes
@@ -822,6 +914,18 @@ WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split2_w )
 {
 	space->machine().generic.paletteram2.u8[offset] = data;
 	set_color_444(space->machine(), offset, 8, 0, 4, paletteram16_split(space->machine(), offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRBBBBGGGG_split1_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset, 8, 0, 4, paletteram16_split(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRBBBBGGGG_split2_w )
+{
+	m_generic_paletteram2[offset] = data;
+	set_color_444(machine(), offset, 8, 0, 4, paletteram16_split(offset));
 }
 
 
@@ -859,6 +963,36 @@ WRITE16_HANDLER( paletteram16_xxxxRRRRGGGGBBBB_word_w )
 	set_color_444(space->machine(), offset, 8, 4, 0, space->machine().generic.paletteram.u16[offset]);
 }
 
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_le_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset / 2, 8, 4, 0, paletteram16_le(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_be_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset / 2, 8, 4, 0, paletteram16_be(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_split1_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset, 8, 4, 0, paletteram16_split(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_split2_w )
+{
+	m_generic_paletteram2[offset] = data;
+	set_color_444(machine(), offset, 8, 4, 0, paletteram16_split(offset));
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_xxxxRRRRGGGGBBBB_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_444(machine(), offset, 8, 4, 0, m_generic_paletteram16[offset]);
+}
+
 
 /*-------------------------------------------------
     RRRR-GGGG-BBBB-xxxx writes
@@ -886,6 +1020,30 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBxxxx_word_w )
 {
 	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	set_color_444(space->machine(), offset, 12, 8, 4, space->machine().generic.paletteram.u16[offset]);
+}
+
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_be_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset / 2, 12, 8, 4, paletteram16_be(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_split1_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_444(machine(), offset, 12, 8, 4, paletteram16_split(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_split2_w )
+{
+	m_generic_paletteram2[offset] = data;
+	set_color_444(machine(), offset, 12, 8, 4, paletteram16_split(offset));
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_RRRRGGGGBBBBxxxx_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_444(machine(), offset, 12, 8, 4, m_generic_paletteram16[offset]);
 }
 
 
@@ -928,6 +1086,36 @@ WRITE16_HANDLER( paletteram16_xBBBBBGGGGGRRRRR_word_w )
 	set_color_555(space->machine(), offset, 0, 5, 10, space->machine().generic.paletteram.u16[offset]);
 }
 
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_le_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_555(machine(), offset / 2, 0, 5, 10, paletteram16_le(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_be_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_555(machine(), offset / 2, 0, 5, 10, paletteram16_be(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_split1_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_555(machine(), offset, 0, 5, 10, paletteram16_split(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_split2_w )
+{
+	m_generic_paletteram2[offset] = data;
+	set_color_555(machine(), offset, 0, 5, 10, paletteram16_split(offset));
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_xBBBBBGGGGGRRRRR_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_555(machine(), offset, 0, 5, 10, m_generic_paletteram16[offset]);
+}
+
 
 /*-------------------------------------------------
     x-BBBBB-RRRRR-GGGGG writes
@@ -943,6 +1131,18 @@ WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split2_w )
 {
 	space->machine().generic.paletteram2.u8[offset] = data;
 	set_color_555(space->machine(), offset, 5, 0, 10, paletteram16_split(space->machine(), offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBRRRRRGGGGG_split1_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_555(machine(), offset, 5, 0, 10, paletteram16_split(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBRRRRRGGGGG_split2_w )
+{
+	m_generic_paletteram2[offset] = data;
+	set_color_555(machine(), offset, 5, 0, 10, paletteram16_split(offset));
 }
 
 
@@ -980,6 +1180,36 @@ WRITE16_HANDLER( paletteram16_xRRRRRGGGGGBBBBB_word_w )
 	set_color_555(space->machine(), offset, 10, 5, 0, space->machine().generic.paletteram.u16[offset]);
 }
 
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_le_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_555(machine(), offset / 2, 10, 5, 0, paletteram16_le(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_be_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_555(machine(), offset / 2, 10, 5, 0, paletteram16_be(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_split1_w )
+{
+	m_generic_paletteram[offset] = data;
+	set_color_555(machine(), offset, 10, 5, 0, paletteram16_split(offset));
+}
+
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_split2_w )
+{
+	m_generic_paletteram2[offset] = data;
+	set_color_555(machine(), offset, 10, 5, 0, paletteram16_split(offset));
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_xRRRRRGGGGGBBBBB_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_555(machine(), offset, 10, 5, 0, m_generic_paletteram16[offset]);
+}
+
 
 /*-------------------------------------------------
     x-GGGGG-RRRRR-BBBBB writes
@@ -989,6 +1219,12 @@ WRITE16_HANDLER( paletteram16_xGGGGGRRRRRBBBBB_word_w )
 {
 	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	set_color_555(space->machine(), offset, 5, 10, 0, space->machine().generic.paletteram.u16[offset]);
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_xGGGGGRRRRRBBBBB_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_555(machine(), offset, 5, 10, 0, m_generic_paletteram16[offset]);
 }
 
 
@@ -1002,6 +1238,12 @@ WRITE16_HANDLER( paletteram16_xGGGGGBBBBBRRRRR_word_w )
 	set_color_555(space->machine(), offset, 0, 10, 5, space->machine().generic.paletteram.u16[offset]);
 }
 
+WRITE16_MEMBER( driver_device::paletteram16_xGGGGGBBBBBRRRRR_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_555(machine(), offset, 0, 10, 5, m_generic_paletteram16[offset]);
+}
+
 
 /*-------------------------------------------------
     GGGGG-RRRRR-BBBBB-x writes
@@ -1011,6 +1253,12 @@ WRITE16_HANDLER( paletteram16_GGGGGRRRRRBBBBBx_word_w )
 {
 	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	set_color_555(space->machine(), offset, 6, 11, 1, space->machine().generic.paletteram.u16[offset]);
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_GGGGGRRRRRBBBBBx_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_555(machine(), offset, 6, 11, 1, m_generic_paletteram16[offset]);
 }
 
 /*-------------------------------------------------
@@ -1023,6 +1271,12 @@ WRITE16_HANDLER( paletteram16_RRRRRGGGGGBBBBBx_word_w )
 	set_color_555(space->machine(), offset, 11, 6, 1, space->machine().generic.paletteram.u16[offset]);
 }
 
+WRITE16_MEMBER( driver_device::paletteram16_RRRRRGGGGGBBBBBx_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_555(machine(), offset, 11, 6, 1, m_generic_paletteram16[offset]);
+}
+
 
 /*-------------------------------------------------
     RRRR-GGGG-BBBB-RGBx writes
@@ -1033,6 +1287,15 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBRGBx_word_w )
 	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	data = space->machine().generic.paletteram.u16[offset];
 	palette_set_color_rgb(space->machine(), offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
+	                                       pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
+	                                       pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_RRRRGGGGBBBBRGBx_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	data = m_generic_paletteram16[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
 	                                       pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
 	                                       pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
 }
@@ -1053,6 +1316,12 @@ WRITE16_HANDLER( paletteram16_IIIIRRRRGGGGBBBB_word_w )
 	set_color_4444(space->machine(), offset, 12, 8, 4, 0, space->machine().generic.paletteram.u16[offset]);
 }
 
+WRITE16_MEMBER( driver_device::paletteram16_IIIIRRRRGGGGBBBB_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_4444(machine(), offset, 12, 8, 4, 0, m_generic_paletteram16[offset]);
+}
+
 
 /*-------------------------------------------------
     RRRR-GGGG-BBBB-IIII writes
@@ -1062,6 +1331,12 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBIIII_word_w )
 {
 	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	set_color_4444(space->machine(), offset, 0, 12, 8, 4, space->machine().generic.paletteram.u16[offset]);
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_RRRRGGGGBBBBIIII_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_4444(machine(), offset, 0, 12, 8, 4, m_generic_paletteram16[offset]);
 }
 
 
@@ -1080,6 +1355,12 @@ WRITE16_HANDLER( paletteram16_xrgb_word_be_w )
 	set_color_888(space->machine(), offset / 2, 16, 8, 0, paletteram32_be(space->machine(), offset));
 }
 
+WRITE16_MEMBER( driver_device::paletteram16_xrgb_word_be_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_888(machine(), offset / 2, 16, 8, 0, paletteram32_be(offset));
+}
+
 
 /*-------------------------------------------------
     xxxxxxxx-BBBBBBBB-GGGGGGGG-RRRRRRRR writes
@@ -1089,4 +1370,10 @@ WRITE16_HANDLER( paletteram16_xbgr_word_be_w )
 {
 	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	set_color_888(space->machine(), offset / 2, 0, 8, 16, paletteram32_be(space->machine(), offset));
+}
+
+WRITE16_MEMBER( driver_device::paletteram16_xbgr_word_be_w )
+{
+	COMBINE_DATA(&m_generic_paletteram16[offset]);
+	set_color_888(machine(), offset / 2, 0, 8, 16, paletteram32_be(offset));
 }
