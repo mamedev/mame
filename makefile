@@ -362,7 +362,7 @@ EMULATOR = $(FULLNAME)$(EXE)
 SRC = src
 
 # build the targets in different object dirs, so they can co-exist
-OBJ = obj/$(OSD)/$(FULLNAME)
+OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 
 
 
@@ -565,8 +565,7 @@ endif
 # this variable
 #-------------------------------------------------
 
-OBJDIRS = $(OBJ)
-
+OBJDIRS = $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
 
 
 #-------------------------------------------------
@@ -574,19 +573,19 @@ OBJDIRS = $(OBJ)
 #-------------------------------------------------
 
 LIBEMU = $(OBJ)/libemu.a
-LIBCPU = $(OBJ)/libcpu.a
-LIBDASM = $(OBJ)/libdasm.a
-LIBSOUND = $(OBJ)/libsound.a
+LIBCPU = $(OBJ)/$(TARGET)/$(SUBTARGET)/libcpu.a
+LIBDASM = $(OBJ)/$(TARGET)/$(SUBTARGET)/libdasm.a
+LIBSOUND = $(OBJ)/$(TARGET)/$(SUBTARGET)/libsound.a
 LIBUTIL = $(OBJ)/libutil.a
 LIBOCORE = $(OBJ)/libocore.a
 LIBOSD = $(OBJ)/libosd.a
 
 VERSIONOBJ = $(OBJ)/version.o
 EMUINFOOBJ = $(OBJ)/$(TARGET)/$(TARGET).o
-DRIVLISTSRC = $(OBJ)/drivlist.c
-DRIVLISTOBJ = $(OBJ)/drivlist.o
-DEVLISTSRC = $(OBJ)/devlist.c
-DEVLISTOBJ = $(OBJ)/devlist.o
+DRIVLISTSRC = $(OBJ)/$(TARGET)/$(SUBTARGET)/drivlist.c
+DRIVLISTOBJ = $(OBJ)/$(TARGET)/$(SUBTARGET)/drivlist.o
+DEVLISTSRC = $(OBJ)/$(TARGET)/$(SUBTARGET)/devlist.c
+DEVLISTOBJ = $(OBJ)/$(TARGET)/$(SUBTARGET)/devlist.o
 
 
 
@@ -657,6 +656,7 @@ include $(SRC)/osd/$(OSD)/$(OSD).mak
 
 # then the various core pieces
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak
+-include $(SRC)/$(TARGET)/osd/$(OSD)/$(OSD).mak
 include $(SRC)/emu/emu.mak
 include $(SRC)/lib/lib.mak
 include $(SRC)/build/build.mak
