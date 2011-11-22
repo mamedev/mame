@@ -17,8 +17,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RTC9701_ADD(_tag, _clock ) \
-	MCFG_DEVICE_ADD(_tag, rtc9701, _clock) \
+#define MCFG_RTC9701_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, rtc9701, XTAL_32_768kHz) \
 
 
 //**************************************************************************

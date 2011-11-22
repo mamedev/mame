@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_PPI8255_ADD("fcppi0", ppi0intf)
-	MCFG_V3021_ADD("rtc", XTAL_32_768kHz)
+	MCFG_V3021_ADD("rtc")
 
 	MCFG_GFXDECODE(fortecar)
 	MCFG_PALETTE_LENGTH(0x200)

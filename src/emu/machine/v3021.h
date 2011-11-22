@@ -19,8 +19,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_V3021_ADD(_tag, _clock ) \
-	MCFG_DEVICE_ADD(_tag, v3021, _clock) \
+#define MCFG_V3021_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, v3021, XTAL_32_768kHz) \
 
 
 //**************************************************************************

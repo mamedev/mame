@@ -1322,7 +1322,7 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_MACHINE_RESET( pgm )
 	MCFG_NVRAM_ADD_0FILL("sram")
 
-	MCFG_V3021_ADD("rtc", XTAL_32_768kHz)
+	MCFG_V3021_ADD("rtc")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1495,7 +1495,7 @@ static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 	MCFG_MACHINE_RESET( pgm )
 	MCFG_NVRAM_ADD_0FILL("sram")
 
-	MCFG_V3021_ADD("rtc", XTAL_32_768kHz)
+	MCFG_V3021_ADD("rtc")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

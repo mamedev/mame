@@ -94,8 +94,7 @@ bool rtc9701_device::device_validity_check(emu_options &options, const game_driv
 void rtc9701_device::device_start()
 {
 	/* let's call the timer callback every second */
-	if(clock() >= XTAL_32_768kHz)
-		machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
+	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
 
 	system_time systime;
 	machine().base_datetime(systime);
