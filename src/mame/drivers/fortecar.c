@@ -9,13 +9,12 @@
   TODO:
 
   - Improve serial EEPROM support.
-  - Fix GFX planes...
-  - RTC
+  - RTC needs its own core.
   - Inputs
 
 
-  Enmglish set: bp 529 do pc=53e
-  Spanish set:  bp 529 do pc=562
+  English set: bp 512 do pc=53e
+  Spanish set: bp 512 do pc=562
 
 -------------------------------------------------------------------------------------------------
 
@@ -589,7 +588,6 @@ ROM_START( fortecar )
 
 	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
 	ROM_LOAD( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
-
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "forte_card_82s147.u47", 0x0000, 0x0200, BAD_DUMP CRC(7e631818) SHA1(ac08b0de30260278af3a1c5dee5810d4304cb9ca) )
