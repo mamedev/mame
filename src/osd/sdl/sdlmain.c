@@ -24,9 +24,7 @@
 #endif
 
 // standard includes
-#ifdef MESS
-#include <unistd.h>
-#endif
+
 
 #ifdef SDLMAME_OS2
 #define INCL_DOS

@@ -75,7 +75,7 @@ private:
 	bool generate_timings(track_info *t, UINT32 *track, const UINT32 *data_pos, const UINT32 *gap_pos);
 
 	void rotate(UINT32 *track, UINT32 offset, UINT32 size);
-	void mark_track_splice(UINT32 *t);
+	void mark_track_splice(UINT32 *track, UINT32 offset, UINT32 size);
 	bool generate_track(track_info *t, floppy_image *image);
 	bool generate_tracks(floppy_image *image);
 

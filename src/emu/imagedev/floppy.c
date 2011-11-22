@@ -559,7 +559,7 @@ void floppy_35_hd::setup_limits()
 
 
 floppy_525_dd::floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_525_DD, "3.5\" high density floppy drive", tag, owner, clock)
+	floppy_image_device(mconfig, FLOPPY_525_DD, "5.25\" double density floppy drive", tag, owner, clock)
 {
 }
 

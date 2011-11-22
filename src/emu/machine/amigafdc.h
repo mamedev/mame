@@ -88,6 +88,8 @@ private:
 	void index_callback(floppy_image_device *floppy, int state);
 	bool dma_enabled();
 	void dma_check();
+	void dma_done();
+	void dma_write(UINT16 value);
 
 	void live_start();
 	void checkpoint();

@@ -273,15 +273,16 @@ void ipf_format::rotate(UINT32 *track, UINT32 offset, UINT32 size)
 	}
 }
 
-void ipf_format::mark_track_splice(UINT32 *t)
+void ipf_format::mark_track_splice(UINT32 *track, UINT32 offset, UINT32 size)
 {
 	for(int i=0; i<3; i++) {
-		UINT32 v = *t;
+		UINT32 pos = (offset + i) % size;
+		UINT32 v = track[pos];
 		if((v & floppy_image::MG_MASK) == MG_0)
 			v = (v & floppy_image::TIME_MASK) | MG_1;
 		else if((v & floppy_image::MG_MASK) == MG_1)
 			v = (v & floppy_image::TIME_MASK) | MG_0;
-		*t++ = v;
+		track[pos] = v;
 	}
 }
 
@@ -406,7 +407,7 @@ bool ipf_format::generate_track(track_info *t, floppy_image *image)
 
 	data_pos[t->block_count] = pos;
 
-	mark_track_splice(track + splice_pos[t->block_count-1]);
+	mark_track_splice(track, splice_pos[t->block_count-1], t->size_cells);
 
 	if(!generate_timings(t, track, data_pos, gap_pos)) {
 		global_free(track);

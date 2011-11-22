@@ -119,6 +119,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/hect_tap.o	\
 	$(LIBOBJ)/formats/imd_dsk.o		\
 	$(LIBOBJ)/formats/ipf_dsk.o		\
+	$(LIBOBJ)/formats/kc_cas.o		\
 	$(LIBOBJ)/formats/kim1_cas.o	\
 	$(LIBOBJ)/formats/lviv_lvt.o	\
 	$(LIBOBJ)/formats/msx_dsk.o		\
