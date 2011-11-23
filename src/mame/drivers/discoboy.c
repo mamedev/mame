@@ -5,7 +5,7 @@ Similar to mitchell.c / egghunt.c .. clearly derived from that hardware
 
 TODO:
 - move sound HW into proper file (it's 99% IDENTICAL to yunsung8.c)
-- sound volume issues;
+- ADPCM has sound volume issues, it's either too loud or too quiet;
 
 PCB Layout
 ----------
