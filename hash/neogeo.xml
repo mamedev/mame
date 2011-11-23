@@ -9751,8 +9751,8 @@
       </dataarea>
       <dataarea name="ymsnd" size="0x380000">
         <!-- 0x000000-0x1fffff empty -->
-        <rom name="u8" offset="0x200000" size="0x100000" crc="0840cbc4) SHA1 (1adbd7aef44fa80832f63dfb8efdf69fd7256a57" />
-        <rom name="u9" offset="0x300000" size="0x080000" crc="0a548948) SHA1 (e1e4afd17811cb60401c14fbcf0465035165f4fb" />
+        <rom name="u8" offset="0x200000" size="0x100000" crc="0840cbc4" sha1="1adbd7aef44fa80832f63dfb8efdf69fd7256a57" />
+        <rom name="u9" offset="0x300000" size="0x080000" crc="0a548948" sha1="e1e4afd17811cb60401c14fbcf0465035165f4fb" />
       </dataarea>
       <dataarea name="sprites" size="0x100000">
         <rom loadflag="load16_byte" name="uc5" offset="0x000000" size="0x080000" crc="e89ad494) SHA1 (69c9ea415773af94ac44c48af05d55ada222b138" />        <!-- Plane 0,1 -->
