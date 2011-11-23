@@ -116,7 +116,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 
 void software_display_matches(const device_list &devlist, emu_options &options,const char *interface,const char *swname_bckp);
 
-const char *software_get_default_slot(const device_list &devlist, emu_options &options, const device_image_interface *image, const char *default_card, const char* default_card_slot);
+const char *software_get_default_slot(const device_list &devlist, emu_options &options, const device_image_interface *image, const char* default_card_slot);
 
 /*********************************************************************
 

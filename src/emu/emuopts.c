@@ -263,6 +263,36 @@ bool emu_options::add_slot_options(bool isfirst)
 }
 
 //-------------------------------------------------
+//  update_slot_options - update slot values
+//  depending of image mounted
+//-------------------------------------------------
+
+void emu_options::update_slot_options()
+{
+	// look up the system configured by name; if no match, do nothing
+	const game_driver *cursystem = system();
+	if (cursystem == NULL)
+		return;
+
+	// iterate through all slot devices
+	const device_slot_interface *slot = NULL;
+	// create the configuration
+	machine_config config(*cursystem, *this);
+	for (bool gotone = config.devicelist().first(slot); gotone; gotone = slot->next(slot))
+	{
+		// retrieve info about the device instance
+		astring option_name;
+		option_name.printf("%s;%s", slot->device().tag(), slot->device().tag());
+
+		if (exists(slot->device().tag())) {
+			if (slot->get_slot_interfaces() != NULL) {
+				const char *def = slot->get_default_card_software(config.devicelist(),*this);
+				if (def) set_default_value(slot->device().tag(),def);
+			}
+		}
+	}
+}
+//-------------------------------------------------
 //  add_device_options - add all of the device
 //  options for the configured system
 //-------------------------------------------------
@@ -348,6 +378,7 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_stri
 		set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
 	}
 	result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+	update_slot_options();
 	return result;
 }
 
@@ -473,6 +504,7 @@ void emu_options::set_system_name(const char *name)
 		}
 		// then add the options
 		add_device_options(true);
+		update_slot_options();
 	}
 }
 

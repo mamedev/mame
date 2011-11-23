@@ -1633,9 +1633,9 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
     software_get_default_slot
  -------------------------------------------------*/
 
- const char *software_get_default_slot(const device_list &devlist, emu_options &options, const device_image_interface *image, const char *default_card, const char* default_card_slot)
+ const char *software_get_default_slot(const device_list &devlist, emu_options &options, const device_image_interface *image, const char* default_card_slot)
 {
-	const char* retVal = default_card;
+	const char* retVal = NULL;
 	const char* path = options.value(image->instance_name());
 	software_list *software_list_ptr = NULL;
 	software_info *software_info_ptr = NULL;
