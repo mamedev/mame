@@ -99,6 +99,8 @@ static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 {
 	msm5205_reset_w(device, data & 0x20);
 
+	printf("%02x\n",data);
+
 	memory_set_bank(device->machine(), "bank2", data & 0x07);
 
 	if (data != (data & (~0x27)))

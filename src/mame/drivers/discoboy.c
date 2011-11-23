@@ -3,6 +3,10 @@
 
 Similar to mitchell.c / egghunt.c .. clearly derived from that hardware
 
+TODO:
+- move sound HW into proper file (it's 99% IDENTICAL to yunsung8.c)
+- sound volume issues;
+
 PCB Layout
 ----------
 
@@ -52,7 +56,8 @@ public:
 	UINT8    m_ram_bank;
 	UINT8    m_gfxbank;
 	UINT8    m_port_00;
-	int      m_adpcm_data;
+	int      m_adpcm;
+	UINT8    m_toggle;
 
 	/* devices */
 	device_t *m_audiocpu;
@@ -316,21 +321,32 @@ ADDRESS_MAP_END
 
 /* Sound */
 
-//static WRITE8_HANDLER( splash_adpcm_data_w ){
-//  state->m_adpcm_data = data;
-//}
-
-static void splash_msm5205_int( device_t *device )
+static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 {
-	discoboy_state *state = device->machine().driver_data<discoboy_state>();
-	msm5205_data_w(device, state->m_adpcm_data >> 4);
-//  state->m_adpcm_data = (state->m_adpcm_data << 4) & 0xf0;
+	/* Note: this is bit 5 on yunsung8.c */
+	msm5205_reset_w(device, (data & 0x08) >> 3);
+
+	memory_set_bank(device->machine(), "sndbank", data & 0x07);
+
+	if (data != (data & (~0x0f)))
+		logerror("%s: Bank %02X\n", device->machine().describe_context(), data);
+}
+
+static WRITE8_HANDLER( yunsung8_adpcm_w )
+{
+	discoboy_state *state = space->machine().driver_data<discoboy_state>();
+
+	/* Swap the nibbles */
+	state->m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sndbank")
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm",yunsung8_sound_bankswitch_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -365,9 +381,9 @@ static INPUT_PORTS_START( discoboy )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -430,15 +446,6 @@ static GFXDECODE_START( discoboy )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0x000, 128 )
 GFXDECODE_END
 
-
-
-static const msm5205_interface discoboy_msm5205_interface =
-{
-	splash_msm5205_int,	/* IRQ handler */
-	MSM5205_S48_4B		/* ??? unknown hz */
-};
-
-
 static MACHINE_START( discoboy )
 {
 	discoboy_state *state = machine.driver_data<discoboy_state>();
@@ -448,7 +455,8 @@ static MACHINE_START( discoboy )
 	state->save_item(NAME(state->m_ram_bank));
 	state->save_item(NAME(state->m_port_00));
 	state->save_item(NAME(state->m_gfxbank));
-	state->save_item(NAME(state->m_adpcm_data));
+	state->save_item(NAME(state->m_adpcm));
+	state->save_item(NAME(state->m_toggle));
 }
 
 static MACHINE_RESET( discoboy )
@@ -458,8 +466,25 @@ static MACHINE_RESET( discoboy )
 	state->m_ram_bank = 0;
 	state->m_port_00 = 0;
 	state->m_gfxbank = 0;
-	state->m_adpcm_data = 0x80;
+	state->m_adpcm = 0x80;
+	state->m_toggle = 0;
 }
+
+static void yunsung8_adpcm_int( device_t *device )
+{
+	discoboy_state *state = device->machine().driver_data<discoboy_state>();
+
+	msm5205_data_w(device, state->m_adpcm >> 4);
+	state->m_adpcm <<= 4;
+
+	state->m_toggle ^= 1;
+}
+
+static const msm5205_interface yunsung8_msm5205_interface =
+{
+	yunsung8_adpcm_int,	/* interrupt function */
+	MSM5205_S96_4B		/* 4KHz, 4 Bits */
+};
 
 static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
@@ -491,15 +516,16 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	MCFG_VIDEO_START(discoboy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-
-	MCFG_SOUND_ADD("msm", MSM5205, 384000) // ???? unknown
-	MCFG_SOUND_CONFIG(discoboy_msm5205_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) // ???? unknown
+	MCFG_SOUND_CONFIG(yunsung8_msm5205_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -509,7 +535,7 @@ ROM_START( discoboy )
 	ROM_LOAD( "u18", 0x10000, 0x20000, CRC(88d1282d) SHA1(1f11dad0f577198c54a1dc182ba7502e398b998f) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "2.u28",  0x00000, 0x10000, CRC(7c2ed174) SHA1(ace209dc4cc7a4ffca062842defd84cefc5b10d2))
+	ROM_LOAD( "2.u28",  0x00000, 0x10000, CRC(7c2ed174) SHA1(ace209dc4cc7a4ffca062842defd84cefc5b10d2) )
 	ROM_LOAD( "1.u45",  0x10000, 0x10000, CRC(c266c6df) SHA1(f76e38ded43f56a486cf6569c679ddb57a4165fb) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
@@ -534,6 +560,7 @@ static DRIVER_INIT( discoboy )
 {
 	discoboy_state *state = machine.driver_data<discoboy_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *AUDIO = machine.region("audiocpu")->base();
 
 	memset(state->m_ram_1, 0, sizeof(state->m_ram_1));
 	memset(state->m_ram_2, 0, sizeof(state->m_ram_2));
@@ -549,7 +576,9 @@ static DRIVER_INIT( discoboy )
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 0);
+	memory_configure_bank(machine, "sndbank", 0, 8, &AUDIO[0x00000], 0x4000);
+	memory_set_bank(machine, "sndbank", 0);
 }
 
 
-GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy, ROT270, "Soft Art Co.", "Disco Boy", GAME_SUPPORTS_SAVE )
+GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy, ROT270, "Soft Art Co.", "Disco Boy", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
