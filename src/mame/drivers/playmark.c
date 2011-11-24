@@ -1446,6 +1446,54 @@ ROM_START( wbeachvl2 )
 	ROM_COPY( "user2", 0x0e0000, 0x1a0000, 0x020000)
 ROM_END
 
+
+ROM_START( wbeachvl3 )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "2.u16",   0x000000, 0x40000, CRC(f0f4c282) SHA1(94850b45368c3d09629852adc8ca08164b7a7a94) )
+	ROM_LOAD16_BYTE( "3.u15",   0x000001, 0x40000, CRC(99775c21) SHA1(fa80a81c59142abcf751352d7a7f9e0d3b5172c9) )
+
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (missing) */
+	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD( "wbv_10.bin",   0x000000, 0x80000, CRC(50680f0b) SHA1(ed76ef6ced70ba7e9558162aa94bbe9f19bbabe6) )
+	ROM_LOAD( "wbv_04.bin",   0x080000, 0x80000, CRC(df9cbff1) SHA1(7197939d9c4e8666d37266b6326134cfb4c761da) )
+	ROM_LOAD( "wbv_11.bin",   0x100000, 0x80000, CRC(e59ad0d1) SHA1(70dfc1ea45246fc8e24c96550563ab7a983f3824) )
+	ROM_LOAD( "wbv_05.bin",   0x180000, 0x80000, CRC(51245c3c) SHA1(5ac27d6fc22555766b4cdd532210199f4d7bd8bb) )
+	ROM_LOAD( "wbv_12.bin",   0x200000, 0x80000, CRC(36b87d0b) SHA1(702b8139d150c7cc9399dfa38536567aab40dcef) )
+	ROM_LOAD( "wbv_06.bin",   0x280000, 0x80000, CRC(9eb808ef) SHA1(0e46557665f1acef0606f22f043a391d1086cfce) )
+	ROM_LOAD( "wbv_13.bin",   0x300000, 0x80000, CRC(7021107b) SHA1(088fe3060dbb196e8000a3b4db1cfa3cb0c4b677) )
+	ROM_LOAD( "wbv_07.bin",   0x380000, 0x80000, CRC(4fff9fe8) SHA1(e29d3b4895692fd8559c9018432f32170aecdcc3) )
+	ROM_LOAD( "wbv_14.bin",   0x400000, 0x80000, CRC(0595e675) SHA1(82aebaedc919fa51b71f5519ee765ce9953d613a) )
+	ROM_LOAD( "wbv_08.bin",   0x480000, 0x80000, CRC(07e4b416) SHA1(a780ef0bd11897ab437359985f6e4852030ddbbf) )
+	ROM_LOAD( "wbv_15.bin",   0x500000, 0x80000, CRC(4e1a82d2) SHA1(9e66b52ba8e8144f772183396fc1a2fbb37ed2bc) )
+	ROM_LOAD( "wbv_09.bin",   0x580000, 0x20000, CRC(894ce354) SHA1(331aeabbe10cd645776da2dc0829acc2275e72dc) )
+	/* 5a0000-5fffff is empty */
+
+	ROM_REGION( 0x100000, "user2", 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "wbv_01.bin",   0x00000, 0x100000, CRC(ac33f25f) SHA1(5d9ed16650aeb297d565376a99b31c88ab611668) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0x1c0000, "oki", 0 ) /* Samples */
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x080000, 0x0e0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x100000, 0x020000)
+	ROM_COPY( "user2", 0x0a0000, 0x120000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x140000, 0x020000)
+	ROM_COPY( "user2", 0x0c0000, 0x160000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x180000, 0x020000)
+	ROM_COPY( "user2", 0x0e0000, 0x1a0000, 0x020000)
+ROM_END
+
+
+
 ROM_START( excelsr )
 	ROM_REGION( 0x300000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "22.u301", 0x000001, 0x80000, CRC(f0aa1c1b) SHA1(5ed68181defe6cde6f4979508f0cfce9e9743912) )
@@ -1710,6 +1758,7 @@ GAME( 1995, bigtwin,   0,        bigtwin,  bigtwin,  bigtwin, ROT0, "Playmark", 
 GAME( 1995, bigtwinb,  bigtwin,  bigtwinb, bigtwinb, bigtwin, ROT0, "Playmark", "Big Twin (No Girls Conversion)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl,  0,        wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl2, wbeachvl, wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl3, wbeachvl, wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 3)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1996, excelsr,   0,        excelsr,  excelsr,  bigtwin, ROT0, "Playmark", "Excelsior", GAME_SUPPORTS_SAVE )
 GAME( 1995, hotmind,   0,        hotmind,  hotmind,  bigtwin, ROT0, "Playmark", "Hot Mind", GAME_SUPPORTS_SAVE )
 GAME( 1994, hrdtimes,  0,        hrdtimes, hrdtimes, 0,       ROT0, "Playmark", "Hard Times (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
