@@ -9983,9 +9983,31 @@ ROM_START( jjsquawkb )
 	ROM_COPY( "gfxtemp", 0x100000, 0x000000, 0x100000 )
 	ROM_COPY( "gfxtemp", 0x300000, 0x100000, 0x100000 )
 
-
 	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* jj-rom5.040 + jj-rom6.040 from jjsquawk */
+ROM_END
+
+ROM_START( jjsquawkb2 ) /* PCB was P0-078A, which was a Blandia board converted to JJ Squawkers. No labels on any of the ROMs */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "u3.3a", 0x000000, 0x040000, CRC(f94c913b) SHA1(de6e422c514c787897f8f41d7cd98acb0135c763) ) // 99.999619%
+	ROM_CONTINUE   (                0x100000, 0x040000  )
+	ROM_LOAD16_BYTE( "u4.4a", 0x000001, 0x040000, CRC(0227a2be) SHA1(8ee0c39f84110865778564f803b4db11bfdfbad7) ) // 99.999809%
+	ROM_CONTINUE   (                0x100001, 0x040000  )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
+	ROM_LOAD( "u64.3l",  0x000000, 0x100000, CRC(11d8713a) SHA1(8e3359f605913625191ac0a09222ec465b5fea71) ) /* jj-rom9 + jj-rom10 from jjsquawk */
+	ROM_LOAD( "u63.2l",  0x100000, 0x100000, CRC(7a385ef0) SHA1(d38e2242532074b58707783608a6ddce42c55a77) ) /* jj-rom7 + jj-rom8  from jjsquawk */
+
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 1 */
+	ROM_LOAD       ( "u66.5l", 0x000000, 0x100000, CRC(bbaf40c5) SHA1(aecd48176adbe79e76c8febca1d9bb95ff0d6912) ) /* jj-rom11 + jj-rom12 from jjsquawk */
+	ROM_LOAD16_BYTE( "u65.4l", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) ) /* jj-rom3.040         from jjsquawk */
+
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 2 */
+	ROM_LOAD       ( "u68.7l", 0x000000, 0x100000, CRC(ae9ae01f) SHA1(1a828d5b8848c5b5d8e5f279f1fde26b972a6332) ) /* jj-rom14 + jj-rom13 from jjsquawk */
+	ROM_LOAD16_BYTE( "u67.6l", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) ) /* jj-rom4.040         from jjsquawk */
+
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
+	ROM_LOAD( "u70.10l", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* jj-rom5.040 + jj-rom6.040 from jjsquawk */
 ROM_END
 
 ROM_START( kamenrid )
@@ -10760,6 +10782,7 @@ GAME( 1993, atehate,  0,        atehate,  atehate,  0,        ROT0,   "Athena", 
 GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh", 0 )
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
+GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, 0,        ROT0,   "bootleg",		"J. J. Squawkers (bootleg, Blandia Conversion)", GAME_IMPERFECT_SOUND )
 GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, 0,        ROT0,   "Banpresto / Toei",       "Masked Riders Club Battle Race", 0 )
 GAME( 1993, madshark, 0,        madshark, madshark, 0,        ROT270, "Allumer",                "Mad Shark", 0 )
 GAME( 1993, msgundam, 0,        msgundam, msgundam, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
