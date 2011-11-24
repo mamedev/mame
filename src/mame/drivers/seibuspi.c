@@ -2420,6 +2420,34 @@ ROM_START( batlballa )
 	ROM_LOAD("fb_7.216",      0x200000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
 ROM_END
 
+ROM_START( batlballe ) /* Early version, PCB serial number of 19, hand written labels dated 10/16 (Oct 16, 1995) */
+	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
+	ROM_LOAD32_BYTE("1_10-16", 0x100000, 0x40000, CRC(6b1baa07) SHA1(29b8f4016e9bffdcdb6ec405cd443ca0a80de5d5) )
+	ROM_LOAD32_BYTE("2_10-16", 0x100001, 0x40000, CRC(3c890639) SHA1(968c4a5efc5ebbe4e4cc81f834c286c02596c24e) )
+	ROM_LOAD32_BYTE("3_10-16", 0x100002, 0x40000, CRC(8c30180e) SHA1(47b99b04e2e74f1ee5095aed3f45aba66cd3da3f) )
+	ROM_LOAD32_BYTE("4_10-16", 0x100003, 0x40000, CRC(048c7aaa) SHA1(5eca2cdf4e6f077988509c3c42c86408b21ffbf1) )
+
+	ROM_REGION( 0x30000, "gfx1", 0)
+	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
+	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
+
+	ROM_REGION( 0x300000, "gfx2", 0)	/* background layer roms */
+	ROM_LOAD24_WORD("fb_bg-1d.415", 0x000000, 0x200000, CRC(eae7a1fc) SHA1(26d8a9f4e554848977ec1f6a8aad8751b558a8d4) )
+	ROM_LOAD24_BYTE("fb_bg-1p.410", 0x000002, 0x100000, CRC(b46e774e) SHA1(00b6c1d0b0ea37f4354acab543b270c0bf45896d) )
+
+	ROM_REGION( 0xc00000, "gfx3", 0)	/* sprites */
+	ROM_LOAD("fb_obj-1.322", 0x000000, 0x400000, CRC(29f86f68) SHA1(1afe809ce00a25f8b27543e4188edc3e3e604951) )
+	ROM_LOAD("fb_obj-2.324", 0x400000, 0x400000, CRC(c9e3130b) SHA1(12b5d5363142e8efb3b7fc44289c0afffa5011c6) )
+	ROM_LOAD("fb_obj-3.323", 0x800000, 0x400000, CRC(f6c3bc49) SHA1(d0eb9c6aa3954d94e3a442a48e0fe6cc279f5513) )
+
+	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
+
+	ROM_REGION(0x280000, "user2", ROMREGION_ERASE00)	/* sound roms */
+	ROM_LOAD("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
+	ROM_CONTINUE(0x100000,0x080000)
+	ROM_LOAD("fb_7.216",      0x200000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+ROM_END
+
 ROM_START( batlballu )
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
 	ROM_LOAD32_BYTE("sen1.bin", 0x100000, 0x40000, CRC(13849bf0) SHA1(ffa829a8b8a05a8fbaf883a30759f2ad8071a85b) )
@@ -3602,6 +3630,7 @@ GAME( 1995, senkyu,    0,       spi,      spi_3button, senkyu,   ROT0,   "Seibu 
 GAME( 1995, senkyua,   senkyu,  spi,      spi_3button, senkyua,  ROT0,   "Seibu Kaihatsu", "Senkyu (Japan, set 2)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, batlball,  senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Tuning license)", "Battle Balls (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, batlballa, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Asia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, batlballe, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Asia, earlier)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, batlballu, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Fabtek license)", "Battle Balls (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 GAME( 1995, viprp1,    0,       spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (World, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
