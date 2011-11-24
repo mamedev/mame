@@ -1239,6 +1239,25 @@ ROM_START( pepper2 )
 ROM_END
 
 
+ROM_START( pepper27 ) 
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p2l12ar7.bin", 0x9000, 0x1000, CRC(b3bc51cd) SHA1(12475ac5784bb2ab6887476ee8166c3585864cd6) )
+	ROM_LOAD( "p2l11ar7.bin", 0xa000, 0x1000, CRC(c8b834cd) SHA1(28b4de322de845effaa1d2fc6c9f129145965b8a) )
+	ROM_LOAD( "p2l10ar7.bin", 0xb000, 0x1000, CRC(c3e864a2) SHA1(cfc769b34d181724a5826d3a1bb3313ef5fbbd62) )
+	ROM_LOAD( "p2l9ar7.bin",  0xc000, 0x1000, CRC(451003b2) SHA1(87b9aecfcf861b3d812f0e3c23b40c98c198e933) )
+	ROM_LOAD( "p2l8ar7.bin",  0xd000, 0x1000, CRC(c666cafb) SHA1(5783fcfeeb651c850a1d9676e97a6beaafb06c6e) )
+	ROM_LOAD( "p2l7ar7.bin",  0xe000, 0x1000, CRC(ac1282ef) SHA1(34023d8a01c1f26ec8268d7387660d6f7e875014) )
+	ROM_LOAD( "p2l6ar7.bin",  0xf000, 0x1000, CRC(db8dd4fc) SHA1(9ae00f8d1a19280670dc65a20cf9cc4e7f1cc973) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "audio_5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) )
+	ROM_LOAD( "audio_6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
+	ROM_LOAD( "audio_7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "main_11d", 0x0000, 0x0800, CRC(b25160cd) SHA1(3d768552960a3a660891dcb85da6a5c382b33991) )
+ROM_END
+
 ROM_START( hardhat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hhl-2.11a", 0xa000, 0x1000, CRC(7623deea) SHA1(3c47c0439c80e66536af42c5ee4e522fea5f8374) )
@@ -1502,7 +1521,8 @@ GAME( 1981, venture,  0,       venture,  venture,  venture,  ROT0, "Exidy",   "V
 GAME( 1981, venture2, venture, venture,  venture,  venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, venture4, venture, venture,  venture,  venture,  ROT0, "Exidy",   "Venture (version 4)", GAME_SUPPORTS_SAVE )
 GAME( 1982, teetert,  0,       teetert,  teetert,  teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1982, pepper2,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy",   "Pepper II", GAME_SUPPORTS_SAVE )
+GAME( 1982, pepper2,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", GAME_SUPPORTS_SAVE )
+GAME( 1982, pepper27, pepper2, pepper2,  pepper2,  pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", GAME_SUPPORTS_SAVE )
 GAME( 1982, hardhat,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy",   "Hard Hat", GAME_SUPPORTS_SAVE )
 GAME( 1983, fax,      0,       fax,      fax,      fax,      ROT0, "Exidy",   "FAX", GAME_SUPPORTS_SAVE )
 GAME( 1983, fax2,     fax,     fax,      fax,      fax,      ROT0, "Exidy",   "FAX 2", GAME_SUPPORTS_SAVE )
