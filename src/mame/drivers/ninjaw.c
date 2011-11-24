@@ -245,7 +245,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
   - Region stored at 0x01fffe.w
   - Sets :
-      * 'ninjaw' : region = 0x0003
+      * 'ninjaw'  : region = 0x0003
+      * 'ninjawu' : region = 0x0004
       * 'ninjawj' : region = 0x0000
   - Coinage relies on the region (code at 0x0013bc) :
       * 0x0000 (Japan), 0x0001 (?) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
@@ -976,8 +977,64 @@ MACHINE_CONFIG_END
 
 ROM_START( ninjaw )
 	ROM_REGION( 0xc0000, "maincpu", 0 )	/* 256K for 68000 CPUA code */
-	ROM_LOAD16_BYTE( "b31-45",    0x00000, 0x10000, CRC(107902c3) SHA1(026f71a918059e3374ae262304a2ee1270f5c5bd) )
-	ROM_LOAD16_BYTE( "b31-47",    0x00001, 0x10000, CRC(bd536b1e) SHA1(39c86cbb3a33fc77a0141b5648a1aca862e0a5fd) )
+	ROM_LOAD16_BYTE( "b31_45.35", 0x00000, 0x10000, CRC(107902c3) SHA1(026f71a918059e3374ae262304a2ee1270f5c5bd) )
+	ROM_LOAD16_BYTE( "b31_47.32", 0x00001, 0x10000, CRC(bd536b1e) SHA1(39c86cbb3a33fc77a0141b5648a1aca862e0a5fd) )
+	ROM_LOAD16_BYTE( "b31_29.34", 0x20000, 0x10000, CRC(f2941a37) SHA1(cf1f231d9caddc903116a8b654f49181ca459697) )
+	ROM_LOAD16_BYTE( "b31_27.31", 0x20001, 0x10000, CRC(2f3ff642) SHA1(7d6775b51d96b459b163d8fde2385b0e3f5242ca) )
+
+	ROM_LOAD16_BYTE( "b31_41.5", 0x40000, 0x20000, CRC(0daef28a) SHA1(7c7e16b0eebc589ab99f62ddb98b372596ff5ae6) )	/* data roms ? */
+	ROM_LOAD16_BYTE( "b31_39.2", 0x40001, 0x20000, CRC(e9197c3c) SHA1(a7f0ef2b3c4258c09edf05284fec45832a8fb147) )
+	ROM_LOAD16_BYTE( "b31_40.6", 0x80000, 0x20000, CRC(2ce0f24e) SHA1(39632397ac7e8457607c32c31fccf1c08d4b2621) )
+	ROM_LOAD16_BYTE( "b31_38.3", 0x80001, 0x20000, CRC(bc68cd99) SHA1(bb31ea589339c9f9b61e312e1024b5c8410cdb43) )
+
+	ROM_REGION( 0x60000, "sub", 0 )	/* 384K for 68000 CPUB code */
+	ROM_LOAD16_BYTE( "b31_33.87", 0x00000, 0x10000, CRC(6ce9af44) SHA1(486e332af238c211c3f64f7ead114282661687c4) )
+	ROM_LOAD16_BYTE( "b31_36.97", 0x00001, 0x10000, CRC(ba20b0d4) SHA1(fb3dcb7681a95087afac9aa9393765d786243486) )
+	ROM_LOAD16_BYTE( "b31_32.86", 0x20000, 0x10000, CRC(e6025fec) SHA1(071f83a9ddebe67bd6c6c2505318e177895163ee) )
+	ROM_LOAD16_BYTE( "b31_35.96", 0x20001, 0x10000, CRC(70d9a89f) SHA1(20f846beb052fd8cddcf00c3e42e3304e102a87b) )
+	ROM_LOAD16_BYTE( "b31_31.85", 0x40000, 0x10000, CRC(837f47e2) SHA1(88d596f01566456ba18a01afd0a6a7c121d3ca88) )
+	ROM_LOAD16_BYTE( "b31_34.95", 0x40001, 0x10000, CRC(d6b5fb2a) SHA1(e3ae0d7ec62740465a90e4939b10341d3866d860) )
+
+	ROM_REGION( 0x2c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_LOAD( "b31_37.11",  0x00000, 0x04000, CRC(0ca5799d) SHA1(6485dde076d15b69b9ee65880dda57ad4f8d129c) )
+	ROM_CONTINUE(           0x10000, 0x1c000 )  /* banked stuff */
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "b31-01.23", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) )	/* SCR (screen 1) */
+	ROM_LOAD( "b31-02.24", 0x80000, 0x80000, CRC(4c3b4e33) SHA1(f99b379be1af085bf102d4d7cf35803e002fe80b) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "b31-07.176", 0x000000, 0x80000, CRC(33568cdb) SHA1(87abf56bbbd3659a1bd3e6ce9e43176be7950b41) )	/* OBJ */
+	ROM_LOAD( "b31-06.175", 0x080000, 0x80000, CRC(0d59439e) SHA1(54d844492888e7fe2c3bc61afe64f8d47fdee8dc) )
+	ROM_LOAD( "b31-05.174", 0x100000, 0x80000, CRC(0a1fc9fb) SHA1(a5d6975fd4f7e689c8cafd7c9cd3787797955779) )
+	ROM_LOAD( "b31-04.173", 0x180000, 0x80000, CRC(2e1e4cb5) SHA1(4733cfc015a68e021108a9e1e8ea807b0e7eac7a) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )	/* SCR (screens 2+) */
+
+/* The actual board duplicates the SCR gfx roms for 2nd/3rd TC0100SCN */
+//  ROM_LOAD( "b31-01.26", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 2) */
+//  ROM_LOAD( "b31-02.27", 0x80000, 0x80000, CRC(4c3b4e33) SHA1(f99b379be1af085bf102d4d7cf35803e002fe80b) )
+//  ROM_LOAD( "b31-01.28", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 3) */
+//  ROM_LOAD( "b31-02.29", 0x80000, 0x80000, CRC(4c3b4e33) SHA1(f99b379be1af085bf102d4d7cf35803e002fe80b) )
+
+	ROM_REGION( 0x180000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_LOAD( "b31-09.18", 0x000000, 0x80000, CRC(60a73382) SHA1(0ddeb86fcd4d19a58e62bf8564f996d17e36e5c5) )
+	ROM_LOAD( "b31-10.17", 0x080000, 0x80000, CRC(c6434aef) SHA1(3348ce87882e3f668aa85bbb517975ec1fc9b6fd) )
+	ROM_LOAD( "b31-11.16", 0x100000, 0x80000, CRC(8da531d4) SHA1(525dfab0a0729e9fb6f0e4c8187bf4ce16321b20) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_LOAD( "b31-08.19", 0x000000, 0x80000, CRC(a0a1f87d) SHA1(6b0f8094f3a3ef1ced76984e333e22a17c51af29) )
+
+	ROM_REGION( 0x01000, "user1", 0 )	/* unknown roms */
+	ROM_LOAD( "b31-25.38", 0x00000, 0x200, CRC(a0b4ba48) SHA1(dc9a46366a0cbf63a609f177c3d3ba9675416662) )
+	ROM_LOAD( "b31-26.58", 0x00000, 0x200, CRC(13e5fe15) SHA1(c973c7965954a2a0b427908f099592ed89cf0ff0) )
+ROM_END
+
+ROM_START( ninjawu )
+	ROM_REGION( 0xc0000, "maincpu", 0 )	/* 256K for 68000 CPUA code */
+	ROM_LOAD16_BYTE( "b31_49.35", 0x00000, 0x10000, CRC(d38b6391) SHA1(4711e059531566b779e95619c47621fdbfba2e56) )
+	ROM_LOAD16_BYTE( "b31_48.32", 0x00001, 0x10000, CRC(4b5bb3d8) SHA1(b0e2059e0fe682ef8152690d93392bdd4fda8149) )
 	ROM_LOAD16_BYTE( "b31_29.34", 0x20000, 0x10000, CRC(f2941a37) SHA1(cf1f231d9caddc903116a8b654f49181ca459697) )
 	ROM_LOAD16_BYTE( "b31_27.31", 0x20001, 0x10000, CRC(2f3ff642) SHA1(7d6775b51d96b459b163d8fde2385b0e3f5242ca) )
 
@@ -1133,6 +1190,7 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,    PARENT, MACHINE, INPUT,   INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw,  0,   ROT0,   "Taito Corporation Japan", "The Ninja Warriors (World)", 0 )
-GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, 0,   ROT0,   "Taito Corporation", "The Ninja Warriors (Japan)", 0 )
-GAME( 1989, darius2, 0,      darius2, darius2, 0,   ROT0,   "Taito Corporation", "Darius II (triple screen) (Japan)", 0 )
+GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw,  0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", 0 )
+GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", 0 )
+GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjaw,  0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", 0 ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2, 0,      darius2, darius2, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", 0 )
