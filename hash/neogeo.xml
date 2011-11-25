@@ -9755,8 +9755,8 @@
         <rom name="u9" offset="0x300000" size="0x080000" crc="0a548948" sha1="e1e4afd17811cb60401c14fbcf0465035165f4fb" />
       </dataarea>
       <dataarea name="sprites" size="0x100000">
-        <rom loadflag="load16_byte" name="uc5" offset="0x000000" size="0x080000" crc="e89ad494) SHA1 (69c9ea415773af94ac44c48af05d55ada222b138" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="uc6" offset="0x000001" size="0x080000" crc="4b42d7eb) SHA1 (042ae50a528cea21cf07771d3915c57aa16fd5af" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="uc5" offset="0x000000" size="0x080000" crc="e89ad494" sha1="69c9ea415773af94ac44c48af05d55ada222b138" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="uc6" offset="0x000001" size="0x080000" crc="4b42d7eb" sha1="042ae50a528cea21cf07771d3915c57aa16fd5af" />        <!-- Plane 2,3 -->
       </dataarea>
     </part>
   </software>
