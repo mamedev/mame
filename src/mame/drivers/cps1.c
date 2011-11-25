@@ -3412,7 +3412,7 @@ ROM_END
 /* B-Board 88621B-2 */
 /* This set comes from a USA board with the same pcb layout of the parent forgottn, but uses one more surface mounted ROM
    named LW-13 and located @ 10D instead of LW_25.10C, LW_26.10E, LW_27.11C, LW_28.11E EPROMs.
-/* Note that ROMs are labeled left to right, top to bottom, instead of top to bottom, left to right as usual. */
+   Note that ROMs are labeled left to right, top to bottom, instead of top to bottom, left to right as usual. */
 ROM_START( forgottnu )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lw11c.12f",      0x00000, 0x20000, CRC(e62742b6) SHA1(39dd3bdd405a8217d8816567d4f2014fc77f5ce8) )
