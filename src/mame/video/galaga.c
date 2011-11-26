@@ -546,7 +546,7 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 
 		/* two sets of stars controlled by these bits */
 		set_a = (state->m_galaga_starcontrol[3] & 1);
-		set_b = (state->m_galaga_starcontrol[4] & 1) | 0x2;
+		set_b = (state->m_galaga_starcontrol[4] & 1) | 2;
 
 		for (star_cntr = 0;star_cntr < MAX_STARS ;star_cntr++)
 		{
@@ -557,7 +557,7 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 				x = (star_seed_tab[star_cntr].x + state->m_stars_scrollx) % 256 + x_align;
 				y = (y_align + star_seed_tab[star_cntr].y + state->m_stars_scrolly) % 256;
 
-				if (y >= cliprect->min_y && y <= cliprect->max_y)
+				if (x >= cliprect->min_x && x <= cliprect->max_x && y >= cliprect->min_y && y <= cliprect->max_y)
 					*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[ star_cntr ].col;
 			}
 

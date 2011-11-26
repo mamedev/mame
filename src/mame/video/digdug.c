@@ -248,11 +248,14 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const recta
 	UINT8 *spriteram_3 = state->m_digdug_flpram + 0x380;
 	int offs;
 
-	rectangle visarea = {2*8, 34*8-1, 0*8, 28*8-1};
+	// mask upper and lower columns
+	rectangle visarea = *cliprect;
+	visarea.min_x = 2*8;
+	visarea.max_x = 34*8-1;
 	if (flip_screen_get(machine))
 	{
-		visarea.min_x += 96;
-		visarea.max_x += 96;
+		visarea.min_x += 12*8;
+		visarea.max_x += 12*8;
 	}
 
 	for (offs = 0;offs < 0x80;offs += 2)

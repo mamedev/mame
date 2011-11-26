@@ -141,7 +141,6 @@ VIDEO_START( bosco )
 	state->m_bosco_radarx = state->m_videoram + 0x03f0;
 	state->m_bosco_radary = state->m_bosco_radarx + 0x0800;
 
-
 	state->save_item(NAME(state->m_stars_scrollx));
 	state->save_item(NAME(state->m_stars_scrolly));
 }
@@ -203,7 +202,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		int flipx = spriteram[offs] & 1;
 		int flipy = spriteram[offs] & 2;
 		int color = spriteram_2[offs + 1] & 0x3f;
-		if (flip_screen_get(machine)) sx += 32-2;
+
+		if (flip_screen_get(machine))
+		{
+			sx += 128-2;
+			sy += 8;
+		}
 
 		drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
@@ -222,11 +226,14 @@ static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const recta
 
 	for (offs = 4; offs < 0x10;offs++)
 	{
-		int x,y;
+		int x = state->m_bosco_radarx[offs] + ((~state->m_bosco_radarattr[offs] & 0x01) << 8) - 1;
+		int y = 251 - state->m_bosco_radary[offs];
 
-		x = state->m_bosco_radarx[offs] + ((~state->m_bosco_radarattr[offs] & 0x01) << 8);
-		y = 253 - state->m_bosco_radary[offs];
-		if (flip_screen_get(machine)) x -= 3;
+		if (flip_screen_get(machine))
+		{
+			x += 96-2;
+			y += 8+2;
+		}
 
 		drawgfx_transmask(bitmap,cliprect,machine.gfx[2],
 				((state->m_bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07,
@@ -239,7 +246,7 @@ static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const recta
 
 static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
-	bosco_state *state =  machine.driver_data<bosco_state>();
+	bosco_state *state = machine.driver_data<bosco_state>();
 
 	if (1)
 	{
@@ -247,24 +254,24 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */
-		set_a = state->m_bosco_starblink[0] & 0x01;
-		set_b = (state->m_bosco_starblink[1] & 0x01) |0x2;
+		set_a = (state->m_bosco_starblink[0] & 1);
+		set_b = (state->m_bosco_starblink[1] & 1) | 2;
 
 		for (star_cntr = 0;star_cntr < MAX_STARS;star_cntr++)
 		{
 			int x,y;
 
-			if   ( (set_a == star_seed_tab[star_cntr].set) ||  ( set_b == star_seed_tab[star_cntr].set) )
+			if ( (set_a == star_seed_tab[star_cntr].set) || ( set_b == star_seed_tab[star_cntr].set) )
 			{
-				x = (  star_seed_tab[star_cntr].x + state->m_stars_scrollx) % 256;
-				y = (  star_seed_tab[star_cntr].y + state->m_stars_scrolly) % 256;
+				x = (star_seed_tab[star_cntr].x + state->m_stars_scrollx) % 256;
+				y = (star_seed_tab[star_cntr].y + state->m_stars_scrolly) % 256;
 
 				/* dont draw the stars that are off the screen */
-				if ( x < 224 && y < 224 )
+				if ( x < 224 )
 				{
-					if (flip) x += 64;
+					if (flip) x += 20*8;
 
-					if (y >= cliprect->min_y && y <= cliprect->max_y)
+					if (x >= cliprect->min_x && x <= cliprect->max_x && y >= cliprect->min_y && y <= cliprect->max_y)
 						*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
 				}
 			}
@@ -283,8 +290,8 @@ SCREEN_UPDATE( bosco )
 	rectangle bg_clip = *cliprect;
 	if (flip_screen_get(screen->machine()))
 	{
-		bg_clip.min_x = 8*8;
-		fg_clip.max_x = 8*8-1;
+		bg_clip.min_x = 20*8;
+		fg_clip.max_x = 20*8-1;
 	}
 	else
 	{
