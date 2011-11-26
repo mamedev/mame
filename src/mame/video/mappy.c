@@ -437,8 +437,8 @@ static void mappy_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 			{
 				flipx ^= 1;
 				flipy ^= 1;
-				sy += (264 - 224);
-				sx += (384 - 288);
+				sy += 40;
+				sx += 96;
 			}
 
 			for (y = 0;y <= sizey;y++)
@@ -516,8 +516,8 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_t *bitmap, cons
 			{
 				flipx ^= 1;
 				flipy ^= 1;
-				sy += (264 - 224);
-				sx += (384 - 288);
+				sy += 40;
+				sx += 96;
 			}
 
 			for (y = 0;y <= sizey;y++)

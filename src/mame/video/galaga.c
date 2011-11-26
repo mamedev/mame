@@ -510,7 +510,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		{
 			flipx ^= 1;
 			flipy ^= 1;
-			sy += 48;
+			sy += 40;
+			sx += 96;
 		}
 
 		for (y = 0;y <= sizey;y++)
@@ -535,28 +536,26 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 	/* draw the stars */
 
 	/* $a005 controls the stars ON/OFF */
-
-
 	if ( (state->m_galaga_starcontrol[5] & 1) == 1 )
 	{
+		int y_align = 112; /* 112 is a tweak to get alignment about perfect */
+		int x_align = flip_screen_get(machine) ? 112 : 16;
+
 		int star_cntr;
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */
-
 		set_a = (state->m_galaga_starcontrol[3] & 1);
 		set_b = (state->m_galaga_starcontrol[4] & 1) | 0x2;
-
 
 		for (star_cntr = 0;star_cntr < MAX_STARS ;star_cntr++)
 		{
 			int x,y;
 
-			if   ( (set_a == star_seed_tab[star_cntr].set) ||  ( set_b == star_seed_tab[star_cntr].set) )
+			if ( (set_a == star_seed_tab[star_cntr].set) || ( set_b == star_seed_tab[star_cntr].set) )
 			{
-				x = (star_seed_tab[star_cntr].x + state->m_stars_scrollx) % 256 + 16;
-				y = (112 + star_seed_tab[star_cntr].y + state->m_stars_scrolly) % 256;
-			   /* 112 is a tweak to get alignment about perfect */
+				x = (star_seed_tab[star_cntr].x + state->m_stars_scrollx) % 256 + x_align;
+				y = (y_align + star_seed_tab[star_cntr].y + state->m_stars_scrolly) % 256;
 
 				if (y >= cliprect->min_y && y <= cliprect->max_y)
 					*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[ star_cntr ].col;
@@ -585,7 +584,6 @@ SCREEN_EOF( galaga )
 	/* this function is called by galaga_interrupt_1() */
 	int s0,s1,s2;
 	static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
-
 
 	s0 = (state->m_galaga_starcontrol[0] & 1);
 	s1 = (state->m_galaga_starcontrol[1] & 1);
