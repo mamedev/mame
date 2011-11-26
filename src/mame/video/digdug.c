@@ -240,12 +240,6 @@ WRITE8_HANDLER( digdug_PORT_w )
 
 ***************************************************************************/
 
-static const rectangle spritevisiblearea =
-{
-	2*8, 34*8-1,
-	0*8, 28*8-1
-};
-
 static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	digdug_state *state =  machine.driver_data<digdug_state>();
@@ -253,6 +247,13 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const recta
 	UINT8 *spriteram_2 = state->m_digdug_posram + 0x380;
 	UINT8 *spriteram_3 = state->m_digdug_flpram + 0x380;
 	int offs;
+
+	rectangle visarea = {2*8, 34*8-1, 0*8, 28*8-1};
+	if (flip_screen_get(machine))
+	{
+		visarea.min_x += 96;
+		visarea.max_x += 96;
+	}
 
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
@@ -280,7 +281,8 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const recta
 		{
 			flipx ^= 1;
 			flipy ^= 1;
-			sy += 48;
+			sy += 40;
+			sx += 96;
 		}
 
 		for (y = 0;y <= size;y++)
@@ -288,13 +290,13 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const recta
 			for (x = 0;x <= size;x++)
 			{
 				UINT32 transmask = colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0x1f);
-				drawgfx_transmask(bitmap,&spritevisiblearea,machine.gfx[1],
+				drawgfx_transmask(bitmap,&visarea,machine.gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
 					((sx + 16*x) & 0xff), sy + 16*y,transmask);
 				/* wraparound */
-				drawgfx_transmask(bitmap,&spritevisiblearea,machine.gfx[1],
+				drawgfx_transmask(bitmap,&visarea,machine.gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
