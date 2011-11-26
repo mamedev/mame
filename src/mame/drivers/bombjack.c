@@ -347,11 +347,11 @@ static MACHINE_RESET( bombjack )
 static MACHINE_CONFIG_START( bombjack, bombjack_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)		/* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz????? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)	/* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
@@ -376,13 +376,13 @@ static MACHINE_CONFIG_START( bombjack, bombjack_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)	/* Confirmed from PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 MACHINE_CONFIG_END
 
