@@ -82,12 +82,4 @@ private:
 // device type definition
 extern const device_type RAM;
 
-
-/***************************************************************************
-    LEGACY FUNCTION PROTOTYPES
-***************************************************************************/
-
-inline UINT32 ram_get_size(device_t *device)	{ return downcast<ram_device *>(device)->size(); }
-inline UINT8 *ram_get_ptr(device_t *device)	{ return downcast<ram_device *>(device)->pointer(); }
-
 #endif /* __RAM_H__ */
