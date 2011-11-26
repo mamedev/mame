@@ -452,7 +452,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 			{
 				flipx = !flipx;
 				flipy = !flipy;
-				sy += 48;
+				sy += 40;
+				sx += 96;
 			}
 
 			transmask = colortable_get_transpen_mask(machine.colortable, machine.gfx[bank], color, 0x80);
