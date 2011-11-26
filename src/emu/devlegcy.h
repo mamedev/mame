@@ -521,7 +521,6 @@ public:
 	virtual void call_display_info();
 	virtual device_image_partialhash_func get_partial_hash() const;
 	virtual void call_get_devices();
-	virtual void *get_device_specific_call();
 
 	virtual iodevice_t image_type() const { return static_cast<iodevice_t>(get_legacy_int(DEVINFO_INT_IMAGE_TYPE)); }
 

@@ -174,8 +174,3 @@ device_image_partialhash_func legacy_image_device_base::get_partial_hash() const
 {
 	return reinterpret_cast<device_image_partialhash_func>(get_legacy_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
 }
-
-void *legacy_image_device_base::get_device_specific_call()
-{
-	return (void*) get_legacy_fct(DEVINFO_FCT_DEVICE_SPECIFIC);
-}

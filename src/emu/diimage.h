@@ -171,7 +171,6 @@ public:
 	virtual void call_display() { }
 	virtual void call_display_info() { }
 	virtual void call_get_devices() { }
-	virtual void *get_device_specific_call() { return NULL; }
 	virtual device_image_partialhash_func get_partial_hash() const { return NULL; }
 	virtual iodevice_t image_type()  const = 0;
 	virtual bool is_readable()  const = 0;
