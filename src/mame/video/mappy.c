@@ -437,7 +437,8 @@ static void mappy_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 			{
 				flipx ^= 1;
 				flipy ^= 1;
-				sy += 40;
+				sy += (264 - 224);
+				sx += (384 - 288);
 			}
 
 			for (y = 0;y <= sizey;y++)
@@ -515,7 +516,8 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_t *bitmap, cons
 			{
 				flipx ^= 1;
 				flipy ^= 1;
-				sy += 40;
+				sy += (264 - 224);
+				sx += (384 - 288);
 			}
 
 			for (y = 0;y <= sizey;y++)
@@ -540,9 +542,6 @@ SCREEN_UPDATE( superpac )
 	mappy_state *state = screen->machine().driver_data<mappy_state>();
 	bitmap_t *sprite_bitmap = state->m_sprite_bitmap;
 	int x,y;
-
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 96);
-	tilemap_set_scrolldy(state->m_bg_tilemap, 0, 0);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
@@ -574,9 +573,6 @@ SCREEN_UPDATE( phozon )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(screen->machine(), state->m_spriteram[0x1f7f-0x800] & 1);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 96);
-	tilemap_set_scrolldy(state->m_bg_tilemap, 0, 0);
-
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
 	phozon_draw_sprites(screen->machine(),bitmap,cliprect,state->m_spriteram);
@@ -590,9 +586,6 @@ SCREEN_UPDATE( mappy )
 {
 	mappy_state *state = screen->machine().driver_data<mappy_state>();
 	int offs;
-
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 96);
-	tilemap_set_scrolldy(state->m_bg_tilemap, 0, 0);
 
 	for (offs = 2;offs < 34;offs++)
 		tilemap_set_scrolly(state->m_bg_tilemap,offs,state->m_scroll);
