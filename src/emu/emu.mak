@@ -300,7 +300,6 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/flopdrv.o	\
 	$(EMUIMAGEDEV)/floppy.o		\
 	$(EMUIMAGEDEV)/harddriv.o	\
-	$(EMUIMAGEDEV)/multcart.o	\
 	$(EMUIMAGEDEV)/printer.o	\
 	$(EMUIMAGEDEV)/serial.o		\
 	$(EMUIMAGEDEV)/snapquik.o	\
