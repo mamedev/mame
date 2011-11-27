@@ -32,12 +32,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
-	
+
 	// driver_device overrides
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);

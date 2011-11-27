@@ -12,16 +12,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
-	
+
 	// driver_device overrides
 	virtual void machine_reset();
 };
-	
+
 
 static ADDRESS_MAP_START( bingo_map, AS_PROGRAM, 8, bingo_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
@@ -53,16 +53,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
-	
+
 	// driver_device overrides
 	virtual void machine_reset();
 };
-	
+
 
 static ADDRESS_MAP_START( seeben_map, AS_PROGRAM, 8, seeben_state )
 ADDRESS_MAP_END
@@ -91,15 +91,15 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
-	
+
 	// driver_device overrides
 	virtual void machine_reset();
-};	
+};
 
 static ADDRESS_MAP_START( splin_map, AS_PROGRAM, 16, splin_state )
 	AM_RANGE(0x00000, 0x0bfff) AM_RAM
@@ -291,7 +291,7 @@ ROM_START(tripjok)
 	ROM_LOAD( "13006-2", 0x0000, 0x4000, CRC(c7104e8f) SHA1(a3737f70cb9c97df24b5da915ef53b6d30f2470d))
 ROM_END
 
-	
+
 GAME(1980,	cntinntl,		0,			bingo,	bingo,	bingo,	ROT0,	"Bally",		"Continental (Bingo)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(19??,	goldgame,		0,			splin,	splin,	splin,	ROT0,	"Splin",		"Golden Game (Bingo)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(19??,	goldgkitb,		goldgame,	splin,	splin,	splin,	ROT0,	"Splin",		"Golden Game Kit Bingo Stake 6/10 (Bingo)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

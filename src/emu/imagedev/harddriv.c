@@ -214,7 +214,7 @@ int harddisk_image_device::internal_load_hd(const char *metadata)
 	if (software_entry() != NULL)
 	{
 		m_chd  = get_disk_handle(device().machine(), device().subtag(tempstring,"harddriv"));
-	} else {	
+	} else {
 		do
 		{
 			is_writeable = !is_readonly();
@@ -222,7 +222,7 @@ int harddisk_image_device::internal_load_hd(const char *metadata)
 			err = chd_open_file(image_core_file(), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &m_chd);
 
 			/* special case; if we get CHDERR_FILE_NOT_WRITEABLE, make the
-			 * image read only and repeat */
+             * image read only and repeat */
 			if (err == CHDERR_FILE_NOT_WRITEABLE)
 				make_readonly();
 		}

@@ -23,9 +23,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 };

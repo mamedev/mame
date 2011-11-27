@@ -10,12 +10,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
-	
+
 	// driver_device overrides
 	virtual void machine_reset();
 };
@@ -65,7 +65,7 @@ ROM_START(sleicpin)
 
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("sp01-1_1.rom", 0x0000, 0x2000, CRC(240015bb) SHA1(0e647718173ad59dafbf3b5bc84bef3c33886e23))
-	
+
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("sp04-1_1.rom", 0x0000, 0x8000, CRC(84514cfa) SHA1(6aa87b86892afa534cf963821f08286c126b4245))
 

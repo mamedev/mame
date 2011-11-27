@@ -16,13 +16,13 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_videocpu(*this, "videocpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_videocpu;
-	
+
 	// driver_device overrides
 	virtual void machine_reset();
 };

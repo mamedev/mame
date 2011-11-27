@@ -310,7 +310,7 @@ SCREEN_UPDATE( pacman )
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
-					fy,fx, 			//FIXME: flipping bits are really supposed to be inverted here?
+					fy,fx,			//FIXME: flipping bits are really supposed to be inverted here?
 					sx - 256,sy + state->m_xoffsethack,
 					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
 		}

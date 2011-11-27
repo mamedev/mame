@@ -122,7 +122,7 @@ void init_pcap()
 		mame_printf_verbose("Unable to get network devices: %s\n", errbuf);
 		return;
 	}
-	
+
 	if (devs)
 	{
 		while(devs->next)

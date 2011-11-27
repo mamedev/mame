@@ -1254,7 +1254,7 @@ void validate_drivers(emu_options &options, const game_driver *curdriver)
 	/* iterate over all drivers */
 	emu_options validation_options(options);
 	validation_options.remove_device_options();
-	
+
 	driver_enumerator drivlist(validation_options);
 	while (drivlist.next())
 	{

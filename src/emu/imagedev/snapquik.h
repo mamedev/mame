@@ -22,7 +22,7 @@ public:
 	virtual ~snapshot_image_device();
 
 	// image-level overrides
-	virtual bool call_load();	
+	virtual bool call_load();
 	virtual iodevice_t image_type() const { return IO_SNAPSHOT; }
 
 	virtual bool is_readable()  const { return 1; }
@@ -33,7 +33,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return m_file_extensions; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	void timer_callback();
 	void set_handler(snapquick_load_func load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
 protected:
@@ -44,8 +44,8 @@ protected:
 	snapquick_load_func	m_load;					/* loading function */
 	const char *		m_file_extensions;		/* file extensions */
 	seconds_t			m_delay_seconds;		/* loading delay (seconds) */
-	attoseconds_t		m_delay_attoseconds;	/* loading delay (attoseconds) */	
-	emu_timer 			*m_timer;
+	attoseconds_t		m_delay_attoseconds;	/* loading delay (attoseconds) */
+	emu_timer			*m_timer;
 };
 
 // device type definition
@@ -58,7 +58,7 @@ class quickload_image_device : public snapshot_image_device
 public:
 	// construction/destruction
 	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual iodevice_t image_type() const { return IO_QUICKLOAD; }
 };
 

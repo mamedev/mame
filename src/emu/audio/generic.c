@@ -128,13 +128,13 @@ WRITE16_HANDLER( soundlatch3_word_w ) { latch_w(space, 2, data); }
 WRITE8_HANDLER( soundlatch4_w )       { latch_w(space, 3, data); }
 WRITE16_HANDLER( soundlatch4_word_w ) { latch_w(space, 3, data); }
 
-WRITE8_MEMBER( driver_device::soundlatch_w )   		{ latch_w(&space, 0, data); }
+WRITE8_MEMBER( driver_device::soundlatch_w )		{ latch_w(&space, 0, data); }
 WRITE16_MEMBER( driver_device::soundlatch_word_w )  { latch_w(&space, 0, data); }
-WRITE8_MEMBER( driver_device::soundlatch2_w )  		{ latch_w(&space, 1, data); }
+WRITE8_MEMBER( driver_device::soundlatch2_w )		{ latch_w(&space, 1, data); }
 WRITE16_MEMBER( driver_device::soundlatch2_word_w ) { latch_w(&space, 1, data); }
-WRITE8_MEMBER( driver_device::soundlatch3_w )  		{ latch_w(&space, 2, data); }
+WRITE8_MEMBER( driver_device::soundlatch3_w )		{ latch_w(&space, 2, data); }
 WRITE16_MEMBER( driver_device::soundlatch3_word_w ) { latch_w(&space, 2, data); }
-WRITE8_MEMBER( driver_device::soundlatch4_w )  		{ latch_w(&space, 3, data); }
+WRITE8_MEMBER( driver_device::soundlatch4_w )		{ latch_w(&space, 3, data); }
 WRITE16_MEMBER( driver_device::soundlatch4_word_w ) { latch_w(&space, 3, data); }
 
 
@@ -152,13 +152,13 @@ READ16_HANDLER( soundlatch3_word_r )  { return latch_r(space, 2); }
 READ8_HANDLER( soundlatch4_r )        { return latch_r(space, 3); }
 READ16_HANDLER( soundlatch4_word_r )  { return latch_r(space, 3); }
 
-READ8_MEMBER( driver_device::soundlatch_r )   		{ return latch_r(&space, 0); }
+READ8_MEMBER( driver_device::soundlatch_r ) 		{ return latch_r(&space, 0); }
 READ16_MEMBER( driver_device::soundlatch_word_r )   { return latch_r(&space, 0); }
-READ8_MEMBER( driver_device::soundlatch2_r )   		{ return latch_r(&space, 1); }
+READ8_MEMBER( driver_device::soundlatch2_r )		{ return latch_r(&space, 1); }
 READ16_MEMBER( driver_device::soundlatch2_word_r )  { return latch_r(&space, 1); }
-READ8_MEMBER( driver_device::soundlatch3_r )   		{ return latch_r(&space, 2); }
+READ8_MEMBER( driver_device::soundlatch3_r )		{ return latch_r(&space, 2); }
 READ16_MEMBER( driver_device::soundlatch3_word_r )  { return latch_r(&space, 2); }
-READ8_MEMBER( driver_device::soundlatch4_r )   		{ return latch_r(&space, 3); }
+READ8_MEMBER( driver_device::soundlatch4_r )		{ return latch_r(&space, 3); }
 READ16_MEMBER( driver_device::soundlatch4_word_r )  { return latch_r(&space, 3); }
 
 

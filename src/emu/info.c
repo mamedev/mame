@@ -217,7 +217,7 @@ void info_xml_creator::output(FILE *out)
 	astring dtd(s_dtd_string);
 	dtd.replace(0,"__XML_ROOT__", emulator_info::get_xml_root());
 	dtd.replace(0,"__XML_TOP__", emulator_info::get_xml_top());
-	
+
 	fprintf(m_output, "%s\n\n", dtd.cstr());
 
 	// top-level tag

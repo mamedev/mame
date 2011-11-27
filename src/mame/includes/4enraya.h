@@ -21,7 +21,7 @@ public:
 	int        m_soundlatch;
 	int        m_last_snd_ctrl;
 	int        m_videoram_size;
-	
+
 	int 				m_snd_latch_bit;
 };
 

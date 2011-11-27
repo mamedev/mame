@@ -972,8 +972,8 @@ static UINT32 *process_branch(running_machine &machine, UINT32 *objdata, int vc,
 	UINT32 link = (lower >> 24) | ((upper & 0x7ff) << 8);
 	int taken = 0;
 
-//	if ((ypos & 1) && ypos != 0x7ff)
-//		fprintf(stderr, "        branch cc=%d ypos=%X link=%06X - \n", cc, ypos, link << 3);
+//  if ((ypos & 1) && ypos != 0x7ff)
+//      fprintf(stderr, "        branch cc=%d ypos=%X link=%06X - \n", cc, ypos, link << 3);
 
 	switch (cc)
 	{
@@ -1089,7 +1089,7 @@ static void process_object_list(running_machine &machine, int vc, UINT16 *_scanl
 					logerror("stop   = %08X-%08X\n", objdata[0], objdata[1]);
 				if (interrupt)
 				{
-//					fprintf(stderr, "stop int=%d\n", interrupt);
+//                  fprintf(stderr, "stop int=%d\n", interrupt);
 					cpu_irq_state |= 4;
 					update_cpu_irq(machine);
 				}

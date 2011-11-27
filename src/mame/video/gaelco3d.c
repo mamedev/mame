@@ -437,43 +437,43 @@ SCREEN_UPDATE( gaelco3d )
 	int ret;
 
 /*
-	if (DISPLAY_TEXTURE && (screen->machine().input().code_pressed(KEYCODE_Z) || screen->machine().input().code_pressed(KEYCODE_X)))
-	{
-		static int xv = 0, yv = 0x1000;
-		UINT8 *base = state->m_texture;
-		int length = state->m_texture_size;
+    if (DISPLAY_TEXTURE && (screen->machine().input().code_pressed(KEYCODE_Z) || screen->machine().input().code_pressed(KEYCODE_X)))
+    {
+        static int xv = 0, yv = 0x1000;
+        UINT8 *base = state->m_texture;
+        int length = state->m_texture_size;
 
-		if (screen->machine().input().code_pressed(KEYCODE_X))
-		{
-			base = state->m_texmask;
-			length = state->m_texmask_size;
-		}
+        if (screen->machine().input().code_pressed(KEYCODE_X))
+        {
+            base = state->m_texmask;
+            length = state->m_texmask_size;
+        }
 
-		if (screen->machine().input().code_pressed(KEYCODE_LEFT) && xv >= 4)
-			xv -= 4;
-		if (screen->machine().input().code_pressed(KEYCODE_RIGHT) && xv < 4096 - 4)
-			xv += 4;
+        if (screen->machine().input().code_pressed(KEYCODE_LEFT) && xv >= 4)
+            xv -= 4;
+        if (screen->machine().input().code_pressed(KEYCODE_RIGHT) && xv < 4096 - 4)
+            xv += 4;
 
-		if (screen->machine().input().code_pressed(KEYCODE_UP) && yv >= 4)
-			yv -= 4;
-		if (screen->machine().input().code_pressed(KEYCODE_DOWN) && yv < 0x40000)
-			yv += 4;
+        if (screen->machine().input().code_pressed(KEYCODE_UP) && yv >= 4)
+            yv -= 4;
+        if (screen->machine().input().code_pressed(KEYCODE_DOWN) && yv < 0x40000)
+            yv += 4;
 
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		{
-			UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			{
-				int offs = (yv + y - cliprect->min_y) * 4096 + xv + x - cliprect->min_x;
-				if (offs < length)
-					dest[x] = base[offs];
-				else
-					dest[x] = 0;
-			}
-		}
-		popmessage("(%04X,%04X)", xv, yv);
-	}
-	else*/
+        for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+        {
+            UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+            for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+            {
+                int offs = (yv + y - cliprect->min_y) * 4096 + xv + x - cliprect->min_x;
+                if (offs < length)
+                    dest[x] = base[offs];
+                else
+                    dest[x] = 0;
+            }
+        }
+        popmessage("(%04X,%04X)", xv, yv);
+    }
+    else*/
 	{
 		if (state->m_video_changed)
 			copybitmap(bitmap, state->m_poly->screenbits(), 0,1, 0,0, cliprect);

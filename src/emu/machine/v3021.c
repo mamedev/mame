@@ -6,7 +6,7 @@
 
     Serial Real Time Clock
 
-	- very preliminary, borrowed from hard-coded PGM implementation.
+    - very preliminary, borrowed from hard-coded PGM implementation.
 
 ***************************************************************************/
 

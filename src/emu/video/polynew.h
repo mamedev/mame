@@ -80,11 +80,11 @@ public:
 	{
 		vertex_t() { }
 		vertex_t(_BaseType _x, _BaseType _y) { x = _x; y = _y; }
-	
+
 		_BaseType x, y;							// X, Y coordinates
 		_BaseType p[_MaxParams];				// interpolated parameters
 	};
-	
+
 	// a single extent describes a span and a list of parameter extents
 	struct extent_t
 	{
@@ -98,17 +98,17 @@ public:
 
 	// delegate type for scanline callbacks
 	typedef delegate<void (INT32, const extent_t &, const _ObjectData &, int)> render_delegate;
-	
+
 	// construction/destruction
 	poly_manager(running_machine &machine, UINT8 flags = 0);
 	virtual ~poly_manager();
-	
+
 	// getters
 	running_machine &machine() const { return m_machine; }
 
 	// synchronization
 	void wait(const char *debug_reason = "general");
-	
+
 	// object data allocators
 	_ObjectData &object_data_alloc();
 	_ObjectData &object_data_last() const { return m_object.last(); }
@@ -157,7 +157,7 @@ private:
 	{
 		// size of an item, rounded up to the cache line size
 		static const int k_itemsize = ((sizeof(_Type) + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
-		
+
 	public:
 		// construction
 		poly_array(running_machine &machine, poly_manager &manager)
@@ -166,14 +166,14 @@ private:
 			  m_next(0),
 			  m_max(0),
 			  m_waits(0) { }
-		
+
 		// destruction
 		~poly_array() { auto_free(m_manager.machine(), m_base); }
 
 		// operators
 		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base + index * k_itemsize); }
-		
-		// getters		
+
+		// getters
 		int count() const { return m_next; }
 		int max() const { return m_max; }
 		int waits() const { return m_waits; }
@@ -186,7 +186,7 @@ private:
 		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base + m_next++ * k_itemsize) _Type; }
 		_Type &last() const { return (*this)[m_next - 1]; }
 		void wait_for_space(int count = 1) { while ((m_next + count) >= _Count) { m_waits++; m_manager.wait(""); }  }
-		
+
 	private:
 		// internal state
 		poly_manager &		m_manager;
@@ -214,7 +214,7 @@ private:
 		// wait for space in the polygon and unit arrays
 		m_polygon.wait_for_space();
 		m_unit.wait_for_space((maxy - miny) / SCANLINES_PER_BUCKET + 2);
-		
+
 		// return and initialize the next one
 		polygon_info &polygon = m_polygon.next();
 		polygon.m_owner = this;
@@ -222,7 +222,7 @@ private:
 		polygon.m_callback = callback;
 		return polygon;
 	}
-	
+
 	static void *work_item_callback(void *param, int threadid);
 	void presave() { wait("pre-save"); }
 
@@ -231,9 +231,9 @@ private:
 	osd_work_queue *	m_queue;					// work queue
 
 	// arrays
-	polygon_array 		m_polygon;					// array of polygons
+	polygon_array		m_polygon;					// array of polygons
 	objectdata_array	m_object;					// array of object data
-	unit_array 			m_unit; 					// array of work units
+	unit_array			m_unit; 					// array of work units
 
 	// misc data
 	UINT8				m_flags;					// flags
@@ -317,7 +317,7 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::~poly_manager()
 		conflicts += m_conflicts[i];
 		resolved += m_resolved[i];
 	}
-	
+
 	// output global stats
 	printf("Total triangles = %d\n", m_triangles);
 	printf("Total quads = %d\n", m_quads);
@@ -470,7 +470,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 {
 	const vertex_t *v1 = &_v1;
 	const vertex_t *v2 = &_v2;
-	
+
 	// first sort by Y
 	if (v2->y < v1->y)
 	{
@@ -490,7 +490,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 	v2yclip = MIN(v2yclip, cliprect.max_y + 1);
 	if (v2yclip - v1yclip <= 0)
 		return 0;
-	
+
 	// determine total X extents
 	_BaseType minx = v1->x;
 	_BaseType maxx = v2->x;
@@ -592,7 +592,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 
 
 //-------------------------------------------------
-//  render_triangle - render a single triangle 
+//  render_triangle - render a single triangle
 //  given 3 vertexes
 //-------------------------------------------------
 
@@ -602,7 +602,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	const vertex_t *v1 = &_v1;
 	const vertex_t *v2 = &_v2;
 	const vertex_t *v3 = &_v3;
-	
+
 	// first sort by Y
 	if (v2->y < v1->y)
 	{
@@ -634,7 +634,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	v3yclip = MIN(v3yclip, cliprect.max_y + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
-	
+
 	// determine total X extents
 	_BaseType minx = v1->x;
 	_BaseType maxx = v1->x;
@@ -901,9 +901,9 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 			minv = vertnum;
 		else if (v[vertnum].y > v[maxv].y)
 			maxv = vertnum;
-		if (v[vertnum].x < minx) 
+		if (v[vertnum].x < minx)
 			minx = v[vertnum].x;
-		else if (v[vertnum].x > maxx) 
+		else if (v[vertnum].x > maxx)
 			maxx = v[vertnum].x;
 	}
 

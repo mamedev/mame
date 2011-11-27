@@ -60,7 +60,7 @@
   FULL equivalent to MC6845P, UM6845R, EF6845P, HD6845P, etc.
 
   The ST93CS56 and ST93CS57 are 2K bit Electrically Erasable Programmable Memory (EEPROM)
-  fabricated with SGS-THOMSON’s High Endurance Single Polysilicon CMOS technology. The memory
+  fabricated with SGS-THOMSON?s High Endurance Single Polysilicon CMOS technology. The memory
   is accessed through a serial input D and output Q. The 2K bit memory is organized as 128 x 16 bit
   words.The memory is accessed by a set of instructions which include Read, Write, Page Write, Write
   All and instructions used to set the memory protection. A Read instruction loads the address of the
@@ -230,7 +230,7 @@ static READ8_DEVICE_HANDLER( ppi0_portc_r )
 static const ppi8255_interface ppi0intf =
 {
 /*  Init with 0x9a... A, B and high C as input
-	Serial Eprom connected to Port C
+    Serial Eprom connected to Port C
 */
 
 	DEVCB_INPUT_PORT("SYSTEM"),	/* Port A read */
@@ -279,7 +279,7 @@ Seems to work properly, but must be checked closely...
 		watchdog_reset(device->machine());
 	}
 
-//	logerror("AY port B write %02x\n",data);
+//  logerror("AY port B write %02x\n",data);
 }
 
 
@@ -312,7 +312,7 @@ static const mc6845_interface mc6845_intf =
 static const eeprom_interface forte_eeprom_intf =
 {/*
     Preliminary interface for NM93CS56N Serial EEPROM.
-	Correct address & data. Using 93C46 similar protocol.
+    Correct address & data. Using 93C46 similar protocol.
 */
 	7,                /* address bits */
 	16,               /* data bits */
@@ -450,7 +450,7 @@ GFXDECODE_END
 
 static MACHINE_RESET(fortecar)
 {
-//	fortecar_state *state = machine.driver_data<fortecar_state>();
+//  fortecar_state *state = machine.driver_data<fortecar_state>();
 
 }
 
@@ -508,9 +508,9 @@ ROM_START( fortecar )
 	ROM_LOAD( "fortecar.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
 
 	/* took from the Spanish version, these are likely to be identical anyway */
-//	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-//	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
-//	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
+//  ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
+//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
 
 	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
 	ROM_LOAD( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
@@ -530,7 +530,7 @@ ROM_START( fortecrd )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
-//	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
+//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
 
 	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
 	ROM_LOAD( "forte_card_93cs56.u13", 0x0000, 0x0100, CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )

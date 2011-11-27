@@ -581,7 +581,7 @@ READ8_HANDLER( snes_r_io )
 				if (port != NULL)
 					return input_port_read(space->machine(), "DSW");
 				else
-					return snes_open_bus_r(space, 0);			
+					return snes_open_bus_r(space, 0);
 			}
 //      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
@@ -2148,8 +2148,8 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 
 	#if USE_CYCLE_STEAL
 	/* every byte transfer takes 8 master cycles */
-//	FIXME: this cycle steal makes Final Fantasy VI (III in US) very glitchy!
-//	device_adjust_icount(&space->device(),-8);
+//  FIXME: this cycle steal makes Final Fantasy VI (III in US) very glitchy!
+//  device_adjust_icount(&space->device(),-8);
 	#endif
 
 	if (state->m_dma_channel[dma].dmap & 0x80)	/* PPU->CPU */

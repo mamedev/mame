@@ -234,7 +234,7 @@ void saa5050_update( device_t *device, bitmap_t *bitmap, const rectangle *clipre
 				{
 				case 0x00:
 					// Temporary hack until proper docs are found
-					if (saa5050->rev) // This is not ok, but it is done only in case of malzak					
+					if (saa5050->rev) // This is not ok, but it is done only in case of malzak
 						blank = 1;  // code 0x00 should not display anything, unless HOLDGR is set
 					break;
 				case 0x01: case 0x02: case 0x03: case 0x04:

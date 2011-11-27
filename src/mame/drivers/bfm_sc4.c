@@ -58,9 +58,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
@@ -72,9 +72,9 @@ public:
 		: sc4_state(mconfig, type, tag),
 		  m_adder4cpu(*this, "adder4")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_adder4cpu;
 };

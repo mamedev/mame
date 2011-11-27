@@ -31,10 +31,10 @@ public:
 	DECLARE_READ64_MEMBER(test_r);
 
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
-	
+
 	// driver_device overrides
 	virtual void machine_reset();
 	virtual void video_start();

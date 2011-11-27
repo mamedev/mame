@@ -21,9 +21,9 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<decobsmt_device> m_decobsmt;
-	
+
 protected:
-	
+
 	// driver_device overrides
 	virtual void machine_reset();
 };

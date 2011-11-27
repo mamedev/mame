@@ -1109,7 +1109,7 @@ static MACHINE_RESET( hotchase )
 	int i;
 
 	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
-	         For now let's fill everything with white colors until we have better info about it */
+             For now let's fill everything with white colors until we have better info about it */
 	for(i=0;i<0x2000/2;i++)
 	{
 		machine.generic.paletteram.u16[i] = 0xffff;

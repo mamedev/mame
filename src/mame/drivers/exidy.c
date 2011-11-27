@@ -1239,7 +1239,7 @@ ROM_START( pepper2 )
 ROM_END
 
 
-ROM_START( pepper27 ) 
+ROM_START( pepper27 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p2l12ar7.bin", 0x9000, 0x1000, CRC(b3bc51cd) SHA1(12475ac5784bb2ab6887476ee8166c3585864cd6) )
 	ROM_LOAD( "p2l11ar7.bin", 0xa000, 0x1000, CRC(c8b834cd) SHA1(28b4de322de845effaa1d2fc6c9f129145965b8a) )

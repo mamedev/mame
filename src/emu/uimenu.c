@@ -1653,8 +1653,8 @@ static void menu_main_populate(running_machine &machine, ui_menu *menu, void *st
 		}
 
 	/* add input menu items */
-	ui_menu_item_append(menu, "Input (general)", NULL, 0, (void *)menu_input_groups);	
-	
+	ui_menu_item_append(menu, "Input (general)", NULL, 0, (void *)menu_input_groups);
+
 	menu_text.printf("Input (this %s)",emulator_info::get_capstartgamenoun());
 	ui_menu_item_append(menu, menu_text.cstr(), NULL, 0, (void *)menu_input_specific);
 

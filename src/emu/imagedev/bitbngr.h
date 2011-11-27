@@ -75,10 +75,10 @@ struct _bitbanger_config
 	int						m_default_mode;
 
 	/* output bits per second */
-	int						m_default_baud;					   
+	int						m_default_baud;
 
 	/* fine tune adjustment to the baud */
-	int						m_default_tune;                
+	int						m_default_tune;
 };
 
 

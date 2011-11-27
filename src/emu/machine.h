@@ -681,7 +681,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// internal helpers
 	inline UINT16 paletteram16_le(offs_t offset) const { return m_generic_paletteram[offset & ~1] | (m_generic_paletteram[offset |  1] << 8); }
 	inline UINT16 paletteram16_be(offs_t offset) const { return m_generic_paletteram[offset |  1] | (m_generic_paletteram[offset & ~1] << 8); }
@@ -693,7 +693,7 @@ protected:
 
 	legacy_callback_func	m_callbacks[CB_COUNT];		// generic legacy callbacks
 	palette_init_func		m_palette_init;				// one-time palette init callback
-	
+
 	// generic pointers
 	optional_shared_ptr<UINT8> m_generic_paletteram;
 	optional_shared_ptr<UINT16> m_generic_paletteram16;

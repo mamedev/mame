@@ -72,7 +72,7 @@ void ram_device::device_start()
 
 //-------------------------------------------------
 //  device_validity_check - device-specific validity
-//	checks
+//  checks
 //-------------------------------------------------
 
 bool ram_device::device_validity_check(emu_options &options, const game_driver &driver) const
@@ -181,7 +181,7 @@ bool ram_device::device_validity_check(emu_options &options, const game_driver &
 
 //-------------------------------------------------
 //  parse_string - convert a ram string to an
-//	integer value
+//  integer value
 //-------------------------------------------------
 
 UINT32 ram_device::parse_string(const char *s)

@@ -272,8 +272,8 @@ sdl_options::sdl_options()
 {
 	astring ini_path(INI_PATH);
 	add_entries(s_option_entries);
-	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());	
-	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());	
+	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());
+	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());
 }
 
 

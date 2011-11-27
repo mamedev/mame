@@ -17,12 +17,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
-	
+
 	// driver_device overrides
 	virtual void machine_reset();
 };
@@ -34,9 +34,9 @@ public:
 		: gts80a_state(mconfig, type, tag),
 		  m_videocpu(*this, "video_cpu")
 	{ }
-	
+
 protected:
-	
+
 	// devices
 	required_device<cpu_device> m_videocpu;
 };

@@ -30,14 +30,14 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE8_MEMBER(attributes_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	
+
 	void draw_bullets(bitmap_t *bitmap, const rectangle *cliprect);
 	void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect);
-	
+
 	// devices
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
-	
+
 	// shared pointers
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram_2;
@@ -48,30 +48,30 @@ public:
 	required_shared_size m_spriteram_size;
 	required_shared_size m_bulletsram_size;
 	// currently this driver uses generic palette handling
-	
+
 	// state
 	// video-related
 	tilemap_t   *m_bg_tilemap;
 	tilemap_t   *m_fg_tilemap;
-	
+
 	// sound-related
 	UINT8     m_nmi_enable;
 	UINT8     m_sound_nmi_enabled;
-	
+
 	// misc
 	int       m_percuss_hardware;
-	
+
 protected:
-	
+
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
-class percuss_state : public zodiack_state 
+class percuss_state : public zodiack_state
 {
 public:
 	percuss_state(const machine_config &mconfig, device_type type, const char *tag)

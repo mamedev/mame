@@ -89,7 +89,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 							device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());
 					}
 				}
-				if (!found) 
+				if (!found)
 					throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag());
 			}
 		}

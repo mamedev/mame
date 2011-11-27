@@ -963,7 +963,7 @@ static astring &warnings_string(running_machine &machine, astring &string)
 			/* add the strings for these warnings */
 			if (machine.system().flags & GAME_UNEMULATED_PROTECTION)
 				string.cat("The game has protection which isn't fully emulated.\n");
-			if (machine.system().flags & GAME_NOT_WORKING) {				
+			if (machine.system().flags & GAME_NOT_WORKING) {
 				string.cat("\nTHIS ");
 				string.cat(emulator_info::get_capgamenoun());
 				string.cat(" DOESN'T WORK. The emulation for this game is not yet complete. "
@@ -974,7 +974,7 @@ static astring &warnings_string(running_machine &machine, astring &string)
 				string.cat(emulator_info::get_gamenoun());
 				string.cat(" cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
 					 "It is not possible to fully play this ");
-				string.cat(emulator_info::get_gamenoun());					 
+				string.cat(emulator_info::get_gamenoun());
 				string.cat(".\n");
 			}
 

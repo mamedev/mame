@@ -700,7 +700,7 @@ READ32_HANDLER(archimedes_ioc_r)
 				case 5:
 					if (fdc) {
 						switch(ioc_addr & 0xfffc)
-						{						
+						{
 							case 0x50: return 0; //fdc type, new model returns 5 here
 						}
 					}
