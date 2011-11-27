@@ -301,12 +301,15 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 		else
 		{
 			/* call the input callback if it exists */
-			port->m_in = port->m_in_func(0);
-
-			/* changes to port A need to update the PA7 state */
-			if (port == &m_port[0])
+			if (!port->m_out_func.isnull())
 			{
-				update_pa7_state();
+				port->m_in = port->m_in_func(0);
+
+				/* changes to port A need to update the PA7 state */
+				if (port == &m_port[0])
+				{
+					update_pa7_state();
+				}
 			}
 
 			/* apply the DDR to the result */
