@@ -4599,8 +4599,8 @@ ROM_START( birdiy )
 	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, NO_DUMP )
 
 	ROM_REGION( 0x0200, "namco", 0 )	/* sound PROMs */
-	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, NO_DUMP )	/* timing - not used */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // stolen from pacman, should be identical tho
+	ROM_LOAD( "82s126.3m"  ,  0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
 
