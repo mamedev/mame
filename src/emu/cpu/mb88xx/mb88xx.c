@@ -247,7 +247,7 @@ static int pla( mb88_state *cpustate, int inA, int inB )
 static void set_irq_line(mb88_state *cpustate, int state)
 {
 	/* on falling edge trigger interrupt */
-	if ( (cpustate->pio & 0x04) && state != CLEAR_LINE )
+	if ( (cpustate->pio & 0x04) && cpustate->nf && state == CLEAR_LINE )
 	{
 		cpustate->pending_interrupt |= INT_CAUSE_EXTERNAL;
 	}
