@@ -301,7 +301,7 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 		else
 		{
 			/* call the input callback if it exists */
-			if (!port->m_out_func.isnull())
+			if (!port->m_in_func.isnull())
 			{
 				port->m_in = port->m_in_func(0);
 
