@@ -177,6 +177,7 @@ VIDEO_START( pacman )
 	state->m_colortablebank = 0;
 	state->m_flipscreen = 0;
 	state->m_bgpriority = 0;
+	state->m_inv_spr = 0;
 
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
@@ -186,6 +187,15 @@ VIDEO_START( pacman )
 
 	tilemap_set_scrolldx( state->m_bg_tilemap, 0, 384 - 288 );
 	tilemap_set_scrolldy( state->m_bg_tilemap, 0, 264 - 224 );
+}
+
+VIDEO_START( birdiy )
+{
+	pacman_state *state = machine.driver_data<pacman_state>();
+
+	VIDEO_START_CALL( pacman );
+	state->m_xoffsethack = 0;
+	state->m_inv_spr = 1; // sprites are mirrored in X-axis compared to normal behaviour
 }
 
 WRITE8_HANDLER( pacman_videoram_w )
@@ -233,15 +243,28 @@ SCREEN_UPDATE( pacman )
 		{
 			int color;
 			int sx,sy;
+			UINT8 fx,fy;
 
-			sx = 272 - spriteram_2[offs + 1];
-			sy = spriteram_2[offs] - 31;
+			if(state->m_inv_spr)
+			{
+				sx = spriteram_2[offs + 1];
+				sy = 240 - (spriteram_2[offs]);
+			}
+			else
+			{
+				sx = 272 - spriteram_2[offs + 1];
+				sy = spriteram_2[offs] - 31;
+			}
+
+			fx = (spriteram[offs] & 1) ^ state->m_inv_spr;
+			fy = (spriteram[offs] & 2) ^ ((state->m_inv_spr) << 1);
+
 			color = ( spriteram[offs + 1] & 0x1f ) | (state->m_colortablebank << 5) | (state->m_palettebank << 6 );
 
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
-					spriteram[offs] & 1,spriteram[offs] & 2,
+					fx,fy,
 					sx,sy,
 					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
 
@@ -249,7 +272,7 @@ SCREEN_UPDATE( pacman )
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
-					spriteram[offs] & 1,spriteram[offs] & 2,
+					fx,fy,
 					sx - 256,sy,
 					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
 		}
@@ -259,15 +282,27 @@ SCREEN_UPDATE( pacman )
 		{
 			int color;
 			int sx,sy;
+			UINT8 fx,fy;
 
-			sx = 272 - spriteram_2[offs + 1];
-			sy = spriteram_2[offs] - 31;
+			if(state->m_inv_spr)
+			{
+				sx = spriteram_2[offs + 1];
+				sy = 240 - (spriteram_2[offs]);
+			}
+			else
+			{
+				sx = 272 - spriteram_2[offs + 1];
+				sy = spriteram_2[offs] - 31;
+			}
 			color = ( spriteram[offs + 1] & 0x1f ) | (state->m_colortablebank << 5) | (state->m_palettebank << 6 );
+
+			fx = (spriteram[offs] & 1) ^ state->m_inv_spr;
+			fy = (spriteram[offs] & 2) ^ ((state->m_inv_spr) << 1);
 
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
-					spriteram[offs] & 1,spriteram[offs] & 2,
+					fx,fy,
 					sx,sy + state->m_xoffsethack,
 					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
 
@@ -275,7 +310,7 @@ SCREEN_UPDATE( pacman )
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
-					spriteram[offs] & 2,spriteram[offs] & 1,
+					fy,fx, 			//FIXME: flipping bits are really supposed to be inverted here?
 					sx - 256,sy + state->m_xoffsethack,
 					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
 		}
@@ -304,7 +339,7 @@ VIDEO_START( pengo )
 	state->m_colortablebank = 0;
 	state->m_flipscreen = 0;
 	state->m_bgpriority = 0;
-
+	state->m_inv_spr = 0;
 	state->m_xoffsethack = 0;
 
 	state->m_bg_tilemap = tilemap_create( machine, pacman_get_tile_info, pacman_scan_rows,  8, 8, 36, 28 );
@@ -375,7 +410,7 @@ VIDEO_START( s2650games )
 	state->m_colortablebank = 0;
 	state->m_flipscreen = 0;
 	state->m_bgpriority = 0;
-
+	state->m_inv_spr = 0;
 	state->m_xoffsethack = 1;
 
 	state->m_bg_tilemap = tilemap_create( machine, s2650_get_tile_info,tilemap_scan_rows,8,8,32,32 );
@@ -556,7 +591,7 @@ VIDEO_START( jrpacman )
 	state->m_colortablebank = 0;
 	state->m_flipscreen = 0;
 	state->m_bgpriority = 0;
-
+	state->m_inv_spr = 0;
 	state->m_xoffsethack = 1;
 
 	state->m_bg_tilemap = tilemap_create( machine, jrpacman_get_tile_info,jrpacman_scan_rows,8,8,36,54 );
