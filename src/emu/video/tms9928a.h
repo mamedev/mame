@@ -176,7 +176,7 @@ class tms9118_device : public tms9928a_device
 {
 public:
 	tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9118, "tms9118", tag, owner, clock, false, false ) { }
+		: tms9928a_device( mconfig, TMS9118, "tms9118", tag, owner, clock, false, true ) { }
 };
 
 
@@ -184,7 +184,7 @@ class tms9128_device : public tms9928a_device
 {
 public:
 	tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9128, "tms9128", tag, owner, clock, false, false ) { }
+		: tms9928a_device( mconfig, TMS9128, "tms9128", tag, owner, clock, false, true ) { }
 };
 
 
@@ -208,7 +208,7 @@ class tms9129_device : public tms9928a_device
 {
 public:
 	tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9129, "tms9129", tag, owner, clock, true, false ) { }
+		: tms9928a_device( mconfig, TMS9129, "tms9129", tag, owner, clock, true, true ) { }
 };
 
 
