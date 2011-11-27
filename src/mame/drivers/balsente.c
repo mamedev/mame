@@ -1599,19 +1599,19 @@ ROM_END
 
 ROM_START( triviabb )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab01.bin",  0x10000, 0x4000, CRC(1b7c439d) SHA1(8b3020dcb375b2f2e5e975a8067df6504aa8691e) )
-	ROM_LOAD( "ab23.bin",  0x14000, 0x4000, CRC(e4f1e704) SHA1(e5135134b54e1e2e95c5bfe6e5f0e2dd280db69d) )
-	ROM_LOAD( "ab45.bin",  0x18000, 0x4000, CRC(daa2d8bc) SHA1(feae215877ba42ab33182dfd74083f1d48443d8c) )
-	ROM_LOAD( "ab67.bin",  0x1c000, 0x4000, CRC(3622c4f1) SHA1(d180bb1c4a73d95c369cc507697421fb38a92d2c) )
-	ROM_LOAD( "cd45.bin",  0x28000, 0x4000, CRC(07fd88ff) SHA1(c3168ecf6562e09790c4f18cdd91c7a347223323) )
-	ROM_LOAD( "cd6ef.bin", 0x2c000, 0x4000, CRC(2d03f241) SHA1(986ca6ea20c306e83ae88acc2d6837c7ed5fe351) )
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(1b7c439d) SHA1(8b3020dcb375b2f2e5e975a8067df6504aa8691e) )
+	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(e4f1e704) SHA1(e5135134b54e1e2e95c5bfe6e5f0e2dd280db69d) )
+	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(daa2d8bc) SHA1(feae215877ba42ab33182dfd74083f1d48443d8c) )
+	ROM_LOAD( "ab67.u5a",  0x1c000, 0x4000, CRC(3622c4f1) SHA1(d180bb1c4a73d95c369cc507697421fb38a92d2c) )
+	ROM_LOAD( "cd45.u2a",  0x28000, 0x4000, CRC(07fd88ff) SHA1(c3168ecf6562e09790c4f18cdd91c7a347223323) )
+	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(2d03f241) SHA1(986ca6ea20c306e83ae88acc2d6837c7ed5fe351) )
 
 	SOUNDBOARD_ROMS
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
-	ROM_LOAD( "gr01.bin", 0x00000, 0x4000, CRC(6829de8e) SHA1(4ec494883ba358f2ac7ce8d5a623a2f34b5bc843) )
-	ROM_LOAD( "gr23.bin", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
-	ROM_LOAD( "gr45.bin", 0x08000, 0x4000, CRC(92fb6fb1) SHA1(1a322bd3cfacdf82d4fcc4b4d47f78a701411919) )
+	ROM_LOAD( "gr01.u6b", 0x00000, 0x4000, CRC(6829de8e) SHA1(4ec494883ba358f2ac7ce8d5a623a2f34b5bc843) )
+	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
+	ROM_LOAD( "gr45.u4b", 0x08000, 0x4000, CRC(92fb6fb1) SHA1(1a322bd3cfacdf82d4fcc4b4d47f78a701411919) )
 
 	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
 	ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
@@ -1856,18 +1856,18 @@ ROM_END
 
 ROM_START( sfootbal )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "sfbab01.bin",  0x10000, 0x4000, CRC(2a69803f) SHA1(ca86c9d079fbebae4c93c889d98a8573facc05da) )
-	ROM_LOAD( "sfbab23.bin",  0x14000, 0x4000, CRC(89f157c2) SHA1(59701b7770dce7ec01d0feb01d67450943e6cfbb) )
-	ROM_LOAD( "sfbab45.bin",  0x18000, 0x4000, CRC(91ad42c5) SHA1(0b6fc3ed3a633c825809668d49f209c130f3e978) )
-	ROM_LOAD( "sfbcd6ef.bin", 0x2c000, 0x4000, CRC(bf80bb1a) SHA1(2b70b36d946c36e3f354c7edfd3e34784ffce406) )
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(2a69803f) SHA1(ca86c9d079fbebae4c93c889d98a8573facc05da) )
+	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(89f157c2) SHA1(59701b7770dce7ec01d0feb01d67450943e6cfbb) )
+	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(91ad42c5) SHA1(0b6fc3ed3a633c825809668d49f209c130f3e978) )
+	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(bf80bb1a) SHA1(2b70b36d946c36e3f354c7edfd3e34784ffce406) )
 
 	SOUNDBOARD_ROMS
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
-	ROM_LOAD( "sfbgr01.bin", 0x00000, 0x4000, CRC(e3108d35) SHA1(05b7f1a1a18d7f72a3d3f6102cb8ab42421b7366) )
-	ROM_LOAD( "sfbgr23.bin", 0x04000, 0x4000, CRC(5c5af726) SHA1(04cdd476e6689d17273659fb1fe0ca642edbe5a8) )
-	ROM_LOAD( "sfbgr45.bin", 0x08000, 0x4000, CRC(e767251e) SHA1(3c05295317a673fb1de5924f27de276d2846d805) )
-	ROM_LOAD( "sfbgr67.bin", 0x0c000, 0x4000, CRC(42452a7a) SHA1(37479d6e9071ac775215a6815dbaf280b3c6a57f) )
+	ROM_LOAD( "gr01.u4c", 0x00000, 0x4000, CRC(e3108d35) SHA1(05b7f1a1a18d7f72a3d3f6102cb8ab42421b7366) )
+	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(5c5af726) SHA1(04cdd476e6689d17273659fb1fe0ca642edbe5a8) )
+	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(e767251e) SHA1(3c05295317a673fb1de5924f27de276d2846d805) )
+	ROM_LOAD( "gr67.u1c", 0x0c000, 0x4000, CRC(42452a7a) SHA1(37479d6e9071ac775215a6815dbaf280b3c6a57f) )
 
 	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
 	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
@@ -1881,6 +1881,46 @@ ROM_START( spiker )
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(2d53d023) SHA1(01c1d2cd7d8be60c40527e9c1571b84388a39bd8) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(3be87edf) SHA1(0d4f1ff501d5d865abc3906f6b232ec04586d3dc) )
 	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(f2c73ece) SHA1(4fc108823102fd17c5b7d9be1a0c76667788ba1a) )
+
+	SOUNDBOARD_ROMS
+
+	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
+	ROM_LOAD( "gr01.u4c", 0x00000, 0x4000, CRC(0caa6e3e) SHA1(ce6765d44e444d24129ec99f04a41a866a32eee2) )
+	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(970c81f6) SHA1(f22189e172a795d115597feb48ccbc04be3859b9) )
+	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(90ddd737) SHA1(8e1dde2f42e9bf755dedeef218745d1fc54faac7) )
+
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
+
+	MOTHERBOARD_PALS
+ROM_END
+
+
+ROM_START( spiker2 ) /* Spiker U.R. 5/5/86 */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(59025e39) SHA1(f0e3e45bb32cc6664831c4ef6b0cfabf3fc71f58) )
+	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(ffb23288) SHA1(3458e486794f6c936d15e837be0f419027b01311) )
+	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(7f04774d) SHA1(c49ac3aa86425cdbab9877fc253999329bb99a49) )
+
+	SOUNDBOARD_ROMS
+
+	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
+	ROM_LOAD( "gr01.u4c", 0x00000, 0x4000, CRC(1228b7a3) SHA1(70a207714ba7bc4f4dbc492768480afa424b31c0) )
+	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(970c81f6) SHA1(f22189e172a795d115597feb48ccbc04be3859b9) )
+	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(bf2b413d) SHA1(f0f797853ac1b6e45ff606d7aa5c9350765efd48) )
+
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
+
+	MOTHERBOARD_PALS
+ROM_END
+
+
+ROM_START( spiker3 ) /* Spiker U.R. 6/9/86 */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(2d53d023) SHA1(01c1d2cd7d8be60c40527e9c1571b84388a39bd8) )
+	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(3be87edf) SHA1(0d4f1ff501d5d865abc3906f6b232ec04586d3dc) )
+	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(5b5a6d86) SHA1(a173637991601adc87f0fc8fd1ee9102f5fb2b81) )
 
 	SOUNDBOARD_ROMS
 
@@ -2188,7 +2228,7 @@ GAME( 1984, gghost,   0,        balsente, gghost,   gghost,   ROT0, "Bally/Sente
 
 /* Board: 006-8003-01-0D Rev D */
 GAME( 1984, hattrick, 0,        balsente, hattrick, hattrick, ROT0, "Bally/Sente",  "Hat Trick", GAME_SUPPORTS_SAVE )
-GAME( 1984, trivia12, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (12-14-84)", GAME_SUPPORTS_SAVE )
+GAME( 1984, trivia12, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (12/14/84)", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
 GAME( 1984, otwalls,  0,        balsente, otwalls,  otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", GAME_SUPPORTS_SAVE )
@@ -2199,8 +2239,8 @@ GAME( 1984, snakjack, 0,        balsente, snakjack, snakjack, ROT0, "Bally/Sente
 GAMEL(1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente",  "Stocker (3/19/85)", GAME_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
 GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", GAME_SUPPORTS_SAVE )
 GAME( 1985, minigolf, 0,        balsente, minigolf, minigolf, ROT0, "Bally/Sente",  "Mini Golf (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, minigolf2,minigolf, balsente, minigolf2,minigolf2,ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, triviabb, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition)", GAME_SUPPORTS_SAVE )
+GAME( 1985, minigolf2,minigolf, balsente, minigolf2,minigolf2,ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", GAME_SUPPORTS_SAVE )
+GAME( 1984, triviabb, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
 GAME( 1984, triviag1, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (set 1)", GAME_SUPPORTS_SAVE )
@@ -2215,10 +2255,12 @@ GAME( 1986, nametune, 0,        balsente, nametune, nametune, ROT0, "Bally/Sente
 GAME( 1986, nametune2,nametune, balsente, nametune, nametune, ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", GAME_SUPPORTS_SAVE )
 
 /* Board: 006-8027-01-0B Rev B */
-GAME( 1986, nstocker, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, nstocker2,nstocker, balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente",  "Street Football", GAME_SUPPORTS_SAVE )
+GAME( 1986, nstocker, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", GAME_SUPPORTS_SAVE )
+GAME( 1986, nstocker2,nstocker, balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", GAME_SUPPORTS_SAVE )
+GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente",  "Street Football (11/12/86)", GAME_SUPPORTS_SAVE )
 GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker", GAME_SUPPORTS_SAVE )
+GAME( 1986, spiker2,  0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker (5/5/86)", GAME_SUPPORTS_SAVE )
+GAME( 1986, spiker3,  0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker (6/9/86)", GAME_SUPPORTS_SAVE )
 GAME( 1986, stompin,  0,        balsente, stompin,  stompin,  ROT0, "Bally/Sente",  "Stompin' (4/4/86)", GAME_SUPPORTS_SAVE )
 
 /* Board: A084-91889-A000 (Not a cartridge, but dedicated board) */
