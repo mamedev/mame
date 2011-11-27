@@ -1,10 +1,12 @@
 /***************************************************************************
 
-Driver by Tomasz Slanina  dox@space.pl
+Driver by Tomasz Slanina
 
 TODO:
 - video and irq timings;
 - there's a waitstate penalty on the VRAM apparently?
+
+- Pucky (whats the real title ?) inputs and sound issues
 
 ***************************************************************************
 
@@ -55,6 +57,7 @@ Sound :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 #include "includes/4enraya.h"
 
 #define MAIN_CLOCK XTAL_8MHz
@@ -69,7 +72,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	_4enraya_state *state = device->machine().driver_data<_4enraya_state>();
 
-	if ((state->m_last_snd_ctrl & 0x04) == 0x04 && (data & 0x4) == 0x00)
+	if ((state->m_last_snd_ctrl & state->m_snd_latch_bit ) == state->m_snd_latch_bit && (data & state->m_snd_latch_bit) == 0x00)
 		ay8910_data_address_w(device, state->m_last_snd_ctrl, state->m_soundlatch);
 
 	state->m_last_snd_ctrl = data;
@@ -157,6 +160,21 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
 	AM_RANGE(0x33, 0x33) AM_DEVWRITE("aysnd", sound_control_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( pucky_main_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pucky_main_portmap, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
+	AM_RANGE(0x20, 0x20) AM_WRITE(sound_data_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("aysnd", sound_control_w)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 4enraya )
 	PORT_START("DSW")
@@ -202,6 +220,67 @@ static INPUT_PORTS_START( 4enraya )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pucky )  // guess
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "0-0")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	
+	PORT_DIPNAME( 0x02, 0x00, "0-1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	
+	PORT_DIPNAME( 0x04, 0x00, "0-2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	
+	PORT_DIPNAME( 0x08, 0x00, "0-3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	
+	PORT_DIPNAME( 0x10, 0x00, "0-4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	
+	PORT_DIPNAME( 0x20, 0x00, "0-5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	
+	PORT_DIPNAME( 0x40, 0x00, "0-6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	
+	PORT_DIPNAME( 0x80, 0x00, "0-7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN5 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN6 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN7 )
+		
+	PORT_DIPNAME( 0x80, 0x80, "DIP8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	
+	
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -277,6 +356,14 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pucky, 4enraya )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pucky_main_map)
+	MCFG_CPU_IO_MAP(pucky_main_portmap)
+	MCFG_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -297,4 +384,32 @@ ROM_START( 4enraya )
 	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* system control: used for memory mapping */
 ROM_END
 
+
+ROM_START(pucky)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("1.u14", 0x00000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2))
+	ROM_LOAD("2.u46", 0x08000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291))
+	
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "3.u20",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
+	ROM_LOAD( "4.u19",   0x4000, 0x2000, CRC(4a123a3d) SHA1(26300b8af0d0df0023a153a212699727311d1b74) )
+	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
+ROM_END
+
+static DRIVER_INIT( pucky )
+{
+	_4enraya_state *state = machine.driver_data<_4enraya_state>();
+	UINT8 *rom = machine.region("maincpu")->base();
+	
+	state->m_snd_latch_bit = 2;
+	
+	{
+		for(int i=0x8000;i<0xa000;++i)
+		{
+			rom[i]=BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
+		}
+	}
+}
+
 GAME( 1990, 4enraya,  0,   4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", GAME_SUPPORTS_SAVE )
+GAME( 199?, 	pucky,		0,	pucky,	pucky,	pucky,	ROT0,	"<unknown>",	"Pucky",	GAME_NOT_WORKING)
