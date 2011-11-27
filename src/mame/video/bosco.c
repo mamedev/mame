@@ -226,13 +226,13 @@ static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const recta
 
 	for (offs = 4; offs < 0x10;offs++)
 	{
-		int x = state->m_bosco_radarx[offs] + ((~state->m_bosco_radarattr[offs] & 0x01) << 8) - 1;
-		int y = 251 - state->m_bosco_radary[offs];
+		int x = state->m_bosco_radarx[offs] + ((~state->m_bosco_radarattr[offs] & 0x01) << 8);
+		int y = 253 - state->m_bosco_radary[offs];
 
 		if (flip_screen_get(machine))
 		{
 			x += 96-2;
-			y += 8+2;
+			y += 8;
 		}
 
 		drawgfx_transmask(bitmap,cliprect,machine.gfx[2],
