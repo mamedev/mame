@@ -2277,12 +2277,6 @@ void hlsl_info::delete_resources()
 
 	registered_targets = 0;
 
-	if (shadow_texture != NULL)
-	{
-		global_free(shadow_texture);
-		shadow_texture = NULL;
-	}
-
 	if (shadow_bitmap != NULL)
 	{
 		global_free(shadow_bitmap);
