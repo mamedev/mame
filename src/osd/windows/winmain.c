@@ -1032,6 +1032,7 @@ static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter)
 		if (wait_result == WAIT_TIMEOUT)
 		{
 			fprintf(stderr, "Terminating due to watchdog timeout\n");
+			fflush(stderr);
 			TerminateProcess(GetCurrentProcess(), -1);
 		}
 	}
