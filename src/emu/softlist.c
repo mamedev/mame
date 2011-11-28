@@ -1713,7 +1713,6 @@ void validate_softlists(emu_options &options)
 						if (!seen_before)
 						{
 							lists[list_count++] = swlist->list_name[i];
-							mame_printf_error("Validating : %s\n",swlist->list_name[i]);
 							for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 							{
 								const char *s;

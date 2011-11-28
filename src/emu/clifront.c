@@ -63,7 +63,6 @@ const options_entry cli_options::s_option_entries[] =
 	{ NULL,                            NULL,       OPTION_HEADER,     "CORE COMMANDS" },
 	{ CLICOMMAND_HELP ";h;?",           "0",       OPTION_COMMAND,    "show help message" },
 	{ CLICOMMAND_VALIDATE ";valid",     "0",       OPTION_COMMAND,    "perform driver validation on all game drivers" },
-	{ CLICOMMAND_VALIDATE_LISTS ";vl",  "0",       OPTION_COMMAND,    "perform driver validation on all softlists" },
 
 	/* configuration commands */
 	{ NULL,                            NULL,       OPTION_HEADER,     "CONFIGURATION COMMANDS" },
@@ -1310,11 +1309,6 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
 	{
 		validate_drivers(m_options);
-		return;
-	}
-
-	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE_LISTS) == 0)
-	{
 		validate_softlists(m_options);
 		return;
 	}

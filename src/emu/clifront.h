@@ -52,7 +52,6 @@
 // core commands
 #define CLICOMMAND_HELP					"help"
 #define CLICOMMAND_VALIDATE				"validate"
-#define CLICOMMAND_VALIDATE_LISTS		"validatelists"
 
 // configuration commands
 #define CLICOMMAND_CREATECONFIG			"createconfig"
