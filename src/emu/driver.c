@@ -209,7 +209,7 @@ driver_enumerator::~driver_enumerator()
 //  driver, allocating on demand if needed
 //-------------------------------------------------
 
-machine_config &driver_enumerator::config(int index) const
+machine_config &driver_enumerator::config(int index, emu_options &options) const
 {
 	assert(index >= 0 && index < s_driver_count);
 
@@ -225,7 +225,7 @@ machine_config &driver_enumerator::config(int index) const
 		}
 
 		// allocate the config and add it to the end of the list
-		machine_config *config = m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], m_options));
+		machine_config *config = m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], options));
 		m_config_cache.append(*global_alloc(config_entry(*config, index)));
 	}
 	return *m_config[index];

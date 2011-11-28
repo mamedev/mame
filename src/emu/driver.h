@@ -170,7 +170,7 @@ public:
 
 	// current item
 	const game_driver &driver() const { return driver_list::driver(m_current); }
-	machine_config &config() const { return config(m_current); }
+	machine_config &config() const { return config(m_current, m_options); }
 	int clone() { return driver_list::clone(m_current); }
 	int non_bios_clone() { return driver_list::non_bios_clone(m_current); }
 	int compatible_with() { return driver_list::compatible_with(m_current); }
@@ -180,7 +180,8 @@ public:
 	// any item by index
 	bool included(int index) const { assert(index >= 0 && index < s_driver_count); return m_included[index]; }
 	bool excluded(int index) const { assert(index >= 0 && index < s_driver_count); return !m_included[index]; }
-	machine_config &config(int index) const;
+	machine_config &config(int index) const { return config(index,m_options); }
+	machine_config &config(int index, emu_options &options) const;
 	void include(int index) { assert(index >= 0 && index < s_driver_count); if (!m_included[index]) { m_included[index] = true; m_filtered_count++; }  }
 	void exclude(int index) { assert(index >= 0 && index < s_driver_count); if (m_included[index]) { m_included[index] = false; m_filtered_count--; } }
 	using driver_list::driver;
