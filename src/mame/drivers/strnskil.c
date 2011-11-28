@@ -524,5 +524,5 @@ static DRIVER_INIT( banbam )
 
 GAME( 1984, strnskil, 0,        strnskil, strnskil, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )
 GAME( 1984, guiness,  strnskil, strnskil, strnskil, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", 0 )
-GAME( 1984, banbam,   0,        banbam,   banbam,   banbam,  ROT0, "Sun Electronics", "BanBam", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1984, pettanp,  banbam,   strnskil, banbam,   pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1984, banbam,   0,        banbam,   banbam,   banbam,  ROT0, "Sun Electronics", "BanBam", GAME_UNEMULATED_PROTECTION )
+GAME( 1984, pettanp,  banbam,   strnskil, banbam,   pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", GAME_UNEMULATED_PROTECTION )
