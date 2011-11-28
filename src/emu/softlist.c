@@ -68,12 +68,13 @@ INLINE void ATTR_PRINTF(2,3) parse_error(parse_state *state, const char *fmt, ..
     unknown_tag
 -------------------------------------------------*/
 
-INLINE void unknown_tag(parse_state *state, const char *tagname)
+INLINE void unknown_tag(software_list *swlist, const char *tagname)
 {
-	parse_error(state, "[%lu:%lu]: Unknown tag: %s\n",
-		XML_GetCurrentLineNumber(state->parser),
-		XML_GetCurrentColumnNumber(state->parser),
-		tagname);
+	parse_error(&swlist->state, "%s: Unknown tag: %s (line %lu column %lu)\n",
+		swlist->file->filename(),
+		tagname,
+		XML_GetCurrentLineNumber(swlist->state.parser),
+		XML_GetCurrentColumnNumber(swlist->state.parser));
 }
 
 
@@ -82,12 +83,13 @@ INLINE void unknown_tag(parse_state *state, const char *tagname)
     unknown_attribute
 -------------------------------------------------*/
 
-INLINE void unknown_attribute(parse_state *state, const char *attrname)
+INLINE void unknown_attribute(software_list *swlist, const char *attrname)
 {
-	parse_error(state, "[%lu:%lu]: Unknown attribute: %s\n",
-		XML_GetCurrentLineNumber(state->parser),
-		XML_GetCurrentColumnNumber(state->parser),
-		attrname);
+	parse_error(&swlist->state, "%s: Unknown attribute: %s (line %lu column %lu)\n",
+		swlist->file->filename(),
+		attrname,
+		XML_GetCurrentLineNumber(swlist->state.parser),
+		XML_GetCurrentColumnNumber(swlist->state.parser));
 }
 
 
@@ -96,13 +98,14 @@ INLINE void unknown_attribute(parse_state *state, const char *attrname)
     unknown_attribute_value
 -------------------------------------------------*/
 
-INLINE void unknown_attribute_value(parse_state *state,
+INLINE void unknown_attribute_value(software_list *swlist,
 	const char *attrname, const char *attrvalue)
 {
-	parse_error(state, "[%lu:%lu]: Unknown attribute value: %s\n",
-		XML_GetCurrentLineNumber(state->parser),
-		XML_GetCurrentColumnNumber(state->parser),
-		attrvalue);
+	parse_error(&swlist->state, "%s: Unknown attribute value: %s (line %lu column %lu)\n",
+		swlist->file->filename(),
+		attrvalue,
+		XML_GetCurrentLineNumber(swlist->state.parser),
+		XML_GetCurrentColumnNumber(swlist->state.parser));
 }
 
 
@@ -347,7 +350,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			}
 			else
 			{
-				unknown_tag(&swlist->state, tagname);
+				unknown_tag(swlist, tagname);
 			}
 			break;
 
@@ -445,7 +448,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			}
 			else
 			{
-				unknown_tag(&swlist->state, tagname);
+				unknown_tag(swlist, tagname);
 			}
 			break;
 
@@ -544,7 +547,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				}
 			}
 			else
-				unknown_tag(&swlist->state, tagname);
+				unknown_tag(swlist, tagname);
 
 			if (text_dest && swlist->softinfo)
 				swlist->state.text_dest = text_dest;
@@ -652,8 +655,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					add_feature( swlist, name, value );
 				}
 			}
+			else if (!strcmp(tagname, "dipswitch"))
+			{
+			}
 			else
-				unknown_tag( &swlist->state, tagname );
+				unknown_tag(swlist, tagname );
 			break;
 
 		case POS_DATA:
@@ -792,8 +798,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					}
 				}
 			}
+			else if (!strcmp(tagname, "dipvalue"))
+			{
+			}			
 			else
-				unknown_tag(&swlist->state, tagname);
+				unknown_tag(swlist, tagname);
 			break;
 	}
 	swlist->state.pos = (softlist_parse_position) (swlist->state.pos + 1);
@@ -967,10 +976,11 @@ void software_list_parse(software_list *swlist,
 		swlist->state.done = swlist->file->eof();
 		if (XML_Parse(swlist->state.parser, buf, len, swlist->state.done) == XML_STATUS_ERROR)
 		{
-			parse_error(&swlist->state, "[%lu:%lu]: %s\n",
+			parse_error(&swlist->state, "%s: %s (line %lu column %lu)\n",
+				swlist->file->filename(),
+				XML_ErrorString(XML_GetErrorCode(swlist->state.parser)),
 				XML_GetCurrentLineNumber(swlist->state.parser),
-				XML_GetCurrentColumnNumber(swlist->state.parser),
-				XML_ErrorString(XML_GetErrorCode(swlist->state.parser)));
+				XML_GetCurrentColumnNumber(swlist->state.parser));
 			goto done;
 		}
 	}
@@ -1666,6 +1676,11 @@ static DEVICE_START( software_list )
 {
 }
 
+void validate_error_proc(const char *message)
+{
+	mame_printf_error("%s",message);
+}
+
 void validate_softlists(emu_options &options)
 {
 	driver_enumerator drivlist(options);
@@ -1713,6 +1728,8 @@ void validate_softlists(emu_options &options)
 						if (!seen_before)
 						{
 							lists[list_count++] = swlist->list_name[i];
+							software_list_parse( list, &validate_error_proc, NULL );
+							
 							for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 							{
 								const char *s;
@@ -1723,21 +1740,21 @@ void validate_softlists(emu_options &options)
 								/* Did we lost any description? */
 								if (swinfo->longname == NULL)
 								{
-									mame_printf_error("%s: %s has no description\n", swlist->list_name[i], swinfo->shortname);
+									mame_printf_error("%s: %s has no description\n", list->file->filename(), swinfo->shortname);
 									error = TRUE; break;
 								}
 
 								/* Did we lost any year? */
 								if (swinfo->year == NULL)
 								{
-									mame_printf_error("%s: %s has no year\n", swlist->list_name[i], swinfo->shortname);
+									mame_printf_error("%s: %s has no year\n", list->file->filename(), swinfo->shortname);
 									error = TRUE; break;
 								}
 
 								/* Did we lost any publisher? */
 								if (swinfo->publisher == NULL)
 								{
-									mame_printf_error("%s: %s has no publisher\n", swlist->list_name[i], swinfo->shortname);
+									mame_printf_error("%s: %s has no publisher\n", list->file->filename(), swinfo->shortname);
 									error = TRUE; break;
 								}
 
@@ -1747,7 +1764,7 @@ void validate_softlists(emu_options &options)
 								if (names.add(swinfo->shortname, swinfo, FALSE) == TMERR_DUPLICATE)
 								{
 									software_info *match = names.find(swinfo->shortname);
-									mame_printf_error("%s: %s is a duplicate name (%s)\n", swlist->list_name[i], swinfo->shortname, match->shortname);
+									mame_printf_error("%s: %s is a duplicate name (%s)\n", list->file->filename(), swinfo->shortname, match->shortname);
 									error = TRUE;
 								}
 
@@ -1755,7 +1772,7 @@ void validate_softlists(emu_options &options)
 								if (descriptions.add(swinfo->longname, swinfo, FALSE) == TMERR_DUPLICATE)
 								{
 									software_info *match = names.find(swinfo->shortname);
-									mame_printf_error("%s: %s is a duplicate description (%s)\n", swlist->list_name[i], swinfo->longname, match->longname);
+									mame_printf_error("%s: %s is a duplicate description (%s)\n", list->file->filename(), swinfo->longname, match->longname);
 									error = TRUE;
 								}
 
@@ -1765,7 +1782,7 @@ void validate_softlists(emu_options &options)
 
 									if (strcmp(swinfo->parentname, swinfo->shortname) == 0)
 									{
-										mame_printf_error("%s: %s is set as a clone of itself\n", swlist->list_name[i], swinfo->shortname);
+										mame_printf_error("%s: %s is set as a clone of itself\n", list->file->filename(), swinfo->shortname);
 										error = TRUE;
 										break;
 									}
@@ -1775,14 +1792,14 @@ void validate_softlists(emu_options &options)
 
 									if (!swinfo2)
 									{
-										mame_printf_error("%s: parent '%s' software for '%s' not found\n", swlist->list_name[i], swinfo->parentname, swinfo->shortname);
+										mame_printf_error("%s: parent '%s' software for '%s' not found\n", list->file->filename(), swinfo->parentname, swinfo->shortname);
 										error = TRUE;
 									}
 									else
 									{
 										if (swinfo2->parentname != NULL)
 										{
-											mame_printf_error("%s: %s is a clone of a clone\n", swlist->list_name[i], swinfo->shortname);
+											mame_printf_error("%s: %s is a clone of a clone\n", list->file->filename(), swinfo->shortname);
 											error = TRUE;
 										}
 									}
@@ -1791,7 +1808,7 @@ void validate_softlists(emu_options &options)
 								/* make sure the driver name is 8 chars or less */
 								if ((is_clone && strlen(swinfo->shortname) > NAME_LEN_CLONE) || ((!is_clone) && strlen(swinfo->shortname) > NAME_LEN_PARENT))
 								{
-									mame_printf_error("%s: %s %s driver name must be %d characters or less\n", swlist->list_name[i], swinfo->shortname,
+									mame_printf_error("%s: %s %s driver name must be %d characters or less\n", list->file->filename(), swinfo->shortname,
 													  is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 									error = TRUE;
 								}
@@ -1800,7 +1817,7 @@ void validate_softlists(emu_options &options)
 								for (s = swinfo->year; *s; s++)
 									if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
 									{
-										mame_printf_error("%s: %s has an invalid year '%s'\n", swlist->list_name[i], swinfo->shortname, swinfo->year);
+										mame_printf_error("%s: %s has an invalid year '%s'\n", list->file->filename(), swinfo->shortname, swinfo->year);
 										error = TRUE;
 										break;
 									}
@@ -1809,13 +1826,13 @@ void validate_softlists(emu_options &options)
 								{
 									if (swpart->interface_ == NULL)
 									{
-										mame_printf_error("%s: %s has a part (%s) without interface\n", swlist->list_name[i], swinfo->shortname, swpart->name);
+										mame_printf_error("%s: %s has a part (%s) without interface\n", list->file->filename(), swinfo->shortname, swpart->name);
 										error = TRUE;
 									}
 
 									if (software_find_romdata(swpart, NULL) == NULL)
 									{
-										mame_printf_error("%s: %s has a part (%s) with no data\n", swlist->list_name[i], swinfo->shortname, swpart->name);
+										mame_printf_error("%s: %s has a part (%s) with no data\n", list->file->filename(), swinfo->shortname, swpart->name);
 										error = TRUE;
 									}
 
@@ -1831,7 +1848,7 @@ void validate_softlists(emu_options &options)
 											for (str = data->_name; *str; str++)
 												if (tolower((UINT8)*str) != *str)
 												{
-													mame_printf_error("%s: %s has upper case ROM name %s\n", swlist->list_name[i], swinfo->shortname, data->_name);
+													mame_printf_error("%s: %s has upper case ROM name %s\n", list->file->filename(), swinfo->shortname, data->_name);
 													error = TRUE;
 													break;
 												}
@@ -1840,7 +1857,7 @@ void validate_softlists(emu_options &options)
 											hash_collection hashes;
 											if (!hashes.from_internal_string(data->_hashdata))
 											{
-												mame_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", swlist->list_name[i], swinfo->shortname, data->_name, data->_hashdata);
+												mame_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", list->file->filename(), swinfo->shortname, data->_name, data->_hashdata);
 												error = TRUE;
 											}
 										}
