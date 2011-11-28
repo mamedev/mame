@@ -2723,6 +2723,20 @@ static INPUT_PORTS_START( spacegun )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spacegnj )
+	PORT_INCLUDE( spacegun )
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD_LOC(SW A)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spacegnu )
+	PORT_INCLUDE( spacegun )
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_US_LOC(SW A)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dblaxle )
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
@@ -4895,8 +4909,84 @@ ROM_START( spacegun )
 	ROM_LOAD16_BYTE( "c57-22.73", 0x40001, 0x20000, CRC(5855fde3) SHA1(fcd6d7ed16b61b9023596f0efb7f6971060a2e0b) )
 
 	ROM_REGION( 0x40000, "sub", 0 )	/* 256K for 68000 code (CPU B) */
-	ROM_LOAD16_BYTE( "c57-15.27", 0x00000, 0x20000, CRC(b36eb8f1) SHA1(e6e9fb844fd9acc6ee8a515a964d5df8de088a8c) )
-	ROM_LOAD16_BYTE( "c57-16.29", 0x00001, 0x20000, CRC(bfb5d1e7) SHA1(cbf22e9043aac54e08c5da74d973da27844170ef) )
+	ROM_LOAD16_BYTE( "c57-15+.27", 0x00000, 0x20000, CRC(b36eb8f1) SHA1(e6e9fb844fd9acc6ee8a515a964d5df8de088a8c) ) /* Actual label is "C57 15*" */
+	ROM_LOAD16_BYTE( "c57-16+.29", 0x00001, 0x20000, CRC(bfb5d1e7) SHA1(cbf22e9043aac54e08c5da74d973da27844170ef) ) /* Actual label is "C57 16*" */
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )		/* SCR 8x8 */
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "c57-01.25", 0x000000, 0x100000, CRC(f901b04e) SHA1(24bac1c3a0c585966a7cbeeebd9b2dd3acf45a67) )	/* OBJ 16x8 */
+	ROM_LOAD32_BYTE( "c57-02.24", 0x000001, 0x100000, CRC(21ee4633) SHA1(ddb948b165127c8fb1a988b5a0f17f92117f1b66) )
+	ROM_LOAD32_BYTE( "c57-03.12", 0x000002, 0x100000, CRC(fafca86f) SHA1(dc6ea78f0deafef632d8bd3677ec74e797dc69a2) )
+	ROM_LOAD32_BYTE( "c57-04.11", 0x000003, 0x100000, CRC(a9787090) SHA1(8c05c4c0d14a9f60defb37225da37aadf946c563) )
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_WORD( "c57-05.36", 0x00000, 0x80000, CRC(6a70eb2e) SHA1(307dd876af65204e86e094b4015ffb4a655824f8) )	/* STY spritemap */
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_LOAD( "c57-07.76", 0x00000, 0x80000, CRC(ad653dc1) SHA1(2ec440f793b0a686233fbe61c9462f8365c42b65) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_LOAD( "c57-08.75", 0x00000, 0x80000, CRC(22593550) SHA1(e802e947e6947d146e1b57dbff7ac021e19e7b2b) )
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "pal16l8-c57-09.9",  0x0000, 0x0104, CRC(ea93161e) SHA1(c83c6ce3696b2754abb861d41a8d587a8e82aa1e) )
+	ROM_LOAD( "pal20l8-c57-10.47", 0x0200, 0x0144, CRC(3ee56888) SHA1(030efb0903d919686748b1ff86a327990832d0fa) )
+	ROM_LOAD( "pal16l8-c57-11.48", 0x0400, 0x0104, CRC(6bb4372e) SHA1(513bf6f032a9043303b8660c106753ae214d28ff) )
+	ROM_LOAD( "pal20l8-c57-12.61", 0x0600, 0x0144, CRC(debddb13) SHA1(47be25b3bb157d37b9813737544a56a2090f85ba) )
+	ROM_LOAD( "pal16l8-c57-13.72", 0x0800, 0x0104, CRC(1369f23e) SHA1(bbc960cfc3edd07e89134e1b876aa7a6c0cba5ac) )
+	ROM_LOAD( "pal16r4-c57-14.96", 0x0a00, 0x0104, CRC(75e1bf61) SHA1(e8358329a78ec0ab87641b2ecaec0b2b67c6ca30) )
+ROM_END
+
+ROM_START( spacegunu )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 512K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "c57-18.62", 0x00000, 0x20000, CRC(19d7d52e) SHA1(4361929a43f911864ece4dcd06995ea6b6156c59) )
+	ROM_LOAD16_BYTE( "c57-20.74", 0x00001, 0x20000, CRC(2e58253f) SHA1(36fb52ce1c6cf9f537cf500ba330b167871969b9) )
+	ROM_LOAD16_BYTE( "c57-17.59", 0x40000, 0x20000, CRC(e197edb8) SHA1(2ffd000aac1825ecd564c273f0cc055710ba4050) )
+	ROM_LOAD16_BYTE( "c57-21.73", 0x40001, 0x20000, CRC(2f52cd75) SHA1(7dfd1f57925a0993608055247d565af810753189) )
+
+	ROM_REGION( 0x40000, "sub", 0 )	/* 256K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "c57-15+.27", 0x00000, 0x20000, CRC(b36eb8f1) SHA1(e6e9fb844fd9acc6ee8a515a964d5df8de088a8c) ) /* Actual label is "C57 15*" */
+	ROM_LOAD16_BYTE( "c57-16+.29", 0x00001, 0x20000, CRC(bfb5d1e7) SHA1(cbf22e9043aac54e08c5da74d973da27844170ef) ) /* Actual label is "C57 16*" */
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )		/* SCR 8x8 */
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "c57-01.25", 0x000000, 0x100000, CRC(f901b04e) SHA1(24bac1c3a0c585966a7cbeeebd9b2dd3acf45a67) )	/* OBJ 16x8 */
+	ROM_LOAD32_BYTE( "c57-02.24", 0x000001, 0x100000, CRC(21ee4633) SHA1(ddb948b165127c8fb1a988b5a0f17f92117f1b66) )
+	ROM_LOAD32_BYTE( "c57-03.12", 0x000002, 0x100000, CRC(fafca86f) SHA1(dc6ea78f0deafef632d8bd3677ec74e797dc69a2) )
+	ROM_LOAD32_BYTE( "c57-04.11", 0x000003, 0x100000, CRC(a9787090) SHA1(8c05c4c0d14a9f60defb37225da37aadf946c563) )
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_WORD( "c57-05.36", 0x00000, 0x80000, CRC(6a70eb2e) SHA1(307dd876af65204e86e094b4015ffb4a655824f8) )	/* STY spritemap */
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_LOAD( "c57-07.76", 0x00000, 0x80000, CRC(ad653dc1) SHA1(2ec440f793b0a686233fbe61c9462f8365c42b65) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_LOAD( "c57-08.75", 0x00000, 0x80000, CRC(22593550) SHA1(e802e947e6947d146e1b57dbff7ac021e19e7b2b) )
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "pal16l8-c57-09.9",  0x0000, 0x0104, CRC(ea93161e) SHA1(c83c6ce3696b2754abb861d41a8d587a8e82aa1e) )
+	ROM_LOAD( "pal20l8-c57-10.47", 0x0200, 0x0144, CRC(3ee56888) SHA1(030efb0903d919686748b1ff86a327990832d0fa) )
+	ROM_LOAD( "pal16l8-c57-11.48", 0x0400, 0x0104, CRC(6bb4372e) SHA1(513bf6f032a9043303b8660c106753ae214d28ff) )
+	ROM_LOAD( "pal20l8-c57-12.61", 0x0600, 0x0144, CRC(debddb13) SHA1(47be25b3bb157d37b9813737544a56a2090f85ba) )
+	ROM_LOAD( "pal16l8-c57-13.72", 0x0800, 0x0104, CRC(1369f23e) SHA1(bbc960cfc3edd07e89134e1b876aa7a6c0cba5ac) )
+	ROM_LOAD( "pal16r4-c57-14.96", 0x0a00, 0x0104, CRC(75e1bf61) SHA1(e8358329a78ec0ab87641b2ecaec0b2b67c6ca30) )
+ROM_END
+
+ROM_START( spacegunj )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 512K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "c57-18+.62", 0x00000, 0x20000, CRC(c648c093) SHA1(136baf474036a64c6c19e1c3ced36f796ca47f0e) ) /* Actual label is "C57 18*" */
+	ROM_LOAD16_BYTE( "c57-20+.74", 0x00001, 0x20000, CRC(4de524f6) SHA1(ae4557cb17ad434939174a8092f117da90178320) ) /* Actual label is "C57 20*" */
+	ROM_LOAD16_BYTE( "c57-17.59",  0x40000, 0x20000, CRC(e197edb8) SHA1(2ffd000aac1825ecd564c273f0cc055710ba4050) )
+	ROM_LOAD16_BYTE( "c57-19.73",  0x40001, 0x20000, CRC(c15cac59) SHA1(62d7ce8f15032d215c6ca3d65605195958758ea6) )
+
+	ROM_REGION( 0x40000, "sub", 0 )	/* 256K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "c57-15+.27", 0x00000, 0x20000, CRC(b36eb8f1) SHA1(e6e9fb844fd9acc6ee8a515a964d5df8de088a8c) ) /* Actual label is "C57 15*" */
+	ROM_LOAD16_BYTE( "c57-16+.29", 0x00001, 0x20000, CRC(bfb5d1e7) SHA1(cbf22e9043aac54e08c5da74d973da27844170ef) ) /* Actual label is "C57 16*" */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c57-06.52", 0x00000, 0x80000, CRC(4ebadd5b) SHA1(d32a52b4d7dd19b0fa2551f93ce3d5cbcf2bc158) )		/* SCR 8x8 */
@@ -5123,6 +5213,8 @@ GAME( 1990, aquajack,   0,        aquajack, aquajack, taitoz,   ROT0,           
 GAME( 1990, aquajacku,  aquajack, aquajack, aquajack, taitoz,   ROT0,               "Taito America Corporation", "Aqua Jack (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, aquajackj,  aquajack, aquajack, aquajckj, taitoz,   ROT0,               "Taito Corporation",         "Aqua Jack (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, spacegun,   0,        spacegun, spacegun, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, spacegunj,  spacegun, spacegun, spacegnj, bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, spacegunu,  spacegun, spacegun, spacegnu, bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", GAME_SUPPORTS_SAVE )
 GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle,  dblaxle,  ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
 GAME( 1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, dblaxle,  ROT0,               "Taito Corporation",         "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, racingb,    0,        racingb,  dblaxle,  dblaxle,  ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
