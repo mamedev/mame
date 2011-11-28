@@ -1666,164 +1666,197 @@ static DEVICE_START( software_list )
 {
 }
 
-static DEVICE_VALIDITY_CHECK( software_list )
+void validate_softlists(emu_options &options)
 {
-	software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(device)->inline_config();
-	int error = FALSE;
-	softlist_map names;
-	softlist_map descriptions;
-
-	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
-
-	for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
-	{
-		if (swlist->list_name[i])
+	driver_enumerator drivlist(options);
+	// first determine the maximum number of lists we might encounter
+	int list_count = 0;
+	while (drivlist.next())
+		for (const device_t *dev = drivlist.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 		{
-			software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
-			/* if no .xml list is found, then return (this happens e.g. if you moved/renamed the xml list) */
-			if (list == NULL)
-				return FALSE;
+			for (int listnum = 0; listnum < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; listnum++)
+				if (swlist->list_name[listnum] && *swlist->list_name[listnum] && swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+					list_count++;
+		}
 
-			for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
+	// allocate a list
+	astring *lists = global_alloc_array(astring, list_count);
+	bool error = FALSE;
+	if (list_count)
+	{
+		drivlist.reset();
+		list_count = 0;
+		while (drivlist.next())
+		for (const device_t *dev = drivlist.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+		{
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
+			softlist_map names;
+			softlist_map descriptions;
+
+			enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
+
+			for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
 			{
-				const char *s;
-				int is_clone = 0;
-
-				/* First, check if the xml got corrupted: */
-
-				/* Did we lost any description? */
-				if (swinfo->longname == NULL)
+				if (swlist->list_name[i])
 				{
-					mame_printf_error("%s: %s has no description\n", swlist->list_name[i], swinfo->shortname);
-					return TRUE;
-				}
-
-				/* Did we lost any year? */
-				if (swinfo->year == NULL)
-				{
-					mame_printf_error("%s: %s has no year\n", swlist->list_name[i], swinfo->shortname);
-					return TRUE;
-				}
-
-				/* Did we lost any publisher? */
-				if (swinfo->publisher == NULL)
-				{
-					mame_printf_error("%s: %s has no publisher\n", swlist->list_name[i], swinfo->shortname);
-					return TRUE;
-				}
-
-				/* Second, since the xml is fine, run additional checks: */
-
-				/* check for duplicate names */
-				if (names.add(swinfo->shortname, swinfo, FALSE) == TMERR_DUPLICATE)
-				{
-					software_info *match = names.find(swinfo->shortname);
-					mame_printf_error("%s: %s is a duplicate name (%s)\n", swlist->list_name[i], swinfo->shortname, match->shortname);
-					error = TRUE;
-				}
-
-				/* check for duplicate descriptions */
-				if (descriptions.add(swinfo->longname, swinfo, FALSE) == TMERR_DUPLICATE)
-				{
-					software_info *match = names.find(swinfo->shortname);
-					mame_printf_error("%s: %s is a duplicate description (%s)\n", swlist->list_name[i], swinfo->longname, match->longname);
-					error = TRUE;
-				}
-
-				if (swinfo->parentname != NULL)
-				{
-					is_clone = 1;
-
-					if (strcmp(swinfo->parentname, swinfo->shortname) == 0)
+					software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
+					if ( list )
 					{
-						mame_printf_error("%s: %s is set as a clone of itself\n", swlist->list_name[i], swinfo->shortname);
-						error = TRUE;
-						break;
-					}
+						/* Verify if we have encountered this list before */
+						bool seen_before = false;
+						for (int seen_index = 0; seen_index < list_count && !seen_before; seen_index++)
+							if (lists[seen_index] == swlist->list_name[i])
+								seen_before = true;
 
-					/* make sure the parent exists */
-					software_info *swinfo2 = software_list_find(list, swinfo->parentname, NULL );
-
-					if (!swinfo2)
-					{
-						mame_printf_error("%s: parent '%s' software for '%s' not found\n", swlist->list_name[i], swinfo->parentname, swinfo->shortname);
-						error = TRUE;
-					}
-					else
-					{
-						if (swinfo2->parentname != NULL)
+						if (!seen_before)
 						{
-							mame_printf_error("%s: %s is a clone of a clone\n", swlist->list_name[i], swinfo->shortname);
-							error = TRUE;
-						}
-					}
-				}
+							lists[list_count++] = swlist->list_name[i];
+							mame_printf_error("Validating : %s\n",swlist->list_name[i]);
+							for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
+							{
+								const char *s;
+								int is_clone = 0;
 
-				/* make sure the driver name is 8 chars or less */
-				if ((is_clone && strlen(swinfo->shortname) > NAME_LEN_CLONE) || ((!is_clone) && strlen(swinfo->shortname) > NAME_LEN_PARENT))
-				{
-					mame_printf_error("%s: %s %s driver name must be %d characters or less\n", swlist->list_name[i], swinfo->shortname,
-									  is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
-					error = TRUE;
-				}
+								/* First, check if the xml got corrupted: */
 
-				/* make sure the year is only digits, '?' or '+' */
-				for (s = swinfo->year; *s; s++)
-					if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
-					{
-						mame_printf_error("%s: %s has an invalid year '%s'\n", swlist->list_name[i], swinfo->shortname, swinfo->year);
-						error = TRUE;
-						break;
-					}
-
-				for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
-				{
-					if (swpart->interface_ == NULL)
-					{
-						mame_printf_error("%s: %s has a part (%s) without interface\n", swlist->list_name[i], swinfo->shortname, swpart->name);
-						error = TRUE;
-					}
-
-					if (software_find_romdata(swpart, NULL) == NULL)
-					{
-						mame_printf_error("%s: %s has a part (%s) with no data\n", swlist->list_name[i], swinfo->shortname, swpart->name);
-						error = TRUE;
-					}
-
-					for (struct rom_entry *swdata = software_find_romdata(swpart, NULL); swdata != NULL;  swdata = software_romdata_next(swdata))
-					{
-						struct rom_entry *data = swdata;
-
-						if (data->_name && data->_hashdata)
-						{
-							const char *str;
-
-							/* make sure it's all lowercase */
-							for (str = data->_name; *str; str++)
-								if (tolower((UINT8)*str) != *str)
+								/* Did we lost any description? */
+								if (swinfo->longname == NULL)
 								{
-									mame_printf_error("%s: %s has upper case ROM name %s\n", swlist->list_name[i], swinfo->shortname, data->_name);
-									error = TRUE;
-									break;
+									mame_printf_error("%s: %s has no description\n", swlist->list_name[i], swinfo->shortname);
+									error = TRUE; break;
 								}
 
-							/* make sure the hash is valid */
-							hash_collection hashes;
-							if (!hashes.from_internal_string(data->_hashdata))
-							{
-								mame_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", swlist->list_name[i], swinfo->shortname, data->_name, data->_hashdata);
-								error = TRUE;
+								/* Did we lost any year? */
+								if (swinfo->year == NULL)
+								{
+									mame_printf_error("%s: %s has no year\n", swlist->list_name[i], swinfo->shortname);
+									error = TRUE; break;
+								}
+
+								/* Did we lost any publisher? */
+								if (swinfo->publisher == NULL)
+								{
+									mame_printf_error("%s: %s has no publisher\n", swlist->list_name[i], swinfo->shortname);
+									error = TRUE; break;
+								}
+
+								/* Second, since the xml is fine, run additional checks: */
+
+								/* check for duplicate names */
+								if (names.add(swinfo->shortname, swinfo, FALSE) == TMERR_DUPLICATE)
+								{
+									software_info *match = names.find(swinfo->shortname);
+									mame_printf_error("%s: %s is a duplicate name (%s)\n", swlist->list_name[i], swinfo->shortname, match->shortname);
+									error = TRUE;
+								}
+
+								/* check for duplicate descriptions */
+								if (descriptions.add(swinfo->longname, swinfo, FALSE) == TMERR_DUPLICATE)
+								{
+									software_info *match = names.find(swinfo->shortname);
+									mame_printf_error("%s: %s is a duplicate description (%s)\n", swlist->list_name[i], swinfo->longname, match->longname);
+									error = TRUE;
+								}
+
+								if (swinfo->parentname != NULL)
+								{
+									is_clone = 1;
+
+									if (strcmp(swinfo->parentname, swinfo->shortname) == 0)
+									{
+										mame_printf_error("%s: %s is set as a clone of itself\n", swlist->list_name[i], swinfo->shortname);
+										error = TRUE;
+										break;
+									}
+
+									/* make sure the parent exists */
+									software_info *swinfo2 = software_list_find(list, swinfo->parentname, NULL );
+
+									if (!swinfo2)
+									{
+										mame_printf_error("%s: parent '%s' software for '%s' not found\n", swlist->list_name[i], swinfo->parentname, swinfo->shortname);
+										error = TRUE;
+									}
+									else
+									{
+										if (swinfo2->parentname != NULL)
+										{
+											mame_printf_error("%s: %s is a clone of a clone\n", swlist->list_name[i], swinfo->shortname);
+											error = TRUE;
+										}
+									}
+								}
+
+								/* make sure the driver name is 8 chars or less */
+								if ((is_clone && strlen(swinfo->shortname) > NAME_LEN_CLONE) || ((!is_clone) && strlen(swinfo->shortname) > NAME_LEN_PARENT))
+								{
+									mame_printf_error("%s: %s %s driver name must be %d characters or less\n", swlist->list_name[i], swinfo->shortname,
+													  is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
+									error = TRUE;
+								}
+
+								/* make sure the year is only digits, '?' or '+' */
+								for (s = swinfo->year; *s; s++)
+									if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
+									{
+										mame_printf_error("%s: %s has an invalid year '%s'\n", swlist->list_name[i], swinfo->shortname, swinfo->year);
+										error = TRUE;
+										break;
+									}
+
+								for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
+								{
+									if (swpart->interface_ == NULL)
+									{
+										mame_printf_error("%s: %s has a part (%s) without interface\n", swlist->list_name[i], swinfo->shortname, swpart->name);
+										error = TRUE;
+									}
+
+									if (software_find_romdata(swpart, NULL) == NULL)
+									{
+										mame_printf_error("%s: %s has a part (%s) with no data\n", swlist->list_name[i], swinfo->shortname, swpart->name);
+										error = TRUE;
+									}
+
+									for (struct rom_entry *swdata = software_find_romdata(swpart, NULL); swdata != NULL;  swdata = software_romdata_next(swdata))
+									{
+										struct rom_entry *data = swdata;
+
+										if (data->_name && data->_hashdata)
+										{
+											const char *str;
+
+											/* make sure it's all lowercase */
+											for (str = data->_name; *str; str++)
+												if (tolower((UINT8)*str) != *str)
+												{
+													mame_printf_error("%s: %s has upper case ROM name %s\n", swlist->list_name[i], swinfo->shortname, data->_name);
+													error = TRUE;
+													break;
+												}
+
+											/* make sure the hash is valid */
+											hash_collection hashes;
+											if (!hashes.from_internal_string(data->_hashdata))
+											{
+												mame_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", swlist->list_name[i], swinfo->shortname, data->_name, data->_hashdata);
+												error = TRUE;
+											}
+										}
+									}
+								}
 							}
 						}
-					}
+						software_list_close(list);
+					}					
 				}
 			}
-
-			software_list_close(list);
 		}
 	}
-	return error;
+	if (error)
+		throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity checks failed");
 }
 
 DEVICE_GET_INFO( software_list )
@@ -1837,7 +1870,6 @@ DEVICE_GET_INFO( software_list )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( software_list );	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */										break;
-		case DEVINFO_FCT_VALIDITY_CHECK:				info->p = (void*)DEVICE_VALIDITY_CHECK_NAME( software_list ); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Software lists");					break;

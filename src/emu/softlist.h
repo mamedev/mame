@@ -118,6 +118,7 @@ void software_display_matches(const device_list &devlist, emu_options &options,c
 
 const char *software_get_default_slot(const device_list &devlist, emu_options &options, const device_image_interface *image, const char* default_card_slot);
 
+void validate_softlists(emu_options &options);
 /*********************************************************************
 
     Driver software list configuration
