@@ -6,7 +6,7 @@ TODO:
 - video and irq timings;
 - there's a waitstate penalty on the VRAM apparently?
 
-- Pucky (whats the real title ?) inputs and sound issues
+- unknown Pac-Man gambling game (whats the real title?) sound issues
 
 ***************************************************************************
 
@@ -160,14 +160,14 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
 	AM_RANGE(0x33, 0x33) AM_DEVWRITE("aysnd", sound_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pucky_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( unkpacg_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pucky_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( unkpacg_main_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( 4enraya )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pucky )  // guess
+static INPUT_PORTS_START( unkpacg )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "0-0")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -257,29 +257,27 @@ static INPUT_PORTS_START( pucky )  // guess
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN5 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN6 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN7 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) //  1 credits / initiate minigame
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) //  5 credits / initiate gambling
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) // 10 credits
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_DIPNAME( 0x80, 0x80, "DIP8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-
-
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 INPUT_PORTS_END
 
@@ -356,10 +354,10 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pucky, 4enraya )
+static MACHINE_CONFIG_DERIVED( unkpacg, 4enraya )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pucky_main_map)
-	MCFG_CPU_IO_MAP(pucky_main_portmap)
+	MCFG_CPU_PROGRAM_MAP(unkpacg_main_map)
+	MCFG_CPU_IO_MAP(unkpacg_main_portmap)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -385,7 +383,7 @@ ROM_START( 4enraya )
 ROM_END
 
 
-ROM_START(pucky)
+ROM_START(unkpacg)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("1.u14", 0x00000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2))
 	ROM_LOAD("2.u46", 0x08000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291))
@@ -396,7 +394,7 @@ ROM_START(pucky)
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
 ROM_END
 
-static DRIVER_INIT( pucky )
+static DRIVER_INIT( unkpacg )
 {
 	_4enraya_state *state = machine.driver_data<_4enraya_state>();
 	UINT8 *rom = machine.region("maincpu")->base();
@@ -411,5 +409,5 @@ static DRIVER_INIT( pucky )
 	}
 }
 
-GAME( 1990, 4enraya,  0,   4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", GAME_SUPPORTS_SAVE )
-GAME( 199?, 	pucky,		0,	pucky,	pucky,	pucky,	ROT0,	"<unknown>",	"Pucky",	GAME_NOT_WORKING)
+GAME( 1990, 4enraya,  0,   4enraya,  4enraya,  0,       ROT0, "IDSA",      "4 En Raya", GAME_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,  0,   unkpacg,  unkpacg,  unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", GAME_IMPERFECT_SOUND )
