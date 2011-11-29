@@ -176,6 +176,16 @@ static void software_name_split(const char *swlist_swname, char **swlist_name, c
 static void add_rom_entry(software_list *swlist, const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags)
 {
 	software_part *part = &swlist->softinfo->partdata[swlist->current_part_entry-1];
+	if ((flags & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_REGION && name!=NULL && part!=NULL) {
+		if (swlist->current_rom_entry>0) {
+			for (int i=0;i<swlist->current_rom_entry;i++) {
+				if ((part->romdata[i]._name != NULL) && (strcmp(part->romdata[i]._name,name)==0)) {
+					parse_error(&swlist->state, "%s: Duplicated dataarea %s in %s\n",swlist->file->filename(),name,swlist->current_software_info->shortname);
+				}
+			}
+		}
+	}
+
 	struct rom_entry *entry = &part->romdata[swlist->current_rom_entry];
 
 	entry->_name = name;
