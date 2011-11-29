@@ -2,18 +2,18 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- The list contains both MVS and AES cartridges.
-     
+
      For the majority of official titles the actual ROM data contained in the cartridges is compatible across systems, the actual codepath taken
      depends upon the bios used.
-     
+
      The only real difference with the cartridges is the physical form of the cartridges which allowed a delayed release of the game for AES
      systems at a higher cost.  Due to this many adapters are available which plug into an AES unit allowing you to plug any standard MVS cart
      into the system.  Reverse adapters exist, although were less common because there was no reason to use them.  All MVS carts can be used
      with AES systems so there is no reason to have separate lists especially when in the majority of cases the data is identical.
-     
+
      The primary MVS / AES releases are marked in the list for documentation purposes, typically the first AES release is just a later revision
      of the game code with additional bugfixes etc. when compared to the primary MVS release.
-     
+
      Todo: games which are actually incompatible between systems (the first release of kof2001, and many of the bootlegs / hacks) should be
            tagged with compatibility tags.
 
@@ -28,7 +28,7 @@
    . NGH-001
    NEO-AEG PROG-NAM / NEO-AEG CHA-32
   ***************************************-->
-  
+
   <software name="nam1975">
     <!-- MVS AND AES VERSION -->
     <description>NAM-1975 (NGM-001)(NGH-001)</description>
@@ -3500,7 +3500,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="070-m1.m1" crc="5a3b3191" sha1="fa9a9930e18c64e598841fb344c4471d3d2c1964" />
@@ -7102,7 +7102,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="251-m1.m1" crc="5e74539c" sha1="6f49a9343cbd026b2c6720ff3fa2e5b1f85e80da" />        <!-- TC531001 -->
@@ -7146,7 +7146,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="251-m1.m1" crc="5e74539c" sha1="6f49a9343cbd026b2c6720ff3fa2e5b1f85e80da" />        <!-- TC531001 -->
@@ -7192,7 +7192,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="251-m1.m1" crc="5e74539c" sha1="6f49a9343cbd026b2c6720ff3fa2e5b1f85e80da" />        <!-- TC531001 -->
@@ -7235,7 +7235,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="251-m1.m1" crc="5e74539c" sha1="6f49a9343cbd026b2c6720ff3fa2e5b1f85e80da" />        <!-- TC531001 -->
@@ -7326,7 +7326,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="252-m1.m1" crc="30cc4099" sha1="46453b7aac41855a92724a785372f8daf931d8d4" />
@@ -7370,8 +7370,8 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
-      </dataarea>      
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
+      </dataarea>
       <dataarea name="audiocpu" size="0x040000">
         <rom offset="0x000000" size="0x040000" name="253-m1.m1" crc="36a806be" sha1="90fb44dc0c3fb57946a0f35716056abb84a0f191" />        <!-- TC532000 -->
       </dataarea>
@@ -7414,7 +7414,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x040000">
         <rom offset="0x000000" size="0x040000" name="253-m1.m1" crc="36a806be" sha1="90fb44dc0c3fb57946a0f35716056abb84a0f191" />        <!-- TC532000 -->
@@ -7502,7 +7502,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="254-m1.m1" crc="994b4487" sha1="a4e645a3ababa48a8325980ff022e04a8b51b017" />
@@ -7550,7 +7550,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="255-m1.m1" crc="8efd4014" sha1="5b73809b6e4e49264d281ef3e5004ac8a9de296d" />
@@ -7602,7 +7602,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="256-m1.m1" crc="eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a" />        <!-- mask rom TC534000 -->
@@ -7646,7 +7646,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="256-m1.m1" crc="eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a" />        <!-- mask rom TC534000 -->
@@ -7701,7 +7701,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -7743,7 +7743,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -7797,7 +7797,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="259-m1.m1" crc="85668ee9" sha1="7d3f51710cf90c097cd3faaeeef10ceb85cbb3e8" />
@@ -7838,7 +7838,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="260-m1.m1" crc="6407c5e5" sha1="d273e154cc905b63205a17a1a6d419cac3485a92" />
@@ -7878,7 +7878,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x080000">
         <rom offset="0x000000" size="0x080000" name="261-m1.m1" crc="7d501c39" sha1="8e6bcc428f5ac7532d9c9be7e07ad0821461a080" />        <!-- mask rom TC534000 -->
@@ -7926,7 +7926,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -7970,7 +7970,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8025,7 +8025,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8066,7 +8066,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8115,7 +8115,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8166,7 +8166,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8217,7 +8217,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8265,7 +8265,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8308,7 +8308,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8351,7 +8351,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8402,7 +8402,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8454,7 +8454,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8497,7 +8497,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8549,7 +8549,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
         <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8594,7 +8594,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8644,7 +8644,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8687,7 +8687,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -8731,7 +8731,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x20000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <!-- Encrypted -->
       <dataarea name="audiocrypt" size="0x80000">
@@ -9479,7 +9479,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x40000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x40000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x40000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="kf10-m1.bin" crc="f6fab859" sha1="0184aa1394b9f9946d610278b53b846020dd88dc" />
@@ -9661,7 +9661,7 @@
       </dataarea>
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
-        <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
+        <rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="mart-m1.bin" crc="3ea96ab1" sha1="e5053c4312f658faed2a34e38325a22ef792d384" />
@@ -10129,7 +10129,7 @@
   </software>
 
   <!-- Unlicensed Prototype -->
-  
+
   <software name="diggerma">
     <description>Digger Man (prototype)</description>
     <year>2000</year>

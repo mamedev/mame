@@ -29,7 +29,6 @@
 				<!ELEMENT rom EMPTY>
 					<!ATTLIST rom name CDATA #IMPLIED>
 					<!ATTLIST rom size CDATA #IMPLIED>
-					<!ATTLIST rom length CDATA #IMPLIED>
 					<!ATTLIST rom crc CDATA #IMPLIED>
 					<!ATTLIST rom sha1 CDATA #IMPLIED>
 					<!ATTLIST rom offset CDATA #IMPLIED>

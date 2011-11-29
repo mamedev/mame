@@ -196,12 +196,12 @@
     <publisher>Sega</publisher>
     <part name="cart" interface="stv_cart">
       <dataarea name="rom" size="0x3000000">
-        <rom name="epr18967.13"                   size="0x100000" crc="c0446674" sha1="4917089d95613c9d2a936ed9fe3ebd22f461aa4f" offset="0x000001" loadflag="load16_byte"/>
-        <rom name="mpr18968.2" merge="mpr18968.2" size="0x400000" crc="11a891de" sha1="1a4fa8d7e07e1d8fdc8122ef8a5b93723c007cda" offset="0x400000" loadflag="load16_word_swap"/>
-        <rom name="mpr18969.3" merge="mpr18969.3" size="0x400000" crc="199cc47d" sha1="d78f7c6be7e9b43e208244c5c8722245f4c653e1" offset="0x800000" loadflag="load16_word_swap"/>
-        <rom name="mpr18970.4" merge="mpr18970.4" size="0x400000" crc="8b7a509e" sha1="8f4d36a858231764ed09b26a1141d1f055eee092" offset="0xc00000" loadflag="load16_word_swap"/>
-        <rom name="mpr18971.5" merge="mpr18971.5" size="0x400000" crc="c87c443b" sha1="f2fedb35c80e5c4855c7aebff88186397f4d51bc" offset="0x1000000" loadflag="load16_word_swap"/>
-        <rom name="mpr18972.6" merge="mpr18972.6" size="0x400000" crc="45c64fca" sha1="ae2f678b9885426ce99b615b7f62a451f9ef83f9" offset="0x1400000" loadflag="load16_word_swap"/>
+        <rom name="epr18967.13" size="0x100000" crc="c0446674" sha1="4917089d95613c9d2a936ed9fe3ebd22f461aa4f" offset="0x000001" loadflag="load16_byte"/>
+        <rom name="mpr18968.2" size="0x400000" crc="11a891de" sha1="1a4fa8d7e07e1d8fdc8122ef8a5b93723c007cda" offset="0x400000" loadflag="load16_word_swap"/>
+        <rom name="mpr18969.3" size="0x400000" crc="199cc47d" sha1="d78f7c6be7e9b43e208244c5c8722245f4c653e1" offset="0x800000" loadflag="load16_word_swap"/>
+        <rom name="mpr18970.4" size="0x400000" crc="8b7a509e" sha1="8f4d36a858231764ed09b26a1141d1f055eee092" offset="0xc00000" loadflag="load16_word_swap"/>
+        <rom name="mpr18971.5" size="0x400000" crc="c87c443b" sha1="f2fedb35c80e5c4855c7aebff88186397f4d51bc" offset="0x1000000" loadflag="load16_word_swap"/>
+        <rom name="mpr18972.6" size="0x400000" crc="45c64fca" sha1="ae2f678b9885426ce99b615b7f62a451f9ef83f9" offset="0x1400000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -229,11 +229,11 @@
     <publisher>Sega</publisher>
     <part name="cart" interface="stv_cart">
       <dataarea name="rom" size="0x3000000">
-        <rom name="fpr19114.13"                   size="0x100000" crc="1fd22a5f" sha1="c3d9653b12354a73a3e15f23a2ab7992ffb83e46" offset="0x000001" loadflag="load16_byte"/>
-        <rom name="mpr19115.2" merge="mpr19115.2" size="0x400000" crc="6fe06a30" sha1="dedb90f800bae8fd9df1023eb5bec7fb6c9d0179" offset="0x400000" loadflag="load16_word_swap"/>
-        <rom name="mpr19116.3" merge="mpr19116.3" size="0x400000" crc="af9e627b" sha1="a53921c3185a93ec95299bf1c29e744e2fa3b8c0" offset="0x800000" loadflag="load16_word_swap"/>
-        <rom name="mpr19117.4" merge="mpr19117.4" size="0x400000" crc="74520ff1" sha1="16c1acf878664b3bd866c9b94f3695ae892ac12f" offset="0xc00000" loadflag="load16_word_swap"/>
-        <rom name="mpr19118.5" merge="mpr19118.5" size="0x400000" crc="2c9702f0" sha1="5c2c66de83f2ccbe97d3b1e8c7e65999e1fa2de1" offset="0x1000000" loadflag="load16_word_swap"/>
+        <rom name="fpr19114.13" size="0x100000" crc="1fd22a5f" sha1="c3d9653b12354a73a3e15f23a2ab7992ffb83e46" offset="0x000001" loadflag="load16_byte"/>
+        <rom name="mpr19115.2" size="0x400000" crc="6fe06a30" sha1="dedb90f800bae8fd9df1023eb5bec7fb6c9d0179" offset="0x400000" loadflag="load16_word_swap"/>
+        <rom name="mpr19116.3" size="0x400000" crc="af9e627b" sha1="a53921c3185a93ec95299bf1c29e744e2fa3b8c0" offset="0x800000" loadflag="load16_word_swap"/>
+        <rom name="mpr19117.4" size="0x400000" crc="74520ff1" sha1="16c1acf878664b3bd866c9b94f3695ae892ac12f" offset="0xc00000" loadflag="load16_word_swap"/>
+        <rom name="mpr19118.5" size="0x400000" crc="2c9702f0" sha1="5c2c66de83f2ccbe97d3b1e8c7e65999e1fa2de1" offset="0x1000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -650,11 +650,11 @@
     <publisher>Atlus</publisher>
     <part name="cart" interface="stv_cart">
       <dataarea name="rom" size="0x3000000">
-        <rom name="ic22"        size="0x200000" crc="f88347aa" sha1="3e9ca105edbd6ce11ea4194eb1733785e87f92b2" status="baddump" offset="0x200000" loadflag="load16_word_swap"/>
-        <rom name="ic24"        size="0x200000" crc="b5871198" sha1="10d187eebcca5d70c5ae10d1a144685a96491126" offset="0x400000" loadflag="load16_word_swap"/>
-        <rom name="ic26"        size="0x200000" crc="d97034ed" sha1="a7a0f659eefd539b2a1fd70ef394eed30ea54c0c" offset="0x600000" loadflag="load16_word_swap"/>
-        <rom name="ic28"        size="0x200000" crc="f1421506" sha1="c384b695338144e5f051134bda73b059b678a7df" offset="0x800000" loadflag="load16_word_swap"/>
-        <rom name="ic30" merge="ic30" size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" offset="0xa00000" loadflag="load16_word_swap"/>
+        <rom name="ic22" size="0x200000" crc="f88347aa" sha1="3e9ca105edbd6ce11ea4194eb1733785e87f92b2" status="baddump" offset="0x200000" loadflag="load16_word_swap"/>
+        <rom name="ic24" size="0x200000" crc="b5871198" sha1="10d187eebcca5d70c5ae10d1a144685a96491126" offset="0x400000" loadflag="load16_word_swap"/>
+        <rom name="ic26" size="0x200000" crc="d97034ed" sha1="a7a0f659eefd539b2a1fd70ef394eed30ea54c0c" offset="0x600000" loadflag="load16_word_swap"/>
+        <rom name="ic28" size="0x200000" crc="f1421506" sha1="c384b695338144e5f051134bda73b059b678a7df" offset="0x800000" loadflag="load16_word_swap"/>
+        <rom name="ic30" size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" offset="0xa00000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>

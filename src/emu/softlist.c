@@ -338,14 +338,15 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( ! strcmp(attributes[0], "name" ) )
 					{
 					}
-					if ( ! strcmp(attributes[0], "description" ) )
+					else if ( ! strcmp(attributes[0], "description" ) )
 					{
 						swlist->description =  (const char *)pool_malloc_lib(swlist->pool, (strlen(attributes[1])  + 1) * sizeof(char));
 						if (!swlist->description)
 							return;
 
 						strcpy((char *)swlist->description, attributes[1]);
-					}
+					} else
+						unknown_attribute(swlist, attributes[0]);
 				}
 			}
 			else
@@ -367,14 +368,16 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					{
 						name = attributes[1];
 					}
-					if ( !strcmp( attributes[0], "cloneof" ) )
+					else if ( !strcmp( attributes[0], "cloneof" ) )
 					{
 						parent = attributes[1];
 					}
-					if ( !strcmp( attributes[0], "supported" ) )
+					else if ( !strcmp( attributes[0], "supported" ) )
 					{
 						supported = attributes[1];
-					}
+					} 
+					else
+						unknown_attribute(swlist, attributes[0]);
 				}
 
 				if ( name )
@@ -476,8 +479,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( !strcmp( attributes[0], "name" ) )
 						str_feature_name = attributes[1];
 
-					if ( !strcmp( attributes[0], "value" ) )
+					else if ( !strcmp( attributes[0], "value" ) )
 						str_feature_value = attributes[1];
+
+					else
+						unknown_attribute(swlist, attributes[0]);
 				}
 
 				/* Prepare for adding feature to feature list */
@@ -514,8 +520,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( !strcmp( attributes[0], "name" ) )
 						str_name = attributes[1];
 
-					if ( !strcmp( attributes[0], "interface" ) )
+					else if ( !strcmp( attributes[0], "interface" ) )
 						str_interface = attributes[1];
+						
+					else 
+						unknown_attribute(swlist, attributes[0]);					
 				}
 
 				if ( str_name && str_interface )
@@ -564,8 +573,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( !strcmp( attributes[0], "name" ) )
 						str_name = attributes[1];
 
-					if ( !strcmp( attributes[0], "size") )
+					else if ( !strcmp( attributes[0], "size") )
 						str_size = attributes[1];
+					
+					else 
+						unknown_attribute(swlist, attributes[0]);					
 				}
 				if ( str_name && str_size )
 				{
@@ -596,6 +608,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				{
 					if ( !strcmp( attributes[0], "name" ) )
 						str_name = attributes[1];
+					else
+						unknown_attribute(swlist, attributes[0]);				
 				}
 				if ( str_name )
 				{
@@ -627,8 +641,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( !strcmp( attributes[0], "name" ) )
 						str_feature_name = attributes[1];
 
-					if ( !strcmp( attributes[0], "value" ) )
+					else if ( !strcmp( attributes[0], "value" ) )
 						str_feature_value = attributes[1];
+					
+					else
+						unknown_attribute(swlist, attributes[0]);									
 				}
 
 				/* Prepare for adding feature to feature list */
@@ -678,20 +695,22 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				{
 					if ( !strcmp( attributes[0], "name" ) )
 						str_name = attributes[1];
-					if ( !strcmp( attributes[0], "size" ) )
+					else if ( !strcmp( attributes[0], "size" ) )
 						str_size = attributes[1];
-					if ( !strcmp( attributes[0], "crc" ) )
+					else if ( !strcmp( attributes[0], "crc" ) )
 						str_crc = attributes[1];
-					if ( !strcmp( attributes[0], "sha1" ) )
+					else if ( !strcmp( attributes[0], "sha1" ) )
 						str_sha1 = attributes[1];
-					if ( !strcmp( attributes[0], "offset" ) )
+					else if ( !strcmp( attributes[0], "offset" ) )
 						str_offset = attributes[1];
-					if ( !strcmp( attributes[0], "value" ) )
+					else if ( !strcmp( attributes[0], "value" ) )
 						str_value = attributes[1];
-					if ( !strcmp( attributes[0], "status" ) )
+					else if ( !strcmp( attributes[0], "status" ) )
 						str_status = attributes[1];
-					if ( !strcmp( attributes[0], "loadflag" ) )
-						str_loadflag = attributes[1];
+					else if ( !strcmp( attributes[0], "loadflag" ) )
+						str_loadflag = attributes[1];						
+					else
+						unknown_attribute(swlist, attributes[0]);									
 				}
 				if ( swlist->softinfo )
 				{
@@ -771,12 +790,14 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				{
 					if ( !strcmp( attributes[0], "name" ) )
 						str_name = attributes[1];
-					if ( !strcmp( attributes[0], "sha1" ) )
+					else if ( !strcmp( attributes[0], "sha1" ) )
 						str_sha1 = attributes[1];
-					if ( !strcmp( attributes[0], "status" ) )
+					else if ( !strcmp( attributes[0], "status" ) )
 						str_status = attributes[1];
-					if ( !strcmp( attributes[0], "writeable" ) )
+					else if ( !strcmp( attributes[0], "writeable" ) )
 						str_writeable = attributes[1];
+					else
+						unknown_attribute(swlist, attributes[0]);									
 				}
 				if ( swlist->softinfo )
 				{
