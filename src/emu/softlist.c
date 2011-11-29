@@ -911,6 +911,19 @@ static void data_handler(void *data, const XML_Char *s, int len)
 		memcpy(&text[text_len], s, len);
 		text[text_len + len] = '\0';
 		*swlist->state.text_dest = text;
+	} else {
+		if (swlist->state.error_proc)
+		{
+			int errcnt = 0;
+			for (int i=0;i<len;i++) {
+				if (!(s[i]=='\t' || s[i]=='\n' || s[i]=='\r' || s[i]==' ')) errcnt++;
+			}
+			if (errcnt>0) {
+				parse_error(&swlist->state, "%s: Unknown content (line %lu)\n",
+					swlist->file->filename(),
+					XML_GetCurrentLineNumber(swlist->state.parser));
+			}
+		}
 	}
 }
 
