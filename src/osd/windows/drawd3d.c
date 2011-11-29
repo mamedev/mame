@@ -922,10 +922,11 @@ static void device_delete_resources(d3d_info *d3d)
 		d3d->texlist = tex->next;
 		if (tex->d3dfinaltex != NULL)
 		{
+			if (tex->d3dtex == tex->d3dfinaltex) tex->d3dtex = NULL;
 			(*d3dintf->texture.release)(tex->d3dfinaltex);
 			tex->d3dfinaltex = NULL;
 		}
-		if (tex->d3dtex != NULL && tex->d3dtex != tex->d3dfinaltex)
+		if (tex->d3dtex != NULL)
 		{
 			(*d3dintf->texture.release)(tex->d3dtex);
 			tex->d3dtex = NULL;
