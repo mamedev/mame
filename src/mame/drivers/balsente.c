@@ -2259,8 +2259,8 @@ GAME( 1986, nstocker, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente
 GAME( 1986, nstocker2,nstocker, balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", GAME_SUPPORTS_SAVE )
 GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente",  "Street Football (11/12/86)", GAME_SUPPORTS_SAVE )
 GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker", GAME_SUPPORTS_SAVE )
-GAME( 1986, spiker2,  0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker (5/5/86)", GAME_SUPPORTS_SAVE )
-GAME( 1986, spiker3,  0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker (6/9/86)", GAME_SUPPORTS_SAVE )
+GAME( 1986, spiker2,  spiker,   balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker (5/5/86)", GAME_SUPPORTS_SAVE )
+GAME( 1986, spiker3,  spiker,   balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker (6/9/86)", GAME_SUPPORTS_SAVE )
 GAME( 1986, stompin,  0,        balsente, stompin,  stompin,  ROT0, "Bally/Sente",  "Stompin' (4/4/86)", GAME_SUPPORTS_SAVE )
 
 /* Board: A084-91889-A000 (Not a cartridge, but dedicated board) */
