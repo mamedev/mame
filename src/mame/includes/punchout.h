@@ -22,6 +22,8 @@ public:
 	tilemap_t *m_spr2_tilemap;
 	int m_palette_reverse_top;
 	int m_palette_reverse_bot;
+
+	UINT8 m_nmi_mask;
 };
 
 

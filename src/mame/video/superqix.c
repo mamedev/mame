@@ -118,6 +118,7 @@ WRITE8_HANDLER( superqix_bitmapram2_w )
 
 WRITE8_HANDLER( pbillian_0410_w )
 {
+	superqix_state *state = space->machine().driver_data<superqix_state>();
 	/*
      -------0  ? [not used]
      ------1-  coin counter 1
@@ -132,7 +133,7 @@ WRITE8_HANDLER( pbillian_0410_w )
 
 	memory_set_bank(space->machine(), "bank1", (data & 0x08) >> 3);
 
-	interrupt_enable_w(space,0,data & 0x10);
+	state->m_nmi_mask = data & 0x10;
 	flip_screen_set(space->machine(), data & 0x20);
 }
 
@@ -150,7 +151,7 @@ WRITE8_HANDLER( superqix_0410_w )
 	state->m_show_bitmap = (data & 0x04) >> 2;
 
 	/* bit 3 enables NMI */
-	interrupt_enable_w(space,offset,data & 0x08);
+	state->m_nmi_mask = data & 0x08;
 
 	/* bits 4-5 control ROM bank */
 	memory_set_bank(space->machine(), "bank1", (data & 0x30) >> 4);

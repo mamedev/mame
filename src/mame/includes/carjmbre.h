@@ -19,6 +19,8 @@ public:
 	tilemap_t *m_cj_tilemap;
 	UINT8   m_flipscreen;
 	UINT16  m_bgcolor;
+
+	UINT8	m_nmi_mask;
 };
 
 

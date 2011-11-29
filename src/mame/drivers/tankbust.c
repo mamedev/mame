@@ -78,16 +78,16 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	switch (offset)
 	{
 	case 0:	/* 0xe000 interrupt enable */
-		interrupt_enable_w(space, 0, data);
-	break;
+		state->m_irq_mask = data & 1;
+		break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */
 		space->machine().scheduler().synchronize(FUNC(soundirqline_callback), data);
-	break;
+		break;
 
 	case 2:	/* 0xe002 coin counter */
 		coin_counter_w(space->machine(), 0, data&1);
-	break;
+		break;
 
 	case 6:	/* 0xe006 screen disable ?? or disable screen update */
 		/* program sets this to 0,
@@ -95,14 +95,14 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
            and sets this to 1 */
 
 		/* ???? */
-	break;
+		break;
 
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
 		memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() + 0x10000 + ((data&1) * 0x4000) );
 		memory_set_bankptr(space->machine(),  "bank2", space->machine().region("maincpu")->base() + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
-	break;
+		break;
 	}
 }
 
@@ -142,7 +142,6 @@ static PALETTE_INIT( tankbust )
 //rr    g g g   r b b - bad but still close
 
 
-#if 1 //close one
 		/* blue component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
@@ -159,7 +158,6 @@ static PALETTE_INIT( tankbust )
 		bit0 = (color_prom[i] >> 6) & 0x01;
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		r = 0x55 * bit0 + 0xaa * bit1;
-#endif
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
@@ -324,17 +322,23 @@ static MACHINE_RESET( tankbust )
 	state->m_variable_data = 0x11;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	tankbust_state *state = device->machine().driver_data<tankbust_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
 
 static MACHINE_CONFIG_START( tankbust, tankbust_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)	/* Verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_14_31818MHz/4)		/* Verified on PCB */
 //  MCFG_CPU_ADD("sub", Z80, XTAL_14_31818MHz/3)        /* Accurate to audio recording, but apparently incorrect clock */
-
 	MCFG_CPU_PROGRAM_MAP(map_cpu2)
 	MCFG_CPU_IO_MAP(port_map_cpu2)
 

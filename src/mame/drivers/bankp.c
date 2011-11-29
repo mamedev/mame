@@ -267,13 +267,21 @@ static MACHINE_RESET( bankp )
 	state->m_priority = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	bankp_state *state = device->machine().driver_data<bankp_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( bankp, bankp_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, BANKP_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(bankp_map)
 	MCFG_CPU_IO_MAP(bankp_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_MACHINE_RESET(bankp)
 

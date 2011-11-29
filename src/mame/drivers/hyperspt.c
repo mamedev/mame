@@ -26,6 +26,12 @@ static WRITE8_HANDLER( hyperspt_coin_counter_w )
 	coin_counter_w(space->machine(), offset, data);
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	hyperspt_state *state = space->machine().driver_data<hyperspt_state>();
+
+	state->m_irq_mask = data & 1;
+}
 
 static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, m_spriteram, m_spriteram_size)
@@ -34,7 +40,7 @@ static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
-	AM_RANGE(0x1487, 0x1487) AM_WRITE(interrupt_enable_w)  /* Interrupt enable */
+	AM_RANGE(0x1487, 0x1487) AM_WRITE(irq_mask_w)  /* Interrupt enable */
 	AM_RANGE(0x1500, 0x1500) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
@@ -55,7 +61,7 @@ static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
-	AM_RANGE(0x1487, 0x1487) AM_WRITE(interrupt_enable_w)  /* Interrupt enable */
+	AM_RANGE(0x1487, 0x1487) AM_WRITE(irq_mask_w)  /* Interrupt enable */
 	AM_RANGE(0x1500, 0x1500) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
@@ -267,6 +273,13 @@ static GFXDECODE_START( roadf )
 	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,	 16*16, 16 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	hyperspt_state *state = device->machine().driver_data<hyperspt_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
 
 
 static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
@@ -274,7 +287,7 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

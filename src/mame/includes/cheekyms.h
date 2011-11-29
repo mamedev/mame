@@ -23,6 +23,8 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_dac;
+
+	UINT8          m_irq_mask;
 };
 
 

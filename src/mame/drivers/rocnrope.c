@@ -30,6 +30,12 @@ static WRITE8_HANDLER( rocnrope_interrupt_vector_w )
 	RAM[0xfff2 + offset] = data;
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	rocnrope_state *state = space->machine().driver_data<rocnrope_state>();
+
+	state->m_irq_mask = data & 1;
+}
 
 /*************************************
  *
@@ -56,7 +62,7 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8082, 0x8082) AM_WRITENOP	/* interrupt acknowledge??? */
 	AM_RANGE(0x8083, 0x8083) AM_WRITENOP	/* Coin counter 1 */
 	AM_RANGE(0x8084, 0x8084) AM_WRITENOP	/* Coin counter 2 */
-	AM_RANGE(0x8087, 0x8087) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x8087, 0x8087) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x8100, 0x8100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -184,12 +190,21 @@ GFXDECODE_END
  *
  *************************************/
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	rocnrope_state *state = device->machine().driver_data<rocnrope_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+
 static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(rocnrope_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

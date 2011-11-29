@@ -74,6 +74,8 @@ static READ8_HANDLER( avengers_adpcm_r )
 
 static WRITE8_HANDLER( lwings_bankswitch_w )
 {
+	lwings_state *state = space->machine().driver_data<lwings_state>();
+
 	/* bit 0 is flip screen */
 	flip_screen_set(space->machine(), ~data & 0x01);
 
@@ -81,7 +83,7 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", (data & 0x06) >> 1);
 
 	/* bit 3 enables NMI */
-	interrupt_enable_w(space, 0, data & 0x08);
+	state->m_nmi_mask = data & 8;
 
 	/* bits 6 and 7 are coin counters */
 	coin_counter_w(space->machine(), 1, data & 0x40);
@@ -90,7 +92,9 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 
 static INTERRUPT_GEN( lwings_interrupt )
 {
-	if (interrupt_enable_r(device->memory().space(AS_PROGRAM), 0))
+	lwings_state *state = device->machine().driver_data<lwings_state>();
+
+	if(state->m_nmi_mask)
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 

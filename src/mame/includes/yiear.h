@@ -13,7 +13,8 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
-	int      m_yiear_nmi_enable;
+	UINT8      m_yiear_nmi_enable;
+	UINT8      m_yiear_irq_enable;
 };
 
 

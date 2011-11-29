@@ -53,13 +53,17 @@ WRITE8_HANDLER( slapfight_port_01_w )
 /* Disable and clear hardware interrupt */
 WRITE8_HANDLER( slapfight_port_06_w )
 {
-	interrupt_enable_w(space,0,0);
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
+
+	state->m_irq_mask = 0;
 }
 
 /* Enable hardware interrupt */
 WRITE8_HANDLER( slapfight_port_07_w )
 {
-	interrupt_enable_w(space,0,1);
+	slapfght_state *state = space->machine().driver_data<slapfght_state>();
+
+	state->m_irq_mask = 1;
 }
 
 WRITE8_HANDLER( slapfight_port_08_w )

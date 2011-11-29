@@ -204,22 +204,23 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( questions_bank_w )
 {
-	if (!(data & 0x01))
-		memory_set_bank(space->machine(), "bank1", 0);
-	else if (!(data & 0x02))
-		memory_set_bank(space->machine(), "bank1", 1);
-	else if (!(data & 0x04))
-		memory_set_bank(space->machine(), "bank1", 2);
-	else if (!(data & 0x08))
-		memory_set_bank(space->machine(), "bank1", 3);
-	else if (!(data & 0x10))
-		memory_set_bank(space->machine(), "bank1", 4);
-	else if (!(data & 0x20))
-		memory_set_bank(space->machine(), "bank1", 5);
-	else if (!(data & 0x40))
-		memory_set_bank(space->machine(), "bank1", 6);
-	else if (!(data & 0x80))
-		memory_set_bank(space->machine(), "bank1", 7);
+	int i;
+
+	for(i=0;i<8;i++)
+	{
+		if((data & 1 << i) == 0) // check first bit active low, change ROM bank according to the correlated bit
+		{
+			memory_set_bank(space->machine(), "bank1", i);
+			return;
+		}
+	}
+}
+
+static WRITE8_HANDLER( irq_mask_w )
+{
+	trackfld_state *state = space->machine().driver_data<trackfld_state>();
+
+	state->m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -230,7 +231,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)					/* 24, 23 */
 	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP						/* CN3.2 */
 	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP						/* CN3.4 */
-	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(interrupt_enable_w)		/* INT */
+	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(irq_mask_w)				/* INT */
 	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_WRITE(soundlatch_w)			/* 32 */
 	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
@@ -259,7 +260,7 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)					/* 24, 23 */
 	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP						/* CN3.2 */
 	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP						/* CN3.4 */
-	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(interrupt_enable_w)		/* INT */
+	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(irq_mask_w)				/* INT */
 //  AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_WRITE(soundlatch_w)           /* 32 */
 	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
@@ -286,7 +287,7 @@ static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9080, 0x9080) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x9081, 0x9081) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x9083, 0x9084) AM_WRITE(coin_w)
-	AM_RANGE(0x9087, 0x9087) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x9087, 0x9087) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x9100, 0x9100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x9280, 0x9280) AM_READ_PORT("SYSTEM")
@@ -319,7 +320,7 @@ static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x10b1, 0x10b1) AM_WRITE(konami_sh_irqtrigger_w)
 	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
-	AM_RANGE(0x1087, 0x1087) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x1087, 0x1087) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
@@ -345,7 +346,7 @@ static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1080, 0x1080) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x1081, 0x1081) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
-	AM_RANGE(0x1087, 0x1087) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x1087, 0x1087) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
@@ -882,12 +883,29 @@ static MACHINE_RESET( trackfld )
 	state->m_old_gfx_bank = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	trackfld_state *state = device->machine().driver_data<trackfld_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+static INTERRUPT_GEN( vblank_nmi )
+{
+	trackfld_state *state = device->machine().driver_data<trackfld_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
 static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -932,7 +950,7 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(yieartf_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 //  z80 isn't used
 //  MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
@@ -1006,7 +1024,7 @@ static MACHINE_CONFIG_DERIVED( wizzquiz, trackfld )
 	// right cpu?
 	MCFG_CPU_REPLACE("maincpu",M6800,2048000)		/* 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(wizzquiz_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_nmi)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( reaktor, trackfld )
@@ -1015,7 +1033,7 @@ static MACHINE_CONFIG_DERIVED( reaktor, trackfld )
 	MCFG_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(reaktor_map)
 	MCFG_CPU_IO_MAP(reaktor_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 MACHINE_CONFIG_END
 
 

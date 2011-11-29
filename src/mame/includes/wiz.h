@@ -22,6 +22,7 @@ public:
 	UINT8 *m_spriteram2;
 	size_t m_spriteram_size;
 	UINT8 m_nmi_mask;
+	UINT8 m_sound_irq_mask;
 };
 
 

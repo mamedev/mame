@@ -100,12 +100,14 @@ static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
 	upd7759_reset_w(state->m_upd, data & 2);
 	upd7759_start_w(state->m_upd, data & 1);
 
-	interrupt_enable_w(space, 0, data & 4);
+	state->m_sound_irq_mask = data & 4;
 }
 
 static WRITE8_HANDLER( devstor_sh_irqcontrol_w )
 {
-	interrupt_enable_w(space, 0, data & 4);
+	mainevt_state *state = space->machine().driver_data<mainevt_state>();
+
+	state->m_sound_irq_mask = data & 4;
 }
 
 static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
@@ -439,6 +441,22 @@ static MACHINE_RESET( mainevt )
 	state->m_nmi_enable = 0;
 }
 
+static INTERRUPT_GEN( mainevt_sound_timer_irq )
+{
+	mainevt_state *state = device->machine().driver_data<mainevt_state>();
+
+	if(state->m_sound_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+static INTERRUPT_GEN( devstors_sound_timer_irq )
+{
+	mainevt_state *state = device->machine().driver_data<mainevt_state>();
+
+	if(state->m_sound_irq_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( mainevt, mainevt_state )
 
 	/* basic machine hardware */
@@ -448,7 +466,7 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(mainevt_sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,8*60)	/* ??? */
+	MCFG_CPU_PERIODIC_INT(mainevt_sound_timer_irq,8*60)	/* ??? */
 
 	MCFG_MACHINE_START(mainevt)
 	MCFG_MACHINE_RESET(mainevt)
@@ -509,7 +527,7 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(devstors_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60) /* ??? */
+	MCFG_CPU_PERIODIC_INT(devstors_sound_timer_irq,4*60) /* ??? */
 
 	MCFG_MACHINE_START(mainevt)
 	MCFG_MACHINE_RESET(mainevt)

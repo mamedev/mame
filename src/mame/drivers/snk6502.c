@@ -741,6 +741,8 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( satansat_interrupt )
 {
+	snk6502_state *state = device->machine().driver_data<snk6502_state>();
+
 	if (cpu_getiloops(device) != 0)
 	{
 		UINT8 val = input_port_read(device->machine(), "IN2"); /* TODO: use CUSTOM_INPUT */
@@ -751,7 +753,7 @@ static INTERRUPT_GEN( satansat_interrupt )
 		if (val & 0x01)
 			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
-	else
+	else if(state->m_irq_mask)
 		device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 

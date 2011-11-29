@@ -26,6 +26,8 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
+
+	UINT8      m_irq_mask;
 };
 
 

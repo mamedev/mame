@@ -17,6 +17,8 @@ public:
 	UINT8 m_yscroll[2];
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+
+	UINT8 m_irq_mask;
 };
 
 

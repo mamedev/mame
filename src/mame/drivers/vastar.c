@@ -75,10 +75,7 @@ static MACHINE_RESET( vastar )
 static WRITE8_HANDLER( vastar_hold_cpu2_w )
 {
 	/* I'm not sure that this works exactly like this */
-	if (data & 1)
-		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
-	else
-		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ8_HANDLER( vastar_sharedram_r )
@@ -100,6 +97,12 @@ static WRITE8_HANDLER( flip_screen_w )
 	flip_screen_set(space->machine(), data);
 }
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	vastar_state *state = space->machine().driver_data<vastar_state>();
+
+	state->m_nmi_mask = data & 1;
+}
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -124,7 +127,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_port_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(vastar_hold_cpu2_w)
 ADDRESS_MAP_END
@@ -289,7 +292,13 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	vastar_state *state = device->machine().driver_data<vastar_state>();
 
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_CONFIG_START( vastar, vastar_state )
 
@@ -297,7 +306,7 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_port_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, 3072000)	/* 3.072 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)

@@ -95,12 +95,13 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
+/* same as Tryout */
 static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // unknown, NOT irq/nmi mask
 ADDRESS_MAP_END
 
 /*******************************************************************************/

@@ -145,6 +145,14 @@ static READ8_HANDLER( popper_soundcpu_nmi_r )
 	return 0;
 }
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	popper_state *state = space->machine().driver_data<popper_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
+
 /*************************************
  *
  *  Memory maps
@@ -163,7 +171,7 @@ static ADDRESS_MAP_START( popper_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(popper_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xe007) AM_READ(popper_input_ports_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(popper_flipscreen_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(popper_e002_w)				//?? seems to be graphic related
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(popper_gfx_bank_w)
@@ -324,12 +332,21 @@ static MACHINE_RESET( popper )
 	state->m_gfx_bank = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	popper_state *state = device->machine().driver_data<popper_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
 static MACHINE_CONFIG_START( popper, popper_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6)
 	MCFG_CPU_PROGRAM_MAP(popper_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,18432000/12)
 	MCFG_CPU_PROGRAM_MAP(popper_sound_map)

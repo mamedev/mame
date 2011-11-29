@@ -16,6 +16,8 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	int		 m_sprites_gfx_banked;
+
+	UINT8    m_irq_mask;
 };
 
 /*----------- defined in video/hyperspt.c -----------*/

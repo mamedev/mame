@@ -17,6 +17,9 @@ public:
 	int m_ra_spritebank;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+
+	UINT8 m_nmi_mask;
+	UINT8 m_sound_nmi_mask;
 };
 
 

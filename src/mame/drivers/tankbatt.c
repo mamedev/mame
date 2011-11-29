@@ -99,14 +99,12 @@ static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
 	if (data) sample_stop (space->machine().device("samples"), 2);
-//  interrupt_enable_w (offset, !data);
 }
 
 static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 {
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
 	state->m_nmi_enable = data;
-//  interrupt_enable_w (offset, data);
 }
 
 static WRITE8_HANDLER( tankbatt_sh_expl_w )

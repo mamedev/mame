@@ -119,7 +119,12 @@ static WRITE8_HANDLER( jrpacman_interrupt_vector_w )
 	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	jrpacman_state *state = space->machine().driver_data<jrpacman_state>();
 
+	state->m_irq_mask = data & 1;
+}
 
 /*************************************
  *
@@ -133,7 +138,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4fef) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("P2")
@@ -272,13 +277,21 @@ static const namco_interface namco_config =
  *
  *************************************/
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	jrpacman_state *state = device->machine().driver_data<jrpacman_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( jrpacman, jrpacman_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

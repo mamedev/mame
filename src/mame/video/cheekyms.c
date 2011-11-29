@@ -59,7 +59,7 @@ WRITE8_HANDLER( cheekyms_port_80_w )
 	*state->m_port_80 = data;
 
 	/* d2 - interrupt enable */
-	interrupt_enable_w(space, offset, data & 0x04);
+	state->m_irq_mask = data & 4;
 }
 
 

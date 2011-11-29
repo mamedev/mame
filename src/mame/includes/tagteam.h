@@ -8,6 +8,8 @@ public:
 	UINT8 *m_colorram;
 	int m_palettebank;
 	tilemap_t *m_bg_tilemap;
+
+	UINT8 m_sound_nmi_mask;
 };
 
 

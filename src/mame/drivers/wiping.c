@@ -39,31 +39,6 @@ dip: 6.7 7.7
 #include "includes/wiping.h"
 
 
-static READ8_HANDLER( shared1_r )
-{
-	wiping_state *state = space->machine().driver_data<wiping_state>();
-	return state->m_sharedram1[offset];
-}
-
-static READ8_HANDLER( shared2_r )
-{
-	wiping_state *state = space->machine().driver_data<wiping_state>();
-	return state->m_sharedram2[offset];
-}
-
-static WRITE8_HANDLER( shared1_w )
-{
-	wiping_state *state = space->machine().driver_data<wiping_state>();
-	state->m_sharedram1[offset] = data;
-}
-
-static WRITE8_HANDLER( shared2_w )
-{
-	wiping_state *state = space->machine().driver_data<wiping_state>();
-	state->m_sharedram2[offset] = data;
-}
-
-
 /* input ports are rotated 90 degrees */
 static READ8_HANDLER( ports_r )
 {
@@ -79,12 +54,22 @@ static READ8_HANDLER( ports_r )
 
 static WRITE8_HANDLER( subcpu_reset_w )
 {
-	if (data & 1)
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
-	else
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
+static WRITE8_HANDLER( main_irq_mask_w )
+{
+	wiping_state *state = space->machine().driver_data<wiping_state>();
+
+	state->m_main_irq_mask = data & 1;
+}
+
+static WRITE8_HANDLER( sound_irq_mask_w )
+{
+	wiping_state *state = space->machine().driver_data<wiping_state>();
+
+	state->m_sound_irq_mask = data & 1;
+}
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
@@ -92,9 +77,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8400, 0x87ff) AM_BASE_MEMBER(wiping_state, m_colorram)
 	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE_MEMBER(wiping_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8000, 0x8bff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(shared1_r,shared1_w) AM_BASE_MEMBER(wiping_state, m_sharedram1)
-	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(shared2_r,shared2_w) AM_BASE_MEMBER(wiping_state, m_sharedram2)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(main_irq_mask_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(wiping_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(subcpu_reset_w)
 	AM_RANGE(0xa800, 0xa807) AM_READ(ports_r)
@@ -105,9 +90,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("wiping", wiping_sound_w)
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(shared1_r,shared1_w)
-	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(shared2_r,shared2_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(sound_irq_mask_w)
 ADDRESS_MAP_END
 
 
@@ -279,6 +264,22 @@ static GFXDECODE_START( wiping )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 64 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	wiping_state *state = device->machine().driver_data<wiping_state>();
+
+	if(state->m_main_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+static INTERRUPT_GEN( sound_timer_irq )
+{
+	wiping_state *state = device->machine().driver_data<wiping_state>();
+
+	if(state->m_sound_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
 
 
 static MACHINE_CONFIG_START( wiping, wiping_state )
@@ -286,11 +287,11 @@ static MACHINE_CONFIG_START( wiping, wiping_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,120)	/* periodic interrupt, don't know about the frequency */
+	MCFG_CPU_PERIODIC_INT(sound_timer_irq,120)	/* periodic interrupt, don't know about the frequency */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

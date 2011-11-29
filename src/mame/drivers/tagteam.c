@@ -25,7 +25,6 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -56,12 +55,20 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( sound_nmi_mask_w )
+{
+	tagteam_state *state = space->machine().driver_data<tagteam_state>();
+
+	state->m_sound_nmi_mask = data & 1;
+}
+
+/* Same as Syusse Oozumou */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -189,17 +196,25 @@ static GFXDECODE_START( tagteam )
 GFXDECODE_END
 
 
+static INTERRUPT_GEN( sound_timer_irq )
+{
+	tagteam_state *state = device->machine().driver_data<tagteam_state>();
+
+	if(state->m_sound_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 
 static MACHINE_CONFIG_START( tagteam, tagteam_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,272/16*57) // connected to bit 3 of vcount (basically once every 16 scanlines)
+	MCFG_CPU_PERIODIC_INT(irq0_line_assert,272/16*57) // connected to bit 4 of vcount (basically once every 16 scanlines)
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/2/6) // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,272/16*57) // same source as maincpu irq
+	MCFG_CPU_PERIODIC_INT(sound_timer_irq,272/16*57) // same source as maincpu irq
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

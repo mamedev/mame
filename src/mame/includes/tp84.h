@@ -17,6 +17,8 @@ public:
 	UINT8 *m_flipscreen_y;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+
+	UINT8 m_sub_irq_mask;
 };
 
 

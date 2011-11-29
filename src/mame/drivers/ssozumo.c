@@ -39,12 +39,21 @@ static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+
+static WRITE8_HANDLER( sound_nmi_mask_w )
+{
+	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
+
+	state->m_sound_nmi_mask = data & 1;
+}
+
+/* Same as Tag Team */
 static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_signed_w)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -172,6 +181,13 @@ static GFXDECODE_START( ssozumo )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*8, 2 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( sound_timer_irq )
+{
+	ssozumo_state *state = device->machine().driver_data<ssozumo_state>();
+
+	if(state->m_sound_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 
@@ -182,7 +198,7 @@ static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 
 	MCFG_CPU_ADD("audiocpu", M6502, 975000) 		/* 975 kHz ?? */
 	MCFG_CPU_PROGRAM_MAP(ssozumo_sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60*16)	/* not accurate */
+	MCFG_CPU_PERIODIC_INT(sound_timer_irq,272/16*57) // guess, assume to be the same as tagteam
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

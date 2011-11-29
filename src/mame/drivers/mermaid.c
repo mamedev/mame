@@ -136,6 +136,14 @@ static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 	if (state->m_ay8910_enable[1]) ay8910_address_w(state->m_ay2, offset, data);
 }
 
+
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	mermaid_state *state = space->machine().driver_data<mermaid_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
 /* Memory Map */
 
 static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8 )
@@ -152,7 +160,7 @@ static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe002, 0xe004) AM_WRITENOP // ???
 	AM_RANGE(0xe005, 0xe005) AM_WRITE(mermaid_flip_screen_x_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(mermaid_flip_screen_y_w)
-	AM_RANGE(0xe007, 0xe007) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xe007, 0xe007) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("P1") AM_WRITENOP // ???
 	AM_RANGE(0xe801, 0xe801) AM_WRITENOP	// ???
 	AM_RANGE(0xe802, 0xe802) AM_WRITENOP	// ???
@@ -439,12 +447,20 @@ static const msm5205_interface msm5205_config =
 };
 
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	mermaid_state *state = device->machine().driver_data<mermaid_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( mermaid, mermaid_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(mermaid_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_MACHINE_START(mermaid)
 	MCFG_MACHINE_RESET(mermaid)

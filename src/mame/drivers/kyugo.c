@@ -67,10 +67,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	kyugo_state *state = space->machine().driver_data<kyugo_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
 #define Main_PortMap( name, base )										\
 static ADDRESS_MAP_START( name##_portmap, AS_IO, 8 )			\
 	ADDRESS_MAP_GLOBAL_MASK(0xff)									\
-	AM_RANGE(base+0, base+0) AM_WRITE(interrupt_enable_w)				\
+	AM_RANGE(base+0, base+0) AM_WRITE(nmi_mask_w)				\
 	AM_RANGE(base+1, base+1) AM_WRITE(kyugo_flipscreen_w)				\
 	AM_RANGE(base+2, base+2) AM_WRITE(kyugo_sub_cpu_control_w)			\
 ADDRESS_MAP_END
@@ -477,6 +484,14 @@ static MACHINE_RESET( kyugo )
 	state->m_flipscreen = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	kyugo_state *state = device->machine().driver_data<kyugo_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 
 static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 
@@ -484,7 +499,7 @@ static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(gyrodine_portmap)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gyrodine_sub_map)

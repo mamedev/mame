@@ -20,6 +20,8 @@ public:
 	tilemap_t *m_bg2_tilemap;
 
 	UINT8 *m_sharedram;
+
+	UINT8 m_nmi_mask;
 };
 
 

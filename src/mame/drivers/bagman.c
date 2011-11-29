@@ -102,12 +102,11 @@ static WRITE8_HANDLER( bagman_coin_counter_w )
 	coin_counter_w(space->machine(), offset,data);
 }
 
-static WRITE8_DEVICE_HANDLER( bagman_interrupt_w )
+static WRITE8_HANDLER( irq_mask_w )
 {
-	data &= 1;
-	if (!data)
-		device_set_input_line(device, 0, CLEAR_LINE);
-	cpu_interrupt_enable(device, data);
+	bagman_state *state = space->machine().driver_data<bagman_state>();
+
+	state->m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -118,7 +117,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagman_pal16r6_r)
 	//AM_RANGE(0xa800, 0xa805) AM_READ(bagman_ls259_r) /*just for debugging purposes*/
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("maincpu", bagman_interrupt_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, m_video_enable)
 	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
@@ -148,7 +147,7 @@ static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8 )
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, m_video_enable)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
@@ -467,13 +466,22 @@ static const tms5110_interface bagman_tms5110_interface =
 	DEVCB_NULL										/* rom clock - Only used to drive the data lines */
 };
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	bagman_state *state = device->machine().driver_data<bagman_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+
 static MACHINE_CONFIG_START( bagman, bagman_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_MACHINE_RESET(bagman)
 
@@ -510,7 +518,7 @@ static MACHINE_CONFIG_START( pickin, bagman_state )
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(pickin_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_MACHINE_RESET(bagman)
 
@@ -563,7 +571,7 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(pickin_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_MACHINE_RESET(bagman)
 

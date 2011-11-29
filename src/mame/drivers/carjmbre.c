@@ -50,11 +50,19 @@ Notes:
  *
  *************************************/
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
+
 static ADDRESS_MAP_START( carjmbre_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 //  AM_RANGE(0x8800, 0x8800) AM_READNOP         // watchdog?
-	AM_RANGE(0x8803, 0x8803) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x8803, 0x8803) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x8805, 0x8805) AM_WRITE(carjmbre_bgcolor_w)	// guessed
 	AM_RANGE(0x8806, 0x8806) AM_WRITE(carjmbre_8806_w)		// video related?
 	AM_RANGE(0x8807, 0x8807) AM_WRITE(carjmbre_flipscreen_w)
@@ -184,12 +192,20 @@ static MACHINE_RESET( carjmbre )
 	state->m_bgcolor = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	carjmbre_state *state = device->machine().driver_data<carjmbre_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(carjmbre_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_MACHINE_RESET(carjmbre)
 

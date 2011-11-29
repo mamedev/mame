@@ -56,7 +56,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 //  logerror("%04x: port c0 = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bit 0 = NMI enable */
-	interrupt_enable_w(space,0,data & 1);
+	state->m_nmi_mask = data & 1;
 
 	/* bit 1 = flip screen */
 	flip_screen_set(space->machine(), data & 0x02);

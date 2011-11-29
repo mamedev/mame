@@ -146,6 +146,13 @@ static WRITE8_HANDLER( thepit_sound_enable_w )
 	space->machine().sound().system_enable(data);
 }
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	thepit_state *state = space->machine().driver_data<thepit_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
 
 static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
@@ -157,7 +164,7 @@ static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
@@ -178,7 +185,7 @@ static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
@@ -630,13 +637,20 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	thepit_state *state = device->machine().driver_data<thepit_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_CONFIG_START( thepit, thepit_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(thepit_main_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)

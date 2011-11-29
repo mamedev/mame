@@ -276,6 +276,13 @@ static MACHINE_RESET( cclimber )
 }
 
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	cclimber_state *state = space->machine().driver_data<cclimber_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
 
 /* Note that River Patrol reads/writes to a000-a4f0. This is a bug in the code.
    The instruction at 0x0593 should say LD DE,$8000 */
@@ -294,9 +301,9 @@ static ADDRESS_MAP_START( cclimber_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_flip_screen)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(interrupt_enable_w) //used by Crazy Kong Bootleg with alt levels and speed up
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(nmi_mask_w) //used by Crazy Kong Bootleg with alt levels and speed up
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE(cclimber_sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(cclimber_sample_volume_w)
@@ -318,7 +325,7 @@ static ADDRESS_MAP_START( cannonb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(cannonb_flip_screen_w) AM_BASE_MEMBER(cclimber_state, m_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE(cclimber_sample_rate_w)
@@ -335,7 +342,7 @@ static ADDRESS_MAP_START( swimmer_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_spriteram)
 	AM_RANGE(0x98fc, 0x98ff) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_flip_screen)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_swimmer_side_background_enabled)
 	AM_RANGE(0xa004, 0xa004) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_swimmer_palettebank)
@@ -361,7 +368,7 @@ static ADDRESS_MAP_START( yamato_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_flip_screen)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
@@ -380,7 +387,7 @@ static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9880, 0x995f) AM_RAM AM_BASE_MEMBER(cclimber_state, m_spriteram)
 	AM_RANGE(0x99dc, 0x99df) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa005, 0xa006) AM_WRITE(toprollr_rombank_w)
@@ -982,7 +989,13 @@ static GFXDECODE_START( toprollr )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, cclimber_charlayout,   24*4, 16 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	cclimber_state *state = device->machine().driver_data<cclimber_state>();
 
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_CONFIG_START( root, cclimber_state )
 
@@ -990,7 +1003,7 @@ static MACHINE_CONFIG_START( root, cclimber_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(cclimber_map)
 	MCFG_CPU_IO_MAP(cclimber_portmap)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_MACHINE_RESET(cclimber)
 
@@ -1087,7 +1100,7 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	/* basic machine hardware */
     MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(swimmer_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
     MCFG_CPU_ADD("audiocpu", Z80,XTAL_4MHz/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(swimmer_audio_map)

@@ -15,6 +15,8 @@ public:
 	size_t m_nvram_size;
 	int m_display_enable;
 	tilemap_t *m_bg_tilemap;
+
+	UINT8 m_nmi_mask;
 };
 
 

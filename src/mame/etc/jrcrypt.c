@@ -16,7 +16,7 @@
 #include "emu.h"
 #include <ctype.h>
 
-static int interrupt_enable;
+static int irq_mask;
 
 typedef UINT16 word;
 typedef UINT8 byte;
@@ -398,9 +398,9 @@ void write_rom_section(char *prefix,char *suffix,int start,int end)
 }
 #endif
 
-WRITE8_HANDLER( jrpacman_interrupt_enable_w )
+WRITE8_HANDLER( jrpacman_interrupt_mask_w )
 {
-	interrupt_enable = data;
+	irq_mask = data;
 }
 
 

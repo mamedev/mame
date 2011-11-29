@@ -110,6 +110,12 @@ static WRITE8_HANDLER( pengo_coin_counter_w )
 	coin_counter_w(space->machine(), offset, data & 1);
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	pengo_state *state = space->machine().driver_data<pengo_state>();
+
+	state->m_irq_mask = data & 1;
+}
 
 static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -121,7 +127,7 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x9000, 0x903f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9040, 0x9040) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x9040, 0x9040) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE("namco", pacman_sound_enable_w)
 	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
@@ -143,7 +149,7 @@ static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
 	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
-	AM_RANGE(0x9040, 0x9040) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x9040, 0x9040) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE("namco", pacman_sound_enable_w)
 	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
@@ -359,12 +365,21 @@ static const namco_interface namco_config =
  *
  *************************************/
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	pengo_state *state = device->machine().driver_data<pengo_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+
 static MACHINE_CONFIG_START( pengo, pengo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	/* video hardware */
 	MCFG_GFXDECODE(pengo)

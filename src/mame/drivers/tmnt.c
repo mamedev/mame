@@ -180,7 +180,8 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
+			if (state->m_irq5_mask)
+				device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 			break;
 
 		default:
@@ -2326,6 +2327,15 @@ static MACHINE_RESET( common )
 	state->m_cuebrick_nvram_bank = 0;
 }
 
+/* cuebrick, mia and tmnt */
+static INTERRUPT_GEN( tmnt_vblank_irq )
+{
+	tmnt_state *state = device->machine().driver_data<tmnt_state>();
+
+	if(state->m_irq5_mask)
+		device_set_input_line(device, 5, HOLD_LINE);
+}
+
 
 static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 
@@ -2371,7 +2381,7 @@ static MACHINE_CONFIG_START( mia, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mia_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", tmnt_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(mia_audio_map)
@@ -2425,7 +2435,7 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(tmnt_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", tmnt_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(tmnt_audio_map)

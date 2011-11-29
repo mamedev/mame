@@ -26,6 +26,8 @@ public:
 
 	/* devices */
 	device_t *m_adpcm;
+
+	UINT8 m_nmi_mask;
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

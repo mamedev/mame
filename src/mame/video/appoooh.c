@@ -184,7 +184,7 @@ WRITE8_HANDLER( appoooh_out_w )
 {
 	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 	/* bit 0 controls NMI */
-	interrupt_enable_w(space,0,data & 0x01);
+	state->m_nmi_mask = data & 1;
 
 	/* bit 1 flip screen */
 	flip_screen_set(space->machine(), data & 0x02);

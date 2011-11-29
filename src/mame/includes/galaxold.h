@@ -80,6 +80,8 @@ public:
 	emu_timer *m_stars_blink_timer;
 	emu_timer *m_stars_scroll_timer;
 	struct star m_stars[STAR_COUNT];
+
+	UINT8 m_nmi_mask; /* Harem per-game specific */
 };
 
 

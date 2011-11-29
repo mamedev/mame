@@ -41,13 +41,6 @@ write
 #include "includes/marineb.h"
 
 
-static TIMER_CALLBACK( interrupt_disable )
-{
-	marineb_state *state = machine.driver_data<marineb_state>();
-	//interrupt_enable = 0;
-	cpu_interrupt_enable(state->m_maincpu, 0);
-}
-
 static MACHINE_RESET( marineb )
 {
 	marineb_state *state = machine.driver_data<marineb_state>();
@@ -57,9 +50,6 @@ static MACHINE_RESET( marineb )
 	state->m_flipscreen_x = 0;
 	state->m_flipscreen_y = 0;
 	state->m_marineb_active_low_flipscreen = 0;
-
-	/* we must start with NMI interrupts disabled */
-	machine.scheduler().synchronize(FUNC(interrupt_disable));
 }
 
 static MACHINE_RESET( springer )
@@ -81,6 +71,13 @@ static MACHINE_START( marineb )
 	state->save_item(NAME(state->m_marineb_active_low_flipscreen));
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	marineb_state *state = space->machine().driver_data<marineb_state>();
+
+	state->m_irq_mask = data & 1;
+}
+
 static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -90,7 +87,7 @@ static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(marineb_column_scroll_w)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(marineb_palette_bank_0_w)
 	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(marineb_palette_bank_1_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(marineb_flipscreen_y_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(marineb_flipscreen_x_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
@@ -530,6 +527,22 @@ static GFXDECODE_START( hopprobo )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( marineb_vblank_irq )
+{
+	marineb_state *state = device->machine().driver_data<marineb_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static INTERRUPT_GEN( wanted_vblank_irq )
+{
+	marineb_state *state = device->machine().driver_data<marineb_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
 
 static MACHINE_CONFIG_START( marineb, marineb_state )
 
@@ -537,7 +550,7 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(marineb_map)
 	MCFG_CPU_IO_MAP(marineb_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", marineb_vblank_irq)
 
 	MCFG_MACHINE_START(marineb)
 	MCFG_MACHINE_RESET(marineb)
@@ -602,7 +615,7 @@ static MACHINE_CONFIG_DERIVED( wanted, marineb )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(wanted_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", wanted_vblank_irq)
 
 	/* video hardware */
 	MCFG_GFXDECODE(wanted)

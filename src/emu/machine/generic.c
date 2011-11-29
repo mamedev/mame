@@ -676,28 +676,6 @@ void cpu_interrupt_enable(device_t *device, int enabled)
 }
 
 
-/*-------------------------------------------------
-    interrupt_enable_w - set the global interrupt
-    enable
--------------------------------------------------*/
-
-WRITE8_HANDLER( interrupt_enable_w )
-{
-	cpu_interrupt_enable(&space->device(), data);
-}
-
-
-/*-------------------------------------------------
-    interrupt_enable_r - read the global interrupt
-    enable
--------------------------------------------------*/
-
-READ8_HANDLER( interrupt_enable_r )
-{
-	return interrupt_enabled(&space->device());
-}
-
-
 
 /***************************************************************************
     INTERRUPT GENERATION CALLBACK HELPERS

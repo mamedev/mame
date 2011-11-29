@@ -143,6 +143,19 @@ static WRITE8_HANDLER( gyruss_i8039_irq_w )
 	device_set_input_line(state->m_audiocpu_2, 0, ASSERT_LINE);
 }
 
+static WRITE8_HANDLER( master_nmi_mask_w )
+{
+	gyruss_state *state = space->machine().driver_data<gyruss_state>();
+
+	state->m_master_nmi_mask = data & 1;
+}
+
+static WRITE8_HANDLER( slave_irq_mask_w )
+{
+	gyruss_state *state = space->machine().driver_data<gyruss_state>();
+
+	state->m_slave_irq_mask = data & 1;
+}
 
 static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -156,13 +169,13 @@ static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc180, 0xc180) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xc180, 0xc180) AM_WRITE(master_nmi_mask_w)
 	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE_MEMBER(gyruss_state, m_flipscreen)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w)
 	AM_RANGE(0x4000, 0x403f) AM_RAM
 	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE(gyruss_spriteram_w) AM_BASE_MEMBER(gyruss_state, m_spriteram)
 	AM_RANGE(0x4100, 0x47ff) AM_RAM
@@ -505,16 +518,32 @@ static MACHINE_START( gyruss )
 	state->m_audiocpu_2 = machine.device<cpu_device>("audio2");
 }
 
+static INTERRUPT_GEN( master_vblank_irq )
+{
+	gyruss_state *state = device->machine().driver_data<gyruss_state>();
+
+	if(state->m_master_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static INTERRUPT_GEN( slave_vblank_irq )
+{
+	gyruss_state *state = device->machine().driver_data<gyruss_state>();
+
+	if(state->m_slave_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(main_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", master_vblank_irq)
 
 	MCFG_CPU_ADD("sub", M6809, 2000000)        /* 2 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", slave_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_cpu1_map)

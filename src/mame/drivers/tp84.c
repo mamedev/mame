@@ -169,10 +169,18 @@ static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static WRITE8_HANDLER( sub_irq_mask_w )
+{
+	tp84_state *state = space->machine().driver_data<tp84_state>();
+
+	state->m_sub_irq_mask = data & 1;
+}
+
+
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
 	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irq_mask_w)
 	AM_RANGE(0x6000, 0x679f) AM_RAM
 	AM_RANGE(0x67a0, 0x67ff) AM_RAM_WRITE(tp84_spriteram_w) AM_BASE_MEMBER(tp84_state, m_spriteram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
@@ -273,6 +281,13 @@ static GFXDECODE_START( tp84 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4*8, 16*8 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( sub_vblank_irq )
+{
+	tp84_state *state = device->machine().driver_data<tp84_state>();
+
+	if(state->m_sub_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
 
 
 static MACHINE_CONFIG_START( tp84, tp84_state )
@@ -284,7 +299,7 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", sub_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)

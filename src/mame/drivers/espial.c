@@ -66,14 +66,14 @@ static MACHINE_START( espial )
 }
 
 
-static WRITE8_HANDLER( espial_master_interrupt_enable_w )
+static WRITE8_HANDLER( espial_master_interrupt_mask_w )
 {
 	espial_state *state = space->machine().driver_data<espial_state>();
 	state->m_main_nmi_enabled = ~(data & 1);
 }
 
 
-WRITE8_HANDLER( espial_sound_nmi_enable_w )
+WRITE8_HANDLER( espial_sound_nmi_mask_w )
 {
 	espial_state *state = space->machine().driver_data<espial_state>();
 	state->m_sound_nmi_enabled = data & 1;
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( espial_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
 	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch2_r, espial_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_enable_w)
+	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
 	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE_MEMBER(espial_state, m_spriteram_1)
 	AM_RANGE(0x8020, 0x803f) AM_READONLY
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
 	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch2_r, espial_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_enable_w)
+	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
 	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE_MEMBER(espial_state, m_spriteram_1)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_BASE_MEMBER(espial_state, m_videoram)
@@ -158,7 +158,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( espial_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_enable_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_mask_w)
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 

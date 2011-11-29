@@ -341,7 +341,7 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 		state->m_last = data & 0x08;
 
 		/* bit 5 = irq enable */
-		interrupt_enable_w(space, 0, data & 0x20);
+		state->m_irq5_mask = data & 0x20;
 
 		/* bit 7 = enable char ROM reading through the video RAM */
 		k052109_set_rmrd_line(state->m_k052109, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);

@@ -371,6 +371,13 @@ static GFXDECODE_START( mjkjidai )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	mjkjidai_state *state = device->machine().driver_data<mjkjidai_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 
@@ -378,7 +385,7 @@ static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 	MCFG_CPU_ADD("maincpu", Z80,10000000/2)	/* 5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(mjkjidai_map)
 	MCFG_CPU_IO_MAP(mjkjidai_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_NVRAM_HANDLER(mjkjidai)
 

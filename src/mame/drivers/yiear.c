@@ -109,11 +109,19 @@ static WRITE8_DEVICE_HANDLER( yiear_VLM5030_control_w )
 	vlm5030_rst(device, (data >> 2) & 1);
 }
 
+static INTERRUPT_GEN( yiear_vblank_interrupt )
+{
+	yiear_state *state = device->machine().driver_data<yiear_state>();
+
+	if (state->m_yiear_irq_enable)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+
 static INTERRUPT_GEN( yiear_nmi_interrupt )
 {
 	yiear_state *state = device->machine().driver_data<yiear_state>();
 
-	/* can't use nmi_line_pulse() because interrupt_enable_w() effects it */
 	if (state->m_yiear_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -261,7 +269,7 @@ static MACHINE_CONFIG_START( yiear, yiear_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", yiear_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT(yiear_nmi_interrupt,480)	/* music tempo (correct frequency unknown) */
 
 	MCFG_MACHINE_START(yiear)

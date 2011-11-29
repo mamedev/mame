@@ -120,6 +120,12 @@ static WRITE8_DEVICE_HANDLER( mario_z80dma_rdy_w )
 	z80dma_rdy_w(device, data & 0x01);
 }
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	mario_state *state = space->machine().driver_data<mario_state>();
+
+	state->m_nmi_mask = data & 1;
+}
 
 /*************************************
  *
@@ -138,7 +144,7 @@ static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
-	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", mario_z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f07) AM_WRITE(mario_sh3_w) /* Sound port */
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")	/* DSW */
@@ -158,7 +164,7 @@ static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
-	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", mario_z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f00) AM_WRITE(masao_sh_irqtrigger_w)
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")	/* DSW */
@@ -317,13 +323,21 @@ GFXDECODE_END
  *
  *************************************/
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	mario_state *state = device->machine().driver_data<mario_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( mario_base, mario_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, Z80_CLOCK)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mario_map)
 	MCFG_CPU_IO_MAP(mario_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	/* devices */
 	MCFG_Z80DMA_ADD("z80dma", Z80_CLOCK, mario_dma)

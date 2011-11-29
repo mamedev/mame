@@ -80,7 +80,7 @@ WRITE8_HANDLER( yiear_control_w )
 	state->m_yiear_nmi_enable = data & 0x02;
 
 	/* bit 2 is IRQ enable */
-	interrupt_enable_w(space, 0, data & 0x04);
+	state->m_yiear_irq_enable = data & 0x04;
 
 	/* bits 3 and 4 are coin counters */
 	coin_counter_w(space->machine(), 0, data & 0x08);

@@ -15,6 +15,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_spriteram;
 	UINT8 *m_spriteram2;
+	UINT8 m_nmi_mask;
 };
 
 

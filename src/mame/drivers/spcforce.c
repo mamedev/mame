@@ -28,6 +28,8 @@ driver by Zsolt Vasvari
 a000-a3ff   R/W X/Y scroll position of each character (can be scrolled up
                 to 7 pixels in each direction)
 
+TODO:
+- fix cliprect for sprites that goes out of screen if possible
 
 ***************************************************************************/
 
@@ -79,6 +81,12 @@ static WRITE8_HANDLER( spcforce_soundtrigger_w )
 	cputag_set_input_line(space->machine(), "audiocpu", 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	spcforce_state *state = space->machine().driver_data<spcforce_state>();
+
+	state->m_irq_mask = data & 1;
+}
 
 static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -87,7 +95,7 @@ static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7001, 0x7001) AM_READ_PORT("P1") AM_WRITE(spcforce_soundtrigger_w)
 	AM_RANGE(0x7002, 0x7002) AM_READ_PORT("P2")
 	AM_RANGE(0x700b, 0x700b) AM_WRITE(spcforce_flip_screen_w)
-	AM_RANGE(0x700e, 0x700e) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x700e, 0x700e) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITENOP
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_MEMBER(spcforce_state, m_videoram)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(spcforce_state, m_colorram)
@@ -237,6 +245,13 @@ static PALETTE_INIT( spcforce )
 	}
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	spcforce_state *state = device->machine().driver_data<spcforce_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 3, HOLD_LINE);
+}
 
 static MACHINE_CONFIG_START( spcforce, spcforce_state )
 
@@ -244,7 +259,7 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
 	MCFG_CPU_ADD("maincpu", I8085A, 8000000 * 2)        /* 4.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(spcforce_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8035, 6144000)		/* divisor ??? */
 	MCFG_CPU_PROGRAM_MAP(spcforce_sound_map)

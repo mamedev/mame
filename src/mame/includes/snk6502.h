@@ -29,6 +29,8 @@ public:
 	tilemap_t *m_fg_tilemap;
 
 	rgb_t m_palette[64];
+
+	UINT8 m_irq_mask;
 };
 
 

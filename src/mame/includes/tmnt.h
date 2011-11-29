@@ -58,6 +58,8 @@ public:
 
 	/* memory buffers */
 	INT16      m_sampledata[0x40000];
+
+	UINT8      m_irq5_mask;
 };
 
 

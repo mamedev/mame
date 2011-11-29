@@ -58,6 +58,8 @@ public:
 	size_t	m_spriteram_size;
 	tilemap_t *m_bg_tilemap;
 	int m_monitor;
+
+	UINT8   m_nmi_mask;
 };
 
 /*----------- defined in video/mario.c -----------*/

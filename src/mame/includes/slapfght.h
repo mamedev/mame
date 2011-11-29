@@ -52,6 +52,7 @@ public:
 	int m_slapfight_palette_bank;
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_fix_tilemap;
+	UINT8 m_irq_mask;
 };
 
 

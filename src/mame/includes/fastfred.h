@@ -28,6 +28,9 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_web_tilemap;
+
+	UINT8 m_nmi_mask;
+	UINT8 m_sound_nmi_mask;
 };
 
 

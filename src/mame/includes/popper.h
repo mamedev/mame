@@ -30,6 +30,8 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+
+	UINT8 m_nmi_mask;
 };
 
 

@@ -30,6 +30,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	UINT8 m_nmi_mask;
 };
 
 

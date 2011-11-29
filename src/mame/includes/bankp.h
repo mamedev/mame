@@ -26,6 +26,8 @@ public:
 	tilemap_t *m_fg_tilemap;
 	int     m_scroll_x;
 	int     m_priority;
+
+	UINT8 m_nmi_mask;
 };
 
 

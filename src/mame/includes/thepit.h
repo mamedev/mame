@@ -18,6 +18,7 @@ public:
 	tilemap_t *m_solid_tilemap;
 	tilemap_t *m_tilemap;
 	UINT8 *m_dummy_tile;
+	UINT8 m_nmi_mask;
 };
 
 

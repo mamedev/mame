@@ -19,6 +19,7 @@ public:
 	UINT8 m_yamato_p0;
 	UINT8 m_yamato_p1;
 	UINT8 m_toprollr_rombank;
+	UINT8 m_nmi_mask;
 	tilemap_t *m_pf_tilemap;
 	tilemap_t *m_bs_tilemap;
 	tilemap_t *m_toproller_bg_tilemap;

@@ -76,12 +76,18 @@ static WRITE8_HANDLER( megazone_coin_counter_w )
 	coin_counter_w(space->machine(), 1 - offset, data);		/* 1-offset, because coin counters are in reversed order */
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	megazone_state *state = space->machine().driver_data<megazone_state>();
+
+	state->m_irq_mask = data & 1;
+}
 
 
 static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(megazone_coin_counter_w) /* coin counter 2, coin counter 1 */
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(megazone_flipscreen_w)
-	AM_RANGE(0x0007, 0x0007) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x0007, 0x0007) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE_MEMBER(megazone_state, m_scrolly)
 	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_BASE_MEMBER(megazone_state, m_scrollx)
@@ -244,12 +250,21 @@ static MACHINE_RESET( megazone )
 	state->m_i8039_status = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	megazone_state *state = device->machine().driver_data<megazone_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+
 static MACHINE_CONFIG_START( megazone, megazone_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 18432000/9)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(megazone_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)     /* Z80 Clock is derived from the H1 signal */
 	MCFG_CPU_PROGRAM_MAP(megazone_sound_map)

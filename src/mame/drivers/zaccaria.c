@@ -251,12 +251,12 @@ static WRITE8_HANDLER( coin_w )
 	coin_counter_w(space->machine(), 0,data & 1);
 }
 
-static WRITE8_HANDLER( nmienable_w )
+static WRITE8_HANDLER( nmi_mask_w )
 {
-	interrupt_enable_w(space,0,data & 1);
+	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
+
+	state->m_nmi_mask = data & 1;
 }
-
-
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6c01, 0x6c01) AM_WRITE(zaccaria_flip_screen_y_w)
 	AM_RANGE(0x6c02, 0x6c02) AM_WRITENOP    /* sound reset */
 	AM_RANGE(0x6c06, 0x6c06) AM_WRITE(coin_w)
-	AM_RANGE(0x6c07, 0x6c07) AM_WRITE(nmienable_w)
+	AM_RANGE(0x6c07, 0x6c07) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x6c00, 0x6c07) AM_READ(zaccaria_prot2_r)
 	AM_RANGE(0x6e00, 0x6e00) AM_READWRITE(zaccaria_dsw_r, sound_command_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
@@ -577,6 +577,13 @@ static const tms5220_interface tms5220_config =
 	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, ca2_w)		/* READYQ handler */
 };
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	zaccaria_state *state = device->machine().driver_data<zaccaria_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 
 static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
@@ -584,7 +591,7 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */

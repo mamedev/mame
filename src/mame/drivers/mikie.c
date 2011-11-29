@@ -83,6 +83,13 @@ static WRITE8_HANDLER( mikie_coin_counter_w )
 	coin_counter_w(space->machine(), offset, data);
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	mikie_state *state = space->machine().driver_data<mikie_state>();
+
+	state->m_irq_mask = data & 1;
+}
+
 /*************************************
  *
  *  Address maps
@@ -94,7 +101,7 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2001) AM_WRITE(mikie_coin_counter_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(mikie_sh_irqtrigger_w)
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(mikie_flipscreen_w)
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x2007, 0x2007) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x2100, 0x2100) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(mikie_palettebank_w)
 	AM_RANGE(0x2300, 0x2300) AM_WRITENOP	// ???
@@ -244,12 +251,20 @@ static MACHINE_RESET( mikie )
 	state->m_last_irq = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	mikie_state *state = device->machine().driver_data<mikie_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( mikie, mikie_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, OSC/12)
 	MCFG_CPU_PROGRAM_MAP(mikie_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CLK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

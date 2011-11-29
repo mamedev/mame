@@ -268,6 +268,7 @@ PALETTE_INIT( satansat )
 
 WRITE8_HANDLER( satansat_b002_w )
 {
+	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 	/* bit 0 flips screen */
 
 	if (flip_screen_get(space->machine()) != (data & 0x01))
@@ -276,11 +277,8 @@ WRITE8_HANDLER( satansat_b002_w )
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
-	/* bit 1 enables interrups */
-	/* it controls only IRQs, not NMIs. Here I am affecting both, which */
-	/* is wrong. */
-
-	interrupt_enable_w(space,0,data & 0x02);
+	/* bit 1 enables interrupts */
+	state->m_irq_mask = data & 2;
 
 	/* other bits unused */
 }

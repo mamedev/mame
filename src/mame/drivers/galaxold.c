@@ -762,13 +762,20 @@ static ADDRESS_MAP_START( ozon1_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
+static WRITE8_HANDLER( harem_nmi_mask_w )
+{
+	galaxold_state *state = space->machine().driver_data<galaxold_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
 static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
-	AM_RANGE(0x5800, 0x5800) AM_READNOP AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x5800, 0x5800) AM_READNOP AM_WRITE(harem_nmi_mask_w)
 	AM_RANGE(0x5801, 0x5807) AM_WRITENOP
 	AM_RANGE(0x6101, 0x6101) AM_READ_PORT("IN0")
 	AM_RANGE(0x6102, 0x6102) AM_READ_PORT("IN1")
@@ -2335,12 +2342,20 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	galaxold_state *state = device->machine().driver_data<galaxold_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_DERIVED( harem, galaxold_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(harem_cpu1)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 1620000) //?
 	MCFG_CPU_PROGRAM_MAP(harem_cpu2)
@@ -2892,13 +2907,13 @@ ROM_END
 ROM_START( harem )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p0_ic85.bin",  0x0000, 0x2000, CRC(4521b753) SHA1(9033f9c3be8fec1e5ff251e9f60faaf3848a1a1e) )
-	ROM_LOAD( "p1_ic87.bin",  0x8000, 0x2000, BAD_DUMP CRC(3cc5d1e8) SHA1(827e2d20de2a00ec016ead249ed3afdccd0c856c) )
+	ROM_LOAD( "p1_ic87.bin",  0x8000, 0x2000, BAD_DUMP CRC(3cc5d1e8) SHA1(827e2d20de2a00ec016ead249ed3afdccd0c856c) ) // encrypted?
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s1_ic12.bin",  0x0000, 0x2000, CRC(b54799dd) SHA1(b6aeb010257cba48a52afd33b4f8031c7d99550c) )
 	ROM_LOAD( "s2_ic13.bin",  0x2000, 0x1000, CRC(2d5573a4) SHA1(1fdcd99d89e078509634742b2116a35bb199fe4b) )
 
-	ROM_REGION( 0x2000, "unknown", 0 )
+	ROM_REGION( 0x2000, "unknown", 0 ) /* TMS-based ROM? */
 	ROM_LOAD( "a1_ic25.bin",  0x0000, 0x2000, CRC(279f923a) SHA1(166b1b625997766f0de7cc18af52c42268022fcb) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )

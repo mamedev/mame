@@ -166,6 +166,20 @@ static READ8_HANDLER( imago_sprites_offset_r )
 	return 0xff; //not really used
 }
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
+static WRITE8_HANDLER( sound_nmi_mask_w )
+{
+	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+
+	state->m_sound_nmi_mask = data & 1;
+}
+
 static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -176,7 +190,7 @@ static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_BASE_MEMBER(fastfred_state, m_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(fastfred_charbank1_w)
@@ -202,7 +216,7 @@ static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // Unused, but initialized
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(fastfred_charbank1_w)
@@ -231,7 +245,7 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP // writes 1 when level starts, 0 when game over
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(imago_dma_irq_w)
@@ -246,7 +260,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r, interrupt_enable_w)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r, sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY  // Reset PSG's
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay8910.2", ay8910_address_data_w)
@@ -618,17 +632,32 @@ GFXDECODE_END
 
 #define CLOCK 18432000  /* The crystal is 18.432MHz */
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	fastfred_state *state = device->machine().driver_data<fastfred_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static INTERRUPT_GEN( sound_timer_irq )
+{
+	fastfred_state *state = device->machine().driver_data<fastfred_state>();
+
+	if(state->m_sound_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_CONFIG_START( fastfred, fastfred_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK/6)     /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(fastfred_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CLOCK/12)	 /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,4*60)
+	MCFG_CPU_PERIODIC_INT(sound_timer_irq,4*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

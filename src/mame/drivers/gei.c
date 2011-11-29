@@ -85,6 +85,7 @@ public:
 	int m_yadd;
 	int m_signature_answer;
 	int m_signature_pos;
+	UINT8 m_nmi_mask;
 };
 
 
@@ -157,6 +158,7 @@ static WRITE8_DEVICE_HANDLER( lamps_w )
 static WRITE8_DEVICE_HANDLER( sound_w )
 {
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	gei_state *state = space->machine().driver_data<gei_state>();
 
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	coin_lockout_global_w(device->machine(), ~data & 0x08);
@@ -166,7 +168,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	ticket_dispenser_w(device->machine().device("ticket"), 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(space, 0, data & 0x40);
+	state->m_nmi_mask = data & 0x40;
 
 	/* bit 7 goes directly to the sound amplifier */
 	dac_data_w(device->machine().device("dac"), ((data & 0x80) >> 7) * 255);
@@ -198,12 +200,13 @@ static WRITE8_DEVICE_HANDLER( lamps2_w )
 static WRITE8_DEVICE_HANDLER( nmi_w )
 {
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	gei_state *state = space->machine().driver_data<gei_state>();
 
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	set_led_status(device->machine(), 8,data & 0x10);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(space, 0, data & 0x40);
+	state->m_nmi_mask = data & 0x40;
 }
 
 static READ8_HANDLER( catchall )
@@ -1063,10 +1066,19 @@ static const ppi8255_interface findout_ppi8255_intf[2] =
 	}
 };
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	gei_state *state = device->machine().driver_data<gei_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
 static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(getrivia_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

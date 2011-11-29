@@ -320,6 +320,24 @@ static MACHINE_RESET( gng )
 	state->m_scrollx[1] = 0;
 	state->m_scrolly[0] = 0;
 	state->m_scrolly[1] = 0;
+
+	{
+		int i;
+
+		/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
+	             For now let's fill everything with white colors until we have better info about it */
+		for(i=0;i<0x100;i+=4)
+		{
+			machine.generic.paletteram.u8[i] = machine.generic.paletteram2.u8[i] = 0x00;
+			machine.generic.paletteram.u8[i+1] = machine.generic.paletteram2.u8[i+1] = 0x55;
+			machine.generic.paletteram.u8[i+2] = machine.generic.paletteram2.u8[i+2] = 0xaa;
+			machine.generic.paletteram.u8[i+3] = machine.generic.paletteram2.u8[i+3] = 0xff;
+			palette_set_color_rgb(machine,i+0,0x00,0x00,0x00);
+			palette_set_color_rgb(machine,i+1,0x55,0x55,0x55);
+			palette_set_color_rgb(machine,i+2,0xaa,0xaa,0xaa);
+			palette_set_color_rgb(machine,i+3,0xff,0xff,0xff);
+		}
+	}
 }
 
 static MACHINE_CONFIG_START( gng, gng_state )

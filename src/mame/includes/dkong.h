@@ -138,6 +138,7 @@ public:
 #endif
 	/* machine states */
 	UINT8	            m_hardware_type;
+	UINT8				m_nmi_mask;
 
 	/* sound state */
 	const UINT8       *m_snd_rom;

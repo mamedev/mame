@@ -78,6 +78,12 @@ static WRITE8_HANDLER( pbaction_sh_command_w )
 	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0x00);
 }
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	pbaction_state *state = space->machine().driver_data<pbaction_state>();
+
+	state->m_nmi_mask = data & 1;
+}
 
 static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -89,7 +95,7 @@ static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE_MEMBER(pbaction_state, m_colorram)
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_MEMBER(pbaction_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1") AM_WRITE(pbaction_flipscreen_w)
@@ -269,12 +275,20 @@ static MACHINE_RESET( pbaction )
 	state->m_scroll = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	pbaction_state *state = device->machine().driver_data<pbaction_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( pbaction, pbaction_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(pbaction_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
 	MCFG_CPU_PROGRAM_MAP(pbaction_sound_map)

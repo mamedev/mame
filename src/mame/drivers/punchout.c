@@ -341,6 +341,12 @@ static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_top_videoram)
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	punchout_state *state = space->machine().driver_data<punchout_state>();
+
+	state->m_nmi_mask = data & 1;
+}
 
 static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -352,7 +358,7 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_data_w)	/* VLM5030 */
 //  AM_RANGE(0x05, 0x05) AM_WRITENOP  /* unused */
 //  AM_RANGE(0x06, 0x06) AM_WRITENOP
-	AM_RANGE(0x08, 0x08) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x09, 0x09) AM_WRITENOP	/* watchdog reset, seldom used because 08 clears the watchdog as well */
 	AM_RANGE(0x0a, 0x0a) AM_WRITENOP	/* ?? */
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
@@ -923,6 +929,15 @@ static MACHINE_RESET( punchout )
 	memset(state->m_rp5c01_mem, 0, sizeof(state->m_rp5c01_mem));
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	punchout_state *state = device->machine().driver_data<punchout_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
 
 static MACHINE_CONFIG_START( punchout, punchout_state )
 
@@ -930,7 +945,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(punchout_map)
 	MCFG_CPU_IO_MAP(punchout_io_map)
-	MCFG_CPU_VBLANK_INT("top", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("top", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", N2A03, N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)

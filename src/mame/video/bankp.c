@@ -129,7 +129,7 @@ WRITE8_HANDLER( bankp_out_w )
 	/* bits 2-3 unknown (2 is used) */
 
 	/* bit 4 controls NMI */
-	interrupt_enable_w(space, 0, (data & 0x10) >> 4);
+	state->m_nmi_mask = (data & 0x10) >> 4;
 
 	/* bit 5 controls screen flip */
 	flip_screen_set(space->machine(), data & 0x20);

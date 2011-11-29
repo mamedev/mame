@@ -765,6 +765,12 @@ static WRITE8_DEVICE_HANDLER( dkong_z80dma_rdy_w )
 	z80dma_rdy_w(device, data & 0x01);
 }
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	dkong_state *state = space->machine().driver_data<dkong_state>();
+
+	state->m_nmi_mask = data & 1;
+}
 
 /*************************************
  *
@@ -788,7 +794,7 @@ static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8 )
     AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
-    AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+    AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
     AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE("dma8257", p8257_drq_w)        		/* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
@@ -812,7 +818,7 @@ static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8 )
     AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
-    AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+    AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
     AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE("dma8257", p8257_drq_w)        /* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
     AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE("ls259.5h", latch8_bit0_w)     /* latch for sound and signals above*/
@@ -836,7 +842,7 @@ static ADDRESS_MAP_START( dkong3_map, AS_PROGRAM, 8 )
     AM_RANGE(0x7e81, 0x7e81) AM_WRITE(dkong3_gfxbank_w)
     AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)                 /* 2 PSL Signal */
-    AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
+    AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
     AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", dkong_z80dma_rdy_w)  /* ==> DMA Chip */
     AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
     AM_RANGE(0x8000, 0x9fff) AM_ROM                                       /* DK3 and bootleg DKjr only */
@@ -1660,12 +1666,20 @@ static void braze_decrypt_rom(running_machine &machine, UINT8 *dest)
  *
  *************************************/
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	dkong_state *state = device->machine().driver_data<dkong_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( dkong_base, dkong_state )
 
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
     MCFG_CPU_PROGRAM_MAP(dkong_map)
-    MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+    MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
     MCFG_MACHINE_START(dkong2b)
     MCFG_MACHINE_RESET(dkong)
@@ -1730,7 +1744,7 @@ static MACHINE_CONFIG_START( dkong3, dkong_state )
     MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) /* verified in schematics */
     MCFG_CPU_PROGRAM_MAP(dkong3_map)
     MCFG_CPU_IO_MAP(dkong3_io_map)
-    MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+    MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
     MCFG_MACHINE_START(dkong3)
 

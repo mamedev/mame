@@ -254,23 +254,32 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( sound_irq_mask_w )
+{
+	wiz_state *state = space->machine().driver_data<wiz_state>();
+
+	state->m_sound_irq_mask = data & 1;
+}
+
+
+/* TODO: clean this up! */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,sound_irq_mask_w)	/* Stinger/Scion */
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("8910.3", ay8910_address_data_w)
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_address_data_w)				/* Wiz only */
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Wiz */
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_address_data_w)	/* Wiz only */
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,sound_irq_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,sound_irq_mask_w)	/* Stinger/Scion */
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_address_data_w)				/* Wiz only */
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Wiz */
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_address_data_w)	/* Wiz only */
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,sound_irq_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
 
@@ -705,6 +714,15 @@ static INTERRUPT_GEN( wiz_vblank_irq )
 		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
+static INTERRUPT_GEN( sound_timer_irq )
+{
+	wiz_state *state = device->machine().driver_data<wiz_state>();
+
+	if(state->m_sound_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+
 static MACHINE_CONFIG_START( wiz, wiz_state )
 
 	/* basic machine hardware */
@@ -714,7 +732,7 @@ static MACHINE_CONFIG_START( wiz, wiz_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,4*60)	/* ??? */
+	MCFG_CPU_PERIODIC_INT(sound_timer_irq,4*60)	/* ??? */
 
 	MCFG_MACHINE_RESET( wiz )
 

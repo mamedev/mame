@@ -46,6 +46,8 @@ public:
 	device_t *m_maincpu;
 	device_t *m_ay1;
 	device_t *m_ay2;
+
+	UINT8    m_nmi_mask;
 };
 
 

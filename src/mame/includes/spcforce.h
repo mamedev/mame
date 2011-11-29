@@ -10,6 +10,8 @@ public:
 
 	int m_sn76496_latch;
 	int m_sn76496_select;
+
+	UINT8 m_irq_mask;
 };
 
 

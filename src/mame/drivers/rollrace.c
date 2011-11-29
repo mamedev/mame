@@ -22,6 +22,21 @@ static WRITE8_HANDLER( ra_fake_d800_w )
 /*  logerror("d900: %02X\n",data);*/
 }
 
+static WRITE8_HANDLER( nmi_mask_w )
+{
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
+static WRITE8_HANDLER( sound_nmi_mask_w )
+{
+	rollrace_state *state = space->machine().driver_data<rollrace_state>();
+
+	state->m_sound_nmi_mask = data & 1;
+}
+
+
 static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM			 /* only rollace2 */
@@ -41,7 +56,7 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(rollrace_flipx_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xfc02, 0xfc03) AM_WRITENOP /* coin counters */
 	AM_RANGE(0xfc04, 0xfc05) AM_WRITE(rollrace_charbank_w)
 	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(rollrace_spritebank_w)
@@ -51,7 +66,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w) /* TODO: check me ... */
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_address_data_w)
@@ -195,16 +210,32 @@ static GFXDECODE_START( rollrace )
 	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,	0,	32 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	rollrace_state *state = device->machine().driver_data<rollrace_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static INTERRUPT_GEN( sound_timer_irq )
+{
+	rollrace_state *state = device->machine().driver_data<rollrace_state>();
+
+	if(state->m_sound_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( rollrace, rollrace_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,4*60)
+	MCFG_CPU_PERIODIC_INT(sound_timer_irq,4*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -13,6 +13,8 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+
+	UINT8    m_irq_mask;
 };
 
 /*----------- defined in video/rocnrope.c -----------*/

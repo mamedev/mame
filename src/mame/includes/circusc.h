@@ -31,6 +31,8 @@ public:
 	device_t *m_sn2;
 	device_t *m_dac;
 	device_t *m_discrete;
+
+	UINT8          m_irq_mask;
 };
 
 

@@ -27,6 +27,7 @@ public:
 	int      m_palette_pen;
 	UINT8    m_soundstate;
 	UINT8    m_adpcm;
+	UINT8    m_nmi_mask;
 };
 
 

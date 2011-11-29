@@ -22,6 +22,9 @@ public:
 	/* devices */
 	cpu_device *m_audiocpu;
 	cpu_device *m_audiocpu_2;
+
+	UINT8	   m_master_nmi_mask;
+	UINT8      m_slave_irq_mask;
 };
 
 

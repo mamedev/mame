@@ -29,6 +29,7 @@ public:
 	UINT8 m_bgpriority;
 	int m_xoffsethack;
 	UINT8 m_inv_spr;
+	UINT8 m_irq_mask;
 };
 
 
