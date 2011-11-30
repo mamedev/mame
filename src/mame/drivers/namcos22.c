@@ -1156,7 +1156,6 @@
 
 
 #define MCU_SPEEDUP 		1					/* mcu idle skipping */
-#define DSP_SERIAL_SPEEDUP	1					/* lower DSP serial I/O period */
 
 /**
  * helper function used to read a byte from a chunk of 32 bit memory
@@ -1683,12 +1682,6 @@ static WRITE16_HANDLER( master_external_ram_w )
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	COMBINE_DATA( &state->m_mpMasterExternalRAM[offset] );
 }
-
-#if DSP_SERIAL_SPEEDUP
-#define SERIAL_IO_PERIOD VTOTAL
-#else
-#define SERIAL_IO_PERIOD 1
-#endif
 
 static WRITE16_HANDLER( slave_serial_io_w )
 {
