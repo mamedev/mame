@@ -44,9 +44,12 @@
 
 
 #define MAX_DEVICES 65536
+#define MAX_IGNORE  512
 
 static const char *devlist[MAX_DEVICES];
 static int devcount;
+static const char *ignorelst[MAX_IGNORE];
+static int ignorecount;
 
 
 //-------------------------------------------------
@@ -61,6 +64,20 @@ int sort_callback(const void *elem1, const void *elem2)
 	return strcmp(*item1, *item2);
 }
 
+//-------------------------------------------------
+//  isignored - return info if item is in ignore
+//  list or not
+//-------------------------------------------------
+
+bool isignored(const char *drivname)
+{
+	if (ignorecount>0) {
+		for(int i=0;i<ignorecount;i++) {
+			if (strcmp(ignorelst[i],drivname)==0) return true;
+		}
+	}
+	return false;
+}
 
 //-------------------------------------------------
 //  parse_file - parse a single file, may be
@@ -143,6 +160,21 @@ int parse_file(const char *srcfile)
 			parse_file(filename);
 			continue;
 		}
+		if (c == '!')
+		{
+			char drivname[256];
+			drivname[0] = 0;
+			for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(drivname) - 1 && !isspace(*srcptr); pos++)
+			{
+				drivname[pos] = *srcptr++;
+				drivname[pos+1] = 0;
+			}
+			fprintf(stderr, "Place device '%s' to ignore list\n", drivname);
+			char *name = (char *)malloc(strlen(drivname) + 1);
+			strcpy(name, drivname);
+			ignorelst[ignorecount++] = name;
+			continue;
+		}
 
 		// otherwise treat as a device name
 		char drivname[32];
@@ -164,9 +196,12 @@ int parse_file(const char *srcfile)
 		}
 
 		// add it to the list
-		char *name = (char *)malloc(strlen(drivname) + 1);
-		strcpy(name, drivname);
-		devlist[devcount++] = name;
+		if(!isignored(drivname))
+		{
+			char *name = (char *)malloc(strlen(drivname) + 1);
+			strcpy(name, drivname);
+			devlist[devcount++] = name;
+		}
 	}
 
 	osd_free(buffer);
