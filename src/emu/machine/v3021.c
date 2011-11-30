@@ -28,7 +28,7 @@ const device_type v3021 = &device_creator<v3021_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  rtc9701_device - constructor
+//  v3021_device - constructor
 //-------------------------------------------------
 
 v3021_device::v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __v3021DEV_H__
-#define __v3021DEV_H__
+#ifndef __xxxDEV_H__
+#define __xxxDEV_H__
 
 
 
@@ -19,52 +19,36 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_V3021_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, v3021, XTAL_32_768kHz) \
+#define MCFG_XXX_ADD(_tag,_freq) \
+	MCFG_DEVICE_ADD(_tag, xxx, _freq) \
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef struct
-{
-	UINT8 sec, min, hour, day, wday, month, year;
-} rtc_regs_t;
-
-
 // ======================> v3021_device
 
-class v3021_device :	public device_t
+class xxx_device :	public device_t
 {
 public:
 	// construction/destruction
-	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	void timer_callback();
 
 protected:
 	// device-level overrides
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual void device_start();
 	virtual void device_reset();
-
-	inline UINT8 rtc_read(UINT8 offset);
-	inline void rtc_write(UINT8 offset,UINT8 data);
-
-	static TIMER_CALLBACK( rtc_inc_callback );
-
-	UINT8 m_cal_mask,m_cal_com,m_cal_cnt,m_cal_val;
-
-	rtc_regs_t m_rtc;
 };
 
 
 // device type definition
-extern const device_type v3021;
+extern const device_type xxx;
 
 
 
