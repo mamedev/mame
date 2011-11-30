@@ -127,10 +127,10 @@ static CUSTOM_INPUT( champbas_watchdog_bit2 )
 static WRITE8_HANDLER( irq_enable_w )
 {
 	champbas_state *state = space->machine().driver_data<champbas_state>();
-	int bit = data & 1;
 
-	cpu_interrupt_enable(state->m_maincpu, bit);
-	if (!bit)
+	state->m_irq_mask = data & 1;
+
+	if (!state->m_irq_mask)
 		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
@@ -596,13 +596,21 @@ static MACHINE_RESET( champbas )
 	state->m_gfx_bank = 0;	// talbot has only 1 bank
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	champbas_state *state = device->machine().driver_data<champbas_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, ASSERT_LINE);
+}
+
 
 static MACHINE_CONFIG_START( talbot, champbas_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(talbot_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	/* MCU */
 	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
@@ -639,7 +647,7 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
@@ -691,7 +699,7 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_sub_map)
@@ -749,7 +757,7 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(exctsccrb_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)

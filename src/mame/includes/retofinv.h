@@ -25,6 +25,9 @@ public:
 	int m_bg_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+
+	UINT8 m_main_irq_mask;
+	UINT8 m_sub_irq_mask;
 };
 
 

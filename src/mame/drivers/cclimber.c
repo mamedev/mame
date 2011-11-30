@@ -256,21 +256,12 @@ static WRITE8_HANDLER(toprollr_rombank_w)
 		memory_set_bank(space->machine(), "bank1", state->m_toprollr_rombank);
 }
 
-
-static TIMER_CALLBACK( disable_interrupts )
-{
-	cpu_interrupt_enable(machine.device("maincpu"), 0);
-}
-
-
 static MACHINE_RESET( cclimber )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
-	/* Disable interrupts, River Patrol / Silver Land needs this */
 
-	/* we must do this on a timer in order to have it take effect */
-	/* otherwise, the reset process will override our changes */
-	machine.scheduler().synchronize(FUNC(disable_interrupts));
+	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
+	state->m_nmi_mask = 0;
 
 	state->m_toprollr_rombank = 0;
 }

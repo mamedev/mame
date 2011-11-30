@@ -235,7 +235,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 			break;
 
 		case 0x01:	/* INT ON */
-			cpu_interrupt_enable(state->m_maincpu, bit);
+			state->m_main_irq_mask = bit;
 			if (!bit)
 				device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 			break;
@@ -281,7 +281,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x01:	/* INTST */
-			cpu_interrupt_enable(state->m_maincpu, bit);
+			state->m_main_irq_mask = bit;
 			break;
 
 		case 0x02:	/* MUT */
@@ -894,13 +894,29 @@ static MACHINE_RESET( rallyx )
 	state->m_stars_enable = 0;
 }
 
+static INTERRUPT_GEN( rallyx_vblank_irq )
+{
+	rallyx_state *state = device->machine().driver_data<rallyx_state>();
+
+	if(state->m_main_irq_mask)
+		device_set_input_line(device, 0, ASSERT_LINE);
+}
+
+static INTERRUPT_GEN( jungler_vblank_irq )
+{
+	rallyx_state *state = device->machine().driver_data<rallyx_state>();
+
+	if(state->m_main_irq_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( rallyx, rallyx_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(rallyx_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", rallyx_vblank_irq)
 
 	MCFG_MACHINE_START(rallyx)
 	MCFG_MACHINE_RESET(rallyx)
@@ -940,7 +956,7 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(jungler_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", jungler_vblank_irq)
 
 	MCFG_MACHINE_START(rallyx)
 	MCFG_MACHINE_RESET(rallyx)

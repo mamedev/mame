@@ -17,6 +17,8 @@ public:
 	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_row_scroll;
+
+	UINT8 m_irq_mask;
 };
 
 

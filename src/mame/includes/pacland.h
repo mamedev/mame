@@ -15,6 +15,8 @@ public:
 	UINT32 *m_transmask[3];
 	UINT16 m_scroll0;
 	UINT16 m_scroll1;
+	UINT8 m_main_irq_mask;
+	UINT8 m_mcu_irq_mask;
 };
 
 

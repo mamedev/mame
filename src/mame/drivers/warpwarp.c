@@ -290,8 +290,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 			coin_counter_w(space->machine(), 0,data & 1);
 			break;
 		case 6:
-			state->m_ball_on = data & 1;
-			cpu_interrupt_enable(space->machine().device("maincpu"), data & 1);
+			state->m_ball_on = state->m_irq_mask = data & 1;
 			if (~data & 1)
 				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			break;
@@ -715,6 +714,13 @@ static GFXDECODE_START( color )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256 )
 GFXDECODE_END
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	warpwarp_state *state = device->machine().driver_data<warpwarp_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
 
 
 static MACHINE_CONFIG_START( geebee, warpwarp_state )
@@ -723,7 +729,7 @@ static MACHINE_CONFIG_START( geebee, warpwarp_state )
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(geebee_map)
 	MCFG_CPU_IO_MAP(geebee_port_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

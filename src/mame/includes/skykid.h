@@ -13,6 +13,8 @@ public:
 	UINT8 m_priority;
 	UINT16 m_scroll_x;
 	UINT16 m_scroll_y;
+	UINT8 m_main_irq_mask;
+	UINT8 m_mcu_irq_mask;
 };
 
 

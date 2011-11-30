@@ -32,6 +32,8 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_mcu;
+
+	UINT8          m_irq_mask;
 };
 
 

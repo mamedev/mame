@@ -32,6 +32,8 @@ public:
 	tilemap_t *m_tx_tilemap;
 	int m_chacl;
 	UINT16 m_scroll;
+	UINT8 m_main_irq_mask;
+	UINT8 m_sub_irq_mask;
 };
 
 

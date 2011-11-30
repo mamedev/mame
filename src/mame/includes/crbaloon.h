@@ -21,6 +21,7 @@ public:
 	UINT16 m_collision_address;
 	UINT8 m_collision_address_clear;
 	tilemap_t *m_bg_tilemap;
+	UINT8 m_irq_mask;
 };
 
 

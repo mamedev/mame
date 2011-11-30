@@ -737,44 +737,43 @@ static WRITE8_HANDLER( bosco_flip_screen_w )
 static WRITE8_HANDLER( bosco_latch_w )
 {
 	galaga_state *state = space->machine().driver_data<galaga_state>();
-	int bit = data & 1;
 
 	switch (offset)
 	{
 		case 0x00:	/* IRQ1 */
-			cpu_interrupt_enable(space->machine().device("maincpu"), bit);
-			if (!bit)
+			state->m_main_irq_mask = data & 1;
+			if (!state->m_main_irq_mask)
 				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
-			cpu_interrupt_enable(space->machine().device("sub"), bit);
-			if (!bit)
+			state->m_sub_irq_mask = data & 1;
+			if (!state->m_sub_irq_mask)
 				cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
-			cpu_interrupt_enable(space->machine().device("sub2"), !bit);
+			state->m_sub2_nmi_mask = !(data & 1);
 			break;
 
 		case 0x03:	/* RESET */
-			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
 			break;
 
 		case 0x05:	/* MOD 0 (xevious: n.c.) */
-			state->m_custom_mod = (state->m_custom_mod & ~0x01) | (bit << 0);
+			state->m_custom_mod = (state->m_custom_mod & ~0x01) | ((data & 1) << 0);
 			break;
 
 		case 0x06:	/* MOD 1 (xevious: n.c.) */
-			state->m_custom_mod = (state->m_custom_mod & ~0x02) | (bit << 1);
+			state->m_custom_mod = (state->m_custom_mod & ~0x02) | ((data & 1) << 1);
 			break;
 
 		case 0x07:	/* MOD 2 (xevious: n.c.) */
-			state->m_custom_mod = (state->m_custom_mod & ~0x04) | (bit << 2);
+			state->m_custom_mod = (state->m_custom_mod & ~0x04) | ((data & 1) << 2);
 			break;
 	}
 }
@@ -865,7 +864,8 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 	galaga_state *state = machine.driver_data<galaga_state>();
 	int scanline = param;
 
-	nmi_line_pulse(machine.device("sub2"));
+	if(state->m_sub2_nmi_mask)
+		nmi_line_pulse(machine.device("sub2"));
 
 	scanline = scanline + 128;
 	if (scanline >= 272)
@@ -1637,17 +1637,32 @@ static const samples_interface battles_samples_interface =
 };
 
 
+static INTERRUPT_GEN( main_vblank_irq )
+{
+	galaga_state *state = device->machine().driver_data<galaga_state>();
+
+	if(state->m_main_irq_mask)
+		device_set_input_line(device, 0, ASSERT_LINE);
+}
+
+static INTERRUPT_GEN( sub_vblank_irq )
+{
+	galaga_state *state = device->machine().driver_data<galaga_state>();
+
+	if(state->m_sub_irq_mask)
+		device_set_input_line(device, 0, ASSERT_LINE);
+}
 
 static MACHINE_CONFIG_START( bosco, bosco_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)

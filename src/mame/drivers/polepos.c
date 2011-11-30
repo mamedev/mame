@@ -294,13 +294,13 @@ static WRITE8_HANDLER( polepos_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			cpu_interrupt_enable(space->machine().device("maincpu"), bit);
+			state->m_main_irq_mask = bit;
 			if (!bit)
 				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
-//polepos_mcu_enable_w(offset,data);
+//			polepos_mcu_enable_w(offset,data);
 			break;
 
 		case 0x02:	/* CLSON */
@@ -336,9 +336,10 @@ static WRITE8_HANDLER( polepos_latch_w )
 
 static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 {
+	polepos_state *state = space->machine().driver_data<polepos_state>();
 	data &= 1;
 
-	cpu_interrupt_enable(&space->device(),data);
+	state->m_sub_irq_mask = data;
 	if (!data)
 		device_set_input_line(&space->device(), 0, CLEAR_LINE);
 }
@@ -454,19 +455,16 @@ static const namco_53xx_interface namco_53xx_intf =
 
 static TIMER_DEVICE_CALLBACK( polepos_scanline )
 {
+	polepos_state *state = timer.machine().driver_data<polepos_state>();
 	int scanline = param;
-	running_machine &machine = timer.machine();
 
-	// irq0_line_assert() checks if irq is enabled - IMPORTANT!
-	// so don't replace with cputag_set_input_line()
+	if (((scanline == 64) || (scanline == 192)) && state->m_main_irq_mask)	// 64V
+		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
 
-	if ((scanline == 64) || (scanline == 192))	// 64V
-		irq0_line_assert(machine.device("maincpu"));
-
-	if (scanline == 240)	// VBLANK
+	if (scanline == 240 && state->m_sub_irq_mask)	// VBLANK
 	{
-		irq0_line_assert(machine.device("sub"));
-		irq0_line_assert(machine.device("sub2"));
+		cputag_set_input_line(timer.machine(), "sub", 0, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "sub2", 0, ASSERT_LINE);
 	}
 }
 

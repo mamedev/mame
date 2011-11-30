@@ -19,6 +19,9 @@ public:
 	UINT8 m_starfield_control[4];
 	int m_total_stars;
 	struct star m_stars[MAX_STARS];
+	UINT8 m_main_irq_mask;
+	UINT8 m_sub_irq_mask;
+	UINT8 m_sub2_irq_mask;
 };
 
 

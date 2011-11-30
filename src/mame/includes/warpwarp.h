@@ -17,6 +17,7 @@ public:
 	int m_ball_sizey;
 	int m_handle_joystick;
 	tilemap_t *m_bg_tilemap;
+	UINT8 m_irq_mask;
 };
 
 

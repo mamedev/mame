@@ -586,25 +586,6 @@ static void interrupt_reset(running_machine &machine)
 
 
 /*-------------------------------------------------
-    clear_all_lines - sets the state of all input
-    lines and the NMI line to clear
--------------------------------------------------*/
-
-static TIMER_CALLBACK( clear_all_lines )
-{
-	cpu_device *cpudevice = reinterpret_cast<cpu_device *>(ptr);
-
-	// clear NMI
-	cpudevice->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-
-	// clear all other inputs
-	int inputcount = cpudevice->input_lines();
-	for (int line = 0; line < inputcount; line++)
-		cpudevice->set_input_line(line, CLEAR_LINE);
-}
-
-
-/*-------------------------------------------------
     irq_pulse_clear - clear a "pulsed" IRQ line
 -------------------------------------------------*/
 
@@ -647,32 +628,6 @@ void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
 	device->machine().scheduler().timer_set(target_time - device->machine().time(), FUNC(irq_pulse_clear), irqline, (void *)device);
-}
-
-
-/*-------------------------------------------------
-    cpu_interrupt_enable - controls the enable/
-    disable value for global interrupts
--------------------------------------------------*/
-
-void cpu_interrupt_enable(device_t *device, int enabled)
-{
-	cpu_device *cpudevice = downcast<cpu_device *>(device);
-
-	generic_machine_private *state = device->machine().generic_machine_data;
-	int index;
-	for (index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
-		if (state->interrupt_device[index] == device)
-			break;
-	assert_always(index < ARRAY_LENGTH(state->interrupt_enable), "cpu_interrupt_enable() called for invalid CPU!");
-
-	/* set the new state */
-	if (index < ARRAY_LENGTH(state->interrupt_enable))
-		state->interrupt_enable[index] = enabled;
-
-	/* make sure there are no queued interrupts */
-	if (enabled == 0)
-		device->machine().scheduler().synchronize(FUNC(clear_all_lines), 0, (void *)cpudevice);
 }
 
 

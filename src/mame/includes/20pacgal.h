@@ -35,6 +35,8 @@ public:
 
 	/* 25pacman and 20pacgal store the sprite palette at a different address, this is a hardware difference and confirmed NOT to be a register */
 	UINT8 m_sprite_pal_base;
+
+	UINT8 m_irq_mask;
 };
 
 

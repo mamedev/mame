@@ -28,6 +28,10 @@ public:
 	UINT8 *m_videoram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
+
+	UINT8 m_main_irq_mask;
+	UINT8 m_sub_irq_mask;
+	UINT8 m_sub2_nmi_mask;
 };
 
 class xevious_state : public galaga_state

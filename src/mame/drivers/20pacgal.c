@@ -77,11 +77,10 @@
 static WRITE8_HANDLER( irqack_w )
 {
 	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
-	int bit = data & 1;
 
-	cpu_interrupt_enable(state->m_maincpu, bit);
+	state->m_irq_mask = data & 1;
 
-	if (!bit)
+	if (!state->m_irq_mask)
 		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
@@ -343,13 +342,21 @@ static MACHINE_RESET( 20pacgal )
 	state->m_game_selected = 0;
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	_20pacgal_state *state = device->machine().driver_data<_20pacgal_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
+}
+
 static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(20pacgal_map)
 	MCFG_CPU_IO_MAP(20pacgal_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) // assert breaks the inputs in 25pacman test mode
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_MACHINE_START(20pacgal)
 	MCFG_MACHINE_RESET(20pacgal)

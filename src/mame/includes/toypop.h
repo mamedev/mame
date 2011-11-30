@@ -13,6 +13,8 @@ public:
 	int m_bitmapflip;
 	int m_palettebank;
 	int m_interrupt_enable_68k;
+	UINT8 m_main_irq_mask;
+	UINT8 m_sound_irq_mask;
 };
 
 

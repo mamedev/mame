@@ -108,7 +108,6 @@ void set_led_status(running_machine &machine, int num, int value);
 
 void generic_pulse_irq_line(device_t *device, int irqline);
 void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector);
-void cpu_interrupt_enable(device_t *device, int enabled);
 
 
 
