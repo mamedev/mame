@@ -19,7 +19,6 @@ OBJDIRS += \
 	$(LIBOBJ)/formats \
 	$(LIBOBJ)/zlib \
 	$(LIBOBJ)/softfloat \
-	$(LIBOBJ)/cothread \
 
 
 
@@ -204,18 +203,3 @@ $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 
 $(LIBOBJ)/softfloat/softfloat.o: $(LIBSRC)/softfloat/softfloat.c $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
 $(LIBOBJ)/softfloat/fsincos.o: $(LIBSRC)/softfloat/fsincos.c $(LIBSRC)/softfloat/fpu_constant.h $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
-
-
-
-#-------------------------------------------------
-# cothread library objects
-#-------------------------------------------------
-
-COTHREADOBJS = \
-	$(LIBOBJ)/cothread/libco.o
-
-$(OBJ)/libco.a: $(COTHREADOBJS)
-
-$(LIBOBJ)/cothread/%.o: $(LIBSRC)/cothread/%.c | $(OSPREBUILD)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) -c -fomit-frame-pointer $< -o $@
