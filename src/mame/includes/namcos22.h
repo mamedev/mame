@@ -54,7 +54,6 @@ public:
 	int m_mRenderBufSize;
 	UINT16 m_mRenderBufData[MAX_RENDER_CMD_SEQ];
 	UINT32 m_mSys22PortBits;
-	int m_mFrameCount;
 	int m_irq_state;
 	int m_mDspUploadState;
 	int m_mUploadDestIdx;

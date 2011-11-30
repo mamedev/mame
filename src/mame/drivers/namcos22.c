@@ -1136,13 +1136,24 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "includes/namcos22.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/m37710/m37710.h"
 #include "sound/c352.h"
 
 #define SS22_MASTER_CLOCK	(XTAL_49_152MHz)	/* info from Guru */
+
+/* TODO: NOT measured! */
+#define PIXEL_CLOCK			((SS22_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
+
+#define HTOTAL				(428*2)
+#define HBEND				(0)
+#define HBSTART				(320*2)
+
+#define VTOTAL				(262*2)
+#define VBEND				(0)
+#define VBSTART				(240*2)
+
 
 #define MCU_SPEEDUP 		1					/* mcu idle skipping */
 #define DSP_SERIAL_SPEEDUP	1					/* lower DSP serial I/O period */
@@ -1674,7 +1685,7 @@ static WRITE16_HANDLER( master_external_ram_w )
 }
 
 #if DSP_SERIAL_SPEEDUP
-#define SERIAL_IO_PERIOD 256
+#define SERIAL_IO_PERIOD VTOTAL
 #else
 #define SERIAL_IO_PERIOD 1
 #endif
@@ -1694,21 +1705,37 @@ static READ16_HANDLER( master_serial_io_r )
 	return state->m_mSerialDataSlaveToMasterCurrent;
 }
 
-static INTERRUPT_GEN( dsp_serial_pulse1 )
+static TIMER_DEVICE_CALLBACK( dsp_master_serial_irq )
 {
-	namcos22_state *state = device->machine().driver_data<namcos22_state>();
+	namcos22_state *state = timer.machine().driver_data<namcos22_state>();
+	int scanline = param;
+
 	if( state->m_mbEnableDspIrqs )
 	{
 		state->m_mSerialDataSlaveToMasterCurrent = state->m_mSerialDataSlaveToMasterNext;
 
-		if( cpu_getiloops(device) == 0 )
+		if(scanline == 480)
+			cputag_set_input_line(timer.machine(), "master", TMS32025_INT0, HOLD_LINE);
+		else if((scanline % 2) == 0)
 		{
-			cputag_set_input_line(device->machine(), "master", TMS32025_INT0, HOLD_LINE);
+			cputag_set_input_line(timer.machine(), "master", TMS32025_RINT, HOLD_LINE);
+			cputag_set_input_line(timer.machine(), "master", TMS32025_XINT, HOLD_LINE);
 		}
-		cputag_set_input_line(device->machine(), "master", TMS32025_RINT, HOLD_LINE);
-		cputag_set_input_line(device->machine(), "master", TMS32025_XINT, HOLD_LINE);
-		cputag_set_input_line(device->machine(), "slave", TMS32025_RINT, HOLD_LINE);
-		cputag_set_input_line(device->machine(), "slave", TMS32025_XINT, HOLD_LINE);
+	}
+}
+
+static TIMER_DEVICE_CALLBACK( dsp_slave_serial_irq )
+{
+	namcos22_state *state = timer.machine().driver_data<namcos22_state>();
+	int scanline = param;
+
+	if( state->m_mbEnableDspIrqs )
+	{
+		if((scanline % 2) == 0)
+		{
+			cputag_set_input_line(timer.machine(), "slave", TMS32025_RINT, HOLD_LINE);
+			cputag_set_input_line(timer.machine(), "slave", TMS32025_XINT, HOLD_LINE);
+		}
 	}
 }
 
@@ -2183,8 +2210,6 @@ static WRITE32_HANDLER( namcos22s_system_controller_w )
 static INTERRUPT_GEN( namcos22s_interrupt )
 {
 	namcos22_state *state = device->machine().driver_data<namcos22_state>();
-
-	state->m_mFrameCount++;
 
 	if (nthbyte(state->m_system_controller, 0x00) & 7)
 	{
@@ -2943,20 +2968,18 @@ static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8 )
 	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ( mcu_port4_s22_r )
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( mcu_interrupt )
+static TIMER_DEVICE_CALLBACK( mcu_irq )
 {
-	if (cpu_getiloops(device) == 0)
-	{
-		device_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
-	}
-	else if (cpu_getiloops(device) == 1)
-	{
-		device_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
-	}
-	else
-	{
-		device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
-	}
+	//namcos22_state *state = timer.machine().driver_data<namcos22_state>();
+	int scanline = param;
+
+	/* TODO: real sources of these */
+	if(scanline == 480)
+		cputag_set_input_line(timer.machine(), "mcu", M37710_LINE_IRQ0, HOLD_LINE);
+	else if(scanline == 500)
+		cputag_set_input_line(timer.machine(), "mcu", M37710_LINE_ADC, HOLD_LINE);
+	else if(scanline == 0)
+		cputag_set_input_line(timer.machine(), "mcu", M37710_LINE_IRQ2, HOLD_LINE);
 }
 
 static MACHINE_RESET(namcos22)
@@ -2973,17 +2996,18 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
 	MCFG_CPU_DATA_MAP(master_dsp_data)
 	MCFG_CPU_IO_MAP(master_dsp_io)
-	MCFG_CPU_VBLANK_INT_HACK(dsp_serial_pulse1,SERIAL_IO_PERIOD)
+	MCFG_TIMER_ADD_SCANLINE("master_st", dsp_master_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
 	MCFG_CPU_DATA_MAP(slave_dsp_data)
 	MCFG_CPU_IO_MAP(slave_dsp_io)
+	MCFG_TIMER_ADD_SCANLINE("slave_st", dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M37710, SS22_MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(mcu_program)
 	MCFG_CPU_IO_MAP( mcu_io)
-	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
+	MCFG_TIMER_ADD_SCANLINE("mcu_st", mcu_irq, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -2991,11 +3015,8 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 
 	MCFG_NVRAM_HANDLER(namcos22)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,480-1)
 	MCFG_SCREEN_UPDATE(namcos22s)
 
 	MCFG_PALETTE_LENGTH(NAMCOS22_PALETTE_SIZE)
@@ -3228,12 +3249,13 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
 	MCFG_CPU_DATA_MAP(master_dsp_data)
 	MCFG_CPU_IO_MAP(master_dsp_io)
-	MCFG_CPU_VBLANK_INT_HACK(dsp_serial_pulse1,SERIAL_IO_PERIOD)
+	MCFG_TIMER_ADD_SCANLINE("master_st", dsp_master_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
 	MCFG_CPU_DATA_MAP(slave_dsp_data)
 	MCFG_CPU_IO_MAP(slave_dsp_io)
+	MCFG_TIMER_ADD_SCANLINE("slave_st", dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M37702, SS22_MASTER_CLOCK/3)	// C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	MCFG_CPU_PROGRAM_MAP( mcu_s22_program)
@@ -3243,11 +3265,8 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 
 	MCFG_NVRAM_HANDLER(namcos22)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,480-1)
 	MCFG_SCREEN_UPDATE(namcos22)
 
 	MCFG_PALETTE_LENGTH(NAMCOS22_PALETTE_SIZE)
