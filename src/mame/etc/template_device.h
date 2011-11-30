@@ -1,10 +1,6 @@
 /***************************************************************************
 
-    v3021.h
-
-    EM Microelectronic-Marin SA Ultra Low Power 32kHz CMOS RTC (DIP8)
-
-    Serial Real Time Clock
+Template for skeleton device
 
 ***************************************************************************/
 
