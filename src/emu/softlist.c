@@ -456,6 +456,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				}
 				else
 				{
+					parse_error(&swlist->state, "%s: No name defined for item (line %lu)\n",
+						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
+
 					swlist->softinfo = NULL;
 				}
 			}
@@ -518,6 +521,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					}
 
 					add_info( swlist, name, value );
+				} else {
+					parse_error(&swlist->state, "%s: Incomplete sharedfeat definition (line %lu)\n",
+						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 				}
 			}
 			else if ( !strcmp(tagname, "part" ) )
@@ -563,6 +569,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				else
 				{
 					/* Incomplete/incorrect part definition */
+					parse_error(&swlist->state, "%s: Incomplete part definition (line %lu)\n",
+						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 				}
 			}
 			else
@@ -608,6 +616,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				else
 				{
 					/* Missing dataarea name or size */
+					parse_error(&swlist->state, "%s: Incomplete dataarea definition (line %lu)\n",
+						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 				}
 			}
 			else if (!strcmp(tagname, "diskarea"))
@@ -639,6 +649,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				else
 				{
 					/* Missing dataarea name or size */
+					parse_error(&swlist->state, "%s: Incomplete diskarea definition (line %lu)\n",
+						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 				}
 			}
 			else if ( !strcmp(tagname, "feature") )
@@ -680,6 +692,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					}
 
 					add_feature( swlist, name, value );
+				} else {
+					parse_error(&swlist->state, "%s: Incomplete feature definition (line %lu)\n",
+						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 				}
 			}
 			else if (!strcmp(tagname, "dipswitch"))
@@ -751,10 +766,13 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						}
 						else
 						{
-							if ( str_name && str_crc && str_sha1 )
+							if ( str_name)
 							{
 								char *s_name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
-								char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 + 4 ) );
+								int hashsize = 7 + 4;
+								if (str_crc) hashsize+= strlen(str_crc);
+								if (str_sha1) hashsize+= strlen(str_sha1);
+								char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * (hashsize) );
 								int baddump = ( str_status && !strcmp(str_status, "baddump") ) ? 1 : 0;
 								int nodump = ( str_status && !strcmp(str_status, "nodump" ) ) ? 1 : 0;
 								int romflags = 0;
@@ -763,7 +781,20 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 									return;
 
 								strcpy( s_name, str_name );
-								sprintf( hashdata, "%c%s%c%s%s", hash_collection::HASH_CRC, str_crc, hash_collection::HASH_SHA1, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
+								if (nodump) {
+									sprintf( hashdata, "%s", NO_DUMP);
+									if (str_crc && str_sha1) {
+										parse_error(&swlist->state, "%s: No need for hash definition (line %lu)\n",
+											swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
+									}
+								} else {
+									if (str_crc && str_sha1) {
+										sprintf( hashdata, "%c%s%c%s%s", hash_collection::HASH_CRC, str_crc, hash_collection::HASH_SHA1, str_sha1, (baddump ? BAD_DUMP : ""));
+									} else {
+										parse_error(&swlist->state, "%s: Incomplete rom hash definition (line %lu)\n",
+											swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
+									}
+								}
 
 								/* Handle loadflag attribute */
 								if ( str_loadflag && !strcmp(str_loadflag, "load16_word_swap") )
@@ -779,14 +810,19 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 								/* ROM_LOAD( name, offset, length, hash ) */
 								add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM | romflags );
+							} else {
+								parse_error(&swlist->state, "%s: Rom name missing (line %lu)\n",
+									swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 							}
 						}
 					}
-				}
-				else
-				{
-					/* Missing name, size, crc, sha1, or offset */
-				}
+					else
+					{
+						/* Missing name, size, crc, sha1, or offset */
+						parse_error(&swlist->state, "%s: Incomplete rom definition (line %lu)\n",
+							swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
+					}
+				} 
 			}
 			else
 			if (!strcmp(tagname, "disk"))
@@ -826,6 +862,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						sprintf( hashdata, "%c%s%s", hash_collection::HASH_SHA1, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
 
 						add_rom_entry( swlist, s_name, hashdata, 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY ) );
+					} else {
+						parse_error(&swlist->state, "%s: Incomplete disk definition (line %lu)\n",
+							swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 					}
 				}
 			}
