@@ -163,7 +163,6 @@ static MACHINE_START( rltennis )
 	rltennis_state *state = machine.driver_data<rltennis_state>();
 	state->m_maincpu = machine.device( "maincpu");
 	state->m_screen = machine.device(  "screen");
-	state->m_palette = auto_alloc_array(machine, UINT8, 256*3 );
 	state->m_dac_1 = machine.device("dac1");
 	state->m_dac_2 = machine.device("dac2");
 	state->m_samples_1 = machine.region("samples1")->base();
