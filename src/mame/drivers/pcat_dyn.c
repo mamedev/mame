@@ -12,7 +12,18 @@ preliminary driver by Angelo Salese
 
 TODO:
 - Returns CMOS checksum error, can't enter into BIOS setup screens to set that up ... it's certainly a MESS-to-MAME
-  conversion bug or a keyboard device issue, since it works fine in MESS.
+  conversion bug or a keyboard device issue, since it works fine in MESS. (Update: it's the keyboard device)
+
+keyboard trick;
+- Set 0x41c to zero then set the scancode accordingly:
+- bp f1699 ah = 0x3b
+- bp f53b9 al = scancode
+- bp f08d9 ah = scancode
+
+0x48 is up 0x4d is down 0x50 is right 0x4b is left
+0x3c/0x3d is pageup/pagedown
+0x01 is esc
+0x0d is enter
 
 ********************************************************************************************************************/
 
