@@ -25,6 +25,8 @@ To Do:
 - ilpag, steaser: some minor issues with the blitter emulation;
 - ilpag: sound uses a MP7524 8-bit DAC (bottom right, by the edge connector -PJB),  but the MCU controls the sound writes?
 - steaser: sound uses an OkiM6295 (controlled by the sub MCU), check if it can be simulated;
+- deucesw2: colour cycling effect on attract mode is ugly (background should be blue, it's instead a MAME-esque
+  palette), protection?
 
 *****************************************************************************************************************/
 
