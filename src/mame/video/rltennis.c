@@ -221,44 +221,6 @@ WRITE16_HANDLER(rlt_blitter_w)
 	}
 }
 
-WRITE16_HANDLER(rlt_ramdac_address_wm_w )
-{
-	rltennis_state *state = space->machine().driver_data<rltennis_state>();
-	state->m_palpos_w = data*3;
-}
-
-WRITE16_HANDLER(rlt_ramdac_address_rm_w )
-{
-	rltennis_state *state = space->machine().driver_data<rltennis_state>();
-	state->m_palpos_r = data*3;
-}
-
-WRITE16_HANDLER( rlt_ramdac_data_w )
-{
-	rltennis_state *state = space->machine().driver_data<rltennis_state>();
-	int color=state->m_palpos_w/3;
-	state->m_palette[state->m_palpos_w] = data & 0xff;
-	++state->m_palpos_w;
-
-	state->m_palpos_w %=256*3;
-
-	{
-		int r = state->m_palette[color*3];
-		int g = state->m_palette[color*3+1];
-		int b = state->m_palette[color*3+2];
-		palette_set_color(space->machine(), color, MAKE_RGB(r,g,b));
-	}
-}
-
-READ16_HANDLER( rlt_ramdac_data_r )
-{
-	rltennis_state *state = space->machine().driver_data<rltennis_state>();
-	int data=state->m_palette[state->m_palpos_r];
-	++state->m_palpos_r;
-	state->m_palpos_r %=256*3;
-	return data;
-}
-
 VIDEO_START( rltennis )
 {
 	rltennis_state *state = machine.driver_data<rltennis_state>();

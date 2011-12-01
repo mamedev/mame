@@ -301,7 +301,6 @@ public:
 	UINT8* m_3000_regs;
 	UINT8* m_2801_regs;
 	UINT8* m_2c01_regs;
-	struct { int r,g,b,offs,offs_internal; } m_pal;
 };
 
 
@@ -1239,6 +1238,11 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	0
+};
+
 
 static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
@@ -1263,7 +1267,7 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 
 	MCFG_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_VIDEO_START(sfbonus)
 

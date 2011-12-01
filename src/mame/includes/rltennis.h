@@ -45,10 +45,6 @@ public:
 
 
 WRITE16_HANDLER( rlt_blitter_w );
-WRITE16_HANDLER( rlt_ramdac_address_wm_w );
-WRITE16_HANDLER( rlt_ramdac_address_rm_w );
-WRITE16_HANDLER( rlt_ramdac_data_w );
-READ16_HANDLER( rlt_ramdac_data_r );
 VIDEO_START( rltennis );
 SCREEN_UPDATE( rltennis );
 

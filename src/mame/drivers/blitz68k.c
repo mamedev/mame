@@ -47,8 +47,6 @@ public:
 	optional_shared_ptr<UINT16>	m_nvram;
 	UINT8 *m_blit_buffer;
 	UINT16 *m_frame_buffer;
-	struct { int r,g,b,offs,offs_internal; } m_pal;
-	struct { UINT8 r, g, b, offs, offs_internal, ram[256*3]; } m_btpal;
 	UINT16 *m_blit_romaddr;
 	UINT16 *m_blit_attr1_ram;
 	UINT16 *m_blit_dst_ram_loword;
@@ -1601,6 +1599,11 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	0
+};
+
 static MACHINE_CONFIG_START( ilpag, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, 11059200 )	// ?
 	MCFG_CPU_PROGRAM_MAP(ilpag_map)
@@ -1620,7 +1623,7 @@ static MACHINE_CONFIG_START( ilpag, blitz68k_state )
 
 	MCFG_VIDEO_START(blitz68k)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1701,7 +1704,7 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1734,7 +1737,7 @@ static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1765,7 +1768,7 @@ static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k_addr_factor1)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1795,7 +1798,7 @@ static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1827,7 +1830,7 @@ static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1857,7 +1860,7 @@ static MACHINE_CONFIG_START( hermit, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1890,7 +1893,7 @@ static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("saa", SAA1099, XTAL_8MHz/2)

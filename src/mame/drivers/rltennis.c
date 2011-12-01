@@ -63,6 +63,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "video/ramdac.h"
 
 #define	RLT_REFRESH_RATE   60
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
@@ -92,9 +93,9 @@ static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x700000, 0x70000f) AM_WRITE(rlt_blitter_w)
-	AM_RANGE(0x720000, 0x720001) AM_WRITE(rlt_ramdac_address_wm_w)
-	AM_RANGE(0x720002, 0x720003) AM_READWRITE(rlt_ramdac_data_r, rlt_ramdac_data_w)
-	AM_RANGE(0x720006, 0x720007) AM_WRITE(rlt_ramdac_address_rm_w)
+	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device,index_w,0x00ff)
+	AM_RANGE(0x720002, 0x720003) AM_DEVREADWRITE8_MODERN("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
+	AM_RANGE(0x720006, 0x720007) AM_DEVWRITE8_MODERN("ramdac",ramdac_device,index_r_w,0x00ff)
 	AM_RANGE(0x740000, 0x740001) AM_WRITE(rlt_snd1_w)
 	AM_RANGE(0x760000, 0x760001) AM_WRITE(rlt_snd2_w)
 	AM_RANGE(0x780000, 0x780001) AM_WRITENOP	/* sound control, unknown, usually = 0x0044 */
@@ -177,6 +178,15 @@ static MACHINE_RESET( rltennis )
 	state->m_timer->adjust(attotime::from_hz(RLT_TIMER_FREQ));
 }
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
+ADDRESS_MAP_END
+
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	1
+};
+
 static MACHINE_CONFIG_START( rltennis, rltennis_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
@@ -197,6 +207,7 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VIDEO_START( rltennis )
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

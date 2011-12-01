@@ -39,8 +39,6 @@ const device_type RAMDAC = &device_creator<ramdac_device>;
 ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAMDAC, "ramdac", tag, owner, clock),
 	  device_memory_interface(mconfig, *this),
-		m_pal_index(0),
-		m_pal_mask(0),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(ramdac_palram))
 {
 
@@ -75,6 +73,26 @@ inline void ramdac_device::writebyte(offs_t address, UINT8 data)
 	space()->write_byte(address, data);
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ramdac_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const ramdac_interface *intf = reinterpret_cast<const ramdac_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<ramdac_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		// ...
+	}
+}
+
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -104,55 +122,65 @@ void ramdac_device::device_start()
 
 void ramdac_device::device_reset()
 {
-	m_pal_index = 0;
-	m_pal_mask = 0;
-	m_int_index = 0;
+	m_pal_index[0] = 0;
+	m_int_index[0] = 0;
+	m_pal_index[1] = 0;
+	m_int_index[1] = 0;
+	m_pal_mask = 0xff;
 }
 
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
+//  [0] = W register, [1] = R register
 //**************************************************************************
 
-inline void ramdac_device::reg_increment(void)
+inline void ramdac_device::reg_increment(UINT8 inc_type)
 {
-	m_int_index++;
-	if(m_int_index == 3)
+	m_int_index[inc_type]++;
+	if(m_int_index[inc_type] == 3)
 	{
-		m_int_index = 0;
-		m_pal_index++;
+		m_int_index[inc_type] = 0;
+		m_pal_index[inc_type]++;
 	}
 }
 
 READ8_MEMBER( ramdac_device::index_r )
 {
-	return m_pal_index;
+	return m_pal_index[0];
 }
 
 WRITE8_MEMBER( ramdac_device::index_w )
 {
-	m_pal_index = data;
-	m_int_index = 0;
+	m_pal_index[0] = data;
+	m_int_index[0] = 0;
+}
+
+WRITE8_MEMBER( ramdac_device::index_r_w )
+{
+	m_pal_index[1] = data;
+	m_int_index[1] = 0;
 }
 
 READ8_MEMBER( ramdac_device::pal_r )
 {
 	UINT8 res;
-	res = readbyte(m_pal_index | (m_int_index << 8));
-	reg_increment();
+	res = readbyte(m_pal_index[m_split_read_reg] | (m_int_index[m_split_read_reg] << 8));
+	reg_increment(m_split_read_reg);
 	return res;
 }
 
 WRITE8_MEMBER( ramdac_device::pal_w )
 {
-	writebyte(m_pal_index | (m_int_index << 8),data);
-	reg_increment();
+	writebyte(m_pal_index[0] | (m_int_index[0] << 8),data);
+	reg_increment(0);
 }
 
 WRITE8_MEMBER( ramdac_device::mask_w )
 {
 	m_pal_mask = data;
 }
+
 
 //**************************************************************************
 //  Generic bank read/write handlers
