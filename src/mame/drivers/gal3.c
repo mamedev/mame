@@ -267,33 +267,6 @@ static NVRAM_HANDLER( gal3 )
 	}
 }
 
-/* shared RAM memory handlers */
-
-static READ32_HANDLER( shareram0_r )
-{
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	return state->m_mpSharedRAM0[offset];
-}
-
-static WRITE32_HANDLER( shareram0_w )
-{
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	COMBINE_DATA( &state->m_mpSharedRAM0[offset] );
-}
-
-#if 0
-static READ32_HANDLER( shareram1_r )
-{
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	return state->m_mpSharedRAM1[offset];
-}
-
-static WRITE32_HANDLER( shareram1_w )
-{
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	COMBINE_DATA( &state->m_mpSharedRAM1[offset] );
-}
-#endif
 
 /***************************************************************************************/
 
@@ -376,6 +349,7 @@ static WRITE32_HANDLER(rso_w)
 	state->m_rsoSharedRAM[offset+1] = v&0xffff;
 }
 
+
 static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_BASE_MEMBER(gal3_state, m_nvmem) AM_SIZE_MEMBER(gal3_state, m_nvmem_size)	//NVRAM
@@ -384,8 +358,8 @@ static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_mst_r) AM_WRITE(led_mst_w)	//LEDs
 	AM_RANGE(0x48000000, 0x48000003) AM_READNOP	//irq1 v-blank ack
 	AM_RANGE(0x4c000000, 0x4c000003) AM_READNOP	//irq3 ack
-	AM_RANGE(0x60000000, 0x60007fff) AM_READ(shareram0_r) AM_WRITE(shareram0_w) AM_BASE_MEMBER(gal3_state, m_mpSharedRAM0)	//CRAM
-	AM_RANGE(0x60010000, 0x60017fff) AM_READ(shareram0_r) AM_WRITE(shareram0_w)	//Mirror
+	AM_RANGE(0x60000000, 0x60007fff) AM_RAM AM_SHARE("share1")	//CRAM
+	AM_RANGE(0x60010000, 0x60017fff) AM_RAM AM_SHARE("share1")	//Mirror
 	AM_RANGE(0x80000000, 0x8007ffff) AM_RAM	//512K Local RAM
 /// AM_RANGE(0xc0000000, 0xc000000b) AM_WRITENOP    //upload?
 	AM_RANGE(0xc000000c, 0xc000000f) AM_READNOP	//irq2 ack
@@ -401,8 +375,8 @@ static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x48000000, 0x48000003) AM_READNOP	//irq1 ack
 /// AM_RANGE(0x50000000, 0x50000003) AM_READ() AM_WRITE()
 /// AM_RANGE(0x54000000, 0x54000003) AM_READ() AM_WRITE()
-	AM_RANGE(0x60000000, 0x60007fff) AM_READ(shareram0_r) AM_WRITE(shareram0_w)
-	AM_RANGE(0x60010000, 0x60017fff) AM_READ(shareram0_r) AM_WRITE(shareram0_w)
+	AM_RANGE(0x60000000, 0x60007fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x60010000, 0x60017fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x80000000, 0x8007ffff) AM_RAM	//512K Local RAM
 
 	AM_RANGE(0xf1200000, 0xf120ffff) AM_RAM	//DSP RAM

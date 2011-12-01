@@ -4,7 +4,6 @@
 
     TODO:
     - 8-bit support for FIFO, parameters and command values
-    - convert to C++
     - execution cycles;
 
 ***************************************************************************/
