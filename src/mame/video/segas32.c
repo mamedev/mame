@@ -1882,7 +1882,7 @@ static void sprite_render_list(running_machine &machine)
 
 	g_profiler.start(PROFILER_USER2);
 
-	logerror("----\n");
+//	logerror("----\n");
 
 	/* compute the outer clip */
 	outerclip.min_x = outerclip.min_y = 0;
