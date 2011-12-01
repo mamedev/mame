@@ -191,6 +191,7 @@ MAIN BOARD:
 #include "includes/trackfld.h"
 #include "includes/konamipt.h"
 #include "machine/nvram.h"
+#include "includes/yiear.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 #define SOUND_CLOCK           XTAL_14_31818MHz
@@ -251,12 +252,23 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( yieartf_nmi_mask_w )
+{
+	trackfld_state *state = space->machine().driver_data<trackfld_state>();
+
+	state->m_yieartf_nmi_mask = data & 1;
+}
+
 
 static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0000) AM_DEVREAD("vlm", yiear_speech_r) AM_WRITE(konami_SN76496_latch_w)
+	AM_RANGE(0x0001, 0x0001) AM_DEVWRITE("snsnd", konami_SN76496_w)
+	AM_RANGE(0x0002, 0x0002) AM_DEVWRITE("vlm", yiear_VLM5030_control_w)
+	AM_RANGE(0x0003, 0x0003) AM_DEVWRITE("vlm", vlm5030_data_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)		/* AFE */
 	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)	/* FLIP */
 	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_WRITE(konami_sh_irqtrigger_w)	/* 26 */ /* cause interrupt on audio CPU */
-	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITENOP						/* 25 */
+	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITE(yieartf_nmi_mask_w)		/* 25 */
 	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)					/* 24, 23 */
 	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP						/* CN3.2 */
 	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP						/* CN3.4 */
@@ -945,12 +957,21 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 MACHINE_CONFIG_END
 
 
+static INTERRUPT_GEN( yieartf_timer_irq )
+{
+	trackfld_state *state = device->machine().driver_data<trackfld_state>();
+
+	if (state->m_yieartf_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( yieartf, trackfld_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(yieartf_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_PERIODIC_INT(yieartf_timer_irq,480)
 
 //  z80 isn't used
 //  MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
@@ -1503,9 +1524,9 @@ GAME( 1983, trackfldc, trackfld, trackfld, trackfld, trackfld, ROT0,  "Konami (C
 GAME( 1983, hyprolym,  trackfld, trackfld, trackfld, trackfld, ROT0,  "Konami", "Hyper Olympic", GAME_SUPPORTS_SAVE )
 GAME( 1983, hyprolymb, trackfld, hyprolyb, trackfld, trackfld, ROT0,  "bootleg", "Hyper Olympic (bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1996, atlantol,  trackfld, atlantol, atlantol, atlantol, ROT0,  "bootleg", "Atlant Olimpic", GAME_SUPPORTS_SAVE )
-GAME( 1988, mastkin,   0,        mastkin,  mastkin,  mastkin,  ROT0,  "Du Tech", "The Masters of Kin", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1982, trackfldnz,trackfld, trackfld, trackfld, trackfld, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)", GAME_NOT_WORKING)
+GAME( 1988, mastkin,   0,        mastkin,  mastkin,  mastkin,  ROT0,  "Du Tech", "The Masters of Kin", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1985, wizzquiz,  0,        wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec-Zenitone (Konami license)", "Wizz Quiz (Konami version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, wizzquiza, wizzquiz, wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec-Zenitone", "Wizz Quiz (version 4)", GAME_SUPPORTS_SAVE )
 GAME( 1987, reaktor,   0,        reaktor,  reaktor,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1985, yieartf,   yiear,    yieartf,  yieartf, 0,         ROT0,  "Konami", "Yie Ar Kung-Fu (GX361 conversion)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...
+GAME( 1985, yieartf,   yiear,    yieartf,  yieartf,  0,        ROT0,  "Konami", "Yie Ar Kung-Fu (GX361 conversion)", GAME_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...

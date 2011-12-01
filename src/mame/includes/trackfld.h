@@ -29,6 +29,7 @@ public:
 	int		 m_sprites_gfx_banked;
 
 	UINT8    m_irq_mask;
+	UINT8    m_yieartf_nmi_mask;
 };
 
 

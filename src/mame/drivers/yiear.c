@@ -94,7 +94,7 @@ _________________________|___________________________
 #include "includes/yiear.h"
 
 
-static READ8_DEVICE_HANDLER( yiear_speech_r )
+READ8_DEVICE_HANDLER( yiear_speech_r )
 {
 	if (vlm5030_bsy(device))
 		return 1;
@@ -102,7 +102,7 @@ static READ8_DEVICE_HANDLER( yiear_speech_r )
 		return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( yiear_VLM5030_control_w )
+WRITE8_DEVICE_HANDLER( yiear_VLM5030_control_w )
 {
 	/* bit 0 is latch direction */
 	vlm5030_st(device, (data >> 1) & 1);
