@@ -35,6 +35,7 @@ To Do:
 #include "sound/dac.h"
 #include "sound/saa1099.h"
 #include "machine/nvram.h"
+#include "video/ramdac.h"
 
 class blitz68k_state : public driver_device
 {
@@ -131,121 +132,6 @@ static SCREEN_UPDATE(blitz68k_noblit)
 	}
 
 	return 0;
-}
-
-/*************************************************************************************************************
-
-    Palette
-
-*************************************************************************************************************/
-
-static WRITE16_HANDLER( paletteram_io_w )
-{
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	int pal_data;
-
-	switch(offset*2)
-	{
-		case 0:
-			state->m_pal.offs = (data & 0xff00) >> 8;
-			break;
-		case 4:
-			state->m_pal.offs_internal = 0;
-			break;
-		case 2:
-			switch(state->m_pal.offs_internal)
-			{
-				case 0:
-					pal_data = (data & 0xff00) >> 8;
-					state->m_pal.r = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
-					state->m_pal.offs_internal++;
-					break;
-				case 1:
-					pal_data = (data & 0xff00) >> 8;
-					state->m_pal.g = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
-					state->m_pal.offs_internal++;
-					break;
-				case 2:
-					pal_data = (data & 0xff00) >> 8;
-					state->m_pal.b = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
-					palette_set_color(space->machine(), state->m_pal.offs, MAKE_RGB(state->m_pal.r, state->m_pal.g, state->m_pal.b));
-					state->m_pal.offs_internal = 0;
-					state->m_pal.offs++;
-					break;
-			}
-
-			break;
-	}
-}
-
-/*************************************************************************************************************
-
-    Palette (Bt476 RAMDAC)
-    To do: merge with above, implement as a device
-
-*************************************************************************************************************/
-
-
-static WRITE8_HANDLER( paletteram_bt476_w )
-{
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	switch(offset)
-	{
-		case 0:
-			state->m_btpal.offs = data;
-			state->m_btpal.offs_internal = 0;
-			break;
-		case 2:
-			state->m_btpal.offs = data;
-			state->m_btpal.offs_internal = 0;
-			break;
-		case 1:
-			data &= 0x3f;
-			state->m_btpal.ram[state->m_btpal.offs * 3 + state->m_btpal.offs_internal] = data;
-			switch(state->m_btpal.offs_internal)
-			{
-				case 0:
-					state->m_btpal.r = data << 2;
-					state->m_btpal.offs_internal++;
-					break;
-				case 1:
-					state->m_btpal.g = data << 2;
-					state->m_btpal.offs_internal++;
-					break;
-				case 2:
-					state->m_btpal.b = data << 2;
-					palette_set_color(space->machine(), state->m_btpal.offs, MAKE_RGB(state->m_btpal.r, state->m_btpal.g, state->m_btpal.b));
-					state->m_btpal.offs_internal = 0;
-					state->m_btpal.offs++;
-					break;
-			}
-			break;
-	}
-}
-
-static READ8_HANDLER( paletteram_bt476_r )
-{
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	UINT8 ret = 0xff;
-
-	switch(offset)
-	{
-		case 0:
-			ret = state->m_btpal.offs;
-			break;
-
-		case 1:
-			ret = state->m_btpal.ram[state->m_btpal.offs * 3 + state->m_btpal.offs_internal];
-			state->m_btpal.offs_internal++;
-			if (state->m_btpal.offs_internal >= 3)
-			{
-				state->m_btpal.offs_internal = 0;
-				state->m_btpal.offs++;
-			}
-			break;
-	}
-
-	return ret;
 }
 
 /*************************************************************************************************************
@@ -601,7 +487,9 @@ static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
 //  AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
 
-	AM_RANGE(0x900000, 0x900005) AM_WRITE( paletteram_io_w ) //RAMDAC
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
 	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_transpen) //video registers for the blitter write
 	AM_RANGE(0x990000, 0x990007) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_vregs) //pens
 	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_romaddr)
@@ -628,7 +516,9 @@ static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
 //  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(sound_write_w)
 
-	AM_RANGE(0x900000, 0x900005) AM_WRITE( paletteram_io_w ) //RAMDAC
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
 	AM_RANGE(0x940000, 0x940001) AM_WRITENOP //? Seems a dword write for some read, written consecutively
 	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_transpen)//probably transparency pens
 	AM_RANGE(0x990000, 0x990005) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_vregs)
@@ -690,7 +580,8 @@ static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
-	AM_RANGE(0x220002, 0x220003) AM_READ8 ( paletteram_bt476_r, 0xff00 ) // RAMDAC
+	AM_RANGE(0x220000, 0x220001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0xff00 )
 
 	AM_RANGE(0x240000, 0x240001) AM_WRITE8(blit_addr0_w, 0xff00)
 	AM_RANGE(0x240002, 0x240003) AM_WRITE8(blit_addr1_w, 0xff00)
@@ -722,7 +613,9 @@ static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8(blit_flag6_w, 0xff00)
 	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8(blit_flag7_w, 0xff00)
 
-	AM_RANGE(0x300000, 0x300007) AM_WRITE8( paletteram_bt476_w, 0xff00 ) // RAMDAC
+	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
 
 	AM_RANGE(0x400000, 0x400001) AM_READ8(bankrob_mcu_status_write_r, 0x00ff)
 	AM_RANGE(0x400002, 0x400003) AM_READ8(bankrob_mcu_status_read_r,  0x00ff)
@@ -778,7 +671,9 @@ static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x880001) AM_WRITE8(bankroba_mcu2_r, 0x00ff)	// lev 3
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE8(bankroba_mcu2_w, 0x00ff)
 
-	AM_RANGE(0x900000, 0x900007) AM_WRITE8( paletteram_bt476_w, 0xff00 ) // RAMDAC
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
 
 //  AM_RANGE(0x940000, 0x940001) AM_WRITE   // lev 6
 
@@ -805,7 +700,8 @@ static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x9b8000, 0x9b8001) AM_WRITE8(blit_draw_w, 0x00ff)
 
-	AM_RANGE(0x9c0002, 0x9c0003) AM_READ8 ( paletteram_bt476_r, 0xff00 ) // RAMDAC
+	AM_RANGE(0x9c0000, 0x9c0001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x9c0002, 0x9c0003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0xff00 )
 
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READ8(bankroba_mcu1_status_write_r, 0xff00)
 
@@ -924,8 +820,11 @@ static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x874000, 0x874001) AM_READ_PORT("IN2")
 	AM_RANGE(0x876000, 0x876001) AM_READ_PORT("DSW")
 
-	AM_RANGE(0x880000, 0x880003) AM_WRITE8( paletteram_bt476_w, 0xffff ) // RAMDAC
-	AM_RANGE(0x880000, 0x880001) AM_READ8 ( paletteram_bt476_r, 0xffff ) // ""
+	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x880002, 0x880003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
 
 	AM_RANGE(0x8a0000, 0x8a0007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 
@@ -1015,7 +914,8 @@ static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x800007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x812000, 0x812001) AM_READ8 ( paletteram_bt476_r, 0xffff ) // RAMDAC
+	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
 
 	AM_RANGE(0x830000, 0x830001) AM_READ( deucesw2_mcu_r )
 
@@ -1026,7 +926,9 @@ static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x880000, 0x880007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x890000, 0x890003) AM_WRITE8( paletteram_bt476_w, 0xffff ) // RAMDAC
+	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x890002, 0x890003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
 
 	AM_RANGE(0x894000, 0x894003) AM_WRITE8(blit_pens_w, 0xffff)
 
@@ -1084,7 +986,8 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
-	AM_RANGE(0x220002, 0x220003) AM_READ8 ( paletteram_bt476_r, 0xff00 ) // RAMDAC
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
 
 	AM_RANGE(0x240000, 0x240001) AM_WRITE8(blit_addr0_w, 0xff00)
 	AM_RANGE(0x240002, 0x240003) AM_WRITE8(blit_addr1_w, 0xff00)
@@ -1119,7 +1022,9 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8(blit_flag6_w, 0xff00)
 	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8(blit_flag7_w, 0xff00)
 
-	AM_RANGE(0x300000, 0x300007) AM_WRITE8( paletteram_bt476_w, 0xff00 ) // RAMDAC
+	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
 
 	AM_RANGE(0x400000, 0x400001) AM_READ8(dualgame_mcu_status_write_r, 0x00ff)
 	AM_RANGE(0x400002, 0x400003) AM_READ8(dualgame_mcu_status_read_r,  0x00ff)
@@ -1186,9 +1091,15 @@ static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
-	AM_RANGE(0x800000, 0x800003) AM_WRITE8( paletteram_bt476_w, 0xffff ) // RAMDAC
-	AM_RANGE(0x840000, 0x840003) AM_WRITE8( paletteram_bt476_w, 0xffff ) // RAMDAC
-	AM_RANGE(0x840000, 0x840001) AM_READ8 ( paletteram_bt476_r, 0xffff ) // ""
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x840002, 0x840003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+
 
 	AM_RANGE(0x8c0000, 0x8c0003) AM_WRITE8( blit_pens_w, 0xffff )
 
@@ -1686,6 +1597,10 @@ const mc6845_interface mc6845_intf_irq5 =
 	crtc_addr				/* update address callback */
 };
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_START( ilpag, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, 11059200 )	// ?
 	MCFG_CPU_PROGRAM_MAP(ilpag_map)
@@ -1704,6 +1619,8 @@ static MACHINE_CONFIG_START( ilpag, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
+
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1784,6 +1701,7 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1816,6 +1734,7 @@ static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1846,6 +1765,7 @@ static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k_addr_factor1)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1875,6 +1795,7 @@ static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1906,6 +1827,7 @@ static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1935,6 +1857,7 @@ static MACHINE_CONFIG_START( hermit, blitz68k_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(blitz68k)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1967,6 +1890,7 @@ static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
 	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("saa", SAA1099, XTAL_8MHz/2)
@@ -2622,7 +2546,7 @@ Sub Board --------------------
 *************************************************************************************************************/
 
 ROM_START( poker52 )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code + gfx
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // 68000 code + gfx
 	ROM_LOAD16_BYTE( "unknown_label.u25", 0x00000, 0x20000, CRC(63e0dd69) SHA1(970e6363ade714a2b9a844c5683ab1365193457a) )
 	ROM_LOAD16_BYTE( "unknown_label.u24", 0x00001, 0x20000, NO_DUMP )
 

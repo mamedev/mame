@@ -5,8 +5,7 @@
 	Written by Angelo Salese
 
 	TODO:
-	- read operation
-	- masking
+	- masking register
 
 ***************************************************************************/
 
@@ -115,22 +114,39 @@ void ramdac_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_MEMBER( ramdac_device::index_w )
+inline void ramdac_device::reg_increment(void)
 {
-	m_pal_index = data;
-	m_int_index = 0;
-}
-
-WRITE8_MEMBER( ramdac_device::pal_w )
-{
-	writebyte(m_pal_index | (m_int_index << 8),data);
-
 	m_int_index++;
 	if(m_int_index == 3)
 	{
 		m_int_index = 0;
 		m_pal_index++;
 	}
+}
+
+READ8_MEMBER( ramdac_device::index_r )
+{
+	return m_pal_index;
+}
+
+WRITE8_MEMBER( ramdac_device::index_w )
+{
+	m_pal_index = data;
+	m_int_index = 0;
+}
+
+READ8_MEMBER( ramdac_device::pal_r )
+{
+	UINT8 res;
+	res = readbyte(m_pal_index | (m_int_index << 8));
+	reg_increment();
+	return res;
+}
+
+WRITE8_MEMBER( ramdac_device::pal_w )
+{
+	writebyte(m_pal_index | (m_int_index << 8),data);
+	reg_increment();
 }
 
 WRITE8_MEMBER( ramdac_device::mask_w )

@@ -35,6 +35,8 @@ public:
 	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
+	DECLARE_READ8_MEMBER( index_r );
+	DECLARE_READ8_MEMBER( pal_r );
 	DECLARE_WRITE8_MEMBER( index_w );
 	DECLARE_WRITE8_MEMBER( pal_w );
 	DECLARE_WRITE8_MEMBER( mask_w );
@@ -52,6 +54,7 @@ protected:
 	virtual void device_reset();
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
+	inline void reg_increment();
 
 private:
 	UINT8 m_pal_index;
