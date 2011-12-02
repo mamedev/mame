@@ -14,6 +14,8 @@ TODO:
 
 *******************************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/dac.h"
@@ -24,26 +26,36 @@ class chsuper_state : public driver_device
 {
 public:
 	chsuper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu") { }
+
+	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
+	DECLARE_READ8_MEMBER(ff_r);
 
 	int m_tilexor;
 	UINT8 *m_vram;
+
+	required_device<z180_device> m_maincpu;
+
+protected:
+	// driver_device overrides
+	//virtual void machine_start();
+	//virtual void machine_reset();
+
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
 
-static VIDEO_START(chsuper)
+void chsuper_state::video_start()
 {
-	chsuper_state *state = machine.driver_data<chsuper_state>();
-
-	state->m_vram = auto_alloc_array_clear(machine, UINT8, 1 << 16);
+	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 13);
 }
 
-static SCREEN_UPDATE(chsuper)
+bool chsuper_state::screen_update( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect )
 {
-	chsuper_state *state = screen->machine().driver_data<chsuper_state>();
-	const gfx_element *gfx = screen->machine().gfx[0];
-	UINT8 *vram = state->m_vram;
+	const gfx_element *gfx = machine().gfx[0];
 	int count = 0x0000;
 	int y,x;
 
@@ -51,9 +63,9 @@ static SCREEN_UPDATE(chsuper)
 	{
 		for (x=0;x<128;x++)
 		{
-			int tile = ((vram[count+1]<<8) | vram[count]) & 0xffff;
+			int tile = ((m_vram[count+1]<<8) | m_vram[count]) & 0xffff;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*4,y*8);
+			drawgfx_opaque(&bitmap,&cliprect,gfx,tile,0,0,0,x*4,y*8);
 			count+=2;
 		}
 	}
@@ -61,19 +73,17 @@ static SCREEN_UPDATE(chsuper)
 	return 0;
 }
 
-static READ8_HANDLER( ff_r )
+READ8_MEMBER( chsuper_state::ff_r )
 {
 	return 0xff;
 }
 
-static WRITE8_HANDLER( chsuper_vram_w )
+WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 {
-	chsuper_state *state = space->machine().driver_data<chsuper_state>();
-
-	state->m_vram[offset] = data;
+	m_vram[offset] = data;
 }
 
-static ADDRESS_MAP_START( chsuper_prg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( chsuper_prg_map, AS_PROGRAM, 8, chsuper_state )
 	AM_RANGE(0x00000, 0x0efff) AM_ROM
 	AM_RANGE(0x00000, 0x01fff) AM_WRITE( chsuper_vram_w )
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_REGION("maincpu", 0xf000)
@@ -82,17 +92,17 @@ ADDRESS_MAP_END
 
 //  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
-static ADDRESS_MAP_START( chsuper_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( chsuper_portmap, AS_IO, 8, chsuper_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 	AM_RANGE( 0x00e8, 0x00e8 ) AM_READ_PORT("IN0")
 	AM_RANGE( 0x00e9, 0x00e9 ) AM_READ_PORT("IN1")
 	AM_RANGE( 0x00ea, 0x00ea ) AM_READ_PORT("DSW0")
 	AM_RANGE( 0x00ed, 0x00ef ) AM_WRITENOP //lamps
-	AM_RANGE( 0x00fc, 0x00fc ) AM_DEVWRITE_MODERN("ramdac", ramdac_device, index_w)
-	AM_RANGE( 0x00fd, 0x00fd ) AM_DEVWRITE_MODERN("ramdac", ramdac_device, pal_w)
-	AM_RANGE( 0x00fe, 0x00fe ) AM_DEVWRITE_MODERN("ramdac", ramdac_device, mask_w)
+	AM_RANGE( 0x00fc, 0x00fc ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE( 0x00fd, 0x00fd ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE( 0x00fe, 0x00fe ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 	AM_RANGE( 0x8300, 0x8300 ) AM_READ( ff_r ) //probably data for the dac
-	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_w) // unk writes
+	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE_LEGACY("dac", dac_w) // unk writes
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chsuper )
@@ -174,8 +184,8 @@ static GFXDECODE_START( chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, chsuper_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )
@@ -198,14 +208,12 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE(chsuper)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE(chsuper)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(chsuper)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	/* sound hardware */
