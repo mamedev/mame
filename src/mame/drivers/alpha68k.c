@@ -23,6 +23,7 @@
 TODO:
 - Super Stingray MCU irq controls timer speed, needs the MCU to be hooked up.
 - Super Champion Baseball "ball speed" protection
+- Fix sound CPU crashes properly on Alpha 68k II / V HW games (nested NMIs)
 
 General notes:
 
@@ -1833,13 +1834,36 @@ static const ay8910_interface ay8910_config =
 	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r)
 };
 
+static WRITE8_HANDLER( porta_w )
+{
+	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
+
+	printf("%02x\n",data);
+
+	if(data == 0xff)
+		return; // skip
+
+	/* guess */
+	if(data == 0 && state->m_sound_pa_latch) // 1 -> 0 transition = enables NMI
+		state->m_sound_nmi_mask = 1;
+
+	if(data && state->m_sound_pa_latch == 0) // 0 -> 1 transition = disables NMI
+		state->m_sound_nmi_mask = 0;
+
+	state->m_sound_pa_latch = data & 1;
+}
+
 static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r)
-	}
+		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+		DEVCB_NULL,
+		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, porta_w),
+		DEVCB_NULL
+	},
+	NULL
 };
 
 static void YM3812_irq( device_t *device, int param )
@@ -1951,10 +1975,8 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sstingry_sound_map)
 	MCFG_CPU_IO_MAP(kyros_sound_portmap)
-//AT
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
-//ZT
 
 	MCFG_MACHINE_START(common)
 	MCFG_MACHINE_RESET(common)
@@ -1970,12 +1992,9 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 
 	MCFG_GFXDECODE(sstingry)
 	MCFG_PALETTE_LENGTH(256 + 1)
-//AT
 	MCFG_PALETTE_INIT(kyros)
-//ZT
 
 	/* sound hardware */
-//AT
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
@@ -1989,7 +2008,6 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-//ZT
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kyros, alpha68k_state )
@@ -2003,10 +2021,8 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_sound_map)
 	MCFG_CPU_IO_MAP(kyros_sound_portmap)
-//AT
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
-//ZT
 
 	MCFG_MACHINE_START(common)
 	MCFG_MACHINE_RESET(common)
@@ -2026,7 +2042,6 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_PALETTE_INIT(kyros)
 
 	/* sound hardware */
-//AT
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
@@ -2040,7 +2055,6 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-//ZT
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jongbou, alpha68k_state )
@@ -2054,7 +2068,7 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(jongbou_sound_map)
 	MCFG_CPU_IO_MAP(jongbou_sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 160) // guess, controls sound speed
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 160*60)
 
 	MCFG_MACHINE_START(common)
 	MCFG_MACHINE_RESET(common)
@@ -2105,10 +2119,8 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 
 	MCFG_GFXDECODE(paddle)
 
-//AT
 	MCFG_PALETTE_LENGTH(1024)
 	MCFG_PALETTE_INIT(paddlem)
-//ZT
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2118,6 +2130,14 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static INTERRUPT_GEN( alpha68k_sound_nmi )
+{
+	alpha68k_state *state = device->machine().driver_data<alpha68k_state>();
+
+	if(state->m_sound_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 
 	/* basic machine hardware */
@@ -2125,10 +2145,10 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	MCFG_CPU_PROGRAM_MAP(alpha68k_II_map)
 	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545*2) /* Unlikely but needed to stop nested NMI's */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 7500) //AT
+	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 7500)
 
 	MCFG_MACHINE_START(alpha68k_II)
 	MCFG_MACHINE_RESET(alpha68k_II)
@@ -2167,7 +2187,6 @@ static MACHINE_CONFIG_DERIVED( btlfieldb, alpha68k_II )
 	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60*4) // MCU irq
 MACHINE_CONFIG_END
 
-//AT
 static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 
 	/* basic machine hardware */
@@ -2176,10 +2195,10 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
 	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60*3) // MCU irq
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000*2)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000*2) // TODO: fix this
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 7500)
+	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 7500)
 
 	MCFG_MACHINE_START(alpha68k_II)
 	MCFG_MACHINE_RESET(alpha68k_II)
@@ -2223,7 +2242,7 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 8500) //AT
+	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 8500)
 
 	MCFG_MACHINE_START(alpha68k_V)
 	MCFG_MACHINE_RESET(alpha68k_V)
@@ -2266,7 +2285,7 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 8500) //AT
+	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 8500)
 
 	MCFG_MACHINE_START(alpha68k_V)
 	MCFG_MACHINE_RESET(alpha68k_V)

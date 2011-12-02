@@ -40,6 +40,8 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	UINT8       m_sound_nmi_mask;
+	UINT8       m_sound_pa_latch;
 };
 
 /* game_id - used to deal with a few game specific situations */

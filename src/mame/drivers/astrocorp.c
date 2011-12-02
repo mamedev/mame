@@ -499,13 +499,15 @@ static MACHINE_CONFIG_DERIVED( showhanc, showhand )
 MACHINE_CONFIG_END
 
 
-static INTERRUPT_GEN( skilldrp_irq )
+static TIMER_DEVICE_CALLBACK( skilldrp_scanline )
 {
-	switch (cpu_getiloops(device))
-	{
-		case 0:	device_set_input_line(device, 4, HOLD_LINE);	break;	// sprites, sound, i/o
-		case 1:	device_set_input_line(device, 2, HOLD_LINE);	break;	// palette
-	}
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq. controls sprites, sound, i/o
+		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+
+	if(scanline == 0) // vblank-in? controls palette
+		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
@@ -513,7 +515,7 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)	// JX-1689F1028N GRX586.V5
 	MCFG_CPU_PROGRAM_MAP(skilldrp_map)
-	MCFG_CPU_VBLANK_INT_HACK(skilldrp_irq, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", skilldrp_scanline, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_93C46_ADD("eeprom")
