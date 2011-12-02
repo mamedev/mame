@@ -893,14 +893,6 @@ static void end_handler(void *data, const char *name)
 		case POS_ROOT:
 			break;
 
-		case POS_SOFT:
-			if ( ! strcmp( name, "part" ) && swlist->softinfo )
-			{
-				/* ROM_END */
-				add_rom_entry( swlist, NULL, NULL, 0, 0, ROMENTRYTYPE_END );
-			}
-			break;
-
 		case POS_MAIN:
 			if ( swlist->softinfo )
 			{
@@ -908,20 +900,27 @@ static void end_handler(void *data, const char *name)
 			}
 			break;
 
-		case POS_PART:
-			/* Add shared_info inherited from the software_info level, if any */
-			if ( swlist->softinfo && swlist->softinfo->shared_info )
+		case POS_SOFT:
+			if ( ! strcmp( name, "part" ) && swlist->softinfo )
 			{
-				feature_list *list = swlist->softinfo->shared_info;
-
-				while( list->next )
+				/* ROM_END */
+				add_rom_entry( swlist, NULL, NULL, 0, 0, ROMENTRYTYPE_END );
+				/* Add shared_info inherited from the software_info level, if any */
+				if ( swlist->softinfo && swlist->softinfo->shared_info )
 				{
-					add_feature( swlist, list->next->name, list->next->value );
-					list = list->next;
+					feature_list *list = swlist->softinfo->shared_info;
+
+					while( list->next )
+					{
+						add_feature( swlist, list->next->name, list->next->value );
+						list = list->next;
+					}
 				}
 			}
 			break;
 
+		case POS_PART:
+			break;
 		case POS_DATA:
 			break;
 	}
