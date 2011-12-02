@@ -30,6 +30,17 @@
 #define FPU_EXCEPTION_DENORMAL_OP	0x0002
 #define FPU_EXCEPTION_INVALID_OP	0x0001
 
+
+/* return the 32 bit representation of value seen as a single precision floating point number */
+INLINE UINT32 FPU_SINGLE_INT32(X87_REG value)
+{
+	float fs=(float)value.f;
+	UINT32 v;
+
+	v=*((UINT32 *)(&fs));
+	return v;
+}
+
 INLINE void FPU_PUSH(i386_state *cpustate, X87_REG value)
 {
 	cpustate->fpu_top--;
@@ -90,6 +101,15 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 
 		switch ((modrm >> 3) & 0x7)
 		{
+			case 3:			// FSTP
+			{
+				// st(0) -> ea
+				WRITE32(cpustate,ea,FPU_SINGLE_INT32(ST(0)));
+				FPU_POP(cpustate);
+				CYCLES(cpustate,1);		// TODO
+				break;
+			}
+
 			case 5:			// FLDCW
 			{
 				cpustate->fpu_control_word = READ16(cpustate,ea);
@@ -176,7 +196,23 @@ static void I386OP(fpu_group_db)(i386_state *cpustate)		// Opcode 0xdb
 
 	if (modrm < 0xc0)
 	{
-		fatalerror("I386: FPU Op DB %02X at %08X", modrm, cpustate->pc-2);
+		UINT32 ea = GetEA(cpustate,modrm);
+
+		switch ((modrm >> 3) & 0x7)
+		{
+			case 0:		// FILD
+			{
+				X87_REG t;
+
+				t.f=(INT32)READ32(cpustate,ea);
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,1);		// TODO
+				break;
+			}
+
+			default:
+				fatalerror("I386: FPU Op DB %02X at %08X", modrm, cpustate->pc-2);
+		}
 	}
 	else
 	{

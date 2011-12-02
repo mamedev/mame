@@ -25,7 +25,7 @@
 
 
 gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
-	: poly_manager<float, gaelco3d_object_data, 0, 2000>(state.machine()),
+	: poly_manager<float, gaelco3d_object_data, 1, 2000>(state.machine()),
 	  m_state(state),
 	  m_screenbits(machine().primary_screen->alloc_compatible_bitmap()),
 	  m_zbuffer(auto_bitmap_alloc(state.machine(), state.machine().primary_screen->width(), state.machine().primary_screen->height(), BITMAP_FORMAT_INDEXED16)),

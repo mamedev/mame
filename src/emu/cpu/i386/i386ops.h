@@ -348,7 +348,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xAB,		OP_2BYTE|OP_I386,			I386OP(bts_rm16_r16),			I386OP(bts_rm32_r32),		},
 	{ 0xAC,		OP_2BYTE|OP_I386,			I386OP(shrd16_i8),				I386OP(shrd32_i8),			},
 	{ 0xAD,		OP_2BYTE|OP_I386,			I386OP(shrd16_cl),				I386OP(shrd32_cl),			},
-	{ 0xAE,		OP_2BYTE|OP_I386,			I386OP(invalid),				I386OP(invalid),			},
+	{ 0xAE,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(sse_group0fae),		PENTIUMOP(sse_group0fae),	},
 	{ 0xAF,		OP_2BYTE|OP_I386,			I386OP(imul_r16_rm16),			I386OP(imul_r32_rm32),		},
 	{ 0xB0,		OP_2BYTE|OP_I486,			I486OP(cmpxchg_rm8_r8),			I486OP(cmpxchg_rm8_r8),		},
 	{ 0xB1,		OP_2BYTE|OP_I486,			I486OP(cmpxchg_rm16_r16),		I486OP(cmpxchg_rm32_r32),	},

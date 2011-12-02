@@ -22,7 +22,7 @@ struct gaelco3d_object_data
 
 class gaelco3d_state;
 
-class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 0, 2000>
+class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1, 2000>
 {
 public:
 	gaelco3d_renderer(gaelco3d_state &state);

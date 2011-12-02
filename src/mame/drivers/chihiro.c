@@ -371,6 +371,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "debug/debugcpu.h"
 
 #define LOG_PCI
+#define LOG_OHCI
 
 static struct {
 	device_t	*pic8259_1;
@@ -649,32 +650,20 @@ static void chihiro_debug_commands(running_machine &machine, int ref, int params
 
 static READ32_HANDLER( geforce_r )
 {
-static int x;
+static int x,ret;
 
+	ret=0;
 	if (offset == 0x1804f6) {
 		x = x ^ 0x08080808;
-		return x;
+		ret=x;
 	}
-	return 0;
+	logerror("NV_2A: read at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,ret);
+	return ret;
 }
 
 static WRITE32_HANDLER( geforce_w )
 {
-}
-
-static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
-{
-#ifdef LOG_PCI
-	logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
-#endif
-	return 0;
-}
-
-static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
-{
-#ifdef LOG_PCI
-	logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
-#endif
+	logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
 }
 
 static UINT32 geforce_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -689,6 +678,79 @@ static void geforce_pci_w(device_t *busdevice, device_t *device, int function, i
 {
 #ifdef LOG_PCI
 	logerror("  bus:1 function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
+#endif
+}
+
+/*
+ * ohci usb controller placeholder
+ */
+
+static char *usbregnames[]={
+	"HcRevision",
+	"HcControl",
+	"HcCommandStatus",
+	"HcInterruptStatus",
+	"HcInterruptEnable",
+	"HcInterruptDisable",
+	"HcHCCA",
+	"HcPeriodCurrentED",
+	"HcControlHeadED",
+	"HcControlCurrentED",
+	"HcBulkHeadED",
+	"HcBulkCurrentED",
+	"HcDoneHead",
+	"HcFmInterval",
+	"HcFmRemaining",
+	"HcFmNumber",
+	"HcPeriodicStart",
+	"HcLSThreshold",
+	"HcRhDescriptorA",
+	"HcRhDescriptorB",
+	"HcRhStatus",
+	"HcRhPortStatus[1]"
+};
+
+static READ32_HANDLER( usbctrl_r )
+{
+	if (offset == 0) { /* hack needed until usb (and jvs) is implemented */
+		chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x6a79f,0x01);
+		chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x6a7a0,0x00);
+	}
+#ifdef LOG_OHCI
+	if (offset >= 0x54/4)
+		logerror("usb controller 0 register HcRhPortStatus[%d] read\n",(offset-0x54/4)+1);
+	else
+		logerror("usb controller 0 register %s read\n",usbregnames[offset]);
+#endif
+	return 0;
+}
+
+static WRITE32_HANDLER( usbctrl_w )
+{
+#ifdef LOG_OHCI
+	if (offset >= 0x54/4)
+		logerror("usb controller 0 register HcRhPortStatus[%d] write %08X\n",(offset-0x54/4)+1);
+	else
+		logerror("usb controller 0 register %s write %08X\n",usbregnames[offset]);
+#endif
+}
+
+/*
+ * dummy for non connected devices
+ */
+
+static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+{
+#ifdef LOG_PCI
+	logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+#endif
+	return 0;
+}
+
+static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+#ifdef LOG_PCI
+	logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
 #endif
 }
 
@@ -895,11 +957,19 @@ int smbus_cx25871(int command,int rw,int data)
 	return 0;
 }
 
-static int eeprom_buffer[256];
+// let's try to fake the missing eeprom
+static int dummyeeprom[256]={0x94,0x18,0x10,0x59,0x83,0x58,0x15,0xDA,0xDF,0xCC,0x1D,0x78,0x20,0x8A,0x61,0xB8,0x08,0xB4,0xD6,0xA8,
+	0x9E,0x77,0x9C,0xEB,0xEA,0xF8,0x93,0x6E,0x3E,0xD6,0x9C,0x49,0x6B,0xB5,0x6E,0xAB,0x6D,0xBC,0xB8,0x80,0x68,0x9D,0xAA,0xCD,0x0B,0x83,
+	0x17,0xEC,0x2E,0xCE,0x35,0xA8,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x61,0x62,0x63,0xAA,0xBB,0xCC,0xDD,0xEE,0xFF,0x00,0x00,
+	0x4F,0x6E,0x6C,0x69,0x6E,0x65,0x6B,0x65,0x79,0x69,0x6E,0x76,0x61,0x6C,0x69,0x64,0x00,0x03,0x80,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF,
+	0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
 int smbus_eeprom(int command,int rw,int data)
 {
-	if (rw == 1) { // 8003b744,3b744=0x90 0x90
+	if (command >= 112)
+		return 0;
+	if (rw == 1) { // if reading
+		// 8003b744,3b744=0x90 0x90
 		// hack to avoid hanging if eeprom contents are not correct
 		// this would need dumping the serial eeprom on the xbox board
 		if (command == 0) {
@@ -908,12 +978,12 @@ int smbus_eeprom(int command,int rw,int data)
 			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b766,0xc9);
 			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b767,0xc3);
 		}
-		data = eeprom_buffer[command]+eeprom_buffer[command+1]*256;
+		data = dummyeeprom[command]+dummyeeprom[command+1]*256;
 		logerror("eeprom: %d %d %d\n",command,rw,data);
 		return data;
 	}
 	logerror("eeprom: %d %d %d\n",command,rw,data);
-	eeprom_buffer[command]=data;
+	dummyeeprom[command]=data;
 	return 0;
 }
 
@@ -998,6 +1068,7 @@ static WRITE32_HANDLER( smbus_w )
 static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM
 	AM_RANGE(0xfd000000, 0xfdffffff) AM_READWRITE(geforce_r, geforce_w)
+	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(usbctrl_r, usbctrl_w)
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 

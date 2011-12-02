@@ -50,4 +50,13 @@ static void PENTIUMOP(cmpxchg8b_m64)(i386_state *cpustate)	// Opcode 0x0f c7
 	}
 }
 
+static void PENTIUMOP(sse_group0fae)(i386_state *cpustate)	// Opcode 0x0f ae
+{
+	UINT8 modm = FETCH(cpustate);
+	if( modm == 0xf8 ) {
+		CYCLES(cpustate,1); // sfence instruction
+	} else {
+		fatalerror("pentium: bad/unsupported 0f ae opcode");
+	}
+}
 
