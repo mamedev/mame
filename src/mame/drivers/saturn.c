@@ -2149,9 +2149,43 @@ static MACHINE_RESET( stv )
 
 struct cdrom_interface saturn_cdrom =
 {
-	NULL,
+	"sat_cdrom",
 	NULL
 };
+
+
+
+
+static DEVICE_IMAGE_LOAD( sat_cart )
+{
+	UINT8 *ROM = image.device().machine().region("maincpu")->base()+0x080000;
+	UINT32 length;
+
+	if (image.software_entry() != NULL)
+	{
+		length = image.get_software_region_length("cart");
+		UINT8* imagex =  image.get_software_region("cart");
+
+		memcpy(ROM, imagex, length);
+	}
+	else
+	{
+		length = image.fread( ROM, 0x400000);
+	}
+
+	// fix endianness....
+	for (int i=0;i<length;i+=4)
+	{
+		UINT8 tempa = ROM[i+0];
+		UINT8 tempb = ROM[i+1];
+		ROM[i+1] = ROM[i+2];
+		ROM[i+0] = ROM[i+3];
+		ROM[i+3] = tempa;
+		ROM[i+2] = tempb;
+	}
+
+	return IMAGE_INIT_PASS;
+}
 
 static MACHINE_CONFIG_START( saturn, saturn_state )
 
@@ -2204,9 +2238,40 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_SOUND_ADD("cdda", CDDA, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
-	MCFG_CDROM_ADD( "cdrom", saturn_cdrom)
+/* Different Softlists for different regions (for now at least) */
+MACHINE_CONFIG_DERIVED( saturnus, saturn )
+	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
+	MCFG_SOFTWARE_LIST_ADD("cd_list","sat_us")
+
 	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_INTERFACE("sat_cart")
+	MCFG_CARTSLOT_LOAD(sat_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
+
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED( saturneu, saturn )
+	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
+	MCFG_SOFTWARE_LIST_ADD("cd_list","sat_eu")
+
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_INTERFACE("sat_cart")
+	MCFG_CARTSLOT_LOAD(sat_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
+
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED( saturnjp, saturn )
+	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
+	MCFG_SOFTWARE_LIST_ADD("cd_list","sat_jp")
+
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_INTERFACE("sat_cart")
+	MCFG_CARTSLOT_LOAD(sat_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
+
 MACHINE_CONFIG_END
 
 
@@ -2398,7 +2463,7 @@ ROM_START(saturnjp)
 	ROMX_LOAD("sega1003.bin", 0x00000000, 0x00080000, CRC(b3c63c25) SHA1(7b23b53d62de0f29a23e423d0fe751dfb469c2fa), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "Japan v1.00 (940921)")
 	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(3))
-	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+//	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
@@ -2411,7 +2476,7 @@ ROM_START(saturn)
 	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+//	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
@@ -2423,7 +2488,7 @@ ROM_START(saturneu)
 	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
-	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+//	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
@@ -2431,7 +2496,7 @@ ROM_END
 ROM_START(vsaturn)
 	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_LOAD("vsaturn.bin", 0x00000000, 0x00080000, CRC(e4d61811) SHA1(4154e11959f3d5639b11d7902b3a393a99fb5776))
-	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+//	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
@@ -2439,16 +2504,16 @@ ROM_END
 ROM_START(hisaturn)
 	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796))
-	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+//	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT        COMPANY     FULLNAME            FLAGS */
-CONS( 1994, saturn,     0,      0,      saturn, saturn, saturnus,   "Sega",     "Saturn (USA)",     GAME_NOT_WORKING )
-CONS( 1994, saturnjp,   saturn, 0,      saturn, saturn, saturnjp,   "Sega",     "Saturn (Japan)",   GAME_NOT_WORKING )
-CONS( 1994, saturneu,   saturn, 0,      saturn, saturn, saturneu,   "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
-CONS( 1995, vsaturn,    saturn, 0,      saturn, saturn, saturnjp,   "JVC",      "V-Saturn",         GAME_NOT_WORKING )
-CONS( 1995, hisaturn,   saturn, 0,      saturn, saturn, saturnjp,   "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
+CONS( 1994, saturn,     0,      0,      saturnus, saturn, saturnus,   "Sega",     "Saturn (USA)",     GAME_NOT_WORKING )
+CONS( 1994, saturnjp,   saturn, 0,      saturnjp, saturn, saturnjp,   "Sega",     "Saturn (Japan)",   GAME_NOT_WORKING )
+CONS( 1994, saturneu,   saturn, 0,      saturneu, saturn, saturneu,   "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
+CONS( 1995, vsaturn,    saturn, 0,      saturnjp, saturn, saturnjp,   "JVC",      "V-Saturn",         GAME_NOT_WORKING )
+CONS( 1995, hisaturn,   saturn, 0,      saturnjp, saturn, saturnjp,   "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
 
 #include "stv.c"
