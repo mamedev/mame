@@ -803,7 +803,7 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)     /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(fghtbskt_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("soundcpu", I8039,XTAL_12MHz/4)	/* ????? */
 	MCFG_CPU_PROGRAM_MAP(i8039_map)

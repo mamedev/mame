@@ -98,6 +98,14 @@ static INTERRUPT_GEN( lwings_interrupt )
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
+static INTERRUPT_GEN( avengers_interrupt )
+{
+	lwings_state *state = device->machine().driver_data<lwings_state>();
+
+	if(state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 
 static WRITE8_HANDLER( avengers_protection_w )
 {
@@ -857,7 +865,7 @@ static MACHINE_CONFIG_DERIVED( avengers, trojan )
 
 	MCFG_CPU_MODIFY("maincpu") //AT: (avengers37b16gre)
 	MCFG_CPU_PROGRAM_MAP(avengers_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) // RST 38h triggered by software
+	MCFG_CPU_VBLANK_INT("screen", avengers_interrupt) // RST 38h triggered by software
 
 	MCFG_CPU_MODIFY("adpcm")
 	MCFG_CPU_IO_MAP(avengers_adpcm_io_map)
