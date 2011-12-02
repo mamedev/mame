@@ -113,7 +113,8 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
-	AM_RANGE(0x00100000, 0x001fffff) AM_RAM
+	AM_RANGE(0x00100000, 0x00ffffff) AM_NOP
+	AM_RANGE(0x01000000, 0xfffeffff) AM_NOP
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
@@ -199,7 +200,7 @@ static MACHINE_START( pangofun )
 
 static MACHINE_CONFIG_START( pangofun, pangofun_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000 )	/* I486 ?? Mhz */
+	MCFG_CPU_ADD("maincpu", I486, 25000000 )	/* I486 ?? Mhz (25 according to POST) */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_io)
 

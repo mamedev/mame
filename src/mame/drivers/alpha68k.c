@@ -20,6 +20,10 @@
     Super Champion Baseball (V board?)       SNK/Alpha/Romstar/Sega 1989
     The Next Space          A8004-1 PIC      SNK 1989
 
+TODO:
+- Super Stingray MCU irq controls timer speed, needs the MCU to be hooked up.
+- Super Champion Baseball "ball speed" protection
+
 General notes:
 
     All II & V games are 68000, z80 plus a custom Alpha microcontroller,
@@ -190,7 +194,6 @@ DIP locations verified from manuals for:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -1850,14 +1853,6 @@ static const ym3812_interface ym3812_config =
 	YM3812_irq
 };
 
-static INTERRUPT_GEN( alpha68k_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line(device, 1, HOLD_LINE);
-	else
-		device_set_input_line(device, 2, HOLD_LINE);
-}
-//ZT
 
 /******************************************************************************/
 
@@ -1950,7 +1945,8 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
 	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60) // MCU irq
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sstingry_sound_map)
@@ -2001,7 +1997,8 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)	/* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60) // MCU irq
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_sound_map)
@@ -2051,7 +2048,8 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt,17) // must be at least 4 for the controls to be smooth
+	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60*16) // MCU irq
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(jongbou_sound_map)
@@ -2165,7 +2163,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( btlfieldb, alpha68k_II )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60*4) // MCU irq
 MACHINE_CONFIG_END
 
 //AT
@@ -2174,7 +2173,8 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(alpha68k_II_map)
-	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt, 4)
+	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60*3) // MCU irq
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000*2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2349,7 +2349,7 @@ ROM_START( sstingry )
 	ROM_LOAD( "ss_01.rom",       0x0000,  0x4000, CRC(fef09a92) SHA1(77b6aded1eed1bd5e6ffb25b56b62b10b7b9a304) )
 	ROM_LOAD( "ss_02.rom",       0x4000,  0x4000, CRC(ab4e8c01) SHA1(d96e7f97945fff48fb7b4661fdb575ac7ff77445) )
 
-	ROM_REGION( 0x0400, "cpu2", 0 )	  /* 8748 MCU code */
+	ROM_REGION( 0x0400, "mcu", 0 )	  /* 8748 MCU code */
 	ROM_LOAD( "d8748.bin",       0x0000, 0x0400, CRC(7fcbfc30) SHA1(6d087a3d44e475b6c8260a5134952097f26459b7) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
@@ -2485,6 +2485,10 @@ ROM_START( kyrosj )
 	ROM_LOAD( "2s.1f",      0x00000, 0x4000, CRC(800ceb27) SHA1(4daa1b8adcad7a90cfd5d20704a7c431673c4995) )
 	ROM_LOAD( "1s.1d",      0x04000, 0x8000, CRC(87d3e719) SHA1(4b8b1b600c7c1de3a77030001e7e6f0ff118f294) )
 
+	ROM_REGION( 0x1000, "mcu", 0 ) // these comes from original set
+	ROM_LOAD( "kyros_68705u3.bin",    0x0000, 0x1000, BAD_DUMP CRC(c20880b7) SHA1(b041c36cbc4f348d74e0548df5cb14727f2d353b) ) // this one is from a bootleg PCB, program code *might* be compatible.
+	ROM_LOAD( "kyros_mcu.bin",    0x0000, 0x0800,  BAD_DUMP CRC(3a902a19) SHA1(af1be8894c899b27b1106663ffaf2ab43fa1cdaa) ) // original MCU? (HD6805U1)
+
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "8.9r",   0x00000, 0x8000, CRC(d8203284) SHA1(7dede410239be6b674644fa76c91dd01837f841f) )
 	ROM_LOAD( "11.12m", 0x08000, 0x8000, CRC(a2f9738c) SHA1(31be81274bf70674bf0c32fcddbacf0f58d8f897) )
@@ -2518,6 +2522,9 @@ ROM_START( jongbou )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p7.i1", 0x00000, 0x8000, CRC(88d74794) SHA1(98dbbb4d88c1e96a0e251e39ef43b02bd68e0bba) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "p6.l15", 0x00000, 0x10000, CRC(1facee65) SHA1(6c98338c616e53106960063d0d31483131b492b0) )
 	ROM_LOAD( "p5.k15", 0x10000, 0x10000, CRC(db0ad6bb) SHA1(c2ce0e78a4be9314f4f14ea87f521a79bab3697c) )
@@ -2543,6 +2550,9 @@ ROM_START( paddlema )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )   /* Sound CPU */
 	ROM_LOAD( "padlem.18c", 0x000000, 0x10000, CRC(9269778d) SHA1(bdc9100827f2e018db943d9f7d81b7936c155bf0) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "padlem.16m",      0x00000, 0x10000, CRC(0984fb4d) SHA1(6bc529db93fad277f286e4a380812c40c7f42301) )
@@ -2578,6 +2588,9 @@ ROM_START( timesold )
 	ROM_LOAD( "bf.8",            0x30000,  0x10000, CRC(8a43497b) SHA1(c64519b2aced8b072efdd1a6286f082094a50e61) )
 	ROM_LOAD( "bf.9",            0x50000,  0x10000, CRC(1408416f) SHA1(d7a32de156791f923635d7fdddc8db97f66bfb2a) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "bf.5",            0x00000,  0x08000, CRC(3cec2f55) SHA1(e4fca0c8193680385c7dd4d6c599492c9e0dd4af) )
 	ROM_LOAD( "bf.6",            0x08000,  0x08000, CRC(086a364d) SHA1(b008d4b351ada4240dd6c82c45405a2489e36019) )
@@ -2609,6 +2622,9 @@ ROM_START( timesold1 )
 	ROM_CONTINUE(                0x18000,  0x08000 )
 	ROM_LOAD( "bf.8",            0x30000,  0x10000, CRC(8a43497b) SHA1(c64519b2aced8b072efdd1a6286f082094a50e61) )
 	ROM_LOAD( "bf.9",            0x50000,  0x10000, CRC(1408416f) SHA1(d7a32de156791f923635d7fdddc8db97f66bfb2a) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "bf.5",            0x00000,  0x08000, CRC(3cec2f55) SHA1(e4fca0c8193680385c7dd4d6c599492c9e0dd4af) )
@@ -2674,6 +2690,9 @@ ROM_START( btlfieldb )
 	ROM_LOAD( "bf.8",            0x30000,  0x10000, CRC(8a43497b) SHA1(c64519b2aced8b072efdd1a6286f082094a50e61) )
 	ROM_LOAD( "bf.9",            0x50000,  0x10000, CRC(1408416f) SHA1(d7a32de156791f923635d7fdddc8db97f66bfb2a) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "bfv1_05.bin",     0x00000,  0x08000, CRC(be269dbf) SHA1(3240badbf65e076cc1f7caaec1081df9a4371d47) )
 	ROM_LOAD( "bfv1_06.bin",     0x08000,  0x08000, CRC(022b9de9) SHA1(5a736a4cfe05e7681c78ab816dfe04074fe0293d) )
@@ -2722,6 +2741,9 @@ ROM_START( skysoldr )
 	ROM_LOAD( "ss.8",            0x30000, 0x10000, CRC(e5cf7b37) SHA1(770ee80a1cc0f877486c6b47812db2b1118651d9) )
 	ROM_LOAD( "ss.9",            0x50000, 0x10000, CRC(76124ca2) SHA1(5b87178ab663cd8aa67670f0c14c9cbb8616b04d) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "ss.5",            0x00000, 0x08000, CRC(928ba287) SHA1(c415c5b84b83ee0e5e0aa60eb33132145fcd7487) )
 	ROM_LOAD( "ss.6",            0x08000, 0x08000, CRC(93b30b55) SHA1(51cacc48f4a298131852d41da80126bda5988920) )
@@ -2768,6 +2790,9 @@ ROM_START( goldmedl )
 	ROM_CONTINUE(               0x10000,  0x78000 )
 #endif
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x80000, "audiocpu", 0 ) // banking is slightly different from other Alpha68kII games
 	ROM_LOAD( "38.bin",          0x00000,  0x08000, BAD_DUMP CRC(4bf251b8) SHA1(d69a6607e92dbe8081c7c66b6853f02d578ef73f) ) // we use the bootleg set instead
 	ROM_CONTINUE(                0x18000,  0x08000 )
@@ -2800,6 +2825,9 @@ ROM_START( goldmedla )
 	ROM_LOAD( "39.bin",          0x20000,  0x10000, BAD_DUMP CRC(1d92be86) SHA1(9b6e7141653ee7b7b1915a545d381419aec4e483) )
 	ROM_LOAD( "40.bin",          0x30000,  0x10000, BAD_DUMP CRC(8dafc4e8) SHA1(7d4898557ad638ab8461060bc7ae406d7d24c5a4) )
 	ROM_LOAD( "1.bin",           0x40000,  0x10000, BAD_DUMP CRC(1e78062c) SHA1(821c037edf32eb8b03e5c487d3bab0622337e80b) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "gm.5",           0x000000, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
@@ -2859,6 +2887,9 @@ ROM_START( skyadvnt )
 	ROM_LOAD( "sa.5",           0x50000,  0x10000, CRC(11cdb868) SHA1(6cd9c7952b4789e819272cbe0623f3e6f607b7eb) )
 	ROM_LOAD( "sa.6",           0x70000,  0x08000, CRC(237d93fd) SHA1(4c65169e4ce6a9be229410bbfd9b823060a829d7) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
 
@@ -2881,6 +2912,9 @@ ROM_START( skyadvntu )
 	ROM_LOAD( "sa.5",           0x50000,  0x10000, CRC(11cdb868) SHA1(6cd9c7952b4789e819272cbe0623f3e6f607b7eb) )
 	ROM_LOAD( "sa.6",           0x70000,  0x08000, CRC(237d93fd) SHA1(4c65169e4ce6a9be229410bbfd9b823060a829d7) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
 
@@ -2902,6 +2936,9 @@ ROM_START( skyadvntj )
 	ROM_LOAD( "sa.4",           0x30000,  0x10000, CRC(c2e3c30c) SHA1(43e1b489d879950bce3568433a4781377c3eebe7) )
 	ROM_LOAD( "sa.5",           0x50000,  0x10000, CRC(11cdb868) SHA1(6cd9c7952b4789e819272cbe0623f3e6f607b7eb) )
 	ROM_LOAD( "sa.6",           0x70000,  0x08000, CRC(237d93fd) SHA1(4c65169e4ce6a9be229410bbfd9b823060a829d7) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
@@ -2928,6 +2965,9 @@ ROM_START( gangwars )
 	ROM_LOAD( "gw-11.11f",      0x30000, 0x10000, CRC(7b9f2608) SHA1(8d61dfa32369450e396cc8a5d67c58eedb2167e6) )
 	ROM_LOAD( "gw-10.13f",      0x50000, 0x10000, CRC(eb305d42) SHA1(93910cf60c1b8a87969888d8693c7d6782f1e799) )
 	ROM_LOAD( "gw-9.15f",       0x70000, 0x10000, CRC(84e5c946) SHA1(0b071d15b664a9c529713b1b896bdb5ebfa16c25) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "gw-13.4l",     0x000000, 0x10000, CRC(b75bf1d0) SHA1(c22c0049274c45701be0a7be2afc0517620a3a10) )
@@ -3005,6 +3045,9 @@ ROM_START( gangwarsu )
 	ROM_LOAD( "u10",            0x50000, 0x10000, CRC(636978ae) SHA1(5d8093bc43192c89e230af318609222a69866b6e) )
 	ROM_LOAD( "u9",             0x70000, 0x10000, CRC(9136745e) SHA1(d7a2bfeac69ab2dbd4565a5bd1abb1f3f1199b42) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "gwb_ic.m19",     0x000000, 0x10000, CRC(b75bf1d0) SHA1(c22c0049274c45701be0a7be2afc0517620a3a10) )
 
@@ -3030,6 +3073,9 @@ ROM_START( sbasebal )
 	ROM_LOAD( "snksb4.bin",      0x30000, 0x10000, CRC(cca2555d) SHA1(13c672331e8e5e5dd8fc3aa7829d46de6b8271f3) )
 	ROM_LOAD( "snksb5.bin",      0x50000, 0x10000, CRC(f45ee36f) SHA1(cdfdf696e9fcd2827ab1dd6adc2a45085911333d) )
 	ROM_LOAD( "snksb6.bin",      0x70000, 0x10000, CRC(651c9472) SHA1(bcff6679e22143cd6816c441c5a67b4956ee7ee0) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "snksb7.bin",      0x000000, 0x10000, CRC(8f3c2e25) SHA1(a5b3880f3079cce607678fd4ea5971560ce9ed8d) )
@@ -3267,7 +3313,7 @@ static DRIVER_INIT( tnextspc )
 
 /******************************************************************************/
 
-GAME( 1986, sstingry,  0,        sstingry,       sstingry, sstingry, ROT90, "Alpha Denshi Co.",                                  "Super Stingray", GAME_SUPPORTS_SAVE )
+GAME( 1986, sstingry,  0,        sstingry,       sstingry, sstingry, ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", GAME_SUPPORTS_SAVE | GAME_UNEMULATED_PROTECTION )
 
 GAME( 1987, kyros,     0,        kyros,          kyros,    kyros,    ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", GAME_SUPPORTS_SAVE )
 GAME( 1986, kyrosj,    kyros,    kyros,          kyros,    kyros,    ROT90, "Alpha Denshi Co.",                                  "Kyros No Yakata (Japan)", GAME_SUPPORTS_SAVE )
