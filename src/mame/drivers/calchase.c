@@ -96,6 +96,7 @@ all files across to new HDD, boots up fine.
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "video/pc_vga.h"
 
 
 class calchase_state : public driver_device
@@ -105,7 +106,6 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_bios_ram;
-	UINT32 *m_vga_vram;
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
@@ -121,42 +121,6 @@ public:
 
 
 static void ide_interrupt(device_t *device, int state);
-
-
-static VIDEO_START(calchase)
-{
-}
-
-static SCREEN_UPDATE(calchase)
-{
-	calchase_state *state = screen->machine().driver_data<calchase_state>();
-	int x,y,count,i;
-
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
-
-	count = (0);
-
-	for(y=0;y<256;y++)
-	{
-		for(x=0;x<320;x+=32)
-		{
-			for (i=0;i<32;i++)
-			{
-				UINT32 color;
-
-				color = (state->m_vga_vram[count])>>(32-i) & 0x1;
-
-				if((x+i)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine().pens[color];
-
-			}
-
-			count++;
-		}
-	}
-
-	return 0;
-}
 
 static READ8_DEVICE_HANDLER(at_dma8237_2_r)
 {
@@ -474,7 +438,7 @@ static WRITE32_HANDLER(bios_ram_w)
 
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE_MEMBER(calchase_state, m_vga_vram)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA vram
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
@@ -500,16 +464,13 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
-	AM_RANGE(0x0300, 0x03af) AM_NOP
-	AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
-	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE("share1")
+//	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")
+//	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 
@@ -703,16 +664,21 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_GFXDECODE( CGA )
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(calchase)
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	MCFG_VIDEO_START(calchase)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 MACHINE_CONFIG_END
+
+static const struct pc_vga_interface vga_interface =
+{
+	NULL,
+	NULL,
+	NULL,
+	AS_IO,
+	0x0000
+};
 
 static DRIVER_INIT( calchase )
 {
@@ -724,6 +690,7 @@ static DRIVER_INIT( calchase )
 	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
+	pc_vga_init(machine, &vga_interface, NULL);
 }
 
 
