@@ -766,10 +766,15 @@ static READ8_HANDLER( yarunara_input_r )
 
 static WRITE8_HANDLER( yarunara_rombank_w )
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	memory_set_bank(space->machine(), "bank1", data);
+       dynax_state *state = space->machine().driver_data<dynax_state>();
+       int bank_n = (space->machine().region("maincpu")->bytes() - 0x10000) / 0x8000;
 
-	state->m_hnoridur_bank = data;
+       //logerror("%04x: rom bank = %02x\n", cpu_get_pc(&space->device()), data);
+       if (data < bank_n)
+               memory_set_bank(space->machine(), "bank1", data);
+       else
+               logerror("rom_bank = %02x (larger than the maximum bank %02x)\n",data, bank_n);
+       state->m_hnoridur_bank = data;
 }
 
 static WRITE8_HANDLER( yarunara_flipscreen_w )
