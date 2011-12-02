@@ -685,7 +685,7 @@ static void geforce_pci_w(device_t *busdevice, device_t *device, int function, i
  * ohci usb controller placeholder
  */
 
-static char *usbregnames[]={
+static const char *const usbregnames[]={
 	"HcRevision",
 	"HcControl",
 	"HcCommandStatus",
@@ -729,9 +729,9 @@ static WRITE32_HANDLER( usbctrl_w )
 {
 #ifdef LOG_OHCI
 	if (offset >= 0x54/4)
-		logerror("usb controller 0 register HcRhPortStatus[%d] write %08X\n",(offset-0x54/4)+1);
+		logerror("usb controller 0 register HcRhPortStatus[%d] write %08X\n",(offset-0x54/4)+1,data);
 	else
-		logerror("usb controller 0 register %s write %08X\n",usbregnames[offset]);
+		logerror("usb controller 0 register %s write %08X\n",usbregnames[offset],data);
 #endif
 }
 
