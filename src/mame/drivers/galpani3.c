@@ -946,7 +946,7 @@ static const ymz280b_interface ymz280b_intf =
 };
 
 static MACHINE_CONFIG_START( galpani3, galpani3_state )
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)	 // ? (from which clock?)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28_63636MHz/2)	// Confirmed from PCB
 	MCFG_CPU_PROGRAM_MAP(galpani3_map)
 	MCFG_CPU_VBLANK_INT_HACK(galpani3_vblank, 3)
 
@@ -969,7 +969,7 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 28636400 / 2)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_33_333MHz / 2)	// Confirmed from PCB
 	MCFG_SOUND_CONFIG(ymz280b_intf)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
