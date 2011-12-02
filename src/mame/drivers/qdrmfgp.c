@@ -9,6 +9,8 @@ OSC  :18.43200MHz/32.00000MHz
 Other(GQ460):Konami 053252,054156,056832,054539
 Other(GE557):Konami 056832,058141,058143
 
+TODO:
+- enabling irq acks breaks both games, why?
 
 --
 driver by Eisuke Watanabe
@@ -281,7 +283,7 @@ static INTERRUPT_GEN(qdrmfgp_interrupt)
 		case 1:
 			/* trigger V-blank interrupt */
 			if (state->m_control & 0x0004)
-				device_set_input_line(device, 3, ASSERT_LINE);
+				device_set_input_line(device, 3, HOLD_LINE);
 			break;
 	}
 }
@@ -304,7 +306,7 @@ static TIMER_CALLBACK( gp2_timer_callback )
 {
 	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
 	if (state->m_control & 0x0004)
-		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(qdrmfgp2_interrupt)
@@ -312,7 +314,7 @@ static INTERRUPT_GEN(qdrmfgp2_interrupt)
 	qdrmfgp_state *state = device->machine().driver_data<qdrmfgp_state>();
 	/* trigger V-blank interrupt */
 	if (state->m_control & 0x0008)
-		device_set_input_line(device, 4, ASSERT_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static void gp2_ide_interrupt(device_t *device, int state)
@@ -614,12 +616,12 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq3_ack_w )
 {
-	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
+//	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq4_ack_w )
 {
-	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
+//	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
 }
 
 static const k053252_interface qdrmfgp_k053252_intf =
