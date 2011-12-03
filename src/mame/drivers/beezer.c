@@ -4,10 +4,12 @@
 
   Written by Mathis Rosenhauer
 
+  TODO:
+  - what's really wrong with the sound? Any reference available?
+
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
@@ -75,12 +77,19 @@ static INPUT_PORTS_START( beezer )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
+static MACHINE_START(beezer)
+{
+	beezer_state *state = machine.driver_data<beezer_state>();
+
+	state->m_maincpu = machine.device("maincpu");
+}
+
 static MACHINE_CONFIG_START( beezer, beezer_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1000000)        /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", beezer_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M6809, 1000000)        /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -95,6 +104,8 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 	MCFG_SCREEN_UPDATE(beezer)
 
 	MCFG_PALETTE_LENGTH(16)
+
+	MCFG_MACHINE_START(beezer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

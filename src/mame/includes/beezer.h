@@ -9,7 +9,8 @@ public:
 	UINT8 *m_videoram;
 	int m_pbus;
 	int m_banklatch;
-	int m_scanline;
+
+	device_t *m_maincpu;
 };
 
 
@@ -33,7 +34,7 @@ READ8_DEVICE_HANDLER( beezer_noise_r );
 
 /*----------- defined in video/beezer.c -----------*/
 
-INTERRUPT_GEN( beezer_interrupt );
+TIMER_DEVICE_CALLBACK( beezer_interrupt );
 SCREEN_UPDATE( beezer );
 WRITE8_HANDLER( beezer_map_w );
 READ8_HANDLER( beezer_line_r );

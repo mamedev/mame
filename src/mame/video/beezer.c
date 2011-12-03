@@ -4,17 +4,19 @@
 #include "includes/beezer.h"
 
 
-INTERRUPT_GEN( beezer_interrupt )
+TIMER_DEVICE_CALLBACK( beezer_interrupt )
 {
-	beezer_state *state = device->machine().driver_data<beezer_state>();
-	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
+	int scanline = param;
+//	beezer_state *state = timer.machine().driver_data<beezer_state>();
+	via6522_device *via_0 = timer.machine().device<via6522_device>("via6522_0");
 
-	state->m_scanline = (state->m_scanline + 1) % 0x80;
-	via_0->write_ca2((state->m_scanline & 0x10) ? 1 : 0);
-	if ((state->m_scanline & 0x78) == 0x78)
-		device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+	via_0->write_ca2((scanline & 0x20) ? 1 : 0);
+	#if 0
+	if (scanline == 240) // actually unused by the game! (points to a tight loop)
+		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		device_set_input_line(device, M6809_FIRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	#endif
 }
 
 SCREEN_UPDATE( beezer )
@@ -68,7 +70,6 @@ WRITE8_HANDLER( beezer_map_w )
 
 READ8_HANDLER( beezer_line_r )
 {
-	beezer_state *state = space->machine().driver_data<beezer_state>();
-	return (state->m_scanline & 0xfe) << 1;
+	return space->machine().primary_screen->vpos();
 }
 
