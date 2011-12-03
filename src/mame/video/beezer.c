@@ -71,5 +71,6 @@ WRITE8_HANDLER( beezer_map_w )
 READ8_HANDLER( beezer_line_r )
 {
 	return space->machine().primary_screen->vpos();
+//  Note: was (state->m_scanline & 0xfe) << 1;, with scanline % 128
 }
 
