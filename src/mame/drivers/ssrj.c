@@ -6,8 +6,8 @@
  TODO:
  - colors (missing proms?)
  - dips
- - proper video hw emulation
  - controls (is there START button ?)
+ - when a car sprite goes outside of the screen it gets stuck for a split frame on top of screen
 
 HW info :
 
@@ -121,8 +121,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,3),	/* 1024 characters */
 	3,	/* 3 bits per pixel */
 	{ 0, RGN_FRAC(2,3), RGN_FRAC(1,3) },	/* the bitplanes are separated */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
@@ -153,16 +153,16 @@ static MACHINE_CONFIG_START( ssrj, ssrj_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 30*8-1, 3*8, 32*8-1)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 1*8, 31*8-1) // unknown res
 	MCFG_SCREEN_UPDATE(ssrj)
+	MCFG_SCREEN_EOF(ssrj)
 
 	MCFG_GFXDECODE(ssrj)
 	MCFG_PALETTE_LENGTH(128)
 	MCFG_PALETTE_INIT(ssrj)
 
 	MCFG_VIDEO_START(ssrj)
-//  MCFG_ASPECT_RATIO(3,4)
 
 	MCFG_MACHINE_RESET(ssrj)
 
@@ -195,4 +195,4 @@ ROM_START( ssrj )
 
 ROM_END
 
-GAME( 1985, ssrj,  0,       ssrj,  ssrj,  0, ORIENTATION_FLIP_X, "Taito Corporation", "Super Speed Race Junior (Japan)",GAME_WRONG_COLORS|GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, ssrj,  0,       ssrj,  ssrj,  0, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)",GAME_WRONG_COLORS|GAME_IMPERFECT_GRAPHICS )

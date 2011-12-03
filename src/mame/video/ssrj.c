@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_tile_info1 )
 		0,
 		code&0x3ff,
 		(code>>12)&0x3,
-	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
+	  ((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0)	);
 }
 
 /* tilemap 2 */
@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_tile_info2 )
 		0,
 		code&0x3ff,
 		((code>>12)&0x3)+4,
-	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
+	  ((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0)	);
 }
 
 /* tilemap 4 */
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_tile_info4 )
 		0,
 		code&0x3ff,
 		((code>>12)&0x3)+12,
-	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
+	  ((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0)	);
 }
 
 
@@ -226,11 +226,13 @@ VIDEO_START( ssrj )
 {
 	ssrj_state *state = machine.driver_data<ssrj_state>();
 
-	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_tilemap4 = tilemap_create(machine, get_tile_info4, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_tilemap4 = tilemap_create(machine, get_tile_info4, tilemap_scan_cols, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->m_tilemap2, 0);
 	tilemap_set_transparent_pen(state->m_tilemap4, 0);
+
+	state->m_buffer_spriteram = auto_alloc_array(machine, UINT8, 0x0800);
 }
 
 
@@ -241,10 +243,13 @@ static void draw_objects(running_machine &machine, bitmap_t *bitmap, const recta
 
 	for(i=0;i<6;i++)
 	{
-		x = state->m_scrollram[0x80+20*i];
-		y = state->m_scrollram[0x80+20*i+2];
-		if (!state->m_scrollram[0x80+20*i+3])
-			for(k=0;k<5;k++,y+=8)
+		y = state->m_buffer_spriteram[0x80+20*i];
+		x = state->m_buffer_spriteram[0x80+20*i+2];
+		if (!state->m_buffer_spriteram[0x80+20*i+3])
+		{
+
+			for(k=0;k<5;k++,x+=8)
+			{
 				for(j=0;j<0x20;j++)
 				{
 					int code;
@@ -255,12 +260,14 @@ static void draw_objects(running_machine &machine, bitmap_t *bitmap, const recta
 						cliprect,machine.gfx[0],
 						code&1023,
 						((code>>12)&0x3)+8,
-						code&0x8000,
 						code&0x4000,
-						(247-(x+(j<<3)))&0xff,
-						y,
+						code&0x8000,
+						x,
+						(247-(y+(j<<3)))&0xff,
 						0);
 				}
+			}
+		}
 	}
 }
 
@@ -277,8 +284,8 @@ SCREEN_UPDATE( ssrj )
 {
 	ssrj_state *state = screen->machine().driver_data<ssrj_state>();
 
-	tilemap_set_scrolly(state->m_tilemap1, 0, 0xff-state->m_scrollram[2] );
-	tilemap_set_scrollx(state->m_tilemap1, 0, state->m_scrollram[0] );
+	tilemap_set_scrollx(state->m_tilemap1, 0, 0xff-state->m_scrollram[2] );
+	tilemap_set_scrolly(state->m_tilemap1, 0, state->m_scrollram[0] );
 	tilemap_draw(bitmap, cliprect, state->m_tilemap1, 0, 0);
 	draw_objects(screen->machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
@@ -287,4 +294,9 @@ SCREEN_UPDATE( ssrj )
 	return 0;
 }
 
+SCREEN_EOF( ssrj )
+{
+	ssrj_state *state = screen->machine().driver_data<ssrj_state>();
 
+	memcpy(state->m_buffer_spriteram, state->m_scrollram, 0x800);
+}

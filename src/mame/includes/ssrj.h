@@ -13,6 +13,7 @@ public:
 	UINT8 *m_vram3;
 	UINT8 *m_vram4;
 	UINT8 *m_scrollram;
+	UINT8 *m_buffer_spriteram;
 };
 
 
@@ -24,4 +25,5 @@ WRITE8_HANDLER(ssrj_vram4_w);
 
 VIDEO_START( ssrj );
 SCREEN_UPDATE( ssrj );
+SCREEN_EOF( ssrj );
 PALETTE_INIT( ssrj );
