@@ -593,7 +593,6 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
@@ -622,9 +621,9 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
  *
  *************************************/
 
-static INTERRUPT_GEN( cps2_interrupt )
+static TIMER_DEVICE_CALLBACK( cps2_interrupt )
 {
-	cps_state *state = device->machine().driver_data<cps_state>();
+	cps_state *state = timer.machine().driver_data<cps_state>();
 
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
 	if (state->m_scancount >= 258)
@@ -646,9 +645,9 @@ static INTERRUPT_GEN( cps2_interrupt )
 	if (state->m_scanline1 == state->m_scancount || (state->m_scanline1 < state->m_scancount && !state->m_scancalls))
 	{
 		state->m_cps_b_regs[0x10/2] = 0;
-		device_set_input_line(device, 4, HOLD_LINE);
-		cps2_set_sprite_priorities(device->machine());
-		device->machine().primary_screen->update_partial(16 - 10 + state->m_scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		cps2_set_sprite_priorities(timer.machine());
+		timer.machine().primary_screen->update_partial(16 - 10 + state->m_scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		state->m_scancalls++;
 //          popmessage("IRQ4 scancounter = %04i", state->m_scancount);
 	}
@@ -657,9 +656,9 @@ static INTERRUPT_GEN( cps2_interrupt )
 	if(state->m_scanline2 == state->m_scancount || (state->m_scanline2 < state->m_scancount && !state->m_scancalls))
 	{
 		state->m_cps_b_regs[0x12 / 2] = 0;
-		device_set_input_line(device, 4, HOLD_LINE);
-		cps2_set_sprite_priorities(device->machine());
-		device->machine().primary_screen->update_partial(16 - 10 + state->m_scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		cps2_set_sprite_priorities(timer.machine());
+		timer.machine().primary_screen->update_partial(16 - 10 + state->m_scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		state->m_scancalls++;
 //          popmessage("IRQ4 scancounter = %04i",scancount);
 	}
@@ -668,13 +667,13 @@ static INTERRUPT_GEN( cps2_interrupt )
 	{
 		state->m_cps_b_regs[0x10 / 2] = state->m_scanline1;
 		state->m_cps_b_regs[0x12 / 2] = state->m_scanline2;
-		device_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 		if(state->m_scancalls)
 		{
-			cps2_set_sprite_priorities(device->machine());
-			device->machine().primary_screen->update_partial(256);
+			cps2_set_sprite_priorities(timer.machine());
+			timer.machine().primary_screen->update_partial(256);
 		}
-		cps2_objram_latch(device->machine());
+		cps2_objram_latch(timer.machine());
 	}
 	//popmessage("Raster calls = %i", state->m_scancalls);
 }
@@ -1218,7 +1217,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(cps2_map)
-	MCFG_CPU_VBLANK_INT_HACK(cps2_interrupt,259)	// 262  /* ??? interrupts per frame */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", cps2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
