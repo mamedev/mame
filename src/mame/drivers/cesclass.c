@@ -2,12 +2,14 @@
 
     CES Classic wall games
 
+	Pinball system?
 */
 
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/okim6295.h"
 
 class cesclassic_state : public driver_device
 {
@@ -17,7 +19,8 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ16_MEMBER(_60000_r);
+	DECLARE_READ16_MEMBER(_600000_r);
+	DECLARE_READ16_MEMBER(_670000_r);
 
 protected:
 
@@ -27,6 +30,10 @@ protected:
 	// driver_device overrides
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	int m_test_x;
+	int m_test_y;
+	int m_start_offs;
 };
 
 
@@ -36,39 +43,111 @@ void cesclassic_state::video_start()
 
 bool cesclassic_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
+	int x,y,count,xi;
+	const UINT8 *blit_ram = machine().region("maincpu")->base();
+
+	if(machine().input().code_pressed(KEYCODE_Z))
+		m_test_x++;
+
+	if(machine().input().code_pressed(KEYCODE_X))
+		m_test_x--;
+
+	if(machine().input().code_pressed_once(KEYCODE_C))
+		m_test_x++;
+
+	if(machine().input().code_pressed_once(KEYCODE_V))
+		m_test_x--;
+
+	if(machine().input().code_pressed(KEYCODE_A))
+		m_test_y++;
+
+	if(machine().input().code_pressed(KEYCODE_S))
+		m_test_y--;
+
+	if(machine().input().code_pressed(KEYCODE_Q))
+		m_start_offs+=0x200;
+
+	if(machine().input().code_pressed(KEYCODE_W))
+		m_start_offs-=0x200;
+
+	if(machine().input().code_pressed_once(KEYCODE_E))
+		m_start_offs++;
+
+	if(machine().input().code_pressed_once(KEYCODE_R))
+		m_start_offs--;
+
+	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
+
+	bitmap_fill(&bitmap,&cliprect,get_black_pen(machine()));
+
+	count = (m_start_offs);
+
+	for(y=0;y<m_test_y;y++)
+	{
+		for(x=0;x<m_test_x;x++)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				UINT32 color;
+
+				color = ((blit_ram[count])>>(7-xi)) & 1;
+
+				if((x*8+xi)<256 && ((y)+0)<256)
+					*BITMAP_ADDR32(&bitmap, y, x*8+xi) = machine().pens[color];
+			}
+
+			count++;
+		}
+	}
+
 	return 0;
 }
 
-READ16_MEMBER( cesclassic_state::_60000_r )
+READ16_MEMBER( cesclassic_state::_600000_r )
 {
 	return 0x100 | 0x200;
+}
+
+READ16_MEMBER( cesclassic_state::_670000_r )
+{
+	return -1;
 }
 
 static ADDRESS_MAP_START( cesclassic_map, AS_PROGRAM, 16, cesclassic_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ(_60000_r)
-	AM_RANGE(0x640040, 0x640041) AM_WRITENOP
-	AM_RANGE(0x904000, 0x904001) AM_WRITENOP
+	AM_RANGE(0x600000, 0x600001) AM_READ(_600000_r)
+//	AM_RANGE(0x640040, 0x640041) AM_WRITENOP
+	AM_RANGE(0x670000, 0x670001) AM_READ(_670000_r)
+	AM_RANGE(0x900100, 0x900101) AM_WRITENOP
+//	AM_RANGE(0x900100, 0x900101) AM_DEVREADWRITE8("oki", okim6295_device, read, write,0x00ff)
+//	AM_RANGE(0x904000, 0x904001) AM_WRITENOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cesclassic )
 INPUT_PORTS_END
 
+
 static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
 	MCFG_CPU_PROGRAM_MAP(cesclassic_map)
+	MCFG_CPU_VBLANK_INT("screen",irq3_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
 	MCFG_PALETTE_LENGTH(16)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", 24000000/8, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 

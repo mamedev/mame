@@ -1838,8 +1838,6 @@ static WRITE8_HANDLER( porta_w )
 {
 	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 
-	printf("%02x\n",data);
-
 	if(data == 0xff)
 		return; // skip
 
