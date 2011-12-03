@@ -590,10 +590,10 @@ extern int atari_frame_counter;
 extern VIDEO_START( atari );
 extern SCREEN_UPDATE( atari );
 
-INTERRUPT_GEN( a400_interrupt );
-INTERRUPT_GEN( a800_interrupt );
-INTERRUPT_GEN( a800xl_interrupt );
-INTERRUPT_GEN( a5200_interrupt );
+TIMER_DEVICE_CALLBACK( a400_interrupt );
+TIMER_DEVICE_CALLBACK( a800_interrupt );
+TIMER_DEVICE_CALLBACK( a800xl_interrupt );
+TIMER_DEVICE_CALLBACK( a5200_interrupt );
 
 extern PALETTE_INIT( atari );
 

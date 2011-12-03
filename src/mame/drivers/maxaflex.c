@@ -11,7 +11,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6805/m6805.h"
 #include "includes/atari.h"
@@ -401,7 +400,7 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
-	MCFG_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M68705, 3579545)
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
