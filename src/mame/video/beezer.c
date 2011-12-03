@@ -23,11 +23,11 @@ SCREEN_UPDATE( beezer )
 	UINT8 *videoram = state->m_videoram;
 	int x,y;
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y+=2)
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x+=2)
 		{
-			*BITMAP_ADDR16(bitmap, y+1, x) = videoram[0x80*y+x] & 0x0f;
-			*BITMAP_ADDR16(bitmap, y,   x) = videoram[0x80*y+x] >> 4;
+			*BITMAP_ADDR16(bitmap, y,   x+1) = videoram[0x80*x+y] & 0x0f;
+			*BITMAP_ADDR16(bitmap, y,   x+0) = videoram[0x80*x+y] >> 4;
 		}
 
 	return 0;

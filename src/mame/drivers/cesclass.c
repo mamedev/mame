@@ -2,7 +2,6 @@
 
     CES Classic wall games
 
-	Pinball system?
 */
 
 #define ADDRESS_MAP_MODERN
