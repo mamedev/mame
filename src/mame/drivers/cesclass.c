@@ -2,6 +2,14 @@
 
     CES Classic wall games
 
+	driver by Angelo Salese
+
+	TODO:
+	- custom layout for dual LCDs
+	- artwork needed to make progresses
+    - U43 and U44 bad in Trap Shoot Classic
+    - games are incredibly slow by now
+
 */
 
 #define ADDRESS_MAP_MODERN
@@ -9,6 +17,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "rendlay.h"
 
 class cesclassic_state : public driver_device
 {
@@ -20,6 +29,7 @@ public:
 
 	DECLARE_READ16_MEMBER(_600000_r);
 	DECLARE_READ16_MEMBER(_670000_r);
+	UINT16 *m_vram;
 
 protected:
 
@@ -30,9 +40,6 @@ protected:
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	int m_test_x;
-	int m_test_y;
-	int m_start_offs;
 };
 
 
@@ -42,60 +49,26 @@ void cesclassic_state::video_start()
 
 bool cesclassic_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	int x,y,count,xi;
-	const UINT8 *blit_ram = machine().region("maincpu")->base();
-
-	if(machine().input().code_pressed(KEYCODE_Z))
-		m_test_x++;
-
-	if(machine().input().code_pressed(KEYCODE_X))
-		m_test_x--;
-
-	if(machine().input().code_pressed_once(KEYCODE_C))
-		m_test_x++;
-
-	if(machine().input().code_pressed_once(KEYCODE_V))
-		m_test_x--;
-
-	if(machine().input().code_pressed(KEYCODE_A))
-		m_test_y++;
-
-	if(machine().input().code_pressed(KEYCODE_S))
-		m_test_y--;
-
-	if(machine().input().code_pressed(KEYCODE_Q))
-		m_start_offs+=0x200;
-
-	if(machine().input().code_pressed(KEYCODE_W))
-		m_start_offs-=0x200;
-
-	if(machine().input().code_pressed_once(KEYCODE_E))
-		m_start_offs++;
-
-	if(machine().input().code_pressed_once(KEYCODE_R))
-		m_start_offs--;
-
-	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
+	int x,y,xi;
 
 	bitmap_fill(&bitmap,&cliprect,get_black_pen(machine()));
 
-	count = (m_start_offs);
-
-	for(y=0;y<m_test_y;y++)
 	{
-		for(x=0;x<m_test_x;x++)
+		for(y=0;y<64;y++)
 		{
-			for(xi=0;xi<8;xi++)
+			for(x=0;x<16;x++)
 			{
-				UINT32 color;
+				for(xi=0;xi<16;xi++)
+				{
+					UINT8 color;
 
-				color = ((blit_ram[count])>>(7-xi)) & 1;
+					color = (((m_vram[x+y*16+0x400])>>(15-xi)) & 1);
+					color |= (((m_vram[x+y*16])>>(15-xi)) & 1)<<1;
 
-				if((x*8+xi)<256 && ((y)+0)<256)
-					*BITMAP_ADDR32(&bitmap, y, x*8+xi) = machine().pens[color];
+					if((x*16+xi)<256 && ((y)+0)<256)
+						*BITMAP_ADDR32(&bitmap, y, x*16+xi) = machine().pens[color];
+				}
 			}
-
-			count++;
 		}
 	}
 
@@ -114,7 +87,8 @@ READ16_MEMBER( cesclassic_state::_670000_r )
 
 static ADDRESS_MAP_START( cesclassic_map, AS_PROGRAM, 16, cesclassic_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+	AM_RANGE(0x400000, 0x40cfff) AM_RAM
+	AM_RANGE(0x40d000, 0x40ffff) AM_RAM AM_BASE(m_vram)
 	AM_RANGE(0x600000, 0x600001) AM_READ(_600000_r)
 //  AM_RANGE(0x640040, 0x640041) AM_WRITENOP
 	AM_RANGE(0x670000, 0x670001) AM_READ(_670000_r)
@@ -126,23 +100,31 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( cesclassic )
 INPUT_PORTS_END
 
+static PALETTE_INIT( cesclassic )
+{
+	int i;
+
+	for (i = 0; i < 4; i++)
+		palette_set_color_rgb(machine, i, pal2bit(i), 0, 0);
+}
 
 static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
 	MCFG_CPU_PROGRAM_MAP(cesclassic_map)
-	MCFG_CPU_VBLANK_INT("screen",irq3_line_hold)
+	MCFG_CPU_VBLANK_INT("l_lcd",irq3_line_hold)
 	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("l_lcd", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_SIZE(8*16*2, 8*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 8*16*2-1, 0*8, 8*8-1)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(4)
+	MCFG_PALETTE_INIT(cesclassic)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 24000000/8, OKIM6295_PIN7_LOW)
@@ -177,6 +159,6 @@ ROM_START(tsclass)
 ROM_END
 
 
-GAME(1996, hrclass, 0, cesclassic, cesclassic, 0, ROT0, "Creative Electronics And Software", "Home Run Classic", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME(1996, ccclass, 0, cesclassic, cesclassic, 0, ROT0, "Creative Electronics And Software", "Country Club Classic", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME(1996, tsclass, 0, cesclassic, cesclassic, 0, ROT0, "Creative Electronics And Software", "Trap Shoot Classic", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME(1997, hrclass, 0, cesclassic, cesclassic, 0, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME(1997, ccclass, 0, cesclassic, cesclassic, 0, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME(1997, tsclass, 0, cesclassic, cesclassic, 0, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)", GAME_NOT_WORKING | GAME_NO_SOUND )
