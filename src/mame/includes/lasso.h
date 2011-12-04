@@ -53,4 +53,3 @@ VIDEO_START( pinbo );
 SCREEN_UPDATE( lasso );
 SCREEN_UPDATE( chameleo );
 SCREEN_UPDATE( wwjgtin );
-SCREEN_UPDATE( pinbo );

@@ -19,7 +19,6 @@ Notes:
   same as the Rock-Ola games of the same area.  Lot of similarities between
   these hardware.  The music ends at the perfect time with this clock speed
 - Lasso: fire button auto-repeats on high score entry screen (real behavior?)
-- Pinbo: background color is wrong (MT #4546)
 
 ***************************************************************************
 
@@ -182,6 +181,7 @@ static ADDRESS_MAP_START( pinbo_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE_MEMBER(lasso_state, m_colorram)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE_MEMBER(lasso_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
+	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, m_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
@@ -603,11 +603,10 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	/* video hardware */
 	MCFG_GFXDECODE(pinbo)
 	MCFG_PALETTE_LENGTH(256)
-
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(pinbo)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(pinbo)
+	MCFG_SCREEN_UPDATE(chameleo)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("sn76489.1")

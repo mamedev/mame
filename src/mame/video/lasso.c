@@ -190,6 +190,8 @@ VIDEO_START( pinbo )
 
 	/* create tilemap */
 	state->m_bg_tilemap = tilemap_create(machine, pinbo_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
 }
 
 
@@ -407,16 +409,6 @@ SCREEN_UPDATE( wwjgtin )
 
 	draw_sprites(screen->machine(), bitmap, cliprect, 1);	// reverse order
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-
-	return 0;
-}
-
-
-SCREEN_UPDATE( pinbo )
-{
-	lasso_state *state = screen->machine().driver_data<lasso_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
