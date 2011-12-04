@@ -300,7 +300,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x01:	/* IOSEL */
-//			polepos_mcu_enable_w(offset,data);
+//          polepos_mcu_enable_w(offset,data);
 			break;
 
 		case 0x02:	/* CLSON */

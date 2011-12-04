@@ -7,7 +7,7 @@
 TIMER_DEVICE_CALLBACK( beezer_interrupt )
 {
 	int scanline = param;
-//	beezer_state *state = timer.machine().driver_data<beezer_state>();
+//  beezer_state *state = timer.machine().driver_data<beezer_state>();
 	via6522_device *via_0 = timer.machine().device<via6522_device>("via6522_0");
 
 	via_0->write_ca2((scanline & 0x20) ? 1 : 0);

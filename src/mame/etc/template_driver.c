@@ -32,7 +32,7 @@ static ADDRESS_MAP_START( xxx_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xxx_io, AS_IO, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xxx )
@@ -55,7 +55,7 @@ GFXDECODE_END
 
 static MACHINE_START( xxx )
 {
-//	xxx_state *state = machine.driver_data<xxx_state>();
+//  xxx_state *state = machine.driver_data<xxx_state>();
 
 }
 
@@ -96,8 +96,8 @@ static MACHINE_CONFIG_START( xxx, xxx_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 

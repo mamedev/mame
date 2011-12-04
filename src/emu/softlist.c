@@ -385,7 +385,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					else if ( !strcmp( attributes[0], "supported" ) )
 					{
 						supported = attributes[1];
-					} 
+					}
 					else
 						unknown_attribute(swlist, attributes[0]);
 				}
@@ -538,9 +538,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 					else if ( !strcmp( attributes[0], "interface" ) )
 						str_interface = attributes[1];
-						
-					else 
-						unknown_attribute(swlist, attributes[0]);					
+
+					else
+						unknown_attribute(swlist, attributes[0]);
 				}
 
 				if ( str_name && str_interface )
@@ -593,9 +593,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 					else if ( !strcmp( attributes[0], "size") )
 						str_size = attributes[1];
-					
-					else 
-						unknown_attribute(swlist, attributes[0]);					
+
+					else
+						unknown_attribute(swlist, attributes[0]);
 				}
 				if ( str_name && str_size )
 				{
@@ -629,7 +629,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( !strcmp( attributes[0], "name" ) )
 						str_name = attributes[1];
 					else
-						unknown_attribute(swlist, attributes[0]);				
+						unknown_attribute(swlist, attributes[0]);
 				}
 				if ( str_name )
 				{
@@ -665,9 +665,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 					else if ( !strcmp( attributes[0], "value" ) )
 						str_feature_value = attributes[1];
-					
+
 					else
-						unknown_attribute(swlist, attributes[0]);									
+						unknown_attribute(swlist, attributes[0]);
 				}
 
 				/* Prepare for adding feature to feature list */
@@ -733,9 +733,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					else if ( !strcmp( attributes[0], "status" ) )
 						str_status = attributes[1];
 					else if ( !strcmp( attributes[0], "loadflag" ) )
-						str_loadflag = attributes[1];						
+						str_loadflag = attributes[1];
 					else
-						unknown_attribute(swlist, attributes[0]);									
+						unknown_attribute(swlist, attributes[0]);
 				}
 				if ( swlist->softinfo )
 				{
@@ -822,7 +822,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						parse_error(&swlist->state, "%s: Incomplete rom definition (line %lu)\n",
 							swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 					}
-				} 
+				}
 			}
 			else
 			if (!strcmp(tagname, "disk"))
@@ -843,7 +843,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					else if ( !strcmp( attributes[0], "writeable" ) )
 						str_writeable = attributes[1];
 					else
-						unknown_attribute(swlist, attributes[0]);									
+						unknown_attribute(swlist, attributes[0]);
 				}
 				if ( swlist->softinfo )
 				{
@@ -870,7 +870,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			}
 			else if (!strcmp(tagname, "dipvalue"))
 			{
-			}			
+			}
 			else
 				unknown_tag(swlist, tagname);
 			break;
@@ -1811,7 +1811,7 @@ void validate_softlists(emu_options &options)
 						{
 							lists[list_count++] = swlist->list_name[i];
 							software_list_parse( list, &validate_error_proc, NULL );
-							
+
 							for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 							{
 								const char *s;
@@ -1948,7 +1948,7 @@ void validate_softlists(emu_options &options)
 							}
 						}
 						software_list_close(list);
-					}					
+					}
 				}
 			}
 		}

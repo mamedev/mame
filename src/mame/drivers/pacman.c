@@ -917,8 +917,8 @@ static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
- 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-// 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
+//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
 //  AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 //  AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)

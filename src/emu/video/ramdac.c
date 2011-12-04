@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	Generic Palette RAMDAC device
+    Generic Palette RAMDAC device
 
-	Written by Angelo Salese
+    Written by Angelo Salese
 
-	TODO:
-	- masking register
+    TODO:
+    - masking register
 
 ***************************************************************************/
 

@@ -1558,7 +1558,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 	/* is this a SMD file? */
 	if (genesis_is_SMD(&rawROM[0x2200], (unsigned)length))
 	{
-//		printf("SMD!\n");
+//      printf("SMD!\n");
 		tmpROMnew = ROM;
 		tmpROM = ROM + 0x2000 + 512;
 
@@ -1590,7 +1590,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 	else if ((rawROM[0x2080] == 'E') && (rawROM[0x2081] == 'A') &&
 			 (rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))
 	{
-//		printf("MD!\n");
+//      printf("MD!\n");
 		tmpROMnew = global_alloc_array(unsigned char, length);
 		secondhalf = &tmpROMnew[length >> 1];
 

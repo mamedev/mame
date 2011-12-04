@@ -73,7 +73,7 @@ const int TRIGGER_SUSPENDTIME	= -4000;
 
 device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device),
-//	  m_cothread(cothread_entry_delegate(FUNC(device_execute_interface::run_thread_wrapper), this)),
+//    m_cothread(cothread_entry_delegate(FUNC(device_execute_interface::run_thread_wrapper), this)),
 	  m_disabled(false),
 	  m_vblank_interrupt(NULL),
 	  m_vblank_interrupts_per_frame(0),
@@ -380,12 +380,12 @@ UINT64 device_execute_interface::total_cycles() const
 /*
 void device_execute_interface::run_thread_wrapper()
 {
-	// loop infinitely
-	device_scheduler &scheduler = device().machine().scheduler();
-	while (1)
+    // loop infinitely
+    device_scheduler &scheduler = device().machine().scheduler();
+    while (1)
     {
-    	// call the classic run function, then swap back to the scheduler's thread
-    	execute_run();
+        // call the classic run function, then swap back to the scheduler's thread
+        execute_run();
         scheduler.make_active();
     }
 }

@@ -325,7 +325,7 @@ static MACHINE_RESET( gng )
 		int i;
 
 		/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
-	             For now let's fill everything with white colors until we have better info about it */
+                 For now let's fill everything with white colors until we have better info about it */
 		for(i=0;i<0x100;i+=4)
 		{
 			machine.generic.paletteram.u8[i] = machine.generic.paletteram2.u8[i] = 0x00;

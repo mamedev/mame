@@ -205,7 +205,7 @@ public:
 
 	// required operation overrides
 //#if USE_COTHREADS
-//	void run() { m_cothread.make_active(); }
+//  void run() { m_cothread.make_active(); }
 //#else
 	void run() { execute_run(); }
 //#endif
@@ -272,7 +272,7 @@ protected:
 	};
 
 	// internal state
-//	cothread				m_cothread;					// thread used for execution
+//  cothread                m_cothread;                 // thread used for execution
 
 	// configuration
 	bool					m_disabled;					// disabled from executing?

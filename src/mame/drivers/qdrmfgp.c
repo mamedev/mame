@@ -616,12 +616,12 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq3_ack_w )
 {
-//	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
+//  cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq4_ack_w )
 {
-//	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
+//  cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
 }
 
 static const k053252_interface qdrmfgp_k053252_intf =

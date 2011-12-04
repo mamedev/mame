@@ -14,7 +14,7 @@ public:
 	UINT8 *		m_videoram;
 	UINT8 *		m_colorram;
 	UINT8 *		m_spriteram;
-//  UINT8 *		m_paletteram;  // currently this uses generic palette handling
+//  UINT8 *     m_paletteram;  // currently this uses generic palette handling
 	size_t		m_spriteram_size;
 
 	/* video-related */
