@@ -211,6 +211,13 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 	}
 
 	floppy_image_read(floppy, header, 0, 0x100);
+#ifdef SPOT_DUPLICATES
+	// this allow to spot .dsk files with same data and different headers, making easier to debug softlists.
+	UINT32 temp_size = floppy_image_size(floppy);
+	UINT8 tmp_copy[temp_size - 0x100];
+	floppy_image_read(floppy,tmp_copy,0x100,temp_size - 0x100);
+	printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy, temp_size - 0x100));
+#endif
 
 	tag = (struct dskdsk_tag *) floppy_create_tag(floppy, sizeof(struct dskdsk_tag));
 	if (!tag)
