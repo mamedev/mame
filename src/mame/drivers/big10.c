@@ -61,7 +61,6 @@
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "machine/nvram.h"
-#include "deprecat.h"
 
 
 class big10_state : public driver_device
@@ -86,9 +85,9 @@ static void big10_vdp_interrupt(running_machine &machine, int i)
 	cputag_set_input_line (machine, "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
 }
 
-static INTERRUPT_GEN( big10_interrupt )
+static TIMER_DEVICE_CALLBACK( big10_interrupt )
 {
-	v9938_interrupt(device->machine(), 0);
+	v9938_interrupt(timer.machine(), 0);
 }
 
 
@@ -256,7 +255,7 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io)
-	MCFG_CPU_VBLANK_INT_HACK(big10_interrupt, 262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", big10_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(big10)
 

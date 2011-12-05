@@ -2,7 +2,9 @@ class battlera_state : public driver_device
 {
 public:
 	battlera_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		{ }
 
 	int m_control_port_select;
 	int m_msm5205next;
@@ -23,6 +25,8 @@ public:
 	int m_bb_enable;
 	int m_bldwolf_vblank;
 	UINT8 m_blank_tile[32];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -30,7 +34,7 @@ public:
 
 SCREEN_UPDATE( battlera );
 VIDEO_START( battlera );
-INTERRUPT_GEN( battlera_interrupt );
+TIMER_DEVICE_CALLBACK( battlera_irq );
 
 READ8_HANDLER( HuC6270_register_r );
 WRITE8_HANDLER( HuC6270_register_w );

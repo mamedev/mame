@@ -8,7 +8,6 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/battlera.h"
 
@@ -370,23 +369,23 @@ SCREEN_UPDATE( battlera )
 
 /******************************************************************************/
 
-INTERRUPT_GEN( battlera_interrupt )
+TIMER_DEVICE_CALLBACK( battlera_irq )
 {
-	battlera_state *state = device->machine().driver_data<battlera_state>();
-	state->m_current_scanline=255-cpu_getiloops(device); /* 8 lines clipped at top */
+	battlera_state *state = timer.machine().driver_data<battlera_state>();
+	state->m_current_scanline = param; /* 8 lines clipped at top */
 
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
 	if (state->m_rcr_enable && (state->m_current_scanline+56)==state->m_HuC6270_registers[6]) {
-		device->machine().primary_screen->update_partial(state->m_current_scanline);
-		device_set_input_line(device, 0, HOLD_LINE); /* RCR interrupt */
+		timer.machine().primary_screen->update_partial(state->m_current_scanline);
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
 	else if (state->m_current_scanline==240) {
 		state->m_bldwolf_vblank=1;
-		device->machine().primary_screen->update_partial(240);
+		timer.machine().primary_screen->update_partial(240);
 		if (state->m_irq_enable)
-			device_set_input_line(device, 0, HOLD_LINE); /* VBL */
+			device_set_input_line(state->m_maincpu, 0, HOLD_LINE); /* VBL */
 	}
 
 	/* End of vblank */
