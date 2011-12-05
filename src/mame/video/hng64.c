@@ -1544,8 +1544,6 @@ SCREEN_UPDATE( hng64 )
 	hng64_drawtilemap(screen->machine(),bitmap,cliprect, 1);
 	hng64_drawtilemap(screen->machine(),bitmap,cliprect, 0);
 
-	draw_sprites(screen->machine(), bitmap,cliprect);
-
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites.
 	{
 		int x, y;
@@ -1566,8 +1564,9 @@ SCREEN_UPDATE( hng64 )
 			}
 		}
 		//printf("NEW FRAME!\n");   /* Debug - ajg */
-		clear3d(screen->machine());
 	}
+
+	draw_sprites(screen->machine(), bitmap,cliprect);
 
 	if(0)
 		transition_control(screen->machine(), bitmap, cliprect);
@@ -1652,6 +1651,11 @@ SCREEN_UPDATE( hng64 )
 	}
 
 	return 0;
+}
+
+SCREEN_EOF( hng64 )
+{
+	clear3d(screen->machine());
 }
 
 VIDEO_START( hng64 )

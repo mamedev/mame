@@ -448,7 +448,16 @@ or Fatal Fury for example).
 #include "machine/nvram.h"
 #include "includes/hng64.h"
 
+/* TODO: NOT measured! */
+#define PIXEL_CLOCK			((MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
 
+#define HTOTAL				(0x200+0x100)
+#define HBEND				(0)
+#define HBSTART				(0x200)
+
+#define VTOTAL				(264*2)
+#define VBEND				(0)
+#define VBSTART				(224*2)
 
 
 #ifdef UNUSED_FUNCTION
@@ -931,7 +940,7 @@ static WRITE32_HANDLER( tcram_w )
 		visarea.max_x = min_x + max_x - 1;
 		visarea.min_y = min_y;
 		visarea.max_y = min_y + max_y - 1;
-		space->machine().primary_screen->configure(0x200, 0x1c0, visarea, space->machine().primary_screen->frame_period().attoseconds );
+		space->machine().primary_screen->configure(HTOTAL, VTOTAL, visarea, space->machine().primary_screen->frame_period().attoseconds );
 	}
 }
 
@@ -1632,36 +1641,31 @@ static const mips3_config vr4300_config =
 	16384				/* data cache size */
 };
 
-static TIMER_CALLBACK( irq_stop )
-{
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-}
 
-static INTERRUPT_GEN( irq_start )
+static TIMER_DEVICE_CALLBACK( hng64_irq )
 {
-	hng64_state *state = device->machine().driver_data<hng64_state>();
+	hng64_state *state = timer.machine().driver_data<hng64_state>();
+	int scanline = param;
+	int irq_fired,irq_type;
 
-	logerror("HNG64 interrupt level %x\n", cpu_getiloops(device));
+	irq_fired = irq_type = 0;
 
 	/* there are more, the sources are unknown at the moment */
-	switch (cpu_getiloops(device))
+	switch(scanline)
 	{
-		case 0x00: state->m_interrupt_level_request = 0;
-		break;
-		case 0x01: state->m_interrupt_level_request = 1;
-		break;
-		case 0x02: state->m_interrupt_level_request = 2;
-		break;
-		case 0x03:
-		if (state->m_mcu_type == RACING_MCU)
-			state->m_interrupt_level_request = 11; //network irq
-		else
-			return;
-		break;
+		case 224*2:	state->m_interrupt_level_request = 0; irq_fired = 1; irq_type = 1; break;
+		case 0*2: state->m_interrupt_level_request = 1; irq_fired = 1; irq_type = 1; break;
+		case 64*2: state->m_interrupt_level_request = 2; irq_fired = 1; irq_type = 1; break;
+		case 128*2:  state->m_interrupt_level_request = 11; irq_fired = 1; irq_type = 1; break;
+		case (0+1)*2:
+		case (224+1)*2:
+		case (64+1)*2:
+		case (128+1)*2:
+			irq_fired = 1; irq_type = 0; break;
 	}
 
-	device_set_input_line(device, 0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(irq_stop));
+	if(irq_fired)
+		device_set_input_line(state->m_maincpu, 0, (irq_type) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1721,7 +1725,7 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK) 	// actually R4300
 	MCFG_CPU_CONFIG(vr4300_config)
 	MCFG_CPU_PROGRAM_MAP(hng_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq_start,4)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", hng64_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", V33, 8000000)				// v53, 16? mhz!
 	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
@@ -1737,16 +1741,14 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_MACHINE_RESET(hyperneo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0x1c0-1)
 	MCFG_SCREEN_UPDATE(hng64)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(hng64)
+	MCFG_SCREEN_EOF(hng64)
 MACHINE_CONFIG_END
 
 
