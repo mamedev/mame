@@ -89,7 +89,6 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "deprecat.h"
 #include "sound/ymf271.h"
 #include "rendlay.h"
 #include "machine/jalcrpt.h"
@@ -1332,11 +1331,12 @@ static void irq_raise(running_machine &machine, int level)
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
-
-static INTERRUPT_GEN(ms32_interrupt)
+/* TODO: fix this arrangement (derived from old deprecat.h) */
+static TIMER_DEVICE_CALLBACK(ms32_interrupt)
 {
-	if( cpu_getiloops(device) == 0 ) irq_raise(device->machine(), 10);
-	if( cpu_getiloops(device) == 1 ) irq_raise(device->machine(), 9);
+	int scanline = param;
+	if( scanline == 0 ) irq_raise(timer.machine(), 10);
+	if( scanline == 8)  irq_raise(timer.machine(), 9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
        kirarast needs it too, at least 8 per frame, but waits for a variable amount
        47pi2 needs ?? per frame (otherwise it hangs when you lose)
@@ -1345,7 +1345,7 @@ static INTERRUPT_GEN(ms32_interrupt)
        desertwr
        p47aces
        */
-	if( cpu_getiloops(device) >= 3 && cpu_getiloops(device) <= 32 ) irq_raise(device->machine(), 0);
+	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(timer.machine(), 0);
 }
 
 static MACHINE_RESET( ms32 )
@@ -1359,7 +1359,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
 	MCFG_CPU_PROGRAM_MAP(bnstars_map)
-	MCFG_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ms32_interrupt, "lscreen", 0, 1)
 
 //  MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 //  MCFG_CPU_PROGRAM_MAP(bnstars_z80_map)
@@ -1377,7 +1377,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE(bnstars)
 
@@ -1385,7 +1385,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE(bnstars)
 
@@ -1475,4 +1475,4 @@ static DRIVER_INIT (bnstars)
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
 }
 
-GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_NO_SOUND )
+GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
