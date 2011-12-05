@@ -10,7 +10,8 @@ class dynax_state : public driver_device
 {
 public:
 	dynax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		{ }
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	UINT8 *  m_pixmap[8][2];
