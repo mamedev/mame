@@ -1036,7 +1036,7 @@ Shooting Star:
     2x 27c1001 eproms
     2x mk48t08b-15 timekeeper RAM
 
-- common adp i/o board (see adp.c ) with MC68681 an YM2149F
+- common adp i/o board (see adp.c ) with MC68681 and YM2149F
 
 - lamp board with triacs
 
