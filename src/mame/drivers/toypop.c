@@ -64,20 +64,20 @@ static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->m_main_irq_mask = 1;
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->m_main_irq_mask = 0;
+//	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->m_sound_irq_mask = 1;
-	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+//	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
@@ -114,7 +114,7 @@ static INTERRUPT_GEN( toypop_main_vblank_irq )
 	device_t *namcoio_2 = device->machine().device("56xx_2");
 
 	if(state->m_main_irq_mask)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_0))		/* give the cpu a tiny bit of time to write the command before processing it */
 		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
@@ -132,7 +132,7 @@ static INTERRUPT_GEN( toypop_sound_timer_irq )
 	toypop_state *state = device->machine().driver_data<toypop_state>();
 
 	if(state->m_sound_irq_mask)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_clear_w )
