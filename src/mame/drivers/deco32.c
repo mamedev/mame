@@ -300,6 +300,7 @@ static TIMER_DEVICE_CALLBACK( interrupt_gen )
 
 static READ32_HANDLER( deco32_irq_controller_r )
 {
+	deco32_state *state = space->machine().driver_data<deco32_state>();
 	int vblank;
 
 	switch (offset)
@@ -326,7 +327,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 		if (vblank)
 			return 0xffffff80 | 0x1 | 0x10; /* Assume VBL takes priority over possible raster/lightgun irq */
 
-		return 0xffffff80 | vblank | (cpu_getiloops(&space->device()) ? 0x40 : 0x20);
+		return 0xffffff80 | vblank | ((state->m_irq_source) ? 0x40 : 0x20);
 //      return 0xffffff80 | vblank | (0x40); //test for lock load guns
 	}
 
@@ -2018,12 +2019,31 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static TIMER_DEVICE_CALLBACK( lockload_vbl_irq )
+{
+	deco32_state *state = timer.machine().driver_data<deco32_state>();
+	int scanline = param;
+
+	if(scanline == 31*8)
+	{
+		state->m_irq_source = 0;
+		device_set_input_line(state->m_maincpu, ARM_IRQ_LINE, HOLD_LINE);
+	}
+
+	if(scanline == 0)
+	{
+		state->m_irq_source = 1;
+		device_set_input_line(state->m_maincpu, ARM_IRQ_LINE, HOLD_LINE);
+	}
+}
+
+
 static MACHINE_CONFIG_START( lockload, dragngun_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
 	MCFG_CPU_PROGRAM_MAP(lockload_map)
-	MCFG_CPU_VBLANK_INT_HACK(deco32_vbl_interrupt,2) // From 2
+	MCFG_TIMER_ADD_SCANLINE("scantimer", lockload_vbl_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2039,7 +2059,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(42*8, 32*8)
+	MCFG_SCREEN_SIZE(42*8, 32*8+22)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(dragngun)
 	MCFG_SCREEN_EOF(dragngun)

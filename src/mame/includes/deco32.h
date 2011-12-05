@@ -5,9 +5,11 @@ class deco32_state : public driver_device
 public:
 	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_decobsmt(*this, "decobsmt")
     { }
 
+	required_device<cpu_device> m_maincpu;
 	optional_device<decobsmt_device> m_decobsmt;
 
 	UINT32 *m_ram;
@@ -49,6 +51,7 @@ public:
 
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
+	UINT8 m_irq_source;
 };
 
 class dragngun_state : public deco32_state

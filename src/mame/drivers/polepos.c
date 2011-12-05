@@ -219,7 +219,6 @@ Todo:
 #include "cpu/z80/z80.h"
 #include "cpu/z8000/z8000.h"
 #include "cpu/mb88xx/mb88xx.h"
-#include "deprecat.h"
 #include "machine/namco06.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
