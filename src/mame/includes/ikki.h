@@ -8,7 +8,9 @@ class ikki_state : public driver_device
 {
 public:
 	ikki_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		{ }
 
 	/* memory pointers */
 	UINT8 *    m_videoram;
@@ -21,6 +23,9 @@ public:
 	bitmap_t   *m_sprite_bitmap;
 	UINT8      m_flipscreen;
 	int        m_punch_through_pen;
+	UINT8      m_irq_source;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

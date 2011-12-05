@@ -39,7 +39,7 @@ public:
 	int        m_keymatrix;
 
 	/* devices */
-	optional_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	UINT8 *m_nvram;

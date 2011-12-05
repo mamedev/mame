@@ -13,7 +13,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "includes/ikki.h"
 
@@ -26,11 +25,11 @@ TODO:
 
 static READ8_HANDLER( ikki_e000_r )
 {
+	ikki_state *state = space->machine().driver_data<ikki_state>();
+
 /* bit1: interrupt type?, bit0: CPU2 busack? */
 
-	if (cpu_getiloops(&space->device()) == 0)
-		return 0;
-	return 2;
+	return (state->m_irq_source << 1);
 }
 
 static WRITE8_HANDLER( ikki_coin_counters )
@@ -174,9 +173,9 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
+	RGN_FRAC(1,3),   /* 2048 characters */
 	3,      /* 3 bits per pixel */
-	{0,16384*8,16384*8*2},
+	{RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3)},
 	{7,6,5,4,3,2,1,0},
 	{8*0, 8*1, 8*2, 8*3, 8*4, 8*5, 8*6, 8*7},
 	8*8
@@ -185,9 +184,9 @@ static const gfx_layout charlayout =
 static const gfx_layout spritelayout =
 {
 	16,32,  /* 16*32 characters */
-	256,    /* 256 characters */
+	RGN_FRAC(1,3),    /* 256 characters */
 	3,      /* 3 bits per pixel */
-	{16384*8*2,16384*8,0},
+	{RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3)},
 	{7,6,5,4,3,2,1,0,
 		8*16+7,8*16+6,8*16+5,8*16+4,8*16+3,8*16+2,8*16+1,8*16+0},
 	{8*0, 8*1, 8*2, 8*3, 8*4, 8*5, 8*6, 8*7,
@@ -215,6 +214,7 @@ static MACHINE_START( ikki )
 
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_punch_through_pen));
+	state->save_item(NAME(state->m_irq_source));
 }
 
 static MACHINE_RESET( ikki )
@@ -224,18 +224,31 @@ static MACHINE_RESET( ikki )
 	state->m_flipscreen = 0;
 }
 
+static TIMER_DEVICE_CALLBACK( ikki_irq )
+{
+	ikki_state *state = timer.machine().driver_data<ikki_state>();
+	int scanline = param;
+
+	if(scanline == 240 || scanline == 0)
+	{
+		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
+
+		state->m_irq_source = (scanline != 240);
+	}
+}
+
 static MACHINE_CONFIG_START( ikki, ikki_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(ikki_cpu1)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ikki_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(ikki_cpu2)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START(ikki)
 	MCFG_MACHINE_RESET(ikki)
@@ -245,7 +258,7 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_SIZE(32*8, 32*8+3*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE(ikki)
 
@@ -284,14 +297,14 @@ ROM_START( ikki )
 	ROM_LOAD( "tvg17_5",  0x0000,  0x2000, CRC(22bdb40e) SHA1(265801ad660a5a3fc5bb187fa92dbe6098b390f5) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* sprite */
-	ROM_LOAD( "tvg17_6",  0x0000,  0x4000, CRC(dc8aa269) SHA1(fd8b5c2bead52e1e136d4df4c26f136d8992d9be) )
+	ROM_LOAD( "tvg17_8",  0x0000,  0x4000, CRC(45c9087a) SHA1(9db82fc194096588fde5048e922a654e2ad12c23) )
 	ROM_LOAD( "tvg17_7",  0x4000,  0x4000, CRC(0e9efeba) SHA1(d922c4276a988b78b9a2a3ca632136e64a80d995) )
-	ROM_LOAD( "tvg17_8",  0x8000,  0x4000, CRC(45c9087a) SHA1(9db82fc194096588fde5048e922a654e2ad12c23) )
+	ROM_LOAD( "tvg17_6",  0x8000,  0x4000, CRC(dc8aa269) SHA1(fd8b5c2bead52e1e136d4df4c26f136d8992d9be) )
 
 	ROM_REGION( 0xc000, "gfx2", 0 ) /* bg */
-	ROM_LOAD( "tvg17_9",  0x8000,  0x4000, CRC(c594f3c5) SHA1(6fe19d9ccbe6934a210eb2cab441cd0ba83cbcf4) )
-	ROM_LOAD( "tvg17_10", 0x4000,  0x4000, CRC(2e510b4e) SHA1(c0ff4515e66ab4959b597a4d930cbbcc31c53cda) )
 	ROM_LOAD( "tvg17_11", 0x0000,  0x4000, CRC(35012775) SHA1(c90386660755c85fb9f020f8161805dd02a16271) )
+	ROM_LOAD( "tvg17_10", 0x4000,  0x4000, CRC(2e510b4e) SHA1(c0ff4515e66ab4959b597a4d930cbbcc31c53cda) )
+	ROM_LOAD( "tvg17_9",  0x8000,  0x4000, CRC(c594f3c5) SHA1(6fe19d9ccbe6934a210eb2cab441cd0ba83cbcf4) )
 
 	ROM_REGION( 0x0700, "proms", 0 ) /* color PROMs */
 	ROM_LOAD( "prom17_3", 0x0000,  0x0100, CRC(dbcd3bec) SHA1(1baeec277b16c82b67e10da9d4c84cf383ef4a82) ) /* R */
@@ -317,14 +330,14 @@ ROM_START( farmer )
 	ROM_LOAD( "tvg-5.30",  0x0000, 0x2000, CRC(22bdb40e) SHA1(265801ad660a5a3fc5bb187fa92dbe6098b390f5) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* sprite */
-	ROM_LOAD( "tvg-6.104", 0x0000, 0x4000, CRC(dc8aa269) SHA1(fd8b5c2bead52e1e136d4df4c26f136d8992d9be) )
+	ROM_LOAD( "tvg-8.102", 0x0000, 0x4000, CRC(45c9087a) SHA1(9db82fc194096588fde5048e922a654e2ad12c23) )
 	ROM_LOAD( "tvg-7.103", 0x4000, 0x4000, CRC(0e9efeba) SHA1(d922c4276a988b78b9a2a3ca632136e64a80d995) )
-	ROM_LOAD( "tvg-8.102", 0x8000, 0x4000, CRC(45c9087a) SHA1(9db82fc194096588fde5048e922a654e2ad12c23) )
+	ROM_LOAD( "tvg-6.104", 0x8000, 0x4000, CRC(dc8aa269) SHA1(fd8b5c2bead52e1e136d4df4c26f136d8992d9be) )
 
 	ROM_REGION( 0xc000, "gfx2", 0 ) /* bg */
-	ROM_LOAD( "tvg17_9",  0x8000,  0x4000, CRC(c594f3c5) SHA1(6fe19d9ccbe6934a210eb2cab441cd0ba83cbcf4) )
-	ROM_LOAD( "tvg17_10", 0x4000,  0x4000, CRC(2e510b4e) SHA1(c0ff4515e66ab4959b597a4d930cbbcc31c53cda) )
 	ROM_LOAD( "tvg17_11", 0x0000,  0x4000, CRC(35012775) SHA1(c90386660755c85fb9f020f8161805dd02a16271) )
+	ROM_LOAD( "tvg17_10", 0x4000,  0x4000, CRC(2e510b4e) SHA1(c0ff4515e66ab4959b597a4d930cbbcc31c53cda) )
+	ROM_LOAD( "tvg17_9",  0x8000,  0x4000, CRC(c594f3c5) SHA1(6fe19d9ccbe6934a210eb2cab441cd0ba83cbcf4) )
 
 	ROM_REGION( 0x0700, "proms", 0 ) /* color PROMs */
 	ROM_LOAD( "prom17_3", 0x0000,  0x0100, CRC(dbcd3bec) SHA1(1baeec277b16c82b67e10da9d4c84cf383ef4a82) ) /* R */

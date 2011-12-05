@@ -1107,7 +1107,7 @@ static TIMER_DEVICE_CALLBACK( mitchell_irq )
 	mitchell_state *state = timer.machine().driver_data<mitchell_state>();
 	int scanline = param;
 
-	if(scanline == 248 || scanline == 112)
+	if(scanline == 248 || scanline == 0)
 	{
 		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
 
