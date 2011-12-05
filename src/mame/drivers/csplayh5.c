@@ -29,12 +29,16 @@ class csplayh5_state : public driver_device
 {
 public:
 	csplayh5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	bitmap_t *m_vdp0_bitmap;
 	UINT16 m_mux_data;
 	UINT8 m_pio_dir[5];
 	UINT8 m_pio_latch[5];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -597,16 +601,20 @@ static MACHINE_RESET( csplayh5 )
 	}
 }
 
-static INTERRUPT_GEN( scanline_irq )
+static TIMER_DEVICE_CALLBACK( csplayh5_irq )
 {
-	v9938_set_sprite_limit(0, 0);
-	v9938_set_resolution(0, RENDER_HIGH);
-	v9938_interrupt(device->machine(), 0);
-}
+	csplayh5_state *state = timer.machine().driver_data<csplayh5_state>();
+	int scanline = param;
 
-static INTERRUPT_GEN( csplayh5_irq )
-{
-	device_set_input_line_and_vector(device, 1, HOLD_LINE,0x100/4);
+	if(scanline == 212*2)
+		device_set_input_line_and_vector(state->m_maincpu, 1, HOLD_LINE,0x100/4);
+
+	if((scanline % 2) == 0)
+	{
+		v9938_set_sprite_limit(0, 0);
+		v9938_set_resolution(0, RENDER_HIGH);
+		v9938_interrupt(timer.machine(), 0);
+	}
 }
 
 static const z80_daisy_config daisy_chain_sound[] =
@@ -621,8 +629,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
-	MCFG_CPU_VBLANK_INT("screen", csplayh5_irq )
-	MCFG_CPU_PERIODIC_INT(scanline_irq,262*60) // unknown timing
+	MCFG_TIMER_ADD_SCANLINE("scantimer", csplayh5_irq, "screen", 0, 1)
 
 #if USE_H8
 	MCFG_CPU_ADD("subcpu", H83002, 16000000)	/* unknown clock */
@@ -646,8 +653,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)

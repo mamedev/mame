@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/gaelco2.h"
 
@@ -189,19 +188,18 @@ WRITE16_HANDLER( bang_clr_gun_int_w )
 	state->m_clr_gun_int = 1;
 }
 
-INTERRUPT_GEN( bang_interrupt )
+TIMER_DEVICE_CALLBACK( bang_irq )
 {
-	gaelco2_state *state = device->machine().driver_data<gaelco2_state>();
-	if (cpu_getiloops(device) == 0){
-		device_set_input_line(device, 2, HOLD_LINE);
+	gaelco2_state *state = timer.machine().driver_data<gaelco2_state>();
+	int scanline = param;
 
+	if (scanline == 256){
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 		state->m_clr_gun_int = 0;
 	}
-	else if (cpu_getiloops(device) % 2){
-		if (state->m_clr_gun_int){
-			device_set_input_line(device, 4, HOLD_LINE);
-		}
-	}
+
+	if ((scanline % 64) == 0 && state->m_clr_gun_int)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
 /***************************************************************************

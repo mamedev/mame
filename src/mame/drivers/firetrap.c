@@ -168,7 +168,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/3526intf.h"
 #include "sound/msm5205.h"
@@ -317,7 +316,7 @@ static WRITE8_HANDLER( firetrap_sound_2400_w )
 {
 	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	msm5205_reset_w(state->m_msm, ~data & 0x01);
-	state->m_irq_enable = data & 0x02;
+	state->m_sound_irq_enable = data & 0x02;
 }
 
 static WRITE8_HANDLER( firetrap_sound_bankselect_w )
@@ -333,7 +332,7 @@ static void firetrap_adpcm_int( device_t *device )
 	state->m_msm5205next <<= 4;
 
 	state->m_adpcm_toggle ^= 1;
-	if (state->m_irq_enable && state->m_adpcm_toggle)
+	if (state->m_sound_irq_enable && state->m_adpcm_toggle)
 		device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
@@ -413,6 +412,25 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static INPUT_CHANGED( coin_inserted )
+{
+	firetrap_state *state = field.machine().driver_data<firetrap_state>();
+
+	/* coin insertion causes an IRQ */
+	if(newval)
+	{
+		state->m_coin_command_pending = (UINT8)(FPTR)(param);
+
+		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
+            definitely doesn't expect them as it locks out the coin routine */
+		if (state->m_coin_command_pending && !state->m_i8751_current_command)
+		{
+			state->m_i8751_return = state->m_coin_command_pending;
+			device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xff);
+			state->m_coin_command_pending = 0;
+		}
+	}
+}
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( firetrap )
@@ -490,9 +508,9 @@ static INPUT_PORTS_START( firetrap )
 	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START("COIN")	/* Connected to i8751 directly */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 3)
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -574,46 +592,9 @@ static const msm5205_interface msm5205_config =
 static INTERRUPT_GEN( firetrap_irq )
 {
 	firetrap_state *state = device->machine().driver_data<firetrap_state>();
-	UINT8 coin = 0;
-	UINT8 port = input_port_read(device->machine(), "COIN") & 0x07; /* TODO: remove me */
-
-	/* Check for coin IRQ */
-	if (cpu_getiloops(device))
-	{
-		if (port != 0x07 && !state->m_int_latch)
-		{
-			if (!(port & 0x01)) /* COIN1 */
-				coin = 1;
-			if (!(port & 0x02)) /* COIN2 */
-				coin = 2;
-			if (!(port & 0x04)) /* SERVICE1 */
-				coin = 3;
-			state->m_coin_command_pending = coin;
-			state->m_int_latch = 1;
-		}
-		if (port == 0x07)
-			state->m_int_latch = 0;
-
-		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
-            definitely doesn't expect them as it locks out the coin routine */
-		if (state->m_coin_command_pending && !state->m_i8751_current_command)
-		{
-			state->m_i8751_return = state->m_coin_command_pending;
-			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xff);
-			state->m_coin_command_pending = 0;
-		}
-	}
-
-	if (state->m_nmi_enable && !cpu_getiloops(device))
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-static INTERRUPT_GEN( bootleg_irq )
-{
-	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
 	if (state->m_nmi_enable)
-		device_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -631,13 +612,12 @@ static MACHINE_START( firetrap )
 	memory_configure_bank(machine, "bank2", 0, 2, &SOUND[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_i8751_current_command));
-	state->save_item(NAME(state->m_irq_enable));
+	state->save_item(NAME(state->m_sound_irq_enable));
 	state->save_item(NAME(state->m_nmi_enable));
 	state->save_item(NAME(state->m_i8751_return));
 	state->save_item(NAME(state->m_i8751_init_ptr));
 	state->save_item(NAME(state->m_msm5205next));
 	state->save_item(NAME(state->m_adpcm_toggle));
-	state->save_item(NAME(state->m_int_latch));
 	state->save_item(NAME(state->m_coin_command_pending));
 	state->save_item(NAME(state->m_scroll1_x));
 	state->save_item(NAME(state->m_scroll1_y));
@@ -659,13 +639,12 @@ static MACHINE_RESET( firetrap )
 	}
 
 	state->m_i8751_current_command = 0;
-	state->m_irq_enable = 0;
+	state->m_sound_irq_enable = 0;
 	state->m_nmi_enable = 0;
 	state->m_i8751_return = 0;
 	state->m_i8751_init_ptr = 0;
 	state->m_msm5205next = 0xff;
 	state->m_adpcm_toggle = 0;
-	state->m_int_latch = 0;
 	state->m_coin_command_pending = 0;
 }
 
@@ -674,7 +653,7 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
 	MCFG_CPU_PROGRAM_MAP(firetrap_map)
-	MCFG_CPU_VBLANK_INT_HACK(firetrap_irq,2)
+	MCFG_CPU_VBLANK_INT("screen",firetrap_irq)
 
 	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)	// 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -715,7 +694,7 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
 	MCFG_CPU_PROGRAM_MAP(firetrap_bootleg_map)
-	MCFG_CPU_VBLANK_INT("screen", bootleg_irq)
+	MCFG_CPU_VBLANK_INT("screen", firetrap_irq)
 
 	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)	// 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)

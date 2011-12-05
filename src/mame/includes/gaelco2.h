@@ -2,7 +2,9 @@ class gaelco2_state : public driver_device
 {
 public:
 	gaelco2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT16 *m_snowboar_protection;
 	UINT16 *m_vregs;
@@ -11,6 +13,8 @@ public:
 	UINT16 *m_videoram;
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -25,7 +29,7 @@ WRITE16_HANDLER( gaelco2_coin2_w );
 WRITE16_HANDLER( wrally2_coin_w );
 WRITE16_HANDLER( touchgo_coin_w );
 WRITE16_HANDLER( bang_clr_gun_int_w );
-INTERRUPT_GEN( bang_interrupt );
+TIMER_DEVICE_CALLBACK( bang_irq );
 CUSTOM_INPUT( wrally2_analog_bit_r );
 WRITE16_HANDLER( wrally2_adc_clk );
 WRITE16_HANDLER( wrally2_adc_cs );

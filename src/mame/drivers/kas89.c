@@ -196,7 +196,6 @@
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "machine/nvram.h"
-#include "deprecat.h"
 #include "kas89.lh"
 
 
@@ -204,7 +203,8 @@ class kas89_state : public driver_device
 {
 public:
 	kas89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		{ }
 
 	UINT8 m_mux_data;
 	UINT8 m_main_nmi_enable;
@@ -230,9 +230,12 @@ static void kas89_vdp_interrupt(running_machine &machine, int i)
 	cputag_set_input_line (machine, "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
 }
 
-static INTERRUPT_GEN( kas89_interrupt )
+static TIMER_DEVICE_CALLBACK( kas89_interrupt )
 {
-	v9938_interrupt(device->machine(), 0);
+	int scanline = param;
+
+	if((scanline % 2) == 0)
+		v9938_interrupt(timer.machine(), 0);
 }
 
 
@@ -306,15 +309,21 @@ static READ8_HANDLER( mux_r )
 	return state->m_mux_data;
 }
 
-static INTERRUPT_GEN ( kas89_nmi_interrupt )
+static TIMER_DEVICE_CALLBACK ( kas89_nmi_cb )
 {
-	kas89_state *state = device->machine().driver_data<kas89_state>();
+	kas89_state *state = timer.machine().driver_data<kas89_state>();
 
 	if (state->m_main_nmi_enable)
-	{
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
+
+static TIMER_DEVICE_CALLBACK ( kas89_sound_nmi_cb )
+{
+	kas89_state *state = timer.machine().driver_data<kas89_state>();
+
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 
 static WRITE8_HANDLER( control_w )
 {
@@ -773,13 +782,13 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(kas89_map)
 	MCFG_CPU_IO_MAP(kas89_io)
-	MCFG_CPU_VBLANK_INT_HACK(kas89_interrupt, 262)
-	MCFG_CPU_PERIODIC_INT(kas89_nmi_interrupt, 138)	/* Connected to a 138Hz osc. *AND* bit6 of port $82 */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", kas89_interrupt, "screen", 0, 1)
+	MCFG_TIMER_ADD_PERIODIC("kas89_nmi", kas89_nmi_cb, attotime::from_hz(138)) /* Connected to a 138Hz osc. *AND* bit6 of port $82 */
 
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/6)	/* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 138)		/* Connected to a 138Hz osc.*/
+	MCFG_TIMER_ADD_PERIODIC("kas89_snmi", kas89_sound_nmi_cb, attotime::from_hz(138)) /* Connected to a 138Hz osc.*/
 
 	MCFG_MACHINE_START(kas89)
 	MCFG_MACHINE_RESET(kas89)
@@ -791,7 +800,7 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(544, 480)
+	MCFG_SCREEN_SIZE(544, 524)
 	MCFG_SCREEN_VISIBLE_AREA(0, 544 - 1, 0, 480 - 1)
 	MCFG_SCREEN_UPDATE(generic_bitmapped)
 
