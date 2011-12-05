@@ -9,7 +9,6 @@
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "includes/eolithsp.h"
 
 static int eolith_speedup_address;
@@ -39,24 +38,24 @@ static const struct
 } eolith_speedup_table[] =
 {
 	/* eolith.c */
-	{ "ironfort", 0x40020854, 239 },
-	{ "hidnctch", 0x4000bba0, 239 },
-	{ "raccoon",  0x40008204, 239 },
-	{ "puzzlekg", 0x40029458, 239 },
-	{ "hidctch2", 0x40009524, 239 },
-	{ "hidctch2a",0x40029B58, 239 },
-	{ "landbrk",  0x40023574, 239 },
-	{ "landbrka", 0x4002446c, 239 },
-	{ "nhidctch", 0x40012778, 239 },
-	{ "hidctch3", 0x4001f6a0, 239 },
-	{ "fort2b",   0x000081e0, 239 },
-	{ "fort2ba",  0x000081e0, 239 },
-	{ "penfan",   0x4001FA66, 239 },
-	{ "candy",	  0x4001990C, 239 },
+	{ "ironfort", 0x40020854, 240 },
+	{ "hidnctch", 0x4000bba0, 240 },
+	{ "raccoon",  0x40008204, 240 },
+	{ "puzzlekg", 0x40029458, 240 },
+	{ "hidctch2", 0x40009524, 240 },
+	{ "hidctch2a",0x40029B58, 240 },
+	{ "landbrk",  0x40023574, 240 },
+	{ "landbrka", 0x4002446c, 240 },
+	{ "nhidctch", 0x40012778, 240 },
+	{ "hidctch3", 0x4001f6a0, 240 },
+	{ "fort2b",   0x000081e0, 240 },
+	{ "fort2ba",  0x000081e0, 240 },
+	{ "penfan",   0x4001FA66, 240 },
+	{ "candy",	  0x4001990C, 240 },
 	/* eolith16.c */
-	{ "klondkp",  0x0001a046, 239 },
+	{ "klondkp",  0x0001a046, 240 },
 	/* vegaeo.c */
-	{ "crazywar",  0x00008cf8, 239 },
+	{ "crazywar",  0x00008cf8, 240 },
 	{ NULL, 0, 0 }
 };
 
@@ -80,21 +79,19 @@ void init_eolith_speedup(running_machine &machine)
 }
 
 /* todo, use timers instead! */
-INTERRUPT_GEN( eolith_speedup )
+TIMER_DEVICE_CALLBACK( eolith_speedup )
 {
-	eolith_scanline = 261 -  cpu_getiloops(device);
-
-	if (eolith_scanline==0)
+	if (param==0)
 	{
 		eolith_vblank = 0;
 	}
 
-	if (eolith_scanline==eolith_speedup_resume_scanline)
+	if (param==eolith_speedup_resume_scanline)
 	{
-		device->machine().scheduler().trigger(1000);
+		timer.machine().scheduler().trigger(1000);
 	}
 
-	if (eolith_scanline==240)
+	if (param==240)
 	{
 		eolith_vblank = 1;
 	}
@@ -102,5 +99,5 @@ INTERRUPT_GEN( eolith_speedup )
 
 CUSTOM_INPUT( eolith_speedup_getvblank )
 {
-	return eolith_vblank&1;
+	return (field.machine().primary_screen->vpos() >= 240);
 }

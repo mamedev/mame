@@ -82,11 +82,8 @@
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/eolith.h"
-
-
 #include "includes/eolithsp.h"
 
 // It's configured for 512 bytes
@@ -397,7 +394,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( eolith45, eolith_state )
 	MCFG_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
 	MCFG_CPU_PROGRAM_MAP(eolith_map)
-	MCFG_CPU_VBLANK_INT_HACK(eolith_speedup,262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", eolith_speedup, "screen", 0, 1)
 
 	/* sound cpu */
 
@@ -406,9 +403,9 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE(eolith)
 

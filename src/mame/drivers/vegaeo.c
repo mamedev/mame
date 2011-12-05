@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
-#include "deprecat.h"
 #include "machine/at28c16.h"
 #include "includes/eolithsp.h"
 
@@ -180,7 +179,7 @@ static SCREEN_UPDATE( vega )
 static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_CPU_ADD("maincpu", GMS30C2132, 55000000)	/* 55 MHz */
 	MCFG_CPU_PROGRAM_MAP(vega_map)
-	MCFG_CPU_VBLANK_INT_HACK(eolith_speedup,262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", eolith_speedup, "screen", 0, 1)
 
 	/* sound cpu */
 
@@ -189,7 +188,7 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE(vega)
 

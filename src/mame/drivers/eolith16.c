@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "includes/eolithsp.h"
@@ -175,16 +174,16 @@ static PALETTE_INIT( eolith16 )
 static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_CPU_ADD("maincpu", E116T, 60000000)		/* no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
-	MCFG_CPU_VBLANK_INT_HACK(eolith_speedup,262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", eolith_speedup, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C66)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
 	MCFG_SCREEN_UPDATE(eolith16)
 
