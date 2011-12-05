@@ -68,7 +68,6 @@ mw-9.rom = ST M27C1001 / GFX
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/cps1.h"	// needed for decoding functions only
 #include "includes/mitchell.h"
@@ -113,7 +112,7 @@ static NVRAM_HANDLER( mitchell )
 
 static READ8_HANDLER( pang_port5_r )
 {
-	int bit = space->machine().device<eeprom_device>("eeprom")->read_bit() << 7;
+	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
         bit 3 is checked before updating the palette so it really seems to be vblank.
@@ -121,10 +120,8 @@ static READ8_HANDLER( pang_port5_r )
         Many games require two interrupts per frame and for these bits to toggle,
         otherwise music doesn't work.
     */
-	if (cpu_getiloops(&space->device()) & 1)
-		bit |= 0x01;
 
-	return (input_port_read(space->machine(), "SYS0") & 0x7e) | bit;
+	return (input_port_read(space->machine(), "SYS0") & 0xfe) | (state->m_irq_source & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
@@ -434,7 +431,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -684,7 +681,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -732,7 +729,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM (spang) */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -848,7 +845,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )	/* same as the service mode farther down */
@@ -888,7 +885,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -930,7 +927,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1087,6 +1084,7 @@ static MACHINE_START( mitchell )
 	state->save_item(NAME(state->m_keymatrix));
 	state->save_item(NAME(state->m_dir));
 	state->save_item(NAME(state->m_dial));
+	state->save_item(NAME(state->m_irq_source));
 //  state_save_register_global(machine, init_eeprom_count);
 }
 
@@ -1104,13 +1102,26 @@ static MACHINE_RESET( mitchell )
 	state->m_keymatrix = 0;
 }
 
+static TIMER_DEVICE_CALLBACK( mitchell_irq )
+{
+	mitchell_state *state = timer.machine().driver_data<mitchell_state>();
+	int scanline = param;
+
+	if(scanline == 248 || scanline == 112)
+	{
+		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
+
+		state->m_irq_source = (scanline == 248);
+	}
+}
+
 static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* probably same clock as the other mitchell hardware games */
 	MCFG_CPU_PROGRAM_MAP(mgakuen_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MCFG_MACHINE_START(mitchell)
 	MCFG_MACHINE_RESET(mitchell)
@@ -1148,7 +1159,7 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MCFG_MACHINE_START(mitchell)
 	MCFG_MACHINE_RESET(mitchell)
@@ -1283,7 +1294,7 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MCFG_NVRAM_HANDLER(mitchell)
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
@@ -1336,7 +1347,7 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MCFG_NVRAM_HANDLER(mitchell)
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)

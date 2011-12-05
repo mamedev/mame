@@ -11,6 +11,7 @@ class mitchell_state : public driver_device
 public:
 	mitchell_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
 		  m_audiocpu(*this, "audiocpu"),
 		  m_oki(*this, "oki") { }
 
@@ -38,10 +39,12 @@ public:
 	int        m_keymatrix;
 
 	/* devices */
+	optional_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	UINT8 *m_nvram;
 	size_t m_nvram_size;
+	UINT8 m_irq_source;
 };
 
 
