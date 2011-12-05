@@ -72,6 +72,9 @@ static WRITE8_HANDLER( brkthru_1803_w )
 	/* bit 0 = NMI enable */
 	state->m_nmi_mask = ~data & 1;
 
+	if(data & 2)
+		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
@@ -81,6 +84,10 @@ static WRITE8_HANDLER( darwin_0803_w )
 	/* bit 0 = NMI enable */
 	state->m_nmi_mask = data & 1;
 	logerror("0803 %02X\n",data);
+
+	if(data & 2)
+		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+
 
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
@@ -97,7 +104,8 @@ static INPUT_CHANGED( coin_inserted )
 	brkthru_state *state = field.machine().driver_data<brkthru_state>();
 
 	/* coin insertion causes an IRQ */
-	device_set_input_line(state->m_maincpu, 0, newval ? CLEAR_LINE : ASSERT_LINE);
+	if(oldval)
+		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
 }
 
 
