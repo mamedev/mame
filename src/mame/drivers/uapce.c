@@ -24,7 +24,6 @@
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
@@ -202,7 +201,7 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
 	MCFG_CPU_IO_MAP(pce_io)
-	MCFG_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", Z80, 1400000)
 	MCFG_CPU_PROGRAM_MAP(z80_map)

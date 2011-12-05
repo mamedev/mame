@@ -158,9 +158,9 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)
 	MCFG_CPU_IO_MAP(sgx_io)
-	MCFG_CPU_VBLANK_INT_HACK(sgx_interrupt, VDC_LPF)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sgx_interrupt, "screen", 0, 1)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+//	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
 

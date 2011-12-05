@@ -29,7 +29,6 @@
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "machine/nvram.h"
-#include "deprecat.h"
 
 class tonton_state : public driver_device
 {
@@ -219,11 +218,11 @@ static MACHINE_RESET( tonton )
 *      R/W Handlers and Interrupt Routines       *
 *************************************************/
 
-INTERRUPT_GEN( tonton_interrupt )
+static TIMER_DEVICE_CALLBACK( tonton_interrupt )
 {
 	v9938_set_sprite_limit(0, 0);
 	v9938_set_resolution(0, 0);
-	v9938_interrupt(device->machine(), 0);
+	v9938_interrupt(timer.machine(), 0);
 }
 
 
@@ -271,7 +270,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/6)	/* Guess. According to other MSX2 based gambling games */
 	MCFG_CPU_PROGRAM_MAP(tonton_map)
 	MCFG_CPU_IO_MAP(tonton_io)
-	MCFG_CPU_VBLANK_INT_HACK(tonton_interrupt, 262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", tonton_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

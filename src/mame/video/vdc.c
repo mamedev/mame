@@ -79,7 +79,7 @@ static void pce_refresh_sprites(running_machine &machine, int which, int line, U
 static void vdc_do_dma(running_machine &machine, int which);
 static void vpc_init( running_machine &machine );
 
-INTERRUPT_GEN( pce_interrupt )
+TIMER_DEVICE_CALLBACK( pce_interrupt )
 {
 	/* Draw the last scanline */
 	if ( vce.current_bitmap_line >= 14 && vce.current_bitmap_line < 14 + 242 )
@@ -109,22 +109,22 @@ INTERRUPT_GEN( pce_interrupt )
 			/* Draw VDC #0 sprite layer */
 			if(vdc[0].vdc_data[CR].w & CR_SB)
 			{
-				pce_refresh_sprites(device->machine(), 0, vdc[0].current_segment_line, drawn, line_buffer);
+				pce_refresh_sprites(timer.machine(), 0, vdc[0].current_segment_line, drawn, line_buffer);
 			}
 		}
 	}
 	else
 	{
 		/* We are in one of the blanking areas */
-		draw_black_line(device->machine(), vce.current_bitmap_line );
+		draw_black_line(timer.machine(), vce.current_bitmap_line );
 	}
 
 	/* bump current scanline */
 	vce.current_bitmap_line = ( vce.current_bitmap_line + 1 ) % VDC_LPF;
-	vdc_advance_line(device->machine(), 0 );
+	vdc_advance_line(timer.machine(), 0 );
 }
 
-INTERRUPT_GEN( sgx_interrupt )
+TIMER_DEVICE_CALLBACK( sgx_interrupt )
 {
 	/* Draw the last scanline */
 	if ( vce.current_bitmap_line >= 14 && vce.current_bitmap_line < 14 + 242 )
@@ -156,7 +156,7 @@ INTERRUPT_GEN( sgx_interrupt )
 			/* Draw VDC #0 sprite layer */
 			if(vdc[0].vdc_data[CR].w & CR_SB)
 			{
-				pce_refresh_sprites(device->machine(), 0, vdc[0].current_segment_line, drawn[0], temp_buffer[0]);
+				pce_refresh_sprites(timer.machine(), 0, vdc[0].current_segment_line, drawn[0], temp_buffer[0]);
 			}
 
 			/* Draw VDC #1 background layer */
@@ -165,7 +165,7 @@ INTERRUPT_GEN( sgx_interrupt )
 			/* Draw VDC #1 sprite layer */
 			if ( vdc[1].vdc_data[CR].w & CR_SB )
 			{
-				pce_refresh_sprites(device->machine(), 1, vdc[1].current_segment_line, drawn[1], temp_buffer[1]);
+				pce_refresh_sprites(timer.machine(), 1, vdc[1].current_segment_line, drawn[1], temp_buffer[1]);
 			}
 
 			line_buffer = BITMAP_ADDR16( vce.bmp, vce.current_bitmap_line, 86 );
@@ -269,13 +269,13 @@ INTERRUPT_GEN( sgx_interrupt )
 	else
 	{
 		/* We are in one of the blanking areas */
-		draw_black_line(device->machine(), vce.current_bitmap_line );
+		draw_black_line(timer.machine(), vce.current_bitmap_line );
 	}
 
 	/* bump current scanline */
 	vce.current_bitmap_line = ( vce.current_bitmap_line + 1 ) % VDC_LPF;
-	vdc_advance_line(device->machine(), 0 );
-	vdc_advance_line(device->machine(), 1 );
+	vdc_advance_line(timer.machine(), 0 );
+	vdc_advance_line(timer.machine(), 1 );
 }
 
 static void vdc_advance_line(running_machine &machine, int which)

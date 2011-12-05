@@ -14,8 +14,8 @@ WRITE8_HANDLER( vpc_w );
  READ8_HANDLER( vpc_r );
 WRITE8_HANDLER( sgx_vdc_w );
  READ8_HANDLER( sgx_vdc_r );
-INTERRUPT_GEN( pce_interrupt );
-INTERRUPT_GEN( sgx_interrupt );
+TIMER_DEVICE_CALLBACK( pce_interrupt );
+TIMER_DEVICE_CALLBACK( sgx_interrupt );
 
 /* Screen timing stuff */
 
