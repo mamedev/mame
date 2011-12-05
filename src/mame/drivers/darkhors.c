@@ -56,7 +56,6 @@ To do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/st0016.h"
@@ -68,7 +67,9 @@ class darkhors_state : public driver_device
 {
 public:
 	darkhors_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		{ }
 
 	tilemap_t *m_tmap;
 	tilemap_t *m_tmap2;
@@ -80,6 +81,8 @@ public:
 	UINT32* m_jclub2_tileram;
 	int m_jclub2_gfx_index;
 	UINT32 *m_spriteram;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -636,20 +639,25 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( darkhors )
+static TIMER_DEVICE_CALLBACK( darkhors_irq )
 {
-	switch (cpu_getiloops(device))
-	{
-		case 0:	device_set_input_line(device, 3, HOLD_LINE);	break;
-		case 1:	device_set_input_line(device, 4, HOLD_LINE);	break;
-		case 2:	device_set_input_line(device, 5, HOLD_LINE);	break;
-	}
+	darkhors_state *state = timer.machine().driver_data<darkhors_state>();
+	int scanline = param;
+
+	if(scanline == 248)
+		device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+
+	if(scanline >= 1 && scanline <= 247)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
-	MCFG_CPU_VBLANK_INT_HACK(darkhors,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -658,7 +666,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(0x190, 0x100)
+	MCFG_SCREEN_SIZE(0x190, 0x100+16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE(darkhors)
 
@@ -700,7 +708,7 @@ static SCREEN_UPDATE(jclub2)
 static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
-	MCFG_CPU_VBLANK_INT_HACK(darkhors,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -709,7 +717,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(0x190, 0x100)
+	MCFG_SCREEN_SIZE(0x190, 0x100+16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE(jclub2)
 

@@ -6,6 +6,7 @@
     special thanks to Guru for references and HW advices
 
     TODO:
+    - decode compressed GFX ROMs for "sprite" blitter (6,141,122 is the patent number)
     - DMA is still a bit of a mystery;
     - video emulation is pratically non-existant;
     - SCSP;
