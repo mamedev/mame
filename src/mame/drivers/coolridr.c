@@ -248,7 +248,6 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
 #include "debugger.h"
 #include "cpu/sh2/sh2.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/scsp.h"
 
 
@@ -256,7 +255,11 @@ class coolridr_state : public driver_device
 {
 public:
 	coolridr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this,"sub"),
+		m_soundcpu(*this,"soundcpu")
+		{ }
 
 	UINT32* m_sysh1_workram_h;
 	UINT32* m_framebuffer_vram;
@@ -276,6 +279,10 @@ public:
 	UINT32 m_attr_buff[0x10];
 	UINT8 m_txt_index;
 	UINT8 m_attr_index;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 
@@ -1077,13 +1084,16 @@ static INTERRUPT_GEN( system_h1 )
 }
 
 //IRQs 10,12 and 14 are valid on SH-1 instead
-static INTERRUPT_GEN( system_h1_sub )
+static TIMER_DEVICE_CALLBACK( system_h1_sub )
 {
-	switch(cpu_getiloops(device))
+	coolridr_state *state = timer.machine().driver_data<coolridr_state>();
+	int scanline = param;
+
+	switch(scanline)
 	{
-    	case 0:device_set_input_line(device, 0xa, HOLD_LINE); break;
-        case 1:device_set_input_line(device, 0xc, HOLD_LINE); break;
-        case 2:device_set_input_line(device, 0xe, HOLD_LINE); break;
+    	case 512:device_set_input_line(state->m_subcpu, 0xa, HOLD_LINE); break;
+        case 256:device_set_input_line(state->m_subcpu, 0xc, HOLD_LINE); break;
+        case 0:device_set_input_line(state->m_subcpu, 0xe, HOLD_LINE); break;
 	}
 }
 
@@ -1098,20 +1108,20 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
 	MCFG_CPU_VBLANK_INT("screen",system_h1)
 
-	MCFG_CPU_ADD("soundcpu", M68000, 16000000)	// 16 mhz
+	MCFG_CPU_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(system_h1_sound_map)
 
 	MCFG_CPU_ADD("sub", SH1, 16000000)	// SH7032 HD6417032F20!! 16 mhz
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
-	MCFG_CPU_VBLANK_INT_HACK(system_h1_sub, 3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", system_h1_sub, "screen", 0, 1)
 
 	MCFG_GFXDECODE(coolridr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(128*8, 64*8)
+	MCFG_SCREEN_SIZE(128*8+22, 64*8+44)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1) //TODO: these are just two different screens
 	MCFG_SCREEN_UPDATE(coolridr)
 
@@ -1162,7 +1172,6 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mpr-17649.ic10",0x2000000, 0x0400000, CRC(618c47ae) SHA1(5b69ad36fcf8e70d34c3b2fc71412ce953c5ceb3) )
 ROM_END
 
-/*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/
 #if 0
 static READ32_HANDLER( coolridr_hack1_r )
 {
@@ -1175,6 +1184,7 @@ static READ32_HANDLER( coolridr_hack1_r )
 }
 #endif
 
+/*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/
 static READ32_HANDLER( coolridr_hack2_r )
 {
 	coolridr_state *state = space->machine().driver_data<coolridr_state>();
