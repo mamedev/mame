@@ -73,7 +73,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "includes/dynax.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/msm6242.h"
@@ -4415,7 +4414,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_SIZE(512, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE(hnoridur)
 
@@ -4805,24 +4804,24 @@ void neruton_update_irq( running_machine &machine )
 	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x42);
 }
 
-static INTERRUPT_GEN( neruton_vblank_interrupt )
+static TIMER_DEVICE_CALLBACK( neruton_irq_scanline )
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
+	dynax_state *state = timer.machine().driver_data<dynax_state>();
+	int scanline = param;
 
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
 	if (state->m_blitter_irq)	return;
 
-	switch (cpu_getiloops(device))
-	{
-		case 0:  device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);	break;
-		default: device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x46);	break;
-	}
+	if(scanline == 256)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x40);
+	else if((scanline % 32) == 0)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x46);
 }
 
 static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_HACK(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", neruton_irq_scanline, "screen", 0, 1)
 
 	MCFG_VIDEO_START(neruton)
 MACHINE_CONFIG_END
@@ -4912,14 +4911,19 @@ MACHINE_CONFIG_END
                                Mahjong Tenkaigen
 ***************************************************************************/
 
-static INTERRUPT_GEN( tenkai_interrupt )
+static TIMER_DEVICE_CALLBACK( tenkai_interrupt )
 {
-	switch (cpu_getiloops(device))
-	{
-		case 0: device_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;
-		case 1: device_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;
-		case 2: device_set_input_line(device, INPUT_LINE_IRQ2, HOLD_LINE);	break;
-	}
+	dynax_state *state = timer.machine().driver_data<dynax_state>();
+	int scanline = param;
+
+	if(scanline == 256)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+
+	if(scanline == 128)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ2, HOLD_LINE);
 }
 
 static const ay8910_interface tenkai_ay8910_interface =
@@ -4944,7 +4948,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
 	MCFG_CPU_PROGRAM_MAP(tenkai_map)
 	MCFG_CPU_IO_MAP(tenkai_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", tenkai_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START(tenkai)
 	MCFG_MACHINE_RESET(dynax)
@@ -4956,7 +4960,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_SIZE(512, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)	// hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 	MCFG_SCREEN_UPDATE(hnoridur)
 
