@@ -58,7 +58,6 @@ To Do:
 ***************************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
@@ -85,9 +84,6 @@ public:
 	UINT16			m_scrollx;
 	UINT16			m_scrolly;
 	UINT16			m_port0_data;
-
-	/* Interrupts */
-	UINT8			m_int_vector;
 
 	/* Mermaid */
 	UINT8			m_data_to_mermaid;
@@ -129,7 +125,6 @@ static MACHINE_RESET( hvyunit )
 {
 	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 
-	state->m_int_vector = 0xff;
 	state->m_mermaid_int0_l = 1;
 	state->m_mermaid_to_z80_full = 0;
 	state->m_z80_to_mermaid_full = 0;
@@ -618,12 +613,18 @@ GFXDECODE_END
  *
  *************************************/
 
-static INTERRUPT_GEN( hvyunit_interrupt )
+/* Main Z80 uses IM2 */
+static TIMER_DEVICE_CALLBACK( hvyunit_scanline )
 {
-	hvyunit_state *state = device->machine().driver_data<hvyunit_state>();
+	hvyunit_state *state = timer.machine().driver_data<hvyunit_state>();
+	int scanline = param;
 
-	state->m_int_vector ^= 0x02;
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->m_int_vector);
+	if(scanline == 240) // vblank-out irq
+		device_set_input_line_and_vector(state->m_master_cpu, 0, HOLD_LINE, 0xfd);
+
+	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
+	if(scanline == 64)
+		device_set_input_line_and_vector(state->m_master_cpu, 0, HOLD_LINE, 0xff);
 }
 
 static const kaneko_pandora_interface hvyunit_pandora_config =
@@ -645,7 +646,7 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_CPU_ADD("master", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(master_memory)
 	MCFG_CPU_IO_MAP(master_io)
-	MCFG_CPU_VBLANK_INT_HACK(hvyunit_interrupt, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", hvyunit_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(slave_memory)
