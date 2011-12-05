@@ -86,6 +86,7 @@ private:
 	FILE *					m_output;
 	driver_enumerator &		m_drivlist;
 	UINT8 * 				m_device_used;
+	emu_options 			m_lookup_options;
 
 	static const char s_dtd_string[];
 };

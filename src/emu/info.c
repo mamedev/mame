@@ -199,8 +199,10 @@ extern int m_device_count;
 
 info_xml_creator::info_xml_creator(driver_enumerator &drivlist)
 	: m_output(NULL),
-	  m_drivlist(drivlist)
+	  m_drivlist(drivlist),
+	  m_lookup_options(m_drivlist.options())
 {
+	m_lookup_options.remove_device_options();
 }
 
 
@@ -1276,13 +1278,11 @@ void info_xml_creator::output_ramoptions()
 const char *info_xml_creator::get_merge_name(const hash_collection &romhashes)
 {
 	const char *merge_name = NULL;
-	emu_options lookup_options(m_drivlist.options());
-	lookup_options.remove_device_options();
 	// walk the parent chain
 	for (int clone_of = m_drivlist.find(m_drivlist.driver().parent); clone_of != -1; clone_of = m_drivlist.find(m_drivlist.driver(clone_of).parent))
 
 		// look in the parent's ROMs
-		for (const rom_source *psource = rom_first_source(m_drivlist.config(clone_of,lookup_options)); psource != NULL; psource = rom_next_source(*psource))
+		for (const rom_source *psource = rom_first_source(m_drivlist.config(clone_of,m_lookup_options)); psource != NULL; psource = rom_next_source(*psource))
 			for (const rom_entry *pregion = rom_first_region(*psource); pregion != NULL; pregion = rom_next_region(pregion))
 				for (const rom_entry *prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
 				{
