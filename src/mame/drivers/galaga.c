@@ -884,6 +884,9 @@ static MACHINE_START( galaga )
 	state->m_cpu3_interrupt_timer = machine.scheduler().timer_alloc(FUNC(cpu3_interrupt_callback));
 	state->m_custom_mod = 0;
 	state_save_register_global(machine, state->m_custom_mod);
+	state->save_item(NAME(state->m_main_irq_mask));
+	state->save_item(NAME(state->m_sub_irq_mask));
+	state->save_item(NAME(state->m_sub2_nmi_mask));
 }
 
 static void bosco_latch_reset(running_machine &machine)
