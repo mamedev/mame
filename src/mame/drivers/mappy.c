@@ -1623,6 +1623,15 @@ static const namcoio_interface intf1_interleave =
 	NULL
 };
 
+static MACHINE_START( mappy )
+{
+	mappy_state *state = machine.driver_data<mappy_state>();
+
+	state->save_item(NAME(state->m_main_irq_mask));
+	state->save_item(NAME(state->m_sub_irq_mask));
+	state->save_item(NAME(state->m_sub2_irq_mask));
+}
+
 
 static MACHINE_CONFIG_START( superpac, mappy_state )
 
@@ -1638,6 +1647,7 @@ static MACHINE_CONFIG_START( superpac, mappy_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+	MCFG_MACHINE_START(mappy)
 	MCFG_MACHINE_RESET(superpac)
 
 	MCFG_NAMCO56XX_ADD("namcoio_1", intf0)
@@ -1711,6 +1721,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+	MCFG_MACHINE_START(mappy)
 	MCFG_MACHINE_RESET(phozon)
 
 	MCFG_NAMCO58XX_ADD("namcoio_1", intf0)
@@ -1751,6 +1762,7 @@ static MACHINE_CONFIG_START( mappy, mappy_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+	MCFG_MACHINE_START(mappy)
 	MCFG_MACHINE_RESET(mappy)
 
 	MCFG_NAMCO58XX_ADD("namcoio_1", intf0)
