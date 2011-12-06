@@ -8407,8 +8407,8 @@ static MACHINE_CONFIG_DERIVED( hparadis, quizchq )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hparadis_map)
 	MCFG_CPU_IO_MAP(hparadis_portmap)
-	MCFG_DEVICE_REMOVE("scantimer")
 	MCFG_CPU_VBLANK_INT("screen", hparadis_irq)
+	MCFG_DEVICE_REMOVE("scantimer")
 
 	MCFG_MACHINE_START(hparadis)
 MACHINE_CONFIG_END
