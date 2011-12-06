@@ -180,11 +180,13 @@ static void magtouch_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
 
+static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+
 static const struct pc_vga_interface vga_interface =
 {
 	NULL,
 	NULL,
-	NULL,
+	vga_setting,
 	AS_IO,
 	0x0000
 };
