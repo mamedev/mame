@@ -69,6 +69,7 @@ Notes:
 #include "deprecat.h"
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"
+#include "video/ramdac.h"
 
 #define FIFO_SIZE 1024
 #define IO_SIZE 	0x100
@@ -185,20 +186,6 @@ static const int gfxlookup[][4]=
    { -1,-1,-1,-1}
 };
 
-static WRITE16_HANDLER( sliver_RAMDAC_offset_w )
-{
-	sliver_state *state = space->machine().driver_data<sliver_state>();
-
-	state->m_clr_offset=data*3;
-}
-
-static WRITE16_HANDLER( sliver_RAMDAC_color_w )
-{
-	sliver_state *state = space->machine().driver_data<sliver_state>();
-
-	state->m_colorram[state->m_clr_offset]=data;
-	state->m_clr_offset=(state->m_clr_offset+1)%768;
-}
 
 static void plot_pixel_rgb(sliver_state *state, int x, int y, UINT32 r, UINT32 g, UINT32 b)
 {
@@ -230,15 +217,12 @@ static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	addr*=3;
-
-	b=state->m_colorram[addr] << 2;
-	g=state->m_colorram[addr+1] << 2;
-	r=state->m_colorram[addr+2] << 2;
+	b=(state->m_colorram[addr] << 2) | (state->m_colorram[addr] & 0x3);
+	g=(state->m_colorram[addr+0x100] << 2) | (state->m_colorram[addr+0x100] & 3);
+	r=(state->m_colorram[addr+0x200] << 2) | (state->m_colorram[addr+0x200] & 3);
 
 	if (state->m_bitmap_fg->bpp == 32)
 	{
-
 		*BITMAP_ADDR32(state->m_bitmap_fg, y, x) = r | (g<<8) | (b<<16);
 	}
 	else
@@ -430,9 +414,9 @@ static WRITE16_HANDLER(sound_w)
 static ADDRESS_MAP_START( sliver_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(sliver_RAMDAC_offset_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(sliver_RAMDAC_color_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITENOP//RAMDAC
+	AM_RANGE(0x100000, 0x100001 ) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003 ) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x100004, 0x100005 ) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, mask_w, 0x00ff)
 
 	AM_RANGE(0x300002, 0x300003) AM_NOP // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
 
@@ -568,6 +552,16 @@ static INTERRUPT_GEN( sliver_int )
 	device_set_input_line(device, 2+cpu_getiloops(device), HOLD_LINE);
 }
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_RAM AM_BASE_MEMBER(sliver_state,m_colorram)
+ADDRESS_MAP_END
+
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	0
+};
+
+
 static MACHINE_CONFIG_START( sliver, sliver_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -578,14 +572,15 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
 	MCFG_SCREEN_UPDATE(sliver)
+
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_VIDEO_START(sliver)
 
@@ -628,7 +623,6 @@ static DRIVER_INIT(sliver)
 	sliver_state *state = machine.driver_data<sliver_state>();
 
 	state->m_jpeg_addr = -1;
-	state->m_colorram=auto_alloc_array(machine, UINT8, 256*3);
 }
 
 GAME( 1996, sliver, 0,        sliver, sliver, sliver, ROT0,  "Hollow Corp", "Sliver", GAME_IMPERFECT_GRAPHICS )
