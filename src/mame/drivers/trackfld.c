@@ -330,9 +330,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(trackfld_flipscreen_w)
-	AM_RANGE(0x10b1, 0x10b1) AM_WRITE(konami_sh_irqtrigger_w)
-	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
-	AM_RANGE(0x1087, 0x1087) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x10b1, 0x10b1) AM_READNOP AM_WRITE(konami_sh_irqtrigger_w)
+	AM_RANGE(0x10b3, 0x10b4) AM_WRITE(coin_w) // actually not used
+	AM_RANGE(0x10b7, 0x10b7) AM_READNOP AM_WRITE(irq_mask_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
@@ -345,6 +345,7 @@ static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM // initialized at POST
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, m_videoram)

@@ -4580,7 +4580,7 @@ Roms 1 through 8 read well in-circuit in the right
 places in the memory map for moon cresta,
 (through the fluke 9100) but the game does not
 currently run. Roms dumped adn verified with no
-anomolies.
+anomalies.
 
 Rom 9 was placed on the through-socket and has
 pins 20 and 18 (/E and A11 respectively) tied to
