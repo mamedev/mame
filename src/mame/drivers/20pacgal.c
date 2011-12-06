@@ -332,6 +332,8 @@ static MACHINE_START( 20pacgal )
 
 	state->save_item(NAME(state->m_game_selected));
 	state->save_item(NAME(state->m_ram_48000));
+	state->save_item(NAME(state->m_irq_mask));
+
 	machine.save().register_postload(save_prepost_delegate(FUNC(set_bankptr), &machine));
 }
 
