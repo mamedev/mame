@@ -25,7 +25,6 @@ public:
 
 	/* misc */
 	int          m_nmi_enable;
-	int          m_which;
 	UINT8        m_sound_nmi_enable;
 
 	/* devices */

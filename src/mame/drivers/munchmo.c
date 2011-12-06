@@ -25,7 +25,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/munchmo.h"
@@ -43,15 +42,15 @@ static WRITE8_HANDLER( mnchmobl_nmi_enable_w )
 	state->m_nmi_enable = data;
 }
 
-static INTERRUPT_GEN( mnchmobl_interrupt )
+static TIMER_DEVICE_CALLBACK( mnchmobl_interrupt )
 {
-	munchmo_state *state = device->machine().driver_data<munchmo_state>();
-	state->m_which = !state->m_which;
+	munchmo_state *state = timer.machine().driver_data<munchmo_state>();
+	int scanline = param;
 
-	if (state->m_which)
-		device_set_input_line(device, 0, HOLD_LINE);
-	else if (state->m_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (scanline == 240)
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	else if (state->m_nmi_enable && scanline == 0)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( mnchmobl_sound_irq )
@@ -66,7 +65,7 @@ static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
 	munchmo_state *state = space->machine().driver_data<munchmo_state>();
 
-	soundlatch_w(space, offset, data);
+	soundlatch_w(space, 0, data);
 	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE );
 }
 
@@ -121,7 +120,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITENOP /* ? */
+	//AM_RANGE(0x8000, 0x8000) AM_WRITE(mnchmobl_soundlatch_w) /* ? */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_nmi_ack_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
@@ -315,7 +314,6 @@ static MACHINE_START( munchmo )
 	state->save_item(NAME(state->m_palette_bank));
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_nmi_enable));
-	state->save_item(NAME(state->m_which));
 }
 
 static MACHINE_RESET( munchmo )
@@ -325,7 +323,6 @@ static MACHINE_RESET( munchmo )
 	state->m_palette_bank = 0;
 	state->m_flipscreen = 0;
 	state->m_nmi_enable = 0;
-	state->m_which = 0;
 }
 
 static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
@@ -333,7 +330,7 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(mnchmobl_map)
-	MCFG_CPU_VBLANK_INT_HACK(mnchmobl_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mnchmobl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
