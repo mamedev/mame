@@ -67,6 +67,7 @@ file_error win_error_to_file_error(DWORD error)
 			break;
 
 		case ERROR_FILE_NOT_FOUND:
+		case ERROR_FILENAME_EXCED_RANGE:
 		case ERROR_PATH_NOT_FOUND:
 			filerr = FILERR_NOT_FOUND;
 			break;
