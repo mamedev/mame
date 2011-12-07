@@ -155,18 +155,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// ROM (banked)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM				            	// RAM (MCU data copied here)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(thedeep_protection_r, thedeep_protection_w	)	// To MCU
-	AM_RANGE(0xe004, 0xe004) AM_READWRITE(thedeep_e004_r, thedeep_nmi_w			)	//
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(thedeep_protection_r, thedeep_protection_w)	// To MCU
+	AM_RANGE(0xe004, 0xe004) AM_READWRITE(thedeep_e004_r, thedeep_nmi_w)	//
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("e008")			// P1 (Inputs)
 	AM_RANGE(0xe009, 0xe009) AM_READ_PORT("e009")			// P2
 	AM_RANGE(0xe00a, 0xe00a) AM_READ_PORT("e00a")			// DSW1
 	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")			// DSW2
-	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w		)	// To Sound CPU
-	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w		)	// ?
-	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE_MEMBER(thedeep_state, m_scroll				)	// Scroll
+	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w)	// To Sound CPU
+	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w)	// ?
+	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE_MEMBER(thedeep_state, m_scroll)	// Scroll
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(thedeep_state, m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE_MEMBER(thedeep_state, m_vram_1		)	// Text Layer
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE_MEMBER(thedeep_state, m_vram_0		)	// Background Layer
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE_MEMBER(thedeep_state, m_vram_1)	// Text Layer
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE_MEMBER(thedeep_state, m_vram_0)	// Background Layer
 	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_BASE_MEMBER(thedeep_state, m_scroll2				)	// Column Scroll
 	AM_RANGE(0xf840, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -180,8 +180,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_w	)	//
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r				)	// From Main CPU
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_w)	//
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)	// From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -191,6 +191,7 @@ ADDRESS_MAP_END
                                 Input Ports
 
 ***************************************************************************/
+
 
 static INPUT_PORTS_START( thedeep )
 	PORT_START("e008")

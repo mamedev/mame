@@ -22,7 +22,7 @@
  1.31 fix a minor bug with the dac range. wolfpack clips again, and I'm almost sure its an encoding error on the original speech - LN (0.125u9)
  1.31a Add chip pinout and other notes - LN (0.128u4)
  1.31b slight update to notes to clarify input bus stuff, mostly finish the state map in the comments - LN
- 1.31c remove usage of deprecat.h - AtariAce (0.128u5)
+ 1.31c remove usage of deprecat lib - AtariAce (0.128u5)
  1.32 fix the squealing noise using a define; it isn't accurate to the chip exactly, but there are other issues which need to be fixed too. see TODO. - LN (0.136u2)
 
  TODO:

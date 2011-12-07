@@ -44,7 +44,6 @@ Note
 
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2413intf.h"
 
@@ -53,7 +52,9 @@ class jackie_state : public driver_device
 {
 public:
 	jackie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	int m_exp_bank;
 	UINT8 *m_fg_tile_ram;
@@ -73,6 +74,8 @@ public:
 	int m_hopper;
 	UINT8 m_out[3];
 	UINT16 m_unk_reg[3][5];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -231,18 +234,6 @@ static MACHINE_RESET( jackie )
 	state->m_nmi_enable	=	0;
 	state->m_hopper		=	0;
 	state->m_bg_enable	=	1;
-}
-
-static INTERRUPT_GEN( jackie_interrupt )
-{
-	jackie_state *state = device->machine().driver_data<jackie_state>();
-	if (cpu_getiloops(device) % 2) {
-		if (state->m_irq_enable)
-		device_set_input_line(device, 0, HOLD_LINE);
-	} else {
-		if (state->m_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
 }
 
 
@@ -555,6 +546,19 @@ static DRIVER_INIT( jackie )
 	rom[0x7e86] = 0xc3;
 }
 
+static TIMER_DEVICE_CALLBACK( jackie_irq )
+{
+	jackie_state *state = timer.machine().driver_data<jackie_state>();
+	int scanline = param;
+
+	if((scanline % 32) != 0)
+		return;
+
+	if((scanline % 64) == 32 && state->m_irq_enable)
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	else if	((scanline % 64) == 0 && state->m_nmi_enable)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_CONFIG_START( jackie, jackie_state )
 
@@ -562,7 +566,7 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(jackie_prg_map)
 	MCFG_CPU_IO_MAP(jackie_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(jackie_interrupt,8)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", jackie_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(jackie)
 

@@ -1324,12 +1324,12 @@ static void irq_raise(running_machine &machine, int level)
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
-/* TODO: fix this arrangement (derived from old deprecat.h) */
+/* TODO: fix this arrangement (derived from old deprecat lib) */
 static TIMER_DEVICE_CALLBACK(ms32_interrupt)
 {
 	int scanline = param;
-	if( scanline == 0 ) irq_raise(timer.machine(), 10);
-	if( scanline == 8)  irq_raise(timer.machine(), 9);
+	if( scanline == 0) irq_raise(timer.machine(), 10);
+	if( scanline == 8) irq_raise(timer.machine(), 9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
        kirarast needs it too, at least 8 per frame, but waits for a variable amount
        47pi2 needs ?? per frame (otherwise it hangs when you lose)

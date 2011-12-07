@@ -95,9 +95,6 @@
  */
 
 #include "emu.h"
-#include "deprecat.h"
-
-#include "video/konamiic.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tms57002/tms57002.h"
@@ -105,6 +102,7 @@
 #include "sound/k054539.h"
 #include "includes/konamigx.h"
 #include "machine/adc083x.h"
+#include "video/konamiic.h"
 #include "rendlay.h"
 
 #define GX_DEBUG     0
@@ -659,41 +657,38 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 	dmastart_callback(0);
 }
 
-static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
+static TIMER_DEVICE_CALLBACK(konamigx_hbinterrupt)
 {
-	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; device->machine().scheduler().trigger(resume_trigger); }
+	konamigx_state *state = timer.machine().driver_data<konamigx_state>();
+	int scanline = param;
 
-	// IRQ 1 is the main 60hz vblank interrupt
-	// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board
-	// generates the timing in those cases.  With this change, rushing heroes and rng2 boot :)
-
-	// maybe this interrupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
-	// the real hardware should output the display for each screen on alternate frames
-//  if(device->machine().primary_screen->frame_number() & 1)
-	if (1) // gx_syncen & 0x20)
+	if (scanline == 240)
 	{
-		gx_syncen &= ~0x20;
+		// lift idle suspension
+		if (resume_trigger && suspension_active) { suspension_active = 0; timer.machine().scheduler().trigger(resume_trigger); }
 
-		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
+		// IRQ 1 is the main 60hz vblank interrupt
+		// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board
+		// generates the timing in those cases.  With this change, rushing heroes and rng2 boot :)
+
+		// maybe this interrupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
+		// the real hardware should output the display for each screen on alternate frames
+		//  if(device->machine().primary_screen->frame_number() & 1)
+		if (1) // gx_syncen & 0x20)
 		{
-			gx_syncen &= ~1;
-			device_set_input_line(device, 1, HOLD_LINE);
+			gx_syncen &= ~0x20;
 
+			if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
+			{
+				gx_syncen &= ~1;
+				device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+
+			}
 		}
+
+		dmastart_callback(0);
 	}
-
-
-	dmastart_callback(0);
-}
-
-static INTERRUPT_GEN(konamigx_hbinterrupt)
-{
-	if (!cpu_getiloops(device))
-	{
-		konamigx_vbinterrupt_type4(device);
-	}
-	else	// hblank
+	else if(scanline < 240)	// hblank
 	{
 		// IRQ 2 is a programmable interrupt with scanline resolution
 		if (gx_syncen & 0x40)
@@ -703,7 +698,7 @@ static INTERRUPT_GEN(konamigx_hbinterrupt)
 			if ((konamigx_wrport1_1 & 0x82) == 0x82 || (gx_syncen & 2))
 			{
 				gx_syncen &= ~2;
-				device_set_input_line(device, 2, HOLD_LINE);
+				device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 			}
 		}
 	}
@@ -1785,7 +1780,7 @@ static GFXDECODE_START( type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( konamigx, driver_device )
+static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 24000000)
 	MCFG_CPU_PROGRAM_MAP(gx_type2_map)
@@ -1886,9 +1881,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu", M68EC020, 24000000)
 	MCFG_CPU_PROGRAM_MAP(gx_type3_map)
-	MCFG_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", konamigx_hbinterrupt, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
@@ -1896,13 +1893,13 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 	MCFG_VIDEO_START(konamigx_type3)
 	MCFG_PALETTE_LENGTH(16384)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(576, 32*8)
+	MCFG_SCREEN_SIZE(576, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
 	MCFG_SCREEN_ADD("screen2", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(576, 32*8)
+	MCFG_SCREEN_SIZE(576, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 	MCFG_SCREEN_UPDATE(konamigx)
 
@@ -1911,21 +1908,23 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu", M68EC020, 24000000)
 	MCFG_CPU_PROGRAM_MAP(gx_type4_map)
-	MCFG_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", konamigx_hbinterrupt, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(128*8, 32*8)
+	MCFG_SCREEN_SIZE(128*8, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
 
 	MCFG_SCREEN_ADD("screen2", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(128*8, 32*8)
+	MCFG_SCREEN_SIZE(128*8, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
 	MCFG_SCREEN_UPDATE(konamigx)
 

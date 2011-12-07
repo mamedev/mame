@@ -2,7 +2,9 @@ class thedeep_state : public driver_device
 {
 public:
 	thedeep_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
@@ -18,6 +20,8 @@ public:
 	UINT8 *m_scroll2;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

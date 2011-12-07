@@ -79,7 +79,7 @@ static TIMER_DEVICE_CALLBACK( overdriv_cpuA_scanline )
 	int scanline = param;
 
 	/* TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?) */
-	/*       this is a temporary solution to get rid of deprecat.h and the crashes, but also makes the game timer to be too slow */
+	/*       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow */
 	if(scanline == 256 && timer.machine().primary_screen->frame_number() & 1) // vblank-out irq
 		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
 	else if((scanline % 128) == 0) // timer irq

@@ -5,7 +5,6 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "includes/atarifb.h"
 #include "sound/discrete.h"
 
@@ -121,10 +120,11 @@ WRITE8_HANDLER( soccer_out2_w )
  *
  *************************************/
 
+/* FIXME: almost surely not tied with screen vertical position */
 WRITE8_HANDLER( atarifb_out3_w )
 {
-	atarifb_state *state = space->machine().driver_data<atarifb_state>();
-	int loop = cpu_getiloops(state->m_maincpu);
+	//atarifb_state *state = space->machine().driver_data<atarifb_state>();
+	int loop = space->machine().primary_screen->vpos() >= 123;
 
 	switch (loop)
 	{
@@ -137,16 +137,12 @@ WRITE8_HANDLER( atarifb_out3_w )
 			output_set_value("ledleft4", (data >> 4) & 1);
 			break;
 		case 0x01:
-			break;
-		case 0x02:
 			/* Player 2 play select lamp */
 			output_set_value("ledright0", (data >> 0) & 1);
 			output_set_value("ledright1", (data >> 1) & 1);
 			output_set_value("ledright2", (data >> 2) & 1);
 			output_set_value("ledright3", (data >> 3) & 1);
 			output_set_value("ledright4", (data >> 4) & 1);
-			break;
-		case 0x03:
 			break;
 	}
 //  logerror("out3_w, %02x:%02x\n", loop, data);

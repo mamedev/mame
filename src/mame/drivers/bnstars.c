@@ -1331,7 +1331,7 @@ static void irq_raise(running_machine &machine, int level)
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
-/* TODO: fix this arrangement (derived from old deprecat.h) */
+/* TODO: fix this arrangement (derived from old deprecat lib) */
 static TIMER_DEVICE_CALLBACK(ms32_interrupt)
 {
 	int scanline = param;
