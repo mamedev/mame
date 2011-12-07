@@ -91,6 +91,9 @@ READ8_DEVICE_HANDLER( ay8910_r );
 WRITE8_DEVICE_HANDLER( ay8910_address_w );
 WRITE8_DEVICE_HANDLER( ay8910_data_w );
 
+/* /RES */
+WRITE8_DEVICE_HANDLER( ay8910_reset_w );
+
 /* use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address' */
 WRITE8_DEVICE_HANDLER( ay8910_data_address_w );
 

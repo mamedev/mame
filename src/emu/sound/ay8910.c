@@ -1116,6 +1116,11 @@ WRITE8_DEVICE_HANDLER( ay8910_data_w )
 #endif
 }
 
+WRITE8_DEVICE_HANDLER( ay8910_reset_w )
+{
+	ay8910_reset_ym(get_safe_token(device));
+}
+
 static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };
 
 READ8_DEVICE_HANDLER( ay8914_r )
@@ -1131,6 +1136,8 @@ WRITE8_DEVICE_HANDLER( ay8914_w )
 	ay8910_address_w(device, 0, mapping8914to8910[offset & 0xff]);
 	ay8910_data_w(device, 0, data & 0xff);
 }
+
+
 
 DEFINE_LEGACY_SOUND_DEVICE(AY8910, ay8910);
 DEFINE_LEGACY_SOUND_DEVICE(AY8912, ay8912);
