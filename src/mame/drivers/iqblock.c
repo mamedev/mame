@@ -52,7 +52,6 @@ Grndtour:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
-#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "includes/iqblock.h"
 #include "sound/2413intf.h"
@@ -76,13 +75,20 @@ static WRITE8_HANDLER( grndtour_prot_w )
 }
 
 
-static INTERRUPT_GEN( iqblock_interrupt )
+static TIMER_DEVICE_CALLBACK( iqblock_irq )
 {
-	if (cpu_getiloops(device) & 1)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* ???? */
-	else
-		device_set_input_line(device, 0, ASSERT_LINE);			/* ???? */
+	iqblock_state *state = timer.machine().driver_data<iqblock_state>();
+	int scanline = param;
+
+	if((scanline % 16) != 0)
+		return;
+
+	if((scanline % 32) == 16)
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	else if	((scanline % 32) == 0)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
+
 
 static WRITE8_HANDLER( iqblock_irqack_w )
 {
@@ -273,7 +279,7 @@ static MACHINE_CONFIG_START( iqblock, iqblock_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", iqblock_irq, "screen", 0, 1)
 
 	MCFG_PPI8255_ADD( "ppi8255", ppi8255_intf )
 

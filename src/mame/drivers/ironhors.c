@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/discrete.h"
@@ -21,19 +20,20 @@
  *
  *************************************/
 
-static INTERRUPT_GEN( ironhors_interrupt )
+static TIMER_DEVICE_CALLBACK( ironhors_irq )
 {
-	ironhors_state *state = device->machine().driver_data<ironhors_state>();
+	ironhors_state *state = timer.machine().driver_data<ironhors_state>();
+	int scanline = param;
 
-	if (cpu_getiloops(device) == 0)
+	if (scanline == 240)
 	{
 		if (*state->m_interrupt_enable & 4)
-			device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
-	else if (cpu_getiloops(device) % 2)
+	else if (((scanline+16) % 64) == 0)
 	{
 		if (*state->m_interrupt_enable & 1)
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -360,6 +360,7 @@ static MACHINE_START( ironhors )
 {
 	ironhors_state *state = machine.driver_data<ironhors_state>();
 
+	state->m_maincpu = machine.device("maincpu");
 	state->m_soundcpu = machine.device("soundcpu");
 
 	state->save_item(NAME(state->m_palettebank));
@@ -381,7 +382,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_VBLANK_INT_HACK(ironhors_interrupt,8)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ironhors_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu",Z80,18432000/6)		 /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
@@ -422,19 +423,20 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( farwest_interrupt )
+static TIMER_DEVICE_CALLBACK( farwest_irq )
 {
-	ironhors_state *state = device->machine().driver_data<ironhors_state>();
+	ironhors_state *state = timer.machine().driver_data<ironhors_state>();
+	int scanline = param;
 
-	if (cpu_getiloops(device) &1)
+	if ((scanline % 2) == 1)
 	{
 		if (*state->m_interrupt_enable & 4)
-			device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
-	else //if (cpu_getiloops() % 2)
+	else if ((scanline % 2) == 0)
 	{
 		if (*state->m_interrupt_enable & 1)
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -464,7 +466,8 @@ static MACHINE_CONFIG_DERIVED( farwest, ironhors )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(farwest_master_map)
-	MCFG_CPU_VBLANK_INT_HACK(farwest_interrupt,255)
+	MCFG_DEVICE_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(farwest_irq)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(farwest_slave_map)

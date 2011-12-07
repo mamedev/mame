@@ -2,7 +2,9 @@ class iqblock_state : public driver_device
 {
 public:
 	iqblock_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT8 *m_rambase;
 	UINT8 *m_bgvideoram;
@@ -11,6 +13,8 @@ public:
 	int m_video_type;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

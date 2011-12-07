@@ -26,6 +26,7 @@ public:
 	int        m_spriterambank;
 
 	/* devices */
+	device_t *m_maincpu;
 	device_t *m_soundcpu;
 };
 
