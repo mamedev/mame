@@ -37,7 +37,6 @@ is a YM2413 compatible chip.
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
 #include "sound/2413intf.h"
@@ -354,11 +353,16 @@ static void msx_vdp_interrupt(running_machine &machine, int i)
 	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
-static INTERRUPT_GEN( sangho_interrupt )
+static TIMER_DEVICE_CALLBACK( sangho_interrupt )
 {
-	v9938_set_sprite_limit(0, 0);
-	v9938_set_resolution(0, RENDER_HIGH);
-	v9938_interrupt(device->machine(), 0);
+	int scanline = param;
+
+	if((scanline % 2) == 0)
+	{
+		v9938_set_sprite_limit(0, 0);
+		v9938_set_resolution(0, RENDER_HIGH);
+		v9938_interrupt(timer.machine(), 0);
+	}
 }
 
 
@@ -373,7 +377,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(pzlestar_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sangho_interrupt, "screen", 0, 1)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
@@ -406,7 +410,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(sexyboom_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sangho_interrupt, "screen", 0, 1)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 

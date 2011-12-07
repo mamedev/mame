@@ -63,7 +63,6 @@ out of the sprite list at that point.. (verify on real hw)
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "includes/snowbros.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -116,18 +115,36 @@ static WRITE16_HANDLER( snowbros_irq2_ack_w )
 	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( snowbros_interrupt )
+static TIMER_DEVICE_CALLBACK( snowbros_irq )
 {
-	device_set_input_line(device, cpu_getiloops(device) + 2, ASSERT_LINE);	/* IRQs 4, 3, and 2 */
+	snowbros_state *state = timer.machine().driver_data<snowbros_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+
+	if(scanline == 128)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+
+	if(scanline == 32)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( snowbro3_interrupt )
+static TIMER_DEVICE_CALLBACK( snowbros3_irq )
 {
-	snowbros_state *state = device->machine().driver_data<snowbros_state>();
-	okim6295_device *adpcm = device->machine().device<okim6295_device>("oki");
+	snowbros_state *state = timer.machine().driver_data<snowbros_state>();
+	okim6295_device *adpcm = timer.machine().device<okim6295_device>("oki");
 	int status = adpcm->read_status();
+	int scanline = param;
 
-	device_set_input_line(device, cpu_getiloops(device) + 2, ASSERT_LINE);	/* IRQs 4, 3, and 2 */
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+
+	if(scanline == 128)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+
+	if(scanline == 32)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 
 	if (state->m_sb3_music_is_playing)
 	{
@@ -1430,7 +1447,7 @@ static MACHINE_RESET (semiprot)
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
-	state->m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
+		state->m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
 static MACHINE_RESET (finalttr)
@@ -1440,7 +1457,7 @@ static MACHINE_RESET (finalttr)
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
-	state->m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
+		state->m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
 }
 
 static const kaneko_pandora_interface snowbros_pandora_config =
@@ -1455,7 +1472,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
 	MCFG_CPU_PROGRAM_MAP(snowbros_map)
-	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", snowbros_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1466,7 +1483,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SCREEN_REFRESH_RATE(57.5) /* ~57.5 - confirmed */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE(snowbros)
 	MCFG_SCREEN_EOF(snowbros)
@@ -1566,7 +1583,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(honeydol_map)
-	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", snowbros_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(honeydol_sound_map)
@@ -1577,7 +1594,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	MCFG_SCREEN_REFRESH_RATE(57.5)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE(honeydol)
 
@@ -1603,7 +1620,7 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) // or 12
 	MCFG_CPU_PROGRAM_MAP(twinadv_map)
-	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", snowbros_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1615,7 +1632,7 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_SCREEN_REFRESH_RATE(57.5)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE(twinadv)
 
@@ -1681,7 +1698,7 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
 	MCFG_CPU_PROGRAM_MAP(snowbros3_map)
-	MCFG_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", snowbros3_irq, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

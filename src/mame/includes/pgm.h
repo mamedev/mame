@@ -3,7 +3,8 @@ class pgm_state : public driver_device
 {
 public:
 	pgm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		{ }
 
 	/* memory pointers */
 //  UINT16 *      m_mainram;  // currently this is also used by nvram handler
@@ -80,6 +81,7 @@ public:
 	system_time  m_systime;
 
 	/* devices */
+	cpu_device *m_maincpu;
 	cpu_device *m_soundcpu;
 	cpu_device *m_prot;
 	device_t *m_ics;

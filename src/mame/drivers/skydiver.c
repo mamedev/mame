@@ -88,7 +88,6 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "deprecat.h"
 #include "includes/skydiver.h"
 #include "sound/discrete.h"
 
@@ -377,7 +376,7 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)	   /* ???? */
 	MCFG_CPU_PROGRAM_MAP(skydiver_map)
-	MCFG_CPU_VBLANK_INT_HACK(skydiver_interrupt, 5)
+	MCFG_CPU_PERIODIC_INT(skydiver_interrupt, 5*60)
 	MCFG_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
 
 	MCFG_MACHINE_RESET(skydiver)

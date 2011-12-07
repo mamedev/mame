@@ -295,7 +295,6 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/arm7/arm7.h"
-#include "deprecat.h"
 #include "sound/ics2115.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/nvram.h"
@@ -1268,43 +1267,45 @@ GFXDECODE_END
 
 /* only dragon world 2 NEEDs irq4, Puzzli 2 explicitly doesn't want it, what
    is the source? maybe the protection device? */
-static INTERRUPT_GEN( drgw_interrupt )
+static TIMER_DEVICE_CALLBACK( drgw_interrupt )
 {
-	if (cpu_getiloops(device) == 0)
-	{
-		//printf("vbl\n");
-		device_set_input_line(device, 6, HOLD_LINE);
-	}
-	else
-		device_set_input_line(device, 4, HOLD_LINE);
+	pgm_state *state = timer.machine().driver_data<pgm_state>();
+	int scanline = param;
+
+	if(scanline == 224)
+		device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
 static MACHINE_START( pgm )
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
 
-	machine.base_datetime(state->m_systime);
+//	machine.base_datetime(state->m_systime);
 
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 	state->m_prot = machine.device<cpu_device>("prot");
 	state->m_ics = machine.device("ics");
 
-	state->save_item(NAME(state->m_cal_val));
-	state->save_item(NAME(state->m_cal_mask));
-	state->save_item(NAME(state->m_cal_com));
-	state->save_item(NAME(state->m_cal_cnt));
+//	state->save_item(NAME(state->m_cal_val));
+//	state->save_item(NAME(state->m_cal_mask));
+//	state->save_item(NAME(state->m_cal_com));
+//	state->save_item(NAME(state->m_cal_cnt));
 }
 
 static MACHINE_RESET( pgm )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+//	pgm_state *state = machine.driver_data<pgm_state>();
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 
-	state->m_cal_val = 0;
-	state->m_cal_mask = 0;
-	state->m_cal_com = 0;
-	state->m_cal_cnt = 0;
+//	state->m_cal_val = 0;
+//	state->m_cal_mask = 0;
+//	state->m_cal_com = 0;
+//	state->m_cal_cnt = 0;
 }
 
 
@@ -1349,11 +1350,14 @@ static MACHINE_CONFIG_START( pgm, pgm_state )
 	MCFG_FRAGMENT_ADD(pgmbase)
 MACHINE_CONFIG_END
 
+// needs an extra IRQ, puzzli2 doesn't want this irq!
+
 
 static MACHINE_CONFIG_DERIVED( drgw2, pgm )
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_ADD("maincpu", M68000, 20000000)
+	MCFG_CPU_PROGRAM_MAP(pgm_mem)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_RESET( killbld );
@@ -1371,9 +1375,11 @@ static MACHINE_RESET( dw3 );
 
 static MACHINE_CONFIG_DERIVED( dw3, pgm )
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(killbld_mem)
-	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+		MCFG_DEVICE_REMOVE("maincpu")
+		MCFG_CPU_ADD("maincpu", M68000, 20000000)
+		MCFG_CPU_PROGRAM_MAP(pgm_mem)
+		MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
+
 
 	MCFG_MACHINE_RESET(dw3)
 
@@ -1402,9 +1408,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kov_disabled_arm, pgm )
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kovsh_mem)
-	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+		MCFG_DEVICE_REMOVE("maincpu")
+		MCFG_CPU_ADD("maincpu", M68000, 20000000)
+		MCFG_CPU_PROGRAM_MAP(pgm_mem)
+		MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
+
 
 	/* protection CPU */
 	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E/F/G
@@ -1425,9 +1433,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svg, pgm )
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_ADD("maincpu", M68000, 20000000)
 	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
-	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+	MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
 
 	/* protection CPU */
 	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857G
@@ -1435,11 +1444,14 @@ static MACHINE_CONFIG_DERIVED( svg, pgm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( oldsplus, oldsplus_state )
+static MACHINE_CONFIG_START( oldsplus, pgm_state )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+		MCFG_DEVICE_REMOVE("maincpu")
+		MCFG_CPU_ADD("maincpu", M68000, 20000000)
+		MCFG_CPU_PROGRAM_MAP(pgm_mem)
+		MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
+
 
 //  Simulated for now
 //  MCFG_CPU_ADD("prot", ARM7, 20000000)
@@ -1483,9 +1495,8 @@ static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000)
-
 	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
-	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)

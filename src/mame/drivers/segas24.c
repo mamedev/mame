@@ -335,7 +335,6 @@ Notes:
 
 #define ADDRESS_MAP_MODERN
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
 #include "sound/dac.h"
@@ -987,30 +986,29 @@ READ16_MEMBER(segas24_state::irq_r)
 	return irq_tval & 0xfff;
 }
 
-static INTERRUPT_GEN(irq_vbl)
+static TIMER_DEVICE_CALLBACK(irq_vbl)
 {
-	segas24_state *state = device->machine().driver_data<segas24_state>();
+	segas24_state *state = timer.machine().driver_data<segas24_state>();
 	int irq, mask;
+	int scanline = param;
 
-	if(cpu_getiloops(device)) {
-		irq = IRQ_SPRITE;
-		state->irq_sprite = 1;
-	} else {
-		irq = IRQ_VBLANK;
-		state->irq_vblank = 1;
-	}
+	/* TODO: perhaps vblank irq happens at 400, sprite IRQ certainly don't at 0! */
+	if(scanline == 0) { irq = IRQ_SPRITE; state->irq_sprite = 1; }
+	else if(scanline == 384) { irq = IRQ_VBLANK; state->irq_vblank = 1; }
+	else
+		return;
 
 	state->irq_timer_clear->adjust(attotime::from_hz(HSYNC_CLOCK));
 
 	mask = 1 << irq;
 
 	if(state->irq_allow0 & mask)
-		cputag_set_input_line(device->machine(), "maincpu", 1+irq, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "maincpu", 1+irq, ASSERT_LINE);
 
 	if(state->irq_allow1 & mask)
-		cputag_set_input_line(device->machine(), "sub", 1+irq, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "sub", 1+irq, ASSERT_LINE);
 
-	if(!cpu_getiloops(device)) {
+	if(scanline == 384) {
 		// Ensure one index pulse every 20 frames
 		// The is some code in bnzabros at 0x852 that makes it crash
 		// if the pulse train is too fast
@@ -1020,7 +1018,7 @@ static INTERRUPT_GEN(irq_vbl)
 	}
 
 	state->irq_timer_sync();
-	state->irq_vsynctime = device->machine().time();
+	state->irq_vsynctime = timer.machine().time();
 }
 
 static void irq_ym(device_t *device, int irq)
@@ -1951,7 +1949,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system24_cpu1_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq_vbl, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", irq_vbl, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)

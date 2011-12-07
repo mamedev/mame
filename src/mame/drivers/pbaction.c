@@ -65,7 +65,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "machine/segacrpt.h"
 #include "includes/pbaction.h"
@@ -293,7 +292,7 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
 	MCFG_CPU_PROGRAM_MAP(pbaction_sound_map)
 	MCFG_CPU_IO_MAP(pbaction_sound_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(pbaction_interrupt,2)	/* ??? */
+	MCFG_CPU_PERIODIC_INT(pbaction_interrupt,2*60)	/* ??? */
 									/* IRQs are caused by the main CPU */
 
 	MCFG_MACHINE_START(pbaction)

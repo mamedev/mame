@@ -145,7 +145,6 @@ NEP-16
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "sound/ymz280b.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/nvram.h"
@@ -317,7 +316,7 @@ static WRITE32_HANDLER ( skns_hit2_w )
 		case 'A':
 			if (data < 2) hit.disconnect= 0;
 		break;
-		// unknow country id, unlock per default
+		// unknown country id, unlock per default
 		default:
 			hit.disconnect= 0;
 		break;
@@ -438,19 +437,15 @@ static MACHINE_RESET(skns)
 }
 
 
-static INTERRUPT_GEN(skns_interrupt)
+static TIMER_DEVICE_CALLBACK(skns_irq)
 {
-	UINT8 interrupt = 5;
-	switch(cpu_getiloops(device))
-	{
-		case 0:
-			interrupt = 5; // VBLANK
-			break;
-		case 1:
-			interrupt = 1; // SPC
-			break;
-	}
-	device_set_input_line(device,interrupt,HOLD_LINE);
+	skns_state *state = timer.machine().driver_data<skns_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu,5,HOLD_LINE); //vblank
+	else if(scanline == 0)
+		device_set_input_line(state->m_maincpu,1,HOLD_LINE); // spc
 }
 
 /**********************************************************************************
@@ -815,7 +810,7 @@ static const ymz280b_interface ymz280b_intf =
 static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_CPU_ADD("maincpu", SH2,28638000)
 	MCFG_CPU_PROGRAM_MAP(skns_map)
-	MCFG_CPU_VBLANK_INT_HACK(skns_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", skns_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(skns)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -833,7 +828,7 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_SCREEN_REFRESH_RATE(59.5971) // measured by Guru
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320,240)
+	MCFG_SCREEN_SIZE(340,262)
 	MCFG_SCREEN_VISIBLE_AREA(0,319,0,239)
 	MCFG_SCREEN_UPDATE(skns)
 	MCFG_SCREEN_EOF(skns)

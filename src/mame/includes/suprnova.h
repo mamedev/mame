@@ -18,7 +18,9 @@ class skns_state : public driver_device
 {
 public:
 	skns_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	sknsspr_device* m_spritegen;
 	UINT32 *m_tilemapA_ram;
@@ -63,6 +65,8 @@ public:
 	tilemap_t *m_tilemap_B;
 
 	UINT8 m_region;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

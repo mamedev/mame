@@ -56,7 +56,6 @@ YM2203C
 #include "video/v9938.h"
 #include "machine/8255ppi.h"
 #include "sound/2203intf.h"
-#include "deprecat.h"
 
 
 class sfkick_state : public driver_device
@@ -458,10 +457,11 @@ static MACHINE_RESET(sfkick)
 	sfkick_remap_banks(machine);
 }
 
-static INTERRUPT_GEN( sfkick_interrupt )
+static TIMER_DEVICE_CALLBACK( sfkick_interrupt )
 {
-	v9938_interrupt(device->machine(), 0);
+	v9938_interrupt(timer.machine(), 0);
 }
+
 static void irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line_and_vector(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(sfkick_map)
 	MCFG_CPU_IO_MAP(sfkick_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(sfkick_interrupt,262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sfkick_interrupt, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
