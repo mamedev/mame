@@ -41,15 +41,15 @@ static WRITE8_HANDLER( mnchmobl_nmi_enable_w )
 	state->m_nmi_enable = data;
 }
 
-static TIMER_DEVICE_CALLBACK( mnchmobl_interrupt )
+/* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
+static INTERRUPT_GEN( mnchmobl_vblank_irq )
 {
-	munchmo_state *state = timer.machine().driver_data<munchmo_state>();
-	int scanline = param;
+	munchmo_state *state = device->machine().driver_data<munchmo_state>();
 
-	if (scanline == 240)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
-	else if (state->m_nmi_enable && scanline == 0)
+	if (state->m_nmi_enable)
 		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+
+	device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( mnchmobl_sound_irq )
@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(mnchmobl_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mnchmobl_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", mnchmobl_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
