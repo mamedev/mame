@@ -66,7 +66,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/ramdac.h"
@@ -81,7 +80,9 @@ class sliver_state : public driver_device
 {
 public:
 	sliver_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		{ }
 
 	UINT16 m_io_offset;
 	UINT16 m_io_reg[IO_SIZE];
@@ -103,6 +104,8 @@ public:
 	bitmap_t *m_bitmap_bg;
 
 	UINT16 m_tempbuf[8];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 static const int gfxlookup[][4]=
@@ -414,9 +417,9 @@ static WRITE16_HANDLER(sound_w)
 static ADDRESS_MAP_START( sliver_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001 ) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003 ) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x100004, 0x100005 ) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, mask_w, 0x00ff)
 
 	AM_RANGE(0x300002, 0x300003) AM_NOP // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
 
@@ -546,12 +549,6 @@ static INPUT_PORTS_START( sliver )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( sliver_int )
-{
-	//valid interrupts are 2,3,4
-	device_set_input_line(device, 2+cpu_getiloops(device), HOLD_LINE);
-}
-
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
 	AM_RANGE(0x000, 0x3ff) AM_RAM AM_BASE_MEMBER(sliver_state,m_colorram)
 ADDRESS_MAP_END
@@ -561,12 +558,19 @@ static RAMDAC_INTERFACE( ramdac_intf )
 	0
 };
 
+static TIMER_DEVICE_CALLBACK ( obj_irq_cb )
+{
+	sliver_state *state = timer.machine().driver_data<sliver_state>();
+
+	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+}
 
 static MACHINE_CONFIG_START( sliver, sliver_state )
-
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sliver_map)
-	MCFG_CPU_VBLANK_INT_HACK(sliver_int,3)
+	MCFG_CPU_VBLANK_INT("screen",irq4_line_hold)
+	MCFG_TIMER_ADD_PERIODIC("obj_actel", obj_irq_cb, attotime::from_hz(60)) /* unknown clock, causes "obj actel ready error" without this */
+	// irq 2 valid but not used?
 
 	MCFG_CPU_ADD("audiocpu", I8051, 8000000)
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
