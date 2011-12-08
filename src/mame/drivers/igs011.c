@@ -61,7 +61,6 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
@@ -85,7 +84,9 @@ class igs011_state : public driver_device
 {
 public:
 	igs011_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		{ }
 
 	UINT8 *m_layer[8];
 	UINT16 m_priority;
@@ -105,6 +106,8 @@ public:
 	UINT16 m_lhb_irq_enable;
 	UINT16 *m_vbowl_trackball;
 	blitter_t m_blitter;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -3587,20 +3590,19 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( drgnwrld_interrupt )
+
+static TIMER_DEVICE_CALLBACK ( drgnworld_timer_irq_cb )
 {
-	switch (cpu_getiloops(device))
-	{
-		case 0:	device_set_input_line(device, 6, HOLD_LINE);	break;
-		default:
-		case 1:	device_set_input_line(device, 5, HOLD_LINE);	break;
-	}
+	igs011_state *state = timer.machine().driver_data<igs011_state>();
+
+	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drgnwrld)
-	MCFG_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", drgnworld_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -3613,43 +3615,47 @@ MACHINE_CONFIG_END
 
 
 
-static INTERRUPT_GEN( lhb_interrupt )
+static INTERRUPT_GEN( lhb_vblank_irq )
 {
 	igs011_state *state = device->machine().driver_data<igs011_state>();
 	if (!state->m_lhb_irq_enable)
 		return;
 
-	switch (cpu_getiloops(device))
-	{
-		case 0:	device_set_input_line(device, 3, HOLD_LINE);	break;
-		case 2:	device_set_input_line(device, 6, HOLD_LINE);	break;
-		default:
-				// It reads the inputs. Must be called more than once for test mode on boot to work
-				device_set_input_line(device, 5, HOLD_LINE);	break;
-	}
+	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+}
+
+static TIMER_DEVICE_CALLBACK ( lhb_timer_irq_cb )
+{
+	igs011_state *state = timer.machine().driver_data<igs011_state>();
+	if (!state->m_lhb_irq_enable)
+		return;
+
+	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( lhb, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lhb)
-	MCFG_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
+	MCFG_CPU_VBLANK_INT("screen",lhb_vblank_irq)
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", lhb_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	// irq 3 points to an apparently unneeded routine
 MACHINE_CONFIG_END
 
 
 
-static INTERRUPT_GEN( wlcc_interrupt )
+static TIMER_DEVICE_CALLBACK ( wlcc_timer_irq_cb )
 {
-	switch (cpu_getiloops(device))
-	{
-		case 0:	device_set_input_line(device, 3, HOLD_LINE);	break;
-		case 1:	device_set_input_line(device, 6, HOLD_LINE);	break;
-	}
+	igs011_state *state = timer.machine().driver_data<igs011_state>();
+
+	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 }
+
 
 static MACHINE_CONFIG_DERIVED( wlcc, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wlcc)
-	MCFG_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", wlcc_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 MACHINE_CONFIG_END
 
 
@@ -3657,7 +3663,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( xymg, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xymg)
-	MCFG_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", wlcc_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 MACHINE_CONFIG_END
 
 
@@ -3665,7 +3672,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lhb2)
-	MCFG_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", drgnworld_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
 //  MCFG_GFXDECODE(igs011_hi)
 
@@ -3680,22 +3688,13 @@ static void sound_irq(device_t *device, int state)
 //   cputag_set_input_line(machine, "maincpu", 3, state);
 }
 
-static INTERRUPT_GEN( vbowl_interrupt )
-{
-	switch (cpu_getiloops(device))
-	{
-		case 0:	device_set_input_line(device, 4, HOLD_LINE);	break;
-		case 1:	device_set_input_line(device, 5, HOLD_LINE);	break;
-		case 2:	device_set_input_line(device, 6, HOLD_LINE);	break;
-		default:
-		case 3:	device_set_input_line(device, 3, HOLD_LINE);	break;	// sound
-	}
-}
-
 static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vbowl)
-	MCFG_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
+	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", wlcc_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	// irq 5 points to a debug function (all routines are clearly patched out)
+	// irq 4 points to an apparently unneeded routine
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_EOF(vbowl)	// trackball
