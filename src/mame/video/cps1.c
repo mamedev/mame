@@ -110,9 +110,9 @@ The King of Dragons* (Japan 910805, B-Board 90629B-3)          90629B-3   KD29B 
 
 Captain Commando* (World 911014)                         1991  91635B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 Captain Commando* (World 911202)                               91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632B   IOC1
-Captain Commando* (USA 910928)                                 91635B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+Captain Commando* (USA 910928)                                 91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 Captain Commando* (Japan 910928)                               91634B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
-Captain Commando* (Japan 911202)                               91634B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+Captain Commando* (Japan 911202)                               91634B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632B   IOC1
 
 Knights of the Round* (World 911127)                     1991  91635B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 Knights of the Round* (USA 911127)                             91635B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
@@ -136,10 +136,10 @@ Varth: Operation Thunderstorm* (Japan 920714)                  88622B-3   VA22B 
 Quiz & Dragons: Capcom Quiz Game* (USA 920701)           1992  89625B-1   QD22B            IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Quiz & Dragons: Capcom Quiz Game* (Japan 940921)         1994  91634B-2   QD63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 
-Warriors of Fate* (World 921002)                         1992  91635B-?   TK263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014
+Warriors of Fate* (World 921002)                         1992  91635B-?   TK263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
 Warriors of Fate* (USA 921031)                                 91635B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
-Sangokushi II* (Asia 921005)                                   91634B-?   TK263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014
-Tenchi wo Kurau II: Sekiheki no Tatakai* (Japan 921031)        91634B-?   TK263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014
+Sangokushi II* (Asia 921005)                                   91634B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Tenchi wo Kurau II: Sekiheki no Tatakai* (Japan 921031)        91634B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 
 Street Fighter II': Hyper Fighting (World 921209)        1992  91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Hyper Fighting (USA 921209)                91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
@@ -919,7 +919,6 @@ static const struct gfx_range mapper_STF29_table[] =
 };
 
 
-
 // RT24B and RT22B are equivalent, but since we could dump both PALs we are
 // documenting both.
 
@@ -1228,8 +1227,6 @@ static const struct gfx_range mapper_pang3_table[] =
 };
 
 
-
-
 #define mapper_sfzch	{ 0x20000, 0, 0, 0 }, mapper_sfzch_table
 static const struct gfx_range mapper_sfzch_table[] =
 {
@@ -1237,9 +1234,6 @@ static const struct gfx_range mapper_sfzch_table[] =
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x1ffff, 0 },
 	{ 0 }
 };
-
-
-
 
 
 /*
@@ -1270,43 +1264,43 @@ static const struct CPS1config cps1_config_table[]=
 	{"daimakai",    CPS_B_01,     mapper_DM22A },	// equivalent to DM620
 	{"daimakair",   CPS_B_21_DEF, mapper_DAM63B },	// equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
 	{"strider",     CPS_B_01,     mapper_ST24M1 },
-	{"striderua",   CPS_B_01,     mapper_ST24M1 },	// wrong, this set uses ST24B2, still non dumped
+	{"striderua",   CPS_B_01,     mapper_ST24M1 },	// wrong, this set uses ST24B2, still not dumped
 	{"striderj",    CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
-	{"striderjr",   CPS_B_21_DEF, mapper_ST24M1 },	// wrong, this set uses STH63B, still non dumped
+	{"striderjr",   CPS_B_21_DEF, mapper_ST24M1 },	// wrong, this set uses STH63B, still not dumped
 	{"dynwar",      CPS_B_02,     mapper_TK22B },	// wrong, this set uses TK24B1, dumped but equations still not added
 	{"dynwara",     CPS_B_02,     mapper_TK22B },
 	{"dynwarj",     CPS_B_02,     mapper_TK22B },
-	{"dynwarjr",    CPS_B_21_DEF, mapper_TK22B },	// wrong, this set uses TK163B, still non dumped
+	{"dynwarjr",    CPS_B_21_DEF, mapper_TK22B },	// wrong, this set uses TK163B, still not dumped
 	{"willow",      CPS_B_03,     mapper_WL24B },
 	{"willowo",     CPS_B_03,     mapper_WL24B },
-	{"willowj",     CPS_B_03,     mapper_WL24B },	// wrong, this set uses WL22B, still non dumped
+	{"willowj",     CPS_B_03,     mapper_WL24B },	// wrong, this set uses WL22B, still not dumped
 	{"ffight",      CPS_B_04,     mapper_S224B },
 	{"ffightu",     CPS_B_04,     mapper_S224B },
 	{"ffightu1",    CPS_B_04,     mapper_S224B },
 	{"ffightua",    CPS_B_01,     mapper_S224B },
 	{"ffightub",    CPS_B_05,     mapper_S224B },
-	{"ffightj",     CPS_B_04,     mapper_S224B },	// wrong, this set uses S222B, still non dumped
-	{"ffightj1",    CPS_B_01,     mapper_S224B },	// wrong, this set uses S222B, still non dumped
-	{"ffightj2",    CPS_B_02,     mapper_S224B },	// wrong, this set uses S222B, still non dumped
+	{"ffightj",     CPS_B_04,     mapper_S224B },	// wrong, this set uses S222B, still not dumped
+	{"ffightj1",    CPS_B_01,     mapper_S224B },	// wrong, this set uses S222B, still not dumped
+	{"ffightj2",    CPS_B_02,     mapper_S224B },	// wrong, this set uses S222B, still not dumped
 	{"ffightjh",    CPS_B_01,     mapper_S224B },	// wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941u",       CPS_B_05,     mapper_YI24B },
-	{"1941j",       CPS_B_05,     mapper_YI24B },	// wrong, this set uses YI22B, still non dumped
+	{"1941j",       CPS_B_05,     mapper_YI24B },	// wrong, this set uses YI22B, still not dumped
 	{"unsquad",     CPS_B_11,     mapper_AR24B },
 	{"area88",      CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
-	{"area88r",     CPS_B_21_DEF, mapper_AR22B },	// wrong, this set uses ARA63B, still non dumped
+	{"area88r",     CPS_B_21_DEF, mapper_AR22B },	// wrong, this set uses ARA63B, still not dumped
 	{"mercs",       CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsu",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsur1",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
-	{"mercsj",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },	// wrong, this set uses O222B, still non dumped
+	{"mercsj",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },	// wrong, this set uses O222B, still not dumped
 	{"msword",      CPS_B_13,     mapper_MS24B },
 	{"mswordr1",    CPS_B_13,     mapper_MS24B },
 	{"mswordu",     CPS_B_13,     mapper_MS24B },
-	{"mswordj",     CPS_B_13,     mapper_MS24B },	// wrong, this set uses MS22B, still non dumped
+	{"mswordj",     CPS_B_13,     mapper_MS24B },	// wrong, this set uses MS22B, still not dumped
 	{"mtwins",      CPS_B_14,     mapper_CK24B },
-	{"chikij",      CPS_B_14,     mapper_CK24B },	// wrong, this set uses CK22B, still non dumped
+	{"chikij",      CPS_B_14,     mapper_CK24B },	// wrong, this set uses CK22B, still not dumped
 	{"nemo",        CPS_B_15,     mapper_NM24B },
-	{"nemoj",       CPS_B_15,     mapper_NM24B },	// wrong, this set uses NM22B, still non dumped
+	{"nemoj",       CPS_B_15,     mapper_NM24B },	// wrong, this set uses NM22B, still not dumped
 	{"cawing",      CPS_B_16,     mapper_CA24B },
 	{"cawingr1",    CPS_B_16,     mapper_CA24B },
 	{"cawingu",     CPS_B_16,     mapper_CA24B },
@@ -1339,7 +1333,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"kodr1",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodu",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodj",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
-	{"kodja",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },	// wrong, this set uses KD22B, still non dumped
+	{"kodja",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },	// wrong, this set uses KD22B, still not dumped
 	{"kodb",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },	/* bootleg, doesn't use multiply protection */
 	{"captcomm",    CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommr1",  CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
@@ -1350,7 +1344,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"knights",     CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
-	{"knightsja",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// wrong, this set uses KR22B, still non dumped
+	{"knightsja",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// wrong, this set uses KR22B, still not dumped
 	{"knightsb",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// wrong, knightsb bootleg doesn't use the KR63B PAL
 	{"sf2ce",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceea",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
@@ -1376,8 +1370,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2yyc",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2koryu",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2mdt",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"varth",       CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */	// wrong, this set uses VA24B, still non dumped
-	{"varthr1",     CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */	// wrong, this set uses VA24B, still non dumped
+	{"varth",       CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */	// wrong, this set uses VA24B, dumped but equations still not added
+	{"varthr1",     CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */	// wrong, this set uses VA24B, dumped but equations still not added
 	{"varthu",      CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthj",      CPS_B_21_BT5, mapper_VA22B },	/* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
 	{"cworld2j",    CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },	/* (ports 36, 34 probably leftover input code from another game) */
@@ -1419,12 +1413,15 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3j",      CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"pang3b",      CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9K
 
-	{"sfach",    CPS_B_21_DEF, mapper_sfzch },
-	{"sfzbch",   CPS_B_21_DEF, mapper_sfzch },
-	{"sfzch",    CPS_B_21_DEF, mapper_sfzch },
-	{"wofch",    CPS_B_21_DEF, mapper_sfzch },
+	/* CPS Changer */
 
-    /* CPS2 games */
+	{"sfach",       CPS_B_21_DEF, mapper_sfzch },	// wrong, this set uses an unknown PAL, still not dumped
+	{"sfzbch",      CPS_B_21_DEF, mapper_sfzch },	// wrong, this set uses an unknown PAL, still not dumped
+	{"sfzch",       CPS_B_21_DEF, mapper_sfzch },	// wrong, this set uses an unknown PAL, still not dumped
+	{"wofch",       CPS_B_21_DEF, mapper_TK263B },
+
+	/* CPS2 games */
+
 	{"cps2",        CPS_B_21_DEF, mapper_cps2 },
 
 	{0}		/* End of table */
