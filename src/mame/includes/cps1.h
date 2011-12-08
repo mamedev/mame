@@ -93,7 +93,6 @@ public:
 	int          m_scanline1;
 	int          m_scanline2;
 	int          m_scancalls;
-	int          m_scancount;
 
 	int          m_scroll1x;
 	int          m_scroll1y;

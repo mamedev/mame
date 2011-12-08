@@ -626,12 +626,8 @@ static TIMER_DEVICE_CALLBACK( cps2_interrupt )
 	cps_state *state = timer.machine().driver_data<cps_state>();
 
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
-	if (state->m_scancount >= 258)
-	{
-		state->m_scancount = -1;
+	if (param == 0)
 		state->m_scancalls = 0;
-	}
-	state->m_scancount++;
 
 	if (state->m_cps_b_regs[0x10 / 2] & 0x8000)
 		state->m_cps_b_regs[0x10 / 2] &= 0x1ff;
@@ -639,31 +635,31 @@ static TIMER_DEVICE_CALLBACK( cps2_interrupt )
 	if (state->m_cps_b_regs[0x12 / 2] & 0x8000)
 		state->m_cps_b_regs[0x12 / 2] &= 0x1ff;
 
-//  popmessage("%04x %04x - %04x %04x",state->m_scanline1,state->m_scanline2,state->m_cps_b_regs[0x10/2],state->m_cps_b_regs[0x12/2]);
+//	popmessage("%04x %04x - %04x %04x",state->m_scanline1,state->m_scanline2,state->m_cps_b_regs[0x10/2],state->m_cps_b_regs[0x12/2]);
 
 	/* raster effects */
-	if (state->m_scanline1 == state->m_scancount || (state->m_scanline1 < state->m_scancount && !state->m_scancalls))
+	if (state->m_scanline1 == param || (state->m_scanline1 < param && !state->m_scancalls))
 	{
 		state->m_cps_b_regs[0x10/2] = 0;
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 		cps2_set_sprite_priorities(timer.machine());
-		timer.machine().primary_screen->update_partial(16 - 10 + state->m_scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		timer.machine().primary_screen->update_partial(param);
 		state->m_scancalls++;
-//          popmessage("IRQ4 scancounter = %04i", state->m_scancount);
+//		popmessage("IRQ4 scancounter = %04i", param);
 	}
 
 	/* raster effects */
-	if(state->m_scanline2 == state->m_scancount || (state->m_scanline2 < state->m_scancount && !state->m_scancalls))
+	if(state->m_scanline2 == param || (state->m_scanline2 < param && !state->m_scancalls))
 	{
 		state->m_cps_b_regs[0x12 / 2] = 0;
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 		cps2_set_sprite_priorities(timer.machine());
-		timer.machine().primary_screen->update_partial(16 - 10 + state->m_scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		timer.machine().primary_screen->update_partial(param);
 		state->m_scancalls++;
-//          popmessage("IRQ4 scancounter = %04i",scancount);
+//		popmessage("IRQ4 scancounter = %04i", param);
 	}
 
-	if (state->m_scancount == 240)  /* VBlank */
+	if (param == 240)  /* VBlank */
 	{
 		state->m_cps_b_regs[0x10 / 2] = state->m_scanline1;
 		state->m_cps_b_regs[0x12 / 2] = state->m_scanline2;
@@ -675,7 +671,7 @@ static TIMER_DEVICE_CALLBACK( cps2_interrupt )
 		}
 		cps2_objram_latch(timer.machine());
 	}
-	//popmessage("Raster calls = %i", state->m_scancalls);
+//	popmessage("Raster calls = %i", state->m_scancalls);
 }
 
 
@@ -1204,8 +1200,6 @@ static MACHINE_START( cps2 )
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
-
-	state->save_item(NAME(state->m_scancount));
 
 	if (state->m_audiocpu != NULL)	// gigaman2 has no audiocpu
 		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine.region("audiocpu")->base() + 0x10000, 0x4000);
@@ -7988,7 +7982,6 @@ static DRIVER_INIT( cps2 )
 	/* Initialize some video elements */
 	DRIVER_INIT_CALL(cps2_video);
 
-	state->m_scancount = 0;
 	state->m_cps2networkpresent = 0;
 
 	machine.device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
