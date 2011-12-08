@@ -29,7 +29,6 @@ ft5_v6_c4.u58 /
 #define NVRAM_HACK 1
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
@@ -38,7 +37,9 @@ class koftball_state : public driver_device
 {
 public:
 	koftball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT16 *m_bmc_1_videoram;
 	UINT16 *m_bmc_2_videoram;
@@ -48,6 +49,8 @@ public:
 	UINT8 *m_bmc_colorram;
 	int m_clr_offset;
 	UINT16 m_prot_data;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -202,10 +205,19 @@ static INPUT_PORTS_START( koftball )
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( bmc_interrupt )
+static TIMER_DEVICE_CALLBACK( bmc_interrupt )
 {
-	static const int bmcints[]={2,3,6};
-	device_set_input_line(device, bmcints[cpu_getiloops(device)], HOLD_LINE);
+	koftball_state *state = timer.machine().driver_data<koftball_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+
+	if(scanline == 128)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+
+	if(scanline == 64)
+		device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
 }
 
 static const gfx_layout tilelayout =
@@ -227,7 +239,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MCFG_CPU_PROGRAM_MAP(koftball_mem)
-	MCFG_CPU_VBLANK_INT_HACK(bmc_interrupt,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", bmc_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

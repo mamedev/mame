@@ -74,7 +74,6 @@ Known issues:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
@@ -87,7 +86,9 @@ class imolagp_state : public driver_device
 {
 public:
 	imolagp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT8 *m_slave_workram; // used only ifdef HLE_COM
 
@@ -110,6 +111,8 @@ public:
 
 	/* memory */
 	UINT8  m_videoram[3][0x4000];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -463,21 +466,13 @@ INPUT_PORTS_END
 
 /***************************************************************************/
 
-static INTERRUPT_GEN( master_interrupt )
+
+static TIMER_DEVICE_CALLBACK ( imolagp_nmi_cb )
 {
-	imolagp_state *state = device->machine().driver_data<imolagp_state>();
-	int which = cpu_getiloops(device);
-	if (which == 0)
+	imolagp_state *state = timer.machine().driver_data<imolagp_state>();
+
 	{
-#ifdef HLE_COM
-		memcpy(&state->m_slave_workram[0x80], state->m_mComData, state->m_mComCount);
-		state->m_mComCount = 0;
-#endif
-		device_set_input_line(device, 0, HOLD_LINE);
-	}
-	else
-	{
-		int newsteer = input_port_read(device->machine(), "2802") & 0xf;
+		int newsteer = input_port_read(timer.machine(), "2802") & 0xf;
 		if (newsteer != state->m_oldsteer)
 		{
 			if (state->m_steerlatch == 0)
@@ -491,9 +486,20 @@ static INTERRUPT_GEN( master_interrupt )
 			{
 				state->m_oldsteer = (state->m_oldsteer + 1) & 0xf;
 			}
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
+}
+
+static INTERRUPT_GEN( vblank_irq )
+{
+	imolagp_state *state = device->machine().driver_data<imolagp_state>();
+
+#ifdef HLE_COM
+	memcpy(&state->m_slave_workram[0x80], state->m_mComData, state->m_mComCount);
+	state->m_mComCount = 0;
+#endif
+	device_set_input_line(device, 0, HOLD_LINE);
 } /* master_interrupt */
 
 
@@ -550,7 +556,8 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_CPU_ADD("maincpu", Z80,8000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(imolagp_master)
 	MCFG_CPU_IO_MAP(readport_master)
-	MCFG_CPU_VBLANK_INT_HACK(master_interrupt,4)
+	MCFG_CPU_VBLANK_INT("screen",vblank_irq)
+	MCFG_TIMER_ADD_PERIODIC("pot_irq", imolagp_nmi_cb, attotime::from_hz(60*3))
 
 	MCFG_CPU_ADD("slave", Z80,8000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(imolagp_slave)

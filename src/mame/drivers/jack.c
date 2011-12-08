@@ -42,7 +42,6 @@ The 2 ay-8910 read ports are responsible for reading the sound commands.
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/jack.h"
@@ -860,15 +859,11 @@ static MACHINE_CONFIG_DERIVED( tripool, jack )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60) /* tripool needs 2 or the palette is broken */
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( joinem_interrupts )
+static INTERRUPT_GEN( joinem_vblank_irq )
 {
-	if (cpu_getiloops(device) > 0)
-		device_set_input_line(device, 0, HOLD_LINE);
-	else
-	{
-		if (!(input_port_read(device->machine(), "IN2") & 0x80)) /* TODO: remove me */
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
+	 /* TODO: looks hackish to me ... */
+	if (!(input_port_read(device->machine(), "IN2") & 0x80))
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( joinem, jack )
@@ -876,7 +871,8 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(joinem_map)
-	MCFG_CPU_VBLANK_INT_HACK(joinem_interrupts,3)
+	MCFG_CPU_VBLANK_INT("screen",joinem_vblank_irq)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
 	MCFG_GFXDECODE(joinem)
 	MCFG_PALETTE_LENGTH(0x100)

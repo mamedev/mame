@@ -42,7 +42,6 @@ Notes:
 ************************************************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
 #include "machine/8255ppi.h"
@@ -54,7 +53,9 @@ class igs017_state : public driver_device
 {
 public:
 	igs017_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		{ }
 
 	int m_toggle;
 	int m_debug_addr;
@@ -75,6 +76,8 @@ public:
 	int m_irq1_enable;
 	int m_irq2_enable;
 	UINT8 *m_spriteram;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -2271,20 +2274,18 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static INTERRUPT_GEN( iqblocka_interrupt )
+static TIMER_DEVICE_CALLBACK( irqblocka_interrupt )
 {
-	igs017_state *state = device->machine().driver_data<igs017_state>();
-	if (cpu_getiloops(device) & 1)
-	{
-		 if (state->m_nmi_enable)
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
-	else
-	{
-		 if (state->m_irq_enable)
-			device_set_input_line(device, 0, HOLD_LINE);
-	}
+	igs017_state *state = timer.machine().driver_data<igs017_state>();
+	int scanline = param;
+
+	if(scanline == 240 && state->m_irq_enable)
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+
+	if(scanline == 0 && state->m_nmi_enable)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
+
 
 // Dips are read through the 8255
 static const ppi8255_interface iqblocka_ppi8255_intf =
@@ -2310,7 +2311,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
-	MCFG_CPU_VBLANK_INT_HACK(iqblocka_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", irqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_PPI8255_ADD( "ppi8255", iqblocka_ppi8255_intf )
 
@@ -2344,19 +2345,16 @@ MACHINE_CONFIG_END
 
 // mgcs
 
-static INTERRUPT_GEN( mgcs_interrupt )
+static TIMER_DEVICE_CALLBACK( mgcs_interrupt )
 {
-	igs017_state *state = device->machine().driver_data<igs017_state>();
-	if (cpu_getiloops(device) & 1)
-	{
-		 if (state->m_irq2_enable)
-			device_set_input_line(device, 2, HOLD_LINE);
-	}
-	else
-	{
-		 if (state->m_irq1_enable)
-			device_set_input_line(device, 1, HOLD_LINE);
-	}
+	igs017_state *state = timer.machine().driver_data<igs017_state>();
+	int scanline = param;
+
+	if(scanline == 240 && state->m_irq1_enable)
+		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+
+	if(scanline == 0 && state->m_irq2_enable)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 }
 
 static MACHINE_RESET( mgcs )
@@ -2383,7 +2381,7 @@ static const ppi8255_interface mgcs_ppi8255_intf =
 static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
-	MCFG_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(mgcs)
 
@@ -2428,7 +2426,7 @@ static const ppi8255_interface sdmg2_ppi8255_intf =
 static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
-	MCFG_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(mgcs)
 
@@ -2458,19 +2456,16 @@ MACHINE_CONFIG_END
 
 // mgdh
 
-static INTERRUPT_GEN( mgdh_interrupt )
+static TIMER_DEVICE_CALLBACK( mgdh_interrupt )
 {
-	igs017_state *state = device->machine().driver_data<igs017_state>();
-	if (cpu_getiloops(device) & 1)
-	{
-		 if (state->m_irq2_enable)
-			device_set_input_line(device, 3, HOLD_LINE);	// lev 3 instead of 2
-	}
-	else
-	{
-		 if (state->m_irq1_enable)
-			device_set_input_line(device, 1, HOLD_LINE);
-	}
+	igs017_state *state = timer.machine().driver_data<igs017_state>();
+	int scanline = param;
+
+	if(scanline == 240 && state->m_irq1_enable)
+		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+
+	if(scanline == 0 && state->m_irq2_enable)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE); // lev 3 instead of 2
 }
 
 static const ppi8255_interface mgdh_ppi8255_intf =
@@ -2487,7 +2482,7 @@ static const ppi8255_interface mgdh_ppi8255_intf =
 static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
-	MCFG_CPU_VBLANK_INT_HACK(mgdh_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mgdh_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(mgcs)
 
@@ -2521,7 +2516,7 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tjsb_map)
 	MCFG_CPU_IO_MAP(tjsb_io)
-	MCFG_CPU_VBLANK_INT_HACK(iqblocka_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", irqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_PPI8255_ADD( "ppi8255", iqblocka_ppi8255_intf )
 
