@@ -8,7 +8,10 @@ class lastduel_state : public driver_device
 {
 public:
 	lastduel_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")
+		{ }
 
 	/* memory pointers */
 	UINT16 *    m_vram;
@@ -27,7 +30,8 @@ public:
 	int         m_tilemap_priority;
 
 	/* devices */
-	device_t *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in video/lastduel.c -----------*/

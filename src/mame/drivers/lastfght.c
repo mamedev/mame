@@ -63,7 +63,6 @@ Notes:
 *********************************************************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/h83002/h8.h"
 #include "machine/nvram.h"
 
@@ -71,7 +70,9 @@ class lastfght_state : public driver_device
 {
 public:
 	lastfght_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	/* video-related */
 	bitmap_t *m_bitmap[2];
@@ -97,7 +98,7 @@ public:
 	UINT16 m_c00006;
 
 	/* devices */
-	device_t *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	/* memory */
 	UINT8   m_colorram[256 * 3];
@@ -520,22 +521,13 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( unknown_interrupt )
 {
 	lastfght_state *state = device->machine().driver_data<lastfght_state>();
-	switch (cpu_getiloops(device))
-	{
-		case 0:
-			generic_pulse_irq_line(device, 0);
-			break;
-		default:
-			device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
-			break;
-	}
+
+	device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 static MACHINE_START( lastfght )
 {
 	lastfght_state *state = machine.driver_data<lastfght_state>();
-
-	state->m_maincpu = machine.device("maincpu");
 
 	state->save_item(NAME(state->m_clr_offset));
 	state->save_item(NAME(state->m_dest));
@@ -582,7 +574,8 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP( lastfght_map)
-	MCFG_CPU_VBLANK_INT_HACK(unknown_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT(unknown_interrupt,60)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -61,7 +61,6 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 
@@ -69,7 +68,9 @@ class meijinsn_state : public driver_device
 {
 public:
 	meijinsn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	/* memory pointers */
 	UINT16 *   m_shared_ram;
@@ -86,6 +87,8 @@ public:
 	UINT8 m_credits;
 	UINT8 m_coinvalue;
 	int m_mcu_latch;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -222,7 +225,7 @@ static INPUT_PORTS_START( meijinsn )
 	PORT_DIPSETTING(    0x02, "10:00" )
 	PORT_DIPSETTING(    0x01, "20:00" )
 	PORT_DIPSETTING(    0x00, "0:30" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x08, "A 1C/1C B 1C/5C" )
 	PORT_DIPSETTING(    0x00, "A 1C/2C B 2C/1C" )
 	PORT_DIPNAME( 0x10, 0x00, "2 Player" )
@@ -306,12 +309,16 @@ static SCREEN_UPDATE(meijinsn)
 }
 
 
-static INTERRUPT_GEN( meijinsn_interrupt )
+static TIMER_DEVICE_CALLBACK( meijinsn_interrupt )
 {
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line(device, 1, HOLD_LINE);
-	else
-		device_set_input_line(device, 2, HOLD_LINE);
+	meijinsn_state *state = timer.machine().driver_data<meijinsn_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 }
 
 static const ay8910_interface ay8910_config =
@@ -345,7 +352,7 @@ static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 9000000 )
 	MCFG_CPU_PROGRAM_MAP(meijinsn_map)
-	MCFG_CPU_VBLANK_INT_HACK(meijinsn_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", meijinsn_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(meijinsn_sound_map)

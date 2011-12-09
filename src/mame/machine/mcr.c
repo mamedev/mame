@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "audio/mcr.h"
 #include "includes/mcr.h"
 
@@ -188,32 +187,38 @@ MACHINE_RESET( mcr )
  *
  *************************************/
 
-INTERRUPT_GEN( mcr_interrupt )
+TIMER_DEVICE_CALLBACK( mcr_interrupt )
 {
-	device_t *ctc = device->machine().device("ctc");
+	//mcr_state *state = timer.machine().driver_data<mcr_state>();
+	device_t *ctc = timer.machine().device("ctc");
+	int scanline = param;
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
-	z80ctc_trg2_w(ctc, 1);
-	z80ctc_trg2_w(ctc, 0);
+	if(scanline == 0 || scanline == 240)
+	{
+		z80ctc_trg2_w(ctc, 1);
+		z80ctc_trg2_w(ctc, 0);
+	}
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
-	if (cpu_getiloops(device) == 0)
+	if (scanline == 0)
 	{
 		z80ctc_trg3_w(ctc, 1);
 		z80ctc_trg3_w(ctc, 0);
 	}
 }
 
-
-INTERRUPT_GEN( mcr_ipu_interrupt )
+TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt )
 {
-	device_t *ctc = device->machine().device("ipu_ctc");
+	//mcr_state *state = timer.machine().driver_data<mcr_state>();
+	device_t *ctc = timer.machine().device("ctc");
+	int scanline = param;
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
-	if (cpu_getiloops(device) == 0)
+	if (scanline == 0)
 	{
 		z80ctc_trg3_w(ctc, 1);
 		z80ctc_trg3_w(ctc, 0);

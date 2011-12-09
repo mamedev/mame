@@ -59,14 +59,13 @@ Unresolved Issues:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
-#include "video/konicdev.h"
-#include "machine/k053252.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
+#include "machine/k053252.h"
 #include "sound/k054539.h"
 #include "sound/2151intf.h"
 #include "sound/flt_vol.h"
+#include "video/konicdev.h"
 #include "includes/xexex.h"
 #include "includes/konamipt.h"
 
@@ -285,39 +284,40 @@ static TIMER_CALLBACK( dmaend_callback )
 	}
 }
 
-static INTERRUPT_GEN( xexex_interrupt )
+static TIMER_DEVICE_CALLBACK( xexex_interrupt )
 {
-	xexex_state *state = device->machine().driver_data<xexex_state>();
+	xexex_state *state = timer.machine().driver_data<xexex_state>();
+	int scanline = param;
 
 	if (state->m_suspension_active)
 	{
 		state->m_suspension_active = 0;
-		device->machine().scheduler().trigger(state->m_resume_trigger);
+		timer.machine().scheduler().trigger(state->m_resume_trigger);
 	}
 
-	switch (cpu_getiloops(device))
+	if(scanline == 0)
 	{
-		case 0:
-			// IRQ 6 is for test mode only
+		// IRQ 6 is for test mode only
 			if (state->m_cur_control2 & 0x0020)
-				device_set_input_line(device, 6, HOLD_LINE);
-		break;
+				device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+	}
 
-		case 1:
-			if (k053246_is_irq_enabled(state->m_k053246))
-			{
-				// OBJDMA starts at the beginning of V-blank
-				xexex_objdma(device->machine(), 0);
+	/* TODO: vblank is at 256! (enable CCU then have fun in fixing offsetted layers) */
+	if(scanline == 128)
+	{
+		if (k053246_is_irq_enabled(state->m_k053246))
+		{
+			// OBJDMA starts at the beginning of V-blank
+			xexex_objdma(timer.machine(), 0);
 
-				// schedule DMA end interrupt
-				state->m_dmadelay_timer->adjust(XE_DMADELAY);
-			}
+			// schedule DMA end interrupt
+			state->m_dmadelay_timer->adjust(XE_DMADELAY);
+		}
 
-			// IRQ 4 is the V-blank interrupt. It controls color, sound and
-			// vital game logics that shouldn't be interfered by frame-drop.
-			if (state->m_cur_control2 & 0x0800)
-				device_set_input_line(device, 4, HOLD_LINE);
-		break;
+		// IRQ 4 is the V-blank interrupt. It controls color, sound and
+		// vital game logics that shouldn't be interfered by frame-drop.
+		if (state->m_cur_control2 & 0x0800)
+			device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 	}
 }
 
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE_MODERN("k053250", k053250_t, reg_r, reg_w)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_word_w)				// CLTC
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_lsb_w)				// priority encoder
-//  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_r,k053252_w,0x00ff)                // CCU
+//	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_r,k053252_w,0x00ff)                // CCU
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	// 16MHz (32MHz xtal)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(xexex_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", xexex_interrupt, "screen", 0, 1)
 
 	// 8MHz (PCB shows one 32MHz/18.432MHz xtal, reference: www.system16.com)
 	// more likely 32MHz since 18.432MHz yields 4.608MHz(too slow) or 9.216MHz(too fast) with integer divisors

@@ -233,7 +233,8 @@ static const k053252_interface hexion_k053252_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_LINE(hexion_irq_ack_w),
-	DEVCB_LINE(hexion_nmi_ack_w)
+	DEVCB_LINE(hexion_nmi_ack_w),
+	0, 0
 };
 
 static MACHINE_CONFIG_START( hexion, hexion_state )

@@ -284,7 +284,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -1574,7 +1573,7 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_CPU_CONFIG(mcr_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(cpu_90009_map)
 	MCFG_CPU_IO_MAP(cpu_90009_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mcr_interrupt, "screen", 0, 1)
 
 	MCFG_Z80CTC_ADD("ctc", MAIN_OSC_MCR_I/8 /* same as "maincpu" */, mcr_ctc_intf)
 
@@ -1663,7 +1662,8 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 	MCFG_CPU_CONFIG(mcr_ipu_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ipu_91695_map)
 	MCFG_CPU_IO_MAP(ipu_91695_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(mcr_ipu_interrupt,2)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(mcr_ipu_interrupt)
 
 	MCFG_Z80CTC_ADD("ipu_ctc", 7372800/2 /* same as "ipu" */, nflfoot_ctc_intf)
 	MCFG_Z80PIO_ADD("ipu_pio0", 7372800/2, nflfoot_pio_intf)

@@ -49,7 +49,9 @@ class sbowling_state : public driver_device
 {
 public:
 	sbowling_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		{ }
 
 	int m_bgmap;
 	UINT8 *m_videoram;
@@ -60,6 +62,8 @@ public:
 	UINT32 m_color_prom_address;
 	UINT8 m_pix_sh;
 	UINT8 m_pix[2];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 static TILE_GET_INFO( get_sb_tile_info )
@@ -153,11 +157,17 @@ static READ8_HANDLER( pix_data_r )
 
 
 
-static INTERRUPT_GEN( sbw_interrupt )
+static TIMER_DEVICE_CALLBACK( sbw_interrupt )
 {
-	int vector = device->machine().primary_screen->vblank() ? 0xcf : 0xd7;	/* RST 08h/10h */
+	sbowling_state *state = timer.machine().driver_data<sbowling_state>();
+	int scanline = param;
 
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
+	if(scanline == 256)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xcf); /* RST 08h */
+
+	if(scanline == 128)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xd7); /* RST 10h */
+
 }
 
 static WRITE8_HANDLER (system_w)
@@ -316,9 +326,9 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,
-	256,
+	RGN_FRAC(1,3),
 	3,
-	{ 0x800*0*8, 0x800*1*8, 0x800*2*8 },
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -369,12 +379,10 @@ static PALETTE_INIT( sbowling )
 }
 
 static MACHINE_CONFIG_START( sbowling, sbowling_state )
-
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_HACK(sbw_interrupt, 2)
-	MCFG_GFXDECODE(sbowling)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sbw_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -383,6 +391,8 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(sbowling)
+
+	MCFG_GFXDECODE(sbowling)
 
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_PALETTE_INIT(sbowling)

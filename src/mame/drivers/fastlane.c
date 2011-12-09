@@ -22,9 +22,9 @@ static TIMER_DEVICE_CALLBACK( fastlane_scanline )
 	int scanline = param;
 
 	if(scanline == 240 && k007121_ctrlram_r(state->m_k007121, 7) & 0x02) // vblank irq
-		cputag_set_input_line(timer.machine(), "maincpu", HD6309_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, HD6309_IRQ_LINE, HOLD_LINE);
 	else if(((scanline % 32) == 0) && k007121_ctrlram_r(state->m_k007121, 7) & 0x01) // timer irq
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

@@ -103,7 +103,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "audio/mcr.h"
 #include "machine/nvram.h"
@@ -1094,7 +1093,7 @@ static MACHINE_CONFIG_START( mcrmono, mcr3_state )
 	MCFG_CPU_PROGRAM_MAP(mcrmono_map)
 	MCFG_CPU_IO_MAP(mcrmono_portmap)
 	MCFG_CPU_CONFIG(mcr_daisy_chain)
-	MCFG_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mcr_interrupt, "screen", 0, 1)
 
 	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "maincpu" */, mcr_ctc_intf)
 
