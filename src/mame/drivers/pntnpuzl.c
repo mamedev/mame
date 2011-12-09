@@ -129,7 +129,9 @@ class pntnpuzl_state : public driver_device
 {
 public:
 	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT16 m_eeprom;
 	UINT16* m_3a0000ram;
@@ -142,6 +144,8 @@ public:
 	UINT16 m_serial_out;
 	UINT16 m_read_count;
 	int m_touchscr[5];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -179,7 +183,6 @@ static WRITE16_DEVICE_HANDLER( pntnpuzl_eeprom_w )
 	eeprom->set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
 	eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 }
-
 
 
 
@@ -389,13 +392,33 @@ static READ16_HANDLER( pntnpuzl_28001a_r )
 	return 0x4c00;
 }
 
+static READ16_HANDLER( irq1_ack_r )
+{
+//	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
+//	device_set_input_line(state->m_maincpu, 1, CLEAR_LINE);
+	return 0;
+}
+
+static READ16_HANDLER( irq2_ack_r )
+{
+//	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
+//	device_set_input_line(state->m_maincpu, 2, CLEAR_LINE);
+	return 0;
+}
+
+static READ16_HANDLER( irq4_ack_r )
+{
+//	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
+//	device_set_input_line(state->m_maincpu, 4, CLEAR_LINE);
+	return 0;
+}
 
 
 static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READNOP //|
-	AM_RANGE(0x100000, 0x100001) AM_READNOP	//| irq lines clear
-	AM_RANGE(0x180000, 0x180001) AM_READNOP //|
+	AM_RANGE(0x080000, 0x080001) AM_READ(irq1_ack_r)
+	AM_RANGE(0x100000, 0x100001) AM_READ(irq2_ack_r)
+	AM_RANGE(0x180000, 0x180001) AM_READ(irq4_ack_r)
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(pntnpuzl_200000_w)
 	AM_RANGE(0x280000, 0x280001) AM_DEVREAD("eeprom", pntnpuzl_eeprom_r)
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN2")
@@ -420,22 +443,21 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static INTERRUPT_GEN( pntnpuzl_irq )
+static INPUT_CHANGED( coin_inserted )
 {
-	if (input_port_read(device->machine(), "IN0") & 0x02)	/* coin */
-		generic_pulse_irq_line(device, 1);
-	else if (input_port_read(device->machine(), "IN0") & 0x04)	/* service */
-		generic_pulse_irq_line(device, 2);
-	else if (input_port_read(device->machine(), "IN0") & 0x08)	/* coin */
-		generic_pulse_irq_line(device, 4);
+	pntnpuzl_state *state = field.machine().driver_data<pntnpuzl_state>();
+
+	/* TODO: change this! */
+	if(newval)
+		generic_pulse_irq_line(state->m_maincpu, (UINT8)(FPTR)param);
 }
 
 static INPUT_PORTS_START( pntnpuzl )
 	PORT_START("IN0")	/* fake inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH ) PORT_IMPULSE(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 1) PORT_IMPULSE(1)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )PORT_CHANGED(coin_inserted, 2) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 4) PORT_IMPULSE(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	/* game uses a touch screen */
@@ -465,10 +487,8 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
-	MCFG_CPU_VBLANK_INT("screen", pntnpuzl_irq)	// irq1 = coin irq2 = service irq4 = coin
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
-
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -487,6 +507,10 @@ ROM_START( pntnpuzl )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "pntnpuzl.u2", 0x00001, 0x40000, CRC(dfda3f73) SHA1(cca8ccdd501a26cba07365b1238d7b434559bbc6) )
 	ROM_LOAD16_BYTE( "pntnpuzl.u3", 0x00000, 0x40000, CRC(4173f250) SHA1(516fe6f91b925f71c36b97532608b82e63bda436) )
+
+	/* for reference, probably not used in any way by the game */
+	ROM_REGION( 0x10000, "video_bios", 0 )
+	ROM_LOAD( "trident_quadtel_tvga9000_isa16.bin", 0x0000, 0x10000, BAD_DUMP CRC(ad0e7351) SHA1(eb525460a80e1c1baa34642b93d54caf2607920d) )
 ROM_END
 
 

@@ -114,6 +114,8 @@ static const struct pc_vga_interface vga_interface =
 	NULL,
 	NULL,
 	vga_setting,
+	AS_PROGRAM,
+	0xa0000,
 	AS_IO,
 	0x0000
 };

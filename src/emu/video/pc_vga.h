@@ -22,6 +22,10 @@ struct pc_vga_interface
 	/* VGA dipswitch (???) */
 	read8_space_func read_dipswitch;
 
+	/* where the RAM go */
+	int mem_addressspace;
+	offs_t mem_offset;
+
 	/* where the ports go */
 	int port_addressspace;
 	offs_t port_offset;
