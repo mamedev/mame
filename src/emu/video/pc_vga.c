@@ -410,7 +410,7 @@ static WRITE8_HANDLER(vga_vga_w)
 
 static void vga_cpu_interface(running_machine &machine)
 {
-	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = machine.firstcpu->memory().space(vga.vga_intf.mem_addressspace);
 	static int sequencer, gc;
 	read8_space_func read_handler; const char *read_handler_name;
 	write8_space_func write_handler; const char *write_handler_name;

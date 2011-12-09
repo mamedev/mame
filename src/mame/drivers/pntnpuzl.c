@@ -123,6 +123,7 @@ CN1 standard DB15 VGA connector (15KHz)
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
+#include "video/pc_vga.h"
 
 
 class pntnpuzl_state : public driver_device
@@ -134,11 +135,6 @@ public:
 		{ }
 
 	UINT16 m_eeprom;
-	UINT16* m_3a0000ram;
-	UINT16* m_bank;
-	int m_indx;
-	int m_sub;
-	int m_rgb[3];
 	UINT16 m_pntpzl_200000;
 	UINT16 m_serial;
 	UINT16 m_serial_out;
@@ -182,130 +178,6 @@ static WRITE16_DEVICE_HANDLER( pntnpuzl_eeprom_w )
 	eeprom->write_bit(data & 0x1000);
 	eeprom->set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
 	eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-/* vid */
-static VIDEO_START( pntnpuzl )
-{
-	pntnpuzl_state *state = machine.driver_data<pntnpuzl_state>();
-	state->m_3a0000ram=auto_alloc_array(machine, UINT16, 0x100000/2);
-}
-
-static SCREEN_UPDATE( pntnpuzl )
-{
-	pntnpuzl_state *state = screen->machine().driver_data<pntnpuzl_state>();
-	int x,y;
-	int count;
-#if 0
-	static int xxx=0x18f;
-	static int yyy=512;
-	static int sss=0xa8;
-
-	if ( screen->machine().input().code_pressed_once(KEYCODE_Q) )
-	{
-		xxx--;
-		mame_printf_debug("xxx %04x\n",xxx);
-	}
-
-	if ( screen->machine().input().code_pressed_once(KEYCODE_W) )
-	{
-		xxx++;
-		mame_printf_debug("xxx %04x\n",xxx);
-	}
-
-	if ( screen->machine().input().code_pressed_once(KEYCODE_A) )
-	{
-		yyy--;
-		mame_printf_debug("yyy %04x\n",yyy);
-	}
-
-	if ( screen->machine().input().code_pressed_once(KEYCODE_S) )
-	{
-		yyy++;
-		mame_printf_debug("yyy %04x\n",yyy);
-	}
-
-	if ( screen->machine().input().code_pressed_once(KEYCODE_Z) )
-	{
-		sss--;
-		mame_printf_debug("sss %04x\n",sss);
-	}
-
-	if ( screen->machine().input().code_pressed_once(KEYCODE_X) )
-	{
-		sss++;
-		mame_printf_debug("sss %04x\n",sss);
-	}
-#else
-	const int xxx=0x18f;
-	const int yyy=512;
-	const int sss=0xa8;
-#endif
-
-
-	count=sss;
-
-	for(y=0;y<yyy;y++)
-	{
-		for(x=0;x<xxx;x+=2)
-		{
-			*BITMAP_ADDR16(bitmap, y, x) = (state->m_3a0000ram[count]&0x1f00)>>8;
-			*BITMAP_ADDR16(bitmap, y, x+1) = (state->m_3a0000ram[count]&0x001f)>>0;
-			count++;
-		}
-	}
-	return 0;
-}
-
-static WRITE16_HANDLER( pntnpuzl_palette_w )
-{
-	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-
-	if (ACCESSING_BITS_8_15)
-	{
-		state->m_indx = data >> 8;
-		state->m_sub = 0;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		state->m_rgb[state->m_sub++] = data & 0xff;
-		if (state->m_sub == 3)
-		{
-			palette_set_color_rgb(space->machine(),state->m_indx++,pal6bit(state->m_rgb[0]),pal6bit(state->m_rgb[1]),pal6bit(state->m_rgb[2]));
-			state->m_sub = 0;
-			if (state->m_indx == 256) state->m_indx = 0;
-		}
-	}
-}
-
-
-
-#ifdef UNUSED_FUNCTION
-READ16_HANDLER ( pntnpuzl_random_r )
-{
-	return space->machine().rand();
-}
-#endif
-
-static READ16_HANDLER( pntnpuzl_vid_r )
-{
-	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//  logerror("read_videoram: pc = %06x : offset %04x reg %04x\n",cpu_get_pc(&space->device()),offset*2, state->m_bank[0]);
-	return state->m_3a0000ram[offset+ (state->m_bank[0]&0x0001)*0x8000 ];
-}
-
-static WRITE16_HANDLER( pntnpuzl_vid_w )
-{
-	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//  logerror("write_to_videoram: pc = %06x : offset %04x data %04x reg %04x\n",cpu_get_pc(&space->device()),offset*2, data, state->m_bank[0]);
-	COMBINE_DATA(&state->m_3a0000ram[offset+ (state->m_bank[0]&0x0001)*0x8000 ]);
-}
-
-static READ16_HANDLER( pntnpuzl_vblank_r )
-{
-	return (input_port_read(space->machine(), "IN0") & 1) << 11;
 }
 
 
@@ -434,10 +306,8 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x28001a, 0x28001b) AM_WRITENOP
 
 	/* standard VGA */
-	AM_RANGE(0x3a0000, 0x3affff) AM_READWRITE(pntnpuzl_vid_r, pntnpuzl_vid_w)
-	AM_RANGE(0x3c03c4, 0x3c03c5) AM_RAM AM_BASE_MEMBER(pntnpuzl_state, m_bank)//??
-	AM_RANGE(0x3c03c8, 0x3c03c9) AM_WRITE(pntnpuzl_palette_w)
-	AM_RANGE(0x3c03da, 0x3c03db) AM_READ(pntnpuzl_vblank_r)
+	AM_RANGE(0x3a0000, 0x3bffff) AM_RAM // RAM
+//	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM // regs
 
 	AM_RANGE(0x400000, 0x407fff) AM_RAM
 ADDRESS_MAP_END
@@ -482,7 +352,18 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
+static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
+static const struct pc_vga_interface vga_interface =
+{
+	NULL,
+	NULL,
+	vga_setting,
+	AS_PROGRAM,
+	0x3a0000,
+	AS_PROGRAM,
+	0x3c0000
+};
 
 static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
@@ -490,17 +371,8 @@ static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(pntnpuzl)
-
-	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_VIDEO_START(pntnpuzl)
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
 MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )
@@ -519,6 +391,7 @@ static DRIVER_INIT(pip)
 //  UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
+	pc_vga_init(machine, &vga_interface, NULL);
 }
 
 GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl,    pip, ROT90,  "Century?", "Paint & Puzzle",GAME_NO_SOUND|GAME_NOT_WORKING )
