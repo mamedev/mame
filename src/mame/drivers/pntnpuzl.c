@@ -394,4 +394,4 @@ static DRIVER_INIT(pip)
 	pc_vga_init(machine, &vga_interface, NULL);
 }
 
-GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl,    pip, ROT90,  "Century?", "Paint & Puzzle",GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl,    pip, ROT0,  "Century?", "Paint & Puzzle",GAME_NO_SOUND|GAME_NOT_WORKING )

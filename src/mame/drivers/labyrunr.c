@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/hd6309/hd6309.h"
 #include "sound/2203intf.h"
 #include "video/konicdev.h"

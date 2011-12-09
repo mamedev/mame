@@ -32,7 +32,6 @@ metlclsh:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
@@ -133,6 +132,13 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
+
+static INPUT_CHANGED( coin_inserted )
+{
+	if(newval != oldval)
+		cputag_set_input_line(field.machine(), "sub", INPUT_LINE_NMI, ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( metlclsh )
 	PORT_START("IN0")		/* c000 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -176,8 +182,8 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START("DSW")		/* c003 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
@@ -196,7 +202,7 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// cpu2 will clr c040 on startup forever
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
@@ -264,14 +270,6 @@ static const ym3526_interface ym3526_config =
 	metlclsh_irqhandler
 };
 
-static INTERRUPT_GEN( metlclsh_interrupt2 )
-{
-	if (cpu_getiloops(device) == 0)
-		return;
-	/* generate NMI on coin insertion */
-	if ((~input_port_read(device->machine(), "IN2") & 0xc0) || (~input_port_read(device->machine(), "DSW") & 0x40)) /* TODO: remove me */
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-}
 
 static MACHINE_START( metlclsh )
 {
@@ -303,7 +301,6 @@ static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
 
 	MCFG_CPU_ADD("sub", M6809, 1500000)        // ?
 	MCFG_CPU_PROGRAM_MAP(metlclsh_slave_map)
-	MCFG_CPU_VBLANK_INT_HACK(metlclsh_interrupt2,2)
 	// IRQ by cpu #1, NMI by coins insertion
 
 	MCFG_MACHINE_START(metlclsh)
