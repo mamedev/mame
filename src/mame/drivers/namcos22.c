@@ -1146,9 +1146,9 @@
 /* TODO: NOT measured! */
 #define PIXEL_CLOCK			((SS22_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
 
-#define HTOTAL				(428*2)
+#define HTOTAL				(782)
 #define HBEND				(0)
-#define HBSTART				(320*2)
+#define HBSTART				(640)
 
 #define VTOTAL				(262*2)
 #define VBEND				(0)
