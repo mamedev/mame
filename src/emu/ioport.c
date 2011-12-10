@@ -1734,11 +1734,7 @@ static INT32 apply_analog_settings(INT32 value, analog_field_state *analog)
 
 	/* apply reversal if needed */
 	if (analog->reverse)
-	{
 		value = analog->reverse_val - value;
-		if (analog->wraps)
-			value--;
-	}
 	else if (analog->single_scale)
 		/* it's a pedal or the default value is equal to min/max */
 		/* so we need to adjust the center to the minimum */
@@ -2413,9 +2409,9 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 			/* positional controls reverse from their max range */
 			state->reverse_val = state->maximum + state->minimum;
 
-//          /* relative controls reverse from 1 past their max range */
-//          if (state->positionalscale == 0)
-//              state->reverse_val += INPUT_RELATIVE_PER_PIXEL;
+			/* relative controls reverse from 1 past their max range */
+			if (state->wraps)
+				state->reverse_val -= INPUT_RELATIVE_PER_PIXEL;
 		}
 	}
 
