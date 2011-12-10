@@ -912,7 +912,7 @@ void pc_vga_reset(running_machine &machine)
 void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf)
 {
 	int i, j, k, mask1, buswidth;
-	address_space *mem_space,*io_space;
+	address_space *io_space; // , mem_space;
 
 	memset(&vga, 0, sizeof(vga));
 
@@ -958,7 +958,7 @@ void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_in
 	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
 	buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	mem_space = machine.firstcpu->memory().space(vga.vga_intf.mem_addressspace);
+//	mem_space = machine.firstcpu->memory().space(vga.vga_intf.mem_addressspace);
 	io_space = machine.firstcpu->memory().space(vga.vga_intf.port_addressspace);
 	switch(buswidth)
 	{
