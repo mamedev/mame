@@ -646,7 +646,6 @@ ALL VROM ROMs are 16M MASK
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/eeprom.h"
 #include "machine/53c810.h"
@@ -5133,17 +5132,15 @@ static const scsp_interface scsp2_interface =
     0x02: Video (VBLANK start?)
     0x01: Video (unused?)
 */
-static INTERRUPT_GEN(model3_interrupt)
+static TIMER_DEVICE_CALLBACK(model3_interrupt)
 {
-	model3_state *state = device->machine().driver_data<model3_state>();
-	if (state->m_vblank == 0) {
-		model3_set_irq_line(device->machine(), 0x02, ASSERT_LINE);
-	} else {
-		model3_set_irq_line(device->machine(), 0x0d, ASSERT_LINE);
-	}
+//	model3_state *state = timer.machine().driver_data<model3_state>();
+	int scanline = param;
 
-	state->m_vblank++;
-	state->m_vblank &= 1;
+	if (scanline == 384)
+		model3_set_irq_line(timer.machine(), 0x02, ASSERT_LINE);
+	else if(scanline == 0)
+		model3_set_irq_line(timer.machine(), 0x0d, ASSERT_LINE);
 }
 
 static const powerpc_config model3_10 =
@@ -5168,7 +5165,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
 	MCFG_CPU_CONFIG(model3_10)
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
-	MCFG_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model3_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model3_snd)
@@ -5210,7 +5207,7 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_CPU_CONFIG(model3_15)
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
-	MCFG_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model3_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model3_snd)
@@ -5250,7 +5247,7 @@ static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
 	MCFG_CPU_CONFIG(model3_2x)
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
-	MCFG_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model3_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model3_snd)
@@ -5290,7 +5287,7 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
 	MCFG_CPU_CONFIG(model3_2x)
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
-	MCFG_CPU_VBLANK_INT_HACK(model3_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model3_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model3_snd)

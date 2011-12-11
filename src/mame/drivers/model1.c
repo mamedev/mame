@@ -626,7 +626,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/v60/v60.h"
-#include "deprecat.h"
 #include "video/segaic24.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mb86233/mb86233.h"
@@ -714,21 +713,23 @@ static void irq_init(running_machine &machine)
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 }
 
-static INTERRUPT_GEN(model1_interrupt)
+static TIMER_DEVICE_CALLBACK( model1_interrupt )
 {
-	model1_state *state = device->machine().driver_data<model1_state>();
-	if (cpu_getiloops(device))
+	model1_state *state = timer.machine().driver_data<model1_state>();
+	int scanline = param;
+
+	if (scanline == 384)
 	{
-		irq_raise(device->machine(), 1);
+		irq_raise(timer.machine(), 1);
 	}
-	else
+	else if(scanline == 384/2)
 	{
-		irq_raise(device->machine(), state->m_sound_irq);
+		irq_raise(timer.machine(), state->m_sound_irq);
 
 		// if the FIFO has something in it, signal the 68k too
 		if (state->m_fifo_rptr != state->m_fifo_wptr)
 		{
-			cputag_set_input_line(device->machine(), "audiocpu", 2, HOLD_LINE);
+			cputag_set_input_line(timer.machine(), "audiocpu", 2, HOLD_LINE);
 		}
 	}
 }
@@ -1080,7 +1081,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( wingwar )
 	PORT_START("AN0")	/* X */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
 	PORT_START("AN1")	/* Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
@@ -1094,19 +1095,19 @@ static INPUT_PORTS_START( wingwar )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("View 1")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("View 2")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View 3")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("View 4")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Machine Gun")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Missile")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("Smoke")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1505,7 +1506,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_mem)
 	MCFG_CPU_IO_MAP(model1_io)
-	MCFG_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model1_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
@@ -1547,7 +1548,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)
-	MCFG_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model1_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(model1_snd)

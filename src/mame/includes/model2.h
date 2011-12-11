@@ -9,7 +9,9 @@ class model2_state : public driver_device
 {
 public:
 	model2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT32 *m_workram;
 	UINT32 m_intreq;
@@ -65,6 +67,8 @@ public:
 	raster_state *m_raster;
 	geo_state *m_geo;
 	bitmap_t *m_sys24_bitmap;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

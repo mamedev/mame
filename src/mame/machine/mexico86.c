@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "deprecat.h"
 #include "includes/mexico86.h"
 
 /*
@@ -166,7 +165,6 @@ INTERRUPT_GEN( kikikai_interrupt )
 
 
 #if 0
-//AT
 /***************************************************************************
 
  Collision logic used by Kiki Kaikai (theoretical)
@@ -210,7 +208,6 @@ static void kiki_clogic(running_machine &machine, int address, int latch)
 		}
 	}
 }
-//ZT
 #endif
 
 
@@ -224,11 +221,7 @@ static void kiki_clogic(running_machine &machine, int address, int latch)
 
 INTERRUPT_GEN( mexico86_m68705_interrupt )
 {
-	/* I don't know how to handle the interrupt line so I just toggle it every time. */
-	if (cpu_getiloops(device) & 1)
-		device_set_input_line(device, 0, CLEAR_LINE);
-	else
-		device_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
@@ -319,7 +312,8 @@ WRITE8_HANDLER( mexico86_68705_port_b_w )
 	if (BIT(state->m_ddr_b, 5) && BIT(data, 5) && BIT(~state->m_port_b_out, 5))
 	{
 		device_set_input_line_vector(state->m_maincpu, 0, state->m_protection_ram[0]);
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);        //AT: HOLD_LINE works better in Z80 interrupt mode 1.
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);        // HOLD_LINE works better in Z80 interrupt mode 1.
+		device_set_input_line(state->m_mcu, 0, CLEAR_LINE);
 	}
 
 	if (BIT(state->m_ddr_b, 6) && BIT(~data, 6) && BIT(state->m_port_b_out, 6))

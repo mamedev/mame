@@ -87,7 +87,6 @@
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "machine/nvram.h"
 #include "video/segaic24.h"
@@ -1785,49 +1784,50 @@ static INPUT_PORTS_START( rchase2 )
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static INTERRUPT_GEN(model2_interrupt)
+static TIMER_DEVICE_CALLBACK(model2_interrupt)
 {
-	model2_state *state = device->machine().driver_data<model2_state>();
-	switch (cpu_getiloops(device))
+	model2_state *state = timer.machine().driver_data<model2_state>();
+	int scanline = param;
+
+	if(scanline == 0) // 384
 	{
-		case 0:
-			state->m_intreq |= (1<<10);
-			if (state->m_intena & (1<<10))
-			{
-				device_set_input_line(device, I960_IRQ3, ASSERT_LINE);
-			}
-			break;
-		case 1:
-			state->m_intreq |= (1<<0);
-			if (state->m_intena & (1<<0))
-			{
-				device_set_input_line(device, I960_IRQ0, ASSERT_LINE);
-			}
-			break;
+		state->m_intreq |= (1<<10);
+		if (state->m_intena & (1<<10))
+			device_set_input_line(state->m_maincpu, I960_IRQ3, ASSERT_LINE);
+	}
+
+	if(scanline == 384/2)
+	{
+		state->m_intreq |= (1<<0);
+		if (state->m_intena & (1<<0))
+			device_set_input_line(state->m_maincpu, I960_IRQ0, ASSERT_LINE);
 	}
 }
 
-static INTERRUPT_GEN(model2c_interrupt)
+static TIMER_DEVICE_CALLBACK(model2c_interrupt)
 {
-	model2_state *state = device->machine().driver_data<model2_state>();
-	switch (cpu_getiloops(device))
-	{
-		case 0:
-			state->m_intreq |= (1<<10);
-			if (state->m_intena & (1<<10))
-				device_set_input_line(device, I960_IRQ3, ASSERT_LINE);
-			break;
-		case 1:
-			state->m_intreq |= (1<<2);
-			if (state->m_intena & (1<<2))
-				device_set_input_line(device, I960_IRQ2, ASSERT_LINE);
+	model2_state *state = timer.machine().driver_data<model2_state>();
+	int scanline = param;
 
-			break;
-		case 2:
-			state->m_intreq |= (1<<0);
-			if (state->m_intena & (1<<0))
-				device_set_input_line(device, I960_IRQ0, ASSERT_LINE);
-			break;
+	if(scanline == 0) // 384
+	{
+		state->m_intreq |= (1<<10);
+		if (state->m_intena & (1<<10))
+			device_set_input_line(state->m_maincpu, I960_IRQ3, ASSERT_LINE);
+	}
+
+	if(scanline == 256)
+	{
+		state->m_intreq |= (1<<2);
+		if (state->m_intena & (1<<2))
+			device_set_input_line(state->m_maincpu, I960_IRQ2, ASSERT_LINE);
+	}
+
+	if(scanline == 128)
+	{
+		state->m_intreq |= (1<<0);
+		if (state->m_intena & (1<<0))
+			device_set_input_line(state->m_maincpu, I960_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -2003,7 +2003,7 @@ static const mb86233_cpu_core tgp_config =
 static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2o_mem)
-	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
@@ -2063,7 +2063,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
-	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
@@ -2162,7 +2162,7 @@ static const sharc_config sharc_cfg =
 static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
-	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
@@ -2220,7 +2220,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2c_crx_mem)
-	MCFG_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", model2c_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)

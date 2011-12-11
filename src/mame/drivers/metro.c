@@ -84,7 +84,6 @@ driver modified by Eisuke Watanabe
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h83002/h8.h"
@@ -252,20 +251,31 @@ static TIMER_DEVICE_CALLBACK( msgogo_interrupt )
 
 
 /* lev 2-7 (lev 1 seems sound related) */
+/* TODO: fix this arrangement (various things still doesn't work with this) */
 static TIMER_DEVICE_CALLBACK( karatour_interrupt )
 {
 	metro_state *state = timer.machine().driver_data<metro_state>();
 	int scanline = param;
 
-	if(scanline == 240)
+	if(scanline == 224)
 	{
 		state->m_requested_int[0] = 1;
-		//state->m_requested_int[5] = 1;	// write the scroll registers (TODO: where to put this without making the game to hang???)
+		state->m_requested_int[4] = 0;
+		//state->m_requested_int[5] = 0;
+		update_irq_state(timer.machine());
+	}
+	else if(scanline == 240)
+	{
+		state->m_requested_int[0] = 1;
+		state->m_requested_int[4] = 0;
+		state->m_requested_int[5] = 1;
 		update_irq_state(timer.machine());
 	}
 	else if(scanline == 0)
 	{
+		//state->m_requested_int[0] = 0;
 		state->m_requested_int[4] = 1;
+		state->m_requested_int[5] = 0;
 		update_irq_state(timer.machine());
 	}
 }
@@ -3858,7 +3868,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, 224) // was 58fps?
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_UPDATE(metro)
 
@@ -4268,7 +4278,7 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224) // was 58fps?
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_UPDATE(metro)
 
@@ -4313,7 +4323,7 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224) // was 58fps?
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_UPDATE(metro)
 
@@ -4335,41 +4345,40 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-
-static INTERRUPT_GEN( puzzlet_interrupt )
+//1770e
+static TIMER_DEVICE_CALLBACK( puzzlet_interrupt )
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
+	metro_state *state = timer.machine().driver_data<metro_state>();
+	int scanline = param;
 
-	switch (cpu_getiloops(device))
+	if(scanline == 224)
 	{
-		case 0:
-			state->m_requested_int[1] = 1;
-			update_irq_state(device->machine());
-			break;
-
-		case 1:
-			state->m_requested_int[3] = 1;
-			update_irq_state(device->machine());
-			break;
-
-		case 2:
-			state->m_requested_int[5] = 1;
-			update_irq_state(device->machine());
-			break;
-
-		case 3:
-			state->m_requested_int[2] = 1;
-			update_irq_state(device->machine());
-			break;
+		state->m_requested_int[1] = 1;
+		update_irq_state(timer.machine());
 	}
+
+	if(scanline == 0)
+	{
+		state->m_requested_int[2] = 1;
+		update_irq_state(timer.machine());
+	}
+
+	if(scanline == 64)
+	{
+		state->m_requested_int[5] = 1;
+		update_irq_state(timer.machine());
+	}
+
+	if(scanline == 128)
+	{
+		state->m_requested_int[3] = 1;
+		update_irq_state(timer.machine());
+	}
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( unknown_interrupt )
-{
-	metro_state *state = device->machine().driver_data<metro_state>();
-
-	device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
-}
 
 static MACHINE_CONFIG_START( puzzlet, metro_state )
 
@@ -4377,8 +4386,7 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_CPU_ADD("maincpu", H83007, XTAL_20MHz)	// H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
 	MCFG_CPU_PROGRAM_MAP(puzzlet_map)
 	MCFG_CPU_IO_MAP(puzzlet_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(puzzlet_interrupt, 5)
-	MCFG_CPU_PERIODIC_INT(unknown_interrupt,60)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", puzzlet_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)

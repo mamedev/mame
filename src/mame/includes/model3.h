@@ -14,7 +14,9 @@ class model3_state : public driver_device
 {
 public:
 	model3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
     int m_sound_irq_enable;
     emu_timer *m_sound_timer;
@@ -50,7 +52,6 @@ public:
 	UINT64 *m_network_ram;
 	int m_prot_data_ptr;
 	int m_scsp_last_line;
-	int m_vblank;
 	UINT32 *m_vrom;
 	int m_step;
 	UINT64 *m_paletteram64;
@@ -100,6 +101,8 @@ public:
 	PLANE m_clip_plane[5];
 	UINT32 m_matrix_base_address;
 	cached_texture *m_texcache[2][1024/32][2048/32];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
