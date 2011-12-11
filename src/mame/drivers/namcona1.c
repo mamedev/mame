@@ -974,13 +974,17 @@ static ADDRESS_MAP_START( namcona1_mcu_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static INTERRUPT_GEN( namcona1_interrupt )
+static TIMER_DEVICE_CALLBACK( namcona1_interrupt )
 {
-	namcona1_state *state = device->machine().driver_data<namcona1_state>();
-	int level = cpu_getiloops(device); /* 0,1,2,3,4 */
+	namcona1_state *state = timer.machine().driver_data<namcona1_state>();
+	int level = param / 50;
+
+	if((param % 51) != 0)
+		return;
+
 	if( level==0 )
 	{
-		simulate_mcu( device->machine() );
+		simulate_mcu( timer.machine() );
 	}
 	if( state->m_mEnableInterrupts )
 	{
@@ -991,10 +995,10 @@ static INTERRUPT_GEN( namcona1_interrupt )
 				int scanline = state->m_vreg[0x8a/2]&0xff;
 				if( scanline )
 				{
-					device->machine().primary_screen->update_partial(scanline );
+					timer.machine().primary_screen->update_partial(scanline );
 				}
 			}
-			device_set_input_line(device, level+1, HOLD_LINE);
+			device_set_input_line(state->m_maincpu, level+1, HOLD_LINE);
 		}
 	}
 }
@@ -1003,15 +1007,18 @@ static INTERRUPT_GEN( namcona1_interrupt )
 //                 IRQ 1 =>
 //                 IRQ 2 =>
 
-static INTERRUPT_GEN( mcu_interrupt )
+static TIMER_DEVICE_CALLBACK( mcu_interrupt )
 {
-	if (cpu_getiloops(device) == 0)
+	namcona1_state *state = timer.machine().driver_data<namcona1_state>();
+	int scanline = param;
+
+	if (scanline == 0)
 	{
-		device_set_input_line(device, M37710_LINE_IRQ1, HOLD_LINE);
+		device_set_input_line(state->m_mcu, M37710_LINE_IRQ1, HOLD_LINE);
 	}
-	else if (cpu_getiloops(device) == 1)
+	else if (scanline == 128)
 	{
-		device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
+		device_set_input_line(state->m_mcu, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 
@@ -1025,12 +1032,12 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 50113000/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_main_map)
-	MCFG_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
+	MCFG_TIMER_ADD_SCANLINE("scan_main", namcona1_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M37702, 50113000/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 2)
+	MCFG_TIMER_ADD_SCANLINE("scan_mcu", mcu_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_HANDLER(namcosna1)
 	MCFG_MACHINE_START(namcona1)

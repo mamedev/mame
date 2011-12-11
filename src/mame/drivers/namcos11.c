@@ -269,7 +269,6 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/psx/psx.h"
 #include "cpu/m37710/m37710.h"
 #include "video/psx.h"
@@ -284,7 +283,10 @@ class namcos11_state : public psx_state
 {
 public:
 	namcos11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag) { }
+		: psx_state(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_mcu(*this,"c76")
+		{ }
 
 	UINT32 *m_sharedram;
 	UINT32 *m_keycus;
@@ -292,6 +294,9 @@ public:
 	UINT8 m_su_83;
 
 	UINT32 m_n_bankoffset;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -814,24 +819,6 @@ ADDRESS_MAP_START( c76_io_map, AS_IO, 8 )
 	AM_RANGE(M37710_ADC0_H, M37710_ADC7_H) AM_READNOP
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( c76_interrupt )
-{
-	switch (cpu_getiloops(device))
-	{
-		case 0:
-			device_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
-			break;
-
-		case 1:
-			device_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
-			break;
-
-		case 2:
-			device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
-			break;
-	}
-}
-
 static READ16_HANDLER( c76_speedup_r )
 {
 	namcos11_state *state = space->machine().driver_data<namcos11_state>();
@@ -981,6 +968,28 @@ static MACHINE_RESET( namcos11 )
 	memset( state->m_keycus, 0, state->m_keycus_size );
 }
 
+
+static TIMER_DEVICE_CALLBACK( mcu_irq0_cb )
+{
+	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_IRQ0, HOLD_LINE);
+}
+
+static TIMER_DEVICE_CALLBACK( mcu_irq2_cb )
+{
+	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_IRQ2, HOLD_LINE);
+}
+
+static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
+{
+	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_ADC, HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( coh100, namcos11_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
@@ -989,7 +998,10 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_CPU_ADD("c76", M37702, 16934400)
 	MCFG_CPU_PROGRAM_MAP(c76_map)
 	MCFG_CPU_IO_MAP(c76_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(c76_interrupt, 3)
+	/* TODO: irq generation for these */
+	MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( namcos11 )
 

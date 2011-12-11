@@ -2,7 +2,9 @@ class mystwarr_state : public driver_device
 {
 public:
 	mystwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT16 *m_gx_workram;
 	UINT8 m_mw_irq_control;
@@ -19,6 +21,8 @@ public:
 	tilemap_t *m_ult_936_tilemap;
 	UINT16 m_clip;
 	UINT16 *m_spriteram;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

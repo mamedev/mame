@@ -17,13 +17,19 @@ class namcofl_state : public driver_device
 {
 public:
 	namcofl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_mcu(*this,"mcu")
+		{ }
 
 	emu_timer *m_raster_interrupt_timer;
 	UINT32 *m_workram;
 	UINT16 *m_shareram;
 	UINT8 m_mcu_port6;
 	UINT32 m_sprbank;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 };
 
 

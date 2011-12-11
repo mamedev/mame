@@ -3,6 +3,9 @@
 Mr F Lea
 Pacific Novelty 1982
 
+TODO:
+- fix slave cpu irq generation
+
 4 way joystick and jump button
 
 I/O Board
@@ -61,7 +64,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ******************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/mrflea.h"
@@ -120,11 +122,13 @@ static READ8_HANDLER( mrflea_io_status_r )
 	return state->m_status ^ 0x01;
 }
 
-static INTERRUPT_GEN( mrflea_slave_interrupt )
+static TIMER_DEVICE_CALLBACK( mrflea_slave_interrupt )
 {
-	mrflea_state *state = device->machine().driver_data<mrflea_state>();
-	if (cpu_getiloops(device) == 0 || (state->m_status & 0x08))
-		device_set_input_line(device, 0, HOLD_LINE);
+	mrflea_state *state = timer.machine().driver_data<mrflea_state>();
+	int scanline = param;
+
+	if ((scanline == 248) || (scanline == 248/2 && (state->m_status & 0x08)))
+		device_set_input_line(state->m_subcpu, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mrflea_interrupt_type_r )
@@ -368,7 +372,7 @@ static MACHINE_CONFIG_START( mrflea, mrflea_state )
 	MCFG_CPU_ADD("sub", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mrflea_slave_map)
 	MCFG_CPU_IO_MAP(mrflea_slave_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(mrflea_slave_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mrflea_slave_interrupt, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

@@ -156,7 +156,6 @@ OSC3: 48.384MHz
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "includes/namcos2.h"
 #include "includes/namcoic.h"
 #include "cpu/i960/i960.h"
@@ -554,21 +553,27 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 	state->m_raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
 }
 
-static INTERRUPT_GEN( mcu_interrupt )
+static TIMER_DEVICE_CALLBACK( mcu_irq0_cb )
 {
-	if (cpu_getiloops(device) == 0)
-	{
-		device_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
-	}
-	else if (cpu_getiloops(device) == 1)
-	{
-		device_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
-	}
-	else
-	{
-		device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
-	}
+	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_IRQ0, HOLD_LINE);
 }
+
+static TIMER_DEVICE_CALLBACK( mcu_irq2_cb )
+{
+	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_IRQ2, HOLD_LINE);
+}
+
+static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
+{
+	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_ADC, HOLD_LINE);
+}
+
 
 static MACHINE_START( namcofl )
 {
@@ -597,7 +602,10 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 	MCFG_CPU_ADD("mcu", M37702, 48384000/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
-	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
+	/* TODO: irq generation for these */
+	MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_MACHINE_START(namcofl)
 	MCFG_MACHINE_RESET(namcofl)
