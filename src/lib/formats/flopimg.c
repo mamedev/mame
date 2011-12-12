@@ -1078,48 +1078,45 @@ int floppy_image_format_t::crc_cells_size(int type) const
 	}
 }
 
-bool floppy_image_format_t::bit_r(UINT8 *buffer, int offset)
+bool floppy_image_format_t::bit_r(const UINT32 *buffer, int offset)
 {
-	return (buffer[offset >> 3] >> ((offset & 7) ^ 7)) & 1;
+	return (buffer[offset] & floppy_image::MG_MASK) == MG_1;
 }
 
-void floppy_image_format_t::bit_w(UINT8 *buffer, int offset, bool val)
+void floppy_image_format_t::bit_w(UINT32 *buffer, int offset, bool val, UINT32 size)
 {
-	if(val)
-		buffer[offset >> 3] |= 0x80 >> (offset & 7);
-	else
-		buffer[offset >> 3] &= ~(0x80 >> (offset & 7));
+	buffer[offset] = (val ? MG_1 : MG_0) | size;
 }
 
-void floppy_image_format_t::raw_w(UINT8 *buffer, int &offset, int n, UINT32 val)
+void floppy_image_format_t::raw_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size)
 {
 	for(int i=n-1; i>=0; i--)
-		bit_w(buffer, offset++, (val >> i) & 1);
+		bit_w(buffer, offset++, (val >> i) & 1, size);
 }
 
-void floppy_image_format_t::mfm_w(UINT8 *buffer, int &offset, int n, UINT32 val)
+void floppy_image_format_t::mfm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size)
 {
 	int prec = offset ? bit_r(buffer, offset-1) : 0;
 	for(int i=n-1; i>=0; i--) {
 		int bit = (val >> i) & 1;
-		bit_w(buffer, offset++, !(prec || bit));
-		bit_w(buffer, offset++, bit);
+		bit_w(buffer, offset++, !(prec || bit), size);
+		bit_w(buffer, offset++, bit, size);
 		prec = bit;
 	}
 }
 
-void floppy_image_format_t::mfm_half_w(UINT8 *buffer, int &offset, int start_bit, UINT32 val)
+void floppy_image_format_t::mfm_half_w(UINT32 *buffer, int &offset, int start_bit, UINT32 val, UINT32 size)
 {
 	int prec = offset ? bit_r(buffer, offset-1) : 0;
 	for(int i=start_bit; i>=0; i-=2) {
 		int bit = (val >> i) & 1;
-		bit_w(buffer, offset++, !(prec || bit));
-		bit_w(buffer, offset++, bit);
+		bit_w(buffer, offset++, !(prec || bit), size);
+		bit_w(buffer, offset++, bit, size);
 		prec = bit;
 	}
 }
 
-void floppy_image_format_t::fixup_crc_amiga(UINT8 *buffer, const gen_crc_info *crc)
+void floppy_image_format_t::fixup_crc_amiga(UINT32 *buffer, const gen_crc_info *crc)
 {
 	UINT16 res = 0;
 	int size = crc->end - crc->start;
@@ -1131,22 +1128,27 @@ void floppy_image_format_t::fixup_crc_amiga(UINT8 *buffer, const gen_crc_info *c
 	mfm_w(buffer, offset, 16, res);
 }
 
-void floppy_image_format_t::fixup_crc_ccitt(UINT8 *buffer, const gen_crc_info *crc)
+UINT16 floppy_image_format_t::calc_crc_ccitt(const UINT32 *buffer, int start, int end)
 {
 	UINT32 res = 0xffff;
-	int size = crc->end - crc->start;
+	int size = end - start;
 	for(int i=1; i<size; i+=2) {
 		res <<= 1;
-		if(bit_r(buffer, crc->start + i))
+		if(bit_r(buffer, start + i))
 			res ^= 0x10000;
 		if(res & 0x10000)
 			res ^= 0x11021;
 	}
-	int offset = crc->write;
-	mfm_w(buffer, offset, 16, res);
+	return res;
 }
 
-void floppy_image_format_t::fixup_crcs(UINT8 *buffer, gen_crc_info *crcs)
+void floppy_image_format_t::fixup_crc_ccitt(UINT32 *buffer, const gen_crc_info *crc)
+{
+	int offset = crc->write;
+	mfm_w(buffer, offset, 16, calc_crc_ccitt(buffer, crc->start, crc->end));
+}
+
+void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 {
 	for(int i=0; i != MAX_CRC_COUNT; i++)
 		if(crcs[i].write != -1) {
@@ -1183,7 +1185,7 @@ int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, 
 
 void floppy_image_format_t::generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image)
 {
-	UINT8 *buffer = global_alloc_array_clear(UINT8, (track_size+7)/8);
+	UINT32 *buffer = global_alloc_array_clear(UINT32, track_size);
 
 	gen_crc_info crcs[MAX_CRC_COUNT];
 	collect_crcs(desc, crcs);
@@ -1332,7 +1334,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 	fixup_crcs(buffer, crcs);
 
-	generate_track_from_bitstream(track, head, buffer, track_size, image);
+	generate_track_from_levels(track, head, buffer, track_size, 0, image);
 	global_free(buffer);
 }
 

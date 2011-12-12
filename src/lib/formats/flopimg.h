@@ -410,6 +410,13 @@ protected:
 	//   PC-type sectors with MFM encoding and fixed-size
 	void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata);
 
+	bool bit_r(const UINT32 *buffer, int offset);
+	void bit_w(UINT32 *buffer, int offset, bool val, UINT32 size = 1000);
+	UINT16 calc_crc_ccitt(const UINT32 *buffer, int start, int end);
+	void raw_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	void mfm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	void mfm_half_w(UINT32 *buffer, int &offset, int start_bit, UINT32 val, UINT32 size = 1000);
+
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT };
 	enum { MAX_CRC_COUNT = 64 };
@@ -421,16 +428,10 @@ private:
 	bool type_no_data(int type) const;
 	bool type_data_mfm(int type, int p1, const gen_crc_info *crcs) const;
 
-	bool bit_r(UINT8 *buffer, int offset);
-	void bit_w(UINT8 *buffer, int offset, bool val);
-
 	int crc_cells_size(int type) const;
-	void fixup_crc_amiga(UINT8 *buffer, const gen_crc_info *crc);
-	void fixup_crc_ccitt(UINT8 *buffer, const gen_crc_info *crc);
-	void fixup_crcs(UINT8 *buffer, gen_crc_info *crcs);
-	void raw_w(UINT8 *buffer, int &offset, int n, UINT32 val);
-	void mfm_w(UINT8 *buffer, int &offset, int n, UINT32 val);
-	void mfm_half_w(UINT8 *buffer, int &offset, int start_bit, UINT32 val);
+	void fixup_crc_amiga(UINT32 *buffer, const gen_crc_info *crc);
+	void fixup_crc_ccitt(UINT32 *buffer, const gen_crc_info *crc);
+	void fixup_crcs(UINT32 *buffer, gen_crc_info *crcs);
 	void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
 
 	int sbit_r(const UINT8 *bitstream, int pos);

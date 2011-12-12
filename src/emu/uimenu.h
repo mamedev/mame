@@ -57,98 +57,139 @@ class ui_menu;
 
 
 /* menu-related callback functions */
-typedef void (*ui_menu_handler_func)(running_machine &machine, ui_menu *menu, void *parameter, void *state);
 typedef void (*ui_menu_custom_func)(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-typedef void (*ui_menu_destroy_state_func)(ui_menu *menu, void *state);
 
 
 /* menu-related events */
-typedef struct _ui_menu_event ui_menu_event;
-struct _ui_menu_event
+struct ui_menu_event
 {
 	void *			itemref;			/* reference for the selected item */
 	int				iptkey;				/* one of the IPT_* values from inptport.h */
 	unicode_char	unichar;			/* unicode character if iptkey == IPT_SPECIAL */
 };
 
+struct ui_menu_pool
+{
+	ui_menu_pool *		next;			/* chain to next one */
+	UINT8 *				top;			/* top of the pool */
+	UINT8 *				end;			/* end of the pool */
+};
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+class ui_menu_item
+{
+public:
+	const char *		text;
+	const char *		subtext;
+	UINT32				flags;
+	void *				ref;
 
+	inline bool is_selectable() const;
+};
 
-/* ----- core system management ----- */
+class ui_menu
+{
+public:
+	ui_menu(running_machine &machine, render_container *container);
+	virtual ~ui_menu();
 
-/* initialization */
-void ui_menu_init(running_machine &machine);
+	running_machine &machine() const { return m_machine; }
 
+	render_container *	container;			/* render_container we render to */
+	ui_menu_event		menu_event;			/* the UI menu_event that occurred */
+	ui_menu *			parent;				/* pointer to parent menu */
+	int					resetpos;			/* reset position */
+	void *				resetref;			/* reset reference */
+	int					selected;			/* which item is selected */
+	int					hover;				/* which item is being hovered over */
+	int					visitems;			/* number of visible items */
+	int					numitems;			/* number of items in the menu */
+	int					allocitems;			/* allocated size of array */
+	ui_menu_item *		item;				/* pointer to array of items */
+	float				customtop;			/* amount of extra height to add at the top */
+	float				custombottom;		/* amount of extra height to add at the bottom */
+	ui_menu_pool *		pool;				/* list of memory pools */
 
+	/* free all items in the menu, and all memory allocated from the memory pool */
+	void reset(ui_menu_reset_options options);
 
-/* ----- core menu management ----- */
+	/* returns true if the menu has any non-default items in it */
+	bool populated();
 
-/* allocate a new menu */
-ui_menu *ui_menu_alloc(running_machine &machine, render_container *container, ui_menu_handler_func handler, void *parameter);
+	/* append a new item to the end of the menu */
+	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref);
 
-/* free a menu */
-void ui_menu_free(ui_menu *menu);
+	/* process a menu, drawing it and returning any interesting events */
+	const ui_menu_event *process(UINT32 flags);
 
-/* free all items in the menu, and all memory allocated from the memory pool */
-void ui_menu_reset(ui_menu *menu, ui_menu_reset_options options);
+	/* configure the menu for custom rendering */
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
-/* returns TRUE if the menu has any non-default items in it */
-int ui_menu_populated(ui_menu *menu);
+	/* allocate temporary memory from the menu's memory pool */
+	void *m_pool_alloc(size_t size);
 
-/* append a new item to the end of the menu */
-void ui_menu_item_append(ui_menu *menu, const char *text, const char *subtext, UINT32 flags, void *ref);
+	/* make a temporary string copy in the menu's memory pool */
+	const char *pool_strdup(const char *string);
 
-/* process a menu, drawing it and returning any interesting events */
-const ui_menu_event *ui_menu_process(running_machine &machine, ui_menu *menu, UINT32 flags);
+	/* retrieves the index of the currently selected menu item */
+	void *get_selection();
 
-/* configure the menu for custom rendering */
-void ui_menu_set_custom_render(ui_menu *menu, ui_menu_custom_func custom, float top, float bottom);
+	/* changes the index of the currently selected menu item */
+	void set_selection(void *selected_itemref);
 
-/* allocate permanent memory to represent the menu's state */
-void *ui_menu_alloc_state(ui_menu *menu, size_t size, ui_menu_destroy_state_func destroy_state);
+	/* request the specific handling of the game selection main menu */
+	bool is_special_main_menu() const;
+	void set_special_main_menu(bool disable);
 
-/* allocate temporary memory from the menu's memory pool */
-void *ui_menu_pool_alloc(ui_menu *menu, size_t size);
+	/* Global initialization */
+	static void init(running_machine &machine);
+	static void exit(running_machine &machine);
 
-/* make a temporary string copy in the menu's memory pool */
-const char *ui_menu_pool_strdup(ui_menu *menu, const char *string);
+	/* reset the menus, clearing everything */
+	static void stack_reset(running_machine &machine);
 
-/* retrieves the index of the currently selected menu item */
-void *ui_menu_get_selection(ui_menu *menu);
+	/* push a new menu onto the stack */
+	static void stack_push(ui_menu *menu);
 
-/* changes the index of the currently selected menu item */
-void ui_menu_set_selection(ui_menu *menu, void *selected_itemref);
+	/* pop a menu from the stack */
+	static void stack_pop(running_machine &machine);
 
-
-
-/* ----- menu stack management ----- */
-
-/* reset the menus, clearing everything */
-void ui_menu_stack_reset(running_machine &machine);
-
-/* push a new menu onto the stack */
-void ui_menu_stack_push(ui_menu *menu);
-
-/* pop a menu from the stack */
-void ui_menu_stack_pop(running_machine &machine);
-
-
-
-/* ----- UI system interaction ----- */
+	/* test if one of the menus in the stack requires hide disable */
+	static bool stack_has_special_main_menu();
 
 /* master handler */
-UINT32 ui_menu_ui_handler(running_machine &machine, render_container *container, UINT32 state);
+	static UINT32 ui_handler(running_machine &machine, render_container *container, UINT32 state);
 
-/* slider handler */
-UINT32 ui_slider_ui_handler(running_machine &machine, render_container *container, UINT32 state);
+	/* Used by sliders */
+	void validate_selection(int scandir);
+	static ui_menu *menu_stack;
 
-/* force game select menu */
-void ui_menu_force_game_select(running_machine &machine, render_container *container);
-int ui_menu_is_force_game_select(void);
+	void do_handle();
 
+	/* To be reimplemented in the menu subclass */
+	virtual void populate() = 0;
+
+	/* To be reimplemented in the menu subclass */
+	virtual void handle() = 0;
+
+private:
+	static ui_menu *menu_free;
+	static bitmap_t *hilight_bitmap;
+	static render_texture *hilight_texture, *arrow_texture;
+
+	bool special_main_menu;
+
+	running_machine &	m_machine;			/* machine we are attached to */
+
+	void draw(bool customonly);
+	void draw_text_box();
+	void handle_events();
+	void handle_keys(UINT32 flags);
+	void clear_free_list();
+
+	inline bool exclusive_input_pressed(int key, int repeat);
+	static void clear_free_list(running_machine &machine);
+	static void render_triangle(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param);
+};
 
 #endif	/* __UIMENU_H__ */

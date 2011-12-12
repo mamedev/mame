@@ -3,6 +3,20 @@
 #ifndef __OSDNET_H__
 #define __OSDNET_H__
 
+class netdev;
+
+#define CREATE_NETDEV(name) class netdev *name(const char *ifname, class device_network_interface *ifdev, int rate)
+typedef class netdev *(*create_netdev)(const char *ifname, class device_network_interface *ifdev, int rate);
+
+typedef struct netdev_entry
+{
+	int id;
+	char name[256];
+	char description[256];
+	create_netdev func;
+	struct netdev_entry *m_next;
+} netdev_entry_t;
+
 class netdev
 {
 public:
@@ -25,10 +39,9 @@ private:
 	class device_network_interface *m_dev;
 };
 
-#define CREATE_NETDEV(name) class netdev *name(const char *ifname, class device_network_interface *ifdev, int rate)
-typedef class netdev *(*create_netdev)(const char *ifname, class device_network_interface *ifdev, int rate);
-
 class netdev *open_netdev(int id, class device_network_interface *ifdev, int rate);
-void add_netdev(const char *name, create_netdev func);
+void add_netdev(const char *name, const char *description, create_netdev func);
 void clear_netdev();
+const netdev_entry_t *netdev_first();
+int netdev_count();
 #endif

@@ -129,6 +129,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/oric_dsk.o	\
 	$(LIBOBJ)/formats/oric_tap.o	\
 	$(LIBOBJ)/formats/p6001_cas.o	\
+	$(LIBOBJ)/formats/pasti_dsk.o	\
 	$(LIBOBJ)/formats/pc_dsk.o		\
 	$(LIBOBJ)/formats/pmd_pmd.o		\
 	$(LIBOBJ)/formats/primoptp.o	\

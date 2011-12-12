@@ -15,6 +15,7 @@ public:
 
 	const char *get_mac() { return m_mac; }
 	bool get_promisc() { return m_promisc; }
+	int get_interface() { return m_intf; }
 
 	int send(UINT8 *buf, int len);
 	virtual void recv_cb(UINT8 *buf, int len);
@@ -25,5 +26,6 @@ protected:
 	char m_mac[6];
 	float m_bandwidth;
 	class netdev *m_dev;
+	int m_intf;
 };
 #endif

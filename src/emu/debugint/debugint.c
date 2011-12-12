@@ -1159,15 +1159,23 @@ static void render_editor(DView_edit *editor)
     menu_main_populate - populate the main menu
   -------------------------------------------------*/
 
+class ui_menu_what_the_hell : public ui_menu {
+public:
+	ui_menu_what_the_hell(running_machine &machine, render_container *container) : ui_menu(machine, container) {}
+	virtual ~ui_menu_what_the_hell() {}
+	virtual void populate() {}
+	virtual void handle() {}
+};
+
 static void CreateMainMenu(running_machine &machine)
 {
 	const char *subtext = "";
 	int rc;
 	astring title;
 
-	if (menu != NULL)
-		ui_menu_free(menu);
-	menu = ui_menu_alloc(machine, &machine.render().ui_container(),NULL,NULL);
+	if (menu)
+		auto_free(machine, menu);
+	menu = auto_alloc_clear(machine, ui_menu_what_the_hell(machine, &machine.render().ui_container()));
 
 	switch (focus_view->type)
 	{
@@ -1188,8 +1196,8 @@ static void CreateMainMenu(running_machine &machine)
 		break;
 	}
 
-	ui_menu_item_append(menu, title.cat(focus_view->title), NULL, MENU_FLAG_DISABLE, NULL);
-	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	menu->item_append(title.cat(focus_view->title), NULL, MENU_FLAG_DISABLE, NULL);
+	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	switch (focus_view->type)
 	{
@@ -1202,38 +1210,38 @@ static void CreateMainMenu(running_machine &machine)
 		case DASM_RIGHTCOL_ENCRYPTED:	subtext = "Enc Opcodes"; break;
 		case DASM_RIGHTCOL_COMMENTS:		subtext = "Comments"; break;
 		}
-		ui_menu_item_append(menu, "View", subtext, MENU_FLAG_RIGHT_ARROW, (void *)on_view_opcodes_activate);
-		ui_menu_item_append(menu, "Run to cursor", NULL, 0, (void *)on_run_to_cursor_activate);
+		menu->item_append("View", subtext, MENU_FLAG_RIGHT_ARROW, (void *)on_view_opcodes_activate);
+		menu->item_append("Run to cursor", NULL, 0, (void *)on_run_to_cursor_activate);
 
 		if (!dview_is_state(focus_view, VIEW_STATE_FOLLOW_CPU))
 		{
-			ui_menu_item_append(menu, "CPU", focus_view->view->source()->name(), MENU_FLAG_RIGHT_ARROW, (void *)on_disasm_cpu_activate);
+			menu->item_append("CPU", focus_view->view->source()->name(), MENU_FLAG_RIGHT_ARROW, (void *)on_disasm_cpu_activate);
 		}
-		ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+		menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 		break;
 	}
 	}
 
 	/* add input menu items */
 
-	ui_menu_item_append(menu, "New Memory Window", NULL, 0, (void *)on_memory_window_activate);
-	ui_menu_item_append(menu, "New Disassembly Window", NULL, 0, (void *)on_disassembly_window_activate);
-	ui_menu_item_append(menu, "New Error Log Window", NULL, 0, (void *)on_log_window_activate);
-	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	ui_menu_item_append(menu, "Run", NULL, 0, (void *)on_run_activate);
-	ui_menu_item_append(menu, "Run to Next CPU", NULL, 0, (void *)on_run_cpu_activate);
-	ui_menu_item_append(menu, "Run until Next Interrupt on This CPU", NULL, 0, (void *)on_run_irq_activate);
-	ui_menu_item_append(menu, "Run until Next VBLANK", NULL, 0, (void *)on_run_vbl_activate);
-	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	ui_menu_item_append(menu, "Step Into", NULL, 0, (void *)on_step_into_activate);
-	ui_menu_item_append(menu, "Step Over", NULL, 0, (void *)on_step_over_activate);
-	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	ui_menu_item_append(menu, "Soft Reset", NULL, 0, (void *)on_soft_reset_activate);
-	ui_menu_item_append(menu, "Hard Reset", NULL, 0, (void *)on_hard_reset_activate);
-	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	menu->item_append("New Memory Window", NULL, 0, (void *)on_memory_window_activate);
+	menu->item_append("New Disassembly Window", NULL, 0, (void *)on_disassembly_window_activate);
+	menu->item_append("New Error Log Window", NULL, 0, (void *)on_log_window_activate);
+	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	menu->item_append("Run", NULL, 0, (void *)on_run_activate);
+	menu->item_append("Run to Next CPU", NULL, 0, (void *)on_run_cpu_activate);
+	menu->item_append("Run until Next Interrupt on This CPU", NULL, 0, (void *)on_run_irq_activate);
+	menu->item_append("Run until Next VBLANK", NULL, 0, (void *)on_run_vbl_activate);
+	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	menu->item_append("Step Into", NULL, 0, (void *)on_step_into_activate);
+	menu->item_append("Step Over", NULL, 0, (void *)on_step_over_activate);
+	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	menu->item_append("Soft Reset", NULL, 0, (void *)on_soft_reset_activate);
+	menu->item_append("Hard Reset", NULL, 0, (void *)on_hard_reset_activate);
+	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	if (!dview_is_state(focus_view, VIEW_STATE_FOLLOW_CPU))
-		ui_menu_item_append(menu, "Close Window", NULL, 0, (void *)on_close_activate);
-	ui_menu_item_append(menu, "Exit", NULL, 0, (void *)on_exit_activate);
+		menu->item_append("Close Window", NULL, 0, (void *)on_close_activate);
+	menu->item_append("Exit", NULL, 0, (void *)on_exit_activate);
 }
 
 static int map_point(DView *dv, INT32 target_x, INT32 target_y, INT32 *mapped_x, INT32 *mapped_y)
@@ -1355,10 +1363,10 @@ static void handle_menus(running_machine &machine)
 	if (menu != NULL)
 	{
 		/* process the menu */
-		event = ui_menu_process(machine, menu, 0);
+		event = menu->process(0);
 		if (event != NULL && (event->iptkey == IPT_UI_SELECT || (event->iptkey == IPT_UI_RIGHT)))
 		{
-			//ui_menu_free(menu);
+			//auto_free(machine, menu);
 			//menu = NULL;
 			((void (*)(DView *, const ui_menu_event *)) event->itemref)(focus_view, event);
 			//ui_menu_stack_push(ui_menu_alloc(machine, menu->container, (ui_menu_handler_func)event->itemref, NULL));
@@ -1366,7 +1374,7 @@ static void handle_menus(running_machine &machine)
 		}
 		else if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
 		{
-			ui_menu_free(menu);
+			auto_free(machine, menu);
 			menu = NULL;
 		}
 	}

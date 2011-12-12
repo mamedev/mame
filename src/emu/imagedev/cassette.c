@@ -275,10 +275,10 @@ bool cassette_image_device::call_load()
 			} else {
 				astring fname = astring(m_mame_file->filename());
 				int loc = fname.rchr(0,'.');
-				if (loc!=-1) {					
+				if (loc!=-1) {
 					extension = fname.substr(loc + 1,fname.len()-loc).cstr();
 				} else {
-					extension = "";	
+					extension = "";
 				}
 			}
 			err = cassette_open_choices((void *)image, &image_ioprocs, extension, m_formats, cassette_flags, &m_cassette);

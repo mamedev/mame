@@ -19,17 +19,21 @@
         However the fact that they indeed happen in the ST is quite interesting.
 
         The MFP will generate a spurious interrupt if interrupts are disabled (by changing the IERA/IERB registers)
-        at the ???precise point???. The precise point would be after the system (but not necessarily the CPU, see below)
+        at the 'precise point'. The precise point would be after the system (but not necessarily the CPU, see below)
         triggered an MFP interrupt, and before the CPU drives the interrupt acknowledge cycle.
 
-        If the MFP was connected directly to the CPU, spurious interrupts probably couldn???t happen. However in the
+        If the MFP was connected directly to the CPU, spurious interrupts probably couldn't happen. However in the
         ST, GLUE seats in the middle and handles all the interrupt timing. It is possible that GLUE introduces a
         delay between detecting a change in the MFP interrupt request signal and actually propagating the change to
         the CPU IPL signals (it is even possible that GLUE make some kind of latching). This would create a window
-        long enough for the ???precise point??? described above.
+        long enough for the 'precise point' described above.
 
         "yes, the spurious interrupt occurs when i mask a timer. i did not notice an occurance of the SPI when changing data and control registers.
         if i kill interrupts with the status reg before masking the timer interrupt, then the SPI occurs as soon as the status register is set to re-enable interrupts."
+
+        Well, more experiments show that it's somewhat incorrect, and
+        the GLUE is essentially invisible w.r.t IPL.  The CPU and the
+        MFP manage to add the delays all by themselves.
 
     - divide serial clock by 16
     - synchronous mode

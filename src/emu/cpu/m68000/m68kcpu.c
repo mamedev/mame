@@ -644,6 +644,7 @@ INLINE m68ki_cpu_core *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == M68000 ||
 		   device->type() == M68008 ||
+		   device->type() == M68008PLCC ||
 		   device->type() == M68010 ||
 		   device->type() == M68EC020 ||
 		   device->type() == M68020 ||
@@ -1857,8 +1858,26 @@ CPU_GET_INFO( m68008 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 22;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 20;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68008");				break;
+
+		default:										CPU_GET_INFO_CALL(m68k);				break;
+	}
+}
+
+CPU_GET_INFO( m68008plcc )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 22;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
@@ -2506,6 +2525,7 @@ CPU_GET_INFO( mcf5206e )
 
 DEFINE_LEGACY_CPU_DEVICE(M68000, m68000);
 DEFINE_LEGACY_CPU_DEVICE(M68008, m68008);
+DEFINE_LEGACY_CPU_DEVICE(M68008PLCC, m68008plcc);
 DEFINE_LEGACY_CPU_DEVICE(M68010, m68010);
 DEFINE_LEGACY_CPU_DEVICE(M68EC020, m68ec020);
 DEFINE_LEGACY_CPU_DEVICE(M68020, m68020);
@@ -2519,4 +2539,3 @@ DEFINE_LEGACY_CPU_DEVICE(M68040, m68040);
 DEFINE_LEGACY_CPU_DEVICE(SCC68070, scc68070);
 DEFINE_LEGACY_CPU_DEVICE(M68340, m68340);
 DEFINE_LEGACY_CPU_DEVICE(MCF5206E, mcf5206e);
-

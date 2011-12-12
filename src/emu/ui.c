@@ -20,6 +20,7 @@
 #include "ui.h"
 #include "uiinput.h"
 #include "uimenu.h"
+#include "uimain.h"
 #include "uigfx.h"
 #include <ctype.h>
 
@@ -241,7 +242,7 @@ int ui_init(running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_exit), &machine));
 
 	/* initialize the other UI bits */
-	ui_menu_init(machine);
+	ui_menu::init(machine);
 	ui_gfx_init(machine);
 
 	/* reset globals */
@@ -289,7 +290,7 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 
 	/* loop over states */
 	ui_set_handler(handler_ingame, 0);
-	for (state = 0; state < maxstate && !machine.scheduled_event_pending() && !ui_menu_is_force_game_select(); state++)
+	for (state = 0; state < maxstate && !machine.scheduled_event_pending() && !ui_menu::stack_has_special_main_menu(); state++)
 	{
 		/* default to standard colors */
 		messagebox_backcolor = UI_BACKGROUND_COLOR;
@@ -324,7 +325,7 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 		while (machine.input().poll_switches() != INPUT_CODE_INVALID) ;
 
 		/* loop while we have a handler */
-		while (ui_handler_callback != handler_ingame && !machine.scheduled_event_pending() && !ui_menu_is_force_game_select())
+		while (ui_handler_callback != handler_ingame && !machine.scheduled_event_pending() && !ui_menu::stack_has_special_main_menu())
 			machine.video().frame_update();
 
 		/* clear the handler and force an update */
@@ -333,8 +334,8 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 	}
 
 	/* if we're the empty driver, force the menus on */
-	if (ui_menu_is_force_game_select())
-		ui_set_handler(ui_menu_ui_handler, 0);
+	if (ui_menu::stack_has_special_main_menu())
+		ui_set_handler(ui_menu::ui_handler, 0);
 
 	return 0;
 }
@@ -377,7 +378,7 @@ void ui_update_and_render(running_machine &machine, render_container *container)
 	if (machine.phase() >= MACHINE_PHASE_RESET && (single_step || machine.paused()))
 	{
 		int alpha = (1.0f - machine.options().pause_brightness()) * 255.0f;
-		if (ui_menu_is_force_game_select())
+		if (ui_menu::stack_has_special_main_menu())
 			alpha = 255;
 		if (alpha > 255)
 			alpha = 255;
@@ -856,7 +857,7 @@ int ui_get_show_profiler(void)
 
 void ui_show_menu(void)
 {
-	ui_set_handler(ui_menu_ui_handler, 0);
+	ui_set_handler(ui_menu::ui_handler, 0);
 }
 
 
@@ -867,7 +868,7 @@ void ui_show_menu(void)
 
 int ui_is_menu_active(void)
 {
-	return (ui_handler_callback == ui_menu_ui_handler);
+	return (ui_handler_callback == ui_menu::ui_handler);
 }
 
 
@@ -1380,11 +1381,11 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 
 	/* turn on menus if requested */
 	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
-		return ui_set_handler(ui_menu_ui_handler, 0);
+		return ui_set_handler(ui_menu::ui_handler, 0);
 
 	/* if the on-screen display isn't up and the user has toggled it, turn it on */
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
-		return ui_set_handler(ui_slider_ui_handler, 1);
+		return ui_set_handler(ui_menu_sliders::ui_handler, 1);
 
 	/* handle a reset request */
 	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))

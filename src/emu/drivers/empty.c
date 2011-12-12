@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "render.h"
 #include "uimenu.h"
+#include "uimain.h"
 
 
 /*************************************

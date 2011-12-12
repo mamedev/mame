@@ -127,7 +127,7 @@ void init_pcap()
 	{
 		while(devs->next)
 		{
-			add_netdev(devs->name, create_pcap);
+			add_netdev(devs->name, devs->description, create_pcap);
 			devs = devs->next;
 		}
 	}

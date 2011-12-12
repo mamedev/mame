@@ -392,6 +392,8 @@ void floppy_image_device::write_flux(attotime start, attotime end, int transitio
 		index = find_index(start_pos, buf, cells);
 	else {
 		index = 0;
+		image->set_track_size(cyl, ss, 1);
+		buf = image->get_buffer(cyl, ss);
 		buf[cells++] = floppy_image::MG_N | 200000000;
 	}
 
@@ -405,6 +407,8 @@ void floppy_image_device::write_flux(attotime start, attotime end, int transitio
 	UINT32 pos = start_pos;
 	int ti = 0;
 	while(pos != end_pos) {
+		if(image->get_track_size(cyl, ss) < cells+10)
+			image->set_track_size(cyl, ss, cells+200);
 		UINT32 next_pos;
 		if(ti != transition_count)
 			next_pos = trans_pos[ti++];

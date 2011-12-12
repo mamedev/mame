@@ -114,6 +114,9 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "softlist.h"
 #include "image.h"
 
+// networking
+#include "network.h"
+
 // the running machine
 #include "machine.h"
 #include "mame.h"

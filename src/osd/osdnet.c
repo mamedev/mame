@@ -1,22 +1,16 @@
 #include "emu.h"
 #include "osdnet.h"
 
-typedef struct netdev_entry
-{
-	int id;
-	char name[256];
-	create_netdev func;
-	struct netdev_entry *m_next;
-} netdev_entry_t;
-
 static class simple_list<netdev_entry_t> netdev_list;
 
-void add_netdev(const char *name, create_netdev func)
+void add_netdev(const char *name, const char *description, create_netdev func)
 {
 	netdev_entry_t *entry = global_alloc_clear(netdev_entry_t);
 	entry->id = netdev_list.count();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';
+	strncpy(entry->description, description, 255);
+	entry->description[255] = '\0';
 	entry->func = func;
 	netdev_list.append(*entry);
 }
@@ -24,6 +18,10 @@ void add_netdev(const char *name, create_netdev func)
 void clear_netdev()
 {
 	netdev_list.reset();
+}
+
+const netdev_entry_t *netdev_first() { 
+	return netdev_list.first();
 }
 
 class netdev *open_netdev(int id, class device_network_interface *ifdev, int rate)
@@ -97,3 +95,7 @@ const char *netdev::get_mac()
 	return "\0\0\0\0\0\0";
 }
 
+int netdev_count()
+{
+	return netdev_list.count();
+}

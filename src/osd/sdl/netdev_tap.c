@@ -94,7 +94,7 @@ static CREATE_NETDEV(create_tap)
 
 void init_tap()
 {
-	add_netdev("tap", create_tap);
+	add_netdev("tap", "TAP/TUN Device", create_tap);
 }
 
 void deinit_tap()

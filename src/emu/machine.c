@@ -111,6 +111,7 @@
 #include "cheat.h"
 #include "ui.h"
 #include "uimenu.h"
+#include "uimain.h"
 #include "uiinput.h"
 #include "crsshair.h"
 #include "validity.h"
@@ -307,6 +308,7 @@ void running_machine::start()
 	image_init(*this);
 	tilemap_init(*this);
 	crosshair_init(*this);
+	network_init(*this);
 
 	// initialize the debugger
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
