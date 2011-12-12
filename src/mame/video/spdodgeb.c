@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/spdodgeb.h"
 
@@ -84,20 +83,20 @@ VIDEO_START( spdodgeb )
 ***************************************************************************/
 
 
-INTERRUPT_GEN( spdodgeb_interrupt )
+TIMER_DEVICE_CALLBACK( spdodgeb_interrupt )
 {
-	int iloop = cpu_getiloops(device);
-	int scanline = (32-iloop) * 8;
+	spdodgeb_state *state = timer.machine().driver_data<spdodgeb_state>();
+	int scanline = param;
 
-	if (iloop > 1 && iloop < 32)
+	if (scanline == 256)
 	{
-		device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);
-		device->machine().primary_screen->update_partial(scanline+7);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().primary_screen->update_partial(256);
 	}
-	else if (!iloop)
+	else if ((scanline % 8) == 0)
 	{
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-		device->machine().primary_screen->update_partial(256);
+		device_set_input_line(state->m_maincpu, M6502_IRQ_LINE, HOLD_LINE);
+		timer.machine().primary_screen->update_partial(scanline+16); /* TODO: pretty off ... */
 	}
 }
 

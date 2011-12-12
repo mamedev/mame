@@ -2,7 +2,9 @@ class pingpong_state : public driver_device
 {
 public:
 	pingpong_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	int m_intenable;
 	int m_question_addr_high;
@@ -11,6 +13,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

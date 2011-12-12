@@ -23,7 +23,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
@@ -419,18 +418,15 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,12000000/6)	/* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
-	MCFG_CPU_VBLANK_INT_HACK(spdodgeb_interrupt,33)	/* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", spdodgeb_interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
 	MCFG_CPU_ADD("audiocpu", M6809,12000000/6)	/* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
+	MCFG_SCREEN_RAW_PARAMS(12000000/2, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(spdodgeb)
 
 	MCFG_GFXDECODE(spdodgeb)

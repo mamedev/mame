@@ -56,7 +56,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "includes/sprcros2.h"
 
@@ -231,19 +230,20 @@ static GFXDECODE_START( sprcros2 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprcros2_fglayout,     512, 64 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( sprcros2_m_interrupt )
+static TIMER_DEVICE_CALLBACK( sprcros2_m_interrupt )
 {
-	sprcros2_state *state = device->machine().driver_data<sprcros2_state>();
+	sprcros2_state *state = timer.machine().driver_data<sprcros2_state>();
+	int scanline = param;
 
-	if (cpu_getiloops(device) == 0)
+	if (scanline == 240)
 	{
 		if(state->m_port7&0x01)
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(state->m_master, INPUT_LINE_NMI, PULSE_LINE);
 	}
-	else
+	else if(scanline == 0)
 	{
 		if(state->m_port7&0x08)
-			device_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(state->m_master, 0, HOLD_LINE);
 	}
 }
 
@@ -269,12 +269,12 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_CPU_ADD("master", Z80,10000000/2)
 	MCFG_CPU_PROGRAM_MAP(sprcros2_master_map)
 	MCFG_CPU_IO_MAP(sprcros2_master_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(sprcros2_m_interrupt,2)	//1 nmi + 1 irq
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sprcros2_m_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", Z80,10000000/2)
 	MCFG_CPU_PROGRAM_MAP(sprcros2_slave_map)
 	MCFG_CPU_IO_MAP(sprcros2_slave_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(sprcros2_s_interrupt,2)	//2 nmis
+	MCFG_CPU_PERIODIC_INT(sprcros2_s_interrupt,2*60)	//2 nmis
 
 	MCFG_MACHINE_START(sprcros2)
 

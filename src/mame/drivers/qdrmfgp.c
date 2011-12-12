@@ -22,7 +22,6 @@ GP1 HDD data contents:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/idectrl.h"
 #include "sound/k054539.h"
@@ -270,22 +269,19 @@ static READ16_HANDLER( gp2_ide_std_r )
  *
  *************************************/
 
-static INTERRUPT_GEN(qdrmfgp_interrupt)
+static TIMER_DEVICE_CALLBACK(qdrmfgp_interrupt)
 {
-	qdrmfgp_state *state = device->machine().driver_data<qdrmfgp_state>();
-	switch (cpu_getiloops(device))
-	{
-		case 0:
-			if (state->m_control & 0x0001)
-				device_set_input_line(device, 1, HOLD_LINE);
-			break;
+	qdrmfgp_state *state = timer.machine().driver_data<qdrmfgp_state>();
+	int scanline = param;
 
-		case 1:
-			/* trigger V-blank interrupt */
-			if (state->m_control & 0x0004)
-				device_set_input_line(device, 3, HOLD_LINE);
-			break;
-	}
+	if(scanline == 0)
+		if (state->m_control & 0x0001)
+			device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+
+	/* trigger V-blank interrupt */
+	if(scanline == 240)
+		if (state->m_control & 0x0004)
+			device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 }
 
 static void ide_interrupt(device_t *device, int state)
@@ -682,7 +678,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp_map)
-	MCFG_CPU_VBLANK_INT_HACK(qdrmfgp_interrupt, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", qdrmfgp_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START(qdrmfgp)
 	MCFG_MACHINE_RESET(qdrmfgp)

@@ -43,7 +43,6 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "machine/tmp68301.h"
 #include "includes/realbrk.h"
 #include "sound/2413intf.h"
@@ -667,13 +666,8 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( realbrk_interrupt )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 0:
-			/* VBlank is connected to INT1 (external interrupts pin 1) */
-			tmp68301_external_interrupt_1(device->machine());
-			break;
-	}
+	/* VBlank is connected to INT1 (external interrupts pin 1) */
+	tmp68301_external_interrupt_1(device->machine());
 }
 
 static MACHINE_CONFIG_START( realbrk, realbrk_state )

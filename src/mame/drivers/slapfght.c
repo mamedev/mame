@@ -264,7 +264,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "includes/slapfght.h"
@@ -760,7 +759,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(getstar_interrupt,4)	/* music speed, verified */
+	MCFG_CPU_PERIODIC_INT(getstar_interrupt,4*60)	/* music speed, verified */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -903,7 +902,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(getstar_interrupt, 3)
+	MCFG_CPU_PERIODIC_INT(getstar_interrupt, 3*60)
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfight_m68705_map)

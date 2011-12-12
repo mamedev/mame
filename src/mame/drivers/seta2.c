@@ -100,7 +100,6 @@ reelquak:
 
 #include "emu.h"
 #include "memconv.h"
-#include "deprecat.h"
 #include "includes/seta2.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/tmp68301.h"
@@ -2004,26 +2003,13 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( seta2_interrupt )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 0:
-			/* VBlank is connected to INT0 (external interrupts pin 0) */
-			tmp68301_external_interrupt_0(device->machine());
-			break;
-	}
+	/* VBlank is connected to INT0 (external interrupts pin 0) */
+	tmp68301_external_interrupt_0(device->machine());
 }
 
 static INTERRUPT_GEN( samshoot_interrupt )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 0:
-			tmp68301_external_interrupt_0(device->machine());	// vblank
-			break;
-		case 1:
-			tmp68301_external_interrupt_2(device->machine());	// to do: hook up x1-10 interrupts
-			break;
-	}
+	tmp68301_external_interrupt_2(device->machine());	// to do: hook up x1-10 interrupts
 }
 
 static const x1_010_interface x1_010_sound_intf =
@@ -2158,7 +2144,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( samshoot, seta2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(samshoot_map)
-	MCFG_CPU_VBLANK_INT_HACK(samshoot_interrupt,2)
+	MCFG_CPU_PERIODIC_INT(samshoot_interrupt,60)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2172,13 +2158,16 @@ MACHINE_CONFIG_END
                                   Funcube
 ***************************************************************************/
 
-static INTERRUPT_GEN( funcube_interrupt )
+static TIMER_DEVICE_CALLBACK( funcube_interrupt )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 1:  device_set_input_line(device, 2, HOLD_LINE); break;
-		case 0:  device_set_input_line(device, 1, HOLD_LINE); break;
-	}
+	seta2_state *state = timer.machine().driver_data<seta2_state>();
+	int scanline = param;
+
+	if(scanline == 368)
+		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( funcube_sub_timer_irq )
@@ -2222,7 +2211,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 
 	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL_25_447MHz)
 	MCFG_CPU_PROGRAM_MAP(funcube_map)
-	MCFG_CPU_VBLANK_INT_HACK(funcube_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", funcube_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(funcube_sub_map)

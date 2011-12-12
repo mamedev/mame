@@ -13,7 +13,6 @@ driver by Barry Rodewald
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 
 
@@ -21,10 +20,14 @@ class rotaryf_state : public driver_device
 {
 public:
 	rotaryf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT8 *m_videoram;
 	size_t m_videoram_size;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -38,14 +41,17 @@ public:
  *
  *************************************/
 
-static INTERRUPT_GEN( rotaryf_interrupt )
+static TIMER_DEVICE_CALLBACK( rotaryf_interrupt )
 {
-	if (device->machine().primary_screen->vblank())
-		device_set_input_line(device, I8085_RST55_LINE, HOLD_LINE);
-	else
+	rotaryf_state *state = timer.machine().driver_data<rotaryf_state>();
+	int scanline = param;
+
+	if (scanline == 256)
+		device_set_input_line(state->m_maincpu, I8085_RST55_LINE, HOLD_LINE);
+	else if((scanline % 64) == 0)
 	{
-		device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
-		device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+		device_set_input_line(state->m_maincpu, I8085_RST75_LINE, ASSERT_LINE);
+		device_set_input_line(state->m_maincpu, I8085_RST75_LINE, CLEAR_LINE);
 	}
 }
 
@@ -167,7 +173,7 @@ static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
 	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(rotaryf_map)
 	MCFG_CPU_IO_MAP(rotaryf_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(rotaryf_interrupt,5)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", rotaryf_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

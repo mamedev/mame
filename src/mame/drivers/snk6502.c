@@ -281,7 +281,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "sound/sn76477.h"
@@ -446,6 +445,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static INPUT_CHANGED( coin_inserted )
+{
+	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( snk6502_generic_joy8way )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -468,8 +472,8 @@ static INPUT_PORTS_START( snk6502_generic_joy8way )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -519,7 +523,7 @@ static INPUT_PORTS_START( satansat )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk6502_music0_r, NULL)     /* music0 playing */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                         /* NC */
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sasuke_count_r, NULL)       /* connected to a binary counter */
 
@@ -743,35 +747,13 @@ static INTERRUPT_GEN( satansat_interrupt )
 {
 	snk6502_state *state = device->machine().driver_data<snk6502_state>();
 
-	if (cpu_getiloops(device) != 0)
-	{
-		UINT8 val = input_port_read(device->machine(), "IN2"); /* TODO: use CUSTOM_INPUT */
-
-		coin_counter_w(device->machine(), 0, val & 1);
-
-		/* user asks to insert coin: generate a NMI interrupt. */
-		if (val & 0x01)
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
-	else if(state->m_irq_mask)
+	if(state->m_irq_mask)
 		device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 static INTERRUPT_GEN( snk6502_interrupt )
 {
-	if (cpu_getiloops(device) != 0)
-	{
-		UINT8 val = input_port_read(device->machine(), "IN2"); /* TODO: use CUSTOM_INPUT */
-
-		coin_counter_w(device->machine(), 0, val & 1);
-		coin_counter_w(device->machine(), 1, val & 2);
-
-		/* user asks to insert coin: generate a NMI interrupt. */
-		if (val & 0x03)
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
-	else
-		device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+	device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 
@@ -845,7 +827,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
 	MCFG_CPU_PROGRAM_MAP(sasuke_map)
-	MCFG_CPU_VBLANK_INT_HACK(satansat_interrupt, 2)
+	MCFG_CPU_VBLANK_INT("screen",satansat_interrupt)
 
 	MCFG_MACHINE_RESET(sasuke)
 
@@ -921,7 +903,7 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	//MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
 	MCFG_CPU_ADD("maincpu", M6502, 930000)		// adjusted
 	MCFG_CPU_PROGRAM_MAP(vanguard_map)
-	MCFG_CPU_VBLANK_INT_HACK(snk6502_interrupt, 2)
+	MCFG_CPU_VBLANK_INT("screen",snk6502_interrupt)
 
 	MCFG_MACHINE_RESET(vanguard)
 

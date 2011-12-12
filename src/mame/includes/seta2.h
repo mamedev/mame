@@ -3,8 +3,10 @@ class seta2_state : public driver_device
 public:
 	seta2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this,"maincpu"),
 		  m_nvram(*this, "nvram") { }
 
+	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT16> m_nvram;
 
 	UINT16 *m_vregs;

@@ -40,7 +40,6 @@ OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "video/v9938.h"
-#include "deprecat.h"
 
 
 class sothello_state : public driver_device
@@ -317,9 +316,9 @@ static void sothello_vdp_interrupt(running_machine &machine, int i)
     cputag_set_input_line(machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
-static INTERRUPT_GEN( sothello_interrupt )
+static TIMER_DEVICE_CALLBACK( sothello_interrupt )
 {
-    v9938_interrupt(device->machine(), 0);
+    v9938_interrupt(timer.machine(), 0);
 }
 
 static void adpcm_int(device_t *device)
@@ -369,7 +368,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
     MCFG_CPU_ADD("maincpu",Z80, MAINCPU_CLOCK)
     MCFG_CPU_PROGRAM_MAP(maincpu_mem_map)
     MCFG_CPU_IO_MAP(maincpu_io_map)
-    MCFG_CPU_VBLANK_INT_HACK(sothello_interrupt,262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sothello_interrupt, "screen", 0, 1)
 
     MCFG_CPU_ADD("soundcpu",Z80, SOUNDCPU_CLOCK)
     MCFG_CPU_PROGRAM_MAP(soundcpu_mem_map)

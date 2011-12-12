@@ -6,7 +6,6 @@ Ping Pong (c) 1985 Konami
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "machine/nvram.h"
 #include "includes/pingpong.h"
@@ -18,32 +17,15 @@ static WRITE8_HANDLER( cashquiz_question_bank_high_w )
 	pingpong_state *state = space->machine().driver_data<pingpong_state>();
 	if( data != 0xff )
 	{
-		switch( ~data & 0xff )
+		int i;
+
+		for(i=0;i<8;i++)
 		{
-		case 0x01:
-			state->m_question_addr_high = 0;
-			break;
-		case 0x02:
-			state->m_question_addr_high = 0x8000;
-			break;
-		case 0x04:
-			state->m_question_addr_high = 0x10000;
-			break;
-		case 0x08:
-			state->m_question_addr_high = 0x18000;
-			break;
-		case 0x10:
-			state->m_question_addr_high = 0x20000;
-			break;
-		case 0x20:
-			state->m_question_addr_high = 0x28000;
-			break;
-		case 0x40:
-			state->m_question_addr_high = 0x30000;
-			break;
-		case 0x80:
-			state->m_question_addr_high = 0x38000;
-			break;
+			if((~data & 0xff) == 1 << i)
+			{
+				state->m_question_addr_high = i*0x8000;
+				return;
+			}
 		}
 	}
 }
@@ -76,16 +58,33 @@ static WRITE8_HANDLER( coin_w )
 	/* other bits unknown */
 }
 
-static INTERRUPT_GEN( pingpong_interrupt )
+static TIMER_DEVICE_CALLBACK( pingpong_interrupt )
 {
-	pingpong_state *state = device->machine().driver_data<pingpong_state>();
-	if (cpu_getiloops(device) == 0)
+	pingpong_state *state = timer.machine().driver_data<pingpong_state>();
+	int scanline = param;
+
+	if (scanline == 240)
 	{
-		if (state->m_intenable & 0x04) device_set_input_line(device, 0, HOLD_LINE);
+		if (state->m_intenable & 0x04) device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops(device) % 2)
+	else if ((scanline % 32) == 0)
 	{
-		if (state->m_intenable & 0x08) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->m_intenable & 0x08) device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	}
+}
+
+static TIMER_DEVICE_CALLBACK( merlinmm_interrupt )
+{
+	pingpong_state *state = timer.machine().driver_data<pingpong_state>();
+	int scanline = param;
+
+	if (scanline == 240)
+	{
+		if (state->m_intenable & 0x04) device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	}
+	else if (scanline == 0)
+	{
+		if (state->m_intenable & 0x08) device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -456,14 +455,14 @@ static MACHINE_CONFIG_START( pingpong, pingpong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
 	MCFG_CPU_PROGRAM_MAP(pingpong_map)
-	MCFG_CPU_VBLANK_INT_HACK(pingpong_interrupt,16)	/* 1 IRQ + 8 NMI */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", pingpong_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_SIZE(456, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE(pingpong)
 
@@ -484,7 +483,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( merlinmm, pingpong )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
-	MCFG_CPU_VBLANK_INT_HACK(pingpong_interrupt,2)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(merlinmm_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
