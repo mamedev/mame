@@ -270,7 +270,6 @@ GFX:                Custom 145     ( 80 pin PQFP)
 */
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "includes/namconb1.h"
 #include "includes/namcos2.h"
 #include "includes/namcoic.h"
@@ -348,21 +347,28 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 } /* namconb1_interrupt */
 
-static INTERRUPT_GEN( mcu_interrupt )
+
+static TIMER_DEVICE_CALLBACK( mcu_irq0_cb )
 {
-	if (cpu_getiloops(device) == 0)
-	{
-		device_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
-	}
-	else if (cpu_getiloops(device) == 1)
-	{
-		device_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
-	}
-	else
-	{
-		device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
-	}
+	namconb1_state *state = timer.machine().driver_data<namconb1_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_IRQ0, HOLD_LINE);
 }
+
+static TIMER_DEVICE_CALLBACK( mcu_irq2_cb )
+{
+	namconb1_state *state = timer.machine().driver_data<namconb1_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_IRQ2, HOLD_LINE);
+}
+
+static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
+{
+	namconb1_state *state = timer.machine().driver_data<namconb1_state>();
+
+	device_set_input_line(state->m_mcu, M37710_LINE_ADC, HOLD_LINE);
+}
+
 
 static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
@@ -1027,7 +1033,10 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
-	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
+	/* TODO: irq generation for these */
+	MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_NVRAM_HANDLER(namconb1)
 	MCFG_MACHINE_START(namconb)
@@ -1060,7 +1069,10 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
-	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
+	/* TODO: irq generation for these */
+	MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_NVRAM_HANDLER(namconb1)
 	MCFG_MACHINE_START(namconb)
