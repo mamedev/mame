@@ -3870,11 +3870,11 @@
   <software name="ssideki3">
     <description>Super Sidekicks 3 - The Next Glory / Tokuten Ou 3 - eikoue no michi</description>
     <year>1995</year>
+    <publisher>SNK</publisher>
     <sharedfeat name="mvsrelease" value="yes" />
     <sharedfeat name="aesrelease" value="yes" />
     <sharedfeat name="mvscompatible" value="yes" />
     <sharedfeat name="aescompatible" value="yes" />
-    <publisher>SNK</publisher>
     <part name="cart" interface="neo_cart">
       <dataarea name="maincpu" size="0x200000">
         <rom loadflag="load16_word_swap" name="081-p1.p1" offset="0x100000" size="0x100000" crc="6bc27a3d" sha1="94692abe7343f9204a557acae4ab74d0af511ca3" />        <!-- TC5316200 -->
