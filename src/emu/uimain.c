@@ -604,6 +604,8 @@ void ui_menu_input_general::populate()
 				input_item_data *item = (input_item_data *)m_pool_alloc(sizeof(*item));
 				memset(item, 0, sizeof(*item));
 				item->ref = entry;
+				if(pollingitem && pollingref == entry)
+					pollingitem = item;
 				item->seqtype = seqtype;
 				item->seq = input_type_seq(machine(), entry->type, entry->player, seqtype);
 				item->defseq = &entry->defseq[seqtype];
@@ -676,6 +678,8 @@ void ui_menu_input_specific::populate()
 					memset(item, 0, sizeof(*item));
 					item->ref = field;
 					item->seqtype = seqtype;
+					if(pollingitem && pollingref == field)
+						pollingitem = item;
 					item->seq = input_field_seq(field, seqtype);
 					item->defseq = &get_field_default_seq(field, seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
@@ -2501,11 +2505,9 @@ void ui_menu_select_game::handle()
     menu_select_game_populate - populate the game
     select menu
 -------------------------------------------------*/
-driver_enumerator *ui_menu_select_game::drivlist;
-
 ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
-	driverlist = (const game_driver **)m_pool_alloc((driver_list::total()+1)*sizeof(const game_driver *));
+	driverlist = global_alloc_array(const game_driver *, driver_list::total()+1);
 	build_driver_list();
 	if(gamename)
 		strcpy(search, gamename);
@@ -2567,6 +2569,7 @@ void ui_menu_select_game::populate()
 ui_menu_select_game::~ui_menu_select_game()
 {
 	global_free(drivlist);
+	global_free(driverlist);
 }
 
 /*-------------------------------------------------

@@ -121,10 +121,12 @@ protected:
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
 	const input_seq &get_field_default_seq(input_field_config *field, input_seq_type seqtype);
 
-private:
-	UINT16				last_sortorder;
+protected:
 	const void *		pollingref;
 	input_item_data *	pollingitem;
+
+private:
+	UINT16				last_sortorder;
 	bool				record_next;
 	input_seq			starting_seq;
 
@@ -355,8 +357,7 @@ private:
 	int					matchlist[VISIBLE_GAMES_IN_LIST];
 	const game_driver	**driverlist;
 
-	// Still a hack, but a vaguely clearner one
-	static driver_enumerator *drivlist;
+	driver_enumerator *drivlist;
 
 	void build_driver_list();
 };

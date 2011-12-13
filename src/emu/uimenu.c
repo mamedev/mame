@@ -261,7 +261,7 @@ void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, v
 		item[index + 1] = item[index];
 	}
 
-	/* allocate a new item and populte it */
+	/* allocate a new item and populate it */
 	pitem = &item[index];
 	pitem->text = (text != NULL) ? pool_strdup(text) : NULL;
 	pitem->subtext = (subtext != NULL) ? pool_strdup(subtext) : NULL;
