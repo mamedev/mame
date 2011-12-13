@@ -1126,7 +1126,7 @@ void ui_menu_mess_tape_control::populate()
 			flags |= MENU_FLAG_RIGHT_ARROW;
 	}
 
-	if (device->exists())
+	if ((device != NULL) && (device->exists()))
 	{
 		double t0, t1;
 		UINT32 tapeflags = 0;
@@ -1190,7 +1190,6 @@ void ui_menu_mess_tape_control::populate()
 
 void ui_menu_mess_bitbanger_control::populate()
 {
-	bitbanger_device *bitbanger = downcast<bitbanger_device *>(&device->device());
 	int count = bitbanger_count();
 	UINT32 flags = 0, mode_flags = 0, baud_flags = 0, tune_flags = 0;
 
@@ -1202,27 +1201,28 @@ void ui_menu_mess_bitbanger_control::populate()
 			flags |= MENU_FLAG_RIGHT_ARROW;
 	}
 
-   if (bitbanger->inc_mode(TRUE))
-      mode_flags |= MENU_FLAG_RIGHT_ARROW;
-
-   if (bitbanger->dec_mode(TRUE))
-      mode_flags |= MENU_FLAG_LEFT_ARROW;
-
-   if (bitbanger->inc_baud(TRUE))
-      baud_flags |= MENU_FLAG_RIGHT_ARROW;
-
-   if (bitbanger->dec_baud(TRUE))
-      baud_flags |= MENU_FLAG_LEFT_ARROW;
-
-   if (bitbanger->inc_tune(TRUE))
-      tune_flags |= MENU_FLAG_RIGHT_ARROW;
-
-   if (bitbanger->dec_tune(TRUE))
-      tune_flags |= MENU_FLAG_LEFT_ARROW;
-
-
-	if (device->exists())
+	if ((device != NULL) && (device->exists()))
 	{
+		bitbanger_device *bitbanger = downcast<bitbanger_device *>(&device->device());
+
+		if (bitbanger->inc_mode(TRUE))
+		  mode_flags |= MENU_FLAG_RIGHT_ARROW;
+
+		if (bitbanger->dec_mode(TRUE))
+		  mode_flags |= MENU_FLAG_LEFT_ARROW;
+
+		if (bitbanger->inc_baud(TRUE))
+		  baud_flags |= MENU_FLAG_RIGHT_ARROW;
+
+		if (bitbanger->dec_baud(TRUE))
+		  baud_flags |= MENU_FLAG_LEFT_ARROW;
+
+		if (bitbanger->inc_tune(TRUE))
+		  tune_flags |= MENU_FLAG_RIGHT_ARROW;
+
+		if (bitbanger->dec_tune(TRUE))
+		  tune_flags |= MENU_FLAG_LEFT_ARROW;
+
 		/* name of bitbanger file */
 		item_append(device->device().name(), device->filename(), flags, BITBANGERCMD_SELECT);
 		item_append("Device Mode:", bitbanger->mode_string(), mode_flags, BITBANGERCMD_MODE);
