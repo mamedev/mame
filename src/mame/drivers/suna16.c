@@ -24,7 +24,6 @@ Year + Game                 By      Board      Hardware
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "sound/ay8910.h"
@@ -740,13 +739,16 @@ GFXDECODE_END
                             Back Street Soccer
 ***************************************************************************/
 
-static INTERRUPT_GEN( bssoccer_interrupt )
+static TIMER_DEVICE_CALLBACK( bssoccer_interrupt )
 {
-	switch (cpu_getiloops(device))
-	{
-		case 0: 	device_set_input_line(device, 1, HOLD_LINE);	break;
-		case 1: 	device_set_input_line(device, 2, HOLD_LINE);	break;
-	}
+	suna16_state *state = timer.machine().driver_data<suna16_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+
+	if(scanline == 0)
+	 	device_set_input_line(state->m_maincpu, 2, HOLD_LINE); // does RAM to sprite buffer copy here
 }
 
 static MACHINE_CONFIG_START( bssoccer, suna16_state )
@@ -754,7 +756,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_map)
-	MCFG_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", bssoccer_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)		/* Z80B */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_sound_map)
@@ -939,7 +941,7 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/4)
 	MCFG_CPU_PROGRAM_MAP(bestbest_map)
-	MCFG_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", bssoccer_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 24000000/4)
 	MCFG_CPU_PROGRAM_MAP(bestbest_sound_map)

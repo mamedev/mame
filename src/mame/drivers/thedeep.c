@@ -27,7 +27,6 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "includes/thedeep.h"
 #include "sound/2203intf.h"
 
@@ -323,14 +322,16 @@ static const ym2203_interface thedeep_ym2203_intf =
 	irqhandler
 };
 
-static INTERRUPT_GEN( thedeep_interrupt )
+static TIMER_DEVICE_CALLBACK( thedeep_interrupt )
 {
-	thedeep_state *state = device->machine().driver_data<thedeep_state>();
-	if (cpu_getiloops(device))
+	thedeep_state *state = timer.machine().driver_data<thedeep_state>();
+	int scanline = param;
+
+	if (scanline == 124) // TODO: clean this
 	{
 		if (state->m_protection_command != 0x59)
 		{
-			int coins = input_port_read(device->machine(), "MCU");
+			int coins = input_port_read(timer.machine(), "MCU");
 			if		(coins & 1)	state->m_protection_data = 1;
 			else if	(coins & 2)	state->m_protection_data = 2;
 			else if	(coins & 4)	state->m_protection_data = 3;
@@ -340,14 +341,14 @@ static INTERRUPT_GEN( thedeep_interrupt )
 				state->m_protection_irq = 1;
 		}
 		if (state->m_protection_irq)
-			device_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 	}
-	else
+	else if(scanline == 0)
 	{
 		if (state->m_nmi_enable)
 		{
-			device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-			device_set_input_line(device, INPUT_LINE_NMI, CLEAR_LINE);
+			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 		}
 	}
 }
@@ -357,7 +358,7 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(thedeep_interrupt,2)	/* IRQ by MCU, NMI by vblank (maskable) */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", thedeep_interrupt, "screen", 0, 1) /* IRQ by MCU, NMI by vblank (maskable) */
 
 	MCFG_CPU_ADD("audiocpu", M65C02, XTAL_12MHz/8)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
