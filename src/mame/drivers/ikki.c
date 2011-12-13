@@ -8,6 +8,7 @@ Ikki (c) 1985 Sun Electronics
 
 TODO:
 - understand proper CPU communications and irq firing;
+- timings
 
 *****************************************************************************/
 
@@ -229,13 +230,16 @@ static TIMER_DEVICE_CALLBACK( ikki_irq )
 	ikki_state *state = timer.machine().driver_data<ikki_state>();
 	int scanline = param;
 
-	if(scanline == 240 || scanline == 0)
+	if(scanline == 240 || scanline == 120) // TODO: where non-timer IRQ happens?
 	{
 		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
 
 		state->m_irq_source = (scanline != 240);
 	}
 }
+
+
+
 
 static MACHINE_CONFIG_START( ikki, ikki_state )
 
@@ -255,6 +259,7 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+//	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

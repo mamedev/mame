@@ -323,7 +323,7 @@ static TIMER_DEVICE_CALLBACK( strnskil_irq )
 	strnskil_state *state = timer.machine().driver_data<strnskil_state>();
 	int scanline = param;
 
-	if(scanline == 240 || scanline == 0)
+	if(scanline == 240 || scanline == 96)
 	{
 		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
 
