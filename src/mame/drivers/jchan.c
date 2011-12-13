@@ -169,7 +169,6 @@ there are 9 PALS on the pcb (not dumped)
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
 #include "includes/kaneko16.h"
@@ -179,7 +178,10 @@ class jchan_state : public kaneko16_state
 {
 public:
 	jchan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag) { }
+		: kaneko16_state(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_subcpu(*this,"sub")
+		{ }
 
 	bitmap_t *m_sprite_bitmap_1;
 	bitmap_t *m_sprite_bitmap_2;
@@ -198,6 +200,8 @@ public:
 	UINT16 m_mcu_com[4];
 	UINT16 *m_ctrl;
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	sknsspr_device* m_spritegen1;
 	sknsspr_device* m_spritegen2;
 };
@@ -297,41 +301,27 @@ static READ16_HANDLER( jchan_mcu_status_r )
 //  if it is incorrect jchan2 will crash when
 //  certain characters win/lose but no finish
 //  move was performed
-static INTERRUPT_GEN( jchan_vblank )
+static TIMER_DEVICE_CALLBACK( jchan_vblank )
 {
-	jchan_state *state = device->machine().driver_data<jchan_state>();
-	int i = cpu_getiloops(device);
-	switch (i)
-	{
+	jchan_state *state = timer.machine().driver_data<jchan_state>();
+	int scanline = param;
 
-		case 0:
-			device_set_input_line(device, 1, HOLD_LINE);
-			break;
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
 
-		case 100:
-			device_set_input_line(device, 2, HOLD_LINE);
-			break;
-
-	}
+	if(scanline == 11)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 
 	if (state->m_irq_sub_enable)
 	{
-		switch (i)
-		{
+		if(scanline == 240)
+			device_set_input_line(state->m_subcpu, 1, HOLD_LINE);
 
-			case 0:
-				cputag_set_input_line(device->machine(), "sub", 1, HOLD_LINE);
-				break;
+		if(scanline == 249)
+			device_set_input_line(state->m_subcpu, 2, HOLD_LINE);
 
-			case 220:
-				cputag_set_input_line(device->machine(), "sub", 2, HOLD_LINE);
-				break;
-
-			case 100:
-				cputag_set_input_line(device->machine(), "sub", 3, HOLD_LINE);
-				break;
-
-		}
+		if(scanline == 11)
+			device_set_input_line(state->m_subcpu, 3, HOLD_LINE);
 	}
 }
 
@@ -668,7 +658,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_main)
-	MCFG_CPU_VBLANK_INT_HACK(jchan_vblank, 224)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", jchan_vblank, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_sub)

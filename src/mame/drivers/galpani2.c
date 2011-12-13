@@ -22,7 +22,6 @@ To Do:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/kaneko16.h"
 #include "includes/galpani2.h"
@@ -554,28 +553,39 @@ GFXDECODE_END
 
 
 /* CPU#1 Interrups , lev 3,4 & 5 are tested on power up. The rest is rte, but lev 6 */
-#define GALPANI2_INTERRUPTS_NUM	4
-static INTERRUPT_GEN( galpani2_interrupt1 )
+static TIMER_DEVICE_CALLBACK( galpani2_interrupt1 )
 {
-	switch ( cpu_getiloops(device) )
+	galpani2_state *state = timer.machine().driver_data<galpani2_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		 device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+
+	/* MCU related? */
+	if(scanline == 128)
 	{
-		case 3:  device_set_input_line(device, 3, HOLD_LINE); break;
-		case 2:  device_set_input_line(device, 4, HOLD_LINE); break;
-		case 1:  device_set_input_line(device, 5, HOLD_LINE); break;	// vblank?
-		case 0:  device_set_input_line(device, 6, HOLD_LINE); break;	// hblank?
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 	}
+
+	if(scanline == 0)
+		 device_set_input_line(state->m_maincpu, 6, HOLD_LINE); // hblank?
 }
 
-/* CPU#2 Interrups , lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
-#define GALPANI2_INTERRUPTS_NUM2	3
-static INTERRUPT_GEN( galpani2_interrupt2 )
+/* CPU#2 interrupts, lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
+static TIMER_DEVICE_CALLBACK( galpani2_interrupt2 )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 2:  device_set_input_line(device, 3, HOLD_LINE); break;
-		case 1:  device_set_input_line(device, 4, HOLD_LINE); break;
-		case 0:  device_set_input_line(device, 5, HOLD_LINE); break;
-	}
+	galpani2_state *state = timer.machine().driver_data<galpani2_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		device_set_input_line(state->m_subcpu, 5, HOLD_LINE);
+
+	if(scanline == 128)
+		device_set_input_line(state->m_subcpu, 4, HOLD_LINE);
+
+	if(scanline == 0)
+		device_set_input_line(state->m_subcpu, 3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( galpani2, galpani2_state )
@@ -583,12 +593,12 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_27MHz/2)		/* Confirmed on galpani2i PCB */
 	MCFG_CPU_PROGRAM_MAP(galpani2_mem1)
-	MCFG_CPU_VBLANK_INT_HACK(galpani2_interrupt1,GALPANI2_INTERRUPTS_NUM)
+	MCFG_TIMER_ADD_SCANLINE("m_scantimer", galpani2_interrupt1, "screen", 0, 1)
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("sub", M68000, XTAL_27MHz/2)			/* Confirmed on galpani2i PCB */
 	MCFG_CPU_PROGRAM_MAP(galpani2_mem2)
-	MCFG_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
+	MCFG_TIMER_ADD_SCANLINE("s_scantimer", galpani2_interrupt2, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(galpani2)
 	MCFG_EEPROM_93C46_ADD("eeprom")

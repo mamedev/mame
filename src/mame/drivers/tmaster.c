@@ -103,7 +103,6 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 #include "machine/microtch.h"
@@ -121,7 +120,9 @@ class tmaster_state : public driver_device
 {
 public:
 	tmaster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];
@@ -138,6 +139,8 @@ public:
 	UINT8 m_palette_index;
 	UINT8 m_palette_data[3];
 	device_t *m_duart68681;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -876,14 +879,17 @@ static MACHINE_RESET( tmaster )
 	state->m_duart68681 = machine.device( "duart68681" );
 }
 
-static INTERRUPT_GEN( tm3k_interrupt )
+static TIMER_DEVICE_CALLBACK( tm3k_interrupt )
 {
-	switch (cpu_getiloops(device))
-	{
-		case 0:		device_set_input_line(device, 2, HOLD_LINE);	break;
-		case 1:		device_set_input_line(device, 3, HOLD_LINE);	break;
-		default:	device_set_input_line(device, 1, HOLD_LINE);	break;
-	}
+	tmaster_state *state = timer.machine().driver_data<tmaster_state>();
+	int scanline = param;
+
+	if(scanline == 0) // vblank, FIXME
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+	else if((scanline % 16) == 0)
+		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+
+	// lev 2 triggered at the end of the blit
 }
 
 static const duart68681_config tmaster_duart68681_config =
@@ -898,7 +904,7 @@ static const duart68681_config tmaster_duart68681_config =
 static MACHINE_CONFIG_START( tm3k, tmaster_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
-	MCFG_CPU_VBLANK_INT_HACK(tm3k_interrupt,2+20) // ??
+	MCFG_TIMER_ADD_SCANLINE("scantimer", tm3k_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START(tmaster)
 	MCFG_MACHINE_RESET(tmaster)
@@ -932,17 +938,6 @@ static MACHINE_CONFIG_DERIVED( tm, tm3k )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-
-static INTERRUPT_GEN( galgames_interrupt )
-{
-	switch (cpu_getiloops(device))
-	{
-		case 0:		device_set_input_line(device, 3, HOLD_LINE);	break;
-					// lev 2 triggered at the end of a blit
-		default:	device_set_input_line(device, 1, HOLD_LINE);	break;
-	}
-}
-
 static MACHINE_RESET( galgames )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
@@ -965,7 +960,7 @@ static MACHINE_RESET( galgames )
 static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(galgames_map)
-	MCFG_CPU_VBLANK_INT_HACK(galgames_interrupt, 1+20)	// ??
+	MCFG_TIMER_ADD_SCANLINE("scantimer", tm3k_interrupt, "screen", 0, 1)
 
 	// 5 EEPROMs on the motherboard (for BIOS + 4 Carts)
 	MCFG_EEPROM_ADD(GALGAMES_EEPROM_BIOS,  galgames_eeprom_interface)

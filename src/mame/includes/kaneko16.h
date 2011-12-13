@@ -72,7 +72,9 @@ class kaneko16_state : public driver_device
 {
 public:
 	kaneko16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT16 *m_mcu_ram;
 	UINT8 m_nvram_save[128];
@@ -104,6 +106,8 @@ public:
 	int m_keep_sprites;
 	bitmap_t *m_bg15_bitmap;
 	bitmap_t *m_sprites_bitmap;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

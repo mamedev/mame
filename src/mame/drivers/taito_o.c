@@ -29,7 +29,6 @@ TODO:
 *****************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
@@ -101,9 +100,7 @@ static INPUT_PORTS_START( parentj )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Y) PORT_NAME("Opto 2L")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_I) PORT_NAME("All Clear")
 
-	PORT_DIPNAME(0x0010,  0x10, "Test Mode") /* sometimes */
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE(0x0010, IP_ACTIVE_LOW )
 	PORT_DIPNAME(0x0020,  0x20, "IN1 5")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -214,10 +211,17 @@ static GFXDECODE_START( parentj )
 	GFXDECODE_ENTRY( "gfx1", 0, parentj_layout,  0x0, 0x400/16  )
 GFXDECODE_END
 
-
-static INTERRUPT_GEN( parentj_interrupt )
+/* unknown sources ... */
+static TIMER_DEVICE_CALLBACK( parentj_interrupt )
 {
-	device_set_input_line(device, cpu_getiloops(device) ? 4 : 5, HOLD_LINE);
+	taitoo_state *state = timer.machine().driver_data<taitoo_state>();
+	int scanline = param;
+
+	if(scanline == 448)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -250,7 +254,7 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 
 	MCFG_CPU_ADD("maincpu", M68000,12000000 )		/*?? MHz */
 	MCFG_CPU_PROGRAM_MAP(parentj_map)
-	MCFG_CPU_VBLANK_INT_HACK(parentj_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", parentj_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START(taitoo)
 

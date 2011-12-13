@@ -86,7 +86,6 @@ Dip locations verified from manual for:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/kaneko16.h"
 #include "sound/2203intf.h"
@@ -1753,15 +1752,33 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-#define KANEKO16_INTERRUPTS_NUM	3
-static INTERRUPT_GEN( kaneko16_interrupt )
+/*
+	TODO:
+	Fix this arrangement (specific for Bonk's Adventure)!
+
+	pre-deprecat lib note says:
+    Even though 3 interrupts are triggered, I set an int_num of 4. (notice '+1')
+    I agree that it is kind of a misuse of the function, but I haven't found
+    clues in code on how interrupts are scheduled...
+    IT5 is the main int, and needs more time to execute than IT 3 and 4.
+    Between other things, each of these 2 int are responsible of translating
+    a part of sprite buffer from work ram to sprite ram.
+    So now test mode is fully working and visible.
+    SebV
+*/
+static TIMER_DEVICE_CALLBACK( kaneko16_interrupt )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 2:  device_set_input_line(device, 3, HOLD_LINE); break;
-		case 1:  device_set_input_line(device, 4, HOLD_LINE); break;
-		case 0:  device_set_input_line(device, 5, HOLD_LINE); break;
-	}
+	kaneko16_state *state = timer.machine().driver_data<kaneko16_state>();
+	int scanline = param;
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+
+	if(scanline == 180)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+
+	if(scanline == 120)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 }
 
 static const ay8910_interface ay8910_intf_dsw =
@@ -1812,7 +1829,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12 */
 	MCFG_CPU_PROGRAM_MAP(berlwall)
-	MCFG_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(berlwall)
 
@@ -1858,7 +1875,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(bakubrkr)
-	MCFG_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(bakubrkr)
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -1913,7 +1930,7 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000-12 */
 	MCFG_CPU_PROGRAM_MAP(blazeon)
-	MCFG_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* D780C-2 */
 	MCFG_CPU_PROGRAM_MAP(blazeon_soundmem)
@@ -1964,9 +1981,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( gtmr, kaneko16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("gtmr", M68000, XTAL_16MHz)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gtmr_map)
-	MCFG_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(gtmr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -2004,7 +2021,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bloodwar, gtmr )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("gtmr")
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bloodwar)
 
 	MCFG_MACHINE_RESET( bloodwar )
@@ -2017,7 +2034,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gtmr2, gtmr )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("gtmr")
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gtmr2_map)
 MACHINE_CONFIG_END
 
@@ -2025,22 +2042,11 @@ MACHINE_CONFIG_END
                             Bonk's Adventure
 ***************************************************************************/
 
-/*
-    Even though 3 interrupts are triggered, I set an int_num of 4. (notice '+1')
-    I agree that it is kind of a misuse of the function, but I haven't found
-    clues in code on how interrupts are scheduled...
-    IT5 is the main int, and needs more time to execute than IT 3 and 4.
-    Between other things, each of these 2 int are responsible of translating
-    a part of sprite buffer from work ram to sprite ram.
-    So now test mode is fully working and visible.
-    SebV
-*/
 static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("gtmr")
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bonkadv)
-	MCFG_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM + 1 ) // comment above
 
 	MCFG_MACHINE_RESET( bonkadv )
 MACHINE_CONFIG_END
@@ -2054,7 +2060,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mgcrystl)
-	MCFG_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(mgcrystl)
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -2108,31 +2114,32 @@ MACHINE_CONFIG_END
     other: busy loop
 */
 
-#define SHOGWARR_INTERRUPTS_NUM	3
-static INTERRUPT_GEN( shogwarr_interrupt )
+static TIMER_DEVICE_CALLBACK( shogwarr_interrupt )
 {
-	//kaneko16_state *state = device->machine().driver_data<kaneko16_state>();
-	switch ( cpu_getiloops(device) )
+	kaneko16_state *state = timer.machine().driver_data<kaneko16_state>();
+	int scanline = param;
+
+	if(scanline == 240)
 	{
-		case 2:  device_set_input_line(device, 2, HOLD_LINE); break;
-		case 1:  device_set_input_line(device, 3, HOLD_LINE); break;
-
-		// the code for this interrupt is provided by the MCU..
-		case 0:  device_set_input_line(device, 4, HOLD_LINE);
-
-				calc3_mcu_run(device->machine());
-		break;
-#if 0
-		case 0:
-		{
-			// hack, clear this ram address to get into test mode (interrupt would clear it)
-			if (state->mainram[0x2dfe/2]==0xff00)
-			{
-				state->mainram[0x2dfe/2]=0x0000;
-			}
-	        }
-#endif
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		calc3_mcu_run(timer.machine());
 	}
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+
+	if(scanline == 128)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+
+#if 0
+	{
+			// hack, clear this ram address to get into test mode (interrupt would clear it)
+		if (state->mainram[0x2dfe/2]==0xff00)
+		{
+			state->mainram[0x2dfe/2]=0x0000;
+		}
+	}
+#endif
 }
 
 /*
@@ -2174,7 +2181,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(shogwarr)
-	MCFG_CPU_VBLANK_INT_HACK(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", shogwarr_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(shogwarr)
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -2698,7 +2705,7 @@ of214e0220.u26 - 27C080
 ***************************************************************************/
 
 ROM_START( bloodwar )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "ofp0f3.514", 0x000000, 0x080000, CRC(0c93da15) SHA1(65b6b1b4acfc32c551ae4fbe6a13f7f2b8554dbf) )
 	ROM_LOAD16_BYTE( "ofp1f3.513", 0x000001, 0x080000, CRC(894ecbe5) SHA1(bf403d19e6315266114ac742a08cac903e7b54b5) )
 
@@ -2743,7 +2750,7 @@ ROM_START( bloodwar )
 ROM_END
 
 ROM_START( oedfight )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "ofp0j3.514", 0x000000, 0x080000, CRC(0c93da15) SHA1(65b6b1b4acfc32c551ae4fbe6a13f7f2b8554dbf) )
 	ROM_LOAD16_BYTE( "ofp1j3.513", 0x000001, 0x080000, CRC(cc59de49) SHA1(48ff4ed40ad22768054a59bdf5ce0e00891d8f0e) )
 
@@ -2898,7 +2905,7 @@ f1: 10F6
     master up= 94/07/18 15:12:35            */
 
 ROM_START( gtmr )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "u2.bin", 0x000000, 0x080000, CRC(031799f7) SHA1(a59a9635002d139247828e3b74f6cf2fbdd5e569) )
 	ROM_LOAD16_BYTE( "u1.bin", 0x000001, 0x080000, CRC(6238790a) SHA1(a137fd581138804534f3193068f117611a982004) )
 
@@ -2927,7 +2934,7 @@ ROM_START( gtmr )
 ROM_END
 
 ROM_START( gtmra )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "mmp0x2.u514.bin", 0x000000, 0x080000, CRC(ba4a77c8) SHA1(efb6ae0e7aa71ab0c5f486f799bf31edcec24e2b) )
 	ROM_LOAD16_BYTE( "mmp1x2.u513.bin", 0x000001, 0x080000, CRC(a2b9034e) SHA1(466bcb1bf7124eb15d23b25c4e1307b9706474ec) )
 
@@ -2963,7 +2970,7 @@ ROM_END
     master up= 94/09/06 14:49:19            */
 
 ROM_START( gtmre )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "gmmu2.bin", 0x000000, 0x080000, CRC(36dc4aa9) SHA1(0aea4dc169d7aad2ea957a1de698d1fa12c71556) )
 	ROM_LOAD16_BYTE( "gmmu1.bin", 0x000001, 0x080000, CRC(8653c144) SHA1(a253a01327a9443337a55a13c063ea5096444c4c) )
 
@@ -3002,7 +3009,7 @@ ROM_END
     master up= 94/09/06 20:30:39            */
 
 ROM_START( gtmrusa )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "gtmrusa.u2", 0x000000, 0x080000, CRC(5be615c4) SHA1(c14d11a5bf6e025a65b932039165302ff407c4e1) )
 	ROM_LOAD16_BYTE( "gtmrusa.u1", 0x000001, 0x080000, CRC(ae853e4e) SHA1(31eaa73b0c5ddab1292f521ceec43b202653efe9) )
 
@@ -3191,7 +3198,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( gtmr2 )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "m2p0x1a.u8",  0x000000, 0x080000, CRC(c29039fb) SHA1(a16e8863608353c2931e9d45359fbcec8f11ef9d) )
 	ROM_LOAD16_BYTE( "m2p1x1a.u7",  0x000001, 0x080000, CRC(8ef392c4) SHA1(06bd720d931911e32264183dd215ab70ad6d2961) )
 
@@ -3222,7 +3229,7 @@ ROM_START( gtmr2 )
 ROM_END
 
 ROM_START( gtmr2a )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "m2p0x1.u8",  0x000000, 0x080000, CRC(525f6618) SHA1(da8008cc7768b4e8c0091aa3ea21752d0ca33691) )
 	ROM_LOAD16_BYTE( "m2p1x1.u7",  0x000001, 0x080000, CRC(914683e5) SHA1(dbb2140f7de86073647abc6e73ba739ea201dd30) )
 
@@ -3253,7 +3260,7 @@ ROM_START( gtmr2a )
 ROM_END
 
 ROM_START( gtmr2u )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "m2p0a1.u8",  0x000000, 0x080000, CRC(813e1d5e) SHA1(602df02933dc7b77be311113af1d1edad2751cc9) )
 	ROM_LOAD16_BYTE( "m2p1a1.u7",  0x000001, 0x080000, CRC(bee63666) SHA1(07585a63f901f50f2a2314eb4dc4307e7028ded7) )
 
@@ -3877,7 +3884,7 @@ Notes:
 **********************************************************************/
 
 ROM_START( bonkadv )
-	ROM_REGION( 0x100000, "gtmr", 0 )			/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "prg.8",        0x000000, 0x080000, CRC(af2e60f8) SHA1(406f79e155d1244b84f8c89c25b37188e1b4f4a6) )
 	ROM_LOAD16_BYTE( "prg.7",        0x000001, 0x080000, CRC(a1cc6a78) SHA1(a9cea21a6a0dfd3b0952664681c057190aa27f8c) )
 

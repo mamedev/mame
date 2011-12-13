@@ -63,7 +63,6 @@ Dumped by Uki
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/ymz280b.h"
 #include "includes/kaneko16.h"
 #include "video/sknsspr.h"
@@ -72,7 +71,9 @@ class galpani3_state : public kaneko16_state
 {
 public:
 	galpani3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag) { }
+		: kaneko16_state(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT16* m_priority_buffer;
 	UINT16* m_framebuffer1;
@@ -115,6 +116,7 @@ public:
 	UINT16 m_regs2_address_regs[0x20];
 	UINT16 m_regs3_address_regs[0x20];
 
+	required_device<cpu_device> m_maincpu;
 	sknsspr_device* m_spritegen;
 };
 
@@ -129,14 +131,19 @@ public:
 
 
 
-static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
+static TIMER_DEVICE_CALLBACK( galpani3_vblank ) // 2, 3, 5 ?
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 2:  device_set_input_line(device, 2, HOLD_LINE); break;
-		case 1:  device_set_input_line(device, 3, HOLD_LINE); break;
-		case 0:  device_set_input_line(device, 5, HOLD_LINE); break; // sound?
-	}
+	galpani3_state *state = timer.machine().driver_data<galpani3_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+
+	if(scanline == 128)
+		device_set_input_line(state->m_maincpu, 5, HOLD_LINE); // timer, related to sound chip?
 }
 
 
@@ -948,8 +955,7 @@ static const ymz280b_interface ymz280b_intf =
 static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28_63636MHz/2)	// Confirmed from PCB
 	MCFG_CPU_PROGRAM_MAP(galpani3_map)
-	MCFG_CPU_VBLANK_INT_HACK(galpani3_vblank, 3)
-
+	MCFG_TIMER_ADD_SCANLINE("scantimer", galpani3_vblank, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
