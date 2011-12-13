@@ -2,13 +2,17 @@ class srumbler_state : public driver_device
 {
 public:
 	srumbler_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT8 *m_backgroundram;
 	UINT8 *m_foregroundram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	int m_scroll[4];
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

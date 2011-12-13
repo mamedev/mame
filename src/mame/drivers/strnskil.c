@@ -19,7 +19,6 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mb88xx/mb88xx.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "includes/strnskil.h"
 
@@ -27,10 +26,11 @@ Notes:
 
 static READ8_HANDLER( strnskil_d800_r )
 {
-    /* bit0: interrupt type?, bit1: CPU2 busack? */
-	if (cpu_getiloops(&space->device()) == 0)
-		return 0;
-	return 1;
+	strnskil_state *state = space->machine().driver_data<strnskil_state>();
+
+/* bit0: interrupt type?, bit1: CPU2 busack? */
+
+	return (state->m_irq_source);
 }
 
 /****************************************************************************/
@@ -318,17 +318,32 @@ static GFXDECODE_START( strnskil )
 GFXDECODE_END
 
 
+static TIMER_DEVICE_CALLBACK( strnskil_irq )
+{
+	strnskil_state *state = timer.machine().driver_data<strnskil_state>();
+	int scanline = param;
+
+	if(scanline == 240 || scanline == 0)
+	{
+		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
+
+		state->m_irq_source = (scanline != 240);
+	}
+}
+
+
 static MACHINE_CONFIG_START( strnskil, strnskil_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(strnskil_map1)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", strnskil_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(strnskil_map2)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
+//	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
@@ -336,7 +351,7 @@ static MACHINE_CONFIG_START( strnskil, strnskil_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_SIZE(32*8+3*8, 32*8+3*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE(strnskil)
 

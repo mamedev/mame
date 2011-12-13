@@ -101,7 +101,6 @@ DSW2 stored @ $f237
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/ay8910.h"
@@ -1022,22 +1021,24 @@ static INTERRUPT_GEN( vblank_irq )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INTERRUPT_GEN( sqix_timer_irq )
+static TIMER_DEVICE_CALLBACK( sqix_timer_irq )
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
+	superqix_state *state = timer.machine().driver_data<superqix_state>();
+	int scanline = param;
 
 	/* highly suspicious... */
-	if (cpu_getiloops(device) <= 3 && state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	if (((scanline % 64) == 0) && state->m_nmi_mask)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( sqixbl_timer_irq )
+static TIMER_DEVICE_CALLBACK( sqixbl_timer_irq )
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
+	superqix_state *state = timer.machine().driver_data<superqix_state>();
+	int scanline = param;
 
 	/* highly suspicious... */
-	if (cpu_getiloops(device) <= 3 && state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (((scanline % 64) == 0) && state->m_nmi_mask)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1117,7 +1118,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sqix_port_map)
-	MCFG_CPU_VBLANK_INT_HACK(sqix_timer_irq,6)	/* ??? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sqix_timer_irq, "screen", 0, 1) /* ??? */
 
 	MCFG_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
 	MCFG_CPU_IO_MAP(bootleg_mcu_io_map)
@@ -1166,7 +1167,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(bootleg_port_map)
-	MCFG_CPU_VBLANK_INT_HACK(sqixbl_timer_irq,6)	/* ??? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sqixbl_timer_irq, "screen", 0, 1) /* ??? */
 
 	MCFG_MACHINE_START(superqix)
 

@@ -2,7 +2,9 @@ class superqix_state : public driver_device
 {
 public:
 	superqix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	INT16 *m_samplebuf;
 	UINT8 m_port1;
@@ -31,6 +33,8 @@ public:
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
 	UINT8 m_nmi_mask;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 

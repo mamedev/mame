@@ -91,7 +91,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"
@@ -103,7 +102,9 @@ class royalmah_state : public driver_device
 {
 public:
 	royalmah_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT8 *m_videoram;
 	UINT8 m_input_port_select;
@@ -120,6 +121,8 @@ public:
 	UINT8 m_gfxdata1;
 	UINT8 m_jansou_colortable[16];
 	UINT8 m_mjifb_rom_enable;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -603,7 +606,7 @@ static ADDRESS_MAP_START( mjapinky_iomap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( janho_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( janoh_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, m_videoram)
@@ -752,7 +755,7 @@ ADDRESS_MAP_END
 ****************************************************************************/
 
 static ADDRESS_MAP_START( janptr96_map, AS_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x5fff) AM_ROM
+	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK("bank3") AM_SHARE("nvram")	// nvram
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK("bank2")	// banked nvram
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
@@ -3201,7 +3204,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( janoh, royalmah )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(janho_map)
+	MCFG_CPU_PROGRAM_MAP(janoh_map)
 
 	MCFG_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(janoh_sub_map)
@@ -3296,21 +3299,28 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 MACHINE_CONFIG_END
 
 /* It runs in IM 2, thus needs a vector on the data bus */
-static INTERRUPT_GEN( janptr96_interrupt )
+static TIMER_DEVICE_CALLBACK( janptr96_interrupt )
 {
-	switch(cpu_getiloops(device))
-	{
-		case 0:		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x80);	break;	// vblank
-		case 1:		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x82);	break;	// rtc
-		default:	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x84);			// demo
-	}
+	royalmah_state *state = timer.machine().driver_data<royalmah_state>();
+	int scanline = param;
+
+	if(scanline == 248)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x80);	// vblank
+
+	if(scanline == 128)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x82);	// rtc
+
+	if(scanline == 0)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x84);	// demo
 }
 
 static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
-	MCFG_CPU_REPLACE("maincpu",Z80,XTAL_16MHz/2)	/* 8 MHz? */
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu",Z80,XTAL_16MHz/2)	/* 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(janptr96_map)
 	MCFG_CPU_IO_MAP(janptr96_iomap)
-	MCFG_CPU_VBLANK_INT_HACK(janptr96_interrupt,3)	/* IM 2 needs a vector on the data bus */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", janptr96_interrupt, "screen", 0, 1)	/* IM 2 needs a vector on the data bus */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
@@ -3342,20 +3352,24 @@ static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 MACHINE_CONFIG_END
 
 
-static INTERRUPT_GEN( mjtensin_interrupt )
+static TIMER_DEVICE_CALLBACK( mjtensin_interrupt )
 {
-	switch(cpu_getiloops(device))
-	{
-		case 0:		device_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;	// vblank
-		case 1:		device_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;	// rtc
-	}
+	royalmah_state *state = timer.machine().driver_data<royalmah_state>();
+	int scanline = param;
+
+	if(scanline == 248)
+		device_set_input_line(state->m_maincpu, 0, INPUT_LINE_IRQ0);	// vblank
+
+	if(scanline == 128)
+		device_set_input_line(state->m_maincpu, 0, INPUT_LINE_IRQ1);	// rtc
 }
+
 
 static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
 	MCFG_CPU_IO_MAP(mjtensin_iomap)
-	MCFG_CPU_VBLANK_INT_HACK( mjtensin_interrupt,2 )
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mjtensin_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3368,7 +3382,7 @@ static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(cafetime_map)
 	MCFG_CPU_IO_MAP(cafetime_iomap)
-	MCFG_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mjtensin_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3381,7 +3395,7 @@ static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(mjvegasa_map)
 	MCFG_CPU_IO_MAP(mjvegasa_iomap)
-	MCFG_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", mjtensin_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)

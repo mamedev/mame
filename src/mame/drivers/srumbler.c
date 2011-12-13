@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "includes/srumbler.h"
@@ -44,19 +43,23 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 	}
 }
 
-static MACHINE_RESET( srumbler )
+static MACHINE_START( srumbler )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* initialize banked ROM pointers */
 	srumbler_bankswitch_w(space,0,0);
 }
 
-static INTERRUPT_GEN( srumbler_interrupt )
+static TIMER_DEVICE_CALLBACK( srumbler_interrupt )
 {
-	if (cpu_getiloops(device)==0)
-		device_set_input_line(device,0,HOLD_LINE);
-	else
-		device_set_input_line(device,M6809_FIRQ_LINE,HOLD_LINE);
+	srumbler_state *state = timer.machine().driver_data<srumbler_state>();
+	int scanline = param;
+
+	if (scanline == 248)
+		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
+
+	if (scanline == 0)
+		device_set_input_line(state->m_maincpu,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 /*
@@ -236,13 +239,13 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(srumbler_map)
-	MCFG_CPU_VBLANK_INT_HACK(srumbler_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", srumbler_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)        /* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(srumbler_sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
-	MCFG_MACHINE_RESET(srumbler)
+	MCFG_MACHINE_START(srumbler)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

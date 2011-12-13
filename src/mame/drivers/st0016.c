@@ -11,14 +11,12 @@ Dips verified for Neratte Chu (nratechu) from manual
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
 #include "includes/st0016.h"
 
 
 
-static int mux_port;
 UINT32 st0016_rom_bank;
 
 /*************************************
@@ -47,8 +45,10 @@ static READ8_HANDLER(mux_r)
         xxxx - input port #2
     xxxx     - dip switches (2x8 bits) (multiplexed)
 */
+	st0016_state *state = space->machine().driver_data<st0016_state>();
 	int retval = input_port_read(space->machine(), "SYSTEM") & 0x0f;
-	switch(mux_port & 0x30)
+
+	switch(state->mux_port & 0x30)
 	{
 		case 0x00: retval |= ((input_port_read(space->machine(), "DSW1") & 1) << 4) | ((input_port_read(space->machine(), "DSW1") & 0x10) << 1)
 								| ((input_port_read(space->machine(), "DSW2") & 1) << 6) | ((input_port_read(space->machine(), "DSW2") & 0x10) <<3); break;
@@ -59,12 +59,15 @@ static READ8_HANDLER(mux_r)
 		case 0x30: retval |= ((input_port_read(space->machine(), "DSW1") & 8) << 1) | ((input_port_read(space->machine(), "DSW1") & 0x80) >> 2)
 								| ((input_port_read(space->machine(), "DSW2") & 8) << 3) | ((input_port_read(space->machine(), "DSW2") & 0x80)    ); break;
 	}
+
 	return retval;
 }
 
 static WRITE8_HANDLER(mux_select_w)
 {
-	mux_port=data;
+	st0016_state *state = space->machine().driver_data<st0016_state>();
+
+	state->mux_port=data;
 }
 
 WRITE8_HANDLER(st0016_rom_bank_w)
@@ -410,13 +413,16 @@ static GFXDECODE_START( st0016 )
 //  GFXDECODE_ENTRY( NULL, 0, charlayout,      0, 16*4  )
 GFXDECODE_END
 
-static INTERRUPT_GEN(st0016_int)
+static TIMER_DEVICE_CALLBACK(st0016_int)
 {
-	if(!cpu_getiloops(device))
-		device_set_input_line(device,0,HOLD_LINE);
-	else
-		if(cpu_get_reg(device, Z80_IFF1)) /* dirty hack ... */
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE );
+	st0016_state *state = timer.machine().driver_data<st0016_state>();
+	int scanline = param;
+
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
+	else if((scanline % 64) == 0)
+		if(cpu_get_reg(state->m_maincpu, Z80_IFF1)) /* dirty hack ... */
+			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static const st0016_interface st0016_config =
@@ -430,13 +436,12 @@ static const st0016_interface st0016_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( st0016, driver_device )
+static MACHINE_CONFIG_START( st0016, st0016_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
-
-	MCFG_CPU_VBLANK_INT_HACK(st0016_int,5) /*  4*nmi + int0 */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", st0016_int, "screen", 0, 1) /*  4*nmi + int0 */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
