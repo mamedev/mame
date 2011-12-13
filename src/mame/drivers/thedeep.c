@@ -27,6 +27,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs51/mcs51.h"
 #include "includes/thedeep.h"
 #include "sound/2203intf.h"
 
@@ -182,6 +183,11 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_w)	//
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)	// From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	//AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3)
 ADDRESS_MAP_END
 
 
@@ -365,6 +371,9 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	/* CPU3 is a i8751 running at 8Mhz (8mhz xtal)*/
+	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_RESET(thedeep)
 
@@ -426,7 +435,7 @@ ROM_START( thedeep )
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
+	ROM_REGION( 0x1000, "mcu", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x40000, "sprites", 0 )	/* Sprites */
@@ -458,7 +467,7 @@ ROM_START( rundeep )
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
+	ROM_REGION( 0x1000, "mcu", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x40000, "sprites", 0 )	/* Sprites */
