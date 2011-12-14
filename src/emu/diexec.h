@@ -181,9 +181,6 @@ public:
 	int input_state(int linenum) { return m_input[linenum].m_curstate; }
 	void set_irq_callback(device_irq_callback callback);
 
-	// deprecated, but still needed for older drivers
-	int iloops() const { return m_iloops; }
-
 	// suspend/resume
 	void suspend(UINT32 reason, bool eatcycles);
 	void resume(UINT32 reason);
@@ -277,7 +274,6 @@ protected:
 	// configuration
 	bool					m_disabled;					// disabled from executing?
 	device_interrupt_func	m_vblank_interrupt;			// for interrupts tied to VBLANK
-	int 					m_vblank_interrupts_per_frame;	// usually 1
 	const char *			m_vblank_interrupt_screen;	// the screen that causes the VBLANK interrupt
 	device_interrupt_func	m_timed_interrupt;			// for interrupts not tied to VBLANK
 	attotime				m_timed_interrupt_period;	// period for periodic interrupts
@@ -290,11 +286,6 @@ protected:
 	device_irq_callback		m_driver_irq;				// driver-specific IRQ callback
 	device_input			m_input[MAX_INPUT_LINES];	// data about inputs
 	emu_timer *				m_timedint_timer;			// reference to this device's periodic interrupt timer
-
-	// these below are hacks to support multiple interrupts per frame
-	INT32					m_iloops;					// number of interrupts remaining this frame
-	emu_timer *				m_partial_frame_timer;		// the timer that triggers partial frame interrupts
-	attotime				m_partial_frame_period;		// the length of one partial frame for interrupt purposes
 
 	// cycle counting and executing
 	profile_type			m_profiler;					// profiler tag
@@ -323,9 +314,6 @@ private:
 	static void static_timed_trigger_callback(running_machine &machine, void *ptr, int param);
 
 	void on_vblank(screen_device &screen, bool vblank_state);
-
-	static void static_trigger_partial_frame_interrupt(running_machine &machine, void *ptr, int param);
-	void trigger_partial_frame_interrupt();
 
 	static void static_trigger_periodic_interrupt(running_machine &machine, void *ptr, int param);
 	void trigger_periodic_interrupt();

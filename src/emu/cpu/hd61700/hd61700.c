@@ -103,7 +103,7 @@ hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char
 	: cpu_device(mconfig, HD61700, "HD61700", tag, owner, clock),
 	 m_program_config("program", ENDIANNESS_BIG, 16, 18, -1)
 {
-	memset(&m_partial_frame_period, 0, sizeof(m_partial_frame_period));
+//	memset(&m_partial_frame_period, 0, sizeof(m_partial_frame_period));
 }
 
 

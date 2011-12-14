@@ -76,7 +76,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 //    m_cothread(cothread_entry_delegate(FUNC(device_execute_interface::run_thread_wrapper), this)),
 	  m_disabled(false),
 	  m_vblank_interrupt(NULL),
-	  m_vblank_interrupts_per_frame(0),
 	  m_vblank_interrupt_screen(NULL),
 	  m_timed_interrupt(NULL),
 	  m_timed_interrupt_period(attotime::zero),
@@ -84,8 +83,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	  m_nextexec(NULL),
 	  m_driver_irq(0),
 	  m_timedint_timer(NULL),
-	  m_iloops(0),
-	  m_partial_frame_timer(NULL),
 	  m_profiler(PROFILER_IDLE),
 	  m_icountptr(NULL),
 	  m_cycles_running(0),
@@ -143,7 +140,6 @@ void device_execute_interface::static_set_vblank_int(device_t &device, device_in
 	if (!device.interface(exec))
 		throw emu_fatalerror("MCFG_DEVICE_VBLANK_INT called on device '%s' with no execute interface", device.tag());
 	exec->m_vblank_interrupt = function;
-	exec->m_vblank_interrupts_per_frame = rate;
 	exec->m_vblank_interrupt_screen = tag;
 }
 
@@ -500,26 +496,11 @@ bool device_execute_interface::interface_validity_check(emu_options &options, co
 			mame_printf_error("%s: %s device '%s' has a VBLANK interrupt, but the driver is screenless!\n", driver.source_file, driver.name, device().tag());
 			error = true;
 		}
-		else if (m_vblank_interrupt_screen != NULL && m_vblank_interrupts_per_frame != 0)
-		{
-			mame_printf_error("%s: %s device '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver.source_file, driver.name, device().tag());
-			error = true;
-		}
 		else if (m_vblank_interrupt_screen != NULL && device().mconfig().devicelist().find(m_vblank_interrupt_screen) == NULL)
 		{
 			mame_printf_error("%s: %s device '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver.source_file, driver.name, device().tag(), m_vblank_interrupt_screen);
 			error = true;
 		}
-		else if (m_vblank_interrupt_screen == NULL && m_vblank_interrupts_per_frame == 0)
-		{
-			mame_printf_error("%s: %s device '%s' has a VBLANK interrupt handler with 0 interrupts!\n", driver.source_file, driver.name, device().tag());
-			error = true;
-		}
-	}
-	else if (m_vblank_interrupts_per_frame != 0)
-	{
-		mame_printf_error("%s: %s device '%s' has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver.source_file, driver.name, device().tag());
-		error = true;
 	}
 
 	if (m_timed_interrupt != NULL && m_timed_interrupt_period == attotime::zero)
@@ -555,8 +536,6 @@ void device_execute_interface::interface_pre_start()
 		m_input[line].start(this, line);
 
 	// allocate timers if we need them
-	if (m_vblank_interrupts_per_frame > 1)
-		m_partial_frame_timer = device().machine().scheduler().timer_alloc(FUNC(static_trigger_partial_frame_interrupt), (void *)this);
 	if (m_timed_interrupt_period != attotime::zero)
 		m_timedint_timer = device().machine().scheduler().timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
 
@@ -568,7 +547,6 @@ void device_execute_interface::interface_pre_start()
 	m_device.save_item(NAME(m_trigger));
 	m_device.save_item(NAME(m_totalcycles));
 	m_device.save_item(NAME(m_localtime));
-	m_device.save_item(NAME(m_iloops));
 }
 
 
@@ -614,7 +592,7 @@ void device_execute_interface::interface_post_reset()
 		m_input[line].reset();
 
 	// reconfingure VBLANK interrupts
-	if (m_vblank_interrupts_per_frame > 0 || m_vblank_interrupt_screen != NULL)
+	if (m_vblank_interrupt_screen != NULL)
 	{
 		// get the screen that will trigger the VBLANK
 
@@ -734,53 +712,10 @@ void device_execute_interface::on_vblank(screen_device &screen, bool vblank_stat
 	if (!vblank_state)
 		return;
 
-	// start the interrupt counter
-	if (!suspended(SUSPEND_REASON_DISABLE))
-		m_iloops = 0;
-	else
-		m_iloops = -1;
-
 	// generate the interrupt callback
 	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 		(*m_vblank_interrupt)(&m_device);
-
-	// if we have more than one interrupt per frame, start the timer now to trigger the rest of them
-	if (m_vblank_interrupts_per_frame > 1 && !suspended(SUSPEND_REASON_DISABLE))
-	{
-		m_partial_frame_period = device().machine().primary_screen->frame_period() / m_vblank_interrupts_per_frame;
-		m_partial_frame_timer->adjust(m_partial_frame_period);
-	}
 }
-
-
-//-------------------------------------------------
-//  static_trigger_partial_frame_interrupt -
-//  called to trigger a partial frame interrupt
-//-------------------------------------------------
-
-TIMER_CALLBACK( device_execute_interface::static_trigger_partial_frame_interrupt )
-{
-	reinterpret_cast<device_execute_interface *>(ptr)->trigger_partial_frame_interrupt();
-}
-
-void device_execute_interface::trigger_partial_frame_interrupt()
-{
-	// when we hit 0, reset to the total count
-	if (m_iloops == 0)
-		m_iloops = m_vblank_interrupts_per_frame;
-
-	// count one more "iloop"
-	m_iloops--;
-
-	// call the interrupt handler if we're not suspended
-	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
-		(*m_vblank_interrupt)(&m_device);
-
-	// set up to retrigger if there's more interrupts to generate
-	if (m_iloops > 1)
-		m_partial_frame_timer->adjust(m_partial_frame_period);
-}
-
 
 //-------------------------------------------------
 //  static_trigger_periodic_interrupt - timer

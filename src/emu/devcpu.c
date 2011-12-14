@@ -114,8 +114,6 @@ legacy_cpu_device::legacy_cpu_device(const machine_config &mconfig, device_type 
 	m_shortname = get_legacy_string(DEVINFO_STR_SHORTNAME);
 	m_searchpath = m_shortname;
 
-	memset(&m_partial_frame_period, 0, sizeof(m_partial_frame_period));
-
 	int tokenbytes = get_legacy_int(CPUINFO_INT_CONTEXT_SIZE);
 	if (tokenbytes == 0)
 		throw emu_fatalerror("Device %s specifies a 0 context size!\n", tag);
