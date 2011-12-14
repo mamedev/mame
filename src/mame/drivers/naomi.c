@@ -284,7 +284,8 @@ Games known to use this PCB include....
                                                 Sticker    EPROM   MASKROMs    X76F100  XC9536    315-5581
 Game                                            on cart    IC22#   # of SOP44  IC37#    IC41#     IC42#          Notes
 -------------------------------------------------------------------------------------------------------------------------
-18 Wheeler Deluxe (Rev A)                       840-0023C  22285A  20 (64Mb)   ?        315-6213  317-0273-COM
+18 Wheeler (Rev A)                              840-0037C  23298?  20 (64Mb)   ?        315-6213  317-0273-COM
+18 Wheeler Deluxe (Rev A)                       840-0023C  22185A  20 (64Mb)   ?        315-6213  317-0273-COM
 Airline Pilots (Rev A)                          840-0005C  21739A  11 (64Mb)   ?        315-6213  317-0251-COM
 Airline Pilots Deluxe (Rev B)                   ?          21787B  11 (64Mb)   present  315-6213  317-0251-COM   2 know BIOS 21801 (USA), 21802 (EXP)
 Cosmic Smash                                    840-0044C  23428    8 (64Mb)   ?        315-6213  317-0289-COM   joystick + 2 buttons
@@ -419,7 +420,8 @@ Notes:
                                                 Sticker    EPROM   MASKROMs    EPM7032    315-6213  315-5581
 Game                                            on cart    IC22#   # of SOP44  IC27#      IC41#     IC42#         Notes
 ----------------------------------------------------------------------------------------------------------------------------
-Alien Front                                     840-0048C  23586A   5 (128Mb)  315-6319A  present   317-0293-COM
+Alien Front (Rev A)                             840-0048C  23586A   5 (128Mb)  315-6319A  present   317-0293-COM
+Alien Front (Rev T)                             840-0048C  23586T   5 (128Mb)  315-6319A  present   317-0293-COM
 Capcom Vs. SNK Millennium Fight 2000 (Rev A)    841-0011C  23511A   7 (128Mb)  315-6219   present   317-5059-COM  (000804)
 Capcom Vs. SNK Millennium Fight 2000 (Rev C)    841-0011C  23511C   7 (128Mb)  315-6319   present   317-5059-COM  (000904)
 Club Kart: European Session (Rev D)             840-0062C  21473D  11 (128Mb)  315-6319A  present   317-0313-COM
@@ -485,6 +487,7 @@ Melty Blood Actress Again              841-0061C  not present  6 (512Mb)   prese
 Melty Blood Actress Again (Rev A)      841-0061C  24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
 Mushiking - The King Of Beetles II ENG 840-0164C  24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
 Poka Suka Ghost / Manic Panic Ghost    840-0170C  not present  5 (512Mb)   present  317-0461-COM  present
+Radirgy Noa                            841-0062C  not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
 Shooting Love 2007                     841-0057C  not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
 Touch De Zunou (Rev A)                 840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
 
@@ -7736,7 +7739,7 @@ ROM_END
 // 0060 Mamoru-kun wa Norowarete Shimatta!
 /* 0061 */ GAME( 2008, mbaa,     naomi,    naomim4, naomi,    naomi,    ROT0, "Type-Moon/Ecole","Melty Blood Actress Again", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0061 Melty Blood Actress Again (Rev A - original is rev 0)
-// 0062 Radilgy Noar
+// 0062 Radirgy Noa
 /* HMG016007 */ GAME( 2001, hmgeo, naomi,   naomim2, naomi,    naomi,    ROT0, "Capcom",          "Heavy Metal Geomatrix (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* Cart games on Namco custom ROM board */
