@@ -133,18 +133,29 @@ READ8_MEMBER( tms9928a_device::register_read )
 	UINT8 data = m_StatusReg;
 
 	m_StatusReg = m_FifthSprite;
-	if (m_INT) {
-		m_INT = 0;
-		if ( !m_irq_changed.isnull() )
-			m_irq_changed( m_INT );
-	}
+	check_interrupt();
 	m_latch = 0;
 
 	return data;
 }
 
 
-void tms9928a_device::change_register(UINT8 reg, UINT8 val) {
+void tms9928a_device::check_interrupt()
+{
+	// trigger if vblank and interrupt-enable bits are set
+	UINT8 b = (m_StatusReg & 0x80 && m_Regs[1] & 0x20) ? 1 : 0;
+
+	if (b != m_INT)
+	{
+		m_INT = b;
+		if ( !m_irq_changed.isnull() )
+			m_irq_changed( m_INT );
+	}
+}
+
+
+void tms9928a_device::change_register(UINT8 reg, UINT8 val)
+{
 	static const UINT8 Mask[8] =
 		{ 0x03, 0xfb, 0x0f, 0xff, 0x07, 0x7f, 0x07, 0xff };
 	static const char *const modes[] =
@@ -154,7 +165,6 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val) {
 		"Mode 1+3 (BOGUS)", "Mode 2+3 (MULTICOLOR variation)",
 		"Mode 1+2+3 (BOGUS)"
 	};
-	UINT8 b;
 
 	val &= Mask[reg];
 	m_Regs[reg] = val;
@@ -181,14 +191,7 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val) {
 		logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
 		break;
 	case 1:
-		/* check for changes in the INT line */
-		b = (val & 0x20) && (m_StatusReg & 0x80) ;
-		if (b != m_INT)
-		{
-			m_INT = b;
-			if ( !m_irq_changed.isnull() )
-				m_irq_changed( m_INT );
-		}
+		check_interrupt();
 		m_mode = ( (m_reva ? (m_Regs[0] & 2) : 0) | ((m_Regs[1] & 0x10)>>4) | ((m_Regs[1] & 8)>>1));
 		logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
 		break;
@@ -284,15 +287,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		/* Check for end of active display */
 		if ( y == 192 )
 		{
-			UINT8 b;
-
 			m_StatusReg |= 0x80;
-			b = (m_Regs[1] & 0x20) != 0;
-			if (b != m_INT) {
-				m_INT = b;
-				if ( !m_irq_changed.isnull() )
-					m_irq_changed( m_INT );
-			}
+			check_interrupt();
 		}
 	}
 	else
@@ -557,7 +553,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			/* Update sprite overflow bits */
 			if (~m_StatusReg & 0x40)
 			{
-				m_StatusReg |= m_FifthSprite;
+				m_StatusReg = (m_StatusReg & 0xe0) | m_FifthSprite;
 				if (fifth_encountered && ~m_StatusReg & 0x80)
 					m_StatusReg |= 0x40;
 			}

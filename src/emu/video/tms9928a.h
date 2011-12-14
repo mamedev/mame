@@ -118,6 +118,7 @@ protected:
 
 private:
 	void change_register(UINT8 reg, UINT8 val);
+	void check_interrupt();
 
 	static const device_timer_id TIMER_LINE = 0;
 
