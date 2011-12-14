@@ -475,8 +475,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			{
 				int spr_y = m_vMem[ m_spriteattribute + sprattr + 0 ];
 
-				if (!fifth_encountered)
-					m_FifthSprite = sprattr / 4;
+				m_FifthSprite = sprattr / 4;
 
 				/* Stop processing sprites */
 				if ( spr_y == 208 )
@@ -499,8 +498,11 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					num_sprites++;
 
 					/* Fifth sprite encountered? */
-					if( num_sprites == 5 )
+					if ( num_sprites == 5 )
+					{
 						fifth_encountered = true;
+						break;
+					}
 
 					if ( sprite_mag )
 						pataddr += ( ( ( y - spr_y ) & 0x1F ) >> 1 );
