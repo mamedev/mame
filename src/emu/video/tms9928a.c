@@ -329,11 +329,11 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				UINT16 fg = m_Regs[7] >> 4;
 				UINT16 bg = m_Regs[7] & 15;
 
-				/* Extra 8 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+				/* Extra 6 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6, addr++ )
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6, addr++ )
 				{
 					UINT16 charcode = m_vMem[ addr ];
 					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
@@ -342,8 +342,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
 				}
 
-				/* Extra 8 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				/* Extra 10 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
@@ -374,11 +374,11 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				UINT16 fg = m_Regs[7] >> 4;
 				UINT16 bg = m_Regs[7] & 15;
 
-				/* Extra 8 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+				/* Extra 6 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6, addr++ )
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6, addr++ )
 				{
 					UINT16 charcode = ( m_vMem[ addr ] + ( ( y >> 6 ) << 8 ) ) & m_patternmask;
 					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
@@ -387,8 +387,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
 				}
 
-				/* Extra 8 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				/* Extra 10 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
@@ -417,18 +417,18 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				UINT16 fg = m_Regs[7] >> 4;
 				UINT16 bg = m_Regs[7] & 15;
 
-				/* Extra 8 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+				/* Extra 6 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6 )
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6 )
 				{
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = bg;
 				}
 
-				/* Extra 8 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				/* Extra 10 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
