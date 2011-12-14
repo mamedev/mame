@@ -152,7 +152,6 @@ private:
 	UINT8		m_mode;
 
 	/* emulation settings */
-	int			m_LimitSprites; /* max 4 sprites on a row, like original TMS9918A */
 	int			m_top_border;
 };
 

@@ -610,8 +610,6 @@ void tms9928a_device::device_start()
 
 	m_line_timer = timer_alloc(TIMER_LINE);
 
-	m_LimitSprites = 1;
-
 	save_item(NAME(m_Regs[0]));
 	save_item(NAME(m_Regs[1]));
 	save_item(NAME(m_Regs[2]));
