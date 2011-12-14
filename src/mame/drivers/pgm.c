@@ -1283,29 +1283,29 @@ static MACHINE_START( pgm )
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
 
-//	machine.base_datetime(state->m_systime);
+//  machine.base_datetime(state->m_systime);
 
 	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 	state->m_prot = machine.device<cpu_device>("prot");
 	state->m_ics = machine.device("ics");
 
-//	state->save_item(NAME(state->m_cal_val));
-//	state->save_item(NAME(state->m_cal_mask));
-//	state->save_item(NAME(state->m_cal_com));
-//	state->save_item(NAME(state->m_cal_cnt));
+//  state->save_item(NAME(state->m_cal_val));
+//  state->save_item(NAME(state->m_cal_mask));
+//  state->save_item(NAME(state->m_cal_com));
+//  state->save_item(NAME(state->m_cal_cnt));
 }
 
 static MACHINE_RESET( pgm )
 {
-//	pgm_state *state = machine.driver_data<pgm_state>();
+//  pgm_state *state = machine.driver_data<pgm_state>();
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 
-//	state->m_cal_val = 0;
-//	state->m_cal_mask = 0;
-//	state->m_cal_com = 0;
-//	state->m_cal_cnt = 0;
+//  state->m_cal_val = 0;
+//  state->m_cal_mask = 0;
+//  state->m_cal_com = 0;
+//  state->m_cal_cnt = 0;
 }
 
 

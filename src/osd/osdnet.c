@@ -20,7 +20,7 @@ void clear_netdev()
 	netdev_list.reset();
 }
 
-const netdev_entry_t *netdev_first() { 
+const netdev_entry_t *netdev_first() {
 	return netdev_list.first();
 }
 

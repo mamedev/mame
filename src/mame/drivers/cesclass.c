@@ -2,15 +2,15 @@
 
     CES Classic wall games
 
-	driver by Angelo Salese
+    driver by Angelo Salese
 
-	Notes:
-	- to play Home Run Classic you have to select a pitcher shot and keep pressed the
-	  wall strobe. When you release the strobe, batter does the swing.
+    Notes:
+    - to play Home Run Classic you have to select a pitcher shot and keep pressed the
+      wall strobe. When you release the strobe, batter does the swing.
 
-	TODO:
-	- custom layout for dual LCDs
-	- artwork and lamps position needed to make progresses
+    TODO:
+    - custom layout for dual LCDs
+    - artwork and lamps position needed to make progresses
     - U43 and U44 bad in Trap Shoot Classic
     - games are incredibly sluggish by now
     - irq sources are unknown
@@ -106,10 +106,10 @@ WRITE16_MEMBER( cesclassic_state::lamps_w )
 WRITE16_MEMBER( cesclassic_state::outputs_w )
 {
 	/*
-	-x-- ---- OKI bankswitch
-	--x- ---- probably screen enable
-	---- --x- coin counter
-	*/
+    -x-- ---- OKI bankswitch
+    --x- ---- probably screen enable
+    ---- --x- coin counter
+    */
 	m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
 	coin_counter_w(machine(), 0, data & 2);
 	if(data & ~0x62)
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( cesclassic_map, AS_PROGRAM, 16, cesclassic_state )
 	AM_RANGE(0x480000, 0x481fff) AM_RAM AM_SHARE("nvram") //8k according to schematics (games doesn't use that much tho)
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x610000, 0x610001) AM_WRITE(outputs_w)
-//	AM_RANGE(0x640000, 0x640001) AM_WRITENOP
+//  AM_RANGE(0x640000, 0x640001) AM_WRITENOP
 	AM_RANGE(0x640040, 0x640041) AM_WRITE(lamps_w)
 	AM_RANGE(0x670000, 0x670001) AM_READ_PORT("DSW")
 	AM_RANGE(0x70ff00, 0x70ff01) AM_WRITENOP // writes 0xffff at irq 3 end of service, watchdog?

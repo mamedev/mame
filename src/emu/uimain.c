@@ -129,8 +129,8 @@ void ui_menu_main::populate()
 		}
 
 	/* add input menu items */
-	item_append("Input (general)", NULL, 0, (void *)INPUT_GROUPS);	
-	
+	item_append("Input (general)", NULL, 0, (void *)INPUT_GROUPS);
+
 	menu_text.printf("Input (this %s)",emulator_info::get_capstartgamenoun());
 	item_append(menu_text.cstr(), NULL, 0, (void *)INPUT_SPECIFIC);
 
@@ -493,11 +493,11 @@ void ui_menu_network_devices::populate()
 			if(entry->id==curr) {
 				title = entry->description;
 				break;
-			}			
+			}
 			entry = entry->m_next;
 		}
-		
-		item_append(network->device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);		
+
+		item_append(network->device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
 	}
 }
 
@@ -2063,7 +2063,7 @@ ui_menu_video_options::ui_menu_video_options(running_machine &machine, render_co
 
 void ui_menu_video_options::populate()
 {
- 	const char *subtext = "";
+	const char *subtext = "";
 	astring tempstring;
 	int viewnum;
 	int enabled;

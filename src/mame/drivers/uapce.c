@@ -31,8 +31,8 @@
  -x1 Victory Run standardd Hucard
  -x1 Plexiglass control panel overlay (used)
 
-In the February 1990 issue of Video Games & Computer Entertainment magazine, there was a list of 
-all of the available UA produced Hu-Cards (at the current time of the article was published). 
+In the February 1990 issue of Video Games & Computer Entertainment magazine, there was a list of
+all of the available UA produced Hu-Cards (at the current time of the article was published).
 The article mentions that the UA Hu-Cards were not compatible with the TG-16 gaming console.
 - Keith Courage in the Alpha Zones
 - World Class Baseball
@@ -85,7 +85,7 @@ console rather than a TurboGrafx-16, which would cause the region check to
 fail.
 
 
-Keith Courage In Alpha Zones: dump was made from PC-Engine game dump of US version, 
+Keith Courage In Alpha Zones: dump was made from PC-Engine game dump of US version,
  with region check nop'ed out.
 Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 */
@@ -141,7 +141,7 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
       C = JAMMA pin 'z'
       E = Ground
 
-   Pin 'z' is a normally ground connection, but on this board it is isolated from ground. 
+   Pin 'z' is a normally ground connection, but on this board it is isolated from ground.
    The wiring harness also has the corresponding wire separate from the others. */
 	coin_counter_w(space->machine(), 0, BIT(data,5));
 

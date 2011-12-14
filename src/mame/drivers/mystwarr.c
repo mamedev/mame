@@ -118,7 +118,7 @@ static TIMER_DEVICE_CALLBACK(mystwarr_interrupt)
 		device_set_input_line(state->m_maincpu, M68K_IRQ_4, HOLD_LINE);
 
 	/* writes to LSB of 0x410000 port and clears a work RAM flag, almost likely not really necessary. */
-//	device_set_input_line(state->m_maincpu, M68K_IRQ_6, HOLD_LINE);
+//  device_set_input_line(state->m_maincpu, M68K_IRQ_6, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK(metamrph_interrupt)
@@ -127,7 +127,7 @@ static TIMER_DEVICE_CALLBACK(metamrph_interrupt)
 	int scanline = param;
 
 	/* irq 4 has an irq routine in metamrph, but it's not really called */
-//	device_set_input_line(state->m_maincpu, M68K_IRQ_4, HOLD_LINE);
+//  device_set_input_line(state->m_maincpu, M68K_IRQ_4, HOLD_LINE);
 
 	if(scanline == 24)
 		device_set_input_line(state->m_maincpu, M68K_IRQ_6, HOLD_LINE);

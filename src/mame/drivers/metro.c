@@ -4110,7 +4110,7 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)		/* Not confirmed */
 	MCFG_CPU_PROGRAM_MAP(pururun_map)
-//	MCFG_TIMER_ADD_SCANLINE("scantimer", msgogo_interrupt, "screen", 0, 1) /* fixes the title screen scroll in GunMaster, but makes the game painfully slow */
+//  MCFG_TIMER_ADD_SCANLINE("scantimer", msgogo_interrupt, "screen", 0, 1) /* fixes the title screen scroll in GunMaster, but makes the game painfully slow */
 	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1) /* ? */
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)		/* Not confiremd */

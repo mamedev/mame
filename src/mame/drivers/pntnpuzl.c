@@ -266,22 +266,22 @@ static READ16_HANDLER( pntnpuzl_28001a_r )
 
 static READ16_HANDLER( irq1_ack_r )
 {
-//	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//	device_set_input_line(state->m_maincpu, 1, CLEAR_LINE);
+//  pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
+//  device_set_input_line(state->m_maincpu, 1, CLEAR_LINE);
 	return 0;
 }
 
 static READ16_HANDLER( irq2_ack_r )
 {
-//	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//	device_set_input_line(state->m_maincpu, 2, CLEAR_LINE);
+//  pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
+//  device_set_input_line(state->m_maincpu, 2, CLEAR_LINE);
 	return 0;
 }
 
 static READ16_HANDLER( irq4_ack_r )
 {
-//	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//	device_set_input_line(state->m_maincpu, 4, CLEAR_LINE);
+//  pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
+//  device_set_input_line(state->m_maincpu, 4, CLEAR_LINE);
 	return 0;
 }
 
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16 )
 
 	/* standard VGA */
 	AM_RANGE(0x3a0000, 0x3bffff) AM_RAM // RAM
-//	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM // regs
+//  AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM // regs
 
 	AM_RANGE(0x400000, 0x407fff) AM_RAM
 ADDRESS_MAP_END

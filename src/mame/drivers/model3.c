@@ -5134,7 +5134,7 @@ static const scsp_interface scsp2_interface =
 */
 static TIMER_DEVICE_CALLBACK(model3_interrupt)
 {
-//	model3_state *state = timer.machine().driver_data<model3_state>();
+//  model3_state *state = timer.machine().driver_data<model3_state>();
 	int scanline = param;
 
 	if (scanline == 384)

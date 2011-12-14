@@ -70,14 +70,14 @@ static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->m_main_irq_mask = 0;
-//	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+//  cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->m_sound_irq_mask = 1;
-//	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+//  cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )

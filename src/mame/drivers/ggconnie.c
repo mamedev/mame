@@ -159,7 +159,7 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_CPU_IO_MAP(sgx_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", sgx_interrupt, "screen", 0, 1)
 
-//	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
 

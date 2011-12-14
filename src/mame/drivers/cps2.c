@@ -635,7 +635,7 @@ static TIMER_DEVICE_CALLBACK( cps2_interrupt )
 	if (state->m_cps_b_regs[0x12 / 2] & 0x8000)
 		state->m_cps_b_regs[0x12 / 2] &= 0x1ff;
 
-//	popmessage("%04x %04x - %04x %04x",state->m_scanline1,state->m_scanline2,state->m_cps_b_regs[0x10/2],state->m_cps_b_regs[0x12/2]);
+//  popmessage("%04x %04x - %04x %04x",state->m_scanline1,state->m_scanline2,state->m_cps_b_regs[0x10/2],state->m_cps_b_regs[0x12/2]);
 
 	/* raster effects */
 	if (state->m_scanline1 == param || (state->m_scanline1 < param && !state->m_scancalls))
@@ -645,7 +645,7 @@ static TIMER_DEVICE_CALLBACK( cps2_interrupt )
 		cps2_set_sprite_priorities(timer.machine());
 		timer.machine().primary_screen->update_partial(param);
 		state->m_scancalls++;
-//		popmessage("IRQ4 scancounter = %04i", param);
+//      popmessage("IRQ4 scancounter = %04i", param);
 	}
 
 	/* raster effects */
@@ -656,7 +656,7 @@ static TIMER_DEVICE_CALLBACK( cps2_interrupt )
 		cps2_set_sprite_priorities(timer.machine());
 		timer.machine().primary_screen->update_partial(param);
 		state->m_scancalls++;
-//		popmessage("IRQ4 scancounter = %04i", param);
+//      popmessage("IRQ4 scancounter = %04i", param);
 	}
 
 	if (param == 240)  /* VBlank */
@@ -671,7 +671,7 @@ static TIMER_DEVICE_CALLBACK( cps2_interrupt )
 		}
 		cps2_objram_latch(timer.machine());
 	}
-//	popmessage("Raster calls = %i", state->m_scancalls);
+//  popmessage("Raster calls = %i", state->m_scancalls);
 }
 
 

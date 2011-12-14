@@ -2818,7 +2818,7 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_map)
-//	MCFG_TIMER_ADD_SCANLINE("scantimer", gx400_interrupt, "screen", 0, 1)
+//  MCFG_TIMER_ADD_SCANLINE("scantimer", gx400_interrupt, "screen", 0, 1)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */

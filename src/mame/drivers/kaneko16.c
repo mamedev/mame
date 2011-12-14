@@ -1753,10 +1753,10 @@ GFXDECODE_END
 ***************************************************************************/
 
 /*
-	TODO:
-	Fix this arrangement (specific for Bonk's Adventure)!
+    TODO:
+    Fix this arrangement (specific for Bonk's Adventure)!
 
-	pre-deprecat lib note says:
+    pre-deprecat lib note says:
     Even though 3 interrupts are triggered, I set an int_num of 4. (notice '+1')
     I agree that it is kind of a misuse of the function, but I haven't found
     clues in code on how interrupts are scheduled...

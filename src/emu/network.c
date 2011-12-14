@@ -45,7 +45,7 @@ static void network_load(running_machine &machine, int config_type, xml_data_nod
 							for (int i=0;i<6;i++) mac[i]=mac_num[i];
 							network->set_mac(mac);
 						}
-						
+
 					}
 				}
 			}
