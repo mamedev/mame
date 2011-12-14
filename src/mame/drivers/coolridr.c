@@ -1072,16 +1072,10 @@ static INPUT_PORTS_START( coolridr )
 INPUT_PORTS_END
 
 
-// IRQs 4 & 6 are valid on SH-2
+// IRQs 4, 6 (& 8?) are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
 {
 	device_set_input_line(device, 4, HOLD_LINE);
-/*  switch(cpu_getiloops(device))
-    {
-        case 0: break;
-        case 1:device_set_input_line(device, 6, HOLD_LINE); break;
-//      case 2:device_set_input_line(device, 8, HOLD_LINE); break;
-    }*/
 }
 
 //IRQs 10,12 and 14 are valid on SH-1 instead

@@ -28,7 +28,10 @@ class seta_state : public driver_device
 {
 public:
 	seta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_subcpu(*this,"sub")
+		{ }
 
 	UINT8 *m_sharedram;
 	UINT16 *m_workram;
@@ -82,6 +85,9 @@ public:
 	UINT16 m_pairslove_protram[0x200];
 	UINT16 m_pairslove_protram_old[0x200];
 	UINT16 m_downtown_protection[0x200/2];
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
 };
 
 /*----------- defined in video/seta.c -----------*/

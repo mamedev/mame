@@ -192,22 +192,6 @@ WRITE8_HANDLER( nb1413m3_nmi_clock_w )
 
 INTERRUPT_GEN( nb1413m3_interrupt )
 {
-#if 0
-	if (!cpu_getiloops(device))
-	{
-//      nb1413m3_busyflag = 1;
-//      nb1413m3_busyctr = 0;
-		device_set_input_line(device, 0, HOLD_LINE);
-	}
-	if (nb1413m3_nmi_enable)
-	{
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
-
-	#if NB1413M3_CHEAT
-	#include "nbmjchet.inc"
-	#endif
-#else
 //  nb1413m3_busyflag = 1;
 //  nb1413m3_busyctr = 0;
 	device_set_input_line(device, 0, HOLD_LINE);
@@ -220,7 +204,6 @@ INTERRUPT_GEN( nb1413m3_interrupt )
 	#if NB1413M3_CHEAT
 	#include "nbmjchet.inc"
 	#endif
-#endif
 }
 
 READ8_HANDLER( nb1413m3_sndrom_r )

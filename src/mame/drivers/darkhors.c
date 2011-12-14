@@ -769,7 +769,6 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 
 	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
-	//MCFG_CPU_VBLANK_INT_HACK(darkhors,3)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 

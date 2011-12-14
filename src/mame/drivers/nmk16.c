@@ -3525,7 +3525,7 @@ static TIMER_DEVICE_CALLBACK( nmk16_scanline )
 		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
 
 	/* This is either vblank-in or sprite dma irq complete, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
-       cpu_getiloops() implementation), mostly noticeable with sword collisions and related attract mode behaviour. */
+       cpu_getiloops function implementation), mostly noticeable with sword collisions and related attract mode behaviour. */
 	if(scanline == 0)
 		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
 }

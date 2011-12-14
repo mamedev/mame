@@ -862,25 +862,6 @@ static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "road_data", 0, roadlayout,     0,      0x400 )
 GFXDECODE_END
 
-#if 0
-static INTERRUPT_GEN( master_irq )
-{
-	switch(cpu_getiloops(device))
-	{
-		case 0: device_set_input_line(device,1,HOLD_LINE); break;
-		case 1: device_set_input_line(device,3,HOLD_LINE); break;
-	}
-}
-
-static INTERRUPT_GEN( slave_irq )
-{
-	switch(cpu_getiloops(device))
-	{
-		case 0: device_set_input_line(device,3,HOLD_LINE); break;
-		case 1: device_set_input_line(device,1,HOLD_LINE); break;
-	}
-}
-#endif
 
 static const y8950_interface y8950_config = {
 	0 /* TODO */

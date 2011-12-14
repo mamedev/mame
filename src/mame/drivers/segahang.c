@@ -140,13 +140,17 @@ static MACHINE_RESET( hangon )
 }
 
 #if 0
-static INTERRUPT_GEN( hangon_irq )
+static TIMER_DEVICE_CALLBACK( hangon_irq )
 {
+	segas1x_state *state = timer.machine().driver_data<segas1x_state>();
+	int scanline = param;
+
 	/* according to the schematics, IRQ2 is generated every 16 scanlines */
-	if (cpu_getiloops(device) != 0)
-		device_set_input_line(device, 2, HOLD_LINE);
-	else
-		device_set_input_line(device, 4, HOLD_LINE);
+	if((scanline % 16) == 0)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+
+	if(scanline == 240)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 #endif
 
