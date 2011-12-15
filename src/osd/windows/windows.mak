@@ -246,6 +246,11 @@ endif
 
 # ensure we statically link the gcc runtime lib
 LDFLAGS += -static-libgcc
+TEST_GCC = $(shell gcc --version)
+ifeq ($(findstring 4.4,$(TEST_GCC)),) 
+	#if we use new tools
+	LDFLAGS += -static-libstdc++
+endif 
 
 # add the windows libraries
 LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -ldinput8 -lwsock32

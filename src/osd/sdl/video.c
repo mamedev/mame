@@ -397,6 +397,7 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	info.cbSize = sizeof(info);
 	result = GetMonitorInfo(handle, (LPMONITORINFO)&info);
 	assert(result);
+	result++; // to silence gcc 4.6
 
 	// allocate a new monitor info
 	monitor = global_alloc_clear(sdl_monitor_info);
