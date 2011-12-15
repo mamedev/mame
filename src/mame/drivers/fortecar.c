@@ -84,6 +84,46 @@
   7) Turn the Main Control, adjust the time. This is the last step of the initialization procedure.
 
 
+-------------------------------------------------------------------------------------------------
+
+  Edge Connector / Pinouts....
+
+  -------------------+--+------------------
+     Components Side |PN| Solder Side
+  -------------------+--+------------------
+                 GND |01| GND
+                 GND |02| GND
+                 +5V |03| +5V
+                 +5V |04| +5V
+                +12V |05| +12V
+      CUR. LOOP IN + |06| CUR. LOOP OUT +
+      CUR. LOOP IN - |07| CUR. LOOP OUT -
+         DOOR SWITCH |08| COUNTER IN
+             PAYMENT |09| COUNTER OUT
+                COIN |10| COUNTER KEY IN
+        HOPPER COUNT |11| HOPPER DRIVE
+         BANKNOTE IN |12| RESERVED
+              CREDIT |13| RESERVED
+             MANAGER |14| RESERVED
+              PAGE 1 |15| RESERVE OUT
+          RED BUTTON |16| RED LAMP
+        BLACK BUTTON |17| BLACK LAMP
+       HOLD 1 BUTTON |18| HOLD 1 LAMP
+       HOLD 2 BUTTON |19| HOLD 2 LAMP
+       HOLD 3 BUTTON |20| HOLD 3 LAMP
+       HOLD 4 BUTTON |21| HOLD 4 LAMP
+       HOLD 5 BUTTON |22| HOLD 5 LAMP
+        START BUTTON |23| START LAMP
+          GAIN SOUND |24| SPEAKER OUT
+           GND SOUND |25| SP.OUT R/INTENSITY
+  COMP.SYNC / H SYNC |26| RED
+              V SYNC |27| GREEN
+         GND MONITOR |28| BLUE
+
+
+  Note: MANAGER and PAGE 1, are "Owner" and "Rental" modes.
+
+
 **************************************************************************************************/
 
 
