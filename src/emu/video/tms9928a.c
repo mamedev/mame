@@ -158,11 +158,8 @@ void tms9928a_device::check_interrupt()
 
 void tms9928a_device::update_backdrop()
 {
-	// update backdrop colour on change
-	if (m_Regs[7] & 15)
-		palette_set_color(machine(), 0, tms9928a_palette[m_Regs[7] & 15]);
-	else
-		// transparent if EXTVID bit is set
+	// update backdrop colour to transparent if EXTVID bit is set
+	if ((m_Regs[7] & 15) == 0)
 		palette_set_color(machine(), 0, MAKE_ARGB(m_Regs[0] & 1 ? 0 : 255,0,0,0));
 }
 
