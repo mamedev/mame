@@ -102,6 +102,8 @@
 #include "machine/nvram.h"
 #include "video/resnet.h"
 
+#include "fortecrd.lh"
+
 
 class fortecar_state : public driver_device
 {
@@ -244,21 +246,41 @@ static const ppi8255_interface ppi0intf =
 
 static WRITE8_DEVICE_HANDLER( ayporta_w )
 {
-	logerror("AY port A write %02x\n",data);
+/*  System Lamps...
 
-	/*
-    lamps for POST?
-    0x01: RAM test d000-d7ff
-    0x02: VRAM test d800-ffff
-    0x04: Video SYNC test
-    0x08: ROM check
-    0x10: NVRAM check
-    0x20: IRQ test
-    0x40: Stack RAM check
-    */
+    - bits -
+    7654 3210
+    ---- ---x   START lamp.
+    ---- --x-   HOLD5 lamp.
+    ---- -x--   HOLD4 lamp.
+    ---- x---   HOLD3 lamp.
+    ---x ----   HOLD2 lamp.
+    --x- ----   HOLD1 lamp.
+    -x-- ----   BLACK lamp.
+    x--- ----   RED/BET lamp.
+
+    Also used for POST?...
+
+    0x01 (start): RAM test d000-d7ff
+    0x02 (hold5): VRAM test d800-ffff
+    0x04 (hold4): Video SYNC test
+    0x08 (hold3): ROM check
+    0x10 (hold2): NVRAM check
+    0x20 (hold1): IRQ test
+    0x40 (black): Stack RAM check
+*/
+
+	output_set_lamp_value(0, (data >> 0) & 1);	/* START lamp */
+	output_set_lamp_value(1, (data >> 1) & 1);	/* HOLD5 lamp */
+	output_set_lamp_value(2, (data >> 2) & 1);	/* HOLD4 lamp */
+	output_set_lamp_value(3, (data >> 3) & 1);	/* HOLD3 lamp */
+	output_set_lamp_value(4, (data >> 4) & 1);	/* HOLD2 lamp */
+	output_set_lamp_value(5, (data >> 5) & 1);	/* HOLD1 lamp */
+	output_set_lamp_value(6, (data >> 6) & 1);	/* BLACK lamp */
+	output_set_lamp_value(7, (data >> 7) & 1);	/* RED/BET lamp */
 }
 
-/* lamps? */
+
 static WRITE8_DEVICE_HANDLER( ayportb_w )
 {
 /*
@@ -323,6 +345,7 @@ static const eeprom_interface forte_eeprom_intf =
 	"*10011xxxxxx",   /* unlock command */
 };
 
+
 static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -353,35 +376,36 @@ Error messages:
 "FALSA PRUEBA NVRAM PERMANENTE" (NVRAM new, serial EEPROM connected)
 
 */
+
 static INPUT_PORTS_START( fortecar )
 	PORT_START("DSW")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x01, "DSW" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW-1" )				PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "Attract Mode" )		PORT_DIPLOCATION("DSW:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DSW-3" )				PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "DSW-4" )				PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "DSW-5" )				PORT_DIPLOCATION("DSW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "DSW-6" )				PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "DSW-7" )				PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW-8" )				PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("INPUT")	/* 8bit */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Red")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Red / Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
@@ -391,12 +415,10 @@ static INPUT_PORTS_START( fortecar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 
 	PORT_START("SYSTEM")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" ) // key in
+	PORT_DIPNAME( 0x01, 0x01, "Rear Door" ) // key in
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // key out
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -406,16 +428,18 @@ static INPUT_PORTS_START( fortecar )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) // credit
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )  PORT_NAME("Key In")
+//	PORT_DIPNAME( 0x20, 0x20, "Credit Key" )
+//	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Owner" ) // full service
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // service coin?
+	PORT_DIPNAME( 0x80, 0x80, "Rental" ) // page 1
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
 
 static const gfx_layout tiles8x8_layout_3bpp =
 {
@@ -438,7 +462,6 @@ static const gfx_layout tiles8x8_layout_6bpp =
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
 };
-
 
 
 static GFXDECODE_START( fortecar )
@@ -508,8 +531,8 @@ ROM_START( fortecar )
 	ROM_LOAD( "fortecar.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
 
 	/* took from the Spanish version, these are likely to be identical anyway */
-//  ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
-//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
 //  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
 
 	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
@@ -544,5 +567,7 @@ static DRIVER_INIT( fortecar )
 {
 }
 
-GAME( 19??, fortecar, 0,        fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (English)", GAME_NOT_WORKING)
-GAME( 19??, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Spanish)", GAME_NOT_WORKING)
+
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME               FLAGS             LAYOUT */
+GAMEL( 19??, fortecar, 0,        fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (English)", GAME_NOT_WORKING, layout_fortecrd )
+GAMEL( 19??, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Spanish)", GAME_NOT_WORKING, layout_fortecrd )

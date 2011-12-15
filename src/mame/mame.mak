@@ -1958,6 +1958,8 @@ $(DRIVERS)/dlair.o:	$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
+$(DRIVERS)/fortecar.o:	$(LAYOUT)/fortecrd.lh
+
 $(DRIVERS)/funworld.o:	$(LAYOUT)/jollycrd.lh \
 			$(LAYOUT)/bigdeal.lh \
 			$(LAYOUT)/novoplay.lh \
