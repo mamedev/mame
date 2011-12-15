@@ -1377,7 +1377,7 @@ static MACHINE_CONFIG_DERIVED( dw3, pgm )
 
 		MCFG_DEVICE_REMOVE("maincpu")
 		MCFG_CPU_ADD("maincpu", M68000, 20000000)
-		MCFG_CPU_PROGRAM_MAP(pgm_mem)
+		MCFG_CPU_PROGRAM_MAP(killbld_mem)
 		MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
 
 

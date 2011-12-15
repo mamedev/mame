@@ -118,7 +118,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				state->m_protection_data = space->machine().region("cpu3")->base()[0x185+state->m_protection_index++];
+				state->m_protection_data = space->machine().region("mcu")->base()[0x185+state->m_protection_index++];
 			else
 				state->m_protection_data = 0xc9;
 
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
-	/* CPU3 is a i8751 running at 8Mhz (8mhz xtal)*/
+	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_DEVICE_DISABLE()

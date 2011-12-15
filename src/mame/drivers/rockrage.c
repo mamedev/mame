@@ -294,14 +294,15 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_PALETTE_INIT(rockrage)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
 

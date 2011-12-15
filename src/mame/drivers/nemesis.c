@@ -1913,8 +1913,8 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_CONFIG(ym2151_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.2)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.2)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2) // reversed according to MT #4565
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.2)
 MACHINE_CONFIG_END
 
 
