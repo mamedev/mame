@@ -318,8 +318,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					UINT8 charcode = m_vMem[ addr ];
 					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
 					UINT8 colour = m_vMem[ m_colour + ( charcode >> 3 ) ];
-					UINT16 fg = (colour >> 4) ? : BackColour;
-					UINT16 bg = (colour & 15) ? : BackColour;
+					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
+					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
 
 					for ( int i = 0; i < 8; pattern <<= 1, i++ )
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
@@ -331,7 +331,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			//if (vpos==100 ) popmessage("TMS9928A MODE 1");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
-				UINT16 fg = (m_Regs[7] >> 4) ? : BackColour;
+				UINT16 fg = (m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour;
 				UINT16 bg = BackColour;
 
 				/* Extra 6 pixels left border */
@@ -363,8 +363,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					UINT16 charcode = m_vMem[ addr ] + ( ( y >> 6 ) << 8 );
 					UINT8 pattern = m_vMem[ m_pattern + ( ( charcode & m_patternmask ) << 3 ) + ( y & 7 ) ];
 					UINT8 colour = m_vMem[ m_colour + ( ( charcode & m_colourmask ) << 3 ) + ( y & 7 ) ];
-					UINT16 fg = (colour >> 4) ? : BackColour;
-					UINT16 bg = (colour & 15) ? : BackColour;
+					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
+					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
 
 					for ( int i = 0; i < 8; pattern <<= 1, i++ )
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
@@ -376,7 +376,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			//if (vpos==100) popmessage("TMS9928A MODE1+2");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
-				UINT16 fg = (m_Regs[7] >> 4) ? : BackColour;
+				UINT16 fg = (m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour;
 				UINT16 bg = BackColour;
 
 				/* Extra 6 pixels left border */
@@ -407,8 +407,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				{
 					UINT8 charcode = m_vMem[ addr ];
 					UINT8 colour = m_vMem[ m_pattern + ( charcode << 3 ) + ( ( y >> 2 ) & 7 ) ];
-					UINT16 fg = (colour >> 4) ? : BackColour;
-					UINT16 bg = (colour & 15) ? : BackColour;
+					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
+					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
 
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = p[x+6] = p[x+7] = bg;
@@ -419,7 +419,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		case 5:	case 7:		/* MODE bogus */
 			//if (vpos==100 ) popmessage("TMS9928A MODE bogus");
 			{
-				UINT16 fg = (m_Regs[7] >> 4) ? : BackColour;
+				UINT16 fg = (m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour;
 				UINT16 bg = BackColour;
 
 				/* Extra 6 pixels left border */
@@ -447,8 +447,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				{
 					UINT8 charcode = m_vMem[ addr ];
 					UINT8 colour = m_vMem[ m_pattern + ( ( ( charcode + ( ( y >> 2 ) & 7 ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask ) << 3 ) ];
-					UINT16 fg = (colour >> 4) ? : BackColour;
-					UINT16 bg = (colour & 15) ? : BackColour;
+					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
+					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
 
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = p[x+6] = p[x+7] = bg;
