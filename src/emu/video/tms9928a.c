@@ -284,8 +284,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		for ( int i = 0; i < TMS9928A_TOTAL_HORZ; i++ )
 			p[i] = BackColour;
 
-		/* Check for end of active display */
-		if ( y == 192 )
+		/* vblank is set 1 line after end of active display */
+		if ( y == 193 )
 		{
 			m_StatusReg |= 0x80;
 			check_interrupt();
