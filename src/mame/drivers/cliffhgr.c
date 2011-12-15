@@ -146,24 +146,11 @@ static READ8_HANDLER( cliff_irq_ack_r )
 
 static WRITE8_DEVICE_HANDLER( cliff_sound_overlay_w )
 {
-	int sound = data & 3;
-	int overlay = (data & 0x10) ? 1 : 0;
-
-	/* configure pen 0 and 1 as transparent in the renderer and use it as the compositing color */
-	if (overlay)
-	{
-		palette_set_color(device->machine(), 0, palette_get_color(device->machine(), 0) & MAKE_ARGB(0,255,255,255));
-		palette_set_color(device->machine(), 1, palette_get_color(device->machine(), 1) & MAKE_ARGB(0,255,255,255));
-	}
-	else
-	{
-		palette_set_color(device->machine(), 0, palette_get_color(device->machine(), 0) | MAKE_ARGB(255,0,0,0));
-		palette_set_color(device->machine(), 1, palette_get_color(device->machine(), 1) | MAKE_ARGB(255,0,0,0));
-	}
-
 	/* audio */
-	discrete_sound_w(device, CLIFF_ENABLE_SND_1, sound & 1);
-	discrete_sound_w(device, CLIFF_ENABLE_SND_2, (sound >> 1) & 1);
+	discrete_sound_w(device, CLIFF_ENABLE_SND_1, data & 1);
+	discrete_sound_w(device, CLIFF_ENABLE_SND_2, (data >> 1) & 1);
+
+	// bit 4 (data & 0x10) is overlay related?
 }
 
 static WRITE8_HANDLER( cliff_ldwire_w )

@@ -27,10 +27,10 @@
 #define __TMS9928A_H__
 
 #include "emu.h"
-#include "machine//devhelpr.h"
+#include "machine/devhelpr.h"
 
 
-#define TMS9928A_PALETTE_SIZE           16
+#define TMS9928A_PALETTE_SIZE				16
 
 
 /* Some defines used in defining the screens */
@@ -119,6 +119,7 @@ protected:
 private:
 	void change_register(UINT8 reg, UINT8 val);
 	void check_interrupt();
+	void update_backdrop();
 
 	static const device_timer_id TIMER_LINE = 0;
 

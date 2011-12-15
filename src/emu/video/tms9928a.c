@@ -13,6 +13,8 @@
 ** Improved over the years by MESS and MAME teams.
 **
 ** Todo:
+** - External VDP input and sync (pin 34/35 on 9918A)
+** - Updates during mid-scanline, probably only used in some MSX1 demos
 ** - Colours are incorrect. [fixed by R Nabet ?]
 ** - Sprites 8-31 are ghosted/cloned in mode 3 when using less than
 **   three pattern tables. Exact behaviour is not known.
@@ -154,6 +156,17 @@ void tms9928a_device::check_interrupt()
 }
 
 
+void tms9928a_device::update_backdrop()
+{
+	// update backdrop colour on change
+	if (m_Regs[7] & 15)
+		palette_set_color(machine(), 0, tms9928a_palette[m_Regs[7] & 15]);
+	else
+		// transparent if EXTVID bit is set
+		palette_set_color(machine(), 0, MAKE_ARGB(m_Regs[0] & 1 ? 0 : 255,0,0,0));
+}
+
+
 void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 {
 	static const UINT8 Mask[8] =
@@ -166,6 +179,7 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 		"Mode 1+2+3 (BOGUS)"
 	};
 
+	UINT8 prev = m_Regs[reg];
 	val &= Mask[reg];
 	m_Regs[reg] = val;
 
@@ -188,6 +202,8 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 			m_pattern = (m_Regs[4] * 2048) & (m_vram_size - 1);
 		}
 		m_mode = ( (m_reva ? (m_Regs[0] & 2) : 0) | ((m_Regs[1] & 0x10)>>4) | ((m_Regs[1] & 8)>>1));
+		if ((val ^ prev) & 1)
+			update_backdrop();
 		logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
 		break;
 	case 1:
@@ -228,7 +244,8 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 		m_spritepattern = (val * 2048) & (m_vram_size - 1);
 		break;
 	case 7:
-		/* The backdrop is updated at TMS9928A_refresh() */
+		if ((val ^ prev) & 15)
+			update_backdrop();
 		break;
 	}
 }
@@ -263,18 +280,6 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	int vpos = m_screen->vpos();
 	UINT16 BackColour = m_Regs[7] & 15;
 	UINT16 *p = BITMAP_ADDR16( m_tmpbmp, vpos, 0 );
-
-	if (!BackColour)
-		BackColour=1;
-
-	if ( vpos == 0 )
-	{
-		rgb_t oldcolor = palette_get_color(machine(), 0);
-
-		/* note we preserve the alpha here; this is so that it can be controlled independently */
-		/* see cliffhgr.c for an example */
-		palette_set_color(machine(), 0, (tms9928a_palette[BackColour] & MAKE_ARGB(0,255,255,255)) | (oldcolor & MAKE_ARGB(255,0,0,0)));
-	}
 
 	int y = vpos - m_top_border;
 
@@ -313,8 +318,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					UINT8 charcode = m_vMem[ addr ];
 					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
 					UINT8 colour = m_vMem[ m_colour + ( charcode >> 3 ) ];
-					UINT16 fg = colour >> 4;
-					UINT16 bg = colour & 15;
+					UINT16 fg = (colour >> 4) ? : BackColour;
+					UINT16 bg = (colour & 15) ? : BackColour;
 
 					for ( int i = 0; i < 8; pattern <<= 1, i++ )
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
@@ -326,8 +331,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			//if (vpos==100 ) popmessage("TMS9928A MODE 1");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
-				UINT16 fg = m_Regs[7] >> 4;
-				UINT16 bg = m_Regs[7] & 15;
+				UINT16 fg = (m_Regs[7] >> 4) ? : BackColour;
+				UINT16 bg = BackColour;
 
 				/* Extra 6 pixels left border */
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
@@ -358,8 +363,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					UINT16 charcode = m_vMem[ addr ] + ( ( y >> 6 ) << 8 );
 					UINT8 pattern = m_vMem[ m_pattern + ( ( charcode & m_patternmask ) << 3 ) + ( y & 7 ) ];
 					UINT8 colour = m_vMem[ m_colour + ( ( charcode & m_colourmask ) << 3 ) + ( y & 7 ) ];
-					UINT16 fg = colour >> 4;
-					UINT16 bg = colour & 15;
+					UINT16 fg = (colour >> 4) ? : BackColour;
+					UINT16 bg = (colour & 15) ? : BackColour;
 
 					for ( int i = 0; i < 8; pattern <<= 1, i++ )
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
@@ -371,8 +376,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			//if (vpos==100) popmessage("TMS9928A MODE1+2");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
-				UINT16 fg = m_Regs[7] >> 4;
-				UINT16 bg = m_Regs[7] & 15;
+				UINT16 fg = (m_Regs[7] >> 4) ? : BackColour;
+				UINT16 bg = BackColour;
 
 				/* Extra 6 pixels left border */
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
@@ -402,8 +407,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				{
 					UINT8 charcode = m_vMem[ addr ];
 					UINT8 colour = m_vMem[ m_pattern + ( charcode << 3 ) + ( ( y >> 2 ) & 7 ) ];
-					UINT16 fg = colour >> 4;
-					UINT16 bg = colour & 15;
+					UINT16 fg = (colour >> 4) ? : BackColour;
+					UINT16 bg = (colour & 15) ? : BackColour;
 
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = p[x+6] = p[x+7] = bg;
@@ -414,8 +419,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		case 5:	case 7:		/* MODE bogus */
 			//if (vpos==100 ) popmessage("TMS9928A MODE bogus");
 			{
-				UINT16 fg = m_Regs[7] >> 4;
-				UINT16 bg = m_Regs[7] & 15;
+				UINT16 fg = (m_Regs[7] >> 4) ? : BackColour;
+				UINT16 bg = BackColour;
 
 				/* Extra 6 pixels left border */
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
@@ -442,8 +447,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				{
 					UINT8 charcode = m_vMem[ addr ];
 					UINT8 colour = m_vMem[ m_pattern + ( ( ( charcode + ( ( y >> 2 ) & 7 ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask ) << 3 ) ];
-					UINT16 fg = colour >> 4;
-					UINT16 bg = colour & 15;
+					UINT16 fg = (colour >> 4) ? : BackColour;
+					UINT16 bg = (colour & 15) ? : BackColour;
 
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = p[x+6] = p[x+7] = bg;
