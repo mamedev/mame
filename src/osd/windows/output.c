@@ -127,7 +127,7 @@ void winoutput_init(running_machine &machine)
 	// create our window class
 	result = create_window_class();
 	assert(result == 0);
-	result++; // to silence gcc 4.6
+	(void)result; // to silence gcc 4.6
 
 	// create a window
 	output_hwnd = CreateWindowEx(
