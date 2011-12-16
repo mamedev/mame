@@ -1523,9 +1523,9 @@ void mcd212_init(running_machine &machine, mcd212_regs_t *mcd212)
         mcd212->channel[index].ddr = 0;
         mcd212->channel[index].dcp = 0;
         mcd212->channel[index].dca = 0;
-        memset(mcd212->channel[index].clut_r, 0, 768);
-        memset(mcd212->channel[index].clut_g, 0, 768);
-        memset(mcd212->channel[index].clut_b, 0, 768);
+        memset(mcd212->channel[index].clut_r, 0, 256);
+        memset(mcd212->channel[index].clut_g, 0, 256);
+        memset(mcd212->channel[index].clut_b, 0, 256);
         mcd212->channel[index].image_coding_method = 0;
         mcd212->channel[index].transparency_control = 0;
         mcd212->channel[index].plane_order = 0;
