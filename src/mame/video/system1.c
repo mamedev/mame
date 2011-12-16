@@ -76,6 +76,13 @@
     The third and fourth collision regions operate similarly, but
     return data for the 32x32x1 sprite collisions.
 
+**************************************************************************
+
+    TODO:
+    - sprite vs background alignment is off sometimes, best visible when
+      scrolling, eg. in regulus, nob, brain
+    - not sure if sprite priorities are completely accurate
+
 *************************************************************************/
 
 #include "emu.h"
