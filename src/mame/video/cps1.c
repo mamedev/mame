@@ -1376,7 +1376,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"varthu",      CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthj",      CPS_B_21_BT5, mapper_VA22B },	/* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
 	{"cworld2j",    CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },	/* (ports 36, 34 probably leftover input code from another game) */
-	{"wof",         CPS_B_21_DEF, mapper_TK263B },
+	{"wof",         CPS_B_21_QS1, mapper_TK263B },
 	{"wofr1",       CPS_B_21_DEF, mapper_TK263B },
 	{"wofa",        CPS_B_21_DEF, mapper_TK263B },
 	{"wofu",        CPS_B_21_QS1, mapper_TK263B },
