@@ -1407,7 +1407,6 @@ Sega Bass Fishing Challenge
 #include "machine/jvs13551.h"
 
 #define CPU_CLOCK (200000000)
-static UINT32 *dc_sound_ram;
 static macronix_29l001mc_device *awflash;
 
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
@@ -1415,12 +1414,16 @@ static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,
 
 static READ64_HANDLER( naomi_arm_r )
 {
-	return *((UINT64 *)dc_sound_ram+offset);
+	dc_state *state = space->machine().driver_data<dc_state>();
+
+	return *((UINT64 *)state->dc_sound_ram+offset);
 }
 
 static WRITE64_HANDLER( naomi_arm_w )
 {
-	COMBINE_DATA((UINT64 *)dc_sound_ram + offset);
+	dc_state *state = space->machine().driver_data<dc_state>();
+
+	COMBINE_DATA((UINT64 *)state->dc_sound_ram + offset);
 }
 
 static READ64_HANDLER( naomi_unknown1_r )
@@ -1822,7 +1825,7 @@ static const aica_interface aica_config =
 
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE( &dc_sound_ram )                /* shared with SH-4 */
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE_MEMBER( dc_state, dc_sound_ram )                /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE("aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
@@ -2485,15 +2488,17 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( naomi )
 {
+	dc_state *state = machine.driver_data<dc_state>();
+
 	MACHINE_RESET_CALL(dc);
-	aica_set_ram_base(machine.device("aica"), dc_sound_ram, 8*1024*1024);
+	aica_set_ram_base(machine.device("aica"), state->dc_sound_ram, 8*1024*1024);
 }
 
 /*
  * Common for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
-static MACHINE_CONFIG_START( naomi_aw_base, driver_device )
+static MACHINE_CONFIG_START( naomi_aw_base, dc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
 	MCFG_CPU_CONFIG(sh4cpu_config)

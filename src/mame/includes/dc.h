@@ -7,6 +7,45 @@
 #ifndef __DC_H__
 #define __DC_H__
 
+class dc_state : public driver_device
+{
+	public:
+		dc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
+
+	UINT32 *dc_sound_ram;
+
+	/* machine related */
+	UINT32 dc_rtcregister[4];
+	UINT32 g2bus_regs[0x100/4];
+
+	/* video related */
+	UINT32 pvrta_regs[0x2000/4];
+
+	struct {
+		UINT32 aica_addr;
+		UINT32 root_addr;
+		UINT32 size;
+		UINT8 dir;
+		UINT8 flag;
+		UINT8 indirect;
+		UINT8 start;
+		UINT8 sel;
+	}m_wave_dma;
+
+	struct {
+		UINT32 pvr_addr;
+		UINT32 sys_addr;
+		UINT32 size;
+		UINT8 sel;
+		UINT8 dir;
+		UINT8 flag;
+		UINT8 start;
+	}m_pvr_dma;
+
+	emu_timer *dc_rtc_timer;
+};
+
 /*----------- defined in machine/dc.c -----------*/
 
 READ64_HANDLER( pvr_ctrl_r );

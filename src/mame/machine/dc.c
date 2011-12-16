@@ -20,8 +20,6 @@
 #define DEBUG_AICA_DMA (0)
 #define DEBUG_PVRCTRL	(0)
 
-static UINT8 mp_mux_data;
-
 #if DEBUG_SYSCTRL
 static const char *const sysctrl_names[] =
 {
@@ -79,54 +77,38 @@ static const char *const sysctrl_names[] =
 #endif
 
 UINT32 dc_sysctrl_regs[0x200/4];
-static UINT32 dc_rtcregister[4];
 UINT32 g1bus_regs[0x100/4];
-static UINT32 g2bus_regs[0x100/4];
-static emu_timer *dc_rtc_timer;
-
-static struct {
-	UINT32 aica_addr;
-	UINT32 root_addr;
-	UINT32 size;
-	UINT8 dir;
-	UINT8 flag;
-	UINT8 indirect;
-	UINT8 start;
-	UINT8 sel;
-}wave_dma;
-
-static struct {
-	UINT32 pvr_addr;
-	UINT32 sys_addr;
-	UINT32 size;
-	UINT8 sel;
-	UINT8 dir;
-	UINT8 flag;
-	UINT8 start;
-}pvr_dma;
 
 static TIMER_CALLBACK( aica_dma_irq )
 {
-	wave_dma.start = g2bus_regs[SB_ADST] = 0;
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->m_wave_dma.start = state->g2bus_regs[SB_ADST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( pvr_dma_irq )
 {
-	pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->m_pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
 	dc_update_interrupt_status(machine);
 }
 
 void naomi_g1_irq(running_machine &machine)
 {
+	//	dc_state *state = machine.driver_data<dc_state>();
+
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( ch2_dma_irq )
 {
+	//	dc_state *state = machine.driver_data<dc_state>();
+
 	dc_sysctrl_regs[SB_C2DLEN]=0;
 	dc_sysctrl_regs[SB_C2DST]=0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
@@ -135,23 +117,27 @@ static TIMER_CALLBACK( ch2_dma_irq )
 
 static TIMER_CALLBACK( yuv_fifo_irq )
 {
+	//	dc_state *state = machine.driver_data<dc_state>();
+
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
 	dc_update_interrupt_status(machine);
 }
 
 static void wave_dma_execute(address_space *space)
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
+
 	UINT32 src,dst,size;
-	dst = wave_dma.aica_addr;
-	src = wave_dma.root_addr;
+	dst = state->m_wave_dma.aica_addr;
+	src = state->m_wave_dma.root_addr;
 	size = 0;
 
 	/* 0 rounding size = 32 Mbytes */
-	if(wave_dma.size == 0) { wave_dma.size = 0x200000; }
+	if(state->m_wave_dma.size == 0) { state->m_wave_dma.size = 0x200000; }
 
-	if(wave_dma.dir == 0)
+	if(state->m_wave_dma.dir == 0)
 	{
-		for(;size<wave_dma.size;size+=4)
+		for(;size<state->m_wave_dma.size;size+=4)
 		{
 			space->write_dword(dst,space->read_dword(src));
 			src+=4;
@@ -160,7 +146,7 @@ static void wave_dma_execute(address_space *space)
 	}
 	else
 	{
-		for(;size<wave_dma.size;size+=4)
+		for(;size<state->m_wave_dma.size;size+=4)
 		{
 			space->write_dword(src,space->read_dword(dst));
 			src+=4;
@@ -169,10 +155,10 @@ static void wave_dma_execute(address_space *space)
 	}
 
 	/* update the params*/
-	wave_dma.aica_addr = g2bus_regs[SB_ADSTAG] = dst;
-	wave_dma.root_addr = g2bus_regs[SB_ADSTAR] = src;
-	wave_dma.size = g2bus_regs[SB_ADLEN] = 0;
-	wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
+	state->m_wave_dma.aica_addr = state->g2bus_regs[SB_ADSTAG] = dst;
+	state->m_wave_dma.root_addr = state->g2bus_regs[SB_ADSTAR] = src;
+	state->m_wave_dma.size = state->g2bus_regs[SB_ADLEN] = 0;
+	state->m_wave_dma.flag = (state->m_wave_dma.indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
 	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(aica_dma_irq));
@@ -180,22 +166,24 @@ static void wave_dma_execute(address_space *space)
 
 static void pvr_dma_execute(address_space *space)
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
+
 	UINT32 src,dst,size;
-	dst = pvr_dma.pvr_addr;
-	src = pvr_dma.sys_addr;
+	dst = state->m_pvr_dma.pvr_addr;
+	src = state->m_pvr_dma.sys_addr;
 	size = 0;
 
 	/* used so far by usagui and sprtjam*/
 	//printf("PVR-DMA start\n");
-	//printf("%08x %08x %08x\n",pvr_dma.pvr_addr,pvr_dma.sys_addr,pvr_dma.size);
-	//printf("src %s dst %08x\n",pvr_dma.dir ? "->" : "<-",pvr_dma.sel);
+	//printf("%08x %08x %08x\n",state->m_pvr_dma.pvr_addr,state->m_pvr_dma.sys_addr,state->m_pvr_dma.size);
+	//printf("src %s dst %08x\n",state->m_pvr_dma.dir ? "->" : "<-",state->m_pvr_dma.sel);
 
 	/* 0 rounding size = 16 Mbytes */
-	if(pvr_dma.size == 0) { pvr_dma.size = 0x100000; }
+	if(state->m_pvr_dma.size == 0) { state->m_pvr_dma.size = 0x100000; }
 
-	if(pvr_dma.dir == 0)
+	if(state->m_pvr_dma.dir == 0)
 	{
-		for(;size<pvr_dma.size;size+=4)
+		for(;size<state->m_pvr_dma.size;size+=4)
 		{
 			space->write_dword(dst,space->read_dword(src));
 			src+=4;
@@ -204,7 +192,7 @@ static void pvr_dma_execute(address_space *space)
 	}
 	else
 	{
-		for(;size<pvr_dma.size;size+=4)
+		for(;size<state->m_pvr_dma.size;size+=4)
 		{
 			space->write_dword(src,space->read_dword(dst));
 			src+=4;
@@ -267,6 +255,7 @@ INLINE int decode_reg3216_64(running_machine &machine, UINT32 offset, UINT64 mem
 
 int dc_compute_interrupt_level(running_machine &machine)
 {
+	//dc_state *state = machine.driver_data<dc_state>();
 	UINT32 ln,lx,le;
 
 	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML6NRM];
@@ -298,6 +287,7 @@ int dc_compute_interrupt_level(running_machine &machine)
 
 void dc_update_interrupt_status(running_machine &machine)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int level;
 
 	if (dc_sysctrl_regs[SB_ISTERR])
@@ -322,7 +312,7 @@ void dc_update_interrupt_status(running_machine &machine)
 	sh4_set_irln_input(machine.device("maincpu"), 15-level);
 
 	/* Wave DMA HW trigger */
-	if(wave_dma.flag && ((wave_dma.sel & 2) == 2))
+	if(state->m_wave_dma.flag && ((state->m_wave_dma.sel & 2) == 2))
 	{
 		if((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
@@ -334,7 +324,7 @@ void dc_update_interrupt_status(running_machine &machine)
 	}
 
 	/* PVR-DMA HW trigger */
-	if(pvr_dma.flag && ((pvr_dma.sel & 1) == 1))
+	if(state->m_pvr_dma.flag && ((state->m_pvr_dma.sel & 1) == 1))
 	{
 		if((dc_sysctrl_regs[SB_PDTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_PDTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
@@ -348,6 +338,8 @@ void dc_update_interrupt_status(running_machine &machine)
 
 READ64_HANDLER( dc_sysctrl_r )
 {
+	//	dc_state *state = space->machine().driver_data<dc_state>();
+
 	int reg;
 	UINT64 shift;
 
@@ -365,6 +357,8 @@ READ64_HANDLER( dc_sysctrl_r )
 
 WRITE64_HANDLER( dc_sysctrl_w )
 {
+	//	dc_state *state = space->machine().driver_data<dc_state>();
+
 	int reg;
 	UINT64 shift;
 	UINT32 old,dat;
@@ -464,6 +458,8 @@ WRITE64_HANDLER( dc_sysctrl_w )
 
 READ64_HANDLER( dc_gdrom_r )
 {
+//	dc_state *state = space->machine().driver_data<dc_state>();
+
 	UINT32 off;
 
 	if ((int)~mem_mask & 1)
@@ -485,6 +481,7 @@ READ64_HANDLER( dc_gdrom_r )
 
 WRITE64_HANDLER( dc_gdrom_w )
 {
+//	dc_state *state = space->machine().driver_data<dc_state>();
 	UINT32 dat,off;
 
 	if ((int)~mem_mask & 1)
@@ -503,16 +500,18 @@ WRITE64_HANDLER( dc_gdrom_w )
 
 READ64_HANDLER( dc_g2_ctrl_r )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
 	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
-	return (UINT64)g2bus_regs[reg] << shift;
+	return (UINT64)state->g2bus_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_g2_ctrl_w )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
@@ -521,41 +520,41 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
-	g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
+	state->g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
 
 	switch (reg)
 	{
 		/*AICA Address register*/
-		case SB_ADSTAG: wave_dma.aica_addr = dat; break;
+		case SB_ADSTAG: state->m_wave_dma.aica_addr = dat; break;
 		/*Root address (work ram)*/
-		case SB_ADSTAR:	wave_dma.root_addr = dat; break;
+		case SB_ADSTAR:	state->m_wave_dma.root_addr = dat; break;
 		/*DMA size (in dword units, bit 31 is "set dma initiation enable setting to 0"*/
 		case SB_ADLEN:
-			wave_dma.size = dat & 0x7fffffff;
-			wave_dma.indirect = (dat & 0x80000000)>>31;
+			state->m_wave_dma.size = dat & 0x7fffffff;
+			state->m_wave_dma.indirect = (dat & 0x80000000)>>31;
 			break;
 		/*0 = root memory to aica / 1 = aica to root memory*/
-		case SB_ADDIR: wave_dma.dir = (dat & 1); break;
+		case SB_ADDIR: state->m_wave_dma.dir = (dat & 1); break;
 		/*dma flag (active HIGH, bug in docs)*/
-		case SB_ADEN: wave_dma.flag = (dat & 1); break;
+		case SB_ADEN: state->m_wave_dma.flag = (dat & 1); break;
 		/*
         SB_ADTSEL
         bit 1: (0) Wave DMA through SB_ADST flag (1) Wave DMA through irq trigger, defined by SB_G2DTNRM / SB_G2DTEXT
         */
-		case SB_ADTSEL: wave_dma.sel = dat & 7; break;
+		case SB_ADTSEL: state->m_wave_dma.sel = dat & 7; break;
 		/*ready for dma'ing*/
 		case SB_ADST:
-			old = wave_dma.start & 1;
-			wave_dma.start = dat & 1;
+			old = state->m_wave_dma.start & 1;
+			state->m_wave_dma.start = dat & 1;
 
 			#if DEBUG_AICA_DMA
 			printf("AICA: G2-DMA start \n");
-			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",wave_dma.aica_addr,wave_dma.root_addr,wave_dma.size,wave_dma.indirect);
-			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",wave_dma.sel,wave_dma.start,wave_dma.flag,wave_dma.dir);
+			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",state->m_wave_dma.aica_addr,state->m_wave_dma.root_addr,state->m_wave_dma.size,state->m_wave_dma.indirect);
+			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",state->m_wave_dma.sel,state->m_wave_dma.start,state->m_wave_dma.flag,state->m_wave_dma.dir);
 			#endif
 
 			//mame_printf_verbose("SB_ADST data %08x\n",dat);
-			if(((old & 1) == 0) && wave_dma.flag && wave_dma.start && ((wave_dma.sel & 2) == 0)) // 0 -> 1
+			if(((old & 1) == 0) && state->m_wave_dma.flag && state->m_wave_dma.start && ((state->m_wave_dma.sel & 2) == 0)) // 0 -> 1
 				wave_dma_execute(space);
 			break;
 
@@ -604,6 +603,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 
 READ64_HANDLER( pvr_ctrl_r )
 {
+//	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
@@ -618,6 +618,7 @@ READ64_HANDLER( pvr_ctrl_r )
 
 WRITE64_HANDLER( pvr_ctrl_w )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
@@ -628,21 +629,21 @@ WRITE64_HANDLER( pvr_ctrl_w )
 
 	switch (reg)
 	{
-		case SB_PDSTAP: pvr_dma.pvr_addr = dat; break;
-		case SB_PDSTAR: pvr_dma.sys_addr = dat; break;
-		case SB_PDLEN: pvr_dma.size = dat; break;
-		case SB_PDDIR: pvr_dma.dir = dat & 1; break;
+		case SB_PDSTAP: state->m_pvr_dma.pvr_addr = dat; break;
+		case SB_PDSTAR: state->m_pvr_dma.sys_addr = dat; break;
+		case SB_PDLEN: state->m_pvr_dma.size = dat; break;
+		case SB_PDDIR: state->m_pvr_dma.dir = dat & 1; break;
 		case SB_PDTSEL:
-			pvr_dma.sel = dat & 1;
-			//if(pvr_dma.sel & 1)
+			state->m_pvr_dma.sel = dat & 1;
+			//if(state->m_pvr_dma.sel & 1)
 			//  printf("Warning: Unsupported irq mode trigger PVR-DMA\n");
 			break;
-		case SB_PDEN: pvr_dma.flag = dat & 1; break;
+		case SB_PDEN: state->m_pvr_dma.flag = dat & 1; break;
 		case SB_PDST:
-			old = pvr_dma.start & 1;
-			pvr_dma.start = dat & 1;
+			old = state->m_pvr_dma.start & 1;
+			state->m_pvr_dma.start = dat & 1;
 
-			if(((old & 1) == 0) && pvr_dma.flag && pvr_dma.start && ((pvr_dma.sel & 1) == 0)) // 0 -> 1
+			if(((old & 1) == 0) && state->m_pvr_dma.flag && state->m_pvr_dma.start && ((state->m_pvr_dma.sel & 1) == 0)) // 0 -> 1
 				pvr_dma_execute(space);
 			break;
 	}
@@ -658,6 +659,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 
 READ64_HANDLER( dc_modem_r )
 {
+//	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
@@ -676,6 +678,7 @@ READ64_HANDLER( dc_modem_r )
 
 WRITE64_HANDLER( dc_modem_w )
 {
+//	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
@@ -687,41 +690,43 @@ WRITE64_HANDLER( dc_modem_w )
 
 READ64_HANDLER( dc_rtc_r )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
 	reg = decode_reg3216_64(space->machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("RTC:  Unmapped read %08x\n", 0x710000+reg*4);
 
-	return (UINT64)dc_rtcregister[reg] << shift;
+	return (UINT64)state->dc_rtcregister[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_rtc_w )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 old,dat;
 
 	reg = decode_reg3216_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	old = dc_rtcregister[reg];
-	dc_rtcregister[reg] = dat & 0xFFFF; // 5f6c00+off*4=dat
+	old = state->dc_rtcregister[reg];
+	state->dc_rtcregister[reg] = dat & 0xFFFF; // 5f6c00+off*4=dat
 	switch (reg)
 	{
 	case RTC1:
-		if (dc_rtcregister[RTC3])
-			dc_rtcregister[RTC3] = 0;
+		if (state->dc_rtcregister[RTC3])
+			state->dc_rtcregister[RTC3] = 0;
 		else
-			dc_rtcregister[reg] = old;
+			state->dc_rtcregister[reg] = old;
 		break;
 	case RTC2:
-		if (dc_rtcregister[RTC3] == 0)
-			dc_rtcregister[reg] = old;
+		if (state->dc_rtcregister[RTC3] == 0)
+			state->dc_rtcregister[reg] = old;
 		else
-			dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+			state->dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 		break;
 	case RTC3:
-		dc_rtcregister[RTC3] &= 1;
+		state->dc_rtcregister[RTC3] &= 1;
 		break;
 	}
 	mame_printf_verbose("RTC: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x710000 + reg*4, dat, data, offset, mem_mask);
@@ -729,21 +734,24 @@ WRITE64_HANDLER( dc_rtc_w )
 
 static TIMER_CALLBACK(dc_rtc_increment)
 {
-    dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
-    if (dc_rtcregister[RTC2] == 0)
-        dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
+	dc_state *state = machine.driver_data<dc_state>();
+
+    state->dc_rtcregister[RTC2] = (state->dc_rtcregister[RTC2] + 1) & 0xFFFF;
+    if (state->dc_rtcregister[RTC2] == 0)
+        state->dc_rtcregister[RTC1] = (state->dc_rtcregister[RTC1] + 1) & 0xFFFF;
 }
 
 /* fill the RTC registers with the proper start-up values */
 static void rtc_initial_setup(running_machine &machine)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	static UINT32 current_time;
 	static int year_count,cur_year,i;
 	static const int month_to_day_conversion[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 	system_time systime;
 	machine.base_datetime(systime);
 
-	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
+	memset(state->dc_rtcregister, 0, sizeof(state->dc_rtcregister));
 
 	/* put the seconds */
 	current_time = systime.local_time.second;
@@ -768,33 +776,36 @@ static void rtc_initial_setup(running_machine &machine)
 	for(i=0;i<year_count-1;i++)
 		current_time += (((((i+1950) % 4) == 0) && (((i+1950) % 100) != 0)) || (((i+1950) % 400) == 0)) ? 60*60*24*366 : 60*60*24*365;
 
-	dc_rtcregister[RTC2] = current_time & 0x0000ffff;
-	dc_rtcregister[RTC1] = (current_time & 0xffff0000) >> 16;
+	state->dc_rtcregister[RTC2] = current_time & 0x0000ffff;
+	state->dc_rtcregister[RTC1] = (current_time & 0xffff0000) >> 16;
 
-	dc_rtc_timer = machine.scheduler().timer_alloc(FUNC(dc_rtc_increment));
+	state->dc_rtc_timer = machine.scheduler().timer_alloc(FUNC(dc_rtc_increment));
 }
 
 MACHINE_START( dc )
 {
+//	dc_state *state = machine.driver_data<dc_state>();
+
 	rtc_initial_setup(machine);
 }
 
 MACHINE_RESET( dc )
 {
+	dc_state *state = machine.driver_data<dc_state>();
+
 	/* halt the ARM7 */
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 
-	dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+	state->dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
-
-	mp_mux_data = 0;
 }
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )
 {
+	//	dc_state *state = device->machine().driver_data<dc_state>();
 	//int reg;
 	UINT64 shift;
 
@@ -807,6 +818,7 @@ READ64_DEVICE_HANDLER( dc_aica_reg_r )
 
 WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 {
+	//	dc_state *state = device->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
