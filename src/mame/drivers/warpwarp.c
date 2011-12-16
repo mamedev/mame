@@ -138,6 +138,17 @@ TODO:
 #define MASTER_CLOCK		XTAL_18_432MHz
 
 
+/* Interrupt Gen */
+static INTERRUPT_GEN( vblank_irq )
+{
+	warpwarp_state *state = device->machine().driver_data<warpwarp_state>();
+
+	if(state->m_ball_on)
+		device_set_input_line(device, 0, ASSERT_LINE);
+}
+
+
+/* B&W Games I/O */
 static READ8_HANDLER( geebee_in_r )
 {
 	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
@@ -208,6 +219,8 @@ static WRITE8_HANDLER( geebee_out7_w )
 			break;
 		case 6:
 			state->m_ball_on = data & 1;
+			if (~data & 1)
+				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 		case 7:
 			flip_screen_set(space->machine(), data & 1);
@@ -215,6 +228,8 @@ static WRITE8_HANDLER( geebee_out7_w )
 	}
 }
 
+
+/* Color Games I/O */
 
 /* Read Switch Inputs */
 static READ8_HANDLER( warpwarp_sw_r )
@@ -290,7 +305,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 			coin_counter_w(space->machine(), 0,data & 1);
 			break;
 		case 6:
-			state->m_ball_on = state->m_irq_mask = data & 1;
+			state->m_ball_on = data & 1;
 			if (~data & 1)
 				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			break;
@@ -340,6 +355,7 @@ static ADDRESS_MAP_START( warpwarp_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc020, 0xc02f) AM_DEVREADWRITE("warpwarp", warpwarp_dsw1_r, warpwarp_music2_w)
 	AM_RANGE(0xc030, 0xc03f) AM_WRITE(warpwarp_out3_w)
 ADDRESS_MAP_END
+
 
 
 static INPUT_PORTS_START( geebee )
@@ -714,13 +730,6 @@ static GFXDECODE_START( color )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( vblank_irq )
-{
-	warpwarp_state *state = device->machine().driver_data<warpwarp_state>();
-
-	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
-}
 
 
 static MACHINE_CONFIG_START( geebee, warpwarp_state )
@@ -765,7 +774,7 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)		/* 18.432 MHz / 9 */
 	MCFG_CPU_PROGRAM_MAP(bombbee_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
