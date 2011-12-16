@@ -128,7 +128,7 @@ static void video_start_common(running_machine &machine, int pagecount)
 	}
 
 	/* allocate a temporary bitmap for sprite rendering */
-	state->m_sprite_bitmap = auto_bitmap_alloc(machine, 256, 256, BITMAP_FORMAT_INDEXED16);
+	state->m_sprite_bitmap = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
 
 	/* register for save stats */
 	state_save_register_global(machine, state->m_video_mode);
@@ -377,12 +377,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		UINT16 srcaddr = spritedata[6] + (spritedata[7] << 8);
 		UINT16 stride = spritedata[4] + (spritedata[5] << 8);
 		UINT8 bank = ((spritedata[3] & 0x80) >> 7) | ((spritedata[3] & 0x40) >> 5) | ((spritedata[3] & 0x20) >> 3);
-		int xstart = ((spritedata[2] + (spritedata[3] << 8)) & 0x1ff) / 2 + xoffset;
+		int xstart = ((spritedata[2] | (spritedata[3] << 8)) & 0x1ff) + xoffset;
 		int bottom = spritedata[1] + 1;
 		int top = spritedata[0] + 1;
 		UINT16 palettebase = spritenum * 0x10;
 		const UINT8 *gfxbankbase;
-		int x, y;
+		int x, y, i;
 
 		/* writing an 0xff into the first byte of sprite RAM seems to disable all sprites;
            not sure if this applies to each sprite or only to the first one; see pitfall2
@@ -418,7 +418,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 			/* iterate over X */
 			addrdelta = (srcaddr & 0x8000) ? -1 : 1;
-			for (x = xstart, curaddr = srcaddr; ; x += 2, curaddr += addrdelta)
+			for (x = xstart, curaddr = srcaddr; ; x += 4, curaddr += addrdelta)
 			{
 				UINT8 color1, color2;
 				UINT8 data;
@@ -444,14 +444,17 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				/* draw if non-transparent */
 				if (color1 != 0)
 				{
-					int effx = flipscreen ? 255 - (x + 0) : (x + 0);
-					if (effx >= cliprect->min_x && effx <= cliprect->max_x)
+					for (i = 0; i < 2; i++)
 					{
-						int prevpix = destbase[effx];
-
-						if ((prevpix & 0x0f) != 0)
-							state->m_sprite_collide[((prevpix >> 4) & 0x1f) + 32 * spritenum] = state->m_sprite_collide_summary = 1;
-						destbase[effx] = color1 | palettebase;
+						int effx = flipscreen ? 255 - (x + i) : (x + i);
+						if (effx >= cliprect->min_x && effx <= cliprect->max_x)
+						{
+							int prevpix = destbase[effx];
+	
+							if ((prevpix & 0x0f) != 0)
+								state->m_sprite_collide[((prevpix >> 4) & 0x1f) + 32 * spritenum] = state->m_sprite_collide_summary = 1;
+							destbase[effx] = color1 | palettebase;
+						}
 					}
 				}
 
@@ -462,14 +465,17 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				/* draw if non-transparent */
 				if (color2 != 0)
 				{
-					int effx = flipscreen ? 255 - (x + 1) : (x + 1);
-					if (effx >= cliprect->min_x && effx <= cliprect->max_x)
+					for (i = 0; i < 2; i++)
 					{
-						int prevpix = destbase[effx];
-
-						if ((prevpix & 0x0f) != 0)
-							state->m_sprite_collide[((prevpix >> 4) & 0x1f) + 32 * spritenum] = state->m_sprite_collide_summary = 1;
-						destbase[effx] = color2 | palettebase;
+						int effx = flipscreen ? 255 - (x + 2 + i) : (x + 2 + i);
+						if (effx >= cliprect->min_x && effx <= cliprect->max_x)
+						{
+							int prevpix = destbase[effx];
+	
+							if ((prevpix & 0x0f) != 0)
+								state->m_sprite_collide[((prevpix >> 4) & 0x1f) + 32 * spritenum] = state->m_sprite_collide_summary = 1;
+							destbase[effx] = color2 | palettebase;
+						}
 					}
 				}
 			}
@@ -512,8 +518,8 @@ static void video_update_common(device_t *screen, bitmap_t *bitmap, const rectan
 		/* iterate over pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			int bgx = (x - bgxscroll) & 0x1ff;
-			UINT16 fgpix = fgbase[x];
+			int bgx = ((x - bgxscroll) / 2) & 0x1ff;
+			UINT16 fgpix = fgbase[x / 2];
 			UINT16 bgpix = bgbase[bgx >> 8][bgx & 0xff];
 			UINT16 sprpix = sprbase[x];
 			UINT8 lookup_index;
@@ -569,7 +575,7 @@ SCREEN_UPDATE( system1 )
 	fgpixmap = tilemap_get_pixmap(state->m_tilemap_page[1]);
 
 	/* get fixed scroll offsets */
-	xscroll = (videoram[0xffc] | (videoram[0xffd] << 8)) / 2 + 14;
+	xscroll = (videoram[0xffc] | (videoram[0xffd] << 8)) + 28;
 	yscroll = videoram[0xfbd];
 
 	/* adjust for flipping */
@@ -611,9 +617,9 @@ SCREEN_UPDATE( system2 )
 	/* get scroll offsets */
 	if (!flip_screen_get(screen->machine()))
 	{
-		xscroll = (((videoram[0x7c0] | (videoram[0x7c1] << 8)) / 2) & 0xff) - 256 + 5;
+		xscroll = ((videoram[0x7c0] | (videoram[0x7c1] << 8)) & 0x1ff) - 512 + 10;
 		yscroll = videoram[0x7ba];
-		sprxoffset = 7;
+		sprxoffset = 14;
 	}
 	else
 	{
@@ -654,7 +660,7 @@ SCREEN_UPDATE( system2_rowscroll )
 	if (!flip_screen_get(screen->machine()))
 	{
 		for (y = 0; y < 32; y++)
-			rowscroll[y] = (((videoram[0x7c0 + y * 2] | (videoram[0x7c1 + y * 2] << 8)) / 2) & 0xff) - 256 + 5;
+			rowscroll[y] = ((videoram[0x7c0 + y * 2] | (videoram[0x7c1 + y * 2] << 8)) & 0x1ff) - 512 + 10;
 		yscroll = videoram[0x7ba];
 	}
 	else
@@ -665,6 +671,6 @@ SCREEN_UPDATE( system2_rowscroll )
 	}
 
 	/* common update */
-	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, yscroll, 7);
+	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, yscroll, 14);
 	return 0;
 }
