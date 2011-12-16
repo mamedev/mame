@@ -13,14 +13,18 @@ class dc_state : public driver_device
 		dc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	UINT64 *dc_framebuffer_ram; // '32-bit access area'
+	UINT64 *dc_texture_ram; // '64-bit access area'
+
 	UINT32 *dc_sound_ram;
 
 	/* machine related */
 	UINT32 dc_rtcregister[4];
+	UINT32 dc_sysctrl_regs[0x200/4];
+//	UINT32 g1bus_regs[0x100/4];
 	UINT32 g2bus_regs[0x100/4];
 
-	/* video related */
-	UINT32 pvrta_regs[0x2000/4];
+	emu_timer *dc_rtc_timer;
 
 	struct {
 		UINT32 aica_addr;
@@ -43,7 +47,24 @@ class dc_state : public driver_device
 		UINT8 start;
 	}m_pvr_dma;
 
-	emu_timer *dc_rtc_timer;
+	/* video related */
+	UINT32 pvrta_regs[0x2000/4];
+	UINT32 pvrctrl_regs[0x100/4];
+	UINT32 debug_dip_status;
+	emu_timer *vbout_timer;
+	emu_timer *vbin_timer;
+	emu_timer *hbin_timer;
+	emu_timer *endofrender_timer_isp;
+	emu_timer *endofrender_timer_tsp;
+	emu_timer *endofrender_timer_video;
+	UINT32 tafifo_buff[32];
+	int scanline;
+	int next_y;
+
+	/* Naomi 2 specific (To be moved) */
+	UINT64 *pvr2_texture_ram;
+	UINT64 *pvr2_framebuffer_ram;
+	UINT64 *elan_ram;
 };
 
 /*----------- defined in machine/dc.c -----------*/
@@ -74,9 +95,6 @@ MACHINE_RESET( dc );
 
 int dc_compute_interrupt_level(running_machine &machine);
 void dc_update_interrupt_status(running_machine &machine);
-
-extern UINT32 dc_sysctrl_regs[0x200/4];
-extern UINT32 g1bus_regs[0x100/4];
 
 /*--------- Ch2-DMA Control Registers ----------*/
 #define SB_C2DSTAT	((0x005f6800-0x005f6800)/4)

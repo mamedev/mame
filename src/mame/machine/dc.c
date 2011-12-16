@@ -76,15 +76,12 @@ static const char *const sysctrl_names[] =
 
 #endif
 
-UINT32 dc_sysctrl_regs[0x200/4];
-UINT32 g1bus_regs[0x100/4];
-
 static TIMER_CALLBACK( aica_dma_irq )
 {
 	dc_state *state = machine.driver_data<dc_state>();
 
 	state->m_wave_dma.start = state->g2bus_regs[SB_ADST] = 0;
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
 	dc_update_interrupt_status(machine);
 }
 
@@ -92,34 +89,34 @@ static TIMER_CALLBACK( pvr_dma_irq )
 {
 	dc_state *state = machine.driver_data<dc_state>();
 
-	state->m_pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+	state->m_pvr_dma.start = state->pvrctrl_regs[SB_PDST] = 0;
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
 	dc_update_interrupt_status(machine);
 }
 
 void naomi_g1_irq(running_machine &machine)
 {
-	//	dc_state *state = machine.driver_data<dc_state>();
+	dc_state *state = machine.driver_data<dc_state>();
 
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( ch2_dma_irq )
 {
-	//	dc_state *state = machine.driver_data<dc_state>();
+	dc_state *state = machine.driver_data<dc_state>();
 
-	dc_sysctrl_regs[SB_C2DLEN]=0;
-	dc_sysctrl_regs[SB_C2DST]=0;
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
+	state->dc_sysctrl_regs[SB_C2DLEN]=0;
+	state->dc_sysctrl_regs[SB_C2DST]=0;
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( yuv_fifo_irq )
 {
-	//	dc_state *state = machine.driver_data<dc_state>();
+	dc_state *state = machine.driver_data<dc_state>();
 
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
 	dc_update_interrupt_status(machine);
 }
 
@@ -255,28 +252,28 @@ INLINE int decode_reg3216_64(running_machine &machine, UINT32 offset, UINT64 mem
 
 int dc_compute_interrupt_level(running_machine &machine)
 {
-	//dc_state *state = machine.driver_data<dc_state>();
+	dc_state *state = machine.driver_data<dc_state>();
 	UINT32 ln,lx,le;
 
-	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML6NRM];
-	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML6EXT];
-	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML6ERR];
+	ln=state->dc_sysctrl_regs[SB_ISTNRM] & state->dc_sysctrl_regs[SB_IML6NRM];
+	lx=state->dc_sysctrl_regs[SB_ISTEXT] & state->dc_sysctrl_regs[SB_IML6EXT];
+	le=state->dc_sysctrl_regs[SB_ISTERR] & state->dc_sysctrl_regs[SB_IML6ERR];
 	if (ln | lx | le)
 	{
 		return 6;
 	}
 
-	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML4NRM];
-	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML4EXT];
-	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML4ERR];
+	ln=state->dc_sysctrl_regs[SB_ISTNRM] & state->dc_sysctrl_regs[SB_IML4NRM];
+	lx=state->dc_sysctrl_regs[SB_ISTEXT] & state->dc_sysctrl_regs[SB_IML4EXT];
+	le=state->dc_sysctrl_regs[SB_ISTERR] & state->dc_sysctrl_regs[SB_IML4ERR];
 	if (ln | lx | le)
 	{
 		return 4;
 	}
 
-	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML2NRM];
-	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML2EXT];
-	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML2ERR];
+	ln=state->dc_sysctrl_regs[SB_ISTNRM] & state->dc_sysctrl_regs[SB_IML2NRM];
+	lx=state->dc_sysctrl_regs[SB_ISTEXT] & state->dc_sysctrl_regs[SB_IML2EXT];
+	le=state->dc_sysctrl_regs[SB_ISTERR] & state->dc_sysctrl_regs[SB_IML2ERR];
 	if (ln | lx | le)
 	{
 		return 2;
@@ -290,22 +287,22 @@ void dc_update_interrupt_status(running_machine &machine)
 	dc_state *state = machine.driver_data<dc_state>();
 	int level;
 
-	if (dc_sysctrl_regs[SB_ISTERR])
+	if (state->dc_sysctrl_regs[SB_ISTERR])
 	{
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_ERROR;
+		state->dc_sysctrl_regs[SB_ISTNRM] |= IST_ERROR;
 	}
 	else
 	{
-		dc_sysctrl_regs[SB_ISTNRM] &= ~IST_ERROR;
+		state->dc_sysctrl_regs[SB_ISTNRM] &= ~IST_ERROR;
 	}
 
-	if (dc_sysctrl_regs[SB_ISTEXT])
+	if (state->dc_sysctrl_regs[SB_ISTEXT])
 	{
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_G1G2EXTSTAT;
+		state->dc_sysctrl_regs[SB_ISTNRM] |= IST_G1G2EXTSTAT;
 	}
 	else
 	{
-		dc_sysctrl_regs[SB_ISTNRM] &= ~IST_G1G2EXTSTAT;
+		state->dc_sysctrl_regs[SB_ISTNRM] &= ~IST_G1G2EXTSTAT;
 	}
 
 	level=dc_compute_interrupt_level(machine);
@@ -314,7 +311,7 @@ void dc_update_interrupt_status(running_machine &machine)
 	/* Wave DMA HW trigger */
 	if(state->m_wave_dma.flag && ((state->m_wave_dma.sel & 2) == 2))
 	{
-		if((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
+		if((state->dc_sysctrl_regs[SB_G2DTNRM] & state->dc_sysctrl_regs[SB_ISTNRM]) || (state->dc_sysctrl_regs[SB_G2DTEXT] & state->dc_sysctrl_regs[SB_ISTEXT]))
 		{
 			address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
@@ -326,7 +323,7 @@ void dc_update_interrupt_status(running_machine &machine)
 	/* PVR-DMA HW trigger */
 	if(state->m_pvr_dma.flag && ((state->m_pvr_dma.sel & 1) == 1))
 	{
-		if((dc_sysctrl_regs[SB_PDTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_PDTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
+		if((state->dc_sysctrl_regs[SB_PDTNRM] & state->dc_sysctrl_regs[SB_ISTNRM]) || (state->dc_sysctrl_regs[SB_PDTEXT] & state->dc_sysctrl_regs[SB_ISTEXT]))
 		{
 			address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
@@ -338,7 +335,7 @@ void dc_update_interrupt_status(running_machine &machine)
 
 READ64_HANDLER( dc_sysctrl_r )
 {
-	//	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space->machine().driver_data<dc_state>();
 
 	int reg;
 	UINT64 shift;
@@ -348,16 +345,16 @@ READ64_HANDLER( dc_sysctrl_r )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
 	{
-		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(&space->device()));
+		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, state->dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(&space->device()));
 	}
 	#endif
 
-	return (UINT64)dc_sysctrl_regs[reg] << shift;
+	return (UINT64)state->dc_sysctrl_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_sysctrl_w )
 {
-	//	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space->machine().driver_data<dc_state>();
 
 	int reg;
 	UINT64 shift;
@@ -367,23 +364,23 @@ WRITE64_HANDLER( dc_sysctrl_w )
 
 	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	old = dc_sysctrl_regs[reg];
-	dc_sysctrl_regs[reg] = dat; // 5f6800+off*4=dat
+	old = state->dc_sysctrl_regs[reg];
+	state->dc_sysctrl_regs[reg] = dat; // 5f6800+off*4=dat
 	switch (reg)
 	{
 		case SB_C2DST:
 			if(((old & 1) == 0) && (dat & 1)) // 0 -> 1
 			{
-				address=(dc_sysctrl_regs[SB_C2DSTAT] & 0x03ffffe0) | 0x10000000;
-				if(dc_sysctrl_regs[SB_C2DSTAT] & 0x1f)
-					printf("C2DSTAT just used to reserved bits %02x\n",dc_sysctrl_regs[SB_C2DSTAT] & 0x1f);
+				address=(state->dc_sysctrl_regs[SB_C2DSTAT] & 0x03ffffe0) | 0x10000000;
+				if(state->dc_sysctrl_regs[SB_C2DSTAT] & 0x1f)
+					printf("C2DSTAT just used to reserved bits %02x\n",state->dc_sysctrl_regs[SB_C2DSTAT] & 0x1f);
 
 				ddtdata.destination=address;
 				/* 0 rounding size = 16 Mbytes */
-				if(dc_sysctrl_regs[SB_C2DLEN] == 0)
+				if(state->dc_sysctrl_regs[SB_C2DLEN] == 0)
 					ddtdata.length = 0x1000000;
 				else
-					ddtdata.length = dc_sysctrl_regs[SB_C2DLEN];
+					ddtdata.length = state->dc_sysctrl_regs[SB_C2DLEN];
 				ddtdata.size=1;
 				ddtdata.direction=0;
 				ddtdata.channel=2;
@@ -391,27 +388,27 @@ WRITE64_HANDLER( dc_sysctrl_w )
 				sh4_dma_ddt(space->machine().device("maincpu"),&ddtdata);
 				#if DEBUG_SYSCTRL
 				if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
-					if (dc_sysctrl_regs[SB_LMMODE0])
-						printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
+					if (state->dc_sysctrl_regs[SB_LMMODE0])
+						printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", state->dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, state->dc_sysctrl_regs[SB_C2DSTAT],state->dc_sysctrl_regs[SB_LMMODE0],state->dc_sysctrl_regs[SB_LMMODE1]); // 1
 					else
-						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
+						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", state->dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, state->dc_sysctrl_regs[SB_C2DSTAT],state->dc_sysctrl_regs[SB_LMMODE0],state->dc_sysctrl_regs[SB_LMMODE1]); // 0
 				else if ((address >= 0x13000000) && (address <= 0x13FFFFFF))
-					if (dc_sysctrl_regs[SB_LMMODE1])
-						printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
+					if (state->dc_sysctrl_regs[SB_LMMODE1])
+						printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", state->dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, state->dc_sysctrl_regs[SB_C2DSTAT],state->dc_sysctrl_regs[SB_LMMODE0],state->dc_sysctrl_regs[SB_LMMODE1]); // 1
 					else
-						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
+						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", state->dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, state->dc_sysctrl_regs[SB_C2DSTAT],state->dc_sysctrl_regs[SB_LMMODE0],state->dc_sysctrl_regs[SB_LMMODE1]); // 0
 				else if ((address >= 0x10800000) && (address <= 0x10ffffff))
-					printf("SYSCTRL: Ch2 YUV dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+					printf("SYSCTRL: Ch2 YUV dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", state->dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, state->dc_sysctrl_regs[SB_C2DSTAT],state->dc_sysctrl_regs[SB_LMMODE0],state->dc_sysctrl_regs[SB_LMMODE1]);
 				else if ((address >= 0x10000000) && (address <= 0x107fffff))
-					mame_printf_verbose("SYSCTRL: Ch2 TA Display List dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+					mame_printf_verbose("SYSCTRL: Ch2 TA Display List dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", state->dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, state->dc_sysctrl_regs[SB_C2DSTAT],state->dc_sysctrl_regs[SB_LMMODE0],state->dc_sysctrl_regs[SB_LMMODE1]);
 				else
-					mame_printf_verbose("SYSCTRL: Ch2 unknown dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+					mame_printf_verbose("SYSCTRL: Ch2 unknown dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", state->dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, state->dc_sysctrl_regs[SB_C2DSTAT],state->dc_sysctrl_regs[SB_LMMODE0],state->dc_sysctrl_regs[SB_LMMODE1]);
 				#endif
 
 				if ((!(address & 0x01000000)))
-					dc_sysctrl_regs[SB_C2DSTAT]=address;
+					state->dc_sysctrl_regs[SB_C2DSTAT]=address;
 				else //direct texture path
-					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
+					state->dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				/* 200 usecs breaks sfz3upper */
 				space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(ch2_dma_irq));
@@ -422,17 +419,17 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			break;
 
 		case SB_ISTNRM:
-			dc_sysctrl_regs[SB_ISTNRM] = old & ~(dat | 0xC0000000); // bits 31,30 ro
+			state->dc_sysctrl_regs[SB_ISTNRM] = old & ~(dat | 0xC0000000); // bits 31,30 ro
 			dc_update_interrupt_status(space->machine());
 			break;
 
 		case SB_ISTEXT:
-			dc_sysctrl_regs[SB_ISTEXT] = old;
+			state->dc_sysctrl_regs[SB_ISTEXT] = old;
 			dc_update_interrupt_status(space->machine());
 			break;
 
 		case SB_ISTERR:
-			dc_sysctrl_regs[SB_ISTERR] = old & ~dat;
+			state->dc_sysctrl_regs[SB_ISTERR] = old & ~dat;
 			dc_update_interrupt_status(space->machine());
 			break;
 		case SB_SDST:
@@ -441,8 +438,8 @@ WRITE64_HANDLER( dc_sysctrl_w )
 				// TODO: Sort-DMA routine goes here
 				printf("Sort-DMA irq\n");
 
-				dc_sysctrl_regs[SB_SDST] = 0;
-				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_SORT;
+				state->dc_sysctrl_regs[SB_SDST] = 0;
+				state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_SORT;
 				dc_update_interrupt_status(space->machine());
 			}
 			break;
@@ -603,17 +600,17 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 
 READ64_HANDLER( pvr_ctrl_r )
 {
-//	dc_state *state = space->machine().driver_data<dc_state>();
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(&space->device()));
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, state->pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(&space->device()));
 	#endif
 
-	return (UINT64)pvrctrl_regs[reg] << shift;
+	return (UINT64)state->pvrctrl_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( pvr_ctrl_w )
@@ -652,8 +649,8 @@ WRITE64_HANDLER( pvr_ctrl_w )
 	mame_printf_verbose("PVRCTRL: [%08x=%x] write %" I64FMT "x to %x (reg %x), mask %" I64FMT "x\n", 0x5f7c00+reg*4, dat, data>>shift, offset, reg, mem_mask);
 	#endif
 
-//  pvrctrl_regs[reg] |= dat;
-	pvrctrl_regs[reg] = dat;
+//  state->pvrctrl_regs[reg] |= dat;
+	state->pvrctrl_regs[reg] = dat;
 
 }
 
@@ -784,9 +781,36 @@ static void rtc_initial_setup(running_machine &machine)
 
 MACHINE_START( dc )
 {
-//	dc_state *state = machine.driver_data<dc_state>();
+	dc_state *state = machine.driver_data<dc_state>();
 
 	rtc_initial_setup(machine);
+
+	// save states
+	state_save_register_global_pointer(machine, state->dc_rtcregister, 4);
+	state_save_register_global_pointer(machine, state->dc_sysctrl_regs, 0x200/4);
+	state_save_register_global_pointer(machine, state->g2bus_regs, 0x100/4);
+	state_save_register_global(machine, state->m_wave_dma.aica_addr);
+	state_save_register_global(machine, state->m_wave_dma.root_addr);
+	state_save_register_global(machine, state->m_wave_dma.size);
+	state_save_register_global(machine, state->m_wave_dma.dir);
+	state_save_register_global(machine, state->m_wave_dma.flag);
+	state_save_register_global(machine, state->m_wave_dma.indirect);
+	state_save_register_global(machine, state->m_wave_dma.start);
+	state_save_register_global(machine, state->m_wave_dma.sel);
+	state_save_register_global(machine, state->m_pvr_dma.pvr_addr);
+	state_save_register_global(machine, state->m_pvr_dma.sys_addr);
+	state_save_register_global(machine, state->m_pvr_dma.size);
+	state_save_register_global(machine, state->m_pvr_dma.sel);
+	state_save_register_global(machine, state->m_pvr_dma.dir);
+	state_save_register_global(machine, state->m_pvr_dma.flag);
+	state_save_register_global(machine, state->m_pvr_dma.start);
+	state_save_register_global_pointer(machine,state->pvrta_regs,0x2000/4);
+	state_save_register_global_pointer(machine,state->pvrctrl_regs,0x100/4);
+	state_save_register_global(machine, state->debug_dip_status);
+	state_save_register_global_pointer(machine,state->tafifo_buff,32);
+	state_save_register_global(machine, state->scanline);
+	state_save_register_global(machine, state->next_y);
+	state_save_register_global_pointer(machine,state->dc_sound_ram,sizeof(state->dc_sound_ram));
 }
 
 MACHINE_RESET( dc )
@@ -796,11 +820,11 @@ MACHINE_RESET( dc )
 	/* halt the ARM7 */
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
-	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
+	memset(state->dc_sysctrl_regs, 0, sizeof(state->dc_sysctrl_regs));
 
 	state->dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
-	dc_sysctrl_regs[SB_SBREV] = 0x0b;
+	state->dc_sysctrl_regs[SB_SBREV] = 0x0b;
 }
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )

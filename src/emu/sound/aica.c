@@ -1285,6 +1285,22 @@ static DEVICE_START( aica )
 
 		AICA->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, AICA, AICA_Update);
 	}
+
+	// save state
+	{
+		device->save_item(NAME(AICA->IrqTimA));
+		device->save_item(NAME(AICA->IrqTimBC));
+		device->save_item(NAME(AICA->IrqMidi));
+		device->save_item(NAME(AICA->MidiOutW));
+		device->save_item(NAME(AICA->MidiOutR));
+		device->save_item(NAME(AICA->MidiStack),16);
+		device->save_item(NAME(AICA->MidiW));
+		device->save_item(NAME(AICA->MidiR));
+		device->save_item(NAME(AICA->LPANTABLE),0x20000);
+		device->save_item(NAME(AICA->RPANTABLE),0x20000);
+		device->save_item(NAME(AICA->TimPris),3);
+		device->save_item(NAME(AICA->TimCnt),3);
+	}
 }
 
 static DEVICE_STOP( aica )
