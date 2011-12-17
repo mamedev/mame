@@ -68,7 +68,7 @@
 #define LOG(n,x) do { if (VERBOSE >= (n)) logerror x; } while (0)
 
 #define CHECK_CHIP_NUM					assert(sn != NULL)
-#define CHECK_CHIP_NUM_AND_BOOLEAN		CHECK_CHIP_NUM; assert((data & 0x01) == data)
+#define CHECK_CHIP_NUM_AND_BOOLEAN		CHECK_CHIP_NUM; assert((state & 0x01) == state)
 #define CHECK_CHIP_NUM_AND_POSITIVE		CHECK_CHIP_NUM; assert(data >= 0.0)
 #define CHECK_CHIP_NUM_AND_VOLTAGE		CHECK_CHIP_NUM; assert((data >= 0.0) && (data <= 5.0))
 #define CHECK_CHIP_NUM_AND_CAP_VOLTAGE	CHECK_CHIP_NUM; assert(((data >= 0.0) && (data <= 5.0)) || (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT))
@@ -999,14 +999,14 @@ static void SN76477_test_enable_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_enable_w(device_t *device, UINT32 data)
+WRITE_LINE_DEVICE_HANDLER( sn76477_enable_w )
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
-	SN76477_test_enable_w(sn, data);
+	SN76477_test_enable_w(sn, state);
 #endif
 }
 
@@ -1024,18 +1024,18 @@ static void _SN76477_mixer_a_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_mixer_a_w(device_t *device, UINT32 data)
+WRITE_LINE_DEVICE_HANDLER( sn76477_mixer_a_w )
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
-	if (data != ((sn->mixer_mode >> 0) & 0x01))
+	if (state != ((sn->mixer_mode >> 0) & 0x01))
 	{
 		sn->channel->update();
 
-		_SN76477_mixer_a_w(sn, data);
+		_SN76477_mixer_a_w(sn, state);
 
 		log_mixer_mode(sn);
 	}
@@ -1049,18 +1049,18 @@ static void _SN76477_mixer_b_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_mixer_b_w(device_t *device, UINT32 data)
+WRITE_LINE_DEVICE_HANDLER( sn76477_mixer_b_w )
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
-	if (data != ((sn->mixer_mode >> 1) & 0x01))
+	if (state != ((sn->mixer_mode >> 1) & 0x01))
 	{
 		sn->channel->update();
 
-		_SN76477_mixer_b_w(sn, data);
+		_SN76477_mixer_b_w(sn, state);
 
 		log_mixer_mode(sn);
 	}
@@ -1074,18 +1074,18 @@ static void _SN76477_mixer_c_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_mixer_c_w(device_t *device, UINT32 data)
+WRITE_LINE_DEVICE_HANDLER( sn76477_mixer_c_w )
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
-	if (data != ((sn->mixer_mode >> 2) & 0x01))
+	if (state != ((sn->mixer_mode >> 2) & 0x01))
 	{
 		sn->channel->update();
 
-		_SN76477_mixer_c_w(sn, data);
+		_SN76477_mixer_c_w(sn, state);
 
 		log_mixer_mode(sn);
 	}
@@ -1106,18 +1106,18 @@ static void _SN76477_envelope_1_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_envelope_1_w(device_t *device, UINT32 data)
+WRITE_LINE_DEVICE_HANDLER( sn76477_envelope_1_w )
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
-	if (data != ((sn->envelope_mode >> 0) & 0x01))
+	if (state != ((sn->envelope_mode >> 0) & 0x01))
 	{
 		sn->channel->update();
 
-		_SN76477_envelope_1_w(sn, data);
+		_SN76477_envelope_1_w(sn, state);
 
 		log_envelope_mode(sn);
 	}
@@ -1131,18 +1131,18 @@ static void _SN76477_envelope_2_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_envelope_2_w(device_t *device, UINT32 data)
+WRITE_LINE_DEVICE_HANDLER( sn76477_envelope_2_w )
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
-	if (data != ((sn->envelope_mode >> 1) & 0x01))
+	if (state != ((sn->envelope_mode >> 1) & 0x01))
 	{
 		sn->channel->update();
 
-		_SN76477_envelope_2_w(sn, data);
+		_SN76477_envelope_2_w(sn, state);
 
 		log_envelope_mode(sn);
 	}
@@ -1163,18 +1163,18 @@ static void _SN76477_vco_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_vco_w(device_t *device, UINT32 data)
+WRITE_LINE_DEVICE_HANDLER( sn76477_vco_w )
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
-	if (data != sn->vco_mode)
+	if (state != sn->vco_mode)
 	{
 		sn->channel->update();
 
-		_SN76477_vco_w(sn, data);
+		_SN76477_vco_w(sn, state);
 
 		log_vco_mode(sn);
 	}
@@ -1578,16 +1578,16 @@ void sn76477_pitch_voltage_w(device_t *device, double data)
  *
  *****************************************************************************/
 
-void sn76477_noise_clock_w(device_t *device, UINT32 data)
+WRITE_LINE_DEVICE_HANDLER( sn76477_noise_clock_w )
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
-	if (data != sn->noise_clock)
+	if (state != sn->noise_clock)
 	{
-		sn->noise_clock = data;
+		sn->noise_clock = state;
 
 		/* on the rising edge shift generate next value,
            if external control is enabled */
