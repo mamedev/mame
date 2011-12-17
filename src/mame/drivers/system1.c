@@ -615,9 +615,11 @@ static INTERRUPT_GEN( mcu_irq_assert )
 
 static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
 {
-	/* the T0 line is clocked by something; if it is not clocked fast
+	/* The T0 line is clocked by something; if it is not clocked fast
        enough, the MCU will fail; on shtngmst this happens after 3
-       VBLANKs without a tick */
+       VBLANKs without a tick.
+       choplift is even more picky about it, affecting scroll speed
+    */
 
 	device_t *mcu = timer.machine().device("mcu");
 	device_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
@@ -2222,7 +2224,9 @@ static MACHINE_CONFIG_FRAGMENT( mcu )
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", mcu_irq_assert)
 
-	MCFG_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, attotime::from_msec(20))	/* ??? actual clock unknown */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, attotime::from_usec(2500))	/* ??? actual clock unknown */
 MACHINE_CONFIG_END
 
 
