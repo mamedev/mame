@@ -21,7 +21,7 @@ class dc_state : public driver_device
 	/* machine related */
 	UINT32 dc_rtcregister[4];
 	UINT32 dc_sysctrl_regs[0x200/4];
-//	UINT32 g1bus_regs[0x100/4];
+	UINT32 g1bus_regs[0x100/4]; // DC-only
 	UINT32 g2bus_regs[0x100/4];
 
 	emu_timer *dc_rtc_timer;
