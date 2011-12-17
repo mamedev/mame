@@ -19,6 +19,7 @@ Notes:
   same as the Rock-Ola games of the same area.  Lot of similarities between
   these hardware.  The music ends at the perfect time with this clock speed
 - Lasso: fire button auto-repeats on high score entry screen (real behavior?)
+- Pinbo: bgcolor is wrong, how does it generate it? ($a0, should be darkblue)
 
 ***************************************************************************
 
@@ -790,9 +791,9 @@ ROM_START( pinbo )
 	ROM_CONTINUE(       	 0xb800, 0x0800 )
 
 	ROM_REGION( 0x00300, "proms", 0 )
-	ROM_LOAD( "red.l10",     0x0000, 0x0100, CRC(e6c9ba52) SHA1(6ea96f9bd71de6181d675b0f2d59a8c5e1be5aa3) )
-	ROM_LOAD( "green.k10",   0x0100, 0x0100, CRC(1bf2d335) SHA1(dcb074d3de939dfc652743e25bc66bd6fbdc3289) )
-	ROM_LOAD( "blue.n10",    0x0200, 0x0100, CRC(e41250ad) SHA1(2e9a2babbacb1753057d46cf1dd6dc183611747e) )
+	ROM_LOAD( "red.l10",     0x0000, 0x0100, CRC(e6c9ba52) SHA1(6ea96f9bd71de6181d675b0f2d59a8c5e1be5aa3) ) // 2nd half is garbage?
+	ROM_LOAD( "green.k10",   0x0100, 0x0100, CRC(1bf2d335) SHA1(dcb074d3de939dfc652743e25bc66bd6fbdc3289) ) // "
+	ROM_LOAD( "blue.n10",    0x0200, 0x0100, CRC(e41250ad) SHA1(2e9a2babbacb1753057d46cf1dd6dc183611747e) ) // "
 ROM_END
 
 ROM_START( pinboa )
