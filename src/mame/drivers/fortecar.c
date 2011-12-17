@@ -5,12 +5,13 @@
   Driver by Angelo Salese.
   Additional work by Roberto Fresca & Rob Ragon.
 
+  Notes:
+  - NMI mask and vblank bit are made thru SW usage of the I register (that is unused
+    if the z80 is in IM 1).
+
 
   TODO:
-
   - Improve serial EEPROM support.
-  - RTC needs its own core.
-  - Inputs
 
 
   English set: bp 512 do pc=53e
@@ -149,17 +150,14 @@ class fortecar_state : public driver_device
 {
 public:
 	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	UINT8 *m_vram;
+	size_t m_vram_size;
 
-	/* calendar */
-	UINT8        m_cal_val;
-	UINT8        m_cal_mask;
-	UINT8        m_cal_com;
-	UINT8        m_cal_cnt;
-	system_time  m_systime;
-
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -390,7 +388,7 @@ static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_MEMBER(fortecar_state, m_vram)
+	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(fortecar_state, m_vram,m_vram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
@@ -513,8 +511,12 @@ GFXDECODE_END
 
 static MACHINE_RESET(fortecar)
 {
-//  fortecar_state *state = machine.driver_data<fortecar_state>();
+	fortecar_state *state = machine.driver_data<fortecar_state>();
+	int i;
 
+	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorythm) */
+	for(i=0;i<state->m_vram_size;i++)
+		state->m_vram[i] = machine.rand();
 }
 
 
@@ -605,6 +607,7 @@ ROM_END
 
 static DRIVER_INIT( fortecar )
 {
+	// ...
 }
 
 
