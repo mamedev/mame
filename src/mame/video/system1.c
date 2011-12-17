@@ -79,8 +79,9 @@
 **************************************************************************
 
     TODO:
-    - sprite vs background alignment is off sometimes, best visible when
-      scrolling, eg. in regulus, nob, brain
+    - Sprite vs background alignment is off sometimes, best visible when
+      scrolling, eg. in regulus, brain. Yet it is correct in other games,
+      such as wboy.
     - not sure if sprite priorities are completely accurate
 
 *************************************************************************/
@@ -169,7 +170,7 @@ VIDEO_START( system2 )
 WRITE8_HANDLER( system1_videomode_w )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-if (data & 0x6e) logerror("videomode = %02x\n",data);
+	if (data & 0x6e) logerror("videomode = %02x\n",data);
 
 	/* bit 4 is screen blank */
 	state->m_video_mode = data;
@@ -453,7 +454,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				{
 					for (i = 0; i < 2; i++)
 					{
-						int effx = flipscreen ? 255 - (x + i) : (x + i);
+						int effx = flipscreen ? 0x1fe - (x + i) : (x + i);
 						if (effx >= cliprect->min_x && effx <= cliprect->max_x)
 						{
 							int prevpix = destbase[effx];
@@ -474,7 +475,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				{
 					for (i = 0; i < 2; i++)
 					{
-						int effx = flipscreen ? 255 - (x + 2 + i) : (x + 2 + i);
+						int effx = flipscreen ? 0x1fe - (x + 2 + i) : (x + 2 + i);
 						if (effx >= cliprect->min_x && effx <= cliprect->max_x)
 						{
 							int prevpix = destbase[effx];
@@ -582,14 +583,14 @@ SCREEN_UPDATE( system1 )
 	fgpixmap = tilemap_get_pixmap(state->m_tilemap_page[1]);
 
 	/* get fixed scroll offsets */
-	xscroll = (videoram[0xffc] | (videoram[0xffd] << 8)) + 28;
+	xscroll = (INT16)((videoram[0xffc] | (videoram[0xffd] << 8)) + 28);
 	yscroll = videoram[0xfbd];
 
 	/* adjust for flipping */
 	if (flip_screen_get(screen->machine()))
 	{
-		xscroll = 279 - xscroll;
-		yscroll = 256 - yscroll;
+		xscroll = 640 - (xscroll & 0x1ff);
+		yscroll = 764 - (yscroll & 0x1ff);
 	}
 
 	/* fill in the row scroll table */
@@ -630,9 +631,9 @@ SCREEN_UPDATE( system2 )
 	}
 	else
 	{
-		xscroll = 262+256 - ((((videoram[0x7f6] | (videoram[0x7f7] << 8)) / 2) & 0xff) - 256 + 5);
-		yscroll = 256+256 - videoram[0x784];
-		sprxoffset = -7;
+		xscroll = 512 + 512 + 10 - (((videoram[0x7f6] | (videoram[0x7f7] << 8)) & 0x1ff) - 512 + 10);
+		yscroll = 512 + 512 - videoram[0x784];
+		sprxoffset = -14;
 	}
 
 	/* fill in the row scroll table */
@@ -652,6 +653,7 @@ SCREEN_UPDATE( system2_rowscroll )
 	bitmap_t *bgpixmaps[4], *fgpixmap;
 	int rowscroll[32];
 	int yscroll;
+	int sprxoffset;
 	int y;
 
 	/* 4 independent background pages */
@@ -668,16 +670,20 @@ SCREEN_UPDATE( system2_rowscroll )
 	{
 		for (y = 0; y < 32; y++)
 			rowscroll[y] = ((videoram[0x7c0 + y * 2] | (videoram[0x7c1 + y * 2] << 8)) & 0x1ff) - 512 + 10;
+
 		yscroll = videoram[0x7ba];
+		sprxoffset = 14;
 	}
 	else
 	{
 		for (y = 0; y < 32; y++)
-			rowscroll[y] = 262+256 - ((((videoram[0x7fe - y * 2] | (videoram[0x7ff - y * 2] << 8)) / 2) & 0xff) - 256 + 5);
-		yscroll = 256+256 - videoram[0x784];
+			rowscroll[y] = 512 + 512 + 10 - (((videoram[0x7fe - y * 2] | (videoram[0x7ff - y * 2] << 8)) & 0x1ff) - 512 + 10);
+
+		yscroll = 512 + 512 - videoram[0x784];
+		sprxoffset = -14;
 	}
 
 	/* common update */
-	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, yscroll, 14);
+	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, yscroll, sprxoffset);
 	return 0;
 }
