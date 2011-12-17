@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
-	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r)
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("eeprom", eeprom_cs_w)
@@ -1230,7 +1230,9 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_CONFIG_DERIVED( spangbl, pang )
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(spangbl_map)
 	MCFG_CPU_IO_MAP(spangbl_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
