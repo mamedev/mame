@@ -97,6 +97,8 @@ dumped by sayu
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
 
+#define MAIN_CLOCK XTAL_18_432MHz
+
 class jantotsu_state : public driver_device
 {
 public:
@@ -138,6 +140,7 @@ static SCREEN_UPDATE(jantotsu)
 	jantotsu_state *state = screen->machine().driver_data<jantotsu_state>();
 	int x, y, i;
 	int count = 0;
+	UINT8 pen_i;
 
 	if(!state->m_display_on)
 		return 0;
@@ -146,20 +149,14 @@ static SCREEN_UPDATE(jantotsu)
 	{
 		for (x = 0; x < 256; x += 8)
 		{
-			int pen[4], color;
+			UINT8 color;
 
 			for (i = 0; i < 8; i++)
 			{
-				pen[0] = (state->m_bitmap[count + 0x0000]) >> (7 - i);
-				pen[1] = (state->m_bitmap[count + 0x2000]) >> (7 - i);
-				pen[2] = (state->m_bitmap[count + 0x4000]) >> (7 - i);
-				pen[3] = (state->m_bitmap[count + 0x6000]) >> (7 - i);
+				color = state->m_col_bank;
 
-				color  = ((pen[0] & 1) << 0);
-				color |= ((pen[1] & 1) << 1);
-				color |= ((pen[2] & 1) << 2);
-				color |= ((pen[3] & 1) << 3);
-				color |= state->m_col_bank;
+				for(pen_i = 0;pen_i<4;pen_i++)
+					color |= (((state->m_bitmap[count + pen_i*0x2000]) >> (7 - i)) & 1) << pen_i;
 
 				if ((x + i) <= screen->visible_area().max_x && (y + 0) < screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine().pens[color];
@@ -233,29 +230,26 @@ static PALETTE_INIT( jantotsu )
 static READ8_HANDLER( jantotsu_mux_r )
 {
 	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
-	UINT8 coin_port = input_port_read(space->machine(), "COINS");
+	const char *const portnames[] = { "PL1_1", "PL1_2", "PL1_3", "PL1_4",
+									  "PL2_1", "PL2_2", "PL2_3", "PL2_4" };
+	UINT8 i,res;
 
 	//  printf("%02x\n", state->m_mux_data);
+	res = input_port_read(space->machine(), "COINS");
 
-	switch (state->m_mux_data)
+	for(i=0;i<8;i++)
 	{
-		case 0x01: return input_port_read(space->machine(), "PL1_1") | coin_port;
-		case 0x02: return input_port_read(space->machine(), "PL1_2") | coin_port;
-		case 0x04: return input_port_read(space->machine(), "PL1_3") | coin_port;
-		case 0x08: return input_port_read(space->machine(), "PL1_4") | coin_port;
-		case 0x10: return input_port_read(space->machine(), "PL2_1") | coin_port;
-		case 0x20: return input_port_read(space->machine(), "PL2_2") | coin_port;
-		case 0x40: return input_port_read(space->machine(), "PL2_3") | coin_port;
-		case 0x80: return input_port_read(space->machine(), "PL2_4") | coin_port;
+		if((~state->m_mux_data) & (1 << i))
+			res |= input_port_read(space->machine(), portnames[i]);
 	}
 
-	return coin_port;
+	return res;
 }
 
 static WRITE8_HANDLER( jantotsu_mux_w )
 {
 	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
-	state->m_mux_data = ~data;
+	state->m_mux_data = data;
 }
 
 /*If bits 6 & 7 doesn't return 0x80,the game hangs until this bit is set,
@@ -507,7 +501,7 @@ static MACHINE_RESET( jantotsu )
 static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/4)
+	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(jantotsu_map)
 	MCFG_CPU_IO_MAP(jantotsu_io)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
@@ -532,13 +526,13 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, 18432000/4)
+	MCFG_SOUND_ADD("sn1", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, 18432000/4)
+	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
+	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
