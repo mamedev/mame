@@ -11,8 +11,8 @@
 
 
   TODO:
-  - Improve serial EEPROM support.
-
+  - fortecar requires a proper EEPROM dump, doesn't start due of it.
+  - fortecrd has non-default data in the default EEPROM.
 
   English set: bp 512 do pc=53e
   Spanish set: bp 512 do pc=562
@@ -257,7 +257,7 @@ DOUT PPI_PC4
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit((data & 0x04) >> 2);
 	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom->set_clock_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
@@ -307,15 +307,10 @@ static WRITE8_DEVICE_HANDLER( ayporta_w )
     0x20 (hold1): IRQ test
     0x40 (black): Stack RAM check
 */
+	int i;
 
-	output_set_lamp_value(0, (data >> 0) & 1);	/* START lamp */
-	output_set_lamp_value(1, (data >> 1) & 1);	/* HOLD5 lamp */
-	output_set_lamp_value(2, (data >> 2) & 1);	/* HOLD4 lamp */
-	output_set_lamp_value(3, (data >> 3) & 1);	/* HOLD3 lamp */
-	output_set_lamp_value(4, (data >> 4) & 1);	/* HOLD2 lamp */
-	output_set_lamp_value(5, (data >> 5) & 1);	/* HOLD1 lamp */
-	output_set_lamp_value(6, (data >> 6) & 1);	/* BLACK lamp */
-	output_set_lamp_value(7, (data >> 7) & 1);	/* RED/BET lamp */
+	for(i=0;i<8;i++)
+		output_set_lamp_value(i, (data >> i) & 1);
 }
 
 
@@ -374,7 +369,7 @@ static const eeprom_interface forte_eeprom_intf =
     Preliminary interface for NM93CS56N Serial EEPROM.
     Correct address & data. Using 93C46 similar protocol.
 */
-	7,                /* address bits */
+	8,                /* address bits */
 	16,               /* data bits */
 	"*110",           /* read command */
 	"*101",           /* write command */
@@ -457,19 +452,12 @@ static INPUT_PORTS_START( fortecar )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )  PORT_NAME("Key In")
-//	PORT_DIPNAME( 0x20, 0x20, "Credit Key" )
-//	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Owner" ) // full service
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -577,8 +565,8 @@ ROM_START( fortecar )
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
 //  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
 
-	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
-	ROM_LOAD( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
+	ROM_REGION( 0x0200,	"eeprom", 0 )	/* default serial EEPROM */
+	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "forte_card_82s147.u47", 0x0000, 0x0200, BAD_DUMP CRC(7e631818) SHA1(ac08b0de30260278af3a1c5dee5810d4304cb9ca) )
@@ -597,8 +585,8 @@ ROM_START( fortecrd )
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
 //  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
 
-	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
-	ROM_LOAD( "forte_card_93cs56.u13", 0x0000, 0x0100, CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
+	ROM_REGION( 0x0200,	"eeprom", 0 )	/* default serial EEPROM */
+	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "forte_card_82s147.u47", 0x0000, 0x0200, CRC(7e631818) SHA1(ac08b0de30260278af3a1c5dee5810d4304cb9ca) )
@@ -613,4 +601,4 @@ static DRIVER_INIT( fortecar )
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME               FLAGS             LAYOUT */
 GAMEL( 19??, fortecar, 0,        fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (English)", GAME_NOT_WORKING, layout_fortecrd )
-GAMEL( 19??, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Spanish)", GAME_NOT_WORKING, layout_fortecrd )
+GAMEL( 19??, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Spanish)", 0, layout_fortecrd )
