@@ -1134,6 +1134,7 @@ $(MAMEOBJ)/pacman.a: \
 $(MAMEOBJ)/pce.a: \
 	$(DRIVERS)/ggconnie.o \
 	$(DRIVERS)/paranoia.o \
+	$(DRIVERS)/tourvis.o \
 	$(DRIVERS)/uapce.o \
 	$(MACHINE)/pcecommn.o $(VIDEO)/vdc.o \
 

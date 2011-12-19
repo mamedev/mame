@@ -2884,6 +2884,7 @@ src/mame/drivers/toobin.c svneol=native#text/plain
 src/mame/drivers/topspeed.c svneol=native#text/plain
 src/mame/drivers/toratora.c svneol=native#text/plain
 src/mame/drivers/tourtabl.c svneol=native#text/plain
+src/mame/drivers/tourvis.c svneol=native#text/plain
 src/mame/drivers/toypop.c svneol=native#text/plain
 src/mame/drivers/tp84.c svneol=native#text/plain
 src/mame/drivers/trackfld.c svneol=native#text/plain

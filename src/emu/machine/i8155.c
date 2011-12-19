@@ -456,6 +456,8 @@ void i8155_device::register_w(int offset, UINT8 data)
 		case COMMAND_TM_STOP:
 			// NOP if timer has not started, stop counting if the timer is running
 			if (LOG) logerror("8155 '%s' Timer Command: Stop\n", tag());
+			m_to = 1;
+			timer_output();
 			m_timer->enable(0);
 			break;
 
