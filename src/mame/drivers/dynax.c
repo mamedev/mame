@@ -4945,7 +4945,7 @@ static TIMER_DEVICE_CALLBACK( tenkai_interrupt )
 		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ2, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);
 }
 
 static const ay8910_interface tenkai_ay8910_interface =
@@ -4968,7 +4968,7 @@ static WRITE_LINE_DEVICE_HANDLER(tenkai_rtc_irq)
 {
 	dynax_state *drvstate = device->machine().driver_data<dynax_state>();
 
-	device_set_input_line(drvstate->m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);
+	device_set_input_line(drvstate->m_maincpu, INPUT_LINE_IRQ2, HOLD_LINE);
 }
 
 static MSM6242_INTERFACE( tenkai_rtc_intf )

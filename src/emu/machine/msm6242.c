@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "machine/msm6242.h"
+#include "machine/devhelpr.h"
 
 
 enum
@@ -59,41 +60,57 @@ void msm6242_device::rtc_timer_callback()
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
 
-	m_rtc.sec++;
+	m_tick++;
 
-	if(m_rtc.sec >= 60)				{ m_rtc.min++; m_rtc.sec = 0; }
-	if(m_rtc.min >= 60)				{ m_rtc.hour++; m_rtc.min = 0; }
-	if(m_rtc.hour >= 24)				{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
-	if(m_rtc.wday >= 6)				{ m_rtc.wday = 1; }
-
-	/* TODO: crude leap year support */
-	dpm_count = (m_rtc.month)-1;
-
-	if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
+	if(m_irq_flag == 1 && m_irq_type == 0 && ((m_tick % 0x200) == 0)) // 1/64 of second
 	{
-		if((m_rtc.day) >= dpm[dpm_count]+1+1)
-			{ m_rtc.month++; m_rtc.day = 0x01; }
+		if ( !m_out_int_func.isnull() )
+			m_out_int_func( ASSERT_LINE );
 	}
-	else if(m_rtc.day >= dpm[dpm_count]+1)		{ m_rtc.month++; m_rtc.day = 0x01; }
-	if(m_rtc.month >= 0x13)						{ m_rtc.year++; m_rtc.month = 1; }
-	if(m_rtc.year >= 100)						{ m_rtc.year = 0; } //1900-1999 possible timeframe
-}
 
-void msm6242_device::std_callback()
-{
-	//if ( !m_irq_changed.isnull() )
-	//	m_irq_changed(TRUE);
+	if(m_tick & 0x8000) // 32,768 KHz == 0x8000 ticks
+	{
+		m_tick = 0;
+		m_rtc.sec++;
+
+		if(m_irq_flag == 1 && m_irq_type == 1) // 1 second clock
+			if ( !m_out_int_func.isnull() )
+				m_out_int_func(ASSERT_LINE);
+
+		if(m_rtc.sec >= 60)
+		{
+			m_rtc.min++; m_rtc.sec = 0;
+			if(m_irq_flag == 1 && m_irq_type == 2) // 1 minute clock
+				if ( !m_out_int_func.isnull() )
+					m_out_int_func(ASSERT_LINE);
+		}
+		if(m_rtc.min >= 60)
+		{
+			m_rtc.hour++; m_rtc.min = 0;
+			if(m_irq_flag == 1 && m_irq_type == 3) // 1 hour clock
+				if ( !m_out_int_func.isnull() )
+					m_out_int_func(ASSERT_LINE);
+		}
+		if(m_rtc.hour >= 24)			{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
+		if(m_rtc.wday >= 6)				{ m_rtc.wday = 1; }
+
+		/* TODO: crude leap year support */
+		dpm_count = (m_rtc.month)-1;
+
+		if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
+		{
+			if((m_rtc.day) >= dpm[dpm_count]+1+1)
+				{ m_rtc.month++; m_rtc.day = 0x01; }
+		}
+		else if(m_rtc.day >= dpm[dpm_count]+1)		{ m_rtc.month++; m_rtc.day = 0x01; }
+		if(m_rtc.month >= 0x13)						{ m_rtc.year++; m_rtc.month = 1; }
+		if(m_rtc.year >= 100)						{ m_rtc.year = 0; } //1900-1999 possible timeframe
+	}
 }
 
 TIMER_CALLBACK( msm6242_device::rtc_inc_callback )
 {
 	reinterpret_cast<msm6242_device *>(ptr)->rtc_timer_callback();
-}
-
-
-TIMER_CALLBACK( msm6242_device::std_callback )
-{
-	reinterpret_cast<msm6242_device *>(ptr)->std_callback();
 }
 
 //-------------------------------------------------
@@ -113,11 +130,10 @@ bool msm6242_device::device_validity_check(emu_options &options, const game_driv
 
 void msm6242_device::device_start()
 {
-	m_irq_changed.resolve( m_out_int_line, *this );
+	m_out_int_func.resolve( m_out_int_cb, *this );
 
 	/* let's call the timer callback every second */
-	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
-	m_std_timer = machine().scheduler().timer_alloc(FUNC(std_callback), 0);
+	machine().scheduler().timer_pulse(attotime::from_hz(clock()), FUNC(rtc_inc_callback), 0, (void *)this);
 
 	system_time systime;
 	machine().base_datetime(systime);
@@ -129,6 +145,9 @@ void msm6242_device::device_start()
 	m_rtc.hour = (systime.local_time.hour);
 	m_rtc.min = (systime.local_time.minute);
 	m_rtc.sec = (systime.local_time.second);
+	m_tick = 0;
+	m_irq_flag = 0;
+	m_irq_type = 0;
 
 	m_reg[0] = 0;
 	m_reg[1] = 0;
@@ -142,10 +161,8 @@ void msm6242_device::device_start()
 
 void msm6242_device::device_reset()
 {
-	m_std_timer->adjust(attotime::never, 0, attotime::never);
-
-	if ( !m_irq_changed.isnull() )
-		m_irq_changed( FALSE );
+	if ( !m_out_int_func.isnull() )
+		m_out_int_func( CLEAR_LINE );
 }
 
 
@@ -165,7 +182,7 @@ void msm6242_device::device_config_complete()
 	}
 	else
 	{
-		memset(&m_out_int_line, 0, sizeof(m_out_int_line));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
 	}
 }
 
@@ -255,15 +272,15 @@ WRITE8_MEMBER( msm6242_device::write )
 		m_reg[1] = data & 0x0f;
 		if((data & 3) == 0) // MASK & STD = 0
 		{
-			static const double timer_param[4] = { 1000 / 64, 1000, 1000 * 60, 1000 * 60 * 60};
-
-			m_std_timer->adjust(attotime::from_msec(timer_param[(data & 0xc) >> 2]), 0, attotime::from_msec(timer_param[(data & 0xc) >> 2]));
+			m_irq_flag = 1;
+			m_irq_type = (data & 0xc) >> 2;
+			//m_std_timer->adjust(attotime::from_msec(timer_param[(data & 0xc) >> 2]), 0, attotime::from_msec(timer_param[(data & 0xc) >> 2]));
 		}
 		else
 		{
-			m_std_timer->adjust(attotime::never, 0, attotime::never);
-			//if ( !m_irq_changed.isnull() )
-			//	m_irq_changed( FALSE );
+			m_irq_flag = 0;
+			if ( !m_out_int_func.isnull() )
+				m_out_int_func( CLEAR_LINE );
 		}
 
 		return;

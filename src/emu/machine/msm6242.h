@@ -12,6 +12,9 @@
 #ifndef __MSM6242DEV_H__
 #define __MSM6242DEV_H__
 
+#include "emu.h"
+#include "machine/devhelpr.h"
+
 
 #define MCFG_MSM6242_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, msm6242, XTAL_32_768kHz) \
@@ -20,12 +23,12 @@
 #define MSM6242_INTERFACE(name) \
 	const msm6242_interface (name) =
 
-// ======================> ramdac_interface
+// ======================> msm6242_interface
 
 typedef struct _msm6242_interface msm6242_interface;
 struct _msm6242_interface
 {
-	devcb_write_line	m_out_int_line;	/* Callback is called whenever the state of the INT output changes */
+	devcb_write_line	m_out_int_cb;
 };
 
 typedef struct
@@ -47,25 +50,25 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 	void rtc_timer_callback();
-	void std_callback();
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 	static TIMER_CALLBACK( rtc_inc_callback );
-	static TIMER_CALLBACK( std_callback );
 
 private:
 	UINT8 m_reg[3];
+	UINT8 m_irq_flag;
+	UINT8 m_irq_type;
+	UINT16 m_tick;
 
 	rtc_regs_t m_rtc;
 	rtc_regs_t m_hold;
-	emu_timer *m_std_timer;
-	devcb_resolved_write_line	m_irq_changed;
+	devcb_resolved_write_line	m_out_int_func;
 };
 
 
