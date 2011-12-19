@@ -23,7 +23,7 @@ Template for skeleton device
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> v3021_device
+// ======================> xxx_device
 
 class xxx_device :	public device_t
 {

@@ -129,10 +129,6 @@ READ8_MEMBER( v3021_device::read )
 
 WRITE8_MEMBER( v3021_device::write )
 {
-	//pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	//space->machine().base_datetime(state->m_systime);
-
 	m_cal_com <<= 1;
 	m_cal_com |= data & 1;
 	++m_cal_cnt;

@@ -359,7 +359,9 @@ static WRITE8_HANDLER( yarunara_palette_w )
 
 		case 0x1c:	// RTC
 		{
-			msm6242_w(state->m_rtc, offset, data);
+			msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
+
+			rtc->write(*space, offset,data);
 		}
 		return;
 
@@ -1250,7 +1252,7 @@ static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8 )
 	AM_RANGE( 0x42, 0x42 ) AM_DEVREAD("aysnd", ay8910_r)		//
 	AM_RANGE( 0x44, 0x44 ) AM_DEVWRITE("aysnd", ay8910_data_w)	//
 	AM_RANGE( 0x46, 0x47 ) AM_DEVWRITE("ymsnd", ym2413_w)		//
-	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
+	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
 	AM_RANGE( 0xa0, 0xa3 ) AM_WRITE(ddenlovr_palette_base_w)	// ddenlovr mixer chip
 	AM_RANGE( 0xa4, 0xa7 ) AM_WRITE(ddenlovr_palette_mask_w)
 	AM_RANGE( 0xa8, 0xab ) AM_WRITE(ddenlovr_transparency_pen_w)
@@ -1474,7 +1476,11 @@ static READ8_HANDLER( tenkai_8000_r )
 	if (state->m_rombank < 0x10)
 		return state->m_romptr[offset];
 	else if ((state->m_rombank == 0x10) && (offset < 0x10))
-		return msm6242_r(state->m_rtc, offset);
+	{
+		msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
+
+		return rtc->read(*space, offset);
+	}
 	else if (state->m_rombank == 0x12)
 		return tenkai_palette_r(space, offset);
 
@@ -1488,7 +1494,9 @@ static WRITE8_HANDLER( tenkai_8000_w )
 
 	if ((state->m_rombank == 0x10) && (offset < 0x10))
 	{
-		msm6242_w(state->m_rtc, offset, data);
+		msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
+
+		rtc->write(*space, offset, data);
 		return;
 	}
 	else if (state->m_rombank == 0x12)

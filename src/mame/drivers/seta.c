@@ -2900,7 +2900,7 @@ static ADDRESS_MAP_START( inttoote_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x700000, 0x700101) AM_RAM_READ(inttoote_700000_r) AM_BASE_MEMBER(seta_state, m_inttoote_700000)
 
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
+	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write, 0x00ff)
 
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w		)	// Sound
 
@@ -2966,7 +2966,7 @@ static ADDRESS_MAP_START( jockeyc_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500003) AM_READ(inttoote_dsw_r)	// DSW x 3
 	AM_RANGE(0x600000, 0x600003) AM_READ(unk_r)
 
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
+	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write, 0x00ff)
 
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w)	// Sound
 
