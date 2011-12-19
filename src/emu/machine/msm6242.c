@@ -54,7 +54,7 @@ msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, d
 
 }
 
-void msm6242_device::timer_callback()
+void msm6242_device::rtc_timer_callback()
 {
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
@@ -79,9 +79,21 @@ void msm6242_device::timer_callback()
 	if(m_rtc.year >= 100)						{ m_rtc.year = 0; } //1900-1999 possible timeframe
 }
 
+void msm6242_device::std_callback()
+{
+	//if ( !m_irq_changed.isnull() )
+	//	m_irq_changed(TRUE);
+}
+
 TIMER_CALLBACK( msm6242_device::rtc_inc_callback )
 {
-	reinterpret_cast<msm6242_device *>(ptr)->timer_callback();
+	reinterpret_cast<msm6242_device *>(ptr)->rtc_timer_callback();
+}
+
+
+TIMER_CALLBACK( msm6242_device::std_callback )
+{
+	reinterpret_cast<msm6242_device *>(ptr)->std_callback();
 }
 
 //-------------------------------------------------
@@ -101,8 +113,11 @@ bool msm6242_device::device_validity_check(emu_options &options, const game_driv
 
 void msm6242_device::device_start()
 {
+	m_irq_changed.resolve( m_out_int_line, *this );
+
 	/* let's call the timer callback every second */
 	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
+	m_std_timer = machine().scheduler().timer_alloc(FUNC(std_callback), 0);
 
 	system_time systime;
 	machine().base_datetime(systime);
@@ -127,6 +142,31 @@ void msm6242_device::device_start()
 
 void msm6242_device::device_reset()
 {
+	m_std_timer->adjust(attotime::never, 0, attotime::never);
+
+	if ( !m_irq_changed.isnull() )
+		m_irq_changed( FALSE );
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void msm6242_device::device_config_complete()
+{
+	const msm6242_interface *intf = reinterpret_cast<const msm6242_interface *>(static_config());
+
+	if ( intf != NULL )
+	{
+		*static_cast<msm6242_interface *>(this) = *intf;
+	}
+	else
+	{
+		memset(&m_out_int_line, 0, sizeof(m_out_int_line));
+	}
 }
 
 //**************************************************************************
@@ -211,7 +251,22 @@ WRITE8_MEMBER( msm6242_device::write )
 			return;
 		}
 
-		case MSM6242_REG_CE: m_reg[1] = data & 0x0f; return;
+		case MSM6242_REG_CE:
+		m_reg[1] = data & 0x0f;
+		if((data & 3) == 0) // MASK & STD = 0
+		{
+			static const double timer_param[4] = { 1000 / 64, 1000, 1000 * 60, 1000 * 60 * 60};
+
+			m_std_timer->adjust(attotime::from_msec(timer_param[(data & 0xc) >> 2]), 0, attotime::from_msec(timer_param[(data & 0xc) >> 2]));
+		}
+		else
+		{
+			m_std_timer->adjust(attotime::never, 0, attotime::never);
+			//if ( !m_irq_changed.isnull() )
+			//	m_irq_changed( FALSE );
+		}
+
+		return;
 
 		case MSM6242_REG_CF:
 		{

@@ -8973,7 +8973,7 @@ MACHINE_CONFIG_END
                              International Toote
 ***************************************************************************/
 
-// Test mode shows a 16ms and 2ms counters
+// Test mode shows a 16ms and 2ms counters, then there's vblank and presumably ACIA irqs ...
 static TIMER_DEVICE_CALLBACK( inttoote_interrupt )
 {
 	seta_state *state = timer.machine().driver_data<seta_state>();
@@ -9024,6 +9024,11 @@ static const pia6821_interface inttoote_pia1_intf =
 	DEVCB_NULL		/* IRQB */
 };
 
+static MSM6242_INTERFACE( rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( inttoote, seta_state )
 
 	/* basic machine hardware */
@@ -9060,7 +9065,7 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jockeyc, inttoote )

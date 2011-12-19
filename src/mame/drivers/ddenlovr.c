@@ -7789,6 +7789,12 @@ static MACHINE_START( sryudens )
                             Don Den Lover Vol.1
 ***************************************************************************/
 
+static MSM6242_INTERFACE( ddenlovr_rtc_intf )
+{
+	DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( ddenlovr, dynax_state )
 
 	/* basic machine hardware */
@@ -7826,7 +7832,7 @@ static MACHINE_CONFIG_START( ddenlovr, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", ddenlovr_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddenlovj, ddenlovr )
@@ -7913,6 +7919,11 @@ static INTERRUPT_GEN( rtc_irq )
 }
 #endif
 
+static MSM6242_INTERFACE( quizchq_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( quizchq, dynax_state )
 
 	/* basic machine hardware */
@@ -7948,7 +7959,7 @@ static MACHINE_CONFIG_START( quizchq, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", quizchq_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rongrong, quizchq )
@@ -7989,6 +8000,12 @@ static TIMER_DEVICE_CALLBACK( mmpanic_irq )
 	if(scanline == 0)
 		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xe7); // RST 20, clock
 }
+
+static MSM6242_INTERFACE( mmpanic_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 
 static MACHINE_CONFIG_START( mmpanic, dynax_state )
 
@@ -8033,7 +8050,7 @@ static MACHINE_CONFIG_START( mmpanic, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", mmpanic_rtc_intf)
 MACHINE_CONFIG_END
 
 
@@ -8067,6 +8084,10 @@ static TIMER_DEVICE_CALLBACK( hanakanz_irq )
 		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xe2);
 }
 
+static MSM6242_INTERFACE( hanakanz_rtc_intf )
+{
+	DEVCB_NULL
+};
 
 static MACHINE_CONFIG_START( hanakanz, dynax_state )
 
@@ -8103,7 +8124,7 @@ static MACHINE_CONFIG_START( hanakanz, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hkagerou, hanakanz )
@@ -8413,6 +8434,12 @@ static MACHINE_CONFIG_DERIVED( hparadis, quizchq )
 	MCFG_MACHINE_START(hparadis)
 MACHINE_CONFIG_END
 
+static MSM6242_INTERFACE( jongtei_rtc_intf )
+{
+	DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( jongtei, dynax_state )
 
 	/* basic machine hardware */
@@ -8448,12 +8475,17 @@ static MACHINE_CONFIG_START( jongtei, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", jongtei_rtc_intf)
 MACHINE_CONFIG_END
 
 /***************************************************************************
                             Mahjong Seiryu Densetsu
 ***************************************************************************/
+
+static MSM6242_INTERFACE( sryudens_rtc_intf )
+{
+	DEVCB_NULL
+};
 
 static MACHINE_CONFIG_START( sryudens, dynax_state )
 
@@ -8493,12 +8525,19 @@ static MACHINE_CONFIG_START( sryudens, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", sryudens_rtc_intf)
 MACHINE_CONFIG_END
 
 /***************************************************************************
                             Mahjong Daimyojin
 ***************************************************************************/
+
+
+static MSM6242_INTERFACE( daimyojin_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 
 static MACHINE_CONFIG_START( daimyojn, dynax_state )
 
@@ -8535,7 +8574,7 @@ static MACHINE_CONFIG_START( daimyojn, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", daimyojin_rtc_intf)
 MACHINE_CONFIG_END
 
 

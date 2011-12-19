@@ -3282,6 +3282,11 @@ static TIMER_DEVICE_CALLBACK( janptr96_interrupt )
 		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x84);	// demo
 }
 
+static MSM6242_INTERFACE( janptr96_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MCFG_DEVICE_REMOVE("maincpu")
 
@@ -3294,7 +3299,7 @@ static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", janptr96_rtc_intf)
 MACHINE_CONFIG_END
 
 
@@ -3332,6 +3337,11 @@ static TIMER_DEVICE_CALLBACK( mjtensin_interrupt )
 		device_set_input_line(state->m_maincpu, 0, INPUT_LINE_IRQ1);	// rtc
 }
 
+static MSM6242_INTERFACE( mjtensin_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 
 static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
@@ -3343,7 +3353,7 @@ static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", mjtensin_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
@@ -3356,7 +3366,7 @@ static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", mjtensin_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
@@ -3369,7 +3379,7 @@ static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", mjtensin_rtc_intf)
 MACHINE_CONFIG_END
 
 

@@ -4620,6 +4620,11 @@ static INTERRUPT_GEN( yarunara_clock_interrupt )
 	sprtmtch_update_irq(device->machine());
 }
 
+static MSM6242_INTERFACE( yarunara_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
 
 	/* basic machine hardware */
@@ -4635,7 +4640,7 @@ static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 8, 256-1-8-1)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", yarunara_rtc_intf)
 MACHINE_CONFIG_END
 
 
@@ -4700,6 +4705,12 @@ static MACHINE_START( jantouki )
 	MACHINE_START_CALL(dynax);
 }
 
+static MSM6242_INTERFACE( jantouki_rtc_intf )
+{
+	DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( jantouki, dynax_state )
 
 	/* basic machine hardware */
@@ -4759,7 +4770,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", jantouki_rtc_intf)
 MACHINE_CONFIG_END
 
 
@@ -4872,6 +4883,12 @@ static const ay8910_interface htengoku_ay8910_interface =
 	DEVCB_NULL,						DEVCB_HANDLER(htengoku_dsw_w)		// W
 };
 
+static MSM6242_INTERFACE( htengoku_rtc_intf )
+{
+	DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( htengoku, dynax_state )
 
 	/* basic machine hardware */
@@ -4911,7 +4928,7 @@ static MACHINE_CONFIG_START( htengoku, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", htengoku_rtc_intf)
 MACHINE_CONFIG_END
 
 
@@ -4926,9 +4943,6 @@ static TIMER_DEVICE_CALLBACK( tenkai_interrupt )
 
 	if(scanline == 256)
 		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
-
-	if(scanline == 128)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);
 
 	if(scanline == 0)
 		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ2, HOLD_LINE);
@@ -4949,6 +4963,18 @@ static MACHINE_START( tenkai )
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(tenkai_update_rombank), &machine));
 }
+
+static WRITE_LINE_DEVICE_HANDLER(tenkai_rtc_irq)
+{
+	dynax_state *drvstate = device->machine().driver_data<dynax_state>();
+
+	device_set_input_line(drvstate->m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);
+}
+
+static MSM6242_INTERFACE( tenkai_rtc_intf )
+{
+	DEVCB_LINE(tenkai_rtc_irq)
+};
 
 static MACHINE_CONFIG_START( tenkai, dynax_state )
 
@@ -4987,7 +5013,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", tenkai_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
