@@ -16,7 +16,13 @@
 #define MCFG_MSM6242_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, msm6242, XTAL_32_768kHz)
 
-// ======================> xxx_device
+typedef struct
+{
+	UINT8 sec, min, hour, day, wday, month, year;
+} rtc_regs_t;
+
+
+// ======================> msm6242_device
 
 class msm6242_device :	public device_t
 {
@@ -27,6 +33,7 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
+	void timer_callback();
 
 protected:
 	// device-level overrides
@@ -34,8 +41,12 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	UINT8 reg[3];
-	system_time hold_time;
+	static TIMER_CALLBACK( rtc_inc_callback );
+
+	UINT8 m_reg[3];
+
+	rtc_regs_t m_rtc;
+	rtc_regs_t m_hold;
 };
 
 
