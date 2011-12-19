@@ -4852,21 +4852,25 @@ MACHINE_CONFIG_END
 /*  It runs in IM 2, thus needs a vector on the data bus:
     0x42 and 0x44 are very similar, they should be triggered by the blitter
     0x40 is vblank  */
-static INTERRUPT_GEN( majxtal7_vblank_interrupt )
+
+static TIMER_DEVICE_CALLBACK( majxtal7_vblank_interrupt )
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
+	dynax_state *state = timer.machine().driver_data<dynax_state>();
+	int scanline = param;
 
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
 	if (state->m_blitter_irq)	return;
 
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);
+	if(scanline == 256)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x40);
+	else if((scanline % 32) == 0)
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x44); // temp kludge
 }
 
 static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT("screen", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
-
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(majxtal7_vblank_interrupt)
 MACHINE_CONFIG_END
 
 
