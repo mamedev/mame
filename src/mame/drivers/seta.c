@@ -8979,6 +8979,7 @@ static TIMER_DEVICE_CALLBACK( inttoote_interrupt )
 	seta_state *state = timer.machine().driver_data<seta_state>();
 	int scanline = param;
 
+	/* ACIA irq */
 	if(scanline == 15)
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 

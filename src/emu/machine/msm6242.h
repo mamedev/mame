@@ -33,7 +33,8 @@ struct _msm6242_interface
 
 typedef struct
 {
-	UINT8 sec, min, hour, day, wday, month, year;
+	UINT8 sec, min, hour, day, wday, month;
+	UINT16 year;
 } rtc_regs_t;
 
 

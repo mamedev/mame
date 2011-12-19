@@ -150,6 +150,7 @@ NEP-16
 #include "machine/nvram.h"
 #include "video/sknsspr.h"
 #include "includes/suprnova.h"
+#include "machine/msm6242.h"
 
 static void hit_calc_orig(UINT16 p, UINT16 s, UINT16 org, UINT16 *l, UINT16 *r)
 {
@@ -602,18 +603,6 @@ INPUT_PORTS_END
 
 
 
-static WRITE32_HANDLER( skns_msm6242_w )
-{
-	skns_state *state = space->machine().driver_data<skns_state>();
-	COMBINE_DATA(&state->m_timer_0_temp[offset]);
-
-	if(offset>=4)
-	{
-		mame_printf_debug("Timer 0 outbound\n");
-		return;
-	}
-}
-
 static WRITE32_HANDLER( skns_io_w )
 {
 	switch(offset) {
@@ -675,46 +664,6 @@ static WRITE32_HANDLER( skns_io_w )
 	}
 }
 
-
-static READ32_HANDLER( skns_msm6242_r )
-{
-	system_time systime;
-	long value;
-
-	space->machine().base_datetime(systime);
-	// The clock is not y2k-compatible, wrap back 10 years, screw the leap years
-	//  tm->tm_year -= 10;
-
-	switch(offset) {
-	case 0:
-		value  = (systime.local_time.second % 10)<<24;
-		value |= (systime.local_time.second / 10)<<16;
-		value |= (systime.local_time.minute % 10)<<8;
-		value |= (systime.local_time.minute / 10);
-		break;
-	case 1:
-		value  = (systime.local_time.hour % 10)<<24;
-		value |= ((systime.local_time.hour / 10) /*| (tm->tm_hour >= 12 ? 4 : 0)*/)<<16;
-		value |= (systime.local_time.mday % 10)<<8;
-		value |= (systime.local_time.mday / 10);
-		break;
-	case 2:
-		value  = ((systime.local_time.month + 1) % 10)<<24;
-		value |= ((systime.local_time.month + 1) / 10)<<16;
-		value |= (systime.local_time.year % 10)<<8;
-		value |= ((systime.local_time.year / 10) % 10);
-		break;
-	case 3:
-	default:
-		value  = (systime.local_time.weekday)<<24;
-		value |= (1)<<16;
-		value |= (6)<<8;
-		value |= (4);
-		break;
-	}
-	return value;
-}
-
 /* end old driver code */
 
 static WRITE32_HANDLER( skns_v3t_w )
@@ -744,7 +693,7 @@ static ADDRESS_MAP_START( skns_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x0040000c, 0x0040000f) AM_READ_PORT("40000c")
 	AM_RANGE(0x00800000, 0x00801fff) AM_RAM AM_SHARE("nvram") /* 'backup' RAM */
 	AM_RANGE(0x00c00000, 0x00c00003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff0000) /* ymz280_w (sound) */
-	AM_RANGE(0x01000000, 0x0100000f) AM_READWRITE(skns_msm6242_r, skns_msm6242_w)
+	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write, 0xffffffff)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(skns_hit2_w)
 	AM_RANGE(0x02000000, 0x02003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
 	AM_RANGE(0x02100000, 0x0210003f) AM_RAM AM_BASE_MEMBER(skns_state, m_spc_regs) /* sprite registers */
@@ -805,12 +754,17 @@ static const ymz280b_interface ymz280b_intf =
 };
 
 
-
+static MSM6242_INTERFACE( rtc_intf )
+{
+	DEVCB_NULL
+};
 
 static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_CPU_ADD("maincpu", SH2,28638000)
 	MCFG_CPU_PROGRAM_MAP(skns_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", skns_irq, "screen", 0, 1)
+
+	MCFG_MSM6242_ADD("rtc", rtc_intf)
 
 	MCFG_MACHINE_RESET(skns)
 	MCFG_NVRAM_ADD_1FILL("nvram")

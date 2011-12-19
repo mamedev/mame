@@ -2,9 +2,12 @@
 
     MSM6242 Real Time Clock
 
+	Note:
+	- this RTC has a y2k bug
+
 	TODO:
 	- HOLD mechanism
-	- IRQ
+	- IRQ ACK
 
 ***************************************************************************/
 
@@ -141,7 +144,7 @@ void msm6242_device::device_start()
 	m_rtc.day = (systime.local_time.mday);
 	m_rtc.month = (systime.local_time.month+1);
 	m_rtc.wday = (systime.local_time.weekday);
-	m_rtc.year = (systime.local_time.year)-1900;
+	m_rtc.year = (systime.local_time.year % 100);
 	m_rtc.hour = (systime.local_time.hour);
 	m_rtc.min = (systime.local_time.minute);
 	m_rtc.sec = (systime.local_time.second);
@@ -233,7 +236,7 @@ READ8_MEMBER( msm6242_device::read )
 		case MSM6242_REG_MO1: return (cur_time .month % 10) & 0xf;
 		case MSM6242_REG_MO10: return (cur_time.month / 10) & 0xf;
 		case MSM6242_REG_Y1: return (cur_time.year % 10) & 0xf;
-		case MSM6242_REG_Y10: return ((cur_time.year % 100) / 10) & 0xf;
+		case MSM6242_REG_Y10: return ((cur_time.year / 10) % 10) & 0xf;
 		case MSM6242_REG_W: return cur_time.wday;
 		case MSM6242_REG_CD: return m_reg[0];
 		case MSM6242_REG_CE: return m_reg[1];
