@@ -1268,6 +1268,9 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( system18_8751, system18 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT(NULL, NULL)
+
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
