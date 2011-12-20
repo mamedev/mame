@@ -5,6 +5,8 @@
 
   Driver by Roberto Fresca.
 
+  TODO:
+  - needs CTC and daisy chain to make progresses
 
   Games running on this hardware:
 
@@ -399,6 +401,7 @@
 
 
 ************************************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 
 #define MASTER_CLOCK	XTAL_10MHz			/* unknown */
@@ -418,13 +421,42 @@ class avt_state : public driver_device
 {
 public:
 	avt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_crtc(*this, "crtc")
+		{ }
+
+	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
+	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
+	DECLARE_READ8_MEMBER( avt_6845_data_r );
+	DECLARE_WRITE8_MEMBER(avt_videoram_w);
+	DECLARE_WRITE8_MEMBER(avt_colorram_w);
 
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
+	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
 };
 
+#define mc6845_h_char_total 	(state->m_crtc_vreg[0])
+#define mc6845_h_display		(state->m_crtc_vreg[1])
+#define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
+#define mc6845_sync_width		(state->m_crtc_vreg[3])
+#define mc6845_v_char_total		(state->m_crtc_vreg[4])
+#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
+#define mc6845_v_display		(state->m_crtc_vreg[6])
+#define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
+#define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
+#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
+#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
 /*********************************************
@@ -432,19 +464,17 @@ public:
 *********************************************/
 
 
-static WRITE8_HANDLER( avt_videoram_w )
+WRITE8_MEMBER( avt_state::avt_videoram_w )
 {
-	avt_state *state = space->machine().driver_data<avt_state>();
-	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(m_bg_tilemap, offset);
 }
 
 
-static WRITE8_HANDLER( avt_colorram_w )
+WRITE8_MEMBER( avt_state::avt_colorram_w )
 {
-	avt_state *state = space->machine().driver_data<avt_state>();
-	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(m_bg_tilemap, offset);
 }
 
 
@@ -457,7 +487,7 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- xxxx   seems unused.
 */
 	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int code = state->m_videoram[tile_index] | ((attr & 1) << 8);
 	int color = (attr & 0xf0)>>4;
 
 	SET_TILE_INFO( 0, code, color, 0);
@@ -474,7 +504,25 @@ static VIDEO_START( avt )
 static SCREEN_UPDATE( avt )
 {
 	avt_state *state = screen->machine().driver_data<avt_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	int x,y;
+	int count;
+	const gfx_element *gfx = screen->machine().gfx[0];
+
+	count = 0;
+
+	for(y=0;y<mc6845_v_display;y++)
+	{
+		for(x=0;x<mc6845_h_display;x++)
+		{
+			UINT16 tile = state->m_videoram[count] | ((state->m_colorram[count] & 1) << 8);
+			UINT8 color = (state->m_colorram[count] & 0xf0) >> 4;
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,(y*8));
+
+			count++;
+		}
+	}
+	//tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -539,32 +587,50 @@ static PALETTE_INIT( avt )
 //  popmessage("written : %02X", data);
 //}
 
+WRITE8_MEMBER( avt_state::avt_6845_address_w )
+{
+	m_crtc_index = data;
+	m_crtc->address_w(space, offset, data);
+}
+
+WRITE8_MEMBER( avt_state::avt_6845_data_w )
+{
+	m_crtc_vreg[m_crtc_index] = data;
+	m_crtc->register_w(space, offset, data);
+}
+
+READ8_MEMBER( avt_state::avt_6845_data_r )
+{
+	//m_crtc_vreg[m_crtc_index] = data;
+	return m_crtc->register_r(space, offset);
+}
 
 /*********************************************
 *           Memory Map Information           *
 *********************************************/
 
 /* avtnfl, avtbingo */
-static ADDRESS_MAP_START( avt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( avt_map, AS_PROGRAM, 8, avt_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_BASE_MEMBER(avt_state, m_videoram)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE_MEMBER(avt_state, m_colorram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE(m_colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avt_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x03) unk, maybe IO
 //  AM_RANGE(0x00, 0x00)  AM_READ_PORT("IN0")
 //  AM_RANGE(0x01, 0x01)  AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 //  AM_RANGE(0x08, 0x0b) unk, maybe IO
 //  AM_RANGE(0x08, 0x08)  AM_READ_PORT("IN2")
 //  AM_RANGE(0x09, 0x09)  AM_READ_PORT("IN3")
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE("aysnd", ay8910_data_w)		/* AY8910 data */
-	AM_RANGE(0x23, 0x23) AM_DEVWRITE("aysnd", ay8910_address_w)		/* AY8910 control */
-	AM_RANGE(0x28, 0x28) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x29, 0x29) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x21, 0x21) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)		/* AY8910 data */
+	AM_RANGE(0x23, 0x23) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)		/* AY8910 control */
+	AM_RANGE(0x28, 0x28) AM_WRITE(avt_6845_address_w)
+	AM_RANGE(0x29, 0x29) AM_READWRITE(avt_6845_data_r,avt_6845_data_w)
 ADDRESS_MAP_END
 
 /* I/O byte R/W
@@ -810,13 +876,21 @@ static const ay8910_interface ay8910_config =
 *              Machine Drivers               *
 *********************************************/
 
+/* IM 2 */
+static INTERRUPT_GEN( avt_vblank_irq )
+{
+	avt_state *state = device->machine().driver_data<avt_state>();
+
+	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x06);
+}
+
 static MACHINE_CONFIG_START( avt, avt_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(avt_map)
 	MCFG_CPU_IO_MAP(avt_portmap)
-//  MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", avt_vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
