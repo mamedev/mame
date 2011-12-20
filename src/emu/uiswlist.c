@@ -133,12 +133,14 @@ ui_menu_software_entry_info *ui_menu_software_list::append_software_entry(softwa
 	ui_menu_software_entry_info *entry = NULL;
 	ui_menu_software_entry_info **entryptr;
 	const char *interface = image->image_interface();
+	bool entry_updated = FALSE;
 
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
 	for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 	{
 		if (strcmp(interface, swpart->interface_) == 0)
 		{
+			entry_updated = TRUE;
 			// allocate a new entry
 			entry = (ui_menu_software_entry_info *) m_pool_alloc(sizeof(*entry));
 			memset(entry, 0, sizeof(*entry));
@@ -152,14 +154,18 @@ ui_menu_software_entry_info *ui_menu_software_list::append_software_entry(softwa
 		}
 	}
 
-	// find the end of the list
-	entryptr = &entrylist;
-	while ((*entryptr != NULL) && (compare_entries(entry, *entryptr, ordered_by_shortname) >= 0))
-		entryptr = &(*entryptr)->next;
+	// skip this if no new entry has been allocated (e.g. if the software has no matching interface for this image device)
+	if (entry_updated)
+	{
+		// find the end of the list
+		entryptr = &entrylist;
+		while ((*entryptr != NULL) && (compare_entries(entry, *entryptr, ordered_by_shortname) >= 0))
+			entryptr = &(*entryptr)->next;
 
-	// insert the entry
-	entry->next = *entryptr;
-	*entryptr = entry;
+		// insert the entry
+		entry->next = *entryptr;
+		*entryptr = entry;
+	}
 
 	return entry;
 }
