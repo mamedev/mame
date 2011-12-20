@@ -121,13 +121,13 @@ static TIMER_DEVICE_CALLBACK( snowbros_irq )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 2, ASSERT_LINE);
 
 	if(scanline == 128)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 3, ASSERT_LINE);
 
 	if(scanline == 32)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 4, ASSERT_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( snowbros3_irq )
@@ -138,13 +138,13 @@ static TIMER_DEVICE_CALLBACK( snowbros3_irq )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 2, ASSERT_LINE);
 
 	if(scanline == 128)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 3, ASSERT_LINE);
 
 	if(scanline == 32)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 4, ASSERT_LINE);
 
 	if (state->m_sb3_music_is_playing)
 	{
