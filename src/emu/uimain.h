@@ -123,6 +123,7 @@ protected:
 
 protected:
 	const void *		pollingref;
+	input_seq_type		pollingseq;
 	input_item_data *	pollingitem;
 
 private:
