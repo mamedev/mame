@@ -1393,7 +1393,7 @@ software_part *software_find_part(software_info *sw, const char *partname, const
 		}
 	}
 
-	if ( ! part->name )
+	if ( part && ! part->name )
 		part = NULL;
 
 	return part;
