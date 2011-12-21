@@ -927,7 +927,6 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 
 ui_menu_settings_dip_switches::ui_menu_settings_dip_switches(running_machine &machine, render_container *container) : ui_menu_settings(machine, container, IPT_DIPSWITCH)
 {
-	custombottom = dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING;
 }
 
 ui_menu_settings_dip_switches::~ui_menu_settings_dip_switches()
@@ -1075,6 +1074,8 @@ void ui_menu_settings::populate()
 					}
 				}
 			}
+	if (type == IPT_DIPSWITCH)
+		custombottom = dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING;
 }
 
 ui_menu_settings::~ui_menu_settings()
