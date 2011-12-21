@@ -264,6 +264,12 @@ static TIMER_CALLBACK( kbdc8042_time )
 	at_8042_check_keyboard(machine);
 }
 
+static TIMER_CALLBACK( kbdc8042_clr_int )
+{
+	/* Lets 8952's timers do their job before clear the interrupt line, */
+	/* else Keyboard interrupt never happens. */
+	kbdc8042.keyboard_interrupt(machine, 0); 
+}
 
 
 void kbdc8042_init(running_machine &machine, const struct kbdc8042_interface *intf)
@@ -293,7 +299,9 @@ static void at_8042_receive(running_machine &machine, UINT8 data)
 	if (kbdc8042.keyboard_interrupt)
 	{
 		kbdc8042.keyboard_interrupt(machine, 1);
-		kbdc8042.keyboard_interrupt(machine, 0);
+		/* Lets 8952's timers do their job before clear the interrupt line, */
+		/* else Keyboard interrupt never happens. */
+		machine.scheduler().timer_set( attotime::from_usec(2), FUNC(kbdc8042_clr_int),0,0 );
 	}
 }
 
