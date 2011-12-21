@@ -247,15 +247,7 @@ void ui_menu_software_list::handle()
 			// if the selected software has multiple parts that can be loaded, open the submenu
 			if (swinfo_has_multiple_parts(tmp_info, image->image_interface()))
 			{
-#if 0
-				ui_menu *child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), ui_mess_menu_software_parts, entry);
-				ui_menu_software_entry_info *child_menustate = (ui_menu_software_entry_info *)child_menu->alloc_state(sizeof(*child_menustate), NULL);
-				child_menustate->short_name = entry->short_name;
-				child_menustate->interface = image->image_interface();
-				child_menustate->list_name = list_name;
-				child_menustate->image = image;
-				ui_menu::stack_push(child_menu);
-#endif
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, entry)));
 			}
 			else
 			{
