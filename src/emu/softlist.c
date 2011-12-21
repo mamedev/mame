@@ -1481,7 +1481,8 @@ static void find_software_item(const device_list &devlist, emu_options &options,
 	software_name_split(path, &swlist_name, &swname, &swpart );
 //  swname_bckp = swname;
 
-	const char *interface = image->image_interface();
+	const char *interface = NULL;
+	if (image) interface = image->image_interface();
 
 	if ( swlist_name )
 	{
@@ -1686,6 +1687,43 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 		/* Tell the world which part we actually loaded */
 		*full_sw_name = auto_alloc_array( image->device().machine(), char, strlen(swlist_name) + strlen(software_info_ptr->shortname) + strlen(software_part_ptr->name) + 3 );
 		sprintf( *full_sw_name, "%s:%s:%s", swlist_name, software_info_ptr->shortname, software_part_ptr->name );
+		
+		{
+			const char *requirement = software_part_get_feature(software_part_ptr, "requirement");
+			if (requirement!=NULL) {
+				software_list *req_software_list_ptr = NULL;
+				software_info *req_software_info_ptr = NULL;
+				software_part *req_software_part_ptr = NULL;
+				const char *req_swlist_name = NULL;
+
+				find_software_item(image->device().machine().devicelist(), options, NULL, requirement, &req_software_list_ptr, &req_software_info_ptr, &req_software_part_ptr, &req_swlist_name);
+			
+				if ( req_software_list_ptr )
+				{
+					device_image_interface *req_image = NULL;
+					for (bool gotone = image->device().machine().devicelist().first(req_image); gotone; gotone = req_image->next(req_image))
+					{
+						const char *interface = req_image->image_interface();												
+						if (interface != NULL)
+						{
+							if (!strcmp(interface, req_software_part_ptr->interface_))
+							{
+								const char *option = options.value(req_image->brief_instance_name());
+								// mount only if not already mounted
+								if (strlen(option)==0) {
+									req_image->load(requirement);
+								}
+								break;
+							}												
+						}
+					}
+					software_list_close( req_software_list_ptr );
+					req_software_info_ptr = NULL;
+					req_software_list_ptr = NULL;
+					global_free(req_swlist_name);
+				}				
+			}			
+		}
 	}
 
 	/* Close the software list if it's still open */

@@ -237,7 +237,14 @@ void image_device_init(running_machine &machine)
 					image_err.cstr());
 			}
 		}
-		else
+	}
+	
+    for (bool gotone = machine.devicelist().first(image); gotone; gotone = image->next(image))
+	{
+		/* is an image specified for this image */
+		image_name = image->filename();
+
+		if (!((image_name != NULL) && (image_name[0] != '\0')))
 		{
 			/* no image... must this device be loaded? */
 			if (image->must_be_loaded())
