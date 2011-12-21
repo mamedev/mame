@@ -22,7 +22,11 @@
 		</rect>
 		<text string="HOLD 5">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.2" width="1" height="0.6" />
+			<bounds x="0" y="0.05" width="1" height="0.5" />
+		</text>
+		<text string="x2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
 		</text>
 	</element>
 
@@ -74,7 +78,11 @@
 		</rect>
 		<text string="HOLD 1">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.2" width="1" height="0.6" />
+			<bounds x="0" y="0.05" width="1" height="0.5" />
+		</text>
+		<text string="1/2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
 		</text>
 	</element>
 

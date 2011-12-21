@@ -1,6 +1,7 @@
 /*************************************************************************************************
 
   Forte Card
+  1994, Fortex Ltd.
 
   Driver by Angelo Salese.
   Additional work by Roberto Fresca & Rob Ragon.
@@ -16,6 +17,17 @@
 
   English set: bp 512 do pc=53e
   Spanish set: bp 512 do pc=562
+
+-------------------------------------------------------------------------------------------------
+
+  The Fortex company manufactured its first game 'Forte Card' in 1994. It soon became a favorite
+  with the Bulgarian players. Improved versions were developed and were sold in Russia, Austria,
+  Brazil, Argentina and the Balkan peninsular.
+
+  In 1995, Fortex, first of all Bulgarian games manufacturers, exibited at the Plovdiv Fair a com-
+  puter based version of Forte Card. The following years were times of hard teamwork, which resul-
+  ted in a variety of products: centralized cash desk, on-line jackpot and a network control and
+  management system for game centers.
 
 -------------------------------------------------------------------------------------------------
 
@@ -61,11 +73,30 @@
   FULL equivalent to MC6845P, UM6845R, EF6845P, HD6845P, etc.
 
   The ST93CS56 and ST93CS57 are 2K bit Electrically Erasable Programmable Memory (EEPROM)
-  fabricated with SGS-THOMSON?s High Endurance Single Polysilicon CMOS technology. The memory
+  fabricated with SGS-THOMSON's High Endurance Single Polysilicon CMOS technology. The memory
   is accessed through a serial input D and output Q. The 2K bit memory is organized as 128 x 16 bit
   words.The memory is accessed by a set of instructions which include Read, Write, Page Write, Write
   All and instructions used to set the memory protection. A Read instruction loads the address of the
   first word to be read into an internal address pointer.
+
+
+-------------------------------------------------------------------------------------------------
+
+  Game Notes...
+
+
+  There are 3 keys for service modes:
+
+  1) The Owner Key.
+  2) The Rental Key.
+  3) The Credits Key.
+
+
+  To enter credits through an operator:
+
+  1) Turn ON the Credits Key.
+  2) Press RED button to add x1000, or BLACK to add x100
+  3) Turn OFF the Credit Key.
 
 
 -------------------------------------------------------------------------------------------------
@@ -123,6 +154,154 @@
 
 
   Note: MANAGER and PAGE 1, are "Owner" and "Rental" modes.
+
+
+-------------------------------------------------------------------------------------------------
+
+  Serial EEPROM
+  -------------
+
+  Forte Card (Ver 110, Spanish)
+
+  0x80 x 16bit words
+
+  Word   Bytes   Description                         Mode    Notes
+  -----+-------+-----------------------------------+-------+--------
+  0x00   00-01   Total Entradas (low)                Owner
+  0x01   02-03   Total Entradas (med)                Owner
+  0x02   04-05   Total Entradas (high)               Owner
+  0x03   06-07   Total Salidas (low)                 Owner
+  0x04   08-09   Total Salidas (med)                 Owner
+  0x05   0A-0B   Total Salidas (high)                Owner
+  0x06   0C-0D   Total Juegos (low)                  Owner
+  0x07   0E-0F   Total Juegos (med)                  Owner
+  0x08   10-11   Total Juegos (high)                 Owner
+  0x09   12-13   Total Ganancias (low)               Owner
+  0x0A   14-15   Total Ganancias (med)               Owner
+  0x0B   16-17   Total Ganancias (high)              Owner
+  0x0C   18-19   Total Ganancias C/Apuestas (low)    Owner
+  0x0D   1A-1B   Total Ganancias C/Apuestas (med)    Owner
+  0x0E   1C-1D   Total Ganancias C/Apuestas (high)   Owner
+  0x0F   1E-1F   Total Apuestas (low)                Owner
+
+  0x10   20-21   Total Apuestas (med)                Owner
+  0x11   22-23   Total Apuestas (high)               Owner
+  0x12   24-25   Valor Moneda / Nivel Ganancia
+  0x13   26-27   Min Bet / Max Bet step (0-B) - (Clase C, bit1 active??)
+  0x14   28-29   Jokers (1-2) / ????
+  0x15   2A-2B   Registro Dinero Minimo (low)
+  0x16   2C-2D   Registro Dinero Minimo (high)
+  0x17   2E-2F   Factor de Calculo (1-10-100)
+  0x18   30-31   Serial Number (low, 4 digits)
+  0x19   32-33   Serial Number (high, 0970)
+  0x1A   34-35   Unknown (6F2B)
+  0x1B   36-37   Unknown (0341)
+  0x1C   38-39   Unknown (980C)
+  0x1D   3A-3B   Balance (low)                       Owner
+  0x1E   3C-3D   Balance (med)                       Owner
+  0x1F   3E-3F   Balance (high)                      Owner
+
+  0x20   40-41   Unknown (0000)
+  0x21   42-43   Unknown (0000)
+  0x22   44-45   Unknown (0000)
+  0x23   46-47   Unknown (0000)
+  0x24   48-49   Unknown (0000)
+  0x25   4A-4B   Unknown (0000)
+  0x26   4C-4D   Unknown (0000)
+  0x27   4E-4F   Unknown (0000)
+  0x28   50-51   Unknown (0000)
+  0x29   52-53   Unknown (0000)
+  0x2A   54-55   Unknown (0000)
+  0x2B   56-57   Unknown (0000)
+  0x2C   58-59   Unknown (0000)
+  0x2D   5A-5B   Unknown (0000)
+  0x2E   5C-5D   Unknown (0000)
+  0x2F   5E-5F   Unknown (0000)
+
+  0x30   60-61   Unknown (0000)
+  0x31   62-63   Unknown (0000)
+  0x32   64-65   Unknown (0000)
+  0x33   66-67   Unknown (0000)
+  0x34   68-69   Unknown (0000)
+  0x35   6A-6B   Unknown (0000)
+  0x36   6C-6D   Unknown (0000)
+  0x37   6E-6F   Unknown (0000)
+  0x38   70-71   Unknown (0000)
+  0x39   72-73   Unknown (0000)
+  0x3A   74-75   Unknown (0000)
+  0x3B   76-77   Unknown (0000)
+  0x3C   78-79   Unknown (0000)
+  0x3D   7A-7B   Unknown (0000)
+  0x3E   7C-7D   Unknown (0000)
+  0x3F   7E-7F   Unknown (0000)
+
+  0x40   80-81   Unknown (0000)
+  0x41   82-83   Unknown (0000)
+  0x42   84-85   Unknown (0000)
+  0x43   86-87   Unknown (1187)
+  0x44   88-89   Unknown (B042)
+  0x45   8A-8B   Unknown (0000)
+  0x46   8C-8D   Unknown (0000)
+  0x47   8E-8F   Unknown (0000)
+  0x48   90-91   Unknown (0000)
+  0x49   92-93   Unknown (0000)
+  0x4A   94-95   Unknown (0000)
+  0x4B   96-97   Unknown (0000)
+  0x4C   98-99   Unknown (0000)
+  0x4D   9A-9B   Unknown (0000)
+  0x4E   9C-9D   Unknown (0000)
+  0x4F   9E-9F   Unknown (0000)
+
+  0x50   A0-A1   Unknown (0000)
+  0x51   A2-A3   Unknown (0000)
+  0x52   A4-A5   Unknown (0000)
+  0x53   A6-A7   Unknown (0000)
+  0x54   A8-A9   Unknown (0000)
+  0x55   AA-AB   Unknown (0000)
+  0x56   AC-AD   Unknown (0000)
+  0x57   AE-AF   Unknown (0000)
+  0x58   B0-B1   Unknown (0000)
+  0x59   B2-B3   Unknown (0000)
+  0x5A   B4-B5   Unknown (0000)
+  0x5B   B6-B7   Unknown (0000)
+  0x5C   B8-B9   Unknown (0000)
+  0x5D   BA-BB   Unknown (0000)
+  0x5E   BC-BD   Unknown (0000)
+  0x5F   BE-BF   Unknown (0000)
+
+  0x60   C0-C1   Unknown (0000)
+  0x61   C2-C3   Unknown (0000)
+  0x62   C4-C5   Unknown (0000)
+  0x63   C6-C7   Unknown (0000)
+  0x64   C8-C9   Unknown (0000)
+  0x65   CA-CB   Unknown (0000)
+  0x66   CC-CD   Unknown (0000)
+  0x67   CE-CF   Unknown (0000)
+  0x68   D0-D1   Unknown (0000)
+  0x69   D2-D3   Unknown (0000)
+  0x6A   D4-D5   Unknown (0000)
+  0x6B   D6-D7   Unknown (1187)
+  0x6C   D8-D9   Unknown (B042)
+  0x6D   DA-DB   Global Entradas (low)               Rental
+  0x6E   DC-DD   Global Entradas (high)              Rental
+  0x6F   DE-DF   Unknown (1187)
+
+  0x70   E0-E1   Unknown (B042)
+  0x71   E2-E3   Global Salidas (low)                Rental
+  0x72   E4-E5   Global Salidas (high)               Rental
+  0x73   E6-E7   Unknown (172E)
+  0x74   E8-E9   Unknown (980B)
+  0x75   EA-EB   Total Entradas Anterior (low)
+  0x76   EC-ED   Total Entradas Anterior (high)
+  0x77   EE-EF   Unknown (172E)
+  0x78   F0-F1   Unknown (980B)
+  0x79   F2-F3   Total Salidas Anterior (low)
+  0x7A   F4-F5   Total Salidas Anterior (high)
+  0x7B   F6-F7   Unknown (2114)
+  0x7C   F8-F9   ??? / Valor Billete
+  0x7D   FA-FB   Unknown (0000)
+  0x7E   FC-FD   Unknown (0000)
+  0x7F   FE-FF   Checksum
 
 
 **************************************************************************************************/
@@ -438,8 +617,8 @@ static INPUT_PORTS_START( fortecar )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("INPUT")	/* 8bit */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Red / Bet")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Red / Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Black")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -448,22 +627,14 @@ static INPUT_PORTS_START( fortecar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 
 	PORT_START("SYSTEM")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x01, "Rear Door" ) // key in
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Rear Door")   PORT_CODE(KEYCODE_D)  PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )  PORT_NAME("Key In")
-	PORT_DIPNAME( 0x40, 0x40, "Owner" ) // full service
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Rental" ) // page 1
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )         PORT_NAME("Coin In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )       /* to trace */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )         PORT_NAME("Note In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Credits Key") PORT_CODE(KEYCODE_Q)  PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Owner Key")   PORT_CODE(KEYCODE_0)  PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Rental Key")  PORT_CODE(KEYCODE_9)  PORT_TOGGLE
 INPUT_PORTS_END
 
 
@@ -562,11 +733,10 @@ ROM_START( fortecar )
 
 	/* took from the Spanish version, these are likely to be identical anyway */
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
-	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
-//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
+	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(7d3e7eb5) SHA1(788fe7adc381bcc6eaefed33f5aa1081340608a0) )
 
 	ROM_REGION( 0x0200,	"eeprom", 0 )	/* default serial EEPROM */
-	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
+	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56_serial_12345678.u13", 0x0000, 0x0100, BAD_DUMP CRC(2fc5961d) SHA1(f958c8b2b4e48cc6e5a607a6751acde5592bd27f) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "forte_card_82s147.u47", 0x0000, 0x0200, BAD_DUMP CRC(7e631818) SHA1(ac08b0de30260278af3a1c5dee5810d4304cb9ca) )
@@ -582,11 +752,10 @@ ROM_START( fortecrd )
 	ROM_LOAD( "forte_card.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
-//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
+	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(7d3e7eb5) SHA1(788fe7adc381bcc6eaefed33f5aa1081340608a0) )
 
 	ROM_REGION( 0x0200,	"eeprom", 0 )	/* default serial EEPROM */
-	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
+	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56_serial_12345678.u13", 0x0000, 0x0100, CRC(2fc5961d) SHA1(f958c8b2b4e48cc6e5a607a6751acde5592bd27f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "forte_card_82s147.u47", 0x0000, 0x0200, CRC(7e631818) SHA1(ac08b0de30260278af3a1c5dee5810d4304cb9ca) )
@@ -599,6 +768,6 @@ static DRIVER_INIT( fortecar )
 }
 
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME               FLAGS             LAYOUT */
-GAMEL( 19??, fortecar, 0,        fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (English)", GAME_NOT_WORKING, layout_fortecrd )
-GAMEL( 19??, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Spanish)", 0, layout_fortecrd )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME                        FLAGS             LAYOUT */
+GAMEL( 1994, fortecar, 0,        fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", GAME_NOT_WORKING, layout_fortecrd )
+GAMEL( 1994, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                layout_fortecrd )
