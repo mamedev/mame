@@ -588,7 +588,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 {
 	FILE *infile;
 	int i, trknum;
-	static char token[128];
+	static char token[512];
 	static char lastfname[256];
 	UINT32 wavlen, wavoffs;
 	astring path = astring(tocfname);
@@ -850,7 +850,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 {
 	FILE *infile;
 	int i, trknum;
-	static char token[128];
+	static char token[512];
 
 	if (strstr(tocfname,".gdi"))
 	{
