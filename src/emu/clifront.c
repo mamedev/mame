@@ -197,33 +197,35 @@ int cli_frontend::execute(int argc, char **argv)
 							for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 							{
 								const char *mount = software_part_get_feature(swpart, "automount");
-								if (mount==NULL || strcmp(mount,"no")!=0) {
-									// loop trough all parts
-									// search for a device with the right interface
-									const device_image_interface *image = NULL;
-									for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
-									{
-										const char *interface = image->image_interface();
-										if (interface != NULL)
+								if (is_software_compatible(swpart, swlist)) {
+									if (mount==NULL || strcmp(mount,"no")!=0) {
+										// loop trough all parts
+										// search for a device with the right interface
+										const device_image_interface *image = NULL;
+										for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
 										{
-											if (!strcmp(interface, swpart->interface_))
+											const char *interface = image->image_interface();
+											if (interface != NULL)
 											{
-												const char *option = m_options.value(image->brief_instance_name());
-												// mount only if not already mounted
-												if (strlen(option)==0) {
-													astring val;
-													val.printf("%s:%s:%s",swlist->list_name,m_options.software_name(),swpart->name);
-													// call this in order to set slot devices according to mounting
-													m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.cstr());
+												if (!strcmp(interface, swpart->interface_))
+												{
+													const char *option = m_options.value(image->brief_instance_name());
+													// mount only if not already mounted
+													if (strlen(option)==0) {
+														astring val;
+														val.printf("%s:%s:%s",swlist->list_name,m_options.software_name(),swpart->name);
+														// call this in order to set slot devices according to mounting
+														m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.cstr());
+													}
+													break;
 												}
-												break;
 											}
 										}
 									}
+									found = TRUE;
 								}
 							}
 							software_list_close(list);
-							found = TRUE;
 							break;
 						}
 

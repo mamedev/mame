@@ -126,20 +126,6 @@ int ui_menu_software_list::compare_entries(const ui_menu_software_entry_info *e1
 	return result;
 }
 
-bool ui_menu_software_list::if_compatible(const char *compatibility, const char *filter)
-{
-	if ((compatibility==NULL) || (filter==NULL)) return TRUE;
-	astring comp = astring(compatibility,",");
-	char *filt = core_strdup(filter);
-	char *token = strtok(filt,",");
-	while (token!= NULL)
-	{
-		if (comp.find(0,astring(token,","))!=-1) return TRUE;
-		token = strtok (NULL, ",");
-	}
-	return FALSE;
-}
-
 /* populate a specific list */
 
 ui_menu_software_entry_info *ui_menu_software_list::append_software_entry(software_info *swinfo, device_image_interface* image)
@@ -152,8 +138,7 @@ ui_menu_software_entry_info *ui_menu_software_list::append_software_entry(softwa
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
 	for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 	{
-		const char *compatibility = software_part_get_feature(swpart, "compatibility");
-		if ((strcmp(interface, swpart->interface_) == 0) && if_compatible(compatibility, swlist->filter))
+		if ((strcmp(interface, swpart->interface_) == 0) && is_software_compatible(swpart, swlist))
 		{
 			entry_updated = TRUE;
 			// allocate a new entry

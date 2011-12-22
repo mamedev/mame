@@ -1211,7 +1211,7 @@ static int softlist_penalty_compare(const char *source, const char *target)
  software_list_find_approx_matches
  -------------------------------------------------*/
 
-void software_list_find_approx_matches(software_list *swlist, const char *name, int matches, software_info **list, const char* interface)
+void software_list_find_approx_matches(software_list_config *swlistcfg, software_list *swlist, const char *name, int matches, software_info **list, const char* interface)
 {
 #undef rand
 
@@ -1238,7 +1238,7 @@ void software_list_find_approx_matches(software_list *swlist, const char *name, 
 		software_info *candidate = swinfo;
 
 		software_part *part = software_find_part(swinfo, NULL, NULL);
-		if (interface==NULL || !strcmp(interface, part->interface_))
+		if ((interface==NULL || !strcmp(interface, part->interface_)) && (is_software_compatible(part, swlistcfg)))
 		{
 
 			/* pick the best match between driver name and description */
@@ -1442,7 +1442,7 @@ void software_display_matches(const device_list &devlist,emu_options &options, c
 
 			software_list_parse(list, list->error_proc, NULL);
 			// get the top 5 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
-			software_list_find_approx_matches(list, name, ARRAY_LENGTH(matches), matches, interface);
+			software_list_find_approx_matches(swlist, list, name, ARRAY_LENGTH(matches), matches, interface);
 
 			if (matches[0] != 0)
 			{
@@ -1677,6 +1677,17 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 		*full_sw_name = auto_alloc_array( image->device().machine(), char, strlen(swlist_name) + strlen(software_info_ptr->shortname) + strlen(software_part_ptr->name) + 3 );
 		sprintf( *full_sw_name, "%s:%s:%s", swlist_name, software_info_ptr->shortname, software_part_ptr->name );
 		
+		for (device_t *swlists = image->device().machine().devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
+		{
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
+			if (strcmp(swlist->list_name,swlist_name)==0) {
+				if (!is_software_compatible(software_part_ptr, swlist)) {
+					mame_printf_warning("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n",software_info_ptr->shortname,swlist->filter);
+				}
+				break;
+			}
+		}
+		
 		{
 			const char *requirement = software_part_get_feature(software_part_ptr, "requirement");
 			if (requirement!=NULL) {
@@ -1774,6 +1785,26 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
 		global_free(swlist_name);
 	}
 	return retVal;
+}
+
+/*-------------------------------------------------
+    is_software_compatible
+ -------------------------------------------------*/
+
+bool is_software_compatible(software_part *swpart, software_list_config *swlist)
+{
+	const char *compatibility = software_part_get_feature(swpart, "compatibility");
+	const char *filter = swlist->filter;
+	if ((compatibility==NULL) || (filter==NULL)) return TRUE;
+	astring comp = astring(compatibility,",");
+	char *filt = core_strdup(filter);
+	char *token = strtok(filt,",");
+	while (token!= NULL)
+	{
+		if (comp.find(0,astring(token,","))!=-1) return TRUE;
+		token = strtok (NULL, ",");
+	}
+	return FALSE;
 }
 
 /***************************************************************************

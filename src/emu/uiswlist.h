@@ -55,7 +55,6 @@ private:
 	int compare_entries(const ui_menu_software_entry_info *e1, const ui_menu_software_entry_info *e2, bool shortname);
 	ui_menu_software_entry_info *append_software_entry(software_info *swinfo, device_image_interface* image);
 	bool swinfo_has_multiple_parts(software_info *swinfo, const char *interface);
-	bool if_compatible(const char *compatibility, const char *filter);
 };
 
 class ui_menu_software : public ui_menu {
