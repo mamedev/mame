@@ -678,7 +678,7 @@ void ui_menu_input_specific::populate()
 					memset(item, 0, sizeof(*item));
 					item->ref = field;
 					item->seqtype = seqtype;
-					if(pollingitem && pollingref == field)
+					if(pollingitem && pollingref == field && pollingseq == seqtype)
 						pollingitem = item;
 					item->seq = input_field_seq(field, seqtype);
 					item->defseq = &get_field_default_seq(field, seqtype);
