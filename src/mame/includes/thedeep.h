@@ -3,7 +3,9 @@ class thedeep_state : public driver_device
 public:
 	thedeep_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu")
 		{ }
 
 	UINT8 *m_spriteram;
@@ -20,8 +22,11 @@ public:
 	UINT8 *m_scroll2;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
+	UINT8 m_mcu_p3_reg;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_mcu;
 };
 
 

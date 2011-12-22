@@ -185,9 +185,87 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+
+/***************************************************************************
+
+                                    MCU
+
+***************************************************************************/
+
+static void thedeep_maincpu_bankswitch(running_machine &machine,UINT8 bank_trig)
+{
+	thedeep_state *state = machine.driver_data<thedeep_state>();
+	UINT8 *rom;
+	int new_rombank = bank_trig & 3;
+
+	if (state->m_rombank == new_rombank)
+		return;
+	state->m_rombank = new_rombank;
+	rom = machine.region("maincpu")->base();
+	memory_set_bankptr(machine, "bank1", rom + 0x10000 + state->m_rombank * 0x4000);
+	/* there's code which falls through from the fixed ROM to bank #1, I have to */
+	/* copy it there otherwise the CPU bank switching support will not catch it. */
+	memcpy(rom + 0x08000, rom + 0x10000 + state->m_rombank * 0x4000, 0x4000);
+
+}
+
+static WRITE8_HANDLER( thedeep_p1_w )
+{
+	flip_screen_set(space->machine(), ~(data & 1));
+	thedeep_maincpu_bankswitch(space->machine(),(data & 6) >> 1);
+	logerror("P1 %02x\n",data);
+}
+
+static READ8_HANDLER( thedeep_from_main_r )
+{
+	static UINT8 res;
+
+	res = 0x11;
+
+	logerror("From Main read = %02x\n",res);
+	return 0x20;
+}
+
+static WRITE8_HANDLER( thedeep_to_main_w )
+{
+	// ...
+}
+
+static WRITE8_HANDLER( thedeep_p3_w )
+{
+	thedeep_state *state = space->machine().driver_data<thedeep_state>();
+
+	/* bit 0 0->1 transition IRQ0 to main */
+	if((!(state->m_mcu_p3_reg & 0x01)) && data & 0x01)
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+
+	/* bit 6 0->1 transition INT1 IRQ ACK */
+	if((!(state->m_mcu_p3_reg & 0x40)) && data & 0x40)
+		device_set_input_line(state->m_mcu, MCS51_INT1_LINE, CLEAR_LINE);
+
+	/* bit 7 0->1 transition INT0 IRQ ACK */
+	if((!(state->m_mcu_p3_reg & 0x80)) && data & 0x80)
+		device_set_input_line(state->m_mcu, MCS51_INT0_LINE, CLEAR_LINE);
+
+	state->m_mcu_p3_reg = data;
+	logerror("P3 %02x\n",data);
+}
+
+static READ8_HANDLER( thedeep_p0_r )
+{
+	UINT8 coin_mux;
+
+	coin_mux = ((input_port_read(space->machine(),"COINS") & 0x0e) == 0x0e); // bit 0 is hard-wired to ALL three coin latches
+
+	return (input_port_read(space->machine(),"COINS") & 0xfe) | (coin_mux & 1);
+}
+
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3)
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READ(thedeep_p0_r)
+	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) AM_WRITE(thedeep_p1_w)
+	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2) AM_READWRITE(thedeep_from_main_r,thedeep_to_main_w)
+	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_WRITE(thedeep_p3_w)
 ADDRESS_MAP_END
 
 
@@ -196,7 +274,6 @@ ADDRESS_MAP_END
                                 Input Ports
 
 ***************************************************************************/
-
 
 static INPUT_PORTS_START( thedeep )
 	PORT_START("e008")
@@ -268,6 +345,13 @@ static INPUT_PORTS_START( thedeep )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) // mux of bits 1-2-3
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -359,6 +443,13 @@ static TIMER_DEVICE_CALLBACK( thedeep_interrupt )
 	}
 }
 
+static INTERRUPT_GEN( thedeep_mcu_irq )
+{
+	thedeep_state *state = device->machine().driver_data<thedeep_state>();
+
+	device_set_input_line(state->m_mcu, MCS51_INT1_LINE, ASSERT_LINE);
+}
+
 static MACHINE_CONFIG_START( thedeep, thedeep_state )
 
 	/* basic machine hardware */
@@ -373,6 +464,7 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_CPU_VBLANK_INT("screen",thedeep_mcu_irq ) // unknown source, but presumably vblank
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_RESET(thedeep)
