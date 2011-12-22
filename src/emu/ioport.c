@@ -312,7 +312,7 @@ struct _input_port_private
 ***************************************************************************/
 
 /* XML attributes for the different types */
-static const char *const seqtypestrings[] = { "standard", "decrement", "increment" };
+static const char *const seqtypestrings[] = { "standard", "increment", "decrement" };
 
 
 static const char_info charinfo[] =
