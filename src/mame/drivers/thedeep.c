@@ -211,7 +211,7 @@ static void thedeep_maincpu_bankswitch(running_machine &machine,UINT8 bank_trig)
 
 static WRITE8_HANDLER( thedeep_p1_w )
 {
-	flip_screen_set(space->machine(), ~(data & 1));
+	flip_screen_set(space->machine(), (data & 1) ^ 1);
 	thedeep_maincpu_bankswitch(space->machine(),(data & 6) >> 1);
 	logerror("P1 %02x\n",data);
 }
