@@ -154,4 +154,4 @@ ROM_START( dfruit )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
-GAME( 199?, dfruit,  0,   dfruit, dfruit,  0, ROT0, "<unknown>", "Dream Fruit", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, dfruit,  0,   dfruit, dfruit,  0, ROT0, "<unknown>", "Dream Fruit", GAME_IS_SKELETON )

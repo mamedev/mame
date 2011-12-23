@@ -106,9 +106,9 @@ ROM_START(spcrider)
 ROM_END
 
 
-GAME( 1976, atarians, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","The Atarians", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-//GAME( 2002, atarianb, atarians,   atari_s1, atari_s1, atari_s1, ROT0, "Atari / Gaston","The Atarians (working bootleg)",  GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, time2000, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Time 2000",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, aavenger, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Airborne Avenger", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, midearth, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Middle Earth", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, spcrider, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Space Riders",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1976, atarians, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","The Atarians", 	GAME_IS_SKELETON_MECHANICAL)
+//GAME( 2002, atarianb, atarians,   atari_s1, atari_s1, atari_s1, ROT0, "Atari / Gaston","The Atarians (working bootleg)",  GAME_IS_SKELETON_MECHANICAL)
+GAME( 1977, time2000, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Time 2000",		GAME_IS_SKELETON_MECHANICAL)
+GAME( 1977, aavenger, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Airborne Avenger", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, midearth, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Middle Earth", 	GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, spcrider, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Space Riders",		GAME_IS_SKELETON_MECHANICAL)

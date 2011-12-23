@@ -93,13 +93,13 @@ DRIVER_INIT( cupidon )
 }
 
 /* (c) date is from string in ROM, revision date is noted next to sets - Spellings are as found in ROM */
-GAME( 2004, tsarevna		,0,			cupidon, cupidon, cupidon, ROT0, "Kupidon","Tsarevna (v1.29)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 12 Oct 2005
-GAME( 2004, tsarevnaa		,tsarevna,	cupidon, cupidon, cupidon, ROT0, "Kupidon","Tsarevna (v1.31)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 17 Jan 2007
+GAME( 2004, tsarevna		,0,			cupidon, cupidon, cupidon, ROT0, "Kupidon","Tsarevna (v1.29)", GAME_IS_SKELETON ) // 12 Oct 2005
+GAME( 2004, tsarevnaa		,tsarevna,	cupidon, cupidon, cupidon, ROT0, "Kupidon","Tsarevna (v1.31)", GAME_IS_SKELETON ) // 17 Jan 2007
 
-GAME( 2004, gangrose		,0,			cupidon, cupidon, cupidon, ROT0, "Kupidon","Gangster's Roses (v4.70)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 01 Sep 2004
+GAME( 2004, gangrose		,0,			cupidon, cupidon, cupidon, ROT0, "Kupidon","Gangster's Roses (v4.70)", GAME_IS_SKELETON ) // 01 Sep 2004
 
-GAME( 2004, funnyfm			,0,			cupidon, cupidon, cupidon, ROT0, "Kupidon","Funny Farm (v1.17)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 02 Mar 2005
-GAME( 2004, funnyfma		,funnyfm,	cupidon, cupidon, cupidon, ROT0, "Kupidon","Funny Farm (v1.26)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 08 Aug 2005
-GAME( 2004, funnyfmb		,funnyfm,	cupidon, cupidon, cupidon, ROT0, "Kupidon","Funny Farm (v1.30)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 16 May 2006
+GAME( 2004, funnyfm			,0,			cupidon, cupidon, cupidon, ROT0, "Kupidon","Funny Farm (v1.17)", GAME_IS_SKELETON ) // 02 Mar 2005
+GAME( 2004, funnyfma		,funnyfm,	cupidon, cupidon, cupidon, ROT0, "Kupidon","Funny Farm (v1.26)", GAME_IS_SKELETON ) // 08 Aug 2005
+GAME( 2004, funnyfmb		,funnyfm,	cupidon, cupidon, cupidon, ROT0, "Kupidon","Funny Farm (v1.30)", GAME_IS_SKELETON ) // 16 May 2006
 
-GAME( 2005, cashtrn			,0,			cupidon, cupidon, cupidon, ROT0, "Kupidon","Cash Train (v1.10)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 09 Jan 2006
+GAME( 2005, cashtrn			,0,			cupidon, cupidon, cupidon, ROT0, "Kupidon","Cash Train (v1.10)", GAME_IS_SKELETON ) // 09 Jan 2006

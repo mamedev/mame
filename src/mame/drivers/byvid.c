@@ -99,5 +99,5 @@ ROM_START(granny)
 ROM_END
 
 
-GAME(1982,  babypac,  0,  by133,  by133,  by133,  ROT0,  "Bally",    "Baby Pacman (Video/Pinball Combo)",              GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,  granny,   0,  by133,  by133,  by133,  ROT0,  "Bally",    "Granny and the Gators (Video/Pinball Combo)",    GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1982,  babypac,  0,  by133,  by133,  by133,  ROT0,  "Bally",    "Baby Pacman (Video/Pinball Combo)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,  granny,   0,  by133,  by133,  by133,  ROT0,  "Bally",    "Granny and the Gators (Video/Pinball Combo)",    GAME_IS_SKELETON_MECHANICAL)

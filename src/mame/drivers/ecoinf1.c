@@ -335,6 +335,6 @@ DRIVER_INIT( ecoinf1 )
 }
 
 // Early HW Type
-GAME( 19??, ec_bar5,   0		 , ecoinf1_older,   ecoinf1,   ecoinf1,	ROT0,  "Electrocoin", "Bar 5 (older PCB) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_barxo,  ec_barx	 , ecoinf1_older,   ecoinf1,   ecoinf1,	ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_casbxo, ec_casbx	 , ecoinf1_older,   ecoinf1,   ecoinf1,	ROT0,  "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_bar5,   0		 , ecoinf1_older,   ecoinf1,   ecoinf1,	ROT0,  "Electrocoin", "Bar 5 (older PCB) (Electrocoin)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxo,  ec_barx	 , ecoinf1_older,   ecoinf1,   ecoinf1,	ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_casbxo, ec_casbx	 , ecoinf1_older,   ecoinf1,   ecoinf1,	ROT0,  "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (?)"		, GAME_IS_SKELETON_MECHANICAL)

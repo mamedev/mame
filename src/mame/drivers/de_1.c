@@ -74,5 +74,5 @@ ROM_START(lwar_e90)
 ROM_END
 
 
-GAME(1987,  lwar_a83,  0,         de_1,  de_1,  de_1,  ROT0,  "Data East",    "Laser War (8.3)",           GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1987,  lwar_e90,  lwar_a83,  de_1,  de_1,  de_1,  ROT0,  "Data East",    "Laser War (9.0 Europe)",    GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,  lwar_a83,  0,         de_1,  de_1,  de_1,  ROT0,  "Data East",    "Laser War (8.3)",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  lwar_e90,  lwar_a83,  de_1,  de_1,  de_1,  ROT0,  "Data East",    "Laser War (9.0 Europe)",    GAME_IS_SKELETON_MECHANICAL)

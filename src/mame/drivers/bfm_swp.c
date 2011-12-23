@@ -246,7 +246,7 @@ ROM_END
 
 
 
-GAME( 199?, c3_rtime		, 0			, bfm_swp, bfm_swp, 0, ROT0, "Maygay", "Radio Times (Bellfruit) (Cobra 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, c3_telly		, 0			, bfm_swp, bfm_swp, 0, ROT0, "Maygay", "Telly Addicts (Bellfruit) (Cobra 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, c3_totp			, 0			, bfm_swp, bfm_swp, 0, ROT0, "Maygay", "Top of the Pops (Bellfruit) (Cobra 3?)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, c3_ppays		, 0			, bfm_swp, bfm_swp, 0, ROT0, "Maygay", "The Phrase That Pays (Bellfruit) (Cobra 3?)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, c3_rtime		, 0			, bfm_swp, bfm_swp, 0, ROT0, "Maygay", "Radio Times (Bellfruit) (Cobra 3)", GAME_IS_SKELETON )
+GAME( 199?, c3_telly		, 0			, bfm_swp, bfm_swp, 0, ROT0, "Maygay", "Telly Addicts (Bellfruit) (Cobra 3)", GAME_IS_SKELETON )
+GAME( 199?, c3_totp			, 0			, bfm_swp, bfm_swp, 0, ROT0, "Maygay", "Top of the Pops (Bellfruit) (Cobra 3?)", GAME_IS_SKELETON )
+GAME( 199?, c3_ppays		, 0			, bfm_swp, bfm_swp, 0, ROT0, "Maygay", "The Phrase That Pays (Bellfruit) (Cobra 3?)", GAME_IS_SKELETON )
