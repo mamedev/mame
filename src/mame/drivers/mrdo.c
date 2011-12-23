@@ -187,10 +187,10 @@ static MACHINE_CONFIG_START( mrdo, mrdo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, MAIN_CLOCK/2)	/* Verified */
+	MCFG_SOUND_ADD("sn1", U8106, MAIN_CLOCK/2)	/* sn76489-equivalent?, Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489, MAIN_CLOCK/2)	/* Verified */
+	MCFG_SOUND_ADD("sn2", U8106, MAIN_CLOCK/2)	/* sn76489-equivalent?, Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

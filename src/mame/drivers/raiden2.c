@@ -1676,6 +1676,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(XTAL_28_63636MHz/8,XTAL_28_63636MHz/28,1,2)
+	// the sound z80 has /NMI, /BUSREQ and /WAIT tied high/unused
 
 
 /* Sound hardware infos: Z80 and YM2151 are clocked at XTAL_28_63636MHz/8 */

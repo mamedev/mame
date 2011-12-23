@@ -24,7 +24,7 @@
   It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
   Its output is not inverted.
   ** SN76494 is the same as SN76489A but lacks the /8 divider on its clock input.
-  ** SN76496 is identical in operation to the SN76489A, but the audio input is
+  ** SN76496 is identical in operation to the SN76489A, but the audio input on pin 9 is
   documented.
   All the TI-made PSG chips have an audio input line which is mixed with the 4 channels
   of output. (It is undocumented and may not function properly on the sn76489, 76489a
@@ -151,6 +151,7 @@ INLINE sn76496_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SN76496 ||
+		   device->type() == U8106 ||
 		   device->type() == SN76489 ||
 		   device->type() == SN76489A ||
 		   device->type() == SN76494 ||
@@ -431,7 +432,7 @@ static void generic_start(device_t *device, int feedbackmask, int noisetap1, int
 	device->save_item(NAME(chip->Freq0IsMax));
 }
 
-// function parameters: device, feedback destination tap, feedback source taps,
+// function parameters: device, feedback destination tap, feedback source taps (1,2),
 // normal(false)/invert(true), mono(false)/stereo(true), clock divider factor
 
 static DEVICE_START( sn76489 )
@@ -442,6 +443,11 @@ static DEVICE_START( sn76489 )
 static DEVICE_START( sn76489a )
 {
 	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 8, TRUE); // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)
+}
+
+static DEVICE_START( u8106 ) // a custom marked sn76489? only used on mr. do and maybe other universal games
+{
+	generic_start(device, 0x4000, 0x01, 0x02, TRUE, FALSE, 8, TRUE); // SN76489 not verified yet. todo: verify;
 }
 
 static DEVICE_START( sn76494 )
@@ -520,6 +526,16 @@ DEVICE_GET_INFO( sn76489a )
 	}
 }
 
+DEVICE_GET_INFO( u8106 )
+{
+	switch (state)
+	{
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( u8106 );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "U8106 (SN76489)");					break;
+		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
+	}
+}
+
 DEVICE_GET_INFO( sn76494 )
 {
 	switch (state)
@@ -572,6 +588,7 @@ DEVICE_GET_INFO( segapsg )
 
 
 DEFINE_LEGACY_SOUND_DEVICE(SN76496, sn76496);
+DEFINE_LEGACY_SOUND_DEVICE(U8106, u8106);
 DEFINE_LEGACY_SOUND_DEVICE(SN76489, sn76489);
 DEFINE_LEGACY_SOUND_DEVICE(SN76489A, sn76489a);
 DEFINE_LEGACY_SOUND_DEVICE(SN76494, sn76494);
