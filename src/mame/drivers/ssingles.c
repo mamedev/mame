@@ -9,6 +9,7 @@
  Upper half of 7.bin = upper half of 8.bin = intentional or bad dump ?
 
  TODO:
+ - atamanot: needs a trojan, in order to understand how the protection really works.
  - colors (missing prom(s) ?)
  - samples (at least two of unused roms contains samples (unkn. format , adpcm ?)
  - dips (one is tested in game (difficulty related?), another 2 are tested at start)
@@ -160,6 +161,8 @@ public:
 	UINT8 m_colorram[VMEM_SIZE];
 	UINT8 m_prot_data;
 	pen_t m_pens[NUM_PENS];
+
+	UINT8 m_atamanot_prot_state;
 };
 
 //fake palette
@@ -175,7 +178,7 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 	0x00,0x00,0x00,	0xff,0x00,0xff,	0x80,0x00,0x80,	0x40,0x00,0x40
 };
 
-static MC6845_UPDATE_ROW( update_row )
+static MC6845_UPDATE_ROW( ssingles_update_row )
 {
 	ssingles_state *state = device->machine().driver_data<ssingles_state>();
 	int cx,x;
@@ -213,12 +216,50 @@ static MC6845_UPDATE_ROW( update_row )
 	}
 }
 
-static const mc6845_interface mc6845_intf =
+static MC6845_UPDATE_ROW( atamanot_update_row )
+{
+	ssingles_state *state = device->machine().driver_data<ssingles_state>();
+	int cx,x;
+	UINT32 tile_address;
+	UINT16 cell,palette;
+	UINT8 b0,b1;
+	const UINT8 *gfx = device->machine().region("gfx1")->base();
+
+	for(cx=0;cx<x_count;++cx)
+	{
+		int address=((ma>>1)+(cx>>1))&0xff;
+
+		cell=state->m_videoram[address]+(state->m_colorram[address]<<8);
+
+		tile_address=((cell&0x1ff)<<4)+ra;
+		palette=(cell>>10)&0x1c;
+
+		if(cx&1)
+		{
+			b0=gfx[tile_address+0x0000]; /*  9.bin */
+			b1=gfx[tile_address+0x4000]; /* 11.bin */
+		}
+		else
+		{
+			b0=gfx[tile_address+0x2000]; /* 10.bin */
+			b1=gfx[tile_address+0x6000]; /* 12.bin */
+		}
+
+		for(x=7;x>=0;--x)
+		{
+			*BITMAP_ADDR32(bitmap, y, (cx<<3)|(x)) = state->m_pens[palette+((b1&1)|((b0&1)<<1))];
+			b0>>=1;
+			b1>>=1;
+		}
+	}
+}
+
+static const mc6845_interface ssingles_mc6845_intf =
 {
 	"screen",
 	8,
 	NULL,						/* before pixel update callback */
-	update_row,					/* row update callback */
+	ssingles_update_row,		/* row update callback */
 	NULL,						/* after pixel update callback */
 	DEVCB_NULL,					/* callback for display state changes */
 	DEVCB_NULL,					/* callback for cursor state changes */
@@ -227,15 +268,34 @@ static const mc6845_interface mc6845_intf =
 	NULL						/* update address callback */
 };
 
+static const mc6845_interface atamanot_mc6845_intf =
+{
+	"screen",
+	8,
+	NULL,						/* before pixel update callback */
+	atamanot_update_row,		/* row update callback */
+	NULL,						/* after pixel update callback */
+	DEVCB_NULL,					/* callback for display state changes */
+	DEVCB_NULL,					/* callback for cursor state changes */
+	DEVCB_NULL,					/* HSYNC callback */
+	DEVCB_NULL,					/* VSYNC callback */
+	NULL						/* update address callback */
+};
+
+
 static WRITE8_HANDLER(ssingles_videoram_w)
 {
 	ssingles_state *state = space->machine().driver_data<ssingles_state>();
+	UINT8 *vram = space->machine().region("vram")->base();
+	vram[offset] = data;
 	state->m_videoram[offset]=data;
 }
 
 static WRITE8_HANDLER(ssingles_colorram_w)
 {
 	ssingles_state *state = space->machine().driver_data<ssingles_state>();
+	UINT8 *cram = space->machine().region("cram")->base();
+	cram[offset] = data;
 	state->m_colorram[offset]=data;
 }
 
@@ -312,16 +372,48 @@ static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+
+static READ8_HANDLER( atamanot_prot_r )
+{
+	ssingles_state *state = space->machine().driver_data<ssingles_state>();
+	static const char prot_id[] = { "PROGRAM BY KOYAMA" };
+
+	logerror("%04x %02x\n",offset,state->m_atamanot_prot_state);
+
+	switch(state->m_atamanot_prot_state)
+	{
+		case 0x20:
+		case 0x21:
+		case 0x22:
+		case 0x23:
+			return prot_id[offset % 0x11];
+
+		case 0xc0:
+			return 2; // 1 goes to service mode?
+	}
+
+	return 0;
+}
+
+static WRITE8_HANDLER( atamanot_prot_w )
+{
+	ssingles_state *state = space->machine().driver_data<ssingles_state>();
+
+	state->m_atamanot_prot_state = data;
+}
+
+
 static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-//  AM_RANGE(0x6000, 0x60ff) AM_RAM //kanji tilemap?
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("question",0)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
+	AM_RANGE(0x6000, 0x60ff) AM_RAM //kanji tilemap?
+//	AM_RANGE(0x6000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_READ(atamanot_prot_r)
+//	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
+//	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
+//	AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8 )
@@ -334,10 +426,24 @@ static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8 )
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
 	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0xff, 0xff) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0x08, 0x08) AM_READNOP
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
+	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1") AM_WRITE(atamanot_prot_w)
+	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
+//	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xff, 0xff) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssingles )
@@ -409,63 +515,23 @@ static INPUT_PORTS_START( ssingles )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ssingles, ssingles_state )
-
-	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(ssingles_map)
-	MCFG_CPU_IO_MAP(ssingles_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
-	MCFG_SCREEN_UPDATE(ssingles)
-
-	MCFG_PALETTE_LENGTH(4) //guess
-
-	MCFG_VIDEO_START(ssingles)
-
-	MCFG_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, mc6845_intf)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000) /* ? MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000) /* ? MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(atamanot_map)
-MACHINE_CONFIG_END
-
-ROM_START( ssingles )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 main CPU  */
-	ROM_LOAD( "1.bin", 0x00000, 0x2000, CRC(43f02215) SHA1(9f04a7d4671ff39fd2bd8ec7afced4981ee7be05) )
-	ROM_LOAD( "2.bin", 0x06000, 0x2000, CRC(281f27e4) SHA1(cef28717ab2ed991a5709464c01490f0ab1dc17c) )
-	ROM_LOAD( "3.bin", 0x08000, 0x2000, CRC(14fdcb65) SHA1(70f7fcb46e74937de0e4037c9fe79349a30d0d07) )
-	ROM_LOAD( "4.bin", 0x0a000, 0x2000, CRC(acb44685) SHA1(d68aab8b7e68d842a350d3fb76985ac857b1d972) )
-
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "9.bin",  0x0000, 0x4000, CRC(57fac6f9) SHA1(12f6695c9831399e599a95008ebf9db943725437) )
-	ROM_LOAD( "10.bin", 0x4000, 0x4000, CRC(cd3ba260) SHA1(2499ad9982cc6356e2eb3a0f10d77886872a0c9f) )
-	ROM_LOAD( "11.bin", 0x8000, 0x4000, CRC(f7107b29) SHA1(a405926fd3cb4b3d2a1c705dcde25d961dba5884) )
-	ROM_LOAD( "12.bin", 0xc000, 0x4000, CRC(e5585a93) SHA1(04d55699b56d869066f2be2c6ac48042aa6c3108) )
-
-	ROM_REGION( 0x08000, "user1", 0) /* samples ? data ?*/
-	ROM_LOAD( "5.bin", 0x00000, 0x2000, CRC(242a8dda) SHA1(e140893cc05fb8cee75904d98b02626f2565ed1b) )
-	ROM_LOAD( "6.bin", 0x02000, 0x2000, CRC(85ab8aab) SHA1(566f034e1ba23382442f27457447133a0e0f1cfc) )
-	ROM_LOAD( "7.bin", 0x04000, 0x2000, CRC(57cc112d) SHA1(fc861c58ae39503497f04d302a9f16fca19b37fb) )
-	ROM_LOAD( "8.bin", 0x06000, 0x2000, CRC(52de717a) SHA1(e60399355165fb46fac862fb7fcdff16ff351631) )
-
-ROM_END
-
 /*
 atamanot kanji gfx decoding:
+
+It looks "stolen" from an unknown Japanese computer?
+*/
+
+static const gfx_layout layout_8x8 =
+{
+    8,8,
+    RGN_FRAC(1,2),
+    2,
+    { RGN_FRAC(0,2), RGN_FRAC(1,2) },
+    { STEP8(0,1) },
+    { STEP8(0,8) },
+    8*8
+};
+
 
 static const gfx_layout layout_16x16 =
 {
@@ -493,17 +559,98 @@ static const gfx_layout layout_8x16 =
     8*8
 };
 
+static GFXDECODE_START( ssingles )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8, 0, 8 )
+GFXDECODE_END
+
+static GFXDECODE_START( atamanot )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8, 0, 8 )
     GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
     GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
     GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
+GFXDECODE_END
 
-It looks "stolen" from an unknown Japanese computer?
-*/
+static MACHINE_CONFIG_START( ssingles, ssingles_state )
+
+	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(ssingles_map)
+	MCFG_CPU_IO_MAP(ssingles_io_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_UPDATE(ssingles)
+
+	MCFG_PALETTE_LENGTH(4) //guess
+
+	MCFG_GFXDECODE(ssingles)
+
+	MCFG_VIDEO_START(ssingles)
+
+	MCFG_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, ssingles_mc6845_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000) /* ? MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000) /* ? MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+MACHINE_CONFIG_END
+
+static INTERRUPT_GEN( atamanot_irq )
+{
+	// ...
+}
+
+static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(atamanot_map)
+	MCFG_CPU_IO_MAP(atamanot_io_map)
+	MCFG_CPU_VBLANK_INT("screen", atamanot_irq)
+
+	MCFG_DEVICE_REMOVE("crtc")
+
+	MCFG_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, atamanot_mc6845_intf)
+
+	MCFG_GFXDECODE(atamanot)
+MACHINE_CONFIG_END
+
+ROM_START( ssingles )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 main CPU  */
+	ROM_LOAD( "1.bin", 0x00000, 0x2000, CRC(43f02215) SHA1(9f04a7d4671ff39fd2bd8ec7afced4981ee7be05) )
+	ROM_LOAD( "2.bin", 0x06000, 0x2000, CRC(281f27e4) SHA1(cef28717ab2ed991a5709464c01490f0ab1dc17c) )
+	ROM_LOAD( "3.bin", 0x08000, 0x2000, CRC(14fdcb65) SHA1(70f7fcb46e74937de0e4037c9fe79349a30d0d07) )
+	ROM_LOAD( "4.bin", 0x0a000, 0x2000, CRC(acb44685) SHA1(d68aab8b7e68d842a350d3fb76985ac857b1d972) )
+
+	ROM_REGION( 0x100, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100, "cram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "9.bin",  0x0000, 0x4000, CRC(57fac6f9) SHA1(12f6695c9831399e599a95008ebf9db943725437) )
+	ROM_LOAD( "10.bin", 0x4000, 0x4000, CRC(cd3ba260) SHA1(2499ad9982cc6356e2eb3a0f10d77886872a0c9f) )
+	ROM_LOAD( "11.bin", 0x8000, 0x4000, CRC(f7107b29) SHA1(a405926fd3cb4b3d2a1c705dcde25d961dba5884) )
+	ROM_LOAD( "12.bin", 0xc000, 0x4000, CRC(e5585a93) SHA1(04d55699b56d869066f2be2c6ac48042aa6c3108) )
+
+	ROM_REGION( 0x08000, "user1", 0) /* samples ? data ?*/
+	ROM_LOAD( "5.bin", 0x00000, 0x2000, CRC(242a8dda) SHA1(e140893cc05fb8cee75904d98b02626f2565ed1b) )
+	ROM_LOAD( "6.bin", 0x02000, 0x2000, CRC(85ab8aab) SHA1(566f034e1ba23382442f27457447133a0e0f1cfc) )
+	ROM_LOAD( "7.bin", 0x04000, 0x2000, CRC(57cc112d) SHA1(fc861c58ae39503497f04d302a9f16fca19b37fb) )
+	ROM_LOAD( "8.bin", 0x06000, 0x2000, CRC(52de717a) SHA1(e60399355165fb46fac862fb7fcdff16ff351631) )
+
+ROM_END
+
 
 ROM_START( atamanot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tt1.2",   0x0000, 0x2000, CRC(da9e270d) SHA1(b7408be913dad8abf022c6153f2493204dd74952) )
-	ROM_LOAD( "tt2.3",   0x8000, 0x2000, CRC(7595ade8) SHA1(71f9d6d987407f88cdd3b28bd1e35e00ac17e1f5) )
+	ROM_LOAD( "tt2.3",   0x2000, 0x2000, CRC(7595ade8) SHA1(71f9d6d987407f88cdd3b28bd1e35e00ac17e1f5) )
+
+	ROM_REGION( 0x100, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100, "cram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x18000, "question", 0 ) //question roms?
 	ROM_LOAD( "ta.bin",  0x00000, 0x2000, CRC(5c61edaf) SHA1(ea56df6b320aa7e52828aaccbb5838cd0c756f24) )
@@ -521,8 +668,8 @@ ROM_START( atamanot )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "ca.49",   0x0000, 0x2000, CRC(28d20b52) SHA1(a104ef1cd103f31803b88bd2d4804eab5a26e7fa) )
-	ROM_LOAD( "cb.47",   0x2000, 0x2000, CRC(8bc85c0c) SHA1(64701bc910c28666d15ee22f59f32888cc2302ae) )
-	ROM_LOAD( "cc.48",   0x4000, 0x2000, CRC(209cab0d) SHA1(9a89af1f7186e4845e43f9cdafd273e69d280bfb) )
+	ROM_LOAD( "cc.48",   0x2000, 0x2000, CRC(209cab0d) SHA1(9a89af1f7186e4845e43f9cdafd273e69d280bfb) )
+	ROM_LOAD( "cb.47",   0x4000, 0x2000, CRC(8bc85c0c) SHA1(64701bc910c28666d15ee22f59f32888cc2302ae) )
 	ROM_LOAD( "cd.46",   0x6000, 0x2000, CRC(22e8d103) SHA1(f0146f7e192eef8d03404a9c5b8a9f9c9577d936) )
 
 	ROM_REGION( 0x20000, "kanji", 0 )
@@ -554,5 +701,5 @@ static DRIVER_INIT(ssingles)
 }
 
 GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Ent. Ent. Ltd", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", GAME_NOT_WORKING )
+GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 
