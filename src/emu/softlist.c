@@ -1643,34 +1643,40 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 		if ( software_info_ptr->publisher )
 			(*sw_info)->publisher = auto_strdup( image->device().machine(), software_info_ptr->publisher );
 
-		*sw_part = auto_alloc_clear( image->device().machine(), software_part );
-		(*sw_part)->name = auto_strdup( image->device().machine(), software_part_ptr->name );
-		if ( software_part_ptr->interface_ )
-			(*sw_part)->interface_ = auto_strdup( image->device().machine(), software_part_ptr->interface_ );
-
-		if ( software_part_ptr->featurelist )
+		(*sw_info)->partdata = (software_part *)auto_alloc_array_clear(image->device().machine(), UINT8, software_list_ptr->part_entries * sizeof(software_part) );
+		software_part *new_part = (*sw_info)->partdata;
+		for (software_part *swp = software_find_part(software_info_ptr, NULL, NULL); swp != NULL; swp = software_part_next(swp))
 		{
-			feature_list *list = software_part_ptr->featurelist;
-			feature_list *new_list = auto_alloc_clear( image->device().machine(), feature_list );
+			if (strcmp(software_part_ptr->name,swp->name)==0) *sw_part = new_part;
+			
+			new_part->name = auto_strdup( image->device().machine(), swp->name );
+			if ( swp->interface_ )
+				new_part->interface_ = auto_strdup( image->device().machine(), swp->interface_ );
 
-			(*sw_part)->featurelist = new_list;
-
-			new_list->name = auto_strdup( image->device().machine(), list->name );
-			new_list->value = auto_strdup( image->device().machine(), list->value );
-
-			list = list->next;
-
-			while( list )
+			if ( swp->featurelist )
 			{
-				new_list->next = auto_alloc_clear( image->device().machine(), feature_list );
-				new_list = new_list->next;
+				feature_list *list = swp->featurelist;
+				feature_list *new_list = auto_alloc_clear( image->device().machine(), feature_list );
+
+				new_part->featurelist = new_list;
+
 				new_list->name = auto_strdup( image->device().machine(), list->name );
 				new_list->value = auto_strdup( image->device().machine(), list->value );
 
 				list = list->next;
-			}
 
-			new_list->next = NULL;
+				while( list )
+				{
+					new_list->next = auto_alloc_clear( image->device().machine(), feature_list );
+					new_list = new_list->next;
+					new_list->name = auto_strdup( image->device().machine(), list->name );
+					new_list->value = auto_strdup( image->device().machine(), list->value );
+
+					list = list->next;
+				}
+				new_list->next = NULL;
+			}			
+			new_part++;
 		}
 
 		/* Tell the world which part we actually loaded */
