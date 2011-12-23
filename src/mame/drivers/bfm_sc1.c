@@ -2691,6 +2691,7 @@ ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+#define GAME_FLAGS GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL
 
 GAME( 1988, sc1lotus		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 1988, sc1roul			, 0			, scorpion1			, scorpion1	, rou029		, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
@@ -2780,65 +2781,65 @@ GAME( 198?, sc1winfl		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/
 GAME( 198?, sc1winst		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1zep			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "ELAM",     "Zeppelin (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 198?, sc1wthn			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "Eurocoin", "Wild Thing (Eurocoin) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 199?, sc1moonl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Bwb",      "Moon Lite (Bwb)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1ltdv			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Pcp",      "Little Devil (Pcp)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1moonl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Bwb",      "Moon Lite (Bwb)", GAME_FLAGS)
+GAME( 199?, sc1ltdv			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Pcp",      "Little Devil (Pcp)", GAME_FLAGS)
 GAME( 198?, sc1t1k			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "Eurocoin", "Top 1000 (Eurocoin) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 GAME( 199?, sc1smoke		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Mdm",      "Smokey Vs The Bandit (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1ccroc		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Mdm",      "Crazy Crocs (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1crocr		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Mdm",      "Croc And Roll (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1btclk		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Mdm",      "Beat The Clock (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME( 199?, sc1clins		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1clinsa		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1clinsb		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1clinsc		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1clinsd		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 5)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1clinse		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1clb3			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Club 3000 (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1czbrk		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Crazy Break (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // Battery Defect
-GAME( 199?, sc1energ		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Energy (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // Battery Defect
-GAME( 199?, sc1hipt			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1hipta		, sc1hipt	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1satse		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Satellite SE (Bellfruit) (Dutch) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1strk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Strike (Bellfruit) (Dutch) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Super Flush (Bellfruit) (Dutch) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clins		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS)
+GAME( 199?, sc1clinsa		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS)
+GAME( 199?, sc1clinsb		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 3)", GAME_FLAGS)
+GAME( 199?, sc1clinsc		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 4)", GAME_FLAGS)
+GAME( 199?, sc1clinsd		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 5)", GAME_FLAGS)
+GAME( 199?, sc1clinse		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 6)", GAME_FLAGS)
+GAME( 199?, sc1clb3			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Club 3000 (Bellfruit) (Scorpion 1)", GAME_FLAGS)
+GAME( 199?, sc1czbrk		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Crazy Break (Bellfruit) (Scorpion 1)", GAME_FLAGS) // Battery Defect
+GAME( 199?, sc1energ		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Energy (Bellfruit) (Scorpion 1)", GAME_FLAGS) // Battery Defect
+GAME( 199?, sc1hipt			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS)
+GAME( 199?, sc1hipta		, sc1hipt	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS)
+GAME( 199?, sc1satse		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Satellite SE (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS)
+GAME( 199?, sc1strk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Strike (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS)
+GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Super Flush (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS)
 // are they really SC1?
-GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Beat The Bank Club (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // behaves like sc1clbdya, but then locks up
-GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // OFAH - Phoenix 1
-GAME( 199?, sc1boncl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Bonanza Club (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Beat The Bank Club (Bellfruit) (Scorpion 1?)", GAME_FLAGS) // behaves like sc1clbdya, but then locks up
+GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (Scorpion 1?)", GAME_FLAGS)
+GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_FLAGS) // OFAH - Phoenix 1
+GAME( 199?, sc1boncl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Bonanza Club (Bellfruit) (Scorpion 1)", GAME_FLAGS)
 // are these really SC1? they do more here than in SC2 at least!
-GAME( 199?, sc1days			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "All In A Days Work (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1cscl			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Cash Classic (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1driv			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Driving School (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1vsd			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Vegas Super Deal (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1days			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "All In A Days Work (Global)", GAME_FLAGS)
+GAME( 199?, sc1cscl			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Cash Classic (Global)", GAME_FLAGS)
+GAME( 199?, sc1driv			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Driving School (Global)", GAME_FLAGS)
+GAME( 199?, sc1vsd			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Vegas Super Deal (Global)", GAME_FLAGS)
 
-GAME( 199?, sc1wof			, 0			, scorpion1			, scorpion1	, lotse		    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1wofa			, sc1wof	, scorpion1			, scorpion1	, lotse		    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1wofb			, sc1wof	, scorpion1			, scorpion1	, nocrypt	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1crzyc		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1crzyca		, sc1crzyc	, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1clbdy		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Club Dynamite (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1clbdya		, sc1clbdy	, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Club Dynamite (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1chqfl		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Chequered Flag (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 1992, sc1s1000		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Deltasoft",   "Super 1000 (Deltasoft)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // JT/Deltasoft Nov 1992
-
-
+GAME( 199?, sc1wof			, 0			, scorpion1			, scorpion1	, lotse		    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 1)", GAME_FLAGS)
+GAME( 199?, sc1wofa			, sc1wof	, scorpion1			, scorpion1	, lotse		    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 2)", GAME_FLAGS)
+GAME( 199?, sc1wofb			, sc1wof	, scorpion1			, scorpion1	, nocrypt	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 3)", GAME_FLAGS)
+GAME( 199?, sc1crzyc		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 1)", GAME_FLAGS)
+GAME( 199?, sc1crzyca		, sc1crzyc	, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 2)", GAME_FLAGS)
+GAME( 199?, sc1clbdy		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Club Dynamite (Global) (set 1)", GAME_FLAGS)
+GAME( 199?, sc1clbdya		, sc1clbdy	, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Club Dynamite (Global) (set 2)", GAME_FLAGS)
+GAME( 199?, sc1chqfl		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Chequered Flag (Global)", GAME_FLAGS)
+GAME( 1992, sc1s1000		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Deltasoft",   "Super 1000 (Deltasoft)", GAME_FLAGS) // JT/Deltasoft Nov 1992
 
 
-GAME( 199?, sc1dip			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Diplomat (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // 53 RY error
-GAME( 199?, sc1lamb			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Lambada (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
-GAME( 199?, sc1reply		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Replay (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
-
-GAME( 199?, sc1cdm		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Crystal",   "Club Diamond (Crystal) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1hfcc		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Crystal",   "Hi Flyer Club (Crystal) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-
-GAME( 199?, sc1twice		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Associated Leisure",   "Twice As Nice (Associated Leisure) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
-GAME( 199?, sc1chain			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //was mixed with the sc4/5 potp roms..  System status 98
-GAME( 199?, sc1potpa			, sc1potp			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
 
-GAME( 199?, sc1scunk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "<unknown>",      "unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
+GAME( 199?, sc1dip			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Diplomat (Eurocoin) (Scorpion 1)", GAME_FLAGS) // 53 RY error
+GAME( 199?, sc1lamb			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Lambada (Eurocoin) (Scorpion 1)", GAME_FLAGS) //
+GAME( 199?, sc1reply		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Replay (Eurocoin) (Scorpion 1)", GAME_FLAGS) //
+
+GAME( 199?, sc1cdm		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Crystal",   "Club Diamond (Crystal) (Scorpion 1)", GAME_FLAGS)
+GAME( 199?, sc1hfcc		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Crystal",   "Hi Flyer Club (Crystal) (Scorpion 1)", GAME_FLAGS)
+
+GAME( 199?, sc1twice		, 0			,  scorpion1		, scorpion1		, lotse_bank0		, 0,		 "Associated Leisure",   "Twice As Nice (Associated Leisure) (Scorpion 1)", GAME_FLAGS) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+GAME( 199?, sc1chain			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (Scorpion 1)", GAME_FLAGS)
+GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_FLAGS) //was mixed with the sc4/5 potp roms..  System status 98
+GAME( 199?, sc1potpa			, sc1potp			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
+
+
+GAME( 199?, sc1scunk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "<unknown>",      "unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
 
 
 //Adder 2
