@@ -377,7 +377,7 @@ static void set_irq_line(z180_state *cpustate, int irqline, int state);
 #define Z180_STAT1_TDRE 		0x02
 #define Z180_STAT1_TIE			0x01
 
-#define Z180_STAT1_RESET		0x00
+#define Z180_STAT1_RESET		0x02
 #define Z180_STAT1_RMASK		0xff
 #define Z180_STAT1_WMASK		0x0d
 
