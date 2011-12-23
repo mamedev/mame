@@ -453,9 +453,9 @@ void eeprom_device::write(int bit)
 		if (m_locked == 0)
 		{
 			if (m_data_bits == 16)
-				m_addrspace[0]->write_word(address * 2, 0x0000);
+				m_addrspace[0]->write_word(address * 2, 0xFFFF);
 			else
-				m_addrspace[0]->write_byte(address, 0x00);
+				m_addrspace[0]->write_byte(address, 0xFF);
 		}
 		else
 			logerror("Error: EEPROM %s is locked\n", tag());
