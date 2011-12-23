@@ -70,5 +70,5 @@ ROM_START(movmastr)
 ROM_END
 
 
-GAME(1987,  escape,    0,  jvh,  jvh,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Escape",             GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(19??,  movmastr,  0,  jvh,  jvh,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Movie Masters",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,  escape,    0,  jvh,  jvh,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Escape",             GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  movmastr,  0,  jvh,  jvh,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Movie Masters",      GAME_IS_SKELETON_MECHANICAL)

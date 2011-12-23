@@ -116,6 +116,6 @@ ROM_END
 
 
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_NO_SOUND|GAME_NOT_WORKING)
-GAME(2000, offrthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_NO_SOUND|GAME_NOT_WORKING)
-GAME(2001, arctthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(1999, hydrthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_IS_SKELETON)
+GAME(2000, offrthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_IS_SKELETON)
+GAME(2001, arctthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", GAME_IS_SKELETON)

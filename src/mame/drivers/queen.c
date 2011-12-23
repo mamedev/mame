@@ -120,4 +120,4 @@ ROM_START( queen )
 ROM_END
 
 
-GAME( 2002?, queen,  0,    queen, queen,  0, ROT0, "STG", "Queen?", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002?, queen,  0,    queen, queen,  0, ROT0, "STG", "Queen?", GAME_IS_SKELETON )

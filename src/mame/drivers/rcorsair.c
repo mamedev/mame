@@ -169,4 +169,4 @@ ROM_START( rcorsair )
 ROM_END
 
 
-GAME( 1984, rcorsair,  0,    rcorsair, inports, 0, ROT90, "Nakasawa", "Red Corsair", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1984, rcorsair,  0,    rcorsair, inports, 0, ROT90, "Nakasawa", "Red Corsair", GAME_IS_SKELETON )

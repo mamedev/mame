@@ -63,4 +63,4 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 
-GAME(198?,  heavymtl,  0,  rowamet,  rowamet,  rowamet,  ROT0,  "Rowamet",    "Heavy Metal",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(198?,  heavymtl,  0,  rowamet,  rowamet,  rowamet,  ROT0,  "Rowamet",    "Heavy Metal",      GAME_IS_SKELETON_MECHANICAL)

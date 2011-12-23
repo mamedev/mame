@@ -239,4 +239,4 @@ static DRIVER_INIT( nexus3d )
 	state->m_flash_region = machine.region("user1")->base();
 }
 
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d, ROT0, "Examu", "Arcana Heart Full", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d, ROT0, "Examu", "Arcana Heart Full",GAME_IS_SKELETON )

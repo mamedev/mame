@@ -5730,13 +5730,3 @@ GAME( 199?, j6shoot		, 0			, impctawp, tbirds, 0, ROT0, "JPM / Whitbread", "Shoo
 
 // was marked as SWP, should this be a video game? - Apparently it's just a link box using the same hardware, but for 3 PC based units which aren't dumped, and probably can't really be emulated :-/
 GAME( 199?, j6milln		, 0			, impctawp, tbirds, 0, ROT0, "JPM", "Millionaire (Jpm) (IMPACT)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-
-
-
-
-
-
-
-
-
-

@@ -50,4 +50,4 @@ ROM_START( mmm_ldip )
 ROM_END
 
 
-GAME( 198?,  mmm_ldip,  0,  mmm,  mmm,  0,  ROT0,  "Maygay",    "Lucky Dip (Maygay)",    GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 198?,  mmm_ldip,  0,  mmm,  mmm,  0,  ROT0,  "Maygay",    "Lucky Dip (Maygay)",    GAME_IS_SKELETON_MECHANICAL)

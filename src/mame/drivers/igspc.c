@@ -71,4 +71,4 @@ static DRIVER_INIT(speeddrv)
 
 }
 
-GAME( 2004,  speeddrv,  0,  speeddrv,  speeddrv,  speeddrv,  ROT0,  "IGS",    "Speed Driver",    GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004,  speeddrv,  0,  speeddrv,  speeddrv,  speeddrv,  ROT0,  "IGS",    "Speed Driver",    GAME_IS_SKELETON )

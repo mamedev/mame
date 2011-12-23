@@ -294,28 +294,28 @@ ROM_END
 
 
 
-GAME(198?, j80bac	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Bank A Coin (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80bounc	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Bouncer (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80frogh	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Frog Hop (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80fruit	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Fruit Snappa (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80golds	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Golden Steppa (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80hotln	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Hot Lines (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80myspn	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Mystery Spin (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80nudg2	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Nudge Double Up MkII (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80rr	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Road Runner (Jpm) (SYSTEM80, set 1)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80rra	,j80rr		,jpms80,jpms80,jpms80,ROT0,   "Jpm","Road Runner (Jpm) (SYSTEM80, set 2)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80r66	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Route 66 (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80supst	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Supa Steppa (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80supbk	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Superbank (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80topsp	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Top Sprint (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80topup	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Top Up (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80tumbl	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Tumble (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80wsprt	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Winsprint (Jpm) (SYSTEM80)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j80bac	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Bank A Coin (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80bounc	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Bouncer (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80frogh	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Frog Hop (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80fruit	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Fruit Snappa (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80golds	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Golden Steppa (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80hotln	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Hot Lines (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80myspn	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Mystery Spin (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80nudg2	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Nudge Double Up MkII (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80rr	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Road Runner (Jpm) (SYSTEM80, set 1)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80rra	,j80rr		,jpms80,jpms80,jpms80,ROT0,   "Jpm","Road Runner (Jpm) (SYSTEM80, set 2)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80r66	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Route 66 (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80supst	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Supa Steppa (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80supbk	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Superbank (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80topsp	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Top Sprint (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80topup	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Top Up (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80tumbl	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Tumble (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80wsprt	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Winsprint (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
 // these look like they're probably SYSTEM80, not 100% sure tho
-GAME(198?, j80alad	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Aladdin's Cave (PCP)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80fortr	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Fortune Trail (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80mster	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Masterspy (Pcp)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j80plsnd	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Plus Nudge (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j80alad	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Aladdin's Cave (PCP)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80fortr	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Fortune Trail (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80mster	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Masterspy (Pcp)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80plsnd	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Plus Nudge (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
 
 
 /* Not 100% sure what the stuff below is on, the profiles don't quite match System 85 */
@@ -366,10 +366,10 @@ ROM_END
 
 
 
-GAME(198?, j_ewnud	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j_ewnda	,j_ewnud	,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j_luckac	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "<unknown>","Lucky Aces (Unk)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(198?, j_super2	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Jpm","Super 2 (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j_ewnud	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnda	,j_ewnud	,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_luckac	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "<unknown>","Lucky Aces (Unk)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_super2	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Jpm","Super 2 (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
 
 // this one is different again?
-GAME(198?, j_plus2	,0			,jpms_older_c00,jpms80,jpms80,ROT0,   "Jpm","Plus 2 (Jpm)",						GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(198?, j_plus2	,0			,jpms_older_c00,jpms80,jpms80,ROT0,   "Jpm","Plus 2 (Jpm)",						GAME_IS_SKELETON_MECHANICAL )

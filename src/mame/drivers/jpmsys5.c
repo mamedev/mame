@@ -2468,14 +2468,3 @@ GAME( 199?, j5revo		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Revolver (Jpm) (SY
 GAME( 199?, j5revoa		, j5revo	, jpmsys5, popeye, 0, ROT0, "JPM", "Revolver (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5sizl		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Sizzling (Jpm) (SYSTEM5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5hilos		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Hi Lo Silver (Jpm) (SYSTEM5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-
-
-
-
-
-
-
-
-
-
-

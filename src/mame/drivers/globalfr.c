@@ -112,11 +112,11 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 199?, gl_dow,  0,        globalfr, globalfr, 0, ROT0, "Global", "Deals On Wheels (Global) (Stealth)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 199?, gl_dowcl,0,        globalfr, globalfr, 0, ROT0, "Global", "Deals On Wheels Club (Global) (Stealth)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 199?, gl_wywh, 0,        globalfr, globalfr, 0, ROT0, "Global", "Wish You Were Here Club (Global) (Stealth)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 199?, gl_coc,  0,        globalfr, globalfr, 0, ROT0, "Global", "Carry On Clubbin' (Global) (Stealth)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 199?, gl_uyr,  0,        globalfr, globalfr, 0, ROT0, "Global", "Up Yer Riggin Club (Global) (Stealth)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 199?, gl_hbh,  0,        globalfr, globalfr, 0, ROT0, "Global", "Heartbreak Hotel (Global) (Stealth)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 199?, gl_hbhcl,0,        globalfr, globalfr, 0, ROT0, "Global", "Heartbreak Hotel Club (Global) (Stealth)", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 199?, gl_dow,  0,        globalfr, globalfr, 0, ROT0, "Global", "Deals On Wheels (Global) (Stealth)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 199?, gl_dowcl,0,        globalfr, globalfr, 0, ROT0, "Global", "Deals On Wheels Club (Global) (Stealth)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 199?, gl_wywh, 0,        globalfr, globalfr, 0, ROT0, "Global", "Wish You Were Here Club (Global) (Stealth)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 199?, gl_coc,  0,        globalfr, globalfr, 0, ROT0, "Global", "Carry On Clubbin' (Global) (Stealth)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 199?, gl_uyr,  0,        globalfr, globalfr, 0, ROT0, "Global", "Up Yer Riggin Club (Global) (Stealth)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 199?, gl_hbh,  0,        globalfr, globalfr, 0, ROT0, "Global", "Heartbreak Hotel (Global) (Stealth)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 199?, gl_hbhcl,0,        globalfr, globalfr, 0, ROT0, "Global", "Heartbreak Hotel Club (Global) (Stealth)", GAME_IS_SKELETON_MECHANICAL)
 

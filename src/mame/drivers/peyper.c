@@ -617,10 +617,10 @@ ROM_START(wolfman)
 ROM_END
 
 
-GAME( 1985, odin_dlx, 0, peyper,   odin_dlx, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1986, solarwap, 0, peyper,   solarwap, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)",    GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1987, poleposn, 0, peyper,   poleposn, peyper,   ROT0, "Sonic",  "Pole Position (Sonic)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1987, sonstwar, 0, peyper,   sonstwar, peyper,   ROT0, "Sonic",  "Star Wars (Sonic)",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1985, odin_dlx, 0, peyper,   odin_dlx, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, solarwap, 0, peyper,   solarwap, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, poleposn, 0, peyper,   poleposn, peyper,   ROT0, "Sonic",  "Pole Position (Sonic)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, sonstwar, 0, peyper,   sonstwar, peyper,   ROT0, "Sonic",  "Star Wars (Sonic)",     GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 1987, wolfman,  0, peyper,   wolfman,  peyper,   ROT0, "Peyper", "Wolf Man",              GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1987, odisea,   0, peyper,   odisea,   peyper,   ROT0, "Peyper", "Odisea Paris-Dakar",    GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1987, wolfman,  0, peyper,   wolfman,  peyper,   ROT0, "Peyper", "Wolf Man",              GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, odisea,   0, peyper,   odisea,   peyper,   ROT0, "Peyper", "Odisea Paris-Dakar",    GAME_IS_SKELETON_MECHANICAL)

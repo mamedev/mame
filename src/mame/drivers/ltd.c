@@ -128,10 +128,10 @@ ROM_START(zephy)
 ROM_END
 
 
-GAME(198?,	alcapone,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Al Capone",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(19??,	atla_ltd,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Atlantis (LTD)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(19??,	bhol_ltd,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Black Hole (LTD)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(198?,	columbia,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Columbia",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(198?,	cowboy,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Cowboy Eight Ball",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(198?,	pecmen,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Mr. & Mrs. Pec-Men",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(198?,	zephy,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Zephy",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(198?,	alcapone,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Al Capone",			GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,	atla_ltd,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Atlantis (LTD)",		GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,	bhol_ltd,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Black Hole (LTD)",		GAME_IS_SKELETON_MECHANICAL)
+GAME(198?,	columbia,	0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Columbia",				GAME_IS_SKELETON_MECHANICAL)
+GAME(198?,	cowboy,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Cowboy Eight Ball",	GAME_IS_SKELETON_MECHANICAL)
+GAME(198?,	pecmen,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Mr. & Mrs. Pec-Men",	GAME_IS_SKELETON_MECHANICAL)
+GAME(198?,	zephy,		0,		ltd,	ltd,	ltd,	ROT0,	"LTD",	"Zephy",				GAME_IS_SKELETON_MECHANICAL)
