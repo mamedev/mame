@@ -52,4 +52,4 @@ ROM_START(xforce)
 	ROM_LOAD16_BYTE("ic17", 0x000000, 0x8000, CRC(122ef649) SHA1(0b425f81869bc359841377a91c39f44395502bff))
 ROM_END
 
-GAME(1987,  xforce,  0,  techno,  techno,  techno,  ROT0,  "Tecnoplay",    "X Force",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,  xforce,  0,  techno,  techno,  techno,  ROT0,  "Tecnoplay",    "X Force",     GAME_IS_SKELETON_MECHANICAL)

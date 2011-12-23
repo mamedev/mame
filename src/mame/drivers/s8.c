@@ -71,5 +71,5 @@ ROM_START(pfevr_p3)
 	ROM_RELOAD(0x8000, 0x4000)
 ROM_END
 
-GAME(1984,	pfevr_l2,		0,			williams_s8,	williams_s8,	williams_s8,	ROT0,	"Williams",		"Pennant Fever Baseball (L-2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1984,	pfevr_p3,		pfevr_l2,	williams_s8,	williams_s8,	williams_s8,	ROT0,	"Williams",		"Pennant Fever Baseball (P-3)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1984,	pfevr_l2,		0,			williams_s8,	williams_s8,	williams_s8,	ROT0,	"Williams",		"Pennant Fever Baseball (L-2)",	GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,	pfevr_p3,		pfevr_l2,	williams_s8,	williams_s8,	williams_s8,	ROT0,	"Williams",		"Pennant Fever Baseball (P-3)",	GAME_IS_SKELETON_MECHANICAL)

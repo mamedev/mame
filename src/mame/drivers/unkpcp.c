@@ -157,9 +157,9 @@ DRIVER_INIT( unkpcp )
 {
 }
 
-GAME(199?,  up_dbldx,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Double Deluxe (Pcp)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(199?,  up_nudbk,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Nudge Break (Pcp)",     GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(199?,  up_sstrk,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Starstruck (Pcp)",      GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(199?,  up_xpres,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Xpress (Pcp)",          GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(199?,  up_roll,   0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Roll Up (Pcp)",         GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME(199?,  up_bluec,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Blue Chip (Pcp)",       GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME(199?,  up_dbldx,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Double Deluxe (Pcp)",   GAME_IS_SKELETON_MECHANICAL )
+GAME(199?,  up_nudbk,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Nudge Break (Pcp)",     GAME_IS_SKELETON_MECHANICAL )
+GAME(199?,  up_sstrk,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Starstruck (Pcp)",      GAME_IS_SKELETON_MECHANICAL )
+GAME(199?,  up_xpres,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Xpress (Pcp)",          GAME_IS_SKELETON_MECHANICAL )
+GAME(199?,  up_roll,   0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Roll Up (Pcp)",         GAME_IS_SKELETON_MECHANICAL )
+GAME(199?,  up_bluec,  0,  unkpcp,  unkpcp,  unkpcp,  ROT0,  "Pcp",    "Blue Chip (Pcp)",       GAME_IS_SKELETON_MECHANICAL )

@@ -60,4 +60,4 @@ ROM_START(spectra)
 ROM_END
 
 
-GAME(1979,  spectra,  0,  spectra,  spectra,  spectra,  ROT0,  "Valley",    "Spectra IV",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1979,  spectra,  0,  spectra,  spectra,  spectra,  ROT0,  "Valley",    "Spectra IV",     GAME_IS_SKELETON_MECHANICAL)

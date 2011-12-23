@@ -153,4 +153,4 @@ ROM_START( turrett )
 ROM_END
 
 
-GAME( 2001, turrett, 0, turrett, turrett, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2001, turrett, 0, turrett, turrett, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", GAME_IS_SKELETON )

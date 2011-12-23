@@ -123,8 +123,8 @@ ROM_START(wldcp_l1)
 ROM_END
 
 
-GAME( 1977, httip_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Hot Tip (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, lucky_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Lucky Seven (L-1)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, wldcp_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "World Cup Soccer (L-1)", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, cntct_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Contact (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, disco_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Disco Fever (L-1",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, httip_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Hot Tip (L-1)",			GAME_IS_SKELETON_MECHANICAL)
+GAME( 1977, lucky_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Lucky Seven (L-1)",		GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, wldcp_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "World Cup Soccer (L-1)", 	GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, cntct_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Contact (L-1)",			GAME_IS_SKELETON_MECHANICAL)
+GAME( 1978, disco_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Disco Fever (L-1",		GAME_IS_SKELETON_MECHANICAL)

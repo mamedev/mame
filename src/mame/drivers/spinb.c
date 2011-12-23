@@ -128,7 +128,7 @@ ROM_END
 / Verne's World (1996)
 /-------------------------------------------------------------------*/
 
-GAME(1993,  bushido,   0,       spinb,  spinb,  spinb,  ROT0,  "Inder/Spinball",    "Bushido",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1993,  bushidoa,  bushido, spinb,  spinb,  spinb,  ROT0,  "Inder/Spinball",    "Bushido (alternate set)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1996,  jolypark,  0,       spinb,  spinb,  spinb,  ROT0,  "Spinball",          "Jolly Park",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1995,  mach2,     0,       spinb,  spinb,  spinb,  ROT0,  "Spinball",          "Mach 2",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1993,  bushido,   0,       spinb,  spinb,  spinb,  ROT0,  "Inder/Spinball",    "Bushido",					GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  bushidoa,  bushido, spinb,  spinb,  spinb,  ROT0,  "Inder/Spinball",    "Bushido (alternate set)",	GAME_IS_SKELETON_MECHANICAL)
+GAME(1996,  jolypark,  0,       spinb,  spinb,  spinb,  ROT0,  "Spinball",          "Jolly Park",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1995,  mach2,     0,       spinb,  spinb,  spinb,  ROT0,  "Spinball",          "Mach 2",					GAME_IS_SKELETON_MECHANICAL)

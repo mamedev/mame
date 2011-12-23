@@ -57,4 +57,4 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 
-GAME(1986,  break86,  0,    vd,  vd,  vd,  ROT0,  "Videodens",    "Break '86",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,  break86,  0,    vd,  vd,  vd,  ROT0,  "Videodens",    "Break '86",     GAME_IS_SKELETON_MECHANICAL)

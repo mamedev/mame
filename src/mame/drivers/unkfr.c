@@ -739,5 +739,5 @@ ROM_START( unkfra )
 ROM_END
 
 
-GAME(19??,  unkfr,   0,  unkfr,  unkfr,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 1)",     GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME(19??,  unkfra,  0,  unkfr,  unkfr,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 2)",     GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(19??,  unkfr,   0,  unkfr,  unkfr,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 1)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  unkfra,  0,  unkfr,  unkfr,  0,  ROT0,  "<unknown>",    "Unknown Fruit Machine ROMs (set 2)",     GAME_IS_SKELETON_MECHANICAL)
