@@ -6,6 +6,7 @@
 
     TODO:
     - masking register
+    - needs information about different models and what exactly they does
 
 ***************************************************************************/
 

@@ -26,6 +26,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "video/ramdac.h"
 
 class gaminator_state : public driver_device
 {
@@ -70,39 +71,6 @@ static READ32_HANDLER( gamtor_unk4_r )
 static WRITE32_HANDLER( gamtor_unk4_w )
 {
 
-}
-
-static WRITE8_HANDLER( gamtor_ramdac_w )
-{
-	gaminator_state *state = space->machine().driver_data<gaminator_state>();
-	switch(offset)
-	{
-		case 3:
-			state->m_pal.offs = data;
-			state->m_pal.offs_internal = 0;
-			break;
-		case 2:
-			switch(state->m_pal.offs_internal)
-			{
-				case 0:
-					state->m_pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					state->m_pal.offs_internal++;
-					break;
-				case 1:
-					state->m_pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					state->m_pal.offs_internal++;
-					break;
-				case 2:
-					state->m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine(), state->m_pal.offs, MAKE_RGB(state->m_pal.r, state->m_pal.g, state->m_pal.b));
-					state->m_pal.offs_internal = 0;
-					state->m_pal.offs++;
-					state->m_pal.offs&=0xff;
-					break;
-			}
-
-			break;
-	}
 }
 
 static WRITE32_HANDLER( gamtor_unk6_w )
@@ -195,7 +163,9 @@ static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32 )
 	/* some kind of video control / blitter? */
 	AM_RANGE(0x400003c0, 0x400003c3) AM_WRITE( gamtor_unk3_w )
 	AM_RANGE(0x400003c4, 0x400003c7) AM_READWRITE( gamtor_unk4_r, gamtor_unk4_w )
-	AM_RANGE(0x400003c8, 0x400003cb) AM_WRITE8( gamtor_ramdac_w, 0xffffffff )
+	AM_RANGE(0x400003c8, 0x400003cb) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, index_w, 0x000000ff)
+	AM_RANGE(0x400003c8, 0x400003cb) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, pal_w,   0x0000ff00)
+//	AM_RANGE(0x400003c8, 0x400003cb) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, mask_w,  0x00ff0000)
 	AM_RANGE(0x400003cc, 0x400003cf) AM_WRITE( gamtor_unk6_w )
 	AM_RANGE(0x400003d4, 0x400003d7) AM_READWRITE( gamtor_unk2_r, gamtor_unk2_w )
 	AM_RANGE(0x400003d8, 0x400003fb) AM_READ( gamtor_unk7_r )
@@ -213,6 +183,15 @@ INPUT_PORTS_END
 
 
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	0
+};
+
 static MACHINE_CONFIG_START( gaminator, gaminator_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
 	MCFG_CPU_PROGRAM_MAP(gaminator_map)
@@ -228,6 +207,8 @@ static MACHINE_CONFIG_START( gaminator, gaminator_state )
 	MCFG_SCREEN_UPDATE(gamtor)
 
 	MCFG_PALETTE_LENGTH(0x100)
+
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 
 	MCFG_VIDEO_START(gamtor)
