@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32 )
 
 	AM_RANGE(0x20000000, 0x2003ffff) AM_RAM
 
-	/* some kind of video control / blitter? */
+	/* These are definitely VGA/SVGA ports, for example 0x3d4-0x3d5 = CRTC */
 	AM_RANGE(0x400003c0, 0x400003c3) AM_WRITE( gamtor_unk3_w )
 	AM_RANGE(0x400003c4, 0x400003c7) AM_READWRITE( gamtor_unk4_r, gamtor_unk4_w )
 	AM_RANGE(0x400003c8, 0x400003cb) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, index_w, 0x000000ff)
