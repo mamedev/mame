@@ -1990,6 +1990,7 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
 //	MCFG_CPU_PROGRAM_MAP(i8748_map)
 	MCFG_CPU_IO_MAP(i8748_portmap)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_START(common)
 	MCFG_MACHINE_RESET(common)

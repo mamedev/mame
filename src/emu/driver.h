@@ -74,6 +74,8 @@
 #define GAME_UNOFFICIAL     			0x00008000	/* unofficial hardware change */
 #define GAME_NO_SOUND_HW				0x00010000	/* sound hardware not available */
 #define GAME_MECHANICAL					0x00020000	/* contains mechanical parts (pinball, redemption games,...) */
+#define GAME_IS_SKELETON				0x00000208	/* mask for skelly games */
+#define GAME_IS_SKELETON_MECHANICAL		0x00024208	/* mask for skelly mechanical games */
 #define GAME_TYPE_ARCADE				0x00040000	/* arcade machine (coin operated machines) */
 #define GAME_TYPE_CONSOLE				0x00080000	/* console system */
 #define GAME_TYPE_COMPUTER				0x00100000	/* any kind of computer including home computers, minis, calcs,... */

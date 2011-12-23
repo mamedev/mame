@@ -57,4 +57,4 @@ ROM_START(kissp)
 ROM_END
 
 
-GAME( 1979,  kissp,  kiss,  kissp,  kissp,  kissp,  ROT0,  "Bally",    "Kiss (prototype)",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1979,  kissp,  kiss,  kissp,  kissp,  kissp,  ROT0,  "Bally",    "Kiss (prototype)",      GAME_NO_SOUND | GAME_MECHANICAL)
