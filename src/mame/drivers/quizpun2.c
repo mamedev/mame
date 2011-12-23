@@ -530,6 +530,9 @@ ROM_START( quizpun2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "u22", 0x00000, 0x10000, CRC(f40768b5) SHA1(4410f71850357ec1d10a3a114bb540966e72781b) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "mcu.bin", 0x0000, 0x1000, NO_DUMP ) // could be a state machine instead
+
 	ROM_REGION( 0x40000, "gfx1", 0 )	// 8x16x8
     ROM_LOAD( "u21", 0x00000, 0x10000, CRC(8ac86759) SHA1(2eac9ceee4462ce905aa08ff4f5a6215e0b6672f) )
     ROM_LOAD( "u20", 0x10000, 0x10000, CRC(67640a46) SHA1(5b33850afbb89db9ce9044a578423bfe3a55420d) )
@@ -565,6 +568,9 @@ ROM_START( quizpun )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "05.u22", 0x00000, 0x10000, CRC(515f337e) SHA1(21b2cca95b5da934fd8139892c2ee2c623d51a4e) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "mcu.bin", 0x0000, 0x1000, NO_DUMP ) // could be a state machine instead
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	// 8x16x8
     ROM_LOAD( "04.u21", 0x00000, 0x10000, CRC(fa8d64f4) SHA1(71badabf8f34f246dec83323a1cddbe74deb91bd) )
