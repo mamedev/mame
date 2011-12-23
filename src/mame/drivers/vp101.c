@@ -116,5 +116,5 @@ ROM_START(specfrce)
 ROM_END
 
 
-GAME( 2002,  specfrce,  0,  vp101,  vp101,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training",   GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004,  jnero,     0,  vp101,  vp101,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero",         GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002,  specfrce,  0,  vp101,  vp101,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training",   GAME_IS_SKELETON )
+GAME( 2004,  jnero,     0,  vp101,  vp101,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero",         GAME_IS_SKELETON )

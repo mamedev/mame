@@ -119,4 +119,4 @@ ROM_START( xtom3d )
 ROM_END
 
 
-GAME(1999, xtom3d, 0, xtom3d, xtom3d, 0, ROT0, "Jamie System Development", "X Tom 3D", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(1999, xtom3d, 0, xtom3d, xtom3d, 0, ROT0, "Jamie System Development", "X Tom 3D", GAME_IS_SKELETON)

@@ -78,6 +78,6 @@ ROM_START(spacecty)
 	ROM_LOAD("zsc4.dat", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
 ROM_END
 
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Ski Jump",        GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Space City",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1978,  strike,    0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Strike",          GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Ski Jump",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Space City",      GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  strike,    0,  zac_proto,  zac_proto,  zac_proto,  ROT0,  "Zaccaria",    "Strike",          GAME_IS_SKELETON_MECHANICAL)

@@ -146,4 +146,4 @@ DRIVER_INIT(vegaa)
 }
 #endif
 
-GAME( 19??, vega,   0, vega, vega, 0, ROT270, "Olympia?", "Vega", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 19??, vega,   0, vega, vega, 0, ROT270, "Olympia?", "Vega", GAME_IS_SKELETON )
