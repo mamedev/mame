@@ -1136,9 +1136,9 @@ static void vga_vh_vga(bitmap_t *bitmap)
 	{
 		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line++, addr+=VGA_LINE_LENGTH, curr_addr+=VGA_LINE_LENGTH)
 		{
-			if(line < (vga.line_compare & 0xff))
+			if(line < (vga.line_compare & 0x3ff))
 				curr_addr = addr;
-			if(line == (vga.line_compare & 0xff))
+			if(line == (vga.line_compare & 0x3ff))
 				curr_addr = 0;
 			bitmapline = BITMAP_ADDR16(bitmap, line, 0);
 			addr %= vga.svga_intf.vram_size;
@@ -1161,9 +1161,9 @@ static void vga_vh_vga(bitmap_t *bitmap)
 	{
 		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line++, addr+=VGA_LINE_LENGTH/4, curr_addr+=VGA_LINE_LENGTH/4)
 		{
-			if(line < (vga.line_compare & 0xff))
+			if(line < (vga.line_compare & 0x3ff))
 				curr_addr = addr;
-			if(line == (vga.line_compare & 0xff))
+			if(line == (vga.line_compare & 0x3ff))
 				curr_addr = 0;
 			bitmapline = BITMAP_ADDR16(bitmap, line, 0);
 			addr %= vga.svga_intf.vram_size;
