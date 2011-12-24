@@ -1046,6 +1046,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/csplayh5.o \
 	$(DRIVERS)/cop01.o $(VIDEO)/cop01.o \
 	$(DRIVERS)/dacholer.o \
+	$(DRIVERS)/itaten.o \
 	$(DRIVERS)/galivan.o $(VIDEO)/galivan.o \
 	$(DRIVERS)/gomoku.o $(AUDIO)/gomoku.o $(VIDEO)/gomoku.o \
 	$(DRIVERS)/hyhoo.o $(VIDEO)/hyhoo.o \
