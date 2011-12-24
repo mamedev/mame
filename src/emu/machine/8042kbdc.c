@@ -206,6 +206,7 @@ static struct
 	kbdc8042_type_t type;
 	void (*set_gate_a20)(running_machine &machine, int a20);
 	void (*keyboard_interrupt)(running_machine &machine, int state);
+	void (*set_spkr)(running_machine &machine, int speaker);
 	int (*get_out2)(running_machine &machine);
 
 	UINT8 inport, outport, data, command;
@@ -280,6 +281,7 @@ void kbdc8042_init(running_machine &machine, const struct kbdc8042_interface *in
 	kbdc8042.set_gate_a20 = intf->set_gate_a20;
 	kbdc8042.keyboard_interrupt = intf->keyboard_interrupt;
 	kbdc8042.get_out2 = intf->get_out2;
+	kbdc8042.set_spkr = intf->set_spkr;
 
 	/* ibmat bios wants 0x20 set! (keyboard locked when not set) 0x80 */
 	kbdc8042.inport = 0xa0;
@@ -493,6 +495,9 @@ WRITE8_HANDLER(kbdc8042_8_w)
 
 	case 1:
 		kbdc8042.speaker = data;
+		if (kbdc8042.set_spkr)
+					kbdc8042.set_spkr(space->machine(), kbdc8042.speaker);
+			
 		break;
 
 	case 4:

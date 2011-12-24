@@ -705,7 +705,7 @@ static int taitowlf_get_out2(running_machine &machine)
 
 static const struct kbdc8042_interface at8042 =
 {
-	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, taitowlf_get_out2
+	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, NULL, taitowlf_get_out2
 };
 
 static void taitowlf_set_keyb_int(running_machine &machine, int state)

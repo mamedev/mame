@@ -192,7 +192,7 @@ static int pcat_dyn_get_out2(running_machine &machine) {
 
 static const struct kbdc8042_interface at8042 =
 {
-	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, pcat_dyn_get_out2
+	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, NULL, pcat_dyn_get_out2
 };
 
 static MACHINE_START( pangofun )

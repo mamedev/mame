@@ -30,13 +30,10 @@ public:
 	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT32 *m_vga_vram;
-	UINT8 m_vga_regs[0x19];
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 	UINT8 m_vga_address;
-	struct { int r,g,b,offs,offs_internal; } m_pal;
 
 	device_t	*m_pit8253;
 	device_t	*m_pic8259_1;
@@ -235,7 +232,7 @@ static const struct pit8253_config at_pit8254_config =
 
 static ADDRESS_MAP_START( photoply_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE_MEMBER(photoply_state, m_vga_vram)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0) //???
 	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM AM_REGION("ex_bios", 0)
@@ -305,9 +302,6 @@ static void photoply_set_keyb_int(running_machine &machine, int state)
 static MACHINE_START( photoply )
 {
 	photoply_state *state = machine.driver_data<photoply_state>();
-//  bank = -1;
-//  lastvalue = -1;
-//  hv_blank = 0;
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 	state->m_pit8253 = machine.device( "pit8254" );
 	state->m_pic8259_1 = machine.device( "pic8259_1" );
@@ -390,7 +384,7 @@ ROM_END
 
 static DRIVER_INIT( photoply )
 {
-	pc_vga_init(machine, &vga_interface, NULL); //GRULL_ADDVGA
+	pc_vga_init(machine, &vga_interface, NULL);
 }
 
 GAME( 199?, photoply,  0,   photoply, photoply, photoply, ROT0, "Funworld", "PhotoPlay", GAME_NOT_WORKING|GAME_NO_SOUND )
