@@ -7,13 +7,11 @@ Itazura Tenshi (Japan Ver.)
 
 --- Team Japump!!! ---
 Dumped by Chack'n
-01/Aug/2011
-Written by Hau
-05/Aug/2011
+Driver written by Hau
 
 based on driver from drivers/dacholer.c by Pierpaolo Prazzoli
 note:
-Sound test will not work.
+Sound test does not work.
 */
 
 
