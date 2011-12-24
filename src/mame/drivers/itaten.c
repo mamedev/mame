@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( itaten, itaten_state )
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_19_968MHz/8)		/* Matches reference recording */
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_io_map)
 
@@ -435,13 +435,13 @@ static MACHINE_CONFIG_START( itaten, itaten_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_16MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_19_968MHz/16)	/* Matches reference recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_16MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_19_968MHz/16)	/* Matches reference recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_16MHz/8)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL_19_968MHz/16)	/* Matches reference recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 MACHINE_CONFIG_END
