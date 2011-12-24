@@ -87,7 +87,7 @@ Grull Osgo - Improvements
 
 -Changes about BIOS memory management so ROM Shadow now works properly.
  The changes are:
-	Rom Memory Map remmapped to 128K size AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
+    Rom Memory Map remmapped to 128K size AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
 
 -Changes in mtxc write handler and bios_ram write handler. Now The internal register access are
 compatible with chipset VIA.
@@ -164,32 +164,32 @@ static VIDEO_START(calchase)
 /*GRULL-ADDVGA
 static SCREEN_UPDATE(calchase)
 {
-	calchase_state *state = screen->machine().driver_data<calchase_state>();
-	int x,y,count,i;
+    calchase_state *state = screen->machine().driver_data<calchase_state>();
+    int x,y,count,i;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+    bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
-	count = (0);
+    count = (0);
 
-	for(y=0;y<256;y++)
-	{
-		for(x=0;x<320;x+=32)
-		{
-			for (i=0;i<32;i++)
-			{
-				UINT32 color;
+    for(y=0;y<256;y++)
+    {
+        for(x=0;x<320;x+=32)
+        {
+            for (i=0;i<32;i++)
+            {
+                UINT32 color;
 
-				color = (state->m_vga_vram[count])>>(32-i) & 0x1;
+                color = (state->m_vga_vram[count])>>(32-i) & 0x1;
 
-				if((x+i)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine().pens[color];
+                if((x+i)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
+                    *BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine().pens[color];
 
-			}
+            }
 
-			count++;
-		}
-	}
-	return 0;
+            count++;
+        }
+    }
+    return 0;
 
 }
 */
@@ -380,7 +380,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		//GRULLcase 0x59:
 		case 0x63:	// PAM0
 		{
-			//GRULLif (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
+			//GRULLif (data & 0x10)     // enable RAM access to region 0xf0000 - 0xfffff
 			if ((data & 0x50) | (data & 0xA0))
 			{
 				memory_set_bankptr(busdevice->machine(), "bank1", state->m_bios_ram);
@@ -512,7 +512,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 static WRITE32_HANDLER(bios_ram_w)
 {
 	calchase_state *state = space->machine().driver_data<calchase_state>();
-	//GRULLif (state->m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	//GRULLif (state->m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 	       if (state->m_mxtc_config_reg[0x63] & 0x50)
 	{
 		COMBINE_DATA(state->m_bios_ram + offset);
@@ -587,20 +587,20 @@ ADDRESS_MAP_END
 /*GRULL-ADDVGA
 static const gfx_layout CGA_charlayout =
 {
-	8,8,
+    8,8,
     256,
     1,
     { 0 },
     { 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
+    { 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
     8*8
 };
 */
 
 /*GRULL-ADDVGA
 static GFXDECODE_START( CGA )
-	GFXDECODE_ENTRY( "video_bios", 0x5182, CGA_charlayout,              0, 256 )
-	//there's also a 8x16 entry (just after the 8x8)
+    GFXDECODE_ENTRY( "video_bios", 0x5182, CGA_charlayout,              0, 256 )
+    //there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
 */
 

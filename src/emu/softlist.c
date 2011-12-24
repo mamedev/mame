@@ -1501,7 +1501,7 @@ static void find_software_item(const device_list &devlist, emu_options &options,
 			{
 
 				software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
-				
+
 				swlist_name = swlist->list_name;
 
 				if (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
@@ -1648,7 +1648,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 		for (software_part *swp = software_find_part(software_info_ptr, NULL, NULL); swp != NULL; swp = software_part_next(swp))
 		{
 			if (strcmp(software_part_ptr->name,swp->name)==0) *sw_part = new_part;
-			
+
 			new_part->name = auto_strdup( image->device().machine(), swp->name );
 			if ( swp->interface_ )
 				new_part->interface_ = auto_strdup( image->device().machine(), swp->interface_ );
@@ -1675,14 +1675,14 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 					list = list->next;
 				}
 				new_list->next = NULL;
-			}			
+			}
 			new_part++;
 		}
 
 		/* Tell the world which part we actually loaded */
 		*full_sw_name = auto_alloc_array( image->device().machine(), char, strlen(swlist_name) + strlen(software_info_ptr->shortname) + strlen(software_part_ptr->name) + 3 );
 		sprintf( *full_sw_name, "%s:%s:%s", swlist_name, software_info_ptr->shortname, software_part_ptr->name );
-		
+
 		for (device_t *swlists = image->device().machine().devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
 		{
 			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
@@ -1693,7 +1693,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 				break;
 			}
 		}
-		
+
 		{
 			const char *requirement = software_part_get_feature(software_part_ptr, "requirement");
 			if (requirement!=NULL) {
@@ -1703,13 +1703,13 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 				const char *req_swlist_name = NULL;
 
 				find_software_item(image->device().machine().devicelist(), options, NULL, requirement, &req_software_list_ptr, &req_software_info_ptr, &req_software_part_ptr, &req_swlist_name);
-			
+
 				if ( req_software_list_ptr )
 				{
 					device_image_interface *req_image = NULL;
 					for (bool gotone = image->device().machine().devicelist().first(req_image); gotone; gotone = req_image->next(req_image))
 					{
-						const char *interface = req_image->image_interface();												
+						const char *interface = req_image->image_interface();
 						if (interface != NULL)
 						{
 							if (!strcmp(interface, req_software_part_ptr->interface_))
@@ -1721,15 +1721,15 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 									req_image->load(requirement);
 								}
 								break;
-							}												
+							}
 						}
 					}
 					software_list_close( req_software_list_ptr );
 					req_software_info_ptr = NULL;
 					req_software_list_ptr = NULL;
 					global_free(req_swlist_name);
-				}				
-			}			
+				}
+			}
 		}
 	}
 

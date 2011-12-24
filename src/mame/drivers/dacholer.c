@@ -16,18 +16,18 @@
       - just a guess - upper nibble of byte from port 3 _probably_
         contains sound command (sound cpu writes it to port c)
 
-	Itazura Tenshi (Japan Ver.)
-	(c)1984 Nichibutsu / Alice
+    Itazura Tenshi (Japan Ver.)
+    (c)1984 Nichibutsu / Alice
 
 
 
-	--- Team Japump!!! ---
-	Dumped by Chack'n
-	Driver written by Hau
+    --- Team Japump!!! ---
+    Dumped by Chack'n
+    Driver written by Hau
 
-	based on driver from drivers/dacholer.c by Pierpaolo Prazzoli
-	note:
-	Sound test does not work.
+    based on driver from drivers/dacholer.c by Pierpaolo Prazzoli
+    note:
+    Sound test does not work.
 ******************************************************************************/
 
 #include "emu.h"

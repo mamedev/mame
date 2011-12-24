@@ -231,7 +231,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 					}
 					software_list_close(list);
-					
+
 					if (found) break;
 				}
 				if (!found) {

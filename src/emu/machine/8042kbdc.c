@@ -269,7 +269,7 @@ static TIMER_CALLBACK( kbdc8042_clr_int )
 {
 	/* Lets 8952's timers do their job before clear the interrupt line, */
 	/* else Keyboard interrupt never happens. */
-	kbdc8042.keyboard_interrupt(machine, 0); 
+	kbdc8042.keyboard_interrupt(machine, 0);
 }
 
 
@@ -497,7 +497,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 		kbdc8042.speaker = data;
 		if (kbdc8042.set_spkr)
 					kbdc8042.set_spkr(space->machine(), kbdc8042.speaker);
-			
+
 		break;
 
 	case 4:

@@ -1053,9 +1053,9 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	/* TODO: irq generation for these */
 	MCFG_TIMER_ADD_SCANLINE("mcu_st", mcu_irq, "screen", 0, 1)
 
-//	MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
-//	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
-//	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
+//  MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
+//  MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
+//  MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_NVRAM_HANDLER(namconb1)
 	MCFG_MACHINE_START(namconb)
@@ -1090,9 +1090,9 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_CPU_IO_MAP(namcoc75_io)
 	/* TODO: irq generation for these */
 	MCFG_TIMER_ADD_SCANLINE("mcu_st", mcu_irq, "screen", 0, 1)
-//	MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
-//	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
-//	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
+//  MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
+//  MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
+//  MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_NVRAM_HANDLER(namconb1)
 	MCFG_MACHINE_START(namconb)

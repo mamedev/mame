@@ -238,7 +238,7 @@ void image_device_init(running_machine &machine)
 			}
 		}
 	}
-	
+
     for (bool gotone = machine.devicelist().first(image); gotone; gotone = image->next(image))
 	{
 		/* is an image specified for this image */

@@ -409,11 +409,11 @@ static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x60ff) AM_RAM //kanji tilemap?
-//	AM_RANGE(0x6000, 0x7fff) AM_ROM
+//  AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_READ(atamanot_prot_r)
-//	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
-//	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
-//	AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
+//  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
+//  AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
+//  AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8 )
@@ -426,7 +426,7 @@ static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8 )
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
-//	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
 	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0xff, 0xff) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
@@ -441,7 +441,7 @@ static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8 )
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1") AM_WRITE(atamanot_prot_w)
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
-//	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
 	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0xff, 0xff) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END

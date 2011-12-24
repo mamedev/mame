@@ -455,7 +455,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 
 READ64_HANDLER( dc_gdrom_r )
 {
-//	dc_state *state = space->machine().driver_data<dc_state>();
+//  dc_state *state = space->machine().driver_data<dc_state>();
 
 	UINT32 off;
 
@@ -478,7 +478,7 @@ READ64_HANDLER( dc_gdrom_r )
 
 WRITE64_HANDLER( dc_gdrom_w )
 {
-//	dc_state *state = space->machine().driver_data<dc_state>();
+//  dc_state *state = space->machine().driver_data<dc_state>();
 	UINT32 dat,off;
 
 	if ((int)~mem_mask & 1)
@@ -656,7 +656,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 
 READ64_HANDLER( dc_modem_r )
 {
-//	dc_state *state = space->machine().driver_data<dc_state>();
+//  dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
@@ -675,7 +675,7 @@ READ64_HANDLER( dc_modem_r )
 
 WRITE64_HANDLER( dc_modem_w )
 {
-//	dc_state *state = space->machine().driver_data<dc_state>();
+//  dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
@@ -829,7 +829,7 @@ MACHINE_RESET( dc )
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )
 {
-	//	dc_state *state = device->machine().driver_data<dc_state>();
+	//  dc_state *state = device->machine().driver_data<dc_state>();
 	//int reg;
 	UINT64 shift;
 
@@ -842,7 +842,7 @@ READ64_DEVICE_HANDLER( dc_aica_reg_r )
 
 WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 {
-	//	dc_state *state = device->machine().driver_data<dc_state>();
+	//  dc_state *state = device->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;

@@ -3,11 +3,11 @@
     TourVision
     Driver by Mariusz Wojcieszek
 
-	Bootleg PC-Engine based arcade board from the Spanish company TourVision. 
-	Two known hardware revisions, one with a sub-board with the PC-Engine chipset 
-	and the other as an integrated PCB.
+    Bootleg PC-Engine based arcade board from the Spanish company TourVision.
+    Two known hardware revisions, one with a sub-board with the PC-Engine chipset
+    and the other as an integrated PCB.
 
-	Todo: complete jamma interface emulation.
+    Todo: complete jamma interface emulation.
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
 |                                           ____________               ____________               ____________               ____________       |
@@ -71,7 +71,7 @@ JP107 = 2-pin connector
 JP106 = 14-pin connector to 2-digit 7 segments display
 JP105 = 16-pin connector (unknown functionality)
 PT    = Push-type switch
-BT1   = 3.6 V battery 
+BT1   = 3.6 V battery
 XT2   = 21.32825 MHz UNI 90-H
 JP1-4 = Carts slots
 
@@ -226,11 +226,11 @@ Dumped directly from the cartridge edge connector using the following adapter:
                    +5V |02      02| +5V
                    A18 |03      03| +5V
                    A14 |04      04| A17
-                    A8 |05      05| A13 
+                    A8 |05      05| A13
                    A11 |06      06| A9
                    A10 |07      07| OE#
                     D7 |08      08| CE#
-(front of           D5 |09      09| D6               (rear of 
+(front of           D5 |09      09| D6               (rear of
  cartridge)         D3 |10      10| D4                cartridge)
                     D2 |11      11| GND
                     D0 |12      12| D1
@@ -254,8 +254,8 @@ Dumped directly from the cartridge edge connector using the following adapter:
  ----------------------------------------------------------------------------
                         +----v----+
                     A19 | 1     32| +5V
-                    A16 | 2     31| A18  
-                    A15 | 3     30| A17    
+                    A16 | 2     31| A18
+                    A15 | 3     30| A17
                     A12 | 4     29| A14
                      A7 | 5     28| A13
                      A6 | 6     27| A8

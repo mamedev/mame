@@ -25,9 +25,9 @@ struct kbdc8042_interface
 	void (*keyboard_interrupt)(running_machine &machine, int state);
 	void (*set_spkr)(running_machine &machine, int speaker);
 	int (*get_out2)(running_machine &machine);
-	
-	
-	
+
+
+
 };
 
 

@@ -458,7 +458,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 						if (effx >= cliprect->min_x && effx <= cliprect->max_x)
 						{
 							int prevpix = destbase[effx];
-	
+
 							if ((prevpix & 0x0f) != 0)
 								state->m_sprite_collide[((prevpix >> 4) & 0x1f) + 32 * spritenum] = state->m_sprite_collide_summary = 1;
 							destbase[effx] = color1 | palettebase;
@@ -479,7 +479,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 						if (effx >= cliprect->min_x && effx <= cliprect->max_x)
 						{
 							int prevpix = destbase[effx];
-	
+
 							if ((prevpix & 0x0f) != 0)
 								state->m_sprite_collide[((prevpix >> 4) & 0x1f) + 32 * spritenum] = state->m_sprite_collide_summary = 1;
 							destbase[effx] = color2 | palettebase;

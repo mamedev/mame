@@ -1965,11 +1965,11 @@ static MACHINE_START( alpha68k_II )
 
 
 static ADDRESS_MAP_START( i8748_portmap, AS_IO, 8 )
-//	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugoub1_mcu_command_r)
-//	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE("adpcm", saiyugoub1_m5205_clk_w)		/* Drives the clock on the m5205 at 1/8 of this frequency */
-//	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugoub1_m5205_irq_r)
-//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugoub1_adpcm_rom_addr_w)
-//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("adpcm", saiyugoub1_adpcm_control_w)
+//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugoub1_mcu_command_r)
+//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE("adpcm", saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
+//  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugoub1_m5205_irq_r)
+//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugoub1_adpcm_rom_addr_w)
+//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("adpcm", saiyugoub1_adpcm_control_w)
 ADDRESS_MAP_END
 
 
@@ -1988,7 +1988,7 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 
 	MCFG_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
-//	MCFG_CPU_PROGRAM_MAP(i8748_map)
+//  MCFG_CPU_PROGRAM_MAP(i8748_map)
 	MCFG_CPU_IO_MAP(i8748_portmap)
 	MCFG_DEVICE_DISABLE()
 

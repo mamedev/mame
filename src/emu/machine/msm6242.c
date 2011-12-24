@@ -2,12 +2,12 @@
 
     MSM6242 Real Time Clock
 
-	Note:
-	- this RTC has a y2k bug
+    Note:
+    - this RTC has a y2k bug
 
-	TODO:
-	- HOLD mechanism
-	- IRQ ACK
+    TODO:
+    - HOLD mechanism
+    - IRQ ACK
 
 ***************************************************************************/
 

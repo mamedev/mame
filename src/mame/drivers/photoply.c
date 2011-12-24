@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( photoply_io, AS_IO, 32 )
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //parallel port 3
-//	AM_RANGE(0x03f4, 0x03f7) AM_READ(kludge_r) // fdc
+//  AM_RANGE(0x03f4, 0x03f7) AM_READ(kludge_r) // fdc
 ADDRESS_MAP_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \

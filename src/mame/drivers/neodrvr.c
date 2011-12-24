@@ -876,14 +876,14 @@
     Several early games have a 'feature' called "sphero symphony". None of the games featuring "sphero symphony"
     uses special hardware. It is something sound based, but what exactly it is (specially arragend samples,
     FM synthesis etc.) is unknown. The AES and MVS releases share the same sound data and driver.
-    
+
     The AES game-inserts and manuals have an eye-shaped logo with the following text (not to be found on MVS sets):
     sphero
     symphony
     STEREOPHONIC SOUND
-    
+
     Experience this "LIVE" 3 dimensional sound coming from all around you.
-    
+
     Games featuring "sphero symphony":
     ID-0006 - Riding Hero
     ID-0007 - Alpha Mission II / ASO II - Last Guardian
