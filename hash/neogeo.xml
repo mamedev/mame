@@ -478,33 +478,33 @@
     <sharedfeat name="aescompatible" value="yes" />
     <part name="cart" interface="neo_cart">
       <dataarea name="maincpu" size="0x100000">
-        <rom loadflag="load16_byte" name="proto_007-p1.bin" offset="0x000001" size="0x080000" crc="c763e52a" sha1="b24acbac255c5ee1a2e92e77cdde6620a24081cf" />
-        <rom loadflag="load16_byte" name="proto_007-p2.bin" offset="0x000000" size="0x080000" crc="7a0b435c" sha1="40e6f42a92001d9f4e51898dd7489da143b6b74b" />
+        <rom loadflag="load16_byte" name="proto_007-p1.p1" offset="0x000001" size="0x080000" crc="c763e52a" sha1="b24acbac255c5ee1a2e92e77cdde6620a24081cf" />
+        <rom loadflag="load16_byte" name="proto_007-p2.p2" offset="0x000000" size="0x080000" crc="7a0b435c" sha1="40e6f42a92001d9f4e51898dd7489da143b6b74b" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="proto_007-s1.bin" crc="efc9ae2e" sha1="a594826b0082fe5a13191673e8d9aa42517230f5" />
+        <rom offset="0x000000" size="0x020000" name="proto_007-s1.s1" crc="efc9ae2e" sha1="a594826b0082fe5a13191673e8d9aa42517230f5" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="proto_007-m1.bin" crc="5976b464" sha1="ec824567ecc3579f6d86c9d9385710cbaeef16a3" />
+        <rom offset="0x000000" size="0x020000" name="proto_007-m1.m1" crc="5976b464" sha1="ec824567ecc3579f6d86c9d9385710cbaeef16a3" />
       </dataarea>
       <dataarea name="ymsnd" size="0x200000">
-        <rom name="proto_007-v11.bin" offset="0x000000" size="0x080000" crc="18eaa9e1" sha1="85c94d8660f8a32e4ca8e015f0bd704208482d68" />
-        <rom name="proto_007-v12.bin" offset="0x080000" size="0x080000" crc="2487d495" sha1="49af3c4dc6a38c5158d3641fd8f9a40041b42aa6" />
-        <rom name="proto_007-v13.bin" offset="0x100000" size="0x080000" crc="25e60f25" sha1="d06b0df872372de38fcf90187195070ac5f8c651" />
+        <rom name="proto_007-v11.v11" offset="0x000000" size="0x080000" crc="18eaa9e1" sha1="85c94d8660f8a32e4ca8e015f0bd704208482d68" />
+        <rom name="proto_007-v12.v12" offset="0x080000" size="0x080000" crc="2487d495" sha1="49af3c4dc6a38c5158d3641fd8f9a40041b42aa6" />
+        <rom name="proto_007-v13.v13" offset="0x100000" size="0x080000" crc="25e60f25" sha1="d06b0df872372de38fcf90187195070ac5f8c651" />
       </dataarea>
       <dataarea name="ymsnd.deltat" size="0x80000">
-        <rom name="proto_007-v21.bin" offset="0x000000" size="0x080000" crc="ac44b75a" sha1="7399a05cd4e2c7ecde4a7323d3e189255afe5fc2" />
+        <rom name="proto_007-v21.v21" offset="0x000000" size="0x080000" crc="ac44b75a" sha1="7399a05cd4e2c7ecde4a7323d3e189255afe5fc2" />
       </dataarea>
       <dataarea name="sprites" size="0x400000">
         <!-- note, ROM_LOAD32_BYTE -->
-        <rom loadflag="load32_byte" name="proto_007-c1.bin" offset="0x000000" size="0x080000" crc="24841639" sha1="fcc2a349121dad86ffefc44b9f0e8ba616ce0d30" />
-        <rom loadflag="load32_byte" name="proto_007-c2.bin" offset="0x000002" size="0x080000" crc="912763ab" sha1="cedf26d7d85ad140399ee62813c71f35e65498d6" />
-        <rom loadflag="load32_byte" name="proto_007-c3.bin" offset="0x000001" size="0x080000" crc="0743bde2" sha1="0d13ad6333909ad3cf10f9ac360f9abf191318de" />
-        <rom loadflag="load32_byte" name="proto_007-c4.bin" offset="0x000003" size="0x080000" crc="61240212" sha1="dee36f6604adaeb96e0d761a7256241c066b1cd2" />
-        <rom loadflag="load32_byte" name="proto_007-c5.bin" offset="0x200000" size="0x080000" crc="cf9f4c53" sha1="f979c85f83d9f76e554c2617f85f6d4efca6799c" />
-        <rom loadflag="load32_byte" name="proto_007-c6.bin" offset="0x200002" size="0x080000" crc="3d903b19" sha1="001a8c762336b855fe1df69fe2e605d30a3f00a1" />
-        <rom loadflag="load32_byte" name="proto_007-c7.bin" offset="0x200001" size="0x080000" crc="e41e3875" sha1="730aceb8a66cb33d0194b096568f053ad7dc000a" />
-        <rom loadflag="load32_byte" name="proto_007-c8.bin" offset="0x200003" size="0x080000" crc="4483e2cf" sha1="47c3364f5c36ae9dc3a49fe37ca60bcee0e73314" />
+        <rom loadflag="load32_byte" name="proto_007-c1.c1" offset="0x000000" size="0x080000" crc="24841639" sha1="fcc2a349121dad86ffefc44b9f0e8ba616ce0d30" />
+        <rom loadflag="load32_byte" name="proto_007-c2.c2" offset="0x000002" size="0x080000" crc="912763ab" sha1="cedf26d7d85ad140399ee62813c71f35e65498d6" />
+        <rom loadflag="load32_byte" name="proto_007-c3.c3" offset="0x000001" size="0x080000" crc="0743bde2" sha1="0d13ad6333909ad3cf10f9ac360f9abf191318de" />
+        <rom loadflag="load32_byte" name="proto_007-c4.c4" offset="0x000003" size="0x080000" crc="61240212" sha1="dee36f6604adaeb96e0d761a7256241c066b1cd2" />
+        <rom loadflag="load32_byte" name="proto_007-c5.c5" offset="0x200000" size="0x080000" crc="cf9f4c53" sha1="f979c85f83d9f76e554c2617f85f6d4efca6799c" />
+        <rom loadflag="load32_byte" name="proto_007-c6.c6" offset="0x200002" size="0x080000" crc="3d903b19" sha1="001a8c762336b855fe1df69fe2e605d30a3f00a1" />
+        <rom loadflag="load32_byte" name="proto_007-c7.c7" offset="0x200001" size="0x080000" crc="e41e3875" sha1="730aceb8a66cb33d0194b096568f053ad7dc000a" />
+        <rom loadflag="load32_byte" name="proto_007-c8.c8" offset="0x200003" size="0x080000" crc="4483e2cf" sha1="47c3364f5c36ae9dc3a49fe37ca60bcee0e73314" />
       </dataarea>
     </part>
   </software>
@@ -976,32 +976,32 @@
     <part name="cart" interface="neo_cart">
       <!-- early prototype - all roms were hand labeled with CRCs, dumps verified against them -->
       <dataarea name="maincpu" size="0x100000">
-        <rom loadflag="load16_byte" name="proto_018.p1" offset="0x000001" size="0x080000" crc="5b4032e7" sha1="55df91dad6f484d3d49c28ab5972700bf71a8662" />
-        <rom loadflag="load16_byte" name="proto_018.p2" offset="0x000000" size="0x080000" crc="78762f68" sha1="12170fc6efe75cb5d32624033d3d341032c97548" />
+        <rom loadflag="load16_byte" name="proto_018-p1.p1" offset="0x000001" size="0x080000" crc="5b4032e7" sha1="55df91dad6f484d3d49c28ab5972700bf71a8662" />
+        <rom loadflag="load16_byte" name="proto_018-p2.p2" offset="0x000000" size="0x080000" crc="78762f68" sha1="12170fc6efe75cb5d32624033d3d341032c97548" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="proto_018.s1" crc="f3d130e8" sha1="2fdeb93f4bb2a60d391cac2822be41661b1e1795" />
+        <rom offset="0x000000" size="0x020000" name="proto_018-s1.s1" crc="f3d130e8" sha1="2fdeb93f4bb2a60d391cac2822be41661b1e1795" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="proto_018.m1" crc="470dd5d4" sha1="4291811b4aefe45261a1ae3631b6999fcd74fb3f" />
+        <rom offset="0x000000" size="0x020000" name="proto_018-m1.m1" crc="470dd5d4" sha1="4291811b4aefe45261a1ae3631b6999fcd74fb3f" />
       </dataarea>
       <dataarea name="ymsnd" size="0x200000">
-        <rom name="proto_018.v11" offset="0x000000" size="0x080000" crc="dc07ea3c" sha1="c3e71aaec44ead7ddc581565d16b90030e6db5fd" />
-        <rom name="proto_018.v12" offset="0x080000" size="0x080000" crc="f1ae637c" sha1="02a4c7d4a544350a314ab7b26d8c9d3baa8f5778" />
+        <rom name="proto_018-v11.v11" offset="0x000000" size="0x080000" crc="dc07ea3c" sha1="c3e71aaec44ead7ddc581565d16b90030e6db5fd" />
+        <rom name="proto_018-v12.v12" offset="0x080000" size="0x080000" crc="f1ae637c" sha1="02a4c7d4a544350a314ab7b26d8c9d3baa8f5778" />
       </dataarea>
       <dataarea name="ymsnd.deltat" size="0x80000">
-        <rom name="proto_018.v21" offset="0x000000" size="0x080000" crc="9f3b4eda" sha1="7f516923d04daa483b4b99c9babba66505931a34" />
+        <rom name="proto_018-v21.v21" offset="0x000000" size="0x080000" crc="9f3b4eda" sha1="7f516923d04daa483b4b99c9babba66505931a34" />
       </dataarea>
       <dataarea name="sprites" size="0x400000">
         <!-- note, ROM_LOAD32_BYTE -->
-        <rom loadflag="load32_byte" name="proto_018.c1" offset="0x000000" size="0x080000" crc="6569018b" sha1="25040e0a9c2b72900100a22a2a41de5f6c339d8a" />
-        <rom loadflag="load32_byte" name="proto_018.c2" offset="0x000002" size="0x080000" crc="6949b501" sha1="d8ee48837faff6cc849046ee8757b2b94d440303" />
-        <rom loadflag="load32_byte" name="proto_018.c3" offset="0x000001" size="0x080000" crc="410f653b" sha1="ce94667721baa7b2c318fc268e3bb9209671c9f5" />
-        <rom loadflag="load32_byte" name="proto_018.c4" offset="0x000003" size="0x080000" crc="d43bf2a5" sha1="c27985d8973611d02570f469a0d8cb4f5b63b614" />
-        <rom loadflag="load32_byte" name="proto_018.c5" offset="0x200000" size="0x080000" crc="837d09d3" sha1="d3b06931fca6123604549599544b04529ef34c53" />
-        <rom loadflag="load32_byte" name="proto_018.c6" offset="0x200002" size="0x080000" crc="5fee51e7" sha1="835c632fa12a1d5b4104cd80b8f686ac80b314a1" />
-        <rom loadflag="load32_byte" name="proto_018.c7" offset="0x200001" size="0x080000" crc="0f3f0823" sha1="ec1d681c1795de43d20f30f85956e2473ec39c95" />
-        <rom loadflag="load32_byte" name="proto_018.c8" offset="0x200003" size="0x080000" crc="67cc9e34" sha1="dc72a464c1456a4d2f7b992b416a984fb7885e99" />
+        <rom loadflag="load32_byte" name="proto_018-c1.c1" offset="0x000000" size="0x080000" crc="6569018b" sha1="25040e0a9c2b72900100a22a2a41de5f6c339d8a" />
+        <rom loadflag="load32_byte" name="proto_018-c2.c2" offset="0x000002" size="0x080000" crc="6949b501" sha1="d8ee48837faff6cc849046ee8757b2b94d440303" />
+        <rom loadflag="load32_byte" name="proto_018-c3.c3" offset="0x000001" size="0x080000" crc="410f653b" sha1="ce94667721baa7b2c318fc268e3bb9209671c9f5" />
+        <rom loadflag="load32_byte" name="proto_018-c4.c4" offset="0x000003" size="0x080000" crc="d43bf2a5" sha1="c27985d8973611d02570f469a0d8cb4f5b63b614" />
+        <rom loadflag="load32_byte" name="proto_018-c5.c5" offset="0x200000" size="0x080000" crc="837d09d3" sha1="d3b06931fca6123604549599544b04529ef34c53" />
+        <rom loadflag="load32_byte" name="proto_018-c6.c6" offset="0x200002" size="0x080000" crc="5fee51e7" sha1="835c632fa12a1d5b4104cd80b8f686ac80b314a1" />
+        <rom loadflag="load32_byte" name="proto_018-c7.c7" offset="0x200001" size="0x080000" crc="0f3f0823" sha1="ec1d681c1795de43d20f30f85956e2473ec39c95" />
+        <rom loadflag="load32_byte" name="proto_018-c8.c8" offset="0x200003" size="0x080000" crc="67cc9e34" sha1="dc72a464c1456a4d2f7b992b416a984fb7885e99" />
       </dataarea>
     </part>
   </software>
@@ -1926,40 +1926,38 @@
     <sharedfeat name="aescompatible" value="yes" />
     <part name="cart" interface="neo_cart">
       <dataarea name="maincpu" size="0x100000">
-        <rom loadflag="load16_byte" name="p1.bin" offset="0x000001" size="0x080000" crc="3c1d17e7" sha1="aeaff465fafa46ded903ed4e8cb8cd05de8dc096" />
-        <rom loadflag="load16_byte" name="p2.bin" offset="0x000000" size="0x080000" crc="bc9691f0" sha1="3854659b952d4f8c2edd5d59858a61ce6d518604" />
+        <rom loadflag="load16_byte" name="proto_039-p1.p1" offset="0x000001" size="0x080000" crc="3c1d17e7" sha1="aeaff465fafa46ded903ed4e8cb8cd05de8dc096" />
+        <rom loadflag="load16_byte" name="proto_039-p2.p2" offset="0x000000" size="0x080000" crc="bc9691f0" sha1="3854659b952d4f8c2edd5d59858a61ce6d518604" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="s1.bin" crc="63ee053a" sha1="7d4b92bd022708975b1470e8f24d1f5a712e1b94" />
+        <rom offset="0x000000" size="0x020000" name="039-s1.s1" crc="63ee053a" sha1="7d4b92bd022708975b1470e8f24d1f5a712e1b94" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="m1.bin" crc="0c5b2ad5" sha1="15eb5ea10fecdbdbcfd06225ae6d88bb239592e7" />
+        <rom offset="0x000000" size="0x020000" name="039-m1.m1" crc="0c5b2ad5" sha1="15eb5ea10fecdbdbcfd06225ae6d88bb239592e7" />
       </dataarea>
       <!-- same data as main set, but prototype board layout -->
       <dataarea name="ymsnd" size="0x300000">
-        <rom name="v1.bin" offset="0x000000" size="0x080000" crc="dd3566f1" sha1="f7c2a3747aaab2bc57cdfa33d8bb9fab057b5214" />
-        <rom name="v2.bin" offset="0x080000" size="0x080000" crc="57f60274" sha1="7e17740aa05cf7ad4f9084e147600a8eb82c7284" />
-        <rom name="v3.bin" offset="0x100000" size="0x080000" crc="0f008a07" sha1="ed243a0449232bbea409308c3fec7e057fcd8501" />
-        <rom name="v4.bin" offset="0x180000" size="0x080000" crc="1943d0fe" sha1="47fb716c76ea6b5fe64204ff6d72b7feea10bda9" />
-        <rom name="v5.bin" offset="0x200000" size="0x080000" crc="13be045b" sha1="0e3713ae6b164ebae434c0f18c466365b26b9a77" />
-        <rom name="v6.bin" offset="0x280000" size="0x080000" crc="d1dd3fd6" sha1="052b92168a76cf3a97c8cacebcc3ebab228726df" />
+        <rom name="proto_039-v1.v1" offset="0x000000" size="0x080000" crc="dd3566f1" sha1="f7c2a3747aaab2bc57cdfa33d8bb9fab057b5214" />
+        <rom name="proto_039-v2.v2" offset="0x080000" size="0x080000" crc="57f60274" sha1="7e17740aa05cf7ad4f9084e147600a8eb82c7284" />
+        <rom name="proto_039-v3.v3" offset="0x100000" size="0x080000" crc="0f008a07" sha1="ed243a0449232bbea409308c3fec7e057fcd8501" />
+        <rom name="proto_039-v4.v4" offset="0x180000" size="0x080000" crc="1943d0fe" sha1="47fb716c76ea6b5fe64204ff6d72b7feea10bda9" />
+        <rom name="proto_039-v5.v5" offset="0x200000" size="0x080000" crc="13be045b" sha1="0e3713ae6b164ebae434c0f18c466365b26b9a77" />
+        <rom name="proto_039-v6.v6" offset="0x280000" size="0x080000" crc="d1dd3fd6" sha1="052b92168a76cf3a97c8cacebcc3ebab228726df" />
       </dataarea>
       <!-- same data as main set, but prototype board layout -->
       <dataarea name="sprites" size="0x600000">
         <!-- note, ROM_LOAD32_BYTE -->
-        <rom loadflag="load32_byte" name="c1.bin" offset="0x000000" size="0x100000" crc="7192a787" sha1="7bef6ce79c618103485480aee3c6f856968eb51f" />
-        <rom loadflag="load32_byte" name="c2.bin" offset="0x000002" size="0x100000" crc="7157eca1" sha1="65f36c6a3834775b04076d2c38a6047bffe9a8cf" />
-        <rom loadflag="load32_byte" name="c3.bin" offset="0x000001" size="0x100000" crc="11d75727" sha1="5a4c7b5ca3f1195e7853b45c5e71c13fe74d16e9" />
-        <rom loadflag="load32_byte" name="c4.bin" offset="0x000003" size="0x100000" crc="7ad48b28" sha1="27e65d948f08c231107cb1a810e2b06731091fc3" />
-        <rom loadflag="load32_byte" name="c5.bin" offset="0x400000" size="0x080000" crc="5bdaf9ca" sha1="60620d42ac6cd0e5da019fede2814a2f4171ff3f" />
-        <rom loadflag="load32_byte" name="c6.bin" offset="0x400002" size="0x080000" crc="21d4be8c" sha1="f1b19d37d52d21584f304b7d37d5c096b58219d6" />
-        <rom loadflag="load32_byte" name="c7.bin" offset="0x400001" size="0x080000" crc="da55fd00" sha1="52804f955597591fdd1d7478dc340b36d3c08c4a" />
-        <rom loadflag="load32_byte" name="c8.bin" offset="0x400003" size="0x080000" crc="592e9267" sha1="0d27de59970ccbcaa1d47909ea3d741ffb0d9e07" />
+        <rom loadflag="load32_byte" name="proto_039-c1.c1" offset="0x000000" size="0x100000" crc="7192a787" sha1="7bef6ce79c618103485480aee3c6f856968eb51f" />
+        <rom loadflag="load32_byte" name="proto_039-c2.c2" offset="0x000002" size="0x100000" crc="7157eca1" sha1="65f36c6a3834775b04076d2c38a6047bffe9a8cf" />
+        <rom loadflag="load32_byte" name="proto_039-c3.c3" offset="0x000001" size="0x100000" crc="11d75727" sha1="5a4c7b5ca3f1195e7853b45c5e71c13fe74d16e9" />
+        <rom loadflag="load32_byte" name="proto_039-c4.c4" offset="0x000003" size="0x100000" crc="7ad48b28" sha1="27e65d948f08c231107cb1a810e2b06731091fc3" />
+        <rom loadflag="load32_byte" name="proto_039-c5.c5" offset="0x400000" size="0x080000" crc="5bdaf9ca" sha1="60620d42ac6cd0e5da019fede2814a2f4171ff3f" />
+        <rom loadflag="load32_byte" name="proto_039-c6.c6" offset="0x400002" size="0x080000" crc="21d4be8c" sha1="f1b19d37d52d21584f304b7d37d5c096b58219d6" />
+        <rom loadflag="load32_byte" name="proto_039-c7.c7" offset="0x400001" size="0x080000" crc="da55fd00" sha1="52804f955597591fdd1d7478dc340b36d3c08c4a" />
+        <rom loadflag="load32_byte" name="proto_039-c8.c8" offset="0x400003" size="0x080000" crc="592e9267" sha1="0d27de59970ccbcaa1d47909ea3d741ffb0d9e07" />
       </dataarea>
     </part>
   </software>
-
-
 
   <!--***************************************
  ID-0040
@@ -2492,8 +2490,9 @@
 
   <!--***************************************
  ID-0051
- . ??M-051
- . ??H-051
+ . AIM-051
+ NEO-MVS PROG-G2 / NEO-MVS CHA42G-1
+ . AIH-051
 ***************************************-->
 
   <software name="viewpoin">
@@ -2506,22 +2505,23 @@
     <sharedfeat name="aescompatible" value="yes" />
     <part name="cart" interface="neo_cart">
       <dataarea name="maincpu" size="0x100000">
-        <rom loadflag="load16_word_swap" name="051-p1.p1" offset="0x000000" size="0x100000" crc="17aa899d" sha1="674cd8ace7acdf4f407de741e3d0071bcb49c902" />
+        <rom loadflag="load16_word_swap" name="051-p1.p1" offset="0x000000" size="0x100000" crc="17aa899d" sha1="674cd8ace7acdf4f407de741e3d0071bcb49c902" />        <!-- CXK388002 -->
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="051-s1.s1" crc="9fea5758" sha1="5c6f01da89f2639cf741ee7c39e27023b8083052" />
+        <rom offset="0x000000" size="0x020000" name="051-s1.s1" crc="9fea5758" sha1="5c6f01da89f2639cf741ee7c39e27023b8083052" />        <!-- CXK381000 -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="051-m1.m1" crc="8e69f29a" sha1="7a25f4997996434ea1b7d0d1ca9e7aaf966cbd03" />
+        <rom offset="0x000000" size="0x020000" name="051-m1.m1" crc="8e69f29a" sha1="7a25f4997996434ea1b7d0d1ca9e7aaf966cbd03" />        <!-- CXK381003 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x400000">
-        <rom name="051-v2.v2" offset="0x000000" size="0x200000" crc="019978b6" sha1="7896a551115fc6ed38b5944e0c8dcb2b2c1c077d" />
-        <rom name="051-v4.v4" offset="0x200000" size="0x200000" crc="5758f38c" sha1="da10f4b7d22d9139bbf068bd940be82168a74ca1" />
+      <!-- What board was originally used (labels 051-V2 and 051-V4)? MVS is twice confirmed on NEO-MVS PROG-G2 -->
+        <rom name="051-v2.v1" offset="0x000000" size="0x200000" crc="019978b6" sha1="7896a551115fc6ed38b5944e0c8dcb2b2c1c077d" />        <!-- CXK381600 -->
+        <rom name="051-v4.v2" offset="0x200000" size="0x200000" crc="5758f38c" sha1="da10f4b7d22d9139bbf068bd940be82168a74ca1" />        <!-- CXK381600 -->
       </dataarea>
       <dataarea name="sprites" size="0x600000">
-        <rom loadflag="load16_byte" name="051-c1.c1" offset="0x000000" size="0x100000" crc="d624c132" sha1="49c7e9f020cba45d7083b45252bcc03397f8c286" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="051-c1.c1" offset="0x000000" size="0x100000" crc="d624c132" sha1="49c7e9f020cba45d7083b45252bcc03397f8c286" />        <!-- Plane 0,1 -->        <!-- CXK381600 -->
         <rom size="0x100000" offset="0x400000" loadflag="continue" />
-        <rom loadflag="load16_byte" name="051-c2.c2" offset="0x000001" size="0x100000" crc="40d69f1e" sha1="ec4a13582772594957f927622d50f54b0dfcd8d8" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="051-c2.c2" offset="0x000001" size="0x100000" crc="40d69f1e" sha1="ec4a13582772594957f927622d50f54b0dfcd8d8" />        <!-- Plane 2,3 -->        <!-- CXK381600 -->
         <rom size="0x100000" offset="0x400001" loadflag="continue" />
       </dataarea>
     </part>
@@ -2944,9 +2944,9 @@
 
   <!--***************************************
  ID-0059
- . ??M-059
+ . NGM-059
  NEO-MVS PROGTOP / NEO-MVS CHA256
- . ??H-059
+ . NGH-059
 ***************************************-->
 
   <software name="savagere">
@@ -3801,6 +3801,7 @@
     <sharedfeat name="mvscompatible" value="yes" />
     <sharedfeat name="aescompatible" value="yes" />
     <part name="cart" interface="neo_cart">
+      <!-- MVS AND AES VERSION -->
       <dataarea name="maincpu" size="0x100000">
         <rom loadflag="load16_word_swap" name="080-p1.p1" offset="0x000000" size="0x100000" crc="4440315e" sha1="f4adba8e341d64a1f6280dfd98ebf6918c00608d" />        <!-- mask rom TC538200 -->
       </dataarea>
@@ -5409,23 +5410,23 @@
     <part name="cart" interface="neo_cart">
       <!-- MVS ONLY RELEASE -->
       <dataarea name="maincpu" size="0x200000">
-        <rom loadflag="load16_word_swap" name="219-p1.p1" offset="0x100000" size="0x100000" crc="6af0e574" sha1="c3f0fed0d942e48c99c80b1713f271c033ce0f4f" />
+        <rom loadflag="load16_word_swap" name="219-p1.p1" offset="0x100000" size="0x100000" crc="6af0e574" sha1="c3f0fed0d942e48c99c80b1713f271c033ce0f4f" />        <!-- TC5316200 -->
         <rom size="0x100000" offset="0x000000" loadflag="continue" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="219-s1.s1" crc="002f3c88" sha1="a8a5bbc5397c8ae9858e38997ebdc713b7b4f50a" />
+        <rom offset="0x000000" size="0x020000" name="219-s1.s1" crc="002f3c88" sha1="a8a5bbc5397c8ae9858e38997ebdc713b7b4f50a" />        <!-- TC531000 -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="219-m1.m1" crc="958efdc8" sha1="aacc6056b1ff48cde8f241a11a27473cfb4b4aa3" />
+        <rom offset="0x000000" size="0x020000" name="219-m1.m1" crc="958efdc8" sha1="aacc6056b1ff48cde8f241a11a27473cfb4b4aa3" />        <!-- TC531001 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x400000">
-        <rom name="219-v1.v1" offset="0x000000" size="0x400000" crc="d0ae33d9" sha1="cb21a91184d9d84ff25ca86c00dcadfc210272a8" />
+        <rom name="219-v1.v1" offset="0x000000" size="0x400000" crc="d0ae33d9" sha1="cb21a91184d9d84ff25ca86c00dcadfc210272a8" />        <!-- TC5332204 -->
       </dataarea>
       <dataarea name="sprites" size="0xc00000">
-        <rom loadflag="load16_byte" name="219-c1.c1" offset="0x000000" size="0x400000" crc="67fec4dc" sha1="b99767972a2a4fce2b704df8d08e6b092665a696" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="219-c2.c2" offset="0x000001" size="0x400000" crc="86ed01f2" sha1="9d7d1493946e8fbbd572503d2362b0156c023b76" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="219-c3.c3" offset="0x800000" size="0x200000" crc="5fdad0a5" sha1="56f6d2a7224aa4e82a1858079f918e85cadbd6c2" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="219-c4.c4" offset="0x800001" size="0x200000" crc="f57b4a1c" sha1="875ca69afbc5304ec23f4bc9186abe92f477f6c8" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="219-c1.c1" offset="0x000000" size="0x400000" crc="67fec4dc" sha1="b99767972a2a4fce2b704df8d08e6b092665a696" />        <!-- Plane 0,1 -->        <!-- TC5332205 -->
+        <rom loadflag="load16_byte" name="219-c2.c2" offset="0x000001" size="0x400000" crc="86ed01f2" sha1="9d7d1493946e8fbbd572503d2362b0156c023b76" />        <!-- Plane 2,3 -->        <!-- TC5332205 -->
+        <rom loadflag="load16_byte" name="219-c3.c3" offset="0x800000" size="0x200000" crc="5fdad0a5" sha1="56f6d2a7224aa4e82a1858079f918e85cadbd6c2" />        <!-- Plane 0,1 -->        <!-- TC5316200 -->
+        <rom loadflag="load16_byte" name="219-c4.c4" offset="0x800001" size="0x200000" crc="f57b4a1c" sha1="875ca69afbc5304ec23f4bc9186abe92f477f6c8" />        <!-- Plane 2,3 -->        <!-- TC5316200 -->
       </dataarea>
     </part>
   </software>
@@ -5446,23 +5447,23 @@
     <part name="cart" interface="neo_cart">
       <!-- Prototype - crcs should match the ones of the unreleased dump. -->
       <dataarea name="maincpu" size="0x200000">
-        <rom loadflag="load16_word_swap" name="220-p1p.p1" offset="0x100000" size="0x100000" crc="62a942c6" sha1="12aaa7d9bd84328d1bf4610e056b5c57d0252537" />
+        <rom loadflag="load16_word_swap" name="proto_220-p1.p1" offset="0x100000" size="0x100000" crc="62a942c6" sha1="12aaa7d9bd84328d1bf4610e056b5c57d0252537" />
         <rom size="0x100000" offset="0x000000" loadflag="continue" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="220-s1p.s1" crc="372fe217" sha1="493433e682f519bf647e1481c8bdd3a980830ffb" />
+        <rom offset="0x000000" size="0x020000" name="proto_220-s1.s1" crc="372fe217" sha1="493433e682f519bf647e1481c8bdd3a980830ffb" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="220-m1p.m1" crc="3a08bb63" sha1="d8fbbf42a006ccafc3cd99808d28c82dbaac4590" />
+        <rom offset="0x000000" size="0x020000" name="proto_220-m1.m1" crc="3a08bb63" sha1="d8fbbf42a006ccafc3cd99808d28c82dbaac4590" />
       </dataarea>
       <dataarea name="ymsnd" size="0x400000">
-        <rom name="220-v1p.v1" offset="0x000000" size="0x400000" crc="8f30a215" sha1="0ee866a468c4c3608d55df2b5cb9243c8016d77c" />
+        <rom name="proto_220-v1.v1" offset="0x000000" size="0x400000" crc="8f30a215" sha1="0ee866a468c4c3608d55df2b5cb9243c8016d77c" />
       </dataarea>
       <dataarea name="sprites" size="0x1000000">
-        <rom loadflag="load16_byte" name="220-c1p.c1" offset="0x000000" size="0x400000" crc="9aa2b7dc" sha1="6b3dff292c86f949890b1f8201bc5278f38c2668" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="220-c2p.c2" offset="0x000001" size="0x400000" crc="8a2ad708" sha1="9568ac4cc0552e7fd3e50d3cd8d9f0f4fe7df1d4" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="220-c3p.c3" offset="0x800000" size="0x400000" crc="d67fb15a" sha1="842971aeaf3c92e70f7c653bbf29058bc60f5b71" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="220-c4p.c4" offset="0x800001" size="0x400000" crc="e73ea38b" sha1="27138d588e61e86c292f12d16e36c3681075c607" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_220-c1.c1" offset="0x000000" size="0x400000" crc="9aa2b7dc" sha1="6b3dff292c86f949890b1f8201bc5278f38c2668" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_220-c2.c2" offset="0x000001" size="0x400000" crc="8a2ad708" sha1="9568ac4cc0552e7fd3e50d3cd8d9f0f4fe7df1d4" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_220-c3.c3" offset="0x800000" size="0x400000" crc="d67fb15a" sha1="842971aeaf3c92e70f7c653bbf29058bc60f5b71" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_220-c4.c4" offset="0x800001" size="0x400000" crc="e73ea38b" sha1="27138d588e61e86c292f12d16e36c3681075c607" />        <!-- Plane 2,3 -->
       </dataarea>
     </part>
   </software>
@@ -5478,23 +5479,23 @@
     <part name="cart" interface="neo_cart">
       <!-- Prototype - bootleg/hack based on later release. -->
       <dataarea name="maincpu" size="0x200000">
-        <rom loadflag="load16_word_swap" name="220-p1po.p1" offset="0x100000" size="0x100000" crc="ce37e3a0" sha1="488f95fa15f56eea6666dda13d96ec29dba18e19" />
+        <rom loadflag="load16_word_swap" name="proto_220-p1o.p1" offset="0x100000" size="0x100000" crc="ce37e3a0" sha1="488f95fa15f56eea6666dda13d96ec29dba18e19" />
         <rom size="0x100000" offset="0x000000" loadflag="continue" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="220-s1p.s1" crc="372fe217" sha1="493433e682f519bf647e1481c8bdd3a980830ffb" />
+        <rom offset="0x000000" size="0x020000" name="proto_220-s1.s1" crc="372fe217" sha1="493433e682f519bf647e1481c8bdd3a980830ffb" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="220-m1p.m1" crc="3a08bb63" sha1="d8fbbf42a006ccafc3cd99808d28c82dbaac4590" />
+        <rom offset="0x000000" size="0x020000" name="proto_220-m1.m1" crc="3a08bb63" sha1="d8fbbf42a006ccafc3cd99808d28c82dbaac4590" />
       </dataarea>
       <dataarea name="ymsnd" size="0x400000">
-        <rom name="220-v1p.v1" offset="0x000000" size="0x400000" crc="8f30a215" sha1="0ee866a468c4c3608d55df2b5cb9243c8016d77c" />
+        <rom name="proto_220-v1.v1" offset="0x000000" size="0x400000" crc="8f30a215" sha1="0ee866a468c4c3608d55df2b5cb9243c8016d77c" />
       </dataarea>
       <dataarea name="sprites" size="0x1000000">
-        <rom loadflag="load16_byte" name="220-c1p.c1" offset="0x000000" size="0x400000" crc="9aa2b7dc" sha1="6b3dff292c86f949890b1f8201bc5278f38c2668" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="220-c2p.c2" offset="0x000001" size="0x400000" crc="8a2ad708" sha1="9568ac4cc0552e7fd3e50d3cd8d9f0f4fe7df1d4" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="220-c3p.c3" offset="0x800000" size="0x400000" crc="d67fb15a" sha1="842971aeaf3c92e70f7c653bbf29058bc60f5b71" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="220-c4p.c4" offset="0x800001" size="0x400000" crc="e73ea38b" sha1="27138d588e61e86c292f12d16e36c3681075c607" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_220-c1.c1" offset="0x000000" size="0x400000" crc="9aa2b7dc" sha1="6b3dff292c86f949890b1f8201bc5278f38c2668" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_220-c2.c2" offset="0x000001" size="0x400000" crc="8a2ad708" sha1="9568ac4cc0552e7fd3e50d3cd8d9f0f4fe7df1d4" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_220-c3.c3" offset="0x800000" size="0x400000" crc="d67fb15a" sha1="842971aeaf3c92e70f7c653bbf29058bc60f5b71" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_220-c4.c4" offset="0x800001" size="0x400000" crc="e73ea38b" sha1="27138d588e61e86c292f12d16e36c3681075c607" />        <!-- Plane 2,3 -->
       </dataarea>
     </part>
   </software>
@@ -5841,20 +5842,20 @@
     <part name="cart" interface="neo_cart">
       <!-- Prototype -->
       <dataarea name="maincpu" size="0x100000">
-        <rom loadflag="load16_word_swap" name="228-p1p.p1" offset="0x000000" size="0x100000" crc="6033172e" sha1="f57fb706aa8dd9e5f9e992a5d35c1799578b59f8" />
+        <rom loadflag="load16_word_swap" name="proto_228-p1.p1" offset="0x000000" size="0x100000" crc="6033172e" sha1="f57fb706aa8dd9e5f9e992a5d35c1799578b59f8" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="228-s1p.s1" crc="83c24e81" sha1="585ef209d8bfc23bdccc1f37d8b764eeedfedc1c" />
+        <rom offset="0x000000" size="0x020000" name="proto_228-s1.s1" crc="83c24e81" sha1="585ef209d8bfc23bdccc1f37d8b764eeedfedc1c" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="228-m1p.m1" crc="fd833b33" sha1="ab6c218c42cba821654cbdae154efecb69f844f6" />
+        <rom offset="0x000000" size="0x020000" name="proto_228-m1.m1" crc="fd833b33" sha1="ab6c218c42cba821654cbdae154efecb69f844f6" />
       </dataarea>
       <dataarea name="ymsnd" size="0x200000">
-        <rom name="228-v1p.v1" offset="0x000000" size="0x200000" crc="c603fce6" sha1="5a866471d35895b2ae13cbd5d1cb41bf2e72e1b8" />
+        <rom name="proto_228-v1.v1" offset="0x000000" size="0x200000" crc="c603fce6" sha1="5a866471d35895b2ae13cbd5d1cb41bf2e72e1b8" />
       </dataarea>
       <dataarea name="sprites" size="0x800000">
-        <rom loadflag="load16_byte" name="228-c1p.c1" offset="0x000000" size="0x400000" crc="bfc99efe" sha1="5cd2545310142080b8286e787cf5b859f627b3db" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="228-c2p.c2" offset="0x000001" size="0x400000" crc="69788082" sha1="c3ecb42ddcbd9e16d0018a0c3adb56a911d813ca" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_228-c1.c1" offset="0x000000" size="0x400000" crc="bfc99efe" sha1="5cd2545310142080b8286e787cf5b859f627b3db" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_228-c2.c2" offset="0x000001" size="0x400000" crc="69788082" sha1="c3ecb42ddcbd9e16d0018a0c3adb56a911d813ca" />        <!-- Plane 2,3 -->
       </dataarea>
     </part>
   </software>
@@ -6377,9 +6378,9 @@
 
   <!--***************************************
  ID-0239
- . ??M-2390
+ . NGM-2390
  NEO-MVS PROGBK1 / NEO-MVS CHA512Y
- . ??H-2390
+ . NGH-2390
 ***************************************-->
 
   <software name="blazstar">
@@ -7271,12 +7272,12 @@
     <part name="cart" interface="neo_cart">
       <!-- Prototype Version - Possibly Hacked -->
       <dataarea name="maincpu" size="0x500000">
-        <rom loadflag="load16_word_swap" name="251-p1p.p1" offset="0x000000" size="0x100000" crc="f37929c4" sha1="226e7e3d629568399b88275e5bcd4e5b3839be95" />
-        <rom loadflag="load16_word_swap" name="251-p2p.p2" offset="0x100000" size="0x400000" crc="739742ad" sha1="31acaf05a9bf186305888d3db7e4e8a83f7bb0a4" />
+        <rom loadflag="load16_word_swap" name="proto_251-p1.p1" offset="0x000000" size="0x100000" crc="f37929c4" sha1="226e7e3d629568399b88275e5bcd4e5b3839be95" />
+        <rom loadflag="load16_word_swap" name="proto_251-p2.p2" offset="0x100000" size="0x400000" crc="739742ad" sha1="31acaf05a9bf186305888d3db7e4e8a83f7bb0a4" />
       </dataarea>
       <!-- This is the S1 from the prototype, the final is different -->
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="251-s1p.s1" crc="fb1498ed" sha1="d40060b31b6f217a4abdf3b336439fcd7bd7aaef" />
+        <rom offset="0x000000" size="0x020000" name="proto_251-s1.s1" crc="fb1498ed" sha1="d40060b31b6f217a4abdf3b336439fcd7bd7aaef" />
       </dataarea>
       <!-- Did the Prototype really use the same sound program / voice roms, sound isn't great .. -->
       <dataarea name="audiocpu" size="0x020000">
@@ -7290,14 +7291,14 @@
       </dataarea>
       <dataarea name="sprites" size="0x4000000">
         <!-- these are probably decrypted versions of the roms found in the final -->
-        <rom loadflag="load16_byte" name="251-c1p.c1" offset="0x000000" size="0x800000" crc="e5d8ffa4" sha1="65f15f9f02424a7a9dd35916166594f283e8d424" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="251-c2p.c2" offset="0x000001" size="0x800000" crc="d822778f" sha1="b590055e9bf1549bd6e1ecdabd65702202615712" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="251-c3p.c3" offset="0x1000000" size="0x800000" crc="f20959e8" sha1="38293043fa77ac51c5e3191118874c58f1ae4d30" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="251-c4p.c4" offset="0x1000001" size="0x800000" crc="54ffbe9f" sha1="8e62442923551f07a552621951b1accab2830e3b" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="251-c5p.c5" offset="0x2000000" size="0x800000" crc="d87a3bbc" sha1="430f6812088712e0eb5714dcc664d8bba75e921a" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="251-c6p.c6" offset="0x2000001" size="0x800000" crc="4d40a691" sha1="2b580d0678a5e6033ef16130671e860364d35e56" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="251-c7p.c7" offset="0x3000000" size="0x800000" crc="a4479a58" sha1="d50e6cc9ccfe1ddbc6d90d46b8ca2cb0304edd8c" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="251-c8p.c8" offset="0x3000001" size="0x800000" crc="ead513ce" sha1="e9b07a0b01fdeb3004755a479df059c81b4d0ed6" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_251-c1.c1" offset="0x000000" size="0x800000" crc="e5d8ffa4" sha1="65f15f9f02424a7a9dd35916166594f283e8d424" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_251-c2.c2" offset="0x000001" size="0x800000" crc="d822778f" sha1="b590055e9bf1549bd6e1ecdabd65702202615712" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_251-c3.c3" offset="0x1000000" size="0x800000" crc="f20959e8" sha1="38293043fa77ac51c5e3191118874c58f1ae4d30" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_251-c4.c4" offset="0x1000001" size="0x800000" crc="54ffbe9f" sha1="8e62442923551f07a552621951b1accab2830e3b" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_251-c5.c5" offset="0x2000000" size="0x800000" crc="d87a3bbc" sha1="430f6812088712e0eb5714dcc664d8bba75e921a" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_251-c6.c6" offset="0x2000001" size="0x800000" crc="4d40a691" sha1="2b580d0678a5e6033ef16130671e860364d35e56" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_251-c7.c7" offset="0x3000000" size="0x800000" crc="a4479a58" sha1="d50e6cc9ccfe1ddbc6d90d46b8ca2cb0304edd8c" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_251-c8.c8" offset="0x3000001" size="0x800000" crc="ead513ce" sha1="e9b07a0b01fdeb3004755a479df059c81b4d0ed6" />        <!-- Plane 2,3 -->
       </dataarea>
     </part>
   </software>
@@ -7450,30 +7451,30 @@
     <part name="cart" interface="neo_cart">
       <!-- Prototype Version, seems genuine -->
       <dataarea name="maincpu" size="0x500000">
-        <rom loadflag="load16_word_swap" name="253-p1p.p1" offset="0x000000" size="0x100000" crc="c72f0c16" sha1="1ff6bb651682f93bef9ff02622c3cf63fe594986" />
-        <rom loadflag="load16_word_swap" name="253-p2p.p2" offset="0x100000" size="0x400000" crc="bf8de565" sha1="0e24574168cd38138bed0aa4dca49849f6901ca2" />
+        <rom loadflag="load16_word_swap" name="proto_253-p1.p1" offset="0x000000" size="0x100000" crc="c72f0c16" sha1="1ff6bb651682f93bef9ff02622c3cf63fe594986" />
+        <rom loadflag="load16_word_swap" name="proto_253-p2.p2" offset="0x100000" size="0x400000" crc="bf8de565" sha1="0e24574168cd38138bed0aa4dca49849f6901ca2" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="253-s1p.s1" crc="779989de" sha1="8bd550857b60f8a907f6d39a4225ceffdd330307" />
+        <rom offset="0x000000" size="0x020000" name="proto_253-s1.s1" crc="779989de" sha1="8bd550857b60f8a907f6d39a4225ceffdd330307" />
       </dataarea>
       <dataarea name="audiocpu" size="0x040000">
-        <rom offset="0x000000" size="0x040000" name="253-m1p.m1" crc="bbe464f7" sha1="f5f8f3e48f5d453f45107085d6f4023bcd24c053" />
+        <rom offset="0x000000" size="0x040000" name="proto_253-m1.m1" crc="bbe464f7" sha1="f5f8f3e48f5d453f45107085d6f4023bcd24c053" />
       </dataarea>
       <dataarea name="ymsnd" size="0x1000000">
-        <rom name="253-v1p.v1" offset="0x000000" size="0x400000" crc="274f3923" sha1="4c7a8ad1cd0e3afc1f78de3c2929120ed434f104" />
-        <rom name="253-v2p.v2" offset="0x400000" size="0x400000" crc="8f86dabe" sha1="b3d2d9f5c1d97a6e7aee2c674fb6627f41bbb240" />
-        <rom name="253-v3p.v3" offset="0x800000" size="0x400000" crc="05fd06cd" sha1="6cd699719614bb87547632ea3d61d92d81fdf563" />
-        <rom name="253-v4p.v4" offset="0xc00000" size="0x400000" crc="14984063" sha1="170d5638327ec0eb3590b80dc11590897367250c" />
+        <rom name="proto_253-v1.v1" offset="0x000000" size="0x400000" crc="274f3923" sha1="4c7a8ad1cd0e3afc1f78de3c2929120ed434f104" />
+        <rom name="proto_253-v2.v2" offset="0x400000" size="0x400000" crc="8f86dabe" sha1="b3d2d9f5c1d97a6e7aee2c674fb6627f41bbb240" />
+        <rom name="proto_253-v3.v3" offset="0x800000" size="0x400000" crc="05fd06cd" sha1="6cd699719614bb87547632ea3d61d92d81fdf563" />
+        <rom name="proto_253-v4.v4" offset="0xc00000" size="0x400000" crc="14984063" sha1="170d5638327ec0eb3590b80dc11590897367250c" />
       </dataarea>
       <dataarea name="sprites" size="0x4000000">
-        <rom loadflag="load16_byte" name="253-c1p.c1" offset="0x000000" size="0x800000" crc="5bb5d137" sha1="d648febd8e6a0bdd9bdbb6ce1f1f8b08567ec05a" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="253-c2p.c2" offset="0x000001" size="0x800000" crc="5c8d2960" sha1="f7503502be0332adf408ee0ea5ee5161c8939fd8" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="253-c3p.c3" offset="0x1000000" size="0x800000" crc="234d16fc" sha1="7b9221f7ecc438150c8a10be72390329854ed21b" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="253-c4p.c4" offset="0x1000001" size="0x800000" crc="b9b5b993" sha1="6059793eaf6e58c172235fe64aa9d25a40c38ed6" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="253-c5p.c5" offset="0x2000000" size="0x800000" crc="722615d2" sha1="798832c535869f0e247c3db0d8253779b103e213" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="253-c6p.c6" offset="0x2000001" size="0x800000" crc="0a6fab38" sha1="eaee6f2f18af91f7959d84d4b991b3fc182d07c4" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="253-c7p.c7" offset="0x3000000" size="0x800000" crc="d68e806f" sha1="92bfd9839115bd590972ae4ecc45ad35dce22387" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="253-c8p.c8" offset="0x3000001" size="0x800000" crc="f778fe99" sha1="c963f6ba90a36d02991728b44ffcf174ca18268a" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_253-c1.c1" offset="0x000000" size="0x800000" crc="5bb5d137" sha1="d648febd8e6a0bdd9bdbb6ce1f1f8b08567ec05a" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_253-c2.c2" offset="0x000001" size="0x800000" crc="5c8d2960" sha1="f7503502be0332adf408ee0ea5ee5161c8939fd8" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_253-c3.c3" offset="0x1000000" size="0x800000" crc="234d16fc" sha1="7b9221f7ecc438150c8a10be72390329854ed21b" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_253-c4.c4" offset="0x1000001" size="0x800000" crc="b9b5b993" sha1="6059793eaf6e58c172235fe64aa9d25a40c38ed6" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_253-c5.c5" offset="0x2000000" size="0x800000" crc="722615d2" sha1="798832c535869f0e247c3db0d8253779b103e213" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_253-c6.c6" offset="0x2000001" size="0x800000" crc="0a6fab38" sha1="eaee6f2f18af91f7959d84d4b991b3fc182d07c4" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="proto_253-c7.c7" offset="0x3000000" size="0x800000" crc="d68e806f" sha1="92bfd9839115bd590972ae4ecc45ad35dce22387" />        <!-- Plane 0,1 -->
+        <rom loadflag="load16_byte" name="proto_253-c8.c8" offset="0x3000001" size="0x800000" crc="f778fe99" sha1="c963f6ba90a36d02991728b44ffcf174ca18268a" />        <!-- Plane 2,3 -->
       </dataarea>
     </part>
   </software>

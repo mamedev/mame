@@ -811,6 +811,7 @@
 
 /*
     About supported sets:
+    =====================
 
     MVS carts (arcade) were released before the AES carts (home)
     The actual codepath taken depends entirely on the BIOS rom, not the roms in the cartridge, which (with
@@ -834,6 +835,7 @@
 
 
     M1 (sound driver) rom information:
+    ==================================
     . Many 'M1' roms contain mirrored data (64k mirrored or 128k mirrored).
     . Found on several early sets (ID 0001 ~ 0045) and on the last sets (ID 0267 ~ 0272).
     . This caused some confusion and incorrect rom sizes.
@@ -842,11 +844,13 @@
 
 
     S1 (text layer) rom information:
+    ================================
     . All 'S1' roms found on prom are 1mbit.
     . The remainig 64k 'S1' are marked BAD_DUMP.
 
 
     MULTI PLAY MODE:
+    ================
     The NeoGeo has three games which support MULTI PLAY MODE (Riding Hero / League Bowling / Trash Rally).
     This allows you to 'link' 4 games (MVS) / 2 games (AES) using in game 'Multi-Play' option. To establish
     a link between the carts you have to connect the carts to each other by a communicator cable. The communicatior
@@ -865,6 +869,42 @@
     CABINET 2:        OFF ON  ON
     CABINET 3:        ON  OFF ON
     CABINET 4:        ON  ON  ON
+
+
+    SPHERO SYMPHONY:
+    ================
+    Several early games have a 'feature' called "sphero symphony". None of the games featuring "sphero symphony"
+    uses special hardware. It is something sound based, but what exactly it is (specially arragend samples,
+    FM synthesis etc.) is unknown. The AES and MVS releases share the same sound data and driver.
+    
+    The AES game-inserts and manuals have an eye-shaped logo with the following text (not to be found on MVS sets):
+    sphero
+    symphony
+    STEREOPHONIC SOUND
+    
+    Experience this "LIVE" 3 dimensional sound coming from all around you.
+    
+    Games featuring "sphero symphony":
+    ID-0006 - Riding Hero
+    ID-0007 - Alpha Mission II / ASO II - Last Guardian
+    ID-0009 - Ninja Combat
+    ID-0010 - Cyber-Lip
+    ID-0011 - The Super Spy
+    ID-0014 - Mutation Nation
+    ID-0017 - Sengoku / Sengoku Denshou
+    ID-0018 - Burning Fight
+    ID-0020 - Ghost Pilots
+    ID-0024 - Last Resort
+    ID-0031 - Soccer Brawl
+    ID-0033 - Fatal Fury - King of Fighters / Garou Densetsu - shukumei no tatakai
+    ID-0034 - Football Frenzy
+    ID-0037 - Crossed Swords
+    ID-0038 - Thrash Rally
+    ID-0039 - King of the Monsters 2 - The Next Thing
+    ID-0041 - Baseball Stars 2
+    ID-0044 - Art of Fighting / Ryuuko no Ken
+    ID-0047 - Fatal Fury 2 / Garou Densetsu 2 - arata-naru tatakai
+    ID-0049 - Andro Dunos
 
 */
 
@@ -1214,33 +1254,32 @@ ROM_END
 
 ROM_START( alpham2p ) /* early prototype - all roms were hand labeled with CRCs, dumps verified against them */
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "proto_007-p1.bin", 0x000001, 0x080000, CRC(c763e52a) SHA1(b24acbac255c5ee1a2e92e77cdde6620a24081cf) )
-	ROM_LOAD16_BYTE( "proto_007-p2.bin", 0x000000, 0x080000, CRC(7a0b435c) SHA1(40e6f42a92001d9f4e51898dd7489da143b6b74b) )
+	ROM_LOAD16_BYTE( "proto_007-p1.p1", 0x000001, 0x080000, CRC(c763e52a) SHA1(b24acbac255c5ee1a2e92e77cdde6620a24081cf) )
+	ROM_LOAD16_BYTE( "proto_007-p2.p2", 0x000000, 0x080000, CRC(7a0b435c) SHA1(40e6f42a92001d9f4e51898dd7489da143b6b74b) )
 
-	NEO_SFIX_128K( "proto_007-s1.bin", CRC(efc9ae2e) SHA1(a594826b0082fe5a13191673e8d9aa42517230f5) )
+	NEO_SFIX_128K( "proto_007-s1.s1", CRC(efc9ae2e) SHA1(a594826b0082fe5a13191673e8d9aa42517230f5) )
 
-	NEO_BIOS_AUDIO_128K( "proto_007-m1.bin", CRC(5976b464) SHA1(ec824567ecc3579f6d86c9d9385710cbaeef16a3) )
+	NEO_BIOS_AUDIO_128K( "proto_007-m1.m1", CRC(5976b464) SHA1(ec824567ecc3579f6d86c9d9385710cbaeef16a3) )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
-	ROM_LOAD( "proto_007-v11.bin", 0x000000, 0x080000, CRC(18eaa9e1) SHA1(85c94d8660f8a32e4ca8e015f0bd704208482d68) )
-	ROM_LOAD( "proto_007-v12.bin", 0x080000, 0x080000, CRC(2487d495) SHA1(49af3c4dc6a38c5158d3641fd8f9a40041b42aa6) )
-	ROM_LOAD( "proto_007-v13.bin", 0x100000, 0x080000, CRC(25e60f25) SHA1(d06b0df872372de38fcf90187195070ac5f8c651) )
-	ROM_LOAD( "proto_007-v21.bin", 0x180000, 0x080000, CRC(ac44b75a) SHA1(7399a05cd4e2c7ecde4a7323d3e189255afe5fc2) )
+	ROM_LOAD( "proto_007-v11.v11", 0x000000, 0x080000, CRC(18eaa9e1) SHA1(85c94d8660f8a32e4ca8e015f0bd704208482d68) )
+	ROM_LOAD( "proto_007-v12.v12", 0x080000, 0x080000, CRC(2487d495) SHA1(49af3c4dc6a38c5158d3641fd8f9a40041b42aa6) )
+	ROM_LOAD( "proto_007-v13.v13", 0x100000, 0x080000, CRC(25e60f25) SHA1(d06b0df872372de38fcf90187195070ac5f8c651) )
+	ROM_LOAD( "proto_007-v21.v21", 0x180000, 0x080000, CRC(ac44b75a) SHA1(7399a05cd4e2c7ecde4a7323d3e189255afe5fc2) )
 
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )
 	ROM_COPY( "ymsnd", 0x180000, 0x00000, 0x80000 )
 
 	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
-	ROM_LOAD32_BYTE( "proto_007-c1.bin", 0x000000, 0x80000, CRC(24841639) SHA1(fcc2a349121dad86ffefc44b9f0e8ba616ce0d30) )
-	ROM_LOAD32_BYTE( "proto_007-c2.bin", 0x000002, 0x80000, CRC(912763ab) SHA1(cedf26d7d85ad140399ee62813c71f35e65498d6) )
-	ROM_LOAD32_BYTE( "proto_007-c3.bin", 0x000001, 0x80000, CRC(0743bde2) SHA1(0d13ad6333909ad3cf10f9ac360f9abf191318de) )
-	ROM_LOAD32_BYTE( "proto_007-c4.bin", 0x000003, 0x80000, CRC(61240212) SHA1(dee36f6604adaeb96e0d761a7256241c066b1cd2) )
-	ROM_LOAD32_BYTE( "proto_007-c5.bin", 0x200000, 0x80000, CRC(cf9f4c53) SHA1(f979c85f83d9f76e554c2617f85f6d4efca6799c) )
-	ROM_LOAD32_BYTE( "proto_007-c6.bin", 0x200002, 0x80000, CRC(3d903b19) SHA1(001a8c762336b855fe1df69fe2e605d30a3f00a1) )
-	ROM_LOAD32_BYTE( "proto_007-c7.bin", 0x200001, 0x80000, CRC(e41e3875) SHA1(730aceb8a66cb33d0194b096568f053ad7dc000a) )
-	ROM_LOAD32_BYTE( "proto_007-c8.bin", 0x200003, 0x80000, CRC(4483e2cf) SHA1(47c3364f5c36ae9dc3a49fe37ca60bcee0e73314) )
+	ROM_LOAD32_BYTE( "proto_007-c1.c1", 0x000000, 0x80000, CRC(24841639) SHA1(fcc2a349121dad86ffefc44b9f0e8ba616ce0d30) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "proto_007-c2.c2", 0x000002, 0x80000, CRC(912763ab) SHA1(cedf26d7d85ad140399ee62813c71f35e65498d6) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "proto_007-c3.c3", 0x000001, 0x80000, CRC(0743bde2) SHA1(0d13ad6333909ad3cf10f9ac360f9abf191318de) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "proto_007-c4.c4", 0x000003, 0x80000, CRC(61240212) SHA1(dee36f6604adaeb96e0d761a7256241c066b1cd2) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "proto_007-c5.c5", 0x200000, 0x80000, CRC(cf9f4c53) SHA1(f979c85f83d9f76e554c2617f85f6d4efca6799c) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "proto_007-c6.c6", 0x200002, 0x80000, CRC(3d903b19) SHA1(001a8c762336b855fe1df69fe2e605d30a3f00a1) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "proto_007-c7.c7", 0x200001, 0x80000, CRC(e41e3875) SHA1(730aceb8a66cb33d0194b096568f053ad7dc000a) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "proto_007-c8.c8", 0x200003, 0x80000, CRC(4483e2cf) SHA1(47c3364f5c36ae9dc3a49fe37ca60bcee0e73314) ) /* Plane 3 */
 ROM_END
-
 
 /****************************************
  ID-0008
@@ -1573,30 +1612,30 @@ ROM_END
 
 ROM_START( burningfp ) /* early prototype - all roms were hand labeled with CRCs, dumps verified against them */
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "proto_018.p1", 0x000001, 0x080000, CRC(5b4032e7) SHA1(55df91dad6f484d3d49c28ab5972700bf71a8662) )
-	ROM_LOAD16_BYTE( "proto_018.p2", 0x000000, 0x080000, CRC(78762f68) SHA1(12170fc6efe75cb5d32624033d3d341032c97548) )
+	ROM_LOAD16_BYTE( "proto_018-p1.p1", 0x000001, 0x080000, CRC(5b4032e7) SHA1(55df91dad6f484d3d49c28ab5972700bf71a8662) )
+	ROM_LOAD16_BYTE( "proto_018-p2.p2", 0x000000, 0x080000, CRC(78762f68) SHA1(12170fc6efe75cb5d32624033d3d341032c97548) )
 
-	NEO_SFIX_128K( "proto_018.s1", CRC(f3d130e8) SHA1(2fdeb93f4bb2a60d391cac2822be41661b1e1795) )
+	NEO_SFIX_128K( "proto_018-s1.s1", CRC(f3d130e8) SHA1(2fdeb93f4bb2a60d391cac2822be41661b1e1795) )
 
-	NEO_BIOS_AUDIO_128K( "proto_018.m1", CRC(470dd5d4) SHA1(4291811b4aefe45261a1ae3631b6999fcd74fb3f) )
+	NEO_BIOS_AUDIO_128K( "proto_018-m1.m1", CRC(470dd5d4) SHA1(4291811b4aefe45261a1ae3631b6999fcd74fb3f) )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
-	ROM_LOAD( "proto_018.v11", 0x000000, 0x080000, CRC(dc07ea3c) SHA1(c3e71aaec44ead7ddc581565d16b90030e6db5fd) )
-	ROM_LOAD( "proto_018.v12", 0x080000, 0x080000, CRC(f1ae637c) SHA1(02a4c7d4a544350a314ab7b26d8c9d3baa8f5778) )
-	ROM_LOAD( "proto_018.v21", 0x100000, 0x080000, CRC(9f3b4eda) SHA1(7f516923d04daa483b4b99c9babba66505931a34) )
+	ROM_LOAD( "proto_018-v11.v11", 0x000000, 0x080000, CRC(dc07ea3c) SHA1(c3e71aaec44ead7ddc581565d16b90030e6db5fd) )
+	ROM_LOAD( "proto_018-v12.v12", 0x080000, 0x080000, CRC(f1ae637c) SHA1(02a4c7d4a544350a314ab7b26d8c9d3baa8f5778) )
+	ROM_LOAD( "proto_018-v21.v21", 0x100000, 0x080000, CRC(9f3b4eda) SHA1(7f516923d04daa483b4b99c9babba66505931a34) )
 
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )
 	ROM_COPY( "ymsnd", 0x100000, 0x00000, 0x80000 )
 
 	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
-	ROM_LOAD32_BYTE( "proto_018.c1", 0x000000, 0x80000, CRC(6569018b) SHA1(25040e0a9c2b72900100a22a2a41de5f6c339d8a) )
-	ROM_LOAD32_BYTE( "proto_018.c2", 0x000002, 0x80000, CRC(6949b501) SHA1(d8ee48837faff6cc849046ee8757b2b94d440303) )
-	ROM_LOAD32_BYTE( "proto_018.c3", 0x000001, 0x80000, CRC(410f653b) SHA1(ce94667721baa7b2c318fc268e3bb9209671c9f5) )
-	ROM_LOAD32_BYTE( "proto_018.c4", 0x000003, 0x80000, CRC(d43bf2a5) SHA1(c27985d8973611d02570f469a0d8cb4f5b63b614) )
-	ROM_LOAD32_BYTE( "proto_018.c5", 0x200000, 0x80000, CRC(837d09d3) SHA1(d3b06931fca6123604549599544b04529ef34c53) )
-	ROM_LOAD32_BYTE( "proto_018.c6", 0x200002, 0x80000, CRC(5fee51e7) SHA1(835c632fa12a1d5b4104cd80b8f686ac80b314a1) )
-	ROM_LOAD32_BYTE( "proto_018.c7", 0x200001, 0x80000, CRC(0f3f0823) SHA1(ec1d681c1795de43d20f30f85956e2473ec39c95) )
-	ROM_LOAD32_BYTE( "proto_018.c8", 0x200003, 0x80000, CRC(67cc9e34) SHA1(dc72a464c1456a4d2f7b992b416a984fb7885e99) )
+	ROM_LOAD32_BYTE( "proto_018-c1.c1", 0x000000, 0x80000, CRC(6569018b) SHA1(25040e0a9c2b72900100a22a2a41de5f6c339d8a) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "proto_018-c2.c2", 0x000002, 0x80000, CRC(6949b501) SHA1(d8ee48837faff6cc849046ee8757b2b94d440303) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "proto_018-c3.c3", 0x000001, 0x80000, CRC(410f653b) SHA1(ce94667721baa7b2c318fc268e3bb9209671c9f5) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "proto_018-c4.c4", 0x000003, 0x80000, CRC(d43bf2a5) SHA1(c27985d8973611d02570f469a0d8cb4f5b63b614) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "proto_018-c5.c5", 0x200000, 0x80000, CRC(837d09d3) SHA1(d3b06931fca6123604549599544b04529ef34c53) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "proto_018-c6.c6", 0x200002, 0x80000, CRC(5fee51e7) SHA1(835c632fa12a1d5b4104cd80b8f686ac80b314a1) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "proto_018-c7.c7", 0x200001, 0x80000, CRC(0f3f0823) SHA1(ec1d681c1795de43d20f30f85956e2473ec39c95) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "proto_018-c8.c8", 0x200003, 0x80000, CRC(67cc9e34) SHA1(dc72a464c1456a4d2f7b992b416a984fb7885e99) ) /* Plane 3 */
 ROM_END
 
 
@@ -2271,40 +2310,37 @@ ROM_START( kotm2 ) /* MVS AND AES VERSION */
 	ROM_LOAD16_BYTE( "039-c4.c4", 0x200001, 0x080000, CRC(81c9c250) SHA1(e3a34ff69081a8681b5ca895915892dcdccfa7aa) ) /* Plane 2,3 */ /* TC534200 */
 ROM_END
 
-// fairly late prototype release, only the code differs from the main set
-ROM_START( kotm2p )
+ROM_START( kotm2p ) /* fairly late prototype release, only the code differs from the main set */
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "p1.bin", 0x000001, 0x080000, CRC(3c1d17e7) SHA1(aeaff465fafa46ded903ed4e8cb8cd05de8dc096) )
-	ROM_LOAD16_BYTE( "p2.bin", 0x000000, 0x080000, CRC(bc9691f0) SHA1(3854659b952d4f8c2edd5d59858a61ce6d518604) )
+	ROM_LOAD16_BYTE( "proto_039-p1.p1", 0x000001, 0x080000, CRC(3c1d17e7) SHA1(aeaff465fafa46ded903ed4e8cb8cd05de8dc096) )
+	ROM_LOAD16_BYTE( "proto_039-p2.p2", 0x000000, 0x080000, CRC(bc9691f0) SHA1(3854659b952d4f8c2edd5d59858a61ce6d518604) )
 
-	NEO_SFIX_128K( "s1.bin", CRC(63ee053a) SHA1(7d4b92bd022708975b1470e8f24d1f5a712e1b94) )
+	NEO_SFIX_128K( "039-s1.s1", CRC(63ee053a) SHA1(7d4b92bd022708975b1470e8f24d1f5a712e1b94) ) /* TC531000 */
 
-	NEO_BIOS_AUDIO_128K( "m1.bin", CRC(0c5b2ad5) SHA1(15eb5ea10fecdbdbcfd06225ae6d88bb239592e7) )
+	NEO_BIOS_AUDIO_128K( "039-m1.m1", CRC(0c5b2ad5) SHA1(15eb5ea10fecdbdbcfd06225ae6d88bb239592e7) ) /* TC531001 */
 
 	// same data as main set, but prototype board layout
 	ROM_REGION( 0x300000, "ymsnd", 0 )
-	ROM_LOAD( "v1.bin", 0x000000, 0x080000, CRC(dd3566f1) SHA1(f7c2a3747aaab2bc57cdfa33d8bb9fab057b5214) )
-	ROM_LOAD( "v2.bin", 0x080000, 0x080000, CRC(57f60274) SHA1(7e17740aa05cf7ad4f9084e147600a8eb82c7284) )
-	ROM_LOAD( "v3.bin", 0x100000, 0x080000, CRC(0f008a07) SHA1(ed243a0449232bbea409308c3fec7e057fcd8501) )
-	ROM_LOAD( "v4.bin", 0x180000, 0x080000, CRC(1943d0fe) SHA1(47fb716c76ea6b5fe64204ff6d72b7feea10bda9) )
-	ROM_LOAD( "v5.bin", 0x200000, 0x080000, CRC(13be045b) SHA1(0e3713ae6b164ebae434c0f18c466365b26b9a77) )
-	ROM_LOAD( "v6.bin", 0x280000, 0x080000, CRC(d1dd3fd6) SHA1(052b92168a76cf3a97c8cacebcc3ebab228726df) )
+	ROM_LOAD( "proto_039-v1.v1", 0x000000, 0x080000, CRC(dd3566f1) SHA1(f7c2a3747aaab2bc57cdfa33d8bb9fab057b5214) )
+	ROM_LOAD( "proto_039-v2.v2", 0x080000, 0x080000, CRC(57f60274) SHA1(7e17740aa05cf7ad4f9084e147600a8eb82c7284) )
+	ROM_LOAD( "proto_039-v3.v3", 0x100000, 0x080000, CRC(0f008a07) SHA1(ed243a0449232bbea409308c3fec7e057fcd8501) )
+	ROM_LOAD( "proto_039-v4.v4", 0x180000, 0x080000, CRC(1943d0fe) SHA1(47fb716c76ea6b5fe64204ff6d72b7feea10bda9) )
+	ROM_LOAD( "proto_039-v5.v5", 0x200000, 0x080000, CRC(13be045b) SHA1(0e3713ae6b164ebae434c0f18c466365b26b9a77) )
+	ROM_LOAD( "proto_039-v6.v6", 0x280000, 0x080000, CRC(d1dd3fd6) SHA1(052b92168a76cf3a97c8cacebcc3ebab228726df) )
 
 	NO_DELTAT_REGION
 
 	// same data as main set, but prototype board layout
 	ROM_REGION( 0x600000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
-	ROM_LOAD32_BYTE( "c1.bin", 0x000000, 0x100000, CRC(7192a787) SHA1(7bef6ce79c618103485480aee3c6f856968eb51f) )
-	ROM_LOAD32_BYTE( "c2.bin", 0x000002, 0x100000, CRC(7157eca1) SHA1(65f36c6a3834775b04076d2c38a6047bffe9a8cf) )
-	ROM_LOAD32_BYTE( "c3.bin", 0x000001, 0x100000, CRC(11d75727) SHA1(5a4c7b5ca3f1195e7853b45c5e71c13fe74d16e9) )
-	ROM_LOAD32_BYTE( "c4.bin", 0x000003, 0x100000, CRC(7ad48b28) SHA1(27e65d948f08c231107cb1a810e2b06731091fc3) )
-	ROM_LOAD32_BYTE( "c5.bin", 0x400000, 0x080000, CRC(5bdaf9ca) SHA1(60620d42ac6cd0e5da019fede2814a2f4171ff3f) )
-	ROM_LOAD32_BYTE( "c6.bin", 0x400002, 0x080000, CRC(21d4be8c) SHA1(f1b19d37d52d21584f304b7d37d5c096b58219d6) )
-	ROM_LOAD32_BYTE( "c7.bin", 0x400001, 0x080000, CRC(da55fd00) SHA1(52804f955597591fdd1d7478dc340b36d3c08c4a) )
-	ROM_LOAD32_BYTE( "c8.bin", 0x400003, 0x080000, CRC(592e9267) SHA1(0d27de59970ccbcaa1d47909ea3d741ffb0d9e07) )
+	ROM_LOAD32_BYTE( "proto_039-c1.c1", 0x000000, 0x100000, CRC(7192a787) SHA1(7bef6ce79c618103485480aee3c6f856968eb51f) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "proto_039-c2.c2", 0x000002, 0x100000, CRC(7157eca1) SHA1(65f36c6a3834775b04076d2c38a6047bffe9a8cf) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "proto_039-c3.c3", 0x000001, 0x100000, CRC(11d75727) SHA1(5a4c7b5ca3f1195e7853b45c5e71c13fe74d16e9) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "proto_039-c4.c4", 0x000003, 0x100000, CRC(7ad48b28) SHA1(27e65d948f08c231107cb1a810e2b06731091fc3) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "proto_039-c5.c5", 0x400000, 0x080000, CRC(5bdaf9ca) SHA1(60620d42ac6cd0e5da019fede2814a2f4171ff3f) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "proto_039-c6.c6", 0x400002, 0x080000, CRC(21d4be8c) SHA1(f1b19d37d52d21584f304b7d37d5c096b58219d6) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "proto_039-c7.c7", 0x400001, 0x080000, CRC(da55fd00) SHA1(52804f955597591fdd1d7478dc340b36d3c08c4a) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "proto_039-c8.c8", 0x400003, 0x080000, CRC(592e9267) SHA1(0d27de59970ccbcaa1d47909ea3d741ffb0d9e07) ) /* Plane 3 */
 ROM_END
-
-
 
 /****************************************
  ID-0040
@@ -2696,28 +2732,30 @@ ROM_END
 
 /****************************************
  ID-0051
- . ??M-051
- . ??H-051
+ . AIM-051
+ NEO-MVS PROG-G2 / NEO-MVS CHA42G-1
+ . AIH-051
 ****************************************/
 
 ROM_START( viewpoin )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "051-p1.p1", 0x000000, 0x100000, CRC(17aa899d) SHA1(674cd8ace7acdf4f407de741e3d0071bcb49c902) )
+	ROM_LOAD16_WORD_SWAP( "051-p1.p1", 0x000000, 0x100000, CRC(17aa899d) SHA1(674cd8ace7acdf4f407de741e3d0071bcb49c902) ) /* CXK388002 */
 
-	NEO_SFIX_128K( "051-s1.s1", CRC(9fea5758) SHA1(5c6f01da89f2639cf741ee7c39e27023b8083052) )
+	NEO_SFIX_128K( "051-s1.s1", CRC(9fea5758) SHA1(5c6f01da89f2639cf741ee7c39e27023b8083052) ) /* CXK381000 */
 
-	NEO_BIOS_AUDIO_128K( "051-m1.m1", CRC(8e69f29a) SHA1(7a25f4997996434ea1b7d0d1ca9e7aaf966cbd03) )
+	NEO_BIOS_AUDIO_128K( "051-m1.m1", CRC(8e69f29a) SHA1(7a25f4997996434ea1b7d0d1ca9e7aaf966cbd03) ) /* CXK381003 */
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )
-	ROM_LOAD( "051-v2.v2", 0x000000, 0x200000, CRC(019978b6) SHA1(7896a551115fc6ed38b5944e0c8dcb2b2c1c077d) )
-	ROM_LOAD( "051-v4.v4", 0x200000, 0x200000, CRC(5758f38c) SHA1(da10f4b7d22d9139bbf068bd940be82168a74ca1) )
+	/* What board was originally used (labels 051-V2 and 051-V4)? MVS is twice confirmed on NEO-MVS PROG-G2 */
+	ROM_LOAD( "051-v2.v1", 0x000000, 0x200000, CRC(019978b6) SHA1(7896a551115fc6ed38b5944e0c8dcb2b2c1c077d) ) /* CXK381600 */
+	ROM_LOAD( "051-v4.v2", 0x200000, 0x200000, CRC(5758f38c) SHA1(da10f4b7d22d9139bbf068bd940be82168a74ca1) ) /* CXK381600 */
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x600000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "051-c1.c1", 0x000000, 0x100000, CRC(d624c132) SHA1(49c7e9f020cba45d7083b45252bcc03397f8c286) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "051-c1.c1", 0x000000, 0x100000, CRC(d624c132) SHA1(49c7e9f020cba45d7083b45252bcc03397f8c286) ) /* Plane 0,1 */ /* CXK381600 */
 	ROM_CONTINUE( 0x400000, 0x100000 )
-	ROM_LOAD16_BYTE( "051-c2.c2", 0x000001, 0x100000, CRC(40d69f1e) SHA1(ec4a13582772594957f927622d50f54b0dfcd8d8) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "051-c2.c2", 0x000001, 0x100000, CRC(40d69f1e) SHA1(ec4a13582772594957f927622d50f54b0dfcd8d8) ) /* Plane 2,3 */ /* CXK381600 */
 	ROM_CONTINUE( 0x400001, 0x100000 )
 ROM_END
 
@@ -3029,9 +3067,9 @@ ROM_END
 
 /****************************************
  ID-0059
- . ??M-059
+ . NGM-059
  NEO-MVS PROGTOP / NEO-MVS CHA256
- . ??H-059
+ . NGH-059
 ****************************************/
 
 ROM_START( savagere )
@@ -3665,7 +3703,7 @@ ROM_END
  NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 ****************************************/
 
-ROM_START( quizkof )
+ROM_START( quizkof ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "080-p1.p1", 0x000000, 0x100000, CRC(4440315e) SHA1(f4adba8e341d64a1f6280dfd98ebf6918c00608d) ) /* mask rom TC538200 */
 
@@ -4873,23 +4911,23 @@ ROM_END
 
 ROM_START( pgoal ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "219-p1.p1", 0x100000, 0x100000, CRC(6af0e574) SHA1(c3f0fed0d942e48c99c80b1713f271c033ce0f4f) )
+	ROM_LOAD16_WORD_SWAP( "219-p1.p1", 0x100000, 0x100000, CRC(6af0e574) SHA1(c3f0fed0d942e48c99c80b1713f271c033ce0f4f) ) /* TC5316200 */
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	NEO_SFIX_128K( "219-s1.s1", CRC(002f3c88) SHA1(a8a5bbc5397c8ae9858e38997ebdc713b7b4f50a) )
+	NEO_SFIX_128K( "219-s1.s1", CRC(002f3c88) SHA1(a8a5bbc5397c8ae9858e38997ebdc713b7b4f50a) ) /* TC531000 */
 
-	NEO_BIOS_AUDIO_128K( "219-m1.m1", CRC(958efdc8) SHA1(aacc6056b1ff48cde8f241a11a27473cfb4b4aa3) )
+	NEO_BIOS_AUDIO_128K( "219-m1.m1", CRC(958efdc8) SHA1(aacc6056b1ff48cde8f241a11a27473cfb4b4aa3) ) /* TC531001 */
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )
-	ROM_LOAD( "219-v1.v1", 0x000000, 0x400000, CRC(d0ae33d9) SHA1(cb21a91184d9d84ff25ca86c00dcadfc210272a8) )
+	ROM_LOAD( "219-v1.v1", 0x000000, 0x400000, CRC(d0ae33d9) SHA1(cb21a91184d9d84ff25ca86c00dcadfc210272a8) ) /* TC5332204 */
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0xc00000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "219-c1.c1", 0x0000000, 0x400000, CRC(67fec4dc) SHA1(b99767972a2a4fce2b704df8d08e6b092665a696) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "219-c2.c2", 0x0000001, 0x400000, CRC(86ed01f2) SHA1(9d7d1493946e8fbbd572503d2362b0156c023b76) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "219-c3.c3", 0x0800000, 0x200000, CRC(5fdad0a5) SHA1(56f6d2a7224aa4e82a1858079f918e85cadbd6c2) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "219-c4.c4", 0x0800001, 0x200000, CRC(f57b4a1c) SHA1(875ca69afbc5304ec23f4bc9186abe92f477f6c8) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "219-c1.c1", 0x0000000, 0x400000, CRC(67fec4dc) SHA1(b99767972a2a4fce2b704df8d08e6b092665a696) ) /* Plane 0,1 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "219-c2.c2", 0x0000001, 0x400000, CRC(86ed01f2) SHA1(9d7d1493946e8fbbd572503d2362b0156c023b76) ) /* Plane 2,3 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "219-c3.c3", 0x0800000, 0x200000, CRC(5fdad0a5) SHA1(56f6d2a7224aa4e82a1858079f918e85cadbd6c2) ) /* Plane 0,1 */ /* TC5316200 */
+	ROM_LOAD16_BYTE( "219-c4.c4", 0x0800001, 0x200000, CRC(f57b4a1c) SHA1(875ca69afbc5304ec23f4bc9186abe92f477f6c8) ) /* Plane 2,3 */ /* TC5316200 */
 ROM_END
 
 /****************************************
@@ -4899,44 +4937,44 @@ ROM_END
 
 ROM_START( ironclad ) /* Prototype - crcs should match the ones of the unreleased dump. */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "220-p1p.p1", 0x100000, 0x100000, CRC(62a942c6) SHA1(12aaa7d9bd84328d1bf4610e056b5c57d0252537) )
+	ROM_LOAD16_WORD_SWAP( "proto_220-p1.p1", 0x100000, 0x100000, CRC(62a942c6) SHA1(12aaa7d9bd84328d1bf4610e056b5c57d0252537) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	NEO_SFIX_128K( "220-s1p.s1", CRC(372fe217) SHA1(493433e682f519bf647e1481c8bdd3a980830ffb) )
+	NEO_SFIX_128K( "proto_220-s1.s1", CRC(372fe217) SHA1(493433e682f519bf647e1481c8bdd3a980830ffb) )
 
-	NEO_BIOS_AUDIO_128K( "220-m1p.m1", CRC(3a08bb63) SHA1(d8fbbf42a006ccafc3cd99808d28c82dbaac4590) )
+	NEO_BIOS_AUDIO_128K( "proto_220-m1.m1", CRC(3a08bb63) SHA1(d8fbbf42a006ccafc3cd99808d28c82dbaac4590) )
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )
-	ROM_LOAD( "220-v1p.v1", 0x000000, 0x400000, CRC(8f30a215) SHA1(0ee866a468c4c3608d55df2b5cb9243c8016d77c) )
+	ROM_LOAD( "proto_220-v1.v1", 0x000000, 0x400000, CRC(8f30a215) SHA1(0ee866a468c4c3608d55df2b5cb9243c8016d77c) )
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "220-c1p.c1", 0x000000, 0x400000, CRC(9aa2b7dc) SHA1(6b3dff292c86f949890b1f8201bc5278f38c2668) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "220-c2p.c2", 0x000001, 0x400000, CRC(8a2ad708) SHA1(9568ac4cc0552e7fd3e50d3cd8d9f0f4fe7df1d4) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "220-c3p.c3", 0x800000, 0x400000, CRC(d67fb15a) SHA1(842971aeaf3c92e70f7c653bbf29058bc60f5b71) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "220-c4p.c4", 0x800001, 0x400000, CRC(e73ea38b) SHA1(27138d588e61e86c292f12d16e36c3681075c607) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_220-c1.c1", 0x000000, 0x400000, CRC(9aa2b7dc) SHA1(6b3dff292c86f949890b1f8201bc5278f38c2668) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_220-c2.c2", 0x000001, 0x400000, CRC(8a2ad708) SHA1(9568ac4cc0552e7fd3e50d3cd8d9f0f4fe7df1d4) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_220-c3.c3", 0x800000, 0x400000, CRC(d67fb15a) SHA1(842971aeaf3c92e70f7c653bbf29058bc60f5b71) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_220-c4.c4", 0x800001, 0x400000, CRC(e73ea38b) SHA1(27138d588e61e86c292f12d16e36c3681075c607) ) /* Plane 2,3 */
 ROM_END
 
 ROM_START( ironclado ) /* Prototype - bootleg/hack based on later release. */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "220-p1po.p1", 0x100000, 0x100000, CRC(ce37e3a0) SHA1(488f95fa15f56eea6666dda13d96ec29dba18e19) )
+	ROM_LOAD16_WORD_SWAP( "proto_220-p1o.p1", 0x100000, 0x100000, CRC(ce37e3a0) SHA1(488f95fa15f56eea6666dda13d96ec29dba18e19) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	NEO_SFIX_128K( "220-s1p.s1", CRC(372fe217) SHA1(493433e682f519bf647e1481c8bdd3a980830ffb) )
+	NEO_SFIX_128K( "proto_220-s1.s1", CRC(372fe217) SHA1(493433e682f519bf647e1481c8bdd3a980830ffb) )
 
-	NEO_BIOS_AUDIO_128K( "220-m1p.m1", CRC(3a08bb63) SHA1(d8fbbf42a006ccafc3cd99808d28c82dbaac4590) )
+	NEO_BIOS_AUDIO_128K( "proto_220-m1.m1", CRC(3a08bb63) SHA1(d8fbbf42a006ccafc3cd99808d28c82dbaac4590) )
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )
-	ROM_LOAD( "220-v1p.v1", 0x000000, 0x400000, CRC(8f30a215) SHA1(0ee866a468c4c3608d55df2b5cb9243c8016d77c) )
+	ROM_LOAD( "proto_220-v1.v1", 0x000000, 0x400000, CRC(8f30a215) SHA1(0ee866a468c4c3608d55df2b5cb9243c8016d77c) )
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "220-c1p.c1", 0x000000, 0x400000, CRC(9aa2b7dc) SHA1(6b3dff292c86f949890b1f8201bc5278f38c2668) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "220-c2p.c2", 0x000001, 0x400000, CRC(8a2ad708) SHA1(9568ac4cc0552e7fd3e50d3cd8d9f0f4fe7df1d4) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "220-c3p.c3", 0x800000, 0x400000, CRC(d67fb15a) SHA1(842971aeaf3c92e70f7c653bbf29058bc60f5b71) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "220-c4p.c4", 0x800001, 0x400000, CRC(e73ea38b) SHA1(27138d588e61e86c292f12d16e36c3681075c607) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_220-c1.c1", 0x000000, 0x400000, CRC(9aa2b7dc) SHA1(6b3dff292c86f949890b1f8201bc5278f38c2668) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_220-c2.c2", 0x000001, 0x400000, CRC(8a2ad708) SHA1(9568ac4cc0552e7fd3e50d3cd8d9f0f4fe7df1d4) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_220-c3.c3", 0x800000, 0x400000, CRC(d67fb15a) SHA1(842971aeaf3c92e70f7c653bbf29058bc60f5b71) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_220-c4.c4", 0x800001, 0x400000, CRC(e73ea38b) SHA1(27138d588e61e86c292f12d16e36c3681075c607) ) /* Plane 2,3 */
 ROM_END
 
 /****************************************
@@ -5189,20 +5227,20 @@ ROM_END
 
 ROM_START( ghostlop ) /* Prototype */
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "228-p1p.p1", 0x000000, 0x100000, CRC(6033172e) SHA1(f57fb706aa8dd9e5f9e992a5d35c1799578b59f8) )
+	ROM_LOAD16_WORD_SWAP( "proto_228-p1.p1", 0x000000, 0x100000, CRC(6033172e) SHA1(f57fb706aa8dd9e5f9e992a5d35c1799578b59f8) )
 
-	NEO_SFIX_128K( "228-s1p.s1", CRC(83c24e81) SHA1(585ef209d8bfc23bdccc1f37d8b764eeedfedc1c) )
+	NEO_SFIX_128K( "proto_228-s1.s1", CRC(83c24e81) SHA1(585ef209d8bfc23bdccc1f37d8b764eeedfedc1c) )
 
-	NEO_BIOS_AUDIO_128K( "228-m1p.m1", CRC(fd833b33) SHA1(ab6c218c42cba821654cbdae154efecb69f844f6) )
+	NEO_BIOS_AUDIO_128K( "proto_228-m1.m1", CRC(fd833b33) SHA1(ab6c218c42cba821654cbdae154efecb69f844f6) )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
-	ROM_LOAD( "228-v1p.v1", 0x000000, 0x200000, CRC(c603fce6) SHA1(5a866471d35895b2ae13cbd5d1cb41bf2e72e1b8) )
+	ROM_LOAD( "proto_228-v1.v1", 0x000000, 0x200000, CRC(c603fce6) SHA1(5a866471d35895b2ae13cbd5d1cb41bf2e72e1b8) )
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x800000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "228-c1p.c1", 0x000000, 0x400000, CRC(bfc99efe) SHA1(5cd2545310142080b8286e787cf5b859f627b3db) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "228-c2p.c2", 0x000001, 0x400000, CRC(69788082) SHA1(c3ecb42ddcbd9e16d0018a0c3adb56a911d813ca) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_228-c1.c1", 0x000000, 0x400000, CRC(bfc99efe) SHA1(5cd2545310142080b8286e787cf5b859f627b3db) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_228-c2.c2", 0x000001, 0x400000, CRC(69788082) SHA1(c3ecb42ddcbd9e16d0018a0c3adb56a911d813ca) ) /* Plane 2,3 */
 ROM_END
 
 /****************************************
@@ -5609,9 +5647,9 @@ ROM_END
 
 /****************************************
  ID-0239
- . ??M-2390
+ . NGM-2390
  NEO-MVS PROGBK1 / NEO-MVS CHA512Y
- . ??H-2390
+ . NGH-2390
 ****************************************/
 
 ROM_START( blazstar )
@@ -6271,11 +6309,11 @@ ROM_END
 
 ROM_START( kof99p ) /* Prototype Version - Possibly Hacked */
 	ROM_REGION( 0x500000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "251-p1p.p1", 0x000000, 0x100000, CRC(f37929c4) SHA1(226e7e3d629568399b88275e5bcd4e5b3839be95) )
-	ROM_LOAD16_WORD_SWAP( "251-p2p.p2", 0x100000, 0x400000, CRC(739742ad) SHA1(31acaf05a9bf186305888d3db7e4e8a83f7bb0a4) )
+	ROM_LOAD16_WORD_SWAP( "proto_251-p1.p1", 0x000000, 0x100000, CRC(f37929c4) SHA1(226e7e3d629568399b88275e5bcd4e5b3839be95) )
+	ROM_LOAD16_WORD_SWAP( "proto_251-p2.p2", 0x100000, 0x400000, CRC(739742ad) SHA1(31acaf05a9bf186305888d3db7e4e8a83f7bb0a4) )
 
 	/* This is the S1 from the prototype, the final is different */
-	NEO_SFIX_128K( "251-s1p.s1", CRC(fb1498ed) SHA1(d40060b31b6f217a4abdf3b336439fcd7bd7aaef) )
+	NEO_SFIX_128K( "proto_251-s1.s1", CRC(fb1498ed) SHA1(d40060b31b6f217a4abdf3b336439fcd7bd7aaef) )
 
 	/* Did the Prototype really use the same sound program / voice roms, sound isn't great .. */
 	NEO_BIOS_AUDIO_128K( "251-m1.m1", CRC(5e74539c) SHA1(6f49a9343cbd026b2c6720ff3fa2e5b1f85e80da) ) /* TC531001 */
@@ -6290,14 +6328,14 @@ ROM_START( kof99p ) /* Prototype Version - Possibly Hacked */
 
 	ROM_REGION( 0x4000000, "sprites", 0 )
 	/* these are probably decrypted versions of the roms found in the final */
-	ROM_LOAD16_BYTE( "251-c1p.c1", 0x0000000, 0x800000, CRC(e5d8ffa4) SHA1(65f15f9f02424a7a9dd35916166594f283e8d424) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "251-c2p.c2", 0x0000001, 0x800000, CRC(d822778f) SHA1(b590055e9bf1549bd6e1ecdabd65702202615712) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "251-c3p.c3", 0x1000000, 0x800000, CRC(f20959e8) SHA1(38293043fa77ac51c5e3191118874c58f1ae4d30) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "251-c4p.c4", 0x1000001, 0x800000, CRC(54ffbe9f) SHA1(8e62442923551f07a552621951b1accab2830e3b) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "251-c5p.c5", 0x2000000, 0x800000, CRC(d87a3bbc) SHA1(430f6812088712e0eb5714dcc664d8bba75e921a) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "251-c6p.c6", 0x2000001, 0x800000, CRC(4d40a691) SHA1(2b580d0678a5e6033ef16130671e860364d35e56) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "251-c7p.c7", 0x3000000, 0x800000, CRC(a4479a58) SHA1(d50e6cc9ccfe1ddbc6d90d46b8ca2cb0304edd8c) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "251-c8p.c8", 0x3000001, 0x800000, CRC(ead513ce) SHA1(e9b07a0b01fdeb3004755a479df059c81b4d0ed6) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_251-c1.c1", 0x0000000, 0x800000, CRC(e5d8ffa4) SHA1(65f15f9f02424a7a9dd35916166594f283e8d424) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_251-c2.c2", 0x0000001, 0x800000, CRC(d822778f) SHA1(b590055e9bf1549bd6e1ecdabd65702202615712) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_251-c3.c3", 0x1000000, 0x800000, CRC(f20959e8) SHA1(38293043fa77ac51c5e3191118874c58f1ae4d30) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_251-c4.c4", 0x1000001, 0x800000, CRC(54ffbe9f) SHA1(8e62442923551f07a552621951b1accab2830e3b) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_251-c5.c5", 0x2000000, 0x800000, CRC(d87a3bbc) SHA1(430f6812088712e0eb5714dcc664d8bba75e921a) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_251-c6.c6", 0x2000001, 0x800000, CRC(4d40a691) SHA1(2b580d0678a5e6033ef16130671e860364d35e56) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_251-c7.c7", 0x3000000, 0x800000, CRC(a4479a58) SHA1(d50e6cc9ccfe1ddbc6d90d46b8ca2cb0304edd8c) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_251-c8.c8", 0x3000001, 0x800000, CRC(ead513ce) SHA1(e9b07a0b01fdeb3004755a479df059c81b4d0ed6) ) /* Plane 2,3 */
 ROM_END
 
 /****************************************
@@ -6415,30 +6453,30 @@ ROM_END
 
 ROM_START( garoup ) /* Prototype Version, seems genuine */
 	ROM_REGION( 0x500000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "253-p1p.p1", 0x000000, 0x100000, CRC(c72f0c16) SHA1(1ff6bb651682f93bef9ff02622c3cf63fe594986) )
-	ROM_LOAD16_WORD_SWAP( "253-p2p.p2", 0x100000, 0x400000, CRC(bf8de565) SHA1(0e24574168cd38138bed0aa4dca49849f6901ca2) )
+	ROM_LOAD16_WORD_SWAP( "proto_253-p1.p1", 0x000000, 0x100000, CRC(c72f0c16) SHA1(1ff6bb651682f93bef9ff02622c3cf63fe594986) )
+	ROM_LOAD16_WORD_SWAP( "proto_253-p2.p2", 0x100000, 0x400000, CRC(bf8de565) SHA1(0e24574168cd38138bed0aa4dca49849f6901ca2) )
 
-	NEO_SFIX_128K( "253-s1p.s1", CRC(779989de) SHA1(8bd550857b60f8a907f6d39a4225ceffdd330307) )
+	NEO_SFIX_128K( "proto_253-s1.s1", CRC(779989de) SHA1(8bd550857b60f8a907f6d39a4225ceffdd330307) )
 
-	NEO_BIOS_AUDIO_256K( "253-m1p.m1", CRC(bbe464f7) SHA1(f5f8f3e48f5d453f45107085d6f4023bcd24c053) )
+	NEO_BIOS_AUDIO_256K( "proto_253-m1.m1", CRC(bbe464f7) SHA1(f5f8f3e48f5d453f45107085d6f4023bcd24c053) )
 
 	ROM_REGION( 0x1000000, "ymsnd", 0 )
-	ROM_LOAD( "253-v1p.v1", 0x000000, 0x400000, CRC(274f3923) SHA1(4c7a8ad1cd0e3afc1f78de3c2929120ed434f104) )
-	ROM_LOAD( "253-v2p.v2", 0x400000, 0x400000, CRC(8f86dabe) SHA1(b3d2d9f5c1d97a6e7aee2c674fb6627f41bbb240) )
-	ROM_LOAD( "253-v3p.v3", 0x800000, 0x400000, CRC(05fd06cd) SHA1(6cd699719614bb87547632ea3d61d92d81fdf563) )
-	ROM_LOAD( "253-v4p.v4", 0xc00000, 0x400000, CRC(14984063) SHA1(170d5638327ec0eb3590b80dc11590897367250c) )
+	ROM_LOAD( "proto_253-v1.v1", 0x000000, 0x400000, CRC(274f3923) SHA1(4c7a8ad1cd0e3afc1f78de3c2929120ed434f104) )
+	ROM_LOAD( "proto_253-v2.v2", 0x400000, 0x400000, CRC(8f86dabe) SHA1(b3d2d9f5c1d97a6e7aee2c674fb6627f41bbb240) )
+	ROM_LOAD( "proto_253-v3.v3", 0x800000, 0x400000, CRC(05fd06cd) SHA1(6cd699719614bb87547632ea3d61d92d81fdf563) )
+	ROM_LOAD( "proto_253-v4.v4", 0xc00000, 0x400000, CRC(14984063) SHA1(170d5638327ec0eb3590b80dc11590897367250c) )
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x4000000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "253-c1p.c1", 0x0000000, 0x800000, CRC(5bb5d137) SHA1(d648febd8e6a0bdd9bdbb6ce1f1f8b08567ec05a) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "253-c2p.c2", 0x0000001, 0x800000, CRC(5c8d2960) SHA1(f7503502be0332adf408ee0ea5ee5161c8939fd8) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "253-c3p.c3", 0x1000000, 0x800000, CRC(234d16fc) SHA1(7b9221f7ecc438150c8a10be72390329854ed21b) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "253-c4p.c4", 0x1000001, 0x800000, CRC(b9b5b993) SHA1(6059793eaf6e58c172235fe64aa9d25a40c38ed6) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "253-c5p.c5", 0x2000000, 0x800000, CRC(722615d2) SHA1(798832c535869f0e247c3db0d8253779b103e213) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "253-c6p.c6", 0x2000001, 0x800000, CRC(0a6fab38) SHA1(eaee6f2f18af91f7959d84d4b991b3fc182d07c4) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "253-c7p.c7", 0x3000000, 0x800000, CRC(d68e806f) SHA1(92bfd9839115bd590972ae4ecc45ad35dce22387) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "253-c8p.c8", 0x3000001, 0x800000, CRC(f778fe99) SHA1(c963f6ba90a36d02991728b44ffcf174ca18268a) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_253-c1.c1", 0x0000000, 0x800000, CRC(5bb5d137) SHA1(d648febd8e6a0bdd9bdbb6ce1f1f8b08567ec05a) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_253-c2.c2", 0x0000001, 0x800000, CRC(5c8d2960) SHA1(f7503502be0332adf408ee0ea5ee5161c8939fd8) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_253-c3.c3", 0x1000000, 0x800000, CRC(234d16fc) SHA1(7b9221f7ecc438150c8a10be72390329854ed21b) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_253-c4.c4", 0x1000001, 0x800000, CRC(b9b5b993) SHA1(6059793eaf6e58c172235fe64aa9d25a40c38ed6) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_253-c5.c5", 0x2000000, 0x800000, CRC(722615d2) SHA1(798832c535869f0e247c3db0d8253779b103e213) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_253-c6.c6", 0x2000001, 0x800000, CRC(0a6fab38) SHA1(eaee6f2f18af91f7959d84d4b991b3fc182d07c4) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_253-c7.c7", 0x3000000, 0x800000, CRC(d68e806f) SHA1(92bfd9839115bd590972ae4ecc45ad35dce22387) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_253-c8.c8", 0x3000001, 0x800000, CRC(f778fe99) SHA1(c963f6ba90a36d02991728b44ffcf174ca18268a) ) /* Plane 2,3 */
 ROM_END
 
 /****************************************
@@ -6728,22 +6766,22 @@ ROM_START( bangbedp )
 	ROM_LOAD16_WORD_SWAP( "259-p1.p1", 0x100000, 0x100000, CRC(88a37f8b) SHA1(566db84850fad5e8fe822e8bba910a33e083b550) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	NEO_SFIX_128K( "259-s1p.s1", CRC(bb50fb2d) SHA1(7372939f328fb5e7d09c16985e09ae8c34702b0c) )
+	NEO_SFIX_128K( "proto_259-s1.s1", CRC(bb50fb2d) SHA1(7372939f328fb5e7d09c16985e09ae8c34702b0c) )
 
 	NEO_BIOS_AUDIO_128K( "259-m1.m1", CRC(85668ee9) SHA1(7d3f51710cf90c097cd3faaeeef10ceb85cbb3e8) )
 
 	ROM_REGION( 0x500000, "ymsnd", 0 )
-	ROM_LOAD( "259-v1p.v1", 0x000000, 0x200000, CRC(e97b9385) SHA1(d213cae6cf5732b8ab1f8a8cf04afee5dfd9a260) )
-	ROM_LOAD( "259-v2p.v2", 0x200000, 0x200000, CRC(b0cbd70a) SHA1(fc7c8183f8ff9800e8aae7c8d44d962300058cfb) )
-	ROM_LOAD( "259-v3p.v3", 0x400000, 0x100000, CRC(97528fe9) SHA1(8f5eddbb3a9a225492479d1a44801f3916c8e791) )
+	ROM_LOAD( "proto_259-v1.v1", 0x000000, 0x200000, CRC(e97b9385) SHA1(d213cae6cf5732b8ab1f8a8cf04afee5dfd9a260) )
+	ROM_LOAD( "proto_259-v2.v2", 0x200000, 0x200000, CRC(b0cbd70a) SHA1(fc7c8183f8ff9800e8aae7c8d44d962300058cfb) )
+	ROM_LOAD( "proto_259-v3.v3", 0x400000, 0x100000, CRC(97528fe9) SHA1(8f5eddbb3a9a225492479d1a44801f3916c8e791) )
 
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x600000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "259-c1p.c1", 0x000000, 0x200000, CRC(e3919e44) SHA1(54c722414b5a7ad311dc8ddf6fdda88535e829d1) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "259-c2p.c2", 0x000001, 0x200000, CRC(baf5a320) SHA1(ead3d81d9b4aeb45af4f9cb5c38157f2236b506c) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "259-c3p.c3", 0x400000, 0x100000, CRC(c8e52157) SHA1(f10f58e905c4cbaf182b20e63abe5364462133c5) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "259-c4p.c4", 0x400001, 0x100000, CRC(69fa8e60) SHA1(29c1fbdb79dedf1470683202e2cb3435732d9275) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_259-c1.c1", 0x000000, 0x200000, CRC(e3919e44) SHA1(54c722414b5a7ad311dc8ddf6fdda88535e829d1) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_259-c2.c2", 0x000001, 0x200000, CRC(baf5a320) SHA1(ead3d81d9b4aeb45af4f9cb5c38157f2236b506c) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "proto_259-c3.c3", 0x400000, 0x100000, CRC(c8e52157) SHA1(f10f58e905c4cbaf182b20e63abe5364462133c5) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "proto_259-c4.c4", 0x400001, 0x100000, CRC(69fa8e60) SHA1(29c1fbdb79dedf1470683202e2cb3435732d9275) ) /* Plane 2,3 */
 ROM_END
 #endif
 
