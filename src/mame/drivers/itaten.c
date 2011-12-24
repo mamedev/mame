@@ -26,7 +26,10 @@ class itaten_state : public driver_device
 {
 public:
 	itaten_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_audiocpu(*this,"audiocpu")
+		{ }
 
 	/* memory pointers */
 	UINT8 *  m_bgvideoram;
@@ -42,7 +45,8 @@ public:
 	int      m_bg_bank;
 
 	/* devices */
-	device_t *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -233,6 +237,11 @@ static WRITE8_HANDLER(snd_w)
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static WRITE8_HANDLER( main_irq_ack_w )
+{
+	itaten_state *state = space->machine().driver_data<itaten_state>();
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+}
 
 /*************************************
  *
@@ -255,12 +264,12 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWA")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
-	AM_RANGE(0x05, 0x05) AM_READNOP			/* ? */
+	AM_RANGE(0x05, 0x05) AM_READNOP			/* watchdog */
 	AM_RANGE(0x20, 0x20) AM_WRITE(coins_w)
 	AM_RANGE(0x21, 0x21) AM_WRITE(bg_bank_w)
 	AM_RANGE(0x22, 0x22) AM_WRITE(bg_scroll_x_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(bg_scroll_y_w)
-	AM_RANGE(0x24, 0x24) AM_WRITENOP		/* ? */
+	AM_RANGE(0x24, 0x24) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(snd_w)
 ADDRESS_MAP_END
 
@@ -395,8 +404,6 @@ static MACHINE_START( itaten )
 {
 	itaten_state *state = machine.driver_data<itaten_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
-
 	state->save_item(NAME(state->m_scroll_x));
 	state->save_item(NAME(state->m_scroll_y));
 	state->save_item(NAME(state->m_bg_bank));
@@ -409,7 +416,7 @@ static MACHINE_CONFIG_START( itaten, itaten_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_19_968MHz/8)		/* Matches reference recording */
 	MCFG_CPU_PROGRAM_MAP(snd_map)
