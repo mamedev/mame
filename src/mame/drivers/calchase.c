@@ -607,6 +607,7 @@ GFXDECODE_END
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
 
+#if 0
 static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
@@ -637,6 +638,7 @@ static INPUT_PORTS_START( calchase )
 
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
+#endif
 
 static IRQ_CALLBACK(irq_callback)
 {
@@ -834,20 +836,18 @@ ROM_START( calchase )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
 
 	ROM_REGION(0x8000,"video_bios", 0)
-	ROM_LOAD("et4000.bin", 0x0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+	ROM_LOAD("et4000.bin", 0x0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) ) // Not on the original board, to be changed
 
-
-	//GRULL-ADDVGA ROM_REGION( 0x8000, "video_bios", 0 )
-	//GRULL-ADDVGA ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	//GRULL-ADDVGA ROM_CONTINUE(                                 0x0001, 0x4000 )
+	ROM_REGION( 0x8000, "ovbios", 0 ) // TODO: Make this to work on our VGA driver
+	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x800, "nvram", 0 )
 	ROM_LOAD( "ds1220y_nv.bin", 0x000, 0x800, CRC(7912c070) SHA1(b4c55c7ca76bcd8dad1c4b50297233349ae02ed3) )
 
 	DISK_REGION( "ide" )
-	//GRULL DISK_IMAGE( "calchase", 0,SHA1(487e304ffeed23ca618fa936258136605ce9d1a1) )
-	DISK_IMAGE_READONLY( "calchase", 0,SHA1(487e304ffeed23ca618fa936258136605ce9d1a1) )
+	DISK_IMAGE_READONLY( "calchase", 0,SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
 
-GAME( 1999, calchase,  0,    calchase, calchase,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, calchase,  0,    calchase, pc_keyboard,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_NO_SOUND )
