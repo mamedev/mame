@@ -1830,7 +1830,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/superwng.o \
 	$(DRIVERS)/tapatune.o \
 	$(DRIVERS)/tattack.o \
-	$(DRIVERS)/taxidrvr.o $(VIDEO)/taxidrvr.o \
+	$(DRIVERS)/taxidriv.o $(VIDEO)/taxidriv.o \
 	$(DRIVERS)/tcl.o \
 	$(DRIVERS)/thayers.o \
 	$(DRIVERS)/thedeep.o $(VIDEO)/thedeep.o \

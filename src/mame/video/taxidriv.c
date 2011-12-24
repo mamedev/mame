@@ -1,18 +1,18 @@
 #include "emu.h"
-#include "includes/taxidrvr.h"
+#include "includes/taxidriv.h"
 
 
-WRITE8_DEVICE_HANDLER( taxidrvr_spritectrl_w )
+WRITE8_DEVICE_HANDLER( taxidriv_spritectrl_w )
 {
-	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
+	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
 	state->m_spritectrl[offset] = data;
 }
 
 
 
-SCREEN_UPDATE( taxidrvr )
+SCREEN_UPDATE( taxidriv )
 {
-	taxidrvr_state *state = screen->machine().driver_data<taxidrvr_state>();
+	taxidriv_state *state = screen->machine().driver_data<taxidriv_state>();
 	int offs;
 	int sx,sy;
 

@@ -1,7 +1,7 @@
-class taxidrvr_state : public driver_device
+class taxidriv_state : public driver_device
 {
 public:
-	taxidrvr_state(const machine_config &mconfig, device_type type, const char *tag)
+	taxidriv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
 	int m_s1;
@@ -24,8 +24,8 @@ public:
 };
 
 
-/*----------- defined in video/taxidrvr.c -----------*/
+/*----------- defined in video/taxidriv.c -----------*/
 
-WRITE8_DEVICE_HANDLER( taxidrvr_spritectrl_w );
+WRITE8_DEVICE_HANDLER( taxidriv_spritectrl_w );
 
-SCREEN_UPDATE( taxidrvr );
+SCREEN_UPDATE( taxidriv );
