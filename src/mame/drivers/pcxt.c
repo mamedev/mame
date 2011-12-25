@@ -78,7 +78,6 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_vga_vram;
-	UINT8 *m_work_ram;
 	UINT8 m_video_regs[0x19];
 	UINT8 *m_vga_mode;
 	UINT8 m_hv_blank;
@@ -92,7 +91,6 @@ public:
 	UINT8 m_wss2_data;
 	UINT8 m_status;
 	UINT8 m_clr_status;
-	UINT8 m_drive_data;
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
@@ -571,10 +569,10 @@ static WRITE8_HANDLER( fdc765_data_w )
 
 static WRITE8_HANDLER( drive_selection_w )
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	state->m_drive_data = data;
-	/*write to this area then expects that location [43e] has the bit 7 activated*/
-	state->m_work_ram[0x3e] = 0x80;
+//	pcxt_state *state = space->machine().driver_data<pcxt_state>();
+
+	/* TODO: properly hook-up upd765 FDC there */
+	pic8259_ir6_w(space->machine().device("pic8259_1"), 1);
 }
 
 /******************
@@ -715,9 +713,7 @@ static IRQ_CALLBACK(irq_callback)
 }
 
 static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x003ff) AM_RAM //irq vectors
-	AM_RANGE(0x00400, 0x007ff) AM_RAM AM_BASE_MEMBER(pcxt_state, m_work_ram)
-	AM_RANGE(0x00800, 0x9ffff) AM_RAM //work RAM 640KB
+	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM 640KB
 	AM_RANGE(0xa0000, 0xbffff) AM_RAM_WRITE(vga_vram_w) AM_BASE_MEMBER(pcxt_state, m_vga_vram)//VGA RAM
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
