@@ -14,11 +14,7 @@ Notes:
 TODO:
 - 02851: tetriskr: Corrupt game graphics after some time of gameplay, caused by a wrong
   reading of the i/o $3c8 bit 1.
-- EGA/CGA/VGA emulation uses the bare minimum for these games,there are still a lot of
-  features that needs to be added;
-- Filetto: Add a proper FDC device,if you enable it will give a boot error,probably because it
-  expects that in the floppy drive shouldn't be anything,there's currently a kludge that
-  does the trick;
+- Filetto: Add a proper FDC device.
 - Filetto: Add sound,"buzzer" PC sound plus the UM5100 sound chip ,might be connected to the
   prototyping card;
 - Korean Tetris: Add the aforementioned "buzzer" plus identify if there's any kind of sound
@@ -659,7 +655,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_FRAGMENT_ADD( pcvideo_cga_320x200 ) // TODO
 	MCFG_GFXDECODE(filetto)
 
 	/*Sound Hardware*/
@@ -693,7 +689,8 @@ static MACHINE_CONFIG_START( tetriskr, pcxt_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_FRAGMENT_ADD( pcvideo_cga_320x200 ) // TODO
+
 	MCFG_GFXDECODE(tetriskr)
 
 	/*Sound Hardware*/
