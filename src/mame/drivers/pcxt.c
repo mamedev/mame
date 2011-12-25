@@ -94,7 +94,12 @@ public:
 	device_t	*m_dma8237_2;
 };
 
-
+static SCREEN_UPDATE( tetriskr )
+{
+	/* TODO: backgrounds */
+	SCREEN_UPDATE_CALL(mc6845_cga);
+	return 0;
+}
 
 
 static READ8_HANDLER( disk_iobank_r )
@@ -611,12 +616,7 @@ static const gfx_layout pc_8_charlayout =
 	8*8					/* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( filetto )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout,    3, 1 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout,   3, 1 )
-GFXDECODE_END
-
-static GFXDECODE_START( tetriskr )
+static GFXDECODE_START( pcxt )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout,    3, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout,   3, 1 )
 GFXDECODE_END
@@ -656,7 +656,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga_320x200 ) // TODO
-	MCFG_GFXDECODE(filetto)
+	MCFG_GFXDECODE(pcxt)
 
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -669,36 +669,14 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tetriskr, pcxt_state )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
-	MCFG_CPU_PROGRAM_MAP(filetto_map)
+static MACHINE_CONFIG_DERIVED( tetriskr, filetto )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(tetriskr_io)
 
-	MCFG_MACHINE_RESET( filetto )
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(tetriskr)
 
-	MCFG_PIT8253_ADD( "pit8253", pc_pit8253_config )
-
-	MCFG_PPI8255_ADD( "ppi8255_0", filetto_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", filetto_ppi8255_intf[1] )
-
-	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
-
-	MCFG_PIC8259_ADD( "pic8259_1", pic8259_1_config )
-
-	MCFG_PIC8259_ADD( "pic8259_2", pic8259_2_config )
-
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-
-	MCFG_FRAGMENT_ADD( pcvideo_cga_320x200 ) // TODO
-
-	MCFG_GFXDECODE(tetriskr)
-
-	/*Sound Hardware*/
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-//  PC "buzzer" sound
-	MCFG_SOUND_ADD("beep", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_DEVICE_REMOVE("voice")
 MACHINE_CONFIG_END
 
 ROM_START( filetto )

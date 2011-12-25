@@ -158,7 +158,6 @@ INPUT_PORTS_END
 #define CGA_CHIPSET_PARADISE    0x80    /* Paradise (used in PC1640) */
 
 
-static SCREEN_UPDATE( mc6845_cga );
 static READ8_HANDLER( pc_cga8_r );
 static WRITE8_HANDLER( pc_cga8_w );
 static READ16_HANDLER( pc_cga16le_r );
@@ -395,7 +394,7 @@ static VIDEO_START( pc_cga32k )
 	memory_set_bankptr(machine,"bank11", cga.videoram);
 }
 
-static SCREEN_UPDATE( mc6845_cga )
+SCREEN_UPDATE( mc6845_cga )
 {
 	UINT8 *gfx = screen->machine().region("gfx1")->base();
 	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(CGA_MC6845_NAME);
