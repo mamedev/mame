@@ -74,7 +74,7 @@ public:
 	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8 *m_vga_bg_bank;
+	UINT8 m_bg_bank;
 	int m_bank;
 	int m_lastvalue;
 	UINT8 m_disk_data[2];
@@ -96,8 +96,38 @@ public:
 
 static SCREEN_UPDATE( tetriskr )
 {
-	/* TODO: backgrounds */
-	SCREEN_UPDATE_CALL(mc6845_cga);
+	pcxt_state *state = screen->machine().driver_data<pcxt_state>();
+	int x,y;
+	int yi;
+	const UINT8 *bg_rom = screen->machine().region("gfx2")->base();
+
+	//popmessage("%04x",m_start_offs);
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+
+	for(y=0;y<200/8;y++)
+	{
+		for(yi=0;yi<8;yi++)
+		{
+			for(x=0;x<320/8;x++)
+			{
+				UINT8 color;
+				int xi,pen_i;
+
+				for(xi=0;xi<8;xi++)
+				{
+					color = 0;
+					for(pen_i = 0;pen_i<4;pen_i++)
+						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+state->m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
+
+					if((x+xi)<screen->visible_area().max_x && ((y)+yi)<screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine().pens[color];
+				}
+			}
+		}
+	}
+
+	//SCREEN_UPDATE_CALL(mc6845_cga);
 	return 0;
 }
 
@@ -498,11 +528,18 @@ static ADDRESS_MAP_START( filetto_io, AS_IO, 8 )
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( tetriskr_bg_bank_w )
+{
+	pcxt_state *state = space->machine().driver_data<pcxt_state>();
+
+	state->m_bg_bank = (data & 0x0f) ^ 8;
+}
+
 static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_IMPORT_FROM( pcxt_io_common )
 	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
-//	AM_RANGE(0x03c0, 0x03c0) AM_RAM AM_BASE_MEMBER(pcxt_state, m_vga_bg_bank)
+	AM_RANGE(0x03c0, 0x03c0) AM_WRITE(tetriskr_bg_bank_w)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1")
@@ -712,7 +749,7 @@ ROM_START( tetriskr )
 	ROM_LOAD( "b-3.u36", 0x1800, 0x0800, CRC(1a636f9a) SHA1(a356cc57914d0c9b9127670b55d1f340e64b1ac9) )
 	ROM_IGNORE( 0x1800 )
 
-	ROM_REGION( 0x80000, "gfx2",ROMREGION_INVERT )
+	ROM_REGION( 0x80000+1, "gfx2",ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "b-1.u59", 0x00000, 0x10000, CRC(4719d986) SHA1(6e0499944b968d96fbbfa3ead6237d69c769d634))
 	ROM_LOAD( "b-2.u58", 0x10000, 0x10000, CRC(599e1154) SHA1(14d99f90b4fedeab0ac24ffa9b1fd9ad0f0ba699))
 	ROM_LOAD( "b-4.u54", 0x20000, 0x10000, CRC(e112c450) SHA1(dfdecfc6bd617ec520b7563b7caf44b79d498bd3))
@@ -721,9 +758,6 @@ ROM_START( tetriskr )
 	ROM_LOAD( "b-7.u48", 0x50000, 0x10000, CRC(79336b6c) SHA1(7a95875f3071bdc3ee25c0e6a5a3c00ef02dc977))
 	ROM_LOAD( "b-8.u44", 0x60000, 0x10000, CRC(1f82121a) SHA1(106da0f39f1260d0761217ed0a24c1611bfd7f05))
 	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
-
-	ROM_REGION( 0x180000, "user1", ROMREGION_ERASEFF )
-	// copy for the gfx2,to be made with the DRIVER_INIT
 ROM_END
 
 static DRIVER_INIT( filetto )
@@ -731,31 +765,9 @@ static DRIVER_INIT( filetto )
 	//...
 }
 
-/*Descramble the background gfx data.*/
 static DRIVER_INIT( tetriskr )
 {
-	int i,j,k;
-	int index=0;
-	UINT8 *region = machine.region("user1")->base();
-	UINT8 *gfx = machine.region("gfx2")->base();
-
-	for(i=0;i<0x20000;i++)
-	{
-		//8 pixels/byte
-		for(j=0;j<8;j++)
-		{
-			int mask=(1<<(7-j));
-			int pixel=0;
-			for(k=0;k<4;k++)
-			{
-				if(gfx[k*0x20000+i]&mask)
-				{
-					pixel|=(1<<k);
-				}
-			}
-			region[index++]=pixel;
-		}
-	}
+	//...
 }
 
 GAME( 1990, filetto,  0, filetto,  filetto,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
