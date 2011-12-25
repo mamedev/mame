@@ -736,6 +736,8 @@ $(MAMEOBJ)/ibmpc.a: \
 	$(DRIVERS)/quakeat.o \
 	$(DRIVERS)/queen.o \
 	$(DRIVERS)/igspc.o \
+	$(VIDEO)/pc_cga.o \
+	$(VIDEO)/cgapal.o \
 
 $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/cabaret.o \

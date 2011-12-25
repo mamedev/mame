@@ -69,6 +69,7 @@ the main program is 9th October 1990.
 #include "machine/mc146818.h"
 #include "sound/hc55516.h"
 #include "sound/beep.h"
+#include "video/pc_cga.h"
 
 
 class pcxt_state : public driver_device
@@ -77,14 +78,9 @@ public:
 	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8 *m_vga_vram;
-	UINT8 m_video_regs[0x19];
-	UINT8 *m_vga_mode;
-	UINT8 m_hv_blank;
 	UINT8 *m_vga_bg_bank;
 	int m_bank;
 	int m_lastvalue;
-	UINT8 m_video_index;
 	UINT8 m_disk_data[2];
 	UINT8 m_port_b_data;
 	UINT8 m_wss1_data;
@@ -101,253 +97,6 @@ public:
 	device_t	*m_dma8237_1;
 	device_t	*m_dma8237_2;
 };
-
-
-#define SET_VISIBLE_AREA(_x_,_y_) \
-	{ \
-	rectangle visarea; \
-	visarea.min_x = 0; \
-	visarea.max_x = _x_-1; \
-	visarea.min_y = 0; \
-	visarea.max_y = _y_-1; \
-	machine.primary_screen->configure(_x_, _y_, visarea, machine.primary_screen->frame_period().attoseconds ); \
-	} \
-
-
-/*Add here Video regs defines...*/
-
-
-#define RES_320x200 0
-#define RES_640x200 1
-
-static void cga_alphanumeric_tilemap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs,UINT8 gfx_num);
-
-static VIDEO_START( filetto )
-{
-}
-
-static VIDEO_START( tetriskr )
-{
-}
-
-static READ8_HANDLER( vga_hvretrace_r )
-{
-	/*
-    Read-Only lower 8 bits,TRUSTED
-    ---- x--- Vertical Retrace
-    ---- ---x Horizontal Retrace
-    */
-	UINT8 res;
-	int h,w;
-	res = 0;
-	h = space->machine().primary_screen->height();
-	w = space->machine().primary_screen->width();
-
-//  popmessage("%d %d",h,w);
-
-	if (space->machine().primary_screen->hpos() > h)
-		res|= 1;
-
-	if (space->machine().primary_screen->vpos() > w)
-		res|= 8;
-
-	return res;
-}
-
-/*Basic Graphic mode */
-/*TODO: non-black colours should use the bright versions*/
-static void cga_graphic_bitmap(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
-{
-	pcxt_state *state = machine.driver_data<pcxt_state>();
-	UINT16 x,y;
-	UINT32 offs;
-
-	SET_VISIBLE_AREA(320,200);
-	offs = map_offs;
-	for(y=0;y<200;y+=2)
-		for(x=0;x<320;x+=4)
-		{
-			*BITMAP_ADDR16(bitmap, y, x+0) = machine.pens[0x200+(((state->m_vga_vram[offs] & 0xc0)>>6)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+1) = machine.pens[0x200+(((state->m_vga_vram[offs] & 0x30)>>4)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+2) = machine.pens[0x200+(((state->m_vga_vram[offs] & 0x0c)>>2)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+3) = machine.pens[0x200+(((state->m_vga_vram[offs] & 0x03)>>0)<<1)];
-			offs++;
-		}
-
-	offs = 0x2000+map_offs;
-	for(y=1;y<200;y+=2)
-		for(x=0;x<320;x+=4)
-		{
-			*BITMAP_ADDR16(bitmap, y, x+0) = machine.pens[0x200+(((state->m_vga_vram[offs] & 0xc0)>>6)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+1) = machine.pens[0x200+(((state->m_vga_vram[offs] & 0x30)>>4)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+2) = machine.pens[0x200+(((state->m_vga_vram[offs] & 0x0c)>>2)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+3) = machine.pens[0x200+(((state->m_vga_vram[offs] & 0x03)>>0)<<1)];
-			offs++;
-		}
-
-}
-
-
-
-static void cga_alphanumeric_tilemap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs,UINT8 gfx_num)
-{
-	pcxt_state *state = machine.driver_data<pcxt_state>();
-	UINT32 offs,x,y,max_x,max_y;
-
-	/*define the visible area*/
-	switch(size)
-	{
-		case RES_320x200:
-			SET_VISIBLE_AREA(320,200);
-			max_x = 40;
-			max_y = 25;
-			break;
-		case RES_640x200:
-			SET_VISIBLE_AREA(640,200);
-			max_x = 80;
-			max_y = 25;
-			break;
-		default:
-			fatalerror("Unknown size");
-	}
-
-	offs = map_offs;
-
-	for(y=0;y<max_y;y++)
-		for(x=0;x<max_x;x++)
-		{
-			int tile =  state->m_vga_vram[offs] & 0xff;
-			int color = state->m_vga_vram[offs+1] & 0xff;
-
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[gfx_num],
-					tile,
-					color,
-					0,0,
-					x*8,y*8,
-					((color & 0xf0) != 0) ? -1 : 0);
-
-			offs+=2;
-		}
-}
-
-
-static SCREEN_UPDATE( filetto )
-{
-	pcxt_state *state = screen->machine().driver_data<pcxt_state>();
-/*          xx1x xxxx  Attribute bit 7. 0=blink, 1=Intesity
-            xxx1 xxxx  640x200 mode
-            xxxx 1xxx  Enable video signal
-            xxxx x1xx  Select B/W mode
-            xxxx xx1x  Select graphics
-            xxxx xxx1  80x25 text
-            */
-	bitmap_fill(bitmap, cliprect, 0);
-
-	if(state->m_vga_mode[0] & 8)
-	{
-		if(state->m_vga_mode[0] & 2)
-			cga_graphic_bitmap(screen->machine(),bitmap,cliprect,0,0x18000);
-		else
-		{
-			switch(state->m_vga_mode[0] & 1)
-			{
-				case 0x00:
-					cga_alphanumeric_tilemap(screen->machine(),bitmap,cliprect,RES_320x200,0x18000,2);
-					break;
-				case 0x01:
-					cga_alphanumeric_tilemap(screen->machine(),bitmap,cliprect,RES_640x200,0x18000,2);
-					break;
-			}
-		}
-	}
-
-	return 0;
-}
-
-static void vga_bitmap_layer(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
-{
-	pcxt_state *state = machine.driver_data<pcxt_state>();
-	int x,y,z;
-	UINT8 *region = machine.region("user1")->base();
-	UINT32 cur_bank;
-
-	/*TODO: might be a different descramble algorithm plus plain bg bank*/
-	cur_bank = (((8-state->m_vga_bg_bank[0]) & 0x1f)*0x10000);
-
-	popmessage("%02x",state->m_vga_bg_bank[0]);
-
-	for(y=0;y<200;y+=8)
-	{
-		for(z=0;z<8;z++)
-		for(x=0;x<320;x++)
-		{
-			*BITMAP_ADDR16(bitmap, y+z, x) = 0x200+(region[(y*320/8)+x+z*0x2000+cur_bank+8] & 0xf);
-		}
-	}
-}
-
-/*S3 Video card,VGA*/
-static SCREEN_UPDATE( tetriskr )
-{
-	pcxt_state *state = screen->machine().driver_data<pcxt_state>();
-	bitmap_fill(bitmap, cliprect, 0);
-
-	if(state->m_vga_mode[0] & 8)
-	{
-		if(state->m_vga_mode[0] & 2)
-			cga_graphic_bitmap(screen->machine(),bitmap,cliprect,0,0x18000);
-		else
-		{
-			vga_bitmap_layer(screen->machine(),bitmap,cliprect);
-
-			switch(state->m_vga_mode[0] & 1)
-			{
-				case 0x00:
-					cga_alphanumeric_tilemap(screen->machine(),bitmap,cliprect,RES_320x200,0x18000,0);
-					break;
-				case 0x01:
-					cga_alphanumeric_tilemap(screen->machine(),bitmap,cliprect,RES_640x200,0x18000,0);
-					break;
-			}
-		}
-	}
-
-	return 0;
-}
-
-static READ8_HANDLER( vga_regs_r )
-{
-	logerror("(PC=%05x) Warning: VGA reg port read\n",cpu_get_pc(&space->device()));
-	return 0xff;
-}
-
-static WRITE8_HANDLER( vga_regs_w )
-{
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-
-	if(offset == 0)
-	{
-		state->m_video_index = data;
-	}
-	if(offset == 1)
-	{
-		if(state->m_video_index <= 0x18)
-		{
-			state->m_video_regs[state->m_video_index] = data;
-			//logerror("write %02x to video register [%02x]",data,state->m_video_index);
-		}
-		else
-			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",cpu_get_pc(&space->device()),state->m_video_index,data);
-	}
-}
-
-static WRITE8_HANDLER( vga_vram_w )
-{
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	state->m_vga_vram[offset] = data;
-}
-
-/*end of Video HW file*/
 
 
 
@@ -714,12 +463,12 @@ static IRQ_CALLBACK(irq_callback)
 
 static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM 640KB
-	AM_RANGE(0xa0000, 0xbffff) AM_RAM_WRITE(vga_vram_w) AM_BASE_MEMBER(pcxt_state, m_vga_vram)//VGA RAM
+	AM_RANGE(0xa0000, 0xbffff) AM_RAM
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( filetto_io, AS_IO, 8 )
+static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
@@ -729,56 +478,33 @@ static ADDRESS_MAP_START( filetto_io, AS_IO, 8 )
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE_MODERN("rtc", mc146818_device, read, write)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
-//  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
-	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
-	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
-	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
-	AM_RANGE(0x03b4, 0x03b5) AM_READWRITE(vga_regs_r,vga_regs_w) //various VGA/CGA/EGA regs
-	AM_RANGE(0x03d4, 0x03d5) AM_READWRITE(vga_regs_r,vga_regs_w) //mirror of above
-	AM_RANGE(0x03d8, 0x03d9) AM_RAM AM_BASE_MEMBER(pcxt_state, m_vga_mode)
-	AM_RANGE(0x03ba, 0x03bb) AM_READ(vga_hvretrace_r)//Controls H-Blank/V-Blank
-	AM_RANGE(0x03da, 0x03db) AM_READ(vga_hvretrace_r)//mirror of above
 	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(drive_selection_w)
 	AM_RANGE(0x03f4, 0x03f4) AM_READ(fdc765_status_r) //765 Floppy Disk Controller (FDC) Status
 	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE(fdc765_data_r,fdc765_data_w)//FDC Data
 	AM_RANGE(0x03f8, 0x03ff) AM_RAM //rs232c (serial) port
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( filetto_io, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	AM_IMPORT_FROM( pcxt_io_common )
+//  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
+	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
+	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
+	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)    //8253 PIT
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE_MODERN("rtc", mc146818_device, read, write)
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
+	AM_IMPORT_FROM( pcxt_io_common )
 	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
-//  AM_RANGE(0x0201, 0x0201) AM_READ_PORT("IN1") //game port
-	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
-	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
-//  AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
-//  AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
-	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
-	AM_RANGE(0x03c0, 0x03c0) AM_RAM AM_BASE_MEMBER(pcxt_state, m_vga_bg_bank)
+//	AM_RANGE(0x03c0, 0x03c0) AM_RAM AM_BASE_MEMBER(pcxt_state, m_vga_bg_bank)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1")
-	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
-	AM_RANGE(0x03b4, 0x03b5) AM_READWRITE(vga_regs_r,vga_regs_w) //various VGA/CGA/EGA regs
-	AM_RANGE(0x03d4, 0x03d5) AM_READWRITE(vga_regs_r,vga_regs_w) //mirror of above
-	AM_RANGE(0x03d8, 0x03d9) AM_RAM AM_BASE_MEMBER(pcxt_state, m_vga_mode)
-	AM_RANGE(0x03ba, 0x03bb) AM_READ(vga_hvretrace_r)//Controls H-Blank/V-Blank
-	AM_RANGE(0x03da, 0x03db) AM_READ(vga_hvretrace_r)//mirror of above
-	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(drive_selection_w)
-	AM_RANGE(0x03f4, 0x03f4) AM_READ(fdc765_status_r) //765 Floppy Disk Controller (FDC) Status
-	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE(fdc765_data_r,fdc765_data_w)//FDC Data
-	AM_RANGE(0x03f8, 0x03ff) AM_RAM //rs232c (serial) port
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( filetto )
@@ -813,6 +539,9 @@ static INPUT_PORTS_START( filetto )
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "pcvideo_cga_config" )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetriskr )
@@ -852,106 +581,56 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "pcvideo_cga_config" )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
-static const gfx_layout dos_chars =
+
+/* F4 Character Displayer */
+static const gfx_layout pc_16_charlayout =
 {
-	8,16,
-	256,
-	1,
-	{ 0 },
+	8, 16,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	(0x4000)+(0*8),(0x4000)+(1*8),(0x4000)+(2*8),(0x4000)+(3*8),(0x4000)+(4*8),(0x4000)+(5*8),(0x4000)+(6*8),(0x4000)+(7*8) },
-	8*8
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
+	8*8					/* every char takes 2 x 8 bytes */
 };
 
-static const gfx_layout dos_chars2 =
+static const gfx_layout pc_8_charlayout =
 {
-	8,8,
-	256,
-	1,
-	{ 0 },
+	8, 8,					/* 8 x 8 characters */
+	512,					/* 512 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	8*8					/* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( filetto )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, dos_chars,    0, 0x100 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, dos_chars2,   0, 0x100 )
-	GFXDECODE_ENTRY( "gfx1", 0x1800, dos_chars2,   0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout,    3, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout,   3, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( tetriskr )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, dos_chars2,   0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout,    3, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout,   3, 1 )
 GFXDECODE_END
 
-
-/*
-BLACK = 0
-BLUE = 1
-GREEN = 2
-CYAN = 3
-RED = 4
-MAGENTA = 5
-BROWN = 6
-LIGHT GRAY = 7
-*/
-
-static const rgb_t defcolors[]=
-{
-	MAKE_RGB(0x00,0x00,0x00),
-	MAKE_RGB(0x00,0x00,0xaa),
-	MAKE_RGB(0x00,0xaa,0x00),
-	MAKE_RGB(0x00,0xaa,0xaa),
-	MAKE_RGB(0xaa,0x00,0x00),
-	MAKE_RGB(0xaa,0x00,0xaa),
-	MAKE_RGB(0xaa,0xaa,0x00),
-	MAKE_RGB(0xaa,0xaa,0xaa),
-	MAKE_RGB(0x55,0x55,0x55),
-	MAKE_RGB(0x55,0x55,0xff),
-	MAKE_RGB(0x55,0xff,0x55),
-	MAKE_RGB(0x55,0xff,0xff),
-	MAKE_RGB(0xff,0x55,0x55),
-	MAKE_RGB(0xff,0x55,0xff),
-	MAKE_RGB(0xff,0xff,0x55),
-	MAKE_RGB(0xff,0xff,0xff)
-};
-
-static PALETTE_INIT(filetto)
-{
-	/*Note:palette colors are 6bpp...
-    xxxx xx--
-    */
-	int ix,iy;
-
-	for(ix=0;ix<0x300;ix++)
-		palette_set_color(machine, ix,MAKE_RGB(0x00,0x00,0x00));
-
-	//regular colors
-	for(iy=0;iy<0x10;iy++)
-	{
-		for(ix=0;ix<0x10;ix++)
-		{
-			palette_set_color(machine,(ix*2)+1+(iy*0x20),defcolors[ix]);
-			palette_set_color(machine,(ix*2)+0+(iy*0x20),defcolors[iy]);
-		}
-	}
-
-	//bitmap mode
-	for(ix=0;ix<0x10;ix++)
-		palette_set_color(machine, 0x200+ix,defcolors[ix]);
-	//todo: 256 colors
-}
 
 static MACHINE_RESET( filetto )
 {
 	pcxt_state *state = machine.driver_data<pcxt_state>();
 	state->m_bank = -1;
 	state->m_lastvalue = -1;
-	state->m_hv_blank = 0;
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 	state->m_pit8253 = machine.device( "pit8253" );
 	state->m_pic8259_1 = machine.device( "pic8259_1" );
@@ -980,18 +659,8 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_GFXDECODE(filetto)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE(filetto)
-
-	MCFG_PALETTE_LENGTH(0x300)
-
-	MCFG_PALETTE_INIT(filetto)
-
-	MCFG_VIDEO_START(filetto)
 
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1024,18 +693,8 @@ static MACHINE_CONFIG_START( tetriskr, pcxt_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_GFXDECODE(tetriskr)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE(tetriskr)
-
-	MCFG_PALETTE_LENGTH(0x300)
-
-	MCFG_PALETTE_INIT(filetto)
-
-	MCFG_VIDEO_START(tetriskr)
 
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1074,8 +733,9 @@ ROM_START( tetriskr )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* code */
 	ROM_LOAD( "b-10.u10", 0xf0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
 
-	ROM_REGION( 0x10000, "gfx1",0 ) /* gfx - 1bpp font*/
-	ROM_LOAD( "b-3.u36", 0x00000, 0x2000, CRC(1a636f9a) SHA1(a356cc57914d0c9b9127670b55d1f340e64b1ac9) )
+	ROM_REGION( 0x2000, "gfx1",ROMREGION_ERASE00 ) /* gfx - 1bpp font*/
+	ROM_LOAD( "b-3.u36", 0x1800, 0x0800, CRC(1a636f9a) SHA1(a356cc57914d0c9b9127670b55d1f340e64b1ac9) )
+	ROM_IGNORE( 0x1800 )
 
 	ROM_REGION( 0x80000, "gfx2",ROMREGION_INVERT )
 	ROM_LOAD( "b-1.u59", 0x00000, 0x10000, CRC(4719d986) SHA1(6e0499944b968d96fbbfa3ead6237d69c769d634))
