@@ -64,7 +64,7 @@ the main program is 9th October 1990.
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
 #include "sound/hc55516.h"
-#include "sound/beep.h"
+#include "sound/speaker.h"
 #include "video/pc_cga.h"
 
 
@@ -86,6 +86,7 @@ public:
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
+	UINT8 m_pc_spkrdata, m_pc_input;
 
 	device_t	*m_pit8253;
 	device_t	*m_pic8259_1;
@@ -203,6 +204,37 @@ static WRITE8_HANDLER( disk_iobank_w )
 Pit8253
 *********************************/
 
+UINT8 pc_speaker_get_spk(running_machine &machine)
+{
+	pcxt_state *state = machine.driver_data<pcxt_state>();
+	return state->m_pc_spkrdata & state->m_pc_input;
+}
+
+
+void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data)
+{
+	device_t *speaker = machine.device("speaker");
+	pcxt_state *state = machine.driver_data<pcxt_state>();
+	state->m_pc_spkrdata = data ? 1 : 0;
+	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
+}
+
+
+void pc_speaker_set_input(running_machine &machine, UINT8 data)
+{
+	device_t *speaker = machine.device("speaker");
+	pcxt_state *state = machine.driver_data<pcxt_state>();
+	state->m_pc_input = data ? 1 : 0;
+	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
+}
+
+
+static WRITE_LINE_DEVICE_HANDLER( ibm5150_pit8253_out2_changed )
+{
+	pc_speaker_set_input( device->machine(), state );
+}
+
+
 static const struct pit8253_config pc_pit8253_config =
 {
 	{
@@ -217,7 +249,7 @@ static const struct pit8253_config pc_pit8253_config =
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_NULL
+			DEVCB_LINE(ibm5150_pit8253_out2_changed)
 		}
 	}
 };
@@ -255,7 +287,14 @@ static READ8_DEVICE_HANDLER( port_b_r )
 static READ8_DEVICE_HANDLER( port_c_r )
 {
 	pcxt_state *state = device->machine().driver_data<pcxt_state>();
-	return state->m_wss2_data;//???
+	int timer2_output = pit8253_get_output( state->m_pit8253, 2 );
+	if ( state->m_port_b_data & 0x01 )
+	{
+		state->m_wss2_data = ( state->m_wss2_data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+	}
+	state->m_wss2_data = ( state->m_wss2_data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+
+	return state->m_wss2_data;//TODO
 }
 
 /*'buzzer' sound routes here*/
@@ -264,6 +303,10 @@ static READ8_DEVICE_HANDLER( port_c_r )
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	pcxt_state *state = device->machine().driver_data<pcxt_state>();
+
+	/* PPI controller port B*/
+	pit8253_gate2_w(state->m_pit8253, BIT(data, 0));
+	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
 	state->m_port_b_data = data;
 // device_t *beep = device->machine().device("beep");
 // device_t *cvsd = device->machine().device("cvsd");
@@ -585,7 +628,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetriskr )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) //probably unused
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -663,6 +706,7 @@ GFXDECODE_END
 static MACHINE_RESET( filetto )
 {
 	pcxt_state *state = machine.driver_data<pcxt_state>();
+	device_t *speaker = machine.device("speaker");
 	state->m_bank = -1;
 	state->m_lastvalue = -1;
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
@@ -671,6 +715,11 @@ static MACHINE_RESET( filetto )
 	state->m_pic8259_2 = machine.device( "pic8259_2" );
 	state->m_dma8237_1 = machine.device( "dma8237_1" );
 	state->m_dma8237_2 = machine.device( "dma8237_2" );
+
+	state->m_pc_spkrdata = 0;
+	state->m_pc_input = 0;
+
+	speaker_level_w( speaker, 0 );
 }
 
 static MACHINE_CONFIG_START( filetto, pcxt_state )
@@ -703,8 +752,8 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 //  PC "buzzer" sound
-	MCFG_SOUND_ADD("beep", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tetriskr, filetto )
@@ -772,5 +821,5 @@ static DRIVER_INIT( tetriskr )
 	//...
 }
 
-GAME( 1990, filetto,  0, filetto,  filetto,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, tetriskr, ROT0,  "bootleg",    "Tetris (bootleg of Mirrorsoft PC-XT Tetris version)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1990, filetto,  0, filetto,  filetto,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_IMPERFECT_SOUND )
+GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, tetriskr, ROT0,  "bootleg",    "Tetris (bootleg of Mirrorsoft PC-XT Tetris version)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
