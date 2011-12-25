@@ -457,4 +457,4 @@ ROM_START( taxidriv )
 ROM_END
 
 
-GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, 0, ROT90, "[Graphic Techno]", "Taxi Driver", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, 0, ROT90, "Graphic Techno", "Taxi Driver", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
