@@ -265,6 +265,7 @@ static struct
 
 	size_t  videoram_size;
 	UINT8  *videoram;
+	UINT8 is_superimpose;
 } cga;
 
 
@@ -350,6 +351,7 @@ static VIDEO_START( pc_cga )
 	internal_pc_cga_video_start(machine);
 	cga.videoram_size = 0x4000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x4000);
+	cga.is_superimpose = 0;
 
 	memory_set_bankptr(machine,"bank11", cga.videoram);
 }
@@ -390,6 +392,7 @@ static VIDEO_START( pc_cga32k )
 
 	cga.videoram_size = 0x8000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x8000);
+	cga.is_superimpose = 0;
 
 	memory_set_bankptr(machine,"bank11", cga.videoram);
 }
@@ -437,6 +440,13 @@ static SCREEN_UPDATE( cga_poisk2 )
 		break;
 	}
 	return 0;
+}
+
+/* for superimposing CGA over a different source video (i.e. tetriskr) */
+VIDEO_START( pc_cga_superimpose )
+{
+	VIDEO_START_CALL( pc_cga );
+	cga.is_superimpose = 1;
 }
 
 /***************************************************************************
@@ -602,6 +612,51 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 	}
 }
 
+static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
+{
+	UINT8 *videoram = cga.videoram;
+	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
+	int i;
+	running_machine &machine = device->machine();
+
+	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
+	for ( i = 0; i < x_count; i++ )
+	{
+		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
+		UINT8 chr = videoram[ offset ];
+		UINT8 attr = videoram[ offset +1 ];
+		UINT8 data = cga.chr_gen[ chr * 8 + ra ];
+		UINT16 fg = attr & 0x0F;
+		UINT16 bg = attr >> 4;
+		UINT8 xi;
+
+		if ( i == cursor_x )
+		{
+			if ( cga.frame & 0x08 )
+			{
+				data = 0xFF;
+			}
+		}
+		else
+		{
+			if ( ( attr & 0x80 ) && ( cga.frame & 0x10 ) )
+			{
+				data = 0x00;
+			}
+		}
+
+		for(xi=0;xi<8;xi++)
+		{
+			UINT8 pen_data, dot;
+
+			dot = (data & (1 << (7-xi)));
+			pen_data = dot ? fg : bg;
+			if(pen_data || dot)
+				*p = pen_data;
+			p++;
+		}
+	}
+}
 
 /***************************************************************************
   Draw text mode with 40x25 characters (default) and blinking colors.
@@ -981,18 +1036,18 @@ static void pc_cga_mode_control_w(running_machine &machine, int data)
 			if ( cga.mode_control & 0x04 )
 			{
 				/* Composite greyscale */
-				cga.update_row = cga_text_blink_update_row;
+				cga.update_row = cga.is_superimpose ? cga_text_blink_update_row_si : cga_text_blink_update_row;
 			}
 			else
 			{
 				/* Composite colour */
-				cga.update_row = cga_text_blink_update_row;
+				cga.update_row = cga.is_superimpose ? cga_text_blink_update_row_si : cga_text_blink_update_row;
 			}
 		}
 		else
 		{
 			/* RGB colour */
-			cga.update_row = cga_text_blink_update_row;
+			cga.update_row = cga.is_superimpose ? cga_text_blink_update_row_si : cga_text_blink_update_row;
 		}
 		break;
 	case 0x38: case 0x39: case 0x3C: case 0x3D:

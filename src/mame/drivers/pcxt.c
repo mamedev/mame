@@ -117,6 +117,7 @@ static SCREEN_UPDATE( tetriskr )
 				for(xi=0;xi<8;xi++)
 				{
 					color = 0;
+					/* TODO: first byte seems bogus? */
 					for(pen_i = 0;pen_i<4;pen_i++)
 						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+state->m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
@@ -127,7 +128,7 @@ static SCREEN_UPDATE( tetriskr )
 		}
 	}
 
-	//SCREEN_UPDATE_CALL(mc6845_cga);
+	SCREEN_UPDATE_CALL(mc6845_cga);
 	return 0;
 }
 
@@ -711,6 +712,7 @@ static MACHINE_CONFIG_DERIVED( tetriskr, filetto )
 	MCFG_CPU_IO_MAP(tetriskr_io)
 
 	MCFG_DEVICE_MODIFY("screen")
+	MCFG_VIDEO_START(pc_cga_superimpose)
 	MCFG_SCREEN_UPDATE(tetriskr)
 
 	MCFG_DEVICE_REMOVE("voice")
