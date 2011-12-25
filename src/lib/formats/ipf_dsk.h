@@ -63,8 +63,8 @@ private:
 	bool gap_description_to_reserved_size(const UINT8 *&data, const UINT8 *dlimit, UINT32 &res_size);
 	bool generate_gap_from_description(const UINT8 *&data, const UINT8 *dlimit, UINT32 *track, UINT32 size, bool pre, bool &context);
 	bool generate_block_gap_0(UINT32 gap_cells, UINT8 pattern, UINT32 &spos, UINT32 ipos, UINT32 *track, bool &context);
-	bool generate_block_gap_1(UINT32 gap_cells, UINT32 &spos, const UINT8 *data, const UINT8 *dlimit, UINT32 *track, bool &context);
-	bool generate_block_gap_2(UINT32 gap_cells, UINT32 &spos, const UINT8 *data, const UINT8 *dlimit, UINT32 *track, bool &context);
+	bool generate_block_gap_1(UINT32 gap_cells, UINT32 &spos, UINT32 ipos, const UINT8 *data, const UINT8 *dlimit, UINT32 *track, bool &context);
+	bool generate_block_gap_2(UINT32 gap_cells, UINT32 &spos, UINT32 ipos, const UINT8 *data, const UINT8 *dlimit, UINT32 *track, bool &context);
 	bool generate_block_gap_3(UINT32 gap_cells, UINT32 &spos, UINT32 ipos, const UINT8 *data, const UINT8 *dlimit, UINT32 *track, bool &context);
 	bool generate_block_gap(UINT32 gap_type, UINT32 gap_cells, UINT8 pattern, UINT32 &spos, UINT32 ipos, const UINT8 *data, const UINT8 *dlimit, UINT32 *track, bool &context);
 
