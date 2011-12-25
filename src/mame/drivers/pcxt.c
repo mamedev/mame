@@ -276,6 +276,8 @@ static void vga_bitmap_layer(running_machine &machine, bitmap_t *bitmap,const re
 	/*TODO: might be a different descramble algorithm plus plain bg bank*/
 	cur_bank = (((8-state->m_vga_bg_bank[0]) & 0x1f)*0x10000);
 
+	popmessage("%02x",state->m_vga_bg_bank[0]);
+
 	for(y=0;y<200;y+=8)
 	{
 		for(z=0;z<8;z++)
@@ -963,7 +965,7 @@ static MACHINE_RESET( filetto )
 }
 
 static MACHINE_CONFIG_START( filetto, pcxt_state )
-	MCFG_CPU_ADD("maincpu", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
+	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
 
@@ -985,11 +987,8 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_GFXDECODE(filetto)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 480-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE(filetto)
 
 	MCFG_PALETTE_LENGTH(0x300)
@@ -1010,7 +1009,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tetriskr, pcxt_state )
-	MCFG_CPU_ADD("maincpu", I8088, 14318180/3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(tetriskr_io)
 
@@ -1032,11 +1031,8 @@ static MACHINE_CONFIG_START( tetriskr, pcxt_state )
 	MCFG_GFXDECODE(tetriskr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 480-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE(tetriskr)
 
 	MCFG_PALETTE_LENGTH(0x300)
