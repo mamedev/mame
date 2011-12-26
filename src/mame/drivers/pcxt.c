@@ -14,11 +14,9 @@ Notes:
 TODO:
 - 02851: tetriskr: Corrupt game graphics after some time of gameplay, caused by a wrong
   reading of the i/o $3c8 bit 1.
-- Filetto: Add a proper FDC device.
-- Filetto: Add sound,"buzzer" PC sound plus the UM5100 sound chip ,might be connected to the
-  prototyping card;
-- Korean Tetris: Add the aforementioned "buzzer" plus identify if there's any kind of sound
-  chip on it;
+- Add a proper FDC device.
+- Filetto: Add UM5100 sound chip ,might be connected to the prototyping card;
+- buzzer sound has issues in both games
 
 ********************************************************************************************
 Filetto HW notes:
@@ -239,15 +237,15 @@ static const struct pit8253_config pc_pit8253_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			XTAL_14_31818MHz/12,				/* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			XTAL_14_31818MHz/12,				/* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_LINE(ibm5150_pit8253_out2_changed)
 		}
@@ -586,7 +584,7 @@ static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8 )
 	AM_RANGE(0x03c0, 0x03c0) AM_WRITE(tetriskr_bg_bank_w)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
-//  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1")
+//  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( filetto )
@@ -628,7 +626,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetriskr )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) //probably unused
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -638,16 +636,15 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_START("IN1") //dip-switches?
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN1") //dip-switches
+	PORT_DIPNAME( 0x03, 0x03, "Starting Level" )
+	PORT_DIPSETTING(    0x03, "0" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x04, 0x04, "Starting Bomb" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -657,12 +654,11 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) duplicate
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 	PORT_START( "pcvideo_cga_config" )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -753,7 +749,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 
 //  PC "buzzer" sound
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tetriskr, filetto )
