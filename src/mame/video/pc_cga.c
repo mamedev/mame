@@ -187,6 +187,9 @@ static const mc6845_interface mc6845_cga_intf =
 	NULL
 };
 
+#define CGA_HCLK (XTAL_14_31818MHz/8)
+#define CGA_LCLK (XTAL_14_31818MHz/16)
+
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_cga )
 	MCFG_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
@@ -1059,6 +1062,10 @@ static void pc_cga_mode_control_w(running_machine &machine, int data)
 		break;
 	}
 
+	// The lowest bit of the mode register selects, among others, the
+	// input clock to the 6845.
+	mc6845->set_clock( ( cga.mode_control & 1 ) ? CGA_HCLK : CGA_LCLK );
+
 	pc_cga_set_palette_luts();
 }
 
@@ -1170,6 +1177,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 		break;
 	case 0x0f:
 		// Not sure if some all CGA cards have ability to upload char definition
+		// The original CGA card had a char rom
 		UINT8 buswidth = space->machine().firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 		address_space *space_prg = space->machine().firstcpu->memory().space(AS_PROGRAM);
 		cga.p3df = data;
