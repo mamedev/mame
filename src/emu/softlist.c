@@ -1520,7 +1520,7 @@ static void find_software_item(const device_list &devlist, emu_options &options,
 						if ( *software_info_ptr )
 						{
 							*software_part_ptr = software_find_part( *software_info_ptr, swpart, interface );
-							break;
+							if (*software_part_ptr) break;
 						}
 					}
 				}
