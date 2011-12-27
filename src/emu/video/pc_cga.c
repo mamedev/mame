@@ -78,7 +78,6 @@
 #include "emu.h"
 #include "video/pc_cga.h"
 #include "video/mc6845.h"
-#include "video/cgapal.h"
 #include "memconv.h"
 
 #define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */
@@ -92,6 +91,8 @@
 			logerror A; \
 		} \
 	} while (0)
+
+#include "video/cgapal.c"
 
 /***************************************************************************
 
