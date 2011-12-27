@@ -629,16 +629,14 @@ READ8_HANDLER( vga_port_03c0_r )
 
 	switch (offset)
 	{
+		case 0:
+			data = vga.attribute.index;
+			break;
 		case 1:
-			if (vga.attribute.state==0)
-			{
-				data = vga.attribute.index;
-			}
-			else
-			{
-				if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
-					data=vga.attribute.data[vga.attribute.index&0x1f];
-			}
+			if( vga.attribute.index & 0x20) // protection bit
+				data = 0xff; // TODO: actually undefined
+			else if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
+				data=vga.attribute.data[vga.attribute.index&0x1f];
 			break;
 
 		case 2:
@@ -766,8 +764,9 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		}
 		else
 		{
-			if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
-				vga.attribute.data[vga.attribute.index&0x1f]=data;
+			if(!(vga.attribute.index & 0x20)) // protection bit
+				if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
+					vga.attribute.data[vga.attribute.index&0x1f]=data;
 		}
 		vga.attribute.state=!vga.attribute.state;
 		break;
