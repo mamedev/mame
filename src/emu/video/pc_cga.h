@@ -7,7 +7,6 @@
 #define CGA_MC6845_NAME	"mc6845_cga"
 
 MACHINE_CONFIG_EXTERN( pcvideo_cga );
-MACHINE_CONFIG_EXTERN( pcvideo_cga_320x200 );
 MACHINE_CONFIG_EXTERN( pcvideo_cga32k );
 INPUT_PORTS_EXTERN( pcvideo_cga );
 SCREEN_UPDATE( mc6845_cga );

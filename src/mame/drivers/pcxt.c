@@ -190,7 +190,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 	if (newbank != state->m_bank)
 	{
 		state->m_bank = newbank;
-		memory_set_bankptr(space->machine(),  "bank1",space->machine().region("user1")->base() + 0x10000 * state->m_bank );
+		memory_set_bankptr(space->machine(),  "bank1",space->machine().region("game_prg")->base() + 0x10000 * state->m_bank );
 	}
 
 	state->m_lastvalue = data;
@@ -536,8 +536,9 @@ static IRQ_CALLBACK(irq_callback)
 
 static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM 640KB
-	AM_RANGE(0xa0000, 0xbffff) AM_RAM
+	AM_RANGE(0xa0000, 0xbffff) AM_RAM //CGA VRAM
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank1")
+	AM_RANGE(0xd0000, 0xeffff) AM_NOP
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -738,7 +739,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-	MCFG_FRAGMENT_ADD( pcvideo_cga_320x200 ) // TODO
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_GFXDECODE(pcxt)
 
 	/*Sound Hardware*/
@@ -774,7 +775,7 @@ ROM_START( filetto )
 	ROM_RELOAD(         0xf6000, 0x2000 )
 	ROM_RELOAD(         0xf2000, 0x2000 )
 
-	ROM_REGION( 0x40000, "user1", 0 ) // program data
+	ROM_REGION( 0x40000, "game_prg", 0 ) // program data
 	ROM_LOAD( "m0.u1", 0x00000, 0x10000, CRC(2408289d) SHA1(eafc144a557a79b58bcb48545cb9c9778e61fcd3) )
 	ROM_LOAD( "m1.u2", 0x10000, 0x10000, CRC(5b623114) SHA1(0d9a14e6b7f57ce4fa09762343b610a973910f58) )
 	ROM_LOAD( "m2.u3", 0x20000, 0x10000, CRC(abc64869) SHA1(564fc9d90d241a7b7776160b3fd036fb08037355) )
@@ -783,7 +784,7 @@ ROM_START( filetto )
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD("u67.bin", 0x0000, 0x2000, CRC(09710122) SHA1(de84bdd9245df287bbd3bb808f0c3531d13a3545) )
 
-	ROM_REGION( 0x40000, "user2", 0 ) // UM5100 sample roms?
+	ROM_REGION( 0x40000, "samples", 0 ) // UM5100 sample roms?
 	ROM_LOAD16_BYTE("v1.u15",  0x00000, 0x20000, CRC(613ddd07) SHA1(ebda3d559315879819cb7034b5696f8e7861fe42) )
 	ROM_LOAD16_BYTE("v2.u14",  0x00001, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
 ROM_END
