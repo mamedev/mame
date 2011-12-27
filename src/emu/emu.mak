@@ -277,6 +277,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/mc6845.o		\
 	$(EMUVIDEO)/msm6255.o		\
 	$(EMUVIDEO)/pc_cga.o		\
+	$(EMUVIDEO)/cgapal.o		\
 	$(EMUVIDEO)/pc_vga.o		\
 	$(EMUVIDEO)/poly.o		\
 	$(EMUVIDEO)/psx.o		\
@@ -349,7 +350,6 @@ $(EMUMACHINE)/s3c2400.o:	$(EMUSRC)/machine/s3c24xx.c
 $(EMUMACHINE)/s3c2410.o:	$(EMUSRC)/machine/s3c24xx.c
 $(EMUMACHINE)/s3c2440.o:	$(EMUSRC)/machine/s3c24xx.c
 
-$(EMUVIDEO)/pc_cga.o:    $(EMUVIDEO)/cgapal.o 
 
 #-------------------------------------------------
 # core layouts
