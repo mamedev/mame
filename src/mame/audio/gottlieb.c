@@ -527,7 +527,6 @@ static WRITE8_HANDLER( cobram3_speech_control_w )
 
 	if ( data & 0x10 )
 	{
-		device_t *ay = space->machine().device((data & 0x08) ? "ay1" : "ay2");
 		state->m_psg_data_latch = *state->m_psg_latch;
 	}
 	else
