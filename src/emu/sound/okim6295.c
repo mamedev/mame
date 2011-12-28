@@ -130,7 +130,10 @@ void okim6295_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
 
 	save_item(NAME(m_command));
+	save_item(NAME(m_bank_installed));
 	save_item(NAME(m_bank_offs));
+	save_item(NAME(m_pin7_state));
+
 	for (int voicenum = 0; voicenum < OKIM6295_VOICES; voicenum++)
 	{
 		save_item(NAME(m_voice[voicenum].m_playing), voicenum);
@@ -163,6 +166,7 @@ void okim6295_device::device_reset()
 void okim6295_device::device_post_load()
 {
 	set_bank_base(m_bank_offs);
+	device_clock_changed();
 }
 
 
