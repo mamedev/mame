@@ -9612,7 +9612,7 @@ ROM_START( slammast )
 	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, CRC(b8392f02) SHA1(8dedf9f43b30991694f8009302ca628cb50a0b1a) )
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
@@ -9675,7 +9675,7 @@ ROM_START( slammastu )
 	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, CRC(b8392f02) SHA1(8dedf9f43b30991694f8009302ca628cb50a0b1a) )
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
@@ -9715,21 +9715,21 @@ ROM_START( mbomberj )
 	ROMX_LOAD( "mb_13.bin",      0x400006, 0x80000, CRC(da810d5f) SHA1(392bbd405244b8c99024c9228cfec6a7ef0accdb) , ROM_GROUPWORD | ROM_SKIP(6) )
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* QSound Z80 code */
-	ROM_LOAD( "mb_qa.rom",      0x00000, 0x08000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
-	ROM_CONTINUE(               0x10000, 0x18000 )
+	ROM_LOAD( "mb_qa.5k",   0x00000, 0x08000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
+	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x8000, "user1", 0 )
 	ROM_COPY( "audiocpu", 0x00000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
-	ROM_LOAD( "mb_q1.bin",      0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
-	ROM_LOAD( "mb_q2.bin",      0x080000, 0x80000, CRC(354f9c21) SHA1(1dc6b39791fd0f760697f409a6b62361a7bf62e9) )
-	ROM_LOAD( "mb_q3.bin",      0x100000, 0x80000, CRC(7838487c) SHA1(056b7da05cfca46873edacd674ca25c70855c6db) )
-	ROM_LOAD( "mb_q4.bin",      0x180000, 0x80000, CRC(ab66e087) SHA1(066ea69a0157e8647eea3c44d0a1843898860678) )
-	ROM_LOAD( "mb_q5.bin",      0x200000, 0x80000, CRC(c789fef2) SHA1(10d1e3d92288fccd4e064a3716a788a165efc3c9) )
-	ROM_LOAD( "mb_q6.bin",      0x280000, 0x80000, CRC(ecb81b61) SHA1(e339f21ae47de4782f3b338befcdac659c3503f6) )
-	ROM_LOAD( "mb_q7.bin",      0x300000, 0x80000, CRC(041e49ba) SHA1(3220b033a5c0cfbbe75c0c113cf2db39fb093a7e) )
-	ROM_LOAD( "mb_q8.bin",      0x380000, 0x80000, CRC(59fe702a) SHA1(807178dfc6d864e49fd7aabb5c4895835cf0e85b) )
+	ROM_LOAD( "mb-q1.1k",   0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
+	ROM_LOAD( "mb-q2.2k",   0x080000, 0x80000, CRC(354f9c21) SHA1(1dc6b39791fd0f760697f409a6b62361a7bf62e9) )
+	ROM_LOAD( "mb-q3.3k",   0x100000, 0x80000, CRC(7838487c) SHA1(056b7da05cfca46873edacd674ca25c70855c6db) )
+	ROM_LOAD( "mb-q4.4k",   0x180000, 0x80000, CRC(ab66e087) SHA1(066ea69a0157e8647eea3c44d0a1843898860678) )
+	ROM_LOAD( "mb-q5.1m",   0x200000, 0x80000, CRC(c789fef2) SHA1(10d1e3d92288fccd4e064a3716a788a165efc3c9) )
+	ROM_LOAD( "mb-q6.2m",   0x280000, 0x80000, CRC(ecb81b61) SHA1(e339f21ae47de4782f3b338befcdac659c3503f6) )
+	ROM_LOAD( "mb-q7.3m",   0x300000, 0x80000, CRC(041e49ba) SHA1(3220b033a5c0cfbbe75c0c113cf2db39fb093a7e) )
+	ROM_LOAD( "mb-q8.4m",   0x380000, 0x80000, CRC(59fe702a) SHA1(807178dfc6d864e49fd7aabb5c4895835cf0e85b) )
 
 	ROM_REGION( 0x0200, "aboardplds", 0 )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
@@ -9738,12 +9738,18 @@ ROM_START( mbomberj )
 	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, CRC(b8392f02) SHA1(8dedf9f43b30991694f8009302ca628cb50a0b1a) )
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
+
+	ROM_REGION( 0x0200, "dboardplds", 0 )
+	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
+	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
+	ROM_LOAD( "d9k2.9k",      0x0000, 0x0117, CRC(cd85a156) SHA1(a88f8939c5d93e65d7bcc0eb3ee5b6f4f1114e3a) )	// pal verification required
+	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
 /* FIXME B-Board uncertain but should be 91635B from the program ROM names */
@@ -9775,18 +9781,18 @@ ROM_START( mbombrd )
 	ROMX_LOAD( "mb_13.bin",      0x400006, 0x80000, CRC(da810d5f) SHA1(392bbd405244b8c99024c9228cfec6a7ef0accdb) , ROM_GROUPWORD | ROM_SKIP(6) )
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* QSound Z80 code */
-	ROM_LOAD( "mb_q.bin",       0x00000, 0x08000, CRC(d6fa76d1) SHA1(3bfcb703e0e458ef1bb843230f8537167f1d4c3c) )
-	ROM_CONTINUE(               0x10000, 0x18000 )
+	ROM_LOAD( "mb_q.5k",    0x00000, 0x08000, CRC(d6fa76d1) SHA1(3bfcb703e0e458ef1bb843230f8537167f1d4c3c) )
+	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
-	ROM_LOAD( "mb_q1.bin",      0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
-	ROM_LOAD( "mb_q2.bin",      0x080000, 0x80000, CRC(354f9c21) SHA1(1dc6b39791fd0f760697f409a6b62361a7bf62e9) )
-	ROM_LOAD( "mb_q3.bin",      0x100000, 0x80000, CRC(7838487c) SHA1(056b7da05cfca46873edacd674ca25c70855c6db) )
-	ROM_LOAD( "mb_q4.bin",      0x180000, 0x80000, CRC(ab66e087) SHA1(066ea69a0157e8647eea3c44d0a1843898860678) )
-	ROM_LOAD( "mb_q5.bin",      0x200000, 0x80000, CRC(c789fef2) SHA1(10d1e3d92288fccd4e064a3716a788a165efc3c9) )
-	ROM_LOAD( "mb_q6.bin",      0x280000, 0x80000, CRC(ecb81b61) SHA1(e339f21ae47de4782f3b338befcdac659c3503f6) )
-	ROM_LOAD( "mb_q7.bin",      0x300000, 0x80000, CRC(041e49ba) SHA1(3220b033a5c0cfbbe75c0c113cf2db39fb093a7e) )
-	ROM_LOAD( "mb_q8.bin",      0x380000, 0x80000, CRC(59fe702a) SHA1(807178dfc6d864e49fd7aabb5c4895835cf0e85b) )
+	ROM_LOAD( "mb-q1.1k",   0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
+	ROM_LOAD( "mb-q2.2k",   0x080000, 0x80000, CRC(354f9c21) SHA1(1dc6b39791fd0f760697f409a6b62361a7bf62e9) )
+	ROM_LOAD( "mb-q3.3k",   0x100000, 0x80000, CRC(7838487c) SHA1(056b7da05cfca46873edacd674ca25c70855c6db) )
+	ROM_LOAD( "mb-q4.4k",   0x180000, 0x80000, CRC(ab66e087) SHA1(066ea69a0157e8647eea3c44d0a1843898860678) )
+	ROM_LOAD( "mb-q5.1m",   0x200000, 0x80000, CRC(c789fef2) SHA1(10d1e3d92288fccd4e064a3716a788a165efc3c9) )
+	ROM_LOAD( "mb-q6.2m",   0x280000, 0x80000, CRC(ecb81b61) SHA1(e339f21ae47de4782f3b338befcdac659c3503f6) )
+	ROM_LOAD( "mb-q7.3m",   0x300000, 0x80000, CRC(041e49ba) SHA1(3220b033a5c0cfbbe75c0c113cf2db39fb093a7e) )
+	ROM_LOAD( "mb-q8.4m",   0x380000, 0x80000, CRC(59fe702a) SHA1(807178dfc6d864e49fd7aabb5c4895835cf0e85b) )
 
 	ROM_REGION( 0x0200, "aboardplds", 0 )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
@@ -9795,12 +9801,18 @@ ROM_START( mbombrd )
 	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, NO_DUMP )										// supposing it's the same as slammast and clones, pal verification required
+	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, CRC(b8392f02) SHA1(8dedf9f43b30991694f8009302ca628cb50a0b1a) )	// supposing it's the same as slammast and clones, pal verification required
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
+
+	ROM_REGION( 0x0200, "dboardplds", 0 )
+	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
+	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
+	ROM_LOAD( "d9k2.9k",      0x0000, 0x0117, CRC(cd85a156) SHA1(a88f8939c5d93e65d7bcc0eb3ee5b6f4f1114e3a) )	// pal verification required
+	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
 /* FIXME B-Board uncertain but should be 91634B from the program ROM names */
@@ -9832,18 +9844,18 @@ ROM_START( mbombrdj )
 	ROMX_LOAD( "mb_13.bin",      0x400006, 0x80000, CRC(da810d5f) SHA1(392bbd405244b8c99024c9228cfec6a7ef0accdb) , ROM_GROUPWORD | ROM_SKIP(6) )
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* QSound Z80 code */
-	ROM_LOAD( "mb_q.bin",       0x00000, 0x08000, CRC(d6fa76d1) SHA1(3bfcb703e0e458ef1bb843230f8537167f1d4c3c) )
-	ROM_CONTINUE(               0x10000, 0x18000 )
+	ROM_LOAD( "mb_q.5k",    0x00000, 0x08000, CRC(d6fa76d1) SHA1(3bfcb703e0e458ef1bb843230f8537167f1d4c3c) )
+	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
-	ROM_LOAD( "mb_q1.bin",      0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
-	ROM_LOAD( "mb_q2.bin",      0x080000, 0x80000, CRC(354f9c21) SHA1(1dc6b39791fd0f760697f409a6b62361a7bf62e9) )
-	ROM_LOAD( "mb_q3.bin",      0x100000, 0x80000, CRC(7838487c) SHA1(056b7da05cfca46873edacd674ca25c70855c6db) )
-	ROM_LOAD( "mb_q4.bin",      0x180000, 0x80000, CRC(ab66e087) SHA1(066ea69a0157e8647eea3c44d0a1843898860678) )
-	ROM_LOAD( "mb_q5.bin",      0x200000, 0x80000, CRC(c789fef2) SHA1(10d1e3d92288fccd4e064a3716a788a165efc3c9) )
-	ROM_LOAD( "mb_q6.bin",      0x280000, 0x80000, CRC(ecb81b61) SHA1(e339f21ae47de4782f3b338befcdac659c3503f6) )
-	ROM_LOAD( "mb_q7.bin",      0x300000, 0x80000, CRC(041e49ba) SHA1(3220b033a5c0cfbbe75c0c113cf2db39fb093a7e) )
-	ROM_LOAD( "mb_q8.bin",      0x380000, 0x80000, CRC(59fe702a) SHA1(807178dfc6d864e49fd7aabb5c4895835cf0e85b) )
+	ROM_LOAD( "mb-q1.1k",   0x000000, 0x80000, CRC(0630c3ce) SHA1(520fc74c5c3638f611fa2f1b5efb08b91747e29b) )
+	ROM_LOAD( "mb-q2.2k",   0x080000, 0x80000, CRC(354f9c21) SHA1(1dc6b39791fd0f760697f409a6b62361a7bf62e9) )
+	ROM_LOAD( "mb-q3.3k",   0x100000, 0x80000, CRC(7838487c) SHA1(056b7da05cfca46873edacd674ca25c70855c6db) )
+	ROM_LOAD( "mb-q4.4k",   0x180000, 0x80000, CRC(ab66e087) SHA1(066ea69a0157e8647eea3c44d0a1843898860678) )
+	ROM_LOAD( "mb-q5.1m",   0x200000, 0x80000, CRC(c789fef2) SHA1(10d1e3d92288fccd4e064a3716a788a165efc3c9) )
+	ROM_LOAD( "mb-q6.2m",   0x280000, 0x80000, CRC(ecb81b61) SHA1(e339f21ae47de4782f3b338befcdac659c3503f6) )
+	ROM_LOAD( "mb-q7.3m",   0x300000, 0x80000, CRC(041e49ba) SHA1(3220b033a5c0cfbbe75c0c113cf2db39fb093a7e) )
+	ROM_LOAD( "mb-q8.4m",   0x380000, 0x80000, CRC(59fe702a) SHA1(807178dfc6d864e49fd7aabb5c4895835cf0e85b) )
 
 	ROM_REGION( 0x0200, "aboardplds", 0 )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
@@ -9852,12 +9864,18 @@ ROM_START( mbombrdj )
 	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, NO_DUMP )										// supposing it's the same as slammast and clones, pal verification required
+	ROM_LOAD( "mb63b.1a",     0x0000, 0x0117, CRC(b8392f02) SHA1(8dedf9f43b30991694f8009302ca628cb50a0b1a) )	// supposing it's the same as slammast and clones, pal verification required
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
+
+	ROM_REGION( 0x0200, "dboardplds", 0 )
+	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
+	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
+	ROM_LOAD( "d9k2.9k",      0x0000, 0x0117, CRC(cd85a156) SHA1(a88f8939c5d93e65d7bcc0eb3ee5b6f4f1114e3a) )	// pal verification required
+	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
 /* B-Board 89625B-1 */

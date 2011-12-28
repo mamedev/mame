@@ -136,8 +136,8 @@ Varth: Operation Thunderstorm* (Japan 920714)                  88622B-3   VA22B 
 Quiz & Dragons: Capcom Quiz Game* (USA 920701)           1992  89625B-1   QD22B            IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Quiz & Dragons: Capcom Quiz Game* (Japan 940921)         1994  91634B-2   QD63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 
-Warriors of Fate* (World 921031)                         1992  91635B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
-Warriors of Fate* (World 921002)                               91635B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Warriors of Fate* (World 921002)                         1992  91635B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Warriors of Fate* (World 921031)                               91635B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Warriors of Fate* (USA 921031)                                 91635B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Sangokushi II* (Asia 921005)                                   91634B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Tenchi wo Kurau II: Sekiheki no Tatakai* (Japan 921031)        91634B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
@@ -158,8 +158,8 @@ Saturday Night Slam Masters* (World 930713)              1993  91635B-2   MB63B 
 Saturday Night Slam Masters* (USA 930713)                      91635B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Muscle Bomber: The Body Explosion* (Japan 930713)              91634B-?   MB63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
 
-Muscle Bomber Duo: Ultimate Team Battle* (World 931206)  1993  91635B-?   ?        BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
-Muscle Bomber Duo: Heat Up Warriors* (Japan 931206)            91634B-?   ?        BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+Muscle Bomber Duo: Ultimate Team Battle* (World 931206)  1993  91635B-?   MB63B?   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+Muscle Bomber Duo: Heat Up Warriors* (Japan 931206)            91634B-?   MB63B?   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
 
 Ken Sei Mogura (Japan ??????)                            1994  ?          ?                ?     ?            ?         ?
 
