@@ -29,6 +29,7 @@ public:
 	UINT8 m_last_command;
 	UINT8 *m_dac_data;
 	UINT8 *m_psg_latch;
+	UINT8 m_psg_data_latch;
 	UINT8 *m_sp0250_latch;
 	int m_score_sample;
 	int m_random_offset;
@@ -67,6 +68,7 @@ WRITE8_HANDLER( gottlieb_sh_w );
 
 MACHINE_CONFIG_EXTERN( gottlieb_soundrev1 );
 MACHINE_CONFIG_EXTERN( gottlieb_soundrev2 );
+MACHINE_CONFIG_EXTERN( gottlieb_cobram3_soundrev2 );
 
 INPUT_PORTS_EXTERN( gottlieb1_sound );
 INPUT_PORTS_EXTERN( gottlieb2_sound );

@@ -1899,7 +1899,6 @@ static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
 MACHINE_CONFIG_END
 
 
-
 /*************************************
  *
  *  Specific machine drivers
@@ -1935,15 +1934,26 @@ static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )
 	MCFG_VIDEO_START(screwloo)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
+	MCFG_FRAGMENT_ADD(gottlieb_cobram3_soundrev2)
 
-static MACHINE_CONFIG_DERIVED( cobram3, g2laser )
+	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
+	MCFG_LASERDISC_AUDIO(laserdisc_audio_process)
+	MCFG_LASERDISC_OVERLAY(gottlieb, GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
+
+	MCFG_DEVICE_REMOVE("screen")
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+
+	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	/* right channel is processed as data */
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("dac1")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
 
 
 /*************************************

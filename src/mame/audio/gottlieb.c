@@ -514,6 +514,41 @@ static WRITE8_HANDLER( speech_control_w )
 		space->machine().device("spsnd")->reset();
 }
 
+static WRITE8_HANDLER( cobram3_speech_control_w )
+{
+	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
+	UINT8 previous = state->m_speech_control;
+	state->m_speech_control = data;
+
+	/* bit 0 enables/disables the NMI line */
+	nmi_state_update(space->machine());
+
+	/* bit 1 controls a LED on the sound board */
+
+	if ( data & 0x10 )
+	{
+		device_t *ay = space->machine().device((data & 0x08) ? "ay1" : "ay2");
+		state->m_psg_data_latch = *state->m_psg_latch;
+	}
+	else
+	{
+		device_t *ay = space->machine().device((data & 0x08) ? "ay1" : "ay2");
+		ay8910_address_w(ay, 0, *state->m_psg_latch);
+		ay8910_data_w(ay, 0, state->m_psg_data_latch);
+	}
+	/* bit 5 goes to the speech chip DIRECT DATA TEST pin */
+
+	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
+	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
+	{
+		device_t *sp = space->machine().device("spsnd");
+		sp0250_w(sp, 0, *state->m_sp0250_latch);
+	}
+
+	/* bit 7 goes to the speech chip RESET pin */
+	if ((previous ^ data) & 0x80)
+		space->machine().device("spsnd")->reset();
+}
 
 
 /*************************************
@@ -560,6 +595,18 @@ static ADDRESS_MAP_START( gottlieb_speech2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( gottlieb_cobram3_speech2_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1fff) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, m_sp0250_latch)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(cobram3_speech_control_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ_PORT("SB2")
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, m_psg_latch)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_WRITE(nmi_rate_w)
+	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ(speech_data_r)
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_WRITE(signal_audio_nmi_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( gottlieb_audio2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x3c00) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac1", gottlieb_dac_w) AM_BASE_MEMBER(gottlieb_state, m_dac_data)
@@ -602,6 +649,33 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_soundrev2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_FRAGMENT( gottlieb_cobram3_soundrev2 )
+	/* audio CPUs */
+	MCFG_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
+	MCFG_DEVICE_DISABLE()
+	MCFG_CPU_PROGRAM_MAP(gottlieb_audio2_map)
+
+	MCFG_CPU_ADD("speech", M6502, SOUND2_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(gottlieb_cobram3_speech2_map)
+
+	/* sound hardware */
+	MCFG_SOUND_START( gottlieb2 )
+
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
+	MCFG_SOUND_ADD("ay1", AY8913, SOUND2_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("ay2", AY8913, SOUND2_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("spsnd", SP0250, SOUND2_SPEECH_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 /*************************************
