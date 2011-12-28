@@ -79,6 +79,7 @@ Dip locations verified from manual for:
 - shogwarr
 
 [general]
+- interrupt timing/behaviour
 - replace sample bank copying with new ADDRESS MAP system for OKI and do banking like CPUs
 
 ***************************************************************************/
@@ -1752,32 +1753,21 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-/*
-    TODO:
-    Fix this arrangement (specific for Bonk's Adventure)!
-
-    pre-deprecat lib note says:
-    Even though 3 interrupts are triggered, I set an int_num of 4. (notice '+1')
-    I agree that it is kind of a misuse of the function, but I haven't found
-    clues in code on how interrupts are scheduled...
-    IT5 is the main int, and needs more time to execute than IT 3 and 4.
-    Between other things, each of these 2 int are responsible of translating
-    a part of sprite buffer from work ram to sprite ram.
-    So now test mode is fully working and visible.
-    SebV
-*/
 static TIMER_DEVICE_CALLBACK( kaneko16_interrupt )
 {
 	kaneko16_state *state = timer.machine().driver_data<kaneko16_state>();
 	int scanline = param;
 
-	if(scanline == 0)
+	// main vblank interrupt
+	if(scanline == 224)
 		device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
 
-	if(scanline == 180)
+	// each of these 2 int are responsible of translating a part of sprite buffer
+	// from work ram to sprite ram. How these are scheduled is unknown.
+	if(scanline == 64)
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 
-	if(scanline == 120)
+	if(scanline == 144)
 		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 }
 
@@ -2119,27 +2109,24 @@ static TIMER_DEVICE_CALLBACK( shogwarr_interrupt )
 	kaneko16_state *state = timer.machine().driver_data<kaneko16_state>();
 	int scanline = param;
 
-	if(scanline == 240)
+	if(scanline == 224)
 	{
+		// the code for this interrupt is provided by the MCU..
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 		calc3_mcu_run(timer.machine());
-	}
-
-	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
-
-	if(scanline == 128)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 
 #if 0
-	{
-			// hack, clear this ram address to get into test mode (interrupt would clear it)
+		// hack, clear this ram address to get into test mode (interrupt would clear it)
 		if (state->mainram[0x2dfe/2]==0xff00)
-		{
 			state->mainram[0x2dfe/2]=0x0000;
-		}
-	}
 #endif
+	}
+
+	if(scanline == 64)
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+
+	if(scanline == 144)
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 }
 
 /*
