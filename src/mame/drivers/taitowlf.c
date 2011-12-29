@@ -16,7 +16,7 @@
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-
+#include "video/pc_vga.h"
 
 class taitowlf_state : public driver_device
 {
@@ -24,7 +24,6 @@ public:
 	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT32 *m_cga_ram;
 	UINT32 *m_bios_ram;
 	UINT8 m_mxtc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
@@ -42,71 +41,6 @@ public:
 
 static void ide_interrupt(device_t *device, int state);
 
-
-static const rgb_t cga_palette[16] =
-{
-	MAKE_RGB( 0x00, 0x00, 0x00 ), MAKE_RGB( 0x00, 0x00, 0xaa ), MAKE_RGB( 0x00, 0xaa, 0x00 ), MAKE_RGB( 0x00, 0xaa, 0xaa ),
-	MAKE_RGB( 0xaa, 0x00, 0x00 ), MAKE_RGB( 0xaa, 0x00, 0xaa ), MAKE_RGB( 0xaa, 0x55, 0x00 ), MAKE_RGB( 0xaa, 0xaa, 0xaa ),
-	MAKE_RGB( 0x55, 0x55, 0x55 ), MAKE_RGB( 0x55, 0x55, 0xff ), MAKE_RGB( 0x55, 0xff, 0x55 ), MAKE_RGB( 0x55, 0xff, 0xff ),
-	MAKE_RGB( 0xff, 0x55, 0x55 ), MAKE_RGB( 0xff, 0x55, 0xff ), MAKE_RGB( 0xff, 0xff, 0x55 ), MAKE_RGB( 0xff, 0xff, 0xff ),
-};
-
-static VIDEO_START(taitowlf)
-{
-	int i;
-	for (i=0; i < 16; i++)
-	{
-		palette_set_color(machine, i, cga_palette[i]);
-	}
-}
-
-static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
-{
-	int i,j;
-	const UINT8 *dp;
-	int index = 0;
-	dp = gfx_element_get_data(gfx, ch);
-
-	for (j=y; j < y+8; j++)
-	{
-		UINT16 *p = BITMAP_ADDR16(bitmap, j, 0);
-		for (i=x; i < x+8; i++)
-		{
-			UINT8 pen = dp[index++];
-			if (pen)
-				p[i] = gfx->color_base + (att & 0xf);
-			else
-				p[i] = gfx->color_base  + ((att >> 4) & 0x7);
-		}
-	}
-}
-
-static SCREEN_UPDATE(taitowlf)
-{
-	taitowlf_state *state = screen->machine().driver_data<taitowlf_state>();
-	int i, j;
-	const gfx_element *gfx = screen->machine().gfx[0];
-	UINT32 *cga = state->m_cga_ram;
-	int index = 0;
-
-	bitmap_fill(bitmap, cliprect, 0);
-
-	for (j=0; j < 25; j++)
-	{
-		for (i=0; i < 80; i+=2)
-		{
-			int att0 = (cga[index] >> 8) & 0xff;
-			int ch0 = (cga[index] >> 0) & 0xff;
-			int att1 = (cga[index] >> 24) & 0xff;
-			int ch1 = (cga[index] >> 16) & 0xff;
-
-			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
-			index++;
-		}
-	}
-	return 0;
-}
 
 static READ8_DEVICE_HANDLER(at_dma8237_2_r)
 {
@@ -473,8 +407,8 @@ static WRITE32_HANDLER(at_page32_w)
 
 static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE_MEMBER(taitowlf_state, m_cga_ram)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
@@ -502,28 +436,6 @@ static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
-
-static const gfx_layout CGA_charlayout =
-{
-	8,8,					/* 8 x 16 characters */
-    256,                    /* 256 characters */
-    1,                      /* 1 bits per pixel */
-    { 0 },                  /* no bitplanes; 1 bit per pixel */
-    /* x offsets */
-    { 0,1,2,3,4,5,6,7 },
-    /* y offsets */
-	{ 0*8,1*8,2*8,3*8,
-	  4*8,5*8,6*8,7*8 },
-    8*8                     /* every char takes 8 bytes */
-};
-
-static GFXDECODE_START( CGA )
-/* Support up to four CGA fonts */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout,              0, 256 )   /* Font 0 */
-	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout,              0, 256 )   /* Font 1 */
-	GFXDECODE_ENTRY( "gfx1", 0x1000, CGA_charlayout,              0, 256 )   /* Font 2 */
-	GFXDECODE_ENTRY( "gfx1", 0x1800, CGA_charlayout,              0, 256 )   /* Font 3*/
-GFXDECODE_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
@@ -666,18 +578,8 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MCFG_SCREEN_UPDATE(taitowlf)
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	MCFG_GFXDECODE(CGA)
-	MCFG_PALETTE_LENGTH(16)
-
-	MCFG_VIDEO_START(taitowlf)
 MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine &machine, int a20)
@@ -714,6 +616,19 @@ static void taitowlf_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
+static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+
+static const struct pc_vga_interface vga_interface =
+{
+	NULL,
+	NULL,
+	vga_setting,
+	AS_PROGRAM,
+	0xa0000,
+	AS_IO,
+	0x0000
+};
+
 static DRIVER_INIT( taitowlf )
 {
 	taitowlf_state *state = machine.driver_data<taitowlf_state>();
@@ -724,6 +639,7 @@ static DRIVER_INIT( taitowlf )
 	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
+	pc_vga_init(machine, &vga_interface, NULL);
 }
 
 /*****************************************************************************/
@@ -732,8 +648,9 @@ ROM_START(pf2012)
 	ROM_REGION32_LE(0x40000, "user1", 0)
 	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
 
-	ROM_REGION(0x08100, "gfx1", 0)
-    ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+	ROM_REGION( 0x8000, "video_bios", 0 ) // needs a proper VGA dump (don't even know the model at current stage)
+	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION32_LE(0x400000, "user3", 0)		// Program ROM disk
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
