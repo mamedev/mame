@@ -76,6 +76,7 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "sound/dmadac.h"
+#include "video/ramdac.h"
 
 #define SPEEDUP_HACKS	1
 
@@ -384,7 +385,7 @@ static WRITE32_HANDLER( disp_ctrl_w )
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-	printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
+//	printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(state->m_disp_ctrl_reg + offset);
 }
 
@@ -433,9 +434,11 @@ static WRITE32_HANDLER( memory_ctrl_w )
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-	printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
+//	printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
+		ramdac_device *ramdac = space->machine().device<ramdac_device>("ramdac");
+
 		if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
 			// guess: crtc params?
@@ -444,6 +447,7 @@ static WRITE32_HANDLER( memory_ctrl_w )
 		else if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
 			state->m_pal_index = data;
+			ramdac->index_w( *space, 0, data );
 		}
 		else if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
@@ -453,6 +457,7 @@ static WRITE32_HANDLER( memory_ctrl_w )
 			{
 				state->m_pal_index = 0;
 			}
+			ramdac->pal_w( *space, 0, data );
 		}
 	}
 	else
@@ -1112,6 +1117,14 @@ static const struct pit8253_config mediagx_pit8254_config =
 	}
 };
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	0
+};
 
 static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
@@ -1142,6 +1155,8 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1151,7 +1166,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SCREEN_UPDATE(mediagx)
 
 	MCFG_GFXDECODE(CGA)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(mediagx)
 
