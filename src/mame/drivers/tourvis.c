@@ -8,6 +8,28 @@
     and the other as an integrated PCB.
 
     Todo: complete jamma interface emulation.
+
+	By now, three known BIOS versions, U4-52 (dumped from a board with-subboard PCB), 
+	U4-55 (dumped from an integrated PCB) and U4-60 (dumped from a board with-subboard PCB). 
+
+	Known games:
+
+    Special Crimimal Investigation
+    Power League IV
+    Final Match Tennis
+    Formation Soccer
+    Super Volleay Ball
+    Rastan Saga II
+    Dungeon Explorer
+    Legend Axe
+    Thunder Blade
+    USA Pro Basketball
+    Out Run
+    After Burner
+    Final Lap
+    Columns
+    Power Sports
+
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
 |                                           ____________               ____________               ____________               ____________       |
@@ -74,6 +96,62 @@ PT    = Push-type switch
 BT1   = 3.6 V battery
 XT2   = 21.32825 MHz UNI 90-H
 JP1-4 = Carts slots
+
+Games are dumped directly from the cartridge edge connector using the following adapter:
+
+ ----------------------------------------------------------------------------
+ Cartridge pinout
+ ----------------------------------------------------------------------------
+
+                       +----------+
+                (N.C.) |01      01| +5V
+                   +5V |02      02| +5V
+                   A18 |03      03| +5V
+                   A14 |04      04| A17
+                    A8 |05      05| A13
+                   A11 |06      06| A9
+                   A10 |07      07| OE#
+                    D7 |08      08| CE#
+(front of           D5 |09      09| D6               (rear of
+ cartridge)         D3 |10      10| D4                cartridge)
+                    D2 |11      11| GND
+                    D0 |12      12| D1
+                    A1 |13      13| A0
+                    A3 |14      14| A2
+                    A5 |15      15| A4
+                    A7 |16      16| A6
+                   A15 |17      17| A12
+                   A19 |18      18| A16
+                   GND |19      19| (N.C.)
+                   GND |20      20| (N.C.)
+                 (KEY) |21------21| (KEY)
+                (N.C.) |22      22| (N.C.)
+                (N.C.) |23      23| (N.C.)
+                (N.C.) |24      24| (N.C.)
+                (N.C.) |25      25| (N.C.)
+                       +----------+
+
+ ----------------------------------------------------------------------------
+ 27C080 pinout
+ ----------------------------------------------------------------------------
+                        +----v----+
+                    A19 | 1     32| +5V
+                    A16 | 2     31| A18
+                    A15 | 3     30| A17
+                    A12 | 4     29| A14
+                     A7 | 5     28| A13
+                     A6 | 6     27| A8
+                     A5 | 7     26| A9
+                     A4 | 8     25| A11
+                     A3 | 9     24| OE#
+                     A2 |10     23| A10
+                     A1 |11     22| CE#
+                     A0 |12     21| D7
+                     D0 |13     20| D6
+                     D1 |14     19| D5
+                     D2 |15     18| D4
+                    GND |16     17| D3
+                        +---------+
 
 ****************************************************************************/
 
@@ -152,7 +230,7 @@ static WRITE8_DEVICE_HANDLER(tourvision_i8155_c_w)
 
 static WRITE_LINE_DEVICE_HANDLER(tourvision_timer_out)
 {
-	cputag_set_input_line(device->machine(), "sub", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(device->machine(), "subcpu", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);
 }
 
@@ -181,7 +259,7 @@ static MACHINE_CONFIG_START( tourvision, tourvision_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_CPU_ADD("sub", I8085A, 18000000/3 /*?*/)
+	MCFG_CPU_ADD("subcpu", I8085A, 18000000/3 /*?*/)
 	MCFG_CPU_PROGRAM_MAP(tourvision_8085_map)
 
     /* video hardware */
@@ -207,6 +285,78 @@ static MACHINE_CONFIG_START( tourvision, tourvision_state )
 
 MACHINE_CONFIG_END
 
+#define TOURVISION_BIOS \
+	ROM_REGION( 0x8000, "subcpu", 0 ) \
+	ROM_SYSTEM_BIOS( 0, "60", "U4-60" ) \
+	ROMX_LOAD( "u4-60_am27c256.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(1) ) \
+	ROM_SYSTEM_BIOS( 1, "55", "U4-55" ) \
+	ROMX_LOAD( "u4-55_am27c256.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
+	ROM_SYSTEM_BIOS( 2, "52", "U4-52" ) \
+	ROMX_LOAD( "bios.29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) )
+	
+
+ROM_START(tourvis)
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+/*
+Aicom USA Pro Basketball Tourvision cart.
+
+Notes:
+ -4 identical 256KB parts, left unsplit for reference.
+ -Cart's A19 and A18 lines seems not connected to anything.
+ -CRC of split ROM ("1CAD4B7F") matches the common PC Engine Hu-Card ROM dump.
+*/
+
+
+ROM_START(tvusapb)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "tourv_usaprobasketball.bin", 0x00000, 0x40000, CRC(f9a86270) SHA1(45f33fd80a0fa16a9271d258d8e827c3d5e8c98d) )
+	ROM_CONTINUE(0x00000, 0x40000)
+	ROM_CONTINUE(0x00000, 0x40000)
+	ROM_CONTINUE(0x00000, 0x40000)
+
+	TOURVISION_BIOS
+ROM_END
+
+/*
+Sega Thunder Blade Tourvision cart.
+
+Notes:
+ -1st and 2nd halfs are identical, left unsplit for reference.
+ -Cart's A19 line seems not connected to anything.
+ -CRC of split ROM ("DDC3E809") matches the common PC Engine Hu-Card ROM dump.
+*/
+
+ROM_START(tvthbld)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "tourv_thunderblade.bin", 0x00000, 0x80000, CRC(0b93b85b) SHA1(b7d9fc2f46f95d305aa24326eded13abbe93738c) )
+	ROM_CONTINUE(0x00000, 0x80000)
+
+	TOURVISION_BIOS
+ROM_END
+
+/*
+Hudson Power League IV Tourvision cart.
+
+Notes:
+ -1st and 2nd halfs are identical, left unsplit for reference.
+ -Cart's A19 line seems not connected to anything.
+ -CRC of split ROM ("30cc3563") matches the common PC Engine Hu-Card ROM dump.
+*/
+
+ROM_START(tvpwlg4)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "tourv_powerleague4.bin", 0x00000, 0x80000, CRC(0a6e65f8) SHA1(88adf3f5b9a6d139f216bdb73abf8606bb8e5b16) )
+	ROM_CONTINUE(0x00000, 0x80000)
+
+	TOURVISION_BIOS
+ROM_END
+
+
 /*
 Taito Scene Crime Investigation (SCI) Tourvision cart.
 
@@ -215,61 +365,6 @@ Notes:
  -Cart's A19 line seems not connected to anything.
  -CRC of split ROM ("09a0bfcc") matches the common English language PC Engine Hu-Card ROM dump.
 
-Dumped directly from the cartridge edge connector using the following adapter:
-
- ----------------------------------------------------------------------------
- Cartridge pinout
- ----------------------------------------------------------------------------
-
-                       +----------+
-                (N.C.) |01      01| +5V
-                   +5V |02      02| +5V
-                   A18 |03      03| +5V
-                   A14 |04      04| A17
-                    A8 |05      05| A13
-                   A11 |06      06| A9
-                   A10 |07      07| OE#
-                    D7 |08      08| CE#
-(front of           D5 |09      09| D6               (rear of
- cartridge)         D3 |10      10| D4                cartridge)
-                    D2 |11      11| GND
-                    D0 |12      12| D1
-                    A1 |13      13| A0
-                    A3 |14      14| A2
-                    A5 |15      15| A4
-                    A7 |16      16| A6
-                   A15 |17      17| A12
-                   A19 |18      18| A16
-                   GND |19      19| (N.C.)
-                   GND |20      20| (N.C.)
-                 (KEY) |21------21| (KEY)
-                (N.C.) |22      22| (N.C.)
-                (N.C.) |23      23| (N.C.)
-                (N.C.) |24      24| (N.C.)
-                (N.C.) |25      25| (N.C.)
-                       +----------+
-
- ----------------------------------------------------------------------------
- 27C080 pinout
- ----------------------------------------------------------------------------
-                        +----v----+
-                    A19 | 1     32| +5V
-                    A16 | 2     31| A18
-                    A15 | 3     30| A17
-                    A12 | 4     29| A14
-                     A7 | 5     28| A13
-                     A6 | 6     27| A8
-                     A5 | 7     26| A9
-                     A4 | 8     25| A11
-                     A3 | 9     24| OE#
-                     A2 |10     23| A10
-                     A1 |11     22| CE#
-                     A0 |12     21| D7
-                     D0 |13     20| D6
-                     D1 |14     19| D5
-                     D2 |15     18| D4
-                    GND |16     17| D3
-                        +---------+
 */
 
 ROM_START(scitvpce)
@@ -277,8 +372,7 @@ ROM_START(scitvpce)
 	ROM_LOAD( "tourv_sci.bin", 0x00000, 0x80000, CRC(4baac6d8) SHA1(4c2431d9553e2bd952cf816e78fc1e3387376ef4) )
 	ROM_CONTINUE(0x00000, 0x80000)
 
-	ROM_REGION( 0x8000, "sub", 0 )
-	ROM_LOAD( "tourvision.bin", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f) )
+	TOURVISION_BIOS
 ROM_END
 
 static DRIVER_INIT(tourvision)
@@ -286,4 +380,8 @@ static DRIVER_INIT(tourvision)
 	DRIVER_INIT_CALL(pce);
 }
 
-GAME( 1991, scitvpce, 0, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
+GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Aicom", "USA Pro Basketball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, scitvpce, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
