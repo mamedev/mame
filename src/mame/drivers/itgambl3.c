@@ -236,9 +236,9 @@ static PALETTE_INIT( itgambl3 )
 
 	for(x=0;x<0x100;x++)
 	{
-		r = (x & 0xf)*0x10;
-		g = ((x & 0x3c)>>2)*0x10;
-		b = ((x & 0xf0)>>4)*0x10;
+		r = (x & 0xf)*0x11;
+		g = ((x & 0x3c)>>2)*0x11;
+		b = ((x & 0xf0)>>4)*0x11;
 		palette_set_color(machine,x,MAKE_RGB(r,g,b));
 	}
 }

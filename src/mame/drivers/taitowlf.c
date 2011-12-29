@@ -65,6 +65,27 @@ public:
 #if !ENABLE_VGA
 static SCREEN_UPDATE( taitowlf )
 {
+	int x,y,count;
+	const UINT8 *blit_ram = screen->machine().region("user5")->base();
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+
+	count = (0);
+
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<512;x++)
+		{
+			UINT32 color;
+
+			color = (blit_ram[count] & 0xff);
+
+			if((x)+0<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
+				*BITMAP_ADDR32(bitmap, y, x+0) = screen->machine().pens[color];
+
+			count++;
+		}
+	}
 
 	return 0;
 }
@@ -592,6 +613,17 @@ static const struct pit8253_config taitowlf_pit8254_config =
 	}
 };
 
+/* debug purpose*/
+static PALETTE_INIT( taitowlf )
+{
+	palette_set_color(machine,0x70,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine,0x71,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine,0x01,MAKE_RGB(0x55,0x00,0x00));
+	palette_set_color(machine,0x10,MAKE_RGB(0xaa,0x00,0x00));
+	palette_set_color(machine,0x00,MAKE_RGB(0x00,0x00,0x00));
+}
+
+
 static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 
 	/* basic machine hardware */
@@ -622,11 +654,12 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 400)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_PALETTE_LENGTH(256)
 	MCFG_SCREEN_UPDATE(taitowlf)
+	MCFG_PALETTE_INIT(taitowlf)
 	#endif
 MACHINE_CONFIG_END
 
