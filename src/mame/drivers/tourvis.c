@@ -188,7 +188,7 @@ static INPUT_PORTS_START( tourvision )
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
-	AM_RANGE( 0x000000, 0x07FFFF) AM_ROM
+	AM_RANGE( 0x000000, 0x0FFFFF) AM_ROM
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
@@ -298,7 +298,7 @@ MACHINE_CONFIG_END
 	
 
 ROM_START(tourvis)
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 
 	TOURVISION_BIOS
 ROM_END
@@ -315,11 +315,8 @@ Notes:
 
 
 ROM_START(tvusapb)
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "tourv_usaprobasketball.bin", 0x00000, 0x40000, CRC(f9a86270) SHA1(45f33fd80a0fa16a9271d258d8e827c3d5e8c98d) )
-	ROM_CONTINUE(0x00000, 0x40000)
-	ROM_CONTINUE(0x00000, 0x40000)
-	ROM_CONTINUE(0x00000, 0x40000)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_usaprobasketball.bin", 0x00000, 0x100000, CRC(f9a86270) SHA1(45f33fd80a0fa16a9271d258d8e827c3d5e8c98d) )
 
 	TOURVISION_BIOS
 ROM_END
@@ -334,12 +331,27 @@ Notes:
 */
 
 ROM_START(tvthbld)
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "tourv_thunderblade.bin", 0x00000, 0x80000, CRC(0b93b85b) SHA1(b7d9fc2f46f95d305aa24326eded13abbe93738c) )
-	ROM_CONTINUE(0x00000, 0x80000)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_thunderblade.bin", 0x00000, 0x100000, CRC(0b93b85b) SHA1(b7d9fc2f46f95d305aa24326eded13abbe93738c) )
 
 	TOURVISION_BIOS
 ROM_END
+
+/*
+Taito Rastan Saga II Tourvision cart.
+
+Notes:
+ -Cart's A18 line seems not connected to anything.
+
+*/
+
+ROM_START(tvrs2)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_rastansagaii.bin", 0x00000, 0x100000, CRC(cfe4c2f1) SHA1(1e39276b7d4bdb49421cc1102ad2fbba946127da) )
+
+	TOURVISION_BIOS
+ROM_END
+
 
 /*
 Hudson Power League IV Tourvision cart.
@@ -351,9 +363,8 @@ Notes:
 */
 
 ROM_START(tvpwlg4)
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "tourv_powerleague4.bin", 0x00000, 0x80000, CRC(0a6e65f8) SHA1(88adf3f5b9a6d139f216bdb73abf8606bb8e5b16) )
-	ROM_CONTINUE(0x00000, 0x80000)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_powerleague4.bin", 0x00000, 0x100000, CRC(0a6e65f8) SHA1(88adf3f5b9a6d139f216bdb73abf8606bb8e5b16) )
 
 	TOURVISION_BIOS
 ROM_END
@@ -370,9 +381,8 @@ Notes:
 */
 
 ROM_START(scitvpce)
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "tourv_sci.bin", 0x00000, 0x80000, CRC(4baac6d8) SHA1(4c2431d9553e2bd952cf816e78fc1e3387376ef4) )
-	ROM_CONTINUE(0x00000, 0x80000)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_sci.bin", 0x00000, 0x100000, CRC(4baac6d8) SHA1(4c2431d9553e2bd952cf816e78fc1e3387376ef4) )
 
 	TOURVISION_BIOS
 ROM_END
@@ -385,5 +395,6 @@ static DRIVER_INIT(tourvision)
 GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
 GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Aicom", "USA Pro Basketball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Rastan Saga II (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, scitvpce, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
