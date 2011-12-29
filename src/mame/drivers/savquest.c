@@ -100,4 +100,4 @@ ROM_START( savquest )
 ROM_END
 
 
-GAME(1999, savquest, 0, savquest, savquest, 0, ROT0, "Interactive Light", "Savage Quest", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(1999, savquest, 0, savquest, savquest, 0, ROT0, "Interactive Light", "Savage Quest", GAME_IS_SKELETON)

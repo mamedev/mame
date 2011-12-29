@@ -1,7 +1,29 @@
 /*  Taito Wolf System
 
     Driver by Ville Linde
+
+AMD M4-128N/64 stamped 'E58-01'
+AMD MACH231 stamped 'E58-02'
+AMD MACH211 stamped 'E58-03'
+Zoom ZFX2
+Zoom ZSG-2
+Taito TC0510NIO
+Panasonic MN1020019
+1x RAM NEC 42S4260
+1x RAM GM71C4400
+12x RAM Alliance AS4C256K16E0-35 (256k x 16)
+Mitsubishi M66220
+Fujitsu MB87078
+Atmel 93C66 EEPROM (4kb probably for high scores, test mode settings etc)
+ICS GENDAC ICS5342-3
+3DFX 500-0003-03 F805281.1 FBI
+3DFX 500-0004-02 F804701.1 TMU
+some logic
+clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
+
 */
+
+#define ENABLE_VGA 0
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
@@ -16,7 +38,9 @@
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#if ENABLE_VGA
 #include "video/pc_vga.h"
+#endif
 
 class taitowlf_state : public driver_device
 {
@@ -38,6 +62,13 @@ public:
 	device_t	*m_dma8237_2;
 };
 
+#if !ENABLE_VGA
+static SCREEN_UPDATE( taitowlf )
+{
+
+	return 0;
+}
+#endif
 
 static void ide_interrupt(device_t *device, int state);
 
@@ -408,7 +439,11 @@ static WRITE32_HANDLER(at_page32_w)
 static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	#if ENABLE_VGA
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
+	#else
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_NOP
+	#endif
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
@@ -580,8 +615,19 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* video hardware */
+	#if ENABLE_VGA
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-
+	#else
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 400)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_SCREEN_UPDATE(taitowlf)
+	#endif
 MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine &machine, int a20)
@@ -618,6 +664,7 @@ static void taitowlf_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
+#if ENABLE_VGA
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
 static const struct pc_vga_interface vga_interface =
@@ -630,6 +677,7 @@ static const struct pc_vga_interface vga_interface =
 	AS_IO,
 	0x0000
 };
+#endif
 
 static DRIVER_INIT( taitowlf )
 {
@@ -641,7 +689,9 @@ static DRIVER_INIT( taitowlf )
 	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
+	#if ENABLE_VGA
 	pc_vga_init(machine, &vga_interface, NULL);
+	#endif
 }
 
 /*****************************************************************************/
@@ -650,9 +700,11 @@ ROM_START(pf2012)
 	ROM_REGION32_LE(0x40000, "user1", 0)
 	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
 
-	ROM_REGION( 0x8000, "video_bios", 0 ) // needs a proper VGA dump (don't even know the model at current stage)
+	#if ENABLE_VGA
+	ROM_REGION( 0x8000, "video_bios", 0 ) // debug
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
+	#endif
 
 	ROM_REGION32_LE(0x400000, "user3", 0)		// Program ROM disk
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
