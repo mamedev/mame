@@ -613,6 +613,7 @@ static const struct pit8253_config taitowlf_pit8254_config =
 	}
 };
 
+#if !ENABLE_VGA
 /* debug purpose*/
 static PALETTE_INIT( taitowlf )
 {
@@ -622,7 +623,7 @@ static PALETTE_INIT( taitowlf )
 	palette_set_color(machine,0x10,MAKE_RGB(0xaa,0x00,0x00));
 	palette_set_color(machine,0x00,MAKE_RGB(0x00,0x00,0x00));
 }
-
+#endif
 
 static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 
