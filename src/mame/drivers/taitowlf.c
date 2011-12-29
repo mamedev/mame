@@ -437,6 +437,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
+#if 0
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
 
@@ -470,6 +471,7 @@ static INPUT_PORTS_START(taitowlf)
 
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
+#endif
 
 static IRQ_CALLBACK(irq_callback)
 {
@@ -683,4 +685,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(1997, pf2012, 0,	taitowlf, taitowlf, taitowlf,	ROT0,   "Taito",  "Psychic Force 2012", GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME(1997, pf2012, 0,	taitowlf, pc_keyboard, taitowlf,	ROT0,   "Taito",  "Psychic Force 2012", GAME_NOT_WORKING | GAME_NO_SOUND)

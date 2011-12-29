@@ -16,6 +16,14 @@
     ega/vga
     64k (early ega 16k) words of 32 bit memory
 
+	TODO:
+	- modernize
+	- convert to a device.
+	- fix pixel clock
+	- add emulated mc6845 hook-up
+	- fix resolution change
+	- fix video update.
+	- (and many more ...)
 
     ROM declarations:
 
@@ -525,38 +533,8 @@ static READ8_HANDLER(vga_crtc_r)
 	case 0xa:
 		vga.attribute.state = 0;
 		data = 0;/*4; */
-#if 0 /* slow */
-		{
-			int clock=vga.monitor.get_clock();
-			int lines=vga.monitor.get_lines();
-			int columns=vga.monitor.get_columns();
-			int diff = (((space->machine().time() - vga.monitor.start_time) * clock).seconds)
-				%(lines*columns);
-			if (diff<columns*vga.monitor.get_sync_lines()) data|=8;
-			diff=diff/lines;
-			if (diff%columns<vga.monitor.get_sync_columns()) data|=1;
-		}
-#elif 1
-		if (vga.monitor.retrace)
-		{
-			data |= 1;
-			if ((space->machine().time() - vga.monitor.start_time) > attotime::from_usec(300))
-			{
-				data |= 8;
-				vga.monitor.retrace=0;
-			}
-		}
-		else
-		{
-			if ((space->machine().time() - vga.monitor.start_time)  > attotime::from_msec(15))
-				vga.monitor.retrace=1;
-			vga.monitor.start_time=space->machine().time();
-		}
-#else
-		// not working with ps2m30
-		if (vga.monitor.retrace) data|=9;
-		vga.monitor.retrace=0;
-#endif
+		data |= (space->machine().primary_screen->hblank() & 1) << 0;
+		data |= (space->machine().primary_screen->vblank() & 1) << 3;
 		/* ega diagnostic readback enough for oak bios */
 		switch (vga.attribute.data[0x12]&0x30) {
 		case 0:
@@ -998,11 +976,6 @@ void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_in
 	pc_vga_reset(machine);
 }
 
-static TIMER_CALLBACK(vga_timer)
-{
-	vga.monitor.retrace=1;
-}
-
 static VIDEO_START( vga )
 {
 	vga.monitor.get_clock=vga_get_clock;
@@ -1010,7 +983,6 @@ static VIDEO_START( vga )
 	vga.monitor.get_columns=vga_get_crtc_columns;
 	vga.monitor.get_sync_lines=vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns=vga_get_crtc_sync_columns;
-	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(vga_timer));
 	pc_video_start(machine, pc_vga_choosevideomode);
 }
 
@@ -1269,11 +1241,8 @@ size_t pc_vga_memory_size(void)
 MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(720, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0,720-1, 0,480-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,800,0,640,525,0,480)
 	MCFG_SCREEN_UPDATE(pc_video)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(vga)
