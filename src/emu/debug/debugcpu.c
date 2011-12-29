@@ -1691,9 +1691,12 @@ device_debug::device_debug(device_t &device)
 	// set up state-related stuff
 	if (m_state != NULL)
 	{
-		// add a global symbol for the current instruction pointer
+		// add global symbol for cycles and totalcycles
 		if (m_exec != NULL)
+		{
 			m_symtable.add("cycles", NULL, get_cycles);
+			m_symtable.add("totalcycles", NULL, get_totalcycles);
+		}
 
 		// add entries to enable/disable unmap reporting for each space
 		if (m_memory != NULL)
@@ -3079,6 +3082,18 @@ UINT64 device_debug::get_cycles(symbol_table &table, void *ref)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	return device->debug()->m_exec->cycles_remaining();
+}
+
+
+//-------------------------------------------------
+//  get_totalcycles - getter callback for the
+//  'totalcycles' symbol
+//-------------------------------------------------
+
+UINT64 device_debug::get_totalcycles(symbol_table &table, void *ref)
+{
+	device_t *device = reinterpret_cast<device_t *>(table.globalref());
+	return device->debug()->m_exec->total_cycles();
 }
 
 

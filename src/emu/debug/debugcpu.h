@@ -243,6 +243,7 @@ private:
 	// symbol get/set callbacks
 	static UINT64 get_current_pc(symbol_table &table, void *ref);
 	static UINT64 get_cycles(symbol_table &table, void *ref);
+	static UINT64 get_totalcycles(symbol_table &table, void *ref);
 	static UINT64 get_logunmap(symbol_table &table, void *ref);
 	static void set_logunmap(symbol_table &table, void *ref, UINT64 value);
 	static UINT64 get_state(symbol_table &table, void *ref);
