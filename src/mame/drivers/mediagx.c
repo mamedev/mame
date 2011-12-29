@@ -384,6 +384,7 @@ static WRITE32_HANDLER( disp_ctrl_w )
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
+	printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(state->m_disp_ctrl_reg + offset);
 }
 
@@ -432,18 +433,26 @@ static WRITE32_HANDLER( memory_ctrl_w )
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-	//mame_printf_debug("memory_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
-	if (offset == 7)
+	printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
+	if (offset == 0x20/4)
 	{
-		state->m_pal_index = 0;
-	}
-	else if (offset == 8)
-	{
-		state->m_pal[state->m_pal_index] = data & 0xff;
-		state->m_pal_index++;
-		if (state->m_pal_index >= 768)
+		if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
-			state->m_pal_index = 0;
+			// guess: crtc params?
+			// ...
+		}
+		else if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
+		{
+			state->m_pal_index = data;
+		}
+		else if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
+		{
+			state->m_pal[state->m_pal_index] = data & 0xff;
+			state->m_pal_index++;
+			if (state->m_pal_index >= 768)
+			{
+				state->m_pal_index = 0;
+			}
 		}
 	}
 	else
