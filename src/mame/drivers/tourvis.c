@@ -14,14 +14,14 @@
 
 	Known games:
 
-    Special Crimimal Investigation
+    Special Criminal Investigation
     Power League IV
     Final Match Tennis
     Formation Soccer
     Super Volleay Ball
     Rastan Saga II
     Dungeon Explorer
-    Legend Axe
+    Legendary Axe
     Thunder Blade
     USA Pro Basketball
     Out Run
@@ -29,6 +29,8 @@
     Final Lap
     Columns
     Power Sports
+	Saigo no Nindou
+	Son Son II
 
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
